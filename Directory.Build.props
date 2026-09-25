@@ -1,0 +1,19 @@
+<Project>
+  <!-- Shared settings for every C# project (Godot game layer, Core, tests, tools). -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <Deterministic>true</Deterministic>
+    <Configurations>Debug;Release;ExportDebug;ExportRelease</Configurations>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+  <!-- Godot builds with ExportDebug/ExportRelease; make referenced libraries honour them. -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release' Or '$(Configuration)' == 'ExportRelease'">
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug' Or '$(Configuration)' == 'ExportDebug'">
+    <DefineConstants>$(DefineConstants);DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+</Project>

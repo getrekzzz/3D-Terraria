@@ -1,0 +1,17 @@
+<Project Sdk="Godot.NET.Sdk/4.7.2">
+  <!-- Godot-facing game layer. All simulation/data logic lives in src/Strata.Core (engine-agnostic). -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <RootNamespace>Strata.Game</RootNamespace>
+    <AssemblyName>Strata</AssemblyName>
+    <ImplicitUsings>disable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="src/**;tests/**;tools/**" />
+    <None Remove="src/**;tests/**;tools/**" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="src/Strata.Core/Strata.Core.csproj" />
+  </ItemGroup>
+</Project>

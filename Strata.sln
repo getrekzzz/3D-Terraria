@@ -1,0 +1,65 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata", "Strata.csproj", "{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8A71C3F9-36E2-4BFF-9FA8-7E67E6839DD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata.Core", "src\Strata.Core\Strata.Core.csproj", "{861282C9-E00A-4E47-A50F-65C539F12DA7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{CB9D2E54-7F72-4F3E-9987-B43F8799447F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata.Core.Tests", "tests\Strata.Core.Tests\Strata.Core.Tests.csproj", "{7481690C-AE67-48CD-9486-4FD46F6B2ED0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{98AE0890-0B6C-4FFF-8C02-2E2EB8E3928D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Strata.Tools", "tools\Strata.Tools\Strata.Tools.csproj", "{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		ExportDebug|Any CPU = ExportDebug|Any CPU
+		ExportRelease|Any CPU = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7481690C-AE67-48CD-9486-4FD46F6B2ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7481690C-AE67-48CD-9486-4FD46F6B2ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7481690C-AE67-48CD-9486-4FD46F6B2ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7481690C-AE67-48CD-9486-4FD46F6B2ED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{08B3EA20-4D38-4F7B-A965-8A77DD1C8DA1}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{861282C9-E00A-4E47-A50F-65C539F12DA7}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{7481690C-AE67-48CD-9486-4FD46F6B2ED0}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7481690C-AE67-48CD-9486-4FD46F6B2ED0}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F}.ExportDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F}.ExportRelease|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{861282C9-E00A-4E47-A50F-65C539F12DA7} = {8A71C3F9-36E2-4BFF-9FA8-7E67E6839DD8}
+		{7481690C-AE67-48CD-9486-4FD46F6B2ED0} = {CB9D2E54-7F72-4F3E-9987-B43F8799447F}
+		{0513AD63-4D3E-4DCF-ADF8-8CC873102D4F} = {98AE0890-0B6C-4FFF-8C02-2E2EB8E3928D}
+	EndGlobalSection
+EndGlobal

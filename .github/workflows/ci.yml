@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  core:
+    name: Core tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        # Windows runs only where it matters (determinism of world generation across OSes)
+        # to keep private-repo Actions minutes low.
+        os: ${{ (github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch') && fromJSON('["ubuntu-latest","windows-latest"]') || fromJSON('["ubuntu-latest"]') }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Module size guard
+        if: runner.os == 'Linux'
+        run: python3 tools/ci/check_file_length.py
+      - name: Build
+        run: dotnet build Strata.sln -c Debug
+      - name: Test
+        run: dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj -c Debug --no-build --logger "console;verbosity=normal"
