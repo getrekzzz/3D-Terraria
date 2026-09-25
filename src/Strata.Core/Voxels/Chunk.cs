@@ -39,6 +39,9 @@ public sealed class Chunk
     /// <summary>Changed since it was generated/loaded; must be persisted.</summary>
     public bool Modified { get; internal set; }
 
+    /// <summary>Flags gameplay state stored with the chunk (container contents, object state) for saving.</summary>
+    public void MarkModified() => Modified = true;
+
     /// <summary>Number of world mutations (hardmode conversions…) already applied to this chunk.</summary>
     public int MutationLevel { get; internal set; }
 

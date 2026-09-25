@@ -119,6 +119,9 @@ public sealed class GameWorld : IDisposable
 
     public event Action<PlayerEntity>? PlayerDied;
 
+    /// <summary>A player collected a dropped stack (count actually stored).</summary>
+    public event Action<PlayerEntity, ItemStack>? ItemPickedUp;
+
     /// <summary>Raised when a player respawns (the engine moves the body to <see cref="PlayerEntity.Position"/>).</summary>
     public event Action<PlayerEntity>? PlayerRespawned;
 
@@ -138,7 +141,12 @@ public sealed class GameWorld : IDisposable
         const float dt = 1f / Units.TicksPerSecond;
         var player = LocalPlayer;
         if (player is { Alive: true })
-            Drops.Tick(Session.World, dt, player.Center, stack => player.State.Inventory.Pickup(stack));
+            Drops.Tick(Session.World, dt, player.Center, stack =>
+            {
+                var rest = player.State.Inventory.Pickup(stack);
+                if (rest.Count < stack.Count) ItemPickedUp?.Invoke(player, stack.WithCount(stack.Count - rest.Count));
+                return rest;
+            });
         else
             Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
         foreach (var p in Players) TickPlayer(p);

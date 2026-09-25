@@ -70,17 +70,32 @@ public partial class GameRoot : Node
         var launched = WorldLauncher.Launch(this, Services, name, seed, size, forceNew);
         World = launched.Runtime;
         Commands = BuiltinCommands.CreateRegistry();
+        EngineCommands.Register(Commands, launched);
         CommandContext = GodotCommandHost.CreateContext(launched, Services.Log, Commands);
         var console = new DebugConsole();
         AddChild(console);
         console.Initialize(Commands, CommandContext);
+        ScreenshotCapture? capture = null;
         if (Services.Args.Get("screenshot") is { } shot)
-            AddChild(new ScreenshotCapture { World = launched.Runtime, OutputPath = shot });
+        {
+            capture = new ScreenshotCapture { World = launched.Runtime, OutputPath = shot };
+            AddChild(capture);
+        }
         if (Services.Args.Get("smoke") is { } script)
         {
             // Scripts aim from the eye: first person makes the crosshair ray and the eye ray coincide.
             if (launched.Player != null) launched.Player.Rig.FirstPerson = true;
             StartScript(script);
+        }
+        else if (Services.Args.Get("exec") is { } exec)
+        {
+            // Inline startup commands separated by ';' (screenshots, manual testing); the game keeps running.
+            var runner = new ScriptRunner { Name = "ExecRunner", QuitWhenDone = false };
+            bool done = false;
+            runner.Finished += _ => done = true;
+            if (capture != null) capture.WaitFor = () => done;
+            AddChild(runner);
+            runner.Start("--exec", exec.Replace(';', '\n'), Commands, CommandContext!);
         }
         else if (launched.Player != null) Input.MouseMode = Input.MouseModeEnum.Captured;
         return launched;

@@ -18,6 +18,9 @@ public sealed partial class ScreenshotCapture : Node
     public double TimeoutSeconds { get; set; } = 240;
     public bool QuitAfter { get; set; } = true;
 
+    /// <summary>Extra readiness condition (e.g. a startup script has finished).</summary>
+    public System.Func<bool>? WaitFor { get; set; }
+
     public event System.Action<string>? Captured;
 
     private double _nextReport = 5;
@@ -31,7 +34,7 @@ public sealed partial class ScreenshotCapture : Node
             var s = World.Streamer;
             GD.Print($"[stream] t={_elapsed:F0}s loaded={s.LoadedCount} meshed={s.MeshedCount} loads={s.LoadsInFlight} meshes={s.MeshesInFlight} jobs={World.Jobs.Pending}/{World.Jobs.Running} uploads={World.Renderer.PendingUploads} idle={s.IsIdle}");
         }
-        bool idle = World.Streamer.IsIdle && World.Renderer.PendingUploads == 0 && World.Jobs.Idle;
+        bool idle = World.Streamer.IsIdle && World.Renderer.PendingUploads == 0 && World.Jobs.Idle && (WaitFor?.Invoke() ?? true);
         _idleTime = idle ? _idleTime + delta : 0;
         if (_idleTime < SettleSeconds && _elapsed < TimeoutSeconds) return;
         SetProcess(false);
