@@ -19,6 +19,7 @@ public static class BuiltinCommands
         EditCommands.Register(r);
         CombatCommands.Register(r);
         LiquidCommands.Register(r);
+        TownCommands.Register(r);
         return r;
     }
 

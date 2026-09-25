@@ -4,7 +4,9 @@ using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Events;
 using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Gameplay.Items;
+using Strata.Core.Gameplay.Housing;
 using Strata.Core.Gameplay.Liquids;
+using Strata.Core.Gameplay.Navigation;
 using Strata.Core.Gameplay.Player;
 using Strata.Core.Gameplay.Stats;
 using Strata.Core.Persistence;
@@ -113,6 +115,8 @@ public sealed class GameWorld : IDisposable
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
         Liquids = new LiquidSimulator(session);
+        Housing = new HousingScanner(session.World);
+        Navigator = new VoxelNavigator(session.World);
         LiquidEffects = new LiquidEffects(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
@@ -133,6 +137,8 @@ public sealed class GameWorld : IDisposable
     public SpawnDirector Spawner { get; }
     public EventDirector Events { get; }
     public LiquidSimulator Liquids { get; }
+    public HousingScanner Housing { get; }
+    public VoxelNavigator Navigator { get; }
     public LiquidEffects LiquidEffects { get; }
     public string? PlayerDirectory { get; }
     public List<PlayerEntity> Players { get; } = new();

@@ -54,8 +54,23 @@ public sealed class ObjectInteraction
     }
 
     /// <summary>Whether a door currently blocks movement (closed doors are solid).</summary>
-    public static bool Blocks(TileObjectInstance obj) =>
-        obj.Def.Collision == TileCollision.Solid && !(obj.Def.Interaction == TileInteraction.Door && obj.Active);
+    public static bool Blocks(TileObjectInstance obj) => obj.BlocksMovement;
+
+    /// <summary>Opens or closes a door for a non-player walker (town folk); refuses to close on a body in the way.</summary>
+    public bool SetDoor(TileObjectInstance door, bool open, IEnumerable<(System.Numerics.Vector3 Min, System.Numerics.Vector3 Max)> bodiesInCells)
+    {
+        if (!door.IsDoor || door.Active == open) return false;
+        if (!open)
+        {
+            var b = door.Bounds;
+            foreach (var (min, max) in bodiesInCells)
+                if (min.X < b.Max.X && max.X > b.Min.X && min.Y < b.Max.Y && max.Y > b.Min.Y && min.Z < b.Max.Z && max.Z > b.Min.Z) return false;
+        }
+        door.Active = open;
+        MarkModified(door);
+        StateChanged?.Invoke(door);
+        return true;
+    }
 
     private static bool Overlaps(PlayerEntity p, TileObjectInstance obj)
     {

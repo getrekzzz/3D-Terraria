@@ -33,6 +33,7 @@ internal static class StandardProbes
         ctx.AddProbe("npcs.alive_life", () => w.Npcs.All.Sum(n => n.Life));
         ctx.AddProbe("projectiles.count", () => w.Projectiles.All.Count);
         ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
+        ctx.AddProbe("house.valid", () => w.Housing.Scan(ctx.Player.FeetCell + Int3.Up).Valid ? 1 : 0);
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
         ctx.AddProbe("player.in_liquid", () => ctx.Player.Liquid?.Code ?? 0);
         ctx.AddProbe("player.submerged", () => ctx.Player.Submerged ? 1 : 0);

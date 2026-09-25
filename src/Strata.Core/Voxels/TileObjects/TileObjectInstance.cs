@@ -32,6 +32,11 @@ public sealed class TileObjectInstance
     public int Variant { get; }
 
     public Int3 Footprint => FootprintOf(Def, Rotation);
+
+    /// <summary>Solid objects stop bodies; an open door does not.</summary>
+    public bool BlocksMovement => Def.Collision == TileCollision.Solid && !(Def.Interaction == TileInteraction.Door && Active);
+
+    public bool IsDoor => Def.Interaction == TileInteraction.Door;
     public Aabb3i Bounds => new(Anchor, Anchor + Footprint);
 
     public int HitPoints { get; set; }

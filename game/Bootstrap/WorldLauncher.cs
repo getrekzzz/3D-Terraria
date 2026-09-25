@@ -57,6 +57,7 @@ public static class WorldLauncher
         runtime.AddChild(objectRenderer);
         objectRenderer.Initialize(runtime, props);
         game.Spawner.Config = Strata.Core.Gameplay.Entities.SpawnConfig.Load(services.Data);
+        game.Housing.Config = Strata.Core.Gameplay.Housing.HousingConfig.Load(services.Data);
         var creatures = new Entities.NpcRenderer();
         runtime.AddChild(creatures);
         creatures.Initialize(game, props);

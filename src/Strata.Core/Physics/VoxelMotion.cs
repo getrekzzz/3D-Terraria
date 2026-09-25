@@ -5,8 +5,8 @@ using Strata.Core.Voxels;
 namespace Strata.Core.Physics;
 
 /// <summary>
-/// Axis-separated AABB movement against solid voxels (dropped items, simple creatures, projectiles).
-/// Positions are in meters (box centre), sizes are half-extents in meters.
+/// Axis-separated AABB movement against solid voxels and blocking tile objects such as closed doors (dropped items,
+/// creatures, projectiles). Positions are in meters (box centre), sizes are half-extents in meters.
 /// </summary>
 public static class VoxelMotion
 {
@@ -48,7 +48,7 @@ public static class VoxelMotion
         for (int y = y0; y < y1; y++)
             for (int z = z0; z < z1; z++)
                 for (int x = x0; x < x1; x++)
-                    if (world.IsSolid(x, y, z)) return true;
+                    if (world.IsSolid(x, y, z) || world.TileObjects.At(new Int3(x, y, z)) is { BlocksMovement: true }) return true;
         return false;
     }
 
