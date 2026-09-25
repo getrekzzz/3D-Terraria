@@ -7,8 +7,9 @@
 │        ObjectColliders, TileObjectRenderer                        │
 │ Player: PlayerController, CameraRig, PlayerAvatar,                │
 │         InteractionController, TargetHighlight                    │
-│ Entities: NpcRenderer, ProjectileRenderer, CombatEffects          │
-│ UI: Hud, InventoryScreen, CraftingPanel, DebugConsole, PerfOverlay│
+│ Entities: NpcRenderer, TownRenderer, ProjectileRenderer, effects  │
+│ UI: Hud, InventoryScreen, CraftingPanel, TownDialog, DebugConsole,│
+│     PerfOverlay                                                   │
 │ Rendering: PropLibrary, CreatureVisual, LightProbe, shaders/      │
 │ Testing: ScriptRunner (.cmds), ScreenshotCapture                  │
 └──────────────────────────────┬────────────────────────────────────┘
@@ -17,7 +18,8 @@
 │ Session.GameWorld: streaming + jobs + clock + WorldEditor +       │
 │   DroppedItemSystem + players + NpcSystem + MeleeSystem +         │
 │   ProjectileSystem + SpawnDirector + ItemUseSystem + interaction +│
-│   EventDirector + LiquidSimulator + LiquidEffects                 │
+│   EventDirector + LiquidSimulator + LiquidEffects + TownSystem +  │
+│   TownCommerce + HousingScanner + VoxelNavigator                  │
 │ WorldSession: content, generator, VoxelWorld, sky map, saves      │
 │ Content · Voxels · WorldGen · Lighting · Meshing · Streaming      │
 │ Gameplay (items, crafting, combat, stats, buffs, mining, building)│
@@ -45,6 +47,6 @@
    colliders near the player, environment (sun/moon/fog).
 2. `_PhysicsProcess`: `PlayerController` moves the body and syncs the Core `PlayerEntity`;
    `InteractionController` targets and uses items; `GameWorld.Tick()` advances clock, drops, players,
-   liquids (flow + contact effects), events, spawner, creatures, melee, projectiles, autosave.
+   liquids (flow + contact effects), events, spawner, creatures, town residents, melee, projectiles, autosave.
 3. Presentation nodes (`TileObjectRenderer`, `NpcRenderer`, `DroppedItemRenderer`, HUD) read Core state and
    react to Core events (object added/removed, damage, kills, pickups).

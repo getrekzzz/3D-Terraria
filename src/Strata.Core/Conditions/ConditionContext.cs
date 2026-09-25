@@ -34,6 +34,18 @@ public sealed class ConditionContext
     public IReadOnlySet<string> Events { get; set; } = Empty;
     public IReadOnlySet<string> NearbyLiquids { get; set; } = Empty;
 
+    /// <summary>Copper value of the coins the (richest) player carries.</summary>
+    public long PlayerCoins { get; set; }
+
+    /// <summary>Highest maximum life among the players.</summary>
+    public int PlayerMaxLife { get; set; }
+
+    /// <summary>Town residents currently living in the world (town NPC ids).</summary>
+    public IReadOnlySet<string> Residents { get; set; } = Empty;
+
+    /// <summary>How many of an item (or items with a tag, "#tag") the players carry; null = unknown (0).</summary>
+    public Func<string, int>? ItemCount { get; set; }
+
     public Pcg32 Random;
 
     public bool HasBiome(string id)

@@ -15,6 +15,7 @@ public sealed partial class CombatEffects : Node3D
         Name = "CombatEffects";
         game.Npcs.Damaged += e => Number(e);
         game.Npcs.Killed += npc => Puff(new Vector3(npc.Center.X, npc.Center.Y, npc.Center.Z), Color.FromHtml(npc.Def.Tint), npc.HalfExtents.Y);
+        game.Town.Hurt += (t, dmg) => Number(new DamageEvent(t.Center + new System.Numerics.Vector3(0, 1.1f, 0), dmg, false, true));
         game.Liquids.Mixed += (cell, _) => Puff((new Vector3(cell.X, cell.Y, cell.Z) + new Vector3(0.5f, 1f, 0.5f)) * Strata.Core.Common.Units.CellSize, new Color(0.85f, 0.85f, 0.88f), 0.6f, rise: true);
         game.LiquidEffects.ItemDestroyed += (item, liquid) => Puff(new Vector3(item.Position.X, item.Position.Y, item.Position.Z), Color.FromHtml(liquid.Color), 0.2f, rise: true);
     }

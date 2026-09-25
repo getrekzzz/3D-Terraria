@@ -24,6 +24,7 @@ public sealed class LaunchedWorld
     public FreeCamera? FreeCamera { get; init; }
     public UI.InventoryScreen? Inventory { get; init; }
     public UI.Hud? Hud { get; init; }
+    public UI.TownDialog? TownDialog { get; init; }
 }
 
 /// <summary>Creates or loads a world and assembles the scene nodes that present it.</summary>
@@ -58,9 +59,13 @@ public static class WorldLauncher
         objectRenderer.Initialize(runtime, props);
         game.Spawner.Config = Strata.Core.Gameplay.Entities.SpawnConfig.Load(services.Data);
         game.Housing.Config = Strata.Core.Gameplay.Housing.HousingConfig.Load(services.Data);
+        game.Town.Config = Strata.Core.Gameplay.Town.TownConfig.Load(services.Data);
         var creatures = new Entities.NpcRenderer();
         runtime.AddChild(creatures);
         creatures.Initialize(game, props);
+        var residents = new Entities.TownRenderer();
+        runtime.AddChild(residents);
+        residents.Initialize(game, props);
         var projectiles = new Entities.ProjectileRenderer();
         runtime.AddChild(projectiles);
         projectiles.Initialize(game, props);
@@ -110,10 +115,13 @@ public static class WorldLauncher
         var inventory = new UI.InventoryScreen();
         runtime.AddChild(inventory);
         inventory.Initialize(ui);
+        var townDialog = new UI.TownDialog();
+        runtime.AddChild(townDialog);
+        townDialog.Initialize(ui);
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
-        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud };
+        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

@@ -604,6 +604,56 @@
       "params": {
         "part": "tail"
       }
+    },
+    "wayfinder": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#e0b088",
+        "shirt": "#5a7a3a",
+        "pants": "#4a3a2a",
+        "hair": "#6a4020",
+        "boots": "#8a6a50",
+        "coat": "#6a5a3a"
+      }
+    },
+    "peddler": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#e8b890",
+        "shirt": "#8a5a2a",
+        "pants": "#3a3a3a",
+        "hair": "#c8c8c8",
+        "beard": "#d8d8d8",
+        "hat": "wide",
+        "hatColor": "#5a3a1a",
+        "coat": "#6a4424"
+      }
+    },
+    "mender": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#f0c8a0",
+        "shirt": "#f0f0f0",
+        "pants": "#e8e8e8",
+        "hair": "#c84a2a",
+        "hat": "cap",
+        "hatColor": "#ffffff",
+        "apron": "#f0a0b0",
+        "boots": "#f0f0f0"
+      }
+    },
+    "grovekeeper": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#d8b080",
+        "shirt": "#4a8a3a",
+        "pants": "#3a6a2a",
+        "hair": "#6aa84a",
+        "hat": "wreath",
+        "hatColor": "#7ab050",
+        "flower": "#f0d040",
+        "boots": "#6a4a2a"
+      }
     }
   }
 }

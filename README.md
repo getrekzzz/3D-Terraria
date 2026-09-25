@@ -22,7 +22,7 @@ Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medi
 |---|---|
 | WASD, Space, Shift, Ctrl | move, jump (hold for height), sprint, drop through platforms |
 | Mouse / wheel / 1–0 | look / hotbar |
-| LMB / RMB or E | use held item (mine, chop, place, attack, drink) / interact (doors, chests, beds) |
+| LMB / RMB or E | use held item (mine, chop, place, attack, drink, buckets) / interact (doors, chests, beds, talk to residents) |
 | T / Shift+T, R, Alt | cycle build shape, rotate, precision (single-cell) mining |
 | Q (Ctrl+Q) | drop one (stack) |
 | Tab or I | inventory, equipment, crafting, open chest |
@@ -30,7 +30,7 @@ Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medi
 | ` or F1 / F3 / Esc | console / performance overlay / release mouse |
 
 Console commands include `help`, `give`, `spawn`, `boss`, `event`, `tp`, `biome`, `time`, `flag`, `setblock`,
-`fill`, `place`, `liquid`, `liquids`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`
+`fill`, `place`, `liquid`, `liquids`, `house`, `town`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`
 (`help <command>` for usage).
 
 ## Developing

@@ -7,6 +7,7 @@
     "events.json",
     "liquids.json",
     "progression.json",
+    "town.json",
     "blocks/built.json",
     "blocks/natural.json",
     "blocks/ores.json",

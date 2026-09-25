@@ -62,6 +62,8 @@ def load_content():
             objects[o["id"]] = o
         for e in doc.get("enemies", []):
             enemies[e["id"]] = e
+        for t in doc.get("townNpcs", []):  # town residents use rigged creature models too
+            enemies[t["id"]] = t
     return blocks, items, objects, enemies
 
 
@@ -71,7 +73,7 @@ def plan(spec, blocks, items, objects, enemies):
     creature_jobs = dict(spec.get("creatures", {}))
     for eid, e in enemies.items():
         if e.get("model", eid) not in creature_jobs:
-            errors.append(f"enemy '{eid}' uses creature model '{e.get('model', eid)}' missing from assets.json creatures")
+            errors.append(f"creature '{eid}' uses model '{e.get('model', eid)}' missing from assets.json creatures")
     if "player" not in creature_jobs:
         errors.append("assets.json creatures needs a 'player' model")
     object_jobs = {}

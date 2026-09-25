@@ -7,5 +7,10 @@
   "countRadius": 60,
   "minDistance": 22,
   "maxDistance": 46,
-  "attempts": 12
+  "attempts": 12,
+  // Towns: this many housed residents within townRadius of a player multiply the spawn chance by townFactor
+  // (not during world events).
+  "townResidents": 2,
+  "townRadius": 40,
+  "townFactor": 0.25
 }

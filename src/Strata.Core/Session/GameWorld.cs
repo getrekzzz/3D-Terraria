@@ -7,6 +7,7 @@ using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Housing;
 using Strata.Core.Gameplay.Liquids;
 using Strata.Core.Gameplay.Navigation;
+using Strata.Core.Gameplay.Town;
 using Strata.Core.Gameplay.Player;
 using Strata.Core.Gameplay.Stats;
 using Strata.Core.Persistence;
@@ -117,6 +118,8 @@ public sealed class GameWorld : IDisposable
         Liquids = new LiquidSimulator(session);
         Housing = new HousingScanner(session.World);
         Navigator = new VoxelNavigator(session.World);
+        Town = new TownSystem(this);
+        Commerce = new TownCommerce(this, Town);
         LiquidEffects = new LiquidEffects(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
@@ -139,6 +142,8 @@ public sealed class GameWorld : IDisposable
     public LiquidSimulator Liquids { get; }
     public HousingScanner Housing { get; }
     public VoxelNavigator Navigator { get; }
+    public TownSystem Town { get; }
+    public TownCommerce Commerce { get; }
     public LiquidEffects LiquidEffects { get; }
     public string? PlayerDirectory { get; }
     public List<PlayerEntity> Players { get; } = new();
@@ -186,6 +191,7 @@ public sealed class GameWorld : IDisposable
         Events.Tick();
         Spawner.Tick();
         Npcs.Tick();
+        Town.Tick();
         Melee.Tick();
         Projectiles.Tick();
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
@@ -257,6 +263,7 @@ public sealed class GameWorld : IDisposable
     public int SaveAll()
     {
         Events.Persist();
+        Town.Persist();
         int chunks = Session.SaveAll();
         foreach (var p in Players) SavePlayer(p.State);
         return chunks;

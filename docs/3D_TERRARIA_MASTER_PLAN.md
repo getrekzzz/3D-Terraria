@@ -31,7 +31,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 800 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 37.3 % |
+| Content | Reference DBs + coverage | ✅ | 800 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 37.8 % |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, dungeon v1 |
@@ -46,10 +46,10 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
 | UI | HUD, inventory, equipment, chests, crafting, console, perf overlay | ✅ | Settings/menus/world select ⬜ |
 | Combat | Damage model, melee arcs, projectiles, buffs | ✅ | Whips/yoyos/summons ⬜ |
-| AI | Slime, walker, flyer, boss brains, worm | ✅ | Voxel A*, utility AI, behaviour trees ⬜ (M2) |
-| Spawning | Data-driven spawn rules | ✅ | Housing suppression ⬜ |
-| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 128 item models, 11 creatures, 200 icons |
-| NPCs | Town NPCs, housing | ⬜ | M2 |
+| AI | Slime, walker, flyer, boss brains, worm; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
+| Spawning | Data-driven spawn rules | ✅ | Closed doors stop creatures; spawn suppression near homes ⬜ |
+| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 128 item models, 15 creatures (4 residents), 200 icons |
+| NPCs | Town residents, 3D housing, shops, services, happiness | ✅ | 4 residents (guide/merchant/nurse/dryad roles); more residents, enemies attacking town ⬜ |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
 | Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels); arenas, boss bar; music state ⬜ |
 | Events | Event director | ✅ | Blood moon, slime rain; invasions ⬜ |
@@ -72,7 +72,7 @@ Content ─┬─> Voxels ─> WorldGen ─> Lighting ─> Meshing ─> Godot st
          ├─> Items/ItemUse ─> Crafting ─> UI
          ├─> Combat ─> Creatures/Brains ─> Spawning ─> Events ─> Bosses
          └─> Persistence (world, regions, players, migrations)
-GameWorld (Core) = streaming + clock + editor + drops + players + liquids + NPCs + melee + projectiles + spawner + events
+GameWorld (Core) = streaming + clock + editor + drops + players + liquids + NPCs + town + melee + projectiles + spawner + events
 Commands (Core) ─> console (Godot), smoke scripts (CI), screenshots (--exec)
 Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ```
@@ -80,7 +80,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (135) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (151) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -90,6 +90,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: event start/stop, sky tint, kill goals | `events.cmds` | ✅ CI |
 | Engine smoke: boss summons, arenas, segments, defeat flags | `bosses.cmds` | ✅ CI |
 | Engine smoke: liquid flow, lava + water → obsidian, buckets, burning/dousing, submersion | `liquids.cmds` | ✅ CI |
+| Engine smoke: starter guide, built home, move-in, walking home through a door at night, talk/shop UI, buying | `town.cmds` | ✅ CI |
 | Screenshots | local (Xvfb + lavapipe) via `--screenshot` + `--exec` | 🟡 CI screenshot tour ⬜ |
 
 ## 7. Performance
@@ -99,12 +100,14 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 * Concerns: dense forests (hundreds of trees in view), shadow cost of props, LOD not yet implemented.
 
 ## 8. Next development targets (M2)
-Done in M2 so far: events (blood moon, slime rain), boss framework + three bosses, liquid simulation.
-1. Town NPCs: 3D housing validator (enclosed room, light, table, chair, door), voxel A*, first NPCs with shops.
-2. LOD rings + horizon heightfield; cave culling from navigation summaries.
-3. Screenshot tour in CI (surface, cave, cavern, biomes, underworld, ocean).
+Done in M2 so far: events (blood moon, slime rain), boss framework + three bosses, liquid simulation, voxel A*,
+3D housing, town residents with shops/services/happiness.
+1. LOD rings + horizon heightfield; cave culling from navigation summaries.
+2. Screenshot tour in CI (surface, cave, cavern, biomes, underworld, ocean, town).
+3. More residents (arms dealer, demolitionist roles), enemies that attack residents, spawn suppression near towns.
 4. Liquid follow-ups: breath/drowning, pressure (U-tubes), sponges and bottomless buckets, fishing hooks.
 5. Audio director (data-driven cues for mining, combat, liquids, music states for bosses/events).
+6. Dungeon v2 + Crypt Warden; underworld + The Mawwall (towards M3 hardmode).
 
 ## 9. Directive summary (condensed)
 Phases: 1 core loop → 2 world → 3 progression → 4 systemic depth → 5 hardmode → 6 endgame → 7 polish.

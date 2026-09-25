@@ -858,6 +858,51 @@
    "generator": "gel_sovereign",
    "animations": []
   },
+  "grovekeeper": {
+   "model": "assets/models/creatures/grovekeeper.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "mender": {
+   "model": "assets/models/creatures/mender.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "peddler": {
+   "model": "assets/models/creatures/peddler.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "player": {
    "model": "assets/models/creatures/player.glb",
    "generator": "humanoid",
@@ -897,6 +942,21 @@
    "model": "assets/models/creatures/watcher_maw.glb",
    "generator": "watcher_maw",
    "animations": []
+  },
+  "wayfinder": {
+   "model": "assets/models/creatures/wayfinder.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   }
  },
  "generatorVersion": 1

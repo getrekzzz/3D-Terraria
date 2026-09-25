@@ -11,37 +11,8 @@ namespace Strata.Core.Tests.Gameplay;
 
 public class HousingNavigationTests
 {
-    /// <summary>
-    /// A 9×9 room, 6 cells tall, walled with player-built bricks on the arena floor, a door in the −Z wall, a torch,
-    /// a table and a chair. Returns the door.
-    /// </summary>
-    private static TileObjectInstance BuildHouse(TestGame g, bool built = true, bool chair = true)
-    {
-        var f = g.Floor;
-        var world = g.World.Session.World;
-        var brick = g.Content.BlockId("stone_brick");
-        var flags = built ? CellFlags.PlayerPlaced : CellFlags.None;
-        var batch = world.BeginEdit();
-        for (int y = 1; y <= 7; y++)
-            for (int z = -5; z <= 5; z++)
-                for (int x = -5; x <= 5; x++)
-                {
-                    bool shell = y == 7 || Math.Abs(x) == 5 || Math.Abs(z) == 5;
-                    batch.SetBlock(f.X + x, f.Y + y, f.Z + z, shell ? brick : (ushort)0, 0, shell ? flags : CellFlags.None);
-                }
-        // Door opening in the −Z wall.
-        for (int y = 1; y <= 4; y++)
-            for (int x = 0; x <= 1; x++)
-                batch.SetBlock(f.X + x, f.Y + y, f.Z - 5, 0);
-        g.World.Session.Commit(batch);
-        var store = world.TileObjects;
-        var door = new TileObjectInstance(g.Content.TileObjects.Get("wooden_door"), f + new Int3(0, 1, -5), 0, 0);
-        Assert.True(store.TryAdd(door));
-        Assert.True(store.TryAdd(new TileObjectInstance(g.Content.TileObjects.Get("torch"), f + new Int3(-4, 1, 4), 0, 0)));
-        Assert.True(store.TryAdd(new TileObjectInstance(g.Content.TileObjects.Get("wooden_table"), f + new Int3(1, 1, 1), 0, 0)));
-        if (chair) Assert.True(store.TryAdd(new TileObjectInstance(g.Content.TileObjects.Get("wooden_chair"), f + new Int3(-3, 1, 1), 0, 0)));
-        return door;
-    }
+    private static TileObjectInstance BuildHouse(TestGame g, bool built = true, bool chair = true) =>
+        TestHouses.Build(g, g.Floor, built, chair);
 
     private static Int3 Inside(TestGame g) => g.Floor + new Int3(-2, 2, -2);
 

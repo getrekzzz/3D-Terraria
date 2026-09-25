@@ -31,6 +31,7 @@ public static partial class ContentValidator
         ValidateFlags(ctx);
         ValidateEvents(ctx);
         ValidateLiquids(ctx);
+        ValidateTown(ctx);
         if (options.CheckObtainability) ValidateObtainability(ctx);
     }
 

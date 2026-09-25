@@ -23,6 +23,7 @@ public sealed class ContentDatabase
     public Registry<OreVeinDef> OreVeins { get; } = new("oreVein");
     public Registry<EventDef> Events { get; } = new("event");
     public Registry<LiquidDef> Liquids { get; } = new("liquid");
+    public Registry<TownNpcDef> TownNpcs { get; } = new("townNpc");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();
@@ -45,7 +46,7 @@ public sealed class ContentDatabase
     public IEnumerable<IRegistry> AllRegistries => new IRegistry[]
     {
         Blocks, Items, TileObjects, Recipes, RecipeGroups, Biomes, Enemies, SpawnRules, Projectiles, Buffs,
-        Prefixes, LootTables, Flags, OreVeins, Events, Liquids,
+        Prefixes, LootTables, Flags, OreVeins, Events, Liquids, TownNpcs,
     };
 
     internal ContentDatabase()

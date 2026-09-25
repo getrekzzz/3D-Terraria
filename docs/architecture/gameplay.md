@@ -31,12 +31,25 @@
   sweetens, water clears `fire` buffs), `liquidImmune` effects, drag/buoyancy on drops and item
   incineration. Buckets are the `bucket` behaviour (scoop from a pool's surface, pour with overflow up).
   All liquid properties live in `data/liquids.json`; the voxel byte stores code (1–7) + level (0–31).
+* **Navigation** — `VoxelNavigator` is A* over standing nodes (grid vertex + feet height; the body is the 2×2 cell
+  columns around the vertex, 4 cells tall): 8-way walking without corner cutting, ledge steps/jumps, drops,
+  doors passable for walkers that open them, harmful liquids avoided, unloaded cells treated as solid.
+* **Housing** — `HousingScanner` flood-fills the air reachable from a cell (doors count as wall) up to
+  `maxVolume`, then checks floor area, headroom, the share of player-built walls and furniture roles from
+  `data/config/housing.json` (door in the walls, light, table, chair) and picks a home node inside.
+* **Town** — `TownSystem` places starter residents, moves residents in (data-driven `arrival` conditions such as
+  `coins`, `maxLife`, `resident`, `flag`) when a vacant valid home exists (rooms found from chairs), re-validates
+  homes, and drives residents: stroll by day, walk home at night along A* paths, opening and closing doors, stop
+  and face the player while talking. `TownCommerce` picks dialogue lines by condition (placeholders for names),
+  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys and sells
+  (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`). Residents persist in the
+  world metadata. Residents live in `data/town.json`, tuning in `data/config/town.json`.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
-`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `stream.idle`, `errors`, …) used by `assert` and `wait_until`.
+`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `house.valid`, `stream.idle`, `errors`, …) used by `assert` and `wait_until`.
 `game/Testing/Scripts/*.cmds` run headless in CI with `--smoke=` and print `SMOKE PASS`/`SMOKE FAIL`;
 `--exec="cmd;cmd"` runs commands at startup (screenshots, manual testing). Runner directives: `wait`,
 `wait_until <probe> <op> <value> [timeout]`, `hold <action> <seconds>`, `repeat <n> <command>`.

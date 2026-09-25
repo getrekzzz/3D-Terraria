@@ -34,6 +34,7 @@ public static class ContentLoader
         ["oreVeins"] = (db, a, f) => ReadInto(db, db.OreVeins, a, f),
         ["events"] = (db, a, f) => ReadInto(db, db.Events, a, f),
         ["liquids"] = (db, a, f) => ReadInto(db, db.Liquids, a, f),
+        ["townNpcs"] = (db, a, f) => ReadInto(db, db.TownNpcs, a, f),
     };
 
     public static IReadOnlyCollection<string> CategoryNames => Categories.Keys;

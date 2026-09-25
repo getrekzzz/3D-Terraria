@@ -23,6 +23,14 @@ public sealed class SpawnConfig
     public float MaxDistance { get; init; } = 46f;
     public int Attempts { get; init; } = 12;
 
+    /// <summary>Towns: with this many housed residents within <see cref="TownRadius"/> of a player, spawning slows.</summary>
+    public int TownResidents { get; init; } = 2;
+
+    public float TownRadius { get; init; } = 40f;
+
+    /// <summary>Spawn chance multiplier inside a town (world events ignore it).</summary>
+    public float TownFactor { get; init; } = 0.25f;
+
     public static SpawnConfig Load(IDataSource data)
     {
         const string path = "data/config/spawning.json";
@@ -64,10 +72,16 @@ public sealed class SpawnDirector
         float chance = MathF.Min(1f, Config.Chance * _world.Events.SpawnRateMultiplier);
         foreach (var p in _world.Players)
         {
-            if (!p.Alive || _npcs.CountNear(p.Center, Config.CountRadius) >= max || !_rng.Chance(chance)) continue;
+            if (!p.Alive || _npcs.CountNear(p.Center, Config.CountRadius) >= max) continue;
+            float local = InTown(p) && _world.Session.Events.Count == 0 ? chance * Config.TownFactor : chance;
+            if (!_rng.Chance(local)) continue;
             TrySpawnNear(p);
         }
     }
+
+    /// <summary>Is the player among enough housed residents to count as being in town?</summary>
+    public bool InTown(PlayerEntity p) =>
+        _world.Town.Residents.Count(r => r.Alive && r.Home != null && Vector3.Distance(r.Position, p.Position) <= Config.TownRadius) >= Config.TownResidents;
 
     /// <summary>Attempts one natural spawn near a player; returns the spawned creatures (possibly none).</summary>
     public List<Npc> TrySpawnNear(PlayerEntity player)

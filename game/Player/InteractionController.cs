@@ -34,6 +34,12 @@ public sealed partial class InteractionController : Node
     public event System.Action<UseOutcome>? Used;
     public event System.Action<InteractOutcome>? Interacted;
 
+    /// <summary>The town resident under the crosshair within talking range (null if none).</summary>
+    public Strata.Core.Gameplay.Town.TownNpc? TalkTarget { get; private set; }
+
+    /// <summary>The player asked to talk to a resident (the dialog opens).</summary>
+    public event System.Action<Strata.Core.Gameplay.Town.TownNpc>? TalkRequested;
+
     private GameWorld Game => _runtime.Game;
     private PlayerEntity Entity => _player.Entity;
 
@@ -56,7 +62,13 @@ public sealed partial class InteractionController : Node
             var outcome = Game.ItemUse.Use(Entity, Target, fresh);
             if (outcome is not (UseOutcome.None or UseOutcome.Cooldown)) Used?.Invoke(outcome);
         }
-        if ((Input.IsActionJustPressed("use_secondary") || Input.IsActionJustPressed("interact")) && Target?.Object is { } obj && InReach)
+        bool interact = Input.IsActionJustPressed("use_secondary") || Input.IsActionJustPressed("interact");
+        if (interact && TalkTarget is { } resident && Game.Town.BeginTalk(resident, Entity))
+        {
+            TalkRequested?.Invoke(resident);
+            return;
+        }
+        if (interact && Target?.Object is { } obj && InReach)
         {
             var r = Game.Interaction.Interact(Entity, obj);
             if (r != InteractOutcome.None) Interacted?.Invoke(r);
@@ -86,6 +98,29 @@ public sealed partial class InteractionController : Node
             InReach = false;
             var far = origin + dir * 40f;
             Entity.Aim = System.Numerics.Vector3.Normalize(ToCore(far) - Entity.Eye);
+        }
+        UpdateTalkTarget(origin, dir);
+    }
+
+    /// <summary>The nearest resident whose body the aim ray passes close to, in front of any terrain hit.</summary>
+    private void UpdateTalkTarget(Vector3 origin, Vector3 dir)
+    {
+        TalkTarget = null;
+        float limit = Target != null ? origin.DistanceTo(ToGodot(Target.HitCells * Strata.Core.Common.Units.CellSize)) + 0.5f : 40f;
+        float best = float.MaxValue;
+        foreach (var npc in Game.Town.Residents)
+        {
+            if (!npc.Alive) continue;
+            var center = ToGodot(npc.Center);
+            float along = (center - origin).Dot(dir);
+            if (along <= 0 || along > limit) continue;
+            float off = (origin + dir * along).DistanceTo(center);
+            if (off > 0.7f || center.DistanceTo(ToGodot(Entity.Center)) > Game.Town.Config.TalkRange) continue;
+            if (along < best)
+            {
+                best = along;
+                TalkTarget = npc;
+            }
         }
     }
 

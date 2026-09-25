@@ -10,6 +10,7 @@ public enum SpecKind
     Condition,
     Effect,
     ProjectileHit,
+    TownService,
 }
 
 /// <summary>
@@ -53,6 +54,7 @@ public sealed class SpecCatalog
         BrainSpecs.Register(c);
         EffectSpecs.Register(c);
         ProjectileHitSpecs.Register(c);
+        TownServiceSpecs.Register(c);
         Conditions.ConditionCompiler.RegisterSpecs(c);
         return c;
     }

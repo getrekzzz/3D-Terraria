@@ -127,8 +127,40 @@ def humanoid(mb: MeshBuilder, p, rng):
         mb.box((sx * 0.1 - 0.07, -0.07, 0.1), (sx * 0.1 + 0.07, 0.07, 0.52), cloth, pants)
         mb.bone = f"foot.{side}"
         mb.box((sx * 0.1 - 0.075, -0.09, 0.0), (sx * 0.1 + 0.075, 0.16, 0.12), "prop:dark_planks", p.get("boots", "#ffffff"))
+    _outfit(mb, p)
     mb.bone = None
     return {"rig": HUMANOID_BONES, "actions": _humanoid_actions}
+
+
+def _outfit(mb: MeshBuilder, p):
+    """Optional clothing for town folk: hat (cap/wide/hood/wreath), beard, long coat, apron."""
+    hat, hat_color = p.get("hat"), p.get("hatColor", "#5a3a1a")
+    mb.bone = "head"
+    if hat == "cap":
+        mb.box((-0.17, -0.18, 1.78), (0.17, 0.16, 1.86), "prop:cloth", hat_color)
+        mb.box((-0.12, 0.14, 1.78), (0.12, 0.24, 1.8), "prop:cloth", hat_color)
+    elif hat == "wide":
+        mb.cylinder((0, 0, 1.78), (0, 0, 1.8), 0.3, None, "prop:cloth", hat_color, segments=16)
+        mb.cylinder((0, 0, 1.8), (0, 0, 1.96), 0.15, 0.13, "prop:cloth", hat_color, segments=12)
+    elif hat == "hood":
+        mb.box((-0.18, -0.19, 1.5), (0.18, 0.12, 1.88), "prop:cloth", hat_color)
+    elif hat == "wreath":
+        ring = [(math.cos(a) * 0.17, math.sin(a) * 0.17, 1.8) for a in (i * 2 * math.pi / 14 for i in range(15))]
+        mb.tube(ring, [0.025] * len(ring), "prop:leaves", hat_color, segments=5)
+        for a in (0.4, 1.9, 3.3, 4.8):
+            mb.sphere((math.cos(a) * 0.17, math.sin(a) * 0.17, 1.82), 0.035, "prop:plain", p.get("flower", "#f0d040"), subdivisions=1)
+    if "beard" in p:
+        mb.box((-0.13, 0.1, 1.42), (0.13, 0.19, 1.56), "prop:cloth", p["beard"])
+    if "coat" in p:
+        mb.bone = "chest"
+        mb.box((-0.205, -0.125, 1.12), (0.205, 0.125, 1.47), "prop:cloth", p["coat"])
+        mb.bone = "hips"
+        mb.box((-0.2, -0.12, 0.62), (0.2, 0.12, 1.12), "prop:cloth", p["coat"])
+    if "apron" in p:
+        mb.bone = "chest"
+        mb.box((-0.14, 0.11, 1.12), (0.14, 0.125, 1.38), "prop:cloth", p["apron"])
+        mb.bone = "hips"
+        mb.box((-0.15, 0.1, 0.7), (0.15, 0.115, 1.12), "prop:cloth", p["apron"])
 
 
 def gel(mb: MeshBuilder, p, rng):
