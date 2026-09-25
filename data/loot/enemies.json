@@ -6,6 +6,9 @@
     { "id": "gazer", "coins": [40, 120], "entries": [{ "item": "lens", "chance": 0.33 }] },
     { "id": "gore_shambler", "coins": [60, 160], "entries": [{ "item": "minor_restorative", "chance": 0.05 }, { "item": "lens", "chance": 0.1 }] },
     { "id": "drip_eye", "coins": [80, 200], "entries": [{ "item": "lens", "min": 1, "max": 2, "chance": 0.5 }] },
+    { "id": "gel_sovereign", "coins": [8000, 12000], "entries": [{ "item": "gel", "min": 40, "max": 80 }, { "item": "minor_restorative", "min": 5, "max": 10 }, { "item": "vital_crystal", "chance": 0.5 }] },
+    { "id": "watcher", "coins": [10000, 15000], "entries": [{ "item": "lens", "min": 3, "max": 6 }, { "item": "umbrite_ore", "min": 30, "max": 90 }, { "item": "mana_star", "chance": 0.5 }] },
+    { "id": "bore_tyrant", "coins": [9000, 14000], "entries": [{ "item": "umbrite_ore", "min": 40, "max": 100 }, { "item": "minor_restorative", "min": 5, "max": 10 }] },
     { "id": "cave_bat", "coins": [20, 60], "entries": [{ "item": "starshard", "chance": 0.02 }] }
   ]
 }

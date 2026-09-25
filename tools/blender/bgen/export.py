@@ -130,5 +130,23 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
     scene.render.image_settings.color_mode = "RGBA"
     scene.view_settings.view_transform = "Standard"
     path.parent.mkdir(parents=True, exist_ok=True)
-    scene.render.filepath = str(path)
+    temp = path.with_suffix(".new.png")
+    scene.render.filepath = str(temp)
     bpy.ops.render.render(write_still=True)
+    _replace_if_changed(temp, path)
+
+
+def _pixels(path):
+    img = bpy.data.images.load(str(path), check_existing=False)
+    try:
+        return tuple(img.size), list(img.pixels)
+    finally:
+        bpy.data.images.remove(img)
+
+
+def _replace_if_changed(temp, path):
+    """Keeps the existing icon when the pixels are identical (PNG metadata differs between runs)."""
+    if path.exists() and _pixels(temp) == _pixels(path):
+        temp.unlink()
+    else:
+        temp.replace(path)

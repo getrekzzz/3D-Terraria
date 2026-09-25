@@ -18,6 +18,7 @@ public sealed partial class NpcRenderer : Node3D
         public required CreatureVisual Visual;
         public required string Model;
         public required Label3D Health;
+        public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public Vector3 Shown;
         public float Squash = 1f;
         public float LastVy;
@@ -36,11 +37,30 @@ public sealed partial class NpcRenderer : Node3D
         game.Npcs.Removed += npc =>
         {
             if (!_views.Remove(npc.Id, out var view)) return;
-            view.Visual.Visible = false;
+            Release(view.Visual, view.Model);
+            foreach (var (seg, model) in view.Segments) Release(seg, model);
             view.Health.QueueFree();
-            if (!_pool.TryGetValue(view.Model, out var stack)) _pool[view.Model] = stack = new Stack<CreatureVisual>();
-            stack.Push(view.Visual);
         };
+    }
+
+    private void Release(CreatureVisual visual, string model)
+    {
+        visual.Visible = false;
+        if (!_pool.TryGetValue(model, out var stack)) _pool[model] = stack = new Stack<CreatureVisual>();
+        stack.Push(visual);
+    }
+
+    private CreatureVisual? Acquire(string model)
+    {
+        if (_pool.TryGetValue(model, out var stack) && stack.Count > 0)
+        {
+            var pooled = stack.Pop();
+            pooled.Visible = true;
+            return pooled;
+        }
+        var visual = CreatureVisual.Create($"assets/models/creatures/{model}.glb", _props);
+        if (visual != null) AddChild(visual);
+        return visual;
     }
 
     public override void _Process(double delta)
@@ -55,11 +75,29 @@ public sealed partial class NpcRenderer : Node3D
                 if (view == null) continue;
                 _views[npc.Id] = view;
             }
-            var target = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
+            var target = npc.Segments.Count > 0
+                ? new Vector3(npc.Center.X, npc.Center.Y, npc.Center.Z)
+                : new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
             view.Shown = view.Shown.DistanceSquaredTo(target) > 4f ? target : view.Shown.Lerp(target, 1f - Mathf.Exp(-dt * 25f));
+            var wanted = npc.ModelOverride ?? npc.Def.Model ?? npc.Def.Id;
+            if (wanted != view.Model && Acquire(wanted) is { } swapped)
+            {
+                Release(view.Visual, view.Model);
+                view.Visual = swapped;
+                view.Model = wanted;
+            }
             var visual = view.Visual;
             visual.Position = view.Shown;
-            visual.Rotation = new Vector3(0, Mathf.LerpAngle(visual.Rotation.Y, npc.Yaw + Mathf.Pi, 1f - Mathf.Exp(-dt * 10f)), 0);
+            if (npc.Segments.Count > 0)
+            {
+                UpdateSegments(npc, view, world);
+                var v = new Vector3(npc.Velocity.X, npc.Velocity.Y, npc.Velocity.Z);
+                if (v.LengthSquared() > 0.01f) visual.Basis = Basis.LookingAt(v.Normalized(), Mathf.Abs(v.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
+            }
+            else
+            {
+                visual.Rotation = new Vector3(0, Mathf.LerpAngle(visual.Rotation.Y, npc.Yaw + Mathf.Pi, 1f - Mathf.Exp(-dt * 10f)), 0);
+            }
             Animate(npc, view, dt);
             var tint = Color.FromHtml(npc.Def.Tint);
             if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);
@@ -71,6 +109,32 @@ public sealed partial class NpcRenderer : Node3D
                 view.Health.Text = $"{npc.Life}/{npc.MaxLife}";
                 view.Health.Position = view.Shown + new Vector3(0, npc.HalfExtents.Y * 2f + 0.35f, 0);
             }
+        }
+    }
+
+    /// <summary>Body segments trail the head; each faces the segment in front of it.</summary>
+    private void UpdateSegments(Npc npc, View view, Strata.Core.Voxels.VoxelWorld world)
+    {
+        var boss = npc.Def.Boss!;
+        var segModel = boss.SegmentModel ?? view.Model;
+        while (view.Segments.Count < npc.Segments.Count)
+        {
+            bool tail = view.Segments.Count == npc.Segments.Count - 1;
+            var model = tail ? boss.TailModel ?? segModel : segModel;
+            if (Acquire(model) is not { } seg) return;
+            view.Segments.Add((seg, model));
+        }
+        var ahead = view.Shown + new Vector3(0, npc.HalfExtents.Y, 0);
+        for (int i = 0; i < npc.Segments.Count; i++)
+        {
+            var p = new Vector3(npc.Segments[i].X, npc.Segments[i].Y, npc.Segments[i].Z);
+            var seg = view.Segments[i].Visual;
+            seg.Position = p;
+            var dir = ahead - p;
+            if (dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
+            seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
+            seg.SetLight(LightProbe.Sample(world, p));
+            ahead = p;
         }
     }
 
@@ -105,15 +169,8 @@ public sealed partial class NpcRenderer : Node3D
     private View? Create(Npc npc)
     {
         var model = npc.Def.Model ?? npc.Def.Id;
-        CreatureVisual? visual = null;
-        if (_pool.TryGetValue(model, out var stack) && stack.Count > 0) visual = stack.Pop();
-        if (visual == null)
-        {
-            visual = CreatureVisual.Create(AssetPaths.CreatureModel(npc.Def), _props);
-            if (visual == null) return null;
-            AddChild(visual);
-        }
-        visual.Visible = true;
+        var visual = Acquire(model);
+        if (visual == null) return null;
         var health = new Label3D
         {
             Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,

@@ -136,9 +136,7 @@ public sealed class ProjectileSystem
         foreach (var npc in _npcs.All.ToList())
         {
             if (!npc.Alive || p.HitNpcs.Contains(npc.Id)) continue;
-            var (min, max) = npc.Box;
-            var closest = Vector3.Clamp(p.Position, min, max);
-            if (Vector3.DistanceSquared(closest, p.Position) > r * r) continue;
+            if (!npc.Volumes().Any(v => Vector3.DistanceSquared(Vector3.Clamp(p.Position, v.Min, v.Max), p.Position) <= r * r)) continue;
             p.HitNpcs.Add(npc.Id);
             _npcs.Hit(npc, p.Owner, p.Damage, p.DamageClass, p.Crit, p.Knockback, p.Position - p.Velocity * 0.05f, melee: false);
             ApplyOnHit(p, npc);

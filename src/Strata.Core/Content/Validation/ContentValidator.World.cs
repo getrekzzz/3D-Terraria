@@ -40,6 +40,15 @@ public static partial class ContentValidator
             ctx.Color(e, e.Tint, "tint");
             ctx.Light(e, e.Light, "light");
             ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
+            if (e.Boss != null)
+            {
+                ctx.Ref(e, ctx.Db.Flags, e.Boss.Flag, "boss.flag");
+                if (string.IsNullOrWhiteSpace(e.Boss.Title)) ctx.Error(e, "boss.title is required.");
+            }
+            foreach (var key in new[] { "minion", "servant" })
+                if (e.Brain.Raw.TryGetProperty(key, out var refId) && refId.GetString() is { } id) ctx.Ref(e, ctx.Db.Enemies, id, $"brain.{key}");
+            if (e.Brain.Raw.TryGetProperty("phase2Model", out var model) && model.GetString() is { } m)
+                ctx.Asset(e, $"assets/models/creatures/{m}.glb", "brain.phase2Model");
         }
         foreach (var s in ctx.Db.SpawnRules.All)
         {

@@ -39,7 +39,13 @@ public sealed class NpcSystem
         _world = world;
         _loot = new LootRoller(world.Session.Content);
         _rng = new Pcg32(Hash.Combine((ulong)world.Session.Settings.Seed, 0x4E5043UL));
-        _ctx = new BrainContext { World = world.Session.World };
+        _ctx = new BrainContext
+        {
+            World = world.Session.World,
+            Content = world.Session.Content,
+            Spawn = (def, at) => Spawn(def, at - new Vector3(0, def.Height * 0.25f * def.Scale, 0)),
+            Carve = (center, radius) => world.Editor.Carve(center, radius),
+        };
     }
 
     public IReadOnlyList<Npc> All => _npcs;
@@ -49,6 +55,14 @@ public sealed class NpcSystem
     public event Action<Npc>? Killed;
     public event Action<DamageEvent>? Damaged;
 
+    public event Action<Npc>? BossSpawned;
+
+    /// <summary>A boss was killed (its defeat flag is already set).</summary>
+    public event Action<Npc>? BossDefeated;
+
+    /// <summary>A boss left without being defeated (day came, players fled the arena).</summary>
+    public event Action<Npc>? BossLeft;
+
     /// <summary>A player was hit: (player, damage, knockback velocity in m/s).</summary>
     public event Action<PlayerEntity, int, Vector3>? PlayerHurt;
 
@@ -56,7 +70,10 @@ public sealed class NpcSystem
     {
         if (_npcs.Count >= MaxNpcs) return null;
         var npc = new Npc(_nextId++, def, feet) { Yaw = _rng.NextFloat() * MathF.Tau };
+        if (def.Boss is { Segments: > 0 } boss)
+            for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
         _npcs.Add(npc);
+        if (def.Boss != null) BossSpawned?.Invoke(npc);
         Spawned?.Invoke(npc);
         return npc;
     }
@@ -89,16 +106,14 @@ public sealed class NpcSystem
                     continue;
                 }
             }
-            if (session.World.GetBlock(VoxelMotion.CellOf(npc.Center)) == VoxelWorld.Unknown)
-            {
-                if (++npc.FarTicks > DespawnDelayTicks) Remove(i);
-                continue; // chunk not loaded: frozen
-            }
             var target = Nearest(npc.Center, out float distance);
-            if (distance > DespawnDistance)
+            float despawn = npc.Def.Boss?.ArenaRadius ?? DespawnDistance;
+            bool leaving = npc.Def.Boss is { DespawnAtDay: true } && session.Clock.IsDay;
+            if (distance > despawn || leaving)
             {
-                if (++npc.FarTicks > DespawnDelayTicks)
+                if (++npc.FarTicks > (leaving ? 1 : DespawnDelayTicks))
                 {
+                    if (npc.IsBoss) BossLeft?.Invoke(npc);
                     Remove(i);
                     continue;
                 }
@@ -107,6 +122,8 @@ public sealed class NpcSystem
             {
                 npc.FarTicks = 0;
             }
+            // Terrain-bound creatures wait while their chunk is not loaded; fliers that ignore terrain keep going.
+            if (npc.Def.CollideTerrain && session.World.GetBlock(VoxelMotion.CellOf(npc.Center)) == VoxelWorld.Unknown) continue;
             _ctx.Target = target;
             _ctx.TargetDistance = distance;
             _ctx.OnSurface = session.Generator.Plan.Bands.LayerAt(npc.Cell.Y) == World.WorldLayer.Surface;
@@ -125,7 +142,12 @@ public sealed class NpcSystem
     {
         var intended = npc.Velocity;
         var center = npc.Center;
-        if (npc.Def.CollideTerrain)
+        if (brain.MovesFreely)
+        {
+            center += npc.Velocity * dt;
+            npc.OnGround = false;
+        }
+        else if (npc.Def.CollideTerrain)
         {
             npc.OnGround = VoxelMotion.Move(_world.Session.World, ref center, ref npc.Velocity, npc.HalfExtents, dt);
         }
@@ -136,13 +158,31 @@ public sealed class NpcSystem
         }
         npc.Position = center - new Vector3(0, npc.HalfExtents.Y, 0);
         brain.AfterMove(npc, intended);
+        FollowSegments(npc);
+    }
+
+    /// <summary>Each body segment keeps its spacing behind the one in front (a chain dragged by the head).</summary>
+    private static void FollowSegments(Npc npc)
+    {
+        if (npc.Segments.Count == 0) return;
+        float spacing = npc.Def.Boss!.SegmentSpacing;
+        var lead = npc.Center;
+        for (int i = 0; i < npc.Segments.Count; i++)
+        {
+            var s = npc.Segments[i];
+            var d = s - lead;
+            float len = d.Length();
+            if (len > spacing) s = lead + d / len * spacing;
+            npc.Segments[i] = s;
+            lead = s;
+        }
     }
 
     private void ContactDamage(Npc npc, PlayerEntity player)
     {
         if (!player.Alive || player.State.Vitals.ImmunityTicks > 0 || npc.Def.Damage <= 0) return;
         var pBox = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
-        if (!Npc.Overlaps(npc.Box, pBox)) return;
+        if (!npc.Volumes().Any(v => Npc.Overlaps(v, pBox))) return;
         var state = player.State;
         var hit = DamageModel.Roll(npc.Def.Damage, DamageClass.None, 0, 6f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
@@ -158,7 +198,7 @@ public sealed class NpcSystem
     /// <summary>Applies a hit from a player. Returns false if the NPC was immune (melee) or already dead.</summary>
     public bool Hit(Npc npc, PlayerEntity? attacker, int baseDamage, DamageClass damageClass, int critChance, float knockback, Vector3 from, bool melee)
     {
-        if (!npc.Alive || (melee && npc.ImmuneTicks > 0)) return false;
+        if (!npc.Alive || npc.Invulnerable || (melee && npc.ImmuneTicks > 0)) return false;
         var hit = DamageModel.Roll(baseDamage, damageClass, critChance, knockback, attacker?.State.Effects.Stats, npc.Def.Defense,
             0.5f, 0f, npc.Def.KnockbackResist, ref _rng);
         npc.Life -= hit.Damage;
@@ -184,6 +224,11 @@ public sealed class NpcSystem
         if (npc.Def.Value > 0) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
+        if (npc.Def.Boss is { } boss)
+        {
+            if (boss.Flag != null) _world.Session.Flags.Add(boss.Flag);
+            BossDefeated?.Invoke(npc);
+        }
         Killed?.Invoke(npc);
         int index = _npcs.IndexOf(npc);
         if (index >= 0) Remove(index);

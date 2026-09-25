@@ -18,6 +18,7 @@ public enum ItemAction
     PlaceBlock = 1 << 6,
     PlaceObject = 1 << 7,
     Consume = 1 << 8,
+    SummonBoss = 1 << 9,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -31,6 +32,8 @@ public sealed class ItemUseInfo
     public ThrustParams? ThrustParams { get; internal set; }
     public ShootProjectileParams? Shoot { get; internal set; }
     public ConsumeParams? Consume { get; internal set; }
+    public SummonBossParams? Summon { get; internal set; }
+    public Conditions.ICondition? SummonCondition { get; internal set; }
     public BlockDef? Block { get; internal set; }
     public TileObjectDef? Object { get; internal set; }
 
@@ -103,6 +106,11 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.PlaceBlock: a |= info.Block != null ? ItemAction.PlaceBlock : 0; break;
                 case ItemBehaviorSpecs.PlaceObject: a |= info.Object != null ? ItemAction.PlaceObject : 0; break;
                 case ItemBehaviorSpecs.Consume: a |= ItemAction.Consume; info.Consume = spec.Parse<ConsumeParams>(); break;
+                case ItemBehaviorSpecs.SummonBoss:
+                    a |= ItemAction.SummonBoss;
+                    info.Summon = spec.Parse<SummonBossParams>();
+                    info.SummonCondition = Conditions.ConditionCompiler.CompileAll(info.Summon.Conditions);
+                    break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

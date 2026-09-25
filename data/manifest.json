@@ -9,6 +9,7 @@
     "blocks/built.json",
     "blocks/natural.json",
     "blocks/ores.json",
+    "enemies/bosses.json",
     "enemies/early.json",
     "enemies/events.json",
     "items/consumables.json",

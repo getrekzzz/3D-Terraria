@@ -19,6 +19,10 @@
     { "id": "swiftness_draught", "output": "swiftness_draught", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "glowcap", "count": 1 }, { "item": "cactus", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
     { "id": "ironbark_draught", "output": "ironbark_draught", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "iron_ore", "count": 1 }, { "item": "mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
     { "id": "amethyst_staff", "output": "amethyst_staff", "inputs": [{ "item": "copper_bar", "count": 10 }, { "item": "amethyst", "count": 8 }], "stations": ["anvil"] },
-    { "id": "topaz_staff", "output": "topaz_staff", "inputs": [{ "item": "tin_bar", "count": 10 }, { "item": "topaz", "count": 8 }], "stations": ["anvil"] }
+    { "id": "topaz_staff", "output": "topaz_staff", "inputs": [{ "item": "tin_bar", "count": 10 }, { "item": "topaz", "count": 8 }], "stations": ["anvil"] },
+    { "id": "gelatin_crown", "output": "gelatin_crown", "inputs": [{ "item": "gel", "count": 20 }, { "item": "gold_bar", "count": 4 }], "stations": ["workbench"] },
+    { "id": "gelatin_crown_platinum", "output": "gelatin_crown", "inputs": [{ "item": "gel", "count": 20 }, { "item": "platinum_bar", "count": 4 }], "stations": ["workbench"] },
+    { "id": "glaring_lens", "output": "glaring_lens", "inputs": [{ "item": "lens", "count": 6 }], "stations": ["anvil"] },
+    { "id": "rotten_bait", "output": "rotten_bait", "inputs": [{ "item": "umbral_stone", "count": 20 }, { "item": "gel", "count": 5 }], "stations": ["anvil"] }
   ]
 }

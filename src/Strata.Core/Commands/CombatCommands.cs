@@ -65,6 +65,22 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "boss", Usage = "boss <enemy> [distance]", Help = "Summons a boss near the player, ignoring its summon conditions.",
+            Run = (ctx, a) =>
+            {
+                var content = ctx.World.Session.Content;
+                var id = a.Str(0, "enemy");
+                if (!content.Enemies.TryGet(id, out var def) || def.Boss == null)
+                    throw new CommandException($"unknown boss '{id}' (bosses: {string.Join(", ", content.Enemies.All.Where(e => e.Boss != null).Select(e => e.Id))})");
+                float distance = a.Count > 1 ? a.Float(1, "distance") : 20f;
+                var p = ctx.Player;
+                var flat = Vector3.Normalize(new Vector3(p.Aim.X, 0, p.Aim.Z) + new Vector3(0, 0, 1e-4f));
+                var at = p.Position + flat * distance + new Vector3(0, def.Gravity ? 6f : def.Boss.Segments > 0 ? -8f : 8f, 0);
+                return ctx.World.Npcs.Spawn(def, at) is { } npc ? CommandResult.Success($"{def.Boss.Title} summoned (id {npc.Id}).") : CommandResult.Fail("creature cap reached");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "killall", Usage = "killall", Help = "Removes every creature (no loot).",
             Run = (ctx, _) =>
             {

@@ -12,6 +12,7 @@ public static class ItemBehaviorSpecs
     public const string PlaceBlock = "placeBlock";
     public const string PlaceObject = "placeObject";
     public const string Consume = "consume";
+    public const string SummonBoss = "summonBoss";
 
     public static void Register(SpecCatalog c)
     {
@@ -24,6 +25,7 @@ public static class ItemBehaviorSpecs
         c.Register<PlaceParams>(SpecKind.ItemBehavior, PlaceBlock);
         c.Register<PlaceParams>(SpecKind.ItemBehavior, PlaceObject);
         c.Register<ConsumeParams>(SpecKind.ItemBehavior, Consume);
+        c.Register<SummonBossParams>(SpecKind.ItemBehavior, SummonBoss);
     }
 }
 
@@ -72,4 +74,19 @@ public sealed class ConsumeParams : SpecParams
     public int PermanentMana { get; init; }
 
     public int ManaCap { get; init; } = 200;
+}
+
+/// <summary>Summons a boss near the player when its conditions hold (e.g. night, a biome).</summary>
+public sealed class SummonBossParams : SpecParams
+{
+    public string Enemy { get; init; } = "";
+
+    /// <summary>Conditions evaluated at the player's position.</summary>
+    public TypedSpec[] Conditions { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>Spawn distance from the player (m).</summary>
+    public float Distance { get; init; } = 25f;
+
+    /// <summary>Message shown when the conditions fail.</summary>
+    public string? FailMessage { get; init; }
 }

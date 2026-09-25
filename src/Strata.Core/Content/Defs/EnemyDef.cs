@@ -1,5 +1,38 @@
 namespace Strata.Core.Content.Defs;
 
+/// <summary>Boss metadata: presentation, arena, progression and body segments (worms).</summary>
+public sealed class BossInfo
+{
+    /// <summary>Shown on the boss bar and in announcements.</summary>
+    public string Title { get; init; } = "";
+
+    /// <summary>Progression flag set when defeated.</summary>
+    public string? Flag { get; init; }
+
+    /// <summary>Beyond this distance (m) from every player the boss leaves (despawns).</summary>
+    public float ArenaRadius { get; init; } = 120f;
+
+    /// <summary>Leaves when day breaks (night bosses).</summary>
+    public bool DespawnAtDay { get; init; }
+
+    /// <summary>Music state requested while alive.</summary>
+    public string? Music { get; init; }
+
+    /// <summary>Body segments following the head (worms); 0 = single body.</summary>
+    public int Segments { get; init; }
+
+    /// <summary>Distance between segment centres (m).</summary>
+    public float SegmentSpacing { get; init; } = 1f;
+
+    /// <summary>Collision radius of body segments (m).</summary>
+    public float SegmentRadius { get; init; } = 0.6f;
+
+    /// <summary>Creature model for body segments and for the last segment (defaults to the segment model).</summary>
+    public string? SegmentModel { get; init; }
+
+    public string? TailModel { get; init; }
+}
+
 /// <summary>A hostile or passive creature. Behaviour comes from its <see cref="Brain"/> spec.</summary>
 public sealed class EnemyDef : ContentDef
 {
@@ -30,6 +63,9 @@ public sealed class EnemyDef : ContentDef
     public float Scale { get; init; } = 1f;
 
     public string? Loot { get; init; }
+
+    /// <summary>Set for bosses (boss bar, arena, defeat flag, segments).</summary>
+    public BossInfo? Boss { get; init; }
 
     /// <summary>Coins dropped (copper).</summary>
     public int Value { get; init; }

@@ -132,6 +132,7 @@ vortexian|Vortexian|endgame|vortex pillar|walker
 predictor|Predictor|endgame|nebula pillar|flyer
 stargazer|Stargazer|endgame|stardust pillar|caster
 etherian_goblin|Etherian Goblin|prehardmode|old one's army|walker
+servant_of_cthulhu|Servant of Cthulhu|early|eye of cthulhu|flyer,minion
 """
 
 # id|Name|layer|kind

@@ -1326,6 +1326,17 @@
    "mechanics": [
     "walker"
    ]
+  },
+  {
+   "id": "terraria:servant_of_cthulhu",
+   "name": "Servant of Cthulhu",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "eye of cthulhu",
+   "mechanics": [
+    "flyer",
+    "minion"
+   ]
   }
  ]
 }

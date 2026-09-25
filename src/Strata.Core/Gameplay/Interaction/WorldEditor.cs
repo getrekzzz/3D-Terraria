@@ -125,6 +125,37 @@ public sealed partial class WorldEditor
         if (block == 0) BreakUnsupportedAround(new[] { cell }, new List<TileObjectInstance>());
     }
 
+    /// <summary>
+    /// Removes natural terrain in a sphere (burrowing creatures, explosions without drops). Player-built and
+    /// structure cells are kept; remeshing is scheduled non-urgently.
+    /// </summary>
+    public int Carve(Vector3 centerMeters, float radiusCells)
+    {
+        var c = new Int3((int)MathF.Floor(centerMeters.X / Units.CellSize), (int)MathF.Floor(centerMeters.Y / Units.CellSize), (int)MathF.Floor(centerMeters.Z / Units.CellSize));
+        int r = (int)MathF.Ceiling(radiusCells);
+        var batch = World.BeginEdit();
+        var opened = new List<Int3>();
+        for (int y = -r; y <= r; y++)
+            for (int z = -r; z <= r; z++)
+                for (int x = -r; x <= r; x++)
+                {
+                    if (x * x + y * y + z * z > radiusCells * radiusCells) continue;
+                    var cell = c + new Int3(x, y, z);
+                    ushort b = World.GetBlock(cell);
+                    if (b == 0 || b == VoxelWorld.Unknown || !_session.Content.Blocks[b].IsSolid) continue;
+                    if ((World.GetFlags(cell.X, cell.Y, cell.Z) & (CellFlags.PlayerPlaced | CellFlags.Structure)) != 0) continue;
+                    if (b == World.Bedrock) continue;
+                    batch.SetBlock(cell, 0);
+                    opened.Add(cell);
+                }
+        if (opened.Count == 0) return 0;
+        FallingBlocks.Settle(batch, _session.Content, opened);
+        var dirty = _session.Commit(batch);
+        ChunksDirty?.Invoke(dirty);
+        BreakUnsupportedAround(opened, new List<TileObjectInstance>());
+        return opened.Count;
+    }
+
     /// <summary>Changes the shape of a player-placed crisp block (hammer).</summary>
     public bool Reshape(Int3 cell, byte shape)
     {

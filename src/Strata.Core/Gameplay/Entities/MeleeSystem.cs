@@ -61,7 +61,7 @@ public sealed class MeleeSystem
             foreach (var npc in _npcs.All.ToList())
             {
                 if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
-                if (!Connects(s, npc, t)) continue;
+                if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, t))) continue;
                 var item = s.Item.Item;
                 if (_npcs.Hit(npc, s.Player, item.Damage, item.DamageType, item.Crit + Combat.DamageModel.BaseCritChance, item.Knockback, s.Player.Center, melee: true))
                     s.Hit.Add(npc.Id);
@@ -70,11 +70,11 @@ public sealed class MeleeSystem
         }
     }
 
-    private static bool Connects(Swing s, Npc npc, float t)
+    private static bool Connects(Swing s, Vector3 center, Vector3 half, float t)
     {
         var origin = s.Player.Center + new Vector3(0, 0.3f, 0);
-        var to = npc.Center - origin;
-        float radius = MathF.Max(npc.HalfExtents.X, npc.HalfExtents.Y);
+        var to = center - origin;
+        float radius = MathF.Max(half.X, half.Y);
         if (s.Item.Has(ItemAction.Thrust))
         {
             float length = s.Item.ThrustParams!.Length * Units.CellSize + 0.4f;
@@ -88,13 +88,13 @@ public sealed class MeleeSystem
         var flat = new Vector3(to.X, 0, to.Z);
         if (flat.Length() > reach + radius) return false;
         float aimPlaneY = MathF.Tan(s.Pitch) * flat.Length();
-        if (MathF.Abs(to.Y - aimPlaneY) > VerticalReach + npc.HalfExtents.Y) return false;
+        if (MathF.Abs(to.Y - aimPlaneY) > VerticalReach + half.Y) return false;
         if (flat.Length() < 0.6f) return true; // point blank
         // The blade sweeps from +arc/2 to −arc/2 around the aim yaw over the animation.
-        float half = swing.Arc * MathF.PI / 360f;
-        float current = half - t * 2f * half;
+        float halfArc = swing.Arc * MathF.PI / 360f;
+        float current = halfArc - t * 2f * halfArc;
         float angle = WrapAngle(BrainFactory.YawOf(flat) - s.Yaw);
-        return angle <= half && angle >= current - 0.25f;
+        return angle <= halfArc && angle >= current - 0.25f;
     }
 
     private static float WrapAngle(float a)

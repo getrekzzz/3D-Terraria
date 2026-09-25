@@ -1,0 +1,26 @@
+# Bosses: summoning, boss bar data, minions, worm tunnelling, defeat flags.
+wait_until player.frozen == 0 180
+spawning off
+killall
+heal
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 8 12 air
+wait 0.5
+boss gel_sovereign 12
+assert npcs.gel_sovereign == 1
+wait 2
+assert player.alive == 1
+killall
+time 22
+give glaring_lens 1
+wield glaring_lens
+use
+assert npcs.watcher == 1
+wait 3
+killall
+boss bore_tyrant 10
+wait 3
+assert npcs.bore_tyrant == 1
+killall
+time noon
+assert errors == 0

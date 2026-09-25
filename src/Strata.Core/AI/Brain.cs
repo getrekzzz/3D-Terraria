@@ -17,6 +17,14 @@ public sealed class BrainContext
     public bool OnSurface { get; set; }
     public Pcg32 Rng;
 
+    /// <summary>Spawns a minion (bosses); returns null when the creature cap is reached.</summary>
+    public Func<Content.Defs.EnemyDef, Vector3, Npc?>? Spawn { get; set; }
+
+    /// <summary>Removes natural terrain in a sphere (radius in cells) — burrowing creatures.</summary>
+    public Action<Vector3, float>? Carve { get; set; }
+
+    public required Content.ContentDatabase Content { get; init; }
+
     public const float Gravity = 22f;
 }
 
@@ -25,6 +33,9 @@ public interface IBrain
 {
     /// <summary>Whether gravity applies to this creature.</summary>
     bool UsesGravity { get; }
+
+    /// <summary>Moves through terrain without collision (burrowers); the brain handles everything.</summary>
+    bool MovesFreely => false;
 
     void Think(Npc npc, BrainContext ctx);
 
@@ -41,6 +52,9 @@ public static class BrainFactory
         BrainSpecs.Walker => new WalkerBrain(spec.Parse<WalkerParams>()),
         BrainSpecs.Flyer => new FlyerBrain(spec.Parse<FlyerParams>()),
         BrainSpecs.Idle => new IdleBrain(),
+        BrainSpecs.GelSovereign => new GelSovereignBrain(spec.Parse<GelSovereignParams>()),
+        BrainSpecs.Watcher => new WatcherBrain(spec.Parse<WatcherParams>()),
+        BrainSpecs.Worm => new WormBrain(spec.Parse<WormParams>()),
         _ => throw new InvalidOperationException($"Unknown brain '{spec.Type}' (the content validator should have rejected it)."),
     };
 

@@ -88,6 +88,10 @@ public sealed class ItemUseSystem
             outcome = UseTool(p, info, inReach);
             useTime = (int)MathF.Ceiling(useTime / (1f + p.State.Effects.Stats.Bonus(StatIds.MiningSpeed)));
         }
+        else if (info.Has(ItemAction.SummonBoss))
+        {
+            outcome = Summon(p, info);
+        }
         else if (info.Has(ItemAction.Consume))
         {
             outcome = Consume(p, info);
@@ -197,6 +201,31 @@ public sealed class ItemUseSystem
         if (cfg.PermanentLife > 0) state.Vitals.Heal(cfg.PermanentLife);
         if (cfg.PermanentMana > 0) state.Vitals.RestoreMana(cfg.PermanentMana);
         if (item.Consumable) ConsumeHeld(p);
+        return UseOutcome.Consumed;
+    }
+
+    /// <summary>Raised when a summon fails its conditions (message for the player).</summary>
+    public event Action<PlayerEntity, string>? Refused;
+
+    private UseOutcome Summon(PlayerEntity p, ItemUseInfo info)
+    {
+        var cfg = info.Summon!;
+        var content = _world.Session.Content;
+        if (!content.Enemies.TryGet(cfg.Enemy, out var boss)) return UseOutcome.Blocked;
+        if (_world.Npcs.All.Any(n => n.Def == boss && n.Alive)) return UseOutcome.Blocked;
+        var ctx = _world.Session.ContextAt(p.FeetCell);
+        if (!info.SummonCondition!.Evaluate(ctx))
+        {
+            if (cfg.FailMessage != null) Refused?.Invoke(p, cfg.FailMessage);
+            return UseOutcome.Blocked;
+        }
+        var flat = System.Numerics.Vector3.Normalize(new System.Numerics.Vector3(p.Aim.X, 0, p.Aim.Z) + new System.Numerics.Vector3(1e-4f, 0, 0));
+        var at = p.Position + flat * cfg.Distance;
+        if (!boss.Gravity) at.Y += 8f; // fliers arrive from above
+        else if (boss.Boss is { Segments: > 0 }) at.Y -= 10f; // burrowers rise from below
+        else at.Y += 6f; // hoppers drop in
+        if (_world.Npcs.Spawn(boss, at) == null) return UseOutcome.Blocked;
+        if (info.Item.Consumable) ConsumeHeld(p);
         return UseOutcome.Consumed;
     }
 

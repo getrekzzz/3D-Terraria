@@ -122,11 +122,12 @@ def plan(spec, blocks, items, objects, enemies):
 
 
 def build(opts, spec, object_jobs, item_jobs, creature_jobs):
-    from bgen import creatures, export, furniture, items as item_gen, nature
+    import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
+    from bgen import bosses, creatures, export, furniture, items as item_gen, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
 
-    generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS}
+    generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS, **bosses.GENERATORS}
     manifest_path = REPO / "assets" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() and opts["only"] else {"objects": {}, "items": {}}
     wanted = (lambda i: fnmatch.fnmatch(i, opts["only"])) if opts["only"] else (lambda i: True)
@@ -180,7 +181,8 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
         reset_scene()
         props = PropMaterials(REPO)
         mb = MeshBuilder(name)
-        rig = creatures.GENERATORS[job["generator"]](mb, job.get("params", {}), rng_for(name, 0))
+        gen = creatures.GENERATORS.get(job["generator"]) or bosses.GENERATORS[job["generator"]]
+        rig = gen(mb, job.get("params", {}), rng_for(name, 0))
         for slot in mb.materials:
             props.validate(slot)
         objs = creatures.finish(mb.build(export.simple_material), rig, name)

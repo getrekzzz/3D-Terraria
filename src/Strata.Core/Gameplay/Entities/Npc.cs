@@ -55,14 +55,35 @@ public sealed class Npc
     // Brain scratch state (meaning defined by the brain).
     public int Timer;
     public int Counter;
+    public int Counter2;
     public int Phase;
     public Vector3 Direction;
 
     /// <summary>Set by the brain: the player it is chasing (null when idle/wandering).</summary>
     public long TargetPlayer { get; set; } = -1;
 
-    /// <summary>What the visual should show ("idle", "move", "attack", "jump").</summary>
+    /// <summary>What the visual should show ("idle", "move", "attack", "jump", "telegraph", "teleport").</summary>
     public string Pose { get; set; } = "idle";
+
+    /// <summary>Model shown instead of the definition's (boss phase changes).</summary>
+    public string? ModelOverride { get; set; }
+
+    /// <summary>Temporarily immune to damage (teleporting, burrowing phases).</summary>
+    public bool Invulnerable { get; set; }
+
+    /// <summary>Centres of trailing body segments (worms), head first; empty for single-body creatures.</summary>
+    public List<Vector3> Segments { get; } = new();
+
+    public bool IsBoss => Def.Boss != null;
+
+    /// <summary>Every volume that can hit or be hit: the body plus segments.</summary>
+    public IEnumerable<(Vector3 Min, Vector3 Max)> Volumes()
+    {
+        yield return Box;
+        if (Segments.Count == 0) yield break;
+        var half = new Vector3(Def.Boss?.SegmentRadius ?? 0.5f);
+        foreach (var s in Segments) yield return (s - half, s + half);
+    }
 
     public bool Alive => Life > 0;
     public Vector3 Center => Position + new Vector3(0, HalfExtents.Y, 0);

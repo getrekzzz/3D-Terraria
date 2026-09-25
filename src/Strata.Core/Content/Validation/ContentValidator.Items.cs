@@ -22,6 +22,12 @@ public static partial class ContentValidator
             ctx.Ref(i, ctx.Db.Buffs, i.Buff?.Id, "buff");
             ctx.Light(i, i.HeldLight, "heldLight");
             ctx.Asset(i, AssetPaths.ItemModel(i, ctx.Db), "model");
+            foreach (var b in i.Behaviors.Where(b => b.Type == Specs.ItemBehaviorSpecs.SummonBoss))
+            {
+                if (b.Raw.TryGetProperty("enemy", out var enemy)) ctx.Ref(i, ctx.Db.Enemies, enemy.GetString(), "summonBoss.enemy");
+                if (b.Raw.TryGetProperty("conditions", out var conds) && conds.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    ctx.Specs(i, Specs.SpecKind.Condition, conds.EnumerateArray().Select(c => new TypedSpec(c.GetProperty("type").GetString()!, c.Clone())), "summonBoss.conditions");
+            }
             ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");
             if (i.UseAmmo != null && !ammoClasses.Contains(i.UseAmmo)) ctx.Error(i, $"useAmmo '{i.UseAmmo}' has no ammo items.");
             if (i.UseStyle == UseStyle.Shoot && i.Projectile == null && i.UseAmmo == null)

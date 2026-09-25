@@ -343,9 +343,17 @@
    "model": "assets/models/items/gel.glb",
    "icon": "assets/icons/items/gel.png"
   },
+  "gelatin_crown": {
+   "model": "assets/models/items/gelatin_crown.glb",
+   "icon": "assets/icons/items/gelatin_crown.png"
+  },
   "geode_shard": {
    "model": "assets/models/items/geode_shard.glb",
    "icon": "assets/icons/items/geode_shard.png"
+  },
+  "glaring_lens": {
+   "model": "assets/models/items/glaring_lens.glb",
+   "icon": "assets/icons/items/glaring_lens.png"
   },
   "glimmer_blade": {
    "model": "assets/models/items/glimmer_blade.glb",
@@ -571,6 +579,10 @@
    "object": "rail",
    "icon": "assets/icons/items/rail.png"
   },
+  "rotten_bait": {
+   "model": "assets/models/items/rotten_bait.glb",
+   "icon": "assets/icons/items/rotten_bait.png"
+  },
   "ruby": {
    "model": "assets/models/items/ruby.glb",
    "icon": "assets/icons/items/ruby.png"
@@ -789,6 +801,21 @@
   }
  },
  "creatures": {
+  "bore_head": {
+   "model": "assets/models/creatures/bore_head.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "bore_segment": {
+   "model": "assets/models/creatures/bore_segment.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "bore_tail": {
+   "model": "assets/models/creatures/bore_tail.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
   "cave_bat": {
    "model": "assets/models/creatures/cave_bat.glb",
    "generator": "bat",
@@ -804,6 +831,11 @@
   "gel": {
    "model": "assets/models/creatures/gel.glb",
    "generator": "gel",
+   "animations": []
+  },
+  "gel_sovereign": {
+   "model": "assets/models/creatures/gel_sovereign.glb",
+   "generator": "gel_sovereign",
    "animations": []
   },
   "player": {
@@ -835,6 +867,16 @@
     "use",
     "walk"
    ]
+  },
+  "watcher": {
+   "model": "assets/models/creatures/watcher.glb",
+   "generator": "watcher",
+   "animations": []
+  },
+  "watcher_maw": {
+   "model": "assets/models/creatures/watcher_maw.glb",
+   "generator": "watcher_maw",
+   "animations": []
   }
  },
  "generatorVersion": 1

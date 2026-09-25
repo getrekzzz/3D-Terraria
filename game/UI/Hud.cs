@@ -26,6 +26,9 @@ public sealed partial class Hud : CanvasLayer
     private VBoxContainer _toasts = null!;
     private Label _death = null!;
     private Crosshair _crosshair = null!;
+    private PanelContainer _bossPanel = null!;
+    private Label _bossName = null!;
+    private ProgressBar _bossBar = null!;
 
     public void Initialize(UiContext ui)
     {
@@ -85,6 +88,27 @@ public sealed partial class Hud : CanvasLayer
         _death.AddThemeColorOverride("font_color", new Color(0.9f, 0.25f, 0.25f));
         root.AddChild(_death);
 
+        _bossPanel = new PanelContainer { Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore, CustomMinimumSize = new Vector2(520, 0) };
+        _bossPanel.SetAnchorsPreset(Control.LayoutPreset.CenterTop);
+        _bossPanel.GrowHorizontal = Control.GrowDirection.Both;
+        _bossPanel.OffsetTop = 14;
+        var bossBox = new VBoxContainer();
+        _bossName = new Label { HorizontalAlignment = HorizontalAlignment.Center };
+        _bossName.AddThemeFontSizeOverride("font_size", 18);
+        bossBox.AddChild(_bossName);
+        (_bossBar, _) = Bar(bossBox, new Color(0.75f, 0.12f, 0.2f));
+        _bossBar.CustomMinimumSize = new Vector2(500, 18);
+        _bossPanel.AddChild(bossBox);
+        root.AddChild(_bossPanel);
+
+        var npcs = ui.Game.Npcs;
+        npcs.BossSpawned += b => Announce($"{b.Def.Boss!.Title} has awoken!", new Color(0.8f, 0.5f, 1f));
+        npcs.BossDefeated += b => Announce($"{b.Def.Boss!.Title} has been defeated!", new Color(1f, 0.85f, 0.4f));
+        npcs.BossLeft += b => Announce($"{b.Def.Boss!.Title} has left.", UiTheme.Muted);
+        ui.Game.ItemUse.Refused += (p, message) =>
+        {
+            if (p == ui.Entity) Toast(message, UiTheme.Muted);
+        };
         ui.Notified += Toast;
         ui.Game.Events.Announced += (text, def) => Announce(text, def.SkyTint != null ? Color.FromHtml(def.SkyTint).Lightened(0.3f) : new Color(0.7f, 0.85f, 1f));
         ui.Game.ItemPickedUp += (p, stack) =>
@@ -128,9 +152,22 @@ public sealed partial class Hud : CanvasLayer
         _mana.Value = v.Mana;
         _manaText.Text = $"Mana {v.Mana}/{v.MaxMana}";
         UpdateBuffs();
+        UpdateBossBar();
         _crosshair.InReach = _ui.Interaction.InReach;
         _death.Visible = !_ui.Entity.Alive;
         if (_death.Visible) _death.Text = $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
+    }
+
+    private void UpdateBossBar()
+    {
+        Strata.Core.Gameplay.Entities.Npc? boss = null;
+        foreach (var n in _ui.Game.Npcs.All)
+            if (n.IsBoss && n.Alive && (boss == null || n.Life > boss.Life)) boss = n;
+        _bossPanel.Visible = boss != null;
+        if (boss == null) return;
+        _bossName.Text = boss.Def.Boss!.Title;
+        _bossBar.MaxValue = boss.MaxLife;
+        _bossBar.Value = boss.Life;
     }
 
     private void UpdateBuffs()
