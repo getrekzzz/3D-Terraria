@@ -44,3 +44,42 @@ jobs:
       - name: Validate content
         if: runner.os == 'Linux'
         run: dotnet run --project tools/Strata.Tools -c Debug --no-build -- validate
+
+  engine-smoke:
+    name: Godot smoke test
+    runs-on: ubuntu-latest
+    needs: core
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Cache Godot
+        uses: actions/cache@v4
+        with:
+          path: ~/godot
+          key: godot-${{ env.GODOT_VERSION }}-mono-linux
+      - name: Get Godot
+        run: echo "GODOT=$(bash tools/ci/get-godot.sh ~/godot)" >> "$GITHUB_ENV"
+      - name: Build game assembly
+        run: dotnet build Strata.csproj -c Debug
+      - name: Import project
+        run: timeout 900 "$GODOT" --headless --path . --import
+      - name: Run smoke scripts
+        run: |
+          set -o pipefail
+          for script in game/Testing/Scripts/*.cmds; do
+            name=$(basename "$script" .cmds)
+            echo "::group::$name"
+            timeout 600 "$GODOT" --headless --path . --audio-driver Dummy -- \
+              --world=smoke-$name --size=tiny --new --player=smoke --fresh-player --view=2 \
+              --smoke=res://$script 2>&1 | tee "smoke-$name.log"
+            grep -q "SMOKE PASS" "smoke-$name.log"
+            echo "::endgroup::"
+          done
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-logs
+          path: smoke-*.log

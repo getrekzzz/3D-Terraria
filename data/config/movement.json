@@ -1,0 +1,21 @@
+{
+  // Player movement tuning. One cell is 0.5 m; the player is 1.8 m tall (3.6 cells).
+  "walkSpeed": 5.0,
+  "sprintMultiplier": 1.35,
+  "groundAcceleration": 40,
+  "groundFriction": 30,
+  "airAcceleration": 22,
+  "gravity": 32,
+  "jumpHoldGravity": 0.45,
+  "jumpHoldTime": 0.28,
+  "jumpSpeed": 8.2,
+  "coyoteTime": 0.12,
+  "jumpBuffer": 0.12,
+  "maxFallSpeed": 30,
+  "stepHeight": 0.55,
+  "swimGravity": 6,
+  "swimSpeed": 3.2,
+  "swimUpSpeed": 3.6,
+  "safeFallCells": 25,
+  "fallDamagePerCell": 10
+}

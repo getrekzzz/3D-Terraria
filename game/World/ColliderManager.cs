@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 using Strata.Core.Common;
 using Strata.Core.Meshing;
@@ -14,10 +15,14 @@ public sealed partial class ColliderManager : Node3D
     public const uint TerrainLayer = 1;
     public const uint PlatformLayer = 2;
 
+    /// <summary>Solid tile objects (closed doors, chests, tree trunks).</summary>
+    public const uint ObjectLayer = 4;
+
     private sealed class ChunkCollision
     {
         public CollisionBuilder Data = null!;
         public Rid Body;
+        public Rid PlatformBody;
         public readonly List<Shape3D> Shapes = new();
         public bool Dirty = true;
     }
@@ -81,6 +86,18 @@ public sealed partial class ColliderManager : Node3D
         PhysicsServer3D.BodySetCollisionMask(body, 0);
         AddShapes(body, c, c.Data.Solid);
         c.Body = body;
+        if (c.Data.Platforms.Any(l => l.Count > 0))
+        {
+            // One-way platforms live on their own layer; bodies moving upwards drop it from their mask.
+            var platforms = PhysicsServer3D.BodyCreate();
+            PhysicsServer3D.BodySetMode(platforms, PhysicsServer3D.BodyMode.Static);
+            PhysicsServer3D.BodySetSpace(platforms, GetWorld3D().Space);
+            PhysicsServer3D.BodySetState(platforms, PhysicsServer3D.BodyState.Transform, transform);
+            PhysicsServer3D.BodySetCollisionLayer(platforms, PlatformLayer);
+            PhysicsServer3D.BodySetCollisionMask(platforms, 0);
+            AddShapes(platforms, c, c.Data.Platforms);
+            c.PlatformBody = platforms;
+        }
         BodyCount++;
         Versions[coord] = Versions.GetValueOrDefault(coord) + 1;
     }
@@ -102,6 +119,8 @@ public sealed partial class ColliderManager : Node3D
         if (!c.Body.IsValid) return;
         PhysicsServer3D.FreeRid(c.Body);
         c.Body = default;
+        if (c.PlatformBody.IsValid) PhysicsServer3D.FreeRid(c.PlatformBody);
+        c.PlatformBody = default;
         c.Shapes.Clear();
         BodyCount--;
     }

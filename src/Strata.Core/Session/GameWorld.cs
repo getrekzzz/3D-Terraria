@@ -36,10 +36,22 @@ public sealed class PlayerEntity
     /// <summary>Quarter turns about +Y for shapes and objects (added to the facing direction).</summary>
     public int BuildRotation { get; set; }
 
+    /// <summary>Ticks until respawn while dead.</summary>
+    public int RespawnTicks { get; set; }
+
     /// <summary>Precision mode: tools affect a single cell.</summary>
     public bool Precision { get; set; }
 
     public static readonly Vector3 HalfExtents = new(0.45f, 0.9f, 0.45f);
+
+    /// <summary>
+    /// The cell containing the feet. Bodies rest a few centimetres into the smoothed ground surface, so the cell is
+    /// taken slightly above the feet point.
+    /// </summary>
+    public Common.Int3 FeetCell => new(
+        (int)MathF.Floor(Position.X / Units.CellSize),
+        (int)MathF.Floor((Position.Y + 0.1f) / Units.CellSize),
+        (int)MathF.Floor(Position.Z / Units.CellSize));
 
     /// <summary>Eye position in meters.</summary>
     public Vector3 Eye => Position + new Vector3(0, 1.6f, 0);
@@ -105,6 +117,13 @@ public sealed class GameWorld : IDisposable
     /// <summary>Raised after an autosave with the number of chunks written.</summary>
     public event Action<int>? Autosaved;
 
+    public event Action<PlayerEntity>? PlayerDied;
+
+    /// <summary>Raised when a player respawns (the engine moves the body to <see cref="PlayerEntity.Position"/>).</summary>
+    public event Action<PlayerEntity>? PlayerRespawned;
+
+    public const int RespawnDelayTicks = Units.TicksPerSecond * 5;
+
     /// <summary>Per-frame work: stream around the focus and finish completed jobs within a time budget.</summary>
     public void Update(Int3 focusCell, double jobBudgetMs)
     {
@@ -134,6 +153,21 @@ public sealed class GameWorld : IDisposable
     private void TickPlayer(PlayerEntity p)
     {
         var state = p.State;
+        if (!p.Alive)
+        {
+            if (p.RespawnTicks == 0)
+            {
+                p.RespawnTicks = RespawnDelayTicks;
+                state.Deaths++;
+                state.Buffs.ClearNonPersistent();
+                PlayerDied?.Invoke(p);
+            }
+            else if (--p.RespawnTicks == 0)
+            {
+                Respawn(p);
+            }
+            return;
+        }
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.UseAnimation > 0) p.UseAnimation--;
         if (state.Buffs.Tick()) state.Recompute();
@@ -144,6 +178,17 @@ public sealed class GameWorld : IDisposable
             if (dps > 0 && p.Alive) state.Vitals.DamageDirect(dps);
             state.Recompute();
         }
+    }
+
+    public void Respawn(PlayerEntity p)
+    {
+        p.RespawnTicks = 0;
+        p.State.Recompute();
+        p.State.Vitals.Life = p.State.Vitals.MaxLife;
+        p.State.Vitals.Mana = p.State.Vitals.MaxMana;
+        p.Position = SpawnPositionFor(p.State);
+        p.Velocity = Vector3.Zero;
+        PlayerRespawned?.Invoke(p);
     }
 
     public PlayerEntity AddPlayer(PlayerState state, Vector3 feet)
@@ -190,6 +235,14 @@ public sealed class GameWorld : IDisposable
             }
         }
         return PlayerState.CreateNew(name, content);
+    }
+
+    /// <summary>Deletes a player's file and its backup (fresh characters for tests).</summary>
+    public static void DeletePlayer(string directory, string name)
+    {
+        var path = PlayerPath(directory, name);
+        foreach (var p in new[] { path, path + ".bak", path + ".tmp" })
+            if (File.Exists(p)) File.Delete(p);
     }
 
     public static string PlayerPath(string directory, string name)

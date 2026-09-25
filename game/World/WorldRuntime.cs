@@ -1,6 +1,6 @@
 using Godot;
-using Strata.Core.Common;
 using Strata.Core.Diagnostics;
+using Strata.Core.Common;
 using Strata.Core.Session;
 using Strata.Core.Streaming;
 using Strata.Game.Ambience;
@@ -9,34 +9,35 @@ using Strata.Game.Bootstrap;
 namespace Strata.Game.World;
 
 /// <summary>
-/// Hosts a live <see cref="WorldSession"/> in the scene: streaming, job completion, mesh upload,
-/// colliders, clock and environment. Gameplay nodes (player, entities) attach under it.
+/// Hosts a live <see cref="GameWorld"/> in the scene: drives streaming and the fixed tick, uploads meshes and
+/// colliders, and runs the environment. Gameplay presentation nodes (player, entities, UI) attach under it.
 /// </summary>
 public sealed partial class WorldRuntime : Node3D
 {
     private GameServices _services = null!;
-    private JobSystem _jobs = null!;
     private ChunkRenderer _renderer = null!;
     private ColliderManager _colliders = null!;
     private EnvironmentController _environment = null!;
-    private int _tickAccumulator;
 
-    public WorldSession Session { get; private set; } = null!;
-    public ChunkStreamer Streamer { get; private set; } = null!;
+    public GameWorld Game { get; private set; } = null!;
+    public WorldSession Session => Game.Session;
+    public ChunkStreamer Streamer => Game.Streamer;
+    public JobSystem Jobs => Game.Jobs;
     public ChunkRenderer Renderer => _renderer;
     public ColliderManager Colliders => _colliders;
     public EnvironmentController Environment => _environment;
-    public JobSystem Jobs => _jobs;
+    public GameServices Services => _services;
 
     /// <summary>Node whose position drives streaming (player or camera).</summary>
     public Node3D? Focus { get; set; }
 
-    public void Initialize(GameServices services, WorldSession session, StreamingSettings streaming)
+    /// <summary>When false the fixed tick is paused (menus, loading).</summary>
+    public bool Simulating { get; set; } = true;
+
+    public void Initialize(GameServices services, GameWorld game)
     {
         _services = services;
-        Session = session;
-        _jobs = new JobSystem(System.Math.Max(1, System.Environment.ProcessorCount - 2), services.Log);
-        Streamer = new ChunkStreamer(session, _jobs, streaming);
+        Game = game;
 
         _renderer = new ChunkRenderer { Name = "Chunks" };
         _renderer.Initialize(new TerrainMaterials(services.Render));
@@ -56,6 +57,7 @@ public sealed partial class WorldRuntime : Node3D
             _renderer.Remove(coord);
             _colliders.Remove(coord);
         };
+        game.Autosaved += chunks => services.Log.Info("world", $"Autosaved ({chunks} chunks).");
     }
 
     public Int3 FocusCell
@@ -67,14 +69,23 @@ public sealed partial class WorldRuntime : Node3D
         }
     }
 
-    /// <summary>Applies an edit batch and schedules remeshing of every affected chunk.</summary>
-    public void Commit(Strata.Core.Voxels.EditBatch batch) => Streamer.MarkDirty(Session.Commit(batch));
+    /// <summary>True once the chunks around a cell are meshed and have colliders (safe to drop a body there).</summary>
+    public bool IsAreaReady(Int3 cell)
+    {
+        var chunk = ChunkMath.CellToChunk(cell);
+        for (int dy = -1; dy <= 0; dy++)
+        {
+            var c = chunk + new Int3(0, dy, 0);
+            if (!Session.World.ChunkInBounds(c)) continue;
+            if (!Streamer.IsMeshed(c) || !_colliders.HasBody(c)) return false;
+        }
+        return true;
+    }
 
     public override void _Process(double delta)
     {
         var focus = FocusCell;
-        Streamer.Update(focus);
-        _jobs.Drain(4.0);
+        Game.Update(focus, 4.0);
         _renderer.ProcessUploads(3.0);
         _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
         float surface = Session.Generator.Terrain.SurfaceHeight(focus.X, focus.Z);
@@ -83,26 +94,19 @@ public sealed partial class WorldRuntime : Node3D
 
     public override void _PhysicsProcess(double delta)
     {
-        Session.Clock.Advance();
-        if (++_tickAccumulator >= Units.TicksPerSecond * 120)
-        {
-            _tickAccumulator = 0;
-            int saved = Session.SaveAll();
-            _services.Log.Info("world", $"Autosaved ({saved} chunks).");
-        }
+        if (Simulating) Game.Tick();
     }
 
     public override void _ExitTree()
     {
         try
         {
-            Session.SaveAll();
-            Streamer.UnloadAll();
+            Game.Shutdown();
         }
         catch (System.Exception ex)
         {
             _services.Log.Error("world", "Saving on exit failed", ex);
         }
-        _jobs.Dispose();
+        Game.Dispose();
     }
 }

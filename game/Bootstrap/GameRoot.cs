@@ -1,12 +1,13 @@
 using System.Globalization;
 using Godot;
+using Strata.Core.Commands;
 using Strata.Core.Content.Loading;
 using Strata.Core.Diagnostics;
 using Strata.Core.Meshing;
-using Strata.Core.Session;
-using Strata.Core.Streaming;
 using Strata.Core.World;
 using Strata.Game.Debug;
+using Strata.Game.Testing;
+using Strata.Game.UI;
 using Strata.Game.World;
 
 namespace Strata.Game.Bootstrap;
@@ -19,6 +20,8 @@ public partial class GameRoot : Node
 {
     public GameServices Services { get; private set; } = null!;
     public WorldRuntime? World { get; private set; }
+    public CommandRegistry? Commands { get; private set; }
+    public CommandContext? CommandContext { get; private set; }
 
     public override void _Ready()
     {
@@ -30,7 +33,7 @@ public partial class GameRoot : Node
         {
             GD.PushError($"Fatal startup error: {ex}");
             ShowFatal($"Startup failed: {ex.Message}");
-            if (CommandLine.FromOs().Get("screenshot") != null || CommandLine.FromOs().Flag("smoke")) GetTree().Quit(1);
+            if (CommandLine.FromOs().Get("screenshot") != null || CommandLine.FromOs().Get("smoke") != null) GetTree().Quit(1);
         }
     }
 
@@ -62,45 +65,33 @@ public partial class GameRoot : Node
             System.Enum.Parse<WorldSizePreset>(args.Get("size") ?? "small", ignoreCase: true), args.Flag("new"));
     }
 
-    public WorldRuntime StartWorld(string name, long seed, WorldSizePreset size, bool forceNew)
+    public LaunchedWorld StartWorld(string name, long seed, WorldSizePreset size, bool forceNew)
     {
-        var dir = ProjectSettings.GlobalizePath($"user://worlds/{name}");
-        var store = new Strata.Core.Persistence.WorldSaveStore(dir);
-        if (forceNew && System.IO.Directory.Exists(dir)) System.IO.Directory.Delete(dir, recursive: true);
-        var session = store.Exists
-            ? WorldSession.Load(Services.Content, dir, Services.Render, Services.Log)
-            : WorldSession.Create(Services.Content, new WorldSettings { Name = name, Seed = seed, Size = size }, dir, Services.Render, Services.Log);
-        Services.Log.Info("boot", $"World '{name}' seed {session.Settings.Seed} ({session.Settings.Size}).");
-
-        var runtime = new WorldRuntime { Name = "World" };
-        int view = (int)Services.Args.Long("view", 6);
-        runtime.Initialize(Services, session, new StreamingSettings { MeshRadius = view, MeshDown = System.Math.Min(3, view), MeshUp = System.Math.Min(3, view) });
-        AddChild(runtime);
-        World = runtime;
-
-        var camera = new FreeCamera { Name = "FreeCamera" };
-        runtime.AddChild(camera);
-        var spawn = session.SpawnCell;
-        var eye = new Vector3(spawn.X, spawn.Y + 14, spawn.Z + 40) * Strata.Core.Common.Units.CellSize;
-        if (Services.Args.Get("eye") is { } eyeArg) eye = ParseVector(eyeArg);
-        var target = new Vector3(spawn.X, spawn.Y + 4, spawn.Z) * Strata.Core.Common.Units.CellSize;
-        if (Services.Args.Get("look") is { } lookArg) target = ParseVector(lookArg);
-        camera.LookFrom(eye, target);
-        camera.Current = true;
-        runtime.Focus = camera;
-
+        var launched = WorldLauncher.Launch(this, Services, name, seed, size, forceNew);
+        World = launched.Runtime;
+        Commands = BuiltinCommands.CreateRegistry();
+        CommandContext = GodotCommandHost.CreateContext(launched, Services.Log, Commands);
+        var console = new DebugConsole();
+        AddChild(console);
+        console.Initialize(Commands, CommandContext);
         if (Services.Args.Get("screenshot") is { } shot)
+            AddChild(new ScreenshotCapture { World = launched.Runtime, OutputPath = shot });
+        if (Services.Args.Get("smoke") is { } script)
         {
-            if (Services.Args.Get("hour") is { } hour) session.Clock.SetHour(float.Parse(hour, CultureInfo.InvariantCulture));
-            AddChild(new ScreenshotCapture { World = runtime, OutputPath = shot });
+            // Scripts aim from the eye: first person makes the crosshair ray and the eye ray coincide.
+            if (launched.Player != null) launched.Player.Rig.FirstPerson = true;
+            StartScript(script);
         }
-        return runtime;
+        else if (launched.Player != null) Input.MouseMode = Input.MouseModeEnum.Captured;
+        return launched;
     }
 
-    private static Vector3 ParseVector(string s)
+    private void StartScript(string path)
     {
-        var p = s.Split(',');
-        return new Vector3(float.Parse(p[0], CultureInfo.InvariantCulture), float.Parse(p[1], CultureInfo.InvariantCulture), float.Parse(p[2], CultureInfo.InvariantCulture));
+        if (!FileAccess.FileExists(path)) throw new System.IO.FileNotFoundException($"Smoke script not found: {path}");
+        var runner = new ScriptRunner { Name = "ScriptRunner" };
+        AddChild(runner);
+        runner.Start(path, FileAccess.GetFileAsString(path), Commands!, CommandContext!);
     }
 
     private void ShowFatal(string message)
@@ -114,8 +105,8 @@ public partial class GameRoot : Node
     public override void _UnhandledInput(InputEvent @event)
     {
         if (@event.IsActionPressed("pause"))
-            Input.MouseMode = Input.MouseMode == Input.MouseModeEnum.Captured ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
-        else if (@event is InputEventMouseButton { Pressed: true } && Input.MouseMode != Input.MouseModeEnum.Captured)
+            InputGate.SetOpen("pause", !InputGate.IsOpen("pause"));
+        else if (@event is InputEventMouseButton { Pressed: true } && !InputGate.GameplayBlocked && Input.MouseMode != Input.MouseModeEnum.Captured)
             Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 }
