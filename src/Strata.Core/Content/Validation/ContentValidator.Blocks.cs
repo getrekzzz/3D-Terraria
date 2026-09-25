@@ -28,6 +28,19 @@ public static partial class ContentValidator
         }
     }
 
+    private static void ValidateOreVeins(Ctx ctx)
+    {
+        foreach (var o in ctx.Db.OreVeins.All)
+        {
+            ctx.Ref(o, ctx.Db.Blocks, o.Block, "block");
+            foreach (var r in o.Replace) ctx.Ref(o, ctx.Db.Blocks, r, "replace");
+            foreach (var b in o.Biomes) ctx.Ref(o, ctx.Db.Biomes, b, "biomes");
+            if (o.DepthMin > o.DepthMax) ctx.Error(o, "depthMin must be <= depthMax.");
+            if (o.PerChunk < 0) ctx.Error(o, "perChunk must be >= 0.");
+            if (o.SizeMin <= 0 || o.SizeMax < o.SizeMin || o.SizeMax > 12) ctx.Error(o, "size must be [min>0, max>=min, max<=12].");
+        }
+    }
+
     private static void ValidateTileObjects(Ctx ctx)
     {
         foreach (var t in ctx.Db.TileObjects.All)

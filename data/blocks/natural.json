@@ -29,6 +29,7 @@
     { "id": "rain_cloud", "name": "Storm Cloud", "textures": { "all": "rain_cloud" }, "hardness": 0.5, "sound": "cloth", "color": "#8a97a8", "tags": ["natural", "sky"], "covers": ["terraria:rain_cloud"] },
     { "id": "hive", "name": "Hive", "textures": { "all": "hive" }, "hardness": 1.0, "sound": "dirt", "color": "#c7862b", "tags": ["natural", "jungle"], "covers": ["terraria:hive"] },
     { "id": "moss_stone", "name": "Mossy Stone", "textures": { "top": "moss", "side": "stone", "bottom": "stone" }, "hardness": 1.5, "drop": "stone", "sound": "stone", "color": "#5d7d45", "tags": ["natural", "stone"], "covers": ["terraria:green_moss"] },
+    { "id": "abyssal_rock", "name": "Abyssal Rock", "description": "The unbreakable floor of the world.", "textures": { "all": "abyssal_rock" }, "hardness": 100, "pickPower": 1000, "autoItem": false, "sound": "stone", "color": "#1a1418", "tags": ["natural", "unbreakable"] },
     { "id": "glow_moss_stone", "name": "Lumen Moss", "textures": { "top": "glow_moss", "side": "stone", "bottom": "stone" }, "hardness": 1.5, "drop": "stone", "light": [2, 9, 6], "sound": "stone", "color": "#3fd3a0", "tags": ["natural", "stone"], "covers": ["terraria:lava_moss"] }
   ]
 }

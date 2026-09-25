@@ -1,0 +1,28 @@
+{
+  // Ore distribution. depth: 0 = sea level, 1 = underworld ceiling. Alternate groups pick one metal per world.
+  "oreVeins": [
+    { "id": "copper_veins", "block": "copper_ore", "group": "tier1", "replace": ["stone", "deepstone", "loam", "clay"], "depthMin": 0.0, "depthMax": 0.55, "perChunk": 2.2, "size": [1.8, 3.6] },
+    { "id": "tin_veins", "block": "tin_ore", "group": "tier1", "replace": ["stone", "deepstone", "loam", "clay"], "depthMin": 0.0, "depthMax": 0.55, "perChunk": 2.2, "size": [1.8, 3.6] },
+    { "id": "iron_veins", "block": "iron_ore", "group": "tier2", "replace": ["stone", "deepstone", "loam"], "depthMin": 0.05, "depthMax": 0.75, "perChunk": 1.8, "size": [1.8, 3.4] },
+    { "id": "lead_veins", "block": "lead_ore", "group": "tier2", "replace": ["stone", "deepstone", "loam"], "depthMin": 0.05, "depthMax": 0.75, "perChunk": 1.8, "size": [1.8, 3.4] },
+    { "id": "silver_veins", "block": "silver_ore", "group": "tier3", "replace": ["stone", "deepstone"], "depthMin": 0.2, "depthMax": 0.9, "perChunk": 1.3, "size": [1.6, 3.0] },
+    { "id": "tungsten_veins", "block": "tungsten_ore", "group": "tier3", "replace": ["stone", "deepstone"], "depthMin": 0.2, "depthMax": 0.9, "perChunk": 1.3, "size": [1.6, 3.0] },
+    { "id": "gold_veins", "block": "gold_ore", "group": "tier4", "replace": ["stone", "deepstone"], "depthMin": 0.4, "depthMax": 1.0, "perChunk": 0.9, "size": [1.6, 2.8] },
+    { "id": "platinum_veins", "block": "platinum_ore", "group": "tier4", "replace": ["stone", "deepstone"], "depthMin": 0.4, "depthMax": 1.0, "perChunk": 0.9, "size": [1.6, 2.8] },
+    { "id": "umbrite_veins", "block": "umbrite_ore", "replace": ["umbral_stone"], "depthMin": -0.2, "depthMax": 0.6, "perChunk": 2.5, "size": [1.5, 2.6], "biomes": ["umbral"] },
+    { "id": "sanguite_veins", "block": "sanguite_ore", "replace": ["sanguine_stone"], "depthMin": -0.2, "depthMax": 0.6, "perChunk": 2.5, "size": [1.5, 2.6], "biomes": ["sanguine"] },
+    { "id": "cinderstone_veins", "block": "cinderstone", "replace": ["ash"], "depthMin": 0.95, "depthMax": 2.0, "perChunk": 3.0, "size": [2.0, 4.5] },
+    { "id": "amethyst_veins", "block": "amethyst_ore", "replace": ["stone", "deepstone"], "depthMin": 0.35, "depthMax": 1.0, "perChunk": 0.5, "size": [1.2, 2.0], "stretch": 1.0 },
+    { "id": "topaz_veins", "block": "topaz_ore", "replace": ["stone", "deepstone"], "depthMin": 0.4, "depthMax": 1.0, "perChunk": 0.45, "size": [1.2, 2.0], "stretch": 1.0 },
+    { "id": "sapphire_veins", "block": "sapphire_ore", "replace": ["stone", "deepstone"], "depthMin": 0.5, "depthMax": 1.0, "perChunk": 0.4, "size": [1.2, 2.0], "stretch": 1.0 },
+    { "id": "emerald_veins", "block": "emerald_ore", "replace": ["stone", "deepstone"], "depthMin": 0.55, "depthMax": 1.0, "perChunk": 0.35, "size": [1.2, 2.0], "stretch": 1.0 },
+    { "id": "ruby_veins", "block": "ruby_ore", "replace": ["stone", "deepstone"], "depthMin": 0.65, "depthMax": 1.0, "perChunk": 0.3, "size": [1.2, 1.8], "stretch": 1.0 },
+    { "id": "diamond_veins", "block": "diamond_ore", "replace": ["stone", "deepstone"], "depthMin": 0.75, "depthMax": 1.0, "perChunk": 0.2, "size": [1.0, 1.6], "stretch": 1.0 },
+    { "id": "clay_pockets", "block": "clay", "replace": ["loam", "stone"], "depthMin": -0.3, "depthMax": 0.35, "perChunk": 0.5, "size": [3.0, 6.0] },
+    { "id": "loam_pockets", "block": "loam", "replace": ["stone"], "depthMin": 0.0, "depthMax": 0.6, "perChunk": 0.8, "size": [4.0, 8.0] },
+    { "id": "silt_pockets", "block": "silt", "replace": ["stone", "deepstone"], "depthMin": 0.3, "depthMax": 0.9, "perChunk": 0.35, "size": [3.0, 6.0] },
+    { "id": "stone_pockets", "block": "stone", "replace": ["deepstone"], "depthMin": 0.4, "depthMax": 1.0, "perChunk": 0.6, "size": [5.0, 9.0] },
+    { "id": "obsidian_pockets", "block": "obsidian", "replace": ["deepstone", "ash"], "depthMin": 0.85, "depthMax": 1.1, "perChunk": 0.8, "size": [2.0, 4.0] },
+    { "id": "fossil_beds", "block": "fossil", "replace": ["sandstone", "packed_sand"], "depthMin": 0.0, "depthMax": 0.8, "perChunk": 1.5, "size": [2.5, 5.0], "biomes": ["underground_desert", "desert"] }
+  ]
+}

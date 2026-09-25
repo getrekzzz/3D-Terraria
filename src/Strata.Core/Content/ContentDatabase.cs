@@ -20,6 +20,7 @@ public sealed class ContentDatabase
     public Registry<PrefixDef> Prefixes { get; } = new("prefix");
     public Registry<LootTableDef> LootTables { get; } = new("lootTable");
     public Registry<ProgressionFlagDef> Flags { get; } = new("flag");
+    public Registry<OreVeinDef> OreVeins { get; } = new("oreVein");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();
@@ -36,7 +37,7 @@ public sealed class ContentDatabase
     public IEnumerable<IRegistry> AllRegistries => new IRegistry[]
     {
         Blocks, Items, TileObjects, Recipes, RecipeGroups, Biomes, Enemies, SpawnRules, Projectiles, Buffs,
-        Prefixes, LootTables, Flags,
+        Prefixes, LootTables, Flags, OreVeins,
     };
 
     internal ContentDatabase()

@@ -9,6 +9,7 @@ public static class Program
     {
         new ManifestCommand(),
         new ValidateCommand(),
+        new WorldgenReportCommand(),
     };
 
     public static int Main(string[] args)
