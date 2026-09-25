@@ -1174,6 +1174,13 @@
    "source": "dungeon"
   },
   {
+   "id": "terraria:book_of_skulls",
+   "name": "Book of Skulls",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "skeletron"
+  },
+  {
    "id": "terraria:demon_scythe",
    "name": "Demon Scythe",
    "kind": "weapon",

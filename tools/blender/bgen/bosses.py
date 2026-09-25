@@ -1,4 +1,5 @@
-"""Boss models: Gel Sovereign, The Watcher (eye and maw phases), Bore Tyrant (head, segment, tail).
+"""Boss models: Gel Sovereign, The Watcher (eye and maw phases), Bore Tyrant (head, segment, tail), Crypt Warden
+(skull and hands; the skull also serves the guardian and the hexed skulls).
 Sizes are final (scale 1 in game). Front faces Blender +Y."""
 import math
 
@@ -103,7 +104,50 @@ def eye_lens(mb: MeshBuilder, p, rng):
     mb.sphere((0, 0.125, 0.12), 0.025, "prop:plain", "#050505", subdivisions=1, scale=(1, 0.4, 1))
 
 
+def skull(mb: MeshBuilder, p, rng):
+    """A floating skull centred at height centerZ (bosses are drawn at their centre, other fliers at their feet)."""
+    r, z = p.get("radius", 1.3), p.get("centerZ", 0.0)
+    bone, glow = p.get("bone", "#e8e0c8"), p.get("eyes", "#ff5030")
+    mb.sphere((0, -r * 0.05, z + r * 0.12), r, "prop:plain", bone, subdivisions=3, scale=(0.88, 1.0, 0.92), jitter=0.012, rng=rng)
+    # Cheekbones and upper jaw, then a hinged lower jaw hanging slightly open.
+    mb.box((-r * 0.62, r * 0.2, z - r * 0.55), (r * 0.62, r * 0.8, z - r * 0.18), "prop:plain", bone)
+    mb.box((-r * 0.5, r * 0.12, z - r * 0.98), (r * 0.5, r * 0.72, z - r * 0.7), "prop:plain", bone)
+    for sx in (-1, 1):
+        mb.box((sx * r * 0.44 - r * 0.07, r * 0.1, z - r * 0.8), (sx * r * 0.44 + r * 0.07, r * 0.3, z - r * 0.3), "prop:plain", bone)
+    for k in range(-3, 4):  # teeth, upper and lower rows
+        x = k * r * 0.13
+        mb.box((x - r * 0.045, r * 0.74, z - r * 0.62), (x + r * 0.045, r * 0.82, z - r * 0.46), "prop:plain", "#f6f0e2")
+        mb.box((x - r * 0.045, r * 0.64, z - r * 0.74), (x + r * 0.045, r * 0.72, z - r * 0.6), "prop:plain", "#f6f0e2")
+    # Deep sockets with a burning point in each, and the nasal hole.
+    for sx in (-1, 1):
+        mb.sphere((sx * r * 0.34, r * 0.74, z + r * 0.08), r * 0.25, "prop:plain", "#120c0c", subdivisions=2, scale=(1, 0.55, 0.9))
+        mb.sphere((sx * r * 0.34, r * 0.86, z + r * 0.08), r * 0.085, "prop:plain:glow", glow, subdivisions=1)
+    mb.sphere((0, r * 0.84, z - r * 0.2), r * 0.1, "prop:plain", "#120c0c", subdivisions=1, scale=(0.8, 0.5, 1.2))
+    for _ in range(p.get("cracks", 3)):  # a few dark cracks across the dome
+        a = rng.random() * 2 * math.pi
+        start = Vector((math.cos(a) * r * 0.5, -r * 0.1 + math.sin(a) * r * 0.3, z + r * 0.85))
+        mb.tube([start, start + Vector((rng.random() * 0.3 - 0.15, rng.random() * 0.3, -r * 0.35))], [0.04, 0.02], "prop:plain", "#5a5040", segments=4)
+
+
+def bone_hand(mb: MeshBuilder, p, rng):
+    """A skeletal hand centred at the origin, palm facing +Y (towards what it grabs), fingers curling forward."""
+    s, bone = p.get("size", 1.0), p.get("bone", "#e0d8c0")
+    mb.box((-0.45 * s, -0.15 * s, -0.35 * s), (0.45 * s, 0.1 * s, 0.25 * s), "prop:plain", bone)  # palm
+    mb.cylinder((0, -0.05 * s, -0.35 * s), (0, -0.12 * s, -1.0 * s), 0.13 * s, 0.1 * s, "prop:plain", bone, segments=8)  # wrist
+    mb.sphere((0, -0.12 * s, -1.05 * s), 0.16 * s, "prop:plain", bone, subdivisions=1)
+    for k in range(4):
+        x = (-0.33 + k * 0.22) * s
+        base = Vector((x, 0.0, 0.25 * s))
+        mid = base + Vector((0, 0.2 * s, 0.35 * s))
+        tip = mid + Vector((0, 0.35 * s, 0.1 * s))
+        mb.tube([base, mid, tip], [0.075 * s, 0.065 * s, 0.03 * s], "prop:plain", bone, segments=6)
+        for knuckle in (base, mid):
+            mb.sphere(tuple(knuckle), 0.085 * s, "prop:plain", bone, subdivisions=1)
+    thumb = Vector((0.5 * s, 0.0, -0.1 * s))
+    mb.tube([thumb, thumb + Vector((0.2 * s, 0.25 * s, 0.15 * s)), thumb + Vector((0.1 * s, 0.5 * s, 0.25 * s))], [0.08 * s, 0.06 * s, 0.03 * s], "prop:plain", bone, segments=6)
+
+
 GENERATORS = {
     "gel_sovereign": gel_sovereign, "watcher": watcher, "watcher_maw": watcher_maw, "worm_segment": worm_segment,
-    "crown": crown, "eye_lens": eye_lens,
+    "crown": crown, "eye_lens": eye_lens, "skull": skull, "bone_hand": bone_hand,
 }

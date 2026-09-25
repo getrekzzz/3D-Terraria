@@ -71,8 +71,9 @@ public sealed partial class TownSystem
         r.Activity = ResidentActivity.Idle;
         if (--r.IdleTicks > 0) return;
         r.IdleTicks = _rng.Range(Config.IdleTicksMin, Config.IdleTicksMax);
-        var anchor = r.Home ?? CurrentNode(r);
-        int reach = (int)(Config.WanderRadius / Units.CellSize);
+        var landmark = r.Home == null ? LandmarkNode(r.Def) : null;
+        var anchor = r.Home ?? landmark ?? CurrentNode(r);
+        int reach = (int)((landmark != null ? Config.LandmarkRadius : Config.WanderRadius) / Units.CellSize);
         var target = anchor + new Int3(_rng.Range(-reach, reach), 0, _rng.Range(-reach, reach));
         if (_world.Navigator.NearestStandable(target, Agent, 3) is { } node)
         {
@@ -175,9 +176,15 @@ public sealed partial class TownSystem
 
     private void Revive(TownNpc r)
     {
+        var at = r.Home ?? LandmarkNode(r.Def);
+        if (at == null && r.Def.Landmark != null)
+        {
+            r.RespawnTicks = LandmarkInterval; // their place is not loaded: come back once it is
+            return;
+        }
+        at ??= _world.Navigator.NearestStandable(_world.Session.SpawnCell, Agent, 6) ?? _world.Session.SpawnCell;
         r.Life = r.Def.Life;
-        var at = r.Home ?? _world.Navigator.NearestStandable(_world.Session.SpawnCell, Agent, 6) ?? _world.Session.SpawnCell;
-        r.Position = NodeFeet(at);
+        r.Position = NodeFeet(at.Value);
         r.Velocity = Vector3.Zero;
         r.Path = null;
         Spawned?.Invoke(r);

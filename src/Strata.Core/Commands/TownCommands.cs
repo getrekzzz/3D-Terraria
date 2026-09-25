@@ -25,7 +25,7 @@ public static class TownCommands
         });
         r.Register(new CommandDef
         {
-            Name = "town", Usage = "town [check | summon <id> [dx dy dz] | dismiss <id> | talk <id> | buy <id> <item> [count] | sell <slot 1-50> | heal <id> | arrivals on|off]",
+            Name = "town", Usage = "town [check | summon <id> [dx dy dz] | dismiss <id> | talk <id> | buy <id> <item> [count] | sell <slot 1-50> | heal <id> | curse <id> | arrivals on|off]",
             Help = "Lists residents with their homes and prices, or manages the town.",
             Run = (ctx, a) =>
             {
@@ -62,6 +62,9 @@ public static class TownCommands
                     case "heal":
                         var healed = commerce.Heal(Resident(ctx, a), ctx.Player);
                         return healed == TradeResult.Ok ? CommandResult.Success("Healed.") : CommandResult.Fail(healed.ToString());
+                    case "curse":
+                        var summoned = commerce.Summon(Resident(ctx, a), ctx.Player, out var why);
+                        return summoned == TradeResult.Ok ? CommandResult.Success("Summoned.") : CommandResult.Fail(why ?? summoned.ToString());
                     case "arrivals":
                         town.ArrivalsEnabled = a.Str(1, "on|off") == "on";
                         return CommandResult.Success($"Arrivals {(town.ArrivalsEnabled ? "on" : "off")}.");

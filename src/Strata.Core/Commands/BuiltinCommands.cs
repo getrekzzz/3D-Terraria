@@ -123,7 +123,7 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface | tp cave <underground|cavern|underworld>",
+            Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface | tp cave <underground|cavern|underworld> | tp landmark <id>",
             Help = "Teleports the player (cell coordinates).",
             Run = Teleport,
         });
@@ -266,13 +266,20 @@ public static class BuiltinCommands
                 cell = s.FindCave(ctx.Player.FeetCell, layer) ?? throw new CommandException($"no open {name} cave found nearby");
                 break;
             }
+            case "landmark":
+            {
+                var id = a.Str(1, "id");
+                var marks = s.Generator.Plan.Landmarks;
+                cell = marks.TryGetValue(id, out var mark) ? mark : throw new CommandException($"no landmark '{id}' (known: {string.Join(", ", marks.Keys)})");
+                break;
+            }
             default:
                 cell = new Int3(a.Int(0, "x"), a.Int(1, "y"), a.Int(2, "z"));
                 break;
         }
         if (!s.World.InBounds(cell.X, cell.Y, cell.Z)) throw new CommandException($"{cell} is outside the world");
         // Named surface targets are estimates; exact coordinates and caves are taken as given.
-        ctx.Host.Teleport(ctx.Player, Feet(cell), settle: a.Str(0, "x") is "spawn" or "surface");
+        ctx.Host.Teleport(ctx.Player, Feet(cell), settle: a.Str(0, "x") is "spawn" or "surface" or "landmark");
         return CommandResult.Success($"Teleported to {cell}.");
     }
 

@@ -125,6 +125,11 @@
    "kind": "buff"
   },
   {
+   "id": "terraria:cursed",
+   "name": "Cursed",
+   "kind": "debuff"
+  },
+  {
    "id": "terraria:wet",
    "name": "Wet",
    "kind": "debuff"

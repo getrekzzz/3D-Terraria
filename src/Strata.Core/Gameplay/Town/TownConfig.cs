@@ -39,6 +39,9 @@ public sealed class TownConfig
     /// <summary>How far from home residents stroll by day.</summary>
     public float WanderRadius { get; init; } = 8f;
 
+    /// <summary>How far residents who live at a landmark (the crypt keeper) stray from it.</summary>
+    public float LandmarkRadius { get; init; } = 3f;
+
     public int IdleTicksMin { get; init; } = 180;
     public int IdleTicksMax { get; init; } = 540;
 

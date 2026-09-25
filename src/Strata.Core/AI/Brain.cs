@@ -37,6 +37,9 @@ public interface IBrain
     /// <summary>Moves through terrain without collision (burrowers); the brain handles everything.</summary>
     bool MovesFreely => false;
 
+    /// <summary>Places body segments itself (free parts like hands) instead of dragging them as a chain.</summary>
+    bool PositionsSegments => false;
+
     void Think(Npc npc, BrainContext ctx);
 
     /// <summary>Called after movement with the velocity before collision (for bouncing).</summary>
@@ -57,6 +60,8 @@ public static class BrainFactory
         BrainSpecs.Worm => new WormBrain(spec.Parse<WormParams>()),
         BrainSpecs.Swimmer => new SwimmerBrain(spec.Parse<SwimmerParams>()),
         BrainSpecs.Lunger => new LungerBrain(spec.Parse<LungerParams>()),
+        BrainSpecs.CryptWarden => new CryptWardenBrain(spec.Parse<CryptWardenParams>()),
+        BrainSpecs.Caster => new CasterBrain(spec.Parse<CasterParams>()),
         _ => throw new InvalidOperationException($"Unknown brain '{spec.Type}' (the content validator should have rejected it)."),
     };
 

@@ -36,7 +36,8 @@ internal static class StandardProbes
         ctx.AddProbe("house.valid", () => w.Housing.Scan(ctx.Player.FeetCell + Int3.Up).Valid ? 1 : 0);
         ctx.AddProbe("town.residents", () => w.Town.Residents.Count);
         ctx.AddProbe("town.homed", () => w.Town.Residents.Count(t => t.Home != null));
-        // town.<id>: 1 when the resident lives in town; town.<id>.home: metres from their home (−1 if homeless/absent).
+        // town.<id>: 1 when the resident lives in town; town.<id>.home: metres from their home (−1 if homeless/absent);
+        // town.<id>.alive: 1 while they are alive.
         ctx.AddPrefixProbe("town.", spec =>
         {
             var parts = spec.Split('.');
@@ -44,6 +45,7 @@ internal static class StandardProbes
             var t = w.Town.Find(parts[0]);
             if (parts.Length == 1) return t != null ? 1 : 0;
             if (parts is [_, "home"]) return t?.Home is { } h ? System.Numerics.Vector3.Distance(t.Position, Gameplay.Town.TownSystem.NodeFeet(h)) : -1;
+            if (parts is [_, "alive"]) return t is { Alive: true } ? 1 : 0;
             return null;
         });
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
@@ -55,6 +57,8 @@ internal static class StandardProbes
         ctx.AddPrefixProbe("event.", id => w.Session.Content.Events.Contains(id) ? (w.Events.IsActive(id) ? 1 : 0) : null);
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);
+        // zone.<biome>: 1 while the player stands in a zone (the crypt, spider nests…).
+        ctx.AddPrefixProbe("zone.", id => w.Session.Content.Biomes.Contains(id) ? (w.Session.ZonesAt(ctx.Player.FeetCell).Contains(id) ? 1 : 0) : null);
         // near.<block>: cells of a block within 8 cells of the player's feet.
         ctx.AddPrefixProbe("near.", id =>
         {

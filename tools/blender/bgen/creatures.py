@@ -133,7 +133,7 @@ def humanoid(mb: MeshBuilder, p, rng):
 
 
 def _outfit(mb: MeshBuilder, p):
-    """Optional clothing for town folk: hat (cap/wide/hood/wreath), beard, long coat, apron."""
+    """Optional clothing for town folk: hat (cap/wide/hood/wreath), beard, long coat, robe to the ankles, apron."""
     hat, hat_color = p.get("hat"), p.get("hatColor", "#5a3a1a")
     mb.bone = "head"
     if hat == "cap":
@@ -156,6 +156,13 @@ def _outfit(mb: MeshBuilder, p):
         mb.box((-0.205, -0.125, 1.12), (0.205, 0.125, 1.47), "prop:cloth", p["coat"])
         mb.bone = "hips"
         mb.box((-0.2, -0.12, 0.62), (0.2, 0.12, 1.12), "prop:cloth", p["coat"])
+    if "robe" in p:
+        mb.bone = "chest"
+        mb.box((-0.21, -0.13, 1.1), (0.21, 0.13, 1.48), "prop:cloth", p["robe"])
+        mb.bone = "hips"
+        mb.box((-0.24, -0.16, 0.06), (0.24, 0.16, 1.1), "prop:cloth", p["robe"])
+        if "trim" in p:
+            mb.box((-0.245, -0.165, 0.06), (0.245, 0.165, 0.14), "prop:cloth", p["trim"])
     if "horns" in p:
         mb.bone = "head"
         for sx in (-1, 1):

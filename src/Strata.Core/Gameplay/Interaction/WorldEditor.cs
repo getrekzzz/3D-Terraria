@@ -74,7 +74,7 @@ public sealed partial class WorldEditor
             ushort id = World.GetBlock(cell);
             if (id == 0 || id == VoxelWorld.Unknown) continue;
             var block = content.Blocks[id];
-            if (!MiningRules.CanMine(block, pickPower))
+            if (!MiningRules.CanMine(block, pickPower) || IsLocked(cell))
             {
                 outcome.TooHard.Add(cell);
                 continue;
@@ -167,6 +167,19 @@ public sealed partial class WorldEditor
         batch.SetBlock(cell, id, shape);
         Commit(batch);
         return true;
+    }
+
+    /// <summary>
+    /// A generated structure cell in a zone that is locked until a progression flag (the crypt before its warden
+    /// falls). Player-placed cells are never locked.
+    /// </summary>
+    public bool IsLocked(Int3 cell)
+    {
+        if ((World.GetFlags(cell.X, cell.Y, cell.Z) & CellFlags.Structure) == 0) return false;
+        foreach (var biome in _session.ZonesAt(cell))
+            if (_session.Content.Biomes.TryGet(biome, out var def) && def.LockedUntil != null && !_session.Flags.Contains(def.LockedUntil))
+                return true;
+        return false;
     }
 
     private void Commit(EditBatch batch)

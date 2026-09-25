@@ -272,6 +272,7 @@ well_fed|Well Fed|buff
 honey|Honey|buff
 obsidian_skin|Obsidian Skin|buff
 gills|Gills|buff
+cursed|Cursed|debuff
 wet|Wet|debuff
 """
 
@@ -284,6 +285,8 @@ amethyst_bolt|Amethyst Bolt|magic
 topaz_bolt|Topaz Bolt|magic
 enchanted_beam|Enchanted Beam|melee_projectile
 water_bolt|Water Bolt|magic
+book_of_skulls_skull|Skull (Book of Skulls)|magic
+water_sphere|Water Sphere (Dark Caster)|hostile
 star|Falling Star|special
 bullet|Musket Ball|bullet
 grenade|Grenade|explosive

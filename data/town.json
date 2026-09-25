@@ -13,6 +13,7 @@
         { "text": "Show me an item and I will tell you what it can become." },
         { "text": "Gel from the hopping slimes burns well in a torch.", "conditions": [{ "type": "time", "is": "day" }] },
         { "text": "The night brings out the dead. Stay behind a closed door.", "conditions": [{ "type": "time", "is": "night" }] },
+        { "text": "An old man keeps the door of the crypt by the cold coast. Talk to him before you go digging.", "conditions": [{ "type": "flag", "id": "defeated_crypt_warden", "set": false }] },
         { "text": "Lava and water do not mix. Well, they do, but you get stone out of it.", "conditions": [{ "type": "hasItem", "item": "lava_bucket" }] },
         { "text": "{resident:peddler} keeps a good stock of torches, if you have the coin.", "conditions": [{ "type": "resident", "id": "peddler" }] }
       ],
@@ -88,6 +89,41 @@
       ],
       "mood": [{ "biome": "jungle", "score": 2 }, { "biome": "forest", "score": 1 }, { "neighbor": "wayfinder", "score": 1 }, { "biome": "umbral", "score": -2 }],
       "covers": ["terraria:dryad"]
+    },
+    {
+      "id": "crypt_keeper", "name": "Crypt Keeper", "model": "crypt_keeper", "landmark": "dungeon_gate",
+      "names": ["Aurelius", "Barnabas", "Cornelius", "Ezekiel", "Mordecai", "Obadiah", "Silas", "Thaddeus"],
+      "life": 250, "defense": 15, "speed": 0.9,
+      "leavesWhen": [{ "type": "flag", "id": "defeated_crypt_warden" }],
+      "service": { "type": "summonBoss", "enemy": "crypt_warden", "label": "Break the curse", "height": 7,
+        "conditions": [{ "type": "time", "is": "night" }], "failMessage": "Not while the sun watches. Come back after dark." },
+      "lines": [
+        { "text": "You cannot go in, {player}. The crypt keeps what it takes, and it keeps me at its door." },
+        { "text": "Something wears my name down there. Its hands never rest." },
+        { "text": "Break the curse, and I will be free. Try it by day and it will break you instead." },
+        { "text": "The walls will not yield to your pick while it stands.", "conditions": [{ "type": "time", "is": "day" }] },
+        { "text": "Night again. I feel it stirring behind me.", "conditions": [{ "type": "time", "is": "night" }] }
+      ],
+      "covers": ["terraria:old_man"]
+    },
+    {
+      "id": "tailor", "name": "Tailor", "model": "tailor",
+      "names": ["Alistair", "Bartholomew", "Cedric", "Duncan", "Edmund", "Frederick", "Gilbert", "Harold"],
+      "arrival": [{ "type": "flag", "id": "defeated_crypt_warden" }],
+      "life": 250, "defense": 15, "speed": 1.4,
+      "shop": [
+        { "item": "silk_thread", "price": 600 },
+        { "item": "loom", "price": 1500 },
+        { "item": "bone", "price": 150, "conditions": [{ "type": "time", "is": "night" }] }
+      ],
+      "lines": [
+        { "text": "Free at last, and I have you to thank, {player}. Let me mend something for you." },
+        { "text": "Decades in rags at that door. Never again. Silk, only silk." },
+        { "text": "I still dream of the hands. I wake and my own are shaking." },
+        { "text": "{resident:wayfinder} says I talk to the walls. Old habit.", "conditions": [{ "type": "resident", "id": "wayfinder" }] }
+      ],
+      "mood": [{ "biome": "tundra", "score": 1 }, { "neighbor": "mender", "score": 1 }, { "biome": "sanguine", "score": -2 }, { "biome": "umbral", "score": -2 }],
+      "covers": ["terraria:clothier"]
     }
   ]
 }

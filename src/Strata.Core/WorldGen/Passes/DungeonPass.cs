@@ -37,6 +37,9 @@ public sealed class DungeonPass : GenPass
         };
         var bp = DungeonBuilder.Build(ctx.Content, gate, ref rng, nx, ny, nz);
         StructurePlacementPass.AddStructure(ctx.Plan, "dungeon", bp, zone: "dungeon");
+        // Just outside the gatehouse door (the tower's front wall is 9 cells from the gate centre).
+        int doorZ = gate.Z - 13;
+        ctx.Plan.Landmarks[WorldGen.Plan.LandmarkIds.DungeonGate] = new Int3(gate.X, (int)MathF.Floor(ctx.Terrain.SurfaceHeight(gate.X, doorZ)) + 1, doorZ);
     }
 
     public override void Generate(ChunkGenContext ctx)

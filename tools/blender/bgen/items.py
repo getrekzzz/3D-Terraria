@@ -239,7 +239,20 @@ def bone(mb: MeshBuilder, p, rng):
             mb.sphere((sx * 0.03, 0, z), 0.035, "prop:plain", color, subdivisions=1)
 
 
+def tome(mb: MeshBuilder, p, rng):
+    """A thick spellbook standing on its spine edge, with a clasp and an emblem on the cover."""
+    cover, pages = p.get("cover", "#3a2a4a"), p.get("pages", "#e8dcc0")
+    mb.box((-0.12, -0.05, 0.0), (0.12, 0.05, 0.3), "prop:cloth", cover)
+    mb.box((-0.11, -0.04, 0.01), (0.115, 0.04, 0.29), "prop:plain", pages)
+    mb.box((-0.125, -0.055, 0.0), (-0.1, 0.055, 0.3), "prop:cloth", cover)  # spine
+    mb.box((0.11, -0.015, 0.12), (0.13, 0.015, 0.18), "prop:gold", "#ffffff")  # clasp
+    mb.sphere((0.0, 0.056, 0.15), 0.045, "prop:plain", p.get("emblem", "#e8e0c8"), subdivisions=1, scale=(1, 0.4, 1.1))
+    for sx in (-1, 1):
+        mb.sphere((sx * 0.016, 0.07, 0.16), 0.01, "prop:plain:glow", p.get("glow", "#ff5030"), subdivisions=1)
+
+
 GENERATORS = {
+    "tome": tome,
     "sword": sword, "shortsword": shortsword, "pickaxe": pickaxe, "axe": axe, "hammer": hammer, "bow": bow,
     "wand": wand, "staff": staff, "arrow": arrow, "bar": bar, "gem": gem, "blob": blob, "lens": lens, "spool": spool,
     "potion": potion, "coin": coin, "star": star, "heart": heart, "seed": seed, "chunk": chunk, "helmet": helmet,

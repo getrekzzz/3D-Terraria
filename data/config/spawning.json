@@ -8,6 +8,9 @@
   "minDistance": 22,
   "maxDistance": 46,
   "attempts": 12,
+  // Inside a zone with its own roster (the crypt) creatures appear closer, among its halls.
+  "zoneMinDistance": 9,
+  "zoneMaxDistance": 24,
   // Towns: this many housed residents within townRadius of a player multiply the spawn chance by townFactor
   // (not during world events).
   "townResidents": 2,

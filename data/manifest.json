@@ -12,6 +12,7 @@
     "blocks/natural.json",
     "blocks/ores.json",
     "enemies/bosses.json",
+    "enemies/dungeon.json",
     "enemies/early.json",
     "enemies/events.json",
     "enemies/wilds.json",

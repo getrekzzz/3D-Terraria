@@ -38,4 +38,10 @@ public sealed class BiomeDef : ContentDef
 
     /// <summary>Hostile/transformative biome that spreads over time.</summary>
     public bool Spreads { get; init; }
+
+    /// <summary>Generated structure cells in this zone cannot be broken until this progression flag is set (the crypt).</summary>
+    public string? LockedUntil { get; init; }
+
+    /// <summary>Inside this zone only spawn rules that name it (biome condition) may spawn: the crypt keeps its own roster.</summary>
+    public bool ExclusiveSpawns { get; init; }
 }

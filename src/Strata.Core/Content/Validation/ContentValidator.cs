@@ -30,6 +30,7 @@ public static partial class ContentValidator
         ValidateLoot(ctx);
         ValidateFlags(ctx);
         ValidateEvents(ctx);
+        ValidateBiomes(ctx);
         ValidateLiquids(ctx);
         ValidateTown(ctx);
         if (options.CheckObtainability) ValidateObtainability(ctx);
@@ -69,6 +70,10 @@ public static partial class ContentValidator
             var err = Options.Specs.Validate(kind, spec);
             if (err != null) Error(owner, $"{field}: {err}");
         }
+
+        /// <summary>Parameters of a spec that validates cleanly, else null (<see cref="Spec"/> reports the error).</summary>
+        public T? TryParse<T>(SpecKind kind, TypedSpec spec) where T : SpecParams =>
+            Options.Specs.Validate(kind, spec) == null ? spec.Parse<T>() : null;
 
         public void Specs(ContentDef owner, SpecKind kind, IEnumerable<TypedSpec> specs, string field)
         {

@@ -109,6 +109,10 @@ public sealed partial class TownDialog : CanvasLayer
             {
                 _buttons.AddChild(Button("Help", CraftHelp));
             }
+            else if (service.Type == TownServiceSpecs.SummonBoss)
+            {
+                _buttons.AddChild(Button(service.Parse<SummonServiceParams>().Label, Summon));
+            }
         }
         _buttons.AddChild(Button("Chat", () => _text.Text = _ui.Game.Commerce.Greet(npc, _ui.Entity)));
         _buttons.AddChild(Button("Close", Close));
@@ -166,6 +170,14 @@ public sealed partial class TownDialog : CanvasLayer
             ? $"I know of nothing made from {held.Item!.DisplayName}."
             : $"{held.Item!.DisplayName} goes into: " + string.Join(", ", recipes.Select(r =>
                 $"{_ui.Game.Session.Content.Items.Get(r.Output).DisplayName}{(r.Stations.Length > 0 ? $" (at {string.Join(" or ", r.Stations)})" : "")}").Distinct());
+    }
+
+    private void Summon()
+    {
+        var result = _ui.Game.Commerce.Summon(_npc!, _ui.Entity, out var why);
+        if (result == TradeResult.Refused) _text.Text = why ?? "Not now.";
+        else if (result == TradeResult.NothingToDo) _text.Text = "It is already awake.";
+        else Report(result, "So be it.");
     }
 
     private void Report(TradeResult result, string success)

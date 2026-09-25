@@ -40,6 +40,16 @@
    "kind": "magic"
   },
   {
+   "id": "terraria:book_of_skulls_skull",
+   "name": "Skull (Book of Skulls)",
+   "kind": "magic"
+  },
+  {
+   "id": "terraria:water_sphere",
+   "name": "Water Sphere (Dark Caster)",
+   "kind": "hostile"
+  },
+  {
    "id": "terraria:star",
    "name": "Falling Star",
    "kind": "special"

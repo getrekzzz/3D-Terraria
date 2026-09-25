@@ -573,6 +573,14 @@
         "params": {
           "color": "#40b8c8"
         }
+      },
+      "tome_of_skulls": {
+        "generator": "tome",
+        "params": {
+          "cover": "#4a3a2a",
+          "emblem": "#e8e0c8",
+          "glow": "#ff5030"
+        }
       }
     }
   },
@@ -754,6 +762,79 @@
         "wings": "#5a1a14",
         "tail": "#a02818",
         "boots": "#2a1210"
+      }
+    },
+    "crypt_skull": {
+      "generator": "skull",
+      "params": {
+        "radius": 1.3
+      }
+    },
+    "crypt_hand": {
+      "generator": "bone_hand",
+      "params": {
+        "size": 1.1
+      }
+    },
+    "cursed_skull": {
+      "generator": "skull",
+      "params": {
+        "radius": 0.42,
+        "centerZ": 0.42,
+        "bone": "#d8e0c8",
+        "eyes": "#50ff80",
+        "cracks": 1
+      }
+    },
+    "dark_caster": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#b8b0a8",
+        "shirt": "#2a2040",
+        "pants": "#241c34",
+        "hair": "#1a1420",
+        "eyes": "#c080ff",
+        "hat": "hood",
+        "hatColor": "#3a2a5a",
+        "robe": "#3a2a5a",
+        "trim": "#8a6ac0",
+        "boots": "#1a1420"
+      }
+    },
+    "crypt_keeper": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#d8b898",
+        "shirt": "#5a5048",
+        "pants": "#4a4038",
+        "hair": "#d0d0d0",
+        "beard": "#e8e8e8",
+        "robe": "#6a6258",
+        "trim": "#3a342e",
+        "boots": "#3a2a20"
+      }
+    },
+    "tailor": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#e0b890",
+        "shirt": "#a02a2a",
+        "pants": "#3a3a4a",
+        "hair": "#b0b0b0",
+        "beard": "#c8c8c8",
+        "hat": "wide",
+        "hatColor": "#8a1a1a",
+        "coat": "#b83030",
+        "boots": "#2a2020"
+      }
+    },
+    "crypt_guardian": {
+      "generator": "skull",
+      "params": {
+        "radius": 1.3,
+        "centerZ": 0.8,
+        "eyes": "#ff2010",
+        "cracks": 5
       }
     }
   }

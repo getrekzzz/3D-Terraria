@@ -54,6 +54,9 @@ public sealed class Npc
     }
 
     // Brain scratch state (meaning defined by the brain).
+    /// <summary>Multiplier on contact damage (bosses enraged by daylight).</summary>
+    public float DamageScale { get; set; } = 1f;
+
     /// <summary>Ticks until the next ranged volley.</summary>
     public int AttackTimer;
 

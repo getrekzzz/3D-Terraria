@@ -18,11 +18,17 @@
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
   over time, death loot and coins, despawning far from players. `SpawnDirector` evaluates data-driven spawn
   rules at candidate ground cells (or inside water for `placement: liquid`) with layer/biome/time/light context,
-  slowed in towns (tuning: `data/config/spawning.json`).
+  slowed in towns (tuning: `data/config/spawning.json`). Rules may cap how many are alive (`maxAlive`) or judge
+  their conditions where the player stands (`atPlayer`); creatures may leave when `despawnWhen` holds at their target.
+* **Zones** — planned features with a `zone` (the crypt, spider nests, marble/granite halls, evil hearts) are
+  reported as extra biomes by `WorldSession.ContextAt`/`ZonesAt`; a structure's zone is its blueprint volumes. A
+  zone biome with `lockedUntil` protects its generated structure cells from mining until that flag is set
+  (`WorldEditor.IsLocked`); one with `exclusiveSpawns` only spawns rules that name it, at closer range.
 * **Events and bosses** — `EventDirector` rolls data-driven events at dusk/dawn (`data/events.json`) and
   feeds them to spawn-rule conditions; bosses are enemies with a `boss` block (arena radius, day despawn,
-  segments for worms) driven by `GelSovereign`, `Watcher` and `Worm` brains; `summonBoss` items check
-  conditions and spawn them.
+  segments for worms, per-part `segmentModels`, `dayEnrage`) driven by `GelSovereign`, `Watcher`, `Worm` and
+  `CryptWarden` brains (brains that `PositionsSegments` place free parts such as hands themselves); `summonBoss`
+  items and the keeper's `summonBoss` service check conditions and spawn them.
 * **Liquids** — `LiquidSimulator` (Simulation/Liquids) is a cellular automaton over *active* cells only:
   cells woken by edits (`VoxelWorld.Edited`), by a chunk loading next to them (`WorldSession.ChunkInstalled`
   scan that wakes only cells that could move), or by their own flow. Each liquid steps every `flowInterval`
@@ -44,14 +50,16 @@
   homes, and drives residents: stroll by day, walk home at night along A* paths, opening and closing doors, stop
   and face the player while talking. `TownCommerce` picks dialogue lines by condition (placeholders for names),
   prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys and sells
-  (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`). Residents persist in the
-  world metadata. Residents live in `data/town.json`, tuning in `data/config/town.json`.
+  (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
+  residents (the crypt keeper) are placed at a planned landmark once it streams in and stay near it; any resident
+  whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
+  `data/town.json`, tuning in `data/config/town.json`.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
-`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `house.valid`, `stream.idle`, `errors`, …) used by `assert` and `wait_until`.
+`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …) used by `assert` and `wait_until`.
 `game/Testing/Scripts/*.cmds` run headless in CI with `--smoke=` and print `SMOKE PASS`/`SMOKE FAIL`;
 `--exec="cmd;cmd"` runs commands at startup (screenshots, manual testing). Runner directives: `wait`,
 `wait_until <probe> <op> <value> [timeout]`, `hold <action> <seconds>`, `repeat <n> <command>`.

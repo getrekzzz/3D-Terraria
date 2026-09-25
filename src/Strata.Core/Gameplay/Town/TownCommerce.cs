@@ -17,6 +17,9 @@ public enum TradeResult
     NotSold,
     NothingToDo,
     Unavailable,
+
+    /// <summary>The service's conditions do not hold right now (see the message).</summary>
+    Refused,
 }
 
 /// <summary>An item on offer with its current price (copper).</summary>
@@ -160,6 +163,27 @@ public sealed class TownCommerce
             foreach (var b in state.Buffs.Active.Where(b => b.Def.Debuff && !b.Def.Persistent).ToList()) state.Buffs.Remove(b.Def.Id);
         state.Recompute();
         state.Vitals.Life = state.Vitals.MaxLife;
+        return TradeResult.Ok;
+    }
+
+    /// <summary>
+    /// The resident's boss-summoning service (the keeper's curse): when its conditions hold around the resident,
+    /// the boss appears above them, and a transforming resident vanishes into it.
+    /// </summary>
+    public TradeResult Summon(TownNpc npc, PlayerEntity player, out string? message)
+    {
+        message = null;
+        if (npc.Def.Service is not { Type: TownServiceSpecs.SummonBoss } spec || !npc.Alive) return TradeResult.Unavailable;
+        var p = spec.Parse<SummonServiceParams>();
+        var boss = Content.Enemies.Get(p.Enemy);
+        if (_world.Npcs.All.Any(n => n.Def == boss && n.Alive)) return TradeResult.NothingToDo;
+        if (!Condition(p.Conditions).Evaluate(ContextFor(npc, player)))
+        {
+            message = p.FailMessage;
+            return TradeResult.Refused;
+        }
+        if (_world.Npcs.Spawn(boss, npc.Position + new System.Numerics.Vector3(0, p.Height, 0)) == null) return TradeResult.Unavailable;
+        if (p.Transforms) _town.Vanish(npc);
         return TradeResult.Ok;
     }
 

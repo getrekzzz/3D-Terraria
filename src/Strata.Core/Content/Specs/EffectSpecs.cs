@@ -12,6 +12,9 @@ public static class EffectSpecs
     public const string LiquidImmune = "liquidImmune";
     public const string WaterBreathing = "waterBreathing";
 
+    /// <summary>Held items cannot be used (the crypt's hex).</summary>
+    public const string NoItemUse = "noItemUse";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -22,6 +25,7 @@ public static class EffectSpecs
         c.Register<NoFallDamageParams>(SpecKind.Effect, WaterBreathing);
         c.Register<EmitLightParams>(SpecKind.Effect, EmitLight);
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoFallDamage);
+        c.Register<NoFallDamageParams>(SpecKind.Effect, NoItemUse);
     }
 }
 

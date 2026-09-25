@@ -11,6 +11,7 @@
   "maxPriceFactor": 1.5,
   "sellRatio": 0.2,
   "wanderRadius": 8,
+  "landmarkRadius": 3,
   "idleTicksMin": 180,
   "idleTicksMax": 540,
   "talkRange": 5,

@@ -50,6 +50,15 @@ public sealed class TownNpcDef : ContentDef
     /// <summary>Present from world creation (does not need to meet <see cref="Arrival"/>).</summary>
     public bool Starter { get; init; }
 
+    /// <summary>
+    /// Lives at a planned landmark (e.g. "dungeon_gate") instead of a house: placed there once its area is loaded,
+    /// never housed, and keeps close to it.
+    /// </summary>
+    public string? Landmark { get; init; }
+
+    /// <summary>Once these hold the resident leaves for good (the crypt's keeper after its warden falls).</summary>
+    public TypedSpec[] LeavesWhen { get; init; } = Array.Empty<TypedSpec>();
+
     public int Life { get; init; } = 250;
     public int Defense { get; init; } = 15;
 

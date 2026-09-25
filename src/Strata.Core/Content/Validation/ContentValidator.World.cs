@@ -7,6 +7,16 @@ public static partial class ContentValidator
 {
     private static readonly HashSet<string> PrefixGroups = new() { "melee", "ranged", "magic", "summon", "tool", "accessory", "universal" };
 
+    private static void ValidateBiomes(Ctx ctx)
+    {
+        foreach (var b in ctx.Db.Biomes.All)
+        {
+            ctx.Ref(b, ctx.Db.Flags, b.LockedUntil, "lockedUntil");
+            ctx.Color(b, b.MapColor, "mapColor");
+            ctx.Color(b, b.FogColor, "fogColor");
+        }
+    }
+
     private static void ValidateEvents(Ctx ctx)
     {
         foreach (var e in ctx.Db.Events.All)
@@ -40,11 +50,18 @@ public static partial class ContentValidator
             ctx.Color(e, e.Tint, "tint");
             ctx.Light(e, e.Light, "light");
             ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
-            if (e.Boss != null)
+            if (e.Boss is { } boss)
             {
-                ctx.Ref(e, ctx.Db.Flags, e.Boss.Flag, "boss.flag");
-                if (string.IsNullOrWhiteSpace(e.Boss.Title)) ctx.Error(e, "boss.title is required.");
+                ctx.Ref(e, ctx.Db.Flags, boss.Flag, "boss.flag");
+                if (string.IsNullOrWhiteSpace(boss.Title)) ctx.Error(e, "boss.title is required.");
+                foreach (var (part, field) in new[] { (boss.SegmentModel, "segmentModel"), (boss.TailModel, "tailModel") })
+                    if (part != null) ctx.Asset(e, $"assets/models/creatures/{part}.glb", $"boss.{field}");
+                for (int i = 0; i < boss.SegmentModels.Length; i++)
+                    ctx.Asset(e, $"assets/models/creatures/{boss.SegmentModels[i]}.glb", $"boss.segmentModels[{i}]");
+                if (boss.SegmentModels.Length > boss.Segments) ctx.Error(e, "boss.segmentModels lists more models than boss.segments.");
+                if (boss.DayEnrage is { Damage: <= 0 } or { Speed: <= 0 }) ctx.Error(e, "boss.dayEnrage multipliers must be > 0.");
             }
+            if (e.Brain.Type == BrainSpecs.CryptWarden && e.Boss is not { Segments: >= 2 }) ctx.Error(e, "the cryptWarden brain needs boss.segments >= 2 (its hands).");
             foreach (var key in new[] { "minion", "servant" })
                 if (e.Brain.Raw.TryGetProperty(key, out var refId) && refId.GetString() is { } id) ctx.Ref(e, ctx.Db.Enemies, id, $"brain.{key}");
             if (e.Brain.Raw.TryGetProperty("phase2Model", out var model) && model.GetString() is { } m)
@@ -55,6 +72,7 @@ public static partial class ContentValidator
                 ctx.Ref(e, ctx.Db.Projectiles, r.Projectile, "ranged.projectile");
                 if (r.Interval < 1 || r.Count < 1 || r.Speed <= 0 || r.Range <= 0) ctx.Error(e, "ranged needs interval, count, speed and range > 0.");
             }
+            ctx.Specs(e, SpecKind.Condition, e.DespawnWhen, "despawnWhen");
             ctx.Specs(e, SpecKind.CreatureEffect, e.OnContact, "onContact");
             ctx.Specs(e, SpecKind.CreatureEffect, e.OnDeath, "onDeath");
             foreach (var fx in e.OnContact.Concat(e.OnDeath))
@@ -70,6 +88,7 @@ public static partial class ContentValidator
             ctx.Ref(s, ctx.Db.Enemies, s.Enemy, "enemy");
             if (s.Weight <= 0) ctx.Error(s, "weight must be > 0.");
             if (s.GroupMin < 1 || s.GroupMax < s.GroupMin) ctx.Error(s, "group must be [min>=1, max>=min].");
+            if (s.MaxAlive < 0) ctx.Error(s, "maxAlive must be >= 0.");
             ctx.Specs(s, SpecKind.Condition, s.Conditions, "conditions");
         }
     }

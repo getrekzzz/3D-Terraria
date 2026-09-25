@@ -15,6 +15,9 @@ public abstract class WorldFeature
     public string? Zone { get; init; }
 
     public ulong Seed { get; init; }
+
+    /// <summary>Does this cell belong to the feature's <see cref="Zone"/>? (Default: inside the bounds.)</summary>
+    public virtual bool InZone(Int3 cell) => Bounds.Contains(cell);
 }
 
 /// <summary>Capsule segment carving tunnels, shafts, rivers, lava tubes and chasms.</summary>
@@ -83,6 +86,8 @@ public sealed class ChamberFeature : WorldFeature
     public Vector3 Center { get; }
     public Vector3 Radii { get; }
     public required ChamberKind Chamber { get; init; }
+
+    public override bool InZone(Int3 cell) => Distance(cell.X + 0.5f, cell.Y + 0.5f, cell.Z + 0.5f) <= 1.15f;
 
     /// <summary>Normalized ellipsoid distance: &lt; 1 inside.</summary>
     public float Distance(float x, float y, float z)

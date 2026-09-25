@@ -739,6 +739,10 @@
    "model": "assets/models/items/tin_shortsword.glb",
    "icon": "assets/icons/items/tin_shortsword.png"
   },
+  "tome_of_skulls": {
+   "model": "assets/models/items/tome_of_skulls.glb",
+   "icon": "assets/icons/items/tome_of_skulls.png"
+  },
   "topaz": {
    "model": "assets/models/items/topaz.glb",
    "icon": "assets/icons/items/topaz.png"
@@ -868,6 +872,56 @@
    "generator": "crab",
    "animations": [
     "idle",
+    "walk"
+   ]
+  },
+  "crypt_guardian": {
+   "model": "assets/models/creatures/crypt_guardian.glb",
+   "generator": "skull",
+   "animations": []
+  },
+  "crypt_hand": {
+   "model": "assets/models/creatures/crypt_hand.glb",
+   "generator": "bone_hand",
+   "animations": []
+  },
+  "crypt_keeper": {
+   "model": "assets/models/creatures/crypt_keeper.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "crypt_skull": {
+   "model": "assets/models/creatures/crypt_skull.glb",
+   "generator": "skull",
+   "animations": []
+  },
+  "cursed_skull": {
+   "model": "assets/models/creatures/cursed_skull.glb",
+   "generator": "skull",
+   "animations": []
+  },
+  "dark_caster": {
+   "model": "assets/models/creatures/dark_caster.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
     "walk"
    ]
   },
@@ -1020,6 +1074,21 @@
    "animations": [
     "fly",
     "idle"
+   ]
+  },
+  "tailor": {
+   "model": "assets/models/creatures/tailor.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
    ]
   },
   "vulture": {

@@ -31,7 +31,11 @@ public sealed partial class TownSystem
         _world = world;
         Config = config ?? new TownConfig();
         _rng = new Pcg32(Hash.Combine((ulong)world.Session.Settings.Seed, 0x544F574EUL));
-        foreach (var def in world.Session.Content.TownNpcs.All) _arrival[def.Id] = ConditionCompiler.CompileAll(def.Arrival);
+        foreach (var def in world.Session.Content.TownNpcs.All)
+        {
+            _arrival[def.Id] = ConditionCompiler.CompileAll(def.Arrival);
+            _leaves[def.Id] = ConditionCompiler.CompileAll(def.LeavesWhen);
+        }
         Load(world.Session.Meta);
     }
 
@@ -61,6 +65,7 @@ public sealed partial class TownSystem
         long tick = _world.Session.Clock.Tick;
         if (!_world.Session.Meta.TownStarted) TryPlaceStarters();
         if (ArrivalsEnabled && tick % Config.ArrivalInterval == 0) CheckArrivals();
+        if (tick % LandmarkInterval == 0) UpdateLandmarks();
         if (tick % Config.HomeCheckInterval == 0) CheckHomes();
         foreach (var r in _residents) TickResident(r);
     }
@@ -72,7 +77,7 @@ public sealed partial class TownSystem
         if (player == null) return null;
         var rooms = VacantRooms();
         // Homeless residents are housed first.
-        foreach (var r in _residents.Where(r => r.Home == null && r.Alive))
+        foreach (var r in _residents.Where(r => r.Home == null && r.Alive && r.Def.Landmark == null))
         {
             if (rooms.Count == 0) break;
             AssignHome(r, rooms[0]);
@@ -82,7 +87,7 @@ public sealed partial class TownSystem
         var ctx = TownContext(player);
         foreach (var def in _world.Session.Content.TownNpcs.All)
         {
-            if (Find(def.Id) != null || def.Starter || !_arrival[def.Id].Evaluate(ctx)) continue;
+            if (Find(def.Id) != null || def.Starter || def.Landmark != null || !_arrival[def.Id].Evaluate(ctx) || HasLeft(def, ctx)) continue;
             var npc = Create(def, rooms[0].HomeNode!.Value);
             AssignHome(npc, rooms[0]);
             Arrived?.Invoke(npc);
@@ -140,7 +145,7 @@ public sealed partial class TownSystem
     {
         var spawn = _world.Session.SpawnCell;
         if (World.GetBlock(spawn) == VoxelWorld.Unknown || _world.LocalPlayer == null) return;
-        foreach (var def in _world.Session.Content.TownNpcs.All.Where(d => d.Starter))
+        foreach (var def in _world.Session.Content.TownNpcs.All.Where(d => d.Starter && d.Landmark == null))
         {
             if (Find(def.Id) != null) continue;
             var node = _world.Navigator.NearestStandable(spawn + new Int3(3, 0, 2), Agent, 6) ?? spawn;

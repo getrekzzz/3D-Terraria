@@ -30,6 +30,7 @@ emerald_staff|Emerald Staff|prehardmode|craft
 ruby_staff|Ruby Staff|prehardmode|craft
 diamond_staff|Diamond Staff|prehardmode|craft
 water_bolt|Water Bolt|prehardmode|dungeon
+book_of_skulls|Book of Skulls|prehardmode|skeletron
 demon_scythe|Demon Scythe|prehardmode|voodoo demon
 space_gun|Space Gun|prehardmode|craft
 flamelash|Flamelash|prehardmode|craft

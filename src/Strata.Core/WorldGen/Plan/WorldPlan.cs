@@ -50,6 +50,9 @@ public sealed class WorldPlan
     /// <summary>Player spawn cell (on the surface near the centre).</summary>
     public Int3 Spawn { get; set; }
 
+    /// <summary>Named places found while planning (see <see cref="LandmarkIds"/>), for residents and commands.</summary>
+    public Dictionary<string, Int3> Landmarks { get; } = new(StringComparer.Ordinal);
+
     /// <summary>Direction (turns) from the centre towards the tundra; the jungle lies opposite.</summary>
     public float SnowAngle { get; set; }
 
@@ -105,4 +108,13 @@ public sealed class WorldPlan
         Features.Add(feature);
         RaiseColumnTop(feature.Bounds);
     }
+}
+
+/// <summary>Landmarks the generator plans (content may refer to these by name).</summary>
+public static class LandmarkIds
+{
+    /// <summary>Open ground just outside the crypt's gatehouse door.</summary>
+    public const string DungeonGate = "dungeon_gate";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string> { DungeonGate };
 }

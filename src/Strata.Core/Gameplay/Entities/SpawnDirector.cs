@@ -23,6 +23,11 @@ public sealed class SpawnConfig
     public float MaxDistance { get; init; } = 46f;
     public int Attempts { get; init; } = 12;
 
+    /// <summary>Spawn distances while the player stands in an exclusive-spawn zone (the crypt's halls are close).</summary>
+    public float ZoneMinDistance { get; init; } = 9f;
+
+    public float ZoneMaxDistance { get; init; } = 24f;
+
     /// <summary>Towns: with this many housed residents within <see cref="TownRadius"/> of a player, spawning slows.</summary>
     public int TownResidents { get; init; } = 2;
 
@@ -47,6 +52,8 @@ public sealed class SpawnDirector
     private readonly GameWorld _world;
     private readonly NpcSystem _npcs;
     private readonly List<(SpawnRuleDef Rule, EnemyDef Enemy, ICondition Condition)> _rules = new();
+    private readonly Dictionary<SpawnRuleDef, HashSet<string>> _namedBiomes = new();
+    private readonly HashSet<string> _exclusive;
     private Pcg32 _rng;
 
     public SpawnDirector(GameWorld world, NpcSystem npcs, SpawnConfig? config = null)
@@ -57,7 +64,11 @@ public sealed class SpawnDirector
         _rng = new Pcg32(Hash.Combine((ulong)world.Session.Settings.Seed, 0x5350574EUL));
         var content = world.Session.Content;
         foreach (var rule in content.SpawnRules.All)
+        {
             _rules.Add((rule, content.Enemies.Get(rule.Enemy), ConditionCompiler.CompileAll(rule.Conditions)));
+            _namedBiomes[rule] = NamedBiomes(rule);
+        }
+        _exclusive = content.Biomes.All.Where(b => b.ExclusiveSpawns).Select(b => b.Id).ToHashSet();
     }
 
     public SpawnConfig Config { get; set; }
@@ -79,6 +90,12 @@ public sealed class SpawnDirector
         }
     }
 
+    private static Conditions.ConditionContext WithRandom(Conditions.ConditionContext target, Conditions.ConditionContext source)
+    {
+        target.Random = source.Random;
+        return target;
+    }
+
     /// <summary>Is the player among enough housed residents to count as being in town?</summary>
     public bool InTown(PlayerEntity p) =>
         _world.Town.Residents.Count(r => r.Alive && r.Home != null && Vector3.Distance(r.Position, p.Position) <= Config.TownRadius) >= Config.TownResidents;
@@ -89,10 +106,12 @@ public sealed class SpawnDirector
         var spawned = new List<Npc>();
         var session = _world.Session;
         var origin = player.FeetCell;
+        bool inZone = session.ZonesAt(origin).Any(_exclusive.Contains);
+        float min = inZone ? Config.ZoneMinDistance : Config.MinDistance, max = inZone ? Config.ZoneMaxDistance : Config.MaxDistance;
         for (int attempt = 0; attempt < Config.Attempts; attempt++)
         {
             float angle = _rng.NextFloat() * MathF.Tau;
-            float dist = _rng.Range(Config.MinDistance, Config.MaxDistance) / Units.CellSize;
+            float dist = _rng.Range(min, max) / Units.CellSize;
             int x = origin.X + (int)(MathF.Sin(angle) * dist), z = origin.Z + (int)(MathF.Cos(angle) * dist);
             var ground = FindGround(x, origin.Y, z);
             var water = FindWater(x, origin.Y, z);
@@ -101,7 +120,13 @@ public sealed class SpawnDirector
             var ctx = session.ContextAt(cell.Value);
             ctx.Light = EffectiveLight(cell.Value);
             ctx.Random = _rng;
-            var eligible = _rules.Where(r => (r.Rule.Placement == SpawnPlacement.Liquid ? water : ground) != null && r.Condition.Evaluate(ctx)).ToList();
+            var atPlayer = session.ContextAt(origin);
+            atPlayer.Light = EffectiveLight(origin);
+            var exclusive = ctx.Biomes.Where(_exclusive.Contains).ToList();
+            var eligible = _rules.Where(r => (r.Rule.Placement == SpawnPlacement.Liquid ? water : ground) != null
+                && (exclusive.Count == 0 || exclusive.Any(_namedBiomes[r.Rule].Contains))
+                && (r.Rule.MaxAlive <= 0 || _npcs.All.Count(n => n.Def == r.Enemy) < r.Rule.MaxAlive)
+                && r.Condition.Evaluate(r.Rule.AtPlayer ? WithRandom(atPlayer, ctx) : ctx)).ToList();
             _rng = ctx.Random;
             if (eligible.Count == 0) continue;
             var pick = Weighted(eligible);
@@ -116,6 +141,17 @@ public sealed class SpawnDirector
             return spawned;
         }
         return spawned;
+    }
+
+    /// <summary>Biomes a rule asks for by name (top-level <c>biome any</c> conditions), for exclusive zones.</summary>
+    private static HashSet<string> NamedBiomes(SpawnRuleDef rule)
+    {
+        var names = new HashSet<string>();
+        foreach (var c in rule.Conditions.Where(c => c.Type == "biome"))
+            if (c.Raw.TryGetProperty("any", out var any) && any.ValueKind == JsonValueKind.Array)
+                foreach (var v in any.EnumerateArray())
+                    if (v.GetString() is { } id) names.Add(id);
+        return names;
     }
 
     private (SpawnRuleDef Rule, EnemyDef Enemy, ICondition Condition) Weighted(List<(SpawnRuleDef Rule, EnemyDef Enemy, ICondition Condition)> eligible)

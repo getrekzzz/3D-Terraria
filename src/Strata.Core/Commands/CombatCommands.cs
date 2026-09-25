@@ -81,6 +81,18 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "slay", Usage = "slay [<enemy id>]", Help = "Kills creatures (all, or one kind) as if in battle: loot drops and bosses count as defeated.",
+            Run = (ctx, a) =>
+            {
+                var id = a.OptStr(0);
+                if (id != null && !ctx.World.Session.Content.Enemies.Contains(id)) throw new CommandException($"unknown enemy '{id}'");
+                var victims = ctx.World.Npcs.All.Where(n => n.Alive && (id == null || n.Def.Id == id)).ToList();
+                foreach (var n in victims) ctx.World.Npcs.Kill(n);
+                return CommandResult.Success($"Slew {victims.Count} creatures.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "killall", Usage = "killall", Help = "Removes every creature (no loot).",
             Run = (ctx, _) =>
             {

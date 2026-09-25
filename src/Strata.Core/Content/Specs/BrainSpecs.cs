@@ -12,6 +12,8 @@ public static class BrainSpecs
     public const string Worm = "worm";
     public const string Swimmer = "swimmer";
     public const string Lunger = "lunger";
+    public const string CryptWarden = "cryptWarden";
+    public const string Caster = "caster";
 
     public static void Register(SpecCatalog c)
     {
@@ -24,6 +26,8 @@ public static class BrainSpecs
         c.Register<WormParams>(SpecKind.Brain, Worm);
         c.Register<SwimmerParams>(SpecKind.Brain, Swimmer);
         c.Register<LungerParams>(SpecKind.Brain, Lunger);
+        c.Register<CryptWardenParams>(SpecKind.Brain, CryptWarden);
+        c.Register<CasterParams>(SpecKind.Brain, Caster);
     }
 }
 
@@ -145,4 +149,37 @@ public sealed class LungerParams : SpecParams, IValidatableSpec
     public float AggroRange { get; init; } = 16f;
 
     public string? Validate() => Reach <= 0 ? "reach must be > 0" : null;
+}
+
+/// <summary>A floating skull with two free hands: hovers over the target swiping, then spins through walls at it.</summary>
+public sealed class CryptWardenParams : SpecParams
+{
+    /// <summary>Hover height above the target (m).</summary>
+    public float HoverHeight { get; init; } = 6f;
+
+    /// <summary>Distance of each hand from the skull (m).</summary>
+    public float HandSpacing { get; init; } = 2.6f;
+
+    /// <summary>Ticks between hand swipes (hands alternate).</summary>
+    public int SwipeInterval { get; init; } = 100;
+
+    /// <summary>Ticks of hovering before a spin charge, and the charge's length.</summary>
+    public int SpinInterval { get; init; } = 540;
+    public int SpinDuration { get; init; } = 240;
+
+    public float SpinSpeed { get; init; } = 9f;
+}
+
+/// <summary>Stands and casts (see the enemy's ranged attack), blinking to a new spot near the target now and then.</summary>
+public sealed class CasterParams : SpecParams, IValidatableSpec
+{
+    /// <summary>Cells (like the other brains).</summary>
+    public float AggroRange { get; init; } = 50f;
+    public int TeleportInterval { get; init; } = 300;
+
+    /// <summary>Blink destination distance from the target (m).</summary>
+    public float MinBlink { get; init; } = 5f;
+    public float MaxBlink { get; init; } = 11f;
+
+    public string? Validate() => MaxBlink < MinBlink ? "maxBlink must be >= minBlink" : null;
 }

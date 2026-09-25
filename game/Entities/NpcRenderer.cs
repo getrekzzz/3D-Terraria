@@ -90,9 +90,9 @@ public sealed partial class NpcRenderer : Node3D
             }
             var visual = view.Visual;
             visual.Position = view.Shown;
-            if (npc.Segments.Count > 0)
+            if (npc.Segments.Count > 0) UpdateSegments(npc, view, world);
+            if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
             {
-                UpdateSegments(npc, view, world);
                 var v = new Vector3(npc.Velocity.X, npc.Velocity.Y, npc.Velocity.Z);
                 if (v.LengthSquared() > 0.01f) visual.Basis = Basis.LookingAt(v.Normalized(), Mathf.Abs(v.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
             }
@@ -115,26 +115,36 @@ public sealed partial class NpcRenderer : Node3D
         }
     }
 
-    /// <summary>Body segments trail the head; each faces the segment in front of it.</summary>
+    /// <summary>
+    /// Body segments: a chain (worms) trails the head with each piece facing the one in front; free parts with their
+    /// own models (the warden's hands) face where the head faces, the second of a pair mirrored.
+    /// </summary>
     private void UpdateSegments(Npc npc, View view, Strata.Core.Voxels.VoxelWorld world)
     {
         var boss = npc.Def.Boss!;
         var segModel = boss.SegmentModel ?? view.Model;
+        bool freeParts = boss.SegmentModels.Length > 0;
         while (view.Segments.Count < npc.Segments.Count)
         {
-            bool tail = view.Segments.Count == npc.Segments.Count - 1;
-            var model = tail ? boss.TailModel ?? segModel : segModel;
+            int index = view.Segments.Count;
+            bool tail = index == npc.Segments.Count - 1;
+            var model = index < boss.SegmentModels.Length ? boss.SegmentModels[index] : tail ? boss.TailModel ?? segModel : segModel;
             if (Acquire(model) is not { } seg) return;
             view.Segments.Add((seg, model));
         }
-        var ahead = view.Shown + new Vector3(0, npc.HalfExtents.Y, 0);
+        var ahead = view.Shown;
         for (int i = 0; i < npc.Segments.Count; i++)
         {
             var p = new Vector3(npc.Segments[i].X, npc.Segments[i].Y, npc.Segments[i].Z);
             var seg = view.Segments[i].Visual;
             seg.Position = p;
+            if (freeParts)
+            {
+                var basis = new Basis(Vector3.Up, npc.Yaw + Mathf.Pi);
+                seg.Basis = i % 2 == 1 ? basis.Scaled(new Vector3(-1, 1, 1)) : basis;
+            }
             var dir = ahead - p;
-            if (dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
+            if (!freeParts && dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
             seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
             seg.SetLight(LightProbe.Sample(world, p));
             ahead = p;

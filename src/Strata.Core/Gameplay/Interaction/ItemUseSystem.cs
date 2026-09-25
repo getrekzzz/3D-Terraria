@@ -74,6 +74,7 @@ public sealed partial class ItemUseSystem
         bool repeats = item.AutoReuse || info.IsTool || info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject);
         if (!freshPress && !repeats) return UseOutcome.None;
         if (p.UseCooldown > 0) return UseOutcome.Cooldown;
+        if (p.State.Effects.NoItemUse) return UseOutcome.Blocked;
 
         float reach = (item.Reach + p.State.Effects.Stats.Bonus(StatIds.Reach)) * Units.CellSize;
         var inReach = target != null && target.Distance <= reach ? target : null;

@@ -13,7 +13,7 @@ public sealed partial class WorldSession
     {
         var ctx = reuse ?? new ConditionContext();
         float surface = Generator.Terrain.SurfaceHeight(cell.X, cell.Z);
-        ctx.Biomes = new[] { Generator.Biomes.IdOf(Generator.Biomes.BiomeAt(cell.X, cell.Y, cell.Z, surface)) };
+        ctx.Biomes = ZonesAt(cell).Append(Generator.Biomes.IdOf(Generator.Biomes.BiomeAt(cell.X, cell.Y, cell.Z, surface))).Distinct().ToArray();
         ctx.Layer = Generator.Plan.Bands.LayerAt(cell.Y);
         ctx.Depth = surface - cell.Y;
         ctx.Hour = Clock.Hour;
@@ -22,6 +22,13 @@ public sealed partial class WorldSession
         ctx.Flags = Flags;
         ctx.Events = Events;
         return ctx;
+    }
+
+    /// <summary>Zone biomes (the crypt, spider nests, marble halls…) whose planned features contain the cell.</summary>
+    public IEnumerable<string> ZonesAt(Int3 cell)
+    {
+        foreach (var f in Generator.Plan.Features.At(cell))
+            if (f.Zone != null && f.InZone(cell)) yield return f.Zone;
     }
 
     /// <summary>

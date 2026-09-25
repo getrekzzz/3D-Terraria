@@ -29,6 +29,7 @@ public sealed partial class NpcSystem
     private readonly GameWorld _world;
     private readonly List<Npc> _npcs = new();
     private readonly Dictionary<EnemyDef, IBrain> _brains = new();
+    private readonly Dictionary<EnemyDef, Conditions.ICondition> _despawn = new();
     private readonly LootRoller _loot;
     private readonly BrainContext _ctx;
     private long _nextId = 1;
@@ -69,13 +70,22 @@ public sealed partial class NpcSystem
     public Npc? Spawn(EnemyDef def, Vector3 feet)
     {
         if (_npcs.Count >= MaxNpcs) return null;
-        var npc = new Npc(_nextId++, def, feet) { Yaw = _rng.NextFloat() * MathF.Tau };
+        var npc = new Npc(_nextId++, def, feet) { Yaw = _rng.NextFloat() * MathF.Tau, Invulnerable = def.Invulnerable };
         if (def.Boss is { Segments: > 0 } boss)
             for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
         _npcs.Add(npc);
         if (def.Boss != null) BossSpawned?.Invoke(npc);
         Spawned?.Invoke(npc);
         return npc;
+    }
+
+    /// <summary>The creature's despawn conditions hold where its target stands (checked twice a second).</summary>
+    private bool OutOfBounds(Npc npc, PlayerEntity? target)
+    {
+        if (npc.Def.DespawnWhen.Length == 0 || target == null || npc.Age % 30 != 0) return false;
+        if (!_despawn.TryGetValue(npc.Def, out var condition))
+            _despawn[npc.Def] = condition = Conditions.ConditionCompiler.CompileAll(npc.Def.DespawnWhen);
+        return condition.Evaluate(_world.Session.ContextAt(target.FeetCell));
     }
 
     public IBrain BrainOf(EnemyDef def)
@@ -108,6 +118,12 @@ public sealed partial class NpcSystem
             }
             var target = Nearest(npc.Center, out float distance);
             float despawn = npc.Def.Boss?.ArenaRadius ?? DespawnDistance;
+            if (OutOfBounds(npc, target))
+            {
+                if (npc.IsBoss) BossLeft?.Invoke(npc);
+                Remove(i);
+                continue;
+            }
             bool leaving = npc.Def.Boss is { DespawnAtDay: true } && session.Clock.IsDay;
             if (distance > despawn || leaving)
             {
@@ -159,7 +175,7 @@ public sealed partial class NpcSystem
         }
         npc.Position = center - new Vector3(0, npc.HalfExtents.Y, 0);
         brain.AfterMove(npc, intended);
-        FollowSegments(npc);
+        if (!brain.PositionsSegments) FollowSegments(npc);
     }
 
     /// <summary>Each body segment keeps its spacing behind the one in front (a chain dragged by the head).</summary>
@@ -185,7 +201,7 @@ public sealed partial class NpcSystem
         var pBox = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
         if (!npc.Volumes().Any(v => Npc.Overlaps(v, pBox))) return;
         var state = player.State;
-        var hit = DamageModel.Roll(npc.Def.Damage, DamageClass.None, 0, 6f, null, state.Defense,
+        var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale), DamageClass.None, 0, 6f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
         if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity)) return;

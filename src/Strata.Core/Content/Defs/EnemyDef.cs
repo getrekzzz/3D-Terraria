@@ -1,5 +1,12 @@
 namespace Strata.Core.Content.Defs;
 
+/// <summary>Multipliers a boss gets while the sun is up.</summary>
+public sealed class DayEnrage
+{
+    public float Damage { get; init; } = 4f;
+    public float Speed { get; init; } = 2f;
+}
+
 /// <summary>Boss metadata: presentation, arena, progression and body segments (worms).</summary>
 public sealed class BossInfo
 {
@@ -31,6 +38,12 @@ public sealed class BossInfo
     public string? SegmentModel { get; init; }
 
     public string? TailModel { get; init; }
+
+    /// <summary>Model per segment index (free parts such as hands); overrides SegmentModel/TailModel.</summary>
+    public string[] SegmentModels { get; init; } = Array.Empty<string>();
+
+    /// <summary>Stronger by day instead of leaving (the crypt's curse): multipliers on damage and speed.</summary>
+    public DayEnrage? DayEnrage { get; init; }
 }
 
 /// <summary>A projectile a creature fires at its target (any brain).</summary>
@@ -101,6 +114,12 @@ public sealed class EnemyDef : ContentDef
 
     public RangedAttack? Ranged { get; init; }
 
+    /// <summary>Cannot be harmed (guardians that enforce progression).</summary>
+    public bool Invulnerable { get; init; }
+
+    /// <summary>Leaves at once when these hold where its target stands (the crypt guardian once you step outside).</summary>
+    public TypedSpec[] DespawnWhen { get; init; } = Array.Empty<TypedSpec>();
+
     /// <summary>Effects on a player this creature touches for damage (e.g. applyBuff on_fire).</summary>
     public TypedSpec[] OnContact { get; init; } = Array.Empty<TypedSpec>();
 
@@ -124,6 +143,12 @@ public enum SpawnPlacement
 public sealed class SpawnRuleDef : ContentDef
 {
     public SpawnPlacement Placement { get; init; } = SpawnPlacement.Ground;
+
+    /// <summary>Evaluate the conditions where the player stands rather than at the spawn cell (zone guardians).</summary>
+    public bool AtPlayer { get; init; }
+
+    /// <summary>No more spawns while this many of the enemy are alive (0 = no cap).</summary>
+    public int MaxAlive { get; init; }
 
     /// <summary>Metres above the spawn cell (default: 2.5 for ground-spawned fliers, else 0; rooted creatures use 0).</summary>
     public float? Lift { get; init; }

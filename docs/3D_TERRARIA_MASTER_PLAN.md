@@ -24,6 +24,9 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-25 | Engine behaviour is validated with command scripts (`game/Testing/Scripts/*.cmds`) run headless in CI | The same command registry powers the debug console, tests and screenshot automation. |
 | 2026-09-25 | Liquids simulate only *active* cells; generated liquid is static until disturbed (edits wake it), saved chunks are rescanned on load | Lazy per-chunk generation cannot settle liquid globally like the reference game; this keeps loading cheap and flow local to play. Pass 20 removes liquid hanging over carved space (generator v2). |
 | 2026-09-25 | Town residents are a separate Core entity (not enemy NPCs) with A* paths, homes and trade | Friendly, persistent, schedule-driven; never hit by player attacks. |
+| 2026-09-25 | Zones (crypt, spider nests, marble/granite halls, evil hearts) are planned features reported as extra biomes in every condition context; a structure zone is its blueprint's volumes, not its bounding box | Spawn rules, locks, music and loot all read one context; a sprawling crypt must not claim the open surface above it. |
+| 2026-09-25 | Progression locks are data: a biome's `lockedUntil` flag protects its generated structure cells; `exclusiveSpawns` zones only spawn rules naming them, at closer range | The crypt behaves like the reference dungeon without special-case code. |
+| 2026-09-25 | Landmark residents (the crypt keeper) live at a planned landmark instead of a house and leave for good when `leavesWhen` holds; boss summoning can be a resident service | Old-man/clothier arc expressed with the town system and data. |
 
 ## 3. System status
 Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
@@ -33,10 +36,10 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 804 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 40.3 % (enemies 18 %) |
+| Content | Reference DBs + coverage | ✅ | 808 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 41.6 % (enemies 22 %, NPCs 21 %) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
-| WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, dungeon v1 |
+| WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
 | WorldGen | Report tool | ✅ | Maps, sections, ore/depth charts |
 | Lighting | Sky + RGB block light | ✅ | Stateless per chunk; liquid light (lava) from data; sampled by props/creatures via LightProbe |
 | Meshing | Surface nets + crisp shapes + liquids + collision | ✅ | LOD rings ⬜ |
@@ -48,14 +51,15 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
 | UI | HUD, inventory, equipment, chests, crafting, console, perf overlay | ✅ | Settings/menus/world select ⬜ |
 | Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Whips/yoyos/summons ⬜ |
-| AI | Slime, walker, flyer, swimmer, lunger, boss brains, worm; ranged attacks; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
-| Spawning | Data-driven spawn rules (ground or liquid placement), biome rosters, town suppression | ✅ | Closed doors stop creatures |
-| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 132 item models, 23 creatures (4 residents), 204 icons |
-| NPCs | Town residents, 3D housing, shops, services, happiness | ✅ | 4 residents (guide/merchant/nurse/dryad roles); more residents, enemies attacking town ⬜ |
+| AI | Slime, walker, flyer, swimmer, lunger, caster (blink), boss brains, worm, crypt warden (free hands); ranged attacks; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
+| Spawning | Data-driven spawn rules (ground or liquid placement), biome + zone rosters, exclusive zones, per-rule caps, player-position rules, despawn conditions, town suppression | ✅ | Closed doors stop creatures |
+| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 134 item models, 30 creatures (6 residents), 206 icons |
+| NPCs | Town residents, 3D housing, shops, services, happiness, landmark residents | ✅ | 6 residents (guide/merchant/nurse/dryad/old man/clothier roles); more residents, enemies attacking town ⬜ |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
-| Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels); arenas, boss bar; music state ⬜ |
+| Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels), Crypt Warden (hands, spin, day rage); arenas, boss bar; music state ⬜ |
 | Events | Event director | ✅ | Blood moon, slime rain; invasions ⬜ |
-| Hardmode | Mutations, spread | ⬜ | M3 |
+| Dungeon | Crypt zone, locked walls, guardian, roster, keeper + curse | ✅ | Crypt keys/locked chests, water bolt loot, spike traps ⬜ |
+| Hardmode | Mutations, spread | ⬜ | M3 (next: The Mawwall, then lazy mutations) |
 | Audio | Director + sounds | ⬜ | |
 
 ## 4. Technical debt
@@ -67,6 +71,9 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 * Prefix (reforge) data exists but no reforging service/UI yet.
 * Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
   until disturbed.
+* Crypt Warden hands share the skull's life (the reference boss has separately killable hands).
+* Zone membership scans a structure's blueprint ops per query (hundreds for the crypt); fine at spawn/lock rates,
+  would want a coarse occupancy grid if queried per frame.
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
   batch per liquid, so a large flood remeshes its chunks every few steps (rate-limited by the mesh queue).
 
@@ -84,7 +91,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (162) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (169) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -96,7 +103,8 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: liquid flow, lava + water → obsidian, buckets, burning/dousing, submersion | `liquids.cmds` | ✅ CI |
 | Engine smoke: starter guide, built home, move-in, walking home through a door at night, talk/shop UI, buying | `town.cmds` | ✅ CI |
 | Engine smoke: every biome creature spawns, moves and renders; ranged attackers | `creatures.cmds` | ✅ CI |
-| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
+| Engine smoke: keeper at the crypt gate, guardian leaves outside, night summon, warden defeat frees the keeper | `dungeon.cmds` | ✅ CI |
+| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Crypt Warden) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
 
 ## 7. Performance
 * Targets: 60 fps @1080p on GTX-1060-class; ~250 LOD0 chunks; mesh ≤2 ms/chunk; gen ≤10 ms/chunk.
@@ -104,14 +112,16 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 * Props: trees ~1000 tris, MultiMesh per chunk+model, small decor has 48 m visibility range.
 * Concerns: dense forests (hundreds of trees in view), shadow cost of props, LOD not yet implemented.
 
-## 8. Next development targets (M2)
-Done in M2 so far: events (blood moon, slime rain), boss framework + three bosses, liquid simulation, voxel A*,
-3D housing, town residents with shops/services/happiness.
-1. LOD rings + horizon heightfield; cave culling from navigation summaries.
-2. More residents (arms dealer, demolitionist roles); residents that fight back; town biome effects.
-3. Liquid follow-ups: pressure (U-tubes), sponges and bottomless buckets, fishing hooks.
-4. Audio director (data-driven cues for mining, combat, liquids, music states for bosses/events).
-5. Dungeon v2 + Crypt Warden; underworld + The Mawwall (towards M3 hardmode).
+## 8. Next development targets (M3)
+M2 delivered events, three bosses, liquids, voxel A*, 3D housing, town residents and biome creature rosters.
+M3 so far: the crypt (zone, locked walls, guardian, roster, keeper, Crypt Warden, tailor).
+1. The Mawwall: wayfinder-effigy incineration summon in the underworld, sweeping wall with eyes/mouth and hungry
+   minions; its defeat sets `hardmode`.
+2. Lazy world mutations: `data/mutations.json` (ore veins, hallow/evil wedges, spread sources) applied on chunk
+   load and live, a mutation log in the world save, biome spread, hardmode ore tiers.
+3. LOD rings + horizon heightfield; cave culling from navigation summaries.
+4. More residents; residents that fight back; crypt keys and locked chests.
+5. Audio director (data-driven cues, music states for bosses/events).
 
 ## 9. Directive summary (condensed)
 Phases: 1 core loop → 2 world → 3 progression → 4 systemic depth → 5 hardmode → 6 endgame → 7 polish.

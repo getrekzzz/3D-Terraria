@@ -14,7 +14,7 @@
     { "id": "granite_cave", "name": "Granite Deeps", "kind": "underground", "priority": 3, "mapColor": "#3a3f5c", "fogColor": "#20243a", "covers": ["terraria:granite_cave"] },
     { "id": "spider_nest", "name": "Webbed Warrens", "kind": "zone", "priority": 7, "mapColor": "#8a8070", "fogColor": "#403830", "covers": ["terraria:spider_cave"] },
     { "id": "hive", "name": "Honeycomb Hive", "kind": "zone", "priority": 8, "mapColor": "#c7862b", "fogColor": "#806020", "ambientTint": "#ffd080", "music": "hive", "covers": ["terraria:hive"] },
-    { "id": "dungeon", "name": "The Old Crypt", "kind": "zone", "priority": 9, "mapColor": "#34508a", "fogColor": "#202838", "fogDensity": 1.8, "music": "crypt", "covers": ["terraria:dungeon"] },
+    { "id": "dungeon", "name": "The Old Crypt", "kind": "zone", "priority": 9, "mapColor": "#34508a", "fogColor": "#202838", "fogDensity": 1.8, "music": "crypt", "lockedUntil": "defeated_crypt_warden", "exclusiveSpawns": true, "covers": ["terraria:dungeon"] },
     { "id": "sky", "name": "Skyreach", "kind": "layer", "priority": 5, "mapColor": "#9fd0e8", "fogColor": "#d8ecff", "music": "sky", "ambience": "high_wind", "covers": ["terraria:floating_island"] },
     { "id": "underworld", "name": "The Cinderdeep", "kind": "layer", "priority": 8, "mapColor": "#7a2a1a", "fogColor": "#4a1a0a", "fogDensity": 2.2, "ambientTint": "#ff9060", "music": "cinderdeep", "ambience": "lava", "covers": ["terraria:underworld"] }
   ]
