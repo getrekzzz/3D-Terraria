@@ -22,7 +22,10 @@ public sealed class EnemyDef : ContentDef
     public bool CollideTerrain { get; init; } = true;
     public bool ContactDamage { get; init; } = true;
 
+    /// <summary>Creature model name (assets/models/creatures/&lt;model&gt;.glb); several enemies may share one.</summary>
     public string? Model { get; init; }
+
+    /// <summary>Colour multiplier applied to the model (recolours shared models such as gels; white = as modelled).</summary>
     public string Tint { get; init; } = "#ffffff";
     public float Scale { get; init; } = 1f;
 
