@@ -67,5 +67,47 @@ public sealed class ContentDatabase
 
     public BlockDef Block(ushort runtimeId) => Blocks[runtimeId];
 
+    /// <summary>
+    /// Returns a stand-in block for an id found in a save but missing from content, preserving the
+    /// original id string so re-saving never loses data.
+    /// </summary>
+    public BlockDef GetOrAddPlaceholderBlock(string id)
+    {
+        if (Blocks.TryGet(id, out var existing)) return existing;
+        lock (Blocks)
+        {
+            var def = Blocks.AddLate(new BlockDef
+            {
+                Id = id, Name = $"Missing block ({id})", Render = BlockRender.Crisp,
+                Textures = new BlockTextures { All = "missing" }, Tags = new[] { "placeholder" }, AutoItem = false,
+            });
+            if (BlockDrops.Length < Blocks.Count)
+            {
+                var drops = BlockDrops;
+                var placers = BlockPlacers;
+                Array.Resize(ref drops, Blocks.Count);
+                Array.Resize(ref placers, Blocks.Count);
+                BlockDrops = drops;
+                BlockPlacers = placers;
+            }
+            return def;
+        }
+    }
+
+    public ItemDef GetOrAddPlaceholderItem(string id) =>
+        Items.TryGet(id, out var existing)
+            ? existing
+            : Items.AddLate(new ItemDef { Id = id, Name = $"Missing item ({id})", MaxStack = 9999, Tags = new[] { "placeholder" } });
+
+    public TileObjectDef GetOrAddPlaceholderTileObject(string id) =>
+        TileObjects.TryGet(id, out var existing)
+            ? existing
+            : TileObjects.AddLate(new TileObjectDef { Id = id, Name = $"Missing object ({id})", Natural = true, AutoItem = false, Tags = new[] { "placeholder" } });
+
+    public PrefixDef GetOrAddPlaceholderPrefix(string id) =>
+        Prefixes.TryGet(id, out var existing)
+            ? existing
+            : Prefixes.AddLate(new PrefixDef { Id = id, Name = id, Applies = new[] { "universal" }, Tags = new[] { "placeholder" } });
+
     public ushort BlockId(string id) => (ushort)Blocks.Get(id).RuntimeId;
 }

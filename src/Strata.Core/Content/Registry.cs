@@ -55,6 +55,19 @@ public sealed class Registry<T> : IRegistry, IFreezable where T : ContentDef
         return true;
     }
 
+    /// <summary>Appends a definition after freezing (save placeholders). Assigns the next runtime id.</summary>
+    internal T AddLate(T def)
+    {
+        lock (_items)
+        {
+            if (_byId.TryGetValue(def.Id, out var existing)) return existing;
+            def.RuntimeId = _items.Count;
+            _items.Add(def);
+            _byId[def.Id] = def;
+            return def;
+        }
+    }
+
     void IFreezable.Freeze()
     {
         for (int i = 0; i < _items.Count; i++) _items[i].RuntimeId = i;
