@@ -367,6 +367,10 @@
    "model": "assets/models/items/geode_shard.glb",
    "icon": "assets/icons/items/geode_shard.png"
   },
+  "gillweed_draught": {
+   "model": "assets/models/items/gillweed_draught.glb",
+   "icon": "assets/icons/items/gillweed_draught.png"
+  },
   "glaring_lens": {
    "model": "assets/models/items/glaring_lens.glb",
    "icon": "assets/icons/items/glaring_lens.png"

@@ -10,6 +10,10 @@ world events and a world that transforms as you progress.
 
 ![Player in a generated forest](docs/screenshots/m1_player_forest.png)
 
+| Town residents | Caverns | Underworld |
+|---|---|---|
+| ![Town](docs/screenshots/m2_town.png) | ![Cavern](docs/screenshots/m2_cavern.png) | ![Underworld](docs/screenshots/m2_underworld.png) |
+
 ## Running
 1. Install **Godot 4.7.x .NET** and the **.NET 8 SDK**.
 2. Open `project.godot` in Godot and press Play (F5), or from a terminal: `godot --path .`

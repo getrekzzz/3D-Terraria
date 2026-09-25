@@ -49,6 +49,7 @@ internal static class StandardProbes
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
         ctx.AddProbe("player.in_liquid", () => ctx.Player.Liquid?.Code ?? 0);
         ctx.AddProbe("player.submerged", () => ctx.Player.Submerged ? 1 : 0);
+        ctx.AddProbe("player.breath", () => ctx.Player.Breath);
         ctx.AddPrefixProbe("npcs.", id => w.Session.Content.Enemies.Contains(id) ? w.Npcs.All.Count(n => n.Def.Id == id) : null);
         ctx.AddPrefixProbe("inv.", id => w.Session.Content.Items.TryGet(id, out var item) ? ctx.Player.State.Inventory.Backpack.Count(item) : null);
         ctx.AddPrefixProbe("event.", id => w.Session.Content.Events.Contains(id) ? (w.Events.IsActive(id) ? 1 : 0) : null);

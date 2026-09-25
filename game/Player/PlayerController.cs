@@ -22,6 +22,7 @@ public sealed partial class PlayerController : CharacterBody3D
     private float _peakY;
     private bool _airborne;
     private bool _swimming;
+    private bool _settle;
     private Strata.Core.Content.Defs.LiquidDef? _liquid;
 
     public PlayerEntity Entity { get; private set; } = null!;
@@ -64,9 +65,15 @@ public sealed partial class PlayerController : CharacterBody3D
     public override void _Ready() => GlobalPosition = ToGodot(Entity.Position);
 
     /// <summary>Moves the body (and entity) to a feet position, clearing motion (spawn, teleport, respawn).</summary>
-    public void Teleport(System.Numerics.Vector3 feet, bool resolveSpawn = false)
+    /// <summary>
+    /// Moves the body and freezes it until the area is loaded. <paramref name="resolveSpawn"/>: fall back to the
+    /// spawn point if the spot is blocked (respawning); <paramref name="settle"/>: land on the nearest standable cell
+    /// above or below (surface teleports whose height is an estimate).
+    /// </summary>
+    public void Teleport(System.Numerics.Vector3 feet, bool resolveSpawn = false, bool settle = false)
     {
         _resolveSpawn = resolveSpawn;
+        _settle = settle;
         GlobalPosition = ToGodot(feet);
         Velocity = Vector3.Zero;
         Entity.Position = feet;
@@ -81,6 +88,15 @@ public sealed partial class PlayerController : CharacterBody3D
         if (Frozen)
         {
             if (!_runtime.IsAreaReady(CellAt(GlobalPosition + Vector3.Up * 0.2f))) return;
+            if (_settle)
+            {
+                _settle = false;
+                var at = CellAt(GlobalPosition + Vector3.Up * 0.2f);
+                var ground = _runtime.Session.FindStandableNear(at);
+                GlobalPosition = new Vector3((ground.X + 0.5f) * Units.CellSize, ground.Y * Units.CellSize, (ground.Z + 0.5f) * Units.CellSize);
+                ResetPhysicsInterpolation();
+                return; // the settled spot may still be loading
+            }
             if (_resolveSpawn)
             {
                 _resolveSpawn = false;

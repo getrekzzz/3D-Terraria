@@ -136,7 +136,7 @@ public static class BuiltinCommands
                 var s = ctx.World.Session;
                 if (!s.Content.Biomes.Contains(id)) throw new CommandException($"unknown biome '{id}' (known: {string.Join(", ", s.Content.Biomes.All.Select(b => b.Id))})");
                 var cell = s.FindSurfaceBiome(id, ctx.Player.FeetCell) ?? throw new CommandException($"no surface '{id}' found");
-                ctx.Host.Teleport(ctx.Player, Feet(cell));
+                ctx.Host.Teleport(ctx.Player, Feet(cell), settle: true);
                 return CommandResult.Success($"Teleported to {id} at {cell}.");
             },
         });
@@ -271,7 +271,8 @@ public static class BuiltinCommands
                 break;
         }
         if (!s.World.InBounds(cell.X, cell.Y, cell.Z)) throw new CommandException($"{cell} is outside the world");
-        ctx.Host.Teleport(ctx.Player, Feet(cell));
+        // Named surface targets are estimates; exact coordinates and caves are taken as given.
+        ctx.Host.Teleport(ctx.Player, Feet(cell), settle: a.Str(0, "x") is "spawn" or "surface");
         return CommandResult.Success($"Teleported to {cell}.");
     }
 

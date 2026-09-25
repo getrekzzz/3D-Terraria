@@ -14,9 +14,9 @@ public sealed class GodotCommandHost : ICommandHost
 
     public GodotCommandHost(PlayerController? player) => _player = player;
 
-    public void Teleport(PlayerEntity player, System.Numerics.Vector3 feet)
+    public void Teleport(PlayerEntity player, System.Numerics.Vector3 feet, bool settle = false)
     {
-        if (_player != null && _player.Entity == player) _player.Teleport(feet, resolveSpawn: false);
+        if (_player != null && _player.Entity == player) _player.Teleport(feet, settle: settle);
         else player.Position = feet;
     }
 

@@ -8,7 +8,9 @@ namespace Strata.Core.Commands;
 public interface ICommandHost
 {
     /// <summary>Moves the player's body to a feet position (meters), waiting for terrain as needed.</summary>
-    void Teleport(PlayerEntity player, Vector3 feet);
+    /// <remarks>With <paramref name="settle"/> the body lands on the nearest standable spot once terrain is loaded
+    /// (surface targets are estimates: biome layers add turf and mud above the height field).</remarks>
+    void Teleport(PlayerEntity player, Vector3 feet, bool settle = false);
 
     /// <summary>Points the player's view along a direction.</summary>
     void Aim(PlayerEntity player, Vector3 direction);
@@ -17,7 +19,7 @@ public interface ICommandHost
 /// <summary>Host used by headless runs: moves the Core entity directly.</summary>
 public sealed class HeadlessCommandHost : ICommandHost
 {
-    public void Teleport(PlayerEntity player, Vector3 feet) => player.Position = feet;
+    public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false) => player.Position = feet;
 
     public void Aim(PlayerEntity player, Vector3 direction) => player.Aim = Vector3.Normalize(direction);
 }

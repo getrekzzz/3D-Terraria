@@ -79,6 +79,7 @@ public sealed class LiquidEffects
                 continue;
             }
             (p.Liquid, p.Submerged) = Probe(p.Position, PlayerEntity.HalfExtents.Y * 2f);
+            Breathe(p, tick);
             if (p.Liquid != null) TouchPlayer(p, p.Liquid, tick);
         }
         foreach (var npc in _world.Npcs.All.ToList())
@@ -88,6 +89,28 @@ public sealed class LiquidEffects
             if (liquid != null) TouchCreature(npc, liquid);
         }
         TickDrops();
+    }
+
+    /// <summary>Damage per drowning pulse once breath runs out (every half second).</summary>
+    public const int DrownDamage = 10;
+
+    /// <summary>Breath runs down under a drowning liquid (water-breathing effects prevent it) and refills in air.</summary>
+    private void Breathe(PlayerEntity p, long tick)
+    {
+        bool holding = p.Submerged && p.Liquid is { Drowns: true } && !p.State.Effects.WaterBreathing;
+        if (!holding)
+        {
+            p.Breath = Math.Min(PlayerEntity.MaxBreath, p.Breath + 6);
+            return;
+        }
+        if (p.Breath > 0)
+        {
+            p.Breath--;
+            return;
+        }
+        if (tick % 30 != 0) return;
+        p.State.Vitals.DamageDirect(DrownDamage);
+        _world.Npcs.ReportPlayerDamage(p, DrownDamage, Vector3.Zero);
     }
 
     private void TouchPlayer(PlayerEntity p, LiquidDef liquid, long tick)

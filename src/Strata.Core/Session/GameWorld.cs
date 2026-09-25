@@ -55,6 +55,11 @@ public sealed class PlayerEntity
     /// <summary>The head is under the liquid's surface.</summary>
     public bool Submerged { get; set; }
 
+    public const int MaxBreath = 1200;
+
+    /// <summary>Ticks of air left while submerged (refills in the open).</summary>
+    public int Breath { get; set; } = MaxBreath;
+
     public static readonly Vector3 HalfExtents = new(0.45f, 0.9f, 0.45f);
 
     /// <summary>
@@ -235,6 +240,7 @@ public sealed class GameWorld : IDisposable
     public void Respawn(PlayerEntity p)
     {
         p.RespawnTicks = 0;
+        p.Breath = PlayerEntity.MaxBreath;
         p.State.Recompute();
         p.State.Vitals.Life = p.State.Vitals.MaxLife;
         p.State.Vitals.Mana = p.State.Vitals.MaxMana;

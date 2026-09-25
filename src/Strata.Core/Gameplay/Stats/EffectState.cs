@@ -12,6 +12,9 @@ public sealed class EffectState
     public List<float> ExtraJumps { get; } = new();
 
     public bool NoFallDamage { get; set; }
+
+    /// <summary>Breathes under liquid (gills).</summary>
+    public bool WaterBreathing { get; set; }
     public HashSet<string> Immunities { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Liquids whose contact damage is ignored.</summary>
@@ -26,6 +29,7 @@ public sealed class EffectState
         Stats.Clear();
         ExtraJumps.Clear();
         NoFallDamage = false;
+        WaterBreathing = false;
         Immunities.Clear();
         LiquidImmunities.Clear();
         DamagePerSecond = 0;
@@ -59,6 +63,9 @@ public sealed class EffectState
                 break;
             case EffectSpecs.NoFallDamage:
                 NoFallDamage = true;
+                break;
+            case EffectSpecs.WaterBreathing:
+                WaterBreathing = true;
                 break;
             default:
                 throw new InvalidOperationException($"Unhandled effect type '{spec.Type}'.");

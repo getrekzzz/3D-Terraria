@@ -10,6 +10,7 @@ public static class EffectSpecs
     public const string EmitLight = "emitLight";
     public const string NoFallDamage = "noFallDamage";
     public const string LiquidImmune = "liquidImmune";
+    public const string WaterBreathing = "waterBreathing";
 
     public static void Register(SpecCatalog c)
     {
@@ -18,6 +19,7 @@ public static class EffectSpecs
         c.Register<DamageOverTimeParams>(SpecKind.Effect, DamageOverTime);
         c.Register<ImmuneParams>(SpecKind.Effect, Immune);
         c.Register<LiquidImmuneParams>(SpecKind.Effect, LiquidImmune);
+        c.Register<NoFallDamageParams>(SpecKind.Effect, WaterBreathing);
         c.Register<EmitLightParams>(SpecKind.Effect, EmitLight);
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoFallDamage);
     }

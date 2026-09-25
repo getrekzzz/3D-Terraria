@@ -33,7 +33,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 804 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 40.0 % (enemies 18 %) |
+| Content | Reference DBs + coverage | ✅ | 804 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 40.3 % (enemies 18 %) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, dungeon v1 |
@@ -42,7 +42,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Meshing | Surface nets + crisp shapes + liquids + collision | ✅ | LOD rings ⬜ |
 | Rendering | Terrain, props, creatures, drops, sky/fog | 🟡 | Horizon mesh, LOD, cave culling, particles polish ⬜ |
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
-| Player | Controller, camera, avatar | ✅ | Step-up, variable jump, per-liquid swimming, fall damage, knockback, blink |
+| Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink |
 | Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds |
 | Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; prefixes/reforging ⬜ |
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
@@ -84,7 +84,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (161) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (162) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -109,7 +109,7 @@ Done in M2 so far: events (blood moon, slime rain), boss framework + three bosse
 3D housing, town residents with shops/services/happiness.
 1. LOD rings + horizon heightfield; cave culling from navigation summaries.
 2. More residents (arms dealer, demolitionist roles); residents that fight back; town biome effects.
-3. Liquid follow-ups: breath/drowning, pressure (U-tubes), sponges and bottomless buckets, fishing hooks.
+3. Liquid follow-ups: pressure (U-tubes), sponges and bottomless buckets, fishing hooks.
 4. Audio director (data-driven cues for mining, combat, liquids, music states for bosses/events).
 5. Dungeon v2 + Crypt Warden; underworld + The Mawwall (towards M3 hardmode).
 

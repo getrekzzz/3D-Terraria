@@ -48,10 +48,17 @@ public sealed partial class WorldSession
         return dirty;
     }
 
-    /// <summary>Finds the nearest surface column (spiral search, step in cells) whose surface biome is <paramref name="biomeId"/>.</summary>
-    public Int3? FindSurfaceBiome(string biomeId, Int3 from, int step = 16, int maxRadius = 4096)
+    /// <summary>
+    /// Finds the nearest surface column (spiral search, step in cells) whose surface biome is <paramref name="biomeId"/>,
+    /// preferring dry land (a beach rather than the sea floor) and falling back to any matching column.
+    /// </summary>
+    public Int3? FindSurfaceBiome(string biomeId, Int3 from, int step = 16, int maxRadius = 4096) =>
+        FindSurfaceBiome(biomeId, from, step, maxRadius, dryOnly: true) ?? FindSurfaceBiome(biomeId, from, step, maxRadius, dryOnly: false);
+
+    private Int3? FindSurfaceBiome(string biomeId, Int3 from, int step, int maxRadius, bool dryOnly)
     {
         if (!Content.Biomes.TryGet(biomeId, out var biome)) return null;
+        int sea = Generator.Plan.Bands.SeaLevel;
         for (int r = 0; r <= maxRadius; r += step)
         {
             for (int dz = -r; dz <= r; dz += step)
@@ -61,7 +68,9 @@ public sealed partial class WorldSession
                     int x = from.X + dx, z = from.Z + dz;
                     if (x < 0 || z < 0 || x >= Settings.Dimensions.X || z >= Settings.Dimensions.Z) continue;
                     if (Generator.Biomes.SurfaceBiome(x, z) != biome.RuntimeId) continue;
-                    return new Int3(x, (int)MathF.Ceiling(Generator.Terrain.SurfaceHeight(x, z)) + 1, z);
+                    float surface = Generator.Terrain.SurfaceHeight(x, z);
+                    if (dryOnly && surface < sea + 1) continue;
+                    return new Int3(x, (int)MathF.Ceiling(surface) + 1, z);
                 }
         }
         return null;

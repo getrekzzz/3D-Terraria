@@ -185,6 +185,35 @@ public class LiquidTests
     }
 
     [Fact]
+    public void HoldingYourBreathRunsOutThenYouDrownUnlessYouHaveGills()
+    {
+        using var g = TestGame.Create();
+        g.World.Liquids.Enabled = false;
+        g.World.Spawner.Enabled = false;
+        var feet = g.Player.FeetCell;
+        g.World.Editor.FillLiquid(feet, feet + new Int3(0, 5, 0), Liquid(g, "water"), LiquidCode.MaxLevel);
+        var vitals = g.Player.State.Vitals;
+        g.Ticks(PlayerEntity.MaxBreath - 10);
+        Assert.True(g.Player.Submerged);
+        Assert.InRange(g.Player.Breath, 1, 20);
+        Assert.Equal(vitals.MaxLife, vitals.Life);
+        g.Ticks(70);
+        Assert.Equal(0, g.Player.Breath);
+        Assert.True(vitals.Life < vitals.MaxLife);
+
+        vitals.Life = vitals.MaxLife;
+        g.Player.State.Buffs.Add(g.Content.Buffs.Get("gillbreath"), 7200);
+        g.Player.State.Recompute();
+        g.Ticks(120);
+        Assert.Equal(vitals.MaxLife, vitals.Life);
+        Assert.True(g.Player.Breath > 0); // refills while breathing water
+
+        g.World.Editor.FillLiquid(feet, feet + new Int3(0, 5, 0), null, 0);
+        g.Ticks(300);
+        Assert.Equal(PlayerEntity.MaxBreath, g.Player.Breath);
+    }
+
+    [Fact]
     public void LavaDestroysDroppedItemsExceptLiquidProofOnes()
     {
         using var g = TestGame.Create();

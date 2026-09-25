@@ -44,7 +44,7 @@ public sealed partial class PlayerAvatar : Node3D
         Rotation = new Vector3(0, _yaw, 0);
         UpdateHeld(entity.State.Inventory.Held);
         _visual.Play(ChooseClip(entity, out float speed), speed: speed);
-        _visual.SetLight(LightProbe.Sample(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f));
+        _visual.SetLight(PlayerLight.Brighten(LightProbe.Sample(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
     }
 
     private string ChooseClip(PlayerEntity entity, out float speed)

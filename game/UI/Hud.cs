@@ -19,6 +19,8 @@ public sealed partial class Hud : CanvasLayer
     private ItemDef? _lastHeld;
     private ProgressBar _life = null!;
     private ProgressBar _mana = null!;
+    private ProgressBar _breath = null!;
+    private Label _breathText = null!;
     private Label _lifeText = null!;
     private Label _manaText = null!;
     private HBoxContainer _buffs = null!;
@@ -66,6 +68,8 @@ public sealed partial class Hud : CanvasLayer
         vitals.OffsetTop = 14;
         (_life, _lifeText) = Bar(vitals, UiTheme.Life);
         (_mana, _manaText) = Bar(vitals, UiTheme.Mana);
+        (_breath, _breathText) = Bar(vitals, new Color(0.55f, 0.85f, 1f));
+        _breath.MaxValue = Strata.Core.Session.PlayerEntity.MaxBreath;
         root.AddChild(vitals);
 
         _buffs = new HBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore, Position = new Vector2(16, 14) };
@@ -154,6 +158,10 @@ public sealed partial class Hud : CanvasLayer
         _mana.MaxValue = v.MaxMana;
         _mana.Value = v.Mana;
         _manaText.Text = $"Mana {v.Mana}/{v.MaxMana}";
+        int breath = _ui.Entity.Breath;
+        _breath.Visible = breath < Strata.Core.Session.PlayerEntity.MaxBreath;
+        _breath.Value = breath;
+        _breathText.Text = breath > 0 ? $"Breath {breath * 100 / Strata.Core.Session.PlayerEntity.MaxBreath}%" : "Drowning!";
         UpdateBuffs();
         UpdateBossBar();
         _crosshair.InReach = _ui.Interaction.InReach;
