@@ -61,27 +61,41 @@ public static class PlacementRules
                     if (b == VoxelWorld.Unknown) return PlacementResult.Unloaded;
                     if (b != 0 || world.TileObjects.IsOccupied(new Int3(x, y, z))) return PlacementResult.Occupied;
                 }
-        bool floor = AllSolid(world, box.Min.X, box.Max.X, box.Min.Y - 1, box.Min.Z, box.Max.Z);
-        bool ceiling = AllSolid(world, box.Min.X, box.Max.X, box.Max.Y, box.Min.Z, box.Max.Z);
-        bool wall = TouchesWall(world, box);
-        bool ok = def.Anchor switch
-        {
-            TileAnchor.Floor => floor,
-            TileAnchor.Ceiling => ceiling,
-            TileAnchor.Wall => wall,
-            TileAnchor.FloorOrWall => floor || wall,
-            TileAnchor.Any => floor || ceiling || wall,
-            _ => true,
-        };
-        return ok ? PlacementResult.Ok : PlacementResult.NoSupport;
+        return Supported(world, def.Anchor, box, strict: true) ? PlacementResult.Ok : PlacementResult.NoSupport;
     }
 
-    private static bool AllSolid(VoxelWorld world, int x0, int x1, int y, int z0, int z1)
+    /// <summary>
+    /// Is a placed object still held up? Placement is strict (the whole footprint must rest on solid ground);
+    /// existing objects only fall once <i>nothing</i> holds them.
+    /// </summary>
+    public static bool IsSupported(VoxelWorld world, TileObjectInstance obj) => Supported(world, obj.Def.Anchor, obj.Bounds, strict: false);
+
+    private static bool Supported(VoxelWorld world, TileAnchor anchor, Aabb3i box, bool strict)
+    {
+        bool Floor() => Solid(world, box.Min.X, box.Max.X, box.Min.Y - 1, box.Min.Z, box.Max.Z, strict);
+        bool Ceiling() => Solid(world, box.Min.X, box.Max.X, box.Max.Y, box.Min.Z, box.Max.Z, strict);
+        return anchor switch
+        {
+            TileAnchor.Floor => Floor(),
+            TileAnchor.Ceiling => Ceiling(),
+            TileAnchor.Wall => TouchesWall(world, box),
+            TileAnchor.FloorOrWall => Floor() || TouchesWall(world, box),
+            TileAnchor.Any => Floor() || Ceiling() || TouchesWall(world, box),
+            _ => true,
+        };
+    }
+
+    /// <summary>All (strict) or any (relaxed) cells of a horizontal slab are solid or hold another object.</summary>
+    private static bool Solid(VoxelWorld world, int x0, int x1, int y, int z0, int z1, bool all)
     {
         for (int z = z0; z < z1; z++)
             for (int x = x0; x < x1; x++)
-                if (!world.IsSolid(x, y, z) && !world.TileObjects.IsOccupied(new Int3(x, y, z))) return false;
-        return true;
+            {
+                bool solid = world.IsSolid(x, y, z) || world.TileObjects.IsOccupied(new Int3(x, y, z));
+                if (all && !solid) return false;
+                if (!all && solid) return true;
+            }
+        return all;
     }
 
     private static bool TouchesWall(VoxelWorld world, Aabb3i box)

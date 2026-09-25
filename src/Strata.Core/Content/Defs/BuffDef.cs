@@ -8,6 +8,9 @@ public sealed class BuffDef : ContentDef
     public string Color { get; init; } = "#ffffff";
     public TypedSpec[] Effects { get; init; } = Array.Empty<TypedSpec>();
 
+    /// <summary>Default duration in ticks when applied by a rule rather than an explicit source.</summary>
+    public int Duration { get; init; } = 600;
+
     /// <summary>Removed on death / cannot be cancelled by the player.</summary>
     public bool Persistent { get; init; }
 }

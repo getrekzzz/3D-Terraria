@@ -37,6 +37,25 @@ public sealed class EditBatch
 
     public int PendingChanges => _result.Changes.Count;
 
+    /// <summary>Reads a block including this batch's pending changes.</summary>
+    public ushort GetBlock(int x, int y, int z)
+    {
+        if (!_world.InBounds(x, y, z)) return _world.GetBlock(x, y, z);
+        var coord = new Int3(x >> ChunkMath.Shift, y >> ChunkMath.Shift, z >> ChunkMath.Shift);
+        return _working.TryGetValue(coord, out var w)
+            ? w.Blocks[ChunkMath.Index(x & ChunkMath.Mask, y & ChunkMath.Mask, z & ChunkMath.Mask)]
+            : _world.GetBlock(x, y, z);
+    }
+
+    /// <summary>Reads a shape code including this batch's pending changes.</summary>
+    public byte GetShape(int x, int y, int z)
+    {
+        var coord = new Int3(x >> ChunkMath.Shift, y >> ChunkMath.Shift, z >> ChunkMath.Shift);
+        return _working.TryGetValue(coord, out var w)
+            ? w.Shapes?[ChunkMath.Index(x & ChunkMath.Mask, y & ChunkMath.Mask, z & ChunkMath.Mask)] ?? 0
+            : _world.GetShape(x, y, z);
+    }
+
     public bool SetBlock(Int3 cell, ushort block, byte shape = 0, CellFlags setFlags = CellFlags.None) =>
         SetBlock(cell.X, cell.Y, cell.Z, block, shape, setFlags);
 
