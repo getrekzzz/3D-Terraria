@@ -24,13 +24,13 @@ public static class ContentManifest
         return model.Files;
     }
 
-    /// <summary>Builds the manifest by scanning data/ (excluding data/reference and the manifest itself).</summary>
+    /// <summary>Builds the manifest by scanning data/ (excluding data/reference, data/config and the manifest itself).</summary>
     public static Model Build(string dataDirectory)
     {
         var root = Path.GetFullPath(dataDirectory);
         var files = Directory.EnumerateFiles(root, "*.json", SearchOption.AllDirectories)
             .Select(f => Path.GetRelativePath(root, f).Replace('\\', '/'))
-            .Where(f => !f.StartsWith("reference/", StringComparison.Ordinal) && f != "manifest.json")
+            .Where(f => !f.StartsWith("reference/", StringComparison.Ordinal) && !f.StartsWith("config/", StringComparison.Ordinal) && f != "manifest.json")
             .OrderBy(f => f.Count(c => c == '/'))
             .ThenBy(f => f, StringComparer.Ordinal)
             .ToList();

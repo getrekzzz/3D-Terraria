@@ -15,6 +15,7 @@ public sealed class ChunkMeshResult
     public required int[] NeighbourVersions { get; init; }
     public MeshSurface Opaque { get; } = new();
     public MeshSurface Transparent { get; } = new();
+    public MeshSurface Cutout { get; } = new();
     public MeshSurface Liquid { get; } = new();
     public CollisionBuilder Collision { get; } = new();
 
@@ -23,7 +24,7 @@ public sealed class ChunkMeshResult
 
     public double BuildMs { get; set; }
 
-    public bool IsEmpty => Opaque.IsEmpty && Transparent.IsEmpty && Liquid.IsEmpty;
+    public bool IsEmpty => Opaque.IsEmpty && Transparent.IsEmpty && Cutout.IsEmpty && Liquid.IsEmpty;
 }
 
 /// <summary>Runs lighting and all meshers for one chunk. Thread-safe (per-thread scratch buffers).</summary>
@@ -44,7 +45,7 @@ public static class ChunkMesher
         };
         var vol = new MeshVolume(nb, tables, light);
         SurfaceNetsMesher.Build(vol, result.Opaque, result.Collision);
-        CellMesher.Build(vol, result.Opaque, result.Transparent, result.Collision);
+        CellMesher.Build(vol, result.Opaque, result.Transparent, result.Cutout, result.Collision);
         LiquidMesher.Build(vol, result.Liquid);
         result.BuildMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
         return result;

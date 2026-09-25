@@ -73,7 +73,7 @@ public sealed class MeshVolume
         int count = 0;
         for (int k = 0; k < 8; k++)
             if (Opaque[Index(x + (k & 1), y + ((k >> 1) & 1), z + (k >> 2))]) count++;
-        return count <= 4 ? 1f : 1f - (count - 4) * 0.14f;
+        return count <= 4 ? 1f : 1f - (count - 4) * 0.09f;
     }
 
     public byte Liquid(int i) => Nb.Liquids[i];

@@ -36,6 +36,7 @@ public sealed class RenderTables
         Solid = new bool[n];
         LightFilter = new byte[n];
         Emission = new ushort[n];
+        Cutout = new bool[n];
         var surfaces = new List<SurfaceLayers>();
         var bySurface = new Dictionary<SurfaceLayers, ushort>();
         foreach (var b in content.Blocks.All)
@@ -49,6 +50,7 @@ public sealed class RenderTables
                 _ => CellClass.Empty,
             };
             Solid[id] = b.IsSolid;
+            Cutout[id] = b.HasTag("cutout");
             LightFilter[id] = b.IsOpaque ? (byte)15 : b.HasTag("leaf") ? (byte)2 : b.Render == BlockRender.Transparent ? (byte)1 : (byte)0;
             if (b.Light is { Length: 3 } l) Emission[id] = LightValue.Pack(0, l[0], l[1], l[2]);
             if (b.Render == BlockRender.None) continue;
@@ -70,6 +72,9 @@ public sealed class RenderTables
     public ushort[] Surface { get; }
 
     public bool[] Solid { get; }
+
+    /// <summary>Alpha-tested see-through blocks (leaves, webs) rendered in the cutout pass rather than blended.</summary>
+    public bool[] Cutout { get; }
 
     /// <summary>Extra light attenuation per step through the block (15 = opaque).</summary>
     public byte[] LightFilter { get; }

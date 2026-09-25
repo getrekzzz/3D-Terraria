@@ -11,7 +11,7 @@ namespace Strata.Core.Meshing;
 /// </summary>
 public static class CellMesher
 {
-    public static void Build(MeshVolume vol, MeshSurface opaque, MeshSurface transparent, CollisionBuilder collision)
+    public static void Build(MeshVolume vol, MeshSurface opaque, MeshSurface transparent, MeshSurface cutout, CollisionBuilder collision)
     {
         const int c0 = Neighborhood.Margin, c1 = Neighborhood.Margin + ChunkMath.Size;
         var tables = vol.Tables;
@@ -33,7 +33,8 @@ public static class CellMesher
                     }
                     else if (cls == CellClass.Transparent)
                     {
-                        EmitPolygons(vol, x, y, z, ShapeGeometry.Cube, block, transparent, collision, tables.Solid[block], platform: false, sameBlockCull: true);
+                        var target = tables.Cutout[block] ? cutout : transparent;
+                        EmitPolygons(vol, x, y, z, ShapeGeometry.Cube, block, target, collision, tables.Solid[block], platform: false, sameBlockCull: true);
                     }
                 }
     }

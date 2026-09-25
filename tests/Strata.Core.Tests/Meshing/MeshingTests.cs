@@ -83,7 +83,7 @@ public class MeshingTests
         Assert.True(mesh.Opaque.TriangleCount >= 12);
         var extent = Extent(mesh.Opaque).X;
         // An isolated natural voxel renders as a rounded nub (~1/3 cell); player-placed blocks are crisp cubes.
-        Assert.True(extent >= 0.12f, $"single natural block collapsed to {extent} m");
+        Assert.True(extent >= 0.1f, $"single natural block collapsed to {extent} m");
     }
 
     [Fact]

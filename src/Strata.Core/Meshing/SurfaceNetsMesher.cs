@@ -14,7 +14,7 @@ namespace Strata.Core.Meshing;
 public static class SurfaceNetsMesher
 {
     /// <summary>Taubin smoothing steps (alternating shrink λ and inflate μ so features keep their volume).</summary>
-    public const int RelaxIterations = 4;
+    public const int RelaxIterations = 8;
     private const float Lambda = 0.5f, Mu = -0.53f;
 
     /// <summary>Maximum distance (cells, per axis) relaxation may move a vertex from its edge centroid.</summary>
@@ -103,7 +103,10 @@ public static class SurfaceNetsMesher
 
     private static Vector3 Corner(int k) => new(k & 1, (k >> 1) & 1, k >> 2);
 
-    /// <summary>Most common opaque block among the 8 samples; ties favour upper samples (grass over dirt).</summary>
+    /// <summary>
+    /// Dominant opaque block among the 8 samples, weighted towards samples exposed to air above them
+    /// (so grass tops win over the dirt beneath at terrace edges) and towards upper samples.
+    /// </summary>
     private static ushort Majority(MeshVolume vol, int x, int y, int z)
     {
         Span<ushort> blocks = stackalloc ushort[8];
@@ -111,10 +114,12 @@ public static class SurfaceNetsMesher
         int n = 0;
         for (int k = 0; k < 8; k++)
         {
-            int i = MeshVolume.Index(x + (k & 1), y + ((k >> 1) & 1), z + (k >> 2));
+            int sy = y + ((k >> 1) & 1);
+            int i = MeshVolume.Index(x + (k & 1), sy, z + (k >> 2));
             if (!vol.Opaque[i]) continue;
             ushort b = vol.Nb.Blocks[i];
-            int weight = 2 + ((k >> 1) & 1);
+            bool exposed = !vol.Opaque[i + MeshVolume.N * MeshVolume.N];
+            int weight = 2 + ((k >> 1) & 1) + (exposed ? 6 : 0);
             int slot = blocks[..n].IndexOf(b);
             if (slot < 0)
             {
@@ -178,8 +183,16 @@ public static class SurfaceNetsMesher
             a[i] = (byte)((opaque[i - 1] ? 1 : 0) + (opaque[i] ? 1 : 0) + (opaque[i + 1] ? 1 : 0));
         for (int i = N; i < Neighborhood.Volume - N; i++) b[i] = (byte)(a[i - N] + a[i] + a[i + N]);
         const int L = N * N;
-        for (int i = L; i < Neighborhood.Volume - L; i++) density[i] = (byte)(b[i - L] + b[i] + b[i + L]);
+        for (int i = L; i < Neighborhood.Volume - L; i++) a[i] = (byte)(b[i - L] + b[i] + b[i + L]);
+        // Second box pass (values up to 27*27 overflow bytes, so scale down first): a smoother tent kernel.
+        var c = _sumC ??= new ushort[Neighborhood.Volume];
+        var d = _sumD ??= new ushort[Neighborhood.Volume];
+        for (int i = 1; i < Neighborhood.Volume - 1; i++) c[i] = (ushort)(a[i - 1] + a[i] + a[i + 1]);
+        for (int i = N; i < Neighborhood.Volume - N; i++) d[i] = (ushort)(c[i - N] + c[i] + c[i + N]);
+        for (int i = L; i < Neighborhood.Volume - L; i++) density[i] = (byte)((d[i - L] + d[i] + d[i + L]) / 3);
     }
+
+    [ThreadStatic] private static ushort[]? _sumC, _sumD;
 
     [ThreadStatic] private static byte[]? _sumA, _sumB;
 
