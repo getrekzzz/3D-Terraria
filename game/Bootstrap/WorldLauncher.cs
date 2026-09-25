@@ -17,6 +17,8 @@ namespace Strata.Game.Bootstrap;
 public sealed class LaunchedWorld
 {
     public required WorldRuntime Runtime { get; init; }
+    public required Rendering.PropLibrary Props { get; init; }
+    public required TileObjectRenderer Objects { get; init; }
     public PlayerController? Player { get; init; }
     public InteractionController? Interaction { get; init; }
     public FreeCamera? FreeCamera { get; init; }
@@ -48,12 +50,16 @@ public static class WorldLauncher
         var objectColliders = new ObjectColliders { Name = "ObjectColliders" };
         runtime.AddChild(objectColliders);
         objectColliders.Initialize(runtime);
+        var props = new Rendering.PropLibrary();
+        var objectRenderer = new TileObjectRenderer();
+        runtime.AddChild(objectRenderer);
+        objectRenderer.Initialize(runtime, props);
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
         drops.Initialize(game);
 
         bool freeCam = args.Flag("free-camera") || args.Get("eye") != null;
-        if (freeCam) return new LaunchedWorld { Runtime = runtime, FreeCamera = AddFreeCamera(runtime, session, args) };
+        if (freeCam) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
 
         var playerName = args.Get("player") ?? "Wanderer";
         if (args.Flag("fresh-player")) GameWorld.DeletePlayer(playerDir, playerName);
@@ -75,7 +81,7 @@ public static class WorldLauncher
         var highlight = new TargetHighlight();
         runtime.AddChild(highlight);
         highlight.Initialize(game, interaction, entity);
-        return new LaunchedWorld { Runtime = runtime, Player = player, Interaction = interaction };
+        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

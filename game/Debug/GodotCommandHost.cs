@@ -1,4 +1,5 @@
 using Strata.Core.Commands;
+using Strata.Core.Diagnostics;
 using Strata.Core.Session;
 using Strata.Game.Bootstrap;
 using Strata.Game.Player;
@@ -38,6 +39,12 @@ public sealed class GodotCommandHost : ICommandHost
         ctx.AddProbe("colliders.bodies", () => runtime.Colliders.BodyCount);
         ctx.AddProbe("uploads.pending", () => runtime.Renderer.PendingUploads);
         ctx.AddProbe("fps", () => Godot.Engine.GetFramesPerSecond());
+        ctx.AddProbe("props.problems", () =>
+        {
+            foreach (var p in world.Props.Problems) log.Warn("props", p);
+            return world.Props.Problems.Count;
+        });
+        ctx.AddProbe("objects.instances", () => world.Objects.InstanceCount);
         if (player != null)
         {
             ctx.AddProbe("player.on_floor", () => player.IsOnFloor() ? 1 : 0);

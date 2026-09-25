@@ -47,15 +47,25 @@ public sealed class ItemUseInfo
 /// </summary>
 public sealed class ItemUseTable
 {
-    private readonly ItemUseInfo[] _infos;
+    private readonly ContentDatabase _content;
+    private ItemUseInfo?[] _infos;
 
     public ItemUseTable(ContentDatabase content)
     {
-        _infos = new ItemUseInfo[content.Items.Count];
+        _content = content;
+        _infos = new ItemUseInfo?[content.Items.Count];
         foreach (var item in content.Items.All) _infos[item.RuntimeId] = Resolve(item, content);
     }
 
-    public ItemUseInfo this[ItemDef item] => _infos[item.RuntimeId];
+    /// <summary>Use info for an item; items added after construction (save placeholders) are resolved on demand.</summary>
+    public ItemUseInfo this[ItemDef item]
+    {
+        get
+        {
+            if (item.RuntimeId >= _infos.Length) Array.Resize(ref _infos, _content.Items.Count);
+            return _infos[item.RuntimeId] ??= Resolve(item, _content);
+        }
+    }
 
     private static ItemUseInfo Resolve(ItemDef item, ContentDatabase content)
     {

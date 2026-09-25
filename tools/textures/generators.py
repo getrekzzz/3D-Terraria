@@ -172,10 +172,116 @@ def missing(r, seed):
     return rgb, checker * 0.5, np.full_like(checker, 0.9), np.zeros_like(checker)
 
 
+def foliage(r, seed):
+    """Dense overlapping leaves (ellipses with a midrib) over dark gaps; tiles seamlessly."""
+    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
+    size = s.SIZE
+    rng = s.rng(seed)
+    rgb = np.ones((size, size, 3), np.float32) * np.array(dark) * 0.55
+    height = np.zeros((size, size), np.float32)
+    count = r.get("leaves", 900)
+    ln, wd = r.get("length", 16), r.get("width", 6)
+    win = int(ln * 1.2) + 2
+    yy, xx = np.mgrid[-win:win + 1, -win:win + 1].astype(np.float32)
+    for _ in range(count):
+        cx, cy = rng.random() * size, rng.random() * size
+        a = rng.random() * np.pi
+        length = ln * (0.7 + rng.random() * 0.6)
+        width = wd * (0.7 + rng.random() * 0.6)
+        ca, sa = np.cos(a), np.sin(a)
+        u = xx * ca + yy * sa
+        v = -xx * sa + yy * ca
+        inside = (u / length) ** 2 + (v / width) ** 2 < 1.0
+        tone = rng.random()
+        col = np.array(s.lerp_color(np.array([[tone]]), dark, light)[0, 0]) * 0.8 + np.array(base) * 0.2
+        shade = (0.75 + 0.25 * (u / length))[..., None]
+        rib = (np.abs(v) < 0.8)[..., None]
+        leaf = col * shade * np.where(rib, 0.8, 1.0)
+        ix = (np.arange(-win, win + 1) + int(cx)) % size
+        iy = (np.arange(-win, win + 1) + int(cy)) % size
+        region = np.ix_(iy, ix)
+        rgb[region] = np.where(inside[..., None], leaf, rgb[region])
+        height[region] = np.where(inside, 0.5 + 0.5 * (1 - (v / width) ** 2), height[region])
+    return rgb, height, np.full_like(height, r.get("roughness", 0.97)), np.zeros_like(height)
+
+
+def _vertical_blur(a, k):
+    """Periodic box blur along the v axis (fibres running along a trunk)."""
+    acc = np.zeros_like(a)
+    for i in range(-k // 2, k // 2):
+        acc += np.roll(a, i, axis=0)
+    return acc / k
+
+
+def bark(r, seed):
+    """Vertical furrowed bark: stretched noise ridges plus plates (v axis runs along the trunk)."""
+    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
+    ridges = s.band_noise(seed, r.get("furrows", 14) * 2, width=0.5)
+    stretched = _vertical_blur(ridges, 40)
+    stretched = (stretched - stretched.min()) / max(stretched.max() - stretched.min(), 1e-6)
+    plates = s.voronoi(seed + 1, r.get("plates", 40))[1]
+    detail = s.spectral_noise(seed + 2, falloff=1.6)
+    t = np.clip(stretched * 0.6 + detail * 0.3 + plates * 0.4, 0, 1)
+    rgb = s.gradient_map(t, [(0.0, dark), (0.55, base), (1.0, light)])
+    furrow = np.clip(1 - stretched / 0.28, 0, 1)
+    rgb *= (1 - furrow * 0.45)[..., None]
+    return rgb, np.clip(t - furrow * 0.5, 0, 1), np.full_like(t, 0.9), np.zeros_like(t)
+
+
+def metal(r, seed):
+    """Brushed metal with scratches and soft tarnish."""
+    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
+    brushed = np.repeat(s.rng(seed).random((1, s.SIZE)), s.SIZE, axis=0) * 0.5 + s.band_noise(seed + 1, 60, width=0.8) * 0.5
+    tarnish = s.spectral_noise(seed + 2, falloff=2.6)
+    t = np.clip(brushed * 0.35 + tarnish * 0.65, 0, 1)
+    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
+    scratches = s.band_noise(seed + 3, 90, width=0.2) > 0.82
+    rgb[scratches] = np.array(light)
+    rough = np.clip(r.get("roughness", 0.35) + (tarnish - 0.5) * 0.3, 0, 1)
+    return rgb, t * 0.3, rough, np.full_like(t, r.get("metallic", 1.0))
+
+
+def cloth(r, seed):
+    """Woven fabric: interleaved warp/weft threads."""
+    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
+    y, x = np.mgrid[0:s.SIZE, 0:s.SIZE].astype(np.float32)
+    n = r.get("threads", 64) / s.SIZE * 2 * np.pi
+    warp = 0.5 + 0.5 * np.sin(x * n)
+    weft = 0.5 + 0.5 * np.sin(y * n)
+    checker = ((np.floor(x * n / np.pi) + np.floor(y * n / np.pi)) % 2).astype(np.float32)
+    weave = np.where(checker > 0, warp, weft)
+    t = np.clip(weave * 0.6 + s.spectral_noise(seed, falloff=2.0) * 0.4, 0, 1)
+    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
+    return rgb, weave, np.full_like(t, 0.95), np.zeros_like(t)
+
+
+def ribbed(r, seed):
+    """Vertical ribs (cactus skin, fluted columns) with fine speckles."""
+    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
+    y, x = np.mgrid[0:s.SIZE, 0:s.SIZE].astype(np.float32)
+    ribs = 0.5 + 0.5 * np.cos(x / s.SIZE * 2 * np.pi * r.get("ribs", 6))
+    speck = s.rng(seed).random((s.SIZE, s.SIZE)) > 0.985
+    t = np.clip(ribs * 0.7 + s.spectral_noise(seed + 1, falloff=2.0) * 0.3, 0, 1)
+    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
+    rgb[speck] = s.hex_rgb(r.get("speck", "#f0f0d0"))
+    return rgb, ribs, np.full_like(t, 0.7), np.zeros_like(t)
+
+
+def cap(r, seed):
+    """Mushroom cap: mottled skin with pale spots."""
+    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
+    t = s.spectral_noise(seed, falloff=2.2)
+    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
+    f1 = s.voronoi(seed + 1, r.get("spots", 14))[0]
+    spots = f1 < r.get("spot_size", 0.22)
+    rgb[spots] = s.hex_rgb(r.get("spot", "#f4efe0"))
+    return rgb, np.clip(t * 0.5 + spots * 0.4, 0, 1), np.full_like(t, 0.6), np.zeros_like(t)
+
+
 GENERATORS = {
     "soil": soil, "rock": rock, "veined": veined, "speckled": speckled, "ore": ore, "grass": grass,
     "planks": planks, "bricks": bricks, "translucent": translucent, "leaves": leaves, "web": web,
-    "hive": hive, "missing": missing,
+    "hive": hive, "missing": missing, "bark": bark, "metal": metal, "cloth": cloth, "ribbed": ribbed, "cap": cap, "foliage": foliage,
 }
 
 
