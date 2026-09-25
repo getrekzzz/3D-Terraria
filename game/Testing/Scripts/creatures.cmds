@@ -1,0 +1,34 @@
+# Biome creatures: every new kind spawns, moves and renders; ranged attackers shoot; swimmers live in water.
+wait_until player.frozen == 0 180
+spawning off
+town arrivals off
+time noon
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 10 14 air
+# A pond for the swimmers.
+fill 4 -3 4 9 -1 9 air
+liquid water 4 -3 4 9 -1 9
+wait 0.5
+spawn sea_jelly 1
+spawn razorfin 2
+spawn dune_vulture 1
+spawn sand_gel 1
+spawn frost_gel 1
+spawn frost_shambler 1
+spawn jungle_gel 1
+spawn snatcher 1
+spawn shore_crab 1
+spawn bone_walker 1
+spawn thornet 1
+spawn cinder_imp 1
+spawn magma_gel 1
+spawn ember_bat 1
+assert npcs.count >= 15
+heal
+wait 3
+assert npcs.thornet == 1
+assert errors == 0
+# Clearing up.
+killall
+assert npcs.count == 0
+assert errors == 0

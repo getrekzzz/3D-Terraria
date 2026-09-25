@@ -94,20 +94,23 @@ public sealed class SpawnDirector
             float angle = _rng.NextFloat() * MathF.Tau;
             float dist = _rng.Range(Config.MinDistance, Config.MaxDistance) / Units.CellSize;
             int x = origin.X + (int)(MathF.Sin(angle) * dist), z = origin.Z + (int)(MathF.Cos(angle) * dist);
-            var cell = FindGround(x, origin.Y, z);
+            var ground = FindGround(x, origin.Y, z);
+            var water = FindWater(x, origin.Y, z);
+            var cell = ground ?? water;
             if (cell == null) continue;
             var ctx = session.ContextAt(cell.Value);
             ctx.Light = EffectiveLight(cell.Value);
             ctx.Random = _rng;
-            var eligible = _rules.Where(r => r.Condition.Evaluate(ctx)).ToList();
+            var eligible = _rules.Where(r => (r.Rule.Placement == SpawnPlacement.Liquid ? water : ground) != null && r.Condition.Evaluate(ctx)).ToList();
             _rng = ctx.Random;
             if (eligible.Count == 0) continue;
             var pick = Weighted(eligible);
+            var at = pick.Rule.Placement == SpawnPlacement.Liquid ? water!.Value : ground!.Value;
             int count = _rng.Range(pick.Rule.GroupMin, pick.Rule.GroupMax);
             for (int i = 0; i < count; i++)
             {
-                var feet = new Vector3(cell.Value.X + 0.5f + _rng.NextSigned(), cell.Value.Y, cell.Value.Z + 0.5f + _rng.NextSigned()) * Units.CellSize;
-                if (!pick.Enemy.Gravity) feet.Y += 2.5f;
+                var feet = new Vector3(at.X + 0.5f + _rng.NextSigned(), at.Y, at.Z + 0.5f + _rng.NextSigned()) * Units.CellSize;
+                feet.Y += pick.Rule.Lift ?? (!pick.Enemy.Gravity && pick.Rule.Placement == SpawnPlacement.Ground ? 2.5f : 0f);
                 if (_npcs.Spawn(pick.Enemy, feet) is { } npc) spawned.Add(npc);
             }
             return spawned;
@@ -133,6 +136,19 @@ public sealed class SpawnDirector
         var session = _world.Session;
         for (int dy = 20; dy >= -28; dy--)
             if (session.IsStandable(x, y + dy, z, 4)) return new Int3(x, y + dy, z);
+        return null;
+    }
+
+    /// <summary>A liquid cell with liquid below it too (a body at least two cells deep), scanning down a column.</summary>
+    private Int3? FindWater(int x, int y, int z)
+    {
+        var world = _world.Session.World;
+        for (int dy = 20; dy >= -28; dy--)
+        {
+            int cy = y + dy;
+            if (world.GetLiquid(x, cy, z) != 0 && world.GetLiquid(x, cy - 1, z) != 0 && world.GetBlock(x, cy, z) != Voxels.VoxelWorld.Unknown)
+                return new Int3(x, cy - 1, z);
+        }
         return null;
     }
 

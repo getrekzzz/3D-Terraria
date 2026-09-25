@@ -11,6 +11,7 @@ public enum SpecKind
     Effect,
     ProjectileHit,
     TownService,
+    CreatureEffect,
 }
 
 /// <summary>
@@ -55,6 +56,7 @@ public sealed class SpecCatalog
         EffectSpecs.Register(c);
         ProjectileHitSpecs.Register(c);
         TownServiceSpecs.Register(c);
+        CreatureEffectSpecs.Register(c);
         Conditions.ConditionCompiler.RegisterSpecs(c);
         return c;
     }

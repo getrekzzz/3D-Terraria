@@ -13,10 +13,12 @@
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the use animation (one hit per creature per
   swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
-* **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Idle`, created from the enemy's
-  `brain` spec), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
+* **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
+  brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
+  sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
   over time, death loot and coins, despawning far from players. `SpawnDirector` evaluates data-driven spawn
-  rules at candidate ground cells with layer/biome/time/light context (tuning: `data/config/spawning.json`).
+  rules at candidate ground cells (or inside water for `placement: liquid`) with layer/biome/time/light context,
+  slowed in towns (tuning: `data/config/spawning.json`).
 * **Events and bosses** — `EventDirector` rolls data-driven events at dusk/dawn (`data/events.json`) and
   feeds them to spawn-rule conditions; bosses are enemies with a `boss` block (arena radius, day despawn,
   segments for worms) driven by `GelSovereign`, `Watcher` and `Worm` brains; `summonBoss` items check

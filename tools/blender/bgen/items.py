@@ -215,10 +215,34 @@ def bucket(mb: MeshBuilder, p, rng):
         mb.cylinder((0, 0, 0.02), (0, 0, 0.18), 0.094, 0.117, "prop:plain:glow" if glow else "prop:gel", p["liquid"], segments=18)
 
 
+def feather(mb: MeshBuilder, p, rng):
+    """Quill with a curved vane of barbs."""
+    color = p.get("color", "#4a3a30")
+    mb.cylinder((0, 0, 0), (0.02, 0, 0.34), 0.008, 0.004, "prop:plain", "#e8e0d0", segments=4)
+    pts = [(0.0, 0.06), (0.05, 0.1), (0.07, 0.2), (0.06, 0.3), (0.02, 0.36), (-0.03, 0.3), (-0.05, 0.18), (-0.03, 0.08)]
+    mb.extrude_polygon(pts, 0.006, "prop:cloth", color)
+
+
+def spike(mb: MeshBuilder, p, rng):
+    """Curved stinger / tooth: a tapered horn."""
+    color = p.get("color", "#2a2418")
+    length = p.get("length", 0.3)
+    pts = [Vector((0, 0, 0)), Vector((0.02, 0, length * 0.5)), Vector((0.07, 0, length))]
+    mb.tube(pts, [p.get("width", 0.045), p.get("width", 0.045) * 0.6, 0.002], p.get("layer", "prop:plain"), color, segments=6)
+
+
+def bone(mb: MeshBuilder, p, rng):
+    color = p.get("color", "#e8e0c8")
+    mb.cylinder((0, 0, 0.05), (0, 0, 0.3), 0.025, None, "prop:plain", color, segments=6)
+    for z in (0.04, 0.31):
+        for sx in (-1, 1):
+            mb.sphere((sx * 0.03, 0, z), 0.035, "prop:plain", color, subdivisions=1)
+
+
 GENERATORS = {
     "sword": sword, "shortsword": shortsword, "pickaxe": pickaxe, "axe": axe, "hammer": hammer, "bow": bow,
     "wand": wand, "staff": staff, "arrow": arrow, "bar": bar, "gem": gem, "blob": blob, "lens": lens, "spool": spool,
     "potion": potion, "coin": coin, "star": star, "heart": heart, "seed": seed, "chunk": chunk, "helmet": helmet,
     "chest_armor": chest_armor, "greaves": greaves, "boots": boots, "horseshoe": horseshoe, "ring": ring,
-    "bottled": bottled, "bucket": bucket,
+    "bottled": bottled, "bucket": bucket, "feather": feather, "spike": spike, "bone": bone,
 }

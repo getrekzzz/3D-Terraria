@@ -55,6 +55,8 @@ public static class BrainFactory
         BrainSpecs.GelSovereign => new GelSovereignBrain(spec.Parse<GelSovereignParams>()),
         BrainSpecs.Watcher => new WatcherBrain(spec.Parse<WatcherParams>()),
         BrainSpecs.Worm => new WormBrain(spec.Parse<WormParams>()),
+        BrainSpecs.Swimmer => new SwimmerBrain(spec.Parse<SwimmerParams>()),
+        BrainSpecs.Lunger => new LungerBrain(spec.Parse<LungerParams>()),
         _ => throw new InvalidOperationException($"Unknown brain '{spec.Type}' (the content validator should have rejected it)."),
     };
 

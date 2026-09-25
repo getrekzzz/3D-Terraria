@@ -287,6 +287,8 @@ water_bolt|Water Bolt|magic
 star|Falling Star|special
 bullet|Musket Ball|bullet
 grenade|Grenade|explosive
+stinger_projectile|Stinger (hornet)|hostile
+imp_fireball|Imp Fireball|hostile
 """
 
 # output|Name|stations(+)|inputs

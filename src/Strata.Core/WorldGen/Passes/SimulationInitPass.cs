@@ -5,7 +5,8 @@ namespace Strata.Core.WorldGen.Passes;
 
 /// <summary>
 /// Pass 20 — simulation initialization: reconciles liquids with the final geometry (no liquid inside
-/// solids; water meeting lava hardens into obsidian) so the liquid simulation starts from a stable state.
+/// solids; water meeting lava hardens into obsidian; no liquid left hanging over space that later passes carved
+/// out beneath it) so generated liquid starts out settled.
 /// </summary>
 public sealed class SimulationInitPass : GenPass
 {
@@ -40,6 +41,26 @@ public sealed class SimulationInitPass : GenPass
                         liquids[i] = 0;
                         ctx.Blocks[i] = ctx.Palette.Obsidian;
                     }
+                }
+        DropHangingLiquid(ctx, liquids);
+    }
+
+    /// <summary>
+    /// Liquid resting on open, dry space (a river channel crossing a cave carved by another pass) would pour down
+    /// the moment the chunk loads. Bottom-up per column, so a whole hanging column goes. The chunk's lowest layer
+    /// cannot see below the chunk and is left alone.
+    /// </summary>
+    private void DropHangingLiquid(ChunkGenContext ctx, byte[] liquids)
+    {
+        int n = ChunkGenContext.Size;
+        for (int lz = 0; lz < n; lz++)
+            for (int lx = 0; lx < n; lx++)
+                for (int ly = 1; ly < n; ly++)
+                {
+                    int i = ChunkGenContext.Index(lx, ly, lz);
+                    if (liquids[i] == 0) continue;
+                    int below = ChunkGenContext.Index(lx, ly - 1, lz);
+                    if (!_solid![ctx.Blocks[below]] && liquids[below] == 0) liquids[i] = 0;
                 }
     }
 

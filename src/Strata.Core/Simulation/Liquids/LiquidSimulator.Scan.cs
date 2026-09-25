@@ -6,20 +6,21 @@ namespace Strata.Core.Simulation.Liquids;
 public sealed partial class LiquidSimulator
 {
     /// <summary>
-    /// A chunk joined the world: wake its liquid cells that can move (generated lakes cut open by a neighbour's
-    /// caves, water left hanging at a border), plus the facing layer of loaded neighbours that may now flow in.
+    /// A chunk joined the world. Generated liquid is static until something disturbs it (an edit wakes it), so a
+    /// fresh chunk wakes nothing; a chunk from the save may have been saved mid-flow, so its liquid cells that can
+    /// still move are woken, and so is the facing layer of played-in neighbours that may now flow into it.
     /// Settled liquid stays asleep, so loading an ocean costs one pass over its cells.
     /// </summary>
-    private void OnChunkInstalled(Chunk chunk)
+    private void OnChunkInstalled(Chunk chunk, bool fromSave)
     {
         var data = chunk.Capture();
-        if (data.Liquids != null) ScanChunk(chunk.Coord, data, Int3.Zero, new Int3(ChunkMath.Size, ChunkMath.Size, ChunkMath.Size));
+        if (fromSave && data.Liquids != null) ScanChunk(chunk.Coord, data, Int3.Zero, new Int3(ChunkMath.Size, ChunkMath.Size, ChunkMath.Size));
         const int last = ChunkMath.Size - 1;
         for (int f = 0; f < Faces.Count; f++)
         {
             var o = Faces.Offsets[f];
             var neighbour = World.GetChunk(chunk.Coord + o);
-            if (neighbour == null) continue;
+            if (neighbour == null || !(neighbour.FromSave || neighbour.Modified)) continue;
             var nd = neighbour.Capture();
             if (nd.Liquids == null) continue;
             // The neighbour's layer touching this chunk.

@@ -1,0 +1,95 @@
+# Screenshot tour: surface biomes, caves at three depths, the underworld, a town and night.
+# Rendering required for images (headless runs only exercise the route):
+#   godot --path . --rendering-driver vulkan -- --world=tour --size=small --new --player=tour --fresh-player \
+#         --view=4 --shots=/tmp/shots --smoke=res://game/Testing/Tours/tour.cmds
+wait_until player.frozen == 0 300
+spawning off
+town arrivals off
+camera third
+time 10
+aim 0 -0.12 1
+
+wait_until stream.idle == 1 900
+screenshot 01_spawn_forest
+wait_until screenshot.pending == 0 900
+
+biome desert
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+screenshot 02_desert
+wait_until screenshot.pending == 0 900
+
+biome tundra
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+screenshot 03_tundra
+wait_until screenshot.pending == 0 900
+
+biome jungle
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+screenshot 04_jungle
+wait_until screenshot.pending == 0 900
+
+biome ocean
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+screenshot 05_ocean
+wait_until screenshot.pending == 0 900
+
+# Underground: a held torch lights the way.
+tp spawn
+wait_until player.frozen == 0 300
+select 4
+tp cave underground
+wait_until player.frozen == 0 300
+aim 0 -0.05 1
+wait_until stream.idle == 1 900
+screenshot 06_cave
+wait_until screenshot.pending == 0 900
+
+tp cave cavern
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+screenshot 07_cavern
+wait_until screenshot.pending == 0 900
+
+tp cave underworld
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+screenshot 08_underworld
+wait_until screenshot.pending == 0 900
+
+# A small town at spawn with its residents gathered round.
+tp spawn
+wait_until player.frozen == 0 300
+select 1
+fill -8 -1 -2 8 -1 22 stone
+fill -8 0 -2 8 9 22 air
+fill -4 0 12 6 6 22 stone_brick
+fill -3 0 13 5 5 21 air
+fill 0 0 12 1 3 12 air
+place wooden_door 0 0 12
+place torch -3 0 21
+place wooden_table 1 0 18
+place wooden_chair -2 0 18
+town dismiss wayfinder
+wait_until stream.idle == 1 900
+town summon wayfinder -3 0 6
+town summon peddler 1 0 5
+town summon mender 4 0 7
+town summon grovekeeper -6 0 8
+town talk wayfinder
+town talk peddler
+town talk mender
+town talk grovekeeper
+aim 0 -0.2 1
+wait 1
+screenshot 09_town
+wait_until screenshot.pending == 0 900
+
+time 23
+wait 1
+screenshot 10_night
+wait_until screenshot.pending == 0 900
+assert errors == 0

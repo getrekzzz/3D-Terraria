@@ -123,7 +123,7 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface",
+            Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface | tp cave <underground|cavern|underworld>",
             Help = "Teleports the player (cell coordinates).",
             Run = Teleport,
         });
@@ -256,6 +256,14 @@ public static class BuiltinCommands
             {
                 var here = ctx.Player.FeetCell;
                 cell = new Int3(here.X, (int)MathF.Ceiling(s.Generator.Terrain.SurfaceHeight(here.X, here.Z)) + 1, here.Z);
+                break;
+            }
+            case "cave":
+            {
+                var name = a.Str(1, "layer");
+                if (!Enum.TryParse<World.WorldLayer>(name, ignoreCase: true, out var layer) || layer is not (World.WorldLayer.Underground or World.WorldLayer.Cavern or World.WorldLayer.Underworld))
+                    throw new CommandException("layer must be underground, cavern or underworld");
+                cell = s.FindCave(ctx.Player.FeetCell, layer) ?? throw new CommandException($"no open {name} cave found nearby");
                 break;
             }
             default:

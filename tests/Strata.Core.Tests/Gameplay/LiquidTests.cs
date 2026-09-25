@@ -222,6 +222,51 @@ public class LiquidTests
     }
 
     [Fact]
+    public void FreshlyGeneratedChunksDoNotWakeTheirLiquid()
+    {
+        using var g = TestGame.Create();
+        var session = g.World.Session;
+        g.World.Liquids.Enabled = false;
+        var hanging = g.Floor + new Int3(3, 6, 3);
+        g.World.Editor.FillLiquid(hanging, hanging, Liquid(g, "water"), LiquidCode.MaxLevel);
+        var sim = new LiquidSimulator(session);
+        var coord = ChunkMath.CellToChunk(hanging);
+        var chunk = session.World.GetChunk(coord)!;
+        session.Install(new ChunkProduct(coord, chunk.Capture(), Array.Empty<TileObjectInstance>(), chunk.MutationLevel, FromSave: false));
+        Assert.False(sim.IsActive(hanging)); // generated liquid is static until disturbed
+        g.World.Editor.SetBlock(hanging + new Int3(1, 0, 0), g.Content.BlockId("stone")); // an edit next to it wakes it
+        Assert.True(sim.IsActive(hanging));
+    }
+
+    [Fact]
+    public void GeneratedLiquidNeverHangsOverOpenSpaceInsideAChunk()
+    {
+        using var g = TestGame.Create();
+        var session = g.World.Session;
+        var spawn = ChunkMath.CellToChunk(session.SpawnCell);
+        int checkedCells = 0;
+        for (int cy = 0; cy < session.World.ChunkCounts.Y; cy++)
+            for (int dz = -1; dz <= 1; dz++)
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    var coord = new Int3(spawn.X + dx, cy, spawn.Z + dz);
+                    var data = session.Generator.Generate(coord).Data;
+                    if (data.Liquids == null) continue;
+                    for (int ly = 1; ly < ChunkMath.Size; ly++)
+                        for (int lz = 0; lz < ChunkMath.Size; lz++)
+                            for (int lx = 0; lx < ChunkMath.Size; lx++)
+                            {
+                                int i = ChunkMath.Index(lx, ly, lz), below = ChunkMath.Index(lx, ly - 1, lz);
+                                if (data.Liquids[i] == 0) continue;
+                                checkedCells++;
+                                bool open = !g.Content.Blocks[data.GetBlock(below)].IsSolid && data.Liquids[below] == 0;
+                                Assert.False(open, $"liquid hangs at {coord * ChunkMath.Size + new Int3(lx, ly, lz)}");
+                            }
+                }
+        Assert.True(checkedCells > 0);
+    }
+
+    [Fact]
     public void LiquidEditsDirtyNeighbourChunksAtBordersAndLavaRelights()
     {
         using var g = TestGame.Create();

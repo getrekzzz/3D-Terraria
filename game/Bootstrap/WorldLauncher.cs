@@ -100,6 +100,9 @@ public static class WorldLauncher
         var avatar = new PlayerAvatar();
         player.AddChild(avatar);
         avatar.Initialize(player, game, props);
+        var carried = new PlayerLight();
+        player.AddChild(carried);
+        carried.Initialize(entity);
 
         var interaction = new InteractionController();
         interaction.Initialize(runtime, player);

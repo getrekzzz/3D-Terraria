@@ -19,7 +19,7 @@ public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Cri
 /// Owns every live creature: brains, movement against voxels, contact damage to players, taking hits
 /// (knockback, immunity), death with loot and coins, and despawning far from players.
 /// </summary>
-public sealed class NpcSystem
+public sealed partial class NpcSystem
 {
     public const int MaxNpcs = 200;
     public const float DespawnDistance = 90f;
@@ -133,6 +133,7 @@ public sealed class NpcSystem
             _rng = _ctx.Rng;
             if (brain.UsesGravity && npc.Def.Gravity) npc.Velocity.Y = MathF.Max(npc.Velocity.Y - BrainContext.Gravity * dt, -30f);
             Move(npc, brain, dt);
+            if (npc.Def.Ranged != null && target != null) RangedAttack(npc, target, distance);
             if (npc.Def.ContactDamage && target != null) ContactDamage(npc, target);
             if (npc.Position.Y < 0) Remove(i);
         }
@@ -192,6 +193,7 @@ public sealed class NpcSystem
         if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
         var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);
         ReportPlayerDamage(player, hit.Damage, knock);
+        ApplyContactEffects(npc, player);
     }
 
     /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
@@ -230,6 +232,7 @@ public sealed class NpcSystem
         if (npc.Def.Value > 0) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
+        DeathEffects(npc);
         if (npc.Def.Boss is { } boss)
         {
             if (boss.Flag != null) _world.Session.Flags.Add(boss.Flag);

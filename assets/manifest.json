@@ -259,6 +259,10 @@
    "model": "assets/models/items/band_of_vigor.glb",
    "icon": "assets/icons/items/band_of_vigor.png"
   },
+  "bone": {
+   "model": "assets/models/items/bone.glb",
+   "icon": "assets/icons/items/bone.png"
+  },
   "bottle": {
    "object": "alchemy_bottle",
    "icon": "assets/icons/items/bottle.png"
@@ -342,6 +346,10 @@
   "empty_bucket": {
    "model": "assets/models/items/empty_bucket.glb",
    "icon": "assets/icons/items/empty_bucket.png"
+  },
+  "feather": {
+   "model": "assets/models/items/feather.glb",
+   "icon": "assets/icons/items/feather.png"
   },
   "furnace": {
    "object": "furnace",
@@ -611,6 +619,10 @@
    "object": "sawmill",
    "icon": "assets/icons/items/sawmill.png"
   },
+  "shark_tooth": {
+   "model": "assets/models/items/shark_tooth.glb",
+   "icon": "assets/icons/items/shark_tooth.png"
+  },
   "silk_thread": {
    "model": "assets/models/items/silk_thread.glb",
    "icon": "assets/icons/items/silk_thread.png"
@@ -662,6 +674,10 @@
   "starshard": {
    "model": "assets/models/items/starshard.glb",
    "icon": "assets/icons/items/starshard.png"
+  },
+  "stinger": {
+   "model": "assets/models/items/stinger.glb",
+   "icon": "assets/icons/items/stinger.png"
   },
   "swiftness_draught": {
    "model": "assets/models/items/swiftness_draught.glb",
@@ -843,6 +859,22 @@
     "fly"
    ]
   },
+  "crab": {
+   "model": "assets/models/creatures/crab.glb",
+   "generator": "crab",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "fish": {
+   "model": "assets/models/creatures/fish.glb",
+   "generator": "fish",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
   "gazer": {
    "model": "assets/models/creatures/gazer.glb",
    "generator": "eye",
@@ -871,6 +903,36 @@
     "swing",
     "use",
     "walk"
+   ]
+  },
+  "hornet": {
+   "model": "assets/models/creatures/hornet.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "imp": {
+   "model": "assets/models/creatures/imp.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "jellyfish": {
+   "model": "assets/models/creatures/jellyfish.glb",
+   "generator": "jelly",
+   "animations": [
+    "fly",
+    "idle"
    ]
   },
   "mender": {
@@ -931,6 +993,37 @@
     "swing",
     "use",
     "walk"
+   ]
+  },
+  "skeleton": {
+   "model": "assets/models/creatures/skeleton.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "snatcher": {
+   "model": "assets/models/creatures/snatcher.glb",
+   "generator": "snatcher",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "vulture": {
+   "model": "assets/models/creatures/vulture.glb",
+   "generator": "bird",
+   "animations": [
+    "fly",
+    "idle"
    ]
   },
   "watcher": {

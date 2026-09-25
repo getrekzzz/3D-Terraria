@@ -33,6 +33,9 @@ public sealed class Chunk
 
     public ChunkState State { get; internal set; } = ChunkState.Ready;
 
+    /// <summary>Loaded from the save rather than generated (its contents may have been shaped by play).</summary>
+    public bool FromSave { get; init; }
+
     /// <summary>Incremented whenever voxel content changes. Job results carry the version they used.</summary>
     public int Version { get; private set; }
 

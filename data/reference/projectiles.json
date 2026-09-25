@@ -53,6 +53,16 @@
    "id": "terraria:grenade",
    "name": "Grenade",
    "kind": "explosive"
+  },
+  {
+   "id": "terraria:stinger_projectile",
+   "name": "Stinger (hornet)",
+   "kind": "hostile"
+  },
+  {
+   "id": "terraria:imp_fireball",
+   "name": "Imp Fireball",
+   "kind": "hostile"
   }
  ]
 }

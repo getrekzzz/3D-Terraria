@@ -2427,6 +2427,20 @@
    "source": "craft"
   },
   {
+   "id": "terraria:feather",
+   "name": "Feather",
+   "kind": "material",
+   "stage": "early",
+   "source": "drop"
+  },
+  {
+   "id": "terraria:shark_fin",
+   "name": "Shark Fin",
+   "kind": "material",
+   "stage": "early",
+   "source": "drop"
+  },
+  {
    "id": "terraria:wood",
    "name": "Wood",
    "kind": "material",

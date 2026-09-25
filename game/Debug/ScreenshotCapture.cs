@@ -5,7 +5,8 @@ namespace Strata.Game.Debug;
 
 /// <summary>
 /// Waits until streaming and uploads are idle (plus a settle delay), saves a screenshot and optionally quits.
-/// Driven by <c>--screenshot=path.png</c> (used by CI and visual QA).
+/// Driven by <c>--screenshot=path.png</c> (used by CI and visual QA), or re-armed by the <c>screenshot</c> command for
+/// scripted tours.
 /// </summary>
 public sealed partial class ScreenshotCapture : Node
 {
@@ -22,6 +23,22 @@ public sealed partial class ScreenshotCapture : Node
     public System.Func<bool>? WaitFor { get; set; }
 
     public event System.Action<string>? Captured;
+
+    /// <summary>A capture is requested and not yet written.</summary>
+    public bool Armed { get; set; } = true;
+
+    /// <summary>Starts waiting for the next idle moment to capture <paramref name="path"/>.</summary>
+    public void Request(string path)
+    {
+        OutputPath = path;
+        _idleTime = 0;
+        _elapsed = 0;
+        _nextReport = 5;
+        Armed = true;
+        SetProcess(true);
+    }
+
+    public override void _Ready() => SetProcess(Armed);
 
     private double _nextReport = 5;
 
@@ -46,6 +63,7 @@ public sealed partial class ScreenshotCapture : Node
         if (DisplayServer.GetName() == "headless")
         {
             GD.Print("SCREENSHOT skipped (headless renderer)");
+            Armed = false;
             Captured?.Invoke("");
             if (QuitAfter) GetTree().Quit(0);
             return;
@@ -56,6 +74,7 @@ public sealed partial class ScreenshotCapture : Node
         System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path)!);
         var err = image.SavePng(path);
         GD.Print(err == Error.Ok ? $"SCREENSHOT {path}" : $"Screenshot failed: {err}");
+        Armed = false;
         Captured?.Invoke(path);
         if (QuitAfter) GetTree().Quit(err == Error.Ok ? 0 : 1);
     }

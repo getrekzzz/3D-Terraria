@@ -541,6 +541,32 @@
         "params": {
           "color": "#c03a5a"
         }
+      },
+      "feather": {
+        "generator": "feather",
+        "params": {
+          "color": "#4a3a30"
+        }
+      },
+      "stinger": {
+        "generator": "spike",
+        "params": {
+          "color": "#2a2418",
+          "length": 0.32,
+          "width": 0.05
+        }
+      },
+      "bone": {
+        "generator": "bone",
+        "params": {}
+      },
+      "shark_tooth": {
+        "generator": "spike",
+        "params": {
+          "color": "#f0ece0",
+          "length": 0.22,
+          "width": 0.07
+        }
       }
     }
   },
@@ -653,6 +679,75 @@
         "hatColor": "#7ab050",
         "flower": "#f0d040",
         "boots": "#6a4a2a"
+      }
+    },
+    "vulture": {
+      "generator": "bird",
+      "params": {
+        "feathers": "#3a3028",
+        "head": "#d09080",
+        "wing": "#2a221c"
+      }
+    },
+    "crab": {
+      "generator": "crab",
+      "params": {
+        "shell": "#c0482a"
+      }
+    },
+    "jellyfish": {
+      "generator": "jelly",
+      "params": {
+        "color": "#6ab0ff",
+        "core": "#c0e8ff"
+      }
+    },
+    "fish": {
+      "generator": "fish",
+      "params": {
+        "scales": "#6a7a5a",
+        "belly": "#c05040"
+      }
+    },
+    "hornet": {
+      "generator": "insect",
+      "params": {
+        "color": "#e0b020",
+        "stripes": "#201a10",
+        "eyes": "#a0ff60"
+      }
+    },
+    "snatcher": {
+      "generator": "snatcher",
+      "params": {
+        "leaf": "#4a8a2a",
+        "inner": "#c03050"
+      }
+    },
+    "skeleton": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#e8e0c8",
+        "shirt": "#d8d0b8",
+        "pants": "#c8c0a8",
+        "hair": "#e8e0c8",
+        "eyes": "#ff3020",
+        "boots": "#a09880"
+      }
+    },
+    "imp": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#c83020",
+        "skinLayer": "flesh",
+        "shirt": "#3a1a14",
+        "pants": "#2a1210",
+        "hair": "#1a0a08",
+        "eyes": "#ffd040",
+        "horns": "#302018",
+        "wings": "#5a1a14",
+        "tail": "#a02818",
+        "boots": "#2a1210"
       }
     }
   }

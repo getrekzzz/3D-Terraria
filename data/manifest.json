@@ -14,6 +14,7 @@
     "enemies/bosses.json",
     "enemies/early.json",
     "enemies/events.json",
+    "enemies/wilds.json",
     "items/consumables.json",
     "items/equipment.json",
     "items/materials.json",

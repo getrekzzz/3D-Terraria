@@ -22,6 +22,8 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-25 | Player body = Godot CharacterBody3D on the smooth collision mesh; creatures, drops and projectiles = Core AABB voxel physics | Visually exact player movement; everything else simulates headless and at any distance. |
 | 2026-09-25 | Props/items/creatures generated in Blender from `tools/blender/assets.json`; materials are texture-layer names, the game supplies the shader | One consistent PBR look with terrain; assets regenerate deterministically. |
 | 2026-09-25 | Engine behaviour is validated with command scripts (`game/Testing/Scripts/*.cmds`) run headless in CI | The same command registry powers the debug console, tests and screenshot automation. |
+| 2026-09-25 | Liquids simulate only *active* cells; generated liquid is static until disturbed (edits wake it), saved chunks are rescanned on load | Lazy per-chunk generation cannot settle liquid globally like the reference game; this keeps loading cheap and flow local to play. Pass 20 removes liquid hanging over carved space (generator v2). |
+| 2026-09-25 | Town residents are a separate Core entity (not enemy NPCs) with A* paths, homes and trade | Friendly, persistent, schedule-driven; never hit by player attacks. |
 
 ## 3. System status
 Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
@@ -31,7 +33,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 800 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 37.8 % |
+| Content | Reference DBs + coverage | ✅ | 804 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 40.0 % (enemies 18 %) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, dungeon v1 |
@@ -45,10 +47,10 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; prefixes/reforging ⬜ |
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
 | UI | HUD, inventory, equipment, chests, crafting, console, perf overlay | ✅ | Settings/menus/world select ⬜ |
-| Combat | Damage model, melee arcs, projectiles, buffs | ✅ | Whips/yoyos/summons ⬜ |
-| AI | Slime, walker, flyer, boss brains, worm; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
-| Spawning | Data-driven spawn rules | ✅ | Closed doors stop creatures; spawn suppression near homes ⬜ |
-| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 128 item models, 15 creatures (4 residents), 200 icons |
+| Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Whips/yoyos/summons ⬜ |
+| AI | Slime, walker, flyer, swimmer, lunger, boss brains, worm; ranged attacks; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
+| Spawning | Data-driven spawn rules (ground or liquid placement), biome rosters, town suppression | ✅ | Closed doors stop creatures |
+| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 132 item models, 23 creatures (4 residents), 204 icons |
 | NPCs | Town residents, 3D housing, shops, services, happiness | ✅ | 4 residents (guide/merchant/nurse/dryad roles); more residents, enemies attacking town ⬜ |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
 | Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels); arenas, boss bar; music state ⬜ |
@@ -63,6 +65,8 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 * Streaming once failed to reach idle in a rendered run (not reproduced since); `ChunkStreamer.DebugState()` is logged by the screenshot tool to catch it.
 * Item held-in-hand orientation is generic (+90° about X); per-item grip data would improve swords/bows.
 * Prefix (reforge) data exists but no reforging service/UI yet.
+* Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
+  until disturbed.
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
   batch per liquid, so a large flood remeshes its chunks every few steps (rate-limited by the mesh queue).
 
@@ -80,7 +84,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (151) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (161) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -91,7 +95,8 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: boss summons, arenas, segments, defeat flags | `bosses.cmds` | ✅ CI |
 | Engine smoke: liquid flow, lava + water → obsidian, buckets, burning/dousing, submersion | `liquids.cmds` | ✅ CI |
 | Engine smoke: starter guide, built home, move-in, walking home through a door at night, talk/shop UI, buying | `town.cmds` | ✅ CI |
-| Screenshots | local (Xvfb + lavapipe) via `--screenshot` + `--exec` | 🟡 CI screenshot tour ⬜ |
+| Engine smoke: every biome creature spawns, moves and renders; ranged attackers | `creatures.cmds` | ✅ CI |
+| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
 
 ## 7. Performance
 * Targets: 60 fps @1080p on GTX-1060-class; ~250 LOD0 chunks; mesh ≤2 ms/chunk; gen ≤10 ms/chunk.
@@ -103,11 +108,10 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 Done in M2 so far: events (blood moon, slime rain), boss framework + three bosses, liquid simulation, voxel A*,
 3D housing, town residents with shops/services/happiness.
 1. LOD rings + horizon heightfield; cave culling from navigation summaries.
-2. Screenshot tour in CI (surface, cave, cavern, biomes, underworld, ocean, town).
-3. More residents (arms dealer, demolitionist roles), enemies that attack residents, spawn suppression near towns.
-4. Liquid follow-ups: breath/drowning, pressure (U-tubes), sponges and bottomless buckets, fishing hooks.
-5. Audio director (data-driven cues for mining, combat, liquids, music states for bosses/events).
-6. Dungeon v2 + Crypt Warden; underworld + The Mawwall (towards M3 hardmode).
+2. More residents (arms dealer, demolitionist roles); residents that fight back; town biome effects.
+3. Liquid follow-ups: breath/drowning, pressure (U-tubes), sponges and bottomless buckets, fishing hooks.
+4. Audio director (data-driven cues for mining, combat, liquids, music states for bosses/events).
+5. Dungeon v2 + Crypt Warden; underworld + The Mawwall (towards M3 hardmode).
 
 ## 9. Directive summary (condensed)
 Phases: 1 core loop → 2 world → 3 progression → 4 systemic depth → 5 hardmode → 6 endgame → 7 polish.

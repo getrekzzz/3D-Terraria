@@ -156,6 +156,18 @@ def _outfit(mb: MeshBuilder, p):
         mb.box((-0.205, -0.125, 1.12), (0.205, 0.125, 1.47), "prop:cloth", p["coat"])
         mb.bone = "hips"
         mb.box((-0.2, -0.12, 0.62), (0.2, 0.12, 1.12), "prop:cloth", p["coat"])
+    if "horns" in p:
+        mb.bone = "head"
+        for sx in (-1, 1):
+            mb.tube([Vector((sx * 0.1, 0.0, 1.78)), Vector((sx * 0.16, -0.02, 1.9)), Vector((sx * 0.13, -0.08, 1.98))], [0.035, 0.025, 0.005], "prop:clay", p["horns"], segments=5)
+    if "wings" in p:
+        mb.bone = "chest"
+        for sx in (-1, 1):
+            mb.extrude_polygon([(sx * 0.05, 1.35), (sx * 0.55, 1.55), (sx * 0.6, 1.2), (sx * 0.4, 1.28), (sx * 0.3, 1.1), (sx * 0.1, 1.2)],
+                               0.012, "prop:cloth", p["wings"], matrix=Matrix.Translation((0, -0.14, 0)))
+    if "tail" in p:
+        mb.bone = "hips"
+        mb.tube([Vector((0, -0.1, 0.95)), Vector((0, -0.3, 0.8)), Vector((0, -0.42, 0.9)), Vector((0, -0.5, 1.05))], [0.03, 0.025, 0.02, 0.005], "prop:flesh", p["tail"], segments=5)
     if "apron" in p:
         mb.bone = "chest"
         mb.box((-0.14, 0.11, 1.12), (0.14, 0.125, 1.38), "prop:cloth", p["apron"])

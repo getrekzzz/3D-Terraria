@@ -101,7 +101,7 @@ public sealed class ProjectileSystem
                 continue;
             }
             if (!p.Def.CollideTerrain) p.Position += p.Velocity * dt;
-            if (p.Def.Friendly && HitCreatures(p))
+            if (p.Def.Friendly ? HitCreatures(p) : HitPlayers(p))
             {
                 End(i);
                 continue;
@@ -143,6 +143,52 @@ public sealed class ProjectileSystem
             if (p.PierceLeft >= 0 && --p.PierceLeft <= 0) return true;
         }
         return false;
+    }
+
+    /// <summary>Hostile projectiles hurt players (defense and i-frames apply) and town residents they touch.</summary>
+    private bool HitPlayers(Projectile p)
+    {
+        float r = p.Def.Radius * Units.CellSize;
+        foreach (var player in _world.Players)
+        {
+            if (!player.Alive) continue;
+            var box = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
+            if (Vector3.DistanceSquared(Vector3.Clamp(p.Position, box.Item1, box.Item2), p.Position) > r * r) continue;
+            var state = player.State;
+            if (state.Vitals.ImmunityTicks > 0) return true; // absorbed by i-frames
+            var hit = Combat.DamageModel.Roll(p.Damage, DamageClass.None, 0, p.Knockback, null, state.Defense,
+                Combat.DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
+                state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
+            if (state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity))
+            {
+                var push = new Vector3(p.Velocity.X, 0, p.Velocity.Z);
+                var knock = (push.LengthSquared() > 1e-4f ? Vector3.Normalize(push) : Vector3.Zero) * (2f + hit.Knockback * 0.5f) + new Vector3(0, 3.5f, 0);
+                _npcs.ReportPlayerDamage(player, hit.Damage, knock);
+                ApplyOnHitPlayer(p, player);
+            }
+            return true;
+        }
+        foreach (var resident in _world.Town.Residents)
+        {
+            if (!resident.Alive) continue;
+            var box = (resident.Center - Town.TownNpc.HalfExtents, resident.Center + Town.TownNpc.HalfExtents);
+            if (Vector3.DistanceSquared(Vector3.Clamp(p.Position, box.Item1, box.Item2), p.Position) > r * r) continue;
+            _world.Town.Damage(resident, p.Damage, p.Position - p.Velocity * 0.05f);
+            return true;
+        }
+        return false;
+    }
+
+    private void ApplyOnHitPlayer(Projectile p, PlayerEntity player)
+    {
+        foreach (var spec in p.Def.OnHit)
+        {
+            if (spec.Type != ProjectileHitSpecs.ApplyBuff) continue;
+            var b = spec.Parse<ApplyBuffParams>();
+            if (!_rng.Chance(b.Chance) || !_world.Session.Content.Buffs.TryGet(b.Buff, out var buff)) continue;
+            player.State.Buffs.Add(buff, b.Ticks, player.State.Effects.Immunities);
+            player.State.Recompute();
+        }
     }
 
     private void ApplyOnHit(Projectile p, Npc? npc)

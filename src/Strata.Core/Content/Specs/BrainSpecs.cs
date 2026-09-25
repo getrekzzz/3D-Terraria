@@ -10,6 +10,8 @@ public static class BrainSpecs
     public const string GelSovereign = "gelSovereign";
     public const string Watcher = "watcher";
     public const string Worm = "worm";
+    public const string Swimmer = "swimmer";
+    public const string Lunger = "lunger";
 
     public static void Register(SpecCatalog c)
     {
@@ -20,6 +22,8 @@ public static class BrainSpecs
         c.Register<GelSovereignParams>(SpecKind.Brain, GelSovereign);
         c.Register<WatcherParams>(SpecKind.Brain, Watcher);
         c.Register<WormParams>(SpecKind.Brain, Worm);
+        c.Register<SwimmerParams>(SpecKind.Brain, Swimmer);
+        c.Register<LungerParams>(SpecKind.Brain, Lunger);
     }
 }
 
@@ -118,4 +122,27 @@ public sealed class WormParams : SpecParams
 
     /// <summary>Gravity applied while outside terrain (makes it arc back into the ground).</summary>
     public float AirGravity { get; init; } = 14f;
+}
+
+/// <summary>Lives in liquid: chases targets through water, flops helplessly on land.</summary>
+public sealed class SwimmerParams : SpecParams
+{
+    public float AggroRange { get; init; } = 30f;
+
+    /// <summary>Moves in bursts (jellyfish) instead of steadily (fish).</summary>
+    public bool Pulse { get; init; }
+
+    /// <summary>Only chases players who are in liquid themselves.</summary>
+    public bool ChaseOnlyInLiquid { get; init; } = true;
+}
+
+/// <summary>Rooted where it spawned; its head lunges at targets within reach (snatcher vines).</summary>
+public sealed class LungerParams : SpecParams, IValidatableSpec
+{
+    /// <summary>Longest stretch of the stalk (cells).</summary>
+    public float Reach { get; init; } = 8f;
+
+    public float AggroRange { get; init; } = 16f;
+
+    public string? Validate() => Reach <= 0 ? "reach must be > 0" : null;
 }

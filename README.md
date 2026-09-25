@@ -15,7 +15,7 @@ world events and a world that transforms as you progress.
 2. Open `project.godot` in Godot and press Play (F5), or from a terminal: `godot --path .`
 
 Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medium|large --new --player=NAME
---fresh-player --view=CHUNKS --hour=H --free-camera --exec="cmd;cmd" --screenshot=PATH --smoke=SCRIPT`.
+--fresh-player --view=CHUNKS --hour=H --free-camera --exec="cmd;cmd" --screenshot=PATH --shots=DIR --smoke=SCRIPT`.
 
 ### Controls
 | Key | Action |
@@ -43,6 +43,8 @@ dotnet run --project tools/Strata.Tools -- worldgen-report --seed=1234 --size=ti
 godot --headless --path . --import                        # import assets once
 godot --headless --path . -- --world=smoke --size=tiny --new --player=smoke --fresh-player \
       --view=2 --smoke=res://game/Testing/Scripts/basic.cmds   # engine smoke test (prints SMOKE PASS)
+godot --path . -- --world=tour --size=small --new --player=tour --fresh-player --view=3 \
+      --shots=/tmp/shots --smoke=res://game/Testing/Tours/tour.cmds   # screenshot tour (needs a GPU or lavapipe)
 ```
 
 ### Asset pipelines

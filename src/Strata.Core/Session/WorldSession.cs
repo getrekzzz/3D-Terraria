@@ -115,13 +115,16 @@ public sealed partial class WorldSession
         return new ChunkProduct(coord, generated.Data, generated.Objects, Meta.MutationLevel, FromSave: false);
     }
 
-    /// <summary>Raised on the main thread after a chunk joins the live world (liquids wake along its borders).</summary>
-    public event Action<Chunk>? ChunkInstalled;
+    /// <summary>
+    /// Raised on the main thread after a chunk joins the live world. The flag says whether it came from the save
+    /// (it may hold liquid that was still moving) rather than fresh from the generator (settled by pass 20).
+    /// </summary>
+    public event Action<Chunk, bool>? ChunkInstalled;
 
     /// <summary>Adds a produced chunk to the live world (main thread). Returns sky-exposure changes.</summary>
     public List<(int X, int Z, int Old, int New)> Install(ChunkProduct product)
     {
-        var chunk = new Chunk(product.Coord, product.Data) { MutationLevel = product.MutationLevel };
+        var chunk = new Chunk(product.Coord, product.Data) { MutationLevel = product.MutationLevel, FromSave = product.FromSave };
         World.AddChunk(chunk);
         _installing = true;
         try
@@ -133,7 +136,7 @@ public sealed partial class WorldSession
             _installing = false;
         }
         var sky = Sky.Rebuild(product.Coord.X, product.Coord.Z);
-        ChunkInstalled?.Invoke(chunk);
+        ChunkInstalled?.Invoke(chunk, product.FromSave);
         return sky;
     }
 

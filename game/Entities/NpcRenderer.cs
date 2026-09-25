@@ -18,6 +18,7 @@ public sealed partial class NpcRenderer : Node3D
         public required CreatureVisual Visual;
         public required string Model;
         public required Label3D Health;
+        public MeshInstance3D? Stalk;
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public Vector3 Shown;
         public float Squash = 1f;
@@ -40,6 +41,7 @@ public sealed partial class NpcRenderer : Node3D
             Release(view.Visual, view.Model);
             foreach (var (seg, model) in view.Segments) Release(seg, model);
             view.Health.QueueFree();
+            view.Stalk?.QueueFree();
         };
     }
 
@@ -99,6 +101,7 @@ public sealed partial class NpcRenderer : Node3D
                 visual.Rotation = new Vector3(0, Mathf.LerpAngle(visual.Rotation.Y, npc.Yaw + Mathf.Pi, 1f - Mathf.Exp(-dt * 10f)), 0);
             }
             Animate(npc, view, dt);
+            if (view.Stalk != null) UpdateStalk(npc, view);
             var tint = Color.FromHtml(npc.Def.Tint);
             if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);
             visual.SetTint(tint);
@@ -166,11 +169,56 @@ public sealed partial class NpcRenderer : Node3D
             visual.Position += new Vector3(0, Mathf.Sin(npc.Age * 0.08f) * 0.08f, 0); // bobbing eye
     }
 
+    /// <summary>Rooted creatures (snatchers): a vine from the anchor to the head.</summary>
+    private static void UpdateStalk(Npc npc, View view)
+    {
+        var root = new Vector3(npc.Anchor.X, npc.Anchor.Y, npc.Anchor.Z);
+        var head = view.Shown + new Vector3(0, npc.HalfExtents.Y * 0.8f, 0);
+        var span = head - root;
+        float len = span.Length();
+        view.Stalk!.Visible = len > 0.05f;
+        if (len <= 0.05f) return;
+        var up = span / len;
+        var side = Mathf.Abs(up.Y) > 0.95f ? Vector3.Right : up.Cross(Vector3.Up).Normalized();
+        var basis = new Basis(side, up, side.Cross(up)).Scaled(new Vector3(1, len, 1));
+        view.Stalk.GlobalTransform = new Transform3D(basis, root + span * 0.5f);
+    }
+
+    private static MeshInstance3D NewStalk() => new()
+    {
+        Mesh = new CylinderMesh { TopRadius = 0.05f, BottomRadius = 0.09f, Height = 1f, RadialSegments = 6, Rings = 1 },
+        MaterialOverride = new StandardMaterial3D { AlbedoColor = new Color(0.25f, 0.45f, 0.15f), Roughness = 0.9f },
+    };
+
     private View? Create(Npc npc)
     {
         var model = npc.Def.Model ?? npc.Def.Id;
         var visual = Acquire(model);
         if (visual == null) return null;
+        // Visuals are pooled per model, so a reused one may carry another creature's glow.
+        var glow = visual.GetNodeOrNull<OmniLight3D>("Glow");
+        if (npc.Def.Light is { Length: 3 } l)
+        {
+            if (glow == null)
+            {
+                glow = new OmniLight3D { Name = "Glow", LightEnergy = 0.8f, ShadowEnabled = false };
+                visual.AddChild(glow);
+            }
+            glow.LightColor = new Color(l[0] / 15f, l[1] / 15f, l[2] / 15f);
+            glow.OmniRange = 2f + Mathf.Max(l[0], Mathf.Max(l[1], l[2])) / 3f;
+            glow.Position = new Vector3(0, npc.HalfExtents.Y, 0);
+            glow.Visible = true;
+        }
+        else if (glow != null)
+        {
+            glow.Visible = false;
+        }
+        MeshInstance3D? stalk = null;
+        if (npc.Def.Brain.Type == Strata.Core.Content.Specs.BrainSpecs.Lunger)
+        {
+            stalk = NewStalk();
+            AddChild(stalk);
+        }
         var health = new Label3D
         {
             Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
@@ -183,6 +231,6 @@ public sealed partial class NpcRenderer : Node3D
         };
         AddChild(health);
         var pos = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
-        return new View { Visual = visual, Model = model, Health = health, Shown = pos };
+        return new View { Visual = visual, Model = model, Health = health, Shown = pos, Stalk = stalk };
     }
 }

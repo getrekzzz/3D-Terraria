@@ -81,6 +81,7 @@ public partial class GameRoot : Node
             capture = new ScreenshotCapture { World = launched.Runtime, OutputPath = shot };
             AddChild(capture);
         }
+        AddTourShots(launched);
         if (Services.Args.Get("smoke") is { } script)
         {
             // Scripts aim from the eye: first person makes the crosshair ray and the eye ray coincide.
@@ -99,6 +100,27 @@ public partial class GameRoot : Node
         }
         else if (launched.Player != null) Input.MouseMode = Input.MouseModeEnum.Captured;
         return launched;
+    }
+
+    /// <summary>The <c>screenshot &lt;name&gt;</c> command: waits for streaming to settle and saves into <c>--shots</c>.</summary>
+    private void AddTourShots(LaunchedWorld launched)
+    {
+        var shots = new ScreenshotCapture { Name = "TourShots", World = launched.Runtime, QuitAfter = false, Armed = false };
+        AddChild(shots);
+        string dir = Services.Args.Get("shots") ?? "user://shots";
+        Commands!.Register(new CommandDef
+        {
+            Name = "screenshot", Usage = "screenshot <name>",
+            Help = "Saves <shots dir>/<name>.png once streaming is idle (wait with: wait_until screenshot.pending == 0).",
+            Run = (_, a) =>
+            {
+                var file = a.Str(0, "name");
+                if (file.IndexOfAny(new[] { '/', '\\', '.' }) >= 0) throw new CommandException("name must be a plain file name");
+                shots.Request($"{dir.TrimEnd('/')}/{file}.png");
+                return CommandResult.Success($"Screenshot {file} requested.");
+            },
+        });
+        CommandContext!.AddProbe("screenshot.pending", () => shots.Armed ? 1 : 0);
     }
 
     private void StartScript(string path)

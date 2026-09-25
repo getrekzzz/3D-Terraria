@@ -33,6 +33,29 @@ public sealed class BossInfo
     public string? TailModel { get; init; }
 }
 
+/// <summary>A projectile a creature fires at its target (any brain).</summary>
+public sealed class RangedAttack
+{
+    /// <summary>Hostile projectile (projectile with <c>friendly: false</c>).</summary>
+    public string Projectile { get; init; } = "";
+
+    public int Damage { get; init; } = 10;
+
+    /// <summary>Launch speed (m/s).</summary>
+    public float Speed { get; init; } = 12f;
+
+    /// <summary>Ticks between volleys.</summary>
+    public int Interval { get; init; } = 120;
+
+    /// <summary>Fires only within this distance (m) and with a clear line of sight.</summary>
+    public float Range { get; init; } = 18f;
+
+    public int Count { get; init; } = 1;
+
+    /// <summary>Random spread per projectile (degrees).</summary>
+    public float Spread { get; init; }
+}
+
 /// <summary>A hostile or passive creature. Behaviour comes from its <see cref="Brain"/> spec.</summary>
 public sealed class EnemyDef : ContentDef
 {
@@ -76,13 +99,35 @@ public sealed class EnemyDef : ContentDef
     /// <summary>Emitted light [r,g,b] 0–15 (glowing creatures).</summary>
     public int[]? Light { get; init; }
 
+    public RangedAttack? Ranged { get; init; }
+
+    /// <summary>Effects on a player this creature touches for damage (e.g. applyBuff on_fire).</summary>
+    public TypedSpec[] OnContact { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>Effects when it dies (pourLiquid, spawnEnemies).</summary>
+    public TypedSpec[] OnDeath { get; init; } = Array.Empty<TypedSpec>();
+
     public float Width => Size.Length > 0 ? Size[0] : 2f;
     public float Height => Size.Length > 1 ? Size[1] : 2f;
+}
+
+public enum SpawnPlacement
+{
+    /// <summary>Standing on ground with headroom (walkers, hoppers, low fliers).</summary>
+    Ground,
+
+    /// <summary>Inside a body of liquid at least two cells deep (swimmers).</summary>
+    Liquid,
 }
 
 /// <summary>Where and when an enemy may naturally spawn.</summary>
 public sealed class SpawnRuleDef : ContentDef
 {
+    public SpawnPlacement Placement { get; init; } = SpawnPlacement.Ground;
+
+    /// <summary>Metres above the spawn cell (default: 2.5 for ground-spawned fliers, else 0; rooted creatures use 0).</summary>
+    public float? Lift { get; init; }
+
     public string Enemy { get; init; } = "";
     public float Weight { get; init; } = 1f;
     public int[] Group { get; init; } = { 1, 1 };

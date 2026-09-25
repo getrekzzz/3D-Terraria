@@ -5,5 +5,5 @@ namespace Strata.Core.WorldGen;
 /// </summary>
 public static class GenVersion
 {
-    public const int Current = 1;
+    public const int Current = 2; // 2: generated liquid no longer hangs over carved space
 }

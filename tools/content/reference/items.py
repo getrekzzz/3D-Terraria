@@ -219,6 +219,8 @@ mechanical_skull|Mechanical Skull|hardmode|craft
 celestial_sigil|Celestial Sigil|endgame|craft
 """,
     "material": """
+feather|Feather|early|drop
+shark_fin|Shark Fin|early|drop
 wood|Wood|early|tree
 boreal_wood|Boreal Wood|early|tree
 palm_wood|Palm Wood|early|tree

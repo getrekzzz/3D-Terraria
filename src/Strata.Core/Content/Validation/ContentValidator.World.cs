@@ -49,6 +49,21 @@ public static partial class ContentValidator
                 if (e.Brain.Raw.TryGetProperty(key, out var refId) && refId.GetString() is { } id) ctx.Ref(e, ctx.Db.Enemies, id, $"brain.{key}");
             if (e.Brain.Raw.TryGetProperty("phase2Model", out var model) && model.GetString() is { } m)
                 ctx.Asset(e, $"assets/models/creatures/{m}.glb", "brain.phase2Model");
+            if (e.Ranged is { } r)
+            {
+                if (ctx.Db.Projectiles.TryGet(r.Projectile, out var proj) && proj.Friendly) ctx.Error(e, $"ranged.projectile '{r.Projectile}' must be hostile (friendly: false).");
+                ctx.Ref(e, ctx.Db.Projectiles, r.Projectile, "ranged.projectile");
+                if (r.Interval < 1 || r.Count < 1 || r.Speed <= 0 || r.Range <= 0) ctx.Error(e, "ranged needs interval, count, speed and range > 0.");
+            }
+            ctx.Specs(e, SpecKind.CreatureEffect, e.OnContact, "onContact");
+            ctx.Specs(e, SpecKind.CreatureEffect, e.OnDeath, "onDeath");
+            foreach (var fx in e.OnContact.Concat(e.OnDeath))
+            {
+                string? Str(string name) => fx.Raw.TryGetProperty(name, out var v) ? v.GetString() : null;
+                ctx.Ref(e, ctx.Db.Buffs, fx.Type == CreatureEffectSpecs.ApplyBuff ? Str("buff") : null, "effect.buff");
+                ctx.Ref(e, ctx.Db.Liquids, fx.Type == CreatureEffectSpecs.PourLiquid ? Str("liquid") : null, "effect.liquid");
+                ctx.Ref(e, ctx.Db.Enemies, fx.Type == CreatureEffectSpecs.SpawnEnemies ? Str("enemy") : null, "effect.enemy");
+            }
         }
         foreach (var s in ctx.Db.SpawnRules.All)
         {

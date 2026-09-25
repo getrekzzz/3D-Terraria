@@ -13,6 +13,7 @@ public sealed class Npc
         Id = id;
         Def = def;
         Position = feet;
+        Anchor = feet;
         Life = MaxLife = def.Life;
         HalfExtents = new Vector3(def.Width * 0.25f * def.Scale, def.Height * 0.25f * def.Scale, def.Width * 0.25f * def.Scale);
     }
@@ -53,6 +54,12 @@ public sealed class Npc
     }
 
     // Brain scratch state (meaning defined by the brain).
+    /// <summary>Ticks until the next ranged volley.</summary>
+    public int AttackTimer;
+
+    /// <summary>Where the creature spawned (anchored creatures stay near it).</summary>
+    public Vector3 Anchor;
+
     public int Timer;
     public int Counter;
     public int Counter2;
