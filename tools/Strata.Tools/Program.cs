@@ -11,6 +11,7 @@ public static class Program
         new ValidateCommand(),
         new WorldgenReportCommand(),
         new MeshBenchCommand(),
+        new CoverageCommand(),
     };
 
     public static int Main(string[] args)

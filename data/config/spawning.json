@@ -1,0 +1,11 @@
+{
+  // Natural enemy spawning around players (see SpawnDirector). Distances in metres, intervals in ticks (60/s).
+  "checkInterval": 30,
+  "chance": 0.18,
+  "maxNearbyDay": 4,
+  "maxNearbyNight": 7,
+  "countRadius": 60,
+  "minDistance": 22,
+  "maxDistance": 46,
+  "attempts": 12
+}

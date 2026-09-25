@@ -36,7 +36,8 @@ public sealed partial class PlayerAvatar : Node3D
     {
         if (_visual == null) return;
         var entity = _controller.Entity;
-        Visible = !_controller.Rig.FirstPerson;
+        int immune = entity.State.Vitals.ImmunityTicks;
+        Visible = !_controller.Rig.FirstPerson && (immune <= 0 || (immune / 4) % 2 == 0); // blink while invulnerable
         var aim = entity.Aim;
         float target = Mathf.Atan2(-aim.X, -aim.Z);
         _yaw = Mathf.LerpAngle(_yaw, target, 1f - Mathf.Exp(-(float)delta * 14f));

@@ -136,7 +136,8 @@ public sealed partial class ScriptRunner : Node
     {
         SetPhysicsProcess(false);
         bool pass = _failures == 0;
-        GD.Print(pass ? $"SMOKE PASS {_name}" : $"SMOKE FAIL {_name} ({_failures} failures)");
+        string kind = QuitWhenDone ? "SMOKE" : "SCRIPT";
+        GD.Print(pass ? $"{kind} PASS {_name}" : $"{kind} FAIL {_name} ({_failures} failures)");
         Finished?.Invoke(pass);
         if (QuitWhenDone) GetTree().Quit(pass ? 0 : 1);
     }

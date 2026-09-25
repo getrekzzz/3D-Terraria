@@ -59,6 +59,26 @@ public sealed partial class ChunkStreamer
     public bool IsIdle => _loadsInFlight == 0 && _meshesInFlight == 0 &&
                           _entries.Values.All(e => !e.MeshWanted || (e.HasMesh && !e.MeshDirty));
 
+    /// <summary>Why streaming is not idle (diagnostics): counts and the first chunk blocked on a missing neighbour.</summary>
+    public string DebugState()
+    {
+        int wanted = 0, dirty = 0, missing = 0, blocked = 0;
+        string first = "";
+        foreach (var (coord, e) in _entries)
+        {
+            if (!e.MeshWanted) continue;
+            wanted++;
+            if (e.MeshDirty) dirty++;
+            if (!e.HasMesh) missing++;
+            if ((e.MeshDirty || !e.HasMesh) && !e.MeshInFlight && !NeighboursReady(coord))
+            {
+                blocked++;
+                if (first.Length == 0) first = $"{coord} state={e.Data}";
+            }
+        }
+        return $"wanted={wanted} dirty={dirty} unmeshed={missing} blocked={blocked} {first}";
+    }
+
     public bool IsMeshed(Int3 chunk) => _entries.TryGetValue(chunk, out var e) && e.HasMesh;
 
     /// <summary>Called every frame with the focus cell (player or camera).</summary>

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.Common;
+using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Player;
@@ -97,6 +98,10 @@ public sealed class GameWorld : IDisposable
         Uses = new ItemUseTable(session.Content);
         ItemUse = new ItemUseSystem(this);
         Interaction = new ObjectInteraction(this);
+        Npcs = new NpcSystem(this);
+        Melee = new MeleeSystem(Npcs, ItemUse);
+        Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
+        Spawner = new SpawnDirector(this, Npcs);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
     }
@@ -109,6 +114,10 @@ public sealed class GameWorld : IDisposable
     public ItemUseTable Uses { get; }
     public ItemUseSystem ItemUse { get; }
     public ObjectInteraction Interaction { get; }
+    public NpcSystem Npcs { get; }
+    public MeleeSystem Melee { get; }
+    public ProjectileSystem Projectiles { get; }
+    public SpawnDirector Spawner { get; }
     public string? PlayerDirectory { get; }
     public List<PlayerEntity> Players { get; } = new();
 
@@ -150,6 +159,10 @@ public sealed class GameWorld : IDisposable
         else
             Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
         foreach (var p in Players) TickPlayer(p);
+        Spawner.Tick();
+        Npcs.Tick();
+        Melee.Tick();
+        Projectiles.Tick();
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
         if (++_autosaveCounter >= AutosaveTicks)
         {

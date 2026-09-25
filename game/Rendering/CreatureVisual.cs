@@ -70,6 +70,11 @@ public sealed partial class CreatureVisual : Node3D
 
     public bool IsPlaying => _player?.IsPlaying() ?? false;
 
+    public void SetTint(Color tint)
+    {
+        foreach (var g in _geometry) g.SetInstanceShaderParameter("tint", tint);
+    }
+
     public void SetLight(Color voxelLight)
     {
         foreach (var g in _geometry) g.SetInstanceShaderParameter("voxel_light", voxelLight);

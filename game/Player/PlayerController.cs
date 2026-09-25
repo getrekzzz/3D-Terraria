@@ -115,6 +115,11 @@ public sealed partial class PlayerController : CharacterBody3D
         var target = wish * speed;
         bool onFloor = IsOnFloor();
         float accel = onFloor ? (wish.LengthSquared() > 0.01f ? _config.GroundAcceleration : _config.GroundFriction) : _config.AirAcceleration;
+        if (_knockbackTime > 0)
+        {
+            _knockbackTime -= dt; // briefly lose control while knocked back
+            accel *= 0.15f;
+        }
         horizontal = horizontal.MoveToward(target, accel * dt);
 
         UpdateJump(dt, onFloor, ref v);
@@ -132,6 +137,19 @@ public sealed partial class PlayerController : CharacterBody3D
         TrackFall();
         Sync();
     }
+
+    /// <summary>Knockback from a hit: replaces horizontal momentum and pops the player up.</summary>
+    public void ApplyKnockback(Vector3 impulse)
+    {
+        var v = Velocity;
+        v.X = impulse.X;
+        v.Z = impulse.Z;
+        v.Y = Mathf.Max(v.Y, impulse.Y);
+        Velocity = v;
+        _knockbackTime = 0.25f;
+    }
+
+    private float _knockbackTime;
 
     private void UpdateJump(float dt, bool onFloor, ref Vector3 v)
     {

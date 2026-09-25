@@ -32,7 +32,7 @@ public sealed partial class ScreenshotCapture : Node
         {
             _nextReport += 5;
             var s = World.Streamer;
-            GD.Print($"[stream] t={_elapsed:F0}s loaded={s.LoadedCount} meshed={s.MeshedCount} loads={s.LoadsInFlight} meshes={s.MeshesInFlight} jobs={World.Jobs.Pending}/{World.Jobs.Running} uploads={World.Renderer.PendingUploads} idle={s.IsIdle}");
+            GD.Print($"[stream] t={_elapsed:F0}s loaded={s.LoadedCount} meshed={s.MeshedCount} loads={s.LoadsInFlight} meshes={s.MeshesInFlight} jobs={World.Jobs.Pending}/{World.Jobs.Running} uploads={World.Renderer.PendingUploads} idle={s.IsIdle} {(s.IsIdle ? "" : s.DebugState())} completions={World.Jobs.Completions.Count}");
         }
         bool idle = World.Streamer.IsIdle && World.Renderer.PendingUploads == 0 && World.Jobs.Idle && (WaitFor?.Invoke() ?? true);
         _idleTime = idle ? _idleTime + delta : 0;

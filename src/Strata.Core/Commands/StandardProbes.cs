@@ -29,6 +29,10 @@ internal static class StandardProbes
         ctx.AddProbe("chunks.meshed", () => w.Streamer.MeshedCount);
         ctx.AddProbe("stream.idle", () => w.Streamer.IsIdle && w.Jobs.Idle ? 1 : 0);
         ctx.AddProbe("objects.count", () => w.Session.World.TileObjects.Count);
+        ctx.AddProbe("npcs.count", () => w.Npcs.All.Count);
+        ctx.AddProbe("npcs.alive_life", () => w.Npcs.All.Sum(n => n.Life));
+        ctx.AddProbe("projectiles.count", () => w.Projectiles.All.Count);
+        ctx.AddPrefixProbe("npcs.", id => w.Session.Content.Enemies.Contains(id) ? w.Npcs.All.Count(n => n.Def.Id == id) : null);
         ctx.AddPrefixProbe("inv.", id => w.Session.Content.Items.TryGet(id, out var item) ? ctx.Player.State.Inventory.Backpack.Count(item) : null);
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);

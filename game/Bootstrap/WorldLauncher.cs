@@ -56,6 +56,16 @@ public static class WorldLauncher
         var objectRenderer = new TileObjectRenderer();
         runtime.AddChild(objectRenderer);
         objectRenderer.Initialize(runtime, props);
+        game.Spawner.Config = Strata.Core.Gameplay.Entities.SpawnConfig.Load(services.Data);
+        var creatures = new Entities.NpcRenderer();
+        runtime.AddChild(creatures);
+        creatures.Initialize(game, props);
+        var projectiles = new Entities.ProjectileRenderer();
+        runtime.AddChild(projectiles);
+        projectiles.Initialize(game, props);
+        var effects = new Entities.CombatEffects();
+        runtime.AddChild(effects);
+        effects.Initialize(game);
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
         drops.Initialize(game);
@@ -72,6 +82,10 @@ public static class WorldLauncher
         runtime.AddChild(player);
         player.Rig.Camera.Current = true;
         runtime.Focus = player;
+        game.Npcs.PlayerHurt += (p, _, knock) =>
+        {
+            if (p == entity) player.ApplyKnockback(new Vector3(knock.X, knock.Y, knock.Z));
+        };
         game.PlayerRespawned += p =>
         {
             if (p == entity) player.Teleport(p.Position, resolveSpawn: true);

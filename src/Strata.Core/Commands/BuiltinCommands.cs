@@ -17,6 +17,7 @@ public static class BuiltinCommands
         var r = new CommandRegistry();
         Register(r);
         EditCommands.Register(r);
+        CombatCommands.Register(r);
         return r;
     }
 
@@ -196,6 +197,17 @@ public static class BuiltinCommands
                 var target = Targeting.Cast(ctx.World.Session.World, p.Eye, p.Aim, 30f);
                 var outcome = ctx.World.ItemUse.Use(p, target, freshPress: true);
                 return CommandResult.Success($"{outcome}" + (target != null ? $" at {target.Cell}" : ""));
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "stream", Usage = "stream", Help = "Prints chunk streaming state (diagnostics).",
+            Run = (ctx, _) =>
+            {
+                var s = ctx.World.Streamer;
+                var j = ctx.World.Jobs;
+                return CommandResult.Success($"loaded {s.LoadedCount} meshed {s.MeshedCount} loads {s.LoadsInFlight} meshes {s.MeshesInFlight} " +
+                    $"jobs {j.Pending}/{j.Running} completions {j.Completions.Count} idle {s.IsIdle} | {s.DebugState()}");
             },
         });
         r.Register(new CommandDef
