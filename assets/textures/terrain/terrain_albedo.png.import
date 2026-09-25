@@ -2,7 +2,7 @@
 
 importer="2d_array_texture"
 type="CompressedTexture2DArray"
-uid="uid://cngcebl0pxl54"
+uid="uid://b24dmwv55tfkr"
 path.s3tc="res://.godot/imported/terrain_albedo.png-2259dc938a8f219d91c2f5562736abd1.s3tc.ctexarray"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -26,4 +26,4 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 slices/horizontal=8
-slices/vertical=9
+slices/vertical=10

@@ -15,7 +15,6 @@ public readonly record struct LightSource(Int3 Cell, ushort Light);
 public static class LightEngine
 {
     private const int N = Neighborhood.Size;
-    private static readonly ushort LavaLight = LightValue.Pack(0, 14, 6, 1);
 
     [ThreadStatic] private static int[]? _queue;
 
@@ -59,7 +58,7 @@ public static class LightEngine
         for (int i = 0; i < Neighborhood.Volume; i++)
         {
             ushort e = emission[blocks[i]];
-            if (liquids[i] != 0 && LiquidCode.Type(liquids[i]) == LiquidType.Lava) e = LavaLight;
+            if (liquids[i] != 0 && tables.LiquidEmission[liquids[i] >> 5] is var le and not 0) e = le;
             if (e == 0) continue;
             light[i] = Merge(light[i], e);
             queue[tail++] = i;

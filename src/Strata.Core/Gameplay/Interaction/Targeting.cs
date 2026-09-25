@@ -45,6 +45,36 @@ public static class Targeting
         return new Target(cell, normal, blockId, obj, origin + direction * t, t * Units.CellSize);
     }
 
+    /// <summary>
+    /// Walks the ray for a bucket: the first liquid cell (<c>Liquid</c> true) or, when the ray meets a
+    /// solid block or runs out of reach first, the last open cell before it (where poured liquid would go).
+    /// </summary>
+    public static (Int3 Cell, bool Liquid)? CastLiquid(VoxelWorld world, Vector3 originMeters, Vector3 direction, float reachMeters)
+    {
+        if (direction.LengthSquared() < 1e-10f) return null;
+        direction = Vector3.Normalize(direction);
+        var origin = originMeters / Units.CellSize;
+        float reach = reachMeters / Units.CellSize;
+        var content = world.Content;
+        Int3? lastOpen = null;
+        var hit = Cast(world, origin, direction, reach, (cell, block) =>
+        {
+            if (world.GetLiquid(cell.X, cell.Y, cell.Z) != 0) return true;
+            if (block != 0 && content.Blocks[block].IsSolid) return true;
+            lastOpen = cell;
+            return false;
+        });
+        if (hit is { } h && world.GetLiquid(h.Cell.X, h.Cell.Y, h.Cell.Z) != 0) return (h.Cell, true);
+        if (hit == null)
+        {
+            // Out of reach without hitting anything: pour at the end of the reach.
+            var end = origin + direction * reach;
+            var cell = new Int3((int)MathF.Floor(end.X), (int)MathF.Floor(end.Y), (int)MathF.Floor(end.Z));
+            return world.GetBlock(cell) == VoxelWorld.Unknown ? null : (cell, false);
+        }
+        return lastOpen is { } open ? (open, false) : null;
+    }
+
     private static (Int3 Cell, Int3 Normal, float T, ushort Block)? Cast(VoxelWorld world, Vector3 origin, Vector3 dir, float maxT, Func<Int3, ushort, bool> isHit)
     {
         int x = (int)MathF.Floor(origin.X), y = (int)MathF.Floor(origin.Y), z = (int)MathF.Floor(origin.Z);

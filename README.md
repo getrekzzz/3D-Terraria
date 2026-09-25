@@ -29,8 +29,9 @@ Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medi
 | V, Ctrl+wheel | first/third person, camera distance |
 | ` or F1 / F3 / Esc | console / performance overlay / release mouse |
 
-Console commands include `help`, `give`, `spawn`, `tp`, `biome`, `time`, `flag`, `setblock`, `fill`,
-`place`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera` (`help <command>` for usage).
+Console commands include `help`, `give`, `spawn`, `boss`, `event`, `tp`, `biome`, `time`, `flag`, `setblock`,
+`fill`, `place`, `liquid`, `liquids`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`
+(`help <command>` for usage).
 
 ## Developing
 ```bash

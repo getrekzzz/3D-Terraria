@@ -13,6 +13,9 @@ public sealed class EffectState
 
     public bool NoFallDamage { get; set; }
     public HashSet<string> Immunities { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Liquids whose contact damage is ignored.</summary>
+    public HashSet<string> LiquidImmunities { get; } = new(StringComparer.Ordinal);
     public int DamagePerSecond { get; set; }
 
     /// <summary>Brightest emitted light [r,g,b] (0–15), or null.</summary>
@@ -24,6 +27,7 @@ public sealed class EffectState
         ExtraJumps.Clear();
         NoFallDamage = false;
         Immunities.Clear();
+        LiquidImmunities.Clear();
         DamagePerSecond = 0;
         Light = null;
     }
@@ -45,6 +49,9 @@ public sealed class EffectState
                 break;
             case EffectSpecs.Immune:
                 Immunities.Add(Parsed<ImmuneParams>(spec).Buff);
+                break;
+            case EffectSpecs.LiquidImmune:
+                LiquidImmunities.Add(Parsed<LiquidImmuneParams>(spec).Liquid);
                 break;
             case EffectSpecs.EmitLight:
                 var c = Parsed<EmitLightParams>(spec).Color;

@@ -18,6 +18,7 @@ public static class BuiltinCommands
         Register(r);
         EditCommands.Register(r);
         CombatCommands.Register(r);
+        LiquidCommands.Register(r);
         return r;
     }
 

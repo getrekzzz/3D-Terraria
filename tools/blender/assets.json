@@ -512,6 +512,35 @@
           "layer": "flesh",
           "color": "#8a5a9a"
         }
+      },
+      "empty_bucket": {
+        "generator": "bucket",
+        "params": {}
+      },
+      "water_bucket": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#2e78c8"
+        }
+      },
+      "lava_bucket": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#ff7a18",
+          "glow": true
+        }
+      },
+      "honey_bucket": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#e8a020"
+        }
+      },
+      "emberskin_draught": {
+        "generator": "potion",
+        "params": {
+          "color": "#c03a5a"
+        }
       }
     }
   },

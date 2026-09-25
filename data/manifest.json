@@ -5,6 +5,7 @@
     "biomes.json",
     "combat.json",
     "events.json",
+    "liquids.json",
     "progression.json",
     "blocks/built.json",
     "blocks/natural.json",

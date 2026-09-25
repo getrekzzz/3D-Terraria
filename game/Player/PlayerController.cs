@@ -22,6 +22,7 @@ public sealed partial class PlayerController : CharacterBody3D
     private float _peakY;
     private bool _airborne;
     private bool _swimming;
+    private Strata.Core.Content.Defs.LiquidDef? _liquid;
 
     public PlayerEntity Entity { get; private set; } = null!;
     public CameraRig Rig { get; private set; } = null!;
@@ -101,11 +102,12 @@ public sealed partial class PlayerController : CharacterBody3D
             return;
         }
 
-        _swimming = InLiquid(GlobalPosition + Vector3.Up * 0.9f);
+        _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
+        _swimming = _liquid != null;
         var stats = Entity.State.Effects.Stats;
         float speed = _config.WalkSpeed * (1f + stats.Bonus(StatIds.MoveSpeed)) * stats.Multiplier(StatIds.MoveSpeed);
         if (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint")) speed *= _config.SprintMultiplier;
-        if (_swimming) speed = Mathf.Min(speed, _config.SwimSpeed);
+        if (_liquid != null) speed = Mathf.Min(speed * _liquid.MoveSpeed, _config.SwimSpeed);
 
         bool blocked = UI.InputGate.GameplayBlocked;
         var input = blocked ? Vector2.Zero : Input.GetVector("move_left", "move_right", "move_forward", "move_back");
@@ -159,9 +161,11 @@ public sealed partial class PlayerController : CharacterBody3D
         bool held = !blocked && Input.IsActionPressed("jump");
         float jumpScale = 1f + Entity.State.Effects.Stats.Bonus(StatIds.JumpHeight);
 
-        if (_swimming)
+        if (_liquid != null)
         {
-            v.Y = held ? Mathf.MoveToward(v.Y, _config.SwimUpSpeed, 20f * dt) : Mathf.MoveToward(v.Y, -_config.SwimGravity * 0.5f, _config.SwimGravity * dt);
+            // Viscous liquids (honey, lava) are harder to swim up through.
+            float up = _config.SwimUpSpeed * _liquid.SwimStrength;
+            v.Y = held ? Mathf.MoveToward(v.Y, up, 20f * _liquid.SwimStrength * dt) : Mathf.MoveToward(v.Y, -_config.SwimGravity * 0.5f, _config.SwimGravity * dt);
             _peakY = GlobalPosition.Y;
             return;
         }
@@ -234,10 +238,10 @@ public sealed partial class PlayerController : CharacterBody3D
         Entity.Velocity = new System.Numerics.Vector3(Velocity.X, Velocity.Y, Velocity.Z);
     }
 
-    private bool InLiquid(Vector3 point)
+    private Strata.Core.Content.Defs.LiquidDef? LiquidAt(Vector3 point)
     {
         var c = CellAt(point);
-        return _runtime.Session.World.GetLiquid(c.X, c.Y, c.Z) != 0;
+        return _runtime.Session.Content.LiquidOf(_runtime.Session.World.GetLiquid(c.X, c.Y, c.Z));
     }
 
     public static Int3 CellAt(Vector3 meters) =>

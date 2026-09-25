@@ -18,7 +18,7 @@ public sealed record CoverageLine(string Category, int Total, int Covered, IRead
 public sealed class ReferenceCatalog
 {
     public static readonly string[] Categories =
-        { "items", "enemies", "bosses", "biomes", "recipes", "progression", "events", "npcs", "tiles", "buffs", "projectiles" };
+        { "items", "enemies", "bosses", "biomes", "recipes", "progression", "events", "npcs", "tiles", "buffs", "projectiles", "liquids" };
 
     private readonly Dictionary<string, List<ReferenceEntry>> _byCategory = new(StringComparer.Ordinal);
     private readonly HashSet<string> _ids = new(StringComparer.Ordinal);

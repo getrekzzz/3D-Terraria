@@ -117,6 +117,13 @@ dynamite|Dynamite|early|shop
 rope|Rope|early|craft
 builder_s_wand|Builder's Wand|hardmode|shop
 paint_sprayer|Paint Sprayer|prehardmode|shop
+empty_bucket|Empty Bucket|early|craft
+water_bucket|Water Bucket|early|bucket
+lava_bucket|Lava Bucket|prehardmode|bucket
+honey_bucket|Honey Bucket|early|bucket
+bottomless_water_bucket|Bottomless Water Bucket|hardmode|fishing
+bottomless_lava_bucket|Bottomless Lava Bucket|hardmode|fishing
+super_absorbant_sponge|Super Absorbant Sponge|hardmode|fishing
 """,
     "armor": """
 wood_helmet|Wood Helmet|early|craft
@@ -194,6 +201,8 @@ shine_potion|Shine Potion|early|craft
 night_owl_potion|Night Owl Potion|early|craft
 mining_potion|Mining Potion|early|craft
 builder_potion|Builder Potion|prehardmode|craft
+obsidian_skin_potion|Obsidian Skin Potion|prehardmode|craft
+gills_potion|Gills Potion|early|craft
 life_crystal|Life Crystal|early|world
 mana_crystal|Mana Crystal|early|craft
 life_fruit|Life Fruit|post-mech|jungle

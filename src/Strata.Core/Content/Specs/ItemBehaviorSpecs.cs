@@ -13,6 +13,7 @@ public static class ItemBehaviorSpecs
     public const string PlaceObject = "placeObject";
     public const string Consume = "consume";
     public const string SummonBoss = "summonBoss";
+    public const string Bucket = "bucket";
 
     public static void Register(SpecCatalog c)
     {
@@ -26,6 +27,7 @@ public static class ItemBehaviorSpecs
         c.Register<PlaceParams>(SpecKind.ItemBehavior, PlaceObject);
         c.Register<ConsumeParams>(SpecKind.ItemBehavior, Consume);
         c.Register<SummonBossParams>(SpecKind.ItemBehavior, SummonBoss);
+        c.Register<BucketParams>(SpecKind.ItemBehavior, Bucket);
     }
 }
 
@@ -89,4 +91,20 @@ public sealed class SummonBossParams : SpecParams
 
     /// <summary>Message shown when the conditions fail.</summary>
     public string? FailMessage { get; init; }
+}
+
+/// <summary>
+/// Scoops or pours one cell of liquid. Without <see cref="Liquid"/> the item is an empty bucket that collects
+/// whatever liquid it is aimed at and becomes that liquid's bucket item; with it, pouring returns <see cref="Empty"/>.
+/// </summary>
+public sealed class BucketParams : SpecParams
+{
+    /// <summary>Liquid held (null = empty bucket).</summary>
+    public string? Liquid { get; init; }
+
+    /// <summary>Item left after pouring (the empty bucket).</summary>
+    public string? Empty { get; init; }
+
+    /// <summary>Minimum levels (of 31) the aimed pool must provide to fill the bucket.</summary>
+    public int MinCollect { get; init; } = 16;
 }

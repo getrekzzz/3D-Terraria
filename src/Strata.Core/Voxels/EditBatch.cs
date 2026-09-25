@@ -5,10 +5,16 @@ namespace Strata.Core.Voxels;
 /// <summary>One cell change recorded by an edit batch.</summary>
 public readonly record struct CellChange(Int3 Cell, ushort OldBlock, ushort NewBlock, byte OldShape, byte NewShape);
 
+/// <summary>One liquid change recorded by an edit batch (liquid bytes, see <see cref="LiquidCode"/>).</summary>
+public readonly record struct LiquidChange(Int3 Cell, byte Old, byte New);
+
 /// <summary>Outcome of a committed <see cref="EditBatch"/>.</summary>
 public sealed class EditResult
 {
     public List<CellChange> Changes { get; } = new();
+
+    /// <summary>Liquid writes (type or level), in order.</summary>
+    public List<LiquidChange> LiquidChanges { get; } = new();
 
     /// <summary>Chunks whose voxel data changed.</summary>
     public HashSet<Int3> ChangedChunks { get; } = new();
@@ -56,6 +62,22 @@ public sealed class EditBatch
             : _world.GetShape(x, y, z);
     }
 
+    /// <summary>Reads a liquid byte including this batch's pending changes.</summary>
+    public byte GetLiquid(int x, int y, int z)
+    {
+        if (!_world.InBounds(x, y, z)) return 0;
+        var coord = new Int3(x >> ChunkMath.Shift, y >> ChunkMath.Shift, z >> ChunkMath.Shift);
+        return _working.TryGetValue(coord, out var w)
+            ? w.Liquids?[ChunkMath.Index(x & ChunkMath.Mask, y & ChunkMath.Mask, z & ChunkMath.Mask)] ?? 0
+            : _world.GetLiquid(x, y, z);
+    }
+
+    public byte GetLiquid(Int3 c) => GetLiquid(c.X, c.Y, c.Z);
+
+    public ushort GetBlock(Int3 c) => GetBlock(c.X, c.Y, c.Z);
+
+    public bool SetLiquid(Int3 c, byte liquid) => SetLiquid(c.X, c.Y, c.Z, liquid);
+
     public bool SetBlock(Int3 cell, ushort block, byte shape = 0, CellFlags setFlags = CellFlags.None) =>
         SetBlock(cell.X, cell.Y, cell.Z, block, shape, setFlags);
 
@@ -85,9 +107,11 @@ public sealed class EditBatch
     {
         var w = GetWorking(x, y, z, out int index);
         if (w == null) return false;
-        if ((w.Liquids?[index] ?? 0) == liquid) return true;
+        byte old = w.Liquids?[index] ?? 0;
+        if (old == liquid) return true;
         (w.Liquids ??= new byte[ChunkMath.Volume])[index] = liquid;
         w.LiquidChanged = true;
+        _result.LiquidChanges.Add(new LiquidChange(new Int3(x, y, z), old, liquid));
         return true;
     }
 
@@ -105,16 +129,38 @@ public sealed class EditBatch
         }
 
         foreach (var change in _result.Changes) AddInfluence(change.Cell);
+        foreach (var change in _result.LiquidChanges) AddLiquidInfluence(change);
         foreach (var coord in _result.ChangedChunks) _result.AffectedChunks.Add(coord);
 
         if (!_result.IsEmpty) _world.RaiseEdited(_result);
         return _result;
     }
 
-    private void AddInfluence(Int3 cell)
+    private void AddInfluence(Int3 cell) => AddBox(cell - Int3.One * InfluenceRadius, cell + Int3.One * InfluenceRadius);
+
+    /// <summary>
+    /// Liquid surfaces blend with neighbouring columns, so border cells touch the next chunk's mesh; glowing liquids
+    /// (lava) relight their whole light radius.
+    /// </summary>
+    private void AddLiquidInfluence(LiquidChange change)
     {
-        var min = ChunkMath.CellToChunk(cell - Int3.One * InfluenceRadius);
-        var max = ChunkMath.CellToChunk(cell + Int3.One * InfluenceRadius);
+        var content = _world.Content;
+        if (content.LiquidOf(change.Old)?.Light != null || content.LiquidOf(change.New)?.Light != null)
+        {
+            AddInfluence(change.Cell);
+            return;
+        }
+        const int last = ChunkMath.Size - 1;
+        var c = change.Cell;
+        int lx = c.X & ChunkMath.Mask, ly = c.Y & ChunkMath.Mask, lz = c.Z & ChunkMath.Mask;
+        if (lx is > 0 and < last && ly is > 0 and < last && lz is > 0 and < last) return;
+        AddBox(c - Int3.One, c + Int3.One);
+    }
+
+    private void AddBox(Int3 minCell, Int3 maxCell)
+    {
+        var min = ChunkMath.CellToChunk(minCell);
+        var max = ChunkMath.CellToChunk(maxCell);
         for (int y = min.Y; y <= max.Y; y++)
             for (int z = min.Z; z <= max.Z; z++)
                 for (int x = min.X; x <= max.X; x++)

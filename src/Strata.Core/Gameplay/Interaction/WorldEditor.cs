@@ -108,6 +108,7 @@ public sealed partial class WorldEditor
         if (decor != null) BreakObject(decor, dropItems: true);
         var batch = World.BeginEdit();
         batch.SetBlock(cell, (ushort)block.RuntimeId, shape, CellFlags.PlayerPlaced);
+        if (block.IsSolid) batch.SetLiquid(cell, 0); // the block displaces liquid
         var opened = new List<Int3>();
         if (block.Falls && World.GetBlock(cell + Int3.Down) == 0) opened.Add(cell);
         FallingBlocks.Settle(batch, _session.Content, opened);
@@ -121,6 +122,7 @@ public sealed partial class WorldEditor
     {
         var batch = World.BeginEdit();
         batch.SetBlock(cell, block, shape, flags);
+        if (block != 0 && _session.Content.Blocks[block].IsSolid) batch.SetLiquid(cell, 0);
         Commit(batch);
         if (block == 0) BreakUnsupportedAround(new[] { cell }, new List<TileObjectInstance>());
     }

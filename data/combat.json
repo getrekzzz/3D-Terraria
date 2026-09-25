@@ -7,7 +7,7 @@
     { "id": "glimmer_beam", "name": "Glimmer Beam", "visual": "bolt", "color": "#8fd0ff", "lifetime": 45, "radius": 0.5, "pierce": 2, "collideTerrain": true, "light": [4, 8, 14], "trail": "#b8e4ff", "covers": ["terraria:enchanted_beam"] }
   ],
   "buffs": [
-    { "id": "on_fire", "name": "Burning", "debuff": true, "color": "#ff7a20", "effects": [{ "type": "damageOverTime", "perSecond": 4 }, { "type": "emitLight", "color": [8, 4, 1] }], "covers": ["terraria:on_fire"] },
+    { "id": "on_fire", "name": "Burning", "debuff": true, "color": "#ff7a20", "tags": ["fire"], "effects": [{ "type": "damageOverTime", "perSecond": 4 }, { "type": "emitLight", "color": [8, 4, 1] }], "covers": ["terraria:on_fire"] },
     { "id": "poisoned", "name": "Poisoned", "debuff": true, "color": "#7ac040", "effects": [{ "type": "damageOverTime", "perSecond": 2 }], "covers": ["terraria:poisoned"] },
     { "id": "bleeding", "name": "Bleeding", "debuff": true, "color": "#c02020", "effects": [{ "type": "stat", "stat": "lifeRegen", "mul": 0 }], "covers": ["terraria:bleeding"] },
     { "id": "chilled", "name": "Chilled", "debuff": true, "color": "#9ad0ff", "effects": [{ "type": "stat", "stat": "moveSpeed", "add": -0.5 }], "covers": ["terraria:chilled"] },

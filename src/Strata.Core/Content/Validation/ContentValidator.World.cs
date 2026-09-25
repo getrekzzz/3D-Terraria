@@ -145,6 +145,10 @@ public static partial class ContentValidator
             // Breaking a world-generated object yields its placing item.
             if (t.PlacingItemId != null && (t.Natural || t.HasTag("world"))) sources.Add(t.PlacingItemId);
         }
+        // Filling an obtainable empty bucket yields the liquid's bucket.
+        if (ctx.Db.Items.All.Any(i => sources.Contains(i.Id) && i.Behaviors.Any(b => b.Type == Specs.ItemBehaviorSpecs.Bucket && !b.Raw.TryGetProperty("liquid", out _))))
+            foreach (var l in ctx.Db.Liquids.All)
+                if (l.Bucket != null) sources.Add(l.Bucket);
         bool anyCoins = ctx.Db.LootTables.All.Any(t => t.Coins != null);
 
         foreach (var i in ctx.Db.Items.All)

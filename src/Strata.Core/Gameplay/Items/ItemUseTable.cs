@@ -19,6 +19,7 @@ public enum ItemAction
     PlaceObject = 1 << 7,
     Consume = 1 << 8,
     SummonBoss = 1 << 9,
+    Bucket = 1 << 10,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -34,6 +35,11 @@ public sealed class ItemUseInfo
     public ConsumeParams? Consume { get; internal set; }
     public SummonBossParams? Summon { get; internal set; }
     public Conditions.ICondition? SummonCondition { get; internal set; }
+    public BucketParams? Bucket { get; internal set; }
+
+    /// <summary>Liquid a filled bucket pours (null for an empty bucket).</summary>
+    public LiquidDef? BucketLiquid { get; internal set; }
+
     public BlockDef? Block { get; internal set; }
     public TileObjectDef? Object { get; internal set; }
 
@@ -110,6 +116,11 @@ public sealed class ItemUseTable
                     a |= ItemAction.SummonBoss;
                     info.Summon = spec.Parse<SummonBossParams>();
                     info.SummonCondition = Conditions.ConditionCompiler.CompileAll(info.Summon.Conditions);
+                    break;
+                case ItemBehaviorSpecs.Bucket:
+                    a |= ItemAction.Bucket;
+                    info.Bucket = spec.Parse<BucketParams>();
+                    info.BucketLiquid = info.Bucket.Liquid != null && content.Liquids.TryGet(info.Bucket.Liquid, out var liquid) ? liquid : null;
                     break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }

@@ -1,6 +1,6 @@
 {
  "columns": 8,
- "rows": 9,
+ "rows": 10,
  "size": 256,
  "layers": [
   {
@@ -357,6 +357,16 @@
    "name": "missing",
    "index": 70,
    "type": "missing"
+  },
+  {
+   "name": "honey_block",
+   "index": 71,
+   "type": "hive"
+  },
+  {
+   "name": "crispy_honey",
+   "index": 72,
+   "type": "hive"
   }
  ]
 }

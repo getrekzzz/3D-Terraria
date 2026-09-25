@@ -53,6 +53,7 @@ def build():
     dbs["biomes"] = [entry(c, n, kind, source=layer) for c, n, layer, kind in rows(world.BIOMES)]
     dbs["tiles"] = [entry(c, n, kind, s) for c, n, s, kind in rows(world.TILES)]
     dbs["buffs"] = [entry(c, n, kind) for c, n, kind in rows(world.BUFFS)]
+    dbs["liquids"] = [entry(c, n, kind) for c, n, kind in rows(world.LIQUIDS)]
     dbs["projectiles"] = [entry(c, n, kind) for c, n, kind in rows(world.PROJECTILES)]
     dbs["recipes"] = [entry(c, n, "recipe", source=st, mechanics=[i.strip() for i in ins.split(",")]) for c, n, st, ins in rows(world.RECIPES)]
     return dbs

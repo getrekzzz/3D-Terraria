@@ -2,7 +2,7 @@
   // Bosses and their minions. Boss behaviour is a brain spec; "boss" adds the bar, arena, defeat flag and segments.
   "enemies": [
     {
-      "id": "gel_sovereign", "model": "gel_sovereign", "tags": ["gel", "boss"], "name": "Gel Sovereign",
+      "id": "gel_sovereign", "model": "gel_sovereign", "tags": ["gel", "boss", "lava_immune"], "name": "Gel Sovereign",
       "description": "A monarch of gel that crushes intruders beneath its bulk.",
       "brain": { "type": "gelSovereign", "jumpHeight": 8, "jumpSpeed": 5.5, "hopInterval": 55, "teleportDistance": 26, "minion": "green_gel", "minionEveryLife": 0.06 },
       "life": 2000, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [7, 6], "moveSpeed": 4, "tint": "#ffffff",
@@ -11,7 +11,7 @@
       "covers": ["terraria:king_slime"]
     },
     {
-      "id": "watcher", "model": "watcher", "tags": ["boss"], "name": "The Watcher",
+      "id": "watcher", "model": "watcher", "tags": ["boss", "lava_immune"], "name": "The Watcher",
       "description": "It has been watching since the first night.",
       "brain": { "type": "watcher", "orbitRadius": 16, "dashSpeed": 15, "dashesPerBurst": 3, "telegraphTicks": 30, "servant": "watcher_servant", "servantInterval": 100, "phase2Life": 0.5, "phase2Model": "watcher_maw" },
       "life": 2800, "damage": 18, "defense": 12, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
@@ -26,7 +26,7 @@
       "value": 0, "covers": ["terraria:servant_of_cthulhu"]
     },
     {
-      "id": "bore_tyrant", "model": "bore_head", "tags": ["boss"], "name": "Bore Tyrant",
+      "id": "bore_tyrant", "model": "bore_head", "tags": ["boss", "lava_immune"], "name": "Bore Tyrant",
       "description": "A ravenous worm that chews tunnels through the tainted earth.",
       "brain": { "type": "worm", "speed": 9, "turnRate": 2.5, "digRadius": 1.8, "digInterval": 6, "airGravity": 14 },
       "life": 4000, "damage": 22, "defense": 4, "knockbackResist": 1.0, "size": [3, 3], "moveSpeed": 9, "gravity": false, "collideTerrain": false,

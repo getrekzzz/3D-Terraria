@@ -39,7 +39,8 @@ public static class EditCommands
                 var here = Here(ctx);
                 var p0 = here + new Int3(a.Int(0, "dx0"), a.Int(1, "dy0"), a.Int(2, "dz0"));
                 var p1 = here + new Int3(a.Int(3, "dx1"), a.Int(4, "dy1"), a.Int(5, "dz1"));
-                var (id, _) = Block(ctx, a.Str(6, "block"));
+                var (id, def) = Block(ctx, a.Str(6, "block"));
+                bool displaces = def is { IsSolid: true };
                 var min = Int3.Min(p0, p1);
                 var max = Int3.Max(p0, p1);
                 long volume = (long)(max.X - min.X + 1) * (max.Y - min.Y + 1) * (max.Z - min.Z + 1);
@@ -48,7 +49,10 @@ public static class EditCommands
                 for (int y = min.Y; y <= max.Y; y++)
                     for (int z = min.Z; z <= max.Z; z++)
                         for (int x = min.X; x <= max.X; x++)
+                        {
                             batch.SetBlock(x, y, z, id, 0, id == 0 ? CellFlags.None : CellFlags.PlayerPlaced);
+                            if (displaces) batch.SetLiquid(x, y, z, 0);
+                        }
                 int changed = batch.PendingChanges;
                 ctx.World.Streamer.MarkDirty(ctx.World.Session.Commit(batch));
                 // Objects inside the box are replaced by the fill (and would otherwise float in cleared space).

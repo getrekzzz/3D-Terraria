@@ -115,6 +115,9 @@ public sealed partial class WorldSession
         return new ChunkProduct(coord, generated.Data, generated.Objects, Meta.MutationLevel, FromSave: false);
     }
 
+    /// <summary>Raised on the main thread after a chunk joins the live world (liquids wake along its borders).</summary>
+    public event Action<Chunk>? ChunkInstalled;
+
     /// <summary>Adds a produced chunk to the live world (main thread). Returns sky-exposure changes.</summary>
     public List<(int X, int Z, int Old, int New)> Install(ChunkProduct product)
     {
@@ -129,7 +132,9 @@ public sealed partial class WorldSession
         {
             _installing = false;
         }
-        return Sky.Rebuild(product.Coord.X, product.Coord.Z);
+        var sky = Sky.Rebuild(product.Coord.X, product.Coord.Z);
+        ChunkInstalled?.Invoke(chunk);
+        return sky;
     }
 
     /// <summary>Removes a chunk from memory, returning its encoded blob when it must be saved.</summary>

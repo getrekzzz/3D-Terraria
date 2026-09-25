@@ -5,7 +5,7 @@ using Strata.Core.Session;
 
 namespace Strata.Game.Entities;
 
-/// <summary>Floating damage numbers and death puffs.</summary>
+/// <summary>Floating damage numbers, death puffs, and liquid reactions (steam where liquids harden, items burning up).</summary>
 public sealed partial class CombatEffects : Node3D
 {
     private readonly Queue<Label3D> _pool = new();
@@ -15,6 +15,8 @@ public sealed partial class CombatEffects : Node3D
         Name = "CombatEffects";
         game.Npcs.Damaged += e => Number(e);
         game.Npcs.Killed += npc => Puff(new Vector3(npc.Center.X, npc.Center.Y, npc.Center.Z), Color.FromHtml(npc.Def.Tint), npc.HalfExtents.Y);
+        game.Liquids.Mixed += (cell, _) => Puff((new Vector3(cell.X, cell.Y, cell.Z) + new Vector3(0.5f, 1f, 0.5f)) * Strata.Core.Common.Units.CellSize, new Color(0.85f, 0.85f, 0.88f), 0.6f, rise: true);
+        game.LiquidEffects.ItemDestroyed += (item, liquid) => Puff(new Vector3(item.Position.X, item.Position.Y, item.Position.Z), Color.FromHtml(liquid.Color), 0.2f, rise: true);
     }
 
     private void Number(DamageEvent e)
@@ -52,7 +54,7 @@ public sealed partial class CombatEffects : Node3D
         return label;
     }
 
-    private void Puff(Vector3 at, Color color, float size)
+    private void Puff(Vector3 at, Color color, float size, bool rise = false)
     {
         var particles = new CpuParticles3D
         {
@@ -65,7 +67,7 @@ public sealed partial class CombatEffects : Node3D
             Spread = 180f,
             InitialVelocityMin = 1.5f,
             InitialVelocityMax = 3.5f,
-            Gravity = new Vector3(0, -6f, 0),
+            Gravity = new Vector3(0, rise ? 1.5f : -6f, 0),
             ScaleAmountMin = 0.6f,
             ScaleAmountMax = 1.2f,
             Color = color,

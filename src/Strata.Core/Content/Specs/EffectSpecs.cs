@@ -9,6 +9,7 @@ public static class EffectSpecs
     public const string Immune = "immune";
     public const string EmitLight = "emitLight";
     public const string NoFallDamage = "noFallDamage";
+    public const string LiquidImmune = "liquidImmune";
 
     public static void Register(SpecCatalog c)
     {
@@ -16,6 +17,7 @@ public static class EffectSpecs
         c.Register<ExtraJumpParams>(SpecKind.Effect, ExtraJump);
         c.Register<DamageOverTimeParams>(SpecKind.Effect, DamageOverTime);
         c.Register<ImmuneParams>(SpecKind.Effect, Immune);
+        c.Register<LiquidImmuneParams>(SpecKind.Effect, LiquidImmune);
         c.Register<EmitLightParams>(SpecKind.Effect, EmitLight);
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoFallDamage);
     }
@@ -48,6 +50,12 @@ public sealed class DamageOverTimeParams : SpecParams
 public sealed class ImmuneParams : SpecParams
 {
     public string Buff { get; init; } = "";
+}
+
+/// <summary>No contact damage from a liquid (lava walking).</summary>
+public sealed class LiquidImmuneParams : SpecParams
+{
+    public string Liquid { get; init; } = "";
 }
 
 public sealed class EmitLightParams : SpecParams

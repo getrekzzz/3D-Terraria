@@ -4,9 +4,11 @@ using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Events;
 using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Gameplay.Items;
+using Strata.Core.Gameplay.Liquids;
 using Strata.Core.Gameplay.Player;
 using Strata.Core.Gameplay.Stats;
 using Strata.Core.Persistence;
+using Strata.Core.Simulation.Liquids;
 using Strata.Core.Streaming;
 
 namespace Strata.Core.Session;
@@ -43,6 +45,12 @@ public sealed class PlayerEntity
 
     /// <summary>Precision mode: tools affect a single cell.</summary>
     public bool Precision { get; set; }
+
+    /// <summary>Liquid the body is standing or swimming in (null when dry). Set by the liquid effects each tick.</summary>
+    public Content.Defs.LiquidDef? Liquid { get; set; }
+
+    /// <summary>The head is under the liquid's surface.</summary>
+    public bool Submerged { get; set; }
 
     public static readonly Vector3 HalfExtents = new(0.45f, 0.9f, 0.45f);
 
@@ -104,8 +112,11 @@ public sealed class GameWorld : IDisposable
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
+        Liquids = new LiquidSimulator(session);
+        LiquidEffects = new LiquidEffects(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
+        Liquids.ChunksDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
     }
 
     public WorldSession Session { get; }
@@ -121,6 +132,8 @@ public sealed class GameWorld : IDisposable
     public ProjectileSystem Projectiles { get; }
     public SpawnDirector Spawner { get; }
     public EventDirector Events { get; }
+    public LiquidSimulator Liquids { get; }
+    public LiquidEffects LiquidEffects { get; }
     public string? PlayerDirectory { get; }
     public List<PlayerEntity> Players { get; } = new();
 
@@ -162,6 +175,8 @@ public sealed class GameWorld : IDisposable
         else
             Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
         foreach (var p in Players) TickPlayer(p);
+        Liquids.Tick(Session.Clock.Tick);
+        LiquidEffects.Tick();
         Events.Tick();
         Spawner.Tick();
         Npcs.Tick();

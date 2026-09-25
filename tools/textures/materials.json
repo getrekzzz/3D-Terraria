@@ -667,6 +667,20 @@
   {
    "name": "missing",
    "type": "missing"
+  },
+  {
+   "name": "honey_block",
+   "type": "hive",
+   "base": "#e8a42a",
+   "dark": "#b87010",
+   "light": "#ffd878"
+  },
+  {
+   "name": "crispy_honey",
+   "type": "hive",
+   "base": "#8a4a14",
+   "dark": "#4a2206",
+   "light": "#c07a30"
   }
  ]
 }

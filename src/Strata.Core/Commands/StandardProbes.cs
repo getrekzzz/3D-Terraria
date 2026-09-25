@@ -32,11 +32,35 @@ internal static class StandardProbes
         ctx.AddProbe("npcs.count", () => w.Npcs.All.Count);
         ctx.AddProbe("npcs.alive_life", () => w.Npcs.All.Sum(n => n.Life));
         ctx.AddProbe("projectiles.count", () => w.Projectiles.All.Count);
+        ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
+        ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
+        ctx.AddProbe("player.in_liquid", () => ctx.Player.Liquid?.Code ?? 0);
+        ctx.AddProbe("player.submerged", () => ctx.Player.Submerged ? 1 : 0);
         ctx.AddPrefixProbe("npcs.", id => w.Session.Content.Enemies.Contains(id) ? w.Npcs.All.Count(n => n.Def.Id == id) : null);
         ctx.AddPrefixProbe("inv.", id => w.Session.Content.Items.TryGet(id, out var item) ? ctx.Player.State.Inventory.Backpack.Count(item) : null);
         ctx.AddPrefixProbe("event.", id => w.Session.Content.Events.Contains(id) ? (w.Events.IsActive(id) ? 1 : 0) : null);
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);
+        // near.<block>: cells of a block within 8 cells of the player's feet.
+        ctx.AddPrefixProbe("near.", id =>
+        {
+            if (!w.Session.Content.Blocks.TryGet(id, out var def)) return null;
+            var f = ctx.Player.FeetCell;
+            int n = 0;
+            for (int y = -8; y <= 8; y++)
+                for (int z = -8; z <= 8; z++)
+                    for (int x = -8; x <= 8; x++)
+                        if (w.Session.World.GetBlock(f.X + x, f.Y + y, f.Z + z) == def.RuntimeId) n++;
+            return n;
+        });
+        // liquid.<dx>.<dy>.<dz>: liquid level relative to the player's feet cell (0 = dry).
+        ctx.AddPrefixProbe("liquid.", spec =>
+        {
+            var parts = spec.Split('.');
+            if (parts.Length != 3 || !int.TryParse(parts[0], out int dx) || !int.TryParse(parts[1], out int dy) || !int.TryParse(parts[2], out int dz)) return null;
+            var c = ctx.Player.FeetCell + new Int3(dx, dy, dz);
+            return LiquidCode.Level(w.Session.World.GetLiquid(c.X, c.Y, c.Z));
+        });
         // block.<dx>.<dy>.<dz>: runtime block id relative to the player's feet cell (0 = air).
         ctx.AddPrefixProbe("block.", spec =>
         {

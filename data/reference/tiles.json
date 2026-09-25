@@ -381,6 +381,18 @@
    "name": "Demon Altar",
    "kind": "special",
    "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:honey_block",
+   "name": "Honey Block",
+   "kind": "liquid_mix",
+   "stage": "early"
+  },
+  {
+   "id": "terraria:crispy_honey_block",
+   "name": "Crispy Honey Block",
+   "kind": "liquid_mix",
+   "stage": "early"
   }
  ]
 }

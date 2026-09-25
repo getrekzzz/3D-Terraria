@@ -27,7 +27,7 @@ public static class StationScanner
                 for (int x = -ReachXZ; x <= ReachXZ; x++)
                 {
                     byte l = world.GetLiquid(cell.X + x, cell.Y + y, cell.Z + z);
-                    if (l != 0) set.Add(LiquidCode.Type(l).ToString().ToLowerInvariant());
+                    if (l != 0 && world.Content.LiquidOf(l) is { } liquid) set.Add(liquid.Id);
                 }
         return set;
     }

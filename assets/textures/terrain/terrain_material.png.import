@@ -2,7 +2,7 @@
 
 importer="2d_array_texture"
 type="CompressedTexture2DArray"
-uid="uid://qdfksgwhwam4"
+uid="uid://c6nwk5d7foj3"
 path.s3tc="res://.godot/imported/terrain_material.png-488bafbfe38da080bd234cc5468e14c5.s3tc.ctexarray"
 metadata={
 "imported_formats": ["s3tc_bptc"],
@@ -26,4 +26,4 @@ compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1
 slices/horizontal=8
-slices/vertical=9
+slices/vertical=10

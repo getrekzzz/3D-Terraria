@@ -22,6 +22,7 @@ public sealed class ContentDatabase
     public Registry<ProgressionFlagDef> Flags { get; } = new("flag");
     public Registry<OreVeinDef> OreVeins { get; } = new("oreVein");
     public Registry<EventDef> Events { get; } = new("event");
+    public Registry<LiquidDef> Liquids { get; } = new("liquid");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();
@@ -35,10 +36,16 @@ public sealed class ContentDatabase
     /// <summary>Item that places each block runtime id (null = not placeable).</summary>
     public ItemDef?[] BlockPlacers { get; private set; } = Array.Empty<ItemDef?>();
 
+    /// <summary>Liquid per voxel liquid code 0–7 (index 0 and unused codes are null).</summary>
+    public LiquidDef?[] LiquidByCode { get; private set; } = new LiquidDef?[LiquidDef.MaxCode + 1];
+
+    /// <summary>Block runtime id formed where liquid codes a and b meet (<c>[a * 8 + b]</c>, 0 = they do not react).</summary>
+    public ushort[] LiquidMixes { get; private set; } = new ushort[(LiquidDef.MaxCode + 1) * (LiquidDef.MaxCode + 1)];
+
     public IEnumerable<IRegistry> AllRegistries => new IRegistry[]
     {
         Blocks, Items, TileObjects, Recipes, RecipeGroups, Biomes, Enemies, SpawnRules, Projectiles, Buffs,
-        Prefixes, LootTables, Flags, OreVeins,
+        Prefixes, LootTables, Flags, OreVeins, Events, Liquids,
     };
 
     internal ContentDatabase()
@@ -65,7 +72,32 @@ public sealed class ContentDatabase
         {
             if (item.PlaceBlock != null && Blocks.TryGet(item.PlaceBlock, out var b)) BlockPlacers[b.RuntimeId] ??= item;
         }
+        ResolveLiquids();
     }
+
+    private void ResolveLiquids()
+    {
+        const int n = LiquidDef.MaxCode + 1;
+        foreach (var liquid in Liquids.All)
+            if (liquid.Code is >= 1 and <= LiquidDef.MaxCode) LiquidByCode[liquid.Code] ??= liquid;
+        foreach (var liquid in Liquids.All)
+        {
+            if (LiquidByCode[liquid.Code] != liquid) continue;
+            foreach (var mix in liquid.Mixes)
+            {
+                if (!Liquids.TryGet(mix.With, out var other) || !Blocks.TryGet(mix.Block, out var block)) continue;
+                int a = liquid.Code, b = other.Code;
+                if (LiquidMixes[a * n + b] == 0) LiquidMixes[a * n + b] = (ushort)block.RuntimeId;
+                if (LiquidMixes[b * n + a] == 0) LiquidMixes[b * n + a] = (ushort)block.RuntimeId;
+            }
+        }
+    }
+
+    /// <summary>Liquid definition for a voxel liquid byte (null when empty or unknown).</summary>
+    public LiquidDef? LiquidOf(byte code) => code == 0 ? null : LiquidByCode[code >> 5];
+
+    /// <summary>Block formed where liquid codes a and b meet (0 = none).</summary>
+    public ushort MixOf(int a, int b) => LiquidMixes[a * (LiquidDef.MaxCode + 1) + b];
 
     public BlockDef Block(ushort runtimeId) => Blocks[runtimeId];
 

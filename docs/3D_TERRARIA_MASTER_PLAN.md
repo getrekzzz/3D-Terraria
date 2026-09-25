@@ -31,28 +31,28 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 775 concepts / 11 DBs, `Strata.Tools coverage`; overall 34.7 % |
+| Content | Reference DBs + coverage | ✅ | 800 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 37.3 % |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, dungeon v1 |
 | WorldGen | Report tool | ✅ | Maps, sections, ore/depth charts |
-| Lighting | Sky + RGB block light | ✅ | Stateless per chunk; sampled by props/creatures via LightProbe |
+| Lighting | Sky + RGB block light | ✅ | Stateless per chunk; liquid light (lava) from data; sampled by props/creatures via LightProbe |
 | Meshing | Surface nets + crisp shapes + liquids + collision | ✅ | LOD rings ⬜ |
 | Rendering | Terrain, props, creatures, drops, sky/fog | 🟡 | Horizon mesh, LOD, cave culling, particles polish ⬜ |
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
-| Player | Controller, camera, avatar | ✅ | Step-up, variable jump, swim, fall damage, knockback, blink |
+| Player | Controller, camera, avatar | ✅ | Step-up, variable jump, per-liquid swimming, fall damage, knockback, blink |
 | Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds |
 | Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; prefixes/reforging ⬜ |
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
 | UI | HUD, inventory, equipment, chests, crafting, console, perf overlay | ✅ | Settings/menus/world select ⬜ |
 | Combat | Damage model, melee arcs, projectiles, buffs | ✅ | Whips/yoyos/summons ⬜ |
-| AI | Slime, walker, flyer brains | ✅ | Voxel A*, utility AI, behaviour trees ⬜ (M2) |
+| AI | Slime, walker, flyer, boss brains, worm | ✅ | Voxel A*, utility AI, behaviour trees ⬜ (M2) |
 | Spawning | Data-driven spawn rules | ✅ | Housing suppression ⬜ |
-| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 136 item models, 5 creatures, 190 icons |
+| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 128 item models, 11 creatures, 200 icons |
 | NPCs | Town NPCs, housing | ⬜ | M2 |
-| Liquids | Flow simulation | ⬜ | Static liquids only (M2) |
-| Bosses | Framework + bosses | ⬜ | M2 |
-| Events | Blood moon, invasions | ⬜ | M2 |
+| Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
+| Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels); arenas, boss bar; music state ⬜ |
+| Events | Event director | ✅ | Blood moon, slime rain; invasions ⬜ |
 | Hardmode | Mutations, spread | ⬜ | M3 |
 | Audio | Director + sounds | ⬜ | |
 
@@ -63,6 +63,8 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 * Streaming once failed to reach idle in a rendered run (not reproduced since); `ChunkStreamer.DebugState()` is logged by the screenshot tool to catch it.
 * Item held-in-hand orientation is generic (+90° about X); per-item grip data would improve swords/bows.
 * Prefix (reforge) data exists but no reforging service/UI yet.
+* Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
+  batch per liquid, so a large flood remeshes its chunks every few steps (rate-limited by the mesh queue).
 
 ## 5. Dependency map
 ```
@@ -70,7 +72,7 @@ Content ─┬─> Voxels ─> WorldGen ─> Lighting ─> Meshing ─> Godot st
          ├─> Items/ItemUse ─> Crafting ─> UI
          ├─> Combat ─> Creatures/Brains ─> Spawning ─> Events ─> Bosses
          └─> Persistence (world, regions, players, migrations)
-GameWorld (Core) = streaming + clock + editor + drops + players + NPCs + melee + projectiles + spawner
+GameWorld (Core) = streaming + clock + editor + drops + players + liquids + NPCs + melee + projectiles + spawner + events
 Commands (Core) ─> console (Godot), smoke scripts (CI), screenshots (--exec)
 Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ```
@@ -78,13 +80,16 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (115) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (135) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
 | Module size guard (≤400 lines) | `tools/ci/check_file_length.py` | ✅ CI |
 | Engine smoke: boot, stream, land, walk, mine, collect, build, objects, time, save | `basic.cmds` | ✅ CI |
 | Engine smoke: contact damage, melee, arrows, death/respawn | `combat.cmds` | ✅ CI |
+| Engine smoke: event start/stop, sky tint, kill goals | `events.cmds` | ✅ CI |
+| Engine smoke: boss summons, arenas, segments, defeat flags | `bosses.cmds` | ✅ CI |
+| Engine smoke: liquid flow, lava + water → obsidian, buckets, burning/dousing, submersion | `liquids.cmds` | ✅ CI |
 | Screenshots | local (Xvfb + lavapipe) via `--screenshot` + `--exec` | 🟡 CI screenshot tour ⬜ |
 
 ## 7. Performance
@@ -94,12 +99,12 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 * Concerns: dense forests (hundreds of trees in view), shadow cost of props, LOD not yet implemented.
 
 ## 8. Next development targets (M2)
-1. Liquids: cellular automaton (water/lava/honey), buoyancy, swimming polish, liquid meshing updates.
-2. Boss framework (phases, telegraphs, arenas, music state) + Gel Sovereign, The Watcher, Bore Tyrant (real tunnelling worm).
-3. Events: blood moon, slime rain; `event` and `boss` commands; event conditions in spawn rules.
-4. Town NPCs: 3D housing validator (enclosed room, light, table, chair, door), voxel A*, first NPCs with shops.
-5. LOD rings + horizon heightfield; cave culling from navigation summaries.
-6. Screenshot tour in CI (surface, cave, cavern, biomes, underworld, ocean).
+Done in M2 so far: events (blood moon, slime rain), boss framework + three bosses, liquid simulation.
+1. Town NPCs: 3D housing validator (enclosed room, light, table, chair, door), voxel A*, first NPCs with shops.
+2. LOD rings + horizon heightfield; cave culling from navigation summaries.
+3. Screenshot tour in CI (surface, cave, cavern, biomes, underworld, ocean).
+4. Liquid follow-ups: breath/drowning, pressure (U-tubes), sponges and bottomless buckets, fishing hooks.
+5. Audio director (data-driven cues for mining, combat, liquids, music states for bosses/events).
 
 ## 9. Directive summary (condensed)
 Phases: 1 core loop → 2 world → 3 progression → 4 systemic depth → 5 hardmode → 6 endgame → 7 polish.

@@ -331,9 +331,17 @@
    "model": "assets/models/items/ember_wand.glb",
    "icon": "assets/icons/items/ember_wand.png"
   },
+  "emberskin_draught": {
+   "model": "assets/models/items/emberskin_draught.glb",
+   "icon": "assets/icons/items/emberskin_draught.png"
+  },
   "emerald": {
    "model": "assets/models/items/emerald.glb",
    "icon": "assets/icons/items/emerald.png"
+  },
+  "empty_bucket": {
+   "model": "assets/models/items/empty_bucket.glb",
+   "icon": "assets/icons/items/empty_bucket.png"
   },
   "furnace": {
    "object": "furnace",
@@ -411,6 +419,10 @@
    "model": "assets/models/items/gold_shortsword.glb",
    "icon": "assets/icons/items/gold_shortsword.png"
   },
+  "honey_bucket": {
+   "model": "assets/models/items/honey_bucket.glb",
+   "icon": "assets/icons/items/honey_bucket.png"
+  },
   "iron_anvil": {
    "object": "iron_anvil",
    "icon": "assets/icons/items/iron_anvil.png"
@@ -462,6 +474,10 @@
   "ironbark_draught": {
    "model": "assets/models/items/ironbark_draught.glb",
    "icon": "assets/icons/items/ironbark_draught.png"
+  },
+  "lava_bucket": {
+   "model": "assets/models/items/lava_bucket.glb",
+   "icon": "assets/icons/items/lava_bucket.png"
   },
   "lead_anvil": {
    "object": "lead_anvil",
@@ -758,6 +774,10 @@
   "vital_crystal": {
    "model": "assets/models/items/vital_crystal.glb",
    "icon": "assets/icons/items/vital_crystal.png"
+  },
+  "water_bucket": {
+   "model": "assets/models/items/water_bucket.glb",
+   "icon": "assets/icons/items/water_bucket.png"
   },
   "wooden_arrow": {
    "model": "assets/models/items/wooden_arrow.glb",

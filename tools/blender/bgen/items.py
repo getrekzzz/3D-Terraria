@@ -202,10 +202,23 @@ def bottled(mb: MeshBuilder, p, rng):
     mb.sphere((0, 0, 0.1), 0.06, "prop:plain", "#ffffff", subdivisions=2, jitter=0.15, rng=rng)
 
 
+def bucket(mb: MeshBuilder, p, rng):
+    """Tapered iron pail with a rolled rim and wire handle; filled buckets show the liquid's surface."""
+    layer, tint = "prop:iron", "#b8bcc4"
+    mb.lathe([(0.0, 0.0), (0.1, 0.0), (0.13, 0.22), (0.12, 0.22), (0.092, 0.018), (0.0, 0.018)], layer, tint, segments=18)
+    rim = [Vector((math.cos(a) * 0.126, math.sin(a) * 0.126, 0.222)) for a in (i * 2 * math.pi / 20 for i in range(21))]
+    mb.tube(rim, [0.009] * len(rim), layer, tint, segments=5)
+    handle = [Vector((math.cos(a) * 0.128, 0, 0.2 + math.sin(a) * 0.15)) for a in (math.radians(d) for d in range(0, 181, 15))]
+    mb.tube(handle, [0.006] * len(handle), layer, "#9098a0", segments=5)
+    if "liquid" in p:
+        glow = p.get("glow", False)
+        mb.cylinder((0, 0, 0.02), (0, 0, 0.18), 0.094, 0.117, "prop:plain:glow" if glow else "prop:gel", p["liquid"], segments=18)
+
+
 GENERATORS = {
     "sword": sword, "shortsword": shortsword, "pickaxe": pickaxe, "axe": axe, "hammer": hammer, "bow": bow,
     "wand": wand, "staff": staff, "arrow": arrow, "bar": bar, "gem": gem, "blob": blob, "lens": lens, "spool": spool,
     "potion": potion, "coin": coin, "star": star, "heart": heart, "seed": seed, "chunk": chunk, "helmet": helmet,
     "chest_armor": chest_armor, "greaves": greaves, "boots": boots, "horseshoe": horseshoe, "ring": ring,
-    "bottled": bottled,
+    "bottled": bottled, "bucket": bucket,
 }

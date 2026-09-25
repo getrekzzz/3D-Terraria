@@ -191,8 +191,14 @@ public sealed class NpcSystem
         var away = BrainFactory.Flat(player.Position - npc.Position);
         if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
         var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);
-        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), hit.Damage, false, true));
-        PlayerHurt?.Invoke(player, hit.Damage, knock);
+        ReportPlayerDamage(player, hit.Damage, knock);
+    }
+
+    /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
+    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock)
+    {
+        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true));
+        PlayerHurt?.Invoke(player, damage, knock);
     }
 
     /// <summary>Applies a hit from a player. Returns false if the NPC was immune (melee) or already dead.</summary>

@@ -45,6 +45,26 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void ValidatesLiquids()
+    {
+        var db = Load("""
+        { "liquids": [
+            { "id": "water", "code": 1, "bucket": "water_bucket", "mixes": [ { "with": "lava", "block": "nope" } ] },
+            { "id": "lava", "code": 1, "contactBuff": "missing" }
+          ],
+          "items": [
+            { "id": "water_bucket", "behaviors": [ { "type": "bucket", "liquid": "lava", "empty": "pail" } ] }
+          ] }
+        """);
+        AssertError(db, "code 1 is already used by 'water'");
+        AssertError(db, "unknown block 'nope'");
+        AssertError(db, "unknown buff 'missing'");
+        AssertError(db, "unknown item 'pail'");
+        AssertError(db, "bucket holds 'lava' but that liquid's bucket is ''");
+        AssertError(db, "places liquid code 3");
+    }
+
+    [Fact]
     public void DetectsLootCycles()
     {
         var db = Load("""

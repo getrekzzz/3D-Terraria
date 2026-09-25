@@ -28,6 +28,8 @@ public enum UseOutcome
     Shot,
     NoAmmo,
     NoMana,
+    PouredLiquid,
+    CollectedLiquid,
 }
 
 /// <summary>A projectile launch requested by an item use (resolved by the projectile system).</summary>
@@ -37,7 +39,7 @@ public sealed record ShotRequest(PlayerEntity Player, ItemUseInfo Weapon, Projec
 /// Executes the held item's actions for a player: tools against terrain and objects, block and object placement,
 /// consumption, melee swings and shooting. Use timing (use time, auto-reuse, mining speed) is enforced here.
 /// </summary>
-public sealed class ItemUseSystem
+public sealed partial class ItemUseSystem
 {
     private readonly GameWorld _world;
     private readonly BuffDef? _healingCooldown;
@@ -87,6 +89,10 @@ public sealed class ItemUseSystem
         {
             outcome = UseTool(p, info, inReach);
             useTime = (int)MathF.Ceiling(useTime / (1f + p.State.Effects.Stats.Bonus(StatIds.MiningSpeed)));
+        }
+        else if (info.Has(ItemAction.Bucket))
+        {
+            outcome = UseBucket(p, info, reach);
         }
         else if (info.Has(ItemAction.SummonBoss))
         {

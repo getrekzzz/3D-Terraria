@@ -107,6 +107,15 @@ public sealed class DroppedItemSystem
             }
     }
 
+    /// <summary>Removes a dropped item (destroyed by lava, despawned by a command).</summary>
+    public bool Remove(DroppedItem item)
+    {
+        int i = _items.IndexOf(item);
+        if (i < 0) return false;
+        RemoveAt(i);
+        return true;
+    }
+
     private void RemoveAt(int i)
     {
         var it = _items[i];

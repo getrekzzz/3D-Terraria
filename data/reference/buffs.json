@@ -108,6 +108,26 @@
    "id": "terraria:well_fed",
    "name": "Well Fed",
    "kind": "buff"
+  },
+  {
+   "id": "terraria:honey",
+   "name": "Honey",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:obsidian_skin",
+   "name": "Obsidian Skin",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:gills",
+   "name": "Gills",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:wet",
+   "name": "Wet",
+   "kind": "debuff"
   }
  ]
 }

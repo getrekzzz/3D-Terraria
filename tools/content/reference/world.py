@@ -229,6 +229,21 @@ life_crystal_node|Life Crystal (placed)|early|breakable
 shadow_orb|Shadow Orb|prehardmode|breakable
 crimson_heart|Crimson Heart|prehardmode|breakable
 demon_altar|Demon Altar|prehardmode|special
+honey_block|Honey Block|early|liquid_mix
+crispy_honey_block|Crispy Honey Block|early|liquid_mix
+"""
+
+# Liquids and liquid mechanics: id|Name|kind
+LIQUIDS = """
+water|Water|liquid
+lava|Lava|liquid
+honey|Honey|liquid
+shimmer|Shimmer|liquid
+liquid_flow|Liquid Flow|mechanic
+liquid_mixing|Liquid Mixing|mechanic
+swimming|Swimming|mechanic
+lava_contact|Lava Contact Damage|mechanic
+item_incineration|Items Destroyed by Lava|mechanic
 """
 
 # id|Name|kind(buff/debuff)
@@ -254,6 +269,10 @@ builder|Builder|buff
 cozy_fire|Cozy Fire|buff
 heart_lamp|Heart Lamp|buff
 well_fed|Well Fed|buff
+honey|Honey|buff
+obsidian_skin|Obsidian Skin|buff
+gills|Gills|buff
+wet|Wet|debuff
 """
 
 # id|Name|kind

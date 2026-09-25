@@ -36,6 +36,10 @@ public sealed class RenderTables
         Solid = new bool[n];
         LightFilter = new byte[n];
         Emission = new ushort[n];
+        LiquidEmission = new ushort[LiquidDef.MaxCode + 1];
+        foreach (var liquid in content.Liquids.All)
+            if (liquid.Light is { Length: 3 } ll && liquid.Code is >= 1 and <= LiquidDef.MaxCode)
+                LiquidEmission[liquid.Code] = LightValue.Pack(0, ll[0], ll[1], ll[2]);
         Cutout = new bool[n];
         var surfaces = new List<SurfaceLayers>();
         var bySurface = new Dictionary<SurfaceLayers, ushort>();
@@ -81,6 +85,9 @@ public sealed class RenderTables
 
     /// <summary>Emitted light per block (packed <see cref="LightValue"/>).</summary>
     public ushort[] Emission { get; }
+
+    /// <summary>Packed block light emitted per liquid code (lava glows).</summary>
+    public ushort[] LiquidEmission { get; }
 
     public IReadOnlyList<SurfaceLayers> Surfaces { get; }
 

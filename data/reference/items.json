@@ -1769,6 +1769,55 @@
    "source": "shop"
   },
   {
+   "id": "terraria:empty_bucket",
+   "name": "Empty Bucket",
+   "kind": "tool",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:water_bucket",
+   "name": "Water Bucket",
+   "kind": "tool",
+   "stage": "early",
+   "source": "bucket"
+  },
+  {
+   "id": "terraria:lava_bucket",
+   "name": "Lava Bucket",
+   "kind": "tool",
+   "stage": "prehardmode",
+   "source": "bucket"
+  },
+  {
+   "id": "terraria:honey_bucket",
+   "name": "Honey Bucket",
+   "kind": "tool",
+   "stage": "early",
+   "source": "bucket"
+  },
+  {
+   "id": "terraria:bottomless_water_bucket",
+   "name": "Bottomless Water Bucket",
+   "kind": "tool",
+   "stage": "hardmode",
+   "source": "fishing"
+  },
+  {
+   "id": "terraria:bottomless_lava_bucket",
+   "name": "Bottomless Lava Bucket",
+   "kind": "tool",
+   "stage": "hardmode",
+   "source": "fishing"
+  },
+  {
+   "id": "terraria:super_absorbant_sponge",
+   "name": "Super Absorbant Sponge",
+   "kind": "tool",
+   "stage": "hardmode",
+   "source": "fishing"
+  },
+  {
    "id": "terraria:wood_helmet",
    "name": "Wood Helmet",
    "kind": "armor",
@@ -2263,6 +2312,20 @@
    "name": "Builder Potion",
    "kind": "consumable",
    "stage": "prehardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:obsidian_skin_potion",
+   "name": "Obsidian Skin Potion",
+   "kind": "consumable",
+   "stage": "prehardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:gills_potion",
+   "name": "Gills Potion",
+   "kind": "consumable",
+   "stage": "early",
    "source": "craft"
   },
   {
