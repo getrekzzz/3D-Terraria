@@ -38,6 +38,7 @@ public sealed class WorldgenReportCommand : IToolCommand
         };
         var outDir = Path.GetFullPath(context.Options.Get("out") ?? context.PathOf("build/worldgen"));
         Directory.CreateDirectory(outDir);
+        File.WriteAllText(Path.Combine(Path.GetDirectoryName(outDir)!, ".gdignore"), "");
 
         var sw = Stopwatch.StartNew();
         var gen = new WorldGenerator(content, settings, new ConsoleLog()) { ProfilePasses = new Metrics() };

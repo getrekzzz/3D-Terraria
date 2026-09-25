@@ -1,0 +1,362 @@
+{
+ "columns": 8,
+ "rows": 9,
+ "size": 256,
+ "layers": [
+  {
+   "name": "loam",
+   "index": 0,
+   "type": "soil"
+  },
+  {
+   "name": "clay",
+   "index": 1,
+   "type": "soil"
+  },
+  {
+   "name": "sand",
+   "index": 2,
+   "type": "soil"
+  },
+  {
+   "name": "packed_sand",
+   "index": 3,
+   "type": "soil"
+  },
+  {
+   "name": "silt",
+   "index": 4,
+   "type": "soil"
+  },
+  {
+   "name": "mud",
+   "index": 5,
+   "type": "soil"
+  },
+  {
+   "name": "snow",
+   "index": 6,
+   "type": "soil"
+  },
+  {
+   "name": "slush",
+   "index": 7,
+   "type": "soil"
+  },
+  {
+   "name": "ash",
+   "index": 8,
+   "type": "soil"
+  },
+  {
+   "name": "cloud",
+   "index": 9,
+   "type": "soil"
+  },
+  {
+   "name": "rain_cloud",
+   "index": 10,
+   "type": "soil"
+  },
+  {
+   "name": "grass",
+   "index": 11,
+   "type": "grass"
+  },
+  {
+   "name": "jungle_grass",
+   "index": 12,
+   "type": "grass"
+  },
+  {
+   "name": "umbral_grass",
+   "index": 13,
+   "type": "grass"
+  },
+  {
+   "name": "sanguine_grass",
+   "index": 14,
+   "type": "grass"
+  },
+  {
+   "name": "mushroom_grass",
+   "index": 15,
+   "type": "grass"
+  },
+  {
+   "name": "moss",
+   "index": 16,
+   "type": "grass"
+  },
+  {
+   "name": "glow_moss",
+   "index": 17,
+   "type": "grass"
+  },
+  {
+   "name": "stone",
+   "index": 18,
+   "type": "rock"
+  },
+  {
+   "name": "deepstone",
+   "index": 19,
+   "type": "rock"
+  },
+  {
+   "name": "sandstone",
+   "index": 20,
+   "type": "rock"
+  },
+  {
+   "name": "fossil",
+   "index": 21,
+   "type": "speckled"
+  },
+  {
+   "name": "ice",
+   "index": 22,
+   "type": "rock"
+  },
+  {
+   "name": "obsidian",
+   "index": 23,
+   "type": "veined"
+  },
+  {
+   "name": "marble",
+   "index": 24,
+   "type": "veined"
+  },
+  {
+   "name": "granite",
+   "index": 25,
+   "type": "speckled"
+  },
+  {
+   "name": "umbral_stone",
+   "index": 26,
+   "type": "rock"
+  },
+  {
+   "name": "sanguine_stone",
+   "index": 27,
+   "type": "rock"
+  },
+  {
+   "name": "hive",
+   "index": 28,
+   "type": "hive"
+  },
+  {
+   "name": "abyssal_rock",
+   "index": 29,
+   "type": "rock"
+  },
+  {
+   "name": "copper_ore",
+   "index": 30,
+   "type": "ore"
+  },
+  {
+   "name": "tin_ore",
+   "index": 31,
+   "type": "ore"
+  },
+  {
+   "name": "iron_ore",
+   "index": 32,
+   "type": "ore"
+  },
+  {
+   "name": "lead_ore",
+   "index": 33,
+   "type": "ore"
+  },
+  {
+   "name": "silver_ore",
+   "index": 34,
+   "type": "ore"
+  },
+  {
+   "name": "tungsten_ore",
+   "index": 35,
+   "type": "ore"
+  },
+  {
+   "name": "gold_ore",
+   "index": 36,
+   "type": "ore"
+  },
+  {
+   "name": "platinum_ore",
+   "index": 37,
+   "type": "ore"
+  },
+  {
+   "name": "umbrite_ore",
+   "index": 38,
+   "type": "ore"
+  },
+  {
+   "name": "sanguite_ore",
+   "index": 39,
+   "type": "ore"
+  },
+  {
+   "name": "meteorite",
+   "index": 40,
+   "type": "ore"
+  },
+  {
+   "name": "cinderstone",
+   "index": 41,
+   "type": "ore"
+  },
+  {
+   "name": "amethyst_ore",
+   "index": 42,
+   "type": "ore"
+  },
+  {
+   "name": "topaz_ore",
+   "index": 43,
+   "type": "ore"
+  },
+  {
+   "name": "sapphire_ore",
+   "index": 44,
+   "type": "ore"
+  },
+  {
+   "name": "emerald_ore",
+   "index": 45,
+   "type": "ore"
+  },
+  {
+   "name": "ruby_ore",
+   "index": 46,
+   "type": "ore"
+  },
+  {
+   "name": "diamond_ore",
+   "index": 47,
+   "type": "ore"
+  },
+  {
+   "name": "crystal",
+   "index": 48,
+   "type": "translucent"
+  },
+  {
+   "name": "planks",
+   "index": 49,
+   "type": "planks"
+  },
+  {
+   "name": "pine_planks",
+   "index": 50,
+   "type": "planks"
+  },
+  {
+   "name": "jungle_planks",
+   "index": 51,
+   "type": "planks"
+  },
+  {
+   "name": "palm_planks",
+   "index": 52,
+   "type": "planks"
+  },
+  {
+   "name": "living_wood",
+   "index": 53,
+   "type": "planks"
+  },
+  {
+   "name": "leaves",
+   "index": 54,
+   "type": "leaves"
+  },
+  {
+   "name": "stone_brick",
+   "index": 55,
+   "type": "bricks"
+  },
+  {
+   "name": "red_brick",
+   "index": 56,
+   "type": "bricks"
+  },
+  {
+   "name": "sandstone_brick",
+   "index": 57,
+   "type": "bricks"
+  },
+  {
+   "name": "snow_brick",
+   "index": 58,
+   "type": "bricks"
+  },
+  {
+   "name": "mud_brick",
+   "index": 59,
+   "type": "bricks"
+  },
+  {
+   "name": "copper_brick",
+   "index": 60,
+   "type": "bricks"
+  },
+  {
+   "name": "gold_brick",
+   "index": 61,
+   "type": "bricks"
+  },
+  {
+   "name": "azure_brick",
+   "index": 62,
+   "type": "bricks"
+  },
+  {
+   "name": "verdant_brick",
+   "index": 63,
+   "type": "bricks"
+  },
+  {
+   "name": "rose_brick",
+   "index": 64,
+   "type": "bricks"
+  },
+  {
+   "name": "obsidian_brick",
+   "index": 65,
+   "type": "bricks"
+  },
+  {
+   "name": "cinder_brick",
+   "index": 66,
+   "type": "bricks"
+  },
+  {
+   "name": "sky_brick",
+   "index": 67,
+   "type": "bricks"
+  },
+  {
+   "name": "glass",
+   "index": 68,
+   "type": "translucent"
+  },
+  {
+   "name": "cobweb",
+   "index": 69,
+   "type": "web"
+  },
+  {
+   "name": "missing",
+   "index": 70,
+   "type": "missing"
+  }
+ ]
+}
