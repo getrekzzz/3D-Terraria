@@ -85,7 +85,9 @@ public sealed partial class WorldRuntime : Node3D
     public override void _Process(double delta)
     {
         var focus = FocusCell;
-        Game.Update(focus, 4.0);
+        // Finish more background work per frame when it piles up (initial load, fast travel).
+        int backlog = Jobs.Completions.Count;
+        Game.Update(focus, backlog > 64 ? 14.0 : backlog > 16 ? 8.0 : 4.0);
         _renderer.ProcessUploads(3.0);
         _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
         float surface = Session.Generator.Terrain.SurfaceHeight(focus.X, focus.Z);
