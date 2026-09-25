@@ -29,6 +29,9 @@ public sealed class OreVeinDef : ContentDef
     /// <summary>Stretch factor: > 1 makes elongated seams rather than round blobs.</summary>
     public float Stretch { get; init; } = 1.6f;
 
+    /// <summary>False: never placed by world generation, only by a world mutation (hardmode ores).</summary>
+    public bool Generate { get; init; } = true;
+
     public float SizeMin => Size.Length > 0 ? Size[0] : 1.5f;
     public float SizeMax => Size.Length > 1 ? Size[1] : SizeMin;
 }

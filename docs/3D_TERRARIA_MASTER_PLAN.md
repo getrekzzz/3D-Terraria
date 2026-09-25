@@ -28,6 +28,9 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-25 | Progression locks are data: a biome's `lockedUntil` flag protects its generated structure cells; `exclusiveSpawns` zones only spawn rules naming them, at closer range | The crypt behaves like the reference dungeon without special-case code. |
 | 2026-09-25 | Progression flags are raised only through `ProgressionSystem`; `autoSet` flags follow from their requirements (defeated_mawwall → hardmode) and may announce themselves | One place for consequences (hardmode mutations hook on `Raised`), no special cases in boss code. |
 | 2026-09-25 | The Mawwall is an enemy whose brain sets a `Barrier` volume (drawn as tiled flesh, hurts and ejects players behind it) and tethers minions (`Leader`); summoned by burning an effigy (`incinerationSummon`) in underworld lava | A 3D wall of flesh that cannot be walked around (it tracks the target's Z) built from generic parts. |
+| 2026-09-25 | World mutations are an ordered log of (id, seed) in world.json; each step is a pure function of (world, seed, chunk, blocks). Produce applies the missing levels on workers (freshly generated chunks start at level 0), loaded chunks catch up a few per tick as ordinary edits | Hardmode reaches every chunk, visited or not, with identical results whether applied at load or live; saves only store chunks players touched. |
+| 2026-09-25 | Open air under a floating roof (island, arch, high canopy) is lit as outdoor shade (sky 12) via a per-column `ShadeTop` in the sky map | The land under sky islands was pitch black at noon (sky light is column-based and spreads only 15 cells); caves and rooms are unaffected. |
+| 2026-09-25 | Ore veins are placed by one shared `VeinStamper` for generation and mutations (verified bit-identical to the old pass); hardmode ores are `generate: false` vein rules | No second ore algorithm; alternates are chosen per world from the mutation seed without disturbing generation's random stream. |
 | 2026-09-25 | Landmark residents (the crypt keeper) live at a planned landmark instead of a house and leave for good when `leavesWhen` holds; boss summoning can be a resident service | Old-man/clothier arc expressed with the town system and data. |
 
 ## 3. System status
@@ -38,12 +41,12 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 811 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 42.5 % (enemies 24 %, bosses 17 %, NPCs 21 %) |
+| Content | Reference DBs + coverage | ✅ | 819 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 49.8 % (items 51 %, enemies 24 %, bosses 17 %, NPCs 21 %) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
 | WorldGen | Report tool | ✅ | Maps, sections, ore/depth charts |
-| Lighting | Sky + RGB block light | ✅ | Stateless per chunk; liquid light (lava) from data; sampled by props/creatures via LightProbe |
+| Lighting | Sky + RGB block light | ✅ | Stateless per chunk; outdoor shade under floating roofs; liquid light (lava) from data; sampled by props/creatures via LightProbe; biome fog/sky/ambient looks from data |
 | Meshing | Surface nets + crisp shapes + liquids + collision | ✅ | LOD rings ⬜ |
 | Rendering | Terrain, props, creatures, drops, sky/fog | 🟡 | Horizon mesh, LOD, cave culling, particles polish ⬜ |
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
@@ -62,7 +65,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Progression | Flags, auto-set cascade, announcements, incineration summons | ✅ | `ProgressionSystem.Raised` is the hook for hardmode mutations |
 | Events | Event director | ✅ | Blood moon, slime rain; invasions ⬜ |
 | Dungeon | Crypt zone, locked walls, guardian, roster, keeper + curse | ✅ | Crypt keys/locked chests, water bolt loot, spike traps ⬜ |
-| Hardmode | Trigger, mutations, spread | 🟡 | `hardmode` is raised by the Mawwall's defeat; lazy world mutations and spread are next |
+| Hardmode | Trigger, lazy world mutations, spread, ore tiers | ✅ | Mawwall → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190); hardmode creatures and mechanical bosses ⬜ |
 | Audio | Director + sounds | ⬜ | |
 
 ## 4. Technical debt
@@ -79,6 +82,12 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
   (a MultiMesh would be cheaper for very tall cavities).
 * Zone membership scans a structure's blueprint ops per query (hundreds for the crypt); fine at spawn/lock rates,
   would want a coarse occupancy grid if queried per frame.
+* Outdoor shade considers only the first roof in a column (stacked islands shade as one).
+* Spreading only visits loaded chunks, and spread land outside a wedge does not count as that zone (zones are the
+  wedges); trees, grass tufts and flowers on converted land keep their forest look.
+* Spread converts a few cells every half second, so converted borders keep remeshing (intended in play; tours and
+  screenshots pause it with `mutations spread off`).
+* All bars smelt at the furnace and all metal gear uses the anvil (no hellforge / hardmode anvil and forge stations yet).
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
   batch per liquid, so a large flood remeshes its chunks every few steps (rate-limited by the mesh queue).
 
@@ -96,7 +105,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (176) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (190) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -110,7 +119,8 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: every biome creature spawns, moves and renders; ranged attackers | `creatures.cmds` | ✅ CI |
 | Engine smoke: keeper at the crypt gate, guardian leaves outside, night summon, warden defeat frees the keeper | `dungeon.cmds` | ✅ CI |
 | Engine smoke: effigy burned in underworld lava calls the Mawwall (wayfinder sacrificed), the fight runs, defeat raises hardmode | `mawwall.cmds` | ✅ CI |
-| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Crypt Warden, Mawwall) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
+| Engine smoke: hardmode appends mutations, loaded chunks catch up, the radiant wedge streams in converted and is a zone, spread runs | `hardmode.cmds` | ✅ CI |
+| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Crypt Warden, Mawwall, radiant wedge) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
 
 ## 7. Performance
 * Targets: 60 fps @1080p on GTX-1060-class; ~250 LOD0 chunks; mesh ≤2 ms/chunk; gen ≤10 ms/chunk.
@@ -118,15 +128,17 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 * Props: trees ~1000 tris, MultiMesh per chunk+model, small decor has 48 m visibility range.
 * Concerns: dense forests (hundreds of trees in view), shadow cost of props, LOD not yet implemented.
 
-## 8. Next development targets (M3)
+## 8. Next development targets (M4)
 M2 delivered events, three bosses, liquids, voxel A*, 3D housing, town residents and biome creature rosters.
-M3 so far: the crypt (zone, locked walls, guardian, roster, keeper, Crypt Warden, tailor); the Mawwall (effigy
-incineration summon, sweeping barrier, eye lasers, tethered minions) whose defeat raises `hardmode`.
-1. Lazy world mutations: `data/mutations.json` (ore veins, hallow/evil wedges, spread sources) applied on chunk
-   load and live, a mutation log in the world save, biome spread, hardmode ore tiers.
+M3 delivered the crypt (zone, locked walls, guardian, roster, keeper, Crypt Warden, tailor), the Mawwall (effigy
+incineration summon, sweeping barrier, eye lasers, tethered minions) and the hardmode transformation (lazy world
+mutations: new ore tiers, radiant and blighted wedges, spreading biomes; evil, cinder and hardmode metal families).
+1. Hardmode life: radiant and blighted creature rosters, hardmode variants of cavern/underworld creatures, a
+   hardmode anvil and forge, wings/flight accessories.
 2. LOD rings + horizon heightfield; cave culling from navigation summaries.
-3. More residents; residents that fight back; crypt keys and locked chests.
-4. Audio director (data-driven cues, music states for bosses/events).
+3. Mechanical bosses (Twin Lenses, Iron Serpent, Warden Prime) on the progression flags that already exist.
+4. More residents; residents that fight back; crypt keys and locked chests.
+5. Audio director (data-driven cues, music states for bosses/events).
 
 ## 9. Directive summary (condensed)
 Phases: 1 core loop → 2 world → 3 progression → 4 systemic depth → 5 hardmode → 6 endgame → 7 polish.

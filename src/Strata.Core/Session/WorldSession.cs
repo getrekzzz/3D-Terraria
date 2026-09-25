@@ -37,6 +37,8 @@ public sealed partial class WorldSession
                 ? (plan.ColumnTop[plan.ColumnIndex(cx, cz)] - 1) >> ChunkMath.Shift
                 : plan.Bands.SeaLevel >> ChunkMath.Shift);
         Flags = new HashSet<string>(meta.Flags, StringComparer.Ordinal);
+        Mutations = new WorldGen.Mutations.MutationLog(Generator, content, Settings);
+        Mutations.Load(meta, log);
         Events = new HashSet<string>(StringComparer.Ordinal);
         World.TileObjects.Added += o => MarkModified(o);
         World.TileObjects.Removed += o => MarkModified(o);
@@ -57,6 +59,9 @@ public sealed partial class WorldSession
     public SkyMap Sky { get; }
     public GameClock Clock { get; }
     public HashSet<string> Flags { get; }
+
+    /// <summary>World mutations so far (hardmode ores, wedges); chunks behind the level catch up as they load.</summary>
+    public WorldGen.Mutations.MutationLog Mutations { get; }
 
     /// <summary>Ids of running world events (maintained by the event director).</summary>
     public HashSet<string> Events { get; }
@@ -104,7 +109,9 @@ public sealed partial class WorldSession
             try
             {
                 var decoded = ChunkCodec.Decode(blob, Content, Ids);
-                return new ChunkProduct(coord, decoded.Data, decoded.TileObjects, decoded.MutationLevel, FromSave: true);
+                var steps = Mutations.Steps;
+                return new ChunkProduct(coord, WorldGen.Mutations.MutationLog.Apply(decoded.Data, coord, steps, decoded.MutationLevel),
+                    decoded.TileObjects, Math.Max(decoded.MutationLevel, steps.Count), FromSave: true);
             }
             catch (Exception ex) when (ex is InvalidDataException or EndOfStreamException or IOException)
             {
@@ -112,7 +119,8 @@ public sealed partial class WorldSession
             }
         }
         var generated = Generator.Generate(coord);
-        return new ChunkProduct(coord, generated.Data, generated.Objects, Meta.MutationLevel, FromSave: false);
+        var snapshot = Mutations.Steps; // freshly generated chunks start at level 0
+        return new ChunkProduct(coord, WorldGen.Mutations.MutationLog.Apply(generated.Data, coord, snapshot, 0), generated.Objects, snapshot.Count, FromSave: false);
     }
 
     /// <summary>

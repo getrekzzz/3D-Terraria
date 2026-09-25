@@ -101,6 +101,54 @@
    "stage": "early"
   },
   {
+   "id": "terraria:hallowed_grass",
+   "name": "Hallowed Grass",
+   "kind": "grass",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:pearlstone_block",
+   "name": "Pearlstone Block",
+   "kind": "stone",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:pearlsand_block",
+   "name": "Pearlsand Block",
+   "kind": "sand",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:pink_ice_block",
+   "name": "Pink Ice Block",
+   "kind": "ice",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:ebonsand_block",
+   "name": "Ebonsand Block",
+   "kind": "sand",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:crimsand_block",
+   "name": "Crimsand Block",
+   "kind": "sand",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:purple_ice_block",
+   "name": "Purple Ice Block",
+   "kind": "ice",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:red_ice_block",
+   "name": "Red Ice Block",
+   "kind": "ice",
+   "stage": "hardmode"
+  },
+  {
    "id": "terraria:crimstone_block",
    "name": "Crimstone Block",
    "kind": "stone",

@@ -116,6 +116,8 @@ public sealed class GameWorld : IDisposable
         ItemUse = new ItemUseSystem(this);
         Interaction = new ObjectInteraction(this);
         Progression = new Gameplay.Progression.ProgressionSystem(this);
+        Mutations = new Gameplay.Progression.MutationDirector(this);
+        Spread = new Gameplay.Progression.SpreadSystem(this);
         Npcs = new NpcSystem(this);
         Melee = new MeleeSystem(Npcs, ItemUse);
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
@@ -142,6 +144,8 @@ public sealed class GameWorld : IDisposable
     public ItemUseSystem ItemUse { get; }
     public ObjectInteraction Interaction { get; }
     public Gameplay.Progression.ProgressionSystem Progression { get; }
+    public Gameplay.Progression.MutationDirector Mutations { get; }
+    public Gameplay.Progression.SpreadSystem Spread { get; }
     public NpcSystem Npcs { get; }
     public MeleeSystem Melee { get; }
     public ProjectileSystem Projectiles { get; }
@@ -203,6 +207,8 @@ public sealed class GameWorld : IDisposable
         Town.Tick();
         Melee.Tick();
         Projectiles.Tick();
+        Mutations.Tick();
+        Spread.Tick();
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
         if (++_autosaveCounter >= AutosaveTicks)
         {

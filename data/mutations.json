@@ -1,0 +1,44 @@
+{
+  // How the world changes as it progresses. When hardmode begins (the Mawwall falls) new ores are seeded through the
+  // stone, and two slanted wedges cut through the land: one radiant, one blighted (the world's own evil). Afterwards
+  // those biomes creep outward. Mutations apply lazily to every chunk, however late it is first visited.
+  "oreVeins": [
+    { "id": "cerulite_veins", "block": "cerulite_ore", "group": "hard1", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "umbral_stone", "sanguine_stone"], "depthMin": 0.1, "depthMax": 1.0, "perChunk": 1.4, "size": [1.6, 3.0] },
+    { "id": "rosalite_veins", "block": "rosalite_ore", "group": "hard1", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "umbral_stone", "sanguine_stone"], "depthMin": 0.1, "depthMax": 1.0, "perChunk": 1.4, "size": [1.6, 3.0] },
+    { "id": "verdite_veins", "block": "verdite_ore", "group": "hard2", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "umbral_stone", "sanguine_stone"], "depthMin": 0.3, "depthMax": 1.0, "perChunk": 1.1, "size": [1.5, 2.8] },
+    { "id": "orchidite_veins", "block": "orchidite_ore", "group": "hard2", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "umbral_stone", "sanguine_stone"], "depthMin": 0.3, "depthMax": 1.0, "perChunk": 1.1, "size": [1.5, 2.8] },
+    { "id": "crimsite_veins", "block": "crimsite_ore", "group": "hard3", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "umbral_stone", "sanguine_stone"], "depthMin": 0.5, "depthMax": 1.05, "perChunk": 0.9, "size": [1.4, 2.6] },
+    { "id": "stellite_veins", "block": "stellite_ore", "group": "hard3", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "umbral_stone", "sanguine_stone"], "depthMin": 0.5, "depthMax": 1.05, "perChunk": 0.9, "size": [1.4, 2.6] }
+  ],
+  "conversions": [
+    { "id": "radiance", "zone": "hallowed", "map": {
+      "turf": "hallowed_turf", "umbral_turf": "hallowed_turf", "sanguine_turf": "hallowed_turf",
+      "stone": "pearlstone", "deepstone": "pearlstone", "moss_stone": "pearlstone", "umbral_stone": "pearlstone", "sanguine_stone": "pearlstone",
+      "sand": "pearlsand", "umbral_sand": "pearlsand", "sanguine_sand": "pearlsand",
+      "ice": "pink_ice", "umbral_ice": "pink_ice", "sanguine_ice": "pink_ice" } },
+    { "id": "umbral_blight", "zone": "umbral", "map": {
+      "turf": "umbral_turf", "hallowed_turf": "umbral_turf",
+      "stone": "umbral_stone", "deepstone": "umbral_stone", "moss_stone": "umbral_stone", "pearlstone": "umbral_stone",
+      "sand": "umbral_sand", "pearlsand": "umbral_sand",
+      "ice": "umbral_ice", "pink_ice": "umbral_ice" } },
+    { "id": "sanguine_blight", "zone": "sanguine", "map": {
+      "turf": "sanguine_turf", "hallowed_turf": "sanguine_turf",
+      "stone": "sanguine_stone", "deepstone": "sanguine_stone", "moss_stone": "sanguine_stone", "pearlstone": "sanguine_stone",
+      "sand": "sanguine_sand", "pearlsand": "sanguine_sand",
+      "ice": "sanguine_ice", "pink_ice": "sanguine_ice" } }
+  ],
+  "mutations": [
+    { "id": "hardmode_ores", "name": "New Ores", "trigger": "hardmode",
+      "step": { "type": "oreVeins", "veins": ["cerulite_veins", "rosalite_veins", "verdite_veins", "orchidite_veins", "crimsite_veins", "stellite_veins"] },
+      "covers": ["terraria:hardmode_ores"] },
+    { "id": "hardmode_radiance", "name": "The Radiant Wedge", "trigger": "hardmode",
+      "step": { "type": "wedge", "conversion": "radiance", "halfWidth": 14, "length": 220, "lean": 0.8, "depth": 0.9, "distance": 0.3 } },
+    { "id": "hardmode_blight", "name": "The Blighted Wedge", "trigger": "hardmode",
+      "step": { "type": "wedge", "byEvil": { "umbral": "umbral_blight", "sanguine": "sanguine_blight" }, "halfWidth": 14, "length": 220, "lean": -0.8, "depth": 0.9, "distance": 0.3 } }
+  ],
+  "spreadRules": [
+    { "id": "radiance_spread", "conversion": "radiance", "requiresFlag": "hardmode", "chance": 0.3 },
+    { "id": "umbral_spread", "conversion": "umbral_blight", "requiresFlag": "hardmode", "chance": 0.3 },
+    { "id": "sanguine_spread", "conversion": "sanguine_blight", "requiresFlag": "hardmode", "chance": 0.3 }
+  ]
+}

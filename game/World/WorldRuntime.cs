@@ -91,8 +91,18 @@ public sealed partial class WorldRuntime : Node3D
         _renderer.ProcessUploads(3.0);
         _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
         _environment.EventTint = Game.Events.SkyTint is { } tint ? Color.FromHtml(tint) : null;
+        if (Engine.GetProcessFrames() % 15 == 0) _environment.Biome = BiomeAround(focus);
         float surface = Session.Generator.Terrain.SurfaceHeight(focus.X, focus.Z);
         _environment.Apply(Session.Clock, (surface - focus.Y) * Units.CellSize, delta);
+    }
+
+    /// <summary>The highest-priority biome or zone at a cell (the crypt over the tundra, a hardmode wedge over forest).</summary>
+    private Strata.Core.Content.Defs.BiomeDef? BiomeAround(Int3 cell)
+    {
+        Strata.Core.Content.Defs.BiomeDef? best = null;
+        foreach (var id in Session.ContextAt(cell).Biomes)
+            if (Session.Content.Biomes.TryGet(id, out var def) && (best == null || def.Priority > best.Priority)) best = def;
+        return best;
     }
 
     public override void _PhysicsProcess(double delta)

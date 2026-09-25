@@ -1,0 +1,6 @@
+{
+  // Spreading biomes (see Gameplay/Progression/SpreadSystem): every `interval` ticks each loaded chunk has
+  // `cellsPerChunk` random cells updated; spread rules and conversions live in data/mutations.json.
+  "interval": 30,
+  "cellsPerChunk": 3
+}

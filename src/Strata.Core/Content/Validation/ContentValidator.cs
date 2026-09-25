@@ -22,6 +22,7 @@ public static partial class ContentValidator
 
         ValidateBlocks(ctx);
         ValidateOreVeins(ctx);
+        ValidateMutations(ctx);
         ValidateTileObjects(ctx);
         ValidateItems(ctx);
         ValidateRecipes(ctx);

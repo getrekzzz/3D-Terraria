@@ -42,7 +42,7 @@ public sealed class MeshBenchCommand : IToolCommand
                 {
                     var nb = Neighborhood.Capture(world, center + new Int3(dx, dy, dz))!;
                     var sw = Stopwatch.StartNew();
-                    var result = ChunkMesher.Build(nb, tables, sky.SkyTop, Array.Empty<LightSource>());
+                    var result = ChunkMesher.Build(nb, tables, sky.SkyTop, Array.Empty<LightSource>(), sky.ShadeTop);
                     times.Add(sw.Elapsed.TotalMilliseconds);
                     verts += result.Opaque.VertexCount + result.Transparent.VertexCount + result.Liquid.VertexCount;
                     tris += result.Opaque.TriangleCount + result.Transparent.TriangleCount + result.Liquid.TriangleCount;

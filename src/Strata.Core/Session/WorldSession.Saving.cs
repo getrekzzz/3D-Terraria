@@ -39,6 +39,7 @@ public sealed partial class WorldSession
         Meta.WorldTick = Clock.Tick;
         Meta.LastPlayedUtc = DateTime.UtcNow;
         Meta.Flags = Flags.OrderBy(f => f, StringComparer.Ordinal).ToList();
+        Mutations.Persist(Meta);
         Meta.StoreIdTables(Ids);
         Store.SaveMeta(Meta);
     }

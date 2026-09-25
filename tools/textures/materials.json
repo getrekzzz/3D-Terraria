@@ -681,6 +681,145 @@
    "base": "#8a4a14",
    "dark": "#4a2206",
    "light": "#c07a30"
+  },
+  {
+   "name": "hallowed_grass",
+   "type": "grass",
+   "base": "#6fd0e8",
+   "dark": "#3f98b8",
+   "light": "#b8f0ff"
+  },
+  {
+   "name": "pearlstone",
+   "type": "rock",
+   "base": "#d8cce0",
+   "dark": "#b0a0c0",
+   "light": "#f4ecf8",
+   "cells": 16,
+   "cracks": 0.5
+  },
+  {
+   "name": "pearlsand",
+   "type": "soil",
+   "base": "#e8dcec",
+   "dark": "#c8b8d0",
+   "light": "#fff4ff",
+   "grit": 0.35,
+   "roughness": 0.98
+  },
+  {
+   "name": "pink_ice",
+   "type": "rock",
+   "base": "#f0b8dc",
+   "dark": "#d08cb8",
+   "light": "#ffe0f4",
+   "cells": 8,
+   "cracks": 0.8,
+   "roughness": 0.15
+  },
+  {
+   "name": "umbral_sand",
+   "type": "soil",
+   "base": "#7a6a90",
+   "dark": "#5a4c70",
+   "light": "#9a8ab0",
+   "grit": 0.35,
+   "roughness": 0.98
+  },
+  {
+   "name": "umbral_ice",
+   "type": "rock",
+   "base": "#a894d8",
+   "dark": "#806cb0",
+   "light": "#d0c0f4",
+   "cells": 8,
+   "cracks": 0.8,
+   "roughness": 0.15
+  },
+  {
+   "name": "sanguine_sand",
+   "type": "soil",
+   "base": "#9a5a58",
+   "dark": "#7a3c3a",
+   "light": "#c07a78",
+   "grit": 0.35,
+   "roughness": 0.98
+  },
+  {
+   "name": "sanguine_ice",
+   "type": "rock",
+   "base": "#e8a8a8",
+   "dark": "#c07a7a",
+   "light": "#ffd0d0",
+   "cells": 8,
+   "cracks": 0.8,
+   "roughness": 0.15
+  },
+  {
+   "name": "cerulite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#3a86f0",
+   "metallic": 0.85
+  },
+  {
+   "name": "rosalite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#f08a58",
+   "metallic": 0.85
+  },
+  {
+   "name": "verdite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#38d878",
+   "metallic": 0.85
+  },
+  {
+   "name": "orchidite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#f06ac0",
+   "metallic": 0.85
+  },
+  {
+   "name": "crimsite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#e8283c",
+   "metallic": 0.85
+  },
+  {
+   "name": "stellite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#dce8f8",
+   "metallic": 0.85
   }
  ]
 }

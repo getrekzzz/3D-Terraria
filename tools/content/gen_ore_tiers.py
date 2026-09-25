@@ -13,14 +13,31 @@ REPO = HERE.parents[1]
 OUT = REPO / "data" / "items" / "generated" / "ore_tiers.json"
 
 
+# Hardmode metals map their pieces onto the reference game's family names (the reference has no helmet, hammer or
+# shortsword for them, so those pieces cover nothing).
+REF_PIECES = {"pickaxe": "pickaxe", "axe": "waraxe", "broadsword": "sword", "bow": "repeater",
+              "chainmail": "breastplate", "greaves": "leggings", "bar": "bar"}
+
+
+def covers(t: dict, piece: str) -> list:
+    """Reference concepts an item of this tier covers: explicit per-tier covers, a reference metal family, or the
+    same-named reference item (pre-hardmode metals)."""
+    if "covers" in t:
+        return [t["covers"][piece]] if piece in t["covers"] else []
+    if "refMetal" in t:
+        return [f"terraria:{t['refMetal']}_{REF_PIECES[piece]}"] if piece in REF_PIECES else []
+    return [f"terraria:{t['metal']}_{piece}"]
+
+
 def build(table: dict) -> dict:
     items, recipes = [], []
     for t in table["tiers"]:
         m, n, r, p, v = t["metal"], t["name"], t["rarity"], t["power"], t["value"]
         bar = f"{m}_bar"
         items.append({"id": bar, "name": f"{n} Bar", "category": "material", "maxStack": 9999,
-                      "value": v * 3 // 4, "rarity": r, "covers": [f"terraria:{bar}"]})
-        recipes.append({"id": bar, "output": bar, "inputs": [{"item": f"{m}_ore", "count": t["orePerBar"]}],
+                      "value": v * 3 // 4, "rarity": r, "covers": covers(t, "bar")})
+        recipes.append({"id": bar, "output": bar,
+                        "inputs": [{"item": t.get("ore", f"{m}_ore"), "count": t["orePerBar"]}] + t.get("extraInputs", []),
                         "stations": ["furnace"]})
 
         def tool(kind, stat_field, dmg_time, bars, wood, extra):
@@ -29,7 +46,7 @@ def build(table: dict) -> dict:
             item = {"id": iid, "name": f"{n} {kind.capitalize()}", "category": "tool", "rarity": r,
                     "value": v * bars // 2, "useStyle": "swing", "useTime": use, "useAnimation": use + 6,
                     "autoReuse": True, "damage": dmg, "damageType": "melee", "knockback": 2.0,
-                    stat_field: p, "covers": [f"terraria:{iid}"]}
+                    stat_field: p, "covers": covers(t, kind)}
             item.update(extra)
             items.append(item)
             recipes.append({"id": iid, "output": iid, "inputs": [{"item": bar, "count": bars},
@@ -42,7 +59,7 @@ def build(table: dict) -> dict:
         dmg, use, kb = t["broad"]
         items.append({"id": f"{m}_broadsword", "name": f"{n} Broadsword", "category": "weapon", "rarity": r,
                       "value": v * 4, "useStyle": "swing", "useTime": use, "useAnimation": use, "damage": dmg,
-                      "damageType": "melee", "knockback": kb, "crit": 0, "covers": [f"terraria:{m}_broadsword"],
+                      "damageType": "melee", "knockback": kb, "crit": 0, "covers": covers(t, "broadsword"),
                       "behaviors": [{"type": "meleeSwing", "arc": 160, "length": 3.2}]})
         recipes.append({"id": f"{m}_broadsword", "output": f"{m}_broadsword", "inputs": [{"item": bar, "count": 8}],
                         "stations": ["anvil"]})
@@ -51,7 +68,7 @@ def build(table: dict) -> dict:
         items.append({"id": f"{m}_shortsword", "name": f"{n} Shortsword", "category": "weapon", "rarity": r,
                       "value": v * 3, "useStyle": "thrust", "useTime": use, "useAnimation": use, "damage": dmg,
                       "damageType": "melee", "knockback": kb, "autoReuse": True,
-                      "covers": [f"terraria:{m}_shortsword"], "behaviors": [{"type": "thrust", "length": 2.4}]})
+                      "covers": covers(t, "shortsword"), "behaviors": [{"type": "thrust", "length": 2.4}]})
         recipes.append({"id": f"{m}_shortsword", "output": f"{m}_shortsword", "inputs": [{"item": bar, "count": 7}],
                         "stations": ["anvil"]})
 
@@ -59,7 +76,7 @@ def build(table: dict) -> dict:
         items.append({"id": f"{m}_bow", "name": f"{n} Bow", "category": "weapon", "rarity": r, "value": v * 3,
                       "useStyle": "shoot", "useTime": use, "useAnimation": use, "damage": dmg,
                       "damageType": "ranged", "knockback": 0.5, "useAmmo": "arrow", "shootSpeed": speed * 3.0,
-                      "covers": [f"terraria:{m}_bow"]})
+                      "covers": covers(t, "bow")})
         recipes.append({"id": f"{m}_bow", "output": f"{m}_bow", "inputs": [{"item": bar, "count": 7}],
                         "stations": ["anvil"]})
 
@@ -67,7 +84,7 @@ def build(table: dict) -> dict:
             iid = f"{m}_{part}"
             items.append({"id": iid, "name": f"{n} {part.capitalize()}", "category": "armor", "rarity": r,
                           "value": v * bars // 2, "equipSlot": slot, "defense": t["armor"][idx],
-                          "armorSet": f"{m}_armor", "covers": [f"terraria:{iid}"]})
+                          "armorSet": f"{m}_armor", "covers": covers(t, part)})
             recipes.append({"id": iid, "output": iid, "inputs": [{"item": bar, "count": bars}],
                             "stations": ["anvil"]})
     return {"items": items, "recipes": recipes}

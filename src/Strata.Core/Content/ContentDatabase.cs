@@ -24,6 +24,9 @@ public sealed class ContentDatabase
     public Registry<EventDef> Events { get; } = new("event");
     public Registry<LiquidDef> Liquids { get; } = new("liquid");
     public Registry<TownNpcDef> TownNpcs { get; } = new("townNpc");
+    public Registry<WorldMutationDef> Mutations { get; } = new("mutation");
+    public Registry<ConversionDef> Conversions { get; } = new("conversion");
+    public Registry<SpreadRuleDef> SpreadRules { get; } = new("spreadRule");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();
@@ -46,7 +49,7 @@ public sealed class ContentDatabase
     public IEnumerable<IRegistry> AllRegistries => new IRegistry[]
     {
         Blocks, Items, TileObjects, Recipes, RecipeGroups, Biomes, Enemies, SpawnRules, Projectiles, Buffs,
-        Prefixes, LootTables, Flags, OreVeins, Events, Liquids, TownNpcs,
+        Prefixes, LootTables, Flags, OreVeins, Events, Liquids, TownNpcs, Mutations, Conversions, SpreadRules,
     };
 
     internal ContentDatabase()

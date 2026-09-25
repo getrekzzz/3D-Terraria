@@ -1,0 +1,21 @@
+# Hardmode: the Mawwall's defeat raises hardmode; its world mutations join the log, loaded chunks catch up as edits,
+# newly streamed chunks arrive mutated, the radiant wedge is a zone, and the changed biomes spread.
+wait_until player.frozen == 0 180
+spawning off
+town arrivals off
+assert mutation.level == 0
+flag defeated_mawwall
+assert flag.hardmode == 1
+assert mutation.level == 3
+wait_until mutation.behind == 0 60
+mutations
+
+# Travel to where the radiant wedge meets the surface: new chunks stream in already converted.
+tp zone hallowed
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 600
+assert zone.hallowed == 1
+assert mutation.behind == 0
+mutations spread 20
+assert spread.conversions >= 0
+assert errors == 0

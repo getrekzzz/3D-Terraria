@@ -7,9 +7,12 @@ namespace Strata.Core.Lighting;
 
 /// <summary>
 /// Per-column sky exposure: <c>SkyTop(x, z)</c> is the lowest y such that every cell at or above it in the
-/// column lets sunlight through unattenuated. Maintained from loaded chunk data (top-down scan); columns
-/// whose upper chunks are not loaded fall back to an estimate from the world plan.
-/// Tiles are published copy-on-write, so mesh jobs read them lock-free.
+/// column lets sunlight through unattenuated. <c>ShadeTop(x, z)</c> extends it for open air under a floating roof (a
+/// sky island, an arch, a high canopy): when the first blocking cell floats above the terrain surface with a tall
+/// air gap below it, the air from the ground up to the roof counts as outdoor shade (lit, but less than open sky);
+/// otherwise it equals <c>SkyTop</c>. Maintained from loaded chunk data (top-down scan); columns whose upper chunks
+/// are not loaded fall back to an estimate from the world plan. Tiles are published copy-on-write, so mesh jobs read
+/// them lock-free.
 /// </summary>
 public sealed class SkyMap
 {
@@ -29,6 +32,12 @@ public sealed class SkyMap
         _columnTopChunk = columnTopChunk;
     }
 
+    /// <summary>Minimum air gap (cells) under a floating roof for the ground below to count as outdoor shade.</summary>
+    public const int ShadeGap = 12;
+
+    /// <summary>A roof must start at least this far above the terrain surface estimate to count as floating.</summary>
+    public const int ShadeMargin = 3;
+
     private static long Key(int tx, int tz) => ((long)tx << 32) ^ (uint)tz;
 
     public int SkyTop(int x, int z)
@@ -38,23 +47,34 @@ public sealed class SkyMap
         return _estimate(x, z);
     }
 
+    /// <summary>Lowest y of outdoor shade under a floating roof (equal to <see cref="SkyTop"/> when there is none).</summary>
+    public int ShadeTop(int x, int z)
+    {
+        int tx = x >> ChunkMath.Shift, tz = z >> ChunkMath.Shift;
+        if (_tiles.TryGetValue(Key(tx, tz), out var tile)) return tile[ChunkMath.Area + (z & ChunkMath.Mask) * ChunkMath.Size + (x & ChunkMath.Mask)];
+        return _estimate(x, z);
+    }
+
     /// <summary>Rescans a chunk column. Returns (column index, old, new) for every column whose value changed.</summary>
     public List<(int X, int Z, int Old, int New)> Rebuild(int chunkX, int chunkZ)
     {
         var changes = new List<(int, int, int, int)>();
         var key = Key(chunkX, chunkZ);
         _tiles.TryGetValue(key, out var old);
-        var tile = new int[ChunkMath.Area];
+        var tile = new int[ChunkMath.Area * 2]; // sky tops, then shade tops
         int ox = chunkX << ChunkMath.Shift, oz = chunkZ << ChunkMath.Shift;
         int topChunk = Math.Max(_columnTopChunk(chunkX, chunkZ), HighestLoaded(chunkX, chunkZ));
         for (int lz = 0; lz < ChunkMath.Size; lz++)
             for (int lx = 0; lx < ChunkMath.Size; lx++)
             {
-                int value = ScanColumn(ox + lx, oz + lz, chunkX, chunkZ, topChunk);
+                var (sky, shade) = ScanColumn(ox + lx, oz + lz, chunkX, chunkZ, topChunk);
                 int i = lz * ChunkMath.Size + lx;
-                tile[i] = value;
+                tile[i] = sky;
+                tile[ChunkMath.Area + i] = shade;
                 int previous = old?[i] ?? _estimate(ox + lx, oz + lz);
-                if (previous != value) changes.Add((ox + lx, oz + lz, previous, value));
+                int previousShade = old?[ChunkMath.Area + i] ?? previous;
+                if (previous != sky) changes.Add((ox + lx, oz + lz, previous, sky));
+                if (previousShade != shade) changes.Add((ox + lx, oz + lz, Math.Min(previousShade, shade), Math.Max(previous, sky)));
             }
         _tiles[key] = tile;
         return changes;
@@ -69,25 +89,51 @@ public sealed class SkyMap
         return -1;
     }
 
-    private int ScanColumn(int x, int z, int cx, int cz, int topChunk)
+    /// <summary>Sky top and shade top of one column (see the class summary).</summary>
+    private (int Sky, int Shade) ScanColumn(int x, int z, int cx, int cz, int topChunk)
     {
         int lx = x & ChunkMath.Mask, lz = z & ChunkMath.Mask;
+        int floating = _estimate(x, z) + ShadeMargin;
+        int sky = -1, roofBottom = -1;
         for (int cy = topChunk; cy >= 0; cy--)
         {
             var chunk = _world.GetChunk(new Int3(cx, cy, cz));
             if (chunk == null)
             {
-                // Unknown content below: fall back to the estimate (never above the known-open part).
-                return Math.Min(_estimate(x, z), (cy + 1) << ChunkMath.Shift);
+                // Unknown content below: fall back to the estimate (never above the known-open part). Under a roof
+                // whose ground is not loaded there is no shade until it is.
+                if (sky < 0)
+                {
+                    int estimate = Math.Min(_estimate(x, z), (cy + 1) << ChunkMath.Shift);
+                    return (estimate, estimate);
+                }
+                return (sky, sky);
             }
             var data = chunk.Capture();
             for (int ly = ChunkMath.Size - 1; ly >= 0; ly--)
             {
                 int i = ChunkMath.Index(lx, ly, lz);
-                if (_tables.LightFilter[data.GetBlock(i)] != 0 || (data.Liquids != null && data.Liquids[i] != 0) || (data.Shapes != null && data.Shapes[i] != 0))
-                    return (cy << ChunkMath.Shift) + ly + 1;
+                int y = (cy << ChunkMath.Shift) + ly;
+                bool blocking = _tables.LightFilter[data.GetBlock(i)] != 0 || (data.Liquids != null && data.Liquids[i] != 0) || (data.Shapes != null && data.Shapes[i] != 0);
+                if (sky < 0)
+                {
+                    if (!blocking) continue;
+                    sky = y + 1;
+                    if (y < floating) return (sky, sky); // the terrain itself: no floating roof
+                }
+                else if (roofBottom < 0)
+                {
+                    if (blocking) continue;
+                    roofBottom = y + 1; // first air under the roof
+                    if (roofBottom <= floating) return (sky, sky);
+                }
+                else if (blocking)
+                {
+                    int ground = y + 1;
+                    return (sky, roofBottom - ground >= ShadeGap ? ground : sky);
+                }
             }
         }
-        return 0;
+        return sky < 0 ? (0, 0) : (sky, roofBottom >= ShadeGap ? 0 : sky);
     }
 }

@@ -1360,6 +1360,1452 @@
       "covers": [
         "terraria:platinum_greaves"
       ]
+    },
+    {
+      "id": "umbrite_bar",
+      "name": "Umbrite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 900,
+      "rarity": 1,
+      "covers": [
+        "terraria:demonite_bar"
+      ]
+    },
+    {
+      "id": "umbrite_pickaxe",
+      "name": "Umbrite Pickaxe",
+      "category": "tool",
+      "rarity": 1,
+      "value": 7200,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 26,
+      "autoReuse": true,
+      "damage": 9,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 65,
+      "covers": [
+        "terraria:nightmare_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "umbrite_axe",
+      "name": "Umbrite Axe",
+      "category": "tool",
+      "rarity": 1,
+      "value": 5400,
+      "useStyle": "swing",
+      "useTime": 26,
+      "useAnimation": 32,
+      "autoReuse": true,
+      "damage": 16,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 65,
+      "covers": []
+    },
+    {
+      "id": "umbrite_hammer",
+      "name": "Umbrite Hammer",
+      "category": "tool",
+      "rarity": 1,
+      "value": 6000,
+      "useStyle": "swing",
+      "useTime": 26,
+      "useAnimation": 32,
+      "autoReuse": true,
+      "damage": 20,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 65,
+      "covers": []
+    },
+    {
+      "id": "umbrite_broadsword",
+      "name": "Umbrite Broadsword",
+      "category": "weapon",
+      "rarity": 1,
+      "value": 4800,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 20,
+      "damage": 18,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "crit": 0,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "umbrite_shortsword",
+      "name": "Umbrite Shortsword",
+      "category": "weapon",
+      "rarity": 1,
+      "value": 3600,
+      "useStyle": "thrust",
+      "useTime": 10,
+      "useAnimation": 10,
+      "damage": 14,
+      "damageType": "melee",
+      "knockback": 4.0,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "umbrite_bow",
+      "name": "Umbrite Bow",
+      "category": "weapon",
+      "rarity": 1,
+      "value": 3600,
+      "useStyle": "shoot",
+      "useTime": 23,
+      "useAnimation": 23,
+      "damage": 14,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 21.6,
+      "covers": []
+    },
+    {
+      "id": "umbrite_helmet",
+      "name": "Umbrite Helmet",
+      "category": "armor",
+      "rarity": 1,
+      "value": 9000,
+      "equipSlot": "head",
+      "defense": 6,
+      "armorSet": "umbrite_armor",
+      "covers": []
+    },
+    {
+      "id": "umbrite_chainmail",
+      "name": "Umbrite Chainmail",
+      "category": "armor",
+      "rarity": 1,
+      "value": 15000,
+      "equipSlot": "body",
+      "defense": 7,
+      "armorSet": "umbrite_armor",
+      "covers": []
+    },
+    {
+      "id": "umbrite_greaves",
+      "name": "Umbrite Greaves",
+      "category": "armor",
+      "rarity": 1,
+      "value": 12000,
+      "equipSlot": "legs",
+      "defense": 6,
+      "armorSet": "umbrite_armor",
+      "covers": []
+    },
+    {
+      "id": "sanguite_bar",
+      "name": "Sanguite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 900,
+      "rarity": 1,
+      "covers": [
+        "terraria:crimtane_bar"
+      ]
+    },
+    {
+      "id": "sanguite_pickaxe",
+      "name": "Sanguite Pickaxe",
+      "category": "tool",
+      "rarity": 1,
+      "value": 7200,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 26,
+      "autoReuse": true,
+      "damage": 10,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 65,
+      "covers": [
+        "terraria:deathbringer_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "sanguite_axe",
+      "name": "Sanguite Axe",
+      "category": "tool",
+      "rarity": 1,
+      "value": 5400,
+      "useStyle": "swing",
+      "useTime": 26,
+      "useAnimation": 32,
+      "autoReuse": true,
+      "damage": 16,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 65,
+      "covers": []
+    },
+    {
+      "id": "sanguite_hammer",
+      "name": "Sanguite Hammer",
+      "category": "tool",
+      "rarity": 1,
+      "value": 6000,
+      "useStyle": "swing",
+      "useTime": 26,
+      "useAnimation": 32,
+      "autoReuse": true,
+      "damage": 20,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 65,
+      "covers": []
+    },
+    {
+      "id": "sanguite_broadsword",
+      "name": "Sanguite Broadsword",
+      "category": "weapon",
+      "rarity": 1,
+      "value": 4800,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 20,
+      "damage": 19,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "crit": 0,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "sanguite_shortsword",
+      "name": "Sanguite Shortsword",
+      "category": "weapon",
+      "rarity": 1,
+      "value": 3600,
+      "useStyle": "thrust",
+      "useTime": 10,
+      "useAnimation": 10,
+      "damage": 15,
+      "damageType": "melee",
+      "knockback": 4.0,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "sanguite_bow",
+      "name": "Sanguite Bow",
+      "category": "weapon",
+      "rarity": 1,
+      "value": 3600,
+      "useStyle": "shoot",
+      "useTime": 23,
+      "useAnimation": 23,
+      "damage": 15,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 21.6,
+      "covers": []
+    },
+    {
+      "id": "sanguite_helmet",
+      "name": "Sanguite Helmet",
+      "category": "armor",
+      "rarity": 1,
+      "value": 9000,
+      "equipSlot": "head",
+      "defense": 6,
+      "armorSet": "sanguite_armor",
+      "covers": []
+    },
+    {
+      "id": "sanguite_chainmail",
+      "name": "Sanguite Chainmail",
+      "category": "armor",
+      "rarity": 1,
+      "value": 15000,
+      "equipSlot": "body",
+      "defense": 7,
+      "armorSet": "sanguite_armor",
+      "covers": []
+    },
+    {
+      "id": "sanguite_greaves",
+      "name": "Sanguite Greaves",
+      "category": "armor",
+      "rarity": 1,
+      "value": 12000,
+      "equipSlot": "legs",
+      "defense": 6,
+      "armorSet": "sanguite_armor",
+      "covers": []
+    },
+    {
+      "id": "cinder_bar",
+      "name": "Cinder Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 1500,
+      "rarity": 3,
+      "covers": [
+        "terraria:hellstone_bar"
+      ]
+    },
+    {
+      "id": "cinder_pickaxe",
+      "name": "Cinder Pickaxe",
+      "category": "tool",
+      "rarity": 3,
+      "value": 12000,
+      "useStyle": "swing",
+      "useTime": 18,
+      "useAnimation": 24,
+      "autoReuse": true,
+      "damage": 12,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 100,
+      "covers": [
+        "terraria:molten_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "cinder_axe",
+      "name": "Cinder Axe",
+      "category": "tool",
+      "rarity": 3,
+      "value": 9000,
+      "useStyle": "swing",
+      "useTime": 24,
+      "useAnimation": 30,
+      "autoReuse": true,
+      "damage": 20,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 100,
+      "covers": []
+    },
+    {
+      "id": "cinder_hammer",
+      "name": "Cinder Hammer",
+      "category": "tool",
+      "rarity": 3,
+      "value": 10000,
+      "useStyle": "swing",
+      "useTime": 24,
+      "useAnimation": 30,
+      "autoReuse": true,
+      "damage": 24,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 100,
+      "covers": []
+    },
+    {
+      "id": "cinder_broadsword",
+      "name": "Cinder Broadsword",
+      "category": "weapon",
+      "rarity": 3,
+      "value": 8000,
+      "useStyle": "swing",
+      "useTime": 25,
+      "useAnimation": 25,
+      "damage": 36,
+      "damageType": "melee",
+      "knockback": 6.5,
+      "crit": 0,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "cinder_shortsword",
+      "name": "Cinder Shortsword",
+      "category": "weapon",
+      "rarity": 3,
+      "value": 6000,
+      "useStyle": "thrust",
+      "useTime": 11,
+      "useAnimation": 11,
+      "damage": 26,
+      "damageType": "melee",
+      "knockback": 4.5,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "cinder_bow",
+      "name": "Cinder Bow",
+      "category": "weapon",
+      "rarity": 3,
+      "value": 6000,
+      "useStyle": "shoot",
+      "useTime": 21,
+      "useAnimation": 21,
+      "damage": 26,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 22.799999999999997,
+      "covers": []
+    },
+    {
+      "id": "cinder_helmet",
+      "name": "Cinder Helmet",
+      "category": "armor",
+      "rarity": 3,
+      "value": 15000,
+      "equipSlot": "head",
+      "defense": 8,
+      "armorSet": "cinder_armor",
+      "covers": []
+    },
+    {
+      "id": "cinder_chainmail",
+      "name": "Cinder Chainmail",
+      "category": "armor",
+      "rarity": 3,
+      "value": 25000,
+      "equipSlot": "body",
+      "defense": 9,
+      "armorSet": "cinder_armor",
+      "covers": []
+    },
+    {
+      "id": "cinder_greaves",
+      "name": "Cinder Greaves",
+      "category": "armor",
+      "rarity": 3,
+      "value": 20000,
+      "equipSlot": "legs",
+      "defense": 8,
+      "armorSet": "cinder_armor",
+      "covers": []
+    },
+    {
+      "id": "cerulite_bar",
+      "name": "Cerulite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 2250,
+      "rarity": 4,
+      "covers": [
+        "terraria:cobalt_bar"
+      ]
+    },
+    {
+      "id": "cerulite_pickaxe",
+      "name": "Cerulite Pickaxe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 18000,
+      "useStyle": "swing",
+      "useTime": 13,
+      "useAnimation": 19,
+      "autoReuse": true,
+      "damage": 10,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 110,
+      "covers": [
+        "terraria:cobalt_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "cerulite_axe",
+      "name": "Cerulite Axe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 13500,
+      "useStyle": "swing",
+      "useTime": 22,
+      "useAnimation": 28,
+      "autoReuse": true,
+      "damage": 25,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 110,
+      "covers": [
+        "terraria:cobalt_waraxe"
+      ]
+    },
+    {
+      "id": "cerulite_hammer",
+      "name": "Cerulite Hammer",
+      "category": "tool",
+      "rarity": 4,
+      "value": 15000,
+      "useStyle": "swing",
+      "useTime": 24,
+      "useAnimation": 30,
+      "autoReuse": true,
+      "damage": 28,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 110,
+      "covers": []
+    },
+    {
+      "id": "cerulite_broadsword",
+      "name": "Cerulite Broadsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 12000,
+      "useStyle": "swing",
+      "useTime": 21,
+      "useAnimation": 21,
+      "damage": 42,
+      "damageType": "melee",
+      "knockback": 5.8,
+      "crit": 0,
+      "covers": [
+        "terraria:cobalt_sword"
+      ],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "cerulite_shortsword",
+      "name": "Cerulite Shortsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 9000,
+      "useStyle": "thrust",
+      "useTime": 10,
+      "useAnimation": 10,
+      "damage": 32,
+      "damageType": "melee",
+      "knockback": 4.5,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "cerulite_bow",
+      "name": "Cerulite Bow",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 9000,
+      "useStyle": "shoot",
+      "useTime": 22,
+      "useAnimation": 22,
+      "damage": 30,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 24.0,
+      "covers": [
+        "terraria:cobalt_repeater"
+      ]
+    },
+    {
+      "id": "cerulite_helmet",
+      "name": "Cerulite Helmet",
+      "category": "armor",
+      "rarity": 4,
+      "value": 22500,
+      "equipSlot": "head",
+      "defense": 10,
+      "armorSet": "cerulite_armor",
+      "covers": []
+    },
+    {
+      "id": "cerulite_chainmail",
+      "name": "Cerulite Chainmail",
+      "category": "armor",
+      "rarity": 4,
+      "value": 37500,
+      "equipSlot": "body",
+      "defense": 11,
+      "armorSet": "cerulite_armor",
+      "covers": [
+        "terraria:cobalt_breastplate"
+      ]
+    },
+    {
+      "id": "cerulite_greaves",
+      "name": "Cerulite Greaves",
+      "category": "armor",
+      "rarity": 4,
+      "value": 30000,
+      "equipSlot": "legs",
+      "defense": 10,
+      "armorSet": "cerulite_armor",
+      "covers": [
+        "terraria:cobalt_leggings"
+      ]
+    },
+    {
+      "id": "rosalite_bar",
+      "name": "Rosalite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 2550,
+      "rarity": 4,
+      "covers": [
+        "terraria:palladium_bar"
+      ]
+    },
+    {
+      "id": "rosalite_pickaxe",
+      "name": "Rosalite Pickaxe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 20400,
+      "useStyle": "swing",
+      "useTime": 12,
+      "useAnimation": 18,
+      "autoReuse": true,
+      "damage": 12,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 130,
+      "covers": [
+        "terraria:palladium_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "rosalite_axe",
+      "name": "Rosalite Axe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 15300,
+      "useStyle": "swing",
+      "useTime": 21,
+      "useAnimation": 27,
+      "autoReuse": true,
+      "damage": 27,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 130,
+      "covers": [
+        "terraria:palladium_waraxe"
+      ]
+    },
+    {
+      "id": "rosalite_hammer",
+      "name": "Rosalite Hammer",
+      "category": "tool",
+      "rarity": 4,
+      "value": 17000,
+      "useStyle": "swing",
+      "useTime": 23,
+      "useAnimation": 29,
+      "autoReuse": true,
+      "damage": 30,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 130,
+      "covers": []
+    },
+    {
+      "id": "rosalite_broadsword",
+      "name": "Rosalite Broadsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 13600,
+      "useStyle": "swing",
+      "useTime": 21,
+      "useAnimation": 21,
+      "damage": 46,
+      "damageType": "melee",
+      "knockback": 5.8,
+      "crit": 0,
+      "covers": [
+        "terraria:palladium_sword"
+      ],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "rosalite_shortsword",
+      "name": "Rosalite Shortsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 10200,
+      "useStyle": "thrust",
+      "useTime": 10,
+      "useAnimation": 10,
+      "damage": 34,
+      "damageType": "melee",
+      "knockback": 4.5,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "rosalite_bow",
+      "name": "Rosalite Bow",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 10200,
+      "useStyle": "shoot",
+      "useTime": 21,
+      "useAnimation": 21,
+      "damage": 32,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 24.0,
+      "covers": [
+        "terraria:palladium_repeater"
+      ]
+    },
+    {
+      "id": "rosalite_helmet",
+      "name": "Rosalite Helmet",
+      "category": "armor",
+      "rarity": 4,
+      "value": 25500,
+      "equipSlot": "head",
+      "defense": 11,
+      "armorSet": "rosalite_armor",
+      "covers": []
+    },
+    {
+      "id": "rosalite_chainmail",
+      "name": "Rosalite Chainmail",
+      "category": "armor",
+      "rarity": 4,
+      "value": 42500,
+      "equipSlot": "body",
+      "defense": 12,
+      "armorSet": "rosalite_armor",
+      "covers": [
+        "terraria:palladium_breastplate"
+      ]
+    },
+    {
+      "id": "rosalite_greaves",
+      "name": "Rosalite Greaves",
+      "category": "armor",
+      "rarity": 4,
+      "value": 34000,
+      "equipSlot": "legs",
+      "defense": 11,
+      "armorSet": "rosalite_armor",
+      "covers": [
+        "terraria:palladium_leggings"
+      ]
+    },
+    {
+      "id": "verdite_bar",
+      "name": "Verdite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 3375,
+      "rarity": 4,
+      "covers": [
+        "terraria:mythril_bar"
+      ]
+    },
+    {
+      "id": "verdite_pickaxe",
+      "name": "Verdite Pickaxe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 27000,
+      "useStyle": "swing",
+      "useTime": 11,
+      "useAnimation": 17,
+      "autoReuse": true,
+      "damage": 15,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 150,
+      "covers": [
+        "terraria:mythril_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "verdite_axe",
+      "name": "Verdite Axe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 20250,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 26,
+      "autoReuse": true,
+      "damage": 30,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 150,
+      "covers": [
+        "terraria:mythril_waraxe"
+      ]
+    },
+    {
+      "id": "verdite_hammer",
+      "name": "Verdite Hammer",
+      "category": "tool",
+      "rarity": 4,
+      "value": 22500,
+      "useStyle": "swing",
+      "useTime": 22,
+      "useAnimation": 28,
+      "autoReuse": true,
+      "damage": 34,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 150,
+      "covers": []
+    },
+    {
+      "id": "verdite_broadsword",
+      "name": "Verdite Broadsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 18000,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 20,
+      "damage": 50,
+      "damageType": "melee",
+      "knockback": 6.0,
+      "crit": 0,
+      "covers": [
+        "terraria:mythril_sword"
+      ],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "verdite_shortsword",
+      "name": "Verdite Shortsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 13500,
+      "useStyle": "thrust",
+      "useTime": 9,
+      "useAnimation": 9,
+      "damage": 38,
+      "damageType": "melee",
+      "knockback": 4.5,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "verdite_bow",
+      "name": "Verdite Bow",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 13500,
+      "useStyle": "shoot",
+      "useTime": 20,
+      "useAnimation": 20,
+      "damage": 36,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 25.200000000000003,
+      "covers": [
+        "terraria:mythril_repeater"
+      ]
+    },
+    {
+      "id": "verdite_helmet",
+      "name": "Verdite Helmet",
+      "category": "armor",
+      "rarity": 4,
+      "value": 33750,
+      "equipSlot": "head",
+      "defense": 13,
+      "armorSet": "verdite_armor",
+      "covers": []
+    },
+    {
+      "id": "verdite_chainmail",
+      "name": "Verdite Chainmail",
+      "category": "armor",
+      "rarity": 4,
+      "value": 56250,
+      "equipSlot": "body",
+      "defense": 14,
+      "armorSet": "verdite_armor",
+      "covers": [
+        "terraria:mythril_breastplate"
+      ]
+    },
+    {
+      "id": "verdite_greaves",
+      "name": "Verdite Greaves",
+      "category": "armor",
+      "rarity": 4,
+      "value": 45000,
+      "equipSlot": "legs",
+      "defense": 12,
+      "armorSet": "verdite_armor",
+      "covers": [
+        "terraria:mythril_leggings"
+      ]
+    },
+    {
+      "id": "orchidite_bar",
+      "name": "Orchidite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 3750,
+      "rarity": 4,
+      "covers": [
+        "terraria:orichalcum_bar"
+      ]
+    },
+    {
+      "id": "orchidite_pickaxe",
+      "name": "Orchidite Pickaxe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 30000,
+      "useStyle": "swing",
+      "useTime": 10,
+      "useAnimation": 16,
+      "autoReuse": true,
+      "damage": 17,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 165,
+      "covers": [
+        "terraria:orichalcum_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "orchidite_axe",
+      "name": "Orchidite Axe",
+      "category": "tool",
+      "rarity": 4,
+      "value": 22500,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 26,
+      "autoReuse": true,
+      "damage": 32,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 165,
+      "covers": [
+        "terraria:orichalcum_waraxe"
+      ]
+    },
+    {
+      "id": "orchidite_hammer",
+      "name": "Orchidite Hammer",
+      "category": "tool",
+      "rarity": 4,
+      "value": 25000,
+      "useStyle": "swing",
+      "useTime": 22,
+      "useAnimation": 28,
+      "autoReuse": true,
+      "damage": 36,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 165,
+      "covers": []
+    },
+    {
+      "id": "orchidite_broadsword",
+      "name": "Orchidite Broadsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 20000,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 20,
+      "damage": 54,
+      "damageType": "melee",
+      "knockback": 6.0,
+      "crit": 0,
+      "covers": [
+        "terraria:orichalcum_sword"
+      ],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "orchidite_shortsword",
+      "name": "Orchidite Shortsword",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 15000,
+      "useStyle": "thrust",
+      "useTime": 9,
+      "useAnimation": 9,
+      "damage": 40,
+      "damageType": "melee",
+      "knockback": 4.5,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "orchidite_bow",
+      "name": "Orchidite Bow",
+      "category": "weapon",
+      "rarity": 4,
+      "value": 15000,
+      "useStyle": "shoot",
+      "useTime": 19,
+      "useAnimation": 19,
+      "damage": 38,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 25.200000000000003,
+      "covers": [
+        "terraria:orichalcum_repeater"
+      ]
+    },
+    {
+      "id": "orchidite_helmet",
+      "name": "Orchidite Helmet",
+      "category": "armor",
+      "rarity": 4,
+      "value": 37500,
+      "equipSlot": "head",
+      "defense": 14,
+      "armorSet": "orchidite_armor",
+      "covers": []
+    },
+    {
+      "id": "orchidite_chainmail",
+      "name": "Orchidite Chainmail",
+      "category": "armor",
+      "rarity": 4,
+      "value": 62500,
+      "equipSlot": "body",
+      "defense": 15,
+      "armorSet": "orchidite_armor",
+      "covers": [
+        "terraria:orichalcum_breastplate"
+      ]
+    },
+    {
+      "id": "orchidite_greaves",
+      "name": "Orchidite Greaves",
+      "category": "armor",
+      "rarity": 4,
+      "value": 50000,
+      "equipSlot": "legs",
+      "defense": 13,
+      "armorSet": "orchidite_armor",
+      "covers": [
+        "terraria:orichalcum_leggings"
+      ]
+    },
+    {
+      "id": "crimsite_bar",
+      "name": "Crimsite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 5250,
+      "rarity": 5,
+      "covers": [
+        "terraria:adamantite_bar"
+      ]
+    },
+    {
+      "id": "crimsite_pickaxe",
+      "name": "Crimsite Pickaxe",
+      "category": "tool",
+      "rarity": 5,
+      "value": 42000,
+      "useStyle": "swing",
+      "useTime": 9,
+      "useAnimation": 15,
+      "autoReuse": true,
+      "damage": 20,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 180,
+      "covers": [
+        "terraria:adamantite_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "crimsite_axe",
+      "name": "Crimsite Axe",
+      "category": "tool",
+      "rarity": 5,
+      "value": 31500,
+      "useStyle": "swing",
+      "useTime": 18,
+      "useAnimation": 24,
+      "autoReuse": true,
+      "damage": 36,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 180,
+      "covers": [
+        "terraria:adamantite_waraxe"
+      ]
+    },
+    {
+      "id": "crimsite_hammer",
+      "name": "Crimsite Hammer",
+      "category": "tool",
+      "rarity": 5,
+      "value": 35000,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 26,
+      "autoReuse": true,
+      "damage": 40,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 180,
+      "covers": []
+    },
+    {
+      "id": "crimsite_broadsword",
+      "name": "Crimsite Broadsword",
+      "category": "weapon",
+      "rarity": 5,
+      "value": 28000,
+      "useStyle": "swing",
+      "useTime": 19,
+      "useAnimation": 19,
+      "damage": 62,
+      "damageType": "melee",
+      "knockback": 6.2,
+      "crit": 0,
+      "covers": [
+        "terraria:adamantite_sword"
+      ],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "crimsite_shortsword",
+      "name": "Crimsite Shortsword",
+      "category": "weapon",
+      "rarity": 5,
+      "value": 21000,
+      "useStyle": "thrust",
+      "useTime": 8,
+      "useAnimation": 8,
+      "damage": 46,
+      "damageType": "melee",
+      "knockback": 5.0,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "crimsite_bow",
+      "name": "Crimsite Bow",
+      "category": "weapon",
+      "rarity": 5,
+      "value": 21000,
+      "useStyle": "shoot",
+      "useTime": 18,
+      "useAnimation": 18,
+      "damage": 44,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 26.400000000000002,
+      "covers": [
+        "terraria:adamantite_repeater"
+      ]
+    },
+    {
+      "id": "crimsite_helmet",
+      "name": "Crimsite Helmet",
+      "category": "armor",
+      "rarity": 5,
+      "value": 52500,
+      "equipSlot": "head",
+      "defense": 17,
+      "armorSet": "crimsite_armor",
+      "covers": []
+    },
+    {
+      "id": "crimsite_chainmail",
+      "name": "Crimsite Chainmail",
+      "category": "armor",
+      "rarity": 5,
+      "value": 87500,
+      "equipSlot": "body",
+      "defense": 18,
+      "armorSet": "crimsite_armor",
+      "covers": [
+        "terraria:adamantite_breastplate"
+      ]
+    },
+    {
+      "id": "crimsite_greaves",
+      "name": "Crimsite Greaves",
+      "category": "armor",
+      "rarity": 5,
+      "value": 70000,
+      "equipSlot": "legs",
+      "defense": 15,
+      "armorSet": "crimsite_armor",
+      "covers": [
+        "terraria:adamantite_leggings"
+      ]
+    },
+    {
+      "id": "stellite_bar",
+      "name": "Stellite Bar",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 5625,
+      "rarity": 5,
+      "covers": [
+        "terraria:titanium_bar"
+      ]
+    },
+    {
+      "id": "stellite_pickaxe",
+      "name": "Stellite Pickaxe",
+      "category": "tool",
+      "rarity": 5,
+      "value": 45000,
+      "useStyle": "swing",
+      "useTime": 8,
+      "useAnimation": 14,
+      "autoReuse": true,
+      "damage": 22,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "pickPower": 190,
+      "covers": [
+        "terraria:titanium_pickaxe"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "stellite_axe",
+      "name": "Stellite Axe",
+      "category": "tool",
+      "rarity": 5,
+      "value": 33750,
+      "useStyle": "swing",
+      "useTime": 18,
+      "useAnimation": 24,
+      "autoReuse": true,
+      "damage": 38,
+      "damageType": "melee",
+      "knockback": 2.0,
+      "axePower": 190,
+      "covers": [
+        "terraria:titanium_waraxe"
+      ]
+    },
+    {
+      "id": "stellite_hammer",
+      "name": "Stellite Hammer",
+      "category": "tool",
+      "rarity": 5,
+      "value": 37500,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 26,
+      "autoReuse": true,
+      "damage": 42,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 190,
+      "covers": []
+    },
+    {
+      "id": "stellite_broadsword",
+      "name": "Stellite Broadsword",
+      "category": "weapon",
+      "rarity": 5,
+      "value": 30000,
+      "useStyle": "swing",
+      "useTime": 18,
+      "useAnimation": 18,
+      "damage": 66,
+      "damageType": "melee",
+      "knockback": 6.2,
+      "crit": 0,
+      "covers": [
+        "terraria:titanium_sword"
+      ],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 160,
+          "length": 3.2
+        }
+      ]
+    },
+    {
+      "id": "stellite_shortsword",
+      "name": "Stellite Shortsword",
+      "category": "weapon",
+      "rarity": 5,
+      "value": 22500,
+      "useStyle": "thrust",
+      "useTime": 8,
+      "useAnimation": 8,
+      "damage": 48,
+      "damageType": "melee",
+      "knockback": 5.0,
+      "autoReuse": true,
+      "covers": [],
+      "behaviors": [
+        {
+          "type": "thrust",
+          "length": 2.4
+        }
+      ]
+    },
+    {
+      "id": "stellite_bow",
+      "name": "Stellite Bow",
+      "category": "weapon",
+      "rarity": 5,
+      "value": 22500,
+      "useStyle": "shoot",
+      "useTime": 17,
+      "useAnimation": 17,
+      "damage": 46,
+      "damageType": "ranged",
+      "knockback": 0.5,
+      "useAmmo": "arrow",
+      "shootSpeed": 26.400000000000002,
+      "covers": [
+        "terraria:titanium_repeater"
+      ]
+    },
+    {
+      "id": "stellite_helmet",
+      "name": "Stellite Helmet",
+      "category": "armor",
+      "rarity": 5,
+      "value": 56250,
+      "equipSlot": "head",
+      "defense": 18,
+      "armorSet": "stellite_armor",
+      "covers": []
+    },
+    {
+      "id": "stellite_chainmail",
+      "name": "Stellite Chainmail",
+      "category": "armor",
+      "rarity": 5,
+      "value": 93750,
+      "equipSlot": "body",
+      "defense": 19,
+      "armorSet": "stellite_armor",
+      "covers": [
+        "terraria:titanium_breastplate"
+      ]
+    },
+    {
+      "id": "stellite_greaves",
+      "name": "Stellite Greaves",
+      "category": "armor",
+      "rarity": 5,
+      "value": 75000,
+      "equipSlot": "legs",
+      "defense": 16,
+      "armorSet": "stellite_armor",
+      "covers": [
+        "terraria:titanium_leggings"
+      ]
     }
   ],
   "recipes": [
@@ -2492,6 +3938,1288 @@
       "inputs": [
         {
           "item": "platinum_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_bar",
+      "output": "umbrite_bar",
+      "inputs": [
+        {
+          "item": "umbrite_ore",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "umbrite_pickaxe",
+      "output": "umbrite_pickaxe",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_axe",
+      "output": "umbrite_axe",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_hammer",
+      "output": "umbrite_hammer",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_broadsword",
+      "output": "umbrite_broadsword",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_shortsword",
+      "output": "umbrite_shortsword",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_bow",
+      "output": "umbrite_bow",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_helmet",
+      "output": "umbrite_helmet",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_chainmail",
+      "output": "umbrite_chainmail",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "umbrite_greaves",
+      "output": "umbrite_greaves",
+      "inputs": [
+        {
+          "item": "umbrite_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_bar",
+      "output": "sanguite_bar",
+      "inputs": [
+        {
+          "item": "sanguite_ore",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "sanguite_pickaxe",
+      "output": "sanguite_pickaxe",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_axe",
+      "output": "sanguite_axe",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_hammer",
+      "output": "sanguite_hammer",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_broadsword",
+      "output": "sanguite_broadsword",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_shortsword",
+      "output": "sanguite_shortsword",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_bow",
+      "output": "sanguite_bow",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_helmet",
+      "output": "sanguite_helmet",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_chainmail",
+      "output": "sanguite_chainmail",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "sanguite_greaves",
+      "output": "sanguite_greaves",
+      "inputs": [
+        {
+          "item": "sanguite_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_bar",
+      "output": "cinder_bar",
+      "inputs": [
+        {
+          "item": "cinderstone",
+          "count": 3
+        },
+        {
+          "item": "obsidian",
+          "count": 1
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "cinder_pickaxe",
+      "output": "cinder_pickaxe",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_axe",
+      "output": "cinder_axe",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_hammer",
+      "output": "cinder_hammer",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_broadsword",
+      "output": "cinder_broadsword",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_shortsword",
+      "output": "cinder_shortsword",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_bow",
+      "output": "cinder_bow",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_helmet",
+      "output": "cinder_helmet",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_chainmail",
+      "output": "cinder_chainmail",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cinder_greaves",
+      "output": "cinder_greaves",
+      "inputs": [
+        {
+          "item": "cinder_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_bar",
+      "output": "cerulite_bar",
+      "inputs": [
+        {
+          "item": "cerulite_ore",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "cerulite_pickaxe",
+      "output": "cerulite_pickaxe",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_axe",
+      "output": "cerulite_axe",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_hammer",
+      "output": "cerulite_hammer",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_broadsword",
+      "output": "cerulite_broadsword",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_shortsword",
+      "output": "cerulite_shortsword",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_bow",
+      "output": "cerulite_bow",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_helmet",
+      "output": "cerulite_helmet",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_chainmail",
+      "output": "cerulite_chainmail",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cerulite_greaves",
+      "output": "cerulite_greaves",
+      "inputs": [
+        {
+          "item": "cerulite_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_bar",
+      "output": "rosalite_bar",
+      "inputs": [
+        {
+          "item": "rosalite_ore",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "rosalite_pickaxe",
+      "output": "rosalite_pickaxe",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_axe",
+      "output": "rosalite_axe",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_hammer",
+      "output": "rosalite_hammer",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_broadsword",
+      "output": "rosalite_broadsword",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_shortsword",
+      "output": "rosalite_shortsword",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_bow",
+      "output": "rosalite_bow",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_helmet",
+      "output": "rosalite_helmet",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_chainmail",
+      "output": "rosalite_chainmail",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "rosalite_greaves",
+      "output": "rosalite_greaves",
+      "inputs": [
+        {
+          "item": "rosalite_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_bar",
+      "output": "verdite_bar",
+      "inputs": [
+        {
+          "item": "verdite_ore",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "verdite_pickaxe",
+      "output": "verdite_pickaxe",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_axe",
+      "output": "verdite_axe",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_hammer",
+      "output": "verdite_hammer",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_broadsword",
+      "output": "verdite_broadsword",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_shortsword",
+      "output": "verdite_shortsword",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_bow",
+      "output": "verdite_bow",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_helmet",
+      "output": "verdite_helmet",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_chainmail",
+      "output": "verdite_chainmail",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "verdite_greaves",
+      "output": "verdite_greaves",
+      "inputs": [
+        {
+          "item": "verdite_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_bar",
+      "output": "orchidite_bar",
+      "inputs": [
+        {
+          "item": "orchidite_ore",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "orchidite_pickaxe",
+      "output": "orchidite_pickaxe",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_axe",
+      "output": "orchidite_axe",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_hammer",
+      "output": "orchidite_hammer",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_broadsword",
+      "output": "orchidite_broadsword",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_shortsword",
+      "output": "orchidite_shortsword",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_bow",
+      "output": "orchidite_bow",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_helmet",
+      "output": "orchidite_helmet",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_chainmail",
+      "output": "orchidite_chainmail",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "orchidite_greaves",
+      "output": "orchidite_greaves",
+      "inputs": [
+        {
+          "item": "orchidite_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_bar",
+      "output": "crimsite_bar",
+      "inputs": [
+        {
+          "item": "crimsite_ore",
+          "count": 5
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "crimsite_pickaxe",
+      "output": "crimsite_pickaxe",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_axe",
+      "output": "crimsite_axe",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_hammer",
+      "output": "crimsite_hammer",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_broadsword",
+      "output": "crimsite_broadsword",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_shortsword",
+      "output": "crimsite_shortsword",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_bow",
+      "output": "crimsite_bow",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_helmet",
+      "output": "crimsite_helmet",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_chainmail",
+      "output": "crimsite_chainmail",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "crimsite_greaves",
+      "output": "crimsite_greaves",
+      "inputs": [
+        {
+          "item": "crimsite_bar",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_bar",
+      "output": "stellite_bar",
+      "inputs": [
+        {
+          "item": "stellite_ore",
+          "count": 5
+        }
+      ],
+      "stations": [
+        "furnace"
+      ]
+    },
+    {
+      "id": "stellite_pickaxe",
+      "output": "stellite_pickaxe",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 12
+        },
+        {
+          "group": "any_wood",
+          "count": 4
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_axe",
+      "output": "stellite_axe",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 9
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_hammer",
+      "output": "stellite_hammer",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 10
+        },
+        {
+          "group": "any_wood",
+          "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_broadsword",
+      "output": "stellite_broadsword",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 8
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_shortsword",
+      "output": "stellite_shortsword",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_bow",
+      "output": "stellite_bow",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 7
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_helmet",
+      "output": "stellite_helmet",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_chainmail",
+      "output": "stellite_chainmail",
+      "inputs": [
+        {
+          "item": "stellite_bar",
+          "count": 25
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "stellite_greaves",
+      "output": "stellite_greaves",
+      "inputs": [
+        {
+          "item": "stellite_bar",
           "count": 20
         }
       ],

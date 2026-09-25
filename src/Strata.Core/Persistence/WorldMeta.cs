@@ -35,7 +35,11 @@ public sealed class WorldMeta
     /// <summary>Absolute world clock in ticks (time of day, moon phase derive from it).</summary>
     public long WorldTick { get; set; }
 
+    /// <summary>Number of world mutations applied (kept equal to <see cref="Mutations"/>.Count; older saves have 0).</summary>
     public int MutationLevel { get; set; }
+
+    /// <summary>World mutations in the order they happened (added without a version bump: older saves have none).</summary>
+    public List<MutationModel> Mutations { get; set; } = new();
     public List<string> Flags { get; set; } = new();
     public List<string> ActiveEvents { get; set; } = new();
 
@@ -55,6 +59,8 @@ public sealed class WorldMeta
     public Dictionary<string, JsonElement>? Extra { get; set; }
 
     public sealed record EventStateModel(string Id, int TicksLeft, int Kills);
+
+    public sealed record MutationModel(string Id, ulong Seed);
 
     public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks);
 

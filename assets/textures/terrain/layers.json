@@ -1,6 +1,6 @@
 {
  "columns": 8,
- "rows": 10,
+ "rows": 11,
  "size": 256,
  "layers": [
   {
@@ -367,6 +367,76 @@
    "name": "crispy_honey",
    "index": 72,
    "type": "hive"
+  },
+  {
+   "name": "hallowed_grass",
+   "index": 73,
+   "type": "grass"
+  },
+  {
+   "name": "pearlstone",
+   "index": 74,
+   "type": "rock"
+  },
+  {
+   "name": "pearlsand",
+   "index": 75,
+   "type": "soil"
+  },
+  {
+   "name": "pink_ice",
+   "index": 76,
+   "type": "rock"
+  },
+  {
+   "name": "umbral_sand",
+   "index": 77,
+   "type": "soil"
+  },
+  {
+   "name": "umbral_ice",
+   "index": 78,
+   "type": "rock"
+  },
+  {
+   "name": "sanguine_sand",
+   "index": 79,
+   "type": "soil"
+  },
+  {
+   "name": "sanguine_ice",
+   "index": 80,
+   "type": "rock"
+  },
+  {
+   "name": "cerulite_ore",
+   "index": 81,
+   "type": "ore"
+  },
+  {
+   "name": "rosalite_ore",
+   "index": 82,
+   "type": "ore"
+  },
+  {
+   "name": "verdite_ore",
+   "index": 83,
+   "type": "ore"
+  },
+  {
+   "name": "orchidite_ore",
+   "index": 84,
+   "type": "ore"
+  },
+  {
+   "name": "crimsite_ore",
+   "index": 85,
+   "type": "ore"
+  },
+  {
+   "name": "stellite_ore",
+   "index": 86,
+   "type": "ore"
   }
  ]
 }

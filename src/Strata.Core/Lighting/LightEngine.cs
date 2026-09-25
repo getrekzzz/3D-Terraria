@@ -18,7 +18,11 @@ public static class LightEngine
 
     [ThreadStatic] private static int[]? _queue;
 
-    public static ushort[] Compute(Neighborhood nb, RenderTables tables, Func<int, int, int> skyTop, IReadOnlyList<LightSource> sources, ushort[]? into = null)
+    /// <summary>Sky light level of outdoor shade under a floating roof (see <see cref="SkyMap.ShadeTop"/>).</summary>
+    public const int ShadeLight = 12;
+
+    public static ushort[] Compute(Neighborhood nb, RenderTables tables, Func<int, int, int> skyTop, IReadOnlyList<LightSource> sources,
+        ushort[]? into = null, Func<int, int, int>? shadeTop = null)
     {
         var light = into ?? new ushort[Neighborhood.Volume];
         Array.Clear(light);
@@ -50,6 +54,21 @@ public static class LightEngine
                 if (z < N - 1) highestNeighbour = Math.Max(highestNeighbour, tops[(z + 1) * N + x]);
                 for (int y = top; y < Math.Min(N, highestNeighbour + 1); y++) queue[tail++] = Neighborhood.Index(x, y, z);
             }
+        // Open air under a floating roof (a sky island, an arch): outdoor shade, spreading like sunlight.
+        if (shadeTop != null)
+            for (int z = 0; z < N; z++)
+                for (int x = 0; x < N; x++)
+                {
+                    int top = tops[z * N + x];
+                    int shade = Math.Clamp(shadeTop(nb.Origin.X + x, nb.Origin.Z + z) - nb.Origin.Y, 0, N);
+                    for (int y = shade; y < top; y++)
+                    {
+                        int i = Neighborhood.Index(x, y, z);
+                        if (filter[blocks[i]] != 0 || liquids[i] != 0 || LightValue.Sky(light[i]) >= ShadeLight) continue;
+                        light[i] = LightValue.Pack(ShadeLight, 0, 0, 0);
+                        queue[tail++] = i;
+                    }
+                }
         Propagate(light, queue, ref head, ref tail, nb, filter, sky: true);
 
         // --- Block light from emitters.

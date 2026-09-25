@@ -20,6 +20,7 @@ public static class BuiltinCommands
         CombatCommands.Register(r);
         LiquidCommands.Register(r);
         TownCommands.Register(r);
+        WorldCommands.Register(r);
         return r;
     }
 
@@ -133,7 +134,7 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface | tp cave <underground|cavern|underworld> | tp landmark <id>",
+            Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface | tp cave <underground|cavern|underworld> | tp landmark <id> | tp zone <biome>",
             Help = "Teleports the player (cell coordinates).",
             Run = Teleport,
         });
@@ -283,13 +284,23 @@ public static class BuiltinCommands
                 cell = marks.TryGetValue(id, out var mark) ? mark : throw new CommandException($"no landmark '{id}' (known: {string.Join(", ", marks.Keys)})");
                 break;
             }
+            case "zone":
+            {
+                // Where a world mutation's zone (the radiant wedge, a blight) meets the surface.
+                var id = a.Str(1, "biome");
+                var zone = s.Mutations.Zones.OfType<WorldGen.Mutations.WedgeStep>().FirstOrDefault(z => z.Zone == id)
+                    ?? throw new CommandException($"no mutation zone '{id}' (zones: {string.Join(", ", s.Mutations.Zones.Select(z => z.Zone))})");
+                var (x, z, _, _) = zone.Anchor;
+                cell = new Int3((int)x, (int)MathF.Ceiling(s.Generator.Terrain.SurfaceHeight(x, z)) + 1, (int)z);
+                break;
+            }
             default:
                 cell = new Int3(a.Int(0, "x"), a.Int(1, "y"), a.Int(2, "z"));
                 break;
         }
         if (!s.World.InBounds(cell.X, cell.Y, cell.Z)) throw new CommandException($"{cell} is outside the world");
         // Named surface targets are estimates; exact coordinates and caves are taken as given.
-        ctx.Host.Teleport(ctx.Player, Feet(cell), settle: a.Str(0, "x") is "spawn" or "surface" or "landmark");
+        ctx.Host.Teleport(ctx.Player, Feet(cell), settle: a.Str(0, "x") is "spawn" or "surface" or "landmark" or "zone");
         return CommandResult.Success($"Teleported to {cell}.");
     }
 

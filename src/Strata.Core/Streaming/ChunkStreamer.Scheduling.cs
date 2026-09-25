@@ -112,7 +112,7 @@ public sealed partial class ChunkStreamer
             _jobs.Schedule(e.Priority, () =>
             {
                 var nb = Neighborhood.Capture(_session.World, c);
-                return nb == null ? null : ChunkMesher.Build(nb, _tables, _session.Sky.SkyTop, sources);
+                return nb == null ? null : ChunkMesher.Build(nb, _tables, _session.Sky.SkyTop, sources, _session.Sky.ShadeTop);
             }, result => OnMeshed(c, result), $"mesh {c}");
             if (e.Priority < 0) e.Priority = 0;
         }

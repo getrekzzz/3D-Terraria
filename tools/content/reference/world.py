@@ -183,6 +183,14 @@ mushroom_grass|Mushroom Grass|early|grass
 corrupt_grass|Corrupt Grass|early|grass
 crimson_grass|Crimson Grass|early|grass
 ebonstone_block|Ebonstone Block|early|stone
+hallowed_grass|Hallowed Grass|hardmode|grass
+pearlstone_block|Pearlstone Block|hardmode|stone
+pearlsand_block|Pearlsand Block|hardmode|sand
+pink_ice_block|Pink Ice Block|hardmode|ice
+ebonsand_block|Ebonsand Block|hardmode|sand
+crimsand_block|Crimsand Block|hardmode|sand
+purple_ice_block|Purple Ice Block|hardmode|ice
+red_ice_block|Red Ice Block|hardmode|ice
 crimstone_block|Crimstone Block|early|stone
 snow_block|Snow Block|early|soil
 ice_block|Ice Block|early|stone

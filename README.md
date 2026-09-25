@@ -18,6 +18,10 @@ world events and a world that transforms as you progress.
 |---|---|
 | ![Crypt Warden](docs/screenshots/m3_crypt_warden.png) | ![Mawwall](docs/screenshots/m3_mawwall.png) |
 
+| Hardmode: the radiant wedge cuts through the forest | Hardmode: the blighted wedge eats the desert |
+|---|---|
+| ![Radiant wedge](docs/screenshots/m3_radiant.png) | ![Blighted wedge](docs/screenshots/m3_blight.png) |
+
 ## Running
 1. Install **Godot 4.7.x .NET** and the **.NET 8 SDK**.
 2. Open `project.godot` in Godot and press Play (F5), or from a terminal: `godot --path .`
@@ -37,7 +41,7 @@ Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medi
 | V, Ctrl+wheel | first/third person, camera distance |
 | ` or F1 / F3 / Esc | console / performance overlay / release mouse |
 
-Console commands include `help`, `give`, `drop`, `spawn`, `boss`, `slay`, `god`, `event`, `tp` (also `tp landmark dungeon_gate`), `biome`, `time`, `flag`, `setblock`,
+Console commands include `help`, `give`, `drop`, `spawn`, `boss`, `slay`, `god`, `event`, `tp` (also `tp landmark dungeon_gate`, `tp zone hallowed`), `mutations`, `biome`, `time`, `flag`, `setblock`,
 `fill`, `place`, `liquid`, `liquids`, `house`, `town`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`
 (`help <command>` for usage).
 

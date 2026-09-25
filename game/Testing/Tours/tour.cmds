@@ -1,4 +1,5 @@
-# Screenshot tour: surface biomes, caves at three depths, the underworld, a town, night, the crypt and the Mawwall.
+# Screenshot tour: surface biomes, caves at three depths, the underworld, a town, night, the crypt, the Mawwall
+# and the hardmode world.
 # Rendering required for images (headless runs only exercise the route):
 #   godot --path . --rendering-driver vulkan -- --world=tour --size=small --new --player=tour --fresh-player \
 #         --view=4 --shots=/tmp/shots --smoke=res://game/Testing/Tours/tour.cmds
@@ -130,4 +131,18 @@ wait_until screenshot.pending == 0 900
 killall
 liquids on
 god off
+
+# Hardmode: the world changes. Spread is paused so the converted land stops remeshing for the camera.
+mutations spread off
+flag defeated_mawwall
+wait_until mutation.behind == 0 120
+tp zone hallowed
+wait_until player.frozen == 0 300
+time 10
+aim 0.3 -0.15 1
+wait_until stream.idle == 1 900
+wait 1
+screenshot 14_radiant_wedge
+wait_until screenshot.pending == 0 900
+mutations spread on
 assert errors == 0

@@ -22,9 +22,15 @@ sky ≥ 0.80 · space ≥ 0.93. Sizes (cells, 0.5 m): Tiny 512³, Small 2048×76
 Large 6144×1024×6144.
 
 Determinism rules: SplitMix/PCG32 streams derived from names (`SeedTree`), never call order; no
-`Math.Sin/Pow/Exp` in generation (polynomial `Trig`); vendored FastNoiseLite. Golden chunk hashes guard
-unintended changes; a deliberate change bumps `GenVersion` (existing saves keep their edited chunks and
+`Math.Sin/Pow/Exp` in generation (polynomial `Trig`); vendored FastNoiseLite. Golden chunk hashes
+(`WorldGenTests.GeneratedChunksMatchTheirGoldenHashes`) guard unintended changes; a deliberate change bumps `GenVersion` (existing saves keep their edited chunks and
 regenerate the rest with the new generator, with a logged warning).
+
+**World mutations** (hardmode) are a third, lazy tier: an ordered log of steps saved with the world, each a pure
+function of (world, mutation seed, chunk, blocks). `WorldSession.Produce` applies whatever a chunk is missing (freshly
+generated chunks start at level 0; saved chunks store their level), and loaded chunks are caught up live, so a region
+first visited long after hardmode looks exactly as if it had been loaded at the moment the world changed. Ore veins
+for both generation and mutations come from the same `VeinStamper`.
 
 Inspect with `dotnet run --project tools/Strata.Tools -- worldgen-report --seed=N --size=tiny`
 (top-down biome map, cross-sections, ore-by-depth charts).

@@ -36,6 +36,24 @@ public class WorldGenTests
             Assert.Equal(ChunkHash(a.Generate(c)), ChunkHash(b.Generate(c)));
     }
 
+    /// <summary>
+    /// Golden chunk hashes (seed 1234, tiny, generator version <see cref="GenVersion.Current"/>): any change to world
+    /// generation output fails here. A deliberate change bumps GenVersion and updates these values in the same commit.
+    /// </summary>
+    [Theory]
+    [InlineData(8, 10, 8, 5014375410925121077UL)]
+    [InlineData(8, 9, 8, 10266172546085080418UL)]
+    [InlineData(8, 7, 8, 17018525288982942300UL)]
+    [InlineData(8, 4, 8, 3249732967929143139UL)]
+    [InlineData(2, 4, 9, 7700367495048783130UL)]
+    [InlineData(12, 1, 5, 186453762913151607UL)]
+    public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
+    {
+        Assert.Equal(2, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(new Int3(8, 10, 8), ChunkMath.CellToChunk(Tiny.Value.Plan.Spawn));
+        Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
+    }
+
     [Fact]
     public void DifferentSeedsDiffer()
     {

@@ -32,10 +32,11 @@ public static class ChunkMesher
 {
     [ThreadStatic] private static ushort[]? _light;
 
-    public static ChunkMeshResult Build(Neighborhood nb, RenderTables tables, Func<int, int, int> skyTop, IReadOnlyList<LightSource> lightSources)
+    public static ChunkMeshResult Build(Neighborhood nb, RenderTables tables, Func<int, int, int> skyTop, IReadOnlyList<LightSource> lightSources,
+        Func<int, int, int>? shadeTop = null)
     {
         long start = Stopwatch.GetTimestamp();
-        var light = LightEngine.Compute(nb, tables, skyTop, lightSources, _light ??= new ushort[Neighborhood.Volume]);
+        var light = LightEngine.Compute(nb, tables, skyTop, lightSources, _light ??= new ushort[Neighborhood.Volume], shadeTop);
         var result = new ChunkMeshResult
         {
             Coord = nb.Chunk,

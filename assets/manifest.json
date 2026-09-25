@@ -279,6 +279,86 @@
    "object": "candle",
    "icon": "assets/icons/items/candle.png"
   },
+  "cerulite_axe": {
+   "model": "assets/models/items/cerulite_axe.glb",
+   "icon": "assets/icons/items/cerulite_axe.png"
+  },
+  "cerulite_bar": {
+   "model": "assets/models/items/cerulite_bar.glb",
+   "icon": "assets/icons/items/cerulite_bar.png"
+  },
+  "cerulite_bow": {
+   "model": "assets/models/items/cerulite_bow.glb",
+   "icon": "assets/icons/items/cerulite_bow.png"
+  },
+  "cerulite_broadsword": {
+   "model": "assets/models/items/cerulite_broadsword.glb",
+   "icon": "assets/icons/items/cerulite_broadsword.png"
+  },
+  "cerulite_chainmail": {
+   "model": "assets/models/items/cerulite_chainmail.glb",
+   "icon": "assets/icons/items/cerulite_chainmail.png"
+  },
+  "cerulite_greaves": {
+   "model": "assets/models/items/cerulite_greaves.glb",
+   "icon": "assets/icons/items/cerulite_greaves.png"
+  },
+  "cerulite_hammer": {
+   "model": "assets/models/items/cerulite_hammer.glb",
+   "icon": "assets/icons/items/cerulite_hammer.png"
+  },
+  "cerulite_helmet": {
+   "model": "assets/models/items/cerulite_helmet.glb",
+   "icon": "assets/icons/items/cerulite_helmet.png"
+  },
+  "cerulite_pickaxe": {
+   "model": "assets/models/items/cerulite_pickaxe.glb",
+   "icon": "assets/icons/items/cerulite_pickaxe.png"
+  },
+  "cerulite_shortsword": {
+   "model": "assets/models/items/cerulite_shortsword.glb",
+   "icon": "assets/icons/items/cerulite_shortsword.png"
+  },
+  "cinder_axe": {
+   "model": "assets/models/items/cinder_axe.glb",
+   "icon": "assets/icons/items/cinder_axe.png"
+  },
+  "cinder_bar": {
+   "model": "assets/models/items/cinder_bar.glb",
+   "icon": "assets/icons/items/cinder_bar.png"
+  },
+  "cinder_bow": {
+   "model": "assets/models/items/cinder_bow.glb",
+   "icon": "assets/icons/items/cinder_bow.png"
+  },
+  "cinder_broadsword": {
+   "model": "assets/models/items/cinder_broadsword.glb",
+   "icon": "assets/icons/items/cinder_broadsword.png"
+  },
+  "cinder_chainmail": {
+   "model": "assets/models/items/cinder_chainmail.glb",
+   "icon": "assets/icons/items/cinder_chainmail.png"
+  },
+  "cinder_greaves": {
+   "model": "assets/models/items/cinder_greaves.glb",
+   "icon": "assets/icons/items/cinder_greaves.png"
+  },
+  "cinder_hammer": {
+   "model": "assets/models/items/cinder_hammer.glb",
+   "icon": "assets/icons/items/cinder_hammer.png"
+  },
+  "cinder_helmet": {
+   "model": "assets/models/items/cinder_helmet.glb",
+   "icon": "assets/icons/items/cinder_helmet.png"
+  },
+  "cinder_pickaxe": {
+   "model": "assets/models/items/cinder_pickaxe.glb",
+   "icon": "assets/icons/items/cinder_pickaxe.png"
+  },
+  "cinder_shortsword": {
+   "model": "assets/models/items/cinder_shortsword.glb",
+   "icon": "assets/icons/items/cinder_shortsword.png"
+  },
   "copper_axe": {
    "model": "assets/models/items/copper_axe.glb",
    "icon": "assets/icons/items/copper_axe.png"
@@ -326,6 +406,46 @@
   "courier_boots": {
    "model": "assets/models/items/courier_boots.glb",
    "icon": "assets/icons/items/courier_boots.png"
+  },
+  "crimsite_axe": {
+   "model": "assets/models/items/crimsite_axe.glb",
+   "icon": "assets/icons/items/crimsite_axe.png"
+  },
+  "crimsite_bar": {
+   "model": "assets/models/items/crimsite_bar.glb",
+   "icon": "assets/icons/items/crimsite_bar.png"
+  },
+  "crimsite_bow": {
+   "model": "assets/models/items/crimsite_bow.glb",
+   "icon": "assets/icons/items/crimsite_bow.png"
+  },
+  "crimsite_broadsword": {
+   "model": "assets/models/items/crimsite_broadsword.glb",
+   "icon": "assets/icons/items/crimsite_broadsword.png"
+  },
+  "crimsite_chainmail": {
+   "model": "assets/models/items/crimsite_chainmail.glb",
+   "icon": "assets/icons/items/crimsite_chainmail.png"
+  },
+  "crimsite_greaves": {
+   "model": "assets/models/items/crimsite_greaves.glb",
+   "icon": "assets/icons/items/crimsite_greaves.png"
+  },
+  "crimsite_hammer": {
+   "model": "assets/models/items/crimsite_hammer.glb",
+   "icon": "assets/icons/items/crimsite_hammer.png"
+  },
+  "crimsite_helmet": {
+   "model": "assets/models/items/crimsite_helmet.glb",
+   "icon": "assets/icons/items/crimsite_helmet.png"
+  },
+  "crimsite_pickaxe": {
+   "model": "assets/models/items/crimsite_pickaxe.glb",
+   "icon": "assets/icons/items/crimsite_pickaxe.png"
+  },
+  "crimsite_shortsword": {
+   "model": "assets/models/items/crimsite_shortsword.glb",
+   "icon": "assets/icons/items/crimsite_shortsword.png"
   },
   "diamond": {
    "model": "assets/models/items/diamond.glb",
@@ -567,6 +687,46 @@
    "model": "assets/models/items/mushroom.glb",
    "icon": "assets/icons/items/mushroom.png"
   },
+  "orchidite_axe": {
+   "model": "assets/models/items/orchidite_axe.glb",
+   "icon": "assets/icons/items/orchidite_axe.png"
+  },
+  "orchidite_bar": {
+   "model": "assets/models/items/orchidite_bar.glb",
+   "icon": "assets/icons/items/orchidite_bar.png"
+  },
+  "orchidite_bow": {
+   "model": "assets/models/items/orchidite_bow.glb",
+   "icon": "assets/icons/items/orchidite_bow.png"
+  },
+  "orchidite_broadsword": {
+   "model": "assets/models/items/orchidite_broadsword.glb",
+   "icon": "assets/icons/items/orchidite_broadsword.png"
+  },
+  "orchidite_chainmail": {
+   "model": "assets/models/items/orchidite_chainmail.glb",
+   "icon": "assets/icons/items/orchidite_chainmail.png"
+  },
+  "orchidite_greaves": {
+   "model": "assets/models/items/orchidite_greaves.glb",
+   "icon": "assets/icons/items/orchidite_greaves.png"
+  },
+  "orchidite_hammer": {
+   "model": "assets/models/items/orchidite_hammer.glb",
+   "icon": "assets/icons/items/orchidite_hammer.png"
+  },
+  "orchidite_helmet": {
+   "model": "assets/models/items/orchidite_helmet.glb",
+   "icon": "assets/icons/items/orchidite_helmet.png"
+  },
+  "orchidite_pickaxe": {
+   "model": "assets/models/items/orchidite_pickaxe.glb",
+   "icon": "assets/icons/items/orchidite_pickaxe.png"
+  },
+  "orchidite_shortsword": {
+   "model": "assets/models/items/orchidite_shortsword.glb",
+   "icon": "assets/icons/items/orchidite_shortsword.png"
+  },
   "platinum_axe": {
    "model": "assets/models/items/platinum_axe.glb",
    "icon": "assets/icons/items/platinum_axe.png"
@@ -615,6 +775,46 @@
    "object": "rail",
    "icon": "assets/icons/items/rail.png"
   },
+  "rosalite_axe": {
+   "model": "assets/models/items/rosalite_axe.glb",
+   "icon": "assets/icons/items/rosalite_axe.png"
+  },
+  "rosalite_bar": {
+   "model": "assets/models/items/rosalite_bar.glb",
+   "icon": "assets/icons/items/rosalite_bar.png"
+  },
+  "rosalite_bow": {
+   "model": "assets/models/items/rosalite_bow.glb",
+   "icon": "assets/icons/items/rosalite_bow.png"
+  },
+  "rosalite_broadsword": {
+   "model": "assets/models/items/rosalite_broadsword.glb",
+   "icon": "assets/icons/items/rosalite_broadsword.png"
+  },
+  "rosalite_chainmail": {
+   "model": "assets/models/items/rosalite_chainmail.glb",
+   "icon": "assets/icons/items/rosalite_chainmail.png"
+  },
+  "rosalite_greaves": {
+   "model": "assets/models/items/rosalite_greaves.glb",
+   "icon": "assets/icons/items/rosalite_greaves.png"
+  },
+  "rosalite_hammer": {
+   "model": "assets/models/items/rosalite_hammer.glb",
+   "icon": "assets/icons/items/rosalite_hammer.png"
+  },
+  "rosalite_helmet": {
+   "model": "assets/models/items/rosalite_helmet.glb",
+   "icon": "assets/icons/items/rosalite_helmet.png"
+  },
+  "rosalite_pickaxe": {
+   "model": "assets/models/items/rosalite_pickaxe.glb",
+   "icon": "assets/icons/items/rosalite_pickaxe.png"
+  },
+  "rosalite_shortsword": {
+   "model": "assets/models/items/rosalite_shortsword.glb",
+   "icon": "assets/icons/items/rosalite_shortsword.png"
+  },
   "rotten_bait": {
    "model": "assets/models/items/rotten_bait.glb",
    "icon": "assets/icons/items/rotten_bait.png"
@@ -622,6 +822,46 @@
   "ruby": {
    "model": "assets/models/items/ruby.glb",
    "icon": "assets/icons/items/ruby.png"
+  },
+  "sanguite_axe": {
+   "model": "assets/models/items/sanguite_axe.glb",
+   "icon": "assets/icons/items/sanguite_axe.png"
+  },
+  "sanguite_bar": {
+   "model": "assets/models/items/sanguite_bar.glb",
+   "icon": "assets/icons/items/sanguite_bar.png"
+  },
+  "sanguite_bow": {
+   "model": "assets/models/items/sanguite_bow.glb",
+   "icon": "assets/icons/items/sanguite_bow.png"
+  },
+  "sanguite_broadsword": {
+   "model": "assets/models/items/sanguite_broadsword.glb",
+   "icon": "assets/icons/items/sanguite_broadsword.png"
+  },
+  "sanguite_chainmail": {
+   "model": "assets/models/items/sanguite_chainmail.glb",
+   "icon": "assets/icons/items/sanguite_chainmail.png"
+  },
+  "sanguite_greaves": {
+   "model": "assets/models/items/sanguite_greaves.glb",
+   "icon": "assets/icons/items/sanguite_greaves.png"
+  },
+  "sanguite_hammer": {
+   "model": "assets/models/items/sanguite_hammer.glb",
+   "icon": "assets/icons/items/sanguite_hammer.png"
+  },
+  "sanguite_helmet": {
+   "model": "assets/models/items/sanguite_helmet.glb",
+   "icon": "assets/icons/items/sanguite_helmet.png"
+  },
+  "sanguite_pickaxe": {
+   "model": "assets/models/items/sanguite_pickaxe.glb",
+   "icon": "assets/icons/items/sanguite_pickaxe.png"
+  },
+  "sanguite_shortsword": {
+   "model": "assets/models/items/sanguite_shortsword.glb",
+   "icon": "assets/icons/items/sanguite_shortsword.png"
   },
   "sapphire": {
    "model": "assets/models/items/sapphire.glb",
@@ -690,6 +930,46 @@
   "starshard": {
    "model": "assets/models/items/starshard.glb",
    "icon": "assets/icons/items/starshard.png"
+  },
+  "stellite_axe": {
+   "model": "assets/models/items/stellite_axe.glb",
+   "icon": "assets/icons/items/stellite_axe.png"
+  },
+  "stellite_bar": {
+   "model": "assets/models/items/stellite_bar.glb",
+   "icon": "assets/icons/items/stellite_bar.png"
+  },
+  "stellite_bow": {
+   "model": "assets/models/items/stellite_bow.glb",
+   "icon": "assets/icons/items/stellite_bow.png"
+  },
+  "stellite_broadsword": {
+   "model": "assets/models/items/stellite_broadsword.glb",
+   "icon": "assets/icons/items/stellite_broadsword.png"
+  },
+  "stellite_chainmail": {
+   "model": "assets/models/items/stellite_chainmail.glb",
+   "icon": "assets/icons/items/stellite_chainmail.png"
+  },
+  "stellite_greaves": {
+   "model": "assets/models/items/stellite_greaves.glb",
+   "icon": "assets/icons/items/stellite_greaves.png"
+  },
+  "stellite_hammer": {
+   "model": "assets/models/items/stellite_hammer.glb",
+   "icon": "assets/icons/items/stellite_hammer.png"
+  },
+  "stellite_helmet": {
+   "model": "assets/models/items/stellite_helmet.glb",
+   "icon": "assets/icons/items/stellite_helmet.png"
+  },
+  "stellite_pickaxe": {
+   "model": "assets/models/items/stellite_pickaxe.glb",
+   "icon": "assets/icons/items/stellite_pickaxe.png"
+  },
+  "stellite_shortsword": {
+   "model": "assets/models/items/stellite_shortsword.glb",
+   "icon": "assets/icons/items/stellite_shortsword.png"
   },
   "stinger": {
    "model": "assets/models/items/stinger.glb",
@@ -806,6 +1086,86 @@
   "tungsten_shortsword": {
    "model": "assets/models/items/tungsten_shortsword.glb",
    "icon": "assets/icons/items/tungsten_shortsword.png"
+  },
+  "umbrite_axe": {
+   "model": "assets/models/items/umbrite_axe.glb",
+   "icon": "assets/icons/items/umbrite_axe.png"
+  },
+  "umbrite_bar": {
+   "model": "assets/models/items/umbrite_bar.glb",
+   "icon": "assets/icons/items/umbrite_bar.png"
+  },
+  "umbrite_bow": {
+   "model": "assets/models/items/umbrite_bow.glb",
+   "icon": "assets/icons/items/umbrite_bow.png"
+  },
+  "umbrite_broadsword": {
+   "model": "assets/models/items/umbrite_broadsword.glb",
+   "icon": "assets/icons/items/umbrite_broadsword.png"
+  },
+  "umbrite_chainmail": {
+   "model": "assets/models/items/umbrite_chainmail.glb",
+   "icon": "assets/icons/items/umbrite_chainmail.png"
+  },
+  "umbrite_greaves": {
+   "model": "assets/models/items/umbrite_greaves.glb",
+   "icon": "assets/icons/items/umbrite_greaves.png"
+  },
+  "umbrite_hammer": {
+   "model": "assets/models/items/umbrite_hammer.glb",
+   "icon": "assets/icons/items/umbrite_hammer.png"
+  },
+  "umbrite_helmet": {
+   "model": "assets/models/items/umbrite_helmet.glb",
+   "icon": "assets/icons/items/umbrite_helmet.png"
+  },
+  "umbrite_pickaxe": {
+   "model": "assets/models/items/umbrite_pickaxe.glb",
+   "icon": "assets/icons/items/umbrite_pickaxe.png"
+  },
+  "umbrite_shortsword": {
+   "model": "assets/models/items/umbrite_shortsword.glb",
+   "icon": "assets/icons/items/umbrite_shortsword.png"
+  },
+  "verdite_axe": {
+   "model": "assets/models/items/verdite_axe.glb",
+   "icon": "assets/icons/items/verdite_axe.png"
+  },
+  "verdite_bar": {
+   "model": "assets/models/items/verdite_bar.glb",
+   "icon": "assets/icons/items/verdite_bar.png"
+  },
+  "verdite_bow": {
+   "model": "assets/models/items/verdite_bow.glb",
+   "icon": "assets/icons/items/verdite_bow.png"
+  },
+  "verdite_broadsword": {
+   "model": "assets/models/items/verdite_broadsword.glb",
+   "icon": "assets/icons/items/verdite_broadsword.png"
+  },
+  "verdite_chainmail": {
+   "model": "assets/models/items/verdite_chainmail.glb",
+   "icon": "assets/icons/items/verdite_chainmail.png"
+  },
+  "verdite_greaves": {
+   "model": "assets/models/items/verdite_greaves.glb",
+   "icon": "assets/icons/items/verdite_greaves.png"
+  },
+  "verdite_hammer": {
+   "model": "assets/models/items/verdite_hammer.glb",
+   "icon": "assets/icons/items/verdite_hammer.png"
+  },
+  "verdite_helmet": {
+   "model": "assets/models/items/verdite_helmet.glb",
+   "icon": "assets/icons/items/verdite_helmet.png"
+  },
+  "verdite_pickaxe": {
+   "model": "assets/models/items/verdite_pickaxe.glb",
+   "icon": "assets/icons/items/verdite_pickaxe.png"
+  },
+  "verdite_shortsword": {
+   "model": "assets/models/items/verdite_shortsword.glb",
+   "icon": "assets/icons/items/verdite_shortsword.png"
   },
   "vital_crystal": {
    "model": "assets/models/items/vital_crystal.glb",

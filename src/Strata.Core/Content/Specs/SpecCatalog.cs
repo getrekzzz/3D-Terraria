@@ -12,6 +12,7 @@ public enum SpecKind
     ProjectileHit,
     TownService,
     CreatureEffect,
+    Mutation,
 }
 
 /// <summary>
@@ -57,6 +58,7 @@ public sealed class SpecCatalog
         ProjectileHitSpecs.Register(c);
         TownServiceSpecs.Register(c);
         CreatureEffectSpecs.Register(c);
+        MutationSpecs.Register(c);
         Conditions.ConditionCompiler.RegisterSpecs(c);
         return c;
     }

@@ -35,6 +35,13 @@
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Mawwall) and
   fires `Raised` (announcements; the hook for world mutations).
+* **World mutations** — `data/mutations.json` defines mutations triggered by flags (`oreVeins`: vein rules with
+  `generate: false` placed by the shared `VeinStamper`; `wedge`: a slanted slab converted through a conversion table,
+  which is also a zone). `MutationDirector` appends them to the world's `MutationLog` (saved as id + seed);
+  `WorldSession.Produce` brings generated or saved chunks up to the log's level on worker threads, and loaded chunks
+  are caught up a few per tick as edit batches (lighting, meshing and saves follow). `SpreadSystem` randomly updates
+  cells of loaded chunks: sources of an active spread rule convert neighbours through its conversion
+  (`data/config/spread.json`).
 * **Liquids** — `LiquidSimulator` (Simulation/Liquids) is a cellular automaton over *active* cells only:
   cells woken by edits (`VoxelWorld.Edited`), by a chunk loading next to them (`WorldSession.ChunkInstalled`
   scan that wakes only cells that could move), or by their own flow. Each liquid steps every `flowInterval`

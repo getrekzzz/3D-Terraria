@@ -192,4 +192,51 @@ public class MeshingTests
         Assert.Equal(15, LightValue.Sky(mesh.Light[ChunkMath.Index(10, 10, 10)]));
         Assert.Equal(0, LightValue.Sky(mesh.Light[ChunkMath.Index(10, 3, 10)]));
     }
+
+    /// <summary>A 3×3×3-chunk air world with stone ground at y 32–39 and a stone roof slab over the middle.</summary>
+    private static (VoxelWorld World, SkyMap Sky) GroundUnderRoof(int roofBottom, int roofTop)
+    {
+        var world = AirWorldWith((b, stone, _) =>
+        {
+            for (int x = 0; x < 96; x++)
+                for (int z = 0; z < 96; z++)
+                {
+                    for (int y = 32; y < 40; y++) b.SetBlock(x, y, z, stone);
+                    if (x is >= 16 and < 80 && z is >= 16 and < 80)
+                        for (int y = roofBottom; y <= roofTop; y++) b.SetBlock(x, y, z, stone);
+                }
+        });
+        var sky = new SkyMap(world, Tables, (_, _) => 40, (_, _) => 2);
+        for (int cz = 0; cz < 3; cz++)
+            for (int cx = 0; cx < 3; cx++) sky.Rebuild(cx, cz);
+        return (world, sky);
+    }
+
+    [Fact]
+    public void GroundUnderAFloatingRoofIsOutdoorShadeNotACave()
+    {
+        var (world, sky) = GroundUnderRoof(roofBottom: 70, roofTop: 74);
+        Assert.Equal(75, sky.SkyTop(48, 48));
+        Assert.Equal(40, sky.ShadeTop(48, 48));
+        Assert.Equal(40, sky.ShadeTop(4, 4)); // open sky: shade equals the sky top
+        Assert.Equal(40, sky.SkyTop(4, 4));
+        var nb = Neighborhood.Capture(world, new Int3(1, 1, 1))!;
+        var shaded = ChunkMesher.Build(nb, Tables, sky.SkyTop, Array.Empty<LightSource>(), sky.ShadeTop);
+        var dark = ChunkMesher.Build(nb, Tables, sky.SkyTop, Array.Empty<LightSource>());
+        int centre = ChunkMath.Index(16, 10, 16); // (48, 42, 48): on the ground, 30 cells under the roof's middle
+        Assert.Equal(LightEngine.ShadeLight, LightValue.Sky(shaded.Light[centre]));
+        Assert.Equal(0, LightValue.Sky(dark.Light[centre]));
+    }
+
+    [Fact]
+    public void LowRoofsAndTheTerrainItselfStayShadowed()
+    {
+        var (world, sky) = GroundUnderRoof(roofBottom: 46, roofTop: 48); // a 6-cell room, like a house
+        Assert.Equal(sky.SkyTop(48, 48), sky.ShadeTop(48, 48));
+        var nb = Neighborhood.Capture(world, new Int3(1, 1, 1))!;
+        var mesh = ChunkMesher.Build(nb, Tables, sky.SkyTop, Array.Empty<LightSource>(), sky.ShadeTop);
+        Assert.Equal(0, LightValue.Sky(mesh.Light[ChunkMath.Index(16, 10, 16)]));
+        // Solid ground under open sky has no shade range either.
+        Assert.Equal(sky.SkyTop(4, 4), sky.ShadeTop(4, 4));
+    }
 }

@@ -68,7 +68,23 @@ public sealed partial class EnvironmentController : Node3D
     /// <summary>Tint of the active world event (crimson moon…), or null.</summary>
     public Color? EventTint { get; set; }
 
+    /// <summary>The look of the biome around the camera (fog colour and density, sky and ambient tint), from data.</summary>
+    public Strata.Core.Content.Defs.BiomeDef? Biome { get; set; }
+
     private float _eventBlend;
+    private Color _biomeFog = new(0.62f, 0.72f, 0.82f), _biomeSky = Colors.White, _biomeAmbient = Colors.White;
+    private float _biomeDensity = 1f;
+
+    /// <summary>Eases the biome look towards the current biome's (a few seconds to cross into a new one).</summary>
+    private void BlendBiome(double delta)
+    {
+        float k = 1f - Mathf.Exp(-(float)delta * 0.8f);
+        var b = Biome;
+        _biomeFog = _biomeFog.Lerp(b != null ? Color.FromHtml(b.FogColor) : new Color(0.62f, 0.72f, 0.82f), k);
+        _biomeSky = _biomeSky.Lerp(b != null ? Color.FromHtml(b.SkyTint) : Colors.White, k);
+        _biomeAmbient = _biomeAmbient.Lerp(b != null ? Color.FromHtml(b.AmbientTint) : Colors.White, k);
+        _biomeDensity = Mathf.Lerp(_biomeDensity, b?.FogDensity ?? 1f, k);
+    }
 
     /// <summary>Updates lighting for the given clock; <paramref name="depthBelowSurface"/> (m) darkens fog underground.</summary>
     public void Apply(GameClock clock, float depthBelowSurface, double delta)
@@ -100,7 +116,8 @@ public sealed partial class EnvironmentController : Node3D
         var ambient = nightAmbient.Lerp(dayAmbient, Daylight).Lerp(new Color(0.75f, 0.5f, 0.4f), dusk * 0.4f);
         _eventBlend = Mathf.MoveToward(_eventBlend, EventTint.HasValue ? 1f : 0f, (float)delta * 0.3f);
         var eventTint = Colors.White.Lerp(EventTint ?? Colors.White, _eventBlend);
-        ambient *= Colors.White.Lerp(eventTint, 0.45f);
+        BlendBiome(delta);
+        ambient *= Colors.White.Lerp(eventTint, 0.45f) * Colors.White.Lerp(_biomeAmbient, 0.5f);
         RenderingServer.GlobalShaderParameterSet("strata_sky_ambient", ambient);
         RenderingServer.GlobalShaderParameterSet("strata_daylight", Daylight);
         RenderingServer.GlobalShaderParameterSet("strata_time", _time);
@@ -110,13 +127,15 @@ public sealed partial class EnvironmentController : Node3D
         _sky.SetShaderParameter("sun_dir", sunDir);
         _sky.SetShaderParameter("moon_dir", moonDir);
         _sky.SetShaderParameter("moon_phase", clock.MoonPhase / 8f);
-        _sky.SetShaderParameter("tint", Colors.White.Lerp(eventTint, 0.7f));
+        _sky.SetShaderParameter("tint", Colors.White.Lerp(eventTint, 0.7f) * Colors.White.Lerp(_biomeSky, 0.6f));
 
         // Fog: hazy outdoors, thick and dark in the depths.
         float under = Mathf.Clamp(depthBelowSurface / 30f, 0f, 1f);
-        var skyFog = new Color(0.62f, 0.72f, 0.82f).Lerp(new Color(0.03f, 0.04f, 0.07f), 1f - Daylight);
-        _env.FogLightColor = skyFog.Lerp(new Color(0.02f, 0.02f, 0.03f), under) * Colors.White.Lerp(eventTint, 0.5f);
-        _env.FogDensity = Mathf.Lerp(0.0022f, 0.018f, under);
+        // The biome's fog colour shows by day on the surface and faintly in the depths (the crypt's gloom, cinder haze).
+        var skyFog = _biomeFog.Lerp(new Color(0.03f, 0.04f, 0.07f), 1f - Daylight);
+        var deepFog = new Color(0.02f, 0.02f, 0.03f).Lerp(_biomeFog * 0.25f, 0.5f);
+        _env.FogLightColor = skyFog.Lerp(deepFog, under) * Colors.White.Lerp(eventTint, 0.5f);
+        _env.FogDensity = Mathf.Lerp(0.0022f, 0.018f, under) * _biomeDensity;
         _env.FogSkyAffect = Mathf.Lerp(0.25f, 1f, under);
     }
 

@@ -8,7 +8,16 @@
     "silver": "#e2e6ee",
     "tungsten": "#94b08e",
     "gold": "#f2c850",
-    "platinum": "#cfe0ee"
+    "platinum": "#cfe0ee",
+    "umbrite": "#7a5ab8",
+    "sanguite": "#c0404e",
+    "cinder": "#e0602a",
+    "cerulite": "#3a86f0",
+    "rosalite": "#f08a58",
+    "verdite": "#38d878",
+    "orchidite": "#f06ac0",
+    "crimsite": "#e8283c",
+    "stellite": "#dce8f8"
   },
   "objects": {
     "oak_tree": {

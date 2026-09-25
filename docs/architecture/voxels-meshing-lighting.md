@@ -11,6 +11,10 @@
 ## Lighting (stateless)
 Per mesh job, a 64³ neighbourhood (chunk ± 16 cells) is lit by BFS: 4-bit skylight seeded from the sky map
 (per-column highest opaque cell) and RGB block light from emissive blocks and tile-object light sources.
+Open air under a *floating* roof — a sky island, an arch, a high canopy: the first blocking cell sits above the
+terrain surface estimate with at least 12 cells of air below it — is seeded as outdoor shade (sky 12) from the ground
+up (`SkyMap.ShadeTop`), so the land under an island is shaded rather than cave-dark; caves and ordinary rooms keep
+the old behaviour.
 Because light spreads ≤15 cells the result is exact; no global light state exists. The chunk keeps the
 result for gameplay (spawn light conditions, `LightProbe` for props/creatures/drops).
 Shaders apply `ambient(time) × sky + block light` as emission, and gate the sun by skylight so caves stay

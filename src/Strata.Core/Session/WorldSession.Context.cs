@@ -24,11 +24,16 @@ public sealed partial class WorldSession
         return ctx;
     }
 
-    /// <summary>Zone biomes (the crypt, spider nests, marble halls…) whose planned features contain the cell.</summary>
+    /// <summary>
+    /// Zone biomes containing the cell: planned features (the crypt, spider nests, marble halls…) and regions world
+    /// mutations converted (the radiant reach and blights of hardmode).
+    /// </summary>
     public IEnumerable<string> ZonesAt(Int3 cell)
     {
         foreach (var f in Generator.Plan.Features.At(cell))
             if (f.Zone != null && f.InZone(cell)) yield return f.Zone;
+        foreach (var z in Mutations.Zones)
+            if (z.InZone(cell)) yield return z.Zone;
     }
 
     /// <summary>
@@ -40,7 +45,9 @@ public sealed partial class WorldSession
         var chunk = World.GetChunk(coord) ?? throw new InvalidOperationException($"Chunk {coord} is not loaded.");
         var generated = Generator.Generate(coord);
         foreach (var obj in World.TileObjects.InChunk(coord).ToList()) World.TileObjects.Remove(obj);
-        chunk.Publish(generated.Data);
+        var steps = Mutations.Steps; // the world's mutations still apply to a regenerated chunk
+        chunk.Publish(WorldGen.Mutations.MutationLog.Apply(generated.Data, coord, steps, 0));
+        chunk.MutationLevel = steps.Count;
         chunk.Modified = true;
         foreach (var obj in generated.Objects) World.TileObjects.TryAdd(obj);
         var dirty = new HashSet<Int3>();

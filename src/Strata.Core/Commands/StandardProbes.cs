@@ -49,6 +49,13 @@ internal static class StandardProbes
             return null;
         });
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
+        // Voxel light at the player's head (0–15; -1 before the chunk is lit) and the sky map's column top.
+        ctx.AddProbe("light.sky", () => HeadLight(w, ctx, block: false));
+        ctx.AddProbe("light.block", () => HeadLight(w, ctx, block: true));
+        ctx.AddProbe("sky.top", () => w.Session.Sky.SkyTop(ctx.Player.FeetCell.X, ctx.Player.FeetCell.Z));
+        ctx.AddProbe("mutation.level", () => w.Session.Mutations.Level);
+        ctx.AddProbe("mutation.behind", () => w.Mutations.Behind);
+        ctx.AddProbe("spread.conversions", () => w.Spread.Conversions);
         ctx.AddProbe("player.in_liquid", () => ctx.Player.Liquid?.Code ?? 0);
         ctx.AddProbe("player.submerged", () => ctx.Player.Submerged ? 1 : 0);
         ctx.AddProbe("player.breath", () => ctx.Player.Breath);
@@ -87,6 +94,15 @@ internal static class StandardProbes
             ushort b = w.Session.World.GetBlock(ctx.Player.FeetCell + new Int3(dx, dy, dz));
             return b == VoxelWorld.Unknown ? -1 : b;
         });
+    }
+
+    private static double HeadLight(Session.GameWorld w, CommandContext ctx, bool block)
+    {
+        var cell = ctx.Player.FeetCell + Int3.Up;
+        var chunk = w.Session.World.GetChunk(ChunkMath.CellToChunk(cell));
+        if (chunk?.Light == null) return -1;
+        ushort v = chunk.Light[ChunkMath.Index(ChunkMath.CellToLocal(cell))];
+        return block ? Meshing.LightValue.BlockMax(v) : Meshing.LightValue.Sky(v);
     }
 
     public static Int3 Cell(System.Numerics.Vector3 meters) =>
