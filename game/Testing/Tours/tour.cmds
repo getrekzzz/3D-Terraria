@@ -1,4 +1,4 @@
-# Screenshot tour: surface biomes, caves at three depths, the underworld, a town, night and the crypt.
+# Screenshot tour: surface biomes, caves at three depths, the underworld, a town, night, the crypt and the Mawwall.
 # Rendering required for images (headless runs only exercise the route):
 #   godot --path . --rendering-driver vulkan -- --world=tour --size=small --new --player=tour --fresh-player \
 #         --view=4 --shots=/tmp/shots --smoke=res://game/Testing/Tours/tour.cmds
@@ -110,4 +110,24 @@ heal
 screenshot 12_crypt_warden
 wait_until screenshot.pending == 0 900
 killall
+
+# The Mawwall rising over an obsidian ledge in the underworld (god mode keeps the camera alive).
+god on
+tp cave underworld
+wait_until player.frozen == 0 300
+liquids off
+fill -10 -2 -10 10 -1 10 obsidian
+fill -10 0 -10 10 8 10 air
+liquid none -10 0 -10 10 8 10
+wait_until stream.idle == 1 1200
+wait 1
+boss mawwall 5
+aim -1 0.2 0
+wait 16
+heal
+screenshot 13_mawwall
+wait_until screenshot.pending == 0 900
+killall
+liquids on
+god off
 assert errors == 0

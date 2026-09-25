@@ -44,6 +44,11 @@ public sealed class BossInfo
 
     /// <summary>Stronger by day instead of leaving (the crypt's curse): multipliers on damage and speed.</summary>
     public DayEnrage? DayEnrage { get; init; }
+
+    /// <summary>Model tiled over the creature's <see cref="Gameplay.Entities.Npc.Barrier"/> (a wall's flesh), and its tile size (m).</summary>
+    public string? BarrierModel { get; init; }
+
+    public float BarrierTile { get; init; } = 4f;
 }
 
 /// <summary>A projectile a creature fires at its target (any brain).</summary>
@@ -67,6 +72,9 @@ public sealed class RangedAttack
 
     /// <summary>Random spread per projectile (degrees).</summary>
     public float Spread { get; init; }
+
+    /// <summary>Volleys come from the body parts (segments) in turn, e.g. a wall's eyes, instead of the body.</summary>
+    public bool FromParts { get; init; }
 }
 
 /// <summary>A hostile or passive creature. Behaviour comes from its <see cref="Brain"/> spec.</summary>
@@ -116,6 +124,9 @@ public sealed class EnemyDef : ContentDef
 
     /// <summary>Cannot be harmed (guardians that enforce progression).</summary>
     public bool Invulnerable { get; init; }
+
+    /// <summary>Colour of the stalk or tether drawn from its anchor (rooted and tethered creatures; default vine green).</summary>
+    public string? TetherColor { get; init; }
 
     /// <summary>Leaves at once when these hold where its target stands (the crypt guardian once you step outside).</summary>
     public TypedSpec[] DespawnWhen { get; init; } = Array.Empty<TypedSpec>();

@@ -33,6 +33,9 @@ public sealed partial class TownSystem
         }
     }
 
+    /// <summary>Kills a resident outright (a sacrifice); they return after the respawn delay like any fallen resident.</summary>
+    public void Slay(TownNpc r) => Damage(r, r.Life + r.Def.Defense, r.Position);
+
     /// <summary>Applies a hit to a resident from a point (knockback away from it).</summary>
     public void Damage(TownNpc r, int amount, Vector3 from)
     {

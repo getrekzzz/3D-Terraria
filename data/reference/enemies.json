@@ -619,6 +619,16 @@
    ]
   },
   {
+   "id": "terraria:the_hungry",
+   "name": "The Hungry",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "wall of flesh",
+   "mechanics": [
+    "tethered"
+   ]
+  },
+  {
    "id": "terraria:goblin_peon",
    "name": "Goblin Peon",
    "kind": "enemy",

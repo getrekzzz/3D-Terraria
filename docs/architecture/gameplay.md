@@ -27,8 +27,14 @@
 * **Events and bosses** — `EventDirector` rolls data-driven events at dusk/dawn (`data/events.json`) and
   feeds them to spawn-rule conditions; bosses are enemies with a `boss` block (arena radius, day despawn,
   segments for worms, per-part `segmentModels`, `dayEnrage`) driven by `GelSovereign`, `Watcher`, `Worm` and
-  `CryptWarden` brains (brains that `PositionsSegments` place free parts such as hands themselves); `summonBoss`
-  items and the keeper's `summonBoss` service check conditions and spawn them.
+  `CryptWarden` and `Mawwall` brains (brains that `PositionsSegments` place free parts such as hands or eyes
+  themselves; `ranged.fromParts` fires from them in turn). A brain may give its creature a `Barrier` (the Mawwall's
+  flesh: tiled `barrierModel`, hurts and throws out players behind it) and tether minions to it (`Leader`: their
+  anchor follows it and they die with it). `summonBoss` items, the keeper's `summonBoss` service and
+  `incinerationSummon` items (burned in lava in a given layer, sacrificing a resident) spawn bosses.
+* **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
+  command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Mawwall) and
+  fires `Raised` (announcements; the hook for world mutations).
 * **Liquids** — `LiquidSimulator` (Simulation/Liquids) is a cellular automaton over *active* cells only:
   cells woken by edits (`VoxelWorld.Edited`), by a chunk loading next to them (`WorldSession.ChunkInstalled`
   scan that wakes only cells that could move), or by their own flow. Each liquid steps every `flowInterval`
@@ -59,7 +65,8 @@
 
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
-`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …) used by `assert` and `wait_until`.
+`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …); debug commands such as
+`god`, `drop`, `slay` and `tp landmark` make fights and summons scriptable used by `assert` and `wait_until`.
 `game/Testing/Scripts/*.cmds` run headless in CI with `--smoke=` and print `SMOKE PASS`/`SMOKE FAIL`;
 `--exec="cmd;cmd"` runs commands at startup (screenshots, manual testing). Runner directives: `wait`,
 `wait_until <probe> <op> <value> [timeout]`, `hold <action> <seconds>`, `repeat <n> <command>`.

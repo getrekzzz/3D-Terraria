@@ -15,4 +15,10 @@ public sealed class ProgressionFlagDef : ContentDef
 
     /// <summary>Progression stage (reference model) this flag advances the world to.</summary>
     public string? Stage { get; init; }
+
+    /// <summary>Raised automatically as soon as every flag in <see cref="Requires"/> is set.</summary>
+    public bool AutoSet { get; init; }
+
+    /// <summary>Shown to players when the flag is raised.</summary>
+    public string? Announce { get; init; }
 }

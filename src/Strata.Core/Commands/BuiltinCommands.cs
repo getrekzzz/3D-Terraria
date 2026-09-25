@@ -117,8 +117,18 @@ public static class BuiltinCommands
             Name = "kill", Usage = "kill", Help = "Kills the player (tests respawn).",
             Run = (ctx, _) =>
             {
-                ctx.Player.State.Vitals.DamageDirect(int.MaxValue / 2);
+                ctx.Player.State.Vitals.Kill();
                 return CommandResult.Success("Killed.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "god", Usage = "god [on|off]", Help = "Debug: hits still land but the player cannot die (not saved).",
+            Run = (ctx, a) =>
+            {
+                var v = ctx.Player.State.Vitals;
+                v.Undying = (a.OptStr(0) ?? (v.Undying ? "off" : "on")) == "on";
+                return CommandResult.Success($"God mode {(v.Undying ? "on" : "off")}.");
             },
         });
         r.Register(new CommandDef
@@ -166,15 +176,15 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "flag", Aliases = new[] { "progress" }, Usage = "flag <id> [on|off]", Help = "Sets or clears a world progression flag.",
+            Name = "flag", Aliases = new[] { "progress" }, Usage = "flag <id> [on|off]", Help = "Sets (with its consequences, e.g. hardmode) or clears a world progression flag.",
             Run = (ctx, a) =>
             {
                 var s = ctx.World.Session;
                 var id = a.Str(0, "id");
                 if (!s.Content.Flags.Contains(id)) throw new CommandException($"unknown progression flag '{id}'");
                 bool on = (a.OptStr(1) ?? "on") != "off";
-                if (on) s.Flags.Add(id);
-                else s.Flags.Remove(id);
+                if (on) ctx.World.Progression.Set(id);
+                else ctx.World.Progression.Clear(id);
                 return CommandResult.Success($"{id} = {(on ? "on" : "off")}");
             },
         });

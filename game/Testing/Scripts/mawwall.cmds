@@ -1,0 +1,37 @@
+# The Mawwall: the wayfinder's effigy burned in underworld lava calls the wall (the wayfinder is its price); the wall
+# sweeps the cavity with its eyes firing and hungry mouths tethered to it; its fall turns the world to hardmode.
+wait_until player.frozen == 0 180
+spawning off
+town arrivals off
+heal
+god on
+wait_until town.wayfinder == 1 30
+tp cave underworld
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 300
+# A platform with a small lava pit in front of the player (the teleport may still be settling).
+liquids off
+fill -3 -1 -3 3 -1 7 stone
+fill -3 0 -3 3 3 7 air
+wait 1
+fill -1 -1 3 1 -1 5 air
+fill -1 -2 3 1 -2 5 stone
+liquid lava -1 -1 3 1 -1 5
+drop wayfinder_effigy 1 0 -1 4
+wait 1
+assert npcs.mawwall == 1
+assert town.wayfinder.alive == 0
+assert errors == 0
+
+# It fights for a while (the barrier and lasers must not break anything), then falls.
+wait 6
+assert player.alive == 1
+assert npcs.mawwall == 1
+slay mawwall
+assert flag.defeated_mawwall == 1
+assert flag.hardmode == 1
+wait 0.5
+assert npcs.hungry == 0
+liquids on
+god off
+assert errors == 0

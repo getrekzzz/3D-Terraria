@@ -20,6 +20,7 @@ public sealed partial class NpcRenderer : Node3D
         public required Label3D Health;
         public MeshInstance3D? Stalk;
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
+        public readonly List<CreatureVisual> Barrier = new();
         public Vector3 Shown;
         public float Squash = 1f;
         public float LastVy;
@@ -40,6 +41,7 @@ public sealed partial class NpcRenderer : Node3D
             if (!_views.Remove(npc.Id, out var view)) return;
             Release(view.Visual, view.Model);
             foreach (var (seg, model) in view.Segments) Release(seg, model);
+            if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
             view.Health.QueueFree();
             view.Stalk?.QueueFree();
         };
@@ -91,6 +93,7 @@ public sealed partial class NpcRenderer : Node3D
             var visual = view.Visual;
             visual.Position = view.Shown;
             if (npc.Segments.Count > 0) UpdateSegments(npc, view, world);
+            if (npc.Barrier != null) UpdateBarrier(npc, view, world);
             if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
             {
                 var v = new Vector3(npc.Velocity.X, npc.Velocity.Y, npc.Velocity.Z);
@@ -105,7 +108,7 @@ public sealed partial class NpcRenderer : Node3D
             var tint = Color.FromHtml(npc.Def.Tint);
             if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);
             visual.SetTint(tint);
-            visual.SetLight(LightProbe.Sample(world, view.Shown + Vector3.Up * 0.5f));
+            visual.SetLight(OwnLight(npc, LightProbe.Sample(world, view.Shown + Vector3.Up * 0.5f)));
             view.Health.Visible = npc.Life < npc.MaxLife;
             if (view.Health.Visible)
             {
@@ -146,7 +149,7 @@ public sealed partial class NpcRenderer : Node3D
             var dir = ahead - p;
             if (!freeParts && dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
             seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
-            seg.SetLight(LightProbe.Sample(world, p));
+            seg.SetLight(OwnLight(npc, LightProbe.Sample(world, p)));
             ahead = p;
         }
     }
@@ -194,10 +197,10 @@ public sealed partial class NpcRenderer : Node3D
         view.Stalk.GlobalTransform = new Transform3D(basis, root + span * 0.5f);
     }
 
-    private static MeshInstance3D NewStalk() => new()
+    private static MeshInstance3D NewStalk(string? color) => new()
     {
         Mesh = new CylinderMesh { TopRadius = 0.05f, BottomRadius = 0.09f, Height = 1f, RadialSegments = 6, Rings = 1 },
-        MaterialOverride = new StandardMaterial3D { AlbedoColor = new Color(0.25f, 0.45f, 0.15f), Roughness = 0.9f },
+        MaterialOverride = new StandardMaterial3D { AlbedoColor = color != null ? Color.FromHtml(color) : new Color(0.25f, 0.45f, 0.15f), Roughness = 0.9f },
     };
 
     private View? Create(Npc npc)
@@ -226,7 +229,7 @@ public sealed partial class NpcRenderer : Node3D
         MeshInstance3D? stalk = null;
         if (npc.Def.Brain.Type == Strata.Core.Content.Specs.BrainSpecs.Lunger)
         {
-            stalk = NewStalk();
+            stalk = NewStalk(npc.Def.TetherColor);
             AddChild(stalk);
         }
         var health = new Label3D

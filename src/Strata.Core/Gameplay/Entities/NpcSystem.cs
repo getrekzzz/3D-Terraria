@@ -46,6 +46,7 @@ public sealed partial class NpcSystem
             Content = world.Session.Content,
             Spawn = (def, at) => Spawn(def, at - new Vector3(0, def.Height * 0.25f * def.Scale, 0)),
             Carve = (center, radius) => world.Editor.Carve(center, radius),
+            Bands = world.Session.Generator.Plan.Bands,
         };
     }
 
@@ -102,6 +103,11 @@ public sealed partial class NpcSystem
         for (int i = _npcs.Count - 1; i >= 0; i--)
         {
             var npc = _npcs[i];
+            if (!FollowLeader(npc))
+            {
+                Remove(i);
+                continue;
+            }
             npc.Age++;
             if (npc.ImmuneTicks > 0) npc.ImmuneTicks--;
             if (npc.HurtFlash > 0) npc.HurtFlash--;
@@ -151,6 +157,7 @@ public sealed partial class NpcSystem
             Move(npc, brain, dt);
             if (npc.Def.Ranged != null && target != null) RangedAttack(npc, target, distance);
             if (npc.Def.ContactDamage && target != null) ContactDamage(npc, target);
+            if (npc.Barrier != null) BarrierEffects(npc);
             if (npc.Position.Y < 0) Remove(i);
         }
     }
@@ -251,7 +258,7 @@ public sealed partial class NpcSystem
         DeathEffects(npc);
         if (npc.Def.Boss is { } boss)
         {
-            if (boss.Flag != null) _world.Session.Flags.Add(boss.Flag);
+            if (boss.Flag != null) _world.Progression.Set(boss.Flag);
             BossDefeated?.Invoke(npc);
         }
         Killed?.Invoke(npc);
@@ -294,6 +301,8 @@ public sealed partial class NpcSystem
     {
         var npc = _npcs[index];
         _npcs.RemoveAt(index);
+        npc.Removed = true;
+        npc.Leader?.Followers.Remove(npc);
         Removed?.Invoke(npc);
     }
 }

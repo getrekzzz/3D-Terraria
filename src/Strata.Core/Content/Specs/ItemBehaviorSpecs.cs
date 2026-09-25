@@ -14,6 +14,7 @@ public static class ItemBehaviorSpecs
     public const string Consume = "consume";
     public const string SummonBoss = "summonBoss";
     public const string Bucket = "bucket";
+    public const string IncinerationSummon = "incinerationSummon";
 
     public static void Register(SpecCatalog c)
     {
@@ -28,6 +29,7 @@ public static class ItemBehaviorSpecs
         c.Register<ConsumeParams>(SpecKind.ItemBehavior, Consume);
         c.Register<SummonBossParams>(SpecKind.ItemBehavior, SummonBoss);
         c.Register<BucketParams>(SpecKind.ItemBehavior, Bucket);
+        c.Register<IncinerationSummonParams>(SpecKind.ItemBehavior, IncinerationSummon);
     }
 }
 
@@ -107,4 +109,22 @@ public sealed class BucketParams : SpecParams
 
     /// <summary>Minimum levels (of 31) the aimed pool must provide to fill the bucket.</summary>
     public int MinCollect { get; init; } = 16;
+}
+
+/// <summary>
+/// Summons a boss when the item is destroyed by a liquid (thrown into lava) in the given world layer — the wayfinder's
+/// effigy. When <see cref="KillsResident"/> is set that resident must be alive, and dies.
+/// </summary>
+public sealed class IncinerationSummonParams : SpecParams, IValidatableSpec
+{
+    public string Enemy { get; init; } = "";
+
+    /// <summary>World layer the item must burn in (surface, underground, cavern, underworld…).</summary>
+    public string Layer { get; init; } = "underworld";
+
+    public string? KillsResident { get; init; }
+
+    public string? Validate() =>
+        string.IsNullOrWhiteSpace(Enemy) ? "enemy is required"
+        : !Enum.TryParse<World.WorldLayer>(Layer, ignoreCase: true, out _) ? $"layer '{Layer}' is not a world layer" : null;
 }

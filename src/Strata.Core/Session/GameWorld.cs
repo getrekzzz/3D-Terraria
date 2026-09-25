@@ -115,6 +115,7 @@ public sealed class GameWorld : IDisposable
         Uses = new ItemUseTable(session.Content);
         ItemUse = new ItemUseSystem(this);
         Interaction = new ObjectInteraction(this);
+        Progression = new Gameplay.Progression.ProgressionSystem(this);
         Npcs = new NpcSystem(this);
         Melee = new MeleeSystem(Npcs, ItemUse);
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
@@ -126,6 +127,7 @@ public sealed class GameWorld : IDisposable
         Town = new TownSystem(this);
         Commerce = new TownCommerce(this, Town);
         LiquidEffects = new LiquidEffects(this);
+        Incineration = new Gameplay.Progression.IncinerationSummons(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
         Liquids.ChunksDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
@@ -139,6 +141,7 @@ public sealed class GameWorld : IDisposable
     public ItemUseTable Uses { get; }
     public ItemUseSystem ItemUse { get; }
     public ObjectInteraction Interaction { get; }
+    public Gameplay.Progression.ProgressionSystem Progression { get; }
     public NpcSystem Npcs { get; }
     public MeleeSystem Melee { get; }
     public ProjectileSystem Projectiles { get; }
@@ -150,6 +153,7 @@ public sealed class GameWorld : IDisposable
     public TownSystem Town { get; }
     public TownCommerce Commerce { get; }
     public LiquidEffects LiquidEffects { get; }
+    public Gameplay.Progression.IncinerationSummons Incineration { get; }
     public string? PlayerDirectory { get; }
     public List<PlayerEntity> Players { get; } = new();
 

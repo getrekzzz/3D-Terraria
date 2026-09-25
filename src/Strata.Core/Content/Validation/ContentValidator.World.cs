@@ -48,6 +48,7 @@ public static partial class ContentValidator
             ctx.Spec(e, SpecKind.Brain, e.Brain, "brain");
             ctx.Ref(e, ctx.Db.LootTables, e.Loot, "loot");
             ctx.Color(e, e.Tint, "tint");
+            ctx.Color(e, e.TetherColor, "tetherColor");
             ctx.Light(e, e.Light, "light");
             ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
             if (e.Boss is { } boss)
@@ -59,9 +60,14 @@ public static partial class ContentValidator
                 for (int i = 0; i < boss.SegmentModels.Length; i++)
                     ctx.Asset(e, $"assets/models/creatures/{boss.SegmentModels[i]}.glb", $"boss.segmentModels[{i}]");
                 if (boss.SegmentModels.Length > boss.Segments) ctx.Error(e, "boss.segmentModels lists more models than boss.segments.");
+                if (boss.BarrierModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.BarrierModel}.glb", "boss.barrierModel");
+                if (boss.BarrierTile <= 0) ctx.Error(e, "boss.barrierTile must be > 0.");
                 if (boss.DayEnrage is { Damage: <= 0 } or { Speed: <= 0 }) ctx.Error(e, "boss.dayEnrage multipliers must be > 0.");
             }
-            if (e.Brain.Type == BrainSpecs.CryptWarden && e.Boss is not { Segments: >= 2 }) ctx.Error(e, "the cryptWarden brain needs boss.segments >= 2 (its hands).");
+            if (e.Brain.Type is BrainSpecs.CryptWarden or BrainSpecs.Mawwall && e.Boss is not { Segments: >= 2 })
+                ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 (its hands or eyes).");
+            if (e.Brain.Type == BrainSpecs.Mawwall && e.Brain.Raw.TryGetProperty("minion", out var minion)) ctx.Ref(e, ctx.Db.Enemies, minion.GetString(), "brain.minion");
+            if (e.Ranged is { FromParts: true } && e.Boss is not { Segments: > 0 }) ctx.Error(e, "ranged.fromParts needs body parts (boss.segments).");
             foreach (var key in new[] { "minion", "servant" })
                 if (e.Brain.Raw.TryGetProperty(key, out var refId) && refId.GetString() is { } id) ctx.Ref(e, ctx.Db.Enemies, id, $"brain.{key}");
             if (e.Brain.Raw.TryGetProperty("phase2Model", out var model) && model.GetString() is { } m)
@@ -140,8 +146,11 @@ public static partial class ContentValidator
     private static void ValidateFlags(Ctx ctx)
     {
         foreach (var f in ctx.Db.Flags.All)
+        {
             foreach (var r in f.Requires)
                 ctx.Ref(f, ctx.Db.Flags, r, "requires");
+            if (f.AutoSet && f.Requires.Length == 0) ctx.Error(f, "autoSet needs at least one required flag.");
+        }
         DetectCycles(ctx, ctx.Db.Flags.All, f => f.Requires, "flag");
     }
 

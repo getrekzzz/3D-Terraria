@@ -581,6 +581,40 @@
           "emblem": "#e8e0c8",
           "glow": "#ff5030"
         }
+      },
+      "wayfinder_effigy": {
+        "generator": "doll",
+        "params": {
+          "shirt": "#5a7a3a",
+          "pants": "#4a3a2a",
+          "skin": "#e0b088",
+          "hair": "#6a4020"
+        }
+      },
+      "gorehammer": {
+        "generator": "hammer",
+        "params": {
+          "metal": "#b0505a",
+          "metalLayer": "flesh"
+        }
+      },
+      "warrior_sigil": {
+        "generator": "sigil",
+        "params": {
+          "gem": "#ff5030"
+        }
+      },
+      "marksman_sigil": {
+        "generator": "sigil",
+        "params": {
+          "gem": "#50e060"
+        }
+      },
+      "sorcerer_sigil": {
+        "generator": "sigil",
+        "params": {
+          "gem": "#6080ff"
+        }
       }
     }
   },
@@ -835,6 +869,31 @@
         "centerZ": 0.8,
         "eyes": "#ff2010",
         "cracks": 5
+      }
+    },
+    "maw_mouth": {
+      "generator": "maw_mouth",
+      "params": {
+        "radius": 2.1
+      }
+    },
+    "maw_eye": {
+      "generator": "maw_eye",
+      "params": {
+        "radius": 1.4
+      }
+    },
+    "maw_flesh": {
+      "generator": "maw_flesh",
+      "params": {
+        "size": 4.0,
+        "thickness": 3.0
+      }
+    },
+    "hungry": {
+      "generator": "hungry",
+      "params": {
+        "radius": 0.55
       }
     }
   }

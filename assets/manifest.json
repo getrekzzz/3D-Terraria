@@ -431,6 +431,10 @@
    "model": "assets/models/items/gold_shortsword.glb",
    "icon": "assets/icons/items/gold_shortsword.png"
   },
+  "gorehammer": {
+   "model": "assets/models/items/gorehammer.glb",
+   "icon": "assets/icons/items/gorehammer.png"
+  },
   "honey_bucket": {
    "model": "assets/models/items/honey_bucket.glb",
    "icon": "assets/icons/items/honey_bucket.png"
@@ -546,6 +550,10 @@
   "mana_star": {
    "model": "assets/models/items/mana_star.glb",
    "icon": "assets/icons/items/mana_star.png"
+  },
+  "marksman_sigil": {
+   "model": "assets/models/items/marksman_sigil.glb",
+   "icon": "assets/icons/items/marksman_sigil.png"
   },
   "minor_mana_tonic": {
    "model": "assets/models/items/minor_mana_tonic.glb",
@@ -675,6 +683,10 @@
    "model": "assets/models/items/silver_shortsword.glb",
    "icon": "assets/icons/items/silver_shortsword.png"
   },
+  "sorcerer_sigil": {
+   "model": "assets/models/items/sorcerer_sigil.glb",
+   "icon": "assets/icons/items/sorcerer_sigil.png"
+  },
   "starshard": {
    "model": "assets/models/items/starshard.glb",
    "icon": "assets/icons/items/starshard.png"
@@ -799,9 +811,17 @@
    "model": "assets/models/items/vital_crystal.glb",
    "icon": "assets/icons/items/vital_crystal.png"
   },
+  "warrior_sigil": {
+   "model": "assets/models/items/warrior_sigil.glb",
+   "icon": "assets/icons/items/warrior_sigil.png"
+  },
   "water_bucket": {
    "model": "assets/models/items/water_bucket.glb",
    "icon": "assets/icons/items/water_bucket.png"
+  },
+  "wayfinder_effigy": {
+   "model": "assets/models/items/wayfinder_effigy.glb",
+   "icon": "assets/icons/items/wayfinder_effigy.png"
   },
   "wooden_arrow": {
    "model": "assets/models/items/wooden_arrow.glb",
@@ -970,6 +990,11 @@
     "fly"
    ]
   },
+  "hungry": {
+   "model": "assets/models/creatures/hungry.glb",
+   "generator": "hungry",
+   "animations": []
+  },
   "imp": {
    "model": "assets/models/creatures/imp.glb",
    "generator": "humanoid",
@@ -992,6 +1017,21 @@
     "fly",
     "idle"
    ]
+  },
+  "maw_eye": {
+   "model": "assets/models/creatures/maw_eye.glb",
+   "generator": "maw_eye",
+   "animations": []
+  },
+  "maw_flesh": {
+   "model": "assets/models/creatures/maw_flesh.glb",
+   "generator": "maw_flesh",
+   "animations": []
+  },
+  "maw_mouth": {
+   "model": "assets/models/creatures/maw_mouth.glb",
+   "generator": "maw_mouth",
+   "animations": []
   },
   "mender": {
    "model": "assets/models/creatures/mender.glb",

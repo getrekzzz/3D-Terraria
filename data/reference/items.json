@@ -1573,6 +1573,13 @@
    "source": "craft"
   },
   {
+   "id": "terraria:pwnhammer",
+   "name": "Pwnhammer",
+   "kind": "tool",
+   "stage": "hardmode",
+   "source": "wall of flesh"
+  },
+  {
    "id": "terraria:cactus_pickaxe",
    "name": "Cactus Pickaxe",
    "kind": "tool",

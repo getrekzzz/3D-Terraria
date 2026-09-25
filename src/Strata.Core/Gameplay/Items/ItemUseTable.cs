@@ -37,6 +37,9 @@ public sealed class ItemUseInfo
     public Conditions.ICondition? SummonCondition { get; internal set; }
     public BucketParams? Bucket { get; internal set; }
 
+    /// <summary>Boss summoned when this item burns in a liquid (not a use action).</summary>
+    public IncinerationSummonParams? Incineration { get; internal set; }
+
     /// <summary>Liquid a filled bucket pours (null for an empty bucket).</summary>
     public LiquidDef? BucketLiquid { get; internal set; }
 
@@ -122,6 +125,7 @@ public sealed class ItemUseTable
                     info.Bucket = spec.Parse<BucketParams>();
                     info.BucketLiquid = info.Bucket.Liquid != null && content.Liquids.TryGet(info.Bucket.Liquid, out var liquid) ? liquid : null;
                     break;
+                case ItemBehaviorSpecs.IncinerationSummon: info.Incineration = spec.Parse<IncinerationSummonParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

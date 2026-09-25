@@ -118,6 +118,10 @@ public sealed partial class Hud : CanvasLayer
         ui.Game.Town.HomeLost += t => Toast($"{t.Title}'s home is no longer suitable.", UiTheme.Muted);
         ui.Game.Town.Died += t => Announce($"{t.Title} was slain...", new Color(1f, 0.4f, 0.35f));
         ui.Game.Town.Departed += t => Announce($"{t.Title} has left.", new Color(0.7f, 0.8f, 1f));
+        ui.Game.Progression.Raised += f =>
+        {
+            if (f.Announce != null) Announce(f.Announce, new Color(0.75f, 0.55f, 1f));
+        };
         ui.Game.Events.Announced += (text, def) => Announce(text, def.SkyTint != null ? Color.FromHtml(def.SkyTint).Lightened(0.3f) : new Color(0.7f, 0.85f, 1f));
         ui.Game.ItemPickedUp += (p, stack) =>
         {

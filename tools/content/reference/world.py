@@ -62,6 +62,7 @@ dungeon_guardian|Dungeon Guardian|prehardmode|dungeon|guardian
 fire_imp|Fire Imp|prehardmode|underworld|caster,teleport
 demon|Demon|prehardmode|underworld|flyer,projectiles
 voodoo_demon|Voodoo Demon|prehardmode|underworld|flyer
+the_hungry|The Hungry|prehardmode|wall of flesh|tethered
 goblin_peon|Goblin Peon|prehardmode|goblin army|walker
 goblin_thief|Goblin Thief|prehardmode|goblin army|walker
 goblin_warrior|Goblin Warrior|prehardmode|goblin army|walker
@@ -292,6 +293,7 @@ bullet|Musket Ball|bullet
 grenade|Grenade|explosive
 stinger_projectile|Stinger (hornet)|hostile
 imp_fireball|Imp Fireball|hostile
+eye_laser|Eye Laser (Wall of Flesh)|hostile
 """
 
 # output|Name|stations(+)|inputs

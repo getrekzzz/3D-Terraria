@@ -89,6 +89,7 @@ terraprisma|Terraprisma|post-plantera|empress of light
 """,
     "tool": """
 wooden_hammer|Wooden Hammer|early|craft
+pwnhammer|Pwnhammer|hardmode|wall of flesh
 cactus_pickaxe|Cactus Pickaxe|early|craft
 reaver_shark|Reaver Shark|prehardmode|fishing
 nightmare_pickaxe|Nightmare Pickaxe|prehardmode|craft

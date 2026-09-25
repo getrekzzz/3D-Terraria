@@ -81,6 +81,27 @@ public sealed class Npc
     /// <summary>Temporarily immune to damage (teleporting, burrowing phases).</summary>
     public bool Invulnerable { get; set; }
 
+    /// <summary>The creature this one is tethered to (a boss's hungry mouths): its anchor follows the leader and it dies with it.</summary>
+    public Npc? Leader { get; set; }
+
+    /// <summary>Anchor offset from the leader's centre.</summary>
+    public Vector3 LeaderOffset { get; set; }
+
+    /// <summary>Live creatures tethered to this one.</summary>
+    public List<Npc> Followers { get; } = new();
+
+    /// <summary>
+    /// A wall this creature is (the Mawwall's flesh): an axis-aligned box sweeping along <see cref="Direction"/>.X.
+    /// Players inside it or behind its front face are hurt and thrown out in front. Set by the brain.
+    /// </summary>
+    public (Vector3 Min, Vector3 Max)? Barrier { get; set; }
+
+    /// <summary>Which body part fires the next ranged volley (ranged attacks from parts).</summary>
+    public int PartCursor { get; set; }
+
+    /// <summary>Taken out of the simulation (killed or despawned).</summary>
+    public bool Removed { get; internal set; }
+
     /// <summary>Centres of trailing body segments (worms), head first; empty for single-body creatures.</summary>
     public List<Vector3> Segments { get; } = new();
 

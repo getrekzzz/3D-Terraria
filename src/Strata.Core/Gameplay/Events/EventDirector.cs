@@ -149,7 +149,7 @@ public sealed class EventDirector
     {
         _active.Remove(a);
         _world.Session.Events.Remove(a.Def.Id);
-        if (completed && a.Def.CompletionFlag != null) _world.Session.Flags.Add(a.Def.CompletionFlag);
+        if (completed && a.Def.CompletionFlag != null) _world.Progression.Set(a.Def.CompletionFlag);
         if (a.Def.EndMessage != null) Announced?.Invoke(a.Def.EndMessage, a.Def);
         Ended?.Invoke(a.Def);
     }

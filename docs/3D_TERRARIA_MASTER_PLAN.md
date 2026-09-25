@@ -26,6 +26,8 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-25 | Town residents are a separate Core entity (not enemy NPCs) with A* paths, homes and trade | Friendly, persistent, schedule-driven; never hit by player attacks. |
 | 2026-09-25 | Zones (crypt, spider nests, marble/granite halls, evil hearts) are planned features reported as extra biomes in every condition context; a structure zone is its blueprint's volumes, not its bounding box | Spawn rules, locks, music and loot all read one context; a sprawling crypt must not claim the open surface above it. |
 | 2026-09-25 | Progression locks are data: a biome's `lockedUntil` flag protects its generated structure cells; `exclusiveSpawns` zones only spawn rules naming them, at closer range | The crypt behaves like the reference dungeon without special-case code. |
+| 2026-09-25 | Progression flags are raised only through `ProgressionSystem`; `autoSet` flags follow from their requirements (defeated_mawwall → hardmode) and may announce themselves | One place for consequences (hardmode mutations hook on `Raised`), no special cases in boss code. |
+| 2026-09-25 | The Mawwall is an enemy whose brain sets a `Barrier` volume (drawn as tiled flesh, hurts and ejects players behind it) and tethers minions (`Leader`); summoned by burning an effigy (`incinerationSummon`) in underworld lava | A 3D wall of flesh that cannot be walked around (it tracks the target's Z) built from generic parts. |
 | 2026-09-25 | Landmark residents (the crypt keeper) live at a planned landmark instead of a house and leave for good when `leavesWhen` holds; boss summoning can be a resident service | Old-man/clothier arc expressed with the town system and data. |
 
 ## 3. System status
@@ -36,7 +38,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 808 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 41.6 % (enemies 22 %, NPCs 21 %) |
+| Content | Reference DBs + coverage | ✅ | 811 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 42.5 % (enemies 24 %, bosses 17 %, NPCs 21 %) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
@@ -53,13 +55,14 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Whips/yoyos/summons ⬜ |
 | AI | Slime, walker, flyer, swimmer, lunger, caster (blink), boss brains, worm, crypt warden (free hands); ranged attacks; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
 | Spawning | Data-driven spawn rules (ground or liquid placement), biome + zone rosters, exclusive zones, per-rule caps, player-position rules, despawn conditions, town suppression | ✅ | Closed doors stop creatures |
-| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 134 item models, 30 creatures (6 residents), 206 icons |
+| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 139 item models, 34 creatures (6 residents), 211 icons |
 | NPCs | Town residents, 3D housing, shops, services, happiness, landmark residents | ✅ | 6 residents (guide/merchant/nurse/dryad/old man/clothier roles); more residents, enemies attacking town ⬜ |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
-| Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels), Crypt Warden (hands, spin, day rage); arenas, boss bar; music state ⬜ |
+| Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels), Crypt Warden (hands, spin, day rage), The Mawwall (sweeping barrier, eye lasers, tethered hungry maws); arenas, boss bar; music state ⬜ |
+| Progression | Flags, auto-set cascade, announcements, incineration summons | ✅ | `ProgressionSystem.Raised` is the hook for hardmode mutations |
 | Events | Event director | ✅ | Blood moon, slime rain; invasions ⬜ |
 | Dungeon | Crypt zone, locked walls, guardian, roster, keeper + curse | ✅ | Crypt keys/locked chests, water bolt loot, spike traps ⬜ |
-| Hardmode | Mutations, spread | ⬜ | M3 (next: The Mawwall, then lazy mutations) |
+| Hardmode | Trigger, mutations, spread | 🟡 | `hardmode` is raised by the Mawwall's defeat; lazy world mutations and spread are next |
 | Audio | Director + sounds | ⬜ | |
 
 ## 4. Technical debt
@@ -72,6 +75,8 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 * Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
   until disturbed.
 * Crypt Warden hands share the skull's life (the reference boss has separately killable hands).
+* The Mawwall only sweeps along X and only its mouth and eyes take hits; its flesh tiles are separate pooled visuals
+  (a MultiMesh would be cheaper for very tall cavities).
 * Zone membership scans a structure's blueprint ops per query (hundreds for the crypt); fine at spawn/lock rates,
   would want a coarse occupancy grid if queried per frame.
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
@@ -91,7 +96,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (169) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (176) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -104,7 +109,8 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: starter guide, built home, move-in, walking home through a door at night, talk/shop UI, buying | `town.cmds` | ✅ CI |
 | Engine smoke: every biome creature spawns, moves and renders; ranged attackers | `creatures.cmds` | ✅ CI |
 | Engine smoke: keeper at the crypt gate, guardian leaves outside, night summon, warden defeat frees the keeper | `dungeon.cmds` | ✅ CI |
-| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Crypt Warden) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
+| Engine smoke: effigy burned in underworld lava calls the Mawwall (wayfinder sacrificed), the fight runs, defeat raises hardmode | `mawwall.cmds` | ✅ CI |
+| Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Crypt Warden, Mawwall) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
 
 ## 7. Performance
 * Targets: 60 fps @1080p on GTX-1060-class; ~250 LOD0 chunks; mesh ≤2 ms/chunk; gen ≤10 ms/chunk.
@@ -114,14 +120,13 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 
 ## 8. Next development targets (M3)
 M2 delivered events, three bosses, liquids, voxel A*, 3D housing, town residents and biome creature rosters.
-M3 so far: the crypt (zone, locked walls, guardian, roster, keeper, Crypt Warden, tailor).
-1. The Mawwall: wayfinder-effigy incineration summon in the underworld, sweeping wall with eyes/mouth and hungry
-   minions; its defeat sets `hardmode`.
-2. Lazy world mutations: `data/mutations.json` (ore veins, hallow/evil wedges, spread sources) applied on chunk
+M3 so far: the crypt (zone, locked walls, guardian, roster, keeper, Crypt Warden, tailor); the Mawwall (effigy
+incineration summon, sweeping barrier, eye lasers, tethered minions) whose defeat raises `hardmode`.
+1. Lazy world mutations: `data/mutations.json` (ore veins, hallow/evil wedges, spread sources) applied on chunk
    load and live, a mutation log in the world save, biome spread, hardmode ore tiers.
-3. LOD rings + horizon heightfield; cave culling from navigation summaries.
-4. More residents; residents that fight back; crypt keys and locked chests.
-5. Audio director (data-driven cues, music states for bosses/events).
+2. LOD rings + horizon heightfield; cave culling from navigation summaries.
+3. More residents; residents that fight back; crypt keys and locked chests.
+4. Audio director (data-driven cues, music states for bosses/events).
 
 ## 9. Directive summary (condensed)
 Phases: 1 core loop → 2 world → 3 progression → 4 systemic depth → 5 hardmode → 6 endgame → 7 polish.

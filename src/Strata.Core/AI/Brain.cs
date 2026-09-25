@@ -25,6 +25,9 @@ public sealed class BrainContext
 
     public required Content.ContentDatabase Content { get; init; }
 
+    /// <summary>The world's layer heights (cells): underworld cavity, lava level, surface…</summary>
+    public required WorldGen.Plan.LayerBands Bands { get; init; }
+
     public const float Gravity = 22f;
 }
 
@@ -62,6 +65,7 @@ public static class BrainFactory
         BrainSpecs.Lunger => new LungerBrain(spec.Parse<LungerParams>()),
         BrainSpecs.CryptWarden => new CryptWardenBrain(spec.Parse<CryptWardenParams>()),
         BrainSpecs.Caster => new CasterBrain(spec.Parse<CasterParams>()),
+        BrainSpecs.Mawwall => new MawwallBrain(spec.Parse<MawwallParams>()),
         _ => throw new InvalidOperationException($"Unknown brain '{spec.Type}' (the content validator should have rejected it)."),
     };
 

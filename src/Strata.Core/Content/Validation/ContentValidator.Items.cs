@@ -28,6 +28,13 @@ public static partial class ContentValidator
                 if (b.Raw.TryGetProperty("conditions", out var conds) && conds.ValueKind == System.Text.Json.JsonValueKind.Array)
                     ctx.Specs(i, Specs.SpecKind.Condition, conds.EnumerateArray().Select(c => new TypedSpec(c.GetProperty("type").GetString()!, c.Clone())), "summonBoss.conditions");
             }
+            foreach (var b in i.Behaviors.Where(b => b.Type == Specs.ItemBehaviorSpecs.IncinerationSummon))
+                if (ctx.TryParse<Specs.IncinerationSummonParams>(SpecKind.ItemBehavior, b) is { } burn)
+                {
+                    ctx.Ref(i, ctx.Db.Enemies, burn.Enemy, "incinerationSummon.enemy");
+                    if (ctx.Db.Enemies.TryGet(burn.Enemy, out var boss) && boss.Boss == null) ctx.Error(i, $"incinerationSummon.enemy '{burn.Enemy}' is not a boss.");
+                    ctx.Ref(i, ctx.Db.TownNpcs, burn.KillsResident, "incinerationSummon.killsResident");
+                }
             ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");
             if (i.UseAmmo != null && !ammoClasses.Contains(i.UseAmmo)) ctx.Error(i, $"useAmmo '{i.UseAmmo}' has no ammo items.");
             if (i.UseStyle == UseStyle.Shoot && i.Projectile == null && i.UseAmmo == null)

@@ -16,10 +16,12 @@ public sealed partial class NpcSystem
             npc.AttackTimer--;
             return;
         }
-        if (!target.Alive || distance > r.Range || !InSight(npc.Center, target.Eye)) return;
+        bool parts = r.FromParts && npc.Segments.Count > 0;
+        var from = parts ? npc.Segments[npc.PartCursor % npc.Segments.Count] : npc.Center + new Vector3(0, npc.HalfExtents.Y * 0.4f, 0);
+        if (!target.Alive || Vector3.Distance(from, target.Center) > r.Range || !InSight(from, target.Eye)) return;
         if (!_world.Session.Content.Projectiles.TryGet(r.Projectile, out var def)) return;
         npc.AttackTimer = r.Interval;
-        var from = npc.Center + new Vector3(0, npc.HalfExtents.Y * 0.4f, 0);
+        if (parts) npc.PartCursor++;
         var to = target.Center + new Vector3(0, 0.3f, 0);
         float flight = Vector3.Distance(from, to) / r.Speed;
         to.Y += 0.5f * def.Gravity * flight * flight; // lob gravity-bound projectiles
@@ -34,7 +36,8 @@ public sealed partial class NpcSystem
                 var up = Vector3.Cross(side, d);
                 d = Vector3.Normalize(d + side * _rng.NextSigned() * spread + up * _rng.NextSigned() * spread);
             }
-            _world.Projectiles.Spawn(def, from + d * (npc.HalfExtents.X + 0.2f), d * r.Speed, null, r.Damage, 3f, Content.Defs.DamageClass.None, 0);
+            float clear = parts ? (npc.Def.Boss?.SegmentRadius ?? 0.5f) + 0.2f : npc.HalfExtents.X + 0.2f;
+            _world.Projectiles.Spawn(def, from + d * clear, d * r.Speed, null, r.Damage, 3f, Content.Defs.DamageClass.None, 0);
         }
         npc.Pose = "attack";
     }

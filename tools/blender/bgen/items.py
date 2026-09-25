@@ -251,7 +251,29 @@ def tome(mb: MeshBuilder, p, rng):
         mb.sphere((sx * 0.016, 0.07, 0.16), 0.01, "prop:plain:glow", p.get("glow", "#ff5030"), subdivisions=1)
 
 
+def doll(mb: MeshBuilder, p, rng):
+    """A small stitched doll (the wayfinder's effigy)."""
+    cloth, skin = p.get("shirt", "#5a7a3a"), p.get("skin", "#e0b088")
+    mb.box((-0.06, -0.035, 0.08), (0.06, 0.035, 0.2), "prop:cloth", cloth)
+    for sx in (-1, 1):
+        mb.box((sx * 0.02 - 0.022, -0.03, 0.0), (sx * 0.02 + 0.022, 0.03, 0.08), "prop:cloth", p.get("pants", "#4a3a2a"))
+        mb.box((sx * 0.085 - 0.02, -0.025, 0.1), (sx * 0.085 + 0.02, 0.025, 0.19), "prop:cloth", cloth)
+    mb.sphere((0, 0, 0.25), 0.055, "prop:cloth", skin, subdivisions=2)
+    mb.box((-0.055, -0.05, 0.27), (0.055, 0.04, 0.31), "prop:cloth", p.get("hair", "#6a4020"))
+    for sx in (-1, 1):
+        mb.sphere((sx * 0.022, 0.05, 0.255), 0.011, "prop:plain", "#101010", subdivisions=1)
+    mb.cylinder((-0.07, 0.036, 0.16), (0.07, 0.036, 0.12), 0.004, None, "prop:plain", "#d0c0a0", segments=4)  # a stitch
+
+
+def sigil(mb: MeshBuilder, p, rng):
+    """A shield-shaped emblem with a gem."""
+    pts = [(-0.11, 0.2), (0.11, 0.2), (0.12, 0.08), (0.0, -0.04), (-0.12, 0.08)]
+    mb.extrude_polygon(pts, 0.025, "prop:gold", "#ffffff", matrix=Matrix.Translation((0, 0.0125, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+    mb.sphere((0, 0.03, 0.11), 0.04, "prop:crystal:glow", p.get("gem", "#ff4040"), subdivisions=1, scale=(1, 0.5, 1))
+
+
 GENERATORS = {
+    "doll": doll, "sigil": sigil,
     "tome": tome,
     "sword": sword, "shortsword": shortsword, "pickaxe": pickaxe, "axe": axe, "hammer": hammer, "bow": bow,
     "wand": wand, "staff": staff, "arrow": arrow, "bar": bar, "gem": gem, "blob": blob, "lens": lens, "spool": spool,

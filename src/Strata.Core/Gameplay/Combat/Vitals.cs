@@ -27,11 +27,16 @@ public sealed class Vitals
 
     public bool IsDead => Life <= 0;
 
+    /// <summary>Debug "god" mode (not saved): hits still land (knockback, effects) but life never drops below 1.</summary>
+    public bool Undying { get; set; }
+
+    private int Floor => Undying ? 1 : 0;
+
     /// <summary>Applies damage unless invulnerable. Returns false if the hit was ignored.</summary>
     public bool Hurt(int damage, int immunityTicks = 40)
     {
         if (ImmunityTicks > 0 || IsDead) return false;
-        Life = Math.Max(0, Life - damage);
+        Life = Math.Max(Floor, Life - damage);
         ImmunityTicks = immunityTicks;
         TicksSinceHurt = 0;
         return true;
@@ -41,7 +46,14 @@ public sealed class Vitals
     public void DamageDirect(int damage)
     {
         if (IsDead) return;
-        Life = Math.Max(0, Life - damage);
+        Life = Math.Max(Floor, Life - damage);
+        TicksSinceHurt = 0;
+    }
+
+    /// <summary>Kills outright, even when <see cref="Undying"/> (the kill command).</summary>
+    public void Kill()
+    {
+        Life = 0;
         TicksSinceHurt = 0;
     }
 

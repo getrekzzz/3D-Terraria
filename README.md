@@ -14,9 +14,9 @@ world events and a world that transforms as you progress.
 |---|---|---|
 | ![Town](docs/screenshots/m2_town.png) | ![Cavern](docs/screenshots/m2_cavern.png) | ![Underworld](docs/screenshots/m2_underworld.png) |
 
-| The Crypt Warden, called out by the keeper at the crypt gate |
-|---|
-| ![Crypt Warden](docs/screenshots/m3_crypt_warden.png) |
+| The Crypt Warden, called out by the keeper at the crypt gate | The Mawwall sweeping the underworld |
+|---|---|
+| ![Crypt Warden](docs/screenshots/m3_crypt_warden.png) | ![Mawwall](docs/screenshots/m3_mawwall.png) |
 
 ## Running
 1. Install **Godot 4.7.x .NET** and the **.NET 8 SDK**.
@@ -37,7 +37,7 @@ Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medi
 | V, Ctrl+wheel | first/third person, camera distance |
 | ` or F1 / F3 / Esc | console / performance overlay / release mouse |
 
-Console commands include `help`, `give`, `spawn`, `boss`, `slay`, `event`, `tp` (also `tp landmark dungeon_gate`), `biome`, `time`, `flag`, `setblock`,
+Console commands include `help`, `give`, `drop`, `spawn`, `boss`, `slay`, `god`, `event`, `tp` (also `tp landmark dungeon_gate`), `biome`, `time`, `flag`, `setblock`,
 `fill`, `place`, `liquid`, `liquids`, `house`, `town`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`
 (`help <command>` for usage).
 

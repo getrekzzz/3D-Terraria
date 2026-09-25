@@ -73,6 +73,11 @@
    "id": "terraria:imp_fireball",
    "name": "Imp Fireball",
    "kind": "hostile"
+  },
+  {
+   "id": "terraria:eye_laser",
+   "name": "Eye Laser (Wall of Flesh)",
+   "kind": "hostile"
   }
  ]
 }

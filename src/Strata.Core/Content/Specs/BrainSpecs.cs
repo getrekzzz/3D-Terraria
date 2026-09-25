@@ -14,6 +14,7 @@ public static class BrainSpecs
     public const string Lunger = "lunger";
     public const string CryptWarden = "cryptWarden";
     public const string Caster = "caster";
+    public const string Mawwall = "mawwall";
 
     public static void Register(SpecCatalog c)
     {
@@ -28,6 +29,7 @@ public static class BrainSpecs
         c.Register<LungerParams>(SpecKind.Brain, Lunger);
         c.Register<CryptWardenParams>(SpecKind.Brain, CryptWarden);
         c.Register<CasterParams>(SpecKind.Brain, Caster);
+        c.Register<MawwallParams>(SpecKind.Brain, Mawwall);
     }
 }
 
@@ -182,4 +184,42 @@ public sealed class CasterParams : SpecParams, IValidatableSpec
     public float MaxBlink { get; init; } = 11f;
 
     public string? Validate() => MaxBlink < MinBlink ? "maxBlink must be >= minBlink" : null;
+}
+
+/// <summary>
+/// A wall of flesh filling the underworld cavity from lava to ceiling that sweeps along X towards the far side of
+/// the world, keeping its width centred on its target; eyes (segments) fire, the mouth (body) bites and spits tethered
+/// minions, and it speeds up as it weakens or falls behind.
+/// </summary>
+public sealed class MawwallParams : SpecParams, IValidatableSpec
+{
+    /// <summary>How far behind the target the wall appears (m), on the side of the nearer world edge.</summary>
+    public float StartDistance { get; init; } = 45f;
+
+    /// <summary>Wall width across Z (m) and thickness along X (m).</summary>
+    public float Width { get; init; } = 40f;
+    public float Thickness { get; init; } = 3f;
+
+    /// <summary>Sweep speed (m/s) at full life and at no life.</summary>
+    public float BaseSpeed { get; init; } = 1.6f;
+    public float MaxSpeed { get; init; } = 5f;
+
+    /// <summary>Beyond this lead (m) the target has over the wall it hurries (double speed).</summary>
+    public float CatchUpDistance { get; init; } = 60f;
+
+    /// <summary>How fast the wall slides sideways to stay centred on its target (m/s).</summary>
+    public float TrackSpeed { get; init; } = 3f;
+
+    /// <summary>Vertical distance between the two eyes (m).</summary>
+    public float EyeSpacing { get; init; } = 7f;
+
+    /// <summary>Tethered minion spat from the wall's face, how often (ticks) and how many at once.</summary>
+    public string? Minion { get; init; }
+    public int MinionInterval { get; init; } = 300;
+    public int MaxMinions { get; init; } = 5;
+
+    public string? Validate() =>
+        Width <= 0 || Thickness <= 0 ? "width and thickness must be > 0"
+        : MaxSpeed < BaseSpeed ? "maxSpeed must be >= baseSpeed"
+        : MinionInterval < 1 ? "minionInterval must be >= 1" : null;
 }
