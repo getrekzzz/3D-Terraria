@@ -35,6 +35,11 @@ class MeshBuilder:
         self.color_layer = self.bm.loops.layers.color.new("Color")
         self.materials: list[str] = []
         self.smooth_faces: set = set()
+        # Rigid skinning: parts created while ``bone`` is set are weighted 100 % to that bone.
+        self.bone: str | None = None
+        self.bones: list[str] = []
+        # Created up front: adding a layer later would invalidate BMVert references held by callers.
+        self.deform = self.bm.verts.layers.deform.verify()
 
     # ------------------------------------------------------------------ bookkeeping
     def _material_index(self, material: str) -> int:
@@ -51,6 +56,12 @@ class MeshBuilder:
         faces = {f for v in verts for f in v.link_faces}
         index = self._material_index(material)
         rgba = hex_color(color)
+        if self.bone is not None:
+            if self.bone not in self.bones:
+                self.bones.append(self.bone)
+            group = self.bones.index(self.bone)
+            for v in verts:
+                v[self.deform][group] = 1.0
         z0 = min(v.co.z for v in verts)
         z1 = max(v.co.z for v in verts)
         for f in faces:
@@ -159,15 +170,22 @@ class MeshBuilder:
     # ------------------------------------------------------------------ output
     def build(self, material_factory) -> bpy.types.Object:
         """Creates the Blender object. ``material_factory(name)`` returns a bpy material for a slot name."""
-        bmesh.ops.remove_doubles(self.bm, verts=self.bm.verts, dist=1e-5)
+        if not self.bones:  # rigged parts must stay separate so each keeps its own bone
+            bmesh.ops.remove_doubles(self.bm, verts=self.bm.verts, dist=1e-5)
         for f in self.bm.faces:
             f.smooth = f in self.smooth_faces
         mesh = bpy.data.meshes.new(self.name)
         self.bm.to_mesh(mesh)
         self.bm.free()
+        if "Color" in mesh.color_attributes:
+            color = mesh.color_attributes["Color"]
+            mesh.color_attributes.active_color = color
+            mesh.color_attributes.render_color_index = mesh.color_attributes.find("Color")
         for name in self.materials:
             mesh.materials.append(material_factory(name))
         obj = bpy.data.objects.new(self.name, mesh)
+        for bone in self.bones:
+            obj.vertex_groups.new(name=bone)
         bpy.context.scene.collection.objects.link(obj)
         return obj
 

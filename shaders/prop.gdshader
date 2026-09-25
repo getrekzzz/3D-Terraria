@@ -17,6 +17,8 @@ uniform float sway = 0.0;
 // MultiMesh instances carry voxel light in their custom data; single instances use the instance uniform.
 uniform bool light_from_custom = false;
 instance uniform vec4 voxel_light = vec4(0.0, 0.0, 0.0, 1.0);
+// Per-instance colour multiplier (enemy variants, hurt flash via values above 1).
+instance uniform vec4 tint = vec4(1.0);
 
 varying vec3 v_obj_pos;
 varying vec3 v_obj_normal;
@@ -47,7 +49,7 @@ void fragment() {
 	vec4 m = w.x * texture(material_array, vec3(p.zy * vec2(1.0, -1.0), layer))
 		+ w.y * texture(material_array, vec3(p.xz, layer))
 		+ w.z * texture(material_array, vec3(p.xy * vec2(1.0, -1.0), layer));
-	vec3 albedo = a.rgb * COLOR.rgb;
+	vec3 albedo = a.rgb * COLOR.rgb * tint.rgb;
 	ALBEDO = albedo;
 	ROUGHNESS = m.z;
 	METALLIC = m.w;

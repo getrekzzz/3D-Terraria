@@ -21,8 +21,8 @@ public static partial class ContentValidator
             ctx.Ref(i, ctx.Db.Projectiles, i.Projectile, "projectile");
             ctx.Ref(i, ctx.Db.Buffs, i.Buff?.Id, "buff");
             ctx.Light(i, i.HeldLight, "heldLight");
-            ctx.Asset(i, i.Model, "model");
-            ctx.Asset(i, i.Icon, "icon");
+            ctx.Asset(i, AssetPaths.ItemModel(i, ctx.Db), "model");
+            ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");
             if (i.UseAmmo != null && !ammoClasses.Contains(i.UseAmmo)) ctx.Error(i, $"useAmmo '{i.UseAmmo}' has no ammo items.");
             if (i.UseStyle == UseStyle.Shoot && i.Projectile == null && i.UseAmmo == null)
                 ctx.Error(i, "shoot items need a projectile or useAmmo.");

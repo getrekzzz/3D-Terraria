@@ -788,5 +788,54 @@
    "icon": "assets/icons/items/workbench.png"
   }
  },
+ "creatures": {
+  "cave_bat": {
+   "model": "assets/models/creatures/cave_bat.glb",
+   "generator": "bat",
+   "animations": [
+    "fly"
+   ]
+  },
+  "gazer": {
+   "model": "assets/models/creatures/gazer.glb",
+   "generator": "eye",
+   "animations": []
+  },
+  "gel": {
+   "model": "assets/models/creatures/gel.glb",
+   "generator": "gel",
+   "animations": []
+  },
+  "player": {
+   "model": "assets/models/creatures/player.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "shambler": {
+   "model": "assets/models/creatures/shambler.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  }
+ },
  "generatorVersion": 1
 }

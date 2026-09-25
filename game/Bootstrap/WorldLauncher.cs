@@ -75,6 +75,10 @@ public static class WorldLauncher
             if (p == entity) player.Teleport(p.Position, resolveSpawn: true);
         };
 
+        var avatar = new PlayerAvatar();
+        player.AddChild(avatar);
+        avatar.Initialize(player, game, props);
+
         var interaction = new InteractionController();
         interaction.Initialize(runtime, player);
         runtime.AddChild(interaction);

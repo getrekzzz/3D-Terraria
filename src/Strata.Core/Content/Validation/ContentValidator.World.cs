@@ -18,7 +18,7 @@ public static partial class ContentValidator
             ctx.Ref(e, ctx.Db.LootTables, e.Loot, "loot");
             ctx.Color(e, e.Tint, "tint");
             ctx.Light(e, e.Light, "light");
-            ctx.Asset(e, e.Model, "model");
+            ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
         }
         foreach (var s in ctx.Db.SpawnRules.All)
         {
@@ -37,7 +37,7 @@ public static partial class ContentValidator
             if (p.Radius <= 0) ctx.Error(p, "radius must be > 0.");
             ctx.Light(p, p.Light, "light");
             ctx.Color(p, p.Color, "color");
-            ctx.Asset(p, p.Model, "model");
+            if (p.Model != null) ctx.Asset(p, AssetPaths.ProjectileModel(p), "model");
             ctx.Specs(p, SpecKind.ProjectileHit, p.OnHit, "onHit");
         }
         foreach (var b in ctx.Db.Buffs.All)

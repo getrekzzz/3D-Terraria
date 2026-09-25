@@ -24,4 +24,6 @@ public static class AssetPaths
     }
 
     public static string CreatureModel(EnemyDef enemy) => $"assets/models/creatures/{enemy.Model ?? enemy.Id}.glb";
+
+    public static string ProjectileModel(ProjectileDef projectile) => $"assets/models/projectiles/{projectile.Model ?? projectile.Id}.glb";
 }

@@ -1,0 +1,92 @@
+using System.Collections.Generic;
+using Godot;
+
+namespace Strata.Game.Rendering;
+
+/// <summary>
+/// An instanced animated model (player, enemies): the GLB scene with prop materials on every surface, looping
+/// locomotion clips, cross-faded playback and per-frame voxel light / tint.
+/// </summary>
+public sealed partial class CreatureVisual : Node3D
+{
+    private static readonly HashSet<string> Looping = new() { "idle", "walk", "run", "fly", "jump", "fall" };
+    private readonly List<GeometryInstance3D> _geometry = new();
+    private AnimationPlayer? _player;
+    private string _current = "";
+
+    public Skeleton3D? Skeleton { get; private set; }
+
+    /// <summary>Loads a creature model; returns null (and records a problem) if the file is missing.</summary>
+    public static CreatureVisual? Create(string projectPath, PropLibrary props)
+    {
+        var path = "res://" + projectPath;
+        if (!ResourceLoader.Exists(path))
+        {
+            props.Problems.Add($"missing creature model {path}");
+            return null;
+        }
+        var visual = new CreatureVisual { Name = "Visual" };
+        var scene = GD.Load<PackedScene>(path).Instantiate<Node3D>();
+        visual.AddChild(scene);
+        visual.Setup(scene, props);
+        return visual;
+    }
+
+    private void Setup(Node node, PropLibrary props)
+    {
+        if (node is MeshInstance3D mi && mi.Mesh != null)
+        {
+            for (int i = 0; i < mi.Mesh.GetSurfaceCount(); i++)
+                mi.SetSurfaceOverrideMaterial(i, props.Material(mi.Mesh.SurfaceGetMaterial(i)?.ResourceName ?? "prop:missing", multimesh: false));
+            _geometry.Add(mi);
+        }
+        if (node is AnimationPlayer ap)
+        {
+            _player = ap;
+            foreach (var name in ap.GetAnimationList())
+                if (Looping.Contains(name)) ap.GetAnimation(name).LoopMode = Animation.LoopModeEnum.Linear;
+        }
+        if (node is Skeleton3D sk) Skeleton = sk;
+        foreach (var child in node.GetChildren()) Setup(child, props);
+    }
+
+    public bool HasAnimation(string name) => _player != null && _player.HasAnimation(name);
+
+    /// <summary>Plays a clip, cross-fading; restarting the same looping clip is a no-op unless <paramref name="restart"/>.</summary>
+    public void Play(string name, float blend = 0.15f, float speed = 1f, bool restart = false)
+    {
+        if (_player == null || !_player.HasAnimation(name)) return;
+        if (_current == name && !restart && _player.IsPlaying())
+        {
+            _player.SpeedScale = speed;
+            return;
+        }
+        _current = name;
+        _player.Play(name, blend, speed);
+        if (restart) _player.Seek(0, true);
+    }
+
+    public string Current => _current;
+
+    public bool IsPlaying => _player?.IsPlaying() ?? false;
+
+    public void SetLight(Color voxelLight)
+    {
+        foreach (var g in _geometry) g.SetInstanceShaderParameter("voxel_light", voxelLight);
+    }
+
+    /// <summary>Attaches a node to a bone (held items); returns false if the bone does not exist.</summary>
+    public bool AttachToBone(string bone, Node3D node)
+    {
+        if (Skeleton == null || Skeleton.FindBone(bone) < 0) return false;
+        var attachment = new BoneAttachment3D { BoneName = bone, Name = "Attach_" + bone };
+        Skeleton.AddChild(attachment);
+        attachment.AddChild(node);
+        return true;
+    }
+
+    public void SetCastShadows(bool on)
+    {
+        foreach (var g in _geometry) g.CastShadow = on ? GeometryInstance3D.ShadowCastingSetting.On : GeometryInstance3D.ShadowCastingSetting.Off;
+    }
+}

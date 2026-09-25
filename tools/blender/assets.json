@@ -99,5 +99,12 @@
       "iron_horseshoe": { "generator": "horseshoe", "params": {} },
       "band_of_vigor": { "generator": "ring", "params": { "gem": "#ff4060" } }
     }
+  },
+  "creatures": {
+    "player": { "generator": "humanoid", "params": {} },
+    "shambler": { "generator": "humanoid", "params": { "skin": "#9ab07a", "skinLayer": "flesh", "shirt": "#6a5a44", "pants": "#3e3a30", "hair": "#2a3424", "eyes": "#f0e040", "boots": "#8a8070" } },
+    "gel": { "generator": "gel", "params": {} },
+    "gazer": { "generator": "eye", "params": { "iris": "#3a8a5a" } },
+    "cave_bat": { "generator": "bat", "params": {} }
   }
 }

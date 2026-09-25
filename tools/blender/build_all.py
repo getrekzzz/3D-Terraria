@@ -8,7 +8,7 @@ Options:
   --only=GLOB      rebuild matching asset ids (fnmatch), keep the rest of the manifest
   --no-icons       skip icon rendering
   --samples=N      Cycles samples per icon (default 24)
-Outputs: assets/models/{objects,items}/*.glb, assets/icons/items/*.png, assets/manifest.json
+Outputs: assets/models/{objects,items,creatures}/*.glb, assets/icons/items/*.png, assets/manifest.json
 """
 import fnmatch
 import json
@@ -51,7 +51,7 @@ def load_json(path: pathlib.Path):
 
 def load_content():
     manifest = load_json(REPO / "data" / "manifest.json")
-    blocks, items, objects = {}, {}, {}
+    blocks, items, objects, enemies = {}, {}, {}, {}
     for rel in manifest["files"]:
         doc = load_json(REPO / "data" / rel)
         for b in doc.get("blocks", []):
@@ -60,12 +60,20 @@ def load_content():
             items[i["id"]] = i
         for o in doc.get("tileObjects", []):
             objects[o["id"]] = o
-    return blocks, items, objects
+        for e in doc.get("enemies", []):
+            enemies[e["id"]] = e
+    return blocks, items, objects, enemies
 
 
-def plan(spec, blocks, items, objects):
-    """Decides how every model and icon is produced. Returns (object_jobs, item_jobs, block_icons, errors)."""
+def plan(spec, blocks, items, objects, enemies):
+    """Decides how every model and icon is produced. Returns (object_jobs, item_jobs, block_icons, creature_jobs, errors)."""
     errors = []
+    creature_jobs = dict(spec.get("creatures", {}))
+    for eid, e in enemies.items():
+        if e.get("model", eid) not in creature_jobs:
+            errors.append(f"enemy '{eid}' uses creature model '{e.get('model', eid)}' missing from assets.json creatures")
+    if "player" not in creature_jobs:
+        errors.append("assets.json creatures needs a 'player' model")
     object_jobs = {}
     for oid, o in objects.items():
         s = spec["objects"].get(oid)
@@ -110,11 +118,11 @@ def plan(spec, blocks, items, objects):
             item_jobs[iid] = {"object": placed}
             continue
         errors.append(f"item '{iid}' has no model/icon source (add it to assets.json items)")
-    return object_jobs, item_jobs, block_icons, errors
+    return object_jobs, item_jobs, block_icons, creature_jobs, errors
 
 
-def build(opts, spec, object_jobs, item_jobs):
-    from bgen import export, furniture, items as item_gen, nature
+def build(opts, spec, object_jobs, item_jobs, creature_jobs):
+    from bgen import creatures, export, furniture, items as item_gen, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
 
@@ -148,7 +156,7 @@ def build(opts, spec, object_jobs, item_jobs):
     for iid, job in sorted(item_jobs.items()):
         if not wanted(iid) and not (job.get("object") and wanted(job["object"])):
             continue
-        entry = {}
+        entry = {k: v for k, v in manifest["items"].get(iid, {}).items() if k == "icon" and not opts["icons"]}
         if "object" in job:
             obj, props = make(job["object"], object_jobs[job["object"]], 0)
             entry["object"] = job["object"]
@@ -165,9 +173,27 @@ def build(opts, spec, object_jobs, item_jobs):
         manifest["items"][iid] = entry
         print(f"item {iid}: {entry}")
 
+    manifest.setdefault("creatures", {})
+    for name, job in sorted(creature_jobs.items()):
+        if not wanted(name):
+            continue
+        reset_scene()
+        props = PropMaterials(REPO)
+        mb = MeshBuilder(name)
+        rig = creatures.GENERATORS[job["generator"]](mb, job.get("params", {}), rng_for(name, 0))
+        for slot in mb.materials:
+            props.validate(slot)
+        objs = creatures.finish(mb.build(export.simple_material), rig, name)
+        rel = f"assets/models/creatures/{name}.glb"
+        export.export_glb(objs, REPO / rel)
+        actions = sorted(a.name for a in __import__("bpy").data.actions)
+        manifest["creatures"][name] = {"model": rel, "generator": job["generator"], "animations": actions}
+        print(f"creature {name}: {actions}")
+
     manifest["generatorVersion"] = GENERATOR_VERSION
     manifest["objects"] = dict(sorted(manifest["objects"].items()))
     manifest["items"] = dict(sorted(manifest["items"].items()))
+    manifest["creatures"] = dict(sorted(manifest["creatures"].items()))
     manifest_path.write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
     print(f"wrote {manifest_path.relative_to(REPO)}")
 
@@ -180,16 +206,16 @@ def _view_for(generator: str) -> str:
 def main() -> int:
     opts = args()
     spec = json.loads((HERE / "assets.json").read_text(encoding="utf-8"))
-    blocks, items, objects = load_content()
-    object_jobs, item_jobs, block_icons, errors = plan(spec, blocks, items, objects)
+    blocks, items, objects, enemies = load_content()
+    object_jobs, item_jobs, block_icons, creature_jobs, errors = plan(spec, blocks, items, objects, enemies)
     for e in errors:
         print("ERROR:", e)
     if errors:
         return 1
-    print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(block_icons)} block icons (tools/textures/build_icons.py)")
+    print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(creature_jobs)} creatures, {len(block_icons)} block icons (tools/textures/build_icons.py)")
     if opts["check"]:
         return 0
-    build(opts, spec, object_jobs, item_jobs)
+    build(opts, spec, object_jobs, item_jobs, creature_jobs)
     return 0
 
 

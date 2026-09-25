@@ -49,8 +49,8 @@ public static partial class ContentValidator
             ctx.Ref(t, ctx.Db.Items, t.Item, "item");
             ctx.Ref(t, ctx.Db.LootTables, t.Loot, "loot");
             ctx.Light(t, t.Light, "light");
-            ctx.Asset(t, t.Model, "model");
             if (t.Variants < 1) ctx.Error(t, "variants must be >= 1.");
+            for (int v = 0; v < t.Variants; v++) ctx.Asset(t, AssetPaths.ObjectModel(t, v), $"model (variant {v})");
             if (t.HitPoints < 1) ctx.Error(t, "hitPoints must be >= 1.");
             if (t.Interaction == TileInteraction.Chest && t.ContainerSlots <= 0) ctx.Error(t, "chest needs containerSlots.");
             if (t.Interaction == TileInteraction.Station && t.Stations.Length == 0) ctx.Error(t, "station needs 'stations'.");
