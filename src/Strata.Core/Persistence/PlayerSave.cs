@@ -1,0 +1,103 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
+using Strata.Core.Content;
+using Strata.Core.Gameplay.Items;
+using Strata.Core.Gameplay.Player;
+using Strata.Core.Persistence.Migrations;
+
+namespace Strata.Core.Persistence;
+
+/// <summary>Versioned JSON save of a player character (content ids as strings; unknown ids become placeholders).</summary>
+public sealed class PlayerSave
+{
+    public const string FormatId = "strata-player";
+    public const int CurrentVersion = 1;
+
+    public string Format { get; set; } = FormatId;
+    public int Version { get; set; } = CurrentVersion;
+    public string Name { get; set; } = "";
+    public int Life { get; set; }
+    public int Mana { get; set; }
+    public int BonusLife { get; set; }
+    public int BonusMana { get; set; }
+    public int Deaths { get; set; }
+    public int SelectedHotbar { get; set; }
+    public List<SlotModel> Backpack { get; set; } = new();
+    public List<SlotModel> Armor { get; set; } = new();
+    public List<SlotModel> Accessories { get; set; } = new();
+    public List<BuffModel> Buffs { get; set; } = new();
+    public Dictionary<string, int[]> SpawnPoints { get; set; } = new();
+
+    [JsonExtensionData]
+    public Dictionary<string, JsonElement>? Extra { get; set; }
+
+    public sealed record SlotModel(int Slot, string Item, int Count, string? Prefix);
+
+    public sealed record BuffModel(string Id, int Ticks);
+
+    public static PlayerSave From(PlayerState p) => new()
+    {
+        Name = p.Name,
+        Life = p.Vitals.Life,
+        Mana = p.Vitals.Mana,
+        BonusLife = p.BonusLife,
+        BonusMana = p.BonusMana,
+        Deaths = p.Deaths,
+        SelectedHotbar = p.Inventory.SelectedHotbar,
+        Backpack = Slots(p.Inventory.Backpack),
+        Armor = Slots(p.Inventory.Armor),
+        Accessories = Slots(p.Inventory.Accessories),
+        Buffs = p.Buffs.Active.Where(b => !b.Def.Debuff).Select(b => new BuffModel(b.Def.Id, b.TicksLeft)).ToList(),
+        SpawnPoints = new Dictionary<string, int[]>(p.SpawnPoints),
+    };
+
+    public PlayerState ToState(ContentDatabase content)
+    {
+        var p = new PlayerState(Name) { BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths };
+        Fill(p.Inventory.Backpack, Backpack, content);
+        Fill(p.Inventory.Armor, Armor, content);
+        Fill(p.Inventory.Accessories, Accessories, content);
+        foreach (var b in Buffs)
+            if (content.Buffs.TryGet(b.Id, out var def)) p.Buffs.Add(def, b.Ticks);
+        foreach (var kv in SpawnPoints) p.SpawnPoints[kv.Key] = kv.Value;
+        p.Inventory.Select(SelectedHotbar);
+        p.Recompute();
+        p.Vitals.Life = Math.Clamp(Life, 1, p.Vitals.MaxLife);
+        p.Vitals.Mana = Math.Clamp(Mana, 0, p.Vitals.MaxMana);
+        return p;
+    }
+
+    public string Serialize() => JsonSerializer.Serialize(this, SaveJson.Options);
+
+    public static PlayerSave Deserialize(string json)
+    {
+        var node = JsonNode.Parse(json) as JsonObject ?? throw new InvalidDataException("Player save is not an object.");
+        SaveMigrations.Default.Upgrade(node, FormatId, CurrentVersion);
+        var save = node.Deserialize<PlayerSave>(SaveJson.Options) ?? throw new InvalidDataException("Empty player save.");
+        if (save.Format != FormatId) throw new InvalidDataException($"Unexpected player format '{save.Format}'.");
+        return save;
+    }
+
+    private static List<SlotModel> Slots(Inventory inv)
+    {
+        var list = new List<SlotModel>();
+        for (int i = 0; i < inv.Size; i++)
+        {
+            var s = inv[i];
+            if (!s.IsEmpty) list.Add(new SlotModel(i, s.Item!.Id, s.Count, s.Prefix?.Id));
+        }
+        return list;
+    }
+
+    private static void Fill(Inventory inv, List<SlotModel> slots, ContentDatabase content)
+    {
+        foreach (var s in slots)
+        {
+            if (s.Slot < 0 || s.Slot >= inv.Size) continue;
+            var item = content.GetOrAddPlaceholderItem(s.Item);
+            var prefix = s.Prefix == null ? null : content.GetOrAddPlaceholderPrefix(s.Prefix);
+            inv[s.Slot] = new ItemStack(item, s.Count, prefix);
+        }
+    }
+}
