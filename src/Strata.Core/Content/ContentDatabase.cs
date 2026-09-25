@@ -21,6 +21,7 @@ public sealed class ContentDatabase
     public Registry<LootTableDef> LootTables { get; } = new("lootTable");
     public Registry<ProgressionFlagDef> Flags { get; } = new("flag");
     public Registry<OreVeinDef> OreVeins { get; } = new("oreVein");
+    public Registry<EventDef> Events { get; } = new("event");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();

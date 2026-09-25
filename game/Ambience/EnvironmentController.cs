@@ -65,6 +65,11 @@ public sealed partial class EnvironmentController : Node3D
         AddChild(_moon);
     }
 
+    /// <summary>Tint of the active world event (crimson moon…), or null.</summary>
+    public Color? EventTint { get; set; }
+
+    private float _eventBlend;
+
     /// <summary>Updates lighting for the given clock; <paramref name="depthBelowSurface"/> (m) darkens fog underground.</summary>
     public void Apply(GameClock clock, float depthBelowSurface, double delta)
     {
@@ -93,6 +98,9 @@ public sealed partial class EnvironmentController : Node3D
         var dayAmbient = new Color(0.55f, 0.62f, 0.72f);
         var nightAmbient = new Color(0.07f, 0.09f, 0.16f);
         var ambient = nightAmbient.Lerp(dayAmbient, Daylight).Lerp(new Color(0.75f, 0.5f, 0.4f), dusk * 0.4f);
+        _eventBlend = Mathf.MoveToward(_eventBlend, EventTint.HasValue ? 1f : 0f, (float)delta * 0.3f);
+        var eventTint = Colors.White.Lerp(EventTint ?? Colors.White, _eventBlend);
+        ambient *= Colors.White.Lerp(eventTint, 0.45f);
         RenderingServer.GlobalShaderParameterSet("strata_sky_ambient", ambient);
         RenderingServer.GlobalShaderParameterSet("strata_daylight", Daylight);
         RenderingServer.GlobalShaderParameterSet("strata_time", _time);
@@ -102,11 +110,12 @@ public sealed partial class EnvironmentController : Node3D
         _sky.SetShaderParameter("sun_dir", sunDir);
         _sky.SetShaderParameter("moon_dir", moonDir);
         _sky.SetShaderParameter("moon_phase", clock.MoonPhase / 8f);
+        _sky.SetShaderParameter("tint", Colors.White.Lerp(eventTint, 0.7f));
 
         // Fog: hazy outdoors, thick and dark in the depths.
         float under = Mathf.Clamp(depthBelowSurface / 30f, 0f, 1f);
         var skyFog = new Color(0.62f, 0.72f, 0.82f).Lerp(new Color(0.03f, 0.04f, 0.07f), 1f - Daylight);
-        _env.FogLightColor = skyFog.Lerp(new Color(0.02f, 0.02f, 0.03f), under);
+        _env.FogLightColor = skyFog.Lerp(new Color(0.02f, 0.02f, 0.03f), under) * Colors.White.Lerp(eventTint, 0.5f);
         _env.FogDensity = Mathf.Lerp(0.0022f, 0.018f, under);
         _env.FogSkyAffect = Mathf.Lerp(0.25f, 1f, under);
     }

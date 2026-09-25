@@ -60,10 +60,11 @@ public sealed class SpawnDirector
     public void Tick()
     {
         if (!Enabled || _world.Session.Clock.Tick % Config.CheckInterval != 0) return;
-        int max = _world.Session.Clock.IsDay ? Config.MaxNearbyDay : Config.MaxNearbyNight;
+        int max = (_world.Session.Clock.IsDay ? Config.MaxNearbyDay : Config.MaxNearbyNight) + _world.Events.MaxNearbyBonus;
+        float chance = MathF.Min(1f, Config.Chance * _world.Events.SpawnRateMultiplier);
         foreach (var p in _world.Players)
         {
-            if (!p.Alive || _npcs.CountNear(p.Center, Config.CountRadius) >= max || !_rng.Chance(Config.Chance)) continue;
+            if (!p.Alive || _npcs.CountNear(p.Center, Config.CountRadius) >= max || !_rng.Chance(chance)) continue;
             TrySpawnNear(p);
         }
     }

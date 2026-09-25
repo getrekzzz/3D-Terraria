@@ -4,6 +4,8 @@
     { "id": "gel_cave", "coins": [15, 60], "entries": [{ "item": "gel", "min": 2, "max": 4 }, { "item": "torch", "min": 1, "max": 3, "chance": 0.1 }] },
     { "id": "shambler", "coins": [30, 90], "entries": [{ "item": "minor_restorative", "chance": 0.02 }] },
     { "id": "gazer", "coins": [40, 120], "entries": [{ "item": "lens", "chance": 0.33 }] },
+    { "id": "gore_shambler", "coins": [60, 160], "entries": [{ "item": "minor_restorative", "chance": 0.05 }, { "item": "lens", "chance": 0.1 }] },
+    { "id": "drip_eye", "coins": [80, 200], "entries": [{ "item": "lens", "min": 1, "max": 2, "chance": 0.5 }] },
     { "id": "cave_bat", "coins": [20, 60], "entries": [{ "item": "starshard", "chance": 0.02 }] }
   ]
 }

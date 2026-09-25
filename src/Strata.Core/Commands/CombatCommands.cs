@@ -43,6 +43,28 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "event", Usage = "event <id> | event stop <id> | event list", Help = "Starts, stops or lists world events.",
+            Run = (ctx, a) =>
+            {
+                var events = ctx.World.Events;
+                var content = ctx.World.Session.Content;
+                switch (a.Str(0, "id"))
+                {
+                    case "list":
+                        return CommandResult.Success("active: " + (events.Active.Count == 0 ? "none" : string.Join(", ", events.Active.Select(e => $"{e.Def.Id} ({(e.TicksLeft < 0 ? "until phase end" : $"{e.TicksLeft / 60}s")}, kills {e.Kills})")))
+                            + "\nknown: " + string.Join(", ", content.Events.All.Select(e => e.Id)));
+                    case "stop":
+                        var stopId = a.Str(1, "id");
+                        return events.Stop(stopId) ? CommandResult.Success($"Stopped {stopId}.") : CommandResult.Fail($"{stopId} is not active");
+                    default:
+                        var id = a[0];
+                        if (!content.Events.TryGet(id, out var def)) throw new CommandException($"unknown event '{id}'");
+                        return events.Start(def) ? CommandResult.Success($"Started {def.DisplayName}.") : CommandResult.Fail($"{id} is already active");
+                }
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "killall", Usage = "killall", Help = "Removes every creature (no loot).",
             Run = (ctx, _) =>
             {

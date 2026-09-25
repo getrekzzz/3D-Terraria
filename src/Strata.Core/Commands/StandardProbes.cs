@@ -34,6 +34,7 @@ internal static class StandardProbes
         ctx.AddProbe("projectiles.count", () => w.Projectiles.All.Count);
         ctx.AddPrefixProbe("npcs.", id => w.Session.Content.Enemies.Contains(id) ? w.Npcs.All.Count(n => n.Def.Id == id) : null);
         ctx.AddPrefixProbe("inv.", id => w.Session.Content.Items.TryGet(id, out var item) ? ctx.Player.State.Inventory.Backpack.Count(item) : null);
+        ctx.AddPrefixProbe("event.", id => w.Session.Content.Events.Contains(id) ? (w.Events.IsActive(id) ? 1 : 0) : null);
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);
         // block.<dx>.<dy>.<dz>: runtime block id relative to the player's feet cell (0 = air).

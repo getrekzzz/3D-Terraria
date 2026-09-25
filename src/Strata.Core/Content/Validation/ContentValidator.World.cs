@@ -7,6 +7,27 @@ public static partial class ContentValidator
 {
     private static readonly HashSet<string> PrefixGroups = new() { "melee", "ranged", "magic", "summon", "tool", "accessory", "universal" };
 
+    private static void ValidateEvents(Ctx ctx)
+    {
+        foreach (var e in ctx.Db.Events.All)
+        {
+            if (e.Chance is < 0 or > 1) ctx.Error(e, "chance must be 0–1.");
+            if (e.Phase == EventPhase.Manual && e.Duration <= 0 && e.KillGoal <= 0) ctx.Error(e, "manual events need a duration or a kill goal.");
+            if (e.KillGoal > 0 && string.IsNullOrEmpty(e.KillTag)) ctx.Error(e, "killGoal needs killTag.");
+            if (e.SpawnRateMultiplier <= 0) ctx.Error(e, "spawnRateMultiplier must be > 0.");
+            ctx.Ref(e, ctx.Db.Enemies, e.FinaleEnemy, "finaleEnemy");
+            ctx.Ref(e, ctx.Db.Flags, e.CompletionFlag, "completionFlag");
+            ctx.Color(e, e.SkyTint, "skyTint");
+            ctx.Specs(e, SpecKind.Condition, e.Conditions, "conditions");
+        }
+        foreach (var s in ctx.Db.SpawnRules.All)
+            foreach (var c in s.Conditions.Where(c => c.Type == "event"))
+            {
+                var id = c.Raw.TryGetProperty("id", out var v) ? v.GetString() : null;
+                if (id != null && !ctx.Db.Events.Contains(id)) ctx.Error(s, $"event condition references unknown event '{id}'.");
+            }
+    }
+
     private static void ValidateEnemies(Ctx ctx)
     {
         foreach (var e in ctx.Db.Enemies.All)

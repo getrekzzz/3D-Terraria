@@ -86,6 +86,7 @@ public sealed partial class Hud : CanvasLayer
         root.AddChild(_death);
 
         ui.Notified += Toast;
+        ui.Game.Events.Announced += (text, def) => Announce(text, def.SkyTint != null ? Color.FromHtml(def.SkyTint).Lightened(0.3f) : new Color(0.7f, 0.85f, 1f));
         ui.Game.ItemPickedUp += (p, stack) =>
         {
             if (p == ui.Entity) Toast($"+{stack.Count} {stack.Item!.DisplayName}", UiTheme.Rarity(stack.Item.Rarity));
@@ -162,6 +163,22 @@ public sealed partial class Hud : CanvasLayer
         tween.TweenProperty(label, "modulate:a", 0.0, 0.6);
         tween.TweenCallback(Callable.From(label.QueueFree));
         while (_toasts.GetChildCount() > 6) _toasts.GetChild(0).Free();
+    }
+
+    /// <summary>Large centred message (events, bosses) that fades after a few seconds.</summary>
+    public void Announce(string text, Color color)
+    {
+        var label = new Label { Text = text, HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = Control.MouseFilterEnum.Ignore };
+        label.SetAnchorsPreset(Control.LayoutPreset.CenterTop);
+        label.GrowHorizontal = Control.GrowDirection.Both;
+        label.OffsetTop = 120;
+        label.AddThemeFontSizeOverride("font_size", 30);
+        label.AddThemeColorOverride("font_color", color);
+        _death.GetParent().AddChild(label);
+        var tween = label.CreateTween();
+        tween.TweenInterval(4.0);
+        tween.TweenProperty(label, "modulate:a", 0.0, 1.5);
+        tween.TweenCallback(Callable.From(label.QueueFree));
     }
 
     private static Label Centered(Control root, float offsetBottom, int size)

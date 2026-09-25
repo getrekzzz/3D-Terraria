@@ -37,6 +37,7 @@ public sealed partial class WorldSession
                 ? (plan.ColumnTop[plan.ColumnIndex(cx, cz)] - 1) >> ChunkMath.Shift
                 : plan.Bands.SeaLevel >> ChunkMath.Shift);
         Flags = new HashSet<string>(meta.Flags, StringComparer.Ordinal);
+        Events = new HashSet<string>(StringComparer.Ordinal);
         World.TileObjects.Added += o => MarkModified(o);
         World.TileObjects.Removed += o => MarkModified(o);
 
@@ -56,6 +57,9 @@ public sealed partial class WorldSession
     public SkyMap Sky { get; }
     public GameClock Clock { get; }
     public HashSet<string> Flags { get; }
+
+    /// <summary>Ids of running world events (maintained by the event director).</summary>
+    public HashSet<string> Events { get; }
 
     /// <summary>True while tile objects are being installed from chunk data (not a gameplay change).</summary>
     private bool _installing;

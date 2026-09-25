@@ -1,0 +1,19 @@
+{
+  // World events. Night events roll at dusk and day events at dawn (chance + conditions); manual events are
+  // started by items, progression or commands. Spawn rules react through { "type": "event", "id": ... }.
+  "events": [
+    {
+      "id": "blood_moon", "name": "Crimson Moon", "phase": "night", "chance": 0.11,
+      "conditions": [{ "type": "moon", "phases": [1, 2, 3, 5, 6, 7] }],
+      "spawnRateMultiplier": 2.5, "maxNearbyBonus": 4, "skyTint": "#b83030", "preventsSleep": true,
+      "startMessage": "The Crimson Moon is rising...", "endMessage": "The Crimson Moon has set.",
+      "covers": ["terraria:blood_moon"]
+    },
+    {
+      "id": "slime_rain", "name": "Gel Downpour", "phase": "day", "chance": 0.03,
+      "spawnRateMultiplier": 3, "maxNearbyBonus": 6, "killGoal": 60, "killTag": "gel",
+      "startMessage": "Gel is falling from the sky!", "endMessage": "The gel downpour has passed.",
+      "covers": ["terraria:slime_rain"]
+    }
+  ]
+}

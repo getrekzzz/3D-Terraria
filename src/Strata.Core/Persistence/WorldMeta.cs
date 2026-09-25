@@ -38,12 +38,17 @@ public sealed class WorldMeta
     public int MutationLevel { get; set; }
     public List<string> Flags { get; set; } = new();
     public List<string> ActiveEvents { get; set; } = new();
+
+    /// <summary>Running events with their remaining time and kill progress.</summary>
+    public List<EventStateModel> EventStates { get; set; } = new();
     public int[] Spawn { get; set; } = { 0, 0, 0 };
 
     public IdTablesModel IdTables { get; set; } = new();
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
+
+    public sealed record EventStateModel(string Id, int TicksLeft, int Kills);
 
     public sealed class IdTablesModel
     {

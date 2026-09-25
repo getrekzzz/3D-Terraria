@@ -29,6 +29,7 @@ public static partial class ContentValidator
         ValidateProjectilesAndBuffs(ctx);
         ValidateLoot(ctx);
         ValidateFlags(ctx);
+        ValidateEvents(ctx);
         if (options.CheckObtainability) ValidateObtainability(ctx);
     }
 

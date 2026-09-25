@@ -1,0 +1,14 @@
+{
+  // Creatures that only appear during world events.
+  "enemies": [
+    { "id": "gore_shambler", "model": "shambler", "tags": ["undead"], "name": "Gore Shambler", "description": "Drawn out by the crimson moon.", "brain": { "type": "walker", "aggroRange": 90, "jumpHeight": 5 }, "life": 60, "damage": 18, "defense": 8, "knockbackResist": 0.45, "size": [2.0, 3.6], "moveSpeed": 2.8, "tint": "#ff8a80", "loot": "gore_shambler", "value": 90, "covers": ["terraria:blood_zombie"] },
+    { "id": "drip_eye", "model": "gazer", "name": "Weeping Eye", "brain": { "type": "flyer", "aggroRange": 100, "orbitRadius": 8, "dashSpeed": 12, "dashCooldown": 110 }, "life": 70, "damage": 20, "defense": 4, "knockbackResist": 0.3, "size": [2.2, 2.2], "moveSpeed": 5.5, "gravity": false, "tint": "#ff9a9a", "loot": "drip_eye", "value": 110, "covers": ["terraria:drippler"] },
+    { "id": "rain_gel", "model": "gel", "tags": ["gel"], "name": "Downpour Gel", "brain": { "type": "slimeHop", "jumpHeight": 5, "jumpSpeed": 4.0, "hopInterval": 55 }, "life": 30, "damage": 10, "defense": 3, "knockbackResist": 0.1, "size": [2.4, 2.0], "moveSpeed": 3, "tint": "#b070ff", "loot": "gel_small", "value": 60, "covers": ["terraria:purple_slime"] }
+  ],
+  "spawnRules": [
+    { "id": "gore_shambler_blood_moon", "enemy": "gore_shambler", "weight": 5, "group": [1, 2], "conditions": [{ "type": "event", "id": "blood_moon" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "drip_eye_blood_moon", "enemy": "drip_eye", "weight": 3, "conditions": [{ "type": "event", "id": "blood_moon" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "rain_gel_downpour", "enemy": "rain_gel", "weight": 6, "group": [1, 3], "conditions": [{ "type": "event", "id": "slime_rain" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "green_gel_downpour", "enemy": "green_gel", "weight": 4, "group": [1, 2], "conditions": [{ "type": "event", "id": "slime_rain" }, { "type": "layer", "any": ["surface"] }] }
+  ]
+}

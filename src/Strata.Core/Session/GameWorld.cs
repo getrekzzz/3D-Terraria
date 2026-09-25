@@ -1,6 +1,7 @@
 using System.Numerics;
 using Strata.Core.Common;
 using Strata.Core.Gameplay.Entities;
+using Strata.Core.Gameplay.Events;
 using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Player;
@@ -102,6 +103,7 @@ public sealed class GameWorld : IDisposable
         Melee = new MeleeSystem(Npcs, ItemUse);
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
         Spawner = new SpawnDirector(this, Npcs);
+        Events = new EventDirector(this, Npcs);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
     }
@@ -118,6 +120,7 @@ public sealed class GameWorld : IDisposable
     public MeleeSystem Melee { get; }
     public ProjectileSystem Projectiles { get; }
     public SpawnDirector Spawner { get; }
+    public EventDirector Events { get; }
     public string? PlayerDirectory { get; }
     public List<PlayerEntity> Players { get; } = new();
 
@@ -159,6 +162,7 @@ public sealed class GameWorld : IDisposable
         else
             Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
         foreach (var p in Players) TickPlayer(p);
+        Events.Tick();
         Spawner.Tick();
         Npcs.Tick();
         Melee.Tick();
@@ -231,6 +235,7 @@ public sealed class GameWorld : IDisposable
     /// <summary>Saves modified chunks, world metadata and every player. Returns chunks written.</summary>
     public int SaveAll()
     {
+        Events.Persist();
         int chunks = Session.SaveAll();
         foreach (var p in Players) SavePlayer(p.State);
         return chunks;

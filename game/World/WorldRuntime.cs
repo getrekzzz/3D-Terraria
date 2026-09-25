@@ -90,6 +90,7 @@ public sealed partial class WorldRuntime : Node3D
         Game.Update(focus, backlog > 64 ? 14.0 : backlog > 16 ? 8.0 : 4.0);
         _renderer.ProcessUploads(3.0);
         _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
+        _environment.EventTint = Game.Events.SkyTint is { } tint ? Color.FromHtml(tint) : null;
         float surface = Session.Generator.Terrain.SurfaceHeight(focus.X, focus.Z);
         _environment.Apply(Session.Clock, (surface - focus.Y) * Units.CellSize, delta);
     }
