@@ -1,0 +1,83 @@
+using Strata.Core.Content;
+using Strata.Core.Content.Defs;
+
+namespace Strata.Core.Meshing;
+
+/// <summary>How a cell participates in meshing (precomputed per block runtime id).</summary>
+public enum CellClass : byte
+{
+    /// <summary>Air or non-rendered.</summary>
+    Empty,
+
+    /// <summary>Natural opaque material in the smooth surface.</summary>
+    Smooth,
+
+    /// <summary>Built opaque full cube (crisp faces, snaps the surface to the grid).</summary>
+    Crisp,
+
+    /// <summary>See-through full cube (glass, leaves, webs, crystals).</summary>
+    Transparent,
+}
+
+/// <summary>Texture layers of one render surface (a distinct top/side/bottom combination).</summary>
+public readonly record struct SurfaceLayers(int Top, int Side, int Bottom);
+
+/// <summary>
+/// Per-block rendering and light properties resolved once from content + the texture atlas layout.
+/// Immutable and shared by all mesh jobs.
+/// </summary>
+public sealed class RenderTables
+{
+    public RenderTables(ContentDatabase content, Func<string, int> layerIndex)
+    {
+        int n = content.Blocks.Count;
+        Class = new CellClass[n];
+        Surface = new ushort[n];
+        Solid = new bool[n];
+        LightFilter = new byte[n];
+        Emission = new ushort[n];
+        var surfaces = new List<SurfaceLayers>();
+        var bySurface = new Dictionary<SurfaceLayers, ushort>();
+        foreach (var b in content.Blocks.All)
+        {
+            int id = b.RuntimeId;
+            Class[id] = b.Render switch
+            {
+                BlockRender.Smooth => CellClass.Smooth,
+                BlockRender.Crisp => CellClass.Crisp,
+                BlockRender.Transparent => CellClass.Transparent,
+                _ => CellClass.Empty,
+            };
+            Solid[id] = b.IsSolid;
+            LightFilter[id] = b.IsOpaque ? (byte)15 : b.HasTag("leaf") ? (byte)2 : b.Render == BlockRender.Transparent ? (byte)1 : (byte)0;
+            if (b.Light is { Length: 3 } l) Emission[id] = LightValue.Pack(0, l[0], l[1], l[2]);
+            if (b.Render == BlockRender.None) continue;
+            var layers = new SurfaceLayers(layerIndex(b.Textures.TopLayer), layerIndex(b.Textures.SideLayer), layerIndex(b.Textures.BottomLayer));
+            if (!bySurface.TryGetValue(layers, out var s))
+            {
+                s = (ushort)surfaces.Count;
+                surfaces.Add(layers);
+                bySurface[layers] = s;
+            }
+            Surface[id] = s;
+        }
+        Surfaces = surfaces;
+    }
+
+    public CellClass[] Class { get; }
+
+    /// <summary>Render surface id per block (index into <see cref="Surfaces"/>).</summary>
+    public ushort[] Surface { get; }
+
+    public bool[] Solid { get; }
+
+    /// <summary>Extra light attenuation per step through the block (15 = opaque).</summary>
+    public byte[] LightFilter { get; }
+
+    /// <summary>Emitted light per block (packed <see cref="LightValue"/>).</summary>
+    public ushort[] Emission { get; }
+
+    public IReadOnlyList<SurfaceLayers> Surfaces { get; }
+
+    public bool IsOpaque(ushort block) => Class[block] is CellClass.Smooth or CellClass.Crisp;
+}

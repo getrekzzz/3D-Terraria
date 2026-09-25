@@ -10,6 +10,7 @@ public static class Program
         new ManifestCommand(),
         new ValidateCommand(),
         new WorldgenReportCommand(),
+        new MeshBenchCommand(),
     };
 
     public static int Main(string[] args)
