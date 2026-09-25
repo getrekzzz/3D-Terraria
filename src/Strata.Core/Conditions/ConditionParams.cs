@@ -1,0 +1,75 @@
+using Strata.Core.Content;
+using Strata.Core.Content.Specs;
+
+namespace Strata.Core.Conditions;
+
+public sealed class BiomeConditionParams : SpecParams, IValidatableSpec
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+    public string[] None { get; init; } = Array.Empty<string>();
+
+    public string? Validate() => Any.Length == 0 && None.Length == 0 ? "biome condition needs 'any' or 'none'" : null;
+}
+
+public sealed class LayerConditionParams : SpecParams, IValidatableSpec
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+
+    public string? Validate()
+    {
+        foreach (var l in Any)
+            if (!Enum.TryParse<World.WorldLayer>(l, ignoreCase: true, out _)) return $"unknown layer '{l}'";
+        return Any.Length == 0 ? "layer condition needs 'any'" : null;
+    }
+}
+
+public sealed class TimeConditionParams : SpecParams, IValidatableSpec
+{
+    /// <summary>"day", "night", or null to use the hour window.</summary>
+    public string? Is { get; init; }
+
+    public float FromHour { get; init; }
+    public float ToHour { get; init; } = 24f;
+
+    public string? Validate() => Is is null or "day" or "night" ? null : $"time.is must be day|night, got '{Is}'";
+}
+
+public sealed class FlagConditionParams : SpecParams
+{
+    public string Id { get; init; } = "";
+    public bool Set { get; init; } = true;
+}
+
+public sealed class EventConditionParams : SpecParams
+{
+    public string Id { get; init; } = "";
+    public bool Active { get; init; } = true;
+}
+
+public sealed class RangeConditionParams : SpecParams
+{
+    public float Min { get; init; } = float.MinValue;
+    public float Max { get; init; } = float.MaxValue;
+}
+
+public sealed class MoonConditionParams : SpecParams
+{
+    public int[] Phases { get; init; } = Array.Empty<int>();
+}
+
+public sealed class NearLiquidParams : SpecParams
+{
+    public string Liquid { get; init; } = "water";
+}
+
+public sealed class ChanceConditionParams : SpecParams, IValidatableSpec
+{
+    public float P { get; init; } = 0.5f;
+
+    public string? Validate() => P is < 0 or > 1 ? "p must be in [0,1]" : null;
+}
+
+public sealed class CompositeConditionParams : SpecParams
+{
+    public TypedSpec[] Of { get; init; } = Array.Empty<TypedSpec>();
+}

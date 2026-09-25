@@ -1,0 +1,11 @@
+{
+  "tileObjects": [
+    { "id": "workbench", "name": "Workbench", "size": [4, 2, 2], "interaction": "station", "stations": ["workbench"], "housing": ["table"], "hitPoints": 3, "itemCategory": "station", "itemValue": 30, "covers": ["terraria:work_bench"] },
+    { "id": "furnace", "name": "Furnace", "size": [3, 3, 3], "interaction": "station", "stations": ["furnace"], "light": [9, 5, 2], "hitPoints": 4, "itemCategory": "station", "itemValue": 300, "covers": ["terraria:furnace"] },
+    { "id": "iron_anvil", "name": "Iron Anvil", "size": [3, 2, 2], "interaction": "station", "stations": ["anvil"], "hitPoints": 5, "itemCategory": "station", "itemValue": 5000, "covers": ["terraria:iron_anvil"] },
+    { "id": "lead_anvil", "name": "Lead Anvil", "size": [3, 2, 2], "interaction": "station", "stations": ["anvil"], "hitPoints": 5, "itemCategory": "station", "itemValue": 5000, "covers": ["terraria:lead_anvil"] },
+    { "id": "alchemy_bottle", "name": "Placed Bottle", "size": [1, 1, 1], "anchor": "floor", "interaction": "station", "stations": ["alchemy"], "item": "bottle", "hitPoints": 1, "covers": ["terraria:placed_bottle"] },
+    { "id": "sawmill", "name": "Sawmill", "size": [4, 3, 2], "interaction": "station", "stations": ["sawmill"], "hitPoints": 4, "itemCategory": "station", "itemValue": 500, "covers": ["terraria:sawmill"] },
+    { "id": "loom", "name": "Loom", "size": [4, 3, 2], "interaction": "station", "stations": ["loom"], "hitPoints": 4, "itemCategory": "station", "itemValue": 500, "covers": ["terraria:loom"] }
+  ]
+}

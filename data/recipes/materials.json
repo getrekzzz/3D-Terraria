@@ -1,0 +1,24 @@
+{
+  "recipes": [
+    { "id": "stone_brick", "output": "stone_brick", "inputs": [{ "item": "stone", "count": 2 }], "stations": ["furnace"] },
+    { "id": "red_brick", "output": "red_brick", "inputs": [{ "item": "clay", "count": 2 }], "stations": ["furnace"] },
+    { "id": "sandstone_brick", "output": "sandstone_brick", "inputs": [{ "item": "sandstone", "count": 2 }], "stations": ["furnace"] },
+    { "id": "snow_brick", "output": "snow_brick", "inputs": [{ "item": "snow", "count": 2 }], "stations": ["workbench"] },
+    { "id": "mud_brick", "output": "mud_brick", "inputs": [{ "item": "mud", "count": 2 }], "stations": ["furnace"] },
+    { "id": "copper_brick", "output": "copper_brick", "inputs": [{ "item": "stone", "count": 1 }, { "item": "copper_ore", "count": 1 }], "stations": ["furnace"] },
+    { "id": "gold_brick", "output": "gold_brick", "inputs": [{ "item": "stone", "count": 1 }, { "item": "gold_ore", "count": 1 }], "stations": ["furnace"] },
+    { "id": "obsidian_brick", "output": "obsidian_brick", "inputs": [{ "item": "obsidian", "count": 2 }], "stations": ["furnace"] },
+    { "id": "cinder_brick", "output": "cinder_brick", "inputs": [{ "item": "cinderstone", "count": 1 }, { "item": "ash", "count": 1 }], "stations": ["furnace"] },
+    { "id": "sky_brick", "output": "sky_brick", "inputs": [{ "item": "stone", "count": 1 }, { "item": "starshard", "count": 1 }], "stations": ["furnace"] },
+    { "id": "glass", "output": "glass", "inputs": [{ "item": "sand", "count": 2 }], "stations": ["furnace"] },
+    { "id": "bottle", "output": "bottle", "count": 2, "inputs": [{ "item": "glass", "count": 1 }], "stations": ["furnace"] },
+    { "id": "silk_thread", "output": "silk_thread", "inputs": [{ "item": "cobweb", "count": 7 }], "stations": ["loom"] },
+    { "id": "minor_restorative", "output": "minor_restorative", "count": 2, "inputs": [{ "item": "mushroom", "count": 2 }, { "item": "gel", "count": 2 }, { "item": "bottle", "count": 2 }], "stations": ["alchemy"] },
+    { "id": "minor_mana_tonic", "output": "minor_mana_tonic", "count": 2, "inputs": [{ "item": "gel", "count": 2 }, { "item": "starshard", "count": 1 }, { "item": "bottle", "count": 2 }], "stations": ["alchemy"] },
+    { "id": "mana_star", "output": "mana_star", "inputs": [{ "item": "starshard", "count": 5 }] },
+    { "id": "swiftness_draught", "output": "swiftness_draught", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "glowcap", "count": 1 }, { "item": "cactus", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
+    { "id": "ironbark_draught", "output": "ironbark_draught", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "iron_ore", "count": 1 }, { "item": "mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
+    { "id": "amethyst_staff", "output": "amethyst_staff", "inputs": [{ "item": "copper_bar", "count": 10 }, { "item": "amethyst", "count": 8 }], "stations": ["anvil"] },
+    { "id": "topaz_staff", "output": "topaz_staff", "inputs": [{ "item": "tin_bar", "count": 10 }, { "item": "topaz", "count": 8 }], "stations": ["anvil"] }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "recipeGroups": [
+    { "id": "any_wood", "name": "Any Wood", "items": ["wood", "pine_wood", "jungle_wood", "palm_wood"] },
+    { "id": "any_iron_bar", "name": "Any Iron Bar", "items": ["iron_bar", "lead_bar"] },
+    { "id": "any_copper_bar", "name": "Any Copper Bar", "items": ["copper_bar", "tin_bar"] }
+  ],
+  "recipes": [
+    { "id": "workbench", "output": "workbench", "inputs": [{ "group": "any_wood", "count": 10 }] },
+    { "id": "torch", "output": "torch", "count": 3, "inputs": [{ "item": "gel", "count": 1 }, { "group": "any_wood", "count": 1 }] },
+    { "id": "wooden_table", "output": "wooden_table", "inputs": [{ "item": "wood", "count": 8 }], "stations": ["workbench"] },
+    { "id": "wooden_chair", "output": "wooden_chair", "inputs": [{ "item": "wood", "count": 4 }], "stations": ["workbench"] },
+    { "id": "wooden_door", "output": "wooden_door", "inputs": [{ "item": "wood", "count": 6 }], "stations": ["workbench"] },
+    { "id": "wooden_chest", "output": "wooden_chest", "inputs": [{ "item": "wood", "count": 8 }, { "group": "any_iron_bar", "count": 2 }], "stations": ["workbench"] },
+    { "id": "wooden_bed", "output": "wooden_bed", "inputs": [{ "item": "wood", "count": 15 }, { "item": "silk_thread", "count": 5 }], "stations": ["sawmill"] },
+    { "id": "candle", "output": "candle", "inputs": [{ "item": "gel", "count": 2 }, { "item": "wood", "count": 1 }], "stations": ["workbench"] },
+    { "id": "sawmill", "output": "sawmill", "inputs": [{ "item": "wood", "count": 10 }, { "group": "any_iron_bar", "count": 2 }, { "item": "wooden_chair", "count": 1 }], "stations": ["workbench"] },
+    { "id": "loom", "output": "loom", "inputs": [{ "item": "wood", "count": 12 }], "stations": ["sawmill"] },
+    { "id": "furnace", "output": "furnace", "inputs": [{ "item": "stone", "count": 20 }, { "group": "any_wood", "count": 4 }, { "item": "torch", "count": 3 }], "stations": ["workbench"] },
+    { "id": "iron_anvil", "output": "iron_anvil", "inputs": [{ "item": "iron_bar", "count": 5 }], "stations": ["workbench"] },
+    { "id": "lead_anvil", "output": "lead_anvil", "inputs": [{ "item": "lead_bar", "count": 5 }], "stations": ["workbench"] },
+    { "id": "rail", "output": "rail", "count": 50, "inputs": [{ "group": "any_iron_bar", "count": 1 }, { "item": "wood", "count": 1 }], "stations": ["anvil"] },
+    { "id": "wooden_sword", "output": "wooden_sword", "inputs": [{ "item": "wood", "count": 7 }], "stations": ["workbench"] },
+    { "id": "wooden_hammer", "output": "wooden_hammer", "inputs": [{ "item": "wood", "count": 8 }], "stations": ["workbench"] },
+    { "id": "wooden_bow", "output": "wooden_bow", "inputs": [{ "item": "wood", "count": 10 }], "stations": ["workbench"] },
+    { "id": "wooden_arrow", "output": "wooden_arrow", "count": 5, "inputs": [{ "group": "any_wood", "count": 1 }, { "item": "stone", "count": 1 }], "stations": ["workbench"] },
+    { "id": "timber_helmet", "output": "timber_helmet", "inputs": [{ "item": "wood", "count": 20 }], "stations": ["workbench"] },
+    { "id": "timber_breastplate", "output": "timber_breastplate", "inputs": [{ "item": "wood", "count": 30 }], "stations": ["workbench"] },
+    { "id": "timber_greaves", "output": "timber_greaves", "inputs": [{ "item": "wood", "count": 25 }], "stations": ["workbench"] }
+  ]
+}

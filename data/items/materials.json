@@ -1,0 +1,228 @@
+{
+  "items": [
+    {
+      "id": "gel",
+      "name": "Gel",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 1,
+      "covers": [
+        "terraria:gel"
+      ]
+    },
+    {
+      "id": "lens",
+      "name": "Lens",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 100,
+      "covers": [
+        "terraria:lens"
+      ]
+    },
+    {
+      "id": "silk_thread",
+      "name": "Silk Thread",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 10,
+      "covers": [
+        "terraria:cobweb"
+      ]
+    },
+    {
+      "id": "geode_shard",
+      "name": "Geode Shard",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 60,
+      "rarity": 1,
+      "heldLight": [
+        4,
+        2,
+        6
+      ]
+    },
+    {
+      "id": "amethyst",
+      "name": "Amethyst",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 375,
+      "covers": [
+        "terraria:amethyst"
+      ]
+    },
+    {
+      "id": "topaz",
+      "name": "Topaz",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 750,
+      "covers": [
+        "terraria:topaz"
+      ]
+    },
+    {
+      "id": "sapphire",
+      "name": "Sapphire",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 1125,
+      "covers": [
+        "terraria:sapphire"
+      ]
+    },
+    {
+      "id": "emerald",
+      "name": "Emerald",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 1500,
+      "covers": [
+        "terraria:emerald"
+      ]
+    },
+    {
+      "id": "ruby",
+      "name": "Ruby",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 2250,
+      "covers": [
+        "terraria:ruby"
+      ]
+    },
+    {
+      "id": "diamond",
+      "name": "Diamond",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 3000,
+      "covers": [
+        "terraria:diamond"
+      ]
+    },
+    {
+      "id": "mushroom",
+      "name": "Field Mushroom",
+      "category": "consumable",
+      "maxStack": 9999,
+      "value": 25,
+      "useStyle": "consume",
+      "useTime": 17,
+      "useAnimation": 17,
+      "consumable": true,
+      "healLife": 15,
+      "covers": [
+        "terraria:mushroom"
+      ]
+    },
+    {
+      "id": "glowcap",
+      "name": "Glowcap",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 10,
+      "heldLight": [
+        1,
+        3,
+        7
+      ],
+      "covers": [
+        "terraria:glowing_mushroom"
+      ]
+    },
+    {
+      "id": "starshard",
+      "name": "Starshard",
+      "description": "Falls from the night sky. Warm to the touch.",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 500,
+      "heldLight": [
+        9,
+        8,
+        4
+      ],
+      "tags": [
+        "world"
+      ],
+      "covers": [
+        "terraria:fallen_star"
+      ]
+    },
+    {
+      "id": "acorn",
+      "name": "Acorn",
+      "category": "placeable",
+      "maxStack": 9999,
+      "value": 0,
+      "covers": [
+        "terraria:acorn"
+      ]
+    },
+    {
+      "id": "copper_coin",
+      "name": "Copper Coin",
+      "category": "coin",
+      "maxStack": 100,
+      "value": 1,
+      "tags": [
+        "coin"
+      ],
+      "covers": [
+        "terraria:copper_coin"
+      ]
+    },
+    {
+      "id": "silver_coin",
+      "name": "Silver Coin",
+      "category": "coin",
+      "maxStack": 100,
+      "value": 100,
+      "tags": [
+        "coin"
+      ],
+      "covers": [
+        "terraria:silver_coin"
+      ]
+    },
+    {
+      "id": "gold_coin",
+      "name": "Gold Coin",
+      "category": "coin",
+      "maxStack": 100,
+      "value": 10000,
+      "tags": [
+        "coin"
+      ],
+      "covers": [
+        "terraria:gold_coin"
+      ]
+    },
+    {
+      "id": "platinum_coin",
+      "name": "Platinum Coin",
+      "category": "coin",
+      "maxStack": 9999,
+      "value": 1000000,
+      "tags": [
+        "coin"
+      ],
+      "covers": [
+        "terraria:platinum_coin"
+      ]
+    },
+    {
+      "id": "cactus",
+      "name": "Cactus",
+      "category": "material",
+      "maxStack": 9999,
+      "value": 0,
+      "covers": [
+        "terraria:cactus"
+      ]
+    }
+  ]
+}

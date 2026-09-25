@@ -1,0 +1,13 @@
+{
+  "comment": "Source table for metal equipment families. Run tools/content/gen_ore_tiers.py to regenerate data/items/generated/ore_tiers.json.",
+  "tiers": [
+    { "metal": "copper",   "name": "Copper",   "rarity": 0, "orePerBar": 3, "power": 35, "value": 100,  "pick": [4, 15], "axe": [3, 21], "hammer": [4, 23], "broad": [8, 23, 5.0], "short": [5, 13, 4.0], "bow": [6, 28, 6.6], "armor": [1, 2, 1] },
+    { "metal": "tin",      "name": "Tin",      "rarity": 0, "orePerBar": 3, "power": 35, "value": 150,  "pick": [5, 15], "axe": [4, 21], "hammer": [5, 23], "broad": [9, 22, 5.0], "short": [7, 12, 4.0], "bow": [7, 27, 6.6], "armor": [2, 2, 1] },
+    { "metal": "iron",     "name": "Iron",     "rarity": 0, "orePerBar": 3, "power": 40, "value": 200,  "pick": [5, 13], "axe": [5, 20], "hammer": [7, 22], "broad": [10, 21, 5.5], "short": [8, 11, 4.0], "bow": [8, 26, 6.6], "armor": [2, 3, 2] },
+    { "metal": "lead",     "name": "Lead",     "rarity": 0, "orePerBar": 3, "power": 43, "value": 300,  "pick": [6, 13], "axe": [5, 20], "hammer": [7, 21], "broad": [11, 21, 6.0], "short": [8, 11, 4.0], "bow": [9, 26, 6.6], "armor": [3, 3, 2] },
+    { "metal": "silver",   "name": "Silver",   "rarity": 0, "orePerBar": 3, "power": 45, "value": 400,  "pick": [6, 12], "axe": [6, 19], "hammer": [8, 20], "broad": [11, 20, 6.0], "short": [9, 10, 4.0], "bow": [9, 25, 6.8], "armor": [3, 4, 3] },
+    { "metal": "tungsten", "name": "Tungsten", "rarity": 0, "orePerBar": 3, "power": 50, "value": 600,  "pick": [7, 12], "axe": [6, 19], "hammer": [8, 20], "broad": [12, 20, 6.0], "short": [10, 10, 4.0], "bow": [10, 25, 6.8], "armor": [4, 4, 3] },
+    { "metal": "gold",     "name": "Gold",     "rarity": 1, "orePerBar": 4, "power": 55, "value": 800,  "pick": [6, 11], "axe": [7, 18], "hammer": [9, 19], "broad": [13, 19, 6.5], "short": [11, 9, 4.5], "bow": [11, 24, 7.0], "armor": [5, 6, 5] },
+    { "metal": "platinum", "name": "Platinum", "rarity": 1, "orePerBar": 4, "power": 59, "value": 1000, "pick": [7, 11], "axe": [8, 18], "hammer": [10, 19], "broad": [15, 19, 6.5], "short": [12, 9, 4.5], "bow": [12, 24, 7.0], "armor": [5, 6, 5] }
+  ]
+}

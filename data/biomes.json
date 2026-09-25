@@ -1,0 +1,21 @@
+{
+  "biomes": [
+    { "id": "forest", "name": "Verdant Wilds", "kind": "surface", "priority": 0, "mapColor": "#4f9a3a", "fogColor": "#b9cfe0", "music": "forest_day", "ambience": "birds", "covers": ["terraria:forest"] },
+    { "id": "tundra", "name": "Frostreach", "kind": "surface", "priority": 2, "mapColor": "#dfe8f2", "fogColor": "#dbe6f2", "fogDensity": 1.4, "skyTint": "#e8f0ff", "music": "tundra", "ambience": "wind", "covers": ["terraria:snow_biome"] },
+    { "id": "jungle", "name": "Tanglewild", "kind": "surface", "priority": 3, "mapColor": "#3fae4a", "fogColor": "#9fc79a", "fogDensity": 1.6, "skyTint": "#e8ffe0", "ambientTint": "#c8ffc0", "music": "jungle", "ambience": "insects", "covers": ["terraria:jungle"] },
+    { "id": "desert", "name": "Sunscour", "kind": "surface", "priority": 2, "mapColor": "#d8c27a", "fogColor": "#f0dcb0", "fogDensity": 1.2, "skyTint": "#fff4e0", "music": "desert", "ambience": "desert_wind", "covers": ["terraria:desert"] },
+    { "id": "ocean", "name": "Brinedeep", "kind": "layer", "priority": 4, "mapColor": "#2a5f9e", "fogColor": "#7fb0d8", "music": "ocean", "ambience": "waves", "covers": ["terraria:ocean"] },
+    { "id": "umbral", "name": "The Umbral Blight", "kind": "surface", "priority": 6, "mapColor": "#6b5a8e", "fogColor": "#4a3c63", "fogDensity": 2.0, "skyTint": "#b0a0d0", "ambientTint": "#a890d0", "music": "blight", "spreads": true, "covers": ["terraria:the_corruption"] },
+    { "id": "sanguine", "name": "The Sanguine Rot", "kind": "surface", "priority": 6, "mapColor": "#b43a3a", "fogColor": "#6a2a2a", "fogDensity": 2.0, "skyTint": "#e0a0a0", "ambientTint": "#e09090", "music": "rot", "spreads": true, "covers": ["terraria:the_crimson"] },
+    { "id": "hallowed", "name": "The Radiant Reach", "kind": "surface", "priority": 5, "mapColor": "#6fd0e8", "fogColor": "#f0d0ff", "skyTint": "#fff0ff", "ambientTint": "#ffe8ff", "music": "radiant", "spreads": true, "covers": ["terraria:the_hallow"] },
+    { "id": "mushroom", "name": "Glowcap Hollows", "kind": "underground", "priority": 5, "mapColor": "#4d6fe0", "fogColor": "#2a3c80", "ambientTint": "#90a8ff", "music": "mushroom", "covers": ["terraria:glowing_mushroom_biome"] },
+    { "id": "underground_desert", "name": "Buried Sands", "kind": "underground", "priority": 4, "mapColor": "#b8904a", "fogColor": "#806030", "music": "underground_desert", "covers": ["terraria:underground_desert"] },
+    { "id": "marble_cave", "name": "Marble Halls", "kind": "underground", "priority": 3, "mapColor": "#d9d6ce", "fogColor": "#b8b4a8", "covers": ["terraria:marble_cave"] },
+    { "id": "granite_cave", "name": "Granite Deeps", "kind": "underground", "priority": 3, "mapColor": "#3a3f5c", "fogColor": "#20243a", "covers": ["terraria:granite_cave"] },
+    { "id": "spider_nest", "name": "Webbed Warrens", "kind": "zone", "priority": 7, "mapColor": "#8a8070", "fogColor": "#403830", "covers": ["terraria:spider_cave"] },
+    { "id": "hive", "name": "Honeycomb Hive", "kind": "zone", "priority": 8, "mapColor": "#c7862b", "fogColor": "#806020", "ambientTint": "#ffd080", "music": "hive", "covers": ["terraria:hive"] },
+    { "id": "dungeon", "name": "The Old Crypt", "kind": "zone", "priority": 9, "mapColor": "#34508a", "fogColor": "#202838", "fogDensity": 1.8, "music": "crypt", "covers": ["terraria:dungeon"] },
+    { "id": "sky", "name": "Skyreach", "kind": "layer", "priority": 5, "mapColor": "#9fd0e8", "fogColor": "#d8ecff", "music": "sky", "ambience": "high_wind", "covers": ["terraria:floating_island"] },
+    { "id": "underworld", "name": "The Cinderdeep", "kind": "layer", "priority": 8, "mapColor": "#7a2a1a", "fogColor": "#4a1a0a", "fogDensity": 2.2, "ambientTint": "#ff9060", "music": "cinderdeep", "ambience": "lava", "covers": ["terraria:underworld"] }
+  ]
+}

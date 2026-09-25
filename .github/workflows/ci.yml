@@ -36,3 +36,11 @@ jobs:
         run: dotnet build Strata.sln -c Debug
       - name: Test
         run: dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj -c Debug --no-build --logger "console;verbosity=normal"
+      - name: Content up to date (manifest + generated tiers)
+        if: runner.os == 'Linux'
+        run: |
+          python3 tools/content/gen_ore_tiers.py --check
+          dotnet run --project tools/Strata.Tools -c Debug --no-build -- manifest --check
+      - name: Validate content
+        if: runner.os == 'Linux'
+        run: dotnet run --project tools/Strata.Tools -c Debug --no-build -- validate

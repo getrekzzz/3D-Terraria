@@ -1,0 +1,9 @@
+{
+  "lootTables": [
+    { "id": "gel_small", "coins": [5, 30], "entries": [{ "item": "gel", "min": 1, "max": 2 }] },
+    { "id": "gel_cave", "coins": [15, 60], "entries": [{ "item": "gel", "min": 2, "max": 4 }, { "item": "torch", "min": 1, "max": 3, "chance": 0.1 }] },
+    { "id": "shambler", "coins": [30, 90], "entries": [{ "item": "minor_restorative", "chance": 0.02 }] },
+    { "id": "gazer", "coins": [40, 120], "entries": [{ "item": "lens", "chance": 0.33 }] },
+    { "id": "cave_bat", "coins": [20, 60], "entries": [{ "item": "starshard", "chance": 0.02 }] }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "tileObjects": [
+    { "id": "wooden_table", "name": "Wooden Table", "size": [4, 2, 3], "housing": ["table"], "hitPoints": 2, "itemValue": 60, "covers": ["terraria:wooden_table"] },
+    { "id": "wooden_chair", "name": "Wooden Chair", "size": [2, 3, 2], "interaction": "sit", "housing": ["chair"], "hitPoints": 2, "itemValue": 30, "covers": ["terraria:wooden_chair"] },
+    { "id": "wooden_door", "name": "Wooden Door", "size": [2, 4, 1], "collision": "solid", "interaction": "door", "housing": ["door"], "hitPoints": 3, "itemValue": 200, "covers": ["terraria:wooden_door"] },
+    { "id": "wooden_chest", "name": "Wooden Chest", "size": [2, 2, 2], "collision": "solid", "interaction": "chest", "containerSlots": 40, "hitPoints": 3, "itemCategory": "container", "itemValue": 500, "covers": ["terraria:chest"] },
+    { "id": "gold_chest", "name": "Gilded Chest", "size": [2, 2, 2], "collision": "solid", "interaction": "chest", "containerSlots": 40, "hitPoints": 4, "itemCategory": "container", "itemValue": 1000, "tags": ["world"], "covers": ["terraria:gold_chest"] },
+    { "id": "torch", "name": "Torch", "size": [1, 1, 1], "anchor": "floorOrWall", "light": [14, 11, 7], "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemMaxStack": 9999, "itemValue": 10, "covers": ["terraria:torch"] },
+    { "id": "candle", "name": "Candle", "size": [1, 1, 1], "anchor": "floor", "light": [11, 9, 6], "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemValue": 30, "covers": ["terraria:candle"] },
+    { "id": "wooden_bed", "name": "Wooden Bed", "size": [3, 2, 5], "interaction": "sleep", "housing": ["bed", "comfort"], "hitPoints": 3, "itemValue": 400, "covers": ["terraria:bed"] },
+    { "id": "rail", "name": "Rail Track", "size": [1, 1, 1], "anchor": "floor", "hitPoints": 1, "itemCategory": "minecart", "itemMaxStack": 9999, "itemValue": 50, "covers": ["terraria:minecart_track"] }
+  ]
+}

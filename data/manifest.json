@@ -1,0 +1,24 @@
+{
+  "format": "strata-content-manifest",
+  "version": 1,
+  "files": [
+    "biomes.json",
+    "combat.json",
+    "progression.json",
+    "blocks/built.json",
+    "blocks/natural.json",
+    "blocks/ores.json",
+    "enemies/early.json",
+    "items/consumables.json",
+    "items/equipment.json",
+    "items/materials.json",
+    "loot/containers.json",
+    "loot/enemies.json",
+    "recipes/basic.json",
+    "recipes/materials.json",
+    "tileobjects/furniture.json",
+    "tileobjects/nature.json",
+    "tileobjects/stations.json",
+    "items/generated/ore_tiers.json"
+  ]
+}

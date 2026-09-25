@@ -1,0 +1,11 @@
+{
+  "items": [
+    { "id": "bottle", "name": "Bottle", "category": "material", "maxStack": 9999, "value": 20, "placeObject": "alchemy_bottle", "useStyle": "place", "useTime": 15, "useAnimation": 15, "consumable": true, "covers": ["terraria:bottle"] },
+    { "id": "minor_restorative", "name": "Minor Restorative", "category": "potion", "maxStack": 30, "value": 300, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "healLife": 50, "covers": ["terraria:lesser_healing_potion"] },
+    { "id": "minor_mana_tonic", "name": "Minor Mana Tonic", "category": "potion", "maxStack": 30, "value": 100, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "healMana": 50, "covers": ["terraria:lesser_mana_potion"] },
+    { "id": "vital_crystal", "name": "Vital Crystal", "description": "Permanently increases maximum life by 20.", "category": "consumable", "rarity": 2, "maxStack": 9999, "value": 7500, "useStyle": "consume", "useTime": 30, "useAnimation": 30, "consumable": true, "behaviors": [{ "type": "consume", "permanentLife": 20, "lifeCap": 400 }], "covers": ["terraria:life_crystal"] },
+    { "id": "mana_star", "name": "Mana Star", "description": "Permanently increases maximum mana by 20.", "category": "consumable", "rarity": 2, "maxStack": 9999, "value": 5000, "useStyle": "consume", "useTime": 30, "useAnimation": 30, "consumable": true, "behaviors": [{ "type": "consume", "permanentMana": 20, "manaCap": 200 }], "covers": ["terraria:mana_crystal"] },
+    { "id": "swiftness_draught", "name": "Swiftness Draught", "category": "potion", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "swiftness", "ticks": 14400 }, "covers": ["terraria:swiftness_potion"] },
+    { "id": "ironbark_draught", "name": "Ironbark Draught", "category": "potion", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "ironbark", "ticks": 18000 }, "covers": ["terraria:ironskin_potion"] }
+  ]
+}

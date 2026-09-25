@@ -1,0 +1,18 @@
+{
+  "enemies": [
+    { "id": "green_gel", "name": "Green Gel", "brain": { "type": "slimeHop", "jumpHeight": 4, "jumpSpeed": 3.0, "hopInterval": 80 }, "life": 14, "damage": 6, "defense": 0, "knockbackResist": 0.2, "size": [2.2, 1.8], "moveSpeed": 3, "tint": "#62d44a", "loot": "gel_small", "value": 25, "covers": ["terraria:green_slime"] },
+    { "id": "blue_gel", "name": "Azure Gel", "brain": { "type": "slimeHop", "jumpHeight": 5, "jumpSpeed": 3.5, "hopInterval": 70 }, "life": 25, "damage": 7, "defense": 2, "knockbackResist": 0.1, "size": [2.4, 2.0], "moveSpeed": 3, "tint": "#4a8ef0", "loot": "gel_small", "value": 50, "covers": ["terraria:blue_slime"] },
+    { "id": "cave_gel", "name": "Umber Gel", "brain": { "type": "slimeHop", "jumpHeight": 6, "jumpSpeed": 4.0, "hopInterval": 60, "bigHopEvery": 2 }, "life": 45, "damage": 13, "defense": 6, "knockbackResist": 0.1, "size": [2.6, 2.2], "moveSpeed": 3, "tint": "#9a6a3a", "loot": "gel_cave", "value": 80, "light": [2, 1, 0], "covers": ["terraria:red_slime"] },
+    { "id": "shambler", "name": "Shambler", "description": "The restless dead walk when the sun sets.", "brain": { "type": "walker", "aggroRange": 70, "jumpHeight": 4, "fleeDaylight": true }, "life": 45, "damage": 14, "defense": 6, "knockbackResist": 0.5, "size": [2.0, 3.6], "moveSpeed": 2.2, "tint": "#86a07a", "loot": "shambler", "value": 60, "covers": ["terraria:zombie"] },
+    { "id": "gazer", "name": "Gazer", "description": "A drifting eye that stalks travellers at night.", "brain": { "type": "flyer", "aggroRange": 90, "orbitRadius": 12, "dashSpeed": 11, "dashCooldown": 140 }, "life": 60, "damage": 18, "defense": 2, "knockbackResist": 0.2, "size": [1.8, 1.8], "moveSpeed": 5, "gravity": false, "tint": "#f0e6e0", "loot": "gazer", "value": 75, "covers": ["terraria:demon_eye"] },
+    { "id": "cave_bat", "name": "Cave Bat", "brain": { "type": "flyer", "aggroRange": 50, "orbitRadius": 4, "dashSpeed": 9, "dashCooldown": 60, "bounceOffTerrain": true }, "life": 16, "damage": 13, "defense": 2, "knockbackResist": 0.2, "size": [1.4, 1.0], "moveSpeed": 6, "gravity": false, "tint": "#6a5a50", "loot": "cave_bat", "value": 40, "covers": ["terraria:cave_bat"] }
+  ],
+  "spawnRules": [
+    { "id": "green_gel_surface", "enemy": "green_gel", "weight": 3, "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "day" }, { "type": "biome", "none": ["ocean", "umbral", "sanguine"] }] },
+    { "id": "blue_gel_surface", "enemy": "blue_gel", "weight": 1.5, "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "day" }] },
+    { "id": "shambler_night", "enemy": "shambler", "weight": 3, "group": [1, 2], "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "night" }] },
+    { "id": "gazer_night", "enemy": "gazer", "weight": 2, "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "night" }] },
+    { "id": "cave_gel_underground", "enemy": "cave_gel", "weight": 2, "conditions": [{ "type": "layer", "any": ["underground", "cavern"] }, { "type": "light", "max": 6 }] },
+    { "id": "cave_bat_cavern", "enemy": "cave_bat", "weight": 2, "group": [1, 3], "conditions": [{ "type": "layer", "any": ["underground", "cavern"] }, { "type": "light", "max": 6 }] }
+  ]
+}
