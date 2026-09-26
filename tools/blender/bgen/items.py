@@ -80,11 +80,22 @@ def staff(mb: MeshBuilder, p, rng):
 
 def arrow(mb: MeshBuilder, p, rng):
     mb.cylinder((0, 0, -0.35), (0, 0, 0.3), 0.008, None, "prop:planks", segments=5)
-    mb.cylinder((0, 0, 0.3), (0, 0, 0.38), 0.02, 0.0, "prop:stone", "#b0b0b0", segments=4, smooth=False)
+    mb.cylinder((0, 0, 0.3), (0, 0, 0.38), 0.02, 0.0, p.get("tipLayer", "prop:stone"), p.get("tip", "#b0b0b0"), segments=4, smooth=False)
     for k in range(3):
         a = k * 2 * math.pi / 3
         m = Matrix.Rotation(a, 4, "Z")
-        mb.extrude_polygon([(0.0, -0.34), (0.035, -0.3), (0.035, -0.22), (0.0, -0.18)], 0.004, "prop:cloth", "#e8e0d0", matrix=m)
+        mb.extrude_polygon([(0.0, -0.34), (0.035, -0.3), (0.035, -0.22), (0.0, -0.18)], 0.004, "prop:cloth", p.get("fletching", "#e8e0d0"), matrix=m)
+
+
+def essence(mb: MeshBuilder, p, rng):
+    """A floating mote of essence: a glowing core in a pale shell with wisps drifting around it."""
+    color = p["color"]
+    mb.sphere((0, 0, 0.12), 0.05, "prop:plain:glow", p.get("core", "#ffffff"), subdivisions=2)
+    mb.sphere((0, 0, 0.12), 0.085, "prop:gel:glow", color, subdivisions=2, jitter=0.08, rng=rng)
+    for k in range(4):
+        a = k * math.pi / 2 + 0.4
+        pts = [Vector((math.cos(a + t) * (0.09 + t * 0.05), math.sin(a + t) * (0.09 + t * 0.05), 0.12 + t * 0.1 - 0.05)) for t in (0.0, 0.4, 0.8, 1.2)]
+        mb.tube(pts, [0.014, 0.01, 0.006, 0.001], "prop:plain:glow", color, segments=4)
 
 
 def bar(mb: MeshBuilder, p, rng):
@@ -279,5 +290,5 @@ GENERATORS = {
     "wand": wand, "staff": staff, "arrow": arrow, "bar": bar, "gem": gem, "blob": blob, "lens": lens, "spool": spool,
     "potion": potion, "coin": coin, "star": star, "heart": heart, "seed": seed, "chunk": chunk, "helmet": helmet,
     "chest_armor": chest_armor, "greaves": greaves, "boots": boots, "horseshoe": horseshoe, "ring": ring,
-    "bottled": bottled, "bucket": bucket, "feather": feather, "spike": spike, "bone": bone,
+    "bottled": bottled, "bucket": bucket, "feather": feather, "spike": spike, "bone": bone, "essence": essence,
 }

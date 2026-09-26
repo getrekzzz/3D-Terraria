@@ -853,6 +853,46 @@
    ]
   },
   {
+   "id": "terraria:illuminant_slime",
+   "name": "Illuminant Slime",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "underground hallow",
+   "mechanics": [
+    "hop"
+   ]
+  },
+  {
+   "id": "terraria:slimer",
+   "name": "Slimer",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "corruption",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:crimslime",
+   "name": "Crimslime",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "crimson",
+   "mechanics": [
+    "hop"
+   ]
+  },
+  {
+   "id": "terraria:floaty_gross",
+   "name": "Floaty Gross",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "crimson night",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
    "id": "terraria:chaos_elemental",
    "name": "Chaos Elemental",
    "kind": "enemy",

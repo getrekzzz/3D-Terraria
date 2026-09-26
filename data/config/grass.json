@@ -14,6 +14,6 @@
     "umbral_turf":   { "color": "#6a5a92", "height": [0.18, 0.38], "density": 0.8 },
     "sanguine_turf": { "color": "#a23a3c", "height": [0.18, 0.38], "density": 0.8 },
     "mushroom_turf": { "color": "#4a6fe0", "height": [0.12, 0.28], "density": 0.7, "glow": 0.55 },
-    "hallowed_turf": { "color": "#6cc4d8", "height": [0.22, 0.46], "density": 1.0, "flowers": 0.05, "flowerColors": ["#f0a0e0", "#a0e8f8", "#fff4c0"] }
+    "hallowed_turf": { "color": "#68b4c0", "height": [0.22, 0.46], "density": 1.0, "flowers": 0.05, "flowerColors": ["#f0a0e0", "#a0e8f8", "#fff4c0"] }
   }
 }

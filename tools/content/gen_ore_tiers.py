@@ -38,7 +38,8 @@ def build(table: dict) -> dict:
                       "value": v * 3 // 4, "rarity": r, "covers": covers(t, "bar")})
         recipes.append({"id": bar, "output": bar,
                         "inputs": [{"item": t.get("ore", f"{m}_ore"), "count": t["orePerBar"]}] + t.get("extraInputs", []),
-                        "stations": ["furnace"]})
+                        "stations": [t.get("barStation", "furnace")]})
+        craft = [t.get("craftStation", "anvil")]
 
         def tool(kind, stat_field, dmg_time, bars, wood, extra):
             iid = f"{m}_{kind}"
@@ -50,7 +51,7 @@ def build(table: dict) -> dict:
             item.update(extra)
             items.append(item)
             recipes.append({"id": iid, "output": iid, "inputs": [{"item": bar, "count": bars},
-                            {"group": "any_wood", "count": wood}], "stations": ["anvil"]})
+                            {"group": "any_wood", "count": wood}], "stations": craft})
 
         tool("pickaxe", "pickPower", t["pick"], 12, 4, {"mineBrush": 2})
         tool("axe", "axePower", t["axe"], 9, 3, {})
@@ -62,7 +63,7 @@ def build(table: dict) -> dict:
                       "damageType": "melee", "knockback": kb, "crit": 0, "covers": covers(t, "broadsword"),
                       "behaviors": [{"type": "meleeSwing", "arc": 160, "length": 3.2}]})
         recipes.append({"id": f"{m}_broadsword", "output": f"{m}_broadsword", "inputs": [{"item": bar, "count": 8}],
-                        "stations": ["anvil"]})
+                        "stations": craft})
 
         dmg, use, kb = t["short"]
         items.append({"id": f"{m}_shortsword", "name": f"{n} Shortsword", "category": "weapon", "rarity": r,
@@ -70,7 +71,7 @@ def build(table: dict) -> dict:
                       "damageType": "melee", "knockback": kb, "autoReuse": True,
                       "covers": covers(t, "shortsword"), "behaviors": [{"type": "thrust", "length": 2.4}]})
         recipes.append({"id": f"{m}_shortsword", "output": f"{m}_shortsword", "inputs": [{"item": bar, "count": 7}],
-                        "stations": ["anvil"]})
+                        "stations": craft})
 
         dmg, use, speed = t["bow"]
         items.append({"id": f"{m}_bow", "name": f"{n} Bow", "category": "weapon", "rarity": r, "value": v * 3,
@@ -78,7 +79,7 @@ def build(table: dict) -> dict:
                       "damageType": "ranged", "knockback": 0.5, "useAmmo": "arrow", "shootSpeed": speed * 3.0,
                       "covers": covers(t, "bow")})
         recipes.append({"id": f"{m}_bow", "output": f"{m}_bow", "inputs": [{"item": bar, "count": 7}],
-                        "stations": ["anvil"]})
+                        "stations": craft})
 
         for slot, part, bars, idx in (("head", "helmet", 15, 0), ("body", "chainmail", 25, 1), ("legs", "greaves", 20, 2)):
             iid = f"{m}_{part}"
@@ -86,7 +87,7 @@ def build(table: dict) -> dict:
                           "value": v * bars // 2, "equipSlot": slot, "defense": t["armor"][idx],
                           "armorSet": f"{m}_armor", "covers": covers(t, part)})
             recipes.append({"id": iid, "output": iid, "inputs": [{"item": bar, "count": bars}],
-                            "stations": ["anvil"]})
+                            "stations": craft})
     return {"items": items, "recipes": recipes}
 
 

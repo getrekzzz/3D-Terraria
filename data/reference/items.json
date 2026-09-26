@@ -2658,6 +2658,27 @@
    "source": "dungeon"
   },
   {
+   "id": "terraria:pixie_dust",
+   "name": "Pixie Dust",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "pixie"
+  },
+  {
+   "id": "terraria:unicorn_horn",
+   "name": "Unicorn Horn",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "unicorn"
+  },
+  {
+   "id": "terraria:cursed_flame",
+   "name": "Cursed Flame",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "corruption"
+  },
+  {
    "id": "terraria:soul_of_light",
    "name": "Soul of Light",
    "kind": "material",
@@ -2903,8 +2924,22 @@
    "source": "craft"
   },
   {
+   "id": "terraria:orichalcum_anvil",
+   "name": "Orichalcum Anvil",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "craft"
+  },
+  {
    "id": "terraria:adamantite_forge",
    "name": "Adamantite Forge",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:titanium_forge",
+   "name": "Titanium Forge",
    "kind": "furniture",
    "stage": "hardmode",
    "source": "craft"
@@ -2984,6 +3019,20 @@
    "name": "Unholy Arrow",
    "kind": "ammo",
    "stage": "prehardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:cursed_arrow",
+   "name": "Cursed Arrow",
+   "kind": "ammo",
+   "stage": "hardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:ichor_arrow",
+   "name": "Ichor Arrow",
+   "kind": "ammo",
+   "stage": "hardmode",
    "source": "craft"
   },
   {

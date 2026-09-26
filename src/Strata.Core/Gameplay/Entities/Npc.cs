@@ -46,6 +46,9 @@ public sealed class Npc
     /// <summary>Effects of active buffs (damage over time, light), rebuilt when buffs change.</summary>
     public Stats.EffectState Effects { get; } = new();
 
+    /// <summary>Defense after buffs and debuffs (ichor, ironbark-like effects), never below zero.</summary>
+    public int Defense => Math.Max(0, (int)MathF.Round(Effects.Stats.Get(Stats.StatIds.Defense, Def.Defense)));
+
     public void RecomputeEffects()
     {
         Effects.Clear();

@@ -10,6 +10,7 @@ from .mesh import MeshBuilder
 
 FPS = 24
 
+
 def _armature(name, bones):
     data = bpy.data.armatures.new(name + "_rig")
     arm = bpy.data.objects.new(name + "_rig", data)

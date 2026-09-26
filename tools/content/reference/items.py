@@ -252,6 +252,9 @@ jungle_spores|Jungle Spores|prehardmode|jungle
 stinger|Stinger|prehardmode|hornet
 vine|Vine|prehardmode|jungle
 bone|Bone|prehardmode|dungeon
+pixie_dust|Pixie Dust|hardmode|pixie
+unicorn_horn|Unicorn Horn|hardmode|unicorn
+cursed_flame|Cursed Flame|hardmode|corruption
 soul_of_light|Soul of Light|hardmode|drop
 soul_of_night|Soul of Night|hardmode|drop
 soul_of_flight|Soul of Flight|hardmode|wyvern
@@ -289,7 +292,9 @@ hellforge|Hellforge|prehardmode|underworld
 alchemy_table|Alchemy Table|prehardmode|dungeon
 tinkerer_s_workshop|Tinkerer's Workshop|prehardmode|goblin
 mythril_anvil|Mythril Anvil|hardmode|craft
+orichalcum_anvil|Orichalcum Anvil|hardmode|craft
 adamantite_forge|Adamantite Forge|hardmode|craft
+titanium_forge|Titanium Forge|hardmode|craft
 ancient_manipulator|Ancient Manipulator|endgame|cultist
 heart_lantern|Heart Lantern|prehardmode|craft
 campfire|Campfire|early|craft
@@ -305,6 +310,8 @@ wooden_arrow|Wooden Arrow|early|craft
 flaming_arrow|Flaming Arrow|early|craft
 jester_s_arrow|Jester's Arrow|prehardmode|craft
 unholy_arrow|Unholy Arrow|prehardmode|craft
+cursed_arrow|Cursed Arrow|hardmode|craft
+ichor_arrow|Ichor Arrow|hardmode|craft
 musket_ball|Musket Ball|early|shop
 meteor_shot|Meteor Shot|prehardmode|craft
 """,

@@ -19,3 +19,30 @@ assert mutation.behind == 0
 mutations spread 20
 assert spread.conversions >= 0
 assert errors == 0
+
+# Hardmode life: the new stations place; every new creature spawns, moves and renders (ranged ones shoot).
+god
+fill -10 -3 -10 10 -1 10 pearlstone
+fill -10 0 -10 10 10 10 air
+place cinder_forge 4 0 4
+place verdite_anvil -4 0 4
+place crimsite_forge -4 0 -5
+wait 0.5
+spawn glimmer_sprite 1
+spawn prism_steed 1
+spawn lustre_gel 1
+spawn flux_stalker 1
+spawn blight_drifter 1
+spawn umbral_gel 1
+spawn clot_gel 1
+spawn ichor_spitter 1
+spawn gore_drifter 1
+spawn armored_bones 1
+spawn dread_wraith 1
+spawn gloom_bat 1
+assert npcs.count >= 12
+wait 3
+assert npcs.prism_steed == 1
+assert errors == 0
+killall
+assert errors == 0

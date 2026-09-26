@@ -34,11 +34,21 @@ def workbench(mb: MeshBuilder, p, rng):
 
 
 def furnace(mb: MeshBuilder, p, rng):
+    """Stone kiln with a glowing mouth. Forges recolour the stone, fire and trim and add metal bands (fractions of
+    the height in ``bands``)."""
     w, h, d = p["size"]
-    mb.lathe([(w * 0.48, 0.0), (w * 0.46, h * 0.45), (w * 0.3, h * 0.8), (w * 0.14, h * 0.85)], "prop:stone_brick", "#d0c8c0", segments=8, smooth=False)
-    mb.cylinder((0, 0, h * 0.8), (0, 0, h), w * 0.12, w * 0.1, "prop:stone_brick", "#b0a8a0", segments=8, smooth=False)
-    mb.box((-w * 0.2, d * 0.28, 0.08), (w * 0.2, d * 0.46, h * 0.32), "prop:plain:glow", "#ff8a2a")
-    mb.box((-w * 0.26, d * 0.38, h * 0.32), (w * 0.26, d * 0.48, h * 0.38), "prop:dark_iron")
+    stone, tint = f"prop:{p.get('stone', 'stone_brick')}", p.get("stoneTint", "#d0c8c0")
+    trim, trim_tint = f"prop:{p.get('trim', 'dark_iron')}", p.get("trimTint", "#ffffff")
+    profile = [(w * 0.48, 0.0), (w * 0.46, h * 0.45), (w * 0.3, h * 0.8), (w * 0.14, h * 0.85)]
+    mb.lathe(profile, stone, tint, segments=8, smooth=False)
+    mb.cylinder((0, 0, h * 0.8), (0, 0, h), w * 0.12, w * 0.1, stone, p.get("chimneyTint", "#b0a8a0"), segments=8, smooth=False)
+    mb.box((-w * 0.2, d * 0.28, 0.08), (w * 0.2, d * 0.46, h * 0.32), "prop:plain:glow", p.get("glow", "#ff8a2a"))
+    mb.box((-w * 0.26, d * 0.38, h * 0.32), (w * 0.26, d * 0.48, h * 0.38), trim, trim_tint)
+    for f in p.get("bands", []):
+        z = h * f
+        (r0, z0), (r1, z1) = next((a, b) for a, b in zip(profile, profile[1:]) if a[1] <= z <= b[1])
+        r = r0 + (r1 - r0) * (z - z0) / (z1 - z0) + 0.015
+        mb.cylinder((0, 0, z - 0.03), (0, 0, z + 0.03), r, r, trim, trim_tint, segments=16)
 
 
 def anvil(mb: MeshBuilder, p, rng):
@@ -48,6 +58,8 @@ def anvil(mb: MeshBuilder, p, rng):
     profile = [(-w * 0.28, h * 0.45), (w * 0.28, h * 0.45), (w * 0.2, h * 0.6), (w * 0.22, h * 0.72), (w * 0.34, h * 0.8),
                (w * 0.46, h * 0.86), (w * 0.3, h * 0.92), (-w * 0.3, h * 0.92), (-w * 0.36, h * 0.8), (-w * 0.2, h * 0.72), (-w * 0.2, h * 0.6)]
     mb.extrude_polygon(profile, d * 0.36, metal, p.get("tint", "#ffffff"), matrix=Matrix.Rotation(math.pi / 2, 4, "Z"))
+    if "glow" in p:  # hardmode anvils: a vein of their ore glowing along the waist
+        mb.box((-d * 0.19, -w * 0.21, h * 0.62), (d * 0.19, w * 0.21, h * 0.68), "prop:plain:glow", p["glow"])
 
 
 def sawmill(mb: MeshBuilder, p, rng):

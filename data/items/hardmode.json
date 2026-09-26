@@ -1,0 +1,22 @@
+{
+  // Hardmode consumables made from the new creatures' drops.
+  "projectiles": [
+    { "id": "cursed_arrow", "name": "Blight Arrow", "visual": "arrow", "color": "#7ad040", "gravity": 10, "lifetime": 600, "radius": 0.3, "pierce": 1, "light": [4, 9, 2], "trail": "#a0f060",
+      "onHit": [{ "type": "applyBuff", "buff": "blight_fire", "ticks": 240, "chance": 1.0 }], "covers": ["terraria:cursed_arrow"] },
+    { "id": "ichor_arrow", "name": "Ichor Arrow", "visual": "arrow", "color": "#f0c040", "gravity": 10, "lifetime": 600, "radius": 0.3, "pierce": 1, "light": [9, 7, 2], "trail": "#ffe080",
+      "onHit": [{ "type": "applyBuff", "buff": "ichor", "ticks": 420, "chance": 1.0 }], "covers": ["terraria:ichor_arrow"] }
+  ],
+  "items": [
+    { "id": "greater_restorative", "name": "Greater Restorative", "category": "potion", "rarity": 3, "maxStack": 30, "value": 1500, "useStyle": "consume", "useTime": 17, "useAnimation": 17,
+      "consumable": true, "healLife": 150, "covers": ["terraria:greater_healing_potion"] },
+    { "id": "cursed_arrow", "name": "Blight Arrow", "description": "Sets its target alight with green fire.", "category": "ammo", "rarity": 3, "maxStack": 9999, "value": 40, "damage": 17, "damageType": "ranged",
+      "knockback": 3, "ammoClass": "arrow", "projectile": "cursed_arrow", "consumable": true, "covers": ["terraria:cursed_arrow"] },
+    { "id": "ichor_arrow", "name": "Ichor Arrow", "description": "Weakens its target's armour.", "category": "ammo", "rarity": 3, "maxStack": 9999, "value": 40, "damage": 16, "damageType": "ranged",
+      "knockback": 3, "ammoClass": "arrow", "projectile": "ichor_arrow", "consumable": true, "covers": ["terraria:ichor_arrow"] }
+  ],
+  "recipes": [
+    { "id": "greater_restorative", "output": "greater_restorative", "count": 3, "inputs": [{ "item": "bottle", "count": 3 }, { "item": "glimmer_dust", "count": 1 }, { "item": "starshard", "count": 1 }], "stations": ["alchemy"] },
+    { "id": "cursed_arrow", "output": "cursed_arrow", "count": 150, "inputs": [{ "item": "wooden_arrow", "count": 150 }, { "item": "blight_ember", "count": 1 }], "stations": ["hardmode_anvil"] },
+    { "id": "ichor_arrow", "output": "ichor_arrow", "count": 150, "inputs": [{ "item": "wooden_arrow", "count": 150 }, { "item": "sanguine_ichor", "count": 1 }], "stations": ["hardmode_anvil"] }
+  ]
+}

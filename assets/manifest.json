@@ -34,6 +34,12 @@
    ],
    "generator": "candle"
   },
+  "cinder_forge": {
+   "models": [
+    "assets/models/objects/cinder_forge_v0.glb"
+   ],
+   "generator": "furnace"
+  },
   "clay_pot": {
    "models": [
     "assets/models/objects/clay_pot_v0.glb",
@@ -41,6 +47,12 @@
     "assets/models/objects/clay_pot_v2.glb"
    ],
    "generator": "pot"
+  },
+  "crimsite_forge": {
+   "models": [
+    "assets/models/objects/crimsite_forge_v0.glb"
+   ],
+   "generator": "furnace"
   },
   "fern": {
    "models": [
@@ -134,6 +146,12 @@
    ],
    "generator": "broadleaf"
   },
+  "orchidite_anvil": {
+   "models": [
+    "assets/models/objects/orchidite_anvil_v0.glb"
+   ],
+   "generator": "anvil"
+  },
   "palm_tree": {
    "models": [
     "assets/models/objects/palm_tree_v0.glb",
@@ -186,6 +204,12 @@
    ],
    "generator": "spike"
   },
+  "stellite_forge": {
+   "models": [
+    "assets/models/objects/stellite_forge_v0.glb"
+   ],
+   "generator": "furnace"
+  },
   "torch": {
    "models": [
     "assets/models/objects/torch_v0.glb"
@@ -198,6 +222,12 @@
     "assets/models/objects/umbral_tree_v1.glb"
    ],
    "generator": "twisted"
+  },
+  "verdite_anvil": {
+   "models": [
+    "assets/models/objects/verdite_anvil_v0.glb"
+   ],
+   "generator": "anvil"
   },
   "vital_crystal_node": {
    "models": [
@@ -258,6 +288,10 @@
   "band_of_vigor": {
    "model": "assets/models/items/band_of_vigor.glb",
    "icon": "assets/icons/items/band_of_vigor.png"
+  },
+  "blight_ember": {
+   "model": "assets/models/items/blight_ember.glb",
+   "icon": "assets/icons/items/blight_ember.png"
   },
   "bone": {
    "model": "assets/models/items/bone.glb",
@@ -338,6 +372,10 @@
   "cinder_chainmail": {
    "model": "assets/models/items/cinder_chainmail.glb",
    "icon": "assets/icons/items/cinder_chainmail.png"
+  },
+  "cinder_forge": {
+   "object": "cinder_forge",
+   "icon": "assets/icons/items/cinder_forge.png"
   },
   "cinder_greaves": {
    "model": "assets/models/items/cinder_greaves.glb",
@@ -427,6 +465,10 @@
    "model": "assets/models/items/crimsite_chainmail.glb",
    "icon": "assets/icons/items/crimsite_chainmail.png"
   },
+  "crimsite_forge": {
+   "object": "crimsite_forge",
+   "icon": "assets/icons/items/crimsite_forge.png"
+  },
   "crimsite_greaves": {
    "model": "assets/models/items/crimsite_greaves.glb",
    "icon": "assets/icons/items/crimsite_greaves.png"
@@ -446,6 +488,10 @@
   "crimsite_shortsword": {
    "model": "assets/models/items/crimsite_shortsword.glb",
    "icon": "assets/icons/items/crimsite_shortsword.png"
+  },
+  "cursed_arrow": {
+   "model": "assets/models/items/cursed_arrow.glb",
+   "icon": "assets/icons/items/cursed_arrow.png"
   },
   "diamond": {
    "model": "assets/models/items/diamond.glb",
@@ -498,6 +544,10 @@
   "glimmer_blade": {
    "model": "assets/models/items/glimmer_blade.glb",
    "icon": "assets/icons/items/glimmer_blade.png"
+  },
+  "glimmer_dust": {
+   "model": "assets/models/items/glimmer_dust.glb",
+   "icon": "assets/icons/items/glimmer_dust.png"
   },
   "glowcap": {
    "model": "assets/models/items/glowcap.glb",
@@ -555,9 +605,17 @@
    "model": "assets/models/items/gorehammer.glb",
    "icon": "assets/icons/items/gorehammer.png"
   },
+  "greater_restorative": {
+   "model": "assets/models/items/greater_restorative.glb",
+   "icon": "assets/icons/items/greater_restorative.png"
+  },
   "honey_bucket": {
    "model": "assets/models/items/honey_bucket.glb",
    "icon": "assets/icons/items/honey_bucket.png"
+  },
+  "ichor_arrow": {
+   "model": "assets/models/items/ichor_arrow.glb",
+   "icon": "assets/icons/items/ichor_arrow.png"
   },
   "iron_anvil": {
    "object": "iron_anvil",
@@ -667,6 +725,10 @@
    "object": "loom",
    "icon": "assets/icons/items/loom.png"
   },
+  "lumen_essence": {
+   "model": "assets/models/items/lumen_essence.glb",
+   "icon": "assets/icons/items/lumen_essence.png"
+  },
   "mana_star": {
    "model": "assets/models/items/mana_star.glb",
    "icon": "assets/icons/items/mana_star.png"
@@ -686,6 +748,10 @@
   "mushroom": {
    "model": "assets/models/items/mushroom.glb",
    "icon": "assets/icons/items/mushroom.png"
+  },
+  "orchidite_anvil": {
+   "object": "orchidite_anvil",
+   "icon": "assets/icons/items/orchidite_anvil.png"
   },
   "orchidite_axe": {
    "model": "assets/models/items/orchidite_axe.glb",
@@ -771,6 +837,10 @@
    "model": "assets/models/items/platinum_shortsword.glb",
    "icon": "assets/icons/items/platinum_shortsword.png"
   },
+  "prism_horn": {
+   "model": "assets/models/items/prism_horn.glb",
+   "icon": "assets/icons/items/prism_horn.png"
+  },
   "rail": {
    "object": "rail",
    "icon": "assets/icons/items/rail.png"
@@ -822,6 +892,10 @@
   "ruby": {
    "model": "assets/models/items/ruby.glb",
    "icon": "assets/icons/items/ruby.png"
+  },
+  "sanguine_ichor": {
+   "model": "assets/models/items/sanguine_ichor.glb",
+   "icon": "assets/icons/items/sanguine_ichor.png"
   },
   "sanguite_axe": {
    "model": "assets/models/items/sanguite_axe.glb",
@@ -950,6 +1024,10 @@
   "stellite_chainmail": {
    "model": "assets/models/items/stellite_chainmail.glb",
    "icon": "assets/icons/items/stellite_chainmail.png"
+  },
+  "stellite_forge": {
+   "object": "stellite_forge",
+   "icon": "assets/icons/items/stellite_forge.png"
   },
   "stellite_greaves": {
    "model": "assets/models/items/stellite_greaves.glb",
@@ -1087,6 +1165,10 @@
    "model": "assets/models/items/tungsten_shortsword.glb",
    "icon": "assets/icons/items/tungsten_shortsword.png"
   },
+  "umbra_essence": {
+   "model": "assets/models/items/umbra_essence.glb",
+   "icon": "assets/icons/items/umbra_essence.png"
+  },
   "umbrite_axe": {
    "model": "assets/models/items/umbrite_axe.glb",
    "icon": "assets/icons/items/umbrite_axe.png"
@@ -1126,6 +1208,10 @@
   "umbrite_shortsword": {
    "model": "assets/models/items/umbrite_shortsword.glb",
    "icon": "assets/icons/items/umbrite_shortsword.png"
+  },
+  "verdite_anvil": {
+   "object": "verdite_anvil",
+   "icon": "assets/icons/items/verdite_anvil.png"
   },
   "verdite_axe": {
    "model": "assets/models/items/verdite_axe.glb",
@@ -1305,12 +1391,42 @@
     "walk"
    ]
   },
+  "dread_wraith": {
+   "model": "assets/models/creatures/dread_wraith.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "fish": {
    "model": "assets/models/creatures/fish.glb",
    "generator": "fish",
    "animations": [
     "fly",
     "idle"
+   ]
+  },
+  "flux_stalker": {
+   "model": "assets/models/creatures/flux_stalker.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
    ]
   },
   "gazer": {
@@ -1474,6 +1590,21 @@
    "animations": [
     "fly",
     "idle"
+   ]
+  },
+  "sprite": {
+   "model": "assets/models/creatures/sprite.glb",
+   "generator": "sprite",
+   "animations": [
+    "fly"
+   ]
+  },
+  "steed": {
+   "model": "assets/models/creatures/steed.glb",
+   "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
    ]
   },
   "tailor": {

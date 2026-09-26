@@ -245,6 +245,65 @@
     "rail": {
       "generator": "rail",
       "params": {}
+    },
+    "cinder_forge": {
+      "generator": "furnace",
+      "params": {
+        "stoneTint": "#5a4440",
+        "chimneyTint": "#4a3834",
+        "glow": "#ff5a10",
+        "trim": "dark_iron",
+        "bands": [
+          0.2,
+          0.6
+        ]
+      }
+    },
+    "verdite_anvil": {
+      "generator": "anvil",
+      "params": {
+        "metal": "iron",
+        "tint": "#9ae8b0",
+        "glow": "#40e070"
+      }
+    },
+    "orchidite_anvil": {
+      "generator": "anvil",
+      "params": {
+        "metal": "iron",
+        "tint": "#f0b0e0",
+        "glow": "#ff60d0"
+      }
+    },
+    "crimsite_forge": {
+      "generator": "furnace",
+      "params": {
+        "stoneTint": "#8a4a48",
+        "chimneyTint": "#6a3432",
+        "glow": "#ff3a20",
+        "trim": "iron",
+        "trimTint": "#d86060",
+        "bands": [
+          0.15,
+          0.4,
+          0.65
+        ]
+      }
+    },
+    "stellite_forge": {
+      "generator": "furnace",
+      "params": {
+        "stoneTint": "#a8b0c0",
+        "chimneyTint": "#8890a0",
+        "glow": "#70b8ff",
+        "trim": "iron",
+        "trimTint": "#e0e8f4",
+        "bands": [
+          0.15,
+          0.4,
+          0.65
+        ]
+      }
     }
   },
   "items": {
@@ -625,6 +684,72 @@
         "params": {
           "gem": "#6080ff"
         }
+      },
+      "glimmer_dust": {
+        "generator": "blob",
+        "params": {
+          "color": "#f0c8ff",
+          "layer": "plain:glow"
+        }
+      },
+      "prism_horn": {
+        "generator": "spike",
+        "params": {
+          "color": "#f4e8ff",
+          "length": 0.34,
+          "width": 0.05,
+          "layer": "prop:crystal:glow"
+        }
+      },
+      "lumen_essence": {
+        "generator": "essence",
+        "params": {
+          "color": "#ffc8f0"
+        }
+      },
+      "umbra_essence": {
+        "generator": "essence",
+        "params": {
+          "color": "#6a3aa0",
+          "core": "#d0a0ff"
+        }
+      },
+      "blight_ember": {
+        "generator": "chunk",
+        "params": {
+          "layer": "plain:glow",
+          "color": "#6ac030"
+        }
+      },
+      "sanguine_ichor": {
+        "generator": "blob",
+        "params": {
+          "color": "#e8b830",
+          "layer": "gel"
+        }
+      },
+      "greater_restorative": {
+        "generator": "potion",
+        "params": {
+          "color": "#ff2a78",
+          "glow": true
+        }
+      },
+      "cursed_arrow": {
+        "generator": "arrow",
+        "params": {
+          "tip": "#6ac030",
+          "tipLayer": "prop:plain:glow",
+          "fletching": "#a0e070"
+        }
+      },
+      "ichor_arrow": {
+        "generator": "arrow",
+        "params": {
+          "tip": "#f0c040",
+          "tipLayer": "prop:plain:glow",
+          "fletching": "#f0d890"
+        }
       }
     }
   },
@@ -937,6 +1062,54 @@
       "generator": "hungry",
       "params": {
         "radius": 0.55
+      }
+    },
+    "sprite": {
+      "generator": "sprite",
+      "params": {}
+    },
+    "steed": {
+      "generator": "steed",
+      "params": {}
+    },
+    "flux_stalker": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#c8b8f0",
+        "shirt": "#4a3a80",
+        "pants": "#3a2a6a",
+        "hair": "#e8e0ff",
+        "eyes": "#f0f0ff",
+        "hat": "hood",
+        "hatColor": "#6a50b0",
+        "robe": "#5a44a0",
+        "trim": "#b0e0ff",
+        "boots": "#2a2050",
+        "hairStyle": "long",
+        "body": "female",
+        "build": 0.4,
+        "weight": 0.2,
+        "height": 1.9
+      }
+    },
+    "dread_wraith": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#5a6068",
+        "shirt": "#16161c",
+        "pants": "#121216",
+        "hair": "#101014",
+        "eyes": "#90e0ff",
+        "hat": "hood",
+        "hatColor": "#1a1a22",
+        "robe": "#1c1c24",
+        "trim": "#3a3a48",
+        "boots": "#101014",
+        "hairStyle": "bald",
+        "undead": true,
+        "build": 0.3,
+        "weight": 0.1,
+        "height": 2.0
       }
     }
   }

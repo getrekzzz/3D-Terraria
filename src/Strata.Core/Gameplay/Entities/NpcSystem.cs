@@ -230,7 +230,7 @@ public sealed partial class NpcSystem
     public bool Hit(Npc npc, PlayerEntity? attacker, int baseDamage, DamageClass damageClass, int critChance, float knockback, Vector3 from, bool melee)
     {
         if (!npc.Alive || npc.Invulnerable || (melee && npc.ImmuneTicks > 0)) return false;
-        var hit = DamageModel.Roll(baseDamage, damageClass, critChance, knockback, attacker?.State.Effects.Stats, npc.Def.Defense,
+        var hit = DamageModel.Roll(baseDamage, damageClass, critChance, knockback, attacker?.State.Effects.Stats, npc.Defense,
             0.5f, 0f, npc.Def.KnockbackResist, ref _rng);
         npc.Life -= hit.Damage;
         npc.HurtFlash = 8;

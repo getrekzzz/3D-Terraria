@@ -85,6 +85,10 @@ tim|Tim|early|cavern|caster,rare
 mimic|Mimic|early|cavern|hop,rare
 unicorn|Unicorn|hardmode|hallow|charger
 pixie|Pixie|hardmode|hallow|flyer
+illuminant_slime|Illuminant Slime|hardmode|underground hallow|hop
+slimer|Slimer|hardmode|corruption|flyer
+crimslime|Crimslime|hardmode|crimson|hop
+floaty_gross|Floaty Gross|hardmode|crimson night|flyer
 chaos_elemental|Chaos Elemental|hardmode|underground hallow|teleport
 gastropod|Gastropod|hardmode|hallow night|flyer
 clinger|Clinger|hardmode|underground corruption|anchored
