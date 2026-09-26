@@ -105,6 +105,10 @@ public sealed partial class ItemUseSystem
         {
             outcome = Consume(p, info);
         }
+        else if (info.Has(ItemAction.Fish))
+        {
+            outcome = Fish(p, info);
+        }
         else if (info.Has(ItemAction.Shoot))
         {
             outcome = Shoot(p, info);
@@ -224,6 +228,8 @@ public sealed partial class ItemUseSystem
         state.Recompute();
         if (cfg.PermanentLife > 0) state.Vitals.Heal(cfg.PermanentLife);
         if (cfg.PermanentMana > 0) state.Vitals.RestoreMana(cfg.PermanentMana);
+        if (cfg.Recall) Recall(p);
+        if (cfg.Loot != null) Open(p, cfg.Loot);
         if (item.Consumable) ConsumeHeld(p);
         return UseOutcome.Consumed;
     }
@@ -269,6 +275,8 @@ public sealed partial class ItemUseSystem
             if (ammo.Consumable) state.Inventory.Backpack.Take(slot, 1);
         }
         if (projectile == null) return UseOutcome.None;
+        // Boomerangs and flails: one out at a time.
+        if (projectile.Returns > 0 && _world.Projectiles.All.Any(x => x.Owner == p && x.Def == projectile)) return UseOutcome.Blocked;
         if (item.ManaCost > 0)
         {
             int cost = (int)MathF.Round(item.ManaCost * state.Effects.Stats.Get(StatIds.ManaCost, 1f));
@@ -279,6 +287,7 @@ public sealed partial class ItemUseSystem
         var shot = info.Shoot!;
         for (int i = 0; i < shot.Count; i++)
             Shot?.Invoke(new ShotRequest(p, info, projectile, ammo, item.ShootSpeed, damage, knockback));
+        if (item.Consumable && item.UseAmmo == null) ConsumeHeld(p); // thrown: bombs, shuriken, knives
         return UseOutcome.Shot;
     }
 

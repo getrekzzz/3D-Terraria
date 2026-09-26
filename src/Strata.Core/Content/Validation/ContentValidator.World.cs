@@ -119,8 +119,19 @@ public static partial class ContentValidator
             if (p.Radius <= 0) ctx.Error(p, "radius must be > 0.");
             ctx.Light(p, p.Light, "light");
             ctx.Color(p, p.Color, "color");
-            if (p.Model != null) ctx.Asset(p, AssetPaths.ProjectileModel(p), "model");
+            switch (p.Visual)
+            {
+                case "creature": ctx.Asset(p, $"assets/models/creatures/{p.Model ?? p.Id}.glb", "model"); break;
+                case "item" when !ctx.Db.Items.Contains(p.Model ?? p.Id): ctx.Error(p, $"item visual needs an item '{p.Model ?? p.Id}'."); break;
+                case "item": break;
+                default:
+                    if (p.Model != null) ctx.Asset(p, AssetPaths.ProjectileModel(p), "model");
+                    break;
+            }
             ctx.Specs(p, SpecKind.ProjectileHit, p.OnHit, "onHit");
+            if (p.Minion is { Shoot: { } shot } && !ctx.Db.Projectiles.Contains(shot)) ctx.Error(p, $"minion shoots unknown projectile '{shot}'.");
+            if (p.Minion is { Speed: <= 0 } or { Range: <= 0 }) ctx.Error(p, "minion speed and range must be > 0.");
+            if (p.Fuse && !p.OnHit.Any(h => h.Type == Specs.ProjectileHitSpecs.Explode)) ctx.Warn(p, "fuse without an explode effect does nothing.");
         }
         foreach (var b in ctx.Db.Buffs.All)
         {

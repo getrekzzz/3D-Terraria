@@ -308,6 +308,16 @@
     "tinkerers_workshop": {
       "generator": "workbench",
       "params": {}
+    },
+    "cooking_pot": {
+      "generator": "pot",
+      "params": {
+        "bands": [
+          "#6a6a70",
+          "#4a4a50",
+          "#8a8a90"
+        ]
+      }
     }
   },
   "items": {
@@ -1096,6 +1106,422 @@
           "style": "membrane",
           "color": "#4ac0b0",
           "strap": "#2a6a6a"
+        }
+      },
+      "cactus_sword": {
+        "generator": "sword",
+        "params": {
+          "metalLayer": "plain",
+          "metal": "#4a9a3a",
+          "guard": "#3a7a2a",
+          "length": 0.85
+        }
+      },
+      "starfury": {
+        "generator": "sword",
+        "params": {
+          "metal": "#ffd84a",
+          "guard": "#ff9a3a",
+          "glow": true,
+          "length": 0.95
+        }
+      },
+      "muramasa": {
+        "generator": "sword",
+        "params": {
+          "metal": "#4a8aff",
+          "guard": "#1a2a4a",
+          "glow": true,
+          "length": 1.0,
+          "width": 0.07
+        }
+      },
+      "blade_of_grass": {
+        "generator": "sword",
+        "params": {
+          "metalLayer": "plain",
+          "metal": "#5ac83a",
+          "guard": "#8a5a2a",
+          "length": 1.05
+        }
+      },
+      "spear": {
+        "generator": "spear",
+        "params": {}
+      },
+      "trident": {
+        "generator": "spear",
+        "params": {
+          "prongs": true,
+          "metal": "#d8b860"
+        }
+      },
+      "dark_lance": {
+        "generator": "spear",
+        "params": {
+          "metal": "#3a2a4a",
+          "darkShaft": true,
+          "glow": "#9a4aff",
+          "length": 1.3
+        }
+      },
+      "leather_whip": {
+        "generator": "whip",
+        "params": {
+          "color": "#6a4a2a"
+        }
+      },
+      "snapthorn": {
+        "generator": "whip",
+        "params": {
+          "color": "#4a8a2a",
+          "handle": "#3a5a22"
+        }
+      },
+      "wooden_boomerang": {
+        "generator": "boomerang",
+        "params": {}
+      },
+      "enchanted_boomerang": {
+        "generator": "boomerang",
+        "params": {
+          "color": "#6ab0ff",
+          "glow": true
+        }
+      },
+      "flamarang": {
+        "generator": "boomerang",
+        "params": {
+          "color": "#ff7a2a",
+          "glow": true
+        }
+      },
+      "wood_yoyo": {
+        "generator": "yoyo",
+        "params": {
+          "color": "#b0703a"
+        }
+      },
+      "rally": {
+        "generator": "yoyo",
+        "params": {
+          "color": "#3a8aff"
+        }
+      },
+      "amazon": {
+        "generator": "yoyo",
+        "params": {
+          "color": "#3ab84a"
+        }
+      },
+      "code_1": {
+        "generator": "yoyo",
+        "params": {
+          "color": "#d8d8e8"
+        }
+      },
+      "sunfury": {
+        "generator": "flail",
+        "params": {
+          "ball": "#ff8a2a",
+          "glow": true
+        }
+      },
+      "blue_moon": {
+        "generator": "flail",
+        "params": {
+          "ball": "#4a7aff",
+          "glow": true
+        }
+      },
+      "flintlock_pistol": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol"
+        }
+      },
+      "minishark": {
+        "generator": "gun",
+        "params": {
+          "style": "minigun",
+          "metal": "#8a9aa8",
+          "accent": "#4a6a8a"
+        }
+      },
+      "boomstick": {
+        "generator": "gun",
+        "params": {
+          "style": "shotgun"
+        }
+      },
+      "handgun": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol",
+          "metal": "#3a3e46"
+        }
+      },
+      "phoenix_blaster": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol",
+          "metal": "#c8502a",
+          "accent": "#ffb040",
+          "glow": true
+        }
+      },
+      "musket_ball": {
+        "generator": "bullet",
+        "params": {}
+      },
+      "flaming_arrow": {
+        "generator": "arrow",
+        "params": {}
+      },
+      "sapphire_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#4a8aff"
+        }
+      },
+      "emerald_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#3ad46a"
+        }
+      },
+      "ruby_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#ff3a4a"
+        }
+      },
+      "diamond_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#e8f6ff"
+        }
+      },
+      "water_bolt": {
+        "generator": "tome",
+        "params": {
+          "cover": "#2a5a9a",
+          "emblem": "#8ac8ff",
+          "glow": "#4aa8ff"
+        }
+      },
+      "demon_scythe": {
+        "generator": "tome",
+        "params": {
+          "cover": "#3a1a4a",
+          "emblem": "#c08aff",
+          "glow": "#9a4aff"
+        }
+      },
+      "flamelash": {
+        "generator": "wand",
+        "params": {
+          "gem": "#ff6a1a"
+        }
+      },
+      "slime_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#5ab8ff"
+        }
+      },
+      "finch_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#d8a860"
+        }
+      },
+      "imp_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#ff4a1a"
+        }
+      },
+      "shuriken": {
+        "generator": "shuriken",
+        "params": {}
+      },
+      "throwing_knife": {
+        "generator": "knife",
+        "params": {}
+      },
+      "bomb": {
+        "generator": "bomb",
+        "params": {
+          "style": "bomb"
+        }
+      },
+      "dynamite": {
+        "generator": "bomb",
+        "params": {
+          "style": "dynamite"
+        }
+      },
+      "grenade": {
+        "generator": "bomb",
+        "params": {
+          "style": "grenade"
+        }
+      },
+      "cactus_pickaxe": {
+        "generator": "pickaxe",
+        "params": {
+          "metalLayer": "plain",
+          "metal": "#4a9a3a"
+        }
+      },
+      "reaver_shark": {
+        "generator": "pickaxe",
+        "params": {
+          "metalLayer": "plain",
+          "metal": "#6a8aa8"
+        }
+      },
+      "magic_mirror": {
+        "generator": "mirror",
+        "params": {}
+      },
+      "recall_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#6ab0ff",
+          "glow": true
+        }
+      },
+      "wooden_fishing_pole": {
+        "generator": "rod",
+        "params": {}
+      },
+      "reinforced_fishing_pole": {
+        "generator": "rod",
+        "params": {
+          "metal": "#9aa0a8"
+        }
+      },
+      "fisher_of_souls": {
+        "generator": "rod",
+        "params": {
+          "metal": "#6a4a8a",
+          "bobber": "#9a4aff"
+        }
+      },
+      "fleshcatcher": {
+        "generator": "rod",
+        "params": {
+          "metal": "#a83a3a",
+          "bobber": "#ff4a4a"
+        }
+      },
+      "golden_fishing_rod": {
+        "generator": "rod",
+        "params": {
+          "metal": "#e8c040",
+          "bobber": "#ffd84a"
+        }
+      },
+      "bass": {
+        "generator": "fish",
+        "params": {
+          "color": "#6a8a5a"
+        }
+      },
+      "trout": {
+        "generator": "fish",
+        "params": {
+          "color": "#b8a07a",
+          "fin": "#d88a7a"
+        }
+      },
+      "salmon": {
+        "generator": "fish",
+        "params": {
+          "color": "#e88a6a"
+        }
+      },
+      "atlantic_cod": {
+        "generator": "fish",
+        "params": {
+          "color": "#b0a890"
+        }
+      },
+      "neon_tetra": {
+        "generator": "fish",
+        "params": {
+          "color": "#3ad4ff",
+          "fin": "#ff4a4a"
+        }
+      },
+      "tuna": {
+        "generator": "fish",
+        "params": {
+          "color": "#4a6a9a"
+        }
+      },
+      "red_snapper": {
+        "generator": "fish",
+        "params": {
+          "color": "#e84a3a"
+        }
+      },
+      "ebonkoi": {
+        "generator": "fish",
+        "params": {
+          "color": "#6a3a8a"
+        }
+      },
+      "hemopiranha": {
+        "generator": "fish",
+        "params": {
+          "color": "#b82a2a"
+        }
+      },
+      "prismite": {
+        "generator": "fish",
+        "params": {
+          "color": "#e8a8ff",
+          "fin": "#8ae8ff"
+        }
+      },
+      "specular_fish": {
+        "generator": "fish",
+        "params": {
+          "color": "#d8e0e8"
+        }
+      },
+      "armored_cavefish": {
+        "generator": "fish",
+        "params": {
+          "color": "#5a5a6a"
+        }
+      },
+      "cooked_fish": {
+        "generator": "fish",
+        "params": {
+          "color": "#b8702a",
+          "fin": "#8a4a1a"
+        }
+      },
+      "wooden_crate": {
+        "generator": "crate",
+        "params": {}
+      },
+      "iron_crate": {
+        "generator": "crate",
+        "params": {
+          "color": "#b8b8c0",
+          "band": "iron"
+        }
+      },
+      "golden_crate": {
+        "generator": "crate",
+        "params": {
+          "color": "#e8c870",
+          "band": "gold"
         }
       }
     }

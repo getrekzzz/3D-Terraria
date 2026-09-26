@@ -25,13 +25,30 @@ public sealed class Projectile
     public int PierceLeft { get; set; }
     public int BouncesLeft { get; set; }
     public HashSet<long> HitNpcs { get; } = new();
+
+    /// <summary>The item that fired it (fishing rods, boomerangs).</summary>
+    public ItemDef? Source { get; init; }
+
+    /// <summary>A boomerang on its way back.</summary>
+    public bool Returning { get; set; }
+
+    /// <summary>A bobber resting on liquid, and the tick a fish bites (or bit).</summary>
+    public bool Floating { get; set; }
+
+    public int BiteAt { get; set; }
+
+    /// <summary>A fish is on the line right now (reel in to catch it).</summary>
+    public bool Biting { get; set; }
+
+    /// <summary>Minions: the tick of their next shot and the order they were summoned.</summary>
+    public int NextShot { get; set; }
 }
 
 /// <summary>
 /// Simulates projectiles: gravity and drag, terrain collision (bounce or stop), creature hits with pierce,
 /// on-hit effects (buffs, explosions) and lifetime. Spawned from item use shot requests.
 /// </summary>
-public sealed class ProjectileSystem
+public sealed partial class ProjectileSystem
 {
     private readonly GameWorld _world;
     private readonly NpcSystem _npcs;
@@ -54,6 +71,9 @@ public sealed class ProjectileSystem
     /// <summary>A projectile ended (hit, expired or stopped) at its current position.</summary>
     public event Action<Projectile>? Removed;
 
+    /// <summary>An explosion went off (position, radius in metres) — flash, smoke and sound.</summary>
+    public event Action<Vector3, float>? Exploded;
+
     private void Fire(ShotRequest shot)
     {
         var p = shot.Player;
@@ -66,16 +86,17 @@ public sealed class ProjectileSystem
             dir = Vector3.Normalize(dir + side * _rng.NextSigned() * spread + up * _rng.NextSigned() * spread * 0.5f);
         }
         var item = shot.Weapon.Item;
-        Spawn(shot.Projectile, p.Eye + dir * 0.4f, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, item.Crit + Combat.DamageModel.BaseCritChance);
+        Spawn(shot.Projectile, p.Eye + dir * 0.4f, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, item.Crit + Combat.DamageModel.BaseCritChance, item);
     }
 
-    public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit)
+    public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit, ItemDef? source = null)
     {
         var proj = new Projectile
         {
             Id = _nextId++, Def = def, Position = position, Velocity = velocity, Owner = owner, Damage = damage, Knockback = knockback,
-            DamageClass = damageClass, Crit = crit, PierceLeft = def.Pierce, BouncesLeft = def.Bounces,
+            DamageClass = damageClass, Crit = crit, PierceLeft = def.Pierce, BouncesLeft = def.Bounces, Source = source,
         };
+        if (def.Minion != null && owner != null) MakeRoomForMinion(owner, def.Minion.Slots);
         _items.Add(proj);
         Spawned?.Invoke(proj);
         return proj;
@@ -88,22 +109,36 @@ public sealed class ProjectileSystem
         for (int i = _items.Count - 1; i >= 0; i--)
         {
             var p = _items[i];
+            if (p.Def.Minion != null || p.Def.Bobber || p.Returning)
+            {
+                if (!TickSpecial(p, dt)) End(i);
+                continue;
+            }
             if (++p.Age > p.Def.Lifetime || world.GetBlock(VoxelMotion.CellOf(p.Position)) == VoxelWorld.Unknown)
             {
+                if (p.Def.Fuse) ApplyOnHit(p, null);
                 End(i);
+                continue;
+            }
+            if (p.Def.Returns > 0 && p.Age >= p.Def.Returns)
+            {
+                p.Returning = true;
                 continue;
             }
             p.Velocity.Y -= p.Def.Gravity * dt;
             if (p.Def.Drag > 0) p.Velocity *= 1f - p.Def.Drag * dt;
+            if (p.Def.Homing > 0) Steer(p, dt);
             if (p.Def.CollideTerrain && !MoveThroughTerrain(p, dt))
             {
-                End(i);
+                if (p.Def.Returns > 0) p.Returning = true;
+                else End(i);
                 continue;
             }
             if (!p.Def.CollideTerrain) p.Position += p.Velocity * dt;
-            if (p.Def.Friendly ? HitCreatures(p) : HitPlayers(p))
+            if (p.Def.Contact && (p.Def.Friendly ? HitCreatures(p) : HitPlayers(p)))
             {
-                End(i);
+                if (p.Def.Returns > 0) p.Returning = true;
+                else End(i);
                 continue;
             }
         }
@@ -156,16 +191,7 @@ public sealed class ProjectileSystem
             if (Vector3.DistanceSquared(Vector3.Clamp(p.Position, box.Item1, box.Item2), p.Position) > r * r) continue;
             var state = player.State;
             if (state.Vitals.ImmunityTicks > 0) return true; // absorbed by i-frames
-            var hit = Combat.DamageModel.Roll(p.Damage, DamageClass.None, 0, p.Knockback, null, state.Defense,
-                Combat.DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
-                state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
-            if (state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity))
-            {
-                var push = new Vector3(p.Velocity.X, 0, p.Velocity.Z);
-                var knock = (push.LengthSquared() > 1e-4f ? Vector3.Normalize(push) : Vector3.Zero) * (2f + hit.Knockback * 0.5f) + new Vector3(0, 3.5f, 0);
-                _npcs.ReportPlayerDamage(player, hit.Damage, knock);
-                ApplyOnHitPlayer(p, player);
-            }
+            if (HurtPlayer(player, p.Damage, p.Knockback, new Vector3(p.Velocity.X, 0, p.Velocity.Z))) ApplyOnHitPlayer(p, player);
             return true;
         }
         foreach (var resident in _world.Town.Residents)
@@ -177,6 +203,19 @@ public sealed class ProjectileSystem
             return true;
         }
         return false;
+    }
+
+    /// <summary>Damages a player (defense, endurance and i-frames apply) and knocks them along <paramref name="push"/>.</summary>
+    private bool HurtPlayer(PlayerEntity player, int damage, float knockback, Vector3 push)
+    {
+        var state = player.State;
+        var hit = Combat.DamageModel.Roll(damage, DamageClass.None, 0, knockback, null, state.Defense,
+            Combat.DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
+            state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
+        if (!state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity)) return false;
+        var knock = (push.LengthSquared() > 1e-4f ? Vector3.Normalize(push) : Vector3.Zero) * (2f + hit.Knockback * 0.5f) + new Vector3(0, 3.5f, 0);
+        _npcs.ReportPlayerDamage(player, hit.Damage, knock);
+        return true;
     }
 
     private void ApplyOnHitPlayer(Projectile p, PlayerEntity player)
@@ -214,6 +253,11 @@ public sealed class ProjectileSystem
         foreach (var npc in _npcs.All.ToList())
             if (npc.Alive && Vector3.Distance(npc.Center, p.Position) <= radius + npc.HalfExtents.X)
                 _npcs.Hit(npc, p.Owner, e.Damage > 0 ? e.Damage : p.Damage, p.DamageClass, 0, p.Knockback + 4, p.Position, melee: false);
+        if (e.HurtsPlayers)
+            foreach (var player in _world.Players)
+                if (player.Alive && Vector3.Distance(player.Center, p.Position) <= radius + 0.4f)
+                    HurtPlayer(player, e.Damage > 0 ? e.Damage : p.Damage, p.Knockback + 4, player.Center - p.Position);
+        Exploded?.Invoke(p.Position, radius);
         if (!e.DestroyTerrain) return;
         var center = VoxelMotion.CellOf(p.Position);
         int r = (int)MathF.Ceiling(e.Radius);

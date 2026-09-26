@@ -121,6 +121,10 @@ public static class WorldLauncher
         {
             if (p == entity) player.Teleport(p.Position, resolveSpawn: true);
         };
+        game.ItemUse.Recalled += (p, home) =>
+        {
+            if (p == entity) player.Teleport(home, resolveSpawn: true);
+        };
 
         var avatar = new PlayerAvatar();
         player.AddChild(avatar);

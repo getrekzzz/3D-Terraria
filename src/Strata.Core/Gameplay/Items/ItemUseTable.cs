@@ -21,6 +21,7 @@ public enum ItemAction
     SummonBoss = 1 << 9,
     Bucket = 1 << 10,
     Grapple = 1 << 11,
+    Fish = 1 << 12,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -40,6 +41,9 @@ public sealed class ItemUseInfo
 
     /// <summary>Hook parameters (grappling hooks).</summary>
     public GrappleParams? Grapple { get; internal set; }
+
+    /// <summary>Fishing rod parameters.</summary>
+    public FishingParams? Fishing { get; internal set; }
 
     /// <summary>Boss summoned when this item burns in a liquid (not a use action).</summary>
     public IncinerationSummonParams? Incineration { get; internal set; }
@@ -131,6 +135,7 @@ public sealed class ItemUseTable
                     break;
                 case ItemBehaviorSpecs.IncinerationSummon: info.Incineration = spec.Parse<IncinerationSummonParams>(); break;
                 case ItemBehaviorSpecs.Grapple: a |= ItemAction.Grapple; info.Grapple = spec.Parse<GrappleParams>(); break;
+                case ItemBehaviorSpecs.Fishing: a |= ItemAction.Fish; info.Fishing = spec.Parse<FishingParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

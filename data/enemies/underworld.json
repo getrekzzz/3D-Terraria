@@ -23,7 +23,7 @@
   "lootTables": [
     { "id": "wall_of_flesh_emblems", "mode": "weighted", "rolls": 1, "entries": [{ "item": "warrior_emblem" }, { "item": "ranger_emblem" }, { "item": "sorcerer_emblem" }] },
     { "id": "wall_of_flesh", "coins": [60000, 90000], "entries": [{ "item": "pwnhammer" }, { "table": "wall_of_flesh_emblems" }, { "item": "lesser_healing_potion", "min": 5, "max": 15 }] },
-    { "id": "voodoo_demon", "coins": [300, 800], "entries": [{ "item": "guide_voodoo_doll" }] }
+    { "id": "voodoo_demon", "coins": [300, 800], "entries": [{ "item": "guide_voodoo_doll" }, { "item": "demon_scythe", "chance": 0.03 }] }
   ],
   "enemies": [
     {

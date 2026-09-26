@@ -24,6 +24,9 @@ public sealed class ExplodeParams : SpecParams
     public bool DestroyTerrain { get; init; }
 
     public int PickPower { get; init; } = 0;
+
+    /// <summary>Also hurts players in the blast (the thrower included), as bombs and dynamite do.</summary>
+    public bool HurtsPlayers { get; init; }
 }
 
 public sealed class ApplyBuffParams : SpecParams

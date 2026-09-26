@@ -177,7 +177,72 @@ def whip(mb: MeshBuilder, p, rng):
     mb.tube(coil, [0.01 - i * 0.0002 for i in range(40)], "prop:leather", p.get("color", "#6a4a2a"), segments=4)
 
 
+def boomerang(mb: MeshBuilder, p, rng):
+    """A curved throwing stick (a flat chevron), optionally glowing."""
+    color = p.get("color", "#a8703a")
+    layer = "prop:plain:glow" if p.get("glow") else ("prop:planks" if p.get("wood", True) else "prop:iron")
+    pts = [(-0.2, 0.0), (0.0, 0.2), (0.2, 0.0), (0.15, -0.02), (0.0, 0.13), (-0.15, -0.02)]
+    mb.extrude_polygon(pts, 0.025, layer, color, matrix=Matrix.Translation((0, 0.012, 0.05)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+
+
+def yoyo(mb: MeshBuilder, p, rng):
+    """Two discs on an axle with a coil of string."""
+    color = p.get("color", "#b0703a")
+    for y in (-0.03, 0.03):
+        mb.cylinder((0, y, 0.12), (0, y + (0.02 if y > 0 else -0.02), 0.12), 0.09, 0.08, "prop:plain", color, segments=14)
+    mb.cylinder((0, -0.03, 0.12), (0, 0.03, 0.12), 0.02, None, "prop:plain", "#e8e8e8", segments=8)
+    string = [Vector((0, 0, 0.12)), Vector((0.02, 0, 0.0)), Vector((0.0, 0, -0.1))]
+    mb.tube(string, [0.003] * 3, "prop:plain", "#f0f0f0", segments=3)
+
+
+def flail(mb: MeshBuilder, p, rng):
+    """A handle, a short chain and a spiked (or glowing) ball."""
+    layer, tint = _metal(p, "#9098a0")
+    mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", "#5a3a24", segments=6)
+    chain = [Vector((0, 0, 0.08)), Vector((0.03, 0, 0.18)), Vector((0.02, 0, 0.28))]
+    mb.tube(chain, [0.008] * 3, "prop:iron", "#8a8e96", segments=4)
+    ball = "prop:plain:glow" if p.get("glow") else layer
+    mb.sphere((0.02, 0, 0.36), 0.08, ball, p.get("ball", tint), subdivisions=2)
+    for k in range(6):
+        d = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)][k]
+        base = Vector((0.02, 0, 0.36)) + Vector(d) * 0.07
+        mb.cylinder(tuple(base), tuple(base + Vector(d) * 0.05), 0.02, 0.002, layer, tint, segments=5)
+
+
+def spear(mb: MeshBuilder, p, rng):
+    """A long shaft with a leaf-shaped head (tridents get three prongs)."""
+    layer, tint = _metal(p, "#b8bcc4")
+    length = p.get("length", 1.1)
+    mb.cylinder((0, 0, -0.15), (0, 0, length), 0.018, 0.016, "prop:planks" if not p.get("darkShaft") else "prop:dark_planks", p.get("shaft", "#ffffff"), segments=7)
+    if p.get("prongs"):
+        for x in (-0.05, 0.0, 0.05):
+            mb.cylinder((x, 0, length - 0.02), (x, 0, length + (0.2 if x == 0 else 0.16)), 0.01, 0.002, layer, tint, segments=5)
+        mb.box((-0.06, -0.01, length - 0.04), (0.06, 0.01, length), layer, tint)
+    else:
+        mb.sphere((0, 0, length + 0.1), 0.04, layer, tint, subdivisions=2, scale=(1, 0.3, 3))
+    if p.get("glow"):
+        mb.sphere((0, 0, length), 0.025, "prop:plain:glow", p["glow"], subdivisions=1)
+
+
+def shuriken(mb: MeshBuilder, p, rng):
+    """A four-pointed throwing star."""
+    pts = []
+    for k in range(8):
+        a = k * math.pi / 4
+        r = 0.1 if k % 2 == 0 else 0.03
+        pts.append((math.cos(a) * r, math.sin(a) * r))
+    mb.extrude_polygon(pts, 0.01, "prop:iron", p.get("color", "#b8bcc4"), matrix=Matrix.Translation((0, 0.005, 0.1)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+
+
+def knife(mb: MeshBuilder, p, rng):
+    """A small throwing knife."""
+    mb.cylinder((0, 0, -0.06), (0, 0, 0.04), 0.012, None, "prop:leather", "#4a3020", segments=6)
+    mb.extrude_polygon([(-0.018, 0.04), (0.018, 0.04), (0.0, 0.2)], 0.006, "prop:iron", p.get("color", "#c8ccd4"),
+                       matrix=Matrix.Translation((0, 0.003, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+
+
 GENERATORS = {
+    "boomerang": boomerang, "yoyo": yoyo, "flail": flail, "spear": spear, "shuriken": shuriken, "knife": knife,
     "hook": hook, "wings": wings, "shield": shield, "balloon": balloon, "gun": gun, "bullet": bullet, "bomb": bomb,
     "rod": rod, "mirror": mirror, "orb": orb, "crate": crate, "fish": fish, "key": key, "whip": whip,
 }

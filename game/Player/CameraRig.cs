@@ -93,6 +93,9 @@ public sealed partial class CameraRig : Node3D
     public override void _Process(double delta)
     {
         Rotation = new Vector3(_pitch, _yaw, 0);
+        var shake = CameraShake.Sample(delta);
+        Camera.HOffset = shake.X;
+        Camera.VOffset = shake.Y;
         if (_firstPerson)
         {
             _pivot.Position = Vector3.Zero;

@@ -1436,7 +1436,9 @@
       "damageType": "melee",
       "knockback": 5.5,
       "crit": 0,
-      "covers": [],
+      "covers": [
+        "terraria:light_s_bane"
+      ],
       "behaviors": [
         {
           "type": "meleeSwing",
@@ -1491,7 +1493,9 @@
       "equipSlot": "head",
       "defense": 6,
       "armorSet": "demonite_armor",
-      "covers": []
+      "covers": [
+        "terraria:shadow_helmet"
+      ]
     },
     {
       "id": "demonite_chainmail",
@@ -1590,7 +1594,9 @@
       "damageType": "melee",
       "knockback": 5.5,
       "crit": 0,
-      "covers": [],
+      "covers": [
+        "terraria:blood_butcherer"
+      ],
       "behaviors": [
         {
           "type": "meleeSwing",
@@ -1645,7 +1651,9 @@
       "equipSlot": "head",
       "defense": 6,
       "armorSet": "crimtane_armor",
-      "covers": []
+      "covers": [
+        "terraria:crimson_helmet"
+      ]
     },
     {
       "id": "crimtane_chainmail",
@@ -1713,7 +1721,9 @@
       "damageType": "melee",
       "knockback": 2.0,
       "axePower": 100,
-      "covers": []
+      "covers": [
+        "terraria:molten_hamaxe"
+      ]
     },
     {
       "id": "hellstone_hammer",
@@ -1744,7 +1754,9 @@
       "damageType": "melee",
       "knockback": 6.5,
       "crit": 0,
-      "covers": [],
+      "covers": [
+        "terraria:fiery_greatsword"
+      ],
       "behaviors": [
         {
           "type": "meleeSwing",
@@ -1788,7 +1800,9 @@
       "knockback": 0.5,
       "useAmmo": "arrow",
       "shootSpeed": 22.799999999999997,
-      "covers": []
+      "covers": [
+        "terraria:molten_fury"
+      ]
     },
     {
       "id": "hellstone_helmet",
@@ -1799,7 +1813,9 @@
       "equipSlot": "head",
       "defense": 8,
       "armorSet": "hellstone_armor",
-      "covers": []
+      "covers": [
+        "terraria:molten_helmet"
+      ]
     },
     {
       "id": "hellstone_chainmail",

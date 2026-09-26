@@ -49,7 +49,7 @@ console switches and remembers one); rendering is described in [`docs/architectu
 | WASD, Space, Shift, Ctrl | move, jump (hold for height), sprint, drop through platforms |
 | F, Space in the air, double-tap a direction | grappling hook (throw / let go), extra jumps, wings and rocket boots (hold), dash (with a dash accessory) |
 | Mouse / wheel / 1–0 | look / hotbar |
-| LMB / RMB or E | use held item (mine, chop, place, attack, drink, buckets) / interact (doors, chests, beds, talk to residents) |
+| LMB / RMB or E | use held item (mine, chop, place, attack, throw, cast/reel a fishing rod, drink, buckets) / interact (doors, chests, beds, talk to residents) |
 | T / Shift+T, R, Alt | cycle build shape, rotate, precision (single-cell) mining |
 | Q (Ctrl+Q) | drop one (stack) |
 | Tab or I | inventory, equipment, crafting, open chest |
