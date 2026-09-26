@@ -8,7 +8,15 @@ world events and a world that transforms as you progress.
 * Design & status: [`docs/3D_TERRARIA_MASTER_PLAN.md`](docs/3D_TERRARIA_MASTER_PLAN.md) · architecture: [`docs/architecture/`](docs/architecture)
 * Rules: [`docs/CONVENTIONS.md`](docs/CONVENTIONS.md)
 
-![Player in a generated forest](docs/screenshots/m1_player_forest.png)
+![Golden hour in a generated forest](docs/screenshots/m4_forest_dusk.png)
+
+| Leaf-card trees and instanced grass by day | Night: moonlit clouds and a carried torch |
+|---|---|
+| ![Forest by day](docs/screenshots/m4_forest_day.png) | ![Night with a torch](docs/screenshots/m4_night_torch.png) |
+
+| Procedural townsfolk (the Mender and the Peddler) | A bone walker up close | Lava crust over glowing cracks |
+|---|---|---|
+| ![Townsfolk](docs/screenshots/m4_townsfolk.png) | ![Skeleton](docs/screenshots/m4_skeleton.png) | ![Lava](docs/screenshots/m4_lava.png) |
 
 | Town residents | Caverns | Underworld |
 |---|---|---|
@@ -27,7 +35,9 @@ world events and a world that transforms as you progress.
 2. Open `project.godot` in Godot and press Play (F5), or from a terminal: `godot --path .`
 
 Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medium|large --new --player=NAME
---fresh-player --view=CHUNKS --hour=H --free-camera --exec="cmd;cmd" --screenshot=PATH --shots=DIR --smoke=SCRIPT`.
+--fresh-player --view=CHUNKS --hour=H --free-camera --exec="cmd;cmd" --screenshot=PATH --shots=DIR --smoke=SCRIPT
+--graphics=low|medium|high|ultra`. Graphics presets live in `data/config/graphics.json` (`graphics <preset>` in the
+console switches and remembers one); rendering is described in [`docs/architecture/rendering.md`](docs/architecture/rendering.md).
 
 ### Controls
 | Key | Action |

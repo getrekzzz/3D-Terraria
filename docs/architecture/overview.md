@@ -3,14 +3,16 @@
 ```
 ┌────────────────────────── Godot (game/) ──────────────────────────┐
 │ Bootstrap: GameRoot, WorldLauncher, input, command line           │
-│ World: WorldRuntime, ChunkRenderer, ColliderManager,              │
-│        ObjectColliders, TileObjectRenderer                        │
+│ World: WorldRuntime, ChunkRenderer, GrassRenderer,                │
+│        ColliderManager, ObjectColliders, TileObjectRenderer       │
 │ Player: PlayerController, CameraRig, PlayerAvatar,                │
 │         InteractionController, TargetHighlight                    │
 │ Entities: NpcRenderer, TownRenderer, ProjectileRenderer, effects  │
 │ UI: Hud, InventoryScreen, CraftingPanel, TownDialog, DebugConsole,│
 │     PerfOverlay                                                   │
-│ Rendering: PropLibrary, CreatureVisual, LightProbe, shaders/      │
+│ Rendering: PropLibrary, CharacterMaterials, CreatureVisual,       │
+│        LightProbe, GraphicsSettings, shaders/ (see rendering.md)  │
+│ Ambience: EnvironmentController, Atmosphere, SkyNoise             │
 │ Testing: ScriptRunner (.cmds), ScreenshotCapture                  │
 └──────────────────────────────┬────────────────────────────────────┘
                                │ reads state, feeds input, renders

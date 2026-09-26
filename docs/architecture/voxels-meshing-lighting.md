@@ -17,8 +17,9 @@ up (`SkyMap.ShadeTop`), so the land under an island is shaded rather than cave-d
 the old behaviour.
 Because light spreads ≤15 cells the result is exact; no global light state exists. The chunk keeps the
 result for gameplay (spawn light conditions, `LightProbe` for props/creatures/drops).
-Shaders apply `ambient(time) × sky + block light` as emission, and gate the sun by skylight so caves stay
-dark beyond shadow range; placed torches are baked, OmniLights are reserved for moving sources.
+Shaders use the baked sky exposure as ambient occlusion for the physical sky's ambient light and reflections,
+apply block light as emission, and gate the sun by skylight so caves stay dark beyond shadow range; placed torches
+are baked, OmniLights are reserved for moving sources (see [rendering](rendering.md)).
 
 ## Meshing
 Constrained surface nets: one vertex per dual cell (crossing-edge centroid), Taubin smoothing clamped to
@@ -26,6 +27,6 @@ Constrained surface nets: one vertex per dual cell (crossing-edge centroid), Tau
 built geometry stays exact and flush with smooth terrain. Materials: exposure-weighted majority per vertex,
 barycentric three-surface blending in the shader (triplanar sampling of the terrain texture array).
 Normals come from a tent-filtered density gradient including the padding ring, so chunk borders match.
-Also produced: liquid surfaces, cutout (leaves, cobweb) and glass surfaces, and collision triangles in
-16³ buckets (solid + one-way platforms). Colliders exist only near the player and rebuild the same frame
+Also produced: liquid surfaces, cutout (leaves, cobweb) and glass surfaces, grass clumps on grass surfaces
+(`GrassScatter`), and collision triangles in 16³ buckets (solid + one-way platforms). Colliders exist only near the player and rebuild the same frame
 for edits next to it.

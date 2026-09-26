@@ -1,7 +1,7 @@
 # 3D Terraria-Style World — Master Plan (persistent project memory)
 
 > Update this file at the end of every development cycle. It is the single source of truth for what
-> exists, what is partial, what is missing, and what comes next. Last update: 2026-09-25 (cycle M1).
+> exists, what is partial, what is missing, and what comes next. Last update: 2026-09-26 (cycle M4, graphics).
 
 ## 1. Vision
 A native-3D evolution of Terraria's design philosophy — depth, interconnectivity, freedom, discovery,
@@ -32,6 +32,13 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-25 | Open air under a floating roof (island, arch, high canopy) is lit as outdoor shade (sky 12) via a per-column `ShadeTop` in the sky map | The land under sky islands was pitch black at noon (sky light is column-based and spreads only 15 cells); caves and rooms are unaffected. |
 | 2026-09-25 | Ore veins are placed by one shared `VeinStamper` for generation and mutations (verified bit-identical to the old pass); hardmode ores are `generate: false` vein rules | No second ore algorithm; alternates are chosen per world from the mutation seed without disturbing generation's random stream. |
 | 2026-09-25 | Landmark residents (the crypt keeper) live at a planned landmark instead of a house and leave for good when `leavesWhen` holds; boss summoning can be a resident service | Old-man/clothier arc expressed with the town system and data. |
+| 2026-09-26 | Physically based lighting: single-scattering sky (Rayleigh/Mie/ozone) drives sun colour, sky ambient and reflections; the baked voxel sky exposure becomes per-surface AO (caves get no sky light); block light stays baked emission and yields to daylight; GGX with cloud shadows | Realistic outdoor light without losing the voxel game's dark caves; no global illumination bake to maintain. |
+| 2026-09-26 | Graphics presets are data (`data/config/graphics.json`, validated in Core) applied by `GraphicsSettings`; `ultra` is the default | Every knob tunable without code; CI and software rendering pick lighter presets. |
+| 2026-09-26 | Textures are synthesised in numpy (height in albedo alpha, detail array); terrain blends its three surfaces by height | Deterministic, license-free, regenerable materials with realistic transitions. |
+| 2026-09-26 | People are generated procedurally in Blender (metaball anatomy, sculpted head, jointed hands, clothing shells, 52-bone rig) with a dedicated character shader | Detailed humans from the same reproducible pipeline. Reading the CC0 MakeHuman/MPFB2 assets was not permitted in this environment; that route (a MakeHuman base mesh + our clothing and rig) remains an option if approved. |
+| 2026-09-26 | Grass is scattered in the Core mesh jobs (deterministic, per grass block kind from `data/config/grass.json`) and drawn as per-chunk MultiMeshes whose shuffled prefix is the distance LOD | Grass follows edits and remeshes for free, costs nothing when switched off, and thins evenly with distance. |
+| 2026-09-26 | Tree crowns and bushes are alpha-tested leaf cards (`card:<layer>`, sprig textures) with crown-shaped custom normals | Leafy, see-through silhouettes at ~2k triangles per tree instead of solid blobs. |
+| 2026-09-26 | Vertex colours are written as sRGB (bmesh bytes / `color_srgb`) | glTF exports linear colour; writing linear floats made painted skin and clothes pale. |
 
 ## 3. System status
 Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
@@ -48,7 +55,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | WorldGen | Report tool | ✅ | Maps, sections, ore/depth charts |
 | Lighting | Sky + RGB block light | ✅ | Stateless per chunk; outdoor shade under floating roofs; liquid light (lava) from data; sampled by props/creatures via LightProbe; biome fog/sky/ambient looks from data |
 | Meshing | Surface nets + crisp shapes + liquids + collision | ✅ | LOD rings ⬜ |
-| Rendering | Terrain, props, creatures, drops, sky/fog | 🟡 | Horizon mesh, LOD, cave culling, particles polish ⬜ |
+| Rendering | Physical sky + clouds, sky-lit PBR, graphics presets, terrain materials, water/lava, grass, leaf-card trees, character shader | 🟡 | See `docs/architecture/rendering.md`. Horizon mesh, LOD rings, cave culling, particles polish ⬜ |
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
 | Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink |
 | Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds |
@@ -58,7 +65,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Whips/yoyos/summons ⬜ |
 | AI | Slime, walker, flyer, swimmer, lunger, caster (blink), boss brains, worm, crypt warden (free hands); ranged attacks; voxel A* | ✅ | A* used by residents; enemy path following, utility AI ⬜ |
 | Spawning | Data-driven spawn rules (ground or liquid placement), biome + zone rosters, exclusive zones, per-rule caps, player-position rules, despawn conditions, town suppression | ✅ | Closed doors stop creatures |
-| Assets | Blender pipeline, icons, props textures | ✅ | 66 object models, 139 item models, 34 creatures (6 residents), 211 icons |
+| Assets | Blender pipeline, icons, synthesised textures | ✅ | 35 object kinds, 245 item models/icons, 34 creatures; 11 procedural humans (player, 6 residents, shambler, skeleton, imp, hexcaster) with faces, hands, hair, clothing, 52-bone rig |
 | NPCs | Town residents, 3D housing, shops, services, happiness, landmark residents | ✅ | 6 residents (guide/merchant/nurse/dryad/old man/clothier roles); more residents, enemies attacking town ⬜ |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
 | Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels), Crypt Warden (hands, spin, day rage), The Mawwall (sweeping barrier, eye lasers, tethered hungry maws); arenas, boss bar; music state ⬜ |
@@ -88,6 +95,14 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 * Spread converts a few cells every half second, so converted borders keep remeshing (intended in play; tours and
   screenshots pause it with `mutations spread off`).
 * All bars smelt at the furnace and all metal gear uses the anvil (no hellforge / hardmode anvil and forge stations yet).
+* Texture layers are 256² (terrain at 2 m tiles, props at 1 m); 512² would sharpen close-ups at 4× the atlas size.
+* Humans are 50–67k triangles each with no authored LODs (Godot's automatic LOD only); crowds will cost. Hair is
+  shell-based and reads as a solid mass up close (strand cards would look better).
+* Water is drawn in the transparent pass (refraction needs the screen texture), so it gets sky reflections only, no
+  screen-space reflections of the shore.
+* Grass grows through tile objects standing on grass (chests, stations, tree bases); it only avoids blocks.
+* Lavapipe (CI, container QA) cannot run the `ultra` preset at usable speed; real-GPU frame times of `high`/`ultra`
+  with grass and leaf cards are not measured yet.
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
   batch per liquid, so a large flood remeshes its chunks every few steps (rate-limited by the mesh queue).
 
@@ -105,8 +120,8 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (190) | `tests/Strata.Core.Tests` | ✅ CI |
-| Content validation (refs, specs, assets) | `Strata.Tools validate` | ✅ CI |
+| Core unit/integration tests (200, incl. graphics presets and grass scatter) | `tests/Strata.Core.Tests` | ✅ CI |
+| Content validation (refs, specs, assets, graphics presets, grass kinds) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
 | Module size guard (≤400 lines) | `tools/ci/check_file_length.py` | ✅ CI |
@@ -125,10 +140,16 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 7. Performance
 * Targets: 60 fps @1080p on GTX-1060-class; ~250 LOD0 chunks; mesh ≤2 ms/chunk; gen ≤10 ms/chunk.
 * Measured (container CPU, Release): light+mesh ~6.5 ms median/chunk, worldgen ~17 ms/chunk single thread.
-* Props: trees ~1000 tris, MultiMesh per chunk+model, small decor has 48 m visibility range.
-* Concerns: dense forests (hundreds of trees in view), shadow cost of props, LOD not yet implemented.
+* Props: trees ~1–3k tris of bark + leaf cards, MultiMesh per chunk+model, small decor has 48 m visibility range.
+* Grass: up to 14 clumps/m² scattered per chunk (≤16k), drawn within 22–50 m by preset; near clumps 63 triangles,
+  far 15, far chunks draw a thinned prefix; no shadows.
+* Concerns: dense forests (hundreds of trees in view, alpha-tested overdraw), shadow cost of props, human triangle
+  counts, LOD rings not yet implemented.
 
-## 8. Next development targets (M4)
+## 8. Next development targets (rest of M4)
+M4 graphics delivered the physical sky and clouds, sky-lit PBR shading with graphics presets, synthesised
+materials with height blending, refractive water and crusted lava, instanced grass and flowers, leaf-card trees, and
+detailed procedural people with a character shader.
 M2 delivered events, three bosses, liquids, voxel A*, 3D housing, town residents and biome creature rosters.
 M3 delivered the crypt (zone, locked walls, guardian, roster, keeper, Crypt Warden, tailor), the Mawwall (effigy
 incineration summon, sweeping barrier, eye lasers, tethered minions) and the hardmode transformation (lazy world
