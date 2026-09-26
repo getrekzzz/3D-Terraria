@@ -1,0 +1,39 @@
+# Mechanical terrors: the clockwork eye calls both Twin Lenses (the pair counts once both fall), the Iron Serpent
+# flies through the ground releasing probes, Warden Prime swings four tools; with all three down the world moves on.
+wait_until player.frozen == 0 180
+spawning off
+town arrivals off
+flag defeated_mawwall
+killall
+heal
+god
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 10 12 air
+time 22
+give clockwork_eye 1
+wield clockwork_eye
+use
+assert npcs.twin_lens_ray == 1
+assert npcs.twin_lens_flare == 1
+wait 3
+assert errors == 0
+slay twin_lens_ray
+assert flag.defeated_mech_twins == 0
+slay twin_lens_flare
+assert flag.defeated_mech_twins == 1
+killall
+boss iron_serpent 14
+wait 5
+assert npcs.iron_serpent == 1
+assert npcs.serpent_probe >= 1
+slay iron_serpent
+assert flag.defeated_mech_worm == 1
+killall
+boss warden_prime 12
+wait 3
+assert npcs.warden_prime == 1
+slay warden_prime
+assert flag.defeated_mech_warden == 1
+assert flag.defeated_all_mechs == 1
+time noon
+assert errors == 0

@@ -1419,6 +1419,13 @@
    "source": "craft"
   },
   {
+   "id": "terraria:hallowed_repeater",
+   "name": "Hallowed Repeater",
+   "kind": "weapon",
+   "stage": "post-mech",
+   "source": "craft"
+  },
+  {
    "id": "terraria:true_night_s_edge",
    "name": "True Night's Edge",
    "kind": "weapon",
@@ -1911,6 +1918,20 @@
   {
    "id": "terraria:hallowed_helmet",
    "name": "Hallowed Helmet",
+   "kind": "armor",
+   "stage": "post-mech",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:hallowed_plate_mail",
+   "name": "Hallowed Plate Mail",
+   "kind": "armor",
+   "stage": "post-mech",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:hallowed_greaves",
+   "name": "Hallowed Greaves",
    "kind": "armor",
    "stage": "post-mech",
    "source": "craft"

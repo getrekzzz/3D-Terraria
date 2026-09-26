@@ -46,6 +46,7 @@ public sealed partial class NpcSystem
             Content = world.Session.Content,
             Spawn = (def, at) => Spawn(def, at - new Vector3(0, def.Height * 0.25f * def.Scale, 0)),
             Carve = (center, radius) => world.Editor.Carve(center, radius),
+            CountAlive = id => _npcs.Count(n => n.Alive && n.Def.Id == id),
             Bands = world.Session.Generator.Plan.Bands,
         };
     }
@@ -74,11 +75,26 @@ public sealed partial class NpcSystem
         var npc = new Npc(_nextId++, def, feet) { Yaw = _rng.NextFloat() * MathF.Tau, Invulnerable = def.Invulnerable };
         if (def.Boss is { Segments: > 0 } boss)
             for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
+        bool joinsGroup = def.Boss != null && GroupAlive(def.Boss, npc);
         _npcs.Add(npc);
-        if (def.Boss != null) BossSpawned?.Invoke(npc);
+        if (def.Boss != null && !joinsGroup) BossSpawned?.Invoke(npc);
         Spawned?.Invoke(npc);
+        if (def.Boss is { Companions.Length: > 0 } group)
+        {
+            // Companions arrive beside it, spread around the summoning point.
+            for (int i = 0; i < group.Companions.Length; i++)
+                if (_world.Session.Content.Enemies.TryGet(group.Companions[i], out var companion))
+                {
+                    float a = (i + 1) * MathF.Tau / (group.Companions.Length + 1);
+                    Spawn(companion, feet + new Vector3(MathF.Cos(a), 0.3f, MathF.Sin(a)) * 7f);
+                }
+        }
         return npc;
     }
+
+    /// <summary>Another living boss shares this one's defeat flag (the other of a pair).</summary>
+    public bool GroupAlive(Content.Defs.BossInfo boss, Npc? except) =>
+        boss.Flag != null && _npcs.Any(n => n != except && n.Alive && n.Def.Boss?.Flag == boss.Flag);
 
     /// <summary>The creature's despawn conditions hold where its target stands (checked twice a second).</summary>
     private bool OutOfBounds(Npc npc, PlayerEntity? target)
@@ -126,7 +142,7 @@ public sealed partial class NpcSystem
             float despawn = npc.Def.Boss?.ArenaRadius ?? DespawnDistance;
             if (OutOfBounds(npc, target))
             {
-                if (npc.IsBoss) BossLeft?.Invoke(npc);
+                if (npc.IsBoss && !GroupAlive(npc.Def.Boss!, npc)) BossLeft?.Invoke(npc);
                 Remove(i);
                 continue;
             }
@@ -135,7 +151,7 @@ public sealed partial class NpcSystem
             {
                 if (++npc.FarTicks > (leaving ? 1 : DespawnDelayTicks))
                 {
-                    if (npc.IsBoss) BossLeft?.Invoke(npc);
+                    if (npc.IsBoss && !GroupAlive(npc.Def.Boss!, npc)) BossLeft?.Invoke(npc);
                     Remove(i);
                     continue;
                 }
@@ -256,7 +272,7 @@ public sealed partial class NpcSystem
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);
-        if (npc.Def.Boss is { } boss)
+        if (npc.Def.Boss is { } boss && !GroupAlive(boss, npc))
         {
             if (boss.Flag != null) _world.Progression.Set(boss.Flag);
             BossDefeated?.Invoke(npc);

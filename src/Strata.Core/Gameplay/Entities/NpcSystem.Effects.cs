@@ -11,13 +11,18 @@ public sealed partial class NpcSystem
     private void RangedAttack(Npc npc, PlayerEntity target, float distance)
     {
         var r = npc.Def.Ranged!;
+        if (npc.Enraged && r.Enraged != null) r = r.Enraged;
         if (npc.AttackTimer > 0)
         {
             npc.AttackTimer--;
             return;
         }
-        bool parts = r.FromParts && npc.Segments.Count > 0;
-        var from = parts ? npc.Segments[npc.PartCursor % npc.Segments.Count] : npc.Center + new Vector3(0, npc.HalfExtents.Y * 0.4f, 0);
+        var baseAttack = npc.Def.Ranged!;
+        bool parts = baseAttack.FromParts && npc.Segments.Count > 0;
+        int part = !parts ? -1 : baseAttack.Parts.Length > 0
+            ? baseAttack.Parts[npc.PartCursor % baseAttack.Parts.Length] % npc.Segments.Count
+            : npc.PartCursor % npc.Segments.Count;
+        var from = parts ? npc.Segments[part] : npc.Center + new Vector3(0, npc.HalfExtents.Y * 0.4f, 0);
         if (!target.Alive || Vector3.Distance(from, target.Center) > r.Range || !InSight(from, target.Eye)) return;
         if (!_world.Session.Content.Projectiles.TryGet(r.Projectile, out var def)) return;
         npc.AttackTimer = r.Interval;

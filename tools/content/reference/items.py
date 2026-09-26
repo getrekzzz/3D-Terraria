@@ -65,6 +65,7 @@ grenade|Grenade|early|shop
 shuriken|Shuriken|early|chest
 throwing_knife|Throwing Knife|early|chest
 excalibur|Excalibur|post-mech|craft
+hallowed_repeater|Hallowed Repeater|post-mech|craft
 true_night_s_edge|True Night's Edge|post-mech|craft
 terra_blade|Terra Blade|post-plantera|craft
 megashark|Megashark|post-mech|shop
@@ -140,6 +141,8 @@ necro_helmet|Necro Helmet|prehardmode|drop
 molten_helmet|Molten Helmet|prehardmode|craft
 bee_headgear|Bee Headgear|prehardmode|craft
 hallowed_helmet|Hallowed Helmet|post-mech|craft
+hallowed_plate_mail|Hallowed Plate Mail|post-mech|craft
+hallowed_greaves|Hallowed Greaves|post-mech|craft
 chlorophyte_mask|Chlorophyte Mask|post-mech|craft
 turtle_helmet|Turtle Helmet|post-plantera|craft
 spectre_hood|Spectre Hood|post-plantera|craft

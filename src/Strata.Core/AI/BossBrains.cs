@@ -107,6 +107,7 @@ public sealed class WatcherBrain : IBrain
         if (ctx.Target == null) return;
         npc.TargetPlayer = 0;
         bool enraged = npc.Life <= npc.MaxLife * _p.Phase2Life;
+        npc.Enraged = enraged;
         if (enraged && npc.ModelOverride == null && _p.Phase2Model != null) npc.ModelOverride = _p.Phase2Model;
         var toTarget = ctx.Target.Center - npc.Center;
         npc.Timer++;

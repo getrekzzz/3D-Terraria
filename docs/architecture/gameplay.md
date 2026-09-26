@@ -16,7 +16,7 @@
 * **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
   brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
-  over time, death loot and coins, despawning far from players. `SpawnDirector` evaluates data-driven spawn
+  over time (debuff stats count: ichor lowers a creature's defense), death loot and coins, despawning far from players. `SpawnDirector` evaluates data-driven spawn
   rules at candidate ground cells (or inside water for `placement: liquid`) with layer/biome/time/light context,
   slowed in towns (tuning: `data/config/spawning.json`). Rules may cap how many are alive (`maxAlive`) or judge
   their conditions where the player stands (`atPlayer`); creatures may leave when `despawnWhen` holds at their target.
@@ -28,7 +28,12 @@
   feeds them to spawn-rule conditions; bosses are enemies with a `boss` block (arena radius, day despawn,
   segments for worms, per-part `segmentModels`, `dayEnrage`) driven by `GelSovereign`, `Watcher`, `Worm` and
   `CryptWarden` and `Mawwall` brains (brains that `PositionsSegments` place free parts such as hands or eyes
-  themselves; `ranged.fromParts` fires from them in turn). A brain may give its creature a `Barrier` (the Mawwall's
+  themselves; `ranged.fromParts` fires from them in turn, or only from `ranged.parts`). Brains mark a second phase
+  with `Npc.Enraged`, which swaps in `ranged.enraged` (the Twin Lenses' rapid lasers and flamethrower). A boss may
+  bring `companions` that share its flag: the group spawns together, is announced once, shares one boss bar and
+  counts as defeated only when its last member falls. Worms can release capped `minion` drones from their segments;
+  the warden brain holds any number of hands in pairs (Warden Prime's saw, vice, cannon and laser), with only the
+  first `swipingHands` swiping. A brain may give its creature a `Barrier` (the Mawwall's
   flesh: tiled `barrierModel`, hurts and throws out players behind it) and tether minions to it (`Leader`: their
   anchor follows it and they die with it). `summonBoss` items, the keeper's `summonBoss` service and
   `incinerationSummon` items (burned in lava in a given layer, sacrificing a resident) spawn bosses.

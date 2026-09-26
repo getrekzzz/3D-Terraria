@@ -63,6 +63,15 @@ public static partial class ContentValidator
                 if (boss.BarrierModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.BarrierModel}.glb", "boss.barrierModel");
                 if (boss.BarrierTile <= 0) ctx.Error(e, "boss.barrierTile must be > 0.");
                 if (boss.DayEnrage is { Damage: <= 0 } or { Speed: <= 0 }) ctx.Error(e, "boss.dayEnrage multipliers must be > 0.");
+                foreach (var companionId in boss.Companions)
+                {
+                    ctx.Ref(e, ctx.Db.Enemies, companionId, "boss.companions");
+                    if (!ctx.Db.Enemies.TryGet(companionId, out var companion)) continue;
+                    if (companion.Boss is not { } cb || cb.Flag != boss.Flag || boss.Flag == null)
+                        ctx.Error(e, $"boss.companions: '{companionId}' must be a boss with the same flag ('{boss.Flag}').");
+                    else if (cb.Companions.Length > 0)
+                        ctx.Error(e, $"boss.companions: '{companionId}' may not bring companions of its own.");
+                }
             }
             if (e.Brain.Type is BrainSpecs.CryptWarden or BrainSpecs.Mawwall && e.Boss is not { Segments: >= 2 })
                 ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 (its hands or eyes).");
@@ -72,11 +81,14 @@ public static partial class ContentValidator
                 if (e.Brain.Raw.TryGetProperty(key, out var refId) && refId.GetString() is { } id) ctx.Ref(e, ctx.Db.Enemies, id, $"brain.{key}");
             if (e.Brain.Raw.TryGetProperty("phase2Model", out var model) && model.GetString() is { } m)
                 ctx.Asset(e, $"assets/models/creatures/{m}.glb", "brain.phase2Model");
-            if (e.Ranged is { } r)
+            foreach (var (r, field) in new[] { (e.Ranged, "ranged"), (e.Ranged?.Enraged, "ranged.enraged") })
             {
-                if (ctx.Db.Projectiles.TryGet(r.Projectile, out var proj) && proj.Friendly) ctx.Error(e, $"ranged.projectile '{r.Projectile}' must be hostile (friendly: false).");
-                ctx.Ref(e, ctx.Db.Projectiles, r.Projectile, "ranged.projectile");
-                if (r.Interval < 1 || r.Count < 1 || r.Speed <= 0 || r.Range <= 0) ctx.Error(e, "ranged needs interval, count, speed and range > 0.");
+                if (r == null) continue;
+                if (ctx.Db.Projectiles.TryGet(r.Projectile, out var proj) && proj.Friendly) ctx.Error(e, $"{field}.projectile '{r.Projectile}' must be hostile (friendly: false).");
+                ctx.Ref(e, ctx.Db.Projectiles, r.Projectile, $"{field}.projectile");
+                if (r.Interval < 1 || r.Count < 1 || r.Speed <= 0 || r.Range <= 0) ctx.Error(e, $"{field} needs interval, count, speed and range > 0.");
+                if (r.Parts.Any(i => i < 0 || i >= (e.Boss?.Segments ?? 0))) ctx.Error(e, $"{field}.parts must index body parts (0..boss.segments-1).");
+                if (r.Enraged?.Enraged != null) ctx.Error(e, $"{field}.enraged may not nest another enraged attack.");
             }
             ctx.Specs(e, SpecKind.Condition, e.DespawnWhen, "despawnWhen");
             ctx.Specs(e, SpecKind.CreatureEffect, e.OnContact, "onContact");

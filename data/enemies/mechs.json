@@ -1,0 +1,91 @@
+{
+  // The mechanical terrors of hardmode, called at night with clockwork summons forged from the essences of light and
+  // night. Each drops radiant bars and its own essence; with all three down the world moves on (defeated_all_mechs).
+  "projectiles": [
+    { "id": "mech_laser", "name": "Mechanical Laser", "visual": "bolt", "color": "#ff3030", "friendly": false, "lifetime": 90, "radius": 0.3, "light": [12, 2, 2], "trail": "#ff8080" },
+    { "id": "mech_fireball", "name": "Blight Fireball", "visual": "orb", "color": "#70f040", "friendly": false, "lifetime": 160, "radius": 0.5, "light": [4, 12, 2], "trail": "#b0ff80",
+      "onHit": [{ "type": "applyBuff", "buff": "blight_fire", "ticks": 180, "chance": 0.6 }] },
+    { "id": "mech_flame", "name": "Blight Flame", "visual": "spark", "color": "#90ff50", "friendly": false, "drag": 1.5, "lifetime": 40, "radius": 0.55, "pierce": 3, "light": [4, 10, 2],
+      "onHit": [{ "type": "applyBuff", "buff": "blight_fire", "ticks": 120, "chance": 0.4 }] },
+    { "id": "prime_shell", "name": "Prime Shell", "visual": "orb", "color": "#ffa040", "friendly": false, "gravity": 9, "lifetime": 200, "radius": 0.55, "light": [10, 6, 1], "trail": "#ffd080",
+      "onHit": [{ "type": "applyBuff", "buff": "on_fire", "ticks": 180, "chance": 0.5 }] }
+  ],
+  "items": [
+    { "id": "radiant_bar", "name": "Radiant Bar", "description": "Metal that remembers the light it was forged in.", "category": "material", "maxStack": 9999, "value": 4000, "rarity": 5, "covers": ["terraria:hallowed_bar"] },
+    { "id": "essence_of_sight", "name": "Essence of Sight", "description": "It watches back.", "category": "material", "maxStack": 9999, "value": 4000, "rarity": 5, "covers": ["terraria:soul_of_sight"] },
+    { "id": "essence_of_might", "name": "Essence of Might", "description": "Heavy for something so small.", "category": "material", "maxStack": 9999, "value": 4000, "rarity": 5, "covers": ["terraria:soul_of_might"] },
+    { "id": "essence_of_fright", "name": "Essence of Fright", "description": "Cold to the touch, and it rattles.", "category": "material", "maxStack": 9999, "value": 4000, "rarity": 5, "covers": ["terraria:soul_of_fright"] },
+    { "id": "clockwork_eye", "name": "Clockwork Eye", "description": "Summons the Twin Lenses. Only at night.", "category": "consumable", "rarity": 4, "maxStack": 20, "value": 8000,
+      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+      "behaviors": [{ "type": "summonBoss", "enemy": "twin_lens_ray", "conditions": [{ "type": "time", "is": "night" }], "failMessage": "The lenses only open in the dark." }], "covers": ["terraria:mechanical_eye"] },
+    { "id": "clockwork_worm", "name": "Clockwork Worm", "description": "Summons the Iron Serpent. Only at night.", "category": "consumable", "rarity": 4, "maxStack": 20, "value": 8000,
+      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+      "behaviors": [{ "type": "summonBoss", "enemy": "iron_serpent", "conditions": [{ "type": "time", "is": "night" }], "failMessage": "The serpent sleeps while the sun is up." }], "covers": ["terraria:mechanical_worm"] },
+    { "id": "clockwork_skull", "name": "Clockwork Skull", "description": "Summons Warden Prime. Only at night.", "category": "consumable", "rarity": 4, "maxStack": 20, "value": 8000,
+      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+      "behaviors": [{ "type": "summonBoss", "enemy": "warden_prime", "conditions": [{ "type": "time", "is": "night" }], "failMessage": "Its jaw will not wind by daylight." }], "covers": ["terraria:mechanical_skull"] }
+  ],
+  "recipes": [
+    { "id": "clockwork_eye", "output": "clockwork_eye", "inputs": [{ "item": "lens", "count": 3 }, { "item": "iron_bar", "count": 5 }, { "item": "lumen_essence", "count": 6 }], "stations": ["hardmode_anvil"] },
+    { "id": "clockwork_worm", "output": "clockwork_worm", "inputs": [{ "item": "umbra_essence", "count": 6 }, { "item": "iron_bar", "count": 5 }, { "item": "umbrite_ore", "count": 10 }], "stations": ["hardmode_anvil"] },
+    { "id": "clockwork_skull", "output": "clockwork_skull", "inputs": [{ "item": "bone", "count": 30 }, { "item": "iron_bar", "count": 5 }, { "item": "lumen_essence", "count": 3 }, { "item": "umbra_essence", "count": 3 }], "stations": ["hardmode_anvil"] }
+  ],
+  "lootTables": [
+    { "id": "twin_lens", "coins": [15000, 22000], "entries": [{ "item": "radiant_bar", "min": 8, "max": 15 }, { "item": "essence_of_sight", "min": 12, "max": 20 }, { "item": "greater_restorative", "min": 3, "max": 8 }] },
+    { "id": "iron_serpent", "coins": [30000, 45000], "entries": [{ "item": "radiant_bar", "min": 15, "max": 30 }, { "item": "essence_of_might", "min": 25, "max": 40 }, { "item": "greater_restorative", "min": 5, "max": 15 }] },
+    { "id": "warden_prime", "coins": [30000, 45000], "entries": [{ "item": "radiant_bar", "min": 15, "max": 30 }, { "item": "essence_of_fright", "min": 25, "max": 40 }, { "item": "greater_restorative", "min": 5, "max": 15 }] }
+  ],
+  "enemies": [
+    {
+      "id": "twin_lens_ray", "model": "twin_lens_ray", "tags": ["boss", "lava_immune", "mechanical"], "name": "Ocular Ray",
+      "description": "The cold eye of the pair: it keeps its distance and burns with light.",
+      "brain": { "type": "watcher", "orbitRadius": 22, "dashSpeed": 14, "dashesPerBurst": 1, "telegraphTicks": 40, "phase2Life": 0.45, "phase2Model": "twin_lens_ray_open" },
+      "ranged": { "projectile": "mech_laser", "damage": 32, "speed": 30, "interval": 75, "range": 45,
+        "enraged": { "projectile": "mech_laser", "damage": 26, "speed": 34, "interval": 18, "range": 45 } },
+      "life": 8000, "damage": 45, "defense": 12, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
+      "loot": "twin_lens", "value": 0,
+      "boss": { "title": "The Twin Lenses", "flag": "defeated_mech_twins", "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["twin_lens_flare"] },
+      "covers": ["terraria:the_twins"]
+    },
+    {
+      "id": "twin_lens_flare", "model": "twin_lens_flare", "tags": ["boss", "lava_immune", "mechanical"], "name": "Ocular Flare",
+      "description": "The hot eye of the pair: it charges, and when it opens it breathes green fire.",
+      "brain": { "type": "watcher", "orbitRadius": 14, "dashSpeed": 19, "dashesPerBurst": 3, "telegraphTicks": 26, "phase2Life": 0.45, "phase2Model": "twin_lens_flare_open" },
+      "ranged": { "projectile": "mech_fireball", "damage": 36, "speed": 14, "interval": 95, "range": 30,
+        "enraged": { "projectile": "mech_flame", "damage": 22, "speed": 17, "interval": 6, "count": 2, "spread": 8, "range": 12 } },
+      "life": 8000, "damage": 50, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 10, "gravity": false, "collideTerrain": false, "light": [2, 10, 2],
+      "loot": "twin_lens", "value": 0,
+      "boss": { "title": "The Twin Lenses", "flag": "defeated_mech_twins", "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech" }
+    },
+    {
+      "id": "iron_serpent", "model": "serpent_head", "tags": ["boss", "lava_immune", "mechanical"], "name": "The Iron Serpent",
+      "description": "A clockwork worm long enough to ring a hill; every plate of it carries a laser.",
+      "brain": { "type": "worm", "speed": 12, "turnRate": 2.8, "digRadius": 0, "airGravity": 3, "minion": "serpent_probe", "minionInterval": 200, "maxMinions": 6 },
+      "ranged": { "projectile": "mech_laser", "damage": 28, "speed": 26, "interval": 22, "range": 40, "fromParts": true },
+      "life": 18000, "damage": 55, "defense": 24, "knockbackResist": 1.0, "size": [4, 4], "moveSpeed": 12, "gravity": false, "collideTerrain": false,
+      "loot": "iron_serpent", "value": 0,
+      "boss": { "title": "The Iron Serpent", "flag": "defeated_mech_worm", "arenaRadius": 220, "despawnAtDay": true, "music": "boss_mech",
+        "segments": 50, "segmentSpacing": 1.3, "segmentRadius": 0.9, "segmentModel": "serpent_segment", "tailModel": "serpent_tail" },
+      "covers": ["terraria:the_destroyer"]
+    },
+    {
+      "id": "serpent_probe", "model": "serpent_probe", "tags": ["mechanical"], "name": "Probe",
+      "brain": { "type": "flyer", "aggroRange": 120, "orbitRadius": 7, "dashSpeed": 9, "dashCooldown": 160, "bounceOffTerrain": false },
+      "ranged": { "projectile": "mech_laser", "damage": 20, "speed": 24, "interval": 150, "range": 30 },
+      "life": 200, "damage": 30, "defense": 20, "knockbackResist": 0.5, "size": [1.4, 1.4], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 1, 1],
+      "value": 0, "covers": ["terraria:probe"]
+    },
+    {
+      "id": "warden_prime", "model": "prime_skull", "tags": ["boss", "lava_immune", "mechanical"], "name": "Warden Prime",
+      "description": "The crypt's curse, rebuilt in steel with a saw, a vice, a cannon and a laser.",
+      "brain": { "type": "cryptWarden", "hoverHeight": 7, "handSpacing": 3.2, "swipeInterval": 70, "spinInterval": 600, "spinDuration": 300, "spinSpeed": 12, "swipingHands": 2, "phase2Life": 0.5 },
+      "ranged": { "projectile": "prime_shell", "damage": 40, "speed": 15, "interval": 55, "range": 36, "fromParts": true, "parts": [2, 3],
+        "enraged": { "projectile": "mech_laser", "damage": 30, "speed": 30, "interval": 20, "range": 40 } },
+      "life": 14000, "damage": 55, "defense": 26, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
+      "loot": "warden_prime", "value": 0,
+      "boss": { "title": "Warden Prime", "flag": "defeated_mech_warden", "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech",
+        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"] },
+      "covers": ["terraria:skeletron_prime"]
+    }
+  ]
+}

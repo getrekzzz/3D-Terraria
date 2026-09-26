@@ -397,6 +397,18 @@
    "model": "assets/models/items/cinder_shortsword.glb",
    "icon": "assets/icons/items/cinder_shortsword.png"
   },
+  "clockwork_eye": {
+   "model": "assets/models/items/clockwork_eye.glb",
+   "icon": "assets/icons/items/clockwork_eye.png"
+  },
+  "clockwork_skull": {
+   "model": "assets/models/items/clockwork_skull.glb",
+   "icon": "assets/icons/items/clockwork_skull.png"
+  },
+  "clockwork_worm": {
+   "model": "assets/models/items/clockwork_worm.glb",
+   "icon": "assets/icons/items/clockwork_worm.png"
+  },
   "copper_axe": {
    "model": "assets/models/items/copper_axe.glb",
    "icon": "assets/icons/items/copper_axe.png"
@@ -512,6 +524,18 @@
   "empty_bucket": {
    "model": "assets/models/items/empty_bucket.glb",
    "icon": "assets/icons/items/empty_bucket.png"
+  },
+  "essence_of_fright": {
+   "model": "assets/models/items/essence_of_fright.glb",
+   "icon": "assets/icons/items/essence_of_fright.png"
+  },
+  "essence_of_might": {
+   "model": "assets/models/items/essence_of_might.glb",
+   "icon": "assets/icons/items/essence_of_might.png"
+  },
+  "essence_of_sight": {
+   "model": "assets/models/items/essence_of_sight.glb",
+   "icon": "assets/icons/items/essence_of_sight.png"
   },
   "feather": {
    "model": "assets/models/items/feather.glb",
@@ -840,6 +864,34 @@
   "prism_horn": {
    "model": "assets/models/items/prism_horn.glb",
    "icon": "assets/icons/items/prism_horn.png"
+  },
+  "prism_pickaxe": {
+   "model": "assets/models/items/prism_pickaxe.glb",
+   "icon": "assets/icons/items/prism_pickaxe.png"
+  },
+  "radiant_bar": {
+   "model": "assets/models/items/radiant_bar.glb",
+   "icon": "assets/icons/items/radiant_bar.png"
+  },
+  "radiant_blade": {
+   "model": "assets/models/items/radiant_blade.glb",
+   "icon": "assets/icons/items/radiant_blade.png"
+  },
+  "radiant_greaves": {
+   "model": "assets/models/items/radiant_greaves.glb",
+   "icon": "assets/icons/items/radiant_greaves.png"
+  },
+  "radiant_helmet": {
+   "model": "assets/models/items/radiant_helmet.glb",
+   "icon": "assets/icons/items/radiant_helmet.png"
+  },
+  "radiant_plate": {
+   "model": "assets/models/items/radiant_plate.glb",
+   "icon": "assets/icons/items/radiant_plate.png"
+  },
+  "radiant_repeater": {
+   "model": "assets/models/items/radiant_repeater.glb",
+   "icon": "assets/icons/items/radiant_repeater.png"
   },
   "rail": {
    "object": "rail",
@@ -1554,6 +1606,51 @@
     "walk"
    ]
   },
+  "prime_cannon": {
+   "model": "assets/models/creatures/prime_cannon.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "prime_laser": {
+   "model": "assets/models/creatures/prime_laser.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "prime_saw": {
+   "model": "assets/models/creatures/prime_saw.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "prime_skull": {
+   "model": "assets/models/creatures/prime_skull.glb",
+   "generator": "prime_skull",
+   "animations": []
+  },
+  "prime_vice": {
+   "model": "assets/models/creatures/prime_vice.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "serpent_head": {
+   "model": "assets/models/creatures/serpent_head.glb",
+   "generator": "serpent",
+   "animations": []
+  },
+  "serpent_probe": {
+   "model": "assets/models/creatures/serpent_probe.glb",
+   "generator": "serpent",
+   "animations": []
+  },
+  "serpent_segment": {
+   "model": "assets/models/creatures/serpent_segment.glb",
+   "generator": "serpent",
+   "animations": []
+  },
+  "serpent_tail": {
+   "model": "assets/models/creatures/serpent_tail.glb",
+   "generator": "serpent",
+   "animations": []
+  },
   "shambler": {
    "model": "assets/models/creatures/shambler.glb",
    "generator": "humanoid",
@@ -1621,6 +1718,26 @@
     "use",
     "walk"
    ]
+  },
+  "twin_lens_flare": {
+   "model": "assets/models/creatures/twin_lens_flare.glb",
+   "generator": "mech_eye",
+   "animations": []
+  },
+  "twin_lens_flare_open": {
+   "model": "assets/models/creatures/twin_lens_flare_open.glb",
+   "generator": "mech_eye",
+   "animations": []
+  },
+  "twin_lens_ray": {
+   "model": "assets/models/creatures/twin_lens_ray.glb",
+   "generator": "mech_eye",
+   "animations": []
+  },
+  "twin_lens_ray_open": {
+   "model": "assets/models/creatures/twin_lens_ray_open.glb",
+   "generator": "mech_eye",
+   "animations": []
   },
   "vulture": {
    "model": "assets/models/creatures/vulture.glb",

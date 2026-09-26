@@ -181,9 +181,18 @@ public sealed partial class Hud : CanvasLayer
             if (n.IsBoss && n.Alive && (boss == null || n.Life > boss.Life)) boss = n;
         _bossPanel.Visible = boss != null;
         if (boss == null) return;
-        _bossName.Text = boss.Def.Boss!.Title;
-        _bossBar.MaxValue = boss.MaxLife;
-        _bossBar.Value = boss.Life;
+        // A pair of bosses (companions share the defeat flag) shows as one bar with their combined life.
+        var flag = boss.Def.Boss!.Flag;
+        long life = 0, max = 0;
+        foreach (var n in _ui.Game.Npcs.All)
+            if (n.Alive && (n == boss || (flag != null && n.Def.Boss?.Flag == flag)))
+            {
+                life += n.Life;
+                max += n.MaxLife;
+            }
+        _bossName.Text = boss.Def.Boss.Title;
+        _bossBar.MaxValue = max;
+        _bossBar.Value = life;
     }
 
     private void UpdateBuffs()

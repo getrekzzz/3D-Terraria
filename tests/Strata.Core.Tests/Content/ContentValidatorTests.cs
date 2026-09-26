@@ -45,6 +45,26 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void BossCompanionsAndEnragedAttacksAreChecked()
+    {
+        var db = Load("""
+        { "flags": [ { "id": "pair_down", "name": "Pair", "kind": "boss" }, { "id": "other_down", "name": "Other", "kind": "boss" } ],
+          "projectiles": [ { "id": "zap", "friendly": false } ],
+          "enemies": [
+            { "id": "left", "boss": { "title": "Pair", "flag": "pair_down", "companions": ["right", "stranger", "ghost"] },
+              "ranged": { "projectile": "zap", "parts": [3], "enraged": { "projectile": "zap", "enraged": { "projectile": "zap" } } } },
+            { "id": "right", "boss": { "title": "Pair", "flag": "pair_down", "companions": ["left"] } },
+            { "id": "stranger", "boss": { "title": "Other", "flag": "other_down" } }
+          ] }
+        """);
+        AssertError(db, "'right' may not bring companions of its own");
+        AssertError(db, "'stranger' must be a boss with the same flag");
+        AssertError(db, "unknown enemy 'ghost'");
+        AssertError(db, "ranged.parts must index body parts");
+        AssertError(db, "ranged.enraged may not nest another enraged attack");
+    }
+
+    [Fact]
     public void ValidatesLiquids()
     {
         var db = Load("""

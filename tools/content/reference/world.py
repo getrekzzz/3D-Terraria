@@ -108,6 +108,7 @@ ice_elemental|Ice Elemental|hardmode|underground snow|flyer
 ice_tortoise|Ice Tortoise|hardmode|underground snow|charger
 wolf|Wolf|hardmode|snow|walker
 red_devil|Red Devil|hardmode|underworld|flyer,projectiles
+probe|Probe|hardmode|the destroyer|flyer,projectiles
 lihzahrd|Lihzahrd|post-plantera|temple|walker
 flying_snake|Flying Snake|post-plantera|temple|flyer
 paladin|Paladin|post-plantera|dungeon|walker,projectiles

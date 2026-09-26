@@ -1,0 +1,24 @@
+{
+  // Gear forged from radiant bars (dropped by the mechanical terrors) at a hardmode anvil.
+  "items": [
+    { "id": "radiant_blade", "name": "Radiant Blade", "description": "Light made into an edge.", "category": "weapon", "rarity": 5, "value": 60000,
+      "useStyle": "swing", "useTime": 20, "useAnimation": 20, "autoReuse": true, "damage": 72, "damageType": "melee", "knockback": 4.5, "crit": 4,
+      "behaviors": [{ "type": "meleeSwing", "arc": 170, "length": 3.8 }], "covers": ["terraria:excalibur"] },
+    { "id": "radiant_repeater", "name": "Radiant Repeater", "category": "weapon", "rarity": 5, "value": 60000, "useStyle": "shoot", "useTime": 16, "useAnimation": 16,
+      "autoReuse": true, "damage": 50, "damageType": "ranged", "knockback": 2.5, "useAmmo": "arrow", "shootSpeed": 33, "covers": ["terraria:hallowed_repeater"] },
+    { "id": "prism_pickaxe", "name": "Prism Pickaxe", "description": "Mines anything this side of the jungle temple, and fells trees in passing.", "category": "tool", "rarity": 5, "value": 80000,
+      "useStyle": "swing", "useTime": 7, "useAnimation": 15, "autoReuse": true, "damage": 26, "damageType": "melee", "knockback": 4.5,
+      "pickPower": 200, "axePower": 110, "mineBrush": 2, "covers": ["terraria:pickaxe_axe"] },
+    { "id": "radiant_helmet", "name": "Radiant Helmet", "category": "armor", "rarity": 5, "value": 45000, "equipSlot": "head", "defense": 21, "armorSet": "radiant_armor", "covers": ["terraria:hallowed_helmet"] },
+    { "id": "radiant_plate", "name": "Radiant Plate", "category": "armor", "rarity": 5, "value": 60000, "equipSlot": "body", "defense": 15, "armorSet": "radiant_armor", "covers": ["terraria:hallowed_plate_mail"] },
+    { "id": "radiant_greaves", "name": "Radiant Greaves", "category": "armor", "rarity": 5, "value": 50000, "equipSlot": "legs", "defense": 11, "armorSet": "radiant_armor", "covers": ["terraria:hallowed_greaves"] }
+  ],
+  "recipes": [
+    { "id": "radiant_blade", "output": "radiant_blade", "inputs": [{ "item": "radiant_bar", "count": 12 }], "stations": ["hardmode_anvil"] },
+    { "id": "radiant_repeater", "output": "radiant_repeater", "inputs": [{ "item": "radiant_bar", "count": 12 }], "stations": ["hardmode_anvil"] },
+    { "id": "prism_pickaxe", "output": "prism_pickaxe", "inputs": [{ "item": "radiant_bar", "count": 18 }, { "item": "essence_of_sight", "count": 1 }, { "item": "essence_of_might", "count": 1 }, { "item": "essence_of_fright", "count": 1 }], "stations": ["hardmode_anvil"] },
+    { "id": "radiant_helmet", "output": "radiant_helmet", "inputs": [{ "item": "radiant_bar", "count": 12 }], "stations": ["hardmode_anvil"] },
+    { "id": "radiant_plate", "output": "radiant_plate", "inputs": [{ "item": "radiant_bar", "count": 24 }], "stations": ["hardmode_anvil"] },
+    { "id": "radiant_greaves", "output": "radiant_greaves", "inputs": [{ "item": "radiant_bar", "count": 18 }], "stations": ["hardmode_anvil"] }
+  ]
+}

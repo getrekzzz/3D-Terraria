@@ -750,6 +750,98 @@
           "tipLayer": "prop:plain:glow",
           "fletching": "#f0d890"
         }
+      },
+      "radiant_bar": {
+        "generator": "bar",
+        "params": {
+          "metal": "#fff0c8",
+          "metalLayer": "gold",
+          "count": 2
+        }
+      },
+      "essence_of_sight": {
+        "generator": "essence",
+        "params": {
+          "color": "#50e060",
+          "core": "#e0ffe0"
+        }
+      },
+      "essence_of_might": {
+        "generator": "essence",
+        "params": {
+          "color": "#4070ff",
+          "core": "#d8e4ff"
+        }
+      },
+      "essence_of_fright": {
+        "generator": "essence",
+        "params": {
+          "color": "#ff8030",
+          "core": "#fff0d0"
+        }
+      },
+      "clockwork_eye": {
+        "generator": "clockwork",
+        "params": {
+          "kind": "eye"
+        }
+      },
+      "clockwork_worm": {
+        "generator": "clockwork",
+        "params": {
+          "kind": "worm"
+        }
+      },
+      "clockwork_skull": {
+        "generator": "clockwork",
+        "params": {
+          "kind": "skull"
+        }
+      },
+      "radiant_blade": {
+        "generator": "sword",
+        "params": {
+          "metal": "#fff0c8",
+          "metalLayer": "gold",
+          "length": 1.05,
+          "width": 0.1
+        }
+      },
+      "radiant_repeater": {
+        "generator": "bow",
+        "params": {
+          "metal": "#fff0c8",
+          "metalLayer": "gold",
+          "limbLayer": "gold"
+        }
+      },
+      "prism_pickaxe": {
+        "generator": "pickaxe",
+        "params": {
+          "metal": "#f0d0ff",
+          "metalLayer": "gold"
+        }
+      },
+      "radiant_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#fff0c8",
+          "metalLayer": "gold"
+        }
+      },
+      "radiant_plate": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#fff0c8",
+          "metalLayer": "gold"
+        }
+      },
+      "radiant_greaves": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#fff0c8",
+          "metalLayer": "gold"
+        }
       }
     }
   },
@@ -1110,6 +1202,90 @@
         "build": 0.3,
         "weight": 0.1,
         "height": 2.0
+      }
+    },
+    "twin_lens_ray": {
+      "generator": "mech_eye",
+      "params": {
+        "variant": "ray",
+        "iris": "#ff2a2a"
+      }
+    },
+    "twin_lens_ray_open": {
+      "generator": "mech_eye",
+      "params": {
+        "variant": "ray",
+        "iris": "#ff2a2a",
+        "open": true
+      }
+    },
+    "twin_lens_flare": {
+      "generator": "mech_eye",
+      "params": {
+        "variant": "flare",
+        "iris": "#50f040",
+        "thrust": "#80ff60"
+      }
+    },
+    "twin_lens_flare_open": {
+      "generator": "mech_eye",
+      "params": {
+        "variant": "flare",
+        "iris": "#50f040",
+        "thrust": "#80ff60",
+        "open": true
+      }
+    },
+    "serpent_head": {
+      "generator": "serpent",
+      "params": {
+        "part": "head"
+      }
+    },
+    "serpent_segment": {
+      "generator": "serpent",
+      "params": {
+        "part": "segment"
+      }
+    },
+    "serpent_tail": {
+      "generator": "serpent",
+      "params": {
+        "part": "tail"
+      }
+    },
+    "serpent_probe": {
+      "generator": "serpent",
+      "params": {
+        "part": "probe"
+      }
+    },
+    "prime_skull": {
+      "generator": "prime_skull",
+      "params": {}
+    },
+    "prime_saw": {
+      "generator": "prime_arm",
+      "params": {
+        "tool": "saw"
+      }
+    },
+    "prime_vice": {
+      "generator": "prime_arm",
+      "params": {
+        "tool": "vice"
+      }
+    },
+    "prime_cannon": {
+      "generator": "prime_arm",
+      "params": {
+        "tool": "cannon"
+      }
+    },
+    "prime_laser": {
+      "generator": "prime_arm",
+      "params": {
+        "tool": "laser"
       }
     }
   }

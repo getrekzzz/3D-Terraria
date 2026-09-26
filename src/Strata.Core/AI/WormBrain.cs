@@ -9,7 +9,8 @@ namespace Strata.Core.AI;
 /// Burrowing worm (Bore Tyrant, diggers): the head swims through terrain at constant speed, turning towards the
 /// target at a limited rate and carving a real tunnel; when it bursts out above the target it arcs back down under
 /// gravity with weak steering.
-/// Body segments follow the head's path (see <see cref="NpcSystem"/>).
+/// Body segments follow the head's path (see <see cref="NpcSystem"/>). Mechanical worms fly through terrain without
+/// carving (dig radius 0, low air gravity) and release drones from their segments.
 /// </summary>
 public sealed class WormBrain : IBrain
 {
@@ -45,6 +46,17 @@ public sealed class WormBrain : IBrain
         npc.Pose = buried ? "move" : "attack";
         if (_p.DigRadius > 0 && ctx.Carve != null && (npc.Age % _p.DigInterval) == 0 && (buried || NearTerrain(ctx, head)))
             ctx.Carve(head, _p.DigRadius);
+        ReleaseMinion(npc, ctx);
+    }
+
+    /// <summary>Drones launched from a random segment while fewer than the cap are alive.</summary>
+    private void ReleaseMinion(Npc npc, BrainContext ctx)
+    {
+        if (_p.Minion == null || ctx.Spawn == null || ctx.Target == null || npc.Segments.Count == 0) return;
+        if (npc.Age == 0 || npc.Age % Math.Max(1, _p.MinionInterval) != 0) return;
+        if (!ctx.Content.Enemies.TryGet(_p.Minion, out var minion) || (ctx.CountAlive?.Invoke(minion.Id) ?? 0) >= _p.MaxMinions) return;
+        var from = npc.Segments[ctx.Rng.NextInt(npc.Segments.Count)];
+        if (ctx.Spawn(minion, from) is { } m) m.Velocity = new Vector3(ctx.Rng.NextSigned(), 1f, ctx.Rng.NextSigned()) * 4f;
     }
 
     private static bool NearTerrain(BrainContext ctx, Vector3 point)

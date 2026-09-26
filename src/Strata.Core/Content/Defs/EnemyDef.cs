@@ -49,6 +49,12 @@ public sealed class BossInfo
     public string? BarrierModel { get; init; }
 
     public float BarrierTile { get; init; } = 4f;
+
+    /// <summary>
+    /// Bosses summoned alongside this one (a pair of eyes). They share its <see cref="Flag"/>, which is raised only when
+    /// the last of the group falls; announcements and the boss bar treat the group as one.
+    /// </summary>
+    public string[] Companions { get; init; } = Array.Empty<string>();
 }
 
 /// <summary>A projectile a creature fires at its target (any brain).</summary>
@@ -75,6 +81,12 @@ public sealed class RangedAttack
 
     /// <summary>Volleys come from the body parts (segments) in turn, e.g. a wall's eyes, instead of the body.</summary>
     public bool FromParts { get; init; }
+
+    /// <summary>With <see cref="FromParts"/>: only these part indices fire (a cannon arm, not a saw); empty = all.</summary>
+    public int[] Parts { get; init; } = Array.Empty<int>();
+
+    /// <summary>Replaces this attack while the creature is enraged (a boss's second phase): e.g. rapid lasers.</summary>
+    public RangedAttack? Enraged { get; init; }
 }
 
 /// <summary>A hostile or passive creature. Behaviour comes from its <see cref="Brain"/> spec.</summary>

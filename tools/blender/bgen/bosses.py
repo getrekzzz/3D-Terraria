@@ -1,5 +1,5 @@
 """Boss models: Gel Sovereign, The Watcher (eye and maw phases), Bore Tyrant (head, segment, tail), Crypt Warden
-(skull and hands; the skull also serves the guardian and the hexed skulls), The Mawwall (mouth, eyes, a flesh tile
+(skull and hands; the skull also serves the guardian, the hexed skulls and, in steel, Warden Prime), The Mawwall (mouth, eyes, a flesh tile
 the game repeats over the wall, hungry mouths).
 Sizes are final (scale 1 in game). Front faces Blender +Y."""
 import math
@@ -109,16 +109,17 @@ def skull(mb: MeshBuilder, p, rng):
     """A floating skull centred at height centerZ (bosses are drawn at their centre, other fliers at their feet)."""
     r, z = p.get("radius", 1.3), p.get("centerZ", 0.0)
     bone, glow = p.get("bone", "#e8e0c8"), p.get("eyes", "#ff5030")
-    mb.sphere((0, -r * 0.05, z + r * 0.12), r, "prop:plain", bone, subdivisions=3, scale=(0.88, 1.0, 0.92), jitter=0.012, rng=rng)
+    mat = f"prop:{p.get('layer', 'plain')}"  # Warden Prime recasts it in steel
+    mb.sphere((0, -r * 0.05, z + r * 0.12), r, mat, bone, subdivisions=3, scale=(0.88, 1.0, 0.92), jitter=0.012, rng=rng)
     # Cheekbones and upper jaw, then a hinged lower jaw hanging slightly open.
-    mb.box((-r * 0.62, r * 0.2, z - r * 0.55), (r * 0.62, r * 0.8, z - r * 0.18), "prop:plain", bone)
-    mb.box((-r * 0.5, r * 0.12, z - r * 0.98), (r * 0.5, r * 0.72, z - r * 0.7), "prop:plain", bone)
+    mb.box((-r * 0.62, r * 0.2, z - r * 0.55), (r * 0.62, r * 0.8, z - r * 0.18), mat, bone)
+    mb.box((-r * 0.5, r * 0.12, z - r * 0.98), (r * 0.5, r * 0.72, z - r * 0.7), mat, bone)
     for sx in (-1, 1):
-        mb.box((sx * r * 0.44 - r * 0.07, r * 0.1, z - r * 0.8), (sx * r * 0.44 + r * 0.07, r * 0.3, z - r * 0.3), "prop:plain", bone)
+        mb.box((sx * r * 0.44 - r * 0.07, r * 0.1, z - r * 0.8), (sx * r * 0.44 + r * 0.07, r * 0.3, z - r * 0.3), mat, bone)
     for k in range(-3, 4):  # teeth, upper and lower rows
         x = k * r * 0.13
-        mb.box((x - r * 0.045, r * 0.74, z - r * 0.62), (x + r * 0.045, r * 0.82, z - r * 0.46), "prop:plain", "#f6f0e2")
-        mb.box((x - r * 0.045, r * 0.64, z - r * 0.74), (x + r * 0.045, r * 0.72, z - r * 0.6), "prop:plain", "#f6f0e2")
+        mb.box((x - r * 0.045, r * 0.74, z - r * 0.62), (x + r * 0.045, r * 0.82, z - r * 0.46), mat, "#f6f0e2")
+        mb.box((x - r * 0.045, r * 0.64, z - r * 0.74), (x + r * 0.045, r * 0.72, z - r * 0.6), mat, "#f6f0e2")
     # Deep sockets with a burning point in each, and the nasal hole.
     for sx in (-1, 1):
         mb.sphere((sx * r * 0.34, r * 0.74, z + r * 0.08), r * 0.25, "prop:plain", "#120c0c", subdivisions=2, scale=(1, 0.55, 0.9))

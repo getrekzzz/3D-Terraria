@@ -60,6 +60,9 @@ public sealed class Npc
     /// <summary>Multiplier on contact damage (bosses enraged by daylight).</summary>
     public float DamageScale { get; set; } = 1f;
 
+    /// <summary>Set by the brain in a creature's second phase (or day rage); switches to <see cref="Content.Defs.RangedAttack.Enraged"/>.</summary>
+    public bool Enraged { get; set; }
+
     /// <summary>Ticks until the next ranged volley.</summary>
     public int AttackTimer;
 

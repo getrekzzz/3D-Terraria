@@ -20,6 +20,9 @@ public sealed class BrainContext
     /// <summary>Spawns a minion (bosses); returns null when the creature cap is reached.</summary>
     public Func<Content.Defs.EnemyDef, Vector3, Npc?>? Spawn { get; set; }
 
+    /// <summary>How many living creatures of a kind exist (caps a boss's minions).</summary>
+    public Func<string, int>? CountAlive { get; set; }
+
     /// <summary>Removes natural terrain in a sphere (radius in cells) — burrowing creatures.</summary>
     public Action<Vector3, float>? Carve { get; set; }
 

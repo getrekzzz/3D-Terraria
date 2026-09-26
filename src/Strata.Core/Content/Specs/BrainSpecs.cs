@@ -128,6 +128,11 @@ public sealed class WormParams : SpecParams
 
     /// <summary>Gravity applied while outside terrain (makes it arc back into the ground).</summary>
     public float AirGravity { get; init; } = 14f;
+
+    /// <summary>Released from a random body segment every <see cref="MinionInterval"/> ticks (probes), up to <see cref="MaxMinions"/> alive.</summary>
+    public string? Minion { get; init; }
+    public int MinionInterval { get; init; } = 240;
+    public int MaxMinions { get; init; } = 6;
 }
 
 /// <summary>Lives in liquid: chases targets through water, flops helplessly on land.</summary>
@@ -170,6 +175,12 @@ public sealed class CryptWardenParams : SpecParams
     public int SpinDuration { get; init; } = 240;
 
     public float SpinSpeed { get; init; } = 9f;
+
+    /// <summary>Only the first N hands swipe (the rest are guns that hold position); 0 = every hand.</summary>
+    public int SwipingHands { get; init; }
+
+    /// <summary>Below this life fraction the warden is enraged (faster swipes, enraged ranged attack); 0 = never.</summary>
+    public float Phase2Life { get; init; }
 }
 
 /// <summary>Stands and casts (see the enemy's ranged attack), blinking to a new spot near the target now and then.</summary>

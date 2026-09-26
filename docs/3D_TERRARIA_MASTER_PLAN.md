@@ -39,6 +39,8 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-26 | Grass is scattered in the Core mesh jobs (deterministic, per grass block kind from `data/config/grass.json`) and drawn as per-chunk MultiMeshes whose shuffled prefix is the distance LOD | Grass follows edits and remeshes for free, costs nothing when switched off, and thins evenly with distance. |
 | 2026-09-26 | Tree crowns and bushes are alpha-tested leaf cards (`card:<layer>`, sprig textures) with crown-shaped custom normals | Leafy, see-through silhouettes at ~2k triangles per tree instead of solid blobs. |
 | 2026-09-26 | Vertex colours are written as sRGB (bmesh bytes / `color_srgb`) | glTF exports linear colour; writing linear floats made painted skin and clothes pale. |
+| 2026-09-26 | Hardmode stations are tier-table data (`barStation`/`craftStation` per metal): cinder forge → hardmode anvil → hardmode forge | The station chain stays one table edit; better stations list the stations they replace. |
+| 2026-09-26 | Boss pairs are `companions` sharing one defeat flag (spawned together, one announcement and bar, flag on the last death); second phases are `Npc.Enraged` + `ranged.enraged` | The Twin Lenses need no special-case code, and any brain can switch attacks by phase. |
 
 ## 3. System status
 Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
@@ -48,7 +50,7 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Foundation | Solution, projects, CI | ✅ | Core tests (Linux; +Windows on PR/main), content/asset/reference checks, Godot headless smoke job |
 | Foundation | Determinism | ✅ | SplitMix/PCG32, name-derived seeds, no trig/pow in worldgen, golden hashes |
 | Content | Loader, registries, validator, manifest | ✅ | Strict JSON, typed specs, DAG checks, obtainability, conventional asset paths |
-| Content | Reference DBs + coverage | ✅ | 819 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 49.8 % (items 51 %, enemies 24 %, bosses 17 %, NPCs 21 %) |
+| Content | Reference DBs + coverage | ✅ | 834 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; overall 54.3 % (items 56 %, enemies 32 %, bosses 28 %, NPCs 21 %) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
@@ -68,11 +70,11 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | Assets | Blender pipeline, icons, synthesised textures | ✅ | 35 object kinds, 245 item models/icons, 34 creatures; 11 procedural humans (player, 6 residents, shambler, skeleton, imp, hexcaster) with faces, hands, hair, clothing, 52-bone rig |
 | NPCs | Town residents, 3D housing, shops, services, happiness, landmark residents | ✅ | 6 residents (guide/merchant/nurse/dryad/old man/clothier roles); more residents, enemies attacking town ⬜ |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
-| Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels), Crypt Warden (hands, spin, day rage), The Mawwall (sweeping barrier, eye lasers, tethered hungry maws); arenas, boss bar; music state ⬜ |
+| Bosses | Framework + bosses | ✅ | Gel Sovereign, The Watcher, Bore Tyrant (tunnels), Crypt Warden (hands, spin, day rage), The Mawwall (sweeping barrier, eye lasers, tethered hungry maws), Twin Lenses (paired eyes, phase-2 lasers and flamethrower), Iron Serpent (50-segment flying worm, part lasers, probes), Warden Prime (four tools, gun arms fire); arenas, boss bar; music state ⬜ |
 | Progression | Flags, auto-set cascade, announcements, incineration summons | ✅ | `ProgressionSystem.Raised` is the hook for hardmode mutations |
 | Events | Event director | ✅ | Blood moon, slime rain; invasions ⬜ |
 | Dungeon | Crypt zone, locked walls, guardian, roster, keeper + curse | ✅ | Crypt keys/locked chests, water bolt loot, spike traps ⬜ |
-| Hardmode | Trigger, lazy world mutations, spread, ore tiers | ✅ | Mawwall → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190); hardmode creatures and mechanical bosses ⬜ |
+| Hardmode | Trigger, lazy world mutations, spread, ore tiers, rosters, stations, mechanical bosses | ✅ | Mawwall → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190 → 200); 12 hardmode creatures; cinder forge, hardmode anvils and forges; Twin Lenses, Iron Serpent, Warden Prime → radiant gear; wings, hardmode variants of old creatures ⬜ |
 | Audio | Director + sounds | ⬜ | |
 
 ## 4. Technical debt
@@ -103,6 +105,8 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 * Grass grows through tile objects standing on grass (chests, stations, tree bases); it only avoids blocks.
 * Lavapipe (CI, container QA) cannot run the `ultra` preset at usable speed; real-GPU frame times of `high`/`ultra`
   with grass and leaf cards are not measured yet.
+* Bosses share one life pool per creature: the Iron Serpent's segments and Warden Prime's tools take hits for the
+  body (the reference game lets you break Prime's arms and destroys the Destroyer segment by segment).
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
   batch per liquid, so a large flood remeshes its chunks every few steps (rate-limited by the mesh queue).
 
@@ -120,7 +124,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (200, incl. graphics presets and grass scatter) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (216, incl. graphics presets, grass scatter, hardmode life, mechanical bosses) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets, graphics presets, grass kinds) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -134,7 +138,8 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: every biome creature spawns, moves and renders; ranged attackers | `creatures.cmds` | ✅ CI |
 | Engine smoke: keeper at the crypt gate, guardian leaves outside, night summon, warden defeat frees the keeper | `dungeon.cmds` | ✅ CI |
 | Engine smoke: effigy burned in underworld lava calls the Mawwall (wayfinder sacrificed), the fight runs, defeat raises hardmode | `mawwall.cmds` | ✅ CI |
-| Engine smoke: hardmode appends mutations, loaded chunks catch up, the radiant wedge streams in converted and is a zone, spread runs | `hardmode.cmds` | ✅ CI |
+| Engine smoke: hardmode appends mutations, loaded chunks catch up, the radiant wedge streams in converted and is a zone, spread runs; hardmode stations place and every hardmode creature spawns | `hardmode.cmds` | ✅ CI |
+| Engine smoke: clockwork eye brings both Twin Lenses (flag on the second death), Iron Serpent releases probes, Warden Prime, all-mechs flag | `mechs.cmds` | ✅ CI |
 | Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Crypt Warden, Mawwall, radiant wedge) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
 
 ## 7. Performance
@@ -154,10 +159,11 @@ M2 delivered events, three bosses, liquids, voxel A*, 3D housing, town residents
 M3 delivered the crypt (zone, locked walls, guardian, roster, keeper, Crypt Warden, tailor), the Mawwall (effigy
 incineration summon, sweeping barrier, eye lasers, tethered minions) and the hardmode transformation (lazy world
 mutations: new ore tiers, radiant and blighted wedges, spreading biomes; evil, cinder and hardmode metal families).
-1. Hardmode life: radiant and blighted creature rosters, hardmode variants of cavern/underworld creatures, a
-   hardmode anvil and forge, wings/flight accessories.
-2. LOD rings + horizon heightfield; cave culling from navigation summaries.
-3. Mechanical bosses (Twin Lenses, Iron Serpent, Warden Prime) on the progression flags that already exist.
+M4 content delivered hardmode life (12 creatures, new debuffs and drops, the forge/anvil chain) and the three
+mechanical bosses with radiant gear.
+1. LOD rings + horizon heightfield; cave culling from navigation summaries.
+2. Wings/flight accessories; hardmode variants of cavern/underworld creatures.
+3. Post-mechanical: Thornheart (jungle), chlorophyte, the temple.
 4. More residents; residents that fight back; crypt keys and locked chests.
 5. Audio director (data-driven cues, music states for bosses/events).
 

@@ -1084,6 +1084,17 @@
    ]
   },
   {
+   "id": "terraria:probe",
+   "name": "Probe",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "the destroyer",
+   "mechanics": [
+    "flyer",
+    "projectiles"
+   ]
+  },
+  {
    "id": "terraria:lihzahrd",
    "name": "Lihzahrd",
    "kind": "enemy",
