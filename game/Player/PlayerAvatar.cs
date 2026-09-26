@@ -28,9 +28,12 @@ public sealed partial class PlayerAvatar : Node3D
         _game = game;
         _props = props;
         Name = "Avatar";
-        _visual = CreatureVisual.Create("assets/models/creatures/player.glb", props);
+        var look = controller.Entity.State.Look;
+        var model = $"assets/models/creatures/{look.ModelId}.glb";
+        _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props);
         if (_visual == null) return;
         AddChild(_visual);
+        if (ResourceLoader.Exists("res://" + model)) _visual.SetAppearance(look);
         // Full detail up close: simplified LODs let the hair shell sink into the scalp.
         _visual.SetLodBias(8f);
     }

@@ -30,6 +30,14 @@ uniform float sss = 0.0;
 uniform float sheen = 0.0;
 instance uniform vec4 voxel_light = vec4(0.0, 0.0, 0.0, 1.0);
 instance uniform vec4 tint = vec4(1.0);
+// Player characters are generated with marker colours (grey hair, belt and boots, a red shirt, a green pair of trousers)
+// and recoloured to the character's chosen look; linear colours, recolor = 1 enables it.
+instance uniform float recolor = 0.0;
+instance uniform vec4 hair_color = vec4(0.216, 0.216, 0.216, 1.0);
+instance uniform vec4 skin_color = vec4(0.745, 0.434, 0.279, 1.0);
+instance uniform vec4 shirt_color = vec4(0.434, 0.080, 0.080, 1.0);
+instance uniform vec4 pants_color = vec4(0.080, 0.352, 0.080, 1.0);
+instance uniform vec4 shoe_color = vec4(0.216, 0.216, 0.216, 1.0);
 
 varying vec3 v_rest;
 varying vec3 v_rest_normal;
@@ -63,8 +71,22 @@ vec3 rest_bump(sampler2DArray tex, float lay, vec3 p, vec3 n, vec3 w, float scal
 	return w.x * vec3(0.0, tx.y, tx.x) + w.y * vec3(ty.x, 0.0, ty.y) + w.z * vec3(tz.x, tz.y, 0.0);
 }
 
+// The chosen colour carrying the marker's shading (folds, streaks, roots) as a brightness ratio.
+vec3 recolored(vec3 painted, vec3 marker, vec3 chosen) {
+	const vec3 lw = vec3(0.2126, 0.7152, 0.0722);
+	return chosen * dot(painted, lw) / max(dot(marker, lw), 1e-3);
+}
+
 void fragment() {
 	vec3 base = COLOR.rgb * tint.rgb;
+	if (recolor > 0.5) {
+		if (kind == 2) base = recolored(COLOR.rgb, vec3(0.216), hair_color.rgb) * tint.rgb;
+		else if (kind == 0) base = COLOR.rgb * skin_color.rgb / vec3(0.745, 0.434, 0.279) * tint.rgb;
+		else if (kind == 4) base = (COLOR.r > COLOR.g
+			? recolored(COLOR.rgb, vec3(0.434, 0.080, 0.080), shirt_color.rgb)
+			: recolored(COLOR.rgb, vec3(0.080, 0.352, 0.080), pants_color.rgb)) * tint.rgb;
+		else if (kind == 5) base = recolored(COLOR.rgb, vec3(0.216), shoe_color.rgb) * tint.rgb;
+	}
 	vec3 n = normalize(v_rest_normal);
 	vec3 w = tri_weights(n);
 	vec3 bump = vec3(0.0);

@@ -23,4 +23,12 @@ public static class InputGate
     }
 
     public static bool IsOpen(string layer) => Open.Contains(layer);
+
+    /// <summary>Closes every layer (leaving a world for the menu).</summary>
+    public static void Reset()
+    {
+        Open.Clear();
+        TextEntry = false;
+        Godot.Input.MouseMode = Godot.Input.MouseModeEnum.Visible;
+    }
 }

@@ -46,6 +46,9 @@ public sealed class PlayerEntity
     /// <summary>Ticks until respawn while dead.</summary>
     public int RespawnTicks { get; set; }
 
+    /// <summary>A hardcore character that died: it never respawns and is not saved again.</summary>
+    public bool Lost { get; set; }
+
     /// <summary>Precision mode: tools affect a single cell.</summary>
     public bool Precision { get; set; }
 
@@ -100,7 +103,7 @@ public sealed class PlayerEntity
 /// dropped items, world editing and players. The Godot layer renders it and feeds input; tests and the smoke
 /// runner drive it directly.
 /// </summary>
-public sealed class GameWorld : IDisposable
+public sealed partial class GameWorld : IDisposable
 {
     public const int AutosaveTicks = Units.TicksPerSecond * 120;
     private int _autosaveCounter;
@@ -227,14 +230,16 @@ public sealed class GameWorld : IDisposable
                 p.RespawnTicks = RespawnDelayTicks;
                 state.Deaths++;
                 state.Buffs.ClearNonPersistent();
+                ApplyDeathPenalty(p);
                 PlayerDied?.Invoke(p);
             }
-            else if (--p.RespawnTicks == 0)
+            else if (--p.RespawnTicks == 0 && !p.Lost)
             {
                 Respawn(p);
             }
             return;
         }
+        state.PlayTicks++;
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.UseAnimation > 0) p.UseAnimation--;
         if (state.Buffs.Tick()) state.Recompute();
@@ -287,9 +292,16 @@ public sealed class GameWorld : IDisposable
 
     public void SavePlayer(PlayerState state)
     {
-        if (PlayerDirectory == null) return;
-        Directory.CreateDirectory(PlayerDirectory);
-        AtomicFile.WriteAllText(PlayerPath(PlayerDirectory, state.Name), PlayerSave.From(state).Serialize());
+        if (PlayerDirectory == null || Players.Any(p => p.State == state && p.Lost)) return;
+        WritePlayer(PlayerDirectory, state);
+    }
+
+    /// <summary>Writes a character's save file (new characters from the menu, saves during play).</summary>
+    public static void WritePlayer(string directory, PlayerState state)
+    {
+        Directory.CreateDirectory(directory);
+        state.LastPlayedUtc = DateTime.UtcNow;
+        AtomicFile.WriteAllText(PlayerPath(directory, state.Name), PlayerSave.From(state).Serialize());
     }
 
     /// <summary>Loads a player file, or creates a new character with the starting kit.</summary>

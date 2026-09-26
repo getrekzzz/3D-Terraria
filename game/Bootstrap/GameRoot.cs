@@ -66,32 +66,121 @@ public partial class GameRoot : Node
         }
         var render = new RenderTables(content, layers.IndexOf, grass);
         InputSetup.Register(data);
+        Settings.KeyBindings.Load();
         var graphics = Rendering.GraphicsSettings.Load(data, args, log);
         graphics.Apply(GetViewport());
         Services = new GameServices(log, data, content, layers, render, args, graphics);
         log.Info("boot", $"Graphics preset '{graphics.Name}'.");
         log.Info("boot", $"Content: {content.Blocks.Count} blocks, {content.Items.Count} items, {content.Recipes.Count} recipes.");
+        Audio.AudioBuses.Setup();
+        Audio.Sfx.Attach(this);
+        var user = Settings.UserSettings.Current;
+        user.Changed += ApplyDisplay;
+        if (!IsAutomated(args)) ApplyDisplay(user);
 
         if (args.Flag("no-world")) return;
-        StartWorld(args.Get("world") ?? "dev", args.Long("seed", 1234),
-            System.Enum.Parse<WorldSizePreset>(args.Get("size") ?? "small", ignoreCase: true), args.Flag("new"));
+        if (!IsAutomated(args) && args.Get("world") == null)
+        {
+            ShowMenu();
+            if (args.Get("menu-tour") is { } tour)
+            {
+                var runner = new Testing.MenuTour();
+                AddChild(runner);
+                runner.Start(this, tour == "true" ? null : tour);
+            }
+            return;
+        }
+        // Developer and test starts: a named world from the command line.
+        var name = args.Get("world") ?? "dev";
+        StartWorld(new LaunchOptions
+        {
+            WorldDirectory = ProjectSettings.GlobalizePath($"user://worlds/{name}"),
+            NewWorld = new WorldSettings
+            {
+                Name = name, Seed = args.Long("seed", 1234),
+                Size = System.Enum.Parse<WorldSizePreset>(args.Get("size") ?? "small", ignoreCase: true),
+            },
+            ForceNew = args.Flag("new"),
+            PlayerName = args.Get("player") ?? "Wanderer",
+            FreshPlayer = args.Flag("fresh-player"),
+            FreeCamera = args.Flag("free-camera") || args.Get("eye") != null,
+            ViewDistance = (int)args.Long("view", user.ViewDistance),
+        });
     }
 
-    public LaunchedWorld StartWorld(string name, long seed, WorldSizePreset size, bool forceNew)
+    /// <summary>Scripted runs (smoke tests, screenshots) skip the menu and keep the window as launched.</summary>
+    private static bool IsAutomated(CommandLine args) =>
+        args.Get("smoke") != null || args.Get("screenshot") != null || args.Get("exec") != null || args.Get("shots") != null;
+
+    private void ApplyDisplay(Settings.UserSettings s)
     {
-        var launched = WorldLauncher.Launch(this, Services, name, seed, size, forceNew);
+        Settings.DisplaySettings.Apply(s);
+        Settings.DisplaySettings.ApplyUiScale(GetTree().Root, s);
+    }
+
+    /// <summary>The title screen; choosing a world there starts it.</summary>
+    public void ShowMenu()
+    {
+        var menu = new Menu.MainMenu();
+        AddChild(menu);
+        menu.Initialize(Services);
+        menu.PlayRequested += request =>
+        {
+            menu.QueueFree();
+            StartWorld(new LaunchOptions
+            {
+                WorldDirectory = request.WorldDirectory,
+                PlayerName = request.PlayerName,
+                ViewDistance = Settings.UserSettings.Current.ViewDistance,
+            });
+        };
+    }
+
+    /// <summary>Saves and closes the open world, then shows the title screen.</summary>
+    public void ExitToMenu()
+    {
+        if (_worldHost == null) return;
+        var host = _worldHost;
+        _worldHost = null;
+        World = null;
+        Commands = null;
+        CommandContext = null;
+        InputGate.Reset();
+        RemoveChild(host);
+        host.QueueFree(); // the world saves as it leaves the tree
+        ShowMenu();
+    }
+
+    private Node? _worldHost;
+
+    public LaunchedWorld StartWorld(LaunchOptions options)
+    {
+        _worldHost = new Node { Name = "WorldHost" };
+        AddChild(_worldHost);
+        var launched = WorldLauncher.Launch(_worldHost, Services, options);
         World = launched.Runtime;
         Commands = BuiltinCommands.CreateRegistry();
         EngineCommands.Register(Commands, launched);
         CommandContext = GodotCommandHost.CreateContext(launched, Services.Log, Commands);
         var console = new DebugConsole();
-        AddChild(console);
+        _worldHost.AddChild(console);
         console.Initialize(Commands, CommandContext);
+        if (launched.Player != null)
+        {
+            var pause = new PauseMenu();
+            _worldHost.AddChild(pause);
+            pause.Initialize(Services, launched.Runtime, ExitToMenu);
+            // A hardcore character's death ends the session: show the message, then return to the title screen.
+            launched.Runtime.Game.PlayerLost += _ => GetTree().CreateTimer(6.0).Timeout += () =>
+            {
+                if (World == launched.Runtime) ExitToMenu();
+            };
+        }
         ScreenshotCapture? capture = null;
         if (Services.Args.Get("screenshot") is { } shot)
         {
             capture = new ScreenshotCapture { World = launched.Runtime, OutputPath = shot };
-            AddChild(capture);
+            _worldHost.AddChild(capture);
         }
         AddTourShots(launched);
         if (Services.Args.Get("smoke") is { } script)
@@ -107,7 +196,7 @@ public partial class GameRoot : Node
             bool done = false;
             runner.Finished += _ => done = true;
             if (capture != null) capture.WaitFor = () => done;
-            AddChild(runner);
+            _worldHost.AddChild(runner);
             runner.Start("--exec", exec.Replace(';', '\n'), Commands, CommandContext!);
         }
         else if (launched.Player != null) Input.MouseMode = Input.MouseModeEnum.Captured;
@@ -118,7 +207,7 @@ public partial class GameRoot : Node
     private void AddTourShots(LaunchedWorld launched)
     {
         var shots = new ScreenshotCapture { Name = "TourShots", World = launched.Runtime, QuitAfter = false, Armed = false };
-        AddChild(shots);
+        _worldHost!.AddChild(shots);
         string dir = Services.Args.Get("shots") ?? "user://shots";
         Commands!.Register(new CommandDef
         {
@@ -133,13 +222,17 @@ public partial class GameRoot : Node
             },
         });
         CommandContext!.AddProbe("screenshot.pending", () => shots.Armed ? 1 : 0);
+        CommandContext.AddProbe("render.fps", () => Engine.GetFramesPerSecond());
+        CommandContext.AddProbe("render.draw_calls", () => RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TotalDrawCallsInFrame));
+        CommandContext.AddProbe("render.primitives", () => RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TotalPrimitivesInFrame));
+        CommandContext.AddProbe("render.objects", () => RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TotalObjectsInFrame));
     }
 
     private void StartScript(string path)
     {
         if (!FileAccess.FileExists(path)) throw new System.IO.FileNotFoundException($"Smoke script not found: {path}");
         var runner = new ScriptRunner { Name = "ScriptRunner" };
-        AddChild(runner);
+        _worldHost!.AddChild(runner);
         runner.Start(path, FileAccess.GetFileAsString(path), Commands!, CommandContext!);
     }
 
@@ -153,9 +246,7 @@ public partial class GameRoot : Node
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (@event.IsActionPressed("pause"))
-            InputGate.SetOpen("pause", !InputGate.IsOpen("pause"));
-        else if (@event is InputEventMouseButton { Pressed: true } && !InputGate.GameplayBlocked && Input.MouseMode != Input.MouseModeEnum.Captured)
+        if (World != null && @event is InputEventMouseButton { Pressed: true } && !InputGate.GameplayBlocked && Input.MouseMode != Input.MouseModeEnum.Captured)
             Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 }

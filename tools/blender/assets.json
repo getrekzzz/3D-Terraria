@@ -854,6 +854,132 @@
         "hairStyle": "short"
       }
     },
+    "player_m_short": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "young",
+        "hairStyle": "short",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_m_messy": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "young",
+        "hairStyle": "messy",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_m_long": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "young",
+        "hairStyle": "long",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_m_buzz": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "young",
+        "hairStyle": "buzz",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_m_bald": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "young",
+        "hairStyle": "bald",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_f_long": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "hairStyle": "long",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_f_ponytail": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "hairStyle": "ponytail",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_f_bun": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "hairStyle": "bun",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
+    "player_f_short": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "hairStyle": "short",
+        "hair": "#808080",
+        "shirt": "#b05050",
+        "pants": "#50a050",
+        "boots": "#808080",
+        "belt": "#808080",
+        "recolorable": true
+      }
+    },
     "shambler": {
       "generator": "humanoid",
       "params": {

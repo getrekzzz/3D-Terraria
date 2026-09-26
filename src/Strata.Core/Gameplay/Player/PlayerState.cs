@@ -35,6 +35,17 @@ public sealed class PlayerState
 
     public int Deaths { get; set; }
 
+    public Appearance Look { get; set; } = new();
+
+    public CharacterDifficulty Difficulty { get; set; }
+
+    /// <summary>Time played with this character (ticks), shown in the character list.</summary>
+    public long PlayTicks { get; set; }
+
+    public DateTime CreatedUtc { get; set; } = DateTime.UtcNow;
+
+    public DateTime LastPlayedUtc { get; set; } = DateTime.UtcNow;
+
     /// <summary>Respawn cell per world name (bed-set spawn points).</summary>
     public Dictionary<string, int[]> SpawnPoints { get; } = new(StringComparer.Ordinal);
 

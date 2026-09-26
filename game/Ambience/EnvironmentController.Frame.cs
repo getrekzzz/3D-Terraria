@@ -67,6 +67,7 @@ public sealed partial class EnvironmentController
 
         // Colour fades at night (rod vision): moonlit scenes read blue-grey rather than green.
         _env.AdjustmentSaturation = Mathf.Lerp(0.62f, 1.1f, Daylight);
+        _env.AdjustmentBrightness = Mathf.Clamp(Settings.UserSettings.Current.Brightness, 0.5f, 2f);
         // Night keeps a faint floor under the moonlit sky so shapes stay readable.
         _env.AmbientLightColor = new Color(0.05f, 0.065f, 0.11f);
         _env.AmbientLightSkyContribution = Mathf.Lerp(0.6f, 1f, Daylight);

@@ -115,6 +115,8 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (open == IsOpen) return;
         _root.Visible = open;
         InputGate.SetOpen(Gate, open);
+        // Auto-pause (single player option): the world waits while the inventory is open.
+        if (Settings.UserSettings.Current.AutoPause || !open) _ui.Player.Runtime.Simulating = !open;
         if (open)
         {
             _crafting.Refresh();

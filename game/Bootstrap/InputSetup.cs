@@ -23,7 +23,7 @@ public static class InputSetup
         }
     }
 
-    private static InputEvent? Parse(string binding)
+    public static InputEvent? Parse(string binding)
     {
         var parts = binding.Split(':', 2);
         if (parts.Length != 2) return null;

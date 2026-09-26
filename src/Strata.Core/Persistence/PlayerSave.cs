@@ -29,6 +29,15 @@ public sealed class PlayerSave
     public List<BuffModel> Buffs { get; set; } = new();
     public Dictionary<string, int[]> SpawnPoints { get; set; } = new();
 
+    // Added without a version bump: older saves load with the defaults.
+    public Appearance Look { get; set; } = new();
+    public CharacterDifficulty Difficulty { get; set; }
+    public long PlayTicks { get; set; }
+    public DateTime CreatedUtc { get; set; }
+    public DateTime LastPlayedUtc { get; set; }
+    public int MaxLife { get; set; }
+    public int MaxMana { get; set; }
+
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
 
@@ -50,11 +59,22 @@ public sealed class PlayerSave
         Accessories = Slots(p.Inventory.Accessories),
         Buffs = p.Buffs.Active.Where(b => !b.Def.Debuff).Select(b => new BuffModel(b.Def.Id, b.TicksLeft)).ToList(),
         SpawnPoints = new Dictionary<string, int[]>(p.SpawnPoints),
+        Look = p.Look.Clone(),
+        Difficulty = p.Difficulty,
+        PlayTicks = p.PlayTicks,
+        CreatedUtc = p.CreatedUtc,
+        LastPlayedUtc = p.LastPlayedUtc,
+        MaxLife = p.Vitals.MaxLife,
+        MaxMana = p.Vitals.MaxMana,
     };
 
     public PlayerState ToState(ContentDatabase content)
     {
-        var p = new PlayerState(Name) { BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths };
+        var p = new PlayerState(Name)
+        {
+            BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, Look = Look ?? new Appearance(), Difficulty = Difficulty,
+            PlayTicks = PlayTicks, CreatedUtc = CreatedUtc, LastPlayedUtc = LastPlayedUtc,
+        };
         Fill(p.Inventory.Backpack, Backpack, content);
         Fill(p.Inventory.Armor, Armor, content);
         Fill(p.Inventory.Accessories, Accessories, content);

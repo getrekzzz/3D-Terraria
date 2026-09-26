@@ -26,6 +26,8 @@ public sealed partial class PlayerController : CharacterBody3D
     private Strata.Core.Content.Defs.LiquidDef? _liquid;
 
     public PlayerEntity Entity { get; private set; } = null!;
+
+    public WorldRuntime Runtime => _runtime;
     public CameraRig Rig { get; private set; } = null!;
 
     /// <summary>Waiting for terrain colliders before physics starts.</summary>

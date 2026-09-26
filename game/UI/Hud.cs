@@ -29,6 +29,7 @@ public sealed partial class Hud : CanvasLayer
     private Label _death = null!;
     private Crosshair _crosshair = null!;
     private Label _targetName = null!;
+    private Label _fps = null!;
     private PanelContainer _bossPanel = null!;
     private Label _bossName = null!;
     private ProgressBar _bossBar = null!;
@@ -94,6 +95,9 @@ public sealed partial class Hud : CanvasLayer
         _targetName.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
         _targetName.AddThemeConstantOverride("outline_size", 4);
         root.AddChild(_targetName);
+        _fps = new Label { Position = new Vector2(16, 44), MouseFilter = Control.MouseFilterEnum.Ignore };
+        _fps.AddThemeFontSizeOverride("font_size", 14);
+        root.AddChild(_fps);
 
         _death = new Label { Visible = false, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         _death.SetAnchorsPreset(Control.LayoutPreset.FullRect);
@@ -179,9 +183,14 @@ public sealed partial class Hud : CanvasLayer
         UpdateBuffs();
         UpdateBossBar();
         _crosshair.InReach = _ui.Interaction.InReach;
+        _fps.Visible = Settings.UserSettings.Current.ShowFps;
+        if (_fps.Visible) _fps.Text = $"{Engine.GetFramesPerSecond():0} FPS";
         _targetName.Text = Settings.UserSettings.Current.ShowTargetName && _ui.Interaction.InReach ? TargetName() : "";
         _death.Visible = !_ui.Entity.Alive;
-        if (_death.Visible) _death.Text = $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
+        if (_death.Visible)
+            _death.Text = _ui.Entity.Lost
+                ? $"{_ui.Entity.State.Name} has perished.\nHardcore characters do not return."
+                : $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
     }
 
     private string TargetName()

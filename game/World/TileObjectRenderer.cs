@@ -23,6 +23,7 @@ public sealed partial class TileObjectRenderer : Node3D
     private readonly HashSet<Int3> _dirty = new();
     private GameWorld _game = null!;
     private PropLibrary _props = null!;
+    private Strata.Core.Streaming.ChunkStreamer _streamer = null!;
 
     /// <summary>Where each object's model goes (grounding, wall mounting, doors).</summary>
     public ObjectPlacement Placement { get; private set; } = null!;
@@ -33,6 +34,7 @@ public sealed partial class TileObjectRenderer : Node3D
     {
         _game = runtime.Game;
         _props = props;
+        _streamer = runtime.Streamer;
         Placement = new ObjectPlacement(runtime);
         Name = "TileObjects";
         var store = _game.Session.World.TileObjects;
@@ -67,7 +69,8 @@ public sealed partial class TileObjectRenderer : Node3D
     {
         Clear(chunk);
         var objects = _game.Session.World.TileObjects.InChunk(chunk);
-        if (objects.Count == 0 || !_game.Session.World.HasChunk(chunk)) return;
+        // Only chunks with terrain on screen: objects of load-only border chunks would float without their ground.
+        if (objects.Count == 0 || !_game.Session.World.HasChunk(chunk) || !_streamer.IsMeshed(chunk)) return;
         var groups = new Dictionary<(TileObjectDef Def, int Variant), List<TileObjectInstance>>();
         foreach (var o in objects)
         {

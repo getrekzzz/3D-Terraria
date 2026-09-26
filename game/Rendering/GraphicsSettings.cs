@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using Strata.Core.Presentation;
 using Strata.Game.Bootstrap;
@@ -29,17 +30,26 @@ public sealed class GraphicsSettings
 
     public event Action<GraphicsPreset>? Changed;
 
+    /// <summary>Name of the user-tuned preset (a copy of a base preset with individual options changed).</summary>
+    public const string Custom = "custom";
+
     public static GraphicsSettings Load(GodotDataSource data, CommandLine args, GodotLog log)
     {
         var config = GraphicsConfig.Load(data);
         var problems = config.Validate();
         if (problems.Count > 0) throw new InvalidOperationException($"{GraphicsConfig.Path}: {string.Join("; ", problems)}");
         string? wanted = args.Get("graphics");
+        GraphicsPreset? custom = null;
         if (wanted == null)
         {
             var file = new ConfigFile();
-            if (file.Load(SettingsFile) == Error.Ok) wanted = (string)file.GetValue("graphics", "preset", config.Default);
+            if (file.Load(SettingsFile) == Error.Ok)
+            {
+                wanted = (string)file.GetValue("graphics", "preset", config.Default);
+                if (wanted == Custom) custom = ReadCustom(file, config.Get(config.Default), log);
+            }
         }
+        if (custom != null) return new GraphicsSettings(config, config.Default) { Preset = custom, Name = Custom };
         if (wanted == null || !config.Presets.ContainsKey(wanted))
         {
             if (wanted != null) log.Write(Strata.Core.Diagnostics.LogLevel.Warning, "graphics", $"Unknown graphics preset '{wanted}', using '{config.Default}'.");
@@ -54,13 +64,48 @@ public sealed class GraphicsSettings
         Preset = Config.Get(name);
         Name = name;
         Apply(viewport);
-        if (remember)
+        if (remember) Save();
+    }
+
+    /// <summary>Uses a tuned copy of a preset (the settings menu's individual options) and remembers it.</summary>
+    public void SelectCustom(GraphicsPreset preset, Viewport viewport)
+    {
+        var problems = string.Join("; ", preset.Validate());
+        if (problems.Length > 0) throw new InvalidOperationException($"custom graphics preset: {problems}");
+        Preset = preset;
+        Name = Custom;
+        Apply(viewport);
+        Save();
+    }
+
+    private void Save()
+    {
+        var file = new ConfigFile();
+        file.SetValue("graphics", "preset", Name);
+        if (Name == Custom)
+            foreach (var prop in typeof(GraphicsPreset).GetProperties())
+            {
+                var v = prop.GetValue(Preset);
+                file.SetValue(Custom, prop.Name, v switch { bool b => b, int i => i, float f => f, string str => str, _ => default(Variant) });
+            }
+        var error = file.Save(SettingsFile);
+        if (error != Error.Ok) throw new InvalidOperationException($"could not save {SettingsFile}: {error}");
+    }
+
+    private static GraphicsPreset? ReadCustom(ConfigFile file, GraphicsPreset basis, GodotLog log)
+    {
+        var p = basis.Clone();
+        foreach (var prop in typeof(GraphicsPreset).GetProperties())
         {
-            var file = new ConfigFile();
-            file.SetValue("graphics", "preset", name);
-            var error = file.Save(SettingsFile);
-            if (error != Error.Ok) throw new InvalidOperationException($"could not save {SettingsFile}: {error}");
+            if (!prop.CanWrite || !file.HasSectionKey(Custom, prop.Name)) continue;
+            var v = file.GetValue(Custom, prop.Name);
+            object value = prop.PropertyType == typeof(bool) ? v.AsBool() : prop.PropertyType == typeof(int) ? v.AsInt32()
+                : prop.PropertyType == typeof(float) ? v.AsSingle() : v.AsString();
+            prop.SetValue(p, value);
         }
+        if (!p.Validate().Any()) return p;
+        log.Write(Strata.Core.Diagnostics.LogLevel.Warning, "graphics", "Custom graphics settings were invalid; using the default preset.");
+        return null;
     }
 
     /// <summary>Pushes the current preset to the viewport and renderer and notifies listeners.</summary>

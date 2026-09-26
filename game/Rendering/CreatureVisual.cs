@@ -99,6 +99,25 @@ public sealed partial class CreatureVisual : Node3D
         return true;
     }
 
+    /// <summary>
+    /// Colours a recolourable player model (generated with marker colours) to a character's look: hair, skin, shirt,
+    /// trousers and shoes.
+    /// </summary>
+    public void SetAppearance(Strata.Core.Gameplay.Player.Appearance look)
+    {
+        foreach (var g in _geometry)
+        {
+            g.SetInstanceShaderParameter("recolor", 1f);
+            g.SetInstanceShaderParameter("hair_color", Linear(look.HairColor));
+            g.SetInstanceShaderParameter("skin_color", Linear(look.SkinColor));
+            g.SetInstanceShaderParameter("shirt_color", Linear(look.ShirtColor));
+            g.SetInstanceShaderParameter("pants_color", Linear(look.PantsColor));
+            g.SetInstanceShaderParameter("shoe_color", Linear(look.ShoeColor));
+        }
+    }
+
+    private static Color Linear(string hex) => Color.FromHtml(hex).SrgbToLinear();
+
     /// <summary>Prefers finer mesh LODs (above 1) — the player's own body is always close to the camera.</summary>
     public void SetLodBias(float bias)
     {

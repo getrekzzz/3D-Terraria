@@ -22,6 +22,7 @@ public sealed partial class CombatEffects : Node3D
 
     private void Number(DamageEvent e)
     {
+        if (!Settings.UserSettings.Current.DamageNumbers) return;
         var label = _pool.Count > 0 ? _pool.Dequeue() : NewLabel();
         label.Visible = true;
         label.Text = e.Amount.ToString();

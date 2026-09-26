@@ -83,6 +83,11 @@ jobs:
             grep -q "SMOKE PASS" "smoke-$name.log"
             echo "::endgroup::"
           done
+      - name: Menu tour (title → create character and world → settings → play → pause → exit)
+        run: |
+          set -o pipefail
+          timeout 600 "$GODOT" --headless --path . --audio-driver Dummy -- --menu-tour 2>&1 | tee smoke-menu.log
+          grep -q "MENU PASS" smoke-menu.log
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4

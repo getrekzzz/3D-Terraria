@@ -27,22 +27,44 @@ public sealed class LaunchedWorld
     public UI.TownDialog? TownDialog { get; init; }
 }
 
+/// <summary>What to open: a world directory (created from <see cref="NewWorld"/> when missing) and a character.</summary>
+public sealed record LaunchOptions
+{
+    public required string WorldDirectory { get; init; }
+
+    /// <summary>Settings for creating the world when the directory holds none (command-line starts).</summary>
+    public WorldSettings? NewWorld { get; init; }
+
+    /// <summary>Delete any existing world in the directory first (tests).</summary>
+    public bool ForceNew { get; init; }
+
+    public string PlayerName { get; init; } = "Wanderer";
+
+    /// <summary>Start the character over from the starting kit (tests).</summary>
+    public bool FreshPlayer { get; init; }
+
+    public bool FreeCamera { get; init; }
+
+    /// <summary>Streaming radius in chunks.</summary>
+    public int ViewDistance { get; init; } = 5;
+}
+
 /// <summary>Creates or loads a world and assembles the scene nodes that present it.</summary>
 public static class WorldLauncher
 {
-    public static LaunchedWorld Launch(Node parent, GameServices services, string name, long seed, WorldSizePreset size, bool forceNew)
+    public static LaunchedWorld Launch(Node parent, GameServices services, LaunchOptions o)
     {
         var args = services.Args;
-        var dir = ProjectSettings.GlobalizePath($"user://worlds/{name}");
-        if (forceNew && System.IO.Directory.Exists(dir)) System.IO.Directory.Delete(dir, recursive: true);
+        var dir = o.WorldDirectory;
+        if (o.ForceNew && System.IO.Directory.Exists(dir)) System.IO.Directory.Delete(dir, recursive: true);
         var store = new WorldSaveStore(dir);
         var session = store.Exists
             ? WorldSession.Load(services.Content, dir, services.Render, services.Log)
-            : WorldSession.Create(services.Content, new WorldSettings { Name = name, Seed = seed, Size = size }, dir, services.Render, services.Log);
-        services.Log.Info("boot", $"World '{name}' seed {session.Settings.Seed} ({session.Settings.Size}).");
+            : WorldSession.Create(services.Content, o.NewWorld ?? new WorldSettings { Name = System.IO.Path.GetFileName(dir), Seed = 1234 }, dir, services.Render, services.Log);
+        services.Log.Info("boot", $"World '{session.Settings.Name}' seed {session.Settings.Seed} ({session.Settings.Size}, {session.Settings.Difficulty}).");
         if (args.Get("hour") is { } hour) session.Clock.SetHour(float.Parse(hour, CultureInfo.InvariantCulture));
 
-        int view = (int)args.Long("view", 6);
+        int view = System.Math.Clamp(o.ViewDistance, 2, 12);
         var streaming = new StreamingSettings { MeshRadius = view, MeshDown = System.Math.Min(3, view), MeshUp = System.Math.Min(3, view) };
         var playerDir = ProjectSettings.GlobalizePath("user://players");
         var game = new GameWorld(session, streaming, System.Math.Max(1, System.Environment.ProcessorCount - 2), playerDir);
@@ -80,11 +102,10 @@ public static class WorldLauncher
         runtime.AddChild(drops);
         drops.Initialize(game);
 
-        bool freeCam = args.Flag("free-camera") || args.Get("eye") != null;
-        if (freeCam) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
+        if (o.FreeCamera) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
 
-        var playerName = args.Get("player") ?? "Wanderer";
-        if (args.Flag("fresh-player")) GameWorld.DeletePlayer(playerDir, playerName);
+        var playerName = o.PlayerName;
+        if (o.FreshPlayer) GameWorld.DeletePlayer(playerDir, playerName);
         var state = GameWorld.LoadOrCreatePlayer(playerDir, playerName, services.Content);
         var entity = game.AddPlayer(state, game.SpawnPositionFor(state));
         var player = new PlayerController();

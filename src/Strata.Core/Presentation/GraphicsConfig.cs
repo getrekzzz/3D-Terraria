@@ -16,9 +16,9 @@ public sealed class GraphicsConfig
     public static readonly string[] AntiAliasingModes = { "none", "fxaa", "smaa", "taa" };
 
     /// <summary>Preset used when the player has not chosen one.</summary>
-    public string Default { get; init; } = "high";
+    public string Default { get; set; } = "high";
 
-    public Dictionary<string, GraphicsPreset> Presets { get; init; } = new();
+    public Dictionary<string, GraphicsPreset> Presets { get; set; } = new();
 
     public static GraphicsConfig Load(IDataSource data) =>
         JsonSerializer.Deserialize<GraphicsConfig>(data.ReadText(Path), ContentJson.Options) ?? throw new JsonException($"{Path} is empty");
@@ -42,82 +42,89 @@ public sealed class GraphicsConfig
 public sealed class GraphicsPreset
 {
     /// <summary>3D resolution relative to the window (0.5–2).</summary>
-    public float RenderScale { get; init; } = 1f;
+    public float RenderScale { get; set; } = 1f;
 
     /// <summary>none | fsr1 | fsr2 (fsr2 at scale 1 is temporal anti-aliasing at native resolution).</summary>
-    public string Upscaler { get; init; } = "none";
+    public string Upscaler { get; set; } = "none";
 
     /// <summary>none | fxaa | smaa | taa (ignored by fsr2, which resolves its own).</summary>
-    public string AntiAliasing { get; init; } = "fxaa";
+    public string AntiAliasing { get; set; } = "fxaa";
 
     /// <summary>Multisample count: 0, 2, 4 or 8.</summary>
-    public int Msaa { get; init; }
+    public int Msaa { get; set; }
 
     /// <summary>Anisotropic texture filtering: 1, 2, 4, 8 or 16.</summary>
-    public int Anisotropy { get; init; } = 8;
+    public int Anisotropy { get; set; } = 8;
 
     /// <summary>Directional shadow atlas edge (power of two, 1024–16384).</summary>
-    public int ShadowAtlas { get; init; } = 4096;
+    public int ShadowAtlas { get; set; } = 4096;
 
     /// <summary>Sun shadow range in metres.</summary>
-    public float ShadowDistance { get; init; } = 80f;
+    public float ShadowDistance { get; set; } = 80f;
 
     /// <summary>Soft shadow filter: 0 hard … 5 ultra.</summary>
-    public int ShadowFilter { get; init; } = 2;
+    public int ShadowFilter { get; set; } = 2;
 
     /// <summary>Apparent sun diameter in degrees; above 0 shadows harden near their casters (PCSS).</summary>
-    public float SunSize { get; init; }
+    public float SunSize { get; set; }
+
+    /// <summary>Sun shadow cascades: 1, 2 or 4 (more keeps near shadows sharp over a long range, at a cost).</summary>
+    public int ShadowSplits { get; set; } = 4;
 
     /// <summary>Carried torches cast shadows.</summary>
-    public bool TorchShadows { get; init; }
+    public bool TorchShadows { get; set; }
 
-    public bool Ssao { get; init; } = true;
+    public bool Ssao { get; set; } = true;
 
     /// <summary>0 very low … 4 ultra.</summary>
-    public int SsaoQuality { get; init; } = 2;
+    public int SsaoQuality { get; set; } = 2;
 
     /// <summary>Screen-space indirect light (colour bleeding).</summary>
-    public bool Ssil { get; init; }
+    public bool Ssil { get; set; }
 
-    public int SsilQuality { get; init; } = 2;
+    public int SsilQuality { get; set; } = 2;
 
     /// <summary>Screen-space reflections on smooth opaque surfaces.</summary>
-    public bool Ssr { get; init; }
+    public bool Ssr { get; set; }
 
-    public int SsrSteps { get; init; } = 64;
+    public int SsrSteps { get; set; } = 64;
 
     /// <summary>Volumetric fog with light shafts.</summary>
-    public bool VolumetricFog { get; init; }
+    public bool VolumetricFog { get; set; }
 
     /// <summary>Froxel grid edge (32–256) and depth slices (32–256).</summary>
-    public int VolumetricFogSize { get; init; } = 64;
+    public int VolumetricFogSize { get; set; } = 64;
 
-    public int VolumetricFogDepth { get; init; } = 64;
+    public int VolumetricFogDepth { get; set; } = 64;
 
-    public bool Glow { get; init; } = true;
+    public bool Glow { get; set; } = true;
 
     /// <summary>Sky radiance cubemap edge (32–2048, power of two): ambient light and reflection detail.</summary>
-    public int SkyRadiance { get; init; } = 128;
+    public int SkyRadiance { get; set; } = 128;
 
     /// <summary>Cloud light-marching steps (0 draws flat clouds).</summary>
-    public int CloudSteps { get; init; } = 3;
+    public int CloudSteps { get; set; } = 3;
 
     /// <summary>Eye adaptation between bright surface and dark caves.</summary>
-    public bool AutoExposure { get; init; }
+    public bool AutoExposure { get; set; }
 
     /// <summary>Grass blade density (0 disables grass) and draw distance in metres.</summary>
-    public float GrassDensity { get; init; } = 0.5f;
+    public float GrassDensity { get; set; } = 0.5f;
 
-    public float GrassDistance { get; init; } = 30f;
+    public float GrassDistance { get; set; } = 30f;
 
     /// <summary>Mesh LOD switch threshold in pixels (lower keeps detail further away).</summary>
-    public float LodThreshold { get; init; } = 1f;
+    public float LodThreshold { get; set; } = 1f;
 
     /// <summary>How far the horizon (the world's surface beyond the streamed chunks) reaches, in metres; 0 = none.</summary>
-    public float HorizonDistance { get; init; }
+    public float HorizonDistance { get; set; }
+
+    /// <summary>A copy to edit into a custom preset.</summary>
+    public GraphicsPreset Clone() => (GraphicsPreset)MemberwiseClone();
 
     public IEnumerable<string> Validate()
     {
+        if (ShadowSplits is not (1 or 2 or 4)) yield return "shadowSplits must be 1, 2 or 4";
         if (RenderScale is < 0.5f or > 2f) yield return "renderScale must be within 0.5–2";
         if (Array.IndexOf(GraphicsConfig.Upscalers, Upscaler) < 0) yield return $"upscaler must be one of {string.Join(", ", GraphicsConfig.Upscalers)}";
         if (Array.IndexOf(GraphicsConfig.AntiAliasingModes, AntiAliasing) < 0) yield return $"antiAliasing must be one of {string.Join(", ", GraphicsConfig.AntiAliasingModes)}";

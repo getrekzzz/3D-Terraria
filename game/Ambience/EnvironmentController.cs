@@ -88,10 +88,11 @@ public sealed partial class EnvironmentController : Node3D
         for (int level = 0; level < 7; level++) _env.SetGlowLevel(level, level is >= 2 and <= 5 ? 1f : level == 6 ? 0.5f : 0f);
         _camera = new CameraAttributesPractical
         {
+            // Gentle, slow adaptation: turning between sky and ground must not pump the brightness.
             AutoExposureScale = 0.35f,
-            AutoExposureSpeed = 0.7f,
-            AutoExposureMinSensitivity = 70f,
-            AutoExposureMaxSensitivity = 200f,
+            AutoExposureSpeed = 0.3f,
+            AutoExposureMinSensitivity = 85f,
+            AutoExposureMaxSensitivity = 170f,
         };
         AddChild(new WorldEnvironment { Environment = _env, CameraAttributes = _camera });
 
@@ -134,6 +135,12 @@ public sealed partial class EnvironmentController : Node3D
         _sky.SetShaderParameter("cloud_steps", p.CloudSteps);
         _camera.AutoExposureEnabled = p.AutoExposure;
         _sun.DirectionalShadowMaxDistance = p.ShadowDistance;
+        _sun.DirectionalShadowMode = p.ShadowSplits switch
+        {
+            1 => DirectionalLight3D.ShadowMode.Orthogonal,
+            2 => DirectionalLight3D.ShadowMode.Parallel2Splits,
+            _ => DirectionalLight3D.ShadowMode.Parallel4Splits,
+        };
         _sun.LightAngularDistance = p.SunSize;
         _moon.DirectionalShadowMaxDistance = Mathf.Min(p.ShadowDistance, 80f);
         _moon.LightAngularDistance = p.SunSize;
