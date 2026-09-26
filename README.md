@@ -18,6 +18,10 @@ world events and a world that transforms as you progress.
 |---|---|---|
 | ![Townsfolk](docs/screenshots/m4_townsfolk.png) | ![Skeleton](docs/screenshots/m4_skeleton.png) | ![Lava](docs/screenshots/m4_lava.png) |
 
+| The horizon: the world continues past the streamed chunks | Hardmode: a prism steed, glimmer sprites and a dread wraith in the radiant land | The Twin Lenses at nightfall |
+|---|---|---|
+| ![Horizon](docs/screenshots/m4_horizon.png) | ![Radiant life](docs/screenshots/m4_radiant_life.png) | ![Twin Lenses](docs/screenshots/m4_twin_lenses.png) |
+
 | Town residents | Caverns | Underworld |
 |---|---|---|
 | ![Town](docs/screenshots/m2_town.png) | ![Cavern](docs/screenshots/m2_cavern.png) | ![Underworld](docs/screenshots/m2_underworld.png) |
