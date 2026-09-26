@@ -12,11 +12,11 @@ internal sealed class DecorPalette
         byte B(string id) => (byte)content.Biomes.Get(id).RuntimeId;
         TileObjectDef T(string id) => content.TileObjects.Get(id);
         Forest = B("forest"); Tundra = B("tundra"); Jungle = B("jungle"); Desert = B("desert");
-        Umbral = B("umbral"); Sanguine = B("sanguine"); Mushroom = B("mushroom"); Ocean = B("ocean");
-        Oak = T("oak_tree"); Pine = T("pine_tree"); Palm = T("palm_tree"); Mahoe = T("mahoe_tree");
-        Gloom = T("umbral_tree"); Cactus = T("cactus"); GiantGlowcap = T("giant_glowcap");
+        Umbral = B("corruption"); Sanguine = B("crimson"); Mushroom = B("mushroom"); Ocean = B("ocean");
+        Oak = T("oak_tree"); Pine = T("pine_tree"); Palm = T("palm_tree"); Mahoe = T("mahogany_tree");
+        Gloom = T("ebonwood_tree"); Cactus = T("cactus"); GiantGlowcap = T("giant_glowing_mushroom");
         Grass = T("grass_tuft"); Flower = T("flower"); Bush = T("bush"); Fern = T("fern");
-        FieldMushroom = T("mushroom_plant"); Glowcap = T("glowcap_plant");
+        FieldMushroom = T("mushroom_plant"); Glowcap = T("glowing_mushroom_plant");
         Stalagmite = T("stalagmite"); Stalactite = T("stalactite"); Rubble = T("rubble");
     }
 

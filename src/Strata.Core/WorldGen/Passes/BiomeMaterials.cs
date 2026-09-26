@@ -19,8 +19,8 @@ internal sealed class BiomeMaterials
         _jungle = Id("jungle");
         _desert = Id("desert");
         _undergroundDesert = Id("underground_desert");
-        _umbral = Id("umbral");
-        _sanguine = Id("sanguine");
+        _umbral = Id("corruption");
+        _sanguine = Id("crimson");
         _mushroom = Id("mushroom");
         _ocean = Id("ocean");
         _forest = Id("forest");

@@ -56,8 +56,8 @@ public class SlotAndCraftingUiTests
         Assert.Equal("copper_helmet", armor[0].Item!.Id);
 
         var acc = new Inventory(2);
-        acc[0] = S("courier_boots", 1);
-        cursor = S("courier_boots", 1);
+        acc[0] = S("hermes_boots", 1);
+        cursor = S("hermes_boots", 1);
         SlotActions.LeftClick(ref cursor, acc, 1, SlotActions.AccessoryFilter(acc, 1));
         Assert.True(acc[1].IsEmpty); // no duplicate accessories
     }
@@ -71,13 +71,13 @@ public class SlotAndCraftingUiTests
         var book = new RecipeBook(g.Content);
         var env = CraftingEnvironment.Around(g.World, g.Player);
         var entries = env.Browse(book, g.Player.State.Inventory.Backpack);
-        Assert.Contains(entries, e => e.Recipe.Output.Id == "workbench" && e.CanCraft);
+        Assert.Contains(entries, e => e.Recipe.Output.Id == "work_bench" && e.CanCraft);
         Assert.DoesNotContain(entries, e => e.Recipe.Output.Id == "wooden_chair"); // needs a workbench
 
         Assert.Equal(Strata.Core.Gameplay.Building.PlacementResult.Ok,
-            g.World.Editor.PlaceObject(g.Content.TileObjects.Get("workbench"), g.Floor + new Strata.Core.Common.Int3(2, 1, 0), 0));
+            g.World.Editor.PlaceObject(g.Content.TileObjects.Get("work_bench"), g.Floor + new Strata.Core.Common.Int3(2, 1, 0), 0));
         env = CraftingEnvironment.Around(g.World, g.Player);
-        Assert.Contains("workbench", env.Stations);
+        Assert.Contains("work_bench", env.Stations);
         entries = env.Browse(book, g.Player.State.Inventory.Backpack);
         var chair = Assert.Single(entries, e => e.Recipe.Output.Id == "wooden_chair");
         Assert.True(chair.CanCraft);

@@ -9,9 +9,9 @@ heal
 assert npcs.count == 0
 
 # A gel attacks: contact damage with invulnerability frames.
-spawn green_gel 1 3
+spawn green_slime 1 3
 wait_until player.life < 100 12
-assert npcs.green_gel == 1
+assert npcs.green_slime == 1
 
 # Kill it with a sword; it drops gel.
 wield copper_shortsword
@@ -25,7 +25,7 @@ heal
 give wooden_bow 1
 give wooden_arrow 50
 wield wooden_bow
-spawn shambler 1 8
+spawn zombie 1 8
 aim 0 0.02 1
 use
 assert projectiles.count >= 1

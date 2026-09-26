@@ -20,10 +20,28 @@ public enum Difficulty
 }
 
 /// <summary>Which evil biome the world generates with (the other appears only via mutation/items).</summary>
+[System.Text.Json.Serialization.JsonConverter(typeof(EvilKindConverter))]
 public enum EvilKind
 {
-    Umbral,
-    Sanguine,
+    Corruption,
+    Crimson,
+}
+
+/// <summary>Reads evil kinds by name, including the names saves used before the rename (umbral, sanguine).</summary>
+public sealed class EvilKindConverter : System.Text.Json.Serialization.JsonConverter<EvilKind>
+{
+    public override EvilKind Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+    {
+        if (reader.TokenType == System.Text.Json.JsonTokenType.Number) return (EvilKind)reader.GetInt32();
+        return reader.GetString()?.ToLowerInvariant() switch
+        {
+            "crimson" or "sanguine" => EvilKind.Crimson,
+            _ => EvilKind.Corruption,
+        };
+    }
+
+    public override void Write(System.Text.Json.Utf8JsonWriter writer, EvilKind value, System.Text.Json.JsonSerializerOptions options) =>
+        writer.WriteStringValue(value == EvilKind.Crimson ? "crimson" : "corruption");
 }
 
 /// <summary>Immutable parameters chosen when a world is created.</summary>
@@ -33,7 +51,7 @@ public sealed class WorldSettings
     public long Seed { get; init; }
     public WorldSizePreset Size { get; init; } = WorldSizePreset.Small;
     public Difficulty Difficulty { get; init; } = Difficulty.Classic;
-    public EvilKind Evil { get; init; } = EvilKind.Umbral;
+    public EvilKind Evil { get; init; } = EvilKind.Corruption;
 
     public Int3 Dimensions => DimensionsOf(Size);
 

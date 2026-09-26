@@ -25,7 +25,7 @@ public class CombatTests
     public void GelsHopTowardsThePlayerAndDealContactDamage()
     {
         using var g = Arena();
-        var gel = SpawnInFront(g, "green_gel", 6f);
+        var gel = SpawnInFront(g, "green_slime", 6f);
         float start = Vector3.Distance(gel.Position, g.Player.Position);
         int life = g.Player.State.Vitals.Life;
         g.Ticks(60 * 8);
@@ -39,7 +39,7 @@ public class CombatTests
         using var g = Arena();
         var hurt = new List<int>();
         g.World.Npcs.PlayerHurt += (_, dmg, _) => hurt.Add(dmg);
-        SpawnInFront(g, "green_gel", 0.2f);
+        SpawnInFront(g, "green_slime", 0.2f);
         g.Ticks(NpcSystem.PlayerHitImmunity * 2 + 5);
         Assert.InRange(hurt.Count, 1, 3);
     }
@@ -48,7 +48,7 @@ public class CombatTests
     public void SwordSwingsHitOncePerSwingAndKillsDropLoot()
     {
         using var g = Arena();
-        var gel = SpawnInFront(g, "green_gel", 1.2f);
+        var gel = SpawnInFront(g, "green_slime", 1.2f);
         gel.Life = gel.MaxLife = 1000;
         g.Hold("wooden_sword");
         g.Player.Aim = Vector3.UnitZ;
@@ -72,7 +72,7 @@ public class CombatTests
     public void ShortswordThrustsHitAndRepeatWhileHeld()
     {
         using var g = Arena();
-        var gel = SpawnInFront(g, "green_gel", 1.0f);
+        var gel = SpawnInFront(g, "green_slime", 1.0f);
         gel.Life = gel.MaxLife = 1000;
         gel.Timer = -100_000; // sit still
         g.Hold("copper_shortsword");
@@ -91,7 +91,7 @@ public class CombatTests
     public void SwingsMissCreaturesBehindThePlayer()
     {
         using var g = Arena();
-        var gel = SpawnInFront(g, "green_gel", -1.5f);
+        var gel = SpawnInFront(g, "green_slime", -1.5f);
         g.Hold("wooden_sword");
         g.Player.Aim = Vector3.UnitZ;
         g.World.ItemUse.Use(g.Player, null, true);
@@ -103,7 +103,7 @@ public class CombatTests
     public void ArrowsFlyAndHitCreatures()
     {
         using var g = Arena();
-        var gel = SpawnInFront(g, "green_gel", 8f);
+        var gel = SpawnInFront(g, "green_slime", 8f);
         gel.Life = gel.MaxLife = 500;
         gel.Timer = -100_000; // sit still
         g.Hold("wooden_bow");
@@ -124,7 +124,7 @@ public class CombatTests
         var batch = g.World.Session.World.BeginEdit();
         for (int x = -3; x <= 3; x++) batch.SetBlock(g.Floor + new Int3(x, 1, 5), g.Content.BlockId("stone"));
         g.World.Session.Commit(batch);
-        var walker = SpawnInFront(g, "shambler", 5f);
+        var walker = SpawnInFront(g, "zombie", 5f);
         walker.Position += new Vector3(0, 0, 2.5f); // behind the ledge
         g.World.Session.Clock.SetHour(23f);
         g.Ticks(60 * 6);
@@ -138,19 +138,19 @@ public class CombatTests
         var spawned = new List<Npc>();
         for (int i = 0; i < 20 && spawned.Count == 0; i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
         Assert.NotEmpty(spawned);
-        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "green_gel", "blue_gel" })); // surface, daytime
+        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "green_slime", "blue_slime" })); // surface, daytime
         g.World.Npcs.Clear();
         g.World.Session.Clock.SetHour(23f);
         spawned.Clear();
         for (int i = 0; i < 20 && spawned.Count == 0; i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
-        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "shambler", "gazer", "blue_gel" }));
+        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "zombie", "demon_eye", "blue_slime" }));
     }
 
     [Fact]
     public void CreaturesDespawnFarFromPlayers()
     {
         using var g = Arena();
-        var gel = SpawnInFront(g, "green_gel", 3f);
+        var gel = SpawnInFront(g, "green_slime", 3f);
         g.Player.Position += new Vector3(0, 0, 200f);
         g.Ticks(NpcSystem.DespawnDelayTicks + 5);
         Assert.DoesNotContain(gel, g.World.Npcs.All);

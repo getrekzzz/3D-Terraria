@@ -67,23 +67,23 @@ wait_until player.frozen == 0 300
 select 1
 fill -8 -1 -2 8 -1 22 stone
 fill -8 0 -2 8 9 22 air
-fill -4 0 12 6 6 22 stone_brick
+fill -4 0 12 6 6 22 gray_brick
 fill -3 0 13 5 5 21 air
 fill 0 0 12 1 3 12 air
 place wooden_door 0 0 12
 place torch -3 0 21
 place wooden_table 1 0 18
 place wooden_chair -2 0 18
-town dismiss wayfinder
+town dismiss guide
 wait_until stream.idle == 1 900
-town summon wayfinder -3 0 6
-town summon peddler 1 0 5
-town summon mender 4 0 7
-town summon grovekeeper -6 0 8
-town talk wayfinder
-town talk peddler
-town talk mender
-town talk grovekeeper
+town summon guide -3 0 6
+town summon merchant 1 0 5
+town summon nurse 4 0 7
+town summon dryad -6 0 8
+town talk guide
+town talk merchant
+town talk nurse
+town talk dryad
 aim 0 -0.2 1
 wait 1
 screenshot 09_town
@@ -98,14 +98,14 @@ wait_until screenshot.pending == 0 900
 time 18
 tp landmark dungeon_gate
 wait_until player.frozen == 0 300
-wait_until town.crypt_keeper == 1 60
+wait_until town.old_man == 1 60
 aim 0.6 0.1 -1
 wait_until stream.idle == 1 900
 screenshot 11_crypt_gate
 wait_until screenshot.pending == 0 900
 time 21
 aim 0 0.3 -1
-boss crypt_warden 16
+boss skeletron 16
 wait 1.2
 heal
 screenshot 12_crypt_warden
@@ -122,7 +122,7 @@ fill -10 0 -10 10 8 10 air
 liquid none -10 0 -10 10 8 10
 wait_until stream.idle == 1 1200
 wait 1
-boss mawwall 5
+boss wall_of_flesh 5
 aim -1 0.2 0
 wait 16
 heal
@@ -134,9 +134,9 @@ god off
 
 # Hardmode: the world changes. Spread is paused so the converted land stops remeshing for the camera.
 mutations spread off
-flag defeated_mawwall
+flag defeated_wall_of_flesh
 wait_until mutation.behind == 0 120
-tp zone hallowed
+tp zone hallow
 wait_until player.frozen == 0 300
 time 10
 aim 0.3 -0.15 1

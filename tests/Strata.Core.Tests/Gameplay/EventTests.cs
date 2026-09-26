@@ -22,7 +22,7 @@ public class EventTests
         var seen = new HashSet<string>();
         for (int i = 0; i < 40; i++)
             foreach (var n in g.World.Spawner.TrySpawnNear(g.Player)) seen.Add(n.Def.Id);
-        Assert.True(seen.Contains("gore_shambler") || seen.Contains("drip_eye"), "no blood moon creatures: " + string.Join(",", seen));
+        Assert.True(seen.Contains("blood_zombie") || seen.Contains("drippler"), "no blood moon creatures: " + string.Join(",", seen));
 
         g.World.Session.Clock.SetHour(GameClock.DawnHour + 0.01f);
         g.Ticks(2);
@@ -56,7 +56,7 @@ public class EventTests
         using var g = TestGame.Create();
         g.World.Spawner.Enabled = false;
         Assert.True(g.World.Events.Start(g.Content.Events.Get("slime_rain")));
-        var gel = g.Content.Enemies.Get("green_gel");
+        var gel = g.Content.Enemies.Get("green_slime");
         for (int i = 0; i < 60; i++)
         {
             var npc = g.World.Npcs.Spawn(gel, g.Player.Position + new System.Numerics.Vector3(3, 0, 3))!;

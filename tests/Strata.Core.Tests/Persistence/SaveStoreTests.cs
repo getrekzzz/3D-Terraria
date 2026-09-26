@@ -13,7 +13,7 @@ public class SaveStoreTests
     {
         var dir = TestWorlds.TempDir();
         var store = new WorldSaveStore(dir);
-        var meta = new WorldMeta { Name = "Test", Seed = 1234, Size = WorldSizePreset.Small, Flags = { "defeated_watcher" } };
+        var meta = new WorldMeta { Name = "Test", Seed = 1234, Size = WorldSizePreset.Small, Flags = { "defeated_eye_of_cthulhu" } };
         meta.IdTables.Blocks.Add("stone");
         store.SaveMeta(meta);
 
@@ -25,7 +25,7 @@ public class SaveStoreTests
 
         var loaded = store.LoadMeta();
         Assert.Equal(1234, loaded.Seed);
-        Assert.Contains("defeated_watcher", loaded.Flags);
+        Assert.Contains("defeated_eye_of_cthulhu", loaded.Flags);
         store.SaveMeta(loaded);
         Assert.Contains("futureFeature", File.ReadAllText(path));
     }

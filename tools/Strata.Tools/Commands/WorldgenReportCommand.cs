@@ -34,7 +34,7 @@ public sealed class WorldgenReportCommand : IToolCommand
         {
             Seed = context.Options.Long("seed", 1234),
             Size = Enum.Parse<WorldSizePreset>(context.Options.Get("size") ?? "tiny", ignoreCase: true),
-            Evil = context.Options.Get("evil") == "sanguine" ? EvilKind.Sanguine : EvilKind.Umbral,
+            Evil = context.Options.Get("evil") == "crimson" ? EvilKind.Crimson : EvilKind.Corruption,
         };
         var outDir = Path.GetFullPath(context.Options.Get("out") ?? context.PathOf("build/worldgen"));
         Directory.CreateDirectory(outDir);

@@ -14,7 +14,7 @@ namespace Strata.Core.Tests.Gameplay;
 
 public class DungeonTests
 {
-    private const string Defeated = "defeated_crypt_warden";
+    private const string Defeated = "defeated_skeletron";
 
     private static TestGame Create()
     {
@@ -106,7 +106,7 @@ public class DungeonTests
     {
         using var g = Create();
         var content = g.Content;
-        var guardian = g.World.Npcs.Spawn(content.Enemies.Get("crypt_guardian"), g.Player.Position + new Vector3(6, 2, 0))!;
+        var guardian = g.World.Npcs.Spawn(content.Enemies.Get("dungeon_guardian"), g.Player.Position + new Vector3(6, 2, 0))!;
         Assert.False(g.World.Npcs.Hit(guardian, g.Player, 500, DamageClass.Melee, 0, 1f, g.Player.Center, melee: true));
         Assert.Equal(guardian.MaxLife, guardian.Life);
         // Outside the crypt it does not stay.
@@ -143,15 +143,15 @@ public class DungeonTests
         var dungeonRoster = g.Content.SpawnRules.All.Where(r => r.Conditions.Any(c => c.Type == "biome" && c.Raw.GetRawText().Contains("dungeon"))).Select(r => r.Enemy).ToHashSet();
         var spawned = new List<Npc>();
         for (int i = 0; i < 40; i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
-        var inCrypt = spawned.Where(n => session.ZonesAt(n.Cell).Contains("dungeon") || n.Def.Id == "crypt_guardian").ToList();
-        Assert.Contains(inCrypt, n => n.Def.Id != "crypt_guardian");
+        var inCrypt = spawned.Where(n => session.ZonesAt(n.Cell).Contains("dungeon") || n.Def.Id == "dungeon_guardian").ToList();
+        Assert.Contains(inCrypt, n => n.Def.Id != "dungeon_guardian");
         Assert.All(inCrypt, n => Assert.Contains(n.Def.Id, dungeonRoster));
-        Assert.Single(g.World.Npcs.All, n => n.Def.Id == "crypt_guardian");
+        Assert.Single(g.World.Npcs.All, n => n.Def.Id == "dungeon_guardian");
 
         foreach (var n in g.World.Npcs.All.ToList()) g.World.Npcs.Kill(n);
         g.World.Session.Flags.Add(Defeated);
         for (int i = 0; i < 40; i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
-        Assert.DoesNotContain(g.World.Npcs.All, n => n.Def.Id == "crypt_guardian");
+        Assert.DoesNotContain(g.World.Npcs.All, n => n.Def.Id == "dungeon_guardian");
     }
 
     [Fact]
@@ -161,10 +161,10 @@ public class DungeonTests
         var town = g.World.Town;
         var landmark = Gate(g);
         town.UpdateLandmarks();
-        Assert.Null(town.Find("crypt_keeper")); // the gate is not loaded yet
+        Assert.Null(town.Find("old_man")); // the gate is not loaded yet
         Load(g, landmark);
         town.UpdateLandmarks();
-        var keeper = town.Find("crypt_keeper");
+        var keeper = town.Find("old_man");
         Assert.NotNull(keeper);
         Assert.True(Vector3.Distance(keeper!.Position, TestGame.CellFeet(landmark)) < 5f);
         Assert.Null(keeper.Home);
@@ -175,7 +175,7 @@ public class DungeonTests
         Assert.False(string.IsNullOrEmpty(why));
         g.World.Session.Clock.SetHour(22f);
         Assert.Equal(TradeResult.Ok, g.World.Commerce.Summon(keeper, g.Player, out _));
-        var boss = Assert.Single(g.World.Npcs.All, n => n.Def.Id == "crypt_warden");
+        var boss = Assert.Single(g.World.Npcs.All, n => n.Def.Id == "skeletron");
         Assert.False(keeper.Alive); // it became the warden
         Assert.Equal(TradeResult.Unavailable, g.World.Commerce.Summon(keeper, g.Player, out _));
 
@@ -184,10 +184,10 @@ public class DungeonTests
         g.World.Npcs.Kill(boss);
         Assert.Contains(Defeated, g.World.Session.Flags);
         town.UpdateLandmarks();
-        Assert.Null(town.Find("crypt_keeper"));
+        Assert.Null(town.Find("old_man"));
         Assert.Single(departed);
         town.UpdateLandmarks();
-        Assert.Null(town.Find("crypt_keeper")); // gone for good
+        Assert.Null(town.Find("old_man")); // gone for good
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public class DungeonTests
     {
         using var g = Create();
         g.World.Session.Clock.SetHour(22f);
-        var def = g.Content.Enemies.Get("crypt_warden");
+        var def = g.Content.Enemies.Get("skeletron");
         var p = def.Brain.Parse<CryptWardenParams>();
         var boss = g.World.Npcs.Spawn(def, g.Player.Position + new Vector3(0, 6f, 4f))!;
         Assert.Equal(2, boss.Segments.Count);
@@ -232,14 +232,14 @@ public class DungeonTests
         {
             g.World.Tick();
             g.Player.State.Vitals.Life = g.Player.State.Vitals.MaxLife;
-            fired |= g.World.Projectiles.All.Any(pr => pr.Def.Id == "hex_sphere");
+            fired |= g.World.Projectiles.All.Any(pr => pr.Def.Id == "water_sphere");
         }
         Assert.True(fired, "never cast");
         Assert.True(Vector3.Distance(caster.Position, start) > 1f, "never blinked");
         Assert.True(Vector3.Distance(caster.Position, g.Player.Position) <= p.MaxBlink + 1.5f);
 
         g.Hold("torch", 5);
-        g.Player.State.Buffs.Add(g.Content.Buffs.Get("hexed"), 120);
+        g.Player.State.Buffs.Add(g.Content.Buffs.Get("cursed"), 120);
         g.Player.State.Recompute();
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, g.Target(), true));
     }

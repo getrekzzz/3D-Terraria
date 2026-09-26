@@ -174,7 +174,7 @@ public class LiquidTests
         Assert.Equal("water", g.Player.Liquid?.Id);
         Assert.False(g.Player.State.Buffs.Has("on_fire"));
 
-        g.Player.State.Buffs.Add(g.Content.Buffs.Get("emberskin"), 3600);
+        g.Player.State.Buffs.Add(g.Content.Buffs.Get("obsidian_skin"), 3600);
         g.Player.State.Recompute();
         vitals.Life = vitals.MaxLife;
         vitals.ImmunityTicks = 0;
@@ -202,7 +202,7 @@ public class LiquidTests
         Assert.True(vitals.Life < vitals.MaxLife);
 
         vitals.Life = vitals.MaxLife;
-        g.Player.State.Buffs.Add(g.Content.Buffs.Get("gillbreath"), 7200);
+        g.Player.State.Buffs.Add(g.Content.Buffs.Get("gills"), 7200);
         g.Player.State.Recompute();
         g.Ticks(120);
         Assert.Equal(vitals.MaxLife, vitals.Life);

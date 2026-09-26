@@ -45,7 +45,7 @@ public static class CabinBuilder
         bp.Object(tiles.Get("wooden_table"), new Int3(min.X + 2, floorY, min.Z + 3), 0);
         bp.Object(tiles.Get("wooden_chair"), new Int3(min.X + 6, floorY, min.Z + 4), 1);
         bp.Object(tiles.Get("torch"), new Int3(min.X + 1, floorY, box.Max.Z - 2), 0);
-        if (rng.Chance(0.6f)) bp.Object(tiles.Get("clay_pot"), new Int3(box.Max.X - 4, floorY, min.Z + 2), 0, rng.NextInt(3));
+        if (rng.Chance(0.6f)) bp.Object(tiles.Get("pot"), new Int3(box.Max.X - 4, floorY, min.Z + 2), 0, rng.NextInt(3));
         return bp;
     }
 }

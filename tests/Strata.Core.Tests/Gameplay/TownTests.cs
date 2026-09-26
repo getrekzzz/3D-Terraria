@@ -34,7 +34,7 @@ public class TownTests
         using var g = Create();
         var town = g.World.Town;
         g.Ticks(1);
-        var guide = town.Find("wayfinder");
+        var guide = town.Find("guide");
         Assert.NotNull(guide);
         Assert.Null(guide!.Home);
         Assert.True(g.World.Session.Meta.TownStarted);
@@ -45,19 +45,19 @@ public class TownTests
 
         TestHouses.Build(g, g.Floor + new Int3(6, 0, 0));
         Assert.Null(town.CheckArrivals()); // the peddler wants to see 50 silver first
-        Assert.Null(town.Find("peddler"));
+        Assert.Null(town.Find("merchant"));
         GiveCoins(g, 5000);
         var peddler = town.CheckArrivals();
-        Assert.Equal("peddler", peddler?.Def.Id);
+        Assert.Equal("merchant", peddler?.Def.Id);
         Assert.NotNull(peddler!.Home);
         Assert.NotEqual(guide.HomeRoom, peddler.HomeRoom);
-        Assert.Contains(peddler.Name, g.Content.TownNpcs.Get("peddler").Names);
+        Assert.Contains(peddler.Name, g.Content.TownNpcs.Get("merchant").Names);
 
         // No vacant home left: nobody else can move in, whatever their conditions.
         g.Player.State.BonusLife = 40;
         g.Player.State.Recompute();
         Assert.Null(town.CheckArrivals());
-        Assert.Null(town.Find("mender"));
+        Assert.Null(town.Find("nurse"));
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class TownTests
     {
         using var g = Create();
         var town = g.World.Town;
-        var guide = Summon(g, "wayfinder", new Int3(0, 1, -9));
+        var guide = Summon(g, "guide", new Int3(0, 1, -9));
         TestHouses.Build(g, g.Floor + new Int3(6, 0, 0));
         town.CheckArrivals();
         Assert.NotNull(guide.Home);
@@ -83,7 +83,7 @@ public class TownTests
     public void ShopSellsBuysAndMakesChange()
     {
         using var g = Create();
-        var peddler = Summon(g, "peddler", new Int3(2, 1, 2));
+        var peddler = Summon(g, "merchant", new Int3(2, 1, 2));
         var commerce = g.World.Commerce;
         var stock = commerce.Stock(peddler, g.Player);
         var torch = stock.Single(o => o.Item.Id == "torch");
@@ -108,7 +108,7 @@ public class TownTests
     public void MenderHealsAndCuresForCoins()
     {
         using var g = Create();
-        var mender = Summon(g, "mender", new Int3(2, 1, 2));
+        var mender = Summon(g, "nurse", new Int3(2, 1, 2));
         var commerce = g.World.Commerce;
         var state = g.Player.State;
         Assert.Equal(TradeResult.NothingToDo, commerce.Heal(mender, g.Player));
@@ -130,9 +130,9 @@ public class TownTests
     {
         using var g = Create();
         var commerce = g.World.Commerce;
-        var peddler = Summon(g, "peddler", new Int3(2, 1, 2));
+        var peddler = Summon(g, "merchant", new Int3(2, 1, 2));
         float alone = commerce.PriceFactor(peddler);
-        Summon(g, "mender", new Int3(-2, 1, 2)); // the peddler dislikes the mender
+        Summon(g, "nurse", new Int3(-2, 1, 2)); // the peddler dislikes the mender
         Assert.True(commerce.PriceFactor(peddler) > alone);
         Assert.InRange(commerce.PriceFactor(peddler), g.World.Town.Config.MinPriceFactor, g.World.Town.Config.MaxPriceFactor);
 
@@ -150,7 +150,7 @@ public class TownTests
         using var g = Create();
         var town = g.World.Town;
         var door = TestHouses.Build(g, g.Floor + new Int3(6, 0, 0));
-        var guide = Summon(g, "wayfinder", new Int3(7, 1, -9));
+        var guide = Summon(g, "guide", new Int3(7, 1, -9));
         town.CheckArrivals();
         var home = guide.Home!.Value;
         g.World.Session.Clock.SetHour(21);
@@ -171,7 +171,7 @@ public class TownTests
     {
         using var g = Create();
         var town = g.World.Town;
-        var guide = Summon(g, "wayfinder", new Int3(4, 1, 4));
+        var guide = Summon(g, "guide", new Int3(4, 1, 4));
         var brute = g.Content.Enemies.All.First(e => e.ContactDamage && e.Damage > 0 && e.Boss == null && e.Gravity);
         g.World.Npcs.Spawn(brute, guide.Position);
         for (int i = 0; i < 120 && guide.Life == guide.Def.Life; i++) g.World.Tick();
@@ -195,8 +195,8 @@ public class TownTests
     {
         using var g = Create();
         var town = g.World.Town;
-        Summon(g, "wayfinder", new Int3(0, 1, -9));
-        Summon(g, "peddler", new Int3(2, 1, -9));
+        Summon(g, "guide", new Int3(0, 1, -9));
+        Summon(g, "merchant", new Int3(2, 1, -9));
         Assert.False(g.World.Spawner.InTown(g.Player)); // homeless residents do not count
         TestHouses.Build(g, g.Floor + new Int3(-6, 0, 0));
         TestHouses.Build(g, g.Floor + new Int3(6, 0, 0));
@@ -215,7 +215,7 @@ public class TownTests
             Int3? home;
             using (var g = Create(dir))
             {
-                var guide = Summon(g, "wayfinder", new Int3(0, 1, -9));
+                var guide = Summon(g, "guide", new Int3(0, 1, -9));
                 TestHouses.Build(g, g.Floor + new Int3(6, 0, 0));
                 g.World.Town.CheckArrivals();
                 g.Ticks(1);
@@ -226,7 +226,7 @@ public class TownTests
             var session = WorldSession.Load(TestPaths.Content, dir, new RenderTables(TestPaths.Content, _ => 0), new MemoryLog());
             using var world = new GameWorld(session, new StreamingSettings(), 1);
             var restored = Assert.Single(world.Town.Residents);
-            Assert.Equal("wayfinder", restored.Def.Id);
+            Assert.Equal("guide", restored.Def.Id);
             Assert.Equal(name, restored.Name);
             Assert.Equal(home, restored.Home);
             Assert.True(session.Meta.TownStarted);

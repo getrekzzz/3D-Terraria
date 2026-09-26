@@ -31,7 +31,7 @@ public static class PyramidBuilder
         var tiles = content.TileObjects;
         bp.Object(tiles.Get("gold_chest"), new Int3(groundCenter.X - 1, vaultY, groundCenter.Z + 5), 0, 0, "cabin_chest");
         for (int i = 0; i < 4; i++)
-            bp.Object(tiles.Get("clay_pot"), new Int3(groundCenter.X - 7 + i * 4, vaultY, groundCenter.Z - 7), 0, i % 3);
+            bp.Object(tiles.Get("pot"), new Int3(groundCenter.X - 7 + i * 4, vaultY, groundCenter.Z - 7), 0, i % 3);
         bp.Object(tiles.Get("torch"), new Int3(groundCenter.X + 6, vaultY, groundCenter.Z + 6), 0);
         return bp;
     }

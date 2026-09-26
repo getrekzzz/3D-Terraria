@@ -20,25 +20,25 @@
   rules at candidate ground cells (or inside water for `placement: liquid`) with layer/biome/time/light context,
   slowed in towns (tuning: `data/config/spawning.json`). Rules may cap how many are alive (`maxAlive`) or judge
   their conditions where the player stands (`atPlayer`); creatures may leave when `despawnWhen` holds at their target.
-* **Zones** — planned features with a `zone` (the crypt, spider nests, marble/granite halls, evil hearts) are
+* **Zones** — planned features with a `zone` (the Dungeon, spider nests, marble/granite halls, evil hearts) are
   reported as extra biomes by `WorldSession.ContextAt`/`ZonesAt`; a structure's zone is its blueprint volumes. A
   zone biome with `lockedUntil` protects its generated structure cells from mining until that flag is set
   (`WorldEditor.IsLocked`); one with `exclusiveSpawns` only spawns rules that name it, at closer range.
 * **Events and bosses** — `EventDirector` rolls data-driven events at dusk/dawn (`data/events.json`) and
   feeds them to spawn-rule conditions; bosses are enemies with a `boss` block (arena radius, day despawn,
-  segments for worms, per-part `segmentModels`, `dayEnrage`) driven by `GelSovereign`, `Watcher`, `Worm` and
-  `CryptWarden` and `Mawwall` brains (brains that `PositionsSegments` place free parts such as hands or eyes
+  segments for worms, per-part `segmentModels`, `dayEnrage`) driven by `GelSovereign`, `Eye of Cthulhu`, `Worm` and
+  `CryptWarden` and `Wall of Flesh` brains (brains that `PositionsSegments` place free parts such as hands or eyes
   themselves; `ranged.fromParts` fires from them in turn, or only from `ranged.parts`). Brains mark a second phase
-  with `Npc.Enraged`, which swaps in `ranged.enraged` (the Twin Lenses' rapid lasers and flamethrower). A boss may
+  with `Npc.Enraged`, which swaps in `ranged.enraged` (the Twins' rapid lasers and flamethrower). A boss may
   bring `companions` that share its flag: the group spawns together, is announced once, shares one boss bar and
   counts as defeated only when its last member falls. Worms can release capped `minion` drones from their segments;
-  the warden brain holds any number of hands in pairs (Warden Prime's saw, vice, cannon and laser), with only the
-  first `swipingHands` swiping. A brain may give its creature a `Barrier` (the Mawwall's
+  the warden brain holds any number of hands in pairs (Skeletron Prime's saw, vice, cannon and laser), with only the
+  first `swipingHands` swiping. A brain may give its creature a `Barrier` (the Wall of Flesh's
   flesh: tiled `barrierModel`, hurts and throws out players behind it) and tether minions to it (`Leader`: their
   anchor follows it and they die with it). `summonBoss` items, the keeper's `summonBoss` service and
   `incinerationSummon` items (burned in lava in a given layer, sacrificing a resident) spawn bosses.
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
-  command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Mawwall) and
+  command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and
   fires `Raised` (announcements; the hook for world mutations).
 * **World mutations** — `data/mutations.json` defines mutations triggered by flags (`oreVeins`: vein rules with
   `generate: false` placed by the shared `VeinStamper`; `wedge`: a slanted slab converted through a conversion table,
@@ -69,7 +69,7 @@
   and face the player while talking. `TownCommerce` picks dialogue lines by condition (placeholders for names),
   prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys and sells
   (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
-  residents (the crypt keeper) are placed at a planned landmark once it streams in and stay near it; any resident
+  residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per

@@ -85,16 +85,37 @@ public class CharacterTests
         var dir = SaveCatalog.NewWorldDirectory(root, "My World!");
         Assert.EndsWith("My_World_", dir);
         var tables = new Strata.Core.Meshing.RenderTables(TestPaths.Content, _ => 0);
-        WorldSession.Create(TestPaths.Content, new WorldSettings { Name = "My World!", Seed = 99, Size = WorldSizePreset.Tiny, Difficulty = Difficulty.Expert, Evil = EvilKind.Sanguine },
+        WorldSession.Create(TestPaths.Content, new WorldSettings { Name = "My World!", Seed = 99, Size = WorldSizePreset.Tiny, Difficulty = Difficulty.Expert, Evil = EvilKind.Crimson },
             dir, tables, new Strata.Core.Diagnostics.MemoryLog());
         Assert.NotEqual(dir, SaveCatalog.NewWorldDirectory(root, "My World!")); // taken: a new folder name
         var w = Assert.Single(SaveCatalog.Worlds(root));
         Assert.Equal("My World!", w.Name);
         Assert.Equal(Difficulty.Expert, w.Difficulty);
-        Assert.Equal(EvilKind.Sanguine, w.Evil);
+        Assert.Equal(EvilKind.Crimson, w.Evil);
         Assert.Equal(99, w.Seed);
         SaveCatalog.DeleteWorld(w.Directory);
         Assert.Empty(SaveCatalog.Worlds(root));
+    }
+
+    [Fact]
+    public void SavesFromBeforeTheRenameStillLoad()
+    {
+        // A character saved with the old content ids: items and buffs resolve through data/config/aliases.json.
+        var json = """
+            { "format": "strata-player", "version": 1, "name": "Old", "life": 100, "mana": 20,
+              "backpack": [ { "slot": 0, "item": "minor_restorative", "count": 3 }, { "slot": 1, "item": "loam", "count": 50 },
+                            { "slot": 2, "item": "umbrite_pickaxe", "count": 1 } ],
+              "buffs": [ { "id": "ironbark", "ticks": 600 } ] }
+            """;
+        var state = PlayerSave.Deserialize(json).ToState(TestPaths.Content);
+        var inv = state.Inventory.Backpack;
+        Assert.Equal("lesser_healing_potion", inv[0].Item!.Id);
+        Assert.Equal("dirt", inv[1].Item!.Id);
+        Assert.Equal("demonite_pickaxe", inv[2].Item!.Id);
+        Assert.Equal("Nightmare Pickaxe", inv[2].Item!.DisplayName);
+        Assert.Contains(state.Buffs.Active, b => b.Def.Id == "ironskin");
+        Assert.Equal("king_slime", TestPaths.Content.Current("gel_sovereign"));
+        Assert.Equal("stone", TestPaths.Content.Current("stone"));
     }
 
     private static long CopperOf(ItemStack s) => s.Item!.Id switch

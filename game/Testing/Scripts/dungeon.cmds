@@ -5,29 +5,29 @@ spawning off
 town arrivals off
 heal
 tp landmark dungeon_gate
-wait_until town.crypt_keeper == 1 60
+wait_until town.old_man == 1 60
 assert zone.dungeon == 0
 assert errors == 0
 
 # The guardian does not follow anyone out of the crypt.
-spawn crypt_guardian 1 8
+spawn dungeon_guardian 1 8
 wait 1
-assert npcs.crypt_guardian == 0
+assert npcs.dungeon_guardian == 0
 
 # By night the keeper calls out the Crypt Warden and becomes it.
 time 22
-town curse crypt_keeper
-assert npcs.crypt_warden == 1
-assert town.crypt_keeper.alive == 0
+town curse old_man
+assert npcs.skeletron == 1
+assert town.old_man.alive == 0
 wait 3
 heal
-assert npcs.crypt_warden == 1
+assert npcs.skeletron == 1
 
 # Its fall lifts the curse: the keeper leaves town for good.
-slay crypt_warden
-assert flag.defeated_crypt_warden == 1
-assert npcs.crypt_warden == 0
+slay skeletron
+assert flag.defeated_skeletron == 1
+assert npcs.skeletron == 0
 wait 1.5
-assert town.crypt_keeper == 0
+assert town.old_man == 0
 time noon
 assert errors == 0

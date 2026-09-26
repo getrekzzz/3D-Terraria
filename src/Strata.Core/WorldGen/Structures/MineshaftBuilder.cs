@@ -15,7 +15,7 @@ public static class MineshaftBuilder
     public static Blueprint Build(ContentDatabase content, Int3 start, ref Pcg32 rng, int segments)
     {
         var bp = new Blueprint { Flags = Voxels.CellFlags.None };
-        var rail = content.TileObjects.Get("rail");
+        var rail = content.TileObjects.Get("minecart_track");
         var torch = content.TileObjects.Get("torch");
         var pos = start;
         int dir = rng.NextInt(4);

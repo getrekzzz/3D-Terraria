@@ -4,17 +4,17 @@ wait_until player.frozen == 0 180
 spawning off
 town arrivals off
 assert mutation.level == 0
-flag defeated_mawwall
+flag defeated_wall_of_flesh
 assert flag.hardmode == 1
 assert mutation.level == 3
 wait_until mutation.behind == 0 60
 mutations
 
 # Travel to where the radiant wedge meets the surface: new chunks stream in already converted.
-tp zone hallowed
+tp zone hallow
 wait_until player.frozen == 0 300
 wait_until stream.idle == 1 600
-assert zone.hallowed == 1
+assert zone.hallow == 1
 assert mutation.behind == 0
 mutations spread 20
 assert spread.conversions >= 0
@@ -24,25 +24,25 @@ assert errors == 0
 god
 fill -10 -3 -10 10 -1 10 pearlstone
 fill -10 0 -10 10 10 10 air
-place cinder_forge 4 0 4
-place verdite_anvil -4 0 4
-place crimsite_forge -4 0 -5
+place hellforge 4 0 4
+place mythril_anvil -4 0 4
+place adamantite_forge -4 0 -5
 wait 0.5
-spawn glimmer_sprite 1
-spawn prism_steed 1
-spawn lustre_gel 1
-spawn flux_stalker 1
-spawn blight_drifter 1
-spawn umbral_gel 1
-spawn clot_gel 1
-spawn ichor_spitter 1
-spawn gore_drifter 1
-spawn armored_bones 1
-spawn dread_wraith 1
-spawn gloom_bat 1
+spawn pixie 1
+spawn unicorn 1
+spawn illuminant_slime 1
+spawn chaos_elemental 1
+spawn corruptor 1
+spawn corrupt_slime 1
+spawn crimslime 1
+spawn ichor_sticker 1
+spawn floaty_gross 1
+spawn armored_skeleton 1
+spawn wraith 1
+spawn giant_bat 1
 assert npcs.count >= 12
 wait 3
-assert npcs.prism_steed == 1
+assert npcs.unicorn == 1
 assert errors == 0
 killall
 assert errors == 0

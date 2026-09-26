@@ -48,8 +48,8 @@ public class CombatPlayerTests
     {
         var db = TestPaths.Content;
         var p = PlayerState.CreateNew("hero", db);
-        p.Inventory.Backpack.Add(new ItemStack(db.Items.Get("courier_boots"), 1));
-        p.Inventory.Backpack.Add(new ItemStack(db.Items.Get("iron_horseshoe"), 1));
+        p.Inventory.Backpack.Add(new ItemStack(db.Items.Get("hermes_boots"), 1));
+        p.Inventory.Backpack.Add(new ItemStack(db.Items.Get("lucky_horseshoe"), 1));
         p.Inventory.Backpack.Add(new ItemStack(db.Items.Get("copper_helmet"), 1));
         for (int i = 0; i < p.Inventory.Backpack.Size; i++)
             if (!p.Inventory.Backpack[i].IsEmpty && p.Inventory.Backpack[i].Item!.EquipSlot != EquipSlot.None) p.Inventory.Equip(i);
@@ -64,7 +64,7 @@ public class CombatPlayerTests
     {
         var db = TestPaths.Content;
         var p = PlayerState.CreateNew("hero", db);
-        p.Buffs.Add(db.Buffs.Get("ironbark"), 3);
+        p.Buffs.Add(db.Buffs.Get("ironskin"), 3);
         p.Recompute();
         Assert.Equal(8, p.Defense);
         p.Buffs.Tick(); p.Buffs.Tick(); p.Buffs.Tick();

@@ -1,42 +1,42 @@
 {
   "lootTables": [
     { "id": "tree_oak", "entries": [{ "item": "wood", "min": 6, "max": 12 }, { "item": "acorn", "min": 1, "max": 2, "chance": 0.6 }] },
-    { "id": "tree_pine", "entries": [{ "item": "pine_wood", "min": 6, "max": 12 }, { "item": "acorn", "min": 1, "max": 2, "chance": 0.5 }] },
+    { "id": "tree_pine", "entries": [{ "item": "boreal_wood", "min": 6, "max": 12 }, { "item": "acorn", "min": 1, "max": 2, "chance": 0.5 }] },
     { "id": "tree_palm", "entries": [{ "item": "palm_wood", "min": 5, "max": 10 }] },
-    { "id": "tree_mahoe", "entries": [{ "item": "jungle_wood", "min": 10, "max": 18 }] },
+    { "id": "tree_mahogany", "entries": [{ "item": "rich_mahogany", "min": 10, "max": 18 }] },
     { "id": "cactus_plant", "entries": [{ "item": "cactus", "min": 3, "max": 6 }] },
-    { "id": "glowcap_giant", "entries": [{ "item": "glowcap", "min": 4, "max": 8 }] },
+    { "id": "glowing_mushroom_giant", "entries": [{ "item": "glowing_mushroom", "min": 4, "max": 8 }] },
     { "id": "plant_mushroom", "entries": [{ "item": "mushroom" }] },
-    { "id": "plant_glowcap", "entries": [{ "item": "glowcap" }] },
-    { "id": "vital_crystal_node", "entries": [{ "item": "vital_crystal" }] },
-    { "id": "blade_shrine", "mode": "weighted", "entries": [{ "item": "glimmer_blade", "weight": 1 }, { "item": "wooden_sword", "weight": 2 }] },
+    { "id": "plant_glowing_mushroom", "entries": [{ "item": "glowing_mushroom" }] },
+    { "id": "life_crystal_node", "entries": [{ "item": "life_crystal" }] },
+    { "id": "enchanted_sword_shrine", "mode": "weighted", "entries": [{ "item": "enchanted_sword", "weight": 1 }, { "item": "wooden_sword", "weight": 2 }] },
     { "id": "pot", "mode": "weighted", "rolls": 1, "coins": [10, 300], "entries": [
       { "item": "torch", "min": 4, "max": 12, "weight": 3 },
-      { "item": "minor_restorative", "min": 1, "max": 2, "weight": 2 },
+      { "item": "lesser_healing_potion", "min": 1, "max": 2, "weight": 2 },
       { "item": "wooden_arrow", "min": 10, "max": 25, "weight": 2 },
       { "item": "gel", "min": 2, "max": 6, "weight": 1 }
     ] },
     { "id": "cabin_chest_primary", "mode": "weighted", "entries": [
-      { "item": "bottled_gale", "weight": 1 }, { "item": "courier_boots", "weight": 1 }, { "item": "band_of_vigor", "weight": 1 },
-      { "item": "ember_wand", "weight": 1 }, { "item": "iron_horseshoe", "weight": 0.5 }
+      { "item": "cloud_in_a_bottle", "weight": 1 }, { "item": "hermes_boots", "weight": 1 }, { "item": "band_of_regeneration", "weight": 1 },
+      { "item": "wand_of_sparking", "weight": 1 }, { "item": "lucky_horseshoe", "weight": 0.5 }
     ] },
     { "id": "cabin_chest", "coins": [500, 3000], "entries": [
       { "table": "cabin_chest_primary" },
       { "item": "torch", "min": 10, "max": 25, "chance": 0.7 },
-      { "item": "minor_restorative", "min": 2, "max": 5, "chance": 0.6 },
+      { "item": "lesser_healing_potion", "min": 2, "max": 5, "chance": 0.6 },
       { "item": "wooden_arrow", "min": 25, "max": 50, "chance": 0.5 },
       { "item": "iron_bar", "min": 5, "max": 12, "chance": 0.35 },
       { "item": "silver_bar", "min": 5, "max": 10, "chance": 0.25 },
-      { "item": "swiftness_draught", "min": 1, "max": 2, "chance": 0.3 },
-      { "item": "ironbark_draught", "min": 1, "max": 2, "chance": 0.3 }
+      { "item": "swiftness_potion", "min": 1, "max": 2, "chance": 0.3 },
+      { "item": "ironskin_potion", "min": 1, "max": 2, "chance": 0.3 }
     ] },
     { "id": "surface_chest", "coins": [200, 1200], "entries": [
       { "item": "wooden_sword", "chance": 0.3 }, { "item": "wooden_bow", "chance": 0.3 },
-      { "item": "torch", "min": 5, "max": 15, "chance": 0.8 }, { "item": "minor_restorative", "min": 1, "max": 3, "chance": 0.5 },
+      { "item": "torch", "min": 5, "max": 15, "chance": 0.8 }, { "item": "lesser_healing_potion", "min": 1, "max": 3, "chance": 0.5 },
       { "item": "copper_bar", "min": 3, "max": 9, "chance": 0.4 }
     ] },
     { "id": "sky_chest", "coins": [1500, 5000], "entries": [
-      { "item": "iron_horseshoe", "chance": 0.5 }, { "item": "bottled_gale", "chance": 0.35 }, { "item": "starshard", "min": 3, "max": 8 }
+      { "item": "lucky_horseshoe", "chance": 0.5 }, { "item": "cloud_in_a_bottle", "chance": 0.35 }, { "item": "fallen_star", "min": 3, "max": 8 }
     ] }
   ]
 }

@@ -41,10 +41,10 @@ public class WorldGenTests
     /// generation output fails here. A deliberate change bumps GenVersion and updates these values in the same commit.
     /// </summary>
     [Theory]
-    [InlineData(8, 10, 8, 4206328971987812554UL)]
-    [InlineData(8, 9, 8, 10266172546085080418UL)]
-    [InlineData(8, 7, 8, 17018525288982942300UL)]
-    [InlineData(8, 4, 8, 3249732967929143139UL)]
+    [InlineData(8, 10, 8, 7902965437642540499UL)]
+    [InlineData(8, 9, 8, 16680582493488123245UL)]
+    [InlineData(8, 7, 8, 12256379067334564043UL)]
+    [InlineData(8, 4, 8, 12570028347482266087UL)]
     [InlineData(2, 4, 9, 7700367495048783130UL)]
     [InlineData(12, 1, 5, 186453762913151607UL)]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
@@ -121,7 +121,7 @@ public class WorldGenTests
         Assert.Contains("tundra", biomes);
         Assert.Contains("jungle", biomes);
         Assert.Contains("desert", biomes);
-        Assert.Contains("umbral", biomes);
+        Assert.Contains("corruption", biomes);
         Assert.Contains(plan.Features.All, f => f is StructureFeature s && s.Kind == "dungeon" && s.Zone == "dungeon");
         Assert.Contains(plan.Features.All, f => f is IslandFeature);
         Assert.Contains(plan.Features.All, f => f.Kind == "worm");

@@ -42,11 +42,11 @@ public class GrassScatterTests
     [Fact]
     public void FlatTurfGrowsAnEvenLawn()
     {
-        var clumps = Scatter((b, id) => Ground(b, id("turf")));
-        float expected = 16f * 16f * Grass.ClumpsPerSquareMeter * Grass.Kinds["turf"].Density;
+        var clumps = Scatter((b, id) => Ground(b, id("grass")));
+        float expected = 16f * 16f * Grass.ClumpsPerSquareMeter * Grass.Kinds["grass"].Density;
         Assert.InRange(clumps.Count, expected * 0.85f, expected * 1.15f);
-        var look = Grass.Kinds["turf"];
-        int turf = KindOf("turf");
+        var look = Grass.Kinds["grass"];
+        int turf = KindOf("grass");
         foreach (var c in clumps)
         {
             Assert.InRange(c.Position.X, 0f, 16f);
@@ -67,8 +67,8 @@ public class GrassScatterTests
     [Fact]
     public void ScatterIsDeterministicAndShuffled()
     {
-        var a = Scatter((b, id) => Ground(b, id("turf")));
-        var b2 = Scatter((b, id) => Ground(b, id("turf")));
+        var a = Scatter((b, id) => Ground(b, id("grass")));
+        var b2 = Scatter((b, id) => Ground(b, id("grass")));
         Assert.Equal(a, b2);
         // Shuffled: the first tenth already spreads over the whole chunk (a prefix is an even thinning).
         var prefix = a.Take(a.Count / 10).ToList();
@@ -84,7 +84,7 @@ public class GrassScatterTests
         {
             for (int x = 40; x < 44; x++)
                 for (int z = 36; z < 60; z++)
-                    for (int y = 34; y < 50; y++) b.SetBlock(x, y, z, id("turf"));
+                    for (int y = 34; y < 50; y++) b.SetBlock(x, y, z, id("grass"));
         });
         Assert.NotEmpty(wall);
         Assert.All(wall, c => Assert.True(c.Normal.Y >= Grass.MinUpward));
@@ -96,7 +96,7 @@ public class GrassScatterTests
     {
         var border = Scatter((b, id) =>
         {
-            Ground(b, id("turf"), (x, _) => x < 48);
+            Ground(b, id("grass"), (x, _) => x < 48);
             Ground(b, id("stone"), (x, _) => x >= 48);
         });
         Assert.NotEmpty(border);
@@ -104,7 +104,7 @@ public class GrassScatterTests
 
         var covered = Scatter((b, id) =>
         {
-            Ground(b, id("turf"));
+            Ground(b, id("grass"));
             for (int x = 36; x < 44; x++)
                 for (int z = 36; z < 44; z++) b.SetBlock(x, Top, z, id("glass"));
         });
@@ -115,9 +115,9 @@ public class GrassScatterTests
     [Fact]
     public void JungleTurfUsesItsOwnKind()
     {
-        var clumps = Scatter((b, id) => Ground(b, id("jungle_turf")));
+        var clumps = Scatter((b, id) => Ground(b, id("jungle_grass")));
         Assert.NotEmpty(clumps);
-        Assert.All(clumps, c => Assert.Equal(KindOf("jungle_turf"), c.Kind));
+        Assert.All(clumps, c => Assert.Equal(KindOf("jungle_grass"), c.Kind));
     }
 
     [Fact]
@@ -131,16 +131,16 @@ public class GrassScatterTests
             ClumpsPerSquareMeter = 0f,
             Kinds = new()
             {
-                ["turf"] = new GrassKind { Color = "green", Height = new[] { 0.5f, 0.2f }, Flowers = 0.1f },
+                ["grass"] = new GrassKind { Color = "green", Height = new[] { 0.5f, 0.2f }, Flowers = 0.1f },
                 ["stone"] = new GrassKind(),
             },
         };
         var problems = config.Validate(TestPaths.Content);
         Assert.Contains(problems, p => p.Contains("clumpsPerSquareMeter"));
-        Assert.Contains(problems, p => p.Contains("turf: color"));
-        Assert.Contains(problems, p => p.Contains("turf: height"));
-        Assert.Contains(problems, p => p.Contains("turf: flowers need flowerColors"));
+        Assert.Contains(problems, p => p.Contains("grass: color"));
+        Assert.Contains(problems, p => p.Contains("grass: height"));
+        Assert.Contains(problems, p => p.Contains("grass: flowers need flowerColors"));
         Assert.Contains(problems, p => p.Contains("'stone' names a block without the 'grass' tag"));
-        Assert.Contains(problems, p => p.Contains("'jungle_turf' is tagged 'grass' but has no grass kind"));
+        Assert.Contains(problems, p => p.Contains("'jungle_grass' is tagged 'grass' but has no grass kind"));
     }
 }

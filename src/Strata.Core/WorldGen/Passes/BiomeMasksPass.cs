@@ -35,7 +35,7 @@ public sealed class BiomeMasksPass : GenPass
         Add(ctx, seeds, "underground_desert", 4, RegionProfile.Buried, 0, 0, desert.RadiusX * 1.05f, desert.RadiusZ * 1.05f,
             depthCenter: 0.34f, depthRadius: 0.27f, cx: desert.CenterX, cz: desert.CenterZ);
 
-        string evil = plan.Settings.Evil == EvilKind.Umbral ? "umbral" : "sanguine";
+        string evil = plan.Settings.Evil == EvilKind.Corruption ? "corruption" : "crimson";
         int evilCount = plan.Settings.Size switch { WorldSizePreset.Tiny => 1, WorldSizePreset.Small => 2, WorldSizePreset.Medium => 3, _ => 4 };
         var avoid = new List<float> { plan.SnowAngle, plan.SnowAngle + 0.5f, desertAngle };
         for (int i = 0; i < evilCount; i++)

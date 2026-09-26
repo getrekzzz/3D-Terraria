@@ -14,7 +14,7 @@ public static class TestHouses
     public static TileObjectInstance Build(TestGame g, Int3 floor, bool built = true, bool chair = true)
     {
         var world = g.World.Session.World;
-        var brick = g.Content.BlockId("stone_brick");
+        var brick = g.Content.BlockId("gray_brick");
         var flags = built ? CellFlags.PlayerPlaced : CellFlags.None;
         var batch = world.BeginEdit();
         for (int y = 1; y <= 7; y++)

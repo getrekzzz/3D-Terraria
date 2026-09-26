@@ -26,6 +26,7 @@ public sealed partial class WorldSession
         Render = render;
         Log = log;
         Settings = meta.ToSettings();
+        UpgradeIds(meta, content);
         Ids = meta.CreateIdTables();
         Generator = new WorldGenerator(content, Settings, log);
         World = new VoxelWorld(content, Settings.Dimensions, content.BlockId("abyssal_rock"));

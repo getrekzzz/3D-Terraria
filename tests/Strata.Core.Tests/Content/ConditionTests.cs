@@ -17,7 +17,7 @@ public class ConditionTests
     {
         var cond = ConditionCompiler.CompileAll(new[]
         {
-            Spec("""{ "type": "biome", "any": ["forest"], "none": ["umbral"] }"""),
+            Spec("""{ "type": "biome", "any": ["forest"], "none": ["corruption"] }"""),
             Spec("""{ "type": "layer", "any": ["surface"] }"""),
             Spec("""{ "type": "time", "is": "night" }"""),
         });
@@ -26,7 +26,7 @@ public class ConditionTests
         ctx.IsDay = true;
         Assert.False(cond.Evaluate(ctx));
         ctx.IsDay = false;
-        ctx.Biomes = new[] { "forest", "umbral" };
+        ctx.Biomes = new[] { "forest", "corruption" };
         Assert.False(cond.Evaluate(ctx));
     }
 

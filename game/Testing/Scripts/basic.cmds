@@ -41,12 +41,12 @@ assert player.alive == 1
 # Building: place a brick grid block (1 m, one brick per cell) on the floor in front of us.
 fill -10 -3 -10 10 -1 10 stone
 wait 0.5
-give stone_brick 20
-wield stone_brick
+give gray_brick 20
+wield gray_brick
 aim 0 -0.8 1
 use
 assert player.held_count < 20
-fill 2 0 -1 2 3 1 stone_brick
+fill 2 0 -1 2 3 1 gray_brick
 assert block.2.1.0 > 0
 
 # Tile objects: a torch on the floor, a workbench from the item.
@@ -55,11 +55,11 @@ probe block.0.0.3
 probe block.0.-1.3
 place torch -2 0 -3
 assert objects.count > 0
-give workbench 1
-wield workbench
+give work_bench 1
+wield work_bench
 aim -0.6 -0.5 -1
 use
-assert inv.workbench == 0
+assert inv.work_bench == 0
 assert objects.count > 0
 
 # Time of day affects lighting (no errors while switching).

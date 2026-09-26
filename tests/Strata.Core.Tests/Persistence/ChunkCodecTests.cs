@@ -14,7 +14,7 @@ public class ChunkCodecTests
     private static ChunkData RandomChunk(ContentDatabase db, int seed)
     {
         var rng = new Random(seed);
-        var palette = new[] { db.BlockId("air"), db.BlockId("stone"), db.BlockId("loam"), db.BlockId("copper_ore"), db.BlockId("wood") };
+        var palette = new[] { db.BlockId("air"), db.BlockId("stone"), db.BlockId("dirt"), db.BlockId("copper_ore"), db.BlockId("wood") };
         var blocks = new ushort[ChunkMath.Volume];
         var shapes = new byte[ChunkMath.Volume];
         var liquids = new byte[ChunkMath.Volume];

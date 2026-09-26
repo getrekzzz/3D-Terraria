@@ -35,18 +35,18 @@ public class CommandTests
     {
         var (g, r, ctx) = Setup();
         using var _ = g;
-        Assert.True(r.Execute(ctx, "give stone_brick 10").Ok);
-        Assert.True(r.Execute(ctx, "assert inv.stone_brick == 10").Ok);
-        Assert.False(r.Execute(ctx, "assert inv.stone_brick > 10").Ok);
+        Assert.True(r.Execute(ctx, "give gray_brick 10").Ok);
+        Assert.True(r.Execute(ctx, "assert inv.gray_brick == 10").Ok);
+        Assert.False(r.Execute(ctx, "assert inv.gray_brick > 10").Ok);
         Assert.False(r.Execute(ctx, "give no_such_item").Ok);
 
         int slot = g.Player.State.Inventory.Backpack.Stacks.Count() - 1;
         Assert.True(r.Execute(ctx, $"select {slot + 1}").Ok);
-        Assert.Equal("stone_brick", g.Player.State.Inventory.Held.Item!.Id);
+        Assert.Equal("gray_brick", g.Player.State.Inventory.Held.Item!.Id);
         Assert.True(r.Execute(ctx, "aim 0 -0.8 1").Ok);
         var used = r.Execute(ctx, "use");
         Assert.StartsWith("PlacedBlock", used.Output);
-        Assert.True(r.Execute(ctx, "assert inv.stone_brick < 10").Ok); // one per filled cell of the grid block
+        Assert.True(r.Execute(ctx, "assert inv.gray_brick < 10").Ok); // one per filled cell of the grid block
     }
 
     [Fact]
@@ -54,9 +54,9 @@ public class CommandTests
     {
         var (g, r, ctx) = Setup();
         using var _ = g;
-        Assert.True(r.Execute(ctx, "setblock 2 0 0 stone_brick slope 1").Ok);
-        Assert.Equal(g.Content.BlockId("stone_brick"), g.World.Session.World.GetBlock(g.Floor + new Int3(2, 1, 0)));
-        Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 loam").Ok);
+        Assert.True(r.Execute(ctx, "setblock 2 0 0 gray_brick slope 1").Ok);
+        Assert.Equal(g.Content.BlockId("gray_brick"), g.World.Session.World.GetBlock(g.Floor + new Int3(2, 1, 0)));
+        Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 dirt").Ok);
         Assert.True(r.Execute(ctx, "assert block.1.0.1 > 0").Ok);
         Assert.True(r.Execute(ctx, "time midnight").Ok);
         Assert.True(r.Execute(ctx, "assert time.day == 0").Ok);

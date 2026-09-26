@@ -22,7 +22,7 @@ public class MeshingTests
         var world = TestWorlds.Filled("air");
         var db = world.Content;
         var batch = world.BeginEdit();
-        edit(batch, db.BlockId("stone"), db.BlockId("stone_brick"));
+        edit(batch, db.BlockId("stone"), db.BlockId("gray_brick"));
         batch.Commit();
         return world;
     }

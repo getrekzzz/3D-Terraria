@@ -49,7 +49,7 @@ public sealed class FloatingIslandsPass : GenPass
         var bp = new Blueprint { Flags = CellFlags.None };
         int w = rng.Range(9, 13);
         var box = new Aabb3i(new Int3(floor.X - w / 2, floor.Y - 1, floor.Z - w / 2), new Int3(floor.X + w / 2, floor.Y + 8, floor.Z + w / 2));
-        bp.Room(box, "sky_brick");
+        bp.Room(box, "sunplate_block");
         bp.Fill(new Aabb3i(new Int3(box.Min.X, floor.Y + 3, box.Min.Z + 2), new Int3(box.Min.X + 1, floor.Y + 5, box.Max.Z - 2)), "glass");
         bp.Fill(new Aabb3i(new Int3(box.Max.X - 1, floor.Y + 3, box.Min.Z + 2), new Int3(box.Max.X, floor.Y + 5, box.Max.Z - 2)), "glass");
         bp.Carve(new Aabb3i(new Int3(floor.X - 1, floor.Y, box.Min.Z), new Int3(floor.X + 1, floor.Y + 4, box.Min.Z + 1)));

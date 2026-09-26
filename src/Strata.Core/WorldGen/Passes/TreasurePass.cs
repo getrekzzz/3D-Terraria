@@ -19,9 +19,9 @@ public sealed class TreasurePass : GenPass
         if (ctx.AllAir) return;
         var rng = ctx.Rng(this);
         var tiles = ctx.Gen.Content.TileObjects;
-        var pot = tiles.Get("clay_pot");
+        var pot = tiles.Get("pot");
         var chest = tiles.Get("wooden_chest");
-        var crystal = tiles.Get("vital_crystal_node");
+        var crystal = tiles.Get("life_crystal_node");
         float depth = ctx.Depth(ctx.ChunkOrigin.Y + 16);
         if (depth < 0.02f) return;
 

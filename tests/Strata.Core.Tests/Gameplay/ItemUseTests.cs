@@ -17,9 +17,9 @@ public class ItemUseTests
         var db = TestPaths.Content;
         Assert.True(uses[db.Items.Get("copper_pickaxe")].Has(ItemAction.Mine | ItemAction.Melee));
         Assert.True(uses[db.Items.Get("copper_axe")].Has(ItemAction.Chop));
-        Assert.True(uses[db.Items.Get("loam")].Has(ItemAction.PlaceBlock));
+        Assert.True(uses[db.Items.Get("dirt")].Has(ItemAction.PlaceBlock));
         Assert.True(uses[db.Items.Get("torch")].Has(ItemAction.PlaceObject));
-        Assert.True(uses[db.Items.Get("minor_restorative")].Has(ItemAction.Consume));
+        Assert.True(uses[db.Items.Get("lesser_healing_potion")].Has(ItemAction.Consume));
         Assert.True(uses[db.Items.Get("wooden_bow")].Has(ItemAction.Shoot));
         Assert.Equal("wooden_arrow", uses[db.Items.Get("wooden_arrow")].Projectile!.Id);
         Assert.Equal(ItemAction.None, uses[db.Items.Get("gel")].Actions);
@@ -66,13 +66,13 @@ public class ItemUseTests
     public void PlacingBlocksConsumesItemsAndRespectsThePlayerBody()
     {
         using var g = TestGame.Create();
-        g.Hold("stone_brick", 5);
+        g.Hold("gray_brick", 5);
         g.Player.Precision = true;
         var world = g.World.Session.World;
         var front = g.Floor + new Int3(0, 0, 3);
         g.AimAt(TestGame.CellCenter(front) + new Vector3(0, 0.24f, 0)); // top face
         Assert.Equal(UseOutcome.PlacedBlock, g.World.ItemUse.Use(g.Player, g.Target(), true));
-        Assert.Equal(g.Content.BlockId("stone_brick"), world.GetBlock(front + Int3.Up));
+        Assert.Equal(g.Content.BlockId("gray_brick"), world.GetBlock(front + Int3.Up));
         Assert.Equal(CellFlags.PlayerPlaced, world.GetFlags(front.X, front.Y + 1, front.Z) & CellFlags.PlayerPlaced);
         Assert.Equal(4, g.Player.State.Inventory.Held.Count);
 
@@ -87,17 +87,17 @@ public class ItemUseTests
     public void GridPlacementFillsTheBlockOneItemPerCell()
     {
         using var g = TestGame.Create();
-        g.Hold("stone_brick", 20);
+        g.Hold("gray_brick", 20);
         var world = g.World.Session.World;
         var front = g.Floor + new Int3(0, 0, 4);
         var block = BlockGrid.Cells(front + Int3.Up).Where(c => world.GetBlock(c) == 0).ToList();
         g.AimAt(TestGame.CellCenter(front) + new Vector3(0, 0.24f, 0));
         Assert.Equal(UseOutcome.PlacedBlock, g.World.ItemUse.Use(g.Player, g.Target(), true));
-        Assert.All(block, c => Assert.Equal(g.Content.BlockId("stone_brick"), world.GetBlock(c)));
+        Assert.All(block, c => Assert.Equal(g.Content.BlockId("gray_brick"), world.GetBlock(c)));
         Assert.Equal(20 - block.Count, g.Player.State.Inventory.Held.Count);
 
         // Too few items left: only as many cells as the stack holds are filled.
-        g.Hold("stone_brick", 3);
+        g.Hold("gray_brick", 3);
         g.Ticks(30);
         var next = front + new Int3(0, 0, 2);
         g.AimAt(TestGame.CellCenter(next) + new Vector3(0, 0.24f, 0));
@@ -105,7 +105,7 @@ public class ItemUseTests
         Assert.True(g.Player.State.Inventory.Held.IsEmpty);
 
         // The block around our own feet overlaps the body.
-        g.Hold("stone_brick", 20);
+        g.Hold("gray_brick", 20);
         g.Ticks(30);
         g.Player.Aim = Vector3.Normalize(new Vector3(0.01f, -1f, 0.01f));
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, g.Target(), true));
@@ -116,7 +116,7 @@ public class ItemUseTests
     public void CrispShapesTakeTheBuildShapeAndFacing()
     {
         using var g = TestGame.Create();
-        g.Hold("stone_brick", 5);
+        g.Hold("gray_brick", 5);
         g.Player.Precision = true;
         g.Player.BuildShape = CellShape.Slope;
         var front = g.Floor + new Int3(0, 0, 3);
@@ -150,7 +150,7 @@ public class ItemUseTests
         var sand = g.Content.BlockId("sand");
         var baseCell = g.Floor + new Int3(4, 1, 4);
         var batch = world.BeginEdit();
-        batch.SetBlock(baseCell, g.Content.BlockId("loam"));
+        batch.SetBlock(baseCell, g.Content.BlockId("dirt"));
         for (int i = 1; i <= 3; i++) batch.SetBlock(baseCell + new Int3(0, i, 0), sand);
         g.World.Session.Commit(batch);
 
@@ -166,7 +166,7 @@ public class ItemUseTests
         using var g = TestGame.Create();
         var world = g.World.Session.World;
         var pillar = g.Floor + new Int3(-3, 1, 0);
-        g.World.Editor.SetBlock(pillar, g.Content.BlockId("loam"));
+        g.World.Editor.SetBlock(pillar, g.Content.BlockId("dirt"));
         g.Hold("torch", 3);
         g.AimAt(TestGame.CellCenter(pillar) + new Vector3(0, 0.24f, 0));
         Assert.Equal(UseOutcome.PlacedObject, g.World.ItemUse.Use(g.Player, g.Target(), true));
@@ -204,10 +204,10 @@ public class ItemUseTests
         using var g = TestGame.Create();
         var vitals = g.Player.State.Vitals;
         vitals.DamageDirect(60);
-        g.Hold("minor_restorative", 2);
+        g.Hold("lesser_healing_potion", 2);
         Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, true));
         Assert.Equal(90, vitals.Life);
-        Assert.True(g.Player.State.Buffs.Has("remedy_fatigue"));
+        Assert.True(g.Player.State.Buffs.Has("potion_sickness"));
         g.Ticks(60);
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true));
         Assert.Equal(1, g.Player.State.Inventory.Held.Count);
@@ -217,7 +217,7 @@ public class ItemUseTests
     public void VitalCrystalsRaiseMaxLifeUpToTheCap()
     {
         using var g = TestGame.Create();
-        g.Hold("vital_crystal", 20);
+        g.Hold("life_crystal", 20);
         int used = 0;
         for (int i = 0; i < 20; i++)
         {

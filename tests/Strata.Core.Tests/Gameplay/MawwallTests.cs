@@ -46,7 +46,7 @@ public class MawwallTests
     private static TownNpc Wayfinder(TestGame g)
     {
         var town = g.World.Town;
-        return town.Find("wayfinder") ?? town.Summon(g.Content.TownNpcs.Get("wayfinder"), g.Floor + new Int3(3, 1, 0));
+        return town.Find("guide") ?? town.Summon(g.Content.TownNpcs.Get("guide"), g.Floor + new Int3(3, 1, 0));
     }
 
     [Fact]
@@ -55,9 +55,9 @@ public class MawwallTests
         using var g = Create();
         var raised = new List<string>();
         g.World.Progression.Raised += f => raised.Add(f.Id);
-        var wall = g.World.Npcs.Spawn(g.Content.Enemies.Get("mawwall"), g.Player.Position)!;
+        var wall = g.World.Npcs.Spawn(g.Content.Enemies.Get("wall_of_flesh"), g.Player.Position)!;
         g.World.Npcs.Kill(wall);
-        Assert.Equal(new[] { "defeated_mawwall", "hardmode" }, raised);
+        Assert.Equal(new[] { "defeated_wall_of_flesh", "hardmode" }, raised);
         Assert.NotNull(g.Content.Flags.Get("hardmode").Announce);
         Assert.False(g.World.Progression.Set("hardmode")); // already raised
     }
@@ -67,7 +67,7 @@ public class MawwallTests
     {
         using var g = Create();
         var wayfinder = Wayfinder(g);
-        var effigy = new ItemStack(g.Content.Items.Get("wayfinder_effigy"), 1);
+        var effigy = new ItemStack(g.Content.Items.Get("guide_voodoo_doll"), 1);
         var burns = g.World.Incineration;
 
         // Burned at the surface it is just a burned doll.
@@ -79,7 +79,7 @@ public class MawwallTests
         var below = IntoUnderworld(g);
         var wall = burns.Burned(new DroppedItem { Stack = effigy, Position = below });
         Assert.NotNull(wall);
-        Assert.Equal("mawwall", wall!.Def.Id);
+        Assert.Equal("wall_of_flesh", wall!.Def.Id);
         Assert.False(wayfinder.Alive);
         Assert.Single(deaths);
 
@@ -98,10 +98,10 @@ public class MawwallTests
         var cell = Physics.VoxelMotion.CellOf(below + new Vector3(0, 0.3f, 0));
         g.World.Liquids.Enabled = false;
         g.World.Editor.FillLiquid(cell, cell, g.Content.Liquids.Get("lava"), LiquidCode.MaxLevel);
-        g.World.Drops.Spawn(new ItemStack(g.Content.Items.Get("wayfinder_effigy"), 1), below + new Vector3(0, 0.25f, 0), Vector3.Zero, pickupDelay: 600);
+        g.World.Drops.Spawn(new ItemStack(g.Content.Items.Get("guide_voodoo_doll"), 1), below + new Vector3(0, 0.25f, 0), Vector3.Zero, pickupDelay: 600);
         g.Player.Position += new Vector3(0, 30f, 0); // out of the lava's reach
         g.Ticks(5);
-        Assert.Contains(g.World.Npcs.All, n => n.Def.Id == "mawwall");
+        Assert.Contains(g.World.Npcs.All, n => n.Def.Id == "wall_of_flesh");
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class MawwallTests
     {
         using var g = Create();
         var at = IntoUnderworld(g);
-        var def = g.Content.Enemies.Get("mawwall");
+        var def = g.Content.Enemies.Get("wall_of_flesh");
         var p = def.Brain.Parse<MawwallParams>();
         var wall = g.World.Npcs.Spawn(def, at)!;
         g.World.Tick();
@@ -140,7 +140,7 @@ public class MawwallTests
     {
         using var g = Create();
         var at = IntoUnderworld(g);
-        var wall = g.World.Npcs.Spawn(g.Content.Enemies.Get("mawwall"), at)!;
+        var wall = g.World.Npcs.Spawn(g.Content.Enemies.Get("wall_of_flesh"), at)!;
         g.World.Tick();
         float dir = wall.Direction.X;
         var knocks = new List<Vector3>();
@@ -157,7 +157,7 @@ public class MawwallTests
     {
         using var g = Create();
         var at = IntoUnderworld(g);
-        var def = g.Content.Enemies.Get("mawwall");
+        var def = g.Content.Enemies.Get("wall_of_flesh");
         var p = def.Brain.Parse<MawwallParams>();
         var wall = g.World.Npcs.Spawn(def, at + new Vector3(0, 0, 0))!;
         g.World.Tick();
@@ -169,12 +169,12 @@ public class MawwallTests
             g.World.Tick();
             g.Player.State.Vitals.Life = g.Player.State.Vitals.MaxLife;
             g.Player.Position = new Vector3(wall.Center.X + wall.Direction.X * 12f, wall.Center.Y - 1f, wall.Center.Z);
-            foreach (var shot in g.World.Projectiles.All.Where(s => s.Def.Id == "maw_laser" && s.Age <= 1))
+            foreach (var shot in g.World.Projectiles.All.Where(s => s.Def.Id == "wall_of_flesh_laser" && s.Age <= 1))
                 shooters.Add(Vector3.Distance(shot.Position, wall.Segments[0]) < Vector3.Distance(shot.Position, wall.Segments[1]) ? 0 : 1);
         }
         Assert.Equal(2, shooters.Count); // both eyes take turns
         var minion = Assert.Single(wall.Followers);
-        Assert.Equal("hungry", minion.Def.Id);
+        Assert.Equal("the_hungry", minion.Def.Id);
         Assert.Same(wall, minion.Leader);
 
         g.World.Npcs.Kill(wall);
@@ -187,7 +187,7 @@ public class MawwallTests
     {
         using var g = Create();
         var at = IntoUnderworld(g);
-        var wall = g.World.Npcs.Spawn(g.Content.Enemies.Get("mawwall"), at)!;
+        var wall = g.World.Npcs.Spawn(g.Content.Enemies.Get("wall_of_flesh"), at)!;
         var left = new List<Npc>();
         g.World.Npcs.BossLeft += left.Add;
         g.Ticks(40);
@@ -196,6 +196,6 @@ public class MawwallTests
         g.Ticks(40);
         Assert.DoesNotContain(wall, g.World.Npcs.All);
         Assert.Single(left);
-        Assert.DoesNotContain("defeated_mawwall", g.World.Session.Flags);
+        Assert.DoesNotContain("defeated_wall_of_flesh", g.World.Session.Flags);
     }
 }

@@ -24,14 +24,15 @@ wherever possible.
   type names (`BehaviorRegistry`, `ConditionRegistry`, pass registries, command registry).
 
 ## Content IDs
-* String ids, `snake_case`, unique per category (`copper_ore`, `gel_sovereign`).
+* String ids, `snake_case`, unique per category (`copper_ore`, `king_slime`).
 * Runtime numeric ids are dense and assigned in manifest order **per session**; they are never
   persisted. Saves store per-save id tables (string lists) and remap on load. Unknown ids become
   placeholders that keep their original string so data is never silently lost.
 * Every content entry may declare `"covers": ["terraria:<concept>"]` linking it to the reference DB.
   Coverage is computed by `Strata.Tools coverage`.
-* In-game names are **original**. Real-world materials (copper, iron, obsidian…) keep their names;
-  proprietary-flavoured names are replaced.
+* Names follow the reference game (a personal build, the player's choice on 2026-09-26): ids and display names are
+  Terraria's (`king_slime`, "King Slime"). Renamed ids are listed in `data/config/aliases.json` so older saves load;
+  `tools/content/terraria_names.py` holds the mapping the migration used.
 
 ## Determinism (world generation)
 * All randomness derives from the world seed through `SeedTree` using **stable name hashes** of the

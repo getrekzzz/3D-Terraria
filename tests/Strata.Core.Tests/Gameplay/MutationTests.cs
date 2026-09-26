@@ -21,7 +21,7 @@ public class MutationTests
         return g;
     }
 
-    private static void Hardmode(TestGame g) => g.World.Progression.Set("defeated_mawwall");
+    private static void Hardmode(TestGame g) => g.World.Progression.Set("defeated_wall_of_flesh");
 
     /// <summary>Deep chunks below spawn (cavern stone, far from the test arena).</summary>
     private static IEnumerable<Int3> DeepChunks(TestGame g)
@@ -52,7 +52,7 @@ public class MutationTests
         var log = g.World.Session.Mutations;
         Assert.Equal(0, log.Level);
         Hardmode(g);
-        Assert.Equal(new[] { "hardmode_ores", "hardmode_radiance", "hardmode_blight" }, log.Ids);
+        Assert.Equal(new[] { "hardmode_ores", "hardmode_hallow", "hardmode_evil" }, log.Ids);
         g.World.Progression.Clear("hardmode");
         g.World.Progression.Set("hardmode");
         Assert.Equal(3, log.Level);
@@ -117,7 +117,7 @@ public class MutationTests
                 var session = g.World.Session;
                 session.Install(session.Produce(c));
                 edited = ChunkMath.ChunkOrigin(c) + new Int3(5, 5, 5);
-                brick = session.Content.BlockId("stone_brick");
+                brick = session.Content.BlockId("gray_brick");
                 g.World.Editor.SetBlock(edited, brick, 0, CellFlags.PlayerPlaced);
                 session.SaveAll(); // saved at mutation level 0
                 Hardmode(g);
@@ -146,19 +146,19 @@ public class MutationTests
         using var g = Create();
         Hardmode(g);
         var session = g.World.Session;
-        var radiant = session.Mutations.Zones.OfType<WedgeStep>().Single(z => z.Zone == "hallowed");
-        Assert.Contains(session.Mutations.Zones, z => z.Zone is "umbral" or "sanguine");
+        var radiant = session.Mutations.Zones.OfType<WedgeStep>().Single(z => z.Zone == "hallow");
+        Assert.Contains(session.Mutations.Zones, z => z.Zone is "corruption" or "crimson");
         var (x, z, _, _) = radiant.Anchor;
         var surface = new Int3((int)x, (int)MathF.Floor(session.Generator.Terrain.SurfaceHeight(x, z)), (int)z);
-        Assert.Contains("hallowed", session.ContextAt(surface).Biomes);
-        var radiantBlocks = new[] { "hallowed_turf", "pearlstone", "pearlsand", "pink_ice" }.Select(session.Content.BlockId).ToHashSet();
+        Assert.Contains("hallow", session.ContextAt(surface).Biomes);
+        var radiantBlocks = new[] { "hallowed_grass", "pearlstone", "pearlsand", "pink_ice" }.Select(session.Content.BlockId).ToHashSet();
         int converted = 0;
         for (int dy = -2; dy <= 0; dy++)
             converted += Count(session.Produce(ChunkMath.CellToChunk(surface) + new Int3(0, dy, 0)).Data, radiantBlocks);
         Assert.True(converted > 100, $"only {converted} radiant cells around the wedge's surface anchor");
         // Well away from the slab the land is untouched.
         var far = surface + new Int3((int)(radiant.Anchor.DirZ * 120), 0, (int)(-radiant.Anchor.DirX * 120));
-        Assert.DoesNotContain("hallowed", session.ZonesAt(far));
+        Assert.DoesNotContain("hallow", session.ZonesAt(far));
     }
 
     [Fact]

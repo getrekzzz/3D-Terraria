@@ -18,9 +18,9 @@ public sealed class HostileBiomePass : GenPass
     {
         var rng = ctx.SeedsFor(this).Rng("chasms");
         var bands = ctx.Plan.Bands;
-        foreach (var region in ctx.Plan.Regions.Where(r => r.Biome is "umbral" or "sanguine").ToList())
+        foreach (var region in ctx.Plan.Regions.Where(r => r.Biome is "corruption" or "crimson").ToList())
         {
-            string lining = region.Biome == "umbral" ? "umbral_stone" : "sanguine_stone";
+            string lining = region.Biome == "corruption" ? "ebonstone" : "crimstone";
             int chasms = rng.Range(3, 6);
             for (int c = 0; c < chasms; c++)
             {

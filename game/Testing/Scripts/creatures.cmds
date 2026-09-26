@@ -9,24 +9,24 @@ fill -14 0 -14 14 10 14 air
 fill 4 -3 4 9 -1 9 air
 liquid water 4 -3 4 9 -1 9
 wait 0.5
-spawn sea_jelly 1
-spawn razorfin 2
-spawn dune_vulture 1
-spawn sand_gel 1
-spawn frost_gel 1
-spawn frost_shambler 1
-spawn jungle_gel 1
-spawn snatcher 1
-spawn shore_crab 1
-spawn bone_walker 1
-spawn thornet 1
-spawn cinder_imp 1
-spawn magma_gel 1
-spawn ember_bat 1
+spawn blue_jellyfish 1
+spawn shark 2
+spawn vulture 1
+spawn sand_slime 1
+spawn ice_slime 1
+spawn frozen_zombie 1
+spawn jungle_slime 1
+spawn man_eater 1
+spawn crab 1
+spawn skeleton 1
+spawn hornet 1
+spawn fire_imp 1
+spawn lava_slime 1
+spawn hellbat 1
 assert npcs.count >= 15
 heal
 wait 3
-assert npcs.thornet == 1
+assert npcs.hornet == 1
 assert errors == 0
 # Clearing up.
 killall

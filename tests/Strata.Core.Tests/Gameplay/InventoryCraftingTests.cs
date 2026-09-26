@@ -46,16 +46,16 @@ public class InventoryCraftingTests
         var book = new RecipeBook(Db);
         var ctx = new ConditionContext();
         var inv = new Inventory(4);
-        inv.Add(S("pine_wood", 12));
-        var workbench = book.RecipesFor(Db.Items.Get("workbench"))[0];
+        inv.Add(S("boreal_wood", 12));
+        var workbench = book.RecipesFor(Db.Items.Get("work_bench"))[0];
         Assert.True(book.Craft(workbench, inv, new HashSet<string>(), ctx)); // any_wood group, no station needed
-        Assert.Equal(1, inv.Count(Db.Items.Get("workbench")));
-        Assert.Equal(2, inv.Count(Db.Items.Get("pine_wood")));
+        Assert.Equal(1, inv.Count(Db.Items.Get("work_bench")));
+        Assert.Equal(2, inv.Count(Db.Items.Get("boreal_wood")));
 
         var sword = book.RecipesFor(Db.Items.Get("wooden_sword"))[0];
         inv.Add(S("wood", 7));
         Assert.False(book.Craft(sword, inv, new HashSet<string>(), ctx)); // needs a workbench nearby
-        Assert.True(book.Craft(sword, inv, new HashSet<string> { "workbench" }, ctx));
+        Assert.True(book.Craft(sword, inv, new HashSet<string> { "work_bench" }, ctx));
         Assert.Equal(0, inv.Count(Db.Items.Get("wood")));
     }
 
@@ -69,7 +69,7 @@ public class InventoryCraftingTests
         var sword = book.RecipesFor(Db.Items.Get("wooden_sword"))[0];
         // Consuming all 7 wood frees slot 0, so this fits; now block it with a non-stackable item.
         inv[0] = S("wood", 8);
-        var trial = book.Craft(sword, inv, new HashSet<string> { "workbench" }, new ConditionContext());
+        var trial = book.Craft(sword, inv, new HashSet<string> { "work_bench" }, new ConditionContext());
         Assert.False(trial);
         Assert.Equal(8, inv.Count(Db.Items.Get("wood")));
     }
@@ -78,7 +78,7 @@ public class InventoryCraftingTests
     public void EnvironmentConditionsGateRecipes()
     {
         var book = new RecipeBook(Db);
-        var recipe = book.RecipesFor(Db.Items.Get("swiftness_draught"))[0];
+        var recipe = book.RecipesFor(Db.Items.Get("swiftness_potion"))[0];
         var stations = new HashSet<string> { "alchemy" };
         Assert.False(book.StationsAndConditionsMet(recipe, stations, new ConditionContext()));
         Assert.True(book.StationsAndConditionsMet(recipe, stations, new ConditionContext { NearbyLiquids = new HashSet<string> { "water" } }));
@@ -94,7 +94,7 @@ public class InventoryCraftingTests
         var b = roller.Roll("cabin_chest", ref r2);
         Assert.Equal(a, b);
         Assert.Contains(a, s => s.Item!.HasTag("coin"));
-        Assert.Contains(a, s => s.Item!.Category == Strata.Core.Content.Defs.ItemCategory.Accessory || s.Item.Id == "ember_wand");
+        Assert.Contains(a, s => s.Item!.Category == Strata.Core.Content.Defs.ItemCategory.Accessory || s.Item.Id == "wand_of_sparking");
     }
 
     [Fact]

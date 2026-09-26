@@ -14,23 +14,23 @@ world events and a world that transforms as you progress.
 |---|---|
 | ![Forest by day](docs/screenshots/m4_forest_day.png) | ![Night with a torch](docs/screenshots/m4_night_torch.png) |
 
-| Procedural townsfolk (the Mender and the Peddler) | A bone walker up close | Lava crust over glowing cracks |
+| Procedural townsfolk (the Nurse and the Merchant) | A bone walker up close | Lava crust over glowing cracks |
 |---|---|---|
 | ![Townsfolk](docs/screenshots/m4_townsfolk.png) | ![Skeleton](docs/screenshots/m4_skeleton.png) | ![Lava](docs/screenshots/m4_lava.png) |
 
-| The horizon: the world continues past the streamed chunks | Hardmode: a prism steed, glimmer sprites and a dread wraith in the radiant land | The Twin Lenses at nightfall |
+| The horizon: the world continues past the streamed chunks | Hardmode: a prism steed, glimmer sprites and a dread wraith in the radiant land | The Twins at nightfall |
 |---|---|---|
-| ![Horizon](docs/screenshots/m4_horizon.png) | ![Radiant life](docs/screenshots/m4_radiant_life.png) | ![Twin Lenses](docs/screenshots/m4_twin_lenses.png) |
+| ![Horizon](docs/screenshots/m4_horizon.png) | ![Radiant life](docs/screenshots/m4_radiant_life.png) | ![Twins](docs/screenshots/m4_twin_lenses.png) |
 
 | Town residents | Caverns | Underworld |
 |---|---|---|
 | ![Town](docs/screenshots/m2_town.png) | ![Cavern](docs/screenshots/m2_cavern.png) | ![Underworld](docs/screenshots/m2_underworld.png) |
 
-| The Crypt Warden, called out by the keeper at the crypt gate | The Mawwall sweeping the underworld |
+| The Skeletron, called out by the keeper at the Dungeon gate | The Wall of Flesh sweeping the underworld |
 |---|---|
-| ![Crypt Warden](docs/screenshots/m3_crypt_warden.png) | ![Mawwall](docs/screenshots/m3_mawwall.png) |
+| ![Skeletron](docs/screenshots/m3_crypt_warden.png) | ![Wall of Flesh](docs/screenshots/m3_mawwall.png) |
 
-| Hardmode: the radiant wedge cuts through the forest | Hardmode: the blighted wedge eats the desert |
+| Hardmode: the Hallow wedge cuts through the forest | Hardmode: the evil wedge eats the desert |
 |---|---|
 | ![Radiant wedge](docs/screenshots/m3_radiant.png) | ![Blighted wedge](docs/screenshots/m3_blight.png) |
 

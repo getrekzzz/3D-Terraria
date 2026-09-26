@@ -109,8 +109,15 @@ public sealed class ContentDatabase
     /// Returns a stand-in block for an id found in a save but missing from content, preserving the
     /// original id string so re-saving never loses data.
     /// </summary>
+    /// <summary>Old content ids and their new names (data/config/aliases.json): saves from before a rename resolve through it.</summary>
+    public Dictionary<string, string> Aliases { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>The current id for an id read from a save (renamed ids follow their alias).</summary>
+    public string Current(string id) => Aliases.TryGetValue(id, out var renamed) ? renamed : id;
+
     public BlockDef GetOrAddPlaceholderBlock(string id)
     {
+        id = Current(id);
         if (Blocks.TryGet(id, out var existing)) return existing;
         lock (Blocks)
         {
@@ -133,17 +140,17 @@ public sealed class ContentDatabase
     }
 
     public ItemDef GetOrAddPlaceholderItem(string id) =>
-        Items.TryGet(id, out var existing)
+        Items.TryGet(id = Current(id), out var existing)
             ? existing
             : Items.AddLate(new ItemDef { Id = id, Name = $"Missing item ({id})", MaxStack = 9999, Tags = new[] { "placeholder" } });
 
     public TileObjectDef GetOrAddPlaceholderTileObject(string id) =>
-        TileObjects.TryGet(id, out var existing)
+        TileObjects.TryGet(id = Current(id), out var existing)
             ? existing
             : TileObjects.AddLate(new TileObjectDef { Id = id, Name = $"Missing object ({id})", Natural = true, AutoItem = false, Tags = new[] { "placeholder" } });
 
     public PrefixDef GetOrAddPlaceholderPrefix(string id) =>
-        Prefixes.TryGet(id, out var existing)
+        Prefixes.TryGet(id = Current(id), out var existing)
             ? existing
             : Prefixes.AddLate(new PrefixDef { Id = id, Name = id, Applies = new[] { "universal" }, Tags = new[] { "placeholder" } });
 

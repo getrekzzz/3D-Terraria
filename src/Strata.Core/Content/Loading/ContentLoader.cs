@@ -59,10 +59,28 @@ public static class ContentLoader
         }
 
         foreach (var file in files) LoadFile(db, source, DataRoot + file);
+        LoadAliases(db, source);
         DerivedContent.Apply(db);
         db.Finish();
         ContentValidator.Validate(db, validation ?? new ContentValidationOptions());
         return db;
+    }
+
+    private const string AliasPath = "data/config/aliases.json";
+
+    /// <summary>Renamed ids (old → new) for loading older saves; optional.</summary>
+    private static void LoadAliases(ContentDatabase db, IDataSource source)
+    {
+        if (!source.Exists(AliasPath)) return;
+        try
+        {
+            using var doc = JsonDocument.Parse(source.ReadText(AliasPath));
+            foreach (var p in doc.RootElement.GetProperty("aliases").EnumerateObject()) db.Aliases[p.Name] = p.Value.GetString()!;
+        }
+        catch (Exception ex) when (ex is JsonException or IOException or KeyNotFoundException or InvalidOperationException)
+        {
+            db.Report.Error(AliasPath, "aliases", ex.Message);
+        }
     }
 
     /// <summary>Loads a single JSON text into a database (used by tests).</summary>

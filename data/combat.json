@@ -1,23 +1,23 @@
 {
   "projectiles": [
     { "id": "wooden_arrow", "name": "Wooden Arrow", "visual": "arrow", "color": "#b08a5a", "gravity": 14, "lifetime": 600, "radius": 0.3, "pierce": 1, "covers": ["terraria:wooden_arrow"] },
-    { "id": "ember_spark", "name": "Ember Spark", "visual": "spark", "color": "#ff8a2a", "gravity": 6, "lifetime": 90, "radius": 0.3, "bounces": 2, "light": [9, 4, 1], "trail": "#ffb060", "onHit": [{ "type": "applyBuff", "buff": "on_fire", "ticks": 180, "chance": 0.33 }], "covers": ["terraria:spark"] },
+    { "id": "spark", "name": "Spark", "visual": "spark", "color": "#ff8a2a", "gravity": 6, "lifetime": 90, "radius": 0.3, "bounces": 2, "light": [9, 4, 1], "trail": "#ffb060", "onHit": [{ "type": "applyBuff", "buff": "on_fire", "ticks": 180, "chance": 0.33 }], "covers": ["terraria:spark"] },
     { "id": "amethyst_bolt", "name": "Amethyst Bolt", "visual": "bolt", "color": "#b06aff", "lifetime": 120, "radius": 0.35, "light": [6, 2, 9], "trail": "#c890ff", "covers": ["terraria:amethyst_bolt"] },
     { "id": "topaz_bolt", "name": "Topaz Bolt", "visual": "bolt", "color": "#ffc040", "lifetime": 120, "radius": 0.35, "light": [9, 6, 1], "trail": "#ffd880", "covers": ["terraria:topaz_bolt"] },
-    { "id": "glimmer_beam", "name": "Glimmer Beam", "visual": "bolt", "color": "#8fd0ff", "lifetime": 45, "radius": 0.5, "pierce": 2, "collideTerrain": true, "light": [4, 8, 14], "trail": "#b8e4ff", "covers": ["terraria:enchanted_beam"] }
+    { "id": "enchanted_beam", "name": "Enchanted Beam", "visual": "bolt", "color": "#8fd0ff", "lifetime": 45, "radius": 0.5, "pierce": 2, "collideTerrain": true, "light": [4, 8, 14], "trail": "#b8e4ff", "covers": ["terraria:enchanted_beam"] }
   ],
   "buffs": [
-    { "id": "on_fire", "name": "Burning", "debuff": true, "color": "#ff7a20", "tags": ["fire"], "effects": [{ "type": "damageOverTime", "perSecond": 4 }, { "type": "emitLight", "color": [8, 4, 1] }], "covers": ["terraria:on_fire"] },
+    { "id": "on_fire", "name": "On Fire!", "debuff": true, "color": "#ff7a20", "tags": ["fire"], "effects": [{ "type": "damageOverTime", "perSecond": 4 }, { "type": "emitLight", "color": [8, 4, 1] }], "covers": ["terraria:on_fire"] },
     { "id": "poisoned", "name": "Poisoned", "debuff": true, "color": "#7ac040", "effects": [{ "type": "damageOverTime", "perSecond": 2 }], "covers": ["terraria:poisoned"] },
     { "id": "bleeding", "name": "Bleeding", "debuff": true, "color": "#c02020", "effects": [{ "type": "stat", "stat": "lifeRegen", "mul": 0 }], "covers": ["terraria:bleeding"] },
     { "id": "chilled", "name": "Chilled", "debuff": true, "color": "#9ad0ff", "effects": [{ "type": "stat", "stat": "moveSpeed", "add": -0.5 }], "covers": ["terraria:chilled"] },
     { "id": "regeneration", "name": "Regeneration", "color": "#ff6080", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 4 }], "covers": ["terraria:regeneration"] },
     { "id": "swiftness", "name": "Swiftness", "color": "#60e0a0", "effects": [{ "type": "stat", "stat": "moveSpeed", "add": 0.25 }], "covers": ["terraria:swiftness"] },
-    { "id": "ironbark", "name": "Ironbark", "color": "#a0a0a0", "effects": [{ "type": "stat", "stat": "defense", "add": 8 }], "covers": ["terraria:ironskin"] },
-    { "id": "shine", "name": "Radiance", "color": "#fff0a0", "effects": [{ "type": "emitLight", "color": [12, 12, 10] }], "covers": ["terraria:shine"] },
-    { "id": "cozy_fire", "name": "Hearthwarmth", "color": "#ffb070", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 1 }], "covers": ["terraria:cozy_fire"] },
-    { "id": "remedy_fatigue", "name": "Remedy Fatigue", "description": "Cannot drink another restorative yet.", "debuff": true, "duration": 3600, "color": "#c08080", "tags": ["healing_cooldown"], "covers": ["terraria:potion_sickness"] },
-    { "id": "mana_strain", "name": "Mana Strain", "description": "Magic damage reduced.", "debuff": true, "duration": 300, "color": "#8080c0", "tags": ["mana_cooldown"], "effects": [{ "type": "stat", "stat": "magicDamage", "mul": 0.75 }], "covers": ["terraria:mana_sickness"] }
+    { "id": "ironskin", "name": "Ironskin", "color": "#a0a0a0", "effects": [{ "type": "stat", "stat": "defense", "add": 8 }], "covers": ["terraria:ironskin"] },
+    { "id": "shine", "name": "Shine", "color": "#fff0a0", "effects": [{ "type": "emitLight", "color": [12, 12, 10] }], "covers": ["terraria:shine"] },
+    { "id": "cozy_fire", "name": "Cozy Fire", "color": "#ffb070", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 1 }], "covers": ["terraria:cozy_fire"] },
+    { "id": "potion_sickness", "name": "Potion Sickness", "description": "Cannot drink another restorative yet.", "debuff": true, "duration": 3600, "color": "#c08080", "tags": ["healing_cooldown"], "covers": ["terraria:potion_sickness"] },
+    { "id": "mana_sickness", "name": "Mana Sickness", "description": "Magic damage reduced.", "debuff": true, "duration": 300, "color": "#8080c0", "tags": ["mana_cooldown"], "effects": [{ "type": "stat", "stat": "magicDamage", "mul": 0.75 }], "covers": ["terraria:mana_sickness"] }
   ],
   "prefixes": [
     { "id": "keen", "name": "Keen", "applies": ["universal"], "crit": 3 },

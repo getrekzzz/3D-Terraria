@@ -1362,8 +1362,8 @@
       ]
     },
     {
-      "id": "umbrite_bar",
-      "name": "Umbrite Bar",
+      "id": "demonite_bar",
+      "name": "Demonite Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 900,
@@ -1373,8 +1373,8 @@
       ]
     },
     {
-      "id": "umbrite_pickaxe",
-      "name": "Umbrite Pickaxe",
+      "id": "demonite_pickaxe",
+      "name": "Nightmare Pickaxe",
       "category": "tool",
       "rarity": 1,
       "value": 7200,
@@ -1392,8 +1392,8 @@
       "mineBrush": 2
     },
     {
-      "id": "umbrite_axe",
-      "name": "Umbrite Axe",
+      "id": "demonite_axe",
+      "name": "War Axe of the Night",
       "category": "tool",
       "rarity": 1,
       "value": 5400,
@@ -1408,8 +1408,8 @@
       "covers": []
     },
     {
-      "id": "umbrite_hammer",
-      "name": "Umbrite Hammer",
+      "id": "demonite_hammer",
+      "name": "The Breaker",
       "category": "tool",
       "rarity": 1,
       "value": 6000,
@@ -1424,8 +1424,8 @@
       "covers": []
     },
     {
-      "id": "umbrite_broadsword",
-      "name": "Umbrite Broadsword",
+      "id": "demonite_broadsword",
+      "name": "Light's Bane",
       "category": "weapon",
       "rarity": 1,
       "value": 4800,
@@ -1446,8 +1446,8 @@
       ]
     },
     {
-      "id": "umbrite_shortsword",
-      "name": "Umbrite Shortsword",
+      "id": "demonite_shortsword",
+      "name": "Demonite Shortsword",
       "category": "weapon",
       "rarity": 1,
       "value": 3600,
@@ -1467,8 +1467,8 @@
       ]
     },
     {
-      "id": "umbrite_bow",
-      "name": "Umbrite Bow",
+      "id": "demonite_bow",
+      "name": "Demon Bow",
       "category": "weapon",
       "rarity": 1,
       "value": 3600,
@@ -1483,41 +1483,41 @@
       "covers": []
     },
     {
-      "id": "umbrite_helmet",
-      "name": "Umbrite Helmet",
+      "id": "demonite_helmet",
+      "name": "Shadow Helmet",
       "category": "armor",
       "rarity": 1,
       "value": 9000,
       "equipSlot": "head",
       "defense": 6,
-      "armorSet": "umbrite_armor",
+      "armorSet": "demonite_armor",
       "covers": []
     },
     {
-      "id": "umbrite_chainmail",
-      "name": "Umbrite Chainmail",
+      "id": "demonite_chainmail",
+      "name": "Shadow Scalemail",
       "category": "armor",
       "rarity": 1,
       "value": 15000,
       "equipSlot": "body",
       "defense": 7,
-      "armorSet": "umbrite_armor",
+      "armorSet": "demonite_armor",
       "covers": []
     },
     {
-      "id": "umbrite_greaves",
-      "name": "Umbrite Greaves",
+      "id": "demonite_greaves",
+      "name": "Shadow Greaves",
       "category": "armor",
       "rarity": 1,
       "value": 12000,
       "equipSlot": "legs",
       "defense": 6,
-      "armorSet": "umbrite_armor",
+      "armorSet": "demonite_armor",
       "covers": []
     },
     {
-      "id": "sanguite_bar",
-      "name": "Sanguite Bar",
+      "id": "crimtane_bar",
+      "name": "Crimtane Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 900,
@@ -1527,8 +1527,8 @@
       ]
     },
     {
-      "id": "sanguite_pickaxe",
-      "name": "Sanguite Pickaxe",
+      "id": "crimtane_pickaxe",
+      "name": "Deathbringer Pickaxe",
       "category": "tool",
       "rarity": 1,
       "value": 7200,
@@ -1546,8 +1546,8 @@
       "mineBrush": 2
     },
     {
-      "id": "sanguite_axe",
-      "name": "Sanguite Axe",
+      "id": "crimtane_axe",
+      "name": "Blood Lust Cluster",
       "category": "tool",
       "rarity": 1,
       "value": 5400,
@@ -1562,8 +1562,8 @@
       "covers": []
     },
     {
-      "id": "sanguite_hammer",
-      "name": "Sanguite Hammer",
+      "id": "crimtane_hammer",
+      "name": "Flesh Grinder",
       "category": "tool",
       "rarity": 1,
       "value": 6000,
@@ -1578,8 +1578,8 @@
       "covers": []
     },
     {
-      "id": "sanguite_broadsword",
-      "name": "Sanguite Broadsword",
+      "id": "crimtane_broadsword",
+      "name": "Blood Butcherer",
       "category": "weapon",
       "rarity": 1,
       "value": 4800,
@@ -1600,8 +1600,8 @@
       ]
     },
     {
-      "id": "sanguite_shortsword",
-      "name": "Sanguite Shortsword",
+      "id": "crimtane_shortsword",
+      "name": "Crimtane Shortsword",
       "category": "weapon",
       "rarity": 1,
       "value": 3600,
@@ -1621,8 +1621,8 @@
       ]
     },
     {
-      "id": "sanguite_bow",
-      "name": "Sanguite Bow",
+      "id": "crimtane_bow",
+      "name": "Tendon Bow",
       "category": "weapon",
       "rarity": 1,
       "value": 3600,
@@ -1637,41 +1637,41 @@
       "covers": []
     },
     {
-      "id": "sanguite_helmet",
-      "name": "Sanguite Helmet",
+      "id": "crimtane_helmet",
+      "name": "Crimson Helmet",
       "category": "armor",
       "rarity": 1,
       "value": 9000,
       "equipSlot": "head",
       "defense": 6,
-      "armorSet": "sanguite_armor",
+      "armorSet": "crimtane_armor",
       "covers": []
     },
     {
-      "id": "sanguite_chainmail",
-      "name": "Sanguite Chainmail",
+      "id": "crimtane_chainmail",
+      "name": "Crimson Scalemail",
       "category": "armor",
       "rarity": 1,
       "value": 15000,
       "equipSlot": "body",
       "defense": 7,
-      "armorSet": "sanguite_armor",
+      "armorSet": "crimtane_armor",
       "covers": []
     },
     {
-      "id": "sanguite_greaves",
-      "name": "Sanguite Greaves",
+      "id": "crimtane_greaves",
+      "name": "Crimson Greaves",
       "category": "armor",
       "rarity": 1,
       "value": 12000,
       "equipSlot": "legs",
       "defense": 6,
-      "armorSet": "sanguite_armor",
+      "armorSet": "crimtane_armor",
       "covers": []
     },
     {
-      "id": "cinder_bar",
-      "name": "Cinder Bar",
+      "id": "hellstone_bar",
+      "name": "Hellstone Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 1500,
@@ -1681,8 +1681,8 @@
       ]
     },
     {
-      "id": "cinder_pickaxe",
-      "name": "Cinder Pickaxe",
+      "id": "hellstone_pickaxe",
+      "name": "Molten Pickaxe",
       "category": "tool",
       "rarity": 3,
       "value": 12000,
@@ -1700,8 +1700,8 @@
       "mineBrush": 2
     },
     {
-      "id": "cinder_axe",
-      "name": "Cinder Axe",
+      "id": "hellstone_axe",
+      "name": "Molten Hamaxe",
       "category": "tool",
       "rarity": 3,
       "value": 9000,
@@ -1716,8 +1716,8 @@
       "covers": []
     },
     {
-      "id": "cinder_hammer",
-      "name": "Cinder Hammer",
+      "id": "hellstone_hammer",
+      "name": "Molten Hammer",
       "category": "tool",
       "rarity": 3,
       "value": 10000,
@@ -1732,8 +1732,8 @@
       "covers": []
     },
     {
-      "id": "cinder_broadsword",
-      "name": "Cinder Broadsword",
+      "id": "hellstone_broadsword",
+      "name": "Fiery Greatsword",
       "category": "weapon",
       "rarity": 3,
       "value": 8000,
@@ -1754,8 +1754,8 @@
       ]
     },
     {
-      "id": "cinder_shortsword",
-      "name": "Cinder Shortsword",
+      "id": "hellstone_shortsword",
+      "name": "Molten Shortsword",
       "category": "weapon",
       "rarity": 3,
       "value": 6000,
@@ -1775,8 +1775,8 @@
       ]
     },
     {
-      "id": "cinder_bow",
-      "name": "Cinder Bow",
+      "id": "hellstone_bow",
+      "name": "Molten Fury",
       "category": "weapon",
       "rarity": 3,
       "value": 6000,
@@ -1791,41 +1791,41 @@
       "covers": []
     },
     {
-      "id": "cinder_helmet",
-      "name": "Cinder Helmet",
+      "id": "hellstone_helmet",
+      "name": "Molten Helmet",
       "category": "armor",
       "rarity": 3,
       "value": 15000,
       "equipSlot": "head",
       "defense": 8,
-      "armorSet": "cinder_armor",
+      "armorSet": "hellstone_armor",
       "covers": []
     },
     {
-      "id": "cinder_chainmail",
-      "name": "Cinder Chainmail",
+      "id": "hellstone_chainmail",
+      "name": "Molten Breastplate",
       "category": "armor",
       "rarity": 3,
       "value": 25000,
       "equipSlot": "body",
       "defense": 9,
-      "armorSet": "cinder_armor",
+      "armorSet": "hellstone_armor",
       "covers": []
     },
     {
-      "id": "cinder_greaves",
-      "name": "Cinder Greaves",
+      "id": "hellstone_greaves",
+      "name": "Molten Greaves",
       "category": "armor",
       "rarity": 3,
       "value": 20000,
       "equipSlot": "legs",
       "defense": 8,
-      "armorSet": "cinder_armor",
+      "armorSet": "hellstone_armor",
       "covers": []
     },
     {
-      "id": "cerulite_bar",
-      "name": "Cerulite Bar",
+      "id": "cobalt_bar",
+      "name": "Cobalt Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 2250,
@@ -1835,8 +1835,8 @@
       ]
     },
     {
-      "id": "cerulite_pickaxe",
-      "name": "Cerulite Pickaxe",
+      "id": "cobalt_pickaxe",
+      "name": "Cobalt Pickaxe",
       "category": "tool",
       "rarity": 4,
       "value": 18000,
@@ -1854,8 +1854,8 @@
       "mineBrush": 2
     },
     {
-      "id": "cerulite_axe",
-      "name": "Cerulite Axe",
+      "id": "cobalt_axe",
+      "name": "Cobalt Waraxe",
       "category": "tool",
       "rarity": 4,
       "value": 13500,
@@ -1872,8 +1872,8 @@
       ]
     },
     {
-      "id": "cerulite_hammer",
-      "name": "Cerulite Hammer",
+      "id": "cobalt_hammer",
+      "name": "Cobalt Hammer",
       "category": "tool",
       "rarity": 4,
       "value": 15000,
@@ -1888,8 +1888,8 @@
       "covers": []
     },
     {
-      "id": "cerulite_broadsword",
-      "name": "Cerulite Broadsword",
+      "id": "cobalt_broadsword",
+      "name": "Cobalt Sword",
       "category": "weapon",
       "rarity": 4,
       "value": 12000,
@@ -1912,8 +1912,8 @@
       ]
     },
     {
-      "id": "cerulite_shortsword",
-      "name": "Cerulite Shortsword",
+      "id": "cobalt_shortsword",
+      "name": "Cobalt Shortsword",
       "category": "weapon",
       "rarity": 4,
       "value": 9000,
@@ -1933,8 +1933,8 @@
       ]
     },
     {
-      "id": "cerulite_bow",
-      "name": "Cerulite Bow",
+      "id": "cobalt_bow",
+      "name": "Cobalt Repeater",
       "category": "weapon",
       "rarity": 4,
       "value": 9000,
@@ -1951,45 +1951,45 @@
       ]
     },
     {
-      "id": "cerulite_helmet",
-      "name": "Cerulite Helmet",
+      "id": "cobalt_helmet",
+      "name": "Cobalt Helmet",
       "category": "armor",
       "rarity": 4,
       "value": 22500,
       "equipSlot": "head",
       "defense": 10,
-      "armorSet": "cerulite_armor",
+      "armorSet": "cobalt_armor",
       "covers": []
     },
     {
-      "id": "cerulite_chainmail",
-      "name": "Cerulite Chainmail",
+      "id": "cobalt_chainmail",
+      "name": "Cobalt Breastplate",
       "category": "armor",
       "rarity": 4,
       "value": 37500,
       "equipSlot": "body",
       "defense": 11,
-      "armorSet": "cerulite_armor",
+      "armorSet": "cobalt_armor",
       "covers": [
         "terraria:cobalt_breastplate"
       ]
     },
     {
-      "id": "cerulite_greaves",
-      "name": "Cerulite Greaves",
+      "id": "cobalt_greaves",
+      "name": "Cobalt Leggings",
       "category": "armor",
       "rarity": 4,
       "value": 30000,
       "equipSlot": "legs",
       "defense": 10,
-      "armorSet": "cerulite_armor",
+      "armorSet": "cobalt_armor",
       "covers": [
         "terraria:cobalt_leggings"
       ]
     },
     {
-      "id": "rosalite_bar",
-      "name": "Rosalite Bar",
+      "id": "palladium_bar",
+      "name": "Palladium Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 2550,
@@ -1999,8 +1999,8 @@
       ]
     },
     {
-      "id": "rosalite_pickaxe",
-      "name": "Rosalite Pickaxe",
+      "id": "palladium_pickaxe",
+      "name": "Palladium Pickaxe",
       "category": "tool",
       "rarity": 4,
       "value": 20400,
@@ -2018,8 +2018,8 @@
       "mineBrush": 2
     },
     {
-      "id": "rosalite_axe",
-      "name": "Rosalite Axe",
+      "id": "palladium_axe",
+      "name": "Palladium Waraxe",
       "category": "tool",
       "rarity": 4,
       "value": 15300,
@@ -2036,8 +2036,8 @@
       ]
     },
     {
-      "id": "rosalite_hammer",
-      "name": "Rosalite Hammer",
+      "id": "palladium_hammer",
+      "name": "Palladium Hammer",
       "category": "tool",
       "rarity": 4,
       "value": 17000,
@@ -2052,8 +2052,8 @@
       "covers": []
     },
     {
-      "id": "rosalite_broadsword",
-      "name": "Rosalite Broadsword",
+      "id": "palladium_broadsword",
+      "name": "Palladium Sword",
       "category": "weapon",
       "rarity": 4,
       "value": 13600,
@@ -2076,8 +2076,8 @@
       ]
     },
     {
-      "id": "rosalite_shortsword",
-      "name": "Rosalite Shortsword",
+      "id": "palladium_shortsword",
+      "name": "Palladium Shortsword",
       "category": "weapon",
       "rarity": 4,
       "value": 10200,
@@ -2097,8 +2097,8 @@
       ]
     },
     {
-      "id": "rosalite_bow",
-      "name": "Rosalite Bow",
+      "id": "palladium_bow",
+      "name": "Palladium Repeater",
       "category": "weapon",
       "rarity": 4,
       "value": 10200,
@@ -2115,45 +2115,45 @@
       ]
     },
     {
-      "id": "rosalite_helmet",
-      "name": "Rosalite Helmet",
+      "id": "palladium_helmet",
+      "name": "Palladium Helmet",
       "category": "armor",
       "rarity": 4,
       "value": 25500,
       "equipSlot": "head",
       "defense": 11,
-      "armorSet": "rosalite_armor",
+      "armorSet": "palladium_armor",
       "covers": []
     },
     {
-      "id": "rosalite_chainmail",
-      "name": "Rosalite Chainmail",
+      "id": "palladium_chainmail",
+      "name": "Palladium Breastplate",
       "category": "armor",
       "rarity": 4,
       "value": 42500,
       "equipSlot": "body",
       "defense": 12,
-      "armorSet": "rosalite_armor",
+      "armorSet": "palladium_armor",
       "covers": [
         "terraria:palladium_breastplate"
       ]
     },
     {
-      "id": "rosalite_greaves",
-      "name": "Rosalite Greaves",
+      "id": "palladium_greaves",
+      "name": "Palladium Leggings",
       "category": "armor",
       "rarity": 4,
       "value": 34000,
       "equipSlot": "legs",
       "defense": 11,
-      "armorSet": "rosalite_armor",
+      "armorSet": "palladium_armor",
       "covers": [
         "terraria:palladium_leggings"
       ]
     },
     {
-      "id": "verdite_bar",
-      "name": "Verdite Bar",
+      "id": "mythril_bar",
+      "name": "Mythril Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 3375,
@@ -2163,8 +2163,8 @@
       ]
     },
     {
-      "id": "verdite_pickaxe",
-      "name": "Verdite Pickaxe",
+      "id": "mythril_pickaxe",
+      "name": "Mythril Pickaxe",
       "category": "tool",
       "rarity": 4,
       "value": 27000,
@@ -2182,8 +2182,8 @@
       "mineBrush": 2
     },
     {
-      "id": "verdite_axe",
-      "name": "Verdite Axe",
+      "id": "mythril_axe",
+      "name": "Mythril Waraxe",
       "category": "tool",
       "rarity": 4,
       "value": 20250,
@@ -2200,8 +2200,8 @@
       ]
     },
     {
-      "id": "verdite_hammer",
-      "name": "Verdite Hammer",
+      "id": "mythril_hammer",
+      "name": "Mythril Hammer",
       "category": "tool",
       "rarity": 4,
       "value": 22500,
@@ -2216,8 +2216,8 @@
       "covers": []
     },
     {
-      "id": "verdite_broadsword",
-      "name": "Verdite Broadsword",
+      "id": "mythril_broadsword",
+      "name": "Mythril Sword",
       "category": "weapon",
       "rarity": 4,
       "value": 18000,
@@ -2240,8 +2240,8 @@
       ]
     },
     {
-      "id": "verdite_shortsword",
-      "name": "Verdite Shortsword",
+      "id": "mythril_shortsword",
+      "name": "Mythril Shortsword",
       "category": "weapon",
       "rarity": 4,
       "value": 13500,
@@ -2261,8 +2261,8 @@
       ]
     },
     {
-      "id": "verdite_bow",
-      "name": "Verdite Bow",
+      "id": "mythril_bow",
+      "name": "Mythril Repeater",
       "category": "weapon",
       "rarity": 4,
       "value": 13500,
@@ -2279,45 +2279,45 @@
       ]
     },
     {
-      "id": "verdite_helmet",
-      "name": "Verdite Helmet",
+      "id": "mythril_helmet",
+      "name": "Mythril Helmet",
       "category": "armor",
       "rarity": 4,
       "value": 33750,
       "equipSlot": "head",
       "defense": 13,
-      "armorSet": "verdite_armor",
+      "armorSet": "mythril_armor",
       "covers": []
     },
     {
-      "id": "verdite_chainmail",
-      "name": "Verdite Chainmail",
+      "id": "mythril_chainmail",
+      "name": "Mythril Chainmail",
       "category": "armor",
       "rarity": 4,
       "value": 56250,
       "equipSlot": "body",
       "defense": 14,
-      "armorSet": "verdite_armor",
+      "armorSet": "mythril_armor",
       "covers": [
         "terraria:mythril_breastplate"
       ]
     },
     {
-      "id": "verdite_greaves",
-      "name": "Verdite Greaves",
+      "id": "mythril_greaves",
+      "name": "Mythril Greaves",
       "category": "armor",
       "rarity": 4,
       "value": 45000,
       "equipSlot": "legs",
       "defense": 12,
-      "armorSet": "verdite_armor",
+      "armorSet": "mythril_armor",
       "covers": [
         "terraria:mythril_leggings"
       ]
     },
     {
-      "id": "orchidite_bar",
-      "name": "Orchidite Bar",
+      "id": "orichalcum_bar",
+      "name": "Orichalcum Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 3750,
@@ -2327,8 +2327,8 @@
       ]
     },
     {
-      "id": "orchidite_pickaxe",
-      "name": "Orchidite Pickaxe",
+      "id": "orichalcum_pickaxe",
+      "name": "Orichalcum Pickaxe",
       "category": "tool",
       "rarity": 4,
       "value": 30000,
@@ -2346,8 +2346,8 @@
       "mineBrush": 2
     },
     {
-      "id": "orchidite_axe",
-      "name": "Orchidite Axe",
+      "id": "orichalcum_axe",
+      "name": "Orichalcum Waraxe",
       "category": "tool",
       "rarity": 4,
       "value": 22500,
@@ -2364,8 +2364,8 @@
       ]
     },
     {
-      "id": "orchidite_hammer",
-      "name": "Orchidite Hammer",
+      "id": "orichalcum_hammer",
+      "name": "Orichalcum Hammer",
       "category": "tool",
       "rarity": 4,
       "value": 25000,
@@ -2380,8 +2380,8 @@
       "covers": []
     },
     {
-      "id": "orchidite_broadsword",
-      "name": "Orchidite Broadsword",
+      "id": "orichalcum_broadsword",
+      "name": "Orichalcum Sword",
       "category": "weapon",
       "rarity": 4,
       "value": 20000,
@@ -2404,8 +2404,8 @@
       ]
     },
     {
-      "id": "orchidite_shortsword",
-      "name": "Orchidite Shortsword",
+      "id": "orichalcum_shortsword",
+      "name": "Orichalcum Shortsword",
       "category": "weapon",
       "rarity": 4,
       "value": 15000,
@@ -2425,8 +2425,8 @@
       ]
     },
     {
-      "id": "orchidite_bow",
-      "name": "Orchidite Bow",
+      "id": "orichalcum_bow",
+      "name": "Orichalcum Repeater",
       "category": "weapon",
       "rarity": 4,
       "value": 15000,
@@ -2443,45 +2443,45 @@
       ]
     },
     {
-      "id": "orchidite_helmet",
-      "name": "Orchidite Helmet",
+      "id": "orichalcum_helmet",
+      "name": "Orichalcum Helmet",
       "category": "armor",
       "rarity": 4,
       "value": 37500,
       "equipSlot": "head",
       "defense": 14,
-      "armorSet": "orchidite_armor",
+      "armorSet": "orichalcum_armor",
       "covers": []
     },
     {
-      "id": "orchidite_chainmail",
-      "name": "Orchidite Chainmail",
+      "id": "orichalcum_chainmail",
+      "name": "Orichalcum Breastplate",
       "category": "armor",
       "rarity": 4,
       "value": 62500,
       "equipSlot": "body",
       "defense": 15,
-      "armorSet": "orchidite_armor",
+      "armorSet": "orichalcum_armor",
       "covers": [
         "terraria:orichalcum_breastplate"
       ]
     },
     {
-      "id": "orchidite_greaves",
-      "name": "Orchidite Greaves",
+      "id": "orichalcum_greaves",
+      "name": "Orichalcum Leggings",
       "category": "armor",
       "rarity": 4,
       "value": 50000,
       "equipSlot": "legs",
       "defense": 13,
-      "armorSet": "orchidite_armor",
+      "armorSet": "orichalcum_armor",
       "covers": [
         "terraria:orichalcum_leggings"
       ]
     },
     {
-      "id": "crimsite_bar",
-      "name": "Crimsite Bar",
+      "id": "adamantite_bar",
+      "name": "Adamantite Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 5250,
@@ -2491,8 +2491,8 @@
       ]
     },
     {
-      "id": "crimsite_pickaxe",
-      "name": "Crimsite Pickaxe",
+      "id": "adamantite_pickaxe",
+      "name": "Adamantite Pickaxe",
       "category": "tool",
       "rarity": 5,
       "value": 42000,
@@ -2510,8 +2510,8 @@
       "mineBrush": 2
     },
     {
-      "id": "crimsite_axe",
-      "name": "Crimsite Axe",
+      "id": "adamantite_axe",
+      "name": "Adamantite Waraxe",
       "category": "tool",
       "rarity": 5,
       "value": 31500,
@@ -2528,8 +2528,8 @@
       ]
     },
     {
-      "id": "crimsite_hammer",
-      "name": "Crimsite Hammer",
+      "id": "adamantite_hammer",
+      "name": "Adamantite Hammer",
       "category": "tool",
       "rarity": 5,
       "value": 35000,
@@ -2544,8 +2544,8 @@
       "covers": []
     },
     {
-      "id": "crimsite_broadsword",
-      "name": "Crimsite Broadsword",
+      "id": "adamantite_broadsword",
+      "name": "Adamantite Sword",
       "category": "weapon",
       "rarity": 5,
       "value": 28000,
@@ -2568,8 +2568,8 @@
       ]
     },
     {
-      "id": "crimsite_shortsword",
-      "name": "Crimsite Shortsword",
+      "id": "adamantite_shortsword",
+      "name": "Adamantite Shortsword",
       "category": "weapon",
       "rarity": 5,
       "value": 21000,
@@ -2589,8 +2589,8 @@
       ]
     },
     {
-      "id": "crimsite_bow",
-      "name": "Crimsite Bow",
+      "id": "adamantite_bow",
+      "name": "Adamantite Repeater",
       "category": "weapon",
       "rarity": 5,
       "value": 21000,
@@ -2607,45 +2607,45 @@
       ]
     },
     {
-      "id": "crimsite_helmet",
-      "name": "Crimsite Helmet",
+      "id": "adamantite_helmet",
+      "name": "Adamantite Helmet",
       "category": "armor",
       "rarity": 5,
       "value": 52500,
       "equipSlot": "head",
       "defense": 17,
-      "armorSet": "crimsite_armor",
+      "armorSet": "adamantite_armor",
       "covers": []
     },
     {
-      "id": "crimsite_chainmail",
-      "name": "Crimsite Chainmail",
+      "id": "adamantite_chainmail",
+      "name": "Adamantite Breastplate",
       "category": "armor",
       "rarity": 5,
       "value": 87500,
       "equipSlot": "body",
       "defense": 18,
-      "armorSet": "crimsite_armor",
+      "armorSet": "adamantite_armor",
       "covers": [
         "terraria:adamantite_breastplate"
       ]
     },
     {
-      "id": "crimsite_greaves",
-      "name": "Crimsite Greaves",
+      "id": "adamantite_greaves",
+      "name": "Adamantite Leggings",
       "category": "armor",
       "rarity": 5,
       "value": 70000,
       "equipSlot": "legs",
       "defense": 15,
-      "armorSet": "crimsite_armor",
+      "armorSet": "adamantite_armor",
       "covers": [
         "terraria:adamantite_leggings"
       ]
     },
     {
-      "id": "stellite_bar",
-      "name": "Stellite Bar",
+      "id": "titanium_bar",
+      "name": "Titanium Bar",
       "category": "material",
       "maxStack": 9999,
       "value": 5625,
@@ -2655,8 +2655,8 @@
       ]
     },
     {
-      "id": "stellite_pickaxe",
-      "name": "Stellite Pickaxe",
+      "id": "titanium_pickaxe",
+      "name": "Titanium Pickaxe",
       "category": "tool",
       "rarity": 5,
       "value": 45000,
@@ -2674,8 +2674,8 @@
       "mineBrush": 2
     },
     {
-      "id": "stellite_axe",
-      "name": "Stellite Axe",
+      "id": "titanium_axe",
+      "name": "Titanium Waraxe",
       "category": "tool",
       "rarity": 5,
       "value": 33750,
@@ -2692,8 +2692,8 @@
       ]
     },
     {
-      "id": "stellite_hammer",
-      "name": "Stellite Hammer",
+      "id": "titanium_hammer",
+      "name": "Titanium Hammer",
       "category": "tool",
       "rarity": 5,
       "value": 37500,
@@ -2708,8 +2708,8 @@
       "covers": []
     },
     {
-      "id": "stellite_broadsword",
-      "name": "Stellite Broadsword",
+      "id": "titanium_broadsword",
+      "name": "Titanium Sword",
       "category": "weapon",
       "rarity": 5,
       "value": 30000,
@@ -2732,8 +2732,8 @@
       ]
     },
     {
-      "id": "stellite_shortsword",
-      "name": "Stellite Shortsword",
+      "id": "titanium_shortsword",
+      "name": "Titanium Shortsword",
       "category": "weapon",
       "rarity": 5,
       "value": 22500,
@@ -2753,8 +2753,8 @@
       ]
     },
     {
-      "id": "stellite_bow",
-      "name": "Stellite Bow",
+      "id": "titanium_bow",
+      "name": "Titanium Repeater",
       "category": "weapon",
       "rarity": 5,
       "value": 22500,
@@ -2771,38 +2771,38 @@
       ]
     },
     {
-      "id": "stellite_helmet",
-      "name": "Stellite Helmet",
+      "id": "titanium_helmet",
+      "name": "Titanium Helmet",
       "category": "armor",
       "rarity": 5,
       "value": 56250,
       "equipSlot": "head",
       "defense": 18,
-      "armorSet": "stellite_armor",
+      "armorSet": "titanium_armor",
       "covers": []
     },
     {
-      "id": "stellite_chainmail",
-      "name": "Stellite Chainmail",
+      "id": "titanium_chainmail",
+      "name": "Titanium Breastplate",
       "category": "armor",
       "rarity": 5,
       "value": 93750,
       "equipSlot": "body",
       "defense": 19,
-      "armorSet": "stellite_armor",
+      "armorSet": "titanium_armor",
       "covers": [
         "terraria:titanium_breastplate"
       ]
     },
     {
-      "id": "stellite_greaves",
-      "name": "Stellite Greaves",
+      "id": "titanium_greaves",
+      "name": "Titanium Leggings",
       "category": "armor",
       "rarity": 5,
       "value": 75000,
       "equipSlot": "legs",
       "defense": 16,
-      "armorSet": "stellite_armor",
+      "armorSet": "titanium_armor",
       "covers": [
         "terraria:titanium_leggings"
       ]
@@ -3946,11 +3946,11 @@
       ]
     },
     {
-      "id": "umbrite_bar",
-      "output": "umbrite_bar",
+      "id": "demonite_bar",
+      "output": "demonite_bar",
       "inputs": [
         {
-          "item": "umbrite_ore",
+          "item": "demonite_ore",
           "count": 3
         }
       ],
@@ -3959,11 +3959,11 @@
       ]
     },
     {
-      "id": "umbrite_pickaxe",
-      "output": "umbrite_pickaxe",
+      "id": "demonite_pickaxe",
+      "output": "demonite_pickaxe",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 12
         },
         {
@@ -3976,11 +3976,11 @@
       ]
     },
     {
-      "id": "umbrite_axe",
-      "output": "umbrite_axe",
+      "id": "demonite_axe",
+      "output": "demonite_axe",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 9
         },
         {
@@ -3993,11 +3993,11 @@
       ]
     },
     {
-      "id": "umbrite_hammer",
-      "output": "umbrite_hammer",
+      "id": "demonite_hammer",
+      "output": "demonite_hammer",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 10
         },
         {
@@ -4010,11 +4010,11 @@
       ]
     },
     {
-      "id": "umbrite_broadsword",
-      "output": "umbrite_broadsword",
+      "id": "demonite_broadsword",
+      "output": "demonite_broadsword",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 8
         }
       ],
@@ -4023,11 +4023,11 @@
       ]
     },
     {
-      "id": "umbrite_shortsword",
-      "output": "umbrite_shortsword",
+      "id": "demonite_shortsword",
+      "output": "demonite_shortsword",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 7
         }
       ],
@@ -4036,11 +4036,11 @@
       ]
     },
     {
-      "id": "umbrite_bow",
-      "output": "umbrite_bow",
+      "id": "demonite_bow",
+      "output": "demonite_bow",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 7
         }
       ],
@@ -4049,11 +4049,11 @@
       ]
     },
     {
-      "id": "umbrite_helmet",
-      "output": "umbrite_helmet",
+      "id": "demonite_helmet",
+      "output": "demonite_helmet",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 15
         }
       ],
@@ -4062,11 +4062,11 @@
       ]
     },
     {
-      "id": "umbrite_chainmail",
-      "output": "umbrite_chainmail",
+      "id": "demonite_chainmail",
+      "output": "demonite_chainmail",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 25
         }
       ],
@@ -4075,11 +4075,11 @@
       ]
     },
     {
-      "id": "umbrite_greaves",
-      "output": "umbrite_greaves",
+      "id": "demonite_greaves",
+      "output": "demonite_greaves",
       "inputs": [
         {
-          "item": "umbrite_bar",
+          "item": "demonite_bar",
           "count": 20
         }
       ],
@@ -4088,11 +4088,11 @@
       ]
     },
     {
-      "id": "sanguite_bar",
-      "output": "sanguite_bar",
+      "id": "crimtane_bar",
+      "output": "crimtane_bar",
       "inputs": [
         {
-          "item": "sanguite_ore",
+          "item": "crimtane_ore",
           "count": 3
         }
       ],
@@ -4101,11 +4101,11 @@
       ]
     },
     {
-      "id": "sanguite_pickaxe",
-      "output": "sanguite_pickaxe",
+      "id": "crimtane_pickaxe",
+      "output": "crimtane_pickaxe",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 12
         },
         {
@@ -4118,11 +4118,11 @@
       ]
     },
     {
-      "id": "sanguite_axe",
-      "output": "sanguite_axe",
+      "id": "crimtane_axe",
+      "output": "crimtane_axe",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 9
         },
         {
@@ -4135,11 +4135,11 @@
       ]
     },
     {
-      "id": "sanguite_hammer",
-      "output": "sanguite_hammer",
+      "id": "crimtane_hammer",
+      "output": "crimtane_hammer",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 10
         },
         {
@@ -4152,11 +4152,11 @@
       ]
     },
     {
-      "id": "sanguite_broadsword",
-      "output": "sanguite_broadsword",
+      "id": "crimtane_broadsword",
+      "output": "crimtane_broadsword",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 8
         }
       ],
@@ -4165,11 +4165,11 @@
       ]
     },
     {
-      "id": "sanguite_shortsword",
-      "output": "sanguite_shortsword",
+      "id": "crimtane_shortsword",
+      "output": "crimtane_shortsword",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 7
         }
       ],
@@ -4178,11 +4178,11 @@
       ]
     },
     {
-      "id": "sanguite_bow",
-      "output": "sanguite_bow",
+      "id": "crimtane_bow",
+      "output": "crimtane_bow",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 7
         }
       ],
@@ -4191,11 +4191,11 @@
       ]
     },
     {
-      "id": "sanguite_helmet",
-      "output": "sanguite_helmet",
+      "id": "crimtane_helmet",
+      "output": "crimtane_helmet",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 15
         }
       ],
@@ -4204,11 +4204,11 @@
       ]
     },
     {
-      "id": "sanguite_chainmail",
-      "output": "sanguite_chainmail",
+      "id": "crimtane_chainmail",
+      "output": "crimtane_chainmail",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 25
         }
       ],
@@ -4217,11 +4217,11 @@
       ]
     },
     {
-      "id": "sanguite_greaves",
-      "output": "sanguite_greaves",
+      "id": "crimtane_greaves",
+      "output": "crimtane_greaves",
       "inputs": [
         {
-          "item": "sanguite_bar",
+          "item": "crimtane_bar",
           "count": 20
         }
       ],
@@ -4230,11 +4230,11 @@
       ]
     },
     {
-      "id": "cinder_bar",
-      "output": "cinder_bar",
+      "id": "hellstone_bar",
+      "output": "hellstone_bar",
       "inputs": [
         {
-          "item": "cinderstone",
+          "item": "hellstone",
           "count": 3
         },
         {
@@ -4247,11 +4247,11 @@
       ]
     },
     {
-      "id": "cinder_pickaxe",
-      "output": "cinder_pickaxe",
+      "id": "hellstone_pickaxe",
+      "output": "hellstone_pickaxe",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 12
         },
         {
@@ -4264,11 +4264,11 @@
       ]
     },
     {
-      "id": "cinder_axe",
-      "output": "cinder_axe",
+      "id": "hellstone_axe",
+      "output": "hellstone_axe",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 9
         },
         {
@@ -4281,11 +4281,11 @@
       ]
     },
     {
-      "id": "cinder_hammer",
-      "output": "cinder_hammer",
+      "id": "hellstone_hammer",
+      "output": "hellstone_hammer",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 10
         },
         {
@@ -4298,11 +4298,11 @@
       ]
     },
     {
-      "id": "cinder_broadsword",
-      "output": "cinder_broadsword",
+      "id": "hellstone_broadsword",
+      "output": "hellstone_broadsword",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 8
         }
       ],
@@ -4311,11 +4311,11 @@
       ]
     },
     {
-      "id": "cinder_shortsword",
-      "output": "cinder_shortsword",
+      "id": "hellstone_shortsword",
+      "output": "hellstone_shortsword",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 7
         }
       ],
@@ -4324,11 +4324,11 @@
       ]
     },
     {
-      "id": "cinder_bow",
-      "output": "cinder_bow",
+      "id": "hellstone_bow",
+      "output": "hellstone_bow",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 7
         }
       ],
@@ -4337,11 +4337,11 @@
       ]
     },
     {
-      "id": "cinder_helmet",
-      "output": "cinder_helmet",
+      "id": "hellstone_helmet",
+      "output": "hellstone_helmet",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 15
         }
       ],
@@ -4350,11 +4350,11 @@
       ]
     },
     {
-      "id": "cinder_chainmail",
-      "output": "cinder_chainmail",
+      "id": "hellstone_chainmail",
+      "output": "hellstone_chainmail",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 25
         }
       ],
@@ -4363,11 +4363,11 @@
       ]
     },
     {
-      "id": "cinder_greaves",
-      "output": "cinder_greaves",
+      "id": "hellstone_greaves",
+      "output": "hellstone_greaves",
       "inputs": [
         {
-          "item": "cinder_bar",
+          "item": "hellstone_bar",
           "count": 20
         }
       ],
@@ -4376,11 +4376,11 @@
       ]
     },
     {
-      "id": "cerulite_bar",
-      "output": "cerulite_bar",
+      "id": "cobalt_bar",
+      "output": "cobalt_bar",
       "inputs": [
         {
-          "item": "cerulite_ore",
+          "item": "cobalt_ore",
           "count": 3
         }
       ],
@@ -4389,11 +4389,11 @@
       ]
     },
     {
-      "id": "cerulite_pickaxe",
-      "output": "cerulite_pickaxe",
+      "id": "cobalt_pickaxe",
+      "output": "cobalt_pickaxe",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 12
         },
         {
@@ -4406,11 +4406,11 @@
       ]
     },
     {
-      "id": "cerulite_axe",
-      "output": "cerulite_axe",
+      "id": "cobalt_axe",
+      "output": "cobalt_axe",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 9
         },
         {
@@ -4423,11 +4423,11 @@
       ]
     },
     {
-      "id": "cerulite_hammer",
-      "output": "cerulite_hammer",
+      "id": "cobalt_hammer",
+      "output": "cobalt_hammer",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 10
         },
         {
@@ -4440,11 +4440,11 @@
       ]
     },
     {
-      "id": "cerulite_broadsword",
-      "output": "cerulite_broadsword",
+      "id": "cobalt_broadsword",
+      "output": "cobalt_broadsword",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 8
         }
       ],
@@ -4453,11 +4453,11 @@
       ]
     },
     {
-      "id": "cerulite_shortsword",
-      "output": "cerulite_shortsword",
+      "id": "cobalt_shortsword",
+      "output": "cobalt_shortsword",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 7
         }
       ],
@@ -4466,11 +4466,11 @@
       ]
     },
     {
-      "id": "cerulite_bow",
-      "output": "cerulite_bow",
+      "id": "cobalt_bow",
+      "output": "cobalt_bow",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 7
         }
       ],
@@ -4479,11 +4479,11 @@
       ]
     },
     {
-      "id": "cerulite_helmet",
-      "output": "cerulite_helmet",
+      "id": "cobalt_helmet",
+      "output": "cobalt_helmet",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 15
         }
       ],
@@ -4492,11 +4492,11 @@
       ]
     },
     {
-      "id": "cerulite_chainmail",
-      "output": "cerulite_chainmail",
+      "id": "cobalt_chainmail",
+      "output": "cobalt_chainmail",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 25
         }
       ],
@@ -4505,11 +4505,11 @@
       ]
     },
     {
-      "id": "cerulite_greaves",
-      "output": "cerulite_greaves",
+      "id": "cobalt_greaves",
+      "output": "cobalt_greaves",
       "inputs": [
         {
-          "item": "cerulite_bar",
+          "item": "cobalt_bar",
           "count": 20
         }
       ],
@@ -4518,11 +4518,11 @@
       ]
     },
     {
-      "id": "rosalite_bar",
-      "output": "rosalite_bar",
+      "id": "palladium_bar",
+      "output": "palladium_bar",
       "inputs": [
         {
-          "item": "rosalite_ore",
+          "item": "palladium_ore",
           "count": 3
         }
       ],
@@ -4531,11 +4531,11 @@
       ]
     },
     {
-      "id": "rosalite_pickaxe",
-      "output": "rosalite_pickaxe",
+      "id": "palladium_pickaxe",
+      "output": "palladium_pickaxe",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 12
         },
         {
@@ -4548,11 +4548,11 @@
       ]
     },
     {
-      "id": "rosalite_axe",
-      "output": "rosalite_axe",
+      "id": "palladium_axe",
+      "output": "palladium_axe",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 9
         },
         {
@@ -4565,11 +4565,11 @@
       ]
     },
     {
-      "id": "rosalite_hammer",
-      "output": "rosalite_hammer",
+      "id": "palladium_hammer",
+      "output": "palladium_hammer",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 10
         },
         {
@@ -4582,11 +4582,11 @@
       ]
     },
     {
-      "id": "rosalite_broadsword",
-      "output": "rosalite_broadsword",
+      "id": "palladium_broadsword",
+      "output": "palladium_broadsword",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 8
         }
       ],
@@ -4595,11 +4595,11 @@
       ]
     },
     {
-      "id": "rosalite_shortsword",
-      "output": "rosalite_shortsword",
+      "id": "palladium_shortsword",
+      "output": "palladium_shortsword",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 7
         }
       ],
@@ -4608,11 +4608,11 @@
       ]
     },
     {
-      "id": "rosalite_bow",
-      "output": "rosalite_bow",
+      "id": "palladium_bow",
+      "output": "palladium_bow",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 7
         }
       ],
@@ -4621,11 +4621,11 @@
       ]
     },
     {
-      "id": "rosalite_helmet",
-      "output": "rosalite_helmet",
+      "id": "palladium_helmet",
+      "output": "palladium_helmet",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 15
         }
       ],
@@ -4634,11 +4634,11 @@
       ]
     },
     {
-      "id": "rosalite_chainmail",
-      "output": "rosalite_chainmail",
+      "id": "palladium_chainmail",
+      "output": "palladium_chainmail",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 25
         }
       ],
@@ -4647,11 +4647,11 @@
       ]
     },
     {
-      "id": "rosalite_greaves",
-      "output": "rosalite_greaves",
+      "id": "palladium_greaves",
+      "output": "palladium_greaves",
       "inputs": [
         {
-          "item": "rosalite_bar",
+          "item": "palladium_bar",
           "count": 20
         }
       ],
@@ -4660,11 +4660,11 @@
       ]
     },
     {
-      "id": "verdite_bar",
-      "output": "verdite_bar",
+      "id": "mythril_bar",
+      "output": "mythril_bar",
       "inputs": [
         {
-          "item": "verdite_ore",
+          "item": "mythril_ore",
           "count": 4
         }
       ],
@@ -4673,11 +4673,11 @@
       ]
     },
     {
-      "id": "verdite_pickaxe",
-      "output": "verdite_pickaxe",
+      "id": "mythril_pickaxe",
+      "output": "mythril_pickaxe",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 12
         },
         {
@@ -4690,11 +4690,11 @@
       ]
     },
     {
-      "id": "verdite_axe",
-      "output": "verdite_axe",
+      "id": "mythril_axe",
+      "output": "mythril_axe",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 9
         },
         {
@@ -4707,11 +4707,11 @@
       ]
     },
     {
-      "id": "verdite_hammer",
-      "output": "verdite_hammer",
+      "id": "mythril_hammer",
+      "output": "mythril_hammer",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 10
         },
         {
@@ -4724,11 +4724,11 @@
       ]
     },
     {
-      "id": "verdite_broadsword",
-      "output": "verdite_broadsword",
+      "id": "mythril_broadsword",
+      "output": "mythril_broadsword",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 8
         }
       ],
@@ -4737,11 +4737,11 @@
       ]
     },
     {
-      "id": "verdite_shortsword",
-      "output": "verdite_shortsword",
+      "id": "mythril_shortsword",
+      "output": "mythril_shortsword",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 7
         }
       ],
@@ -4750,11 +4750,11 @@
       ]
     },
     {
-      "id": "verdite_bow",
-      "output": "verdite_bow",
+      "id": "mythril_bow",
+      "output": "mythril_bow",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 7
         }
       ],
@@ -4763,11 +4763,11 @@
       ]
     },
     {
-      "id": "verdite_helmet",
-      "output": "verdite_helmet",
+      "id": "mythril_helmet",
+      "output": "mythril_helmet",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 15
         }
       ],
@@ -4776,11 +4776,11 @@
       ]
     },
     {
-      "id": "verdite_chainmail",
-      "output": "verdite_chainmail",
+      "id": "mythril_chainmail",
+      "output": "mythril_chainmail",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 25
         }
       ],
@@ -4789,11 +4789,11 @@
       ]
     },
     {
-      "id": "verdite_greaves",
-      "output": "verdite_greaves",
+      "id": "mythril_greaves",
+      "output": "mythril_greaves",
       "inputs": [
         {
-          "item": "verdite_bar",
+          "item": "mythril_bar",
           "count": 20
         }
       ],
@@ -4802,11 +4802,11 @@
       ]
     },
     {
-      "id": "orchidite_bar",
-      "output": "orchidite_bar",
+      "id": "orichalcum_bar",
+      "output": "orichalcum_bar",
       "inputs": [
         {
-          "item": "orchidite_ore",
+          "item": "orichalcum_ore",
           "count": 4
         }
       ],
@@ -4815,11 +4815,11 @@
       ]
     },
     {
-      "id": "orchidite_pickaxe",
-      "output": "orchidite_pickaxe",
+      "id": "orichalcum_pickaxe",
+      "output": "orichalcum_pickaxe",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 12
         },
         {
@@ -4832,11 +4832,11 @@
       ]
     },
     {
-      "id": "orchidite_axe",
-      "output": "orchidite_axe",
+      "id": "orichalcum_axe",
+      "output": "orichalcum_axe",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 9
         },
         {
@@ -4849,11 +4849,11 @@
       ]
     },
     {
-      "id": "orchidite_hammer",
-      "output": "orchidite_hammer",
+      "id": "orichalcum_hammer",
+      "output": "orichalcum_hammer",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 10
         },
         {
@@ -4866,11 +4866,11 @@
       ]
     },
     {
-      "id": "orchidite_broadsword",
-      "output": "orchidite_broadsword",
+      "id": "orichalcum_broadsword",
+      "output": "orichalcum_broadsword",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 8
         }
       ],
@@ -4879,11 +4879,11 @@
       ]
     },
     {
-      "id": "orchidite_shortsword",
-      "output": "orchidite_shortsword",
+      "id": "orichalcum_shortsword",
+      "output": "orichalcum_shortsword",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 7
         }
       ],
@@ -4892,11 +4892,11 @@
       ]
     },
     {
-      "id": "orchidite_bow",
-      "output": "orchidite_bow",
+      "id": "orichalcum_bow",
+      "output": "orichalcum_bow",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 7
         }
       ],
@@ -4905,11 +4905,11 @@
       ]
     },
     {
-      "id": "orchidite_helmet",
-      "output": "orchidite_helmet",
+      "id": "orichalcum_helmet",
+      "output": "orichalcum_helmet",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 15
         }
       ],
@@ -4918,11 +4918,11 @@
       ]
     },
     {
-      "id": "orchidite_chainmail",
-      "output": "orchidite_chainmail",
+      "id": "orichalcum_chainmail",
+      "output": "orichalcum_chainmail",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 25
         }
       ],
@@ -4931,11 +4931,11 @@
       ]
     },
     {
-      "id": "orchidite_greaves",
-      "output": "orchidite_greaves",
+      "id": "orichalcum_greaves",
+      "output": "orichalcum_greaves",
       "inputs": [
         {
-          "item": "orchidite_bar",
+          "item": "orichalcum_bar",
           "count": 20
         }
       ],
@@ -4944,11 +4944,11 @@
       ]
     },
     {
-      "id": "crimsite_bar",
-      "output": "crimsite_bar",
+      "id": "adamantite_bar",
+      "output": "adamantite_bar",
       "inputs": [
         {
-          "item": "crimsite_ore",
+          "item": "adamantite_ore",
           "count": 5
         }
       ],
@@ -4957,11 +4957,11 @@
       ]
     },
     {
-      "id": "crimsite_pickaxe",
-      "output": "crimsite_pickaxe",
+      "id": "adamantite_pickaxe",
+      "output": "adamantite_pickaxe",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 12
         },
         {
@@ -4974,11 +4974,11 @@
       ]
     },
     {
-      "id": "crimsite_axe",
-      "output": "crimsite_axe",
+      "id": "adamantite_axe",
+      "output": "adamantite_axe",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 9
         },
         {
@@ -4991,11 +4991,11 @@
       ]
     },
     {
-      "id": "crimsite_hammer",
-      "output": "crimsite_hammer",
+      "id": "adamantite_hammer",
+      "output": "adamantite_hammer",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 10
         },
         {
@@ -5008,11 +5008,11 @@
       ]
     },
     {
-      "id": "crimsite_broadsword",
-      "output": "crimsite_broadsword",
+      "id": "adamantite_broadsword",
+      "output": "adamantite_broadsword",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 8
         }
       ],
@@ -5021,11 +5021,11 @@
       ]
     },
     {
-      "id": "crimsite_shortsword",
-      "output": "crimsite_shortsword",
+      "id": "adamantite_shortsword",
+      "output": "adamantite_shortsword",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 7
         }
       ],
@@ -5034,11 +5034,11 @@
       ]
     },
     {
-      "id": "crimsite_bow",
-      "output": "crimsite_bow",
+      "id": "adamantite_bow",
+      "output": "adamantite_bow",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 7
         }
       ],
@@ -5047,11 +5047,11 @@
       ]
     },
     {
-      "id": "crimsite_helmet",
-      "output": "crimsite_helmet",
+      "id": "adamantite_helmet",
+      "output": "adamantite_helmet",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 15
         }
       ],
@@ -5060,11 +5060,11 @@
       ]
     },
     {
-      "id": "crimsite_chainmail",
-      "output": "crimsite_chainmail",
+      "id": "adamantite_chainmail",
+      "output": "adamantite_chainmail",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 25
         }
       ],
@@ -5073,11 +5073,11 @@
       ]
     },
     {
-      "id": "crimsite_greaves",
-      "output": "crimsite_greaves",
+      "id": "adamantite_greaves",
+      "output": "adamantite_greaves",
       "inputs": [
         {
-          "item": "crimsite_bar",
+          "item": "adamantite_bar",
           "count": 20
         }
       ],
@@ -5086,11 +5086,11 @@
       ]
     },
     {
-      "id": "stellite_bar",
-      "output": "stellite_bar",
+      "id": "titanium_bar",
+      "output": "titanium_bar",
       "inputs": [
         {
-          "item": "stellite_ore",
+          "item": "titanium_ore",
           "count": 5
         }
       ],
@@ -5099,11 +5099,11 @@
       ]
     },
     {
-      "id": "stellite_pickaxe",
-      "output": "stellite_pickaxe",
+      "id": "titanium_pickaxe",
+      "output": "titanium_pickaxe",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 12
         },
         {
@@ -5116,11 +5116,11 @@
       ]
     },
     {
-      "id": "stellite_axe",
-      "output": "stellite_axe",
+      "id": "titanium_axe",
+      "output": "titanium_axe",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 9
         },
         {
@@ -5133,11 +5133,11 @@
       ]
     },
     {
-      "id": "stellite_hammer",
-      "output": "stellite_hammer",
+      "id": "titanium_hammer",
+      "output": "titanium_hammer",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 10
         },
         {
@@ -5150,11 +5150,11 @@
       ]
     },
     {
-      "id": "stellite_broadsword",
-      "output": "stellite_broadsword",
+      "id": "titanium_broadsword",
+      "output": "titanium_broadsword",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 8
         }
       ],
@@ -5163,11 +5163,11 @@
       ]
     },
     {
-      "id": "stellite_shortsword",
-      "output": "stellite_shortsword",
+      "id": "titanium_shortsword",
+      "output": "titanium_shortsword",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 7
         }
       ],
@@ -5176,11 +5176,11 @@
       ]
     },
     {
-      "id": "stellite_bow",
-      "output": "stellite_bow",
+      "id": "titanium_bow",
+      "output": "titanium_bow",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 7
         }
       ],
@@ -5189,11 +5189,11 @@
       ]
     },
     {
-      "id": "stellite_helmet",
-      "output": "stellite_helmet",
+      "id": "titanium_helmet",
+      "output": "titanium_helmet",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 15
         }
       ],
@@ -5202,11 +5202,11 @@
       ]
     },
     {
-      "id": "stellite_chainmail",
-      "output": "stellite_chainmail",
+      "id": "titanium_chainmail",
+      "output": "titanium_chainmail",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 25
         }
       ],
@@ -5215,11 +5215,11 @@
       ]
     },
     {
-      "id": "stellite_greaves",
-      "output": "stellite_greaves",
+      "id": "titanium_greaves",
+      "output": "titanium_greaves",
       "inputs": [
         {
-          "item": "stellite_bar",
+          "item": "titanium_bar",
           "count": 20
         }
       ],

@@ -24,7 +24,7 @@
     },
     {
       "id": "wooden_hammer",
-      "name": "Wooden Mallet",
+      "name": "Wooden Hammer",
       "category": "tool",
       "value": 50,
       "useStyle": "swing",
@@ -73,8 +73,8 @@
       ]
     },
     {
-      "id": "ember_wand",
-      "name": "Ember Wand",
+      "id": "wand_of_sparking",
+      "name": "Wand of Sparking",
       "description": "Spits sparks that cling and burn.",
       "category": "weapon",
       "rarity": 1,
@@ -87,7 +87,7 @@
       "damageType": "magic",
       "knockback": 0,
       "manaCost": 2,
-      "projectile": "ember_spark",
+      "projectile": "spark",
       "shootSpeed": 14,
       "covers": [
         "terraria:wand_of_sparking"
@@ -130,8 +130,8 @@
       ]
     },
     {
-      "id": "timber_helmet",
-      "name": "Timber Helmet",
+      "id": "wood_helmet",
+      "name": "Wood Helmet",
       "category": "armor",
       "value": 50,
       "equipSlot": "head",
@@ -142,8 +142,8 @@
       ]
     },
     {
-      "id": "timber_breastplate",
-      "name": "Timber Breastplate",
+      "id": "wood_breastplate",
+      "name": "Wood Breastplate",
       "category": "armor",
       "value": 75,
       "equipSlot": "body",
@@ -154,8 +154,8 @@
       ]
     },
     {
-      "id": "timber_greaves",
-      "name": "Timber Greaves",
+      "id": "wood_greaves",
+      "name": "Wood Greaves",
       "category": "armor",
       "value": 50,
       "equipSlot": "legs",
@@ -166,8 +166,8 @@
       ]
     },
     {
-      "id": "bottled_gale",
-      "name": "Bottled Gale",
+      "id": "cloud_in_a_bottle",
+      "name": "Cloud in a Bottle",
       "description": "A second jump, carried by trapped wind.",
       "category": "accessory",
       "rarity": 1,
@@ -184,8 +184,8 @@
       ]
     },
     {
-      "id": "courier_boots",
-      "name": "Courier's Boots",
+      "id": "hermes_boots",
+      "name": "Hermes Boots",
       "description": "Sprint far faster once you get going.",
       "category": "accessory",
       "rarity": 1,
@@ -203,8 +203,8 @@
       ]
     },
     {
-      "id": "iron_horseshoe",
-      "name": "Iron Horseshoe",
+      "id": "lucky_horseshoe",
+      "name": "Lucky Horseshoe",
       "description": "Negates fall damage.",
       "category": "accessory",
       "rarity": 1,
@@ -220,8 +220,8 @@
       ]
     },
     {
-      "id": "band_of_vigor",
-      "name": "Band of Vigor",
+      "id": "band_of_regeneration",
+      "name": "Band of Regeneration",
       "description": "Slowly regenerates life.",
       "category": "accessory",
       "rarity": 1,
@@ -239,8 +239,8 @@
       ]
     },
     {
-      "id": "glimmer_blade",
-      "name": "Glimmer Blade",
+      "id": "enchanted_sword",
+      "name": "Enchanted Sword",
       "description": "Its edge sheds a wandering light.",
       "category": "weapon",
       "rarity": 2,
@@ -252,7 +252,7 @@
       "damage": 23,
       "damageType": "melee",
       "knockback": 4.5,
-      "projectile": "glimmer_beam",
+      "projectile": "enchanted_beam",
       "shootSpeed": 16,
       "heldLight": [
         4,

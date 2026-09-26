@@ -79,7 +79,7 @@ internal sealed class BiomeRelief
         "tundra" => 10f + 48f * _ridges.Sample01(x, z) + 6f * _hills.Sample(x, z),
         "jungle" => 12f + 22f * _hills.Sample01(x, z) + 10f * _jagged.Sample01(x, z),
         "desert" => 4f + 7f * _dunes.Sample01(x, z),
-        "umbral" or "sanguine" => 9f + 14f * _hills.Sample01(x, z) + 12f * _jagged.Sample01(x, z),
+        "corruption" or "crimson" => 9f + 14f * _hills.Sample01(x, z) + 12f * _jagged.Sample01(x, z),
         _ => ForestRelief(x, z),
     };
 
@@ -88,7 +88,7 @@ internal sealed class BiomeRelief
         "tundra" => 0.55f,
         "jungle" => 0.6f,
         "desert" => 0.05f,
-        "umbral" or "sanguine" => 0.75f,
+        "corruption" or "crimson" => 0.75f,
         _ => 0.15f,
     };
 }

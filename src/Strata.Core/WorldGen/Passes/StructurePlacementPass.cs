@@ -55,8 +55,8 @@ public sealed class StructurePlacementPass : GenPass
             plan.AddFeature(new ChamberFeature(center, new Vector3(7, 5, 7)) { Kind = "shrine", Chamber = ChamberKind.Shrine, Seed = rng.NextUInt() });
             var bp = new Blueprint { Flags = Voxels.CellFlags.None };
             var floor = new Int3((int)x - 1, (int)(y - 3), (int)z - 1);
-            bp.Fill(new Aabb3i(floor - new Int3(5, 1, 5), floor + new Int3(8, 0, 8)), "moss_stone");
-            bp.Object(content.TileObjects.Get("blade_shrine"), floor, 0);
+            bp.Fill(new Aabb3i(floor - new Int3(5, 1, 5), floor + new Int3(8, 0, 8)), "green_moss");
+            bp.Object(content.TileObjects.Get("enchanted_sword_shrine"), floor, 0);
             AddStructure(plan, "shrine_altar", bp);
         }
 
@@ -108,6 +108,6 @@ public sealed class StructurePlacementPass : GenPass
     private static string WoodFor(PlanContext ctx, float x, float y, float z)
     {
         string biome = ctx.Content.Biomes[ctx.Biomes.BiomeAt(x, y, z)].Id;
-        return biome switch { "tundra" => "pine_wood", "jungle" => "jungle_wood", _ => "wood" };
+        return biome switch { "tundra" => "boreal_wood", "jungle" => "rich_mahogany", _ => "wood" };
     }
 }

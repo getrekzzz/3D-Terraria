@@ -9,15 +9,15 @@
     "tungsten": "#94b08e",
     "gold": "#f2c850",
     "platinum": "#cfe0ee",
-    "umbrite": "#7a5ab8",
-    "sanguite": "#c0404e",
-    "cinder": "#e0602a",
-    "cerulite": "#3a86f0",
-    "rosalite": "#f08a58",
-    "verdite": "#38d878",
-    "orchidite": "#f06ac0",
-    "crimsite": "#e8283c",
-    "stellite": "#dce8f8"
+    "demonite": "#7a5ab8",
+    "crimtane": "#c0404e",
+    "hellstone": "#e0602a",
+    "cobalt": "#3a86f0",
+    "palladium": "#f08a58",
+    "mythril": "#38d878",
+    "orichalcum": "#f06ac0",
+    "adamantite": "#e8283c",
+    "titanium": "#dce8f8"
   },
   "objects": {
     "oak_tree": {
@@ -53,7 +53,7 @@
         "fronds": 8
       }
     },
-    "mahoe_tree": {
+    "mahogany_tree": {
       "generator": "jungle",
       "params": {
         "height": 14.5,
@@ -64,7 +64,7 @@
         "sprig": "jungle_sprig"
       }
     },
-    "umbral_tree": {
+    "ebonwood_tree": {
       "generator": "twisted",
       "params": {
         "height": 9.5,
@@ -81,12 +81,12 @@
         "radius": 0.34
       }
     },
-    "giant_glowcap": {
+    "giant_glowing_mushroom": {
       "generator": "giant_mushroom",
       "params": {
         "height": 5.8,
         "cap": 2.4,
-        "capLayer": "glowcap",
+        "capLayer": "glowing_mushroom",
         "glow": "#5aa0ff"
       }
     },
@@ -126,10 +126,10 @@
         "capLayer": "red_cap"
       }
     },
-    "glowcap_plant": {
+    "glowing_mushroom_plant": {
       "generator": "small_mushroom",
       "params": {
-        "capLayer": "glowcap",
+        "capLayer": "glowing_mushroom",
         "glow": true,
         "tint": "#8ab8ff"
       }
@@ -153,7 +153,7 @@
       "generator": "rubble",
       "params": {}
     },
-    "clay_pot": {
+    "pot": {
       "generator": "pot",
       "params": {
         "bands": [
@@ -163,17 +163,17 @@
         ]
       }
     },
-    "vital_crystal_node": {
+    "life_crystal_node": {
       "generator": "crystal_node",
       "params": {
         "color": "#ff3060"
       }
     },
-    "blade_shrine": {
+    "enchanted_sword_shrine": {
       "generator": "shrine",
       "params": {}
     },
-    "workbench": {
+    "work_bench": {
       "generator": "workbench",
       "params": {}
     },
@@ -194,7 +194,7 @@
         "tint": "#b0b8d0"
       }
     },
-    "alchemy_bottle": {
+    "placed_bottle": {
       "generator": "bottle",
       "params": {}
     },
@@ -238,15 +238,15 @@
       "generator": "candle",
       "params": {}
     },
-    "wooden_bed": {
+    "bed": {
       "generator": "bed",
       "params": {}
     },
-    "rail": {
+    "minecart_track": {
       "generator": "rail",
       "params": {}
     },
-    "cinder_forge": {
+    "hellforge": {
       "generator": "furnace",
       "params": {
         "stoneTint": "#5a4440",
@@ -259,7 +259,7 @@
         ]
       }
     },
-    "verdite_anvil": {
+    "mythril_anvil": {
       "generator": "anvil",
       "params": {
         "metal": "iron",
@@ -267,7 +267,7 @@
         "glow": "#40e070"
       }
     },
-    "orchidite_anvil": {
+    "orichalcum_anvil": {
       "generator": "anvil",
       "params": {
         "metal": "iron",
@@ -275,7 +275,7 @@
         "glow": "#ff60d0"
       }
     },
-    "crimsite_forge": {
+    "adamantite_forge": {
       "generator": "furnace",
       "params": {
         "stoneTint": "#8a4a48",
@@ -290,7 +290,7 @@
         ]
       }
     },
-    "stellite_forge": {
+    "titanium_forge": {
       "generator": "furnace",
       "params": {
         "stoneTint": "#a8b0c0",
@@ -370,28 +370,28 @@
           "headLayer": "planks"
         }
       },
-      "timber_helmet": {
+      "wood_helmet": {
         "generator": "helmet",
         "params": {
           "metalLayer": "planks",
           "metal": "#ffffff"
         }
       },
-      "timber_breastplate": {
+      "wood_breastplate": {
         "generator": "chest_armor",
         "params": {
           "metalLayer": "planks",
           "metal": "#ffffff"
         }
       },
-      "timber_greaves": {
+      "wood_greaves": {
         "generator": "greaves",
         "params": {
           "metalLayer": "planks",
           "metal": "#ffffff"
         }
       },
-      "ember_wand": {
+      "wand_of_sparking": {
         "generator": "wand",
         "params": {
           "gem": "#ff8a2a"
@@ -409,7 +409,7 @@
           "gem": "#ffc040"
         }
       },
-      "glimmer_blade": {
+      "enchanted_sword": {
         "generator": "sword",
         "params": {
           "metal": "#9ad8ff",
@@ -432,11 +432,11 @@
         "generator": "lens",
         "params": {}
       },
-      "silk_thread": {
+      "silk": {
         "generator": "spool",
         "params": {}
       },
-      "geode_shard": {
+      "crystal_shard": {
         "generator": "chunk",
         "params": {
           "layer": "crystal",
@@ -479,10 +479,10 @@
           "color": "#e8f8ff"
         }
       },
-      "glowcap": {
+      "glowing_mushroom": {
         "generator": "small_mushroom",
         "params": {
-          "capLayer": "glowcap",
+          "capLayer": "glowing_mushroom",
           "glow": true,
           "tint": "#8ab8ff"
         }
@@ -493,7 +493,7 @@
           "capLayer": "red_cap"
         }
       },
-      "starshard": {
+      "fallen_star": {
         "generator": "star",
         "params": {
           "color": "#fff0a0"
@@ -505,39 +505,39 @@
           "layer": "cactus_skin"
         }
       },
-      "minor_restorative": {
+      "lesser_healing_potion": {
         "generator": "potion",
         "params": {
           "color": "#ff3050",
           "glow": true
         }
       },
-      "minor_mana_tonic": {
+      "lesser_mana_potion": {
         "generator": "potion",
         "params": {
           "color": "#3a6aff",
           "glow": true
         }
       },
-      "swiftness_draught": {
+      "swiftness_potion": {
         "generator": "potion",
         "params": {
           "color": "#40e0a0"
         }
       },
-      "ironbark_draught": {
+      "ironskin_potion": {
         "generator": "potion",
         "params": {
           "color": "#a09070"
         }
       },
-      "vital_crystal": {
+      "life_crystal": {
         "generator": "heart",
         "params": {
           "color": "#ff3060"
         }
       },
-      "mana_star": {
+      "mana_crystal": {
         "generator": "star",
         "params": {
           "color": "#5a8aff"
@@ -547,35 +547,35 @@
         "generator": "seed",
         "params": {}
       },
-      "bottled_gale": {
+      "cloud_in_a_bottle": {
         "generator": "bottled",
         "params": {
           "color": "#dff0ff"
         }
       },
-      "courier_boots": {
+      "hermes_boots": {
         "generator": "boots",
         "params": {}
       },
-      "iron_horseshoe": {
+      "lucky_horseshoe": {
         "generator": "horseshoe",
         "params": {}
       },
-      "band_of_vigor": {
+      "band_of_regeneration": {
         "generator": "ring",
         "params": {
           "gem": "#ff4060"
         }
       },
-      "gelatin_crown": {
+      "slime_crown": {
         "generator": "crown",
         "params": {}
       },
-      "glaring_lens": {
+      "suspicious_looking_eye": {
         "generator": "eye_lens",
         "params": {}
       },
-      "rotten_bait": {
+      "worm_food": {
         "generator": "chunk",
         "params": {
           "layer": "flesh",
@@ -605,7 +605,7 @@
           "liquid": "#e8a020"
         }
       },
-      "emberskin_draught": {
+      "obsidian_skin_potion": {
         "generator": "potion",
         "params": {
           "color": "#c03a5a"
@@ -629,7 +629,7 @@
         "generator": "bone",
         "params": {}
       },
-      "shark_tooth": {
+      "shark_fin": {
         "generator": "spike",
         "params": {
           "color": "#f0ece0",
@@ -637,13 +637,13 @@
           "width": 0.07
         }
       },
-      "gillweed_draught": {
+      "gills_potion": {
         "generator": "potion",
         "params": {
           "color": "#40b8c8"
         }
       },
-      "tome_of_skulls": {
+      "book_of_skulls": {
         "generator": "tome",
         "params": {
           "cover": "#4a3a2a",
@@ -651,7 +651,7 @@
           "glow": "#ff5030"
         }
       },
-      "wayfinder_effigy": {
+      "guide_voodoo_doll": {
         "generator": "doll",
         "params": {
           "shirt": "#5a7a3a",
@@ -660,39 +660,39 @@
           "hair": "#6a4020"
         }
       },
-      "gorehammer": {
+      "pwnhammer": {
         "generator": "hammer",
         "params": {
           "metal": "#b0505a",
           "metalLayer": "flesh"
         }
       },
-      "warrior_sigil": {
+      "warrior_emblem": {
         "generator": "sigil",
         "params": {
           "gem": "#ff5030"
         }
       },
-      "marksman_sigil": {
+      "ranger_emblem": {
         "generator": "sigil",
         "params": {
           "gem": "#50e060"
         }
       },
-      "sorcerer_sigil": {
+      "sorcerer_emblem": {
         "generator": "sigil",
         "params": {
           "gem": "#6080ff"
         }
       },
-      "glimmer_dust": {
+      "pixie_dust": {
         "generator": "blob",
         "params": {
           "color": "#f0c8ff",
           "layer": "plain:glow"
         }
       },
-      "prism_horn": {
+      "unicorn_horn": {
         "generator": "spike",
         "params": {
           "color": "#f4e8ff",
@@ -701,34 +701,34 @@
           "layer": "prop:crystal:glow"
         }
       },
-      "lumen_essence": {
+      "soul_of_light": {
         "generator": "essence",
         "params": {
           "color": "#ffc8f0"
         }
       },
-      "umbra_essence": {
+      "soul_of_night": {
         "generator": "essence",
         "params": {
           "color": "#6a3aa0",
           "core": "#d0a0ff"
         }
       },
-      "blight_ember": {
+      "cursed_flame": {
         "generator": "chunk",
         "params": {
           "layer": "plain:glow",
           "color": "#6ac030"
         }
       },
-      "sanguine_ichor": {
+      "ichor": {
         "generator": "blob",
         "params": {
           "color": "#e8b830",
           "layer": "gel"
         }
       },
-      "greater_restorative": {
+      "greater_healing_potion": {
         "generator": "potion",
         "params": {
           "color": "#ff2a78",
@@ -751,7 +751,7 @@
           "fletching": "#f0d890"
         }
       },
-      "radiant_bar": {
+      "hallowed_bar": {
         "generator": "bar",
         "params": {
           "metal": "#fff0c8",
@@ -759,46 +759,46 @@
           "count": 2
         }
       },
-      "essence_of_sight": {
+      "soul_of_sight": {
         "generator": "essence",
         "params": {
           "color": "#50e060",
           "core": "#e0ffe0"
         }
       },
-      "essence_of_might": {
+      "soul_of_might": {
         "generator": "essence",
         "params": {
           "color": "#4070ff",
           "core": "#d8e4ff"
         }
       },
-      "essence_of_fright": {
+      "soul_of_fright": {
         "generator": "essence",
         "params": {
           "color": "#ff8030",
           "core": "#fff0d0"
         }
       },
-      "clockwork_eye": {
+      "mechanical_eye": {
         "generator": "clockwork",
         "params": {
           "kind": "eye"
         }
       },
-      "clockwork_worm": {
+      "mechanical_worm": {
         "generator": "clockwork",
         "params": {
           "kind": "worm"
         }
       },
-      "clockwork_skull": {
+      "mechanical_skull": {
         "generator": "clockwork",
         "params": {
           "kind": "skull"
         }
       },
-      "radiant_blade": {
+      "excalibur": {
         "generator": "sword",
         "params": {
           "metal": "#fff0c8",
@@ -807,7 +807,7 @@
           "width": 0.1
         }
       },
-      "radiant_repeater": {
+      "hallowed_repeater": {
         "generator": "bow",
         "params": {
           "metal": "#fff0c8",
@@ -815,28 +815,28 @@
           "limbLayer": "gold"
         }
       },
-      "prism_pickaxe": {
+      "pickaxe_axe": {
         "generator": "pickaxe",
         "params": {
           "metal": "#f0d0ff",
           "metalLayer": "gold"
         }
       },
-      "radiant_helmet": {
+      "hallowed_helmet": {
         "generator": "helmet",
         "params": {
           "metal": "#fff0c8",
           "metalLayer": "gold"
         }
       },
-      "radiant_plate": {
+      "hallowed_plate_mail": {
         "generator": "chest_armor",
         "params": {
           "metal": "#fff0c8",
           "metalLayer": "gold"
         }
       },
-      "radiant_greaves": {
+      "hallowed_greaves": {
         "generator": "greaves",
         "params": {
           "metal": "#fff0c8",
@@ -980,7 +980,7 @@
         "recolorable": true
       }
     },
-    "shambler": {
+    "zombie": {
       "generator": "humanoid",
       "params": {
         "skin": "#8ea276",
@@ -997,7 +997,7 @@
       "generator": "gel",
       "params": {}
     },
-    "gazer": {
+    "demon_eye": {
       "generator": "eye",
       "params": {
         "iris": "#3a8a5a"
@@ -1007,37 +1007,37 @@
       "generator": "bat",
       "params": {}
     },
-    "gel_sovereign": {
+    "king_slime": {
       "generator": "gel_sovereign",
       "params": {}
     },
-    "watcher": {
+    "eye_of_cthulhu": {
       "generator": "watcher",
       "params": {}
     },
-    "watcher_maw": {
+    "eye_of_cthulhu_mouth": {
       "generator": "watcher_maw",
       "params": {}
     },
-    "bore_head": {
+    "eater_of_worlds_head": {
       "generator": "worm_segment",
       "params": {
         "part": "head"
       }
     },
-    "bore_segment": {
+    "eater_of_worlds_body": {
       "generator": "worm_segment",
       "params": {
         "part": "segment"
       }
     },
-    "bore_tail": {
+    "eater_of_worlds_tail": {
       "generator": "worm_segment",
       "params": {
         "part": "tail"
       }
     },
-    "wayfinder": {
+    "guide": {
       "generator": "humanoid",
       "params": {
         "skin": "#e0b088",
@@ -1051,7 +1051,7 @@
         "hairStyle": "short"
       }
     },
-    "peddler": {
+    "merchant": {
       "generator": "humanoid",
       "params": {
         "skin": "#e8b890",
@@ -1068,7 +1068,7 @@
         "weight": 0.65
       }
     },
-    "mender": {
+    "nurse": {
       "generator": "humanoid",
       "params": {
         "skin": "#f0c8a0",
@@ -1084,7 +1084,7 @@
         "hairStyle": "bun"
       }
     },
-    "grovekeeper": {
+    "dryad": {
       "generator": "humanoid",
       "params": {
         "skin": "#d8b080",
@@ -1137,7 +1137,7 @@
         "eyes": "#a0ff60"
       }
     },
-    "snatcher": {
+    "man_eater": {
       "generator": "snatcher",
       "params": {
         "leaf": "#4a8a2a",
@@ -1174,13 +1174,13 @@
         "height": 1.5
       }
     },
-    "crypt_skull": {
+    "skeletron_head": {
       "generator": "skull",
       "params": {
         "radius": 1.3
       }
     },
-    "crypt_hand": {
+    "skeletron_hand": {
       "generator": "bone_hand",
       "params": {
         "size": 1.1
@@ -1214,7 +1214,7 @@
         "weight": 0.3
       }
     },
-    "crypt_keeper": {
+    "old_man": {
       "generator": "humanoid",
       "params": {
         "skin": "#d8b898",
@@ -1231,7 +1231,7 @@
         "weight": 0.3
       }
     },
-    "tailor": {
+    "clothier": {
       "generator": "humanoid",
       "params": {
         "skin": "#e0b890",
@@ -1248,7 +1248,7 @@
         "hairStyle": "short"
       }
     },
-    "crypt_guardian": {
+    "dungeon_guardian": {
       "generator": "skull",
       "params": {
         "radius": 1.3,
@@ -1257,40 +1257,40 @@
         "cracks": 5
       }
     },
-    "maw_mouth": {
+    "wall_of_flesh_mouth": {
       "generator": "maw_mouth",
       "params": {
         "radius": 2.1
       }
     },
-    "maw_eye": {
+    "wall_of_flesh_eye": {
       "generator": "maw_eye",
       "params": {
         "radius": 1.4
       }
     },
-    "maw_flesh": {
+    "wall_of_flesh_flesh": {
       "generator": "maw_flesh",
       "params": {
         "size": 4.0,
         "thickness": 3.0
       }
     },
-    "hungry": {
+    "the_hungry": {
       "generator": "hungry",
       "params": {
         "radius": 0.55
       }
     },
-    "sprite": {
+    "pixie": {
       "generator": "sprite",
       "params": {}
     },
-    "steed": {
+    "unicorn": {
       "generator": "steed",
       "params": {}
     },
-    "flux_stalker": {
+    "chaos_elemental": {
       "generator": "humanoid",
       "params": {
         "skin": "#c8b8f0",
@@ -1310,7 +1310,7 @@
         "height": 1.9
       }
     },
-    "dread_wraith": {
+    "wraith": {
       "generator": "humanoid",
       "params": {
         "skin": "#5a6068",
@@ -1330,14 +1330,14 @@
         "height": 2.0
       }
     },
-    "twin_lens_ray": {
+    "retinazer": {
       "generator": "mech_eye",
       "params": {
         "variant": "ray",
         "iris": "#ff2a2a"
       }
     },
-    "twin_lens_ray_open": {
+    "retinazer_open": {
       "generator": "mech_eye",
       "params": {
         "variant": "ray",
@@ -1345,7 +1345,7 @@
         "open": true
       }
     },
-    "twin_lens_flare": {
+    "spazmatism": {
       "generator": "mech_eye",
       "params": {
         "variant": "flare",
@@ -1353,7 +1353,7 @@
         "thrust": "#80ff60"
       }
     },
-    "twin_lens_flare_open": {
+    "spazmatism_open": {
       "generator": "mech_eye",
       "params": {
         "variant": "flare",
@@ -1362,31 +1362,31 @@
         "open": true
       }
     },
-    "serpent_head": {
+    "the_destroyer_head": {
       "generator": "serpent",
       "params": {
         "part": "head"
       }
     },
-    "serpent_segment": {
+    "the_destroyer_body": {
       "generator": "serpent",
       "params": {
         "part": "segment"
       }
     },
-    "serpent_tail": {
+    "the_destroyer_tail": {
       "generator": "serpent",
       "params": {
         "part": "tail"
       }
     },
-    "serpent_probe": {
+    "probe": {
       "generator": "serpent",
       "params": {
         "part": "probe"
       }
     },
-    "prime_skull": {
+    "skeletron_prime_head": {
       "generator": "prime_skull",
       "params": {}
     },

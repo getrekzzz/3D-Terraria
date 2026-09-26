@@ -26,12 +26,12 @@ public class BossTests
         var refused = new List<string>();
         g.World.ItemUse.Refused += (_, m) => refused.Add(m);
         g.World.Session.Clock.SetHour(12f);
-        g.Hold("glaring_lens", 2);
+        g.Hold("suspicious_looking_eye", 2);
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true));
         Assert.Single(refused);
         g.World.Session.Clock.SetHour(22f);
         Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, true));
-        Assert.Contains(g.World.Npcs.All, n => n.Def.Id == "watcher");
+        Assert.Contains(g.World.Npcs.All, n => n.Def.Id == "eye_of_cthulhu");
         g.Ticks(60);
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true)); // one at a time
     }
@@ -40,7 +40,7 @@ public class BossTests
     public void GelSovereignShedsMinionsAndTeleportsToFleeingPlayers()
     {
         using var g = Arena();
-        var boss = Boss(g, "gel_sovereign", new Vector3(0, 0.5f, 6f));
+        var boss = Boss(g, "king_slime", new Vector3(0, 0.5f, 6f));
         g.Ticks(10);
         int before = g.World.Npcs.All.Count;
         boss.Life -= boss.MaxLife / 4;
@@ -57,7 +57,7 @@ public class BossTests
     {
         using var g = Arena();
         g.World.Session.Clock.SetHour(22f);
-        var boss = Boss(g, "watcher", new Vector3(0, 6f, 8f));
+        var boss = Boss(g, "eye_of_cthulhu", new Vector3(0, 6f, 8f));
         var gone = new List<string>();
         g.World.Npcs.Removed += n => gone.Add($"{n.Def.Id}@{g.World.Session.Clock.Tick} life={n.Life} far={n.FarTicks} rel={n.Center - g.Player.Position}");
         float fastest = 0;
@@ -67,10 +67,10 @@ public class BossTests
             fastest = MathF.Max(fastest, boss.Velocity.Length());
         }
         Assert.True(fastest > 12f, $"never dashed (max speed {fastest:0.0})");
-        Assert.True(g.World.Npcs.All.Any(n => n.Def.Id == "watcher_servant"), string.Join("; ", gone));
+        Assert.True(g.World.Npcs.All.Any(n => n.Def.Id == "servant_of_cthulhu"), string.Join("; ", gone));
         boss.Life = boss.MaxLife / 3;
         g.Ticks(2);
-        Assert.Equal("watcher_maw", boss.ModelOverride);
+        Assert.Equal("eye_of_cthulhu_mouth", boss.ModelOverride);
 
         var left = new List<Npc>();
         g.World.Npcs.BossLeft += left.Add;
@@ -84,7 +84,7 @@ public class BossTests
     {
         using var g = Arena();
         var world = g.World.Session.World;
-        var boss = Boss(g, "bore_tyrant", new Vector3(0, -0.6f, 8f)); // inside the arena's stone floor
+        var boss = Boss(g, "eater_of_worlds", new Vector3(0, -0.6f, 8f)); // inside the arena's stone floor
         var trace = new System.Text.StringBuilder();
         for (int i = 0; i < 60 * 3; i++)
         {
@@ -105,7 +105,7 @@ public class BossTests
 
         // A projectile at a body segment damages the shared life pool (fresh worm inside the loaded arena).
         g.World.Npcs.Clear();
-        boss = Boss(g, "bore_tyrant", new Vector3(0, 5f, 6f));
+        boss = Boss(g, "eater_of_worlds", new Vector3(0, 5f, 6f));
         int life = boss.Life;
         var seg = boss.Segments[1];
         g.World.Projectiles.Spawn(g.Content.Projectiles.Get("wooden_arrow"), seg + new Vector3(0, 0, -0.1f), Vector3.Zero, g.Player, 20, 1, Strata.Core.Content.Defs.DamageClass.Ranged, 0);
@@ -117,12 +117,12 @@ public class BossTests
     public void DefeatingABossSetsItsFlagAndDropsLoot()
     {
         using var g = Arena();
-        var boss = Boss(g, "gel_sovereign", new Vector3(0, 0.5f, 6f));
+        var boss = Boss(g, "king_slime", new Vector3(0, 0.5f, 6f));
         var defeated = new List<Npc>();
         g.World.Npcs.BossDefeated += defeated.Add;
         g.World.Npcs.Kill(boss);
         Assert.Single(defeated);
-        Assert.Contains("defeated_gel_sovereign", g.World.Session.Flags);
+        Assert.Contains("defeated_king_slime", g.World.Session.Flags);
         Assert.Contains(g.World.Drops.Items, d => d.Stack.Item!.Id == "gel" && d.Stack.Count >= 1);
     }
 }

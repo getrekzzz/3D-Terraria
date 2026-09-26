@@ -32,16 +32,16 @@ public class ContentDatabaseTests
         Assert.Equal(ItemCategory.Block, stone.Category);
         Assert.Same(stone, db.BlockPlacers[db.BlockId("stone")]);
         // Grass drops loam, so it must not derive its own item.
-        Assert.False(db.Items.Contains("turf"));
-        Assert.Equal("loam", db.BlockDrops[db.BlockId("turf")]!.Id);
+        Assert.False(db.Items.Contains("grass"));
+        Assert.Equal("dirt", db.BlockDrops[db.BlockId("grass")]!.Id);
     }
 
     [Fact]
     public void TileObjectsDerivePlacingItems()
     {
         var db = TestPaths.Content;
-        Assert.Equal("workbench", db.Items.Get("workbench").PlaceObject);
-        Assert.Equal("alchemy_bottle", db.Items.Get("bottle").PlaceObject);
+        Assert.Equal("work_bench", db.Items.Get("work_bench").PlaceObject);
+        Assert.Equal("placed_bottle", db.Items.Get("bottle").PlaceObject);
         Assert.False(db.Items.Contains("oak_tree"));
     }
 

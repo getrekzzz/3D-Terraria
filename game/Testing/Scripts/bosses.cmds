@@ -6,21 +6,21 @@ heal
 fill -12 -4 -12 12 -1 12 stone
 fill -12 0 -12 12 8 12 air
 wait 0.5
-boss gel_sovereign 12
-assert npcs.gel_sovereign == 1
+boss king_slime 12
+assert npcs.king_slime == 1
 wait 2
 assert player.alive == 1
 killall
 time 22
-give glaring_lens 1
-wield glaring_lens
+give suspicious_looking_eye 1
+wield suspicious_looking_eye
 use
-assert npcs.watcher == 1
+assert npcs.eye_of_cthulhu == 1
 wait 3
 killall
-boss bore_tyrant 10
+boss eater_of_worlds 10
 wait 3
-assert npcs.bore_tyrant == 1
+assert npcs.eater_of_worlds == 1
 killall
 time noon
 assert errors == 0

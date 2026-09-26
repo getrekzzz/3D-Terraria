@@ -29,6 +29,12 @@ def covers(t: dict, piece: str) -> list:
     return [f"terraria:{t['metal']}_{piece}"]
 
 
+def label(t: dict, piece: str) -> str:
+    """Display name of a piece: the tier's own name for it (Light's Bane, Molten Fury, Cobalt Repeater) or
+    "<Metal> <Piece>"."""
+    return t.get("pieceNames", {}).get(piece, f"{t['name']} {piece.capitalize()}")
+
+
 def build(table: dict) -> dict:
     items, recipes = [], []
     for t in table["tiers"]:
@@ -44,7 +50,7 @@ def build(table: dict) -> dict:
         def tool(kind, stat_field, dmg_time, bars, wood, extra):
             iid = f"{m}_{kind}"
             dmg, use = dmg_time
-            item = {"id": iid, "name": f"{n} {kind.capitalize()}", "category": "tool", "rarity": r,
+            item = {"id": iid, "name": label(t, kind), "category": "tool", "rarity": r,
                     "value": v * bars // 2, "useStyle": "swing", "useTime": use, "useAnimation": use + 6,
                     "autoReuse": True, "damage": dmg, "damageType": "melee", "knockback": 2.0,
                     stat_field: p, "covers": covers(t, kind)}
@@ -58,7 +64,7 @@ def build(table: dict) -> dict:
         tool("hammer", "hammerPower", t["hammer"], 10, 3, {"knockback": 5.5})
 
         dmg, use, kb = t["broad"]
-        items.append({"id": f"{m}_broadsword", "name": f"{n} Broadsword", "category": "weapon", "rarity": r,
+        items.append({"id": f"{m}_broadsword", "name": label(t, "broadsword"), "category": "weapon", "rarity": r,
                       "value": v * 4, "useStyle": "swing", "useTime": use, "useAnimation": use, "damage": dmg,
                       "damageType": "melee", "knockback": kb, "crit": 0, "covers": covers(t, "broadsword"),
                       "behaviors": [{"type": "meleeSwing", "arc": 160, "length": 3.2}]})
@@ -66,7 +72,7 @@ def build(table: dict) -> dict:
                         "stations": craft})
 
         dmg, use, kb = t["short"]
-        items.append({"id": f"{m}_shortsword", "name": f"{n} Shortsword", "category": "weapon", "rarity": r,
+        items.append({"id": f"{m}_shortsword", "name": label(t, "shortsword"), "category": "weapon", "rarity": r,
                       "value": v * 3, "useStyle": "thrust", "useTime": use, "useAnimation": use, "damage": dmg,
                       "damageType": "melee", "knockback": kb, "autoReuse": True,
                       "covers": covers(t, "shortsword"), "behaviors": [{"type": "thrust", "length": 2.4}]})
@@ -74,7 +80,7 @@ def build(table: dict) -> dict:
                         "stations": craft})
 
         dmg, use, speed = t["bow"]
-        items.append({"id": f"{m}_bow", "name": f"{n} Bow", "category": "weapon", "rarity": r, "value": v * 3,
+        items.append({"id": f"{m}_bow", "name": label(t, "bow"), "category": "weapon", "rarity": r, "value": v * 3,
                       "useStyle": "shoot", "useTime": use, "useAnimation": use, "damage": dmg,
                       "damageType": "ranged", "knockback": 0.5, "useAmmo": "arrow", "shootSpeed": speed * 3.0,
                       "covers": covers(t, "bow")})
@@ -83,7 +89,7 @@ def build(table: dict) -> dict:
 
         for slot, part, bars, idx in (("head", "helmet", 15, 0), ("body", "chainmail", 25, 1), ("legs", "greaves", 20, 2)):
             iid = f"{m}_{part}"
-            items.append({"id": iid, "name": f"{n} {part.capitalize()}", "category": "armor", "rarity": r,
+            items.append({"id": iid, "name": label(t, part), "category": "armor", "rarity": r,
                           "value": v * bars // 2, "equipSlot": slot, "defense": t["armor"][idx],
                           "armorSet": f"{m}_armor", "covers": covers(t, part)})
             recipes.append({"id": iid, "output": iid, "inputs": [{"item": bar, "count": bars}],

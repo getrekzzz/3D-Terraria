@@ -16,15 +16,15 @@ public sealed class BlockPalette
         Bedrock = Id("abyssal_rock");
         Stone = Id("stone");
         Deepstone = Id("deepstone");
-        Loam = Id("loam");
-        Turf = Id("turf");
+        Loam = Id("dirt");
+        Turf = Id("grass");
         Clay = Id("clay");
         Sand = Id("sand");
         Sandstone = Id("sandstone");
-        PackedSand = Id("packed_sand");
+        PackedSand = Id("hardened_sand");
         Silt = Id("silt");
         Mud = Id("mud");
-        JungleTurf = Id("jungle_turf");
+        JungleTurf = Id("jungle_grass");
         Snow = Id("snow");
         Ice = Id("ice");
         Slush = Id("slush");
@@ -32,19 +32,19 @@ public sealed class BlockPalette
         Obsidian = Id("obsidian");
         Marble = Id("marble");
         Granite = Id("granite");
-        UmbralStone = Id("umbral_stone");
-        UmbralTurf = Id("umbral_turf");
-        SanguineStone = Id("sanguine_stone");
-        SanguineTurf = Id("sanguine_turf");
-        MushroomTurf = Id("mushroom_turf");
+        UmbralStone = Id("ebonstone");
+        UmbralTurf = Id("corrupt_grass");
+        SanguineStone = Id("crimstone");
+        SanguineTurf = Id("crimson_grass");
+        MushroomTurf = Id("mushroom_grass");
         Cloud = Id("cloud");
         RainCloud = Id("rain_cloud");
         Hive = Id("hive");
-        MossStone = Id("moss_stone");
-        GlowMossStone = Id("glow_moss_stone");
+        MossStone = Id("green_moss");
+        GlowMossStone = Id("argon_moss");
         Crystal = Id("crystal_cluster");
         Cobweb = Id("cobweb");
-        Cinderstone = Id("cinderstone");
+        Cinderstone = Id("hellstone");
     }
 
     public ushort Air { get; }

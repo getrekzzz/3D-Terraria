@@ -41,7 +41,7 @@ public sealed partial class MenuTour : Node
             await Shot("m03_characters", 2.5);
             menu.Open("create_world");
             await Shot("m04_create_world", 1.0);
-            var dir = menu.CreateWorldNow(new WorldSettings { Name = "Tour World", Seed = 4242, Size = WorldSizePreset.Tiny, Difficulty = Difficulty.Expert, Evil = EvilKind.Sanguine });
+            var dir = menu.CreateWorldNow(new WorldSettings { Name = "Tour World", Seed = 4242, Size = WorldSizePreset.Tiny, Difficulty = Difficulty.Expert, Evil = EvilKind.Crimson });
             menu.Open("worlds");
             await Shot("m05_worlds", 1.0);
             menu.Open("settings");

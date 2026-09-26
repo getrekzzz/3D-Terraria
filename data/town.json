@@ -3,25 +3,25 @@
   // (data/config/housing.json), lives there, sells from its shop and may offer a service.
   "townNpcs": [
     {
-      "id": "wayfinder", "name": "Wayfinder", "model": "wayfinder", "starter": true,
+      "id": "guide", "name": "Guide", "model": "guide", "starter": true,
       "names": ["Aldous", "Brannoc", "Corin", "Dace", "Evander", "Faolan", "Gideon", "Hollis"],
       "life": 250, "defense": 15, "speed": 1.5,
       "service": { "type": "craftHelp" },
       "lines": [
-        { "text": "Welcome, {player}. Chop some trees, build a workbench, and the world opens up from there." },
+        { "text": "Welcome, {player}. Chop some trees, build a Work Bench, and the world opens up from there." },
         { "text": "A home needs walls you built, a door, a light, a table and a chair. Ask me with the housing check if you are unsure." },
         { "text": "Show me an item and I will tell you what it can become." },
         { "text": "Gel from the hopping slimes burns well in a torch.", "conditions": [{ "type": "time", "is": "day" }] },
         { "text": "The night brings out the dead. Stay behind a closed door.", "conditions": [{ "type": "time", "is": "night" }] },
-        { "text": "An old man keeps the door of the crypt by the cold coast. Talk to him before you go digging.", "conditions": [{ "type": "flag", "id": "defeated_crypt_warden", "set": false }] },
+        { "text": "An old man keeps the door of the dungeon by the cold coast. Talk to him before you go digging.", "conditions": [{ "type": "flag", "id": "defeated_skeletron", "set": false }] },
         { "text": "Lava and water do not mix. Well, they do, but you get stone out of it.", "conditions": [{ "type": "hasItem", "item": "lava_bucket" }] },
-        { "text": "{resident:peddler} keeps a good stock of torches, if you have the coin.", "conditions": [{ "type": "resident", "id": "peddler" }] }
+        { "text": "{resident:merchant} keeps a good stock of torches, if you have the coin.", "conditions": [{ "type": "resident", "id": "merchant" }] }
       ],
-      "mood": [{ "biome": "forest", "score": 1 }, { "neighbor": "grovekeeper", "score": 1 }, { "biome": "ocean", "score": -1 }],
+      "mood": [{ "biome": "forest", "score": 1 }, { "neighbor": "dryad", "score": 1 }, { "biome": "ocean", "score": -1 }],
       "covers": ["terraria:guide"]
     },
     {
-      "id": "peddler", "name": "Peddler", "model": "peddler",
+      "id": "merchant", "name": "Merchant", "model": "merchant",
       "names": ["Abner", "Barnaby", "Cletus", "Darby", "Emmett", "Fenwick", "Gustav", "Horace"],
       "arrival": [{ "type": "coins", "min": 5000 }],
       "life": 250, "defense": 15, "speed": 1.5,
@@ -29,57 +29,57 @@
         { "item": "torch", "price": 50 },
         { "item": "bottle", "price": 20 },
         { "item": "wooden_arrow", "price": 5 },
-        { "item": "minor_restorative", "price": 300 },
-        { "item": "minor_mana_tonic", "price": 100 },
+        { "item": "lesser_healing_potion", "price": 300 },
+        { "item": "lesser_mana_potion", "price": 100 },
         { "item": "copper_pickaxe", "price": 1000 },
         { "item": "copper_axe", "price": 800 },
         { "item": "empty_bucket", "price": 600 },
-        { "item": "acorn", "price": 100, "conditions": [{ "type": "flag", "id": "defeated_gel_sovereign" }] },
-        { "item": "glowcap", "price": 50, "conditions": [{ "type": "time", "is": "night" }] }
+        { "item": "acorn", "price": 100, "conditions": [{ "type": "flag", "id": "defeated_king_slime" }] },
+        { "item": "glowing_mushroom", "price": 50, "conditions": [{ "type": "time", "is": "night" }] }
       ],
       "lines": [
         { "text": "Everything has a price, {player}. Today it is a fair one." },
         { "text": "Torches! Bottles! Buckets! The finest goods this side of the caverns." },
         { "text": "I buy anything, at a fifth of what it is worth. Business is business." },
-        { "text": "{resident:mender} charges more than I do. Remember that.", "conditions": [{ "type": "resident", "id": "mender" }] },
+        { "text": "{resident:nurse} charges more than I do. Remember that.", "conditions": [{ "type": "resident", "id": "nurse" }] },
         { "text": "Blood in the sky tonight. Bad for trade.", "conditions": [{ "type": "event", "id": "blood_moon" }] }
       ],
-      "mood": [{ "biome": "forest", "score": 1 }, { "biome": "desert", "score": 1 }, { "neighbor": "mender", "score": -1 }, { "biome": "tundra", "score": -1 }],
+      "mood": [{ "biome": "forest", "score": 1 }, { "biome": "desert", "score": 1 }, { "neighbor": "nurse", "score": -1 }, { "biome": "tundra", "score": -1 }],
       "covers": ["terraria:merchant"]
     },
     {
-      "id": "mender", "name": "Mender", "model": "mender",
+      "id": "nurse", "name": "Nurse", "model": "nurse",
       "names": ["Ada", "Brigid", "Cora", "Delphine", "Edith", "Faye", "Greta", "Hazel"],
-      "arrival": [{ "type": "maxLife", "min": 120 }, { "type": "resident", "id": "peddler" }],
+      "arrival": [{ "type": "maxLife", "min": 120 }, { "type": "resident", "id": "merchant" }],
       "life": 250, "defense": 15, "speed": 1.6,
       "service": { "type": "heal", "costPerLife": 15, "clearsDebuffs": true },
       "shop": [
-        { "item": "minor_restorative", "price": 250 }
+        { "item": "lesser_healing_potion", "price": 250 }
       ],
       "lines": [
         { "text": "Hold still, {player}. This will only sting a little." },
         { "text": "Another bruise? I charge by the wound." },
         { "text": "You look pale. When did you last eat something that was not a mushroom?" },
-        { "text": "{resident:peddler} keeps asking for a discount. He will not get one.", "conditions": [{ "type": "resident", "id": "peddler" }] }
+        { "text": "{resident:merchant} keeps asking for a discount. He will not get one.", "conditions": [{ "type": "resident", "id": "merchant" }] }
       ],
-      "mood": [{ "biome": "hallowed", "score": 2 }, { "neighbor": "wayfinder", "score": 1 }, { "biome": "sanguine", "score": -2 }],
+      "mood": [{ "biome": "hallow", "score": 2 }, { "neighbor": "guide", "score": 1 }, { "biome": "crimson", "score": -2 }],
       "covers": ["terraria:nurse"]
     },
     {
-      "id": "grovekeeper", "name": "Grovekeeper", "model": "grovekeeper",
+      "id": "dryad", "name": "Dryad", "model": "dryad",
       "names": ["Aspen", "Briar", "Cedra", "Elowen", "Fern", "Iris", "Linnea", "Rowan"],
       "arrival": [{ "type": "any", "of": [
-        { "type": "flag", "id": "defeated_gel_sovereign" },
-        { "type": "flag", "id": "defeated_watcher" },
-        { "type": "flag", "id": "defeated_bore_tyrant" }
+        { "type": "flag", "id": "defeated_king_slime" },
+        { "type": "flag", "id": "defeated_eye_of_cthulhu" },
+        { "type": "flag", "id": "defeated_eater_of_worlds" }
       ] }],
       "life": 250, "defense": 15, "speed": 1.6,
       "shop": [
         { "item": "acorn", "price": 50 },
         { "item": "mushroom", "price": 100 },
-        { "item": "glowcap", "price": 60 },
+        { "item": "glowing_mushroom", "price": 60 },
         { "item": "cactus", "price": 40 },
-        { "item": "swiftness_draught", "price": 1000 }
+        { "item": "swiftness_potion", "price": 1000 }
       ],
       "lines": [
         { "text": "The forest remembers every tree you fell, {player}. Plant one back now and then." },
@@ -87,18 +87,18 @@
         { "text": "Something rots beneath the surface. Keep it from spreading." },
         { "text": "The jungle is loud tonight.", "conditions": [{ "type": "time", "is": "night" }] }
       ],
-      "mood": [{ "biome": "jungle", "score": 2 }, { "biome": "forest", "score": 1 }, { "neighbor": "wayfinder", "score": 1 }, { "biome": "umbral", "score": -2 }],
+      "mood": [{ "biome": "jungle", "score": 2 }, { "biome": "forest", "score": 1 }, { "neighbor": "guide", "score": 1 }, { "biome": "corruption", "score": -2 }],
       "covers": ["terraria:dryad"]
     },
     {
-      "id": "crypt_keeper", "name": "Crypt Keeper", "model": "crypt_keeper", "landmark": "dungeon_gate",
+      "id": "old_man", "name": "Old Man", "model": "old_man", "landmark": "dungeon_gate",
       "names": ["Aurelius", "Barnabas", "Cornelius", "Ezekiel", "Mordecai", "Obadiah", "Silas", "Thaddeus"],
       "life": 250, "defense": 15, "speed": 0.9,
-      "leavesWhen": [{ "type": "flag", "id": "defeated_crypt_warden" }],
-      "service": { "type": "summonBoss", "enemy": "crypt_warden", "label": "Break the curse", "height": 7,
+      "leavesWhen": [{ "type": "flag", "id": "defeated_skeletron" }],
+      "service": { "type": "summonBoss", "enemy": "skeletron", "label": "Break the curse", "height": 7,
         "conditions": [{ "type": "time", "is": "night" }], "failMessage": "Not while the sun watches. Come back after dark." },
       "lines": [
-        { "text": "You cannot go in, {player}. The crypt keeps what it takes, and it keeps me at its door." },
+        { "text": "You cannot go in, {player}. The dungeon keeps what it takes, and it keeps me at its door." },
         { "text": "Something wears my name down there. Its hands never rest." },
         { "text": "Break the curse, and I will be free. Try it by day and it will break you instead." },
         { "text": "The walls will not yield to your pick while it stands.", "conditions": [{ "type": "time", "is": "day" }] },
@@ -107,12 +107,12 @@
       "covers": ["terraria:old_man"]
     },
     {
-      "id": "tailor", "name": "Tailor", "model": "tailor",
+      "id": "clothier", "name": "Clothier", "model": "clothier",
       "names": ["Alistair", "Bartholomew", "Cedric", "Duncan", "Edmund", "Frederick", "Gilbert", "Harold"],
-      "arrival": [{ "type": "flag", "id": "defeated_crypt_warden" }],
+      "arrival": [{ "type": "flag", "id": "defeated_skeletron" }],
       "life": 250, "defense": 15, "speed": 1.4,
       "shop": [
-        { "item": "silk_thread", "price": 600 },
+        { "item": "silk", "price": 600 },
         { "item": "loom", "price": 1500 },
         { "item": "bone", "price": 150, "conditions": [{ "type": "time", "is": "night" }] }
       ],
@@ -120,9 +120,9 @@
         { "text": "Free at last, and I have you to thank, {player}. Let me mend something for you." },
         { "text": "Decades in rags at that door. Never again. Silk, only silk." },
         { "text": "I still dream of the hands. I wake and my own are shaking." },
-        { "text": "{resident:wayfinder} says I talk to the walls. Old habit.", "conditions": [{ "type": "resident", "id": "wayfinder" }] }
+        { "text": "{resident:guide} says I talk to the walls. Old habit.", "conditions": [{ "type": "resident", "id": "guide" }] }
       ],
-      "mood": [{ "biome": "tundra", "score": 1 }, { "neighbor": "mender", "score": 1 }, { "biome": "sanguine", "score": -2 }, { "biome": "umbral", "score": -2 }],
+      "mood": [{ "biome": "tundra", "score": 1 }, { "neighbor": "nurse", "score": 1 }, { "biome": "crimson", "score": -2 }, { "biome": "corruption", "score": -2 }],
       "covers": ["terraria:clothier"]
     }
   ]

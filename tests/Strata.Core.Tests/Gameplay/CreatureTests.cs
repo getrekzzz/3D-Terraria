@@ -23,7 +23,7 @@ public class CreatureTests
     public void RangedCreaturesFireHostileProjectilesThatHurtPlayers()
     {
         using var g = Create();
-        var hornet = Spawn(g, "thornet", g.Player.Position + new Vector3(4f, 2f, 0));
+        var hornet = Spawn(g, "hornet", g.Player.Position + new Vector3(4f, 2f, 0));
         int life = g.Player.State.Vitals.Life;
         bool fired = false;
         for (int i = 0; i < 600 && g.Player.State.Vitals.Life == life; i++)
@@ -46,7 +46,7 @@ public class CreatureTests
             for (int z = -6; z <= 6; z++)
                 batch.SetBlock(g.Floor.X + 4, g.Floor.Y + y, g.Floor.Z + z, stone);
         g.World.Session.Commit(batch);
-        Spawn(g, "cinder_imp", TestGame.CellFeet(g.Floor + new Int3(8, 1, 0)));
+        Spawn(g, "fire_imp", TestGame.CellFeet(g.Floor + new Int3(8, 1, 0)));
         g.Ticks(400);
         Assert.DoesNotContain(g.World.Projectiles.All, p => !p.Def.Friendly);
     }
@@ -65,8 +65,8 @@ public class CreatureTests
         g.World.Session.Commit(batch);
         g.World.Liquids.Enabled = false;
         g.World.Editor.FillLiquid(center + new Int3(-2, 1, -2), center + new Int3(2, 4, 2), g.Content.Liquids.Get("water"), LiquidCode.MaxLevel);
-        var fish = Spawn(g, "razorfin", TestGame.CellFeet(center + new Int3(0, 2, 0)));
-        var stranded = Spawn(g, "razorfin", TestGame.CellFeet(g.Floor + new Int3(-6, 4, -6)));
+        var fish = Spawn(g, "shark", TestGame.CellFeet(center + new Int3(0, 2, 0)));
+        var stranded = Spawn(g, "shark", TestGame.CellFeet(g.Floor + new Int3(-6, 4, -6)));
         g.Ticks(360);
         Assert.NotEqual(0, g.World.Session.World.GetLiquid(VoxelMotion.CellOf(fish.Center).X, VoxelMotion.CellOf(fish.Center).Y, VoxelMotion.CellOf(fish.Center).Z));
         Assert.True(stranded.OnGround || stranded.Position.Y < TestGame.CellFeet(g.Floor + new Int3(0, 2, 0)).Y);
@@ -77,7 +77,7 @@ public class CreatureTests
     {
         using var g = Create();
         var root = TestGame.CellFeet(g.Floor + new Int3(6, 1, 0));
-        var snatcher = Spawn(g, "snatcher", root);
+        var snatcher = Spawn(g, "man_eater", root);
         float reach = 7 * Units.CellSize;
         float closest = float.MaxValue;
         for (int i = 0; i < 300; i++)
@@ -93,7 +93,7 @@ public class CreatureTests
     public void ContactDebuffsAndDeathEffects()
     {
         using var g = Create();
-        var frost = Spawn(g, "frost_gel", g.Player.Position);
+        var frost = Spawn(g, "ice_slime", g.Player.Position);
         for (int i = 0; i < 20 && !g.Player.State.Buffs.Has("chilled"); i++)
         {
             g.Player.State.Vitals.ImmunityTicks = 0;
@@ -104,7 +104,7 @@ public class CreatureTests
         Assert.True(g.Player.State.Buffs.Has("chilled"));
 
         var cell = g.Floor + new Int3(-5, 1, -5);
-        var magma = Spawn(g, "magma_gel", TestGame.CellFeet(cell));
+        var magma = Spawn(g, "lava_slime", TestGame.CellFeet(cell));
         g.World.Npcs.Kill(magma);
         Assert.Equal((int)LiquidType.Lava, g.World.Session.World.GetLiquid(cell.X, cell.Y, cell.Z) >> 5);
     }

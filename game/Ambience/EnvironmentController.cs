@@ -34,7 +34,7 @@ public sealed partial class EnvironmentController : Node3D
     /// <summary>Forces the cloud cover (0 clear … 1 overcast) instead of the drifting weather; null restores it.</summary>
     public float? CloudCoverOverride { get; set; }
 
-    /// <summary>Tint of the active world event (crimson moon…), or null.</summary>
+    /// <summary>Tint of the active world event (Blood Moon…), or null.</summary>
     public Color? EventTint { get; set; }
 
     /// <summary>The look of the biome around the camera (fog colour and density, sky and ambient tint), from data.</summary>

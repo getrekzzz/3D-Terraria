@@ -46,7 +46,7 @@ public class StreamingTests
 
         // Dig out the ground under spawn and place a crisp brick.
         var ground = spawn + Int3.Down;
-        var brick = session.Content.BlockId("stone_brick");
+        var brick = session.Content.BlockId("gray_brick");
         var batch = session.World.BeginEdit();
         batch.SetBlock(ground, 0);
         batch.SetBlock(spawn + new Int3(2, 0, 0), brick, 0, CellFlags.PlayerPlaced);

@@ -43,7 +43,7 @@ public sealed class TileObjectDef : ContentDef
 
     public int[]? Light { get; init; }
 
-    /// <summary>Crafting station identities this object provides (e.g. "workbench", "furnace").</summary>
+    /// <summary>Crafting station identities this object provides (e.g. "work_bench", "furnace").</summary>
     public string[] Stations { get; init; } = Array.Empty<string>();
 
     /// <summary>Housing roles (door, light, table, chair, bed).</summary>

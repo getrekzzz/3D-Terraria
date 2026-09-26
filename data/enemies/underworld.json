@@ -2,59 +2,59 @@
   // The Mawwall and the way to it: the effigy bearer carries the wayfinder's effigy; burned in underworld lava while
   // the wayfinder lives, it calls the wall. Its defeat raises defeated_mawwall, which turns the world to hardmode.
   "projectiles": [
-    { "id": "maw_laser", "name": "Maw Laser", "visual": "bolt", "color": "#ff3050", "friendly": false, "lifetime": 150, "radius": 0.35,
+    { "id": "wall_of_flesh_laser", "name": "Laser", "visual": "bolt", "color": "#ff3050", "friendly": false, "lifetime": 150, "radius": 0.35,
       "collideTerrain": false, "light": [12, 2, 4], "trail": "#ff8090", "covers": ["terraria:eye_laser"] }
   ],
   "items": [
-    { "id": "wayfinder_effigy", "name": "Wayfinder Effigy", "description": "It feels warm, and a little too familiar. Keep it away from lava.",
+    { "id": "guide_voodoo_doll", "name": "Guide Voodoo Doll", "description": "It feels warm, and a little too familiar. Keep it away from lava.",
       "category": "bossSummon", "maxStack": 20, "value": 5000,
-      "behaviors": [{ "type": "incinerationSummon", "enemy": "mawwall", "layer": "underworld", "killsResident": "wayfinder" }],
+      "behaviors": [{ "type": "incinerationSummon", "enemy": "wall_of_flesh", "layer": "underworld", "killsResident": "guide" }],
       "covers": ["terraria:guide_voodoo_doll"] },
-    { "id": "gorehammer", "name": "Gorehammer", "description": "Strong enough to crack what the old seals hold.", "category": "tool", "rarity": 4, "value": 39000,
+    { "id": "pwnhammer", "name": "Pwnhammer", "description": "Strong enough to crack what the old seals hold.", "category": "tool", "rarity": 4, "value": 39000,
       "useStyle": "swing", "useTime": 27, "useAnimation": 27, "autoReuse": true, "damage": 26, "damageType": "melee", "knockback": 7.5, "hammerPower": 80,
       "covers": ["terraria:pwnhammer"] },
-    { "id": "warrior_sigil", "name": "Warrior's Sigil", "description": "15% increased melee damage.", "category": "accessory", "rarity": 4, "value": 20000,
+    { "id": "warrior_emblem", "name": "Warrior Emblem", "description": "15% increased melee damage.", "category": "accessory", "rarity": 4, "value": 20000,
       "equipSlot": "accessory", "equipEffects": [{ "type": "stat", "stat": "meleeDamage", "add": 0.15 }], "covers": ["terraria:warrior_emblem"] },
-    { "id": "marksman_sigil", "name": "Marksman's Sigil", "description": "15% increased ranged damage.", "category": "accessory", "rarity": 4, "value": 20000,
+    { "id": "ranger_emblem", "name": "Ranger Emblem", "description": "15% increased ranged damage.", "category": "accessory", "rarity": 4, "value": 20000,
       "equipSlot": "accessory", "equipEffects": [{ "type": "stat", "stat": "rangedDamage", "add": 0.15 }], "covers": ["terraria:ranger_emblem"] },
-    { "id": "sorcerer_sigil", "name": "Sorcerer's Sigil", "description": "15% increased magic damage.", "category": "accessory", "rarity": 4, "value": 20000,
+    { "id": "sorcerer_emblem", "name": "Sorcerer Emblem", "description": "15% increased magic damage.", "category": "accessory", "rarity": 4, "value": 20000,
       "equipSlot": "accessory", "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.15 }], "covers": ["terraria:sorcerer_emblem"] }
   ],
   "lootTables": [
-    { "id": "maw_sigil", "mode": "weighted", "rolls": 1, "entries": [{ "item": "warrior_sigil" }, { "item": "marksman_sigil" }, { "item": "sorcerer_sigil" }] },
-    { "id": "mawwall", "coins": [60000, 90000], "entries": [{ "item": "gorehammer" }, { "table": "maw_sigil" }, { "item": "minor_restorative", "min": 5, "max": 15 }] },
-    { "id": "effigy_bearer", "coins": [300, 800], "entries": [{ "item": "wayfinder_effigy" }] }
+    { "id": "wall_of_flesh_emblems", "mode": "weighted", "rolls": 1, "entries": [{ "item": "warrior_emblem" }, { "item": "ranger_emblem" }, { "item": "sorcerer_emblem" }] },
+    { "id": "wall_of_flesh", "coins": [60000, 90000], "entries": [{ "item": "pwnhammer" }, { "table": "wall_of_flesh_emblems" }, { "item": "lesser_healing_potion", "min": 5, "max": 15 }] },
+    { "id": "voodoo_demon", "coins": [300, 800], "entries": [{ "item": "guide_voodoo_doll" }] }
   ],
   "enemies": [
     {
-      "id": "mawwall", "model": "maw_mouth", "tags": ["boss", "lava_immune", "demon"], "name": "The Mawwall",
+      "id": "wall_of_flesh", "model": "wall_of_flesh_mouth", "tags": ["boss", "lava_immune", "demon"], "name": "Wall of Flesh",
       "description": "The underworld's own flesh, risen to keep the world as it is.",
-      "brain": { "type": "mawwall", "startDistance": 45, "width": 40, "thickness": 3, "baseSpeed": 1.6, "maxSpeed": 5, "catchUpDistance": 60,
-        "trackSpeed": 3, "eyeSpacing": 7, "minion": "hungry", "minionInterval": 300, "maxMinions": 5 },
-      "ranged": { "projectile": "maw_laser", "damage": 22, "speed": 18, "interval": 70, "range": 60, "fromParts": true },
+      "brain": { "type": "wallOfFlesh", "startDistance": 45, "width": 40, "thickness": 3, "baseSpeed": 1.6, "maxSpeed": 5, "catchUpDistance": 60,
+        "trackSpeed": 3, "eyeSpacing": 7, "minion": "the_hungry", "minionInterval": 300, "maxMinions": 5 },
+      "ranged": { "projectile": "wall_of_flesh_laser", "damage": 22, "speed": 18, "interval": 70, "range": 60, "fromParts": true },
       "despawnWhen": [{ "type": "not", "of": [{ "type": "layer", "any": ["underworld"] }] }],
       "life": 6000, "damage": 50, "defense": 12, "knockbackResist": 1.0, "size": [10, 10], "moveSpeed": 2, "gravity": false, "collideTerrain": false,
-      "loot": "mawwall", "value": 0, "light": [8, 3, 3],
-      "boss": { "title": "The Mawwall", "flag": "defeated_mawwall", "arenaRadius": 250, "music": "boss_maw",
-        "segments": 2, "segmentRadius": 1.4, "segmentModels": ["maw_eye", "maw_eye"], "barrierModel": "maw_flesh", "barrierTile": 4 },
+      "loot": "wall_of_flesh", "value": 0, "light": [8, 3, 3],
+      "boss": { "title": "The Wall of Flesh", "flag": "defeated_wall_of_flesh", "arenaRadius": 250, "music": "boss_maw",
+        "segments": 2, "segmentRadius": 1.4, "segmentModels": ["wall_of_flesh_eye", "wall_of_flesh_eye"], "barrierModel": "wall_of_flesh_flesh", "barrierTile": 4 },
       "covers": ["terraria:wall_of_flesh"]
     },
     {
-      "id": "hungry", "model": "hungry", "tags": ["lava_immune", "demon"], "name": "Hungry Maw",
+      "id": "the_hungry", "model": "the_hungry", "tags": ["lava_immune", "demon"], "name": "The Hungry",
       "brain": { "type": "lunger", "reach": 9, "aggroRange": 26 },
       "life": 120, "damage": 30, "defense": 10, "knockbackResist": 0.8, "size": [2.2, 2.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false,
       "tetherColor": "#8a2a34", "value": 0, "covers": ["terraria:the_hungry"]
     },
     {
-      "id": "effigy_bearer", "model": "imp", "tags": ["lava_immune", "demon"], "name": "Effigy Bearer",
+      "id": "voodoo_demon", "model": "imp", "tags": ["lava_immune", "demon"], "name": "Voodoo Demon",
       "description": "Clutches a small, familiar doll.",
       "brain": { "type": "flyer", "aggroRange": 60, "orbitRadius": 10, "dashSpeed": 8, "dashCooldown": 420 },
-      "ranged": { "projectile": "cinder_bolt", "damage": 28, "speed": 10, "interval": 180, "range": 22 },
+      "ranged": { "projectile": "burning_sphere", "damage": 28, "speed": 10, "interval": 180, "range": 22 },
       "life": 140, "damage": 32, "defense": 8, "knockbackResist": 0.6, "size": [1.8, 2.8], "moveSpeed": 3.5, "gravity": false, "scale": 1.1,
-      "tint": "#c090ff", "light": [5, 2, 7], "loot": "effigy_bearer", "value": 300, "covers": ["terraria:voodoo_demon"]
+      "tint": "#c090ff", "light": [5, 2, 7], "loot": "voodoo_demon", "value": 300, "covers": ["terraria:voodoo_demon"]
     }
   ],
   "spawnRules": [
-    { "id": "effigy_bearer_underworld", "enemy": "effigy_bearer", "weight": 0.6, "maxAlive": 1, "conditions": [{ "type": "layer", "any": ["underworld"] }] }
+    { "id": "voodoo_demon_underworld", "enemy": "voodoo_demon", "weight": 0.6, "maxAlive": 1, "conditions": [{ "type": "layer", "any": ["underworld"] }] }
   ]
 }

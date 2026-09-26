@@ -79,7 +79,7 @@ public sealed class PlayerSave
         Fill(p.Inventory.Armor, Armor, content);
         Fill(p.Inventory.Accessories, Accessories, content);
         foreach (var b in Buffs)
-            if (content.Buffs.TryGet(b.Id, out var def)) p.Buffs.Add(def, b.Ticks);
+            if (content.Buffs.TryGet(content.Current(b.Id), out var def)) p.Buffs.Add(def, b.Ticks);
         foreach (var kv in SpawnPoints) p.SpawnPoints[kv.Key] = kv.Value;
         p.Inventory.Select(SelectedHotbar);
         p.Recompute();

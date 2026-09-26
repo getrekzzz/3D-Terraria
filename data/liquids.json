@@ -23,7 +23,7 @@
       "id": "honey", "name": "Honey", "code": 3, "color": "#e09a18",
       "flowInterval": 30, "fallCells": 1, "spreadThreshold": 3, "minLevel": 5, "evaporateChance": 0.05,
       "moveSpeed": 0.3, "swimStrength": 0.4, "drag": 0.8,
-      "contactBuff": "sweetened", "contactBuffTicks": 1800, "bucket": "honey_bucket",
+      "contactBuff": "honey", "contactBuffTicks": 1800, "bucket": "honey_bucket",
       "covers": ["terraria:honey"]
     }
   ],
@@ -32,9 +32,9 @@
     { "id": "crispy_honey", "name": "Crispy Honey Block", "render": "crisp", "textures": { "all": "crispy_honey" }, "hardness": 1.5, "sound": "stone", "color": "#8a4a14", "tags": ["built", "liquid_mix"], "covers": ["terraria:crispy_honey_block"] }
   ],
   "buffs": [
-    { "id": "sweetened", "name": "Sweetened", "description": "Honey mends wounds.", "color": "#f0b040", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 2 }], "covers": ["terraria:honey"] },
-    { "id": "gillbreath", "name": "Gillbreath", "description": "Breathe under liquid.", "color": "#60c0d0", "effects": [{ "type": "waterBreathing" }], "covers": ["terraria:gills"] },
-    { "id": "emberskin", "name": "Emberskin", "description": "Immune to lava.", "color": "#a04060", "effects": [{ "type": "liquidImmune", "liquid": "lava" }, { "type": "immune", "buff": "on_fire" }], "covers": ["terraria:obsidian_skin"] }
+    { "id": "honey", "name": "Honey", "description": "Honey mends wounds.", "color": "#f0b040", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 2 }], "covers": ["terraria:honey"] },
+    { "id": "gills", "name": "Gills", "description": "Breathe under liquid.", "color": "#60c0d0", "effects": [{ "type": "waterBreathing" }], "covers": ["terraria:gills"] },
+    { "id": "obsidian_skin", "name": "Obsidian Skin", "description": "Immune to lava.", "color": "#a04060", "effects": [{ "type": "liquidImmune", "liquid": "lava" }, { "type": "immune", "buff": "on_fire" }], "covers": ["terraria:obsidian_skin"] }
   ],
   "items": [
     { "id": "empty_bucket", "name": "Empty Bucket", "description": "Scoops up liquid.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
@@ -45,12 +45,12 @@
       "behaviors": [{ "type": "bucket", "liquid": "lava", "empty": "empty_bucket" }], "covers": ["terraria:lava_bucket"] },
     { "id": "honey_bucket", "name": "Honey Bucket", "description": "Pours a full cell of honey.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
       "behaviors": [{ "type": "bucket", "liquid": "honey", "empty": "empty_bucket" }], "covers": ["terraria:honey_bucket"] },
-    { "id": "gillweed_draught", "name": "Gillweed Draught", "description": "Breathe underwater for a while.", "category": "potion", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "gillbreath", "ticks": 7200 }, "covers": ["terraria:gills_potion"] },
-    { "id": "emberskin_draught", "name": "Emberskin Draught", "description": "Walk through lava for a while.", "category": "potion", "maxStack": 30, "value": 300, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "emberskin", "ticks": 14400 }, "covers": ["terraria:obsidian_skin_potion"] }
+    { "id": "gills_potion", "name": "Gills Potion", "description": "Breathe underwater for a while.", "category": "potion", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "gills", "ticks": 7200 }, "covers": ["terraria:gills_potion"] },
+    { "id": "obsidian_skin_potion", "name": "Obsidian Skin Potion", "description": "Walk through lava for a while.", "category": "potion", "maxStack": 30, "value": 300, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "obsidian_skin", "ticks": 14400 }, "covers": ["terraria:obsidian_skin_potion"] }
   ],
   "recipes": [
     { "id": "empty_bucket", "output": "empty_bucket", "inputs": [{ "group": "any_iron_bar", "count": 3 }], "stations": ["anvil"] },
-    { "id": "gillweed_draught", "output": "gillweed_draught", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "shark_tooth", "count": 1 }, { "item": "mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
-    { "id": "emberskin_draught", "output": "emberskin_draught", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "obsidian", "count": 2 }, { "item": "glowcap", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] }
+    { "id": "gills_potion", "output": "gills_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "shark_fin", "count": 1 }, { "item": "mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
+    { "id": "obsidian_skin_potion", "output": "obsidian_skin_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "obsidian", "count": 2 }, { "item": "glowing_mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] }
   ]
 }

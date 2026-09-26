@@ -7,14 +7,14 @@ public static class BrainSpecs
     public const string SlimeHop = "slimeHop";
     public const string Walker = "walker";
     public const string Flyer = "flyer";
-    public const string GelSovereign = "gelSovereign";
-    public const string Watcher = "watcher";
+    public const string GelSovereign = "kingSlime";
+    public const string Watcher = "eyeOfCthulhu";
     public const string Worm = "worm";
     public const string Swimmer = "swimmer";
     public const string Lunger = "lunger";
-    public const string CryptWarden = "cryptWarden";
+    public const string CryptWarden = "skeletron";
     public const string Caster = "caster";
-    public const string Mawwall = "mawwall";
+    public const string Mawwall = "wallOfFlesh";
 
     public static void Register(SpecCatalog c)
     {

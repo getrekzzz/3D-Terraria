@@ -16,7 +16,7 @@ public static class DungeonBuilder
     public static Blueprint Build(ContentDatabase content, Int3 gate, ref Pcg32 rng, int nx, int ny, int nz)
     {
         var bp = new Blueprint { Flags = CellFlags.Structure };
-        string brick = rng.Pick(new[] { "azure_brick", "verdant_brick", "rose_brick" });
+        string brick = rng.Pick(new[] { "blue_brick", "green_brick", "pink_brick" });
         byte platform = ShapeCode.Pack(CellShape.Platform, 0);
 
         // Gatehouse with crenellations and an open doorway.
@@ -116,7 +116,7 @@ public static class DungeonBuilder
         if (rng.Chance(0.3f)) bp.Object(tiles.Get("gold_chest"), floor + new Int3(rng.Range(0, 4), 0, rng.Range(0, 4)), 0, 0, "cabin_chest");
         if (rng.Chance(0.7f)) bp.Object(tiles.Get("candle"), new Int3(room.Max.X - 3, room.Min.Y + 1, room.Max.Z - 3), 0);
         for (int i = rng.Range(0, 4); i > 0; i--)
-            bp.Object(tiles.Get("clay_pot"), new Int3(room.Min.X + 2 + i * 3, room.Min.Y + 1, room.Max.Z - 4), 0, i % 3);
+            bp.Object(tiles.Get("pot"), new Int3(room.Min.X + 2 + i * 3, room.Min.Y + 1, room.Max.Z - 4), 0, i % 3);
         if (rng.Chance(0.5f))
         {
             var top = new Int3(room.Min.X + 1, room.Max.Y - 3, room.Min.Z + 1);

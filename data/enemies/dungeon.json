@@ -2,81 +2,81 @@
   // The Old Crypt: its warden (summoned through the keeper at the gate), the guardian that punishes early
   // trespassers, and the crypt's own creatures (the dungeon biome has exclusive spawns).
   "projectiles": [
-    { "id": "hex_sphere", "name": "Hex Sphere", "visual": "orb", "color": "#7a4ae0", "friendly": false, "lifetime": 300, "radius": 0.5, "light": [6, 3, 12], "trail": "#a080ff",
-      "onHit": [{ "type": "applyBuff", "buff": "hexed", "ticks": 180, "chance": 0.25 }], "covers": ["terraria:water_sphere"] },
-    { "id": "skull_bolt", "name": "Skull", "visual": "orb", "color": "#e8e0c8", "lifetime": 150, "radius": 0.45, "light": [8, 7, 5], "trail": "#fff0c0",
+    { "id": "water_sphere", "name": "Water Sphere", "visual": "orb", "color": "#7a4ae0", "friendly": false, "lifetime": 300, "radius": 0.5, "light": [6, 3, 12], "trail": "#a080ff",
+      "onHit": [{ "type": "applyBuff", "buff": "cursed", "ticks": 180, "chance": 0.25 }], "covers": ["terraria:water_sphere"] },
+    { "id": "book_skull", "name": "Skull", "visual": "orb", "color": "#e8e0c8", "lifetime": 150, "radius": 0.45, "light": [8, 7, 5], "trail": "#fff0c0",
       "covers": ["terraria:book_of_skulls_skull"] }
   ],
   "buffs": [
-    { "id": "hexed", "name": "Hexed", "description": "Your hands will not obey you.", "debuff": true, "color": "#8060c0",
+    { "id": "cursed", "name": "Cursed", "description": "Your hands will not obey you.", "debuff": true, "color": "#8060c0",
       "effects": [{ "type": "noItemUse" }], "covers": ["terraria:cursed"] }
   ],
   "items": [
-    { "id": "tome_of_skulls", "name": "Tome of Skulls", "description": "Hurls the crypt's grinning dead.", "category": "weapon", "rarity": 2, "value": 25000,
+    { "id": "book_of_skulls", "name": "Book of Skulls", "description": "Hurls the dungeon's grinning dead.", "category": "weapon", "rarity": 2, "value": 25000,
       "useStyle": "shoot", "useTime": 28, "useAnimation": 28, "autoReuse": true, "damage": 29, "damageType": "magic", "knockback": 3.5,
-      "manaCost": 12, "projectile": "skull_bolt", "shootSpeed": 13, "covers": ["terraria:book_of_skulls"] }
+      "manaCost": 12, "projectile": "book_skull", "shootSpeed": 13, "covers": ["terraria:book_of_skulls"] }
   ],
   "lootTables": [
-    { "id": "crypt_warden", "coins": [10000, 15000], "entries": [{ "item": "tome_of_skulls", "chance": 0.34 }, { "item": "bone", "min": 15, "max": 30 }, { "item": "minor_restorative", "min": 5, "max": 10 }] },
+    { "id": "skeletron", "coins": [10000, 15000], "entries": [{ "item": "book_of_skulls", "chance": 0.34 }, { "item": "bone", "min": 15, "max": 30 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 }] },
     { "id": "angry_bones", "coins": [80, 220], "entries": [{ "item": "bone", "min": 1, "max": 2, "chance": 0.6 }] },
-    { "id": "dark_caster", "coins": [90, 240], "entries": [{ "item": "bone", "chance": 0.5 }, { "item": "minor_mana_tonic", "chance": 0.1 }] },
+    { "id": "dark_caster", "coins": [90, 240], "entries": [{ "item": "bone", "chance": 0.5 }, { "item": "lesser_mana_potion", "chance": 0.1 }] },
     { "id": "cursed_skull", "coins": [60, 180], "entries": [{ "item": "bone", "chance": 0.4 }] },
-    { "id": "dungeon_gel", "coins": [200, 400], "entries": [{ "item": "gel", "min": 3, "max": 6 }] }
+    { "id": "dungeon_slime", "coins": [200, 400], "entries": [{ "item": "gel", "min": 3, "max": 6 }] }
   ],
   "enemies": [
     {
-      "id": "crypt_warden", "model": "crypt_skull", "tags": ["boss", "undead", "lava_immune"], "name": "Crypt Warden",
-      "description": "The curse of the old crypt, given a skull and two grasping hands.",
-      "brain": { "type": "cryptWarden", "hoverHeight": 6, "handSpacing": 2.6, "swipeInterval": 100, "spinInterval": 540, "spinDuration": 240, "spinSpeed": 9 },
+      "id": "skeletron", "model": "skeletron_head", "tags": ["boss", "undead", "lava_immune"], "name": "Skeletron",
+      "description": "The curse of the old dungeon, given a skull and two grasping hands.",
+      "brain": { "type": "skeletron", "hoverHeight": 6, "handSpacing": 2.6, "swipeInterval": 100, "spinInterval": 540, "spinDuration": 240, "spinSpeed": 9 },
       "life": 4400, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [3.2, 3.2], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
-      "loot": "crypt_warden", "value": 10000, "light": [5, 4, 3],
-      "boss": { "title": "Crypt Warden", "flag": "defeated_crypt_warden", "arenaRadius": 150, "music": "boss_crypt",
-        "segments": 2, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["crypt_hand", "crypt_hand"], "dayEnrage": { "damage": 4, "speed": 2.5 } },
+      "loot": "skeletron", "value": 10000, "light": [5, 4, 3],
+      "boss": { "title": "Skeletron", "flag": "defeated_skeletron", "arenaRadius": 150, "music": "boss_crypt",
+        "segments": 2, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["skeletron_hand", "skeletron_hand"], "dayEnrage": { "damage": 4, "speed": 2.5 } },
       "covers": ["terraria:skeletron"]
     },
     {
-      "id": "crypt_guardian", "model": "crypt_guardian", "tags": ["undead", "lava_immune"], "name": "Crypt Guardian",
-      "description": "The crypt does not welcome visitors while its warden stands.",
+      "id": "dungeon_guardian", "model": "dungeon_guardian", "tags": ["undead", "lava_immune"], "name": "Dungeon Guardian",
+      "description": "The dungeon does not welcome visitors while its warden stands.",
       "brain": { "type": "flyer", "aggroRange": 400, "orbitRadius": 1, "dashSpeed": 26, "dashCooldown": 20 },
       "invulnerable": true, "despawnWhen": [{ "type": "biome", "none": ["dungeon"] }],
       "life": 9999, "damage": 1000, "defense": 9999, "knockbackResist": 1.0, "size": [2.6, 2.6], "scale": 0.8, "moveSpeed": 18, "gravity": false, "collideTerrain": false,
       "tint": "#ffb8b8", "light": [12, 2, 2], "value": 0, "covers": ["terraria:dungeon_guardian"]
     },
     {
-      "id": "angry_bones", "model": "skeleton", "tags": ["undead"], "name": "Wrathful Bones",
+      "id": "angry_bones", "model": "skeleton", "tags": ["undead"], "name": "Angry Bones",
       "brain": { "type": "walker", "aggroRange": 70, "jumpHeight": 4 },
       "life": 80, "damage": 26, "defense": 8, "knockbackResist": 0.5, "size": [2.0, 3.6], "moveSpeed": 3.0, "tint": "#c8d4f0", "loot": "angry_bones", "value": 130,
       "covers": ["terraria:angry_bones"]
     },
     {
-      "id": "dark_caster", "model": "dark_caster", "tags": ["undead"], "name": "Hexcaster",
+      "id": "dark_caster", "model": "dark_caster", "tags": ["undead"], "name": "Dark Caster",
       "description": "Mutters curses, then vanishes and reappears somewhere worse.",
       "brain": { "type": "caster", "aggroRange": 60, "teleportInterval": 300, "minBlink": 5, "maxBlink": 11 },
-      "ranged": { "projectile": "hex_sphere", "damage": 24, "speed": 6, "interval": 160, "range": 26 },
+      "ranged": { "projectile": "water_sphere", "damage": 24, "speed": 6, "interval": 160, "range": 26 },
       "life": 50, "damage": 20, "defense": 2, "knockbackResist": 0.4, "size": [2.0, 3.6], "moveSpeed": 0.5, "loot": "dark_caster", "value": 140,
       "covers": ["terraria:dark_caster"]
     },
     {
-      "id": "cursed_skull", "model": "cursed_skull", "tags": ["undead"], "name": "Hexed Skull",
-      "description": "Drifts through the crypt walls. Its touch stays your hand.",
+      "id": "cursed_skull", "model": "cursed_skull", "tags": ["undead"], "name": "Cursed Skull",
+      "description": "Drifts through the dungeon walls. Its touch stays your hand.",
       "brain": { "type": "flyer", "aggroRange": 60, "orbitRadius": 1, "dashSpeed": 8, "dashCooldown": 45 },
-      "onContact": [{ "type": "applyBuff", "buff": "hexed", "ticks": 240, "chance": 0.25 }],
+      "onContact": [{ "type": "applyBuff", "buff": "cursed", "ticks": 240, "chance": 0.25 }],
       "life": 40, "damage": 35, "defense": 6, "knockbackResist": 0.2, "size": [1.4, 1.4], "moveSpeed": 3.5, "gravity": false, "collideTerrain": false,
       "light": [3, 8, 4], "loot": "cursed_skull", "value": 120, "covers": ["terraria:cursed_skull"]
     },
     {
-      "id": "dungeon_gel", "model": "gel", "tags": ["gel"], "name": "Crypt Gel",
+      "id": "dungeon_slime", "model": "gel", "tags": ["gel"], "name": "Dungeon Slime",
       "brain": { "type": "slimeHop", "jumpHeight": 6, "jumpSpeed": 4.0, "hopInterval": 60 },
-      "life": 150, "damage": 30, "defense": 7, "knockbackResist": 0.1, "size": [2.8, 2.4], "moveSpeed": 3, "tint": "#6a78a8", "loot": "dungeon_gel", "value": 300,
+      "life": 150, "damage": 30, "defense": 7, "knockbackResist": 0.1, "size": [2.8, 2.4], "moveSpeed": 3, "tint": "#6a78a8", "loot": "dungeon_slime", "value": 300,
       "covers": ["terraria:dungeon_slime"]
     }
   ],
   "spawnRules": [
-    { "id": "crypt_guardian_trespass", "enemy": "crypt_guardian", "weight": 1000, "atPlayer": true, "maxAlive": 1,
-      "conditions": [{ "type": "biome", "any": ["dungeon"] }, { "type": "flag", "id": "defeated_crypt_warden", "set": false }] },
-    { "id": "angry_bones_crypt", "enemy": "angry_bones", "weight": 5, "group": [1, 2], "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
-    { "id": "dark_caster_crypt", "enemy": "dark_caster", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
-    { "id": "cursed_skull_crypt", "enemy": "cursed_skull", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
-    { "id": "dungeon_gel_crypt", "enemy": "dungeon_gel", "weight": 0.5, "conditions": [{ "type": "biome", "any": ["dungeon"] }] }
+    { "id": "dungeon_guardian_trespass", "enemy": "dungeon_guardian", "weight": 1000, "atPlayer": true, "maxAlive": 1,
+      "conditions": [{ "type": "biome", "any": ["dungeon"] }, { "type": "flag", "id": "defeated_skeletron", "set": false }] },
+    { "id": "angry_bones_dungeon", "enemy": "angry_bones", "weight": 5, "group": [1, 2], "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+    { "id": "dark_caster_dungeon", "enemy": "dark_caster", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+    { "id": "cursed_skull_dungeon", "enemy": "cursed_skull", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+    { "id": "dungeon_slime_dungeon", "enemy": "dungeon_slime", "weight": 0.5, "conditions": [{ "type": "biome", "any": ["dungeon"] }] }
   ]
 }

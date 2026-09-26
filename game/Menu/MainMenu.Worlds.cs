@@ -54,7 +54,7 @@ public sealed partial class MainMenu
         box.AddChild(row);
         var info = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         info.AddChild(MenuKit.Text(w.Name, 24, MenuKit.Idle));
-        string evil = w.Evil == EvilKind.Umbral ? "Corruption" : "Crimson";
+        string evil = w.Evil == EvilKind.Corruption ? "Corruption" : "Crimson";
         string difficulty = w.Difficulty switch { Difficulty.Expert => "Expert", Difficulty.Master => "Master", _ => "Classic" };
         var detail = $"{w.Size} · {difficulty} · {evil}{(w.Hardmode ? " · Hardmode" : "")} · {SaveCatalog.PlayTime(w.PlayTicks)} played · seed {w.Seed}";
         info.AddChild(MenuKit.Text(detail, 15, w.Difficulty == Difficulty.Master ? new Color(1f, 0.45f, 0.4f) : w.Difficulty == Difficulty.Expert ? new Color(1f, 0.75f, 0.3f) : new Color(0.8f, 0.85f, 0.9f)));
@@ -93,9 +93,9 @@ public sealed partial class MainMenu
         buttons.AddChild(MenuKit.Big("Create", () => CreateWorld(name.Length == 0 ? RandomWorldName() : name, ParseSeed(seedText),
             (WorldSizePreset)(size + 1), (Difficulty)difficulty, evil switch
             {
-                1 => EvilKind.Umbral,
-                2 => EvilKind.Sanguine,
-                _ => GD.Randi() % 2 == 0 ? EvilKind.Umbral : EvilKind.Sanguine,
+                1 => EvilKind.Corruption,
+                2 => EvilKind.Crimson,
+                _ => GD.Randi() % 2 == 0 ? EvilKind.Corruption : EvilKind.Crimson,
             }), 26));
         box.AddChild(buttons);
         Show(MenuKit.Centered(panel));
