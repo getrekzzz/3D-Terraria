@@ -3,6 +3,7 @@ render_mode blend_mix, depth_draw_opaque, cull_back;
 
 #include "res://shaders/include/voxel_light.gdshaderinc"
 #include "res://shaders/include/voxel_brdf.gdshaderinc"
+#include "res://shaders/include/clouds.gdshaderinc"
 #include "res://shaders/include/terrain_common.gdshaderinc"
 
 // Glass, ice, crystal: translucent with a fresnel rim; glowing crystals add their own light via EMISSION.
@@ -24,8 +25,9 @@ void fragment() {
 	ALBEDO = albedo.rgb;
 	ALPHA = clamp(albedo.a + fresnel * 0.4, 0.0, 1.0);
 	ROUGHNESS = 0.05;
-	EMISSION = strata_ambient(albedo.rgb, v_light, 1.0) + albedo.rgb * fresnel * 0.15;
-	f_sun_gate = strata_sun_gate(v_light);
+	EMISSION = strata_block_light(albedo.rgb, v_light, 1.0) + albedo.rgb * fresnel * 0.15 * strata_sky_visibility(v_light);
+	AO = strata_sky_visibility(v_light);
+	f_sun_gate = strata_sun_gate(v_light) * strata_cloud_shadow(v_world_pos, strata_light_dir);
 }
 
 void light() {

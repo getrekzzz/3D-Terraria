@@ -1,5 +1,6 @@
 using Strata.Core.Content;
 using Strata.Core.Content.Defs;
+using Strata.Core.Presentation;
 
 namespace Strata.Core.Meshing;
 
@@ -28,7 +29,7 @@ public readonly record struct SurfaceLayers(int Top, int Side, int Bottom);
 /// </summary>
 public sealed class RenderTables
 {
-    public RenderTables(ContentDatabase content, Func<string, int> layerIndex)
+    public RenderTables(ContentDatabase content, Func<string, int> layerIndex, GrassConfig? grass = null)
     {
         int n = content.Blocks.Count;
         Class = new CellClass[n];
@@ -42,7 +43,12 @@ public sealed class RenderTables
                 LiquidEmission[liquid.Code] = LightValue.Pack(0, ll[0], ll[1], ll[2]);
         Cutout = new bool[n];
         var surfaces = new List<SurfaceLayers>();
-        var bySurface = new Dictionary<SurfaceLayers, ushort>();
+        // Blocks share a surface when they look alike: same texture layers and the same grass.
+        var bySurface = new Dictionary<(SurfaceLayers, int), ushort>();
+        var grassKinds = new List<int>();
+        var kindIndex = new Dictionary<string, int>(StringComparer.Ordinal);
+        if (grass != null)
+            for (int k = 0; k < grass.Ordered.Count; k++) kindIndex[grass.Ordered[k].Key] = k;
         foreach (var b in content.Blocks.All)
         {
             int id = b.RuntimeId;
@@ -59,15 +65,19 @@ public sealed class RenderTables
             if (b.Light is { Length: 3 } l) Emission[id] = LightValue.Pack(0, l[0], l[1], l[2]);
             if (b.Render == BlockRender.None) continue;
             var layers = new SurfaceLayers(layerIndex(b.Textures.TopLayer), layerIndex(b.Textures.SideLayer), layerIndex(b.Textures.BottomLayer));
-            if (!bySurface.TryGetValue(layers, out var s))
+            int kind = kindIndex.TryGetValue(b.Id, out int k) ? k : -1;
+            if (!bySurface.TryGetValue((layers, kind), out var s))
             {
                 s = (ushort)surfaces.Count;
                 surfaces.Add(layers);
-                bySurface[layers] = s;
+                grassKinds.Add(kind);
+                bySurface[(layers, kind)] = s;
             }
             Surface[id] = s;
         }
         Surfaces = surfaces;
+        GrassKind = grassKinds.ToArray();
+        Grass = grass;
     }
 
     public CellClass[] Class { get; }
@@ -90,6 +100,12 @@ public sealed class RenderTables
     public ushort[] LiquidEmission { get; }
 
     public IReadOnlyList<SurfaceLayers> Surfaces { get; }
+
+    /// <summary>Grass kind per render surface (index into <see cref="GrassConfig.Ordered"/>), -1 for none.</summary>
+    public int[] GrassKind { get; }
+
+    /// <summary>Grass settings; null when the tables were built without grass (tools, tests).</summary>
+    public GrassConfig? Grass { get; }
 
     public bool IsOpaque(ushort block) => Class[block] is CellClass.Smooth or CellClass.Crisp;
 }

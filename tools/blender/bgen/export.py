@@ -22,8 +22,10 @@ def simple_material(slot: str) -> bpy.types.Material:
     return mat
 
 
-def export_glb(objects, path: pathlib.Path):
+def export_glb(objects, path: pathlib.Path, texcoords=False, tangents=False):
+    """Exports GLB; texture coordinates go along when asked or when a mesh has UVs (leaf cards)."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    texcoords = texcoords or any(o.type == "MESH" and len(o.data.uv_layers) > 0 for o in objects)
     bpy.ops.object.select_all(action="DESELECT")
     for obj in objects:
         obj.select_set(True)
@@ -34,9 +36,9 @@ def export_glb(objects, path: pathlib.Path):
         use_selection=True,
         export_apply=True,
         export_yup=True,
-        export_texcoords=False,
+        export_texcoords=texcoords,
         export_normals=True,
-        export_tangents=False,
+        export_tangents=tangents,
         export_materials="EXPORT",
         export_image_format="NONE",
         export_vertex_color="ACTIVE",

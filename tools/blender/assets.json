@@ -27,7 +27,7 @@
         "trunk": 0.42,
         "canopy": 1.9,
         "bark": "bark",
-        "leaves": "leaves",
+        "sprig": "oak_sprig",
         "limbs": 4
       }
     },
@@ -38,7 +38,7 @@
         "trunk": 0.35,
         "canopy": 2.6,
         "bark": "pine_bark",
-        "leaves": "needles",
+        "sprig": "pine_sprig",
         "tiers": 6
       }
     },
@@ -60,7 +60,8 @@
         "trunk": 0.6,
         "canopy": 3.6,
         "bark": "mahoe_bark",
-        "leaves": "jungle_leaves"
+        "leaves": "jungle_leaves",
+        "sprig": "jungle_sprig"
       }
     },
     "umbral_tree": {
@@ -70,7 +71,7 @@
         "trunk": 0.4,
         "canopy": 2.6,
         "bark": "gloom_bark",
-        "leaves": "gloom_leaves"
+        "sprig": "gloom_sprig"
       }
     },
     "cactus": {
@@ -110,7 +111,7 @@
     "bush": {
       "generator": "bush",
       "params": {
-        "leaves": "leaves"
+        "sprig": "oak_sprig"
       }
     },
     "fern": {
@@ -630,18 +631,23 @@
   "creatures": {
     "player": {
       "generator": "humanoid",
-      "params": {}
+      "params": {
+        "body": "male",
+        "age": "young",
+        "hairStyle": "short"
+      }
     },
     "shambler": {
       "generator": "humanoid",
       "params": {
-        "skin": "#9ab07a",
-        "skinLayer": "flesh",
+        "skin": "#8ea276",
         "shirt": "#6a5a44",
         "pants": "#3e3a30",
         "hair": "#2a3424",
-        "eyes": "#f0e040",
-        "boots": "#8a8070"
+        "eyes": "#d8d040",
+        "boots": "#8a8070",
+        "undead": true,
+        "hairStyle": "messy"
       }
     },
     "gel": {
@@ -696,7 +702,10 @@
         "pants": "#4a3a2a",
         "hair": "#6a4020",
         "boots": "#8a6a50",
-        "coat": "#6a5a3a"
+        "coat": "#6a5a3a",
+        "body": "male",
+        "age": "young",
+        "hairStyle": "short"
       }
     },
     "peddler": {
@@ -709,7 +718,11 @@
         "beard": "#d8d8d8",
         "hat": "wide",
         "hatColor": "#5a3a1a",
-        "coat": "#6a4424"
+        "coat": "#6a4424",
+        "body": "male",
+        "age": "old",
+        "hairStyle": "short",
+        "weight": 0.65
       }
     },
     "mender": {
@@ -722,7 +735,10 @@
         "hat": "cap",
         "hatColor": "#ffffff",
         "apron": "#f0a0b0",
-        "boots": "#f0f0f0"
+        "boots": "#f0f0f0",
+        "body": "female",
+        "age": "young",
+        "hairStyle": "bun"
       }
     },
     "grovekeeper": {
@@ -735,7 +751,11 @@
         "hat": "wreath",
         "hatColor": "#7ab050",
         "flower": "#f0d040",
-        "boots": "#6a4a2a"
+        "boots": "#6a4a2a",
+        "body": "female",
+        "age": "young",
+        "hairStyle": "long",
+        "build": 0.35
       }
     },
     "vulture": {
@@ -784,19 +804,19 @@
     "skeleton": {
       "generator": "humanoid",
       "params": {
-        "skin": "#e8e0c8",
+        "skin": "#e0d8c0",
         "shirt": "#d8d0b8",
         "pants": "#c8c0a8",
         "hair": "#e8e0c8",
         "eyes": "#ff3020",
-        "boots": "#a09880"
+        "boots": "#a09880",
+        "anatomy": "skeleton"
       }
     },
     "imp": {
       "generator": "humanoid",
       "params": {
         "skin": "#c83020",
-        "skinLayer": "flesh",
         "shirt": "#3a1a14",
         "pants": "#2a1210",
         "hair": "#1a0a08",
@@ -804,7 +824,11 @@
         "horns": "#302018",
         "wings": "#5a1a14",
         "tail": "#a02818",
-        "boots": "#2a1210"
+        "boots": "#2a1210",
+        "hairStyle": "bald",
+        "build": 0.75,
+        "weight": 0.25,
+        "height": 1.5
       }
     },
     "crypt_skull": {
@@ -841,7 +865,10 @@
         "hatColor": "#3a2a5a",
         "robe": "#3a2a5a",
         "trim": "#8a6ac0",
-        "boots": "#1a1420"
+        "boots": "#1a1420",
+        "hairStyle": "short",
+        "build": 0.35,
+        "weight": 0.3
       }
     },
     "crypt_keeper": {
@@ -854,7 +881,11 @@
         "beard": "#e8e8e8",
         "robe": "#6a6258",
         "trim": "#3a342e",
-        "boots": "#3a2a20"
+        "boots": "#3a2a20",
+        "body": "male",
+        "age": "old",
+        "hairStyle": "short",
+        "weight": 0.3
       }
     },
     "tailor": {
@@ -868,7 +899,10 @@
         "hat": "wide",
         "hatColor": "#8a1a1a",
         "coat": "#b83030",
-        "boots": "#2a2020"
+        "boots": "#2a2020",
+        "body": "male",
+        "age": "old",
+        "hairStyle": "short"
       }
     },
     "crypt_guardian": {

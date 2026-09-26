@@ -42,13 +42,20 @@ def block_items():
     return {bid: b for bid, b in blocks.items() if b.get("autoItem", True) and "drop" not in b and bid not in items}
 
 
+# Layer types whose albedo alpha is opacity; every other layer stores height there (drawn opaque).
+ALPHA_TYPES = {"translucent", "leaves", "web"}
+
+
 def layer_tile(atlas: Image.Image, meta, name: str) -> Image.Image:
-    index = {layer["name"]: layer["index"] for layer in meta["layers"]}
-    if name not in index:
+    layers = {layer["name"]: layer for layer in meta["layers"]}
+    if name not in layers:
         raise KeyError(f"texture layer '{name}' missing from terrain atlas")
-    row, col = divmod(index[name], meta["columns"])
+    row, col = divmod(layers[name]["index"], meta["columns"])
     s = meta["size"]
-    return atlas.crop((col * s, row * s, (col + 1) * s, (row + 1) * s))
+    tile = atlas.crop((col * s, row * s, (col + 1) * s, (row + 1) * s))
+    if layers[name]["type"] not in ALPHA_TYPES:
+        tile.putalpha(255)
+    return tile
 
 
 def face(tile: Image.Image, origin, u, v, shade) -> Image.Image:

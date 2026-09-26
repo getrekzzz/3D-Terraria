@@ -2,11 +2,12 @@
 """Builds the terrain texture arrays from materials.json.
 
 Outputs per set (assets/textures/<set>/):
-  <set>_albedo.png    RGBA atlas: colour + opacity
+  <set>_albedo.png    RGBA atlas: colour + height (opaque layers) or opacity (cut-out and translucent layers)
   <set>_material.png  RGBA atlas: tangent normal X, normal Y, roughness, metallic
   layers.json         layer name -> slice index (consumed by the game and the content validator)
   *.png.import        Godot importer settings (2D texture array, VRAM compressed)
-Sets: terrain (materials.json -> assets/textures/terrain), props (props.json -> assets/textures/props).
+Sets: terrain (materials.json -> assets/textures/terrain), props (props.json -> assets/textures/props),
+detail (gen_detail.py -> assets/textures/detail/detail.png: fine-grain normal + height layers tiled under terrain).
 Usage: python3 tools/textures/build_textures.py [--set=terrain|props] [--check]
 """
 import json
@@ -18,6 +19,7 @@ from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 from PIL import Image
 
+import gen_detail
 import generators
 import synth
 
@@ -30,6 +32,7 @@ COLUMNS = 8
 SETS = {
     "terrain": ("materials.json", "terrain", "terrain"),
     "props": ("props.json", "props", "props"),
+    "detail": (None, "detail", "detail"),
 }
 
 
@@ -47,7 +50,7 @@ def referenced_layers() -> set:
 def render(recipe: dict):
     rgb, height, rough, metal, alpha = generators.generate(recipe)
     normal = synth.normal_from_height(height, recipe.get("normal_strength", 6.0))
-    albedo = np.dstack([rgb, alpha])
+    albedo = np.dstack([rgb, alpha if recipe["type"] in generators.ALPHA_TYPES else height])
     material = np.dstack([normal, rough, metal])
     return recipe["name"], (albedo * 255 + 0.5).astype(np.uint8), (material * 255 + 0.5).astype(np.uint8)
 
@@ -88,7 +91,29 @@ def main() -> int:
     return 0
 
 
+def build_detail() -> int:
+    out = REPO / "assets" / "textures" / "detail"
+    if "--check" in sys.argv:
+        print(f"detail: {len(gen_detail.DETAIL_LAYERS)} layers OK")
+        return 0
+    tiles = gen_detail.build()
+    size = gen_detail.SIZE
+    rows = (len(tiles) + COLUMNS - 1) // COLUMNS
+    atlas = np.zeros((rows * size, COLUMNS * size, 4), np.uint8)
+    for i, tile in enumerate(tiles):
+        r, c = divmod(i, COLUMNS)
+        atlas[r * size:(r + 1) * size, c * size:(c + 1) * size] = tile
+    out.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(atlas, "RGBA").save(out / "detail.png", optimize=True)
+    (out / "detail.png.import").write_text(import_file("detail", "detail.png", rows, False), encoding="utf-8")
+    (out / "layers.json").write_text(json.dumps({"columns": COLUMNS, "rows": rows, "size": size, "layers": gen_detail.DETAIL_LAYERS}, indent=1) + "\n", encoding="utf-8")
+    print(f"detail: wrote {len(tiles)} layers to {out.relative_to(REPO)}")
+    return 0
+
+
 def build_set(set_name: str) -> int:
+    if set_name == "detail":
+        return build_detail()
     recipe_file, folder, prefix = SETS[set_name]
     out = REPO / "assets" / "textures" / folder
     recipes = json.loads((HERE / recipe_file).read_text(encoding="utf-8"))["materials"]
@@ -122,6 +147,8 @@ def build_set(set_name: str) -> int:
         entry = {"name": name, "index": i, "type": recipe["type"]}
         if "sway" in recipe:
             entry["sway"] = recipe["sway"]  # foliage wind sway used by the prop shader
+        if set_name == "terrain":
+            entry["detail"], entry["detailStrength"] = gen_detail.detail_for(recipe)  # fine grain layer under it
         layers.append(entry)
     # Unused slices repeat the "missing" layer so sampling never returns garbage.
     missing_index = names.index("missing")

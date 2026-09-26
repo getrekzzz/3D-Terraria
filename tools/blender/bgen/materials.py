@@ -1,6 +1,7 @@
 """Blender materials for generated assets.
 
-Slot names encode everything the game needs: ``prop:<layer>`` or ``prop:<layer>:glow``. The game replaces them with
+Slot names encode everything the game needs: ``prop:<layer>`` or ``prop:<layer>:glow``, and ``card:<layer>`` for
+alpha-tested leaf cards. The game replaces them with
 its shared prop shader (texture layer from assets/textures/props/layers.json, tinted by vertex colour, optional
 emission). For icon rendering the same look is rebuilt here with box-projected slices of the props atlas.
 """
@@ -11,6 +12,8 @@ import bpy
 import numpy as np
 
 PREFIX = "prop:"
+# Leaf cards: UV-mapped, alpha-tested slices of the same atlas (tree crowns, bushes).
+CARD_PREFIX = "card:"
 
 
 class PropMaterials:
@@ -27,9 +30,10 @@ class PropMaterials:
 
     @staticmethod
     def parse(slot: str) -> tuple[str, bool]:
-        if not slot.startswith(PREFIX):
-            raise ValueError(f"material slot '{slot}' must start with '{PREFIX}'")
-        parts = slot[len(PREFIX):].split(":")
+        prefix = next((p for p in (PREFIX, CARD_PREFIX) if slot.startswith(p)), None)
+        if prefix is None:
+            raise ValueError(f"material slot '{slot}' must start with '{PREFIX}' or '{CARD_PREFIX}'")
+        parts = slot[len(prefix):].split(":")
         return parts[0], "glow" in parts[1:]
 
     def validate(self, slot: str):
@@ -53,13 +57,17 @@ class PropMaterials:
         vcol.layer_name = "Color"
         tex = nodes.new("ShaderNodeTexImage")
         tex.image = self._layer_image(layer)
-        tex.projection = "BOX"
-        tex.projection_blend = 0.3
         coords = nodes.new("ShaderNodeTexCoord")
-        mapping = nodes.new("ShaderNodeMapping")
-        mapping.inputs["Scale"].default_value = (1.0, 1.0, 1.0)  # one texture tile per metre, like the terrain
-        links.new(coords.outputs["Object"], mapping.inputs["Vector"])
-        links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
+        if slot.startswith(CARD_PREFIX):
+            links.new(coords.outputs["UV"], tex.inputs["Vector"])
+            links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
+        else:
+            tex.projection = "BOX"
+            tex.projection_blend = 0.3
+            mapping = nodes.new("ShaderNodeMapping")
+            mapping.inputs["Scale"].default_value = (1.0, 1.0, 1.0)  # one texture tile per metre, like the terrain
+            links.new(coords.outputs["Object"], mapping.inputs["Vector"])
+            links.new(mapping.outputs["Vector"], tex.inputs["Vector"])
         mix = nodes.new("ShaderNodeMix")
         mix.data_type = "RGBA"
         mix.blend_type = "MULTIPLY"

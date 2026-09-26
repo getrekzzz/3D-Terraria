@@ -1,0 +1,15 @@
+{
+ "columns": 8,
+ "rows": 1,
+ "size": 512,
+ "layers": [
+  "rock",
+  "soil",
+  "sand",
+  "grass",
+  "wood",
+  "snow",
+  "smooth",
+  "porous"
+ ]
+}

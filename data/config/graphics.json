@@ -1,0 +1,37 @@
+{
+  // Graphics presets (see src/Strata.Core/Presentation/GraphicsConfig.cs for every field and its range).
+  // Chosen with the `graphics <preset>` console command or --graphics=<preset>; the choice is remembered.
+  "default": "ultra",
+  "presets": {
+    "low": {
+      "renderScale": 0.8, "upscaler": "fsr1", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 4,
+      "shadowAtlas": 2048, "shadowDistance": 50, "shadowFilter": 1, "sunSize": 0, "torchShadows": false,
+      "ssao": false, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
+      "skyRadiance": 64, "cloudSteps": 0, "autoExposure": false,
+      "grassDensity": 0, "grassDistance": 0, "lodThreshold": 4
+    },
+    "medium": {
+      "renderScale": 1.0, "upscaler": "none", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 8,
+      "shadowAtlas": 4096, "shadowDistance": 80, "shadowFilter": 2, "sunSize": 0, "torchShadows": false,
+      "ssao": true, "ssaoQuality": 1, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
+      "skyRadiance": 128, "cloudSteps": 2, "autoExposure": true,
+      "grassDensity": 0.35, "grassDistance": 22, "lodThreshold": 2
+    },
+    "high": {
+      "renderScale": 1.0, "upscaler": "none", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
+      "shadowAtlas": 4096, "shadowDistance": 120, "shadowFilter": 3, "sunSize": 0.5, "torchShadows": true,
+      "ssao": true, "ssaoQuality": 2, "ssil": true, "ssilQuality": 1, "ssr": true, "ssrSteps": 48,
+      "volumetricFog": true, "volumetricFogSize": 64, "volumetricFogDepth": 64, "glow": true,
+      "skyRadiance": 256, "cloudSteps": 3, "autoExposure": true,
+      "grassDensity": 0.7, "grassDistance": 35, "lodThreshold": 1
+    },
+    "ultra": {
+      "renderScale": 1.0, "upscaler": "fsr2", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
+      "shadowAtlas": 8192, "shadowDistance": 180, "shadowFilter": 5, "sunSize": 0.6, "torchShadows": true,
+      "ssao": true, "ssaoQuality": 3, "ssil": true, "ssilQuality": 3, "ssr": true, "ssrSteps": 96,
+      "volumetricFog": true, "volumetricFogSize": 128, "volumetricFogDepth": 96, "glow": true,
+      "skyRadiance": 256, "cloudSteps": 5, "autoExposure": true,
+      "grassDensity": 1.0, "grassDistance": 50, "lodThreshold": 0.5
+    }
+  }
+}

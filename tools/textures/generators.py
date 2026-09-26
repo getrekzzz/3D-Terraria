@@ -1,288 +1,34 @@
-"""Material generators: recipe dict -> (albedo RGBA [0,1], height [0,1], roughness [0,1], metallic [0,1])."""
+"""Material generators: recipe dict -> (albedo rgb, height, roughness, metallic, alpha), all floats in [0, 1].
+
+Generators live in gen_natural (soils, grass), gen_rock (stone, ores), gen_built (bricks, planks, glass, metal,
+cloth) and gen_plants (leaves, bark). Recipes: materials.json (terrain) and props.json (models).
+"""
 import zlib
 
 import numpy as np
 
-import synth as s
+import gen_built
+import gen_natural
+import gen_plants
+import gen_rock
 
 
 def seed_of(name: str) -> int:
     return zlib.crc32(name.encode("utf-8"))
 
 
-def soil(r, seed):
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    n = s.spectral_noise(seed, falloff=2.2) * 0.65 + s.band_noise(seed + 1, 40) * 0.35
-    grit = s.rng(seed + 2).random((s.SIZE, s.SIZE))
-    t = np.clip(n + (grit - 0.5) * r.get("grit", 0.25), 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    pebbles = (s.voronoi(seed + 3, r.get("pebbles", 0), )[0] < 0.18) if r.get("pebbles", 0) else np.zeros_like(t, bool)
-    rgb[pebbles] = rgb[pebbles] * 0.8 + np.array(light) * 0.2
-    height = t * 0.6 + pebbles * 0.4
-    return rgb, height, np.full_like(t, r.get("roughness", 0.95)), np.zeros_like(t)
-
-
-def rock(r, seed):
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    f1, edge, cid = s.voronoi(seed, r.get("cells", 18))
-    cell_tone = s.rng(seed + 1).random(r.get("cells", 18))[cid]
-    detail = s.spectral_noise(seed + 2, falloff=1.8)
-    broad = s.spectral_noise(seed + 3, falloff=3.0)
-    streaks = s.band_noise(seed + 4, 22, width=0.5)
-    strata = 0.5 + 0.5 * np.sin(np.linspace(0, 2 * np.pi * r.get("strata_bands", 6), s.SIZE))[:, None] * np.ones((1, s.SIZE))
-    t = cell_tone * 0.18 + detail * 0.4 + broad * 0.27 + streaks * 0.15 + strata * r.get("strata", 0.0) * 0.3
-    t = np.clip((t - t.min()) / max(t.max() - t.min(), 1e-6), 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.55, base), (1.0, light)])
-    warp = s.spectral_noise(seed + 5, falloff=2.0) * 0.05
-    crack = np.clip(1 - (edge + warp) / 0.035, 0, 1) * r.get("cracks", 0.5)
-    rgb *= (1 - crack * 0.35)[..., None]
-    height = np.clip(0.5 + (1 - f1) * 0.15 - crack * 0.4 + detail * 0.25 + broad * 0.15, 0, 1)
-    return rgb, height, np.clip(r.get("roughness", 0.85) - crack * 0.1, 0, 1), np.zeros_like(t)
-
-
-def veined(r, seed):
-    rgb, height, rough, metal = rock(r, seed)
-    vein_color = s.hex_rgb(r["vein"])
-    v = s.band_noise(seed + 9, 6, width=0.7)
-    veins = np.clip(1 - np.abs(v - 0.5) / r.get("vein_width", 0.03), 0, 1)
-    rgb = rgb * (1 - veins[..., None]) + np.array(vein_color) * veins[..., None]
-    return rgb, height, rough * (1 - veins * 0.3), metal
-
-
-def speckled(r, seed):
-    rgb, height, rough, metal = rock(r, seed)
-    grains = s.rng(seed + 5).random((s.SIZE, s.SIZE))
-    for key, thresh in (("speck_a", 0.93), ("speck_b", 0.97)):
-        if key in r:
-            m = grains > thresh if key == "speck_a" else grains < 1 - thresh
-            rgb[m] = s.hex_rgb(r[key])
-    return rgb, height, rough, metal
-
-
-def ore(r, seed):
-    rgb, height, rough, metal = rock(r, seed)
-    f1, _, _ = s.voronoi(seed + 11, r.get("nuggets", 22))
-    blob = s.spectral_noise(seed + 12, falloff=2.5)
-    jag = s.spectral_noise(seed + 13, falloff=1.2)
-    size = r.get("nugget_size", 0.32)
-    shape = f1 + (jag - 0.5) * 0.35
-    nug = (shape < size) & (blob > 0.3)
-    shine = np.clip(1 - shape / size, 0, 1) * 0.6 + jag * 0.4
-    ore_rgb = s.gradient_map(shine, [(0, s.shade(s.hex_rgb(r["ore"]), 0.6)), (1, s.hex_rgb(r["ore"]))])
-    rgb[nug] = ore_rgb[nug]
-    height = np.where(nug, height + shine * 0.3, height)
-    metal = np.where(nug, r.get("metallic", 0.8), 0.0)
-    rough = np.where(nug, 0.35, rough)
-    return rgb, np.clip(height, 0, 1), rough, metal
-
-
-def grass(r, seed):
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    n = s.spectral_noise(seed, falloff=1.6)
-    blades = s.band_noise(seed + 1, 70, width=0.4)
-    t = np.clip(n * 0.5 + blades * 0.5, 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    if "flower" in r:
-        m = s.rng(seed + 3).random((s.SIZE, s.SIZE)) > 0.996
-        rgb[m] = s.hex_rgb(r["flower"])
-    return rgb, t, np.full_like(t, 0.9), np.zeros_like(t)
-
-
-def planks(r, seed):
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    idx, u, v, gap = s.planks(r.get("count", 4))
-    tone = s.rng(seed).random(64)[idx % 64]
-    grain = s.band_noise(seed + 1, 18, width=0.6)
-    grain = np.roll(grain, 0, 0)
-    stretched = np.repeat(grain[::8, :], 8, axis=0)[: s.SIZE]
-    t = np.clip(tone * 0.4 + stretched * 0.6, 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    seam = np.clip(1 - gap / 0.05, 0, 1)
-    rgb *= (1 - seam * 0.6)[..., None]
-    height = np.clip(0.7 - seam * 0.6 + stretched * 0.15, 0, 1)
-    return rgb, height, np.full_like(t, 0.75), np.zeros_like(t)
-
-
-def bricks(r, seed):
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    mortar_c = s.hex_rgb(r.get("mortar", "#6a655c"))
-    mask, bid, u, v, edge = s.bricks(r.get("rows", 4), r.get("cols", 2), r.get("mortar_width", 0.06))
-    tone = s.rng(seed).random(512)[bid % 512]
-    noise = s.spectral_noise(seed + 1, falloff=1.7)
-    t = np.clip(tone * 0.55 + noise * 0.45, 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    wear = np.clip(edge / 0.12, 0, 1)
-    rgb *= (0.8 + 0.2 * wear)[..., None]
-    rgb = rgb * mask[..., None] + np.array(mortar_c) * (1 - mask[..., None])
-    height = mask * (0.6 + 0.25 * wear + noise * 0.15)
-    return rgb, height, np.where(mask > 0, r.get("roughness", 0.8), 0.95), np.where(mask > 0, r.get("metallic", 0.0), 0.0)
-
-
-def translucent(r, seed):
-    base, light = s.hex_rgb(r["base"]), s.hex_rgb(r["light"])
-    n = s.spectral_noise(seed, falloff=2.4)
-    f1, edge, _ = s.voronoi(seed + 1, r.get("facets", 10))
-    t = np.clip(n * 0.5 + (1 - f1) * 0.5, 0, 1)
-    rgb = s.gradient_map(t, [(0, base), (1, light)])
-    rgb[edge < 0.03] = light
-    alpha = np.full_like(t, r.get("alpha", 0.5))
-    if r.get("frame"):
-        y, x = np.mgrid[0:s.SIZE, 0:s.SIZE] / s.SIZE
-        border = (np.minimum(np.minimum(x, 1 - x), np.minimum(y, 1 - y)) < 0.05)
-        rgb[border] = s.hex_rgb(r["frame"])
-        alpha[border] = 1.0
-    return rgb, t * 0.3, np.full_like(t, 0.08), np.zeros_like(t), alpha
-
-
-def leaves(r, seed):
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    f1, edge, cid = s.voronoi(seed, 90)
-    tone = s.rng(seed + 1).random(90)[cid]
-    rgb = s.gradient_map(tone, [(0, dark), (0.5, base), (1, light)])
-    alpha = ((f1 < 0.62) & (edge > 0.02)).astype(np.float32)
-    return rgb, (1 - f1), np.full_like(f1, 0.8), np.zeros_like(f1), alpha
-
-
-def web(r, seed):
-    y, x = np.mgrid[0:s.SIZE, 0:s.SIZE].astype(np.float32) / s.SIZE
-    ang = np.arctan2(y - 0.5, x - 0.5)
-    rad = np.sqrt((x - 0.5) ** 2 + (y - 0.5) ** 2)
-    spokes = np.abs(np.sin(ang * 6)) < 0.04
-    rings = np.abs(np.sin(rad * 60)) < 0.12
-    alpha = (spokes | rings).astype(np.float32) * 0.85
-    rgb = np.ones((s.SIZE, s.SIZE, 3), np.float32) * np.array(s.hex_rgb(r["base"]))
-    return rgb, alpha, np.full_like(alpha, 0.6), np.zeros_like(alpha), alpha
-
-
-def hive(r, seed):
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    y, x = np.mgrid[0:s.SIZE, 0:s.SIZE].astype(np.float32) / s.SIZE * 8
-    q = (x * np.sqrt(3) / 3 - y / 3)
-    rr = y * 2 / 3
-    frac = np.abs((q * 3) % 1 - 0.5) + np.abs((rr * 3) % 1 - 0.5)
-    t = np.clip(frac, 0, 1)
-    rgb = s.gradient_map(t, [(0, light), (0.6, base), (1, dark)])
-    return rgb, 1 - t, np.full_like(t, 0.5), np.zeros_like(t)
-
-
-def missing(r, seed):
-    y, x = np.mgrid[0:s.SIZE, 0:s.SIZE] // 32
-    checker = ((x + y) % 2).astype(np.float32)
-    rgb = s.lerp_color(checker, (1, 0, 1), (0.1, 0.1, 0.1))
-    return rgb, checker * 0.5, np.full_like(checker, 0.9), np.zeros_like(checker)
-
-
-def foliage(r, seed):
-    """Dense overlapping leaves (ellipses with a midrib) over dark gaps; tiles seamlessly."""
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    size = s.SIZE
-    rng = s.rng(seed)
-    rgb = np.ones((size, size, 3), np.float32) * np.array(dark) * 0.55
-    height = np.zeros((size, size), np.float32)
-    count = r.get("leaves", 900)
-    ln, wd = r.get("length", 16), r.get("width", 6)
-    win = int(ln * 1.2) + 2
-    yy, xx = np.mgrid[-win:win + 1, -win:win + 1].astype(np.float32)
-    for _ in range(count):
-        cx, cy = rng.random() * size, rng.random() * size
-        a = rng.random() * np.pi
-        length = ln * (0.7 + rng.random() * 0.6)
-        width = wd * (0.7 + rng.random() * 0.6)
-        ca, sa = np.cos(a), np.sin(a)
-        u = xx * ca + yy * sa
-        v = -xx * sa + yy * ca
-        inside = (u / length) ** 2 + (v / width) ** 2 < 1.0
-        tone = rng.random()
-        col = np.array(s.lerp_color(np.array([[tone]]), dark, light)[0, 0]) * 0.8 + np.array(base) * 0.2
-        shade = (0.75 + 0.25 * (u / length))[..., None]
-        rib = (np.abs(v) < 0.8)[..., None]
-        leaf = col * shade * np.where(rib, 0.8, 1.0)
-        ix = (np.arange(-win, win + 1) + int(cx)) % size
-        iy = (np.arange(-win, win + 1) + int(cy)) % size
-        region = np.ix_(iy, ix)
-        rgb[region] = np.where(inside[..., None], leaf, rgb[region])
-        height[region] = np.where(inside, 0.5 + 0.5 * (1 - (v / width) ** 2), height[region])
-    return rgb, height, np.full_like(height, r.get("roughness", 0.97)), np.zeros_like(height)
-
-
-def _vertical_blur(a, k):
-    """Periodic box blur along the v axis (fibres running along a trunk)."""
-    acc = np.zeros_like(a)
-    for i in range(-k // 2, k // 2):
-        acc += np.roll(a, i, axis=0)
-    return acc / k
-
-
-def bark(r, seed):
-    """Vertical furrowed bark: stretched noise ridges plus plates (v axis runs along the trunk)."""
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    ridges = s.band_noise(seed, r.get("furrows", 14) * 2, width=0.5)
-    stretched = _vertical_blur(ridges, 40)
-    stretched = (stretched - stretched.min()) / max(stretched.max() - stretched.min(), 1e-6)
-    plates = s.voronoi(seed + 1, r.get("plates", 40))[1]
-    detail = s.spectral_noise(seed + 2, falloff=1.6)
-    t = np.clip(stretched * 0.6 + detail * 0.3 + plates * 0.4, 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.55, base), (1.0, light)])
-    furrow = np.clip(1 - stretched / 0.28, 0, 1)
-    rgb *= (1 - furrow * 0.45)[..., None]
-    return rgb, np.clip(t - furrow * 0.5, 0, 1), np.full_like(t, 0.9), np.zeros_like(t)
-
-
-def metal(r, seed):
-    """Brushed metal with scratches and soft tarnish."""
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    brushed = np.repeat(s.rng(seed).random((1, s.SIZE)), s.SIZE, axis=0) * 0.5 + s.band_noise(seed + 1, 60, width=0.8) * 0.5
-    tarnish = s.spectral_noise(seed + 2, falloff=2.6)
-    t = np.clip(brushed * 0.35 + tarnish * 0.65, 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    scratches = s.band_noise(seed + 3, 90, width=0.2) > 0.82
-    rgb[scratches] = np.array(light)
-    rough = np.clip(r.get("roughness", 0.35) + (tarnish - 0.5) * 0.3, 0, 1)
-    return rgb, t * 0.3, rough, np.full_like(t, r.get("metallic", 1.0))
-
-
-def cloth(r, seed):
-    """Woven fabric: interleaved warp/weft threads."""
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    y, x = np.mgrid[0:s.SIZE, 0:s.SIZE].astype(np.float32)
-    n = r.get("threads", 64) / s.SIZE * 2 * np.pi
-    warp = 0.5 + 0.5 * np.sin(x * n)
-    weft = 0.5 + 0.5 * np.sin(y * n)
-    checker = ((np.floor(x * n / np.pi) + np.floor(y * n / np.pi)) % 2).astype(np.float32)
-    weave = np.where(checker > 0, warp, weft)
-    t = np.clip(weave * 0.6 + s.spectral_noise(seed, falloff=2.0) * 0.4, 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    return rgb, weave, np.full_like(t, 0.95), np.zeros_like(t)
-
-
-def ribbed(r, seed):
-    """Vertical ribs (cactus skin, fluted columns) with fine speckles."""
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    y, x = np.mgrid[0:s.SIZE, 0:s.SIZE].astype(np.float32)
-    ribs = 0.5 + 0.5 * np.cos(x / s.SIZE * 2 * np.pi * r.get("ribs", 6))
-    speck = s.rng(seed).random((s.SIZE, s.SIZE)) > 0.985
-    t = np.clip(ribs * 0.7 + s.spectral_noise(seed + 1, falloff=2.0) * 0.3, 0, 1)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    rgb[speck] = s.hex_rgb(r.get("speck", "#f0f0d0"))
-    return rgb, ribs, np.full_like(t, 0.7), np.zeros_like(t)
-
-
-def cap(r, seed):
-    """Mushroom cap: mottled skin with pale spots."""
-    base, dark, light = (s.hex_rgb(r[k]) for k in ("base", "dark", "light"))
-    t = s.spectral_noise(seed, falloff=2.2)
-    rgb = s.gradient_map(t, [(0.0, dark), (0.5, base), (1.0, light)])
-    f1 = s.voronoi(seed + 1, r.get("spots", 14))[0]
-    spots = f1 < r.get("spot_size", 0.22)
-    rgb[spots] = s.hex_rgb(r.get("spot", "#f4efe0"))
-    return rgb, np.clip(t * 0.5 + spots * 0.4, 0, 1), np.full_like(t, 0.6), np.zeros_like(t)
-
-
 GENERATORS = {
-    "soil": soil, "rock": rock, "veined": veined, "speckled": speckled, "ore": ore, "grass": grass,
-    "planks": planks, "bricks": bricks, "translucent": translucent, "leaves": leaves, "web": web,
-    "hive": hive, "missing": missing, "bark": bark, "metal": metal, "cloth": cloth, "ribbed": ribbed, "cap": cap, "foliage": foliage,
+    "soil": gen_natural.soil, "grass": gen_natural.grass,
+    "rock": gen_rock.rock, "veined": gen_rock.veined, "speckled": gen_rock.speckled, "ore": gen_rock.ore,
+    "planks": gen_built.planks, "bricks": gen_built.bricks, "translucent": gen_built.translucent, "web": gen_built.web,
+    "hive": gen_built.hive, "missing": gen_built.missing, "metal": gen_built.metal, "cloth": gen_built.cloth,
+    "leather": gen_built.leather,
+    "leaves": gen_plants.leaves, "foliage": gen_plants.foliage, "bark": gen_plants.bark, "cap": gen_plants.cap,
+    "ribbed": gen_plants.ribbed, "sprig": gen_plants.sprig,
 }
+
+# Types whose alpha is opacity (cut-out and translucent surfaces); every other layer stores height in alpha.
+ALPHA_TYPES = {"translucent", "leaves", "web", "sprig"}
 
 
 def generate(recipe: dict):

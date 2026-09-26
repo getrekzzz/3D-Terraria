@@ -55,102 +55,119 @@
    "sway": 0.012
   },
   {
-   "name": "needles",
-   "index": 10,
-   "type": "foliage",
-   "sway": 0.012
-  },
-  {
    "name": "fronds",
-   "index": 11,
+   "index": 10,
    "type": "grass",
    "sway": 0.02
   },
   {
    "name": "jungle_leaves",
-   "index": 12,
+   "index": 11,
    "type": "foliage",
    "sway": 0.012
   },
   {
-   "name": "gloom_leaves",
+   "name": "oak_sprig",
+   "index": 12,
+   "type": "sprig",
+   "sway": 0.012
+  },
+  {
+   "name": "pine_sprig",
    "index": 13,
-   "type": "foliage",
+   "type": "sprig",
+   "sway": 0.01
+  },
+  {
+   "name": "jungle_sprig",
+   "index": 14,
+   "type": "sprig",
+   "sway": 0.012
+  },
+  {
+   "name": "gloom_sprig",
+   "index": 15,
+   "type": "sprig",
    "sway": 0.012
   },
   {
    "name": "cactus_skin",
-   "index": 14,
+   "index": 16,
    "type": "ribbed"
   },
   {
    "name": "glowcap",
-   "index": 15,
+   "index": 17,
    "type": "cap"
   },
   {
    "name": "red_cap",
-   "index": 16,
+   "index": 18,
    "type": "cap"
   },
   {
    "name": "iron",
-   "index": 17,
-   "type": "metal"
-  },
-  {
-   "name": "dark_iron",
-   "index": 18,
-   "type": "metal"
-  },
-  {
-   "name": "gold",
    "index": 19,
    "type": "metal"
   },
   {
-   "name": "copper",
+   "name": "dark_iron",
    "index": 20,
    "type": "metal"
   },
   {
-   "name": "cloth",
+   "name": "gold",
    "index": 21,
+   "type": "metal"
+  },
+  {
+   "name": "copper",
+   "index": 22,
+   "type": "metal"
+  },
+  {
+   "name": "cloth",
+   "index": 23,
    "type": "cloth"
   },
   {
    "name": "red_cloth",
-   "index": 22,
+   "index": 24,
    "type": "cloth"
   },
   {
+   "name": "leather",
+   "index": 25,
+   "type": "leather"
+  },
+  {
    "name": "clay",
-   "index": 23,
+   "index": 26,
    "type": "soil"
   },
   {
    "name": "crystal",
-   "index": 24,
+   "index": 27,
    "type": "translucent"
   },
   {
    "name": "flesh",
-   "index": 25,
+   "index": 28,
    "type": "soil"
   },
   {
    "name": "gel",
-   "index": 26,
+   "index": 29,
    "type": "translucent"
   },
   {
    "name": "plain",
-   "index": 27,
+   "index": 30,
    "type": "soil"
   },
   {
    "name": "missing",
-   "index": 28,
+   "index": 31,
    "type": "missing"
   }
  ]

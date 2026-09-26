@@ -120,7 +120,7 @@ jobs:
           export VK_ICD_FILENAMES=$(ls /usr/share/vulkan/icd.d/lvp_icd*.json | head -1)
           timeout 5400 xvfb-run -a -s "-screen 0 1280x720x24" "$GODOT" --path . --rendering-driver vulkan \
             --audio-driver Dummy --resolution 1280x720 -- --world=tour --size=small --new --player=tour \
-            --fresh-player --view=3 --shots="$PWD/shots" --smoke=res://game/Testing/Tours/tour.cmds 2>&1 | tee tour.log
+            --fresh-player --view=3 --graphics=medium --shots="$PWD/shots" --smoke=res://game/Testing/Tours/tour.cmds 2>&1 | tee tour.log
           grep -q "SMOKE PASS" tour.log
           ls -l shots
       - name: Upload screenshots

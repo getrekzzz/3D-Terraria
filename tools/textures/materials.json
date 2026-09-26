@@ -15,7 +15,8 @@
    "base": "#a4553d",
    "dark": "#7c3b28",
    "light": "#c0705a",
-   "grit": 0.12
+   "grit": 0.12,
+   "style": "clay"
   },
   {
    "name": "sand",
@@ -24,7 +25,8 @@
    "dark": "#b89e58",
    "light": "#efdca0",
    "grit": 0.35,
-   "roughness": 0.98
+   "roughness": 0.98,
+   "style": "sand"
   },
   {
    "name": "packed_sand",
@@ -32,7 +34,8 @@
    "base": "#c7ab66",
    "dark": "#a88d4c",
    "light": "#dcc584",
-   "grit": 0.2
+   "grit": 0.2,
+   "style": "sand"
   },
   {
    "name": "silt",
@@ -40,7 +43,8 @@
    "base": "#7f7d78",
    "dark": "#5f5d59",
    "light": "#9c9a94",
-   "grit": 0.4
+   "grit": 0.4,
+   "style": "powder"
   },
   {
    "name": "mud",
@@ -49,7 +53,8 @@
    "dark": "#33251f",
    "light": "#65504a",
    "grit": 0.15,
-   "roughness": 0.6
+   "roughness": 0.6,
+   "style": "mud"
   },
   {
    "name": "snow",
@@ -58,7 +63,8 @@
    "dark": "#c6d2e0",
    "light": "#ffffff",
    "grit": 0.1,
-   "roughness": 0.7
+   "roughness": 0.7,
+   "style": "snow"
   },
   {
    "name": "slush",
@@ -67,7 +73,8 @@
    "dark": "#76828c",
    "light": "#b8c4ce",
    "grit": 0.3,
-   "roughness": 0.5
+   "roughness": 0.5,
+   "style": "mud"
   },
   {
    "name": "ash",
@@ -75,7 +82,8 @@
    "base": "#4e4644",
    "dark": "#332d2c",
    "light": "#6a6260",
-   "grit": 0.35
+   "grit": 0.35,
+   "style": "powder"
   },
   {
    "name": "cloud",
@@ -84,7 +92,8 @@
    "dark": "#d4dae6",
    "light": "#ffffff",
    "grit": 0.05,
-   "roughness": 1.0
+   "roughness": 1.0,
+   "style": "cloud"
   },
   {
    "name": "rain_cloud",
@@ -93,7 +102,8 @@
    "dark": "#6a7788",
    "light": "#a8b4c4",
    "grit": 0.08,
-   "roughness": 1.0
+   "roughness": 1.0,
+   "style": "cloud"
   },
   {
    "name": "grass",
@@ -101,14 +111,16 @@
    "base": "#4f9a3a",
    "dark": "#2f6a24",
    "light": "#79c052",
-   "flower": "#f0e060"
+   "flower": "#f0e060",
+   "soil": "#3b2a1c"
   },
   {
    "name": "jungle_grass",
    "type": "grass",
    "base": "#3fae4a",
    "dark": "#1f7a30",
-   "light": "#6ed26a"
+   "light": "#6ed26a",
+   "soil": "#3b2a1c"
   },
   {
    "name": "umbral_grass",
@@ -136,14 +148,16 @@
    "type": "grass",
    "base": "#5d7d45",
    "dark": "#3a5228",
-   "light": "#80a060"
+   "light": "#80a060",
+   "style": "moss"
   },
   {
    "name": "glow_moss",
    "type": "grass",
    "base": "#3fd3a0",
    "dark": "#1a8a66",
-   "light": "#a0ffe0"
+   "light": "#a0ffe0",
+   "style": "moss"
   },
   {
    "name": "stone",
@@ -152,7 +166,8 @@
    "dark": "#55565c",
    "light": "#8d8e96",
    "cells": 18,
-   "cracks": 0.5
+   "cracks": 0.5,
+   "strata": 0.25
   },
   {
    "name": "deepstone",
@@ -193,7 +208,8 @@
    "light": "#d0ecff",
    "cells": 8,
    "cracks": 0.8,
-   "roughness": 0.15
+   "roughness": 0.15,
+   "style": "ice"
   },
   {
    "name": "obsidian",
@@ -205,7 +221,8 @@
    "cracks": 0.4,
    "roughness": 0.2,
    "vein": "#6a4a9a",
-   "vein_width": 0.02
+   "vein_width": 0.02,
+   "facet": 0.6
   },
   {
    "name": "marble",
@@ -217,7 +234,8 @@
    "cracks": 0.1,
    "roughness": 0.35,
    "vein": "#8a8478",
-   "vein_width": 0.025
+   "vein_width": 0.025,
+   "facet": 0.3
   },
   {
    "name": "granite",
@@ -705,7 +723,8 @@
    "dark": "#c8b8d0",
    "light": "#fff4ff",
    "grit": 0.35,
-   "roughness": 0.98
+   "roughness": 0.98,
+   "style": "sand"
   },
   {
    "name": "pink_ice",
@@ -715,7 +734,8 @@
    "light": "#ffe0f4",
    "cells": 8,
    "cracks": 0.8,
-   "roughness": 0.15
+   "roughness": 0.15,
+   "style": "ice"
   },
   {
    "name": "umbral_sand",
@@ -724,7 +744,8 @@
    "dark": "#5a4c70",
    "light": "#9a8ab0",
    "grit": 0.35,
-   "roughness": 0.98
+   "roughness": 0.98,
+   "style": "sand"
   },
   {
    "name": "umbral_ice",
@@ -734,7 +755,8 @@
    "light": "#d0c0f4",
    "cells": 8,
    "cracks": 0.8,
-   "roughness": 0.15
+   "roughness": 0.15,
+   "style": "ice"
   },
   {
    "name": "sanguine_sand",
@@ -743,7 +765,8 @@
    "dark": "#7a3c3a",
    "light": "#c07a78",
    "grit": 0.35,
-   "roughness": 0.98
+   "roughness": 0.98,
+   "style": "sand"
   },
   {
    "name": "sanguine_ice",
@@ -753,7 +776,8 @@
    "light": "#ffd0d0",
    "cells": 8,
    "cracks": 0.8,
-   "roughness": 0.15
+   "roughness": 0.15,
+   "style": "ice"
   },
   {
    "name": "cerulite_ore",

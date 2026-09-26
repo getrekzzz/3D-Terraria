@@ -12,11 +12,15 @@ public sealed partial class PlayerLight : OmniLight3D
     private PlayerEntity _entity = null!;
     private float _time;
 
-    public void Initialize(PlayerEntity entity)
+    public void Initialize(PlayerEntity entity, Rendering.GraphicsSettings graphics)
     {
         _entity = entity;
         Name = "PlayerLight";
-        ShadowEnabled = false;
+        ShadowEnabled = graphics.Preset.TorchShadows;
+        ShadowBias = 0.08f;
+        ShadowNormalBias = 1.5f;
+        LightSize = 0.08f; // soft torch shadows
+        graphics.Changed += p => ShadowEnabled = p.TorchShadows;
         Position = new Vector3(0.35f, 1.5f, 0.25f);
         Visible = false;
     }

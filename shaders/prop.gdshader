@@ -5,6 +5,7 @@ render_mode blend_mix, depth_draw_opaque, cull_back;
 
 #include "res://shaders/include/voxel_light.gdshaderinc"
 #include "res://shaders/include/voxel_brdf.gdshaderinc"
+#include "res://shaders/include/clouds.gdshaderinc"
 
 global uniform float strata_time;
 
@@ -14,6 +15,8 @@ uniform float layer = 0.0;
 uniform float glow = 0.0;
 // Foliage sway (metres per metre of height above the origin).
 uniform float sway = 0.0;
+// Thin foliage (leaf layers): wrapped, light-transmitting diffuse instead of the opaque BRDF.
+uniform float foliage = 0.0;
 // MultiMesh instances carry voxel light in their custom data; single instances use the instance uniform.
 uniform bool light_from_custom = false;
 instance uniform vec4 voxel_light = vec4(0.0, 0.0, 0.0, 1.0);
@@ -23,6 +26,7 @@ instance uniform vec4 tint = vec4(1.0);
 varying vec3 v_obj_pos;
 varying vec3 v_obj_normal;
 varying vec4 v_light;
+varying vec3 v_world;
 varying float f_sun_gate;
 
 void vertex() {
@@ -36,6 +40,7 @@ void vertex() {
 		VERTEX.z += cos(t * 0.8) * sway * 0.6 * h;
 	}
 	v_light = light_from_custom ? INSTANCE_CUSTOM : voxel_light;
+	v_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 }
 
 void fragment() {
@@ -53,10 +58,15 @@ void fragment() {
 	ALBEDO = albedo;
 	ROUGHNESS = m.z;
 	METALLIC = m.w;
-	EMISSION = strata_ambient(albedo, v_light, 1.0) + COLOR.rgb * glow;
-	f_sun_gate = strata_sun_gate(v_light);
+	EMISSION = strata_block_light(albedo, v_light, 1.0) + COLOR.rgb * glow;
+	AO = strata_sky_visibility(v_light);
+	f_sun_gate = strata_sun_gate(v_light) * strata_cloud_shadow(v_world, strata_light_dir);
 }
 
 void light() {
-	strata_direct_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, ROUGHNESS, METALLIC, ALBEDO, DIFFUSE_LIGHT, SPECULAR_LIGHT);
+	if (foliage > 0.0) {
+		strata_foliage_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, foliage, DIFFUSE_LIGHT);
+	} else {
+		strata_direct_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, ROUGHNESS, METALLIC, ALBEDO, DIFFUSE_LIGHT, SPECULAR_LIGHT);
+	}
 }

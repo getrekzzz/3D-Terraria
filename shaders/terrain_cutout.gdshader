@@ -3,6 +3,7 @@ render_mode blend_mix, depth_draw_opaque, cull_disabled;
 
 #include "res://shaders/include/voxel_light.gdshaderinc"
 #include "res://shaders/include/voxel_brdf.gdshaderinc"
+#include "res://shaders/include/clouds.gdshaderinc"
 #include "res://shaders/include/terrain_common.gdshaderinc"
 
 // Leaves, webs: alpha-tested, double sided.
@@ -24,10 +25,11 @@ void fragment() {
 	ALPHA = albedo.a;
 	ALPHA_SCISSOR_THRESHOLD = 0.5;
 	ROUGHNESS = mat.z;
-	EMISSION = strata_ambient(albedo.rgb, v_light, 1.0);
-	f_sun_gate = strata_sun_gate(v_light);
+	EMISSION = strata_block_light(albedo.rgb, v_light, 1.0);
+	AO = strata_sky_visibility(v_light);
+	f_sun_gate = strata_sun_gate(v_light) * strata_cloud_shadow(v_world_pos, strata_light_dir);
 }
 
 void light() {
-	strata_direct_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, ROUGHNESS, 0.0, ALBEDO, DIFFUSE_LIGHT, SPECULAR_LIGHT);
+	strata_foliage_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, 0.6, DIFFUSE_LIGHT);
 }

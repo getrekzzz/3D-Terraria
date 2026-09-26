@@ -1,69 +1,38 @@
 using Godot;
-using Strata.Core.Simulation;
+using Strata.Core.Presentation;
+using Strata.Game.Rendering;
 
 namespace Strata.Game.Ambience;
 
 /// <summary>
-/// Sky, sun/moon, ambient globals and fog driven by the world clock and the camera's depth. Environment
-/// ambient light is black: ambient comes from baked voxel sky light through the shared shaders.
+/// The sky, sun, moon, clouds, fog and post-processing of the world. Ambient light and reflections come from the
+/// physically based sky (radiance cubemap); every lit surface gates them with its baked voxel sky exposure, so
+/// caves and sealed rooms stay dark while open land gets real sky light. Quality follows the graphics preset.
 /// </summary>
 public sealed partial class EnvironmentController : Node3D
 {
+    /// <summary>Sun radiance scale of the atmosphere (sky shader units).</summary>
+    private const float SkyIntensity = 33f;
+    private const float SunEnergy = 3.1f;
+    private const float MoonEnergy = 0.3f;
+    private const float CloudAltitude = 1600f;
+
     private DirectionalLight3D _sun = null!;
     private DirectionalLight3D _moon = null!;
     private Godot.Environment _env = null!;
+    private Sky _skyResource = null!;
     private ShaderMaterial _sky = null!;
-    private float _time;
+    private CameraAttributesPractical _camera = null!;
+    private GraphicsPreset _preset = null!;
+    private int _seed;
 
     public float Daylight { get; private set; } = 1f;
 
-    public override void _Ready()
-    {
-        _sky = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/sky.gdshader") };
-        _env = new Godot.Environment
-        {
-            BackgroundMode = Godot.Environment.BGMode.Sky,
-            Sky = new Sky { SkyMaterial = _sky, RadianceSize = Sky.RadianceSizeEnum.Size64 },
-            AmbientLightSource = Godot.Environment.AmbientSource.Color,
-            AmbientLightColor = Colors.Black,
-            AmbientLightEnergy = 0f,
-            ReflectedLightSource = Godot.Environment.ReflectionSource.Disabled,
-            TonemapMode = Godot.Environment.ToneMapper.Agx,
-            TonemapExposure = 1.0f,
-            GlowEnabled = true,
-            GlowIntensity = 0.55f,
-            GlowBloom = 0.05f,
-            GlowHdrThreshold = 1.1f,
-            FogEnabled = true,
-            FogMode = Godot.Environment.FogModeEnum.Exponential,
-            FogDensity = 0.0025f,
-            FogSkyAffect = 0.25f,
-            SsaoEnabled = true,
-            SsaoRadius = 0.8f,
-            SsaoIntensity = 1.6f,
-        };
-        AddChild(new WorldEnvironment { Environment = _env });
+    /// <summary>Radius of the streamed world in metres: distance fog reaches the sky colour there.</summary>
+    public float ViewDistance { get; set; } = 96f;
 
-        _sun = new DirectionalLight3D
-        {
-            Name = "Sun",
-            ShadowEnabled = true,
-            LightColor = new Color(1f, 0.96f, 0.88f),
-            LightEnergy = 1.6f,
-            DirectionalShadowMaxDistance = 80f,
-            DirectionalShadowMode = DirectionalLight3D.ShadowMode.Parallel4Splits,
-        };
-        _moon = new DirectionalLight3D
-        {
-            Name = "Moon",
-            ShadowEnabled = true,
-            LightColor = new Color(0.55f, 0.65f, 1f),
-            LightEnergy = 0.18f,
-            DirectionalShadowMaxDistance = 60f,
-        };
-        AddChild(_sun);
-        AddChild(_moon);
-    }
+    /// <summary>Forces the cloud cover (0 clear … 1 overcast) instead of the drifting weather; null restores it.</summary>
+    public float? CloudCoverOverride { get; set; }
 
     /// <summary>Tint of the active world event (crimson moon…), or null.</summary>
     public Color? EventTint { get; set; }
@@ -71,84 +40,102 @@ public sealed partial class EnvironmentController : Node3D
     /// <summary>The look of the biome around the camera (fog colour and density, sky and ambient tint), from data.</summary>
     public Strata.Core.Content.Defs.BiomeDef? Biome { get; set; }
 
-    private float _eventBlend;
-    private Color _biomeFog = new(0.62f, 0.72f, 0.82f), _biomeSky = Colors.White, _biomeAmbient = Colors.White;
-    private float _biomeDensity = 1f;
-
-    /// <summary>Eases the biome look towards the current biome's (a few seconds to cross into a new one).</summary>
-    private void BlendBiome(double delta)
+    public void Initialize(GraphicsSettings graphics, long seed)
     {
-        float k = 1f - Mathf.Exp(-(float)delta * 0.8f);
-        var b = Biome;
-        _biomeFog = _biomeFog.Lerp(b != null ? Color.FromHtml(b.FogColor) : new Color(0.62f, 0.72f, 0.82f), k);
-        _biomeSky = _biomeSky.Lerp(b != null ? Color.FromHtml(b.SkyTint) : Colors.White, k);
-        _biomeAmbient = _biomeAmbient.Lerp(b != null ? Color.FromHtml(b.AmbientTint) : Colors.White, k);
-        _biomeDensity = Mathf.Lerp(_biomeDensity, b?.FogDensity ?? 1f, k);
+        _seed = (int)(seed & 0x7fffffff);
+        _sky = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/sky.gdshader") };
+        _skyResource = new Sky { SkyMaterial = _sky, ProcessMode = Sky.ProcessModeEnum.Incremental };
+        _env = new Godot.Environment
+        {
+            BackgroundMode = Godot.Environment.BGMode.Sky,
+            Sky = _skyResource,
+            AmbientLightSource = Godot.Environment.AmbientSource.Sky,
+            AmbientLightSkyContribution = 1f,
+            AmbientLightEnergy = 1f,
+            ReflectedLightSource = Godot.Environment.ReflectionSource.Sky,
+            TonemapMode = Godot.Environment.ToneMapper.Agx,
+            TonemapExposure = 1.0f,
+            GlowIntensity = 0.45f,
+            GlowStrength = 1.0f,
+            GlowBloom = 0.02f,
+            GlowHdrThreshold = 1.0f,
+            GlowBlendMode = Godot.Environment.GlowBlendModeEnum.Softlight,
+            FogEnabled = true,
+            FogMode = Godot.Environment.FogModeEnum.Depth,
+            FogDepthCurve = 1.5f,
+            FogSkyAffect = 0f,
+            FogSunScatter = 0.08f,
+            SsaoRadius = 1.2f,
+            SsaoIntensity = 2.2f,
+            SsaoPower = 1.6f,
+            SsaoDetail = 0.6f,
+            SsaoLightAffect = 0.15f,
+            SsilRadius = 6f,
+            SsilIntensity = 1.2f,
+            SsilSharpness = 0.9f,
+            SsrFadeIn = 0.15f,
+            SsrFadeOut = 2.0f,
+            SsrDepthTolerance = 0.3f,
+            VolumetricFogAlbedo = new Color(0.92f, 0.94f, 0.97f),
+            VolumetricFogAnisotropy = 0.6f,
+            VolumetricFogDetailSpread = 2f,
+            VolumetricFogTemporalReprojectionEnabled = true,
+            VolumetricFogTemporalReprojectionAmount = 0.9f,
+            AdjustmentEnabled = true,
+            AdjustmentSaturation = 1.1f,
+            AdjustmentContrast = 1.04f,
+        };
+        for (int level = 0; level < 7; level++) _env.SetGlowLevel(level, level is >= 2 and <= 5 ? 1f : level == 6 ? 0.5f : 0f);
+        _camera = new CameraAttributesPractical
+        {
+            AutoExposureScale = 0.35f,
+            AutoExposureSpeed = 0.7f,
+            AutoExposureMinSensitivity = 70f,
+            AutoExposureMaxSensitivity = 200f,
+        };
+        AddChild(new WorldEnvironment { Environment = _env, CameraAttributes = _camera });
+
+        _sun = new DirectionalLight3D
+        {
+            Name = "Sun",
+            ShadowEnabled = true,
+            DirectionalShadowMode = DirectionalLight3D.ShadowMode.Parallel4Splits,
+            DirectionalShadowBlendSplits = true,
+            ShadowNormalBias = 1.2f,
+            ShadowBias = 0.04f,
+            SkyMode = DirectionalLight3D.SkyModeEnum.LightOnly,
+        };
+        _moon = new DirectionalLight3D
+        {
+            Name = "Moon",
+            ShadowEnabled = true,
+            DirectionalShadowMode = DirectionalLight3D.ShadowMode.Parallel2Splits,
+            ShadowNormalBias = 1.2f,
+            SkyMode = DirectionalLight3D.SkyModeEnum.LightOnly,
+        };
+        AddChild(_sun);
+        AddChild(_moon);
+
+        RenderingServer.GlobalShaderParameterSet("strata_cloud_noise", SkyNoise.Build(_seed));
+        graphics.Changed += ApplyPreset;
+        ApplyPreset(graphics.Preset);
     }
 
-    /// <summary>Updates lighting for the given clock; <paramref name="depthBelowSurface"/> (m) darkens fog underground.</summary>
-    public void Apply(GameClock clock, float depthBelowSurface, double delta)
+    private void ApplyPreset(GraphicsPreset p)
     {
-        _time += (float)delta;
-        float hour = clock.Hour;
-        float dayT = Mathf.Clamp((hour - GameClock.DawnHour) / (GameClock.DuskHour - GameClock.DawnHour), 0f, 1f);
-        float nightHours = 24f - (GameClock.DuskHour - GameClock.DawnHour);
-        float nightT = clock.IsDay ? 0f : ((hour >= GameClock.DuskHour ? hour - GameClock.DuskHour : hour + 24f - GameClock.DuskHour) / nightHours);
-
-        var sunDir = Arc(dayT, clock.IsDay ? 1f : -1f);
-        var moonDir = Arc(nightT, clock.IsDay ? -1f : 1f);
-        Orient(_sun, sunDir);
-        Orient(_moon, moonDir);
-
-        float elevation = Mathf.Max(sunDir.Y, 0f);
-        Daylight = Mathf.SmoothStep(-0.05f, 0.25f, sunDir.Y);
-        float dusk = clock.IsDay ? Mathf.Clamp(1f - Mathf.Abs(dayT - 0.5f) * 2f, 0f, 1f) : 0f;
-        dusk = Mathf.Pow(1f - dusk, 6f) * Daylight;
-
-        _sun.Visible = sunDir.Y > -0.05f;
-        _sun.LightEnergy = 1.7f * Mathf.SmoothStep(0f, 0.2f, elevation);
-        _sun.LightColor = new Color(1f, 0.93f, 0.82f).Lerp(new Color(1f, 0.62f, 0.35f), dusk);
-        _moon.Visible = !clock.IsDay && moonDir.Y > 0f;
-        _moon.LightEnergy = 0.2f * (1f - Mathf.Abs(clock.MoonPhase - 4) / 4f * 0.7f);
-
-        var dayAmbient = new Color(0.55f, 0.62f, 0.72f);
-        var nightAmbient = new Color(0.07f, 0.09f, 0.16f);
-        var ambient = nightAmbient.Lerp(dayAmbient, Daylight).Lerp(new Color(0.75f, 0.5f, 0.4f), dusk * 0.4f);
-        _eventBlend = Mathf.MoveToward(_eventBlend, EventTint.HasValue ? 1f : 0f, (float)delta * 0.3f);
-        var eventTint = Colors.White.Lerp(EventTint ?? Colors.White, _eventBlend);
-        BlendBiome(delta);
-        ambient *= Colors.White.Lerp(eventTint, 0.45f) * Colors.White.Lerp(_biomeAmbient, 0.5f);
-        RenderingServer.GlobalShaderParameterSet("strata_sky_ambient", ambient);
-        RenderingServer.GlobalShaderParameterSet("strata_daylight", Daylight);
-        RenderingServer.GlobalShaderParameterSet("strata_time", _time);
-
-        _sky.SetShaderParameter("daylight", Daylight);
-        _sky.SetShaderParameter("dusk", dusk);
-        _sky.SetShaderParameter("sun_dir", sunDir);
-        _sky.SetShaderParameter("moon_dir", moonDir);
-        _sky.SetShaderParameter("moon_phase", clock.MoonPhase / 8f);
-        _sky.SetShaderParameter("tint", Colors.White.Lerp(eventTint, 0.7f) * Colors.White.Lerp(_biomeSky, 0.6f));
-
-        // Fog: hazy outdoors, thick and dark in the depths.
-        float under = Mathf.Clamp(depthBelowSurface / 30f, 0f, 1f);
-        // The biome's fog colour shows by day on the surface and faintly in the depths (the crypt's gloom, cinder haze).
-        var skyFog = _biomeFog.Lerp(new Color(0.03f, 0.04f, 0.07f), 1f - Daylight);
-        var deepFog = new Color(0.02f, 0.02f, 0.03f).Lerp(_biomeFog * 0.25f, 0.5f);
-        _env.FogLightColor = skyFog.Lerp(deepFog, under) * Colors.White.Lerp(eventTint, 0.5f);
-        _env.FogDensity = Mathf.Lerp(0.0022f, 0.018f, under) * _biomeDensity;
-        _env.FogSkyAffect = Mathf.Lerp(0.25f, 1f, under);
-    }
-
-    /// <summary>Arc across the sky from east (t=0) through zenith to west (t=1); sign flips it below the horizon.</summary>
-    private static Vector3 Arc(float t, float sign)
-    {
-        float a = t * Mathf.Pi;
-        return new Vector3(Mathf.Cos(a), Mathf.Sin(a) * sign, 0.35f).Normalized();
-    }
-
-    private static void Orient(DirectionalLight3D light, Vector3 towardLight)
-    {
-        var up = Mathf.Abs(towardLight.Y) > 0.99f ? Vector3.Forward : Vector3.Up;
-        light.LookAtFromPosition(Vector3.Zero, -towardLight, up);
+        _preset = p;
+        _env.SsaoEnabled = p.Ssao;
+        _env.SsilEnabled = p.Ssil;
+        _env.SsrEnabled = p.Ssr;
+        _env.SsrMaxSteps = p.SsrSteps;
+        _env.VolumetricFogEnabled = p.VolumetricFog;
+        _env.GlowEnabled = p.Glow;
+        _skyResource.RadianceSize = (Sky.RadianceSizeEnum)Mathf.Clamp(Mathf.RoundToInt(Mathf.Log(p.SkyRadiance) / Mathf.Log(2f)) - 5, 0, 6);
+        _sky.SetShaderParameter("cloud_steps", p.CloudSteps);
+        _camera.AutoExposureEnabled = p.AutoExposure;
+        _sun.DirectionalShadowMaxDistance = p.ShadowDistance;
+        _sun.LightAngularDistance = p.SunSize;
+        _moon.DirectionalShadowMaxDistance = Mathf.Min(p.ShadowDistance, 80f);
+        _moon.LightAngularDistance = p.SunSize;
     }
 }

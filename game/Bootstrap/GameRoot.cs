@@ -55,9 +55,20 @@ public partial class GameRoot : Node
         }
 
         var layers = TextureLayerCatalog.Load(data);
-        var render = new RenderTables(content, layers.IndexOf);
+        var grass = Strata.Core.Presentation.GrassConfig.Load(data);
+        var grassProblems = grass.Validate(content);
+        if (grassProblems.Count > 0)
+        {
+            foreach (var problem in grassProblems) log.Error("content", $"{Strata.Core.Presentation.GrassConfig.Path}: {problem}");
+            ShowFatal("Grass settings failed validation — see the log for details.");
+            return;
+        }
+        var render = new RenderTables(content, layers.IndexOf, grass);
         InputSetup.Register(data);
-        Services = new GameServices(log, data, content, layers, render, args);
+        var graphics = Rendering.GraphicsSettings.Load(data, args, log);
+        graphics.Apply(GetViewport());
+        Services = new GameServices(log, data, content, layers, render, args, graphics);
+        log.Info("boot", $"Graphics preset '{graphics.Name}'.");
         log.Info("boot", $"Content: {content.Blocks.Count} blocks, {content.Items.Count} items, {content.Recipes.Count} recipes.");
 
         if (args.Flag("no-world")) return;

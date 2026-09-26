@@ -3,7 +3,7 @@ import math
 
 from mathutils import Matrix, Vector
 
-from .mesh import MeshBuilder
+from .mesh import MeshBuilder, hex_color
 
 
 def _lean(rng, amount):
@@ -11,9 +11,9 @@ def _lean(rng, amount):
 
 
 def broadleaf(mb: MeshBuilder, p, rng):
-    """Oak-like tree: flared trunk, a few limbs and clumped canopy blobs."""
+    """Oak-like tree: flared trunk, a few limbs, and a crown of leaf-card clumps around their ends."""
     h, r = p["height"], p["trunk"]
-    bark, leaves = f"prop:{p['bark']}", f"prop:{p['leaves']}"
+    bark = f"prop:{p['bark']}"
     tint, leaf_tint = p.get("barkTint", "#ffffff"), p.get("leafTint", "#ffffff")
     top = Vector((0, 0, h * 0.62)) + _lean(rng, h * 0.06)
     pts = [Vector((0, 0, -0.3)).lerp(top, t) + _lean(rng, 0.12) * math.sin(t * math.pi) for t in (0, 0.2, 0.4, 0.6, 0.8, 1.0)]
@@ -23,35 +23,81 @@ def broadleaf(mb: MeshBuilder, p, rng):
         d = Vector((math.cos(a), math.sin(a), 0))
         mb.tube([Vector((0, 0, 0.5)), d * r * 1.3 + Vector((0, 0, 0.05)), d * r * 2.0 + Vector((0, 0, -0.2))],
                 [r * 0.45, r * 0.35, r * 0.1], bark, tint, segments=6)
-    blobs = [(top + Vector((0, 0, p["canopy"] * 0.45)), p["canopy"])]
+    blobs = [(top + Vector((0, 0, p["canopy"] * 0.45)), p["canopy"] * 1.1)]
     for k in range(p.get("limbs", 4)):
         a = k * 2 * math.pi / p.get("limbs", 4) + rng.random()
-        start = Vector((0, 0, 0)).lerp(top, 0.55 + rng.random() * 0.35)
-        reach = p["canopy"] * (0.7 + rng.random() * 0.4)
-        end = start + Vector((math.cos(a) * reach, math.sin(a) * reach, reach * (0.5 + rng.random() * 0.4)))
+        start = Vector((0, 0, 0)).lerp(top, 0.5 + rng.random() * 0.3)
+        reach = p["canopy"] * (0.95 + rng.random() * 0.4)
+        end = start + Vector((math.cos(a) * reach, math.sin(a) * reach, reach * (0.35 + rng.random() * 0.3)))
         mid = start.lerp(end, 0.5) + Vector((0, 0, 0.3))
         mb.tube([start, mid, end], [r * 0.4, r * 0.28, r * 0.12], bark, tint, segments=6)
-        blobs.append((end + Vector((0, 0, 0.2)), p["canopy"] * (0.55 + rng.random() * 0.25)))
+        blobs.append((end + Vector((0, 0, 0.2)), p["canopy"] * (0.65 + rng.random() * 0.25)))
+    card = f"card:{p.get('sprig', 'oak_sprig')}"
     for center, radius in blobs:
-        mb.sphere(center, radius, leaves, leaf_tint, subdivisions=2, scale=(1, 1, 0.8), jitter=0.12, rng=rng, shade=0.5)
+        _twigs(mb, center, radius, bark, tint, rng)
+        mb.leaf_cards(center, radius, card, leaf_tint, rng, count=_cards(radius, 0.8), scale=(1, 1, 0.8), size=0.55)
         for _ in range(3):
             off = Vector(((rng.random() - 0.5), (rng.random() - 0.5), (rng.random() - 0.3))) * radius * 1.2
-            mb.sphere(center + off, radius * 0.5, leaves, leaf_tint, subdivisions=1, jitter=0.15, rng=rng, shade=0.4)
+            mb.leaf_cards(center + off, radius * 0.5, card, leaf_tint, rng, count=_cards(radius * 0.5, 1.0), size=0.8)
+
+
+def _cards(radius, flat):
+    """Cards for a crown of this radius (and vertical squash): enough to close the silhouette, a few gaps inside."""
+    return int(16 + 15 * radius * radius * (0.4 + 0.6 * flat))
+
+
+def _twigs(mb: MeshBuilder, center, radius, bark, tint, rng, count=4):
+    """Thin branches reaching into a crown, glimpsed through the gaps between leaf cards."""
+    for _ in range(count):
+        d = Vector((rng.random() - 0.5, rng.random() - 0.5, rng.random() * 0.6)).normalized()
+        mb.tube([center - d * radius * 0.3, center + d * radius * 0.35, center + d * radius * 0.8], [0.06, 0.035, 0.012],
+                bark, tint, segments=4)
 
 
 def conifer(mb: MeshBuilder, p, rng):
-    """Pine: straight trunk wrapped in stacked, slightly irregular needle cones."""
+    """Pine: straight trunk; whorls of drooping branches carrying needle cards, shorter toward the top."""
     h, r = p["height"], p["trunk"]
-    bark, needles = f"prop:{p['bark']}", f"prop:{p['leaves']}"
-    mb.cylinder((0, 0, -0.3), (0, 0, h * 0.95), r, r * 0.25, bark, p.get("barkTint", "#ffffff"), segments=8)
-    tiers = p.get("tiers", 6)
-    base, width = h * 0.22, p["canopy"]
+    bark, tint = f"prop:{p['bark']}", p.get("barkTint", "#ffffff")
+    card = f"card:{p.get('sprig', 'pine_sprig')}"
+    rgba = hex_color(p.get("leafTint", "#ffffff"))
+    mb.cylinder((0, 0, -0.3), (0, 0, h * 0.97), r, r * 0.2, bark, tint, segments=8)
+    tiers = p.get("tiers", 6) * 2
+    base, width = h * 0.2, p["canopy"]
     for i in range(tiers):
         t = i / tiers
-        z0 = base + (h - base) * t * 0.92
-        radius = width * (1.0 - t * 0.8) * (0.9 + rng.random() * 0.2)
-        tier_h = (h - base) / tiers * 1.9
-        mb.cylinder((0, 0, z0), (0, 0, z0 + tier_h), radius, 0.0, needles, p.get("leafTint", "#ffffff"), segments=9, shade=0.45)
+        z = base + (h * 0.95 - base) * t
+        reach = width * (1.0 - t * 0.85) * (0.85 + rng.random() * 0.3)
+        branches = 6 + int(rng.random() * 3)
+        spin = rng.random() * math.tau
+        for k in range(branches):
+            a = spin + k * math.tau / branches + (rng.random() - 0.5) * 0.4
+            d = Vector((math.cos(a), math.sin(a), 0))
+            droop = 0.25 + 0.2 * rng.random()
+            start = Vector((0, 0, z))
+            tip = start + d * reach + Vector((0, 0, -reach * droop + 0.15))
+            mb.tube([start, start.lerp(tip, 0.5) + Vector((0, 0, 0.12)), tip], [0.05 + 0.02 * (1 - t), 0.03, 0.01], bark, tint, segments=4)
+            side = d.cross(Vector((0, 0, 1)))
+            cone = (0, 0, z - width * 0.4)
+
+            def normal_of(q, cone=Vector(cone)):
+                return (q - cone).normalized()
+
+            for j in range(3):
+                f = 0.12 + j * 0.3 + rng.random() * 0.08
+                at = start.lerp(tip, f) + Vector((0, 0, 0.1 * math.sin(f * math.pi)))
+                length = reach * (0.62 - 0.12 * j)
+                along = (tip - start).normalized()
+                for roll in (-0.45, 0.45):
+                    k_occ = 0.62 + 0.38 * f
+                    color = (rgba[0] * k_occ, rgba[1] * k_occ, rgba[2] * k_occ, rgba[3])
+                    tilt = side * math.cos(roll + (rng.random() - 0.5) * 0.4) + Vector((0, 0, math.sin(roll)))
+                    mb.card(at - along * length * 0.15, along, tilt, length, length * 0.9, card, color, normal_of, flip=rng.random() < 0.5)
+    tip_rgba = (rgba[0], rgba[1], rgba[2], rgba[3])
+    for k in range(3):  # leader at the very top
+        a = k * math.tau / 3
+        side = Vector((math.cos(a), math.sin(a), 0))
+        mb.card(Vector((0, 0, h * 0.9)), Vector((0, 0, 1)), side, h * 0.12, h * 0.08, card, tip_rgba,
+                lambda q: Vector((q.x, q.y, 0.6)).normalized())
 
 
 def palm(mb: MeshBuilder, p, rng):
@@ -86,13 +132,17 @@ def jungle(mb: MeshBuilder, p, rng):
         d = Vector((math.cos(a), math.sin(a), 0))
         mb.tube([Vector((0, 0, 2.2)), d * r * 1.4 + Vector((0, 0, 0.8)), d * r * 2.6 + Vector((0, 0, -0.2))],
                 [r * 0.3, r * 0.22, r * 0.08], bark, p.get("barkTint", "#ffffff"), segments=5)
+    card = f"card:{p.get('sprig', 'jungle_sprig')}"
     for layer in range(3):
         z = h * (0.8 + layer * 0.08)
         radius = p["canopy"] * (1.0 - layer * 0.25)
         for k in range(4 - layer):
-            off = Vector(((rng.random() - 0.5), (rng.random() - 0.5), 0)) * radius * 0.6
-            mb.sphere(Vector((0, 0, z)) + off, radius * 0.75, leaves, p.get("leafTint", "#ffffff"), subdivisions=2,
-                      scale=(1, 1, 0.38), jitter=0.12, rng=rng, shade=0.5)
+            a = rng.random() * math.tau
+            off = Vector((math.cos(a), math.sin(a), 0)) * radius * (0.35 + 0.55 * rng.random()) * (1 if k else 0.3)
+            center = Vector((0, 0, z)) + off
+            _twigs(mb, center, radius * 0.75, bark, p.get("barkTint", "#ffffff"), rng, count=3)
+            mb.leaf_cards(center, radius * 0.75, card, p.get("leafTint", "#ffffff"), rng, count=_cards(radius * 0.75, 0.38),
+                          scale=(1, 1, 0.38), size=0.45, droop=0.3)
     for k in range(3):  # hanging vines
         a = rng.random() * 2 * math.pi
         top = Vector((math.cos(a) * p["canopy"] * 0.6, math.sin(a) * p["canopy"] * 0.6, h * 0.78))
@@ -100,16 +150,18 @@ def jungle(mb: MeshBuilder, p, rng):
 
 
 def twisted(mb: MeshBuilder, p, rng):
-    """Gloomwood: corkscrew trunk and spiky dark foliage."""
+    """Gloomwood: corkscrew trunk and spiky dark foliage on crooked branches."""
     h, r = p["height"], p["trunk"]
-    bark, leaves = f"prop:{p['bark']}", f"prop:{p['leaves']}"
+    bark = f"prop:{p['bark']}"
     pts = [Vector((math.sin(t * 7) * 0.35 * t, math.cos(t * 7) * 0.35 * t, h * 0.7 * t - 0.3)) for t in (i / 10 for i in range(11))]
     mb.tube(pts, [r * (1.2 - 0.7 * i / 10) for i in range(11)], bark, p.get("barkTint", "#ffffff"), segments=7)
     crown = pts[-1]
+    card = f"card:{p.get('sprig', 'gloom_sprig')}"
     for k in range(7):
         off = Vector(((rng.random() - 0.5) * 2.4, (rng.random() - 0.5) * 2.4, rng.random() * 1.8))
-        mb.sphere(crown + off, p["canopy"] * (0.35 + rng.random() * 0.25), leaves, p.get("leafTint", "#ffffff"),
-                  subdivisions=1, jitter=0.35, rng=rng, shade=0.45)
+        radius = p["canopy"] * (0.35 + rng.random() * 0.25)
+        mb.tube([crown, crown + off * 0.6 + Vector((0, 0, 0.3)), crown + off], [0.12, 0.07, 0.03], bark, p.get("barkTint", "#ffffff"), segments=5)
+        mb.leaf_cards(crown + off, radius, card, p.get("leafTint", "#ffffff"), rng, count=_cards(radius, 1.0) + 6, size=0.6, droop=0.2)
 
 
 def cactus(mb: MeshBuilder, p, rng):
@@ -156,9 +208,10 @@ def flower(mb: MeshBuilder, p, rng):
 
 
 def bush(mb: MeshBuilder, p, rng):
+    card = f"card:{p.get('sprig', 'oak_sprig')}"
     for _ in range(rng.randint(3, 5)):
         c = Vector(((rng.random() - 0.5) * 0.5, (rng.random() - 0.5) * 0.5, 0.25 + rng.random() * 0.3))
-        mb.sphere(c, 0.3 + rng.random() * 0.15, f"prop:{p['leaves']}", p.get("tint", "#ffffff"), subdivisions=1, jitter=0.2, rng=rng, shade=0.45)
+        mb.leaf_cards(c, 0.32 + rng.random() * 0.15, card, p.get("tint", "#ffffff"), rng, count=14, size=1.1, core=0.2)
 
 
 def fern(mb: MeshBuilder, p, rng):

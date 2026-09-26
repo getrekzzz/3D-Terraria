@@ -19,6 +19,9 @@ public sealed class ChunkMeshResult
     public MeshSurface Liquid { get; } = new();
     public CollisionBuilder Collision { get; } = new();
 
+    /// <summary>Grass clumps on the chunk's grass surfaces (empty when the tables carry no grass settings).</summary>
+    public List<GrassClump> Grass { get; } = new();
+
     /// <summary>Light of the centre chunk's cells (for gameplay queries).</summary>
     public required ushort[] Light { get; init; }
 
@@ -48,6 +51,7 @@ public static class ChunkMesher
         SurfaceNetsMesher.Build(vol, result.Opaque, result.Collision);
         CellMesher.Build(vol, result.Opaque, result.Transparent, result.Cutout, result.Collision);
         LiquidMesher.Build(vol, result.Liquid);
+        GrassScatter.Build(vol, result.Opaque, result.Grass);
         result.BuildMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
         return result;
     }

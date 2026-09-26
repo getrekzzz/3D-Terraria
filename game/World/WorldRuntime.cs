@@ -16,6 +16,7 @@ public sealed partial class WorldRuntime : Node3D
 {
     private GameServices _services = null!;
     private ChunkRenderer _renderer = null!;
+    private GrassRenderer? _grass;
     private ColliderManager _colliders = null!;
     private EnvironmentController _environment = null!;
 
@@ -24,6 +25,7 @@ public sealed partial class WorldRuntime : Node3D
     public ChunkStreamer Streamer => Game.Streamer;
     public JobSystem Jobs => Game.Jobs;
     public ChunkRenderer Renderer => _renderer;
+    public GrassRenderer? Grass => _grass;
     public ColliderManager Colliders => _colliders;
     public EnvironmentController Environment => _environment;
     public GameServices Services => _services;
@@ -42,19 +44,29 @@ public sealed partial class WorldRuntime : Node3D
         _renderer = new ChunkRenderer { Name = "Chunks" };
         _renderer.Initialize(new TerrainMaterials(services.Render));
         AddChild(_renderer);
+        if (services.Render.Grass is { } grass)
+        {
+            _grass = new GrassRenderer { Name = "Grass" };
+            _grass.Initialize(grass, services.Graphics);
+            AddChild(_grass);
+        }
         _colliders = new ColliderManager { Name = "Colliders" };
         AddChild(_colliders);
         _environment = new EnvironmentController { Name = "Environment" };
+        _environment.Initialize(services.Graphics, game.Session.Settings.Seed);
+        _environment.ViewDistance = game.Streamer.Settings.MeshRadius * ChunkMath.Size * Units.CellSize;
         AddChild(_environment);
 
         Streamer.MeshReady += result =>
         {
             _renderer.Enqueue(result);
+            _grass?.Set(result.Coord, result.Grass);
             _colliders.SetData(result.Coord, result.Collision);
         };
         Streamer.ChunkRemoved += coord =>
         {
             _renderer.Remove(coord);
+            _grass?.Remove(coord);
             _colliders.Remove(coord);
         };
         game.Autosaved += chunks => services.Log.Info("world", $"Autosaved ({chunks} chunks).");
@@ -92,8 +104,12 @@ public sealed partial class WorldRuntime : Node3D
         _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
         _environment.EventTint = Game.Events.SkyTint is { } tint ? Color.FromHtml(tint) : null;
         if (Engine.GetProcessFrames() % 15 == 0) _environment.Biome = BiomeAround(focus);
-        float surface = Session.Generator.Terrain.SurfaceHeight(focus.X, focus.Z);
-        _environment.Apply(Session.Clock, (surface - focus.Y) * Units.CellSize, delta);
+        var camera = GetViewport().GetCamera3D();
+        var eye = camera?.GlobalPosition ?? Focus?.GlobalPosition ?? Vector3.Zero;
+        _grass?.Update(eye, Focus?.GlobalPosition ?? eye);
+        float surface = Session.Generator.Terrain.SurfaceHeight(eye.X / Units.CellSize, eye.Z / Units.CellSize);
+        float skyExposure = Rendering.LightProbe.Sample(Session.World, eye).A;
+        _environment.Apply(Session.Clock, surface * Units.CellSize - eye.Y, skyExposure, delta);
     }
 
     /// <summary>The highest-priority biome or zone at a cell (the crypt over the tundra, a hardmode wedge over forest).</summary>

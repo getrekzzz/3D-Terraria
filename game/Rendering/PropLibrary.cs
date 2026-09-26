@@ -7,18 +7,22 @@ namespace Strata.Game.Rendering;
 /// <summary>
 /// Loads generated GLB models and gives every surface the shared prop shader. GLB material names encode the
 /// texture layer and flags (<c>prop:planks</c>, <c>prop:plain:glow</c>); layers come from
-/// res://assets/textures/props/layers.json. Meshes and materials are cached.
+/// res://assets/textures/props/layers.json. Tree crowns use alpha-tested leaf cards (<c>card:oak_sprig</c>); people use
+/// <c>char:&lt;kind&gt;</c> slots (see <see cref="CharacterMaterials"/>).
+/// Meshes and materials are cached.
 /// </summary>
 public sealed class PropLibrary
 {
     private const string Folder = "res://assets/textures/props/";
     private static readonly Shader PropShader = GD.Load<Shader>("res://shaders/prop.gdshader");
+    private static readonly Shader CardShader = GD.Load<Shader>("res://shaders/foliage_card.gdshader");
 
     private readonly Dictionary<string, (int Index, float Sway)> _layers = new();
     private readonly Dictionary<(string Slot, bool Custom), ShaderMaterial> _materials = new();
     private readonly Dictionary<(string Path, bool Custom), Mesh?> _meshes = new();
     private readonly TextureLayered _albedo;
     private readonly TextureLayered _material;
+    private readonly CharacterMaterials _characters = new();
 
     public PropLibrary()
     {
@@ -65,17 +69,30 @@ public sealed class PropLibrary
     {
         var key = (slot, multimesh);
         if (_materials.TryGetValue(key, out var m)) return m;
-        var parts = slot.StartsWith("prop:") ? slot.Substring(5).Split(':') : new[] { "missing" };
+        if (slot.StartsWith("char:") && _characters.Get(slot, _albedo, _material, _layers, Problems) is { } character)
+            return _materials[key] = character;
+        bool card = slot.StartsWith("card:");
+        var parts = slot.StartsWith("prop:") || card ? slot.Substring(5).Split(':') : new[] { "missing" };
         if (!_layers.TryGetValue(parts[0], out var layer))
         {
             Problems.Add($"unknown prop layer in material '{slot}'");
             layer = _layers.TryGetValue("missing", out var missing) ? missing : (0, 0f);
+        }
+        if (card)
+        {
+            m = new ShaderMaterial { Shader = CardShader };
+            m.SetShaderParameter("albedo_array", _albedo);
+            m.SetShaderParameter("layer", (float)layer.Index);
+            m.SetShaderParameter("sway", layer.Sway);
+            m.SetShaderParameter("light_from_custom", multimesh);
+            return _materials[key] = m;
         }
         m = new ShaderMaterial { Shader = PropShader };
         m.SetShaderParameter("albedo_array", _albedo);
         m.SetShaderParameter("material_array", _material);
         m.SetShaderParameter("layer", (float)layer.Index);
         m.SetShaderParameter("sway", layer.Sway);
+        m.SetShaderParameter("foliage", layer.Sway > 0f ? 0.6f : 0f); // swaying layers are leaves: light passes through
         m.SetShaderParameter("glow", System.Array.IndexOf(parts, "glow") > 0 ? 1.1f : 0f);
         m.SetShaderParameter("light_from_custom", multimesh);
         _materials[key] = m;
