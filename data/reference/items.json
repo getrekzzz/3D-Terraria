@@ -1671,6 +1671,48 @@
    "source": "craft"
   },
   {
+   "id": "terraria:amethyst_hook",
+   "name": "Amethyst Hook",
+   "kind": "tool",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:topaz_hook",
+   "name": "Topaz Hook",
+   "kind": "tool",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:sapphire_hook",
+   "name": "Sapphire Hook",
+   "kind": "tool",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:emerald_hook",
+   "name": "Emerald Hook",
+   "kind": "tool",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:ruby_hook",
+   "name": "Ruby Hook",
+   "kind": "tool",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:diamond_hook",
+   "name": "Diamond Hook",
+   "kind": "tool",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
    "id": "terraria:ivy_whip",
    "name": "Ivy Whip",
    "kind": "tool",
@@ -1998,6 +2040,41 @@
    "kind": "accessory",
    "stage": "early",
    "source": "chest"
+  },
+  {
+   "id": "terraria:sandstorm_in_a_bottle",
+   "name": "Sandstorm in a Bottle",
+   "kind": "accessory",
+   "stage": "early",
+   "source": "chest"
+  },
+  {
+   "id": "terraria:blizzard_in_a_bottle",
+   "name": "Blizzard in a Bottle",
+   "kind": "accessory",
+   "stage": "early",
+   "source": "chest"
+  },
+  {
+   "id": "terraria:cloud_in_a_balloon",
+   "name": "Cloud in a Balloon",
+   "kind": "accessory",
+   "stage": "prehardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:obsidian_skull",
+   "name": "Obsidian Skull",
+   "kind": "accessory",
+   "stage": "prehardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:fledgling_wings",
+   "name": "Fledgling Wings",
+   "kind": "accessory",
+   "stage": "early",
+   "source": "sky chest"
   },
   {
    "id": "terraria:cloud_in_a_bottle",
@@ -2812,6 +2889,20 @@
    "source": "craft"
   },
   {
+   "id": "terraria:hook",
+   "name": "Hook",
+   "kind": "material",
+   "stage": "early",
+   "source": "drop"
+  },
+  {
+   "id": "terraria:iron_chain",
+   "name": "Iron Chain",
+   "kind": "material",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
    "id": "terraria:work_bench",
    "name": "Work Bench",
    "kind": "furniture",
@@ -2831,6 +2922,13 @@
    "kind": "furniture",
    "stage": "early",
    "source": "craft"
+  },
+  {
+   "id": "terraria:tinkerers_workshop",
+   "name": "Tinkerer's Workshop",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "shop"
   },
   {
    "id": "terraria:lead_anvil",

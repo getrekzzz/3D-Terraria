@@ -15,13 +15,13 @@
   "lootTables": [
     { "id": "vulture", "coins": [40, 120], "entries": [{ "item": "feather", "min": 1, "max": 2, "chance": 0.5 }] },
     { "id": "snow_creatures", "coins": [30, 90], "entries": [{ "item": "gel", "min": 1, "max": 3 }] },
-    { "id": "jungle_slime", "coins": [40, 110], "entries": [{ "item": "gel", "min": 2, "max": 4 }, { "item": "stinger", "chance": 0.05 }] },
-    { "id": "man_eater", "coins": [50, 140], "entries": [{ "item": "stinger", "chance": 0.1 }] },
+    { "id": "jungle_slime", "coins": [40, 110], "entries": [{ "item": "gel", "min": 2, "max": 4 }, { "item": "stinger", "chance": 0.05 }, { "item": "jungle_spores", "min": 1, "max": 3, "chance": 0.5 }] },
+    { "id": "man_eater", "coins": [50, 140], "entries": [{ "item": "stinger", "chance": 0.1 }, { "item": "vine", "chance": 0.5 }, { "item": "jungle_spores", "min": 1, "max": 2, "chance": 0.4 }] },
     { "id": "crab", "coins": [40, 110], "entries": [{ "item": "shark_fin", "chance": 0.1 }] },
     { "id": "blue_jellyfish", "coins": [40, 120], "entries": [{ "item": "gel", "min": 1, "max": 2 }, { "item": "fallen_star", "chance": 0.03 }] },
     { "id": "shark", "coins": [30, 90], "entries": [{ "item": "shark_fin", "chance": 0.33 }] },
-    { "id": "skeleton", "coins": [60, 160], "entries": [{ "item": "bone", "min": 1, "max": 3, "chance": 0.75 }, { "item": "lesser_healing_potion", "chance": 0.03 }] },
-    { "id": "hornet", "coins": [60, 150], "entries": [{ "item": "stinger", "chance": 0.5 }] },
+    { "id": "skeleton", "coins": [60, 160], "entries": [{ "item": "bone", "min": 1, "max": 3, "chance": 0.75 }, { "item": "hook", "chance": 0.02 }, { "item": "lesser_healing_potion", "chance": 0.03 }] },
+    { "id": "hornet", "coins": [60, 150], "entries": [{ "item": "stinger", "chance": 0.5 }, { "item": "vine", "chance": 0.15 }] },
     { "id": "fire_imp", "coins": [150, 400], "entries": [{ "item": "lesser_healing_potion", "chance": 0.05 }] },
     { "id": "lava_slime", "coins": [80, 200], "entries": [{ "item": "gel", "min": 2, "max": 4 }] },
     { "id": "hellbat", "coins": [80, 220], "entries": [{ "item": "fallen_star", "chance": 0.03 }] }

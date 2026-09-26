@@ -28,6 +28,14 @@ public sealed class EffectState
     /// <summary>Brightest emitted light [r,g,b] (0–15), or null.</summary>
     public int[]? Light { get; set; }
 
+    /// <summary>The best wings (glide) and rocket boots equipped, if any.</summary>
+    public Content.Specs.FlightParams? Wings { get; set; }
+
+    public Content.Specs.FlightParams? RocketBoots { get; set; }
+
+    /// <summary>The fastest dash equipped, if any.</summary>
+    public Content.Specs.DashParams? Dash { get; set; }
+
     public void Clear()
     {
         Stats.Clear();
@@ -39,6 +47,9 @@ public sealed class EffectState
         LiquidImmunities.Clear();
         DamagePerSecond = 0;
         Light = null;
+        Wings = null;
+        RocketBoots = null;
+        Dash = null;
     }
 
     /// <summary>Applies one effect spec (validated at content load).</summary>
@@ -74,6 +85,15 @@ public sealed class EffectState
                 break;
             case EffectSpecs.WaterBreathing:
                 WaterBreathing = true;
+                break;
+            case EffectSpecs.Flight:
+                var f = Parsed<FlightParams>(spec);
+                if (f.Boots) { if (RocketBoots == null || f.Time > RocketBoots.Time) RocketBoots = f; }
+                else if (Wings == null || f.Time > Wings.Time) Wings = f;
+                break;
+            case EffectSpecs.Dash:
+                var d = Parsed<DashParams>(spec);
+                if (Dash == null || d.Speed > Dash.Speed) Dash = d;
                 break;
             default:
                 throw new InvalidOperationException($"Unhandled effect type '{spec.Type}'.");

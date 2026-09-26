@@ -20,6 +20,7 @@ public enum ItemAction
     Consume = 1 << 8,
     SummonBoss = 1 << 9,
     Bucket = 1 << 10,
+    Grapple = 1 << 11,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -36,6 +37,9 @@ public sealed class ItemUseInfo
     public SummonBossParams? Summon { get; internal set; }
     public Conditions.ICondition? SummonCondition { get; internal set; }
     public BucketParams? Bucket { get; internal set; }
+
+    /// <summary>Hook parameters (grappling hooks).</summary>
+    public GrappleParams? Grapple { get; internal set; }
 
     /// <summary>Boss summoned when this item burns in a liquid (not a use action).</summary>
     public IncinerationSummonParams? Incineration { get; internal set; }
@@ -126,6 +130,7 @@ public sealed class ItemUseTable
                     info.BucketLiquid = info.Bucket.Liquid != null && content.Liquids.TryGet(info.Bucket.Liquid, out var liquid) ? liquid : null;
                     break;
                 case ItemBehaviorSpecs.IncinerationSummon: info.Incineration = spec.Parse<IncinerationSummonParams>(); break;
+                case ItemBehaviorSpecs.Grapple: a |= ItemAction.Grapple; info.Grapple = spec.Parse<GrappleParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

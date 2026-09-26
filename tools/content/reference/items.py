@@ -103,6 +103,12 @@ spectre_hamaxe|Spectre Hamaxe|post-plantera|craft
 picksaw|Picksaw|post-golem|golem
 luminite_drill|Luminite Drill|endgame|craft
 grappling_hook|Grappling Hook|early|craft
+amethyst_hook|Amethyst Hook|early|craft
+topaz_hook|Topaz Hook|early|craft
+sapphire_hook|Sapphire Hook|early|craft
+emerald_hook|Emerald Hook|early|craft
+ruby_hook|Ruby Hook|early|craft
+diamond_hook|Diamond Hook|early|craft
 ivy_whip|Ivy Whip|prehardmode|craft
 dual_hook|Dual Hook|hardmode|craft
 magic_mirror|Magic Mirror|early|chest
@@ -154,6 +160,11 @@ stardust_helmet|Stardust Helmet|endgame|craft
 """,
     "accessory": """
 hermes_boots|Hermes Boots|early|chest
+sandstorm_in_a_bottle|Sandstorm in a Bottle|early|chest
+blizzard_in_a_bottle|Blizzard in a Bottle|early|chest
+cloud_in_a_balloon|Cloud in a Balloon|prehardmode|craft
+obsidian_skull|Obsidian Skull|prehardmode|craft
+fledgling_wings|Fledgling Wings|early|sky chest
 cloud_in_a_bottle|Cloud in a Bottle|early|chest
 lucky_horseshoe|Lucky Horseshoe|early|sky chest
 band_of_regeneration|Band of Regeneration|early|chest
@@ -274,11 +285,14 @@ vortex_fragment|Vortex Fragment|endgame|pillar
 nebula_fragment|Nebula Fragment|endgame|pillar
 stardust_fragment|Stardust Fragment|endgame|pillar
 luminite_bar|Luminite Bar|endgame|craft
+hook|Hook|early|drop
+iron_chain|Iron Chain|early|craft
 """,
     "furniture": """
 work_bench|Work Bench|early|craft
 furnace|Furnace|early|craft
 iron_anvil|Iron Anvil|early|craft
+tinkerers_workshop|Tinkerer's Workshop|prehardmode|shop
 lead_anvil|Lead Anvil|early|craft
 sawmill|Sawmill|early|craft
 loom|Loom|early|craft

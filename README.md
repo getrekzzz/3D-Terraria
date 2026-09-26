@@ -47,6 +47,7 @@ console switches and remembers one); rendering is described in [`docs/architectu
 | Key | Action |
 |---|---|
 | WASD, Space, Shift, Ctrl | move, jump (hold for height), sprint, drop through platforms |
+| F, Space in the air, double-tap a direction | grappling hook (throw / let go), extra jumps, wings and rocket boots (hold), dash (with a dash accessory) |
 | Mouse / wheel / 1–0 | look / hotbar |
 | LMB / RMB or E | use held item (mine, chop, place, attack, drink, buckets) / interact (doors, chests, beds, talk to residents) |
 | T / Shift+T, R, Alt | cycle build shape, rotate, precision (single-cell) mining |
@@ -56,7 +57,7 @@ console switches and remembers one); rendering is described in [`docs/architectu
 | ` or F1 / F3 / Esc | console / performance overlay / release mouse |
 
 Console commands include `help`, `give`, `drop`, `spawn`, `boss`, `slay`, `god`, `event`, `tp` (also `tp landmark dungeon_gate`, `tp zone hallowed`), `mutations`, `biome`, `time`, `flag`, `setblock`,
-`fill`, `place`, `liquid`, `liquids`, `house`, `town`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`
+`fill`, `place`, `liquid`, `liquids`, `house`, `town`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`, `equip`
 (`help <command>` for usage).
 
 ## Developing

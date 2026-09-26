@@ -103,6 +103,24 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "equip", Usage = "equip <item>", Help = "Gives an item and equips it (armor or accessory).",
+            Run = (ctx, a) =>
+            {
+                var content = ctx.World.Session.Content;
+                var id = a.Str(0, "item");
+                if (!content.Items.TryGet(id, out var item)) throw new CommandException($"unknown item '{id}'");
+                var inv = ctx.Player.State.Inventory;
+                if (!inv.Pickup(new Gameplay.Items.ItemStack(item, 1)).IsEmpty) throw new CommandException("the backpack is full");
+                int slot = -1;
+                for (int i = 0; i < inv.Backpack.Size; i++)
+                    if (inv.Backpack[i].Item == item) slot = i;
+                if (slot < 0 || !inv.Equip(slot)) throw new CommandException($"'{id}' cannot be equipped");
+                ctx.Player.State.Recompute();
+                return CommandResult.Success($"Equipped {item.DisplayName}.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "spawning", Usage = "spawning <on|off|now>", Help = "Toggles natural spawning or forces one spawn attempt.",
             Run = (ctx, a) =>
             {

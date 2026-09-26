@@ -28,6 +28,7 @@ public sealed partial class PlayerAvatar : Node3D
         _game = game;
         _props = props;
         Name = "Avatar";
+        InitializeGear();
         var look = controller.Entity.State.Look;
         var model = $"assets/models/creatures/{look.ModelId}.glb";
         _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props);
@@ -49,6 +50,7 @@ public sealed partial class PlayerAvatar : Node3D
         _yaw = Mathf.LerpAngle(_yaw, target, 1f - Mathf.Exp(-(float)delta * 14f));
         Rotation = new Vector3(0, _yaw, 0);
         UpdateHeld(entity.State.Inventory.Held);
+        UpdateGear(delta);
         _visual.Play(ChooseClip(entity, out float speed), speed: speed);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
     }

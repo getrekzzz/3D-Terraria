@@ -2,6 +2,7 @@
   "tileObjects": [
     { "id": "work_bench", "name": "Work Bench", "size": [4, 2, 2], "interaction": "station", "stations": ["work_bench"], "housing": ["table"], "hitPoints": 3, "itemCategory": "station", "itemValue": 30, "covers": ["terraria:work_bench"] },
     { "id": "furnace", "name": "Furnace", "size": [3, 3, 3], "interaction": "station", "stations": ["furnace"], "light": [9, 5, 2], "hitPoints": 4, "itemCategory": "station", "itemValue": 300, "covers": ["terraria:furnace"] },
+    { "id": "tinkerers_workshop", "name": "Tinkerer's Workshop", "tags": ["shop"], "description": "Used to combine some accessories.", "size": [4, 3, 2], "interaction": "station", "stations": ["tinkerers_workshop"], "housing": ["table"], "hitPoints": 4, "itemCategory": "station", "itemValue": 100000, "covers": ["terraria:tinkerers_workshop"] },
     { "id": "iron_anvil", "name": "Iron Anvil", "size": [3, 2, 2], "interaction": "station", "stations": ["anvil"], "hitPoints": 5, "itemCategory": "station", "itemValue": 5000, "covers": ["terraria:iron_anvil"] },
     { "id": "lead_anvil", "name": "Lead Anvil", "size": [3, 2, 2], "interaction": "station", "stations": ["anvil"], "hitPoints": 5, "itemCategory": "station", "itemValue": 5000, "covers": ["terraria:lead_anvil"] },
     { "id": "placed_bottle", "name": "Placed Bottle", "size": [1, 1, 1], "anchor": "floor", "interaction": "station", "stations": ["alchemy"], "item": "bottle", "hitPoints": 1, "covers": ["terraria:placed_bottle"] },

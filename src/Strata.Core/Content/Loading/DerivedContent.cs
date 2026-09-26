@@ -55,7 +55,7 @@ internal static class DerivedContent
                 PlaceObject = obj.Id,
                 HeldLight = obj.Light,
                 Covers = obj.Covers,
-                Tags = new[] { "derived" },
+                Tags = obj.Tags.Append("derived").ToArray(), // e.g. "shop" for stations only sold by a resident
             });
             db.Items.Find(itemId)!.SourceFile = obj.SourceFile;
         }

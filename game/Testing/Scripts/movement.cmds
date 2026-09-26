@@ -1,0 +1,52 @@
+# Movement gear: grappling hook, rocket boots and wings, extra jumps and dashing.
+# Runs with: godot --headless --path . -- --world=smoke-move --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/movement.cmds
+
+wait_until player.frozen == 0 180
+wait 1.5
+assert player.alive == 1
+spawning off
+killall
+
+# A walled arena with a stone ceiling slab 8 m overhead.
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 40 14 air
+fill -4 16 -4 4 17 4 stone
+wait 1.0
+assert player.on_floor == 1
+
+# The hook flies up, latches onto the ceiling and reels the player in; jumping lets go.
+give grappling_hook 1
+mark
+aim 0 1 0
+hold grapple 0.05
+wait 0.2
+assert player.hook >= 1
+wait 1.5
+assert player.hook == 2
+assert player.from_mark > 4
+hold jump 0.05
+wait 2.5
+assert player.on_floor == 1
+assert player.hook == 0
+
+# Rocket boots burn while jump is held in the air, and refill on landing.
+fill -4 16 -4 4 17 4 air
+equip rocket_boots
+wait 0.5
+assert player.flight_left > 1.5
+hold jump 1.2
+assert player.flight_left < 1.2
+wait 4
+assert player.on_floor == 1
+assert player.flight_left > 1.5
+
+# Double-tapping a direction dashes with the Shield of Cthulhu.
+equip shield_of_cthulhu
+aim 1 0 0
+mark
+hold move_right 0.05
+hold move_right 0.05
+wait 0.3
+assert player.from_mark > 2
+assert player.alive == 1
+assert errors == 0

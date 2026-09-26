@@ -126,6 +126,7 @@ public sealed partial class PlayerController : CharacterBody3D
         float speed = _config.WalkSpeed * (1f + stats.Bonus(StatIds.MoveSpeed)) * stats.Multiplier(StatIds.MoveSpeed);
         if (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint")) speed *= _config.SprintMultiplier;
         if (_liquid != null) speed = Mathf.Min(speed * _liquid.MoveSpeed, _config.SwimSpeed);
+        speed *= AirSpeedFactor();
 
         bool blocked = UI.InputGate.GameplayBlocked;
         var input = blocked ? Vector2.Zero : Input.GetVector("move_left", "move_right", "move_forward", "move_back");
@@ -134,17 +135,20 @@ public sealed partial class PlayerController : CharacterBody3D
         var horizontal = new Vector3(v.X, 0, v.Z);
         var target = wish * speed;
         bool onFloor = IsOnFloor();
+        if (onFloor) RefillAirMovement();
         float accel = onFloor ? (wish.LengthSquared() > 0.01f ? _config.GroundAcceleration : _config.GroundFriction) : _config.AirAcceleration;
         if (_knockbackTime > 0)
         {
             _knockbackTime -= dt; // briefly lose control while knocked back
             accel *= 0.15f;
         }
+        if (UpdateDash(dt, ref horizontal)) accel *= 0.08f; // a dash carries its own momentum
         horizontal = horizontal.MoveToward(target, accel * dt);
 
         UpdateJump(dt, onFloor, ref v);
         v.X = horizontal.X;
         v.Z = horizontal.Z;
+        if (UpdateGrapple(dt, ref v)) onFloor = false;
         Velocity = v;
 
         bool dropThrough = !blocked && Input.IsActionPressed("crouch");
@@ -194,6 +198,11 @@ public sealed partial class PlayerController : CharacterBody3D
             _jumpBuffer = 0;
             _coyote = 0;
         }
+        else if (!blocked && Input.IsActionJustPressed("jump") && !onFloor && _coyote <= 0 && TryAirJump(ref v))
+        {
+            _jumpBuffer = 0;
+            _jumpHold = 0;
+        }
         float gravity = _config.Gravity;
         if (_jumpHold > 0 && held && v.Y > 0)
         {
@@ -205,6 +214,7 @@ public sealed partial class PlayerController : CharacterBody3D
             _jumpHold = 0;
         }
         if (!onFloor || v.Y > 0) v.Y = Mathf.Max(v.Y - gravity * dt, -_config.MaxFallSpeed);
+        if (!onFloor) UpdateFlight(dt, held, ref v);
     }
 
     /// <summary>Climbs a ledge up to <see cref="MovementConfig.StepHeight"/> when walking into it.</summary>

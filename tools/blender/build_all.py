@@ -125,14 +125,15 @@ def plan(spec, blocks, items, objects, enemies):
 
 def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
-    from bgen import beasts, bosses, creatures, export, fauna, furniture, human, items as item_gen, mechs, nature
+    from bgen import beasts, bosses, creatures, export, fauna, furniture, gear, human, items as item_gen, mechs, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
 
-    generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS, **bosses.GENERATORS, **mechs.GENERATORS}
+    generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS, **bosses.GENERATORS, **mechs.GENERATORS,
+                  **gear.GENERATORS}
     manifest_path = REPO / "assets" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() and opts["only"] else {"objects": {}, "items": {}}
-    wanted = (lambda i: fnmatch.fnmatch(i, opts["only"])) if opts["only"] else (lambda i: True)
+    wanted = (lambda i: any(fnmatch.fnmatch(i, pat) for pat in opts["only"].split(","))) if opts["only"] else (lambda i: True)
 
     def make(asset_id, job, variant):
         reset_scene()
@@ -212,7 +213,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
 
 
 def _view_for(generator: str) -> str:
-    long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow"}
+    long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow", "gun", "rod", "whip"}
     return "item" if generator in long_items else "object"
 
 

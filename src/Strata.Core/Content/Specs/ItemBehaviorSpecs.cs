@@ -16,6 +16,9 @@ public static class ItemBehaviorSpecs
     public const string Bucket = "bucket";
     public const string IncinerationSummon = "incinerationSummon";
 
+    /// <summary>A grappling hook (fired with the grapple key from anywhere in the inventory).</summary>
+    public const string Grapple = "grapple";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
@@ -30,6 +33,7 @@ public static class ItemBehaviorSpecs
         c.Register<SummonBossParams>(SpecKind.ItemBehavior, SummonBoss);
         c.Register<BucketParams>(SpecKind.ItemBehavior, Bucket);
         c.Register<IncinerationSummonParams>(SpecKind.ItemBehavior, IncinerationSummon);
+        c.Register<GrappleParams>(SpecKind.ItemBehavior, Grapple);
     }
 }
 
@@ -44,6 +48,22 @@ public sealed class MeleeSwingParams : SpecParams, IValidatableSpec
     public string? TrailColor { get; init; }
 
     public string? Validate() => Arc is <= 0 or > 360 ? "arc must be in (0, 360]" : Length <= 0 ? "length must be > 0" : null;
+}
+
+/// <summary>A hook: flies out along the aim up to its reach, latches onto a block and reels the player in.</summary>
+public sealed class GrappleParams : SpecParams, IValidatableSpec
+{
+    /// <summary>Reach in cells, hook flight speed and reel-in speed (m/s).</summary>
+    public float Reach { get; init; } = 18f;
+
+    public float Speed { get; init; } = 28f;
+
+    public float Pull { get; init; } = 12f;
+
+    /// <summary>Chain colour (hex).</summary>
+    public string Color { get; init; } = "#9a9aa4";
+
+    public string? Validate() => Reach <= 0 || Speed <= 0 || Pull <= 0 ? "reach, speed and pull must be > 0" : null;
 }
 
 public sealed class ThrustParams : SpecParams

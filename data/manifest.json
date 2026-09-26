@@ -25,6 +25,7 @@
     "items/equipment.json",
     "items/hardmode.json",
     "items/materials.json",
+    "items/mobility.json",
     "items/radiant.json",
     "loot/containers.json",
     "loot/enemies.json",

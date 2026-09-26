@@ -304,6 +304,10 @@
           0.65
         ]
       }
+    },
+    "tinkerers_workshop": {
+      "generator": "workbench",
+      "params": {}
     }
   },
   "items": {
@@ -841,6 +845,257 @@
         "params": {
           "metal": "#fff0c8",
           "metalLayer": "gold"
+        }
+      },
+      "hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#9aa0a8"
+        }
+      },
+      "iron_chain": {
+        "generator": "whip",
+        "params": {
+          "color": "#8a8e96",
+          "handle": "#8a8e96"
+        }
+      },
+      "vine": {
+        "generator": "whip",
+        "params": {
+          "color": "#4a8a2a",
+          "handle": "#3a6a22"
+        }
+      },
+      "jungle_spores": {
+        "generator": "blob",
+        "params": {
+          "color": "#9ad24a",
+          "layer": "plain:glow"
+        }
+      },
+      "soul_of_flight": {
+        "generator": "essence",
+        "params": {
+          "color": "#8ad8ff"
+        }
+      },
+      "grappling_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#9aa0a8"
+        }
+      },
+      "amethyst_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#b06aff",
+          "gem": "#c88aff"
+        }
+      },
+      "topaz_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#ffc83a",
+          "gem": "#ffd86a"
+        }
+      },
+      "sapphire_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#3a7aff",
+          "gem": "#6a9aff"
+        }
+      },
+      "emerald_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#3ad46a",
+          "gem": "#6ae49a"
+        }
+      },
+      "ruby_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#ff3a4a",
+          "gem": "#ff6a7a"
+        }
+      },
+      "diamond_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#dff4ff",
+          "gem": "#ffffff"
+        }
+      },
+      "ivy_whip": {
+        "generator": "whip",
+        "params": {
+          "color": "#5aa83a",
+          "handle": "#3a6a22"
+        }
+      },
+      "dual_hook": {
+        "generator": "hook",
+        "params": {
+          "metal": "#c06ad4",
+          "gem": "#6ad4ff"
+        }
+      },
+      "sandstorm_in_a_bottle": {
+        "generator": "bottled",
+        "params": {
+          "color": "#e8c878"
+        }
+      },
+      "blizzard_in_a_bottle": {
+        "generator": "bottled",
+        "params": {
+          "color": "#f4fbff"
+        }
+      },
+      "shiny_red_balloon": {
+        "generator": "balloon",
+        "params": {
+          "color": "#e83040"
+        }
+      },
+      "cloud_in_a_balloon": {
+        "generator": "balloon",
+        "params": {
+          "color": "#dff0ff"
+        }
+      },
+      "aglet": {
+        "generator": "ring",
+        "params": {
+          "gem": "#d8b860"
+        }
+      },
+      "anklet_of_the_wind": {
+        "generator": "ring",
+        "params": {
+          "gem": "#8aff9a"
+        }
+      },
+      "rocket_boots": {
+        "generator": "boots",
+        "params": {
+          "color": "#c85a3a"
+        }
+      },
+      "spectre_boots": {
+        "generator": "boots",
+        "params": {
+          "color": "#8ad8ff"
+        }
+      },
+      "lightning_boots": {
+        "generator": "boots",
+        "params": {
+          "color": "#f0e04a"
+        }
+      },
+      "terraspark_boots": {
+        "generator": "boots",
+        "params": {
+          "color": "#6ae0a0"
+        }
+      },
+      "lava_charm": {
+        "generator": "ring",
+        "params": {
+          "gem": "#ff6a1a"
+        }
+      },
+      "obsidian_skull": {
+        "generator": "chunk",
+        "params": {
+          "layer": "stone",
+          "color": "#3a2a4a"
+        }
+      },
+      "cobalt_shield": {
+        "generator": "shield",
+        "params": {
+          "metal": "#3a6aff"
+        }
+      },
+      "obsidian_shield": {
+        "generator": "shield",
+        "params": {
+          "metal": "#3a2a4a",
+          "emblem": "#ff6a1a",
+          "glow": true
+        }
+      },
+      "ankh_shield": {
+        "generator": "shield",
+        "params": {
+          "metal": "#d8b860",
+          "emblem": "#ff4a6a",
+          "glow": true
+        }
+      },
+      "shield_of_cthulhu": {
+        "generator": "shield",
+        "params": {
+          "metal": "#8a2a2a",
+          "emblem": "#f0e8d8",
+          "pupil": "#4a8ad8"
+        }
+      },
+      "tabi": {
+        "generator": "boots",
+        "params": {
+          "color": "#3a3a44"
+        }
+      },
+      "fledgling_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "feather",
+          "color": "#c8b8a0",
+          "color2": "#a89880"
+        }
+      },
+      "angel_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "feather",
+          "color": "#f8f4ec",
+          "color2": "#e8e0d0"
+        }
+      },
+      "demon_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "membrane",
+          "color": "#4a2a4a",
+          "strap": "#2a1a2a"
+        }
+      },
+      "fairy_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "insect",
+          "color": "#f0a8ff",
+          "glow": true
+        }
+      },
+      "leaf_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "leaf",
+          "color": "#5ab83a"
+        }
+      },
+      "fishron_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "membrane",
+          "color": "#4ac0b0",
+          "strap": "#2a6a6a"
         }
       }
     }

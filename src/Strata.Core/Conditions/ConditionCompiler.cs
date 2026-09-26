@@ -101,6 +101,11 @@ public static class ConditionCompiler
             string key = p.Item ?? "#" + p.Tag;
             return new DelegateCondition(c => (c.ItemCount?.Invoke(key) ?? 0) >= p.Count);
         },
+        ["difficulty"] = s =>
+        {
+            var p = s.Parse<RangeConditionParams>();
+            return new DelegateCondition(c => c.Difficulty >= p.Min && c.Difficulty <= p.Max);
+        },
         ["all"] = s => new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["any"] = s => new AnyCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["not"] = s => new NotCondition(new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray())),
@@ -138,6 +143,7 @@ public static class ConditionCompiler
         c.Register<ResidentConditionParams>(SpecKind.Condition, "resident");
         c.Register<RangeConditionParams>(SpecKind.Condition, "residents");
         c.Register<HasItemConditionParams>(SpecKind.Condition, "hasItem");
+        c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "not");

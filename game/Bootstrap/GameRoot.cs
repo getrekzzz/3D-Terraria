@@ -211,12 +211,13 @@ public partial class GameRoot : Node
         string dir = Services.Args.Get("shots") ?? "user://shots";
         Commands!.Register(new CommandDef
         {
-            Name = "screenshot", Usage = "screenshot <name>",
+            Name = "screenshot", Usage = "screenshot <name> [settle seconds]",
             Help = "Saves <shots dir>/<name>.png once streaming is idle (wait with: wait_until screenshot.pending == 0).",
             Run = (_, a) =>
             {
                 var file = a.Str(0, "name");
                 if (file.IndexOfAny(new[] { '/', '\\', '.' }) >= 0) throw new CommandException("name must be a plain file name");
+                shots.SettleSeconds = a.Count > 1 ? a.Float(1, "settle") : 1.5;
                 shots.Request($"{dir.TrimEnd('/')}/{file}.png");
                 return CommandResult.Success($"Screenshot {file} requested.");
             },

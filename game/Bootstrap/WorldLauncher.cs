@@ -128,6 +128,9 @@ public static class WorldLauncher
         var viewModel = new ViewModel();
         player.Rig.Camera.AddChild(viewModel);
         viewModel.Initialize(player, game, props);
+        var grapple = new GrappleVisual();
+        runtime.AddChild(grapple);
+        grapple.Initialize(player);
         var trail = new Entities.SwingTrail();
         runtime.AddChild(trail);
         trail.Initialize(game);

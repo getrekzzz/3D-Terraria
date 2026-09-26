@@ -49,6 +49,8 @@ public sealed class GodotCommandHost : ICommandHost
         {
             ctx.AddProbe("player.on_floor", () => player.IsOnFloor() ? 1 : 0);
             ctx.AddProbe("player.frozen", () => player.Frozen ? 1 : 0);
+            ctx.AddProbe("player.hook", () => (int)player.Hook);
+            ctx.AddProbe("player.flight_left", () => player.FlightLeft);
             ctx.AddProbe("player.area_ready", () => runtime.IsAreaReady(PlayerController.CellAt(player.GlobalPosition)) ? 1 : 0);
         }
         return ctx;

@@ -17,6 +17,7 @@
     "rotate_shape": ["key:R"],
     "cycle_shape": ["key:T"],
     "drop_item": ["key:Q"],
+    "grapple": ["key:F"],
     "console": ["key:QuoteLeft", "key:F1"],
     "debug_overlay": ["key:F3"],
     "free_camera": ["key:F4"],
