@@ -27,6 +27,30 @@ public static class LightProbe
         return new Color(LightValue.R(best) / 15f, LightValue.G(best) / 15f, LightValue.B(best) / 15f, LightValue.Sky(best) / 15f);
     }
 
+    /// <summary>
+    /// Light at a point blended between the eight surrounding cell centres (open cells only), so a moving body
+    /// brightens and darkens smoothly instead of stepping at every cell boundary.
+    /// </summary>
+    public static Color SampleSmooth(VoxelWorld world, Vector3 meters)
+    {
+        var p = meters / Units.CellSize - Vector3.One * 0.5f;
+        int x0 = Mathf.FloorToInt(p.X), y0 = Mathf.FloorToInt(p.Y), z0 = Mathf.FloorToInt(p.Z);
+        float fx = p.X - x0, fy = p.Y - y0, fz = p.Z - z0;
+        var sum = new Color(0, 0, 0, 0);
+        float weight = 0;
+        for (int i = 0; i < 8; i++)
+        {
+            int dx = i & 1, dy = (i >> 1) & 1, dz = i >> 2;
+            if (world.IsSolid(x0 + dx, y0 + dy, z0 + dz)) continue;
+            float w = (dx == 1 ? fx : 1 - fx) * (dy == 1 ? fy : 1 - fy) * (dz == 1 ? fz : 1 - fz);
+            if (w <= 0) continue;
+            ushort v = Read(world, new Int3(x0 + dx, y0 + dy, z0 + dz));
+            sum += new Color(LightValue.R(v), LightValue.G(v), LightValue.B(v), LightValue.Sky(v)) * w;
+            weight += w;
+        }
+        return weight > 1e-4f ? sum / (weight * 15f) : Sample(world, meters);
+    }
+
     private static ushort Read(VoxelWorld world, Int3 cell)
     {
         var chunk = world.GetChunk(ChunkMath.CellToChunk(cell));

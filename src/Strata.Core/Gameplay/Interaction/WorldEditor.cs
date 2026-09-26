@@ -25,6 +25,9 @@ public sealed class MineOutcome
 
     public List<TileObjectInstance> ObjectsBroken { get; } = new();
 
+    /// <summary>The first block the swing hit (dust colour, sounds).</summary>
+    public BlockDef? Material { get; set; }
+
     public bool Any => Broken.Count > 0 || Damaged.Count > 0;
 }
 
@@ -52,6 +55,9 @@ public sealed partial class WorldEditor
     /// <summary>Raised with every chunk whose mesh or lighting must be rebuilt.</summary>
     public event Action<HashSet<Int3>>? ChunksDirty;
 
+    /// <summary>Raised after every mining swing that hit something (dust, sounds).</summary>
+    public event Action<MineOutcome>? Struck;
+
     /// <summary>Raised when a cell is broken (for particles and sounds).</summary>
     public event Action<Int3, BlockDef>? BlockBroken;
 
@@ -69,11 +75,13 @@ public sealed partial class WorldEditor
         var outcome = new MineOutcome();
         var content = _session.Content;
         var batch = World.BeginEdit();
+        var drops = new Dictionary<ItemDef, (int Count, Int3 Cell)>();
         foreach (var cell in cells)
         {
             ushort id = World.GetBlock(cell);
             if (id == 0 || id == VoxelWorld.Unknown) continue;
             var block = content.Blocks[id];
+            outcome.Material ??= block;
             if (!MiningRules.CanMine(block, pickPower) || IsLocked(cell))
             {
                 outcome.TooHard.Add(cell);
@@ -89,10 +97,13 @@ public sealed partial class WorldEditor
             Damage.Clear(cell);
             batch.SetBlock(cell, 0);
             outcome.Broken.Add(cell);
-            if (content.BlockDrops[id] is { } drop) SpawnDrop(new ItemStack(drop, 1), cell);
+            // One stack per item for the whole swing (a grid block drops 8 dirt as one pickup, not eight).
+            if (content.BlockDrops[id] is { } drop) drops[drop] = (drops.GetValueOrDefault(drop).Count + 1, cell);
             BlockBroken?.Invoke(cell, block);
         }
+        if (outcome.Material != null) Struck?.Invoke(outcome);
         if (outcome.Broken.Count == 0) return outcome;
+        foreach (var (item, (count, at)) in drops) SpawnDrop(new ItemStack(item, count), at);
         FallingBlocks.Settle(batch, content, outcome.Broken);
         Commit(batch);
         BreakUnsupportedAround(outcome.Broken, outcome.ObjectsBroken);

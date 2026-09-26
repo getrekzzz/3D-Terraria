@@ -50,7 +50,7 @@ public sealed partial class NpcRenderer
                 part.Rotation = rotation;
                 part.Scale = scale;
                 part.SetTint(tint);
-                part.SetLight(OwnLight(npc, LightProbe.Sample(world, at)));
+                part.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, at)));
             }
     }
 }

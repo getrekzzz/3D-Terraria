@@ -29,7 +29,10 @@ public sealed partial class PlayerAvatar : Node3D
         _props = props;
         Name = "Avatar";
         _visual = CreatureVisual.Create("assets/models/creatures/player.glb", props);
-        if (_visual != null) AddChild(_visual);
+        if (_visual == null) return;
+        AddChild(_visual);
+        // Full detail up close: simplified LODs let the hair shell sink into the scalp.
+        _visual.SetLodBias(8f);
     }
 
     public override void _Process(double delta)
@@ -44,7 +47,7 @@ public sealed partial class PlayerAvatar : Node3D
         Rotation = new Vector3(0, _yaw, 0);
         UpdateHeld(entity.State.Inventory.Held);
         _visual.Play(ChooseClip(entity, out float speed), speed: speed);
-        _visual.SetLight(PlayerLight.Brighten(LightProbe.Sample(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
+        _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
     }
 
     private string ChooseClip(PlayerEntity entity, out float speed)
@@ -97,7 +100,10 @@ public sealed partial class PlayerAvatar : Node3D
         if (!_visual.AttachToBone("hand.R", node)) node.QueueFree();
     }
 
-    /// <summary>Placeable furniture shrinks to a hand-held size; tools and weapons keep their modelled size.</summary>
+    /// <summary>
+    /// Placeable furniture shrinks to a hand-held size; lights (torches, candles) are carried at nearly full size so
+    /// they read in the hand; tools and weapons keep their modelled size.
+    /// </summary>
     private static float HeldScale(ItemDef item) =>
-        item.PlaceObject != null ? 0.3f : 1f;
+        item.PlaceObject == null ? 1f : item.HeldLight != null ? 0.95f : 0.3f;
 }

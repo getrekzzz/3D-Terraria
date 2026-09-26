@@ -46,6 +46,27 @@ public static class Targeting
     }
 
     /// <summary>
+    /// The ground under the middle of the feet (its top face), for digging straight down: the first solid cell at most
+    /// <paramref name="depth"/> cells below the feet, or null over a drop.
+    /// </summary>
+    public static Target? UnderFeet(VoxelWorld world, Vector3 feetMeters, int depth = 3)
+    {
+        var at = feetMeters / Units.CellSize;
+        int x = (int)MathF.Floor(at.X), z = (int)MathF.Floor(at.Z);
+        int top = (int)MathF.Floor(at.Y + 0.2f); // bodies rest a little into the smoothed surface
+        for (int y = top; y >= top - depth; y--)
+        {
+            var cell = new Int3(x, y, z);
+            ushort block = world.GetBlock(cell);
+            if (block == VoxelWorld.Unknown) return null;
+            if (block == 0 || world.Content.Blocks[block].Render == Content.Defs.BlockRender.None) continue;
+            var hit = new Vector3(at.X, y + 1, at.Z);
+            return new Target(cell, Int3.Up, block, null, hit, Vector3.Distance(hit, at) * Units.CellSize);
+        }
+        return null;
+    }
+
+    /// <summary>
     /// Walks the ray for a bucket: the first liquid cell (<c>Liquid</c> true) or, when the ray meets a
     /// solid block or runs out of reach first, the last open cell before it (where poured liquid would go).
     /// </summary>

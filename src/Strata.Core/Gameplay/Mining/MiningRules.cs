@@ -15,14 +15,20 @@ public static class MiningRules
 
     /// <summary>
     /// Cells hit by a brush of edge <paramref name="size"/> aimed at <paramref name="target"/> through the face with
-    /// normal <paramref name="normal"/>. The brush extends into the surface and, on the other axes, towards the
-    /// half of the cell that was hit — so a 2×2×2 brush digs a comfortable 1 m tunnel.
+    /// normal <paramref name="normal"/>. A brush of the building grid's size is the aligned grid block containing the
+    /// target (the cube the cursor shows, a 1 m shaft when digging down). Larger brushes extend into the surface and,
+    /// on the other axes, towards the half of the cell that was hit.
     /// </summary>
     public static IEnumerable<Int3> Brush(Int3 target, Int3 normal, Vector3 hitFraction, int size)
     {
         if (size <= 1)
         {
             yield return target;
+            yield break;
+        }
+        if (size == Building.BlockGrid.Size)
+        {
+            foreach (var cell in Building.BlockGrid.Cells(target)) yield return cell;
             yield break;
         }
         int lo(int axis, float frac, int n)

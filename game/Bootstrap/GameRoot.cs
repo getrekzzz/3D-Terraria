@@ -44,6 +44,7 @@ public partial class GameRoot : Node
         var log = new GodotLog();
         var data = new GodotDataSource();
         var args = CommandLine.FromOs();
+        Settings.UserSettings.Load();
 
         var content = ContentLoader.Load(data);
         foreach (var issue in content.Report.Issues)

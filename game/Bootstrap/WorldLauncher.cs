@@ -73,6 +73,9 @@ public static class WorldLauncher
         var effects = new Entities.CombatEffects();
         runtime.AddChild(effects);
         effects.Initialize(game);
+        var blockEffects = new Entities.BlockEffects();
+        runtime.AddChild(blockEffects);
+        blockEffects.Initialize(game);
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
         drops.Initialize(game);
@@ -101,6 +104,12 @@ public static class WorldLauncher
         var avatar = new PlayerAvatar();
         player.AddChild(avatar);
         avatar.Initialize(player, game, props);
+        var viewModel = new ViewModel();
+        player.Rig.Camera.AddChild(viewModel);
+        viewModel.Initialize(player, game, props);
+        var trail = new Entities.SwingTrail();
+        runtime.AddChild(trail);
+        trail.Initialize(game);
         var carried = new PlayerLight();
         player.AddChild(carried);
         carried.Initialize(entity, services.Graphics);

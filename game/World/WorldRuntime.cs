@@ -115,7 +115,7 @@ public sealed partial class WorldRuntime : Node3D
         _grass?.Update(eye, Focus?.GlobalPosition ?? eye);
         UpdateDistance(camera, eye, focus);
         float surface = Session.Generator.Terrain.SurfaceHeight(eye.X / Units.CellSize, eye.Z / Units.CellSize);
-        float skyExposure = Rendering.LightProbe.Sample(Session.World, eye).A;
+        float skyExposure = Rendering.LightProbe.SampleSmooth(Session.World, eye).A;
         _environment.Apply(Session.Clock, surface * Units.CellSize - eye.Y, skyExposure, delta);
     }
 

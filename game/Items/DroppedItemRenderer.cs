@@ -50,7 +50,7 @@ public sealed partial class DroppedItemRenderer : Node3D
             float bob = item.Grounded ? 0.05f + 0.04f * Mathf.Sin(_time * 2.5f + item.Id) : 0f;
             float size = item.Stack.Item!.Category == ItemCategory.Block ? 0.3f : 0.38f;
             mi.Transform = new Transform3D(Basis.Identity.Scaled(Vector3.One * size), new Vector3(p.X, p.Y - 0.15f + bob, p.Z));
-            mi.SetInstanceShaderParameter("voxel_light", LightProbe.Sample(world, mi.Position + Vector3.Up * 0.1f));
+            mi.SetInstanceShaderParameter("voxel_light", LightProbe.SampleSmooth(world, mi.Position + Vector3.Up * 0.1f));
             mi.SetInstanceShaderParameter("glow", item.Stack.Item.Rarity > 0 ? 0.08f : 0f);
         }
     }

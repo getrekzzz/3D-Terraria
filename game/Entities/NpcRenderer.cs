@@ -108,7 +108,7 @@ public sealed partial class NpcRenderer : Node3D
             var tint = Color.FromHtml(npc.Def.Tint);
             if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);
             visual.SetTint(tint);
-            visual.SetLight(OwnLight(npc, LightProbe.Sample(world, view.Shown + Vector3.Up * 0.5f)));
+            visual.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, view.Shown + Vector3.Up * 0.5f)));
             view.Health.Visible = npc.Life < npc.MaxLife;
             if (view.Health.Visible)
             {
@@ -149,7 +149,7 @@ public sealed partial class NpcRenderer : Node3D
             var dir = ahead - p;
             if (!freeParts && dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
             seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
-            seg.SetLight(OwnLight(npc, LightProbe.Sample(world, p)));
+            seg.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, p)));
             ahead = p;
         }
     }

@@ -71,7 +71,8 @@ public sealed partial class ItemUseSystem
         if (held.IsEmpty || !p.Alive) return UseOutcome.None;
         var info = _world.Uses[held.Item!];
         var item = info.Item;
-        bool repeats = item.AutoReuse || info.IsTool || info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject);
+        // Holding the button keeps tools, placeables and melee weapons going (every sword auto-swings, as in 1.4.4).
+        bool repeats = item.AutoReuse || info.IsTool || info.Has(ItemAction.PlaceBlock | ItemAction.PlaceObject | ItemAction.Melee | ItemAction.Thrust);
         if (!freshPress && !repeats) return UseOutcome.None;
         if (p.UseCooldown > 0) return UseOutcome.Cooldown;
         if (p.State.Effects.NoItemUse) return UseOutcome.Blocked;
@@ -83,8 +84,9 @@ public sealed partial class ItemUseSystem
 
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject))
         {
-            outcome = inReach == null ? UseOutcome.OutOfReach : Place(p, info, inReach);
-            if (outcome is UseOutcome.PlacedBlock or UseOutcome.PlacedObject && item.Consumable) ConsumeHeld(p);
+            int placed = 0;
+            outcome = inReach == null ? UseOutcome.OutOfReach : Place(p, info, inReach, out placed);
+            if (outcome is UseOutcome.PlacedBlock or UseOutcome.PlacedObject && item.Consumable) ConsumeHeld(p, placed);
         }
         else if (info.IsTool && inReach != null)
         {
@@ -108,7 +110,8 @@ public sealed partial class ItemUseSystem
             outcome = Shoot(p, info);
         }
 
-        if (info.Has(ItemAction.Melee) && outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool)
+        // Swings and thrusts (shortswords, spears) both attack through the melee system.
+        if (info.Has(ItemAction.Melee | ItemAction.Thrust) && outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool)
         {
             Swung?.Invoke(p, info);
             if (outcome is UseOutcome.None or UseOutcome.OutOfReach) outcome = UseOutcome.Swung;
@@ -132,8 +135,9 @@ public sealed partial class ItemUseSystem
         }
         if (info.Has(ItemAction.Hammer) && !info.Has(ItemAction.Mine))
         {
-            byte shape = ShapeCode.Pack(p.BuildShape, p.FacingQuarter + p.BuildRotation);
-            return editor.Reshape(target.Cell, shape) ? UseOutcome.Reshaped : UseOutcome.WrongTool;
+            int rotation = p.FacingQuarter + p.BuildRotation;
+            if (!p.Precision) return editor.ReshapeBlock(target.Cell, p.BuildShape, rotation) ? UseOutcome.Reshaped : UseOutcome.WrongTool;
+            return editor.Reshape(target.Cell, ShapeCode.Pack(p.BuildShape, rotation)) ? UseOutcome.Reshaped : UseOutcome.WrongTool;
         }
         if (!info.Has(ItemAction.Mine)) return UseOutcome.WrongTool;
         var normal = target.Normal == Int3.Zero ? DominantFace(p) : target.Normal;
@@ -145,14 +149,24 @@ public sealed partial class ItemUseSystem
         return result.TooHard.Count > 0 ? UseOutcome.TooHard : UseOutcome.None;
     }
 
-    private UseOutcome Place(PlayerEntity p, ItemUseInfo info, Target target)
+    private UseOutcome Place(PlayerEntity p, ItemUseInfo info, Target target, out int placed)
     {
         var editor = _world.Editor;
+        placed = 1;
         if (info.Block is { } block)
         {
-            var cell = target.Normal == Int3.Zero ? target.Cell : target.Adjacent;
-            byte shape = block.Render == BlockRender.Crisp ? ShapeCode.Pack(p.BuildShape, p.FacingQuarter + p.BuildRotation) : (byte)0;
+            var cell = PlacementCell(target);
             var blockers = _world.Players.Where(o => o.Alive).Select(o => o.CellBox);
+            if (!p.Precision)
+            {
+                // A whole grid block (1 m), one item per filled cell.
+                var cells = BlockGrid.Pattern(cell, block.Render == BlockRender.Crisp ? p.BuildShape : CellShape.Full, p.FacingQuarter + p.BuildRotation);
+                int limit = info.Item.Consumable ? p.State.Inventory.Held.Count : int.MaxValue;
+                var (result, count) = editor.PlaceBlocks(cells, block, limit, blockers);
+                placed = count;
+                return result == PlacementResult.Ok ? UseOutcome.PlacedBlock : UseOutcome.Blocked;
+            }
+            byte shape = block.Render == BlockRender.Crisp ? ShapeCode.Pack(p.BuildShape, p.FacingQuarter + p.BuildRotation) : (byte)0;
             var r = editor.PlaceBlock(cell, block, shape, blockers);
             return r == PlacementResult.Ok ? UseOutcome.PlacedBlock : UseOutcome.Blocked;
         }
@@ -165,6 +179,9 @@ public sealed partial class ItemUseSystem
         }
         return UseOutcome.None;
     }
+
+    /// <summary>The cell a block placed at <paramref name="target"/> goes into: in front of the hit face.</summary>
+    public static Int3 PlacementCell(Target target) => target.Normal == Int3.Zero ? target.Cell : target.Adjacent;
 
     /// <summary>
     /// Minimum corner for an object placed against a target face: centred on the targeted cell, resting on a floor,
@@ -276,10 +293,10 @@ public sealed partial class ItemUseSystem
         return -1;
     }
 
-    private static void ConsumeHeld(PlayerEntity p)
+    private static void ConsumeHeld(PlayerEntity p, int count = 1)
     {
         var inv = p.State.Inventory;
-        inv.Backpack.Take(inv.SelectedHotbar, 1);
+        inv.Backpack.Take(inv.SelectedHotbar, Math.Max(1, count));
     }
 
     private static Int3 DominantFace(PlayerEntity p)

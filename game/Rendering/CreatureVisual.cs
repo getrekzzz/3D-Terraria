@@ -75,9 +75,18 @@ public sealed partial class CreatureVisual : Node3D
         foreach (var g in _geometry) g.SetInstanceShaderParameter("tint", tint);
     }
 
-    public void SetLight(Color voxelLight)
+    private Color _light;
+    private bool _lit;
+
+    /// <summary>
+    /// Sets the voxel light the model is shaded with, easing towards it (a few frames) so walking past a torch or
+    /// under a roof fades rather than pops.
+    /// </summary>
+    public void SetLight(Color voxelLight, bool immediate = false)
     {
-        foreach (var g in _geometry) g.SetInstanceShaderParameter("voxel_light", voxelLight);
+        _light = _lit && !immediate ? _light.Lerp(voxelLight, 0.18f) : voxelLight;
+        _lit = true;
+        foreach (var g in _geometry) g.SetInstanceShaderParameter("voxel_light", _light);
     }
 
     /// <summary>Attaches a node to a bone (held items); returns false if the bone does not exist.</summary>
@@ -88,6 +97,12 @@ public sealed partial class CreatureVisual : Node3D
         Skeleton.AddChild(attachment);
         attachment.AddChild(node);
         return true;
+    }
+
+    /// <summary>Prefers finer mesh LODs (above 1) — the player's own body is always close to the camera.</summary>
+    public void SetLodBias(float bias)
+    {
+        foreach (var g in _geometry) g.LodBias = bias;
     }
 
     public void SetCastShadows(bool on)

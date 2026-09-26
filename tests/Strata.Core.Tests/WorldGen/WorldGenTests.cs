@@ -41,7 +41,7 @@ public class WorldGenTests
     /// generation output fails here. A deliberate change bumps GenVersion and updates these values in the same commit.
     /// </summary>
     [Theory]
-    [InlineData(8, 10, 8, 5014375410925121077UL)]
+    [InlineData(8, 10, 8, 4206328971987812554UL)]
     [InlineData(8, 9, 8, 10266172546085080418UL)]
     [InlineData(8, 7, 8, 17018525288982942300UL)]
     [InlineData(8, 4, 8, 3249732967929143139UL)]
@@ -49,7 +49,7 @@ public class WorldGenTests
     [InlineData(12, 1, 5, 186453762913151607UL)]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(2, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(3, GenVersion.Current); // bumping the generator version means re-recording these hashes
         Assert.Equal(new Int3(8, 10, 8), ChunkMath.CellToChunk(Tiny.Value.Plan.Spawn));
         Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
     }

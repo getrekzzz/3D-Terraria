@@ -24,18 +24,23 @@ public sealed partial class TileObjectRenderer : Node3D
     private GameWorld _game = null!;
     private PropLibrary _props = null!;
 
+    /// <summary>Where each object's model goes (grounding, wall mounting, doors).</summary>
+    public ObjectPlacement Placement { get; private set; } = null!;
+
     public int InstanceCount { get; private set; }
 
     public void Initialize(WorldRuntime runtime, PropLibrary props)
     {
         _game = runtime.Game;
         _props = props;
+        Placement = new ObjectPlacement(runtime);
         Name = "TileObjects";
         var store = _game.Session.World.TileObjects;
         store.Added += o => _dirty.Add(ChunkOf(o));
         store.Removed += o => _dirty.Add(ChunkOf(o));
         _game.Interaction.StateChanged += o => _dirty.Add(ChunkOf(o));
         runtime.Streamer.MeshReady += r => _dirty.Add(r.Coord);
+        runtime.Colliders.BodyBuilt += c => _dirty.Add(c);
         runtime.Streamer.ChunkRemoved += c =>
         {
             _dirty.Remove(c);
@@ -86,7 +91,7 @@ public sealed partial class TileObjectRenderer : Node3D
             for (int i = 0; i < list.Count; i++)
             {
                 var o = list[i];
-                mm.SetInstanceTransform(i, TransformOf(o));
+                mm.SetInstanceTransform(i, Placement.TransformOf(o));
                 var fp = o.Footprint;
                 var probe = new Vector3(o.Anchor.X + fp.X * 0.5f, o.Anchor.Y + 0.5f, o.Anchor.Z + fp.Z * 0.5f) * Units.CellSize;
                 mm.SetInstanceCustomData(i, LightProbe.Sample(world, probe));
@@ -98,22 +103,6 @@ public sealed partial class TileObjectRenderer : Node3D
             InstanceCount += list.Count;
         }
         _chunks[chunk] = nodes;
-    }
-
-    /// <summary>World transform of an object's model: footprint centre, quarter-turn yaw, doors swung open.</summary>
-    public static Transform3D TransformOf(TileObjectInstance o)
-    {
-        var fp = o.Footprint;
-        var origin = new Vector3(o.Anchor.X + fp.X * 0.5f, o.Anchor.Y, o.Anchor.Z + fp.Z * 0.5f) * Units.CellSize;
-        var basis = new Basis(Vector3.Up, -o.Rotation * Mathf.Pi / 2f);
-        if (o.Def.Interaction == TileInteraction.Door && o.Active)
-        {
-            // Swing about the hinge on the leaf's local -X edge.
-            var hinge = new Vector3(-o.Def.SizeX * 0.5f * Units.CellSize, 0, 0);
-            var swing = new Transform3D(Basis.Identity, hinge) * new Transform3D(new Basis(Vector3.Up, -Mathf.Pi / 2f), Vector3.Zero) * new Transform3D(Basis.Identity, -hinge);
-            return new Transform3D(basis, origin) * swing;
-        }
-        return new Transform3D(basis, origin);
     }
 
     private void Clear(Int3 chunk)

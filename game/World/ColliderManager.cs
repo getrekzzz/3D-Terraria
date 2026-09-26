@@ -34,6 +34,9 @@ public sealed partial class ColliderManager : Node3D
 
     public int BodyCount { get; private set; }
 
+    /// <summary>A chunk's terrain body was (re)built (objects resting on it can settle onto the smoothed ground).</summary>
+    public event System.Action<Int3>? BodyBuilt;
+
     /// <summary>Version counter per chunk, bumped whenever its collider is rebuilt (tests assert on it).</summary>
     public Dictionary<Int3, int> Versions { get; } = new();
 
@@ -100,6 +103,7 @@ public sealed partial class ColliderManager : Node3D
         }
         BodyCount++;
         Versions[coord] = Versions.GetValueOrDefault(coord) + 1;
+        BodyBuilt?.Invoke(coord);
     }
 
     private static void AddShapes(Rid body, ChunkCollision c, List<System.Numerics.Vector3>[] buckets)

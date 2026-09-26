@@ -63,6 +63,10 @@ class SkinPainter:
         self.hair = hex3(p.get("hair", "#4a3020"))
         self.stubble = not frame.female and "beard" not in p and p.get("stubble", True) and not p.get("undead")
         self.undead = bool(p.get("undead"))
+        # Skin under the hair takes the hair colour, so the scalp never reads as a bald patch where the hair shell
+        # thins (distance LOD simplification, extreme head poses).
+        style = p.get("hairStyle", "long" if frame.female else "short")
+        self.scalp = style != "bald" and p.get("hat") != "hood"
 
     def body(self, co: Vector):
         j = self.frame.j
@@ -102,4 +106,10 @@ class SkinPainter:
             upper = gauss(q.x / 0.022, 1.0) * gauss((q.z + 0.057) / 0.005, 1.0)
             amount = max(jaw * (1.0 - lip), upper) * 0.22
             c = mix(c, (0.25, 0.22, 0.2), amount)
+        if self.scalp:
+            from .hair import _in_ear, hairline
+            if not _in_ear(q):
+                from .head import smooth
+                roots = smooth(-0.006, 0.006, q.z - hairline(q))
+                c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), roots)
         return c

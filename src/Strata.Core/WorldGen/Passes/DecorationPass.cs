@@ -61,7 +61,7 @@ public sealed class DecorationPass : GenPass
 
     private void PlaceTrees(ChunkGenContext ctx)
     {
-        const int grid = 7;
+        const int grid = 9; // one candidate per 4.5 m square: open woods you can walk (and draw) comfortably
         var d = _decor!;
         ulong seed = ctx.Plan.Seeds.Child("trees").Value;
         int g0x = (int)MathF.Floor(ctx.ChunkOrigin.X / (float)grid), g0z = (int)MathF.Floor(ctx.ChunkOrigin.Z / (float)grid);

@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.Common;
+using Strata.Core.Gameplay.Building;
 using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Tests.Support;
@@ -25,30 +26,26 @@ public class ItemUseTests
     }
 
     [Fact]
-    public void PickaxeMinesBrushAndDropsAreCollected()
+    public void PickaxeMinesTheGridBlockAndDropsOneStack()
     {
         using var g = TestGame.Create();
         g.Hold("copper_pickaxe");
         var world = g.World.Session.World;
         var target = g.Floor + new Int3(0, 0, 3);
+        var solid = BlockGrid.Cells(target).Where(c => world.GetBlock(c) != 0).ToList();
         g.AimAt(TestGame.CellCenter(target) + new Vector3(0, 0.2f, 0));
         int uses = g.UseUntil(() => world.GetBlock(target) == 0);
         Assert.InRange(uses, 2, 12);
-        Assert.Equal(0, world.GetBlock(target));
-        // A 2×2×2 brush opens 8 cells (two layers of the floor).
-        int open = 0;
-        for (int y = -1; y <= 0; y++)
-            for (int z = 1; z <= 4; z++)
-                for (int x = -1; x <= 1; x++)
-                    if (world.GetBlock(g.Floor + new Int3(x, y, z)) == 0) open++;
-        Assert.Equal(8, open);
-        Assert.Equal(8, g.World.Drops.Items.Sum(d => d.Stack.Count));
+        // The whole aligned 1 m block opens, and its stone drops as one stack.
+        Assert.All(BlockGrid.Cells(target), c => Assert.Equal(0, world.GetBlock(c)));
+        Assert.Single(g.World.Drops.Items);
+        Assert.Equal(solid.Count, g.World.Drops.Items.Sum(d => d.Stack.Count));
 
-        // Walk over to the pit: the dropped stone merges and flies into the backpack.
+        // Walk over to the pit: the dropped stone flies into the backpack.
         g.Player.Position = TestGame.CellFeet(target + Int3.Up);
         g.Ticks(120);
         Assert.Empty(g.World.Drops.Items);
-        Assert.Equal(8, g.Player.State.Inventory.Backpack.Count(g.Content.Items.Get("stone")));
+        Assert.Equal(solid.Count, g.Player.State.Inventory.Backpack.Count(g.Content.Items.Get("stone")));
     }
 
     [Fact]
@@ -59,6 +56,7 @@ public class ItemUseTests
         var cell = g.Floor + new Int3(3, 1, 0);
         g.World.Editor.SetBlock(cell, obsidian);
         g.Hold("copper_pickaxe");
+        g.Player.Precision = true;
         g.AimAt(TestGame.CellCenter(cell));
         Assert.Equal(UseOutcome.TooHard, g.World.ItemUse.Use(g.Player, g.Target(), true));
         Assert.Equal(obsidian, g.World.Session.World.GetBlock(cell));
@@ -69,6 +67,7 @@ public class ItemUseTests
     {
         using var g = TestGame.Create();
         g.Hold("stone_brick", 5);
+        g.Player.Precision = true;
         var world = g.World.Session.World;
         var front = g.Floor + new Int3(0, 0, 3);
         g.AimAt(TestGame.CellCenter(front) + new Vector3(0, 0.24f, 0)); // top face
@@ -85,10 +84,40 @@ public class ItemUseTests
     }
 
     [Fact]
+    public void GridPlacementFillsTheBlockOneItemPerCell()
+    {
+        using var g = TestGame.Create();
+        g.Hold("stone_brick", 20);
+        var world = g.World.Session.World;
+        var front = g.Floor + new Int3(0, 0, 4);
+        var block = BlockGrid.Cells(front + Int3.Up).Where(c => world.GetBlock(c) == 0).ToList();
+        g.AimAt(TestGame.CellCenter(front) + new Vector3(0, 0.24f, 0));
+        Assert.Equal(UseOutcome.PlacedBlock, g.World.ItemUse.Use(g.Player, g.Target(), true));
+        Assert.All(block, c => Assert.Equal(g.Content.BlockId("stone_brick"), world.GetBlock(c)));
+        Assert.Equal(20 - block.Count, g.Player.State.Inventory.Held.Count);
+
+        // Too few items left: only as many cells as the stack holds are filled.
+        g.Hold("stone_brick", 3);
+        g.Ticks(30);
+        var next = front + new Int3(0, 0, 2);
+        g.AimAt(TestGame.CellCenter(next) + new Vector3(0, 0.24f, 0));
+        Assert.Equal(UseOutcome.PlacedBlock, g.World.ItemUse.Use(g.Player, g.Target(), true));
+        Assert.True(g.Player.State.Inventory.Held.IsEmpty);
+
+        // The block around our own feet overlaps the body.
+        g.Hold("stone_brick", 20);
+        g.Ticks(30);
+        g.Player.Aim = Vector3.Normalize(new Vector3(0.01f, -1f, 0.01f));
+        Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, g.Target(), true));
+        Assert.Equal(20, g.Player.State.Inventory.Held.Count);
+    }
+
+    [Fact]
     public void CrispShapesTakeTheBuildShapeAndFacing()
     {
         using var g = TestGame.Create();
         g.Hold("stone_brick", 5);
+        g.Player.Precision = true;
         g.Player.BuildShape = CellShape.Slope;
         var front = g.Floor + new Int3(0, 0, 3);
         g.AimAt(TestGame.CellCenter(front) + new Vector3(0, 0.24f, 0));
@@ -97,6 +126,20 @@ public class ItemUseTests
         byte code = g.World.Session.World.GetShape(front.X, front.Y + 1, front.Z);
         Assert.Equal(CellShape.Slope, ShapeCode.Shape(code));
         Assert.Equal(0, ShapeCode.Rotation(code));
+    }
+
+    [Fact]
+    public void DiggingDownTargetsTheGroundUnderTheFeet()
+    {
+        using var g = TestGame.Create();
+        var world = g.World.Session.World;
+        var t = Targeting.UnderFeet(world, g.Player.Position);
+        Assert.NotNull(t);
+        Assert.Equal(g.Floor, t!.Cell);
+        Assert.Equal(Int3.Up, t.Normal);
+        g.Hold("copper_pickaxe");
+        g.UseUntilTarget(() => world.GetBlock(g.Floor) == 0, () => Targeting.UnderFeet(world, g.Player.Position));
+        Assert.Equal(0, world.GetBlock(g.Floor));
     }
 
     [Fact]

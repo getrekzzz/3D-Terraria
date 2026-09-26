@@ -69,6 +69,25 @@ public class CombatTests
     }
 
     [Fact]
+    public void ShortswordThrustsHitAndRepeatWhileHeld()
+    {
+        using var g = Arena();
+        var gel = SpawnInFront(g, "green_gel", 1.0f);
+        gel.Life = gel.MaxLife = 1000;
+        gel.Timer = -100_000; // sit still
+        g.Hold("copper_shortsword");
+        g.Player.Aim = Vector3.UnitZ;
+        Assert.Equal(Strata.Core.Gameplay.Interaction.UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
+        g.Ticks(20);
+        Assert.True(gel.Life < 1000);
+        // Held down (not a fresh press) it stabs again once the use time has passed.
+        int life = gel.Life;
+        Assert.Equal(Strata.Core.Gameplay.Interaction.UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, false));
+        g.Ticks(20);
+        Assert.True(gel.Life < life);
+    }
+
+    [Fact]
     public void SwingsMissCreaturesBehindThePlayer()
     {
         using var g = Arena();

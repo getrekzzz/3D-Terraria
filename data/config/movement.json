@@ -8,7 +8,7 @@
   "gravity": 32,
   "jumpHoldGravity": 0.45,
   "jumpHoldTime": 0.28,
-  "jumpSpeed": 8.2,
+  "jumpSpeed": 9.2,
   "coyoteTime": 0.12,
   "jumpBuffer": 0.12,
   "maxFallSpeed": 30,

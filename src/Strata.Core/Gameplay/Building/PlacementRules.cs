@@ -35,6 +35,36 @@ public static class PlacementRules
         return PlacementResult.Ok;
     }
 
+    /// <summary>
+    /// Checks placing a block into several cells at once (a grid block). Returns the free cells that would be filled
+    /// (at most <paramref name="limit"/>): the group needs support from one of them and none of them may overlap a
+    /// blocker. Occupied cells are simply skipped.
+    /// </summary>
+    public static (PlacementResult Result, List<(Int3 Cell, byte Shape)> Free) CanPlaceBlocks(VoxelWorld world,
+        IReadOnlyList<(Int3 Cell, byte Shape)> cells, BlockDef block, int limit, IEnumerable<(System.Numerics.Vector3 Min, System.Numerics.Vector3 Max)> blockers)
+    {
+        var free = new List<(Int3 Cell, byte Shape)>();
+        var worst = PlacementResult.Occupied;
+        bool supported = false;
+        var boxes = blockers as IList<(System.Numerics.Vector3, System.Numerics.Vector3)> ?? blockers.ToList();
+        foreach (var (cell, shape) in cells)
+        {
+            if (free.Count >= limit) break;
+            var r = CanPlaceBlock(world, cell, block, boxes);
+            if (r == PlacementResult.NoSupport) r = PlacementResult.Ok; // the group is supported as a whole
+            else if (r == PlacementResult.Ok) supported = true;
+            if (r is PlacementResult.BlockedByEntity or PlacementResult.Unloaded) return (r, new List<(Int3, byte)>());
+            if (r != PlacementResult.Ok)
+            {
+                if (r != PlacementResult.Occupied) worst = r;
+                continue;
+            }
+            free.Add((cell, shape));
+        }
+        if (free.Count == 0) return (worst, free);
+        return supported ? (PlacementResult.Ok, free) : (PlacementResult.NoSupport, new List<(Int3, byte)>());
+    }
+
     /// <summary>Blocks must touch an existing block, tile object or liquid (no floating placement).</summary>
     public static bool HasSupport(VoxelWorld world, Int3 cell)
     {

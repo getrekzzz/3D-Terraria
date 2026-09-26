@@ -49,11 +49,11 @@ internal sealed class DecorPalette
     public (TileObjectDef? Tree, float Chance) TreeFor(ChunkGenContext ctx, ushort ground, byte biome, int x, int z)
     {
         var p = ctx.Palette;
-        if (ground == p.Sand && ctx.Plan.Landness.Sample(x, z) < 0.93f) return (Palm, 0.35f);
-        if (ground == p.Sand && biome == Desert) return (Cactus, 0.12f);
-        if (ground == p.Turf && biome == Forest) return (Oak, 0.42f);
+        if (ground == p.Sand && ctx.Plan.Landness.Sample(x, z) < 0.93f) return (Palm, 0.4f);
+        if (ground == p.Sand && biome == Desert) return (Cactus, 0.15f);
+        if (ground == p.Turf && biome == Forest) return (Oak, 0.35f);
         if (ground == p.Snow) return (Pine, 0.3f);
-        if (ground == p.JungleTurf) return (Mahoe, 0.62f);
+        if (ground == p.JungleTurf) return (Mahoe, 0.75f);
         if (ground == p.UmbralTurf || ground == p.SanguineTurf) return (Gloom, 0.3f);
         return (null, 0f);
     }

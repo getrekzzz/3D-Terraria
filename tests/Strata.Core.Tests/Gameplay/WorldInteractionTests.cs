@@ -4,6 +4,7 @@ using Strata.Core.Gameplay.Building;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Mining;
 using Strata.Core.Tests.Support;
+using Strata.Core.Voxels;
 using Strata.Core.Voxels.TileObjects;
 
 namespace Strata.Core.Tests.Gameplay;
@@ -11,13 +12,36 @@ namespace Strata.Core.Tests.Gameplay;
 public class WorldInteractionTests
 {
     [Fact]
-    public void MiningBrushExtendsIntoTheSurface()
+    public void MiningBrushIsTheAlignedGridBlock()
     {
-        var cells = MiningRules.Brush(new Int3(10, 10, 10), new Int3(0, 1, 0), new Vector3(0.7f, 0.99f, 0.2f), 2).ToList();
-        Assert.Equal(8, cells.Count);
-        Assert.All(cells, c => Assert.InRange(c.Y, 9, 10)); // top face hit: dig down
-        Assert.Contains(new Int3(11, 10, 9), cells);        // towards the hit quadrant (x high, z low)
+        // The same 1 m block whichever of its cells (or face) is hit, also at negative coordinates.
+        var a = MiningRules.Brush(new Int3(10, 10, 10), new Int3(0, 1, 0), new Vector3(0.7f, 0.99f, 0.2f), 2).ToHashSet();
+        var b = MiningRules.Brush(new Int3(11, 11, 11), new Int3(-1, 0, 0), Vector3.Zero, 2).ToHashSet();
+        Assert.Equal(8, a.Count);
+        Assert.True(a.SetEquals(b));
+        Assert.All(a, c => Assert.True(c.X is 10 or 11 && c.Y is 10 or 11 && c.Z is 10 or 11));
+        Assert.Equal(new Int3(-2, -4, 0), BlockGrid.MinOf(new Int3(-1, -3, 1)));
         Assert.Single(MiningRules.Brush(new Int3(1, 1, 1), new Int3(1, 0, 0), Vector3.Zero, 1));
+    }
+
+    [Fact]
+    public void BlockShapesScaleUpAndRotate()
+    {
+        var min = new Int3(4, 6, 8);
+        Assert.Equal(8, BlockGrid.Pattern(min, CellShape.Full, 0).Count);
+        Assert.All(BlockGrid.Pattern(min, CellShape.HalfBottom, 0), p => Assert.Equal(6, p.Cell.Y));
+        // A 1 m ramp rising towards +Z: full cell low at the back, ramps over and in front of it, open top front.
+        var ramp = BlockGrid.Pattern(min, CellShape.Slope, 0).ToDictionary(p => p.Cell, p => p.Shape);
+        Assert.Equal(6, ramp.Count);
+        Assert.Equal(CellShape.Full, ShapeCode.Shape(ramp[new Int3(4, 6, 9)]));
+        Assert.Equal(CellShape.Slope, ShapeCode.Shape(ramp[new Int3(4, 6, 8)]));
+        Assert.Equal(CellShape.Slope, ShapeCode.Shape(ramp[new Int3(4, 7, 9)]));
+        Assert.False(ramp.ContainsKey(new Int3(4, 7, 8)));
+        // One quarter turn (rising towards -X, like single cells): the full cell moves to the low-x side.
+        var turned = BlockGrid.Pattern(min, CellShape.Slope, 1).ToDictionary(p => p.Cell, p => p.Shape);
+        Assert.Equal(CellShape.Full, ShapeCode.Shape(turned[new Int3(4, 6, 8)]));
+        Assert.False(turned.ContainsKey(new Int3(5, 7, 8)));
+        Assert.All(turned.Values, code => Assert.Equal(1, ShapeCode.Rotation(code)));
     }
 
     [Fact]

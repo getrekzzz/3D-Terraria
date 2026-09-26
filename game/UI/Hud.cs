@@ -28,6 +28,7 @@ public sealed partial class Hud : CanvasLayer
     private VBoxContainer _toasts = null!;
     private Label _death = null!;
     private Crosshair _crosshair = null!;
+    private Label _targetName = null!;
     private PanelContainer _bossPanel = null!;
     private Label _bossName = null!;
     private ProgressBar _bossBar = null!;
@@ -85,6 +86,14 @@ public sealed partial class Hud : CanvasLayer
         _crosshair = new Crosshair { MouseFilter = Control.MouseFilterEnum.Ignore };
         _crosshair.SetAnchorsPreset(Control.LayoutPreset.Center);
         root.AddChild(_crosshair);
+        _targetName = new Label { HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = Control.MouseFilterEnum.Ignore };
+        _targetName.SetAnchorsPreset(Control.LayoutPreset.Center);
+        _targetName.GrowHorizontal = Control.GrowDirection.Both;
+        _targetName.OffsetTop = 16;
+        _targetName.AddThemeFontSizeOverride("font_size", 14);
+        _targetName.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
+        _targetName.AddThemeConstantOverride("outline_size", 4);
+        root.AddChild(_targetName);
 
         _death = new Label { Visible = false, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         _death.SetAnchorsPreset(Control.LayoutPreset.FullRect);
@@ -170,8 +179,17 @@ public sealed partial class Hud : CanvasLayer
         UpdateBuffs();
         UpdateBossBar();
         _crosshair.InReach = _ui.Interaction.InReach;
+        _targetName.Text = Settings.UserSettings.Current.ShowTargetName && _ui.Interaction.InReach ? TargetName() : "";
         _death.Visible = !_ui.Entity.Alive;
         if (_death.Visible) _death.Text = $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
+    }
+
+    private string TargetName()
+    {
+        var t = _ui.Interaction.Target;
+        if (t == null) return "";
+        if (t.Object is { } o) return o.Def.DisplayName;
+        return t.Block is 0 or VoxelWorld.Unknown ? "" : _ui.Game.Session.Content.Blocks[t.Block].DisplayName;
     }
 
     private void UpdateBossBar()

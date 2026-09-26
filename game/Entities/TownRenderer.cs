@@ -58,7 +58,7 @@ public sealed partial class TownRenderer : Node3D
             float speed = clip == "walk" ? Mathf.Max(0.6f, new Vector2(npc.Velocity.X, npc.Velocity.Z).Length() / 1.6f) : 1f;
             visual.Play(clip, speed: speed);
             visual.SetTint(npc.ImmuneTicks > TownSystem.HitImmunity - 8 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
-            visual.SetLight(LightProbe.Sample(world, view.Shown + Vector3.Up));
+            visual.SetLight(LightProbe.SampleSmooth(world, view.Shown + Vector3.Up));
             view.Tag.Position = view.Shown + new Vector3(0, 2.15f, 0);
         }
     }

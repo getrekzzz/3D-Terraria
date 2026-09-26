@@ -107,6 +107,22 @@ public sealed class TestGame : IDisposable
         return uses;
     }
 
+    /// <summary>Like <see cref="UseUntil"/> with an explicit target source (e.g. digging under the feet).</summary>
+    public int UseUntilTarget(Func<bool> until, Func<Strata.Core.Gameplay.Interaction.Target?> target, int maxUses = 50)
+    {
+        int uses = 0;
+        for (int tick = 0; tick < maxUses * 120 && uses < maxUses && !until(); tick++)
+        {
+            if (Player.UseCooldown == 0)
+            {
+                World.ItemUse.Use(Player, target(), freshPress: true);
+                uses++;
+            }
+            World.Tick();
+        }
+        return uses;
+    }
+
     public void Ticks(int n)
     {
         for (int i = 0; i < n; i++) World.Tick();
