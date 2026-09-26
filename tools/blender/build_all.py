@@ -125,7 +125,7 @@ def plan(spec, blocks, items, objects, enemies):
 
 def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
-    from bgen import bosses, creatures, export, fauna, furniture, items as item_gen, nature
+    from bgen import bosses, creatures, export, fauna, furniture, human, items as item_gen, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
 
@@ -181,15 +181,23 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
         if not wanted(name):
             continue
         reset_scene()
-        props = PropMaterials(REPO)
-        mb = MeshBuilder(name)
-        gen = creatures.GENERATORS.get(job["generator"]) or fauna.GENERATORS.get(job["generator"]) or bosses.GENERATORS[job["generator"]]
-        rig = gen(mb, job.get("params", {}), rng_for(name, 0))
-        for slot in mb.materials:
-            props.validate(slot)
-        objs = creatures.finish(mb.build(export.simple_material), rig, name)
         rel = f"assets/models/creatures/{name}.glb"
-        export.export_glb(objs, REPO / rel)
+        if job["generator"] == "humanoid":
+            # Detailed people (bgen/human): own meshes, UVs along hair strands and rest-pose UVs for the shader.
+            objs = human.build(name, job.get("params", {}))
+            human.validate_slots(objs)
+            export.export_glb(objs, REPO / rel, texcoords=True, tangents=True)
+            tris = sum(len(p.vertices) - 2 for p in objs[1].data.polygons)
+            print(f"human {name}: {tris} tris, {len(objs[0].data.bones)} bones")
+        else:
+            props = PropMaterials(REPO)
+            mb = MeshBuilder(name)
+            gen = creatures.GENERATORS.get(job["generator"]) or fauna.GENERATORS.get(job["generator"]) or bosses.GENERATORS[job["generator"]]
+            rig = gen(mb, job.get("params", {}), rng_for(name, 0))
+            for slot in mb.materials:
+                props.validate(slot)
+            objs = creatures.finish(mb.build(export.simple_material), rig, name)
+            export.export_glb(objs, REPO / rel)
         actions = sorted(a.name for a in __import__("bpy").data.actions)
         manifest["creatures"][name] = {"model": rel, "generator": job["generator"], "animations": actions}
         print(f"creature {name}: {actions}")
