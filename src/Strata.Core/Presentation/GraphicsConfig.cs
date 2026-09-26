@@ -113,6 +113,9 @@ public sealed class GraphicsPreset
     /// <summary>Mesh LOD switch threshold in pixels (lower keeps detail further away).</summary>
     public float LodThreshold { get; init; } = 1f;
 
+    /// <summary>How far the horizon (the world's surface beyond the streamed chunks) reaches, in metres; 0 = none.</summary>
+    public float HorizonDistance { get; init; }
+
     public IEnumerable<string> Validate()
     {
         if (RenderScale is < 0.5f or > 2f) yield return "renderScale must be within 0.5–2";
@@ -132,6 +135,7 @@ public sealed class GraphicsPreset
         if (GrassDensity is < 0f or > 1f) yield return "grassDensity must be within 0–1";
         if (GrassDistance is < 0f or > 200f) yield return "grassDistance must be within 0–200 m";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
+        if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
     }
 
     private static bool PowerOfTwo(int v, int min, int max) => v >= min && v <= max && (v & (v - 1)) == 0;

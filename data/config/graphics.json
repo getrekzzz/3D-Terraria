@@ -8,14 +8,14 @@
       "shadowAtlas": 2048, "shadowDistance": 50, "shadowFilter": 1, "sunSize": 0, "torchShadows": false,
       "ssao": false, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
       "skyRadiance": 64, "cloudSteps": 0, "autoExposure": false,
-      "grassDensity": 0, "grassDistance": 0, "lodThreshold": 4
+      "grassDensity": 0, "grassDistance": 0, "lodThreshold": 4, "horizonDistance": 0
     },
     "medium": {
       "renderScale": 1.0, "upscaler": "none", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 8,
       "shadowAtlas": 4096, "shadowDistance": 80, "shadowFilter": 2, "sunSize": 0, "torchShadows": false,
       "ssao": true, "ssaoQuality": 1, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
       "skyRadiance": 128, "cloudSteps": 2, "autoExposure": true,
-      "grassDensity": 0.35, "grassDistance": 22, "lodThreshold": 2
+      "grassDensity": 0.35, "grassDistance": 22, "lodThreshold": 2, "horizonDistance": 700
     },
     "high": {
       "renderScale": 1.0, "upscaler": "none", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
@@ -23,7 +23,7 @@
       "ssao": true, "ssaoQuality": 2, "ssil": true, "ssilQuality": 1, "ssr": true, "ssrSteps": 48,
       "volumetricFog": true, "volumetricFogSize": 64, "volumetricFogDepth": 64, "glow": true,
       "skyRadiance": 256, "cloudSteps": 3, "autoExposure": true,
-      "grassDensity": 0.7, "grassDistance": 35, "lodThreshold": 1
+      "grassDensity": 0.7, "grassDistance": 35, "lodThreshold": 1, "horizonDistance": 1200
     },
     "ultra": {
       "renderScale": 1.0, "upscaler": "fsr2", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
@@ -31,7 +31,7 @@
       "ssao": true, "ssaoQuality": 3, "ssil": true, "ssilQuality": 3, "ssr": true, "ssrSteps": 96,
       "volumetricFog": true, "volumetricFogSize": 128, "volumetricFogDepth": 96, "glow": true,
       "skyRadiance": 256, "cloudSteps": 5, "autoExposure": true,
-      "grassDensity": 1.0, "grassDistance": 50, "lodThreshold": 0.5
+      "grassDensity": 1.0, "grassDistance": 50, "lodThreshold": 0.5, "horizonDistance": 2000
     }
   }
 }

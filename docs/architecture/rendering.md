@@ -46,11 +46,21 @@ near chunks draw the detailed clump (9 curved blades), far ones a 5-blade clump 
 widens far blades so the cover stays even, sinks them into the ground at the distance limit, bends them with gusts
 travelling downwind and parts them around the player (`strata_trample`). Grass casts no shadows.
 
+## Horizon
+Beyond the streamed chunks the world continues as a heightfield (`HorizonField`, Core, tested): terrain height from
+the generator's `TerrainField`, the surface biome's map colour, and the sea over low ground and past the world's edge.
+`Build` makes a polar mesh whose rings widen with distance (a continuous level of detail: about 3 m cells at the
+streamed edge, tens of metres at the horizon). `HorizonRenderer` rebuilds it on a worker thread when the focus drifts
+48 m from its centre; `horizon.gdshader` discards it inside the loaded chunk box (real voxels take over there), adds
+macro variation and rock on steep slopes, and lets the fog's aerial perspective melt it into the sky. The preset's
+`horizonDistance` (0 = off) also sets the fog reach and the camera's far plane. It samples fields, not voxels:
+caves, structures, edits and hardmode wedges are not in it.
+
 ## Presets
 `GraphicsConfig` (Core, validated with ranges, tested) → `GraphicsSettings` (game) applies them: render scale and
 upscaler (FSR 1/2), anti-aliasing (FXAA/SMAA/TAA/MSAA), anisotropy, shadow atlas, distance and filter, sun size
 (PCSS), torch shadows, SSAO/SSIL/SSR quality, volumetric fog grid, sky radiance size, cloud steps, auto exposure,
-grass density and distance, mesh LOD threshold. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
+grass density and distance, mesh LOD threshold, horizon distance. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
 remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`.
 
 ## Global shader parameters (`project.godot`)

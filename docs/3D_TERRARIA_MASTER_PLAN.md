@@ -40,6 +40,7 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-26 | Tree crowns and bushes are alpha-tested leaf cards (`card:<layer>`, sprig textures) with crown-shaped custom normals | Leafy, see-through silhouettes at ~2k triangles per tree instead of solid blobs. |
 | 2026-09-26 | Vertex colours are written as sRGB (bmesh bytes / `color_srgb`) | glTF exports linear colour; writing linear floats made painted skin and clothes pale. |
 | 2026-09-26 | Hardmode stations are tier-table data (`barStation`/`craftStation` per metal): cinder forge → hardmode anvil → hardmode forge | The station chain stays one table edit; better stations list the stations they replace. |
+| 2026-09-26 | Far terrain is a generator-sampled polar heightfield (horizon) rather than coarse voxel chunks | Distance reads right at ~22k vertices with no extra chunk generation; voxel detail (caves, builds) only matters close by, where real chunks are streamed. |
 | 2026-09-26 | Boss pairs are `companions` sharing one defeat flag (spawned together, one announcement and bar, flag on the last death); second phases are `Npc.Enraged` + `ranged.enraged` | The Twin Lenses need no special-case code, and any brain can switch attacks by phase. |
 
 ## 3. System status
@@ -56,8 +57,8 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 | WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
 | WorldGen | Report tool | ✅ | Maps, sections, ore/depth charts |
 | Lighting | Sky + RGB block light | ✅ | Stateless per chunk; outdoor shade under floating roofs; liquid light (lava) from data; sampled by props/creatures via LightProbe; biome fog/sky/ambient looks from data |
-| Meshing | Surface nets + crisp shapes + liquids + collision | ✅ | LOD rings ⬜ |
-| Rendering | Physical sky + clouds, sky-lit PBR, graphics presets, terrain materials, water/lava, grass, leaf-card trees, character shader | 🟡 | See `docs/architecture/rendering.md`. Horizon mesh, LOD rings, cave culling, particles polish ⬜ |
+| Meshing | Surface nets + crisp shapes + liquids + collision + grass scatter | ✅ | Far terrain is the horizon heightfield (no coarse voxel chunks) |
+| Rendering | Physical sky + clouds, sky-lit PBR, graphics presets, terrain materials, water/lava, grass, leaf-card trees, character shader, horizon | ✅ | See `docs/architecture/rendering.md`. Cave culling, particles polish ⬜ |
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
 | Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink |
 | Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds |
@@ -105,6 +106,8 @@ Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
 * Grass grows through tile objects standing on grass (chests, stations, tree bases); it only avoids blocks.
 * Lavapipe (CI, container QA) cannot run the `ultra` preset at usable speed; real-GPU frame times of `high`/`ultra`
   with grass and leaf cards are not measured yet.
+* The horizon samples generator fields: it shows neither caves nor structures, edits or hardmode wedges, and its
+  seam with the streamed chunks can show a small step on steep ground.
 * Bosses share one life pool per creature: the Iron Serpent's segments and Warden Prime's tools take hits for the
   body (the reference game lets you break Prime's arms and destroys the Destroyer segment by segment).
 * Liquids have no pressure: water never rises in a U-tube (as in the reference game), and a flow step is one edit
@@ -124,7 +127,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (216, incl. graphics presets, grass scatter, hardmode life, mechanical bosses) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (218, incl. graphics presets, grass scatter, horizon, hardmode life, mechanical bosses) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets, graphics presets, grass kinds) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -160,8 +163,8 @@ M3 delivered the crypt (zone, locked walls, guardian, roster, keeper, Crypt Ward
 incineration summon, sweeping barrier, eye lasers, tethered minions) and the hardmode transformation (lazy world
 mutations: new ore tiers, radiant and blighted wedges, spreading biomes; evil, cinder and hardmode metal families).
 M4 content delivered hardmode life (12 creatures, new debuffs and drops, the forge/anvil chain) and the three
-mechanical bosses with radiant gear.
-1. LOD rings + horizon heightfield; cave culling from navigation summaries.
+mechanical bosses with radiant gear; the horizon heightfield carries the view to 0.7–2 km by preset.
+1. Cave culling from navigation summaries; horizon showing hardmode wedges.
 2. Wings/flight accessories; hardmode variants of cavern/underworld creatures.
 3. Post-mechanical: Thornheart (jungle), chlorophyte, the temple.
 4. More residents; residents that fight back; crypt keys and locked chests.

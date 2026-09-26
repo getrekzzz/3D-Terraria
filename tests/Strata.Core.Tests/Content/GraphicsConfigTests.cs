@@ -27,6 +27,7 @@ public class GraphicsConfigTests
             Assert.True(p[i].ShadowAtlas >= p[i - 1].ShadowAtlas);
             Assert.True(p[i].GrassDensity >= p[i - 1].GrassDensity);
             Assert.True(p[i].CloudSteps >= p[i - 1].CloudSteps);
+            Assert.True(p[i].HorizonDistance >= p[i - 1].HorizonDistance);
         }
     }
 
@@ -36,7 +37,7 @@ public class GraphicsConfigTests
         var config = new GraphicsConfig
         {
             Default = "missing",
-            Presets = new() { ["bad"] = new GraphicsPreset { Msaa = 3, ShadowAtlas = 5000, Upscaler = "dlss", SkyRadiance = 100, GrassDensity = 2f } },
+            Presets = new() { ["bad"] = new GraphicsPreset { Msaa = 3, ShadowAtlas = 5000, Upscaler = "dlss", SkyRadiance = 100, GrassDensity = 2f, HorizonDistance = 50f } },
         };
         var problems = config.Validate();
         Assert.Contains(problems, p => p.Contains("default preset"));
@@ -45,5 +46,6 @@ public class GraphicsConfigTests
         Assert.Contains(problems, p => p.Contains("upscaler"));
         Assert.Contains(problems, p => p.Contains("skyRadiance"));
         Assert.Contains(problems, p => p.Contains("grassDensity"));
+        Assert.Contains(problems, p => p.Contains("horizonDistance"));
     }
 }

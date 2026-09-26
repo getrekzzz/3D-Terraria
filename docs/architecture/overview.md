@@ -4,7 +4,8 @@
 ┌────────────────────────── Godot (game/) ──────────────────────────┐
 │ Bootstrap: GameRoot, WorldLauncher, input, command line           │
 │ World: WorldRuntime, ChunkRenderer, GrassRenderer,                │
-│        ColliderManager, ObjectColliders, TileObjectRenderer       │
+│        HorizonRenderer, ColliderManager, ObjectColliders,         │
+│        TileObjectRenderer                                         │
 │ Player: PlayerController, CameraRig, PlayerAvatar,                │
 │         InteractionController, TargetHighlight                    │
 │ Entities: NpcRenderer, TownRenderer, ProjectileRenderer, effects  │
