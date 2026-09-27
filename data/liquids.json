@@ -1,0 +1,56 @@
+{
+  // Liquids pack: the liquids themselves, what they form when they meet, buckets and the buffs they grant.
+  // Codes 1-3 are written by world generation (water, lava, honey) and persisted in saves.
+  "liquids": [
+    {
+      "id": "water", "name": "Water", "code": 1, "color": "#2e6fb0",
+      "flowInterval": 5, "fallCells": 3, "spreadThreshold": 2, "minLevel": 3, "evaporateChance": 0.15,
+      "moveSpeed": 0.6, "swimStrength": 1.0, "drag": 0.92,
+      "clearsBuffTags": ["fire"], "bucket": "water_bucket",
+      "mixes": [{ "with": "lava", "block": "obsidian" }, { "with": "honey", "block": "honey_block" }],
+      "covers": ["terraria:water", "terraria:liquid_flow", "terraria:liquid_mixing", "terraria:swimming"]
+    },
+    {
+      "id": "lava", "name": "Lava", "code": 2, "color": "#ff6a10", "light": [14, 6, 1],
+      "flowInterval": 20, "fallCells": 1, "spreadThreshold": 2, "minLevel": 4, "evaporateChance": 0.1,
+      "moveSpeed": 0.4, "swimStrength": 0.5, "drag": 0.85,
+      "contactDamage": 50, "contactBuff": "on_fire", "contactBuffTicks": 420, "destroysItems": true,
+      "bucket": "lava_bucket",
+      "mixes": [{ "with": "honey", "block": "crispy_honey" }],
+      "covers": ["terraria:lava", "terraria:lava_contact", "terraria:item_incineration"]
+    },
+    {
+      "id": "honey", "name": "Honey", "code": 3, "color": "#e09a18",
+      "flowInterval": 30, "fallCells": 1, "spreadThreshold": 3, "minLevel": 5, "evaporateChance": 0.05,
+      "moveSpeed": 0.3, "swimStrength": 0.4, "drag": 0.8,
+      "contactBuff": "honey", "contactBuffTicks": 1800, "bucket": "honey_bucket",
+      "covers": ["terraria:honey"]
+    }
+  ],
+  "blocks": [
+    { "id": "honey_block", "name": "Honey Block", "render": "crisp", "textures": { "all": "honey_block" }, "hardness": 1.0, "sound": "dirt", "color": "#e0a030", "tags": ["built", "liquid_mix"], "covers": ["terraria:honey_block"] },
+    { "id": "crispy_honey", "name": "Crispy Honey Block", "render": "crisp", "textures": { "all": "crispy_honey" }, "hardness": 1.5, "sound": "stone", "color": "#8a4a14", "tags": ["built", "liquid_mix"], "covers": ["terraria:crispy_honey_block"] }
+  ],
+  "buffs": [
+    { "id": "honey", "name": "Honey", "description": "Honey mends wounds.", "color": "#f0b040", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 2 }], "covers": ["terraria:honey"] },
+    { "id": "gills", "name": "Gills", "description": "Breathe under liquid.", "color": "#60c0d0", "effects": [{ "type": "waterBreathing" }], "covers": ["terraria:gills"] },
+    { "id": "obsidian_skin", "name": "Obsidian Skin", "description": "Immune to lava.", "color": "#a04060", "effects": [{ "type": "liquidImmune", "liquid": "lava" }, { "type": "immune", "buff": "on_fire" }], "covers": ["terraria:obsidian_skin"] }
+  ],
+  "items": [
+    { "id": "empty_bucket", "name": "Empty Bucket", "description": "Scoops up liquid.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
+      "behaviors": [{ "type": "bucket" }], "covers": ["terraria:empty_bucket"] },
+    { "id": "water_bucket", "name": "Water Bucket", "description": "Pours a full cell of water.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
+      "behaviors": [{ "type": "bucket", "liquid": "water", "empty": "empty_bucket" }], "covers": ["terraria:water_bucket"] },
+    { "id": "lava_bucket", "name": "Lava Bucket", "description": "Pours a full cell of lava.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "tags": ["liquid_proof"],
+      "behaviors": [{ "type": "bucket", "liquid": "lava", "empty": "empty_bucket" }], "covers": ["terraria:lava_bucket"] },
+    { "id": "honey_bucket", "name": "Honey Bucket", "description": "Pours a full cell of honey.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
+      "behaviors": [{ "type": "bucket", "liquid": "honey", "empty": "empty_bucket" }], "covers": ["terraria:honey_bucket"] },
+    { "id": "gills_potion", "name": "Gills Potion", "description": "Breathe underwater for a while.", "category": "potion", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "gills", "ticks": 7200 }, "covers": ["terraria:gills_potion"] },
+    { "id": "obsidian_skin_potion", "name": "Obsidian Skin Potion", "description": "Walk through lava for a while.", "category": "potion", "maxStack": 30, "value": 300, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "obsidian_skin", "ticks": 14400 }, "covers": ["terraria:obsidian_skin_potion"] }
+  ],
+  "recipes": [
+    { "id": "empty_bucket", "output": "empty_bucket", "inputs": [{ "group": "any_iron_bar", "count": 3 }], "stations": ["anvil"] },
+    { "id": "gills_potion", "output": "gills_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "shark_fin", "count": 1 }, { "item": "mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
+    { "id": "obsidian_skin_potion", "output": "obsidian_skin_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "obsidian", "count": 2 }, { "item": "glowing_mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] }
+  ]
+}

@@ -1,0 +1,29 @@
+# Godot
+.godot/
+.import/
+*.translation
+export_presets.cfg.bak
+mono_crash.*.json
+.mono/
+data_*/
+
+# .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+TestResults/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Local build output / scratch
+/build/
+/out/
+/tools/blender/_cache/
+/tools/textures/_cache/

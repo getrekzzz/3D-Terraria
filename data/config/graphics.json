@@ -1,0 +1,38 @@
+{
+  // Graphics presets (see src/Strata.Core/Presentation/GraphicsConfig.cs for every field and its range).
+  // Chosen in Settings > Video (or `graphics <preset>` / --graphics=<preset>); the choice is remembered. Medium is the
+  // default: high and ultra add screen-space GI, reflections and volumetric fog that need a strong GPU.
+  "default": "medium",
+  "presets": {
+    "low": {
+      "renderScale": 0.8, "upscaler": "fsr1", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 4,
+      "shadowAtlas": 2048, "shadowDistance": 50, "shadowSplits": 2, "shadowFilter": 1, "sunSize": 0, "torchShadows": false,
+      "ssao": false, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
+      "skyRadiance": 64, "cloudSteps": 0, "autoExposure": false,
+      "grassDensity": 0, "grassDistance": 0, "lodThreshold": 4, "horizonDistance": 0
+    },
+    "medium": {
+      "renderScale": 1.0, "upscaler": "none", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 8,
+      "shadowAtlas": 4096, "shadowDistance": 70, "shadowSplits": 2, "shadowFilter": 2, "sunSize": 0, "torchShadows": false,
+      "ssao": true, "ssaoQuality": 1, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
+      "skyRadiance": 128, "cloudSteps": 2, "autoExposure": true,
+      "grassDensity": 0.35, "grassDistance": 22, "lodThreshold": 2, "horizonDistance": 700
+    },
+    "high": {
+      "renderScale": 1.0, "upscaler": "none", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
+      "shadowAtlas": 4096, "shadowDistance": 120, "shadowSplits": 4, "shadowFilter": 3, "sunSize": 0.5, "torchShadows": true,
+      "ssao": true, "ssaoQuality": 2, "ssil": true, "ssilQuality": 1, "ssr": true, "ssrSteps": 48,
+      "volumetricFog": true, "volumetricFogSize": 64, "volumetricFogDepth": 64, "glow": true,
+      "skyRadiance": 256, "cloudSteps": 3, "autoExposure": true,
+      "grassDensity": 0.7, "grassDistance": 35, "lodThreshold": 1, "horizonDistance": 1200
+    },
+    "ultra": {
+      "renderScale": 1.0, "upscaler": "fsr2", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
+      "shadowAtlas": 8192, "shadowDistance": 180, "shadowSplits": 4, "shadowFilter": 5, "sunSize": 0.6, "torchShadows": true,
+      "ssao": true, "ssaoQuality": 3, "ssil": true, "ssilQuality": 3, "ssr": true, "ssrSteps": 96,
+      "volumetricFog": true, "volumetricFogSize": 128, "volumetricFogDepth": 96, "glow": true,
+      "skyRadiance": 256, "cloudSteps": 5, "autoExposure": true,
+      "grassDensity": 1.0, "grassDistance": 50, "lodThreshold": 0.5, "horizonDistance": 2000
+    }
+  }
+}

@@ -1,0 +1,44 @@
+# Town: the starter guide, a player-built home, move-in, walking home at night through the door, talking and trading.
+wait_until player.frozen == 0 180
+spawning off
+time noon
+town arrivals off
+fill -16 -3 -16 16 -1 16 stone
+fill -16 0 -16 16 10 16 air
+wait 0.5
+assert town.guide == 1
+assert errors == 0
+
+# A home east of the player: brick shell, door opening, then furniture.
+fill 3 0 -5 13 6 5 gray_brick
+fill 4 0 -4 12 5 4 air
+fill 8 0 -5 9 3 -5 air
+place wooden_door 8 0 -5
+place torch 4 0 4
+place wooden_table 9 0 1
+place wooden_chair 5 0 1
+house 8 1 0
+
+# The guide waits outside, is housed by the move-in check, and walks home at night (opening the door).
+town dismiss guide
+town summon guide 8 0 -10
+town check
+assert town.homed == 1
+town
+time 21
+wait_until town.guide.home < 0.8 60
+wait 2
+assert town.guide.home < 0.3
+time noon
+
+# Talking and trading with the peddler.
+give silver_coin 60
+town summon merchant 0 0 -3
+wait 0.2
+town talk merchant
+ui talk merchant
+ui shop
+town buy merchant torch
+assert inv.torch == 11
+ui close
+assert errors == 0

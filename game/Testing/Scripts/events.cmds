@@ -1,0 +1,17 @@
+# World events: start, spawn modifiers, sky tint, end at phase change, kill goals.
+wait_until player.frozen == 0 180
+spawning off
+time 22
+event blood_moon
+assert event.blood_moon == 1
+event list
+spawning now
+wait 1
+time dawn
+wait 0.3
+assert event.blood_moon == 0
+event slime_rain
+assert event.slime_rain == 1
+event stop slime_rain
+assert event.slime_rain == 0
+assert errors == 0

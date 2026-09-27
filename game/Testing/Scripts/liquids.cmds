@@ -1,0 +1,63 @@
+# Liquids: flow and settling, water meeting lava, buckets, contact effects, swimming.
+wait_until player.frozen == 0 180
+spawning off
+time noon
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 8 10 air
+# Two low basins: water on +X, lava on -X.
+fill 3 0 -3 7 0 3 stone
+fill 4 0 -2 6 0 2 air
+fill -7 0 -3 -3 0 3 stone
+fill -6 0 -2 -4 0 2 air
+wait 0.5
+assert errors == 0
+
+# Poured water falls into the basin, spreads and settles.
+liquid water 5 5 0
+assert liquid.5.5.0 == 31
+wait_until liquid.active == 0 20
+assert liquid.5.5.0 == 0
+assert liquid.5.0.0 > 0
+liquids
+
+# An empty bucket scoops it up; the full bucket pours it back out.
+give empty_bucket
+wield empty_bucket
+aim 2.5 -1.35 0
+use
+assert inv.water_bucket == 1
+assert inv.empty_bucket == 0
+wait 0.3
+aim 0 -1 1.2
+use
+assert inv.empty_bucket == 1
+wait_until liquid.active == 0 20
+
+# Water poured onto lava hardens it into obsidian.
+liquid lava -6 0 -2 -4 0 2
+liquid water -5 3 0
+wait_until near.obsidian > 0 15
+liquids settle 200
+
+# Lava burns and sets you on fire; water puts the fire out.
+heal
+liquid lava 0 0 0 0 1 0
+wait 0.1
+assert player.in_liquid == 2
+assert buff.on_fire == 1
+assert player.life < player.max_life
+liquid water 0 0 0 0 1 0
+wait 0.1
+assert player.in_liquid == 1
+assert buff.on_fire == 0
+
+# Deep water covers the head.
+liquid water 0 0 0 0 4 0
+wait 0.1
+assert player.submerged == 1
+liquid none -10 0 -10 10 8 10
+wait 0.2
+assert player.in_liquid == 0
+heal
+assert player.alive == 1
+assert errors == 0

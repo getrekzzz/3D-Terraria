@@ -1,0 +1,14 @@
+{
+  // What makes an enclosed room a valid home for a town resident (see Gameplay/Housing/HousingScanner).
+  // Cells are 0.5 m. A room is the air reachable from a starting cell without passing walls or doors.
+  "minFloorCells": 24,
+  "minHeadroom": 5,
+  "maxVolume": 3000,
+  "minBuiltBoundary": 0.5,
+  "requirements": [
+    { "role": "door", "where": "boundary", "message": "needs a door" },
+    { "role": "light", "where": "any", "message": "needs a light source" },
+    { "role": "table", "where": "inside", "message": "needs a table or other flat surface" },
+    { "role": "chair", "where": "inside", "message": "needs a chair" }
+  ]
+}

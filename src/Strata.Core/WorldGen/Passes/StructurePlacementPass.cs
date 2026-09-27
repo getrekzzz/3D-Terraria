@@ -1,0 +1,113 @@
+using System.Numerics;
+using Strata.Core.Common;
+using Strata.Core.Determinism;
+using Strata.Core.WorldGen.Chunk;
+using Strata.Core.WorldGen.Features;
+using Strata.Core.WorldGen.Structures;
+
+namespace Strata.Core.WorldGen.Passes;
+
+/// <summary>
+/// Pass 9 — structures and mini-biomes: abandoned cabins, mine networks, heartwood trees, desert
+/// pyramids, blade shrines, and marble/granite cave pockets.
+/// </summary>
+public sealed class StructurePlacementPass : GenPass
+{
+    public override string Name => "structures";
+    public override int Number => 9;
+
+    public override void Plan(PlanContext ctx)
+    {
+        var rng = ctx.SeedsFor(this).Rng("placement");
+        var plan = ctx.Plan;
+        var bands = plan.Bands;
+        var content = ctx.Content;
+
+        for (int i = 0, n = ctx.Scaled(26); i < n; i++)
+        {
+            if (!ctx.TryRandomLandPoint(ref rng, 0.9f, 60f, out float x, out float z)) continue;
+            int y = (int)bands.YForNormalizedDepth(rng.Range(0.06f, 0.85f));
+            string wood = WoodFor(ctx, x, y, z);
+            AddStructure(plan, "cabin", CabinBuilder.Build(content, new Int3((int)x, y, (int)z), wood, ref rng));
+        }
+
+        for (int i = 0, n = Math.Max(1, ctx.Scaled(3)); i < n; i++)
+        {
+            if (!ctx.TryRandomLandPoint(ref rng, 0.92f, 80f, out float x, out float z)) continue;
+            int y = (int)bands.YForNormalizedDepth(rng.Range(0.05f, 0.3f));
+            AddStructure(plan, "mineshaft", MineshaftBuilder.Build(content, new Int3((int)x, y, (int)z), ref rng, rng.Range(6, 12)));
+        }
+
+        for (int i = 0, n = Math.Max(1, ctx.Scaled(2)); i < n; i++)
+        {
+            if (!TryBiomeSurfacePoint(ctx, ref rng, "forest", 90f, out var ground)) continue;
+            AddStructure(plan, "living_tree", LivingTreeBuilder.Build(content, ground, ref rng));
+        }
+
+        if (rng.Chance(0.75f) && TryBiomeSurfacePoint(ctx, ref rng, "desert", 0f, out var dune))
+            AddStructure(plan, "pyramid", PyramidBuilder.Build(content, dune, ref rng));
+
+        for (int i = 0, n = Math.Max(1, ctx.Scaled(2)); i < n; i++)
+        {
+            if (!ctx.TryRandomLandPoint(ref rng, 0.9f, 120f, out float x, out float z)) continue;
+            float y = bands.YForNormalizedDepth(rng.Range(0.1f, 0.4f));
+            var center = new Vector3(x, y, z);
+            plan.AddFeature(new ChamberFeature(center, new Vector3(7, 5, 7)) { Kind = "shrine", Chamber = ChamberKind.Shrine, Seed = rng.NextUInt() });
+            var bp = new Blueprint { Flags = Voxels.CellFlags.None };
+            var floor = new Int3((int)x - 1, (int)(y - 3), (int)z - 1);
+            bp.Fill(new Aabb3i(floor - new Int3(5, 1, 5), floor + new Int3(8, 0, 8)), "green_moss");
+            bp.Object(content.TileObjects.Get("enchanted_sword_shrine"), floor, 0);
+            AddStructure(plan, "shrine_altar", bp);
+        }
+
+        ulong seed = ctx.SeedsFor(this).Value;
+        for (int i = 0, n = ctx.Scaled(6); i < n; i++)
+        {
+            foreach (var kind in new[] { ChamberKind.Marble, ChamberKind.Granite })
+            {
+                if (!ctx.TryRandomLandPoint(ref rng, 0.9f, 60f, out float x, out float z)) continue;
+                float y = bands.YForNormalizedDepth(rng.Range(0.3f, 0.85f));
+                float r = rng.Range(14f, 24f);
+                string zone = kind == ChamberKind.Marble ? "marble_cave" : "granite_cave";
+                plan.AddFeature(new ChamberFeature(new Vector3(x, y, z), new Vector3(r, r * 0.6f, r * rng.Range(0.8f, 1.2f)))
+                {
+                    Kind = "minibiome", Chamber = kind, Zone = zone, Seed = seed + (ulong)(i * 2 + (int)kind),
+                });
+            }
+        }
+    }
+
+    public override void Generate(ChunkGenContext ctx)
+    {
+        foreach (var f in ctx.Plan.Features.InChunk(ctx.Coord))
+        {
+            if (f is ChamberFeature ch && ch.Kind is "shrine" or "minibiome") MiniBiomeCarver.Carve(ctx, ch);
+            else if (f is StructureFeature s && s.Kind is "cabin" or "mineshaft" or "living_tree" or "pyramid" or "shrine_altar")
+                FeatureCarver.Stamp(ctx, s.Blueprint);
+        }
+    }
+
+    internal static void AddStructure(Plan.WorldPlan plan, string kind, Blueprint bp, string? zone = null) =>
+        plan.AddFeature(new StructureFeature(bp) { Kind = kind, Zone = zone });
+
+    /// <summary>A surface point inside a given biome (landness high, not near spawn).</summary>
+    internal static bool TryBiomeSurfacePoint(PlanContext ctx, ref Pcg32 rng, string biome, float minFromSpawn, out Int3 ground)
+    {
+        byte id = (byte)ctx.Content.Biomes.Get(biome).RuntimeId;
+        for (int attempt = 0; attempt < 200; attempt++)
+        {
+            if (!ctx.TryRandomLandPoint(ref rng, 0.95f, minFromSpawn, out float x, out float z)) break;
+            if (ctx.Biomes.SurfaceBiome(x, z) != id) continue;
+            ground = new Int3((int)x, (int)MathF.Floor(ctx.Terrain.SurfaceHeight(x, z)), (int)z);
+            return true;
+        }
+        ground = Int3.Zero;
+        return false;
+    }
+
+    private static string WoodFor(PlanContext ctx, float x, float y, float z)
+    {
+        string biome = ctx.Content.Biomes[ctx.Biomes.BiomeAt(x, y, z)].Id;
+        return biome switch { "tundra" => "boreal_wood", "jungle" => "rich_mahogany", _ => "wood" };
+    }
+}

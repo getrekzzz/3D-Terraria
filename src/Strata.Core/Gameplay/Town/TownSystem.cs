@@ -1,0 +1,225 @@
+using System.Numerics;
+using Strata.Core.Common;
+using Strata.Core.Conditions;
+using Strata.Core.Content.Defs;
+using Strata.Core.Determinism;
+using Strata.Core.Diagnostics;
+using Strata.Core.Gameplay.Housing;
+using Strata.Core.Gameplay.Items;
+using Strata.Core.Gameplay.Navigation;
+using Strata.Core.Persistence;
+using Strata.Core.Session;
+using Strata.Core.Voxels;
+
+namespace Strata.Core.Gameplay.Town;
+
+/// <summary>
+/// The town: residents move in when their data-driven arrival conditions hold and a vacant valid home exists, keep
+/// their homes while the rooms stay valid, stroll by day and walk home at night (voxel A*, opening doors), and are
+/// saved with the world. Talking, trading and services live in <see cref="TownCommerce"/>.
+/// </summary>
+public sealed partial class TownSystem
+{
+    private readonly GameWorld _world;
+    private readonly List<TownNpc> _residents = new();
+    private readonly Dictionary<string, ICondition> _arrival = new();
+    private long _nextId = 1;
+    private Pcg32 _rng;
+
+    public TownSystem(GameWorld world, TownConfig? config = null)
+    {
+        _world = world;
+        Config = config ?? new TownConfig();
+        _rng = new Pcg32(Hash.Combine((ulong)world.Session.Settings.Seed, 0x544F574EUL));
+        foreach (var def in world.Session.Content.TownNpcs.All)
+        {
+            _arrival[def.Id] = ConditionCompiler.CompileAll(def.Arrival);
+            _leaves[def.Id] = ConditionCompiler.CompileAll(def.LeavesWhen);
+        }
+        Load(world.Session.Meta);
+    }
+
+    public TownConfig Config { get; set; }
+
+    /// <summary>Move-ins can be switched off (tests, peaceful building).</summary>
+    public bool ArrivalsEnabled { get; set; } = true;
+
+    public IReadOnlyList<TownNpc> Residents => _residents;
+
+    private NavAgent Agent => NavAgent.Humanoid;
+    private VoxelWorld World => _world.Session.World;
+
+    /// <summary>A resident moved in (HUD announcement).</summary>
+    public event Action<TownNpc>? Arrived;
+
+    /// <summary>A resident's home stopped being valid; they are homeless until another is found.</summary>
+    public event Action<TownNpc>? HomeLost;
+
+    public event Action<TownNpc>? Spawned;
+    public event Action<TownNpc>? Removed;
+
+    public TownNpc? Find(string id) => _residents.FirstOrDefault(r => r.Def.Id == id);
+
+    public void Tick()
+    {
+        long tick = _world.Session.Clock.Tick;
+        if (!_world.Session.Meta.TownStarted) TryPlaceStarters();
+        if (ArrivalsEnabled && tick % Config.ArrivalInterval == 0) CheckArrivals();
+        if (tick % LandmarkInterval == 0) UpdateLandmarks();
+        if (tick % Config.HomeCheckInterval == 0) CheckHomes();
+        foreach (var r in _residents) TickResident(r);
+    }
+
+    /// <summary>Runs the move-in check now (commands, tests). Returns the resident that arrived, if any.</summary>
+    public TownNpc? CheckArrivals()
+    {
+        var player = _world.LocalPlayer;
+        if (player == null) return null;
+        var rooms = VacantRooms();
+        // Homeless residents are housed first.
+        foreach (var r in _residents.Where(r => r.Home == null && r.Alive && r.Def.Landmark == null))
+        {
+            if (rooms.Count == 0) break;
+            AssignHome(r, rooms[0]);
+            rooms.RemoveAt(0);
+        }
+        if (rooms.Count == 0) return null;
+        var ctx = TownContext(player);
+        foreach (var def in _world.Session.Content.TownNpcs.All)
+        {
+            if (Find(def.Id) != null || def.Starter || def.Landmark != null || !_arrival[def.Id].Evaluate(ctx) || HasLeft(def, ctx)) continue;
+            var npc = Create(def, rooms[0].HomeNode!.Value);
+            AssignHome(npc, rooms[0]);
+            Arrived?.Invoke(npc);
+            return npc;
+        }
+        return null;
+    }
+
+    /// <summary>Adds a resident at a node (commands; bypasses arrival conditions). Homeless until a home is found.</summary>
+    public TownNpc Summon(TownNpcDef def, Int3 node)
+    {
+        var existing = Find(def.Id);
+        if (existing != null) return existing;
+        var npc = Create(def, node);
+        return npc;
+    }
+
+    public bool Dismiss(TownNpc npc)
+    {
+        if (!_residents.Remove(npc)) return false;
+        Removed?.Invoke(npc);
+        return true;
+    }
+
+    /// <summary>Valid rooms nobody lives in, found from chairs in loaded chunks (every home needs one).</summary>
+    public List<Room> VacantRooms()
+    {
+        var taken = _residents.Where(r => r.HomeRoom != null).Select(r => r.HomeRoom!.Value).ToHashSet();
+        var seen = new HashSet<Int3>();
+        var rooms = new List<Room>();
+        foreach (var obj in World.TileObjects.All.Where(o => o.Def.Housing.Contains("chair")).OrderBy(o => o.Id).ToList())
+        {
+            if (seen.Contains(obj.Anchor)) continue;
+            var room = _world.Housing.Scan(obj.Anchor);
+            foreach (var c in room.Interior) seen.Add(c);
+            if (room.Valid && room.HomeNode != null && !taken.Contains(room.Key) && rooms.All(r => r.Key != room.Key)) rooms.Add(room);
+        }
+        return rooms;
+    }
+
+    /// <summary>Condition context for town decisions: the player's surroundings plus wealth, life, items and residents.</summary>
+    public ConditionContext TownContext(PlayerEntity player)
+    {
+        var ctx = _world.Session.ContextAt(player.FeetCell);
+        ctx.PlayerCoins = _world.Players.Max(p => Coins.Total(p.State.Inventory.Backpack));
+        ctx.PlayerMaxLife = _world.Players.Max(p => p.State.Vitals.MaxLife);
+        ctx.Residents = _residents.Select(r => r.Def.Id).ToHashSet();
+        ctx.ItemCount = key => _world.Players.Sum(p => key.StartsWith('#')
+            ? p.State.Inventory.Backpack.Count(d => d.HasTag(key[1..]))
+            : _world.Session.Content.Items.TryGet(key, out var item) ? p.State.Inventory.Backpack.Count(item) : 0);
+        return ctx;
+    }
+
+    private void TryPlaceStarters()
+    {
+        var spawn = _world.Session.SpawnCell;
+        if (World.GetBlock(spawn) == VoxelWorld.Unknown || _world.LocalPlayer == null) return;
+        foreach (var def in _world.Session.Content.TownNpcs.All.Where(d => d.Starter && d.Landmark == null))
+        {
+            if (Find(def.Id) != null) continue;
+            var node = _world.Navigator.NearestStandable(spawn + new Int3(3, 0, 2), Agent, 6) ?? spawn;
+            Create(def, node);
+        }
+        _world.Session.Meta.TownStarted = true;
+    }
+
+    private TownNpc Create(TownNpcDef def, Int3 node)
+    {
+        var name = def.Names.Length > 0 ? def.Names[_rng.Range(0, def.Names.Length - 1)] : def.DisplayName;
+        var npc = new TownNpc(def, name) { Id = _nextId++, Position = NodeFeet(node), IdleTicks = Config.IdleTicksMin };
+        _residents.Add(npc);
+        Spawned?.Invoke(npc);
+        return npc;
+    }
+
+    private static void AssignHome(TownNpc npc, Room room)
+    {
+        npc.Home = room.HomeNode;
+        npc.HomeRoom = room.Key;
+    }
+
+    private void CheckHomes()
+    {
+        foreach (var r in _residents)
+        {
+            if (r.Home is not { } home) continue;
+            var cell = home + new Int3(-1, 1, -1);
+            if (World.GetBlock(cell) == VoxelWorld.Unknown) continue; // cannot judge an unloaded home
+            var room = _world.Housing.Scan(cell);
+            if (room.Valid && room.Key == r.HomeRoom) continue;
+            r.Home = null;
+            r.HomeRoom = null;
+            HomeLost?.Invoke(r);
+        }
+    }
+
+    /// <summary>Feet position (m) of a navigation node (grid vertex).</summary>
+    public static Vector3 NodeFeet(Int3 node) => new Vector3(node.X, node.Y, node.Z) * Units.CellSize;
+
+    // --- Persistence -------------------------------------------------------------------------------------------
+
+    /// <summary>Writes residents into the world metadata (called before saving).</summary>
+    public void Persist()
+    {
+        _world.Session.Meta.Residents = _residents.Select(r => new WorldMeta.ResidentModel(
+            r.Def.Id, r.Name,
+            r.Home is { } h ? new[] { h.X, h.Y, h.Z } : null,
+            r.HomeRoom is { } k ? new[] { k.X, k.Y, k.Z } : null,
+            new[] { r.Position.X, r.Position.Y, r.Position.Z }, r.Life, r.RespawnTicks)).ToList();
+    }
+
+    private void Load(WorldMeta meta)
+    {
+        var content = _world.Session.Content;
+        foreach (var m in meta.Residents)
+        {
+            if (!content.TownNpcs.TryGet(m.Id, out var def))
+            {
+                _world.Session.Log.Warn("town", $"Saved resident '{m.Id}' is not in content; they have left town.");
+                continue;
+            }
+            var npc = new TownNpc(def, m.Name)
+            {
+                Id = _nextId++,
+                Home = m.Home is { Length: 3 } h ? new Int3(h[0], h[1], h[2]) : null,
+                HomeRoom = m.HomeRoom is { Length: 3 } k ? new Int3(k[0], k[1], k[2]) : null,
+                Position = m.Position is { Length: 3 } p ? new Vector3(p[0], p[1], p[2]) : Vector3.Zero,
+                Life = Math.Clamp(m.Life, 0, def.Life),
+                RespawnTicks = m.RespawnTicks,
+                IdleTicks = Config.IdleTicksMin,
+            };
+            _residents.Add(npc);
+        }
+    }
+}

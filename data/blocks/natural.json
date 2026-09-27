@@ -1,0 +1,35 @@
+{
+  // Natural terrain materials: meshed as smooth organic terrain (constrained surface nets).
+  "blocks": [
+    { "id": "dirt", "name": "Dirt Block", "textures": { "all": "loam" }, "hardness": 0.8, "sound": "dirt", "color": "#7a5234", "tags": ["natural", "soil"], "covers": ["terraria:dirt_block"] },
+    { "id": "grass", "name": "Grass", "textures": { "top": "grass", "side": "loam", "bottom": "loam" }, "hardness": 0.8, "drop": "dirt", "sound": "grass", "color": "#4f9a3a", "tags": ["natural", "soil", "grass"], "covers": ["terraria:grass_block"] },
+    { "id": "clay", "name": "Clay Block", "textures": { "all": "clay" }, "hardness": 0.9, "sound": "dirt", "color": "#a4553d", "tags": ["natural", "soil"], "covers": ["terraria:clay_block"] },
+    { "id": "stone", "name": "Stone Block", "textures": { "all": "stone" }, "hardness": 1.5, "sound": "stone", "color": "#72737a", "tags": ["natural", "stone"], "covers": ["terraria:stone_block"] },
+    { "id": "deepstone", "name": "Slate", "description": "Dense, dark rock of the cavern layer.", "textures": { "all": "deepstone" }, "hardness": 1.8, "sound": "stone", "color": "#4d4e57", "tags": ["natural", "stone"] },
+    { "id": "sand", "name": "Sand Block", "textures": { "all": "sand" }, "hardness": 0.6, "falls": true, "sound": "sand", "color": "#d8c27a", "tags": ["natural", "sand"], "covers": ["terraria:sand_block"] },
+    { "id": "sandstone", "name": "Sandstone Block", "textures": { "all": "sandstone" }, "hardness": 1.4, "pickPower": 0, "sound": "stone", "color": "#c89a58", "tags": ["natural", "stone", "desert"], "covers": ["terraria:sandstone_block"] },
+    { "id": "hardened_sand", "name": "Hardened Sand Block", "textures": { "all": "packed_sand" }, "hardness": 1.0, "sound": "sand", "color": "#c7ab66", "tags": ["natural", "desert"], "covers": ["terraria:hardened_sand_block"] },
+    { "id": "desert_fossil", "name": "Desert Fossil", "textures": { "all": "fossil" }, "hardness": 1.6, "sound": "stone", "color": "#bfae8a", "tags": ["natural", "desert"], "covers": ["terraria:desert_fossil"] },
+    { "id": "silt", "name": "Silt Block", "textures": { "all": "silt" }, "hardness": 0.7, "falls": true, "sound": "sand", "color": "#7f7d78", "tags": ["natural"], "covers": ["terraria:silt_block"] },
+    { "id": "mud", "name": "Mud Block", "textures": { "all": "mud" }, "hardness": 0.8, "sound": "dirt", "color": "#4d3a36", "tags": ["natural", "soil", "jungle"], "covers": ["terraria:mud_block"] },
+    { "id": "jungle_grass", "name": "Jungle Grass", "textures": { "top": "jungle_grass", "side": "mud", "bottom": "mud" }, "hardness": 0.8, "drop": "mud", "sound": "grass", "color": "#3fae4a", "tags": ["natural", "grass", "jungle"], "covers": ["terraria:jungle_grass"] },
+    { "id": "snow", "name": "Snow Block", "textures": { "all": "snow" }, "hardness": 0.6, "sound": "snow", "color": "#e8eef5", "tags": ["natural", "soil", "snow"], "covers": ["terraria:snow_block"] },
+    { "id": "ice", "name": "Ice Block", "textures": { "all": "ice" }, "hardness": 1.0, "friction": 0.15, "sound": "ice", "color": "#9ecbe8", "tags": ["natural", "snow"], "covers": ["terraria:ice_block"] },
+    { "id": "slush", "name": "Slush Block", "textures": { "all": "slush" }, "hardness": 0.7, "falls": true, "sound": "snow", "color": "#9aa6b0", "tags": ["natural", "snow"], "covers": ["terraria:slush_block"] },
+    { "id": "ash", "name": "Ash Block", "textures": { "all": "ash" }, "hardness": 0.7, "sound": "sand", "color": "#4e4644", "tags": ["natural", "underworld"], "covers": ["terraria:ash_block"] },
+    { "id": "obsidian", "name": "Obsidian", "textures": { "all": "obsidian" }, "hardness": 3.0, "pickPower": 55, "sound": "stone", "color": "#2b2335", "tags": ["natural", "stone"], "covers": ["terraria:obsidian"] },
+    { "id": "marble", "name": "Marble Block", "textures": { "all": "marble" }, "hardness": 1.6, "sound": "stone", "color": "#d9d6ce", "tags": ["natural", "stone"], "covers": ["terraria:marble_block"] },
+    { "id": "granite", "name": "Granite Block", "textures": { "all": "granite" }, "hardness": 1.6, "sound": "stone", "color": "#3a3f5c", "tags": ["natural", "stone"], "covers": ["terraria:granite_block"] },
+    { "id": "ebonstone", "name": "Ebonstone Block", "textures": { "all": "umbral_stone" }, "hardness": 2.0, "pickPower": 65, "sound": "stone", "color": "#4a3c63", "tags": ["natural", "stone", "evil", "corruption"], "covers": ["terraria:ebonstone_block"] },
+    { "id": "corrupt_grass", "name": "Corrupt Grass", "textures": { "top": "umbral_grass", "side": "loam", "bottom": "loam" }, "hardness": 0.8, "drop": "dirt", "sound": "grass", "color": "#6b5a8e", "tags": ["natural", "grass", "evil", "corruption"], "covers": ["terraria:corrupt_grass"] },
+    { "id": "crimstone", "name": "Crimstone Block", "textures": { "all": "sanguine_stone" }, "hardness": 2.0, "pickPower": 65, "sound": "stone", "color": "#7d2e2e", "tags": ["natural", "stone", "evil", "crimson"], "covers": ["terraria:crimstone_block"] },
+    { "id": "crimson_grass", "name": "Crimson Grass", "textures": { "top": "sanguine_grass", "side": "loam", "bottom": "loam" }, "hardness": 0.8, "drop": "dirt", "sound": "grass", "color": "#b43a3a", "tags": ["natural", "grass", "evil", "crimson"], "covers": ["terraria:crimson_grass"] },
+    { "id": "mushroom_grass", "name": "Mushroom Grass", "textures": { "top": "mushroom_grass", "side": "mud", "bottom": "mud" }, "hardness": 0.8, "drop": "mud", "light": [1, 3, 7], "sound": "grass", "color": "#4d6fe0", "tags": ["natural", "grass", "mushroom"], "covers": ["terraria:mushroom_grass"] },
+    { "id": "cloud", "name": "Cloud", "textures": { "all": "cloud" }, "hardness": 0.5, "sound": "cloth", "color": "#f2f5fa", "tags": ["natural", "sky"], "covers": ["terraria:cloud"] },
+    { "id": "rain_cloud", "name": "Rain Cloud", "textures": { "all": "rain_cloud" }, "hardness": 0.5, "sound": "cloth", "color": "#8a97a8", "tags": ["natural", "sky"], "covers": ["terraria:rain_cloud"] },
+    { "id": "hive", "name": "Hive", "textures": { "all": "hive" }, "hardness": 1.0, "sound": "dirt", "color": "#c7862b", "tags": ["natural", "jungle"], "covers": ["terraria:hive"] },
+    { "id": "green_moss", "name": "Green Moss", "textures": { "top": "moss", "side": "stone", "bottom": "stone" }, "hardness": 1.5, "drop": "stone", "sound": "stone", "color": "#5d7d45", "tags": ["natural", "stone"], "covers": ["terraria:green_moss"] },
+    { "id": "abyssal_rock", "name": "Coralstone", "description": "The unbreakable floor of the world.", "textures": { "all": "abyssal_rock" }, "hardness": 100, "pickPower": 1000, "autoItem": false, "sound": "stone", "color": "#1a1418", "tags": ["natural", "unbreakable"] },
+    { "id": "argon_moss", "name": "Argon Moss", "textures": { "top": "glow_moss", "side": "stone", "bottom": "stone" }, "hardness": 1.5, "drop": "stone", "light": [2, 9, 6], "sound": "stone", "color": "#3fd3a0", "tags": ["natural", "stone"], "covers": ["terraria:lava_moss"] }
+  ]
+}

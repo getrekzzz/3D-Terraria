@@ -1,0 +1,19 @@
+{
+  // Natural enemy spawning around players (see SpawnDirector). Distances in metres, intervals in ticks (60/s).
+  "checkInterval": 30,
+  "chance": 0.18,
+  "maxNearbyDay": 4,
+  "maxNearbyNight": 7,
+  "countRadius": 60,
+  "minDistance": 22,
+  "maxDistance": 46,
+  "attempts": 12,
+  // Inside a zone with its own roster (the crypt) creatures appear closer, among its halls.
+  "zoneMinDistance": 9,
+  "zoneMaxDistance": 24,
+  // Towns: this many housed residents within townRadius of a player multiply the spawn chance by townFactor
+  // (not during world events).
+  "townResidents": 2,
+  "townRadius": 40,
+  "townFactor": 0.25
+}

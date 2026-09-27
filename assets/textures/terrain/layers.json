@@ -1,0 +1,637 @@
+{
+ "columns": 8,
+ "rows": 12,
+ "size": 256,
+ "layers": [
+  {
+   "name": "loam",
+   "index": 0,
+   "type": "soil",
+   "detail": 1,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "clay",
+   "index": 1,
+   "type": "soil",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "sand",
+   "index": 2,
+   "type": "soil",
+   "detail": 2,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "packed_sand",
+   "index": 3,
+   "type": "soil",
+   "detail": 2,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "silt",
+   "index": 4,
+   "type": "soil",
+   "detail": 2,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "mud",
+   "index": 5,
+   "type": "soil",
+   "detail": 1,
+   "detailStrength": 0.4
+  },
+  {
+   "name": "snow",
+   "index": 6,
+   "type": "soil",
+   "detail": 5,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "slush",
+   "index": 7,
+   "type": "soil",
+   "detail": 1,
+   "detailStrength": 0.4
+  },
+  {
+   "name": "ash",
+   "index": 8,
+   "type": "soil",
+   "detail": 2,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "cloud",
+   "index": 9,
+   "type": "soil",
+   "detail": 5,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "rain_cloud",
+   "index": 10,
+   "type": "soil",
+   "detail": 5,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "grass",
+   "index": 11,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "jungle_grass",
+   "index": 12,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "umbral_grass",
+   "index": 13,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "sanguine_grass",
+   "index": 14,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "mushroom_grass",
+   "index": 15,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "moss",
+   "index": 16,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "glow_moss",
+   "index": 17,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "stone",
+   "index": 18,
+   "type": "rock",
+   "detail": 0,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "deepstone",
+   "index": 19,
+   "type": "rock",
+   "detail": 0,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "sandstone",
+   "index": 20,
+   "type": "rock",
+   "detail": 0,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "fossil",
+   "index": 21,
+   "type": "speckled",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "ice",
+   "index": 22,
+   "type": "rock",
+   "detail": 6,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "obsidian",
+   "index": 23,
+   "type": "veined",
+   "detail": 6,
+   "detailStrength": 0.4
+  },
+  {
+   "name": "marble",
+   "index": 24,
+   "type": "veined",
+   "detail": 6,
+   "detailStrength": 0.4
+  },
+  {
+   "name": "granite",
+   "index": 25,
+   "type": "speckled",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "umbral_stone",
+   "index": 26,
+   "type": "rock",
+   "detail": 0,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "sanguine_stone",
+   "index": 27,
+   "type": "rock",
+   "detail": 0,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "hive",
+   "index": 28,
+   "type": "hive",
+   "detail": 6,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "abyssal_rock",
+   "index": 29,
+   "type": "rock",
+   "detail": 0,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "copper_ore",
+   "index": 30,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "tin_ore",
+   "index": 31,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "iron_ore",
+   "index": 32,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "lead_ore",
+   "index": 33,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "silver_ore",
+   "index": 34,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "tungsten_ore",
+   "index": 35,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "gold_ore",
+   "index": 36,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "platinum_ore",
+   "index": 37,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "umbrite_ore",
+   "index": 38,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "sanguite_ore",
+   "index": 39,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "meteorite",
+   "index": 40,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "cinderstone",
+   "index": 41,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "amethyst_ore",
+   "index": 42,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "topaz_ore",
+   "index": 43,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "sapphire_ore",
+   "index": 44,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "emerald_ore",
+   "index": 45,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "ruby_ore",
+   "index": 46,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "diamond_ore",
+   "index": 47,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "crystal",
+   "index": 48,
+   "type": "translucent",
+   "detail": 0,
+   "detailStrength": 0.0
+  },
+  {
+   "name": "planks",
+   "index": 49,
+   "type": "planks",
+   "detail": 4,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "pine_planks",
+   "index": 50,
+   "type": "planks",
+   "detail": 4,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "jungle_planks",
+   "index": 51,
+   "type": "planks",
+   "detail": 4,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "palm_planks",
+   "index": 52,
+   "type": "planks",
+   "detail": 4,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "living_wood",
+   "index": 53,
+   "type": "planks",
+   "detail": 4,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "leaves",
+   "index": 54,
+   "type": "leaves",
+   "detail": 0,
+   "detailStrength": 0.0
+  },
+  {
+   "name": "stone_brick",
+   "index": 55,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "red_brick",
+   "index": 56,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "sandstone_brick",
+   "index": 57,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "snow_brick",
+   "index": 58,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "mud_brick",
+   "index": 59,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "copper_brick",
+   "index": 60,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "gold_brick",
+   "index": 61,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "azure_brick",
+   "index": 62,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "verdant_brick",
+   "index": 63,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "rose_brick",
+   "index": 64,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "obsidian_brick",
+   "index": 65,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "cinder_brick",
+   "index": 66,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "sky_brick",
+   "index": 67,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "glass",
+   "index": 68,
+   "type": "translucent",
+   "detail": 0,
+   "detailStrength": 0.0
+  },
+  {
+   "name": "cobweb",
+   "index": 69,
+   "type": "web",
+   "detail": 0,
+   "detailStrength": 0.0
+  },
+  {
+   "name": "missing",
+   "index": 70,
+   "type": "missing",
+   "detail": 0,
+   "detailStrength": 0.0
+  },
+  {
+   "name": "honey_block",
+   "index": 71,
+   "type": "hive",
+   "detail": 6,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "crispy_honey",
+   "index": 72,
+   "type": "hive",
+   "detail": 6,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "hallowed_grass",
+   "index": 73,
+   "type": "grass",
+   "detail": 3,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "pearlstone",
+   "index": 74,
+   "type": "rock",
+   "detail": 0,
+   "detailStrength": 0.8
+  },
+  {
+   "name": "pearlsand",
+   "index": 75,
+   "type": "soil",
+   "detail": 2,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "pink_ice",
+   "index": 76,
+   "type": "rock",
+   "detail": 6,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "umbral_sand",
+   "index": 77,
+   "type": "soil",
+   "detail": 2,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "umbral_ice",
+   "index": 78,
+   "type": "rock",
+   "detail": 6,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "sanguine_sand",
+   "index": 79,
+   "type": "soil",
+   "detail": 2,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "sanguine_ice",
+   "index": 80,
+   "type": "rock",
+   "detail": 6,
+   "detailStrength": 0.3
+  },
+  {
+   "name": "cerulite_ore",
+   "index": 81,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "rosalite_ore",
+   "index": 82,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "verdite_ore",
+   "index": 83,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "orchidite_ore",
+   "index": 84,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "crimsite_ore",
+   "index": 85,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "stellite_ore",
+   "index": 86,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "lihzahrd_brick",
+   "index": 87,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "chlorophyte_ore",
+   "index": 88,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "luminite",
+   "index": 89,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  }
+ ]
+}

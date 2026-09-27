@@ -1,0 +1,127 @@
+{
+  // The Corruption and the Crimson before hardmode: their creatures, the Shadow Orbs and Crimson Hearts deep in their
+  // chasms (every third smashed wakes the world's evil boss; a meteorite may fall that night), the Demon and Crimson
+  // Altars (crafting stations; a Pwnhammer smashes them to seed hardmode ores), and the Brain of Cthulhu.
+  "projectiles": [
+    { "id": "vilethorn", "name": "Vilethorn", "visual": "bolt", "color": "#8a5ac8", "lifetime": 40, "radius": 0.6, "pierce": -1, "collideTerrain": false, "light": [6, 3, 9] },
+    { "id": "crimson_rod_bolt", "name": "Blood Rain", "visual": "bolt", "color": "#e8303a", "lifetime": 120, "radius": 0.4, "homing": 3, "light": [10, 2, 2], "trail": "#ff7070" },
+    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "visual": "item", "lifetime": 120, "radius": 0.7, "returns": 26, "pierce": -1 },
+    { "id": "creeper_ichor", "name": "Ichor Spit", "visual": "orb", "color": "#e0c040", "gravity": 6, "lifetime": 180, "radius": 0.4, "friendly": false, "hostile": true }
+  ],
+  "tileObjects": [
+    { "id": "shadow_orb", "name": "Shadow Orb", "description": "A pulsing orb of darkness. Smash it with a hammer.", "size": [2, 2, 2], "anchor": "none", "breakTool": "hammer",
+      "hitPoints": 3, "light": [8, 4, 12], "loot": "shadow_orb", "natural": true, "autoItem": false,
+      "onBreak": { "counter": "orbs", "flags": ["smashed_orb"], "summon": "eater_of_worlds", "every": 3, "meteor": 0.5,
+        "messages": ["A horrible chill goes down your spine...", "Screams echo around you...", ""] }, "covers": ["terraria:shadow_orb"] },
+    { "id": "crimson_heart", "name": "Crimson Heart", "description": "It beats. Smash it with a hammer.", "size": [2, 2, 2], "anchor": "none", "breakTool": "hammer",
+      "hitPoints": 3, "light": [12, 3, 3], "loot": "crimson_heart", "natural": true, "autoItem": false,
+      "onBreak": { "counter": "orbs", "flags": ["smashed_orb"], "summon": "brain_of_cthulhu", "every": 3, "meteor": 0.5,
+        "messages": ["A horrible chill goes down your spine...", "Screams echo around you...", ""] }, "covers": ["terraria:crimson_heart"] },
+    { "id": "demon_altar", "name": "Demon Altar", "description": "Used to craft dark artefacts. Only a Pwnhammer can smash it.", "size": [4, 2, 2], "interaction": "station", "stations": ["demon_altar"],
+      "breakTool": "hammer", "minPower": 80, "hitPoints": 6, "light": [5, 2, 7], "natural": true, "autoItem": false,
+      "onBreak": { "counter": "altars", "flags": ["smashed_altar_1", "smashed_altar_2", "smashed_altar_3"], "release": "wraith", "releaseChance": 0.33 },
+      "covers": ["terraria:demon_altar"] },
+    { "id": "crimson_altar", "name": "Crimson Altar", "description": "Used to craft dark artefacts. Only a Pwnhammer can smash it.", "size": [4, 2, 2], "interaction": "station", "stations": ["demon_altar"],
+      "breakTool": "hammer", "minPower": 80, "hitPoints": 6, "light": [8, 2, 2], "natural": true, "autoItem": false,
+      "onBreak": { "counter": "altars", "flags": ["smashed_altar_1", "smashed_altar_2", "smashed_altar_3"], "release": "wraith", "releaseChance": 0.33 } }
+  ],
+  "items": [
+    { "id": "rotten_chunk", "name": "Rotten Chunk", "description": "It smells.", "category": "material", "maxStack": 9999, "value": 10 },
+    { "id": "vertebra", "name": "Vertebra", "description": "Taken from the Crimson's creatures.", "category": "material", "maxStack": 9999, "value": 10 },
+    { "id": "shadow_scale", "name": "Shadow Scale", "category": "material", "rarity": 1, "maxStack": 9999, "value": 100, "covers": ["terraria:shadow_scale"] },
+    { "id": "tissue_sample", "name": "Tissue Sample", "category": "material", "rarity": 1, "maxStack": 9999, "value": 100, "covers": ["terraria:tissue_sample"] },
+    { "id": "vile_powder", "name": "Vile Powder", "category": "material", "maxStack": 9999, "value": 100, "tags": ["shop"] },
+    { "id": "vicious_powder", "name": "Vicious Powder", "category": "material", "maxStack": 9999, "value": 100, "tags": ["shop"] },
+    { "id": "bloody_spine", "name": "Bloody Spine", "description": "Summons the Brain of Cthulhu. Use in the Crimson.", "category": "bossSummon", "rarity": 1, "maxStack": 20, "value": 5000,
+      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+      "behaviors": [{ "type": "summonBoss", "enemy": "brain_of_cthulhu", "conditions": [{ "type": "biome", "any": ["crimson"] }], "failMessage": "The spine only twitches in the Crimson." }],
+      "covers": ["terraria:bloody_spine"] },
+
+    { "id": "musket", "name": "Musket", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 43, "useAnimation": 43,
+      "damage": 31, "damageType": "ranged", "knockback": 5.25, "useAmmo": "bullet", "shootSpeed": 55, "covers": ["terraria:musket"] },
+    { "id": "the_undertaker", "name": "The Undertaker", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 20, "useAnimation": 20, "autoReuse": true,
+      "damage": 15, "damageType": "ranged", "knockback": 1.5, "useAmmo": "bullet", "shootSpeed": 45, "covers": ["terraria:the_undertaker"] },
+    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 45, "useAnimation": 45,
+      "damage": 15, "damageType": "melee", "knockback": 6.5, "projectile": "ball_o_hurt", "shootSpeed": 15, "covers": ["terraria:ball_o_hurt"] },
+    { "id": "vilethorn", "name": "Vilethorn", "description": "Summons a vile thorn.", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 28, "useAnimation": 28,
+      "damage": 10, "damageType": "magic", "knockback": 1, "manaCost": 10, "projectile": "vilethorn", "shootSpeed": 16 },
+    { "id": "crimson_rod", "name": "Crimson Rod", "description": "Casts droplets of blood that seek the wicked.", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 24, "useAnimation": 24,
+      "damage": 12, "damageType": "magic", "manaCost": 8, "projectile": "crimson_rod_bolt", "shootSpeed": 13 },
+    { "id": "the_rotted_fork", "name": "The Rotted Fork", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "thrust", "useTime": 31, "useAnimation": 31,
+      "damage": 14, "damageType": "melee", "knockback": 5, "behaviors": [{ "type": "thrust", "length": 3.8 }] },
+    { "id": "band_of_starpower", "name": "Band of Starpower", "description": "Increases maximum mana by 20.", "category": "accessory", "rarity": 1, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "maxMana", "add": 20 }] },
+    { "id": "panic_necklace", "name": "Panic Necklace", "description": "Increases movement speed.", "category": "accessory", "rarity": 1, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "moveSpeed", "add": 0.1 }] },
+    { "id": "worm_scarf", "name": "Worm Scarf", "description": "Reduces damage taken by 17%.", "category": "accessory", "rarity": 3, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "endurance", "add": 0.17 }], "covers": ["terraria:worm_scarf"] },
+    { "id": "brain_of_confusion", "name": "Brain of Confusion", "description": "May confuse nearby enemies after being struck.", "category": "accessory", "rarity": 3, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "genericCrit", "add": 4 }], "covers": ["terraria:brain_of_confusion"] },
+    { "id": "nights_edge", "name": "Night's Edge", "description": "Forged from the four blades of the underground.", "category": "weapon", "rarity": 3, "value": 54000, "useStyle": "swing", "useTime": 21, "useAnimation": 21,
+      "autoReuse": true, "damage": 42, "damageType": "melee", "knockback": 4.5, "heldLight": [6, 3, 12],
+      "behaviors": [{ "type": "meleeSwing", "arc": 180, "length": 4.4 }], "covers": ["terraria:night_s_edge"] }
+  ],
+  "recipes": [
+    { "id": "bloody_spine", "output": "bloody_spine", "inputs": [{ "item": "vertebra", "count": 15 }, { "item": "vicious_powder", "count": 30 }], "stations": ["demon_altar"] },
+    { "id": "nights_edge", "output": "nights_edge", "inputs": [{ "group": "any_evil_sword", "count": 1 }, { "item": "muramasa", "count": 1 }, { "item": "blade_of_grass", "count": 1 }, { "item": "hellstone_broadsword", "count": 1 }], "stations": ["demon_altar"] }
+  ],
+  "recipeGroups": [
+    { "id": "any_evil_sword", "name": "Light's Bane or Blood Butcherer", "items": ["demonite_broadsword", "crimtane_broadsword"] }
+  ],
+  "lootTables": [
+    { "id": "shadow_orb", "mode": "weighted", "entries": [
+      { "table": "shadow_orb_musket", "weight": 1 }, { "item": "vilethorn", "weight": 1 }, { "item": "ball_o_hurt", "weight": 1 }, { "item": "band_of_starpower", "weight": 1 }
+    ] },
+    { "id": "shadow_orb_musket", "entries": [{ "item": "musket" }, { "item": "musket_ball", "min": 100, "max": 100 }] },
+    { "id": "crimson_heart", "mode": "weighted", "entries": [
+      { "table": "crimson_heart_undertaker", "weight": 1 }, { "item": "crimson_rod", "weight": 1 }, { "item": "the_rotted_fork", "weight": 1 }, { "item": "panic_necklace", "weight": 1 }
+    ] },
+    { "id": "crimson_heart_undertaker", "entries": [{ "item": "the_undertaker" }, { "item": "musket_ball", "min": 100, "max": 100 }] },
+    { "id": "eater_of_souls", "coins": [30, 120], "entries": [{ "item": "rotten_chunk", "chance": 0.33 }] },
+    { "id": "crimera", "coins": [30, 120], "entries": [{ "item": "vertebra", "chance": 0.33 }] },
+    { "id": "face_monster", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] },
+    { "id": "blood_crawler", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] },
+    { "id": "brain_of_cthulhu", "coins": [10000, 15000], "entries": [
+      { "item": "crimtane_ore", "min": 40, "max": 110 }, { "item": "tissue_sample", "min": 10, "max": 20 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 },
+      { "item": "brain_of_confusion", "conditions": [{ "type": "difficulty", "min": 1 }] }
+    ] }
+  ],
+  "enemies": [
+    { "id": "eater_of_souls", "model": "eater_of_souls", "tags": ["evil"], "name": "Eater of Souls", "description": "It swoops from the chasms with a mouth where a face should be.",
+      "brain": { "type": "flyer", "aggroRange": 80, "orbitRadius": 3, "dashSpeed": 10, "dashCooldown": 70 },
+      "life": 60, "damage": 22, "defense": 8, "knockbackResist": 0.2, "size": [1.8, 1.4], "moveSpeed": 6, "gravity": false, "loot": "eater_of_souls", "value": 90, "covers": ["terraria:eater_of_souls"] },
+    { "id": "crimera", "model": "crimera", "tags": ["evil"], "name": "Crimera", "description": "A fleshy flier that bites at anything warm.",
+      "brain": { "type": "flyer", "aggroRange": 80, "orbitRadius": 3, "dashSpeed": 10, "dashCooldown": 70 },
+      "life": 70, "damage": 22, "defense": 8, "knockbackResist": 0.2, "size": [1.8, 1.4], "moveSpeed": 6, "gravity": false, "loot": "crimera", "value": 90, "covers": ["terraria:crimera"] },
+    { "id": "face_monster", "model": "face_monster", "tags": ["evil"], "name": "Face Monster", "description": "Its face is where its belly should be.",
+      "brain": { "type": "walker", "aggroRange": 60, "jumpHeight": 4 },
+      "life": 120, "damage": 25, "defense": 10, "knockbackResist": 0.3, "size": [1.6, 3.6], "moveSpeed": 2.6, "loot": "face_monster", "value": 120, "covers": ["terraria:face_monster"] },
+    { "id": "blood_crawler", "model": "blood_crawler", "tags": ["evil"], "name": "Blood Crawler", "description": "A spider of the Crimson's caves.",
+      "brain": { "type": "walker", "aggroRange": 50, "jumpHeight": 5 },
+      "life": 70, "damage": 26, "defense": 10, "knockbackResist": 0.3, "size": [2.2, 1.2], "moveSpeed": 4.2, "loot": "blood_crawler", "value": 100, "covers": ["terraria:blood_crawler"] },
+    { "id": "creeper", "model": "creeper", "tags": ["evil", "lava_immune"], "name": "Creeper", "description": "An eye grown from the Brain; it shields its master.",
+      "brain": { "type": "flyer", "aggroRange": 200, "orbitRadius": 4, "dashSpeed": 9, "dashCooldown": 90, "bounceOffTerrain": false },
+      "life": 100, "damage": 20, "defense": 10, "knockbackResist": 0.5, "size": [2, 2], "scale": 0.8, "moveSpeed": 6, "gravity": false, "collideTerrain": false, "value": 0 },
+    {
+      "id": "brain_of_cthulhu", "model": "brain_of_cthulhu", "tags": ["boss", "lava_immune"], "name": "Brain of Cthulhu",
+      "description": "A disembodied brain that commands the Crimson; its Creepers guard it until they fall.",
+      "brain": { "type": "pattern", "phases": [
+        { "below": 1.0, "shieldedBy": "creeper", "summon": { "enemy": "creeper", "max": 20, "once": true },
+          "moves": [{ "type": "hover", "ticks": 150, "speed": 4, "height": 3, "distance": 9 }, { "type": "teleport", "ticks": 60, "telegraph": 45, "distance": 10, "height": 2 }] },
+        { "below": 0.99, "model": "brain_of_cthulhu_exposed", "speed": 1.3, "damage": 1.3, "message": "The Brain of Cthulhu is exposed!",
+          "moves": [{ "type": "chase", "ticks": 150, "speed": 7 }, { "type": "teleport", "ticks": 20, "telegraph": 30, "distance": 8, "height": 1 },
+            { "type": "dash", "count": 2, "ticks": 30, "telegraph": 20, "speed": 16 }] }
+      ] },
+      "life": 3000, "damage": 30, "defense": 14, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
+      "loot": "brain_of_cthulhu", "value": 10000,
+      "boss": { "title": "Brain of Cthulhu", "flag": "defeated_brain_of_cthulhu", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 150, "music": "boss_brain" },
+      "covers": ["terraria:brain_of_cthulhu"]
+    }
+  ],
+  "spawnRules": [
+    { "id": "eater_of_souls_corruption", "enemy": "eater_of_souls", "weight": 4, "conditions": [{ "type": "layer", "any": ["surface", "underground"] }, { "type": "biome", "any": ["corruption"] }] },
+    { "id": "crimera_crimson", "enemy": "crimera", "weight": 4, "conditions": [{ "type": "layer", "any": ["surface", "underground"] }, { "type": "biome", "any": ["crimson"] }] },
+    { "id": "face_monster_crimson", "enemy": "face_monster", "weight": 2, "conditions": [{ "type": "time", "is": "night" }, { "type": "layer", "any": ["surface", "underground"] }, { "type": "biome", "any": ["crimson"] }] },
+    { "id": "blood_crawler_crimson", "enemy": "blood_crawler", "weight": 3, "conditions": [{ "type": "layer", "any": ["underground", "cavern"] }, { "type": "biome", "any": ["crimson"] }] }
+  ]
+}

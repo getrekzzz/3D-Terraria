@@ -1,0 +1,73 @@
+{
+  "lootTables": [
+    { "id": "tree_oak", "entries": [{ "item": "wood", "min": 6, "max": 12 }, { "item": "acorn", "min": 1, "max": 2, "chance": 0.6 }] },
+    { "id": "tree_pine", "entries": [{ "item": "boreal_wood", "min": 6, "max": 12 }, { "item": "acorn", "min": 1, "max": 2, "chance": 0.5 }] },
+    { "id": "tree_palm", "entries": [{ "item": "palm_wood", "min": 5, "max": 10 }] },
+    { "id": "tree_mahogany", "entries": [{ "item": "rich_mahogany", "min": 10, "max": 18 }] },
+    { "id": "cactus_plant", "entries": [{ "item": "cactus", "min": 3, "max": 6 }] },
+    { "id": "glowing_mushroom_giant", "entries": [{ "item": "glowing_mushroom", "min": 4, "max": 8 }, { "item": "truffle_worm", "chance": 0.06, "conditions": [{ "type": "flag", "id": "hardmode" }] }] },
+    { "id": "plant_mushroom", "entries": [{ "item": "mushroom" }] },
+    { "id": "plant_glowing_mushroom", "entries": [{ "item": "glowing_mushroom" }] },
+    { "id": "life_crystal_node", "entries": [{ "item": "life_crystal" }] },
+    { "id": "enchanted_sword_shrine", "mode": "weighted", "entries": [{ "item": "enchanted_sword", "weight": 1 }, { "item": "wooden_sword", "weight": 2 }] },
+    { "id": "pot", "mode": "weighted", "rolls": 1, "coins": [10, 300], "entries": [
+      { "item": "torch", "min": 4, "max": 12, "weight": 3 },
+      { "item": "lesser_healing_potion", "min": 1, "max": 2, "weight": 2 },
+      { "item": "wooden_arrow", "min": 10, "max": 25, "weight": 2 },
+      { "item": "gel", "min": 2, "max": 6, "weight": 1 },
+      { "item": "bomb", "min": 1, "max": 3, "weight": 0.6 },
+      { "item": "recall_potion", "weight": 0.4 },
+      { "item": "shuriken", "min": 10, "max": 25, "weight": 0.5, "conditions": [{ "type": "depth", "max": 40 }] }
+    ] },
+    { "id": "cabin_chest_primary", "mode": "weighted", "entries": [
+      { "item": "cloud_in_a_bottle", "weight": 1 }, { "item": "hermes_boots", "weight": 1 }, { "item": "band_of_regeneration", "weight": 1 },
+      { "item": "wand_of_sparking", "weight": 1 }, { "item": "lucky_horseshoe", "weight": 0.5 }, { "item": "aglet", "weight": 1 },
+      { "item": "magic_mirror", "weight": 1.2 }, { "item": "enchanted_boomerang", "weight": 0.8 },
+      { "item": "finch_staff", "weight": 2, "conditions": [{ "type": "biome", "any": ["forest"] }, { "type": "depth", "max": 12 }] },
+      { "item": "amazon", "weight": 2, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
+      { "item": "feral_claws", "weight": 2, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
+      { "item": "natures_gift", "weight": 1, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
+      { "item": "depth_meter", "weight": 0.8 }, { "item": "compass", "weight": 0.8 },
+      { "item": "boomstick", "weight": 1, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
+      { "item": "trident", "weight": 3, "conditions": [{ "type": "biome", "any": ["ocean"] }] },
+      { "item": "muramasa", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+      { "item": "handgun", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+      { "item": "blue_moon", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+      { "item": "water_bolt", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+      { "item": "sunfury", "weight": 2, "conditions": [{ "type": "biome", "any": ["underworld"] }] },
+      { "item": "dark_lance", "weight": 2, "conditions": [{ "type": "biome", "any": ["underworld"] }] },
+      { "item": "flamelash", "weight": 2, "conditions": [{ "type": "biome", "any": ["underworld"] }] },
+      { "item": "anklet_of_the_wind", "weight": 3, "conditions": [{ "type": "biome", "any": ["jungle", "hive"] }] },
+      { "item": "blizzard_in_a_bottle", "weight": 3, "conditions": [{ "type": "biome", "any": ["tundra"] }] },
+      { "item": "sandstorm_in_a_bottle", "weight": 3, "conditions": [{ "type": "biome", "any": ["desert", "underground_desert"] }] },
+      { "item": "cobalt_shield", "weight": 3, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+      { "item": "lava_charm", "weight": 3, "conditions": [{ "type": "biome", "any": ["underworld"] }] }
+    ] },
+    { "id": "cabin_chest", "coins": [500, 3000], "entries": [
+      { "table": "cabin_chest_primary" },
+      { "item": "torch", "min": 10, "max": 25, "chance": 0.7 },
+      { "item": "lesser_healing_potion", "min": 2, "max": 5, "chance": 0.6 },
+      { "item": "wooden_arrow", "min": 25, "max": 50, "chance": 0.5 },
+      { "item": "iron_bar", "min": 5, "max": 12, "chance": 0.35 },
+      { "item": "silver_bar", "min": 5, "max": 10, "chance": 0.25 },
+      { "item": "swiftness_potion", "min": 1, "max": 2, "chance": 0.3 },
+      { "item": "ironskin_potion", "min": 1, "max": 2, "chance": 0.3 },
+      { "item": "bomb", "min": 3, "max": 6, "chance": 0.3 },
+      { "item": "dynamite", "chance": 0.08 },
+      { "item": "recall_potion", "min": 1, "max": 3, "chance": 0.3 },
+      { "item": "musket_ball", "min": 30, "max": 60, "chance": 0.2 },
+      { "item": "throwing_knife", "min": 25, "max": 50, "chance": 0.15 }
+    ] },
+    { "id": "surface_chest", "coins": [200, 1200], "entries": [
+      { "item": "wooden_sword", "chance": 0.3 }, { "item": "wooden_bow", "chance": 0.3 },
+      { "item": "torch", "min": 5, "max": 15, "chance": 0.8 }, { "item": "lesser_healing_potion", "min": 1, "max": 3, "chance": 0.5 },
+      { "item": "copper_bar", "min": 3, "max": 9, "chance": 0.4 },
+      { "item": "wooden_boomerang", "chance": 0.2 }, { "item": "spear", "chance": 0.2 }, { "item": "wood_yoyo", "chance": 0.15 },
+      { "item": "shuriken", "min": 15, "max": 40, "chance": 0.25 }, { "item": "throwing_knife", "min": 15, "max": 40, "chance": 0.2 }
+    ] },
+    { "id": "sky_chest", "coins": [1500, 5000], "entries": [
+      { "item": "lucky_horseshoe", "chance": 0.4 }, { "item": "shiny_red_balloon", "chance": 0.4 }, { "item": "starfury", "chance": 0.35 }, { "item": "fledgling_wings", "chance": 0.25 },
+      { "item": "cloud_in_a_bottle", "chance": 0.3 }, { "item": "fallen_star", "min": 3, "max": 8 }
+    ] }
+  ]
+}

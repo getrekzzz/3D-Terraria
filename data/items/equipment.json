@@ -1,0 +1,277 @@
+{
+  "items": [
+    {
+      "id": "wooden_sword",
+      "name": "Wooden Sword",
+      "category": "weapon",
+      "value": 100,
+      "useStyle": "swing",
+      "useTime": 25,
+      "useAnimation": 25,
+      "damage": 7,
+      "damageType": "melee",
+      "knockback": 5,
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 150,
+          "length": 3.0
+        }
+      ],
+      "covers": [
+        "terraria:wooden_sword"
+      ]
+    },
+    {
+      "id": "wooden_hammer",
+      "name": "Wooden Hammer",
+      "category": "tool",
+      "value": 50,
+      "useStyle": "swing",
+      "useTime": 30,
+      "useAnimation": 33,
+      "autoReuse": true,
+      "damage": 2,
+      "damageType": "melee",
+      "knockback": 5.5,
+      "hammerPower": 25,
+      "covers": [
+        "terraria:wooden_hammer"
+      ]
+    },
+    {
+      "id": "wooden_bow",
+      "name": "Wooden Bow",
+      "category": "weapon",
+      "value": 100,
+      "useStyle": "shoot",
+      "useTime": 28,
+      "useAnimation": 28,
+      "damage": 4,
+      "damageType": "ranged",
+      "knockback": 0,
+      "useAmmo": "arrow",
+      "shootSpeed": 18,
+      "covers": [
+        "terraria:wooden_bow"
+      ]
+    },
+    {
+      "id": "wooden_arrow",
+      "name": "Wooden Arrow",
+      "category": "ammo",
+      "maxStack": 9999,
+      "value": 5,
+      "damage": 5,
+      "damageType": "ranged",
+      "knockback": 2,
+      "ammoClass": "arrow",
+      "projectile": "wooden_arrow",
+      "consumable": true,
+      "covers": [
+        "terraria:wooden_arrow"
+      ]
+    },
+    {
+      "id": "wand_of_sparking",
+      "name": "Wand of Sparking",
+      "description": "Spits sparks that cling and burn.",
+      "category": "weapon",
+      "rarity": 1,
+      "value": 10000,
+      "useStyle": "shoot",
+      "useTime": 22,
+      "useAnimation": 22,
+      "autoReuse": true,
+      "damage": 8,
+      "damageType": "magic",
+      "knockback": 0,
+      "manaCost": 2,
+      "projectile": "spark",
+      "shootSpeed": 14,
+      "covers": [
+        "terraria:wand_of_sparking"
+      ]
+    },
+    {
+      "id": "amethyst_staff",
+      "name": "Amethyst Staff",
+      "category": "weapon",
+      "value": 2000,
+      "useStyle": "shoot",
+      "useTime": 37,
+      "useAnimation": 37,
+      "damage": 14,
+      "damageType": "magic",
+      "knockback": 3.25,
+      "manaCost": 3,
+      "projectile": "amethyst_bolt",
+      "shootSpeed": 24,
+      "covers": [
+        "terraria:amethyst_staff"
+      ]
+    },
+    {
+      "id": "topaz_staff",
+      "name": "Topaz Staff",
+      "category": "weapon",
+      "value": 3000,
+      "useStyle": "shoot",
+      "useTime": 36,
+      "useAnimation": 36,
+      "damage": 15,
+      "damageType": "magic",
+      "knockback": 3.5,
+      "manaCost": 4,
+      "projectile": "topaz_bolt",
+      "shootSpeed": 25,
+      "covers": [
+        "terraria:topaz_staff"
+      ]
+    },
+    {
+      "id": "wood_helmet",
+      "name": "Wood Helmet",
+      "category": "armor",
+      "value": 50,
+      "equipSlot": "head",
+      "defense": 1,
+      "armorSet": "timber_armor",
+      "covers": [
+        "terraria:wood_helmet"
+      ]
+    },
+    {
+      "id": "wood_breastplate",
+      "name": "Wood Breastplate",
+      "category": "armor",
+      "value": 75,
+      "equipSlot": "body",
+      "defense": 1,
+      "armorSet": "timber_armor",
+      "covers": [
+        "terraria:wood_breastplate"
+      ]
+    },
+    {
+      "id": "wood_greaves",
+      "name": "Wood Greaves",
+      "category": "armor",
+      "value": 50,
+      "equipSlot": "legs",
+      "defense": 0,
+      "armorSet": "timber_armor",
+      "covers": [
+        "terraria:wood_greaves"
+      ]
+    },
+    {
+      "id": "cloud_in_a_bottle",
+      "name": "Cloud in a Bottle",
+      "description": "A second jump, carried by trapped wind.",
+      "category": "accessory",
+      "rarity": 1,
+      "value": 10000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "extraJump",
+          "height": 7
+        }
+      ],
+      "covers": [
+        "terraria:cloud_in_a_bottle"
+      ]
+    },
+    {
+      "id": "hermes_boots",
+      "name": "Hermes Boots",
+      "description": "Sprint far faster once you get going.",
+      "category": "accessory",
+      "rarity": 1,
+      "value": 10000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "stat",
+          "stat": "moveSpeed",
+          "add": 0.45
+        }
+      ],
+      "covers": [
+        "terraria:hermes_boots"
+      ]
+    },
+    {
+      "id": "lucky_horseshoe",
+      "name": "Lucky Horseshoe",
+      "description": "Negates fall damage.",
+      "category": "accessory",
+      "rarity": 1,
+      "value": 10000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "noFallDamage"
+        }
+      ],
+      "covers": [
+        "terraria:lucky_horseshoe"
+      ]
+    },
+    {
+      "id": "band_of_regeneration",
+      "name": "Band of Regeneration",
+      "description": "Slowly regenerates life.",
+      "category": "accessory",
+      "rarity": 1,
+      "value": 10000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "stat",
+          "stat": "lifeRegen",
+          "add": 1
+        }
+      ],
+      "covers": [
+        "terraria:band_of_regeneration"
+      ]
+    },
+    {
+      "id": "enchanted_sword",
+      "name": "Enchanted Sword",
+      "description": "Its edge sheds a wandering light.",
+      "category": "weapon",
+      "rarity": 2,
+      "value": 20000,
+      "useStyle": "swing",
+      "useTime": 20,
+      "useAnimation": 20,
+      "autoReuse": true,
+      "damage": 23,
+      "damageType": "melee",
+      "knockback": 4.5,
+      "projectile": "enchanted_beam",
+      "shootSpeed": 16,
+      "heldLight": [
+        4,
+        6,
+        10
+      ],
+      "behaviors": [
+        {
+          "type": "meleeSwing",
+          "arc": 170,
+          "length": 3.6
+        },
+        {
+          "type": "shootProjectile"
+        }
+      ],
+      "covers": [
+        "terraria:enchanted_sword"
+      ]
+    }
+  ]
+}

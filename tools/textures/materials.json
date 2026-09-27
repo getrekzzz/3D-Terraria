@@ -1,0 +1,880 @@
+{
+ "comment": "Texture recipes consumed by tools/textures/build_textures.py",
+ "materials": [
+  {
+   "name": "loam",
+   "type": "soil",
+   "base": "#7a5234",
+   "dark": "#553520",
+   "light": "#9a6c46",
+   "pebbles": 30
+  },
+  {
+   "name": "clay",
+   "type": "soil",
+   "base": "#a4553d",
+   "dark": "#7c3b28",
+   "light": "#c0705a",
+   "grit": 0.12,
+   "style": "clay"
+  },
+  {
+   "name": "sand",
+   "type": "soil",
+   "base": "#d8c27a",
+   "dark": "#b89e58",
+   "light": "#efdca0",
+   "grit": 0.35,
+   "roughness": 0.98,
+   "style": "sand"
+  },
+  {
+   "name": "packed_sand",
+   "type": "soil",
+   "base": "#c7ab66",
+   "dark": "#a88d4c",
+   "light": "#dcc584",
+   "grit": 0.2,
+   "style": "sand"
+  },
+  {
+   "name": "silt",
+   "type": "soil",
+   "base": "#7f7d78",
+   "dark": "#5f5d59",
+   "light": "#9c9a94",
+   "grit": 0.4,
+   "style": "powder"
+  },
+  {
+   "name": "mud",
+   "type": "soil",
+   "base": "#4d3a36",
+   "dark": "#33251f",
+   "light": "#65504a",
+   "grit": 0.15,
+   "roughness": 0.6,
+   "style": "mud"
+  },
+  {
+   "name": "snow",
+   "type": "soil",
+   "base": "#e8eef5",
+   "dark": "#c6d2e0",
+   "light": "#ffffff",
+   "grit": 0.1,
+   "roughness": 0.7,
+   "style": "snow"
+  },
+  {
+   "name": "slush",
+   "type": "soil",
+   "base": "#9aa6b0",
+   "dark": "#76828c",
+   "light": "#b8c4ce",
+   "grit": 0.3,
+   "roughness": 0.5,
+   "style": "mud"
+  },
+  {
+   "name": "ash",
+   "type": "soil",
+   "base": "#4e4644",
+   "dark": "#332d2c",
+   "light": "#6a6260",
+   "grit": 0.35,
+   "style": "powder"
+  },
+  {
+   "name": "cloud",
+   "type": "soil",
+   "base": "#eef2f8",
+   "dark": "#d4dae6",
+   "light": "#ffffff",
+   "grit": 0.05,
+   "roughness": 1.0,
+   "style": "cloud"
+  },
+  {
+   "name": "rain_cloud",
+   "type": "soil",
+   "base": "#8a97a8",
+   "dark": "#6a7788",
+   "light": "#a8b4c4",
+   "grit": 0.08,
+   "roughness": 1.0,
+   "style": "cloud"
+  },
+  {
+   "name": "grass",
+   "type": "grass",
+   "base": "#4f9a3a",
+   "dark": "#2f6a24",
+   "light": "#79c052",
+   "flower": "#f0e060",
+   "soil": "#3b2a1c"
+  },
+  {
+   "name": "jungle_grass",
+   "type": "grass",
+   "base": "#3fae4a",
+   "dark": "#1f7a30",
+   "light": "#6ed26a",
+   "soil": "#3b2a1c"
+  },
+  {
+   "name": "umbral_grass",
+   "type": "grass",
+   "base": "#6b5a8e",
+   "dark": "#43375e",
+   "light": "#9080b8"
+  },
+  {
+   "name": "sanguine_grass",
+   "type": "grass",
+   "base": "#b43a3a",
+   "dark": "#7a2020",
+   "light": "#d86060"
+  },
+  {
+   "name": "mushroom_grass",
+   "type": "grass",
+   "base": "#4d6fe0",
+   "dark": "#2a3c90",
+   "light": "#90b8ff"
+  },
+  {
+   "name": "moss",
+   "type": "grass",
+   "base": "#5d7d45",
+   "dark": "#3a5228",
+   "light": "#80a060",
+   "style": "moss"
+  },
+  {
+   "name": "glow_moss",
+   "type": "grass",
+   "base": "#3fd3a0",
+   "dark": "#1a8a66",
+   "light": "#a0ffe0",
+   "style": "moss"
+  },
+  {
+   "name": "stone",
+   "type": "rock",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.5,
+   "strata": 0.25
+  },
+  {
+   "name": "deepstone",
+   "type": "rock",
+   "base": "#4d4e57",
+   "dark": "#34353c",
+   "light": "#63646e",
+   "cells": 26,
+   "cracks": 0.6,
+   "strata": 0.4
+  },
+  {
+   "name": "sandstone",
+   "type": "rock",
+   "base": "#c89a58",
+   "dark": "#a07840",
+   "light": "#e0b878",
+   "cells": 10,
+   "cracks": 0.2,
+   "strata": 1.0,
+   "strata_bands": 5
+  },
+  {
+   "name": "fossil",
+   "type": "speckled",
+   "base": "#bfae8a",
+   "dark": "#9a8a68",
+   "light": "#dccca8",
+   "cells": 14,
+   "cracks": 0.3,
+   "speck_a": "#f0e8d8"
+  },
+  {
+   "name": "ice",
+   "type": "rock",
+   "base": "#9ecbe8",
+   "dark": "#78a8cc",
+   "light": "#d0ecff",
+   "cells": 8,
+   "cracks": 0.8,
+   "roughness": 0.15,
+   "style": "ice"
+  },
+  {
+   "name": "obsidian",
+   "type": "veined",
+   "base": "#2b2335",
+   "dark": "#150f1c",
+   "light": "#44385a",
+   "cells": 12,
+   "cracks": 0.4,
+   "roughness": 0.2,
+   "vein": "#6a4a9a",
+   "vein_width": 0.02,
+   "facet": 0.6
+  },
+  {
+   "name": "marble",
+   "type": "veined",
+   "base": "#d9d6ce",
+   "dark": "#bdb8ac",
+   "light": "#f0ede6",
+   "cells": 8,
+   "cracks": 0.1,
+   "roughness": 0.35,
+   "vein": "#8a8478",
+   "vein_width": 0.025,
+   "facet": 0.3
+  },
+  {
+   "name": "granite",
+   "type": "speckled",
+   "base": "#3a3f5c",
+   "dark": "#262a40",
+   "light": "#555b80",
+   "cells": 30,
+   "cracks": 0.3,
+   "speck_a": "#c0c4d8",
+   "speck_b": "#101218",
+   "roughness": 0.5
+  },
+  {
+   "name": "umbral_stone",
+   "type": "rock",
+   "base": "#4a3c63",
+   "dark": "#2e2440",
+   "light": "#655482",
+   "cells": 16,
+   "cracks": 0.7
+  },
+  {
+   "name": "sanguine_stone",
+   "type": "rock",
+   "base": "#7d2e2e",
+   "dark": "#551a1a",
+   "light": "#a04444",
+   "cells": 16,
+   "cracks": 0.7
+  },
+  {
+   "name": "hive",
+   "type": "hive",
+   "base": "#c7862b",
+   "dark": "#8a5a14",
+   "light": "#f0b850"
+  },
+  {
+   "name": "abyssal_rock",
+   "type": "rock",
+   "base": "#1a1418",
+   "dark": "#0a080a",
+   "light": "#302830",
+   "cells": 20,
+   "cracks": 0.8
+  },
+  {
+   "name": "copper_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#d9824f",
+   "metallic": 0.8
+  },
+  {
+   "name": "tin_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#c8c0a0",
+   "metallic": 0.8
+  },
+  {
+   "name": "iron_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#b09080",
+   "metallic": 0.7
+  },
+  {
+   "name": "lead_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#6a7888",
+   "metallic": 0.7
+  },
+  {
+   "name": "silver_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#e0e6ec",
+   "metallic": 0.9
+  },
+  {
+   "name": "tungsten_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#8ab888",
+   "metallic": 0.8
+  },
+  {
+   "name": "gold_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#f0cc40",
+   "metallic": 1.0
+  },
+  {
+   "name": "platinum_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#c8d8e8",
+   "metallic": 0.9
+  },
+  {
+   "name": "umbrite_ore",
+   "type": "ore",
+   "base": "#4a3c63",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#8a60d0",
+   "metallic": 0.6
+  },
+  {
+   "name": "sanguite_ore",
+   "type": "ore",
+   "base": "#7d2e2e",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#e04860",
+   "metallic": 0.6
+  },
+  {
+   "name": "meteorite",
+   "type": "ore",
+   "base": "#5a3a2a",
+   "dark": "#3a2418",
+   "light": "#7a5040",
+   "cells": 14,
+   "cracks": 0.8,
+   "ore": "#ff7a30",
+   "metallic": 0.5,
+   "nugget_size": 0.25
+  },
+  {
+   "name": "cinderstone",
+   "type": "ore",
+   "base": "#6a2a1a",
+   "dark": "#3a120a",
+   "light": "#8a3a20",
+   "cells": 14,
+   "cracks": 0.9,
+   "ore": "#ff5a10",
+   "metallic": 0.2,
+   "nugget_size": 0.45,
+   "nuggets": 30
+  },
+  {
+   "name": "amethyst_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#b070f0",
+   "metallic": 0.1,
+   "nuggets": 10,
+   "nugget_size": 0.22
+  },
+  {
+   "name": "topaz_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#f0c030",
+   "metallic": 0.1,
+   "nuggets": 10,
+   "nugget_size": 0.22
+  },
+  {
+   "name": "sapphire_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#3a78f0",
+   "metallic": 0.1,
+   "nuggets": 10,
+   "nugget_size": 0.22
+  },
+  {
+   "name": "emerald_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#30d070",
+   "metallic": 0.1,
+   "nuggets": 10,
+   "nugget_size": 0.22
+  },
+  {
+   "name": "ruby_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#f02840",
+   "metallic": 0.1,
+   "nuggets": 10,
+   "nugget_size": 0.22
+  },
+  {
+   "name": "diamond_ore",
+   "type": "ore",
+   "base": "#72737a",
+   "dark": "#55565c",
+   "light": "#8d8e96",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#e8f8ff",
+   "metallic": 0.1,
+   "nuggets": 10,
+   "nugget_size": 0.22
+  },
+  {
+   "name": "crystal",
+   "type": "translucent",
+   "base": "#9a6ae0",
+   "light": "#f0d8ff",
+   "alpha": 0.7,
+   "facets": 12
+  },
+  {
+   "name": "planks",
+   "type": "planks",
+   "base": "#a0703c",
+   "dark": "#6a4420",
+   "light": "#c08a50",
+   "count": 4
+  },
+  {
+   "name": "pine_planks",
+   "type": "planks",
+   "base": "#8a6a4a",
+   "dark": "#5a4028",
+   "light": "#a8886a",
+   "count": 4
+  },
+  {
+   "name": "jungle_planks",
+   "type": "planks",
+   "base": "#7a3a2c",
+   "dark": "#4a1c14",
+   "light": "#9a5040",
+   "count": 4
+  },
+  {
+   "name": "palm_planks",
+   "type": "planks",
+   "base": "#c89a5c",
+   "dark": "#987038",
+   "light": "#e0b878",
+   "count": 5
+  },
+  {
+   "name": "living_wood",
+   "type": "planks",
+   "base": "#6a4a2a",
+   "dark": "#402810",
+   "light": "#8a6440",
+   "count": 2
+  },
+  {
+   "name": "leaves",
+   "type": "leaves",
+   "base": "#3c7d2a",
+   "dark": "#23501a",
+   "light": "#5ea040"
+  },
+  {
+   "name": "stone_brick",
+   "type": "bricks",
+   "base": "#7c7e86",
+   "dark": "#5c5e66",
+   "light": "#9c9ea6",
+   "mortar": "#4a4a4a"
+  },
+  {
+   "name": "red_brick",
+   "type": "bricks",
+   "base": "#a24a36",
+   "dark": "#7a3224",
+   "light": "#c06048",
+   "mortar": "#8a8070"
+  },
+  {
+   "name": "sandstone_brick",
+   "type": "bricks",
+   "base": "#caa062",
+   "dark": "#a07840",
+   "light": "#e0b878",
+   "mortar": "#8a7050",
+   "rows": 3,
+   "cols": 2
+  },
+  {
+   "name": "snow_brick",
+   "type": "bricks",
+   "base": "#dfe8f2",
+   "dark": "#b8c8d8",
+   "light": "#ffffff",
+   "mortar": "#a0b0c0"
+  },
+  {
+   "name": "mud_brick",
+   "type": "bricks",
+   "base": "#5a4540",
+   "dark": "#3a2a26",
+   "light": "#7a605a",
+   "mortar": "#2a2020"
+  },
+  {
+   "name": "copper_brick",
+   "type": "bricks",
+   "base": "#c07a4a",
+   "dark": "#8a5030",
+   "light": "#e09a68",
+   "mortar": "#503020",
+   "metallic": 0.8,
+   "roughness": 0.4,
+   "rows": 2,
+   "cols": 1
+  },
+  {
+   "name": "gold_brick",
+   "type": "bricks",
+   "base": "#e0bb40",
+   "dark": "#a08020",
+   "light": "#fff080",
+   "mortar": "#604810",
+   "metallic": 1.0,
+   "roughness": 0.3,
+   "rows": 2,
+   "cols": 1
+  },
+  {
+   "name": "azure_brick",
+   "type": "bricks",
+   "base": "#34508a",
+   "dark": "#1e3060",
+   "light": "#5070b0",
+   "mortar": "#182030"
+  },
+  {
+   "name": "verdant_brick",
+   "type": "bricks",
+   "base": "#3a7050",
+   "dark": "#204830",
+   "light": "#58906c",
+   "mortar": "#15251c"
+  },
+  {
+   "name": "rose_brick",
+   "type": "bricks",
+   "base": "#8a3a5e",
+   "dark": "#5a2038",
+   "light": "#b0587c",
+   "mortar": "#2a1420"
+  },
+  {
+   "name": "obsidian_brick",
+   "type": "bricks",
+   "base": "#2d2438",
+   "dark": "#15101c",
+   "light": "#4a3c5a",
+   "mortar": "#0a080c",
+   "roughness": 0.3
+  },
+  {
+   "name": "cinder_brick",
+   "type": "bricks",
+   "base": "#a8401e",
+   "dark": "#6a200a",
+   "light": "#d86030",
+   "mortar": "#2a1008"
+  },
+  {
+   "name": "sky_brick",
+   "type": "bricks",
+   "base": "#9fd0e8",
+   "dark": "#70a8c8",
+   "light": "#d0f0ff",
+   "mortar": "#e8d890",
+   "rows": 2,
+   "cols": 2
+  },
+  {
+   "name": "glass",
+   "type": "translucent",
+   "base": "#cfe8f0",
+   "light": "#ffffff",
+   "alpha": 0.25,
+   "facets": 3,
+   "frame": "#a0b8c0"
+  },
+  {
+   "name": "cobweb",
+   "type": "web",
+   "base": "#e8e8e8"
+  },
+  {
+   "name": "missing",
+   "type": "missing"
+  },
+  {
+   "name": "honey_block",
+   "type": "hive",
+   "base": "#e8a42a",
+   "dark": "#b87010",
+   "light": "#ffd878"
+  },
+  {
+   "name": "crispy_honey",
+   "type": "hive",
+   "base": "#8a4a14",
+   "dark": "#4a2206",
+   "light": "#c07a30"
+  },
+  {
+   "name": "hallowed_grass",
+   "type": "grass",
+   "base": "#6fd0e8",
+   "dark": "#3f98b8",
+   "light": "#b8f0ff"
+  },
+  {
+   "name": "pearlstone",
+   "type": "rock",
+   "base": "#d8cce0",
+   "dark": "#b0a0c0",
+   "light": "#f4ecf8",
+   "cells": 16,
+   "cracks": 0.5
+  },
+  {
+   "name": "pearlsand",
+   "type": "soil",
+   "base": "#e8dcec",
+   "dark": "#c8b8d0",
+   "light": "#fff4ff",
+   "grit": 0.35,
+   "roughness": 0.98,
+   "style": "sand"
+  },
+  {
+   "name": "pink_ice",
+   "type": "rock",
+   "base": "#f0b8dc",
+   "dark": "#d08cb8",
+   "light": "#ffe0f4",
+   "cells": 8,
+   "cracks": 0.8,
+   "roughness": 0.15,
+   "style": "ice"
+  },
+  {
+   "name": "umbral_sand",
+   "type": "soil",
+   "base": "#7a6a90",
+   "dark": "#5a4c70",
+   "light": "#9a8ab0",
+   "grit": 0.35,
+   "roughness": 0.98,
+   "style": "sand"
+  },
+  {
+   "name": "umbral_ice",
+   "type": "rock",
+   "base": "#a894d8",
+   "dark": "#806cb0",
+   "light": "#d0c0f4",
+   "cells": 8,
+   "cracks": 0.8,
+   "roughness": 0.15,
+   "style": "ice"
+  },
+  {
+   "name": "sanguine_sand",
+   "type": "soil",
+   "base": "#9a5a58",
+   "dark": "#7a3c3a",
+   "light": "#c07a78",
+   "grit": 0.35,
+   "roughness": 0.98,
+   "style": "sand"
+  },
+  {
+   "name": "sanguine_ice",
+   "type": "rock",
+   "base": "#e8a8a8",
+   "dark": "#c07a7a",
+   "light": "#ffd0d0",
+   "cells": 8,
+   "cracks": 0.8,
+   "roughness": 0.15,
+   "style": "ice"
+  },
+  {
+   "name": "cerulite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#3a86f0",
+   "metallic": 0.85
+  },
+  {
+   "name": "rosalite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#f08a58",
+   "metallic": 0.85
+  },
+  {
+   "name": "verdite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#38d878",
+   "metallic": 0.85
+  },
+  {
+   "name": "orchidite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#f06ac0",
+   "metallic": 0.85
+  },
+  {
+   "name": "crimsite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#e8283c",
+   "metallic": 0.85
+  },
+  {
+   "name": "stellite_ore",
+   "type": "ore",
+   "base": "#4d4e57",
+   "dark": "#35363d",
+   "light": "#65666f",
+   "cells": 18,
+   "cracks": 0.4,
+   "ore": "#dce8f8",
+   "metallic": 0.85
+  },
+  {
+   "name": "lihzahrd_brick",
+   "type": "bricks",
+   "base": "#8a5a2a",
+   "dark": "#5a3a1a",
+   "light": "#b07a40",
+   "mortar": "#3a2410",
+   "roughness": 0.5
+  },
+  {
+   "name": "chlorophyte_ore",
+   "type": "ore",
+   "base": "#4d3a36",
+   "dark": "#33251f",
+   "light": "#65504a",
+   "cells": 16,
+   "cracks": 0.5,
+   "ore": "#5ae05a",
+   "metallic": 0.4
+  },
+  {
+   "name": "luminite",
+   "type": "ore",
+   "base": "#1a3a3a",
+   "dark": "#0a2020",
+   "light": "#2a5a5a",
+   "cells": 14,
+   "cracks": 0.6,
+   "ore": "#6affd0",
+   "metallic": 0.7
+  }
+ ]
+}

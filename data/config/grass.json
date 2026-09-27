@@ -1,0 +1,19 @@
+{
+  // Grass blades scattered over the upward faces of grass blocks (src/Strata.Core/Meshing/GrassScatter.cs), drawn
+  // as instanced clumps by game/World/GrassRenderer.cs. Every block tagged "grass" needs a kind here.
+  //   color   mid-blade colour (roots are darker, tips lighter and warmer); each clump varies a little around it
+  //   height  clump height range in metres
+  //   density relative clump density (1 = clumpsPerSquareMeter)
+  //   glow    self-illumination of the tips (glowcap grass), 0–1
+  //   flowers chance that a clump carries a flower head, and the flower colours to pick from
+  "clumpsPerSquareMeter": 14,
+  "minUpward": 0.55,
+  "kinds": {
+    "grass":          { "color": "#5b8a2e", "height": [0.22, 0.46], "density": 1.0, "flowers": 0.035, "flowerColors": ["#f2d23a", "#f4f1e8", "#c9529a", "#7f8ee8"] },
+    "jungle_grass":   { "color": "#3f9436", "height": [0.4, 0.85], "density": 1.2, "flowers": 0.02, "flowerColors": ["#e85a3a", "#f0a030", "#d040a0"] },
+    "corrupt_grass":   { "color": "#6a5a92", "height": [0.18, 0.38], "density": 0.8 },
+    "crimson_grass": { "color": "#a23a3c", "height": [0.18, 0.38], "density": 0.8 },
+    "mushroom_grass": { "color": "#4a6fe0", "height": [0.12, 0.28], "density": 0.7, "glow": 0.55 },
+    "hallowed_grass": { "color": "#68b4c0", "height": [0.22, 0.46], "density": 1.0, "flowers": 0.05, "flowerColors": ["#f0a0e0", "#a0e8f8", "#fff4c0"] }
+  }
+}

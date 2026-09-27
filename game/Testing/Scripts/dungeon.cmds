@@ -1,0 +1,33 @@
+# Dungeon: the keeper at the crypt gate, the guardian that only haunts the crypt, the curse broken at night and
+# the Crypt Warden's fall freeing the keeper.
+wait_until player.frozen == 0 180
+spawning off
+town arrivals off
+heal
+tp landmark dungeon_gate
+wait_until town.old_man == 1 60
+assert zone.dungeon == 0
+assert errors == 0
+
+# The guardian does not follow anyone out of the crypt.
+spawn dungeon_guardian 1 8
+wait 1
+assert npcs.dungeon_guardian == 0
+
+# By night the keeper calls out the Crypt Warden and becomes it.
+time 22
+town curse old_man
+assert npcs.skeletron == 1
+assert town.old_man.alive == 0
+wait 3
+heal
+assert npcs.skeletron == 1
+
+# Its fall lifts the curse: the keeper leaves town for good.
+slay skeletron
+assert flag.defeated_skeletron == 1
+assert npcs.skeletron == 0
+wait 1.5
+assert town.old_man == 0
+time noon
+assert errors == 0

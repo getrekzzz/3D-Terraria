@@ -1,0 +1,33 @@
+{
+  // World events. Night events roll at dusk and day events at dawn (chance + conditions); manual events are
+  // started by items, progression or commands. Spawn rules react through { "type": "event", "id": ... }.
+  "events": [
+    {
+      "id": "blood_moon", "name": "Blood Moon", "phase": "night", "chance": 0.11,
+      "conditions": [{ "type": "moon", "phases": [1, 2, 3, 5, 6, 7] }],
+      "spawnRateMultiplier": 2.5, "maxNearbyBonus": 4, "skyTint": "#b83030", "preventsSleep": true,
+      "startMessage": "The Blood Moon is rising...", "endMessage": "The Blood Moon has set.",
+      "covers": ["terraria:blood_moon"]
+    },
+    {
+      "id": "slime_rain", "name": "Slime Rain", "phase": "day", "chance": 0.03,
+      "spawnRateMultiplier": 3, "maxNearbyBonus": 6, "killGoal": 60, "killTag": "gel",
+      "startMessage": "Slime is falling from the sky!", "endMessage": "Slime has stopped falling from the sky.",
+      "covers": ["terraria:slime_rain"]
+    },
+    {
+      "id": "goblin_army", "name": "Goblin Army", "phase": "day", "chance": 0.12,
+      "conditions": [{ "type": "flag", "id": "smashed_orb" }, { "type": "maxLife", "min": 200 }],
+      "spawnRateMultiplier": 4, "maxNearbyBonus": 8, "killGoal": 80, "killTag": "goblin", "completionFlag": "defeated_goblin_army",
+      "startMessage": "A goblin army is approaching!", "endMessage": "The goblin army has been defeated!",
+      "covers": ["terraria:goblin_army"]
+    },
+    {
+      "id": "lunar_events", "name": "Lunar Events", "phase": "manual", "startsWhen": "defeated_lunatic_cultist",
+      "places": ["solar_pillar", "nebula_pillar", "vortex_pillar", "stardust_pillar"],
+      "killGoal": 4, "killTag": "celestial_pillar", "finaleEnemy": "moon_lord", "completionFlag": "defeated_pillars",
+      "startMessage": "The Celestial Pillars have appeared across the land!", "endMessage": "Impending doom approaches...",
+      "covers": ["terraria:lunar_events", "terraria:celestial_pillars"]
+    }
+  ]
+}

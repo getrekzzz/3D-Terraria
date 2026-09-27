@@ -1,0 +1,69 @@
+{
+  // The Queen Bee: woken by breaking the larva at the heart of a jungle hive, or by an Abeemination in the jungle.
+  "projectiles": [
+    { "id": "queen_stinger", "name": "Stinger", "visual": "bolt", "color": "#e8c83a", "lifetime": 150, "radius": 0.35, "friendly": false, "hostile": true,
+      "onHit": [{ "type": "applyBuff", "buff": "poisoned", "ticks": 300, "chance": 0.5 }] },
+    { "id": "bee_shot", "name": "Bee", "visual": "bolt", "color": "#f0c83a", "lifetime": 150, "radius": 0.35, "homing": 5, "trail": "#ffe070",
+      "onHit": [{ "type": "applyBuff", "buff": "poisoned", "ticks": 120, "chance": 0.2 }] },
+    { "id": "beenade", "name": "Beenade", "visual": "item", "gravity": 14, "drag": 0.3, "lifetime": 150, "radius": 0.4, "bounces": 99, "fuse": true,
+      "onHit": [{ "type": "explode", "radius": 3, "damage": 12 }] }
+  ],
+  "tileObjects": [
+    { "id": "bee_larva", "name": "Larva", "description": "Something big grows in here.", "size": [2, 2, 2], "anchor": "none", "hitPoints": 1, "light": [6, 5, 1],
+      "natural": true, "autoItem": false, "onBreak": { "counter": "larvae", "summon": "queen_bee", "every": 1 } }
+  ],
+  "items": [
+    { "id": "abeemination", "name": "Abeemination", "description": "Summons the Queen Bee. Use in the Jungle.", "category": "bossSummon", "rarity": 1, "maxStack": 20, "value": 5000,
+      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+      "behaviors": [{ "type": "summonBoss", "enemy": "queen_bee", "conditions": [{ "type": "biome", "any": ["jungle", "hive"] }], "failMessage": "Nothing buzzes outside the Jungle." }],
+      "covers": ["terraria:abeemination"] },
+    { "id": "bee_wax", "name": "Bee Wax", "category": "material", "maxStack": 9999, "value": 200 },
+    { "id": "bee_gun", "name": "Bee Gun", "description": "Shoots bees that will chase your enemy.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "shoot", "useTime": 12, "useAnimation": 12,
+      "autoReuse": true, "damage": 9, "damageType": "magic", "manaCost": 4, "projectile": "bee_shot", "shootSpeed": 12, "behaviors": [{ "type": "shootProjectile", "count": 2, "spread": 12 }],
+      "covers": ["terraria:bee_gun"] },
+    { "id": "bee_keeper", "name": "Bee Keeper", "description": "Summons killer bees after striking your foe.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "swing", "useTime": 20, "useAnimation": 20,
+      "autoReuse": true, "damage": 30, "damageType": "melee", "knockback": 5.3, "projectile": "bee_shot", "shootSpeed": 8,
+      "behaviors": [{ "type": "meleeSwing", "arc": 170, "length": 3.8 }, { "type": "shootProjectile" }] },
+    { "id": "bees_knees", "name": "The Bee's Knees", "description": "Wooden arrows turn into a column of bees.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "shoot", "useTime": 23, "useAnimation": 23,
+      "autoReuse": true, "damage": 23, "damageType": "ranged", "useAmmo": "arrow", "shootSpeed": 22, "behaviors": [{ "type": "shootProjectile", "count": 2, "spread": 4 }] },
+    { "id": "beenade", "name": "Beenade", "category": "weapon", "maxStack": 9999, "value": 200, "useStyle": "shoot", "useTime": 25, "useAnimation": 25, "consumable": true,
+      "damage": 12, "damageType": "summon", "projectile": "beenade", "shootSpeed": 12 },
+    { "id": "honey_comb", "name": "Honey Comb", "description": "Releases bees and briefly speeds regeneration when damaged.", "category": "accessory", "rarity": 3, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "lifeRegen", "add": 1 }] },
+    { "id": "hive_pack", "name": "Hive Pack", "description": "Increases the strength of friendly bees.", "category": "accessory", "rarity": 3, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "summonDamage", "add": 0.1 }, { "type": "stat", "stat": "magicDamage", "add": 0.05 }], "covers": ["terraria:hive_pack"] },
+    { "id": "royal_gel", "name": "Royal Gel", "description": "Slimes become friendly.", "category": "accessory", "rarity": 3, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "pacify", "tag": "gel" }], "covers": ["terraria:royal_gel"] }
+  ],
+  "recipes": [
+    { "id": "abeemination", "output": "abeemination", "inputs": [{ "item": "hive", "count": 5 }, { "item": "stinger", "count": 1 }, { "item": "jungle_spores", "count": 5 }], "stations": ["work_bench"] }
+  ],
+  "lootTables": [
+    { "id": "queen_bee", "coins": [10000, 16000], "entries": [
+      { "table": "queen_bee_weapon" },
+      { "item": "bee_wax", "min": 17, "max": 29 }, { "item": "beenade", "min": 10, "max": 30, "chance": 0.5 }, { "item": "honey_comb", "chance": 0.33 },
+      { "item": "lesser_healing_potion", "min": 5, "max": 10 },
+      { "item": "hive_pack", "conditions": [{ "type": "difficulty", "min": 1 }] }
+    ] },
+    { "id": "queen_bee_weapon", "mode": "weighted", "entries": [{ "item": "bee_gun" }, { "item": "bee_keeper" }, { "item": "bees_knees" }] }
+  ],
+  "enemies": [
+    { "id": "bee", "model": "bee", "tags": ["lava_immune"], "name": "Bee", "brain": { "type": "flyer", "aggroRange": 150, "orbitRadius": 1, "dashSpeed": 10, "dashCooldown": 40, "bounceOffTerrain": false },
+      "life": 8, "damage": 20, "defense": 0, "knockbackResist": 0, "size": [1.6, 1.6], "scale": 0.5, "moveSpeed": 8, "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:bee"] },
+    {
+      "id": "queen_bee", "model": "queen_bee", "tags": ["boss", "lava_immune"], "name": "Queen Bee", "description": "The mother of the hive, furious at the loss of her larva.",
+      "brain": { "type": "pattern", "phases": [
+        { "below": 1.0, "summon": { "enemy": "bee", "interval": 120, "max": 8, "count": 3 },
+          "moves": [{ "type": "dash", "count": 3, "telegraph": 30, "ticks": 45, "speed": 18 },
+            { "type": "hover", "ticks": 220, "speed": 9, "height": 5, "distance": 5, "volley": { "projectile": "queen_stinger", "damage": 22, "speed": 16, "interval": 25, "spread": 6 } }] },
+        { "below": 0.5, "speed": 1.25, "damage": 1.15, "summon": { "enemy": "bee", "interval": 90, "max": 10, "count": 3 },
+          "moves": [{ "type": "dash", "count": 4, "telegraph": 22, "ticks": 40, "speed": 21 },
+            { "type": "hover", "ticks": 180, "speed": 10, "height": 5, "distance": 5, "volley": { "projectile": "queen_stinger", "damage": 24, "speed": 18, "interval": 18, "spread": 8 } }] }
+      ] },
+      "life": 3400, "damage": 30, "defense": 8, "knockbackResist": 1.0, "size": [2, 1.7], "scale": 3, "moveSpeed": 9, "gravity": false, "collideTerrain": false,
+      "loot": "queen_bee", "value": 10000,
+      "boss": { "title": "Queen Bee", "flag": "defeated_queen_bee", "arenaRadius": 150, "music": "boss_bee" },
+      "covers": ["terraria:queen_bee"]
+    }
+  ]
+}

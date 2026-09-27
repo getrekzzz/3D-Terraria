@@ -1,0 +1,28 @@
+{
+  "recipes": [
+    { "id": "gray_brick", "output": "gray_brick", "inputs": [{ "item": "stone", "count": 2 }], "stations": ["furnace"] },
+    { "id": "red_brick", "output": "red_brick", "inputs": [{ "item": "clay", "count": 2 }], "stations": ["furnace"] },
+    { "id": "sandstone_brick", "output": "sandstone_brick", "inputs": [{ "item": "sandstone", "count": 2 }], "stations": ["furnace"] },
+    { "id": "snow_brick", "output": "snow_brick", "inputs": [{ "item": "snow", "count": 2 }], "stations": ["work_bench"] },
+    { "id": "mud_brick", "output": "mud_brick", "inputs": [{ "item": "mud", "count": 2 }], "stations": ["furnace"] },
+    { "id": "copper_brick", "output": "copper_brick", "inputs": [{ "item": "stone", "count": 1 }, { "item": "copper_ore", "count": 1 }], "stations": ["furnace"] },
+    { "id": "gold_brick", "output": "gold_brick", "inputs": [{ "item": "stone", "count": 1 }, { "item": "gold_ore", "count": 1 }], "stations": ["furnace"] },
+    { "id": "obsidian_brick", "output": "obsidian_brick", "inputs": [{ "item": "obsidian", "count": 2 }], "stations": ["furnace"] },
+    { "id": "hellstone_brick", "output": "hellstone_brick", "inputs": [{ "item": "hellstone", "count": 1 }, { "item": "ash", "count": 1 }], "stations": ["furnace"] },
+    { "id": "sunplate_block", "output": "sunplate_block", "inputs": [{ "item": "stone", "count": 1 }, { "item": "fallen_star", "count": 1 }], "stations": ["furnace"] },
+    { "id": "glass", "output": "glass", "inputs": [{ "item": "sand", "count": 2 }], "stations": ["furnace"] },
+    { "id": "bottle", "output": "bottle", "count": 2, "inputs": [{ "item": "glass", "count": 1 }], "stations": ["furnace"] },
+    { "id": "silk", "output": "silk", "inputs": [{ "item": "cobweb", "count": 7 }], "stations": ["loom"] },
+    { "id": "lesser_healing_potion", "output": "lesser_healing_potion", "count": 2, "inputs": [{ "item": "mushroom", "count": 2 }, { "item": "gel", "count": 2 }, { "item": "bottle", "count": 2 }], "stations": ["alchemy"] },
+    { "id": "lesser_mana_potion", "output": "lesser_mana_potion", "count": 2, "inputs": [{ "item": "gel", "count": 2 }, { "item": "fallen_star", "count": 1 }, { "item": "bottle", "count": 2 }], "stations": ["alchemy"] },
+    { "id": "mana_crystal", "output": "mana_crystal", "inputs": [{ "item": "fallen_star", "count": 5 }] },
+    { "id": "swiftness_potion", "output": "swiftness_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "glowing_mushroom", "count": 1 }, { "item": "cactus", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
+    { "id": "ironskin_potion", "output": "ironskin_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "iron_ore", "count": 1 }, { "item": "mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
+    { "id": "amethyst_staff", "output": "amethyst_staff", "inputs": [{ "item": "copper_bar", "count": 10 }, { "item": "amethyst", "count": 8 }], "stations": ["anvil"] },
+    { "id": "topaz_staff", "output": "topaz_staff", "inputs": [{ "item": "tin_bar", "count": 10 }, { "item": "topaz", "count": 8 }], "stations": ["anvil"] },
+    { "id": "slime_crown", "output": "slime_crown", "inputs": [{ "item": "gel", "count": 20 }, { "item": "gold_bar", "count": 4 }], "stations": ["work_bench"] },
+    { "id": "slime_crown_platinum", "output": "slime_crown", "inputs": [{ "item": "gel", "count": 20 }, { "item": "platinum_bar", "count": 4 }], "stations": ["work_bench"] },
+    { "id": "suspicious_looking_eye", "output": "suspicious_looking_eye", "inputs": [{ "item": "lens", "count": 6 }], "stations": ["demon_altar"] },
+    { "id": "worm_food", "output": "worm_food", "inputs": [{ "item": "rotten_chunk", "count": 15 }, { "item": "vile_powder", "count": 30 }], "stations": ["demon_altar"] }
+  ]
+}

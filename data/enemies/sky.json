@@ -1,0 +1,346 @@
+{
+  // The sky: Harpies over the floating islands, and in hardmode the Wyvern, whose Souls of Flight make wings.
+  "projectiles": [
+    {
+      "id": "harpy_feather",
+      "name": "Feather",
+      "visual": "bolt",
+      "color": "#8ab0e8",
+      "lifetime": 180,
+      "radius": 0.35,
+      "friendly": false,
+      "hostile": true
+    }
+  ],
+  "items": [
+    {
+      "id": "soul_of_flight",
+      "name": "Soul of Flight",
+      "description": "The essence of powerful flying creatures.",
+      "category": "material",
+      "rarity": 5,
+      "maxStack": 9999,
+      "value": 4000,
+      "covers": [
+        "terraria:soul_of_flight"
+      ]
+    },
+    {
+      "id": "angel_wings",
+      "name": "Angel Wings",
+      "description": "Allows flight and slow fall.",
+      "category": "accessory",
+      "rarity": 5,
+      "value": 80000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "flight",
+          "time": 100,
+          "ascent": 40,
+          "maxRise": 7.5,
+          "glide": 2.5,
+          "airSpeed": 1.35
+        }
+      ],
+      "covers": [
+        "terraria:angel_wings"
+      ]
+    },
+    {
+      "id": "demon_wings",
+      "name": "Demon Wings",
+      "description": "Allows flight and slow fall.",
+      "category": "accessory",
+      "rarity": 5,
+      "value": 80000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "flight",
+          "time": 100,
+          "ascent": 40,
+          "maxRise": 7.5,
+          "glide": 2.5,
+          "airSpeed": 1.35
+        }
+      ],
+      "covers": [
+        "terraria:demon_wings"
+      ]
+    },
+    {
+      "id": "fairy_wings",
+      "name": "Fairy Wings",
+      "description": "Allows flight and slow fall.",
+      "category": "accessory",
+      "rarity": 5,
+      "value": 80000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "flight",
+          "time": 130,
+          "ascent": 42,
+          "maxRise": 7.5,
+          "glide": 2.5,
+          "airSpeed": 1.4
+        }
+      ],
+      "covers": [
+        "terraria:fairy_wings"
+      ]
+    },
+    {
+      "id": "leaf_wings",
+      "name": "Leaf Wings",
+      "description": "Allows flight and slow fall.",
+      "category": "accessory",
+      "rarity": 5,
+      "value": 120000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "flight",
+          "time": 160,
+          "ascent": 44,
+          "maxRise": 8,
+          "glide": 2.2,
+          "airSpeed": 1.45
+        }
+      ],
+      "covers": [
+        "terraria:leaf_wings"
+      ],
+      "tags": [
+        "shop"
+      ]
+    },
+    {
+      "id": "fishron_wings",
+      "name": "Fishron Wings",
+      "description": "Allows flight and slow fall. Lets you fly through water.",
+      "category": "accessory",
+      "rarity": 8,
+      "value": 400000,
+      "equipSlot": "accessory",
+      "equipEffects": [
+        {
+          "type": "flight",
+          "time": 180,
+          "ascent": 48,
+          "maxRise": 9,
+          "glide": 2,
+          "airSpeed": 1.6
+        },
+        {
+          "type": "waterBreathing"
+        }
+      ],
+      "covers": [
+        "terraria:fishron_wings"
+      ]
+    }
+  ],
+  "recipes": [
+    {
+      "id": "angel_wings",
+      "output": "angel_wings",
+      "inputs": [
+        {
+          "item": "feather",
+          "count": 10
+        },
+        {
+          "item": "soul_of_light",
+          "count": 25
+        },
+        {
+          "item": "soul_of_flight",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "demon_wings",
+      "output": "demon_wings",
+      "inputs": [
+        {
+          "item": "feather",
+          "count": 10
+        },
+        {
+          "item": "soul_of_night",
+          "count": 25
+        },
+        {
+          "item": "soul_of_flight",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "fairy_wings",
+      "output": "fairy_wings",
+      "inputs": [
+        {
+          "item": "pixie_dust",
+          "count": 100
+        },
+        {
+          "item": "soul_of_flight",
+          "count": 20
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    }
+  ],
+  "lootTables": [
+    {
+      "id": "harpy",
+      "coins": [
+        80,
+        200
+      ],
+      "entries": [
+        {
+          "item": "feather",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "id": "wyvern",
+      "coins": [
+        2000,
+        5000
+      ],
+      "entries": [
+        {
+          "item": "soul_of_flight",
+          "min": 5,
+          "max": 10
+        }
+      ]
+    }
+  ],
+  "enemies": [
+    {
+      "id": "harpy",
+      "model": "harpy",
+      "name": "Harpy",
+      "description": "Half bird, half woman, all feathers and fury.",
+      "brain": {
+        "type": "flyer",
+        "aggroRange": 70,
+        "orbitRadius": 10,
+        "dashSpeed": 8,
+        "dashCooldown": 300
+      },
+      "ranged": {
+        "projectile": "harpy_feather",
+        "damage": 20,
+        "speed": 14,
+        "interval": 120,
+        "range": 26
+      },
+      "life": 100,
+      "damage": 25,
+      "defense": 8,
+      "knockbackResist": 0.4,
+      "size": [
+        1.6,
+        3.0
+      ],
+      "moveSpeed": 5,
+      "gravity": false,
+      "loot": "harpy",
+      "value": 120,
+      "covers": [
+        "terraria:harpy"
+      ]
+    },
+    {
+      "id": "wyvern",
+      "model": "wyvern_head",
+      "tags": [
+        "lava_immune"
+      ],
+      "name": "Wyvern",
+      "description": "A long cloud serpent that coils through the sky.",
+      "brain": {
+        "type": "worm",
+        "speed": 13,
+        "turnRate": 3,
+        "digRadius": 0,
+        "digInterval": 9999,
+        "airGravity": 0
+      },
+      "life": 4000,
+      "damage": 60,
+      "defense": 10,
+      "knockbackResist": 1.0,
+      "size": [
+        2.4,
+        2.4
+      ],
+      "moveSpeed": 13,
+      "gravity": false,
+      "collideTerrain": false,
+      "loot": "wyvern",
+      "value": 5000,
+      "boss": {
+        "minor": true,
+        "segments": 16,
+        "segmentSpacing": 1.0,
+        "segmentRadius": 0.6,
+        "segmentModel": "wyvern_body",
+        "tailModel": "wyvern_tail"
+      },
+      "covers": [
+        "terraria:wyvern"
+      ]
+    }
+  ],
+  "spawnRules": [
+    {
+      "id": "harpy_sky",
+      "enemy": "harpy",
+      "weight": 4,
+      "conditions": [
+        {
+          "type": "biome",
+          "any": [
+            "sky"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "wyvern_sky",
+      "enemy": "wyvern",
+      "weight": 1,
+      "maxAlive": 1,
+      "conditions": [
+        {
+          "type": "flag",
+          "id": "hardmode"
+        },
+        {
+          "type": "biome",
+          "any": [
+            "sky"
+          ]
+        }
+      ]
+    }
+  ]
+}

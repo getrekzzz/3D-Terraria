@@ -1,0 +1,168 @@
+{
+  // The hardmode jungle: Chlorophyte ore in the mud; Plantera's Bulbs (sealed until all three mechanical bosses fall)
+  // wake Plantera, whose Temple Key opens the Jungle Temple; a Lihzahrd Power Cell on its altar calls Golem.
+  "projectiles": [
+    { "id": "plantera_seed", "name": "Seed", "visual": "orb", "color": "#9ad04a", "lifetime": 200, "radius": 0.4, "friendly": false, "hostile": true,
+      "onHit": [{ "type": "applyBuff", "buff": "poisoned", "ticks": 300, "chance": 0.5 }] },
+    { "id": "thorn_ball", "name": "Thorn Ball", "visual": "orb", "color": "#4a8a2a", "lifetime": 360, "radius": 0.6, "bounces": 6, "friendly": false, "hostile": true },
+    { "id": "golem_fireball", "name": "Fireball", "visual": "orb", "color": "#ff8a2a", "gravity": 6, "lifetime": 240, "radius": 0.5, "friendly": false, "hostile": true, "light": [12, 6, 1],
+      "onHit": [{ "type": "applyBuff", "buff": "on_fire", "ticks": 300, "chance": 0.5 }] },
+    { "id": "golem_laser", "name": "Eye Beam", "visual": "bolt", "color": "#ffb030", "lifetime": 120, "radius": 0.35, "friendly": false, "hostile": true, "light": [12, 8, 2] },
+    { "id": "seedler_seed", "name": "Seed", "visual": "bolt", "color": "#9ad04a", "lifetime": 80, "radius": 0.35, "pierce": 2 },
+    { "id": "leaf", "name": "Leaf", "visual": "bolt", "color": "#6ad04a", "lifetime": 90, "radius": 0.35, "trail": "#9ae070" },
+    { "id": "pygmy_minion", "name": "Pygmy", "visual": "creature", "model": "lihzahrd", "color": "#6a9a4a", "scale": 0.35, "lifetime": 60, "radius": 0.7, "pierce": -1,
+      "minion": { "speed": 10, "range": 26, "shoot": "seedler_seed", "shootInterval": 50, "shootSpeed": 20 } },
+    { "id": "flower_pow", "name": "Flower Pow", "visual": "item", "lifetime": 120, "radius": 0.8, "returns": 28, "pierce": -1 },
+    { "id": "stynger_bolt", "name": "Stynger Bolt", "visual": "bolt", "color": "#e8c83a", "lifetime": 150, "radius": 0.4, "onHit": [{ "type": "explode", "radius": 3, "damage": 0 }] },
+    { "id": "possessed_hatchet", "name": "Possessed Hatchet", "visual": "item", "lifetime": 200, "radius": 0.6, "returns": 60, "homing": 6, "pierce": -1 },
+    { "id": "terra_beam", "name": "Terra Beam", "visual": "bolt", "color": "#5aff8a", "lifetime": 60, "radius": 0.7, "pierce": 3, "collideTerrain": false, "light": [3, 12, 5], "trail": "#b0ffc0" },
+    { "id": "venus_magnum_bullet", "name": "Bullet", "visual": "bullet", "color": "#9ae070", "lifetime": 150, "radius": 0.25 }
+  ],
+  "tileObjects": [
+    { "id": "plantera_bulb", "name": "Plantera's Bulb", "description": "It stirs only once the three mechanical bosses have fallen.", "size": [2, 3, 2], "hitPoints": 3,
+      "light": [8, 3, 6], "natural": true, "autoItem": false, "requiresFlag": "defeated_all_mechs",
+      "onBreak": { "counter": "bulbs", "summon": "plantera", "every": 1 } },
+    { "id": "lihzahrd_door", "name": "Lihzahrd Door", "description": "Locked. The Temple Key opens it.", "size": [2, 4, 1], "collision": "solid", "interaction": "door",
+      "breakTool": "pick", "minPower": 210, "hitPoints": 40, "natural": true, "autoItem": false, "lockedUntil": "temple_unlocked", "key": "temple_key" },
+    { "id": "lihzahrd_altar", "name": "Lihzahrd Altar", "description": "Place a Lihzahrd Power Cell to call Golem.", "size": [4, 2, 2], "interaction": "activate",
+      "breakTool": "pick", "minPower": 9999, "hitPoints": 999, "light": [10, 7, 2], "natural": true, "autoItem": false, "key": "lihzahrd_power_cell", "summon": "golem" }
+  ],
+  "oreVeins": [
+    { "id": "chlorophyte_veins", "block": "chlorophyte_ore", "generate": false, "replace": ["mud", "jungle_grass"], "depthMin": 0.3, "depthMax": 0.95, "perChunk": 1.2, "size": [1.4, 2.4] }
+  ],
+  "mutations": [
+    { "id": "chlorophyte", "name": "Chlorophyte", "trigger": "hardmode", "step": { "type": "oreVeins", "veins": ["chlorophyte_veins"] } }
+  ],
+  "items": [
+    { "id": "chlorophyte_bar", "name": "Chlorophyte Bar", "description": "Reacts to the light.", "category": "material", "rarity": 7, "maxStack": 9999, "value": 9000, "covers": ["terraria:chlorophyte_bar"] },
+    { "id": "chlorophyte_pickaxe", "name": "Chlorophyte Pickaxe", "description": "Able to mine Lihzahrd Bricks? Not quite.", "category": "tool", "rarity": 7, "value": 216000, "useStyle": "swing", "useTime": 7,
+      "useAnimation": 20, "autoReuse": true, "damage": 40, "damageType": "melee", "knockback": 3, "pickPower": 200, "covers": ["terraria:chlorophyte_pickaxe"] },
+    { "id": "chlorophyte_mask", "name": "Chlorophyte Mask", "description": "16% increased melee damage.", "category": "armor", "rarity": 7, "value": 150000, "equipSlot": "head", "defense": 24, "armorSet": "chlorophyte_armor",
+      "equipEffects": [{ "type": "stat", "stat": "meleeDamage", "add": 0.16 }], "covers": ["terraria:chlorophyte_mask"] },
+    { "id": "chlorophyte_plate_mail", "name": "Chlorophyte Plate Mail", "description": "5% increased damage and critical strike chance.", "category": "armor", "rarity": 7, "value": 240000, "equipSlot": "body", "defense": 17,
+      "armorSet": "chlorophyte_armor", "equipEffects": [{ "type": "stat", "stat": "genericDamage", "add": 0.05 }, { "type": "stat", "stat": "genericCrit", "add": 5 }] },
+    { "id": "chlorophyte_greaves", "name": "Chlorophyte Greaves", "description": "8% increased critical strike chance, 5% increased movement speed.", "category": "armor", "rarity": 7, "value": 180000, "equipSlot": "legs",
+      "defense": 13, "armorSet": "chlorophyte_armor", "equipEffects": [{ "type": "stat", "stat": "genericCrit", "add": 8 }, { "type": "stat", "stat": "moveSpeed", "add": 0.05 }] },
+    { "id": "true_excalibur", "name": "True Excalibur", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "swing", "useTime": 18, "useAnimation": 18, "autoReuse": true,
+      "damage": 70, "damageType": "melee", "knockback": 4.5, "projectile": "enchanted_beam", "shootSpeed": 18, "heldLight": [12, 10, 6],
+      "behaviors": [{ "type": "meleeSwing", "arc": 180, "length": 4.4 }, { "type": "shootProjectile" }] },
+    { "id": "true_nights_edge", "name": "True Night's Edge", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "swing", "useTime": 26, "useAnimation": 26, "autoReuse": true,
+      "damage": 90, "damageType": "melee", "knockback": 4.75, "projectile": "demon_scythe", "shootSpeed": 12, "heldLight": [6, 3, 12],
+      "behaviors": [{ "type": "meleeSwing", "arc": 180, "length": 4.6 }, { "type": "shootProjectile" }], "covers": ["terraria:true_night_s_edge"] },
+    { "id": "terra_blade", "name": "Terra Blade", "description": "The true blade of the Terrarian.", "category": "weapon", "rarity": 8, "value": 1000000, "useStyle": "swing", "useTime": 16, "useAnimation": 16,
+      "autoReuse": true, "damage": 95, "damageType": "melee", "knockback": 6.5, "projectile": "terra_beam", "shootSpeed": 22, "heldLight": [4, 12, 6],
+      "behaviors": [{ "type": "meleeSwing", "arc": 190, "length": 4.8 }, { "type": "shootProjectile" }], "covers": ["terraria:terra_blade"] },
+
+    { "id": "temple_key", "name": "Temple Key", "description": "Opens the jungle temple door.", "category": "key", "rarity": 7, "value": 10000 },
+    { "id": "lihzahrd_power_cell", "name": "Lihzahrd Power Cell", "description": "Used at the Lihzahrd Altar.", "category": "bossSummon", "rarity": 7, "maxStack": 20, "value": 10000 },
+    { "id": "seedler", "name": "Seedler", "description": "Shoots seeds that burst on impact.", "category": "weapon", "rarity": 7, "value": 150000, "useStyle": "swing", "useTime": 20, "useAnimation": 20,
+      "autoReuse": true, "damage": 48, "damageType": "melee", "knockback": 5.5, "projectile": "seedler_seed", "shootSpeed": 18,
+      "behaviors": [{ "type": "meleeSwing", "arc": 180, "length": 4.4 }, { "type": "shootProjectile", "count": 3, "spread": 10 }] },
+    { "id": "venus_magnum", "name": "Venus Magnum", "category": "weapon", "rarity": 7, "value": 150000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8, "autoReuse": true,
+      "damage": 50, "damageType": "ranged", "knockback": 4, "useAmmo": "bullet", "shootSpeed": 50 },
+    { "id": "leaf_blower", "name": "Leaf Blower", "description": "Rapidly shoots razor sharp leaves.", "category": "weapon", "rarity": 7, "value": 150000, "useStyle": "shoot", "useTime": 13, "useAnimation": 13,
+      "autoReuse": true, "damage": 36, "damageType": "magic", "knockback": 4, "manaCost": 5, "projectile": "leaf", "shootSpeed": 22, "behaviors": [{ "type": "shootProjectile", "count": 3, "spread": 8 }] },
+    { "id": "pygmy_staff", "name": "Pygmy Staff", "description": "Summons a pygmy to fight for you.", "category": "weapon", "rarity": 7, "value": 150000, "useStyle": "shoot", "useTime": 36, "useAnimation": 36,
+      "damage": 34, "damageType": "summon", "knockback": 3, "manaCost": 10, "projectile": "pygmy_minion", "shootSpeed": 3 },
+    { "id": "flower_pow", "name": "Flower Pow", "category": "weapon", "rarity": 7, "value": 150000, "useStyle": "shoot", "useTime": 40, "useAnimation": 40,
+      "damage": 65, "damageType": "melee", "knockback": 6.75, "projectile": "flower_pow", "shootSpeed": 18 },
+    { "id": "the_axe", "name": "The Axe", "category": "tool", "rarity": 7, "value": 150000, "useStyle": "swing", "useTime": 15, "useAnimation": 30, "autoReuse": true,
+      "damage": 72, "damageType": "melee", "knockback": 7, "axePower": 175, "hammerPower": 100 },
+    { "id": "spore_sac", "name": "Spore Sac", "description": "Spores float around you, harming enemies.", "category": "accessory", "rarity": 8, "value": 100000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "summonDamage", "add": 0.1 }] },
+
+    { "id": "picksaw", "name": "Picksaw", "description": "Capable of mining Lihzahrd Bricks.", "category": "tool", "rarity": 8, "value": 216000, "useStyle": "swing", "useTime": 6, "useAnimation": 12, "autoReuse": true,
+      "damage": 34, "damageType": "melee", "knockback": 5.5, "pickPower": 210, "axePower": 125, "covers": ["terraria:picksaw"] },
+    { "id": "stynger", "name": "Stynger", "description": "Shoots explosive bolts.", "category": "weapon", "rarity": 8, "value": 350000, "useStyle": "shoot", "useTime": 38, "useAnimation": 38, "autoReuse": true,
+      "damage": 45, "damageType": "ranged", "knockback": 5, "projectile": "stynger_bolt", "shootSpeed": 26, "covers": ["terraria:stynger"] },
+    { "id": "possessed_hatchet", "name": "Possessed Hatchet", "description": "Chases after your enemy.", "category": "weapon", "rarity": 8, "value": 350000, "useStyle": "shoot", "useTime": 15, "useAnimation": 15,
+      "damage": 80, "damageType": "melee", "knockback": 5, "projectile": "possessed_hatchet", "shootSpeed": 20, "covers": ["terraria:possessed_hatchet"] },
+    { "id": "sun_stone", "name": "Sun Stone", "description": "Increases all stats if worn during the day.", "category": "accessory", "rarity": 8, "value": 150000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "genericDamage", "add": 0.1 }, { "type": "stat", "stat": "genericCrit", "add": 2 }, { "type": "stat", "stat": "defense", "add": 4 }] },
+    { "id": "eye_of_the_golem", "name": "Eye of the Golem", "description": "10% increased critical strike chance.", "category": "accessory", "rarity": 8, "value": 150000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "genericCrit", "add": 10 }] },
+    { "id": "shiny_stone", "name": "Shiny Stone", "description": "Greatly increases life regen when not moving.", "category": "accessory", "rarity": 8, "value": 150000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "lifeRegen", "add": 4 }] },
+    { "id": "beetle_husk", "name": "Beetle Husk", "category": "material", "rarity": 8, "maxStack": 9999, "value": 5000, "covers": ["terraria:beetle_husk"] },
+    { "id": "beetle_helmet", "name": "Beetle Helmet", "description": "6% increased melee damage.", "category": "armor", "rarity": 8, "value": 300000, "equipSlot": "head", "defense": 22, "armorSet": "beetle_armor",
+      "equipEffects": [{ "type": "stat", "stat": "meleeDamage", "add": 0.06 }], "covers": ["terraria:beetle_helmet"] },
+    { "id": "beetle_shell", "name": "Beetle Shell", "description": "5% increased melee damage and critical strike chance.", "category": "armor", "rarity": 8, "value": 360000, "equipSlot": "body", "defense": 32,
+      "armorSet": "beetle_armor", "equipEffects": [{ "type": "stat", "stat": "meleeDamage", "add": 0.05 }, { "type": "stat", "stat": "meleeCrit", "add": 5 }] },
+    { "id": "beetle_leggings", "name": "Beetle Leggings", "description": "6% increased melee speed.", "category": "armor", "rarity": 8, "value": 300000, "equipSlot": "legs", "defense": 26,
+      "armorSet": "beetle_armor", "equipEffects": [{ "type": "stat", "stat": "meleeSpeed", "add": 0.06 }] }
+  ],
+  "recipes": [
+    { "id": "chlorophyte_bar", "output": "chlorophyte_bar", "inputs": [{ "item": "chlorophyte_ore", "count": 5 }], "stations": ["hardmode_forge"] },
+    { "id": "chlorophyte_pickaxe", "output": "chlorophyte_pickaxe", "inputs": [{ "item": "chlorophyte_bar", "count": 18 }], "stations": ["hardmode_anvil"] },
+    { "id": "chlorophyte_mask", "output": "chlorophyte_mask", "inputs": [{ "item": "chlorophyte_bar", "count": 12 }], "stations": ["hardmode_anvil"] },
+    { "id": "chlorophyte_plate_mail", "output": "chlorophyte_plate_mail", "inputs": [{ "item": "chlorophyte_bar", "count": 24 }], "stations": ["hardmode_anvil"] },
+    { "id": "chlorophyte_greaves", "output": "chlorophyte_greaves", "inputs": [{ "item": "chlorophyte_bar", "count": 18 }], "stations": ["hardmode_anvil"] },
+    { "id": "true_excalibur", "output": "true_excalibur", "inputs": [{ "item": "excalibur", "count": 1 }, { "item": "chlorophyte_bar", "count": 24 }], "stations": ["hardmode_anvil"] },
+    { "id": "true_nights_edge", "output": "true_nights_edge", "inputs": [{ "item": "nights_edge", "count": 1 }, { "item": "soul_of_fright", "count": 20 }, { "item": "soul_of_might", "count": 20 }, { "item": "soul_of_sight", "count": 20 }], "stations": ["hardmode_anvil"] },
+    { "id": "terra_blade", "output": "terra_blade", "inputs": [{ "item": "true_nights_edge", "count": 1 }, { "item": "true_excalibur", "count": 1 }], "stations": ["hardmode_anvil"] },
+    { "id": "beetle_helmet", "output": "beetle_helmet", "inputs": [{ "item": "chlorophyte_mask", "count": 1 }, { "item": "beetle_husk", "count": 8 }], "stations": ["hardmode_anvil"] },
+    { "id": "beetle_shell", "output": "beetle_shell", "inputs": [{ "item": "chlorophyte_plate_mail", "count": 1 }, { "item": "beetle_husk", "count": 12 }], "stations": ["hardmode_anvil"] },
+    { "id": "beetle_leggings", "output": "beetle_leggings", "inputs": [{ "item": "chlorophyte_greaves", "count": 1 }, { "item": "beetle_husk", "count": 10 }], "stations": ["hardmode_anvil"] }
+  ],
+  "lootTables": [
+    { "id": "plantera", "coins": [50000, 80000], "entries": [
+      { "item": "temple_key" }, { "table": "plantera_weapon" }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
+      { "item": "spore_sac", "conditions": [{ "type": "difficulty", "min": 1 }] }
+    ] },
+    { "id": "plantera_weapon", "mode": "weighted", "entries": [
+      { "item": "seedler" }, { "item": "venus_magnum" }, { "item": "leaf_blower" }, { "item": "pygmy_staff" }, { "item": "flower_pow" }, { "item": "the_axe", "weight": 0.5 }
+    ] },
+    { "id": "golem", "coins": [60000, 100000], "entries": [
+      { "item": "picksaw", "chance": 0.33 }, { "table": "golem_weapon" }, { "item": "beetle_husk", "min": 18, "max": 23 }, { "item": "sun_stone", "chance": 0.15 },
+      { "item": "eye_of_the_golem", "chance": 0.15 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
+      { "item": "shiny_stone", "conditions": [{ "type": "difficulty", "min": 1 }] }
+    ] },
+    { "id": "golem_weapon", "mode": "weighted", "entries": [{ "item": "stynger" }, { "item": "possessed_hatchet" }] },
+    { "id": "temple_chest", "coins": [5000, 20000], "entries": [
+      { "item": "lihzahrd_power_cell", "min": 1, "max": 2 }, { "item": "greater_healing_potion", "min": 2, "max": 5, "chance": 0.6 }
+    ] },
+    { "id": "lihzahrd", "coins": [300, 800], "entries": [{ "item": "lihzahrd_power_cell", "chance": 0.02 }] }
+  ],
+  "enemies": [
+    { "id": "lihzahrd", "model": "lihzahrd", "tags": ["lava_immune"], "name": "Lihzahrd", "description": "The temple's reptilian keepers.",
+      "brain": { "type": "walker", "aggroRange": 60, "jumpHeight": 5 },
+      "life": 420, "damage": 60, "defense": 26, "knockbackResist": 0.3, "size": [1.6, 3.4], "moveSpeed": 3.6, "loot": "lihzahrd", "value": 1000, "covers": ["terraria:lihzahrd"] },
+    { "id": "flying_snake", "model": "flying_snake", "name": "Flying Snake", "description": "A winged serpent coiling through the temple halls.",
+      "brain": { "type": "flyer", "aggroRange": 70, "orbitRadius": 3, "dashSpeed": 12, "dashCooldown": 90 },
+      "life": 200, "damage": 70, "defense": 18, "knockbackResist": 0.3, "size": [2.2, 1.2], "moveSpeed": 7, "gravity": false, "value": 800, "covers": ["terraria:flying_snake"] },
+    {
+      "id": "plantera", "model": "plantera", "tags": ["boss", "lava_immune"], "name": "Plantera", "description": "The jungle's heart, awake and very hungry.",
+      "brain": { "type": "pattern", "phases": [
+        { "below": 1.0, "volley": { "projectile": "plantera_seed", "damage": 40, "speed": 16, "interval": 45, "spread": 8 },
+          "moves": [{ "type": "chase", "ticks": 240, "speed": 4.5 }, { "type": "orbit", "ticks": 150, "speed": 7, "distance": 8, "height": 1 }] },
+        { "below": 0.5, "model": "plantera_open", "speed": 1.6, "damage": 1.4, "message": "Plantera's bulb bursts open!",
+          "volley": { "projectile": "thorn_ball", "damage": 50, "speed": 12, "interval": 90, "count": 6, "ring": true },
+          "moves": [{ "type": "chase", "ticks": 180, "speed": 8 }, { "type": "dash", "count": 2, "telegraph": 25, "ticks": 35, "speed": 18 }] }
+      ] },
+      "life": 30000, "damage": 50, "defense": 14, "knockbackResist": 1.0, "size": [7, 7], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 3, 6],
+      "loot": "plantera", "value": 50000,
+      "boss": { "title": "Plantera", "flag": "defeated_plantera", "arenaRadius": 160, "music": "boss_plantera" },
+      "covers": ["terraria:plantera"]
+    },
+    {
+      "id": "golem", "model": "golem", "tags": ["boss", "lava_immune"], "name": "Golem", "description": "The Lihzahrds' idol, animated by the sun.",
+      "brain": { "type": "pattern", "ground": true, "phases": [
+        { "below": 1.0,
+          "moves": [{ "type": "walk", "ticks": 100, "speed": 2.2 }, { "type": "hop", "count": 2, "height": 8, "speed": 6, "telegraph": 30 },
+            { "type": "wait", "ticks": 90, "pose": "attack", "volley": { "projectile": "golem_fireball", "damage": 45, "speed": 14, "interval": 30, "count": 2, "spread": 12 } }] },
+        { "below": 0.45, "speed": 1.4, "damage": 1.2, "message": "Golem's eyes blaze!",
+          "volley": { "projectile": "golem_laser", "damage": 50, "speed": 26, "interval": 50, "count": 2, "spread": 4 },
+          "moves": [{ "type": "hop", "count": 3, "height": 10, "speed": 8, "telegraph": 22 },
+            { "type": "wait", "ticks": 60, "pose": "attack", "volley": { "projectile": "golem_fireball", "damage": 50, "speed": 13, "interval": 20, "count": 8, "ring": true } }] }
+      ] },
+      "life": 39000, "damage": 72, "defense": 26, "knockbackResist": 1.0, "size": [4, 6], "scale": 2, "moveSpeed": 3, "light": [8, 6, 2],
+      "loot": "golem", "value": 60000,
+      "boss": { "title": "Golem", "flag": "defeated_golem", "arenaRadius": 160, "music": "boss_golem" },
+      "covers": ["terraria:golem"]
+    }
+  ],
+  "spawnRules": [
+    { "id": "lihzahrd_temple", "enemy": "lihzahrd", "weight": 4, "conditions": [{ "type": "biome", "any": ["jungle_temple"] }] },
+    { "id": "flying_snake_temple", "enemy": "flying_snake", "weight": 2, "conditions": [{ "type": "biome", "any": ["jungle_temple"] }] }
+  ]
+}

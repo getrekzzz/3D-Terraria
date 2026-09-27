@@ -1,0 +1,83 @@
+# Bosses: summoning, boss bar data, minions, worm tunnelling, defeat flags.
+wait_until player.frozen == 0 180
+spawning off
+killall
+heal
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 8 12 air
+wait 0.5
+boss king_slime 12
+assert npcs.king_slime == 1
+wait 2
+assert player.alive == 1
+killall
+time 22
+give suspicious_looking_eye 1
+wield suspicious_looking_eye
+use
+assert npcs.eye_of_cthulhu == 1
+wait 3
+killall
+boss eater_of_worlds 10
+wait 3
+assert npcs.eater_of_worlds == 1
+killall
+# The pattern bosses: the Brain behind its Creepers, the Queen Bee and her bees, Deerclops; slaying raises their flags.
+# (God mode: a boss leaves once every player is dead.)
+god
+boss brain_of_cthulhu 10
+wait 2
+assert npcs.creeper > 5
+slay brain_of_cthulhu
+assert flag.defeated_brain_of_cthulhu == 1
+assert flag.defeated_evil_boss == 1
+killall
+boss queen_bee 10
+wait 3
+assert npcs.queen_bee == 1
+slay queen_bee
+assert flag.defeated_queen_bee == 1
+killall
+boss deerclops 12
+wait 3
+assert npcs.deerclops == 1
+slay deerclops
+assert flag.defeated_deerclops == 1
+killall
+# A meteorite strike leaves a crater of ore.
+meteor
+assert errors == 0
+# Hardmode's bosses: each appears, fights and raises its flag when slain.
+boss queen_slime 12
+wait 2
+assert npcs.queen_slime == 1
+slay queen_slime
+assert flag.defeated_queen_slime == 1
+killall
+boss plantera 12
+wait 2
+assert npcs.plantera == 1
+slay plantera
+assert flag.defeated_plantera == 1
+killall
+boss golem 14
+wait 2
+assert npcs.golem == 1
+slay golem
+assert flag.defeated_golem == 1
+killall
+boss duke_fishron 14
+wait 2
+assert npcs.duke_fishron == 1
+slay duke_fishron
+assert flag.defeated_duke_fishron == 1
+killall
+time 22
+boss empress_of_light 14
+wait 2
+assert npcs.empress_of_light == 1
+slay empress_of_light
+assert flag.defeated_empress_of_light == 1
+killall
+time noon
+assert errors == 0

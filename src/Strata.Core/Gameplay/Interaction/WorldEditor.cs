@@ -1,0 +1,212 @@
+using System.Numerics;
+using Strata.Core.Common;
+using Strata.Core.Content.Defs;
+using Strata.Core.Determinism;
+using Strata.Core.Gameplay.Building;
+using Strata.Core.Gameplay.Items;
+using Strata.Core.Gameplay.Loot;
+using Strata.Core.Gameplay.Mining;
+using Strata.Core.Session;
+using Strata.Core.Voxels;
+using Strata.Core.Voxels.TileObjects;
+
+namespace Strata.Core.Gameplay.Interaction;
+
+/// <summary>Outcome of one mining swing.</summary>
+public sealed class MineOutcome
+{
+    public List<Int3> Broken { get; } = new();
+
+    /// <summary>Cells that took damage but did not break, with progress 0–1.</summary>
+    public List<(Int3 Cell, float Progress)> Damaged { get; } = new();
+
+    /// <summary>Cells the tool is too weak for (or protected).</summary>
+    public List<Int3> TooHard { get; } = new();
+
+    public List<TileObjectInstance> ObjectsBroken { get; } = new();
+
+    /// <summary>The first block the swing hit (dust colour, sounds).</summary>
+    public BlockDef? Material { get; set; }
+
+    public bool Any => Broken.Count > 0 || Damaged.Count > 0;
+}
+
+/// <summary>
+/// Authoritative world modification for gameplay: mining with accumulated damage, block and tile-object
+/// placement, object breaking with drops and loot, loose-block gravity and support loss. Every change is
+/// committed through the session so lighting, sky exposure, saving and remeshing stay consistent.
+/// </summary>
+public sealed partial class WorldEditor
+{
+    private readonly WorldSession _session;
+    private readonly DroppedItemSystem _drops;
+    private readonly LootRoller _loot;
+    private ulong _rngCounter;
+
+    public WorldEditor(WorldSession session, DroppedItemSystem drops)
+    {
+        _session = session;
+        _drops = drops;
+        _loot = new LootRoller(session.Content);
+    }
+
+    public BlockDamageTracker Damage { get; } = new();
+
+    /// <summary>Raised with every chunk whose mesh or lighting must be rebuilt.</summary>
+    public event Action<HashSet<Int3>>? ChunksDirty;
+
+    /// <summary>Raised after every mining swing that hit something (dust, sounds).</summary>
+    public event Action<MineOutcome>? Struck;
+
+    /// <summary>Raised when a cell is broken (for particles and sounds).</summary>
+    public event Action<Int3, BlockDef>? BlockBroken;
+
+    /// <summary>Raised when a block is placed.</summary>
+    public event Action<Int3, BlockDef>? BlockPlaced;
+
+    private VoxelWorld World => _session.World;
+
+    /// <summary>
+    /// Applies <paramref name="damage"/> to each cell of a brush with a tool of <paramref name="pickPower"/>.
+    /// Broken cells drop their item; loose blocks above fall; unsupported objects break.
+    /// </summary>
+    public MineOutcome Mine(IEnumerable<Int3> cells, int pickPower, float damage, long tick)
+    {
+        var outcome = new MineOutcome();
+        var content = _session.Content;
+        var batch = World.BeginEdit();
+        var drops = new Dictionary<ItemDef, (int Count, Int3 Cell)>();
+        foreach (var cell in cells)
+        {
+            ushort id = World.GetBlock(cell);
+            if (id == 0 || id == VoxelWorld.Unknown) continue;
+            var block = content.Blocks[id];
+            outcome.Material ??= block;
+            if (!MiningRules.CanMine(block, pickPower) || IsLocked(cell))
+            {
+                outcome.TooHard.Add(cell);
+                continue;
+            }
+            float health = MiningRules.Health(block);
+            float total = Damage.Hit(cell, damage, tick);
+            if (total < health)
+            {
+                outcome.Damaged.Add((cell, total / health));
+                continue;
+            }
+            Damage.Clear(cell);
+            batch.SetBlock(cell, 0);
+            outcome.Broken.Add(cell);
+            // One stack per item for the whole swing (a grid block drops 8 dirt as one pickup, not eight).
+            if (content.BlockDrops[id] is { } drop) drops[drop] = (drops.GetValueOrDefault(drop).Count + 1, cell);
+            BlockBroken?.Invoke(cell, block);
+        }
+        if (outcome.Material != null) Struck?.Invoke(outcome);
+        if (outcome.Broken.Count == 0) return outcome;
+        foreach (var (item, (count, at)) in drops) SpawnDrop(new ItemStack(item, count), at);
+        FallingBlocks.Settle(batch, content, outcome.Broken);
+        Commit(batch);
+        BreakUnsupportedAround(outcome.Broken, outcome.ObjectsBroken);
+        return outcome;
+    }
+
+    /// <summary>Places a block (crisp shapes carry rotation). Does not consume items; the caller does.</summary>
+    public PlacementResult PlaceBlock(Int3 cell, BlockDef block, byte shape, IEnumerable<(Vector3 Min, Vector3 Max)> blockers)
+    {
+        var result = PlacementRules.CanPlaceBlock(World, cell, block, blockers);
+        if (result != PlacementResult.Ok) return result;
+        var decor = World.TileObjects.At(cell);
+        if (decor != null) BreakObject(decor, dropItems: true);
+        var batch = World.BeginEdit();
+        batch.SetBlock(cell, (ushort)block.RuntimeId, shape, CellFlags.PlayerPlaced);
+        if (block.IsSolid) batch.SetLiquid(cell, 0); // the block displaces liquid
+        var opened = new List<Int3>();
+        if (block.Falls && World.GetBlock(cell + Int3.Down) == 0) opened.Add(cell);
+        FallingBlocks.Settle(batch, _session.Content, opened);
+        Commit(batch);
+        BlockPlaced?.Invoke(cell, block);
+        return PlacementResult.Ok;
+    }
+
+    /// <summary>Removes a block without drops (hammer reshaping, commands).</summary>
+    public void SetBlock(Int3 cell, ushort block, byte shape = 0, CellFlags flags = CellFlags.None)
+    {
+        var batch = World.BeginEdit();
+        batch.SetBlock(cell, block, shape, flags);
+        if (block != 0 && _session.Content.Blocks[block].IsSolid) batch.SetLiquid(cell, 0);
+        Commit(batch);
+        if (block == 0) BreakUnsupportedAround(new[] { cell }, new List<TileObjectInstance>());
+    }
+
+    /// <summary>
+    /// Removes natural terrain in a sphere (burrowing creatures, explosions without drops). Player-built and
+    /// structure cells are kept; remeshing is scheduled non-urgently.
+    /// </summary>
+    public int Carve(Vector3 centerMeters, float radiusCells)
+    {
+        var c = new Int3((int)MathF.Floor(centerMeters.X / Units.CellSize), (int)MathF.Floor(centerMeters.Y / Units.CellSize), (int)MathF.Floor(centerMeters.Z / Units.CellSize));
+        int r = (int)MathF.Ceiling(radiusCells);
+        var batch = World.BeginEdit();
+        var opened = new List<Int3>();
+        for (int y = -r; y <= r; y++)
+            for (int z = -r; z <= r; z++)
+                for (int x = -r; x <= r; x++)
+                {
+                    if (x * x + y * y + z * z > radiusCells * radiusCells) continue;
+                    var cell = c + new Int3(x, y, z);
+                    ushort b = World.GetBlock(cell);
+                    if (b == 0 || b == VoxelWorld.Unknown || !_session.Content.Blocks[b].IsSolid) continue;
+                    if ((World.GetFlags(cell.X, cell.Y, cell.Z) & (CellFlags.PlayerPlaced | CellFlags.Structure)) != 0) continue;
+                    if (b == World.Bedrock) continue;
+                    batch.SetBlock(cell, 0);
+                    opened.Add(cell);
+                }
+        if (opened.Count == 0) return 0;
+        FallingBlocks.Settle(batch, _session.Content, opened);
+        var dirty = _session.Commit(batch);
+        ChunksDirty?.Invoke(dirty);
+        BreakUnsupportedAround(opened, new List<TileObjectInstance>());
+        return opened.Count;
+    }
+
+    /// <summary>Changes the shape of a player-placed crisp block (hammer).</summary>
+    public bool Reshape(Int3 cell, byte shape)
+    {
+        ushort id = World.GetBlock(cell);
+        if (id == 0 || id == VoxelWorld.Unknown || _session.Content.Blocks[id].Render != BlockRender.Crisp) return false;
+        var batch = World.BeginEdit();
+        batch.SetBlock(cell, id, shape);
+        Commit(batch);
+        return true;
+    }
+
+    /// <summary>
+    /// A generated structure cell in a zone that is locked until a progression flag (the crypt before its warden
+    /// falls). Player-placed cells are never locked.
+    /// </summary>
+    public bool IsLocked(Int3 cell)
+    {
+        if ((World.GetFlags(cell.X, cell.Y, cell.Z) & CellFlags.Structure) == 0) return false;
+        foreach (var biome in _session.ZonesAt(cell))
+            if (_session.Content.Biomes.TryGet(biome, out var def) && def.LockedUntil != null && !_session.Flags.Contains(def.LockedUntil))
+                return true;
+        return false;
+    }
+
+    private void Commit(EditBatch batch)
+    {
+        var dirty = _session.Commit(batch);
+        if (dirty.Count > 0) ChunksDirty?.Invoke(dirty);
+    }
+
+    private Pcg32 NextRng(Int3 cell) =>
+        new(Hash.Combine(Hash.Cell((ulong)_session.Settings.Seed, cell.X, cell.Y, cell.Z), (long)(_session.Clock.Tick * 131 + (long)++_rngCounter)));
+
+    private void SpawnDrop(ItemStack stack, Int3 cell)
+    {
+        var rng = NextRng(cell);
+        var pos = (new Vector3(cell.X, cell.Y, cell.Z) + new Vector3(0.5f)) * Units.CellSize;
+        var vel = new Vector3(rng.NextSigned() * 1.2f, 2.5f + rng.NextFloat() * 1.5f, rng.NextSigned() * 1.2f);
+        _drops.Spawn(stack, pos, vel);
+    }
+}

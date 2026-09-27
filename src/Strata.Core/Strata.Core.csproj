@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Engine-agnostic simulation core: no Godot references allowed here. -->
+  <PropertyGroup>
+    <RootNamespace>Strata.Core</RootNamespace>
+    <AssemblyName>Strata.Core</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Strata.Core.Tests" />
+  </ItemGroup>
+</Project>

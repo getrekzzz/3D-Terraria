@@ -1,0 +1,50 @@
+{
+  // How the world changes as it progresses. When hardmode begins (the Mawwall falls) new ores are seeded through the
+  // stone, and two slanted wedges cut through the land: one radiant, one blighted (the world's own evil). Afterwards
+  // those biomes creep outward. Mutations apply lazily to every chunk, however late it is first visited.
+  "oreVeins": [
+    { "id": "cobalt_veins", "block": "cobalt_ore", "group": "hard1", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "ebonstone", "crimstone"], "depthMin": 0.1, "depthMax": 1.0, "perChunk": 1.4, "size": [1.6, 3.0] },
+    { "id": "palladium_veins", "block": "palladium_ore", "group": "hard1", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "ebonstone", "crimstone"], "depthMin": 0.1, "depthMax": 1.0, "perChunk": 1.4, "size": [1.6, 3.0] },
+    { "id": "mythril_veins", "block": "mythril_ore", "group": "hard2", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "ebonstone", "crimstone"], "depthMin": 0.3, "depthMax": 1.0, "perChunk": 1.1, "size": [1.5, 2.8] },
+    { "id": "orichalcum_veins", "block": "orichalcum_ore", "group": "hard2", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "ebonstone", "crimstone"], "depthMin": 0.3, "depthMax": 1.0, "perChunk": 1.1, "size": [1.5, 2.8] },
+    { "id": "adamantite_veins", "block": "adamantite_ore", "group": "hard3", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "ebonstone", "crimstone"], "depthMin": 0.5, "depthMax": 1.05, "perChunk": 0.9, "size": [1.4, 2.6] },
+    { "id": "titanium_veins", "block": "titanium_ore", "group": "hard3", "generate": false, "replace": ["stone", "deepstone", "pearlstone", "ebonstone", "crimstone"], "depthMin": 0.5, "depthMax": 1.05, "perChunk": 0.9, "size": [1.4, 2.6] }
+  ],
+  "conversions": [
+    { "id": "hallow", "zone": "hallow", "map": {
+      "grass": "hallowed_grass", "corrupt_grass": "hallowed_grass", "crimson_grass": "hallowed_grass",
+      "stone": "pearlstone", "deepstone": "pearlstone", "green_moss": "pearlstone", "ebonstone": "pearlstone", "crimstone": "pearlstone",
+      "sand": "pearlsand", "ebonsand": "pearlsand", "crimsand": "pearlsand",
+      "ice": "pink_ice", "purple_ice": "pink_ice", "red_ice": "pink_ice" } },
+    { "id": "corruption", "zone": "corruption", "map": {
+      "grass": "corrupt_grass", "hallowed_grass": "corrupt_grass",
+      "stone": "ebonstone", "deepstone": "ebonstone", "green_moss": "ebonstone", "pearlstone": "ebonstone",
+      "sand": "ebonsand", "pearlsand": "ebonsand",
+      "ice": "purple_ice", "pink_ice": "purple_ice" } },
+    { "id": "crimson", "zone": "crimson", "map": {
+      "grass": "crimson_grass", "hallowed_grass": "crimson_grass",
+      "stone": "crimstone", "deepstone": "crimstone", "green_moss": "crimstone", "pearlstone": "crimstone",
+      "sand": "crimsand", "pearlsand": "crimsand",
+      "ice": "red_ice", "pink_ice": "red_ice" } }
+  ],
+  "mutations": [
+    // Each Demon/Crimson Altar smashed with a Pwnhammer seeds the next tier of hardmode ore (one of each pair per world).
+    { "id": "altar_ores_1", "name": "Cobalt or Palladium", "trigger": "smashed_altar_1",
+      "step": { "type": "oreVeins", "veins": ["cobalt_veins", "palladium_veins"] }, "covers": ["terraria:hardmode_ores"] },
+    { "id": "altar_ores_2", "name": "Mythril or Orichalcum", "trigger": "smashed_altar_2",
+      "step": { "type": "oreVeins", "veins": ["mythril_veins", "orichalcum_veins"] } },
+    { "id": "altar_ores_3", "name": "Adamantite or Titanium", "trigger": "smashed_altar_3",
+      "step": { "type": "oreVeins", "veins": ["adamantite_veins", "titanium_veins"] } },
+    // Meteorites are appended by the game when one falls (after a Shadow Orb or Crimson Heart is smashed).
+    { "id": "meteorite", "name": "Meteorite", "trigger": "", "step": { "type": "meteor", "block": "meteorite", "radius": 9, "zone": "meteorite" }, "covers": ["terraria:meteor_fall"] },
+    { "id": "hardmode_hallow", "name": "The Hallow", "trigger": "hardmode",
+      "step": { "type": "wedge", "conversion": "hallow", "halfWidth": 14, "length": 220, "lean": 0.8, "depth": 0.9, "distance": 0.3 } },
+    { "id": "hardmode_evil", "name": "The Corruption / Crimson", "trigger": "hardmode",
+      "step": { "type": "wedge", "byEvil": { "corruption": "corruption", "crimson": "crimson" }, "halfWidth": 14, "length": 220, "lean": -0.8, "depth": 0.9, "distance": 0.3 } }
+  ],
+  "spreadRules": [
+    { "id": "hallow_spread", "conversion": "hallow", "requiresFlag": "hardmode", "chance": 0.3 },
+    { "id": "corruption_spread", "conversion": "corruption", "requiresFlag": "hardmode", "chance": 0.3 },
+    { "id": "crimson_spread", "conversion": "crimson", "requiresFlag": "hardmode", "chance": 0.3 }
+  ]
+}

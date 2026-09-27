@@ -1,0 +1,19 @@
+{
+  // Town tuning (see Gameplay/Town). Ticks are 1/60 s; distances in meters.
+  "arrivalInterval": 600,
+  "homeCheckInterval": 900,
+  "respawnTicks": 21600,
+  "neighborRadius": 25,
+  "crowdLimit": 3,
+  "moodStep": 0.06,
+  "crowdStep": 0.05,
+  "minPriceFactor": 0.75,
+  "maxPriceFactor": 1.5,
+  "sellRatio": 0.2,
+  "wanderRadius": 8,
+  "landmarkRadius": 3,
+  "idleTicksMin": 180,
+  "idleTicksMax": 540,
+  "talkRange": 5,
+  "talkTicks": 900
+}

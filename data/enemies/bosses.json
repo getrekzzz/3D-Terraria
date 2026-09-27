@@ -1,0 +1,38 @@
+{
+  // Bosses and their minions. Boss behaviour is a brain spec; "boss" adds the bar, arena, defeat flag and segments.
+  "enemies": [
+    {
+      "id": "king_slime", "model": "king_slime", "tags": ["gel", "boss", "lava_immune"], "name": "King Slime",
+      "description": "A monarch of gel that crushes intruders beneath its bulk.",
+      "brain": { "type": "kingSlime", "jumpHeight": 8, "jumpSpeed": 5.5, "hopInterval": 55, "teleportDistance": 26, "minion": "green_slime", "minionEveryLife": 0.06 },
+      "life": 2000, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [7, 6], "moveSpeed": 4, "tint": "#ffffff",
+      "loot": "king_slime", "value": 5000, "light": [2, 4, 8],
+      "boss": { "title": "King Slime", "flag": "defeated_king_slime", "arenaRadius": 120, "music": "boss_gel" },
+      "covers": ["terraria:king_slime"]
+    },
+    {
+      "id": "eye_of_cthulhu", "model": "eye_of_cthulhu", "tags": ["boss", "lava_immune"], "name": "Eye of Cthulhu",
+      "description": "It has been watching since the first night.",
+      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 16, "dashSpeed": 15, "dashesPerBurst": 3, "telegraphTicks": 30, "servant": "servant_of_cthulhu", "servantInterval": 100, "phase2Life": 0.5, "phase2Model": "eye_of_cthulhu_mouth" },
+      "life": 2800, "damage": 18, "defense": 12, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
+      "loot": "eye_of_cthulhu", "value": 8000,
+      "boss": { "title": "The Eye of Cthulhu", "flag": "defeated_eye_of_cthulhu", "arenaRadius": 150, "despawnAtDay": true, "music": "boss_eye" },
+      "covers": ["terraria:eye_of_cthulhu"]
+    },
+    {
+      "id": "servant_of_cthulhu", "model": "demon_eye", "name": "Servant of Cthulhu",
+      "brain": { "type": "flyer", "aggroRange": 120, "orbitRadius": 2, "dashSpeed": 9, "dashCooldown": 50 },
+      "life": 8, "damage": 12, "defense": 0, "knockbackResist": 0, "size": [1.2, 1.2], "scale": 0.6, "moveSpeed": 6, "gravity": false, "collideTerrain": false,
+      "value": 0, "covers": ["terraria:servant_of_cthulhu"]
+    },
+    {
+      "id": "eater_of_worlds", "model": "eater_of_worlds_head", "tags": ["boss", "lava_immune"], "name": "Eater of Worlds",
+      "description": "A ravenous worm that chews tunnels through the tainted earth.",
+      "brain": { "type": "worm", "speed": 9, "turnRate": 2.5, "digRadius": 1.8, "digInterval": 6, "airGravity": 14 },
+      "life": 4000, "damage": 22, "defense": 4, "knockbackResist": 1.0, "size": [3, 3], "moveSpeed": 9, "gravity": false, "collideTerrain": false,
+      "loot": "eater_of_worlds", "value": 6000,
+      "boss": { "title": "Eater of Worlds", "flag": "defeated_eater_of_worlds", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 140, "music": "boss_worm", "segments": 18, "segmentSpacing": 1.1, "segmentRadius": 0.7, "segmentModel": "eater_of_worlds_body", "tailModel": "eater_of_worlds_tail" },
+      "covers": ["terraria:eater_of_worlds"]
+    }
+  ]
+}

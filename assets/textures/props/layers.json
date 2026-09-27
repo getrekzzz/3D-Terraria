@@ -1,0 +1,174 @@
+{
+ "columns": 8,
+ "rows": 4,
+ "size": 256,
+ "layers": [
+  {
+   "name": "planks",
+   "index": 0,
+   "type": "planks"
+  },
+  {
+   "name": "dark_planks",
+   "index": 1,
+   "type": "planks"
+  },
+  {
+   "name": "stone",
+   "index": 2,
+   "type": "rock"
+  },
+  {
+   "name": "stone_brick",
+   "index": 3,
+   "type": "bricks"
+  },
+  {
+   "name": "bark",
+   "index": 4,
+   "type": "bark"
+  },
+  {
+   "name": "pine_bark",
+   "index": 5,
+   "type": "bark"
+  },
+  {
+   "name": "palm_bark",
+   "index": 6,
+   "type": "bark"
+  },
+  {
+   "name": "mahoe_bark",
+   "index": 7,
+   "type": "bark"
+  },
+  {
+   "name": "gloom_bark",
+   "index": 8,
+   "type": "bark"
+  },
+  {
+   "name": "leaves",
+   "index": 9,
+   "type": "foliage",
+   "sway": 0.012
+  },
+  {
+   "name": "fronds",
+   "index": 10,
+   "type": "grass",
+   "sway": 0.02
+  },
+  {
+   "name": "jungle_leaves",
+   "index": 11,
+   "type": "foliage",
+   "sway": 0.012
+  },
+  {
+   "name": "oak_sprig",
+   "index": 12,
+   "type": "sprig",
+   "sway": 0.012
+  },
+  {
+   "name": "pine_sprig",
+   "index": 13,
+   "type": "sprig",
+   "sway": 0.01
+  },
+  {
+   "name": "jungle_sprig",
+   "index": 14,
+   "type": "sprig",
+   "sway": 0.012
+  },
+  {
+   "name": "gloom_sprig",
+   "index": 15,
+   "type": "sprig",
+   "sway": 0.012
+  },
+  {
+   "name": "cactus_skin",
+   "index": 16,
+   "type": "ribbed"
+  },
+  {
+   "name": "glowcap",
+   "index": 17,
+   "type": "cap"
+  },
+  {
+   "name": "red_cap",
+   "index": 18,
+   "type": "cap"
+  },
+  {
+   "name": "iron",
+   "index": 19,
+   "type": "metal"
+  },
+  {
+   "name": "dark_iron",
+   "index": 20,
+   "type": "metal"
+  },
+  {
+   "name": "gold",
+   "index": 21,
+   "type": "metal"
+  },
+  {
+   "name": "copper",
+   "index": 22,
+   "type": "metal"
+  },
+  {
+   "name": "cloth",
+   "index": 23,
+   "type": "cloth"
+  },
+  {
+   "name": "red_cloth",
+   "index": 24,
+   "type": "cloth"
+  },
+  {
+   "name": "leather",
+   "index": 25,
+   "type": "leather"
+  },
+  {
+   "name": "clay",
+   "index": 26,
+   "type": "soil"
+  },
+  {
+   "name": "crystal",
+   "index": 27,
+   "type": "translucent"
+  },
+  {
+   "name": "flesh",
+   "index": 28,
+   "type": "soil"
+  },
+  {
+   "name": "gel",
+   "index": 29,
+   "type": "translucent"
+  },
+  {
+   "name": "plain",
+   "index": 30,
+   "type": "soil"
+  },
+  {
+   "name": "missing",
+   "index": 31,
+   "type": "missing"
+  }
+ ]
+}

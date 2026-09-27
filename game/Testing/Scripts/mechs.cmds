@@ -1,0 +1,39 @@
+# Mechanical terrors: the clockwork eye calls both Twin Lenses (the pair counts once both fall), the Iron Serpent
+# flies through the ground releasing probes, Warden Prime swings four tools; with all three down the world moves on.
+wait_until player.frozen == 0 180
+spawning off
+town arrivals off
+flag defeated_wall_of_flesh
+killall
+heal
+god
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 10 12 air
+time 22
+give mechanical_eye 1
+wield mechanical_eye
+use
+assert npcs.retinazer == 1
+assert npcs.spazmatism == 1
+wait 3
+assert errors == 0
+slay retinazer
+assert flag.defeated_the_twins == 0
+slay spazmatism
+assert flag.defeated_the_twins == 1
+killall
+boss the_destroyer 14
+wait 5
+assert npcs.the_destroyer == 1
+assert npcs.probe >= 1
+slay the_destroyer
+assert flag.defeated_the_destroyer == 1
+killall
+boss skeletron_prime 12
+wait 3
+assert npcs.skeletron_prime == 1
+slay skeletron_prime
+assert flag.defeated_skeletron_prime == 1
+assert flag.defeated_all_mechs == 1
+time noon
+assert errors == 0

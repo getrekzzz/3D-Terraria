@@ -1,0 +1,71 @@
+using System.Text.Json;
+using Godot;
+using Strata.Core.Meshing;
+
+namespace Strata.Game.World;
+
+/// <summary>
+/// Terrain texture arrays, the surface→layer lookup table, the per-layer detail table and the shared terrain
+/// materials. Layer metadata (detail grain per layer) comes from the texture build's layers.json.
+/// </summary>
+public sealed class TerrainMaterials
+{
+    public TerrainMaterials(RenderTables tables)
+    {
+        var albedo = GD.Load<TextureLayered>("res://assets/textures/terrain/terrain_albedo.png");
+        var material = GD.Load<TextureLayered>("res://assets/textures/terrain/terrain_material.png");
+        var detail = GD.Load<TextureLayered>("res://assets/textures/detail/detail.png");
+        var table = BuildSurfaceTable(tables);
+        var layers = BuildLayerTable("res://assets/textures/terrain/layers.json");
+
+        Opaque = Create("res://shaders/terrain.gdshader", albedo, material, detail, table, layers);
+        Cutout = Create("res://shaders/terrain_cutout.gdshader", albedo, material, detail, table, layers);
+        Glass = Create("res://shaders/terrain_glass.gdshader", albedo, material, detail, table, layers);
+        Liquid = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/liquid.gdshader") };
+    }
+
+    public ShaderMaterial Opaque { get; }
+    public ShaderMaterial Cutout { get; }
+    public ShaderMaterial Glass { get; }
+    public ShaderMaterial Liquid { get; }
+
+    private static ShaderMaterial Create(string shaderPath, TextureLayered albedo, TextureLayered material, TextureLayered detail, Texture2D table, Texture2D layers)
+    {
+        var m = new ShaderMaterial { Shader = GD.Load<Shader>(shaderPath) };
+        m.SetShaderParameter("albedo_array", albedo);
+        m.SetShaderParameter("material_array", material);
+        m.SetShaderParameter("detail_array", detail);
+        m.SetShaderParameter("surface_table", table);
+        m.SetShaderParameter("layer_table", layers);
+        return m;
+    }
+
+    /// <summary>One RGBAF texel per texture layer: (detail layer, detail strength, 0, 0).</summary>
+    private static Texture2D BuildLayerTable(string path)
+    {
+        using var doc = JsonDocument.Parse(FileAccess.GetFileAsString(path));
+        var entries = doc.RootElement.GetProperty("layers");
+        int count = System.Math.Max(1, entries.GetArrayLength());
+        var image = Image.CreateEmpty(count, 1, false, Image.Format.Rgbaf);
+        foreach (var layer in entries.EnumerateArray())
+        {
+            float index = layer.TryGetProperty("detail", out var d) ? d.GetSingle() : 0f;
+            float strength = layer.TryGetProperty("detailStrength", out var st) ? st.GetSingle() : 0f;
+            image.SetPixel(layer.GetProperty("index").GetInt32(), 0, new Color(index, strength, 0, 0));
+        }
+        return ImageTexture.CreateFromImage(image);
+    }
+
+    /// <summary>One RGBAF texel per render surface: (top layer, side layer, bottom layer, unused).</summary>
+    private static Texture2D BuildSurfaceTable(RenderTables tables)
+    {
+        int count = System.Math.Max(1, tables.Surfaces.Count);
+        var image = Image.CreateEmpty(count, 1, false, Image.Format.Rgbaf);
+        for (int i = 0; i < tables.Surfaces.Count; i++)
+        {
+            var s = tables.Surfaces[i];
+            image.SetPixel(i, 0, new Color(s.Top, s.Side, s.Bottom, 0));
+        }
+        return ImageTexture.CreateFromImage(image);
+    }
+}

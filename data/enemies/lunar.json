@@ -1,0 +1,218 @@
+{
+  // The endgame. Once Golem falls, Lunatic Devotees gather at the dungeon gate around the Mysterious Tablet, guarded
+  // by Cultist Archers; strike one and the Lunatic Cultist rises. Its defeat begins the Lunar Events: four Celestial
+  // Pillars stand across the world, each shielded until 100 of its legion fall. When the last pillar breaks, the
+  // Moon Lord descends: his core stays sealed while his head and hands live.
+  "buffs": [
+    { "id": "frostburn", "name": "Frostburn", "description": "It's either really hot or really cold. Either way it REALLY hurts.", "debuff": true, "color": "#8ae0ff", "tags": ["fire"],
+      "effects": [{ "type": "damageOverTime", "perSecond": 8 }, { "type": "emitLight", "color": [4, 8, 12] }] },
+    { "id": "confused", "name": "Confused", "description": "Movement is disoriented.", "debuff": true, "color": "#c880ff",
+      "effects": [{ "type": "stat", "stat": "moveSpeed", "add": -0.4 }], "covers": ["terraria:confused"] }
+  ],
+  "projectiles": [
+    { "id": "cultist_fireball", "name": "Fireball", "visual": "orb", "color": "#ff8a2a", "lifetime": 200, "radius": 0.5, "friendly": false, "hostile": true, "light": [14, 7, 2], "trail": "#ffb04a" },
+    { "id": "cultist_ice_mist", "name": "Ice Mist", "visual": "orb", "color": "#9ae8ff", "lifetime": 300, "radius": 1.0, "homing": 0.8, "friendly": false, "hostile": true, "light": [6, 10, 14],
+      "onHit": [{ "type": "applyBuff", "buff": "frostburn", "ticks": 240, "chance": 1 }] },
+    { "id": "cultist_lightning", "name": "Lightning Orb", "visual": "bolt", "color": "#8ae0ff", "lifetime": 120, "radius": 0.4, "friendly": false, "hostile": true, "light": [8, 12, 15], "trail": "#ffffff" },
+    { "id": "ancient_light", "name": "Ancient Light", "visual": "orb", "color": "#fff0a0", "lifetime": 240, "radius": 0.45, "homing": 1.4, "friendly": false, "hostile": true, "light": [15, 14, 8] },
+    { "id": "shadow_fireball", "name": "Shadow Fireball", "visual": "orb", "color": "#6a2aff", "lifetime": 200, "radius": 0.45, "friendly": false, "hostile": true, "light": [8, 2, 14] },
+    { "id": "vortex_lightning", "name": "Vortex Lightning", "visual": "bolt", "color": "#3affc0", "lifetime": 100, "radius": 0.35, "friendly": false, "hostile": true, "light": [2, 14, 10], "trail": "#b0fff0" },
+    { "id": "storm_diver_laser", "name": "Laser", "visual": "bolt", "color": "#4aff6a", "lifetime": 90, "radius": 0.3, "friendly": false, "hostile": true, "light": [2, 12, 3] },
+    { "id": "alien_stinger", "name": "Stinger", "visual": "bolt", "color": "#9affd0", "gravity": 4, "lifetime": 150, "radius": 0.3, "friendly": false, "hostile": true },
+    { "id": "predictor_laser", "name": "Laser", "visual": "bolt", "color": "#ff6ae0", "lifetime": 90, "radius": 0.3, "friendly": false, "hostile": true, "light": [12, 3, 10] },
+    { "id": "nebula_eye_beam", "name": "Eye Beam", "visual": "bolt", "color": "#c86aff", "lifetime": 100, "radius": 0.4, "friendly": false, "hostile": true, "light": [10, 4, 14] },
+    { "id": "stargazer_star", "name": "Star", "visual": "orb", "color": "#6ab0ff", "lifetime": 200, "radius": 0.45, "homing": 0.6, "friendly": false, "hostile": true, "light": [6, 10, 15] },
+    { "id": "flow_invader_star", "name": "Star", "visual": "orb", "color": "#8ae0ff", "lifetime": 180, "radius": 0.35, "friendly": false, "hostile": true, "light": [6, 12, 15] },
+    { "id": "phantasmal_eye", "name": "Phantasmal Eye", "visual": "orb", "color": "#4affd8", "lifetime": 300, "radius": 0.5, "homing": 1.2, "friendly": false, "hostile": true, "light": [3, 15, 12], "trail": "#b0fff0" },
+    { "id": "phantasmal_sphere", "name": "Phantasmal Sphere", "visual": "orb", "color": "#6affe0", "lifetime": 360, "radius": 1.2, "homing": 0.5, "friendly": false, "hostile": true, "light": [4, 15, 13] },
+    { "id": "phantasmal_bolt", "name": "Phantasmal Bolt", "visual": "bolt", "color": "#9afff0", "lifetime": 120, "radius": 0.35, "friendly": false, "hostile": true, "light": [6, 15, 14], "trail": "#ffffff" },
+    { "id": "phantasmal_deathray", "name": "Phantasmal Deathray", "visual": "bolt", "color": "#b8fff8", "lifetime": 60, "radius": 0.9, "friendly": false, "hostile": true, "light": [10, 15, 15], "trail": "#4affd8" }
+  ],
+  "lootTables": [
+    { "id": "lunatic_cultist", "coins": [100000, 100000], "entries": [{ "item": "ancient_manipulator" }, { "item": "greater_healing_potion", "min": 5, "max": 15 }] },
+    { "id": "cultist_archer", "coins": [500, 1500], "entries": [{ "item": "greater_healing_potion", "chance": 0.1 }] },
+    { "id": "solar_pillar", "entries": [{ "item": "solar_fragment", "min": 25, "max": 40 }] },
+    { "id": "vortex_pillar", "entries": [{ "item": "vortex_fragment", "min": 25, "max": 40 }] },
+    { "id": "nebula_pillar", "entries": [{ "item": "nebula_fragment", "min": 25, "max": 40 }] },
+    { "id": "stardust_pillar", "entries": [{ "item": "stardust_fragment", "min": 25, "max": 40 }] },
+    { "id": "solar_legion", "coins": [500, 1200], "entries": [{ "item": "solar_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
+    { "id": "vortex_legion", "coins": [500, 1200], "entries": [{ "item": "vortex_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
+    { "id": "nebula_legion", "coins": [500, 1200], "entries": [{ "item": "nebula_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
+    { "id": "stardust_legion", "coins": [500, 1200], "entries": [{ "item": "stardust_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
+    { "id": "moon_lord", "coins": [200000, 200000], "entries": [
+      { "item": "luminite", "min": 70, "max": 90 }, { "table": "moon_lord_weapon" }, { "item": "greater_healing_potion", "min": 5, "max": 15 }
+    ] },
+    { "id": "moon_lord_weapon", "mode": "weighted", "entries": [
+      { "item": "meowmere" }, { "item": "terrarian" }, { "item": "star_wrath" }, { "item": "s_d_m_g" }, { "item": "last_prism" },
+      { "item": "lunar_flare" }, { "item": "rainbow_crystal_staff" }, { "item": "lunar_portal_staff" }
+    ] }
+  ],
+  "enemies": [
+    { "id": "mysterious_tablet", "model": "mysterious_tablet", "name": "Mysterious Tablet", "description": "The cultists chant before it.",
+      "life": 1, "invulnerable": true, "contactDamage": false, "knockbackResist": 1.0, "size": [2, 3.6], "moveSpeed": 0, "light": [4, 8, 14] },
+    { "id": "lunatic_devotee", "model": "lunatic_devotee", "name": "Lunatic Devotee", "description": "Lost in worship. Best not to disturb them.",
+      "life": 1, "contactDamage": false, "knockbackResist": 1.0, "size": [1.4, 3.4], "moveSpeed": 0, "covers": ["terraria:lunatic_devotee"] },
+    { "id": "cultist_archer", "model": "cultist_archer", "tags": ["cultist"], "name": "Cultist Archer", "description": "Guards the ritual with a steady bow.",
+      "brain": { "type": "walker", "aggroRange": 60, "jumpHeight": 4 },
+      "ranged": { "projectile": "goblin_arrow", "damage": 40, "speed": 22, "interval": 70, "range": 32 },
+      "life": 1000, "damage": 40, "defense": 20, "knockbackResist": 0.5, "size": [1.4, 3.4], "moveSpeed": 2.6, "loot": "cultist_archer", "value": 1500, "covers": ["terraria:cultist_archer"] },
+    { "id": "lunatic_cultist_clone", "model": "lunatic_cultist", "tint": "#7a7aff", "name": "Ancient Cultist", "description": "An illusion of the Lunatic Cultist.",
+      "brain": { "type": "caster", "aggroRange": 60, "teleportInterval": 200, "minBlink": 6, "maxBlink": 14 },
+      "ranged": { "projectile": "shadow_fireball", "damage": 40, "speed": 12, "interval": 90, "range": 40 },
+      "life": 400, "damage": 30, "defense": 20, "knockbackResist": 0.5, "size": [1.4, 3.4], "moveSpeed": 0.5, "gravity": false, "collideTerrain": false },
+    {
+      "id": "lunatic_cultist", "model": "lunatic_cultist", "tags": ["boss", "lava_immune"], "name": "Lunatic Cultist", "description": "The high priest of an ancient, lunar god.",
+      "brain": { "type": "pattern", "phases": [
+        { "below": 1.0, "summon": { "enemy": "lunatic_cultist_clone", "interval": 720, "max": 3, "count": 3, "radius": 3 },
+          "moves": [
+            { "type": "hover", "ticks": 150, "speed": 7, "distance": 10, "height": 5, "volley": { "projectile": "cultist_fireball", "damage": 50, "speed": 14, "interval": 40, "count": 3, "spread": 14 } },
+            { "type": "teleport", "telegraph": 30, "ticks": 40, "distance": 12, "height": 6 },
+            { "type": "hover", "ticks": 120, "speed": 6, "distance": 12, "height": 7, "volley": { "projectile": "cultist_ice_mist", "damage": 60, "speed": 6, "interval": 60 } },
+            { "type": "wait", "ticks": 90, "pose": "attack", "volley": { "projectile": "cultist_lightning", "damage": 55, "speed": 26, "interval": 30, "count": 3, "spread": 6 } },
+            { "type": "teleport", "telegraph": 30, "ticks": 40, "distance": 10, "height": 5 },
+            { "type": "wait", "ticks": 100, "pose": "attack", "volley": { "projectile": "ancient_light", "damage": 50, "speed": 12, "interval": 50, "count": 5, "spread": 30 } }
+          ] },
+        { "below": 0.5, "speed": 1.3, "damage": 1.2, "summon": { "enemy": "lunatic_cultist_clone", "interval": 540, "max": 4, "count": 4, "radius": 3 },
+          "volley": { "projectile": "ancient_light", "damage": 50, "speed": 12, "interval": 150, "count": 4, "spread": 40 },
+          "moves": [
+            { "type": "teleport", "telegraph": 22, "ticks": 30, "distance": 11, "height": 5 },
+            { "type": "hover", "ticks": 110, "speed": 8, "distance": 9, "height": 5, "volley": { "projectile": "cultist_fireball", "damage": 55, "speed": 16, "interval": 30, "count": 4, "spread": 16 } },
+            { "type": "wait", "ticks": 80, "pose": "attack", "volley": { "projectile": "cultist_lightning", "damage": 60, "speed": 28, "interval": 20, "count": 4, "spread": 8 } },
+            { "type": "orbit", "ticks": 140, "speed": 9, "distance": 11, "height": 6, "volley": { "projectile": "cultist_ice_mist", "damage": 65, "speed": 7, "interval": 70 } }
+          ] }
+      ] },
+      "life": 32000, "damage": 50, "defense": 42, "knockbackResist": 1.0, "size": [1.6, 3.6], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [6, 8, 14],
+      "loot": "lunatic_cultist", "value": 100000,
+      "boss": { "title": "Lunatic Cultist", "flag": "defeated_lunatic_cultist", "arenaRadius": 140, "music": "boss_cultist",
+        "ritual": { "landmark": "dungeon_gate", "requires": "defeated_golem", "altar": "mysterious_tablet", "worshipper": "lunatic_devotee", "count": 4,
+          "guard": "cultist_archer", "guards": 2, "radius": 3.5, "range": 60 } },
+      "covers": ["terraria:lunatic_cultist"]
+    },
+
+    {
+      "id": "solar_pillar", "model": "solar_pillar", "tags": ["celestial_pillar", "lava_immune"], "name": "Solar Pillar", "description": "A tower of living flame from beyond the sky.",
+      "brain": { "type": "pattern", "phases": [{ "moves": [{ "type": "wait", "ticks": 600, "pose": "idle" }],
+        "summon": { "pool": ["selenian", "corite", "drakomire"], "interval": 80, "max": 7, "count": 2, "radius": 18, "range": 100 } }] },
+      "life": 20000, "defense": 20, "contactDamage": false, "knockbackResist": 1.0, "size": [10, 20], "gravity": false, "collideTerrain": false, "light": [15, 9, 3],
+      "shield": { "killTag": "solar", "kills": 100 }, "loot": "solar_pillar", "value": 20000,
+      "boss": { "minor": true, "title": "Solar Pillar", "flag": "defeated_solar_pillar", "arenaRadius": 100000 }
+    },
+    {
+      "id": "vortex_pillar", "model": "vortex_pillar", "tags": ["celestial_pillar", "lava_immune"], "name": "Vortex Pillar", "description": "A tower of storms and alien flight.",
+      "brain": { "type": "pattern", "phases": [{ "moves": [{ "type": "wait", "ticks": 600, "pose": "idle" }],
+        "summon": { "pool": ["vortexian", "storm_diver", "alien_hornet"], "interval": 80, "max": 7, "count": 2, "radius": 18, "range": 100 } }] },
+      "life": 20000, "defense": 20, "contactDamage": false, "knockbackResist": 1.0, "size": [10, 20], "gravity": false, "collideTerrain": false, "light": [3, 15, 11],
+      "shield": { "killTag": "vortex", "kills": 100 }, "loot": "vortex_pillar", "value": 20000,
+      "boss": { "minor": true, "title": "Vortex Pillar", "flag": "defeated_vortex_pillar", "arenaRadius": 100000 }
+    },
+    {
+      "id": "nebula_pillar", "model": "nebula_pillar", "tags": ["celestial_pillar", "lava_immune"], "name": "Nebula Pillar", "description": "A tower of dreaming, psychic light.",
+      "brain": { "type": "pattern", "phases": [{ "moves": [{ "type": "wait", "ticks": 600, "pose": "idle" }],
+        "summon": { "pool": ["predictor", "brain_suckler", "nebula_floater"], "interval": 80, "max": 7, "count": 2, "radius": 18, "range": 100 } }] },
+      "life": 20000, "defense": 20, "contactDamage": false, "knockbackResist": 1.0, "size": [10, 20], "gravity": false, "collideTerrain": false, "light": [13, 5, 15],
+      "shield": { "killTag": "nebula", "kills": 100 }, "loot": "nebula_pillar", "value": 20000,
+      "boss": { "minor": true, "title": "Nebula Pillar", "flag": "defeated_nebula_pillar", "arenaRadius": 100000 }
+    },
+    {
+      "id": "stardust_pillar", "model": "stardust_pillar", "tags": ["celestial_pillar", "lava_immune"], "name": "Stardust Pillar", "description": "A tower of cold starlight.",
+      "brain": { "type": "pattern", "phases": [{ "moves": [{ "type": "wait", "ticks": 600, "pose": "idle" }],
+        "summon": { "pool": ["stargazer", "flow_invader", "twinkle_popper"], "interval": 80, "max": 7, "count": 2, "radius": 18, "range": 100 } }] },
+      "life": 20000, "defense": 20, "contactDamage": false, "knockbackResist": 1.0, "size": [10, 20], "gravity": false, "collideTerrain": false, "light": [5, 10, 15],
+      "shield": { "killTag": "stardust", "kills": 100 }, "loot": "stardust_pillar", "value": 20000,
+      "boss": { "minor": true, "title": "Stardust Pillar", "flag": "defeated_stardust_pillar", "arenaRadius": 100000 }
+    },
+
+    { "id": "selenian", "model": "selenian", "tags": ["solar", "lava_immune"], "name": "Selenian", "description": "A spinning sun-warrior that shrugs off shots while it rolls.",
+      "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 6 },
+      "life": 1100, "damage": 80, "defense": 30, "knockbackResist": 0.2, "size": [1.4, 3.2], "moveSpeed": 5.2, "loot": "solar_legion", "value": 1000, "covers": ["terraria:selenian"] },
+    { "id": "corite", "model": "cursed_skull", "tint": "#ffa040", "tags": ["solar", "lava_immune"], "name": "Corite", "description": "A burning meteor that charges its prey.",
+      "brain": { "type": "flyer", "aggroRange": 120, "orbitRadius": 4, "dashSpeed": 15, "dashCooldown": 80, "bounceOffTerrain": false },
+      "life": 1000, "damage": 80, "defense": 20, "knockbackResist": 0.3, "size": [1.6, 1.6], "moveSpeed": 6.5, "gravity": false, "collideTerrain": false, "light": [14, 7, 2],
+      "loot": "solar_legion", "value": 1000, "covers": ["terraria:corite"] },
+    { "id": "drakomire", "model": "drakomire", "tags": ["solar", "lava_immune"], "name": "Drakomire", "description": "A fire-drake that stomps and breathes flame.",
+      "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 5 },
+      "ranged": { "projectile": "cultist_fireball", "damage": 55, "speed": 14, "interval": 110, "range": 24 },
+      "life": 1500, "damage": 70, "defense": 28, "knockbackResist": 0.6, "size": [3.2, 3.2], "moveSpeed": 3.6, "loot": "solar_legion", "value": 1200, "covers": ["terraria:drakomire"] },
+    { "id": "vortexian", "model": "vortexian", "tags": ["vortex"], "name": "Vortexian", "description": "A long-limbed alien that calls lightning.",
+      "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 7 },
+      "ranged": { "projectile": "vortex_lightning", "damage": 50, "speed": 24, "interval": 100, "range": 26 },
+      "life": 1000, "damage": 60, "defense": 20, "knockbackResist": 0.3, "size": [1.4, 3.6], "moveSpeed": 4.4, "loot": "vortex_legion", "value": 1000, "covers": ["terraria:vortexian"] },
+    { "id": "storm_diver", "model": "storm_diver", "tags": ["vortex"], "name": "Storm Diver", "description": "An alien trooper with a jetpack and a laser.",
+      "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 8 },
+      "ranged": { "projectile": "storm_diver_laser", "damage": 50, "speed": 30, "interval": 50, "count": 3, "spread": 4, "range": 30 },
+      "life": 1000, "damage": 70, "defense": 30, "knockbackResist": 0.4, "size": [1.4, 3.4], "moveSpeed": 3.8, "loot": "vortex_legion", "value": 1000, "covers": ["terraria:storm_diver"] },
+    { "id": "alien_hornet", "model": "alien_hornet", "tags": ["vortex"], "name": "Alien Hornet", "description": "Buzzes in to fire acid stingers.",
+      "brain": { "type": "flyer", "aggroRange": 120, "orbitRadius": 6, "dashSpeed": 10, "dashCooldown": 150 },
+      "ranged": { "projectile": "alien_stinger", "damage": 50, "speed": 20, "interval": 80, "range": 26 },
+      "life": 800, "damage": 70, "defense": 20, "knockbackResist": 0.4, "size": [1.0, 0.9], "scale": 1.8, "moveSpeed": 6, "gravity": false, "loot": "vortex_legion", "value": 1000, "covers": ["terraria:alien_hornet"] },
+    { "id": "predictor", "model": "predictor", "tags": ["nebula"], "name": "Predictor", "description": "Foresees where you will be, and fires there.",
+      "brain": { "type": "flyer", "aggroRange": 120, "orbitRadius": 7, "dashSpeed": 14, "dashCooldown": 120 },
+      "ranged": { "projectile": "predictor_laser", "damage": 55, "speed": 32, "interval": 70, "count": 2, "spread": 3, "range": 32 },
+      "life": 1100, "damage": 80, "defense": 30, "knockbackResist": 0.3, "size": [1.0, 0.9], "scale": 2.2, "moveSpeed": 6, "gravity": false, "loot": "nebula_legion", "value": 1000, "covers": ["terraria:predictor"] },
+    { "id": "brain_suckler", "model": "brain_suckler", "tags": ["nebula"], "name": "Brain Suckler", "description": "Latches onto your head.",
+      "brain": { "type": "flyer", "aggroRange": 120, "orbitRadius": 2, "dashSpeed": 11, "dashCooldown": 70 },
+      "life": 600, "damage": 60, "defense": 20, "knockbackResist": 0.5, "size": [1.2, 1.2], "moveSpeed": 7, "gravity": false, "light": [10, 4, 12],
+      "onContact": [{ "type": "applyBuff", "buff": "confused", "ticks": 180, "chance": 0.5 }], "loot": "nebula_legion", "value": 800, "covers": ["terraria:brain_suckler"] },
+    { "id": "nebula_floater", "model": "nebula_floater", "tags": ["nebula"], "name": "Nebula Floater", "description": "A drifting mind that blinks and stares.",
+      "brain": { "type": "caster", "aggroRange": 80, "teleportInterval": 220, "minBlink": 6, "maxBlink": 14 },
+      "ranged": { "projectile": "nebula_eye_beam", "damage": 60, "speed": 20, "interval": 90, "range": 34 },
+      "life": 1000, "damage": 60, "defense": 20, "knockbackResist": 0.5, "size": [1.0, 1.8], "scale": 2.4, "moveSpeed": 0.6, "gravity": false, "light": [10, 4, 14], "loot": "nebula_legion", "value": 1000, "covers": ["terraria:nebula_floater"] },
+    { "id": "stargazer", "model": "stargazer", "tags": ["stardust"], "name": "Stargazer", "description": "Calls stars down from the heavens.",
+      "brain": { "type": "caster", "aggroRange": 80, "teleportInterval": 260, "minBlink": 6, "maxBlink": 14 },
+      "ranged": { "projectile": "stargazer_star", "damage": 60, "speed": 12, "interval": 80, "count": 3, "spread": 20, "range": 34 },
+      "life": 1100, "damage": 60, "defense": 30, "knockbackResist": 0.4, "size": [1.6, 3.8], "moveSpeed": 0.5, "light": [6, 10, 15], "loot": "stardust_legion", "value": 1000, "covers": ["terraria:stargazer"] },
+    { "id": "flow_invader", "model": "flow_invader", "tags": ["stardust"], "name": "Flow Invader", "description": "A starry squid that sprays shards.",
+      "brain": { "type": "flyer", "aggroRange": 120, "orbitRadius": 6, "dashSpeed": 9, "dashCooldown": 140 },
+      "ranged": { "projectile": "flow_invader_star", "damage": 55, "speed": 18, "interval": 75, "count": 3, "spread": 12, "range": 28 },
+      "life": 900, "damage": 70, "defense": 20, "knockbackResist": 0.4, "size": [1.0, 1.8], "scale": 2.0, "moveSpeed": 5, "gravity": false, "light": [6, 12, 15], "loot": "stardust_legion", "value": 1000, "covers": ["terraria:flow_invader"] },
+    { "id": "twinkle_popper", "model": "gel", "tint": "#8ac8ff", "tags": ["stardust"], "name": "Twinkle Popper", "description": "Bounces in and bursts into twinkles.",
+      "brain": { "type": "slimeHop", "aggroRange": 100, "jumpHeight": 6 },
+      "life": 700, "damage": 60, "defense": 20, "knockbackResist": 0.4, "size": [1.8, 1.4], "moveSpeed": 4, "light": [6, 10, 15], "loot": "stardust_legion", "value": 800, "covers": ["terraria:twinkle_popper"] },
+
+    {
+      "id": "moon_lord", "model": "moon_lord", "tags": ["boss", "lava_immune"], "name": "Moon Lord", "description": "The eldritch god of the moon, freed at last.",
+      "brain": { "type": "pattern", "phases": [
+        { "below": 1.0, "shieldedBy": "moon_lord_hand,moon_lord_head",
+          "moves": [{ "type": "wait", "ticks": 180, "pose": "idle" }, { "type": "hover", "ticks": 360, "speed": 3, "distance": 18, "height": 5 }, { "type": "chase", "ticks": 240, "speed": 2.4, "height": 10 }] },
+        { "below": 0.4, "speed": 1.4, "volley": { "projectile": "phantasmal_bolt", "damage": 60, "speed": 20, "interval": 110, "count": 10, "ring": true },
+          "moves": [{ "type": "hover", "ticks": 300, "speed": 4, "distance": 15, "height": 4 }, { "type": "chase", "ticks": 200, "speed": 3.2, "height": 8 }] }
+      ] },
+      "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [8, 10], "moveSpeed": 4, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
+      "loot": "moon_lord", "value": 200000,
+      "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220, "music": "boss_moon_lord",
+        "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5] }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2] }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2] }] },
+      "covers": ["terraria:moon_lord"]
+    },
+    {
+      "id": "moon_lord_head", "model": "moon_lord_head", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Head", "description": "Its great eye opens to burn.",
+      "brain": { "type": "pattern", "phases": [
+        { "moves": [
+          { "type": "wait", "ticks": 150, "volley": { "projectile": "phantasmal_bolt", "damage": 55, "speed": 22, "interval": 30, "count": 3, "spread": 8 } },
+          { "type": "wait", "ticks": 60, "pose": "telegraph" },
+          { "type": "wait", "ticks": 72, "pose": "attack", "volley": { "projectile": "phantasmal_deathray", "damage": 75, "speed": 40, "interval": 6, "count": 2, "spread": 2, "range": 70 } }
+        ] }
+      ] },
+      "life": 45000, "damage": 60, "defense": 50, "knockbackResist": 1.0, "size": [8, 10], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
+      "onDeath": [{ "type": "spawnEnemies", "enemy": "true_eye_of_cthulhu", "count": 1 }],
+      "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220 }
+    },
+    {
+      "id": "moon_lord_hand", "model": "moon_lord_hand", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Hand", "description": "An eye stares from each palm.",
+      "brain": { "type": "pattern", "phases": [
+        { "moves": [
+          { "type": "wait", "ticks": 120, "volley": { "projectile": "phantasmal_eye", "damage": 50, "speed": 12, "interval": 40, "count": 3, "spread": 25 } },
+          { "type": "wait", "ticks": 150, "volley": { "projectile": "phantasmal_sphere", "damage": 60, "speed": 7, "interval": 75 } }
+        ] }
+      ] },
+      "life": 25000, "damage": 60, "defense": 50, "knockbackResist": 1.0, "size": [6, 8], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
+      "onDeath": [{ "type": "spawnEnemies", "enemy": "true_eye_of_cthulhu", "count": 1 }],
+      "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220 }
+    },
+    { "id": "true_eye_of_cthulhu", "model": "true_eye_of_cthulhu", "tags": ["lava_immune"], "name": "True Eye of Cthulhu", "description": "Freed from its lord's flesh; it will not be stopped.",
+      "brain": { "type": "flyer", "aggroRange": 200, "orbitRadius": 9, "dashSpeed": 12, "dashCooldown": 200, "bounceOffTerrain": false },
+      "ranged": { "projectile": "phantasmal_bolt", "damage": 50, "speed": 20, "interval": 120, "count": 3, "spread": 10, "range": 40 },
+      "life": 1, "invulnerable": true, "damage": 50, "knockbackResist": 1.0, "size": [3, 3], "moveSpeed": 7, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
+      "despawnWhen": [{ "type": "flag", "id": "defeated_moon_lord" }], "covers": ["terraria:true_eye_of_cthulhu"] }
+  ],
+  "spawnRules": []
+}

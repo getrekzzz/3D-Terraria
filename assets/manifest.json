@@ -1,0 +1,3498 @@
+{
+ "objects": {
+  "adamantite_forge": {
+   "models": [
+    "assets/models/objects/adamantite_forge_v0.glb"
+   ],
+   "generator": "furnace"
+  },
+  "ancient_manipulator": {
+   "models": [
+    "assets/models/objects/ancient_manipulator_v0.glb"
+   ],
+   "generator": "manipulator"
+  },
+  "bed": {
+   "models": [
+    "assets/models/objects/bed_v0.glb"
+   ],
+   "generator": "bed"
+  },
+  "bee_larva": {
+   "models": [
+    "assets/models/objects/bee_larva_v0.glb"
+   ],
+   "generator": "larva"
+  },
+  "bush": {
+   "models": [
+    "assets/models/objects/bush_v0.glb",
+    "assets/models/objects/bush_v1.glb",
+    "assets/models/objects/bush_v2.glb"
+   ],
+   "generator": "bush"
+  },
+  "cactus": {
+   "models": [
+    "assets/models/objects/cactus_v0.glb",
+    "assets/models/objects/cactus_v1.glb",
+    "assets/models/objects/cactus_v2.glb"
+   ],
+   "generator": "cactus"
+  },
+  "candle": {
+   "models": [
+    "assets/models/objects/candle_v0.glb"
+   ],
+   "generator": "candle"
+  },
+  "cooking_pot": {
+   "models": [
+    "assets/models/objects/cooking_pot_v0.glb"
+   ],
+   "generator": "pot"
+  },
+  "crimson_altar": {
+   "models": [
+    "assets/models/objects/crimson_altar_v0.glb"
+   ],
+   "generator": "altar"
+  },
+  "crimson_heart": {
+   "models": [
+    "assets/models/objects/crimson_heart_v0.glb"
+   ],
+   "generator": "evil_orb"
+  },
+  "demon_altar": {
+   "models": [
+    "assets/models/objects/demon_altar_v0.glb"
+   ],
+   "generator": "altar"
+  },
+  "ebonwood_tree": {
+   "models": [
+    "assets/models/objects/ebonwood_tree_v0.glb",
+    "assets/models/objects/ebonwood_tree_v1.glb"
+   ],
+   "generator": "twisted"
+  },
+  "enchanted_sword_shrine": {
+   "models": [
+    "assets/models/objects/enchanted_sword_shrine_v0.glb"
+   ],
+   "generator": "shrine"
+  },
+  "fern": {
+   "models": [
+    "assets/models/objects/fern_v0.glb",
+    "assets/models/objects/fern_v1.glb",
+    "assets/models/objects/fern_v2.glb"
+   ],
+   "generator": "fern"
+  },
+  "flower": {
+   "models": [
+    "assets/models/objects/flower_v0.glb",
+    "assets/models/objects/flower_v1.glb",
+    "assets/models/objects/flower_v2.glb",
+    "assets/models/objects/flower_v3.glb"
+   ],
+   "generator": "flower"
+  },
+  "furnace": {
+   "models": [
+    "assets/models/objects/furnace_v0.glb"
+   ],
+   "generator": "furnace"
+  },
+  "giant_glowing_mushroom": {
+   "models": [
+    "assets/models/objects/giant_glowing_mushroom_v0.glb",
+    "assets/models/objects/giant_glowing_mushroom_v1.glb"
+   ],
+   "generator": "giant_mushroom"
+  },
+  "glowing_mushroom_plant": {
+   "models": [
+    "assets/models/objects/glowing_mushroom_plant_v0.glb"
+   ],
+   "generator": "small_mushroom"
+  },
+  "gold_chest": {
+   "models": [
+    "assets/models/objects/gold_chest_v0.glb"
+   ],
+   "generator": "chest"
+  },
+  "grass_tuft": {
+   "models": [
+    "assets/models/objects/grass_tuft_v0.glb",
+    "assets/models/objects/grass_tuft_v1.glb",
+    "assets/models/objects/grass_tuft_v2.glb",
+    "assets/models/objects/grass_tuft_v3.glb"
+   ],
+   "generator": "grass_tuft"
+  },
+  "hellforge": {
+   "models": [
+    "assets/models/objects/hellforge_v0.glb"
+   ],
+   "generator": "furnace"
+  },
+  "iron_anvil": {
+   "models": [
+    "assets/models/objects/iron_anvil_v0.glb"
+   ],
+   "generator": "anvil"
+  },
+  "lead_anvil": {
+   "models": [
+    "assets/models/objects/lead_anvil_v0.glb"
+   ],
+   "generator": "anvil"
+  },
+  "life_crystal_node": {
+   "models": [
+    "assets/models/objects/life_crystal_node_v0.glb"
+   ],
+   "generator": "crystal_node"
+  },
+  "lihzahrd_altar": {
+   "models": [
+    "assets/models/objects/lihzahrd_altar_v0.glb"
+   ],
+   "generator": "altar"
+  },
+  "lihzahrd_door": {
+   "models": [
+    "assets/models/objects/lihzahrd_door_v0.glb"
+   ],
+   "generator": "stone_door"
+  },
+  "loom": {
+   "models": [
+    "assets/models/objects/loom_v0.glb"
+   ],
+   "generator": "loom"
+  },
+  "mahogany_tree": {
+   "models": [
+    "assets/models/objects/mahogany_tree_v0.glb",
+    "assets/models/objects/mahogany_tree_v1.glb",
+    "assets/models/objects/mahogany_tree_v2.glb"
+   ],
+   "generator": "jungle"
+  },
+  "minecart_track": {
+   "models": [
+    "assets/models/objects/minecart_track_v0.glb"
+   ],
+   "generator": "rail"
+  },
+  "mushroom_plant": {
+   "models": [
+    "assets/models/objects/mushroom_plant_v0.glb"
+   ],
+   "generator": "small_mushroom"
+  },
+  "mythril_anvil": {
+   "models": [
+    "assets/models/objects/mythril_anvil_v0.glb"
+   ],
+   "generator": "anvil"
+  },
+  "oak_tree": {
+   "models": [
+    "assets/models/objects/oak_tree_v0.glb",
+    "assets/models/objects/oak_tree_v1.glb",
+    "assets/models/objects/oak_tree_v2.glb",
+    "assets/models/objects/oak_tree_v3.glb"
+   ],
+   "generator": "broadleaf"
+  },
+  "orichalcum_anvil": {
+   "models": [
+    "assets/models/objects/orichalcum_anvil_v0.glb"
+   ],
+   "generator": "anvil"
+  },
+  "palm_tree": {
+   "models": [
+    "assets/models/objects/palm_tree_v0.glb",
+    "assets/models/objects/palm_tree_v1.glb",
+    "assets/models/objects/palm_tree_v2.glb"
+   ],
+   "generator": "palm"
+  },
+  "pine_tree": {
+   "models": [
+    "assets/models/objects/pine_tree_v0.glb",
+    "assets/models/objects/pine_tree_v1.glb",
+    "assets/models/objects/pine_tree_v2.glb"
+   ],
+   "generator": "conifer"
+  },
+  "placed_bottle": {
+   "models": [
+    "assets/models/objects/placed_bottle_v0.glb"
+   ],
+   "generator": "bottle"
+  },
+  "plantera_bulb": {
+   "models": [
+    "assets/models/objects/plantera_bulb_v0.glb"
+   ],
+   "generator": "bulb"
+  },
+  "pot": {
+   "models": [
+    "assets/models/objects/pot_v0.glb",
+    "assets/models/objects/pot_v1.glb",
+    "assets/models/objects/pot_v2.glb"
+   ],
+   "generator": "pot"
+  },
+  "rubble": {
+   "models": [
+    "assets/models/objects/rubble_v0.glb",
+    "assets/models/objects/rubble_v1.glb",
+    "assets/models/objects/rubble_v2.glb"
+   ],
+   "generator": "rubble"
+  },
+  "sawmill": {
+   "models": [
+    "assets/models/objects/sawmill_v0.glb"
+   ],
+   "generator": "sawmill"
+  },
+  "shadow_orb": {
+   "models": [
+    "assets/models/objects/shadow_orb_v0.glb"
+   ],
+   "generator": "evil_orb"
+  },
+  "stalactite": {
+   "models": [
+    "assets/models/objects/stalactite_v0.glb",
+    "assets/models/objects/stalactite_v1.glb",
+    "assets/models/objects/stalactite_v2.glb"
+   ],
+   "generator": "spike"
+  },
+  "stalagmite": {
+   "models": [
+    "assets/models/objects/stalagmite_v0.glb",
+    "assets/models/objects/stalagmite_v1.glb",
+    "assets/models/objects/stalagmite_v2.glb"
+   ],
+   "generator": "spike"
+  },
+  "tinkerers_workshop": {
+   "models": [
+    "assets/models/objects/tinkerers_workshop_v0.glb"
+   ],
+   "generator": "workbench"
+  },
+  "titanium_forge": {
+   "models": [
+    "assets/models/objects/titanium_forge_v0.glb"
+   ],
+   "generator": "furnace"
+  },
+  "torch": {
+   "models": [
+    "assets/models/objects/torch_v0.glb"
+   ],
+   "generator": "torch"
+  },
+  "wooden_chair": {
+   "models": [
+    "assets/models/objects/wooden_chair_v0.glb"
+   ],
+   "generator": "chair"
+  },
+  "wooden_chest": {
+   "models": [
+    "assets/models/objects/wooden_chest_v0.glb"
+   ],
+   "generator": "chest"
+  },
+  "wooden_door": {
+   "models": [
+    "assets/models/objects/wooden_door_v0.glb"
+   ],
+   "generator": "door"
+  },
+  "wooden_table": {
+   "models": [
+    "assets/models/objects/wooden_table_v0.glb"
+   ],
+   "generator": "table"
+  },
+  "work_bench": {
+   "models": [
+    "assets/models/objects/work_bench_v0.glb"
+   ],
+   "generator": "workbench"
+  }
+ },
+ "items": {
+  "abeemination": {
+   "model": "assets/models/items/abeemination.glb",
+   "icon": "assets/icons/items/abeemination.png"
+  },
+  "acorn": {
+   "model": "assets/models/items/acorn.glb",
+   "icon": "assets/icons/items/acorn.png"
+  },
+  "adamantite_axe": {
+   "model": "assets/models/items/adamantite_axe.glb",
+   "icon": "assets/icons/items/adamantite_axe.png"
+  },
+  "adamantite_bar": {
+   "model": "assets/models/items/adamantite_bar.glb",
+   "icon": "assets/icons/items/adamantite_bar.png"
+  },
+  "adamantite_bow": {
+   "model": "assets/models/items/adamantite_bow.glb",
+   "icon": "assets/icons/items/adamantite_bow.png"
+  },
+  "adamantite_broadsword": {
+   "model": "assets/models/items/adamantite_broadsword.glb",
+   "icon": "assets/icons/items/adamantite_broadsword.png"
+  },
+  "adamantite_chainmail": {
+   "model": "assets/models/items/adamantite_chainmail.glb",
+   "icon": "assets/icons/items/adamantite_chainmail.png"
+  },
+  "adamantite_chainsaw": {
+   "model": "assets/models/items/adamantite_chainsaw.glb",
+   "icon": "assets/icons/items/adamantite_chainsaw.png"
+  },
+  "adamantite_drill": {
+   "model": "assets/models/items/adamantite_drill.glb",
+   "icon": "assets/icons/items/adamantite_drill.png"
+  },
+  "adamantite_forge": {
+   "object": "adamantite_forge",
+   "icon": "assets/icons/items/adamantite_forge.png"
+  },
+  "adamantite_greaves": {
+   "model": "assets/models/items/adamantite_greaves.glb",
+   "icon": "assets/icons/items/adamantite_greaves.png"
+  },
+  "adamantite_hammer": {
+   "model": "assets/models/items/adamantite_hammer.glb",
+   "icon": "assets/icons/items/adamantite_hammer.png"
+  },
+  "adamantite_helmet": {
+   "model": "assets/models/items/adamantite_helmet.glb",
+   "icon": "assets/icons/items/adamantite_helmet.png"
+  },
+  "adamantite_pickaxe": {
+   "model": "assets/models/items/adamantite_pickaxe.glb",
+   "icon": "assets/icons/items/adamantite_pickaxe.png"
+  },
+  "adamantite_shortsword": {
+   "model": "assets/models/items/adamantite_shortsword.glb",
+   "icon": "assets/icons/items/adamantite_shortsword.png"
+  },
+  "aglet": {
+   "model": "assets/models/items/aglet.glb",
+   "icon": "assets/icons/items/aglet.png"
+  },
+  "amazon": {
+   "model": "assets/models/items/amazon.glb",
+   "icon": "assets/icons/items/amazon.png"
+  },
+  "amethyst": {
+   "model": "assets/models/items/amethyst.glb",
+   "icon": "assets/icons/items/amethyst.png"
+  },
+  "amethyst_hook": {
+   "model": "assets/models/items/amethyst_hook.glb",
+   "icon": "assets/icons/items/amethyst_hook.png"
+  },
+  "amethyst_staff": {
+   "model": "assets/models/items/amethyst_staff.glb",
+   "icon": "assets/icons/items/amethyst_staff.png"
+  },
+  "ancient_manipulator": {
+   "object": "ancient_manipulator",
+   "icon": "assets/icons/items/ancient_manipulator.png"
+  },
+  "angel_wings": {
+   "model": "assets/models/items/angel_wings.glb",
+   "icon": "assets/icons/items/angel_wings.png"
+  },
+  "ankh_shield": {
+   "model": "assets/models/items/ankh_shield.glb",
+   "icon": "assets/icons/items/ankh_shield.png"
+  },
+  "anklet_of_the_wind": {
+   "model": "assets/models/items/anklet_of_the_wind.glb",
+   "icon": "assets/icons/items/anklet_of_the_wind.png"
+  },
+  "armored_cavefish": {
+   "model": "assets/models/items/armored_cavefish.glb",
+   "icon": "assets/icons/items/armored_cavefish.png"
+  },
+  "atlantic_cod": {
+   "model": "assets/models/items/atlantic_cod.glb",
+   "icon": "assets/icons/items/atlantic_cod.png"
+  },
+  "ball_o_hurt": {
+   "model": "assets/models/items/ball_o_hurt.glb",
+   "icon": "assets/icons/items/ball_o_hurt.png"
+  },
+  "band_of_regeneration": {
+   "model": "assets/models/items/band_of_regeneration.glb",
+   "icon": "assets/icons/items/band_of_regeneration.png"
+  },
+  "band_of_starpower": {
+   "model": "assets/models/items/band_of_starpower.glb",
+   "icon": "assets/icons/items/band_of_starpower.png"
+  },
+  "bass": {
+   "model": "assets/models/items/bass.glb",
+   "icon": "assets/icons/items/bass.png"
+  },
+  "bed": {
+   "object": "bed",
+   "icon": "assets/icons/items/bed.png"
+  },
+  "bee_gun": {
+   "model": "assets/models/items/bee_gun.glb",
+   "icon": "assets/icons/items/bee_gun.png"
+  },
+  "bee_keeper": {
+   "model": "assets/models/items/bee_keeper.glb",
+   "icon": "assets/icons/items/bee_keeper.png"
+  },
+  "bee_wax": {
+   "model": "assets/models/items/bee_wax.glb",
+   "icon": "assets/icons/items/bee_wax.png"
+  },
+  "beenade": {
+   "model": "assets/models/items/beenade.glb",
+   "icon": "assets/icons/items/beenade.png"
+  },
+  "bees_knees": {
+   "model": "assets/models/items/bees_knees.glb",
+   "icon": "assets/icons/items/bees_knees.png"
+  },
+  "beetle_helmet": {
+   "model": "assets/models/items/beetle_helmet.glb",
+   "icon": "assets/icons/items/beetle_helmet.png"
+  },
+  "beetle_husk": {
+   "model": "assets/models/items/beetle_husk.glb",
+   "icon": "assets/icons/items/beetle_husk.png"
+  },
+  "beetle_leggings": {
+   "model": "assets/models/items/beetle_leggings.glb",
+   "icon": "assets/icons/items/beetle_leggings.png"
+  },
+  "beetle_shell": {
+   "model": "assets/models/items/beetle_shell.glb",
+   "icon": "assets/icons/items/beetle_shell.png"
+  },
+  "blade_of_grass": {
+   "model": "assets/models/items/blade_of_grass.glb",
+   "icon": "assets/icons/items/blade_of_grass.png"
+  },
+  "blade_staff": {
+   "model": "assets/models/items/blade_staff.glb",
+   "icon": "assets/icons/items/blade_staff.png"
+  },
+  "blizzard_in_a_bottle": {
+   "model": "assets/models/items/blizzard_in_a_bottle.glb",
+   "icon": "assets/icons/items/blizzard_in_a_bottle.png"
+  },
+  "bloody_spine": {
+   "model": "assets/models/items/bloody_spine.glb",
+   "icon": "assets/icons/items/bloody_spine.png"
+  },
+  "blue_moon": {
+   "model": "assets/models/items/blue_moon.glb",
+   "icon": "assets/icons/items/blue_moon.png"
+  },
+  "bomb": {
+   "model": "assets/models/items/bomb.glb",
+   "icon": "assets/icons/items/bomb.png"
+  },
+  "bone": {
+   "model": "assets/models/items/bone.glb",
+   "icon": "assets/icons/items/bone.png"
+  },
+  "book_of_skulls": {
+   "model": "assets/models/items/book_of_skulls.glb",
+   "icon": "assets/icons/items/book_of_skulls.png"
+  },
+  "boomstick": {
+   "model": "assets/models/items/boomstick.glb",
+   "icon": "assets/icons/items/boomstick.png"
+  },
+  "bottle": {
+   "object": "placed_bottle",
+   "icon": "assets/icons/items/bottle.png"
+  },
+  "brain_of_confusion": {
+   "model": "assets/models/items/brain_of_confusion.glb",
+   "icon": "assets/icons/items/brain_of_confusion.png"
+  },
+  "breaker_blade": {
+   "model": "assets/models/items/breaker_blade.glb",
+   "icon": "assets/icons/items/breaker_blade.png"
+  },
+  "bubble_gun": {
+   "model": "assets/models/items/bubble_gun.glb",
+   "icon": "assets/icons/items/bubble_gun.png"
+  },
+  "cactus": {
+   "model": "assets/models/items/cactus.glb",
+   "icon": "assets/icons/items/cactus.png"
+  },
+  "cactus_pickaxe": {
+   "model": "assets/models/items/cactus_pickaxe.glb",
+   "icon": "assets/icons/items/cactus_pickaxe.png"
+  },
+  "cactus_sword": {
+   "model": "assets/models/items/cactus_sword.glb",
+   "icon": "assets/icons/items/cactus_sword.png"
+  },
+  "candle": {
+   "object": "candle",
+   "icon": "assets/icons/items/candle.png"
+  },
+  "celestial_sigil": {
+   "model": "assets/models/items/celestial_sigil.glb",
+   "icon": "assets/icons/items/celestial_sigil.png"
+  },
+  "cell_phone": {
+   "model": "assets/models/items/cell_phone.glb",
+   "icon": "assets/icons/items/cell_phone.png"
+  },
+  "chlorophyte_bar": {
+   "model": "assets/models/items/chlorophyte_bar.glb",
+   "icon": "assets/icons/items/chlorophyte_bar.png"
+  },
+  "chlorophyte_greaves": {
+   "model": "assets/models/items/chlorophyte_greaves.glb",
+   "icon": "assets/icons/items/chlorophyte_greaves.png"
+  },
+  "chlorophyte_mask": {
+   "model": "assets/models/items/chlorophyte_mask.glb",
+   "icon": "assets/icons/items/chlorophyte_mask.png"
+  },
+  "chlorophyte_pickaxe": {
+   "model": "assets/models/items/chlorophyte_pickaxe.glb",
+   "icon": "assets/icons/items/chlorophyte_pickaxe.png"
+  },
+  "chlorophyte_plate_mail": {
+   "model": "assets/models/items/chlorophyte_plate_mail.glb",
+   "icon": "assets/icons/items/chlorophyte_plate_mail.png"
+  },
+  "clockwork_assault_rifle": {
+   "model": "assets/models/items/clockwork_assault_rifle.glb",
+   "icon": "assets/icons/items/clockwork_assault_rifle.png"
+  },
+  "cloud_in_a_balloon": {
+   "model": "assets/models/items/cloud_in_a_balloon.glb",
+   "icon": "assets/icons/items/cloud_in_a_balloon.png"
+  },
+  "cloud_in_a_bottle": {
+   "model": "assets/models/items/cloud_in_a_bottle.glb",
+   "icon": "assets/icons/items/cloud_in_a_bottle.png"
+  },
+  "cobalt_axe": {
+   "model": "assets/models/items/cobalt_axe.glb",
+   "icon": "assets/icons/items/cobalt_axe.png"
+  },
+  "cobalt_bar": {
+   "model": "assets/models/items/cobalt_bar.glb",
+   "icon": "assets/icons/items/cobalt_bar.png"
+  },
+  "cobalt_bow": {
+   "model": "assets/models/items/cobalt_bow.glb",
+   "icon": "assets/icons/items/cobalt_bow.png"
+  },
+  "cobalt_broadsword": {
+   "model": "assets/models/items/cobalt_broadsword.glb",
+   "icon": "assets/icons/items/cobalt_broadsword.png"
+  },
+  "cobalt_chainmail": {
+   "model": "assets/models/items/cobalt_chainmail.glb",
+   "icon": "assets/icons/items/cobalt_chainmail.png"
+  },
+  "cobalt_chainsaw": {
+   "model": "assets/models/items/cobalt_chainsaw.glb",
+   "icon": "assets/icons/items/cobalt_chainsaw.png"
+  },
+  "cobalt_drill": {
+   "model": "assets/models/items/cobalt_drill.glb",
+   "icon": "assets/icons/items/cobalt_drill.png"
+  },
+  "cobalt_greaves": {
+   "model": "assets/models/items/cobalt_greaves.glb",
+   "icon": "assets/icons/items/cobalt_greaves.png"
+  },
+  "cobalt_hammer": {
+   "model": "assets/models/items/cobalt_hammer.glb",
+   "icon": "assets/icons/items/cobalt_hammer.png"
+  },
+  "cobalt_helmet": {
+   "model": "assets/models/items/cobalt_helmet.glb",
+   "icon": "assets/icons/items/cobalt_helmet.png"
+  },
+  "cobalt_pickaxe": {
+   "model": "assets/models/items/cobalt_pickaxe.glb",
+   "icon": "assets/icons/items/cobalt_pickaxe.png"
+  },
+  "cobalt_shield": {
+   "model": "assets/models/items/cobalt_shield.glb",
+   "icon": "assets/icons/items/cobalt_shield.png"
+  },
+  "cobalt_shortsword": {
+   "model": "assets/models/items/cobalt_shortsword.glb",
+   "icon": "assets/icons/items/cobalt_shortsword.png"
+  },
+  "code_1": {
+   "model": "assets/models/items/code_1.glb",
+   "icon": "assets/icons/items/code_1.png"
+  },
+  "compass": {
+   "model": "assets/models/items/compass.glb",
+   "icon": "assets/icons/items/compass.png"
+  },
+  "cooked_fish": {
+   "model": "assets/models/items/cooked_fish.glb",
+   "icon": "assets/icons/items/cooked_fish.png"
+  },
+  "cooking_pot": {
+   "object": "cooking_pot",
+   "icon": "assets/icons/items/cooking_pot.png"
+  },
+  "copper_axe": {
+   "model": "assets/models/items/copper_axe.glb",
+   "icon": "assets/icons/items/copper_axe.png"
+  },
+  "copper_bar": {
+   "model": "assets/models/items/copper_bar.glb",
+   "icon": "assets/icons/items/copper_bar.png"
+  },
+  "copper_bow": {
+   "model": "assets/models/items/copper_bow.glb",
+   "icon": "assets/icons/items/copper_bow.png"
+  },
+  "copper_broadsword": {
+   "model": "assets/models/items/copper_broadsword.glb",
+   "icon": "assets/icons/items/copper_broadsword.png"
+  },
+  "copper_chainmail": {
+   "model": "assets/models/items/copper_chainmail.glb",
+   "icon": "assets/icons/items/copper_chainmail.png"
+  },
+  "copper_coin": {
+   "model": "assets/models/items/copper_coin.glb",
+   "icon": "assets/icons/items/copper_coin.png"
+  },
+  "copper_greaves": {
+   "model": "assets/models/items/copper_greaves.glb",
+   "icon": "assets/icons/items/copper_greaves.png"
+  },
+  "copper_hammer": {
+   "model": "assets/models/items/copper_hammer.glb",
+   "icon": "assets/icons/items/copper_hammer.png"
+  },
+  "copper_helmet": {
+   "model": "assets/models/items/copper_helmet.glb",
+   "icon": "assets/icons/items/copper_helmet.png"
+  },
+  "copper_pickaxe": {
+   "model": "assets/models/items/copper_pickaxe.glb",
+   "icon": "assets/icons/items/copper_pickaxe.png"
+  },
+  "copper_shortsword": {
+   "model": "assets/models/items/copper_shortsword.glb",
+   "icon": "assets/icons/items/copper_shortsword.png"
+  },
+  "crimson_rod": {
+   "model": "assets/models/items/crimson_rod.glb",
+   "icon": "assets/icons/items/crimson_rod.png"
+  },
+  "crimtane_axe": {
+   "model": "assets/models/items/crimtane_axe.glb",
+   "icon": "assets/icons/items/crimtane_axe.png"
+  },
+  "crimtane_bar": {
+   "model": "assets/models/items/crimtane_bar.glb",
+   "icon": "assets/icons/items/crimtane_bar.png"
+  },
+  "crimtane_bow": {
+   "model": "assets/models/items/crimtane_bow.glb",
+   "icon": "assets/icons/items/crimtane_bow.png"
+  },
+  "crimtane_broadsword": {
+   "model": "assets/models/items/crimtane_broadsword.glb",
+   "icon": "assets/icons/items/crimtane_broadsword.png"
+  },
+  "crimtane_chainmail": {
+   "model": "assets/models/items/crimtane_chainmail.glb",
+   "icon": "assets/icons/items/crimtane_chainmail.png"
+  },
+  "crimtane_greaves": {
+   "model": "assets/models/items/crimtane_greaves.glb",
+   "icon": "assets/icons/items/crimtane_greaves.png"
+  },
+  "crimtane_hammer": {
+   "model": "assets/models/items/crimtane_hammer.glb",
+   "icon": "assets/icons/items/crimtane_hammer.png"
+  },
+  "crimtane_helmet": {
+   "model": "assets/models/items/crimtane_helmet.glb",
+   "icon": "assets/icons/items/crimtane_helmet.png"
+  },
+  "crimtane_pickaxe": {
+   "model": "assets/models/items/crimtane_pickaxe.glb",
+   "icon": "assets/icons/items/crimtane_pickaxe.png"
+  },
+  "crimtane_shortsword": {
+   "model": "assets/models/items/crimtane_shortsword.glb",
+   "icon": "assets/icons/items/crimtane_shortsword.png"
+  },
+  "crystal_shard": {
+   "model": "assets/models/items/crystal_shard.glb",
+   "icon": "assets/icons/items/crystal_shard.png"
+  },
+  "crystal_storm": {
+   "model": "assets/models/items/crystal_storm.glb",
+   "icon": "assets/icons/items/crystal_storm.png"
+  },
+  "cursed_arrow": {
+   "model": "assets/models/items/cursed_arrow.glb",
+   "icon": "assets/icons/items/cursed_arrow.png"
+  },
+  "cursed_flame": {
+   "model": "assets/models/items/cursed_flame.glb",
+   "icon": "assets/icons/items/cursed_flame.png"
+  },
+  "cursed_flames": {
+   "model": "assets/models/items/cursed_flames.glb",
+   "icon": "assets/icons/items/cursed_flames.png"
+  },
+  "daedalus_stormbow": {
+   "model": "assets/models/items/daedalus_stormbow.glb",
+   "icon": "assets/icons/items/daedalus_stormbow.png"
+  },
+  "dark_lance": {
+   "model": "assets/models/items/dark_lance.glb",
+   "icon": "assets/icons/items/dark_lance.png"
+  },
+  "daybreak": {
+   "model": "assets/models/items/daybreak.glb",
+   "icon": "assets/icons/items/daybreak.png"
+  },
+  "deer_thing": {
+   "model": "assets/models/items/deer_thing.glb",
+   "icon": "assets/icons/items/deer_thing.png"
+  },
+  "demon_scythe": {
+   "model": "assets/models/items/demon_scythe.glb",
+   "icon": "assets/icons/items/demon_scythe.png"
+  },
+  "demon_wings": {
+   "model": "assets/models/items/demon_wings.glb",
+   "icon": "assets/icons/items/demon_wings.png"
+  },
+  "demonite_axe": {
+   "model": "assets/models/items/demonite_axe.glb",
+   "icon": "assets/icons/items/demonite_axe.png"
+  },
+  "demonite_bar": {
+   "model": "assets/models/items/demonite_bar.glb",
+   "icon": "assets/icons/items/demonite_bar.png"
+  },
+  "demonite_bow": {
+   "model": "assets/models/items/demonite_bow.glb",
+   "icon": "assets/icons/items/demonite_bow.png"
+  },
+  "demonite_broadsword": {
+   "model": "assets/models/items/demonite_broadsword.glb",
+   "icon": "assets/icons/items/demonite_broadsword.png"
+  },
+  "demonite_chainmail": {
+   "model": "assets/models/items/demonite_chainmail.glb",
+   "icon": "assets/icons/items/demonite_chainmail.png"
+  },
+  "demonite_greaves": {
+   "model": "assets/models/items/demonite_greaves.glb",
+   "icon": "assets/icons/items/demonite_greaves.png"
+  },
+  "demonite_hammer": {
+   "model": "assets/models/items/demonite_hammer.glb",
+   "icon": "assets/icons/items/demonite_hammer.png"
+  },
+  "demonite_helmet": {
+   "model": "assets/models/items/demonite_helmet.glb",
+   "icon": "assets/icons/items/demonite_helmet.png"
+  },
+  "demonite_pickaxe": {
+   "model": "assets/models/items/demonite_pickaxe.glb",
+   "icon": "assets/icons/items/demonite_pickaxe.png"
+  },
+  "demonite_shortsword": {
+   "model": "assets/models/items/demonite_shortsword.glb",
+   "icon": "assets/icons/items/demonite_shortsword.png"
+  },
+  "depth_meter": {
+   "model": "assets/models/items/depth_meter.glb",
+   "icon": "assets/icons/items/depth_meter.png"
+  },
+  "diamond": {
+   "model": "assets/models/items/diamond.glb",
+   "icon": "assets/icons/items/diamond.png"
+  },
+  "diamond_hook": {
+   "model": "assets/models/items/diamond_hook.glb",
+   "icon": "assets/icons/items/diamond_hook.png"
+  },
+  "diamond_staff": {
+   "model": "assets/models/items/diamond_staff.glb",
+   "icon": "assets/icons/items/diamond_staff.png"
+  },
+  "dual_hook": {
+   "model": "assets/models/items/dual_hook.glb",
+   "icon": "assets/icons/items/dual_hook.png"
+  },
+  "dynamite": {
+   "model": "assets/models/items/dynamite.glb",
+   "icon": "assets/icons/items/dynamite.png"
+  },
+  "ebonkoi": {
+   "model": "assets/models/items/ebonkoi.glb",
+   "icon": "assets/icons/items/ebonkoi.png"
+  },
+  "emerald": {
+   "model": "assets/models/items/emerald.glb",
+   "icon": "assets/icons/items/emerald.png"
+  },
+  "emerald_hook": {
+   "model": "assets/models/items/emerald_hook.glb",
+   "icon": "assets/icons/items/emerald_hook.png"
+  },
+  "emerald_staff": {
+   "model": "assets/models/items/emerald_staff.glb",
+   "icon": "assets/icons/items/emerald_staff.png"
+  },
+  "empress_wings": {
+   "model": "assets/models/items/empress_wings.glb",
+   "icon": "assets/icons/items/empress_wings.png"
+  },
+  "empty_bucket": {
+   "model": "assets/models/items/empty_bucket.glb",
+   "icon": "assets/icons/items/empty_bucket.png"
+  },
+  "enchanted_boomerang": {
+   "model": "assets/models/items/enchanted_boomerang.glb",
+   "icon": "assets/icons/items/enchanted_boomerang.png"
+  },
+  "enchanted_sword": {
+   "model": "assets/models/items/enchanted_sword.glb",
+   "icon": "assets/icons/items/enchanted_sword.png"
+  },
+  "excalibur": {
+   "model": "assets/models/items/excalibur.glb",
+   "icon": "assets/icons/items/excalibur.png"
+  },
+  "eye_of_the_golem": {
+   "model": "assets/models/items/eye_of_the_golem.glb",
+   "icon": "assets/icons/items/eye_of_the_golem.png"
+  },
+  "fairy_wings": {
+   "model": "assets/models/items/fairy_wings.glb",
+   "icon": "assets/icons/items/fairy_wings.png"
+  },
+  "fallen_star": {
+   "model": "assets/models/items/fallen_star.glb",
+   "icon": "assets/icons/items/fallen_star.png"
+  },
+  "feather": {
+   "model": "assets/models/items/feather.glb",
+   "icon": "assets/icons/items/feather.png"
+  },
+  "feral_claws": {
+   "model": "assets/models/items/feral_claws.glb",
+   "icon": "assets/icons/items/feral_claws.png"
+  },
+  "finch_staff": {
+   "model": "assets/models/items/finch_staff.glb",
+   "icon": "assets/icons/items/finch_staff.png"
+  },
+  "fisher_of_souls": {
+   "model": "assets/models/items/fisher_of_souls.glb",
+   "icon": "assets/icons/items/fisher_of_souls.png"
+  },
+  "fishron_wings": {
+   "model": "assets/models/items/fishron_wings.glb",
+   "icon": "assets/icons/items/fishron_wings.png"
+  },
+  "flairon": {
+   "model": "assets/models/items/flairon.glb",
+   "icon": "assets/icons/items/flairon.png"
+  },
+  "flamarang": {
+   "model": "assets/models/items/flamarang.glb",
+   "icon": "assets/icons/items/flamarang.png"
+  },
+  "flamelash": {
+   "model": "assets/models/items/flamelash.glb",
+   "icon": "assets/icons/items/flamelash.png"
+  },
+  "flaming_arrow": {
+   "model": "assets/models/items/flaming_arrow.glb",
+   "icon": "assets/icons/items/flaming_arrow.png"
+  },
+  "fledgling_wings": {
+   "model": "assets/models/items/fledgling_wings.glb",
+   "icon": "assets/icons/items/fledgling_wings.png"
+  },
+  "fleshcatcher": {
+   "model": "assets/models/items/fleshcatcher.glb",
+   "icon": "assets/icons/items/fleshcatcher.png"
+  },
+  "flintlock_pistol": {
+   "model": "assets/models/items/flintlock_pistol.glb",
+   "icon": "assets/icons/items/flintlock_pistol.png"
+  },
+  "flinx_fur": {
+   "model": "assets/models/items/flinx_fur.glb",
+   "icon": "assets/icons/items/flinx_fur.png"
+  },
+  "flower_pow": {
+   "model": "assets/models/items/flower_pow.glb",
+   "icon": "assets/icons/items/flower_pow.png"
+  },
+  "furnace": {
+   "object": "furnace",
+   "icon": "assets/icons/items/furnace.png"
+  },
+  "gel": {
+   "model": "assets/models/items/gel.glb",
+   "icon": "assets/icons/items/gel.png"
+  },
+  "gelatin_crystal": {
+   "model": "assets/models/items/gelatin_crystal.glb",
+   "icon": "assets/icons/items/gelatin_crystal.png"
+  },
+  "gills_potion": {
+   "model": "assets/models/items/gills_potion.glb",
+   "icon": "assets/icons/items/gills_potion.png"
+  },
+  "glowing_mushroom": {
+   "model": "assets/models/items/glowing_mushroom.glb",
+   "icon": "assets/icons/items/glowing_mushroom.png"
+  },
+  "gold_axe": {
+   "model": "assets/models/items/gold_axe.glb",
+   "icon": "assets/icons/items/gold_axe.png"
+  },
+  "gold_bar": {
+   "model": "assets/models/items/gold_bar.glb",
+   "icon": "assets/icons/items/gold_bar.png"
+  },
+  "gold_bow": {
+   "model": "assets/models/items/gold_bow.glb",
+   "icon": "assets/icons/items/gold_bow.png"
+  },
+  "gold_broadsword": {
+   "model": "assets/models/items/gold_broadsword.glb",
+   "icon": "assets/icons/items/gold_broadsword.png"
+  },
+  "gold_chainmail": {
+   "model": "assets/models/items/gold_chainmail.glb",
+   "icon": "assets/icons/items/gold_chainmail.png"
+  },
+  "gold_chest": {
+   "object": "gold_chest",
+   "icon": "assets/icons/items/gold_chest.png"
+  },
+  "gold_coin": {
+   "model": "assets/models/items/gold_coin.glb",
+   "icon": "assets/icons/items/gold_coin.png"
+  },
+  "gold_greaves": {
+   "model": "assets/models/items/gold_greaves.glb",
+   "icon": "assets/icons/items/gold_greaves.png"
+  },
+  "gold_hammer": {
+   "model": "assets/models/items/gold_hammer.glb",
+   "icon": "assets/icons/items/gold_hammer.png"
+  },
+  "gold_helmet": {
+   "model": "assets/models/items/gold_helmet.glb",
+   "icon": "assets/icons/items/gold_helmet.png"
+  },
+  "gold_pickaxe": {
+   "model": "assets/models/items/gold_pickaxe.glb",
+   "icon": "assets/icons/items/gold_pickaxe.png"
+  },
+  "gold_shortsword": {
+   "model": "assets/models/items/gold_shortsword.glb",
+   "icon": "assets/icons/items/gold_shortsword.png"
+  },
+  "golden_crate": {
+   "model": "assets/models/items/golden_crate.glb",
+   "icon": "assets/icons/items/golden_crate.png"
+  },
+  "golden_fishing_rod": {
+   "model": "assets/models/items/golden_fishing_rod.glb",
+   "icon": "assets/icons/items/golden_fishing_rod.png"
+  },
+  "golden_shower": {
+   "model": "assets/models/items/golden_shower.glb",
+   "icon": "assets/icons/items/golden_shower.png"
+  },
+  "gps": {
+   "model": "assets/models/items/gps.glb",
+   "icon": "assets/icons/items/gps.png"
+  },
+  "grappling_hook": {
+   "model": "assets/models/items/grappling_hook.glb",
+   "icon": "assets/icons/items/grappling_hook.png"
+  },
+  "greater_healing_potion": {
+   "model": "assets/models/items/greater_healing_potion.glb",
+   "icon": "assets/icons/items/greater_healing_potion.png"
+  },
+  "grenade": {
+   "model": "assets/models/items/grenade.glb",
+   "icon": "assets/icons/items/grenade.png"
+  },
+  "guide_voodoo_doll": {
+   "model": "assets/models/items/guide_voodoo_doll.glb",
+   "icon": "assets/icons/items/guide_voodoo_doll.png"
+  },
+  "hallowed_bar": {
+   "model": "assets/models/items/hallowed_bar.glb",
+   "icon": "assets/icons/items/hallowed_bar.png"
+  },
+  "hallowed_greaves": {
+   "model": "assets/models/items/hallowed_greaves.glb",
+   "icon": "assets/icons/items/hallowed_greaves.png"
+  },
+  "hallowed_helmet": {
+   "model": "assets/models/items/hallowed_helmet.glb",
+   "icon": "assets/icons/items/hallowed_helmet.png"
+  },
+  "hallowed_plate_mail": {
+   "model": "assets/models/items/hallowed_plate_mail.glb",
+   "icon": "assets/icons/items/hallowed_plate_mail.png"
+  },
+  "hallowed_repeater": {
+   "model": "assets/models/items/hallowed_repeater.glb",
+   "icon": "assets/icons/items/hallowed_repeater.png"
+  },
+  "handgun": {
+   "model": "assets/models/items/handgun.glb",
+   "icon": "assets/icons/items/handgun.png"
+  },
+  "harpoon": {
+   "model": "assets/models/items/harpoon.glb",
+   "icon": "assets/icons/items/harpoon.png"
+  },
+  "hellforge": {
+   "object": "hellforge",
+   "icon": "assets/icons/items/hellforge.png"
+  },
+  "hellstone_axe": {
+   "model": "assets/models/items/hellstone_axe.glb",
+   "icon": "assets/icons/items/hellstone_axe.png"
+  },
+  "hellstone_bar": {
+   "model": "assets/models/items/hellstone_bar.glb",
+   "icon": "assets/icons/items/hellstone_bar.png"
+  },
+  "hellstone_bow": {
+   "model": "assets/models/items/hellstone_bow.glb",
+   "icon": "assets/icons/items/hellstone_bow.png"
+  },
+  "hellstone_broadsword": {
+   "model": "assets/models/items/hellstone_broadsword.glb",
+   "icon": "assets/icons/items/hellstone_broadsword.png"
+  },
+  "hellstone_chainmail": {
+   "model": "assets/models/items/hellstone_chainmail.glb",
+   "icon": "assets/icons/items/hellstone_chainmail.png"
+  },
+  "hellstone_greaves": {
+   "model": "assets/models/items/hellstone_greaves.glb",
+   "icon": "assets/icons/items/hellstone_greaves.png"
+  },
+  "hellstone_hammer": {
+   "model": "assets/models/items/hellstone_hammer.glb",
+   "icon": "assets/icons/items/hellstone_hammer.png"
+  },
+  "hellstone_helmet": {
+   "model": "assets/models/items/hellstone_helmet.glb",
+   "icon": "assets/icons/items/hellstone_helmet.png"
+  },
+  "hellstone_pickaxe": {
+   "model": "assets/models/items/hellstone_pickaxe.glb",
+   "icon": "assets/icons/items/hellstone_pickaxe.png"
+  },
+  "hellstone_shortsword": {
+   "model": "assets/models/items/hellstone_shortsword.glb",
+   "icon": "assets/icons/items/hellstone_shortsword.png"
+  },
+  "hemopiranha": {
+   "model": "assets/models/items/hemopiranha.glb",
+   "icon": "assets/icons/items/hemopiranha.png"
+  },
+  "hermes_boots": {
+   "model": "assets/models/items/hermes_boots.glb",
+   "icon": "assets/icons/items/hermes_boots.png"
+  },
+  "hive_pack": {
+   "model": "assets/models/items/hive_pack.glb",
+   "icon": "assets/icons/items/hive_pack.png"
+  },
+  "honey_bucket": {
+   "model": "assets/models/items/honey_bucket.glb",
+   "icon": "assets/icons/items/honey_bucket.png"
+  },
+  "honey_comb": {
+   "model": "assets/models/items/honey_comb.glb",
+   "icon": "assets/icons/items/honey_comb.png"
+  },
+  "hook": {
+   "model": "assets/models/items/hook.glb",
+   "icon": "assets/icons/items/hook.png"
+  },
+  "ichor": {
+   "model": "assets/models/items/ichor.glb",
+   "icon": "assets/icons/items/ichor.png"
+  },
+  "ichor_arrow": {
+   "model": "assets/models/items/ichor_arrow.glb",
+   "icon": "assets/icons/items/ichor_arrow.png"
+  },
+  "imp_staff": {
+   "model": "assets/models/items/imp_staff.glb",
+   "icon": "assets/icons/items/imp_staff.png"
+  },
+  "iron_anvil": {
+   "object": "iron_anvil",
+   "icon": "assets/icons/items/iron_anvil.png"
+  },
+  "iron_axe": {
+   "model": "assets/models/items/iron_axe.glb",
+   "icon": "assets/icons/items/iron_axe.png"
+  },
+  "iron_bar": {
+   "model": "assets/models/items/iron_bar.glb",
+   "icon": "assets/icons/items/iron_bar.png"
+  },
+  "iron_bow": {
+   "model": "assets/models/items/iron_bow.glb",
+   "icon": "assets/icons/items/iron_bow.png"
+  },
+  "iron_broadsword": {
+   "model": "assets/models/items/iron_broadsword.glb",
+   "icon": "assets/icons/items/iron_broadsword.png"
+  },
+  "iron_chain": {
+   "model": "assets/models/items/iron_chain.glb",
+   "icon": "assets/icons/items/iron_chain.png"
+  },
+  "iron_chainmail": {
+   "model": "assets/models/items/iron_chainmail.glb",
+   "icon": "assets/icons/items/iron_chainmail.png"
+  },
+  "iron_crate": {
+   "model": "assets/models/items/iron_crate.glb",
+   "icon": "assets/icons/items/iron_crate.png"
+  },
+  "iron_greaves": {
+   "model": "assets/models/items/iron_greaves.glb",
+   "icon": "assets/icons/items/iron_greaves.png"
+  },
+  "iron_hammer": {
+   "model": "assets/models/items/iron_hammer.glb",
+   "icon": "assets/icons/items/iron_hammer.png"
+  },
+  "iron_helmet": {
+   "model": "assets/models/items/iron_helmet.glb",
+   "icon": "assets/icons/items/iron_helmet.png"
+  },
+  "iron_pickaxe": {
+   "model": "assets/models/items/iron_pickaxe.glb",
+   "icon": "assets/icons/items/iron_pickaxe.png"
+  },
+  "iron_shortsword": {
+   "model": "assets/models/items/iron_shortsword.glb",
+   "icon": "assets/icons/items/iron_shortsword.png"
+  },
+  "ironskin_potion": {
+   "model": "assets/models/items/ironskin_potion.glb",
+   "icon": "assets/icons/items/ironskin_potion.png"
+  },
+  "ivy_whip": {
+   "model": "assets/models/items/ivy_whip.glb",
+   "icon": "assets/icons/items/ivy_whip.png"
+  },
+  "jungle_spores": {
+   "model": "assets/models/items/jungle_spores.glb",
+   "icon": "assets/icons/items/jungle_spores.png"
+  },
+  "laser_rifle": {
+   "model": "assets/models/items/laser_rifle.glb",
+   "icon": "assets/icons/items/laser_rifle.png"
+  },
+  "last_prism": {
+   "model": "assets/models/items/last_prism.glb",
+   "icon": "assets/icons/items/last_prism.png"
+  },
+  "lava_bucket": {
+   "model": "assets/models/items/lava_bucket.glb",
+   "icon": "assets/icons/items/lava_bucket.png"
+  },
+  "lava_charm": {
+   "model": "assets/models/items/lava_charm.glb",
+   "icon": "assets/icons/items/lava_charm.png"
+  },
+  "lead_anvil": {
+   "object": "lead_anvil",
+   "icon": "assets/icons/items/lead_anvil.png"
+  },
+  "lead_axe": {
+   "model": "assets/models/items/lead_axe.glb",
+   "icon": "assets/icons/items/lead_axe.png"
+  },
+  "lead_bar": {
+   "model": "assets/models/items/lead_bar.glb",
+   "icon": "assets/icons/items/lead_bar.png"
+  },
+  "lead_bow": {
+   "model": "assets/models/items/lead_bow.glb",
+   "icon": "assets/icons/items/lead_bow.png"
+  },
+  "lead_broadsword": {
+   "model": "assets/models/items/lead_broadsword.glb",
+   "icon": "assets/icons/items/lead_broadsword.png"
+  },
+  "lead_chainmail": {
+   "model": "assets/models/items/lead_chainmail.glb",
+   "icon": "assets/icons/items/lead_chainmail.png"
+  },
+  "lead_greaves": {
+   "model": "assets/models/items/lead_greaves.glb",
+   "icon": "assets/icons/items/lead_greaves.png"
+  },
+  "lead_hammer": {
+   "model": "assets/models/items/lead_hammer.glb",
+   "icon": "assets/icons/items/lead_hammer.png"
+  },
+  "lead_helmet": {
+   "model": "assets/models/items/lead_helmet.glb",
+   "icon": "assets/icons/items/lead_helmet.png"
+  },
+  "lead_pickaxe": {
+   "model": "assets/models/items/lead_pickaxe.glb",
+   "icon": "assets/icons/items/lead_pickaxe.png"
+  },
+  "lead_shortsword": {
+   "model": "assets/models/items/lead_shortsword.glb",
+   "icon": "assets/icons/items/lead_shortsword.png"
+  },
+  "leaf_blower": {
+   "model": "assets/models/items/leaf_blower.glb",
+   "icon": "assets/icons/items/leaf_blower.png"
+  },
+  "leaf_wings": {
+   "model": "assets/models/items/leaf_wings.glb",
+   "icon": "assets/icons/items/leaf_wings.png"
+  },
+  "leather_whip": {
+   "model": "assets/models/items/leather_whip.glb",
+   "icon": "assets/icons/items/leather_whip.png"
+  },
+  "lens": {
+   "model": "assets/models/items/lens.glb",
+   "icon": "assets/icons/items/lens.png"
+  },
+  "lesser_healing_potion": {
+   "model": "assets/models/items/lesser_healing_potion.glb",
+   "icon": "assets/icons/items/lesser_healing_potion.png"
+  },
+  "lesser_mana_potion": {
+   "model": "assets/models/items/lesser_mana_potion.glb",
+   "icon": "assets/icons/items/lesser_mana_potion.png"
+  },
+  "life_crystal": {
+   "model": "assets/models/items/life_crystal.glb",
+   "icon": "assets/icons/items/life_crystal.png"
+  },
+  "lightning_boots": {
+   "model": "assets/models/items/lightning_boots.glb",
+   "icon": "assets/icons/items/lightning_boots.png"
+  },
+  "lihzahrd_power_cell": {
+   "model": "assets/models/items/lihzahrd_power_cell.glb",
+   "icon": "assets/icons/items/lihzahrd_power_cell.png"
+  },
+  "loom": {
+   "object": "loom",
+   "icon": "assets/icons/items/loom.png"
+  },
+  "lucky_horseshoe": {
+   "model": "assets/models/items/lucky_horseshoe.glb",
+   "icon": "assets/icons/items/lucky_horseshoe.png"
+  },
+  "lucy_the_axe": {
+   "model": "assets/models/items/lucy_the_axe.glb",
+   "icon": "assets/icons/items/lucy_the_axe.png"
+  },
+  "luminite_bar": {
+   "model": "assets/models/items/luminite_bar.glb",
+   "icon": "assets/icons/items/luminite_bar.png"
+  },
+  "lunar_flare": {
+   "model": "assets/models/items/lunar_flare.glb",
+   "icon": "assets/icons/items/lunar_flare.png"
+  },
+  "lunar_portal_staff": {
+   "model": "assets/models/items/lunar_portal_staff.glb",
+   "icon": "assets/icons/items/lunar_portal_staff.png"
+  },
+  "magic_mirror": {
+   "model": "assets/models/items/magic_mirror.glb",
+   "icon": "assets/icons/items/magic_mirror.png"
+  },
+  "magma_stone": {
+   "model": "assets/models/items/magma_stone.glb",
+   "icon": "assets/icons/items/magma_stone.png"
+  },
+  "mana_crystal": {
+   "model": "assets/models/items/mana_crystal.glb",
+   "icon": "assets/icons/items/mana_crystal.png"
+  },
+  "mana_flower": {
+   "model": "assets/models/items/mana_flower.glb",
+   "icon": "assets/icons/items/mana_flower.png"
+  },
+  "mechanical_eye": {
+   "model": "assets/models/items/mechanical_eye.glb",
+   "icon": "assets/icons/items/mechanical_eye.png"
+  },
+  "mechanical_skull": {
+   "model": "assets/models/items/mechanical_skull.glb",
+   "icon": "assets/icons/items/mechanical_skull.png"
+  },
+  "mechanical_worm": {
+   "model": "assets/models/items/mechanical_worm.glb",
+   "icon": "assets/icons/items/mechanical_worm.png"
+  },
+  "megashark": {
+   "model": "assets/models/items/megashark.glb",
+   "icon": "assets/icons/items/megashark.png"
+  },
+  "meowmere": {
+   "model": "assets/models/items/meowmere.glb",
+   "icon": "assets/icons/items/meowmere.png"
+  },
+  "meteor_helmet": {
+   "model": "assets/models/items/meteor_helmet.glb",
+   "icon": "assets/icons/items/meteor_helmet.png"
+  },
+  "meteor_leggings": {
+   "model": "assets/models/items/meteor_leggings.glb",
+   "icon": "assets/icons/items/meteor_leggings.png"
+  },
+  "meteor_shot": {
+   "model": "assets/models/items/meteor_shot.glb",
+   "icon": "assets/icons/items/meteor_shot.png"
+  },
+  "meteor_suit": {
+   "model": "assets/models/items/meteor_suit.glb",
+   "icon": "assets/icons/items/meteor_suit.png"
+  },
+  "meteorite_bar": {
+   "model": "assets/models/items/meteorite_bar.glb",
+   "icon": "assets/icons/items/meteorite_bar.png"
+  },
+  "minecart_track": {
+   "object": "minecart_track",
+   "icon": "assets/icons/items/minecart_track.png"
+  },
+  "minishark": {
+   "model": "assets/models/items/minishark.glb",
+   "icon": "assets/icons/items/minishark.png"
+  },
+  "muramasa": {
+   "model": "assets/models/items/muramasa.glb",
+   "icon": "assets/icons/items/muramasa.png"
+  },
+  "mushroom": {
+   "model": "assets/models/items/mushroom.glb",
+   "icon": "assets/icons/items/mushroom.png"
+  },
+  "musket": {
+   "model": "assets/models/items/musket.glb",
+   "icon": "assets/icons/items/musket.png"
+  },
+  "musket_ball": {
+   "model": "assets/models/items/musket_ball.glb",
+   "icon": "assets/icons/items/musket_ball.png"
+  },
+  "mythril_anvil": {
+   "object": "mythril_anvil",
+   "icon": "assets/icons/items/mythril_anvil.png"
+  },
+  "mythril_axe": {
+   "model": "assets/models/items/mythril_axe.glb",
+   "icon": "assets/icons/items/mythril_axe.png"
+  },
+  "mythril_bar": {
+   "model": "assets/models/items/mythril_bar.glb",
+   "icon": "assets/icons/items/mythril_bar.png"
+  },
+  "mythril_bow": {
+   "model": "assets/models/items/mythril_bow.glb",
+   "icon": "assets/icons/items/mythril_bow.png"
+  },
+  "mythril_broadsword": {
+   "model": "assets/models/items/mythril_broadsword.glb",
+   "icon": "assets/icons/items/mythril_broadsword.png"
+  },
+  "mythril_chainmail": {
+   "model": "assets/models/items/mythril_chainmail.glb",
+   "icon": "assets/icons/items/mythril_chainmail.png"
+  },
+  "mythril_chainsaw": {
+   "model": "assets/models/items/mythril_chainsaw.glb",
+   "icon": "assets/icons/items/mythril_chainsaw.png"
+  },
+  "mythril_drill": {
+   "model": "assets/models/items/mythril_drill.glb",
+   "icon": "assets/icons/items/mythril_drill.png"
+  },
+  "mythril_greaves": {
+   "model": "assets/models/items/mythril_greaves.glb",
+   "icon": "assets/icons/items/mythril_greaves.png"
+  },
+  "mythril_hammer": {
+   "model": "assets/models/items/mythril_hammer.glb",
+   "icon": "assets/icons/items/mythril_hammer.png"
+  },
+  "mythril_helmet": {
+   "model": "assets/models/items/mythril_helmet.glb",
+   "icon": "assets/icons/items/mythril_helmet.png"
+  },
+  "mythril_pickaxe": {
+   "model": "assets/models/items/mythril_pickaxe.glb",
+   "icon": "assets/icons/items/mythril_pickaxe.png"
+  },
+  "mythril_shortsword": {
+   "model": "assets/models/items/mythril_shortsword.glb",
+   "icon": "assets/icons/items/mythril_shortsword.png"
+  },
+  "natures_gift": {
+   "model": "assets/models/items/natures_gift.glb",
+   "icon": "assets/icons/items/natures_gift.png"
+  },
+  "nebula_arcanum": {
+   "model": "assets/models/items/nebula_arcanum.glb",
+   "icon": "assets/icons/items/nebula_arcanum.png"
+  },
+  "nebula_blaze": {
+   "model": "assets/models/items/nebula_blaze.glb",
+   "icon": "assets/icons/items/nebula_blaze.png"
+  },
+  "nebula_breastplate": {
+   "model": "assets/models/items/nebula_breastplate.glb",
+   "icon": "assets/icons/items/nebula_breastplate.png"
+  },
+  "nebula_drill": {
+   "model": "assets/models/items/nebula_drill.glb",
+   "icon": "assets/icons/items/nebula_drill.png"
+  },
+  "nebula_fragment": {
+   "model": "assets/models/items/nebula_fragment.glb",
+   "icon": "assets/icons/items/nebula_fragment.png"
+  },
+  "nebula_hamaxe": {
+   "model": "assets/models/items/nebula_hamaxe.glb",
+   "icon": "assets/icons/items/nebula_hamaxe.png"
+  },
+  "nebula_helmet": {
+   "model": "assets/models/items/nebula_helmet.glb",
+   "icon": "assets/icons/items/nebula_helmet.png"
+  },
+  "nebula_leggings": {
+   "model": "assets/models/items/nebula_leggings.glb",
+   "icon": "assets/icons/items/nebula_leggings.png"
+  },
+  "nebula_mantle": {
+   "model": "assets/models/items/nebula_mantle.glb",
+   "icon": "assets/icons/items/nebula_mantle.png"
+  },
+  "nebula_pickaxe": {
+   "model": "assets/models/items/nebula_pickaxe.glb",
+   "icon": "assets/icons/items/nebula_pickaxe.png"
+  },
+  "neon_tetra": {
+   "model": "assets/models/items/neon_tetra.glb",
+   "icon": "assets/icons/items/neon_tetra.png"
+  },
+  "nightglow": {
+   "model": "assets/models/items/nightglow.glb",
+   "icon": "assets/icons/items/nightglow.png"
+  },
+  "nights_edge": {
+   "model": "assets/models/items/nights_edge.glb",
+   "icon": "assets/icons/items/nights_edge.png"
+  },
+  "obsidian_shield": {
+   "model": "assets/models/items/obsidian_shield.glb",
+   "icon": "assets/icons/items/obsidian_shield.png"
+  },
+  "obsidian_skin_potion": {
+   "model": "assets/models/items/obsidian_skin_potion.glb",
+   "icon": "assets/icons/items/obsidian_skin_potion.png"
+  },
+  "obsidian_skull": {
+   "model": "assets/models/items/obsidian_skull.glb",
+   "icon": "assets/icons/items/obsidian_skull.png"
+  },
+  "orichalcum_anvil": {
+   "object": "orichalcum_anvil",
+   "icon": "assets/icons/items/orichalcum_anvil.png"
+  },
+  "orichalcum_axe": {
+   "model": "assets/models/items/orichalcum_axe.glb",
+   "icon": "assets/icons/items/orichalcum_axe.png"
+  },
+  "orichalcum_bar": {
+   "model": "assets/models/items/orichalcum_bar.glb",
+   "icon": "assets/icons/items/orichalcum_bar.png"
+  },
+  "orichalcum_bow": {
+   "model": "assets/models/items/orichalcum_bow.glb",
+   "icon": "assets/icons/items/orichalcum_bow.png"
+  },
+  "orichalcum_broadsword": {
+   "model": "assets/models/items/orichalcum_broadsword.glb",
+   "icon": "assets/icons/items/orichalcum_broadsword.png"
+  },
+  "orichalcum_chainmail": {
+   "model": "assets/models/items/orichalcum_chainmail.glb",
+   "icon": "assets/icons/items/orichalcum_chainmail.png"
+  },
+  "orichalcum_chainsaw": {
+   "model": "assets/models/items/orichalcum_chainsaw.glb",
+   "icon": "assets/icons/items/orichalcum_chainsaw.png"
+  },
+  "orichalcum_drill": {
+   "model": "assets/models/items/orichalcum_drill.glb",
+   "icon": "assets/icons/items/orichalcum_drill.png"
+  },
+  "orichalcum_greaves": {
+   "model": "assets/models/items/orichalcum_greaves.glb",
+   "icon": "assets/icons/items/orichalcum_greaves.png"
+  },
+  "orichalcum_hammer": {
+   "model": "assets/models/items/orichalcum_hammer.glb",
+   "icon": "assets/icons/items/orichalcum_hammer.png"
+  },
+  "orichalcum_helmet": {
+   "model": "assets/models/items/orichalcum_helmet.glb",
+   "icon": "assets/icons/items/orichalcum_helmet.png"
+  },
+  "orichalcum_pickaxe": {
+   "model": "assets/models/items/orichalcum_pickaxe.glb",
+   "icon": "assets/icons/items/orichalcum_pickaxe.png"
+  },
+  "orichalcum_shortsword": {
+   "model": "assets/models/items/orichalcum_shortsword.glb",
+   "icon": "assets/icons/items/orichalcum_shortsword.png"
+  },
+  "palladium_axe": {
+   "model": "assets/models/items/palladium_axe.glb",
+   "icon": "assets/icons/items/palladium_axe.png"
+  },
+  "palladium_bar": {
+   "model": "assets/models/items/palladium_bar.glb",
+   "icon": "assets/icons/items/palladium_bar.png"
+  },
+  "palladium_bow": {
+   "model": "assets/models/items/palladium_bow.glb",
+   "icon": "assets/icons/items/palladium_bow.png"
+  },
+  "palladium_broadsword": {
+   "model": "assets/models/items/palladium_broadsword.glb",
+   "icon": "assets/icons/items/palladium_broadsword.png"
+  },
+  "palladium_chainmail": {
+   "model": "assets/models/items/palladium_chainmail.glb",
+   "icon": "assets/icons/items/palladium_chainmail.png"
+  },
+  "palladium_chainsaw": {
+   "model": "assets/models/items/palladium_chainsaw.glb",
+   "icon": "assets/icons/items/palladium_chainsaw.png"
+  },
+  "palladium_drill": {
+   "model": "assets/models/items/palladium_drill.glb",
+   "icon": "assets/icons/items/palladium_drill.png"
+  },
+  "palladium_greaves": {
+   "model": "assets/models/items/palladium_greaves.glb",
+   "icon": "assets/icons/items/palladium_greaves.png"
+  },
+  "palladium_hammer": {
+   "model": "assets/models/items/palladium_hammer.glb",
+   "icon": "assets/icons/items/palladium_hammer.png"
+  },
+  "palladium_helmet": {
+   "model": "assets/models/items/palladium_helmet.glb",
+   "icon": "assets/icons/items/palladium_helmet.png"
+  },
+  "palladium_pickaxe": {
+   "model": "assets/models/items/palladium_pickaxe.glb",
+   "icon": "assets/icons/items/palladium_pickaxe.png"
+  },
+  "palladium_shortsword": {
+   "model": "assets/models/items/palladium_shortsword.glb",
+   "icon": "assets/icons/items/palladium_shortsword.png"
+  },
+  "panic_necklace": {
+   "model": "assets/models/items/panic_necklace.glb",
+   "icon": "assets/icons/items/panic_necklace.png"
+  },
+  "pew_matic_horn": {
+   "model": "assets/models/items/pew_matic_horn.glb",
+   "icon": "assets/icons/items/pew_matic_horn.png"
+  },
+  "phantasm": {
+   "model": "assets/models/items/phantasm.glb",
+   "icon": "assets/icons/items/phantasm.png"
+  },
+  "phoenix_blaster": {
+   "model": "assets/models/items/phoenix_blaster.glb",
+   "icon": "assets/icons/items/phoenix_blaster.png"
+  },
+  "pickaxe_axe": {
+   "model": "assets/models/items/pickaxe_axe.glb",
+   "icon": "assets/icons/items/pickaxe_axe.png"
+  },
+  "picksaw": {
+   "model": "assets/models/items/picksaw.glb",
+   "icon": "assets/icons/items/picksaw.png"
+  },
+  "pixie_dust": {
+   "model": "assets/models/items/pixie_dust.glb",
+   "icon": "assets/icons/items/pixie_dust.png"
+  },
+  "platinum_axe": {
+   "model": "assets/models/items/platinum_axe.glb",
+   "icon": "assets/icons/items/platinum_axe.png"
+  },
+  "platinum_bar": {
+   "model": "assets/models/items/platinum_bar.glb",
+   "icon": "assets/icons/items/platinum_bar.png"
+  },
+  "platinum_bow": {
+   "model": "assets/models/items/platinum_bow.glb",
+   "icon": "assets/icons/items/platinum_bow.png"
+  },
+  "platinum_broadsword": {
+   "model": "assets/models/items/platinum_broadsword.glb",
+   "icon": "assets/icons/items/platinum_broadsword.png"
+  },
+  "platinum_chainmail": {
+   "model": "assets/models/items/platinum_chainmail.glb",
+   "icon": "assets/icons/items/platinum_chainmail.png"
+  },
+  "platinum_coin": {
+   "model": "assets/models/items/platinum_coin.glb",
+   "icon": "assets/icons/items/platinum_coin.png"
+  },
+  "platinum_greaves": {
+   "model": "assets/models/items/platinum_greaves.glb",
+   "icon": "assets/icons/items/platinum_greaves.png"
+  },
+  "platinum_hammer": {
+   "model": "assets/models/items/platinum_hammer.glb",
+   "icon": "assets/icons/items/platinum_hammer.png"
+  },
+  "platinum_helmet": {
+   "model": "assets/models/items/platinum_helmet.glb",
+   "icon": "assets/icons/items/platinum_helmet.png"
+  },
+  "platinum_pickaxe": {
+   "model": "assets/models/items/platinum_pickaxe.glb",
+   "icon": "assets/icons/items/platinum_pickaxe.png"
+  },
+  "platinum_shortsword": {
+   "model": "assets/models/items/platinum_shortsword.glb",
+   "icon": "assets/icons/items/platinum_shortsword.png"
+  },
+  "possessed_hatchet": {
+   "model": "assets/models/items/possessed_hatchet.glb",
+   "icon": "assets/icons/items/possessed_hatchet.png"
+  },
+  "prismatic_lacewing": {
+   "model": "assets/models/items/prismatic_lacewing.glb",
+   "icon": "assets/icons/items/prismatic_lacewing.png"
+  },
+  "prismite": {
+   "model": "assets/models/items/prismite.glb",
+   "icon": "assets/icons/items/prismite.png"
+  },
+  "pwnhammer": {
+   "model": "assets/models/items/pwnhammer.glb",
+   "icon": "assets/icons/items/pwnhammer.png"
+  },
+  "pygmy_staff": {
+   "model": "assets/models/items/pygmy_staff.glb",
+   "icon": "assets/icons/items/pygmy_staff.png"
+  },
+  "rainbow_crystal_staff": {
+   "model": "assets/models/items/rainbow_crystal_staff.glb",
+   "icon": "assets/icons/items/rainbow_crystal_staff.png"
+  },
+  "rainbow_rod": {
+   "model": "assets/models/items/rainbow_rod.glb",
+   "icon": "assets/icons/items/rainbow_rod.png"
+  },
+  "rally": {
+   "model": "assets/models/items/rally.glb",
+   "icon": "assets/icons/items/rally.png"
+  },
+  "ranger_emblem": {
+   "model": "assets/models/items/ranger_emblem.glb",
+   "icon": "assets/icons/items/ranger_emblem.png"
+  },
+  "razorblade_typhoon_book": {
+   "model": "assets/models/items/razorblade_typhoon_book.glb",
+   "icon": "assets/icons/items/razorblade_typhoon_book.png"
+  },
+  "reaver_shark": {
+   "model": "assets/models/items/reaver_shark.glb",
+   "icon": "assets/icons/items/reaver_shark.png"
+  },
+  "recall_potion": {
+   "model": "assets/models/items/recall_potion.glb",
+   "icon": "assets/icons/items/recall_potion.png"
+  },
+  "red_snapper": {
+   "model": "assets/models/items/red_snapper.glb",
+   "icon": "assets/icons/items/red_snapper.png"
+  },
+  "reinforced_fishing_pole": {
+   "model": "assets/models/items/reinforced_fishing_pole.glb",
+   "icon": "assets/icons/items/reinforced_fishing_pole.png"
+  },
+  "rocket_boots": {
+   "model": "assets/models/items/rocket_boots.glb",
+   "icon": "assets/icons/items/rocket_boots.png"
+  },
+  "rotten_chunk": {
+   "model": "assets/models/items/rotten_chunk.glb",
+   "icon": "assets/icons/items/rotten_chunk.png"
+  },
+  "royal_gel": {
+   "model": "assets/models/items/royal_gel.glb",
+   "icon": "assets/icons/items/royal_gel.png"
+  },
+  "ruby": {
+   "model": "assets/models/items/ruby.glb",
+   "icon": "assets/icons/items/ruby.png"
+  },
+  "ruby_hook": {
+   "model": "assets/models/items/ruby_hook.glb",
+   "icon": "assets/icons/items/ruby_hook.png"
+  },
+  "ruby_staff": {
+   "model": "assets/models/items/ruby_staff.glb",
+   "icon": "assets/icons/items/ruby_staff.png"
+  },
+  "s_d_m_g": {
+   "model": "assets/models/items/s_d_m_g.glb",
+   "icon": "assets/icons/items/s_d_m_g.png"
+  },
+  "salmon": {
+   "model": "assets/models/items/salmon.glb",
+   "icon": "assets/icons/items/salmon.png"
+  },
+  "sandstorm_in_a_bottle": {
+   "model": "assets/models/items/sandstorm_in_a_bottle.glb",
+   "icon": "assets/icons/items/sandstorm_in_a_bottle.png"
+  },
+  "sapphire": {
+   "model": "assets/models/items/sapphire.glb",
+   "icon": "assets/icons/items/sapphire.png"
+  },
+  "sapphire_hook": {
+   "model": "assets/models/items/sapphire_hook.glb",
+   "icon": "assets/icons/items/sapphire_hook.png"
+  },
+  "sapphire_staff": {
+   "model": "assets/models/items/sapphire_staff.glb",
+   "icon": "assets/icons/items/sapphire_staff.png"
+  },
+  "sawmill": {
+   "object": "sawmill",
+   "icon": "assets/icons/items/sawmill.png"
+  },
+  "seedler": {
+   "model": "assets/models/items/seedler.glb",
+   "icon": "assets/icons/items/seedler.png"
+  },
+  "shadow_scale": {
+   "model": "assets/models/items/shadow_scale.glb",
+   "icon": "assets/icons/items/shadow_scale.png"
+  },
+  "shark_fin": {
+   "model": "assets/models/items/shark_fin.glb",
+   "icon": "assets/icons/items/shark_fin.png"
+  },
+  "shield_of_cthulhu": {
+   "model": "assets/models/items/shield_of_cthulhu.glb",
+   "icon": "assets/icons/items/shield_of_cthulhu.png"
+  },
+  "shiny_red_balloon": {
+   "model": "assets/models/items/shiny_red_balloon.glb",
+   "icon": "assets/icons/items/shiny_red_balloon.png"
+  },
+  "shiny_stone": {
+   "model": "assets/models/items/shiny_stone.glb",
+   "icon": "assets/icons/items/shiny_stone.png"
+  },
+  "shrimpy_truffle": {
+   "model": "assets/models/items/shrimpy_truffle.glb",
+   "icon": "assets/icons/items/shrimpy_truffle.png"
+  },
+  "shuriken": {
+   "model": "assets/models/items/shuriken.glb",
+   "icon": "assets/icons/items/shuriken.png"
+  },
+  "silk": {
+   "model": "assets/models/items/silk.glb",
+   "icon": "assets/icons/items/silk.png"
+  },
+  "silver_axe": {
+   "model": "assets/models/items/silver_axe.glb",
+   "icon": "assets/icons/items/silver_axe.png"
+  },
+  "silver_bar": {
+   "model": "assets/models/items/silver_bar.glb",
+   "icon": "assets/icons/items/silver_bar.png"
+  },
+  "silver_bow": {
+   "model": "assets/models/items/silver_bow.glb",
+   "icon": "assets/icons/items/silver_bow.png"
+  },
+  "silver_broadsword": {
+   "model": "assets/models/items/silver_broadsword.glb",
+   "icon": "assets/icons/items/silver_broadsword.png"
+  },
+  "silver_chainmail": {
+   "model": "assets/models/items/silver_chainmail.glb",
+   "icon": "assets/icons/items/silver_chainmail.png"
+  },
+  "silver_coin": {
+   "model": "assets/models/items/silver_coin.glb",
+   "icon": "assets/icons/items/silver_coin.png"
+  },
+  "silver_greaves": {
+   "model": "assets/models/items/silver_greaves.glb",
+   "icon": "assets/icons/items/silver_greaves.png"
+  },
+  "silver_hammer": {
+   "model": "assets/models/items/silver_hammer.glb",
+   "icon": "assets/icons/items/silver_hammer.png"
+  },
+  "silver_helmet": {
+   "model": "assets/models/items/silver_helmet.glb",
+   "icon": "assets/icons/items/silver_helmet.png"
+  },
+  "silver_pickaxe": {
+   "model": "assets/models/items/silver_pickaxe.glb",
+   "icon": "assets/icons/items/silver_pickaxe.png"
+  },
+  "silver_shortsword": {
+   "model": "assets/models/items/silver_shortsword.glb",
+   "icon": "assets/icons/items/silver_shortsword.png"
+  },
+  "slime_crown": {
+   "model": "assets/models/items/slime_crown.glb",
+   "icon": "assets/icons/items/slime_crown.png"
+  },
+  "slime_staff": {
+   "model": "assets/models/items/slime_staff.glb",
+   "icon": "assets/icons/items/slime_staff.png"
+  },
+  "snapthorn": {
+   "model": "assets/models/items/snapthorn.glb",
+   "icon": "assets/icons/items/snapthorn.png"
+  },
+  "solar_eruption": {
+   "model": "assets/models/items/solar_eruption.glb",
+   "icon": "assets/icons/items/solar_eruption.png"
+  },
+  "solar_flare_breastplate": {
+   "model": "assets/models/items/solar_flare_breastplate.glb",
+   "icon": "assets/icons/items/solar_flare_breastplate.png"
+  },
+  "solar_flare_drill": {
+   "model": "assets/models/items/solar_flare_drill.glb",
+   "icon": "assets/icons/items/solar_flare_drill.png"
+  },
+  "solar_flare_hamaxe": {
+   "model": "assets/models/items/solar_flare_hamaxe.glb",
+   "icon": "assets/icons/items/solar_flare_hamaxe.png"
+  },
+  "solar_flare_helmet": {
+   "model": "assets/models/items/solar_flare_helmet.glb",
+   "icon": "assets/icons/items/solar_flare_helmet.png"
+  },
+  "solar_flare_leggings": {
+   "model": "assets/models/items/solar_flare_leggings.glb",
+   "icon": "assets/icons/items/solar_flare_leggings.png"
+  },
+  "solar_flare_pickaxe": {
+   "model": "assets/models/items/solar_flare_pickaxe.glb",
+   "icon": "assets/icons/items/solar_flare_pickaxe.png"
+  },
+  "solar_fragment": {
+   "model": "assets/models/items/solar_fragment.glb",
+   "icon": "assets/icons/items/solar_fragment.png"
+  },
+  "solar_wings": {
+   "model": "assets/models/items/solar_wings.glb",
+   "icon": "assets/icons/items/solar_wings.png"
+  },
+  "sorcerer_emblem": {
+   "model": "assets/models/items/sorcerer_emblem.glb",
+   "icon": "assets/icons/items/sorcerer_emblem.png"
+  },
+  "soul_of_flight": {
+   "model": "assets/models/items/soul_of_flight.glb",
+   "icon": "assets/icons/items/soul_of_flight.png"
+  },
+  "soul_of_fright": {
+   "model": "assets/models/items/soul_of_fright.glb",
+   "icon": "assets/icons/items/soul_of_fright.png"
+  },
+  "soul_of_light": {
+   "model": "assets/models/items/soul_of_light.glb",
+   "icon": "assets/icons/items/soul_of_light.png"
+  },
+  "soul_of_might": {
+   "model": "assets/models/items/soul_of_might.glb",
+   "icon": "assets/icons/items/soul_of_might.png"
+  },
+  "soul_of_night": {
+   "model": "assets/models/items/soul_of_night.glb",
+   "icon": "assets/icons/items/soul_of_night.png"
+  },
+  "soul_of_sight": {
+   "model": "assets/models/items/soul_of_sight.glb",
+   "icon": "assets/icons/items/soul_of_sight.png"
+  },
+  "space_gun": {
+   "model": "assets/models/items/space_gun.glb",
+   "icon": "assets/icons/items/space_gun.png"
+  },
+  "spear": {
+   "model": "assets/models/items/spear.glb",
+   "icon": "assets/icons/items/spear.png"
+  },
+  "spectre_boots": {
+   "model": "assets/models/items/spectre_boots.glb",
+   "icon": "assets/icons/items/spectre_boots.png"
+  },
+  "specular_fish": {
+   "model": "assets/models/items/specular_fish.glb",
+   "icon": "assets/icons/items/specular_fish.png"
+  },
+  "spiky_ball": {
+   "model": "assets/models/items/spiky_ball.glb",
+   "icon": "assets/icons/items/spiky_ball.png"
+  },
+  "spore_sac": {
+   "model": "assets/models/items/spore_sac.glb",
+   "icon": "assets/icons/items/spore_sac.png"
+  },
+  "star_cannon": {
+   "model": "assets/models/items/star_cannon.glb",
+   "icon": "assets/icons/items/star_cannon.png"
+  },
+  "star_wrath": {
+   "model": "assets/models/items/star_wrath.glb",
+   "icon": "assets/icons/items/star_wrath.png"
+  },
+  "stardust_cell_staff": {
+   "model": "assets/models/items/stardust_cell_staff.glb",
+   "icon": "assets/icons/items/stardust_cell_staff.png"
+  },
+  "stardust_dragon_staff": {
+   "model": "assets/models/items/stardust_dragon_staff.glb",
+   "icon": "assets/icons/items/stardust_dragon_staff.png"
+  },
+  "stardust_drill": {
+   "model": "assets/models/items/stardust_drill.glb",
+   "icon": "assets/icons/items/stardust_drill.png"
+  },
+  "stardust_fragment": {
+   "model": "assets/models/items/stardust_fragment.glb",
+   "icon": "assets/icons/items/stardust_fragment.png"
+  },
+  "stardust_hamaxe": {
+   "model": "assets/models/items/stardust_hamaxe.glb",
+   "icon": "assets/icons/items/stardust_hamaxe.png"
+  },
+  "stardust_helmet": {
+   "model": "assets/models/items/stardust_helmet.glb",
+   "icon": "assets/icons/items/stardust_helmet.png"
+  },
+  "stardust_leggings": {
+   "model": "assets/models/items/stardust_leggings.glb",
+   "icon": "assets/icons/items/stardust_leggings.png"
+  },
+  "stardust_pickaxe": {
+   "model": "assets/models/items/stardust_pickaxe.glb",
+   "icon": "assets/icons/items/stardust_pickaxe.png"
+  },
+  "stardust_plate": {
+   "model": "assets/models/items/stardust_plate.glb",
+   "icon": "assets/icons/items/stardust_plate.png"
+  },
+  "stardust_wings": {
+   "model": "assets/models/items/stardust_wings.glb",
+   "icon": "assets/icons/items/stardust_wings.png"
+  },
+  "starfury": {
+   "model": "assets/models/items/starfury.glb",
+   "icon": "assets/icons/items/starfury.png"
+  },
+  "starlight": {
+   "model": "assets/models/items/starlight.glb",
+   "icon": "assets/icons/items/starlight.png"
+  },
+  "stinger": {
+   "model": "assets/models/items/stinger.glb",
+   "icon": "assets/icons/items/stinger.png"
+  },
+  "stynger": {
+   "model": "assets/models/items/stynger.glb",
+   "icon": "assets/icons/items/stynger.png"
+  },
+  "summoner_emblem": {
+   "model": "assets/models/items/summoner_emblem.glb",
+   "icon": "assets/icons/items/summoner_emblem.png"
+  },
+  "sun_stone": {
+   "model": "assets/models/items/sun_stone.glb",
+   "icon": "assets/icons/items/sun_stone.png"
+  },
+  "sunfury": {
+   "model": "assets/models/items/sunfury.glb",
+   "icon": "assets/icons/items/sunfury.png"
+  },
+  "suspicious_looking_eye": {
+   "model": "assets/models/items/suspicious_looking_eye.glb",
+   "icon": "assets/icons/items/suspicious_looking_eye.png"
+  },
+  "swiftness_potion": {
+   "model": "assets/models/items/swiftness_potion.glb",
+   "icon": "assets/icons/items/swiftness_potion.png"
+  },
+  "tabi": {
+   "model": "assets/models/items/tabi.glb",
+   "icon": "assets/icons/items/tabi.png"
+  },
+  "tempest_staff": {
+   "model": "assets/models/items/tempest_staff.glb",
+   "icon": "assets/icons/items/tempest_staff.png"
+  },
+  "temple_key": {
+   "model": "assets/models/items/temple_key.glb",
+   "icon": "assets/icons/items/temple_key.png"
+  },
+  "terra_blade": {
+   "model": "assets/models/items/terra_blade.glb",
+   "icon": "assets/icons/items/terra_blade.png"
+  },
+  "terraprisma": {
+   "model": "assets/models/items/terraprisma.glb",
+   "icon": "assets/icons/items/terraprisma.png"
+  },
+  "terrarian": {
+   "model": "assets/models/items/terrarian.glb",
+   "icon": "assets/icons/items/terrarian.png"
+  },
+  "terraspark_boots": {
+   "model": "assets/models/items/terraspark_boots.glb",
+   "icon": "assets/icons/items/terraspark_boots.png"
+  },
+  "the_axe": {
+   "model": "assets/models/items/the_axe.glb",
+   "icon": "assets/icons/items/the_axe.png"
+  },
+  "the_rotted_fork": {
+   "model": "assets/models/items/the_rotted_fork.glb",
+   "icon": "assets/icons/items/the_rotted_fork.png"
+  },
+  "the_undertaker": {
+   "model": "assets/models/items/the_undertaker.glb",
+   "icon": "assets/icons/items/the_undertaker.png"
+  },
+  "throwing_knife": {
+   "model": "assets/models/items/throwing_knife.glb",
+   "icon": "assets/icons/items/throwing_knife.png"
+  },
+  "tin_axe": {
+   "model": "assets/models/items/tin_axe.glb",
+   "icon": "assets/icons/items/tin_axe.png"
+  },
+  "tin_bar": {
+   "model": "assets/models/items/tin_bar.glb",
+   "icon": "assets/icons/items/tin_bar.png"
+  },
+  "tin_bow": {
+   "model": "assets/models/items/tin_bow.glb",
+   "icon": "assets/icons/items/tin_bow.png"
+  },
+  "tin_broadsword": {
+   "model": "assets/models/items/tin_broadsword.glb",
+   "icon": "assets/icons/items/tin_broadsword.png"
+  },
+  "tin_chainmail": {
+   "model": "assets/models/items/tin_chainmail.glb",
+   "icon": "assets/icons/items/tin_chainmail.png"
+  },
+  "tin_greaves": {
+   "model": "assets/models/items/tin_greaves.glb",
+   "icon": "assets/icons/items/tin_greaves.png"
+  },
+  "tin_hammer": {
+   "model": "assets/models/items/tin_hammer.glb",
+   "icon": "assets/icons/items/tin_hammer.png"
+  },
+  "tin_helmet": {
+   "model": "assets/models/items/tin_helmet.glb",
+   "icon": "assets/icons/items/tin_helmet.png"
+  },
+  "tin_pickaxe": {
+   "model": "assets/models/items/tin_pickaxe.glb",
+   "icon": "assets/icons/items/tin_pickaxe.png"
+  },
+  "tin_shortsword": {
+   "model": "assets/models/items/tin_shortsword.glb",
+   "icon": "assets/icons/items/tin_shortsword.png"
+  },
+  "tinkerers_workshop": {
+   "object": "tinkerers_workshop",
+   "icon": "assets/icons/items/tinkerers_workshop.png"
+  },
+  "tissue_sample": {
+   "model": "assets/models/items/tissue_sample.glb",
+   "icon": "assets/icons/items/tissue_sample.png"
+  },
+  "titanium_axe": {
+   "model": "assets/models/items/titanium_axe.glb",
+   "icon": "assets/icons/items/titanium_axe.png"
+  },
+  "titanium_bar": {
+   "model": "assets/models/items/titanium_bar.glb",
+   "icon": "assets/icons/items/titanium_bar.png"
+  },
+  "titanium_bow": {
+   "model": "assets/models/items/titanium_bow.glb",
+   "icon": "assets/icons/items/titanium_bow.png"
+  },
+  "titanium_broadsword": {
+   "model": "assets/models/items/titanium_broadsword.glb",
+   "icon": "assets/icons/items/titanium_broadsword.png"
+  },
+  "titanium_chainmail": {
+   "model": "assets/models/items/titanium_chainmail.glb",
+   "icon": "assets/icons/items/titanium_chainmail.png"
+  },
+  "titanium_chainsaw": {
+   "model": "assets/models/items/titanium_chainsaw.glb",
+   "icon": "assets/icons/items/titanium_chainsaw.png"
+  },
+  "titanium_drill": {
+   "model": "assets/models/items/titanium_drill.glb",
+   "icon": "assets/icons/items/titanium_drill.png"
+  },
+  "titanium_forge": {
+   "object": "titanium_forge",
+   "icon": "assets/icons/items/titanium_forge.png"
+  },
+  "titanium_greaves": {
+   "model": "assets/models/items/titanium_greaves.glb",
+   "icon": "assets/icons/items/titanium_greaves.png"
+  },
+  "titanium_hammer": {
+   "model": "assets/models/items/titanium_hammer.glb",
+   "icon": "assets/icons/items/titanium_hammer.png"
+  },
+  "titanium_helmet": {
+   "model": "assets/models/items/titanium_helmet.glb",
+   "icon": "assets/icons/items/titanium_helmet.png"
+  },
+  "titanium_pickaxe": {
+   "model": "assets/models/items/titanium_pickaxe.glb",
+   "icon": "assets/icons/items/titanium_pickaxe.png"
+  },
+  "titanium_shortsword": {
+   "model": "assets/models/items/titanium_shortsword.glb",
+   "icon": "assets/icons/items/titanium_shortsword.png"
+  },
+  "topaz": {
+   "model": "assets/models/items/topaz.glb",
+   "icon": "assets/icons/items/topaz.png"
+  },
+  "topaz_hook": {
+   "model": "assets/models/items/topaz_hook.glb",
+   "icon": "assets/icons/items/topaz_hook.png"
+  },
+  "topaz_staff": {
+   "model": "assets/models/items/topaz_staff.glb",
+   "icon": "assets/icons/items/topaz_staff.png"
+  },
+  "torch": {
+   "object": "torch",
+   "icon": "assets/icons/items/torch.png"
+  },
+  "trident": {
+   "model": "assets/models/items/trident.glb",
+   "icon": "assets/icons/items/trident.png"
+  },
+  "trout": {
+   "model": "assets/models/items/trout.glb",
+   "icon": "assets/icons/items/trout.png"
+  },
+  "true_excalibur": {
+   "model": "assets/models/items/true_excalibur.glb",
+   "icon": "assets/icons/items/true_excalibur.png"
+  },
+  "true_nights_edge": {
+   "model": "assets/models/items/true_nights_edge.glb",
+   "icon": "assets/icons/items/true_nights_edge.png"
+  },
+  "truffle_worm": {
+   "model": "assets/models/items/truffle_worm.glb",
+   "icon": "assets/icons/items/truffle_worm.png"
+  },
+  "tsunami": {
+   "model": "assets/models/items/tsunami.glb",
+   "icon": "assets/icons/items/tsunami.png"
+  },
+  "tuna": {
+   "model": "assets/models/items/tuna.glb",
+   "icon": "assets/icons/items/tuna.png"
+  },
+  "tungsten_axe": {
+   "model": "assets/models/items/tungsten_axe.glb",
+   "icon": "assets/icons/items/tungsten_axe.png"
+  },
+  "tungsten_bar": {
+   "model": "assets/models/items/tungsten_bar.glb",
+   "icon": "assets/icons/items/tungsten_bar.png"
+  },
+  "tungsten_bow": {
+   "model": "assets/models/items/tungsten_bow.glb",
+   "icon": "assets/icons/items/tungsten_bow.png"
+  },
+  "tungsten_broadsword": {
+   "model": "assets/models/items/tungsten_broadsword.glb",
+   "icon": "assets/icons/items/tungsten_broadsword.png"
+  },
+  "tungsten_chainmail": {
+   "model": "assets/models/items/tungsten_chainmail.glb",
+   "icon": "assets/icons/items/tungsten_chainmail.png"
+  },
+  "tungsten_greaves": {
+   "model": "assets/models/items/tungsten_greaves.glb",
+   "icon": "assets/icons/items/tungsten_greaves.png"
+  },
+  "tungsten_hammer": {
+   "model": "assets/models/items/tungsten_hammer.glb",
+   "icon": "assets/icons/items/tungsten_hammer.png"
+  },
+  "tungsten_helmet": {
+   "model": "assets/models/items/tungsten_helmet.glb",
+   "icon": "assets/icons/items/tungsten_helmet.png"
+  },
+  "tungsten_pickaxe": {
+   "model": "assets/models/items/tungsten_pickaxe.glb",
+   "icon": "assets/icons/items/tungsten_pickaxe.png"
+  },
+  "tungsten_shortsword": {
+   "model": "assets/models/items/tungsten_shortsword.glb",
+   "icon": "assets/icons/items/tungsten_shortsword.png"
+  },
+  "unicorn_horn": {
+   "model": "assets/models/items/unicorn_horn.glb",
+   "icon": "assets/icons/items/unicorn_horn.png"
+  },
+  "venus_magnum": {
+   "model": "assets/models/items/venus_magnum.glb",
+   "icon": "assets/icons/items/venus_magnum.png"
+  },
+  "vertebra": {
+   "model": "assets/models/items/vertebra.glb",
+   "icon": "assets/icons/items/vertebra.png"
+  },
+  "vicious_powder": {
+   "model": "assets/models/items/vicious_powder.glb",
+   "icon": "assets/icons/items/vicious_powder.png"
+  },
+  "vile_powder": {
+   "model": "assets/models/items/vile_powder.glb",
+   "icon": "assets/icons/items/vile_powder.png"
+  },
+  "vilethorn": {
+   "model": "assets/models/items/vilethorn.glb",
+   "icon": "assets/icons/items/vilethorn.png"
+  },
+  "vine": {
+   "model": "assets/models/items/vine.glb",
+   "icon": "assets/icons/items/vine.png"
+  },
+  "volatile_gelatin": {
+   "model": "assets/models/items/volatile_gelatin.glb",
+   "icon": "assets/icons/items/volatile_gelatin.png"
+  },
+  "vortex_beater": {
+   "model": "assets/models/items/vortex_beater.glb",
+   "icon": "assets/icons/items/vortex_beater.png"
+  },
+  "vortex_booster": {
+   "model": "assets/models/items/vortex_booster.glb",
+   "icon": "assets/icons/items/vortex_booster.png"
+  },
+  "vortex_breastplate": {
+   "model": "assets/models/items/vortex_breastplate.glb",
+   "icon": "assets/icons/items/vortex_breastplate.png"
+  },
+  "vortex_drill": {
+   "model": "assets/models/items/vortex_drill.glb",
+   "icon": "assets/icons/items/vortex_drill.png"
+  },
+  "vortex_fragment": {
+   "model": "assets/models/items/vortex_fragment.glb",
+   "icon": "assets/icons/items/vortex_fragment.png"
+  },
+  "vortex_hamaxe": {
+   "model": "assets/models/items/vortex_hamaxe.glb",
+   "icon": "assets/icons/items/vortex_hamaxe.png"
+  },
+  "vortex_helmet": {
+   "model": "assets/models/items/vortex_helmet.glb",
+   "icon": "assets/icons/items/vortex_helmet.png"
+  },
+  "vortex_leggings": {
+   "model": "assets/models/items/vortex_leggings.glb",
+   "icon": "assets/icons/items/vortex_leggings.png"
+  },
+  "vortex_pickaxe": {
+   "model": "assets/models/items/vortex_pickaxe.glb",
+   "icon": "assets/icons/items/vortex_pickaxe.png"
+  },
+  "wand_of_sparking": {
+   "model": "assets/models/items/wand_of_sparking.glb",
+   "icon": "assets/icons/items/wand_of_sparking.png"
+  },
+  "warrior_emblem": {
+   "model": "assets/models/items/warrior_emblem.glb",
+   "icon": "assets/icons/items/warrior_emblem.png"
+  },
+  "water_bolt": {
+   "model": "assets/models/items/water_bolt.glb",
+   "icon": "assets/icons/items/water_bolt.png"
+  },
+  "water_bucket": {
+   "model": "assets/models/items/water_bucket.glb",
+   "icon": "assets/icons/items/water_bucket.png"
+  },
+  "weather_pain": {
+   "model": "assets/models/items/weather_pain.glb",
+   "icon": "assets/icons/items/weather_pain.png"
+  },
+  "wood_breastplate": {
+   "model": "assets/models/items/wood_breastplate.glb",
+   "icon": "assets/icons/items/wood_breastplate.png"
+  },
+  "wood_greaves": {
+   "model": "assets/models/items/wood_greaves.glb",
+   "icon": "assets/icons/items/wood_greaves.png"
+  },
+  "wood_helmet": {
+   "model": "assets/models/items/wood_helmet.glb",
+   "icon": "assets/icons/items/wood_helmet.png"
+  },
+  "wood_yoyo": {
+   "model": "assets/models/items/wood_yoyo.glb",
+   "icon": "assets/icons/items/wood_yoyo.png"
+  },
+  "wooden_arrow": {
+   "model": "assets/models/items/wooden_arrow.glb",
+   "icon": "assets/icons/items/wooden_arrow.png"
+  },
+  "wooden_boomerang": {
+   "model": "assets/models/items/wooden_boomerang.glb",
+   "icon": "assets/icons/items/wooden_boomerang.png"
+  },
+  "wooden_bow": {
+   "model": "assets/models/items/wooden_bow.glb",
+   "icon": "assets/icons/items/wooden_bow.png"
+  },
+  "wooden_chair": {
+   "object": "wooden_chair",
+   "icon": "assets/icons/items/wooden_chair.png"
+  },
+  "wooden_chest": {
+   "object": "wooden_chest",
+   "icon": "assets/icons/items/wooden_chest.png"
+  },
+  "wooden_crate": {
+   "model": "assets/models/items/wooden_crate.glb",
+   "icon": "assets/icons/items/wooden_crate.png"
+  },
+  "wooden_door": {
+   "object": "wooden_door",
+   "icon": "assets/icons/items/wooden_door.png"
+  },
+  "wooden_fishing_pole": {
+   "model": "assets/models/items/wooden_fishing_pole.glb",
+   "icon": "assets/icons/items/wooden_fishing_pole.png"
+  },
+  "wooden_hammer": {
+   "model": "assets/models/items/wooden_hammer.glb",
+   "icon": "assets/icons/items/wooden_hammer.png"
+  },
+  "wooden_sword": {
+   "model": "assets/models/items/wooden_sword.glb",
+   "icon": "assets/icons/items/wooden_sword.png"
+  },
+  "wooden_table": {
+   "object": "wooden_table",
+   "icon": "assets/icons/items/wooden_table.png"
+  },
+  "work_bench": {
+   "object": "work_bench",
+   "icon": "assets/icons/items/work_bench.png"
+  },
+  "worm_food": {
+   "model": "assets/models/items/worm_food.glb",
+   "icon": "assets/icons/items/worm_food.png"
+  },
+  "worm_scarf": {
+   "model": "assets/models/items/worm_scarf.glb",
+   "icon": "assets/icons/items/worm_scarf.png"
+  },
+  "zenith": {
+   "model": "assets/models/items/zenith.glb",
+   "icon": "assets/icons/items/zenith.png"
+  }
+ },
+ "creatures": {
+  "alien_hornet": {
+   "model": "assets/models/creatures/alien_hornet.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "bee": {
+   "model": "assets/models/creatures/bee.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "blood_crawler": {
+   "model": "assets/models/creatures/blood_crawler.glb",
+   "generator": "crab",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "brain_of_cthulhu": {
+   "model": "assets/models/creatures/brain_of_cthulhu.glb",
+   "generator": "brain",
+   "animations": []
+  },
+  "brain_of_cthulhu_exposed": {
+   "model": "assets/models/creatures/brain_of_cthulhu_exposed.glb",
+   "generator": "brain",
+   "animations": []
+  },
+  "brain_suckler": {
+   "model": "assets/models/creatures/brain_suckler.glb",
+   "generator": "brain",
+   "animations": []
+  },
+  "cave_bat": {
+   "model": "assets/models/creatures/cave_bat.glb",
+   "generator": "bat",
+   "animations": [
+    "fly"
+   ]
+  },
+  "chaos_elemental": {
+   "model": "assets/models/creatures/chaos_elemental.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "clothier": {
+   "model": "assets/models/creatures/clothier.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "crab": {
+   "model": "assets/models/creatures/crab.glb",
+   "generator": "crab",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "creeper": {
+   "model": "assets/models/creatures/creeper.glb",
+   "generator": "eye",
+   "animations": []
+  },
+  "crimera": {
+   "model": "assets/models/creatures/crimera.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "cultist_archer": {
+   "model": "assets/models/creatures/cultist_archer.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "cursed_skull": {
+   "model": "assets/models/creatures/cursed_skull.glb",
+   "generator": "skull",
+   "animations": []
+  },
+  "dark_caster": {
+   "model": "assets/models/creatures/dark_caster.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "deerclops": {
+   "model": "assets/models/creatures/deerclops.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "demon_eye": {
+   "model": "assets/models/creatures/demon_eye.glb",
+   "generator": "eye",
+   "animations": []
+  },
+  "drakomire": {
+   "model": "assets/models/creatures/drakomire.glb",
+   "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "dryad": {
+   "model": "assets/models/creatures/dryad.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "duke_fishron": {
+   "model": "assets/models/creatures/duke_fishron.glb",
+   "generator": "fish",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "dungeon_guardian": {
+   "model": "assets/models/creatures/dungeon_guardian.glb",
+   "generator": "skull",
+   "animations": []
+  },
+  "eater_of_souls": {
+   "model": "assets/models/creatures/eater_of_souls.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "eater_of_worlds_body": {
+   "model": "assets/models/creatures/eater_of_worlds_body.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "eater_of_worlds_head": {
+   "model": "assets/models/creatures/eater_of_worlds_head.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "eater_of_worlds_tail": {
+   "model": "assets/models/creatures/eater_of_worlds_tail.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "empress_of_light": {
+   "model": "assets/models/creatures/empress_of_light.glb",
+   "generator": "sprite",
+   "animations": [
+    "fly"
+   ]
+  },
+  "eye_of_cthulhu": {
+   "model": "assets/models/creatures/eye_of_cthulhu.glb",
+   "generator": "watcher",
+   "animations": []
+  },
+  "eye_of_cthulhu_mouth": {
+   "model": "assets/models/creatures/eye_of_cthulhu_mouth.glb",
+   "generator": "watcher_maw",
+   "animations": []
+  },
+  "face_monster": {
+   "model": "assets/models/creatures/face_monster.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "fish": {
+   "model": "assets/models/creatures/fish.glb",
+   "generator": "fish",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "flow_invader": {
+   "model": "assets/models/creatures/flow_invader.glb",
+   "generator": "jelly",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "flying_snake": {
+   "model": "assets/models/creatures/flying_snake.glb",
+   "generator": "bird",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "gel": {
+   "model": "assets/models/creatures/gel.glb",
+   "generator": "gel",
+   "animations": []
+  },
+  "goblin_archer": {
+   "model": "assets/models/creatures/goblin_archer.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "goblin_peon": {
+   "model": "assets/models/creatures/goblin_peon.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "goblin_sorcerer": {
+   "model": "assets/models/creatures/goblin_sorcerer.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "goblin_thief": {
+   "model": "assets/models/creatures/goblin_thief.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "goblin_warrior": {
+   "model": "assets/models/creatures/goblin_warrior.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "golem": {
+   "model": "assets/models/creatures/golem.glb",
+   "generator": "golem",
+   "animations": []
+  },
+  "guide": {
+   "model": "assets/models/creatures/guide.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "harpy": {
+   "model": "assets/models/creatures/harpy.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "hornet": {
+   "model": "assets/models/creatures/hornet.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "imp": {
+   "model": "assets/models/creatures/imp.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "jellyfish": {
+   "model": "assets/models/creatures/jellyfish.glb",
+   "generator": "jelly",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "king_slime": {
+   "model": "assets/models/creatures/king_slime.glb",
+   "generator": "gel_sovereign",
+   "animations": []
+  },
+  "lacewing": {
+   "model": "assets/models/creatures/lacewing.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "lihzahrd": {
+   "model": "assets/models/creatures/lihzahrd.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "lunatic_cultist": {
+   "model": "assets/models/creatures/lunatic_cultist.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "lunatic_devotee": {
+   "model": "assets/models/creatures/lunatic_devotee.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "man_eater": {
+   "model": "assets/models/creatures/man_eater.glb",
+   "generator": "snatcher",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "merchant": {
+   "model": "assets/models/creatures/merchant.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "moon_lord": {
+   "model": "assets/models/creatures/moon_lord.glb",
+   "generator": "moon_lord",
+   "animations": []
+  },
+  "moon_lord_hand": {
+   "model": "assets/models/creatures/moon_lord_hand.glb",
+   "generator": "moon_lord_hand",
+   "animations": []
+  },
+  "moon_lord_head": {
+   "model": "assets/models/creatures/moon_lord_head.glb",
+   "generator": "moon_lord_head",
+   "animations": []
+  },
+  "mysterious_tablet": {
+   "model": "assets/models/creatures/mysterious_tablet.glb",
+   "generator": "tablet",
+   "animations": []
+  },
+  "nebula_floater": {
+   "model": "assets/models/creatures/nebula_floater.glb",
+   "generator": "jelly",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "nebula_pillar": {
+   "model": "assets/models/creatures/nebula_pillar.glb",
+   "generator": "celestial_pillar",
+   "animations": []
+  },
+  "nurse": {
+   "model": "assets/models/creatures/nurse.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "old_man": {
+   "model": "assets/models/creatures/old_man.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "pixie": {
+   "model": "assets/models/creatures/pixie.glb",
+   "generator": "sprite",
+   "animations": [
+    "fly"
+   ]
+  },
+  "plantera": {
+   "model": "assets/models/creatures/plantera.glb",
+   "generator": "plantera",
+   "animations": []
+  },
+  "plantera_open": {
+   "model": "assets/models/creatures/plantera_open.glb",
+   "generator": "plantera",
+   "animations": []
+  },
+  "player": {
+   "model": "assets/models/creatures/player.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_f_bun": {
+   "model": "assets/models/creatures/player_f_bun.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_f_long": {
+   "model": "assets/models/creatures/player_f_long.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_f_ponytail": {
+   "model": "assets/models/creatures/player_f_ponytail.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_f_short": {
+   "model": "assets/models/creatures/player_f_short.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_m_bald": {
+   "model": "assets/models/creatures/player_m_bald.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_m_buzz": {
+   "model": "assets/models/creatures/player_m_buzz.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_m_long": {
+   "model": "assets/models/creatures/player_m_long.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_m_messy": {
+   "model": "assets/models/creatures/player_m_messy.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "player_m_short": {
+   "model": "assets/models/creatures/player_m_short.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "predictor": {
+   "model": "assets/models/creatures/predictor.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "prime_cannon": {
+   "model": "assets/models/creatures/prime_cannon.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "prime_laser": {
+   "model": "assets/models/creatures/prime_laser.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "prime_saw": {
+   "model": "assets/models/creatures/prime_saw.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "prime_vice": {
+   "model": "assets/models/creatures/prime_vice.glb",
+   "generator": "prime_arm",
+   "animations": []
+  },
+  "probe": {
+   "model": "assets/models/creatures/probe.glb",
+   "generator": "serpent",
+   "animations": []
+  },
+  "queen_bee": {
+   "model": "assets/models/creatures/queen_bee.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "queen_slime": {
+   "model": "assets/models/creatures/queen_slime.glb",
+   "generator": "gel_sovereign",
+   "animations": []
+  },
+  "retinazer": {
+   "model": "assets/models/creatures/retinazer.glb",
+   "generator": "mech_eye",
+   "animations": []
+  },
+  "retinazer_open": {
+   "model": "assets/models/creatures/retinazer_open.glb",
+   "generator": "mech_eye",
+   "animations": []
+  },
+  "selenian": {
+   "model": "assets/models/creatures/selenian.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "skeleton": {
+   "model": "assets/models/creatures/skeleton.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "skeletron_hand": {
+   "model": "assets/models/creatures/skeletron_hand.glb",
+   "generator": "bone_hand",
+   "animations": []
+  },
+  "skeletron_head": {
+   "model": "assets/models/creatures/skeletron_head.glb",
+   "generator": "skull",
+   "animations": []
+  },
+  "skeletron_prime_head": {
+   "model": "assets/models/creatures/skeletron_prime_head.glb",
+   "generator": "prime_skull",
+   "animations": []
+  },
+  "solar_pillar": {
+   "model": "assets/models/creatures/solar_pillar.glb",
+   "generator": "celestial_pillar",
+   "animations": []
+  },
+  "spazmatism": {
+   "model": "assets/models/creatures/spazmatism.glb",
+   "generator": "mech_eye",
+   "animations": []
+  },
+  "spazmatism_open": {
+   "model": "assets/models/creatures/spazmatism_open.glb",
+   "generator": "mech_eye",
+   "animations": []
+  },
+  "stardust_pillar": {
+   "model": "assets/models/creatures/stardust_pillar.glb",
+   "generator": "celestial_pillar",
+   "animations": []
+  },
+  "stargazer": {
+   "model": "assets/models/creatures/stargazer.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "storm_diver": {
+   "model": "assets/models/creatures/storm_diver.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "the_destroyer_body": {
+   "model": "assets/models/creatures/the_destroyer_body.glb",
+   "generator": "serpent",
+   "animations": []
+  },
+  "the_destroyer_head": {
+   "model": "assets/models/creatures/the_destroyer_head.glb",
+   "generator": "serpent",
+   "animations": []
+  },
+  "the_destroyer_tail": {
+   "model": "assets/models/creatures/the_destroyer_tail.glb",
+   "generator": "serpent",
+   "animations": []
+  },
+  "the_hungry": {
+   "model": "assets/models/creatures/the_hungry.glb",
+   "generator": "hungry",
+   "animations": []
+  },
+  "true_eye_of_cthulhu": {
+   "model": "assets/models/creatures/true_eye_of_cthulhu.glb",
+   "generator": "true_eye",
+   "animations": []
+  },
+  "unicorn": {
+   "model": "assets/models/creatures/unicorn.glb",
+   "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "vortex_pillar": {
+   "model": "assets/models/creatures/vortex_pillar.glb",
+   "generator": "celestial_pillar",
+   "animations": []
+  },
+  "vortexian": {
+   "model": "assets/models/creatures/vortexian.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "vulture": {
+   "model": "assets/models/creatures/vulture.glb",
+   "generator": "bird",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "wall_of_flesh_eye": {
+   "model": "assets/models/creatures/wall_of_flesh_eye.glb",
+   "generator": "maw_eye",
+   "animations": []
+  },
+  "wall_of_flesh_flesh": {
+   "model": "assets/models/creatures/wall_of_flesh_flesh.glb",
+   "generator": "maw_flesh",
+   "animations": []
+  },
+  "wall_of_flesh_mouth": {
+   "model": "assets/models/creatures/wall_of_flesh_mouth.glb",
+   "generator": "maw_mouth",
+   "animations": []
+  },
+  "wraith": {
+   "model": "assets/models/creatures/wraith.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "wyvern_body": {
+   "model": "assets/models/creatures/wyvern_body.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "wyvern_head": {
+   "model": "assets/models/creatures/wyvern_head.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "wyvern_tail": {
+   "model": "assets/models/creatures/wyvern_tail.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "zombie": {
+   "model": "assets/models/creatures/zombie.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  }
+ },
+ "generatorVersion": 1
+}

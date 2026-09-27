@@ -1,0 +1,18 @@
+{
+  "enemies": [
+    { "id": "green_slime", "model": "gel", "tags": ["gel"], "name": "Green Slime", "brain": { "type": "slimeHop", "jumpHeight": 4, "jumpSpeed": 3.0, "hopInterval": 80 }, "life": 14, "damage": 6, "defense": 0, "knockbackResist": 0.2, "size": [2.2, 1.8], "moveSpeed": 3, "tint": "#62d44a", "loot": "slime_small", "value": 25, "covers": ["terraria:green_slime"] },
+    { "id": "blue_slime", "model": "gel", "tags": ["gel"], "name": "Blue Slime", "brain": { "type": "slimeHop", "jumpHeight": 5, "jumpSpeed": 3.5, "hopInterval": 70 }, "life": 25, "damage": 7, "defense": 2, "knockbackResist": 0.1, "size": [2.4, 2.0], "moveSpeed": 3, "tint": "#4a8ef0", "loot": "slime_small", "value": 50, "covers": ["terraria:blue_slime"] },
+    { "id": "black_slime", "model": "gel", "tags": ["gel"], "name": "Black Slime", "brain": { "type": "slimeHop", "jumpHeight": 6, "jumpSpeed": 4.0, "hopInterval": 60, "bigHopEvery": 2 }, "life": 45, "damage": 13, "defense": 6, "knockbackResist": 0.1, "size": [2.6, 2.2], "moveSpeed": 3, "tint": "#9a6a3a", "loot": "slime_cave", "value": 80, "light": [2, 1, 0], "covers": ["terraria:red_slime", "terraria:black_slime"] },
+    { "id": "zombie", "model": "zombie", "tags": ["undead"], "name": "Zombie", "description": "The restless dead walk when the sun sets.", "brain": { "type": "walker", "aggroRange": 70, "jumpHeight": 4, "fleeDaylight": true }, "life": 45, "damage": 14, "defense": 6, "knockbackResist": 0.5, "size": [2.0, 3.6], "moveSpeed": 2.2, "tint": "#ffffff", "loot": "zombie", "value": 60, "covers": ["terraria:zombie"] },
+    { "id": "demon_eye", "model": "demon_eye", "name": "Demon Eye", "description": "A drifting eye that stalks travellers at night.", "brain": { "type": "flyer", "aggroRange": 90, "orbitRadius": 12, "dashSpeed": 11, "dashCooldown": 140 }, "life": 60, "damage": 18, "defense": 2, "knockbackResist": 0.2, "size": [1.8, 1.8], "moveSpeed": 5, "gravity": false, "tint": "#ffffff", "loot": "demon_eye", "value": 75, "covers": ["terraria:demon_eye"] },
+    { "id": "cave_bat", "model": "cave_bat", "name": "Cave Bat", "brain": { "type": "flyer", "aggroRange": 50, "orbitRadius": 4, "dashSpeed": 9, "dashCooldown": 60, "bounceOffTerrain": true }, "life": 16, "damage": 13, "defense": 2, "knockbackResist": 0.2, "size": [1.4, 1.0], "moveSpeed": 6, "gravity": false, "tint": "#ffffff", "loot": "cave_bat", "value": 40, "covers": ["terraria:cave_bat"] }
+  ],
+  "spawnRules": [
+    { "id": "green_slime_surface", "enemy": "green_slime", "weight": 3, "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "day" }, { "type": "biome", "none": ["ocean", "corruption", "crimson"] }] },
+    { "id": "blue_slime_surface", "enemy": "blue_slime", "weight": 1.5, "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "day" }] },
+    { "id": "zombie_night", "enemy": "zombie", "weight": 3, "group": [1, 2], "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "night" }] },
+    { "id": "demon_eye_night", "enemy": "demon_eye", "weight": 2, "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "time", "is": "night" }] },
+    { "id": "black_slime_underground", "enemy": "black_slime", "weight": 2, "conditions": [{ "type": "layer", "any": ["underground", "cavern"] }, { "type": "light", "max": 6 }] },
+    { "id": "cave_bat_cavern", "enemy": "cave_bat", "weight": 2, "group": [1, 3], "conditions": [{ "type": "layer", "any": ["underground", "cavern"] }, { "type": "light", "max": 6 }] }
+  ]
+}
