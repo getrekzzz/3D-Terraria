@@ -646,6 +646,13 @@
    "type": "planks",
    "detail": 4,
    "detailStrength": 0.6
+  },
+  {
+   "name": "rope",
+   "index": 92,
+   "type": "rope",
+   "detail": 0,
+   "detailStrength": 0.0
   }
  ]
 }

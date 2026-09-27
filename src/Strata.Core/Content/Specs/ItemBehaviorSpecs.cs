@@ -26,6 +26,18 @@ public static class ItemBehaviorSpecs
     /// <summary>Bait that hooks a boss instead of a fish (a Truffle Worm in the ocean hooks Duke Fishron).</summary>
     public const string BaitSummon = "baitSummon";
 
+    /// <summary>Lays or cuts red wire (Red Wrench, Wire Cutter).</summary>
+    public const string Wiring = "wiring";
+
+    /// <summary>Swings a net that catches critters (Bug Net).</summary>
+    public const string BugNet = "bugNet";
+
+    /// <summary>Lets a caught critter go.</summary>
+    public const string ReleaseCritter = "releaseCritter";
+
+    /// <summary>Boards a minecart on the track beneath the player.</summary>
+    public const string Minecart = "minecart";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
@@ -44,6 +56,10 @@ public static class ItemBehaviorSpecs
         c.Register<GrappleParams>(SpecKind.ItemBehavior, Grapple);
         c.Register<FishingParams>(SpecKind.ItemBehavior, Fishing);
         c.Register<BaitSummonParams>(SpecKind.ItemBehavior, BaitSummon);
+        c.Register<WiringParams>(SpecKind.ItemBehavior, Wiring);
+        c.Register<BugNetParams>(SpecKind.ItemBehavior, BugNet);
+        c.Register<ReleaseCritterParams>(SpecKind.ItemBehavior, ReleaseCritter);
+        c.Register<MinecartParams>(SpecKind.ItemBehavior, Minecart);
     }
 }
 
@@ -194,4 +210,33 @@ public sealed class IncinerationSummonParams : SpecParams, IValidatableSpec
     public string? Validate() =>
         string.IsNullOrWhiteSpace(Enemy) ? "enemy is required"
         : !Enum.TryParse<World.WorldLayer>(Layer, ignoreCase: true, out _) ? $"layer '{Layer}' is not a world layer" : null;
+}
+
+/// <summary>Lays wire (using up <see cref="Wire"/> items) or, with <see cref="Cut"/>, removes it and gives the wire back.</summary>
+public sealed class WiringParams : SpecParams
+{
+    public bool Cut { get; init; }
+    public string Wire { get; init; } = "wire";
+}
+
+/// <summary>Catches the nearest creature with <see cref="Tag"/> in front of the player; it becomes its catch item.</summary>
+public sealed class BugNetParams : SpecParams
+{
+    public string Tag { get; init; } = "critter";
+
+    /// <summary>Reach in cells.</summary>
+    public float Range { get; init; } = 3.5f;
+}
+
+/// <summary>Releases a caught creature where the player aims.</summary>
+public sealed class ReleaseCritterParams : SpecParams
+{
+    public string Enemy { get; init; } = "";
+}
+
+/// <summary>A rideable minecart: top speed and acceleration along the track, in m/s and m/s².</summary>
+public sealed class MinecartParams : SpecParams
+{
+    public float MaxSpeed { get; init; } = 18f;
+    public float Acceleration { get; init; } = 14f;
 }

@@ -15,7 +15,7 @@
       "damage": 55, "damageType": "ranged", "knockback": 4, "useAmmo": "star", "shootSpeed": 22, "covers": ["terraria:star_cannon"] },
     { "id": "meteor_shot", "name": "Meteor Shot", "category": "ammo", "maxStack": 9999, "value": 10, "damage": 9, "damageType": "ranged", "knockback": 1,
       "ammoClass": "bullet", "projectile": "meteor_shot", "consumable": true, "covers": ["terraria:meteor_shot"] },
-    { "id": "meteor_helmet", "name": "Meteor Helmet", "description": "7% increased magic damage.", "category": "armor", "rarity": 1, "value": 25000, "equipSlot": "head", "defense": 3, "armorSet": "meteor_armor",
+    { "id": "meteor_helmet", "setBonus": "25% reduced mana cost", "setEffects": [{"type": "stat", "stat": "manaCost", "mul": 0.75}], "name": "Meteor Helmet", "description": "7% increased magic damage.", "category": "armor", "rarity": 1, "value": 25000, "equipSlot": "head", "defense": 3, "armorSet": "meteor_armor",
       "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.07 }], "covers": ["terraria:meteor_helmet"] },
     { "id": "meteor_suit", "name": "Meteor Suit", "description": "7% increased magic damage.", "category": "armor", "rarity": 1, "value": 25000, "equipSlot": "body", "defense": 4, "armorSet": "meteor_armor",
       "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.07 }] },

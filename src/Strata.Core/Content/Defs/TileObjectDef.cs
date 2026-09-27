@@ -13,6 +13,9 @@ public enum TileCollision
 public enum TileInteraction
 {
     None, Door, Chest, Sit, Sleep, Station, Read, Activate,
+
+    /// <summary>Levers and switches: flips and signals the wires touching it.</summary>
+    Switch,
 }
 
 public enum BreakTool
@@ -93,6 +96,15 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Boss an "activate" object summons when used with its <see cref="Key"/> (the Lihzahrd Altar calls Golem).</summary>
     public string? Summon { get; init; }
 
+    /// <summary>Minecart track: a minecart rides along connected pieces (straight, up or down a step, or round a corner).</summary>
+    public bool Track { get; init; }
+
+    /// <summary>Signals its wires when a player steps onto it.</summary>
+    public bool PressurePlate { get; init; }
+
+    /// <summary>Fires this projectile when a wire signal reaches it (dart traps).</summary>
+    public TrapDef? Trap { get; init; }
+
     /// <summary>The item id that places/drops this object.</summary>
     public string? PlacingItemId => Item ?? (Natural ? null : Id);
 
@@ -138,4 +150,14 @@ public sealed class AuraBuff
 
     /// <summary>How long the buff lasts once the player walks away (ticks).</summary>
     public int Ticks { get; init; } = 120;
+}
+
+/// <summary>What a wired trap shoots, along the way it faces.</summary>
+public sealed class TrapDef
+{
+    public string Projectile { get; init; } = "";
+    public int Damage { get; init; } = 20;
+
+    /// <summary>Launch speed in m/s.</summary>
+    public float Speed { get; init; } = 22f;
 }

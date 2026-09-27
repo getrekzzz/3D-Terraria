@@ -88,6 +88,12 @@
    ],
    "generator": "evil_orb"
   },
+  "dart_trap": {
+   "models": [
+    "assets/models/objects/dart_trap_v0.glb"
+   ],
+   "generator": "dart_trap"
+  },
   "daybloom_plant": {
    "models": [
     "assets/models/objects/daybloom_plant_v0.glb"
@@ -132,6 +138,12 @@
     "assets/models/objects/fireblossom_plant_v0.glb"
    ],
    "generator": "flower"
+  },
+  "firefly_in_a_bottle": {
+   "models": [
+    "assets/models/objects/firefly_in_a_bottle_v0.glb"
+   ],
+   "generator": "bottle_light"
   },
   "flower": {
    "models": [
@@ -199,6 +211,12 @@
     "assets/models/objects/lead_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "lever": {
+   "models": [
+    "assets/models/objects/lever_v0.glb"
+   ],
+   "generator": "lever"
   },
   "life_crystal_node": {
    "models": [
@@ -319,6 +337,12 @@
    ],
    "generator": "pot"
   },
+  "pressure_plate": {
+   "models": [
+    "assets/models/objects/pressure_plate_v0.glb"
+   ],
+   "generator": "pressure_plate"
+  },
   "rubble": {
    "models": [
     "assets/models/objects/rubble_v0.glb",
@@ -367,6 +391,12 @@
     "assets/models/objects/stalagmite_v2.glb"
    ],
    "generator": "spike"
+  },
+  "switch": {
+   "models": [
+    "assets/models/objects/switch_v0.glb"
+   ],
+   "generator": "switch"
   },
   "tinkerers_workshop": {
    "models": [
@@ -628,6 +658,10 @@
    "model": "assets/models/items/betsys_wrath.glb",
    "icon": "assets/icons/items/betsys_wrath.png"
   },
+  "bird": {
+   "model": "assets/models/items/bird.glb",
+   "icon": "assets/icons/items/bird.png"
+  },
   "blade_of_grass": {
    "model": "assets/models/items/blade_of_grass.glb",
    "icon": "assets/icons/items/blade_of_grass.png"
@@ -708,9 +742,21 @@
    "model": "assets/models/items/bubble_gun.glb",
    "icon": "assets/icons/items/bubble_gun.png"
   },
+  "bug_net": {
+   "model": "assets/models/items/bug_net.glb",
+   "icon": "assets/icons/items/bug_net.png"
+  },
   "builder_potion": {
    "model": "assets/models/items/builder_potion.glb",
    "icon": "assets/icons/items/builder_potion.png"
+  },
+  "bunny": {
+   "model": "assets/models/items/bunny.glb",
+   "icon": "assets/icons/items/bunny.png"
+  },
+  "butterfly": {
+   "model": "assets/models/items/butterfly.glb",
+   "icon": "assets/icons/items/butterfly.png"
   },
   "butterfly_dust": {
    "model": "assets/models/items/butterfly_dust.glb",
@@ -980,6 +1026,10 @@
    "model": "assets/models/items/dark_lance.glb",
    "icon": "assets/icons/items/dark_lance.png"
   },
+  "dart_trap": {
+   "object": "dart_trap",
+   "icon": "assets/icons/items/dart_trap.png"
+  },
   "daybloom": {
    "model": "assets/models/items/daybloom.glb",
    "icon": "assets/icons/items/daybloom.png"
@@ -1080,6 +1130,10 @@
    "model": "assets/models/items/dual_hook.glb",
    "icon": "assets/icons/items/dual_hook.png"
   },
+  "duck": {
+   "model": "assets/models/items/duck.glb",
+   "icon": "assets/icons/items/duck.png"
+  },
   "dynamite": {
    "model": "assets/models/items/dynamite.glb",
    "icon": "assets/icons/items/dynamite.png"
@@ -1172,6 +1226,14 @@
    "object": "fireblossom_plant",
    "icon": "assets/icons/items/fireblossom_seeds.png"
   },
+  "firefly": {
+   "model": "assets/models/items/firefly.glb",
+   "icon": "assets/icons/items/firefly.png"
+  },
+  "firefly_in_a_bottle": {
+   "object": "firefly_in_a_bottle",
+   "icon": "assets/icons/items/firefly_in_a_bottle.png"
+  },
   "fisher_of_souls": {
    "model": "assets/models/items/fisher_of_souls.glb",
    "icon": "assets/icons/items/fisher_of_souls.png"
@@ -1223,6 +1285,10 @@
   "flying_dragon": {
    "model": "assets/models/items/flying_dragon.glb",
    "icon": "assets/icons/items/flying_dragon.png"
+  },
+  "frog": {
+   "model": "assets/models/items/frog.glb",
+   "icon": "assets/icons/items/frog.png"
   },
   "furnace": {
    "object": "furnace",
@@ -1628,6 +1694,10 @@
    "model": "assets/models/items/lesser_mana_potion.glb",
    "icon": "assets/icons/items/lesser_mana_potion.png"
   },
+  "lever": {
+   "object": "lever",
+   "icon": "assets/icons/items/lever.png"
+  },
   "life_crystal": {
    "model": "assets/models/items/life_crystal.glb",
    "icon": "assets/icons/items/life_crystal.png"
@@ -1743,6 +1813,10 @@
   "meteorite_bar": {
    "model": "assets/models/items/meteorite_bar.glb",
    "icon": "assets/icons/items/meteorite_bar.png"
+  },
+  "minecart": {
+   "model": "assets/models/items/minecart.glb",
+   "icon": "assets/icons/items/minecart.png"
   },
   "minecart_track": {
    "object": "minecart_track",
@@ -2124,6 +2198,10 @@
    "model": "assets/models/items/possessed_hatchet.glb",
    "icon": "assets/icons/items/possessed_hatchet.png"
   },
+  "pressure_plate": {
+   "object": "pressure_plate",
+   "icon": "assets/icons/items/pressure_plate.png"
+  },
   "prismatic_lacewing": {
    "model": "assets/models/items/prismatic_lacewing.glb",
    "icon": "assets/icons/items/prismatic_lacewing.png"
@@ -2191,6 +2269,10 @@
   "red_snapper": {
    "model": "assets/models/items/red_snapper.glb",
    "icon": "assets/icons/items/red_snapper.png"
+  },
+  "red_wrench": {
+   "model": "assets/models/items/red_wrench.glb",
+   "icon": "assets/icons/items/red_wrench.png"
   },
   "regeneration_potion": {
    "model": "assets/models/items/regeneration_potion.glb",
@@ -2524,6 +2606,10 @@
    "model": "assets/models/items/spore_sac.glb",
    "icon": "assets/icons/items/spore_sac.png"
   },
+  "squirrel": {
+   "model": "assets/models/items/squirrel.glb",
+   "icon": "assets/icons/items/squirrel.png"
+  },
   "star_cannon": {
    "model": "assets/models/items/star_cannon.glb",
    "icon": "assets/icons/items/star_cannon.png"
@@ -2619,6 +2705,10 @@
   "swiftness_potion": {
    "model": "assets/models/items/swiftness_potion.glb",
    "icon": "assets/icons/items/swiftness_potion.png"
+  },
+  "switch": {
+   "object": "switch",
+   "icon": "assets/icons/items/switch.png"
   },
   "tabi": {
    "model": "assets/models/items/tabi.glb",
@@ -2980,6 +3070,14 @@
    "model": "assets/models/items/weather_pain.glb",
    "icon": "assets/icons/items/weather_pain.png"
   },
+  "wire": {
+   "model": "assets/models/items/wire.glb",
+   "icon": "assets/icons/items/wire.png"
+  },
+  "wire_cutter": {
+   "model": "assets/models/items/wire_cutter.glb",
+   "icon": "assets/icons/items/wire_cutter.png"
+  },
   "wizard_hat": {
    "model": "assets/models/items/wizard_hat.glb",
    "icon": "assets/icons/items/wizard_hat.png"
@@ -3047,6 +3145,10 @@
   "work_bench": {
    "object": "work_bench",
    "icon": "assets/icons/items/work_bench.png"
+  },
+  "worm": {
+   "model": "assets/models/items/worm.glb",
+   "icon": "assets/icons/items/worm.png"
   },
   "worm_food": {
    "model": "assets/models/items/worm_food.glb",
@@ -3154,6 +3256,15 @@
    "generator": "dragon",
    "animations": []
   },
+  "bird": {
+   "model": "assets/models/creatures/bird.glb",
+   "generator": "songbird",
+   "animations": [
+    "fly",
+    "idle",
+    "walk"
+   ]
+  },
   "black_recluse": {
    "model": "assets/models/creatures/black_recluse.glb",
    "generator": "crab",
@@ -3185,6 +3296,14 @@
    "generator": "brain",
    "animations": []
   },
+  "bunny": {
+   "model": "assets/models/creatures/bunny.glb",
+   "generator": "bunny",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
   "butcher": {
    "model": "assets/models/creatures/butcher.glb",
    "generator": "humanoid",
@@ -3198,6 +3317,13 @@
     "swing",
     "use",
     "walk"
+   ]
+  },
+  "butterfly": {
+   "model": "assets/models/creatures/butterfly.glb",
+   "generator": "butterfly",
+   "animations": [
+    "fly"
    ]
   },
   "cave_bat": {
@@ -3410,6 +3536,14 @@
     "walk"
    ]
   },
+  "duck": {
+   "model": "assets/models/creatures/duck.glb",
+   "generator": "duck",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
   "duke_fishron": {
    "model": "assets/models/creatures/duke_fishron.glb",
    "generator": "fish",
@@ -3542,6 +3676,13 @@
     "walk"
    ]
   },
+  "firefly": {
+   "model": "assets/models/creatures/firefly.glb",
+   "generator": "firefly",
+   "animations": [
+    "fly"
+   ]
+  },
   "fish": {
    "model": "assets/models/creatures/fish.glb",
    "generator": "fish",
@@ -3583,6 +3724,14 @@
     "run",
     "swing",
     "use",
+    "walk"
+   ]
+  },
+  "frog": {
+   "model": "assets/models/creatures/frog.glb",
+   "generator": "frog",
+   "animations": [
+    "idle",
     "walk"
    ]
   },
@@ -4792,6 +4941,14 @@
     "walk"
    ]
   },
+  "squirrel": {
+   "model": "assets/models/creatures/squirrel.glb",
+   "generator": "squirrel",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
   "stardust_pillar": {
    "model": "assets/models/creatures/stardust_pillar.glb",
    "generator": "celestial_pillar",
@@ -5092,6 +5249,14 @@
   "wolf": {
    "model": "assets/models/creatures/wolf.glb",
    "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "worm": {
+   "model": "assets/models/creatures/worm.glb",
+   "generator": "worm",
    "animations": [
     "idle",
     "walk"

@@ -117,16 +117,20 @@ public sealed partial class PlayerController : CharacterBody3D
         if (!Entity.Alive)
         {
             Velocity = Vector3.Zero;
+            Entity.Minecart = null;
             return;
         }
+        if (UpdateMinecart(dt)) return;
 
         _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
         _swimming = _liquid != null;
+        _climbing = !_swimming && OnRope();
         var stats = Entity.State.Effects.Stats;
         float speed = _config.WalkSpeed * (1f + stats.Bonus(StatIds.MoveSpeed)) * stats.Multiplier(StatIds.MoveSpeed);
         if (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint")) speed *= _config.SprintMultiplier;
         if (_liquid != null) speed = Mathf.Min(speed * _liquid.MoveSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)), _config.SwimSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)));
         speed *= AirSpeedFactor();
+        if (_climbing) speed *= 0.6f;
 
         bool blocked = UI.InputGate.GameplayBlocked;
         var input = blocked ? Vector2.Zero : Input.GetVector("move_left", "move_right", "move_forward", "move_back");
@@ -184,6 +188,7 @@ public sealed partial class PlayerController : CharacterBody3D
         bool held = !blocked && Input.IsActionPressed("jump");
         float jumpScale = 1f + Entity.State.Effects.Stats.Bonus(StatIds.JumpHeight);
 
+        if (UpdateClimb(ref v)) return;
         if (_liquid != null)
         {
             // Viscous liquids (honey, lava) are harder to swim up through.
@@ -237,7 +242,7 @@ public sealed partial class PlayerController : CharacterBody3D
     private void TrackFall()
     {
         float y = GlobalPosition.Y;
-        if (!IsOnFloor() && !_swimming)
+        if (!IsOnFloor() && !_swimming && !_climbing)
         {
             if (!_airborne)
             {

@@ -891,6 +891,13 @@
    "dark": "#5a2a3a",
    "light": "#a86a7a",
    "count": 4
+  },
+  {
+   "name": "rope",
+   "type": "rope",
+   "base": "#b08a5a",
+   "dark": "#6a4e2a",
+   "light": "#d8b888"
   }
  ]
 }

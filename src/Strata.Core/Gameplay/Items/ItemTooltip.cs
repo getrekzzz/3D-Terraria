@@ -31,6 +31,7 @@ public static class ItemTooltip
         if (item.ManaCost > 0) lines.Add(($"Uses {item.ManaCost} mana", TooltipKind.Stat));
         if (item.EquipSlot != EquipSlot.None) lines.Add(("Equipable", TooltipKind.Info));
         if (item.Defense > 0) lines.Add(($"{item.Defense} defense", TooltipKind.Stat));
+        if (item.SetBonus != null) lines.Add(($"Set bonus: {item.SetBonus}", TooltipKind.Info));
         if (item.HealLife > 0) lines.Add(($"Restores {item.HealLife} life", TooltipKind.Stat));
         if (item.HealMana > 0) lines.Add(($"Restores {item.HealMana} mana", TooltipKind.Stat));
         if (item.AmmoClass != null) lines.Add(("Ammo", TooltipKind.Info));

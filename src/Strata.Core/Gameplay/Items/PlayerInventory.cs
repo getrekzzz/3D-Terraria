@@ -63,6 +63,16 @@ public sealed class PlayerInventory
     public IEnumerable<ItemDef> EquippedItems =>
         Armor.Stacks.Concat(Accessories.Stacks).Select(s => s.Item!);
 
+    /// <summary>The worn armor pieces when head, body and legs all share one armor set; otherwise empty.</summary>
+    public IReadOnlyList<ItemDef> CompleteSet()
+    {
+        var set = Armor[0].Item?.ArmorSet;
+        if (set == null) return Array.Empty<ItemDef>();
+        for (int i = 1; i < ArmorSlots; i++)
+            if (Armor[i].Item?.ArmorSet != set) return Array.Empty<ItemDef>();
+        return new[] { Armor[0].Item!, Armor[1].Item!, Armor[2].Item! };
+    }
+
     /// <summary>Equipped stacks (with their prefixes).</summary>
     public IEnumerable<ItemStack> EquippedStacks => Armor.Stacks.Concat(Accessories.Stacks);
 }

@@ -70,6 +70,7 @@ public static partial class ContentValidator
             ctx.Spec(e, SpecKind.Brain, e.Brain, "brain");
             if (e.Brain.Type == Specs.BrainSpecs.Pattern) ValidatePattern(ctx, e);
             ctx.Ref(e, ctx.Db.LootTables, e.Loot, "loot");
+            ctx.Ref(e, ctx.Db.Items, e.CatchItem, "catchItem");
             ctx.Color(e, e.Tint, "tint");
             ctx.Color(e, e.TetherColor, "tetherColor");
             ctx.Light(e, e.Light, "light");
@@ -249,6 +250,9 @@ public static partial class ContentValidator
             // Breaking a world-generated object yields its placing item.
             if (t.PlacingItemId != null && (t.Natural || t.HasTag("world"))) sources.Add(t.PlacingItemId);
         }
+        // A bug net turns critters into their catch items.
+        foreach (var e in ctx.Db.Enemies.All)
+            if (e.CatchItem != null) sources.Add(e.CatchItem);
         // Residents sell their stock.
         foreach (var t in ctx.Db.TownNpcs.All)
             foreach (var e in t.Shop) sources.Add(e.Item);

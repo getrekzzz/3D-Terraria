@@ -79,8 +79,16 @@ public sealed partial class InteractionController : Node
                 case InteractOutcome.DoorToggled: Audio.Sfx.PlayAt(obj.Active ? "door_open" : "door_close", at); break;
                 case InteractOutcome.ContainerOpened: Audio.Sfx.PlayAt("chest_open", at); break;
                 case InteractOutcome.Activated: Audio.Sfx.Play("summon"); break;
+                case InteractOutcome.Switched: Audio.Sfx.PlayAt("lever", at); break;
             }
         }
+    }
+
+    /// <summary>Direction from the eye to a point; the camera's forward when the point is at the eye (standing in rope).</summary>
+    private System.Numerics.Vector3 AimTowards(System.Numerics.Vector3 point, Vector3 fallback)
+    {
+        var d = point - Entity.Eye;
+        return d.LengthSquared() > 1e-4f ? System.Numerics.Vector3.Normalize(d) : System.Numerics.Vector3.Normalize(ToCore(fallback));
     }
 
     private void UpdateTarget()
@@ -98,14 +106,14 @@ public sealed partial class InteractionController : Node
             float fromEye = System.Numerics.Vector3.Distance(point, Entity.Eye);
             Target = hit with { Distance = fromEye };
             InReach = fromEye <= reach;
-            Entity.Aim = System.Numerics.Vector3.Normalize(point - Entity.Eye);
+            Entity.Aim = AimTowards(point, dir);
         }
         else
         {
             Target = null;
             InReach = false;
             var far = origin + dir * 40f;
-            Entity.Aim = System.Numerics.Vector3.Normalize(ToCore(far) - Entity.Eye);
+            Entity.Aim = AimTowards(ToCore(far), dir);
         }
         if (DigDownTarget(dir) is { } below)
         {

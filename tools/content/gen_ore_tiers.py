@@ -98,6 +98,9 @@ def build(table: dict) -> dict:
             items.append({"id": iid, "name": label(t, part), "category": "armor", "rarity": r,
                           "value": v * bars // 2, "equipSlot": slot, "defense": t["armor"][idx],
                           "armorSet": f"{m}_armor", "covers": covers(t, part)})
+            if idx == 0 and "setBonus" in t:
+                items[-1]["setBonus"] = t["setBonus"]["text"]
+                items[-1]["setEffects"] = t["setBonus"]["effects"]
             recipes.append({"id": iid, "output": iid, "inputs": [{"item": bar, "count": bars}],
                             "stations": craft})
     return {"items": items, "recipes": recipes}

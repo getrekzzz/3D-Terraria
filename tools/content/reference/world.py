@@ -3,6 +3,14 @@
 # id|Name|stage|biome/source|mechanics(comma)
 ENEMIES = """
 green_slime|Green Slime|early|surface day|hop
+bunny|Bunny|early|forest|critter
+squirrel|Squirrel|early|forest|critter
+bird|Bird|early|forest|critter
+butterfly|Butterfly|early|forest day|critter
+firefly|Firefly|early|forest night|critter
+worm|Worm|early|surface|critter
+frog|Frog|early|jungle|critter
+duck|Duck|early|ocean|critter
 blue_slime|Blue Slime|early|surface day|hop
 red_slime|Red Slime|early|underground|hop
 purple_slime|Purple Slime|early|surface|hop
@@ -54,7 +62,6 @@ jellyfish|Jellyfish|early|water|swimmer
 antlion|Antlion|early|desert|anchored,projectiles
 antlion_charger|Antlion Charger|early|desert|walker
 vulture|Vulture|early|desert|flyer
-cactus_man|Cactus Man|early|desert|walker
 harpy|Harpy|early|sky|flyer,projectiles
 wyvern|Wyvern|hardmode|sky|segmented,flyer
 angry_bones|Angry Bones|prehardmode|dungeon|walker

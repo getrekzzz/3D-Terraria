@@ -41,6 +41,13 @@ public static partial class ContentValidator
                     if (ctx.Db.Enemies.TryGet(burn.Enemy, out var boss) && boss.Boss == null) ctx.Error(i, $"incinerationSummon.enemy '{burn.Enemy}' is not a boss.");
                     ctx.Ref(i, ctx.Db.TownNpcs, burn.KillsResident, "incinerationSummon.killsResident");
                 }
+            foreach (var b in i.Behaviors)
+            {
+                if (b.Type == Specs.ItemBehaviorSpecs.Wiring && ctx.TryParse<Specs.WiringParams>(SpecKind.ItemBehavior, b) is { } wiring)
+                    ctx.Ref(i, ctx.Db.Items, wiring.Wire, "wiring.wire");
+                if (b.Type == Specs.ItemBehaviorSpecs.ReleaseCritter && ctx.TryParse<Specs.ReleaseCritterParams>(SpecKind.ItemBehavior, b) is { } release)
+                    ctx.Ref(i, ctx.Db.Enemies, release.Enemy, "releaseCritter.enemy");
+            }
             ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");
             if (i.UseAmmo != null && !ammoClasses.Contains(i.UseAmmo)) ctx.Error(i, $"useAmmo '{i.UseAmmo}' has no ammo items.");
             if (i.UseStyle == UseStyle.Shoot && i.Projectile == null && i.UseAmmo == null)
@@ -52,6 +59,8 @@ public static partial class ContentValidator
             if (i.PlaceBlock != null && i.PlaceObject != null) ctx.Error(i, "item cannot place both a block and an object.");
             ctx.Specs(i, SpecKind.ItemBehavior, i.Behaviors, "behaviors");
             ctx.Specs(i, SpecKind.Effect, i.EquipEffects, "equipEffects");
+            ctx.Specs(i, SpecKind.Effect, i.SetEffects, "setEffects");
+            if ((i.SetEffects.Length > 0 || i.SetBonus != null) && i.ArmorSet == null) ctx.Error(i, "setBonus/setEffects need an armorSet.");
         }
     }
 

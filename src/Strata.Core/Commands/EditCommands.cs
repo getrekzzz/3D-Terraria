@@ -115,6 +115,36 @@ public static class EditCommands
                 return CommandResult.Success($"Regenerated {count} chunks.");
             },
         });
+        r.Register(new CommandDef
+        {
+            Name = "wire", Usage = "wire <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> [cut]", Help = "Lays (or cuts) red wire through a box relative to the player's feet.",
+            Run = (ctx, a) =>
+            {
+                var here = Here(ctx);
+                var p0 = here + new Int3(a.Int(0, "dx0"), a.Int(1, "dy0"), a.Int(2, "dz0"));
+                var p1 = here + new Int3(a.Int(3, "dx1"), a.Int(4, "dy1"), a.Int(5, "dz1"));
+                var min = Int3.Min(p0, p1);
+                var max = Int3.Max(p0, p1);
+                if ((long)(max.X - min.X + 1) * (max.Y - min.Y + 1) * (max.Z - min.Z + 1) > MaxFillCells) throw new CommandException("box too large");
+                bool cut = a.OptStr(6) == "cut";
+                int n = 0;
+                for (int y = min.Y; y <= max.Y; y++)
+                    for (int z = min.Z; z <= max.Z; z++)
+                        for (int x = min.X; x <= max.X; x++)
+                            if (cut ? ctx.World.Wires.Cut(new Int3(x, y, z)) : ctx.World.Wires.Place(new Int3(x, y, z))) n++;
+                return CommandResult.Success($"{(cut ? "Cut" : "Laid")} wire in {n} cells.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "interact", Usage = "interact <dx> <dy> <dz>", Help = "Interacts with the tile object at a cell relative to the player's feet (doors, levers).",
+            Run = (ctx, a) =>
+            {
+                var cell = Here(ctx) + new Int3(a.Int(0, "dx"), a.Int(1, "dy"), a.Int(2, "dz"));
+                var obj = ctx.World.Session.World.TileObjects.At(cell) ?? throw new CommandException($"no object at {cell}");
+                return CommandResult.Success($"{obj.Def.Id}: {ctx.World.Interaction.Interact(ctx.Player, obj)}");
+            },
+        });
     }
 
     private static Int3 Here(CommandContext ctx) => ctx.Player.FeetCell;

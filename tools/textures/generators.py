@@ -20,7 +20,7 @@ def seed_of(name: str) -> int:
 GENERATORS = {
     "soil": gen_natural.soil, "grass": gen_natural.grass,
     "rock": gen_rock.rock, "veined": gen_rock.veined, "speckled": gen_rock.speckled, "ore": gen_rock.ore,
-    "planks": gen_built.planks, "bricks": gen_built.bricks, "translucent": gen_built.translucent, "web": gen_built.web,
+    "planks": gen_built.planks, "bricks": gen_built.bricks, "translucent": gen_built.translucent, "web": gen_built.web, "rope": gen_built.rope,
     "hive": gen_built.hive, "missing": gen_built.missing, "metal": gen_built.metal, "cloth": gen_built.cloth,
     "leather": gen_built.leather,
     "leaves": gen_plants.leaves, "foliage": gen_plants.foliage, "bark": gen_plants.bark, "cap": gen_plants.cap,
@@ -28,7 +28,7 @@ GENERATORS = {
 }
 
 # Types whose alpha is opacity (cut-out and translucent surfaces); every other layer stores height in alpha.
-ALPHA_TYPES = {"translucent", "leaves", "web", "sprig"}
+ALPHA_TYPES = {"translucent", "leaves", "web", "sprig", "rope"}
 
 
 def generate(recipe: dict):

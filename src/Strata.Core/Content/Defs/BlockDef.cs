@@ -61,6 +61,9 @@ public sealed class BlockDef : ContentDef
     /// <summary>Falls when unsupported (sand-like).</summary>
     public bool Falls { get; init; }
 
+    /// <summary>Players can climb it (rope): no gravity inside, jump climbs up and crouch slides down.</summary>
+    public bool Climbable { get; init; }
+
     /// <summary>Movement speed multiplier while inside a non-solid block of this type (webs).</summary>
     public float MoveDrag { get; init; } = 1f;
 

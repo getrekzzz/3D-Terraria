@@ -8,6 +8,6 @@
     { "id": "torch", "name": "Torch", "size": [1, 1, 1], "anchor": "floorOrWall", "light": [14, 11, 7], "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemMaxStack": 9999, "itemValue": 10, "covers": ["terraria:torch"] },
     { "id": "candle", "name": "Candle", "size": [1, 1, 1], "anchor": "floor", "light": [11, 9, 6], "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemValue": 30, "covers": ["terraria:candle"] },
     { "id": "bed", "name": "Bed", "size": [3, 2, 5], "interaction": "sleep", "housing": ["bed", "comfort"], "hitPoints": 3, "itemValue": 400, "covers": ["terraria:bed"] },
-    { "id": "minecart_track", "name": "Minecart Track", "size": [1, 1, 1], "anchor": "floor", "hitPoints": 1, "itemCategory": "minecart", "itemMaxStack": 9999, "itemValue": 50, "covers": ["terraria:minecart_track"] }
+    { "id": "minecart_track", "name": "Minecart Track", "description": "Lay it down and ride a minecart along it.", "size": [1, 1, 1], "anchor": "floor", "track": true, "hitPoints": 1, "itemCategory": "minecart", "itemMaxStack": 9999, "itemValue": 50, "covers": ["terraria:minecart_track"] }
   ]
 }

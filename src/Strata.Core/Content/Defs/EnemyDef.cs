@@ -179,6 +179,9 @@ public sealed class EnemyDef : ContentDef
 
     public string? Loot { get; init; }
 
+    /// <summary>Item a bug net turns this creature into (critters).</summary>
+    public string? CatchItem { get; init; }
+
     /// <summary>Set for bosses (boss bar, arena, defeat flag, segments).</summary>
     public BossInfo? Boss { get; init; }
 

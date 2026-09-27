@@ -51,6 +51,9 @@ public sealed class PlayerState
 
     public int Defense { get; private set; }
 
+    /// <summary>The active armor set bonus text (null unless a full set is worn).</summary>
+    public string? SetBonus { get; private set; }
+
     /// <summary>Recomputes derived effects and stats from equipment and buffs (call after changes and each second).</summary>
     public void Recompute()
     {
@@ -63,6 +66,12 @@ public sealed class PlayerState
             foreach (var e in item.EquipEffects) Effects.Apply(e);
             if (stack.Prefix is { } prefix && item.EquipSlot == Content.Defs.EquipSlot.Accessory)
                 foreach (var (stat, add) in Items.Prefixes.AccessoryStats(prefix)) Effects.Stats.Add(stat, add, 1f);
+        }
+        SetBonus = null;
+        foreach (var piece in Inventory.CompleteSet())
+        {
+            foreach (var e in piece.SetEffects) Effects.Apply(e);
+            SetBonus ??= piece.SetBonus;
         }
         foreach (var b in Buffs.Active)
             foreach (var e in b.Def.Effects) Effects.Apply(e);

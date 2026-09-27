@@ -1,0 +1,40 @@
+{
+  // Critters: harmless animals that wander the world. A Bug Net catches them as items; using the item lets them go.
+  "enemies": [
+    {"id": "bunny", "name": "Bunny", "description": "A fluffy forest hopper.", "tags": ["critter"], "brain": {"type": "walker", "aggroRange": 0, "jumpHeight": 2, "wander": true}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.8, 0.8], "moveSpeed": 2.2, "catchItem": "bunny", "value": 0, "covers": ["terraria:bunny"]},
+    {"id": "squirrel", "name": "Squirrel", "description": "Busy gathering acorns.", "tags": ["critter"], "brain": {"type": "walker", "aggroRange": 0, "jumpHeight": 2, "wander": true}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.7, 0.7], "moveSpeed": 2.6, "catchItem": "squirrel", "value": 0, "covers": ["terraria:squirrel"]},
+    {"id": "bird", "name": "Bird", "description": "It chirps from the treetops.", "tags": ["critter"], "brain": {"type": "flyer", "aggroRange": 0}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.6, 0.6], "moveSpeed": 3.0, "catchItem": "bird", "value": 0, "covers": ["terraria:bird"]},
+    {"id": "butterfly", "name": "Butterfly", "description": "Flutters between the flowers.", "tags": ["critter"], "brain": {"type": "flyer", "aggroRange": 0}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.6, 0.5], "moveSpeed": 1.6, "catchItem": "butterfly", "value": 0, "covers": ["terraria:butterfly"]},
+    {"id": "firefly", "name": "Firefly", "description": "A little light in the dark.", "tags": ["critter"], "brain": {"type": "flyer", "aggroRange": 0}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.4, 0.4], "moveSpeed": 1.4, "catchItem": "firefly", "value": 0, "covers": ["terraria:firefly"], "light": [10, 13, 4]},
+    {"id": "worm", "name": "Worm", "description": "Fish love these.", "tags": ["critter"], "brain": {"type": "walker", "aggroRange": 0, "jumpHeight": 2, "wander": true}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.5, 0.3], "moveSpeed": 0.6, "catchItem": "worm", "value": 0, "covers": ["terraria:worm"]},
+    {"id": "frog", "name": "Frog", "description": "Ribbit.", "tags": ["critter"], "brain": {"type": "walker", "aggroRange": 0, "jumpHeight": 2, "wander": true}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.6, 0.5], "moveSpeed": 2.0, "catchItem": "frog", "value": 0, "covers": ["terraria:frog"]},
+    {"id": "duck", "name": "Duck", "description": "Quack.", "tags": ["critter"], "brain": {"type": "walker", "aggroRange": 0, "jumpHeight": 2, "wander": true}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.8, 0.9], "moveSpeed": 1.8, "catchItem": "duck", "value": 0, "covers": ["terraria:duck"]}
+  ],
+  "items": [
+    {"id": "bunny", "name": "Bunny", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "bunny"}]},
+    {"id": "squirrel", "name": "Squirrel", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "squirrel"}]},
+    {"id": "bird", "name": "Bird", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "bird"}]},
+    {"id": "butterfly", "name": "Butterfly", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "butterfly"}]},
+    {"id": "firefly", "name": "Firefly", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "firefly"}]},
+    {"id": "worm", "name": "Worm", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "worm"}]},
+    {"id": "frog", "name": "Frog", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "frog"}]},
+    {"id": "duck", "name": "Duck", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "duck"}]}
+  ],
+  "spawnRules": [
+    {"id": "bunny_0", "enemy": "bunny", "weight": 2.5, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]},
+    {"id": "squirrel_0", "enemy": "squirrel", "weight": 2.0, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]},
+    {"id": "bird_0", "enemy": "bird", "weight": 2.0, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]},
+    {"id": "butterfly_0", "enemy": "butterfly", "weight": 1.5, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]},
+    {"id": "firefly_0", "enemy": "firefly", "weight": 3, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "night"}]},
+    {"id": "worm_0", "enemy": "worm", "weight": 1, "conditions": [{"type": "layer", "any": ["surface", "underground"]}]},
+    {"id": "frog_0", "enemy": "frog", "weight": 1.5, "conditions": [{"type": "biome", "any": ["jungle"]}]},
+    {"id": "duck_0", "enemy": "duck", "weight": 0.6, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["ocean"]}, {"type": "time", "is": "day"}]},
+    {"id": "duck_1", "enemy": "duck", "weight": 0.6, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]}
+  ],
+  "recipes": [
+    {"id": "firefly_in_a_bottle", "output": "firefly_in_a_bottle", "inputs": [{"item": "firefly", "count": 1}, {"item": "bottle", "count": 1}], "stations": []}
+  ],
+  "tileObjects": [
+    {"id": "firefly_in_a_bottle", "name": "Firefly in a Bottle", "description": "A gentle light.", "size": [1, 1, 1], "anchor": "floorOrWall", "light": [10, 13, 4], "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemValue": 1000, "covers": ["terraria:firefly_in_a_bottle"]}
+  ]
+}

@@ -1,0 +1,72 @@
+# Builder's gear: climbing rope, riding a minecart along its track, wiring a lever to a door and a pressure plate to a dart trap.
+# Runs with: godot --headless --path . -- --world=smoke-builder --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/builder.cmds
+
+wait_until player.frozen == 0 180
+wait 1
+spawning off
+killall
+time noon
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+wait 1.0
+assert player.on_floor == 1
+
+# A rope hangs through the player's column: holding jump climbs it, letting go hangs on, crouch slides back down.
+fill 0 0 0 0 14 0 rope
+mark
+hold jump 1.2
+assert player.from_mark > 3
+wait 0.8
+assert player.from_mark > 3
+hold crouch 2.5
+wait 0.5
+assert player.on_floor == 1
+fill 0 0 0 0 14 0 air
+
+# Minecart: a straight run of track north, boarded with the Minecart and driven forward.
+place minecart_track 0 0 -1
+place minecart_track 0 0 -2
+place minecart_track 0 0 -3
+place minecart_track 0 0 -4
+place minecart_track 0 0 -5
+place minecart_track 0 0 -6
+place minecart_track 0 0 -7
+place minecart_track 0 0 -8
+place minecart_track 0 0 -9
+place minecart_track 0 0 -10
+clear
+give minecart 1
+select 1
+aim 0 -2 -1
+use
+assert player.minecart == 1
+mark
+hold move_forward 2.5
+assert player.from_mark > 3
+hold jump 0.05
+wait 1
+assert player.minecart == 0
+assert errors == 0
+
+# Wiring: a lever beside a door, wired through the floor and up into the door; flipping the lever opens it.
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+wait 0.5
+place wooden_door 4 0 2
+place lever 1 0 2
+wire 1 -1 2 4 -1 2
+wire 4 0 2 4 0 2
+assert wires.count >= 5
+interact 1 0 2
+place dart_trap 5 0 0 3
+wire 0 -1 0 5 -1 0
+wire 5 0 0 5 0 0
+assert projectiles.count == 0
+place pressure_plate 0 0 0
+wait 0.02
+assert projectiles.count >= 1
+wait 0.5
+assert player.life < 100
+assert errors == 0

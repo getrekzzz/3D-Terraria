@@ -43,7 +43,7 @@ def block_items():
 
 
 # Layer types whose albedo alpha is opacity; every other layer stores height there (drawn opaque).
-ALPHA_TYPES = {"translucent", "leaves", "web"}
+ALPHA_TYPES = {"translucent", "leaves", "web", "rope"}
 
 
 def layer_tile(atlas: Image.Image, meta, name: str) -> Image.Image:

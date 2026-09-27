@@ -1,22 +1,977 @@
 {
   "comment": "Source table for metal equipment families (barStation smelts, craftStation forges the gear; defaults furnace and anvil). Run tools/content/gen_ore_tiers.py to regenerate data/items/generated/ore_tiers.json.",
   "tiers": [
-    {"metal": "copper", "name": "Copper", "rarity": 0, "orePerBar": 3, "power": 35, "value": 100, "pick": [4, 15], "axe": [3, 21], "hammer": [4, 23], "broad": [8, 23, 5.0], "short": [5, 13, 4.0], "bow": [6, 28, 6.6], "armor": [1, 2, 1]},
-    {"metal": "tin", "name": "Tin", "rarity": 0, "orePerBar": 3, "power": 35, "value": 150, "pick": [5, 15], "axe": [4, 21], "hammer": [5, 23], "broad": [9, 22, 5.0], "short": [7, 12, 4.0], "bow": [7, 27, 6.6], "armor": [2, 2, 1]},
-    {"metal": "iron", "name": "Iron", "rarity": 0, "orePerBar": 3, "power": 40, "value": 200, "pick": [5, 13], "axe": [5, 20], "hammer": [7, 22], "broad": [10, 21, 5.5], "short": [8, 11, 4.0], "bow": [8, 26, 6.6], "armor": [2, 3, 2]},
-    {"metal": "lead", "name": "Lead", "rarity": 0, "orePerBar": 3, "power": 43, "value": 300, "pick": [6, 13], "axe": [5, 20], "hammer": [7, 21], "broad": [11, 21, 6.0], "short": [8, 11, 4.0], "bow": [9, 26, 6.6], "armor": [3, 3, 2]},
-    {"metal": "silver", "name": "Silver", "rarity": 0, "orePerBar": 3, "power": 45, "value": 400, "pick": [6, 12], "axe": [6, 19], "hammer": [8, 20], "broad": [11, 20, 6.0], "short": [9, 10, 4.0], "bow": [9, 25, 6.8], "armor": [3, 4, 3]},
-    {"metal": "tungsten", "name": "Tungsten", "rarity": 0, "orePerBar": 3, "power": 50, "value": 600, "pick": [7, 12], "axe": [6, 19], "hammer": [8, 20], "broad": [12, 20, 6.0], "short": [10, 10, 4.0], "bow": [10, 25, 6.8], "armor": [4, 4, 3]},
-    {"metal": "gold", "name": "Gold", "rarity": 1, "orePerBar": 4, "power": 55, "value": 800, "pick": [6, 11], "axe": [7, 18], "hammer": [9, 19], "broad": [13, 19, 6.5], "short": [11, 9, 4.5], "bow": [11, 24, 7.0], "armor": [5, 6, 5]},
-    {"metal": "platinum", "name": "Platinum", "rarity": 1, "orePerBar": 4, "power": 59, "value": 1000, "pick": [7, 11], "axe": [8, 18], "hammer": [10, 19], "broad": [15, 19, 6.5], "short": [12, 9, 4.5], "bow": [12, 24, 7.0], "armor": [5, 6, 5]},
-    {"metal": "demonite", "name": "Demonite", "pieceNames": {"pickaxe": "Nightmare Pickaxe", "axe": "War Axe of the Night", "hammer": "The Breaker", "broadsword": "Light's Bane", "shortsword": "Demonite Shortsword", "bow": "Demon Bow", "helmet": "Shadow Helmet", "chainmail": "Shadow Scalemail", "greaves": "Shadow Greaves"}, "ore": "demonite_ore", "rarity": 1, "orePerBar": 3, "power": 65, "value": 1200, "pick": [9, 20], "axe": [16, 26], "hammer": [20, 26], "broad": [18, 20, 5.5], "short": [14, 10, 4.0], "bow": [14, 23, 7.2], "armor": [6, 7, 6], "covers": {"bar": "terraria:demonite_bar", "pickaxe": "terraria:nightmare_pickaxe", "broadsword": "terraria:light_s_bane", "helmet": "terraria:shadow_helmet"}},
-    {"metal": "crimtane", "name": "Crimtane", "pieceNames": {"pickaxe": "Deathbringer Pickaxe", "axe": "Blood Lust Cluster", "hammer": "Flesh Grinder", "broadsword": "Blood Butcherer", "shortsword": "Crimtane Shortsword", "bow": "Tendon Bow", "helmet": "Crimson Helmet", "chainmail": "Crimson Scalemail", "greaves": "Crimson Greaves"}, "ore": "crimtane_ore", "rarity": 1, "orePerBar": 3, "power": 65, "value": 1200, "pick": [10, 20], "axe": [16, 26], "hammer": [20, 26], "broad": [19, 20, 5.5], "short": [15, 10, 4.0], "bow": [15, 23, 7.2], "armor": [6, 7, 6], "covers": {"bar": "terraria:crimtane_bar", "pickaxe": "terraria:deathbringer_pickaxe", "broadsword": "terraria:blood_butcherer", "helmet": "terraria:crimson_helmet"}},
-    {"metal": "hellstone", "name": "Hellstone", "pieceNames": {"pickaxe": "Molten Pickaxe", "axe": "Molten Hamaxe", "hammer": "Molten Hammer", "broadsword": "Fiery Greatsword", "shortsword": "Molten Shortsword", "bow": "Molten Fury", "helmet": "Molten Helmet", "chainmail": "Molten Breastplate", "greaves": "Molten Greaves"}, "ore": "hellstone", "barStation": "hellforge", "extraInputs": [{"item": "obsidian", "count": 1}], "rarity": 3, "orePerBar": 3, "power": 100, "value": 2000, "pick": [12, 18], "axe": [20, 24], "hammer": [24, 24], "broad": [36, 25, 6.5], "short": [26, 11, 4.5], "bow": [26, 21, 7.6], "armor": [8, 9, 8], "covers": {"bar": "terraria:hellstone_bar", "pickaxe": "terraria:molten_pickaxe", "axe": "terraria:molten_hamaxe", "broadsword": "terraria:fiery_greatsword", "bow": "terraria:molten_fury", "helmet": "terraria:molten_helmet"}},
-    {"metal": "cobalt", "name": "Cobalt", "pieceNames": {"axe": "Cobalt Waraxe", "broadsword": "Cobalt Sword", "bow": "Cobalt Repeater", "chainmail": "Cobalt Breastplate", "greaves": "Cobalt Leggings"}, "refMetal": "cobalt", "rarity": 4, "orePerBar": 3, "power": 110, "value": 3000, "pick": [10, 13], "axe": [25, 22], "hammer": [28, 24], "broad": [42, 21, 5.8], "short": [32, 10, 4.5], "bow": [30, 22, 8.0], "armor": [10, 11, 10]},
-    {"metal": "palladium", "name": "Palladium", "pieceNames": {"axe": "Palladium Waraxe", "broadsword": "Palladium Sword", "bow": "Palladium Repeater", "chainmail": "Palladium Breastplate", "greaves": "Palladium Leggings"}, "refMetal": "palladium", "rarity": 4, "orePerBar": 3, "power": 130, "value": 3400, "pick": [12, 12], "axe": [27, 21], "hammer": [30, 23], "broad": [46, 21, 5.8], "short": [34, 10, 4.5], "bow": [32, 21, 8.0], "armor": [11, 12, 11]},
-    {"metal": "mythril", "name": "Mythril", "pieceNames": {"axe": "Mythril Waraxe", "broadsword": "Mythril Sword", "bow": "Mythril Repeater", "chainmail": "Mythril Chainmail", "greaves": "Mythril Greaves"}, "craftStation": "hardmode_anvil", "refMetal": "mythril", "rarity": 4, "orePerBar": 4, "power": 150, "value": 4500, "pick": [15, 11], "axe": [30, 20], "hammer": [34, 22], "broad": [50, 20, 6.0], "short": [38, 9, 4.5], "bow": [36, 20, 8.4], "armor": [13, 14, 12]},
-    {"metal": "orichalcum", "name": "Orichalcum", "pieceNames": {"axe": "Orichalcum Waraxe", "broadsword": "Orichalcum Sword", "bow": "Orichalcum Repeater", "chainmail": "Orichalcum Breastplate", "greaves": "Orichalcum Leggings"}, "craftStation": "hardmode_anvil", "refMetal": "orichalcum", "rarity": 4, "orePerBar": 4, "power": 165, "value": 5000, "pick": [17, 10], "axe": [32, 20], "hammer": [36, 22], "broad": [54, 20, 6.0], "short": [40, 9, 4.5], "bow": [38, 19, 8.4], "armor": [14, 15, 13]},
-    {"metal": "adamantite", "name": "Adamantite", "pieceNames": {"axe": "Adamantite Waraxe", "broadsword": "Adamantite Sword", "bow": "Adamantite Repeater", "chainmail": "Adamantite Breastplate", "greaves": "Adamantite Leggings"}, "barStation": "hardmode_forge", "craftStation": "hardmode_anvil", "refMetal": "adamantite", "rarity": 5, "orePerBar": 5, "power": 180, "value": 7000, "pick": [20, 9], "axe": [36, 18], "hammer": [40, 20], "broad": [62, 19, 6.2], "short": [46, 8, 5.0], "bow": [44, 18, 8.8], "armor": [17, 18, 15]},
-    {"metal": "titanium", "name": "Titanium", "pieceNames": {"axe": "Titanium Waraxe", "broadsword": "Titanium Sword", "bow": "Titanium Repeater", "chainmail": "Titanium Breastplate", "greaves": "Titanium Leggings"}, "barStation": "hardmode_forge", "craftStation": "hardmode_anvil", "refMetal": "titanium", "rarity": 5, "orePerBar": 5, "power": 190, "value": 7500, "pick": [22, 8], "axe": [38, 18], "hammer": [42, 20], "broad": [66, 18, 6.2], "short": [48, 8, 5.0], "bow": [46, 17, 8.8], "armor": [18, 19, 16]}
+    {
+      "metal": "copper",
+      "name": "Copper",
+      "rarity": 0,
+      "orePerBar": 3,
+      "power": 35,
+      "value": 100,
+      "pick": [
+        4,
+        15
+      ],
+      "axe": [
+        3,
+        21
+      ],
+      "hammer": [
+        4,
+        23
+      ],
+      "broad": [
+        8,
+        23,
+        5.0
+      ],
+      "short": [
+        5,
+        13,
+        4.0
+      ],
+      "bow": [
+        6,
+        28,
+        6.6
+      ],
+      "armor": [
+        1,
+        2,
+        1
+      ],
+      "setBonus": {
+        "text": "+2 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 2
+          }
+        ]
+      }
+    },
+    {
+      "metal": "tin",
+      "name": "Tin",
+      "rarity": 0,
+      "orePerBar": 3,
+      "power": 35,
+      "value": 150,
+      "pick": [
+        5,
+        15
+      ],
+      "axe": [
+        4,
+        21
+      ],
+      "hammer": [
+        5,
+        23
+      ],
+      "broad": [
+        9,
+        22,
+        5.0
+      ],
+      "short": [
+        7,
+        12,
+        4.0
+      ],
+      "bow": [
+        7,
+        27,
+        6.6
+      ],
+      "armor": [
+        2,
+        2,
+        1
+      ],
+      "setBonus": {
+        "text": "+2 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 2
+          }
+        ]
+      }
+    },
+    {
+      "metal": "iron",
+      "name": "Iron",
+      "rarity": 0,
+      "orePerBar": 3,
+      "power": 40,
+      "value": 200,
+      "pick": [
+        5,
+        13
+      ],
+      "axe": [
+        5,
+        20
+      ],
+      "hammer": [
+        7,
+        22
+      ],
+      "broad": [
+        10,
+        21,
+        5.5
+      ],
+      "short": [
+        8,
+        11,
+        4.0
+      ],
+      "bow": [
+        8,
+        26,
+        6.6
+      ],
+      "armor": [
+        2,
+        3,
+        2
+      ],
+      "setBonus": {
+        "text": "+2 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 2
+          }
+        ]
+      }
+    },
+    {
+      "metal": "lead",
+      "name": "Lead",
+      "rarity": 0,
+      "orePerBar": 3,
+      "power": 43,
+      "value": 300,
+      "pick": [
+        6,
+        13
+      ],
+      "axe": [
+        5,
+        20
+      ],
+      "hammer": [
+        7,
+        21
+      ],
+      "broad": [
+        11,
+        21,
+        6.0
+      ],
+      "short": [
+        8,
+        11,
+        4.0
+      ],
+      "bow": [
+        9,
+        26,
+        6.6
+      ],
+      "armor": [
+        3,
+        3,
+        2
+      ],
+      "setBonus": {
+        "text": "+3 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 3
+          }
+        ]
+      }
+    },
+    {
+      "metal": "silver",
+      "name": "Silver",
+      "rarity": 0,
+      "orePerBar": 3,
+      "power": 45,
+      "value": 400,
+      "pick": [
+        6,
+        12
+      ],
+      "axe": [
+        6,
+        19
+      ],
+      "hammer": [
+        8,
+        20
+      ],
+      "broad": [
+        11,
+        20,
+        6.0
+      ],
+      "short": [
+        9,
+        10,
+        4.0
+      ],
+      "bow": [
+        9,
+        25,
+        6.8
+      ],
+      "armor": [
+        3,
+        4,
+        3
+      ],
+      "setBonus": {
+        "text": "+3 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 3
+          }
+        ]
+      }
+    },
+    {
+      "metal": "tungsten",
+      "name": "Tungsten",
+      "rarity": 0,
+      "orePerBar": 3,
+      "power": 50,
+      "value": 600,
+      "pick": [
+        7,
+        12
+      ],
+      "axe": [
+        6,
+        19
+      ],
+      "hammer": [
+        8,
+        20
+      ],
+      "broad": [
+        12,
+        20,
+        6.0
+      ],
+      "short": [
+        10,
+        10,
+        4.0
+      ],
+      "bow": [
+        10,
+        25,
+        6.8
+      ],
+      "armor": [
+        4,
+        4,
+        3
+      ],
+      "setBonus": {
+        "text": "+3 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 3
+          }
+        ]
+      }
+    },
+    {
+      "metal": "gold",
+      "name": "Gold",
+      "rarity": 1,
+      "orePerBar": 4,
+      "power": 55,
+      "value": 800,
+      "pick": [
+        6,
+        11
+      ],
+      "axe": [
+        7,
+        18
+      ],
+      "hammer": [
+        9,
+        19
+      ],
+      "broad": [
+        13,
+        19,
+        6.5
+      ],
+      "short": [
+        11,
+        9,
+        4.5
+      ],
+      "bow": [
+        11,
+        24,
+        7.0
+      ],
+      "armor": [
+        5,
+        6,
+        5
+      ],
+      "setBonus": {
+        "text": "+3 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 3
+          }
+        ]
+      }
+    },
+    {
+      "metal": "platinum",
+      "name": "Platinum",
+      "rarity": 1,
+      "orePerBar": 4,
+      "power": 59,
+      "value": 1000,
+      "pick": [
+        7,
+        11
+      ],
+      "axe": [
+        8,
+        18
+      ],
+      "hammer": [
+        10,
+        19
+      ],
+      "broad": [
+        15,
+        19,
+        6.5
+      ],
+      "short": [
+        12,
+        9,
+        4.5
+      ],
+      "bow": [
+        12,
+        24,
+        7.0
+      ],
+      "armor": [
+        5,
+        6,
+        5
+      ],
+      "setBonus": {
+        "text": "+4 defense",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "defense",
+            "add": 4
+          }
+        ]
+      }
+    },
+    {
+      "metal": "demonite",
+      "name": "Demonite",
+      "pieceNames": {
+        "pickaxe": "Nightmare Pickaxe",
+        "axe": "War Axe of the Night",
+        "hammer": "The Breaker",
+        "broadsword": "Light's Bane",
+        "shortsword": "Demonite Shortsword",
+        "bow": "Demon Bow",
+        "helmet": "Shadow Helmet",
+        "chainmail": "Shadow Scalemail",
+        "greaves": "Shadow Greaves"
+      },
+      "ore": "demonite_ore",
+      "rarity": 1,
+      "orePerBar": 3,
+      "power": 65,
+      "value": 1200,
+      "pick": [
+        9,
+        20
+      ],
+      "axe": [
+        16,
+        26
+      ],
+      "hammer": [
+        20,
+        26
+      ],
+      "broad": [
+        18,
+        20,
+        5.5
+      ],
+      "short": [
+        14,
+        10,
+        4.0
+      ],
+      "bow": [
+        14,
+        23,
+        7.2
+      ],
+      "armor": [
+        6,
+        7,
+        6
+      ],
+      "covers": {
+        "bar": "terraria:demonite_bar",
+        "pickaxe": "terraria:nightmare_pickaxe",
+        "broadsword": "terraria:light_s_bane",
+        "helmet": "terraria:shadow_helmet"
+      },
+      "setBonus": {
+        "text": "15% increased movement speed",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "moveSpeed",
+            "add": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "metal": "crimtane",
+      "name": "Crimtane",
+      "pieceNames": {
+        "pickaxe": "Deathbringer Pickaxe",
+        "axe": "Blood Lust Cluster",
+        "hammer": "Flesh Grinder",
+        "broadsword": "Blood Butcherer",
+        "shortsword": "Crimtane Shortsword",
+        "bow": "Tendon Bow",
+        "helmet": "Crimson Helmet",
+        "chainmail": "Crimson Scalemail",
+        "greaves": "Crimson Greaves"
+      },
+      "ore": "crimtane_ore",
+      "rarity": 1,
+      "orePerBar": 3,
+      "power": 65,
+      "value": 1200,
+      "pick": [
+        10,
+        20
+      ],
+      "axe": [
+        16,
+        26
+      ],
+      "hammer": [
+        20,
+        26
+      ],
+      "broad": [
+        19,
+        20,
+        5.5
+      ],
+      "short": [
+        15,
+        10,
+        4.0
+      ],
+      "bow": [
+        15,
+        23,
+        7.2
+      ],
+      "armor": [
+        6,
+        7,
+        6
+      ],
+      "covers": {
+        "bar": "terraria:crimtane_bar",
+        "pickaxe": "terraria:deathbringer_pickaxe",
+        "broadsword": "terraria:blood_butcherer",
+        "helmet": "terraria:crimson_helmet"
+      },
+      "setBonus": {
+        "text": "Greatly increased life regeneration",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "lifeRegen",
+            "add": 2
+          }
+        ]
+      }
+    },
+    {
+      "metal": "hellstone",
+      "name": "Hellstone",
+      "pieceNames": {
+        "pickaxe": "Molten Pickaxe",
+        "axe": "Molten Hamaxe",
+        "hammer": "Molten Hammer",
+        "broadsword": "Fiery Greatsword",
+        "shortsword": "Molten Shortsword",
+        "bow": "Molten Fury",
+        "helmet": "Molten Helmet",
+        "chainmail": "Molten Breastplate",
+        "greaves": "Molten Greaves"
+      },
+      "ore": "hellstone",
+      "barStation": "hellforge",
+      "extraInputs": [
+        {
+          "item": "obsidian",
+          "count": 1
+        }
+      ],
+      "rarity": 3,
+      "orePerBar": 3,
+      "power": 100,
+      "value": 2000,
+      "pick": [
+        12,
+        18
+      ],
+      "axe": [
+        20,
+        24
+      ],
+      "hammer": [
+        24,
+        24
+      ],
+      "broad": [
+        36,
+        25,
+        6.5
+      ],
+      "short": [
+        26,
+        11,
+        4.5
+      ],
+      "bow": [
+        26,
+        21,
+        7.6
+      ],
+      "armor": [
+        8,
+        9,
+        8
+      ],
+      "covers": {
+        "bar": "terraria:hellstone_bar",
+        "pickaxe": "terraria:molten_pickaxe",
+        "axe": "terraria:molten_hamaxe",
+        "broadsword": "terraria:fiery_greatsword",
+        "bow": "terraria:molten_fury",
+        "helmet": "terraria:molten_helmet"
+      },
+      "setBonus": {
+        "text": "17% extra melee damage",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "meleeDamage",
+            "add": 0.17
+          }
+        ]
+      }
+    },
+    {
+      "metal": "cobalt",
+      "name": "Cobalt",
+      "pieceNames": {
+        "axe": "Cobalt Waraxe",
+        "broadsword": "Cobalt Sword",
+        "bow": "Cobalt Repeater",
+        "chainmail": "Cobalt Breastplate",
+        "greaves": "Cobalt Leggings"
+      },
+      "refMetal": "cobalt",
+      "rarity": 4,
+      "orePerBar": 3,
+      "power": 110,
+      "value": 3000,
+      "pick": [
+        10,
+        13
+      ],
+      "axe": [
+        25,
+        22
+      ],
+      "hammer": [
+        28,
+        24
+      ],
+      "broad": [
+        42,
+        21,
+        5.8
+      ],
+      "short": [
+        32,
+        10,
+        4.5
+      ],
+      "bow": [
+        30,
+        22,
+        8.0
+      ],
+      "armor": [
+        10,
+        11,
+        10
+      ],
+      "setBonus": {
+        "text": "15% increased melee speed",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "meleeSpeed",
+            "add": 0.15
+          }
+        ]
+      }
+    },
+    {
+      "metal": "palladium",
+      "name": "Palladium",
+      "pieceNames": {
+        "axe": "Palladium Waraxe",
+        "broadsword": "Palladium Sword",
+        "bow": "Palladium Repeater",
+        "chainmail": "Palladium Breastplate",
+        "greaves": "Palladium Leggings"
+      },
+      "refMetal": "palladium",
+      "rarity": 4,
+      "orePerBar": 3,
+      "power": 130,
+      "value": 3400,
+      "pick": [
+        12,
+        12
+      ],
+      "axe": [
+        27,
+        21
+      ],
+      "hammer": [
+        30,
+        23
+      ],
+      "broad": [
+        46,
+        21,
+        5.8
+      ],
+      "short": [
+        34,
+        10,
+        4.5
+      ],
+      "bow": [
+        32,
+        21,
+        8.0
+      ],
+      "armor": [
+        11,
+        12,
+        11
+      ],
+      "setBonus": {
+        "text": "Greatly increased life regeneration",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "lifeRegen",
+            "add": 3
+          }
+        ]
+      }
+    },
+    {
+      "metal": "mythril",
+      "name": "Mythril",
+      "pieceNames": {
+        "axe": "Mythril Waraxe",
+        "broadsword": "Mythril Sword",
+        "bow": "Mythril Repeater",
+        "chainmail": "Mythril Chainmail",
+        "greaves": "Mythril Greaves"
+      },
+      "craftStation": "hardmode_anvil",
+      "refMetal": "mythril",
+      "rarity": 4,
+      "orePerBar": 4,
+      "power": 150,
+      "value": 4500,
+      "pick": [
+        15,
+        11
+      ],
+      "axe": [
+        30,
+        20
+      ],
+      "hammer": [
+        34,
+        22
+      ],
+      "broad": [
+        50,
+        20,
+        6.0
+      ],
+      "short": [
+        38,
+        9,
+        4.5
+      ],
+      "bow": [
+        36,
+        20,
+        8.4
+      ],
+      "armor": [
+        13,
+        14,
+        12
+      ],
+      "setBonus": {
+        "text": "5% increased melee critical strike chance",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "meleeCrit",
+            "add": 5
+          }
+        ]
+      }
+    },
+    {
+      "metal": "orichalcum",
+      "name": "Orichalcum",
+      "pieceNames": {
+        "axe": "Orichalcum Waraxe",
+        "broadsword": "Orichalcum Sword",
+        "bow": "Orichalcum Repeater",
+        "chainmail": "Orichalcum Breastplate",
+        "greaves": "Orichalcum Leggings"
+      },
+      "craftStation": "hardmode_anvil",
+      "refMetal": "orichalcum",
+      "rarity": 4,
+      "orePerBar": 4,
+      "power": 165,
+      "value": 5000,
+      "pick": [
+        17,
+        10
+      ],
+      "axe": [
+        32,
+        20
+      ],
+      "hammer": [
+        36,
+        22
+      ],
+      "broad": [
+        54,
+        20,
+        6.0
+      ],
+      "short": [
+        40,
+        9,
+        4.5
+      ],
+      "bow": [
+        38,
+        19,
+        8.4
+      ],
+      "armor": [
+        14,
+        15,
+        13
+      ],
+      "setBonus": {
+        "text": "8% increased damage",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "genericDamage",
+            "add": 0.08
+          }
+        ]
+      }
+    },
+    {
+      "metal": "adamantite",
+      "name": "Adamantite",
+      "pieceNames": {
+        "axe": "Adamantite Waraxe",
+        "broadsword": "Adamantite Sword",
+        "bow": "Adamantite Repeater",
+        "chainmail": "Adamantite Breastplate",
+        "greaves": "Adamantite Leggings"
+      },
+      "barStation": "hardmode_forge",
+      "craftStation": "hardmode_anvil",
+      "refMetal": "adamantite",
+      "rarity": 5,
+      "orePerBar": 5,
+      "power": 180,
+      "value": 7000,
+      "pick": [
+        20,
+        9
+      ],
+      "axe": [
+        36,
+        18
+      ],
+      "hammer": [
+        40,
+        20
+      ],
+      "broad": [
+        62,
+        19,
+        6.2
+      ],
+      "short": [
+        46,
+        8,
+        5.0
+      ],
+      "bow": [
+        44,
+        18,
+        8.8
+      ],
+      "armor": [
+        17,
+        18,
+        15
+      ],
+      "setBonus": {
+        "text": "18% increased melee and movement speed",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "meleeSpeed",
+            "add": 0.18
+          },
+          {
+            "type": "stat",
+            "stat": "moveSpeed",
+            "add": 0.18
+          }
+        ]
+      }
+    },
+    {
+      "metal": "titanium",
+      "name": "Titanium",
+      "pieceNames": {
+        "axe": "Titanium Waraxe",
+        "broadsword": "Titanium Sword",
+        "bow": "Titanium Repeater",
+        "chainmail": "Titanium Breastplate",
+        "greaves": "Titanium Leggings"
+      },
+      "barStation": "hardmode_forge",
+      "craftStation": "hardmode_anvil",
+      "refMetal": "titanium",
+      "rarity": 5,
+      "orePerBar": 5,
+      "power": 190,
+      "value": 7500,
+      "pick": [
+        22,
+        8
+      ],
+      "axe": [
+        38,
+        18
+      ],
+      "hammer": [
+        42,
+        20
+      ],
+      "broad": [
+        66,
+        18,
+        6.2
+      ],
+      "short": [
+        48,
+        8,
+        5.0
+      ],
+      "bow": [
+        46,
+        17,
+        8.8
+      ],
+      "armor": [
+        18,
+        19,
+        16
+      ],
+      "setBonus": {
+        "text": "10% reduced damage taken",
+        "effects": [
+          {
+            "type": "stat",
+            "stat": "endurance",
+            "add": 0.1
+          }
+        ]
+      }
+    }
   ]
 }

@@ -23,6 +23,7 @@ public sealed class ObjectPlacement
         var fp = o.Footprint;
         var origin = new Vector3(o.Anchor.X + fp.X * 0.5f, o.Anchor.Y, o.Anchor.Z + fp.Z * 0.5f) * Units.CellSize;
         var basis = new Basis(Vector3.Up, -o.Rotation * Mathf.Pi / 2f);
+        if (o.Def.Interaction == TileInteraction.Switch && o.Active) basis *= new Basis(Vector3.Up, Mathf.Pi); // flipped lever
         if (o.Def.Interaction == TileInteraction.Door && o.Active)
         {
             // Swing about the hinge on the leaf's local -X edge.

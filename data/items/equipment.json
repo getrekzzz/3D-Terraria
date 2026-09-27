@@ -130,7 +130,7 @@
       ]
     },
     {
-      "id": "wood_helmet",
+      "id": "wood_helmet", "setBonus": "+1 defense", "setEffects": [{"type": "stat", "stat": "defense", "add": 1}],
       "name": "Wood Helmet",
       "category": "armor",
       "value": 50,

@@ -252,6 +252,8 @@ public sealed partial class NpcSystem
         var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);
         ReportPlayerDamage(player, hit.Damage, knock);
         ApplyContactEffects(npc, player);
+        float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
+        if (thorns > 0) Hit(npc, null, (int)(npc.Def.Damage * npc.DamageScale * thorns), DamageClass.None, 0, 0f, player.Center, melee: false);
     }
 
     /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
@@ -273,6 +275,8 @@ public sealed partial class NpcSystem
         var away = BrainFactory.Flat(npc.Position - from);
         npc.Velocity += away * hit.Knockback * 1.2f + new Vector3(0, hit.Knockback * 0.5f, 0);
         Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
+        if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
+            attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
         if (npc.Life <= 0) Kill(npc);
         else if (melee && attacker != null)
             foreach (var inflict in attacker.State.Effects.Inflicts)
@@ -315,6 +319,13 @@ public sealed partial class NpcSystem
     }
 
     public int CountNear(Vector3 point, float radius) => _npcs.Count(n => Vector3.DistanceSquared(n.Center, point) < radius * radius);
+
+    /// <summary>Takes a creature out of the world without killing it (caught in a bug net).</summary>
+    public void Despawn(Npc npc)
+    {
+        int index = _npcs.IndexOf(npc);
+        if (index >= 0) Remove(index);
+    }
 
     public void Clear()
     {

@@ -1,0 +1,26 @@
+{
+  // Builder's gear: rope to climb, minecarts and their track, the Bug Net, and red wire (the Mechanic's Red Wrench,
+  // Wire Cutter, levers, switches, pressure plates and dart traps). Doors, lights and traps react to wire signals.
+  "projectiles": [
+    {"id": "trap_dart", "name": "Poison Dart", "visual": "arrow", "color": "#a8a070", "lifetime": 120, "radius": 0.25, "friendly": false, "hostile": true, "onHit": [{"type": "applyBuff", "buff": "poisoned", "ticks": 180, "chance": 1}]}
+  ],
+  "blocks": [
+    {"id": "rope", "name": "Rope", "render": "transparent", "solid": false, "climbable": true, "textures": {"all": "rope"}, "hardness": 0.1, "sound": "cloth", "color": "#b08a5a", "itemValue": 10, "covers": ["terraria:rope"]}
+  ],
+  "tileObjects": [
+    {"id": "lever", "name": "Lever", "description": "Flip it to send a signal down its wires.", "size": [1, 1, 1], "anchor": "floorOrWall", "interaction": "switch", "hitPoints": 1, "itemCategory": "tool", "itemValue": 2000, "covers": ["terraria:lever"]},
+    {"id": "switch", "name": "Switch", "description": "Press it to send a signal down its wires.", "size": [1, 1, 1], "anchor": "wall", "interaction": "switch", "hitPoints": 1, "itemCategory": "tool", "itemValue": 2000, "covers": ["terraria:switch"]},
+    {"id": "pressure_plate", "name": "Red Pressure Plate", "description": "Activates when stepped on.", "size": [1, 1, 1], "anchor": "floor", "pressurePlate": true, "hitPoints": 1, "itemCategory": "tool", "itemValue": 5000, "covers": ["terraria:red_pressure_plate"]},
+    {"id": "dart_trap", "name": "Dart Trap", "description": "Fires a poison dart when its wire is triggered.", "size": [1, 1, 1], "anchor": "any", "collision": "solid", "trap": {"projectile": "trap_dart", "damage": 20, "speed": 22}, "hitPoints": 3, "breakTool": "pick", "itemCategory": "tool", "itemValue": 10000, "covers": ["terraria:dart_trap"]}
+  ],
+  "items": [
+    {"id": "wire", "name": "Wire", "description": "Laid with a Red Wrench.", "category": "material", "maxStack": 9999, "value": 50, "covers": ["terraria:wire"]},
+    {"id": "red_wrench", "name": "Red Wrench", "description": "Places red wire (uses Wire from your inventory).", "category": "tool", "rarity": 1, "value": 40000, "useStyle": "swing", "useTime": 8, "useAnimation": 8, "autoReuse": true, "reach": 12, "behaviors": [{"type": "wiring"}], "covers": ["terraria:red_wrench"]},
+    {"id": "wire_cutter", "name": "Wire Cutter", "description": "Removes wire.", "category": "tool", "rarity": 1, "value": 40000, "useStyle": "swing", "useTime": 8, "useAnimation": 8, "autoReuse": true, "reach": 12, "behaviors": [{"type": "wiring", "cut": true}], "covers": ["terraria:wire_cutter"]},
+    {"id": "bug_net", "name": "Bug Net", "description": "Used to catch critters.", "category": "tool", "value": 2500, "useStyle": "swing", "useTime": 20, "useAnimation": 20, "autoReuse": true, "behaviors": [{"type": "bugNet"}], "covers": ["terraria:bug_net"]},
+    {"id": "minecart", "name": "Minecart", "description": "Use it on a Minecart Track to ride. Jump to get off.", "category": "tool", "rarity": 1, "value": 20000, "useStyle": "swing", "useTime": 20, "useAnimation": 20, "behaviors": [{"type": "minecart"}], "covers": ["terraria:minecart"]}
+  ],
+  "recipes": [
+    {"id": "rope", "output": "rope", "count": 10, "inputs": [{"item": "cobweb", "count": 3}], "stations": []}
+  ]
+}

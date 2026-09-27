@@ -43,6 +43,12 @@ public sealed class PlayerEntity
     /// <summary>Quarter turns about +Y for shapes and objects (added to the facing direction).</summary>
     public int BuildRotation { get; set; }
 
+    /// <summary>The minecart being ridden (the engine moves the body along it), or null.</summary>
+    public Gameplay.Mounts.MinecartRide? Minecart { get; set; }
+
+    /// <summary>Pressure plate currently under the feet (signals once per step onto it).</summary>
+    public long PressurePlate { get; set; } = -1;
+
     /// <summary>Ticks until respawn while dead.</summary>
     public int RespawnTicks { get; set; }
 
@@ -136,6 +142,7 @@ public sealed partial class GameWorld : IDisposable
         Incineration = new Gameplay.Progression.IncinerationSummons(this);
         Objectives = new Gameplay.Progression.WorldObjectives(this);
         Rituals = new Gameplay.Progression.Rituals(this);
+        Wires = new Gameplay.Wiring.WireSystem(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
         Liquids.ChunksDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
@@ -165,6 +172,7 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Orbs, hearts and altars; meteorites.</summary>
     public Gameplay.Progression.WorldObjectives Objectives { get; }
     public Gameplay.Progression.Rituals Rituals { get; }
+    public Gameplay.Wiring.WireSystem Wires { get; }
     public TownCommerce Commerce { get; }
     public TownServices Services { get; }
     public LiquidEffects LiquidEffects { get; }
@@ -251,6 +259,7 @@ public sealed partial class GameWorld : IDisposable
             return;
         }
         state.PlayTicks++;
+        StepOnPlates(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.UseAnimation > 0) p.UseAnimation--;
         if (state.Buffs.Tick()) state.Recompute();

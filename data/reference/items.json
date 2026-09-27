@@ -1888,13 +1888,6 @@
    "source": "craft"
   },
   {
-   "id": "terraria:builder_s_wand",
-   "name": "Builder's Wand",
-   "kind": "tool",
-   "stage": "hardmode",
-   "source": "shop"
-  },
-  {
    "id": "terraria:paint_sprayer",
    "name": "Paint Sprayer",
    "kind": "tool",
@@ -3561,13 +3554,6 @@
    "source": "necromancer"
   },
   {
-   "id": "terraria:jesters_arrow",
-   "name": "Jester's Arrow",
-   "kind": "weapon",
-   "stage": "early",
-   "source": "craft"
-  },
-  {
    "id": "terraria:cross_necklace",
    "name": "Cross Necklace",
    "kind": "weapon",
@@ -3748,6 +3734,55 @@
    "kind": "consumable",
    "stage": "hardmode",
    "source": "moth"
+  },
+  {
+   "id": "terraria:red_wrench",
+   "name": "Red Wrench",
+   "kind": "tool",
+   "stage": "prehardmode",
+   "source": "mechanic"
+  },
+  {
+   "id": "terraria:wire_cutter",
+   "name": "Wire Cutter",
+   "kind": "tool",
+   "stage": "prehardmode",
+   "source": "mechanic"
+  },
+  {
+   "id": "terraria:lever",
+   "name": "Lever",
+   "kind": "tool",
+   "stage": "prehardmode",
+   "source": "mechanic"
+  },
+  {
+   "id": "terraria:switch",
+   "name": "Switch",
+   "kind": "tool",
+   "stage": "prehardmode",
+   "source": "mechanic"
+  },
+  {
+   "id": "terraria:red_pressure_plate",
+   "name": "Red Pressure Plate",
+   "kind": "tool",
+   "stage": "prehardmode",
+   "source": "mechanic"
+  },
+  {
+   "id": "terraria:dart_trap",
+   "name": "Dart Trap",
+   "kind": "tool",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:firefly_in_a_bottle",
+   "name": "Firefly in a Bottle",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "craft"
   }
  ]
 }
