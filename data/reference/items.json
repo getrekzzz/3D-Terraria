@@ -1615,286 +1615,6 @@
    "source": "craft"
   },
   {
-   "id": "terraria:silver_bullet",
-   "name": "Silver Bullet",
-   "kind": "weapon",
-   "stage": "early",
-   "source": "arms dealer"
-  },
-  {
-   "id": "terraria:shotgun",
-   "name": "Shotgun",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "arms dealer"
-  },
-  {
-   "id": "terraria:rocket_i",
-   "name": "Rocket I",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "cyborg"
-  },
-  {
-   "id": "terraria:rocket_launcher",
-   "name": "Rocket Launcher",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "cyborg"
-  },
-  {
-   "id": "terraria:greater_mana_potion",
-   "name": "Greater Mana Potion",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "wizard"
-  },
-  {
-   "id": "terraria:spell_tome",
-   "name": "Spell Tome",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "wizard"
-  },
-  {
-   "id": "terraria:pygmy_necklace",
-   "name": "Pygmy Necklace",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "witch doctor"
-  },
-  {
-   "id": "terraria:hercules_beetle",
-   "name": "Hercules Beetle",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "witch doctor"
-  },
-  {
-   "id": "terraria:steampunk_wings",
-   "name": "Steampunk Wings",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "steampunker"
-  },
-  {
-   "id": "terraria:katana",
-   "name": "Katana",
-   "kind": "weapon",
-   "stage": "early",
-   "source": "travelling merchant"
-  },
-  {
-   "id": "terraria:mushroom_spear",
-   "name": "Mushroom Spear",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "truffle"
-  },
-  {
-   "id": "terraria:hammush",
-   "name": "Hammush",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "truffle"
-  },
-  {
-   "id": "terraria:autohammer",
-   "name": "Autohammer",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "truffle"
-  },
-  {
-   "id": "terraria:broken_hero_sword",
-   "name": "Broken Hero Sword",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "mothron"
-  },
-  {
-   "id": "terraria:mothron_wings",
-   "name": "Mothron Wings",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "mothron"
-  },
-  {
-   "id": "terraria:death_sickle",
-   "name": "Death Sickle",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "reaper"
-  },
-  {
-   "id": "terraria:deadly_sphere_staff",
-   "name": "Deadly Sphere Staff",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "deadly sphere"
-  },
-  {
-   "id": "terraria:pumpkin_moon_medallion",
-   "name": "Pumpkin Moon Medallion",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "craft"
-  },
-  {
-   "id": "terraria:necromantic_scroll",
-   "name": "Necromantic Scroll",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "mourning wood"
-  },
-  {
-   "id": "terraria:the_horsemans_blade",
-   "name": "The Horseman's Blade",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "pumpking"
-  },
-  {
-   "id": "terraria:bat_scepter",
-   "name": "Bat Scepter",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "pumpking"
-  },
-  {
-   "id": "terraria:raven_staff",
-   "name": "Raven Staff",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "pumpking"
-  },
-  {
-   "id": "terraria:naughty_present",
-   "name": "Naughty Present",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "craft"
-  },
-  {
-   "id": "terraria:razorpine",
-   "name": "Razorpine",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "everscream"
-  },
-  {
-   "id": "terraria:christmas_tree_sword",
-   "name": "Christmas Tree Sword",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "everscream"
-  },
-  {
-   "id": "terraria:elf_melter",
-   "name": "Elf Melter",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "santa-nk1"
-  },
-  {
-   "id": "terraria:chain_gun",
-   "name": "Chain Gun",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "santa-nk1"
-  },
-  {
-   "id": "terraria:north_pole",
-   "name": "North Pole",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "ice queen"
-  },
-  {
-   "id": "terraria:blizzard_staff",
-   "name": "Blizzard Staff",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "ice queen"
-  },
-  {
-   "id": "terraria:snowman_cannon",
-   "name": "Snowman Cannon",
-   "kind": "weapon",
-   "stage": "post-plantera",
-   "source": "ice queen"
-  },
-  {
-   "id": "terraria:snow_globe",
-   "name": "Snow Globe",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "present"
-  },
-  {
-   "id": "terraria:cutlass",
-   "name": "Cutlass",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "pirates"
-  },
-  {
-   "id": "terraria:pirate_staff",
-   "name": "Pirate Staff",
-   "kind": "weapon",
-   "stage": "hardmode",
-   "source": "flying dutchman"
-  },
-  {
-   "id": "terraria:influx_waver",
-   "name": "Influx Waver",
-   "kind": "weapon",
-   "stage": "post-golem",
-   "source": "martian saucer"
-  },
-  {
-   "id": "terraria:xenopopper",
-   "name": "Xenopopper",
-   "kind": "weapon",
-   "stage": "post-golem",
-   "source": "martian saucer"
-  },
-  {
-   "id": "terraria:laser_machinegun",
-   "name": "Laser Machinegun",
-   "kind": "weapon",
-   "stage": "post-golem",
-   "source": "martian saucer"
-  },
-  {
-   "id": "terraria:eternia_crystal",
-   "name": "Eternia Crystal",
-   "kind": "weapon",
-   "stage": "prehardmode",
-   "source": "tavernkeep"
-  },
-  {
-   "id": "terraria:betsys_wrath",
-   "name": "Betsy's Wrath",
-   "kind": "weapon",
-   "stage": "post-golem",
-   "source": "betsy"
-  },
-  {
-   "id": "terraria:flying_dragon",
-   "name": "Flying Dragon",
-   "kind": "weapon",
-   "stage": "post-golem",
-   "source": "betsy"
-  },
-  {
-   "id": "terraria:betsy_wings",
-   "name": "Betsy's Wings",
-   "kind": "weapon",
-   "stage": "post-golem",
-   "source": "betsy"
-  },
-  {
    "id": "terraria:last_prism",
    "name": "Last Prism",
    "kind": "weapon",
@@ -3524,6 +3244,426 @@
    "kind": "placeable",
    "stage": "early",
    "source": "tree"
+  },
+  {
+   "id": "terraria:silver_bullet",
+   "name": "Silver Bullet",
+   "kind": "weapon",
+   "stage": "early",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:shotgun",
+   "name": "Shotgun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:rocket_i",
+   "name": "Rocket I",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:rocket_launcher",
+   "name": "Rocket Launcher",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:greater_mana_potion",
+   "name": "Greater Mana Potion",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:spell_tome",
+   "name": "Spell Tome",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:pygmy_necklace",
+   "name": "Pygmy Necklace",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "witch doctor"
+  },
+  {
+   "id": "terraria:hercules_beetle",
+   "name": "Hercules Beetle",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "witch doctor"
+  },
+  {
+   "id": "terraria:steampunk_wings",
+   "name": "Steampunk Wings",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "steampunker"
+  },
+  {
+   "id": "terraria:katana",
+   "name": "Katana",
+   "kind": "weapon",
+   "stage": "early",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:mushroom_spear",
+   "name": "Mushroom Spear",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:hammush",
+   "name": "Hammush",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:autohammer",
+   "name": "Autohammer",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:broken_hero_sword",
+   "name": "Broken Hero Sword",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "mothron"
+  },
+  {
+   "id": "terraria:mothron_wings",
+   "name": "Mothron Wings",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "mothron"
+  },
+  {
+   "id": "terraria:death_sickle",
+   "name": "Death Sickle",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "reaper"
+  },
+  {
+   "id": "terraria:deadly_sphere_staff",
+   "name": "Deadly Sphere Staff",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "deadly sphere"
+  },
+  {
+   "id": "terraria:pumpkin_moon_medallion",
+   "name": "Pumpkin Moon Medallion",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:necromantic_scroll",
+   "name": "Necromantic Scroll",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "mourning wood"
+  },
+  {
+   "id": "terraria:the_horsemans_blade",
+   "name": "The Horseman's Blade",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "pumpking"
+  },
+  {
+   "id": "terraria:bat_scepter",
+   "name": "Bat Scepter",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "pumpking"
+  },
+  {
+   "id": "terraria:raven_staff",
+   "name": "Raven Staff",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "pumpking"
+  },
+  {
+   "id": "terraria:naughty_present",
+   "name": "Naughty Present",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:razorpine",
+   "name": "Razorpine",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "everscream"
+  },
+  {
+   "id": "terraria:christmas_tree_sword",
+   "name": "Christmas Tree Sword",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "everscream"
+  },
+  {
+   "id": "terraria:elf_melter",
+   "name": "Elf Melter",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "santa-nk1"
+  },
+  {
+   "id": "terraria:chain_gun",
+   "name": "Chain Gun",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "santa-nk1"
+  },
+  {
+   "id": "terraria:north_pole",
+   "name": "North Pole",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "ice queen"
+  },
+  {
+   "id": "terraria:blizzard_staff",
+   "name": "Blizzard Staff",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "ice queen"
+  },
+  {
+   "id": "terraria:snowman_cannon",
+   "name": "Snowman Cannon",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "ice queen"
+  },
+  {
+   "id": "terraria:snow_globe",
+   "name": "Snow Globe",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "present"
+  },
+  {
+   "id": "terraria:cutlass",
+   "name": "Cutlass",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "pirates"
+  },
+  {
+   "id": "terraria:pirate_staff",
+   "name": "Pirate Staff",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "flying dutchman"
+  },
+  {
+   "id": "terraria:influx_waver",
+   "name": "Influx Waver",
+   "kind": "weapon",
+   "stage": "post-golem",
+   "source": "martian saucer"
+  },
+  {
+   "id": "terraria:xenopopper",
+   "name": "Xenopopper",
+   "kind": "weapon",
+   "stage": "post-golem",
+   "source": "martian saucer"
+  },
+  {
+   "id": "terraria:laser_machinegun",
+   "name": "Laser Machinegun",
+   "kind": "weapon",
+   "stage": "post-golem",
+   "source": "martian saucer"
+  },
+  {
+   "id": "terraria:eternia_crystal",
+   "name": "Eternia Crystal",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "tavernkeep"
+  },
+  {
+   "id": "terraria:betsys_wrath",
+   "name": "Betsy's Wrath",
+   "kind": "weapon",
+   "stage": "post-golem",
+   "source": "betsy"
+  },
+  {
+   "id": "terraria:flying_dragon",
+   "name": "Flying Dragon",
+   "kind": "weapon",
+   "stage": "post-golem",
+   "source": "betsy"
+  },
+  {
+   "id": "terraria:betsy_wings",
+   "name": "Betsy's Wings",
+   "kind": "weapon",
+   "stage": "post-golem",
+   "source": "betsy"
+  },
+  {
+   "id": "terraria:archery_potion",
+   "name": "Archery Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:endurance_potion",
+   "name": "Endurance Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:featherfall_potion",
+   "name": "Featherfall Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:lifeforce_potion",
+   "name": "Lifeforce Potion",
+   "kind": "consumable",
+   "stage": "hardmode",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:magic_power_potion",
+   "name": "Magic Power Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:mana_regeneration_potion",
+   "name": "Mana Regeneration Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:rage_potion",
+   "name": "Rage Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:summoning_potion",
+   "name": "Summoning Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:titan_potion",
+   "name": "Titan Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:wrath_potion",
+   "name": "Wrath Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:warmth_potion",
+   "name": "Warmth Potion",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:bottled_water",
+   "name": "Bottled Water",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:daybloom",
+   "name": "Daybloom",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "herb"
+  },
+  {
+   "id": "terraria:moonglow",
+   "name": "Moonglow",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "herb"
+  },
+  {
+   "id": "terraria:blinkroot",
+   "name": "Blinkroot",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "herb"
+  },
+  {
+   "id": "terraria:deathweed",
+   "name": "Deathweed",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "herb"
+  },
+  {
+   "id": "terraria:waterleaf",
+   "name": "Waterleaf",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "herb"
+  },
+  {
+   "id": "terraria:fireblossom",
+   "name": "Fireblossom",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "herb"
+  },
+  {
+   "id": "terraria:shiverthorn",
+   "name": "Shiverthorn",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "herb"
+  },
+  {
+   "id": "terraria:antlion_mandible",
+   "name": "Antlion Mandible",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "antlion"
   }
  ]
 }

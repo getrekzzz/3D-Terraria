@@ -6,6 +6,12 @@
    ],
    "generator": "furnace"
   },
+  "alchemy_table": {
+   "models": [
+    "assets/models/objects/alchemy_table_v0.glb"
+   ],
+   "generator": "workbench"
+  },
   "ancient_manipulator": {
    "models": [
     "assets/models/objects/ancient_manipulator_v0.glb"
@@ -30,6 +36,12 @@
    ],
    "generator": "larva"
   },
+  "blinkroot_plant": {
+   "models": [
+    "assets/models/objects/blinkroot_plant_v0.glb"
+   ],
+   "generator": "flower"
+  },
   "bush": {
    "models": [
     "assets/models/objects/bush_v0.glb",
@@ -45,6 +57,12 @@
     "assets/models/objects/cactus_v2.glb"
    ],
    "generator": "cactus"
+  },
+  "campfire": {
+   "models": [
+    "assets/models/objects/campfire_v0.glb"
+   ],
+   "generator": "campfire"
   },
   "candle": {
    "models": [
@@ -69,6 +87,18 @@
     "assets/models/objects/crimson_heart_v0.glb"
    ],
    "generator": "evil_orb"
+  },
+  "daybloom_plant": {
+   "models": [
+    "assets/models/objects/daybloom_plant_v0.glb"
+   ],
+   "generator": "flower"
+  },
+  "deathweed_plant": {
+   "models": [
+    "assets/models/objects/deathweed_plant_v0.glb"
+   ],
+   "generator": "flower"
   },
   "demon_altar": {
    "models": [
@@ -96,6 +126,12 @@
     "assets/models/objects/fern_v2.glb"
    ],
    "generator": "fern"
+  },
+  "fireblossom_plant": {
+   "models": [
+    "assets/models/objects/fireblossom_plant_v0.glb"
+   ],
+   "generator": "flower"
   },
   "flower": {
    "models": [
@@ -140,6 +176,12 @@
    ],
    "generator": "grass_tuft"
   },
+  "heart_lantern": {
+   "models": [
+    "assets/models/objects/heart_lantern_v0.glb"
+   ],
+   "generator": "heart_lantern"
+  },
   "hellforge": {
    "models": [
     "assets/models/objects/hellforge_v0.glb"
@@ -163,6 +205,12 @@
     "assets/models/objects/life_crystal_node_v0.glb"
    ],
    "generator": "crystal_node"
+  },
+  "life_fruit_plant": {
+   "models": [
+    "assets/models/objects/life_fruit_plant_v0.glb"
+   ],
+   "generator": "flower"
   },
   "lihzahrd_altar": {
    "models": [
@@ -195,6 +243,12 @@
     "assets/models/objects/minecart_track_v0.glb"
    ],
    "generator": "rail"
+  },
+  "moonglow_plant": {
+   "models": [
+    "assets/models/objects/moonglow_plant_v0.glb"
+   ],
+   "generator": "flower"
   },
   "mushroom_plant": {
    "models": [
@@ -279,6 +333,12 @@
    ],
    "generator": "evil_orb"
   },
+  "shiverthorn_plant": {
+   "models": [
+    "assets/models/objects/shiverthorn_plant_v0.glb"
+   ],
+   "generator": "flower"
+  },
   "stalactite": {
    "models": [
     "assets/models/objects/stalactite_v0.glb",
@@ -312,6 +372,12 @@
     "assets/models/objects/torch_v0.glb"
    ],
    "generator": "torch"
+  },
+  "waterleaf_plant": {
+   "models": [
+    "assets/models/objects/waterleaf_plant_v0.glb"
+   ],
+   "generator": "flower"
   },
   "wooden_chair": {
    "models": [
@@ -409,6 +475,10 @@
    "model": "assets/models/items/aglet.glb",
    "icon": "assets/icons/items/aglet.png"
   },
+  "alchemy_table": {
+   "object": "alchemy_table",
+   "icon": "assets/icons/items/alchemy_table.png"
+  },
   "amazon": {
    "model": "assets/models/items/amazon.glb",
    "icon": "assets/icons/items/amazon.png"
@@ -440,6 +510,14 @@
   "anklet_of_the_wind": {
    "model": "assets/models/items/anklet_of_the_wind.glb",
    "icon": "assets/icons/items/anklet_of_the_wind.png"
+  },
+  "antlion_mandible": {
+   "model": "assets/models/items/antlion_mandible.glb",
+   "icon": "assets/icons/items/antlion_mandible.png"
+  },
+  "archery_potion": {
+   "model": "assets/models/items/archery_potion.glb",
+   "icon": "assets/icons/items/archery_potion.png"
   },
   "armored_cavefish": {
    "model": "assets/models/items/armored_cavefish.glb",
@@ -529,6 +607,14 @@
    "model": "assets/models/items/blade_staff.glb",
    "icon": "assets/icons/items/blade_staff.png"
   },
+  "blinkroot": {
+   "model": "assets/models/items/blinkroot.glb",
+   "icon": "assets/icons/items/blinkroot.png"
+  },
+  "blinkroot_seeds": {
+   "object": "blinkroot_plant",
+   "icon": "assets/icons/items/blinkroot_seeds.png"
+  },
   "blizzard_in_a_bottle": {
    "model": "assets/models/items/blizzard_in_a_bottle.glb",
    "icon": "assets/icons/items/blizzard_in_a_bottle.png"
@@ -565,6 +651,10 @@
    "object": "placed_bottle",
    "icon": "assets/icons/items/bottle.png"
   },
+  "bottled_water": {
+   "model": "assets/models/items/bottled_water.glb",
+   "icon": "assets/icons/items/bottled_water.png"
+  },
   "brain_of_confusion": {
    "model": "assets/models/items/brain_of_confusion.glb",
    "icon": "assets/icons/items/brain_of_confusion.png"
@@ -581,6 +671,10 @@
    "model": "assets/models/items/bubble_gun.glb",
    "icon": "assets/icons/items/bubble_gun.png"
   },
+  "builder_potion": {
+   "model": "assets/models/items/builder_potion.glb",
+   "icon": "assets/icons/items/builder_potion.png"
+  },
   "cactus": {
    "model": "assets/models/items/cactus.glb",
    "icon": "assets/icons/items/cactus.png"
@@ -592,6 +686,10 @@
   "cactus_sword": {
    "model": "assets/models/items/cactus_sword.glb",
    "icon": "assets/icons/items/cactus_sword.png"
+  },
+  "campfire": {
+   "object": "campfire",
+   "icon": "assets/icons/items/campfire.png"
   },
   "candle": {
    "object": "candle",
@@ -833,6 +931,14 @@
    "model": "assets/models/items/dark_lance.glb",
    "icon": "assets/icons/items/dark_lance.png"
   },
+  "daybloom": {
+   "model": "assets/models/items/daybloom.glb",
+   "icon": "assets/icons/items/daybloom.png"
+  },
+  "daybloom_seeds": {
+   "object": "daybloom_plant",
+   "icon": "assets/icons/items/daybloom_seeds.png"
+  },
   "daybreak": {
    "model": "assets/models/items/daybreak.glb",
    "icon": "assets/icons/items/daybreak.png"
@@ -844,6 +950,14 @@
   "death_sickle": {
    "model": "assets/models/items/death_sickle.glb",
    "icon": "assets/icons/items/death_sickle.png"
+  },
+  "deathweed": {
+   "model": "assets/models/items/deathweed.glb",
+   "icon": "assets/icons/items/deathweed.png"
+  },
+  "deathweed_seeds": {
+   "object": "deathweed_plant",
+   "icon": "assets/icons/items/deathweed_seeds.png"
   },
   "deer_thing": {
    "model": "assets/models/items/deer_thing.glb",
@@ -957,6 +1071,10 @@
    "model": "assets/models/items/enchanted_sword.glb",
    "icon": "assets/icons/items/enchanted_sword.png"
   },
+  "endurance_potion": {
+   "model": "assets/models/items/endurance_potion.glb",
+   "icon": "assets/icons/items/endurance_potion.png"
+  },
   "eternia_crystal": {
    "model": "assets/models/items/eternia_crystal.glb",
    "icon": "assets/icons/items/eternia_crystal.png"
@@ -981,6 +1099,10 @@
    "model": "assets/models/items/feather.glb",
    "icon": "assets/icons/items/feather.png"
   },
+  "featherfall_potion": {
+   "model": "assets/models/items/featherfall_potion.glb",
+   "icon": "assets/icons/items/featherfall_potion.png"
+  },
   "feral_claws": {
    "model": "assets/models/items/feral_claws.glb",
    "icon": "assets/icons/items/feral_claws.png"
@@ -988,6 +1110,14 @@
   "finch_staff": {
    "model": "assets/models/items/finch_staff.glb",
    "icon": "assets/icons/items/finch_staff.png"
+  },
+  "fireblossom": {
+   "model": "assets/models/items/fireblossom.glb",
+   "icon": "assets/icons/items/fireblossom.png"
+  },
+  "fireblossom_seeds": {
+   "object": "fireblossom_plant",
+   "icon": "assets/icons/items/fireblossom_seeds.png"
   },
   "fisher_of_souls": {
    "model": "assets/models/items/fisher_of_souls.glb",
@@ -1176,6 +1306,10 @@
   "healing_potion": {
    "model": "assets/models/items/healing_potion.glb",
    "icon": "assets/icons/items/healing_potion.png"
+  },
+  "heart_lantern": {
+   "object": "heart_lantern",
+   "icon": "assets/icons/items/heart_lantern.png"
   },
   "hellforge": {
    "object": "hellforge",
@@ -1425,6 +1559,14 @@
    "model": "assets/models/items/life_crystal.glb",
    "icon": "assets/icons/items/life_crystal.png"
   },
+  "life_fruit": {
+   "model": "assets/models/items/life_fruit.glb",
+   "icon": "assets/icons/items/life_fruit.png"
+  },
+  "lifeforce_potion": {
+   "model": "assets/models/items/lifeforce_potion.glb",
+   "icon": "assets/icons/items/lifeforce_potion.png"
+  },
   "lightning_boots": {
    "model": "assets/models/items/lightning_boots.glb",
    "icon": "assets/icons/items/lightning_boots.png"
@@ -1461,6 +1603,10 @@
    "model": "assets/models/items/magic_mirror.glb",
    "icon": "assets/icons/items/magic_mirror.png"
   },
+  "magic_power_potion": {
+   "model": "assets/models/items/magic_power_potion.glb",
+   "icon": "assets/icons/items/magic_power_potion.png"
+  },
   "magma_stone": {
    "model": "assets/models/items/magma_stone.glb",
    "icon": "assets/icons/items/magma_stone.png"
@@ -1476,6 +1622,10 @@
   "mana_potion": {
    "model": "assets/models/items/mana_potion.glb",
    "icon": "assets/icons/items/mana_potion.png"
+  },
+  "mana_regeneration_potion": {
+   "model": "assets/models/items/mana_regeneration_potion.glb",
+   "icon": "assets/icons/items/mana_regeneration_potion.png"
   },
   "mechanical_eye": {
    "model": "assets/models/items/mechanical_eye.glb",
@@ -1521,9 +1671,21 @@
    "object": "minecart_track",
    "icon": "assets/icons/items/minecart_track.png"
   },
+  "mining_potion": {
+   "model": "assets/models/items/mining_potion.glb",
+   "icon": "assets/icons/items/mining_potion.png"
+  },
   "minishark": {
    "model": "assets/models/items/minishark.glb",
    "icon": "assets/icons/items/minishark.png"
+  },
+  "moonglow": {
+   "model": "assets/models/items/moonglow.glb",
+   "icon": "assets/icons/items/moonglow.png"
+  },
+  "moonglow_seeds": {
+   "object": "moonglow_plant",
+   "icon": "assets/icons/items/moonglow_seeds.png"
   },
   "mothron_wings": {
    "model": "assets/models/items/mothron_wings.glb",
@@ -1656,6 +1818,10 @@
   "neon_tetra": {
    "model": "assets/models/items/neon_tetra.glb",
    "icon": "assets/icons/items/neon_tetra.png"
+  },
+  "night_owl_potion": {
+   "model": "assets/models/items/night_owl_potion.glb",
+   "icon": "assets/icons/items/night_owl_potion.png"
   },
   "nightglow": {
    "model": "assets/models/items/nightglow.glb",
@@ -1885,6 +2051,10 @@
    "model": "assets/models/items/pygmy_staff.glb",
    "icon": "assets/icons/items/pygmy_staff.png"
   },
+  "rage_potion": {
+   "model": "assets/models/items/rage_potion.glb",
+   "icon": "assets/icons/items/rage_potion.png"
+  },
   "rainbow_crystal_staff": {
    "model": "assets/models/items/rainbow_crystal_staff.glb",
    "icon": "assets/icons/items/rainbow_crystal_staff.png"
@@ -1924,6 +2094,10 @@
   "red_snapper": {
    "model": "assets/models/items/red_snapper.glb",
    "icon": "assets/icons/items/red_snapper.png"
+  },
+  "regeneration_potion": {
+   "model": "assets/models/items/regeneration_potion.glb",
+   "icon": "assets/icons/items/regeneration_potion.png"
   },
   "reinforced_fishing_pole": {
    "model": "assets/models/items/reinforced_fishing_pole.glb",
@@ -2005,6 +2179,10 @@
    "model": "assets/models/items/shield_of_cthulhu.glb",
    "icon": "assets/icons/items/shield_of_cthulhu.png"
   },
+  "shine_potion": {
+   "model": "assets/models/items/shine_potion.glb",
+   "icon": "assets/icons/items/shine_potion.png"
+  },
   "shiny_red_balloon": {
    "model": "assets/models/items/shiny_red_balloon.glb",
    "icon": "assets/icons/items/shiny_red_balloon.png"
@@ -2012,6 +2190,14 @@
   "shiny_stone": {
    "model": "assets/models/items/shiny_stone.glb",
    "icon": "assets/icons/items/shiny_stone.png"
+  },
+  "shiverthorn": {
+   "model": "assets/models/items/shiverthorn.glb",
+   "icon": "assets/icons/items/shiverthorn.png"
+  },
+  "shiverthorn_seeds": {
+   "object": "shiverthorn_plant",
+   "icon": "assets/icons/items/shiverthorn_seeds.png"
   },
   "shotgun": {
    "model": "assets/models/items/shotgun.glb",
@@ -2197,6 +2383,10 @@
    "model": "assets/models/items/spell_tome.glb",
    "icon": "assets/icons/items/spell_tome.png"
   },
+  "spelunker_potion": {
+   "model": "assets/models/items/spelunker_potion.glb",
+   "icon": "assets/icons/items/spelunker_potion.png"
+  },
   "spiky_ball": {
    "model": "assets/models/items/spiky_ball.glb",
    "icon": "assets/icons/items/spiky_ball.png"
@@ -2276,6 +2466,10 @@
   "summoner_emblem": {
    "model": "assets/models/items/summoner_emblem.glb",
    "icon": "assets/icons/items/summoner_emblem.png"
+  },
+  "summoning_potion": {
+   "model": "assets/models/items/summoning_potion.glb",
+   "icon": "assets/icons/items/summoning_potion.png"
   },
   "sun_stone": {
    "model": "assets/models/items/sun_stone.glb",
@@ -2388,6 +2582,10 @@
   "tissue_sample": {
    "model": "assets/models/items/tissue_sample.glb",
    "icon": "assets/icons/items/tissue_sample.png"
+  },
+  "titan_potion": {
+   "model": "assets/models/items/titan_potion.glb",
+   "icon": "assets/icons/items/titan_potion.png"
   },
   "titanium_axe": {
    "model": "assets/models/items/titanium_axe.glb",
@@ -2597,6 +2795,10 @@
    "model": "assets/models/items/wand_of_sparking.glb",
    "icon": "assets/icons/items/wand_of_sparking.png"
   },
+  "warmth_potion": {
+   "model": "assets/models/items/warmth_potion.glb",
+   "icon": "assets/icons/items/warmth_potion.png"
+  },
   "warrior_emblem": {
    "model": "assets/models/items/warrior_emblem.glb",
    "icon": "assets/icons/items/warrior_emblem.png"
@@ -2608,6 +2810,14 @@
   "water_bucket": {
    "model": "assets/models/items/water_bucket.glb",
    "icon": "assets/icons/items/water_bucket.png"
+  },
+  "waterleaf": {
+   "model": "assets/models/items/waterleaf.glb",
+   "icon": "assets/icons/items/waterleaf.png"
+  },
+  "waterleaf_seeds": {
+   "object": "waterleaf_plant",
+   "icon": "assets/icons/items/waterleaf_seeds.png"
   },
   "weather_pain": {
    "model": "assets/models/items/weather_pain.glb",
@@ -2685,6 +2895,10 @@
    "model": "assets/models/items/worm_scarf.glb",
    "icon": "assets/icons/items/worm_scarf.png"
   },
+  "wrath_potion": {
+   "model": "assets/models/items/wrath_potion.glb",
+   "icon": "assets/icons/items/wrath_potion.png"
+  },
   "xenopopper": {
    "model": "assets/models/items/xenopopper.glb",
    "icon": "assets/icons/items/xenopopper.png"
@@ -2714,6 +2928,22 @@
     "run",
     "swing",
     "use",
+    "walk"
+   ]
+  },
+  "antlion": {
+   "model": "assets/models/creatures/antlion.glb",
+   "generator": "crab",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "antlion_charger": {
+   "model": "assets/models/creatures/antlion_charger.glb",
+   "generator": "crab",
+   "animations": [
+    "idle",
     "walk"
    ]
   },

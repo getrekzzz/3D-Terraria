@@ -326,6 +326,17 @@ ironskin|Ironskin|buff
 shine|Shine|buff
 night_owl|Night Owl|buff
 spelunker|Spelunker|buff
+archery|Archery|buff
+endurance|Endurance|buff
+featherfall|Featherfall|buff
+lifeforce|Lifeforce|buff
+magic_power|Magic Power|buff
+mana_regeneration|Mana Regeneration|buff
+rage|Rage|buff
+summoning|Summoning|buff
+titan|Titan|buff
+wrath|Wrath|buff
+warmth|Warmth|buff
 mining|Mining|buff
 builder|Builder|buff
 cozy_fire|Cozy Fire|buff

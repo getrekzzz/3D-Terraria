@@ -220,6 +220,7 @@ public sealed partial class GameWorld : IDisposable
         Projectiles.Tick();
         Mutations.Tick();
         Objectives.Tick();
+        if (Session.Clock.Tick % 60 == 0) ApplyAuras();
         Rituals.Tick();
         Spread.Tick();
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);

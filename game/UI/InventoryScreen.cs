@@ -114,6 +114,7 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         if (open == IsOpen) return;
         _root.Visible = open;
+        Audio.Sfx.Play(open ? "ui_open" : "ui_close");
         InputGate.SetOpen(Gate, open);
         // Auto-pause (single player option): the world waits while the inventory is open.
         if (Settings.UserSettings.Current.AutoPause || !open) _ui.Player.Runtime.Simulating = !open;

@@ -73,6 +73,13 @@ public sealed partial class InteractionController : Node
         {
             var r = Game.Interaction.Interact(Entity, obj);
             if (r != InteractOutcome.None) Interacted?.Invoke(r);
+            var at = new Vector3(obj.Anchor.X + 0.5f, obj.Anchor.Y + 0.5f, obj.Anchor.Z + 0.5f) * Strata.Core.Common.Units.CellSize;
+            switch (r)
+            {
+                case InteractOutcome.DoorToggled: Audio.Sfx.PlayAt(obj.Active ? "door_open" : "door_close", at); break;
+                case InteractOutcome.ContainerOpened: Audio.Sfx.PlayAt("chest_open", at); break;
+                case InteractOutcome.Activated: Audio.Sfx.Play("summon"); break;
+            }
         }
     }
 

@@ -234,6 +234,7 @@ public sealed partial class TownDialog : CanvasLayer
 
     private void Report(TradeResult result, string success)
     {
+        if (result == TradeResult.Ok) Audio.Sfx.Play("coins");
         _text.Text = result switch
         {
             TradeResult.Ok => success,

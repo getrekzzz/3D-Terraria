@@ -142,7 +142,7 @@ public sealed class InflictParams : SpecParams
 
 public sealed class InfoParams : SpecParams, IValidatableSpec
 {
-    public static readonly string[] Kinds = { "depth", "position", "time" };
+    public static readonly string[] Kinds = { "depth", "position", "time", "ores", "night_vision" };
 
     public string[] Show { get; init; } = Array.Empty<string>();
 

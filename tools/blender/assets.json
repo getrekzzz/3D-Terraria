@@ -374,6 +374,84 @@
         "tint": "#6a8aff",
         "glow": "#4a6aff"
       }
+    },
+    "daybloom_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#f0e040"
+        ]
+      }
+    },
+    "moonglow_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#6ab0ff"
+        ]
+      }
+    },
+    "blinkroot_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#c8a060"
+        ]
+      }
+    },
+    "deathweed_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#8a3aa8"
+        ]
+      }
+    },
+    "waterleaf_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#4ac0c8"
+        ]
+      }
+    },
+    "fireblossom_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#ff6a2a"
+        ]
+      }
+    },
+    "shiverthorn_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#9ae8ff"
+        ]
+      }
+    },
+    "life_fruit_plant": {
+      "generator": "flower",
+      "params": {
+        "colors": [
+          "#ff4a2a"
+        ]
+      }
+    },
+    "alchemy_table": {
+      "generator": "workbench",
+      "params": {
+        "tint": "#8a6a4a"
+      }
+    },
+    "campfire": {
+      "generator": "campfire",
+      "params": {}
+    },
+    "heart_lantern": {
+      "generator": "heart_lantern",
+      "params": {}
     }
   },
   "items": {
@@ -2932,6 +3010,187 @@
           "color": "#6a1a2a",
           "strap": "#3a1010"
         }
+      },
+      "daybloom": {
+        "generator": "feather",
+        "params": {
+          "color": "#f0e040"
+        }
+      },
+      "moonglow": {
+        "generator": "feather",
+        "params": {
+          "color": "#6ab0ff"
+        }
+      },
+      "blinkroot": {
+        "generator": "feather",
+        "params": {
+          "color": "#c8a060"
+        }
+      },
+      "deathweed": {
+        "generator": "feather",
+        "params": {
+          "color": "#8a3aa8"
+        }
+      },
+      "waterleaf": {
+        "generator": "feather",
+        "params": {
+          "color": "#4ac0c8"
+        }
+      },
+      "fireblossom": {
+        "generator": "feather",
+        "params": {
+          "color": "#ff6a2a"
+        }
+      },
+      "shiverthorn": {
+        "generator": "feather",
+        "params": {
+          "color": "#9ae8ff"
+        }
+      },
+      "life_fruit": {
+        "generator": "heart",
+        "params": {
+          "color": "#ffb030"
+        }
+      },
+      "bottled_water": {
+        "generator": "potion",
+        "params": {
+          "color": "#6ab0ff"
+        }
+      },
+      "antlion_mandible": {
+        "generator": "spike",
+        "params": {
+          "color": "#c8a060",
+          "length": 0.2,
+          "width": 0.06
+        }
+      },
+      "regeneration_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#ff6a8a",
+          "glow": true
+        }
+      },
+      "shine_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#fff080",
+          "glow": true
+        }
+      },
+      "night_owl_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#8a7a5a",
+          "glow": true
+        }
+      },
+      "spelunker_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#f0d040",
+          "glow": true
+        }
+      },
+      "mining_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#c8a060",
+          "glow": true
+        }
+      },
+      "builder_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#c89a6a",
+          "glow": true
+        }
+      },
+      "archery_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#8ab04a",
+          "glow": true
+        }
+      },
+      "endurance_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#9aa0a8",
+          "glow": true
+        }
+      },
+      "featherfall_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#e8e8f8",
+          "glow": true
+        }
+      },
+      "lifeforce_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#ff6a8a",
+          "glow": true
+        }
+      },
+      "magic_power_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#6a6aff",
+          "glow": true
+        }
+      },
+      "mana_regeneration_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#4a8aff",
+          "glow": true
+        }
+      },
+      "rage_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#e84a4a",
+          "glow": true
+        }
+      },
+      "summoning_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#4ac0a0",
+          "glow": true
+        }
+      },
+      "titan_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#b0a090",
+          "glow": true
+        }
+      },
+      "wrath_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#c83a3a",
+          "glow": true
+        }
+      },
+      "warmth_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#ff9a4a",
+          "glow": true
+        }
       }
     }
   },
@@ -4902,6 +5161,20 @@
     "betsy": {
       "generator": "dragon",
       "params": {}
+    },
+    "antlion": {
+      "generator": "crab",
+      "params": {
+        "shell": "#c8a060",
+        "claw": "#8a6a3a"
+      }
+    },
+    "antlion_charger": {
+      "generator": "crab",
+      "params": {
+        "shell": "#b88a4a",
+        "claw": "#6a4a2a"
+      }
     }
   }
 }

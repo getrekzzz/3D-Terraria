@@ -12,6 +12,7 @@ sys.path.insert(0, str(HERE / "reference"))
 
 import bosses_events  # noqa: E402
 import items  # noqa: E402
+import items_extra  # noqa: E402
 import world  # noqa: E402
 
 
@@ -41,9 +42,10 @@ def build():
     for metal in items.HARD_METALS:
         for key, label, kind in items.HARD_PIECES:
             item_entries.append(entry(f"{metal}_{key}", f"{metal.title()} {label}", kind, "hardmode", "craft" if key != "ore" else "mining"))
-    for kind, text in items.NOTABLE.items():
-        for cid, name, stage, source in rows(text):
-            item_entries.append(entry(cid, name, kind, stage, source))
+    for notable in (items.NOTABLE, items_extra.NOTABLE):
+        for kind, text in notable.items():
+            for cid, name, stage, source in rows(text):
+                item_entries.append(entry(cid, name, kind, stage, source))
     dbs["items"] = item_entries
     dbs["enemies"] = [entry(c, n, "enemy", s, src, m.split(",")) for c, n, s, src, m in rows(world.ENEMIES)]
     dbs["bosses"] = [entry(c, n, "boss", s, src, m, note) for c, n, s, src, m, note in bosses_events.BOSSES]
