@@ -52,6 +52,9 @@ public sealed class EventDef : ContentDef
     /// <summary>Beds cannot be used to skip the night while active.</summary>
     public bool PreventsSleep { get; init; }
 
+    /// <summary>An invasion: it outlasts the day/night change and only ends when its kill goal is met.</summary>
+    public bool UntilDefeated { get; init; }
+
     /// <summary>A manual event that begins the moment this progression flag is raised (the Lunatic Cultist's defeat).</summary>
     public string? StartsWhen { get; init; }
 

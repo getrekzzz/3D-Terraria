@@ -245,6 +245,7 @@ public sealed partial class ItemUseSystem
 
     private UseOutcome Summon(PlayerEntity p, ItemUseInfo info)
     {
+        if (info.StartEvent is { } start) return StartEvent(p, info, start);
         var cfg = info.Summon!;
         var content = _world.Session.Content;
         if (!content.Enemies.TryGet(cfg.Enemy, out var boss)) return UseOutcome.Blocked;
@@ -261,6 +262,19 @@ public sealed partial class ItemUseSystem
         else if (boss.Boss is { Segments: > 0 }) at.Y -= 10f; // burrowers rise from below
         else at.Y += 6f; // hoppers drop in
         if (_world.Npcs.Spawn(boss, at) == null) return UseOutcome.Blocked;
+        if (info.Item.Consumable) ConsumeHeld(p);
+        return UseOutcome.Consumed;
+    }
+
+    private UseOutcome StartEvent(PlayerEntity p, ItemUseInfo info, Content.Specs.StartEventParams cfg)
+    {
+        if (!_world.Session.Content.Events.TryGet(cfg.Event, out var def) || _world.Events.IsActive(def.Id)) return UseOutcome.Blocked;
+        if (!info.SummonCondition!.Evaluate(_world.Session.ContextAt(p.FeetCell)))
+        {
+            if (cfg.FailMessage != null) Refused?.Invoke(p, cfg.FailMessage);
+            return UseOutcome.Blocked;
+        }
+        if (!_world.Events.Start(def)) return UseOutcome.Blocked;
         if (info.Item.Consumable) ConsumeHeld(p);
         return UseOutcome.Consumed;
     }

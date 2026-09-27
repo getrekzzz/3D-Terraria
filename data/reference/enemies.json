@@ -1509,6 +1509,326 @@
    ]
   },
   {
+   "id": "terraria:swamp_thing",
+   "name": "Swamp Thing",
+   "kind": "enemy",
+   "stage": "post-mech",
+   "source": "eclipse",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:vampire",
+   "name": "Vampire",
+   "kind": "enemy",
+   "stage": "post-mech",
+   "source": "eclipse",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:butcher",
+   "name": "Butcher",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "eclipse",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:deadly_sphere",
+   "name": "Deadly Sphere",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "eclipse",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:splinterling",
+   "name": "Splinterling",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "pumpkin moon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:hellhound",
+   "name": "Hellhound",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "pumpkin moon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:poltergeist",
+   "name": "Poltergeist",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "pumpkin moon",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:headless_horseman",
+   "name": "Headless Horseman",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "pumpkin moon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:zombie_elf",
+   "name": "Zombie Elf",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "frost moon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:nutcracker",
+   "name": "Nutcracker",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "frost moon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:yeti",
+   "name": "Yeti",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "frost moon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:krampus",
+   "name": "Krampus",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "frost moon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:flocko",
+   "name": "Flocko",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "frost moon",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:elf_copter",
+   "name": "Elf Copter",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "frost moon",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:present_mimic",
+   "name": "Present Mimic",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "frost moon",
+   "mechanics": [
+    "hop"
+   ]
+  },
+  {
+   "id": "terraria:mister_stabby",
+   "name": "Mister Stabby",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "frost legion",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:snowman_gangsta",
+   "name": "Snowman Gangsta",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "frost legion",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:snow_balla",
+   "name": "Snow Balla",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "frost legion",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:pirate_corsair",
+   "name": "Pirate Corsair",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "pirates",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:pirate_deadeye",
+   "name": "Pirate Deadeye",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "pirates",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:pirate_crossbower",
+   "name": "Pirate Crossbower",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "pirates",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:parrot",
+   "name": "Parrot",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "pirates",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:ray_gunner",
+   "name": "Ray Gunner",
+   "kind": "enemy",
+   "stage": "post-golem",
+   "source": "martians",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:gigazapper",
+   "name": "Gigazapper",
+   "kind": "enemy",
+   "stage": "post-golem",
+   "source": "martians",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:martian_officer",
+   "name": "Martian Officer",
+   "kind": "enemy",
+   "stage": "post-golem",
+   "source": "martians",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:martian_drone",
+   "name": "Martian Drone",
+   "kind": "enemy",
+   "stage": "post-golem",
+   "source": "martians",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:etherian_goblin_bomber",
+   "name": "Etherian Goblin Bomber",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "old one's army",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:etherian_javelin_thrower",
+   "name": "Etherian Javelin Thrower",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "old one's army",
+   "mechanics": [
+    "ranged"
+   ]
+  },
+  {
+   "id": "terraria:kobold",
+   "name": "Kobold",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "old one's army",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:etherian_wyvern",
+   "name": "Etherian Wyvern",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "old one's army",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:wither_beast",
+   "name": "Wither Beast",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "old one's army",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:drakin",
+   "name": "Drakin",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "old one's army",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
    "id": "terraria:etherian_goblin",
    "name": "Etherian Goblin",
    "kind": "enemy",

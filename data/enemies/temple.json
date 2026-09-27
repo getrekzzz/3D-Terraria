@@ -99,7 +99,7 @@
     { "id": "chlorophyte_greaves", "output": "chlorophyte_greaves", "inputs": [{ "item": "chlorophyte_bar", "count": 18 }], "stations": ["hardmode_anvil"] },
     { "id": "true_excalibur", "output": "true_excalibur", "inputs": [{ "item": "excalibur", "count": 1 }, { "item": "chlorophyte_bar", "count": 24 }], "stations": ["hardmode_anvil"] },
     { "id": "true_nights_edge", "output": "true_nights_edge", "inputs": [{ "item": "nights_edge", "count": 1 }, { "item": "soul_of_fright", "count": 20 }, { "item": "soul_of_might", "count": 20 }, { "item": "soul_of_sight", "count": 20 }], "stations": ["hardmode_anvil"] },
-    { "id": "terra_blade", "output": "terra_blade", "inputs": [{ "item": "true_nights_edge", "count": 1 }, { "item": "true_excalibur", "count": 1 }], "stations": ["hardmode_anvil"] },
+    { "id": "terra_blade", "output": "terra_blade", "inputs": [{ "item": "true_nights_edge", "count": 1 }, { "item": "true_excalibur", "count": 1 }, { "item": "broken_hero_sword", "count": 1 }], "stations": ["hardmode_anvil"] },
     { "id": "beetle_helmet", "output": "beetle_helmet", "inputs": [{ "item": "chlorophyte_mask", "count": 1 }, { "item": "beetle_husk", "count": 8 }], "stations": ["hardmode_anvil"] },
     { "id": "beetle_shell", "output": "beetle_shell", "inputs": [{ "item": "chlorophyte_plate_mail", "count": 1 }, { "item": "beetle_husk", "count": 12 }], "stations": ["hardmode_anvil"] },
     { "id": "beetle_leggings", "output": "beetle_leggings", "inputs": [{ "item": "chlorophyte_greaves", "count": 1 }, { "item": "beetle_husk", "count": 10 }], "stations": ["hardmode_anvil"] }

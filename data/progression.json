@@ -23,6 +23,8 @@
     { "id": "defeated_all_mechs", "name": "All mechanical bosses defeated", "kind": "world", "requires": ["defeated_the_twins", "defeated_the_destroyer", "defeated_skeletron_prime"], "stage": "post_mechanical", "autoSet": true,
       "announce": "The last of the clockwork terrors falls silent. Something stirs in the jungle's heart.", "covers": ["terraria:all_mech_down"] },
     { "id": "defeated_pirate_invasion", "name": "Pirate Invasion defeated", "kind": "event", "requires": ["hardmode"], "stage": "hardmode" },
+    { "id": "defeated_martians", "name": "Martian Madness defeated", "kind": "event", "requires": ["defeated_golem"], "stage": "temple" },
+    { "id": "defeated_old_ones_army", "name": "Old One's Army defeated", "kind": "event", "requires": ["defeated_evil_boss"], "stage": "prehardmode" },
     { "id": "defeated_frost_legion", "name": "Frost Legion defeated", "kind": "event", "requires": ["hardmode"], "stage": "hardmode" },
     { "id": "defeated_queen_slime", "name": "Queen Slime defeated", "kind": "boss", "requires": ["hardmode"], "stage": "hardmode" },
     { "id": "defeated_duke_fishron", "name": "Duke Fishron defeated", "kind": "boss", "requires": ["hardmode"], "stage": "post_mechanical" },
