@@ -12,6 +12,7 @@
     { "id": "underground_desert", "name": "Underground Desert", "kind": "underground", "priority": 4, "mapColor": "#b8904a", "fogColor": "#806030", "music": "underground_desert", "covers": ["terraria:underground_desert"] },
     { "id": "marble_cave", "name": "Marble Cave", "kind": "underground", "priority": 3, "mapColor": "#d9d6ce", "fogColor": "#b8b4a8", "covers": ["terraria:marble_cave"] },
     { "id": "granite_cave", "name": "Granite Cave", "kind": "underground", "priority": 3, "mapColor": "#3a3f5c", "fogColor": "#20243a", "covers": ["terraria:granite_cave"] },
+    { "id": "meteorite", "name": "Meteorite", "kind": "zone", "priority": 8, "mapColor": "#8a4a3a", "fogColor": "#5a3020", "fogDensity": 1.4, "skyTint": "#e0b090", "covers": ["terraria:meteorite"] },
     { "id": "spider_nest", "name": "Spider Cave", "kind": "zone", "priority": 7, "mapColor": "#8a8070", "fogColor": "#403830", "covers": ["terraria:spider_cave"] },
     { "id": "hive", "name": "Hive", "kind": "zone", "priority": 8, "mapColor": "#c7862b", "fogColor": "#806020", "ambientTint": "#ffd080", "music": "hive", "covers": ["terraria:hive"] },
     { "id": "dungeon", "name": "The Dungeon", "kind": "zone", "priority": 9, "mapColor": "#34508a", "fogColor": "#202838", "fogDensity": 1.8, "music": "crypt", "lockedUntil": "defeated_skeletron", "exclusiveSpawns": true, "covers": ["terraria:dungeon"] },

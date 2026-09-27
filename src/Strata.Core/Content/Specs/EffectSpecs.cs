@@ -21,6 +21,9 @@ public static class EffectSpecs
     /// <summary>Double-tap a direction to dash (Tabi, Shield of Cthulhu).</summary>
     public const string Dash = "dash";
 
+    /// <summary>Creatures with a tag stop hurting the wearer (Royal Gel: slimes).</summary>
+    public const string Pacify = "pacify";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -34,6 +37,7 @@ public static class EffectSpecs
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoItemUse);
         c.Register<FlightParams>(SpecKind.Effect, Flight);
         c.Register<DashParams>(SpecKind.Effect, Dash);
+        c.Register<PacifyParams>(SpecKind.Effect, Pacify);
     }
 }
 
@@ -113,4 +117,10 @@ public sealed class DashParams : SpecParams
     public float Speed { get; init; } = 14f;
 
     public int Cooldown { get; init; } = 45;
+}
+
+public sealed class PacifyParams : SpecParams
+{
+    /// <summary>Creature tag made harmless (e.g. "gel").</summary>
+    public string Tag { get; init; } = "";
 }

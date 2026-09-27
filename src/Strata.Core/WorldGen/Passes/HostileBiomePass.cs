@@ -46,7 +46,20 @@ public sealed class HostileBiomePass : GenPass
         foreach (var f in ctx.Plan.Features.InChunk(ctx.Coord))
         {
             if (f is CapsuleFeature c && c.Kind == "chasm") FeatureCarver.Capsule(ctx, c, ctx.Palette.Id(c.Lining!));
-            else if (f is ChamberFeature ch && ch.Kind == "evil_heart_chamber") ChamberCarver.Carve(ctx, ch);
+            else if (f is ChamberFeature ch && ch.Kind == "evil_heart_chamber")
+            {
+                ChamberCarver.Carve(ctx, ch);
+                PlaceHeart(ctx, ch);
+            }
         }
+    }
+
+    /// <summary>The chamber's Shadow Orb or Crimson Heart floats at its centre (placed by the chunk holding it).</summary>
+    private static void PlaceHeart(ChunkGenContext ctx, ChamberFeature ch)
+    {
+        var cell = new Common.Int3((int)MathF.Floor(ch.Center.X), (int)MathF.Floor(ch.Center.Y), (int)MathF.Floor(ch.Center.Z));
+        if (Common.ChunkMath.CellToChunk(cell) != ctx.Coord) return;
+        var def = ctx.Gen.Content.TileObjects.Get(ch.Zone == "crimson" ? "crimson_heart" : "shadow_orb");
+        ctx.AddObject(new Voxels.TileObjects.TileObjectInstance(def, cell, 0, 0));
     }
 }

@@ -96,3 +96,9 @@ public sealed class HasItemConditionParams : SpecParams, IValidatableSpec
 
     public string? Validate() => (Item == null) == (Tag == null) ? "hasItem needs exactly one of 'item' or 'tag'" : null;
 }
+
+/// <summary>The world's evil: "corruption" or "crimson".</summary>
+public sealed class EvilConditionParams : SpecParams
+{
+    public string Is { get; init; } = "";
+}

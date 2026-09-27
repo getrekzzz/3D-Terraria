@@ -49,6 +49,9 @@ public sealed class ConditionContext
     /// <summary>World difficulty (0 Classic, 1 Expert, 2 Master, 3 Journey).</summary>
     public int Difficulty { get; set; }
 
+    /// <summary>The world's evil ("corruption" or "crimson").</summary>
+    public string Evil { get; set; } = "";
+
     /// <summary>Fishing power of the rod making a catch (fishing loot only).</summary>
     public int FishingPower { get; set; }
 

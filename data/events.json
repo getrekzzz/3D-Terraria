@@ -14,6 +14,13 @@
       "spawnRateMultiplier": 3, "maxNearbyBonus": 6, "killGoal": 60, "killTag": "gel",
       "startMessage": "Slime is falling from the sky!", "endMessage": "Slime has stopped falling from the sky.",
       "covers": ["terraria:slime_rain"]
+    },
+    {
+      "id": "goblin_army", "name": "Goblin Army", "phase": "day", "chance": 0.12,
+      "conditions": [{ "type": "flag", "id": "smashed_orb" }, { "type": "maxLife", "min": 200 }],
+      "spawnRateMultiplier": 4, "maxNearbyBonus": 8, "killGoal": 80, "killTag": "goblin", "completionFlag": "defeated_goblin_army",
+      "startMessage": "A goblin army is approaching!", "endMessage": "The goblin army has been defeated!",
+      "covers": ["terraria:goblin_army"]
     }
   ]
 }

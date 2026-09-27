@@ -135,7 +135,13 @@ public sealed partial class ItemUseSystem
         if (target.Object is { } obj)
         {
             var r = editor.HitObject(obj, item);
-            return r == ObjectHitResult.WrongTool ? UseOutcome.WrongTool : r == ObjectHitResult.NotEmpty ? UseOutcome.Blocked : UseOutcome.HitObject;
+            return r switch
+            {
+                ObjectHitResult.WrongTool => UseOutcome.WrongTool,
+                ObjectHitResult.TooWeak => UseOutcome.TooHard,
+                ObjectHitResult.NotEmpty => UseOutcome.Blocked,
+                _ => UseOutcome.HitObject,
+            };
         }
         if (info.Has(ItemAction.Hammer) && !info.Has(ItemAction.Mine))
         {

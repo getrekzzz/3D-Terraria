@@ -31,7 +31,7 @@
       "brain": { "type": "worm", "speed": 9, "turnRate": 2.5, "digRadius": 1.8, "digInterval": 6, "airGravity": 14 },
       "life": 4000, "damage": 22, "defense": 4, "knockbackResist": 1.0, "size": [3, 3], "moveSpeed": 9, "gravity": false, "collideTerrain": false,
       "loot": "eater_of_worlds", "value": 6000,
-      "boss": { "title": "Eater of Worlds", "flag": "defeated_eater_of_worlds", "arenaRadius": 140, "music": "boss_worm", "segments": 18, "segmentSpacing": 1.1, "segmentRadius": 0.7, "segmentModel": "eater_of_worlds_body", "tailModel": "eater_of_worlds_tail" },
+      "boss": { "title": "Eater of Worlds", "flag": "defeated_eater_of_worlds", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 140, "music": "boss_worm", "segments": 18, "segmentSpacing": 1.1, "segmentRadius": 0.7, "segmentModel": "eater_of_worlds_body", "tailModel": "eater_of_worlds_tail" },
       "covers": ["terraria:eater_of_worlds"]
     }
   ]

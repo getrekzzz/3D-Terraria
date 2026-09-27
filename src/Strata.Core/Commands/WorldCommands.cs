@@ -9,6 +9,16 @@ public static class WorldCommands
     {
         r.Register(new CommandDef
         {
+            Name = "meteor", Usage = "meteor", Help = "Drops a meteorite now (a crater of meteorite ore) and reports where.",
+            Run = (ctx, _) =>
+            {
+                var at = ctx.World.Objectives.DropMeteor() ?? throw new CommandException("no meteorite mutation in content");
+                ctx.World.Mutations.CatchUpAll();
+                return CommandResult.Success($"A meteorite landed at {at.X} {at.Y} {at.Z}.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "mutations", Usage = "mutations [catchup | spread <updates>|on|off]",
             Help = "Lists world mutations (hardmode ores, wedges), brings loaded chunks up to date, runs or toggles biome spread.",
             Run = (ctx, a) =>

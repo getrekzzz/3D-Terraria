@@ -23,6 +23,12 @@ public sealed class BrainContext
     /// <summary>How many living creatures of a kind exist (caps a boss's minions).</summary>
     public Func<string, int>? CountAlive { get; set; }
 
+    /// <summary>Fires a hostile projectile (id, from, velocity, damage) — pattern bosses' volleys.</summary>
+    public Action<string, Vector3, Vector3, int>? Shoot { get; set; }
+
+    /// <summary>Announces a message to every player (a boss changing phase).</summary>
+    public Action<string>? Announce { get; set; }
+
     /// <summary>Removes natural terrain in a sphere (radius in cells) — burrowing creatures.</summary>
     public Action<Vector3, float>? Carve { get; set; }
 
@@ -69,6 +75,7 @@ public static class BrainFactory
         BrainSpecs.CryptWarden => new CryptWardenBrain(spec.Parse<CryptWardenParams>()),
         BrainSpecs.Caster => new CasterBrain(spec.Parse<CasterParams>()),
         BrainSpecs.Mawwall => new MawwallBrain(spec.Parse<MawwallParams>()),
+        BrainSpecs.Pattern => new PatternBrain(spec.Parse<PatternParams>()),
         _ => throw new InvalidOperationException($"Unknown brain '{spec.Type}' (the content validator should have rejected it)."),
     };
 

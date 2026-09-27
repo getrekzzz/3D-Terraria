@@ -41,6 +41,9 @@ public sealed class WorldMeta
     /// <summary>World mutations in the order they happened (added without a version bump: older saves have none).</summary>
     public List<MutationModel> Mutations { get; set; } = new();
     public List<string> Flags { get; set; } = new();
+
+    /// <summary>World tallies (shadow orbs smashed, altars smashed…); added without a version bump.</summary>
+    public Dictionary<string, int> Counters { get; set; } = new();
     public List<string> ActiveEvents { get; set; } = new();
 
     /// <summary>Running events with their remaining time and kill progress.</summary>

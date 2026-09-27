@@ -5,11 +5,13 @@ public static class MutationSpecs
 {
     public const string OreVeins = "oreVeins";
     public const string Wedge = "wedge";
+    public const string Meteor = "meteor";
 
     public static void Register(SpecCatalog c)
     {
         c.Register<OreVeinsMutationParams>(SpecKind.Mutation, OreVeins);
         c.Register<WedgeMutationParams>(SpecKind.Mutation, Wedge);
+        c.Register<MeteorMutationParams>(SpecKind.Mutation, Meteor);
     }
 }
 
@@ -55,4 +57,16 @@ public sealed class WedgeMutationParams : SpecParams, IValidatableSpec
         (Conversion == null) == (ByEvil.Count == 0) ? "set exactly one of conversion or byEvil"
         : HalfWidth <= 0 || Length <= 0 ? "halfWidth and length must be > 0"
         : Depth <= 0 ? "depth must be > 0" : null;
+}
+
+/// <summary>A meteorite crater: a bowl of ore blasted into the surface somewhere away from the middle of the world.</summary>
+public sealed class MeteorMutationParams : SpecParams
+{
+    public string Block { get; init; } = "meteorite";
+
+    /// <summary>Crater radius in cells.</summary>
+    public float Radius { get; init; } = 9f;
+
+    /// <summary>Zone (biome) the crater becomes, for spawns and music.</summary>
+    public string? Zone { get; init; }
 }

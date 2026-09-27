@@ -382,6 +382,26 @@
    ]
   },
   {
+   "id": "terraria:meteor_head",
+   "name": "Meteor Head",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "meteorite",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:bee",
+   "name": "Bee",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "queen bee",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
    "id": "terraria:crimera",
    "name": "Crimera",
    "kind": "enemy",

@@ -47,6 +47,11 @@ public sealed partial class NpcSystem
             Spawn = (def, at) => Spawn(def, at - new Vector3(0, def.Height * 0.25f * def.Scale, 0)),
             Carve = (center, radius) => world.Editor.Carve(center, radius),
             CountAlive = id => _npcs.Count(n => n.Alive && n.Def.Id == id),
+            Shoot = (id, from, velocity, damage) =>
+            {
+                if (world.Session.Content.Projectiles.TryGet(id, out var def)) world.Projectiles.Spawn(def, from, velocity, null, damage, 3f, Content.Defs.DamageClass.None, 0);
+            },
+            Announce = text => Announced?.Invoke(text),
             Bands = world.Session.Generator.Plan.Bands,
         };
     }
@@ -59,6 +64,9 @@ public sealed partial class NpcSystem
     public event Action<DamageEvent>? Damaged;
 
     public event Action<Npc>? BossSpawned;
+
+    /// <summary>A creature announced something (a boss's new phase).</summary>
+    public event Action<string>? Announced;
 
     /// <summary>A boss was killed (its defeat flag is already set).</summary>
     public event Action<Npc>? BossDefeated;
@@ -75,9 +83,9 @@ public sealed partial class NpcSystem
         var npc = new Npc(_nextId++, def, feet) { Yaw = _rng.NextFloat() * MathF.Tau, Invulnerable = def.Invulnerable };
         if (def.Boss is { Segments: > 0 } boss)
             for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
-        bool joinsGroup = def.Boss != null && GroupAlive(def.Boss, npc);
+        bool joinsGroup = def.Boss is { Minor: false } && GroupAlive(def.Boss, npc);
         _npcs.Add(npc);
-        if (def.Boss != null && !joinsGroup) BossSpawned?.Invoke(npc);
+        if (def.Boss is { Minor: false } && !joinsGroup) BossSpawned?.Invoke(npc);
         Spawned?.Invoke(npc);
         if (def.Boss is { Companions.Length: > 0 } group)
         {
@@ -139,7 +147,7 @@ public sealed partial class NpcSystem
                 }
             }
             var target = Nearest(npc.Center, out float distance);
-            float despawn = npc.Def.Boss?.ArenaRadius ?? DespawnDistance;
+            float despawn = npc.IsBoss ? npc.Def.Boss!.ArenaRadius : DespawnDistance;
             if (OutOfBounds(npc, target))
             {
                 if (npc.IsBoss && !GroupAlive(npc.Def.Boss!, npc)) BossLeft?.Invoke(npc);
@@ -221,6 +229,8 @@ public sealed partial class NpcSystem
     private void ContactDamage(Npc npc, PlayerEntity player)
     {
         if (!player.Alive || player.State.Vitals.ImmunityTicks > 0 || npc.Def.Damage <= 0) return;
+        foreach (var tag in player.State.Effects.Pacified)
+            if (npc.Def.HasTag(tag)) return;
         var pBox = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
         if (!npc.Volumes().Any(v => Npc.Overlaps(v, pBox))) return;
         var state = player.State;
@@ -272,9 +282,10 @@ public sealed partial class NpcSystem
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);
-        if (npc.Def.Boss is { } boss && !GroupAlive(boss, npc))
+        if (npc.Def.Boss is { Minor: false } boss && !GroupAlive(boss, npc))
         {
             if (boss.Flag != null) _world.Progression.Set(boss.Flag);
+            foreach (var extra in boss.AlsoFlags) _world.Progression.Set(extra);
             BossDefeated?.Invoke(npc);
         }
         Killed?.Invoke(npc);

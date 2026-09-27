@@ -11,8 +11,9 @@ public static partial class ContentValidator
         var listed = new HashSet<string>(StringComparer.Ordinal);
         foreach (var m in ctx.Db.Mutations.All)
         {
-            if (string.IsNullOrEmpty(m.Trigger)) ctx.Error(m, "trigger (a progression flag) is required.");
-            ctx.Ref(m, ctx.Db.Flags, m.Trigger, "trigger");
+            // An empty trigger marks a mutation the game appends itself (meteorites); anything else names a flag.
+            if (string.IsNullOrEmpty(m.Trigger) && m.Step.Type != MutationSpecs.Meteor) ctx.Error(m, "trigger (a progression flag) is required.");
+            if (!string.IsNullOrEmpty(m.Trigger)) ctx.Ref(m, ctx.Db.Flags, m.Trigger, "trigger");
             ctx.Spec(m, SpecKind.Mutation, m.Step, "step");
             if (m.Step.Type == MutationSpecs.OreVeins && ctx.TryParse<OreVeinsMutationParams>(SpecKind.Mutation, m.Step) is { } ores)
                 foreach (var id in ores.Veins)

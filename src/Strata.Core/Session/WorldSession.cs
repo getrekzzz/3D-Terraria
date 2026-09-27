@@ -38,6 +38,7 @@ public sealed partial class WorldSession
                 ? (plan.ColumnTop[plan.ColumnIndex(cx, cz)] - 1) >> ChunkMath.Shift
                 : plan.Bands.SeaLevel >> ChunkMath.Shift);
         Flags = new HashSet<string>(meta.Flags, StringComparer.Ordinal);
+        Counters = new Dictionary<string, int>(meta.Counters ?? new(), StringComparer.Ordinal);
         Mutations = new WorldGen.Mutations.MutationLog(Generator, content, Settings);
         Mutations.Load(meta, log);
         Events = new HashSet<string>(StringComparer.Ordinal);
@@ -60,6 +61,9 @@ public sealed partial class WorldSession
     public SkyMap Sky { get; }
     public GameClock Clock { get; }
     public HashSet<string> Flags { get; }
+
+    /// <summary>World tallies kept across saves (orbs smashed, altars smashed).</summary>
+    public Dictionary<string, int> Counters { get; }
 
     /// <summary>World mutations so far (hardmode ores, wedges); chunks behind the level catch up as they load.</summary>
     public WorldGen.Mutations.MutationLog Mutations { get; }

@@ -1,0 +1,69 @@
+{
+  // The Goblin Army invades by day once an orb or heart has been smashed and a player is sturdy enough; beating it
+  // frees the Goblin Tinkerer. Meteorites: the crater's Meteor Heads, the ore's bars and the gear made from them.
+  "projectiles": [
+    { "id": "goblin_arrow", "name": "Arrow", "visual": "arrow", "color": "#9a7a4a", "gravity": 12, "lifetime": 300, "radius": 0.3, "friendly": false, "hostile": true },
+    { "id": "shadowflame_bolt", "name": "Shadowflame", "visual": "orb", "color": "#9a3aff", "lifetime": 200, "radius": 0.45, "friendly": false, "hostile": true, "light": [8, 2, 12] },
+    { "id": "space_laser", "name": "Green Laser", "visual": "bolt", "color": "#4aff6a", "lifetime": 90, "radius": 0.3, "pierce": 2, "light": [2, 12, 3], "trail": "#9aff9a" },
+    { "id": "meteor_shot", "name": "Meteor Shot", "visual": "bullet", "color": "#ffb04a", "lifetime": 150, "radius": 0.25, "pierce": 2, "bounces": 1, "light": [10, 6, 2] }
+  ],
+  "items": [
+    { "id": "meteorite_bar", "name": "Meteorite Bar", "description": "Warm to the touch.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 700, "covers": ["terraria:meteorite_bar"] },
+    { "id": "space_gun", "name": "Space Gun", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "shoot", "useTime": 16, "useAnimation": 16, "autoReuse": true,
+      "damage": 17, "damageType": "magic", "knockback": 1, "manaCost": 6, "projectile": "space_laser", "shootSpeed": 38, "covers": ["terraria:space_gun"] },
+    { "id": "star_cannon", "name": "Star Cannon", "description": "Shoots fallen stars.", "category": "weapon", "rarity": 2, "value": 30000, "useStyle": "shoot", "useTime": 12, "useAnimation": 12, "autoReuse": true,
+      "damage": 55, "damageType": "ranged", "knockback": 4, "useAmmo": "star", "shootSpeed": 22, "covers": ["terraria:star_cannon"] },
+    { "id": "meteor_shot", "name": "Meteor Shot", "category": "ammo", "maxStack": 9999, "value": 10, "damage": 9, "damageType": "ranged", "knockback": 1,
+      "ammoClass": "bullet", "projectile": "meteor_shot", "consumable": true, "covers": ["terraria:meteor_shot"] },
+    { "id": "meteor_helmet", "name": "Meteor Helmet", "description": "7% increased magic damage.", "category": "armor", "rarity": 1, "value": 25000, "equipSlot": "head", "defense": 3, "armorSet": "meteor_armor",
+      "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.07 }], "covers": ["terraria:meteor_helmet"] },
+    { "id": "meteor_suit", "name": "Meteor Suit", "description": "7% increased magic damage.", "category": "armor", "rarity": 1, "value": 25000, "equipSlot": "body", "defense": 4, "armorSet": "meteor_armor",
+      "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.07 }] },
+    { "id": "meteor_leggings", "name": "Meteor Leggings", "description": "7% increased magic damage.", "category": "armor", "rarity": 1, "value": 25000, "equipSlot": "legs", "defense": 3, "armorSet": "meteor_armor",
+      "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.07 }] },
+    { "id": "spiky_ball", "name": "Spiky Ball", "category": "weapon", "maxStack": 9999, "value": 80, "useStyle": "shoot", "useTime": 15, "useAnimation": 15, "consumable": true,
+      "damage": 15, "damageType": "ranged", "projectile": "shuriken", "shootSpeed": 12 },
+    { "id": "harpoon", "name": "Harpoon", "category": "weapon", "rarity": 2, "value": 27000, "useStyle": "shoot", "useTime": 30, "useAnimation": 30,
+      "damage": 25, "damageType": "ranged", "knockback": 6, "projectile": "throwing_knife", "shootSpeed": 24 }
+  ],
+  "recipes": [
+    { "id": "meteorite_bar", "output": "meteorite_bar", "inputs": [{ "item": "meteorite", "count": 3 }], "stations": ["furnace"] },
+    { "id": "space_gun", "output": "space_gun", "inputs": [{ "item": "meteorite_bar", "count": 20 }], "stations": ["anvil"] },
+    { "id": "meteor_helmet", "output": "meteor_helmet", "inputs": [{ "item": "meteorite_bar", "count": 20 }], "stations": ["anvil"] },
+    { "id": "meteor_suit", "output": "meteor_suit", "inputs": [{ "item": "meteorite_bar", "count": 25 }], "stations": ["anvil"] },
+    { "id": "meteor_leggings", "output": "meteor_leggings", "inputs": [{ "item": "meteorite_bar", "count": 20 }], "stations": ["anvil"] },
+    { "id": "meteor_shot", "output": "meteor_shot", "count": 70, "inputs": [{ "item": "musket_ball", "count": 70 }, { "item": "meteorite_bar", "count": 1 }], "stations": ["anvil"] },
+    { "id": "star_cannon", "output": "star_cannon", "inputs": [{ "item": "minishark", "count": 1 }, { "item": "meteorite_bar", "count": 20 }, { "item": "fallen_star", "count": 5 }], "stations": ["anvil"] }
+  ],
+  "lootTables": [
+    { "id": "goblin", "coins": [100, 300], "entries": [{ "item": "spiky_ball", "min": 5, "max": 15, "chance": 0.3 }, { "item": "harpoon", "chance": 0.005 }] },
+    { "id": "meteor_head", "coins": [50, 150], "entries": [{ "item": "meteorite", "min": 1, "max": 3, "chance": 0.3 }] }
+  ],
+  "enemies": [
+    { "id": "goblin_peon", "model": "goblin_peon", "tags": ["goblin"], "name": "Goblin Peon", "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 4 },
+      "life": 45, "damage": 13, "defense": 4, "knockbackResist": 0.2, "size": [1.4, 2.8], "moveSpeed": 3.2, "loot": "goblin", "value": 100, "covers": ["terraria:goblin_peon"] },
+    { "id": "goblin_thief", "model": "goblin_thief", "tags": ["goblin"], "name": "Goblin Thief", "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 5 },
+      "life": 80, "damage": 20, "defense": 6, "knockbackResist": 0.3, "size": [1.4, 2.8], "moveSpeed": 4.6, "loot": "goblin", "value": 150, "covers": ["terraria:goblin_thief"] },
+    { "id": "goblin_warrior", "model": "goblin_warrior", "tags": ["goblin"], "name": "Goblin Warrior", "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 4 },
+      "life": 110, "damage": 25, "defense": 8, "knockbackResist": 0.5, "size": [1.8, 3.2], "moveSpeed": 2.8, "loot": "goblin", "value": 200, "covers": ["terraria:goblin_warrior"] },
+    { "id": "goblin_sorcerer", "model": "goblin_sorcerer", "tags": ["goblin"], "name": "Goblin Sorcerer",
+      "brain": { "type": "caster", "aggroRange": 70, "teleportInterval": 240, "minBlink": 5, "maxBlink": 12 },
+      "ranged": { "projectile": "shadowflame_bolt", "damage": 20, "speed": 7, "interval": 120, "range": 28 },
+      "life": 40, "damage": 10, "defense": 2, "knockbackResist": 0.4, "size": [1.4, 2.8], "moveSpeed": 0.5, "loot": "goblin", "value": 150, "covers": ["terraria:goblin_sorcerer"] },
+    { "id": "goblin_archer", "model": "goblin_archer", "tags": ["goblin"], "name": "Goblin Archer", "brain": { "type": "walker", "aggroRange": 120, "jumpHeight": 4 },
+      "ranged": { "projectile": "goblin_arrow", "damage": 18, "speed": 18, "interval": 110, "range": 28 },
+      "life": 50, "damage": 12, "defense": 4, "knockbackResist": 0.3, "size": [1.4, 2.8], "moveSpeed": 2.6, "loot": "goblin", "value": 150, "covers": ["terraria:goblin_archer"] },
+    { "id": "meteor_head", "model": "cursed_skull", "tags": ["lava_immune"], "name": "Meteor Head", "description": "A burning rock with a grudge.",
+      "brain": { "type": "flyer", "aggroRange": 60, "orbitRadius": 2, "dashSpeed": 7, "dashCooldown": 90, "bounceOffTerrain": false },
+      "life": 26, "damage": 40, "defense": 6, "knockbackResist": 0.2, "size": [1.4, 1.4], "moveSpeed": 4.5, "gravity": false, "collideTerrain": false, "tint": "#ff8a3a", "light": [12, 6, 2],
+      "loot": "meteor_head", "value": 80, "covers": ["terraria:meteor_head"] }
+  ],
+  "spawnRules": [
+    { "id": "goblin_peon_army", "enemy": "goblin_peon", "weight": 5, "group": [1, 3], "conditions": [{ "type": "event", "id": "goblin_army" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "goblin_thief_army", "enemy": "goblin_thief", "weight": 3, "conditions": [{ "type": "event", "id": "goblin_army" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "goblin_warrior_army", "enemy": "goblin_warrior", "weight": 3, "conditions": [{ "type": "event", "id": "goblin_army" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "goblin_sorcerer_army", "enemy": "goblin_sorcerer", "weight": 1.5, "conditions": [{ "type": "event", "id": "goblin_army" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "goblin_archer_army", "enemy": "goblin_archer", "weight": 2, "conditions": [{ "type": "event", "id": "goblin_army" }, { "type": "layer", "any": ["surface"] }] },
+    { "id": "meteor_head_crater", "enemy": "meteor_head", "weight": 6, "conditions": [{ "type": "biome", "any": ["meteorite"] }] }
+  ]
+}

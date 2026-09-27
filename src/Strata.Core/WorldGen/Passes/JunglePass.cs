@@ -37,6 +37,13 @@ public sealed class JunglePass : GenPass
     public override void Generate(ChunkGenContext ctx)
     {
         foreach (var f in ctx.Plan.Features.InChunk(ctx.Coord))
-            if (f is ChamberFeature ch && ch.Kind == "hive") MiniBiomeCarver.Carve(ctx, ch);
+        {
+            if (f is not ChamberFeature ch || ch.Kind != "hive") continue;
+            MiniBiomeCarver.Carve(ctx, ch);
+            // The Queen Bee's larva rests in the heart of the hive.
+            var cell = new Common.Int3((int)MathF.Floor(ch.Center.X), (int)MathF.Floor(ch.Center.Y), (int)MathF.Floor(ch.Center.Z));
+            if (Common.ChunkMath.CellToChunk(cell) == ctx.Coord)
+                ctx.AddObject(new Voxels.TileObjects.TileObjectInstance(ctx.Gen.Content.TileObjects.Get("bee_larva"), cell, 0, 0));
+        }
     }
 }

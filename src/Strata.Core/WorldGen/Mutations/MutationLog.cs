@@ -53,6 +53,16 @@ public sealed class MutationLog
         return step;
     }
 
+    /// <summary>Appends another occurrence of a repeatable mutation (meteorites): its seed also derives from the count.</summary>
+    public IMutationStep AppendOccurrence(WorldMutationDef def, int occurrence)
+    {
+        ulong seed = Hash.Combine((ulong)_settings.Seed, Hash.String($"mutation:{def.Id}:{occurrence}"));
+        var step = Create(def, seed);
+        _records.Add(new WorldMeta.MutationModel(def.Id, seed));
+        _steps = _steps.Append(step).ToArray();
+        return step;
+    }
+
     /// <summary>Restores the log from a save; mutations missing from content keep their slot but do nothing.</summary>
     public void Load(WorldMeta meta, ILog log)
     {
@@ -99,6 +109,7 @@ public sealed class MutationLog
     {
         MutationSpecs.OreVeins => new OreVeinsStep(_gen, _content, def.Step.Parse<OreVeinsMutationParams>(), seed),
         MutationSpecs.Wedge => Wedge(def.Step.Parse<WedgeMutationParams>(), seed),
+        MutationSpecs.Meteor => new MeteorStep(_gen, _content, def.Step.Parse<MeteorMutationParams>(), seed),
         _ => throw new InvalidOperationException($"Unknown mutation step '{def.Step.Type}' (the content validator should have rejected it)."),
     };
 

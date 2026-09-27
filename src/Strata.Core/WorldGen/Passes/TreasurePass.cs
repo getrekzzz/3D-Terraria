@@ -22,6 +22,7 @@ public sealed class TreasurePass : GenPass
         var pot = tiles.Get("pot");
         var chest = tiles.Get("wooden_chest");
         var crystal = tiles.Get("life_crystal_node");
+        var altar = tiles.Get(ctx.Gen.Plan.Settings.Evil == World.EvilKind.Crimson ? "crimson_altar" : "demon_altar");
         float depth = ctx.Depth(ctx.ChunkOrigin.Y + 16);
         if (depth < 0.02f) return;
 
@@ -34,6 +35,8 @@ public sealed class TreasurePass : GenPass
             if (roll < 0.018f + 0.02f * depth) Place(ctx, crystal, x, floorY, z, 0, null);
             else if (roll < 0.05f) Place(ctx, chest, x, floorY, z, rng.NextInt(4), depth > 0.4f ? "cabin_chest" : "surface_chest");
             else if (roll < 0.17f) Place(ctx, pot, x, floorY, z, rng.NextInt(4), null, rng.NextInt(3));
+            else if (roll < 0.1745f && depth > 0.06f && TryFindFloor(ctx, x + 2, z, 3, out int other) && other == floorY)
+                Place(ctx, altar, x, floorY, z, rng.NextInt(4), null); // demon altars dot the underground
         }
     }
 

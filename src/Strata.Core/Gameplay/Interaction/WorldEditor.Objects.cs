@@ -20,6 +20,9 @@ public enum ObjectHitResult
 
     /// <summary>A container that still holds items.</summary>
     NotEmpty,
+
+    /// <summary>The tool is the right kind but too weak (a Pwnhammer is needed for altars).</summary>
+    TooWeak,
 }
 
 public sealed partial class WorldEditor
@@ -55,6 +58,7 @@ public sealed partial class WorldEditor
             _ => Math.Max(tool?.PickPower ?? 0, Math.Max(tool?.AxePower ?? 0, tool?.HammerPower ?? 0)),
         };
         if (power <= 0) return ObjectHitResult.WrongTool;
+        if (power < obj.Def.MinPower) return ObjectHitResult.TooWeak;
         if (obj.Container != null && obj.Container.Any(s => !s.IsEmpty)) return ObjectHitResult.NotEmpty;
         obj.HitPoints -= Math.Max(1, power / 40);
         if (obj.HitPoints > 0) return ObjectHitResult.Damaged;

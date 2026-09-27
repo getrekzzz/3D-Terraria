@@ -79,7 +79,9 @@
         { "item": "mushroom", "price": 100 },
         { "item": "glowing_mushroom", "price": 60 },
         { "item": "cactus", "price": 40 },
-        { "item": "swiftness_potion", "price": 1000 }
+        { "item": "swiftness_potion", "price": 1000 },
+        { "item": "vile_powder", "price": 100, "conditions": [{ "type": "evil", "is": "corruption" }] },
+        { "item": "vicious_powder", "price": 100, "conditions": [{ "type": "evil", "is": "crimson" }] }
       ],
       "lines": [
         { "text": "The forest remembers every tree you fell, {player}. Plant one back now and then." },

@@ -106,6 +106,11 @@ public static class ConditionCompiler
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.Difficulty >= p.Min && c.Difficulty <= p.Max);
         },
+        ["evil"] = s =>
+        {
+            var p = s.Parse<EvilConditionParams>();
+            return new DelegateCondition(c => string.Equals(c.Evil, p.Is, StringComparison.OrdinalIgnoreCase));
+        },
         ["fishingPower"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
@@ -150,6 +155,7 @@ public static class ConditionCompiler
         c.Register<HasItemConditionParams>(SpecKind.Condition, "hasItem");
         c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<RangeConditionParams>(SpecKind.Condition, "fishingPower");
+        c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "not");

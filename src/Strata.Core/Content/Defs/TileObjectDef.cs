@@ -72,10 +72,45 @@ public sealed class TileObjectDef : ContentDef
     public int ItemMaxStack { get; init; } = 99;
     public ItemCategory ItemCategory { get; init; } = ItemCategory.Furniture;
 
+    /// <summary>Least tool power (of the break tool's kind) that can break it: demon altars need a Pwnhammer (80).</summary>
+    public int MinPower { get; init; }
+
+    /// <summary>What breaking it sets in motion (shadow orbs, crimson hearts, altars).</summary>
+    public BreakEffect? OnBreak { get; init; }
+
     /// <summary>The item id that places/drops this object.</summary>
     public string? PlacingItemId => Item ?? (Natural ? null : Id);
 
     public int SizeX => Size.Length > 0 ? Size[0] : 1;
     public int SizeY => Size.Length > 1 ? Size[1] : 1;
     public int SizeZ => Size.Length > 2 ? Size[2] : 1;
+}
+
+/// <summary>
+/// World consequences of breaking an object: a world counter ticks up; its Nth break may raise a flag, and every
+/// <see cref="Every"/>th summons a boss beside it; an announcement may follow; a meteorite may be set to fall.
+/// </summary>
+public sealed class BreakEffect
+{
+    /// <summary>World counter bumped by each break (e.g. "orbs", "altars").</summary>
+    public string Counter { get; init; } = "";
+
+    /// <summary>Flags raised on the 1st, 2nd, 3rd… break.</summary>
+    public string[] Flags { get; init; } = Array.Empty<string>();
+
+    /// <summary>Messages announced on the 1st, 2nd, 3rd… break (the last repeats; empty = none).</summary>
+    public string[] Messages { get; init; } = Array.Empty<string>();
+
+    /// <summary>Boss summoned on every <see cref="Every"/>th break.</summary>
+    public string? Summon { get; init; }
+
+    public int Every { get; init; } = 3;
+
+    /// <summary>Chance that a meteorite falls the coming night.</summary>
+    public float Meteor { get; init; }
+
+    /// <summary>Creatures released at the break (altars loose wraiths in hardmode).</summary>
+    public string? Release { get; init; }
+
+    public float ReleaseChance { get; init; }
 }

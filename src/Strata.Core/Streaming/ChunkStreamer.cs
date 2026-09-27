@@ -69,11 +69,15 @@ public sealed partial class ChunkStreamer
             if (!e.MeshWanted) continue;
             wanted++;
             if (e.MeshDirty) dirty++;
-            if (!e.HasMesh) missing++;
+            if (!e.HasMesh)
+            {
+                missing++;
+                if (first.Length == 0) first = $"unmeshed {coord} data={e.Data} dirty={e.MeshDirty} inFlight={e.MeshInFlight}";
+            }
             if ((e.MeshDirty || !e.HasMesh) && !e.MeshInFlight && !NeighboursReady(coord))
             {
                 blocked++;
-                if (first.Length == 0) first = $"{coord} state={e.Data}";
+                if (first.Length == 0 || first.StartsWith("unmeshed")) first = $"{coord} state={e.Data}";
             }
         }
         return $"wanted={wanted} dirty={dirty} unmeshed={missing} blocked={blocked} {first}";

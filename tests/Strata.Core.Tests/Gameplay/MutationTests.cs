@@ -21,7 +21,14 @@ public class MutationTests
         return g;
     }
 
-    private static void Hardmode(TestGame g) => g.World.Progression.Set("defeated_wall_of_flesh");
+    /// <summary>Hardmode, then three altars smashed (each seeds a tier of ore).</summary>
+    private static void Hardmode(TestGame g)
+    {
+        g.World.Progression.Set("defeated_wall_of_flesh");
+        foreach (var tier in new[] { "smashed_altar_1", "smashed_altar_2", "smashed_altar_3" }) g.World.Progression.Set(tier);
+    }
+
+    private const int HardmodeLevel = 5; // hallow and evil wedges, three ore tiers
 
     /// <summary>Deep chunks below spawn (cavern stone, far from the test arena).</summary>
     private static IEnumerable<Int3> DeepChunks(TestGame g)
@@ -43,7 +50,7 @@ public class MutationTests
     }
 
     private static HashSet<ushort> HardmodeOres(TestGame g) =>
-        g.World.Session.Mutations.Steps.OfType<OreVeinsStep>().Single().Rules.Select(r => r.Block).ToHashSet();
+        g.World.Session.Mutations.Steps.OfType<OreVeinsStep>().SelectMany(o => o.Rules).Select(r => r.Block).ToHashSet();
 
     [Fact]
     public void HardmodeAppendsItsMutationsOnceAndInOrder()
@@ -52,12 +59,12 @@ public class MutationTests
         var log = g.World.Session.Mutations;
         Assert.Equal(0, log.Level);
         Hardmode(g);
-        Assert.Equal(new[] { "hardmode_ores", "hardmode_hallow", "hardmode_evil" }, log.Ids);
+        Assert.Equal(new[] { "hardmode_hallow", "hardmode_evil", "altar_ores_1", "altar_ores_2", "altar_ores_3" }, log.Ids);
         g.World.Progression.Clear("hardmode");
         g.World.Progression.Set("hardmode");
-        Assert.Equal(3, log.Level);
+        Assert.Equal(HardmodeLevel, log.Level);
         // One ore per alternate group.
-        Assert.Equal(3, g.World.Session.Mutations.Steps.OfType<OreVeinsStep>().Single().Rules.Count);
+        Assert.Equal(3, g.World.Session.Mutations.Steps.OfType<OreVeinsStep>().Sum(o => o.Rules.Count));
     }
 
     [Fact]
@@ -74,7 +81,7 @@ public class MutationTests
         foreach (var c in chunks)
         {
             var after = session.Produce(c);
-            Assert.Equal(3, after.MutationLevel);
+            Assert.Equal(HardmodeLevel, after.MutationLevel);
             found += Count(after.Data, ores);
         }
         Assert.True(found > 20, $"only {found} hardmode ore cells in {chunks.Count} deep chunks");
@@ -124,10 +131,10 @@ public class MutationTests
                 session.SaveMetaOnly();
             }
             var reloaded = WorldSession.Load(TestPaths.Content, dir, Tables, new MemoryLog());
-            Assert.Equal(3, reloaded.Mutations.Level);
+            Assert.Equal(HardmodeLevel, reloaded.Mutations.Level);
             var product = reloaded.Produce(c);
             Assert.True(product.FromSave);
-            Assert.Equal(3, product.MutationLevel);
+            Assert.Equal(HardmodeLevel, product.MutationLevel);
             Assert.Equal(brick, product.Data.GetBlock(ChunkMath.Index(edited - ChunkMath.ChunkOrigin(c))));
             using var fresh = Create();
             Hardmode(fresh);

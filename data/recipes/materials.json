@@ -22,7 +22,7 @@
     { "id": "topaz_staff", "output": "topaz_staff", "inputs": [{ "item": "tin_bar", "count": 10 }, { "item": "topaz", "count": 8 }], "stations": ["anvil"] },
     { "id": "slime_crown", "output": "slime_crown", "inputs": [{ "item": "gel", "count": 20 }, { "item": "gold_bar", "count": 4 }], "stations": ["work_bench"] },
     { "id": "slime_crown_platinum", "output": "slime_crown", "inputs": [{ "item": "gel", "count": 20 }, { "item": "platinum_bar", "count": 4 }], "stations": ["work_bench"] },
-    { "id": "suspicious_looking_eye", "output": "suspicious_looking_eye", "inputs": [{ "item": "lens", "count": 6 }], "stations": ["anvil"] },
-    { "id": "worm_food", "output": "worm_food", "inputs": [{ "item": "ebonstone", "count": 20 }, { "item": "gel", "count": 5 }], "stations": ["anvil"] }
+    { "id": "suspicious_looking_eye", "output": "suspicious_looking_eye", "inputs": [{ "item": "lens", "count": 6 }], "stations": ["demon_altar"] },
+    { "id": "worm_food", "output": "worm_food", "inputs": [{ "item": "rotten_chunk", "count": 15 }, { "item": "vile_powder", "count": 30 }], "stations": ["demon_altar"] }
   ]
 }

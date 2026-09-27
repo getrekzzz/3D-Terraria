@@ -22,6 +22,7 @@ public sealed partial class WorldSession
         ctx.Flags = Flags;
         ctx.Events = Events;
         ctx.Difficulty = (int)Settings.Difficulty;
+        ctx.Evil = Settings.Evil.ToString().ToLowerInvariant();
         return ctx;
     }
 

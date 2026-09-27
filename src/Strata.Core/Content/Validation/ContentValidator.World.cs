@@ -38,6 +38,22 @@ public static partial class ContentValidator
             }
     }
 
+    /// <summary>Pattern bosses name projectiles, minions and models that must exist.</summary>
+    private static void ValidatePattern(Ctx ctx, EnemyDef e)
+    {
+        Specs.PatternParams p;
+        try { p = e.Brain.Parse<Specs.PatternParams>(); }
+        catch (Exception) { return; } // reported by the spec check
+        foreach (var phase in p.Phases)
+        {
+            if (phase.Model != null) ctx.Asset(e, $"assets/models/creatures/{phase.Model}.glb", "brain.phases.model");
+            if (phase.ShieldedBy != null && !ctx.Db.Enemies.Contains(phase.ShieldedBy)) ctx.Error(e, $"shieldedBy names unknown enemy '{phase.ShieldedBy}'.");
+            if (phase.Summon != null && !ctx.Db.Enemies.Contains(phase.Summon.Enemy)) ctx.Error(e, $"summons unknown enemy '{phase.Summon.Enemy}'.");
+            foreach (var v in phase.Moves.Select(m => m.Volley).Append(phase.Volley))
+                if (v != null && !ctx.Db.Projectiles.Contains(v.Projectile)) ctx.Error(e, $"volley fires unknown projectile '{v.Projectile}'.");
+        }
+    }
+
     private static void ValidateEnemies(Ctx ctx)
     {
         foreach (var e in ctx.Db.Enemies.All)
@@ -46,6 +62,7 @@ public static partial class ContentValidator
             if (e.Size.Length != 2 || e.Size.Any(v => v <= 0)) ctx.Error(e, "size must be [width, height] > 0.");
             if (e.KnockbackResist is < 0 or > 1) ctx.Error(e, "knockbackResist must be 0–1.");
             ctx.Spec(e, SpecKind.Brain, e.Brain, "brain");
+            if (e.Brain.Type == Specs.BrainSpecs.Pattern) ValidatePattern(ctx, e);
             ctx.Ref(e, ctx.Db.LootTables, e.Loot, "loot");
             ctx.Color(e, e.Tint, "tint");
             ctx.Color(e, e.TetherColor, "tetherColor");
@@ -54,7 +71,7 @@ public static partial class ContentValidator
             if (e.Boss is { } boss)
             {
                 ctx.Ref(e, ctx.Db.Flags, boss.Flag, "boss.flag");
-                if (string.IsNullOrWhiteSpace(boss.Title)) ctx.Error(e, "boss.title is required.");
+                if (string.IsNullOrWhiteSpace(boss.Title) && !boss.Minor) ctx.Error(e, "boss.title is required.");
                 foreach (var (part, field) in new[] { (boss.SegmentModel, "segmentModel"), (boss.TailModel, "tailModel") })
                     if (part != null) ctx.Asset(e, $"assets/models/creatures/{part}.glb", $"boss.{field}");
                 for (int i = 0; i < boss.SegmentModels.Length; i++)

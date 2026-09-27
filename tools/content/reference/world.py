@@ -39,6 +39,8 @@ digger|Digger|hardmode|cavern|segmented,burrow
 bone_serpent|Bone Serpent|prehardmode|underworld|segmented
 tomb_crawler|Tomb Crawler|early|desert|segmented
 eater_of_souls|Eater of Souls|prehardmode|corruption|flyer
+meteor_head|Meteor Head|early|meteorite|flyer
+bee|Bee|prehardmode|queen bee|flyer
 crimera|Crimera|prehardmode|crimson|flyer
 face_monster|Face Monster|prehardmode|crimson|walker
 blood_crawler|Blood Crawler|prehardmode|crimson caves|wall_crawler

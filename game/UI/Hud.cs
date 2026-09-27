@@ -135,6 +135,12 @@ public sealed partial class Hud : CanvasLayer
         {
             if (f.Announce != null) Announce(f.Announce, new Color(0.75f, 0.55f, 1f));
         };
+        ui.Game.Objectives.Announced += (text, color) => Announce(text, Color.FromHtml(color));
+        npcs.Announced += text => Announce(text, new Color(1f, 0.55f, 0.45f));
+        ui.Game.ItemUse.Caught += (p, stack) =>
+        {
+            if (p == ui.Entity) Toast($"Caught {stack.Item!.DisplayName}!", UiTheme.Rarity(stack.Item.Rarity));
+        };
         ui.Game.Events.Announced += (text, def) => Announce(text, def.SkyTint != null ? Color.FromHtml(def.SkyTint).Lightened(0.3f) : new Color(0.7f, 0.85f, 1f));
         ui.Game.ItemPickedUp += (p, stack) =>
         {

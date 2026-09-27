@@ -10,11 +10,20 @@ public sealed class DayEnrage
 /// <summary>Boss metadata: presentation, arena, progression and body segments (worms).</summary>
 public sealed class BossInfo
 {
+    /// <summary>
+    /// A creature that only borrows the boss body (worm segments, free parts) — Wyverns, Devourers, Bone Serpents: no
+    /// boss bar, announcements, music or flag, and it despawns like any creature.
+    /// </summary>
+    public bool Minor { get; init; }
+
     /// <summary>Shown on the boss bar and in announcements.</summary>
     public string Title { get; init; } = "";
 
     /// <summary>Progression flag set when defeated.</summary>
     public string? Flag { get; init; }
+
+    /// <summary>More flags raised with <see cref="Flag"/> (either evil boss sets "defeated_evil_boss").</summary>
+    public string[] AlsoFlags { get; init; } = Array.Empty<string>();
 
     /// <summary>Beyond this distance (m) from every player the boss leaves (despawns).</summary>
     public float ArenaRadius { get; init; } = 120f;

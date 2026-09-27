@@ -15,6 +15,7 @@ public static class BrainSpecs
     public const string CryptWarden = "skeletron";
     public const string Caster = "caster";
     public const string Mawwall = "wallOfFlesh";
+    public const string Pattern = "pattern";
 
     public static void Register(SpecCatalog c)
     {
@@ -30,6 +31,7 @@ public static class BrainSpecs
         c.Register<CryptWardenParams>(SpecKind.Brain, CryptWarden);
         c.Register<CasterParams>(SpecKind.Brain, Caster);
         c.Register<MawwallParams>(SpecKind.Brain, Mawwall);
+        c.Register<PatternParams>(SpecKind.Brain, Pattern);
     }
 }
 

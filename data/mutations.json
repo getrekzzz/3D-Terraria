@@ -28,9 +28,15 @@
       "ice": "red_ice", "pink_ice": "red_ice" } }
   ],
   "mutations": [
-    { "id": "hardmode_ores", "name": "New Ores", "trigger": "hardmode",
-      "step": { "type": "oreVeins", "veins": ["cobalt_veins", "palladium_veins", "mythril_veins", "orichalcum_veins", "adamantite_veins", "titanium_veins"] },
-      "covers": ["terraria:hardmode_ores"] },
+    // Each Demon/Crimson Altar smashed with a Pwnhammer seeds the next tier of hardmode ore (one of each pair per world).
+    { "id": "altar_ores_1", "name": "Cobalt or Palladium", "trigger": "smashed_altar_1",
+      "step": { "type": "oreVeins", "veins": ["cobalt_veins", "palladium_veins"] }, "covers": ["terraria:hardmode_ores"] },
+    { "id": "altar_ores_2", "name": "Mythril or Orichalcum", "trigger": "smashed_altar_2",
+      "step": { "type": "oreVeins", "veins": ["mythril_veins", "orichalcum_veins"] } },
+    { "id": "altar_ores_3", "name": "Adamantite or Titanium", "trigger": "smashed_altar_3",
+      "step": { "type": "oreVeins", "veins": ["adamantite_veins", "titanium_veins"] } },
+    // Meteorites are appended by the game when one falls (after a Shadow Orb or Crimson Heart is smashed).
+    { "id": "meteorite", "name": "Meteorite", "trigger": "", "step": { "type": "meteor", "block": "meteorite", "radius": 9, "zone": "meteorite" }, "covers": ["terraria:meteor_fall"] },
     { "id": "hardmode_hallow", "name": "The Hallow", "trigger": "hardmode",
       "step": { "type": "wedge", "conversion": "hallow", "halfWidth": 14, "length": 220, "lean": 0.8, "depth": 0.9, "distance": 0.3 } },
     { "id": "hardmode_evil", "name": "The Corruption / Crimson", "trigger": "hardmode",

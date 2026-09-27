@@ -36,6 +36,9 @@ public sealed class EffectState
     /// <summary>The fastest dash equipped, if any.</summary>
     public Content.Specs.DashParams? Dash { get; set; }
 
+    /// <summary>Creature tags whose contact no longer hurts (Royal Gel).</summary>
+    public HashSet<string> Pacified { get; } = new(StringComparer.Ordinal);
+
     public void Clear()
     {
         Stats.Clear();
@@ -50,6 +53,7 @@ public sealed class EffectState
         Wings = null;
         RocketBoots = null;
         Dash = null;
+        Pacified.Clear();
     }
 
     /// <summary>Applies one effect spec (validated at content load).</summary>
@@ -94,6 +98,9 @@ public sealed class EffectState
             case EffectSpecs.Dash:
                 var d = Parsed<DashParams>(spec);
                 if (Dash == null || d.Speed > Dash.Speed) Dash = d;
+                break;
+            case EffectSpecs.Pacify:
+                Pacified.Add(Parsed<PacifyParams>(spec).Tag);
                 break;
             default:
                 throw new InvalidOperationException($"Unhandled effect type '{spec.Type}'.");

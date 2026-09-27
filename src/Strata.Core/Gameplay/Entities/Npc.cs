@@ -70,6 +70,12 @@ public sealed class Npc
     public Vector3 Anchor;
 
     public int Timer;
+
+    /// <summary>Pattern bosses: the phase entered (−1 before the first) and volley/summon clocks.</summary>
+    public int Stage = -1;
+
+    public int VolleyTimer;
+    public int SummonTimer;
     public int Counter;
     public int Counter2;
     public int Phase;
@@ -111,7 +117,7 @@ public sealed class Npc
     /// <summary>Centres of trailing body segments (worms), head first; empty for single-body creatures.</summary>
     public List<Vector3> Segments { get; } = new();
 
-    public bool IsBoss => Def.Boss != null;
+    public bool IsBoss => Def.Boss is { Minor: false };
 
     /// <summary>Every volume that can hit or be hit: the body plus segments.</summary>
     public IEnumerable<(Vector3 Min, Vector3 Max)> Volumes()

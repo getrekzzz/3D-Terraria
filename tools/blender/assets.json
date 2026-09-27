@@ -318,6 +318,34 @@
           "#8a8a90"
         ]
       }
+    },
+    "shadow_orb": {
+      "generator": "evil_orb",
+      "params": {
+        "kind": "orb"
+      }
+    },
+    "crimson_heart": {
+      "generator": "evil_orb",
+      "params": {
+        "kind": "heart"
+      }
+    },
+    "demon_altar": {
+      "generator": "altar",
+      "params": {}
+    },
+    "crimson_altar": {
+      "generator": "altar",
+      "params": {
+        "stone": "#6a2a2a",
+        "glow": "#ff4040",
+        "horn": "#e8d8c8"
+      }
+    },
+    "bee_larva": {
+      "generator": "larva",
+      "params": {}
     }
   },
   "items": {
@@ -1523,6 +1551,269 @@
           "color": "#e8c870",
           "band": "gold"
         }
+      },
+      "rotten_chunk": {
+        "generator": "chunk",
+        "params": {
+          "layer": "flesh",
+          "color": "#7a8a4a"
+        }
+      },
+      "vertebra": {
+        "generator": "bone",
+        "params": {}
+      },
+      "shadow_scale": {
+        "generator": "feather",
+        "params": {
+          "color": "#4a2a6a"
+        }
+      },
+      "tissue_sample": {
+        "generator": "blob",
+        "params": {
+          "color": "#c83a3a"
+        }
+      },
+      "vile_powder": {
+        "generator": "bottled",
+        "params": {
+          "color": "#9a6ac8"
+        }
+      },
+      "vicious_powder": {
+        "generator": "bottled",
+        "params": {
+          "color": "#e05050"
+        }
+      },
+      "bloody_spine": {
+        "generator": "bone",
+        "params": {}
+      },
+      "musket": {
+        "generator": "gun",
+        "params": {
+          "style": "musket"
+        }
+      },
+      "the_undertaker": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol",
+          "metal": "#6a2a2a"
+        }
+      },
+      "ball_o_hurt": {
+        "generator": "flail",
+        "params": {
+          "ball": "#5a3a7a"
+        }
+      },
+      "vilethorn": {
+        "generator": "staff",
+        "params": {
+          "gem": "#8a5ac8"
+        }
+      },
+      "crimson_rod": {
+        "generator": "wand",
+        "params": {
+          "gem": "#e8303a"
+        }
+      },
+      "the_rotted_fork": {
+        "generator": "spear",
+        "params": {
+          "prongs": true,
+          "metal": "#a83a3a"
+        }
+      },
+      "band_of_starpower": {
+        "generator": "ring",
+        "params": {
+          "gem": "#4a6aff"
+        }
+      },
+      "panic_necklace": {
+        "generator": "ring",
+        "params": {
+          "gem": "#c83a3a"
+        }
+      },
+      "worm_scarf": {
+        "generator": "spool",
+        "params": {
+          "color": "#8a6ac8"
+        }
+      },
+      "brain_of_confusion": {
+        "generator": "orb",
+        "params": {
+          "color": "#e88a9a"
+        }
+      },
+      "nights_edge": {
+        "generator": "sword",
+        "params": {
+          "metal": "#6a3aff",
+          "guard": "#2a1a4a",
+          "glow": true,
+          "length": 1.1
+        }
+      },
+      "abeemination": {
+        "generator": "orb",
+        "params": {
+          "color": "#f0c020"
+        }
+      },
+      "bee_wax": {
+        "generator": "blob",
+        "params": {
+          "color": "#e8c040"
+        }
+      },
+      "bee_gun": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol",
+          "metal": "#e8b020",
+          "accent": "#2a1a08"
+        }
+      },
+      "bee_keeper": {
+        "generator": "sword",
+        "params": {
+          "metal": "#f0c020",
+          "guard": "#2a1a08",
+          "length": 0.95
+        }
+      },
+      "bees_knees": {
+        "generator": "bow",
+        "params": {
+          "limbLayer": "plain"
+        }
+      },
+      "beenade": {
+        "generator": "bomb",
+        "params": {
+          "style": "grenade"
+        }
+      },
+      "honey_comb": {
+        "generator": "crate",
+        "params": {
+          "color": "#e8b030"
+        }
+      },
+      "hive_pack": {
+        "generator": "crate",
+        "params": {
+          "color": "#f0c020",
+          "band": "gold"
+        }
+      },
+      "royal_gel": {
+        "generator": "blob",
+        "params": {
+          "color": "#ff60c0",
+          "layer": "plain:glow"
+        }
+      },
+      "flinx_fur": {
+        "generator": "blob",
+        "params": {
+          "color": "#f4f6ff",
+          "layer": "cloth"
+        }
+      },
+      "deer_thing": {
+        "generator": "orb",
+        "params": {
+          "color": "#d8c8a8",
+          "standColor": "#5a4a3a"
+        }
+      },
+      "lucy_the_axe": {
+        "generator": "axe",
+        "params": {}
+      },
+      "weather_pain": {
+        "generator": "staff",
+        "params": {
+          "gem": "#cfe8ff"
+        }
+      },
+      "pew_matic_horn": {
+        "generator": "gun",
+        "params": {
+          "style": "launcher",
+          "metal": "#c8b890"
+        }
+      },
+      "meteorite_bar": {
+        "generator": "bar",
+        "params": {
+          "metal": "#c8502a",
+          "count": 2
+        }
+      },
+      "space_gun": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol",
+          "metal": "#8a3a2a",
+          "accent": "#4aff6a",
+          "glow": true
+        }
+      },
+      "star_cannon": {
+        "generator": "gun",
+        "params": {
+          "style": "launcher",
+          "metal": "#3a4a8a",
+          "accent": "#ffe860",
+          "glow": true
+        }
+      },
+      "meteor_shot": {
+        "generator": "bullet",
+        "params": {
+          "color": "#ffb04a",
+          "glow": true
+        }
+      },
+      "meteor_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#c8502a"
+        }
+      },
+      "meteor_suit": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#c8502a"
+        }
+      },
+      "meteor_leggings": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#c8502a"
+        }
+      },
+      "spiky_ball": {
+        "generator": "shuriken",
+        "params": {
+          "color": "#6a6a70"
+        }
+      },
+      "harpoon": {
+        "generator": "spear",
+        "params": {
+          "metal": "#8a8e96"
+        }
       }
     }
   },
@@ -2093,6 +2384,167 @@
       "generator": "prime_arm",
       "params": {
         "tool": "laser"
+      }
+    },
+    "brain_of_cthulhu": {
+      "generator": "brain",
+      "params": {}
+    },
+    "brain_of_cthulhu_exposed": {
+      "generator": "brain",
+      "params": {
+        "exposed": true
+      }
+    },
+    "creeper": {
+      "generator": "eye",
+      "params": {
+        "iris": "#a02020"
+      }
+    },
+    "eater_of_souls": {
+      "generator": "insect",
+      "params": {
+        "color": "#6a5a8a",
+        "stripes": "#3a2a4a",
+        "eyes": "#c080ff"
+      }
+    },
+    "crimera": {
+      "generator": "insect",
+      "params": {
+        "color": "#b83a3a",
+        "stripes": "#5a1a1a",
+        "eyes": "#ffd040"
+      }
+    },
+    "face_monster": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#b8484a",
+        "shirt": "#8a2a2a",
+        "pants": "#5a1a1a",
+        "hair": "#3a0a0a",
+        "eyes": "#ffe040",
+        "boots": "#4a1010",
+        "undead": true,
+        "hairStyle": "messy",
+        "build": 1.1,
+        "weight": 0.6
+      }
+    },
+    "blood_crawler": {
+      "generator": "crab",
+      "params": {
+        "shell": "#8a1a2a"
+      }
+    },
+    "bee": {
+      "generator": "insect",
+      "params": {
+        "color": "#f0c020",
+        "stripes": "#201a10",
+        "eyes": "#302010"
+      }
+    },
+    "queen_bee": {
+      "generator": "insect",
+      "params": {
+        "color": "#f0b818",
+        "stripes": "#2a1a08",
+        "eyes": "#3a2010"
+      }
+    },
+    "deerclops": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#6a5a4a",
+        "shirt": "#5a4a3a",
+        "pants": "#4a3a2a",
+        "hair": "#3a2e24",
+        "eyes": "#ff3a20",
+        "horns": "#e8e0d0",
+        "boots": "#2a2018",
+        "hairStyle": "messy",
+        "build": 1.6,
+        "weight": 0.9,
+        "height": 4.4
+      }
+    },
+    "goblin_peon": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#6a9a4a",
+        "eyes": "#ffd040",
+        "hairStyle": "bald",
+        "height": 1.35,
+        "build": 0.7,
+        "weight": 0.35,
+        "shirt": "#7a5a3a",
+        "pants": "#5a4028",
+        "boots": "#3a2a1a"
+      }
+    },
+    "goblin_thief": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#6a9a4a",
+        "eyes": "#ffd040",
+        "hairStyle": "bald",
+        "height": 1.35,
+        "build": 0.7,
+        "weight": 0.35,
+        "shirt": "#3a3a4a",
+        "pants": "#2a2a34",
+        "boots": "#1a1a20",
+        "hat": "hood",
+        "hatColor": "#2a2a3a"
+      }
+    },
+    "goblin_warrior": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#6a9a4a",
+        "eyes": "#ffd040",
+        "hairStyle": "bald",
+        "height": 1.6,
+        "build": 1.1,
+        "weight": 0.6,
+        "shirt": "#8a8e96",
+        "pants": "#5a5e66",
+        "boots": "#3a3e46"
+      }
+    },
+    "goblin_sorcerer": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#6a9a4a",
+        "eyes": "#ffd040",
+        "hairStyle": "bald",
+        "height": 1.35,
+        "build": 0.7,
+        "weight": 0.35,
+        "shirt": "#5a2a8a",
+        "pants": "#3a1a5a",
+        "boots": "#2a1030",
+        "robe": "#6a3a9a",
+        "trim": "#c08aff",
+        "hat": "hood",
+        "hatColor": "#5a2a8a"
+      }
+    },
+    "goblin_archer": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#6a9a4a",
+        "eyes": "#ffd040",
+        "hairStyle": "bald",
+        "height": 1.35,
+        "build": 0.7,
+        "weight": 0.35,
+        "shirt": "#4a6a3a",
+        "pants": "#3a4a2a",
+        "boots": "#2a3a1a"
       }
     }
   }
