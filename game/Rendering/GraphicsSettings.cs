@@ -146,8 +146,8 @@ public sealed class GraphicsSettings
         RenderingServer.DirectionalShadowAtlasSetSize(p.ShadowAtlas, true);
         RenderingServer.DirectionalSoftShadowFilterSetQuality((RenderingServer.ShadowQuality)p.ShadowFilter);
         RenderingServer.PositionalSoftShadowFilterSetQuality((RenderingServer.ShadowQuality)p.ShadowFilter);
-        RenderingServer.EnvironmentSetSsaoQuality((RenderingServer.EnvironmentSsaoQuality)p.SsaoQuality, p.SsaoQuality < 2, 0.5f, 2, 50f, 300f);
-        RenderingServer.EnvironmentSetSsilQuality((RenderingServer.EnvironmentSsilQuality)p.SsilQuality, p.SsilQuality < 2, 0.5f, 4, 50f, 300f);
+        RenderingServer.EnvironmentSetSsaoQuality((RenderingServer.EnvironmentSsaoQuality)p.SsaoQuality, p.SsaoHalf, 0.5f, 2, 50f, 300f);
+        RenderingServer.EnvironmentSetSsilQuality((RenderingServer.EnvironmentSsilQuality)p.SsilQuality, p.SsilHalf, 0.5f, 4, 50f, 300f);
         RenderingServer.EnvironmentSetVolumetricFogVolumeSize(p.VolumetricFogSize, p.VolumetricFogDepth);
         RenderingServer.EnvironmentSetVolumetricFogFilterActive(true);
         RenderingServer.EnvironmentGlowSetUseBicubicUpscale(true);

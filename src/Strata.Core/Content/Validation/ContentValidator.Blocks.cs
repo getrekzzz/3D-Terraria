@@ -50,6 +50,12 @@ public static partial class ContentValidator
             ctx.Ref(t, ctx.Db.LootTables, t.Loot, "loot");
             ctx.Ref(t, ctx.Db.Projectiles, t.Trap?.Projectile, "trap.projectile");
             ctx.Light(t, t.Light, "light");
+            if (t.Flame is { } flame)
+            {
+                if (flame.At.Length != 3 || flame.At.Any(v => MathF.Abs(v) > 16f)) ctx.Error(t, "flame.at must be [x, y, z] within ±16 m.");
+                if (flame.Size is <= 0f or > 4f) ctx.Error(t, "flame.size must be within (0, 4] m.");
+                ctx.Color(t, flame.Color, "flame.color");
+            }
             if (t.Variants < 1) ctx.Error(t, "variants must be >= 1.");
             for (int v = 0; v < t.Variants; v++) ctx.Asset(t, AssetPaths.ObjectModel(t, v), $"model (variant {v})");
             if (t.HitPoints < 1) ctx.Error(t, "hitPoints must be >= 1.");

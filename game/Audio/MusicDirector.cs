@@ -32,6 +32,7 @@ public sealed partial class MusicDirector : Node
     private double _check;
     private GameWorld? _game;
     private PlayerEntity? _player;
+    private Tween? _fade;
 
     /// <summary>The one director (created by the game root at boot).</summary>
     public static MusicDirector? Instance { get; private set; }
@@ -111,8 +112,10 @@ public sealed partial class MusicDirector : Node
     private AudioStream? Stream(string track)
     {
         if (_streams.TryGetValue(track, out var s)) return s;
-        string path = $"res://assets/audio/music/{track}.ogg";
-        s = ResourceLoader.Exists(path) ? GD.Load<AudioStream>(path) : null;
+        string path = $"{AudioDiagnostics.MusicDirectory}/{track}.ogg";
+        s = AudioDiagnostics.Load(path);
+        if (s == null && ResourceLoader.Exists(path))
+            GD.PushError($"audio: could not load {path}. Open the project in the Godot editor once (or run `godot --path . --import`) so the music is imported.");
         if (s is AudioStreamOggVorbis ogg) ogg.Loop = true;
         return _streams[track] = s;
     }
@@ -127,12 +130,14 @@ public sealed partial class MusicDirector : Node
         to.Stream = stream;
         to.VolumeDb = -40f;
         to.Play();
-        var tween = CreateTween().SetParallel();
+        _fade?.Kill(); // a quick second change must not leave two fades fighting over the same player
+        var tween = _fade = CreateTween().SetParallel();
         tween.TweenProperty(to, "volume_db", 0f, FadeSeconds);
         tween.TweenProperty(from, "volume_db", -60f, FadeSeconds);
         tween.Chain().TweenCallback(Callable.From(() =>
         {
             if (from != _players[_active]) from.Stop();
+            to.VolumeDb = 0f;
         }));
     }
 }

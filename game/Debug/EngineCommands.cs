@@ -20,7 +20,7 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|talk <resident>|shop|close>", Help = "Opens or closes gameplay screens.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close>", Help = "Opens or closes gameplay screens.",
             Run = (ctx, a) =>
             {
                 var screen = world.Inventory ?? throw new CommandException("no inventory screen in this mode");
@@ -28,6 +28,9 @@ public static class EngineCommands
                 switch (a.Str(0, "screen"))
                 {
                     case "inventory": screen.SetOpen(true); return CommandResult.Success("Inventory open.");
+                    case "map":
+                        (world.WorldMap ?? throw new CommandException("no map in this mode")).SetOpen(true);
+                        return CommandResult.Success("Map open.");
                     case "talk":
                         var id = a.Str(1, "resident");
                         var npc = ctx.World.Town.Find(id) ?? throw new CommandException($"'{id}' does not live in town");
@@ -41,6 +44,7 @@ public static class EngineCommands
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
+                        world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
                     default: throw new CommandException("expected inventory, talk, shop or close");
                 }
@@ -74,6 +78,35 @@ public static class EngineCommands
                 if (!graphics.Config.Presets.ContainsKey(name)) throw new CommandException($"unknown preset '{name}' (available: {string.Join(", ", graphics.Config.Presets.Keys)})");
                 graphics.Select(name, world.Runtime.GetViewport(), remember: true);
                 return CommandResult.Success($"Graphics preset '{name}'.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "audio", Usage = "audio [test|files|device <name|Default>]",
+            Help = "Shows the audio driver, output device and buses; plays a test chime; checks every sound file; or picks the output device.",
+            Run = (_, a) =>
+            {
+                string info = $"{Audio.AudioDiagnostics.Device()}\nBuses: {Audio.AudioDiagnostics.Buses()}";
+                switch (a.Count == 0 ? "" : a.Str(0, "action"))
+                {
+                    case "":
+                        return CommandResult.Success($"{info}\nDevices: {string.Join(" | ", Godot.AudioServer.GetOutputDeviceList())}");
+                    case "test":
+                        Audio.AudioDiagnostics.PlayTest(world.Runtime);
+                        return CommandResult.Success($"Playing a test chime, then a click.\n{info}");
+                    case "files":
+                        var (loaded, total, failed) = Audio.AudioDiagnostics.ProbeFiles();
+                        return failed.Count == 0 ? CommandResult.Success($"All {total} sound files load.")
+                            : CommandResult.Fail($"{loaded}/{total} sound files load; failed: {string.Join(", ", failed)}");
+                    case "device":
+                        var s = Settings.UserSettings.Current;
+                        a.Str(1, "device name");
+                        s.AudioDevice = string.Join(" ", System.Linq.Enumerable.Skip(a.All, 1)); // device names contain spaces
+                        s.Apply();
+                        s.Save();
+                        return CommandResult.Success($"Output: {Audio.AudioDiagnostics.Device()}");
+                    default: throw new CommandException("expected test, files or device");
+                }
             },
         });
         r.Register(new CommandDef

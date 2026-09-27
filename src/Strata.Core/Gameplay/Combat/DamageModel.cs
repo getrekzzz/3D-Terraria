@@ -23,6 +23,14 @@ public static class DamageModel
         _ => 0.5f,
     };
 
+    /// <summary>Creature life and damage by world difficulty (the reference game doubles them in Expert, triples in Master).</summary>
+    public static float EnemyScale(Difficulty difficulty) => difficulty switch
+    {
+        Difficulty.Expert => 2f,
+        Difficulty.Master => 3f,
+        _ => 1f,
+    };
+
     public static string DamageStat(DamageClass c) => c switch
     {
         DamageClass.Melee => StatIds.MeleeDamage,

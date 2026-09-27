@@ -73,6 +73,7 @@ public partial class GameRoot : Node
         log.Info("boot", $"Graphics preset '{graphics.Name}'.");
         log.Info("boot", $"Content: {content.Blocks.Count} blocks, {content.Items.Count} items, {content.Recipes.Count} recipes.");
         Audio.AudioBuses.Setup();
+        Audio.AudioDiagnostics.LogStartup(log, IsAutomated(args));
         Audio.Sfx.Attach(this);
         AddChild(new Audio.MusicDirector());
         var dynamicResolution = new Rendering.DynamicResolution();

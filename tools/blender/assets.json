@@ -3794,7 +3794,7 @@
     "demon_eye": {
       "generator": "eye",
       "params": {
-        "iris": "#3a8a5a"
+        "iris": "#e0201a"
       }
     },
     "cave_bat": {

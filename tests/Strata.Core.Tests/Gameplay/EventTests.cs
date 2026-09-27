@@ -20,6 +20,7 @@ public class EventTests
         Assert.True(g.World.Events.SpawnRateMultiplier > 2f);
 
         var seen = new HashSet<string>();
+        g.World.Spawner.Config = new SpawnConfig { SafeRadius = 0 }; // the arena is the world spawn
         for (int i = 0; i < 40; i++)
             foreach (var n in g.World.Spawner.TrySpawnNear(g.Player)) seen.Add(n.Def.Id);
         Assert.True(seen.Contains("blood_zombie") || seen.Contains("drippler"), "no blood moon creatures: " + string.Join(",", seen));
@@ -34,6 +35,8 @@ public class EventTests
     {
         using var g = TestGame.Create();
         g.World.Spawner.Enabled = false;
+        g.Player.State.BonusLife = 40; // the Blood Moon needs a player with more than 120 max life
+        g.Player.State.Recompute();
         int started = 0;
         g.World.Events.Started += e => { if (e.Id == "blood_moon") started++; };
         var clock = g.World.Session.Clock;

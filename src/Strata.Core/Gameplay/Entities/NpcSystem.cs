@@ -26,6 +26,9 @@ public sealed partial class NpcSystem
     public const int DespawnDelayTicks = 180;
     public const int PlayerHitImmunity = 40;
 
+    /// <summary>Creatures leaving at dawn despawn once this far (m) from every player.</summary>
+    public const float LeaveDistance = 32f;
+
     private readonly GameWorld _world;
     private readonly List<Npc> _npcs = new();
     private readonly Dictionary<EnemyDef, IBrain> _brains = new();
@@ -56,7 +59,7 @@ public sealed partial class NpcSystem
             },
             Shoot = (id, from, velocity, damage) =>
             {
-                if (world.Session.Content.Projectiles.TryGet(id, out var def)) world.Projectiles.Spawn(def, from, velocity, null, damage, 3f, Content.Defs.DamageClass.None, 0);
+                if (world.Session.Content.Projectiles.TryGet(id, out var def)) world.Projectiles.Spawn(def, from, velocity, null, (int)(damage * Scale), 3f, Content.Defs.DamageClass.None, 0);
             },
             Announce = text => Announced?.Invoke(text),
             Bands = world.Session.Generator.Plan.Bands,
@@ -64,6 +67,9 @@ public sealed partial class NpcSystem
     }
 
     public IReadOnlyList<Npc> All => _npcs;
+
+    /// <summary>Creature life and damage multiplier of the world's difficulty.</summary>
+    public float Scale => DamageModel.EnemyScale(_world.Session.Settings.Difficulty);
 
     public event Action<Npc>? Spawned;
     public event Action<Npc>? Removed;
@@ -88,6 +94,7 @@ public sealed partial class NpcSystem
     {
         if (_npcs.Count >= MaxNpcs) return null;
         var npc = new Npc(_nextId++, def, feet) { Yaw = _rng.NextFloat() * MathF.Tau, Invulnerable = def.Invulnerable };
+        if (Scale > 1f) npc.Life = npc.MaxLife = (int)(def.Life * Scale);
         if (def.Boss is { Segments: > 0 } boss)
             for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
         bool joinsGroup = def.Boss is { Minor: false } && GroupAlive(def.Boss, npc);
@@ -162,7 +169,8 @@ public sealed partial class NpcSystem
                 Remove(i);
                 continue;
             }
-            bool leaving = npc.Def.Boss is { DespawnAtDay: true } && session.Clock.IsDay;
+            // Bosses that leave at day go at once; creatures walking off at dawn go once out of sight.
+            bool leaving = (npc.Def.Boss is { DespawnAtDay: true } && session.Clock.IsDay) || (npc.Leaving && distance > LeaveDistance);
             if (distance > despawn || leaving)
             {
                 if (++npc.FarTicks > (leaving ? 1 : DespawnDelayTicks))
@@ -183,7 +191,8 @@ public sealed partial class NpcSystem
             _ctx.OnSurface = session.Generator.Plan.Bands.LayerAt(npc.Cell.Y) == World.WorldLayer.Surface;
             _ctx.Rng = _rng;
             var brain = BrainOf(npc.Def);
-            brain.Think(npc, _ctx);
+            if (npc.StunTicks > 0) Reel(npc, brain);
+            else brain.Think(npc, _ctx);
             _rng = _ctx.Rng;
             if (npc.Def.Shield != null && ShieldUp(npc)) npc.Invulnerable = true;
             if (brain.UsesGravity && npc.Def.Gravity) npc.Velocity.Y = MathF.Max(npc.Velocity.Y - BrainContext.Gravity * dt, -30f);
@@ -243,7 +252,7 @@ public sealed partial class NpcSystem
         var pBox = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
         if (!npc.Volumes().Any(v => Npc.Overlaps(v, pBox))) return;
         var state = player.State;
-        var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale), DamageClass.None, 0, 6f, null, state.Defense,
+        var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale * Scale), DamageClass.None, 0, 6f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
         if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;
@@ -272,8 +281,7 @@ public sealed partial class NpcSystem
         npc.Life -= hit.Damage;
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
-        var away = BrainFactory.Flat(npc.Position - from);
-        npc.Velocity += away * hit.Knockback * 1.2f + new Vector3(0, hit.Knockback * 0.5f, 0);
+        Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback);
         Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
@@ -294,7 +302,9 @@ public sealed partial class NpcSystem
             var rng = new Pcg32(Hash.Combine((ulong)npc.Id, _world.Session.Clock.Tick));
             drops.AddRange(_loot.Roll(npc.Def.Loot, ref rng, _world.Session.ContextAt(cell)));
         }
-        if (npc.Def.Value > 0) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
+        // Coins come from the loot table when it names them, else from the creature's value (never both).
+        bool tableCoins = npc.Def.Loot != null && _world.Session.Content.LootTables.TryGet(npc.Def.Loot, out var table) && table.Coins != null;
+        if (npc.Def.Value > 0 && !tableCoins) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);
@@ -319,6 +329,10 @@ public sealed partial class NpcSystem
     }
 
     public int CountNear(Vector3 point, float radius) => _npcs.Count(n => Vector3.DistanceSquared(n.Center, point) < radius * radius);
+
+    /// <summary>Creatures near a point that are (or are not) critters.</summary>
+    public int CountNear(Vector3 point, float radius, bool critters) =>
+        _npcs.Count(n => n.Def.HasTag("critter") == critters && Vector3.DistanceSquared(n.Center, point) < radius * radius);
 
     /// <summary>Takes a creature out of the world without killing it (caught in a bug net).</summary>
     public void Despawn(Npc npc)

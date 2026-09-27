@@ -83,7 +83,7 @@ public sealed partial class NpcSystem
             if (c.Y < min.Y || c.Y > max.Y || c.Z < min.Z || c.Z > max.Z) continue;
             if ((c.X - front) * dir > -PlayerEntity.HalfExtents.X) continue; // in front of the wall
             var state = p.State;
-            var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale), Content.Defs.DamageClass.None, 0, 0f, null, state.Defense,
+            var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale * Scale), Content.Defs.DamageClass.None, 0, 0f, null, state.Defense,
                 DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref _rng);
             if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) continue;
             ReportPlayerDamage(p, hit.Damage, new Vector3(dir * BarrierThrow, 5f, 0));

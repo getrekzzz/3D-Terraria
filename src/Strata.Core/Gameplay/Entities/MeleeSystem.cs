@@ -75,6 +75,10 @@ public sealed class MeleeSystem
         }
     }
 
+    /// <summary>How far off the aim line a thrust still connects (m): generous, since aiming a short blade at a circling
+    /// flyer in 3D is much harder than in the reference game's side view.</summary>
+    public const float ThrustTolerance = 0.7f;
+
     private static bool Connects(Swing s, Vector3 center, Vector3 half, float t)
     {
         var origin = s.Player.Center + new Vector3(0, 0.3f, 0);
@@ -86,7 +90,7 @@ public sealed class MeleeSystem
             var dir = new Vector3(MathF.Sin(s.Yaw) * MathF.Cos(s.Pitch), MathF.Sin(s.Pitch), MathF.Cos(s.Yaw) * MathF.Cos(s.Pitch));
             float along = Vector3.Dot(to, dir);
             if (along < 0 || along > length + radius) return false;
-            return (to - dir * along).Length() <= radius + 0.45f;
+            return (to - dir * along).Length() <= radius + ThrustTolerance;
         }
         var swing = s.Item.Swing!;
         float reach = swing.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.6f;

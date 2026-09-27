@@ -25,6 +25,7 @@ public sealed class LaunchedWorld
     public UI.InventoryScreen? Inventory { get; init; }
     public UI.Hud? Hud { get; init; }
     public UI.TownDialog? TownDialog { get; init; }
+    public UI.WorldMapScreen? WorldMap { get; init; }
 }
 
 /// <summary>What to open: a world directory (created from <see cref="NewWorld"/> when missing) and a character.</summary>
@@ -101,6 +102,15 @@ public static class WorldLauncher
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
         drops.Initialize(game);
+        var lights = new Rendering.DynamicLights();
+        runtime.AddChild(lights);
+        lights.Initialize(services.Graphics);
+        lights.AddProvider((eye, radius) => Rendering.DynamicLights.PlacedLights(game, objectRenderer.Placement, eye, radius));
+        lights.AddProvider(creatures.Glows);
+        var lava = new Rendering.LavaEffects();
+        runtime.AddChild(lava);
+        lava.Initialize(runtime);
+        lights.AddProvider(lava.HeatLights);
 
         if (o.FreeCamera) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
 
@@ -151,7 +161,7 @@ public static class WorldLauncher
         trail.Initialize(game);
         var carried = new PlayerLight();
         player.AddChild(carried);
-        carried.Initialize(entity, services.Graphics);
+        carried.Initialize(entity, services.Graphics, () => viewModel.LightAnchor, () => avatar.LightAnchor);
 
         var interaction = new InteractionController();
         interaction.Initialize(runtime, player);
@@ -167,13 +177,19 @@ public static class WorldLauncher
         var inventory = new UI.InventoryScreen();
         runtime.AddChild(inventory);
         inventory.Initialize(ui);
+        var worldMap = new UI.WorldMapScreen();
+        runtime.AddChild(worldMap);
+        worldMap.Initialize(ui);
+        var minimap = new UI.Minimap();
+        runtime.AddChild(minimap);
+        minimap.Initialize(ui, worldMap);
         var townDialog = new UI.TownDialog();
         runtime.AddChild(townDialog);
         townDialog.Initialize(ui);
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
-        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog };
+        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

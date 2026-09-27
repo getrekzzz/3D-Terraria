@@ -17,6 +17,12 @@ public sealed class ChunkMeshResult
     public MeshSurface Transparent { get; } = new();
     public MeshSurface Cutout { get; } = new();
     public MeshSurface Liquid { get; } = new();
+
+    /// <summary>Lava, drawn opaque with its own material (it hides what is behind it and needs no refraction).</summary>
+    public MeshSurface Lava { get; } = new();
+
+    /// <summary>World cells whose lava surface is open to the air (embers, heat light), at most <see cref="LiquidMesher.MaxLavaTops"/>.</summary>
+    public List<Int3> LavaTops { get; } = new();
     public CollisionBuilder Collision { get; } = new();
 
     /// <summary>Grass clumps on the chunk's grass surfaces (empty when the tables carry no grass settings).</summary>
@@ -36,7 +42,7 @@ public sealed class ChunkMeshResult
     /// <summary>Which of the chunk's faces see each other through open cells (for cave culling).</summary>
     public ushort Visibility { get; set; } = ChunkVisibility.AllConnected;
 
-    public bool IsEmpty => Opaque.IsEmpty && Transparent.IsEmpty && Cutout.IsEmpty && Liquid.IsEmpty;
+    public bool IsEmpty => Opaque.IsEmpty && Transparent.IsEmpty && Cutout.IsEmpty && Liquid.IsEmpty && Lava.IsEmpty;
 }
 
 /// <summary>Runs lighting and all meshers for one chunk. Thread-safe (per-thread scratch buffers).</summary>
@@ -59,7 +65,7 @@ public static class ChunkMesher
         var vol = new MeshVolume(nb, tables, light);
         SurfaceNetsMesher.Build(vol, result.Opaque, result.Collision);
         CellMesher.Build(vol, result.Opaque, result.Transparent, result.Cutout, result.Collision);
-        LiquidMesher.Build(vol, result.Liquid);
+        LiquidMesher.Build(vol, result.Liquid, result.Lava, result.LavaTops);
         GrassScatter.Build(vol, result.Opaque, result.Grass);
         result.Visibility = ChunkVisibility.Compute(nb, tables);
         result.SkyExposed = AnySky(light);

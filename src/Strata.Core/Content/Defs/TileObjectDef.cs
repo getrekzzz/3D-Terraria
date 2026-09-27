@@ -46,6 +46,9 @@ public sealed class TileObjectDef : ContentDef
 
     public int[]? Light { get; init; }
 
+    /// <summary>A living flame drawn over the model (torches, candles).</summary>
+    public FlameSpec? Flame { get; init; }
+
     /// <summary>Crafting station identities this object provides (e.g. "work_bench", "furnace").</summary>
     public string[] Stations { get; init; } = Array.Empty<string>();
 
@@ -160,4 +163,17 @@ public sealed class TrapDef
 
     /// <summary>Launch speed in m/s.</summary>
     public float Speed { get; init; } = 22f;
+}
+
+/// <summary>Where a flame burns on an object's model and how it looks.</summary>
+public sealed class FlameSpec
+{
+    /// <summary>Base of the flame in model space (metres, Y up).</summary>
+    public float[] At { get; init; } = { 0f, 0.4f, 0f };
+
+    /// <summary>Flame height in metres.</summary>
+    public float Size { get; init; } = 0.2f;
+
+    /// <summary>Colour of the flame's body (its core burns near white).</summary>
+    public string Color { get; init; } = "#ff8a2a";
 }

@@ -77,6 +77,9 @@ public sealed class GraphicsPreset
     /// <summary>Carried torches cast shadows.</summary>
     public bool TorchShadows { get; set; }
 
+    /// <summary>Real lights for the nearest placed torches, lava and glowing creatures (0 = baked light only).</summary>
+    public int DynamicLights { get; set; } = 8;
+
     public bool Ssao { get; set; } = true;
 
     /// <summary>0 very low … 4 ultra.</summary>
@@ -86,6 +89,11 @@ public sealed class GraphicsPreset
     public bool Ssil { get; set; }
 
     public int SsilQuality { get; set; } = 2;
+
+    /// <summary>Compute SSAO / SSIL at half resolution (much cheaper, slightly softer).</summary>
+    public bool SsaoHalf { get; set; } = true;
+
+    public bool SsilHalf { get; set; } = true;
 
     /// <summary>Screen-space reflections on smooth opaque surfaces.</summary>
     public bool Ssr { get; set; }
@@ -145,6 +153,7 @@ public sealed class GraphicsPreset
         if (GrassDensity is < 0f or > 1f) yield return "grassDensity must be within 0–1";
         if (GrassDistance is < 0f or > 200f) yield return "grassDistance must be within 0–200 m";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
+        if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
     }
 

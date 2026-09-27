@@ -6,7 +6,7 @@ namespace Strata.Core.WorldGen.Structures;
 
 /// <summary>
 /// Abandoned mine networks: timber-braced corridors with rail tracks (future minecart routes),
-/// lanterns, junctions and descending shafts.
+/// lanterns, junctions and descending shafts, the odd pot along the way and a miner's chest at the far end.
 /// </summary>
 public static class MineshaftBuilder
 {
@@ -17,6 +17,8 @@ public static class MineshaftBuilder
         var bp = new Blueprint { Flags = Voxels.CellFlags.None };
         var rail = content.TileObjects.Get("minecart_track");
         var torch = content.TileObjects.Get("torch");
+        var pot = content.TileObjects.Get("pot");
+        var chest = content.TileObjects.Get("wooden_chest");
         var pos = start;
         int dir = rng.NextInt(4);
         for (int s = 0; s < segments; s++)
@@ -53,8 +55,15 @@ public static class MineshaftBuilder
                 }
                 bp.Object(rail, c, 0);
                 if (i % 12 == 6) bp.Object(torch, c + side, 0);
+                else if (i % 17 == 11 && rng.Chance(0.5f)) bp.Object(pot, c - side * 2, 0, rng.NextInt(3));
             }
             pos += d * len;
+            if (s == segments - 1)
+            {
+                // The end of the line: whatever the miners left behind.
+                bp.Object(chest, pos - d * 3 + side, 0, 0, "cabin_chest");
+                bp.Object(torch, pos - d * 4 - side, 0);
+            }
             dir = (dir + (rng.Chance(0.5f) ? 1 : 3)) % 4;
         }
         return bp;

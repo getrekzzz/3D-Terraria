@@ -23,15 +23,9 @@ public sealed class StructurePlacementPass : GenPass
         var bands = plan.Bands;
         var content = ctx.Content;
 
-        for (int i = 0, n = ctx.Scaled(26); i < n; i++)
-        {
-            if (!ctx.TryRandomLandPoint(ref rng, 0.9f, 60f, out float x, out float z)) continue;
-            int y = (int)bands.YForNormalizedDepth(rng.Range(0.06f, 0.85f));
-            string wood = WoodFor(ctx, x, y, z);
-            AddStructure(plan, "cabin", CabinBuilder.Build(content, new Int3((int)x, y, (int)z), wood, ref rng));
-        }
+        PlaceCabins(ctx, ref rng);
 
-        for (int i = 0, n = Math.Max(1, ctx.Scaled(3)); i < n; i++)
+        for (int i = 0, n = Math.Max(1, ctx.Scaled(5)); i < n; i++)
         {
             if (!ctx.TryRandomLandPoint(ref rng, 0.92f, 80f, out float x, out float z)) continue;
             int y = (int)bands.YForNormalizedDepth(rng.Range(0.05f, 0.3f));
@@ -84,6 +78,44 @@ public sealed class StructurePlacementPass : GenPass
             if (f is ChamberFeature ch && ch.Kind is "shrine" or "minibiome") MiniBiomeCarver.Carve(ctx, ch);
             else if (f is StructureFeature s && s.Kind is "cabin" or "mineshaft" or "living_tree" or "pyramid" or "shrine_altar")
                 FeatureCarver.Stamp(ctx, s.Blueprint);
+        }
+    }
+
+    /// <summary>
+    /// Abandoned cabins, most of them standing in the cave tunnels (the tunnel runs through their doorways) so exploring
+    /// finds them; the rest are buried somewhere in the rock as before. Cavern-layer cabins hold a Gold Chest.
+    /// </summary>
+    private static void PlaceCabins(PlanContext ctx, ref Pcg32 rng)
+    {
+        var plan = ctx.Plan;
+        var bands = plan.Bands;
+        // Tunnel segments well under the surface (the worm tunnels from the cave pass).
+        var tunnels = plan.Features.OfKind<CapsuleFeature>("worm")
+            .Where(c => ctx.Terrain.SurfaceHeight((c.A.X + c.B.X) * 0.5f, (c.A.Z + c.B.Z) * 0.5f) - (c.A.Y + c.B.Y) * 0.5f > 24f)
+            .ToList();
+        var placed = new List<Vector3>();
+        for (int i = 0, n = ctx.Scaled(34); i < n; i++)
+        {
+            Vector3 at;
+            Vector3? along = null;
+            if (tunnels.Count > 0 && rng.Chance(0.8f))
+            {
+                var t = tunnels[rng.NextInt(tunnels.Count)];
+                var mid = (t.A + t.B) * 0.5f;
+                at = new Vector3(mid.X, mid.Y - (t.RadiusA + t.RadiusB) * 0.5f + 1f, mid.Z);
+                along = t.B - t.A;
+            }
+            else
+            {
+                if (!ctx.TryRandomLandPoint(ref rng, 0.9f, 60f, out float x, out float z)) continue;
+                at = new Vector3(x, bands.YForNormalizedDepth(rng.Range(0.06f, 0.85f)), z);
+            }
+            if (placed.Any(p => Vector3.DistanceSquared(p, at) < 40f * 40f)) continue; // keep cabins apart
+            placed.Add(at);
+            bool deep = bands.LayerAt(at.Y) is World.WorldLayer.Cavern or World.WorldLayer.Underworld;
+            string wood = WoodFor(ctx, at.X, at.Y, at.Z);
+            var floor = new Int3((int)at.X, (int)at.Y, (int)at.Z);
+            AddStructure(plan, "cabin", CabinBuilder.Build(ctx.Content, floor, wood, ref rng, deep, along));
         }
     }
 

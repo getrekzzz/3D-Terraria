@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using Strata.Game.Bootstrap;
 using Strata.Game.Settings;
@@ -97,6 +98,34 @@ public sealed partial class SettingsScreen : PanelContainer
         box.AddChild(MenuKit.Row("Music", MenuKit.Slider(0, 1, 0.01, S.MusicVolume, v => { S.MusicVolume = (float)v; Changed(); }, Percent)));
         box.AddChild(MenuKit.Row("Sound", MenuKit.Slider(0, 1, 0.01, S.SoundVolume, v => { S.SoundVolume = (float)v; Changed(); }, Percent)));
         box.AddChild(MenuKit.Row("Ambient", MenuKit.Slider(0, 1, 0.01, S.AmbientVolume, v => { S.AmbientVolume = (float)v; Changed(); }, Percent)));
+
+        box.AddChild(Header("Output"));
+        var devices = Godot.AudioServer.GetOutputDeviceList();
+        int current = System.Math.Max(0, System.Array.IndexOf(devices, S.AudioDevice));
+        box.AddChild(MenuKit.Row("Output device", MenuKit.Choice(devices, current, i => { S.AudioDevice = devices[i]; Changed(); }),
+            "Where the game's sound goes. \"Default\" follows the Windows default device."));
+        var status = MenuKit.Text(Status(), 15);
+        status.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        var test = MenuKit.Small("Test sound", () =>
+        {
+            Strata.Game.Audio.AudioDiagnostics.PlayTest(this);
+            status.Text = Status(probe: true);
+        });
+        box.AddChild(MenuKit.Row("Check", test, "Plays a chime made by the game itself, then a game sound, and checks every sound file."));
+        box.AddChild(status);
+    }
+
+    /// <summary>What the audio system is doing; with <paramref name="probe"/>, also whether every sound file loads.</summary>
+    private static string Status(bool probe = false)
+    {
+        var text = $"Using {Strata.Game.Audio.AudioDiagnostics.Device()}";
+        if (Strata.Game.Audio.AudioDiagnostics.Silent) text += "\nNo audio device is active, so nothing can be heard. Check Windows' sound output.";
+        if (!probe) return text;
+        var (loaded, total, failed) = Strata.Game.Audio.AudioDiagnostics.ProbeFiles();
+        text += $"\nSound files: {loaded}/{total} loaded.";
+        if (failed.Count > 0)
+            text += $" Missing: {string.Join(", ", failed.Take(4))}{(failed.Count > 4 ? "…" : "")}. Open the project in the Godot editor once so the sounds are imported.";
+        return text;
     }
 
     private void Interface(VBoxContainer box)
@@ -106,6 +135,7 @@ public sealed partial class SettingsScreen : PanelContainer
         box.AddChild(MenuKit.Row("Show target name", MenuKit.Toggle(S.ShowTargetName, v => { S.ShowTargetName = v; Changed(); }),
             "Names the block or object under the crosshair."));
         box.AddChild(MenuKit.Row("Show FPS", MenuKit.Toggle(S.ShowFps, v => { S.ShowFps = v; Changed(); })));
+        box.AddChild(MenuKit.Row("Minimap", MenuKit.Toggle(S.ShowMinimap, v => { S.ShowMinimap = v; Changed(); }), "The discovered map around you, top right. M opens the full map."));
         box.AddChild(MenuKit.Row("Cursor colour", MenuKit.ColorField(S.CursorColor, h => { S.CursorColor = h; Changed(); })));
     }
 }

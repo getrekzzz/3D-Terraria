@@ -45,6 +45,8 @@ public sealed partial class PerfOverlay : CanvasLayer
         var light = LightProbe.Sample(session.World, (_runtime.Focus?.GlobalPosition ?? Vector3.Zero) + Vector3.Up);
         var sb = new StringBuilder();
         sb.AppendLine($"FPS {Engine.GetFramesPerSecond():0}  frame {Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.0} ms  physics {Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.0} ms");
+        var viewport = GetViewport();
+        sb.AppendLine($"GPU {FrameTiming.GpuMs(viewport):0.0} ms  render CPU {FrameTiming.CpuMs(viewport):0.0} ms  3D scale {DynamicResolution.CurrentScale * 100:0}%  preset {_runtime.Services.Graphics.Name}");
         sb.AppendLine($"chunks loaded {s.LoadedCount} meshed {s.MeshedCount}  in flight: loads {s.LoadsInFlight} meshes {s.MeshesInFlight}");
         sb.AppendLine($"jobs pending {_runtime.Jobs.Pending} running {_runtime.Jobs.Running}  uploads {_runtime.Renderer.PendingUploads}  colliders {_runtime.Colliders.BodyCount}");
         sb.AppendLine($"draw calls {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TotalDrawCallsInFrame)}  primitives {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TotalPrimitivesInFrame) / 1000}k  objects {_objects?.InstanceCount ?? 0}");

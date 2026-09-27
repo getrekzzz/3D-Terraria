@@ -42,7 +42,7 @@ public sealed partial class NpcSystem
                 d = Vector3.Normalize(d + side * _rng.NextSigned() * spread + up * _rng.NextSigned() * spread);
             }
             float clear = parts ? (npc.Def.Boss?.SegmentRadius ?? 0.5f) + 0.2f : npc.HalfExtents.X + 0.2f;
-            _world.Projectiles.Spawn(def, from + d * clear, d * r.Speed, null, r.Damage, 3f, Content.Defs.DamageClass.None, 0);
+            _world.Projectiles.Spawn(def, from + d * clear, d * r.Speed, null, (int)(r.Damage * Scale), 3f, Content.Defs.DamageClass.None, 0);
         }
         npc.Pose = "attack";
     }

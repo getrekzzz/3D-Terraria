@@ -127,6 +127,7 @@ public sealed partial class GameWorld : IDisposable
         Progression = new Gameplay.Progression.ProgressionSystem(this);
         Mutations = new Gameplay.Progression.MutationDirector(this);
         Spread = new Gameplay.Progression.SpreadSystem(this);
+        Maps = new Gameplay.Map.MapSystem(this);
         Npcs = new NpcSystem(this);
         Melee = new MeleeSystem(Npcs, ItemUse);
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
@@ -159,6 +160,8 @@ public sealed partial class GameWorld : IDisposable
     public Gameplay.Progression.ProgressionSystem Progression { get; }
     public Gameplay.Progression.MutationDirector Mutations { get; }
     public Gameplay.Progression.SpreadSystem Spread { get; }
+    /// <summary>Each player's discovered map of this world (revealed as they explore, saved with the world).</summary>
+    public Gameplay.Map.MapSystem Maps { get; }
     public NpcSystem Npcs { get; }
     public MeleeSystem Melee { get; }
     public ProjectileSystem Projectiles { get; }
@@ -222,6 +225,7 @@ public sealed partial class GameWorld : IDisposable
         }
         var prof = Diagnostics.Metrics.Frame;
         using (prof.Time("tick.players")) foreach (var p in Players) TickPlayer(p);
+        using (prof.Time("tick.map")) Maps.Tick();
         using (prof.Time("tick.liquids")) Liquids.Tick(Session.Clock.Tick);
         using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
         using (prof.Time("tick.events")) Events.Tick();
@@ -290,8 +294,18 @@ public sealed partial class GameWorld : IDisposable
         p.State.Vitals.Mana = p.State.Vitals.MaxMana;
         p.Position = SpawnPositionFor(p.State);
         p.Velocity = Vector3.Zero;
+        p.State.Vitals.ImmunityTicks = RespawnImmunityTicks;
+        // Whatever was waiting at the spawn point (usually what killed the player) wanders off.
+        foreach (var npc in Npcs.All.Where(n => !n.IsBoss && !n.Def.HasTag("critter") && Vector3.Distance(n.Center, p.Center) < RespawnClearRadius).ToList())
+            Npcs.Despawn(npc);
         PlayerRespawned?.Invoke(p);
     }
+
+    /// <summary>Invulnerability after respawning, as in the reference game.</summary>
+    public const int RespawnImmunityTicks = Units.TicksPerSecond * 3;
+
+    /// <summary>Ordinary creatures this close to the respawn point leave when a player respawns.</summary>
+    public const float RespawnClearRadius = 20f;
 
     public PlayerEntity AddPlayer(PlayerState state, Vector3 feet)
     {
@@ -316,6 +330,7 @@ public sealed partial class GameWorld : IDisposable
         Town.Persist();
         int chunks = Session.SaveAll();
         foreach (var p in Players) SavePlayer(p.State);
+        Maps.Save();
         return chunks;
     }
 

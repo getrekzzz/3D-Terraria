@@ -18,13 +18,15 @@ uniform vec3 sun_light = vec3(1.0);
 uniform vec3 moon_light = vec3(0.1);
 // Average sky irradiance colour (ambient on the clouds' shaded sides).
 uniform vec3 sky_ambient = vec3(0.3, 0.4, 0.6);
-uniform vec3 camera_pos = vec3(0.0);
+// Per-frame values are globals: changing a sky material parameter re-renders the radiance cubemap, so the material
+// itself only changes a few times a second (EnvironmentController).
+global uniform vec3 strata_camera;
+global uniform float strata_time;
 uniform vec3 tint : source_color = vec3(1.0);
 uniform vec3 ambient_tint : source_color = vec3(1.0);
 uniform vec3 airglow = vec3(0.0035, 0.0055, 0.011);
 uniform float night = 0.0;
 uniform float star_rotation = 0.0;
-uniform float twinkle = 0.0;
 uniform int cloud_steps = 3;
 
 const float RP = 6360.0;
@@ -96,10 +98,10 @@ float hg(float mu, float g) {
 }
 
 vec4 cloud_layer(vec3 d, float detail, int steps) {
-	float rise = strata_clouds.w - camera_pos.y;
+	float rise = strata_clouds.w - strata_camera.y;
 	if (d.y < 0.012 || rise <= 0.0 || strata_clouds.z <= 0.001) return vec4(0.0);
 	float t = rise / d.y;
-	vec2 xz = camera_pos.xz + d.xz * t;
+	vec2 xz = strata_camera.xz + d.xz * t;
 	float dens = strata_cloud_density(xz, detail);
 	if (dens < 0.002) return vec4(0.0);
 	bool by_sun = sun_dir.y > -0.04;
@@ -141,7 +143,7 @@ vec3 star_field(vec3 d) {
 		float mag = pow(hash13(cell + 11.0), 6.0) * 6.0 + 0.25;
 		float temp = hash13(cell + 5.0);
 		vec3 tone = mix(vec3(1.0, 0.78, 0.55), vec3(0.72, 0.82, 1.0), temp);
-		float tw = 0.75 + 0.25 * sin(twinkle * (3.0 + temp * 5.0) + h * 400.0);
+		float tw = 0.75 + 0.25 * sin(strata_time * (3.0 + temp * 5.0) + h * 400.0);
 		col += tone * mag * tw * exp(-dot(f, f) * 90.0);
 	}
 	// Galactic band.

@@ -114,8 +114,23 @@ public sealed partial class TileObjectRenderer : Node3D
             AddChild(node);
             nodes.Add(node);
             InstanceCount += list.Count;
+            if (def.Flame is { } flame) AddFlames(chunk, flame, list, nodes);
         }
         _chunks[chunk] = nodes;
+    }
+
+    /// <summary>Living flames over the lit objects of one kind (wired-off torches stay dark).</summary>
+    private void AddFlames(Int3 chunk, FlameSpec flame, List<TileObjectInstance> objects, List<MultiMeshInstance3D> nodes)
+    {
+        var bases = new List<Vector3>();
+        foreach (var o in objects)
+            if (!o.Active || o.IsDoor) bases.Add(Flames.BaseOf(flame, Placement.TransformOf(o)));
+        if (bases.Count == 0) return;
+        var node = Flames.Batch(flame, bases);
+        node.Visible = _chunkRenderer?.IsShown(chunk) ?? true;
+        AddChild(node);
+        nodes.Add(node);
+        InstanceCount += bases.Count;
     }
 
     private void Clear(Int3 chunk)

@@ -17,6 +17,9 @@ public static class SaveJson
             AllowTrailingCommas = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
         };
+        // Converters in the options outrank [JsonConverter] on a type, so enums with their own reader (older names)
+        // must be listed before the general enum converter.
+        o.Converters.Add(new Strata.Core.World.EvilKindConverter());
         o.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
         return o;
     }

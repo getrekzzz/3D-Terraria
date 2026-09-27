@@ -12,6 +12,7 @@
     "use_secondary": ["mouse:2"],
     "interact": ["key:E"],
     "inventory": ["key:Tab", "key:I"],
+    "map": ["key:M"],
     "toggle_camera": ["key:V"],
     "precision_mode": ["key:Alt"],
     "rotate_shape": ["key:R"],

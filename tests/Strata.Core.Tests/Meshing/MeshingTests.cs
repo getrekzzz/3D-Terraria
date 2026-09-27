@@ -44,6 +44,29 @@ public class MeshingTests
     }
 
     [Fact]
+    public void LavaGetsItsOwnSurfaceAndListsItsOpenCells()
+    {
+        var world = AirWorldWith((b, stone, _) =>
+        {
+            for (int x = 36; x < 60; x++)
+                for (int z = 36; z < 60; z++)
+                {
+                    b.SetBlock(x, 39, z, stone);
+                    b.SetLiquid(x, 40, z, LiquidCode.Pack(x < 48 ? LiquidType.Lava : LiquidType.Water, LiquidCode.MaxLevel));
+                }
+        });
+        var mesh = Mesh(world, new Int3(1, 1, 1));
+        Assert.False(mesh.Lava.IsEmpty);
+        Assert.False(mesh.Liquid.IsEmpty);
+        // Water stays in the liquid surface, lava in its own (liquid type travels in custom0.x, packed as half floats).
+        static int Type(ulong ids) => (int)(float)BitConverter.UInt16BitsToHalf((ushort)(ids & 0xffff));
+        Assert.All(mesh.Lava.Custom0, c => Assert.Equal((int)LiquidType.Lava, Type(c)));
+        Assert.DoesNotContain(mesh.Liquid.Custom0, c => Type(c) == (int)LiquidType.Lava);
+        Assert.InRange(mesh.LavaTops.Count, 1, LiquidMesher.MaxLavaTops);
+        Assert.All(mesh.LavaTops, c => Assert.True(c.X < 48 && c.Y == 40, $"{c} is not an open lava cell"));
+    }
+
+    [Fact]
     public void ClosedObjectsAreWatertightAndConsistentlyWound()
     {
         var world = AirWorldWith((b, stone, brick) =>

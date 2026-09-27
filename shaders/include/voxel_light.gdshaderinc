@@ -21,10 +21,16 @@ float strata_sky_visibility(vec4 light) {
 	return strata_light_curve(light.a);
 }
 
+// Block light's response: gentler than the sky curve so a torch's glow carries across a room (level 9, 2.5 m out, is
+// ~46% of full; level 6 ~25%) instead of dying a couple of metres from the flame.
+float strata_block_curve(float level) {
+	return level * sqrt(level);
+}
+
 // Block light (torches, lava, glowing ores) applied through EMISSION. Out in daylight the eye is adapted to the
 // sun, so a torch or a lava pool barely tints a sunlit wall; at night and underground it carries the scene.
 vec3 strata_block_light(vec3 albedo, vec4 light, float ao) {
-	vec3 block = vec3(strata_light_curve(light.r), strata_light_curve(light.g), strata_light_curve(light.b));
+	vec3 block = vec3(strata_block_curve(light.r), strata_block_curve(light.g), strata_block_curve(light.b));
 	float daylit = strata_light_curve(light.a) * strata_daylight;
 	vec3 owl = vec3(0.10, 0.11, 0.13) * strata_night_vision * (1.0 - daylit);
 	return albedo * (block * strata_block_light_color.rgb * 1.6 * (1.0 - 0.65 * daylit) + owl) * ao;

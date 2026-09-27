@@ -68,7 +68,9 @@ def gel(mb: MeshBuilder, p, rng):
 
 def eye(mb: MeshBuilder, p, rng):
     mb.sphere((0, 0, 0), 0.5, "prop:plain", "#f4efe8", subdivisions=3)
-    mb.sphere((0, 0.42, 0), 0.2, "prop:plain", p.get("iris", "#3a8a5a"), subdivisions=2, scale=(1, 0.45, 1))
+    # The iris glows (demon eyes burn red in the dark) unless "glow" is false.
+    iris = "prop:plain:glow" if p.get("glow", True) else "prop:plain"
+    mb.sphere((0, 0.42, 0), 0.2, iris, p.get("iris", "#e0201a"), subdivisions=2, scale=(1, 0.45, 1))
     mb.sphere((0, 0.5, 0), 0.09, "prop:plain", "#050505", subdivisions=1, scale=(1, 0.4, 1))
     for k in range(5):
         a = k * 2 * math.pi / 5 + rng.random() * 0.4

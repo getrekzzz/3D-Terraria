@@ -38,6 +38,9 @@ public sealed class Npc
     /// <summary>Ticks left of the hurt flash (visual).</summary>
     public int HurtFlash { get; set; }
 
+    /// <summary>Ticks left reeling from a hit: the brain does not steer, so knockback carries it away.</summary>
+    public int StunTicks { get; set; }
+
     /// <summary>Ticks spent far from every player (despawn timer).</summary>
     public int FarTicks { get; set; }
 
@@ -80,6 +83,9 @@ public sealed class Npc
     public int Counter2;
     public int Phase;
     public Vector3 Direction;
+
+    /// <summary>Set by the brain: it has given up (dawn) and is walking or flying away; it despawns once out of sight.</summary>
+    public bool Leaving { get; set; }
 
     /// <summary>Set by the brain: the player it is chasing (null when idle/wandering).</summary>
     public long TargetPlayer { get; set; } = -1;
