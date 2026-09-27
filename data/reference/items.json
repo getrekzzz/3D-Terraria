@@ -3526,6 +3526,62 @@
    "source": "betsy"
   },
   {
+   "id": "terraria:magic_dagger",
+   "name": "Magic Dagger",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:unholy_trident",
+   "name": "Unholy Trident",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "red devil"
+  },
+  {
+   "id": "terraria:paladins_hammer",
+   "name": "Paladin's Hammer",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "paladin"
+  },
+  {
+   "id": "terraria:sniper_rifle",
+   "name": "Sniper Rifle",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "skeleton sniper"
+  },
+  {
+   "id": "terraria:shadowbeam_staff",
+   "name": "Shadowbeam Staff",
+   "kind": "weapon",
+   "stage": "post-plantera",
+   "source": "necromancer"
+  },
+  {
+   "id": "terraria:jesters_arrow",
+   "name": "Jester's Arrow",
+   "kind": "weapon",
+   "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:cross_necklace",
+   "name": "Cross Necklace",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:wizard_hat",
+   "name": "Wizard Hat",
+   "kind": "weapon",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
    "id": "terraria:archery_potion",
    "name": "Archery Potion",
    "kind": "consumable",
@@ -3664,6 +3720,34 @@
    "kind": "consumable",
    "stage": "early",
    "source": "antlion"
+  },
+  {
+   "id": "terraria:worm_tooth",
+   "name": "Worm Tooth",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "devourer"
+  },
+  {
+   "id": "terraria:ectoplasm",
+   "name": "Ectoplasm",
+   "kind": "consumable",
+   "stage": "post-plantera",
+   "source": "dungeon spirit"
+  },
+  {
+   "id": "terraria:turtle_shell",
+   "name": "Turtle Shell",
+   "kind": "consumable",
+   "stage": "hardmode",
+   "source": "giant tortoise"
+  },
+  {
+   "id": "terraria:butterfly_dust",
+   "name": "Butterfly Dust",
+   "kind": "consumable",
+   "stage": "hardmode",
+   "source": "moth"
   }
  ]
 }

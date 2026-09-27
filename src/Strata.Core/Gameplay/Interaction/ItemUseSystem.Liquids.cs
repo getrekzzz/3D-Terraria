@@ -31,6 +31,11 @@ public sealed partial class ItemUseSystem
 
         if (!isLiquid) return UseOutcome.None;
         var found = content.LiquidOf(world.GetLiquid(cell.X, cell.Y, cell.Z));
+        if (cfg.Absorbs != null)
+        {
+            if (found?.Id != cfg.Absorbs) return UseOutcome.Blocked;
+            return editor.DrainLiquid(cell, LiquidCode.MaxLevel, 1).Item2 > 0 ? UseOutcome.CollectedLiquid : UseOutcome.Blocked;
+        }
         if (found?.Bucket == null || !content.Items.TryGet(found.Bucket, out var filled)) return UseOutcome.Blocked;
         var (_, taken) = editor.DrainLiquid(cell, LiquidCode.MaxLevel, cfg.MinCollect);
         if (taken == 0) return UseOutcome.Blocked;

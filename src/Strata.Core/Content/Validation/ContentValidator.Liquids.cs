@@ -55,6 +55,7 @@ public static partial class ContentValidator
                 string? empty = spec.Raw.TryGetProperty("empty", out var ep) ? ep.GetString() : null;
                 ctx.Ref(item, ctx.Db.Liquids, held, "bucket.liquid");
                 ctx.Ref(item, ctx.Db.Items, empty, "bucket.empty");
+                if (spec.Raw.TryGetProperty("bottomless", out var bp) && bp.ValueKind == System.Text.Json.JsonValueKind.True) continue;
                 if (held != null && empty == null) ctx.Error(item, "a filled bucket needs 'empty' (the item left after pouring).");
                 if (held != null && ctx.Db.Liquids.TryGet(held, out var liquid) && liquid.Bucket != item.Id)
                     ctx.Error(item, $"bucket holds '{held}' but that liquid's bucket is '{liquid.Bucket}'.");

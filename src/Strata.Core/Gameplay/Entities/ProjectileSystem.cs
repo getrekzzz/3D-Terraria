@@ -212,7 +212,7 @@ public sealed partial class ProjectileSystem
         var hit = Combat.DamageModel.Roll(damage, DamageClass.None, 0, knockback, null, state.Defense,
             Combat.DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
-        if (!state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity)) return false;
+        if (!state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return false;
         var knock = (push.LengthSquared() > 1e-4f ? Vector3.Normalize(push) : Vector3.Zero) * (2f + hit.Knockback * 0.5f) + new Vector3(0, 3.5f, 0);
         _npcs.ReportPlayerDamage(player, hit.Damage, knock);
         return true;

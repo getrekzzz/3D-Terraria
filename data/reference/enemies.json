@@ -607,6 +607,16 @@
    ]
   },
   {
+   "id": "terraria:dungeon_spirit",
+   "name": "Dungeon Spirit",
+   "kind": "enemy",
+   "stage": "post-plantera",
+   "source": "dungeon",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
    "id": "terraria:fire_imp",
    "name": "Fire Imp",
    "kind": "enemy",

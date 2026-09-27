@@ -170,6 +170,12 @@ public sealed class BucketParams : SpecParams
 
     /// <summary>Minimum levels (of 31) the aimed pool must provide to fill the bucket.</summary>
     public int MinCollect { get; init; } = 16;
+
+    /// <summary>Soaks up this liquid without ever filling (the Super Absorbant Sponge).</summary>
+    public string? Absorbs { get; init; }
+
+    /// <summary>Never runs dry: pouring keeps the item (the bottomless buckets), so it needs no <see cref="Empty"/>.</summary>
+    public bool Bottomless { get; init; }
 }
 
 /// <summary>

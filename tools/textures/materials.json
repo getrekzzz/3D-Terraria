@@ -875,6 +875,22 @@
    "cracks": 0.6,
    "ore": "#6affd0",
    "metallic": 0.7
+  },
+  {
+   "name": "ebonwood_planks",
+   "type": "planks",
+   "base": "#6a5a8a",
+   "dark": "#3a2a5a",
+   "light": "#8a7aaa",
+   "count": 4
+  },
+  {
+   "name": "shadewood_planks",
+   "type": "planks",
+   "base": "#8a4a5a",
+   "dark": "#5a2a3a",
+   "light": "#a86a7a",
+   "count": 4
   }
  ]
 }

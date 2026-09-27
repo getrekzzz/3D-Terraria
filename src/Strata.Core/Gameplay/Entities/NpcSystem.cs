@@ -246,7 +246,7 @@ public sealed partial class NpcSystem
         var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale), DamageClass.None, 0, 6f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
-        if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity)) return;
+        if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;
         var away = BrainFactory.Flat(player.Position - npc.Position);
         if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
         var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);

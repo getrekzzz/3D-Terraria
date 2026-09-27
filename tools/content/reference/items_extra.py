@@ -42,6 +42,14 @@ eternia_crystal|Eternia Crystal|prehardmode|tavernkeep
 betsys_wrath|Betsy's Wrath|post-golem|betsy
 flying_dragon|Flying Dragon|post-golem|betsy
 betsy_wings|Betsy's Wings|post-golem|betsy
+magic_dagger|Magic Dagger|hardmode|mimic
+unholy_trident|Unholy Trident|hardmode|red devil
+paladins_hammer|Paladin's Hammer|post-plantera|paladin
+sniper_rifle|Sniper Rifle|post-plantera|skeleton sniper
+shadowbeam_staff|Shadowbeam Staff|post-plantera|necromancer
+jesters_arrow|Jester's Arrow|early|craft
+cross_necklace|Cross Necklace|hardmode|mimic
+wizard_hat|Wizard Hat|early|clothier
 """,
     "consumable": """
 archery_potion|Archery Potion|early|craft
@@ -64,5 +72,9 @@ waterleaf|Waterleaf|early|herb
 fireblossom|Fireblossom|early|herb
 shiverthorn|Shiverthorn|early|herb
 antlion_mandible|Antlion Mandible|early|antlion
+worm_tooth|Worm Tooth|early|devourer
+ectoplasm|Ectoplasm|post-plantera|dungeon spirit
+turtle_shell|Turtle Shell|hardmode|giant tortoise
+butterfly_dust|Butterfly Dust|hardmode|moth
 """,
 }
