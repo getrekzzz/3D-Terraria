@@ -74,6 +74,7 @@ public partial class GameRoot : Node
         log.Info("boot", $"Content: {content.Blocks.Count} blocks, {content.Items.Count} items, {content.Recipes.Count} recipes.");
         Audio.AudioBuses.Setup();
         Audio.Sfx.Attach(this);
+        AddChild(new Audio.MusicDirector());
         var user = Settings.UserSettings.Current;
         user.Changed += ApplyDisplay;
         if (!IsAutomated(args)) ApplyDisplay(user);
@@ -121,6 +122,7 @@ public partial class GameRoot : Node
     /// <summary>The title screen; choosing a world there starts it.</summary>
     public void ShowMenu()
     {
+        Audio.MusicDirector.Instance?.PlayFixed("title");
         var menu = new Menu.MainMenu();
         AddChild(menu);
         menu.Initialize(Services);

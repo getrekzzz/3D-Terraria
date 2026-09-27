@@ -126,6 +126,14 @@ public static class WorldLauncher
             if (p == entity) player.Teleport(home, resolveSpawn: true);
         };
 
+        var sounds = new Audio.SoundEvents();
+        runtime.AddChild(sounds);
+        sounds.Initialize(game, entity);
+        Audio.MusicDirector.Instance?.Follow(game, entity);
+        var senses = new Rendering.PlayerSenses();
+        runtime.AddChild(senses);
+        senses.Initialize(game, entity);
+
         var avatar = new PlayerAvatar();
         player.AddChild(avatar);
         avatar.Initialize(player, game, props);

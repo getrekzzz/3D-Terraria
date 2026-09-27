@@ -50,7 +50,7 @@
   ],
   "recipes": [
     { "id": "empty_bucket", "output": "empty_bucket", "inputs": [{ "group": "any_iron_bar", "count": 3 }], "stations": ["anvil"] },
-    { "id": "gills_potion", "output": "gills_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "shark_fin", "count": 1 }, { "item": "mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] },
-    { "id": "obsidian_skin_potion", "output": "obsidian_skin_potion", "inputs": [{ "item": "bottle", "count": 1 }, { "item": "obsidian", "count": 2 }, { "item": "glowing_mushroom", "count": 1 }], "stations": ["alchemy"], "conditions": [{ "type": "nearLiquid", "liquid": "water" }] }
+    { "id": "gills_potion", "output": "gills_potion", "inputs": [{ "item": "bottled_water", "count": 1 }, { "item": "waterleaf", "count": 1 }, { "item": "shark_fin", "count": 1 }], "stations": ["alchemy"] },
+    { "id": "obsidian_skin_potion", "output": "obsidian_skin_potion", "inputs": [{ "item": "bottled_water", "count": 1 }, { "item": "fireblossom", "count": 1 }, { "item": "waterleaf", "count": 1 }, { "item": "obsidian", "count": 1 }], "stations": ["alchemy"] }
   ]
 }

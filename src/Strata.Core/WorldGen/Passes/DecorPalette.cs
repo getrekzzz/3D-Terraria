@@ -18,7 +18,20 @@ internal sealed class DecorPalette
         Grass = T("grass_tuft"); Flower = T("flower"); Bush = T("bush"); Fern = T("fern");
         FieldMushroom = T("mushroom_plant"); Glowcap = T("glowing_mushroom_plant");
         Stalagmite = T("stalagmite"); Stalactite = T("stalactite"); Rubble = T("rubble");
+        TileObjectDef? O(string id) => content.TileObjects.TryGet(id, out var def) ? def : null;
+        Daybloom = O("daybloom_plant"); Moonglow = O("moonglow_plant"); Blinkroot = O("blinkroot_plant"); Deathweed = O("deathweed_plant");
+        Waterleaf = O("waterleaf_plant"); Fireblossom = O("fireblossom_plant"); Shiverthorn = O("shiverthorn_plant"); LifeFruit = O("life_fruit_plant");
     }
+
+    // Alchemy herbs (optional content) and the jungle's Life Fruit.
+    public TileObjectDef? Daybloom { get; }
+    public TileObjectDef? Moonglow { get; }
+    public TileObjectDef? Blinkroot { get; }
+    public TileObjectDef? Deathweed { get; }
+    public TileObjectDef? Waterleaf { get; }
+    public TileObjectDef? Fireblossom { get; }
+    public TileObjectDef? Shiverthorn { get; }
+    public TileObjectDef? LifeFruit { get; }
 
     public byte Forest { get; }
     public byte Tundra { get; }
@@ -62,10 +75,15 @@ internal sealed class DecorPalette
     {
         var p = ctx.Palette;
         if (ground == p.Turf)
-            return roll < 0.09f ? Grass : roll < 0.12f ? Flower : roll < 0.13f ? Bush : roll < 0.135f ? FieldMushroom : null;
-        if (ground == p.JungleTurf) return roll < 0.12f ? Fern : roll < 0.15f ? Grass : null;
+            return roll < 0.09f ? Grass : roll < 0.12f ? Flower : roll < 0.13f ? Bush : roll < 0.135f ? FieldMushroom : roll < 0.139f ? Daybloom : null;
+        if (ground == p.JungleTurf) return roll < 0.12f ? Fern : roll < 0.15f ? Grass : roll < 0.155f ? Moonglow : null;
         if (ground == p.MushroomTurf) return roll < 0.05f ? Glowcap : roll < 0.054f ? GiantGlowcap : null;
-        if (ground == p.Snow && biome == Tundra) return roll < 0.02f ? Grass : null;
+        if (ground == p.Snow && biome == Tundra) return roll < 0.02f ? Grass : roll < 0.024f ? Shiverthorn : null;
+        if (ground == p.Sand && biome == Desert) return roll < 0.004f ? Waterleaf : null;
+        if (ground == p.UmbralTurf || ground == p.SanguineTurf) return roll < 0.01f ? Deathweed : null;
+        if (ground == p.Ash) return roll < 0.006f ? Fireblossom : null;
+        if (ground == p.Loam) return roll < 0.004f ? Blinkroot : null;
+        if (ground == p.Mud) return roll < 0.004f ? Blinkroot : roll < 0.0055f && biome == Jungle ? LifeFruit : null;
         if (ground == p.Stone || ground == p.Deepstone || ground == p.MossStone)
             return roll < 0.008f ? Stalagmite : roll < 0.011f ? Rubble : null;
         return null;

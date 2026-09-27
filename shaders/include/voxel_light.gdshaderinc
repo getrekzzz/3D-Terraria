@@ -5,6 +5,8 @@
 global uniform vec4 strata_sky_ambient;
 global uniform vec4 strata_block_light_color;
 global uniform float strata_daylight;
+// 0..1: the Night Owl potion's night vision (a soft floor of light in the dark).
+global uniform float strata_night_vision;
 // Toward the dominant sky light (the sun by day, the moon by night): cloud shadows.
 global uniform vec3 strata_light_dir;
 
@@ -24,7 +26,8 @@ float strata_sky_visibility(vec4 light) {
 vec3 strata_block_light(vec3 albedo, vec4 light, float ao) {
 	vec3 block = vec3(strata_light_curve(light.r), strata_light_curve(light.g), strata_light_curve(light.b));
 	float daylit = strata_light_curve(light.a) * strata_daylight;
-	return albedo * block * strata_block_light_color.rgb * 1.6 * ao * (1.0 - 0.65 * daylit);
+	vec3 owl = vec3(0.10, 0.11, 0.13) * strata_night_vision * (1.0 - daylit);
+	return albedo * (block * strata_block_light_color.rgb * 1.6 * (1.0 - 0.65 * daylit) + owl) * ao;
 }
 
 // Sky ambient + block light in one term, for shaders that disable the environment's ambient light (sprites).

@@ -31,8 +31,8 @@
     {"id": "shroomite_leggings", "name": "Shroomite Leggings", "description": "7% increased ranged critical strike chance. 12% increased movement speed.", "category": "armor", "rarity": 8, "value": 225000, "equipSlot": "legs", "defense": 16, "armorSet": "shroomite_armor", "equipEffects": [{"type": "stat", "stat": "rangedCrit", "add": 7}, {"type": "stat", "stat": "moveSpeed", "add": 0.12}]}
   ],
   "recipes": [
-    {"id": "healing_potion", "output": "healing_potion", "inputs": [{"item": "lesser_healing_potion", "count": 2}, {"item": "glowing_mushroom", "count": 1}], "stations": ["alchemy"]},
-    {"id": "mana_potion", "output": "mana_potion", "inputs": [{"item": "lesser_mana_potion", "count": 2}, {"item": "glowing_mushroom", "count": 1}], "stations": ["alchemy"]},
+    {"id": "healing_potion", "output": "healing_potion", "count": 2, "inputs": [{"item": "lesser_healing_potion", "count": 2}, {"item": "glowing_mushroom", "count": 1}], "stations": ["alchemy"]},
+    {"id": "mana_potion", "output": "mana_potion", "count": 2, "inputs": [{"item": "lesser_mana_potion", "count": 2}, {"item": "glowing_mushroom", "count": 1}], "stations": ["alchemy"]},
     {"id": "shroomite_bar", "output": "shroomite_bar", "inputs": [{"item": "chlorophyte_bar", "count": 1}, {"item": "glowing_mushroom", "count": 15}], "stations": ["autohammer"]},
     {"id": "shroomite_helmet", "output": "shroomite_helmet", "inputs": [{"item": "shroomite_bar", "count": 12}], "stations": ["hardmode_anvil"]},
     {"id": "shroomite_breastplate", "output": "shroomite_breastplate", "inputs": [{"item": "shroomite_bar", "count": 24}], "stations": ["hardmode_anvil"]},

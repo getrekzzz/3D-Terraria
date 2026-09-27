@@ -205,5 +205,33 @@ def dragon(mb: MeshBuilder, p, rng):
     return None
 
 
-GENERATORS = {"haunted_tree": haunted_tree, "pumpkin_lord": pumpkin_lord, "snowman": snowman, "tank": tank, "present": present, "ghost_ship": ghost_ship,
+def campfire(mb: MeshBuilder, p, rng):
+    """A campfire (tile object): a ring of stones, crossed logs and flames (size in metres, origin at the floor centre)."""
+    w, h, _ = p["size"]
+    r = w * 0.42
+    for k in range(9):
+        a = k * math.tau / 9
+        mb.sphere((math.cos(a) * r, math.sin(a) * r, 0.05), 0.08, "prop:stone", "#6a6a70", subdivisions=1, scale=(1, 1, 0.7))
+    for k in range(3):
+        a = k * math.tau / 3
+        d = Vector((math.cos(a), math.sin(a), 0)) * r * 0.8
+        mb.cylinder(tuple(d + Vector((0, 0, 0.04))), (0, 0, 0.3), 0.06, 0.05, "prop:bark", "#5a3a22", segments=6)
+    for k, (s_, c) in enumerate(((0.16, "#ff6a1a"), (0.11, "#ffb030"), (0.06, "#fff0a0"))):
+        mb.cylinder((0, 0, 0.1), (0, 0, 0.3 + s_ * 2.2), s_, 0.0, "prop:plain:glow", c, segments=7, smooth=False)
+
+
+def heart_lantern(mb: MeshBuilder, p, rng):
+    """A heart lantern hanging from the ceiling (origin at the top): a chain and a glowing red heart in a cage."""
+    w, h, _ = p["size"]
+    mb.cylinder((0, 0, h), (0, 0, h * 0.55), 0.015, 0.015, "prop:iron", "#6a6a70", segments=5)
+    c = Vector((0, 0, h * 0.32))
+    for sx in (-1, 1):
+        mb.sphere(tuple(c + Vector((sx * 0.07, 0, 0.05))), 0.09, "prop:plain:glow", "#ff3a5a", subdivisions=2)
+    mb.cylinder(tuple(c + Vector((0, 0, 0.02))), tuple(c + Vector((0, 0, -0.14))), 0.12, 0.0, "prop:plain:glow", "#ff3a5a", segments=8)
+    for k in range(4):
+        a = k * math.tau / 4
+        mb.cylinder((math.cos(a) * 0.17, math.sin(a) * 0.17, h * 0.55), (math.cos(a) * 0.17, math.sin(a) * 0.17, h * 0.08), 0.012, 0.012, "prop:iron", "#8a7a3a", segments=4)
+
+
+GENERATORS = {"campfire": campfire, "heart_lantern": heart_lantern, "haunted_tree": haunted_tree, "pumpkin_lord": pumpkin_lord, "snowman": snowman, "tank": tank, "present": present, "ghost_ship": ghost_ship,
               "saucer": saucer, "tesla_turret": tesla_turret, "mech_walker": mech_walker, "dragon": dragon}

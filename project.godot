@@ -57,6 +57,10 @@ strata_daylight={
 "type": "float",
 "value": 1.0
 }
+strata_night_vision={
+"type": "float",
+"value": 0.0
+}
 strata_time={
 "type": "float",
 "value": 0.0

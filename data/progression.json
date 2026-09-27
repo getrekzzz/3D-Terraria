@@ -20,6 +20,7 @@
     { "id": "defeated_the_twins", "name": "The Twins defeated", "kind": "boss", "requires": ["hardmode"], "stage": "mechanical", "covers": ["terraria:mech_boss_down"] },
     { "id": "defeated_the_destroyer", "name": "The Destroyer defeated", "kind": "boss", "requires": ["hardmode"], "stage": "mechanical", "covers": ["terraria:mech_boss_down"] },
     { "id": "defeated_skeletron_prime", "name": "Skeletron Prime defeated", "kind": "boss", "requires": ["hardmode"], "stage": "mechanical", "covers": ["terraria:mech_boss_down"] },
+    { "id": "defeated_mechanical_boss", "name": "A mechanical boss defeated", "kind": "boss", "requires": ["hardmode"], "stage": "mechanical" },
     { "id": "defeated_all_mechs", "name": "All mechanical bosses defeated", "kind": "world", "requires": ["defeated_the_twins", "defeated_the_destroyer", "defeated_skeletron_prime"], "stage": "post_mechanical", "autoSet": true,
       "announce": "The last of the clockwork terrors falls silent. Something stirs in the jungle's heart.", "covers": ["terraria:all_mech_down"] },
     { "id": "defeated_pirate_invasion", "name": "Pirate Invasion defeated", "kind": "event", "requires": ["hardmode"], "stage": "hardmode" },

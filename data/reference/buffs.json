@@ -85,6 +85,61 @@
    "kind": "buff"
   },
   {
+   "id": "terraria:archery",
+   "name": "Archery",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:endurance",
+   "name": "Endurance",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:featherfall",
+   "name": "Featherfall",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:lifeforce",
+   "name": "Lifeforce",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:magic_power",
+   "name": "Magic Power",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:mana_regeneration",
+   "name": "Mana Regeneration",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:rage",
+   "name": "Rage",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:summoning",
+   "name": "Summoning",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:titan",
+   "name": "Titan",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:wrath",
+   "name": "Wrath",
+   "kind": "buff"
+  },
+  {
+   "id": "terraria:warmth",
+   "name": "Warmth",
+   "kind": "buff"
+  },
+  {
    "id": "terraria:mining",
    "name": "Mining",
    "kind": "buff"

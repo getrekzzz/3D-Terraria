@@ -81,6 +81,9 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Cannot be broken until this world flag is set (Plantera's Bulbs wait for the mechanical bosses).</summary>
     public string? RequiresFlag { get; init; }
 
+    /// <summary>A buff it gives players nearby (a campfire's Cozy Fire, a heart lantern's Heart Lamp).</summary>
+    public AuraBuff? Aura { get; init; }
+
     /// <summary>A door that stays locked until this flag is set; using it with <see cref="Key"/> sets the flag.</summary>
     public string? LockedUntil { get; init; }
 
@@ -125,4 +128,14 @@ public sealed class BreakEffect
     public string? Release { get; init; }
 
     public float ReleaseChance { get; init; }
+}
+
+/// <summary>A buff granted to players within <see cref="Radius"/> cells, refreshed while they stay close.</summary>
+public sealed class AuraBuff
+{
+    public string Buff { get; init; } = "";
+    public int Radius { get; init; } = 20;
+
+    /// <summary>How long the buff lasts once the player walks away (ticks).</summary>
+    public int Ticks { get; init; } = 120;
 }

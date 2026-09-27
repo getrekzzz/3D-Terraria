@@ -78,8 +78,8 @@ public class InventoryCraftingTests
     public void EnvironmentConditionsGateRecipes()
     {
         var book = new RecipeBook(Db);
-        var recipe = book.RecipesFor(Db.Items.Get("swiftness_potion"))[0];
-        var stations = new HashSet<string> { "alchemy" };
+        var recipe = book.RecipesFor(Db.Items.Get("bottled_water"))[0]; // a bottle filled at the water's edge
+        var stations = new HashSet<string>();
         Assert.False(book.StationsAndConditionsMet(recipe, stations, new ConditionContext()));
         Assert.True(book.StationsAndConditionsMet(recipe, stations, new ConditionContext { NearbyLiquids = new HashSet<string> { "water" } }));
     }
