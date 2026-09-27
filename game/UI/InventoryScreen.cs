@@ -137,6 +137,7 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.inventory_ui");
         if (!IsOpen) return;
         var state = _ui.Entity.State;
         _defense.Text = $"Defense {state.Defense}";

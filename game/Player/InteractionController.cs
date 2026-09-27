@@ -52,6 +52,7 @@ public sealed partial class InteractionController : Node
 
     public override void _PhysicsProcess(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.interaction.physics");
         // Grid blocks (1 m) by default, single cells when the setting says so; holding the precision key swaps.
         Entity.Precision = Settings.UserSettings.Current.SmallBlocks != (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("precision_mode"));
         UpdateTarget();

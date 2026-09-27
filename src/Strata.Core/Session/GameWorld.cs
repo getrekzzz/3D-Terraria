@@ -208,29 +208,36 @@ public sealed partial class GameWorld : IDisposable
         Session.Clock.Advance();
         const float dt = 1f / Units.TicksPerSecond;
         var player = LocalPlayer;
-        if (player is { Alive: true })
-            Drops.Tick(Session.World, dt, player.Center, stack =>
-            {
-                var rest = player.State.Inventory.Pickup(stack);
-                if (rest.Count < stack.Count) ItemPickedUp?.Invoke(player, stack.WithCount(stack.Count - rest.Count));
-                return rest;
-            });
-        else
-            Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
-        foreach (var p in Players) TickPlayer(p);
-        Liquids.Tick(Session.Clock.Tick);
-        LiquidEffects.Tick();
-        Events.Tick();
-        Spawner.Tick();
-        Npcs.Tick();
-        Town.Tick();
-        Melee.Tick();
-        Projectiles.Tick();
-        Mutations.Tick();
-        Objectives.Tick();
-        if (Session.Clock.Tick % 60 == 0) ApplyAuras();
-        Rituals.Tick();
-        Spread.Tick();
+        using (Diagnostics.Metrics.Frame.Time("tick.drops"))
+        {
+            if (player is { Alive: true })
+                Drops.Tick(Session.World, dt, player.Center, stack =>
+                {
+                    var rest = player.State.Inventory.Pickup(stack);
+                    if (rest.Count < stack.Count) ItemPickedUp?.Invoke(player, stack.WithCount(stack.Count - rest.Count));
+                    return rest;
+                });
+            else
+                Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
+        }
+        var prof = Diagnostics.Metrics.Frame;
+        using (prof.Time("tick.players")) foreach (var p in Players) TickPlayer(p);
+        using (prof.Time("tick.liquids")) Liquids.Tick(Session.Clock.Tick);
+        using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
+        using (prof.Time("tick.events")) Events.Tick();
+        using (prof.Time("tick.spawner")) Spawner.Tick();
+        using (prof.Time("tick.npcs")) Npcs.Tick();
+        using (prof.Time("tick.town")) Town.Tick();
+        using (prof.Time("tick.melee")) Melee.Tick();
+        using (prof.Time("tick.projectiles")) Projectiles.Tick();
+        using (prof.Time("tick.world"))
+        {
+            Mutations.Tick();
+            Objectives.Tick();
+            if (Session.Clock.Tick % 60 == 0) ApplyAuras();
+            Rituals.Tick();
+            Spread.Tick();
+        }
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
         if (++_autosaveCounter >= AutosaveTicks)
         {

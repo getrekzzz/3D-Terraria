@@ -39,6 +39,7 @@ public sealed partial class ItemSlotView : Control
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.slot_views");
         var s = _read();
         if (!s.Equals(_shown))
         {

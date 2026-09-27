@@ -35,6 +35,7 @@ public sealed partial class ViewModel : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.view_model");
         var entity = _controller.Entity;
         Visible = _controller.Rig.FirstPerson && entity.Alive;
         if (!Visible) return;

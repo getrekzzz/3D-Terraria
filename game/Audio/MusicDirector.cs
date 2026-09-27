@@ -65,6 +65,7 @@ public sealed partial class MusicDirector : Node
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.music");
         if (_game == null || _player == null) return;
         _check -= delta;
         if (_check > 0) return;

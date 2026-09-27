@@ -36,6 +36,7 @@ public sealed partial class TownRenderer : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.town");
         float dt = (float)delta;
         var world = _game.Session.World;
         foreach (var npc in _game.Town.Residents)

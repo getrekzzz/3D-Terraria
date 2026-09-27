@@ -27,6 +27,15 @@ public sealed class ChunkMeshResult
 
     public double BuildMs { get; set; }
 
+    /// <summary>
+    /// Some cell in the chunk or the one-cell border around it sees the sky. Chunks sealed away from it cannot throw
+    /// a sun shadow onto anything the sun lights, so they skip the shadow passes.
+    /// </summary>
+    public bool SkyExposed { get; set; } = true;
+
+    /// <summary>Which of the chunk's faces see each other through open cells (for cave culling).</summary>
+    public ushort Visibility { get; set; } = ChunkVisibility.AllConnected;
+
     public bool IsEmpty => Opaque.IsEmpty && Transparent.IsEmpty && Cutout.IsEmpty && Liquid.IsEmpty;
 }
 
@@ -52,8 +61,23 @@ public static class ChunkMesher
         CellMesher.Build(vol, result.Opaque, result.Transparent, result.Cutout, result.Collision);
         LiquidMesher.Build(vol, result.Liquid);
         GrassScatter.Build(vol, result.Opaque, result.Grass);
+        result.Visibility = ChunkVisibility.Compute(nb, tables);
+        result.SkyExposed = AnySky(light);
         result.BuildMs = Stopwatch.GetElapsedTime(start).TotalMilliseconds;
         return result;
+    }
+
+    private static bool AnySky(ushort[] light)
+    {
+        const int lo = Neighborhood.Margin - 1, hi = Neighborhood.Margin + ChunkMath.Size;
+        for (int y = lo; y <= hi; y++)
+            for (int z = lo; z <= hi; z++)
+            {
+                int row = Neighborhood.Index(lo, y, z);
+                for (int x = 0; x <= hi - lo; x++)
+                    if (light[row + x] >= 1 << 12) return true;
+            }
+        return false;
     }
 
     private static ushort[] ExtractCore(ushort[] light)

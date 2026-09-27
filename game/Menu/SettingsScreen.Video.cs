@@ -48,6 +48,7 @@ public sealed partial class SettingsScreen
             p => p.ShadowAtlas.ToString(), (p, v) => p.ShadowAtlas = int.Parse(v));
         Pick(box, "Shadow cascades", new[] { "1", "2", "4" }, new[] { "1", "2", "4" }, p => p.ShadowSplits.ToString(), (p, v) => p.ShadowSplits = int.Parse(v));
         Option(box, "Shadow softness", p => p.ShadowFilter, (p, v) => p.ShadowFilter = (int)v, 0, 5, 1, v => $"{v:0}");
+        Flag(box, "Dynamic resolution", p => p.DynamicResolution, (p, v) => p.DynamicResolution = v, "Lowers the 3D resolution while the frame rate drops, keeping the game smooth.");
         Flag(box, "Torch shadows", p => p.TorchShadows, (p, v) => p.TorchShadows = v);
         Flag(box, "Ambient occlusion (SSAO)", p => p.Ssao, (p, v) => p.Ssao = v);
         Flag(box, "Indirect light (SSIL)", p => p.Ssil, (p, v) => p.Ssil = v, "Expensive.");

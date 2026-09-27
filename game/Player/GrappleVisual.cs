@@ -20,6 +20,7 @@ public sealed partial class GrappleVisual : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.grapple");
         _mesh.ClearSurfaces();
         if (_player.Hook == HookState.None) return;
         var hand = _player.HandPosition;

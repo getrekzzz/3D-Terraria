@@ -44,6 +44,9 @@ public sealed class GraphicsPreset
     /// <summary>3D resolution relative to the window (0.5–2).</summary>
     public float RenderScale { get; set; } = 1f;
 
+    /// <summary>Lower the 3D resolution (upscaled with FSR) while frames run slow, and raise it back when they recover.</summary>
+    public bool DynamicResolution { get; set; } = true;
+
     /// <summary>none | fsr1 | fsr2 (fsr2 at scale 1 is temporal anti-aliasing at native resolution).</summary>
     public string Upscaler { get; set; } = "none";
 

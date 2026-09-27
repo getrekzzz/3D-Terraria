@@ -41,6 +41,7 @@ public sealed partial class PlayerAvatar : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.avatar");
         if (_visual == null) return;
         var entity = _controller.Entity;
         int immune = entity.State.Vitals.ImmunityTicks;

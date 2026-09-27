@@ -35,6 +35,7 @@ public sealed partial class DroppedItemRenderer : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.drops");
         _time += (float)delta;
         var world = _game.Session.World;
         foreach (var item in _game.Drops.Items)

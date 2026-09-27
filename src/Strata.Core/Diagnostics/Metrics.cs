@@ -11,13 +11,19 @@ public sealed class Metrics
 
     public static readonly Metrics Global = new();
 
+    /// <summary>When false, <see cref="Time"/> scopes cost almost nothing and record nothing (profiling is opt-in).</summary>
+    public bool Enabled { get; set; } = true;
+
+    /// <summary>The frame/tick profiler: off until the <c>perf</c> command turns it on.</summary>
+    public static readonly Metrics Frame = new() { Enabled = false };
+
     public void Count(string name, long delta = 1) => _counters.AddOrUpdate(name, delta, (_, v) => v + delta);
 
     public long Counter(string name) => _counters.TryGetValue(name, out var v) ? v : 0;
 
     public void Record(string name, double milliseconds) => _timers.GetOrAdd(name, _ => new Accumulator()).Add(milliseconds);
 
-    public TimerScope Time(string name) => new(this, name);
+    public TimerScope Time(string name) => Enabled ? new(this, name) : default;
 
     public IReadOnlyDictionary<string, (long Count, double TotalMs, double MaxMs)> SnapshotTimers() =>
         _timers.ToDictionary(kv => kv.Key, kv => kv.Value.Snapshot());
@@ -43,7 +49,7 @@ public sealed class Metrics
             _start = Stopwatch.GetTimestamp();
         }
 
-        public void Dispose() => _owner.Record(_name, Stopwatch.GetElapsedTime(_start).TotalMilliseconds);
+        public void Dispose() => _owner?.Record(_name, Stopwatch.GetElapsedTime(_start).TotalMilliseconds);
     }
 
     private sealed class Accumulator

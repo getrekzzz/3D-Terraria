@@ -56,6 +56,8 @@ public sealed partial class WorldRuntime : Node3D
         AddChild(_colliders);
         _environment = new EnvironmentController { Name = "Environment" };
         _environment.Initialize(services.Graphics, game.Session.Settings.Seed);
+        _renderer.SetSealedShadows(services.Graphics.Preset.TorchShadows);
+        services.Graphics.Changed += p => _renderer.SetSealedShadows(p.TorchShadows);
         _streamDistance = game.Streamer.Settings.MeshRadius * ChunkMath.Size * Units.CellSize;
         _environment.ViewDistance = _streamDistance;
         AddChild(_environment);
@@ -102,17 +104,24 @@ public sealed partial class WorldRuntime : Node3D
 
     public override void _Process(double delta)
     {
+        var prof = Strata.Core.Diagnostics.Metrics.Frame;
+        using var frame = prof.Time("gd.world_runtime");
+        prof.Record("frame.delta", delta * 1000.0);
         var focus = FocusCell;
         // Finish more background work per frame when it piles up (initial load, fast travel).
         int backlog = Jobs.Completions.Count;
-        Game.Update(focus, backlog > 64 ? 14.0 : backlog > 16 ? 8.0 : 4.0);
-        _renderer.ProcessUploads(3.0);
-        _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
+        using (prof.Time("gd.stream_and_jobs")) Game.Update(focus, backlog > 64 ? 14.0 : backlog > 16 ? 8.0 : 4.0);
+        using (prof.Time("gd.mesh_uploads")) _renderer.ProcessUploads(3.0);
+        using (prof.Time("gd.colliders")) _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
         _environment.EventTint = Game.Events.SkyTint is { } tint ? Color.FromHtml(tint) : null;
         if (Engine.GetProcessFrames() % 15 == 0) _environment.Biome = BiomeAround(focus);
         var camera = GetViewport().GetCamera3D();
         var eye = camera?.GlobalPosition ?? Focus?.GlobalPosition ?? Vector3.Zero;
-        _grass?.Update(eye, Focus?.GlobalPosition ?? eye);
+        var st = Streamer.Settings;
+        var eyeCell = new Int3(Mathf.FloorToInt(eye.X / Units.CellSize), Mathf.FloorToInt(eye.Y / Units.CellSize), Mathf.FloorToInt(eye.Z / Units.CellSize));
+        using (prof.Time("gd.culling"))
+            _renderer.UpdateCulling(ChunkMath.CellToChunk(eyeCell), st.MeshRadius + 1, System.Math.Max(st.MeshUp, st.MeshDown) + 1, CaveCulling);
+        using (prof.Time("gd.grass")) _grass?.Update(eye, Focus?.GlobalPosition ?? eye);
         UpdateDistance(camera, eye, focus);
         float surface = Session.Generator.Terrain.SurfaceHeight(eye.X / Units.CellSize, eye.Z / Units.CellSize);
         float skyExposure = Rendering.LightProbe.SampleSmooth(Session.World, eye).A;
@@ -141,8 +150,12 @@ public sealed partial class WorldRuntime : Node3D
         return best;
     }
 
+    /// <summary>Hide chunks the camera cannot see into (on by default; the <c>cull</c> command toggles it).</summary>
+    public static bool CaveCulling { get; set; } = true;
+
     public override void _PhysicsProcess(double delta)
     {
+        using var tick = Strata.Core.Diagnostics.Metrics.Frame.Time("tick.total");
         if (Simulating) Game.Tick();
     }
 

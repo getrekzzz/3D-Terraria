@@ -40,6 +40,7 @@ public sealed partial class PlayerSenses : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.senses");
         var info = _player.State.Effects.Info;
         float want = info.Contains("night_vision") ? 1f : 0f;
         _owl = Mathf.MoveToward(_owl, want, (float)delta * 2f);

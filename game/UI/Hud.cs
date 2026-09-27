@@ -166,6 +166,7 @@ public sealed partial class Hud : CanvasLayer
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.hud");
         var inv = _ui.Inventory;
         for (int i = 0; i < _hotbar.Count; i++)
         {

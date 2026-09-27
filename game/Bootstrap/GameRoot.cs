@@ -75,6 +75,9 @@ public partial class GameRoot : Node
         Audio.AudioBuses.Setup();
         Audio.Sfx.Attach(this);
         AddChild(new Audio.MusicDirector());
+        var dynamicResolution = new Rendering.DynamicResolution();
+        dynamicResolution.Initialize(graphics);
+        AddChild(dynamicResolution);
         var user = Settings.UserSettings.Current;
         user.Changed += ApplyDisplay;
         if (!IsAutomated(args)) ApplyDisplay(user);

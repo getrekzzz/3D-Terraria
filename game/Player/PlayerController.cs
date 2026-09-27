@@ -86,6 +86,7 @@ public sealed partial class PlayerController : CharacterBody3D
 
     public override void _PhysicsProcess(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.player_physics");
         float dt = (float)delta;
         if (Frozen)
         {

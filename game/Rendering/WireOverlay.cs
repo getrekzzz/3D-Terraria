@@ -49,6 +49,7 @@ public sealed partial class WireOverlay : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.wires");
         var held = _player.State.Inventory.Held.Item;
         bool show = held != null && WiringItems.Contains(held.Id);
         _nodes.Visible = show;

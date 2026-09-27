@@ -11,6 +11,15 @@ public static class EngineCommands
     {
         r.Register(new CommandDef
         {
+            Name = "cull", Usage = "cull <on|off>", Help = "Turns cave culling (hiding chunks the camera cannot see into) on or off.",
+            Run = (ctx, a) =>
+            {
+                World.WorldRuntime.CaveCulling = a.Str(0, "on|off") != "off";
+                return CommandResult.Success($"Cave culling {(World.WorldRuntime.CaveCulling ? "on" : "off")}.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "ui", Usage = "ui <inventory|talk <resident>|shop|close>", Help = "Opens or closes gameplay screens.",
             Run = (ctx, a) =>
             {

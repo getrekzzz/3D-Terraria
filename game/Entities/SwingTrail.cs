@@ -67,6 +67,7 @@ public sealed partial class SwingTrail : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.swing_trail");
         _mesh.ClearSurfaces();
         if (_trails.Count == 0) return;
         _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);

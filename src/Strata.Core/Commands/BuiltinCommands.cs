@@ -21,6 +21,7 @@ public static class BuiltinCommands
         LiquidCommands.Register(r);
         TownCommands.Register(r);
         WorldCommands.Register(r);
+        PerfCommands.Register(r);
         return r;
     }
 
