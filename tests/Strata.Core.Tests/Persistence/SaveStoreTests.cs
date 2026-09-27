@@ -44,6 +44,29 @@ public class SaveStoreTests
         Assert.Equal(new[] { "torch" }, meta.IdTables.Items);
     }
 
+    [Theory]
+    [InlineData("umbral", EvilKind.Corruption, "corruption")]
+    [InlineData("sanguine", EvilKind.Crimson, "crimson")]
+    [InlineData("crimson", EvilKind.Crimson, "crimson")]
+    [InlineData("corruption", EvilKind.Corruption, "corruption")]
+    public void EvilKindReadsNamesFromBeforeTheRename(string saved, EvilKind expected, string written)
+    {
+        var root = TestWorlds.TempDir();
+        var dir = Path.Combine(root, "old");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, WorldSaveStore.MetaFile), $$"""
+            { "format": "strata-world", "version": 1, "name": "Old", "seed": 5, "size": "small", "difficulty": "classic", "evil": "{{saved}}" }
+            """);
+        var store = new WorldSaveStore(dir);
+        Assert.Equal(expected, store.LoadMeta().Evil);
+        var errors = new List<Exception>();
+        var entry = Assert.Single(SaveCatalog.Worlds(root, (_, ex) => errors.Add(ex)));
+        Assert.Empty(errors);
+        Assert.Equal(expected, entry.Evil);
+        store.SaveMeta(store.LoadMeta());
+        Assert.Contains($"\"evil\": \"{written}\"", File.ReadAllText(Path.Combine(dir, WorldSaveStore.MetaFile)));
+    }
+
     [Fact]
     public void NewerVersionsAreRejected()
     {
