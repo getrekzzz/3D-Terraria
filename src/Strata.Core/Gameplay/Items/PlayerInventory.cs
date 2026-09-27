@@ -62,4 +62,7 @@ public sealed class PlayerInventory
 
     public IEnumerable<ItemDef> EquippedItems =>
         Armor.Stacks.Concat(Accessories.Stacks).Select(s => s.Item!);
+
+    /// <summary>Equipped stacks (with their prefixes).</summary>
+    public IEnumerable<ItemStack> EquippedStacks => Armor.Stacks.Concat(Accessories.Stacks);
 }

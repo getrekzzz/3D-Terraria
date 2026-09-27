@@ -113,6 +113,20 @@ public sealed partial class TownDialog : CanvasLayer
             {
                 _buttons.AddChild(Button(service.Parse<SummonServiceParams>().Label, Summon));
             }
+            else if (service.Type == TownServiceSpecs.Reforge)
+            {
+                long cost = _ui.Game.Services.ReforgeCost(npc, _ui.Entity);
+                _buttons.AddChild(Button(cost > 0 ? $"Reforge ({Coins.Format(cost)})" : "Reforge", Reforge));
+            }
+            else if (service.Type == TownServiceSpecs.Taxes)
+            {
+                long due = _ui.Game.Services.TaxesDue(npc);
+                _buttons.AddChild(Button(due > 0 ? $"Taxes ({Coins.Format(due)})" : "Taxes", CollectTaxes));
+            }
+            else if (service.Type == TownServiceSpecs.AnglerQuest)
+            {
+                _buttons.AddChild(Button("Quest", AnglerQuest));
+            }
         }
         _buttons.AddChild(Button("Chat", () => _text.Text = _ui.Game.Commerce.Greet(npc, _ui.Entity)));
         _buttons.AddChild(Button("Close", Close));
@@ -178,6 +192,44 @@ public sealed partial class TownDialog : CanvasLayer
         if (result == TradeResult.Refused) _text.Text = why ?? "Not now.";
         else if (result == TradeResult.NothingToDo) _text.Text = "It is already awake.";
         else Report(result, "So be it.");
+    }
+
+    private void Reforge()
+    {
+        var services = _ui.Game.Services;
+        var held = _ui.Inventory.Held;
+        if (services.ReforgeCost(_npc!, _ui.Entity) == 0)
+        {
+            _text.Text = held.IsEmpty ? "Hold a weapon, tool or accessory and I'll tinker with it." : $"I can't improve a {held.Item!.DisplayName}.";
+            return;
+        }
+        var result = services.Reforge(_npc!, _ui.Entity, out var made);
+        Report(result, $"Reforged: {made}.");
+        RebuildButtons();
+    }
+
+    private void CollectTaxes()
+    {
+        var result = _ui.Game.Services.CollectTaxes(_npc!, _ui.Entity, out long amount);
+        _text.Text = result == TradeResult.Ok ? $"Here's your cut: {Coins.Format(amount)}. Don't spend it all at once." : "Nothing's come in yet. Come back later.";
+        RebuildButtons();
+    }
+
+    private void AnglerQuest()
+    {
+        var services = _ui.Game.Services;
+        var wanted = services.AnglerWants(_npc!);
+        if (wanted == null)
+        {
+            _text.Text = "You already caught what I wanted today. Come back tomorrow!";
+            return;
+        }
+        var result = services.TurnInFish(_npc!, _ui.Entity, out var reward);
+        _text.Text = result switch
+        {
+            TradeResult.Ok => reward.IsEmpty ? "Finally! Here, take some coins." : $"Finally! Take this: {reward}.",
+            _ => $"I want a {wanted.DisplayName}. Go catch me one! Don't come back without it.",
+        };
     }
 
     private void Report(TradeResult result, string success)

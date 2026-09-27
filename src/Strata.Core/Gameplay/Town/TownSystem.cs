@@ -83,15 +83,19 @@ public sealed partial class TownSystem
             AssignHome(r, rooms[0]);
             rooms.RemoveAt(0);
         }
-        if (rooms.Count == 0) return null;
-        var ctx = TownContext(player);
-        foreach (var def in _world.Session.Content.TownNpcs.All)
+        // Each vacant home is judged by its own surroundings (a mushroom house draws Truffle).
+        foreach (var room in rooms)
         {
-            if (Find(def.Id) != null || def.Starter || def.Landmark != null || !_arrival[def.Id].Evaluate(ctx) || HasLeft(def, ctx)) continue;
-            var npc = Create(def, rooms[0].HomeNode!.Value);
-            AssignHome(npc, rooms[0]);
-            Arrived?.Invoke(npc);
-            return npc;
+            var ctx = TownContext(player);
+            ctx.Biomes = _world.Session.ContextAt(room.HomeNode!.Value + Int3.Up).Biomes;
+            foreach (var def in _world.Session.Content.TownNpcs.All)
+            {
+                if (Find(def.Id) != null || def.Starter || def.Landmark != null || !_arrival[def.Id].Evaluate(ctx) || HasLeft(def, ctx)) continue;
+                var npc = Create(def, room.HomeNode!.Value);
+                AssignHome(npc, room);
+                Arrived?.Invoke(npc);
+                return npc;
+            }
         }
         return null;
     }

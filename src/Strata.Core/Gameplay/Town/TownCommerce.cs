@@ -123,7 +123,7 @@ public sealed class TownCommerce
     }
 
     /// <summary>Sale value of a stack (copper).</summary>
-    public long SaleValue(ItemStack stack) => (long)MathF.Floor(stack.Item!.Value * Config.SellRatio) * stack.Count;
+    public long SaleValue(ItemStack stack) => (long)MathF.Floor(Prefixes.Value(stack) * Config.SellRatio) * stack.Count;
 
     /// <summary>Sells the whole stack in a backpack slot.</summary>
     public TradeResult Sell(PlayerEntity player, int slot)

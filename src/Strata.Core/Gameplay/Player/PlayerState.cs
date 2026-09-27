@@ -56,10 +56,13 @@ public sealed class PlayerState
     {
         Effects.Clear();
         int defense = 0;
-        foreach (var item in Inventory.EquippedItems)
+        foreach (var stack in Inventory.EquippedStacks)
         {
+            var item = stack.Item!;
             defense += item.Defense;
             foreach (var e in item.EquipEffects) Effects.Apply(e);
+            if (stack.Prefix is { } prefix && item.EquipSlot == Content.Defs.EquipSlot.Accessory)
+                foreach (var (stat, add) in Items.Prefixes.AccessoryStats(prefix)) Effects.Stats.Add(stat, add, 1f);
         }
         foreach (var b in Buffs.Active)
             foreach (var e in b.Def.Effects) Effects.Apply(e);

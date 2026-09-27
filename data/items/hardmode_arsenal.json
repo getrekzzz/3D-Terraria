@@ -57,9 +57,9 @@
   ],
   "recipes": [
     { "id": "megashark", "output": "megashark", "inputs": [{ "item": "minishark", "count": 1 }, { "item": "shark_fin", "count": 5 }, { "item": "soul_of_might", "count": 20 }], "stations": ["hardmode_anvil"] },
-    { "id": "crystal_storm", "output": "crystal_storm", "inputs": [{ "item": "crystal_shard", "count": 20 }, { "item": "soul_of_light", "count": 15 }, { "item": "water_bolt", "count": 1 }], "stations": ["hardmode_anvil"] },
-    { "id": "cursed_flames", "output": "cursed_flames", "inputs": [{ "item": "cursed_flame", "count": 20 }, { "item": "soul_of_night", "count": 15 }, { "item": "water_bolt", "count": 1 }], "stations": ["hardmode_anvil"] },
-    { "id": "golden_shower", "output": "golden_shower", "inputs": [{ "item": "ichor", "count": 20 }, { "item": "soul_of_night", "count": 15 }, { "item": "water_bolt", "count": 1 }], "stations": ["hardmode_anvil"] },
+    { "id": "crystal_storm", "output": "crystal_storm", "inputs": [{ "item": "crystal_shard", "count": 20 }, { "item": "soul_of_light", "count": 15 }, { "item": "spell_tome", "count": 1 }], "stations": ["hardmode_anvil"] },
+    { "id": "cursed_flames", "output": "cursed_flames", "inputs": [{ "item": "cursed_flame", "count": 20 }, { "item": "soul_of_night", "count": 15 }, { "item": "spell_tome", "count": 1 }], "stations": ["hardmode_anvil"] },
+    { "id": "golden_shower", "output": "golden_shower", "inputs": [{ "item": "ichor", "count": 20 }, { "item": "soul_of_night", "count": 15 }, { "item": "spell_tome", "count": 1 }], "stations": ["hardmode_anvil"] },
     { "id": "daedalus_stormbow", "output": "daedalus_stormbow", "inputs": [{ "item": "hallowed_bar", "count": 12 }, { "item": "soul_of_flight", "count": 15 }], "stations": ["hardmode_anvil"] },
     { "id": "rainbow_rod", "output": "rainbow_rod", "inputs": [{ "item": "crystal_shard", "count": 20 }, { "item": "soul_of_light", "count": 10 }, { "item": "unicorn_horn", "count": 10 }], "stations": ["hardmode_anvil"] },
     { "id": "mana_flower", "output": "mana_flower", "inputs": [{ "item": "natures_gift", "count": 1 }, { "item": "lesser_mana_potion", "count": 1 }], "stations": ["tinkerers_workshop"] },

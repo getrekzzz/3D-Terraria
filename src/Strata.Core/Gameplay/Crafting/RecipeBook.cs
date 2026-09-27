@@ -14,9 +14,12 @@ public sealed class RecipeBook
     private readonly List<CompiledRecipe> _recipes = new();
     private readonly Dictionary<ItemDef, List<CompiledRecipe>> _byIngredient = new();
     private readonly Dictionary<ItemDef, List<CompiledRecipe>> _byOutput = new();
+    private readonly ContentDatabase _content;
+    private Determinism.Pcg32 _rng = new(0x43524146UL);
 
     public RecipeBook(ContentDatabase content)
     {
+        _content = content;
         foreach (var r in content.Recipes.All)
         {
             var inputs = r.Inputs.Select(i => new Ingredient(
@@ -50,7 +53,7 @@ public sealed class RecipeBook
     public bool Craft(CompiledRecipe r, Inventory inventory, IReadOnlySet<string> stations, ConditionContext context)
     {
         if (!CanCraft(r, inventory, stations, context)) return false;
-        var output = new ItemStack(r.Output, r.Def.Count);
+        var output = Prefixes.Fresh(r.Output, r.Def.Count, _content, ref _rng);
         // Simulate: remove inputs from a copy, then check the output fits.
         var trial = new Inventory(inventory.ToArray());
         foreach (var ing in r.Inputs) trial.Remove(d => ing.Accepts.Contains(d), ing.Count);

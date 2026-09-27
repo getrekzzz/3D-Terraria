@@ -35,6 +35,11 @@ public static partial class ContentValidator
                     if (ctx.Db.Enemies.TryGet(summon.Enemy, out var boss) && boss.Boss == null) ctx.Error(t, $"service.enemy '{summon.Enemy}' is not a boss.");
                     ctx.Specs(t, SpecKind.Condition, summon.Conditions, "service.conditions");
                 }
+                if (service.Type == TownServiceSpecs.AnglerQuest && ctx.TryParse<AnglerQuestParams>(SpecKind.TownService, service) is { } quest)
+                {
+                    foreach (var fish in quest.Fish) ctx.Ref(t, ctx.Db.Items, fish, "service.fish");
+                    foreach (var reward in quest.Rewards) ctx.Ref(t, ctx.Db.Items, reward.Item, "service.rewards");
+                }
             }
             if (t.Landmark != null)
             {

@@ -1615,6 +1615,97 @@
    "source": "craft"
   },
   {
+   "id": "terraria:silver_bullet",
+   "name": "Silver Bullet",
+   "kind": "weapon",
+   "stage": "early",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:shotgun",
+   "name": "Shotgun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:rocket_i",
+   "name": "Rocket I",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:rocket_launcher",
+   "name": "Rocket Launcher",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:greater_mana_potion",
+   "name": "Greater Mana Potion",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:spell_tome",
+   "name": "Spell Tome",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:pygmy_necklace",
+   "name": "Pygmy Necklace",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "witch doctor"
+  },
+  {
+   "id": "terraria:hercules_beetle",
+   "name": "Hercules Beetle",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "witch doctor"
+  },
+  {
+   "id": "terraria:steampunk_wings",
+   "name": "Steampunk Wings",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "steampunker"
+  },
+  {
+   "id": "terraria:katana",
+   "name": "Katana",
+   "kind": "weapon",
+   "stage": "early",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:mushroom_spear",
+   "name": "Mushroom Spear",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:hammush",
+   "name": "Hammush",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:autohammer",
+   "name": "Autohammer",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
    "id": "terraria:last_prism",
    "name": "Last Prism",
    "kind": "weapon",

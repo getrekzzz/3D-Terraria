@@ -131,6 +131,7 @@ public sealed partial class GameWorld : IDisposable
         Navigator = new VoxelNavigator(session.World);
         Town = new TownSystem(this);
         Commerce = new TownCommerce(this, Town);
+        Services = new TownServices(this, Commerce);
         LiquidEffects = new LiquidEffects(this);
         Incineration = new Gameplay.Progression.IncinerationSummons(this);
         Objectives = new Gameplay.Progression.WorldObjectives(this);
@@ -165,6 +166,7 @@ public sealed partial class GameWorld : IDisposable
     public Gameplay.Progression.WorldObjectives Objectives { get; }
     public Gameplay.Progression.Rituals Rituals { get; }
     public TownCommerce Commerce { get; }
+    public TownServices Services { get; }
     public LiquidEffects LiquidEffects { get; }
     public Gameplay.Progression.IncinerationSummons Incineration { get; }
     public string? PlayerDirectory { get; }

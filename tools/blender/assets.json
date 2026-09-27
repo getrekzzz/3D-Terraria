@@ -366,6 +366,14 @@
     "ancient_manipulator": {
       "generator": "manipulator",
       "params": {}
+    },
+    "autohammer": {
+      "generator": "anvil",
+      "params": {
+        "metal": "iron",
+        "tint": "#6a8aff",
+        "glow": "#4a6aff"
+      }
     }
   },
   "items": {
@@ -2598,6 +2606,129 @@
           "length": 1.3,
           "width": 0.11
         }
+      },
+      "silver_bullet": {
+        "generator": "bullet",
+        "params": {
+          "color": "#e8ecf4"
+        }
+      },
+      "shotgun": {
+        "generator": "gun",
+        "params": {
+          "style": "shotgun"
+        }
+      },
+      "rocket_i": {
+        "generator": "bullet",
+        "params": {
+          "color": "#c83a2a"
+        }
+      },
+      "rocket_launcher": {
+        "generator": "gun",
+        "params": {
+          "style": "launcher",
+          "metal": "#4a5a3a",
+          "accent": "#c83a2a"
+        }
+      },
+      "healing_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#ff3050",
+          "glow": true
+        }
+      },
+      "mana_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#3a6aff",
+          "glow": true
+        }
+      },
+      "greater_mana_potion": {
+        "generator": "potion",
+        "params": {
+          "color": "#6a8aff",
+          "glow": true
+        }
+      },
+      "spell_tome": {
+        "generator": "tome",
+        "params": {
+          "cover": "#3a3ab8",
+          "emblem": "#e8c040",
+          "glow": "#8ac8ff"
+        }
+      },
+      "pygmy_necklace": {
+        "generator": "ring",
+        "params": {
+          "gem": "#6a9a4a"
+        }
+      },
+      "hercules_beetle": {
+        "generator": "feather",
+        "params": {
+          "color": "#3a6a3a"
+        }
+      },
+      "steampunk_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "feather",
+          "color": "#c8a040",
+          "strap": "#5a3a1a"
+        }
+      },
+      "katana": {
+        "generator": "sword",
+        "params": {
+          "metal": "#d8dce4",
+          "guard": "#1a1a1a",
+          "length": 1.1,
+          "width": 0.06
+        }
+      },
+      "mushroom_spear": {
+        "generator": "spear",
+        "params": {
+          "shaft": "#4a8aff",
+          "glow": "#8ac8ff",
+          "length": 1.3
+        }
+      },
+      "hammush": {
+        "generator": "hammer",
+        "params": {
+          "metal": "#4a8aff"
+        }
+      },
+      "shroomite_bar": {
+        "generator": "bar",
+        "params": {
+          "metal": "#4a6aff",
+          "count": 2
+        }
+      },
+      "shroomite_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#4a6aff"
+        }
+      },
+      "shroomite_breastplate": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#4a6aff"
+        }
+      },
+      "shroomite_leggings": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#4a6aff"
+        }
       }
     }
   },
@@ -3662,6 +3793,393 @@
         "height": 2.0,
         "build": 0.6,
         "weight": 0.3
+      }
+    },
+    "arms_dealer": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#8a5a3a",
+        "hair": "#1a1a1a",
+        "hairStyle": "buzz",
+        "shirt": "#4a5a3a",
+        "pants": "#3a3a2a",
+        "boots": "#2a2018",
+        "belt": "#6a4a2a",
+        "hat": "cap",
+        "hatColor": "#3a4a2a",
+        "weight": 0.6,
+        "build": 0.8
+      }
+    },
+    "demolitionist": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "old",
+        "skin": "#e8b890",
+        "hair": "#b86a2a",
+        "beard": "#c8742a",
+        "hairStyle": "short",
+        "shirt": "#8a6a3a",
+        "pants": "#5a4a3a",
+        "boots": "#3a2a1a",
+        "hat": "cap",
+        "hatColor": "#e8c040",
+        "height": 1.35,
+        "weight": 0.7,
+        "build": 0.9
+      }
+    },
+    "goblin_tinkerer": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#6a9a8a",
+        "eyes": "#ffd040",
+        "hairStyle": "bald",
+        "shirt": "#8a6a4a",
+        "pants": "#4a3a2a",
+        "boots": "#2a1a10",
+        "apron": "#6a4a2a",
+        "height": 1.4,
+        "build": 0.6,
+        "weight": 0.35
+      }
+    },
+    "witch_doctor": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#6a8a3a",
+        "eyes": "#ff6a2a",
+        "hairStyle": "bald",
+        "shirt": "#3a5a2a",
+        "pants": "#2a3a1a",
+        "boots": "#2a1a10",
+        "coat": "#4a6a2a",
+        "hat": "wreath",
+        "hatColor": "#6ab83a",
+        "height": 1.7,
+        "build": 0.7
+      }
+    },
+    "wizard": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "old",
+        "skin": "#e8c8a8",
+        "hair": "#e8e8f0",
+        "beard": "#f0f0f8",
+        "hairStyle": "long",
+        "robe": "#3a3ab8",
+        "trim": "#e8c040",
+        "hat": "wide",
+        "hatColor": "#3a3ab8",
+        "shirt": "#3a3ab8",
+        "pants": "#2a2a8a",
+        "boots": "#1a1a3a"
+      }
+    },
+    "mechanic": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "skin": "#f0c8a8",
+        "hair": "#c83a2a",
+        "hairStyle": "ponytail",
+        "shirt": "#e8e0c8",
+        "pants": "#3a5a9a",
+        "boots": "#3a2a1a",
+        "apron": "#3a5a9a",
+        "belt": "#6a4a2a"
+      }
+    },
+    "steampunker": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "adult",
+        "skin": "#f0d0b0",
+        "hair": "#e8c040",
+        "hairStyle": "bun",
+        "shirt": "#6a3a2a",
+        "pants": "#4a2a1a",
+        "boots": "#2a1a10",
+        "coat": "#8a5a2a",
+        "hat": "wide",
+        "hatColor": "#3a2a1a",
+        "belt": "#c8a040"
+      }
+    },
+    "cyborg": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#a8b0b8",
+        "eyes": "#ff2a2a",
+        "hairStyle": "bald",
+        "shirt": "#5a6a7a",
+        "pants": "#3a4a5a",
+        "boots": "#2a3038",
+        "belt": "#3affc0",
+        "height": 1.9,
+        "build": 1.0,
+        "weight": 0.5
+      }
+    },
+    "truffle": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "young",
+        "skin": "#8ab0ff",
+        "eyes": "#e0f0ff",
+        "hairStyle": "bald",
+        "shirt": "#3a5ab8",
+        "pants": "#2a3a8a",
+        "boots": "#1a2a5a",
+        "hat": "wide",
+        "hatColor": "#4a8aff",
+        "height": 1.3,
+        "weight": 0.4
+      }
+    },
+    "dye_trader": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#b8845a",
+        "hair": "#1a1a1a",
+        "beard": "#1a1a1a",
+        "hairStyle": "short",
+        "robe": "#8a2a8a",
+        "trim": "#e8c040",
+        "shirt": "#c83a6a",
+        "pants": "#6a2a6a",
+        "boots": "#3a1a2a",
+        "hat": "cap",
+        "hatColor": "#e8e8f0"
+      }
+    },
+    "painter": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#f0c8a8",
+        "hair": "#6a4a2a",
+        "beard": "#6a4a2a",
+        "hairStyle": "messy",
+        "shirt": "#e8e8e8",
+        "pants": "#5a5a8a",
+        "boots": "#3a2a2a",
+        "apron": "#c8a8a8",
+        "hat": "cap",
+        "hatColor": "#c83a3a"
+      }
+    },
+    "stylist": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "skin": "#f0c8b0",
+        "hair": "#e84a8a",
+        "hairStyle": "long",
+        "shirt": "#1a1a1a",
+        "pants": "#1a1a1a",
+        "boots": "#3a1a2a",
+        "belt": "#e84a8a"
+      }
+    },
+    "zoologist": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "skin": "#e8b890",
+        "hair": "#c87a3a",
+        "hairStyle": "ponytail",
+        "shirt": "#6a8a3a",
+        "pants": "#8a6a3a",
+        "boots": "#4a3a2a",
+        "tail": "#e87a2a"
+      }
+    },
+    "golfer": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#e8b890",
+        "hair": "#8a6a3a",
+        "hairStyle": "short",
+        "shirt": "#e8e8e8",
+        "pants": "#c8a86a",
+        "boots": "#e8e8e8",
+        "hat": "cap",
+        "hatColor": "#3a8a3a"
+      }
+    },
+    "tavernkeep": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "old",
+        "skin": "#e8b890",
+        "hair": "#8a8a8a",
+        "beard": "#9a9a9a",
+        "hairStyle": "bald",
+        "shirt": "#e8e0c8",
+        "pants": "#5a3a2a",
+        "boots": "#3a2a1a",
+        "apron": "#e8e0c8",
+        "weight": 0.8,
+        "build": 0.8
+      }
+    },
+    "party_girl": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "skin": "#f0c8b0",
+        "hair": "#ff6ae0",
+        "hairStyle": "bun",
+        "shirt": "#ffd040",
+        "pants": "#6ab0ff",
+        "boots": "#ff6ae0",
+        "hat": "cap",
+        "hatColor": "#ff6ae0"
+      }
+    },
+    "tax_collector": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "old",
+        "skin": "#d8c8b8",
+        "hair": "#e0e0e0",
+        "hairStyle": "short",
+        "shirt": "#2a2a2a",
+        "pants": "#2a2a2a",
+        "boots": "#1a1a1a",
+        "coat": "#1a1a2a",
+        "hat": "wide",
+        "hatColor": "#1a1a1a",
+        "height": 1.5,
+        "weight": 0.3
+      }
+    },
+    "pirate": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "adult",
+        "skin": "#c8946a",
+        "hair": "#1a1a1a",
+        "beard": "#1a1a1a",
+        "hairStyle": "long",
+        "shirt": "#e8e0c8",
+        "pants": "#3a2a1a",
+        "boots": "#1a1210",
+        "coat": "#8a1a1a",
+        "hat": "wide",
+        "hatColor": "#1a1a1a",
+        "belt": "#c8a040",
+        "weight": 0.6
+      }
+    },
+    "santa_claus": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "old",
+        "skin": "#f0c8a8",
+        "hair": "#f8f8f8",
+        "beard": "#ffffff",
+        "hairStyle": "short",
+        "shirt": "#c81a1a",
+        "pants": "#c81a1a",
+        "boots": "#1a1a1a",
+        "coat": "#c81a1a",
+        "belt": "#1a1a1a",
+        "hat": "cap",
+        "hatColor": "#c81a1a",
+        "weight": 0.9
+      }
+    },
+    "princess": {
+      "generator": "humanoid",
+      "params": {
+        "body": "female",
+        "age": "young",
+        "skin": "#f8d8c0",
+        "hair": "#e8c060",
+        "hairStyle": "long",
+        "robe": "#ff9ae0",
+        "trim": "#fff0a0",
+        "shirt": "#ff9ae0",
+        "pants": "#ff9ae0",
+        "boots": "#e8c0e0",
+        "hat": "wreath",
+        "hatColor": "#ffd040"
+      }
+    },
+    "angler": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "young",
+        "skin": "#f0c8a8",
+        "hair": "#8a5a2a",
+        "hairStyle": "messy",
+        "shirt": "#4a8a3a",
+        "pants": "#6a5a3a",
+        "boots": "#3a2a1a",
+        "hat": "wide",
+        "hatColor": "#c8a86a",
+        "height": 1.2,
+        "weight": 0.3
+      }
+    },
+    "travelling_merchant": {
+      "generator": "humanoid",
+      "params": {
+        "body": "male",
+        "age": "old",
+        "skin": "#d8a880",
+        "hair": "#8a8a8a",
+        "beard": "#9a9a9a",
+        "hairStyle": "short",
+        "robe": "#6a3a8a",
+        "trim": "#e8c040",
+        "shirt": "#8a6a3a",
+        "pants": "#4a3a2a",
+        "boots": "#3a2a1a",
+        "hat": "wide",
+        "hatColor": "#6a3a8a"
+      }
+    },
+    "skeleton_merchant": {
+      "generator": "humanoid",
+      "params": {
+        "anatomy": "skeleton",
+        "body": "male",
+        "age": "adult",
+        "shirt": "#5a4a3a",
+        "pants": "#3a3a3a",
+        "boots": "#2a2a2a",
+        "hat": "cap",
+        "hatColor": "#8a2a2a"
       }
     }
   }
