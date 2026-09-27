@@ -128,6 +128,16 @@ public sealed partial class WorldEditor
         return PlacementResult.Ok;
     }
 
+    /// <summary>Paints the block in a cell (0 scrapes paint off). Returns false when there is no block to paint.</summary>
+    public bool PaintBlock(Int3 cell, int paint)
+    {
+        if (World.GetBlock(cell) is 0 or VoxelWorld.Unknown || CellPaint.Of((byte)World.GetFlags(cell.X, cell.Y, cell.Z)) == paint) return false;
+        var batch = World.BeginEdit();
+        bool ok = batch.SetPaint(cell, paint);
+        Commit(batch);
+        return ok;
+    }
+
     /// <summary>Removes a block without drops (hammer reshaping, commands).</summary>
     public void SetBlock(Int3 cell, ushort block, byte shape = 0, CellFlags flags = CellFlags.None)
     {

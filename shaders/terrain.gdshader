@@ -43,7 +43,7 @@ void fragment() {
 	}
 	float ao = COLOR.a;
 	vec3 world_n = normalize(n + bent * 0.85 * normal_strength);
-	vec3 base = strata_macro(albedo.rgb, v_world_pos);
+	vec3 base = strata_paint(strata_macro(albedo.rgb, v_world_pos), v_ids.w);
 	ALBEDO = base;
 	ROUGHNESS = mat.z;
 	METALLIC = mat.w;

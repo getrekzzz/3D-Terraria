@@ -39,6 +39,9 @@ public enum UseOutcome
 
     /// <summary>Got into or out of a minecart.</summary>
     Mounted,
+
+    /// <summary>A block was painted or scraped.</summary>
+    Painted,
 }
 
 /// <summary>A projectile launch requested by an item use (resolved by the projectile system).</summary>
@@ -61,6 +64,7 @@ public sealed partial class ItemUseSystem
         var buffs = world.Session.Content.Buffs.All;
         _healingCooldown = buffs.FirstOrDefault(b => b.HasTag("healing_cooldown"));
         _manaCooldown = buffs.FirstOrDefault(b => b.HasTag("mana_cooldown"));
+        world.Editor.BlockPlaced += (cell, _) => SprayPlaced(cell);
     }
 
     /// <summary>A melee swing started (the combat system sweeps its hitbox over the swing).</summary>
@@ -95,7 +99,9 @@ public sealed partial class ItemUseSystem
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject))
         {
             int placed = 0;
+            _placer = p;
             outcome = inReach == null ? UseOutcome.OutOfReach : Place(p, info, inReach, out placed);
+            _placer = null;
             if (outcome is UseOutcome.PlacedBlock or UseOutcome.PlacedObject && item.Consumable) ConsumeHeld(p, placed);
         }
         else if (info.IsTool && inReach != null)
@@ -126,6 +132,10 @@ public sealed partial class ItemUseSystem
         else if (info.Has(ItemAction.Net))
         {
             outcome = SwingNet(p, info.BugNet!);
+        }
+        else if (info.Has(ItemAction.Paint))
+        {
+            outcome = inReach == null ? UseOutcome.OutOfReach : UsePaint(p, info.Painting!, inReach);
         }
         else if (info.Has(ItemAction.Mount))
         {

@@ -3531,6 +3531,111 @@
           "creature": "firefly",
           "glow": "#ffb0f8"
         }
+      },
+      "red_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#d82020"
+        }
+      },
+      "orange_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#e8781c"
+        }
+      },
+      "yellow_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#e8d020"
+        }
+      },
+      "lime_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#90e020"
+        }
+      },
+      "green_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#28b030"
+        }
+      },
+      "teal_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#20b09a"
+        }
+      },
+      "cyan_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#20d0e0"
+        }
+      },
+      "sky_blue_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#50a8f0"
+        }
+      },
+      "blue_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#2848e0"
+        }
+      },
+      "purple_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#8030d8"
+        }
+      },
+      "violet_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#b040e0"
+        }
+      },
+      "pink_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#f060b8"
+        }
+      },
+      "black_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#141418"
+        }
+      },
+      "white_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#f4f4f0"
+        }
+      },
+      "gray_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#808088"
+        }
+      },
+      "brown_paint": {
+        "generator": "bucket",
+        "params": {
+          "liquid": "#7a4a24"
+        }
+      },
+      "paintbrush": {
+        "generator": "paintbrush"
+      },
+      "paint_scraper": {
+        "generator": "paint_scraper"
+      },
+      "paint_sprayer": {
+        "generator": "paint_sprayer"
       }
     }
   },

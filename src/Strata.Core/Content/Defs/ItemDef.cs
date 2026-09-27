@@ -82,6 +82,12 @@ public sealed class ItemDef : ContentDef
     public string? ArmorSet { get; init; }
     public TypedSpec[] EquipEffects { get; init; } = Array.Empty<TypedSpec>();
 
+    /// <summary>Paint index this item applies (1–31; 0 = not a paint), used up by the Paintbrush and Paint Sprayer.</summary>
+    public int Paint { get; init; }
+
+    /// <summary>Colour a paint gives blocks ("#rrggbb").</summary>
+    public string? PaintColor { get; init; }
+
     /// <summary>World progression flag raised the first time a player carries this item (milestones like the first bar smelted).</summary>
     public string? Milestone { get; init; }
 

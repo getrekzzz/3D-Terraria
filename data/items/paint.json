@@ -1,0 +1,25 @@
+{
+  // Paint: the Painter's paints color blocks with the Paintbrush (one paint per block), the Paint Scraper takes it
+  // off, and the Paint Sprayer paints blocks as they are placed. Paint is kept in each cell's flags.
+  "items": [
+    {"id": "red_paint", "name": "Red Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 1, "paintColor": "#d82020", "covers": ["terraria:red_paint"]},
+    {"id": "orange_paint", "name": "Orange Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 2, "paintColor": "#e8781c", "covers": ["terraria:orange_paint"]},
+    {"id": "yellow_paint", "name": "Yellow Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 3, "paintColor": "#e8d020", "covers": ["terraria:yellow_paint"]},
+    {"id": "lime_paint", "name": "Lime Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 4, "paintColor": "#90e020", "covers": ["terraria:lime_paint"]},
+    {"id": "green_paint", "name": "Green Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 5, "paintColor": "#28b030", "covers": ["terraria:green_paint"]},
+    {"id": "teal_paint", "name": "Teal Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 6, "paintColor": "#20b09a", "covers": ["terraria:teal_paint"]},
+    {"id": "cyan_paint", "name": "Cyan Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 7, "paintColor": "#20d0e0", "covers": ["terraria:cyan_paint"]},
+    {"id": "sky_blue_paint", "name": "Sky Blue Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 8, "paintColor": "#50a8f0", "covers": ["terraria:sky_blue_paint"]},
+    {"id": "blue_paint", "name": "Blue Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 9, "paintColor": "#2848e0", "covers": ["terraria:blue_paint"]},
+    {"id": "purple_paint", "name": "Purple Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 10, "paintColor": "#8030d8", "covers": ["terraria:purple_paint"]},
+    {"id": "violet_paint", "name": "Violet Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 11, "paintColor": "#b040e0", "covers": ["terraria:violet_paint"]},
+    {"id": "pink_paint", "name": "Pink Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 12, "paintColor": "#f060b8", "covers": ["terraria:pink_paint"]},
+    {"id": "black_paint", "name": "Black Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 13, "paintColor": "#141418", "covers": ["terraria:black_paint"]},
+    {"id": "white_paint", "name": "White Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 14, "paintColor": "#f4f4f0", "covers": ["terraria:white_paint"]},
+    {"id": "gray_paint", "name": "Gray Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 15, "paintColor": "#808088", "covers": ["terraria:gray_paint"]},
+    {"id": "brown_paint", "name": "Brown Paint", "description": "Used with a Paintbrush.", "category": "material", "maxStack": 9999, "value": 25, "paint": 16, "paintColor": "#7a4a24", "covers": ["terraria:brown_paint"]},
+    {"id": "paintbrush", "name": "Paintbrush", "description": "Used with paint to color blocks.", "category": "tool", "value": 10000, "useStyle": "swing", "useTime": 10, "useAnimation": 10, "autoReuse": true, "reach": 10, "behaviors": [{"type": "paint"}], "covers": ["terraria:paintbrush"]},
+    {"id": "paint_scraper", "name": "Paint Scraper", "description": "Used to remove paint.", "category": "tool", "value": 10000, "useStyle": "swing", "useTime": 10, "useAnimation": 10, "autoReuse": true, "reach": 10, "behaviors": [{"type": "paint", "scrape": true}], "covers": ["terraria:paint_scraper"]},
+    {"id": "paint_sprayer", "name": "Paint Sprayer", "description": "Automatically paints placed blocks.", "category": "accessory", "rarity": 2, "value": 100000, "equipSlot": "accessory", "equipEffects": [{"type": "autoPaint"}], "covers": ["terraria:paint_sprayer"]}
+  ]
+}

@@ -38,6 +38,9 @@ public static class ItemBehaviorSpecs
     /// <summary>Boards a minecart on the track beneath the player.</summary>
     public const string Minecart = "minecart";
 
+    /// <summary>Paints the aimed block with the first paint in the backpack, or scrapes paint off (Paintbrush, Paint Scraper).</summary>
+    public const string PaintTool = "paint";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
@@ -60,6 +63,7 @@ public static class ItemBehaviorSpecs
         c.Register<BugNetParams>(SpecKind.ItemBehavior, BugNet);
         c.Register<ReleaseCritterParams>(SpecKind.ItemBehavior, ReleaseCritter);
         c.Register<MinecartParams>(SpecKind.ItemBehavior, Minecart);
+        c.Register<PaintToolParams>(SpecKind.ItemBehavior, PaintTool);
     }
 }
 
@@ -239,4 +243,10 @@ public sealed class MinecartParams : SpecParams
 {
     public float MaxSpeed { get; init; } = 18f;
     public float Acceleration { get; init; } = 14f;
+}
+
+/// <summary>A paint tool: the Paintbrush paints, the Paint Scraper (<see cref="Scrape"/>) takes paint off.</summary>
+public sealed class PaintToolParams : SpecParams
+{
+    public bool Scrape { get; init; }
 }

@@ -103,6 +103,21 @@ public sealed class EditBatch
         return true;
     }
 
+    /// <summary>Paints (or, with 0, scrapes) the block in a cell. Returns false for empty or unloaded cells.</summary>
+    public bool SetPaint(Int3 cell, int paint)
+    {
+        var w = GetWorking(cell.X, cell.Y, cell.Z, out int index);
+        if (w == null || w.Blocks[index] == 0) return false;
+        byte old = w.Flags?[index] ?? 0;
+        byte now = CellPaint.With(old, paint);
+        if (old == now) return true;
+        (w.Flags ??= new byte[ChunkMath.Volume])[index] = now;
+        ushort block = w.Blocks[index];
+        byte shape = w.Shapes?[index] ?? 0;
+        _result.Changes.Add(new CellChange(cell, block, block, shape, shape));
+        return true;
+    }
+
     public bool SetLiquid(int x, int y, int z, byte liquid)
     {
         var w = GetWorking(x, y, z, out int index);

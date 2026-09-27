@@ -86,4 +86,24 @@ dart_trap|Dart Trap|early|world
     "furniture": """
 firefly_in_a_bottle|Firefly in a Bottle|early|craft
 """,
+    "paint": """
+paintbrush|Paintbrush|early|painter
+paint_scraper|Paint Scraper|early|painter
+red_paint|Red Paint|early|painter
+orange_paint|Orange Paint|early|painter
+yellow_paint|Yellow Paint|early|painter
+lime_paint|Lime Paint|early|painter
+green_paint|Green Paint|early|painter
+teal_paint|Teal Paint|early|painter
+cyan_paint|Cyan Paint|early|painter
+sky_blue_paint|Sky Blue Paint|early|painter
+blue_paint|Blue Paint|early|painter
+purple_paint|Purple Paint|early|painter
+violet_paint|Violet Paint|early|painter
+pink_paint|Pink Paint|early|painter
+black_paint|Black Paint|early|painter
+white_paint|White Paint|early|painter
+gray_paint|Gray Paint|early|painter
+brown_paint|Brown Paint|early|painter
+""",
 }

@@ -137,6 +137,27 @@ public static class EditCommands
         });
         r.Register(new CommandDef
         {
+            Name = "paint", Usage = "paint <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> <paint item|none>", Help = "Paints the blocks in a box relative to the player's feet.",
+            Run = (ctx, a) =>
+            {
+                var here = Here(ctx);
+                var p0 = here + new Int3(a.Int(0, "dx0"), a.Int(1, "dy0"), a.Int(2, "dz0"));
+                var p1 = here + new Int3(a.Int(3, "dx1"), a.Int(4, "dy1"), a.Int(5, "dz1"));
+                string id = a.Str(6, "paint");
+                int paint = id == "none" ? 0 : ctx.World.Session.Content.Items.TryGet(id, out var item) && item.Paint > 0 ? item.Paint
+                    : throw new CommandException($"'{id}' is not a paint");
+                var min = Int3.Min(p0, p1);
+                var max = Int3.Max(p0, p1);
+                int n = 0;
+                for (int y = min.Y; y <= max.Y; y++)
+                    for (int z = min.Z; z <= max.Z; z++)
+                        for (int x = min.X; x <= max.X; x++)
+                            if (ctx.World.Editor.PaintBlock(new Int3(x, y, z), paint)) n++;
+                return CommandResult.Success($"Painted {n} blocks.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "interact", Usage = "interact <dx> <dy> <dz>", Help = "Interacts with the tile object at a cell relative to the player's feet (doors, levers).",
             Run = (ctx, a) =>
             {

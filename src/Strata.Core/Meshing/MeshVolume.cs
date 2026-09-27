@@ -34,6 +34,9 @@ public sealed class MeshVolume
     }
 
     public Neighborhood Nb { get; }
+
+    /// <summary>A cell's paint as surface-flag bits (paint index shifted past the crisp bit; 0 when unpainted).</summary>
+    public int PaintBits(int index) => Nb.HasFlags ? (Voxels.CellPaint.Of(Nb.Flags[index]) << 1) : 0;
     public RenderTables Tables { get; }
     public ushort[] Light { get; }
     public bool[] Opaque { get; }

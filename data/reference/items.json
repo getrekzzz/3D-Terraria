@@ -3776,6 +3776,132 @@
    "kind": "furniture",
    "stage": "early",
    "source": "craft"
+  },
+  {
+   "id": "terraria:paintbrush",
+   "name": "Paintbrush",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:paint_scraper",
+   "name": "Paint Scraper",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:red_paint",
+   "name": "Red Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:orange_paint",
+   "name": "Orange Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:yellow_paint",
+   "name": "Yellow Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:lime_paint",
+   "name": "Lime Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:green_paint",
+   "name": "Green Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:teal_paint",
+   "name": "Teal Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:cyan_paint",
+   "name": "Cyan Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:sky_blue_paint",
+   "name": "Sky Blue Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:blue_paint",
+   "name": "Blue Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:purple_paint",
+   "name": "Purple Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:violet_paint",
+   "name": "Violet Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:pink_paint",
+   "name": "Pink Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:black_paint",
+   "name": "Black Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:white_paint",
+   "name": "White Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:gray_paint",
+   "name": "Gray Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:brown_paint",
+   "name": "Brown Paint",
+   "kind": "paint",
+   "stage": "early",
+   "source": "painter"
   }
  ]
 }

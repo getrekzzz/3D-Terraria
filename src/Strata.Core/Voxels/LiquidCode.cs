@@ -41,3 +41,15 @@ public enum CellFlags : byte
     /// <summary>Part of a generated structure (dungeon, temple): protected until progression allows.</summary>
     Structure = 2,
 }
+
+/// <summary>Paint on a block, kept in the top five bits of its cell flags (0 = unpainted, 1–31 = a paint).</summary>
+public static class CellPaint
+{
+    public const int Shift = 3;
+    public const byte Mask = 0b1111_1000;
+    public const int Max = 31;
+
+    public static int Of(byte flags) => flags >> Shift;
+
+    public static byte With(byte flags, int paint) => (byte)((flags & ~Mask) | ((paint & Max) << Shift));
+}

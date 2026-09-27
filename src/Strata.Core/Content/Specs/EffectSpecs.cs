@@ -18,6 +18,9 @@ public static class EffectSpecs
     /// <summary>Sink through blocks until clear of them (the Shimmer's phase).</summary>
     public const string Phase = "phase";
 
+    /// <summary>Placed blocks are painted with the first paint in the backpack (Paint Sprayer).</summary>
+    public const string AutoPaint = "autoPaint";
+
     /// <summary>Wings and rocket boots: rise while jump is held, for a while.</summary>
     public const string Flight = "flight";
 
@@ -45,6 +48,7 @@ public static class EffectSpecs
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoFallDamage);
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoItemUse);
         c.Register<NoFallDamageParams>(SpecKind.Effect, Phase);
+        c.Register<NoFallDamageParams>(SpecKind.Effect, AutoPaint);
         c.Register<FlightParams>(SpecKind.Effect, Flight);
         c.Register<DashParams>(SpecKind.Effect, Dash);
         c.Register<PacifyParams>(SpecKind.Effect, Pacify);
