@@ -38,6 +38,9 @@ public sealed class Npc
     /// <summary>Ticks left of the hurt flash (visual).</summary>
     public int HurtFlash { get; set; }
 
+    /// <summary>Ticks left reeling from a hit: the brain does not steer, so knockback carries it away.</summary>
+    public int StunTicks { get; set; }
+
     /// <summary>Ticks spent far from every player (despawn timer).</summary>
     public int FarTicks { get; set; }
 

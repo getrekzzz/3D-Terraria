@@ -290,8 +290,18 @@ public sealed partial class GameWorld : IDisposable
         p.State.Vitals.Mana = p.State.Vitals.MaxMana;
         p.Position = SpawnPositionFor(p.State);
         p.Velocity = Vector3.Zero;
+        p.State.Vitals.ImmunityTicks = RespawnImmunityTicks;
+        // Whatever was waiting at the spawn point (usually what killed the player) wanders off.
+        foreach (var npc in Npcs.All.Where(n => !n.IsBoss && !n.Def.HasTag("critter") && Vector3.Distance(n.Center, p.Center) < RespawnClearRadius).ToList())
+            Npcs.Despawn(npc);
         PlayerRespawned?.Invoke(p);
     }
+
+    /// <summary>Invulnerability after respawning, as in the reference game.</summary>
+    public const int RespawnImmunityTicks = Units.TicksPerSecond * 3;
+
+    /// <summary>Ordinary creatures this close to the respawn point leave when a player respawns.</summary>
+    public const float RespawnClearRadius = 20f;
 
     public PlayerEntity AddPlayer(PlayerState state, Vector3 feet)
     {

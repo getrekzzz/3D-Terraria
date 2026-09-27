@@ -82,11 +82,11 @@ public sealed class PlayerState
         Vitals.Mana = Math.Min(Vitals.Mana, Vitals.MaxMana);
     }
 
-    /// <summary>A new character's starting kit (mirrors the reference game's copper tools).</summary>
+    /// <summary>A new character's starting kit: the reference game's copper tools, plus torches for the first night.</summary>
     public static PlayerState CreateNew(string name, ContentDatabase content)
     {
         var p = new PlayerState(name);
-        foreach (var (id, count) in new[] { ("copper_shortsword", 1), ("copper_pickaxe", 1), ("copper_axe", 1), ("torch", 10), ("wood", 20) })
+        foreach (var (id, count) in new[] { ("copper_shortsword", 1), ("copper_pickaxe", 1), ("copper_axe", 1), ("torch", 25), ("wood", 20) })
             if (content.Items.TryGet(id, out var item)) p.Inventory.Backpack.Add(new ItemStack(item, count));
         p.Recompute();
         return p;

@@ -84,6 +84,9 @@ public sealed class FlyerParams : SpecParams
 
     /// <summary>Bounces off terrain instead of stopping.</summary>
     public bool BounceOffTerrain { get; init; } = true;
+
+    /// <summary>Gives up the chase at dawn on the surface and flies off (demon eyes).</summary>
+    public bool FleeDaylight { get; init; }
 }
 
 /// <summary>Giant gel boss: big hops, slams, teleports next to a distant target, sheds minions when hurt.</summary>

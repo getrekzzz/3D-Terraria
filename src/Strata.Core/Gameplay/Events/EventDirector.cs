@@ -128,6 +128,7 @@ public sealed class EventDirector
         var session = _world.Session;
         var ctx = session.ContextAt(session.SpawnCell);
         ctx.Residents = _world.Town.Residents.Where(r => r.Alive).Select(r => r.Def.Id).ToHashSet(); // a party needs its host
+        ctx.PlayerMaxLife = _world.Players.Count == 0 ? 0 : _world.Players.Max(p => p.State.Vitals.MaxLife); // Blood Moon, invasions
         foreach (var def in session.Content.Events.All)
         {
             if (def.Phase != phase || def.Chance <= 0 || IsActive(def.Id)) continue;

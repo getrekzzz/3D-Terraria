@@ -81,6 +81,8 @@ public class CombatTests
         g.Ticks(20);
         Assert.True(gel.Life < 1000);
         // Held down (not a fresh press) it stabs again once the use time has passed.
+        gel.Position = g.Player.Position + new Vector3(0, 0.05f, 1.0f); // back in reach after the knockback
+        gel.Velocity = Vector3.Zero;
         int life = gel.Life;
         Assert.Equal(Strata.Core.Gameplay.Interaction.UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, false));
         g.Ticks(20);
@@ -135,6 +137,7 @@ public class CombatTests
     public void SpawnDirectorPicksRulesMatchingTheLocation()
     {
         using var g = Arena();
+        g.World.Spawner.Config = new SpawnConfig { SafeRadius = 0 }; // the arena is the world spawn
         var spawned = new List<Npc>();
         for (int i = 0; i < 40 && !spawned.Any(Hostile); i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
         Assert.Contains(spawned, Hostile);
@@ -143,7 +146,9 @@ public class CombatTests
         g.World.Session.Clock.SetHour(23f);
         spawned.Clear();
         for (int i = 0; i < 40 && !spawned.Any(Hostile); i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
-        Assert.All(spawned.Where(Hostile), n => Assert.Contains(n.Def.Id, new[] { "zombie", "bald_zombie", "the_groom", "raven", "demon_eye", "blue_slime" }));
+        Assert.Contains(spawned, Hostile);
+        // Ravens (Pumpkin Moon) and the Groom (Blood Moon) no longer join ordinary nights.
+        Assert.All(spawned.Where(Hostile), n => Assert.Contains(n.Def.Id, new[] { "zombie", "bald_zombie", "demon_eye", "blue_slime" }));
     }
 
     private static bool Hostile(Npc n) => !n.Def.HasTag("critter");

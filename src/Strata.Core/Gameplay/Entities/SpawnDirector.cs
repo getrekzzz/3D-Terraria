@@ -14,10 +14,22 @@ namespace Strata.Core.Gameplay.Entities;
 /// <summary>Spawn tuning (data/config/spawning.json).</summary>
 public sealed class SpawnConfig
 {
-    public int CheckInterval { get; init; } = 30;
-    public float Chance { get; init; } = 0.18f;
+    public int CheckInterval { get; init; } = 60;
+
+    /// <summary>Chance per check that a spawn is attempted by day.</summary>
+    public float Chance { get; init; } = 0.10f;
+
+    /// <summary>Chance per check at night (defaults to the day chance).</summary>
+    public float? NightChance { get; init; }
+
+    /// <summary>Hostile creatures allowed near a player by day and at night (critters count separately).</summary>
     public int MaxNearbyDay { get; init; } = 4;
-    public int MaxNearbyNight { get; init; } = 7;
+
+    public int MaxNearbyNight { get; init; } = 5;
+
+    /// <summary>Critters (fireflies, bunnies…) allowed near a player.</summary>
+    public int MaxCritters { get; init; } = 3;
+
     public float CountRadius { get; init; } = 60f;
     public float MinDistance { get; init; } = 22f;
     public float MaxDistance { get; init; } = 46f;
@@ -28,13 +40,20 @@ public sealed class SpawnConfig
 
     public float ZoneMaxDistance { get; init; } = 24f;
 
-    /// <summary>Towns: with this many housed residents within <see cref="TownRadius"/> of a player, spawning slows.</summary>
+    /// <summary>No hostile creature appears within this many metres of the world spawn or a player's bed.</summary>
+    public float SafeRadius { get; init; } = 30f;
+
+    /// <summary>Surface cells lit by placed lights to at least this level never spawn hostiles (outside world events).</summary>
+    public int SafeLight { get; init; } = 8;
+
+    /// <summary>A town (see <see cref="SpawnDirector.InTown"/>): this many housed residents within <see cref="TownRadius"/>.</summary>
     public int TownResidents { get; init; } = 2;
 
     public float TownRadius { get; init; } = 40f;
 
-    /// <summary>Spawn chance multiplier inside a town (world events ignore it).</summary>
-    public float TownFactor { get; init; } = 0.25f;
+    /// <summary>Spawn chance multiplier by the number of living residents within <see cref="TownRadius"/> (the last entry
+    /// covers that many or more); world events ignore it.</summary>
+    public float[] TownFactors { get; init; } = { 1f, 0.5f, 0.25f, 0.1f };
 
     public static SpawnConfig Load(IDataSource data)
     {
@@ -79,15 +98,47 @@ public sealed class SpawnDirector
     public void Tick()
     {
         if (!Enabled || _world.Session.Clock.Tick % Config.CheckInterval != 0) return;
-        int max = (_world.Session.Clock.IsDay ? Config.MaxNearbyDay : Config.MaxNearbyNight) + _world.Events.MaxNearbyBonus;
-        float chance = MathF.Min(1f, Config.Chance * _world.Events.SpawnRateMultiplier);
+        bool day = _world.Session.Clock.IsDay;
+        int max = (day ? Config.MaxNearbyDay : Config.MaxNearbyNight) + _world.Events.MaxNearbyBonus;
+        float chance = MathF.Min(1f, (day ? Config.Chance : Config.NightChance ?? Config.Chance) * _world.Events.SpawnRateMultiplier);
         foreach (var p in _world.Players)
         {
-            if (!p.Alive || _npcs.CountNear(p.Center, Config.CountRadius) >= max) continue;
-            float local = InTown(p) && _world.Session.Events.Count == 0 ? chance * Config.TownFactor : chance;
+            if (!p.Alive) continue;
+            bool hostiles = _npcs.CountNear(p.Center, Config.CountRadius, critters: false) < max;
+            bool critters = _npcs.CountNear(p.Center, Config.CountRadius, critters: true) < Config.MaxCritters;
+            if (!hostiles && !critters) continue;
+            float local = _world.Session.Events.Count == 0 ? chance * TownFactor(p) : chance;
             if (!_rng.Chance(local)) continue;
-            TrySpawnNear(p);
+            TrySpawnNear(p, hostiles, critters);
         }
+    }
+
+    /// <summary>Spawn chance multiplier for the residents living around a player (homeless ones count too).</summary>
+    public float TownFactor(PlayerEntity p)
+    {
+        int n = _world.Town.Residents.Count(r => r.Alive && Vector3.Distance(r.Position, p.Position) <= Config.TownRadius);
+        var f = Config.TownFactors;
+        return f.Length == 0 ? 1f : f[Math.Min(n, f.Length - 1)];
+    }
+
+    /// <summary>
+    /// Safe ground: close to the world spawn or a player's bed, or (on the surface, outside world events) lit by
+    /// placed lights. Hostile creatures never appear there; they can still walk in.
+    /// </summary>
+    public bool IsSafe(Int3 cell, World.WorldLayer layer)
+    {
+        float r = Config.SafeRadius / Units.CellSize;
+        foreach (var point in SafePoints())
+            if ((cell - point).LengthSquared < r * r) return true;
+        return layer == World.WorldLayer.Surface && _world.Session.Events.Count == 0 && BlockLight(cell) >= Config.SafeLight;
+    }
+
+    private IEnumerable<Int3> SafePoints()
+    {
+        yield return _world.Session.SpawnCell;
+        foreach (var p in _world.Players)
+            if (p.State.SpawnPoints.TryGetValue(_world.Session.Settings.Name, out var bed) && bed.Length == 3)
+                yield return new Int3(bed[0], bed[1], bed[2]);
     }
 
     private static Conditions.ConditionContext WithRandom(Conditions.ConditionContext target, Conditions.ConditionContext source)
@@ -101,7 +152,7 @@ public sealed class SpawnDirector
         _world.Town.Residents.Count(r => r.Alive && r.Home != null && Vector3.Distance(r.Position, p.Position) <= Config.TownRadius) >= Config.TownResidents;
 
     /// <summary>Attempts one natural spawn near a player; returns the spawned creatures (possibly none).</summary>
-    public List<Npc> TrySpawnNear(PlayerEntity player)
+    public List<Npc> TrySpawnNear(PlayerEntity player, bool hostiles = true, bool critters = true)
     {
         var spawned = new List<Npc>();
         var session = _world.Session;
@@ -120,10 +171,14 @@ public sealed class SpawnDirector
             var ctx = session.ContextAt(cell.Value);
             ctx.Light = EffectiveLight(cell.Value);
             ctx.Random = _rng;
+            ctx.PlayerMaxLife = player.State.Vitals.MaxLife;
             var atPlayer = session.ContextAt(origin);
             atPlayer.Light = EffectiveLight(origin);
+            atPlayer.PlayerMaxLife = player.State.Vitals.MaxLife;
             var exclusive = ctx.Biomes.Where(_exclusive.Contains).ToList();
-            var eligible = _rules.Where(r => (r.Rule.Placement == SpawnPlacement.Liquid ? water : ground) != null
+            bool hostileHere = hostiles && !IsSafe(cell.Value, ctx.Layer);
+            var eligible = _rules.Where(r => (r.Enemy.HasTag("critter") ? critters : hostileHere)
+                && (r.Rule.Placement == SpawnPlacement.Liquid ? water : ground) != null
                 && (exclusive.Count == 0 || exclusive.Any(_namedBiomes[r.Rule].Contains))
                 && (r.Rule.MaxAlive <= 0 || _npcs.All.Count(n => n.Def == r.Enemy) < r.Rule.MaxAlive)
                 && r.Condition.Evaluate(r.Rule.AtPlayer ? WithRandom(atPlayer, ctx) : ctx)).ToList();
@@ -186,6 +241,13 @@ public sealed class SpawnDirector
                 return new Int3(x, cy - 1, z);
         }
         return null;
+    }
+
+    /// <summary>Light from placed lights and glowing blocks only (no sky light).</summary>
+    public int BlockLight(Int3 cell)
+    {
+        var chunk = _world.Session.World.GetChunk(ChunkMath.CellToChunk(cell));
+        return chunk?.Light == null ? 0 : LightValue.BlockMax(chunk.Light[ChunkMath.Index(ChunkMath.CellToLocal(cell))]);
     }
 
     /// <summary>Light a creature would sense: block light, or sky light scaled by daylight.</summary>

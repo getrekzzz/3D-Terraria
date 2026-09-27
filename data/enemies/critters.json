@@ -25,7 +25,7 @@
     {"id": "squirrel_0", "enemy": "squirrel", "weight": 2.0, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]},
     {"id": "bird_0", "enemy": "bird", "weight": 2.0, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]},
     {"id": "butterfly_0", "enemy": "butterfly", "weight": 1.5, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "day"}]},
-    {"id": "firefly_0", "enemy": "firefly", "weight": 3, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "night"}]},
+    {"id": "firefly_0", "enemy": "firefly", "weight": 1, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["forest"]}, {"type": "time", "is": "night"}]},
     {"id": "worm_0", "enemy": "worm", "weight": 1, "conditions": [{"type": "layer", "any": ["surface", "underground"]}]},
     {"id": "frog_0", "enemy": "frog", "weight": 1.5, "conditions": [{"type": "biome", "any": ["jungle"]}]},
     {"id": "duck_0", "enemy": "duck", "weight": 0.6, "conditions": [{"type": "layer", "any": ["surface"]}, {"type": "biome", "any": ["ocean"]}, {"type": "time", "is": "day"}]},

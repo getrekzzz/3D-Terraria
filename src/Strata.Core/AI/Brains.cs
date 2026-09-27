@@ -123,6 +123,18 @@ public sealed class FlyerBrain : IBrain
     {
         bool chasing = ctx.Target != null && ctx.TargetDistance < _p.AggroRange * Units.CellSize;
         npc.Timer++;
+        if (chasing && _p.FleeDaylight && ctx.IsDay && ctx.OnSurface)
+        {
+            // Dawn: climb away from the player until far enough to despawn.
+            npc.TargetPlayer = -1;
+            npc.Phase = 0;
+            var away = BrainFactory.Flat(npc.Center - ctx.Target!.Center);
+            if (away == Vector3.Zero) away = Vector3.UnitX;
+            Steer(npc, Vector3.Normalize(away + new Vector3(0, 0.6f, 0)) * npc.Def.MoveSpeed, 0.05f);
+            npc.Yaw = BrainFactory.YawOf(away);
+            npc.Pose = "move";
+            return;
+        }
         if (!chasing)
         {
             npc.TargetPlayer = -1;
