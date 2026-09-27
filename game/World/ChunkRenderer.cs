@@ -61,8 +61,8 @@ public sealed partial class ChunkRenderer : Node3D
         var origin = ChunkMath.ChunkOrigin(r.Coord);
         var transform = new Transform3D(Basis.Identity, new Vector3(origin.X, origin.Y, origin.Z) * Units.CellSize);
         var scenario = GetWorld3D().Scenario;
-        // Chunks sealed off from the sky cannot shadow anything the sun lights: keep them out of the shadow passes
-        // (unless torches cast shadows too).
+        // Chunks sealed off from the sky cannot shadow anything the sun lights: they sit on their own layer, which the
+        // sun and moon skip (see ChunkLayers), and cast at all only while torches cast shadows.
         visual.SkyExposed = r.SkyExposed;
         var casts = CastsShadows(visual) ? RenderingServer.ShadowCastingSetting.On : RenderingServer.ShadowCastingSetting.Off;
         Add(visual, MeshUpload.Build(r.Opaque, _materials.Opaque, $"chunk {r.Coord} opaque"), scenario, transform, casts);
@@ -70,7 +70,8 @@ public sealed partial class ChunkRenderer : Node3D
         visual.OpaqueParts = visual.Parts.Count;
         Add(visual, MeshUpload.Build(r.Transparent, _materials.Glass, $"chunk {r.Coord} glass"), scenario, transform, RenderingServer.ShadowCastingSetting.Off);
         Add(visual, MeshUpload.Build(r.Liquid, _materials.Liquid, $"chunk {r.Coord} liquid"), scenario, transform, RenderingServer.ShadowCastingSetting.Off);
-        visual.Triangles = r.Opaque.TriangleCount + r.Cutout.TriangleCount + r.Transparent.TriangleCount + r.Liquid.TriangleCount;
+        Add(visual, MeshUpload.Build(r.Lava, _materials.Lava, $"chunk {r.Coord} lava"), scenario, transform, RenderingServer.ShadowCastingSetting.Off);
+        visual.Triangles = r.Opaque.TriangleCount + r.Cutout.TriangleCount + r.Transparent.TriangleCount + r.Liquid.TriangleCount + r.Lava.TriangleCount;
         visual.Visibility = r.Visibility;
         _cullDirty = true;
         TriangleCount += visual.Triangles;
@@ -84,6 +85,7 @@ public sealed partial class ChunkRenderer : Node3D
         var instance = RenderingServer.InstanceCreate2(mesh.GetRid(), scenario);
         RenderingServer.InstanceSetTransform(instance, transform);
         RenderingServer.InstanceGeometrySetCastShadowsSetting(instance, shadows);
+        if (!visual.SkyExposed) RenderingServer.InstanceSetLayerMask(instance, ChunkLayers.Sealed);
         visual.Parts.Add((instance, mesh));
     }
 

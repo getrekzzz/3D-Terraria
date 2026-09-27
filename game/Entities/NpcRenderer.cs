@@ -31,6 +31,29 @@ public sealed partial class NpcRenderer : Node3D
     private GameWorld _game = null!;
     private PropLibrary _props = null!;
 
+    /// <summary>
+    /// Light candidates for <see cref="Rendering.DynamicLights"/>: glowing creatures near the camera. Critters (fireflies)
+    /// blink faintly over a short range; the pool keeps only the nearest few whatever the swarm size.
+    /// </summary>
+    public IEnumerable<Rendering.DynamicLights.Source> Glows(Vector3 eye, float radius)
+    {
+        foreach (var npc in _game.Npcs.All)
+        {
+            if (npc.Def.Light is not { Length: 3 } l || !npc.Alive) continue;
+            var c = npc.Center;
+            var at = new Vector3(c.X, c.Y, c.Z);
+            if (at.DistanceTo(eye) > radius) continue;
+            int max = System.Math.Max(1, System.Math.Max(l[0], System.Math.Max(l[1], l[2])));
+            float peak = max / 15f;
+            bool critter = npc.Def.HasTag("critter");
+            var color = new Color(l[0] / (float)max, l[1] / (float)max, l[2] / (float)max);
+            yield return new Rendering.DynamicLights.Source(at, color, critter ? peak * 0.4f : peak,
+                critter ? Rendering.DynamicLights.Kind.Blink : Rendering.DynamicLights.Kind.Steady,
+                critter ? 2.5f : 2f + max / 3f, critter ? 0.35f : 0.8f, (npc.Id * 0.618034f) % 1f,
+                () => { var p = npc.Center; return new Vector3(p.X, p.Y, p.Z); });
+        }
+    }
+
     public void Initialize(GameWorld game, PropLibrary props)
     {
         _game = game;
@@ -209,24 +232,9 @@ public sealed partial class NpcRenderer : Node3D
         var model = npc.Def.Model ?? npc.Def.Id;
         var visual = Acquire(model);
         if (visual == null) return null;
-        // Visuals are pooled per model, so a reused one may carry another creature's glow.
-        var glow = visual.GetNodeOrNull<OmniLight3D>("Glow");
-        if (npc.Def.Light is { Length: 3 } l)
-        {
-            if (glow == null)
-            {
-                glow = new OmniLight3D { Name = "Glow", LightEnergy = 0.8f, ShadowEnabled = false };
-                visual.AddChild(glow);
-            }
-            glow.LightColor = new Color(l[0] / 15f, l[1] / 15f, l[2] / 15f);
-            glow.OmniRange = 2f + Mathf.Max(l[0], Mathf.Max(l[1], l[2])) / 3f;
-            glow.Position = new Vector3(0, npc.HalfExtents.Y, 0);
-            glow.Visible = true;
-        }
-        else if (glow != null)
-        {
-            glow.Visible = false;
-        }
+        // Glowing creatures get their light from the shared pool (Rendering.DynamicLights, see Glows); visuals made
+        // before that carried their own light, which a pooled visual may still hold.
+        if (visual.GetNodeOrNull<OmniLight3D>("Glow") is { } oldGlow) oldGlow.QueueFree();
         MeshInstance3D? stalk = null;
         if (npc.Def.Brain.Type == Strata.Core.Content.Specs.BrainSpecs.Lunger)
         {

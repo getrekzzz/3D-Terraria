@@ -50,8 +50,11 @@ public sealed partial class SettingsScreen
         Option(box, "Shadow softness", p => p.ShadowFilter, (p, v) => p.ShadowFilter = (int)v, 0, 5, 1, v => $"{v:0}");
         Flag(box, "Dynamic resolution", p => p.DynamicResolution, (p, v) => p.DynamicResolution = v, "Lowers the 3D resolution while the frame rate drops, keeping the game smooth.");
         Flag(box, "Torch shadows", p => p.TorchShadows, (p, v) => p.TorchShadows = v);
+        Option(box, "Nearby lights", p => p.DynamicLights, (p, v) => p.DynamicLights = (int)v, 0, 32, 1, v => v < 1 ? "Off" : $"{v:0}",
+            "Real lights for the nearest torches, lava and glowing creatures (on top of their baked glow). Fewer is faster.");
         Flag(box, "Ambient occlusion (SSAO)", p => p.Ssao, (p, v) => p.Ssao = v);
         Flag(box, "Indirect light (SSIL)", p => p.Ssil, (p, v) => p.Ssil = v, "Expensive.");
+        Flag(box, "Half-resolution SSAO/SSIL", p => p.SsaoHalf && p.SsilHalf, (p, v) => p.SsaoHalf = p.SsilHalf = v, "Much cheaper, slightly softer.");
         Flag(box, "Reflections (SSR)", p => p.Ssr, (p, v) => p.Ssr = v, "Expensive.");
         Flag(box, "Volumetric fog", p => p.VolumetricFog, (p, v) => p.VolumetricFog = v, "Light shafts. Expensive.");
         Flag(box, "Bloom", p => p.Glow, (p, v) => p.Glow = v);

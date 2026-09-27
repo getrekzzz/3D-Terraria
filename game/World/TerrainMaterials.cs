@@ -25,12 +25,16 @@ public sealed class TerrainMaterials
         Cutout = Create("res://shaders/terrain_cutout.gdshader", albedo, material, detail, table, layers);
         Glass = Create("res://shaders/terrain_glass.gdshader", albedo, material, detail, table, layers);
         Liquid = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/liquid.gdshader") };
+        Lava = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/lava.gdshader") };
     }
 
     public ShaderMaterial Opaque { get; }
     public ShaderMaterial Cutout { get; }
     public ShaderMaterial Glass { get; }
     public ShaderMaterial Liquid { get; }
+
+    /// <summary>Lava: opaque, its own pass (no screen copy needed).</summary>
+    public ShaderMaterial Lava { get; }
 
     private static ShaderMaterial Create(string shaderPath, TextureLayered albedo, TextureLayered material, TextureLayered detail, Texture2D table, Texture2D layers)
     {
@@ -43,7 +47,7 @@ public sealed class TerrainMaterials
         return m;
     }
 
-    /// <summary>One RGBAF texel per texture layer: (detail layer, detail strength, 0, 0).</summary>
+    /// <summary>One RGBAF texel per texture layer: (detail layer, detail strength, ore sparkle, 0).</summary>
     private static Texture2D BuildLayerTable(string path)
     {
         using var doc = JsonDocument.Parse(FileAccess.GetFileAsString(path));
@@ -54,10 +58,17 @@ public sealed class TerrainMaterials
         {
             float index = layer.TryGetProperty("detail", out var d) ? d.GetSingle() : 0f;
             float strength = layer.TryGetProperty("detailStrength", out var st) ? st.GetSingle() : 0f;
-            image.SetPixel(layer.GetProperty("index").GetInt32(), 0, new Color(index, strength, 0, 0));
+            string name = layer.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
+            image.SetPixel(layer.GetProperty("index").GetInt32(), 0, new Color(index, strength, Sparkle(name), 0));
         }
         return ImageTexture.CreateFromImage(image);
     }
+
+    private static readonly string[] Gems = { "amethyst", "topaz", "sapphire", "emerald", "ruby", "diamond" };
+
+    /// <summary>How strongly an ore layer glints (gems most, metals less, everything else not at all).</summary>
+    private static float Sparkle(string layer) =>
+        !layer.EndsWith("_ore") ? 0f : System.Array.Exists(Gems, g => layer.StartsWith(g)) ? 1f : 0.7f;
 
     /// <summary>One RGBAF texel per render surface: (top layer, side layer, bottom layer, unused).</summary>
     private static Texture2D BuildSurfaceTable(RenderTables tables)

@@ -101,6 +101,15 @@ public static class WorldLauncher
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
         drops.Initialize(game);
+        var lights = new Rendering.DynamicLights();
+        runtime.AddChild(lights);
+        lights.Initialize(services.Graphics);
+        lights.AddProvider((eye, radius) => Rendering.DynamicLights.PlacedLights(game, objectRenderer.Placement, eye, radius));
+        lights.AddProvider(creatures.Glows);
+        var lava = new Rendering.LavaEffects();
+        runtime.AddChild(lava);
+        lava.Initialize(runtime);
+        lights.AddProvider(lava.HeatLights);
 
         if (o.FreeCamera) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
 
@@ -151,7 +160,7 @@ public static class WorldLauncher
         trail.Initialize(game);
         var carried = new PlayerLight();
         player.AddChild(carried);
-        carried.Initialize(entity, services.Graphics);
+        carried.Initialize(entity, services.Graphics, () => viewModel.LightAnchor, () => avatar.LightAnchor);
 
         var interaction = new InteractionController();
         interaction.Initialize(runtime, player);

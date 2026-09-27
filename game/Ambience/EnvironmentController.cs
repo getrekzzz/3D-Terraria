@@ -14,7 +14,7 @@ public sealed partial class EnvironmentController : Node3D
     /// <summary>Sun radiance scale of the atmosphere (sky shader units).</summary>
     private const float SkyIntensity = 33f;
     private const float SunEnergy = 3.1f;
-    private const float MoonEnergy = 0.3f;
+    private const float MoonEnergy = 0.45f; // a bright moonlit night reads like the reference game's: dark blue, not black
     private const float CloudAltitude = 1600f;
 
     private DirectionalLight3D _sun = null!;
@@ -55,11 +55,13 @@ public sealed partial class EnvironmentController : Node3D
             ReflectedLightSource = Godot.Environment.ReflectionSource.Sky,
             TonemapMode = Godot.Environment.ToneMapper.Agx,
             TonemapExposure = 1.0f,
-            GlowIntensity = 0.45f,
+            // Screen blending lets bright emitters (flames, lava, glowing ores, magic) bloom into a warm halo without
+            // hazing the whole image; only HDR light above the threshold glows.
+            GlowIntensity = 0.7f,
             GlowStrength = 1.0f,
-            GlowBloom = 0.02f,
+            GlowBloom = 0.0f,
             GlowHdrThreshold = 1.0f,
-            GlowBlendMode = Godot.Environment.GlowBlendModeEnum.Softlight,
+            GlowBlendMode = Godot.Environment.GlowBlendModeEnum.Screen,
             FogEnabled = true,
             FogMode = Godot.Environment.FogModeEnum.Depth,
             FogDepthCurve = 1.5f,
@@ -82,8 +84,8 @@ public sealed partial class EnvironmentController : Node3D
             VolumetricFogTemporalReprojectionEnabled = true,
             VolumetricFogTemporalReprojectionAmount = 0.9f,
             AdjustmentEnabled = true,
-            AdjustmentSaturation = 1.1f,
-            AdjustmentContrast = 1.04f,
+            AdjustmentSaturation = 1.22f,
+            AdjustmentContrast = 1.06f,
         };
         for (int level = 0; level < 7; level++) _env.SetGlowLevel(level, level is >= 2 and <= 5 ? 1f : level == 6 ? 0.5f : 0f);
         _camera = new CameraAttributesPractical
@@ -114,6 +116,10 @@ public sealed partial class EnvironmentController : Node3D
             ShadowNormalBias = 1.2f,
             SkyMode = DirectionalLight3D.SkyModeEnum.LightOnly,
         };
+        // Sealed chunks (caves with no opening to the sky) live on their own layer: the sun and moon cannot reach them,
+        // so they never draw into the big sun and moon shadow maps; torches still see them.
+        _sun.ShadowCasterMask = ~World.ChunkLayers.Sealed;
+        _moon.ShadowCasterMask = ~World.ChunkLayers.Sealed;
         AddChild(_sun);
         AddChild(_moon);
 

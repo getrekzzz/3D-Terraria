@@ -134,16 +134,19 @@ def chest(mb: MeshBuilder, p, rng):
 
 
 def torch(mb: MeshBuilder, p, rng):
+    # Stick, cloth wrap and a charred head with a glowing ember core; the flame itself is drawn live by the game
+    # (shaders/flame.gdshader, placed by the object's "flame" data).
     mb.cylinder((0, 0, 0), (0, 0, 0.32), 0.025, 0.03, "prop:bark", segments=6)
     mb.cylinder((0, 0, 0.3), (0, 0, 0.36), 0.04, 0.04, "prop:cloth", "#5a4030", segments=6)
-    mb.sphere((0, 0, 0.42), 0.055, "prop:plain:glow", "#ffb040", subdivisions=1, scale=(1, 1, 1.6))
-    mb.sphere((0, 0, 0.4), 0.035, "prop:plain:glow", "#fff0b0", subdivisions=1, scale=(1, 1, 1.4))
+    mb.sphere((0, 0, 0.365), 0.038, "prop:plain", "#2a1c14", subdivisions=1, scale=(1, 1, 0.7))
+    mb.sphere((0, 0, 0.372), 0.024, "prop:plain:glow", "#ff6a20", subdivisions=1, scale=(1, 1, 0.8))
 
 
 def candle(mb: MeshBuilder, p, rng):
+    # Holder, wax and a blackened wick; the flame is drawn live by the game.
     mb.cylinder((0, 0, 0), (0, 0, 0.02), 0.09, 0.1, "prop:copper", segments=10)
     mb.cylinder((0, 0, 0.02), (0, 0, 0.2), 0.035, None, "prop:plain", "#f0ead8", segments=8)
-    mb.sphere((0, 0, 0.25), 0.03, "prop:plain:glow", "#ffc050", subdivisions=1, scale=(1, 1, 1.7))
+    mb.cylinder((0, 0, 0.2), (0, 0, 0.222), 0.004, 0.003, "prop:plain", "#1a1410", segments=4)
 
 
 def bed(mb: MeshBuilder, p, rng):

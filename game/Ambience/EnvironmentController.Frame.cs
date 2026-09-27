@@ -39,6 +39,7 @@ public sealed partial class EnvironmentController
         var moonT = Atmosphere.Transmittance(moonDir);
         float moonPeak = Mathf.Max(moonT.X, Mathf.Max(moonT.Y, moonT.Z));
         _moon.Visible = moonDir.Y > 0f && Daylight < 0.5f;
+        if (_moon.ShadowEnabled == _sun.Visible) _moon.ShadowEnabled = !_sun.Visible; // one shadow-casting sky light at a time (dusk and dawn overlap)
         _moon.LightColor = new Color(0.66f, 0.76f, 1f);
         _moon.LightEnergy = MoonEnergy * Mathf.Lerp(0.2f, 1f, phaseLight) * moonPeak * (1f - Daylight);
 
@@ -49,30 +50,36 @@ public sealed partial class EnvironmentController
 
         if (_irradianceFrame++ % 10 == 0) _skyIrradiance = Atmosphere.Irradiance(sunDir, SkyIntensity) + Atmosphere.Irradiance(moonDir, MoonSkyIntensity(phaseLight));
         var cam = GetViewport()?.GetCamera3D();
-        var camPos = cam?.GlobalPosition ?? Vector3.Zero;
-        _sky.SetShaderParameter("sun_dir", sunDir);
-        _sky.SetShaderParameter("moon_dir", moonDir);
-        _sky.SetShaderParameter("moon_phase", clock.MoonPhase / 8f);
-        _sky.SetShaderParameter("sun_intensity", SkyIntensity);
-        _sky.SetShaderParameter("moon_intensity", MoonSkyIntensity(phaseLight));
-        _sky.SetShaderParameter("sun_light", sunT * 1.6f);
-        _sky.SetShaderParameter("moon_light", new Vector3(0.05f, 0.06f, 0.08f) * Mathf.Lerp(0.3f, 1f, phaseLight));
-        _sky.SetShaderParameter("sky_ambient", _skyIrradiance * 1.4f + new Vector3(0.004f, 0.006f, 0.012f));
-        _sky.SetShaderParameter("camera_pos", camPos);
-        _sky.SetShaderParameter("night", 1f - Daylight);
-        _sky.SetShaderParameter("star_rotation", clock.Hour / 24f * Mathf.Tau);
-        _sky.SetShaderParameter("twinkle", _time);
-        _sky.SetShaderParameter("tint", Colors.White.Lerp(eventTint, 0.7f) * Colors.White.Lerp(_biomeSky, 0.6f));
-        _sky.SetShaderParameter("ambient_tint", Colors.White.Lerp(_biomeAmbient, 0.5f) * Colors.White.Lerp(eventTint, 0.45f));
+        RenderingServer.GlobalShaderParameterSet("strata_camera", cam?.GlobalPosition ?? Vector3.Zero);
+        // Every sky material change re-renders the radiance cubemap (ambient light and reflections): refresh it a few
+        // times a second, which the slow sun and moon never outpace, instead of every frame.
+        _skyRefresh -= dt;
+        if (_skyRefresh <= 0f)
+        {
+            _skyRefresh = SkyRefreshSeconds;
+            _sky.SetShaderParameter("sun_dir", sunDir);
+            _sky.SetShaderParameter("moon_dir", moonDir);
+            _sky.SetShaderParameter("moon_phase", clock.MoonPhase / 8f);
+            _sky.SetShaderParameter("sun_intensity", SkyIntensity);
+            _sky.SetShaderParameter("moon_intensity", MoonSkyIntensity(phaseLight));
+            _sky.SetShaderParameter("sun_light", sunT * 1.6f);
+            _sky.SetShaderParameter("moon_light", new Vector3(0.05f, 0.06f, 0.08f) * Mathf.Lerp(0.3f, 1f, phaseLight));
+            _sky.SetShaderParameter("sky_ambient", _skyIrradiance * 1.4f + new Vector3(0.004f, 0.006f, 0.012f));
+            _sky.SetShaderParameter("night", 1f - Daylight);
+            _sky.SetShaderParameter("star_rotation", clock.Hour / 24f * Mathf.Tau);
+            _sky.SetShaderParameter("tint", Colors.White.Lerp(eventTint, 0.7f) * Colors.White.Lerp(_biomeSky, 0.6f));
+            _sky.SetShaderParameter("ambient_tint", Colors.White.Lerp(_biomeAmbient, 0.5f) * Colors.White.Lerp(eventTint, 0.45f));
+        }
 
-        // Colour fades at night (rod vision): moonlit scenes read blue-grey rather than green.
-        _env.AdjustmentSaturation = Mathf.Lerp(0.62f, 1.1f, Daylight);
+        // Rich colour by day (the reference game's saturated palette over realistic materials); it fades somewhat at
+        // night (rod vision), keeping moonlit scenes blue rather than grey.
+        _env.AdjustmentSaturation = Mathf.Lerp(0.85f, 1.22f, Daylight);
         _env.AdjustmentBrightness = Mathf.Clamp(Settings.UserSettings.Current.Brightness, 0.5f, 2f);
-        // Night keeps a faint floor under the moonlit sky so shapes stay readable.
-        _env.AmbientLightColor = new Color(0.05f, 0.065f, 0.11f);
+        // Night keeps a floor under the moonlit sky so shapes and creatures stay readable.
+        _env.AmbientLightColor = new Color(0.08f, 0.1f, 0.17f);
         _env.AmbientLightSkyContribution = Mathf.Lerp(0.6f, 1f, Daylight);
 
-        var ambient = new Color(_skyIrradiance.X, _skyIrradiance.Y, _skyIrradiance.Z) + new Color(0.03f, 0.04f, 0.07f);
+        var ambient = new Color(_skyIrradiance.X, _skyIrradiance.Y, _skyIrradiance.Z) + new Color(0.045f, 0.06f, 0.1f);
         ambient *= Colors.White.Lerp(eventTint, 0.45f) * Colors.White.Lerp(_biomeAmbient, 0.5f);
         RenderingServer.GlobalShaderParameterSet("strata_sky_ambient", ambient);
         RenderingServer.GlobalShaderParameterSet("strata_daylight", Daylight);
@@ -81,6 +88,9 @@ public sealed partial class EnvironmentController
 
         UpdateFog(depthBelowSurface, cameraSkyExposure, eventTint, dt);
     }
+
+    private const float SkyRefreshSeconds = 0.25f;
+    private float _skyRefresh;
 
     /// <summary>Moon radiance scale of the atmosphere: a moonlit night sky, stronger at full moon.</summary>
     private static float MoonSkyIntensity(float phaseLight) => SkyIntensity * 0.02f * Mathf.Lerp(0.25f, 1f, phaseLight);

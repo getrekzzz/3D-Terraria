@@ -61,7 +61,7 @@ console switches and remembers one); rendering is described in [`docs/architectu
 | Q (Ctrl+Q) | drop one (stack) |
 | Tab or I | inventory, equipment, crafting, open chest |
 | V, Ctrl+wheel | first/third person, camera distance |
-| ` or F1 / F3 / Esc | console / performance overlay / release mouse |
+| ` or F1 / F3 / Esc | console / performance overlay (FPS, GPU and CPU ms, 3D render scale) / release mouse |
 
 Console commands include `help`, `give`, `drop`, `spawn`, `boss`, `slay`, `god`, `event`, `tp` (also `tp landmark dungeon_gate`, `tp zone hallowed`), `mutations`, `biome`, `time`, `flag`, `setblock`,
 `fill`, `place`, `liquid`, `liquids`, `house`, `town`, `regen`, `inspect`, `probe`, `assert`, `save`, `stream`, `ui`, `camera`, `equip`

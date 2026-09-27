@@ -1,7 +1,7 @@
 # 3D Terraria-Style World — Master Plan (persistent project memory)
 
 > Update this file at the end of every development cycle. It is the single source of truth for what
-> exists, what is partial, what is missing, and what comes next. Last update: 2026-09-26 (cycle M4, graphics).
+> exists, what is partial, what is missing, and what comes next. Last update: 2026-09-27 (cycle M4, player feedback: nights, light, lava, caves, performance).
 
 ## 1. Vision
 A native-3D evolution of Terraria's design philosophy — depth, interconnectivity, freedom, discovery,
@@ -43,6 +43,13 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-26 | Hardmode stations are tier-table data (`barStation`/`craftStation` per metal): cinder forge → hardmode anvil → hardmode forge | The station chain stays one table edit; better stations list the stations they replace. |
 | 2026-09-26 | Far terrain is a generator-sampled polar heightfield (horizon) rather than coarse voxel chunks | Distance reads right at ~22k vertices with no extra chunk generation; voxel detail (caves, builds) only matters close by, where real chunks are streamed. |
 | 2026-09-26 | Boss pairs are `companions` sharing one defeat flag (spawned together, one announcement and bar, flag on the last death); second phases are `Npc.Enraged` + `ranged.enraged` | The Twins need no special-case code, and any brain can switch attacks by phase. |
+| 2026-09-27 | Natural spawning follows the reference rates (1 attempt/s: 10% day, 17% night), counts hostiles and critters separately and never spawns hostiles on safe ground (30 m around the world spawn and beds; torch-lit surface outside events); every resident nearby slows it | A fresh character's first nights were far harder than the reference game's; safe ground is the 3D stand-in for the reference game's off-screen spawning and walled houses. |
+| 2026-09-27 | Knockback replaces a creature's motion and makes it reel (no steering) for 6 + 2·kb ticks; bosses only take the push | Knockback was erased within a few ticks by the AI's steering, so crowds pinned the player. |
+| 2026-09-27 | Expert/Master multiply creature life and damage ×2/×3 (`DamageModel.EnemyScale`) | The menu promised tougher enemies; only player defense scaled before. |
+| 2026-09-27 | Dynamic lights are a preset-sized pool (`DynamicLights`) shared by placed lights, lava hotspots and glowing creatures; flames are a data spec (`flame` on tile objects) drawn by `flame.gdshader` | Baked 4-bit light stops at 7.5 m and every glowing creature carried its own light (fireflies alone could add dozens). |
+| 2026-09-27 | Lava is its own opaque mesh surface and shader; the mesher lists sampled lava surface cells for embers and heat lights | Realistic lava needs its own look and needs no refraction; the transparent pass and screen copy were wasted on it. |
+| 2026-09-27 | Sealed chunks sit on a visual layer the sun and moon shadow maps skip (`Light3D.ShadowCasterMask`) | Torch shadows had forced every cave chunk back into the 4-cascade sun shadow passes on high/ultra. |
+| 2026-09-27 | Cabins stand in the cave tunnels with doorways along the tunnel; one or two rooms; Gold Chests in the cavern layer (also loose, with pots) | Buried cabins were only found by digging; the reference game's caves are dotted with cabins and gold chests. Generator version 9. |
 
 ## 3. System status
 Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
@@ -128,7 +135,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (218, incl. graphics presets, grass scatter, horizon, hardmode life, mechanical bosses) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (313, incl. graphics presets, grass scatter, horizon, hardmode life, mechanical bosses, nights, cabins, legacy saves) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets, graphics presets, grass kinds) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -154,6 +161,10 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
   far 15, far chunks draw a thinned prefix; no shadows.
 * Concerns: dense forests (hundreds of trees in view, alpha-tested overdraw), shadow cost of props, human triangle
   counts, LOD rings not yet implemented.
+* 2026-09-27 (player report: 20–30 fps on ultra, RX 6600): sealed chunks out of the sun/moon shadow maps, one
+  shadow-casting sky light at a time, sky radiance re-rendered 4×/s instead of every frame (and 128² on high/ultra),
+  half-resolution SSAO/SSIL, lighter ultra shadows (4096 atlas, filter 4, 150 m) and fog grid, dynamic resolution driven
+  by measured GPU time, GPU/CPU ms on F3. Not yet measured on the player's GPU.
 
 ## 8. Next development targets (rest of M4)
 M4 graphics delivered the physical sky and clouds, sky-lit PBR shading with graphics presets, synthesised

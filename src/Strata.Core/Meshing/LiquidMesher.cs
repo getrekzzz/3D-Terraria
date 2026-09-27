@@ -7,16 +7,21 @@ namespace Strata.Core.Meshing;
 /// <summary>
 /// Meshes liquid volumes: a smooth free surface (corner heights averaged across neighbouring columns)
 /// plus side and bottom faces where liquid meets open air. Liquid type travels in custom0 for the shader.
+/// Lava goes to its own surface (drawn opaque) when one is given, and its open-air surface cells are listed.
 /// </summary>
 public static class LiquidMesher
 {
-    public static void Build(MeshVolume vol, MeshSurface surface)
+    /// <summary>Most lava surface cells listed per chunk (enough to scatter embers and find hot spots).</summary>
+    public const int MaxLavaTops = 96;
+
+    public static void Build(MeshVolume vol, MeshSurface surface, MeshSurface? lava = null, List<Int3>? lavaTops = null)
     {
         if (!vol.Nb.HasLiquids) return;
         const int c0 = Neighborhood.Margin, c1 = Neighborhood.Margin + ChunkMath.Size;
         var liquids = vol.Nb.Liquids;
         Span<int> tri = stackalloc int[3];
         Span<float> h = stackalloc float[4];
+        int lavaSeen = 0;
         for (int y = c0; y < c1; y++)
             for (int z = c0; z < c1; z++)
                 for (int x = c0; x < c1; x++)
@@ -25,6 +30,7 @@ public static class LiquidMesher
                     byte liquid = liquids[i];
                     if (liquid == 0) continue;
                     var type = LiquidCode.Type(liquid);
+                    var target = type == LiquidType.Lava && lava != null ? lava : surface;
                     ulong ids = MeshSurface.PackIds((int)type, (int)type, (int)type, MeshSurface.FlagLiquid);
                     ushort l = vol.Light[i];
                     uint light = MeshSurface.PackLight(LightValue.R(l), LightValue.G(l), LightValue.B(l), LightValue.Sky(l));
@@ -38,19 +44,36 @@ public static class LiquidMesher
 
                     if (!coveredAbove && !vol.Opaque[MeshVolume.Index(x, y + 1, z)])
                     {
-                        Quad(surface, tri, ids, light, Vector3.UnitY,
+                        Quad(target, tri, ids, light, Vector3.UnitY,
                             new Vector3(x, y + h[0], z), new Vector3(x + 1, y + h[1], z), new Vector3(x + 1, y + h[2], z + 1), new Vector3(x, y + h[3], z + 1));
+                        if (type == LiquidType.Lava && lavaTops != null)
+                            Sample(lavaTops, ++lavaSeen, ChunkMath.ChunkOrigin(vol.Nb.Chunk) + new Int3(x - c0, y - c0, z - c0));
                     }
 
-                    SideIfOpen(vol, surface, tri, ids, light, x, y, z, 1, 0, new Vector3(x + 1, y, z), new Vector3(x + 1, y, z + 1), h[1], h[2], type);
-                    SideIfOpen(vol, surface, tri, ids, light, x, y, z, -1, 0, new Vector3(x, y, z + 1), new Vector3(x, y, z), h[3], h[0], type);
-                    SideIfOpen(vol, surface, tri, ids, light, x, y, z, 0, 1, new Vector3(x + 1, y, z + 1), new Vector3(x, y, z + 1), h[2], h[3], type);
-                    SideIfOpen(vol, surface, tri, ids, light, x, y, z, 0, -1, new Vector3(x, y, z), new Vector3(x + 1, y, z), h[0], h[1], type);
+                    SideIfOpen(vol, target, tri, ids, light, x, y, z, 1, 0, new Vector3(x + 1, y, z), new Vector3(x + 1, y, z + 1), h[1], h[2], type);
+                    SideIfOpen(vol, target, tri, ids, light, x, y, z, -1, 0, new Vector3(x, y, z + 1), new Vector3(x, y, z), h[3], h[0], type);
+                    SideIfOpen(vol, target, tri, ids, light, x, y, z, 0, 1, new Vector3(x + 1, y, z + 1), new Vector3(x, y, z + 1), h[2], h[3], type);
+                    SideIfOpen(vol, target, tri, ids, light, x, y, z, 0, -1, new Vector3(x, y, z), new Vector3(x + 1, y, z), h[0], h[1], type);
 
                     int below = MeshVolume.Index(x, y - 1, z);
                     if (!vol.Opaque[below] && liquids[below] == 0)
-                        Quad(surface, tri, ids, light, -Vector3.UnitY, new Vector3(x, y, z), new Vector3(x + 1, y, z), new Vector3(x + 1, y, z + 1), new Vector3(x, y, z + 1));
+                        Quad(target, tri, ids, light, -Vector3.UnitY, new Vector3(x, y, z), new Vector3(x + 1, y, z), new Vector3(x + 1, y, z + 1), new Vector3(x, y, z + 1));
                 }
+    }
+
+    /// <summary>Reservoir sampling: an even spread of at most <see cref="MaxLavaTops"/> cells over the whole chunk.</summary>
+    private static void Sample(List<Int3> tops, int seen, Int3 cell)
+    {
+        if (tops.Count < MaxLavaTops)
+        {
+            tops.Add(cell);
+            return;
+        }
+        uint hash = (uint)(cell.X * 73856093 ^ cell.Y * 19349663 ^ cell.Z * 83492791);
+        hash ^= hash >> 13;
+        hash *= 0x5bd1e995;
+        int j = (int)(hash % (uint)seen);
+        if (j < MaxLavaTops) tops[j] = cell;
     }
 
     private static bool SameLiquid(byte code, LiquidType type) => code != 0 && LiquidCode.Type(code) == type;

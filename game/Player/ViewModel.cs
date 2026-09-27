@@ -84,6 +84,7 @@ public sealed partial class ViewModel : Node3D
         _model?.QueueFree();
         _model = null;
         _geometry = null;
+        LightAnchor = null;
         if (item == null) return;
         var path = AssetPaths.ItemModel(item, _game.Session.Content);
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
@@ -99,5 +100,15 @@ public sealed partial class ViewModel : Node3D
             _model = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.18f / 128f, Shaded = false };
         }
         AddChild(_model);
+        LightAnchor = _model;
+        if (Flames.Of(item, _game.Session.Content) is { } flame)
+        {
+            var fire = Flames.Single(flame, embers: false); // sparks this close to the eye would look like snowflakes
+            _model.AddChild(fire);
+            LightAnchor = fire;
+        }
     }
+
+    /// <summary>Where a carried light shines from in first person: the held torch's flame, or the held item.</summary>
+    public Node3D? LightAnchor { get; private set; }
 }

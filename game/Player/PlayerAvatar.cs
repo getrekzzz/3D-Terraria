@@ -89,6 +89,7 @@ public sealed partial class PlayerAvatar : Node3D
         _heldItem = item;
         _held?.QueueFree();
         _held = null;
+        LightAnchor = null;
         if (item == null || _visual == null) return;
         var path = AssetPaths.ItemModel(item, _game.Session.Content);
         Node3D node;
@@ -104,8 +105,22 @@ public sealed partial class PlayerAvatar : Node3D
         node.RotationDegrees = new Vector3(90, 0, 0);
         node.Position = new Vector3(0, 0.08f, 0);
         _held = node;
-        if (!_visual.AttachToBone("hand.R", node)) node.QueueFree();
+        LightAnchor = node;
+        if (Flames.Of(item, _game.Session.Content) is { } flame)
+        {
+            var fire = Flames.Single(flame, embers: true);
+            node.AddChild(fire);
+            LightAnchor = fire;
+        }
+        if (!_visual.AttachToBone("hand.R", node))
+        {
+            node.QueueFree();
+            LightAnchor = null;
+        }
     }
+
+    /// <summary>Where a carried light shines from in third person: the held torch's flame, or the held item.</summary>
+    public Node3D? LightAnchor { get; private set; }
 
     private MeshInstance3D? _cart;
 

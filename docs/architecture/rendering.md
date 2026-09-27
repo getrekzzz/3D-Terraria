@@ -9,8 +9,9 @@ tints (`data/biomes.json`) and the generated texture arrays.
 |---|---|---|
 | Sun / moon | `DirectionalLight3D`, colour and irradiance from `Atmosphere.cs` (CPU port of the sky's scattering) | Custom `light()`: GGX (height-correlated Smith, Schlick, Burley diffuse) in `voxel_brdf.gdshaderinc`, gated by the baked sky exposure (`strata_sun_gate`) and by cloud shadows (`clouds.gdshaderinc`) |
 | Sky ambient and reflections | Godot environment, ambient = sky, reflections = sky radiance cubemap | Multiplied per surface by `AO = strata_sky_visibility(voxel light)`, so a sealed cave gets none; Godot also derives specular occlusion from it |
-| Block light (torches, lava, glowing ores and fungi) | Baked RGB voxel light per vertex / instance | `EMISSION = strata_block_light(albedo, light, ao)` |
-| Carried torch | `OmniLight3D` on the player (shadows on high/ultra) | Regular Godot light through the same `light()` |
+| Block light (torches, lava, glowing ores and fungi) | Baked RGB voxel light per vertex / instance | `EMISSION = strata_block_light(albedo, light, ao)`; its curve (`strata_block_curve`, level^1.5) is gentler than the sky's so a torch's glow carries across a room |
+| Nearest light sources | `DynamicLights`: a pool of shadowless `OmniLight3D` (size = preset `dynamicLights`, 0 on low) given each ¼ s to the nearest placed lights, lava hotspots (`LavaEffects`) and glowing creatures (`NpcRenderer.Glows`, fireflies blink) | Regular Godot lights: longer reach and directional shading on top of the baked glow; a firefly swarm never costs more than the pool |
+| Carried torch | `PlayerLight`: an `OmniLight3D` at the flame in the hand (first or third person), ~15 m reach, a fire's flicker (shadows on high/ultra) | Regular Godot light through the same `light()` |
 | Screen space | SSAO, SSIL (colour bleeding), SSR, volumetric fog with light shafts, auto exposure, glow | Environment settings per preset |
 
 `EnvironmentController(.Frame).cs` drives time of day: sun and moon arcs, atmosphere-coloured light, night
@@ -21,14 +22,18 @@ weather and the ground wind (`strata_wind`) that grass and foliage share.
 Single-scattering atmosphere (Rayleigh, Mie, ozone; quadratic sample spacing) evaluated in the quarter-resolution
 pass, a procedural cloud layer (coverage and wind from `strata_clouds`, noise from the shared `strata_cloud_noise`
 texture — the same field casts the cloud shadows on the ground), stars, a lit moon with phases and the sun disc.
-The cubemap pass adds the ambient tint used for image-based lighting.
+The cubemap pass adds the ambient tint used for image-based lighting. Changing a sky material parameter re-renders
+the radiance cubemap, so `EnvironmentController` updates the material four times a second; per-frame values (star
+twinkle, cloud parallax) read the `strata_time` and `strata_camera` globals instead.
 
 ## Surfaces
 | Shader | Used for | Notes |
 |---|---|---|
-| `terrain.gdshader` | Opaque chunk meshes | Triplanar texture array; three surfaces per triangle blended by height (albedo alpha) + barycentrics; detail array grain; macro colour variation; crisp tiles for built blocks |
+| `terrain.gdshader` | Opaque chunk meshes | Triplanar texture array; three surfaces per triangle blended by height (albedo alpha) + barycentrics; detail array grain; macro colour variation; crisp tiles for built blocks; ore glints (layer table `.z`, set for `*_ore` layers) twinkle within ~12 m, brighter in torchlight |
 | `terrain_cutout.gdshader`, `terrain_glass.gdshader` | Leaf/web blocks, glass | Foliage translucency |
-| `liquid.gdshader` | Water, lava, honey | Water: screen-space refraction, Beer–Lambert absorption by thickness, in-scatter colour, sky Fresnel, shallow foam, caustics on the bed. Lava: drifting crust plates (cellular noise) over glowing cracks and pools, surface-gradient bump. Honey: thick amber |
+| `liquid.gdshader` | Water, honey | Water: screen-space refraction, Beer–Lambert absorption by thickness, in-scatter colour, sky Fresnel, shallow foam, caustics on the bed. Honey: thick amber |
+| `lava.gdshader` | Lava (its own opaque surface from `LiquidMesher`, no screen copy) | A churning temperature field decides where the melt skins over: warped two-scale crust plates of dark basalt split by glowing seams and cooling fissures, open hot rivers in blackbody colours (HDR emission, so it blooms), bubbles that swell and burst, a slow downward heave, streaming falls. `LavaEffects` adds embers from the lava surface cells the mesher lists (`LavaTops`) and a flickering heat light per lava chunk |
+| `flame.gdshader` | Torch and candle flames (`flame` spec on the object; held torches too) | An upright billboard of rising turbulence through a teardrop: white-hot core, orange body, flickering red licks; additive HDR. Placed flames are one MultiMesh per chunk and colour (`Flames`), held ones add a few embers in third person |
 | `prop.gdshader` | Generated props, items, creatures | Object-space triplanar of the props array, vertex-colour tint, sway |
 | `foliage_card.gdshader` | Tree crowns and bushes (`card:<layer>` slots) | UV-mapped alpha-tested sprig cards, crown-shaped normals on both faces, sway + flutter, translucency, mip-aware alpha |
 | `character.gdshader` | People (`char:<kind>` slots) | Skin (pores from the detail array, subsurface scattering, wrapped diffuse), eyes, Kajiya–Kay hair highlights along exported tangents, nails, cloth sheen, leather, metal, bone, glow. Detail is sampled in the rest pose rebuilt from the two UV sets, so it sticks to the animated body |
@@ -63,6 +68,19 @@ upscaler (FSR 1/2), anti-aliasing (FXAA/SMAA/TAA/MSAA), anisotropy, shadow atlas
 grass density and distance, mesh LOD threshold, horizon distance. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
 remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`.
 
+Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class GPU):
+* Chunks sealed from the sky sit on their own visual layer (`ChunkLayers.Sealed`) that the sun's and moon's
+  `ShadowCasterMask` skips: they never draw into the 4-cascade sun shadow map, yet torches still cast their shadows.
+* Only one sky light casts shadows at a time (the moon waits for sunset).
+* SSAO/SSIL can run at half resolution (`ssaoHalf`/`ssilHalf`); high and ultra do.
+* `DynamicResolution` lowers the 3D resolution (FSR, down to 60%) only when the measured GPU time shows the GPU is the
+  bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync).
+* F3 shows GPU and render-CPU milliseconds, the current 3D scale and the preset.
+
 ## Global shader parameters (`project.godot`)
-`strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_light_dir`,
+`strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,
 `strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`.
+
+Look: AgX tonemapping with colour adjustment (saturation 1.22 by day, 0.85 at night; contrast 1.06) for the reference
+game's rich palette over realistic materials; glow in Screen blend so HDR emitters (flames, lava, glints, magic) bloom
+without hazing the image; a moonlit night keeps a blue ambient floor so shapes and creatures stay readable.
