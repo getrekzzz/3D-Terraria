@@ -32,11 +32,13 @@ public static class AudioDiagnostics
     public static bool Silent => AudioServer.GetDriverName() == "Dummy";
 
     /// <summary>Logs the audio setup once at startup (the first thing to read when a player hears nothing).</summary>
-    public static void LogStartup(ILog log)
+    /// <param name="automated">Scripted runs (smoke tests, screenshots) are expected to run silent.</param>
+    public static void LogStartup(ILog log, bool automated = false)
     {
         log.Info("audio", $"Output {Device()}. Devices: {string.Join(" | ", AudioServer.GetOutputDeviceList())}.");
         log.Info("audio", $"Buses: {Buses()}.");
-        if (Silent) log.Error("audio", "The audio driver is 'Dummy': no sound will play. Check that an output device is connected and enabled in Windows, and that the game was not started with --audio-driver Dummy.");
+        if (Silent && automated) log.Info("audio", "Silent audio driver (scripted run).");
+        else if (Silent) log.Error("audio", "The audio driver is 'Dummy': no sound will play. Check that an output device is connected and enabled in Windows.");
         foreach (var path in new[] { $"{SfxDirectory}/ui_click.wav", $"{MusicDirectory}/title.ogg" })
             if (Load(path) == null) log.Error("audio", $"Could not load {path}. Open the project in the Godot editor once (or run `godot --path . --import`) so the audio files are imported.");
     }
