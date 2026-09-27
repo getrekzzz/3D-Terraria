@@ -1,6 +1,6 @@
 {
  "columns": 8,
- "rows": 11,
+ "rows": 12,
  "size": 256,
  "layers": [
   {
@@ -608,6 +608,27 @@
   {
    "name": "stellite_ore",
    "index": 86,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "lihzahrd_brick",
+   "index": 87,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "chlorophyte_ore",
+   "index": 88,
+   "type": "ore",
+   "detail": 0,
+   "detailStrength": 0.7
+  },
+  {
+   "name": "luminite",
+   "index": 89,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7

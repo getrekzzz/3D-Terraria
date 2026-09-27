@@ -28,7 +28,7 @@ public class MutationTests
         foreach (var tier in new[] { "smashed_altar_1", "smashed_altar_2", "smashed_altar_3" }) g.World.Progression.Set(tier);
     }
 
-    private const int HardmodeLevel = 5; // hallow and evil wedges, three ore tiers
+    private const int HardmodeLevel = 6; // hallow and evil wedges, chlorophyte, three altar ore tiers
 
     /// <summary>Deep chunks below spawn (cavern stone, far from the test arena).</summary>
     private static IEnumerable<Int3> DeepChunks(TestGame g)
@@ -59,12 +59,12 @@ public class MutationTests
         var log = g.World.Session.Mutations;
         Assert.Equal(0, log.Level);
         Hardmode(g);
-        Assert.Equal(new[] { "hardmode_hallow", "hardmode_evil", "altar_ores_1", "altar_ores_2", "altar_ores_3" }, log.Ids);
+        Assert.Equal(new[] { "hardmode_hallow", "hardmode_evil", "chlorophyte", "altar_ores_1", "altar_ores_2", "altar_ores_3" }, log.Ids);
         g.World.Progression.Clear("hardmode");
         g.World.Progression.Set("hardmode");
         Assert.Equal(HardmodeLevel, log.Level);
         // One ore per alternate group.
-        Assert.Equal(3, g.World.Session.Mutations.Steps.OfType<OreVeinsStep>().Sum(o => o.Rules.Count));
+        Assert.Equal(4, g.World.Session.Mutations.Steps.OfType<OreVeinsStep>().Sum(o => o.Rules.Count)); // one per alternate pair, plus chlorophyte
     }
 
     [Fact]

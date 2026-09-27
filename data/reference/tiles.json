@@ -203,6 +203,18 @@
    "stage": "prehardmode"
   },
   {
+   "id": "terraria:chlorophyte_ore",
+   "name": "Chlorophyte Ore",
+   "kind": "ore",
+   "stage": "hardmode"
+  },
+  {
+   "id": "terraria:lihzahrd_brick",
+   "name": "Lihzahrd Brick",
+   "kind": "structure",
+   "stage": "hardmode"
+  },
+  {
    "id": "terraria:demonite_ore",
    "name": "Demonite Ore",
    "kind": "ore",

@@ -22,6 +22,9 @@ public static class ItemBehaviorSpecs
     /// <summary>A fishing rod: casts its bobber projectile, and reels it (and any catch) back in.</summary>
     public const string Fishing = "fishing";
 
+    /// <summary>Bait that hooks a boss instead of a fish (a Truffle Worm in the ocean hooks Duke Fishron).</summary>
+    public const string BaitSummon = "baitSummon";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
@@ -38,6 +41,7 @@ public static class ItemBehaviorSpecs
         c.Register<IncinerationSummonParams>(SpecKind.ItemBehavior, IncinerationSummon);
         c.Register<GrappleParams>(SpecKind.ItemBehavior, Grapple);
         c.Register<FishingParams>(SpecKind.ItemBehavior, Fishing);
+        c.Register<BaitSummonParams>(SpecKind.ItemBehavior, BaitSummon);
     }
 }
 
@@ -108,6 +112,14 @@ public sealed class ConsumeParams : SpecParams
 
     /// <summary>Opens into this loot table (crates, treasure bags).</summary>
     public string? Loot { get; init; }
+}
+
+public sealed class BaitSummonParams : SpecParams
+{
+    public string Enemy { get; init; } = "";
+
+    /// <summary>Biomes the bobber must float in.</summary>
+    public string[] Biomes { get; init; } = Array.Empty<string>();
 }
 
 public sealed class FishingParams : SpecParams

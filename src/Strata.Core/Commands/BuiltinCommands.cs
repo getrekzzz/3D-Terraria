@@ -286,12 +286,20 @@ public static class BuiltinCommands
             }
             case "zone":
             {
-                // Where a world mutation's zone (the radiant wedge, a blight) meets the surface.
+                // Where a world mutation's zone (the radiant wedge, a blight) meets the surface; or inside a planned
+                // structure's zone (the Jungle Temple), beside its first object.
                 var id = a.Str(1, "biome");
-                var zone = s.Mutations.Zones.OfType<WorldGen.Mutations.WedgeStep>().FirstOrDefault(z => z.Zone == id)
-                    ?? throw new CommandException($"no mutation zone '{id}' (zones: {string.Join(", ", s.Mutations.Zones.Select(z => z.Zone))})");
-                var (x, z, _, _) = zone.Anchor;
-                cell = new Int3((int)x, (int)MathF.Ceiling(s.Generator.Terrain.SurfaceHeight(x, z)) + 1, (int)z);
+                var zone = s.Mutations.Zones.OfType<WorldGen.Mutations.WedgeStep>().FirstOrDefault(z => z.Zone == id);
+                if (zone != null)
+                {
+                    var (x, z, _, _) = zone.Anchor;
+                    cell = new Int3((int)x, (int)MathF.Ceiling(s.Generator.Terrain.SurfaceHeight(x, z)) + 1, (int)z);
+                    break;
+                }
+                var structure = s.Generator.Plan.Features.All.OfType<WorldGen.Structures.StructureFeature>().FirstOrDefault(f => f.Zone == id)
+                    ?? throw new CommandException($"no zone '{id}' (mutation zones: {string.Join(", ", s.Mutations.Zones.Select(z => z.Zone))})");
+                var inside = structure.Blueprint.Ops.OfType<WorldGen.Structures.ObjectOp>().Select(o => o.Anchor).DefaultIfEmpty(structure.Bounds.Min).Last();
+                cell = inside + new Int3(0, 1, 3);
                 break;
             }
             default:

@@ -6,8 +6,8 @@ using Strata.Core.WorldGen.Features;
 namespace Strata.Core.WorldGen.Passes;
 
 /// <summary>
-/// Pass 11 — jungle specifics: honey-filled hives buried in the jungle column (Hive Matriarch lairs) and
-/// the reserved site of the jungle temple (built when temple progression is implemented).
+/// Pass 11 — jungle specifics: honey-filled hives buried in the jungle column (Queen Bee lairs) and the Jungle
+/// Temple deep beneath the jungle's heart.
 /// </summary>
 public sealed class JunglePass : GenPass
 {
@@ -29,8 +29,10 @@ public sealed class JunglePass : GenPass
                 ctx.Plan.AddFeature(new ChamberFeature(center, new Vector3(r, r * 0.8f, r)) { Kind = "hive", Chamber = ChamberKind.Hive, Zone = "hive", Seed = rng.NextUInt() });
             }
 
-            var site = new Vector3(jungle.CenterX, bands.YForNormalizedDepth(0.68f), jungle.CenterZ);
-            ctx.Plan.Features.Add(new ChamberFeature(site, new Vector3(40, 20, 40)) { Kind = "temple_site", Chamber = ChamberKind.Cavern });
+            // The Jungle Temple, deep under the jungle's heart (its door opens with the Temple Key from Plantera).
+            var site = new Common.Int3((int)jungle.CenterX, (int)bands.YForNormalizedDepth(0.68f), (int)jungle.CenterZ);
+            var templeRng = ctx.SeedsFor(this).Rng("temple");
+            StructurePlacementPass.AddStructure(ctx.Plan, "jungle_temple", Structures.TempleBuilder.Build(ctx.Content, site, ref templeRng), zone: "jungle_temple");
         }
     }
 
@@ -38,6 +40,11 @@ public sealed class JunglePass : GenPass
     {
         foreach (var f in ctx.Plan.Features.InChunk(ctx.Coord))
         {
+            if (f is Structures.StructureFeature { Kind: "jungle_temple" } temple)
+            {
+                FeatureCarver.Stamp(ctx, temple.Blueprint);
+                continue;
+            }
             if (f is not ChamberFeature ch || ch.Kind != "hive") continue;
             MiniBiomeCarver.Carve(ctx, ch);
             // The Queen Bee's larva rests in the heart of the hive.

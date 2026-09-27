@@ -59,6 +59,7 @@ public sealed partial class WorldEditor
         };
         if (power <= 0) return ObjectHitResult.WrongTool;
         if (power < obj.Def.MinPower) return ObjectHitResult.TooWeak;
+        if (obj.Def.RequiresFlag is { } flag && !_session.Flags.Contains(flag)) return ObjectHitResult.TooWeak;
         if (obj.Container != null && obj.Container.Any(s => !s.IsEmpty)) return ObjectHitResult.NotEmpty;
         obj.HitPoints -= Math.Max(1, power / 40);
         if (obj.HitPoints > 0) return ObjectHitResult.Damaged;

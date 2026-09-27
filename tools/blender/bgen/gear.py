@@ -241,7 +241,31 @@ def knife(mb: MeshBuilder, p, rng):
                        matrix=Matrix.Translation((0, 0.003, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
 
 
+def drill(mb: MeshBuilder, p, rng):
+    """A power drill: motor housing with a handle, a fluted metal bit pointing along +Z."""
+    layer, tint = _metal(p)
+    mb.box((-0.06, -0.08, -0.12), (0.06, 0.06, 0.2), "prop:iron", "#4a4e56")
+    mb.cylinder((0, -0.02, -0.1), (0, -0.14, -0.2), 0.03, None, "prop:dark_planks", "#3a2a1a", segments=6)
+    mb.cylinder((0, 0, 0.2), (0, 0, 0.3), 0.07, 0.06, layer, tint, segments=10)
+    mb.cylinder((0, 0, 0.3), (0, 0, 0.62), 0.06, 0.0, layer, tint, segments=8, smooth=False)
+    spiral = [Vector((math.cos(a) * 0.05 * (1 - a / 12), math.sin(a) * 0.05 * (1 - a / 12), 0.3 + a * 0.026)) for a in (i * 0.5 for i in range(24))]
+    mb.tube(spiral, [0.012] * len(spiral), layer, tint, segments=4)
+
+
+def chainsaw(mb: MeshBuilder, p, rng):
+    """A chainsaw: engine block, handle and a long toothed bar along +Z."""
+    layer, tint = _metal(p)
+    mb.box((-0.07, -0.08, -0.15), (0.07, 0.08, 0.15), "prop:iron", "#4a4e56")
+    mb.box((-0.06, 0.08, -0.12), (0.06, 0.1, 0.12), layer, tint)
+    mb.box((-0.015, -0.05, 0.15), (0.015, 0.05, 0.7), layer, tint)
+    for k in range(10):
+        z = 0.18 + k * 0.05
+        for y in (-0.055, 0.055):
+            mb.box((-0.01, y - 0.01, z), (0.01, y + 0.01, z + 0.02), "prop:iron", "#c8ccd4")
+
+
 GENERATORS = {
+    "drill": drill, "chainsaw": chainsaw,
     "boomerang": boomerang, "yoyo": yoyo, "flail": flail, "spear": spear, "shuriken": shuriken, "knife": knife,
     "hook": hook, "wings": wings, "shield": shield, "balloon": balloon, "gun": gun, "bullet": bullet, "bomb": bomb,
     "rod": rod, "mirror": mirror, "orb": orb, "crate": crate, "fish": fish, "key": key, "whip": whip,

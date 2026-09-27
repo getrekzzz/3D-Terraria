@@ -1904,6 +1904,43 @@
       "covers": []
     },
     {
+      "id": "cobalt_drill",
+      "name": "Cobalt Drill",
+      "category": "tool",
+      "rarity": 4,
+      "value": 22500,
+      "useStyle": "swing",
+      "useTime": 8,
+      "useAnimation": 14,
+      "autoReuse": true,
+      "damage": 7,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "pickPower": 110,
+      "covers": [
+        "terraria:cobalt_drill"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "cobalt_chainsaw",
+      "name": "Cobalt Chainsaw",
+      "category": "tool",
+      "rarity": 4,
+      "value": 15000,
+      "useStyle": "swing",
+      "useTime": 12,
+      "useAnimation": 18,
+      "autoReuse": true,
+      "damage": 17,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "axePower": 110,
+      "covers": [
+        "terraria:cobalt_chainsaw"
+      ]
+    },
+    {
       "id": "cobalt_broadsword",
       "name": "Cobalt Sword",
       "category": "weapon",
@@ -2066,6 +2103,43 @@
       "knockback": 5.5,
       "hammerPower": 130,
       "covers": []
+    },
+    {
+      "id": "palladium_drill",
+      "name": "Palladium Drill",
+      "category": "tool",
+      "rarity": 4,
+      "value": 25500,
+      "useStyle": "swing",
+      "useTime": 7,
+      "useAnimation": 13,
+      "autoReuse": true,
+      "damage": 9,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "pickPower": 130,
+      "covers": [
+        "terraria:palladium_drill"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "palladium_chainsaw",
+      "name": "Palladium Chainsaw",
+      "category": "tool",
+      "rarity": 4,
+      "value": 17000,
+      "useStyle": "swing",
+      "useTime": 11,
+      "useAnimation": 17,
+      "autoReuse": true,
+      "damage": 19,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "axePower": 130,
+      "covers": [
+        "terraria:palladium_chainsaw"
+      ]
     },
     {
       "id": "palladium_broadsword",
@@ -2232,6 +2306,43 @@
       "covers": []
     },
     {
+      "id": "mythril_drill",
+      "name": "Mythril Drill",
+      "category": "tool",
+      "rarity": 4,
+      "value": 33750,
+      "useStyle": "swing",
+      "useTime": 6,
+      "useAnimation": 12,
+      "autoReuse": true,
+      "damage": 12,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "pickPower": 150,
+      "covers": [
+        "terraria:mythril_drill"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "mythril_chainsaw",
+      "name": "Mythril Chainsaw",
+      "category": "tool",
+      "rarity": 4,
+      "value": 22500,
+      "useStyle": "swing",
+      "useTime": 10,
+      "useAnimation": 16,
+      "autoReuse": true,
+      "damage": 22,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "axePower": 150,
+      "covers": [
+        "terraria:mythril_chainsaw"
+      ]
+    },
+    {
       "id": "mythril_broadsword",
       "name": "Mythril Sword",
       "category": "weapon",
@@ -2394,6 +2505,43 @@
       "knockback": 5.5,
       "hammerPower": 165,
       "covers": []
+    },
+    {
+      "id": "orichalcum_drill",
+      "name": "Orichalcum Drill",
+      "category": "tool",
+      "rarity": 4,
+      "value": 37500,
+      "useStyle": "swing",
+      "useTime": 5,
+      "useAnimation": 11,
+      "autoReuse": true,
+      "damage": 14,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "pickPower": 165,
+      "covers": [
+        "terraria:orichalcum_drill"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "orichalcum_chainsaw",
+      "name": "Orichalcum Chainsaw",
+      "category": "tool",
+      "rarity": 4,
+      "value": 25000,
+      "useStyle": "swing",
+      "useTime": 10,
+      "useAnimation": 16,
+      "autoReuse": true,
+      "damage": 24,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "axePower": 165,
+      "covers": [
+        "terraria:orichalcum_chainsaw"
+      ]
     },
     {
       "id": "orichalcum_broadsword",
@@ -2560,6 +2708,43 @@
       "covers": []
     },
     {
+      "id": "adamantite_drill",
+      "name": "Adamantite Drill",
+      "category": "tool",
+      "rarity": 5,
+      "value": 52500,
+      "useStyle": "swing",
+      "useTime": 4,
+      "useAnimation": 10,
+      "autoReuse": true,
+      "damage": 17,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "pickPower": 180,
+      "covers": [
+        "terraria:adamantite_drill"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "adamantite_chainsaw",
+      "name": "Adamantite Chainsaw",
+      "category": "tool",
+      "rarity": 5,
+      "value": 35000,
+      "useStyle": "swing",
+      "useTime": 8,
+      "useAnimation": 14,
+      "autoReuse": true,
+      "damage": 28,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "axePower": 180,
+      "covers": [
+        "terraria:adamantite_chainsaw"
+      ]
+    },
+    {
       "id": "adamantite_broadsword",
       "name": "Adamantite Sword",
       "category": "weapon",
@@ -2722,6 +2907,43 @@
       "knockback": 5.5,
       "hammerPower": 190,
       "covers": []
+    },
+    {
+      "id": "titanium_drill",
+      "name": "Titanium Drill",
+      "category": "tool",
+      "rarity": 5,
+      "value": 56250,
+      "useStyle": "swing",
+      "useTime": 4,
+      "useAnimation": 10,
+      "autoReuse": true,
+      "damage": 19,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "pickPower": 190,
+      "covers": [
+        "terraria:titanium_drill"
+      ],
+      "mineBrush": 2
+    },
+    {
+      "id": "titanium_chainsaw",
+      "name": "Titanium Chainsaw",
+      "category": "tool",
+      "rarity": 5,
+      "value": 37500,
+      "useStyle": "swing",
+      "useTime": 8,
+      "useAnimation": 14,
+      "autoReuse": true,
+      "damage": 30,
+      "damageType": "melee",
+      "knockback": 0.5,
+      "axePower": 190,
+      "covers": [
+        "terraria:titanium_chainsaw"
+      ]
     },
     {
       "id": "titanium_broadsword",
@@ -4456,6 +4678,32 @@
       ]
     },
     {
+      "id": "cobalt_drill",
+      "output": "cobalt_drill",
+      "inputs": [
+        {
+          "item": "cobalt_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "cobalt_chainsaw",
+      "output": "cobalt_chainsaw",
+      "inputs": [
+        {
+          "item": "cobalt_bar",
+          "count": 10
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
       "id": "cobalt_broadsword",
       "output": "cobalt_broadsword",
       "inputs": [
@@ -4591,6 +4839,32 @@
         {
           "group": "any_wood",
           "count": 3
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "palladium_drill",
+      "output": "palladium_drill",
+      "inputs": [
+        {
+          "item": "palladium_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "anvil"
+      ]
+    },
+    {
+      "id": "palladium_chainsaw",
+      "output": "palladium_chainsaw",
+      "inputs": [
+        {
+          "item": "palladium_bar",
+          "count": 10
         }
       ],
       "stations": [
@@ -4740,6 +5014,32 @@
       ]
     },
     {
+      "id": "mythril_drill",
+      "output": "mythril_drill",
+      "inputs": [
+        {
+          "item": "mythril_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "mythril_chainsaw",
+      "output": "mythril_chainsaw",
+      "inputs": [
+        {
+          "item": "mythril_bar",
+          "count": 10
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
       "id": "mythril_broadsword",
       "output": "mythril_broadsword",
       "inputs": [
@@ -4875,6 +5175,32 @@
         {
           "group": "any_wood",
           "count": 3
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "orichalcum_drill",
+      "output": "orichalcum_drill",
+      "inputs": [
+        {
+          "item": "orichalcum_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "orichalcum_chainsaw",
+      "output": "orichalcum_chainsaw",
+      "inputs": [
+        {
+          "item": "orichalcum_bar",
+          "count": 10
         }
       ],
       "stations": [
@@ -5024,6 +5350,32 @@
       ]
     },
     {
+      "id": "adamantite_drill",
+      "output": "adamantite_drill",
+      "inputs": [
+        {
+          "item": "adamantite_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "adamantite_chainsaw",
+      "output": "adamantite_chainsaw",
+      "inputs": [
+        {
+          "item": "adamantite_bar",
+          "count": 10
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
       "id": "adamantite_broadsword",
       "output": "adamantite_broadsword",
       "inputs": [
@@ -5159,6 +5511,32 @@
         {
           "group": "any_wood",
           "count": 3
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "titanium_drill",
+      "output": "titanium_drill",
+      "inputs": [
+        {
+          "item": "titanium_bar",
+          "count": 15
+        }
+      ],
+      "stations": [
+        "hardmode_anvil"
+      ]
+    },
+    {
+      "id": "titanium_chainsaw",
+      "output": "titanium_chainsaw",
+      "inputs": [
+        {
+          "item": "titanium_bar",
+          "count": 10
         }
       ],
       "stations": [

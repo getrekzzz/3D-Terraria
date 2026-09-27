@@ -346,6 +346,22 @@
     "bee_larva": {
       "generator": "larva",
       "params": {}
+    },
+    "plantera_bulb": {
+      "generator": "bulb",
+      "params": {}
+    },
+    "lihzahrd_door": {
+      "generator": "stone_door",
+      "params": {}
+    },
+    "lihzahrd_altar": {
+      "generator": "altar",
+      "params": {
+        "stone": "#8a5a2a",
+        "glow": "#ffb030",
+        "horn": "#c8a060"
+      }
     }
   },
   "items": {
@@ -391,6 +407,12 @@
         "params": {
           "stack": 3
         }
+      },
+      "{metal}_drill": {
+        "generator": "drill"
+      },
+      "{metal}_chainsaw": {
+        "generator": "chainsaw"
       }
     },
     "explicit": {
@@ -1814,6 +1836,418 @@
         "params": {
           "metal": "#8a8e96"
         }
+      },
+      "beetle_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#6a4a8a"
+        }
+      },
+      "beetle_shell": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#6a4a8a"
+        }
+      },
+      "beetle_leggings": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#6a4a8a"
+        }
+      },
+      "beetle_husk": {
+        "generator": "feather",
+        "params": {
+          "color": "#6a4a8a"
+        }
+      },
+      "chlorophyte_mask": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#5ae05a"
+        }
+      },
+      "chlorophyte_plate_mail": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#5ae05a"
+        }
+      },
+      "chlorophyte_greaves": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#5ae05a"
+        }
+      },
+      "chlorophyte_bar": {
+        "generator": "bar",
+        "params": {
+          "metal": "#5ae05a",
+          "count": 2
+        }
+      },
+      "chlorophyte_pickaxe": {
+        "generator": "pickaxe",
+        "params": {
+          "metal": "#5ae05a"
+        }
+      },
+      "blade_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#f07ad8"
+        }
+      },
+      "breaker_blade": {
+        "generator": "sword",
+        "params": {
+          "metal": "#8a8e96",
+          "guard": "#5a2a2a",
+          "length": 1.3,
+          "width": 0.14
+        }
+      },
+      "bubble_gun": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol",
+          "metal": "#6ab0e8",
+          "accent": "#e8f8ff",
+          "glow": true
+        }
+      },
+      "cell_phone": {
+        "generator": "key",
+        "params": {
+          "metal": "#3a3e46"
+        }
+      },
+      "clockwork_assault_rifle": {
+        "generator": "gun",
+        "params": {
+          "style": "rifle",
+          "metal": "#8a7a5a"
+        }
+      },
+      "compass": {
+        "generator": "ring",
+        "params": {
+          "gem": "#e8e0c8"
+        }
+      },
+      "crystal_storm": {
+        "generator": "tome",
+        "params": {
+          "cover": "#8a5ac8",
+          "emblem": "#f0c8ff",
+          "glow": "#e8a8ff"
+        }
+      },
+      "cursed_flames": {
+        "generator": "tome",
+        "params": {
+          "cover": "#3a5a1a",
+          "emblem": "#9aff3a",
+          "glow": "#9aff3a"
+        }
+      },
+      "golden_shower": {
+        "generator": "tome",
+        "params": {
+          "cover": "#8a6a1a",
+          "emblem": "#ffe03a",
+          "glow": "#ffe03a"
+        }
+      },
+      "daedalus_stormbow": {
+        "generator": "bow",
+        "params": {
+          "limbLayer": "gold",
+          "metal": "#f0d060"
+        }
+      },
+      "depth_meter": {
+        "generator": "ring",
+        "params": {
+          "gem": "#6ab0e8"
+        }
+      },
+      "gps": {
+        "generator": "key",
+        "params": {
+          "metal": "#6a8ab0"
+        }
+      },
+      "empress_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "energy",
+          "color": "#ffc8ff",
+          "glow": true
+        }
+      },
+      "eye_of_the_golem": {
+        "generator": "orb",
+        "params": {
+          "color": "#ffb030"
+        }
+      },
+      "feral_claws": {
+        "generator": "ring",
+        "params": {
+          "gem": "#c8a060"
+        }
+      },
+      "flairon": {
+        "generator": "flail",
+        "params": {
+          "ball": "#4ac0b0"
+        }
+      },
+      "flower_pow": {
+        "generator": "flail",
+        "params": {
+          "ball": "#e05a9a"
+        }
+      },
+      "gelatin_crystal": {
+        "generator": "gem",
+        "params": {
+          "color": "#f07ad8"
+        }
+      },
+      "laser_rifle": {
+        "generator": "gun",
+        "params": {
+          "style": "rifle",
+          "metal": "#b0b8c8",
+          "accent": "#ff4ae0",
+          "glow": true
+        }
+      },
+      "leaf_blower": {
+        "generator": "gun",
+        "params": {
+          "style": "launcher",
+          "metal": "#4a8a2a",
+          "accent": "#9ae070"
+        }
+      },
+      "lihzahrd_power_cell": {
+        "generator": "orb",
+        "params": {
+          "color": "#ffb030",
+          "standColor": "#8a5a2a"
+        }
+      },
+      "magma_stone": {
+        "generator": "chunk",
+        "params": {
+          "layer": "stone",
+          "color": "#ff6a1a"
+        }
+      },
+      "mana_flower": {
+        "generator": "ring",
+        "params": {
+          "gem": "#4a8aff"
+        }
+      },
+      "megashark": {
+        "generator": "gun",
+        "params": {
+          "style": "minigun",
+          "metal": "#6a7a8a",
+          "accent": "#3a4a6a"
+        }
+      },
+      "natures_gift": {
+        "generator": "ring",
+        "params": {
+          "gem": "#6ad04a"
+        }
+      },
+      "nightglow": {
+        "generator": "staff",
+        "params": {
+          "gem": "#ffb0ff"
+        }
+      },
+      "picksaw": {
+        "generator": "pickaxe",
+        "params": {
+          "metal": "#c8a060"
+        }
+      },
+      "possessed_hatchet": {
+        "generator": "axe",
+        "params": {
+          "metal": "#9a6a3a"
+        }
+      },
+      "prismatic_lacewing": {
+        "generator": "orb",
+        "params": {
+          "color": "#f0a8ff",
+          "stand": false
+        }
+      },
+      "pygmy_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#6a9a4a"
+        }
+      },
+      "rainbow_rod": {
+        "generator": "wand",
+        "params": {
+          "gem": "#ff9ae0"
+        }
+      },
+      "razorblade_typhoon_book": {
+        "generator": "tome",
+        "params": {
+          "cover": "#2a6a8a",
+          "emblem": "#9ae0ff",
+          "glow": "#9ae0ff"
+        }
+      },
+      "seedler": {
+        "generator": "sword",
+        "params": {
+          "metal": "#6ad04a",
+          "guard": "#e05a9a",
+          "length": 1.05
+        }
+      },
+      "shiny_stone": {
+        "generator": "gem",
+        "params": {
+          "color": "#ffe8a0"
+        }
+      },
+      "shrimpy_truffle": {
+        "generator": "blob",
+        "params": {
+          "color": "#6a8aff",
+          "layer": "plain:glow"
+        }
+      },
+      "spore_sac": {
+        "generator": "blob",
+        "params": {
+          "color": "#8ab04a"
+        }
+      },
+      "starlight": {
+        "generator": "spear",
+        "params": {
+          "metal": "#e8e0ff",
+          "glow": "#ffffff",
+          "length": 1.2
+        }
+      },
+      "stynger": {
+        "generator": "gun",
+        "params": {
+          "style": "launcher",
+          "metal": "#c8a060",
+          "accent": "#e8c83a"
+        }
+      },
+      "summoner_emblem": {
+        "generator": "ring",
+        "params": {
+          "gem": "#6ae0a0"
+        }
+      },
+      "sun_stone": {
+        "generator": "gem",
+        "params": {
+          "color": "#ffb030"
+        }
+      },
+      "tempest_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#6ab0c8"
+        }
+      },
+      "temple_key": {
+        "generator": "key",
+        "params": {
+          "metal": "#c8a060"
+        }
+      },
+      "terra_blade": {
+        "generator": "sword",
+        "params": {
+          "metal": "#5aff8a",
+          "guard": "#2a6a3a",
+          "glow": true,
+          "length": 1.2
+        }
+      },
+      "terraprisma": {
+        "generator": "sword",
+        "params": {
+          "metal": "#ffc8ff",
+          "guard": "#9ae0ff",
+          "glow": true,
+          "length": 0.9
+        }
+      },
+      "the_axe": {
+        "generator": "axe",
+        "params": {
+          "metal": "#6ad04a"
+        }
+      },
+      "true_excalibur": {
+        "generator": "sword",
+        "params": {
+          "metal": "#fff0c0",
+          "guard": "#f2c850",
+          "glow": true,
+          "length": 1.15
+        }
+      },
+      "true_nights_edge": {
+        "generator": "sword",
+        "params": {
+          "metal": "#9a4aff",
+          "guard": "#2a1a4a",
+          "glow": true,
+          "length": 1.2
+        }
+      },
+      "truffle_worm": {
+        "generator": "blob",
+        "params": {
+          "color": "#6a8aff"
+        }
+      },
+      "tsunami": {
+        "generator": "bow",
+        "params": {
+          "limbLayer": "iron",
+          "metal": "#4ac0b0"
+        }
+      },
+      "venus_magnum": {
+        "generator": "gun",
+        "params": {
+          "style": "pistol",
+          "metal": "#6ad04a",
+          "accent": "#e05a9a"
+        }
+      },
+      "volatile_gelatin": {
+        "generator": "blob",
+        "params": {
+          "color": "#f07ad8",
+          "layer": "plain:glow"
+        }
       }
     }
   },
@@ -2545,6 +2979,115 @@
         "shirt": "#4a6a3a",
         "pants": "#3a4a2a",
         "boots": "#2a3a1a"
+      }
+    },
+    "harpy": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#e8c8b0",
+        "shirt": "#5a7ad8",
+        "pants": "#4a6ac8",
+        "hair": "#3a5ac8",
+        "eyes": "#ffd040",
+        "wings": "#6a8ad8",
+        "boots": "#e8c8b0",
+        "hairStyle": "long",
+        "build": 0.6,
+        "weight": 0.25,
+        "height": 1.6
+      }
+    },
+    "wyvern_head": {
+      "generator": "worm_segment",
+      "params": {
+        "part": "head",
+        "shell": "#f0f0f8",
+        "flesh": "#9ab8e8"
+      }
+    },
+    "wyvern_body": {
+      "generator": "worm_segment",
+      "params": {
+        "part": "segment",
+        "shell": "#f0f0f8",
+        "flesh": "#9ab8e8",
+        "radius": 0.6
+      }
+    },
+    "wyvern_tail": {
+      "generator": "worm_segment",
+      "params": {
+        "part": "tail",
+        "shell": "#f0f0f8",
+        "flesh": "#9ab8e8",
+        "radius": 0.55
+      }
+    },
+    "lihzahrd": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#c87a3a",
+        "shirt": "#8a5a2a",
+        "pants": "#6a4420",
+        "hair": "#3a2410",
+        "eyes": "#ffe040",
+        "tail": "#c87a3a",
+        "boots": "#6a4420",
+        "hairStyle": "bald",
+        "build": 1.0,
+        "weight": 0.5,
+        "height": 1.7
+      }
+    },
+    "flying_snake": {
+      "generator": "bird",
+      "params": {
+        "feathers": "#5a8a3a",
+        "head": "#8ab04a",
+        "wing": "#4a6a2a"
+      }
+    },
+    "plantera": {
+      "generator": "plantera",
+      "params": {}
+    },
+    "plantera_open": {
+      "generator": "plantera",
+      "params": {
+        "open": true
+      }
+    },
+    "golem": {
+      "generator": "golem",
+      "params": {}
+    },
+    "queen_slime": {
+      "generator": "gel_sovereign",
+      "params": {
+        "body": "#f07ad8"
+      }
+    },
+    "duke_fishron": {
+      "generator": "fish",
+      "params": {
+        "scales": "#4ac0b0",
+        "belly": "#e8d8a0"
+      }
+    },
+    "lacewing": {
+      "generator": "insect",
+      "params": {
+        "color": "#f0a8ff",
+        "stripes": "#8ae0ff",
+        "eyes": "#ffffff"
+      }
+    },
+    "empress_of_light": {
+      "generator": "sprite",
+      "params": {
+        "glow": "#fff0ff",
+        "hair": "#ffb0e8",
+        "wing": "#9ae0ff"
       }
     }
   }

@@ -207,6 +207,8 @@ obsidian|Obsidian|prehardmode|stone
 ash_block|Ash Block|prehardmode|soil
 hellstone|Hellstone|prehardmode|ore
 meteorite|Meteorite|prehardmode|ore
+chlorophyte_ore|Chlorophyte Ore|hardmode|ore
+lihzahrd_brick|Lihzahrd Brick|hardmode|structure
 demonite_ore|Demonite Ore|prehardmode|ore
 crimtane_ore|Crimtane Ore|prehardmode|ore
 cloud|Cloud|early|sky

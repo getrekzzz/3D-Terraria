@@ -45,6 +45,9 @@ public sealed class ItemUseInfo
     /// <summary>Fishing rod parameters.</summary>
     public FishingParams? Fishing { get; internal set; }
 
+    /// <summary>Boss this bait hooks (Truffle Worm).</summary>
+    public BaitSummonParams? BaitSummon { get; internal set; }
+
     /// <summary>Boss summoned when this item burns in a liquid (not a use action).</summary>
     public IncinerationSummonParams? Incineration { get; internal set; }
 
@@ -136,6 +139,7 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.IncinerationSummon: info.Incineration = spec.Parse<IncinerationSummonParams>(); break;
                 case ItemBehaviorSpecs.Grapple: a |= ItemAction.Grapple; info.Grapple = spec.Parse<GrappleParams>(); break;
                 case ItemBehaviorSpecs.Fishing: a |= ItemAction.Fish; info.Fishing = spec.Parse<FishingParams>(); break;
+                case ItemBehaviorSpecs.BaitSummon: info.BaitSummon = spec.Parse<BaitSummonParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

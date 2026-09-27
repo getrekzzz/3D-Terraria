@@ -25,7 +25,7 @@
   "lootTables": [
     { "id": "pixie", "coins": [200, 500], "entries": [{ "item": "pixie_dust", "min": 1, "max": 3 }] },
     { "id": "unicorn", "coins": [400, 900], "entries": [{ "item": "unicorn_horn" }] },
-    { "id": "illuminant_slime", "coins": [200, 450], "entries": [{ "item": "gel", "min": 2, "max": 4 }, { "item": "soul_of_light", "chance": 0.2 }] },
+    { "id": "illuminant_slime", "coins": [200, 450], "entries": [{ "item": "gel", "min": 2, "max": 4 }, { "item": "soul_of_light", "chance": 0.2 }, { "item": "gelatin_crystal", "chance": 0.03 }] },
     { "id": "chaos_elemental", "coins": [300, 700], "entries": [{ "item": "soul_of_light", "chance": 0.25 }, { "item": "pixie_dust", "chance": 0.2 }] },
     { "id": "corruptor", "coins": [250, 600], "entries": [{ "item": "cursed_flame", "min": 1, "max": 2, "chance": 0.5 }, { "item": "soul_of_night", "chance": 0.15 }] },
     { "id": "corrupt_slime", "coins": [200, 450], "entries": [{ "item": "gel", "min": 2, "max": 4 }, { "item": "cursed_flame", "chance": 0.2 }, { "item": "soul_of_night", "chance": 0.1 }] },

@@ -78,6 +78,18 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>What breaking it sets in motion (shadow orbs, crimson hearts, altars).</summary>
     public BreakEffect? OnBreak { get; init; }
 
+    /// <summary>Cannot be broken until this world flag is set (Plantera's Bulbs wait for the mechanical bosses).</summary>
+    public string? RequiresFlag { get; init; }
+
+    /// <summary>A door that stays locked until this flag is set; using it with <see cref="Key"/> sets the flag.</summary>
+    public string? LockedUntil { get; init; }
+
+    /// <summary>Item consumed to unlock a door or to activate an altar (Temple Key, Lihzahrd Power Cell).</summary>
+    public string? Key { get; init; }
+
+    /// <summary>Boss an "activate" object summons when used with its <see cref="Key"/> (the Lihzahrd Altar calls Golem).</summary>
+    public string? Summon { get; init; }
+
     /// <summary>The item id that places/drops this object.</summary>
     public string? PlacingItemId => Item ?? (Natural ? null : Id);
 

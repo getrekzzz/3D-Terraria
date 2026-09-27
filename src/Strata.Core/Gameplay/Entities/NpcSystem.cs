@@ -265,6 +265,9 @@ public sealed partial class NpcSystem
         npc.Velocity += away * hit.Knockback * 1.2f + new Vector3(0, hit.Knockback * 0.5f, 0);
         Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
         if (npc.Life <= 0) Kill(npc);
+        else if (melee && attacker != null)
+            foreach (var inflict in attacker.State.Effects.Inflicts)
+                if (_rng.Chance(inflict.Chance) && _world.Session.Content.Buffs.TryGet(inflict.Buff, out var buff)) AddBuff(npc, buff, inflict.Ticks);
         return true;
     }
 

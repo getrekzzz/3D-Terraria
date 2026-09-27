@@ -47,5 +47,37 @@ killall
 # A meteorite strike leaves a crater of ore.
 meteor
 assert errors == 0
+# Hardmode's bosses: each appears, fights and raises its flag when slain.
+boss queen_slime 12
+wait 2
+assert npcs.queen_slime == 1
+slay queen_slime
+assert flag.defeated_queen_slime == 1
+killall
+boss plantera 12
+wait 2
+assert npcs.plantera == 1
+slay plantera
+assert flag.defeated_plantera == 1
+killall
+boss golem 14
+wait 2
+assert npcs.golem == 1
+slay golem
+assert flag.defeated_golem == 1
+killall
+boss duke_fishron 14
+wait 2
+assert npcs.duke_fishron == 1
+slay duke_fishron
+assert flag.defeated_duke_fishron == 1
+killall
+time 22
+boss empress_of_light 14
+wait 2
+assert npcs.empress_of_light == 1
+slay empress_of_light
+assert flag.defeated_empress_of_light == 1
+killall
 time noon
 assert errors == 0

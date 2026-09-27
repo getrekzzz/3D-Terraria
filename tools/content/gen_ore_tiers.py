@@ -16,7 +16,7 @@ OUT = REPO / "data" / "items" / "generated" / "ore_tiers.json"
 # Hardmode metals map their pieces onto the reference game's family names (the reference has no helmet, hammer or
 # shortsword for them, so those pieces cover nothing).
 REF_PIECES = {"pickaxe": "pickaxe", "axe": "waraxe", "broadsword": "sword", "bow": "repeater",
-              "chainmail": "breastplate", "greaves": "leggings", "bar": "bar"}
+              "chainmail": "breastplate", "greaves": "leggings", "bar": "bar", "drill": "drill", "chainsaw": "chainsaw"}
 
 
 def covers(t: dict, piece: str) -> list:
@@ -56,12 +56,18 @@ def build(table: dict) -> dict:
                     stat_field: p, "covers": covers(t, kind)}
             item.update(extra)
             items.append(item)
-            recipes.append({"id": iid, "output": iid, "inputs": [{"item": bar, "count": bars},
-                            {"group": "any_wood", "count": wood}], "stations": craft})
+            inputs = [{"item": bar, "count": bars}] + ([{"group": "any_wood", "count": wood}] if wood else [])
+            recipes.append({"id": iid, "output": iid, "inputs": inputs, "stations": craft})
 
         tool("pickaxe", "pickPower", t["pick"], 12, 4, {"mineBrush": 2})
         tool("axe", "axePower", t["axe"], 9, 3, {})
         tool("hammer", "hammerPower", t["hammer"], 10, 3, {"knockback": 5.5})
+        if "refMetal" in t:
+            # Hardmode metals also make power tools: faster than the pickaxe and waraxe, a little weaker in a fight.
+            dmg, use = t["pick"]
+            tool("drill", "pickPower", (max(1, dmg - 3), max(4, use - 5)), 15, 0, {"mineBrush": 2, "knockback": 0.5})
+            dmg, use = t["axe"]
+            tool("chainsaw", "axePower", (max(1, dmg - 8), max(4, use - 10)), 10, 0, {"knockback": 0.5})
 
         dmg, use, kb = t["broad"]
         items.append({"id": f"{m}_broadsword", "name": label(t, "broadsword"), "category": "weapon", "rarity": r,

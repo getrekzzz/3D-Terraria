@@ -24,6 +24,12 @@ public static class EffectSpecs
     /// <summary>Creatures with a tag stop hurting the wearer (Royal Gel: slimes).</summary>
     public const string Pacify = "pacify";
 
+    /// <summary>Melee hits may inflict a debuff (Magma Stone: fire).</summary>
+    public const string Inflict = "inflict";
+
+    /// <summary>An information readout on the HUD (Depth Meter: depth, Compass: position, GPS: both and time).</summary>
+    public const string Info = "info";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -38,6 +44,8 @@ public static class EffectSpecs
         c.Register<FlightParams>(SpecKind.Effect, Flight);
         c.Register<DashParams>(SpecKind.Effect, Dash);
         c.Register<PacifyParams>(SpecKind.Effect, Pacify);
+        c.Register<InflictParams>(SpecKind.Effect, Inflict);
+        c.Register<InfoParams>(SpecKind.Effect, Info);
     }
 }
 
@@ -123,4 +131,20 @@ public sealed class PacifyParams : SpecParams
 {
     /// <summary>Creature tag made harmless (e.g. "gel").</summary>
     public string Tag { get; init; } = "";
+}
+
+public sealed class InflictParams : SpecParams
+{
+    public string Buff { get; init; } = "";
+    public int Ticks { get; init; } = 180;
+    public float Chance { get; init; } = 0.33f;
+}
+
+public sealed class InfoParams : SpecParams, IValidatableSpec
+{
+    public static readonly string[] Kinds = { "depth", "position", "time" };
+
+    public string[] Show { get; init; } = Array.Empty<string>();
+
+    public string? Validate() => Show.All(k => Array.IndexOf(Kinds, k) >= 0) ? null : $"show must be of {string.Join(", ", Kinds)}";
 }

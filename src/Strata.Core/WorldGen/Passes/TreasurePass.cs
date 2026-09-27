@@ -23,6 +23,8 @@ public sealed class TreasurePass : GenPass
         var chest = tiles.Get("wooden_chest");
         var crystal = tiles.Get("life_crystal_node");
         var altar = tiles.Get(ctx.Gen.Plan.Settings.Evil == World.EvilKind.Crimson ? "crimson_altar" : "demon_altar");
+        var bulb = tiles.Get("plantera_bulb");
+        byte jungle = (byte)ctx.Gen.Content.Biomes.Get("jungle").RuntimeId;
         float depth = ctx.Depth(ctx.ChunkOrigin.Y + 16);
         if (depth < 0.02f) return;
 
@@ -37,6 +39,8 @@ public sealed class TreasurePass : GenPass
             else if (roll < 0.17f) Place(ctx, pot, x, floorY, z, rng.NextInt(4), null, rng.NextInt(3));
             else if (roll < 0.1745f && depth > 0.06f && TryFindFloor(ctx, x + 2, z, 3, out int other) && other == floorY)
                 Place(ctx, altar, x, floorY, z, rng.NextInt(4), null); // demon altars dot the underground
+            else if (roll < 0.182f && depth > 0.3f && ctx.Biome[ctx.WorldIndex(x, floorY, z)] == jungle)
+                Place(ctx, bulb, x, floorY, z, 0, null); // Plantera's Bulbs, sealed until the mechanical bosses fall
         }
     }
 

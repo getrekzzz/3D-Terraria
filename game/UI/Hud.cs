@@ -30,6 +30,7 @@ public sealed partial class Hud : CanvasLayer
     private Crosshair _crosshair = null!;
     private Label _targetName = null!;
     private Label _fps = null!;
+    private Label _info = null!;
     private PanelContainer _bossPanel = null!;
     private Label _bossName = null!;
     private ProgressBar _bossBar = null!;
@@ -98,6 +99,11 @@ public sealed partial class Hud : CanvasLayer
         _fps = new Label { Position = new Vector2(16, 44), MouseFilter = Control.MouseFilterEnum.Ignore };
         _fps.AddThemeFontSizeOverride("font_size", 14);
         root.AddChild(_fps);
+        _info = new Label { Position = new Vector2(16, 64), MouseFilter = Control.MouseFilterEnum.Ignore };
+        _info.AddThemeFontSizeOverride("font_size", 14);
+        _info.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
+        _info.AddThemeConstantOverride("outline_size", 4);
+        root.AddChild(_info);
 
         _death = new Label { Visible = false, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         _death.SetAnchorsPreset(Control.LayoutPreset.FullRect);
@@ -137,6 +143,10 @@ public sealed partial class Hud : CanvasLayer
         };
         ui.Game.Objectives.Announced += (text, color) => Announce(text, Color.FromHtml(color));
         npcs.Announced += text => Announce(text, new Color(1f, 0.55f, 0.45f));
+        ui.Game.Interaction.Refused += (p, message) =>
+        {
+            if (p == ui.Entity) Toast(message, UiTheme.Muted);
+        };
         ui.Game.ItemUse.Caught += (p, stack) =>
         {
             if (p == ui.Entity) Toast($"Caught {stack.Item!.DisplayName}!", UiTheme.Rarity(stack.Item.Rarity));
@@ -192,6 +202,7 @@ public sealed partial class Hud : CanvasLayer
         _fps.Visible = Settings.UserSettings.Current.ShowFps;
         if (_fps.Visible) _fps.Text = $"{Engine.GetFramesPerSecond():0} FPS";
         _targetName.Text = Settings.UserSettings.Current.ShowTargetName && _ui.Interaction.InReach ? TargetName() : "";
+        _info.Text = InfoText();
         _death.Visible = !_ui.Entity.Alive;
         if (_death.Visible)
             _death.Text = _ui.Entity.Lost
@@ -324,5 +335,33 @@ public sealed partial class Hud : CanvasLayer
             DrawLine(new Vector2(0, -8), new Vector2(0, -3), c, 2);
             DrawLine(new Vector2(0, 3), new Vector2(0, 8), c, 2);
         }
+    }
+
+    /// <summary>Readouts from worn information accessories (Depth Meter, Compass, GPS, Cell Phone).</summary>
+    private string InfoText()
+    {
+        var info = _ui.Entity.State.Effects.Info;
+        if (info.Count == 0) return "";
+        var session = _ui.Game.Session;
+        var cell = _ui.Entity.FeetCell;
+        var lines = new System.Collections.Generic.List<string>();
+        if (info.Contains("depth"))
+        {
+            float depth = session.ContextAt(cell).Depth * Strata.Core.Common.Units.CellSize;
+            lines.Add(Mathf.Abs(depth) < 2f ? "Depth: surface" : depth > 0 ? $"Depth: {depth:0} m below" : $"Height: {-depth:0} m above");
+        }
+        if (info.Contains("position"))
+        {
+            var size = session.Settings.Dimensions;
+            float east = (cell.X - size.X * 0.5f) * Strata.Core.Common.Units.CellSize, north = (size.Z * 0.5f - cell.Z) * Strata.Core.Common.Units.CellSize;
+            lines.Add($"{Mathf.Abs(east):0} m {(east >= 0 ? "east" : "west")}, {Mathf.Abs(north):0} m {(north >= 0 ? "north" : "south")}");
+        }
+        if (info.Contains("time"))
+        {
+            float hour = session.Clock.Hour;
+            int h = (int)hour, m = (int)((hour - h) * 60);
+            lines.Add($"{(h % 12 == 0 ? 12 : h % 12)}:{m:00} {(h < 12 ? "AM" : "PM")}");
+        }
+        return string.Join("\n", lines);
     }
 }

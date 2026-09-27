@@ -844,6 +844,37 @@
    "cracks": 0.4,
    "ore": "#dce8f8",
    "metallic": 0.85
+  },
+  {
+   "name": "lihzahrd_brick",
+   "type": "bricks",
+   "base": "#8a5a2a",
+   "dark": "#5a3a1a",
+   "light": "#b07a40",
+   "mortar": "#3a2410",
+   "roughness": 0.5
+  },
+  {
+   "name": "chlorophyte_ore",
+   "type": "ore",
+   "base": "#4d3a36",
+   "dark": "#33251f",
+   "light": "#65504a",
+   "cells": 16,
+   "cracks": 0.5,
+   "ore": "#5ae05a",
+   "metallic": 0.4
+  },
+  {
+   "name": "luminite",
+   "type": "ore",
+   "base": "#1a3a3a",
+   "dark": "#0a2020",
+   "light": "#2a5a5a",
+   "cells": 14,
+   "cracks": 0.6,
+   "ore": "#6affd0",
+   "metallic": 0.7
   }
  ]
 }

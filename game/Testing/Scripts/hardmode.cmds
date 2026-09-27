@@ -6,10 +6,10 @@ town arrivals off
 assert mutation.level == 0
 flag defeated_wall_of_flesh
 assert flag.hardmode == 1
-assert mutation.level == 2
+assert mutation.level == 3
 # Each altar smashed with a Pwnhammer seeds the next tier of ore.
 flag smashed_altar_1
-assert mutation.level == 3
+assert mutation.level == 4
 wait_until mutation.behind == 0 60
 mutations
 

@@ -1,0 +1,129 @@
+{
+  // Hardmode's optional terrors: Queen Slime (a Gelatin Crystal in the Hallow), Duke Fishron (a Truffle Worm used as
+  // bait in the ocean) and the Empress of Light (a Prismatic Lacewing set free in the Hallow at night).
+  "projectiles": [
+    { "id": "queen_slime_crystal", "name": "Crystal", "visual": "orb", "color": "#f07ad8", "gravity": 10, "lifetime": 200, "radius": 0.4, "friendly": false, "hostile": true, "light": [10, 4, 9] },
+    { "id": "fishron_bubble", "name": "Detonating Bubble", "visual": "orb", "color": "#9ae0ff", "lifetime": 240, "radius": 0.6, "homing": 1.5, "friendly": false, "hostile": true },
+    { "id": "prismatic_bolt", "name": "Prismatic Bolt", "visual": "bolt", "color": "#ff9aff", "lifetime": 240, "radius": 0.45, "homing": 1.2, "friendly": false, "hostile": true, "light": [12, 8, 14], "trail": "#b0e0ff" },
+    { "id": "ethereal_lance", "name": "Ethereal Lance", "visual": "bolt", "color": "#ffe88a", "lifetime": 90, "radius": 0.4, "friendly": false, "hostile": true, "light": [14, 12, 6], "trail": "#ffffff" },
+    { "id": "enchanted_dagger", "name": "Enchanted Dagger", "visual": "item", "model": "blade_staff", "scale": 0.6, "lifetime": 60, "radius": 0.6, "pierce": -1, "minion": { "speed": 16, "range": 26 } },
+    { "id": "tempest_shark", "name": "Sharknado", "visual": "creature", "model": "fish", "color": "#6ab0c8", "scale": 0.6, "lifetime": 60, "radius": 0.7, "pierce": -1, "minion": { "speed": 13, "range": 28 } },
+    { "id": "terraprisma_blade", "name": "Terraprisma", "visual": "item", "model": "terraprisma", "scale": 0.8, "lifetime": 60, "radius": 0.7, "pierce": -1, "light": [10, 8, 14], "minion": { "speed": 22, "range": 32 } },
+    { "id": "razorblade_typhoon", "name": "Razorblade Typhoon", "visual": "bolt", "color": "#9ae0ff", "lifetime": 180, "radius": 0.6, "homing": 5, "pierce": 3, "trail": "#e0f8ff" },
+    { "id": "nightglow_bolt", "name": "Nightglow", "visual": "bolt", "color": "#ffb0ff", "lifetime": 180, "radius": 0.4, "homing": 6, "light": [10, 6, 12], "trail": "#ffe0ff" },
+    { "id": "bubble", "name": "Bubble", "visual": "orb", "color": "#bfe8ff", "lifetime": 90, "radius": 0.4, "drag": 1.5 },
+    { "id": "flairon", "name": "Flairon", "visual": "item", "lifetime": 120, "radius": 0.8, "returns": 26, "pierce": -1 }
+  ],
+  "items": [
+    { "id": "gelatin_crystal", "name": "Gelatin Crystal", "description": "Summons Queen Slime. Use in the Hallow.", "category": "bossSummon", "rarity": 5, "maxStack": 20, "value": 20000,
+      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+      "behaviors": [{ "type": "summonBoss", "enemy": "queen_slime", "conditions": [{ "type": "biome", "any": ["hallow"] }], "failMessage": "The crystal only shivers in the Hallow." }] },
+    { "id": "blade_staff", "name": "Blade Staff", "description": "Summons an enchanted dagger to fight for you. Takes no minion slot.", "category": "weapon", "rarity": 5, "value": 50000,
+      "useStyle": "shoot", "useTime": 20, "useAnimation": 20, "damage": 12, "damageType": "summon", "manaCost": 10, "projectile": "enchanted_dagger", "shootSpeed": 3 },
+    { "id": "volatile_gelatin", "name": "Volatile Gelatin", "description": "Releases volatile gelatin that damages enemies.", "category": "accessory", "rarity": 5, "value": 50000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "genericDamage", "add": 0.04 }] },
+    { "id": "truffle_worm", "name": "Truffle Worm", "description": "Bait that something big in the ocean craves.", "category": "fishing", "rarity": 5, "maxStack": 20, "value": 50000,
+      "behaviors": [{ "type": "baitSummon", "enemy": "duke_fishron", "biomes": ["ocean"] }] },
+    { "id": "flairon", "name": "Flairon", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "shoot", "useTime": 40, "useAnimation": 40,
+      "damage": 66, "damageType": "melee", "knockback": 7, "projectile": "flairon", "shootSpeed": 20 },
+    { "id": "tsunami", "name": "Tsunami", "description": "Fires five arrows at once.", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "shoot", "useTime": 24, "useAnimation": 24,
+      "autoReuse": true, "damage": 60, "damageType": "ranged", "knockback": 2, "useAmmo": "arrow", "shootSpeed": 26, "behaviors": [{ "type": "shootProjectile", "count": 5, "spread": 10 }] },
+    { "id": "razorblade_typhoon_book", "name": "Razorblade Typhoon", "description": "Casts fast moving razorwheels.", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "shoot", "useTime": 40,
+      "useAnimation": 40, "autoReuse": true, "damage": 90, "damageType": "magic", "knockback": 4, "manaCost": 16, "projectile": "razorblade_typhoon", "shootSpeed": 14 },
+    { "id": "bubble_gun", "name": "Bubble Gun", "description": "Rapidly shoots forceful bubbles.", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+      "autoReuse": true, "damage": 90, "damageType": "magic", "knockback": 3, "manaCost": 4, "projectile": "bubble", "shootSpeed": 20, "behaviors": [{ "type": "shootProjectile", "spread": 6 }] },
+    { "id": "tempest_staff", "name": "Tempest Staff", "description": "Summons sharknados to fight for you.", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "shoot", "useTime": 36, "useAnimation": 36,
+      "damage": 40, "damageType": "summon", "manaCost": 10, "projectile": "tempest_shark", "shootSpeed": 3 },
+    { "id": "shrimpy_truffle", "name": "Shrimpy Truffle", "description": "Grants the ability to breathe water and move quickly in it.", "category": "accessory", "rarity": 8, "value": 100000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "waterBreathing" }, { "type": "stat", "stat": "moveSpeed", "add": 0.1 }] },
+
+    { "id": "prismatic_lacewing", "name": "Prismatic Lacewing", "description": "Summons the Empress of Light. Use in the Hallow at night.", "category": "bossSummon", "rarity": 7, "maxStack": 20, "value": 50000,
+      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+      "behaviors": [{ "type": "summonBoss", "enemy": "empress_of_light", "conditions": [{ "type": "biome", "any": ["hallow"] }, { "type": "time", "is": "night" }], "failMessage": "It only glows in the Hallow at night." }] },
+    { "id": "terraprisma", "name": "Terraprisma", "description": "Summons an enchanted prism blade to fight for you.", "category": "weapon", "rarity": 10, "value": 1000000, "useStyle": "shoot",
+      "useTime": 36, "useAnimation": 36, "damage": 100, "damageType": "summon", "manaCost": 10, "projectile": "terraprisma_blade", "shootSpeed": 3, "covers": ["terraria:terraprisma"] },
+    { "id": "nightglow", "name": "Nightglow", "description": "Summons lights that home in on enemies.", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "shoot", "useTime": 34, "useAnimation": 34,
+      "autoReuse": true, "damage": 60, "damageType": "magic", "manaCost": 12, "projectile": "nightglow_bolt", "shootSpeed": 12, "behaviors": [{ "type": "shootProjectile", "count": 3, "spread": 20 }] },
+    { "id": "starlight", "name": "Starlight", "description": "Rapidly thrusts starlight.", "category": "weapon", "rarity": 8, "value": 500000, "useStyle": "thrust", "useTime": 6, "useAnimation": 6, "autoReuse": true,
+      "damage": 70, "damageType": "melee", "knockback": 2, "heldLight": [12, 10, 14], "behaviors": [{ "type": "thrust", "length": 4.2 }] },
+    { "id": "empress_wings", "name": "Empress Wings", "description": "Allows flight and slow fall.", "category": "accessory", "rarity": 8, "value": 400000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "flight", "time": 180, "ascent": 50, "maxRise": 9, "glide": 2, "airSpeed": 1.6 }] }
+  ],
+  "lootTables": [
+    { "id": "queen_slime", "coins": [40000, 60000], "entries": [
+      { "item": "blade_staff", "chance": 0.5 }, { "item": "gel", "min": 50, "max": 100 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
+      { "item": "volatile_gelatin", "conditions": [{ "type": "difficulty", "min": 1 }] }
+    ] },
+    { "id": "duke_fishron", "coins": [80000, 120000], "entries": [
+      { "table": "duke_fishron_weapon" }, { "item": "fishron_wings", "chance": 0.15 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
+      { "item": "shrimpy_truffle", "conditions": [{ "type": "difficulty", "min": 1 }] }
+    ] },
+    { "id": "duke_fishron_weapon", "mode": "weighted", "entries": [
+      { "item": "flairon" }, { "item": "tsunami" }, { "item": "razorblade_typhoon_book" }, { "item": "bubble_gun" }, { "item": "tempest_staff" }
+    ] },
+    { "id": "empress_of_light", "coins": [100000, 150000], "entries": [
+      { "table": "empress_weapon" }, { "item": "terraprisma", "chance": 0.1 }, { "item": "empress_wings", "chance": 0.1 }, { "item": "greater_healing_potion", "min": 5, "max": 15 }
+    ] },
+    { "id": "empress_weapon", "mode": "weighted", "entries": [{ "item": "nightglow" }, { "item": "starlight" }] },
+    { "id": "lacewing", "entries": [{ "item": "prismatic_lacewing" }] },
+    { "id": "crystal_slime", "coins": [50, 150], "entries": [{ "item": "gel", "min": 2, "max": 4 }] }
+  ],
+  "enemies": [
+    { "id": "crystal_slime", "model": "gel", "tags": ["gel"], "name": "Crystal Slime", "brain": { "type": "slimeHop", "jumpHeight": 7, "jumpSpeed": 5, "hopInterval": 45 },
+      "life": 120, "damage": 45, "defense": 20, "knockbackResist": 0.4, "size": [1.8, 1.4], "moveSpeed": 4, "tint": "#f07ad8", "loot": "crystal_slime", "value": 100 },
+    {
+      "id": "queen_slime", "model": "queen_slime", "tags": ["boss", "gel", "lava_immune"], "name": "Queen Slime", "description": "The crystalline sovereign of the Hallow's slimes.",
+      "brain": { "type": "pattern", "ground": true, "phases": [
+        { "below": 1.0, "summon": { "enemy": "crystal_slime", "interval": 180, "max": 6, "count": 2 },
+          "moves": [{ "type": "hop", "count": 3, "height": 8, "speed": 6, "telegraph": 25 },
+            { "type": "wait", "ticks": 50, "pose": "attack", "volley": { "projectile": "queen_slime_crystal", "damage": 40, "speed": 12, "interval": 25, "count": 8, "ring": true } }] },
+        { "below": 0.5, "speed": 1.4, "damage": 1.2, "message": "Queen Slime spreads her wings!",
+          "volley": { "projectile": "queen_slime_crystal", "damage": 44, "speed": 14, "interval": 60, "count": 3, "spread": 15 },
+          "moves": [{ "type": "hop", "count": 4, "height": 12, "speed": 9, "telegraph": 18 }] }
+      ] },
+      "life": 18000, "damage": 60, "defense": 26, "knockbackResist": 1.0, "size": [7, 6], "moveSpeed": 5, "light": [8, 4, 8],
+      "loot": "queen_slime", "value": 40000,
+      "boss": { "title": "Queen Slime", "flag": "defeated_queen_slime", "arenaRadius": 150, "music": "boss_queen_slime" },
+      "covers": ["terraria:queen_slime"]
+    },
+    {
+      "id": "duke_fishron", "model": "duke_fishron", "tags": ["boss", "lava_immune"], "name": "Duke Fishron", "description": "A pig-shark-dragon from the deep, lured by truffle.",
+      "brain": { "type": "pattern", "phases": [
+        { "below": 1.0,
+          "moves": [{ "type": "dash", "count": 3, "telegraph": 22, "ticks": 40, "speed": 22 },
+            { "type": "hover", "ticks": 100, "speed": 10, "height": 4, "distance": 10, "volley": { "projectile": "fishron_bubble", "damage": 50, "speed": 8, "interval": 20, "count": 2, "spread": 30 } }] },
+        { "below": 0.5, "speed": 1.4, "damage": 1.3, "message": "Duke Fishron is enraged!",
+          "moves": [{ "type": "dash", "count": 4, "telegraph": 16, "ticks": 35, "speed": 26 },
+            { "type": "teleport", "ticks": 20, "telegraph": 20, "distance": 12, "height": 4 }] }
+      ] },
+      "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [2.4, 1.6], "scale": 4, "moveSpeed": 10, "gravity": false, "collideTerrain": false,
+      "loot": "duke_fishron", "value": 80000,
+      "boss": { "title": "Duke Fishron", "flag": "defeated_duke_fishron", "arenaRadius": 180, "music": "boss_fishron" },
+      "covers": ["terraria:duke_fishron"]
+    },
+    { "id": "lacewing", "model": "lacewing", "name": "Prismatic Lacewing", "description": "A glimmering moth of the Hallow's nights.",
+      "brain": { "type": "flyer", "aggroRange": 5, "orbitRadius": 8, "dashSpeed": 3, "dashCooldown": 600 },
+      "life": 5, "damage": 0, "defense": 0, "knockbackResist": 1, "size": [1, 1], "moveSpeed": 2, "gravity": false, "contactDamage": false, "light": [8, 6, 12], "loot": "lacewing", "value": 0 },
+    {
+      "id": "empress_of_light", "model": "empress_of_light", "tags": ["boss", "lava_immune"], "name": "Empress of Light", "description": "The Hallow's radiant ruler.",
+      "brain": { "type": "pattern", "phases": [
+        { "below": 1.0,
+          "moves": [{ "type": "orbit", "ticks": 180, "speed": 10, "distance": 10, "height": 4, "volley": { "projectile": "prismatic_bolt", "damage": 55, "speed": 10, "interval": 45, "count": 8, "ring": true } },
+            { "type": "dash", "count": 2, "telegraph": 30, "ticks": 40, "speed": 24 },
+            { "type": "teleport", "ticks": 60, "telegraph": 30, "distance": 9, "height": 5, "volley": { "projectile": "ethereal_lance", "damage": 60, "speed": 30, "interval": 30, "count": 5, "spread": 25 } }] },
+        { "below": 0.5, "speed": 1.35, "damage": 1.3, "message": "The Empress of Light is radiant with fury!",
+          "volley": { "projectile": "ethereal_lance", "damage": 65, "speed": 32, "interval": 70, "count": 3, "spread": 12 },
+          "moves": [{ "type": "orbit", "ticks": 140, "speed": 14, "distance": 9, "height": 4, "volley": { "projectile": "prismatic_bolt", "damage": 60, "speed": 12, "interval": 30, "count": 10, "ring": true } },
+            { "type": "dash", "count": 3, "telegraph": 22, "ticks": 36, "speed": 28 }] }
+      ] },
+      "life": 70000, "damage": 80, "defense": 50, "knockbackResist": 1.0, "size": [2, 3], "scale": 3, "moveSpeed": 12, "gravity": false, "collideTerrain": false, "light": [14, 10, 14],
+      "loot": "empress_of_light", "value": 100000,
+      "boss": { "title": "Empress of Light", "flag": "defeated_empress_of_light", "arenaRadius": 180, "despawnAtDay": true, "music": "boss_empress" },
+      "covers": ["terraria:empress_of_light"]
+    }
+  ],
+  "spawnRules": [
+    { "id": "crystal_slime_hallow", "enemy": "crystal_slime", "weight": 1, "conditions": [{ "type": "flag", "id": "hardmode" }, { "type": "layer", "any": ["underground", "cavern"] }, { "type": "biome", "any": ["hallow"] }] },
+    { "id": "lacewing_hallow", "enemy": "lacewing", "weight": 0.4, "maxAlive": 1, "conditions": [{ "type": "flag", "id": "defeated_plantera" }, { "type": "time", "is": "night" }, { "type": "layer", "any": ["surface"] }, { "type": "biome", "any": ["hallow"] }] }
+  ]
+}

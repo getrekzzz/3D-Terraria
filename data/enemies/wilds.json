@@ -24,7 +24,7 @@
     { "id": "hornet", "coins": [60, 150], "entries": [{ "item": "stinger", "chance": 0.5 }, { "item": "vine", "chance": 0.15 }] },
     { "id": "fire_imp", "coins": [150, 400], "entries": [{ "item": "lesser_healing_potion", "chance": 0.05 }] },
     { "id": "lava_slime", "coins": [80, 200], "entries": [{ "item": "gel", "min": 2, "max": 4 }] },
-    { "id": "hellbat", "coins": [80, 220], "entries": [{ "item": "fallen_star", "chance": 0.03 }] }
+    { "id": "hellbat", "coins": [80, 220], "entries": [{ "item": "fallen_star", "chance": 0.03 }, { "item": "magma_stone", "chance": 0.01 }] }
   ],
   "enemies": [
     { "id": "vulture", "model": "vulture", "name": "Vulture", "description": "Circles the dunes, dropping on the weary.",
@@ -42,13 +42,13 @@
       "life": 45, "damage": 18, "defense": 6, "knockbackResist": 0.2, "size": [2.6, 2.2], "moveSpeed": 3, "tint": "#5ec03c", "loot": "jungle_slime", "value": 70, "covers": ["terraria:jungle_slime"] },
     { "id": "man_eater", "model": "man_eater", "name": "Man Eater", "description": "A rooted jaw that lunges at anything in reach.",
       "brain": { "type": "lunger", "reach": 7, "aggroRange": 14 }, "life": 60, "damage": 22, "defense": 8, "knockbackResist": 0.9, "size": [2.0, 1.8], "moveSpeed": 6, "gravity": false,
-      "loot": "man_eater", "value": 90, "onContact": [{ "type": "applyBuff", "buff": "poisoned", "ticks": 300, "chance": 0.33 }], "covers": ["terraria:snatcher"] },
+      "loot": "man_eater", "value": 90, "onContact": [{ "type": "applyBuff", "buff": "poisoned", "ticks": 300, "chance": 0.33 }], "covers": ["terraria:snatcher", "terraria:man_eater"] },
     { "id": "crab", "model": "crab", "name": "Crab", "brain": { "type": "walker", "aggroRange": 30, "jumpHeight": 2 },
       "life": 40, "damage": 18, "defense": 10, "knockbackResist": 0.3, "size": [2.2, 1.4], "moveSpeed": 2.2, "loot": "crab", "value": 60, "covers": ["terraria:crab"] },
     { "id": "blue_jellyfish", "model": "jellyfish", "name": "Blue Jellyfish", "brain": { "type": "swimmer", "pulse": true, "aggroRange": 24 },
-      "life": 35, "damage": 16, "defense": 4, "knockbackResist": 0.5, "size": [1.8, 1.8], "moveSpeed": 2.5, "gravity": false, "light": [3, 6, 12], "loot": "blue_jellyfish", "value": 60, "covers": ["terraria:blue_jellyfish"] },
+      "life": 35, "damage": 16, "defense": 4, "knockbackResist": 0.5, "size": [1.8, 1.8], "moveSpeed": 2.5, "gravity": false, "light": [3, 6, 12], "loot": "blue_jellyfish", "value": 60, "covers": ["terraria:blue_jellyfish", "terraria:jellyfish"] },
     { "id": "shark", "model": "fish", "name": "Shark", "description": "Travels in hungry schools.", "brain": { "type": "swimmer", "aggroRange": 30 },
-      "life": 30, "damage": 20, "defense": 2, "knockbackResist": 0.4, "size": [1.4, 1.0], "moveSpeed": 5, "gravity": false, "loot": "shark", "value": 40, "covers": ["terraria:piranha"] },
+      "life": 30, "damage": 20, "defense": 2, "knockbackResist": 0.4, "size": [1.4, 1.0], "moveSpeed": 5, "gravity": false, "loot": "shark", "value": 40, "covers": ["terraria:piranha", "terraria:shark"] },
     { "id": "skeleton", "model": "skeleton", "tags": ["undead"], "name": "Skeleton", "brain": { "type": "walker", "aggroRange": 55, "jumpHeight": 4 },
       "life": 60, "damage": 20, "defense": 8, "knockbackResist": 0.5, "size": [2.0, 3.6], "moveSpeed": 2.6, "loot": "skeleton", "value": 100, "covers": ["terraria:skeleton"] },
     { "id": "hornet", "model": "hornet", "name": "Hornet", "description": "Hovers at a distance and fires venomous stingers.",

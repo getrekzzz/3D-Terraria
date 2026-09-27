@@ -152,6 +152,18 @@
    ],
    "generator": "crystal_node"
   },
+  "lihzahrd_altar": {
+   "models": [
+    "assets/models/objects/lihzahrd_altar_v0.glb"
+   ],
+   "generator": "altar"
+  },
+  "lihzahrd_door": {
+   "models": [
+    "assets/models/objects/lihzahrd_door_v0.glb"
+   ],
+   "generator": "stone_door"
+  },
   "loom": {
    "models": [
     "assets/models/objects/loom_v0.glb"
@@ -220,6 +232,12 @@
     "assets/models/objects/placed_bottle_v0.glb"
    ],
    "generator": "bottle"
+  },
+  "plantera_bulb": {
+   "models": [
+    "assets/models/objects/plantera_bulb_v0.glb"
+   ],
+   "generator": "bulb"
   },
   "pot": {
    "models": [
@@ -343,6 +361,14 @@
    "model": "assets/models/items/adamantite_chainmail.glb",
    "icon": "assets/icons/items/adamantite_chainmail.png"
   },
+  "adamantite_chainsaw": {
+   "model": "assets/models/items/adamantite_chainsaw.glb",
+   "icon": "assets/icons/items/adamantite_chainsaw.png"
+  },
+  "adamantite_drill": {
+   "model": "assets/models/items/adamantite_drill.glb",
+   "icon": "assets/icons/items/adamantite_drill.png"
+  },
   "adamantite_forge": {
    "object": "adamantite_forge",
    "icon": "assets/icons/items/adamantite_forge.png"
@@ -447,9 +473,29 @@
    "model": "assets/models/items/bees_knees.glb",
    "icon": "assets/icons/items/bees_knees.png"
   },
+  "beetle_helmet": {
+   "model": "assets/models/items/beetle_helmet.glb",
+   "icon": "assets/icons/items/beetle_helmet.png"
+  },
+  "beetle_husk": {
+   "model": "assets/models/items/beetle_husk.glb",
+   "icon": "assets/icons/items/beetle_husk.png"
+  },
+  "beetle_leggings": {
+   "model": "assets/models/items/beetle_leggings.glb",
+   "icon": "assets/icons/items/beetle_leggings.png"
+  },
+  "beetle_shell": {
+   "model": "assets/models/items/beetle_shell.glb",
+   "icon": "assets/icons/items/beetle_shell.png"
+  },
   "blade_of_grass": {
    "model": "assets/models/items/blade_of_grass.glb",
    "icon": "assets/icons/items/blade_of_grass.png"
+  },
+  "blade_staff": {
+   "model": "assets/models/items/blade_staff.glb",
+   "icon": "assets/icons/items/blade_staff.png"
   },
   "blizzard_in_a_bottle": {
    "model": "assets/models/items/blizzard_in_a_bottle.glb",
@@ -487,6 +533,14 @@
    "model": "assets/models/items/brain_of_confusion.glb",
    "icon": "assets/icons/items/brain_of_confusion.png"
   },
+  "breaker_blade": {
+   "model": "assets/models/items/breaker_blade.glb",
+   "icon": "assets/icons/items/breaker_blade.png"
+  },
+  "bubble_gun": {
+   "model": "assets/models/items/bubble_gun.glb",
+   "icon": "assets/icons/items/bubble_gun.png"
+  },
   "cactus": {
    "model": "assets/models/items/cactus.glb",
    "icon": "assets/icons/items/cactus.png"
@@ -502,6 +556,34 @@
   "candle": {
    "object": "candle",
    "icon": "assets/icons/items/candle.png"
+  },
+  "cell_phone": {
+   "model": "assets/models/items/cell_phone.glb",
+   "icon": "assets/icons/items/cell_phone.png"
+  },
+  "chlorophyte_bar": {
+   "model": "assets/models/items/chlorophyte_bar.glb",
+   "icon": "assets/icons/items/chlorophyte_bar.png"
+  },
+  "chlorophyte_greaves": {
+   "model": "assets/models/items/chlorophyte_greaves.glb",
+   "icon": "assets/icons/items/chlorophyte_greaves.png"
+  },
+  "chlorophyte_mask": {
+   "model": "assets/models/items/chlorophyte_mask.glb",
+   "icon": "assets/icons/items/chlorophyte_mask.png"
+  },
+  "chlorophyte_pickaxe": {
+   "model": "assets/models/items/chlorophyte_pickaxe.glb",
+   "icon": "assets/icons/items/chlorophyte_pickaxe.png"
+  },
+  "chlorophyte_plate_mail": {
+   "model": "assets/models/items/chlorophyte_plate_mail.glb",
+   "icon": "assets/icons/items/chlorophyte_plate_mail.png"
+  },
+  "clockwork_assault_rifle": {
+   "model": "assets/models/items/clockwork_assault_rifle.glb",
+   "icon": "assets/icons/items/clockwork_assault_rifle.png"
   },
   "cloud_in_a_balloon": {
    "model": "assets/models/items/cloud_in_a_balloon.glb",
@@ -531,6 +613,14 @@
    "model": "assets/models/items/cobalt_chainmail.glb",
    "icon": "assets/icons/items/cobalt_chainmail.png"
   },
+  "cobalt_chainsaw": {
+   "model": "assets/models/items/cobalt_chainsaw.glb",
+   "icon": "assets/icons/items/cobalt_chainsaw.png"
+  },
+  "cobalt_drill": {
+   "model": "assets/models/items/cobalt_drill.glb",
+   "icon": "assets/icons/items/cobalt_drill.png"
+  },
   "cobalt_greaves": {
    "model": "assets/models/items/cobalt_greaves.glb",
    "icon": "assets/icons/items/cobalt_greaves.png"
@@ -558,6 +648,10 @@
   "code_1": {
    "model": "assets/models/items/code_1.glb",
    "icon": "assets/icons/items/code_1.png"
+  },
+  "compass": {
+   "model": "assets/models/items/compass.glb",
+   "icon": "assets/icons/items/compass.png"
   },
   "cooked_fish": {
    "model": "assets/models/items/cooked_fish.glb",
@@ -659,6 +753,10 @@
    "model": "assets/models/items/crystal_shard.glb",
    "icon": "assets/icons/items/crystal_shard.png"
   },
+  "crystal_storm": {
+   "model": "assets/models/items/crystal_storm.glb",
+   "icon": "assets/icons/items/crystal_storm.png"
+  },
   "cursed_arrow": {
    "model": "assets/models/items/cursed_arrow.glb",
    "icon": "assets/icons/items/cursed_arrow.png"
@@ -666,6 +764,14 @@
   "cursed_flame": {
    "model": "assets/models/items/cursed_flame.glb",
    "icon": "assets/icons/items/cursed_flame.png"
+  },
+  "cursed_flames": {
+   "model": "assets/models/items/cursed_flames.glb",
+   "icon": "assets/icons/items/cursed_flames.png"
+  },
+  "daedalus_stormbow": {
+   "model": "assets/models/items/daedalus_stormbow.glb",
+   "icon": "assets/icons/items/daedalus_stormbow.png"
   },
   "dark_lance": {
    "model": "assets/models/items/dark_lance.glb",
@@ -723,6 +829,10 @@
    "model": "assets/models/items/demonite_shortsword.glb",
    "icon": "assets/icons/items/demonite_shortsword.png"
   },
+  "depth_meter": {
+   "model": "assets/models/items/depth_meter.glb",
+   "icon": "assets/icons/items/depth_meter.png"
+  },
   "diamond": {
    "model": "assets/models/items/diamond.glb",
    "icon": "assets/icons/items/diamond.png"
@@ -759,6 +869,10 @@
    "model": "assets/models/items/emerald_staff.glb",
    "icon": "assets/icons/items/emerald_staff.png"
   },
+  "empress_wings": {
+   "model": "assets/models/items/empress_wings.glb",
+   "icon": "assets/icons/items/empress_wings.png"
+  },
   "empty_bucket": {
    "model": "assets/models/items/empty_bucket.glb",
    "icon": "assets/icons/items/empty_bucket.png"
@@ -775,6 +889,10 @@
    "model": "assets/models/items/excalibur.glb",
    "icon": "assets/icons/items/excalibur.png"
   },
+  "eye_of_the_golem": {
+   "model": "assets/models/items/eye_of_the_golem.glb",
+   "icon": "assets/icons/items/eye_of_the_golem.png"
+  },
   "fairy_wings": {
    "model": "assets/models/items/fairy_wings.glb",
    "icon": "assets/icons/items/fairy_wings.png"
@@ -787,6 +905,10 @@
    "model": "assets/models/items/feather.glb",
    "icon": "assets/icons/items/feather.png"
   },
+  "feral_claws": {
+   "model": "assets/models/items/feral_claws.glb",
+   "icon": "assets/icons/items/feral_claws.png"
+  },
   "finch_staff": {
    "model": "assets/models/items/finch_staff.glb",
    "icon": "assets/icons/items/finch_staff.png"
@@ -798,6 +920,10 @@
   "fishron_wings": {
    "model": "assets/models/items/fishron_wings.glb",
    "icon": "assets/icons/items/fishron_wings.png"
+  },
+  "flairon": {
+   "model": "assets/models/items/flairon.glb",
+   "icon": "assets/icons/items/flairon.png"
   },
   "flamarang": {
    "model": "assets/models/items/flamarang.glb",
@@ -827,6 +953,10 @@
    "model": "assets/models/items/flinx_fur.glb",
    "icon": "assets/icons/items/flinx_fur.png"
   },
+  "flower_pow": {
+   "model": "assets/models/items/flower_pow.glb",
+   "icon": "assets/icons/items/flower_pow.png"
+  },
   "furnace": {
    "object": "furnace",
    "icon": "assets/icons/items/furnace.png"
@@ -834,6 +964,10 @@
   "gel": {
    "model": "assets/models/items/gel.glb",
    "icon": "assets/icons/items/gel.png"
+  },
+  "gelatin_crystal": {
+   "model": "assets/models/items/gelatin_crystal.glb",
+   "icon": "assets/icons/items/gelatin_crystal.png"
   },
   "gills_potion": {
    "model": "assets/models/items/gills_potion.glb",
@@ -898,6 +1032,14 @@
   "golden_fishing_rod": {
    "model": "assets/models/items/golden_fishing_rod.glb",
    "icon": "assets/icons/items/golden_fishing_rod.png"
+  },
+  "golden_shower": {
+   "model": "assets/models/items/golden_shower.glb",
+   "icon": "assets/icons/items/golden_shower.png"
+  },
+  "gps": {
+   "model": "assets/models/items/gps.glb",
+   "icon": "assets/icons/items/gps.png"
   },
   "grappling_hook": {
    "model": "assets/models/items/grappling_hook.glb",
@@ -1087,6 +1229,10 @@
    "model": "assets/models/items/jungle_spores.glb",
    "icon": "assets/icons/items/jungle_spores.png"
   },
+  "laser_rifle": {
+   "model": "assets/models/items/laser_rifle.glb",
+   "icon": "assets/icons/items/laser_rifle.png"
+  },
   "lava_bucket": {
    "model": "assets/models/items/lava_bucket.glb",
    "icon": "assets/icons/items/lava_bucket.png"
@@ -1139,6 +1285,10 @@
    "model": "assets/models/items/lead_shortsword.glb",
    "icon": "assets/icons/items/lead_shortsword.png"
   },
+  "leaf_blower": {
+   "model": "assets/models/items/leaf_blower.glb",
+   "icon": "assets/icons/items/leaf_blower.png"
+  },
   "leaf_wings": {
    "model": "assets/models/items/leaf_wings.glb",
    "icon": "assets/icons/items/leaf_wings.png"
@@ -1167,6 +1317,10 @@
    "model": "assets/models/items/lightning_boots.glb",
    "icon": "assets/icons/items/lightning_boots.png"
   },
+  "lihzahrd_power_cell": {
+   "model": "assets/models/items/lihzahrd_power_cell.glb",
+   "icon": "assets/icons/items/lihzahrd_power_cell.png"
+  },
   "loom": {
    "object": "loom",
    "icon": "assets/icons/items/loom.png"
@@ -1183,9 +1337,17 @@
    "model": "assets/models/items/magic_mirror.glb",
    "icon": "assets/icons/items/magic_mirror.png"
   },
+  "magma_stone": {
+   "model": "assets/models/items/magma_stone.glb",
+   "icon": "assets/icons/items/magma_stone.png"
+  },
   "mana_crystal": {
    "model": "assets/models/items/mana_crystal.glb",
    "icon": "assets/icons/items/mana_crystal.png"
+  },
+  "mana_flower": {
+   "model": "assets/models/items/mana_flower.glb",
+   "icon": "assets/icons/items/mana_flower.png"
   },
   "mechanical_eye": {
    "model": "assets/models/items/mechanical_eye.glb",
@@ -1198,6 +1360,10 @@
   "mechanical_worm": {
    "model": "assets/models/items/mechanical_worm.glb",
    "icon": "assets/icons/items/mechanical_worm.png"
+  },
+  "megashark": {
+   "model": "assets/models/items/megashark.glb",
+   "icon": "assets/icons/items/megashark.png"
   },
   "meteor_helmet": {
    "model": "assets/models/items/meteor_helmet.glb",
@@ -1267,6 +1433,14 @@
    "model": "assets/models/items/mythril_chainmail.glb",
    "icon": "assets/icons/items/mythril_chainmail.png"
   },
+  "mythril_chainsaw": {
+   "model": "assets/models/items/mythril_chainsaw.glb",
+   "icon": "assets/icons/items/mythril_chainsaw.png"
+  },
+  "mythril_drill": {
+   "model": "assets/models/items/mythril_drill.glb",
+   "icon": "assets/icons/items/mythril_drill.png"
+  },
   "mythril_greaves": {
    "model": "assets/models/items/mythril_greaves.glb",
    "icon": "assets/icons/items/mythril_greaves.png"
@@ -1287,9 +1461,17 @@
    "model": "assets/models/items/mythril_shortsword.glb",
    "icon": "assets/icons/items/mythril_shortsword.png"
   },
+  "natures_gift": {
+   "model": "assets/models/items/natures_gift.glb",
+   "icon": "assets/icons/items/natures_gift.png"
+  },
   "neon_tetra": {
    "model": "assets/models/items/neon_tetra.glb",
    "icon": "assets/icons/items/neon_tetra.png"
+  },
+  "nightglow": {
+   "model": "assets/models/items/nightglow.glb",
+   "icon": "assets/icons/items/nightglow.png"
   },
   "nights_edge": {
    "model": "assets/models/items/nights_edge.glb",
@@ -1331,6 +1513,14 @@
    "model": "assets/models/items/orichalcum_chainmail.glb",
    "icon": "assets/icons/items/orichalcum_chainmail.png"
   },
+  "orichalcum_chainsaw": {
+   "model": "assets/models/items/orichalcum_chainsaw.glb",
+   "icon": "assets/icons/items/orichalcum_chainsaw.png"
+  },
+  "orichalcum_drill": {
+   "model": "assets/models/items/orichalcum_drill.glb",
+   "icon": "assets/icons/items/orichalcum_drill.png"
+  },
   "orichalcum_greaves": {
    "model": "assets/models/items/orichalcum_greaves.glb",
    "icon": "assets/icons/items/orichalcum_greaves.png"
@@ -1371,6 +1561,14 @@
    "model": "assets/models/items/palladium_chainmail.glb",
    "icon": "assets/icons/items/palladium_chainmail.png"
   },
+  "palladium_chainsaw": {
+   "model": "assets/models/items/palladium_chainsaw.glb",
+   "icon": "assets/icons/items/palladium_chainsaw.png"
+  },
+  "palladium_drill": {
+   "model": "assets/models/items/palladium_drill.glb",
+   "icon": "assets/icons/items/palladium_drill.png"
+  },
   "palladium_greaves": {
    "model": "assets/models/items/palladium_greaves.glb",
    "icon": "assets/icons/items/palladium_greaves.png"
@@ -1406,6 +1604,10 @@
   "pickaxe_axe": {
    "model": "assets/models/items/pickaxe_axe.glb",
    "icon": "assets/icons/items/pickaxe_axe.png"
+  },
+  "picksaw": {
+   "model": "assets/models/items/picksaw.glb",
+   "icon": "assets/icons/items/picksaw.png"
   },
   "pixie_dust": {
    "model": "assets/models/items/pixie_dust.glb",
@@ -1455,6 +1657,14 @@
    "model": "assets/models/items/platinum_shortsword.glb",
    "icon": "assets/icons/items/platinum_shortsword.png"
   },
+  "possessed_hatchet": {
+   "model": "assets/models/items/possessed_hatchet.glb",
+   "icon": "assets/icons/items/possessed_hatchet.png"
+  },
+  "prismatic_lacewing": {
+   "model": "assets/models/items/prismatic_lacewing.glb",
+   "icon": "assets/icons/items/prismatic_lacewing.png"
+  },
   "prismite": {
    "model": "assets/models/items/prismite.glb",
    "icon": "assets/icons/items/prismite.png"
@@ -1463,6 +1673,14 @@
    "model": "assets/models/items/pwnhammer.glb",
    "icon": "assets/icons/items/pwnhammer.png"
   },
+  "pygmy_staff": {
+   "model": "assets/models/items/pygmy_staff.glb",
+   "icon": "assets/icons/items/pygmy_staff.png"
+  },
+  "rainbow_rod": {
+   "model": "assets/models/items/rainbow_rod.glb",
+   "icon": "assets/icons/items/rainbow_rod.png"
+  },
   "rally": {
    "model": "assets/models/items/rally.glb",
    "icon": "assets/icons/items/rally.png"
@@ -1470,6 +1688,10 @@
   "ranger_emblem": {
    "model": "assets/models/items/ranger_emblem.glb",
    "icon": "assets/icons/items/ranger_emblem.png"
+  },
+  "razorblade_typhoon_book": {
+   "model": "assets/models/items/razorblade_typhoon_book.glb",
+   "icon": "assets/icons/items/razorblade_typhoon_book.png"
   },
   "reaver_shark": {
    "model": "assets/models/items/reaver_shark.glb",
@@ -1535,6 +1757,10 @@
    "object": "sawmill",
    "icon": "assets/icons/items/sawmill.png"
   },
+  "seedler": {
+   "model": "assets/models/items/seedler.glb",
+   "icon": "assets/icons/items/seedler.png"
+  },
   "shadow_scale": {
    "model": "assets/models/items/shadow_scale.glb",
    "icon": "assets/icons/items/shadow_scale.png"
@@ -1550,6 +1776,14 @@
   "shiny_red_balloon": {
    "model": "assets/models/items/shiny_red_balloon.glb",
    "icon": "assets/icons/items/shiny_red_balloon.png"
+  },
+  "shiny_stone": {
+   "model": "assets/models/items/shiny_stone.glb",
+   "icon": "assets/icons/items/shiny_stone.png"
+  },
+  "shrimpy_truffle": {
+   "model": "assets/models/items/shrimpy_truffle.glb",
+   "icon": "assets/icons/items/shrimpy_truffle.png"
   },
   "shuriken": {
    "model": "assets/models/items/shuriken.glb",
@@ -1663,6 +1897,10 @@
    "model": "assets/models/items/spiky_ball.glb",
    "icon": "assets/icons/items/spiky_ball.png"
   },
+  "spore_sac": {
+   "model": "assets/models/items/spore_sac.glb",
+   "icon": "assets/icons/items/spore_sac.png"
+  },
   "star_cannon": {
    "model": "assets/models/items/star_cannon.glb",
    "icon": "assets/icons/items/star_cannon.png"
@@ -1671,9 +1909,25 @@
    "model": "assets/models/items/starfury.glb",
    "icon": "assets/icons/items/starfury.png"
   },
+  "starlight": {
+   "model": "assets/models/items/starlight.glb",
+   "icon": "assets/icons/items/starlight.png"
+  },
   "stinger": {
    "model": "assets/models/items/stinger.glb",
    "icon": "assets/icons/items/stinger.png"
+  },
+  "stynger": {
+   "model": "assets/models/items/stynger.glb",
+   "icon": "assets/icons/items/stynger.png"
+  },
+  "summoner_emblem": {
+   "model": "assets/models/items/summoner_emblem.glb",
+   "icon": "assets/icons/items/summoner_emblem.png"
+  },
+  "sun_stone": {
+   "model": "assets/models/items/sun_stone.glb",
+   "icon": "assets/icons/items/sun_stone.png"
   },
   "sunfury": {
    "model": "assets/models/items/sunfury.glb",
@@ -1691,9 +1945,29 @@
    "model": "assets/models/items/tabi.glb",
    "icon": "assets/icons/items/tabi.png"
   },
+  "tempest_staff": {
+   "model": "assets/models/items/tempest_staff.glb",
+   "icon": "assets/icons/items/tempest_staff.png"
+  },
+  "temple_key": {
+   "model": "assets/models/items/temple_key.glb",
+   "icon": "assets/icons/items/temple_key.png"
+  },
+  "terra_blade": {
+   "model": "assets/models/items/terra_blade.glb",
+   "icon": "assets/icons/items/terra_blade.png"
+  },
+  "terraprisma": {
+   "model": "assets/models/items/terraprisma.glb",
+   "icon": "assets/icons/items/terraprisma.png"
+  },
   "terraspark_boots": {
    "model": "assets/models/items/terraspark_boots.glb",
    "icon": "assets/icons/items/terraspark_boots.png"
+  },
+  "the_axe": {
+   "model": "assets/models/items/the_axe.glb",
+   "icon": "assets/icons/items/the_axe.png"
   },
   "the_rotted_fork": {
    "model": "assets/models/items/the_rotted_fork.glb",
@@ -1775,6 +2049,14 @@
    "model": "assets/models/items/titanium_chainmail.glb",
    "icon": "assets/icons/items/titanium_chainmail.png"
   },
+  "titanium_chainsaw": {
+   "model": "assets/models/items/titanium_chainsaw.glb",
+   "icon": "assets/icons/items/titanium_chainsaw.png"
+  },
+  "titanium_drill": {
+   "model": "assets/models/items/titanium_drill.glb",
+   "icon": "assets/icons/items/titanium_drill.png"
+  },
   "titanium_forge": {
    "object": "titanium_forge",
    "icon": "assets/icons/items/titanium_forge.png"
@@ -1822,6 +2104,22 @@
   "trout": {
    "model": "assets/models/items/trout.glb",
    "icon": "assets/icons/items/trout.png"
+  },
+  "true_excalibur": {
+   "model": "assets/models/items/true_excalibur.glb",
+   "icon": "assets/icons/items/true_excalibur.png"
+  },
+  "true_nights_edge": {
+   "model": "assets/models/items/true_nights_edge.glb",
+   "icon": "assets/icons/items/true_nights_edge.png"
+  },
+  "truffle_worm": {
+   "model": "assets/models/items/truffle_worm.glb",
+   "icon": "assets/icons/items/truffle_worm.png"
+  },
+  "tsunami": {
+   "model": "assets/models/items/tsunami.glb",
+   "icon": "assets/icons/items/tsunami.png"
   },
   "tuna": {
    "model": "assets/models/items/tuna.glb",
@@ -1871,6 +2169,10 @@
    "model": "assets/models/items/unicorn_horn.glb",
    "icon": "assets/icons/items/unicorn_horn.png"
   },
+  "venus_magnum": {
+   "model": "assets/models/items/venus_magnum.glb",
+   "icon": "assets/icons/items/venus_magnum.png"
+  },
   "vertebra": {
    "model": "assets/models/items/vertebra.glb",
    "icon": "assets/icons/items/vertebra.png"
@@ -1890,6 +2192,10 @@
   "vine": {
    "model": "assets/models/items/vine.glb",
    "icon": "assets/icons/items/vine.png"
+  },
+  "volatile_gelatin": {
+   "model": "assets/models/items/volatile_gelatin.glb",
+   "icon": "assets/icons/items/volatile_gelatin.png"
   },
   "wand_of_sparking": {
    "model": "assets/models/items/wand_of_sparking.glb",
@@ -2122,6 +2428,14 @@
     "walk"
    ]
   },
+  "duke_fishron": {
+   "model": "assets/models/creatures/duke_fishron.glb",
+   "generator": "fish",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
   "dungeon_guardian": {
    "model": "assets/models/creatures/dungeon_guardian.glb",
    "generator": "skull",
@@ -2148,6 +2462,13 @@
    "model": "assets/models/creatures/eater_of_worlds_tail.glb",
    "generator": "worm_segment",
    "animations": []
+  },
+  "empress_of_light": {
+   "model": "assets/models/creatures/empress_of_light.glb",
+   "generator": "sprite",
+   "animations": [
+    "fly"
+   ]
   },
   "eye_of_cthulhu": {
    "model": "assets/models/creatures/eye_of_cthulhu.glb",
@@ -2177,6 +2498,14 @@
   "fish": {
    "model": "assets/models/creatures/fish.glb",
    "generator": "fish",
+   "animations": [
+    "fly",
+    "idle"
+   ]
+  },
+  "flying_snake": {
+   "model": "assets/models/creatures/flying_snake.glb",
+   "generator": "bird",
    "animations": [
     "fly",
     "idle"
@@ -2262,8 +2591,28 @@
     "walk"
    ]
   },
+  "golem": {
+   "model": "assets/models/creatures/golem.glb",
+   "generator": "golem",
+   "animations": []
+  },
   "guide": {
    "model": "assets/models/creatures/guide.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "harpy": {
+   "model": "assets/models/creatures/harpy.glb",
    "generator": "humanoid",
    "animations": [
     "death",
@@ -2311,6 +2660,28 @@
    "model": "assets/models/creatures/king_slime.glb",
    "generator": "gel_sovereign",
    "animations": []
+  },
+  "lacewing": {
+   "model": "assets/models/creatures/lacewing.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "lihzahrd": {
+   "model": "assets/models/creatures/lihzahrd.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   },
   "man_eater": {
    "model": "assets/models/creatures/man_eater.glb",
@@ -2371,6 +2742,16 @@
    "animations": [
     "fly"
    ]
+  },
+  "plantera": {
+   "model": "assets/models/creatures/plantera.glb",
+   "generator": "plantera",
+   "animations": []
+  },
+  "plantera_open": {
+   "model": "assets/models/creatures/plantera_open.glb",
+   "generator": "plantera",
+   "animations": []
   },
   "player": {
    "model": "assets/models/creatures/player.glb",
@@ -2554,6 +2935,11 @@
     "fly"
    ]
   },
+  "queen_slime": {
+   "model": "assets/models/creatures/queen_slime.glb",
+   "generator": "gel_sovereign",
+   "animations": []
+  },
   "retinazer": {
    "model": "assets/models/creatures/retinazer.glb",
    "generator": "mech_eye",
@@ -2669,6 +3055,21 @@
     "use",
     "walk"
    ]
+  },
+  "wyvern_body": {
+   "model": "assets/models/creatures/wyvern_body.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "wyvern_head": {
+   "model": "assets/models/creatures/wyvern_head.glb",
+   "generator": "worm_segment",
+   "animations": []
+  },
+  "wyvern_tail": {
+   "model": "assets/models/creatures/wyvern_tail.glb",
+   "generator": "worm_segment",
+   "animations": []
   },
   "zombie": {
    "model": "assets/models/creatures/zombie.glb",

@@ -94,7 +94,9 @@ public class InventoryCraftingTests
         var b = roller.Roll("cabin_chest", ref r2);
         Assert.Equal(a, b);
         Assert.Contains(a, s => s.Item!.HasTag("coin"));
-        Assert.Contains(a, s => s.Item!.Category == Strata.Core.Content.Defs.ItemCategory.Accessory || s.Item.Id == "wand_of_sparking");
+        // One treasure from the chest's primary pool.
+        var primary = Db.LootTables.Get("cabin_chest_primary").Entries.Select(e => e.Item).ToHashSet();
+        Assert.Contains(a, s => primary.Contains(s.Item!.Id));
     }
 
     [Fact]
