@@ -31,6 +31,11 @@ public sealed class RenderTables
 {
     public RenderTables(ContentDatabase content, Func<string, int> layerIndex, GrassConfig? grass = null)
     {
+        PaintColors = new System.Numerics.Vector3[Voxels.CellPaint.Max + 1];
+        foreach (var item in content.Items.All)
+            if (item.Paint is > 0 and <= Voxels.CellPaint.Max && item.PaintColor is { Length: 7 } hex)
+                PaintColors[item.Paint] = new System.Numerics.Vector3(
+                    Convert.ToInt32(hex.Substring(1, 2), 16) / 255f, Convert.ToInt32(hex.Substring(3, 2), 16) / 255f, Convert.ToInt32(hex.Substring(5, 2), 16) / 255f);
         int n = content.Blocks.Count;
         Class = new CellClass[n];
         Surface = new ushort[n];
@@ -79,6 +84,9 @@ public sealed class RenderTables
         GrassKind = grassKinds.ToArray();
         Grass = grass;
     }
+
+    /// <summary>Colour of each paint index (index 0 unused).</summary>
+    public System.Numerics.Vector3[] PaintColors { get; }
 
     public CellClass[] Class { get; }
 

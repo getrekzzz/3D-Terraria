@@ -96,3 +96,25 @@ def tombstone(mb: MeshBuilder, p, rng):
 
 
 GENERATORS["tombstone"] = tombstone
+
+
+def paintbrush(mb: MeshBuilder, p, rng):
+    mb.cylinder((0, 0, -0.12), (0, 0, 0.22), 0.014, 0.012, "prop:planks", "#b07a40", segments=6)
+    mb.cylinder((0, 0, 0.22), (0, 0, 0.27), 0.02, 0.024, "prop:iron", "#c0c4cc", segments=8)
+    mb.box((-0.028, -0.01, 0.27), (0.028, 0.01, 0.36), "prop:cloth", "#d82020")
+
+
+def paint_scraper(mb: MeshBuilder, p, rng):
+    mb.cylinder((0, 0, -0.1), (0, 0, 0.2), 0.016, 0.016, "prop:planks", "#6a4a2a", segments=6)
+    mb.box((-0.06, -0.006, 0.2), (0.06, 0.006, 0.3), "prop:iron", "#b0b4bc")
+
+
+def paint_sprayer(mb: MeshBuilder, p, rng):
+    """A pressurised paint canister with a nozzle."""
+    mb.cylinder((0, 0, 0), (0, 0, 0.26), 0.07, 0.07, "prop:iron", "#d0d4dc", segments=12)
+    mb.cylinder((0, 0, 0.26), (0, 0, 0.3), 0.07, 0.03, "prop:iron", "#a0a4ac", segments=12)
+    mb.box((-0.015, -0.015, 0.3), (0.015, 0.015, 0.34), "prop:plain", "#202020")
+    mb.cylinder((0, 0, 0.08), (0, 0, 0.18), 0.072, 0.072, "prop:plain", "#40a0e0", segments=12)
+
+
+GENERATORS.update({"paintbrush": paintbrush, "paint_scraper": paint_scraper, "paint_sprayer": paint_sprayer})

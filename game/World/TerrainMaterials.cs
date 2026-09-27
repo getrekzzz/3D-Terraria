@@ -19,6 +19,9 @@ public sealed class TerrainMaterials
         var layers = BuildLayerTable("res://assets/textures/terrain/layers.json");
 
         Opaque = Create("res://shaders/terrain.gdshader", albedo, material, detail, table, layers);
+        var paints = new Vector3[tables.PaintColors.Length];
+        for (int i = 0; i < paints.Length; i++) paints[i] = new Vector3(tables.PaintColors[i].X, tables.PaintColors[i].Y, tables.PaintColors[i].Z);
+        Opaque.SetShaderParameter("paint_colors", paints);
         Cutout = Create("res://shaders/terrain_cutout.gdshader", albedo, material, detail, table, layers);
         Glass = Create("res://shaders/terrain_glass.gdshader", albedo, material, detail, table, layers);
         Liquid = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/liquid.gdshader") };

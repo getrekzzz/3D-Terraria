@@ -22,6 +22,9 @@ public sealed class EffectState
     /// <summary>Sinks through blocks until clear of them (Shimmer).</summary>
     public bool Phasing { get; set; }
 
+    /// <summary>Paints blocks as they are placed (Paint Sprayer).</summary>
+    public bool AutoPaint { get; set; }
+
     public HashSet<string> Immunities { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Liquids whose contact damage is ignored.</summary>
@@ -56,6 +59,7 @@ public sealed class EffectState
         WaterBreathing = false;
         NoItemUse = false;
         Phasing = false;
+        AutoPaint = false;
         Immunities.Clear();
         LiquidImmunities.Clear();
         DamagePerSecond = 0;
@@ -98,6 +102,9 @@ public sealed class EffectState
                 break;
             case EffectSpecs.Phase:
                 Phasing = true;
+                break;
+            case EffectSpecs.AutoPaint:
+                AutoPaint = true;
                 break;
             case EffectSpecs.NoItemUse:
                 NoItemUse = true;

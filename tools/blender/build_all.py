@@ -215,7 +215,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
 
 
 def _view_for(generator: str) -> str:
-    long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow", "gun", "rod", "whip", "red_wrench", "wire_cutter", "bug_net"}
+    long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow", "gun", "rod", "whip", "red_wrench", "wire_cutter", "bug_net", "paintbrush", "paint_scraper"}
     return "item" if generator in long_items else "object"
 
 

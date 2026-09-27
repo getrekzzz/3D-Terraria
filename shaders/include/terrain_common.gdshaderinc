@@ -84,6 +84,16 @@ void strata_sample_surface(float id, vec3 p, vec3 n, vec3 w, float tile, float w
 
 // Large-scale brightness and hue drift over tens of metres (from the shared sky noise) to break up repetition.
 // Requires clouds.gdshaderinc (strata_cloud_noise) to be included first.
+// Paint (index in the surface flags above the crisp bit): the block's shading kept, its colour replaced.
+uniform vec3 paint_colors[32];
+
+vec3 strata_paint(vec3 albedo, float flags) {
+	int paint = (int(flags + 0.5) >> 1) & 31;
+	if (paint == 0) return albedo;
+	float lum = dot(albedo, vec3(0.299, 0.587, 0.114));
+	return paint_colors[paint] * (0.3 + lum * 1.5);
+}
+
 vec3 strata_macro(vec3 albedo, vec3 p) {
 	float broad = texture(strata_cloud_noise, p.xz / 53.0).r;
 	float mid = texture(strata_cloud_noise, p.xz / 17.0 + vec2(0.37, 0.61)).g;

@@ -32,6 +32,7 @@ public static class SurfaceNetsMesher
         public readonly byte[] State = new byte[D * D * D];
         public readonly int[] OutIndex = new int[D * D * D];
         public readonly ushort[] Material = new ushort[D * D * D];
+        public readonly byte[] Paint = new byte[D * D * D];
         public readonly byte[] Density = new byte[Neighborhood.Volume];
     }
 
@@ -80,6 +81,7 @@ public static class SurfaceNetsMesher
                         s.State[di] = Free;
                     }
                     s.Material[di] = Majority(vol, x, y, z);
+                    s.Paint[di] = (byte)CornerPaint(vol, x, y, z);
                 }
     }
 
@@ -107,6 +109,22 @@ public static class SurfaceNetsMesher
     /// Dominant opaque block among the 8 samples, weighted towards samples exposed to air above them
     /// (so grass tops win over the dirt beneath at terrace edges) and towards upper samples.
     /// </summary>
+    /// <summary>Paint bits of a smooth vertex: the paint of a painted solid corner, preferring exposed ones.</summary>
+    private static int CornerPaint(MeshVolume vol, int x, int y, int z)
+    {
+        if (!vol.Nb.HasFlags) return 0;
+        int best = 0;
+        for (int k = 0; k < 8; k++)
+        {
+            int i = MeshVolume.Index(x + (k & 1), y + ((k >> 1) & 1), z + (k >> 2));
+            int bits = vol.Opaque[i] ? vol.PaintBits(i) : 0;
+            if (bits == 0) continue;
+            if (!vol.Opaque[i + MeshVolume.N * MeshVolume.N]) return bits;
+            best = bits;
+        }
+        return best;
+    }
+
     private static ushort Majority(MeshVolume vol, int x, int y, int z)
     {
         Span<ushort> blocks = stackalloc ushort[8];
@@ -245,17 +263,17 @@ public static class SurfaceNetsMesher
                                 break;
                         }
                         bool crisp = vol.CrispCell[solid];
-                        if (crisp) EmitCrispQuad(vol, s, surface, collision, dualCells, normal, vol.Tables.Surface[vol.Nb.Blocks[solid]]);
+                        if (crisp) EmitCrispQuad(vol, s, surface, collision, dualCells, normal, vol.Tables.Surface[vol.Nb.Blocks[solid]], vol.PaintBits(solid));
                         else EmitSmoothQuad(vol, s, surface, collision, dualCells, duals, normal);
                     }
                 }
     }
 
     private static void EmitCrispQuad(MeshVolume vol, Scratch s, MeshSurface surface, CollisionBuilder collision,
-        Span<(int X, int Y, int Z)> cells, Vector3 normal, ushort material)
+        Span<(int X, int Y, int Z)> cells, Vector3 normal, ushort material, int paintBits)
     {
         Span<int> v = stackalloc int[4];
-        ulong ids = MeshSurface.PackIds(material, material, material, MeshSurface.FlagCrisp);
+        ulong ids = MeshSurface.PackIds(material, material, material, MeshSurface.FlagCrisp | paintBits);
         for (int k = 0; k < 4; k++)
         {
             var (x, y, z) = cells[k];
@@ -280,7 +298,7 @@ public static class SurfaceNetsMesher
                 if (Vector3.Dot(n, normal) < -0.2f) n = normal;
                 ushort m = s.Material[di];
                 s.OutIndex[di] = surface.AddVertex(MeshVolume.ToLocalMeters(pos), n, new Vector4(1, 0, 0, vol.DualOcclusion(x, y, z)),
-                    MeshSurface.PackIds(m, m, m, 0), vol.DualLight(x, y, z));
+                    MeshSurface.PackIds(m, m, m, s.Paint[di]), vol.DualLight(x, y, z));
             }
             v[k] = s.OutIndex[di];
         }

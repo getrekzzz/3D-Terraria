@@ -44,7 +44,7 @@ public static class CellMesher
     {
         int self = MeshVolume.Index(x, y, z);
         ushort material = vol.Tables.Surface[block];
-        ulong ids = MeshSurface.PackIds(material, material, material, MeshSurface.FlagCrisp);
+        ulong ids = MeshSurface.PackIds(material, material, material, MeshSurface.FlagCrisp | vol.PaintBits(self));
         var origin = new Vector3(x, y, z);
         Span<int> tri = stackalloc int[3];
         foreach (var poly in polygons)
