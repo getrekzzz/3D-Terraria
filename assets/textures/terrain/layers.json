@@ -653,6 +653,13 @@
    "type": "rope",
    "detail": 0,
    "detailStrength": 0.0
+  },
+  {
+   "name": "aetherium",
+   "index": 93,
+   "type": "speckled",
+   "detail": 0,
+   "detailStrength": 0.7
   }
  ]
 }

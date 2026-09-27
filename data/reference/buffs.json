@@ -188,6 +188,11 @@
    "id": "terraria:wet",
    "name": "Wet",
    "kind": "debuff"
+  },
+  {
+   "id": "terraria:shimmering",
+   "name": "Shimmering",
+   "kind": "liquid"
   }
  ]
 }

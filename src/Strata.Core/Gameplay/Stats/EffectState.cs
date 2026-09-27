@@ -19,6 +19,9 @@ public sealed class EffectState
     /// <summary>Cannot use held items (hexed).</summary>
     public bool NoItemUse { get; set; }
 
+    /// <summary>Sinks through blocks until clear of them (Shimmer).</summary>
+    public bool Phasing { get; set; }
+
     public HashSet<string> Immunities { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Liquids whose contact damage is ignored.</summary>
@@ -52,6 +55,7 @@ public sealed class EffectState
         NoFallDamage = false;
         WaterBreathing = false;
         NoItemUse = false;
+        Phasing = false;
         Immunities.Clear();
         LiquidImmunities.Clear();
         DamagePerSecond = 0;
@@ -91,6 +95,9 @@ public sealed class EffectState
                 break;
             case EffectSpecs.NoFallDamage:
                 NoFallDamage = true;
+                break;
+            case EffectSpecs.Phase:
+                Phasing = true;
                 break;
             case EffectSpecs.NoItemUse:
                 NoItemUse = true;

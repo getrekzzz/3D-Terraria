@@ -898,6 +898,17 @@
    "base": "#b08a5a",
    "dark": "#6a4e2a",
    "light": "#d8b888"
+  },
+  {
+   "name": "aetherium",
+   "type": "speckled",
+   "base": "#a88ad8",
+   "dark": "#6a4aa8",
+   "light": "#f0d8ff",
+   "cells": 16,
+   "cracks": 0.2,
+   "speck_a": "#fff0ff",
+   "speck_b": "#80e8ff"
   }
  ]
 }

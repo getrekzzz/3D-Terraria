@@ -17,7 +17,7 @@ namespace Strata.Core.Gameplay.Liquids;
 /// dropped items, and items destroyed by liquids that incinerate them. Also records which liquid each player is in
 /// for movement and the HUD.
 /// </summary>
-public sealed class LiquidEffects
+public sealed partial class LiquidEffects
 {
     /// <summary>Ticks between contact checks for creatures (spread over creatures by id).</summary>
     public const int CreatureInterval = 30;
@@ -164,6 +164,11 @@ public sealed class LiquidEffects
             {
                 drops.Remove(it);
                 ItemDestroyed?.Invoke(it, liquid);
+                continue;
+            }
+            if (liquid.TransmutesItems)
+            {
+                ShimmerDrop(it);
                 continue;
             }
             // Drag, and buoyancy that nearly cancels gravity so items sink slowly.

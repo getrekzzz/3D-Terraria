@@ -49,7 +49,8 @@
             "add": 2
           }
         ]
-      }
+      },
+      "milestone": "smelted_metal"
     },
     {
       "metal": "tin",
@@ -99,7 +100,8 @@
             "add": 2
           }
         ]
-      }
+      },
+      "milestone": "smelted_metal"
     },
     {
       "metal": "iron",
@@ -612,7 +614,8 @@
             "add": 0.17
           }
         ]
-      }
+      },
+      "milestone": "forged_hellstone"
     },
     {
       "metal": "cobalt",

@@ -41,7 +41,7 @@ public sealed class StructurePlacementPass : GenPass
         for (int i = 0, n = Math.Max(1, ctx.Scaled(2)); i < n; i++)
         {
             if (!TryBiomeSurfacePoint(ctx, ref rng, "forest", 90f, out var ground)) continue;
-            AddStructure(plan, "living_tree", LivingTreeBuilder.Build(content, ground, ref rng));
+            AddStructure(plan, "living_tree", LivingTreeBuilder.Build(content, ground, ref rng), zone: "living_tree");
         }
 
         if (rng.Chance(0.75f) && TryBiomeSurfacePoint(ctx, ref rng, "desert", 0f, out var dune))

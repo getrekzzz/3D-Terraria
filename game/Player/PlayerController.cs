@@ -121,6 +121,7 @@ public sealed partial class PlayerController : CharacterBody3D
             return;
         }
         if (UpdateMinecart(dt)) return;
+        if (UpdatePhase()) return;
 
         _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
         _swimming = _liquid != null;
@@ -209,7 +210,7 @@ public sealed partial class PlayerController : CharacterBody3D
             _jumpBuffer = 0;
             _jumpHold = 0;
         }
-        float gravity = _config.Gravity;
+        float gravity = _config.Gravity * (InSpace() ? SpaceGravity : 1f);
         if (_jumpHold > 0 && held && v.Y > 0)
         {
             gravity *= _config.JumpHoldGravity;

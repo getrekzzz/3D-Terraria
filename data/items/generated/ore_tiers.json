@@ -10,7 +10,8 @@
       "rarity": 0,
       "covers": [
         "terraria:copper_bar"
-      ]
+      ],
+      "milestone": "smelted_metal"
     },
     {
       "id": "copper_pickaxe",
@@ -188,7 +189,8 @@
       "rarity": 0,
       "covers": [
         "terraria:tin_bar"
-      ]
+      ],
+      "milestone": "smelted_metal"
     },
     {
       "id": "tin_pickaxe",
@@ -1766,7 +1768,8 @@
       "rarity": 3,
       "covers": [
         "terraria:hellstone_bar"
-      ]
+      ],
+      "milestone": "forged_hellstone"
     },
     {
       "id": "hellstone_pickaxe",

@@ -465,6 +465,18 @@
    "name": "Crispy Honey Block",
    "kind": "liquid_mix",
    "stage": "early"
+  },
+  {
+   "id": "terraria:tombstone",
+   "name": "Tombstone",
+   "kind": "furniture",
+   "stage": "early"
+  },
+  {
+   "id": "terraria:aetherium_block",
+   "name": "Aetherium Block",
+   "kind": "natural",
+   "stage": "early"
   }
  ]
 }

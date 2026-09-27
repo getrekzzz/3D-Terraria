@@ -34,6 +34,18 @@ public sealed class EcologyZonesPass : GenPass
             }
         }
 
+        // The Aether: one Shimmer-filled cave deep in the caverns, well away from spawn.
+        var aether = ctx.SeedsFor(this).Rng("aether");
+        if (ctx.TryRandomLandPoint(ref aether, 0.9f, 140f, out float ax, out float az))
+        {
+            var center = new Vector3(ax, bands.YForNormalizedDepth(aether.Range(0.55f, 0.7f)), az);
+            float r = aether.Range(16f, 20f);
+            ctx.Plan.AddFeature(new ChamberFeature(center, new Vector3(r * 1.2f, r * 0.7f, r * 1.2f))
+            {
+                Kind = "aether", Chamber = ChamberKind.Aether, Zone = "aether", Seed = aether.NextUInt(),
+            });
+        }
+
         int zones = ctx.Plan.Features.All.Count(f => f.Zone != null);
         ctx.Log.Debug("worldgen", $"Ecology: {zones} zone features registered.");
     }
@@ -42,6 +54,6 @@ public sealed class EcologyZonesPass : GenPass
     {
         if (ctx.AllAir) return;
         foreach (var f in ctx.Plan.Features.InChunk(ctx.Coord))
-            if (f is ChamberFeature ch && ch.Kind == "spider_nest") MiniBiomeCarver.Carve(ctx, ch);
+            if (f is ChamberFeature { Kind: "spider_nest" or "aether" } ch) MiniBiomeCarver.Carve(ctx, ch);
     }
 }

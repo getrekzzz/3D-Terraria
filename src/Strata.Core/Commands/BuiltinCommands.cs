@@ -296,6 +296,12 @@ public static class BuiltinCommands
                     cell = new Int3((int)x, (int)MathF.Ceiling(s.Generator.Terrain.SurfaceHeight(x, z)) + 1, (int)z);
                     break;
                 }
+                // A cave zone (the Aether, a hive): partway out from its middle, settled onto the nearest floor.
+                if (s.Generator.Plan.Features.All.OfType<WorldGen.Features.ChamberFeature>().FirstOrDefault(f => f.Zone == id) is { } chamber)
+                {
+                    cell = new Int3((int)(chamber.Center.X + chamber.Radii.X * 0.6f), (int)(chamber.Center.Y - chamber.Radii.Y * 0.25f), (int)chamber.Center.Z);
+                    break;
+                }
                 var structure = s.Generator.Plan.Features.All.OfType<WorldGen.Structures.StructureFeature>().FirstOrDefault(f => f.Zone == id)
                     ?? throw new CommandException($"no zone '{id}' (mutation zones: {string.Join(", ", s.Mutations.Zones.Select(z => z.Zone))})");
                 var inside = structure.Blueprint.Ops.OfType<WorldGen.Structures.ObjectOp>().Select(o => o.Anchor).DefaultIfEmpty(structure.Bounds.Min).Last();

@@ -1,6 +1,10 @@
 {
   // Progression flags form a DAG; the validator rejects cycles and dangling requirements.
   "flags": [
+    { "id": "new_world", "name": "A new world", "kind": "world", "stage": "early_bosses", "covers": ["terraria:start"] },
+    { "id": "smelted_metal", "name": "The first metal bar smelted", "kind": "world", "stage": "early_bosses", "covers": ["terraria:copper_tier"] },
+    { "id": "found_life_crystal", "name": "A Life Crystal found", "kind": "world", "stage": "early_bosses", "covers": ["terraria:life_crystals"] },
+    { "id": "forged_hellstone", "name": "Hellstone forged", "kind": "world", "stage": "underworld", "covers": ["terraria:hellstone_tier"] },
     { "id": "defeated_king_slime", "name": "King Slime defeated", "kind": "boss", "stage": "early_bosses", "covers": ["terraria:king_slime_down"] },
     { "id": "defeated_eye_of_cthulhu", "name": "Eye of Cthulhu defeated", "kind": "boss", "stage": "early_bosses", "covers": ["terraria:eye_down"] },
     { "id": "defeated_eater_of_worlds", "name": "Eater of Worlds defeated", "kind": "boss", "stage": "evil_boss", "covers": ["terraria:evil_boss_down"] },

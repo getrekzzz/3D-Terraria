@@ -35,6 +35,20 @@ internal static class MiniBiomeCarver
                 else ctx.Blocks[i] = p.Hive;
                 return;
             }
+            if (ch.Chamber == ChamberKind.Aether)
+            {
+                // A dome over an aetherium floor, with a round Shimmer pool sunk into the middle of it.
+                float floor = ch.Center.Y - ch.Radii.Y * 0.35f, cy = y + 0.5f;
+                float hx = (x + 0.5f - ch.Center.X) / ch.Radii.X, hz = (z + 0.5f - ch.Center.Z) / ch.Radii.Z;
+                bool pool = hx * hx + hz * hz < 0.45f * 0.45f && cy < floor && cy >= floor - 5f;
+                if ((d < 0.85f && cy >= floor) || pool)
+                {
+                    ctx.Blocks[i] = p.Air;
+                    if (pool) ctx.EnsureLiquids()[i] = Voxels.LiquidCode.Full(Voxels.LiquidType.Shimmer);
+                }
+                else if (d < 1.05f) ctx.Blocks[i] = p.Aetherium;
+                return;
+            }
             if (ch.Chamber == ChamberKind.SpiderNest)
             {
                 if (d < 0.8f) ctx.Blocks[i] = p.Air;

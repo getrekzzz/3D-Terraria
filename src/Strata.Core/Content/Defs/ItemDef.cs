@@ -82,6 +82,12 @@ public sealed class ItemDef : ContentDef
     public string? ArmorSet { get; init; }
     public TypedSpec[] EquipEffects { get; init; } = Array.Empty<TypedSpec>();
 
+    /// <summary>World progression flag raised the first time a player carries this item (milestones like the first bar smelted).</summary>
+    public string? Milestone { get; init; }
+
+    /// <summary>What Shimmer turns this item into (otherwise it comes apart into its recipe's ingredients).</summary>
+    public string? Shimmer { get; init; }
+
     /// <summary>Set bonus text, shown while head, body and legs all belong to <see cref="ArmorSet"/>.</summary>
     public string? SetBonus { get; init; }
 

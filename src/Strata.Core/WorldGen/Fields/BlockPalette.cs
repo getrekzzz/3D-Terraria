@@ -40,6 +40,7 @@ public sealed class BlockPalette
         Cloud = Id("cloud");
         RainCloud = Id("rain_cloud");
         Hive = Id("hive");
+        Aetherium = Id("aetherium");
         MossStone = Id("green_moss");
         GlowMossStone = Id("argon_moss");
         Crystal = Id("crystal_cluster");
@@ -75,6 +76,7 @@ public sealed class BlockPalette
     public ushort Cloud { get; }
     public ushort RainCloud { get; }
     public ushort Hive { get; }
+    public ushort Aetherium { get; }
     public ushort MossStone { get; }
     public ushort GlowMossStone { get; }
     public ushort Crystal { get; }

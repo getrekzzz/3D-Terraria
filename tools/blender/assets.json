@@ -484,6 +484,9 @@
     },
     "firefly_in_a_bottle": {
       "generator": "bottle_light"
+    },
+    "tombstone": {
+      "generator": "tombstone"
     }
   },
   "items": {
@@ -3521,6 +3524,13 @@
         "params": {
           "creature": "duck"
         }
+      },
+      "faeling": {
+        "generator": "critter",
+        "params": {
+          "creature": "firefly",
+          "glow": "#ffb0f8"
+        }
       }
     }
   },
@@ -5783,6 +5793,12 @@
     "duck": {
       "generator": "duck",
       "params": {}
+    },
+    "faeling": {
+      "generator": "firefly",
+      "params": {
+        "glow": "#ffb0f8"
+      }
     }
   }
 }
