@@ -1,0 +1,26 @@
+{
+  // The Aether: an aetherium cave around a lake of Shimmer, which transmutes items (or takes crafted ones apart) and
+  // lets whoever wades in phase down through the rock. Faelings flit about it. Also what haunts a Graveyard.
+  "liquids": [
+    {"id": "shimmer", "name": "Shimmer", "code": 4, "color": "#c8a8ff", "light": [9, 7, 14], "flowInterval": 12, "fallCells": 2, "spreadThreshold": 2, "minLevel": 3, "evaporateChance": 0.0, "moveSpeed": 0.5, "swimStrength": 0.8, "drag": 0.9, "drowns": false, "contactBuff": "shimmering", "contactBuffTicks": 180, "transmutesItems": true, "covers": ["terraria:shimmer"]}
+  ],
+  "blocks": [
+    {"id": "aetherium", "name": "Aetherium Block", "render": "smooth", "textures": {"all": "aetherium"}, "hardness": 2.0, "pickPower": 35, "sound": "stone", "color": "#b89ae8", "light": [8, 6, 12], "tags": ["natural"], "covers": ["terraria:aetherium_block"]}
+  ],
+  "buffs": [
+    {"id": "shimmering", "name": "Shimmering", "description": "Phasing through the world.", "color": "#d0b0ff", "effects": [{"type": "phase"}], "covers": ["terraria:shimmering"]}
+  ],
+  "enemies": [
+    {"id": "faeling", "name": "Faeling", "description": "A tiny spark of the Aether.", "model": "faeling", "tags": ["critter"], "brain": {"type": "flyer", "aggroRange": 0}, "life": 5, "damage": 0, "defense": 0, "knockbackResist": 0.2, "size": [0.4, 0.4], "moveSpeed": 1.6, "light": [10, 7, 14], "catchItem": "faeling", "value": 0, "covers": ["terraria:faeling"]},
+    {"id": "ghost", "name": "Ghost", "description": "A pale spirit that haunts graveyards.", "model": "wraith", "tags": ["undead"], "brain": {"type": "flyer", "aggroRange": 60, "orbitRadius": 3, "dashSpeed": 8, "dashCooldown": 90, "bounceOffTerrain": false}, "life": 90, "damage": 20, "defense": 10, "knockbackResist": 0.3, "size": [1.2, 1.8], "moveSpeed": 3, "tint": "#c8d8e8", "loot": "undead", "value": 150, "covers": ["terraria:ghost"]}
+  ],
+  "items": [
+    {"id": "faeling", "name": "Faeling", "description": "Right click to let it go.", "category": "material", "maxStack": 9999, "value": 1000, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "behaviors": [{"type": "releaseCritter", "enemy": "faeling"}]}
+  ],
+  "spawnRules": [
+    {"id": "faeling_aether", "enemy": "faeling", "weight": 6, "conditions": [{"type": "biome", "any": ["aether"]}]},
+    {"id": "ghost_graveyard", "enemy": "ghost", "weight": 3, "conditions": [{"type": "biome", "any": ["graveyard"]}]},
+    {"id": "zombie_graveyard", "enemy": "zombie", "weight": 4, "conditions": [{"type": "biome", "any": ["graveyard"]}]},
+    {"id": "raven_graveyard", "enemy": "raven", "weight": 2, "conditions": [{"type": "biome", "any": ["graveyard"]}]}
+  ]
+}

@@ -6,6 +6,7 @@ public enum LiquidType : byte
     Water = 1,
     Lava = 2,
     Honey = 3,
+    Shimmer = 4,
 }
 
 /// <summary>Packs liquid type (bits 5–7) and fill level 0–31 (bits 0–4) into one byte per cell.</summary>

@@ -37,7 +37,7 @@
       "step": { "type": "oreVeins", "veins": ["adamantite_veins", "titanium_veins"] } },
     // Meteorites are appended by the game when one falls (after a Shadow Orb or Crimson Heart is smashed).
     { "id": "meteorite", "name": "Meteorite", "trigger": "", "step": { "type": "meteor", "block": "meteorite", "radius": 9, "zone": "meteorite" }, "covers": ["terraria:meteor_fall"] },
-    { "id": "hardmode_hallow", "name": "The Hallow", "trigger": "hardmode",
+    { "id": "hardmode_hallow", "name": "The Hallow", "trigger": "hardmode", "covers": ["terraria:hardmode_conversion"],
       "step": { "type": "wedge", "conversion": "hallow", "halfWidth": 14, "length": 220, "lean": 0.8, "depth": 0.9, "distance": 0.3 } },
     { "id": "hardmode_evil", "name": "The Corruption / Crimson", "trigger": "hardmode",
       "step": { "type": "wedge", "byEvil": { "corruption": "corruption", "crimson": "crimson" }, "halfWidth": 14, "length": 220, "lean": -0.8, "depth": 0.9, "distance": 0.3 } }

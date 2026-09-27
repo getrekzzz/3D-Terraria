@@ -83,3 +83,16 @@ def bug_net(mb: MeshBuilder, p, rng):
 GENERATORS = {"lever": lever, "switch": switch, "pressure_plate": pressure_plate, "dart_trap": dart_trap,
               "bottle_light": bottle_light, "minecart": minecart, "red_wrench": red_wrench, "wire_cutter": wire_cutter, "wire_coil": wire_coil,
               "bug_net": bug_net}
+
+
+def tombstone(mb: MeshBuilder, p, rng):
+    """A weathered grave marker: a rounded slab on a low plinth."""
+    stone = "#8a8a86"
+    mb.box((-0.2, -0.12, 0), (0.2, 0.12, 0.08), "prop:stone", "#6e6e6a")
+    mb.box((-0.15, -0.05, 0.08), (0.15, 0.05, 0.62), "prop:stone", stone)
+    mb.cylinder((0, -0.05, 0.62), (0, 0.05, 0.62), 0.15, 0.15, "prop:stone", stone, segments=12)
+    mb.box((-0.02, 0.05, 0.3), (0.02, 0.06, 0.56), "prop:stone", "#5a5a56")
+    mb.box((-0.09, 0.05, 0.46), (0.09, 0.06, 0.5), "prop:stone", "#5a5a56")
+
+
+GENERATORS["tombstone"] = tombstone

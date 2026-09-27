@@ -55,6 +55,7 @@
     "tileobjects/furniture.json",
     "tileobjects/nature.json",
     "tileobjects/stations.json",
+    "worldgen/aether.json",
     "worldgen/ores.json",
     "items/generated/ore_tiers.json"
   ]

@@ -68,6 +68,9 @@ public enum ChamberKind
     Granite,
     Mushroom,
     Shrine,
+
+    /// <summary>The Aether: an aetherium-lined cave around a Shimmer lake.</summary>
+    Aether,
 }
 
 /// <summary>Ellipsoidal chamber with a kind-specific interior.</summary>

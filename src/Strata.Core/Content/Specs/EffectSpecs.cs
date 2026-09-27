@@ -15,6 +15,9 @@ public static class EffectSpecs
     /// <summary>Held items cannot be used (the crypt's hex).</summary>
     public const string NoItemUse = "noItemUse";
 
+    /// <summary>Sink through blocks until clear of them (the Shimmer's phase).</summary>
+    public const string Phase = "phase";
+
     /// <summary>Wings and rocket boots: rise while jump is held, for a while.</summary>
     public const string Flight = "flight";
 
@@ -41,6 +44,7 @@ public static class EffectSpecs
         c.Register<EmitLightParams>(SpecKind.Effect, EmitLight);
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoFallDamage);
         c.Register<NoFallDamageParams>(SpecKind.Effect, NoItemUse);
+        c.Register<NoFallDamageParams>(SpecKind.Effect, Phase);
         c.Register<FlightParams>(SpecKind.Effect, Flight);
         c.Register<DashParams>(SpecKind.Effect, Dash);
         c.Register<PacifyParams>(SpecKind.Effect, Pacify);

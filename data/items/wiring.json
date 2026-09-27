@@ -15,7 +15,7 @@
   ],
   "items": [
     {"id": "wire", "name": "Wire", "description": "Laid with a Red Wrench.", "category": "material", "maxStack": 9999, "value": 50, "covers": ["terraria:wire"]},
-    {"id": "red_wrench", "name": "Red Wrench", "description": "Places red wire (uses Wire from your inventory).", "category": "tool", "rarity": 1, "value": 40000, "useStyle": "swing", "useTime": 8, "useAnimation": 8, "autoReuse": true, "reach": 12, "behaviors": [{"type": "wiring"}], "covers": ["terraria:red_wrench"]},
+    {"id": "red_wrench", "name": "Red Wrench", "description": "Places red wire (uses Wire from your inventory).", "category": "tool", "rarity": 1, "value": 40000, "useStyle": "swing", "useTime": 8, "useAnimation": 8, "autoReuse": true, "reach": 12, "behaviors": [{"type": "wiring"}], "covers": ["terraria:wrench"]},
     {"id": "wire_cutter", "name": "Wire Cutter", "description": "Removes wire.", "category": "tool", "rarity": 1, "value": 40000, "useStyle": "swing", "useTime": 8, "useAnimation": 8, "autoReuse": true, "reach": 12, "behaviors": [{"type": "wiring", "cut": true}], "covers": ["terraria:wire_cutter"]},
     {"id": "bug_net", "name": "Bug Net", "description": "Used to catch critters.", "category": "tool", "value": 2500, "useStyle": "swing", "useTime": 20, "useAnimation": 20, "autoReuse": true, "behaviors": [{"type": "bugNet"}], "covers": ["terraria:bug_net"]},
     {"id": "minecart", "name": "Minecart", "description": "Use it on a Minecart Track to ride. Jump to get off.", "category": "tool", "rarity": 1, "value": 20000, "useStyle": "swing", "useTime": 20, "useAnimation": 20, "behaviors": [{"type": "minecart"}], "covers": ["terraria:minecart"]}

@@ -42,6 +42,8 @@ def build(table: dict) -> dict:
         bar = f"{m}_bar"
         items.append({"id": bar, "name": f"{n} Bar", "category": "material", "maxStack": 9999,
                       "value": v * 3 // 4, "rarity": r, "covers": covers(t, "bar")})
+        if "milestone" in t:
+            items[-1]["milestone"] = t["milestone"]
         recipes.append({"id": bar, "output": bar,
                         "inputs": [{"item": t.get("ore", f"{m}_ore"), "count": t["orePerBar"]}] + t.get("extraInputs", []),
                         "stations": [t.get("barStation", "furnace")]})

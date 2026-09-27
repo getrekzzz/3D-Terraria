@@ -14,6 +14,7 @@ import bosses_events  # noqa: E402
 import items  # noqa: E402
 import items_extra  # noqa: E402
 import world  # noqa: E402
+import world_extra  # noqa: E402
 
 
 def entry(cid, name, kind, stage="", source="", mechanics=None, note=""):
@@ -47,14 +48,14 @@ def build():
             for cid, name, stage, source in rows(text):
                 item_entries.append(entry(cid, name, kind, stage, source))
     dbs["items"] = item_entries
-    dbs["enemies"] = [entry(c, n, "enemy", s, src, m.split(",")) for c, n, s, src, m in rows(world.ENEMIES)]
+    dbs["enemies"] = [entry(c, n, "enemy", s, src, m.split(",")) for c, n, s, src, m in rows(world.ENEMIES + world_extra.ENEMIES)]
     dbs["bosses"] = [entry(c, n, "boss", s, src, m, note) for c, n, s, src, m, note in bosses_events.BOSSES]
     dbs["events"] = [entry(c, n, "event", s, src, m, note) for c, n, s, src, m, note in bosses_events.EVENTS]
     dbs["npcs"] = [entry(c, n, "town_npc", s, src, m) for c, n, s, src, m in bosses_events.NPCS]
     dbs["progression"] = [entry(c, n, "stage", s, f"after {req}" if req else "", m) for c, n, s, req, m in bosses_events.PROGRESSION]
     dbs["biomes"] = [entry(c, n, kind, source=layer) for c, n, layer, kind in rows(world.BIOMES)]
-    dbs["tiles"] = [entry(c, n, kind, s) for c, n, s, kind in rows(world.TILES)]
-    dbs["buffs"] = [entry(c, n, kind) for c, n, kind in rows(world.BUFFS)]
+    dbs["tiles"] = [entry(c, n, kind, s) for c, n, s, kind in rows(world.TILES + world_extra.TILES)]
+    dbs["buffs"] = [entry(c, n, kind) for c, n, kind in rows(world.BUFFS + world_extra.BUFFS)]
     dbs["liquids"] = [entry(c, n, kind) for c, n, kind in rows(world.LIQUIDS)]
     dbs["projectiles"] = [entry(c, n, kind) for c, n, kind in rows(world.PROJECTILES)]
     dbs["recipes"] = [entry(c, n, "recipe", source=st, mechanics=[i.strip() for i in ins.split(",")]) for c, n, st, ins in rows(world.RECIPES)]

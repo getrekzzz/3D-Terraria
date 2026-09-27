@@ -77,7 +77,6 @@ turtle_shell|Turtle Shell|hardmode|giant tortoise
 butterfly_dust|Butterfly Dust|hardmode|moth
 """,
     "tool": """
-red_wrench|Red Wrench|prehardmode|mechanic
 wire_cutter|Wire Cutter|prehardmode|mechanic
 lever|Lever|prehardmode|mechanic
 switch|Switch|prehardmode|mechanic

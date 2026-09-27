@@ -13,8 +13,9 @@ public sealed partial class WorldSession
     {
         var ctx = reuse ?? new ConditionContext();
         float surface = Generator.Terrain.SurfaceHeight(cell.X, cell.Z);
-        ctx.Biomes = ZonesAt(cell).Append(Generator.Biomes.IdOf(Generator.Biomes.BiomeAt(cell.X, cell.Y, cell.Z, surface))).Distinct().ToArray();
+        string baseBiome = Generator.Biomes.IdOf(Generator.Biomes.BiomeAt(cell.X, cell.Y, cell.Z, surface));
         ctx.Layer = Generator.Plan.Bands.LayerAt(cell.Y);
+        ctx.Biomes = ZonesAt(cell).Append(baseBiome).Concat(LayeredBiomes(cell, baseBiome, ctx.Layer)).Distinct().ToArray();
         ctx.Depth = surface - cell.Y;
         ctx.Hour = Clock.Hour;
         ctx.IsDay = Clock.IsDay;
@@ -25,6 +26,41 @@ public sealed partial class WorldSession
         ctx.Difficulty = (int)Settings.Difficulty;
         ctx.Evil = Settings.Evil.ToString().ToLowerInvariant();
         return ctx;
+    }
+
+    /// <summary>
+    /// Biomes that depend on where in a base biome a cell is, or on what players built there: the Underground Jungle
+    /// and Ice biome below the jungle and snow, Space high above everything, and a Graveyard wherever enough
+    /// tombstones stand together.
+    /// </summary>
+    private IEnumerable<string> LayeredBiomes(Int3 cell, string baseBiome, Strata.Core.World.WorldLayer layer)
+    {
+        if (layer is Strata.Core.World.WorldLayer.Underground or Strata.Core.World.WorldLayer.Cavern)
+        {
+            if (baseBiome == "jungle") yield return "underground_jungle";
+            if (baseBiome == "tundra") yield return "ice_biome";
+        }
+        if (layer == Strata.Core.World.WorldLayer.Space) yield return "space";
+        if (layer is Strata.Core.World.WorldLayer.Surface or Strata.Core.World.WorldLayer.Underground && InGraveyard(cell)) yield return "graveyard";
+    }
+
+    public const int GraveyardStones = 5;
+    public const int GraveyardRadius = 20;
+    private readonly Dictionary<Int3, (long Tick, bool Yes)> _graveyards = new();
+
+    /// <summary>Whether at least <see cref="GraveyardStones"/> tombstones stand nearby (cached per 8-cell region for two seconds).</summary>
+    public bool InGraveyard(Int3 cell)
+    {
+        var region = new Int3(cell.X >> 3, cell.Y >> 3, cell.Z >> 3);
+        long now = Clock.Tick;
+        if (_graveyards.TryGetValue(region, out var cached) && now - cached.Tick < 120) return cached.Yes;
+        var center = new Int3(region.X * 8 + 4, region.Y * 8 + 4, region.Z * 8 + 4);
+        int stones = 0;
+        foreach (var o in World.TileObjects.InBox(new Aabb3i(center - Int3.One * GraveyardRadius, center + Int3.One * GraveyardRadius)))
+            if (o.Def.HasTag("tombstone") && ++stones >= GraveyardStones) break;
+        if (_graveyards.Count > 4096) _graveyards.Clear();
+        _graveyards[region] = (now, stones >= GraveyardStones);
+        return stones >= GraveyardStones;
     }
 
     /// <summary>

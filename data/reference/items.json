@@ -3736,13 +3736,6 @@
    "source": "moth"
   },
   {
-   "id": "terraria:red_wrench",
-   "name": "Red Wrench",
-   "kind": "tool",
-   "stage": "prehardmode",
-   "source": "mechanic"
-  },
-  {
    "id": "terraria:wire_cutter",
    "name": "Wire Cutter",
    "kind": "tool",

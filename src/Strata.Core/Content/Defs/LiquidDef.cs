@@ -69,6 +69,9 @@ public sealed class LiquidDef : ContentDef
     /// <summary>Dropped items touching the liquid are destroyed unless tagged <c>liquid_proof</c>.</summary>
     public bool DestroysItems { get; init; }
 
+    /// <summary>Dropped items touching the liquid transmute or come apart into their ingredients (Shimmer).</summary>
+    public bool TransmutesItems { get; init; }
+
     /// <summary>Holding your head under it uses up breath; with none left you drown.</summary>
     public bool Drowns { get; init; } = true;
 

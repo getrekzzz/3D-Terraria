@@ -67,7 +67,7 @@ internal static class StandardProbes
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);
         // zone.<biome>: 1 while the player stands in a zone (the crypt, spider nests…).
-        ctx.AddPrefixProbe("zone.", id => w.Session.Content.Biomes.Contains(id) ? (w.Session.ZonesAt(ctx.Player.FeetCell).Contains(id) ? 1 : 0) : null);
+        ctx.AddPrefixProbe("zone.", id => w.Session.Content.Biomes.Contains(id) ? (w.Session.ContextAt(ctx.Player.FeetCell).Biomes.Contains(id) ? 1 : 0) : null);
         // near.<block>: cells of a block within 8 cells of the player's feet.
         ctx.AddPrefixProbe("near.", id =>
         {

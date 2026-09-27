@@ -1,4 +1,5 @@
 using Godot;
+using Strata.Core.Common;
 using Strata.Core.Gameplay.Mounts;
 
 namespace Strata.Game.Player;
@@ -40,6 +41,45 @@ public sealed partial class PlayerController
         RefillAirMovement();
         Sync();
         return true;
+    }
+
+    private bool _phasing;
+
+    /// <summary>Gravity multiplier high above the world, in Space.</summary>
+    private const float SpaceGravity = 0.45f;
+
+    private bool InSpace() => GlobalPosition.Y / Units.CellSize >= _runtime.Session.Generator.Plan.Bands.SpaceStart;
+
+    /// <summary>
+    /// Shimmer's phase: while it lasts the body sinks slowly through blocks, and it keeps sinking afterwards until
+    /// it is clear of them. Returns true while phasing (normal movement is skipped).
+    /// </summary>
+    private bool UpdatePhase()
+    {
+        if (!Entity.State.Effects.Phasing && !(_phasing && InsideSolid()))
+        {
+            _phasing = false;
+            return false;
+        }
+        _phasing = true;
+        CollisionMask = 0;
+        Velocity = new Vector3(Velocity.X * 0.9f, -3f, Velocity.Z * 0.9f);
+        MoveAndSlide();
+        _peakY = GlobalPosition.Y;
+        _airborne = false;
+        Sync();
+        return true;
+    }
+
+    private bool InsideSolid()
+    {
+        var session = _runtime.Session;
+        foreach (var y in new[] { 0.2f, 1.0f, 1.7f })
+        {
+            ushort id = session.World.GetBlock(CellAt(GlobalPosition + Vector3.Up * y));
+            if (id != 0 && id < session.Content.Blocks.Count && session.Content.Blocks[id].IsSolid) return true;
+        }
+        return false;
     }
 
     /// <summary>Whether the body is inside a climbable block (rope).</summary>

@@ -14,6 +14,9 @@ public sealed class DroppedItem
     public int Age { get; set; }
     public int PickupDelay { get; set; }
     public bool Grounded { get; set; }
+
+    /// <summary>Already transformed by Shimmer (it floats out rather than changing again).</summary>
+    public bool Shimmered { get; set; }
 }
 
 /// <summary>

@@ -410,6 +410,12 @@
    ],
    "generator": "furnace"
   },
+  "tombstone": {
+   "models": [
+    "assets/models/objects/tombstone_v0.glb"
+   ],
+   "generator": "tombstone"
+  },
   "torch": {
    "models": [
     "assets/models/objects/torch_v0.glb"
@@ -1193,6 +1199,10 @@
   "eye_of_the_golem": {
    "model": "assets/models/items/eye_of_the_golem.glb",
    "icon": "assets/icons/items/eye_of_the_golem.png"
+  },
+  "faeling": {
+   "model": "assets/models/items/faeling.glb",
+   "icon": "assets/icons/items/faeling.png"
   },
   "fairy_wings": {
    "model": "assets/models/items/fairy_wings.glb",
@@ -2862,6 +2872,10 @@
    "model": "assets/models/items/titanium_shortsword.glb",
    "icon": "assets/icons/items/titanium_shortsword.png"
   },
+  "tombstone": {
+   "object": "tombstone",
+   "icon": "assets/icons/items/tombstone.png"
+  },
   "topaz": {
    "model": "assets/models/items/topaz.glb",
    "icon": "assets/icons/items/topaz.png"
@@ -3674,6 +3688,13 @@
     "swing",
     "use",
     "walk"
+   ]
+  },
+  "faeling": {
+   "model": "assets/models/creatures/faeling.glb",
+   "generator": "firefly",
+   "animations": [
+    "fly"
    ]
   },
   "firefly": {

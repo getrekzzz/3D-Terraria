@@ -250,6 +250,7 @@ public sealed partial class GameWorld : IDisposable
                 state.Deaths++;
                 state.Buffs.ClearNonPersistent();
                 ApplyDeathPenalty(p);
+                DropTombstone(p);
                 PlayerDied?.Invoke(p);
             }
             else if (--p.RespawnTicks == 0 && !p.Lost)
@@ -269,6 +270,7 @@ public sealed partial class GameWorld : IDisposable
         {
             if (dps > 0 && p.Alive) state.Vitals.DamageDirect(dps);
             state.Recompute();
+            CheckMilestones(p);
         }
     }
 
