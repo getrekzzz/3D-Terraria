@@ -47,6 +47,9 @@ public sealed class UserSettings
     public float SoundVolume { get; set; } = 0.8f;
     public float AmbientVolume { get; set; } = 0.6f;
 
+    /// <summary>Audio output device by name; "Default" follows the system's default device.</summary>
+    public string AudioDevice { get; set; } = "Default";
+
     // Interface
     public float UiScale { get; set; } = 1f;
     public bool ShowFps { get; set; }

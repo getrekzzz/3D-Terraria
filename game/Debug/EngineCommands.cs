@@ -78,6 +78,35 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
+            Name = "audio", Usage = "audio [test|files|device <name|Default>]",
+            Help = "Shows the audio driver, output device and buses; plays a test chime; checks every sound file; or picks the output device.",
+            Run = (_, a) =>
+            {
+                string info = $"{Audio.AudioDiagnostics.Device()}\nBuses: {Audio.AudioDiagnostics.Buses()}";
+                switch (a.Count == 0 ? "" : a.Str(0, "action"))
+                {
+                    case "":
+                        return CommandResult.Success($"{info}\nDevices: {string.Join(" | ", Godot.AudioServer.GetOutputDeviceList())}");
+                    case "test":
+                        Audio.AudioDiagnostics.PlayTest(world.Runtime);
+                        return CommandResult.Success($"Playing a test chime, then a click.\n{info}");
+                    case "files":
+                        var (loaded, total, failed) = Audio.AudioDiagnostics.ProbeFiles();
+                        return failed.Count == 0 ? CommandResult.Success($"All {total} sound files load.")
+                            : CommandResult.Fail($"{loaded}/{total} sound files load; failed: {string.Join(", ", failed)}");
+                    case "device":
+                        var s = Settings.UserSettings.Current;
+                        a.Str(1, "device name");
+                        s.AudioDevice = string.Join(" ", System.Linq.Enumerable.Skip(a.All, 1)); // device names contain spaces
+                        s.Apply();
+                        s.Save();
+                        return CommandResult.Success($"Output: {Audio.AudioDiagnostics.Device()}");
+                    default: throw new CommandException("expected test, files or device");
+                }
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "sky", Usage = "sky clouds <0..1|auto>", Help = "Forces the cloud cover (0 clear … 1 overcast) or returns it to the drifting weather.",
             Run = (_, a) =>
             {

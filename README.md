@@ -36,7 +36,14 @@ world events and a world that transforms as you progress.
 
 ## Running
 1. Install **Godot 4.7.x .NET** and the **.NET 8 SDK**.
-2. Open `project.godot` in Godot and press Play (F5), or from a terminal: `godot --path .`
+2. Open `project.godot` in Godot and press Play (F5), or from a terminal: `godot --path .`. Open the project in the editor
+   once after every download (or run `godot --headless --path . --import`) so new sounds, models and textures are
+   imported; a terminal start does not import anything.
+
+**No sound?** Settings → Audio → *Test sound* plays a chime made by the game itself, then a game sound, and shows the
+driver, output device and how many sound files loaded (the console `audio`, `audio test`, `audio files` and
+`audio device <name>` do the same). Pick another *Output device* there if the chime is silent. The startup log
+(`%APPDATA%\Godot\app_userdata\Strata\logs\strata.log` on Windows) has an `audio:` line with the same details.
 
 Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medium|large --new --player=NAME
 --fresh-player --view=CHUNKS --hour=H --free-camera --exec="cmd;cmd" --screenshot=PATH --shots=DIR --smoke=SCRIPT

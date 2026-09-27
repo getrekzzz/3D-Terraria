@@ -67,19 +67,33 @@ public static class Sfx
         return null;
     }
 
+    /// <summary>Sound files that exist but could not be loaded (not imported, or damaged).</summary>
+    public static int FailedLoads { get; private set; }
+
     private static AudioStream[]? Streams(string id)
     {
         if (Cache.TryGetValue(id, out var cached)) return cached;
         var list = new List<AudioStream>();
-        string single = $"res://assets/audio/sfx/{id}.wav";
-        if (ResourceLoader.Exists(single)) list.Add(GD.Load<AudioStream>(single));
+        Add(list, $"{AudioDiagnostics.SfxDirectory}/{id}.wav");
         for (int i = 1; i <= 8; i++)
         {
-            string variant = $"res://assets/audio/sfx/{id}_{i}.wav";
+            string variant = $"{AudioDiagnostics.SfxDirectory}/{id}_{i}.wav";
             if (!ResourceLoader.Exists(variant)) break;
-            list.Add(GD.Load<AudioStream>(variant));
+            Add(list, variant);
         }
         return Cache[id] = list.ToArray();
+    }
+
+    private static void Add(List<AudioStream> list, string path)
+    {
+        if (!ResourceLoader.Exists(path)) return;
+        if (ResourceLoader.Load<AudioStream>(path) is { } stream)
+        {
+            list.Add(stream);
+            return;
+        }
+        FailedLoads++;
+        GD.PushError($"audio: could not load {path}. Open the project in the Godot editor once (or run `godot --path . --import`) so the sounds are imported.");
     }
 }
 
@@ -106,6 +120,7 @@ public static class AudioBuses
 
     public static void Apply(UserSettings s)
     {
+        AudioDiagnostics.ApplyDevice(s.AudioDevice);
         Set("Master", s.MasterVolume);
         Set(Music, s.MusicVolume);
         Set(Sound, s.SoundVolume);
