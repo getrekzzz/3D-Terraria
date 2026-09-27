@@ -93,6 +93,19 @@ phantasm|Phantasm|endgame|craft
 nebula_arcanum|Nebula Arcanum|endgame|craft
 nebula_blaze|Nebula Blaze|endgame|craft
 stardust_cell_staff|Stardust Cell Staff|endgame|craft
+silver_bullet|Silver Bullet|early|arms dealer
+shotgun|Shotgun|hardmode|arms dealer
+rocket_i|Rocket I|hardmode|cyborg
+rocket_launcher|Rocket Launcher|hardmode|cyborg
+greater_mana_potion|Greater Mana Potion|hardmode|wizard
+spell_tome|Spell Tome|hardmode|wizard
+pygmy_necklace|Pygmy Necklace|hardmode|witch doctor
+hercules_beetle|Hercules Beetle|hardmode|witch doctor
+steampunk_wings|Steampunk Wings|hardmode|steampunker
+katana|Katana|early|travelling merchant
+mushroom_spear|Mushroom Spear|hardmode|truffle
+hammush|Hammush|hardmode|truffle
+autohammer|Autohammer|hardmode|truffle
 last_prism|Last Prism|endgame|moon lord
 lunar_flare|Lunar Flare|endgame|moon lord
 stardust_dragon_staff|Stardust Dragon Staff|endgame|craft

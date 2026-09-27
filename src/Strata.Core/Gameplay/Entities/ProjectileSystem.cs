@@ -86,7 +86,7 @@ public sealed partial class ProjectileSystem
             dir = Vector3.Normalize(dir + side * _rng.NextSigned() * spread + up * _rng.NextSigned() * spread * 0.5f);
         }
         var item = shot.Weapon.Item;
-        Spawn(shot.Projectile, p.Eye + dir * 0.4f, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, item.Crit + Combat.DamageModel.BaseCritChance, item);
+        Spawn(shot.Projectile, p.Eye + dir * 0.4f, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
     }
 
     public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit, ItemDef? source = null)

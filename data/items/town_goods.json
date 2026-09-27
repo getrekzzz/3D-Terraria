@@ -1,0 +1,41 @@
+{
+  // Goods the new town residents sell or unlock: the Arms Dealer's ammo and shotgun, the Cyborg's rockets, the Wizard's
+  // tome and potions, the Witch Doctor's summoner charms, the Steampunker's wings, the Travelling Merchant's katana, and
+  // Truffle's mushroom gear with the Autohammer (Shroomite Bars and armor).
+  "tileObjects": [
+    {"id": "autohammer", "name": "Autohammer", "description": "Used to craft Shroomite Bars.", "tags": ["shop"], "size": [2, 2, 2], "interaction": "station", "stations": ["autohammer"], "hitPoints": 4, "itemCategory": "station", "itemValue": 200000, "covers": ["terraria:autohammer"]}
+  ],
+  "projectiles": [
+    {"id": "silver_bullet", "name": "Silver Bullet", "visual": "bullet", "color": "#e8ecf4", "lifetime": 150, "radius": 0.25},
+    {"id": "rocket_i", "name": "Rocket", "visual": "bolt", "color": "#ff8a3a", "lifetime": 200, "radius": 0.4, "light": [12, 6, 2], "trail": "#b0b0b0", "onHit": [{"type": "explode", "radius": 3, "damage": 0}]},
+    {"id": "mushroom_spear_thrust", "name": "Mushroom Spear", "visual": "orb", "color": "#4a8aff", "lifetime": 40, "radius": 0.5, "pierce": 2, "light": [3, 6, 14]}
+  ],
+  "items": [
+    {"id": "silver_bullet", "name": "Silver Bullet", "category": "ammo", "maxStack": 9999, "value": 15, "tags": ["shop"], "damage": 9, "damageType": "ranged", "knockback": 3, "ammoClass": "bullet", "projectile": "silver_bullet", "consumable": true, "covers": ["terraria:silver_bullet"]},
+    {"id": "shotgun", "name": "Shotgun", "description": "Fires a spread of bullets.", "category": "weapon", "rarity": 4, "value": 250000, "tags": ["shop"], "useStyle": "shoot", "useTime": 45, "useAnimation": 45, "damage": 24, "damageType": "ranged", "knockback": 4.5, "useAmmo": "bullet", "shootSpeed": 40, "behaviors": [{"type": "shootProjectile", "count": 5, "spread": 10}], "covers": ["terraria:shotgun"]},
+    {"id": "rocket_i", "name": "Rocket I", "description": "Small blast radius. Will not destroy tiles.", "category": "ammo", "maxStack": 9999, "value": 50, "tags": ["shop"], "damage": 40, "damageType": "ranged", "knockback": 4, "ammoClass": "rocket", "projectile": "rocket_i", "consumable": true, "covers": ["terraria:rocket_i"]},
+    {"id": "rocket_launcher", "name": "Rocket Launcher", "category": "weapon", "rarity": 8, "value": 350000, "tags": ["shop"], "useStyle": "shoot", "useTime": 30, "useAnimation": 30, "autoReuse": true, "damage": 50, "damageType": "ranged", "knockback": 4, "useAmmo": "rocket", "shootSpeed": 18, "covers": ["terraria:rocket_launcher"]},
+    {"id": "healing_potion", "name": "Healing Potion", "category": "potion", "rarity": 1, "maxStack": 30, "value": 1000, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "healLife": 100, "covers": ["terraria:healing_potion"]},
+    {"id": "mana_potion", "name": "Mana Potion", "category": "potion", "rarity": 1, "maxStack": 30, "value": 250, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "healMana": 100, "covers": ["terraria:mana_potion"]},
+    {"id": "greater_mana_potion", "name": "Greater Mana Potion", "category": "potion", "rarity": 3, "maxStack": 30, "value": 500, "tags": ["shop"], "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "healMana": 200, "covers": ["terraria:greater_mana_potion"]},
+    {"id": "spell_tome", "name": "Spell Tome", "description": "Can be enchanted.", "category": "material", "rarity": 3, "maxStack": 99, "value": 50000, "tags": ["shop"], "covers": ["terraria:spell_tome"]},
+    {"id": "pygmy_necklace", "name": "Pygmy Necklace", "description": "Increases your max number of minions by 1.", "category": "accessory", "rarity": 4, "value": 100000, "tags": ["shop"], "equipSlot": "accessory", "equipEffects": [{"type": "stat", "stat": "maxMinions", "add": 1}], "covers": ["terraria:pygmy_necklace"]},
+    {"id": "hercules_beetle", "name": "Hercules Beetle", "description": "Increases minion damage by 15%.", "category": "accessory", "rarity": 5, "value": 150000, "tags": ["shop"], "equipSlot": "accessory", "equipEffects": [{"type": "stat", "stat": "summonDamage", "add": 0.15}], "covers": ["terraria:hercules_beetle"]},
+    {"id": "steampunk_wings", "name": "Steampunk Wings", "description": "Allows flight and slow fall.", "category": "accessory", "rarity": 8, "value": 400000, "tags": ["shop"], "equipSlot": "accessory", "equipEffects": [{"type": "flight", "time": 180, "ascent": 48, "maxRise": 9, "glide": 2.0, "airSpeed": 1.6}], "covers": ["terraria:steampunk_wings"]},
+    {"id": "katana", "name": "Katana", "category": "weapon", "rarity": 1, "value": 100000, "tags": ["shop"], "useStyle": "swing", "useTime": 15, "useAnimation": 15, "autoReuse": true, "damage": 16, "damageType": "melee", "knockback": 3, "behaviors": [{"type": "meleeSwing", "arc": 170, "length": 3.8}], "covers": ["terraria:katana"]},
+    {"id": "mushroom_spear", "name": "Mushroom Spear", "description": "Mushrooms burst from each thrust.", "category": "weapon", "rarity": 8, "value": 300000, "tags": ["shop"], "useStyle": "shoot", "useTime": 40, "useAnimation": 40, "damage": 60, "damageType": "melee", "knockback": 6.5, "projectile": "mushroom_spear_thrust", "shootSpeed": 14, "covers": ["terraria:mushroom_spear"]},
+    {"id": "hammush", "name": "Hammush", "category": "tool", "rarity": 8, "value": 300000, "tags": ["shop"], "useStyle": "swing", "useTime": 20, "useAnimation": 30, "autoReuse": true, "damage": 26, "damageType": "melee", "knockback": 7.5, "hammerPower": 85, "axePower": 150, "covers": ["terraria:hammush"]},
+    {"id": "shroomite_bar", "name": "Shroomite Bar", "description": "Well hello there.", "category": "material", "rarity": 8, "maxStack": 9999, "value": 12000, "covers": ["terraria:shroomite_bar"]},
+    {"id": "shroomite_helmet", "name": "Shroomite Helmet", "description": "15% increased ranged damage.", "category": "armor", "rarity": 8, "value": 375000, "equipSlot": "head", "defense": 11, "armorSet": "shroomite_armor", "equipEffects": [{"type": "stat", "stat": "rangedDamage", "add": 0.15}]},
+    {"id": "shroomite_breastplate", "name": "Shroomite Breastplate", "description": "13% increased ranged critical strike chance.", "category": "armor", "rarity": 8, "value": 300000, "equipSlot": "body", "defense": 24, "armorSet": "shroomite_armor", "equipEffects": [{"type": "stat", "stat": "rangedCrit", "add": 13}]},
+    {"id": "shroomite_leggings", "name": "Shroomite Leggings", "description": "7% increased ranged critical strike chance. 12% increased movement speed.", "category": "armor", "rarity": 8, "value": 225000, "equipSlot": "legs", "defense": 16, "armorSet": "shroomite_armor", "equipEffects": [{"type": "stat", "stat": "rangedCrit", "add": 7}, {"type": "stat", "stat": "moveSpeed", "add": 0.12}]}
+  ],
+  "recipes": [
+    {"id": "healing_potion", "output": "healing_potion", "inputs": [{"item": "lesser_healing_potion", "count": 2}, {"item": "glowing_mushroom", "count": 1}], "stations": ["alchemy"]},
+    {"id": "mana_potion", "output": "mana_potion", "inputs": [{"item": "lesser_mana_potion", "count": 2}, {"item": "glowing_mushroom", "count": 1}], "stations": ["alchemy"]},
+    {"id": "shroomite_bar", "output": "shroomite_bar", "inputs": [{"item": "chlorophyte_bar", "count": 1}, {"item": "glowing_mushroom", "count": 15}], "stations": ["autohammer"]},
+    {"id": "shroomite_helmet", "output": "shroomite_helmet", "inputs": [{"item": "shroomite_bar", "count": 12}], "stations": ["hardmode_anvil"]},
+    {"id": "shroomite_breastplate", "output": "shroomite_breastplate", "inputs": [{"item": "shroomite_bar", "count": 24}], "stations": ["hardmode_anvil"]},
+    {"id": "shroomite_leggings", "output": "shroomite_leggings", "inputs": [{"item": "shroomite_bar", "count": 18}], "stations": ["hardmode_anvil"]}
+  ]
+}

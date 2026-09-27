@@ -33,7 +33,7 @@ public enum UseOutcome
 }
 
 /// <summary>A projectile launch requested by an item use (resolved by the projectile system).</summary>
-public sealed record ShotRequest(PlayerEntity Player, ItemUseInfo Weapon, ProjectileDef Projectile, ItemDef? Ammo, float Speed, int Damage, float Knockback);
+public sealed record ShotRequest(PlayerEntity Player, ItemUseInfo Weapon, ProjectileDef Projectile, ItemDef? Ammo, float Speed, int Damage, float Knockback, int Crit = 0);
 
 /// <summary>
 /// Executes the held item's actions for a player: tools against terrain and objects, block and object placement,
@@ -80,7 +80,7 @@ public sealed partial class ItemUseSystem
         float reach = (item.Reach + p.State.Effects.Stats.Bonus(StatIds.Reach)) * Units.CellSize;
         var inReach = target != null && target.Distance <= reach ? target : null;
         var outcome = UseOutcome.None;
-        int useTime = item.UseTime;
+        int useTime = Prefixes.UseTime(held, item.UseTime);
 
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject))
         {
@@ -283,16 +283,17 @@ public sealed partial class ItemUseSystem
         if (projectile == null) return UseOutcome.None;
         // Boomerangs and flails: one out at a time.
         if (projectile.Returns > 0 && _world.Projectiles.All.Any(x => x.Owner == p && x.Def == projectile)) return UseOutcome.Blocked;
+        var held = state.Inventory.Held.Item == item ? state.Inventory.Held : new ItemStack(item, 1);
         if (item.ManaCost > 0)
         {
-            int cost = (int)MathF.Round(item.ManaCost * state.Effects.Stats.Get(StatIds.ManaCost, 1f));
+            int cost = (int)MathF.Round(Prefixes.ManaCost(held) * state.Effects.Stats.Get(StatIds.ManaCost, 1f));
             if (!state.Vitals.TrySpendMana(cost)) return UseOutcome.NoMana;
         }
-        int damage = item.Damage + (ammo?.Damage ?? 0);
-        float knockback = item.Knockback + (ammo?.Knockback ?? 0f);
+        int damage = Prefixes.Damage(held) + (ammo?.Damage ?? 0);
+        float knockback = Prefixes.Knockback(held) + (ammo?.Knockback ?? 0f);
         var shot = info.Shoot!;
         for (int i = 0; i < shot.Count; i++)
-            Shot?.Invoke(new ShotRequest(p, info, projectile, ammo, item.ShootSpeed, damage, knockback));
+            Shot?.Invoke(new ShotRequest(p, info, projectile, ammo, Prefixes.ShootSpeed(held), damage, knockback, Prefixes.Crit(held)));
         if (item.Consumable && item.UseAmmo == null) ConsumeHeld(p); // thrown: bombs, shuriken, knives
         return UseOutcome.Shot;
     }
