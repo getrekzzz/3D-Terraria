@@ -53,6 +53,7 @@ public sealed class UserSettings
     // Interface
     public float UiScale { get; set; } = 1f;
     public bool ShowFps { get; set; }
+    public bool ShowMinimap { get; set; } = true;
     public bool ShowTargetName { get; set; } = true;
     public string CursorColor { get; set; } = "#ffffff";
 

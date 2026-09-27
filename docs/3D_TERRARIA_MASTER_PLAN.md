@@ -49,6 +49,7 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-27 | Dynamic lights are a preset-sized pool (`DynamicLights`) shared by placed lights, lava hotspots and glowing creatures; flames are a data spec (`flame` on tile objects) drawn by `flame.gdshader` | Baked 4-bit light stops at 7.5 m and every glowing creature carried its own light (fireflies alone could add dozens). |
 | 2026-09-27 | Lava is its own opaque mesh surface and shader; the mesher lists sampled lava surface cells for embers and heat lights | Realistic lava needs its own look and needs no refraction; the transparent pass and screen copy were wasted on it. |
 | 2026-09-27 | Sealed chunks sit on a visual layer the sun and moon shadow maps skip (`Light3D.ShadowCasterMask`) | Torch shadows had forced every cave chunk back into the 4-cascade sun shadow passes on high/ultra. |
+| 2026-09-27 | The world map is per player per world (`maps/<player>.map`): 1 m pixels in sparse 64² tiles remembering the surface seen outdoors and the cave floor or rock seen underground at the player's depth; M opens it, a minimap follows the player | A top-down adaptation of the reference game's discoverable map that still shows caves; block ids are saved by name. |
 | 2026-09-27 | Cabins stand in the cave tunnels with doorways along the tunnel; one or two rooms; Gold Chests in the cavern layer (also loose, with pots) | Buried cabins were only found by digging; the reference game's caves are dotted with cabins and gold chests. Generator version 9. |
 
 ## 3. System status

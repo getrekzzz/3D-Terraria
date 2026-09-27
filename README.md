@@ -60,6 +60,7 @@ console switches and remembers one); rendering is described in [`docs/architectu
 | T / Shift+T, R, Alt | cycle build shape, rotate, precision (single-cell) mining |
 | Q (Ctrl+Q) | drop one (stack) |
 | Tab or I | inventory, equipment, crafting, open chest |
+| M | world map: everything this character has discovered (drag, wheel zoom, U surface/caves, C centre); a minimap sits top right |
 | V, Ctrl+wheel | first/third person, camera distance |
 | ` or F1 / F3 / Esc | console / performance overlay (FPS, GPU and CPU ms, 3D render scale) / release mouse |
 

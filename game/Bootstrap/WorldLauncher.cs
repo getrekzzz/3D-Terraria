@@ -25,6 +25,7 @@ public sealed class LaunchedWorld
     public UI.InventoryScreen? Inventory { get; init; }
     public UI.Hud? Hud { get; init; }
     public UI.TownDialog? TownDialog { get; init; }
+    public UI.WorldMapScreen? WorldMap { get; init; }
 }
 
 /// <summary>What to open: a world directory (created from <see cref="NewWorld"/> when missing) and a character.</summary>
@@ -176,13 +177,19 @@ public static class WorldLauncher
         var inventory = new UI.InventoryScreen();
         runtime.AddChild(inventory);
         inventory.Initialize(ui);
+        var worldMap = new UI.WorldMapScreen();
+        runtime.AddChild(worldMap);
+        worldMap.Initialize(ui);
+        var minimap = new UI.Minimap();
+        runtime.AddChild(minimap);
+        minimap.Initialize(ui, worldMap);
         var townDialog = new UI.TownDialog();
         runtime.AddChild(townDialog);
         townDialog.Initialize(ui);
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
-        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog };
+        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

@@ -135,6 +135,7 @@ public sealed partial class SettingsScreen : PanelContainer
         box.AddChild(MenuKit.Row("Show target name", MenuKit.Toggle(S.ShowTargetName, v => { S.ShowTargetName = v; Changed(); }),
             "Names the block or object under the crosshair."));
         box.AddChild(MenuKit.Row("Show FPS", MenuKit.Toggle(S.ShowFps, v => { S.ShowFps = v; Changed(); })));
+        box.AddChild(MenuKit.Row("Minimap", MenuKit.Toggle(S.ShowMinimap, v => { S.ShowMinimap = v; Changed(); }), "The discovered map around you, top right. M opens the full map."));
         box.AddChild(MenuKit.Row("Cursor colour", MenuKit.ColorField(S.CursorColor, h => { S.CursorColor = h; Changed(); })));
     }
 }

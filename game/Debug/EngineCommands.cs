@@ -20,7 +20,7 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|talk <resident>|shop|close>", Help = "Opens or closes gameplay screens.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close>", Help = "Opens or closes gameplay screens.",
             Run = (ctx, a) =>
             {
                 var screen = world.Inventory ?? throw new CommandException("no inventory screen in this mode");
@@ -28,6 +28,9 @@ public static class EngineCommands
                 switch (a.Str(0, "screen"))
                 {
                     case "inventory": screen.SetOpen(true); return CommandResult.Success("Inventory open.");
+                    case "map":
+                        (world.WorldMap ?? throw new CommandException("no map in this mode")).SetOpen(true);
+                        return CommandResult.Success("Map open.");
                     case "talk":
                         var id = a.Str(1, "resident");
                         var npc = ctx.World.Town.Find(id) ?? throw new CommandException($"'{id}' does not live in town");
@@ -41,6 +44,7 @@ public static class EngineCommands
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
+                        world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
                     default: throw new CommandException("expected inventory, talk, shop or close");
                 }
