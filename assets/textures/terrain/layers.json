@@ -632,6 +632,20 @@
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
+  },
+  {
+   "name": "ebonwood_planks",
+   "index": 90,
+   "type": "planks",
+   "detail": 4,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "shadewood_planks",
+   "index": 91,
+   "type": "planks",
+   "detail": 4,
+   "detailStrength": 0.6
   }
  ]
 }

@@ -32,11 +32,18 @@ public static class StatIds
     public const string EnduranceReduction = "endurance";
     public const string FlightTime = "flightTime";
 
+    /// <summary>Extra invincibility after being hit (ticks; the Cross Necklace).</summary>
+    public const string Immunity = "immunity";
+
+    /// <summary>Swimming speed bonus (Flipper).</summary>
+    public const string SwimSpeed = "swimSpeed";
+
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
         MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, Acceleration, JumpHeight, GenericDamage,
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
+        Immunity, SwimSpeed,
     };
 
     public static bool IsKnown(string id) => Known.Contains(id);

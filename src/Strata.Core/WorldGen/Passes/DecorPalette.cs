@@ -20,6 +20,7 @@ internal sealed class DecorPalette
         Stalagmite = T("stalagmite"); Stalactite = T("stalactite"); Rubble = T("rubble");
         TileObjectDef? O(string id) => content.TileObjects.TryGet(id, out var def) ? def : null;
         Daybloom = O("daybloom_plant"); Moonglow = O("moonglow_plant"); Blinkroot = O("blinkroot_plant"); Deathweed = O("deathweed_plant");
+        Shade = O("shadewood_tree"); LifeCrystal = O("life_crystal_rock");
         Waterleaf = O("waterleaf_plant"); Fireblossom = O("fireblossom_plant"); Shiverthorn = O("shiverthorn_plant"); LifeFruit = O("life_fruit_plant");
     }
 
@@ -32,6 +33,8 @@ internal sealed class DecorPalette
     public TileObjectDef? Fireblossom { get; }
     public TileObjectDef? Shiverthorn { get; }
     public TileObjectDef? LifeFruit { get; }
+    public TileObjectDef? Shade { get; }
+    public TileObjectDef? LifeCrystal { get; }
 
     public byte Forest { get; }
     public byte Tundra { get; }
@@ -67,11 +70,12 @@ internal sealed class DecorPalette
         if (ground == p.Turf && biome == Forest) return (Oak, 0.35f);
         if (ground == p.Snow) return (Pine, 0.3f);
         if (ground == p.JungleTurf) return (Mahoe, 0.75f);
-        if (ground == p.UmbralTurf || ground == p.SanguineTurf) return (Gloom, 0.3f);
+        if (ground == p.UmbralTurf) return (Gloom, 0.3f);
+        if (ground == p.SanguineTurf) return (Shade ?? Gloom, 0.3f);
         return (null, 0f);
     }
 
-    public TileObjectDef? FloorPlant(ChunkGenContext ctx, ushort ground, byte biome, float roll)
+    public TileObjectDef? FloorPlant(ChunkGenContext ctx, ushort ground, byte biome, float roll, float depth)
     {
         var p = ctx.Palette;
         if (ground == p.Turf)
@@ -85,7 +89,7 @@ internal sealed class DecorPalette
         if (ground == p.Loam) return roll < 0.004f ? Blinkroot : null;
         if (ground == p.Mud) return roll < 0.004f ? Blinkroot : roll < 0.0055f && biome == Jungle ? LifeFruit : null;
         if (ground == p.Stone || ground == p.Deepstone || ground == p.MossStone)
-            return roll < 0.008f ? Stalagmite : roll < 0.011f ? Rubble : null;
+            return roll < 0.008f ? Stalagmite : roll < 0.011f ? Rubble : roll < 0.01112f && depth > 0.3f ? LifeCrystal : null;
         return null;
     }
 }

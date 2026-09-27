@@ -5,7 +5,7 @@
     { "id": "pine_tree", "name": "Boreal Tree", "size": [3, 26, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 3, "loot": "tree_pine", "natural": true, "covers": ["terraria:boreal_tree"] },
     { "id": "palm_tree", "name": "Palm Tree", "size": [3, 20, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 5, "variants": 3, "loot": "tree_palm", "natural": true, "covers": ["terraria:palm_tree"] },
     { "id": "mahogany_tree", "name": "Rich Mahogany Tree", "size": [4, 30, 4], "collision": "trunk", "breakTool": "axe", "hitPoints": 8, "variants": 3, "loot": "tree_mahogany", "natural": true, "covers": ["terraria:mahogany_tree"] },
-    { "id": "ebonwood_tree", "name": "Ebonwood Tree", "size": [3, 20, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 2, "loot": "tree_oak", "natural": true, "covers": ["terraria:ebonwood_tree"] },
+    { "id": "ebonwood_tree", "name": "Ebonwood Tree", "size": [3, 20, 3], "collision": "trunk", "breakTool": "axe", "hitPoints": 6, "variants": 2, "loot": "tree_ebonwood", "natural": true, "covers": ["terraria:ebonwood_tree"] },
     { "id": "cactus", "name": "Cactus", "size": [2, 8, 2], "collision": "solid", "breakTool": "axe", "hitPoints": 3, "variants": 3, "loot": "cactus_plant", "natural": true, "covers": ["terraria:cactus"] },
     { "id": "giant_glowing_mushroom", "name": "Giant Glowing Mushroom", "size": [5, 14, 5], "collision": "trunk", "breakTool": "axe", "hitPoints": 5, "variants": 2, "light": [2, 5, 12], "loot": "glowing_mushroom_giant", "natural": true, "covers": ["terraria:giant_glowing_mushroom"] },
     { "id": "grass_tuft", "name": "Tall Grass", "size": [1, 1, 1], "decor": true, "variants": 4, "natural": true },

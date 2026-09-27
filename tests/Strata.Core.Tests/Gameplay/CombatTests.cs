@@ -138,12 +138,12 @@ public class CombatTests
         var spawned = new List<Npc>();
         for (int i = 0; i < 20 && spawned.Count == 0; i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
         Assert.NotEmpty(spawned);
-        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "green_slime", "blue_slime" })); // surface, daytime
+        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "green_slime", "blue_slime", "pinky" })); // surface, daytime
         g.World.Npcs.Clear();
         g.World.Session.Clock.SetHour(23f);
         spawned.Clear();
         for (int i = 0; i < 20 && spawned.Count == 0; i++) spawned.AddRange(g.World.Spawner.TrySpawnNear(g.Player));
-        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "zombie", "demon_eye", "blue_slime" }));
+        Assert.All(spawned, n => Assert.Contains(n.Def.Id, new[] { "zombie", "bald_zombie", "the_groom", "raven", "demon_eye", "blue_slime" }));
     }
 
     [Fact]

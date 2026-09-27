@@ -98,7 +98,7 @@ public sealed class DecorationPass : GenPass
                     int x = ctx.Origin.X + lx, y = ctx.Origin.Y + ly, z = ctx.Origin.Z + lz;
                     float roll = Hash.ToUnitFloat(Hash.Cell(seed, x, y, z));
                     TileObjectDef? pick = null;
-                    if (below != p.Air) pick = d.FloorPlant(ctx, below, ctx.Biome[i], roll);
+                    if (below != p.Air) pick = d.FloorPlant(ctx, below, ctx.Biome[i], roll, ctx.Depth(y));
                     else if ((above == p.Stone || above == p.Deepstone) && roll < 0.008f) pick = d.Stalactite;
                     if (pick == null) continue;
                     int yy = pick.Anchor == TileAnchor.Ceiling ? y - pick.SizeY + 1 : y;

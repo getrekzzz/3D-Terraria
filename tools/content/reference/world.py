@@ -61,6 +61,7 @@ angry_bones|Angry Bones|prehardmode|dungeon|walker
 dark_caster|Dark Caster|prehardmode|dungeon|caster,teleport
 cursed_skull|Cursed Skull|prehardmode|dungeon|flyer
 dungeon_guardian|Dungeon Guardian|prehardmode|dungeon|guardian
+dungeon_spirit|Dungeon Spirit|post-plantera|dungeon|flyer
 fire_imp|Fire Imp|prehardmode|underworld|caster,teleport
 demon|Demon|prehardmode|underworld|flyer,projectiles
 voodoo_demon|Voodoo Demon|prehardmode|underworld|flyer
@@ -282,6 +283,7 @@ boreal_tree|Boreal Tree|early|tree
 palm_tree|Palm Tree|early|tree
 mahogany_tree|Mahogany Tree|early|tree
 ebonwood_tree|Ebonwood Tree|early|tree
+shadewood_tree|Shadewood Tree|early|tree
 cactus|Cactus|early|plant
 giant_glowing_mushroom|Giant Glowing Mushroom|early|tree
 glowing_mushroom|Glowing Mushroom|early|plant

@@ -90,7 +90,7 @@
     ] },
     { "id": "wooden_crate_treasure", "mode": "weighted", "entries": [
       { "item": "aglet", "weight": 1 }, { "item": "wooden_boomerang", "weight": 1 }, { "item": "spear", "weight": 1 }, { "item": "shiny_red_balloon", "weight": 0.5 },
-      { "item": "trident", "weight": 0.5 }, { "item": "wood_yoyo", "weight": 1 }
+      { "item": "trident", "weight": 0.5 }, { "item": "wood_yoyo", "weight": 1 }, { "item": "flipper", "weight": 0.5 }
     ] },
     { "id": "iron_crate", "coins": [2500, 10000], "entries": [
       { "table": "iron_crate_treasure", "chance": 0.3 },

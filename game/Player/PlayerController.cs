@@ -125,7 +125,7 @@ public sealed partial class PlayerController : CharacterBody3D
         var stats = Entity.State.Effects.Stats;
         float speed = _config.WalkSpeed * (1f + stats.Bonus(StatIds.MoveSpeed)) * stats.Multiplier(StatIds.MoveSpeed);
         if (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint")) speed *= _config.SprintMultiplier;
-        if (_liquid != null) speed = Mathf.Min(speed * _liquid.MoveSpeed, _config.SwimSpeed);
+        if (_liquid != null) speed = Mathf.Min(speed * _liquid.MoveSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)), _config.SwimSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)));
         speed *= AirSpeedFactor();
 
         bool blocked = UI.InputGate.GameplayBlocked;
