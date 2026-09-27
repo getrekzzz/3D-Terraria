@@ -44,6 +44,9 @@ public sealed class WorldMeta
 
     /// <summary>World tallies (shadow orbs smashed, altars smashed…); added without a version bump.</summary>
     public Dictionary<string, int> Counters { get; set; } = new();
+
+    /// <summary>Wired cells as flattened x, y, z triples (added without a version bump).</summary>
+    public List<int> Wires { get; set; } = new();
     public List<string> ActiveEvents { get; set; } = new();
 
     /// <summary>Running events with their remaining time and kill progress.</summary>

@@ -82,6 +82,12 @@ public sealed class ItemDef : ContentDef
     public string? ArmorSet { get; init; }
     public TypedSpec[] EquipEffects { get; init; } = Array.Empty<TypedSpec>();
 
+    /// <summary>Set bonus text, shown while head, body and legs all belong to <see cref="ArmorSet"/>.</summary>
+    public string? SetBonus { get; init; }
+
+    /// <summary>Effects granted while the full set is worn (usually listed on the head piece).</summary>
+    public TypedSpec[] SetEffects { get; init; } = Array.Empty<TypedSpec>();
+
     // --- Consumption ---
     public int HealLife { get; init; }
     public int HealMana { get; init; }

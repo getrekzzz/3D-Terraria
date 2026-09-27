@@ -134,7 +134,6 @@ minecart_track|Minecart Track|early|craft
 bomb|Bomb|early|shop
 dynamite|Dynamite|early|shop
 rope|Rope|early|craft
-builder_s_wand|Builder's Wand|hardmode|shop
 paint_sprayer|Paint Sprayer|prehardmode|shop
 empty_bucket|Empty Bucket|early|craft
 water_bucket|Water Bucket|early|bucket

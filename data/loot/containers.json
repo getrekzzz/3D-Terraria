@@ -22,7 +22,7 @@
     { "id": "cabin_chest_primary", "mode": "weighted", "entries": [
       { "item": "cloud_in_a_bottle", "weight": 1 }, { "item": "hermes_boots", "weight": 1 }, { "item": "band_of_regeneration", "weight": 1 },
       { "item": "wand_of_sparking", "weight": 1 }, { "item": "lucky_horseshoe", "weight": 0.5 }, { "item": "aglet", "weight": 1 },
-      { "item": "magic_mirror", "weight": 1.2 }, { "item": "enchanted_boomerang", "weight": 0.8 },
+      { "item": "magic_mirror", "weight": 1.2 }, { "item": "enchanted_boomerang", "weight": 0.8 }, { "item": "minecart", "weight": 0.6 },
       { "item": "finch_staff", "weight": 2, "conditions": [{ "type": "biome", "any": ["forest"] }, { "type": "depth", "max": 12 }] },
       { "item": "amazon", "weight": 2, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
       { "item": "feral_claws", "weight": 2, "conditions": [{ "type": "biome", "any": ["jungle"] }] },

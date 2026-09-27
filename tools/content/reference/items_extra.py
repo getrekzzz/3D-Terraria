@@ -47,7 +47,6 @@ unholy_trident|Unholy Trident|hardmode|red devil
 paladins_hammer|Paladin's Hammer|post-plantera|paladin
 sniper_rifle|Sniper Rifle|post-plantera|skeleton sniper
 shadowbeam_staff|Shadowbeam Staff|post-plantera|necromancer
-jesters_arrow|Jester's Arrow|early|craft
 cross_necklace|Cross Necklace|hardmode|mimic
 wizard_hat|Wizard Hat|early|clothier
 """,
@@ -76,5 +75,16 @@ worm_tooth|Worm Tooth|early|devourer
 ectoplasm|Ectoplasm|post-plantera|dungeon spirit
 turtle_shell|Turtle Shell|hardmode|giant tortoise
 butterfly_dust|Butterfly Dust|hardmode|moth
+""",
+    "tool": """
+red_wrench|Red Wrench|prehardmode|mechanic
+wire_cutter|Wire Cutter|prehardmode|mechanic
+lever|Lever|prehardmode|mechanic
+switch|Switch|prehardmode|mechanic
+red_pressure_plate|Red Pressure Plate|prehardmode|mechanic
+dart_trap|Dart Trap|early|world
+""",
+    "furniture": """
+firefly_in_a_bottle|Firefly in a Bottle|early|craft
 """,
 }

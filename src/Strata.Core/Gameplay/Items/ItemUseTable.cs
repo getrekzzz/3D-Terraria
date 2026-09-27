@@ -22,6 +22,10 @@ public enum ItemAction
     Bucket = 1 << 10,
     Grapple = 1 << 11,
     Fish = 1 << 12,
+    Wire = 1 << 13,
+    Net = 1 << 14,
+    Release = 1 << 15,
+    Mount = 1 << 16,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -47,6 +51,11 @@ public sealed class ItemUseInfo
 
     /// <summary>Fishing rod parameters.</summary>
     public FishingParams? Fishing { get; internal set; }
+
+    public WiringParams? Wiring { get; internal set; }
+    public BugNetParams? BugNet { get; internal set; }
+    public ReleaseCritterParams? Release { get; internal set; }
+    public MinecartParams? Minecart { get; internal set; }
 
     /// <summary>Boss this bait hooks (Truffle Worm).</summary>
     public BaitSummonParams? BaitSummon { get; internal set; }
@@ -148,6 +157,10 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.Grapple: a |= ItemAction.Grapple; info.Grapple = spec.Parse<GrappleParams>(); break;
                 case ItemBehaviorSpecs.Fishing: a |= ItemAction.Fish; info.Fishing = spec.Parse<FishingParams>(); break;
                 case ItemBehaviorSpecs.BaitSummon: info.BaitSummon = spec.Parse<BaitSummonParams>(); break;
+                case ItemBehaviorSpecs.Wiring: a |= ItemAction.Wire; info.Wiring = spec.Parse<WiringParams>(); break;
+                case ItemBehaviorSpecs.BugNet: a |= ItemAction.Net; info.BugNet = spec.Parse<BugNetParams>(); break;
+                case ItemBehaviorSpecs.ReleaseCritter: a |= ItemAction.Release; info.Release = spec.Parse<ReleaseCritterParams>(); break;
+                case ItemBehaviorSpecs.Minecart: a |= ItemAction.Mount; info.Minecart = spec.Parse<MinecartParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

@@ -305,6 +305,8 @@ RECIPES = {
     "rocket": (whoosh(1500, 5000, 0.35, 0.6), 1), "dash": (whoosh(700, 4000, 0.3, 0.9), 1), "grapple": (grapple, 1),
     "splash": (splash, 2), "fish_bite": (bloop, 1), "door_open": (creak(140), 1), "door_close": (creak(110), 1),
     "chest_open": (creak(220), 1), "craft": (craft, 2), "summon": (summon, 1), "place": (lambda r: dig("wood")(r) * 0.8, 2),
+    "lever": (clack, 1), "wire": (blip(2400, 0.05, "square", 0.012), 1), "net": (whoosh(1200, 2600, 0.2, 0.6), 1),
+    "minecart": (creak(300), 1), "dart_trap": (bow, 1),
 }
 for _m in ("dirt", "grass", "stone", "ore", "wood", "sand", "snow", "glass", "ice", "metal", "cloth"):
     RECIPES[f"dig_{_m}"] = (dig(_m), 3)
@@ -315,7 +317,8 @@ for _m in ("grass", "stone", "sand", "wood", "snow"):
 
 # Peak level per sound (quiet cues stay quiet; the rest land around -2 dBFS).
 GAIN = {"ui_hover": 0.25, "ui_click": 0.4, "ui_open": 0.4, "ui_close": 0.4, "pickup": 0.45, "coins": 0.55, "jump": 0.4, "land": 0.5,
-        "swing": 0.55, "grapple": 0.6, "fish_bite": 0.6, "place": 0.6, "mana": 0.5, "heal": 0.5}
+        "swing": 0.55, "grapple": 0.6, "fish_bite": 0.6, "place": 0.6, "mana": 0.5, "heal": 0.5,
+        "wire": 0.3, "net": 0.5, "lever": 0.6}
 for _m in ("grass", "stone", "sand", "wood", "snow"):
     GAIN[f"step_{_m}"] = 0.3
 for _m in ("dirt", "grass", "stone", "ore", "wood", "sand", "snow", "glass", "ice", "metal", "cloth"):

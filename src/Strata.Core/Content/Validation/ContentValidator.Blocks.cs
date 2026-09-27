@@ -48,6 +48,7 @@ public static partial class ContentValidator
             if (t.Size.Length != 3 || t.Size.Any(v => v < 1 || v > 64)) ctx.Error(t, "size must be [x, y, z] with values 1–64.");
             ctx.Ref(t, ctx.Db.Items, t.Item, "item");
             ctx.Ref(t, ctx.Db.LootTables, t.Loot, "loot");
+            ctx.Ref(t, ctx.Db.Projectiles, t.Trap?.Projectile, "trap.projectile");
             ctx.Light(t, t.Light, "light");
             if (t.Variants < 1) ctx.Error(t, "variants must be >= 1.");
             for (int v = 0; v < t.Variants; v++) ctx.Asset(t, AssetPaths.ObjectModel(t, v), $"model (variant {v})");

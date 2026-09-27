@@ -133,6 +133,9 @@ public static class WorldLauncher
         var senses = new Rendering.PlayerSenses();
         runtime.AddChild(senses);
         senses.Initialize(game, entity);
+        var wires = new Rendering.WireOverlay();
+        runtime.AddChild(wires);
+        wires.Initialize(game, entity);
 
         var avatar = new PlayerAvatar();
         player.AddChild(avatar);

@@ -15,6 +15,86 @@
    ]
   },
   {
+   "id": "terraria:bunny",
+   "name": "Bunny",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "forest",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
+   "id": "terraria:squirrel",
+   "name": "Squirrel",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "forest",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
+   "id": "terraria:bird",
+   "name": "Bird",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "forest",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
+   "id": "terraria:butterfly",
+   "name": "Butterfly",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "forest day",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
+   "id": "terraria:firefly",
+   "name": "Firefly",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "forest night",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
+   "id": "terraria:worm",
+   "name": "Worm",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "surface",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
+   "id": "terraria:frog",
+   "name": "Frog",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "jungle",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
+   "id": "terraria:duck",
+   "name": "Duck",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "ocean",
+   "mechanics": [
+    "critter"
+   ]
+  },
+  {
    "id": "terraria:blue_slime",
    "name": "Blue Slime",
    "kind": "enemy",
@@ -531,16 +611,6 @@
    "source": "desert",
    "mechanics": [
     "flyer"
-   ]
-  },
-  {
-   "id": "terraria:cactus_man",
-   "name": "Cactus Man",
-   "kind": "enemy",
-   "stage": "early",
-   "source": "desert",
-   "mechanics": [
-    "walker"
    ]
   },
   {

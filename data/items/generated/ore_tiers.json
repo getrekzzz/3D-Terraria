@@ -143,6 +143,14 @@
       "armorSet": "copper_armor",
       "covers": [
         "terraria:copper_helmet"
+      ],
+      "setBonus": "+2 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 2
+        }
       ]
     },
     {
@@ -313,6 +321,14 @@
       "armorSet": "tin_armor",
       "covers": [
         "terraria:tin_helmet"
+      ],
+      "setBonus": "+2 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 2
+        }
       ]
     },
     {
@@ -483,6 +499,14 @@
       "armorSet": "iron_armor",
       "covers": [
         "terraria:iron_helmet"
+      ],
+      "setBonus": "+2 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 2
+        }
       ]
     },
     {
@@ -653,6 +677,14 @@
       "armorSet": "lead_armor",
       "covers": [
         "terraria:lead_helmet"
+      ],
+      "setBonus": "+3 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 3
+        }
       ]
     },
     {
@@ -823,6 +855,14 @@
       "armorSet": "silver_armor",
       "covers": [
         "terraria:silver_helmet"
+      ],
+      "setBonus": "+3 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 3
+        }
       ]
     },
     {
@@ -993,6 +1033,14 @@
       "armorSet": "tungsten_armor",
       "covers": [
         "terraria:tungsten_helmet"
+      ],
+      "setBonus": "+3 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 3
+        }
       ]
     },
     {
@@ -1163,6 +1211,14 @@
       "armorSet": "gold_armor",
       "covers": [
         "terraria:gold_helmet"
+      ],
+      "setBonus": "+3 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 3
+        }
       ]
     },
     {
@@ -1333,6 +1389,14 @@
       "armorSet": "platinum_armor",
       "covers": [
         "terraria:platinum_helmet"
+      ],
+      "setBonus": "+4 defense",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "defense",
+          "add": 4
+        }
       ]
     },
     {
@@ -1495,6 +1559,14 @@
       "armorSet": "demonite_armor",
       "covers": [
         "terraria:shadow_helmet"
+      ],
+      "setBonus": "15% increased movement speed",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "moveSpeed",
+          "add": 0.15
+        }
       ]
     },
     {
@@ -1653,6 +1725,14 @@
       "armorSet": "crimtane_armor",
       "covers": [
         "terraria:crimson_helmet"
+      ],
+      "setBonus": "Greatly increased life regeneration",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "lifeRegen",
+          "add": 2
+        }
       ]
     },
     {
@@ -1815,6 +1895,14 @@
       "armorSet": "hellstone_armor",
       "covers": [
         "terraria:molten_helmet"
+      ],
+      "setBonus": "17% extra melee damage",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "meleeDamage",
+          "add": 0.17
+        }
       ]
     },
     {
@@ -2012,7 +2100,15 @@
       "equipSlot": "head",
       "defense": 10,
       "armorSet": "cobalt_armor",
-      "covers": []
+      "covers": [],
+      "setBonus": "15% increased melee speed",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "meleeSpeed",
+          "add": 0.15
+        }
+      ]
     },
     {
       "id": "cobalt_chainmail",
@@ -2213,7 +2309,15 @@
       "equipSlot": "head",
       "defense": 11,
       "armorSet": "palladium_armor",
-      "covers": []
+      "covers": [],
+      "setBonus": "Greatly increased life regeneration",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "lifeRegen",
+          "add": 3
+        }
+      ]
     },
     {
       "id": "palladium_chainmail",
@@ -2414,7 +2518,15 @@
       "equipSlot": "head",
       "defense": 13,
       "armorSet": "mythril_armor",
-      "covers": []
+      "covers": [],
+      "setBonus": "5% increased melee critical strike chance",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "meleeCrit",
+          "add": 5
+        }
+      ]
     },
     {
       "id": "mythril_chainmail",
@@ -2615,7 +2727,15 @@
       "equipSlot": "head",
       "defense": 14,
       "armorSet": "orichalcum_armor",
-      "covers": []
+      "covers": [],
+      "setBonus": "8% increased damage",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "genericDamage",
+          "add": 0.08
+        }
+      ]
     },
     {
       "id": "orichalcum_chainmail",
@@ -2816,7 +2936,20 @@
       "equipSlot": "head",
       "defense": 17,
       "armorSet": "adamantite_armor",
-      "covers": []
+      "covers": [],
+      "setBonus": "18% increased melee and movement speed",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "meleeSpeed",
+          "add": 0.18
+        },
+        {
+          "type": "stat",
+          "stat": "moveSpeed",
+          "add": 0.18
+        }
+      ]
     },
     {
       "id": "adamantite_chainmail",
@@ -3017,7 +3150,15 @@
       "equipSlot": "head",
       "defense": 18,
       "armorSet": "titanium_armor",
-      "covers": []
+      "covers": [],
+      "setBonus": "10% reduced damage taken",
+      "setEffects": [
+        {
+          "type": "stat",
+          "stat": "endurance",
+          "add": 0.1
+        }
+      ]
     },
     {
       "id": "titanium_chainmail",

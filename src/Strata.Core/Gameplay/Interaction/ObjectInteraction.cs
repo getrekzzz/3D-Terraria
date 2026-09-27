@@ -19,6 +19,9 @@ public enum InteractOutcome
 
     /// <summary>An altar consumed its key and called its boss.</summary>
     Activated,
+
+    /// <summary>A lever or switch was flipped (its wires carried the signal).</summary>
+    Switched,
 }
 
 /// <summary>"Interact" on tile objects: doors, containers, beds and seats.</summary>
@@ -51,6 +54,11 @@ public sealed class ObjectInteraction
                 return InteractOutcome.DoorToggled;
             case TileInteraction.Activate when obj.Def.Summon != null:
                 return Activate(p, obj);
+            case TileInteraction.Switch:
+                obj.Active = !obj.Active;
+                NotifyChanged(obj);
+                _world.Wires.Signal(obj);
+                return InteractOutcome.Switched;
             case TileInteraction.Door:
                 // A closing door must not trap the player inside its cells.
                 if (obj.Active && Overlaps(p, obj)) return InteractOutcome.DoorBlocked;
@@ -126,6 +134,13 @@ public sealed class ObjectInteraction
         var (min, max) = p.CellBox;
         var b = obj.Bounds;
         return min.X < b.Max.X && max.X > b.Min.X && min.Y < b.Max.Y && max.Y > b.Min.Y && min.Z < b.Max.Z && max.Z > b.Min.Z;
+    }
+
+    /// <summary>Records a state change made elsewhere (wiring) so it saves and redraws.</summary>
+    public void NotifyChanged(TileObjectInstance obj)
+    {
+        MarkModified(obj);
+        StateChanged?.Invoke(obj);
     }
 
     private void MarkModified(TileObjectInstance obj)

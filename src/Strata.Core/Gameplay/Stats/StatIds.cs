@@ -38,12 +38,21 @@ public static class StatIds
     /// <summary>Swimming speed bonus (Flipper).</summary>
     public const string SwimSpeed = "swimSpeed";
 
+    /// <summary>Chance (0–1) that a shot does not use up its ammo.</summary>
+    public const string AmmoSave = "ammoSave";
+
+    /// <summary>Share of contact damage returned to the attacker.</summary>
+    public const string Thorns = "thorns";
+
+    /// <summary>Share of magic damage dealt that heals the caster.</summary>
+    public const string LifeSteal = "lifeSteal";
+
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
         MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, Acceleration, JumpHeight, GenericDamage,
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
-        Immunity, SwimSpeed,
+        Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal,
     };
 
     public static bool IsKnown(string id) => Known.Contains(id);

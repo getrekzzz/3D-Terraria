@@ -49,7 +49,8 @@ public sealed partial class PlayerAvatar : Node3D
         float target = Mathf.Atan2(-aim.X, -aim.Z);
         _yaw = Mathf.LerpAngle(_yaw, target, 1f - Mathf.Exp(-(float)delta * 14f));
         Rotation = new Vector3(0, _yaw, 0);
-        UpdateHeld(entity.State.Inventory.Held);
+        UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
+        UpdateCart(entity.Minecart);
         UpdateGear(delta);
         _visual.Play(ChooseClip(entity, out float speed), speed: speed);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
@@ -103,6 +104,27 @@ public sealed partial class PlayerAvatar : Node3D
         node.Position = new Vector3(0, 0.08f, 0);
         _held = node;
         if (!_visual.AttachToBone("hand.R", node)) node.QueueFree();
+    }
+
+    private MeshInstance3D? _cart;
+
+    /// <summary>The minecart under a riding player, facing along the track.</summary>
+    private void UpdateCart(Strata.Core.Gameplay.Mounts.MinecartRide? ride)
+    {
+        if (ride == null)
+        {
+            if (_cart != null) _cart.Visible = false;
+            return;
+        }
+        if (_cart == null)
+        {
+            _cart = new MeshInstance3D { Mesh = _props.Model("assets/models/items/minecart.glb", multimesh: false), TopLevel = true };
+            AddChild(_cart);
+        }
+        _cart.Visible = true;
+        var h = new Vector3(ride.Heading.X, 0, ride.Heading.Z);
+        var basis = h.LengthSquared() > 1e-4f ? Basis.LookingAt(h.Normalized(), Vector3.Up) : Basis.Identity;
+        _cart.GlobalTransform = new Transform3D(basis.Scaled(Vector3.One * 1.6f), _controller.GlobalPosition - Vector3.Up * 0.2f);
     }
 
     /// <summary>

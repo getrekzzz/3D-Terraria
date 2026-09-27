@@ -469,6 +469,21 @@
       "params": {
         "color": "#ff3060"
       }
+    },
+    "lever": {
+      "generator": "lever"
+    },
+    "switch": {
+      "generator": "switch"
+    },
+    "pressure_plate": {
+      "generator": "pressure_plate"
+    },
+    "dart_trap": {
+      "generator": "dart_trap"
+    },
+    "firefly_in_a_bottle": {
+      "generator": "bottle_light"
     }
   },
   "items": {
@@ -3443,6 +3458,69 @@
         "params": {
           "color": "#f0e060"
         }
+      },
+      "wire": {
+        "generator": "wire_coil"
+      },
+      "red_wrench": {
+        "generator": "red_wrench"
+      },
+      "wire_cutter": {
+        "generator": "wire_cutter"
+      },
+      "bug_net": {
+        "generator": "bug_net"
+      },
+      "minecart": {
+        "generator": "minecart"
+      },
+      "bunny": {
+        "generator": "critter",
+        "params": {
+          "creature": "bunny"
+        }
+      },
+      "squirrel": {
+        "generator": "critter",
+        "params": {
+          "creature": "squirrel"
+        }
+      },
+      "bird": {
+        "generator": "critter",
+        "params": {
+          "creature": "songbird"
+        }
+      },
+      "butterfly": {
+        "generator": "critter",
+        "params": {
+          "creature": "butterfly"
+        }
+      },
+      "firefly": {
+        "generator": "critter",
+        "params": {
+          "creature": "firefly"
+        }
+      },
+      "worm": {
+        "generator": "critter",
+        "params": {
+          "creature": "worm"
+        }
+      },
+      "frog": {
+        "generator": "critter",
+        "params": {
+          "creature": "frog"
+        }
+      },
+      "duck": {
+        "generator": "critter",
+        "params": {
+          "creature": "duck"
+        }
       }
     }
   },
@@ -5673,6 +5751,38 @@
         "color": "#8a5a2a",
         "ribbon": "#c8a040"
       }
+    },
+    "bunny": {
+      "generator": "bunny",
+      "params": {}
+    },
+    "squirrel": {
+      "generator": "squirrel",
+      "params": {}
+    },
+    "bird": {
+      "generator": "songbird",
+      "params": {}
+    },
+    "butterfly": {
+      "generator": "butterfly",
+      "params": {}
+    },
+    "firefly": {
+      "generator": "firefly",
+      "params": {}
+    },
+    "worm": {
+      "generator": "worm",
+      "params": {}
+    },
+    "frog": {
+      "generator": "frog",
+      "params": {}
+    },
+    "duck": {
+      "generator": "duck",
+      "params": {}
     }
   }
 }

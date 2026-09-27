@@ -30,6 +30,15 @@ public enum UseOutcome
     NoMana,
     PouredLiquid,
     CollectedLiquid,
+
+    /// <summary>Wire laid or cut.</summary>
+    Wired,
+
+    /// <summary>A critter was netted.</summary>
+    Caught,
+
+    /// <summary>Got into or out of a minecart.</summary>
+    Mounted,
 }
 
 /// <summary>A projectile launch requested by an item use (resolved by the projectile system).</summary>
@@ -42,6 +51,7 @@ public sealed record ShotRequest(PlayerEntity Player, ItemUseInfo Weapon, Projec
 public sealed partial class ItemUseSystem
 {
     private readonly GameWorld _world;
+    private Determinism.Pcg32 _ammoRng = new(0xA3305);
     private readonly BuffDef? _healingCooldown;
     private readonly BuffDef? _manaCooldown;
 
@@ -108,6 +118,22 @@ public sealed partial class ItemUseSystem
         else if (info.Has(ItemAction.Fish))
         {
             outcome = Fish(p, info);
+        }
+        else if (info.Has(ItemAction.Wire))
+        {
+            outcome = inReach == null ? UseOutcome.OutOfReach : UseWiring(p, info.Wiring!, inReach);
+        }
+        else if (info.Has(ItemAction.Net))
+        {
+            outcome = SwingNet(p, info.BugNet!);
+        }
+        else if (info.Has(ItemAction.Mount))
+        {
+            outcome = Mount(p, info.Minecart!, inReach);
+        }
+        else if (info.Has(ItemAction.Release))
+        {
+            outcome = inReach == null ? UseOutcome.OutOfReach : Release(p, info.Release!, inReach);
         }
         else if (info.Has(ItemAction.Shoot))
         {
@@ -292,7 +318,7 @@ public sealed partial class ItemUseSystem
             ammo = state.Inventory.Backpack[slot].Item!;
             projectile ??= _world.Uses[ammo].Projectile;
             if (projectile == null) return UseOutcome.NoAmmo;
-            if (ammo.Consumable) state.Inventory.Backpack.Take(slot, 1);
+            if (ammo.Consumable && !_ammoRng.Chance(state.Effects.Stats.Bonus(StatIds.AmmoSave))) state.Inventory.Backpack.Take(slot, 1);
         }
         if (projectile == null) return UseOutcome.None;
         // Boomerangs and flails: one out at a time.

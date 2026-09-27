@@ -23,6 +23,7 @@ public sealed partial class InventoryScreen : CanvasLayer
     private CraftingPanel _crafting = null!;
     private Label _coins = null!;
     private Label _defense = null!;
+    private Label _setBonus = null!;
     private TextureRect _cursorIcon = null!;
     private Label _cursorCount = null!;
     private readonly Inventory _trash = new(1);
@@ -62,6 +63,10 @@ public sealed partial class InventoryScreen : CanvasLayer
         eq.AddChild(slots);
         _defense = new Label();
         eq.AddChild(_defense);
+        _setBonus = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(160, 0) };
+        _setBonus.AddThemeColorOverride("font_color", new Color(0.55f, 0.95f, 0.55f));
+        _setBonus.AddThemeFontSizeOverride("font_size", 12);
+        eq.AddChild(_setBonus);
         eq.AddChild(new Label { Text = "Trash" });
         eq.AddChild(Slot(_trash, 0, null, null));
         _coins = new Label();
@@ -135,6 +140,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (!IsOpen) return;
         var state = _ui.Entity.State;
         _defense.Text = $"Defense {state.Defense}";
+        _setBonus.Text = state.SetBonus != null ? $"Set bonus: {state.SetBonus}" : "";
         _coins.Text = Coins.Format(Coins.Total(state.Inventory.Backpack));
         var cursor = _ui.Inventory.Cursor;
         _cursorIcon.Visible = !cursor.IsEmpty;

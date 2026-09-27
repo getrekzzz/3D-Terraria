@@ -159,6 +159,21 @@ def web(r, seed):
     return rgb, alpha, np.full_like(alpha, 0.6), np.zeros_like(alpha), alpha
 
 
+def rope(r, seed):
+    """A braided rope hanging down the middle of the face; transparent on either side (cut-out like webs)."""
+    n = s.SIZE
+    y, x = np.mgrid[0:n, 0:n].astype(np.float32) / n
+    half = r.get("width", 0.09)
+    across = np.abs(x - 0.5) / half
+    alpha = (across < 1).astype(np.float32)
+    twist = np.sin((y * 10 + x * 3) * np.pi * 2) * 0.5 + 0.5
+    shade = np.clip(1 - across ** 2, 0, 1) * 0.6 + 0.4
+    base, dark, light = s.palette(r)
+    t = np.clip(twist * shade, 0, 1)
+    rgb = s.gradient_map(t, [(0.0, dark), (0.6, base), (1.0, light)])
+    return rgb, alpha, np.full_like(alpha, 0.85), np.zeros_like(alpha), alpha
+
+
 def missing(r, seed):
     y, x = np.mgrid[0:s.SIZE, 0:s.SIZE] // 32
     checker = ((x + y) % 2).astype(np.float32)

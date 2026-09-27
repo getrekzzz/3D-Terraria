@@ -66,4 +66,36 @@ public class GearTests
         Assert.Equal(ObjectHitResult.Broken, result);
         Assert.Contains(g.World.Drops.Items, d => d.Stack.Item?.Id == "life_crystal");
     }
+
+    [Fact]
+    public void AFullArmorSetGrantsItsBonus()
+    {
+        using var g = Arena();
+        var state = g.Player.State;
+        var armor = state.Inventory.Armor;
+        armor[0] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("copper_helmet"), 1);
+        armor[1] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("copper_chainmail"), 1);
+        armor[2] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("iron_greaves"), 1);
+        state.Recompute();
+        Assert.Null(state.SetBonus);
+        int partial = state.Defense;
+        armor[2] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("copper_greaves"), 1);
+        state.Recompute();
+        Assert.Equal("+2 defense", state.SetBonus);
+        Assert.Equal(partial - g.Content.Items.Get("iron_greaves").Defense + g.Content.Items.Get("copper_greaves").Defense + 2, state.Defense);
+    }
+
+    [Fact]
+    public void TurtleArmorHurtsWhoeverTouchesYou()
+    {
+        using var g = Arena();
+        var armor = g.Player.State.Inventory.Armor;
+        foreach (var (slot, id) in new[] { (0, "turtle_helmet"), (1, "turtle_scale_mail"), (2, "turtle_leggings") })
+            armor[slot] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get(id), 1);
+        g.Player.State.Recompute();
+        var slime = g.World.Npcs.Spawn(g.Content.Enemies.Get("blue_slime"), g.Player.Position)!;
+        int life = slime.Life;
+        for (int i = 0; i < 60 && slime.Life == life; i++) g.Ticks(1);
+        Assert.True(slime.Life < life);
+    }
 }

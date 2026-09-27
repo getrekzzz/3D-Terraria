@@ -18,6 +18,8 @@ internal static class StandardProbes
         ctx.AddProbe("player.y", () => ctx.Player.Position.Y);
         ctx.AddProbe("player.z", () => ctx.Player.Position.Z);
         ctx.AddProbe("player.speed", () => ctx.Player.Velocity.Length());
+        ctx.AddProbe("player.minecart", () => ctx.Player.Minecart != null ? 1 : 0);
+        ctx.AddProbe("wires.count", () => w.Wires.All.Count);
         ctx.AddProbe("player.alive", () => ctx.Player.Alive ? 1 : 0);
         ctx.AddProbe("player.cell_y", () => ctx.Player.FeetCell.Y);
         ctx.AddProbe("player.from_mark", () => ctx.Mark is { } m ? System.Numerics.Vector3.Distance(m, ctx.Player.Position) : throw new CommandException("no mark set"));

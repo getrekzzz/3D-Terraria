@@ -129,6 +129,9 @@ public sealed partial class WorldEditor
                     yield return new Int3(x, y, z);
     }
 
+    /// <summary>Re-lights around a light that was switched on or off.</summary>
+    public void Relight(TileObjectInstance obj) => DirtyForLight(obj);
+
     private void DirtyForLight(TileObjectInstance obj)
     {
         if (obj.Def.Light is not { Length: 3 } l || (l[0] | l[1] | l[2]) == 0) return;

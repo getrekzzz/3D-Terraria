@@ -113,6 +113,16 @@ public sealed partial class SoundEvents : Node
             case UseOutcome.CollectedLiquid:
                 Sfx.Play("splash", -4f);
                 break;
+            case UseOutcome.Wired:
+                Sfx.Play("wire", -2f);
+                break;
+            case UseOutcome.Caught:
+                Sfx.Play("net");
+                Sfx.Play("pickup");
+                break;
+            case UseOutcome.Mounted:
+                Sfx.Play("minecart");
+                break;
         }
     }
 
