@@ -49,7 +49,7 @@ public sealed partial class NpcRenderer : Node3D
             var color = new Color(l[0] / (float)max, l[1] / (float)max, l[2] / (float)max);
             yield return new Rendering.DynamicLights.Source(at, color, critter ? peak * 0.4f : peak,
                 critter ? Rendering.DynamicLights.Kind.Blink : Rendering.DynamicLights.Kind.Steady,
-                critter ? 2.5f : 2f + max / 3f, critter ? 0.35f : 0.8f, (npc.Id * 0.618034f) % 1f,
+                critter ? 2f : 2f + max / 3f, critter ? 0.12f : 0.5f, (npc.Id * 0.618034f) % 1f,
                 () => { var p = npc.Center; return new Vector3(p.X, p.Y, p.Z); });
         }
     }
