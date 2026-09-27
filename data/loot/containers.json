@@ -58,6 +58,23 @@
       { "item": "musket_ball", "min": 30, "max": 60, "chance": 0.2 },
       { "item": "throwing_knife", "min": 25, "max": 50, "chance": 0.15 }
     ] },
+    { "id": "gold_chest", "coins": [1500, 6000], "entries": [
+      { "table": "cabin_chest_primary" },
+      { "item": "torch", "min": 15, "max": 30, "chance": 0.7 },
+      { "item": "healing_potion", "min": 2, "max": 4, "chance": 0.5 },
+      { "item": "lesser_healing_potion", "min": 3, "max": 6, "chance": 0.4 },
+      { "item": "gold_bar", "min": 5, "max": 12, "chance": 0.3 },
+      { "item": "platinum_bar", "min": 5, "max": 12, "chance": 0.2 },
+      { "item": "tungsten_bar", "min": 6, "max": 14, "chance": 0.25 },
+      { "item": "spelunker_potion", "min": 1, "max": 2, "chance": 0.3 },
+      { "item": "night_owl_potion", "min": 1, "max": 2, "chance": 0.3 },
+      { "item": "shine_potion", "min": 1, "max": 2, "chance": 0.3 },
+      { "item": "mining_potion", "min": 1, "max": 2, "chance": 0.25 },
+      { "item": "regeneration_potion", "min": 1, "max": 2, "chance": 0.25 },
+      { "item": "recall_potion", "min": 1, "max": 3, "chance": 0.35 },
+      { "item": "bomb", "min": 5, "max": 10, "chance": 0.3 },
+      { "item": "rope", "min": 50, "max": 100, "chance": 0.3 }
+    ] },
     { "id": "surface_chest", "coins": [200, 1200], "entries": [
       { "item": "wooden_sword", "chance": 0.3 }, { "item": "wooden_bow", "chance": 0.3 },
       { "item": "torch", "min": 5, "max": 15, "chance": 0.8 }, { "item": "lesser_healing_potion", "min": 1, "max": 3, "chance": 0.5 },
