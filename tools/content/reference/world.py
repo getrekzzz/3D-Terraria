@@ -139,6 +139,17 @@ selenian|Selenian|endgame|solar pillar|charger
 vortexian|Vortexian|endgame|vortex pillar|walker
 predictor|Predictor|endgame|nebula pillar|flyer
 stargazer|Stargazer|endgame|stardust pillar|caster
+lunatic_devotee|Lunatic Devotee|endgame|dungeon entrance|ritual
+cultist_archer|Cultist Archer|endgame|dungeon entrance|archer
+corite|Corite|endgame|solar pillar|charger
+drakomire|Drakomire|endgame|solar pillar|walker
+storm_diver|Storm Diver|endgame|vortex pillar|shooter
+alien_hornet|Alien Hornet|endgame|vortex pillar|flyer
+brain_suckler|Brain Suckler|endgame|nebula pillar|flyer
+nebula_floater|Nebula Floater|endgame|nebula pillar|caster
+flow_invader|Flow Invader|endgame|stardust pillar|flyer
+twinkle_popper|Twinkle Popper|endgame|stardust pillar|hopper
+true_eye_of_cthulhu|True Eye of Cthulhu|endgame|moon lord|flyer
 etherian_goblin|Etherian Goblin|prehardmode|old one's army|walker
 servant_of_cthulhu|Servant of Cthulhu|early|eye of cthulhu|flyer,minion
 """
@@ -208,6 +219,7 @@ ash_block|Ash Block|prehardmode|soil
 hellstone|Hellstone|prehardmode|ore
 meteorite|Meteorite|prehardmode|ore
 chlorophyte_ore|Chlorophyte Ore|hardmode|ore
+luminite|Luminite|endgame|ore
 lihzahrd_brick|Lihzahrd Brick|hardmode|structure
 demonite_ore|Demonite Ore|prehardmode|ore
 crimtane_ore|Crimtane Ore|prehardmode|ore

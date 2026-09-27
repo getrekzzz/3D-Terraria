@@ -125,12 +125,12 @@ def plan(spec, blocks, items, objects, enemies):
 
 def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
-    from bgen import beasts, bosses, creatures, export, fauna, furniture, gear, horrors, human, items as item_gen, mechs, nature
+    from bgen import beasts, bosses, creatures, export, fauna, furniture, gear, horrors, human, items as item_gen, lunar, mechs, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
 
     generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS, **bosses.GENERATORS, **mechs.GENERATORS,
-                  **gear.GENERATORS, **horrors.GENERATORS}
+                  **gear.GENERATORS, **horrors.GENERATORS, **lunar.GENERATORS}
     manifest_path = REPO / "assets" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() and opts["only"] else {"objects": {}, "items": {}}
     wanted = (lambda i: any(fnmatch.fnmatch(i, pat) for pat in opts["only"].split(","))) if opts["only"] else (lambda i: True)
@@ -195,6 +195,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
             mb = MeshBuilder(name)
             gen = (creatures.GENERATORS.get(job["generator"]) or fauna.GENERATORS.get(job["generator"])
                    or beasts.GENERATORS.get(job["generator"]) or mechs.GENERATORS.get(job["generator"]) or horrors.GENERATORS.get(job["generator"])
+                   or lunar.GENERATORS.get(job["generator"])
                    or bosses.GENERATORS[job["generator"]])
             rig = gen(mb, job.get("params", {}), rng_for(name, 0))
             for slot in mb.materials:

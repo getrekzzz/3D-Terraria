@@ -21,6 +21,13 @@
       "spawnRateMultiplier": 4, "maxNearbyBonus": 8, "killGoal": 80, "killTag": "goblin", "completionFlag": "defeated_goblin_army",
       "startMessage": "A goblin army is approaching!", "endMessage": "The goblin army has been defeated!",
       "covers": ["terraria:goblin_army"]
+    },
+    {
+      "id": "lunar_events", "name": "Lunar Events", "phase": "manual", "startsWhen": "defeated_lunatic_cultist",
+      "places": ["solar_pillar", "nebula_pillar", "vortex_pillar", "stardust_pillar"],
+      "killGoal": 4, "killTag": "celestial_pillar", "finaleEnemy": "moon_lord", "completionFlag": "defeated_pillars",
+      "startMessage": "The Celestial Pillars have appeared across the land!", "endMessage": "Impending doom approaches...",
+      "covers": ["terraria:lunar_events", "terraria:celestial_pillars"]
     }
   ]
 }

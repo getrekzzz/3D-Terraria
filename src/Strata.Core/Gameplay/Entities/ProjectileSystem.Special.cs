@@ -39,21 +39,35 @@ public sealed partial class ProjectileSystem
         return true;
     }
 
-    /// <summary>Turns the velocity toward the nearest creature within 25 m, keeping its speed.</summary>
+    /// <summary>
+    /// Turns the velocity toward the nearest creature within 25 m (a hostile shot: the nearest player), keeping its speed.
+    /// </summary>
     private void Steer(Projectile p, float dt)
     {
-        Npc? best = null;
+        Vector3? goal = null;
         float bestDist = 25f * 25f;
-        foreach (var npc in _npcs.All)
+        if (p.Def.Friendly)
         {
-            if (!npc.Alive || npc.Invulnerable || p.HitNpcs.Contains(npc.Id)) continue;
-            float d = Vector3.DistanceSquared(npc.Center, p.Position);
-            if (d < bestDist) (best, bestDist) = (npc, d);
+            foreach (var npc in _npcs.All)
+            {
+                if (!npc.Alive || npc.Invulnerable || p.HitNpcs.Contains(npc.Id)) continue;
+                float d = Vector3.DistanceSquared(npc.Center, p.Position);
+                if (d < bestDist) (goal, bestDist) = (npc.Center, d);
+            }
         }
-        if (best == null) return;
+        else
+        {
+            foreach (var player in _world.Players)
+            {
+                if (!player.Alive) continue;
+                float d = Vector3.DistanceSquared(player.Center, p.Position);
+                if (d < bestDist) (goal, bestDist) = (player.Center, d);
+            }
+        }
+        if (goal == null) return;
         float speed = p.Velocity.Length();
         if (speed < 1e-3f) return;
-        var want = Vector3.Normalize(best.Center - p.Position);
+        var want = Vector3.Normalize(goal.Value - p.Position);
         var dir = Vector3.Normalize(Vector3.Lerp(p.Velocity / speed, want, MathF.Min(1f, p.Def.Homing * dt)));
         p.Velocity = dir * speed;
     }
@@ -84,14 +98,16 @@ public sealed partial class ProjectileSystem
             if (x == p) break;
             if (x.Owner == owner && x.Def.Minion != null) index++;
         }
-        // Keep up: a minion left far behind catches up at once.
-        if (Vector3.DistanceSquared(p.Position, owner.Center) > 45f * 45f) p.Position = owner.Center + new Vector3(0, 2, 0);
+        // Keep up: a minion left far behind catches up at once (a sentry stays where it was set down).
+        bool sentry = m.Speed <= 0;
+        if (!sentry && Vector3.DistanceSquared(p.Position, owner.Center) > 45f * 45f) p.Position = owner.Center + new Vector3(0, 2, 0);
+        var watch = sentry ? p.Position : owner.Center;
         Npc? target = null;
         float best = m.Range * m.Range;
         foreach (var npc in _npcs.All)
         {
             if (!npc.Alive || npc.Invulnerable) continue;
-            float d = Vector3.DistanceSquared(npc.Center, owner.Center);
+            float d = Vector3.DistanceSquared(npc.Center, watch);
             if (d < best) (target, best) = (npc, d);
         }
         Vector3 goal;

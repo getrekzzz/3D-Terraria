@@ -83,6 +83,16 @@ meowmere|Meowmere|endgame|moon lord
 star_wrath|Star Wrath|endgame|moon lord
 s_d_m_g|S.D.M.G.|endgame|moon lord
 zenith|Zenith|endgame|craft
+terrarian|Terrarian|endgame|moon lord
+rainbow_crystal_staff|Rainbow Crystal Staff|endgame|moon lord
+lunar_portal_staff|Lunar Portal Staff|endgame|moon lord
+solar_eruption|Solar Eruption|endgame|craft
+daybreak|Daybreak|endgame|craft
+vortex_beater|Vortex Beater|endgame|craft
+phantasm|Phantasm|endgame|craft
+nebula_arcanum|Nebula Arcanum|endgame|craft
+nebula_blaze|Nebula Blaze|endgame|craft
+stardust_cell_staff|Stardust Cell Staff|endgame|craft
 last_prism|Last Prism|endgame|moon lord
 lunar_flare|Lunar Flare|endgame|moon lord
 stardust_dragon_staff|Stardust Dragon Staff|endgame|craft

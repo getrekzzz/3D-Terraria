@@ -1399,6 +1399,116 @@
    ]
   },
   {
+   "id": "terraria:lunatic_devotee",
+   "name": "Lunatic Devotee",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "dungeon entrance",
+   "mechanics": [
+    "ritual"
+   ]
+  },
+  {
+   "id": "terraria:cultist_archer",
+   "name": "Cultist Archer",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "dungeon entrance",
+   "mechanics": [
+    "archer"
+   ]
+  },
+  {
+   "id": "terraria:corite",
+   "name": "Corite",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "solar pillar",
+   "mechanics": [
+    "charger"
+   ]
+  },
+  {
+   "id": "terraria:drakomire",
+   "name": "Drakomire",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "solar pillar",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:storm_diver",
+   "name": "Storm Diver",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "vortex pillar",
+   "mechanics": [
+    "shooter"
+   ]
+  },
+  {
+   "id": "terraria:alien_hornet",
+   "name": "Alien Hornet",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "vortex pillar",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:brain_suckler",
+   "name": "Brain Suckler",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "nebula pillar",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:nebula_floater",
+   "name": "Nebula Floater",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "nebula pillar",
+   "mechanics": [
+    "caster"
+   ]
+  },
+  {
+   "id": "terraria:flow_invader",
+   "name": "Flow Invader",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "stardust pillar",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
+   "id": "terraria:twinkle_popper",
+   "name": "Twinkle Popper",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "stardust pillar",
+   "mechanics": [
+    "hopper"
+   ]
+  },
+  {
+   "id": "terraria:true_eye_of_cthulhu",
+   "name": "True Eye of Cthulhu",
+   "kind": "enemy",
+   "stage": "endgame",
+   "source": "moon lord",
+   "mechanics": [
+    "flyer"
+   ]
+  },
+  {
    "id": "terraria:etherian_goblin",
    "name": "Etherian Goblin",
    "kind": "enemy",

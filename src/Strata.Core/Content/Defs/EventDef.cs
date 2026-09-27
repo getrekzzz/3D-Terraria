@@ -51,4 +51,13 @@ public sealed class EventDef : ContentDef
 
     /// <summary>Beds cannot be used to skip the night while active.</summary>
     public bool PreventsSleep { get; init; }
+
+    /// <summary>A manual event that begins the moment this progression flag is raised (the Lunatic Cultist's defeat).</summary>
+    public string? StartsWhen { get; init; }
+
+    /// <summary>
+    /// Creatures placed across the world's surface when the event starts, spread evenly west to east (the Celestial
+    /// Pillars). One whose boss flag is already set is skipped; missing ones return when a saved event is loaded.
+    /// </summary>
+    public string[] Places { get; init; } = Array.Empty<string>();
 }

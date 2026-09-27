@@ -23,6 +23,9 @@ public sealed class BrainContext
     /// <summary>How many living creatures of a kind exist (caps a boss's minions).</summary>
     public Func<string, int>? CountAlive { get; set; }
 
+    /// <summary>Feet position on standable ground in the column under or over a point (loaded chunks), or null.</summary>
+    public Func<Vector3, Vector3?>? Ground { get; set; }
+
     /// <summary>Fires a hostile projectile (id, from, velocity, damage) — pattern bosses' volleys.</summary>
     public Action<string, Vector3, Vector3, int>? Shoot { get; set; }
 

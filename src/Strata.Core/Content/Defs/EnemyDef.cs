@@ -64,6 +64,56 @@ public sealed class BossInfo
     /// the last of the group falls; announcements and the boss bar treat the group as one.
     /// </summary>
     public string[] Companions { get; init; } = Array.Empty<string>();
+
+    /// <summary>
+    /// Parts that fight on their own but are fixed to the body (Moon Lord's hands and head): spawned with it, held at
+    /// their offsets as it turns, and gone when it goes. Give them this boss's flag so the group falls as one.
+    /// </summary>
+    public BossPart[] Parts { get; init; } = Array.Empty<BossPart>();
+
+    /// <summary>A gathering at a landmark that calls this boss up when disturbed (the Lunatic Cultist's devotees).</summary>
+    public BossRitual? Ritual { get; init; }
+}
+
+public sealed class BossPart
+{
+    public string Enemy { get; init; } = "";
+
+    /// <summary>Offset from the body's centre in metres [right, up, forward], turned with the body's facing.</summary>
+    public float[] Offset { get; init; } = { 0f, 0f, 0f };
+}
+
+/// <summary>
+/// Worshippers gather around an altar at a landmark once <see cref="Requires"/> is raised (and until the boss's own
+/// flag is), with guards around them. Striking down a worshipper calls the boss up in their place.
+/// </summary>
+public sealed class BossRitual
+{
+    /// <summary>World landmark id (e.g. "dungeon_gate").</summary>
+    public string Landmark { get; init; } = "";
+
+    public string Requires { get; init; } = "";
+
+    /// <summary>The creature they gather around (the Mysterious Tablet); optional.</summary>
+    public string? Altar { get; init; }
+
+    public string Worshipper { get; init; } = "";
+    public int Count { get; init; } = 4;
+    public string? Guard { get; init; }
+    public int Guards { get; init; } = 2;
+
+    /// <summary>Ring radius around the altar (m).</summary>
+    public float Radius { get; init; } = 3f;
+
+    /// <summary>They gather only while a player is this close to the landmark (m).</summary>
+    public float Range { get; init; } = 60f;
+}
+
+/// <summary>A barrier that holds until enough creatures carrying <see cref="KillTag"/> die (the Celestial Pillars' shields).</summary>
+public sealed class KillShield
+{
+    public string KillTag { get; init; } = "";
+    public int Kills { get; init; } = 100;
 }
 
 /// <summary>A projectile a creature fires at its target (any brain).</summary>
@@ -154,6 +204,9 @@ public sealed class EnemyDef : ContentDef
 
     /// <summary>Effects on a player this creature touches for damage (e.g. applyBuff on_fire).</summary>
     public TypedSpec[] OnContact { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>Cannot be harmed until enough of its kind's creatures have fallen.</summary>
+    public KillShield? Shield { get; init; }
 
     /// <summary>Effects when it dies (pourLiquid, spawnEnemies).</summary>
     public TypedSpec[] OnDeath { get; init; } = Array.Empty<TypedSpec>();

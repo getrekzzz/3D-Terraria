@@ -47,6 +47,13 @@ public sealed partial class NpcSystem
             Spawn = (def, at) => Spawn(def, at - new Vector3(0, def.Height * 0.25f * def.Scale, 0)),
             Carve = (center, radius) => world.Editor.Carve(center, radius),
             CountAlive = id => _npcs.Count(n => n.Alive && n.Def.Id == id),
+            Ground = at =>
+            {
+                var c = VoxelMotion.CellOf(at);
+                for (int dy = 12; dy >= -24; dy--)
+                    if (world.Session.IsStandable(c.X, c.Y + dy, c.Z, 4)) return new Vector3(at.X, (c.Y + dy) * Units.CellSize, at.Z);
+                return null;
+            },
             Shoot = (id, from, velocity, damage) =>
             {
                 if (world.Session.Content.Projectiles.TryGet(id, out var def)) world.Projectiles.Spawn(def, from, velocity, null, damage, 3f, Content.Defs.DamageClass.None, 0);
@@ -97,6 +104,7 @@ public sealed partial class NpcSystem
                     Spawn(companion, feet + new Vector3(MathF.Cos(a), 0.3f, MathF.Sin(a)) * 7f);
                 }
         }
+        if (def.Boss is { Parts.Length: > 0 }) SpawnParts(npc);
         return npc;
     }
 
@@ -177,6 +185,7 @@ public sealed partial class NpcSystem
             var brain = BrainOf(npc.Def);
             brain.Think(npc, _ctx);
             _rng = _ctx.Rng;
+            if (npc.Def.Shield != null && ShieldUp(npc)) npc.Invulnerable = true;
             if (brain.UsesGravity && npc.Def.Gravity) npc.Velocity.Y = MathF.Max(npc.Velocity.Y - BrainContext.Gravity * dt, -30f);
             Move(npc, brain, dt);
             if (npc.Def.Ranged != null && target != null) RangedAttack(npc, target, distance);
@@ -285,6 +294,8 @@ public sealed partial class NpcSystem
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);
+        CountShieldKill(npc);
+        if (npc.Def.Boss is { Minor: true, Flag: { } minorFlag }) _world.Progression.Set(minorFlag);
         if (npc.Def.Boss is { Minor: false } boss && !GroupAlive(boss, npc))
         {
             if (boss.Flag != null) _world.Progression.Set(boss.Flag);

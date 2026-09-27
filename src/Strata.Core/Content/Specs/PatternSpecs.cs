@@ -41,7 +41,7 @@ public sealed class PatternPhase
     /// <summary>Model shown during the phase (a revealed eye, an opened mouth).</summary>
     public string? Model { get; init; }
 
-    /// <summary>Invulnerable while any creature of this kind lives (the Brain's Creepers).</summary>
+    /// <summary>Invulnerable while any creature of these kinds lives (the Brain's Creepers; comma-separated ids).</summary>
     public string? ShieldedBy { get; init; }
 
     /// <summary>Contact damage and movement speed multipliers.</summary>
@@ -113,4 +113,13 @@ public sealed class PatternSummon
 
     /// <summary>Summon <see cref="Max"/> at once when the phase starts, then never again.</summary>
     public bool Once { get; init; }
+
+    /// <summary>Kinds summoned at random instead of <see cref="Enemy"/> (a pillar's legion); Max counts them all.</summary>
+    public string[] Pool { get; init; } = Array.Empty<string>();
+
+    /// <summary>How far around the summoner they appear (m); beyond 3 m walkers are stood on the ground there.</summary>
+    public float Radius { get; init; } = 2f;
+
+    /// <summary>Summons only while a player is within this distance (m); 0 = always.</summary>
+    public float Range { get; init; }
 }

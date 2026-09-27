@@ -99,6 +99,9 @@ public sealed class Npc
     /// <summary>Anchor offset from the leader's centre.</summary>
     public Vector3 LeaderOffset { get; set; }
 
+    /// <summary>The offset is in the leader's own frame and turns with its facing (a boss's hands).</summary>
+    public bool TurnsWithLeader { get; set; }
+
     /// <summary>Live creatures tethered to this one.</summary>
     public List<Npc> Followers { get; } = new();
 

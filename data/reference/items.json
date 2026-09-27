@@ -1545,6 +1545,76 @@
    "source": "craft"
   },
   {
+   "id": "terraria:terrarian",
+   "name": "Terrarian",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "moon lord"
+  },
+  {
+   "id": "terraria:rainbow_crystal_staff",
+   "name": "Rainbow Crystal Staff",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "moon lord"
+  },
+  {
+   "id": "terraria:lunar_portal_staff",
+   "name": "Lunar Portal Staff",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "moon lord"
+  },
+  {
+   "id": "terraria:solar_eruption",
+   "name": "Solar Eruption",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:daybreak",
+   "name": "Daybreak",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:vortex_beater",
+   "name": "Vortex Beater",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:phantasm",
+   "name": "Phantasm",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:nebula_arcanum",
+   "name": "Nebula Arcanum",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:nebula_blaze",
+   "name": "Nebula Blaze",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:stardust_cell_staff",
+   "name": "Stardust Cell Staff",
+   "kind": "weapon",
+   "stage": "endgame",
+   "source": "craft"
+  },
+  {
    "id": "terraria:last_prism",
    "name": "Last Prism",
    "kind": "weapon",

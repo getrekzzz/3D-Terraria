@@ -27,6 +27,9 @@ public static partial class ContentValidator
             if (e.SpawnRateMultiplier <= 0) ctx.Error(e, "spawnRateMultiplier must be > 0.");
             ctx.Ref(e, ctx.Db.Enemies, e.FinaleEnemy, "finaleEnemy");
             ctx.Ref(e, ctx.Db.Flags, e.CompletionFlag, "completionFlag");
+            ctx.Ref(e, ctx.Db.Flags, e.StartsWhen, "startsWhen");
+            foreach (var placed in e.Places) ctx.Ref(e, ctx.Db.Enemies, placed, "places");
+            if (e.StartsWhen != null && e.Phase != EventPhase.Manual) ctx.Error(e, "startsWhen is for manual events.");
             ctx.Color(e, e.SkyTint, "skyTint");
             ctx.Specs(e, SpecKind.Condition, e.Conditions, "conditions");
         }
@@ -47,8 +50,11 @@ public static partial class ContentValidator
         foreach (var phase in p.Phases)
         {
             if (phase.Model != null) ctx.Asset(e, $"assets/models/creatures/{phase.Model}.glb", "brain.phases.model");
-            if (phase.ShieldedBy != null && !ctx.Db.Enemies.Contains(phase.ShieldedBy)) ctx.Error(e, $"shieldedBy names unknown enemy '{phase.ShieldedBy}'.");
-            if (phase.Summon != null && !ctx.Db.Enemies.Contains(phase.Summon.Enemy)) ctx.Error(e, $"summons unknown enemy '{phase.Summon.Enemy}'.");
+            foreach (var guard in (phase.ShieldedBy ?? "").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+                if (!ctx.Db.Enemies.Contains(guard)) ctx.Error(e, $"shieldedBy names unknown enemy '{guard}'.");
+            if (phase.Summon is { } s)
+                foreach (var id in s.Pool.Length > 0 ? s.Pool : new[] { s.Enemy })
+                    if (!ctx.Db.Enemies.Contains(id)) ctx.Error(e, $"summons unknown enemy '{id}'.");
             foreach (var v in phase.Moves.Select(m => m.Volley).Append(phase.Volley))
                 if (v != null && !ctx.Db.Projectiles.Contains(v.Projectile)) ctx.Error(e, $"volley fires unknown projectile '{v.Projectile}'.");
         }
@@ -80,6 +86,19 @@ public static partial class ContentValidator
                 if (boss.BarrierModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.BarrierModel}.glb", "boss.barrierModel");
                 if (boss.BarrierTile <= 0) ctx.Error(e, "boss.barrierTile must be > 0.");
                 if (boss.DayEnrage is { Damage: <= 0 } or { Speed: <= 0 }) ctx.Error(e, "boss.dayEnrage multipliers must be > 0.");
+                foreach (var part in boss.Parts)
+                {
+                    ctx.Ref(e, ctx.Db.Enemies, part.Enemy, "boss.parts");
+                    if (part.Offset.Length != 3) ctx.Error(e, "boss.parts offsets are [right, up, forward].");
+                }
+                if (boss.Ritual is { } ritual)
+                {
+                    ctx.Ref(e, ctx.Db.Flags, ritual.Requires, "boss.ritual.requires");
+                    ctx.Ref(e, ctx.Db.Enemies, ritual.Worshipper, "boss.ritual.worshipper");
+                    ctx.Ref(e, ctx.Db.Enemies, ritual.Altar, "boss.ritual.altar");
+                    ctx.Ref(e, ctx.Db.Enemies, ritual.Guard, "boss.ritual.guard");
+                    if (!WorldGen.Plan.LandmarkIds.All.Contains(ritual.Landmark)) ctx.Error(e, $"boss.ritual.landmark '{ritual.Landmark}' is not a planned landmark.");
+                }
                 foreach (var companionId in boss.Companions)
                 {
                     ctx.Ref(e, ctx.Db.Enemies, companionId, "boss.companions");
@@ -108,6 +127,7 @@ public static partial class ContentValidator
                 if (r.Enraged?.Enraged != null) ctx.Error(e, $"{field}.enraged may not nest another enraged attack.");
             }
             ctx.Specs(e, SpecKind.Condition, e.DespawnWhen, "despawnWhen");
+            if (e.Shield is { } shield && (shield.Kills < 1 || string.IsNullOrEmpty(shield.KillTag))) ctx.Error(e, "shield needs killTag and kills >= 1.");
             ctx.Specs(e, SpecKind.CreatureEffect, e.OnContact, "onContact");
             ctx.Specs(e, SpecKind.CreatureEffect, e.OnDeath, "onDeath");
             foreach (var fx in e.OnContact.Concat(e.OnDeath))
@@ -147,7 +167,8 @@ public static partial class ContentValidator
             }
             ctx.Specs(p, SpecKind.ProjectileHit, p.OnHit, "onHit");
             if (p.Minion is { Shoot: { } shot } && !ctx.Db.Projectiles.Contains(shot)) ctx.Error(p, $"minion shoots unknown projectile '{shot}'.");
-            if (p.Minion is { Speed: <= 0 } or { Range: <= 0 }) ctx.Error(p, "minion speed and range must be > 0.");
+            if (p.Minion is { Speed: < 0 } or { Range: <= 0 }) ctx.Error(p, "minion speed must be >= 0 (0 = a sentry) and range > 0.");
+            if (p.Minion is { Speed: 0, Shoot: null }) ctx.Error(p, "a sentry (minion speed 0) needs something to shoot.");
             if (p.Fuse && !p.OnHit.Any(h => h.Type == Specs.ProjectileHitSpecs.Explode)) ctx.Warn(p, "fuse without an explode effect does nothing.");
         }
         foreach (var b in ctx.Db.Buffs.All)

@@ -29,6 +29,10 @@
     { "id": "temple_unlocked", "name": "The Jungle Temple opened", "kind": "world", "requires": ["defeated_plantera"], "stage": "temple" },
     { "id": "defeated_golem", "name": "Golem defeated", "kind": "boss", "requires": ["defeated_plantera"], "stage": "temple", "covers": ["terraria:golem_down"] },
     { "id": "defeated_lunatic_cultist", "name": "Lunatic Cultist defeated", "kind": "boss", "requires": ["defeated_golem"], "stage": "cultist", "covers": ["terraria:cultist_down"] },
+    { "id": "defeated_solar_pillar", "name": "Solar Pillar destroyed", "kind": "event", "requires": ["defeated_lunatic_cultist"], "stage": "celestial" },
+    { "id": "defeated_vortex_pillar", "name": "Vortex Pillar destroyed", "kind": "event", "requires": ["defeated_lunatic_cultist"], "stage": "celestial" },
+    { "id": "defeated_nebula_pillar", "name": "Nebula Pillar destroyed", "kind": "event", "requires": ["defeated_lunatic_cultist"], "stage": "celestial" },
+    { "id": "defeated_stardust_pillar", "name": "Stardust Pillar destroyed", "kind": "event", "requires": ["defeated_lunatic_cultist"], "stage": "celestial" },
     { "id": "defeated_pillars", "name": "Celestial Pillars destroyed", "kind": "event", "requires": ["defeated_lunatic_cultist"], "stage": "celestial", "covers": ["terraria:pillars_down"] },
     { "id": "defeated_moon_lord", "name": "Moon Lord defeated", "kind": "boss", "requires": ["defeated_pillars"], "stage": "endgame", "covers": ["terraria:moon_lord_down"] }
   ]

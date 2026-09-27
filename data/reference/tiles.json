@@ -209,6 +209,12 @@
    "stage": "hardmode"
   },
   {
+   "id": "terraria:luminite",
+   "name": "Luminite",
+   "kind": "ore",
+   "stage": "endgame"
+  },
+  {
    "id": "terraria:lihzahrd_brick",
    "name": "Lihzahrd Brick",
    "kind": "structure",

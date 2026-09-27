@@ -19,6 +19,7 @@
     { "id": "emerald_ore", "name": "Emerald Stone", "textures": { "all": "emerald_ore" }, "hardness": 2.0, "drop": "emerald", "light": [0, 3, 1], "sound": "ore", "color": "#2fbf6a", "tags": ["natural", "ore", "gem"], "covers": ["terraria:emerald"] },
     { "id": "ruby_ore", "name": "Ruby Stone", "textures": { "all": "ruby_ore" }, "hardness": 2.2, "drop": "ruby", "light": [3, 0, 0], "sound": "ore", "color": "#d6283c", "tags": ["natural", "ore", "gem"], "covers": ["terraria:ruby"] },
     { "id": "diamond_ore", "name": "Diamond Stone", "textures": { "all": "diamond_ore" }, "hardness": 2.4, "drop": "diamond", "light": [3, 3, 3], "sound": "ore", "color": "#d8f0ff", "tags": ["natural", "ore", "gem"], "covers": ["terraria:diamond"] },
-    { "id": "crystal_cluster", "name": "Crystal Shard", "render": "transparent", "textures": { "all": "crystal" }, "hardness": 1.2, "drop": "crystal_shard", "light": [6, 3, 9], "sound": "glass", "color": "#c79bff", "tags": ["natural", "gem"] }
+    { "id": "crystal_cluster", "name": "Crystal Shard", "render": "transparent", "textures": { "all": "crystal" }, "hardness": 1.2, "drop": "crystal_shard", "light": [6, 3, 9], "sound": "glass", "color": "#c79bff", "tags": ["natural", "gem"] },
+    { "id": "luminite", "name": "Luminite", "textures": { "all": "luminite" }, "hardness": 4.0, "pickPower": 225, "light": [2, 8, 7], "sound": "ore", "color": "#4affd8", "tags": ["ore"], "covers": ["terraria:luminite"] }
   ]
 }

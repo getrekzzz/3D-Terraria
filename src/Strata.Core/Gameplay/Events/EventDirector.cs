@@ -33,6 +33,7 @@ public sealed class EventDirector
     private readonly List<ActiveEvent> _active = new();
     private readonly Dictionary<EventDef, ICondition> _conditions = new();
     private bool? _wasDay;
+    private bool _placePending;
     private Pcg32 _rng;
 
     public EventDirector(GameWorld world, NpcSystem npcs)
@@ -42,8 +43,16 @@ public sealed class EventDirector
         foreach (var e in world.Session.Content.Events.All) _conditions[e] = ConditionCompiler.CompileAll(e.Conditions);
         foreach (var saved in world.Session.Meta.EventStates)
             if (world.Session.Content.Events.TryGet(saved.Id, out var def))
+            {
                 Add(new ActiveEvent(def, saved.TicksLeft) { Kills = saved.Kills });
+                _placePending = true; // on the first tick, once the world's systems are all listening
+            }
         npcs.Killed += OnKilled;
+        world.Progression.Raised += flag =>
+        {
+            foreach (var def in world.Session.Content.Events.All)
+                if (def.StartsWhen == flag.Id) Start(def);
+        };
     }
 
     public IReadOnlyList<ActiveEvent> Active => _active;
@@ -74,6 +83,11 @@ public sealed class EventDirector
             Roll(day ? EventPhase.Day : EventPhase.Night);
         }
         _wasDay = day;
+        if (_placePending)
+        {
+            _placePending = false;
+            foreach (var a in _active) Place(a.Def);
+        }
         for (int i = _active.Count - 1; i >= 0; i--)
         {
             var a = _active[i];
@@ -87,6 +101,7 @@ public sealed class EventDirector
         if (IsActive(def.Id)) return false;
         int ticks = def.Duration > 0 ? def.Duration : -1;
         Add(new ActiveEvent(def, ticks));
+        Place(def);
         if (def.StartMessage != null) Announced?.Invoke(def.StartMessage, def);
         Started?.Invoke(def);
         return true;
@@ -136,6 +151,33 @@ public sealed class EventDirector
             if (a.Def.FinaleEnemy != null && _world.LocalPlayer is { } p && _world.Session.Content.Enemies.TryGet(a.Def.FinaleEnemy, out var boss))
                 _world.Npcs.Spawn(boss, p.Position + new System.Numerics.Vector3(0, 12f, 0));
             End(a, completed: true);
+        }
+    }
+
+    /// <summary>
+    /// Stands the event's placed creatures on the surface, evenly around a ring halfway out from the world's centre
+    /// (drawn in over the sea); skips any already alive or whose boss flag is set (destroyed before a save).
+    /// </summary>
+    private void Place(EventDef def)
+    {
+        var session = _world.Session;
+        var plan = session.Generator.Plan;
+        int n = def.Places.Length;
+        for (int i = 0; i < n; i++)
+        {
+            if (!session.Content.Enemies.TryGet(def.Places[i], out var enemy)) continue;
+            if (enemy.Boss?.Flag is { } flag && _world.Progression.IsSet(flag)) continue;
+            if (_world.Npcs.All.Any(x => x.Alive && x.Def == enemy)) continue;
+            float angle = MathF.PI * 0.25f + i * MathF.Tau / n, r = MathF.Min(plan.Size.X, plan.Size.Z) * 0.25f;
+            float x = 0, z = 0;
+            for (int k = 0; k < 12; k++, r *= 0.9f)
+            {
+                x = plan.Size.X * 0.5f + MathF.Cos(angle) * r;
+                z = plan.Size.Z * 0.5f + MathF.Sin(angle) * r;
+                if (plan.Landness.Sample(x, z) >= 0.97f) break;
+            }
+            float y = MathF.Ceiling(session.Generator.Terrain.SurfaceHeight(x, z)) + 2f;
+            _world.Npcs.Spawn(enemy, new System.Numerics.Vector3(x, y, z) * Common.Units.CellSize);
         }
     }
 

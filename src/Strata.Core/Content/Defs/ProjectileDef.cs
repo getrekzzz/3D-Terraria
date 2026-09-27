@@ -61,7 +61,7 @@ public sealed class ProjectileDef : ContentDef
 /// <summary>A summoned minion: follows its owner and attacks creatures near them until the owner dies.</summary>
 public sealed class MinionDef
 {
-    /// <summary>Flight speed (m/s) and how far from the owner it looks for targets (m).</summary>
+    /// <summary>Flight speed (m/s; 0 = a sentry that stays where it was summoned) and how far from the owner it looks for targets (m).</summary>
     public float Speed { get; init; } = 9f;
 
     public float Range { get; init; } = 22f;

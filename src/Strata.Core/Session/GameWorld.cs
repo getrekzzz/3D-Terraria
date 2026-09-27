@@ -134,6 +134,7 @@ public sealed partial class GameWorld : IDisposable
         LiquidEffects = new LiquidEffects(this);
         Incineration = new Gameplay.Progression.IncinerationSummons(this);
         Objectives = new Gameplay.Progression.WorldObjectives(this);
+        Rituals = new Gameplay.Progression.Rituals(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
         Liquids.ChunksDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
@@ -162,6 +163,7 @@ public sealed partial class GameWorld : IDisposable
 
     /// <summary>Orbs, hearts and altars; meteorites.</summary>
     public Gameplay.Progression.WorldObjectives Objectives { get; }
+    public Gameplay.Progression.Rituals Rituals { get; }
     public TownCommerce Commerce { get; }
     public LiquidEffects LiquidEffects { get; }
     public Gameplay.Progression.IncinerationSummons Incineration { get; }
@@ -216,6 +218,7 @@ public sealed partial class GameWorld : IDisposable
         Projectiles.Tick();
         Mutations.Tick();
         Objectives.Tick();
+        Rituals.Tick();
         Spread.Tick();
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
         if (++_autosaveCounter >= AutosaveTicks)

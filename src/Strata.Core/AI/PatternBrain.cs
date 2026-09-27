@@ -27,7 +27,7 @@ public sealed class PatternBrain : IBrain
         var phase = _p.Phases[stage];
         if (stage != npc.Stage) Enter(npc, stage, phase, ctx);
         npc.DamageScale = phase.Damage;
-        bool shielded = phase.ShieldedBy != null && (ctx.CountAlive?.Invoke(phase.ShieldedBy) ?? 0) > 0;
+        bool shielded = Guarded(phase.ShieldedBy, ctx);
         Summon(npc, phase, ctx);
         var target = ctx.Target;
         if (target == null)
@@ -40,6 +40,7 @@ public sealed class PatternBrain : IBrain
         npc.TargetPlayer = 0;
         var move = phase.Moves[npc.Counter % phase.Moves.Length];
         bool teleporting = Move(npc, move, phase.Speed, target, ctx);
+        if (npc.Leader != null) npc.Velocity = (npc.Anchor - npc.Center) * 8f; // a fixed part keeps to its place on the body
         npc.Invulnerable = shielded || teleporting;
         if (phase.Volley != null) Fire(npc, phase.Volley, ref npc.VolleyTimer, target, ctx);
         if (move.Volley != null)
@@ -66,13 +67,41 @@ public sealed class PatternBrain : IBrain
 
     private static Vector3 Scatter(ref Determinism.Pcg32 rng, float r) => new(rng.NextSigned() * r, rng.NextSigned() * r * 0.5f, rng.NextSigned() * r);
 
+    /// <summary>Any guardian of the comma-separated kinds lives.</summary>
+    private static bool Guarded(string? kinds, BrainContext ctx)
+    {
+        if (string.IsNullOrEmpty(kinds) || ctx.CountAlive == null) return false;
+        foreach (var id in kinds.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+            if (ctx.CountAlive(id) > 0) return true;
+        return false;
+    }
+
     private static void Summon(Npc npc, PatternPhase phase, BrainContext ctx)
     {
-        if (phase.Summon is not { Once: false } s || ctx.Spawn == null || !ctx.Content.Enemies.TryGet(s.Enemy, out var def)) return;
+        if (phase.Summon is not { Once: false } s || ctx.Spawn == null) return;
         if (++npc.SummonTimer < s.Interval) return;
         npc.SummonTimer = 0;
-        int alive = ctx.CountAlive?.Invoke(s.Enemy) ?? 0;
-        for (int i = 0; i < s.Count && alive + i < s.Max; i++) ctx.Spawn(def, npc.Center + Scatter(ref ctx.Rng, 2f));
+        if (s.Range > 0 && (ctx.Target == null || ctx.TargetDistance > s.Range)) return;
+        var pool = s.Pool.Length > 0 ? s.Pool : new[] { s.Enemy };
+        int alive = pool.Sum(id => ctx.CountAlive?.Invoke(id) ?? 0);
+        for (int i = 0; i < s.Count && alive + i < s.Max; i++)
+        {
+            if (!ctx.Content.Enemies.TryGet(pool.Length == 1 ? pool[0] : pool[ctx.Rng.Range(0, pool.Length)], out var def)) continue;
+            if (s.Radius <= 3f)
+            {
+                ctx.Spawn(def, npc.Center + Scatter(ref ctx.Rng, s.Radius));
+                continue;
+            }
+            float a = ctx.Rng.NextFloat() * MathF.Tau, d = s.Radius * ctx.Rng.Range(0.4f, 1f);
+            var at = npc.Center + new Vector3(MathF.Cos(a) * d, 0, MathF.Sin(a) * d);
+            if (def.Gravity)
+            {
+                // Walkers stand on the ground there (none spawns inside a hill or in the air).
+                if (ctx.Ground?.Invoke(at) is not { } feet) continue;
+                at = feet + new Vector3(0, def.Height * 0.25f * def.Scale, 0);
+            }
+            ctx.Spawn(def, at);
+        }
     }
 
     /// <summary>Advances the current move; returns true while the boss is mid-teleport (untouchable).</summary>

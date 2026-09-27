@@ -362,6 +362,10 @@
         "glow": "#ffb030",
         "horn": "#c8a060"
       }
+    },
+    "ancient_manipulator": {
+      "generator": "manipulator",
+      "params": {}
     }
   },
   "items": {
@@ -2248,6 +2252,352 @@
           "color": "#f07ad8",
           "layer": "plain:glow"
         }
+      },
+      "celestial_sigil": {
+        "generator": "orb",
+        "params": {
+          "color": "#4affd8",
+          "standColor": "#3a3a5a"
+        }
+      },
+      "daybreak": {
+        "generator": "spear",
+        "params": {
+          "shaft": "#ffd060",
+          "glow": "#ffb040",
+          "length": 1.3
+        }
+      },
+      "last_prism": {
+        "generator": "orb",
+        "params": {
+          "color": "#ffffff",
+          "standColor": "#9ae0ff",
+          "size": 0.1
+        }
+      },
+      "luminite_bar": {
+        "generator": "bar",
+        "params": {
+          "metal": "#4affd8",
+          "count": 2
+        }
+      },
+      "lunar_flare": {
+        "generator": "tome",
+        "params": {
+          "cover": "#1a2a6a",
+          "emblem": "#9ae0ff",
+          "glow": "#6ab0ff"
+        }
+      },
+      "lunar_portal_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#4affd8"
+        }
+      },
+      "meowmere": {
+        "generator": "sword",
+        "params": {
+          "metal": "#ff9ae0",
+          "guard": "#9ae0ff",
+          "glow": true,
+          "length": 1.2
+        }
+      },
+      "nebula_arcanum": {
+        "generator": "tome",
+        "params": {
+          "cover": "#6a1a8a",
+          "emblem": "#ff9af0",
+          "glow": "#ff6ae0"
+        }
+      },
+      "nebula_blaze": {
+        "generator": "wand",
+        "params": {
+          "gem": "#ff6ae0"
+        }
+      },
+      "nebula_breastplate": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#ff6ae0"
+        }
+      },
+      "nebula_drill": {
+        "generator": "drill",
+        "params": {
+          "metal": "#ff6ae0"
+        }
+      },
+      "nebula_fragment": {
+        "generator": "chunk",
+        "params": {
+          "color": "#ff6ae0",
+          "layer": "plain:glow"
+        }
+      },
+      "nebula_hamaxe": {
+        "generator": "axe",
+        "params": {
+          "metal": "#ff6ae0"
+        }
+      },
+      "nebula_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#ff6ae0"
+        }
+      },
+      "nebula_leggings": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#ff6ae0"
+        }
+      },
+      "nebula_mantle": {
+        "generator": "wings",
+        "params": {
+          "style": "membrane",
+          "color": "#c86aff",
+          "strap": "#4a1a5a"
+        }
+      },
+      "nebula_pickaxe": {
+        "generator": "pickaxe",
+        "params": {
+          "metal": "#ff6ae0"
+        }
+      },
+      "phantasm": {
+        "generator": "bow",
+        "params": {
+          "metal": "#3affc0"
+        }
+      },
+      "rainbow_crystal_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#ffb0f0"
+        }
+      },
+      "s_d_m_g": {
+        "generator": "gun",
+        "params": {
+          "style": "minigun",
+          "metal": "#3a2a5a",
+          "accent": "#9a6aff",
+          "glow": "#9a6aff"
+        }
+      },
+      "solar_eruption": {
+        "generator": "flail",
+        "params": {
+          "metal": "#ff9a3a",
+          "ball": "#ffb040",
+          "glow": "#ffb040"
+        }
+      },
+      "solar_flare_breastplate": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#ff9a3a"
+        }
+      },
+      "solar_flare_drill": {
+        "generator": "drill",
+        "params": {
+          "metal": "#ff9a3a"
+        }
+      },
+      "solar_flare_hamaxe": {
+        "generator": "axe",
+        "params": {
+          "metal": "#ff9a3a"
+        }
+      },
+      "solar_flare_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#ff9a3a"
+        }
+      },
+      "solar_flare_leggings": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#ff9a3a"
+        }
+      },
+      "solar_flare_pickaxe": {
+        "generator": "pickaxe",
+        "params": {
+          "metal": "#ff9a3a"
+        }
+      },
+      "solar_fragment": {
+        "generator": "chunk",
+        "params": {
+          "color": "#ff9a3a",
+          "layer": "plain:glow"
+        }
+      },
+      "solar_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "energy",
+          "color": "#ffb040",
+          "strap": "#8a3a0a"
+        }
+      },
+      "star_wrath": {
+        "generator": "sword",
+        "params": {
+          "metal": "#ff4a9a",
+          "guard": "#6a1a3a",
+          "glow": true,
+          "length": 1.2
+        }
+      },
+      "stardust_cell_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#6ab0ff"
+        }
+      },
+      "stardust_dragon_staff": {
+        "generator": "staff",
+        "params": {
+          "gem": "#8ac8ff"
+        }
+      },
+      "stardust_drill": {
+        "generator": "drill",
+        "params": {
+          "metal": "#6ab0ff"
+        }
+      },
+      "stardust_fragment": {
+        "generator": "chunk",
+        "params": {
+          "color": "#6ab0ff",
+          "layer": "plain:glow"
+        }
+      },
+      "stardust_hamaxe": {
+        "generator": "axe",
+        "params": {
+          "metal": "#6ab0ff"
+        }
+      },
+      "stardust_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#6ab0ff"
+        }
+      },
+      "stardust_leggings": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#6ab0ff"
+        }
+      },
+      "stardust_pickaxe": {
+        "generator": "pickaxe",
+        "params": {
+          "metal": "#6ab0ff"
+        }
+      },
+      "stardust_plate": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#6ab0ff"
+        }
+      },
+      "stardust_wings": {
+        "generator": "wings",
+        "params": {
+          "style": "feather",
+          "color": "#8ac8ff",
+          "strap": "#1a2a5a"
+        }
+      },
+      "terrarian": {
+        "generator": "yoyo",
+        "params": {
+          "color": "#4aff8a"
+        }
+      },
+      "vortex_beater": {
+        "generator": "gun",
+        "params": {
+          "style": "minigun",
+          "metal": "#2a6a5a",
+          "accent": "#3affc0",
+          "glow": "#3affc0"
+        }
+      },
+      "vortex_booster": {
+        "generator": "wings",
+        "params": {
+          "style": "energy",
+          "color": "#3affc0",
+          "strap": "#0a3a30"
+        }
+      },
+      "vortex_breastplate": {
+        "generator": "chest_armor",
+        "params": {
+          "metal": "#3affc0"
+        }
+      },
+      "vortex_drill": {
+        "generator": "drill",
+        "params": {
+          "metal": "#3affc0"
+        }
+      },
+      "vortex_fragment": {
+        "generator": "chunk",
+        "params": {
+          "color": "#3affc0",
+          "layer": "plain:glow"
+        }
+      },
+      "vortex_hamaxe": {
+        "generator": "axe",
+        "params": {
+          "metal": "#3affc0"
+        }
+      },
+      "vortex_helmet": {
+        "generator": "helmet",
+        "params": {
+          "metal": "#3affc0"
+        }
+      },
+      "vortex_leggings": {
+        "generator": "greaves",
+        "params": {
+          "metal": "#3affc0"
+        }
+      },
+      "vortex_pickaxe": {
+        "generator": "pickaxe",
+        "params": {
+          "metal": "#3affc0"
+        }
+      },
+      "zenith": {
+        "generator": "sword",
+        "params": {
+          "metal": "#9affd8",
+          "guard": "#2a6a5a",
+          "glow": true,
+          "length": 1.3,
+          "width": 0.11
+        }
       }
     }
   },
@@ -3088,6 +3438,230 @@
         "glow": "#fff0ff",
         "hair": "#ffb0e8",
         "wing": "#9ae0ff"
+      }
+    },
+    "alien_hornet": {
+      "generator": "insect",
+      "params": {
+        "color": "#3affc0",
+        "stripes": "#0a3a2a",
+        "eyes": "#ff4a4a"
+      }
+    },
+    "brain_suckler": {
+      "generator": "brain",
+      "params": {
+        "radius": 0.45,
+        "color": "#e08ae0",
+        "fold": "#a05aa8",
+        "exposed": true
+      }
+    },
+    "cultist_archer": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#d8c8b8",
+        "eyes": "#80c0ff",
+        "hairStyle": "bald",
+        "robe": "#2a3a6a",
+        "trim": "#8a8ab0",
+        "hat": "hood",
+        "hatColor": "#2a3a6a",
+        "shirt": "#2a3a6a",
+        "pants": "#1a2a4a",
+        "boots": "#1a1a2a",
+        "height": 1.8,
+        "build": 0.8,
+        "weight": 0.4
+      }
+    },
+    "drakomire": {
+      "generator": "steed",
+      "params": {
+        "coat": "#b04a1a",
+        "hoof": "#3a1a0a",
+        "horn": "#ffb040",
+        "mane": [
+          "#ff6a1a",
+          "#ffb040",
+          "#ffd060"
+        ]
+      }
+    },
+    "flow_invader": {
+      "generator": "jelly",
+      "params": {
+        "color": "#4a8aff",
+        "core": "#c0e8ff"
+      }
+    },
+    "lunatic_cultist": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#d8c8b8",
+        "eyes": "#80c0ff",
+        "hairStyle": "bald",
+        "robe": "#2a3a9a",
+        "trim": "#e8c040",
+        "hat": "hood",
+        "hatColor": "#2a3a9a",
+        "shirt": "#2a3a9a",
+        "pants": "#1a2a6a",
+        "boots": "#1a1a3a",
+        "height": 1.9,
+        "build": 0.8,
+        "weight": 0.4
+      }
+    },
+    "lunatic_devotee": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#d8c8b8",
+        "eyes": "#80c0ff",
+        "hairStyle": "bald",
+        "robe": "#3a5ab8",
+        "trim": "#c0a040",
+        "hat": "hood",
+        "hatColor": "#3a5ab8",
+        "shirt": "#3a5ab8",
+        "pants": "#2a3a8a",
+        "boots": "#1a1a3a",
+        "height": 1.8,
+        "build": 0.75,
+        "weight": 0.4
+      }
+    },
+    "moon_lord": {
+      "generator": "moon_lord",
+      "params": {}
+    },
+    "moon_lord_hand": {
+      "generator": "moon_lord_hand",
+      "params": {}
+    },
+    "moon_lord_head": {
+      "generator": "moon_lord_head",
+      "params": {}
+    },
+    "mysterious_tablet": {
+      "generator": "tablet",
+      "params": {}
+    },
+    "nebula_floater": {
+      "generator": "jelly",
+      "params": {
+        "color": "#c86aff",
+        "core": "#ff9af0"
+      }
+    },
+    "nebula_pillar": {
+      "generator": "celestial_pillar",
+      "params": {
+        "style": "nebula",
+        "color": "#8a3aa8",
+        "glow": "#ff6ae0",
+        "accent": "#3a0a4a"
+      }
+    },
+    "predictor": {
+      "generator": "insect",
+      "params": {
+        "color": "#e06ae0",
+        "stripes": "#4a1a5a",
+        "eyes": "#ffffff"
+      }
+    },
+    "selenian": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#ffd8a0",
+        "eyes": "#ffffff",
+        "hairStyle": "bald",
+        "shirt": "#ff8a2a",
+        "pants": "#c0501a",
+        "boots": "#6a2a0a",
+        "belt": "#ffd040",
+        "height": 1.7,
+        "build": 0.9,
+        "weight": 0.4
+      }
+    },
+    "solar_pillar": {
+      "generator": "celestial_pillar",
+      "params": {
+        "style": "solar",
+        "color": "#c8702a",
+        "glow": "#ffb040",
+        "accent": "#6a2a0a"
+      }
+    },
+    "stardust_pillar": {
+      "generator": "celestial_pillar",
+      "params": {
+        "style": "stardust",
+        "color": "#3a5ab8",
+        "glow": "#8ac8ff",
+        "accent": "#1a2a5a"
+      }
+    },
+    "stargazer": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#b0c8ff",
+        "eyes": "#ffffff",
+        "hairStyle": "bald",
+        "robe": "#2a4ab8",
+        "trim": "#9ae0ff",
+        "hat": "hood",
+        "hatColor": "#2a4ab8",
+        "shirt": "#2a4ab8",
+        "pants": "#1a2a6a",
+        "boots": "#1a1a3a",
+        "height": 2.0,
+        "build": 0.7,
+        "weight": 0.35
+      }
+    },
+    "storm_diver": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#2a8a7a",
+        "eyes": "#4aff6a",
+        "hairStyle": "bald",
+        "shirt": "#3a5a6a",
+        "pants": "#2a3a4a",
+        "boots": "#1a2a30",
+        "belt": "#3affc0",
+        "height": 1.8,
+        "build": 0.9,
+        "weight": 0.5
+      }
+    },
+    "true_eye_of_cthulhu": {
+      "generator": "true_eye",
+      "params": {}
+    },
+    "vortex_pillar": {
+      "generator": "celestial_pillar",
+      "params": {
+        "style": "vortex",
+        "color": "#2a8a7a",
+        "glow": "#3affc0",
+        "accent": "#0a3a30"
+      }
+    },
+    "vortexian": {
+      "generator": "humanoid",
+      "params": {
+        "skin": "#3ac0a0",
+        "eyes": "#e0fff0",
+        "hairStyle": "bald",
+        "shirt": "#1a6a5a",
+        "pants": "#0a4a3a",
+        "boots": "#0a2a20",
+        "height": 2.0,
+        "build": 0.6,
+        "weight": 0.3
       }
     }
   }
