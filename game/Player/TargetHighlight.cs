@@ -45,6 +45,7 @@ public sealed partial class TargetHighlight : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.target_highlight");
         _mesh.Clear();
         var target = _interaction.Target;
         var held = _entity.State.Inventory.Held;

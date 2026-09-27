@@ -70,6 +70,7 @@ public sealed partial class SoundEvents : Node
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.sounds");
         if (_wasAlive && !_local.Alive) Sfx.Play("player_death");
         _wasAlive = _local.Alive;
     }

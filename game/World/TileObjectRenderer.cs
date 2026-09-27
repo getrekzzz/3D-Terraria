@@ -30,6 +30,8 @@ public sealed partial class TileObjectRenderer : Node3D
 
     public int InstanceCount { get; private set; }
 
+    private ChunkRenderer? _chunkRenderer;
+
     public void Initialize(WorldRuntime runtime, PropLibrary props)
     {
         _game = runtime.Game;
@@ -43,6 +45,12 @@ public sealed partial class TileObjectRenderer : Node3D
         _game.Interaction.StateChanged += o => _dirty.Add(ChunkOf(o));
         runtime.Streamer.MeshReady += r => _dirty.Add(r.Coord);
         runtime.Colliders.BodyBuilt += c => _dirty.Add(c);
+        _chunkRenderer = runtime.Renderer;
+        runtime.Renderer.ChunkShown += (c, show) =>
+        {
+            if (_chunks.TryGetValue(c, out var nodes))
+                foreach (var n in nodes) n.Visible = show;
+        };
         runtime.Streamer.ChunkRemoved += c =>
         {
             _dirty.Remove(c);
@@ -52,6 +60,7 @@ public sealed partial class TileObjectRenderer : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects");
         int budget = 8;
         var done = new List<Int3>();
         foreach (var c in _dirty)
@@ -101,6 +110,7 @@ public sealed partial class TileObjectRenderer : Node3D
             }
             var node = new MultiMeshInstance3D { Multimesh = mm, CastShadow = def.SizeY <= SmallObjectHeight ? GeometryInstance3D.ShadowCastingSetting.Off : GeometryInstance3D.ShadowCastingSetting.On };
             if (def.SizeY <= SmallObjectHeight) node.VisibilityRangeEnd = SmallObjectRange;
+            node.Visible = _chunkRenderer?.IsShown(chunk) ?? true;
             AddChild(node);
             nodes.Add(node);
             InstanceCount += list.Count;

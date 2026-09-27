@@ -38,6 +38,8 @@ public sealed class GodotCommandHost : ICommandHost
         ctx.AddProbe("warnings", () => log.Warnings);
         ctx.AddProbe("colliders.bodies", () => runtime.Colliders.BodyCount);
         ctx.AddProbe("uploads.pending", () => runtime.Renderer.PendingUploads);
+        ctx.AddProbe("chunks.hidden", () => runtime.Renderer.HiddenCount);
+        ctx.AddProbe("chunks.triangles", () => runtime.Renderer.ShownTriangles);
         ctx.AddProbe("fps", () => Godot.Engine.GetFramesPerSecond());
         ctx.AddProbe("props.problems", () =>
         {

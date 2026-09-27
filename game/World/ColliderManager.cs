@@ -55,9 +55,13 @@ public sealed partial class ColliderManager : Node3D
     public bool HasBody(Int3 coord) => _chunks.TryGetValue(coord, out var c) && c.Body.IsValid;
 
     /// <summary>Creates, rebuilds or frees bodies according to distance from the focus chunk.</summary>
-    public void UpdateFocus(Int3 focusChunk, int maxBuildsPerFrame = 6)
+    /// <summary>
+    /// Keeps bodies for chunks near the focus. Chunks touching the focus chunk are built at once; the rest share a
+    /// small per-frame time budget so walking into new ground never stalls a frame.
+    /// </summary>
+    public void UpdateFocus(Int3 focusChunk, double budgetMs = 2.0)
     {
-        int builds = 0;
+        long start = System.Diagnostics.Stopwatch.GetTimestamp();
         foreach (var (coord, c) in _chunks)
         {
             var d = coord - focusChunk;
@@ -69,9 +73,8 @@ public sealed partial class ColliderManager : Node3D
             }
             if (!c.Dirty && c.Body.IsValid) continue;
             bool urgent = d.ChebyshevLength <= 1;
-            if (!urgent && builds >= maxBuildsPerFrame) continue;
+            if (!urgent && System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds >= budgetMs) continue;
             Build(coord, c);
-            builds++;
         }
     }
 

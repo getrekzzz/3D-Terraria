@@ -50,6 +50,12 @@ public sealed class GraphicsSettings
             }
         }
         if (custom != null) return new GraphicsSettings(config, config.Default) { Preset = custom, Name = Custom };
+        // First launch: integrated and software GPUs start on the low preset.
+        if (wanted == null && config.Presets.ContainsKey("low") && RenderingServer.GetVideoAdapterType() is RenderingDevice.DeviceType.IntegratedGpu or RenderingDevice.DeviceType.Cpu)
+        {
+            log.Write(Strata.Core.Diagnostics.LogLevel.Info, "graphics", $"First start on '{RenderingServer.GetVideoAdapterName()}' (integrated graphics): using the low preset.");
+            wanted = "low";
+        }
         if (wanted == null || !config.Presets.ContainsKey(wanted))
         {
             if (wanted != null) log.Write(Strata.Core.Diagnostics.LogLevel.Warning, "graphics", $"Unknown graphics preset '{wanted}', using '{config.Default}'.");

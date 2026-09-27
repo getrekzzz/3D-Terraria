@@ -69,6 +69,7 @@ public sealed partial class NpcRenderer : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.npcs");
         float dt = (float)delta;
         var world = _game.Session.World;
         foreach (var npc in _game.Npcs.All)

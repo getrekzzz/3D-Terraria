@@ -92,6 +92,7 @@ public sealed partial class CameraRig : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.camera");
         Rotation = new Vector3(_pitch, _yaw, 0);
         var shake = CameraShake.Sample(delta);
         Camera.HOffset = shake.X;

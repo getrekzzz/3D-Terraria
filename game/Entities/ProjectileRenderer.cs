@@ -39,6 +39,7 @@ public sealed partial class ProjectileRenderer : Node3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.projectiles");
         _clock += (float)delta;
         _lines.ClearSurfaces();
         bool anyLine = false;

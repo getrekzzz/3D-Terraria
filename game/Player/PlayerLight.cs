@@ -44,6 +44,7 @@ public sealed partial class PlayerLight : OmniLight3D
 
     public override void _Process(double delta)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.player_light");
         _time += (float)delta;
         var held = _entity.State.Inventory.Held;
         var rgb = Carried(_entity);
