@@ -26,6 +26,9 @@ public sealed partial class NpcSystem
     public const int DespawnDelayTicks = 180;
     public const int PlayerHitImmunity = 40;
 
+    /// <summary>Creatures leaving at dawn despawn once this far (m) from every player.</summary>
+    public const float LeaveDistance = 32f;
+
     private readonly GameWorld _world;
     private readonly List<Npc> _npcs = new();
     private readonly Dictionary<EnemyDef, IBrain> _brains = new();
@@ -166,7 +169,8 @@ public sealed partial class NpcSystem
                 Remove(i);
                 continue;
             }
-            bool leaving = npc.Def.Boss is { DespawnAtDay: true } && session.Clock.IsDay;
+            // Bosses that leave at day go at once; creatures walking off at dawn go once out of sight.
+            bool leaving = (npc.Def.Boss is { DespawnAtDay: true } && session.Clock.IsDay) || (npc.Leaving && distance > LeaveDistance);
             if (distance > despawn || leaving)
             {
                 if (++npc.FarTicks > (leaving ? 1 : DespawnDelayTicks))

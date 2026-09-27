@@ -50,18 +50,21 @@ public static class Flames
             Mesh = Quad(spec.Color),
             InstanceCount = bases.Count,
         };
+        var box = new Aabb(bases[0], Vector3.Zero);
         for (int i = 0; i < bases.Count; i++)
         {
             mm.SetInstanceTransform(i, new Transform3D(Basis.Identity, bases[i]));
             mm.SetInstanceCustomData(i, new Color(Phase(bases[i]), spec.Size, 0, 0));
+            box = box.Expand(bases[i]);
         }
+        // The billboard is built in the shader, so the quad's own bounds say nothing: box the flames themselves (in the
+        // instances' space) with room for their height.
+        mm.CustomAabb = box.Grow(Mathf.Max(0.5f, spec.Size * 2f));
         return new MultiMeshInstance3D
         {
             Multimesh = mm,
             CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
             VisibilityRangeEnd = Range,
-            // The billboard is built in the shader: keep the box generous so culling never clips a flame.
-            CustomAabb = new Aabb(-Vector3.One, Vector3.One * 2f),
         };
     }
 

@@ -109,6 +109,32 @@ public class NightTests
     }
 
     [Fact]
+    public void ZombiesWalkAwaySteadilyAtDawnAndDespawnOutOfSight()
+    {
+        using var g = Night();
+        var zombie = g.World.Npcs.Spawn(g.Content.Enemies.Get("zombie"), g.Player.Position + new Vector3(0, 0.05f, 4f))!;
+        g.Ticks(30);
+        g.World.Session.Clock.SetHour(9f);
+        g.Ticks(1);
+        Assert.True(zombie.Leaving);
+        var start = zombie.Position;
+        var heading = zombie.Direction;
+        int reversals = 0;
+        for (int i = 0; i < 60 * 3; i++)
+        {
+            g.Ticks(1);
+            if (Vector3.Dot(heading, zombie.Direction) < -0.5f) reversals++; // turning aside is fine, flipping back is the old jitter
+            heading = zombie.Direction;
+        }
+        Assert.Equal(0, reversals);
+        Assert.Equal(-1, zombie.TargetPlayer);
+        Assert.True(Vector3.Distance(start, zombie.Position) > 2.5f, "the zombie should walk off");
+        g.Player.Position -= Vector3.Normalize(zombie.Position - g.Player.Position) * 40f; // out of sight
+        g.Ticks(2);
+        Assert.DoesNotContain(zombie, g.World.Npcs.All);
+    }
+
+    [Fact]
     public void HitsMakeCreaturesReel()
     {
         using var g = Night();

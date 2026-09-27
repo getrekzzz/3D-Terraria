@@ -8,7 +8,7 @@ render_mode blend_add, unshaded, cull_disabled, depth_draw_never, shadows_disabl
 #include "res://shaders/include/noise.gdshaderinc"
 
 uniform vec4 flame_color : source_color = vec4(1.0, 0.54, 0.16, 1.0);
-uniform float intensity = 1.7;
+uniform float intensity = 1.35;
 global uniform vec4 strata_wind;
 
 varying vec2 v_uv;

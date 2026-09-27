@@ -61,9 +61,15 @@ public sealed class WalkerBrain : IBrain
 
     public void Think(Npc npc, BrainContext ctx)
     {
+        if (_p.FleeDaylight && ctx.IsDay && ctx.OnSurface)
+        {
+            Leave(npc, ctx);
+            return;
+        }
+        npc.Leaving = false;
         bool chasing = ctx.Target != null && ctx.TargetDistance < _p.AggroRange * Units.CellSize;
         Vector3 dir;
-        if (chasing && !(_p.FleeDaylight && ctx.IsDay && ctx.OnSurface))
+        if (chasing)
         {
             dir = BrainFactory.Flat(ctx.Target!.Position - npc.Position);
             npc.TargetPlayer = 0;
@@ -71,16 +77,12 @@ public sealed class WalkerBrain : IBrain
         else
         {
             npc.TargetPlayer = -1;
-            if (chasing) dir = -BrainFactory.Flat(ctx.Target!.Position - npc.Position); // flee the light
-            else
+            if (--npc.Timer <= 0 || npc.Direction == Vector3.Zero)
             {
-                if (--npc.Timer <= 0 || npc.Direction == Vector3.Zero)
-                {
-                    npc.Timer = 120 + ctx.Rng.NextInt(240);
-                    npc.Direction = _p.Wander && ctx.Rng.Chance(0.7f) ? SlimeHopBrain.RandomDir(ref ctx.Rng) : Vector3.Zero;
-                }
-                dir = npc.Direction;
+                npc.Timer = 120 + ctx.Rng.NextInt(240);
+                npc.Direction = _p.Wander && ctx.Rng.Chance(0.7f) ? SlimeHopBrain.RandomDir(ref ctx.Rng) : Vector3.Zero;
             }
+            dir = npc.Direction;
         }
         float speed = npc.Def.MoveSpeed * (chasing ? 1f : 0.45f);
         var target = dir * speed;
@@ -94,6 +96,42 @@ public sealed class WalkerBrain : IBrain
         {
             npc.Velocity.Y = BrainFactory.JumpVelocity(_p.JumpHeight + 0.5f);
             npc.Counter = 0;
+            npc.Pose = "jump";
+        }
+    }
+
+    /// <summary>
+    /// Dawn: give up the hunt and walk away on one heading (chosen once, away from the nearest player), jumping ledges
+    /// and turning aside at walls, until far enough to despawn. A steady retreat, not a jittery flight every tick.
+    /// </summary>
+    private void Leave(Npc npc, BrainContext ctx)
+    {
+        npc.TargetPlayer = -1;
+        if (!npc.Leaving || npc.Direction == Vector3.Zero)
+        {
+            npc.Leaving = true;
+            var away = ctx.Target != null ? BrainFactory.Flat(npc.Position - ctx.Target.Position) : Vector3.Zero;
+            npc.Direction = away != Vector3.Zero ? away : SlimeHopBrain.RandomDir(ref ctx.Rng);
+            npc.Counter2 = 0;
+        }
+        var dir = npc.Direction;
+        var target = dir * npc.Def.MoveSpeed * 0.8f;
+        float accel = npc.OnGround ? 0.25f : 0.06f;
+        npc.Velocity.X += (target.X - npc.Velocity.X) * accel;
+        npc.Velocity.Z += (target.Z - npc.Velocity.Z) * accel;
+        npc.Yaw = BrainFactory.YawOf(dir);
+        npc.Pose = "move";
+        if (npc.OnGround && npc.Counter > 0)
+        {
+            npc.Counter = 0;
+            if (++npc.Counter2 > 2)
+            {
+                // Still stuck after a few jumps: turn aside (left or right) and try that way.
+                npc.Direction = ctx.Rng.Chance(0.5f) ? new Vector3(-dir.Z, 0, dir.X) : new Vector3(dir.Z, 0, -dir.X);
+                npc.Counter2 = 0;
+                return;
+            }
+            npc.Velocity.Y = BrainFactory.JumpVelocity(_p.JumpHeight + 0.5f);
             npc.Pose = "jump";
         }
     }
@@ -127,6 +165,7 @@ public sealed class FlyerBrain : IBrain
         {
             // Dawn: climb away from the player until far enough to despawn.
             npc.TargetPlayer = -1;
+            npc.Leaving = true;
             npc.Phase = 0;
             var away = BrainFactory.Flat(npc.Center - ctx.Target!.Center);
             if (away == Vector3.Zero) away = Vector3.UnitX;
@@ -135,6 +174,7 @@ public sealed class FlyerBrain : IBrain
             npc.Pose = "move";
             return;
         }
+        npc.Leaving = false;
         if (!chasing)
         {
             npc.TargetPlayer = -1;

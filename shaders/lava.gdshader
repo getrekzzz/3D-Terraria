@@ -13,7 +13,7 @@ render_mode cull_disabled, depth_draw_opaque;
 
 global uniform float strata_time;
 uniform vec3 crust_color : source_color = vec3(0.07, 0.048, 0.042);
-uniform float glow = 1.6;
+uniform float glow = 1.4;
 
 varying vec3 v_world_pos;
 varying vec3 v_world_normal;
@@ -61,7 +61,7 @@ void fragment() {
 		vec2 q = p + drift;
 		// Temperature: broad hot rivers and cool rafts, slowly shifting; most of a lake is crusted over.
 		float temp = strata_fbm4(q * 0.13 + vec2(t * 0.012, -t * 0.009));
-		temp = clamp(mix(temp, strata_fbm3(q * 0.55 - t * 0.02), 0.3) * 1.35 - 0.3, 0.0, 1.0);
+		temp = clamp(mix(temp, strata_fbm3(q * 0.55 - t * 0.02), 0.3) * 1.35 - 0.36, 0.0, 1.0);
 		float cool = smoothstep(0.15, 0.6, 1.0 - temp);
 		// Plates at two scales, strongly warped so none are alike: big rafts split by glowing seams, each raft
 		// crazed by finer cooling fissures.
@@ -72,7 +72,7 @@ void fragment() {
 		float seam_w = mix(0.3, 0.07, cool) + px * 0.5;
 		float seam = 1.0 - smoothstep(seam_w * 0.3, seam_w, big.y - big.x);
 		float fissure = (1.0 - smoothstep(0.02 + px * 1.2, 0.06 + px * 1.5, small.y - small.x)) * cool;
-		float cover = smoothstep(0.1, 0.45, cool + (big.z - 0.5) * 0.35);
+		float cover = smoothstep(0.05, 0.38, cool + (big.z - 0.5) * 0.35);
 		crust = cover * (1.0 - seam) * (1.0 - fissure * 0.85);
 		rim = cover * smoothstep(seam_w * 2.8, seam_w * 0.6, big.y - big.x) * (1.0 - seam);
 		// Bubbles in the open melt: a skin swells, darkens, then bursts in a bright ring.

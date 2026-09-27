@@ -84,6 +84,9 @@ public sealed class Npc
     public int Phase;
     public Vector3 Direction;
 
+    /// <summary>Set by the brain: it has given up (dawn) and is walking or flying away; it despawns once out of sight.</summary>
+    public bool Leaving { get; set; }
+
     /// <summary>Set by the brain: the player it is chasing (null when idle/wandering).</summary>
     public long TargetPlayer { get; set; } = -1;
 

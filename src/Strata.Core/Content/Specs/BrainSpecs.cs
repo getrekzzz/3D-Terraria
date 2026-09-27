@@ -66,7 +66,7 @@ public sealed class WalkerParams : SpecParams
     /// <summary>Wanders when no target.</summary>
     public bool Wander { get; init; } = true;
 
-    /// <summary>Flees in daylight (undead-like) instead of burning.</summary>
+    /// <summary>Undead-like: gives up at dawn on the surface and walks away on one heading, despawning out of sight.</summary>
     public bool FleeDaylight { get; init; }
 }
 
