@@ -28,7 +28,7 @@ public sealed partial class WorldMapScreen : CanvasLayer
         _root = new Control { Visible = false, MouseFilter = Control.MouseFilterEnum.Stop };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
-        _view = new MapView { Interactive = true, Zoom = 1.5f };
+        _view = new MapView { Interactive = true, Zoom = 3f };
         _view.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _view.Initialize(ui.Game.Session.Content);
         _view.Markers = () => Markers(ui);

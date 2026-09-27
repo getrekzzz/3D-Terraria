@@ -23,7 +23,7 @@ public sealed class MapSystem
     public const string MapDirectory = "maps";
 
     private readonly GameWorld _world;
-    private readonly Dictionary<PlayerEntity, (ExploredMap Map, Int3 Last)> _maps = new();
+    private readonly Dictionary<PlayerEntity, (ExploredMap Map, Int3? Last)> _maps = new();
     private readonly ushort _air;
 
     public MapSystem(GameWorld world)
@@ -37,7 +37,7 @@ public sealed class MapSystem
     {
         if (_maps.TryGetValue(player, out var entry)) return entry.Map;
         var map = LoadOrNew(player);
-        _maps[player] = (map, new Int3(int.MinValue, 0, 0));
+        _maps[player] = (map, null);
         return map;
     }
 
@@ -53,8 +53,7 @@ public sealed class MapSystem
     {
         var map = For(player);
         var feet = player.FeetCell;
-        var last = _maps[player].Last;
-        if (!force && Math.Abs(feet.X - last.X) + Math.Abs(feet.Y - last.Y) + Math.Abs(feet.Z - last.Z) < 3) return;
+        if (!force && _maps[player].Last is { } last && Math.Abs(feet.X - last.X) + Math.Abs(feet.Y - last.Y) + Math.Abs(feet.Z - last.Z) < 3) return;
         _maps[player] = (map, feet);
         if (IsOutdoors(player)) RevealSurface(map, feet, SurfaceRadius);
         else RevealCaves(map, feet, CaveRadius);

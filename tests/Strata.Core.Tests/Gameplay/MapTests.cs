@@ -27,6 +27,20 @@ public class MapTests
     }
 
     [Fact]
+    public void PlayingRevealsTheMapWithoutBeingAsked()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        var map = g.World.Maps.For(g.Player);
+        g.Ticks(MapSystem.RevealInterval * 2);
+        int first = map.CountExplored();
+        Assert.True(first > 500, $"only {first} pixels revealed by playing");
+        g.Player.Position += new System.Numerics.Vector3(6f, 0, 0); // walk on: more comes into view
+        g.Ticks(MapSystem.RevealInterval * 2);
+        Assert.True(map.CountExplored() > first);
+    }
+
+    [Fact]
     public void UndergroundTheCaveFloorAtThePlayersDepthIsRevealed()
     {
         using var g = TestGame.Create();
