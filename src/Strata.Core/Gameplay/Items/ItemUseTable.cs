@@ -36,6 +36,9 @@ public sealed class ItemUseInfo
     public ShootProjectileParams? Shoot { get; internal set; }
     public ConsumeParams? Consume { get; internal set; }
     public SummonBossParams? Summon { get; internal set; }
+
+    /// <summary>An event the item starts instead of a boss (medallions, globes, crystals).</summary>
+    public StartEventParams? StartEvent { get; internal set; }
     public Conditions.ICondition? SummonCondition { get; internal set; }
     public BucketParams? Bucket { get; internal set; }
 
@@ -130,6 +133,11 @@ public sealed class ItemUseTable
                     a |= ItemAction.SummonBoss;
                     info.Summon = spec.Parse<SummonBossParams>();
                     info.SummonCondition = Conditions.ConditionCompiler.CompileAll(info.Summon.Conditions);
+                    break;
+                case ItemBehaviorSpecs.StartEvent:
+                    a |= ItemAction.SummonBoss;
+                    info.StartEvent = spec.Parse<StartEventParams>();
+                    info.SummonCondition = Conditions.ConditionCompiler.CompileAll(info.StartEvent.Conditions);
                     break;
                 case ItemBehaviorSpecs.Bucket:
                     a |= ItemAction.Bucket;

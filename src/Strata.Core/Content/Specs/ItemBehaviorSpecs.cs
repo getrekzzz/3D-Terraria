@@ -13,6 +13,7 @@ public static class ItemBehaviorSpecs
     public const string PlaceObject = "placeObject";
     public const string Consume = "consume";
     public const string SummonBoss = "summonBoss";
+    public const string StartEvent = "startEvent";
     public const string Bucket = "bucket";
     public const string IncinerationSummon = "incinerationSummon";
 
@@ -37,6 +38,7 @@ public static class ItemBehaviorSpecs
         c.Register<PlaceParams>(SpecKind.ItemBehavior, PlaceObject);
         c.Register<ConsumeParams>(SpecKind.ItemBehavior, Consume);
         c.Register<SummonBossParams>(SpecKind.ItemBehavior, SummonBoss);
+        c.Register<StartEventParams>(SpecKind.ItemBehavior, StartEvent);
         c.Register<BucketParams>(SpecKind.ItemBehavior, Bucket);
         c.Register<IncinerationSummonParams>(SpecKind.ItemBehavior, IncinerationSummon);
         c.Register<GrappleParams>(SpecKind.ItemBehavior, Grapple);
@@ -126,6 +128,17 @@ public sealed class FishingParams : SpecParams
 {
     /// <summary>Fishing power: faster bites and better catches (crates, rare fish).</summary>
     public int Power { get; init; } = 5;
+}
+
+/// <summary>Starts a world event (a moon, an invasion) when its conditions hold; fails while it is already running.</summary>
+public sealed class StartEventParams : SpecParams
+{
+    public string Event { get; init; } = "";
+
+    /// <summary>Conditions evaluated at the player's position.</summary>
+    public TypedSpec[] Conditions { get; init; } = Array.Empty<TypedSpec>();
+
+    public string? FailMessage { get; init; }
 }
 
 /// <summary>Summons a boss near the player when its conditions hold (e.g. night, a biome).</summary>

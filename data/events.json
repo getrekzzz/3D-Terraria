@@ -18,7 +18,7 @@
     {
       "id": "goblin_army", "name": "Goblin Army", "phase": "day", "chance": 0.12,
       "conditions": [{ "type": "flag", "id": "smashed_orb" }, { "type": "maxLife", "min": 200 }],
-      "spawnRateMultiplier": 4, "maxNearbyBonus": 8, "killGoal": 80, "killTag": "goblin", "completionFlag": "defeated_goblin_army",
+      "spawnRateMultiplier": 4, "maxNearbyBonus": 8, "killGoal": 80, "killTag": "goblin", "completionFlag": "defeated_goblin_army", "untilDefeated": true,
       "startMessage": "A goblin army is approaching!", "endMessage": "The goblin army has been defeated!",
       "covers": ["terraria:goblin_army"]
     },
@@ -28,6 +28,18 @@
       "killGoal": 4, "killTag": "celestial_pillar", "finaleEnemy": "moon_lord", "completionFlag": "defeated_pillars",
       "startMessage": "The Celestial Pillars have appeared across the land!", "endMessage": "Impending doom approaches...",
       "covers": ["terraria:lunar_events", "terraria:celestial_pillars"]
-    }
+    },
+    {"id": "solar_eclipse", "name": "Solar Eclipse", "phase": "day", "chance": 0.05, "conditions": [{"type": "any", "of": [{"type": "flag", "id": "defeated_the_twins"}, {"type": "flag", "id": "defeated_the_destroyer"}, {"type": "flag", "id": "defeated_skeletron_prime"}]}], "spawnRateMultiplier": 3, "maxNearbyBonus": 6, "skyTint": "#3a2418", "preventsSleep": true, "startMessage": "A solar eclipse is happening!", "endMessage": "The solar eclipse is over.", "covers": ["terraria:solar_eclipse"]},
+    {"id": "pumpkin_moon", "name": "Pumpkin Moon", "phase": "night", "killGoal": 250, "killTag": "pumpkin_moon", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "skyTint": "#c8601a", "preventsSleep": true, "startMessage": "The Pumpkin Moon is rising...", "endMessage": "The Pumpkin Moon has set.", "covers": ["terraria:pumpkin_moon"]},
+    {"id": "frost_moon", "name": "Frost Moon", "phase": "night", "killGoal": 250, "killTag": "frost_moon", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "skyTint": "#6a9ad8", "preventsSleep": true, "startMessage": "The Frost Moon is rising...", "endMessage": "The Frost Moon has set.", "covers": ["terraria:frost_moon"]},
+    {"id": "frost_legion", "name": "Frost Legion", "phase": "manual", "untilDefeated": true, "killGoal": 80, "killTag": "frost_legion", "completionFlag": "defeated_frost_legion", "spawnRateMultiplier": 4, "maxNearbyBonus": 8, "startMessage": "The Frost Legion has arrived!", "endMessage": "The Frost Legion has been defeated!", "covers": ["terraria:frost_legion"]},
+    {"id": "pirate_invasion", "name": "Pirate Invasion", "phase": "day", "chance": 0.04, "untilDefeated": true, "conditions": [{"type": "flag", "id": "hardmode"}, {"type": "flag", "id": "smashed_altar_1"}], "killGoal": 120, "killTag": "pirate", "completionFlag": "defeated_pirate_invasion", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "startMessage": "Pirates are approaching!", "endMessage": "The pirates have been defeated!", "covers": ["terraria:pirate_invasion"]},
+    {"id": "martian_madness", "name": "Martian Madness", "phase": "day", "chance": 0.04, "untilDefeated": true, "conditions": [{"type": "flag", "id": "defeated_golem"}], "killGoal": 150, "killTag": "martian", "completionFlag": "defeated_martians", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "skyTint": "#4a8a6a", "startMessage": "Martians are invading!", "endMessage": "The martians have been defeated!", "covers": ["terraria:martian_madness"]},
+    {"id": "old_ones_army", "name": "Old One's Army", "phase": "manual", "untilDefeated": true, "killGoal": 140, "killTag": "old_ones_army", "completionFlag": "defeated_old_ones_army", "spawnRateMultiplier": 4, "maxNearbyBonus": 10, "skyTint": "#6a4a8a", "startMessage": "The Old One's Army is approaching!", "endMessage": "The Old One's Army has been defeated!", "covers": ["terraria:old_ones_army"]},
+    {"id": "rain", "name": "Rain", "phase": "day", "chance": 0.12, "skyTint": "#5a6a78", "startMessage": "It's starting to rain.", "endMessage": "The rain has stopped.", "covers": ["terraria:rain"]},
+    {"id": "windy_day", "name": "Windy Day", "phase": "day", "chance": 0.1, "startMessage": "The wind is picking up!", "covers": ["terraria:windy_day"]},
+    {"id": "sandstorm", "name": "Sandstorm", "phase": "day", "chance": 0.06, "skyTint": "#b89a60", "startMessage": "A sandstorm is blowing in the desert!", "endMessage": "The sandstorm has passed.", "covers": ["terraria:sandstorm"]},
+    {"id": "party", "name": "Party", "phase": "day", "chance": 0.1, "conditions": [{"type": "resident", "id": "party_girl"}], "startMessage": "Party time!", "endMessage": "The party is over.", "covers": ["terraria:party"]},
+    {"id": "lantern_night", "name": "Lantern Night", "phase": "night", "chance": 0.06, "conditions": [{"type": "flag", "id": "defeated_eye_of_cthulhu"}], "skyTint": "#ffc080", "startMessage": "Lanterns are rising into the night sky!", "covers": ["terraria:lantern_night"]}
   ]
 }

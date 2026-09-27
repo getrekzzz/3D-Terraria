@@ -26,6 +26,7 @@ public sealed partial class Hud : CanvasLayer
     private HBoxContainer _buffs = null!;
     private Label _buildHint = null!;
     private VBoxContainer _toasts = null!;
+    private VBoxContainer _announcements = null!;
     private Label _death = null!;
     private Crosshair _crosshair = null!;
     private Label _targetName = null!;
@@ -84,6 +85,11 @@ public sealed partial class Hud : CanvasLayer
         _toasts.GrowHorizontal = Control.GrowDirection.Begin;
         _toasts.OffsetRight = -24;
         root.AddChild(_toasts);
+        _announcements = new VBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore };
+        _announcements.SetAnchorsPreset(Control.LayoutPreset.CenterTop);
+        _announcements.GrowHorizontal = Control.GrowDirection.Both;
+        _announcements.OffsetTop = 120;
+        root.AddChild(_announcements);
 
         _crosshair = new Crosshair { MouseFilter = Control.MouseFilterEnum.Ignore };
         _crosshair.SetAnchorsPreset(Control.LayoutPreset.Center);
@@ -274,13 +280,12 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>Large centred message (events, bosses) that fades after a few seconds.</summary>
     public void Announce(string text, Color color)
     {
+        // Messages stack downwards instead of printing over one another.
         var label = new Label { Text = text, HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = Control.MouseFilterEnum.Ignore };
-        label.SetAnchorsPreset(Control.LayoutPreset.CenterTop);
-        label.GrowHorizontal = Control.GrowDirection.Both;
-        label.OffsetTop = 120;
         label.AddThemeFontSizeOverride("font_size", 30);
         label.AddThemeColorOverride("font_color", color);
-        _death.GetParent().AddChild(label);
+        _announcements.AddChild(label);
+        while (_announcements.GetChildCount() > 4) _announcements.GetChild(0).Free();
         var tween = label.CreateTween();
         tween.TweenInterval(4.0);
         tween.TweenProperty(label, "modulate:a", 0.0, 1.5);

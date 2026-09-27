@@ -150,6 +150,38 @@ nebula_floater|Nebula Floater|endgame|nebula pillar|caster
 flow_invader|Flow Invader|endgame|stardust pillar|flyer
 twinkle_popper|Twinkle Popper|endgame|stardust pillar|hopper
 true_eye_of_cthulhu|True Eye of Cthulhu|endgame|moon lord|flyer
+swamp_thing|Swamp Thing|post-mech|eclipse|walker
+vampire|Vampire|post-mech|eclipse|walker
+butcher|Butcher|post-plantera|eclipse|walker
+deadly_sphere|Deadly Sphere|post-plantera|eclipse|flyer
+splinterling|Splinterling|post-plantera|pumpkin moon|walker
+hellhound|Hellhound|post-plantera|pumpkin moon|walker
+poltergeist|Poltergeist|post-plantera|pumpkin moon|flyer
+headless_horseman|Headless Horseman|post-plantera|pumpkin moon|walker
+zombie_elf|Zombie Elf|post-plantera|frost moon|walker
+nutcracker|Nutcracker|post-plantera|frost moon|walker
+yeti|Yeti|post-plantera|frost moon|walker
+krampus|Krampus|post-plantera|frost moon|walker
+flocko|Flocko|post-plantera|frost moon|flyer
+elf_copter|Elf Copter|post-plantera|frost moon|flyer
+present_mimic|Present Mimic|post-plantera|frost moon|hop
+mister_stabby|Mister Stabby|hardmode|frost legion|walker
+snowman_gangsta|Snowman Gangsta|hardmode|frost legion|ranged
+snow_balla|Snow Balla|hardmode|frost legion|ranged
+pirate_corsair|Pirate Corsair|hardmode|pirates|walker
+pirate_deadeye|Pirate Deadeye|hardmode|pirates|ranged
+pirate_crossbower|Pirate Crossbower|hardmode|pirates|ranged
+parrot|Parrot|hardmode|pirates|flyer
+ray_gunner|Ray Gunner|post-golem|martians|ranged
+gigazapper|Gigazapper|post-golem|martians|walker
+martian_officer|Martian Officer|post-golem|martians|ranged
+martian_drone|Martian Drone|post-golem|martians|flyer
+etherian_goblin_bomber|Etherian Goblin Bomber|prehardmode|old one's army|ranged
+etherian_javelin_thrower|Etherian Javelin Thrower|prehardmode|old one's army|ranged
+kobold|Kobold|prehardmode|old one's army|walker
+etherian_wyvern|Etherian Wyvern|prehardmode|old one's army|flyer
+wither_beast|Wither Beast|hardmode|old one's army|walker
+drakin|Drakin|hardmode|old one's army|walker
 etherian_goblin|Etherian Goblin|prehardmode|old one's army|walker
 servant_of_cthulhu|Servant of Cthulhu|early|eye of cthulhu|flyer,minion
 """

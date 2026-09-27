@@ -21,6 +21,7 @@ public sealed partial class WorldSession
         ctx.MoonPhase = Clock.MoonPhase;
         ctx.Flags = Flags;
         ctx.Events = Events;
+        ctx.EventKills = EventKills;
         ctx.Difficulty = (int)Settings.Difficulty;
         ctx.Evil = Settings.Evil.ToString().ToLowerInvariant();
         return ctx;

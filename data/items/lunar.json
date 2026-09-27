@@ -115,6 +115,6 @@
     {"id": "nebula_blaze", "output": "nebula_blaze", "inputs": [{"item": "nebula_fragment", "count": 18}], "stations": ["ancient_manipulator"]},
     {"id": "stardust_cell_staff", "output": "stardust_cell_staff", "inputs": [{"item": "stardust_fragment", "count": 18}], "stations": ["ancient_manipulator"]},
     {"id": "stardust_dragon_staff", "output": "stardust_dragon_staff", "inputs": [{"item": "stardust_fragment", "count": 18}], "stations": ["ancient_manipulator"]},
-    {"id": "zenith", "output": "zenith", "inputs": [{"item": "terra_blade", "count": 1}, {"item": "meowmere", "count": 1}, {"item": "star_wrath", "count": 1}, {"item": "seedler", "count": 1}, {"item": "starfury", "count": 1}, {"item": "bee_keeper", "count": 1}, {"item": "enchanted_sword", "count": 1}, {"item": "copper_shortsword", "count": 1}], "stations": ["tinkerers_workshop"]}
+    {"id": "zenith", "output": "zenith", "inputs": [{"item": "terra_blade", "count": 1}, {"item": "meowmere", "count": 1}, {"item": "star_wrath", "count": 1}, {"item": "seedler", "count": 1}, {"item": "starfury", "count": 1}, {"item": "bee_keeper", "count": 1}, {"item": "enchanted_sword", "count": 1}, {"item": "copper_shortsword", "count": 1}, {"item": "influx_waver", "count": 1}, {"item": "the_horsemans_blade", "count": 1}], "stations": ["tinkerers_workshop"]}
   ]
 }

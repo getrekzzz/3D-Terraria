@@ -32,6 +32,9 @@ public sealed class ConditionContext
 
     public IReadOnlySet<string> Flags { get; set; } = Empty;
     public IReadOnlySet<string> Events { get; set; } = Empty;
+
+    /// <summary>Kills counted so far by each active event (its waves).</summary>
+    public IReadOnlyDictionary<string, int> EventKills { get; set; } = new Dictionary<string, int>();
     public IReadOnlySet<string> NearbyLiquids { get; set; } = Empty;
 
     /// <summary>Copper value of the coins the (richest) player carries.</summary>

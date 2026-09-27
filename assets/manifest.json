@@ -469,6 +469,10 @@
    "model": "assets/models/items/bass.glb",
    "icon": "assets/icons/items/bass.png"
   },
+  "bat_scepter": {
+   "model": "assets/models/items/bat_scepter.glb",
+   "icon": "assets/icons/items/bat_scepter.png"
+  },
   "bed": {
    "object": "bed",
    "icon": "assets/icons/items/bed.png"
@@ -509,6 +513,14 @@
    "model": "assets/models/items/beetle_shell.glb",
    "icon": "assets/icons/items/beetle_shell.png"
   },
+  "betsy_wings": {
+   "model": "assets/models/items/betsy_wings.glb",
+   "icon": "assets/icons/items/betsy_wings.png"
+  },
+  "betsys_wrath": {
+   "model": "assets/models/items/betsys_wrath.glb",
+   "icon": "assets/icons/items/betsys_wrath.png"
+  },
   "blade_of_grass": {
    "model": "assets/models/items/blade_of_grass.glb",
    "icon": "assets/icons/items/blade_of_grass.png"
@@ -520,6 +532,10 @@
   "blizzard_in_a_bottle": {
    "model": "assets/models/items/blizzard_in_a_bottle.glb",
    "icon": "assets/icons/items/blizzard_in_a_bottle.png"
+  },
+  "blizzard_staff": {
+   "model": "assets/models/items/blizzard_staff.glb",
+   "icon": "assets/icons/items/blizzard_staff.png"
   },
   "bloody_spine": {
    "model": "assets/models/items/bloody_spine.glb",
@@ -557,6 +573,10 @@
    "model": "assets/models/items/breaker_blade.glb",
    "icon": "assets/icons/items/breaker_blade.png"
   },
+  "broken_hero_sword": {
+   "model": "assets/models/items/broken_hero_sword.glb",
+   "icon": "assets/icons/items/broken_hero_sword.png"
+  },
   "bubble_gun": {
    "model": "assets/models/items/bubble_gun.glb",
    "icon": "assets/icons/items/bubble_gun.png"
@@ -585,6 +605,10 @@
    "model": "assets/models/items/cell_phone.glb",
    "icon": "assets/icons/items/cell_phone.png"
   },
+  "chain_gun": {
+   "model": "assets/models/items/chain_gun.glb",
+   "icon": "assets/icons/items/chain_gun.png"
+  },
   "chlorophyte_bar": {
    "model": "assets/models/items/chlorophyte_bar.glb",
    "icon": "assets/icons/items/chlorophyte_bar.png"
@@ -604,6 +628,10 @@
   "chlorophyte_plate_mail": {
    "model": "assets/models/items/chlorophyte_plate_mail.glb",
    "icon": "assets/icons/items/chlorophyte_plate_mail.png"
+  },
+  "christmas_tree_sword": {
+   "model": "assets/models/items/christmas_tree_sword.glb",
+   "icon": "assets/icons/items/christmas_tree_sword.png"
   },
   "clockwork_assault_rifle": {
    "model": "assets/models/items/clockwork_assault_rifle.glb",
@@ -793,6 +821,10 @@
    "model": "assets/models/items/cursed_flames.glb",
    "icon": "assets/icons/items/cursed_flames.png"
   },
+  "cutlass": {
+   "model": "assets/models/items/cutlass.glb",
+   "icon": "assets/icons/items/cutlass.png"
+  },
   "daedalus_stormbow": {
    "model": "assets/models/items/daedalus_stormbow.glb",
    "icon": "assets/icons/items/daedalus_stormbow.png"
@@ -804,6 +836,14 @@
   "daybreak": {
    "model": "assets/models/items/daybreak.glb",
    "icon": "assets/icons/items/daybreak.png"
+  },
+  "deadly_sphere_staff": {
+   "model": "assets/models/items/deadly_sphere_staff.glb",
+   "icon": "assets/icons/items/deadly_sphere_staff.png"
+  },
+  "death_sickle": {
+   "model": "assets/models/items/death_sickle.glb",
+   "icon": "assets/icons/items/death_sickle.png"
   },
   "deer_thing": {
    "model": "assets/models/items/deer_thing.glb",
@@ -885,6 +925,10 @@
    "model": "assets/models/items/ebonkoi.glb",
    "icon": "assets/icons/items/ebonkoi.png"
   },
+  "elf_melter": {
+   "model": "assets/models/items/elf_melter.glb",
+   "icon": "assets/icons/items/elf_melter.png"
+  },
   "emerald": {
    "model": "assets/models/items/emerald.glb",
    "icon": "assets/icons/items/emerald.png"
@@ -912,6 +956,10 @@
   "enchanted_sword": {
    "model": "assets/models/items/enchanted_sword.glb",
    "icon": "assets/icons/items/enchanted_sword.png"
+  },
+  "eternia_crystal": {
+   "model": "assets/models/items/eternia_crystal.glb",
+   "icon": "assets/icons/items/eternia_crystal.png"
   },
   "excalibur": {
    "model": "assets/models/items/excalibur.glb",
@@ -984,6 +1032,10 @@
   "flower_pow": {
    "model": "assets/models/items/flower_pow.glb",
    "icon": "assets/icons/items/flower_pow.png"
+  },
+  "flying_dragon": {
+   "model": "assets/models/items/flying_dragon.glb",
+   "icon": "assets/icons/items/flying_dragon.png"
   },
   "furnace": {
    "object": "furnace",
@@ -1209,6 +1261,10 @@
    "model": "assets/models/items/imp_staff.glb",
    "icon": "assets/icons/items/imp_staff.png"
   },
+  "influx_waver": {
+   "model": "assets/models/items/influx_waver.glb",
+   "icon": "assets/icons/items/influx_waver.png"
+  },
   "iron_anvil": {
    "object": "iron_anvil",
    "icon": "assets/icons/items/iron_anvil.png"
@@ -1276,6 +1332,10 @@
   "katana": {
    "model": "assets/models/items/katana.glb",
    "icon": "assets/icons/items/katana.png"
+  },
+  "laser_machinegun": {
+   "model": "assets/models/items/laser_machinegun.glb",
+   "icon": "assets/icons/items/laser_machinegun.png"
   },
   "laser_rifle": {
    "model": "assets/models/items/laser_rifle.glb",
@@ -1465,6 +1525,10 @@
    "model": "assets/models/items/minishark.glb",
    "icon": "assets/icons/items/minishark.png"
   },
+  "mothron_wings": {
+   "model": "assets/models/items/mothron_wings.glb",
+   "icon": "assets/icons/items/mothron_wings.png"
+  },
   "muramasa": {
    "model": "assets/models/items/muramasa.glb",
    "icon": "assets/icons/items/muramasa.png"
@@ -1541,6 +1605,10 @@
    "model": "assets/models/items/natures_gift.glb",
    "icon": "assets/icons/items/natures_gift.png"
   },
+  "naughty_present": {
+   "model": "assets/models/items/naughty_present.glb",
+   "icon": "assets/icons/items/naughty_present.png"
+  },
   "nebula_arcanum": {
    "model": "assets/models/items/nebula_arcanum.glb",
    "icon": "assets/icons/items/nebula_arcanum.png"
@@ -1581,6 +1649,10 @@
    "model": "assets/models/items/nebula_pickaxe.glb",
    "icon": "assets/icons/items/nebula_pickaxe.png"
   },
+  "necromantic_scroll": {
+   "model": "assets/models/items/necromantic_scroll.glb",
+   "icon": "assets/icons/items/necromantic_scroll.png"
+  },
   "neon_tetra": {
    "model": "assets/models/items/neon_tetra.glb",
    "icon": "assets/icons/items/neon_tetra.png"
@@ -1592,6 +1664,10 @@
   "nights_edge": {
    "model": "assets/models/items/nights_edge.glb",
    "icon": "assets/icons/items/nights_edge.png"
+  },
+  "north_pole": {
+   "model": "assets/models/items/north_pole.glb",
+   "icon": "assets/icons/items/north_pole.png"
   },
   "obsidian_shield": {
    "model": "assets/models/items/obsidian_shield.glb",
@@ -1729,6 +1805,10 @@
    "model": "assets/models/items/picksaw.glb",
    "icon": "assets/icons/items/picksaw.png"
   },
+  "pirate_staff": {
+   "model": "assets/models/items/pirate_staff.glb",
+   "icon": "assets/icons/items/pirate_staff.png"
+  },
   "pixie_dust": {
    "model": "assets/models/items/pixie_dust.glb",
    "icon": "assets/icons/items/pixie_dust.png"
@@ -1789,6 +1869,10 @@
    "model": "assets/models/items/prismite.glb",
    "icon": "assets/icons/items/prismite.png"
   },
+  "pumpkin_moon_medallion": {
+   "model": "assets/models/items/pumpkin_moon_medallion.glb",
+   "icon": "assets/icons/items/pumpkin_moon_medallion.png"
+  },
   "pwnhammer": {
    "model": "assets/models/items/pwnhammer.glb",
    "icon": "assets/icons/items/pwnhammer.png"
@@ -1817,9 +1901,17 @@
    "model": "assets/models/items/ranger_emblem.glb",
    "icon": "assets/icons/items/ranger_emblem.png"
   },
+  "raven_staff": {
+   "model": "assets/models/items/raven_staff.glb",
+   "icon": "assets/icons/items/raven_staff.png"
+  },
   "razorblade_typhoon_book": {
    "model": "assets/models/items/razorblade_typhoon_book.glb",
    "icon": "assets/icons/items/razorblade_typhoon_book.png"
+  },
+  "razorpine": {
+   "model": "assets/models/items/razorpine.glb",
+   "icon": "assets/icons/items/razorpine.png"
   },
   "reaver_shark": {
    "model": "assets/models/items/reaver_shark.glb",
@@ -2012,6 +2104,14 @@
   "snapthorn": {
    "model": "assets/models/items/snapthorn.glb",
    "icon": "assets/icons/items/snapthorn.png"
+  },
+  "snow_globe": {
+   "model": "assets/models/items/snow_globe.glb",
+   "icon": "assets/icons/items/snow_globe.png"
+  },
+  "snowman_cannon": {
+   "model": "assets/models/items/snowman_cannon.glb",
+   "icon": "assets/icons/items/snowman_cannon.png"
   },
   "solar_eruption": {
    "model": "assets/models/items/solar_eruption.glb",
@@ -2224,6 +2324,10 @@
   "the_axe": {
    "model": "assets/models/items/the_axe.glb",
    "icon": "assets/icons/items/the_axe.png"
+  },
+  "the_horsemans_blade": {
+   "model": "assets/models/items/the_horsemans_blade.glb",
+   "icon": "assets/icons/items/the_horsemans_blade.png"
   },
   "the_rotted_fork": {
    "model": "assets/models/items/the_rotted_fork.glb",
@@ -2581,6 +2685,10 @@
    "model": "assets/models/items/worm_scarf.glb",
    "icon": "assets/icons/items/worm_scarf.png"
   },
+  "xenopopper": {
+   "model": "assets/models/items/xenopopper.glb",
+   "icon": "assets/icons/items/xenopopper.png"
+  },
   "zenith": {
    "model": "assets/models/items/zenith.glb",
    "icon": "assets/icons/items/zenith.png"
@@ -2631,6 +2739,11 @@
     "fly"
    ]
   },
+  "betsy": {
+   "model": "assets/models/creatures/betsy.glb",
+   "generator": "dragon",
+   "animations": []
+  },
   "blood_crawler": {
    "model": "assets/models/creatures/blood_crawler.glb",
    "generator": "crab",
@@ -2653,6 +2766,21 @@
    "model": "assets/models/creatures/brain_suckler.glb",
    "generator": "brain",
    "animations": []
+  },
+  "butcher": {
+   "model": "assets/models/creatures/butcher.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   },
   "cave_bat": {
    "model": "assets/models/creatures/cave_bat.glb",
@@ -2761,6 +2889,21 @@
     "walk"
    ]
   },
+  "dark_mage": {
+   "model": "assets/models/creatures/dark_mage.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "deerclops": {
    "model": "assets/models/creatures/deerclops.glb",
    "generator": "humanoid",
@@ -2795,6 +2938,14 @@
    "model": "assets/models/creatures/demon_eye.glb",
    "generator": "eye",
    "animations": []
+  },
+  "drakin": {
+   "model": "assets/models/creatures/drakin.glb",
+   "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
+   ]
   },
   "drakomire": {
    "model": "assets/models/creatures/drakomire.glb",
@@ -2869,12 +3020,47 @@
    "generator": "worm_segment",
    "animations": []
   },
+  "elf_archer": {
+   "model": "assets/models/creatures/elf_archer.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "empress_of_light": {
    "model": "assets/models/creatures/empress_of_light.glb",
    "generator": "sprite",
    "animations": [
     "fly"
    ]
+  },
+  "etherian_goblin": {
+   "model": "assets/models/creatures/etherian_goblin.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "everscream": {
+   "model": "assets/models/creatures/everscream.glb",
+   "generator": "haunted_tree",
+   "animations": []
   },
   "eye_of_cthulhu": {
    "model": "assets/models/creatures/eye_of_cthulhu.glb",
@@ -2885,6 +3071,21 @@
    "model": "assets/models/creatures/eye_of_cthulhu_mouth.glb",
    "generator": "watcher_maw",
    "animations": []
+  },
+  "eyezor": {
+   "model": "assets/models/creatures/eyezor.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   },
   "face_monster": {
    "model": "assets/models/creatures/face_monster.glb",
@@ -2917,6 +3118,11 @@
     "idle"
    ]
   },
+  "flying_dutchman": {
+   "model": "assets/models/creatures/flying_dutchman.glb",
+   "generator": "ghost_ship",
+   "animations": []
+  },
   "flying_snake": {
    "model": "assets/models/creatures/flying_snake.glb",
    "generator": "bird",
@@ -2925,10 +3131,55 @@
     "idle"
    ]
   },
+  "frankenstein": {
+   "model": "assets/models/creatures/frankenstein.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "gel": {
    "model": "assets/models/creatures/gel.glb",
    "generator": "gel",
    "animations": []
+  },
+  "gigazapper": {
+   "model": "assets/models/creatures/gigazapper.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "gingerbread_man": {
+   "model": "assets/models/creatures/gingerbread_man.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   },
   "goblin_archer": {
    "model": "assets/models/creatures/goblin_archer.glb",
@@ -3070,11 +3321,42 @@
     "walk"
    ]
   },
+  "headless_horseman": {
+   "model": "assets/models/creatures/headless_horseman.glb",
+   "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "hellhound": {
+   "model": "assets/models/creatures/hellhound.glb",
+   "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
   "hornet": {
    "model": "assets/models/creatures/hornet.glb",
    "generator": "insect",
    "animations": [
     "fly"
+   ]
+  },
+  "ice_queen": {
+   "model": "assets/models/creatures/ice_queen.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
    ]
   },
   "imp": {
@@ -3104,6 +3386,36 @@
    "model": "assets/models/creatures/king_slime.glb",
    "generator": "gel_sovereign",
    "animations": []
+  },
+  "kobold": {
+   "model": "assets/models/creatures/kobold.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "krampus": {
+   "model": "assets/models/creatures/krampus.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   },
   "lacewing": {
    "model": "assets/models/creatures/lacewing.glb",
@@ -3165,6 +3477,31 @@
     "idle"
    ]
   },
+  "martian_officer": {
+   "model": "assets/models/creatures/martian_officer.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "martian_saucer": {
+   "model": "assets/models/creatures/martian_saucer.glb",
+   "generator": "saucer",
+   "animations": []
+  },
+  "martian_walker": {
+   "model": "assets/models/creatures/martian_walker.glb",
+   "generator": "mech_walker",
+   "animations": []
+  },
   "mechanic": {
    "model": "assets/models/creatures/mechanic.glb",
    "generator": "humanoid",
@@ -3195,6 +3532,11 @@
     "walk"
    ]
   },
+  "mister_stabby": {
+   "model": "assets/models/creatures/mister_stabby.glb",
+   "generator": "snowman",
+   "animations": []
+  },
   "moon_lord": {
    "model": "assets/models/creatures/moon_lord.glb",
    "generator": "moon_lord",
@@ -3208,6 +3550,18 @@
   "moon_lord_head": {
    "model": "assets/models/creatures/moon_lord_head.glb",
    "generator": "moon_lord_head",
+   "animations": []
+  },
+  "mothron": {
+   "model": "assets/models/creatures/mothron.glb",
+   "generator": "insect",
+   "animations": [
+    "fly"
+   ]
+  },
+  "mourning_wood": {
+   "model": "assets/models/creatures/mourning_wood.glb",
+   "generator": "haunted_tree",
    "animations": []
   },
   "mysterious_tablet": {
@@ -3230,6 +3584,36 @@
   },
   "nurse": {
    "model": "assets/models/creatures/nurse.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "nutcracker": {
+   "model": "assets/models/creatures/nutcracker.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "ogre": {
+   "model": "assets/models/creatures/ogre.glb",
    "generator": "humanoid",
    "animations": [
     "death",
@@ -3290,6 +3674,81 @@
   },
   "pirate": {
    "model": "assets/models/creatures/pirate.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "pirate_captain": {
+   "model": "assets/models/creatures/pirate_captain.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "pirate_corsair": {
+   "model": "assets/models/creatures/pirate_corsair.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "pirate_crossbower": {
+   "model": "assets/models/creatures/pirate_crossbower.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "pirate_deadeye": {
+   "model": "assets/models/creatures/pirate_deadeye.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "pirate_deckhand": {
+   "model": "assets/models/creatures/pirate_deckhand.glb",
    "generator": "humanoid",
    "animations": [
     "death",
@@ -3477,6 +3936,11 @@
     "fly"
    ]
   },
+  "present_mimic": {
+   "model": "assets/models/creatures/present_mimic.glb",
+   "generator": "present",
+   "animations": []
+  },
   "prime_cannon": {
    "model": "assets/models/creatures/prime_cannon.glb",
    "generator": "prime_arm",
@@ -3517,6 +3981,11 @@
    "generator": "serpent",
    "animations": []
   },
+  "pumpking": {
+   "model": "assets/models/creatures/pumpking.glb",
+   "generator": "pumpkin_lord",
+   "animations": []
+  },
   "queen_bee": {
    "model": "assets/models/creatures/queen_bee.glb",
    "generator": "insect",
@@ -3528,6 +3997,36 @@
    "model": "assets/models/creatures/queen_slime.glb",
    "generator": "gel_sovereign",
    "animations": []
+  },
+  "ray_gunner": {
+   "model": "assets/models/creatures/ray_gunner.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "reaper": {
+   "model": "assets/models/creatures/reaper.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   },
   "retinazer": {
    "model": "assets/models/creatures/retinazer.glb",
@@ -3541,6 +4040,26 @@
   },
   "santa_claus": {
    "model": "assets/models/creatures/santa_claus.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "santa_nk1": {
+   "model": "assets/models/creatures/santa_nk1.glb",
+   "generator": "tank",
+   "animations": []
+  },
+  "scarecrow": {
+   "model": "assets/models/creatures/scarecrow.glb",
    "generator": "humanoid",
    "animations": [
     "death",
@@ -3614,6 +4133,16 @@
    "generator": "prime_skull",
    "animations": []
   },
+  "snow_balla": {
+   "model": "assets/models/creatures/snow_balla.glb",
+   "generator": "snowman",
+   "animations": []
+  },
+  "snowman_gangsta": {
+   "model": "assets/models/creatures/snowman_gangsta.glb",
+   "generator": "snowman",
+   "animations": []
+  },
   "solar_pillar": {
    "model": "assets/models/creatures/solar_pillar.glb",
    "generator": "celestial_pillar",
@@ -3628,6 +4157,21 @@
    "model": "assets/models/creatures/spazmatism_open.glb",
    "generator": "mech_eye",
    "animations": []
+  },
+  "splinterling": {
+   "model": "assets/models/creatures/splinterling.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
   },
   "stardust_pillar": {
    "model": "assets/models/creatures/stardust_pillar.glb",
@@ -3694,6 +4238,21 @@
     "walk"
    ]
   },
+  "swamp_thing": {
+   "model": "assets/models/creatures/swamp_thing.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "tavernkeep": {
    "model": "assets/models/creatures/tavernkeep.glb",
    "generator": "humanoid",
@@ -3723,6 +4282,11 @@
     "use",
     "walk"
    ]
+  },
+  "tesla_turret": {
+   "model": "assets/models/creatures/tesla_turret.glb",
+   "generator": "tesla_turret",
+   "animations": []
   },
   "the_destroyer_body": {
    "model": "assets/models/creatures/the_destroyer_body.glb",
@@ -3787,6 +4351,21 @@
     "walk"
    ]
   },
+  "vampire": {
+   "model": "assets/models/creatures/vampire.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "vortex_pillar": {
    "model": "assets/models/creatures/vortex_pillar.glb",
    "generator": "celestial_pillar",
@@ -3845,6 +4424,14 @@
     "walk"
    ]
   },
+  "wither_beast": {
+   "model": "assets/models/creatures/wither_beast.glb",
+   "generator": "steed",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
   "wizard": {
    "model": "assets/models/creatures/wizard.glb",
    "generator": "humanoid",
@@ -3890,8 +4477,38 @@
    "generator": "worm_segment",
    "animations": []
   },
+  "yeti": {
+   "model": "assets/models/creatures/yeti.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
   "zombie": {
    "model": "assets/models/creatures/zombie.glb",
+   "generator": "humanoid",
+   "animations": [
+    "death",
+    "fall",
+    "hurt",
+    "idle",
+    "jump",
+    "run",
+    "swing",
+    "use",
+    "walk"
+   ]
+  },
+  "zombie_elf": {
+   "model": "assets/models/creatures/zombie_elf.glb",
    "generator": "humanoid",
    "animations": [
     "death",

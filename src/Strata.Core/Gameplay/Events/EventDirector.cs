@@ -127,6 +127,7 @@ public sealed class EventDirector
     {
         var session = _world.Session;
         var ctx = session.ContextAt(session.SpawnCell);
+        ctx.Residents = _world.Town.Residents.Where(r => r.Alive).Select(r => r.Def.Id).ToHashSet(); // a party needs its host
         foreach (var def in session.Content.Events.All)
         {
             if (def.Phase != phase || def.Chance <= 0 || IsActive(def.Id)) continue;
@@ -139,7 +140,8 @@ public sealed class EventDirector
 
     private void EndPhase(EventPhase phase)
     {
-        foreach (var a in _active.Where(a => a.Def.Phase == phase && a.TicksLeft < 0).ToList()) End(a, completed: a.Def.KillGoal == 0);
+        foreach (var a in _active.Where(a => a.Def.Phase == phase && a.TicksLeft < 0 && !(a.Def.UntilDefeated && a.Def.KillGoal > 0)).ToList())
+            End(a, completed: a.Def.KillGoal == 0);
     }
 
     private void OnKilled(Npc npc)
@@ -147,7 +149,8 @@ public sealed class EventDirector
         foreach (var a in _active.ToList())
         {
             if (a.Def.KillGoal <= 0 || a.Def.KillTag == null || !npc.Def.HasTag(a.Def.KillTag)) continue;
-            if (++a.Kills < a.Def.KillGoal) continue;
+            _world.Session.EventKills[a.Def.Id] = ++a.Kills;
+            if (a.Kills < a.Def.KillGoal) continue;
             if (a.Def.FinaleEnemy != null && _world.LocalPlayer is { } p && _world.Session.Content.Enemies.TryGet(a.Def.FinaleEnemy, out var boss))
                 _world.Npcs.Spawn(boss, p.Position + new System.Numerics.Vector3(0, 12f, 0));
             End(a, completed: true);
@@ -185,12 +188,14 @@ public sealed class EventDirector
     {
         _active.Add(a);
         _world.Session.Events.Add(a.Def.Id);
+        _world.Session.EventKills[a.Def.Id] = a.Kills;
     }
 
     private void End(ActiveEvent a, bool completed)
     {
         _active.Remove(a);
         _world.Session.Events.Remove(a.Def.Id);
+        _world.Session.EventKills.Remove(a.Def.Id);
         if (completed && a.Def.CompletionFlag != null) _world.Progression.Set(a.Def.CompletionFlag);
         if (a.Def.EndMessage != null) Announced?.Invoke(a.Def.EndMessage, a.Def);
         Ended?.Invoke(a.Def);

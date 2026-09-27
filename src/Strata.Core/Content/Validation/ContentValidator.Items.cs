@@ -28,6 +28,12 @@ public static partial class ContentValidator
                 if (b.Raw.TryGetProperty("conditions", out var conds) && conds.ValueKind == System.Text.Json.JsonValueKind.Array)
                     ctx.Specs(i, Specs.SpecKind.Condition, conds.EnumerateArray().Select(c => new TypedSpec(c.GetProperty("type").GetString()!, c.Clone())), "summonBoss.conditions");
             }
+            foreach (var b in i.Behaviors.Where(b => b.Type == Specs.ItemBehaviorSpecs.StartEvent))
+                if (ctx.TryParse<Specs.StartEventParams>(SpecKind.ItemBehavior, b) is { } start)
+                {
+                    ctx.Ref(i, ctx.Db.Events, start.Event, "startEvent.event");
+                    ctx.Specs(i, Specs.SpecKind.Condition, start.Conditions, "startEvent.conditions");
+                }
             foreach (var b in i.Behaviors.Where(b => b.Type == Specs.ItemBehaviorSpecs.IncinerationSummon))
                 if (ctx.TryParse<Specs.IncinerationSummonParams>(SpecKind.ItemBehavior, b) is { } burn)
                 {

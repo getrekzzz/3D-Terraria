@@ -44,6 +44,9 @@ public sealed class EventConditionParams : SpecParams
 {
     public string Id { get; init; } = "";
     public bool Active { get; init; } = true;
+
+    /// <summary>Holds only once the running event has counted at least this many kills (its later waves).</summary>
+    public int MinKills { get; init; }
 }
 
 public sealed class RangeConditionParams : SpecParams

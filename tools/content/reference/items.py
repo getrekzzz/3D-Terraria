@@ -106,6 +106,33 @@ katana|Katana|early|travelling merchant
 mushroom_spear|Mushroom Spear|hardmode|truffle
 hammush|Hammush|hardmode|truffle
 autohammer|Autohammer|hardmode|truffle
+broken_hero_sword|Broken Hero Sword|post-plantera|mothron
+mothron_wings|Mothron Wings|post-plantera|mothron
+death_sickle|Death Sickle|post-plantera|reaper
+deadly_sphere_staff|Deadly Sphere Staff|post-plantera|deadly sphere
+pumpkin_moon_medallion|Pumpkin Moon Medallion|post-plantera|craft
+necromantic_scroll|Necromantic Scroll|post-plantera|mourning wood
+the_horsemans_blade|The Horseman's Blade|post-plantera|pumpking
+bat_scepter|Bat Scepter|post-plantera|pumpking
+raven_staff|Raven Staff|post-plantera|pumpking
+naughty_present|Naughty Present|post-plantera|craft
+razorpine|Razorpine|post-plantera|everscream
+christmas_tree_sword|Christmas Tree Sword|post-plantera|everscream
+elf_melter|Elf Melter|post-plantera|santa-nk1
+chain_gun|Chain Gun|post-plantera|santa-nk1
+north_pole|North Pole|post-plantera|ice queen
+blizzard_staff|Blizzard Staff|post-plantera|ice queen
+snowman_cannon|Snowman Cannon|post-plantera|ice queen
+snow_globe|Snow Globe|hardmode|present
+cutlass|Cutlass|hardmode|pirates
+pirate_staff|Pirate Staff|hardmode|flying dutchman
+influx_waver|Influx Waver|post-golem|martian saucer
+xenopopper|Xenopopper|post-golem|martian saucer
+laser_machinegun|Laser Machinegun|post-golem|martian saucer
+eternia_crystal|Eternia Crystal|prehardmode|tavernkeep
+betsys_wrath|Betsy's Wrath|post-golem|betsy
+flying_dragon|Flying Dragon|post-golem|betsy
+betsy_wings|Betsy's Wings|post-golem|betsy
 last_prism|Last Prism|endgame|moon lord
 lunar_flare|Lunar Flare|endgame|moon lord
 stardust_dragon_staff|Stardust Dragon Staff|endgame|craft

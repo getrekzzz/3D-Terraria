@@ -48,7 +48,8 @@ public static class ConditionCompiler
         ["event"] = s =>
         {
             var p = s.Parse<EventConditionParams>();
-            return new DelegateCondition(c => c.Events.Contains(p.Id) == p.Active);
+            if (p.MinKills <= 0) return new DelegateCondition(c => c.Events.Contains(p.Id) == p.Active);
+            return new DelegateCondition(c => c.Events.Contains(p.Id) && c.EventKills.TryGetValue(p.Id, out int k) && k >= p.MinKills);
         },
         ["depth"] = s =>
         {

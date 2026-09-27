@@ -71,6 +71,9 @@ public sealed partial class WorldSession
     /// <summary>Ids of running world events (maintained by the event director).</summary>
     public HashSet<string> Events { get; }
 
+    /// <summary>Kills counted by each active event (kept by the event director).</summary>
+    public Dictionary<string, int> EventKills { get; } = new(StringComparer.Ordinal);
+
     /// <summary>True while tile objects are being installed from chunk data (not a gameplay change).</summary>
     private bool _installing;
 
