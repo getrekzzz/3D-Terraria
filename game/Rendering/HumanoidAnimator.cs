@@ -34,7 +34,7 @@ public sealed class HumanoidAnimator
 
     private readonly AnimationTree _tree;
     private readonly AnimationLibrary _library;
-    private string _state = "idle";
+    private string _state = ""; // nothing requested yet: the transition node starts with no current state
     private float _hold, _holdTarget, _actionLeft;
 
     private HumanoidAnimator(AnimationTree tree, AnimationLibrary library)
@@ -68,6 +68,7 @@ public sealed class HumanoidAnimator
         tree.RootNode = tree.GetPathTo(root);
         tree.Active = true;
         var animator = new HumanoidAnimator(tree, library);
+        animator.Locomotion("idle");
         if (aim)
         {
             animator.Aim = new AimModifier { Name = "Aim" };
