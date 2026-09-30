@@ -80,6 +80,8 @@ godot --headless --path . -- --world=smoke --size=tiny --new --player=smoke --fr
       --view=2 --smoke=res://game/Testing/Scripts/basic.cmds   # engine smoke test (prints SMOKE PASS)
 godot --path . -- --world=tour --size=small --new --player=tour --fresh-player --view=3 \
       --shots=/tmp/shots --smoke=res://game/Testing/Tours/tour.cmds   # screenshot tour (needs a GPU or lavapipe)
+# also Tours/animation.cmds (player actions, in slow motion) and Tours/bosses.cmds (every boss, frozen with `ai off`);
+# debug commands for such scripts: camera orbit <deg>, press <action> [on|off], timescale <f>, ai <on|off>
 ```
 
 ### Asset pipelines
@@ -89,6 +91,8 @@ python3 tools/textures/build_icons.py               # block item icons
 blender --background --python tools/blender/build_all.py -- [--only=GLOB] [--no-icons]
 python3.13 tools/blender/build_all.py               # same, with `pip install bpy==5.2.2`
 python3 tools/blender/build_all.py --check          # coverage check only (no Blender)
+python3.13 tools/blender/build_all.py --anims       # shared human animation sets (--shard=I/N to split)
+python3.13 tools/blender/preview.py -- --creature=king_slime --out=/tmp/prev   # contact sheet (needs libegl1)
 python3 tools/content/gen_reference.py              # regenerate data/reference
 ```
 On Windows: `"C:\Program Files\Blender Foundation\Blender 5.2\blender.exe" --background --python tools/blender/build_all.py`.

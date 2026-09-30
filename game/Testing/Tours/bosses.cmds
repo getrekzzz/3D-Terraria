@@ -1,0 +1,213 @@
+# Boss gallery: every boss summoned in front of the player, frozen (ai off) and photographed.
+#   godot --path . --rendering-driver vulkan -- --world=gallery --size=small --new --player=gallery --fresh-player \
+#         --view=3 --shots=/tmp/shots --smoke=res://game/Testing/Tours/bosses.cmds
+wait_until player.frozen == 0 300
+spawning off
+liquids off
+town arrivals off
+town dismiss guide
+god on
+camera third
+fill -60 -1 -20 60 -1 90 stone
+fill -60 0 -20 60 12 90 air
+fill -60 13 -20 60 25 90 air
+fill -60 26 -20 60 38 90 air
+wait_until stream.idle == 1 900
+
+time 12
+aim 0 0.1 1
+boss king_slime 14
+wait 1.2
+ai off
+screenshot 01_king_slime 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 22
+aim 0 0.15 1
+boss eye_of_cthulhu 14
+wait 1.2
+ai off
+screenshot 02_eye_of_cthulhu 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.1 1
+boss eater_of_worlds 14
+wait 1.2
+ai off
+screenshot 03_eater_of_worlds 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.15 1
+boss brain_of_cthulhu 14
+wait 1.2
+ai off
+screenshot 04_brain_of_cthulhu 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.15 1
+boss queen_bee 14
+wait 1.2
+ai off
+screenshot 05_queen_bee 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 22
+aim 0 0.2 1
+boss skeletron 16
+wait 1.2
+ai off
+screenshot 06_skeletron 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.2 1
+boss deerclops 16
+wait 1.2
+ai off
+screenshot 07_deerclops 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.1 1
+boss wall_of_flesh 20
+wait 1.2
+ai off
+screenshot 08_wall_of_flesh 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.1 1
+boss queen_slime 14
+wait 1.2
+ai off
+screenshot 09_queen_slime 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 22
+aim 0 0.2 1
+boss retinazer 18
+wait 1.2
+ai off
+screenshot 10_retinazer 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 22
+aim 0 0.15 1
+boss the_destroyer 20
+wait 1.2
+ai off
+screenshot 11_the_destroyer 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 22
+aim 0 0.2 1
+boss skeletron_prime 18
+wait 1.2
+ai off
+screenshot 12_skeletron_prime 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.15 1
+boss plantera 16
+wait 1.2
+ai off
+screenshot 13_plantera 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.2 1
+boss golem 16
+wait 1.2
+ai off
+screenshot 14_golem 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.15 1
+boss duke_fishron 18
+wait 1.2
+ai off
+screenshot 15_duke_fishron 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 22
+aim 0 0.2 1
+boss empress_of_light 16
+wait 1.2
+ai off
+screenshot 16_empress_of_light 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 12
+aim 0 0.15 1
+boss lunatic_cultist 12
+wait 1.2
+ai off
+screenshot 17_lunatic_cultist 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
+
+time 22
+aim 0 0.45 1
+boss moon_lord 36
+wait 1.2
+ai off
+screenshot 18_moon_lord 0.5
+wait_until screenshot.pending == 0 900
+ai on
+killall
+wait 0.5
