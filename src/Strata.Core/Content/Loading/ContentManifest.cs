@@ -37,5 +37,6 @@ public static class ContentManifest
         return new Model { Files = files };
     }
 
-    public static string Serialize(Model model) => JsonSerializer.Serialize(model, ContentJson.Options) + "\n";
+    /// <summary>LF on every OS (the committed file is checked out with LF; .NET 8 indents with the OS newline).</summary>
+    public static string Serialize(Model model) => JsonSerializer.Serialize(model, ContentJson.Options).ReplaceLineEndings("\n") + "\n";
 }
