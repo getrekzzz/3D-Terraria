@@ -51,11 +51,8 @@ def build(name):
 def _extra_modules():
     import importlib
     out = []
-    for mod in ("bosses_pre", "bosses_pre2", "bosses_hard", "bosses_lunar"):
-        try:
-            out.append(importlib.import_module(f"bgen.{mod}"))
-        except ModuleNotFoundError:
-            pass
+    for path in sorted((HERE / "bgen").glob("bosses_*.py")):
+        out.append(importlib.import_module(f"bgen.{path.stem}"))
     return out
 
 

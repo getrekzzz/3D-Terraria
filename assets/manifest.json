@@ -3540,16 +3540,10 @@
   },
   "deerclops": {
    "model": "assets/models/creatures/deerclops.glb",
-   "generator": "humanoid",
+   "generator": "deerclops_beast",
    "animations": [
-    "death",
-    "fall",
-    "hurt",
+    "attack",
     "idle",
-    "jump",
-    "run",
-    "swing",
-    "use",
     "walk"
    ]
   },
@@ -5194,7 +5188,7 @@
   },
   "the_hungry": {
    "model": "assets/models/creatures/the_hungry.glb",
-   "generator": "hungry",
+   "generator": "wof_hungry",
    "animations": []
   },
   "travelling_merchant": {
@@ -5293,18 +5287,23 @@
   },
   "wall_of_flesh_eye": {
    "model": "assets/models/creatures/wall_of_flesh_eye.glb",
-   "generator": "maw_eye",
+   "generator": "wof_eye",
    "animations": []
   },
   "wall_of_flesh_flesh": {
    "model": "assets/models/creatures/wall_of_flesh_flesh.glb",
-   "generator": "maw_flesh",
+   "generator": "wof_flesh",
    "animations": []
   },
   "wall_of_flesh_mouth": {
    "model": "assets/models/creatures/wall_of_flesh_mouth.glb",
-   "generator": "maw_mouth",
-   "animations": []
+   "generator": "wof_mouth",
+   "animations": [
+    "attack",
+    "fly",
+    "idle",
+    "walk"
+   ]
   },
   "werewolf": {
    "model": "assets/models/creatures/werewolf.glb",

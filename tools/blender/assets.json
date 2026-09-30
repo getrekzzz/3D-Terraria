@@ -4054,26 +4054,26 @@
       }
     },
     "wall_of_flesh_mouth": {
-      "generator": "maw_mouth",
+      "generator": "wof_mouth",
       "params": {
         "radius": 2.1
       }
     },
     "wall_of_flesh_eye": {
-      "generator": "maw_eye",
+      "generator": "wof_eye",
       "params": {
         "radius": 1.4
       }
     },
     "wall_of_flesh_flesh": {
-      "generator": "maw_flesh",
+      "generator": "wof_flesh",
       "params": {
         "size": 4.0,
         "thickness": 3.0
       }
     },
     "the_hungry": {
-      "generator": "hungry",
+      "generator": "wof_hungry",
       "params": {
         "radius": 0.55
       }
@@ -4274,20 +4274,8 @@
       "params": {}
     },
     "deerclops": {
-      "generator": "humanoid",
-      "params": {
-        "skin": "#6a5a4a",
-        "shirt": "#5a4a3a",
-        "pants": "#4a3a2a",
-        "hair": "#3a2e24",
-        "eyes": "#ff3a20",
-        "horns": "#e8e0d0",
-        "boots": "#2a2018",
-        "hairStyle": "messy",
-        "build": 1.6,
-        "weight": 0.9,
-        "height": 4.4
-      }
+      "generator": "deerclops_beast",
+      "params": {}
     },
     "goblin_peon": {
       "generator": "humanoid",
