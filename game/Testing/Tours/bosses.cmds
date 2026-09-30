@@ -1,4 +1,5 @@
-# Boss gallery: every boss summoned in front of the player in daylight, frozen at once (ai off) and photographed;
+# Boss gallery: with creatures frozen (ai off, so none flee by day or charge), every boss is summoned in front of the
+# player in daylight and photographed;
 # the Wall of Flesh last, in the underworld where it stays.
 #   godot --path . --rendering-driver vulkan -- --world=gallery --size=small --new --player=gallery --fresh-player \
 #         --view=3 --shots=/tmp/shots --smoke=res://game/Testing/Tours/bosses.cmds
@@ -15,191 +16,158 @@ fill -60 0 -20 60 12 90 air
 fill -60 13 -20 60 25 90 air
 fill -60 26 -20 60 38 90 air
 wait_until stream.idle == 1 900
+ai off
 
 time 12
 aim 0 0.1 1
 boss king_slime 14
-wait 0.4
-ai off
+wait 0.5
 screenshot 01_king_slime 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.15 1
 boss eye_of_cthulhu 14
-wait 0.4
-ai off
+wait 0.5
 screenshot 02_eye_of_cthulhu 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.1 1
 boss eater_of_worlds 14
-wait 0.4
-ai off
+wait 0.5
 screenshot 03_eater_of_worlds 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.15 1
 boss brain_of_cthulhu 14
-wait 0.4
-ai off
+wait 0.5
 screenshot 04_brain_of_cthulhu 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.15 1
 boss queen_bee 16
-wait 0.4
-ai off
+wait 0.5
 screenshot 05_queen_bee 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.2 1
 boss skeletron 16
-wait 0.4
-ai off
+wait 0.5
 screenshot 06_skeletron 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.2 1
 boss deerclops 14
-wait 0.4
-ai off
+wait 0.5
 screenshot 07_deerclops 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.1 1
 boss queen_slime 14
-wait 0.4
-ai off
+wait 0.5
 screenshot 08_queen_slime 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.2 1
 boss retinazer 18
-wait 0.4
-ai off
+wait 0.5
 screenshot 09_retinazer 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.15 1
 boss the_destroyer 20
-wait 0.4
-ai off
+wait 0.5
 screenshot 10_the_destroyer 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.2 1
 boss skeletron_prime 18
-wait 0.4
-ai off
+wait 0.5
 screenshot 11_skeletron_prime 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.15 1
 boss plantera 16
-wait 0.4
-ai off
+wait 0.5
 screenshot 12_plantera 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.2 1
 boss golem 16
-wait 0.4
-ai off
+wait 0.5
 screenshot 13_golem 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.15 1
 boss duke_fishron 20
-wait 0.4
-ai off
+wait 0.5
 screenshot 14_duke_fishron 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.2 1
 boss empress_of_light 16
-wait 0.4
-ai off
+wait 0.5
 screenshot 15_empress_of_light 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.15 1
 boss lunatic_cultist 12
-wait 0.4
-ai off
+wait 0.5
 screenshot 16_lunatic_cultist 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
 time 12
 aim 0 0.35 1
 boss moon_lord 26
-wait 0.4
-ai off
+wait 0.5
 screenshot 17_moon_lord 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
 wait 0.5
 
@@ -209,8 +177,6 @@ aim 0 0.1 1
 wait_until stream.idle == 1 900
 boss wall_of_flesh 18
 wait 1
-ai off
 screenshot 18_wall_of_flesh 0.5
 wait_until screenshot.pending == 0 900
-ai on
 killall
