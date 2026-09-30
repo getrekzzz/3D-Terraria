@@ -42,9 +42,6 @@ public sealed partial class PlayerController : CharacterBody3D
     /// <summary>Re-resolve a standable spawn position once terrain around it is loaded.</summary>
     private bool _resolveSpawn = true;
 
-    /// <summary>Raised with fall damage taken on landing.</summary>
-    public event System.Action<int>? FallDamaged;
-
     public void Initialize(WorldRuntime runtime, PlayerEntity entity, MovementConfig config)
     {
         _runtime = runtime;
@@ -245,32 +242,6 @@ public sealed partial class PlayerController : CharacterBody3D
         if (!TestMove(stepped, -up, collision)) return; // nothing to stand on: not a ledge
         GlobalPosition = stepped.Origin + collision.GetTravel();
         ApplyFloorSnap();
-    }
-
-    private void TrackFall()
-    {
-        float y = GlobalPosition.Y;
-        if (!IsOnFloor() && !_swimming && !_climbing)
-        {
-            if (!_airborne)
-            {
-                _airborne = true;
-                _peakY = y;
-            }
-            _peakY = Mathf.Max(_peakY, y);
-            return;
-        }
-        if (_airborne && !_swimming)
-        {
-            int damage = _config.FallDamage(_peakY - y, Entity.State.Effects.NoFallDamage);
-            if (damage > 0)
-            {
-                Entity.State.Vitals.DamageDirect(damage);
-                FallDamaged?.Invoke(damage);
-            }
-        }
-        _airborne = false;
-        _peakY = y;
     }
 
     private void Sync()

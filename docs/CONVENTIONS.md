@@ -20,6 +20,10 @@ wherever possible.
 * `game/` — Godot adapters only: nodes, rendering upload, physics shapes, input, UI, audio.
 * One responsibility per file. `tools/ci/check_file_length.py` fails CI above 400 lines (aim < 300).
   Vendored code lives in `ThirdParty/` folders (exempt).
+* Hub classes are split into partials by concern (`GameWorld.Saving`/`.PlayerFiles`, `ItemUseSystem.Shooting`/
+  `.Consume`, `NpcSystem.Death`, `ContentValidator.Enemies`/`.Projectiles`, `WorldLauncher.Assets`/`.Effects`/
+  `.Player`/`.Ui`, `PlayerController.Fall`, `InteractionController.Talk`). New code goes into the partial for its
+  concern, or a new one, not into the main file.
 * No giant switch statements over content. Behaviour is attached through registries keyed by string
   type names (`BehaviorRegistry`, `ConditionRegistry`, pass registries, command registry).
 

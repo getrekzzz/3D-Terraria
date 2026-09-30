@@ -4,7 +4,6 @@ using Strata.Core.Common;
 using Strata.Core.Content.Defs;
 using Strata.Core.Determinism;
 using Strata.Core.Gameplay.Combat;
-using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Loot;
 using Strata.Core.Physics;
 using Strata.Core.Session;
@@ -114,10 +113,6 @@ public sealed partial class NpcSystem
         if (def.Boss is { Parts.Length: > 0 }) SpawnParts(npc);
         return npc;
     }
-
-    /// <summary>Another living boss shares this one's defeat flag (the other of a pair).</summary>
-    public bool GroupAlive(Content.Defs.BossInfo boss, Npc? except) =>
-        boss.Flag != null && _npcs.Any(n => n != except && n.Alive && n.Def.Boss?.Flag == boss.Flag);
 
     /// <summary>The creature's despawn conditions hold where its target stands (checked twice a second).</summary>
     private bool OutOfBounds(Npc npc, PlayerEntity? target)
@@ -294,35 +289,6 @@ public sealed partial class NpcSystem
             foreach (var inflict in attacker.State.Effects.Inflicts)
                 if (_rng.Chance(inflict.Chance) && _world.Session.Content.Buffs.TryGet(inflict.Buff, out var buff)) AddBuff(npc, buff, inflict.Ticks);
         return true;
-    }
-
-    public void Kill(Npc npc)
-    {
-        npc.Life = 0;
-        var cell = npc.Cell;
-        var drops = new List<ItemStack>();
-        if (npc.Def.Loot != null)
-        {
-            var rng = new Pcg32(Hash.Combine((ulong)npc.Id, _world.Session.Clock.Tick));
-            drops.AddRange(_loot.Roll(npc.Def.Loot, ref rng, _world.Session.ContextAt(cell)));
-        }
-        // Coins come from the loot table when it names them, else from the creature's value (never both).
-        bool tableCoins = npc.Def.Loot != null && _world.Session.Content.LootTables.TryGet(npc.Def.Loot, out var table) && table.Coins != null;
-        if (npc.Def.Value > 0 && !tableCoins) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
-        foreach (var stack in drops)
-            _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
-        DeathEffects(npc);
-        CountShieldKill(npc);
-        if (npc.Def.Boss is { Minor: true, Flag: { } minorFlag }) _world.Progression.Set(minorFlag);
-        if (npc.Def.Boss is { Minor: false } boss && !GroupAlive(boss, npc))
-        {
-            if (boss.Flag != null) _world.Progression.Set(boss.Flag);
-            foreach (var extra in boss.AlsoFlags) _world.Progression.Set(extra);
-            BossDefeated?.Invoke(npc);
-        }
-        Killed?.Invoke(npc);
-        int index = _npcs.IndexOf(npc);
-        if (index >= 0) Remove(index);
     }
 
     /// <summary>Applies a buff (e.g. from a projectile) and refreshes derived effects.</summary>
