@@ -37,7 +37,7 @@
   ],
   "enemies": [
     {
-      "id": "retinazer", "model": "retinazer", "tags": ["boss", "lava_immune", "mechanical"], "name": "Retinazer",
+      "id": "retinazer", "facing": "look", "model": "retinazer", "tags": ["boss", "lava_immune", "mechanical"], "name": "Retinazer",
       "description": "The cold eye of the pair: it keeps its distance and burns with light.",
       "brain": { "type": "eyeOfCthulhu", "orbitRadius": 22, "dashSpeed": 14, "dashesPerBurst": 1, "telegraphTicks": 40, "phase2Life": 0.45, "phase2Model": "retinazer_open" },
       "ranged": { "projectile": "death_laser", "damage": 32, "speed": 30, "interval": 75, "range": 45,
@@ -48,7 +48,7 @@
       "covers": ["terraria:the_twins"]
     },
     {
-      "id": "spazmatism", "model": "spazmatism", "tags": ["boss", "lava_immune", "mechanical"], "name": "Spazmatism",
+      "id": "spazmatism", "facing": "look", "model": "spazmatism", "tags": ["boss", "lava_immune", "mechanical"], "name": "Spazmatism",
       "description": "The hot eye of the pair: it charges, and when it opens it breathes green fire.",
       "brain": { "type": "eyeOfCthulhu", "orbitRadius": 14, "dashSpeed": 19, "dashesPerBurst": 3, "telegraphTicks": 26, "phase2Life": 0.45, "phase2Model": "spazmatism_open" },
       "ranged": { "projectile": "cursed_fireball", "damage": 36, "speed": 14, "interval": 95, "range": 30,
@@ -84,7 +84,7 @@
       "life": 14000, "damage": 55, "defense": 26, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
       "loot": "skeletron_prime", "value": 0,
       "boss": { "title": "Skeletron Prime", "flag": "defeated_skeletron_prime", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech",
-        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"] },
+        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"], "armModel": "prime_arm_strut" },
       "covers": ["terraria:skeletron_prime"]
     }
   ]

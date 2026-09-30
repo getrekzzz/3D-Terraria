@@ -69,17 +69,16 @@ public sealed partial class SwingTrail : Node3D
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.swing_trail");
         _mesh.ClearSurfaces();
-        if (_trails.Count == 0) return;
-        _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
         for (int i = _trails.Count - 1; i >= 0; i--)
         {
             var t = _trails[i];
             t.Age += (float)delta;
-            if (t.Age > t.Duration * 1.3f || !t.Player.Alive)
-            {
-                _trails.RemoveAt(i);
-                continue;
-            }
+            if (t.Age > t.Duration * 1.3f || !t.Player.Alive) _trails.RemoveAt(i);
+        }
+        if (_trails.Count == 0) return; // (an empty surface is an error)
+        _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+        foreach (var t in _trails)
+        {
             var c = t.Player.Center;
             var origin = new Vector3(c.X, c.Y + 0.3f, c.Z);
             if (t.Thrust) DrawThrust(t, origin);

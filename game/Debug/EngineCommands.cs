@@ -1,3 +1,4 @@
+using Godot;
 using Strata.Core.Commands;
 using Strata.Game.Bootstrap;
 using Strata.Game.UI;
@@ -52,16 +53,41 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "camera", Usage = "camera <first|third>", Help = "Switches the player camera mode.",
+            Name = "camera", Usage = "camera <first|third|orbit <degrees>>",
+            Help = "Switches the player camera mode, or swings the third-person camera round the player (aim unchanged).",
             Run = (ctx, a) =>
             {
                 var player = world.Player ?? throw new CommandException("no player camera in this mode");
-                player.Rig.FirstPerson = a.Str(0, "mode") switch
+                switch (a.Str(0, "mode"))
                 {
-                    "first" => true,
-                    "third" => false,
-                    _ => throw new CommandException("expected first or third"),
-                };
+                    case "first": player.Rig.FirstPerson = true; break;
+                    case "third": player.Rig.FirstPerson = false; break;
+                    case "orbit": player.Rig.Orbit = Mathf.DegToRad(a.Float(1, "degrees")); break;
+                    default: throw new CommandException("expected first, third or orbit <degrees>");
+                }
+                return CommandResult.Success();
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "timescale", Usage = "timescale <factor>",
+            Help = "Slows down (below 1) or speeds up the whole game, e.g. to screenshot an animation mid-swing.",
+            Run = (_, a) =>
+            {
+                Engine.TimeScale = Mathf.Clamp(a.Float(0, "factor"), 0.01f, 4f);
+                return CommandResult.Success($"Time scale {Engine.TimeScale:0.###}.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "press", Usage = "press <input action> [on|off]",
+            Help = "Holds (on, the default) or releases an input action such as move_forward or jump (automated tests).",
+            Run = (_, a) =>
+            {
+                var action = a.Str(0, "action");
+                if (!InputMap.HasAction(action)) throw new CommandException($"unknown input action '{action}'");
+                if (a.Count > 1 && a.Str(1, "state") == "off") Input.ActionRelease(action);
+                else Input.ActionPress(action);
                 return CommandResult.Success();
             },
         });

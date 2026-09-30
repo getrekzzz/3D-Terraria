@@ -9,7 +9,8 @@ namespace Strata.Game.Entities;
 
 /// <summary>
 /// Presents creatures: an animated model per creature (pooled by model), smoothed between simulation ticks,
-/// tinted per definition, flashing when hurt, gels squashing on landing, plus a small health readout.
+/// tinted per definition, flashing when hurt, plus a small health readout. Motion on top of the clips (facing,
+/// banking, squash, attacks, deaths): NpcRenderer.Motion.
 /// </summary>
 public sealed partial class NpcRenderer : Node3D
 {
@@ -21,9 +22,13 @@ public sealed partial class NpcRenderer : Node3D
         public MeshInstance3D? Stalk;
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public readonly List<CreatureVisual> Barrier = new();
+        public readonly List<CreatureVisual> Arms = new();
         public Vector3 Shown;
         public float Squash = 1f;
         public float LastVy;
+        public Quaternion Turn = Quaternion.Identity;
+        public float Yaw, Bank, Stretch, Spin, Blink = 1f;
+        public int LastAttackTimer, LastHurtFlash, LastSwing = -1000;
     }
 
     private readonly Dictionary<long, View> _views = new();
@@ -62,8 +67,9 @@ public sealed partial class NpcRenderer : Node3D
         game.Npcs.Removed += npc =>
         {
             if (!_views.Remove(npc.Id, out var view)) return;
-            Release(view.Visual, view.Model);
+            if (!KeepCorpse(npc, view)) Release(view.Visual, view.Model);
             foreach (var (seg, model) in view.Segments) Release(seg, model);
+            ReleaseArms(npc, view);
             if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
             view.Health.QueueFree();
             view.Stalk?.QueueFree();
@@ -95,6 +101,7 @@ public sealed partial class NpcRenderer : Node3D
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.npcs");
         float dt = (float)delta;
         var world = _game.Session.World;
+        UpdateCorpses(dt);
         foreach (var npc in _game.Npcs.All)
         {
             if (!_views.TryGetValue(npc.Id, out var view))
@@ -113,20 +120,22 @@ public sealed partial class NpcRenderer : Node3D
                 Release(view.Visual, view.Model);
                 view.Visual = swapped;
                 view.Model = wanted;
+                view.Spin = 1f;
             }
             var visual = view.Visual;
-            visual.Position = view.Shown;
-            if (npc.Segments.Count > 0) UpdateSegments(npc, view, world);
+            visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.LiftFor(npc.HalfExtents.Y * 2f, npc.Def.Scale) : view.Shown;
+            if (npc.Segments.Count > 0)
+            {
+                UpdateSegments(npc, view, world);
+                UpdateArms(npc, view);
+            }
             if (npc.Barrier != null) UpdateBarrier(npc, view, world);
             if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
             {
                 var v = new Vector3(npc.Velocity.X, npc.Velocity.Y, npc.Velocity.Z);
                 if (v.LengthSquared() > 0.01f) visual.Basis = Basis.LookingAt(v.Normalized(), Mathf.Abs(v.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
             }
-            else
-            {
-                visual.Rotation = new Vector3(0, Mathf.LerpAngle(visual.Rotation.Y, npc.Yaw + Mathf.Pi, 1f - Mathf.Exp(-dt * 10f)), 0);
-            }
+            else Orient(npc, view, dt);
             Animate(npc, view, dt);
             if (view.Stalk != null) UpdateStalk(npc, view);
             var tint = Color.FromHtml(npc.Def.Tint);
@@ -178,34 +187,6 @@ public sealed partial class NpcRenderer : Node3D
         }
     }
 
-    private void Animate(Npc npc, View view, float dt)
-    {
-        var visual = view.Visual;
-        if (npc.Def.Brain.Type == Strata.Core.Content.Specs.BrainSpecs.SlimeHop)
-        {
-            // Squash on landing, stretch while rising.
-            if (npc.OnGround && view.LastVy < -2f) view.Squash = 0.65f;
-            float want = npc.OnGround ? 1f : Mathf.Clamp(1f + npc.Velocity.Y * 0.04f, 0.85f, 1.25f);
-            view.Squash = Mathf.Lerp(view.Squash, want, 1f - Mathf.Exp(-dt * 12f));
-            float s = npc.Def.Scale;
-            visual.Scale = new Vector3(s / Mathf.Sqrt(view.Squash), s * view.Squash, s / Mathf.Sqrt(view.Squash));
-            view.LastVy = npc.Velocity.Y;
-            return;
-        }
-        visual.Scale = Vector3.One * npc.Def.Scale;
-        string clip = npc.Pose switch
-        {
-            "move" => visual.HasAnimation("walk") ? "walk" : "fly",
-            "attack" => visual.HasAnimation("fly") ? "fly" : "walk",
-            "jump" => "jump",
-            _ => visual.HasAnimation("idle") ? "idle" : "fly",
-        };
-        float speed = clip == "walk" ? Mathf.Max(0.5f, new Vector2(npc.Velocity.X, npc.Velocity.Z).Length() / 2.5f) : (clip == "fly" && npc.Pose == "attack" ? 2f : 1f);
-        visual.Play(clip, speed: speed);
-        if (!visual.HasAnimation("fly") && !visual.HasAnimation("walk") && npc.Def.Gravity == false)
-            visual.Position += new Vector3(0, Mathf.Sin(npc.Age * 0.08f) * 0.08f, 0); // bobbing eye
-    }
-
     /// <summary>Rooted creatures (snatchers): a vine from the anchor to the head.</summary>
     private static void UpdateStalk(Npc npc, View view)
     {
@@ -253,6 +234,7 @@ public sealed partial class NpcRenderer : Node3D
         };
         AddChild(health);
         var pos = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
-        return new View { Visual = visual, Model = model, Health = health, Shown = pos, Stalk = stalk };
+        float yaw = npc.Yaw + Mathf.Pi;
+        return new View { Visual = visual, Model = model, Health = health, Shown = pos, Stalk = stalk, Yaw = yaw, Turn = new Quaternion(Vector3.Up, yaw) };
     }
 }

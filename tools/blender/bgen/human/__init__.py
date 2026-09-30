@@ -6,7 +6,7 @@ eyeballs (head) -> hands with fingers and nails (hands) -> skin painting (paint)
 with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
-hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat, hatColor, horns, wings, tail, anatomy
+hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat, hatColor, mask, horns, wings, tail, anatomy
 (human|skeleton), undead.
 """
 import math
@@ -87,6 +87,46 @@ def build_preview(name: str, p: dict):
 
 
 DEFAULTS = {"shirt": "#4a7ac0", "pants": "#3a4a6a", "boots": "#5a3c26", "hair": "#5a3a20", "eyes": "#5a7890"}
+
+
+def motion_params(p: dict) -> dict:
+    """The parameters a character's skeleton and actions are built from (as build() and build_skeleton() see them)."""
+    p = {**DEFAULTS, **p}
+    if p.get("undead"):
+        p = {"build": 0.25, "weight": 0.15, **p}
+    if p.get("anatomy") == "skeleton":
+        p = {**p, "undead": True}
+    return p
+
+
+def motion_key(p: dict) -> str:
+    """Characters with equal keys have identical skeletons and actions, so they share one animation set: body,
+    stooped age, height and the way they move (people, shambling undead, walking skeletons)."""
+    q = motion_params(p)
+    fr = frame_mod.Frame(q)
+    kind = "skeleton" if q.get("anatomy") == "skeleton" else "undead" if q.get("undead") else "human"
+    return f"{'f' if fr.female else 'm'}{'_old' if fr.old else ''}_{round(fr.height * 100)}_{kind}"
+
+
+def build_motion(p: dict):
+    """A character's animation set: its armature (named ``anim_rig``, which the game gives every character's
+    armature node) with every action, and a one-triangle mesh so the importer builds a skeleton."""
+    import bmesh
+    from .garments import mesh_from
+    q = motion_params(p)
+    fr = frame_mod.Frame(q)
+    arm = frame_mod.build_armature(fr, "anim")
+    bm = bmesh.new()
+    verts = [bm.verts.new(v) for v in ((0, 0, 0), (0.01, 0, 0), (0, 0, 0.01))]
+    bm.faces.new(verts)
+    stub = mesh_from(bm, "anim_stub")
+    set_material(stub, "char:skin")
+    rig.rigid(stub, "root")
+    stub.parent = arm
+    mod = stub.modifiers.new("Armature", "ARMATURE")
+    mod.object = arm
+    motion.animate(arm, fr, q)
+    return [arm, stub]
 
 
 def build(name: str, p: dict):
@@ -192,6 +232,8 @@ def dress(fr, head, parts, p):
     strip_covered(body, covers)
     if p.get("hat"):
         add(accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040")))
+    if "mask" in p:
+        add(accessories.mask(head, parts["head"], p["mask"]))
     if "horns" in p:
         add(accessories.horns(head, p["horns"]))
     if "wings" in p:

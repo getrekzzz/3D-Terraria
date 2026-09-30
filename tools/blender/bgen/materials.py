@@ -1,6 +1,7 @@
 """Blender materials for generated assets.
 
-Slot names encode everything the game needs: ``prop:<layer>`` or ``prop:<layer>:glow``, and ``card:<layer>`` for
+Slot names encode everything the game needs: ``prop:<layer>`` plus flags ``:glow`` (emissive) and ``:clear``
+(translucent, vertex alpha scales it), and ``card:<layer>`` for
 alpha-tested leaf cards. The game replaces them with
 its shared prop shader (texture layer from assets/textures/props/layers.json, tinted by vertex colour, optional
 emission). For icon rendering the same look is rebuilt here with box-projected slices of the props atlas.

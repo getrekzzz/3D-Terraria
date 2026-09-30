@@ -59,7 +59,7 @@
     { "id": "crimslime", "model": "gel", "tags": ["gel"], "name": "Crimslime", "brain": { "type": "slimeHop", "jumpHeight": 6, "jumpSpeed": 4.2, "hopInterval": 55 },
       "life": 210, "damage": 58, "defense": 24, "knockbackResist": 0.3, "size": [2.6, 2.2], "moveSpeed": 3, "tint": "#a02a30", "loot": "crimslime", "value": 250,
       "onContact": [{ "type": "applyBuff", "buff": "ichor", "ticks": 300, "chance": 0.25 }], "covers": ["terraria:crimslime"] },
-    { "id": "ichor_sticker", "model": "demon_eye", "name": "Ichor Sticker", "description": "Hangs in the red caverns, dripping golden spit.",
+    { "id": "ichor_sticker", "facing": "look", "model": "demon_eye", "name": "Ichor Sticker", "description": "Hangs in the red caverns, dripping golden spit.",
       "brain": { "type": "flyer", "aggroRange": 70, "orbitRadius": 10, "dashSpeed": 6, "dashCooldown": 400 },
       "ranged": { "projectile": "ichor_splash", "damage": 35, "speed": 11, "interval": 110, "range": 18 },
       "life": 220, "damage": 45, "defense": 26, "knockbackResist": 0.4, "size": [1.8, 1.8], "moveSpeed": 3.5, "gravity": false, "tint": "#e0b040", "loot": "ichor_sticker", "value": 400, "covers": ["terraria:ichor_sticker"] },

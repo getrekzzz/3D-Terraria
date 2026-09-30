@@ -2,7 +2,7 @@
   // Creatures that only appear during world events.
   "enemies": [
     { "id": "blood_zombie", "model": "zombie", "tags": ["undead"], "name": "Blood Zombie", "description": "Drawn out by the Blood Moon.", "brain": { "type": "walker", "aggroRange": 90, "jumpHeight": 5 }, "life": 60, "damage": 18, "defense": 8, "knockbackResist": 0.45, "size": [2.0, 3.6], "moveSpeed": 2.8, "tint": "#ff8a80", "loot": "blood_zombie", "value": 90, "covers": ["terraria:blood_zombie"] },
-    { "id": "drippler", "model": "demon_eye", "name": "Drippler", "brain": { "type": "flyer", "aggroRange": 100, "orbitRadius": 8, "dashSpeed": 12, "dashCooldown": 110 }, "life": 70, "damage": 20, "defense": 4, "knockbackResist": 0.3, "size": [2.2, 2.2], "moveSpeed": 5.5, "gravity": false, "tint": "#ff9a9a", "loot": "drippler", "value": 110, "covers": ["terraria:drippler"] },
+    { "id": "drippler", "facing": "look", "model": "demon_eye", "name": "Drippler", "brain": { "type": "flyer", "aggroRange": 100, "orbitRadius": 8, "dashSpeed": 12, "dashCooldown": 110 }, "life": 70, "damage": 20, "defense": 4, "knockbackResist": 0.3, "size": [2.2, 2.2], "moveSpeed": 5.5, "gravity": false, "tint": "#ff9a9a", "loot": "drippler", "value": 110, "covers": ["terraria:drippler"] },
     { "id": "purple_slime", "model": "gel", "tags": ["gel"], "name": "Purple Slime", "brain": { "type": "slimeHop", "jumpHeight": 5, "jumpSpeed": 4.0, "hopInterval": 55 }, "life": 30, "damage": 10, "defense": 3, "knockbackResist": 0.1, "size": [2.4, 2.0], "moveSpeed": 3, "tint": "#b070ff", "loot": "slime_small", "value": 60, "covers": ["terraria:purple_slime"] }
   ],
   "spawnRules": [

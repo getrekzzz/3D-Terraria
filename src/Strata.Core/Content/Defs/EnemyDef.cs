@@ -51,6 +51,12 @@ public sealed class BossInfo
     /// <summary>Model per segment index (free parts such as hands); overrides SegmentModel/TailModel.</summary>
     public string[] SegmentModels { get; init; } = Array.Empty<string>();
 
+    /// <summary>
+    /// Model stretched from the head to each free part (<see cref="SegmentModels"/>) as a two-bone arm with an outward
+    /// elbow (Skeletron's bones, Prime's struts); modelled along +Y, one unit long.
+    /// </summary>
+    public string? ArmModel { get; init; }
+
     /// <summary>Stronger by day instead of leaving (the crypt's curse): multipliers on damage and speed.</summary>
     public DayEnrage? DayEnrage { get; init; }
 
@@ -176,6 +182,15 @@ public sealed class EnemyDef : ContentDef
     /// <summary>Colour multiplier applied to the model (recolours shared models such as gels; white = as modelled).</summary>
     public string Tint { get; init; } = "#ffffff";
     public float Scale { get; init; } = 1f;
+
+    /// <summary>
+    /// How the model turns (presentation only): "yaw" about the vertical (default), "look" fully toward its target (eyes
+    /// that stare you down), "velocity" along its flight (fish, darting fliers).
+    /// </summary>
+    public string Facing { get; init; } = "yaw";
+
+    /// <summary>Squashes on landing and stretches while rising (gels; slime-hoppers always do).</summary>
+    public bool Squash { get; init; }
 
     public string? Loot { get; init; }
 

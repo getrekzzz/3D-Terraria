@@ -5,7 +5,8 @@ hands use chain weights (nearest bone segment, blended with its parent/children 
 (eyes, ears, nails, hats) are bound to one bone.
 
 Poses are authored in armature space: ``swing(bone, toward, angle)`` turns a bone's rest direction toward a world
-direction, ``twist`` turns it about itself, ``axis`` about an arbitrary axis. Rotations are converted to each bone's
+direction, ``twist`` turns it about itself, ``axis`` about an arbitrary axis, ``local`` about one of the bone's own
+rest axes. Rotations are converted to each bone's
 local rest frame, so they compose naturally down the chain (a bent elbow stays bent when the shoulder moves).
 """
 import math
@@ -171,6 +172,8 @@ class Poser:
                 r = Quaternion(self.dir[bone], op[1])
             elif kind == "axis":
                 r = Quaternion(Vector(op[1]).normalized(), op[2])
+            elif kind == "local":                 # about one of the bone's own rest axes (e.g. X flexes a wrist)
+                r = Quaternion((self.rest[bone] @ Vector(op[1])).normalized(), op[2])
             else:
                 continue
             q = r @ q
@@ -192,7 +195,7 @@ def keyframe_action(arm, poser, name, length_s, keys, fps=24):
     used = sorted({b for pose in keys.values() for b in pose})
     moved = sorted({b for pose in keys.values() for b, spec in pose.items() if isinstance(spec, dict) and "loc" in spec})
     for t, pose in sorted(keys.items()):
-        frame = 1 + round(t * length_s * fps)
+        frame = round(t * length_s * fps)
         for bone in used:
             pb = arm.pose.bones[bone]
             pb.rotation_mode = "QUATERNION"

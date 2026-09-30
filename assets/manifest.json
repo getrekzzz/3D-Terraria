@@ -3373,12 +3373,12 @@
   },
   "brain_of_cthulhu": {
    "model": "assets/models/creatures/brain_of_cthulhu.glb",
-   "generator": "brain",
+   "generator": "cthulhu_brain",
    "animations": []
   },
   "brain_of_cthulhu_exposed": {
    "model": "assets/models/creatures/brain_of_cthulhu_exposed.glb",
-   "generator": "brain",
+   "generator": "cthulhu_brain",
    "animations": []
   },
   "brain_suckler": {
@@ -3463,7 +3463,7 @@
   },
   "creeper": {
    "model": "assets/models/creatures/creeper.glb",
-   "generator": "eye",
+   "generator": "creeper_eye",
    "animations": []
   },
   "crimera": {
@@ -3540,16 +3540,10 @@
   },
   "deerclops": {
    "model": "assets/models/creatures/deerclops.glb",
-   "generator": "humanoid",
+   "generator": "deerclops_beast",
    "animations": [
-    "death",
-    "fall",
-    "hurt",
+    "attack",
     "idle",
-    "jump",
-    "run",
-    "swing",
-    "use",
     "walk"
    ]
   },
@@ -3636,15 +3630,16 @@
   },
   "duke_fishron": {
    "model": "assets/models/creatures/duke_fishron.glb",
-   "generator": "fish",
+   "generator": "duke_fishron_detailed",
    "animations": [
+    "attack",
     "fly",
     "idle"
    ]
   },
   "dungeon_guardian": {
    "model": "assets/models/creatures/dungeon_guardian.glb",
-   "generator": "skull",
+   "generator": "skeletron_skull",
    "animations": []
   },
   "dye_trader": {
@@ -3671,17 +3666,21 @@
   },
   "eater_of_worlds_body": {
    "model": "assets/models/creatures/eater_of_worlds_body.glb",
-   "generator": "worm_segment",
+   "generator": "eater_segment",
    "animations": []
   },
   "eater_of_worlds_head": {
    "model": "assets/models/creatures/eater_of_worlds_head.glb",
-   "generator": "worm_segment",
-   "animations": []
+   "generator": "eater_head",
+   "animations": [
+    "fly",
+    "idle",
+    "walk"
+   ]
   },
   "eater_of_worlds_tail": {
    "model": "assets/models/creatures/eater_of_worlds_tail.glb",
-   "generator": "worm_segment",
+   "generator": "eater_tail",
    "animations": []
   },
   "elf_archer": {
@@ -3701,9 +3700,11 @@
   },
   "empress_of_light": {
    "model": "assets/models/creatures/empress_of_light.glb",
-   "generator": "sprite",
+   "generator": "empress_detailed",
    "animations": [
-    "fly"
+    "attack",
+    "fly",
+    "idle"
    ]
   },
   "etherian_goblin": {
@@ -3728,12 +3729,12 @@
   },
   "eye_of_cthulhu": {
    "model": "assets/models/creatures/eye_of_cthulhu.glb",
-   "generator": "watcher",
+   "generator": "cthulhu_eye",
    "animations": []
   },
   "eye_of_cthulhu_mouth": {
    "model": "assets/models/creatures/eye_of_cthulhu_mouth.glb",
-   "generator": "watcher_maw",
+   "generator": "cthulhu_maw",
    "animations": []
   },
   "eyezor": {
@@ -3975,7 +3976,7 @@
   },
   "golem": {
    "model": "assets/models/creatures/golem.glb",
-   "generator": "golem",
+   "generator": "golem_idol",
    "animations": []
   },
   "golfer": {
@@ -4132,7 +4133,7 @@
   },
   "king_slime": {
    "model": "assets/models/creatures/king_slime.glb",
-   "generator": "gel_sovereign",
+   "generator": "slime_king",
    "animations": []
   },
   "kobold": {
@@ -4191,13 +4192,25 @@
    "model": "assets/models/creatures/lunatic_cultist.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -4206,13 +4219,25 @@
    "model": "assets/models/creatures/lunatic_devotee.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -4307,17 +4332,17 @@
   },
   "moon_lord": {
    "model": "assets/models/creatures/moon_lord.glb",
-   "generator": "moon_lord",
+   "generator": "moon_lord_body",
    "animations": []
   },
   "moon_lord_hand": {
    "model": "assets/models/creatures/moon_lord_hand.glb",
-   "generator": "moon_lord_hand",
+   "generator": "moon_lord_hand_detailed",
    "animations": []
   },
   "moon_lord_head": {
    "model": "assets/models/creatures/moon_lord_head.glb",
-   "generator": "moon_lord_head",
+   "generator": "moon_lord_head_detailed",
    "animations": []
   },
   "moth": {
@@ -4613,13 +4638,21 @@
   },
   "plantera": {
    "model": "assets/models/creatures/plantera.glb",
-   "generator": "plantera",
-   "animations": []
+   "generator": "plantera_bulb",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
   },
   "plantera_open": {
    "model": "assets/models/creatures/plantera_open.glb",
-   "generator": "plantera",
-   "animations": []
+   "generator": "plantera_bulb",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
   },
   "player": {
    "model": "assets/models/creatures/player.glb",
@@ -4798,24 +4831,29 @@
    "generator": "present",
    "animations": []
   },
+  "prime_arm_strut": {
+   "model": "assets/models/creatures/prime_arm_strut.glb",
+   "generator": "prime_strut",
+   "animations": []
+  },
   "prime_cannon": {
    "model": "assets/models/creatures/prime_cannon.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "prime_laser": {
    "model": "assets/models/creatures/prime_laser.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "prime_saw": {
    "model": "assets/models/creatures/prime_saw.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "prime_vice": {
    "model": "assets/models/creatures/prime_vice.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "princess": {
@@ -4835,7 +4873,7 @@
   },
   "probe": {
    "model": "assets/models/creatures/probe.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "pumpking": {
@@ -4845,14 +4883,21 @@
   },
   "queen_bee": {
    "model": "assets/models/creatures/queen_bee.glb",
-   "generator": "insect",
+   "generator": "queen_bee_detailed",
    "animations": [
-    "fly"
+    "attack",
+    "fly",
+    "idle"
    ]
   },
   "queen_slime": {
    "model": "assets/models/creatures/queen_slime.glb",
-   "generator": "gel_sovereign",
+   "generator": "slime_queen",
+   "animations": []
+  },
+  "queen_slime_winged": {
+   "model": "assets/models/creatures/queen_slime_winged.glb",
+   "generator": "slime_queen",
    "animations": []
   },
   "ray_gunner": {
@@ -4887,12 +4932,12 @@
   },
   "retinazer": {
    "model": "assets/models/creatures/retinazer.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "retinazer_open": {
    "model": "assets/models/creatures/retinazer_open.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "salamander": {
@@ -4983,19 +5028,24 @@
     "walk"
    ]
   },
+  "skeletron_arm": {
+   "model": "assets/models/creatures/skeletron_arm.glb",
+   "generator": "skeletron_arm_bone",
+   "animations": []
+  },
   "skeletron_hand": {
    "model": "assets/models/creatures/skeletron_hand.glb",
-   "generator": "bone_hand",
+   "generator": "skeletron_hand_bones",
    "animations": []
   },
   "skeletron_head": {
    "model": "assets/models/creatures/skeletron_head.glb",
-   "generator": "skull",
+   "generator": "skeletron_skull",
    "animations": []
   },
   "skeletron_prime_head": {
    "model": "assets/models/creatures/skeletron_prime_head.glb",
-   "generator": "prime_skull",
+   "generator": "prime_head",
    "animations": []
   },
   "snow_balla": {
@@ -5015,12 +5065,12 @@
   },
   "spazmatism": {
    "model": "assets/models/creatures/spazmatism.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "spazmatism_open": {
    "model": "assets/models/creatures/spazmatism_open.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "splinterling": {
@@ -5163,22 +5213,22 @@
   },
   "the_destroyer_body": {
    "model": "assets/models/creatures/the_destroyer_body.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "the_destroyer_head": {
    "model": "assets/models/creatures/the_destroyer_head.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "the_destroyer_tail": {
    "model": "assets/models/creatures/the_destroyer_tail.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "the_hungry": {
    "model": "assets/models/creatures/the_hungry.glb",
-   "generator": "hungry",
+   "generator": "wof_hungry",
    "animations": []
   },
   "travelling_merchant": {
@@ -5277,18 +5327,23 @@
   },
   "wall_of_flesh_eye": {
    "model": "assets/models/creatures/wall_of_flesh_eye.glb",
-   "generator": "maw_eye",
+   "generator": "wof_eye",
    "animations": []
   },
   "wall_of_flesh_flesh": {
    "model": "assets/models/creatures/wall_of_flesh_flesh.glb",
-   "generator": "maw_flesh",
+   "generator": "wof_flesh",
    "animations": []
   },
   "wall_of_flesh_mouth": {
    "model": "assets/models/creatures/wall_of_flesh_mouth.glb",
-   "generator": "maw_mouth",
-   "animations": []
+   "generator": "wof_mouth",
+   "animations": [
+    "attack",
+    "fly",
+    "idle",
+    "walk"
+   ]
   },
   "werewolf": {
    "model": "assets/models/creatures/werewolf.glb",

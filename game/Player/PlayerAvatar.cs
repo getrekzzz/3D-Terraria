@@ -9,8 +9,8 @@ using Strata.Game.Rendering;
 namespace Strata.Game.Player;
 
 /// <summary>
-/// The visible player body in third person: animated humanoid facing the aim, locomotion/use/death clips,
-/// the held item in the right hand and voxel lighting.
+/// The visible player body in third person: the animated human (see PlayerAvatar.Motion), the held item in the right
+/// hand and voxel lighting.
 /// </summary>
 public sealed partial class PlayerAvatar : Node3D
 {
@@ -20,7 +20,6 @@ public sealed partial class PlayerAvatar : Node3D
     private CreatureVisual? _visual;
     private Node3D? _held;
     private ItemDef? _heldItem;
-    private float _yaw;
 
     public void Initialize(PlayerController controller, GameWorld game, PropLibrary props)
     {
@@ -31,7 +30,7 @@ public sealed partial class PlayerAvatar : Node3D
         InitializeGear();
         var look = controller.Entity.State.Look;
         var model = $"assets/models/creatures/{look.ModelId}.glb";
-        _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props);
+        _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props, aim: true);
         if (_visual == null) return;
         AddChild(_visual);
         if (ResourceLoader.Exists("res://" + model)) _visual.SetAppearance(look);
@@ -46,17 +45,14 @@ public sealed partial class PlayerAvatar : Node3D
         var entity = _controller.Entity;
         int immune = entity.State.Vitals.ImmunityTicks;
         Visible = !_controller.Rig.FirstPerson && (immune <= 0 || (immune / 4) % 2 == 0); // blink while invulnerable
-        var aim = entity.Aim;
-        float target = Mathf.Atan2(-aim.X, -aim.Z);
-        _yaw = Mathf.LerpAngle(_yaw, target, 1f - Mathf.Exp(-(float)delta * 14f));
-        Rotation = new Vector3(0, _yaw, 0);
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
         UpdateCart(entity.Minecart);
         UpdateGear(delta);
-        _visual.Play(ChooseClip(entity, out float speed), speed: speed);
+        Animate(entity, (float)delta);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
     }
 
+    /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>
     private string ChooseClip(PlayerEntity entity, out float speed)
     {
         speed = 1f;

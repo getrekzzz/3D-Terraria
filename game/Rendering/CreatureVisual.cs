@@ -5,7 +5,8 @@ namespace Strata.Game.Rendering;
 
 /// <summary>
 /// An instanced animated model (player, enemies): the GLB scene with prop materials on every surface, looping
-/// locomotion clips, cross-faded playback and per-frame voxel light / tint.
+/// locomotion clips, cross-faded playback and per-frame voxel light / tint. Generated humans play their shared
+/// animation set through a <see cref="HumanoidAnimator"/> (layered actions, aim); other creatures their own clips.
 /// </summary>
 public sealed partial class CreatureVisual : Node3D
 {
@@ -16,8 +17,12 @@ public sealed partial class CreatureVisual : Node3D
 
     public Skeleton3D? Skeleton { get; private set; }
 
+    /// <summary>Set for generated humans with an animation set (see <see cref="HumanAnimations"/>).</summary>
+    public HumanoidAnimator? Humanoid { get; private set; }
+
     /// <summary>Loads a creature model; returns null (and records a problem) if the file is missing.</summary>
-    public static CreatureVisual? Create(string projectPath, PropLibrary props)
+    /// <param name="aim">Give a human an <see cref="AimModifier"/> (the player's body).</param>
+    public static CreatureVisual? Create(string projectPath, PropLibrary props, bool aim = false)
     {
         var path = "res://" + projectPath;
         if (!ResourceLoader.Exists(path))
@@ -28,14 +33,40 @@ public sealed partial class CreatureVisual : Node3D
         var visual = new CreatureVisual { Name = "Visual" };
         var scene = GD.Load<PackedScene>(path).Instantiate<Node3D>();
         visual.AddChild(scene);
-        visual.Setup(scene, props);
+        visual.Setup(scene, props, scene.Transform);
+        if (visual.Skeleton is { } skeleton && HumanAnimations.For(projectPath) is { } library)
+        {
+            // The set's tracks address the armature by one shared name.
+            if (skeleton.GetParent() is Node3D armature && armature != scene) armature.Name = HumanoidAnimator.Rig;
+            visual.Humanoid = HumanoidAnimator.Create(scene, skeleton, library, visual._player, aim);
+        }
         return visual;
     }
 
-    private void Setup(Node node, PropLibrary props)
+    /// <summary>The model's vertical extent around its origin (metres, at scale 1).</summary>
+    public float Bottom { get; private set; } = float.MaxValue;
+
+    public float Top { get; private set; } = float.MinValue;
+
+    /// <summary>
+    /// How far to raise a model built around its centre (eyes, skulls) so it sits in its creature's box, which starts at
+    /// the feet: only models whose bounds are centred on the origin and about the box's size (a body with legs dangling
+    /// far below its box, like the Moon Lord's, is placed as modelled).
+    /// </summary>
+    public float LiftFor(float boxHeight, float scale)
+    {
+        float height = Top - Bottom, centre = (Top + Bottom) * 0.5f;
+        if (Bottom >= 0f || height <= 0f || Mathf.Abs(centre) > 0.15f * height || height * scale > 2.2f * boxHeight) return 0f;
+        return -Bottom * scale;
+    }
+
+    private void Setup(Node node, PropLibrary props, Transform3D xf)
     {
         if (node is MeshInstance3D mi && mi.Mesh != null)
         {
+            var box = xf * mi.Mesh.GetAabb();
+            Bottom = Mathf.Min(Bottom, box.Position.Y);
+            Top = Mathf.Max(Top, box.End.Y);
             for (int i = 0; i < mi.Mesh.GetSurfaceCount(); i++)
                 mi.SetSurfaceOverrideMaterial(i, props.Material(mi.Mesh.SurfaceGetMaterial(i)?.ResourceName ?? "prop:missing", multimesh: false));
             _geometry.Add(mi);
@@ -47,14 +78,23 @@ public sealed partial class CreatureVisual : Node3D
                 if (Looping.Contains(name)) ap.GetAnimation(name).LoopMode = Animation.LoopModeEnum.Linear;
         }
         if (node is Skeleton3D sk) Skeleton = sk;
-        foreach (var child in node.GetChildren()) Setup(child, props);
+        foreach (var child in node.GetChildren()) Setup(child, props, child is Node3D n ? xf * n.Transform : xf);
     }
 
-    public bool HasAnimation(string name) => _player != null && _player.HasAnimation(name);
+    public bool HasAnimation(string name) => Humanoid?.Has(name) ?? (_player != null && _player.HasAnimation(name));
 
-    /// <summary>Plays a clip, cross-fading; restarting the same looping clip is a no-op unless <paramref name="restart"/>.</summary>
+    /// <summary>
+    /// Plays a clip, cross-fading; restarting the same looping clip is a no-op unless <paramref name="restart"/>. For
+    /// humans this sets the locomotion state (actions go through <see cref="Humanoid"/>).
+    /// </summary>
     public void Play(string name, float blend = 0.15f, float speed = 1f, bool restart = false)
     {
+        if (Humanoid != null)
+        {
+            Humanoid.Locomotion(name, speed);
+            _current = name;
+            return;
+        }
         if (_player == null || !_player.HasAnimation(name)) return;
         if (_current == name && !restart && _player.IsPlaying())
         {
@@ -68,7 +108,9 @@ public sealed partial class CreatureVisual : Node3D
 
     public string Current => _current;
 
-    public bool IsPlaying => _player?.IsPlaying() ?? false;
+    public bool IsPlaying => Humanoid != null || (_player?.IsPlaying() ?? false);
+
+    public override void _Process(double delta) => Humanoid?.Update((float)delta);
 
     public void SetTint(Color tint)
     {

@@ -34,7 +34,8 @@ twinkle, cloud parallax) read the `strata_time` and `strata_camera` globals inst
 | `liquid.gdshader` | Water, honey | Water: screen-space refraction, Beer–Lambert absorption by thickness, in-scatter colour, sky Fresnel, shallow foam, caustics on the bed. Honey: thick amber |
 | `lava.gdshader` | Lava (its own opaque surface from `LiquidMesher`, no screen copy) | A churning temperature field decides where the melt skins over: warped two-scale crust plates of dark basalt split by glowing seams and cooling fissures, open hot rivers in blackbody colours (HDR emission, so it blooms), bubbles that swell and burst, a slow downward heave, streaming falls. `LavaEffects` adds embers from the lava surface cells the mesher lists (`LavaTops`) and a flickering heat light per lava chunk |
 | `flame.gdshader` | Torch and candle flames (`flame` spec on the object; held torches too) | An upright billboard of rising turbulence through a teardrop: white-hot core, orange body, flickering red licks; additive HDR. Placed flames are one MultiMesh per chunk and colour (`Flames`), held ones add a few embers in third person |
-| `prop.gdshader` | Generated props, items, creatures | Object-space triplanar of the props array, vertex-colour tint, sway |
+| `prop.gdshader` | Generated props, items, creatures | Object-space triplanar of the props array, vertex-colour tint, sway (body in `include/prop_common.gdshaderinc`) |
+| `prop_clear.gdshader` | Translucent parts (`prop:<layer>:clear`): slime gel, corneas, wings | The prop shader with alpha: see-through face on, thicker at the rim, vertex alpha per part; drawn after opaque geometry so what is inside shows |
 | `foliage_card.gdshader` | Tree crowns and bushes (`card:<layer>` slots) | UV-mapped alpha-tested sprig cards, crown-shaped normals on both faces, sway + flutter, translucency, mip-aware alpha |
 | `character.gdshader` | People (`char:<kind>` slots) | Skin (pores from the detail array, subsurface scattering, wrapped diffuse), eyes, Kajiya–Kay hair highlights along exported tangents, nails, cloth sheen, leather, metal, bone, glow. Detail is sampled in the rest pose rebuilt from the two UV sets, so it sticks to the animated body |
 | `grass.gdshader` | Instanced grass and flowers | See below |
@@ -84,3 +85,20 @@ Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class 
 Look: AgX tonemapping with colour adjustment (saturation 1.22 by day, 0.85 at night; contrast 1.06) for the reference
 game's rich palette over realistic materials; glow in Screen blend so HDR emitters (flames, lava, glints, magic) bloom
 without hazing the image; a moonlit night keeps a blue ambient floor so shapes and creatures stay readable.
+
+## Creature animation
+Generated humans (the player, town folk, humanoid enemies) play their shared animation set through a
+`HumanoidAnimator` (an `AnimationTree` built in code): a cross-faded locomotion state (idle, walk, run, sprint, jump,
+fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed so feet do not slide, negative
+when backpedalling), an upper-body `OneShot` for item actions stretched to the item's use time and restarted on
+every use (so you can swing while running), a right-arm blend that holds a carried torch up, and a hurt flinch. For
+the player an `AimModifier` (`SkeletonModifier3D`) then turns the torso and head toward the aim while the legs face
+the way they walk, and brings the arms up to the aim for guns, bows, staffs and spears.
+
+`NpcRenderer.Motion` adds presence to everything else: `facing` look (eyes stare at their target) or velocity (fish),
+fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a
+dash, a shrink on teleport, a spin when a boss changes form; humanoid enemies swing or shoot when they attack, flinch
+when hit and fall dead (corpses sink after a moment, other creatures shrink away). Models built around their centre
+are raised onto their feet by their bounds (`CreatureVisual.LiftFor`, only for centred, box-sized models). `NpcRenderer.Arms` stretches a boss's `armModel`
+from its shoulders to each free-flying hand with an outward elbow.
+

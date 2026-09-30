@@ -40,7 +40,10 @@ public sealed partial class CameraRig : Node3D
     public Basis YawBasis => new(Vector3.Up, _yaw);
 
     /// <summary>World-space view direction.</summary>
-    public Vector3 Forward => -Camera.GlobalTransform.Basis.Z;
+    public Vector3 Forward => -GlobalTransform.Basis.Z;
+
+    /// <summary>Swings the third-person camera round the player (radians) without changing the aim (screenshots).</summary>
+    public float Orbit { get; set; }
 
     public float Pitch => _pitch;
 
@@ -97,6 +100,7 @@ public sealed partial class CameraRig : Node3D
         var shake = CameraShake.Sample(delta);
         Camera.HOffset = shake.X;
         Camera.VOffset = shake.Y;
+        _pivot.Rotation = new Vector3(0, _firstPerson ? 0f : Orbit, 0);
         if (_firstPerson)
         {
             _pivot.Position = Vector3.Zero;

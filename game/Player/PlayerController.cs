@@ -33,6 +33,12 @@ public sealed partial class PlayerController : CharacterBody3D
     /// <summary>Waiting for terrain colliders before physics starts.</summary>
     public bool Frozen { get; private set; } = true;
 
+    /// <summary>In a liquid deep enough to swim (animation).</summary>
+    public bool Swimming => _swimming;
+
+    /// <summary>Holding on to a rope (animation).</summary>
+    public bool Climbing => _climbing;
+
     /// <summary>Re-resolve a standable spawn position once terrain around it is loaded.</summary>
     private bool _resolveSpawn = true;
 

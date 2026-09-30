@@ -1,0 +1,143 @@
+# Animation tour (timescale slows animation, not the simulation: waits after "use" are animation time): the player's body from the side while idling, running, swinging, mining, stabbing, shooting,
+# drawing a bow, casting, drinking and holding a torch; zombies shambling and dying; bosses turning to look.
+#   godot --path . --rendering-driver vulkan -- --world=anim --size=tiny --new --player=anim --fresh-player \
+#         --view=2 --shots=/tmp/shots --smoke=res://game/Testing/Tours/animation.cmds
+wait_until player.frozen == 0 300
+spawning off
+liquids off
+town arrivals off
+town dismiss guide
+god on
+time 12
+camera third
+fill -40 -1 -30 40 -1 60 stone
+fill -40 0 -30 40 16 60 air
+aim 0 -0.05 1
+camera orbit 95
+wait_until stream.idle == 1 900
+wait 2
+screenshot a_idle
+wait_until screenshot.pending == 0 900
+
+give copper_broadsword
+wield copper_broadsword
+wait 0.5
+timescale 0.01
+use
+wait 0.12
+screenshot b_swing 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give copper_pickaxe
+wield copper_pickaxe
+wait 0.3
+timescale 0.01
+use
+wait 0.14
+screenshot c_mine 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give spear
+wield spear
+wait 0.3
+timescale 0.01
+use
+wait 0.16
+screenshot d_thrust 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give flintlock_pistol
+give musket_ball 50
+wield flintlock_pistol
+aim 0 0.35 1
+wait 0.3
+timescale 0.01
+use
+wait 0.1
+screenshot e_shoot_up 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give wooden_bow
+give wooden_arrow 50
+wield wooden_bow
+aim 0 0 1
+wait 0.3
+timescale 0.01
+use
+wait 0.2
+screenshot f_bow 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give wand_of_sparking
+wield wand_of_sparking
+wait 0.3
+timescale 0.01
+use
+wait 0.14
+screenshot g_cast 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give lesser_healing_potion 3
+wield lesser_healing_potion
+wait 0.3
+timescale 0.01
+use
+wait 0.12
+screenshot h_drink 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+give torch 10
+wield torch
+time 21
+wait 1
+screenshot i_torch_hold
+wait_until screenshot.pending == 0 900
+time 12
+
+# Running (legs along the run, torso to the aim) and running while swinging.
+wield copper_broadsword
+press move_forward
+wait 0.6
+screenshot j_run
+wait_until screenshot.pending == 0 900
+timescale 0.01
+use
+wait 0.12
+screenshot k_run_swing 0
+wait_until screenshot.pending == 0 900
+timescale 1
+press move_forward off
+press move_right
+wait 0.6
+screenshot l_strafe
+wait_until screenshot.pending == 0 900
+press move_right off
+press jump
+wait 0.25
+screenshot m_jump 0
+wait_until screenshot.pending == 0 900
+press jump off
+wait 1.5
+
+camera orbit 0
+spawn zombie 3 6
+wait 1.5
+screenshot n_zombies
+wait_until screenshot.pending == 0 900
+slay zombie
+wait 0.9
+screenshot o_zombie_death 0
+wait_until screenshot.pending == 0 900
+wait 2
+time 21
+spawn demon_eye 1 5
+wait 1.5
+screenshot p_demon_eye_look
+wait_until screenshot.pending == 0 900

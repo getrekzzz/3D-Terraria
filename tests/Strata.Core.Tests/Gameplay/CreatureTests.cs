@@ -37,6 +37,22 @@ public class CreatureTests
     }
 
     [Fact]
+    public void PausedCreaturesHoldStill()
+    {
+        using var g = Create();
+        var hornet = Spawn(g, "hornet", g.Player.Position + new Vector3(4f, 2f, 0));
+        g.World.Npcs.Paused = true;
+        var at = hornet.Position;
+        int age = hornet.Age;
+        for (int i = 0; i < 60; i++) g.World.Tick();
+        Assert.Equal(at, hornet.Position);
+        Assert.Equal(age, hornet.Age);
+        g.World.Npcs.Paused = false;
+        for (int i = 0; i < 60; i++) g.World.Tick();
+        Assert.NotEqual(at, hornet.Position);
+    }
+
+    [Fact]
     public void RangedCreaturesNeedLineOfSight()
     {
         using var g = Create();

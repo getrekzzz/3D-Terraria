@@ -1,4 +1,4 @@
-"""Hats (cap, wide brim, hood, wreath), aprons and creature features (horns, bat wings, a spaded tail), fitted to
+"""Hats (cap, wide brim, hood, wreath), a face mask, aprons and creature features (horns, bat wings, a spaded tail), fitted to
 the generated head and body and bound to the bones that carry them."""
 import math
 
@@ -70,6 +70,30 @@ def hat(head, head_obj, kind, color, flower="#f0d040"):
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     obj = mesh_from(bm, f"hat_{kind}")
     set_slot(obj, "char:cloth")
+    rigid(obj, "head")
+    return obj
+
+
+def mask(head, head_obj, color):
+    """A smooth face mask (the Lunatic Cultist's): the face lifted into a thin shell over the skin, with eye holes."""
+    h = head.h
+    bm = bmesh.new()
+    bm.from_mesh(head_obj.data)
+    bm.normal_update()
+    eyes = [Vector((sx * 0.031, 0.066, -0.002)) for sx in (1, -1)]
+    drop = []
+    for f in bm.faces:
+        q = head.local(f.calc_center_median())
+        if not (q.y > 0.02 and abs(q.x) < 0.065 and -0.11 < q.z < 0.05) or any((q - e).length < 0.016 for e in eyes):
+            drop.append(f)
+    bmesh.ops.delete(bm, geom=drop, context="FACES")
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    bm.normal_update()
+    for v in bm.verts:
+        v.co += v.normal * 0.007 * h
+    colorize(bm, color)
+    obj = mesh_from(bm, "mask")
+    set_slot(obj, "char:bone")
     rigid(obj, "head")
     return obj
 

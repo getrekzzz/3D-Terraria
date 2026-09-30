@@ -35,9 +35,23 @@ People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a propo
 weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and
 lashes), hands with jointed fingers and nails, painted skin (lips, flush, knuckles, stubble), hair styles and
 beards as strand shells, clothing cut from body shells (shirts, trousers, dresses, coats, robes, aprons, belts,
-boots, hats), and a 52-bone rig (fingers included) with heat/chain weights and nine clips. Skeletons are separate
-bones on the same rig. Params per character live in `assets.json`. They export rest-pose UVs and tangents for the
-character shader.
+boots, hats, masks), and a 52-bone rig (fingers included) with heat/chain weights. Skeletons are separate bones on
+the same rig. Params per character live in `assets.json`. They export rest-pose UVs and tangents for the character
+shader.
+
+Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
+(exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,
+death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,
+hold. Characters with the same skeleton (body, height, gait) share one animation set,
+`assets/models/creatures/anim/<set>.glb`, with `index.json` naming each character's set; rebuild them with
+`build_all.py --anims [--shard=I/N]` (seconds each, no character meshes touched).
+
+Bosses and other detailed creatures (`bgen/bosses_pre*.py`, `bosses_hard.py`, `bosses_lunar.py`) build organic
+bodies from metaballs (`bgen/detail.py`: sculpted and painted per vertex, branching veins, teeth rings and rows),
+translucent parts in `prop:<layer>:clear` slots (slime gel, cornea, wings), and small rigs through
+`bosses_pre2.clips` (mandibles, jaws, wings, a stinger, Deerclops' walk and swipe). Free-flying boss hands are joined
+to the head by an `armModel` the game stretches between them. `tools/blender/preview.py` renders any creature (or a
+raw `generator:params`) as a Workbench contact sheet of views or clip frames, without the game.
 
 Rendering-only settings: `data/config/graphics.json` (presets) and `data/config/grass.json` (grass kinds per grass
 block) are validated by `Strata.Tools validate` and at boot.

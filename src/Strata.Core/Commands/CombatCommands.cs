@@ -121,6 +121,20 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "ai", Usage = "ai <on|off>", Help = "Debug: freezes every creature in place (off) or lets them move again (on).",
+            Run = (ctx, a) =>
+            {
+                ctx.World.Npcs.Paused = a.Str(0, "mode") switch
+                {
+                    "off" => true,
+                    "on" => false,
+                    _ => throw new CommandException("expected on or off"),
+                };
+                return CommandResult.Success(ctx.World.Npcs.Paused ? "Creatures frozen." : "Creatures moving.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "spawning", Usage = "spawning <on|off|now>", Help = "Toggles natural spawning or forces one spawn attempt.",
             Run = (ctx, a) =>
             {

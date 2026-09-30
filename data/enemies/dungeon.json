@@ -31,7 +31,7 @@
       "life": 4400, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [3.2, 3.2], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
       "loot": "skeletron", "value": 10000, "light": [5, 4, 3],
       "boss": { "title": "Skeletron", "flag": "defeated_skeletron", "arenaRadius": 150, "music": "boss_crypt",
-        "segments": 2, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["skeletron_hand", "skeletron_hand"], "dayEnrage": { "damage": 4, "speed": 2.5 } },
+        "segments": 2, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["skeletron_hand", "skeletron_hand"], "armModel": "skeletron_arm", "dayEnrage": { "damage": 4, "speed": 2.5 } },
       "covers": ["terraria:skeletron"]
     },
     {

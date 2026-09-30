@@ -167,6 +167,24 @@ class MeshBuilder:
             self.bm.faces.new(rings[-1])
         return self._finish_part([v for r in rings for v in r], material, color, smooth)
 
+    def merge(self, obj, material, color="#ffffff", paint=None, smooth=True, matrix: Matrix | None = None):
+        """Adds a Blender mesh object's geometry (a polygonised metaball body, see human/blobs.Blob) as one part and
+        removes the object. ``paint(position, normal) -> colour`` colours it per vertex (after ``matrix``)."""
+        before = set(self.bm.verts)
+        self.bm.from_mesh(obj.data)
+        data = obj.data
+        bpy.data.objects.remove(obj)
+        bpy.data.meshes.remove(data)
+        verts = [v for v in self.bm.verts if v not in before]
+        verts = self._finish_part(verts, material, color, smooth, matrix)
+        if paint is not None:
+            self.bm.normal_update()
+            faces = {f for v in verts for f in v.link_faces}
+            for f in faces:
+                for loop in f.loops:
+                    loop[self.color_layer] = hex_color(paint(loop.vert.co.copy(), loop.vert.normal.copy()))
+        return verts
+
     # ------------------------------------------------------------------ foliage cards
     def card(self, base, up, side, length, width, material, color, normal_of, flip=False):
         """One alpha-tested leaf card (``card:<layer>`` slot): texture v runs from the twig at ``base`` along ``up``.

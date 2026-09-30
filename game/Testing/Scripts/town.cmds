@@ -39,6 +39,7 @@ town talk merchant
 ui talk merchant
 ui shop
 town buy merchant torch
-assert inv.torch == 11
+# 25 from the starting kit (PlayerState) + 1 bought.
+assert inv.torch == 26
 ui close
 assert errors == 0

@@ -134,8 +134,12 @@ public sealed partial class NpcSystem
         return brain;
     }
 
+    /// <summary>Debug: creatures hold still (no AI, movement or timers) while true, e.g. for screenshots.</summary>
+    public bool Paused { get; set; }
+
     public void Tick()
     {
+        if (Paused) return;
         const float dt = 1f / Units.TicksPerSecond;
         var session = _world.Session;
         _ctx.IsDay = session.Clock.IsDay;
