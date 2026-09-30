@@ -84,7 +84,7 @@
       "life": 14000, "damage": 55, "defense": 26, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
       "loot": "skeletron_prime", "value": 0,
       "boss": { "title": "Skeletron Prime", "flag": "defeated_skeletron_prime", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech",
-        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"] },
+        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"], "armModel": "prime_arm_strut" },
       "covers": ["terraria:skeletron_prime"]
     }
   ]

@@ -131,7 +131,7 @@
       "brain": { "type": "flyer", "aggroRange": 70, "orbitRadius": 3, "dashSpeed": 12, "dashCooldown": 90 },
       "life": 200, "damage": 70, "defense": 18, "knockbackResist": 0.3, "size": [2.2, 1.2], "moveSpeed": 7, "gravity": false, "value": 800, "covers": ["terraria:flying_snake"] },
     {
-      "id": "plantera", "model": "plantera", "tags": ["boss", "lava_immune"], "name": "Plantera", "description": "The jungle's heart, awake and very hungry.",
+      "id": "plantera", "facing": "look", "model": "plantera", "tags": ["boss", "lava_immune"], "name": "Plantera", "description": "The jungle's heart, awake and very hungry.",
       "brain": { "type": "pattern", "phases": [
         { "below": 1.0, "volley": { "projectile": "plantera_seed", "damage": 40, "speed": 16, "interval": 45, "spread": 8 },
           "moves": [{ "type": "chase", "ticks": 240, "speed": 4.5 }, { "type": "orbit", "ticks": 150, "speed": 7, "distance": 8, "height": 1 }] },

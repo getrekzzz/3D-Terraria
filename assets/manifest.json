@@ -4611,13 +4611,21 @@
   },
   "plantera": {
    "model": "assets/models/creatures/plantera.glb",
-   "generator": "plantera",
-   "animations": []
+   "generator": "plantera_bulb",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
   },
   "plantera_open": {
    "model": "assets/models/creatures/plantera_open.glb",
-   "generator": "plantera",
-   "animations": []
+   "generator": "plantera_bulb",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
   },
   "player": {
    "model": "assets/models/creatures/player.glb",
@@ -4796,24 +4804,29 @@
    "generator": "present",
    "animations": []
   },
+  "prime_arm_strut": {
+   "model": "assets/models/creatures/prime_arm_strut.glb",
+   "generator": "prime_strut",
+   "animations": []
+  },
   "prime_cannon": {
    "model": "assets/models/creatures/prime_cannon.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "prime_laser": {
    "model": "assets/models/creatures/prime_laser.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "prime_saw": {
    "model": "assets/models/creatures/prime_saw.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "prime_vice": {
    "model": "assets/models/creatures/prime_vice.glb",
-   "generator": "prime_arm",
+   "generator": "prime_tool",
    "animations": []
   },
   "princess": {
@@ -4833,7 +4846,7 @@
   },
   "probe": {
    "model": "assets/models/creatures/probe.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "pumpking": {
@@ -4892,12 +4905,12 @@
   },
   "retinazer": {
    "model": "assets/models/creatures/retinazer.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "retinazer_open": {
    "model": "assets/models/creatures/retinazer_open.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "salamander": {
@@ -5005,7 +5018,7 @@
   },
   "skeletron_prime_head": {
    "model": "assets/models/creatures/skeletron_prime_head.glb",
-   "generator": "prime_skull",
+   "generator": "prime_head",
    "animations": []
   },
   "snow_balla": {
@@ -5025,12 +5038,12 @@
   },
   "spazmatism": {
    "model": "assets/models/creatures/spazmatism.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "spazmatism_open": {
    "model": "assets/models/creatures/spazmatism_open.glb",
-   "generator": "mech_eye",
+   "generator": "twin_eye",
    "animations": []
   },
   "splinterling": {
@@ -5173,17 +5186,17 @@
   },
   "the_destroyer_body": {
    "model": "assets/models/creatures/the_destroyer_body.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "the_destroyer_head": {
    "model": "assets/models/creatures/the_destroyer_head.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "the_destroyer_tail": {
    "model": "assets/models/creatures/the_destroyer_tail.glb",
-   "generator": "serpent",
+   "generator": "destroyer_part",
    "animations": []
   },
   "the_hungry": {

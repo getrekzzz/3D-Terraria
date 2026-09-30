@@ -4127,85 +4127,91 @@
       }
     },
     "retinazer": {
-      "generator": "mech_eye",
+      "generator": "twin_eye",
       "params": {
+        "iris": "#ff2a2a",
         "variant": "ray",
-        "iris": "#ff2a2a"
+        "radius": 1.3
       }
     },
     "retinazer_open": {
-      "generator": "mech_eye",
+      "generator": "twin_eye",
       "params": {
-        "variant": "ray",
         "iris": "#ff2a2a",
+        "variant": "ray",
+        "radius": 1.3,
         "open": true
       }
     },
     "spazmatism": {
-      "generator": "mech_eye",
+      "generator": "twin_eye",
       "params": {
-        "variant": "flare",
         "iris": "#50f040",
-        "thrust": "#80ff60"
+        "variant": "flare",
+        "thrust": "#80ff60",
+        "radius": 1.3
       }
     },
     "spazmatism_open": {
-      "generator": "mech_eye",
+      "generator": "twin_eye",
       "params": {
-        "variant": "flare",
         "iris": "#50f040",
+        "variant": "flare",
         "thrust": "#80ff60",
+        "radius": 1.3,
         "open": true
       }
     },
     "the_destroyer_head": {
-      "generator": "serpent",
+      "generator": "destroyer_part",
       "params": {
         "part": "head"
       }
     },
     "the_destroyer_body": {
-      "generator": "serpent",
+      "generator": "destroyer_part",
       "params": {
         "part": "segment"
       }
     },
     "the_destroyer_tail": {
-      "generator": "serpent",
+      "generator": "destroyer_part",
       "params": {
         "part": "tail"
       }
     },
     "probe": {
-      "generator": "serpent",
+      "generator": "destroyer_part",
       "params": {
         "part": "probe"
       }
     },
     "skeletron_prime_head": {
-      "generator": "prime_skull",
-      "params": {}
+      "generator": "prime_head",
+      "params": {
+        "radius": 1.2
+      }
     },
     "prime_saw": {
-      "generator": "prime_arm",
+      "generator": "prime_tool",
       "params": {
         "tool": "saw"
       }
     },
     "prime_vice": {
-      "generator": "prime_arm",
+      "generator": "prime_tool",
       "params": {
         "tool": "vice"
       }
     },
     "prime_cannon": {
-      "generator": "prime_arm",
+      "generator": "prime_tool",
       "params": {
         "tool": "cannon"
       }
     },
     "prime_laser": {
-      "generator": "prime_arm",
+      "generator": "prime_tool",
       "params": {
         "tool": "laser"
       }
@@ -4420,11 +4426,11 @@
       }
     },
     "plantera": {
-      "generator": "plantera",
+      "generator": "plantera_bulb",
       "params": {}
     },
     "plantera_open": {
-      "generator": "plantera",
+      "generator": "plantera_bulb",
       "params": {
         "open": true
       }
@@ -5897,6 +5903,12 @@
       "generator": "skeletron_arm_bone",
       "params": {
         "radius": 0.13
+      }
+    },
+    "prime_arm_strut": {
+      "generator": "prime_strut",
+      "params": {
+        "radius": 0.15
       }
     }
   }
