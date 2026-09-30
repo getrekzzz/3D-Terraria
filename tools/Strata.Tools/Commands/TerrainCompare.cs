@@ -15,21 +15,27 @@ internal static class TerrainCompare
 
     private static readonly string[] BiomeMetrics = { "columns", "lipPercent", "floatingPer10k", "breachPercent", "stepP99", "roughness", "relief" };
 
-    /// <summary>Prints the table and writes it to <paramref name="outPath"/>; false when the older file has no terrain section.</summary>
-    public static bool Write(string beforePath, string afterJson, string outPath)
+    /// <summary>Reads an older stats.json; null (with the reason on stderr) when it is missing or has no terrain section.</summary>
+    public static string? Load(string path)
     {
-        if (!File.Exists(beforePath))
+        if (!File.Exists(path))
         {
-            Console.Error.WriteLine($"--compare: {beforePath} not found");
-            return false;
+            Console.Error.WriteLine($"--compare: {path} not found");
+            return null;
         }
-        using var beforeDoc = JsonDocument.Parse(File.ReadAllText(beforePath));
+        var text = File.ReadAllText(path);
+        using var doc = JsonDocument.Parse(text);
+        if (doc.RootElement.TryGetProperty("terrain", out _)) return text;
+        Console.Error.WriteLine($"--compare: {path} has no terrain section (made before terrain metrics existed)");
+        return null;
+    }
+
+    /// <summary>Prints the table and writes it to <paramref name="outPath"/> (<paramref name="beforeJson"/> from <see cref="Load"/>).</summary>
+    public static void Write(string beforeJson, string afterJson, string outPath)
+    {
+        using var beforeDoc = JsonDocument.Parse(beforeJson);
         using var afterDoc = JsonDocument.Parse(afterJson);
-        if (!beforeDoc.RootElement.TryGetProperty("terrain", out var before))
-        {
-            Console.Error.WriteLine($"--compare: {beforePath} has no terrain section (made before terrain metrics existed)");
-            return false;
-        }
+        var before = beforeDoc.RootElement.GetProperty("terrain");
         var after = afterDoc.RootElement.GetProperty("terrain");
         var lines = new List<string>();
         foreach (var key in new[] { "seed", "size" })
@@ -52,7 +58,6 @@ internal static class TerrainCompare
 
         foreach (var line in lines) Console.WriteLine(line);
         File.WriteAllLines(outPath, lines);
-        return true;
     }
 
     private static string Row(string name, double? before, double? after)

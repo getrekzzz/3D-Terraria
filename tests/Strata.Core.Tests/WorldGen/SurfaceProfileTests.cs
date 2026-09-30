@@ -94,6 +94,42 @@ public class SurfaceProfileTests
     }
 
     [Fact]
+    public void MetricThresholdsArePinned()
+    {
+        // The definitions are frozen so reports stay comparable: pin every threshold on both sides.
+        var world = Plane();
+        var batch = world.BeginEdit();
+        void Clear(int x, int z, int yFrom, int yTo)
+        {
+            for (int y = yFrom; y <= yTo; y++) batch.SetBlock(x, y, z, 0);
+        }
+        Clear(10, 10, 30, 33); // roof 6 thick over air
+        Clear(12, 10, 29, 32); // roof 7 thick
+        Clear(14, 10, 25, 26); // 2-cell gap under the cell 12 below Top
+        Clear(16, 10, 24, 25); // 2-cell gap under the cell 13 below Top
+        Clear(18, 10, 30, 30); // 1-cell gap under a 9-thick run
+        Clear(20, 10, 36, 36); // 1-cell gap under a 3-thick run
+        Clear(30, 30, Ground - 2, Ground - 1); // Top 3 below the surface
+        Clear(32, 30, Ground - 3, Ground - 1); // Top 4 below the surface
+        Clear(40, 40, Ground - SurfaceProfile.Footroom, Ground - 1); // nothing solid in the scan band
+        batch.Commit();
+
+        var profile = Profile(world);
+        Assert.Equal(SurfaceFlags.Lip | SurfaceFlags.Floating, profile.FlagsAt(10, 10));
+        Assert.Equal(SurfaceFlags.Floating, profile.FlagsAt(12, 10));
+        Assert.Equal(SurfaceFlags.Floating, profile.FlagsAt(14, 10));
+        Assert.Equal(1, profile.FloatingCells[profile.Index(14, 10)]);
+        Assert.Equal(SurfaceFlags.None, profile.FlagsAt(16, 10));
+        Assert.Equal(SurfaceFlags.None, profile.FlagsAt(18, 10));
+        Assert.Equal(SurfaceFlags.Lip, profile.FlagsAt(20, 10));
+        Assert.Equal(Ground - 3, profile.TopAt(30, 30));
+        Assert.Equal(SurfaceFlags.None, profile.FlagsAt(30, 30));
+        Assert.Equal(SurfaceFlags.Breach, profile.FlagsAt(32, 30));
+        Assert.Equal(Ground - SurfaceProfile.Footroom - 1, profile.TopAt(40, 40));
+        Assert.Equal(SurfaceFlags.Breach, profile.FlagsAt(40, 40));
+    }
+
+    [Fact]
     public void GeneratedWindowIsMeasurable()
     {
         // The scan band must cover the tallest overhang the density field can produce.

@@ -40,6 +40,16 @@ public sealed class WorldgenReportCommand : IToolCommand
             Evil = context.Options.Get("evil") == "crimson" ? EvilKind.Crimson : EvilKind.Corruption,
         };
         var outDir = Path.GetFullPath(context.Options.Get("out") ?? context.PathOf("build/worldgen"));
+        int terrainWindow = context.Options.Int("terrain-window", 512);
+        string? compare = context.Options.Get("compare");
+        if (compare != null && terrainWindow <= 0)
+        {
+            Console.Error.WriteLine("--compare needs the terrain metrics (--terrain-window > 0)");
+            return 1;
+        }
+        // Read before anything is written: --compare may point at the stats.json this run replaces.
+        string? beforeJson = compare != null ? TerrainCompare.Load(Path.GetFullPath(compare)) : null;
+        if (compare != null && beforeJson == null) return 1;
         Directory.CreateDirectory(outDir);
         File.WriteAllText(Path.Combine(Path.GetDirectoryName(outDir)!, ".gdignore"), "");
 
@@ -72,7 +82,6 @@ public sealed class WorldgenReportCommand : IToolCommand
             painter.Slice(Path.Combine(outDir, $"slice_depth_{(int)(depth * 100):00}.png"), slice, y);
         }
 
-        int terrainWindow = context.Options.Int("terrain-window", 512);
         var terrain = terrainWindow > 0 ? MeasureTerrain(gen, terrainWindow, outDir) : null;
 
         var summary = stats.Summarize(gen, planMs, timings, terrain);
@@ -81,9 +90,7 @@ public sealed class WorldgenReportCommand : IToolCommand
         foreach (var (name, (count, total, max)) in gen.ProfilePasses!.SnapshotTimers().OrderByDescending(kv => kv.Value.TotalMs))
             Console.WriteLine($"  {name,-20} avg {total / count:F2} ms  max {max:F1} ms");
         Console.WriteLine($"plan {planMs} ms; {timings.Count} chunks, avg {timings.Average():F2} ms, max {timings.Max():F1} ms");
-        if (context.Options.Get("compare") is { } compare && terrain != null
-            && !TerrainCompare.Write(Path.GetFullPath(compare), json, Path.Combine(outDir, "terrain_compare.txt")))
-            return 1;
+        if (beforeJson != null) TerrainCompare.Write(beforeJson, json, Path.Combine(outDir, "terrain_compare.txt"));
         Console.WriteLine($"report written to {outDir}");
         return 0;
     }
@@ -95,8 +102,12 @@ public sealed class WorldgenReportCommand : IToolCommand
         var spawn = gen.Plan.Spawn;
         int w = Math.Min(window, size.X), d = Math.Min(window, size.Z);
         int x0 = Math.Clamp(spawn.X - w / 2, 0, size.X - w), z0 = Math.Clamp(spawn.Z - d / 2, 0, size.Z - d);
+        // Keep the per-pass timings printed at the end about the section/slice sample chunks only.
+        var passTimers = gen.ProfilePasses;
+        gen.ProfilePasses = null;
         var sw = Stopwatch.StartNew();
         var profile = SurfaceProfile.Measure(gen, x0, z0, w, d, Threads);
+        gen.ProfilePasses = passTimers;
         var t = profile.Stats();
         long ms = sw.ElapsedMilliseconds;
         var painter = new TerrainPainter(gen, profile);
