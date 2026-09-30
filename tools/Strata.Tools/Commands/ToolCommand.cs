@@ -12,7 +12,7 @@ public sealed record ToolContext(string ProjectRoot, ToolOptions Options)
     public string PathOf(string relative) => Path.Combine(ProjectRoot, relative.Replace('/', Path.DirectorySeparatorChar));
 }
 
-/// <summary>Parses <c>--key value</c> and <c>--flag</c> arguments.</summary>
+/// <summary>Parses <c>--key value</c>, <c>--key=value</c> and <c>--flag</c> arguments.</summary>
 public sealed class ToolOptions
 {
     private readonly Dictionary<string, string> _values = new(StringComparer.Ordinal);
@@ -25,6 +25,12 @@ public sealed class ToolOptions
         {
             if (!list[i].StartsWith("--", StringComparison.Ordinal)) continue;
             var key = list[i][2..];
+            int eq = key.IndexOf('=');
+            if (eq > 0)
+            {
+                o._values[key[..eq]] = key[(eq + 1)..];
+                continue;
+            }
             bool hasValue = i + 1 < list.Count && !list[i + 1].StartsWith("--", StringComparison.Ordinal);
             o._values[key] = hasValue ? list[++i] : "true";
         }
