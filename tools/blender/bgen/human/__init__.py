@@ -6,7 +6,7 @@ eyeballs (head) -> hands with fingers and nails (hands) -> skin painting (paint)
 with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
-hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat, hatColor, horns, wings, tail, anatomy
+hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat, hatColor, mask, horns, wings, tail, anatomy
 (human|skeleton), undead.
 """
 import math
@@ -232,6 +232,8 @@ def dress(fr, head, parts, p):
     strip_covered(body, covers)
     if p.get("hat"):
         add(accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040")))
+    if "mask" in p:
+        add(accessories.mask(head, parts["head"], p["mask"]))
     if "horns" in p:
         add(accessories.horns(head, p["horns"]))
     if "wings" in p:

@@ -3630,8 +3630,9 @@
   },
   "duke_fishron": {
    "model": "assets/models/creatures/duke_fishron.glb",
-   "generator": "fish",
+   "generator": "duke_fishron_detailed",
    "animations": [
+    "attack",
     "fly",
     "idle"
    ]
@@ -3699,9 +3700,11 @@
   },
   "empress_of_light": {
    "model": "assets/models/creatures/empress_of_light.glb",
-   "generator": "sprite",
+   "generator": "empress_detailed",
    "animations": [
-    "fly"
+    "attack",
+    "fly",
+    "idle"
    ]
   },
   "etherian_goblin": {
@@ -3973,7 +3976,7 @@
   },
   "golem": {
    "model": "assets/models/creatures/golem.glb",
-   "generator": "golem",
+   "generator": "golem_idol",
    "animations": []
   },
   "golfer": {
@@ -4189,13 +4192,25 @@
    "model": "assets/models/creatures/lunatic_cultist.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -4204,13 +4219,25 @@
    "model": "assets/models/creatures/lunatic_devotee.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -4305,17 +4332,17 @@
   },
   "moon_lord": {
    "model": "assets/models/creatures/moon_lord.glb",
-   "generator": "moon_lord",
+   "generator": "moon_lord_body",
    "animations": []
   },
   "moon_lord_hand": {
    "model": "assets/models/creatures/moon_lord_hand.glb",
-   "generator": "moon_lord_hand",
+   "generator": "moon_lord_hand_detailed",
    "animations": []
   },
   "moon_lord_head": {
    "model": "assets/models/creatures/moon_lord_head.glb",
-   "generator": "moon_lord_head",
+   "generator": "moon_lord_head_detailed",
    "animations": []
   },
   "moth": {

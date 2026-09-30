@@ -4436,7 +4436,7 @@
       }
     },
     "golem": {
-      "generator": "golem",
+      "generator": "golem_idol",
       "params": {}
     },
     "queen_slime": {
@@ -4444,11 +4444,8 @@
       "params": {}
     },
     "duke_fishron": {
-      "generator": "fish",
-      "params": {
-        "scales": "#4ac0b0",
-        "belly": "#e8d8a0"
-      }
+      "generator": "duke_fishron_detailed",
+      "params": {}
     },
     "lacewing": {
       "generator": "insect",
@@ -4459,12 +4456,8 @@
       }
     },
     "empress_of_light": {
-      "generator": "sprite",
-      "params": {
-        "glow": "#fff0ff",
-        "hair": "#ffb0e8",
-        "wing": "#9ae0ff"
-      }
+      "generator": "empress_detailed",
+      "params": {}
     },
     "alien_hornet": {
       "generator": "insect",
@@ -4536,7 +4529,8 @@
         "boots": "#1a1a3a",
         "height": 1.9,
         "build": 0.8,
-        "weight": 0.4
+        "weight": 0.4,
+        "mask": "#e8e2d2"
       }
     },
     "lunatic_devotee": {
@@ -4554,19 +4548,20 @@
         "boots": "#1a1a3a",
         "height": 1.8,
         "build": 0.75,
-        "weight": 0.4
+        "weight": 0.4,
+        "mask": "#d8d2c2"
       }
     },
     "moon_lord": {
-      "generator": "moon_lord",
+      "generator": "moon_lord_body",
       "params": {}
     },
     "moon_lord_hand": {
-      "generator": "moon_lord_hand",
+      "generator": "moon_lord_hand_detailed",
       "params": {}
     },
     "moon_lord_head": {
-      "generator": "moon_lord_head",
+      "generator": "moon_lord_head_detailed",
       "params": {}
     },
     "mysterious_tablet": {
