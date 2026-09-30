@@ -1,4 +1,6 @@
-"""Generates every model and item icon from tools/blender/assets.json and the game content.
+"""Generates every model and item icon from tools/blender/assets.json (+ the drop-in files tools/blender/assets.d/*.json,
+merged by asset_spec.py) and the game content. Generators come from bgen's @generator registry and the per-module
+GENERATORS dicts listed in build().
 
 Run with Blender:   blender --background --python tools/blender/build_all.py -- [options]
 or the bpy module:  python3.13 tools/blender/build_all.py [options]      (pip install bpy==5.2.2)
@@ -21,6 +23,7 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
+from asset_spec import SpecError, load_spec  # noqa: E402
 
 GENERATOR_VERSION = 1
 CELL = 0.5
@@ -132,12 +135,26 @@ def plan(spec, blocks, items, objects, enemies):
 
 def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
+    import bgen
     from bgen import beasts, bosses, bosses_hard, bosses_lunar, bosses_pre, bosses_pre2, bosses_pre3, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
 
     generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS, **bosses.GENERATORS, **mechs.GENERATORS,
                   **gear.GENERATORS, **horrors.GENERATORS, **lunar.GENERATORS, **festive.GENERATORS, **critters.ITEM_GENERATORS, **mechanisms.GENERATORS}
+    # Creature generators, first module wins (creatures, fauna, beasts, …, bosses_lunar, then bosses).
+    creature_generators = {}
+    for module in (bosses, bosses_lunar, bosses_hard, bosses_pre3, bosses_pre2, bosses_pre, critters, festive, lunar, horrors, mechs,
+                   beasts, fauna, creatures):
+        creature_generators.update(module.GENERATORS)
+    # Generators registered with @bgen.generator (load_all imports every bgen module) join both tables; reusing a name
+    # from the dicts above is an error rather than a silent override.
+    registry = bgen.load_all()
+    clash = sorted(set(registry) & (set(generators) | set(creature_generators)))
+    if clash:
+        raise SystemExit(f"ERROR: generator name(s) {', '.join(clash)} registered with @generator are already used by a module's GENERATORS dict")
+    generators.update(registry)
+    creature_generators.update(registry)
     manifest_path = REPO / "assets" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() and opts["only"] else {"objects": {}, "items": {}}
     wanted = (lambda i: any(fnmatch.fnmatch(i, pat) for pat in opts["only"].split(","))) if opts["only"] else (lambda i: True)
@@ -200,12 +217,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
         else:
             props = PropMaterials(REPO)
             mb = MeshBuilder(name)
-            gen = (creatures.GENERATORS.get(job["generator"]) or fauna.GENERATORS.get(job["generator"])
-                   or beasts.GENERATORS.get(job["generator"]) or mechs.GENERATORS.get(job["generator"]) or horrors.GENERATORS.get(job["generator"])
-                   or lunar.GENERATORS.get(job["generator"]) or festive.GENERATORS.get(job["generator"]) or critters.GENERATORS.get(job["generator"])
-                   or bosses_pre.GENERATORS.get(job["generator"]) or bosses_pre2.GENERATORS.get(job["generator"])
-                   or bosses_pre3.GENERATORS.get(job["generator"]) or bosses_hard.GENERATORS.get(job["generator"])
-                   or bosses_lunar.GENERATORS.get(job["generator"]) or bosses.GENERATORS[job["generator"]])
+            gen = creature_generators[job["generator"]]
             rig = gen(mb, job.get("params", {}), rng_for(name, 0))
             for slot in mb.materials:
                 props.validate(slot)
@@ -257,7 +269,11 @@ def _view_for(generator: str) -> str:
 
 def main() -> int:
     opts = args()
-    spec = json.loads((HERE / "assets.json").read_text(encoding="utf-8"))
+    try:
+        spec = load_spec()
+    except SpecError as e:
+        print("ERROR:", e)
+        return 1
     blocks, items, objects, enemies = load_content()
     object_jobs, item_jobs, block_icons, creature_jobs, errors = plan(spec, blocks, items, objects, enemies)
     for e in errors:

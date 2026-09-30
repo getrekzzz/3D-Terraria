@@ -1,5 +1,12 @@
 """Recipes for every sound effect the game plays (assets/audio/sfx/<id>.wav, variants <id>_<n>.wav). Each recipe takes a
-numpy Generator (for per-variant variation) and returns a mono float array at SFX_SR."""
+numpy Generator (for per-variant variation) and returns a mono float array at SFX_SR.
+
+New sounds go in their own module, tools/audio/sfx_recipes_<topic>.py, which defines RECIPES (and optionally GAIN) in
+the same form as below; this module merges them in file-name order (a sound id defined twice is an error). Extension
+modules may import helpers from here (``from sfx_recipes import whoosh``); always import this module, not an extension."""
+import importlib
+import pathlib
+
 import numpy as np
 
 from synth import (adsr, bandpass, decay, fade, highpass, kick, lowpass, midi_hz, mix, osc, reverb, samples, seconds, snare,
@@ -323,6 +330,24 @@ for _m in ("grass", "stone", "sand", "wood", "snow"):
     GAIN[f"step_{_m}"] = 0.3
 for _m in ("dirt", "grass", "stone", "ore", "wood", "sand", "snow", "glass", "ice", "metal", "cloth"):
     GAIN[f"dig_{_m}"] = 0.6
+
+
+def _merge_extensions():
+    """Adds RECIPES and GAIN from every sfx_recipes_*.py next to this file, sorted by file name."""
+    owners = {"RECIPES": dict.fromkeys(RECIPES, "sfx_recipes.py"), "GAIN": dict.fromkeys(GAIN, "sfx_recipes.py")}
+    for path in sorted(pathlib.Path(__file__).resolve().parent.glob("sfx_recipes_*.py")):
+        module = importlib.import_module(path.stem)
+        if not isinstance(getattr(module, "RECIPES", None), dict):
+            raise ValueError(f"tools/audio/{path.name} must define a RECIPES dict")
+        for name, table in (("RECIPES", RECIPES), ("GAIN", GAIN)):
+            for sid, value in getattr(module, name, {}).items():
+                if sid in owners[name]:
+                    raise ValueError(f"sound '{sid}' in {name} of tools/audio/{path.name} is already defined in {owners[name][sid]}")
+                owners[name][sid] = path.name
+                table[sid] = value
+
+
+_merge_extensions()
 
 
 def render(sound_id, variant, seed):

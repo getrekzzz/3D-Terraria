@@ -82,3 +82,7 @@
 `game/Testing/Scripts/*.cmds` run headless in CI with `--smoke=` and print `SMOKE PASS`/`SMOKE FAIL`;
 `--exec="cmd;cmd"` runs commands at startup (screenshots, manual testing). Runner directives: `wait`,
 `wait_until <probe> <op> <value> [timeout]`, `hold <action> <seconds>`, `repeat <n> <command>`.
+Probes come from `StandardProbes` and from `[ProbeSource]` classes (static `Register(CommandContext ctx, …)`):
+`CommandContext` registers those in Strata.Core (e.g. `TownProbes`), `GodotCommandHost.CreateContext` those in the game
+assembly (e.g. `PlayerProbes`, which also takes the `LaunchedWorld`), in full-type-name order (`ProbeSources`). A
+probe name is registered once; new probes go in a new source file (docs/CONVENTIONS.md, *Extension points*).

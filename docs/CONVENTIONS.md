@@ -69,3 +69,33 @@ wherever possible.
 * Blender generators live in `tools/blender/`, are deterministic from parameters, and export GLB to
   `assets/models/`. `assets/manifest.json` lists every asset; the validator cross-checks content refs.
 * Textures are synthesized by `tools/textures/` into texture-array atlases.
+* The Blender asset spec is `tools/blender/assets.json` plus the drop-in files `tools/blender/assets.d/*.json`; read
+  it through `load_spec()` in `tools/blender/asset_spec.py`, never by opening `assets.json` directly.
+
+## Testing
+* Core logic is covered by xunit tests in `tests/Strata.Core.Tests`; engine behaviour by command scripts in
+  `game/Testing/Scripts/*.cmds`, which CI runs headless one by one (each must print `SMOKE PASS`).
+* Scripts check state through probes (`assert`, `wait_until`). A new probe goes in a probe-source file (see
+  *Extension points*); existing probes keep their names, since scripts depend on them.
+* A block appended to a shared `.cmds` file goes at the end, under a marker line with its work-package id, in
+  work-package order, so parallel branches merge by concatenation:
+  ```
+  # --- P2-06 ---
+  give torch 5
+  assert inv.torch >= 5
+  ```
+
+## Extension points
+Parallel work adds a new file at one of these points instead of editing a shared hub file.
+
+| What | Add | Picked up by |
+|---|---|---|
+| Probes (Core) | A `static class` marked `[ProbeSource]` in `src/Strata.Core` with `static void Register(CommandContext ctx)` (e.g. `Commands/TownProbes.cs`) | Every `CommandContext`, after `StandardProbes` |
+| Probes (engine) | A `[ProbeSource]` static class in `game/` whose `Register(CommandContext ctx, …)` may also take the `LaunchedWorld` and the `GodotLog` (e.g. `game/Debug/PlayerProbes.cs`) | `GodotCommandHost.CreateContext`, after the core engine counters |
+| Sound effects | `tools/audio/sfx_recipes_<topic>.py` defining `RECIPES` (and optionally `GAIN`) like `sfx_recipes.py` | `sfx_recipes.py`, which merges them by file name |
+| Blender asset entries | `tools/blender/assets.d/<topic>.json` with the `assets.json` schema (see its README) | `asset_spec.load_spec()` (`build_all.py`, `preview.py`) |
+| Blender generators | `tools/blender/bgen/<module>.py` with functions registered by `@generator` from `bgen/__init__.py` | `bgen.load_all()` in `build_all.py` and `preview.py`, alongside the per-module `GENERATORS` dicts |
+| Smoke-script blocks | A `# --- <WP id> ---` block at the end of a shared `.cmds` file (see *Testing*) | The script runner (`#` lines are comments) |
+
+Probe sources register in full-type-name order; a `Register` asking for a service the host does not pass fails at
+start-up. A duplicated probe name, sound id, asset id or generator name is an error, never a silent override.
