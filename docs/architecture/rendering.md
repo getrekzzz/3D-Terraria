@@ -99,6 +99,6 @@ the way they walk, and brings the arms up to the aim for guns, bows, staffs and 
 fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a
 dash, a shrink on teleport, a spin when a boss changes form; humanoid enemies swing or shoot when they attack, flinch
 when hit and fall dead (corpses sink after a moment, other creatures shrink away). Models built around their centre
-are raised onto their feet by their bounds (`CreatureVisual.Lift`). `NpcRenderer.Arms` stretches a boss's `armModel`
+are raised onto their feet by their bounds (`CreatureVisual.LiftFor`, only for centred, box-sized models). `NpcRenderer.Arms` stretches a boss's `armModel`
 from its shoulders to each free-flying hand with an outward elbow.
 

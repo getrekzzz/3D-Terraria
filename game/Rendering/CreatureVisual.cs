@@ -43,17 +43,30 @@ public sealed partial class CreatureVisual : Node3D
         return visual;
     }
 
+    /// <summary>The model's vertical extent around its origin (metres, at scale 1).</summary>
+    public float Bottom { get; private set; } = float.MaxValue;
+
+    public float Top { get; private set; } = float.MinValue;
+
     /// <summary>
-    /// How far the model reaches below its origin (metres, at scale 1): models built around their centre (eyes, brains)
-    /// are raised by this so they sit inside the creature's box, which starts at its feet.
+    /// How far to raise a model built around its centre (eyes, skulls) so it sits in its creature's box, which starts at
+    /// the feet: only models whose bounds are centred on the origin and about the box's size (a body with legs dangling
+    /// far below its box, like the Moon Lord's, is placed as modelled).
     /// </summary>
-    public float Lift { get; private set; }
+    public float LiftFor(float boxHeight, float scale)
+    {
+        float height = Top - Bottom, centre = (Top + Bottom) * 0.5f;
+        if (Bottom >= 0f || height <= 0f || Mathf.Abs(centre) > 0.15f * height || height * scale > 2.2f * boxHeight) return 0f;
+        return -Bottom * scale;
+    }
 
     private void Setup(Node node, PropLibrary props, Transform3D xf)
     {
         if (node is MeshInstance3D mi && mi.Mesh != null)
         {
-            Lift = Mathf.Max(Lift, -(xf * mi.Mesh.GetAabb()).Position.Y);
+            var box = xf * mi.Mesh.GetAabb();
+            Bottom = Mathf.Min(Bottom, box.Position.Y);
+            Top = Mathf.Max(Top, box.End.Y);
             for (int i = 0; i < mi.Mesh.GetSurfaceCount(); i++)
                 mi.SetSurfaceOverrideMaterial(i, props.Material(mi.Mesh.SurfaceGetMaterial(i)?.ResourceName ?? "prop:missing", multimesh: false));
             _geometry.Add(mi);

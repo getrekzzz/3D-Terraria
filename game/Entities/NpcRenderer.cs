@@ -123,7 +123,7 @@ public sealed partial class NpcRenderer : Node3D
                 view.Spin = 1f;
             }
             var visual = view.Visual;
-            visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.Lift * npc.Def.Scale : view.Shown;
+            visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.LiftFor(npc.HalfExtents.Y * 2f, npc.Def.Scale) : view.Shown;
             if (npc.Segments.Count > 0)
             {
                 UpdateSegments(npc, view, world);
