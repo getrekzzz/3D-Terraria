@@ -99,7 +99,7 @@
     { "id": "blood_crawler", "model": "blood_crawler", "tags": ["evil"], "name": "Blood Crawler", "description": "A spider of the Crimson's caves.",
       "brain": { "type": "walker", "aggroRange": 50, "jumpHeight": 5 },
       "life": 70, "damage": 26, "defense": 10, "knockbackResist": 0.3, "size": [2.2, 1.2], "moveSpeed": 4.2, "loot": "blood_crawler", "value": 100, "covers": ["terraria:blood_crawler"] },
-    { "id": "creeper", "model": "creeper", "tags": ["evil", "lava_immune"], "name": "Creeper", "description": "An eye grown from the Brain; it shields its master.",
+    { "id": "creeper", "facing": "look", "model": "creeper", "tags": ["evil", "lava_immune"], "name": "Creeper", "description": "An eye grown from the Brain; it shields its master.",
       "brain": { "type": "flyer", "aggroRange": 200, "orbitRadius": 4, "dashSpeed": 9, "dashCooldown": 90, "bounceOffTerrain": false },
       "life": 100, "damage": 20, "defense": 10, "knockbackResist": 0.5, "size": [2, 2], "scale": 0.8, "moveSpeed": 6, "gravity": false, "collideTerrain": false, "value": 0 },
     {

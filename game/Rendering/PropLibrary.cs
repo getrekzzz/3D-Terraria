@@ -6,7 +6,7 @@ namespace Strata.Game.Rendering;
 
 /// <summary>
 /// Loads generated GLB models and gives every surface the shared prop shader. GLB material names encode the
-/// texture layer and flags (<c>prop:planks</c>, <c>prop:plain:glow</c>); layers come from
+/// texture layer and flags (<c>prop:planks</c>, <c>prop:plain:glow</c>, translucent <c>prop:gel:clear</c>); layers come from
 /// res://assets/textures/props/layers.json. Tree crowns use alpha-tested leaf cards (<c>card:oak_sprig</c>); people use
 /// <c>char:&lt;kind&gt;</c> slots (see <see cref="CharacterMaterials"/>).
 /// Meshes and materials are cached.
@@ -15,6 +15,7 @@ public sealed class PropLibrary
 {
     private const string Folder = "res://assets/textures/props/";
     private static readonly Shader PropShader = GD.Load<Shader>("res://shaders/prop.gdshader");
+    private static readonly Shader PropClearShader = GD.Load<Shader>("res://shaders/prop_clear.gdshader");
     private static readonly Shader CardShader = GD.Load<Shader>("res://shaders/foliage_card.gdshader");
 
     private readonly Dictionary<string, (int Index, float Sway)> _layers = new();
@@ -87,7 +88,7 @@ public sealed class PropLibrary
             m.SetShaderParameter("light_from_custom", multimesh);
             return _materials[key] = m;
         }
-        m = new ShaderMaterial { Shader = PropShader };
+        m = new ShaderMaterial { Shader = System.Array.IndexOf(parts, "clear") > 0 ? PropClearShader : PropShader };
         m.SetShaderParameter("albedo_array", _albedo);
         m.SetShaderParameter("material_array", _material);
         m.SetShaderParameter("layer", (float)layer.Index);

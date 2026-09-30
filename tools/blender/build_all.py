@@ -8,6 +8,8 @@ Options:
   --only=GLOB      rebuild matching asset ids (fnmatch), keep the rest of the manifest
   --no-icons       skip icon rendering
   --samples=N      Cycles samples per icon (default 24)
+  --anims          build only the human animation sets (assets/models/creatures/anim; --only matches characters or sets)
+  --shard=I/N      with --anims: build every Nth set starting at I (to run several builds side by side)
 Outputs: assets/models/{objects,items,creatures}/*.glb, assets/icons/items/*.png, assets/manifest.json
 """
 import fnmatch
@@ -29,7 +31,7 @@ METAL_LAYERS = {"copper": "copper", "gold": "gold"}
 
 def args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
-    opts = {"check": False, "only": None, "icons": True, "samples": 24}
+    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None}
     for a in argv:
         if a == "--check":
             opts["check"] = True
@@ -39,6 +41,11 @@ def args():
             opts["icons"] = False
         elif a.startswith("--samples="):
             opts["samples"] = int(a.split("=", 1)[1])
+        elif a == "--anims":
+            opts["anims"] = True
+        elif a.startswith("--shard="):
+            i, n = a.split("=", 1)[1].split("/")
+            opts["shard"] = (int(i), int(n))
         else:
             raise SystemExit(f"unknown option {a}")
     return opts
@@ -214,6 +221,33 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     print(f"wrote {manifest_path.relative_to(REPO)}")
 
 
+def build_anims(opts, creature_jobs):
+    """Human animation sets: one per distinct skeleton (body, height, gait), shared by every character built on it.
+    index.json maps each character model to its set; the game plays a character's actions from its set."""
+    import bpy  # noqa: F401
+    from bgen import export, human
+    from bgen.mesh import reset_scene
+
+    out = REPO / "assets" / "models" / "creatures" / "anim"
+    out.mkdir(parents=True, exist_ok=True)
+    index, params = {}, {}
+    for name, job in sorted(creature_jobs.items()):
+        if job["generator"] == "humanoid":
+            key = human.motion_key(job.get("params", {}))
+            index[name] = key
+            params.setdefault(key, job.get("params", {}))
+    (out / "index.json").write_text(json.dumps(index, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    pats = opts["only"].split(",") if opts["only"] else ["*"]
+    hit = lambda i: any(fnmatch.fnmatch(i, pat) for pat in pats)
+    keys = sorted(k for k in params if hit(k) or any(hit(n) for n, v in index.items() if v == k))
+    if opts["shard"]:
+        keys = keys[opts["shard"][0]::opts["shard"][1]]
+    for key in keys:
+        reset_scene()
+        export.export_glb(human.build_motion(params[key]), out / f"{key}.glb")
+        print(f"anim {key}: {sorted(a.name for a in bpy.data.actions)}")
+
+
 def _view_for(generator: str) -> str:
     long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow", "gun", "rod", "whip", "red_wrench", "wire_cutter", "bug_net", "paintbrush", "paint_scraper"}
     return "item" if generator in long_items else "object"
@@ -230,6 +264,9 @@ def main() -> int:
         return 1
     print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(creature_jobs)} creatures, {len(block_icons)} block icons (tools/textures/build_icons.py)")
     if opts["check"]:
+        return 0
+    if opts["anims"]:
+        build_anims(opts, creature_jobs)
         return 0
     build(opts, spec, object_jobs, item_jobs, creature_jobs)
     return 0

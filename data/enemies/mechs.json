@@ -37,7 +37,7 @@
   ],
   "enemies": [
     {
-      "id": "retinazer", "model": "retinazer", "tags": ["boss", "lava_immune", "mechanical"], "name": "Retinazer",
+      "id": "retinazer", "facing": "look", "model": "retinazer", "tags": ["boss", "lava_immune", "mechanical"], "name": "Retinazer",
       "description": "The cold eye of the pair: it keeps its distance and burns with light.",
       "brain": { "type": "eyeOfCthulhu", "orbitRadius": 22, "dashSpeed": 14, "dashesPerBurst": 1, "telegraphTicks": 40, "phase2Life": 0.45, "phase2Model": "retinazer_open" },
       "ranged": { "projectile": "death_laser", "damage": 32, "speed": 30, "interval": 75, "range": 45,
@@ -48,7 +48,7 @@
       "covers": ["terraria:the_twins"]
     },
     {
-      "id": "spazmatism", "model": "spazmatism", "tags": ["boss", "lava_immune", "mechanical"], "name": "Spazmatism",
+      "id": "spazmatism", "facing": "look", "model": "spazmatism", "tags": ["boss", "lava_immune", "mechanical"], "name": "Spazmatism",
       "description": "The hot eye of the pair: it charges, and when it opens it breathes green fire.",
       "brain": { "type": "eyeOfCthulhu", "orbitRadius": 14, "dashSpeed": 19, "dashesPerBurst": 3, "telegraphTicks": 26, "phase2Life": 0.45, "phase2Model": "spazmatism_open" },
       "ranged": { "projectile": "cursed_fireball", "damage": 36, "speed": 14, "interval": 95, "range": 30,

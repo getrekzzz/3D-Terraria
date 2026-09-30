@@ -72,7 +72,7 @@
     { "id": "crystal_slime", "model": "gel", "tags": ["gel"], "name": "Crystal Slime", "brain": { "type": "slimeHop", "jumpHeight": 7, "jumpSpeed": 5, "hopInterval": 45 },
       "life": 120, "damage": 45, "defense": 20, "knockbackResist": 0.4, "size": [1.8, 1.4], "moveSpeed": 4, "tint": "#f07ad8", "loot": "crystal_slime", "value": 100 },
     {
-      "id": "queen_slime", "model": "queen_slime", "tags": ["boss", "gel", "lava_immune"], "name": "Queen Slime", "description": "The crystalline sovereign of the Hallow's slimes.",
+      "id": "queen_slime", "squash": true, "model": "queen_slime", "tags": ["boss", "gel", "lava_immune"], "name": "Queen Slime", "description": "The crystalline sovereign of the Hallow's slimes.",
       "brain": { "type": "pattern", "ground": true, "phases": [
         { "below": 1.0, "summon": { "enemy": "crystal_slime", "interval": 180, "max": 6, "count": 2 },
           "moves": [{ "type": "hop", "count": 3, "height": 8, "speed": 6, "telegraph": 25 },
@@ -87,7 +87,7 @@
       "covers": ["terraria:queen_slime"]
     },
     {
-      "id": "duke_fishron", "model": "duke_fishron", "tags": ["boss", "lava_immune"], "name": "Duke Fishron", "description": "A pig-shark-dragon from the deep, lured by truffle.",
+      "id": "duke_fishron", "facing": "velocity", "model": "duke_fishron", "tags": ["boss", "lava_immune"], "name": "Duke Fishron", "description": "A pig-shark-dragon from the deep, lured by truffle.",
       "brain": { "type": "pattern", "phases": [
         { "below": 1.0,
           "moves": [{ "type": "dash", "count": 3, "telegraph": 22, "ticks": 40, "speed": 22 },

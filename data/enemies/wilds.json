@@ -47,7 +47,7 @@
       "life": 40, "damage": 18, "defense": 10, "knockbackResist": 0.3, "size": [2.2, 1.4], "moveSpeed": 2.2, "loot": "crab", "value": 60, "covers": ["terraria:crab"] },
     { "id": "blue_jellyfish", "model": "jellyfish", "name": "Blue Jellyfish", "brain": { "type": "swimmer", "pulse": true, "aggroRange": 24 },
       "life": 35, "damage": 16, "defense": 4, "knockbackResist": 0.5, "size": [1.8, 1.8], "moveSpeed": 2.5, "gravity": false, "light": [3, 6, 12], "loot": "blue_jellyfish", "value": 60, "covers": ["terraria:blue_jellyfish", "terraria:jellyfish"] },
-    { "id": "shark", "model": "fish", "name": "Shark", "description": "Travels in hungry schools.", "brain": { "type": "swimmer", "aggroRange": 30 },
+    { "id": "shark", "facing": "velocity", "model": "fish", "name": "Shark", "description": "Travels in hungry schools.", "brain": { "type": "swimmer", "aggroRange": 30 },
       "life": 30, "damage": 20, "defense": 2, "knockbackResist": 0.4, "size": [1.4, 1.0], "moveSpeed": 5, "gravity": false, "loot": "shark", "value": 40, "covers": ["terraria:piranha", "terraria:shark"] },
     { "id": "skeleton", "model": "skeleton", "tags": ["undead"], "name": "Skeleton", "brain": { "type": "walker", "aggroRange": 55, "jumpHeight": 4 },
       "life": 60, "damage": 20, "defense": 8, "knockbackResist": 0.5, "size": [2.0, 3.6], "moveSpeed": 2.6, "loot": "skeleton", "value": 100, "covers": ["terraria:skeleton"] },
