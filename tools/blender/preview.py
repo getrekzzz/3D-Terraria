@@ -2,6 +2,7 @@
 
     python3.13 tools/blender/preview.py -- --creature=player --clips=walk,swing --frames=6 --out=DIR
     python3.13 tools/blender/preview.py -- --creature=king_slime --out=DIR
+    python3.13 tools/blender/preview.py -- '--creature=king_slime_v2:{"width": 3.5}' --out=DIR   (generator:params)
 
 Builds the creature from tools/blender/assets.json (nothing is written to assets/) and renders it with Blender's
 Workbench engine in vertex colours: for every clip a row of evenly spaced frames seen from the front-right, or for a
@@ -34,22 +35,23 @@ def build(name):
     import bpy  # noqa: F401
     from bgen import beasts, bosses, creatures, critters, export, fauna, festive, horrors, human, lunar, mechs
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
-    job = json.loads((HERE / "assets.json").read_text(encoding="utf-8"))["creatures"][name]
+    spec = json.loads((HERE / "assets.json").read_text(encoding="utf-8"))["creatures"]
+    job = spec[name] if ":" not in name else {"generator": name.split(":")[0], "params": json.loads(name.split(":", 1)[1] or "{}")}
     reset_scene()
     if job["generator"] == "humanoid":
         return human.build(name, job.get("params", {}))
-    mb = MeshBuilder(name)
+    mb = MeshBuilder(name.split(":")[0])
     gen = None
     for module in (creatures, fauna, beasts, mechs, horrors, lunar, festive, critters, bosses, *_extra_modules()):
         gen = gen or getattr(module, "GENERATORS", {}).get(job["generator"])
-    rig = gen(mb, job.get("params", {}), rng_for(name, 0))
+    rig = gen(mb, job.get("params", {}), rng_for(name.split(":")[0], 0))
     return creatures.finish(mb.build(export.simple_material), rig, name)
 
 
 def _extra_modules():
     import importlib
     out = []
-    for mod in ("bosses_pre", "bosses_hard"):
+    for mod in ("bosses_pre", "bosses_pre2", "bosses_hard", "bosses_lunar"):
         try:
             out.append(importlib.import_module(f"bgen.{mod}"))
         except ModuleNotFoundError:
@@ -150,7 +152,7 @@ def main():
     arm = next((o for o in objs if o.type == "ARMATURE"), None)
     cam, centre, size, _ = setup_scene(objs)
     tiles = []
-    tmp = out / "_tiles"
+    tmp = out / f"_tiles_{opts['creature'].split(':')[0]}"      # per creature, so previews can run side by side
     tmp.mkdir(exist_ok=True)
     actions = sorted(a.name for a in bpy.data.actions)
     clips = opts["clips"].split(",") if opts["clips"] else actions
@@ -159,7 +161,7 @@ def main():
         for i, v in enumerate(views):
             shoot(cam, centre, size, v, tmp / f"{i}.png")
             tiles.append(tmp / f"{i}.png")
-        sheet(tiles, len(views), out / f"{opts['creature']}.png")
+        sheet(tiles, len(views), out / f"{opts['creature'].split(':')[0]}.png")
         return
     if opts["hold"] and "hand.R" in arm.data.bones:
         hold_rod(arm)
@@ -181,7 +183,7 @@ def main():
             path = tmp / f"{clip}_{k}.png"
             shoot(cam, centre, size, tuple(float(v) for v in opts["view"].split(",")), path, span=1.15)
             tiles.append(path)
-    sheet(tiles, n, out / f"{opts['creature']}.png")
+    sheet(tiles, n, out / f"{opts['creature'].split(':')[0]}.png")
     print("clips:", ", ".join(c for c in clips if bpy.data.actions.get(c)))
 
 

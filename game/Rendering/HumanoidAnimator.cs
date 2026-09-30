@@ -35,7 +35,7 @@ public sealed class HumanoidAnimator
     private readonly AnimationTree _tree;
     private readonly AnimationLibrary _library;
     private string _state = "idle";
-    private float _hold, _holdTarget;
+    private float _hold, _holdTarget, _actionLeft;
 
     private HumanoidAnimator(AnimationTree tree, AnimationLibrary library)
     {
@@ -196,6 +196,7 @@ public sealed class HumanoidAnimator
         _tree.Set("parameters/pick/transition_request", action);
         _tree.Set("parameters/act_speed/scale", clip.Length / Mathf.Max(0.08f, seconds));
         _tree.Set("parameters/action/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
+        _actionLeft = Mathf.Max(0.08f, seconds);
     }
 
     public void StopAction() => _tree.Set("parameters/action/request", (int)AnimationNodeOneShot.OneShotRequest.FadeOut);
@@ -209,6 +210,8 @@ public sealed class HumanoidAnimator
     {
         _hold = Mathf.MoveToward(_hold, _holdTarget, dt * 5f);
         _tree.Set("parameters/hold/blend_amount", Mathf.SmoothStep(0f, 1f, _hold));
-        if (Action != null && !ActionPlaying) Action = null;
+        // (Timed rather than read from the tree, which only picks up a request on its next process.)
+        _actionLeft -= dt;
+        if (_actionLeft <= 0f) Action = null;
     }
 }

@@ -3373,12 +3373,12 @@
   },
   "brain_of_cthulhu": {
    "model": "assets/models/creatures/brain_of_cthulhu.glb",
-   "generator": "brain",
+   "generator": "cthulhu_brain",
    "animations": []
   },
   "brain_of_cthulhu_exposed": {
    "model": "assets/models/creatures/brain_of_cthulhu_exposed.glb",
-   "generator": "brain",
+   "generator": "cthulhu_brain",
    "animations": []
   },
   "brain_suckler": {
@@ -3463,7 +3463,7 @@
   },
   "creeper": {
    "model": "assets/models/creatures/creeper.glb",
-   "generator": "eye",
+   "generator": "creeper_eye",
    "animations": []
   },
   "crimera": {
@@ -3644,7 +3644,7 @@
   },
   "dungeon_guardian": {
    "model": "assets/models/creatures/dungeon_guardian.glb",
-   "generator": "skull",
+   "generator": "skeletron_skull",
    "animations": []
   },
   "dye_trader": {
@@ -3671,17 +3671,21 @@
   },
   "eater_of_worlds_body": {
    "model": "assets/models/creatures/eater_of_worlds_body.glb",
-   "generator": "worm_segment",
+   "generator": "eater_segment",
    "animations": []
   },
   "eater_of_worlds_head": {
    "model": "assets/models/creatures/eater_of_worlds_head.glb",
-   "generator": "worm_segment",
-   "animations": []
+   "generator": "eater_head",
+   "animations": [
+    "fly",
+    "idle",
+    "walk"
+   ]
   },
   "eater_of_worlds_tail": {
    "model": "assets/models/creatures/eater_of_worlds_tail.glb",
-   "generator": "worm_segment",
+   "generator": "eater_tail",
    "animations": []
   },
   "elf_archer": {
@@ -3728,12 +3732,12 @@
   },
   "eye_of_cthulhu": {
    "model": "assets/models/creatures/eye_of_cthulhu.glb",
-   "generator": "watcher",
+   "generator": "cthulhu_eye",
    "animations": []
   },
   "eye_of_cthulhu_mouth": {
    "model": "assets/models/creatures/eye_of_cthulhu_mouth.glb",
-   "generator": "watcher_maw",
+   "generator": "cthulhu_maw",
    "animations": []
   },
   "eyezor": {
@@ -4132,7 +4136,7 @@
   },
   "king_slime": {
    "model": "assets/models/creatures/king_slime.glb",
-   "generator": "gel_sovereign",
+   "generator": "slime_king",
    "animations": []
   },
   "kobold": {
@@ -4845,14 +4849,21 @@
   },
   "queen_bee": {
    "model": "assets/models/creatures/queen_bee.glb",
-   "generator": "insect",
+   "generator": "queen_bee_detailed",
    "animations": [
-    "fly"
+    "attack",
+    "fly",
+    "idle"
    ]
   },
   "queen_slime": {
    "model": "assets/models/creatures/queen_slime.glb",
-   "generator": "gel_sovereign",
+   "generator": "slime_queen",
+   "animations": []
+  },
+  "queen_slime_winged": {
+   "model": "assets/models/creatures/queen_slime_winged.glb",
+   "generator": "slime_queen",
    "animations": []
   },
   "ray_gunner": {
@@ -4983,14 +4994,19 @@
     "walk"
    ]
   },
+  "skeletron_arm": {
+   "model": "assets/models/creatures/skeletron_arm.glb",
+   "generator": "skeletron_arm_bone",
+   "animations": []
+  },
   "skeletron_hand": {
    "model": "assets/models/creatures/skeletron_hand.glb",
-   "generator": "bone_hand",
+   "generator": "skeletron_hand_bones",
    "animations": []
   },
   "skeletron_head": {
    "model": "assets/models/creatures/skeletron_head.glb",
-   "generator": "skull",
+   "generator": "skeletron_skull",
    "animations": []
   },
   "skeletron_prime_head": {

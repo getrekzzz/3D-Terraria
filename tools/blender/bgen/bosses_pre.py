@@ -48,16 +48,16 @@ def _slime_face(mb, w, h, eye_z, spread=0.15, size=0.075):
 def _crown(mb, center, r, gold="#ffffff", gem="#ff2040", points=5, tiara=False):
     """A royal crown (or a tiara) with a ridged band, pointed tines tipped with balls and set jewels."""
     c = Vector(center)
-    band_h = r * (0.35 if not tiara else 0.22)
+    band_h = r * (0.5 if not tiara else 0.22)
     mb.lathe([(r * 0.98, 0), (r * 1.04, band_h * 0.12), (r, band_h * 0.25), (r * 1.03, band_h * 0.8), (r * 0.99, band_h),
               (r * 0.9, band_h), (r * 0.9, 0)], "prop:gold", gold, segments=36, smooth=True, matrix=Matrix.Translation(c))
     for k in range(points):
         a = 2 * math.pi * k / points + math.pi / 2
         radial = Vector((math.cos(a), math.sin(a), 0))
         front = max(0.0, radial.y)
-        tall = r * ((0.55 if not tiara else 0.25) + (0.35 if tiara else 0.12) * front)
+        tall = r * ((0.8 if not tiara else 0.25) + (0.35 if tiara else 0.15) * front)
         base = c + radial * r * 0.96 + Vector((0, 0, band_h * 0.9))
-        mb.cylinder(base, base + Vector((0, 0, tall)) + radial * r * 0.04, r * 0.16, 0.0, "prop:gold", gold, segments=6, smooth=False)
+        mb.cylinder(base, base + Vector((0, 0, tall)) + radial * r * 0.06, r * 0.22, 0.0, "prop:gold", gold, segments=6, smooth=False)
         mb.sphere(base + Vector((0, 0, tall + r * 0.04)), r * 0.06, "prop:gold", gold, subdivisions=1)
         jewel = c + radial * r * 1.03 + Vector((0, 0, band_h * 0.5))
         mb.sphere(jewel, r * 0.06, "prop:crystal:glow", "#40a0ff" if k % 2 else gem, subdivisions=1, scale=(1, 0.6, 1))
@@ -88,7 +88,7 @@ def king_slime(mb: MeshBuilder, p, rng):
     _ninja(mb, (0.1, -0.1, h * 0.12), h * 0.55)
     _slime_body(mb, w, h, body, rng)
     _slime_face(mb, w, h, h * 0.52)
-    _crown(mb, (0, 0, h * 0.9), w * 0.2, gem="#ff2848")
+    _crown(mb, (0, 0, h * 0.88), w * 0.22, gem="#ff2848")
 
 
 def queen_slime(mb: MeshBuilder, p, rng):
@@ -97,8 +97,8 @@ def queen_slime(mb: MeshBuilder, p, rng):
     # Crystal shards grown through the gel, poking out of the top.
     for k in range(9):
         a = rng.uniform(0, 2 * math.pi)
-        base = Vector((math.cos(a) * w * rng.uniform(0.05, 0.28), math.sin(a) * w * rng.uniform(0.05, 0.25), h * rng.uniform(0.45, 0.75)))
-        tip = base + Vector((math.cos(a) * 0.35, math.sin(a) * 0.3, rng.uniform(0.5, 1.0))) * w * 0.22
+        base = Vector((math.cos(a) * w * rng.uniform(0.05, 0.3), math.sin(a) * w * rng.uniform(0.05, 0.26), h * rng.uniform(0.6, 0.8)))
+        tip = base + Vector((math.cos(a) * 0.35, math.sin(a) * 0.3, rng.uniform(0.8, 1.3))) * w * 0.24
         mb.cylinder(base, tip, w * rng.uniform(0.035, 0.06), 0.0, "prop:crystal:glow", rng.choice(("#ff78e0", "#c090ff", "#70d8ff")), segments=5, smooth=False)
     _slime_body(mb, w, h, body, rng, alpha=0.7)
     _slime_face(mb, w, h, h * 0.5, spread=0.13, size=0.07)
@@ -113,42 +113,56 @@ def _crystal_wings(mb, w, h):
         for upper, (span, tilt) in enumerate(((w * 0.95, 0.35), (w * 0.65, -0.25))):
             root = Vector((sx * w * 0.12, -w * 0.3, h * (0.6 + 0.12 * upper)))
             pts = [(0, 0), (span * 0.35, span * 0.28), (span * 0.8, span * 0.36), (span, span * 0.18), (span * 0.85, -span * 0.08), (span * 0.35, -span * 0.12)]
-            m = Matrix.Translation(root) @ Matrix.Rotation(tilt * sx, 4, "Y") @ Matrix.Rotation(-0.35 * sx, 4, "Z") @ Matrix.Diagonal((sx, 1, 1, 1)) @ Matrix.Rotation(math.pi / 2, 4, "X")
+            # Upright membranes (drawn in the XZ plane), swept back and fanned up or down.
+            m = Matrix.Translation(root) @ Matrix.Rotation(0.45 * sx, 4, "Z") @ Matrix.Rotation(-tilt * sx, 4, "Y") @ Matrix.Diagonal((sx, 1, 1, 1))
             mb.extrude_polygon(pts, 0.02, "prop:crystal:clear", (0.95, 0.65, 1.0, 0.55), matrix=m)
             for vx, vz in ((span * 0.8, span * 0.33), (span * 0.95, span * 0.12), (span * 0.6, -span * 0.08)):
                 mb.tube([m @ Vector((0, 0, 0)), m @ Vector((vx * 0.5, 0.012, vz * 0.6)), m @ Vector((vx, 0.012, vz))], [0.03, 0.02, 0.008], "prop:crystal:glow", "#ff9ae8", segments=4)
 
 
 # ---------------------------------------------------------------------------------------------------- eyes
-def _eyeball(mb, r, iris, rng, vein_trees=10, sclera="#f6f0ea", pupil=0.36, cornea=True, blood=0.0):
-    """A detailed eyeball centred at the origin looking along +Y: sclera reddening toward the back, fibrous iris,
-    dark pupil, clear glossy cornea and branching veins."""
+def _eyeball(mb, r, iris, rng, vein_trees=10, sclera="#f6f0ea", pupil=0.36, cornea=True, blood=0.0, center=(0, 0, 0), hole=0.0,
+             tris=4500, vein_depth=3):
+    """A detailed eyeball at ``center`` looking along +Y: sclera reddening toward the back, a fibrous iris and dark
+    pupil riding on the front of the ball, a clear glossy cornea and branching veins. ``hole`` (0..1) instead carves
+    the front open (a torn maw) to that fraction of the radius."""
+    c = Vector(center)
+
     def paint(p, n):
         back = max(0.0, -n.y)
         return mix(sclera, "#d06060", back ** 1.5 * 0.55 + blood + 0.05 * noise3(p, 6))
 
-    organic(mb, lambda b: b.ball((0, 0, 0), r), "prop:plain", tris=4000, resolution=r / 22, paint=paint, smooth=1)
-    ir = r * 0.5
-    y0 = math.sqrt(r * r - ir * ir) - r * 0.005
-    iris_c = Vector((0, y0, 0))
+    def build(b):
+        b.ball(c, r)
+        if hole > 0:
+            b.ball(c + Vector((0, r * 1.05, 0)), r * hole, negative=True)
 
-    def iris_color(q, n):
-        d = q - iris_c
-        rad = Vector((d.x, 0, d.z)).length / ir
-        ang = math.atan2(d.z, d.x)
-        fib = 0.5 + 0.5 * math.sin(ang * 38 + 3 * noise3(q, 8))
-        c = mix(iris, "#ffffff", 0.25 * fib * (1 - rad))
-        c = mix(c, "#060606", max(0.0, (rad - 0.82) / 0.18) * 0.8)       # dark limbal ring
-        return mix(c, "#020202", 1.0 if rad < pupil else 0.0)
+    organic(mb, build, "prop:plain", tris=tris, resolution=r / 24, paint=paint, smooth=1)
+    front = c + Vector((0, r, 0))
+    if hole <= 0:
+        ir = r * 0.5
 
-    prof = [(0.0, 0.0), (ir * pupil * 0.9, 0.0), (ir * 0.55, -ir * 0.01), (ir, -ir * 0.03), (ir * 1.02, -ir * 0.12)]
-    verts = mb.lathe(prof, "prop:plain", "#ffffff", segments=48, matrix=Matrix.Translation(iris_c) @ Matrix.Rotation(-math.pi / 2, 4, "X"))
-    _repaint(mb, verts, iris_color)
-    if cornea:
-        mb.sphere(iris_c + Vector((0, -ir * 0.62, 0)), ir * 1.08, "prop:gel:clear", (1, 1, 1, 0.25), subdivisions=3, scale=(1, 0.6, 1))
+        def iris_color(q, n):
+            d = q - c
+            rad = Vector((d.x, 0, d.z)).length / ir
+            ang = math.atan2(d.z, d.x)
+            fib = 0.5 + 0.5 * math.sin(ang * 38 + 3 * noise3(q, 8))
+            col = mix(iris, "#ffffff", 0.3 * fib * (1 - rad))
+            col = mix(col, "#060606", max(0.0, (rad - 0.82) / 0.18) * 0.8)       # dark limbal ring
+            return mix(col, "#020202", 1.0 if rad < pupil else 0.0)
+
+        # A cap following the ball's curve, just proud of it (lathe about Z, turned to look along +Y).
+        prof = [(ir * k / 8, math.sqrt(r * r - (ir * k / 8) ** 2) + r * 0.006) for k in range(9)]
+        prof.append((ir * 1.01, math.sqrt(r * r - ir * ir) - r * 0.01))
+        verts = mb.lathe(prof, "prop:plain", "#ffffff", segments=48, matrix=Matrix.Translation(c) @ Matrix.Rotation(-math.pi / 2, 4, "X"))
+        _repaint(mb, verts, iris_color)
+        if cornea:
+            h = r - math.sqrt(r * r - ir * ir)
+            mb.sphere(front - Vector((0, h * 1.6, 0)), ir * 1.1, "prop:gel:clear", (1, 1, 1, 0.22), subdivisions=3, scale=(1, 0.55, 1))
     for d in fibonacci(vein_trees * 2, hemisphere=(0, -1, 0))[:vein_trees]:
-        veins(mb, (0, 0, 0), r, d + Vector((0, 0.3, 0)), rng, "prop:flesh", "#b81c1c", length=r * 1.2, width=r * 0.022, depth=3)
-    return iris_c
+        veins(mb, c, r, d + Vector((0, 0.3, 0)), rng, "prop:flesh", "#b81c1c", length=r * 1.25, width=r * 0.032, depth=vein_depth,
+              segments=5 if vein_depth > 2 else 4)
+    return front
 
 
 def _repaint(mb, verts, fn):
@@ -158,7 +172,7 @@ def _repaint(mb, verts, fn):
             loop[mb.color_layer] = fn(loop.vert.co.copy(), loop.vert.normal.copy())
 
 
-def _optic_nerves(mb, r, rng, color="#b83838", count=6, length=2.4):
+def _optic_nerves(mb, r, rng, color="#b83838", count=6, length=2.4, segments=7):
     """A bundle of thick, tapering optic nerves trailing from the back of the eye, twisting as they go."""
     for k in range(count):
         a = 2 * math.pi * k / count + rng.uniform(-0.2, 0.2)
@@ -171,7 +185,7 @@ def _optic_nerves(mb, r, rng, color="#b83838", count=6, length=2.4):
                                -r * 0.75 - length * t * rng.uniform(0.8, 1.1),
                                math.sin(twist) * r * 0.2 * (1 - t) + off.z * (1 - t * 0.4) - t * t * r * 0.25)))
             radii.append(r * (0.16 - 0.14 * t) * rng.uniform(0.85, 1.1))
-        mb.tube(pts, radii, "prop:flesh", mix(color, "#601010", rng.uniform(0, 0.4)), segments=7)
+        mb.tube(pts, radii, "prop:flesh", mix(color, "#601010", rng.uniform(0, 0.4)), segments=segments)
 
 
 def eye_of_cthulhu(mb: MeshBuilder, p, rng):
@@ -183,25 +197,27 @@ def eye_of_cthulhu(mb: MeshBuilder, p, rng):
 def eye_of_cthulhu_maw(mb: MeshBuilder, p, rng):
     """The second form: the iris has torn open into a ragged, fanged mouth."""
     r = p.get("radius", 1.25)
-    _eyeball(mb, r, "#300808", rng, vein_trees=14, cornea=False, blood=0.12)
-    front = Vector((0, r * 0.62, 0))
-    rot = Matrix.Translation(front) @ Matrix.Rotation(-math.pi / 2, 4, "X")
-    mb.lathe([(r * 0.66, r * 0.12), (r * 0.7, 0.0), (r * 0.55, -r * 0.3), (r * 0.28, -r * 0.5), (0.0, -r * 0.55)], "prop:flesh", "#3a0606", segments=32, matrix=rot)
+    _eyeball(mb, r, "#300808", rng, vein_trees=14, blood=0.12, hole=0.62)
+    rim_y = r * 0.8
+    # The throat: a dark red cup set into the opening.
+    mb.lathe([(r * 0.6, 0.0), (r * 0.5, -r * 0.25), (r * 0.3, -r * 0.45), (0.0, -r * 0.5)], "prop:flesh", "#3a0606", segments=32,
+             matrix=Matrix.Translation((0, rim_y, 0)) @ Matrix.Rotation(-math.pi / 2, 4, "X"))
     # Torn gum flaps around the rim, then two rings of fangs.
-    for k in range(14):
-        a = 2 * math.pi * k / 14
+    for k in range(16):
+        a = 2 * math.pi * k / 16
         radial = Vector((math.cos(a), 0, math.sin(a)))
-        base = front + radial * r * 0.68 + Vector((0, r * 0.1, 0))
-        mb.tube([base - radial * r * 0.05, base + radial * r * 0.07 + Vector((0, r * 0.08, 0))], [r * 0.09, r * 0.02], "prop:flesh", "#a01818", segments=5)
-    teeth_ring(mb, front + Vector((0, r * 0.08, 0)), r * 0.6, (0, 1, 0), 16, r * 0.32, r * 0.06, inward=0.75, rng=rng)
-    teeth_ring(mb, front - Vector((0, r * 0.15, 0)), r * 0.42, (0, 1, 0), 12, r * 0.22, r * 0.045, inward=0.8, rng=rng)
+        base = Vector((0, rim_y, 0)) + radial * r * 0.58
+        mb.tube([base - radial * r * 0.06, base + radial * r * 0.04 + Vector((0, r * 0.1, 0))], [r * 0.09, r * 0.02], "prop:flesh", "#a01818", segments=5)
+    teeth_ring(mb, (0, rim_y, 0), r * 0.54, (0, 1, 0), 16, r * 0.34, r * 0.065, inward=0.72, rng=rng)
+    teeth_ring(mb, (0, rim_y - r * 0.18, 0), r * 0.4, (0, 1, 0), 12, r * 0.24, r * 0.05, inward=0.8, rng=rng)
     _optic_nerves(mb, r, rng, count=7)
 
 
 def creeper(mb: MeshBuilder, p, rng):
     r = p.get("radius", 0.42)
-    _eyeball(mb, r, p.get("iris", "#8a1414"), rng, vein_trees=8, sclera="#f0d8d0", blood=0.08)
-    _optic_nerves(mb, r, rng, count=4, length=r * 1.8)
+    # A swarm minion: kept light (about 3k triangles).
+    _eyeball(mb, r, p.get("iris", "#8a1414"), rng, vein_trees=6, sclera="#f0d8d0", blood=0.08, tris=1200, vein_depth=2)
+    _optic_nerves(mb, r, rng, count=4, length=r * 1.8, segments=5)
 
 
 # ---------------------------------------------------------------------------------------------------- brain
@@ -230,7 +246,7 @@ def brain_of_cthulhu(mb: MeshBuilder, p, rng):
     def paint(q, n):
         return mix(base, groove, fold(q) * 0.9 + 0.08 * noise3(q, 9))
 
-    organic(mb, build, "prop:flesh", tris=12000, resolution=0.028, paint=paint, sculpt=sculpt, smooth=1)
+    organic(mb, build, "prop:flesh", tris=10000, resolution=0.028, paint=paint, sculpt=sculpt, smooth=1)
     # Spinal cord and nerves hanging below.
     stem = c + Vector((0, -ry * 0.3, -rz * 1.2))
     cord = [stem, stem + Vector((0.05, -0.1, -0.35)), stem + Vector((-0.05, 0.0, -0.75)), Vector((0.04, -ry * 0.2, 0.02))]
@@ -242,20 +258,14 @@ def brain_of_cthulhu(mb: MeshBuilder, p, rng):
         mid = start.lerp(end, 0.5) + Vector((rng.uniform(-0.2, 0.2), rng.uniform(-0.2, 0.2), rng.uniform(-0.1, 0.1)))
         mb.tube([start, mid, end], [0.07, 0.045, 0.012], "prop:flesh", "#b8404c" if not exposed else "#701020", segments=5)
     if exposed:
-        eye_c = c + Vector((0, ry * 0.72, -rz * 0.05))
-        m = Matrix.Translation(eye_c)
-        verts_before = set(mb.bm.verts)
-        _eyeball(mb, 0.55, "#c01818", rng, vein_trees=6, blood=0.1)
-        moved = [v for v in mb.bm.verts if v not in verts_before]
-        import bmesh
-        bmesh.ops.transform(mb.bm, matrix=m, verts=moved)
+        _eyeball(mb, 0.55, "#c01818", rng, vein_trees=5, blood=0.1, center=c + Vector((0, ry * 0.8, -rz * 0.05)), tris=1800, vein_depth=2)
 
 
 GENERATORS = {
-    "king_slime_v2": king_slime,
-    "queen_slime_v2": queen_slime,
-    "eye_of_cthulhu_v2": eye_of_cthulhu,
-    "eye_of_cthulhu_maw_v2": eye_of_cthulhu_maw,
-    "creeper_v2": creeper,
-    "brain_of_cthulhu_v2": brain_of_cthulhu,
+    "slime_king": king_slime,
+    "slime_queen": queen_slime,
+    "cthulhu_eye": eye_of_cthulhu,
+    "cthulhu_maw": eye_of_cthulhu_maw,
+    "creeper_eye": creeper,
+    "cthulhu_brain": brain_of_cthulhu,
 }

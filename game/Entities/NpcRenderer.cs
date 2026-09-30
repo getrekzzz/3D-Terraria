@@ -22,6 +22,7 @@ public sealed partial class NpcRenderer : Node3D
         public MeshInstance3D? Stalk;
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public readonly List<CreatureVisual> Barrier = new();
+        public readonly List<CreatureVisual> Arms = new();
         public Vector3 Shown;
         public float Squash = 1f;
         public float LastVy;
@@ -68,6 +69,7 @@ public sealed partial class NpcRenderer : Node3D
             if (!_views.Remove(npc.Id, out var view)) return;
             if (!KeepCorpse(npc, view)) Release(view.Visual, view.Model);
             foreach (var (seg, model) in view.Segments) Release(seg, model);
+            ReleaseArms(npc, view);
             if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
             view.Health.QueueFree();
             view.Stalk?.QueueFree();
@@ -122,7 +124,11 @@ public sealed partial class NpcRenderer : Node3D
             }
             var visual = view.Visual;
             visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.Lift * npc.Def.Scale : view.Shown;
-            if (npc.Segments.Count > 0) UpdateSegments(npc, view, world);
+            if (npc.Segments.Count > 0)
+            {
+                UpdateSegments(npc, view, world);
+                UpdateArms(npc, view);
+            }
             if (npc.Barrier != null) UpdateBarrier(npc, view, world);
             if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
             {

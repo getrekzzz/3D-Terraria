@@ -3802,33 +3802,36 @@
       "params": {}
     },
     "king_slime": {
-      "generator": "gel_sovereign",
+      "generator": "slime_king",
       "params": {}
     },
     "eye_of_cthulhu": {
-      "generator": "watcher",
+      "generator": "cthulhu_eye",
       "params": {}
     },
     "eye_of_cthulhu_mouth": {
-      "generator": "watcher_maw",
+      "generator": "cthulhu_maw",
       "params": {}
     },
     "eater_of_worlds_head": {
-      "generator": "worm_segment",
+      "generator": "eater_head",
       "params": {
-        "part": "head"
+        "radius": 0.8,
+        "length": 1.2
       }
     },
     "eater_of_worlds_body": {
-      "generator": "worm_segment",
+      "generator": "eater_segment",
       "params": {
-        "part": "segment"
+        "radius": 0.72,
+        "length": 1.15
       }
     },
     "eater_of_worlds_tail": {
-      "generator": "worm_segment",
+      "generator": "eater_tail",
       "params": {
-        "part": "tail"
+        "radius": 0.72,
+        "length": 1.15
       }
     },
     "guide": {
@@ -3969,13 +3972,13 @@
       }
     },
     "skeletron_head": {
-      "generator": "skull",
+      "generator": "skeletron_skull",
       "params": {
-        "radius": 1.3
+        "radius": 1.1
       }
     },
     "skeletron_hand": {
-      "generator": "bone_hand",
+      "generator": "skeletron_hand_bones",
       "params": {
         "size": 1.1
       }
@@ -4043,12 +4046,11 @@
       }
     },
     "dungeon_guardian": {
-      "generator": "skull",
+      "generator": "skeletron_skull",
       "params": {
-        "radius": 1.3,
-        "centerZ": 0.8,
+        "radius": 1.2,
         "eyes": "#ff2010",
-        "cracks": 5
+        "cracks": 6
       }
     },
     "wall_of_flesh_mouth": {
@@ -4209,20 +4211,18 @@
       }
     },
     "brain_of_cthulhu": {
-      "generator": "brain",
+      "generator": "cthulhu_brain",
       "params": {}
     },
     "brain_of_cthulhu_exposed": {
-      "generator": "brain",
+      "generator": "cthulhu_brain",
       "params": {
         "exposed": true
       }
     },
     "creeper": {
-      "generator": "eye",
-      "params": {
-        "iris": "#a02020"
-      }
+      "generator": "creeper_eye",
+      "params": {}
     },
     "eater_of_souls": {
       "generator": "insect",
@@ -4270,12 +4270,8 @@
       }
     },
     "queen_bee": {
-      "generator": "insect",
-      "params": {
-        "color": "#f0b818",
-        "stripes": "#2a1a08",
-        "eyes": "#3a2010"
-      }
+      "generator": "queen_bee_detailed",
+      "params": {}
     },
     "deerclops": {
       "generator": "humanoid",
@@ -4450,10 +4446,8 @@
       "params": {}
     },
     "queen_slime": {
-      "generator": "gel_sovereign",
-      "params": {
-        "body": "#f07ad8"
-      }
+      "generator": "slime_queen",
+      "params": {}
     },
     "duke_fishron": {
       "generator": "fish",
@@ -5903,6 +5897,18 @@
       "generator": "firefly",
       "params": {
         "glow": "#ffb0f8"
+      }
+    },
+    "queen_slime_winged": {
+      "generator": "slime_queen",
+      "params": {
+        "wings": true
+      }
+    },
+    "skeletron_arm": {
+      "generator": "skeletron_arm_bone",
+      "params": {
+        "radius": 0.13
       }
     }
   }

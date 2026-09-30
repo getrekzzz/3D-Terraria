@@ -132,7 +132,7 @@ def plan(spec, blocks, items, objects, enemies):
 
 def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
-    from bgen import beasts, bosses, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
+    from bgen import beasts, bosses, bosses_pre, bosses_pre2, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, reset_scene, rng_for
 
@@ -203,6 +203,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
             gen = (creatures.GENERATORS.get(job["generator"]) or fauna.GENERATORS.get(job["generator"])
                    or beasts.GENERATORS.get(job["generator"]) or mechs.GENERATORS.get(job["generator"]) or horrors.GENERATORS.get(job["generator"])
                    or lunar.GENERATORS.get(job["generator"]) or festive.GENERATORS.get(job["generator"]) or critters.GENERATORS.get(job["generator"])
+                   or bosses_pre.GENERATORS.get(job["generator"]) or bosses_pre2.GENERATORS.get(job["generator"])
                    or bosses.GENERATORS[job["generator"]])
             rig = gen(mb, job.get("params", {}), rng_for(name, 0))
             for slot in mb.materials:
