@@ -58,6 +58,8 @@ public sealed partial class DynamicResolution : Node
         else if (headroom)
             target = Mathf.Min(preset.RenderScale, _scale + Step);
         if (Mathf.IsEqualApprox(target, _scale)) return;
+        // The 3D buffers are reallocated at the next draw; the call count shows how often the scale flips.
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.dynres.change");
         _scale = CurrentScale = target;
         var viewport = GetViewport();
         if (_scale < 0.999f && viewport.Scaling3DMode == Viewport.Scaling3DModeEnum.Bilinear) viewport.Scaling3DMode = Viewport.Scaling3DModeEnum.Fsr;

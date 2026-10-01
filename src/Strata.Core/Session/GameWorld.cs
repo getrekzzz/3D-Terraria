@@ -157,7 +157,7 @@ public sealed partial class GameWorld : IDisposable
         if (++_autosaveCounter >= AutosaveTicks)
         {
             _autosaveCounter = 0;
-            Autosaved?.Invoke(SaveAll());
+            using (prof.Time("tick.autosave")) Autosaved?.Invoke(SaveAll());
         }
     }
 

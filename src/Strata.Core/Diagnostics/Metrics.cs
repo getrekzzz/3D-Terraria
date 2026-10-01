@@ -14,16 +14,48 @@ public sealed class Metrics
     /// <summary>When false, <see cref="Time"/> scopes cost almost nothing and record nothing (profiling is opt-in).</summary>
     public bool Enabled { get; set; } = true;
 
-    /// <summary>The frame/tick profiler: off until the <c>perf</c> command turns it on.</summary>
+    /// <summary>The frame/tick profiler: off until the <c>perf</c> command or the F3 overlay turns it on.</summary>
     public static readonly Metrics Frame = new() { Enabled = false };
+
+    private volatile bool _trackFrames;
+
+    /// <summary>Per-frame timer totals and the slowest recent frames, fed while <see cref="TrackFrames"/> is on.</summary>
+    public SpikeLog Spikes { get; } = new();
+
+    /// <summary>
+    /// When true (<c>perf start</c>, F3 open), every recorded timer also adds into the current frame, and
+    /// <see cref="EndFrame"/> closes frames into <see cref="Spikes"/>. Off, recording costs one flag check more.
+    /// </summary>
+    public bool TrackFrames
+    {
+        get => _trackFrames;
+        set
+        {
+            if (value && !_trackFrames) Spikes.Resume();
+            _trackFrames = value;
+        }
+    }
 
     public void Count(string name, long delta = 1) => _counters.AddOrUpdate(name, delta, (_, v) => v + delta);
 
     public long Counter(string name) => _counters.TryGetValue(name, out var v) ? v : 0;
 
-    public void Record(string name, double milliseconds) => _timers.GetOrAdd(name, _ => new Accumulator()).Add(milliseconds);
+    public void Record(string name, double milliseconds)
+    {
+        _timers.GetOrAdd(name, _ => new Accumulator()).Add(milliseconds);
+        if (_trackFrames) Spikes.Add(name, milliseconds);
+    }
+
+    /// <summary>Closes the current frame with its real length (the engine calls this once per rendered frame).</summary>
+    public void EndFrame(double frameMs)
+    {
+        if (_trackFrames) Spikes.EndFrame(frameMs);
+    }
 
     public TimerScope Time(string name) => Enabled ? new(this, name) : default;
+
+    /// <summary>One timer's calls, total and longest call (zeros when it never ran).</summary>
+    public (long Count, double TotalMs, double MaxMs) Timer(string name) => _timers.TryGetValue(name, out var a) ? a.Snapshot() : default;
 
     public IReadOnlyDictionary<string, (long Count, double TotalMs, double MaxMs)> SnapshotTimers() =>
         _timers.ToDictionary(kv => kv.Key, kv => kv.Value.Snapshot());
@@ -34,6 +66,7 @@ public sealed class Metrics
     {
         _timers.Clear();
         _counters.Clear();
+        Spikes.Reset();
     }
 
     public readonly struct TimerScope : IDisposable

@@ -139,6 +139,7 @@ public sealed partial class GrassRenderer : Node3D
 
     private void Create(Int3 coord, ChunkGrass chunk)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.grass.create");
         var scenario = GetWorld3D().Scenario;
         var transform = new Transform3D(Basis.Identity, new Vector3(coord.X, coord.Y, coord.Z) * ChunkMeters);
         var bounds = new Aabb(new Vector3(-1f, -1f, -1f), Vector3.One * (ChunkMeters + 2f));

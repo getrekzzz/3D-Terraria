@@ -76,6 +76,7 @@ public sealed partial class TileObjectRenderer : Node3D
 
     private void Rebuild(Int3 chunk)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects.rebuild");
         Clear(chunk);
         var objects = _game.Session.World.TileObjects.InChunk(chunk);
         // Only chunks with terrain on screen: objects of load-only border chunks would float without their ground.

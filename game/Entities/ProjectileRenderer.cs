@@ -90,6 +90,7 @@ public sealed partial class ProjectileRenderer : Node3D
 
     private Node3D Create(Projectile p)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.projectiles.create");
         var root = new Node3D();
         var color = Color.FromHtml(p.Def.Color);
         var content = _game.Session.Content;

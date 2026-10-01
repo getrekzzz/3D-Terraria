@@ -73,6 +73,7 @@ public static partial class WorldLauncher
         var runtime = new WorldRuntime { Name = "World" };
         runtime.Initialize(services, game);
         parent.AddChild(runtime);
+        runtime.AddChild(new FrameProbe()); // processes last whatever its place: closes each frame for the spike log
 
         var (props, objectRenderer) = AddWorldObjects(runtime);
         LoadConfigs(game, services);

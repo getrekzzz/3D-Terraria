@@ -1,18 +1,23 @@
 using System.Text;
 using Godot;
 using Strata.Core.Common;
+using Strata.Core.Diagnostics;
 using Strata.Game.Rendering;
 using Strata.Game.World;
 
 namespace Strata.Game.UI;
 
-/// <summary>F3 overlay: frame timing, streaming and job queues, rendering counters, memory and location info.</summary>
+/// <summary>
+/// F3 overlay: frame timing and hitches (the frame profiler runs while it is open), streaming and job queues, rendering
+/// counters, memory and location info.
+/// </summary>
 public sealed partial class PerfOverlay : CanvasLayer
 {
     private WorldRuntime _runtime = null!;
     private TileObjectRenderer? _objects;
     private Label _label = null!;
     private double _timer;
+    private bool _profiling; // the overlay turned the frame profiler on (not perf start), so it turns it off again
 
     public void Initialize(WorldRuntime runtime, TileObjectRenderer? objects)
     {
@@ -29,7 +34,28 @@ public sealed partial class PerfOverlay : CanvasLayer
     {
         if (InputGate.TextEntry || !e.IsActionPressed("debug_overlay")) return;
         _label.Visible = !_label.Visible;
+        Profile(_label.Visible);
         GetViewport().SetInputAsHandled();
+    }
+
+    public override void _ExitTree() => Profile(false);
+
+    /// <summary>Timers and the spike log run while the overlay is open, unless <c>perf start</c> already runs them.</summary>
+    private void Profile(bool on)
+    {
+        var m = Metrics.Frame;
+        if (on && !m.TrackFrames)
+        {
+            m.Enabled = true;
+            m.TrackFrames = true;
+            _profiling = true;
+        }
+        else if (!on && _profiling)
+        {
+            m.Enabled = false;
+            m.TrackFrames = false;
+            _profiling = false;
+        }
     }
 
     public override void _Process(double delta)
@@ -47,6 +73,7 @@ public sealed partial class PerfOverlay : CanvasLayer
         sb.AppendLine($"FPS {Engine.GetFramesPerSecond():0}  frame {Performance.GetMonitor(Performance.Monitor.TimeProcess) * 1000:0.0} ms  physics {Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess) * 1000:0.0} ms");
         var viewport = GetViewport();
         sb.AppendLine($"GPU {FrameTiming.GpuMs(viewport):0.0} ms  render CPU {FrameTiming.CpuMs(viewport):0.0} ms  3D scale {DynamicResolution.CurrentScale * 100:0}%  preset {_runtime.Services.Graphics.Name}");
+        AppendSpikes(sb);
         sb.AppendLine($"chunks loaded {s.LoadedCount} meshed {s.MeshedCount}  in flight: loads {s.LoadsInFlight} meshes {s.MeshesInFlight}");
         sb.AppendLine($"jobs pending {_runtime.Jobs.Pending} running {_runtime.Jobs.Running}  uploads {_runtime.Renderer.PendingUploads}  colliders {_runtime.Colliders.BodyCount}");
         sb.AppendLine($"draw calls {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TotalDrawCallsInFrame)}  primitives {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.TotalPrimitivesInFrame) / 1000}k  objects {_objects?.InstanceCount ?? 0}");
@@ -54,5 +81,15 @@ public sealed partial class PerfOverlay : CanvasLayer
         sb.AppendLine($"cell {focus}  chunk {ChunkMath.CellToChunk(focus)}  {string.Join('/', ctx.Biomes)} {ctx.Layer} depth {ctx.Depth:0}");
         sb.AppendLine($"light sky {light.A * 15:0} block {light.R * 15:0}/{light.G * 15:0}/{light.B * 15:0}  time {session.Clock.Hour:00.00}h {(session.Clock.IsDay ? "day" : "night")} moon {session.Clock.MoonPhase}");
         _label.Text = sb.ToString();
+    }
+
+    /// <summary>"spikes >33 ms N (worst X) · GC a/b/c pause y ms" and the last spike's frame time and top timers.</summary>
+    private static void AppendSpikes(StringBuilder sb)
+    {
+        var log = Metrics.Frame.Spikes;
+        var (gen0, gen1, gen2) = log.Collections;
+        sb.AppendLine($"spikes >33 ms {log.Over33} (>50 {log.Over50}, worst {log.WorstMs:0}) of {log.Frames} frames{(log.MainThreadOnly ? " (main thread)" : "")} · p99 {log.Percentile(0.99):0.0} ms · GC {gen0}/{gen1}/{gen2} pause {log.GcPauseMs:0.0} ms");
+        var last = log.Recent(1);
+        if (last.Count > 0) sb.AppendLine($"last: {last[0].Describe()}");
     }
 }
