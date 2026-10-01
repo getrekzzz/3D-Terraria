@@ -23,10 +23,13 @@ public static class ItemBehaviorSpecs
     /// <summary>A fishing rod: casts its bobber projectile, and reels it (and any catch) back in.</summary>
     public const string Fishing = "fishing";
 
+    /// <summary>Fishing bait: adds its bait power to the rod's; one may be used up with each catch.</summary>
+    public const string Bait = "bait";
+
     /// <summary>Bait that hooks a boss instead of a fish (a Truffle Worm in the ocean hooks Duke Fishron).</summary>
     public const string BaitSummon = "baitSummon";
 
-    /// <summary>Lays or cuts red wire (Red Wrench, Wire Cutter).</summary>
+    /// <summary>Lays wire of a colour (Red, Blue, Green, Yellow Wrench), places actuators, or cuts both (Wire Cutter).</summary>
     public const string Wiring = "wiring";
 
     /// <summary>Swings a net that catches critters (Bug Net).</summary>
@@ -58,6 +61,7 @@ public static class ItemBehaviorSpecs
         c.Register<IncinerationSummonParams>(SpecKind.ItemBehavior, IncinerationSummon);
         c.Register<GrappleParams>(SpecKind.ItemBehavior, Grapple);
         c.Register<FishingParams>(SpecKind.ItemBehavior, Fishing);
+        c.Register<BaitParams>(SpecKind.ItemBehavior, Bait);
         c.Register<BaitSummonParams>(SpecKind.ItemBehavior, BaitSummon);
         c.Register<WiringParams>(SpecKind.ItemBehavior, Wiring);
         c.Register<BugNetParams>(SpecKind.ItemBehavior, BugNet);
@@ -160,6 +164,16 @@ public sealed class FishingParams : SpecParams
 {
     /// <summary>Fishing power: faster bites and better catches (crates, rare fish).</summary>
     public int Power { get; init; } = 5;
+
+    /// <summary>The bobber survives lava (Hotline Fishing Hook), so lava can be fished without other gear.</summary>
+    public bool Lava { get; init; }
+}
+
+/// <summary>Bait power (Terraria percentages: Worm 25, Master Bait 50); higher power is also used up less often.</summary>
+public sealed class BaitParams : SpecParams, IValidatableSpec
+{
+    public int Power { get; init; } = 10;
+    public string? Validate() => Power is < 1 or > 100 ? "power must be in [1,100]" : null;
 }
 
 /// <summary>Starts a world event (a moon, an invasion) when its conditions hold; fails while it is already running.</summary>
@@ -229,10 +243,21 @@ public sealed class IncinerationSummonParams : SpecParams, IValidatableSpec
 }
 
 /// <summary>Lays wire (using up <see cref="Wire"/> items) or, with <see cref="Cut"/>, removes it and gives the wire back.</summary>
-public sealed class WiringParams : SpecParams
+public sealed class WiringParams : SpecParams, IValidatableSpec
 {
+    /// <summary>Wire Cutter: removes every wire colour and the actuator from the aimed cell.</summary>
     public bool Cut { get; init; }
+
+    /// <summary>Item used up per placement (Wire for wrenches; the Actuator places itself).</summary>
     public string Wire { get; init; } = "wire";
+
+    /// <summary>Wire colour laid: "red", "blue", "green" or "yellow".</summary>
+    public string Color { get; init; } = "red";
+
+    /// <summary>Places an actuator on the aimed block instead of wire.</summary>
+    public bool Actuator { get; init; }
+
+    public string? Validate() => Color is "red" or "blue" or "green" or "yellow" ? null : $"unknown wire colour '{Color}'";
 }
 
 /// <summary>Catches the nearest creature with <see cref="Tag"/> in front of the player; it becomes its catch item.</summary>

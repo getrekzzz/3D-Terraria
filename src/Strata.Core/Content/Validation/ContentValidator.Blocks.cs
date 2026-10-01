@@ -49,6 +49,7 @@ public static partial class ContentValidator
             ctx.Ref(t, ctx.Db.Items, t.Item, "item");
             ctx.Ref(t, ctx.Db.LootTables, t.Loot, "loot");
             ctx.Ref(t, ctx.Db.Projectiles, t.Trap?.Projectile, "trap.projectile");
+            ValidateWiringObject(ctx, t);
             ctx.Light(t, t.Light, "light");
             if (t.Flame is { } flame)
             {

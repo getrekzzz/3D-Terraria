@@ -145,6 +145,7 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
         using (prof.Time("tick.events")) Events.Tick();
         using (prof.Time("tick.weather")) Weather.Tick();
+        using (prof.Time("tick.wires")) Wires.Tick();
         using (prof.Time("tick.spawner")) Spawner.Tick();
         using (prof.Time("tick.npcs")) Npcs.Tick();
         using (prof.Time("tick.town")) Town.Tick();

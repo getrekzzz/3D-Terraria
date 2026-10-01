@@ -61,8 +61,17 @@ public sealed class ConditionContext
     /// <summary>A windy day is blowing.</summary>
     public bool Windy { get; set; }
 
+    /// <summary>The seasonal event running ("halloween", "christmas"; "" for none).</summary>
+    public string Season { get; set; } = "";
+
     /// <summary>Fishing power of the rod making a catch (fishing loot only).</summary>
     public int FishingPower { get; set; }
+
+    /// <summary>Liquid the catch comes from ("water", "honey", "lava"; fishing loot only).</summary>
+    public string FishingLiquid { get; set; } = "";
+
+    /// <summary>Quest fish the Angler wants today ("" when none; fishing loot only).</summary>
+    public string AnglerQuest { get; set; } = "";
 
     public Pcg32 Random;
 

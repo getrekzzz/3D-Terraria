@@ -120,6 +120,7 @@
   residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.
+<<<<<<< HEAD
 * **Weather** — `WeatherSystem` (`Gameplay/Weather`) rolls once per in-game hour from the world seed and the hour
   (deterministic, independent of frame timing): rain spells (a share are thunderstorms), windy days at the roll hour,
   sandstorms on windy days, and the hour's wind; intensity and wind ease every tick. `WeatherState` lives on the session
@@ -128,6 +129,46 @@
   `Windy` and the `weather` condition. The `rain`, `thunderstorm`, `windy_day` and `sandstorm` events (phase `weather`)
   start and stop with it, so announcements and `{ "type": "event" }` spawn rules follow. Tuning and presentation
   budgets in `data/config/weather.json`; `weather` command and `weather.*` probes.
+=======
+* **Fishing** — rods (`fishing` behaviour: `power`, `lava` for the Hotline hook) cast a bobber that floats on water,
+  honey and (with a `lava` rod or the `lavaFishing` stat of the Lavaproof Fishing Hook) lava; without that gear lava
+  burns the line. Casting needs bait (`bait` behaviour with Terraria's bait power; worms, fireflies, butterflies and
+  frogs from the Bug Net are bait too). `Fishing.FishingPower` is the pure math: (rod + bait + `fishingPower` stat) ×
+  rain/storm (world-wide) × dawn/dusk/midday hours × moon phase × events (Blood Moon), scaled by the bobber's pool
+  (6-neighbour flood fill once when it lands, capped at `fullPoolCells`; below `minPoolCells` nothing bites); bait is
+  used up per catch with chance 1 / (1 + power/6 + `baitSaving`). `ProjectileSystem.Fishing` times bites by power and
+  on reeling rolls a rarity tier (uncommon … legendary, chance 1 / max(floor, odds/power)), then lands today's Angler
+  quest fish (`fishing_quest`, `anglerQuest` condition; only while a living Angler wants it), a crate (`crateChance`
+  + the Crate Potion's `crateChance` stat) or a catch; each table is tried as `<table>_<tier>` falling back to commoner
+  tiers. Tables: `data/loot/fishing.json` (water/honey via `fishingLiquid`, lava, crates), crate contents in
+  `data/loot/crates.json` (biome crates need their biome), tuning in `data/config/fishing.json`. Command `fishing`
+  (`bite`, `bait always|normal`), probes `fishing.bobber|power|pool|catches`; smoke `fishing.cmds`.
+* **Wiring** — `Wiring.WireGrid` (in `WorldSession.Wires`) keeps a bit per wire colour (red, blue, green, yellow) and an
+  actuator bit per cell, plus the blocks actuators have switched off; world.json keeps red in `wires` (older saves load
+  unchanged) and the rest in `wiresBlue|Green|Yellow`, `actuators`, `inactiveBlocks`. `WireSystem.Signal` walks each
+  colour separately from wire inside or face-sharing the trigger (reused scratch collections, at most 4096 cells per
+  colour) and activates what it reaches: doors, lights, dart traps, actuators (toggles gathered per chain and applied in
+  one edit; a switched-off block is air, remembered with shape and paint, and drops as an item if something was built in
+  its place), timers (`timer` ticks; switched by hand or signal, fired from `WireSystem.Tick` over the placed timers
+  only), teleporter pads (the first two on a colour swap their occupants; `Teleported` moves the player's body),
+  statues (`statue`: creature or item with per-statue cap, radius and cooldown, at most 10 statue creatures world-wide;
+  `Npc.FromStatue` drops nothing) and logic lamps; a gate (`logicGate`) re-reads its lamp stack and, when its output
+  changes, fires its own wires (not those through its lamps) once per chain, at most 256 chained signals. Wrenches lay
+  their `color`, the Actuator places itself, the Wire Cutter removes everything in the cell. `game/Rendering/WireOverlay`
+  draws the wire view per colour (pooled MultiMeshes, rebuilt on change or after 8 cells of movement). Command
+  `wire … [colour|actuator|cut]`, probes `wires.<colour>|actuators|inactive|teleports|statue_npcs`.
+* **Seasons** — `Seasons.SeasonState` (`WorldSession.Seasons`) names the seasonal event running: Halloween (Oct 10 –
+  Nov 1) or Christmas (Dec 15 – 31) from inclusive date windows in `data/config/seasons.json`, read through an
+  injectable `Clock` (tests pin it; `TestGame` uses a date outside every season) and rechecked every `recheckSeconds`;
+  the player's "Seasonal events" setting (`UserSettings.SeasonalEvents`, Settings > Gameplay) switches it off, and the
+  `season halloween|christmas|off|auto` command forces it for the session (probe `season.id`). `ContextAt` fills
+  `ConditionContext.Season`, so any spawn rule, loot entry, shop entry or town rule can use
+  `{ "type": "season", "is": "halloween" }`. Every slain hostile creature (not critters or statue creatures) also rolls
+  `NpcSystem.GlobalDropTable` (`enemy_global_drops` in `data/items/seasonal.json`: goodie bags at Halloween, presents
+  at Christmas) with seasonal vanity, candy and decorations inside. Santa Claus moves in at Christmas once the Frost
+  Legion is beaten and leaves when it ends; `TownRenderer.Hats` puts witch or Santa hats on the other residents (shared
+  procedural meshes on the head bone, toggled on season change).
+>>>>>>> ovh-world/laneB
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 

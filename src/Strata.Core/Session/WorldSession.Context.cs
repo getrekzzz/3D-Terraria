@@ -19,6 +19,7 @@ public sealed partial class WorldSession
         ctx.Depth = surface - cell.Y;
         ctx.Weather = Weather.LocalAt(ctx.Biomes, ctx.Layer);
         ctx.Windy = Weather.Windy;
+        ctx.Season = Seasons.Current;
         ctx.Hour = Clock.Hour;
         ctx.IsDay = Clock.IsDay;
         ctx.MoonPhase = Clock.MoonPhase;

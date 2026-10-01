@@ -121,3 +121,21 @@ public sealed class EvilConditionParams : SpecParams
 {
     public string Is { get; init; } = "";
 }
+
+/// <summary>The catch comes from one of these liquids ("water", "honey", "lava").</summary>
+public sealed class FishingLiquidConditionParams : SpecParams
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+}
+
+/// <summary>A quest fish entry: holds only while the Angler wants <see cref="Fish"/> today.</summary>
+public sealed class AnglerQuestConditionParams : SpecParams
+{
+    public string Fish { get; init; } = "";
+}
+
+/// <summary>The seasonal event running is <see cref="Is"/> ("halloween", "christmas", or "none").</summary>
+public sealed class SeasonConditionParams : SpecParams
+{
+    public string Is { get; init; } = "";
+}

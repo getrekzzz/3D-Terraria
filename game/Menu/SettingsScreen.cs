@@ -88,6 +88,8 @@ public sealed partial class SettingsScreen : PanelContainer
         box.AddChild(Header("World"));
         box.AddChild(MenuKit.Row("Pause when inventory is open", MenuKit.Toggle(S.AutoPause, v => { S.AutoPause = v; Changed(); })));
         box.AddChild(MenuKit.Row("Damage numbers", MenuKit.Toggle(S.DamageNumbers, v => { S.DamageNumbers = v; Changed(); })));
+        box.AddChild(MenuKit.Row("Seasonal events", MenuKit.Toggle(S.SeasonalEvents, v => { S.SeasonalEvents = v; Changed(); }),
+            "Halloween (Oct 10 - Nov 1) and Christmas (Dec 15 - 31) by your computer's date: goodie bags, presents, hats and Santa."));
     }
 
     private void Audio(VBoxContainer box)

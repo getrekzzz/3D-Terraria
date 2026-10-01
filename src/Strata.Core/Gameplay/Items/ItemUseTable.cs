@@ -59,6 +59,9 @@ public sealed class ItemUseInfo
     public MinecartParams? Minecart { get; internal set; }
     public PaintToolParams? Painting { get; internal set; }
 
+    /// <summary>Fishing bait (worms, fireflies, Master Bait).</summary>
+    public BaitParams? Bait { get; internal set; }
+
     /// <summary>Boss this bait hooks (Truffle Worm).</summary>
     public BaitSummonParams? BaitSummon { get; internal set; }
 
@@ -160,6 +163,7 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.Grapple: a |= ItemAction.Grapple; info.Grapple = spec.Parse<GrappleParams>(); break;
                 case ItemBehaviorSpecs.Fishing: a |= ItemAction.Fish; info.Fishing = spec.Parse<FishingParams>(); break;
                 case ItemBehaviorSpecs.BaitSummon: info.BaitSummon = spec.Parse<BaitSummonParams>(); break;
+                case ItemBehaviorSpecs.Bait: info.Bait = spec.Parse<BaitParams>(); break;
                 case ItemBehaviorSpecs.Wiring: a |= ItemAction.Wire; info.Wiring = spec.Parse<WiringParams>(); break;
                 case ItemBehaviorSpecs.BugNet: a |= ItemAction.Net; info.BugNet = spec.Parse<BugNetParams>(); break;
                 case ItemBehaviorSpecs.ReleaseCritter: a |= ItemAction.Release; info.Release = spec.Parse<ReleaseCritterParams>(); break;

@@ -108,6 +108,21 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Fires this projectile when a wire signal reaches it (dart traps).</summary>
     public TrapDef? Trap { get; init; }
 
+    /// <summary>A timer: while switched on (by hand or by a signal) it signals its wires every this many ticks.</summary>
+    public int Timer { get; init; }
+
+    /// <summary>A teleporter pad: a signal swaps whoever stands on it with whoever stands on the other pad it reaches.</summary>
+    public bool Teleporter { get; init; }
+
+    /// <summary>A statue: a signal makes it release a creature or drop an item (with caps).</summary>
+    public StatueDef? Statue { get; init; }
+
+    /// <summary>A logic gate ("and", "or", "nand", "nor", "xor", "xnor") reading the logic lamps stacked on it.</summary>
+    public string? LogicGate { get; init; }
+
+    /// <summary>A logic gate lamp: a signal toggles it; the gate beneath it re-evaluates.</summary>
+    public bool LogicLamp { get; init; }
+
     /// <summary>The item id that places/drops this object.</summary>
     public string? PlacingItemId => Item ?? (Natural ? null : Id);
 
@@ -176,4 +191,24 @@ public sealed class FlameSpec
 
     /// <summary>Colour of the flame's body (its core burns near white).</summary>
     public string Color { get; init; } = "#ff8a2a";
+}
+
+/// <summary>What a wired statue releases when signalled, and its caps.</summary>
+public sealed class StatueDef
+{
+    /// <summary>Creature released (it drops no loot or coins).</summary>
+    public string? Enemy { get; init; }
+
+    /// <summary>Item dropped instead (heart, star, bomb statues).</summary>
+    public string? Item { get; init; }
+
+    public int Count { get; init; } = 1;
+
+    /// <summary>Most of its creatures (or dropped items) allowed within <see cref="Radius"/> cells.</summary>
+    public int Cap { get; init; } = 3;
+
+    public int Radius { get; init; } = 100;
+
+    /// <summary>Ticks before the same statue may release again.</summary>
+    public int Cooldown { get; init; } = 30;
 }

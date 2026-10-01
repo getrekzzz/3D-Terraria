@@ -35,8 +35,18 @@ public sealed partial class ItemUseSystem
             return UseOutcome.Shot;
         }
         if (info.Projectile == null) return UseOutcome.None;
+        if (!HasAnyBait(p)) return Refuse(_world.Projectiles.Fishing.NoBaitMessage);
         Shot?.Invoke(new ShotRequest(p, info, info.Projectile, null, info.Item.ShootSpeed, 0, 0));
         return UseOutcome.Shot;
+    }
+
+    /// <summary>Bait of any kind in the backpack (fishing bait, or a boss bait such as the Truffle Worm).</summary>
+    private bool HasAnyBait(PlayerEntity p)
+    {
+        var backpack = p.State.Inventory.Backpack;
+        for (int i = 0; i < backpack.Size; i++)
+            if (backpack[i].Item is { } item && _world.Uses[item] is { } u && (u.Bait != null || u.BaitSummon != null)) return true;
+        return false;
     }
 
     /// <summary>

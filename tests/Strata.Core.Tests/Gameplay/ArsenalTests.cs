@@ -183,6 +183,7 @@ public class ArsenalTests
         g.World.Session.Commit(batch);
         g.World.Liquids.Enabled = false;
         g.Hold("golden_fishing_rod");
+        g.Player.State.Inventory.Backpack.Add(new ItemStack(g.Content.Items.Get("master_bait"), 50));
         g.Player.Aim = Vector3.Normalize(new Vector3(0, -0.35f, 1)); // lob it into the pond 2–5 m ahead
         int caught = 0;
         for (int cast = 0; cast < 6 && caught == 0; cast++)

@@ -40,6 +40,12 @@ public sealed class Projectile
     /// <summary>A fish is on the line right now (reel in to catch it).</summary>
     public bool Biting { get; set; }
 
+    /// <summary>Bobbers: fishing power when the bite was scheduled (0 = nothing will bite), the liquid fished and the
+    /// size of its pool in cells (capped at the config's full pool).</summary>
+    public int FishingPower { get; set; }
+    public LiquidType FishLiquid { get; set; }
+    public int PoolCells { get; set; }
+
     /// <summary>Minions: the tick of their next shot and the order they were summoned.</summary>
     public int NextShot { get; set; }
 }
