@@ -42,14 +42,17 @@ public sealed class MeleeSystem
 
     private void Start(PlayerEntity player, ItemUseInfo info)
     {
+        // The arc is centred on where the player looks; the aim (eye to crosshair point) bends sideways towards
+        // close targets off the shoulder camera, so it only sets the pitch.
         var aim = player.Aim;
+        var facing = player.Facing;
         _active.RemoveAll(s => s.Player == player);
         _active.Add(new Swing
         {
             Player = player,
             Item = info,
             Duration = Math.Max(2, info.Item.UseAnimation),
-            Yaw = MathF.Atan2(aim.X, aim.Z),
+            Yaw = MathF.Atan2(facing.X, facing.Z),
             Pitch = MathF.Asin(Math.Clamp(aim.Y, -1f, 1f)),
             Stack = player.State.Inventory.Held.Item == info.Item ? player.State.Inventory.Held : new Items.ItemStack(info.Item, 1),
         });

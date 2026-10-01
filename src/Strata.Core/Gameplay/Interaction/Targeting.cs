@@ -18,31 +18,87 @@ public sealed record Target(Int3 Cell, Int3 Normal, ushort Block, TileObjectInst
     public bool IsObject => Object != null;
 }
 
+/// <summary>Which soft objects a targeting ray may stop at (blocks and other objects always stop it).</summary>
+[Flags]
+public enum TargetFilter
+{
+    /// <summary>The ray passes through decor and tree canopies; only trunks, furniture and blocks stop it.</summary>
+    None = 0,
+
+    /// <summary>Decor objects (grass, flowers, bushes, stalagmites, rubble) stop the ray.</summary>
+    Decor = 1,
+
+    /// <summary>The whole box of a tree-like object (<see cref="Content.Defs.TileCollision.Trunk"/>) stops the ray, canopy included.</summary>
+    TreeCanopy = 2,
+
+    All = Decor | TreeCanopy,
+}
+
 /// <summary>Voxel-exact targeting: DDA through cells, stopping at solid (or non-air) blocks and tile objects.</summary>
 public static class Targeting
 {
     /// <summary>
     /// Casts from <paramref name="originMeters"/> along <paramref name="direction"/> up to <paramref name="reachMeters"/>.
-    /// Liquids are ignored; decor objects are hit only when <paramref name="includeDecor"/> is set.
+    /// Liquids are ignored; decor objects are hit only when <paramref name="includeDecor"/> is set. Tree canopies
+    /// always stop the ray (the behaviour of the console and test helpers).
     /// </summary>
-    public static Target? Cast(VoxelWorld world, Vector3 originMeters, Vector3 direction, float reachMeters, bool includeDecor = true)
+    public static Target? Cast(VoxelWorld world, Vector3 originMeters, Vector3 direction, float reachMeters, bool includeDecor = true) =>
+        Cast(world, originMeters, direction, reachMeters, includeDecor ? TargetFilter.All : TargetFilter.TreeCanopy);
+
+    /// <summary>
+    /// Casts from <paramref name="originMeters"/> along <paramref name="direction"/> up to <paramref name="reachMeters"/>.
+    /// Liquids are ignored; <paramref name="filter"/> says whether decor and tree canopies stop the ray (a trunk
+    /// column always does).
+    /// </summary>
+    public static Target? Cast(VoxelWorld world, Vector3 originMeters, Vector3 direction, float reachMeters, TargetFilter filter)
     {
         if (direction.LengthSquared() < 1e-10f) return null;
         direction = Vector3.Normalize(direction);
         var origin = originMeters / Units.CellSize;
-        float reach = reachMeters / Units.CellSize;
-        TileObjectInstance? obj = null;
-        var hit = Cast(world, origin, direction, reach, (cell, block) =>
-        {
-            if (block != 0 && world.Content.Blocks[block].Render != Content.Defs.BlockRender.None) return true;
-            var o = world.TileObjects.At(cell);
-            if (o == null || (o.Def.Decor && !includeDecor)) return false;
-            obj = o;
-            return true;
-        });
+        var test = new FilteredHit(world, filter);
+        var hit = Walk(world, origin, direction, reachMeters / Units.CellSize, ref test);
         if (hit == null) return null;
         var (cell, normal, t, blockId) = hit.Value;
-        return new Target(cell, normal, blockId, obj, origin + direction * t, t * Units.CellSize);
+        return new Target(cell, normal, blockId, test.Object, origin + direction * t, t * Units.CellSize);
+    }
+
+    /// <summary>
+    /// The crosshair ray of a camera that sits behind (and beside) the eye: the walk starts where the ray crosses the
+    /// eye's plane (<paramref name="startT"/> metres from the camera), so nothing between the camera and the player can
+    /// be selected. It covers <paramref name="reachMeters"/> plus the ray's sideways offset from the eye, and the
+    /// returned <see cref="Target.Distance"/> is measured from <paramref name="eye"/>.
+    /// </summary>
+    public static Target? CastView(VoxelWorld world, Vector3 camera, Vector3 dir, Vector3 eye, float reachMeters, TargetFilter filter, out float startT)
+    {
+        startT = 0;
+        if (dir.LengthSquared() < 1e-10f) return null;
+        dir = Vector3.Normalize(dir);
+        startT = MathF.Max(0f, Vector3.Dot(eye - camera, dir));
+        var start = camera + dir * startT;
+        float lateral = Vector3.Distance(eye, start);
+        var origin = start / Units.CellSize;
+        var test = new FilteredHit(world, filter);
+        var hit = Walk(world, origin, dir, (reachMeters + lateral + 0.5f) / Units.CellSize, ref test);
+        if (hit == null) return null;
+        var (cell, normal, t, blockId) = hit.Value;
+        var at = origin + dir * t;
+        return new Target(cell, normal, blockId, test.Object, at, Vector3.Distance(at * Units.CellSize, eye));
+    }
+
+    /// <summary>
+    /// The raw cell walk with a caller-supplied stop test (grapple latches, shot origins): the first cell along the
+    /// ray where <paramref name="isHit"/> is true, as a <see cref="Target"/> without an object (distance in metres from
+    /// <paramref name="originMeters"/>), or null when nothing stops it within reach or the ray leaves loaded terrain.
+    /// </summary>
+    public static Target? CastWhere(VoxelWorld world, Vector3 originMeters, Vector3 direction, float reachMeters, Func<Int3, ushort, bool> isHit)
+    {
+        if (direction.LengthSquared() < 1e-10f) return null;
+        direction = Vector3.Normalize(direction);
+        var origin = originMeters / Units.CellSize;
+        var hit = Cast(world, origin, direction, reachMeters / Units.CellSize, isHit);
+        if (hit == null) return null;
+        var (cell, normal, t, blockId) = hit.Value;
+        return new Target(cell, normal, blockId, null, origin + direction * t, t * Units.CellSize);
     }
 
     /// <summary>
@@ -96,7 +152,59 @@ public static class Targeting
         return lastOpen is { } open ? (open, false) : null;
     }
 
+    /// <summary>A stop test for <see cref="Walk{T}"/> (a struct, so the per-tick crosshair casts allocate no closure).</summary>
+    private interface ICellTest
+    {
+        bool IsHit(Int3 cell, ushort block);
+    }
+
+    private struct FuncHit : ICellTest
+    {
+        public Func<Int3, ushort, bool> Test;
+
+        public bool IsHit(Int3 cell, ushort block) => Test(cell, block);
+    }
+
+    /// <summary>
+    /// Rendered blocks and tile objects stop the ray; decor only with <see cref="TargetFilter.Decor"/>, and a tree-like
+    /// object only inside its trunk column unless <see cref="TargetFilter.TreeCanopy"/> is set.
+    /// </summary>
+    private struct FilteredHit : ICellTest
+    {
+        private readonly VoxelWorld _world;
+        private readonly TargetFilter _filter;
+
+        /// <summary>The object that stopped the ray (null for a block).</summary>
+        public TileObjectInstance? Object;
+
+        public FilteredHit(VoxelWorld world, TargetFilter filter)
+        {
+            _world = world;
+            _filter = filter;
+            Object = null;
+        }
+
+        public bool IsHit(Int3 cell, ushort block)
+        {
+            if (block != 0 && _world.Content.Blocks[block].Render != Content.Defs.BlockRender.None) return true;
+            var o = _world.TileObjects.At(cell);
+            if (o == null) return false;
+            if (o.Def.Decor && (_filter & TargetFilter.Decor) == 0) return false;
+            if (o.Def.Collision == Content.Defs.TileCollision.Trunk && (_filter & TargetFilter.TreeCanopy) == 0 && !o.TrunkContains(cell)) return false;
+            Object = o;
+            return true;
+        }
+    }
+
     private static (Int3 Cell, Int3 Normal, float T, ushort Block)? Cast(VoxelWorld world, Vector3 origin, Vector3 dir, float maxT, Func<Int3, ushort, bool> isHit)
+    {
+        var test = new FuncHit { Test = isHit };
+        return Walk(world, origin, dir, maxT, ref test);
+    }
+
+    /// <summary>Walks cells along the ray (cell units) until <paramref name="test"/> stops it, reach runs out or terrain is unloaded.</summary>
+    private static (Int3 Cell, Int3 Normal, float T, ushort Block)? Walk<T>(VoxelWorld world, Vector3 origin, Vector3 dir, float maxT, ref T test)
+        where T : struct, ICellTest
     {
         int x = (int)MathF.Floor(origin.X), y = (int)MathF.Floor(origin.Y), z = (int)MathF.Floor(origin.Z);
         int sx = Math.Sign(dir.X), sy = Math.Sign(dir.Y), sz = Math.Sign(dir.Z);
@@ -113,7 +221,7 @@ public static class Targeting
             var cell = new Int3(x, y, z);
             ushort block = world.GetBlock(cell);
             if (block == VoxelWorld.Unknown) return null;
-            if (isHit(cell, block)) return (cell, normal, t, block);
+            if (test.IsHit(cell, block)) return (cell, normal, t, block);
             if (tx < ty && tx < tz) { x += sx; t = tx; tx += dx; normal = new Int3(-sx, 0, 0); }
             else if (ty < tz) { y += sy; t = ty; ty += dy; normal = new Int3(0, -sy, 0); }
             else { z += sz; t = tz; tz += dz; normal = new Int3(0, 0, -sz); }

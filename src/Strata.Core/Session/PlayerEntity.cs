@@ -16,8 +16,23 @@ public sealed class PlayerEntity
 
     public Vector3 Velocity { get; set; }
 
-    /// <summary>Normalized aim direction.</summary>
+    /// <summary>Normalized aim direction: from the eye to the crosshair point (shots, swing pitch, item drops).</summary>
     public Vector3 Aim { get; set; } = -Vector3.UnitZ;
+
+    /// <summary>
+    /// The camera's forward (normalized), set by the engine each tick and by the <c>aim</c> command; null while nothing
+    /// has set it (headless tests that only aim).
+    /// </summary>
+    public Vector3? ViewDirection { get; set; }
+
+    /// <summary>
+    /// Where the player is looking: the view direction when known, else the aim. Unlike <see cref="Aim"/> it does not
+    /// swing towards close targets beside the shoulder camera, so it drives the build rotation and the melee arc.
+    /// </summary>
+    public Vector3 Facing => ViewDirection ?? Aim;
+
+    /// <summary>Distance (m) from the eye to the crosshair point along <see cref="Aim"/> (terrain, or far away).</summary>
+    public float AimDistance { get; set; } = 40f;
 
     /// <summary>Ticks until the held item can be used again.</summary>
     public int UseCooldown { get; set; }
@@ -72,14 +87,15 @@ public sealed class PlayerEntity
     public Vector3 Eye => Position + new Vector3(0, 1.6f, 0);
 
     /// <summary>
-    /// Horizontal facing as a <see cref="Voxels.ShapeCode"/> rotation: 0 = looking +Z, 1 = −X, 2 = −Z, 3 = +X.
+    /// Horizontal <see cref="Facing"/> as a <see cref="Voxels.ShapeCode"/> rotation: 0 = looking +Z, 1 = −X, 2 = −Z, 3 = +X.
     /// Slopes placed with it rise away from the player; objects face the player.
     /// </summary>
     public int FacingQuarter
     {
         get
         {
-            int q = (int)MathF.Round(MathF.Atan2(Aim.X, Aim.Z) / (MathF.PI / 2f));
+            var f = Facing;
+            int q = (int)MathF.Round(MathF.Atan2(f.X, f.Z) / (MathF.PI / 2f));
             return ((-q % 4) + 4) % 4;
         }
     }

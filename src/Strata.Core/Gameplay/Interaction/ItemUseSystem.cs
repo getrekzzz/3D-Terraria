@@ -91,7 +91,7 @@ public sealed partial class ItemUseSystem
         if (p.UseCooldown > 0) return UseOutcome.Cooldown;
         if (p.State.Effects.NoItemUse) return UseOutcome.Blocked;
 
-        float reach = (item.Reach + p.State.Effects.Stats.Bonus(StatIds.Reach)) * Units.CellSize;
+        float reach = ReachMeters(p, item);
         var inReach = target != null && target.Distance <= reach ? target : null;
         var outcome = UseOutcome.None;
         int useTime = Prefixes.UseTime(held, item.UseTime);
@@ -162,6 +162,23 @@ public sealed partial class ItemUseSystem
         p.UseAnimation = Math.Max(1, item.UseAnimation);
         Used?.Invoke(p, info, outcome);
         return outcome;
+    }
+
+    /// <summary>
+    /// How far (m) from the eye the player can use <paramref name="item"/> (10 cells with an empty hand), plus the
+    /// Reach stat (Builder Potion and friends). The crosshair's in-reach highlight uses the same value.
+    /// </summary>
+    public static float ReachMeters(PlayerEntity p, ItemDef? item) =>
+        ((item?.Reach ?? 10) + p.State.Effects.Stats.Bonus(StatIds.Reach)) * Units.CellSize;
+
+    /// <summary>
+    /// Which soft objects the crosshair stops at for a held item: mining, chopping and hammering tools select decor
+    /// (and clear it), only axes select a tree's canopy; weapons, placeables and the empty hand look through both.
+    /// </summary>
+    public static TargetFilter FilterFor(ItemUseInfo? info)
+    {
+        if (info == null || !info.IsTool) return TargetFilter.None;
+        return info.Has(ItemAction.Chop) ? TargetFilter.Decor | TargetFilter.TreeCanopy : TargetFilter.Decor;
     }
 
     private UseOutcome UseTool(PlayerEntity p, ItemUseInfo info, Target target)

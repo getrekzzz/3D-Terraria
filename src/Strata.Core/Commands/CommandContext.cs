@@ -21,7 +21,12 @@ public sealed class HeadlessCommandHost : ICommandHost
 {
     public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false) => player.Position = feet;
 
-    public void Aim(PlayerEntity player, Vector3 direction) => player.Aim = Vector3.Normalize(direction);
+    public void Aim(PlayerEntity player, Vector3 direction)
+    {
+        var dir = Vector3.Normalize(direction);
+        player.Aim = dir;
+        player.ViewDirection = dir;
+    }
 }
 
 /// <summary>What commands operate on, plus named numeric probes used by <c>assert</c> and <c>probe</c>.</summary>
