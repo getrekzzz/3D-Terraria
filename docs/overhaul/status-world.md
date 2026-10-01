@@ -10,6 +10,18 @@ Owner: World & life session. Order: X-01 → X-08 (+P3-49) → X-06 → X-13 →
 
 CI (push 1): GREEN — file length, build, 426 Core tests, ore tiers/manifest/validate/coverage/gen_reference/build_all/audio checks, Godot import, all 15 smoke scripts (incl. new weather.cmds) SMOKE PASS, menu tour MENU PASS.
 
+## Push 2 — fishing, wiring, seasons (+ review fixes)
+| WP | State | Notes |
+|---|---|---|
+| X-13 fishing depth | done | Fishing power (rod + bait + `fishingPower` gear) × rain/storm/time/moon/Blood Moon × pool size (`data/config/fishing.json`); bait consumed by Terraria's chance; 10 biome crates + tier tables; lava fishing via Hotline rod / Lavaproof hook; 22 quest fish (water-only quests need water); bug-net critters are bait; `fishing.cmds` smoke. |
+| X-15 wiring set | done | Red/blue/green/yellow wire networks, actuators, 1/3/5 s timers, teleporter pads, mob/bomb statues with caps, logic gates, per-colour wire view; additive save fields (old red-only saves load). Adversarially reviewed: fixes for stale timers after unloads, mid-tick switch-off, statue critters (no netting, no event kills), actuator removal in unloaded chunks. |
+| X-06 seasons | done | Halloween (Oct 10–Nov 1) / Christmas (Dec 15–31) from the system date (`data/config/seasons.json`), settings toggle, `season` command/probe/condition; goodie bags and presents, seasonal vanity and decor, NPC hats, Santa at Christmas. Scripted runs (`--smoke`) ignore the calendar unless a script sets `season`. |
+
+CI (push 2, merge): GREEN — 467 Core tests, all 16 smoke scripts (incl. new fishing.cmds) and menu tour pass. Review-fix commit: see push 3 line below once verified.
+
+Gaps: no junk catches or hardmode crates; statues are crafted (no worldgen placement); lamp models do not show on/off;
+mining a block does not drop its actuator; no season-only enemies; seasonal vanity not drawn on the avatar yet.
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and
