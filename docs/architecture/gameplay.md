@@ -33,17 +33,18 @@
   land on the crosshair. When a solid cell or blocking object lies between the eye and the hand (a wall at the
   shoulder) the shot starts at the eye instead, never inside terrain. `ProjectileSystem.Fire` applies the weapon's
   spread around that line; other spawns (creature volleys) keep their own origins.
-* **Grappling hooks** — `GrappleHook` (`PlayerEntity.Hook`) is the hook's state machine (`None`, `Flying`,
-  `Attached`, `Retracting`; probe `player.hook` 0–3). A click with a hook held (`ItemUseSystem` grapple branch,
+* **Grappling hooks** — `GrappleHook` (`PlayerEntity.Hook`) is the hook's state machine (`None`, `Flying`, `Attached`,
+  `Retracting`; probe `player.hook` 0–3). A click with a hook held (`ItemUseSystem` grapple branch,
   `UseOutcome.Grappled`) or the grapple key (`GrappleHook.Best`: longest reach, accessories then inventory) throws it
   from `PlayerEntity.Hand`; pressing again lets go. The throw walks the voxel ray from the eye along `Aim`
   (`Targeting.CastWhere`) to the first `Latchable` cell within reach: solid blocks (platforms included), shaped blocks
-  with a walkable top and colliding tile objects, a tree's whole box (canopy) too, but never liquids, cobwebs, decor or
-  an object the eye stands inside. It latches to that exact cell and lets go only when the cell stops being latchable,
-  the player jumps or presses again, so the offset between smoothed terrain and its cells cannot drop it. Core decides
-  anchor, state and `PullVelocity` (towards the anchor at the hook's pull speed, hanging within 1.1 m); the engine body
-  (`PlayerEntity.HasBody`) advances the hook in `_PhysicsProcess` and applies the pull, while `GameWorld` ticks it for
-  bodiless (headless, test) players. Death, teleports and recalls put the hook away.
+  with a walkable top and colliding tile objects, a tree's whole box (canopy) too, but never liquids, cobwebs, decor,
+  open doors or an object the eye stands inside. It latches to that exact cell and lets go only when the cell stops
+  being latchable, the player jumps or presses again, so the offset between smoothed terrain and its cells cannot drop
+  it. Core decides anchor, state and `PullVelocity` (towards the anchor at the hook's pull speed, hanging within
+  1.1 m); the engine body (`PlayerEntity.HasBody`) advances the hook in `_PhysicsProcess` and applies the pull, while
+  `GameWorld` ticks it for bodiless (headless, test) players. Death, teleports and recalls put the hook away; nothing
+  is thrown from a minecart, and riding one or phasing lets go of a hook that is out.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor

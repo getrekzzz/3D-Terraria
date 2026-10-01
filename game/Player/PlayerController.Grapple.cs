@@ -48,4 +48,17 @@ public sealed partial class PlayerController
         RefillAirMovement(); // hanging on a hook counts as a fresh start for jumps and wings
         return true;
     }
+
+    /// <summary>
+    /// Riding a minecart or phasing through blocks: a hook that is out lets go and comes back to the hand, instead of
+    /// hanging frozen in the air and yanking the body back to its anchor on the way out.
+    /// </summary>
+    private void ReelInHook(float dt)
+    {
+        var hook = Entity.Hook;
+        if (!hook.Active) return;
+        hook.Release();
+        var hand = HandPosition;
+        hook.Tick(_runtime.Session.World, dt, new System.Numerics.Vector3(hand.X, hand.Y, hand.Z));
+    }
 }

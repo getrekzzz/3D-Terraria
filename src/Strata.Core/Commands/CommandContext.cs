@@ -19,7 +19,11 @@ public interface ICommandHost
 /// <summary>Host used by headless runs: moves the Core entity directly.</summary>
 public sealed class HeadlessCommandHost : ICommandHost
 {
-    public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false) => player.Position = feet;
+    public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false)
+    {
+        player.Position = feet;
+        player.Hook.Reset(); // as the engine body does: a latched hook would pull back across the world
+    }
 
     public void Aim(PlayerEntity player, Vector3 direction)
     {

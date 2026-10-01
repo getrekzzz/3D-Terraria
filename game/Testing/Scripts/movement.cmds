@@ -39,7 +39,7 @@ assert player.hook >= 1
 wait 1.5
 assert player.hook == 2
 assert player.from_mark > 4
-fill -6 0 -6 6 8 6 air
+fill -10 0 -10 10 8 10 air
 wait 0.3
 assert player.hook != 2
 wait 2.5

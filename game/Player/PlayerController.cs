@@ -126,8 +126,11 @@ public sealed partial class PlayerController : CharacterBody3D
             Entity.Minecart = null;
             return;
         }
-        if (UpdateMinecart(dt)) return;
-        if (UpdatePhase()) return;
+        if (UpdateMinecart(dt) || UpdatePhase())
+        {
+            ReelInHook(dt);
+            return;
+        }
 
         _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
         _swimming = _liquid != null;

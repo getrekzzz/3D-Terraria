@@ -63,11 +63,11 @@ public sealed partial class ItemUseSystem
 
     /// <summary>
     /// Throws the held hook along the crosshair, as the grapple key does, or lets go of one already flying or latched
-    /// (pressing again releases, as in Terraria).
+    /// (pressing again releases, as in Terraria). Nothing is thrown from a minecart.
     /// </summary>
     private UseOutcome Grapple(PlayerEntity p, ItemUseInfo info)
     {
-        if (info.Grapple is not { } gp) return UseOutcome.None;
+        if (info.Grapple is not { } gp || p.Minecart != null) return UseOutcome.None;
         if (p.Hook.State is HookState.Flying or HookState.Attached) p.Hook.Release();
         else p.Hook.Fire(_world.Session.World, gp, info.Item, p.Hand, p.Eye, p.Aim);
         return UseOutcome.Grappled;

@@ -67,8 +67,8 @@ public sealed class GrappleHook
     /// <summary>
     /// Can a hook hold on to cell <paramref name="c"/>? Solid blocks (platforms are solid blocks with a thin shape), a
     /// rendered block shaped with a walkable top, and tile objects that collide, which includes a tree's whole box
-    /// (its canopy). Air, liquids, non-solid blocks such as cobwebs and decor never hold it. A cell whose chunk is
-    /// not loaded counts as holding, as for collision.
+    /// (its canopy). Air, liquids, non-solid blocks such as cobwebs, decor and open doors (bodies walk through them)
+    /// never hold it. A cell whose chunk is not loaded counts as holding, as for collision.
     /// </summary>
     public static bool Latchable(VoxelWorld w, Int3 c)
     {
@@ -81,7 +81,7 @@ public sealed class GrappleHook
             byte shape = w.GetShape(c.X, c.Y, c.Z);
             if (def.Render != BlockRender.None && shape != 0 && ShapeCode.IsWalkableTop(ShapeCode.Shape(shape))) return true;
         }
-        return w.TileObjects.At(c) is { } o && o.Def.Collision != TileCollision.None && !o.Def.Decor;
+        return w.TileObjects.At(c) is { } o && o.Def.Collision != TileCollision.None && !o.Def.Decor && !(o.IsDoor && o.Active);
     }
 
     /// <summary>

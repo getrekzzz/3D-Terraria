@@ -227,6 +227,43 @@ public class GrappleTests
     }
 
     [Fact]
+    public void OpenDoorsDoNotHold()
+    {
+        using var g = Arena();
+        var world = g.World.Session.World;
+        var door = new TileObjectInstance(g.Content.TileObjects.Get("wooden_door"), g.Floor + new Int3(3, 1, 0), 0, 0);
+        Assert.True(world.TileObjects.TryAdd(door));
+        Assert.True(GrappleHook.Latchable(world, door.Anchor + Int3.Up));
+        door.Active = true; // open: bodies walk through the doorway
+        Assert.False(GrappleHook.Latchable(world, door.Anchor + Int3.Up));
+    }
+
+    [Fact]
+    public void NothingIsThrownFromAMinecart()
+    {
+        using var g = Arena();
+        var world = g.World.Session.World;
+        Assert.True(world.TileObjects.TryAdd(new TileObjectInstance(g.Content.TileObjects.Get("minecart_track"), g.Floor + Int3.Up, 0, 0)));
+        g.Player.Position = TestGame.CellFeet(g.Floor + Int3.Up);
+        g.Player.Minecart = Strata.Core.Gameplay.Mounts.Minecarts.Board(world, g.Floor + Int3.Up, -Vector3.UnitZ, g.World.Uses[g.Content.Items.Get("minecart")].Minecart!);
+        Assert.NotNull(g.Player.Minecart);
+        g.Hold("grappling_hook");
+        Assert.Equal(UseOutcome.None, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(HookState.None, g.Player.Hook.State);
+    }
+
+    [Fact]
+    public void ATeleportPutsTheHookAway()
+    {
+        using var g = Arena();
+        NaturalSlab(g, 16);
+        Throw(g, Vector3.UnitY);
+        TickUntil(g, HookState.Attached, 60);
+        new Strata.Core.Commands.HeadlessCommandHost().Teleport(g.Player, g.Player.Position + new Vector3(40f, 0f, 0f));
+        Assert.Equal(HookState.None, g.Player.Hook.State);
+    }
+
+    [Fact]
     public void AnEngineBodyAdvancesItsOwnHook()
     {
         using var g = Arena();
