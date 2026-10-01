@@ -133,7 +133,7 @@ public class SurfaceProfileTests
     public void GeneratedWindowIsMeasurable()
     {
         // The scan band must cover the tallest overhang the density field can produce.
-        Assert.True(TerrainField.OverhangAmplitude(1f) + 8f <= SurfaceProfile.Headroom);
+        Assert.True(TerrainField.OverhangAmplitude(1f, 1f) + 8f <= SurfaceProfile.Headroom);
 
         var gen = new WorldGenerator(TestPaths.Content, new WorldSettings { Seed = 1234, Size = WorldSizePreset.Tiny });
         var spawn = gen.Plan.Spawn;

@@ -128,13 +128,22 @@ public sealed class Npc
 
     public bool IsBoss => Def.Boss is { Minor: false };
 
-    /// <summary>Every volume that can hit or be hit: the body plus segments.</summary>
+    /// <summary>Every volume that can hit or be hit: the body plus segments (allocates an iterator; see <see cref="VolumeAt"/>).</summary>
     public IEnumerable<(Vector3 Min, Vector3 Max)> Volumes()
     {
-        yield return Box;
-        if (Segments.Count == 0) yield break;
+        for (int i = 0; i < VolumeCount; i++) yield return VolumeAt(i);
+    }
+
+    /// <summary>How many volumes <see cref="VolumeAt"/> serves: the body plus one per segment.</summary>
+    public int VolumeCount => 1 + Segments.Count;
+
+    /// <summary>Volume <paramref name="i"/> without allocating: 0 is the body's <see cref="Box"/>, then each segment's cube.</summary>
+    public (Vector3 Min, Vector3 Max) VolumeAt(int i)
+    {
+        if (i == 0) return Box;
         var half = new Vector3(Def.Boss?.SegmentRadius ?? 0.5f);
-        foreach (var s in Segments) yield return (s - half, s + half);
+        var s = Segments[i - 1];
+        return (s - half, s + half);
     }
 
     public bool Alive => Life > 0;

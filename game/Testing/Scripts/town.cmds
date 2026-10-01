@@ -35,6 +35,17 @@ time noon
 give silver_coin 60
 town summon merchant 0 0 -3
 wait 0.2
+# The crosshair names him with his life (P1-07), and right-click talks to the resident under it.
+camera first
+aim 0 0 -1
+wait 0.3
+assert hover.resident == 1
+assert hover.talk == 1
+assert hud.target_name.the_merchant_250/250 == 1
+hold use_secondary 0.1
+assert ui.talk_open == 1
+ui close
+camera third
 town talk merchant
 ui talk merchant
 ui shop

@@ -80,4 +80,18 @@ slay empress_of_light
 assert flag.defeated_empress_of_light == 1
 killall
 time noon
+# A worm's body segment under the crosshair names the whole worm with its life (P1-07): spawned 2 m up and 4 m ahead
+# and frozen at once, its first segment hangs at eye height below the head.
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 8 12 air
+camera first
+aim 0 0 1
+spawn eater_of_worlds 1 4
+ai off
+wait 0.3
+assert hover.eater_of_worlds == 1
+assert hud.target_name.eater_of_worlds == 1
+ai on
+killall
+camera third
 assert errors == 0

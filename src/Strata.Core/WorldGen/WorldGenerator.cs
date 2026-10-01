@@ -31,7 +31,7 @@ public sealed class WorldGenerator
         var sw = Stopwatch.StartNew();
         var ctx = new PlanContext(this);
         foreach (var pass in Passes) pass.Plan(ctx);
-        Plan.RaiseTerrainColumnTops(Terrain.SurfaceHeight);
+        Plan.RaiseTerrainColumnTops(Terrain);
         Plan.Hash = PlanHasher.Compute(Plan);
         Log.Info("worldgen", $"Plan built in {sw.ElapsedMilliseconds} ms (seed {settings.Seed}, {settings.Size}, hash {Plan.Hash}).");
     }

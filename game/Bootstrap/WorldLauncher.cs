@@ -18,6 +18,10 @@ public sealed class LaunchedWorld
     public required Rendering.PropLibrary Props { get; init; }
     public required TileObjectRenderer Objects { get; init; }
     public PlayerController? Player { get; init; }
+
+    /// <summary>The player's third-person body (null in free-camera worlds).</summary>
+    public PlayerAvatar? Avatar { get; init; }
+
     public InteractionController? Interaction { get; init; }
     public FreeCamera? FreeCamera { get; init; }
     public UI.InventoryScreen? Inventory { get; init; }
@@ -84,10 +88,10 @@ public static partial class WorldLauncher
 
         var (entity, player) = AddPlayer(runtime, services, game, o, playerDir);
         AddPlayerEffects(runtime, game, entity);
-        AddPlayerVisuals(runtime, services, game, props, entity, player);
+        var avatar = AddPlayerVisuals(runtime, services, game, props, entity, player);
         var interaction = AddInteraction(runtime, game, entity, player);
         var (hud, inventory, worldMap, townDialog) = AddUi(runtime, game, player, interaction, objectRenderer);
-        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap };
+        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

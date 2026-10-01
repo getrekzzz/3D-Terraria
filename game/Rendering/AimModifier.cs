@@ -4,15 +4,19 @@ namespace Strata.Game.Rendering;
 
 /// <summary>
 /// Turns a human's upper body toward where it aims, after the animation has posed it: <see cref="Twist"/> turns the
-/// torso and head about the vertical (the legs keep facing where they walk), <see cref="Pitch"/> bends the spine and
-/// head up or down, and <see cref="ArmAim"/> lets the arms follow the pitch fully (guns, bows, staffs held at the
-/// target). Spread down the spine so no single joint kinks.
+/// torso about the vertical so the chest, the arms it carries and the head face the aim exactly (the legs keep facing
+/// where they walk), <see cref="Pitch"/> bends the spine and head up or down, and <see cref="ArmAim"/> lets the arms
+/// follow the pitch fully (guns, bows, staffs held at the target). The twist is split between the spine and the chest
+/// and the pitch spread up to the head, so no single joint kinks.
 /// </summary>
 public sealed partial class AimModifier : SkeletonModifier3D
 {
+    /// <summary>The largest torso twist applied (radians, about 77°); the player's legs stay within 70° of the aim.</summary>
+    public const float TwistLimit = 1.35f;
+
     private static readonly (string Bone, float Twist, float Pitch)[] Chain =
     {
-        ("spine", 0.25f, 0.08f), ("chest", 0.35f, 0.17f), ("neck", 0.15f, 0.3f), ("head", 0.25f, 0.45f),
+        ("spine", 0.45f, 0.08f), ("chest", 0.55f, 0.17f), ("neck", 0f, 0.3f), ("head", 0f, 0.45f),
     };
 
     private int[] _chain = System.Array.Empty<int>();
@@ -20,6 +24,9 @@ public sealed partial class AimModifier : SkeletonModifier3D
 
     /// <summary>Torso turn relative to the legs, radians (+ = to the character's left, as Godot yaw).</summary>
     public float Twist { get; set; }
+
+    /// <summary>The twist the chest actually turns by (<see cref="Twist"/> within <see cref="TwistLimit"/>).</summary>
+    public float AppliedTwist => Mathf.Clamp(Twist, -TwistLimit, TwistLimit);
 
     /// <summary>Aim pitch, radians (+ = up).</summary>
     public float Pitch { get; set; }
@@ -38,7 +45,7 @@ public sealed partial class AimModifier : SkeletonModifier3D
             _armR = sk.FindBone("upper_arm.R");
             _armL = sk.FindBone("upper_arm.L");
         }
-        float twist = Mathf.Clamp(Twist, -1.35f, 1.35f), pitch = Mathf.Clamp(Pitch, -1.1f, 1.1f);
+        float twist = AppliedTwist, pitch = Mathf.Clamp(Pitch, -1.1f, 1.1f);
         if (Mathf.Abs(twist) < 1e-3f && Mathf.Abs(pitch) < 1e-3f) return;
         float turned = 0f;
         for (int i = 0; i < _chain.Length; i++)
