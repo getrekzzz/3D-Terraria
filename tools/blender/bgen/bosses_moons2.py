@@ -235,7 +235,7 @@ def _track(mb, sx):
             mb.box((x - 0.33, y - 0.07, z - 0.04), (x + 0.33, y + 0.07, z + 0.04), "prop:dark_iron", "#3a3c40")
     for y in (-1.25, -0.42, 0.42, 1.25):
         r = 0.4 if abs(y) > 1 else 0.3
-        mb.cylinder((x - sx * 0.33, y, 0.47), (x + sx * 0.36, y, 0.47), r, r, "prop:dark_iron", "#2e3034", segments=14)
+        mb.cylinder((x - sx * 0.33, y, 0.47), (x + sx * 0.36, y, 0.47), r, r, "prop:dark_iron", "#2e3034", segments=20)
         mb.cylinder((x + sx * 0.35, y, 0.47), (x + sx * 0.4, y, 0.47), r * 0.55, r * 0.45, "prop:iron:metal", RED, segments=10)
         mb.sphere((x + sx * 0.41, y, 0.47), r * 0.15, "prop:gold:metal", "#d8b040", subdivisions=1)
     mb.box((x - 0.38, -1.75, 0.98), (x + 0.38, 1.75, 1.08), "prop:iron:metal", RED_DARK)
@@ -268,7 +268,7 @@ def _santa_head(mb, rng):
     mb.cylinder((0, -0.15, 1.58), (0, -0.15, 2.0), 1.0, 0.92, "prop:iron:metal", RED, segments=24)
     mb.cylinder((0, -0.15, 1.95), (0, -0.15, 2.05), 0.95, 0.95, "prop:fur", WHITE, segments=24)
     c = Vector((0, 0.1, 2.55))
-    organic(mb, lambda b: b.ellipsoid(c, (0.5, 0.48, 0.55)), "prop:plain", tris=900, resolution=0.03,
+    organic(mb, lambda b: b.ellipsoid(c, (0.5, 0.48, 0.55)), "prop:plain", tris=1300, resolution=0.025,
             paint=lambda q, n: mix("#e8b090", "#c07860", max(0.0, -n.y) * 0.6))
     for sx in (-1, 1):  # glowing robot eyes under bushy brows, rosy cheeks
         mb.sphere(c + Vector((sx * 0.18, 0.44, 0.12)), 0.08, "prop:plain:glow", "#ff2010", subdivisions=2, scale=(1.2, 0.5, 0.8))
@@ -282,7 +282,7 @@ def _santa_head(mb, rng):
         for sx in (-1, 1):
             b.ellipsoid(c + Vector((sx * 0.2, 0.46, -0.12)), (0.22, 0.1, 0.08))   # moustache
             b.ellipsoid(c + Vector((sx * 0.45, 0.0, -0.05)), (0.12, 0.25, 0.3))
-    organic(mb, beard, "prop:fur", tris=1400, resolution=0.025, paint=lambda q, n: mix(WHITE, "#b8b8c0", max(0.0, -n.z) * 0.5),
+    organic(mb, beard, "prop:fur", tris=2000, resolution=0.025, paint=lambda q, n: mix(WHITE, "#b8b8c0", max(0.0, -n.z) * 0.5),
             sculpt=lambda q, n: n * 0.03 * noise3(q, 18) - Vector((0, 0, 0.02 * abs(noise3(q, 30)))))
     hat = [c + Vector((0, -0.05, 0.38)), c + Vector((0, -0.12, 0.75)), c + Vector((0, -0.4, 1.0)), c + Vector((0, -0.75, 0.95)),
            c + Vector((0, -0.95, 0.75))]
