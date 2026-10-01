@@ -90,3 +90,16 @@ use
 assert player.use_anim == 22
 assert melee.swings == 1
 assert errors == 0
+
+# --- P1-15 ---
+# A bow with no arrows: the fresh press is reported once (a dry click and 'Needs Wooden Arrow'); holding the button
+# down reports its own fresh press and nothing more.
+clear
+give wooden_bow 1
+wield wooden_bow
+assert use.failures == 0
+use
+assert use.failures == 1
+hold use_primary 0.5
+assert use.failures == 2
+assert errors == 0

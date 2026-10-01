@@ -85,6 +85,7 @@ public sealed partial class ItemUseSystem
         if (held.IsEmpty || !p.Alive) return UseOutcome.None;
         var info = _world.Uses[held.Item!];
         var item = info.Item;
+        _refusal = null;
         // Holding the button keeps tools, placeables and melee weapons going (every sword auto-swings, as in 1.4.4).
         bool repeats = item.AutoReuse || info.IsTool || info.Has(ItemAction.PlaceBlock | ItemAction.PlaceObject | ItemAction.Melee | ItemAction.Thrust);
         if (!freshPress && !repeats) return UseOutcome.None;
@@ -94,7 +95,7 @@ public sealed partial class ItemUseSystem
         bool melee = info.Has(ItemAction.Melee | ItemAction.Thrust);
         if (p.UseCooldown > 0 && !(newAnimation && info.IsTool)) return UseOutcome.Cooldown;
         if (!newAnimation && melee && !info.IsTool) return UseOutcome.Cooldown; // one strike per swing
-        if (p.State.Effects.NoItemUse) return UseOutcome.Blocked;
+        if (p.State.Effects.NoItemUse) return Report(p, info, Refuse("You can't use items right now"), freshPress);
         float speed = UseSpeed(p, held, info);
         if (p.UseCooldown > 0)
         {
@@ -170,7 +171,8 @@ public sealed partial class ItemUseSystem
         bool swings = melee && newAnimation
             && (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Shot or UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool);
         if (swings && (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach)) outcome = UseOutcome.Swung;
-        if (outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Blocked or UseOutcome.NoAmmo or UseOutcome.NoMana) return outcome;
+        if (outcome is UseOutcome.Blocked or UseOutcome.NoAmmo or UseOutcome.NoMana) return Report(p, info, outcome, freshPress);
+        if (outcome is UseOutcome.None or UseOutcome.OutOfReach) return outcome;
         p.UseCooldown = UseTicks(useTime);
         if (newAnimation) StartAnimation(p, item, speed); // mid-animation digs and gun bursts leave the swing alone
         if (swings) Swung?.Invoke(p, info);

@@ -7,15 +7,17 @@ using Strata.Core.Session;
 namespace Strata.Game.Audio;
 
 /// <summary>
-/// Turns what happens in the world into sound: picks biting blocks by material, placing, swings and shots by weapon
-/// kind, hits and deaths, explosions, bosses rising and falling, events beginning, residents arriving, pick-ups, drinks,
-/// the Magic Mirror and the local player's death.
+/// Turns what happens in the world into sound: picks biting blocks by material (or tinking off one too hard), placing,
+/// swings and shots by weapon kind, a dry click or a mana fizzle for a press that could not be used, hits and deaths,
+/// explosions, bosses rising and falling, events beginning, residents arriving, pick-ups, drinks, the Magic Mirror and the
+/// local player's death.
 /// </summary>
 public sealed partial class SoundEvents : Node
 {
     private GameWorld _game = null!;
     private PlayerEntity _local = null!;
     private ulong _lastPlaceFrame;
+    private ulong _tinkFrame;
     private ulong _lastHitMs;
     private bool _wasAlive = true;
     private int _lastSerial;
@@ -30,6 +32,12 @@ public sealed partial class SoundEvents : Node
         game.Editor.ObjectPlaced += obj => Placed(obj.Anchor);
         game.Editor.ObjectBroken += obj => Sfx.PlayAt("break_wood", Cell(obj.Anchor), -3f);
         game.ItemUse.Used += OnUsed;
+        game.ItemUse.Failed += (p, _, outcome) =>
+        {
+            if (p != _local) return; // once per press, never while held
+            if (outcome == UseOutcome.NoMana) Sfx.Play("no_mana", -4f);
+            else Sfx.Play("use_fail", -4f);
+        };
         game.Npcs.Damaged += e =>
         {
             ulong now = Time.GetTicksMsec();
@@ -82,8 +90,13 @@ public sealed partial class SoundEvents : Node
         var cell = o.Broken.Count > 0 ? o.Broken.First() : o.Damaged.Count > 0 ? o.Damaged[0].Cell : o.TooHard.Count > 0 ? o.TooHard.First() : (Strata.Core.Common.Int3?)null;
         if (cell == null) return;
         bool broke = o.Broken.Count > 0;
-        Sfx.PlayAt(Sfx.Has($"{(broke ? "break" : "dig")}_{material}") ? $"{(broke ? "break" : "dig")}_{material}" : broke ? "break_stone" : "dig_stone",
-            Cell(cell.Value), o.TooHard.Count > 0 && o.Damaged.Count == 0 && !broke ? -8f : 0f);
+        if (!broke && o.Damaged.Count == 0)
+        {
+            _tinkFrame = Engine.GetProcessFrames();
+            Sfx.PlayAt("tink", Cell(cell.Value), -6f); // the pick is too weak: it only glances off
+            return;
+        }
+        Sfx.PlayAt(Sfx.Has($"{(broke ? "break" : "dig")}_{material}") ? $"{(broke ? "break" : "dig")}_{material}" : broke ? "break_stone" : "dig_stone", Cell(cell.Value));
     }
 
     private void Placed(Strata.Core.Common.Int3 cell)
@@ -107,6 +120,8 @@ public sealed partial class SoundEvents : Node
                 break;
             case UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool:
                 if (newSwing && info.IsTool) Sfx.Play("swing", item.UseTime < 18 ? -3f : 0f);
+                // An object too tough for the tool (an altar before its time) tinks too; blocks already did where struck.
+                if (outcome == UseOutcome.TooHard && Engine.GetProcessFrames() != _tinkFrame) Sfx.Play("tink", -6f);
                 break;
             case UseOutcome.Shot:
                 Sfx.Play(ShotSound(item), item.UseTime <= 6 ? -5f : 0f);
