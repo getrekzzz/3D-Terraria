@@ -45,6 +45,20 @@ sits a gentle two-octave detail of at most 2 cells. Editing a relief value chang
 `GenVersion` bump and re-pinned golden hashes. `ReliefTests` keep inland slopes outside mountains below 0.9 and the
 hills around spawn from flattening.
 
+**Surface shape.** The ground is a heightfield plus a small 3D jitter: `TerrainField.Density` adds a two-octave
+overhang noise (λ48, y stretched by 0.8) of amplitude `0.6 + 1.4 × ruggedness + 11 × cliff` cells within amplitude + 1
+of the surface (`TerrainTuning` holds these generator constants). Outside cliff zones the amplitude stays at most about
+2 cells, so the density falls monotonically with height: one surface per column, no fins, floating blobs or pits.
+Cliffs and undercuts appear only in rare deliberate cliff zones (`WorldPlan.Cliffs`, planned by `BiomeRelief`): where a
+λ520 mask peaks, times the biome's `cliffs` affinity (blended towards 0.8 in mountain ranges), kept 180+ cells from
+spawn and off the beaches, about 5% of the land on Small. There the noise is also terraced (steepened 2.5× and
+clipped), so the ground forms shelves between steep walls, with an undercut in about 1% of the columns. `ChunkGenContext` caches each column's cliff strength and
+overhang amplitude; below surface − amplitude every cell is solid, so the noise caves measure their roof from there
+(at least 5 cells under the lowest the surface can dip). Worm tunnels: about 30% are cave mouths that start one cell
+under the ground, head into rising ground and dive 25–36° for three segments, a hole into the hillside rather than a
+trench; the rest start 14–40 cells down. Chasms, shafts and sinkholes stay deliberate surface openings.
+`TerrainShapeTests` pin these properties.
+
 **World mutations** (hardmode) are a third, lazy tier: an ordered log of steps saved with the world, each a pure
 function of (world, mutation seed, chunk, blocks). `WorldSession.Produce` applies whatever a chunk is missing (freshly
 generated chunks start at level 0; saved chunks store their level), and loaded chunks are caught up live, so a region

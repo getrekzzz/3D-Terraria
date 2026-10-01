@@ -1,6 +1,7 @@
 using Strata.Core.Content.Defs;
 using Strata.Core.Determinism;
 using Strata.Core.Diagnostics;
+using Strata.Core.WorldGen.Fields;
 using Strata.Core.WorldGen.Plan;
 
 namespace Strata.Core.WorldGen.Passes;
@@ -8,7 +9,8 @@ namespace Strata.Core.WorldGen.Passes;
 /// <summary>
 /// Per-biome surface relief from <see cref="BiomeDef.Relief"/> (rolling hills, soft snow ridges, jungle mounds, dunes,
 /// mountain ranges in the open forest) blended across wide borders and blurred, so landforms read as rounded hills
-/// instead of knife-edge ridges and biome borders ramp instead of stepping.
+/// instead of knife-edge ridges and biome borders ramp instead of stepping. Also plans the rare cliff zones
+/// (<see cref="WorldPlan.Cliffs"/>): where a large-scale mask peaks over a biome with cliff affinity or a mountain range.
 /// </summary>
 internal sealed class BiomeRelief
 {
@@ -18,7 +20,7 @@ internal sealed class BiomeRelief
     private readonly WorldPlan _plan;
     private readonly ReliefSpec _open;
     private readonly ReliefSpec[] _specs;
-    private readonly NoiseField _hills, _ridges, _bumps, _dunes, _mountainMask, _mountains;
+    private readonly NoiseField _hills, _ridges, _bumps, _dunes, _mountainMask, _mountains, _cliffMask;
     private readonly bool _useRolling, _useHills, _useRidges, _useBumps, _useDunes;
 
     public BiomeRelief(SeedTree seeds, PlanContext ctx)
@@ -30,6 +32,7 @@ internal sealed class BiomeRelief
         _dunes = NoiseField.Create(seeds, "dunes", 70f, NoiseFractal.Fbm, 2);
         _mountainMask = NoiseField.Create(seeds, "mountain_mask", 700f, NoiseFractal.Fbm, 2);
         _mountains = NoiseField.Create(seeds, "mountains", 260f, NoiseFractal.Fbm, 3);
+        _cliffMask = NoiseField.Create(seeds, "cliff_mask", TerrainTuning.CliffMaskWavelength, NoiseFractal.Fbm, 2);
 
         var biomes = ctx.Content.Biomes;
         _open = biomes.TryGet(OpenLand, out var forest) && forest.Relief != null ? forest.Relief : Missing(ctx, OpenLand, new ReliefSpec());
@@ -58,7 +61,7 @@ internal sealed class BiomeRelief
         return fallback;
     }
 
-    /// <summary>Adds the relief to the plan heights (scaled down towards the coast) and sets the ruggedness grid.</summary>
+    /// <summary>Adds the relief to the plan heights (scaled down towards the coast) and sets the ruggedness and cliff grids.</summary>
     public void Apply()
     {
         var plan = _plan;
@@ -66,6 +69,7 @@ internal sealed class BiomeRelief
         var weights = new float[regions.Count];
         var relief = new Grid2D(plan.Size.X, plan.Size.Z, WorldPlan.HeightStep);
         var rugged = new Grid2D(plan.Size.X, plan.Size.Z, WorldPlan.HeightStep);
+        var cliffs = new Grid2D(plan.Size.X, plan.Size.Z, WorldPlan.HeightStep);
         var mountains = _open.Mountains;
 
         for (int gz = 0; gz < relief.Depth; gz++)
@@ -81,15 +85,17 @@ internal sealed class BiomeRelief
                 var terms = Sample(x, z);
                 float forest = MathF.Max(0f, 1f - total);
                 float norm = forest + total;
-                float h = forest * terms.Relief(_open), rug = forest * _open.Ruggedness;
+                float h = forest * terms.Relief(_open), rug = forest * _open.Ruggedness, cliff = forest * _open.Cliffs;
                 for (int i = 0; i < regions.Count; i++)
                 {
                     if (weights[i] <= 0f) continue;
                     h += weights[i] * terms.Relief(_specs[i]);
                     rug += weights[i] * _specs[i].Ruggedness;
+                    cliff += weights[i] * _specs[i].Cliffs;
                 }
                 h /= norm;
                 rug /= norm;
+                cliff /= norm;
 
                 float spawnCalm = SpawnCalm(x, z);
                 float mask = MountainMask(x, z, spawnCalm, forest);
@@ -97,10 +103,12 @@ internal sealed class BiomeRelief
                 {
                     h += mask * (mountains!.Height + mountains.Peak * DetMath.SoftRidge(_mountains.Sample(x, z), 0.3f));
                     rug = DetMath.Lerp(rug, 0.5f, mask);
+                    cliff = DetMath.Lerp(cliff, TerrainTuning.MountainCliffs, mask);
                 }
 
                 relief[gx, gz] = h * DetMath.Lerp(0.35f, 1f, spawnCalm);
                 rugged[gx, gz] = rug * spawnCalm;
+                cliffs[gx, gz] = cliff * CliffZone(x, z);
             }
 
         // Two radius-2 box passes approximate a Gaussian about 40 cells wide; ruggedness ramps too, so overhang
@@ -108,12 +116,15 @@ internal sealed class BiomeRelief
         relief.Blur(2);
         relief.Blur(2);
         rugged.Blur(3);
+        cliffs.Blur(2);
         for (int i = 0; i < plan.Height.Values.Length; i++)
         {
             float land = plan.Landness.Values[i];
             float beach = DetMath.SmoothStep(0.45f, 0.85f, land);
             plan.Height.Values[i] += relief.Values[i] * land * beach;
             plan.Ruggedness.Values[i] = rugged.Values[i] * land;
+            // Off the beaches too: the relief fades out there, and a cliff wall on flat sand is only noise blobs.
+            plan.Cliffs.Values[i] = cliffs.Values[i] * land * beach;
         }
     }
 
@@ -131,6 +142,17 @@ internal sealed class BiomeRelief
     private float MountainMask(float x, float z, float spawnCalm, float openLand) =>
         _open.Mountains == null || spawnCalm * openLand <= 0f ? 0f
             : DetMath.SmoothStep(0.25f, 0.55f, _mountainMask.Sample(x, z)) * spawnCalm * openLand;
+
+    /// <summary>
+    /// 0–1: where the large-scale cliff mask peaks (a few percent of the map), held back from the spawn area entirely.
+    /// Multiplied by the blended cliff affinity it gives the cliff strength before the blur.
+    /// </summary>
+    private float CliffZone(float x, float z)
+    {
+        float dx = x - _plan.Size.X * 0.5f, dz = z - _plan.Size.Z * 0.5f;
+        float calm = DetMath.SmoothStep(TerrainTuning.CliffCalmInner, TerrainTuning.CliffCalmOuter, MathF.Sqrt(dx * dx + dz * dz));
+        return calm <= 0f ? 0f : calm * DetMath.SmoothStep(TerrainTuning.CliffMaskLow, TerrainTuning.CliffMaskHigh, _cliffMask.Sample01(x, z));
+    }
 
     /// <summary>A region's share of the relief at a point: ramps in over a wide border (buried regions have none).</summary>
     private static float Weight(BiomeRegion r, float x, float z) =>
