@@ -196,7 +196,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
         if opts["icons"]:
             icon = f"assets/icons/items/{iid}.png"
             export.apply_textured_materials([obj], props)
-            export.render_icon([obj], REPO / icon, "object" if "object" in job else _view_for(job["generator"]), samples=opts["samples"])
+            export.render_icon([obj], REPO / icon, "object" if "object" in job else _view_for(job["generator"], bgen.VIEWS), samples=opts["samples"])
             entry["icon"] = icon
         manifest["items"][iid] = entry
         print(f"item {iid}: {entry}")
@@ -262,7 +262,10 @@ def build_anims(opts, creature_jobs):
         print(f"anim {key}: {sorted(a.name for a in bpy.data.actions)}")
 
 
-def _view_for(generator: str) -> str:
+def _view_for(generator: str, views: dict) -> str:
+    """Icon framing for an item generator: the view given at @generator registration, else by the long-item list."""
+    if generator in views:
+        return views[generator]
     long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow", "gun", "rod", "whip", "red_wrench", "wire_cutter", "bug_net", "paintbrush", "paint_scraper"}
     return "item" if generator in long_items else "object"
 

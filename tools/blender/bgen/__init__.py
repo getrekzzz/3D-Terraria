@@ -12,6 +12,9 @@ the registrations run, and consult GENERATORS alongside the older per-module GEN
     @generator("gem_lamp")        # registered under an explicit name
     def lamp(mb, params, rng): ...
 
+    @generator(view="item")       # a long held item: its icon is laid diagonally like swords and tools
+    def spear(mb, params, rng): ...
+
 Object and item generators build into the MeshBuilder; creature generators also return their rig description, just
 like the entries of the per-module dicts. A name registered twice, or one the older dicts already use, is an error.
 """
@@ -19,15 +22,23 @@ import importlib
 import pkgutil
 
 GENERATORS = {}
+# Icon view per registered item generator ("item": laid diagonally, "object": three-quarter view; the default).
+VIEWS = {}
 
 
-def generator(name=None):
-    """Registers fn(mb, params, rng) in GENERATORS under `name` (default: the function's name)."""
+def generator(name=None, *, view=None):
+    """Registers fn(mb, params, rng) in GENERATORS under `name` (default: the function's name); `view` picks the icon
+    framing of an item generator ("item" for long weapons and tools, "object" otherwise)."""
+    if view not in (None, "item", "object"):
+        raise ValueError(f"generator view must be 'item' or 'object', not {view!r}")
+
     def register(fn, key=None):
         key = key or fn.__name__
         if key in GENERATORS:
             raise ValueError(f"generator '{key}' is registered twice ({GENERATORS[key].__module__} and {fn.__module__})")
         GENERATORS[key] = fn
+        if view:
+            VIEWS[key] = view
         return fn
     if callable(name):  # bare @generator
         return register(name)

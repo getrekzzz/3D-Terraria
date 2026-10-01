@@ -333,7 +333,8 @@ for _m in ("dirt", "grass", "stone", "ore", "wood", "sand", "snow", "glass", "ic
 
 
 def _merge_extensions():
-    """Adds RECIPES and GAIN from every sfx_recipes_*.py next to this file, sorted by file name."""
+    """Adds RECIPES and GAIN from every sfx_recipes_*.py next to this file, sorted by file name. A module's GAIN may only
+    name its own recipes, so no file changes the level of another file's sound."""
     owners = {"RECIPES": dict.fromkeys(RECIPES, "sfx_recipes.py"), "GAIN": dict.fromkeys(GAIN, "sfx_recipes.py")}
     for path in sorted(pathlib.Path(__file__).resolve().parent.glob("sfx_recipes_*.py")):
         module = importlib.import_module(path.stem)
@@ -343,6 +344,8 @@ def _merge_extensions():
             for sid, value in getattr(module, name, {}).items():
                 if sid in owners[name]:
                     raise ValueError(f"sound '{sid}' in {name} of tools/audio/{path.name} is already defined in {owners[name][sid]}")
+                if name == "GAIN" and owners["RECIPES"].get(sid) != path.name:
+                    raise ValueError(f"GAIN '{sid}' in tools/audio/{path.name} is not a recipe of that file")
                 owners[name][sid] = path.name
                 table[sid] = value
 

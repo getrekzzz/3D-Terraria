@@ -18,4 +18,5 @@ files too). Add a file here (for example `p3-38-guns.json`, named after the work
 * Files merge in file-name order. An id defined in `assets.json` or an earlier file is an error; so is any other key.
 * Check with `python3 tools/blender/build_all.py --check`; build with `--only=<ids>`.
 * A new generator for these entries goes in its own `tools/blender/bgen/<module>.py`, registered with
-  `@generator` from `bgen/__init__.py` (no edit to `build_all.py` needed).
+  `@generator` from `bgen/__init__.py` (no edit to `build_all.py` needed; `@generator(view="item")` for a long
+  weapon or tool, whose icon is laid diagonally).

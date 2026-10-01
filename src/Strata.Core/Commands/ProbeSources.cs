@@ -14,7 +14,7 @@ public static class ProbeSources
 
     /// <summary>
     /// Registers every probe source of <paramref name="assembly"/> into <paramref name="ctx"/>, in full-type-name order
-    /// (later sources see earlier probes; a repeated fixed name replaces the earlier probe). Each <c>Register</c>
+    /// (later sources see earlier probes; a fixed name registered twice throws). Each <c>Register</c>
     /// parameter receives the context or the first of <paramref name="services"/> of its type; a source asking for
     /// anything else throws, since it would silently lose its probes.
     /// </summary>

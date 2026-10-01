@@ -94,7 +94,7 @@ Parallel work adds a new file at one of these points instead of editing a shared
 | Probes (engine) | A `[ProbeSource]` static class in `game/` whose `Register(CommandContext ctx, …)` may also take the `LaunchedWorld` and the `GodotLog` (e.g. `game/Debug/PlayerProbes.cs`) | `GodotCommandHost.CreateContext`, after the core engine counters |
 | Sound effects | `tools/audio/sfx_recipes_<topic>.py` defining `RECIPES` (and optionally `GAIN`) like `sfx_recipes.py` | `sfx_recipes.py`, which merges them by file name |
 | Blender asset entries | `tools/blender/assets.d/<topic>.json` with the `assets.json` schema (see its README) | `asset_spec.load_spec()` (`build_all.py`, `preview.py`) |
-| Blender generators | `tools/blender/bgen/<module>.py` with functions registered by `@generator` from `bgen/__init__.py` | `bgen.load_all()` in `build_all.py` and `preview.py`, alongside the per-module `GENERATORS` dicts |
+| Blender generators | `tools/blender/bgen/<module>.py` with functions registered by `@generator` from `bgen/__init__.py` (`@generator(view="item")` for long held items, whose icons are laid diagonally) | `bgen.load_all()` in `build_all.py` and `preview.py`, alongside the per-module `GENERATORS` dicts |
 | Smoke-script blocks | A `# --- <WP id> ---` block at the end of a shared `.cmds` file (see *Testing*) | The script runner (`#` lines are comments) |
 
 Probe sources register in full-type-name order; a `Register` asking for a service the host does not pass fails at
