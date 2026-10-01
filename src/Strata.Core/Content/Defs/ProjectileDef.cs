@@ -54,6 +54,14 @@ public sealed class ProjectileDef : ContentDef
     /// <summary>Model scale for "item" and "creature" visuals.</summary>
     public float Scale { get; init; } = 1f;
 
+    /// <summary>
+    /// Sticks to the first creature it hits (Piranha Gun): rides along at the spot it bit and strikes again every
+    /// <see cref="LatchInterval"/> ticks until its lifetime ends or the creature dies.
+    /// </summary>
+    public bool Latch { get; init; }
+
+    public int LatchInterval { get; init; } = 10;
+
     /// <summary>Summoned minion behaviour (summon staves); null for ordinary projectiles.</summary>
     public MinionDef? Minion { get; init; }
 }
@@ -72,6 +80,9 @@ public sealed class MinionDef
     public int ShootInterval { get; init; } = 60;
     public float ShootSpeed { get; init; } = 14f;
 
-    /// <summary>Minion slots used (the owner has 1 plus the maxMinions stat).</summary>
+    /// <summary>Minion slots used (the owner has 1 plus the maxMinions stat); sentries have their own single slot.</summary>
     public int Slots { get; init; } = 1;
+
+    /// <summary>A sentry (speed 0) stays where it was summoned and does not take a minion slot.</summary>
+    public bool IsSentry => Speed <= 0;
 }

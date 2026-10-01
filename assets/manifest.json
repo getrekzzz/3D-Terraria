@@ -1393,6 +1393,10 @@
    "model": "assets/models/items/depth_meter.glb",
    "icon": "assets/icons/items/depth_meter.png"
   },
+  "desert_tiger_staff": {
+   "model": "assets/models/items/desert_tiger_staff.glb",
+   "icon": "assets/icons/items/desert_tiger_staff.png"
+  },
   "diabolic_sigil": {
    "object": "diabolic_sigil",
    "icon": "assets/icons/items/diabolic_sigil.png"
@@ -2537,6 +2541,10 @@
    "model": "assets/models/items/pink_paint.glb",
    "icon": "assets/icons/items/pink_paint.png"
   },
+  "piranha_gun": {
+   "model": "assets/models/items/piranha_gun.glb",
+   "icon": "assets/icons/items/piranha_gun.png"
+  },
   "pirate_staff": {
    "model": "assets/models/items/pirate_staff.glb",
    "icon": "assets/icons/items/pirate_staff.png"
@@ -2636,6 +2644,10 @@
   "rainbow_crystal_staff": {
    "model": "assets/models/items/rainbow_crystal_staff.glb",
    "icon": "assets/icons/items/rainbow_crystal_staff.png"
+  },
+  "rainbow_gun": {
+   "model": "assets/models/items/rainbow_gun.glb",
+   "icon": "assets/icons/items/rainbow_gun.png"
   },
   "rainbow_rod": {
    "model": "assets/models/items/rainbow_rod.glb",
@@ -2752,6 +2764,10 @@
   "sawmill": {
    "object": "sawmill",
    "icon": "assets/icons/items/sawmill.png"
+  },
+  "scourge_of_the_corruptor": {
+   "model": "assets/models/items/scourge_of_the_corruptor.glb",
+   "icon": "assets/icons/items/scourge_of_the_corruptor.png"
   },
   "seedler": {
    "model": "assets/models/items/seedler.glb",
@@ -3032,6 +3048,10 @@
   "squirrel": {
    "model": "assets/models/items/squirrel.glb",
    "icon": "assets/icons/items/squirrel.png"
+  },
+  "staff_of_the_frost_hydra": {
+   "model": "assets/models/items/staff_of_the_frost_hydra.glb",
+   "icon": "assets/icons/items/staff_of_the_frost_hydra.png"
   },
   "star_cannon": {
    "model": "assets/models/items/star_cannon.glb",
@@ -3404,6 +3424,10 @@
   "unicorn_horn": {
    "model": "assets/models/items/unicorn_horn.glb",
    "icon": "assets/icons/items/unicorn_horn.png"
+  },
+  "vampire_knives": {
+   "model": "assets/models/items/vampire_knives.glb",
+   "icon": "assets/icons/items/vampire_knives.png"
   },
   "venus_magnum": {
    "model": "assets/models/items/venus_magnum.glb",

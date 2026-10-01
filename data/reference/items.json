@@ -3239,6 +3239,48 @@
    "source": "tree"
   },
   {
+   "id": "terraria:piranha_gun",
+   "name": "Piranha Gun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "jungle chest"
+  },
+  {
+   "id": "terraria:scourge_of_the_corruptor",
+   "name": "Scourge of the Corruptor",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corruption chest"
+  },
+  {
+   "id": "terraria:vampire_knives",
+   "name": "Vampire Knives",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson chest"
+  },
+  {
+   "id": "terraria:rainbow_gun",
+   "name": "Rainbow Gun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed chest"
+  },
+  {
+   "id": "terraria:staff_of_the_frost_hydra",
+   "name": "Staff of the Frost Hydra",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "frozen chest"
+  },
+  {
+   "id": "terraria:desert_tiger_staff",
+   "name": "Desert Tiger Staff",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "desert chest"
+  },
+  {
    "id": "terraria:silver_bullet",
    "name": "Silver Bullet",
    "kind": "weapon",

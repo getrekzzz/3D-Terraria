@@ -36,6 +36,7 @@
     "enemies/wilds.json",
     "items/alchemy.json",
     "items/arsenal.json",
+    "items/biome_chest_weapons.json",
     "items/consumables.json",
     "items/equipment.json",
     "items/gear.json",

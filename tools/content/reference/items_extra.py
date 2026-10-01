@@ -2,6 +2,12 @@
 
 NOTABLE = {
     "weapon": """
+piranha_gun|Piranha Gun|hardmode|jungle chest
+scourge_of_the_corruptor|Scourge of the Corruptor|hardmode|corruption chest
+vampire_knives|Vampire Knives|hardmode|crimson chest
+rainbow_gun|Rainbow Gun|hardmode|hallowed chest
+staff_of_the_frost_hydra|Staff of the Frost Hydra|hardmode|frozen chest
+desert_tiger_staff|Desert Tiger Staff|hardmode|desert chest
 silver_bullet|Silver Bullet|early|arms dealer
 shotgun|Shotgun|hardmode|arms dealer
 rocket_i|Rocket I|hardmode|cyborg

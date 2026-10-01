@@ -61,6 +61,10 @@
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
   strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
+  On-hit effects include `explode`, `applyBuff`, `lifeSteal {fraction}` (heals the owner by a share of the damage
+  dealt) and `spawnProjectiles {projectile, count, speed, homing, damageScale}`; a `latch` projectile sticks to the
+  creature it bites and strikes again every `latchInterval` ticks until its lifetime ends (the Piranha Gun).
+  Minions with speed 0 are sentries, which have their own single slot apart from the minion slots.
 * **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
   brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
