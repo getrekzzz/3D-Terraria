@@ -27,7 +27,7 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
-from asset_plan import boss_models, load_content, plan, plan_projectiles, portrait_models  # noqa: E402
+from asset_plan import boss_models, load_content, plan, plan_armor, plan_projectiles, portrait_models  # noqa: E402
 from asset_spec import SpecError, load_spec  # noqa: E402
 
 GENERATOR_VERSION = 1
@@ -63,7 +63,7 @@ def args():
     return opts
 
 
-def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs):
+def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, items):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
     import bgen
     from bgen import icon_views, sockets as socket_gen
@@ -113,7 +113,11 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs):
             print(f"object {oid} v{v}: {tris} tris")
         manifest["objects"][oid] = {"models": models, "generator": job["generator"]}
 
+    from bgen import armor_build
+    worn = {i for slots in armor_build.armor_items(spec.get("armor", {}), items).values() for i in slots.values()}
     for iid, job in sorted(item_jobs.items()):
+        if iid in worn:  # armour items get their model and icon from the worn pieces (below)
+            continue
         if not wanted(iid) and not (job.get("object") and wanted(job["object"])):
             continue
         entry = {k: v for k, v in manifest["items"].get(iid, {}).items() if k == "icon" and not opts["icons"]}
@@ -127,6 +131,8 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs):
             entry["model"] = rel
             if sockets:
                 entry["sockets"] = socket_gen.y_up(sockets)
+            if job["generator"] in ("shield", "balloon"):  # accessories the avatar wears (game/Player/PlayerAvatar.Armor.cs)
+                entry["worn"] = job["generator"]
             if "icon" in entry:  # icon last, whether or not icons are re-rendered (stable manifest key order)
                 entry["icon"] = entry.pop("icon")
         if opts["icons"]:
@@ -144,6 +150,8 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs):
             entry["icon"] = icon
         manifest["items"][iid] = entry
         print(f"item {iid}: {entry}")
+
+    armor_build.build_armor(REPO, spec.get("armor", {}), items, wanted, manifest, icons=opts["icons"], samples=opts["samples"])
 
     manifest.setdefault("projectiles", {})
     for mid, job in sorted(projectile_jobs.items()):
@@ -227,7 +235,7 @@ def main() -> int:
     blocks, items, objects, enemies, projectiles = load_content()
     object_jobs, item_jobs, block_icons, creature_jobs, errors = plan(spec, blocks, items, objects, enemies)
     projectile_jobs, projectile_errors = plan_projectiles(spec, projectiles)
-    errors += projectile_errors
+    errors += projectile_errors + plan_armor(spec, items)
     for e in errors:
         print("ERROR:", e)
     if errors:
@@ -262,7 +270,7 @@ def main() -> int:
     if opts["anims"]:
         build_anims(opts, creature_jobs)
         return 0
-    build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs)
+    build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, items)
     return 0
 
 
