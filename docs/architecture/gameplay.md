@@ -102,7 +102,8 @@
   phase's `expert` block scales move speed, contact damage, volley interval/count (`expertCount`/`expertInterval` per
   volley win), summon caps and wind-ups, `expertBelow` replaces `below`, and `expertOnly` moves join the loop (the
   Classic loop, its RNG order and timings are unchanged). `fly` suspends a ground boss's gravity for the phase; `slam`
-  rises above the target, drops and raises `Impacted` (and fires its volley once) on landing; `summon.tether` makes
+  rises above the target, drops and raises `Impacted` (and fires its volley once) on landing (`track` caps how fast it
+  follows the target, 0 = a stomp in place); `summon.tether` makes
   minions followers on a ring that die with the boss and `leash` holds the boss near their centroid; `aura` pulses a
   buff (`expertOnly` optional); `illusions` sets `Npc.Illusions` with `MirrorAround` = the target (`AI.Illusions`
   places the copies a quarter turn apart); `defense` overrides defense (`DefenseOverride` is cleared before each think).
@@ -116,7 +117,7 @@
 * **Queen Bee and Deerclops** — Queen Bee (3400) alternates charges and a stinger hover (volleys of 3 below half life)
   while calling bees; Expert adds speed, two stingers per volley and three more bees, and `boss.enrage` (target outside
   jungle, underground jungle and hive) doubles her damage and speeds her up 1.5×. Deerclops (7000) walks, hurls debris,
-  stomps with a `slam` (impact + a ring of ice spikes) and, below half life or in Expert, sends shadow hands that pass
+  stomps in place with a `slam` (`track: 0`; impact + a ring of ice spikes) and, below half life or in Expert, sends shadow hands that pass
   through walls; Expert also adds speed, denser volleys and an extra stomp.
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and

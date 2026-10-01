@@ -188,4 +188,16 @@ public class PatternBrainTests
         Assert.Equal(-real.X, seen[2].X, 3);
         Assert.Equal(-real.Z, seen[2].Z, 3);
     }
+
+    [Fact]
+    public void IllusionsVanishWithoutATarget()
+    {
+        using var g = Arena();
+        var npc = Spawn(g, Boss("{'type':'pattern','phases':[{'illusions':3,'moves':[{'type':'wait','ticks':600}]}]}"), new Vector3(3, 2, 1));
+        g.Ticks(2);
+        Assert.Equal(3, npc.Illusions);
+        g.Player.State.Vitals.Life = 0; // no target: nothing to mirror the copies around
+        g.Ticks(2);
+        Assert.Equal(0, npc.Illusions);
+    }
 }

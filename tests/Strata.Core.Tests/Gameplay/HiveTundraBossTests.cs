@@ -75,4 +75,28 @@ public class HiveTundraBossTests
         Assert.True(shards);
         Assert.DoesNotContain(g.World.Projectiles.All, p => p.Def.Id == "deerclops_shadow_hand"); // Expert-only in its first phase
     }
+
+    [Fact]
+    public void DeerclopsStompsWhereItStands()
+    {
+        // Its stomp is a wind-up in place, not a 14 m/s glide onto the player (the slam's default tracking).
+        using var g = Arena();
+        var impacts = new List<Vector3>();
+        g.World.Npcs.Impacted += (at, _) => impacts.Add(at);
+        var deer = Boss(g, "deerclops", new Vector3(0, 0.2f, 10));
+        g.World.Tick();
+        deer.Counter = 2; // the stomp
+        deer.Timer = 0;
+        var start = deer.Position;
+        float fastest = 0, moved = 0;
+        Fight(g, 50, () =>
+        {
+            if (deer.Counter != 2) return;
+            if (deer.Timer > 10) fastest = MathF.Max(fastest, new Vector2(deer.Velocity.X, deer.Velocity.Z).Length());
+            moved = new Vector2(deer.Position.X - start.X, deer.Position.Z - start.Z).Length();
+        });
+        Assert.True(fastest < 1f, $"slid at {fastest:0.0} m/s during the stomp");
+        Assert.True(moved < 1f, $"moved {moved:0.00} m during the stomp");
+        Assert.Single(impacts);
+    }
 }

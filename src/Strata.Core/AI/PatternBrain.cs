@@ -66,18 +66,19 @@ public sealed partial class PatternBrain : IBrain
         npc.PhaseTimer++;
         npc.DamageScale = phase.Damage * ex.Damage;
         if (phase.Defense is { } defense) npc.DefenseOverride = defense;
-        npc.Illusions = phase.Illusions;
         bool shielded = Guarded(_guards[stage], ctx);
         Summon(npc, phase, _pools[stage], ex, ctx);
         var target = ctx.Target;
         if (target == null)
         {
-            npc.Phase = phase.Fly ? 1 : 0;
+            npc.Phase = _p.Ground && phase.Fly ? 1 : 0;
             npc.Velocity *= 0.9f;
             npc.Pose = "idle";
             npc.Invulnerable = shielded;
+            npc.Illusions = 0; // illusions are mirrored around a target: none without one
             return;
         }
+        npc.Illusions = phase.Illusions;
         npc.TargetPlayer = 0;
         var moves = expert ? _expert[stage] : _classic[stage];
         var move = moves[npc.Counter % moves.Length];

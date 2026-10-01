@@ -111,7 +111,7 @@ public sealed partial class PatternBrain
                 break;
             }
             case "slam":
-                done = Slam(npc, m, speed, telegraph, target, ex, ctx);
+                done = Slam(npc, m, speed, m.Track is { } track ? track * speedScale : MathF.Max(speed, 8f), telegraph, target, ex, ctx);
                 break;
             default: // wait
                 npc.Velocity = ground ? new Vector3(npc.Velocity.X * 0.7f, npc.Velocity.Y, npc.Velocity.Z * 0.7f) : npc.Velocity * 0.85f;
@@ -129,21 +129,23 @@ public sealed partial class PatternBrain
     }
 
     /// <summary>
-    /// Rises to <see cref="PatternMove.Height"/> above the target and tracks it through the wind-up, then drops at
-    /// Speed. Landing (on terrain, or at the target's feet for a boss that ignores terrain) raises an impact and fires
-    /// the move's volley once; true when the slam is over (landed, or the fall ran out of ticks).
+    /// Rises to <see cref="PatternMove.Height"/> above the target and tracks it through the wind-up at
+    /// <paramref name="track"/> m/s, then drops at Speed (still following it). Landing (on terrain, or at the target's
+    /// feet for a boss that ignores terrain) raises an impact and fires the move's volley once; true when the slam is
+    /// over (landed, or the fall ran out of ticks).
     /// </summary>
-    private static bool Slam(Npc npc, PatternMove m, float speed, int telegraph, ICombatTarget target, PatternExpert ex, BrainContext ctx)
+    private static bool Slam(Npc npc, PatternMove m, float speed, float track, int telegraph, ICombatTarget target, PatternExpert ex, BrainContext ctx)
     {
         if (npc.Timer <= telegraph)
         {
             npc.Pose = "telegraph";
-            Steer(npc, target.Center + new Vector3(0, m.Height, 0), MathF.Max(speed, 8f), 0.2f);
+            Steer(npc, target.Center + new Vector3(0, m.Height, 0), track, 0.2f);
             return false;
         }
         npc.Pose = "attack";
         var flatOff = target.Center - npc.Center;
-        npc.Velocity = new Vector3(Math.Clamp(flatOff.X * 3f, -speed, speed), -speed, Math.Clamp(flatOff.Z * 3f, -speed, speed));
+        float side = m.Track == null ? speed : track;
+        npc.Velocity = new Vector3(Math.Clamp(flatOff.X * 3f, -side, side), -speed, Math.Clamp(flatOff.Z * 3f, -side, side));
         bool landed = npc.Def.CollideTerrain ? npc.OnGround && npc.Timer > telegraph + 1 : npc.Position.Y <= target.Position.Y;
         if (landed)
         {

@@ -23,6 +23,7 @@ public sealed class PatternParams : SpecParams, IValidatableSpec
             {
                 if (Array.IndexOf(PatternMove.Kinds, m.Type) < 0) return $"unknown move '{m.Type}' (expected {string.Join(", ", PatternMove.Kinds)})";
                 if (m.Type == "slam" && !Ground && !p.Fly) return "'slam' needs a ground boss or a fly phase";
+                if (m.Track < 0) return "track must be >= 0";
             }
             if (Array.TrueForAll(p.Moves, m => m.ExpertOnly)) return "every phase needs a move that is not expertOnly";
             if (p.ExpertBelow is { } eb && (eb <= 0f || eb > 1f)) return "expertBelow must be in (0, 1]";
@@ -110,6 +111,12 @@ public sealed class PatternMove
 
     /// <summary>Wind-up before each dash, hop, teleport or slam (ticks).</summary>
     public int Telegraph { get; init; } = 30;
+
+    /// <summary>
+    /// Slam: how fast the boss follows the target through the wind-up and the fall (m/s, scaled like Speed); unset =
+    /// max(Speed, 8), so it lands on the target. 0 stomps where it stands (Deerclops).
+    /// </summary>
+    public float? Track { get; init; }
 
     /// <summary>Only in Expert and Master worlds (skipped in Classic and Journey).</summary>
     public bool ExpertOnly { get; init; }
