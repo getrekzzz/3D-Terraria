@@ -1,0 +1,6 @@
+{
+ "comment": "P4-35: the Pumpking's scythe hand as its own model, for future pumpking parts (HandBrain swipe); then set pumpking params {\"hands\": false}.",
+ "creatures": {
+  "pumpking_blade": {"generator": "moon_pumpking_blade", "params": {"side": 1}}
+ }
+}

@@ -4289,15 +4289,7 @@
         "core": "#ff9af0"
       }
     },
-    "nebula_pillar": {
-      "generator": "celestial_pillar",
-      "params": {
-        "style": "nebula",
-        "color": "#8a3aa8",
-        "glow": "#ff6ae0",
-        "accent": "#3a0a4a"
-      }
-    },
+    "nebula_pillar": {"generator": "event_celestial_pillar", "params": {"style": "nebula"}},
     "predictor": {
       "generator": "insect",
       "params": {
@@ -4321,24 +4313,8 @@
         "weight": 0.4
       }
     },
-    "solar_pillar": {
-      "generator": "celestial_pillar",
-      "params": {
-        "style": "solar",
-        "color": "#c8702a",
-        "glow": "#ffb040",
-        "accent": "#6a2a0a"
-      }
-    },
-    "stardust_pillar": {
-      "generator": "celestial_pillar",
-      "params": {
-        "style": "stardust",
-        "color": "#3a5ab8",
-        "glow": "#8ac8ff",
-        "accent": "#1a2a5a"
-      }
-    },
+    "solar_pillar": {"generator": "event_celestial_pillar", "params": {"style": "solar"}},
+    "stardust_pillar": {"generator": "event_celestial_pillar", "params": {"style": "stardust"}},
     "stargazer": {
       "generator": "humanoid",
       "params": {
@@ -4376,15 +4352,7 @@
       "generator": "true_eye",
       "params": {}
     },
-    "vortex_pillar": {
-      "generator": "celestial_pillar",
-      "params": {
-        "style": "vortex",
-        "color": "#2a8a7a",
-        "glow": "#3affc0",
-        "accent": "#0a3a30"
-      }
-    },
+    "vortex_pillar": {"generator": "event_celestial_pillar", "params": {"style": "vortex"}},
     "vortexian": {
       "generator": "humanoid",
       "params": {
@@ -4875,14 +4843,7 @@
         "weight": 1.0
       }
     },
-    "mothron": {
-      "generator": "insect",
-      "params": {
-        "color": "#8a6a4a",
-        "stripes": "#3a2a1a",
-        "eyes": "#ff6a2a"
-      }
-    },
+    "mothron": {"generator": "event_mothron", "params": {"color": "#9a7048", "stripes": "#3a2614", "eyes": "#ff7a1a"}},
     "scarecrow": {
       "generator": "humanoid",
       "params": {
@@ -4924,18 +4885,8 @@
         ]
       }
     },
-    "mourning_wood": {
-      "generator": "haunted_tree",
-      "params": {
-        "style": "oak",
-        "bark": "#5a3a22",
-        "glow": "#ff8a2a"
-      }
-    },
-    "pumpking": {
-      "generator": "pumpkin_lord",
-      "params": {}
-    },
+    "mourning_wood": {"generator": "moon_mourning_wood", "params": {"bark": "#8a5a2e", "glow": "#ff8a2a"}},
+    "pumpking": {"generator": "moon_pumpking", "params": {}},
     "zombie_elf": {
       "generator": "humanoid",
       "params": {
@@ -5032,19 +4983,8 @@
       "generator": "present",
       "params": {}
     },
-    "everscream": {
-      "generator": "haunted_tree",
-      "params": {
-        "style": "pine",
-        "bark": "#4a3a2a",
-        "glow": "#ff3a2a",
-        "leaves": "#2a6a3a"
-      }
-    },
-    "santa_nk1": {
-      "generator": "tank",
-      "params": {}
-    },
+    "everscream": {"generator": "moon_everscream", "params": {"glow": "#ff2a1a", "needles": "#2a6a3a"}},
+    "santa_nk1": {"generator": "moon_santa_nk1", "params": {}},
     "ice_queen": {
       "generator": "humanoid",
       "params": {
@@ -5156,10 +5096,7 @@
         "height": 1.9
       }
     },
-    "flying_dutchman": {
-      "generator": "ghost_ship",
-      "params": {}
-    },
+    "flying_dutchman": {"generator": "event_flying_dutchman", "params": {}},
     "ray_gunner": {
       "generator": "humanoid",
       "params": {
@@ -5208,10 +5145,7 @@
       "generator": "mech_walker",
       "params": {}
     },
-    "martian_saucer": {
-      "generator": "saucer",
-      "params": {}
-    },
+    "martian_saucer": {"generator": "event_martian_saucer", "params": {}},
     "etherian_goblin": {
       "generator": "humanoid",
       "params": {
@@ -5295,10 +5229,7 @@
         "weight": 1.0
       }
     },
-    "betsy": {
-      "generator": "dragon",
-      "params": {}
-    },
+    "betsy": {"generator": "event_betsy", "params": {}},
     "antlion": {"generator": "antlion", "params": {"shell": "#c8a060", "sand": "#d8c08a"}},
     "antlion_charger": {
       "generator": "crab",
