@@ -34,6 +34,9 @@ public sealed partial class InteractionController : Node
     public event System.Action<UseOutcome>? Used;
     public event System.Action<InteractOutcome>? Interacted;
 
+    /// <summary>The creature (a worm segment resolves to its worm) or town resident under the crosshair at any distance, in front of the terrain (null if none).</summary>
+    public EntityPick? Hovered { get; private set; }
+
     /// <summary>The town resident under the crosshair within talking range (null if none).</summary>
     public Strata.Core.Gameplay.Town.TownNpc? TalkTarget { get; private set; }
 
@@ -118,17 +121,25 @@ public sealed partial class InteractionController : Node
         Entity.ViewDirection = view;
         Target = Targeting.CastView(world, camera, view, eye, reach + 2f, filter, out float startT);
         InReach = Target != null && Target.Distance <= reach;
-        var point = Targeting.CastView(world, camera, view, eye, ConvergenceMeters, TargetFilter.None, out _) is { } hit
-            ? hit.HitCells * Strata.Core.Common.Units.CellSize
-            : camera + view * (startT + ConvergenceMeters);
+        float terrainT = startT + ConvergenceMeters;
+        if (Targeting.CastView(world, camera, view, eye, ConvergenceMeters, TargetFilter.None, out _) is { } hit)
+            terrainT = System.Numerics.Vector3.Dot(hit.HitCells * Strata.Core.Common.Units.CellSize - camera, view);
+        // Creatures and residents on the ray in front of that terrain: walls hide them. The crosshair point moves onto
+        // the nearer one (at least a metre past the eye's plane, so a body hugging the player does not swing the aim
+        // sideways), and a resident within talking range is who right-click talks to.
+        Hovered = EntityPicking.Pick(Game, camera, view, startT, terrainT);
+        float aimT = Hovered is { } pick ? System.MathF.Min(terrainT, System.MathF.Max(pick.Distance, startT + 1f)) : terrainT;
+        var point = camera + view * aimT;
         Entity.Aim = AimTowards(point, view);
         Entity.AimDistance = System.Numerics.Vector3.Distance(point, eye);
+        TalkTarget = Hovered?.Resident is { } resident && System.Numerics.Vector3.Distance(resident.Center, Entity.Center) <= Game.Town.Config.TalkRange
+            ? resident
+            : null;
         if (DigDownTarget(dir) is { } below)
         {
             Target = below;
             InReach = true;
         }
-        UpdateTalkTarget(origin, dir, startT, ToGodot(point));
     }
 
     public override void _UnhandledInput(InputEvent @event)
@@ -168,5 +179,4 @@ public sealed partial class InteractionController : Node
     }
 
     private static System.Numerics.Vector3 ToCore(Vector3 v) => new(v.X, v.Y, v.Z);
-    private static Vector3 ToGodot(System.Numerics.Vector3 v) => new(v.X, v.Y, v.Z);
 }

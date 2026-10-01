@@ -167,3 +167,32 @@ assert player.aim_distance < 16
 fill -3 0 11 3 8 30 air
 camera first
 assert errors == 0
+
+# --- P1-07 ---
+# A creature under the crosshair is named with its life at any distance, a wall in front hides it, and with no
+# creature hovered the label names the block in reach.
+killall
+heal
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+camera first
+wield copper_pickaxe
+aim 0 0 1
+spawn blue_slime 1 4
+ai off
+aim 0 -0.25 1
+wait 0.3
+assert hover.npc == 1
+assert hover.blue_slime == 1
+assert hud.target_name == 1
+assert hud.target_name.blue_slime_25/25 == 1
+fill -2 0 3 2 4 3 stone
+wait 0.2
+assert hover.npc == 0
+assert hud.target_name.blue_slime == 0
+assert hud.target_name.stone == 1
+fill -2 0 3 2 4 3 air
+ai on
+killall
+camera third
+assert errors == 0

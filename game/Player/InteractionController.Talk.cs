@@ -24,29 +24,4 @@ public sealed partial class InteractionController
         }
         return Targeting.UnderFeet(Game.Session.World, Entity.Position);
     }
-
-    /// <summary>
-    /// The nearest resident whose body the view ray passes close to, between the eye's plane (<paramref name="startT"/> m
-    /// along the ray: nobody behind the player) and the terrain the crosshair rests on (<paramref name="point"/>).
-    /// </summary>
-    private void UpdateTalkTarget(Vector3 origin, Vector3 dir, float startT, Vector3 point)
-    {
-        TalkTarget = null;
-        float limit = (point - origin).Dot(dir) + 0.5f;
-        float best = float.MaxValue;
-        foreach (var npc in Game.Town.Residents)
-        {
-            if (!npc.Alive) continue;
-            var center = ToGodot(npc.Center);
-            float along = (center - origin).Dot(dir);
-            if (along < startT || along > limit) continue;
-            float off = (origin + dir * along).DistanceTo(center);
-            if (off > 0.7f || center.DistanceTo(ToGodot(Entity.Center)) > Game.Town.Config.TalkRange) continue;
-            if (along < best)
-            {
-                best = along;
-                TalkTarget = npc;
-            }
-        }
-    }
 }

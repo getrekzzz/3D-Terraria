@@ -61,11 +61,21 @@
   `Targeting.CastView`: reach + 2 m with the held item's `FilterFor` filter gives `Target` (`InReach` when its eye
   distance is within reach), and 60 m with `TargetFilter.None` gives the crosshair point (terrain, trunks and
   furniture, or 60 m out) that sets `Aim` and `AimDistance`, so shots converge on what the crosshair rests on at any
-  range. Smart digging may still swap in the cell under the feet; residents are talked to between the eye's plane
-  and that point. In third person the body always faces the camera's yaw: the chest, arms and head stay on the
+  range. Smart digging may still swap in the cell under the feet. In third person the body always faces the camera's yaw: the chest, arms and head stay on the
   crosshair while the legs strafe or backpedal (`BodyFacing`, see rendering.md, Creature animation), and the swing
   trail, like the melee arc, is centred on `Facing`. Probes: `target.front` (1 when the target is not behind the
   eye along `Facing`), `target.dist`, `player.aim_distance`.
+* **Entity picking (crosshair names)** — `EntityPicking.Pick` (Core) finds the creature or town resident the view
+  ray enters first between the eye's plane and the terrain the crosshair rests on (so walls hide names), up to 60 m:
+  a slab test against each live creature's padded volumes (`Npc.VolumeCount`/`VolumeAt`, the allocation-free form of
+  `Volumes()`: the body, then each worm segment, which resolves to its worm) and each live resident's body. It
+  allocates nothing per tick. `InteractionController.Hovered` holds the pick; the crosshair point moves onto it (at
+  least a metre past the eye's plane), and a hovered resident within `TownConfig.TalkRange` is the `TalkTarget`
+  right-click talks to. `EntityPicking.Describe` gives the label: a boss's title, a creature's name or a resident's
+  title ("Andrew the Guide") with its life; the HUD's `TargetLabel` shows it at any distance ("Blue Slime 25/25",
+  tinted by life, bosses in the boss bar's red), else the block or object in reach, rebuilding its text only when
+  that changes. Probes: `hover.npc`, `hover.resident`, `hover.talk`, `hover.<enemy id>`, `hud.target_name`,
+  `hud.target_name.<words>` (the label in snake case contains them), `ui.talk_open`.
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
