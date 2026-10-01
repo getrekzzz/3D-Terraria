@@ -66,3 +66,14 @@ wait 0.3
 assert player.from_mark > 2
 assert player.alive == 1
 assert errors == 0
+
+# --- P3-42 ---
+# Armour shows on the third-person body: a full copper set is at least 8 pieces (helmet, chainmail, belt, pauldrons,
+# leg pieces and boots), and taking it off removes them.
+equip copper_helmet
+equip copper_chainmail
+equip copper_greaves
+wait 0.2
+assert avatar.armor_pieces >= 8
+assert props.problems == 0
+assert errors == 0

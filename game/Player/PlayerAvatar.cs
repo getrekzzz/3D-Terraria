@@ -10,7 +10,7 @@ namespace Strata.Game.Player;
 
 /// <summary>
 /// The visible player body in third person: the animated human (see PlayerAvatar.Motion), the held item in the right
-/// hand and voxel lighting.
+/// hand, worn armour (PlayerAvatar.Armor) and voxel lighting.
 /// </summary>
 public sealed partial class PlayerAvatar : Node3D
 {
@@ -28,6 +28,7 @@ public sealed partial class PlayerAvatar : Node3D
         _props = props;
         Name = "Avatar";
         InitializeGear();
+        InitializeArmor();
         var look = controller.Entity.State.Look;
         var model = $"assets/models/creatures/{look.ModelId}.glb";
         _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props, aim: true);
@@ -50,6 +51,7 @@ public sealed partial class PlayerAvatar : Node3D
         UpdateGear(delta);
         Animate(entity, (float)delta);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
+        UpdateArmor((float)delta);
     }
 
     /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>

@@ -60,8 +60,11 @@ public sealed partial class CreatureVisual : Node3D
         return -Bottom * scale;
     }
 
+    private PropLibrary? _props;
+
     private void Setup(Node node, PropLibrary props, Transform3D xf)
     {
+        _props = props;
         if (node is MeshInstance3D mi && mi.Mesh != null)
         {
             var box = xf * mi.Mesh.GetAabb();
@@ -119,6 +122,9 @@ public sealed partial class CreatureVisual : Node3D
 
     private Color _light;
     private bool _lit;
+
+    /// <summary>The (eased) voxel light the model is shaded with; attachments that should match it read this.</summary>
+    public Color CurrentLight => _light;
 
     /// <summary>
     /// Sets the voxel light the model is shaded with, easing towards it (a few frames) so walking past a torch or
