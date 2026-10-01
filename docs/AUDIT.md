@@ -182,7 +182,7 @@ below are in behaviour and presentation, not in data.
 | Use timing: the animation restarts mid-swing; speed bonuses don't scale `useAnimation` | ❌ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:97,110,158,161-162` | P1-10 (W1a), P3-01' (W5) |
 | Tools (86 pickaxes, axes, hammers and drills) | 🟡 | Mining works. Swings restart, and stone and ores take 1.7–2× the reference hits (`src/Strata.Core/Gameplay/Mining/MiningRules.cs:11`). | P1-10 (W1a), P3-24 (W5) |
 | Swords (41) | 🟡 | Hitbox and trail sweep flat and linear from tick 0 while the arm winds up (`src/Strata.Core/Gameplay/Entities/MeleeSystem.cs`, `game/Entities/SwingTrail.cs`) | P1-10 (W1a), P1-11 (W1b), P3-04 (W5) |
-| Swords that also shoot (Starfury, Terra Blade, Zenith and 12 more) | ❌ | Never melee; Zenith blocks (`ItemUseSystem.cs:154`, `ItemUseSystem.Shooting.cs:27`) | P1-16 (W1a) |
+| Swords that also shoot (Starfury, Terra Blade, Zenith and 12 more) | ✅ | The 14 swords swing with every shot; Zenith is `noMelee` with `maxActive: 0` and never blocks (`ItemUseSystem.cs:155-163`, `ItemUseSystem.Shooting.cs:27-29`; `ArsenalTests`, `combat.cmds`) | P1-16 (W1a) |
 | Spears and shortswords (22) | 🟡 | Thrust works, but the model never reaches the 1.6–2.1 m hitbox (`src/Strata.Core/Gameplay/Entities/MeleeSystem.cs`) | P3-04 (W5) |
 | Bows (23) | ❌ | Arrow leaves before the draw; all metal bows are one mesh; Daedalus Stormbow fires from the eye | P1-13 (W1a), P1-14 (W1b), P3-39 (W2), P3-09' (W5) |
 | Guns (17) | 🟡 | Fire and recoil work. Missing: muzzle flash, real bursts, ammo count on the slot, Megashark/Minishark ammo saving (`ItemUseSystem.Shooting.cs:18-23`). Icons render edge-on. | P3-38 (W2), P2-06 (W3), P3-01', P3-09', P3-10 (W5) |

@@ -64,6 +64,13 @@ public partial class GameRoot : Node
             ShowFatal("Grass settings failed validation — see the log for details.");
             return;
         }
+        var useStyleProblems = Strata.Core.Presentation.UseStyleConfig.Load(data).Validate();
+        if (useStyleProblems.Count > 0)
+        {
+            foreach (var problem in useStyleProblems) log.Error("content", $"{Strata.Core.Presentation.UseStyleConfig.Path}: {problem}");
+            ShowFatal("Use style settings failed validation — see the log for details.");
+            return;
+        }
         var render = new RenderTables(content, layers.IndexOf, grass);
         InputSetup.Register(data);
         Settings.KeyBindings.Load();

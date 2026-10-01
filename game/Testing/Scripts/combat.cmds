@@ -1,4 +1,5 @@
-# Combat smoke test: creatures spawn, chase and damage the player; melee, bows and loot work; respawn works.
+# Combat smoke test: creatures spawn, chase and damage the player; melee, swords that shoot, Zenith, bows and loot
+# work; respawn works.
 wait_until player.frozen == 0 180
 spawning off
 killall
@@ -21,6 +22,31 @@ wait 1.5
 killall
 heal
 
+# A sword that shoots still swings: one use starts a blade swing and a star; the frozen slime at 2 m dies.
+give starfury 1
+wield starfury
+killall
+aim 0 0 1
+spawn green_slime 1 2
+ai off
+use
+assert melee.swings == 1
+assert projectiles.count >= 1
+wait 0.6
+assert npcs.alive_life < 14
+ai on
+killall
+
+# Zenith never blocks: a second use throws three more blades while the first three are still out.
+wait_until projectiles.count == 0 5
+give zenith 1
+wield zenith
+use
+use
+assert projectiles.count >= 6
+assert melee.swings == 0
+wait_until projectiles.count == 0 5
+
 # Arrows fly and hit.
 give wooden_bow 1
 give wooden_arrow 50
@@ -39,4 +65,41 @@ wait 0.5
 assert player.alive == 0
 wait_until player.alive == 1 10
 assert player.deaths >= 1
+assert errors == 0
+
+# --- P1-10 ---
+# Use time vs animation: a held pickaxe plays whole 21-tick swings and digs on its own 15-tick cadence inside them
+# (one second is three swings; restarting the swing on every dig would make it four); the wooden sword swings for
+# 25 ticks, and Feral Claws (+12 % melee speed) shorten the whole swing to 22.
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+give copper_pickaxe 1
+wield copper_pickaxe
+aim 0.05 -1 0.05
+mark
+hold use_primary 1
+assert player.use_anim == 21
+assert player.swings == 3
+give wooden_sword 1
+wield wooden_sword
+aim 0 0 1
+use
+assert player.use_anim == 25
+equip feral_claws
+use
+assert player.use_anim == 22
+assert melee.swings == 1
+assert errors == 0
+
+# --- P1-15 ---
+# A bow with no arrows: the fresh press is reported once (a dry click and 'Needs Wooden Arrow'); holding the button
+# down reports its own fresh press and nothing more.
+clear
+give wooden_bow 1
+wield wooden_bow
+assert use.failures == 0
+use
+assert use.failures == 1
+hold use_primary 0.5
+assert use.failures == 2
 assert errors == 0

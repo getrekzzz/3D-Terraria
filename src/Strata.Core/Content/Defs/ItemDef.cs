@@ -48,6 +48,12 @@ public sealed class ItemDef : ContentDef
     public bool AutoReuse { get; init; }
     public bool Consumable { get; init; }
 
+    /// <summary>
+    /// The swing or thrust is animation only and the blade never hits (Terraria's noMelee: Zenith fights with its
+    /// projectiles alone). Stops <see cref="UseStyle"/> from implying a melee attack.
+    /// </summary>
+    public bool NoMelee { get; init; }
+
     /// <summary>Interaction reach in cells (tools, placement).</summary>
     public int Reach { get; init; } = 10;
 

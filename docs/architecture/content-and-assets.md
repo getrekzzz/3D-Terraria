@@ -56,5 +56,6 @@ to the head by an `armModel` the game stretches between them. `tools/blender/pre
 raw `generator:params`) as a Workbench contact sheet of views or clip frames, without the game.
 
 Rendering-only settings: `data/config/graphics.json` (presets) and `data/config/grass.json` (grass kinds per grass
-block) are validated by `Strata.Tools validate` and at boot; `data/config/lighting.json` (exposure, glow, fog cap,
-torch lights, block-light curve) is validated by `Strata.Tools validate`.
+block) are validated by `Strata.Tools validate` and at boot, as is `data/config/use_styles.json` (the human clips'
+strike, release and re-draw windows, shared by gameplay and presentation); `data/config/lighting.json` (exposure,
+glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools validate`.

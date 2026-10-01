@@ -10,7 +10,7 @@ public sealed partial class ItemUseSystem
         var item = info.Item;
         var state = p.State;
         var cfg = info.Consume!;
-        if (item.HealLife > 0 && _healingCooldown != null && state.Buffs.Has(_healingCooldown.Id)) return UseOutcome.Blocked;
+        if (item.HealLife > 0 && _healingCooldown != null && state.Buffs.Has(_healingCooldown.Id)) return Refuse(_healingCooldown.DisplayName);
         if (cfg.PermanentLife > 0 && Player.PlayerState.BaseLife + state.BonusLife >= cfg.LifeCap) return UseOutcome.Blocked;
         if (cfg.PermanentMana > 0 && Player.PlayerState.BaseMana + state.BonusMana >= cfg.ManaCap) return UseOutcome.Blocked;
 
@@ -37,9 +37,6 @@ public sealed partial class ItemUseSystem
         return UseOutcome.Consumed;
     }
 
-    /// <summary>Raised when a summon fails its conditions (message for the player).</summary>
-    public event Action<PlayerEntity, string>? Refused;
-
     private UseOutcome Summon(PlayerEntity p, ItemUseInfo info)
     {
         if (info.StartEvent is { } start) return StartEvent(p, info, start);
@@ -48,11 +45,7 @@ public sealed partial class ItemUseSystem
         if (!content.Enemies.TryGet(cfg.Enemy, out var boss)) return UseOutcome.Blocked;
         if (_world.Npcs.All.Any(n => n.Def == boss && n.Alive)) return UseOutcome.Blocked;
         var ctx = _world.Session.ContextAt(p.FeetCell);
-        if (!info.SummonCondition!.Evaluate(ctx))
-        {
-            if (cfg.FailMessage != null) Refused?.Invoke(p, cfg.FailMessage);
-            return UseOutcome.Blocked;
-        }
+        if (!info.SummonCondition!.Evaluate(ctx)) return cfg.FailMessage != null ? Refuse(cfg.FailMessage) : UseOutcome.Blocked;
         var flat = System.Numerics.Vector3.Normalize(new System.Numerics.Vector3(p.Aim.X, 0, p.Aim.Z) + new System.Numerics.Vector3(1e-4f, 0, 0));
         var at = p.Position + flat * cfg.Distance;
         if (!boss.Gravity) at.Y += 8f; // fliers arrive from above
@@ -66,11 +59,7 @@ public sealed partial class ItemUseSystem
     private UseOutcome StartEvent(PlayerEntity p, ItemUseInfo info, Content.Specs.StartEventParams cfg)
     {
         if (!_world.Session.Content.Events.TryGet(cfg.Event, out var def) || _world.Events.IsActive(def.Id)) return UseOutcome.Blocked;
-        if (!info.SummonCondition!.Evaluate(_world.Session.ContextAt(p.FeetCell)))
-        {
-            if (cfg.FailMessage != null) Refused?.Invoke(p, cfg.FailMessage);
-            return UseOutcome.Blocked;
-        }
+        if (!info.SummonCondition!.Evaluate(_world.Session.ContextAt(p.FeetCell))) return cfg.FailMessage != null ? Refuse(cfg.FailMessage) : UseOutcome.Blocked;
         if (!_world.Events.Start(def)) return UseOutcome.Blocked;
         if (info.Item.Consumable) ConsumeHeld(p);
         return UseOutcome.Consumed;

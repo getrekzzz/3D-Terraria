@@ -106,7 +106,19 @@ public sealed class ShootProjectileParams : SpecParams, IValidatableSpec
     public int Count { get; init; } = 1;
     public float Spread { get; init; }
 
-    public string? Validate() => Count < 1 ? "count must be >= 1" : null;
+    /// <summary>
+    /// How many of this weapon's projectiles one player may have out at once; a use that would exceed it is refused.
+    /// Unset means one for returning projectiles (boomerangs, flails) and no limit otherwise; 0 means no limit.
+    /// </summary>
+    public int? MaxActive { get; init; }
+
+    /// <summary>The live-projectile limit for a projectile that returns after <paramref name="returns"/> ticks (0 = none).</summary>
+    public int Limit(int returns) => MaxActive ?? (returns > 0 ? 1 : 0);
+
+    public string? Validate() =>
+        Count < 1 ? "count must be >= 1"
+        : MaxActive < 0 ? "maxActive must be >= 0"
+        : MaxActive > 0 && Count > MaxActive ? "count must not exceed maxActive (the weapon could never fire)" : null;
 }
 
 public sealed class ToolParams : SpecParams

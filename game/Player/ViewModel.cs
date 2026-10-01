@@ -48,7 +48,7 @@ public sealed partial class ViewModel : Node3D
         var bob = _controller.IsOnFloor() ? new Vector3(Mathf.Sin(_bob) * 0.012f, Mathf.Abs(Mathf.Cos(_bob)) * 0.016f, 0) * Mathf.Min(speed / 5f, 1.2f) : Vector3.Zero;
 
         var info = _game.Uses[_item!];
-        float t = entity.UseAnimation > 0 ? 1f - entity.UseAnimation / (float)Mathf.Max(1, _item!.UseAnimation) : 0f;
+        float t = entity.UseAnimation > 0 ? 1f - entity.UseAnimation / (float)Mathf.Max(1, entity.UseAnimationMax) : 0f;
         var position = Rest + bob;
         var rotation = new Vector3(-0.35f, 0.25f, 0.15f);
         if (t > 0)
@@ -59,7 +59,7 @@ public sealed partial class ViewModel : Node3D
                 position += new Vector3(-0.12f * stab, 0.05f * stab, -0.35f * stab);
                 rotation = new Vector3(-1.45f, 0.1f, 0f);
             }
-            else if (info.Has(ItemAction.Melee) || info.IsTool)
+            else if (info.Has(ItemAction.Melee) || info.IsTool || _item!.UseStyle == UseStyle.Swing) // noMelee blades still swing
             {
                 // Raised over the right shoulder, then brought down and across the view.
                 float s = Mathf.SmoothStep(0f, 1f, t);

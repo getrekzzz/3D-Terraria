@@ -33,13 +33,70 @@ public class ArsenalTests
         g.Hold("wooden_boomerang");
         g.Player.Aim = Vector3.Normalize(gel.Center - g.Player.Eye);
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
-        g.Player.UseCooldown = 0;
+        g.Player.ResetUse();
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true)); // still out
         g.Ticks(30);
         Assert.True(gel.Life < 5000, "boomerang missed");
         g.Ticks(120);
         Assert.Empty(g.World.Projectiles.All); // caught again
         Assert.Equal(1, g.Player.State.Inventory.Held.Count); // not consumed
+    }
+
+    [Theory]
+    [InlineData("starfury")]
+    [InlineData("enchanted_sword")]
+    public void SwordsWithProjectilesAlsoSwing(string sword)
+    {
+        using var g = Arena();
+        var gel = Dummy(g, 1.5f);
+        g.Hold(sword);
+        // Pitched 35° up, so the shot sails over the slime and only the blade can reach it.
+        float pitch = 35f * MathF.PI / 180f;
+        g.Player.Aim = new Vector3(0, MathF.Sin(pitch), MathF.Cos(pitch));
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(1, g.World.Melee.ActiveSwings);
+        Assert.NotEmpty(g.World.Projectiles.All);
+        bool bladeHit = false;
+        for (int t = 0; t < 30; t++)
+        {
+            g.World.Tick();
+            bladeHit |= gel.ImmuneTicks > 0; // only melee hits grant immunity frames
+        }
+        Assert.True(gel.Life < 5000, "the slime was never hit");
+        Assert.True(bladeHit, "the blade never connected");
+    }
+
+    [Fact]
+    public void SwordWhoseShotIsRefusedStillSwings()
+    {
+        using var g = Arena();
+        g.Hold("starfury");
+        g.Player.Aim = Vector3.UnitZ;
+        // One star out at a time (no shipped sword is capped, so cap this world's Starfury).
+        g.World.Uses[g.Content.Items.Get("starfury")].Shoot = new Strata.Core.Content.Specs.ShootProjectileParams
+        {
+            Type = Strata.Core.Content.Specs.ItemBehaviorSpecs.ShootProjectile,
+            MaxActive = 1,
+        };
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        g.Player.ResetUse();
+        Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true)); // the star is still out
+        Assert.Single(g.World.Projectiles.All);
+        Assert.Equal(1, g.World.Melee.ActiveSwings);
+        Assert.True(g.Player.UseCooldown > 0, "a refused shot must still start the swing's cooldown");
+    }
+
+    [Fact]
+    public void ZenithNeverBlocks()
+    {
+        using var g = Arena();
+        g.Hold("zenith");
+        g.Player.Aim = Vector3.UnitZ;
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        g.Player.ResetUse(); // a fresh use while the first blades are still out
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(6, g.World.Projectiles.All.Count);
+        Assert.Equal(0, g.World.Melee.ActiveSwings); // the swing is only an animation
     }
 
     [Fact]

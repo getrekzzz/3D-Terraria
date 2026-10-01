@@ -166,6 +166,7 @@ public sealed partial class GameWorld : IDisposable
         var state = p.State;
         if (!p.Alive)
         {
+            p.Hook.Reset(); // the chain does not hang from a corpse or follow it to the respawn point
             if (p.RespawnTicks == 0)
             {
                 p.RespawnTicks = RespawnDelayTicks;
@@ -185,6 +186,8 @@ public sealed partial class GameWorld : IDisposable
         StepOnPlates(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.UseAnimation > 0) p.UseAnimation--;
+        // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
+        if (!p.HasBody && p.Hook.Active) p.Hook.Tick(Session.World, Units.SecondsPerTick, p.Hand);
         if (state.Buffs.Tick()) state.Recompute();
         int dps = state.Effects.DamagePerSecond;
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
