@@ -642,6 +642,18 @@
    "mortar": "#2a1420"
   },
   {
+   "name": "bone_block",
+   "type": "bricks",
+   "base": "#d8d0b4",
+   "dark": "#a89c7c",
+   "light": "#f0ead4",
+   "mortar": "#5a5040",
+   "rows": 3,
+   "cols": 2,
+   "mortar_width": 0.08,
+   "roughness": 0.7
+  },
+  {
    "name": "obsidian_brick",
    "type": "bricks",
    "base": "#2d2438",

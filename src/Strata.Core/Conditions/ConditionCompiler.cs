@@ -102,6 +102,11 @@ public static class ConditionCompiler
             string key = p.Item ?? "#" + p.Tag;
             return new DelegateCondition(c => (c.ItemCount?.Invoke(key) ?? 0) >= p.Count);
         },
+        ["wearing"] = s =>
+        {
+            var p = s.Parse<WearingConditionParams>();
+            return new DelegateCondition(c => c.Wearing?.Invoke(p.Item) ?? false);
+        },
         ["difficulty"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
@@ -164,6 +169,7 @@ public static class ConditionCompiler
         c.Register<ResidentConditionParams>(SpecKind.Condition, "resident");
         c.Register<RangeConditionParams>(SpecKind.Condition, "residents");
         c.Register<HasItemConditionParams>(SpecKind.Condition, "hasItem");
+        c.Register<WearingConditionParams>(SpecKind.Condition, "wearing");
         c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<RangeConditionParams>(SpecKind.Condition, "fishingPower");
         c.Register<ExpertConditionParams>(SpecKind.Condition, "expert");

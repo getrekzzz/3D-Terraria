@@ -222,4 +222,31 @@ public class ArsenalTests
         Assert.Equal(1, g.Player.State.Inventory.Held.Count);
         Assert.True(Coins.Total(g.Player.State.Inventory.Backpack) > before, "a golden crate always holds coins");
     }
+
+    [Fact]
+    public void MagicMissileFollowsTheAim()
+    {
+        using var g = Arena();
+        g.Player.State.Vitals.MaxMana = 200;
+        g.Player.State.Vitals.RestoreMana(200);
+        g.Hold("magic_missile");
+        var start = Vector3.Normalize(new Vector3(0, 0.5f, 1));
+        g.Player.Aim = start;
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        var missile = g.World.Projectiles.All.Single();
+        g.Ticks(5);
+        var turned = Vector3.Transform(start, Matrix4x4.CreateRotationY(MathF.PI / 6)); // swing the crosshair 30 degrees
+        g.Player.Aim = turned;
+        float before = Vector3.Dot(Vector3.Normalize(missile.Velocity), turned);
+        g.Ticks(20);
+        float after = Vector3.Dot(Vector3.Normalize(missile.Velocity), turned);
+        Assert.True(after > before + 0.05f, $"the missile did not turn toward the aim ({before:F2} -> {after:F2})");
+        float speed = missile.Velocity.Length();
+        g.Hold("copper_shortsword"); // let go of the wand: it flies on straight
+        var heading = missile.Velocity;
+        g.Player.Aim = start;
+        g.Ticks(5);
+        Assert.True(Vector3.Dot(Vector3.Normalize(missile.Velocity), Vector3.Normalize(heading)) > 0.999f);
+        Assert.Equal(speed, missile.Velocity.Length(), 2);
+    }
 }

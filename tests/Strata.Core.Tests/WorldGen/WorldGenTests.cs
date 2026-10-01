@@ -41,12 +41,12 @@ public class WorldGenTests
     /// generation output fails here. A deliberate change bumps GenVersion and updates these values in the same commit.
     /// </summary>
     [Theory]
-    [InlineData(8, 10, 8, 11137789750146089947UL)]
-    [InlineData(8, 9, 8, 9898080192801599494UL)]
-    [InlineData(8, 7, 8, 2339553099039670698UL)]
-    [InlineData(8, 4, 8, 5603505991156344888UL)]
-    [InlineData(2, 4, 9, 14208479395055082940UL)]
-    [InlineData(12, 1, 5, 15020070613740224912UL)]
+    [InlineData(8, 10, 8, 3453761948223444790UL)]
+    [InlineData(8, 9, 8, 11583059761707546353UL)]
+    [InlineData(8, 7, 8, 15773868886855303292UL)]
+    [InlineData(8, 4, 8, 12792646513477769902UL)]
+    [InlineData(2, 4, 9, 12235239809409800194UL)]
+    [InlineData(12, 1, 5, 9339724396543202857UL)]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
         Assert.Equal(9, GenVersion.Current); // bumping the generator version means re-recording these hashes

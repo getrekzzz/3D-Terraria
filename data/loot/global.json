@@ -1,0 +1,6 @@
+{
+  // Rolled after every kill that counts (worth coins, not a critter or a part): NpcSystem.GlobalKillTable.
+  "lootTables": [
+    { "id": "global_kill", "entries": [{ "item": "golden_key", "chance": 0.015384615, "conditions": [{ "type": "biome", "any": ["dungeon"] }] }] }
+  ]
+}

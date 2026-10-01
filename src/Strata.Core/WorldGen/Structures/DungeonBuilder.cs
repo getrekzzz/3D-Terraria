@@ -66,10 +66,11 @@ public static class DungeonBuilder
             stack.Push(next);
         }
 
+        bool shadowKey = false; // the first locked chest holds the world's one Shadow Key
         for (int y = 0; y < ny; y++)
             for (int z = 0; z < nz; z++)
                 for (int x = 0; x < nx; x++)
-                    if (visited[x, y, z]) Furnish(bp, content, rooms[x, y, z], ref rng);
+                    if (visited[x, y, z]) Furnish(bp, content, rooms[x, y, z], ref rng, ref shadowKey);
         return bp;
     }
 
@@ -109,11 +110,15 @@ public static class DungeonBuilder
         bp.Carve(b.Expand(-1));
     }
 
-    private static void Furnish(Blueprint bp, ContentDatabase content, Aabb3i room, ref Pcg32 rng)
+    private static void Furnish(Blueprint bp, ContentDatabase content, Aabb3i room, ref Pcg32 rng, ref bool shadowKey)
     {
         var floor = new Int3(room.Min.X + 2, room.Min.Y + 1, room.Min.Z + 2);
         var tiles = content.TileObjects;
-        if (rng.Chance(0.3f)) bp.Object(tiles.Get("gold_chest"), floor + new Int3(rng.Range(0, 4), 0, rng.Range(0, 4)), 0, 0, "cabin_chest");
+        if (rng.Chance(0.3f))
+        {
+            bp.Object(tiles.Get("gold_chest"), floor + new Int3(rng.Range(0, 4), 0, rng.Range(0, 4)), 0, 0, shadowKey ? "dungeon_chest" : "dungeon_chest_shadow_key");
+            shadowKey = true;
+        }
         if (rng.Chance(0.7f)) bp.Object(tiles.Get("candle"), new Int3(room.Max.X - 3, room.Min.Y + 1, room.Max.Z - 3), 0);
         for (int i = rng.Range(0, 4); i > 0; i--)
             bp.Object(tiles.Get("pot"), new Int3(room.Min.X + 2 + i * 3, room.Min.Y + 1, room.Max.Z - 4), 0, i % 3);

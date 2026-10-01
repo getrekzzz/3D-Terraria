@@ -136,6 +136,7 @@ public sealed partial class ProjectileSystem
             p.Velocity.Y -= p.Def.Gravity * dt;
             if (p.Def.Drag > 0) p.Velocity *= 1f - p.Def.Drag * dt;
             if (p.Def.Homing > 0) Steer(p, dt);
+            if (p.Def.Guided > 0) Guide(p, dt);
             if (p.Def.CollideTerrain && !MoveThroughTerrain(p, dt))
             {
                 if (p.Def.Returns > 0) p.Returning = true;

@@ -68,6 +68,9 @@ public static partial class ContentValidator
             foreach (var c in r.Conditions) CheckTownCondition(ctx, r, c);
         foreach (var r in ctx.Db.Recipes.All)
             foreach (var c in r.Conditions) CheckTownCondition(ctx, r, c);
+        foreach (var t in ctx.Db.LootTables.All)
+            foreach (var e in t.Entries)
+                foreach (var c in e.Conditions) CheckTownCondition(ctx, t, c);
     }
 
     private static IEnumerable<TypedSpec> AllConditions(TownNpcDef t) =>
@@ -84,6 +87,9 @@ public static partial class ContentValidator
                 break;
             case "hasItem":
                 ctx.Ref(owner, ctx.Db.Items, Str("item"), "hasItem condition");
+                break;
+            case "wearing":
+                ctx.Ref(owner, ctx.Db.Items, Str("item"), "wearing condition");
                 break;
             case "all" or "any" or "not" when c.Raw.TryGetProperty("of", out var of) && of.ValueKind == System.Text.Json.JsonValueKind.Array:
                 foreach (var inner in of.EnumerateArray())

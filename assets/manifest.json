@@ -102,6 +102,12 @@
    ],
    "generator": "vase"
   },
+  "bone_welder": {
+   "models": [
+    "assets/models/objects/bone_welder_v0.glb"
+   ],
+   "generator": "bone_welder"
+  },
   "book": {
    "models": [
     "assets/models/objects/book_v0.glb",
@@ -785,6 +791,10 @@
    "model": "assets/models/items/antlion_mandible.glb",
    "icon": "assets/icons/items/antlion_mandible.png"
   },
+  "aqua_scepter": {
+   "model": "assets/models/items/aqua_scepter.glb",
+   "icon": "assets/icons/items/aqua_scepter.png"
+  },
   "archery_potion": {
    "model": "assets/models/items/archery_potion.glb",
    "icon": "assets/icons/items/archery_potion.png"
@@ -968,6 +978,10 @@
   "bone": {
    "model": "assets/models/items/bone.glb",
    "icon": "assets/icons/items/bone.png"
+  },
+  "bone_welder": {
+   "object": "bone_welder",
+   "icon": "assets/icons/items/bone_welder.png"
   },
   "book": {
    "model": "assets/models/items/book.glb",
@@ -1657,6 +1671,10 @@
    "model": "assets/models/items/golden_fishing_rod.glb",
    "icon": "assets/icons/items/golden_fishing_rod.png"
   },
+  "golden_key": {
+   "model": "assets/models/items/golden_key.glb",
+   "icon": "assets/icons/items/golden_key.png"
+  },
   "golden_shower": {
    "model": "assets/models/items/golden_shower.glb",
    "icon": "assets/icons/items/golden_shower.png"
@@ -2084,6 +2102,10 @@
   "magic_mirror": {
    "model": "assets/models/items/magic_mirror.glb",
    "icon": "assets/icons/items/magic_mirror.png"
+  },
+  "magic_missile": {
+   "model": "assets/models/items/magic_missile.glb",
+   "icon": "assets/icons/items/magic_missile.png"
   },
   "magic_power_potion": {
    "model": "assets/models/items/magic_power_potion.glb",
@@ -2681,6 +2703,10 @@
    "model": "assets/models/items/recall_potion.glb",
    "icon": "assets/icons/items/recall_potion.png"
   },
+  "red_hat": {
+   "model": "assets/models/items/red_hat.glb",
+   "icon": "assets/icons/items/red_hat.png"
+  },
   "red_paint": {
    "model": "assets/models/items/red_paint.glb",
    "icon": "assets/icons/items/red_paint.png"
@@ -2772,6 +2798,10 @@
   "seedler": {
    "model": "assets/models/items/seedler.glb",
    "icon": "assets/icons/items/seedler.png"
+  },
+  "shadow_key": {
+   "model": "assets/models/items/shadow_key.glb",
+   "icon": "assets/icons/items/shadow_key.png"
   },
   "shadow_scale": {
    "model": "assets/models/items/shadow_scale.glb",
@@ -3424,6 +3454,10 @@
   "unicorn_horn": {
    "model": "assets/models/items/unicorn_horn.glb",
    "icon": "assets/icons/items/unicorn_horn.png"
+  },
+  "valor": {
+   "model": "assets/models/items/valor.glb",
+   "icon": "assets/icons/items/valor.png"
   },
   "vampire_knives": {
    "model": "assets/models/items/vampire_knives.glb",

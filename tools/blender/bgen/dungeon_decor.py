@@ -11,6 +11,7 @@ statue(p):  pose    'skeleton' | 'armor' | 'angel'    stone  prop layer (stone) 
             base    pedestal tint (default: tint darkened)
 book(p):    covers  list of cover tints; variant N of the object takes covers[N % len]   pages  page tint
 spike_strip(p): metal  prop layer (iron)    tint  spike tint    plate  plate tint    count  spikes (5)
+bone_welder(p): bone  bone tint    slab  work-slab tint    iron  vise tint (a bone-framed anvil with a skull vise)
 Helpers: emblem_outline(shape, r) -> [(x, z)] polygon, hanging_cloth(mb, ...) a sagging panel with a hem.
 """
 import math
@@ -161,3 +162,29 @@ def spike_strip(mb: MeshBuilder, p, rng):
         x, y = sx * w * 0.27, sy * d * 0.27
         tall = h * (0.7 if (sx, sy) == (0, 0) else 0.55)
         mb.cylinder((x, y, 0.04), (x, y, tall), w * 0.1, 0.0, metal, tint, segments=6, smooth=False)
+
+
+@generator
+def bone_welder(mb: MeshBuilder, p, rng):
+    """A bone-framed anvil: crossed femur legs under a stone work slab, a skull clamped in an iron vise on top."""
+    w, h, d = p["size"]
+    bone, slab, iron = p.get("bone", "#e0d8c0"), p.get("slab", "#6a6660"), p.get("iron", "#5a5e66")
+    top = h * 0.5
+    for sx in (-1, 1):  # two crossed pairs of femurs, knobbed at both ends
+        for sy in (-1, 1):
+            a, b = (sx * w * 0.38, sy * d * 0.3, 0.0), (-sx * w * 0.12, sy * d * 0.22, top - 0.06)
+            mb.cylinder(a, b, 0.045, 0.04, "prop:plain", bone, segments=6)
+            for end in (a, b):
+                mb.sphere(end, 0.07, "prop:plain", bone, subdivisions=1, scale=(1.0, 1.0, 0.8))
+    mb.box((-w * 0.45, -d * 0.4, top - 0.06), (w * 0.45, d * 0.4, top + 0.1), "prop:stone", slab)  # work slab
+    for k in range(5):  # rib-bone edging along the front of the slab
+        x = -w * 0.36 + k * w * 0.18
+        mb.cylinder((x, -d * 0.41, top - 0.04), (x, -d * 0.41, top + 0.08), 0.03, None, "prop:plain", bone, segments=5)
+    base = top + 0.1
+    mb.box((-w * 0.18, -d * 0.12, base), (-w * 0.12, d * 0.12, base + 0.34), "prop:iron", iron)  # vise jaws
+    mb.box((w * 0.12, -d * 0.12, base), (w * 0.18, d * 0.12, base + 0.34), "prop:iron", iron)
+    mb.cylinder((-w * 0.3, 0, base + 0.22), (w * 0.3, 0, base + 0.22), 0.025, None, "prop:iron", iron, segments=6)  # screw
+    mb.sphere((0, 0, base + 0.2), 0.17, "prop:plain", bone, subdivisions=2, scale=(0.85, 1.0, 1.0))  # the skull
+    mb.box((-0.08, -0.12, base + 0.02), (0.08, 0.02, base + 0.09), "prop:plain", bone)  # jaw
+    for sx in (-1, 1):
+        mb.sphere((sx * 0.06, -0.14, base + 0.22), 0.04, "prop:plain", "#201810", subdivisions=1)  # eye sockets

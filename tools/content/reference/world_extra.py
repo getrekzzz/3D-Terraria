@@ -12,12 +12,16 @@ frog|Frog|early|jungle|critter
 duck|Duck|early|ocean|critter
 faeling|Faeling|early|aether|critter
 ghost|Ghost|early|graveyard|flyer
+angry_bones_big|Angry Bones (big)|prehardmode|dungeon|walker
+angry_bones_big_muscle|Angry Bones (muscle)|prehardmode|dungeon|walker
+angry_bones_big_helmet|Angry Bones (helmet)|prehardmode|dungeon|walker
 """
 
 # id|Name|stage|kind
 TILES = """
 tombstone|Tombstone|early|furniture
 aetherium_block|Aetherium Block|early|natural
+bone_block|Bone Block|prehardmode|built
 """
 
 # id|Name|kind

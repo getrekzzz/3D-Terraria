@@ -3281,6 +3281,34 @@
    "source": "desert chest"
   },
   {
+   "id": "terraria:aqua_scepter",
+   "name": "Aqua Scepter",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:handgun",
+   "name": "Handgun",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:magic_missile",
+   "name": "Magic Missile",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:valor",
+   "name": "Valor",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
    "id": "terraria:silver_bullet",
    "name": "Silver Bullet",
    "kind": "weapon",
@@ -4058,11 +4086,39 @@
    "source": "dungeon"
   },
   {
+   "id": "terraria:bone_welder",
+   "name": "Bone Welder",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
    "id": "terraria:book",
    "name": "Book",
    "kind": "material",
    "stage": "prehardmode",
    "source": "dungeon"
+  },
+  {
+   "id": "terraria:golden_key",
+   "name": "Golden Key",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:shadow_key",
+   "name": "Shadow Key",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:red_hat",
+   "name": "Red Hat",
+   "kind": "armor",
+   "stage": "prehardmode",
+   "source": "craft"
   },
   {
    "id": "terraria:paintbrush",

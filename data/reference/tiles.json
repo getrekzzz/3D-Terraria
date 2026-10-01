@@ -477,6 +477,12 @@
    "name": "Aetherium Block",
    "kind": "natural",
    "stage": "early"
+  },
+  {
+   "id": "terraria:bone_block",
+   "name": "Bone Block",
+   "kind": "built",
+   "stage": "prehardmode"
   }
  ]
 }

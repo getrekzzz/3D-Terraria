@@ -1,0 +1,6 @@
+{
+  // Dungeon building blocks: the Bone Block made at a Bone Welder (P4-13 adds the dungeon wall panels).
+  "blocks": [
+    { "id": "bone_block", "name": "Bone Block", "render": "crisp", "textures": { "all": "bone_block" }, "hardness": 1.5, "sound": "stone", "color": "#d8d0b4", "tags": ["built"], "covers": ["terraria:bone_block"] }
+  ]
+}

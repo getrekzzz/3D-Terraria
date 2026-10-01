@@ -48,6 +48,12 @@ public sealed class ProjectileDef : ContentDef
     /// <summary>Steers toward the nearest creature (turn rate in radians per second; 0 = flies straight).</summary>
     public float Homing { get; init; }
 
+    /// <summary>
+    /// Steers along the owner's aim while they hold the item that fired it (Magic Missile follows the crosshair):
+    /// turn rate like <see cref="Homing"/>; 0 = not guided.
+    /// </summary>
+    public float Guided { get; init; }
+
     /// <summary>Fishing bobbers float on liquid and wait for a bite.</summary>
     public bool Bobber { get; init; }
 

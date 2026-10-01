@@ -8,6 +8,10 @@ vampire_knives|Vampire Knives|hardmode|crimson chest
 rainbow_gun|Rainbow Gun|hardmode|hallowed chest
 staff_of_the_frost_hydra|Staff of the Frost Hydra|hardmode|frozen chest
 desert_tiger_staff|Desert Tiger Staff|hardmode|desert chest
+aqua_scepter|Aqua Scepter|prehardmode|dungeon
+handgun|Handgun|prehardmode|dungeon
+magic_missile|Magic Missile|prehardmode|dungeon
+valor|Valor|prehardmode|dungeon
 silver_bullet|Silver Bullet|early|arms dealer
 shotgun|Shotgun|hardmode|arms dealer
 rocket_i|Rocket I|hardmode|cyborg
@@ -125,9 +129,15 @@ skeleton_statue|Skeleton Statue|early|world
 armor_statue|Armor Statue|early|world
 angel_statue|Angel Statue|early|world
 spike|Spike|prehardmode|dungeon
+bone_welder|Bone Welder|prehardmode|dungeon
 """,
     "material": """
 book|Book|prehardmode|dungeon
+golden_key|Golden Key|prehardmode|dungeon
+shadow_key|Shadow Key|prehardmode|dungeon
+""",
+    "armor": """
+red_hat|Red Hat|prehardmode|craft
 """,
     "paint": """
 paintbrush|Paintbrush|early|painter

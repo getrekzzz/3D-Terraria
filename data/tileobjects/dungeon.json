@@ -34,7 +34,8 @@
     { "id": "armor_statue", "name": "Armor Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:armor_statue"]},
     { "id": "angel_statue", "name": "Angel Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:angel_statue"]},
     { "id": "book", "name": "Book", "size": [1, 1, 1], "variants": 4, "natural": true, "loot": "book", "hitPoints": 1},
-    { "id": "spike", "name": "Spike", "description": "Hurts whoever steps on it.", "size": [1, 1, 1], "anchor": "any", "breakTool": "pick", "hazard": { "damage": 40, "knockback": 6}, "hitPoints": 1, "itemMaxStack": 9999, "itemValue": 0, "tags": ["world", "dungeon"], "covers": ["terraria:spike"]}
+    { "id": "spike", "name": "Spike", "description": "Hurts whoever steps on it.", "size": [1, 1, 1], "anchor": "any", "breakTool": "pick", "hazard": { "damage": 40, "knockback": 6}, "hitPoints": 1, "itemMaxStack": 9999, "itemValue": 0, "tags": ["world", "dungeon"], "covers": ["terraria:spike"]},
+    { "id": "bone_welder", "name": "Bone Welder", "size": [3, 3, 2], "interaction": "station", "stations": ["bone_welder"], "hitPoints": 4, "itemCategory": "station", "itemValue": 1500, "covers": ["terraria:bone_welder"]}
   ],
   "items": [
     { "id": "book", "name": "Book", "description": "It's got old writing on it.", "category": "material", "maxStack": 9999, "value": 75, "covers": ["terraria:book"]}

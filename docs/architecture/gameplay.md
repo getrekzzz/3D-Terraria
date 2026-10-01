@@ -143,6 +143,13 @@
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance
   `PendingLoot` replaces its kind's `loot` when broken (the one Water Bolt among the Dungeon's shelf books).
+* **Dungeon loot and keys** — dungeon rooms place `dungeon_chest` (one weighted treasure: Muramasa, Cobalt Shield,
+  Aqua Scepter, Handgun, Blue Moon, Magic Missile, Valor; Bone Welder 14 %) and one `dungeon_chest_shadow_key` per world
+  (`data/loot/dungeon.json`). `NpcSystem.Kill` rolls `global_kill` (`data/loot/global.json`: Golden Key 1/65 in the
+  dungeon zone) after a creature's own loot for kills worth coins, never critters or parts. `ProjectileDef.guided`
+  (Magic Missile) steers toward the owner's aim ray at the projectile's own distance from the eye while the owner holds
+  the item that fired it. A fallen town resident drops table `<id>_death` when it exists; its conditions may test
+  `wearing` (an equipped item, the Clothier's Red Hat).
 
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
