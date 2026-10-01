@@ -10,7 +10,7 @@
     { "from": 9.5, "to": 15.5, "multiplier": 0.8 }
   ],
   // By moon phase: full, waning gibbous, third quarter, waning crescent, new, waxing crescent, first quarter, waxing gibbous.
-  "moonMultipliers": [1.1, 1.05, 1.05, 0.95, 0.9, 0.95, 1.05, 1.05],
+  "moonMultipliers": [1.1, 1.05, 1.0, 0.95, 0.9, 0.95, 1.0, 1.05],
   "eventMultipliers": { "blood_moon": 1.1 },
   // Connected liquid cells (0.5 m cubes) for full power; fewer scale power down, and below the minimum nothing bites.
   "fullPoolCells": 300,

@@ -31,15 +31,19 @@ public sealed partial class WireSystem
         _statueReady.Remove(obj.Id);
     }
 
-    /// <summary>Running timers fire when due. Cost: one dictionary pass over the placed timers.</summary>
+    /// <summary>
+    /// Running timers fire when due. Cost: one dictionary pass over the placed timers. Timers and statue cooldowns whose
+    /// chunk unloaded (the store detaches objects without a Removed event) are dropped as they are found.
+    /// </summary>
     public void Tick()
     {
-        if (_timers.Count == 0) return;
         long now = _world.Session.Clock.Tick;
+        var objects = _world.Session.World.TileObjects;
+        if (now % PruneTicks == 0) PruneStatues(objects);
+        if (_timers.Count == 0) return;
         _due.Clear();
         foreach (var (timer, at) in _timers)
-            if (timer.Active && now >= at) _due.Add(timer);
-        var objects = _world.Session.World.TileObjects;
+            if (objects.Get(timer.Id) != timer || timer.Active && now >= at) _due.Add(timer);
         foreach (var timer in _due)
         {
             if (objects.Get(timer.Id) != timer)
@@ -47,9 +51,22 @@ public sealed partial class WireSystem
                 _timers.Remove(timer); // its chunk unloaded
                 continue;
             }
+            if (!timer.Active) continue; // switched off by an earlier timer's signal this tick
             _timers[timer] = now + timer.Def.Timer;
             Signal(timer);
         }
+    }
+
+    private const int PruneTicks = 600;
+    private readonly List<long> _stale = new();
+
+    private void PruneStatues(Voxels.TileObjects.TileObjectStore objects)
+    {
+        if (_statueReady.Count == 0) return;
+        _stale.Clear();
+        foreach (var id in _statueReady.Keys)
+            if (objects.Get(id) == null) _stale.Add(id);
+        foreach (var id in _stale) _statueReady.Remove(id);
     }
 
     /// <summary>Switches a timer on (it fires one period from now) or off; by hand or by a signal.</summary>

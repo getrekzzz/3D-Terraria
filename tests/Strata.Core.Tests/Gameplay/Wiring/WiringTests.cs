@@ -248,4 +248,20 @@ public class WiringTests
         Assert.Equal(5, g.Player.State.Inventory.Backpack.Count(g.Content.Items.Get("wire")));
         Assert.Equal(2, g.Player.State.Inventory.Backpack.Count(g.Content.Items.Get("actuator")));
     }
+
+    [Fact]
+    public void StatueCreaturesDoNotWinEvents()
+    {
+        using var g = Strata.Core.Tests.Support.TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        Assert.True(g.World.Events.Start(g.Content.Events.Get("slime_rain")));
+        var gel = g.Content.Enemies.Get("green_slime");
+        for (int i = 0; i < 100; i++)
+        {
+            var npc = g.World.Npcs.Spawn(gel, g.Player.Position + new System.Numerics.Vector3(3, 0, 3))!;
+            npc.FromStatue = true;
+            g.World.Npcs.Kill(npc);
+        }
+        Assert.True(g.World.Events.IsActive("slime_rain"));
+    }
 }

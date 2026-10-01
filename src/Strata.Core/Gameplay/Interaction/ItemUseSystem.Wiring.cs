@@ -49,7 +49,7 @@ public sealed partial class ItemUseSystem
         float bestDistance = float.MaxValue;
         foreach (var npc in _world.Npcs.All)
         {
-            if (!npc.Alive || !npc.Def.HasTag(cfg.Tag) || npc.Def.CatchItem == null) continue;
+            if (!npc.Alive || npc.FromStatue || !npc.Def.HasTag(cfg.Tag) || npc.Def.CatchItem == null) continue; // statue critters are not for keeping
             var to = npc.Center - p.Eye;
             float d = to.Length();
             if (d > reach + npc.HalfExtents.X || d >= bestDistance) continue;

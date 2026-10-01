@@ -50,11 +50,12 @@ public sealed partial class ItemUseSystem
     }
 
     /// <summary>
-    /// Special bait in the backpack whose biome matches the bobber's water hooks its boss instead of a fish: the bait
-    /// is used up and the boss surfaces at the bobber.
+    /// Special bait in the backpack whose biome matches the bobber's water hooks its boss instead of a fish, when it is the
+    /// first bait in the backpack (as in Terraria): the bait is used up and the boss surfaces at the bobber.
     /// </summary>
     private bool HookBoss(PlayerEntity p, Entities.Projectile bobber)
     {
+        if (!_world.Projectiles.LeadsWithBossBait(p)) return false;
         var backpack = p.State.Inventory.Backpack;
         var cell = Physics.VoxelMotion.CellOf(bobber.Position);
         var ctx = _world.Session.ContextAt(cell);

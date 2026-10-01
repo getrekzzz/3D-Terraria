@@ -47,6 +47,23 @@ public sealed partial class ProjectileSystem
         return null;
     }
 
+    /// <summary>
+    /// Whether the first bait in the backpack (hotbar first) is a boss bait such as the Truffle Worm: the line then bites
+    /// even without ordinary bait, and the bite hooks the boss where its biome matches.
+    /// </summary>
+    public bool LeadsWithBossBait(PlayerEntity owner)
+    {
+        var backpack = owner.State.Inventory.Backpack;
+        for (int i = 0; i < backpack.Size; i++)
+        {
+            if (backpack[i].Item is not { } item) continue;
+            var u = _world.Uses[item];
+            if (u.BaitSummon != null) return true;
+            if (u.Bait != null) return false;
+        }
+        return false;
+    }
+
     /// <summary>Whether the owner's gear lets a bobber rest in lava (a Hotline rod or a Lavaproof Fishing Hook).</summary>
     public bool CanFishLava(PlayerEntity owner, ItemDef? rod) =>
         rod != null && _world.Uses[rod].Fishing is { Lava: true } || owner.State.Effects.Stats.Bonus(StatIds.LavaFishing) > 0;
@@ -122,6 +139,7 @@ public sealed partial class ProjectileSystem
     private void ScheduleBite(Projectile p)
     {
         p.FishingPower = p.Owner != null ? FishingPowerFor(p.Owner, p.Source, p.PoolCells) : 0;
+        if (p.FishingPower <= 0 && p.Owner != null && LeadsWithBossBait(p.Owner)) p.FishingPower = 1; // a boss bait still draws a bite
         if (p.FishingPower <= 0)
         {
             p.BiteAt = p.Age + 120;

@@ -147,6 +147,7 @@ public sealed class EventDirector
 
     private void OnKilled(Npc npc)
     {
+        if (npc.FromStatue) return; // statue farms do not win invasions
         foreach (var a in _active.ToList())
         {
             if (a.Def.KillGoal <= 0 || a.Def.KillTag == null || !npc.Def.HasTag(a.Def.KillTag)) continue;

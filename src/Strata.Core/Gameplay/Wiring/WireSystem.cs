@@ -104,6 +104,8 @@ public sealed partial class WireSystem
 
     private bool RemoveActuator(Int3 cell)
     {
+        // A switched-off block in an unloaded chunk could not be restored: keep its actuator until the chunk is back.
+        if (Grid.Inactive.ContainsKey(cell) && _world.Session.World.GetBlock(cell) == Voxels.VoxelWorld.Unknown) return false;
         if (!Grid.SetActuator(cell, false)) return false;
         if (Grid.Inactive.ContainsKey(cell))
         {

@@ -172,4 +172,30 @@ public class FishingPowerTests
         ctx.AnglerQuest = "";
         Assert.Empty(roller.Roll(g.World.Projectiles.Fishing.QuestTable, ref rng, ctx));
     }
+
+    [Fact]
+    public void ABossBaitAloneStillDrawsABite()
+    {
+        using var g = FishingRig.Pond(LiquidType.Water);
+        g.Hold("golden_fishing_rod");
+        g.Player.State.Inventory.Backpack.Add(new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("truffle_worm"), 1));
+        g.Player.UseCooldown = 0;
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        var bobber = g.World.Projectiles.BobberOf(g.Player)!;
+        bool bit = false;
+        for (int t = 0; t < 3000 && !bit; t++)
+        {
+            g.World.Tick();
+            bit = bobber.Biting;
+        }
+        Assert.True(bit, "a Truffle Worm on its own never drew a bite (Duke Fishron could not be fished up)");
+    }
+
+    [Fact]
+    public void QuarterMoonsAreNeutral()
+    {
+        Assert.Equal(1f, FishingPower.Multiplier(Cfg, Precipitation.None, 12.5f, 2, null) / FishingPower.Multiplier(Cfg, Precipitation.None, 12.5f, 6, null), 3);
+        Assert.Equal(Cfg.MoonMultipliers[2], 1f, 3);
+        Assert.Equal(Cfg.MoonMultipliers[6], 1f, 3);
+    }
 }

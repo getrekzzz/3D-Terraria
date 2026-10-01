@@ -26,7 +26,7 @@ public sealed record FishingConfig
     };
 
     /// <summary>Multiplier by moon phase (0 full … 4 new … 7).</summary>
-    public float[] MoonMultipliers { get; init; } = { 1.1f, 1.05f, 1.05f, 0.95f, 0.9f, 0.95f, 1.05f, 1.05f };
+    public float[] MoonMultipliers { get; init; } = { 1.1f, 1.05f, 1f, 0.95f, 0.9f, 0.95f, 1f, 1.05f };
 
     /// <summary>World events that change fishing power (the Blood Moon ×1.1).</summary>
     public Dictionary<string, float> EventMultipliers { get; init; } = new() { ["blood_moon"] = 1.1f };
