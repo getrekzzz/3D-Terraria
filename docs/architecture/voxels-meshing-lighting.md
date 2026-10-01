@@ -27,6 +27,13 @@ Constrained surface nets: one vertex per dual cell (crossing-edge centroid), Tau
 built geometry stays exact and flush with smooth terrain. Materials: exposure-weighted majority per vertex,
 barycentric three-surface blending in the shader (triplanar sampling of the terrain texture array).
 Normals come from a tent-filtered density gradient including the padding ring, so chunk borders match.
+Heightfield reconstruction (`HeightfieldSmoothing`, after the relaxation): Taubin keeps long staircases as ripples, so
+each free vertex on monotone, up-facing ground takes the tent-weighted mean (radius 4 columns) of the column tops
+around it, read in a ±5-cell window that rejects columns with air under the top (ledges, roofs, caves), snapping
+cells, or a step over 3 cells (cliffs); it needs its own four columns and 75% of the 8×8 around it valid. The height is
+clamped to the dual cell and to the 0.45-cell drift, so colliders, `FeetCell` and object placement still agree with
+the voxels; only a fixed local window is read, so chunk seams stay identical. `mesh-bench --roughness` prints the
+RMS height deviation of up-facing vertices from a local 3×3 plane fit (seed 1234: 3.2 cm before, 1.7 cm after).
 Also produced: liquid surfaces, cutout (leaves, cobweb) and glass surfaces, grass clumps on grass surfaces
 (`GrassScatter`), and collision triangles in 16³ buckets (solid + one-way platforms). Colliders exist only near the player and rebuild the same frame
 for edits next to it.
