@@ -62,11 +62,15 @@ def bow(mb: MeshBuilder, p, rng):
     mb.tube(pts, [0.012, 0.018, 0.022, 0.026, 0.03, 0.026, 0.022, 0.018, 0.012], layer, tint, segments=6)
     mb.cylinder(pts[0], pts[-1], 0.004, None, "prop:cloth", "#f0f0e0", segments=4)
     mb.cylinder((-0.17, 0, -0.08), (-0.17, 0, 0.08), 0.03, None, "prop:red_cloth", segments=8)
+    # The hand holds the riser; the arrow nocks at the string centre (the origin) and flies toward the riser (-X).
+    mb.socket("grip", (-0.17, 0, 0))
+    mb.socket("nock", (0, 0, 0), (-1, 0, 0), (0, 0, 1))
 
 
 def wand(mb: MeshBuilder, p, rng):
     mb.cylinder((0, 0, -0.1), (0, 0, 0.42), 0.016, 0.012, "prop:bark", segments=6)
     mb.sphere((0, 0, 0.46), 0.04, "prop:plain:glow", p.get("gem", "#ff8a2a"), subdivisions=1)
+    mb.socket("tip", (0, 0, 0.46))
 
 
 def staff(mb: MeshBuilder, p, rng):
@@ -76,6 +80,7 @@ def staff(mb: MeshBuilder, p, rng):
         mb.tube([(0, 0, 1.05), (math.cos(a) * 0.06, math.sin(a) * 0.06, 1.15), (math.cos(a) * 0.03, math.sin(a) * 0.03, 1.25)],
                 [0.012, 0.01, 0.004], "prop:gold", segments=4)
     mb.sphere((0, 0, 1.18), 0.055, "prop:crystal:glow", p.get("gem", "#b06aff"), subdivisions=1, scale=(1, 1, 1.4))
+    mb.socket("tip", (0, 0, 1.18))
 
 
 def arrow(mb: MeshBuilder, p, rng):

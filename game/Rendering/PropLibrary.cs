@@ -11,7 +11,7 @@ namespace Strata.Game.Rendering;
 /// <c>char:&lt;kind&gt;</c> slots (see <see cref="CharacterMaterials"/>).
 /// Meshes and materials are cached.
 /// </summary>
-public sealed class PropLibrary
+public sealed partial class PropLibrary
 {
     private const string Folder = "res://assets/textures/props/";
     private static readonly Shader PropShader = GD.Load<Shader>("res://shaders/prop.gdshader");
@@ -59,7 +59,11 @@ public sealed class PropLibrary
             var scene = GD.Load<PackedScene>(path).Instantiate();
             var source = FindMesh(scene);
             if (source == null) Problems.Add($"model {path} contains no mesh");
-            else result = Retarget(source, multimesh, path);
+            else
+            {
+                result = Retarget(source.Mesh, multimesh, path);
+                CollectSockets(projectPath, source);
+            }
             scene.Free();
         }
         _meshes[key] = result;
@@ -112,9 +116,9 @@ public sealed class PropLibrary
         return mesh;
     }
 
-    private static Mesh? FindMesh(Node node)
+    private static MeshInstance3D? FindMesh(Node node)
     {
-        if (node is MeshInstance3D mi && mi.Mesh != null) return mi.Mesh;
+        if (node is MeshInstance3D mi && mi.Mesh != null) return mi;
         foreach (var child in node.GetChildren())
             if (FindMesh(child) is { } m) return m;
         return null;

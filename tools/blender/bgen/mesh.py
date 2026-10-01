@@ -40,6 +40,13 @@ class MeshBuilder:
         self.bones: list[str] = []
         # Created up front: adding a layer later would invalidate BMVert references held by callers.
         self.deform = self.bm.verts.layers.deform.verify()
+        # Named attachment points (held items: grip, muzzle, tip, nock, …), see bgen/sockets.py.
+        self.sockets: dict[str, tuple] = {}
+
+    def socket(self, name: str, pos, forward=(0, 0, 1), up=(0, 1, 0)):
+        """Records a named attachment point (Blender space, metres): where the hand grips the item, where shots leave
+        it, where a string or chain starts. ``forward`` is the direction out of it, ``up`` its roll reference."""
+        self.sockets[name] = (tuple(pos), tuple(forward), tuple(up))
 
     # ------------------------------------------------------------------ bookkeeping
     def _material_index(self, material: str) -> int:

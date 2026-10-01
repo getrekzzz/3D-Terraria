@@ -12,7 +12,10 @@ Options:
   --samples=N      Cycles samples per icon (default 24)
   --anims          build only the human animation sets (assets/models/creatures/anim; --only matches characters or sets)
   --shard=I/N      with --anims: build every Nth set starting at I (to run several builds side by side)
-Outputs: assets/models/{objects,items,creatures}/*.glb, assets/icons/items/*.png, assets/manifest.json
+Held items export their sockets (grip, muzzle, tip, nock, string, chain; bgen/sockets.py) as empties next to the mesh
+and list them in the manifest. The "projectiles" section builds projectile models (yoyo heads, flail balls) for
+content projectiles (an entry's "projectile", default its id).
+Outputs: assets/models/{objects,items,creatures,projectiles}/*.glb, assets/icons/items/*.png, assets/manifest.json
 """
 import fnmatch
 import json
@@ -61,7 +64,7 @@ def load_json(path: pathlib.Path):
 
 def load_content():
     manifest = load_json(REPO / "data" / "manifest.json")
-    blocks, items, objects, enemies = {}, {}, {}, {}
+    blocks, items, objects, enemies, projectiles = {}, {}, {}, {}, {}
     for rel in manifest["files"]:
         doc = load_json(REPO / "data" / rel)
         for b in doc.get("blocks", []):
@@ -74,7 +77,21 @@ def load_content():
             enemies[e["id"]] = e
         for t in doc.get("townNpcs", []):  # town residents use rigged creature models too
             enemies[t["id"]] = t
-    return blocks, items, objects, enemies
+        for p in doc.get("projectiles", []):
+            projectiles[p["id"]] = p
+    return blocks, items, objects, enemies, projectiles
+
+
+def plan_projectiles(spec, projectiles):
+    """Projectile model jobs (model id -> job) and errors: every entry must name a content projectile."""
+    jobs, errors = {}, []
+    for mid, s in spec.get("projectiles", {}).items():
+        target = s.get("projectile", mid)
+        if target not in projectiles:
+            errors.append(f"assets.json projectile model '{mid}' is for '{target}', which is not a content projectile")
+            continue
+        jobs[mid] = {"generator": s["generator"], "params": dict(s.get("params", {}))}
+    return jobs, errors
 
 
 def plan(spec, blocks, items, objects, enemies):
@@ -133,12 +150,13 @@ def plan(spec, blocks, items, objects, enemies):
     return object_jobs, item_jobs, block_icons, creature_jobs, errors
 
 
-def build(opts, spec, object_jobs, item_jobs, creature_jobs):
+def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
     import bgen
+    from bgen import sockets as socket_gen
     from bgen import beasts, bosses, bosses_hard, bosses_lunar, bosses_pre, bosses_pre2, bosses_pre3, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
     from bgen.materials import PropMaterials
-    from bgen.mesh import MeshBuilder, reset_scene, rng_for
+    from bgen.mesh import MeshBuilder, bounds as mesh_bounds, reset_scene, rng_for
 
     generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS, **bosses.GENERATORS, **mechs.GENERATORS,
                   **gear.GENERATORS, **horrors.GENERATORS, **lunar.GENERATORS, **festive.GENERATORS, **critters.ITEM_GENERATORS, **mechanisms.GENERATORS}
@@ -159,21 +177,22 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() and opts["only"] else {"objects": {}, "items": {}}
     wanted = (lambda i: any(fnmatch.fnmatch(i, pat) for pat in opts["only"].split(","))) if opts["only"] else (lambda i: True)
 
-    def make(asset_id, job, variant):
+    def make(asset_id, job, variant, held=False):
         reset_scene()
         props = PropMaterials(REPO)
         mb = MeshBuilder(f"{asset_id}_v{variant}")
         generators[job["generator"]](mb, job["params"], rng_for(asset_id, variant))
         for slot in mb.materials:
             props.validate(slot)
-        return mb.build(export.simple_material), props
+        obj = mb.build(export.simple_material)
+        return obj, props, socket_gen.resolve(job["generator"], mb, job["params"], *mesh_bounds([obj]), held=held)
 
     for oid, job in sorted(object_jobs.items()):
         if not wanted(oid):
             continue
         models = []
         for v in range(job["variants"]):
-            obj, props = make(oid, job, v)
+            obj, props, _ = make(oid, job, v)
             rel = f"assets/models/objects/{oid}_v{v}.glb"
             export.export_glb([obj], REPO / rel)
             models.append(rel)
@@ -186,13 +205,17 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
             continue
         entry = {k: v for k, v in manifest["items"].get(iid, {}).items() if k == "icon" and not opts["icons"]}
         if "object" in job:
-            obj, props = make(job["object"], object_jobs[job["object"]], 0)
+            obj, props, _ = make(job["object"], object_jobs[job["object"]], 0)
             entry["object"] = job["object"]
         else:
-            obj, props = make(iid, job, 0)
+            obj, props, sockets = make(iid, job, 0, held=True)
             rel = f"assets/models/items/{iid}.glb"
-            export.export_glb([obj], REPO / rel)
+            export.export_glb([obj, *socket_gen.empties(obj, sockets)], REPO / rel)
             entry["model"] = rel
+            if sockets:
+                entry["sockets"] = socket_gen.y_up(sockets)
+            if "icon" in entry:  # icon last, whether or not icons are re-rendered (stable manifest key order)
+                entry["icon"] = entry.pop("icon")
         if opts["icons"]:
             icon = f"assets/icons/items/{iid}.png"
             export.apply_textured_materials([obj], props)
@@ -200,6 +223,16 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
             entry["icon"] = icon
         manifest["items"][iid] = entry
         print(f"item {iid}: {entry}")
+
+    manifest.setdefault("projectiles", {})
+    for mid, job in sorted(projectile_jobs.items()):
+        if not wanted(mid):
+            continue
+        obj, _props, sockets = make(mid, job, 0)
+        rel = f"assets/models/projectiles/{mid}.glb"
+        export.export_glb([obj, *socket_gen.empties(obj, sockets)], REPO / rel)
+        manifest["projectiles"][mid] = {"model": rel, "generator": job["generator"], "sockets": socket_gen.y_up(sockets)}
+        print(f"projectile {mid}: {rel}")
 
     manifest.setdefault("creatures", {})
     for name, job in sorted(creature_jobs.items()):
@@ -231,6 +264,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     manifest["objects"] = dict(sorted(manifest["objects"].items()))
     manifest["items"] = dict(sorted(manifest["items"].items()))
     manifest["creatures"] = dict(sorted(manifest["creatures"].items()))
+    manifest["projectiles"] = dict(sorted(manifest["projectiles"].items()))
     manifest_path.write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
     print(f"wrote {manifest_path.relative_to(REPO)}")
 
@@ -277,19 +311,21 @@ def main() -> int:
     except SpecError as e:
         print("ERROR:", e)
         return 1
-    blocks, items, objects, enemies = load_content()
+    blocks, items, objects, enemies, projectiles = load_content()
     object_jobs, item_jobs, block_icons, creature_jobs, errors = plan(spec, blocks, items, objects, enemies)
+    projectile_jobs, projectile_errors = plan_projectiles(spec, projectiles)
+    errors += projectile_errors
     for e in errors:
         print("ERROR:", e)
     if errors:
         return 1
-    print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(creature_jobs)} creatures, {len(block_icons)} block icons (tools/textures/build_icons.py)")
+    print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(creature_jobs)} creatures, {len(projectile_jobs)} projectiles, {len(block_icons)} block icons (tools/textures/build_icons.py)")
     if opts["check"]:
         return 0
     if opts["anims"]:
         build_anims(opts, creature_jobs)
         return 0
-    build(opts, spec, object_jobs, item_jobs, creature_jobs)
+    build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs)
     return 0
 
 

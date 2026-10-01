@@ -86,7 +86,7 @@
       "params": {
         "height": 5.8,
         "cap": 2.4,
-        "capLayer": "glowing_mushroom",
+        "capLayer": "glowcap",
         "glow": "#5aa0ff"
       }
     },
@@ -129,7 +129,7 @@
     "glowing_mushroom_plant": {
       "generator": "small_mushroom",
       "params": {
-        "capLayer": "glowing_mushroom",
+        "capLayer": "glowcap",
         "glow": true,
         "tint": "#8ab8ff"
       }
@@ -671,7 +671,7 @@
       "glowing_mushroom": {
         "generator": "small_mushroom",
         "params": {
-          "capLayer": "glowing_mushroom",
+          "capLayer": "glowcap",
           "glow": true,
           "tint": "#8ab8ff"
         }

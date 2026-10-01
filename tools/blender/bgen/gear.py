@@ -88,6 +88,7 @@ def gun(mb: MeshBuilder, p, rng):
         mb.cylinder((0, 0.045, 0.1), (0, 0.045, length), 0.018 if style != "shotgun" else 0.024, None, layer, tint, segments=8)
     if p.get("accent"):
         mb.box((-0.035, 0.07, 0.02), (0.035, 0.085, length * 0.6), "prop:plain:glow" if p.get("glow") else "prop:plain", p["accent"])
+    mb.socket("muzzle", (0, 0.04 if style == "minigun" else (0.05 if style == "launcher" else 0.045), length))
 
 
 def bullet(mb: MeshBuilder, p, rng):
@@ -126,6 +127,7 @@ def rod(mb: MeshBuilder, p, rng):
     line = [Vector((0, 0, 0.9)), Vector((0.04, 0, 0.7)), Vector((0.06, 0, 0.5))]
     mb.tube(line, [0.0015] * 3, "prop:plain", "#e8e8e8", segments=3)
     mb.sphere((0.06, 0, 0.48), 0.018, "prop:plain", p.get("bobber", "#e83030"), subdivisions=1)
+    mb.socket("tip", (0, 0, 0.9))
 
 
 def mirror(mb: MeshBuilder, p, rng):
@@ -175,6 +177,7 @@ def whip(mb: MeshBuilder, p, rng):
     mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", p.get("handle", "#5a3a24"), segments=6)
     coil = [Vector((math.cos(a) * (0.1 - a * 0.004), math.sin(a) * (0.1 - a * 0.004), 0.1 + a * 0.01)) for a in (i * 0.4 for i in range(40))]
     mb.tube(coil, [0.01 - i * 0.0002 for i in range(40)], "prop:leather", p.get("color", "#6a4a2a"), segments=4)
+    mb.socket("handle_end", (0, 0, 0.08))
 
 
 def boomerang(mb: MeshBuilder, p, rng):
@@ -186,11 +189,17 @@ def boomerang(mb: MeshBuilder, p, rng):
 
 
 def yoyo(mb: MeshBuilder, p, rng):
-    """Two discs on an axle with a coil of string."""
+    """Two discs on an axle with a coil of string; ``head_only`` (the thrown projectile) centres the discs on the
+    origin without the string."""
     color = p.get("color", "#b0703a")
+    z = 0.0 if p.get("head_only") else 0.12
+    layer = "prop:plain:glow" if p.get("glow") else "prop:plain"
     for y in (-0.03, 0.03):
-        mb.cylinder((0, y, 0.12), (0, y + (0.02 if y > 0 else -0.02), 0.12), 0.09, 0.08, "prop:plain", color, segments=14)
-    mb.cylinder((0, -0.03, 0.12), (0, 0.03, 0.12), 0.02, None, "prop:plain", "#e8e8e8", segments=8)
+        mb.cylinder((0, y, z), (0, y + (0.02 if y > 0 else -0.02), z), 0.09, 0.08, layer, color, segments=14)
+    mb.cylinder((0, -0.03, z), (0, 0.03, z), 0.02, None, "prop:plain", p.get("axle", "#e8e8e8"), segments=8)
+    mb.socket("string", (0, 0, z))
+    if p.get("head_only"):
+        return
     string = [Vector((0, 0, 0.12)), Vector((0.02, 0, 0.0)), Vector((0.0, 0, -0.1))]
     mb.tube(string, [0.003] * 3, "prop:plain", "#f0f0f0", segments=3)
 
@@ -198,14 +207,19 @@ def yoyo(mb: MeshBuilder, p, rng):
 def flail(mb: MeshBuilder, p, rng):
     """A handle, a short chain and a spiked (or glowing) ball."""
     layer, tint = _metal(p, "#9098a0")
-    mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", "#5a3a24", segments=6)
-    chain = [Vector((0, 0, 0.08)), Vector((0.03, 0, 0.18)), Vector((0.02, 0, 0.28))]
-    mb.tube(chain, [0.008] * 3, "prop:iron", "#8a8e96", segments=4)
+    centre = Vector((0, 0, 0)) if p.get("head_only") else Vector((0.02, 0, 0.36))
+    if p.get("head_only"):  # the thrown ball: centred on the origin, its chain attaches at the bottom
+        mb.socket("chain", (0, 0, -0.08), (0, 0, -1))
+    else:
+        mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", "#5a3a24", segments=6)
+        chain = [Vector((0, 0, 0.08)), Vector((0.03, 0, 0.18)), Vector((0.02, 0, 0.28))]
+        mb.tube(chain, [0.008] * 3, "prop:iron", "#8a8e96", segments=4)
+        mb.socket("chain", (0, 0, 0.08))
     ball = "prop:plain:glow" if p.get("glow") else layer
-    mb.sphere((0.02, 0, 0.36), 0.08, ball, p.get("ball", tint), subdivisions=2)
+    mb.sphere(tuple(centre), 0.08, ball, p.get("ball", tint), subdivisions=2)
     for k in range(6):
         d = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)][k]
-        base = Vector((0.02, 0, 0.36)) + Vector(d) * 0.07
+        base = centre + Vector(d) * 0.07
         mb.cylinder(tuple(base), tuple(base + Vector(d) * 0.05), 0.02, 0.002, layer, tint, segments=5)
 
 

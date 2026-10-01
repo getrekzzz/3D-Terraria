@@ -1,6 +1,6 @@
 """The Blender asset spec: tools/blender/assets.json merged with every drop-in file tools/blender/assets.d/*.json.
 
-A drop-in file has the same schema as assets.json and may add entries to "metals", "objects", "creatures",
+A drop-in file has the same schema as assets.json and may add entries to "metals", "objects", "creatures", "projectiles",
 "items.patterns" and "items.explicit" (plus a free-form "comment"). Files merge in file-name order; an id that is
 already defined (in assets.json or an earlier drop-in) is an error, as is any other key. Every tool that reads the
 spec goes through load_spec() so they all see the same set; plain Python, no Blender needed.
@@ -13,7 +13,7 @@ BASE = HERE / "assets.json"
 DROP_IN = HERE / "assets.d"
 
 # Id maps a drop-in file may add to, as key paths into the spec.
-SECTIONS = (("metals",), ("objects",), ("items", "patterns"), ("items", "explicit"), ("creatures",))
+SECTIONS = (("metals",), ("objects",), ("items", "patterns"), ("items", "explicit"), ("creatures",), ("projectiles",))
 
 
 class SpecError(ValueError):
