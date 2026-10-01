@@ -9,13 +9,13 @@
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor
   (grass, bushes, rubble) and tree canopies stop the ray: `ItemUseSystem.FilterFor` gives tools `Decor` and axes
-  `TreeCanopy` too; otherwise a tree only counts inside `TileObjectInstance.TrunkBox`, the same column the
-  body collider uses. `Targeting.CastView` starts the crosshair ray where it crosses the eye's plane (nothing
-  between the shoulder camera and the player can be selected) and measures `Distance` from the eye;
-  `CastWhere` exposes the raw walk with a custom stop test. `ItemUseSystem.ReachMeters` (item reach plus the
-  Reach stat) bounds both the use and the in-reach highlight. `PlayerEntity.ViewDirection` (camera forward)
-  feeds `Facing`, which drives `FacingQuarter` and the melee arc yaw; `Aim` (eye to crosshair point) keeps the
-  pitch, shots and drops.
+  `TreeCanopy` too; otherwise a tree only counts where the ray crosses `TileObjectInstance.TrunkBox` (an exact
+  ray-box test), the same column the body collider uses. `Targeting.CastView` starts the crosshair ray where it
+  crosses the eye's plane (nothing between the shoulder camera and the player can be selected) and measures
+  `Distance` from the eye; `CastWhere` exposes the raw walk with a custom stop test. `ItemUseSystem.ReachMeters`
+  (item reach plus the Reach stat) bounds both the use and the in-reach highlight. `PlayerEntity.ViewDirection`
+  (camera forward) feeds `Facing`, which drives `FacingQuarter` and the melee arc yaw; `Aim` (eye to crosshair
+  point) keeps the pitch, shots and drops.
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback

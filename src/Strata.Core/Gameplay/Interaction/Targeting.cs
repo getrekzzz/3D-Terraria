@@ -55,7 +55,7 @@ public static class Targeting
         if (direction.LengthSquared() < 1e-10f) return null;
         direction = Vector3.Normalize(direction);
         var origin = originMeters / Units.CellSize;
-        var test = new FilteredHit(world, filter);
+        var test = new FilteredHit(world, filter, origin, direction);
         var hit = Walk(world, origin, direction, reachMeters / Units.CellSize, ref test);
         if (hit == null) return null;
         var (cell, normal, t, blockId) = hit.Value;
@@ -77,7 +77,7 @@ public static class Targeting
         var start = camera + dir * startT;
         float lateral = Vector3.Distance(eye, start);
         var origin = start / Units.CellSize;
-        var test = new FilteredHit(world, filter);
+        var test = new FilteredHit(world, filter, origin, dir);
         var hit = Walk(world, origin, dir, (reachMeters + lateral + 0.5f) / Units.CellSize, ref test);
         if (hit == null) return null;
         var (cell, normal, t, blockId) = hit.Value;
@@ -167,20 +167,27 @@ public static class Targeting
 
     /// <summary>
     /// Rendered blocks and tile objects stop the ray; decor only with <see cref="TargetFilter.Decor"/>, and a tree-like
-    /// object only inside its trunk column unless <see cref="TargetFilter.TreeCanopy"/> is set.
+    /// object only where the ray crosses its trunk column unless <see cref="TargetFilter.TreeCanopy"/> is set.
     /// </summary>
     private struct FilteredHit : ICellTest
     {
         private readonly VoxelWorld _world;
         private readonly TargetFilter _filter;
+        private readonly Vector3 _origin, _dir;
 
         /// <summary>The object that stopped the ray (null for a block).</summary>
         public TileObjectInstance? Object;
 
-        public FilteredHit(VoxelWorld world, TargetFilter filter)
+        /// <param name="world">The world walked.</param>
+        /// <param name="filter">Which soft objects stop the ray.</param>
+        /// <param name="origin">Ray origin in cell units.</param>
+        /// <param name="dir">Normalized ray direction.</param>
+        public FilteredHit(VoxelWorld world, TargetFilter filter, Vector3 origin, Vector3 dir)
         {
             _world = world;
             _filter = filter;
+            _origin = origin;
+            _dir = dir;
             Object = null;
         }
 
@@ -190,9 +197,38 @@ public static class Targeting
             var o = _world.TileObjects.At(cell);
             if (o == null) return false;
             if (o.Def.Decor && (_filter & TargetFilter.Decor) == 0) return false;
-            if (o.Def.Collision == Content.Defs.TileCollision.Trunk && (_filter & TargetFilter.TreeCanopy) == 0 && !o.TrunkContains(cell)) return false;
+            if (o.Def.Collision == Content.Defs.TileCollision.Trunk && (_filter & TargetFilter.TreeCanopy) == 0 && !CrossesTrunk(o, cell)) return false;
             Object = o;
             return true;
+        }
+
+        /// <summary>
+        /// The ray passes through the part of <paramref name="o"/>'s trunk column inside <paramref name="cell"/>. The
+        /// column is the body collider's exact box, so one narrower or wider than whole cells (mahogany, giant
+        /// mushrooms) is hit exactly where it stops the player, not wherever a cell centre happens to fall.
+        /// </summary>
+        private readonly bool CrossesTrunk(TileObjectInstance o, Int3 cell)
+        {
+            var (trunkMin, trunkMax) = o.TrunkBox;
+            var lo = new Vector3(cell.X, cell.Y, cell.Z);
+            var min = Vector3.Max(trunkMin, lo);
+            var max = Vector3.Min(trunkMax, lo + Vector3.One);
+            if (min.X >= max.X || min.Y >= max.Y || min.Z >= max.Z) return false; // the column does not reach into this cell
+            float enter = 0f, exit = float.PositiveInfinity;
+            return Slab(_origin.X, _dir.X, min.X, max.X, ref enter, ref exit)
+                && Slab(_origin.Y, _dir.Y, min.Y, max.Y, ref enter, ref exit)
+                && Slab(_origin.Z, _dir.Z, min.Z, max.Z, ref enter, ref exit);
+        }
+
+        /// <summary>Narrows the ray's [enter, exit] interval to one axis of a box; false once it is empty.</summary>
+        private static bool Slab(float o, float d, float min, float max, ref float enter, ref float exit)
+        {
+            if (MathF.Abs(d) < 1e-8f) return o >= min && o <= max;
+            float a = (min - o) / d, b = (max - o) / d;
+            if (a > b) (a, b) = (b, a);
+            enter = MathF.Max(enter, a);
+            exit = MathF.Min(exit, b);
+            return enter <= exit;
         }
     }
 

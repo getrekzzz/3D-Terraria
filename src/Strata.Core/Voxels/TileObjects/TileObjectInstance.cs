@@ -70,14 +70,6 @@ public sealed class TileObjectInstance
         }
     }
 
-    /// <summary>The cell's centre lies inside <see cref="TrunkBox"/>.</summary>
-    public bool TrunkContains(Int3 cell)
-    {
-        var (min, max) = TrunkBox;
-        float x = cell.X + 0.5f, y = cell.Y + 0.5f, z = cell.Z + 0.5f;
-        return x >= min.X && x <= max.X && y >= min.Y && y <= max.Y && z >= min.Z && z <= max.Z;
-    }
-
     public static Int3 FootprintOf(TileObjectDef def, int rotation) =>
         (rotation & 1) == 0 ? new Int3(def.SizeX, def.SizeY, def.SizeZ) : new Int3(def.SizeZ, def.SizeY, def.SizeX);
 

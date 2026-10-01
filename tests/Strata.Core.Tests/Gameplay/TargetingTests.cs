@@ -30,6 +30,20 @@ public class TargetingTests
     private static Int3 CellOf(Vector3 meters) => new(
         (int)MathF.Floor(meters.X / Units.CellSize), (int)MathF.Floor(meters.Y / Units.CellSize), (int)MathF.Floor(meters.Z / Units.CellSize));
 
+    /// <summary>Air and no objects from the floor up to <paramref name="top"/> cells, in front of the arena centre.</summary>
+    private static void ClearAbove(TestGame g, int top)
+    {
+        var world = g.World.Session.World;
+        var batch = world.BeginEdit();
+        for (int y = 1; y <= top; y++)
+            for (int z = -1; z <= 10; z++)
+                for (int x = -3; x <= 3; x++)
+                    batch.SetBlock(g.Floor.X + x, g.Floor.Y + y, g.Floor.Z + z, 0);
+        g.World.Session.Commit(batch);
+        var clear = new Aabb3i(g.Floor + new Int3(-3, 1, -1), g.Floor + new Int3(4, top + 1, 11));
+        foreach (var o in world.TileObjects.InBox(clear).ToList()) world.TileObjects.Remove(o);
+    }
+
     [Fact]
     public void ViewRayIgnoresBlocksBetweenCameraAndPlayer()
     {
@@ -83,15 +97,7 @@ public class TargetingTests
     {
         using var g = Arena();
         var world = g.World.Session.World;
-        // Open air well above the arena for the 22-cell tree and a backstop behind its canopy.
-        var batch = world.BeginEdit();
-        for (int y = 1; y <= 25; y++)
-            for (int z = -1; z <= 10; z++)
-                for (int x = -2; x <= 2; x++)
-                    batch.SetBlock(g.Floor.X + x, g.Floor.Y + y, g.Floor.Z + z, 0);
-        g.World.Session.Commit(batch);
-        var clear = new Aabb3i(g.Floor + new Int3(-2, 1, -1), g.Floor + new Int3(3, 26, 11));
-        foreach (var o in world.TileObjects.InBox(clear).ToList()) world.TileObjects.Remove(o);
+        ClearAbove(g, 25); // open air well above the arena for the 22-cell tree and a backstop behind its canopy
 
         var tree = new TileObjectInstance(g.Content.TileObjects.Get("oak_tree"), g.Floor + new Int3(-1, 1, 4), 0, 0);
         Assert.True(world.TileObjects.TryAdd(tree));
@@ -114,6 +120,59 @@ public class TargetingTests
         Assert.Same(tree, atTrunk!.Object);
         Assert.Equal(g.Floor.Z + 5, atTrunk.Cell.Z); // passes the outer cells of the box, stops at the column
         Assert.Same(tree, Targeting.Cast(world, trunk, Vector3.UnitZ, 10f, TargetFilter.TreeCanopy)!.Object);
+    }
+
+    [Fact]
+    public void TrunkColumnIsHitExactlyWhereItsColliderIs()
+    {
+        using var g = Arena();
+        var world = g.World.Session.World;
+        ClearAbove(g, 31);
+        for (int x = -3; x <= 3; x++) SetBlock(g, g.Floor + new Int3(x, 3, 9), "stone"); // a backstop behind the trunks
+        // A ray along +Z at trunk height, x cells east of the arena centre cell's west edge.
+        Target? RayAt(float x) => Targeting.Cast(world, new Vector3(g.Floor.X + x, g.Floor.Y + 3.5f, g.Floor.Z + 0.5f) * Units.CellSize, Vector3.UnitZ, 10f, TargetFilter.None);
+        bool Passes(float x) => RayAt(x) is { Object: null } t && t.Cell.Z == g.Floor.Z + 9;
+
+        // Mahogany (4 wide): the column is 1.33 cells wide, x in [-0.67, 0.67]. A ray through the outer cell's centre
+        // half misses the column (and the collider), so it must pass.
+        var mahogany = new TileObjectInstance(g.Content.TileObjects.Get("mahogany_tree"), g.Floor + new Int3(-2, 1, 3), 0, 0);
+        Assert.True(world.TileObjects.TryAdd(mahogany));
+        Assert.Equal(-2f / 3f, mahogany.TrunkBox.Min.X - g.Floor.X, 3);
+        Assert.True(Passes(-0.8f));
+        Assert.Same(mahogany, RayAt(-0.5f)!.Object);
+        Assert.Same(mahogany, RayAt(0.6f)!.Object);
+        world.TileObjects.Remove(mahogany);
+
+        // Giant glowing mushroom (5 wide): the stem is 1.67 cells wide, x in [-0.33, 1.33], so it reaches into cells whose
+        // centres lie outside it; a ray through that part must still stop at the stem.
+        var mushroom = new TileObjectInstance(g.Content.TileObjects.Get("giant_glowing_mushroom"), g.Floor + new Int3(-2, 1, 3), 0, 0);
+        Assert.True(world.TileObjects.TryAdd(mushroom));
+        var stem = RayAt(-0.2f);
+        Assert.Same(mushroom, stem!.Object);
+        Assert.Equal(g.Floor.Z + 4, stem.Cell.Z); // the stem starts at z 4.67, inside cell 4
+        Assert.Same(mushroom, RayAt(1.25f)!.Object);
+        Assert.True(Passes(-0.45f));
+        Assert.True(Passes(1.45f));
+    }
+
+    [Fact]
+    public void CastWhereStopsWhereTheCallerSays()
+    {
+        using var g = Arena();
+        var world = g.World.Session.World;
+        SetBlock(g, g.Floor + new Int3(0, 1, 3), "stone");
+        var dirtCell = g.Floor + new Int3(0, 1, 6);
+        SetBlock(g, dirtCell, "dirt");
+        ushort dirt = g.Content.BlockId("dirt");
+        var origin = TestGame.CellCenter(g.Floor + Int3.Up);
+
+        var hit = Targeting.CastWhere(world, origin, Vector3.UnitZ, 10f, (_, block) => block == dirt); // looks through the stone
+        Assert.NotNull(hit);
+        Assert.Equal(dirtCell, hit.Cell);
+        Assert.Equal(new Int3(0, 0, -1), hit.Normal);
+        Assert.Null(hit.Object);
+        Assert.Equal(5.5f * Units.CellSize, hit.Distance, 3); // metres from the origin
+        Assert.Null(Targeting.CastWhere(world, origin, Vector3.UnitZ, 2f, (_, block) => block == dirt));
     }
 
     [Fact]

@@ -110,13 +110,15 @@ public sealed partial class InteractionController : Node
             Target = hit with { Distance = fromEye };
             InReach = fromEye <= reach;
             Entity.Aim = AimTowards(point, dir);
+            Entity.AimDistance = fromEye;
         }
         else
         {
             Target = null;
             InReach = false;
-            var far = origin + dir * 40f;
-            Entity.Aim = AimTowards(ToCore(far), dir);
+            var far = ToCore(origin + dir * 40f);
+            Entity.Aim = AimTowards(far, dir);
+            Entity.AimDistance = System.Numerics.Vector3.Distance(far, Entity.Eye);
         }
         if (DigDownTarget(dir) is { } below)
         {
