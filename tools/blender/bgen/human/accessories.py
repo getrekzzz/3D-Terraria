@@ -1,4 +1,4 @@
-"""Hats (cap, wide brim, hood, wreath), a face mask, aprons and creature features (horns, bat wings, a spaded tail), fitted to
+"""Hats (cap, wide brim, hood, wreath, bandana, tricorne, goblin helm), a face mask, an eye patch, aprons and creature features (horns, bat wings, a spaded tail), fitted to
 the generated head and body and bound to the bones that carry them."""
 import math
 
@@ -58,6 +58,29 @@ def hat(head, head_obj, kind, color, flower="#f0d040"):
             bmesh.ops.scale(bm, vec=(1.4, 0.7, 0.5), verts=res["verts"])
             bmesh.ops.rotate(bm, cent=Vector(), matrix=Matrix.Rotation(a + 1.2, 3, "Z"), verts=res["verts"])
             bmesh.ops.translate(bm, vec=c, verts=res["verts"])
+    elif kind == "bandana":  # a pirate's head scarf: a snug cap with a knot and two tails at the back
+        prof = [(0.09 * h * math.cos(a), 0.012 * h + 0.07 * h * math.sin(a)) for a in (i * math.pi / 2 / 8 for i in range(9))]
+        _lathe(bm, top + Vector((0, -0.004 * h, -0.012 * h)), prof, 28, 1.12)
+        knot = head.at((0.0, -0.105, 0.0))
+        for dx, dz in ((0.0, 0.0), (0.012, -0.03), (-0.012, -0.045)):
+            res = bmesh.ops.create_icosphere(bm, subdivisions=1, radius=0.016 * h)
+            bmesh.ops.scale(bm, vec=(1.0, 0.6, 1.4 if dz else 1.0), verts=res["verts"])
+            bmesh.ops.translate(bm, vec=knot + Vector((dx, -0.01, dz)) * h, verts=res["verts"])
+    elif kind == "tricorne":  # a captain's three-cornered hat: a crown with the brim turned up in three points
+        crown = [(0.098 * h, 0.06 * h), (0.094 * h, 0.13 * h), (0.075 * h, 0.15 * h), (0.0, 0.152 * h)]
+        _lathe(bm, top, crown, 30, 1.08)
+        corners = [head.at((math.cos(a) * 0.17, math.sin(a) * 0.17 - 0.012, 0.11)) for a in (math.pi / 2, math.pi / 2 + 2.1, math.pi / 2 - 2.1)]
+        rim = [head.at((math.cos(a) * 0.1, math.sin(a) * 0.1 - 0.012, 0.06)) for a in (math.pi / 2 + k * 2 * math.pi / 6 for k in range(6))]
+        for i in range(3):
+            a, b, c = rim[2 * i], rim[2 * i + 1], rim[(2 * i + 2) % 6]
+            tip = corners[i]
+            for p0, p1 in ((a, b), (b, c)):
+                bm.faces.new([bm.verts.new(p0), bm.verts.new(p1), bm.verts.new(tip)])
+    elif kind == "helm":  # a goblin warrior's iron cap with a nose guard
+        prof = [(0.1 * h * math.cos(a), 0.0 + 0.085 * h * math.sin(a)) for a in (i * math.pi / 2 / 8 for i in range(9))]
+        _lathe(bm, top + Vector((0, 0, -0.01 * h)), prof, 28, 1.1)
+        nose = [bm.verts.new(head.at(q)) for q in ((-0.008, 0.108, 0.0), (0.008, 0.108, 0.0), (0.006, 0.112, -0.045), (-0.006, 0.112, -0.045))]
+        bm.faces.new(nose)
     colorize(bm, color)
     if kind == "wreath":
         layer = bm.loops.layers.color["Color"]
@@ -69,7 +92,7 @@ def hat(head, head_obj, kind, color, flower="#f0d040"):
                     loop[layer] = (*fc, 1.0)
     bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     obj = mesh_from(bm, f"hat_{kind}")
-    set_slot(obj, "char:cloth")
+    set_slot(obj, "char:metal" if kind == "helm" else "char:cloth")
     rigid(obj, "head")
     return obj
 
@@ -94,6 +117,24 @@ def mask(head, head_obj, color):
     colorize(bm, color)
     obj = mesh_from(bm, "mask")
     set_slot(obj, "char:bone")
+    rigid(obj, "head")
+    return obj
+
+
+def eyepatch(head, color="#141414"):
+    """A pirate's eye patch over the left eye with its strap around the head."""
+    h = head.h
+    bm = bmesh.new()
+    eye = head.eyes[-1]
+    res = bmesh.ops.create_circle(bm, cap_ends=True, segments=12, radius=0.02 * h)
+    bmesh.ops.rotate(bm, cent=Vector(), matrix=Matrix.Rotation(math.pi / 2, 3, "X"), verts=res["verts"])
+    bmesh.ops.translate(bm, vec=eye + Vector((0, 0.014 * h, 0.0)), verts=res["verts"])
+    strap = [head.at((math.cos(a) * 0.087, math.sin(a) * 0.1, 0.01 + 0.012 * math.sin(a))) for a in (i * 2 * math.pi / 24 for i in range(25))]
+    _tube(bm, strap, [0.0025 * h] * 25, 4)
+    colorize(bm, color)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    obj = mesh_from(bm, "eyepatch")
+    set_slot(obj, "char:leather")
     rigid(obj, "head")
     return obj
 

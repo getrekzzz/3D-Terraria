@@ -167,6 +167,11 @@ class Head:
                 B.capsule(a + out * 0.006 * h, b + out * 0.006 * h, 0.0038 * h)
             B.ellipsoid(c + out * 0.009 * h + Vector((0, 0.002, -0.004)) * h, (0.011 * h, 0.009 * h, 0.004 * h), rot, negative=True)
             B.ball(c + Vector((0, 0.004, -0.028)) * h + out * 0.004 * h, 0.0068 * h)
+            if self.p.get("ears") == "pointed":  # goblins, elves: a long blade swept back and up from the helix
+                for k in range(9):
+                    t = k / 8
+                    q = c + out * 0.006 * h + Vector((sx * 0.052 * t, -0.034 * t, 0.02 + 0.03 * t)) * h
+                    B.ellipsoid(q, ((0.016 - 0.012 * t) * h, (0.011 - 0.008 * t) * h, 0.004 * h), rot)
             parts.append(B.to_mesh(f"ear_{sx}", 1400, smooth_iterations=1))
         return parts
 

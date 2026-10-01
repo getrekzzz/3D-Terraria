@@ -32,3 +32,33 @@ assert errors == 0
 killall
 assert npcs.count == 0
 assert errors == 0
+
+# --- P3-43/P3-44/P3-45/P3-50 ---
+# Creatures with their own bodies now (canines, spiders, mimic, shark, flinx, tortoise, lizard, winged serpent, bone
+# serpent, eater of souls, crimera, elementals, antlion), the reworked common enemies and the themed humanoids load
+# and animate without problems.
+god on
+spawn wolf 1
+spawn black_recluse 1
+spawn mimic 1
+spawn snow_flinx 1
+spawn giant_tortoise 1
+spawn salamander 1
+spawn flying_snake 1
+spawn bone_serpent 1
+spawn eater_of_souls 1
+spawn crimera 1
+spawn granite_elemental 1
+spawn antlion 1
+spawn green_slime 1
+spawn demon_eye 1
+spawn cave_bat 1
+spawn cursed_skull 1
+spawn wyvern 1
+spawn goblin_warrior 1
+spawn pirate_captain 1
+wait 1
+assert props.problems == 0
+assert errors == 0
+killall
+assert errors == 0

@@ -166,7 +166,7 @@ def prime_tool(mb: MeshBuilder, p, rng):
         mb.cylinder((0, -0.1, 0), (0, 1.0, 0), 0.17, 0.12, "prop:iron", STEEL, segments=14)
         for k in range(6):
             y = 0.05 + k * 0.15
-            mb.cylinder((0, y, 0), (0, y + 0.06, 0), 0.26, None, "prop:copper", "#e08c5a", segments=16)
+            mb.cylinder((0, y, 0), (0, y + 0.06, 0), 0.26, None, "prop:iron:metal", "#e08c5a", segments=16)
         mb.sphere((0, 1.02, 0), 0.15, "prop:plain:glow", glow, subdivisions=2)
 
 

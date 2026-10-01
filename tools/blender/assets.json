@@ -123,7 +123,9 @@
     "mushroom_plant": {
       "generator": "small_mushroom",
       "params": {
-        "capLayer": "red_cap"
+        "capLayer": "plain",
+        "tint": "#d0402c",
+        "spots": 5
       }
     },
     "glowing_mushroom_plant": {
@@ -671,7 +673,9 @@
       "mushroom": {
         "generator": "small_mushroom",
         "params": {
-          "capLayer": "red_cap"
+          "capLayer": "plain",
+        "tint": "#d0402c",
+        "spots": 5
         }
       },
       "fallen_star": {
@@ -3685,20 +3689,9 @@
         "hairStyle": "messy"
       }
     },
-    "gel": {
-      "generator": "gel",
-      "params": {}
-    },
-    "demon_eye": {
-      "generator": "eye",
-      "params": {
-        "iris": "#e0201a"
-      }
-    },
-    "cave_bat": {
-      "generator": "bat",
-      "params": {}
-    },
+    "gel": {"generator": "jelly_slime", "params": {}},
+    "demon_eye": {"generator": "veined_eye", "params": {"iris": "#e0201a"}},
+    "cave_bat": {"generator": "fur_bat", "params": {}},
     "king_slime": {
       "generator": "slime_king",
       "params": {}
@@ -3881,16 +3874,7 @@
         "size": 1.1
       }
     },
-    "cursed_skull": {
-      "generator": "skull",
-      "params": {
-        "radius": 0.42,
-        "centerZ": 0.42,
-        "bone": "#d8e0c8",
-        "eyes": "#50ff80",
-        "cracks": 1
-      }
-    },
+    "cursed_skull": {"generator": "cursed_skull", "params": {"radius": 0.42, "centerZ": 0.42, "bone": "#d8e0c8", "eyes": "#50ff80", "cracks": 1}},
     "dark_caster": {
       "generator": "humanoid",
       "params": {
@@ -4128,22 +4112,8 @@
       "generator": "creeper_eye",
       "params": {}
     },
-    "eater_of_souls": {
-      "generator": "insect",
-      "params": {
-        "color": "#6a5a8a",
-        "stripes": "#3a2a4a",
-        "eyes": "#c080ff"
-      }
-    },
-    "crimera": {
-      "generator": "insect",
-      "params": {
-        "color": "#b83a3a",
-        "stripes": "#5a1a1a",
-        "eyes": "#ffd040"
-      }
-    },
+    "eater_of_souls": {"generator": "eater_of_souls", "params": {"skin": "#6a5a8a", "inner": "#c04a8a"}},
+    "crimera": {"generator": "crimera", "params": {"flesh": "#b83a3a", "eyes": "#f0e8c8"}},
     "face_monster": {
       "generator": "humanoid",
       "params": {
@@ -4159,12 +4129,7 @@
         "weight": 0.6
       }
     },
-    "blood_crawler": {
-      "generator": "crab",
-      "params": {
-        "shell": "#8a1a2a"
-      }
-    },
+    "blood_crawler": {"generator": "spider", "params": {"shell": "#8a1a2a", "mark": "#f0c0a0", "eyes": "#ffe060"}},
     "bee": {
       "generator": "insect",
       "params": {
@@ -4192,7 +4157,8 @@
         "weight": 0.35,
         "shirt": "#7a5a3a",
         "pants": "#5a4028",
-        "boots": "#3a2a1a"
+        "boots": "#3a2a1a",
+        "ears": "pointed"
       }
     },
     "goblin_thief": {
@@ -4208,7 +4174,8 @@
         "pants": "#2a2a34",
         "boots": "#1a1a20",
         "hat": "hood",
-        "hatColor": "#2a2a3a"
+        "hatColor": "#2a2a3a",
+        "ears": "pointed"
       }
     },
     "goblin_warrior": {
@@ -4222,7 +4189,10 @@
         "weight": 0.6,
         "shirt": "#8a8e96",
         "pants": "#5a5e66",
-        "boots": "#3a3e46"
+        "boots": "#3a3e46",
+        "ears": "pointed",
+        "hat": "helm",
+        "hatColor": "#8a8e96"
       }
     },
     "goblin_sorcerer": {
@@ -4240,7 +4210,8 @@
         "robe": "#6a3a9a",
         "trim": "#c08aff",
         "hat": "hood",
-        "hatColor": "#5a2a8a"
+        "hatColor": "#5a2a8a",
+        "ears": "pointed"
       }
     },
     "goblin_archer": {
@@ -4254,7 +4225,8 @@
         "weight": 0.35,
         "shirt": "#4a6a3a",
         "pants": "#3a4a2a",
-        "boots": "#2a3a1a"
+        "boots": "#2a3a1a",
+        "ears": "pointed"
       }
     },
     "harpy": {
@@ -4273,32 +4245,9 @@
         "height": 1.6
       }
     },
-    "wyvern_head": {
-      "generator": "worm_segment",
-      "params": {
-        "part": "head",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8"
-      }
-    },
-    "wyvern_body": {
-      "generator": "worm_segment",
-      "params": {
-        "part": "segment",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8",
-        "radius": 0.6
-      }
-    },
-    "wyvern_tail": {
-      "generator": "worm_segment",
-      "params": {
-        "part": "tail",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8",
-        "radius": 0.55
-      }
-    },
+    "wyvern_head": {"generator": "wyvern_part", "params": {"part": "head", "scales": "#f0f0f8", "mane": "#9ab8e8", "radius": 0.55}},
+    "wyvern_body": {"generator": "wyvern_part", "params": {"part": "segment", "scales": "#f0f0f8", "mane": "#9ab8e8", "radius": 0.45}},
+    "wyvern_tail": {"generator": "wyvern_part", "params": {"part": "tail", "scales": "#f0f0f8", "mane": "#9ab8e8", "radius": 0.42}},
     "lihzahrd": {
       "generator": "humanoid",
       "params": {
@@ -4315,14 +4264,7 @@
         "height": 1.7
       }
     },
-    "flying_snake": {
-      "generator": "bird",
-      "params": {
-        "feathers": "#5a8a3a",
-        "head": "#8ab04a",
-        "wing": "#4a6a2a"
-      }
-    },
+    "flying_snake": {"generator": "flying_serpent", "params": {"scales": "#5a8a3a", "belly": "#c8d870", "wing": "#d84a2a"}},
     "plantera": {
       "generator": "plantera_bulb",
       "params": {}
@@ -5095,19 +5037,7 @@
         "weight": 0.2
       }
     },
-    "hellhound": {
-      "generator": "steed",
-      "params": {
-        "coat": "#1a1414",
-        "hoof": "#3a1a0a",
-        "horn": "#ff4a1a",
-        "mane": [
-          "#ff4a1a",
-          "#ff8a2a",
-          "#ffc040"
-        ]
-      }
-    },
+    "hellhound": {"generator": "canine", "params": {"fur": "#2a1a18", "belly": "#4a2a20", "eyes": "#ff4a1a", "mane": "#ff6a1a"}},
     "headless_horseman": {
       "generator": "steed",
       "params": {
@@ -5144,7 +5074,8 @@
         "hat": "cap",
         "hatColor": "#3a8a3a",
         "height": 1.25,
-        "undead": true
+        "undead": true,
+        "ears": "pointed"
       }
     },
     "gingerbread_man": {
@@ -5171,7 +5102,8 @@
         "boots": "#3a2a1a",
         "hat": "cap",
         "hatColor": "#c82a2a",
-        "height": 1.25
+        "height": 1.25,
+        "ears": "pointed"
       }
     },
     "nutcracker": {
@@ -5285,7 +5217,7 @@
         "shirt": "#e8e8f0",
         "pants": "#3a3a5a",
         "boots": "#1a1a1a",
-        "hat": "cap",
+        "hat": "bandana",
         "hatColor": "#c82a2a"
       }
     },
@@ -5300,8 +5232,9 @@
         "pants": "#2a2a2a",
         "boots": "#1a1a1a",
         "belt": "#c8a040",
-        "hat": "cap",
-        "hatColor": "#1a1a1a"
+        "hat": "bandana",
+        "hatColor": "#1a1a1a",
+        "eyepatch": "#141414"
       }
     },
     "pirate_deadeye": {
@@ -5313,7 +5246,10 @@
         "shirt": "#5a4a3a",
         "pants": "#3a3a3a",
         "boots": "#1a1a1a",
-        "coat": "#3a2a1a"
+        "coat": "#3a2a1a",
+        "hat": "bandana",
+        "hatColor": "#3a5a8a",
+        "eyepatch": "#141414"
       }
     },
     "pirate_crossbower": {
@@ -5341,7 +5277,7 @@
         "boots": "#1a1a1a",
         "coat": "#1a1a4a",
         "trim": "#e8c040",
-        "hat": "wide",
+        "hat": "tricorne",
         "hatColor": "#1a1a1a",
         "height": 1.9
       }
@@ -5413,7 +5349,8 @@
         "weight": 0.35,
         "shirt": "#4a3a6a",
         "pants": "#2a1a4a",
-        "boots": "#1a1030"
+        "boots": "#1a1030",
+        "ears": "pointed"
       }
     },
     "kobold": {
@@ -5488,13 +5425,7 @@
       "generator": "dragon",
       "params": {}
     },
-    "antlion": {
-      "generator": "crab",
-      "params": {
-        "shell": "#c8a060",
-        "claw": "#8a6a3a"
-      }
-    },
+    "antlion": {"generator": "antlion", "params": {"shell": "#c8a060", "sand": "#d8c08a"}},
     "antlion_charger": {
       "generator": "crab",
       "params": {
@@ -5557,13 +5488,7 @@
         "height": 1.6
       }
     },
-    "granite_elemental": {
-      "generator": "jelly",
-      "params": {
-        "color": "#3a4a8a",
-        "core": "#8ae0ff"
-      }
-    },
+    "granite_elemental": {"generator": "elemental", "params": {"color": "#3a4a8a", "core": "#8ae0ff"}},
     "hoplite": {
       "generator": "humanoid",
       "params": {
@@ -5591,24 +5516,9 @@
         "tail": "#6a9a5a"
       }
     },
-    "wall_creeper": {
-      "generator": "crab",
-      "params": {
-        "shell": "#3a2a2a"
-      }
-    },
-    "black_recluse": {
-      "generator": "crab",
-      "params": {
-        "shell": "#1a1a1a"
-      }
-    },
-    "salamander": {
-      "generator": "crab",
-      "params": {
-        "shell": "#c8a060"
-      }
-    },
+    "wall_creeper": {"generator": "spider", "params": {"shell": "#3a2a2a", "mark": "#8a6a4a", "eyes": "#ffb020", "hairy": true}},
+    "black_recluse": {"generator": "spider", "params": {"shell": "#1a1a1e", "mark": "#d02020", "eyes": "#ff3020", "hairy": true}},
+    "salamander": {"generator": "lizard", "params": {"skin": "#d8783a", "belly": "#e8c890", "spots": "#3a2a1a"}},
     "mummy": {
       "generator": "humanoid",
       "params": {
@@ -5629,12 +5539,7 @@
         "eyes": "#ffffff"
       }
     },
-    "giant_tortoise": {
-      "generator": "crab",
-      "params": {
-        "shell": "#5a8a3a"
-      }
-    },
+    "giant_tortoise": {"generator": "tortoise", "params": {"shell": "#5a7a3a", "scute": "#8a6a3a", "skin": "#8a8a5a"}},
     "moth": {
       "generator": "insect",
       "params": {
@@ -5643,25 +5548,8 @@
         "eyes": "#1a1a1a"
       }
     },
-    "ice_elemental": {
-      "generator": "jelly",
-      "params": {
-        "color": "#9ae8ff",
-        "core": "#ffffff"
-      }
-    },
-    "wolf": {
-      "generator": "steed",
-      "params": {
-        "coat": "#8a8a9a",
-        "hoof": "#3a3a3a",
-        "horn": "#8a8a9a",
-        "mane": [
-          "#6a6a7a",
-          "#9a9aaa"
-        ]
-      }
-    },
+    "ice_elemental": {"generator": "elemental", "params": {"color": "#9ae8ff", "core": "#ffffff", "ice": true}},
+    "wolf": {"generator": "canine", "params": {"fur": "#8a8a96", "belly": "#c8c8d0", "eyes": "#ffd040"}},
     "gastropod": {
       "generator": "jelly",
       "params": {
@@ -5741,13 +5629,7 @@
         "eyes": "#1a1a1a"
       }
     },
-    "mimic": {
-      "generator": "present",
-      "params": {
-        "color": "#8a5a2a",
-        "ribbon": "#c8a040"
-      }
-    },
+    "mimic": {"generator": "mimic", "params": {"wood": "#8a5a2a", "band": "#5a5a62", "gold": "#e8c040"}},
     "bunny": {
       "generator": "bunny",
       "params": {}

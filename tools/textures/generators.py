@@ -1,13 +1,14 @@
 """Material generators: recipe dict -> (albedo rgb, height, roughness, metallic, alpha), all floats in [0, 1].
 
 Generators live in gen_natural (soils, grass), gen_rock (stone, ores), gen_built (bricks, planks, glass, metal,
-cloth) and gen_plants (leaves, bark). Recipes: materials.json (terrain) and props.json (models).
+cloth), gen_plants (leaves, bark) and gen_creature (fur, chitin, bone). Recipes: materials.json (terrain) and props.json (models).
 """
 import zlib
 
 import numpy as np
 
 import gen_built
+import gen_creature
 import gen_natural
 import gen_plants
 import gen_rock
@@ -22,7 +23,7 @@ GENERATORS = {
     "rock": gen_rock.rock, "veined": gen_rock.veined, "speckled": gen_rock.speckled, "ore": gen_rock.ore,
     "planks": gen_built.planks, "bricks": gen_built.bricks, "translucent": gen_built.translucent, "web": gen_built.web, "rope": gen_built.rope,
     "hive": gen_built.hive, "missing": gen_built.missing, "metal": gen_built.metal, "cloth": gen_built.cloth,
-    "leather": gen_built.leather,
+    "leather": gen_built.leather, "fur": gen_creature.fur, "chitin": gen_creature.chitin, "bone": gen_creature.bone,
     "leaves": gen_plants.leaves, "foliage": gen_plants.foliage, "bark": gen_plants.bark, "cap": gen_plants.cap,
     "ribbed": gen_plants.ribbed, "sprig": gen_plants.sprig,
 }

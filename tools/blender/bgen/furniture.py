@@ -144,7 +144,7 @@ def torch(mb: MeshBuilder, p, rng):
 
 def candle(mb: MeshBuilder, p, rng):
     # Holder, wax and a blackened wick; the flame is drawn live by the game.
-    mb.cylinder((0, 0, 0), (0, 0, 0.02), 0.09, 0.1, "prop:copper", segments=10)
+    mb.cylinder((0, 0, 0), (0, 0, 0.02), 0.09, 0.1, "prop:iron:metal", "#e8804a", segments=10)
     mb.cylinder((0, 0, 0.02), (0, 0, 0.2), 0.035, None, "prop:plain", "#f0ead8", segments=8)
     mb.cylinder((0, 0, 0.2), (0, 0, 0.222), 0.004, 0.003, "prop:plain", "#1a1410", segments=4)
 

@@ -234,6 +234,8 @@ def dress(fr, head, parts, p):
         add(accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040")))
     if "mask" in p:
         add(accessories.mask(head, parts["head"], p["mask"]))
+    if "eyepatch" in p:
+        add(accessories.eyepatch(head, p["eyepatch"]))
     if "horns" in p:
         add(accessories.horns(head, p["horns"]))
     if "wings" in p:
@@ -249,7 +251,7 @@ def groom(fr, head, parts, p):
     color = p.get("hair", "#4a3020")
     out = []
     if style != "bald" and p.get("hat") != "hood":
-        hatted = p.get("hat") in ("cap", "wide")
+        hatted = p.get("hat") in ("cap", "wide", "bandana", "tricorne", "helm")
         out.append(hair.scalp_shell(head, parts["head"], "buzz" if style == "buzz" else ("short" if style in ("ponytail", "bun") else style), color, hatted))
         if style == "long":
             out.append(hair.mane(head, color, 0.3 * fr.s))
