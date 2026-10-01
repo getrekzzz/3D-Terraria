@@ -19,6 +19,8 @@ public static partial class ContentValidator
             if (phase.Summon is { } s)
                 foreach (var id in s.Pool.Length > 0 ? s.Pool : new[] { s.Enemy })
                     if (!ctx.Db.Enemies.Contains(id)) ctx.Error(e, $"summons unknown enemy '{id}'.");
+            if (phase.Aura is { } aura && !ctx.Db.Buffs.Contains(aura.Buff)) ctx.Error(e, $"aura pulses unknown buff '{aura.Buff}'.");
+            if (phase.Leash is { } leash && !ctx.Db.Enemies.Contains(leash.Kind)) ctx.Error(e, $"leash names unknown enemy '{leash.Kind}'.");
             foreach (var v in phase.Moves.Select(m => m.Volley).Append(phase.Volley))
                 if (v != null && !ctx.Db.Projectiles.Contains(v.Projectile)) ctx.Error(e, $"volley fires unknown projectile '{v.Projectile}'.");
         }

@@ -48,7 +48,7 @@ public sealed partial class NpcSystem
             Content = world.Session.Content,
             Spawn = (def, at) => Spawn(def, at - new Vector3(0, def.Height * 0.25f * def.Scale, 0)),
             Carve = (center, radius) => world.Editor.Carve(center, radius),
-            CountAlive = id => _npcs.Count(n => n.Alive && n.Def.Id == id),
+            CountAlive = CountAlive,
             Ground = at =>
             {
                 var c = VoxelMotion.CellOf(at);
@@ -225,6 +225,7 @@ public sealed partial class NpcSystem
             if (thinks)
             {
                 npc.DefenseDelta = 0;
+                npc.DefenseOverride = null;
                 npc.DamageScale = 1f;
                 brain.Think(npc, _ctx);
             }

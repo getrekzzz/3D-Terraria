@@ -7,51 +7,101 @@ using Strata.Core.Session;
 namespace Strata.Core.AI;
 
 /// <summary>
-/// Runs a <see cref="PatternParams"/> boss: picks the phase for its remaining life, loops that phase's moves and
-/// fires its volleys and summons. State: <see cref="Npc.Stage"/> = phase, Counter = move index, Timer = ticks into
-/// the move, Counter2 = dashes/hops done, Direction = the current dash heading.
+/// Runs a <see cref="PatternParams"/> boss: picks the phase for its remaining life (the Expert threshold in Expert),
+/// loops that phase's moves (Expert-only moves only in Expert) and fires its volleys and summons, pulses its aura,
+/// keeps to its leash and places its illusions. State: <see cref="Npc.Stage"/> = phase, Counter = move index, Timer =
+/// ticks into the move, Counter2 = dashes/hops done, Direction = the current dash heading, Phase = 1 while gravity is
+/// suspended (a fly phase or a slam), <see cref="Npc.PhaseTimer"/> = ticks into the phase (aura clock).
 /// </summary>
-public sealed class PatternBrain : IBrain
+public sealed partial class PatternBrain : IBrain
 {
+    private static readonly PatternExpert Classic = new();
+
     private readonly PatternParams _p;
 
-    public PatternBrain(PatternParams p) => _p = p;
+    /// <summary>Per phase: the moves played in Classic (no Expert-only moves) and in Expert (all of them).</summary>
+    private readonly PatternMove[][] _classic, _expert;
+
+    /// <summary>Per phase: the guardian ids of <see cref="PatternPhase.ShieldedBy"/> and the summon pool.</summary>
+    private readonly string[][] _guards, _pools;
+
+    public PatternBrain(PatternParams p)
+    {
+        _p = p;
+        int n = p.Phases.Length;
+        _classic = new PatternMove[n][];
+        _expert = new PatternMove[n][];
+        _guards = new string[n][];
+        _pools = new string[n][];
+        for (int i = 0; i < n; i++)
+        {
+            var ph = p.Phases[i];
+            _expert[i] = ph.Moves;
+            var classic = Array.FindAll(ph.Moves, m => !m.ExpertOnly);
+            _classic[i] = classic.Length > 0 ? classic : ph.Moves;
+            _guards[i] = (ph.ShieldedBy ?? "").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            _pools[i] = ph.Summon is { } s ? (s.Pool.Length > 0 ? s.Pool : new[] { s.Enemy }) : Array.Empty<string>();
+        }
+    }
 
     public bool UsesGravity => _p.Ground;
+
+    public bool UsesGravityFor(Npc npc) => _p.Ground && npc.Phase == 0;
 
     public void Think(Npc npc, BrainContext ctx)
     {
         float life = npc.Life / (float)Math.Max(1, npc.MaxLife);
+        bool expert = ctx.Expert;
         int stage = 0;
         for (int i = 0; i < _p.Phases.Length; i++)
-            if (life <= _p.Phases[i].Below) stage = i;
+        {
+            var ph = _p.Phases[i];
+            if (life <= (expert && ph.ExpertBelow is { } eb ? eb : ph.Below)) stage = i;
+        }
         var phase = _p.Phases[stage];
-        if (stage != npc.Stage) Enter(npc, stage, phase, ctx);
-        npc.DamageScale = phase.Damage;
-        bool shielded = Guarded(phase.ShieldedBy, ctx);
-        Summon(npc, phase, ctx);
+        var ex = expert ? phase.Expert ?? Classic : Classic;
+        if (stage != npc.Stage) Enter(npc, stage, phase, ex, ctx);
+        npc.PhaseTimer++;
+        npc.DamageScale = phase.Damage * ex.Damage;
+        if (phase.Defense is { } defense) npc.DefenseOverride = defense;
+        npc.Illusions = phase.Illusions;
+        bool shielded = Guarded(_guards[stage], ctx);
+        Summon(npc, phase, _pools[stage], ex, ctx);
         var target = ctx.Target;
         if (target == null)
         {
+            npc.Phase = phase.Fly ? 1 : 0;
             npc.Velocity *= 0.9f;
             npc.Pose = "idle";
             npc.Invulnerable = shielded;
             return;
         }
         npc.TargetPlayer = 0;
-        var move = phase.Moves[npc.Counter % phase.Moves.Length];
-        bool teleporting = Move(npc, move, phase.Speed, target, ctx);
+        var moves = expert ? _expert[stage] : _classic[stage];
+        var move = moves[npc.Counter % moves.Length];
+        bool ground = _p.Ground && !phase.Fly;
+        npc.Phase = _p.Ground && (phase.Fly || move.Type == "slam") ? 1 : 0;
+        bool teleporting = Move(npc, move, phase.Speed * ex.Speed, ex.TelegraphScale, ground, target, ex, ctx);
         if (npc.Leader != null) npc.Velocity = (npc.Anchor - npc.Center) * 8f; // a fixed part keeps to its place on the body
+        if (phase.Leash is { } leash) Leash(npc, leash);
         npc.Invulnerable = shielded || teleporting;
-        if (phase.Volley != null) Fire(npc, phase.Volley, ref npc.VolleyTimer, target, ctx);
-        if (move.Volley != null)
+        if (phase.Volley is { } pv) Fire(npc, pv, ref npc.VolleyTimer, VolleyInterval(pv, ex, expert), VolleyCount(pv, ex, expert), target, ctx);
+        if (move.Volley is { } mv && move.Type != "slam")
         {
-            int t = npc.Timer; // move volleys follow the move's own clock
-            if (t % Math.Max(1, move.Volley.Interval) == move.Volley.Interval / 2) Fire(npc, move.Volley, target, ctx);
+            int t = npc.Timer, interval = VolleyInterval(mv, ex, expert); // move volleys follow the move's own clock
+            if (t % interval == interval / 2) Fire(npc, mv, VolleyCount(mv, ex, expert), target, ctx);
         }
+        if (phase.Aura is { } aura && (!aura.ExpertOnly || expert) && npc.PhaseTimer % aura.Interval == 0)
+            ctx.Pulse?.Invoke(npc.Center, aura.Radius, aura.Buff, aura.Ticks);
+        if (npc.Illusions > 0) npc.MirrorAround = target.Center;
     }
 
-    private static void Enter(Npc npc, int stage, PatternPhase phase, BrainContext ctx)
+    private static int VolleyInterval(PatternVolley v, PatternExpert ex, bool expert) =>
+        Math.Max(1, !expert ? v.Interval : v.ExpertInterval ?? (ex.VolleyInterval == 1f ? v.Interval : (int)MathF.Round(v.Interval * ex.VolleyInterval)));
+
+    private static int VolleyCount(PatternVolley v, PatternExpert ex, bool expert) => !expert ? v.Count : v.ExpertCount ?? v.Count + ex.VolleyCount;
+
+    private static void Enter(Npc npc, int stage, PatternPhase phase, PatternExpert ex, BrainContext ctx)
     {
         bool first = npc.Stage < 0;
         npc.Stage = stage;
@@ -59,42 +109,71 @@ public sealed class PatternBrain : IBrain
         npc.Counter2 = 0;
         npc.Timer = 0;
         npc.SummonTimer = 0;
+        npc.PhaseTimer = 0;
         npc.ModelOverride = phase.Model;
         npc.Enraged = stage > 0;
         if (!first && !string.IsNullOrEmpty(phase.Message)) ctx.Announce?.Invoke(phase.Message);
-        if (phase.Summon is { Once: true } once && ctx.Content.Enemies.TryGet(once.Enemy, out var def))
-            for (int i = 0; i < once.Max; i++) ctx.Spawn?.Invoke(def, npc.Center + Scatter(ref ctx.Rng, 3f));
+        if (phase.Summon is not { Once: true } once || ctx.Spawn == null || !ctx.Content.Enemies.TryGet(once.Enemy, out var def)) return;
+        int count = once.Max + ex.SummonMax;
+        var offset = OffsetOf(once);
+        for (int i = 0; i < count; i++)
+        {
+            if (!once.Tether)
+            {
+                ctx.Spawn(def, npc.Center + offset + Scatter(ref ctx.Rng, 3f));
+                continue;
+            }
+            var o = Ring(i, count, once.Radius) + offset;
+            if (ctx.Spawn(def, npc.Center + o) is { } m) NpcSystem.Tether(m, npc, o);
+        }
     }
 
     private static Vector3 Scatter(ref Determinism.Pcg32 rng, float r) => new(rng.NextSigned() * r, rng.NextSigned() * r * 0.5f, rng.NextSigned() * r);
 
-    /// <summary>Any guardian of the comma-separated kinds lives.</summary>
-    private static bool Guarded(string? kinds, BrainContext ctx)
+    /// <summary>Slot <paramref name="i"/> of <paramref name="n"/> evenly spaced on a flat ring.</summary>
+    private static Vector3 Ring(int i, int n, float radius)
     {
-        if (string.IsNullOrEmpty(kinds) || ctx.CountAlive == null) return false;
-        foreach (var id in kinds.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        float a = i * MathF.Tau / Math.Max(1, n);
+        return new Vector3(MathF.Cos(a) * radius, 0, MathF.Sin(a) * radius);
+    }
+
+    private static Vector3 OffsetOf(PatternSummon s) =>
+        s.Offset.Length == 0 ? Vector3.Zero : new Vector3(s.Offset[0], s.Offset.Length > 1 ? s.Offset[1] : 0, s.Offset.Length > 2 ? s.Offset[2] : 0);
+
+    /// <summary>Any guardian of the phase's kinds lives.</summary>
+    private static bool Guarded(string[] kinds, BrainContext ctx)
+    {
+        if (kinds.Length == 0 || ctx.CountAlive == null) return false;
+        foreach (var id in kinds)
             if (ctx.CountAlive(id) > 0) return true;
         return false;
     }
 
-    private static void Summon(Npc npc, PatternPhase phase, BrainContext ctx)
+    private static void Summon(Npc npc, PatternPhase phase, string[] pool, PatternExpert ex, BrainContext ctx)
     {
         if (phase.Summon is not { Once: false } s || ctx.Spawn == null) return;
         if (++npc.SummonTimer < s.Interval) return;
         npc.SummonTimer = 0;
         if (s.Range > 0 && (ctx.Target == null || ctx.TargetDistance > s.Range)) return;
-        var pool = s.Pool.Length > 0 ? s.Pool : new[] { s.Enemy };
-        int alive = pool.Sum(id => ctx.CountAlive?.Invoke(id) ?? 0);
-        for (int i = 0; i < s.Count && alive + i < s.Max; i++)
+        int alive = 0, max = s.Max + ex.SummonMax;
+        foreach (var id in pool) alive += ctx.CountAlive?.Invoke(id) ?? 0;
+        var offset = OffsetOf(s);
+        for (int i = 0; i < s.Count && alive + i < max; i++)
         {
             if (!ctx.Content.Enemies.TryGet(pool.Length == 1 ? pool[0] : pool[ctx.Rng.Range(0, pool.Length)], out var def)) continue;
+            if (s.Tether)
+            {
+                var o = Ring(alive + i, max, s.Radius) + offset;
+                if (ctx.Spawn(def, npc.Center + o) is { } m) NpcSystem.Tether(m, npc, o);
+                continue;
+            }
             if (s.Radius <= 3f)
             {
-                ctx.Spawn(def, npc.Center + Scatter(ref ctx.Rng, s.Radius));
+                ctx.Spawn(def, npc.Center + offset + Scatter(ref ctx.Rng, s.Radius));
                 continue;
             }
             float a = ctx.Rng.NextFloat() * MathF.Tau, d = s.Radius * ctx.Rng.Range(0.4f, 1f);
-            var at = npc.Center + new Vector3(MathF.Cos(a) * d, 0, MathF.Sin(a) * d);
+            var at = npc.Center + offset + new Vector3(MathF.Cos(a) * d, 0, MathF.Sin(a) * d);
             if (def.Gravity)
             {
                 // Walkers stand on the ground there (none spawns inside a hill or in the air).
@@ -105,144 +184,51 @@ public sealed class PatternBrain : IBrain
         }
     }
 
-    /// <summary>Advances the current move; returns true while the boss is mid-teleport (untouchable).</summary>
-    private bool Move(Npc npc, PatternMove m, float speedScale, ICombatTarget target, BrainContext ctx)
+    /// <summary>
+    /// Beyond the leash radius from its living anchors' centroid, the boss is pulled back to the edge and loses the
+    /// outward part of its velocity (inside it moves freely, so dashes are not fought).
+    /// </summary>
+    private static void Leash(Npc npc, PatternLeash leash)
     {
-        float speed = m.Speed * speedScale;
-        var toTarget = target.Center - npc.Center;
-        var flat = BrainFactory.Flat(toTarget);
-        if (flat != Vector3.Zero) npc.Yaw = BrainFactory.YawOf(flat);
-        npc.Timer++;
-        npc.Pose = m.Pose ?? "move";
-        bool done = false, teleporting = false;
-        switch (m.Type)
-        {
-            case "hover":
+        var sum = Vector3.Zero;
+        int n = 0;
+        foreach (var f in npc.Followers)
+            if (f.Alive && !f.Removed && f.Def.Id == leash.Kind)
             {
-                var side = BrainFactory.Flat(npc.Center - target.Center);
-                if (side == Vector3.Zero) side = Vector3.UnitX;
-                Steer(npc, target.Center + side * m.Distance + new Vector3(0, m.Height, 0), speed);
-                done = npc.Timer >= m.Ticks;
-                break;
+                sum += f.Center;
+                n++;
             }
-            case "chase":
-                Steer(npc, target.Center + new Vector3(0, m.Height * 0.2f, 0), speed);
-                done = npc.Timer >= m.Ticks;
-                break;
-            case "orbit":
-            {
-                var off = npc.Center - target.Center;
-                float angle = MathF.Atan2(off.Z, off.X) + speed / MathF.Max(1f, m.Distance) / Common.Units.TicksPerSecond;
-                Steer(npc, target.Center + new Vector3(MathF.Cos(angle) * m.Distance, m.Height, MathF.Sin(angle) * m.Distance), speed * 1.6f);
-                done = npc.Timer >= m.Ticks;
-                break;
-            }
-            case "dash":
-                if (npc.Timer <= m.Telegraph)
-                {
-                    npc.Velocity *= 0.85f;
-                    npc.Pose = "telegraph";
-                    if (npc.Timer == m.Telegraph)
-                    {
-                        npc.Direction = _p.Ground ? flat : (toTarget.LengthSquared() > 1e-4f ? Vector3.Normalize(toTarget) : Vector3.UnitX);
-                        npc.Velocity = npc.Direction * speed + (_p.Ground ? new Vector3(0, npc.Velocity.Y, 0) : Vector3.Zero);
-                    }
-                }
-                else
-                {
-                    npc.Pose = "attack";
-                    var v = npc.Direction * speed;
-                    npc.Velocity = _p.Ground ? new Vector3(v.X, npc.Velocity.Y, v.Z) : v;
-                    if (npc.Timer >= m.Telegraph + m.Ticks)
-                    {
-                        npc.Timer = 0;
-                        done = ++npc.Counter2 >= m.Count;
-                    }
-                }
-                break;
-            case "teleport":
-                if (npc.Timer < m.Telegraph)
-                {
-                    npc.Velocity *= 0.8f;
-                    npc.Pose = "teleport";
-                    teleporting = true;
-                }
-                else if (npc.Timer == m.Telegraph)
-                {
-                    float a = ctx.Rng.NextFloat() * MathF.Tau;
-                    npc.Position = target.Center + new Vector3(MathF.Cos(a) * m.Distance, m.Height - npc.HalfExtents.Y, MathF.Sin(a) * m.Distance);
-                    npc.Velocity = Vector3.Zero;
-                }
-                else npc.Velocity *= 0.9f;
-                done = npc.Timer >= m.Telegraph + m.Ticks;
-                break;
-            case "hop":
-                if (!_p.Ground || npc.OnGround)
-                {
-                    npc.Velocity.X *= 0.6f;
-                    npc.Velocity.Z *= 0.6f;
-                    if (npc.Timer >= m.Telegraph)
-                    {
-                        npc.Velocity = flat * speed + new Vector3(0, BrainFactory.JumpVelocity(m.Height), 0);
-                        npc.Timer = 0;
-                        done = ++npc.Counter2 >= m.Count;
-                    }
-                    else npc.Pose = "telegraph";
-                }
-                else npc.Pose = "jump";
-                break;
-            case "walk":
-            {
-                var v = flat * speed;
-                npc.Velocity = new Vector3(v.X, npc.Velocity.Y, v.Z);
-                // Step up ledges now and then while pressing on.
-                if (npc.OnGround && npc.Timer % 45 == 0 && new Vector2(toTarget.X, toTarget.Z).Length() > 3f) npc.Velocity.Y = BrainFactory.JumpVelocity(4f);
-                done = npc.Timer >= m.Ticks;
-                break;
-            }
-            default: // wait
-                npc.Velocity = _p.Ground ? new Vector3(npc.Velocity.X * 0.7f, npc.Velocity.Y, npc.Velocity.Z * 0.7f) : npc.Velocity * 0.85f;
-                npc.Pose = m.Pose ?? "idle";
-                done = npc.Timer >= m.Ticks;
-                break;
-        }
-        if (done)
-        {
-            npc.Counter++;
-            npc.Counter2 = 0;
-            npc.Timer = 0;
-        }
-        return teleporting;
+        if (n == 0) return;
+        var centroid = sum / n;
+        var off = npc.Center - centroid;
+        float len = off.Length();
+        if (len <= leash.Radius || len < 1e-4f) return;
+        var dir = off / len;
+        npc.Position -= dir * (len - leash.Radius);
+        float outward = Vector3.Dot(npc.Velocity, dir);
+        if (outward > 0) npc.Velocity -= dir * (outward * 1.5f); // a little spring back
     }
 
-    private static void Steer(Npc npc, Vector3 goal, float speed)
+    private static void Fire(Npc npc, PatternVolley v, ref int timer, int interval, int count, ICombatTarget target, BrainContext ctx)
     {
-        var d = goal - npc.Center;
-        float len = d.Length();
-        var want = len > 0.05f ? d / len * MathF.Min(speed, len * 3f) : Vector3.Zero;
-        npc.Velocity = Vector3.Lerp(npc.Velocity, want, 0.1f);
-    }
-
-    private static void Fire(Npc npc, PatternVolley v, ref int timer, ICombatTarget target, BrainContext ctx)
-    {
-        if (++timer < v.Interval) return;
+        if (++timer < interval) return;
         timer = 0;
-        Fire(npc, v, target, ctx);
+        Fire(npc, v, count, target, ctx);
     }
 
-    private static void Fire(Npc npc, PatternVolley v, ICombatTarget target, BrainContext ctx)
+    private static void Fire(Npc npc, PatternVolley v, int count, ICombatTarget target, BrainContext ctx)
     {
-        if (ctx.Shoot == null || Vector3.Distance(npc.Center, target.Center) > v.Range) return;
+        if (ctx.Shoot == null || count <= 0 || Vector3.Distance(npc.Center, target.Center) > v.Range) return;
         var from = npc.Center;
         var aim = target.Center - from;
         var dir = aim.LengthSquared() > 1e-4f ? Vector3.Normalize(aim) : Vector3.UnitX;
         float spread = v.Spread * MathF.PI / 180f;
-        for (int i = 0; i < v.Count; i++)
+        for (int i = 0; i < count; i++)
         {
             Vector3 d;
             if (v.Ring)
             {
-                float a = i * MathF.Tau / v.Count;
+                float a = i * MathF.Tau / count;
                 d = Vector3.Normalize(new Vector3(MathF.Cos(a), dir.Y * 0.5f, MathF.Sin(a)));
             }
             else

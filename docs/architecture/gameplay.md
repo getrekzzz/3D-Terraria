@@ -98,6 +98,14 @@
   announcement also goes out on `NpcSystem.Messaged` with a `MessageKind` (`MessageColors`: boss purple), including
   "<Title> has awoken!" / "has been defeated!". Probes: `boss.<enemyId>.<field>` (life, max, defense, stage, phase,
   enraged, frenzied, illusions, parts, segments).
+* **Pattern bosses** — `PatternBrain` (+`.Moves`) plays `brain.phases` (`PatternSpecs`, `PatternExtras`): in Expert a
+  phase's `expert` block scales move speed, contact damage, volley interval/count (`expertCount`/`expertInterval` per
+  volley win), summon caps and wind-ups, `expertBelow` replaces `below`, and `expertOnly` moves join the loop (the
+  Classic loop, its RNG order and timings are unchanged). `fly` suspends a ground boss's gravity for the phase; `slam`
+  rises above the target, drops and raises `Impacted` (and fires its volley once) on landing; `summon.tether` makes
+  minions followers on a ring that die with the boss and `leash` holds the boss near their centroid; `aura` pulses a
+  buff (`expertOnly` optional); `illusions` sets `Npc.Illusions` with `MirrorAround` = the target (`AI.Illusions`
+  places the copies a quarter turn apart); `defense` overrides defense (`DefenseOverride` is cleared before each think).
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and
   fires `Raised` (announcements; the hook for world mutations).

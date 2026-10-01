@@ -58,7 +58,7 @@ public sealed class Npc
     /// <summary>Defense the brain adds this tick (a guarding phase); zeroed before each think.</summary>
     public int DefenseDelta { get; set; }
 
-    /// <summary>Fixed defense while set (written by the enrage step).</summary>
+    /// <summary>Fixed defense while set (a pattern phase's, or the enrage step's); cleared before each think.</summary>
     public int? DefenseOverride { get; set; }
 
     public void RecomputeEffects()
@@ -106,6 +106,9 @@ public sealed class Npc
 
     public int VolleyTimer;
     public int SummonTimer;
+
+    /// <summary>Pattern bosses: ticks into the current phase.</summary>
+    public int PhaseTimer;
     public int Counter;
     public int Counter2;
     public int Phase;
