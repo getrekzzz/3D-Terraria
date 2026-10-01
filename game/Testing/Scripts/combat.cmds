@@ -22,7 +22,7 @@ wait 1.5
 killall
 heal
 
-# A sword that shoots still swings: the blade hits a frozen slime at 2 m while the star flies on.
+# A sword that shoots still swings: one use starts a blade swing and a star; the frozen slime at 2 m dies.
 give starfury 1
 wield starfury
 killall
@@ -30,6 +30,7 @@ aim 0 0 1
 spawn green_slime 1 2
 ai off
 use
+assert melee.swings == 1
 assert projectiles.count >= 1
 wait 0.6
 assert npcs.alive_life < 14
@@ -43,6 +44,7 @@ wield zenith
 use
 use
 assert projectiles.count >= 6
+assert melee.swings == 0
 wait_until projectiles.count == 0 5
 
 # Arrows fly and hit.

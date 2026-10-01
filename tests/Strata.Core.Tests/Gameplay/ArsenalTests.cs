@@ -67,6 +67,26 @@ public class ArsenalTests
     }
 
     [Fact]
+    public void SwordWhoseShotIsRefusedStillSwings()
+    {
+        using var g = Arena();
+        g.Hold("starfury");
+        g.Player.Aim = Vector3.UnitZ;
+        // One star out at a time (no shipped sword is capped, so cap this world's Starfury).
+        g.World.Uses[g.Content.Items.Get("starfury")].Shoot = new Strata.Core.Content.Specs.ShootProjectileParams
+        {
+            Type = Strata.Core.Content.Specs.ItemBehaviorSpecs.ShootProjectile,
+            MaxActive = 1,
+        };
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        g.Player.UseCooldown = g.Player.UseAnimation = 0;
+        Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true)); // the star is still out
+        Assert.Single(g.World.Projectiles.All);
+        Assert.Equal(1, g.World.Melee.ActiveSwings);
+        Assert.True(g.Player.UseCooldown > 0, "a refused shot must still start the swing's cooldown");
+    }
+
+    [Fact]
     public void ZenithNeverBlocks()
     {
         using var g = Arena();
