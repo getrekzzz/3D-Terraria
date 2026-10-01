@@ -5,6 +5,7 @@ using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Physics;
 using Strata.Core.Tests.Support;
+using Strata.Core.Voxels.TileObjects;
 
 namespace Strata.Core.Tests.Gameplay;
 
@@ -74,22 +75,29 @@ public class ShotGeometryTests
         Assert.True(AngleDegrees(velocity, clamped - at) < 1f, $"off the 2 m point by {AngleDegrees(velocity, clamped - at):0.00}°");
     }
 
-    [Fact]
-    public void NeverSpawnsInsideAWall()
+    /// <summary>
+    /// Puts the player's front against the cell row ahead and looks diagonally right, so the hand reaches past the body
+    /// into the cell at the right shoulder (returned) while the eye stays in open air.
+    /// </summary>
+    private static Int3 HandPastTheBody(TestGame g)
     {
-        using var g = Archer();
-        // Pressed against a wall ahead and looking diagonally right along it: the hand reaches past the body into
-        // the stone column at the right shoulder.
         var front = (g.Floor.Z + 1) * Units.CellSize;
         g.Player.Position = new Vector3((g.Floor.X + 0.5f) * Units.CellSize, g.Player.Position.Y, front - 0.46f);
         var look = Vector3.Normalize(new Vector3(1f, 0, 1f));
         g.Player.ViewDirection = look;
         g.Player.Aim = look;
         g.Player.AimDistance = 10f;
+        var right = Vector3.Normalize(Vector3.Cross(look, Vector3.UnitY));
+        return VoxelMotion.CellOf(g.Player.Eye + right * ShotGeometry.HandOffset.X + Vector3.UnitY * ShotGeometry.HandOffset.Y + look * ShotGeometry.HandOffset.Z);
+    }
+
+    [Fact]
+    public void NeverSpawnsInsideAWall()
+    {
+        using var g = Archer();
+        var handCell = HandPastTheBody(g);
         var world = g.World.Session.World;
         var eye = g.Player.Eye;
-        var right = Vector3.Normalize(Vector3.Cross(look, Vector3.UnitY));
-        var handCell = VoxelMotion.CellOf(eye + right * ShotGeometry.HandOffset.X + Vector3.UnitY * ShotGeometry.HandOffset.Y + look * ShotGeometry.HandOffset.Z);
         var batch = world.BeginEdit();
         for (int y = 1; y <= TestGame.ArenaHeight; y++) batch.SetBlock(handCell.X, g.Floor.Y + y, handCell.Z, g.Content.BlockId("stone"));
         g.World.Session.Commit(batch);
@@ -101,7 +109,24 @@ public class ShotGeometryTests
         var cell = VoxelMotion.CellOf(at);
         Assert.False(world.IsSolid(cell.X, cell.Y, cell.Z), $"spawned inside {cell}");
         Assert.True(Vector3.Distance(at, eye) < 0.01f, "a blocked hand falls back to the eye");
-        Assert.True(AngleDegrees(velocity, look) < 1f);
+        Assert.True(AngleDegrees(velocity, g.Player.Aim) < 1f);
+    }
+
+    [Fact]
+    public void ClosedDoorsBlockTheHandOpenOnesDoNot()
+    {
+        using var g = Archer();
+        var handCell = HandPastTheBody(g);
+        var world = g.World.Session.World;
+        var door = new TileObjectInstance(g.Content.TileObjects.Get("wooden_door"), new Int3(handCell.X, g.Floor.Y + 1, handCell.Z), 0, 0);
+        Assert.True(world.TileObjects.TryAdd(door));
+        Assert.Same(door, world.TileObjects.At(handCell));
+
+        // A closed door stops projectiles like a wall, so the shot starts at the eye.
+        Assert.True(Vector3.Distance(ShotGeometry.Origin(world, g.Player), g.Player.Eye) < 0.01f, "a closed door let the hand through");
+        // An open one does not: the shot leaves the hand.
+        door.Active = true;
+        Assert.True(Vector3.Distance(ShotGeometry.Origin(world, g.Player), g.Player.Eye) > 0.3f, "an open door blocked the hand");
     }
 
     [Fact]
