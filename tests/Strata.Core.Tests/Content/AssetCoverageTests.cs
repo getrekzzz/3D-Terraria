@@ -16,6 +16,13 @@ public class AssetCoverageTests
     }
 
     [Fact]
+    public void EveryBossHasAHeadIcon()
+    {
+        var missing = TestPaths.Content.Enemies.All.Where(e => e.Boss is { Minor: false } && !Exists(AssetPaths.BossIcon(e))).Select(e => e.Id).ToList();
+        Assert.True(missing.Count == 0, "bosses without head icons (build_all.py --boss-icons): " + string.Join(", ", missing));
+    }
+
+    [Fact]
     public void EveryTileObjectVariantHasAModel()
     {
         var missing = new List<string>();

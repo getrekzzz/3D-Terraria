@@ -10,6 +10,7 @@ Options:
   --only=GLOB      rebuild matching asset ids (fnmatch), keep the rest of the manifest
   --no-icons       skip icon rendering
   --samples=N      Cycles samples per icon (default 24)
+  --boss-icons     render only the boss-bar head icons (assets/icons/bosses; --only matches boss ids)
   --anims          build only the human animation sets (assets/models/creatures/anim; --only matches characters or sets)
   --shard=I/N      with --anims: build every Nth set starting at I (to run several builds side by side)
 Held items export their sockets (grip, muzzle, tip, nock, string, chain; bgen/sockets.py) as empties next to the mesh
@@ -38,7 +39,7 @@ CELL = 0.5
 
 def args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
-    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None}
+    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None, "boss_icons": False}
     for a in argv:
         if a == "--check":
             opts["check"] = True
@@ -48,6 +49,8 @@ def args():
             opts["icons"] = False
         elif a.startswith("--samples="):
             opts["samples"] = int(a.split("=", 1)[1])
+        elif a == "--boss-icons":
+            opts["boss_icons"] = True
         elif a == "--anims":
             opts["anims"] = True
         elif a.startswith("--shard="):
@@ -298,6 +301,11 @@ def build_anims(opts, creature_jobs):
         print(f"anim {key}: {sorted(a.name for a in bpy.data.actions)}")
 
 
+def boss_models(enemies):
+    """Non-minor bosses (the boss bar shows them) -> the creature model their head icon is rendered from."""
+    return {eid: e.get("model", eid) for eid, e in enemies.items() if e.get("boss") and not e["boss"].get("minor")}
+
+
 def _view_for(generator: str, views: dict) -> str:
     """Icon framing for an item generator: the view given at @generator registration, else by the long-item list."""
     if generator in views:
@@ -322,7 +330,18 @@ def main() -> int:
     if errors:
         return 1
     print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(creature_jobs)} creatures, {len(projectile_jobs)} projectiles, {len(block_icons)} block icons (tools/textures/build_icons.py)")
+    bosses = boss_models(enemies)
+    missing = sorted(b for b in bosses if not (REPO / "assets" / "icons" / "bosses" / f"{b}.png").exists())
+    if missing and not opts["boss_icons"]:
+        print("ERROR: bosses without a head icon (build_all.py --boss-icons):", ", ".join(missing))
+        return 1
     if opts["check"]:
+        return 0
+    if opts["boss_icons"]:
+        import bpy  # noqa: F401
+        from bgen import boss_icons
+        pats = opts["only"].split(",") if opts["only"] else ["*"]
+        boss_icons.render_boss_icons(REPO, bosses, lambda i: any(fnmatch.fnmatch(i, p) for p in pats), samples=16)
         return 0
     if opts["anims"]:
         build_anims(opts, creature_jobs)

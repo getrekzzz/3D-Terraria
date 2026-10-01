@@ -40,6 +40,7 @@ public static partial class ContentValidator
             if (e.Facing is not ("yaw" or "look" or "velocity")) ctx.Error(e, $"facing '{e.Facing}' must be yaw, look or velocity.");
             ctx.Light(e, e.Light, "light");
             ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
+            if (e.Boss is { Minor: false }) ctx.Asset(e, AssetPaths.BossIcon(e), "boss head icon");
             if (e.Boss is { } boss)
             {
                 ctx.Ref(e, ctx.Db.Flags, boss.Flag, "boss.flag");

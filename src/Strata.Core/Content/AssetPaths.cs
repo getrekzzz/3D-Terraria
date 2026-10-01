@@ -27,5 +27,8 @@ public static class AssetPaths
 
     public static string TownNpcModel(TownNpcDef npc) => $"assets/models/creatures/{npc.Model ?? npc.Id}.glb";
 
+    /// <summary>The boss bar's head icon of a (non-minor) boss, rendered from its model (build_all.py --boss-icons).</summary>
+    public static string BossIcon(EnemyDef boss) => $"assets/icons/bosses/{boss.Id}.png";
+
     public static string ProjectileModel(ProjectileDef projectile) => $"assets/models/projectiles/{projectile.Model ?? projectile.Id}.glb";
 }

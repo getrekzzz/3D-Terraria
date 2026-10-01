@@ -65,8 +65,9 @@ def apply_textured_materials(objects, props):
             obj.data.materials[i] = props.material(slot.name)
 
 
-def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples: int = 24):
-    """Renders a transparent icon. view: 'object' (3/4 from the front) or 'item' (tool laid diagonally)."""
+def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples: int = 24, head_share: float = 1.0):
+    """Renders a transparent icon. view: 'object' (3/4 from the front), 'item' (tool laid diagonally) or 'boss' (a
+    head-on portrait framing the top ``head_share`` of the model's height)."""
     scene = bpy.context.scene
     lo, hi = bounds(objects)
     center = (lo + hi) / 2
@@ -89,6 +90,8 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
         lo, hi = bounds(objects)
         center, extent = (lo + hi) / 2, hi - lo
         direction = Vector((0.0, -1.0, 0.05)).normalized()
+    elif view == "boss":
+        direction = Vector((0.0, 1.0, 0.15)).normalized()  # from the front, slightly above
     else:
         direction = Vector((0.55, 1.0, 0.55)).normalized()  # front (+Y) right-above
     distance = max(extent.length, 1.0) * 3
@@ -105,6 +108,18 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
             v = inv @ (obj.matrix_world @ Vector(corner))
             xs.append(v.x)
             ys.append(v.y)
+    if view == "boss":
+        # Frame the head: the vertices in the top ``head_share`` of the posed model (as seen by the camera).
+        pts = []
+        deps = bpy.context.evaluated_depsgraph_get()
+        for obj in objects:
+            if obj.type == "MESH":
+                ev = obj.evaluated_get(deps)
+                pts += [inv @ (ev.matrix_world @ v.co) for v in ev.data.vertices]
+        top, low = max(p.y for p in pts), min(p.y for p in pts)
+        bottom = top - (top - low) * head_share
+        band = [p for p in pts if p.y >= bottom]
+        xs, ys = [p.x for p in band], [p.y for p in band]
     span = max(max(xs) - min(xs), max(ys) - min(ys)) * 1.08
     cam_data.ortho_scale = max(span, 0.05)
     cam.location += cam.matrix_world.to_3x3() @ Vector(((max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2, 0))
