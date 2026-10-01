@@ -54,27 +54,32 @@
     "volumetricAlbedo": 0.5
   },
   "torch": {
-    // Energy of a placed torch's pooled light per unit of its peak light channel.
-    "placedEnergy": 1.5,
+    // Energy of a placed torch's pooled light per unit of its peak light channel (the nearest few placed lights get a
+    // real light on every preset, see graphics.json dynamicLights).
+    "placedEnergy": 1.35,
     // Range of a placed torch's light in metres at zero peak; the range is base + perPeak * peak channel (0-1).
     "placedRangeBase": 4,
-    // Metres of range added per unit of the placed torch's peak channel (a full torch reaches about 13 m).
+    // Metres of range added per unit of the placed torch's peak channel (a full torch reaches about 13.5 m, well past
+    // the 7.5 m edge of its baked light).
     "placedRangePerPeak": 9.5,
-    // Godot omni falloff of a placed torch's light (lower carries further before fading).
-    "placedAttenuation": 0.6,
+    // Godot omni falloff of a placed torch's light (2 is inverse-square; lower carries further before fading, so the
+    // torch lights the cave 8-10 m out and not just the wall beside it).
+    "placedAttenuation": 0.8,
     // Energy of the torch carried in the hand per unit of its peak channel (at least the placed energy).
-    "heldEnergy": 2.0,
+    "heldEnergy": 1.8,
     // Range of the carried torch's light in metres at zero peak; the range is base + perPeak * peak channel.
     "heldRangeBase": 4,
-    // Metres of range added per unit of the carried torch's peak channel (a held torch reaches about 15 m).
+    // Metres of range added per unit of the carried torch's peak channel (a held torch reaches about 16 m).
     "heldRangePerPeak": 12,
-    // Godot omni falloff of the carried torch's light.
-    "heldAttenuation": 0.6
+    // Godot omni falloff of the carried torch's light: flatter than a placed torch's, so it lights the way ahead.
+    "heldAttenuation": 0.75
   },
   "blockLight": {
-    // Linear share of the baked block-light curve, level * mix(linear, 1, level): higher keeps a long soft tail.
+    // Linear share of the baked block-light curve, level * mix(linear, 1, level) (0 = level squared, 1 = linear):
+    // higher keeps a long soft tail out to the 7.5 m edge of a torch's baked light.
     "linear": 0.62,
-    // Brightness of baked block light (torches, lava, glowing ores and fungi).
+    // Brightness of baked block light (torches, lava, glowing ores and fungi); lower it if lava or glowing mushrooms
+    // wash out (lighting tour lava_cave and mushroom_cave shots).
     "gain": 1.35,
     // Share of block light removed on surfaces in full daylight (the eye is adapted to the sun).
     "daylitSuppression": 0.65

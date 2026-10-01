@@ -15,6 +15,8 @@ public class GraphicsConfigTests
         Assert.Empty(config.Validate());
         Assert.Contains(config.Default, config.Presets.Keys);
         Assert.Equal(new[] { "low", "medium", "high", "ultra" }, config.Presets.Keys);
+        // Even low gives the nearest placed torches a real light (shadowless omnis cost next to nothing in Forward+).
+        Assert.True(config.Presets["low"].DynamicLights >= 4);
     }
 
     [Fact]

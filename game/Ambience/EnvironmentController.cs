@@ -125,6 +125,9 @@ public sealed partial class EnvironmentController : Node3D
         AddChild(_moon);
 
         RenderingServer.GlobalShaderParameterSet("strata_cloud_noise", SkyNoise.Build(_seed));
+        // Baked block light's response curve and gain (voxel_light.gdshaderinc), shared by every lit shader.
+        var block = lighting.BlockLight;
+        RenderingServer.GlobalShaderParameterSet("strata_block_response", new Vector4(block.Linear, block.Gain, block.DaylitSuppression, 0f));
         graphics.Changed += ApplyPreset;
         ApplyPreset(graphics.Preset);
     }

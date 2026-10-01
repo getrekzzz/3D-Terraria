@@ -174,6 +174,8 @@ public sealed class TorchSettings
     {
         foreach (var p in Light("placed", PlacedEnergy, PlacedRangeBase, PlacedRangePerPeak, PlacedAttenuation)) yield return p;
         foreach (var p in Light("held", HeldEnergy, HeldRangeBase, HeldRangePerPeak, HeldAttenuation)) yield return p;
+        // The torch in the hand lights the way ahead: never dimmer than the same torch set down.
+        if (HeldEnergy < PlacedEnergy) yield return "heldEnergy must be at least placedEnergy";
     }
 
     private static IEnumerable<string> Light(string kind, float energy, float rangeBase, float rangePerPeak, float attenuation)

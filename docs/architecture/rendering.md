@@ -9,9 +9,9 @@ tints (`data/biomes.json`) and the generated texture arrays.
 |---|---|---|
 | Sun / moon | `DirectionalLight3D`, colour and irradiance from `Atmosphere.cs` (CPU port of the sky's scattering) | Custom `light()`: GGX (height-correlated Smith, Schlick, Burley diffuse) in `voxel_brdf.gdshaderinc`, gated by the baked sky exposure (`strata_sun_gate`) and by cloud shadows (`clouds.gdshaderinc`) |
 | Sky ambient and reflections | Godot environment, ambient = sky, reflections = sky radiance cubemap | Multiplied per surface by `AO = strata_sky_visibility(voxel light)`, so a sealed cave gets none; Godot also derives specular occlusion from it |
-| Block light (torches, lava, glowing ores and fungi) | Baked RGB voxel light per vertex / instance | `EMISSION = strata_block_light(albedo, light, ao)`; its curve (`strata_block_curve`, level^1.5) is gentler than the sky's so a torch's glow carries across a room |
-| Nearest light sources | `DynamicLights`: a pool of shadowless `OmniLight3D` (size = preset `dynamicLights`, 0 on low) given each ¼ s to the nearest placed lights, lava hotspots (`LavaEffects`) and glowing creatures (`NpcRenderer.Glows`, fireflies blink) | Regular Godot lights: longer reach and directional shading on top of the baked glow; a firefly swarm never costs more than the pool |
-| Carried torch | `PlayerLight`: an `OmniLight3D` at the flame in the hand (first or third person), ~15 m reach, a fire's flicker (shadows on high/ultra) | Regular Godot light through the same `light()` |
+| Block light (torches, lava, glowing ores and fungi) | Baked RGB voxel light per vertex / instance | `EMISSION = strata_block_light(albedo, light, ao)`; its curve (`strata_block_curve`: level × mix(`linear`, 1, level) × `gain`, from `lighting.json` `blockLight` through the `strata_block_response` shader global) is much flatter than the sky's, so a torch's glow carries across a cave with a soft tail out to the 7.5 m edge of the baked light; surfaces in full daylight lose `daylitSuppression` of it |
+| Nearest light sources | `DynamicLights`: a pool of shadowless `OmniLight3D` (size = preset `dynamicLights`: 4 on low, 8/16/24 above) given each ¼ s to the nearest placed lights, lava hotspots (`LavaEffects`) and glowing creatures (`NpcRenderer.Glows`, fireflies blink); ranking the candidates allocates nothing | Regular Godot lights: longer reach and directional shading on top of the baked glow; a placed torch's light reaches about 13 m (`lighting.json` `torch.placed*`: energy and range scale with the light's peak channel, each source has its own attenuation); a firefly swarm never costs more than the pool |
+| Carried torch | `PlayerLight`: an `OmniLight3D` at the flame in the hand (first or third person), about 16 m reach, at least a placed torch's energy (`torch.held*`), a fire's flicker (shadows on high/ultra) | Regular Godot light through the same `light()` |
 | Screen space | SSAO, SSIL (colour bleeding), SSR, volumetric fog with light shafts | Environment settings per preset; SSIL strength and the fog's albedo from `lighting.json` `screenSpace` |
 | Eye adaptation | `EnvironmentController.Exposure.cs` steps `ExposureModel` (Core) each frame from the camera's unsmoothed sky exposure, the daylight and the eased biome `exposureBias`, and writes the camera's exposure multiplier when it moves by more than 0.002. Presets with `autoExposure` add Godot's metering, confined to `autoMin`–`autoMax` (`ExposureModel.AutoWindow`). Godot applies the multiplier to lights, sky and emission before it meters, so the metering key and window are scaled by the multiplier too: Godot meters the scene as if at exposure 1 and its correction multiplies with the model instead of undoing it | Scales all light before AgX tone mapping and before the glow threshold. The same on every preset: a cave opens the eye up to `caveBoost` at `brightenPerSecond`, leaving it closes down at `darkenPerSecond` (no flashbang), by day desert and snow are dimmed by their bias. Probe `render.exposure` |
 | Glow | Environment glow from `lighting.json` `glow`: HDR `threshold`, `softness` (HDR scale), `intensity`, `luminanceCap`, normalized level weights; screen blend | Only light above the threshold after exposure blooms (flames, lava, magic, glowing ores); sunlit sand and snow stay under it |
@@ -80,7 +80,14 @@ CPU model on every preset, so desert and snow read the same on low and ultra. Th
 times however slowly lavapipe draws) shoots forest, desert, snow and a cave on each preset plus the frames 0.5 s and
 2 s after the walls of a sealed room vanish in the desert (at a quarter time scale, so remeshing the room costs game
 time as at 40 fps); `tools/ci/shot_stats.py --check` holds desert, snow and exit frames on medium, high and ultra to a
-mean luma of 0.35–0.6 with under 2% clipped pixels.
+mean luma of 0.35–0.6 with under 2% clipped pixels. Its torch part builds a sealed 2.5 m stone corridor with a torch
+at the player's feet and an end wall 1, 4, 6, 8 and 10 m ahead (`*_corridor_*`, plus the held torch alone at 8 m);
+`shot_stats.py --ratio/--centre-min` compare the luma of the frame's middle tenth (the end wall): on medium the 8 m
+wall keeps at least 20% of the 1 m wall and the 10 m wall 10%, the 6 m wall reads (0.25) on low and medium, and low
+stays within 30% of medium. Further stops check that the flatter block-light curve does not wash out a lava pool in
+the underworld, the glowing mushroom caverns or a sandstone room under the held torch, and that a torch by a sunlit
+wall at noon stays a faint tint. Edits in tours are relative to the feet cell, so the tour centres the player in it
+(`tp ~ ~ ~`, relative coordinates) once the colliders of a freshly built room are in.
 
 Light tuning shared by every preset is `LightingConfig` (Core, `data/config/lighting.json`, every value required and
 range-checked by `Strata.Tools validate`): eye adaptation, glow threshold/softness/levels, the fog near cap and
@@ -91,8 +98,8 @@ eases toward it, opening up slowly and closing down fast so leaving a cave never
 turns the `autoMin`–`autoMax` multiplier range into Godot's auto exposure ISO window (luminance = ISO × 12.5 / 100 /
 100 at sensitivity 100). `GraphicsSettings` loads and validates the file at start (a bad value stops the game, like a
 bad `graphics.json`); `EnvironmentController` takes exposure, glow, the fog section, SSIL and the volumetric albedo
-from it. The torch and block-light sections are not read by the renderer yet: torch lights and `strata_block_curve`
-keep built-in values.
+from it, `DynamicLights` and `PlayerLight` the torch section, and `EnvironmentController` sets the
+`strata_block_response` shader global (linear share, gain, daylit suppression) from the block-light section.
 
 Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class GPU):
 * Chunks sealed from the sky sit on their own visual layer (`ChunkLayers.Sealed`) that the sun's and moon's

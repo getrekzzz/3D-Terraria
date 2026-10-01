@@ -35,6 +35,25 @@ public class LightingConfigTests
     }
 
     [Fact]
+    public void ShippedTorchesReachAcrossACave()
+    {
+        // A full torch's real light carries well past the 7.5 m edge of its baked light, and the one in the hand is
+        // at least as bright as the one set down.
+        var torch = Shipped().Torch;
+        Assert.True(torch.PlacedRangeBase + torch.PlacedRangePerPeak >= 12f);
+        Assert.True(torch.HeldRangeBase + torch.HeldRangePerPeak >= torch.PlacedRangeBase + torch.PlacedRangePerPeak);
+        Assert.True(torch.HeldEnergy >= torch.PlacedEnergy);
+    }
+
+    [Fact]
+    public void AHeldTorchMayNotBeDimmerThanAPlacedOne()
+    {
+        var config = Shipped();
+        config.Torch.HeldEnergy = config.Torch.PlacedEnergy * 0.5f;
+        Assert.Contains(config.Validate(), p => p.StartsWith("torch.heldEnergy", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void LeavingACaveMayNotBeSlowerThanEnteringOne()
     {
         var config = Shipped();

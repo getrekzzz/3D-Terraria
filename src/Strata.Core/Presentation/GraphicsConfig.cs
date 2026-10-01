@@ -77,7 +77,10 @@ public sealed class GraphicsPreset
     /// <summary>Carried torches cast shadows.</summary>
     public bool TorchShadows { get; set; }
 
-    /// <summary>Real lights for the nearest placed torches, lava and glowing creatures (0 = baked light only).</summary>
+    /// <summary>
+    /// Real (shadowless) lights for the nearest placed torches, lava and glowing creatures (0 = baked light only, which
+    /// stops 7.5 m from a torch).
+    /// </summary>
     public int DynamicLights { get; set; } = 8;
 
     public bool Ssao { get; set; } = true;

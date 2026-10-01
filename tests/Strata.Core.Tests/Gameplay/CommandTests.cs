@@ -66,6 +66,12 @@ public class CommandTests
         Assert.True(r.Execute(ctx, "tp 100 300 100").Ok);
         Assert.True(r.Execute(ctx, "assert player.cell_y == 300").Ok);
         Assert.False(r.Execute(ctx, "tp 1 2").Ok);
+        // ~ is relative to the feet cell, and the player lands in the middle of the cell.
+        ctx.Player.Position += new System.Numerics.Vector3(0.2f, 0f, 0.24f);
+        Assert.True(r.Execute(ctx, "tp ~ ~ ~2").Ok);
+        Assert.Equal(new Int3(100, 300, 102), ctx.Player.FeetCell);
+        Assert.Equal(BuiltinCommands.Feet(new Int3(100, 300, 102)), ctx.Player.Position);
+        Assert.False(r.Execute(ctx, "tp ~ ~x ~").Ok);
         Assert.True(r.Execute(ctx, "inspect").Ok);
     }
 
