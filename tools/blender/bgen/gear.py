@@ -56,7 +56,7 @@ def shield(mb: MeshBuilder, p, rng):
     """A heater shield with a raised boss or an eye emblem."""
     layer, tint = _metal(p, p.get("color", "#8a5a3a"))
     pts = [(-0.14, 0.32), (0.14, 0.32), (0.15, 0.14), (0.0, -0.04), (-0.15, 0.14)]
-    mb.extrude_polygon(pts, 0.03, layer, tint, matrix=Matrix.Translation((0, 0.015, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+    mb.extrude_polygon(pts, 0.03, layer, tint)  # the plate stands in the XZ plane, its face (and boss) toward +Y
     mb.sphere((0, 0.035, 0.16), 0.05, "prop:plain" + (":glow" if p.get("glow") else ""), p.get("emblem", "#e8e0d0"), subdivisions=2, scale=(1, 0.45, 1))
     if p.get("pupil"):
         mb.sphere((0, 0.055, 0.16), 0.022, "prop:plain", p["pupil"], subdivisions=1, scale=(1, 0.4, 1))

@@ -14,6 +14,7 @@ namespace Strata.Game.Player;
 /// </summary>
 public sealed partial class PlayerAvatar
 {
+    private static readonly StringName VoxelLight = "voxel_light";
     private readonly List<Node3D> _worn = new();
     private readonly List<GeometryInstance3D> _wornGeometry = new();
     private Node3D? _balloon;
@@ -39,7 +40,7 @@ public sealed partial class PlayerAvatar
             _wornDirty = false;
             RebuildWorn();
         }
-        foreach (var g in _wornGeometry) g.SetInstanceShaderParameter("voxel_light", light);
+        foreach (var g in _wornGeometry) g.SetInstanceShaderParameter(VoxelLight, light);
         if (_balloon != null)
         {
             _bob += delta;
@@ -60,7 +61,8 @@ public sealed partial class PlayerAvatar
         {
             var item = stack.Item!;
             string slot = item.EquipSlot.ToString().ToLowerInvariant();
-            foreach (var piece in assets.Set(item.ArmorSet ?? item.Id))
+            var set = item.ArmorSet != null && assets.Set(item.ArmorSet).Count > 0 ? item.ArmorSet : item.Id; // as armor_build.armor_items
+            foreach (var piece in assets.Set(set))
             {
                 if (piece.Slot != slot || _props.Model(piece.Model, multimesh: false) is not { } mesh) continue;
                 var node = new MeshInstance3D { Mesh = mesh, Scale = Vector3.One * PieceScale(piece.Bone, piece.RefLength), Name = piece.Name };
@@ -75,8 +77,8 @@ public sealed partial class PlayerAvatar
                 continue;
             if (kind == "shield")
             {
-                // The shield's face (model -Z) turns outward from the left forearm (bone -X), its top up the arm.
-                var node = new MeshInstance3D { Mesh = mesh, Position = new Vector3(-0.07f, 0.12f, 0f), RotationDegrees = new Vector3(0f, 90f, 180f) };
+                // The shield's face (model -Z) turns outward from the left forearm (bone -X), its height along the arm.
+                var node = new MeshInstance3D { Mesh = mesh, Position = new Vector3(-0.07f, -0.02f, 0f), RotationDegrees = new Vector3(0f, 90f, 0f) };
                 Attach("forearm.L", node);
             }
             else if (_balloon == null)
@@ -95,6 +97,7 @@ public sealed partial class PlayerAvatar
             node.QueueFree();
             return false;
         }
+        node.LodBias = 8f; // like the body (PlayerAvatar.Initialize): simplified LODs would let the body poke through
         _worn.Add(node);
         _wornGeometry.Add(node);
         return true;

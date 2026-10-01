@@ -25,24 +25,40 @@ public sealed class WornAssets
     {
         const string path = "res://assets/manifest.json";
         if (!FileAccess.FileExists(path)) return;
-        using var doc = JsonDocument.Parse(FileAccess.GetFileAsString(path));
-        var root = doc.RootElement;
-        if (root.TryGetProperty("armor", out var armor))
+        try
+        {
+            using var doc = JsonDocument.Parse(FileAccess.GetFileAsString(path));
+            Read(doc.RootElement);
+        }
+        catch (JsonException e)
+        {
+            GD.PushError($"assets/manifest.json: {e.Message} (worn armour and accessories are not drawn)");
+        }
+    }
+
+    private void Read(JsonElement root)
+    {
+        if (root.TryGetProperty("armor", out var armor) && armor.ValueKind == JsonValueKind.Object)
             foreach (var set in armor.EnumerateObject())
             {
                 var pieces = new List<Piece>();
                 foreach (var p in set.Value.EnumerateObject())
-                    pieces.Add(new Piece(p.Name, p.Value.GetProperty("model").GetString()!, p.Value.GetProperty("bone").GetString()!,
-                        p.Value.TryGetProperty("slot", out var slot) ? slot.GetString()! : "",
-                        p.Value.GetProperty("refLength").GetSingle(), p.Value.TryGetProperty("hidesHair", out var h) && h.GetBoolean()));
+                    if (Text(p.Value, "model") is { } model && Text(p.Value, "bone") is { } bone)
+                        pieces.Add(new Piece(p.Name, model, bone, Text(p.Value, "slot") ?? "",
+                            p.Value.TryGetProperty("refLength", out var r) && r.ValueKind == JsonValueKind.Number ? r.GetSingle() : 0f,
+                            p.Value.TryGetProperty("hidesHair", out var h) && h.ValueKind == JsonValueKind.True));
                 _sets[set.Name] = pieces.ToArray();
             }
-        if (root.TryGetProperty("armorRig", out var rig))
-            foreach (var b in rig.EnumerateObject()) _rig[b.Name] = b.Value.GetSingle();
-        if (root.TryGetProperty("items", out var items))
+        if (root.TryGetProperty("armorRig", out var rig) && rig.ValueKind == JsonValueKind.Object)
+            foreach (var b in rig.EnumerateObject())
+                if (b.Value.ValueKind == JsonValueKind.Number) _rig[b.Name] = b.Value.GetSingle();
+        if (root.TryGetProperty("items", out var items) && items.ValueKind == JsonValueKind.Object)
             foreach (var item in items.EnumerateObject())
-                if (item.Value.TryGetProperty("worn", out var worn)) _worn[item.Name] = worn.GetString()!;
+                if (Text(item.Value, "worn") is { } worn) _worn[item.Name] = worn;
     }
+
+    private static string? Text(JsonElement e, string key) =>
+        e.ValueKind == JsonValueKind.Object && e.TryGetProperty(key, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
 
     /// <summary>The pieces of an armour set (or single piece such as the mining helmet); empty when it has none.</summary>
     public IReadOnlyList<Piece> Set(string key) => _sets.TryGetValue(key, out var p) ? p : None;
