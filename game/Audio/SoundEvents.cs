@@ -18,6 +18,7 @@ public sealed partial class SoundEvents : Node
     private PlayerEntity _local = null!;
     private ulong _lastPlaceFrame;
     private ulong _tinkFrame;
+    private ulong _blastFrame;
     private ulong _lastHitMs;
     private bool _wasAlive = true;
     private int _lastSerial;
@@ -57,7 +58,11 @@ public sealed partial class SoundEvents : Node
         };
         game.Npcs.BossSpawned += _ => Sfx.Play("boss_roar");
         game.Npcs.BossDefeated += _ => Sfx.Play("boss_defeated");
-        game.Projectiles.Exploded += (at, radius) => Sfx.PlayAt("explosion", ToGodot(at), Mathf.Clamp(radius * 2f - 6f, -6f, 4f));
+        game.Projectiles.Exploded += (at, radius) =>
+        {
+            _blastFrame = Engine.GetProcessFrames(); // the blast's own strike on the terrain follows at once
+            Sfx.PlayAt("explosion", ToGodot(at), Mathf.Clamp(radius * 2f - 6f, -6f, 4f));
+        };
         game.Events.Started += def =>
         {
             if (def.KillGoal > 0 || def.SkyTint != null) Sfx.Play("event_start", -2f);
@@ -92,6 +97,7 @@ public sealed partial class SoundEvents : Node
         bool broke = o.Broken.Count > 0;
         if (!broke && o.Damaged.Count == 0)
         {
+            if (Engine.GetProcessFrames() == _blastFrame) return; // a bomb against bricks it cannot break: the blast speaks
             _tinkFrame = Engine.GetProcessFrames();
             Sfx.PlayAt("tink", Cell(cell.Value), -6f); // the pick is too weak: it only glances off
             return;
