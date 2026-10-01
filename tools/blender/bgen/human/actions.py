@@ -4,9 +4,9 @@ that gameplay times (swing, mine, thrust, bow) take their length and windows fro
 file Core reads for the strike window (src/Strata.Core/Presentation/UseStyleConfig.cs), so what the body shows and
 what the game does line up:
 
-swing   Terraria's overhead arc: raised behind the head at the start and end (autoswing chains seamlessly), a short
-        wind-up, the strike over the top and down in front through the strike window (eased like the gameplay sweep),
-        a follow-through low, then the blade brought back up.
+swing   Terraria's overhead arc: the blade raised behind the head at the start and end (a chained swing carries on
+        from where the last one ended), a short wind-up, the strike over the top and down in front through the strike
+        window (eased like the gameplay sweep), a follow-through low, then the blade brought back up.
 mine    a tool chop from over the shoulder that bites early (impact at the strike end), a bounce, then the pull back up.
 thrust  pull back to the hip through the wind-up, lunge the arm straight out by the strike end, hold, retract.
 shoot   both hands on the weapon at shoulder height, a recoil kick and settle (guns, launchers).
@@ -18,8 +18,13 @@ use     the item lifted out in front (placing, summoning, other uses).
 hold    a carried light held up in front (loops; the game plays it on the right arm only).
 
 The right arm's main angle is its pitch in the side plane: 0 hanging down, 90 straight out in front, 180 overhead,
-over 180 reaching behind the head. Held items stick out of the fist at right angles to the forearm (a sword carried
-point-forward, a torch upright); the wrist angle turns them in line with the arm (about -100 with the elbow's soft bend), so blades, shafts and barrels
+over 180 reaching behind the head. Keep the upper arm short of straight up (about 170 at most) at a clip's start and
+end and wherever the game fades it: the game blends an action in and out by the shortest turn from the rest pose, so
+an arm turned past straight up would swing the other way round for a frame; fold the elbow to reach behind the head
+instead (Motion.stance gives actions a living person's arms on every body for the same reason).
+
+Held items stick out of the fist at right angles to the forearm (a sword carried point-forward, a torch upright); the
+wrist angle turns them in line with the arm (about -100 with the elbow's soft bend), so blades, shafts and barrels
 extend the arm at the moment of a strike, a thrust or a shot.
 """
 import json
@@ -88,8 +93,8 @@ def swing(t, w):
     f = b + 0.3 * (1 - b)                   # the end of the follow-through; the rest brings the blade back up
     keys = [(0, "lin"), (a, "out"), (b, "io"), (f, "out"), (1, "io")]
     #                       raised  wind-up  struck  follow  raised
-    pitch = keyed(t, keys, (195, 205, 45, 26, 195))
-    elbow = keyed(t, keys, (20, 30, 6, 14, 20)) + 85 * hump(t, f, 1)     # the elbow folds to lift the blade back
+    pitch = keyed(t, keys, (158, 166, 45, 26, 158))     # raised: the upper arm up, the folded elbow puts the blade behind
+    elbow = keyed(t, keys, (58, 72, 6, 14, 58)) + 40 * hump(t, f, 1)     # the elbow folds to lift the blade back
     inward = keyed(t, keys, (0, -4, 12, 22, 0))
     wrist = keyed(t, keys, (-95, -90, -78, -80, -95))   # the blade in line with the arm: raised up-back, extending the strike
     twist = keyed(t, keys, (-20, -26, 22, 28, -20))
