@@ -23,6 +23,20 @@
     { "id": "pink_dungeon_candelabra", "name": "Pink Dungeon Candelabra", "size": [2, 2, 1], "light": [12, 10, 6], "flame": { "at": [-0.34, 0.805, 0], "size": 0.1, "color": "#ffa040", "also": [[0, 0.925, 0], [0.34, 0.805, 0]]}, "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemValue": 300, "tags": ["world", "dungeon"], "covers": ["terraria:pink_dungeon_candelabra"]},
     { "id": "pink_dungeon_chandelier", "name": "Pink Dungeon Chandelier", "size": [3, 3, 3], "anchor": "ceiling", "light": [15, 13, 8], "flame": { "at": [0, 0.695, -0.54], "size": 0.11, "color": "#ffa040", "also": [[-0.468, 0.695, 0.27], [0.468, 0.695, 0.27]]}, "housing": ["light"], "hitPoints": 2, "itemCategory": "light", "itemValue": 600, "tags": ["world", "dungeon"], "covers": ["terraria:pink_dungeon_chandelier"]},
     { "id": "pink_dungeon_lamp", "name": "Pink Dungeon Lamp", "size": [1, 4, 1], "light": [12, 10, 7], "flame": { "at": [0, 1.65, 0], "size": 0.12, "color": "#ffa040" }, "housing": ["light"], "hitPoints": 2, "itemCategory": "light", "itemValue": 500, "tags": ["world", "dungeon"], "covers": ["terraria:pink_dungeon_lamp"]},
-    { "id": "pink_dungeon_vase", "name": "Pink Dungeon Vase", "size": [1, 2, 1], "hitPoints": 1, "itemValue": 100, "tags": ["world", "dungeon"], "covers": ["terraria:pink_dungeon_vase"]}
+    { "id": "pink_dungeon_vase", "name": "Pink Dungeon Vase", "size": [1, 2, 1], "hitPoints": 1, "itemValue": 100, "tags": ["world", "dungeon"], "covers": ["terraria:pink_dungeon_vase"]},
+    { "id": "marching_bones_banner", "name": "Marching Bones Banner", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:marching_bones_banner"]},
+    { "id": "necromantic_sign", "name": "Necromantic Sign", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:necromantic_sign"]},
+    { "id": "rusted_company_standard", "name": "Rusted Company Standard", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:rusted_company_standard"]},
+    { "id": "ragged_brotherhood_sigil", "name": "Ragged Brotherhood Sigil", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:ragged_brotherhood_sigil"]},
+    { "id": "molten_legion_flag", "name": "Molten Legion Flag", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:molten_legion_flag"]},
+    { "id": "diabolic_sigil", "name": "Diabolic Sigil", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:diabolic_sigil"]},
+    { "id": "skeleton_statue", "name": "Skeleton Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:skeleton_statue"]},
+    { "id": "armor_statue", "name": "Armor Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:armor_statue"]},
+    { "id": "angel_statue", "name": "Angel Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:angel_statue"]},
+    { "id": "book", "name": "Book", "size": [1, 1, 1], "variants": 4, "natural": true, "loot": "book", "hitPoints": 1},
+    { "id": "spike", "name": "Spike", "description": "Hurts whoever steps on it.", "size": [1, 1, 1], "anchor": "any", "breakTool": "pick", "hazard": { "damage": 40, "knockback": 6}, "hitPoints": 1, "itemMaxStack": 9999, "itemValue": 0, "tags": ["world", "dungeon"], "covers": ["terraria:spike"]}
+  ],
+  "items": [
+    { "id": "book", "name": "Book", "description": "It's got old writing on it.", "category": "material", "maxStack": 9999, "value": 75, "covers": ["terraria:book"]}
   ]
 }

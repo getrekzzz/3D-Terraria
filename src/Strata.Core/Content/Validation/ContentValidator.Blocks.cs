@@ -57,6 +57,7 @@ public static partial class ContentValidator
                 if (flame.Size is <= 0f or > 4f) ctx.Error(t, "flame.size must be within (0, 4] m.");
                 ctx.Color(t, flame.Color, "flame.color");
             }
+            if (t.Hazard is { } hazard && (hazard.Damage < 0 || hazard.Knockback < 0)) ctx.Error(t, "hazard damage and knockback must be >= 0.");
             if (t.Variants < 1) ctx.Error(t, "variants must be >= 1.");
             for (int v = 0; v < t.Variants; v++) ctx.Asset(t, AssetPaths.ObjectModel(t, v), $"model (variant {v})");
             if (t.HitPoints < 1) ctx.Error(t, "hitPoints must be >= 1.");

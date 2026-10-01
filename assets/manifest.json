@@ -18,6 +18,18 @@
    ],
    "generator": "manipulator"
   },
+  "angel_statue": {
+   "models": [
+    "assets/models/objects/angel_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
+  "armor_statue": {
+   "models": [
+    "assets/models/objects/armor_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
   "autohammer": {
    "models": [
     "assets/models/objects/autohammer_v0.glb"
@@ -90,6 +102,15 @@
    ],
    "generator": "vase"
   },
+  "book": {
+   "models": [
+    "assets/models/objects/book_v0.glb",
+    "assets/models/objects/book_v1.glb",
+    "assets/models/objects/book_v2.glb",
+    "assets/models/objects/book_v3.glb"
+   ],
+   "generator": "book"
+  },
   "bush": {
    "models": [
     "assets/models/objects/bush_v0.glb",
@@ -159,6 +180,12 @@
     "assets/models/objects/demon_altar_v0.glb"
    ],
    "generator": "altar"
+  },
+  "diabolic_sigil": {
+   "models": [
+    "assets/models/objects/diabolic_sigil_v0.glb"
+   ],
+   "generator": "banner"
   },
   "ebonwood_tree": {
    "models": [
@@ -358,11 +385,23 @@
    ],
    "generator": "jungle"
   },
+  "marching_bones_banner": {
+   "models": [
+    "assets/models/objects/marching_bones_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "minecart_track": {
    "models": [
     "assets/models/objects/minecart_track_v0.glb"
    ],
    "generator": "rail"
+  },
+  "molten_legion_flag": {
+   "models": [
+    "assets/models/objects/molten_legion_flag_v0.glb"
+   ],
+   "generator": "banner"
   },
   "moonglow_plant": {
    "models": [
@@ -381,6 +420,12 @@
     "assets/models/objects/mythril_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "necromantic_sign": {
+   "models": [
+    "assets/models/objects/necromantic_sign_v0.glb"
+   ],
+   "generator": "banner"
   },
   "oak_tree": {
    "models": [
@@ -487,6 +532,12 @@
    ],
    "generator": "pressure_plate"
   },
+  "ragged_brotherhood_sigil": {
+   "models": [
+    "assets/models/objects/ragged_brotherhood_sigil_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "rubble": {
    "models": [
     "assets/models/objects/rubble_v0.glb",
@@ -494,6 +545,12 @@
     "assets/models/objects/rubble_v2.glb"
    ],
    "generator": "rubble"
+  },
+  "rusted_company_standard": {
+   "models": [
+    "assets/models/objects/rusted_company_standard_v0.glb"
+   ],
+   "generator": "banner"
   },
   "sawmill": {
    "models": [
@@ -519,6 +576,18 @@
     "assets/models/objects/shiverthorn_plant_v0.glb"
    ],
    "generator": "flower"
+  },
+  "skeleton_statue": {
+   "models": [
+    "assets/models/objects/skeleton_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
+  "spike": {
+   "models": [
+    "assets/models/objects/spike_v0.glb"
+   ],
+   "generator": "spike_strip"
   },
   "stalactite": {
    "models": [
@@ -696,6 +765,10 @@
    "object": "ancient_manipulator",
    "icon": "assets/icons/items/ancient_manipulator.png"
   },
+  "angel_statue": {
+   "object": "angel_statue",
+   "icon": "assets/icons/items/angel_statue.png"
+  },
   "angel_wings": {
    "model": "assets/models/items/angel_wings.glb",
    "icon": "assets/icons/items/angel_wings.png"
@@ -715,6 +788,10 @@
   "archery_potion": {
    "model": "assets/models/items/archery_potion.glb",
    "icon": "assets/icons/items/archery_potion.png"
+  },
+  "armor_statue": {
+   "object": "armor_statue",
+   "icon": "assets/icons/items/armor_statue.png"
   },
   "armored_cavefish": {
    "model": "assets/models/items/armored_cavefish.glb",
@@ -891,6 +968,10 @@
   "bone": {
    "model": "assets/models/items/bone.glb",
    "icon": "assets/icons/items/bone.png"
+  },
+  "book": {
+   "model": "assets/models/items/book.glb",
+   "icon": "assets/icons/items/book.png"
   },
   "book_of_skulls": {
    "model": "assets/models/items/book_of_skulls.glb",
@@ -1311,6 +1392,10 @@
   "depth_meter": {
    "model": "assets/models/items/depth_meter.glb",
    "icon": "assets/icons/items/depth_meter.png"
+  },
+  "diabolic_sigil": {
+   "object": "diabolic_sigil",
+   "icon": "assets/icons/items/diabolic_sigil.png"
   },
   "diamond": {
    "model": "assets/models/items/diamond.glb",
@@ -2020,6 +2105,10 @@
    "model": "assets/models/items/mana_regeneration_potion.glb",
    "icon": "assets/icons/items/mana_regeneration_potion.png"
   },
+  "marching_bones_banner": {
+   "object": "marching_bones_banner",
+   "icon": "assets/icons/items/marching_bones_banner.png"
+  },
   "mechanical_eye": {
    "model": "assets/models/items/mechanical_eye.glb",
    "icon": "assets/icons/items/mechanical_eye.png"
@@ -2079,6 +2168,10 @@
   "minishark": {
    "model": "assets/models/items/minishark.glb",
    "icon": "assets/icons/items/minishark.png"
+  },
+  "molten_legion_flag": {
+   "object": "molten_legion_flag",
+   "icon": "assets/icons/items/molten_legion_flag.png"
   },
   "moonglow": {
    "model": "assets/models/items/moonglow.glb",
@@ -2227,6 +2320,10 @@
   "necromantic_scroll": {
    "model": "assets/models/items/necromantic_scroll.glb",
    "icon": "assets/icons/items/necromantic_scroll.png"
+  },
+  "necromantic_sign": {
+   "object": "necromantic_sign",
+   "icon": "assets/icons/items/necromantic_sign.png"
   },
   "neon_tetra": {
    "model": "assets/models/items/neon_tetra.glb",
@@ -2532,6 +2629,10 @@
    "model": "assets/models/items/rage_potion.glb",
    "icon": "assets/icons/items/rage_potion.png"
   },
+  "ragged_brotherhood_sigil": {
+   "object": "ragged_brotherhood_sigil",
+   "icon": "assets/icons/items/ragged_brotherhood_sigil.png"
+  },
   "rainbow_crystal_staff": {
    "model": "assets/models/items/rainbow_crystal_staff.glb",
    "icon": "assets/icons/items/rainbow_crystal_staff.png"
@@ -2619,6 +2720,10 @@
   "ruby_staff": {
    "model": "assets/models/items/ruby_staff.glb",
    "icon": "assets/icons/items/ruby_staff.png"
+  },
+  "rusted_company_standard": {
+   "object": "rusted_company_standard",
+   "icon": "assets/icons/items/rusted_company_standard.png"
   },
   "s_d_m_g": {
    "model": "assets/models/items/s_d_m_g.glb",
@@ -2768,6 +2873,10 @@
    "model": "assets/models/items/silver_shortsword.glb",
    "icon": "assets/icons/items/silver_shortsword.png"
   },
+  "skeleton_statue": {
+   "object": "skeleton_statue",
+   "icon": "assets/icons/items/skeleton_statue.png"
+  },
   "sky_blue_paint": {
    "model": "assets/models/items/sky_blue_paint.glb",
    "icon": "assets/icons/items/sky_blue_paint.png"
@@ -2907,6 +3016,10 @@
   "spelunker_potion": {
    "model": "assets/models/items/spelunker_potion.glb",
    "icon": "assets/icons/items/spelunker_potion.png"
+  },
+  "spike": {
+   "object": "spike",
+   "icon": "assets/icons/items/spike.png"
   },
   "spiky_ball": {
    "model": "assets/models/items/spiky_ball.glb",

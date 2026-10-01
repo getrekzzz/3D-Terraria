@@ -50,6 +50,7 @@
     "items/utility.json",
     "items/wiring.json",
     "loot/containers.json",
+    "loot/dungeon.json",
     "loot/enemies.json",
     "recipes/basic.json",
     "recipes/materials.json",

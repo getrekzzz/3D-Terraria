@@ -108,6 +108,9 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Fires this projectile when a wire signal reaches it (dart traps).</summary>
     public TrapDef? Trap { get; init; }
 
+    /// <summary>Hurts players who touch it (dungeon spikes).</summary>
+    public HazardSpec? Hazard { get; init; }
+
     /// <summary>The item id that places/drops this object.</summary>
     public string? PlacingItemId => Item ?? (Natural ? null : Id);
 
@@ -153,6 +156,15 @@ public sealed class AuraBuff
 
     /// <summary>How long the buff lasts once the player walks away (ticks).</summary>
     public int Ticks { get; init; } = 120;
+}
+
+/// <summary>Contact damage an object deals to a player touching it (defense and immunity frames apply).</summary>
+public sealed class HazardSpec
+{
+    public int Damage { get; init; } = 40;
+
+    /// <summary>Knockback away from the object (Terraria knockback units).</summary>
+    public float Knockback { get; init; } = 6f;
 }
 
 /// <summary>What a wired trap shoots, along the way it faces.</summary>

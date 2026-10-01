@@ -109,6 +109,19 @@ pink_dungeon_candelabra|Pink Dungeon Candelabra|prehardmode|dungeon
 pink_dungeon_chandelier|Pink Dungeon Chandelier|prehardmode|dungeon
 pink_dungeon_lamp|Pink Dungeon Lamp|prehardmode|dungeon
 pink_dungeon_vase|Pink Dungeon Vase|prehardmode|dungeon
+marching_bones_banner|Marching Bones Banner|prehardmode|dungeon
+necromantic_sign|Necromantic Sign|prehardmode|dungeon
+rusted_company_standard|Rusted Company Standard|prehardmode|dungeon
+ragged_brotherhood_sigil|Ragged Brotherhood Sigil|prehardmode|dungeon
+molten_legion_flag|Molten Legion Flag|prehardmode|dungeon
+diabolic_sigil|Diabolic Sigil|prehardmode|dungeon
+skeleton_statue|Skeleton Statue|early|world
+armor_statue|Armor Statue|early|world
+angel_statue|Angel Statue|early|world
+spike|Spike|prehardmode|dungeon
+""",
+    "material": """
+book|Book|prehardmode|dungeon
 """,
     "paint": """
 paintbrush|Paintbrush|early|painter

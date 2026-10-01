@@ -78,10 +78,12 @@ public sealed partial class WorldEditor
             var content = _session.Content;
             if (obj.Def.PlacingItemId is { } itemId && content.Items.TryGet(itemId, out var item) && !obj.Def.Natural)
                 SpawnDrop(new ItemStack(item, 1), center);
-            if (obj.Def.Loot != null)
+            // A non-container's own pending loot (the one Water Bolt among a shelf of books) replaces its kind's table.
+            var table = obj.Container == null && obj.PendingLoot != null ? obj.PendingLoot : obj.Def.Loot;
+            if (table != null)
             {
                 var rng = NextRng(center);
-                foreach (var stack in _loot.Roll(obj.Def.Loot, ref rng, LootContext(center))) SpawnDrop(stack, center);
+                foreach (var stack in _loot.Roll(table, ref rng, LootContext(center))) SpawnDrop(stack, center);
             }
             if (obj.Container != null)
                 foreach (var stack in obj.Container.Where(s => !s.IsEmpty)) SpawnDrop(stack, center);

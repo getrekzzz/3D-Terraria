@@ -3946,6 +3946,83 @@
    "source": "dungeon"
   },
   {
+   "id": "terraria:marching_bones_banner",
+   "name": "Marching Bones Banner",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:necromantic_sign",
+   "name": "Necromantic Sign",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:rusted_company_standard",
+   "name": "Rusted Company Standard",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:ragged_brotherhood_sigil",
+   "name": "Ragged Brotherhood Sigil",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:molten_legion_flag",
+   "name": "Molten Legion Flag",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:diabolic_sigil",
+   "name": "Diabolic Sigil",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:skeleton_statue",
+   "name": "Skeleton Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:armor_statue",
+   "name": "Armor Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:angel_statue",
+   "name": "Angel Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:spike",
+   "name": "Spike",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:book",
+   "name": "Book",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
    "id": "terraria:paintbrush",
    "name": "Paintbrush",
    "kind": "paint",

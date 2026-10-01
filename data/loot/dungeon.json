@@ -1,0 +1,6 @@
+{
+  "lootTables": [
+    { "id": "book", "entries": [{ "item": "book" }] },
+    { "id": "water_bolt_book", "entries": [{ "item": "water_bolt" }] }
+  ]
+}

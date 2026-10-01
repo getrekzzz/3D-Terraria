@@ -184,6 +184,7 @@ public sealed partial class GameWorld : IDisposable
         }
         state.PlayTicks++;
         StepOnPlates(p);
+        TouchHazards(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.UseAnimation > 0) p.UseAnimation--;
         // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
