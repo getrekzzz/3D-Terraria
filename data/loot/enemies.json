@@ -6,10 +6,10 @@
     { "id": "demon_eye", "coins": [40, 120], "entries": [{ "item": "lens", "chance": 0.33 }] },
     { "id": "blood_zombie", "coins": [60, 160], "entries": [{ "item": "lesser_healing_potion", "chance": 0.05 }, { "item": "lens", "chance": 0.1 }] },
     { "id": "drippler", "coins": [80, 200], "entries": [{ "item": "lens", "min": 1, "max": 2, "chance": 0.5 }] },
-    { "id": "king_slime", "coins": [8000, 12000], "entries": [{ "item": "gel", "min": 40, "max": 80 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 }, { "item": "life_crystal", "chance": 0.5 }, { "item": "royal_gel", "conditions": [{ "type": "difficulty", "min": 1 }] }] },
-    { "id": "eye_of_cthulhu", "coins": [10000, 15000], "entries": [{ "item": "lens", "min": 3, "max": 6 }, { "item": "demonite_ore", "min": 30, "max": 90 }, { "item": "mana_crystal", "chance": 0.5 }, { "item": "code_1", "chance": 0.1 }, { "item": "shield_of_cthulhu", "conditions": [{ "type": "difficulty", "min": 1 }] }] },
+    { "id": "king_slime", "coins": [8000, 12000], "entries": [{ "item": "gel", "min": 40, "max": 80 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 }, { "item": "life_crystal", "chance": 0.5 }, { "item": "royal_gel", "conditions": [{ "type": "expert" }] }] },
+    { "id": "eye_of_cthulhu", "coins": [10000, 15000], "entries": [{ "item": "lens", "min": 3, "max": 6 }, { "item": "demonite_ore", "min": 30, "max": 90 }, { "item": "mana_crystal", "chance": 0.5 }, { "item": "code_1", "chance": 0.1 }, { "item": "shield_of_cthulhu", "conditions": [{ "type": "expert" }] }] },
     { "id": "eater_of_worlds", "coins": [9000, 14000], "entries": [{ "item": "demonite_ore", "min": 40, "max": 100 }, { "item": "shadow_scale", "min": 10, "max": 20 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 },
-      { "item": "worm_scarf", "conditions": [{ "type": "difficulty", "min": 1 }] }] },
+      { "item": "worm_scarf", "conditions": [{ "type": "expert" }] }] },
     { "id": "cave_bat", "coins": [20, 60], "entries": [{ "item": "fallen_star", "chance": 0.02 }] }
   ]
 }

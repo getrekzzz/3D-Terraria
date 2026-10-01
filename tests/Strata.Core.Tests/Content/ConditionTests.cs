@@ -56,4 +56,27 @@ public class ConditionTests
         Assert.True(cond.Evaluate(new ConditionContext { Hour = 1 }));
         Assert.False(cond.Evaluate(new ConditionContext { Hour = 12 }));
     }
+
+    [Fact]
+    public void ExpertConditionExcludesClassicAndJourney()
+    {
+        var expert = ConditionCompiler.Compile(Spec("""{ "type": "expert" }"""));
+        var notExpert = ConditionCompiler.Compile(Spec("""{ "type": "expert", "is": false }"""));
+        foreach (var (d, want) in new[] { (Difficulty.Classic, false), (Difficulty.Expert, true), (Difficulty.Master, true), (Difficulty.Journey, false) })
+        {
+            var ctx = new ConditionContext { Difficulty = (int)d };
+            Assert.Equal(want, expert.Evaluate(ctx));
+            Assert.Equal(!want, notExpert.Evaluate(ctx));
+        }
+    }
+
+    [Fact]
+    public void DefenseConditionReadsPlayerDefense()
+    {
+        var cond = ConditionCompiler.Compile(Spec("""{ "type": "defense", "min": 10, "max": 40 }"""));
+        Assert.False(cond.Evaluate(new ConditionContext { PlayerDefense = 9 }));
+        Assert.True(cond.Evaluate(new ConditionContext { PlayerDefense = 10 }));
+        Assert.True(cond.Evaluate(new ConditionContext { PlayerDefense = 40 }));
+        Assert.False(cond.Evaluate(new ConditionContext { PlayerDefense = 41 }));
+    }
 }

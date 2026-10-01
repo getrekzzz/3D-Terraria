@@ -60,12 +60,20 @@ public sealed partial class NpcSystem
             {
                 if (world.Session.Content.Projectiles.TryGet(id, out var def)) world.Projectiles.Spawn(def, from, velocity, null, (int)(damage * Scale), 3f, Content.Defs.DamageClass.None, 0);
             },
-            Announce = text => Announced?.Invoke(text),
+            Announce = text => Announce(text, Messages.MessageKind.Boss),
+            Impact = (at, strength) => Impacted?.Invoke(at, strength),
+            InSight = InSight,
+            Cue = (npc, sfx) => Cued?.Invoke(npc, sfx),
+            Pulse = Pulse,
             Bands = world.Session.Generator.Plan.Bands,
         };
+        _ctx.Expert = world.Session.Settings.Difficulty is World.Difficulty.Expert or World.Difficulty.Master;
     }
 
     public IReadOnlyList<Npc> All => _npcs;
+
+    /// <summary>The context brains think with (tests read its world-wide fields).</summary>
+    internal BrainContext Context => _ctx;
 
     /// <summary>Creature life and damage multiplier of the world's difficulty.</summary>
     public float Scale => DamageModel.EnemyScale(_world.Session.Settings.Difficulty);
@@ -79,6 +87,18 @@ public sealed partial class NpcSystem
 
     /// <summary>A creature announced something (a boss's new phase).</summary>
     public event Action<string>? Announced;
+
+    /// <summary>
+    /// Every creature announcement with its kind, including "&lt;Title&gt; has awoken!" and "… has been defeated!" (which
+    /// <see cref="Announced"/> leaves to <see cref="BossSpawned"/>/<see cref="BossDefeated"/> listeners).
+    /// </summary>
+    public event Action<string, Messages.MessageKind>? Messaged;
+
+    /// <summary>A heavy landing or slam (point, strength 0–1): camera shake and dust.</summary>
+    public event Action<Vector3, float>? Impacted;
+
+    /// <summary>A creature's sound cue (creature, sfx id).</summary>
+    public event Action<Npc, string>? Cued;
 
     /// <summary>A boss was killed (its defeat flag is already set).</summary>
     public event Action<Npc>? BossDefeated;
@@ -98,7 +118,11 @@ public sealed partial class NpcSystem
             for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
         bool joinsGroup = def.Boss is { Minor: false } && GroupAlive(def.Boss, npc);
         _npcs.Add(npc);
-        if (def.Boss is { Minor: false } && !joinsGroup) BossSpawned?.Invoke(npc);
+        if (def.Boss is { Minor: false } && !joinsGroup)
+        {
+            BossSpawned?.Invoke(npc);
+            Messaged?.Invoke($"{def.Boss.Title} has awoken!", Messages.MessageKind.BossAwoken);
+        }
         Spawned?.Invoke(npc);
         if (def.Boss is { Companions.Length: > 0 } group)
         {
@@ -115,7 +139,7 @@ public sealed partial class NpcSystem
     }
 
     /// <summary>The creature's despawn conditions hold where its target stands (checked twice a second).</summary>
-    private bool OutOfBounds(Npc npc, PlayerEntity? target)
+    private bool OutOfBounds(Npc npc, Combat.ICombatTarget? target)
     {
         if (npc.Def.DespawnWhen.Length == 0 || target == null || npc.Age % 30 != 0) return false;
         if (!_despawn.TryGetValue(npc.Def, out var condition))
@@ -138,6 +162,7 @@ public sealed partial class NpcSystem
         const float dt = 1f / Units.TicksPerSecond;
         var session = _world.Session;
         _ctx.IsDay = session.Clock.IsDay;
+        _ctx.Expert = session.Settings.Difficulty is World.Difficulty.Expert or World.Difficulty.Master;
         for (int i = _npcs.Count - 1; i >= 0; i--)
         {
             var npc = _npcs[i];
@@ -162,7 +187,8 @@ public sealed partial class NpcSystem
             }
             var target = Nearest(npc.Center, out float distance);
             float despawn = npc.IsBoss ? npc.Def.Boss!.ArenaRadius : DespawnDistance;
-            if (OutOfBounds(npc, target))
+            bool part = npc.IsPart; // parts stay and go with their body
+            if (!part && OutOfBounds(npc, target))
             {
                 if (npc.IsBoss && !GroupAlive(npc.Def.Boss!, npc)) BossLeft?.Invoke(npc);
                 Remove(i);
@@ -170,7 +196,11 @@ public sealed partial class NpcSystem
             }
             // Bosses that leave at day go at once; creatures walking off at dawn go once out of sight.
             bool leaving = (npc.Def.Boss is { DespawnAtDay: true } && session.Clock.IsDay) || (npc.Leaving && distance > LeaveDistance);
-            if (distance > despawn || leaving)
+            if (part)
+            {
+                npc.FarTicks = 0;
+            }
+            else if (distance > despawn || leaving)
             {
                 if (++npc.FarTicks > (leaving ? 1 : DespawnDelayTicks))
                 {
@@ -190,12 +220,15 @@ public sealed partial class NpcSystem
             _ctx.OnSurface = session.Generator.Plan.Bands.LayerAt(npc.Cell.Y) == World.WorldLayer.Surface;
             _ctx.Rng = _rng;
             var brain = BrainOf(npc.Def);
+            npc.DefenseDelta = 0;
+            npc.DamageScale = 1f;
             if (npc.StunTicks > 0) Reel(npc, brain);
             else brain.Think(npc, _ctx);
             _rng = _ctx.Rng;
+            ApplyEnrage(npc, target);
             if (npc.Def.Shield != null && ShieldUp(npc)) npc.Invulnerable = true;
-            if (brain.UsesGravity && npc.Def.Gravity) npc.Velocity.Y = MathF.Max(npc.Velocity.Y - BrainContext.Gravity * dt, -30f);
-            Move(npc, brain, dt);
+            if (brain.UsesGravityFor(npc) && npc.Def.Gravity) npc.Velocity.Y = MathF.Max(npc.Velocity.Y - BrainContext.Gravity * dt, -30f);
+            Move(npc, brain, dt * npc.SpeedScale);
             if (npc.Def.Ranged != null && target != null) RangedAttack(npc, target, distance);
             if (npc.Def.ContactDamage && target != null) ContactDamage(npc, target);
             if (npc.Barrier != null) BarrierEffects(npc);
@@ -241,34 +274,6 @@ public sealed partial class NpcSystem
             npc.Segments[i] = s;
             lead = s;
         }
-    }
-
-    private void ContactDamage(Npc npc, PlayerEntity player)
-    {
-        if (!player.Alive || player.State.Vitals.ImmunityTicks > 0 || npc.Def.Damage <= 0) return;
-        foreach (var tag in player.State.Effects.Pacified)
-            if (npc.Def.HasTag(tag)) return;
-        var pBox = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
-        if (!npc.Volumes().Any(v => Npc.Overlaps(v, pBox))) return;
-        var state = player.State;
-        var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale * Scale), DamageClass.None, 0, 6f, null, state.Defense,
-            DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
-            state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
-        if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;
-        var away = BrainFactory.Flat(player.Position - npc.Position);
-        if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
-        var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);
-        ReportPlayerDamage(player, hit.Damage, knock);
-        ApplyContactEffects(npc, player);
-        float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
-        if (thorns > 0) Hit(npc, null, (int)(npc.Def.Damage * npc.DamageScale * thorns), DamageClass.None, 0, 0f, player.Center, melee: false);
-    }
-
-    /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
-    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock)
-    {
-        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true));
-        PlayerHurt?.Invoke(player, damage, knock);
     }
 
     /// <summary>Applies a hit from a player. Returns false if the NPC was immune (melee) or already dead.</summary>

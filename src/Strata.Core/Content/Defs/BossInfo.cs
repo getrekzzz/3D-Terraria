@@ -7,6 +7,29 @@ public sealed class DayEnrage
     public float Speed { get; init; } = 2f;
 }
 
+/// <summary>
+/// Data-driven enrage: while <see cref="When"/> holds where the boss's target stands (checked twice a second), the boss
+/// is <see cref="Gameplay.Entities.Npc.Frenzied"/> and fights with these multipliers or fixed values (Terraria's
+/// lethal daylight or out-of-biome rages).
+/// </summary>
+public sealed class Enrage
+{
+    public TypedSpec[] When { get; init; } = Array.Empty<TypedSpec>();
+    public float Damage { get; init; } = 1f;
+    public float Speed { get; init; } = 1f;
+
+    /// <summary>Contact and barrier damage while frenzied, replacing the scaled base damage.</summary>
+    public int? SetDamage { get; init; }
+
+    public int? SetDefense { get; init; }
+
+    /// <summary>Once frenzied it stays so until it dies or leaves.</summary>
+    public bool Latch { get; init; }
+
+    /// <summary>Announced once each time the rage begins.</summary>
+    public string? Message { get; init; }
+}
+
 /// <summary>Boss metadata: presentation, arena, progression and body segments (worms).</summary>
 public sealed class BossInfo
 {
@@ -77,6 +100,15 @@ public sealed class BossInfo
     /// </summary>
     public BossPart[] Parts { get; init; } = Array.Empty<BossPart>();
 
+    /// <summary>Condition-driven rage (see <see cref="Defs.Enrage"/>).</summary>
+    public Enrage? Enrage { get; init; }
+
+    /// <summary>Boss head icon id (map and boss bar); defaults to the enemy id.</summary>
+    public string? Icon { get; init; }
+
+    /// <summary>Roll the loot table only when the whole group falls (a pair's last eye), not for every member.</summary>
+    public bool LootOnDefeat { get; init; }
+
     /// <summary>A gathering at a landmark that calls this boss up when disturbed (the Lunatic Cultist's devotees).</summary>
     public BossRitual? Ritual { get; init; }
 }
@@ -87,6 +119,18 @@ public sealed class BossPart
 
     /// <summary>Offset from the body's centre in metres [right, up, forward], turned with the body's facing.</summary>
     public float[] Offset { get; init; } = { 0f, 0f, 0f };
+
+    /// <summary>
+    /// The part falls with the body: it does not keep the group's defeat flag from being raised, and it is removed
+    /// (without loot) once the body dies. When false it fights on alone after the body falls.
+    /// </summary>
+    public bool DiesWithBody { get; init; } = true;
+
+    /// <summary>The part's life counts on the boss bar (Moon Lord's hands and head; not Skeletron's hands).</summary>
+    public bool InBossBar { get; init; }
+
+    /// <summary>A left-hand part: presentation mirrors its model (<see cref="Gameplay.Entities.Npc.Mirrored"/>).</summary>
+    public bool Mirror { get; init; }
 }
 
 /// <summary>

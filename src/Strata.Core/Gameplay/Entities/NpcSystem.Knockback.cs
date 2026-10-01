@@ -33,9 +33,10 @@ public sealed partial class NpcSystem
     private static void Reel(Npc npc, IBrain brain)
     {
         npc.StunTicks--;
-        float drag = !brain.UsesGravity || !npc.Def.Gravity ? 0.93f : npc.OnGround ? 0.88f : 0.96f;
+        bool falls = brain.UsesGravityFor(npc) && npc.Def.Gravity;
+        float drag = !falls ? 0.93f : npc.OnGround ? 0.88f : 0.96f;
         npc.Velocity.X *= drag;
         npc.Velocity.Z *= drag;
-        if (!brain.UsesGravity || !npc.Def.Gravity) npc.Velocity.Y *= drag;
+        if (!falls) npc.Velocity.Y *= drag;
     }
 }

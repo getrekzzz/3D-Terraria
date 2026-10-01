@@ -49,6 +49,12 @@ public sealed class EventConditionParams : SpecParams
     public int MinKills { get; init; }
 }
 
+/// <summary>The world is (or is not) an Expert-rules world: Expert or Master, never Classic or Journey.</summary>
+public sealed class ExpertConditionParams : SpecParams
+{
+    public bool Is { get; init; } = true;
+}
+
 public sealed class RangeConditionParams : SpecParams
 {
     public float Min { get; init; } = float.MinValue;

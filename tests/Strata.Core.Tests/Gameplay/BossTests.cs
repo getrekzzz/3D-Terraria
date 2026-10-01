@@ -125,4 +125,20 @@ public class BossTests
         Assert.Contains("defeated_king_slime", g.World.Session.Flags);
         Assert.Contains(g.World.Drops.Items, d => d.Stack.Item!.Id == "gel" && d.Stack.Count >= 1);
     }
+
+    [Fact]
+    public void JourneyWorldsDropNoExpertItems()
+    {
+        using var g = TestGame.Create(difficulty: Strata.Core.World.Difficulty.Journey);
+        g.World.Spawner.Enabled = false;
+        var def = g.Content.Enemies.Get("king_slime");
+        for (int i = 0; i < 50; i++)
+        {
+            var boss = g.World.Npcs.Spawn(def, g.Player.Position + new Vector3(0, 0.5f, 6f))!;
+            g.World.Npcs.Kill(boss);
+            foreach (var slime in g.World.Npcs.All.ToList()) g.World.Npcs.Despawn(slime);
+        }
+        Assert.DoesNotContain(g.World.Drops.Items, d => d.Stack.Item?.Id == "royal_gel");
+        Assert.Contains(g.World.Drops.Items, d => d.Stack.Item?.Id == "gel");
+    }
 }

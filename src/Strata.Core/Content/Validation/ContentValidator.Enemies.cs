@@ -53,6 +53,12 @@ public static partial class ContentValidator
                 if (boss.ArmModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.ArmModel}.glb", "boss.armModel");
                 if (boss.BarrierTile <= 0) ctx.Error(e, "boss.barrierTile must be > 0.");
                 if (boss.DayEnrage is { Damage: <= 0 } or { Speed: <= 0 }) ctx.Error(e, "boss.dayEnrage multipliers must be > 0.");
+                if (boss.Enrage is { } rage)
+                {
+                    ctx.Specs(e, SpecKind.Condition, rage.When, "boss.enrage.when");
+                    if (rage.Damage <= 0 || rage.Speed <= 0) ctx.Error(e, "boss.enrage multipliers must be > 0.");
+                    if (rage.SetDamage < 0 || rage.SetDefense < 0) ctx.Error(e, "boss.enrage setDamage and setDefense must be >= 0.");
+                }
                 foreach (var part in boss.Parts)
                 {
                     ctx.Ref(e, ctx.Db.Enemies, part.Enemy, "boss.parts");

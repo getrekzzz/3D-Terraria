@@ -10,11 +10,21 @@ public sealed partial class NpcSystem
     /// <summary>Knockback (m/s) that throws a player out in front of a barrier.</summary>
     private const float BarrierThrow = 16f;
 
-    /// <summary>Keeps a tethered follower's anchor on its leader; false when the leader is gone (it goes too).</summary>
+    /// <summary>
+    /// Keeps a tethered follower's anchor on its leader; false when the leader is gone (it goes too, without loot). A
+    /// boss part that does not die with its body is cut loose instead and fights on.
+    /// </summary>
     private static bool FollowLeader(Npc npc)
     {
         if (npc.Leader is not { } leader) return true;
-        if (!leader.Alive || leader.Removed) return false;
+        if (!leader.Alive || leader.Removed)
+        {
+            if (npc.Part is not { DiesWithBody: false }) return false;
+            leader.Followers.Remove(npc);
+            npc.Leader = null;
+            npc.TurnsWithLeader = false;
+            return true;
+        }
         var o = npc.LeaderOffset;
         if (npc.TurnsWithLeader)
         {
@@ -35,6 +45,8 @@ public sealed partial class NpcSystem
             if (Spawn(def, npc.Center + o - new Vector3(0, def.Height * 0.25f * def.Scale, 0)) is not { } m) continue;
             Tether(m, npc, o);
             m.TurnsWithLeader = true;
+            m.Part = part;
+            m.Mirrored = part.Mirror;
             FollowLeader(m);
         }
     }
@@ -54,7 +66,7 @@ public sealed partial class NpcSystem
             int k = _world.Session.Counters.GetValueOrDefault(key);
             if (k >= sh.Kills) continue;
             _world.Session.Counters[key] = k + 1;
-            if (k + 1 == sh.Kills) Announced?.Invoke($"The {n.Def.DisplayName}'s shield is down!");
+            if (k + 1 == sh.Kills) Announce($"The {n.Def.DisplayName}'s shield is down!", Messages.MessageKind.Boss);
         }
     }
 
@@ -83,7 +95,7 @@ public sealed partial class NpcSystem
             if (c.Y < min.Y || c.Y > max.Y || c.Z < min.Z || c.Z > max.Z) continue;
             if ((c.X - front) * dir > -PlayerEntity.HalfExtents.X) continue; // in front of the wall
             var state = p.State;
-            var hit = DamageModel.Roll((int)(npc.Def.Damage * npc.DamageScale * Scale), Content.Defs.DamageClass.None, 0, 0f, null, state.Defense,
+            var hit = DamageModel.Roll(ContactBase(npc), Content.Defs.DamageClass.None, 0, 0f, null, state.Defense,
                 DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref _rng);
             if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) continue;
             ReportPlayerDamage(p, hit.Damage, new Vector3(dir * BarrierThrow, 5f, 0));

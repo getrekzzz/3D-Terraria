@@ -210,7 +210,7 @@ public sealed partial class GameWorld : IDisposable
         p.Velocity = Vector3.Zero;
         p.State.Vitals.ImmunityTicks = RespawnImmunityTicks;
         // Whatever was waiting at the spawn point (usually what killed the player) wanders off.
-        foreach (var npc in Npcs.All.Where(n => !n.IsBoss && !n.Def.HasTag("critter") && Vector3.Distance(n.Center, p.Center) < RespawnClearRadius).ToList())
+        foreach (var npc in Npcs.All.Where(n => !n.IsBoss && !n.IsPart && !n.Def.HasTag("critter") && Vector3.Distance(n.Center, p.Center) < RespawnClearRadius).ToList())
             Npcs.Despawn(npc);
         PlayerRespawned?.Invoke(p);
     }

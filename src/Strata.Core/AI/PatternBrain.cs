@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.Content.Specs;
+using Strata.Core.Gameplay.Combat;
 using Strata.Core.Gameplay.Entities;
 using Strata.Core.Session;
 
@@ -105,7 +106,7 @@ public sealed class PatternBrain : IBrain
     }
 
     /// <summary>Advances the current move; returns true while the boss is mid-teleport (untouchable).</summary>
-    private bool Move(Npc npc, PatternMove m, float speedScale, PlayerEntity target, BrainContext ctx)
+    private bool Move(Npc npc, PatternMove m, float speedScale, ICombatTarget target, BrainContext ctx)
     {
         float speed = m.Speed * speedScale;
         var toTarget = target.Center - npc.Center;
@@ -222,14 +223,14 @@ public sealed class PatternBrain : IBrain
         npc.Velocity = Vector3.Lerp(npc.Velocity, want, 0.1f);
     }
 
-    private static void Fire(Npc npc, PatternVolley v, ref int timer, PlayerEntity target, BrainContext ctx)
+    private static void Fire(Npc npc, PatternVolley v, ref int timer, ICombatTarget target, BrainContext ctx)
     {
         if (++timer < v.Interval) return;
         timer = 0;
         Fire(npc, v, target, ctx);
     }
 
-    private static void Fire(Npc npc, PatternVolley v, PlayerEntity target, BrainContext ctx)
+    private static void Fire(Npc npc, PatternVolley v, ICombatTarget target, BrainContext ctx)
     {
         if (ctx.Shoot == null || Vector3.Distance(npc.Center, target.Center) > v.Range) return;
         var from = npc.Center;

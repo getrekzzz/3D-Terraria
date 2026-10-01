@@ -180,7 +180,7 @@
       "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [8, 10], "moveSpeed": 4, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
       "loot": "moon_lord", "value": 200000,
       "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220, "music": "boss_moon_lord",
-        "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5] }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2] }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2] }] },
+        "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5], "inBossBar": true }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2], "inBossBar": true, "mirror": true }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2], "inBossBar": true }] },
       "covers": ["terraria:moon_lord"]
     },
     {
