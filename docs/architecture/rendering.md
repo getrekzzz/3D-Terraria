@@ -12,11 +12,14 @@ tints (`data/biomes.json`) and the generated texture arrays.
 | Block light (torches, lava, glowing ores and fungi) | Baked RGB voxel light per vertex / instance | `EMISSION = strata_block_light(albedo, light, ao)`; its curve (`strata_block_curve`, level^1.5) is gentler than the sky's so a torch's glow carries across a room |
 | Nearest light sources | `DynamicLights`: a pool of shadowless `OmniLight3D` (size = preset `dynamicLights`, 0 on low) given each ¼ s to the nearest placed lights, lava hotspots (`LavaEffects`) and glowing creatures (`NpcRenderer.Glows`, fireflies blink) | Regular Godot lights: longer reach and directional shading on top of the baked glow; a firefly swarm never costs more than the pool |
 | Carried torch | `PlayerLight`: an `OmniLight3D` at the flame in the hand (first or third person), ~15 m reach, a fire's flicker (shadows on high/ultra) | Regular Godot light through the same `light()` |
-| Screen space | SSAO, SSIL (colour bleeding), SSR, volumetric fog with light shafts, auto exposure, glow | Environment settings per preset |
+| Screen space | SSAO, SSIL (colour bleeding), SSR, volumetric fog with light shafts | Environment settings per preset; SSIL strength and the fog's albedo from `lighting.json` `screenSpace` |
+| Eye adaptation | `EnvironmentController.Exposure.cs` steps `ExposureModel` (Core) each frame from the camera's unsmoothed sky exposure, the daylight and the eased biome `exposureBias`, and writes the camera's exposure multiplier when it moves by more than 0.002. Presets with `autoExposure` add Godot's metering, confined to `autoMin`–`autoMax` (`ExposureModel.AutoWindow`). Godot applies the multiplier to lights, sky and emission before it meters, so the metering key and window are scaled by the multiplier too: Godot meters the scene as if at exposure 1 and its correction multiplies with the model instead of undoing it | Scales all light before AgX tone mapping and before the glow threshold. The same on every preset: a cave opens the eye up to `caveBoost` at `brightenPerSecond`, leaving it closes down at `darkenPerSecond` (no flashbang), by day desert and snow are dimmed by their bias. Probe `render.exposure` |
+| Glow | Environment glow from `lighting.json` `glow`: HDR `threshold`, `softness` (HDR scale), `intensity`, `luminanceCap`, normalized level weights; screen blend | Only light above the threshold after exposure blooms (flames, lava, magic, glowing ores); sunlit sand and snow stay under it |
 
 `EnvironmentController(.Frame).cs` drives time of day: sun and moon arcs, atmosphere-coloured light, night
-desaturation, fog (aerial perspective above ground, close biome-tinted gloom below), cloud cover drifting with the
-weather and the ground wind (`strata_wind`) that grass and foliage share.
+desaturation, fog (aerial perspective above ground, close biome-tinted gloom below; the gloom closes in at
+`fog.closePerSecond` when the camera loses the sky and clears at the faster `fog.clearPerSecond`), cloud cover
+drifting with the weather and the ground wind (`strata_wind`) that grass and foliage share.
 
 ## Sky (`sky.gdshader`)
 Single-scattering atmosphere (Rayleigh, Mie, ozone; quadratic sample spacing) evaluated in the quarter-resolution
@@ -58,7 +61,9 @@ the generator's `TerrainField`, the surface biome's map colour, and the sea over
 `Build` makes a polar mesh whose rings widen with distance (a continuous level of detail: about 3 m cells at the
 streamed edge, tens of metres at the horizon). `HorizonRenderer` rebuilds it on a worker thread when the focus drifts
 48 m from its centre; `horizon.gdshader` discards it inside the loaded chunk box (real voxels take over there), adds
-macro variation and rock on steep slopes, and lets the fog's aerial perspective melt it into the sky. The preset's
+macro variation and rock on steep slopes, and lets the fog's aerial perspective melt it into the sky. Land albedo is
+clamped to luminance 0.42 and its ambient occlusion to 0.8, so distant sand and snow never outshine the streamed
+terrain; the fog starts within `fog.nearCap` metres (divided by the biome's fog density) on every preset. The preset's
 `horizonDistance` (0 = off) also sets the fog reach and the camera's far plane. It samples fields, not voxels:
 caves, structures, edits and hardmode wedges are not in it.
 
@@ -67,16 +72,26 @@ caves, structures, edits and hardmode wedges are not in it.
 upscaler (FSR 1/2), anti-aliasing (FXAA/SMAA/TAA/MSAA), anisotropy, shadow atlas, distance and filter, sun size
 (PCSS), torch shadows, SSAO/SSIL/SSR quality, volumetric fog grid, sky radiance size, cloud steps, auto exposure,
 grass density and distance, mesh LOD threshold, horizon distance. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
-remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`.
+remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`. Auto exposure (medium and
+up) only fine-tunes within the narrow window from `lighting.json`; cave adaptation and the biome bias come from the
+CPU model on every preset, so desert and snow read the same on low and ultra. The lighting tour
+(`game/Testing/Tours/lighting.cmds`, HUD hidden with `hud off`, run with `--fixed-fps 10` so frames land at exact game
+times however slowly lavapipe draws) shoots forest, desert, snow and a cave on each preset plus the frames 0.5 s and
+2 s after the walls of a sealed room vanish in the desert (at a quarter time scale, so remeshing the room costs game
+time as at 40 fps); `tools/ci/shot_stats.py --check` holds desert, snow and exit frames on medium, high and ultra to a
+mean luma of 0.35–0.6 with under 2% clipped pixels.
 
 Light tuning shared by every preset is `LightingConfig` (Core, `data/config/lighting.json`, every value required and
-range-checked by `Strata.Tools validate`): eye adaptation, glow threshold/softness/levels, the fog near cap, SSIL and
-volumetric strengths, placed and held torch lights, and the block-light curve. `ExposureModel` (Core, pure) gives the
-exposure the eye wants (`caveBoost` sealed from the sky; in the open `nightBoost` at night and the biome's
-`exposureBias` by day, below 1 for desert, snow, sky, hallow and ocean) and eases toward it, opening up slowly and
-closing down fast so leaving a cave never flashes. `ExposureModel.AutoWindow` turns the `autoMin`–`autoMax`
-multiplier range into Godot's auto exposure ISO window (luminance = ISO × 12.5 / 100 / 100 at sensitivity 100). The
-renderer keeps its built-in exposure, glow and torch values until it is wired to this file.
+range-checked by `Strata.Tools validate`): eye adaptation, glow threshold/softness/levels, the fog near cap and
+cave-gloom rates, SSIL and volumetric strengths, placed and held torch lights, and the block-light curve.
+`ExposureModel` (Core, pure) gives the exposure the eye wants (`caveBoost` sealed from the sky; in the open
+`nightBoost` at night and the biome's `exposureBias` by day, below 1 for desert, snow, sky, hallow and ocean) and
+eases toward it, opening up slowly and closing down fast so leaving a cave never flashes. `ExposureModel.AutoWindow`
+turns the `autoMin`–`autoMax` multiplier range into Godot's auto exposure ISO window (luminance = ISO × 12.5 / 100 /
+100 at sensitivity 100). `GraphicsSettings` loads and validates the file at start (a bad value stops the game, like a
+bad `graphics.json`); `EnvironmentController` takes exposure, glow, the fog section, SSIL and the volumetric albedo
+from it. The torch and block-light sections are not read by the renderer yet: torch lights and `strata_block_curve`
+keep built-in values.
 
 Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class GPU):
 * Chunks sealed from the sky sit on their own visual layer (`ChunkLayers.Sealed`) that the sun's and moon's

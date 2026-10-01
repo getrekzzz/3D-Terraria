@@ -1,0 +1,206 @@
+# Lighting tour: noon in the forest, the desert and the snow, and an underground cave, on every preset; then the
+# frames after the walls of a sealed room vanish in the desert sun (leaving a cave) on medium, high and ultra.
+# Rendering required. --fixed-fps makes every frame 1/10 s of game time, so the exit frames land at +0.5 s and +2 s
+# however slowly a software renderer draws (each shot logs render.exposure after it). The HUD is hidden so the shots
+# measure only the scene. Lavapipe needs about an hour:
+#   xvfb-run -a -s "-screen 0 1600x900x24" godot --path . --rendering-driver vulkan --fixed-fps 10 --resolution 640x360 \
+#     -- --world=light --size=small --new --player=t --fresh-player --view=3 --shots=$PWD/shots \
+#     --smoke=res://game/Testing/Tours/lighting.cmds
+# Acceptance (desert and snow in [0.35, 0.6] mean luma with under 2% clipped pixels on medium, high and ultra, and the
+# exit frames no brighter):
+#   python3 tools/ci/shot_stats.py shots/*.png --check '[mhu]*_desert*' --check '[mhu]*_tundra*' --check '[mhu]*_exit_*'
+wait_until player.frozen == 0 300
+spawning off
+town arrivals off
+god on
+camera third
+hud off
+aim 0 -0.12 1
+
+# Forest at spawn.
+wait_until stream.idle == 1 900
+graphics low
+time 12
+wait 2
+screenshot low_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+time 12
+wait 2
+screenshot medium_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+time 12
+wait 2
+screenshot high_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+time 12
+wait 2
+screenshot ultra_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# Desert: the biome's exposure bias settles over a few seconds after the teleport.
+biome desert
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+aim 0 -0.12 1
+graphics low
+time 12
+wait 4
+screenshot low_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+time 12
+wait 2
+screenshot medium_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+time 12
+wait 2
+screenshot high_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+time 12
+wait 2
+screenshot ultra_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# Leaving a cave: a sealed room around the player and the camera lets the eyes adapt to the dark, then its walls and
+# roof vanish (a sand floor stays) and the frames 0.5 s and 2 s later are kept. The room is under 12 cells tall: a
+# taller one counts as outdoor shade under a floating roof (SkyMap.ShadeGap), not as a cave. Time runs at a quarter
+# speed meanwhile (40 frames per game second), so remeshing the opened room costs game time as it would at 40 fps.
+graphics medium
+fill -21 -1 -21 21 10 21 stone
+fill -20 0 -20 20 9 20 air
+wait_until stream.idle == 1 300
+time 12
+wait 8
+probe render.exposure
+timescale 0.25
+fill -21 0 -21 21 10 21 air
+fill -21 -1 -21 21 -1 21 sand
+wait 0.5
+probe render.exposure
+screenshot medium_exit_05 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+wait 1.4
+probe render.exposure
+screenshot medium_exit_2 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+timescale 1
+
+graphics high
+fill -21 -1 -21 21 10 21 stone
+fill -20 0 -20 20 9 20 air
+wait_until stream.idle == 1 300
+time 12
+wait 8
+probe render.exposure
+timescale 0.25
+fill -21 0 -21 21 10 21 air
+fill -21 -1 -21 21 -1 21 sand
+wait 0.5
+probe render.exposure
+screenshot high_exit_05 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+wait 1.4
+probe render.exposure
+screenshot high_exit_2 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+timescale 1
+
+graphics ultra
+fill -21 -1 -21 21 10 21 stone
+fill -20 0 -20 20 9 20 air
+wait_until stream.idle == 1 300
+time 12
+wait 8
+probe render.exposure
+timescale 0.25
+fill -21 0 -21 21 10 21 air
+fill -21 -1 -21 21 -1 21 sand
+wait 0.5
+probe render.exposure
+screenshot ultra_exit_05 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+wait 1.4
+probe render.exposure
+screenshot ultra_exit_2 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+timescale 1
+
+# Snow.
+biome tundra
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+aim 0 -0.12 1
+graphics low
+time 12
+wait 4
+screenshot low_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+time 12
+wait 2
+screenshot medium_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+time 12
+wait 2
+screenshot high_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+time 12
+wait 2
+screenshot ultra_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# An underground cave lit by the held torch: the eyes have opened up (cave boost) on every preset.
+select 4
+tp cave underground
+wait_until player.frozen == 0 300
+aim 0 -0.05 1
+wait_until stream.idle == 1 900
+graphics low
+wait 4
+screenshot low_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+wait 2
+screenshot ultra_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+graphics medium
+hud on
+assert errors == 0

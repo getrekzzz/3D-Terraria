@@ -21,6 +21,17 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
+            Name = "hud", Usage = "hud <on|off>",
+            Help = "Shows or hides every 2D layer (HUD, minimap, screens), e.g. so tour screenshots measure only the 3D scene.",
+            Run = (_, a) =>
+            {
+                bool on = a.Str(0, "on|off") != "off";
+                world.Runtime.GetViewport().CanvasCullMask = on ? uint.MaxValue : 0u;
+                return CommandResult.Success($"HUD {(on ? "shown" : "hidden")}.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close>", Help = "Opens or closes gameplay screens.",
             Run = (ctx, a) =>
             {

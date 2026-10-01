@@ -72,3 +72,15 @@ assert time.day == 1
 save
 inspect
 assert errors == 0
+
+# --- P1-03 ---
+# Eye adaptation: a room sealed from the sky opens the eyes up (cave boost); opening its roof closes them fast.
+time noon
+fill -11 -3 -11 11 9 11 stone
+fill -10 0 -10 10 7 10 air
+wait 4
+assert render.exposure > 1.3
+fill -10 8 -10 10 9 10 air
+wait 1.5
+assert render.exposure < 1.15
+assert errors == 0

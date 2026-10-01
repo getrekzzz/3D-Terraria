@@ -3,22 +3,28 @@
   // and its range, and ExposureModel.cs for how exposure adapts). Every value lives here: calibrate from the lighting
   // tour screenshots (game/Testing/Tours/lighting.cmds), never with constants in code.
   "exposure": {
-    // Exposure multiplier in a cave sealed from the sky: the eye opens up so torch-lit rooms read.
-    "caveBoost": 1.7,
+    // Exposure multiplier in a cave sealed from the sky: the eye opens up so torch-lit rooms read. With Godot's
+    // metering on top (medium and up), caves there stay at least as bright as before the exposure model.
+    "caveBoost": 2.8,
     // Multiplier under the open night sky (moonlight reads dark blue, not black); at most caveBoost.
     "nightBoost": 1.2,
     // Rate (1/s) at which the eye opens up when it gets darker (entering a cave): slow, 63% of the way every 2 s.
     "brightenPerSecond": 0.5,
-    // Rate (1/s) at which the eye closes down when it gets brighter (leaving a cave): fast, within 10% in under 1 s.
-    "darkenPerSecond": 2.5,
-    // Godot auto exposure scale (presets with autoExposure): the mid-grey luminance the metering aims for.
-    "autoKey": 0.35,
-    // Lowest multiplier Godot's auto exposure may apply (bright desert or snow at noon can darken to this).
-    "autoMin": 0.72,
-    // Highest multiplier Godot's auto exposure may apply (dim scenes brighten up to this).
-    "autoMax": 1.45,
-    // Godot auto exposure adaptation speed.
-    "autoSpeed": 1.0
+    // Rate (1/s) at which the eye closes down when it gets brighter (leaving a cave): fast, within 10% in 0.25 s, so
+    // the first frames in the sun are never a white wash.
+    "darkenPerSecond": 10,
+    // Godot auto exposure scale (presets with autoExposure): the mid-grey luminance the metering aims for. The game
+    // scales it (and the window) by the model's multiplier, so Godot meters the scene as if at exposure 1.
+    "autoKey": 0.4,
+    // Lowest multiplier Godot's auto exposure may apply. Sunlit sand and snow sit at this floor; close to 1, so the
+    // biome exposure bias (the same on every preset) does the darkening and medium and up read like low.
+    "autoMin": 0.95,
+    // Highest multiplier Godot's auto exposure may apply: shaded forest and caves reach this ceiling, a small lift
+    // over low.
+    "autoMax": 1.4,
+    // Godot auto exposure adaptation speed: quick, so the metering lift from a cave is gone within a second of leaving
+    // it; the window is narrow, so turning between sky and ground cannot pump the brightness much.
+    "autoSpeed": 3
   },
   "glow": {
     // HDR luminance (after exposure) where bloom starts: above sunlit sand and snow, below flames, lava and magic.
@@ -34,13 +40,18 @@
   },
   "fog": {
     // Distance fog starts no further than this many metres (divided by the biome's fog density), so far land fades.
-    "nearCap": 70
+    "nearCap": 70,
+    // Rate (1/s) at which the close, dark cave gloom closes in when the camera loses the open sky.
+    "closePerSecond": 2,
+    // Rate (1/s) at which the gloom clears again under the open sky: fast, like the eye, so the first frames after
+    // leaving a cave are not a bright haze.
+    "clearPerSecond": 6
   },
   "screenSpace": {
     // Screen-space indirect light (colour bleeding) strength on presets with SSIL.
     "ssilIntensity": 0.9,
     // Grey albedo of the volumetric fog on presets with volumetric fog (lower scatters less sunlight back).
-    "volumetricAlbedo": 0.8
+    "volumetricAlbedo": 0.5
   },
   "torch": {
     // Energy of a placed torch's pooled light per unit of its peak light channel.

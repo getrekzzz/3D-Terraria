@@ -43,6 +43,10 @@ public sealed partial class EnvironmentController : Node3D
     public void Initialize(GraphicsSettings graphics, long seed)
     {
         _seed = (int)(seed & 0x7fffffff);
+        var lighting = graphics.Lighting;
+        var glow = lighting.Glow;
+        float fogAlbedo = lighting.ScreenSpace.VolumetricAlbedo;
+        _fogSettings = lighting.Fog;
         _sky = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/sky.gdshader") };
         _skyResource = new Sky { SkyMaterial = _sky, ProcessMode = Sky.ProcessModeEnum.Incremental };
         _env = new Godot.Environment
@@ -56,11 +60,15 @@ public sealed partial class EnvironmentController : Node3D
             TonemapMode = Godot.Environment.ToneMapper.Agx,
             TonemapExposure = 1.0f,
             // Screen blending lets bright emitters (flames, lava, glowing ores, magic) bloom into a warm halo without
-            // hazing the whole image; only HDR light above the threshold glows.
-            GlowIntensity = 0.7f,
+            // hazing the whole image; only HDR light above the threshold (after exposure) glows, so sunlit sand and
+            // snow stay crisp. Level weights are normalized, so the levels shape the halo and the intensity sets it.
+            GlowNormalized = true,
+            GlowIntensity = glow.Intensity,
             GlowStrength = 1.0f,
             GlowBloom = 0.0f,
-            GlowHdrThreshold = 1.0f,
+            GlowHdrThreshold = glow.Threshold,
+            GlowHdrScale = glow.Softness,
+            GlowHdrLuminanceCap = glow.LuminanceCap,
             GlowBlendMode = Godot.Environment.GlowBlendModeEnum.Screen,
             FogEnabled = true,
             FogMode = Godot.Environment.FogModeEnum.Depth,
@@ -73,12 +81,12 @@ public sealed partial class EnvironmentController : Node3D
             SsaoDetail = 0.6f,
             SsaoLightAffect = 0.15f,
             SsilRadius = 6f,
-            SsilIntensity = 1.2f,
+            SsilIntensity = lighting.ScreenSpace.SsilIntensity,
             SsilSharpness = 0.9f,
             SsrFadeIn = 0.15f,
             SsrFadeOut = 2.0f,
             SsrDepthTolerance = 0.3f,
-            VolumetricFogAlbedo = new Color(0.92f, 0.94f, 0.97f),
+            VolumetricFogAlbedo = new Color(fogAlbedo, fogAlbedo, fogAlbedo),
             VolumetricFogAnisotropy = 0.6f,
             VolumetricFogDetailSpread = 2f,
             VolumetricFogTemporalReprojectionEnabled = true,
@@ -87,15 +95,8 @@ public sealed partial class EnvironmentController : Node3D
             AdjustmentSaturation = 1.22f,
             AdjustmentContrast = 1.06f,
         };
-        for (int level = 0; level < 7; level++) _env.SetGlowLevel(level, level is >= 2 and <= 5 ? 1f : level == 6 ? 0.5f : 0f);
-        _camera = new CameraAttributesPractical
-        {
-            // Gentle, slow adaptation: turning between sky and ground must not pump the brightness.
-            AutoExposureScale = 0.35f,
-            AutoExposureSpeed = 0.3f,
-            AutoExposureMinSensitivity = 85f,
-            AutoExposureMaxSensitivity = 170f,
-        };
+        for (int level = 0; level < GlowSettings.LevelCount; level++) _env.SetGlowLevel(level, glow.Levels[level]);
+        _camera = CreateExposure(lighting.Exposure);
         AddChild(new WorldEnvironment { Environment = _env, CameraAttributes = _camera });
 
         _sun = new DirectionalLight3D

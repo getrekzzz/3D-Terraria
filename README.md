@@ -80,8 +80,9 @@ godot --headless --path . -- --world=smoke --size=tiny --new --player=smoke --fr
       --view=2 --smoke=res://game/Testing/Scripts/basic.cmds   # engine smoke test (prints SMOKE PASS)
 godot --path . -- --world=tour --size=small --new --player=tour --fresh-player --view=3 \
       --shots=/tmp/shots --smoke=res://game/Testing/Tours/tour.cmds   # screenshot tour (needs a GPU or lavapipe)
-# also Tours/animation.cmds (player actions, in slow motion) and Tours/bosses.cmds (every boss, frozen with `ai off`);
-# debug commands for such scripts: camera orbit <deg>, press <action> [on|off], timescale <f>, ai <on|off>
+# also Tours/animation.cmds (player actions, in slow motion), Tours/bosses.cmds (every boss, frozen with `ai off`) and
+# Tours/lighting.cmds (exposure per preset; run with --fixed-fps 10, check with tools/ci/shot_stats.py, see its header);
+# debug commands for such scripts: camera orbit <deg>, press <action> [on|off], timescale <f>, ai <on|off>, hud <on|off>
 ```
 
 ### Asset pipelines

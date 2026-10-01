@@ -1,9 +1,9 @@
 {
   "biomes": [
     { "id": "forest", "name": "Forest", "kind": "surface", "priority": 0, "mapColor": "#4f9a3a", "fogColor": "#b9cfe0", "music": "forest_day", "ambience": "birds", "covers": ["terraria:forest"] },
-    { "id": "tundra", "name": "Snow", "kind": "surface", "priority": 2, "mapColor": "#dfe8f2", "fogColor": "#dbe6f2", "fogDensity": 1.4, "skyTint": "#e8f0ff", "music": "tundra", "ambience": "wind", "exposureBias": 0.82, "covers": ["terraria:snow_biome"] },
+    { "id": "tundra", "name": "Snow", "kind": "surface", "priority": 2, "mapColor": "#dfe8f2", "fogColor": "#dbe6f2", "fogDensity": 1.4, "skyTint": "#e8f0ff", "music": "tundra", "ambience": "wind", "exposureBias": 0.95, "covers": ["terraria:snow_biome"] },
     { "id": "jungle", "name": "Jungle", "kind": "surface", "priority": 3, "mapColor": "#3fae4a", "fogColor": "#9fc79a", "fogDensity": 1.6, "skyTint": "#e8ffe0", "ambientTint": "#c8ffc0", "music": "jungle", "ambience": "insects", "covers": ["terraria:jungle"] },
-    { "id": "desert", "name": "Desert", "kind": "surface", "priority": 2, "mapColor": "#d8c27a", "fogColor": "#f0dcb0", "fogDensity": 1.2, "skyTint": "#fff4e0", "music": "desert", "ambience": "desert_wind", "exposureBias": 0.85, "covers": ["terraria:desert"] },
+    { "id": "desert", "name": "Desert", "kind": "surface", "priority": 2, "mapColor": "#d8c27a", "fogColor": "#f0dcb0", "fogDensity": 1.2, "skyTint": "#fff4e0", "music": "desert", "ambience": "desert_wind", "exposureBias": 0.45, "covers": ["terraria:desert"] },
     { "id": "ocean", "name": "Ocean", "kind": "layer", "priority": 4, "mapColor": "#2a5f9e", "fogColor": "#7fb0d8", "music": "ocean", "ambience": "waves", "exposureBias": 0.92, "covers": ["terraria:ocean"] },
     { "id": "corruption", "name": "The Corruption", "kind": "surface", "priority": 6, "mapColor": "#6b5a8e", "fogColor": "#4a3c63", "fogDensity": 2.0, "skyTint": "#b0a0d0", "ambientTint": "#a890d0", "music": "blight", "spreads": true, "covers": ["terraria:the_corruption"] },
     { "id": "crimson", "name": "The Crimson", "kind": "surface", "priority": 6, "mapColor": "#b43a3a", "fogColor": "#6a2a2a", "fogDensity": 2.0, "skyTint": "#e0a0a0", "ambientTint": "#e09090", "music": "rot", "spreads": true, "covers": ["terraria:the_crimson"] },

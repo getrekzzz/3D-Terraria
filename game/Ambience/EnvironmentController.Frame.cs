@@ -1,4 +1,5 @@
 using Godot;
+using Strata.Core.Presentation;
 using Strata.Core.Simulation;
 
 namespace Strata.Game.Ambience;
@@ -12,13 +13,14 @@ public sealed partial class EnvironmentController
     private float _eventBlend;
     private Color _biomeFog = new(0.62f, 0.72f, 0.82f), _biomeSky = Colors.White, _biomeAmbient = Colors.White;
     private float _biomeDensity = 1f;
+    private FogSettings _fogSettings = null!; // lighting.json fog
     private Vector3 _skyIrradiance = new(0.3f, 0.4f, 0.6f);
     private int _irradianceFrame;
 
     /// <summary>
     /// Updates the sky for the clock and the camera: <paramref name="depthBelowSurface"/> (m) and
     /// <paramref name="cameraSkyExposure"/> (0 sealed … 1 open sky, the baked voxel value) move fog and haze from
-    /// the open-air look to the dark, close gloom of caves.
+    /// the open-air look to the dark, close gloom of caves, and the eye's exposure with them.
     /// </summary>
     public void Apply(GameClock clock, float depthBelowSurface, float cameraSkyExposure, double delta)
     {
@@ -86,7 +88,9 @@ public sealed partial class EnvironmentController
         RenderingServer.GlobalShaderParameterSet("strata_time", _time);
         RenderingServer.GlobalShaderParameterSet("strata_light_dir", sunDir.Y > -0.02f ? sunDir : moonDir);
 
-        UpdateFog(depthBelowSurface, cameraSkyExposure, eventTint, dt);
+        float outdoor = Mathf.Clamp(cameraSkyExposure * 1.25f, 0f, 1f);
+        UpdateFog(depthBelowSurface, outdoor, eventTint, dt);
+        UpdateExposure(outdoor, dt);
     }
 
     private const float SkyRefreshSeconds = 0.25f;
@@ -120,9 +124,11 @@ public sealed partial class EnvironmentController
         RenderingServer.GlobalShaderParameterSet("strata_wind", new Vector4(dir.X, dir.Y, strength, _gusts));
     }
 
-    private void UpdateFog(float depthBelowSurface, float cameraSkyExposure, Color eventTint, float dt)
+    private void UpdateFog(float depthBelowSurface, float outdoor, Color eventTint, float dt)
     {
-        _outdoor = Mathf.Lerp(_outdoor, Mathf.Clamp(cameraSkyExposure * 1.25f, 0f, 1f), 1f - Mathf.Exp(-dt * 2f));
+        // The gloom closes in gently when the sky is lost and clears fast under it again (leaving a cave).
+        float rate = outdoor > _outdoor ? _fogSettings.ClearPerSecond : _fogSettings.ClosePerSecond;
+        _outdoor = Mathf.Lerp(_outdoor, outdoor, 1f - Mathf.Exp(-dt * rate));
         float under = Mathf.Clamp(depthBelowSurface / 30f, 0f, 1f);
         float deep = Mathf.Max(under, (1f - _outdoor) * 0.8f);
         // Open air: clear near the camera, melting into the sky colour at the edge of the streamed world.
@@ -132,7 +138,9 @@ public sealed partial class EnvironmentController
         _env.FogLightColor = skyFog.Lerp(deepFog, deep) * Colors.White.Lerp(eventTint, 0.5f);
         _env.FogAerialPerspective = Mathf.Lerp(0.8f, 0f, deep);
         float reach = ViewDistance / Mathf.Max(_biomeDensity, 0.25f);
-        _env.FogDepthBegin = Mathf.Lerp(reach * 0.3f, 2f, deep);
+        // The haze starts within the near cap even when the horizon pushes the fog's end far out, so distant sunlit
+        // land (sand, snow) fades into the sky instead of glaring at full brightness.
+        _env.FogDepthBegin = Mathf.Lerp(Mathf.Min(reach * 0.3f, _fogSettings.NearCap / Mathf.Max(_biomeDensity, 0.5f)), 2f, deep);
         _env.FogDepthEnd = Mathf.Lerp(ViewDistance * 1.02f, 42f / Mathf.Max(_biomeDensity, 0.5f), deep);
         _env.FogDensity = Mathf.Lerp(1f, 0.92f, deep);
         _env.FogSunScatter = 0.08f * (1f - deep);
@@ -155,6 +163,7 @@ public sealed partial class EnvironmentController
         _biomeSky = _biomeSky.Lerp(b != null ? Color.FromHtml(b.SkyTint) : Colors.White, k);
         _biomeAmbient = _biomeAmbient.Lerp(b != null ? Color.FromHtml(b.AmbientTint) : Colors.White, k);
         _biomeDensity = Mathf.Lerp(_biomeDensity, b?.FogDensity ?? 1f, k);
+        BlendBiomeExposure(k);
     }
 
     /// <summary>Point on the celestial circle: angle 0 east horizon, π/2 high in the south, π west horizon.</summary>

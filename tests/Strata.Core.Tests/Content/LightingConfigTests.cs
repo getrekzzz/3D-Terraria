@@ -43,6 +43,14 @@ public class LightingConfigTests
     }
 
     [Fact]
+    public void CaveGloomMayNotClearSlowerThanItCloses()
+    {
+        var config = Shipped();
+        config.Fog.ClearPerSecond = config.Fog.ClosePerSecond * 0.5f;
+        Assert.Contains(config.Validate(), p => p.StartsWith("fog.clearPerSecond", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void NullValuesAreReportedNotThrown()
     {
         // The shipped file with "levels" and the whole "fog" section written as null (`required` accepts both).

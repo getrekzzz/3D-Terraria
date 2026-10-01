@@ -118,15 +118,24 @@ public sealed class GlowSettings
     }
 }
 
-/// <summary>Distance fog limits that hold on every preset.</summary>
+/// <summary>Distance fog limits that hold on every preset, and how fast the close cave gloom follows the camera.</summary>
 public sealed class FogSettings
 {
     /// <summary>Fog starts no further than this (metres, divided by the biome's fog density), so distant land fades.</summary>
     public required float NearCap { get; set; }
 
+    /// <summary>Exponential rate (per second) at which the cave gloom closes in when the camera loses the sky.</summary>
+    public required float ClosePerSecond { get; set; }
+
+    /// <summary>Exponential rate (per second) at which the gloom clears under the open sky; at least the close rate.</summary>
+    public required float ClearPerSecond { get; set; }
+
     public IEnumerable<string> Validate()
     {
         if (NearCap is < 1f or > 1000f) yield return "nearCap must be within 1–1000 m";
+        if (ClosePerSecond <= 0f || ClosePerSecond > 50f) yield return "closePerSecond must be within 0–50 (above 0)";
+        if (ClearPerSecond <= 0f || ClearPerSecond > 50f) yield return "clearPerSecond must be within 0–50 (above 0)";
+        if (ClearPerSecond < ClosePerSecond) yield return "clearPerSecond must be at least closePerSecond (leaving a cave must not stay hazy)";
     }
 }
 
