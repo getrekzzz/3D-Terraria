@@ -29,7 +29,7 @@ public static class ItemBehaviorSpecs
     /// <summary>Bait that hooks a boss instead of a fish (a Truffle Worm in the ocean hooks Duke Fishron).</summary>
     public const string BaitSummon = "baitSummon";
 
-    /// <summary>Lays or cuts red wire (Red Wrench, Wire Cutter).</summary>
+    /// <summary>Lays wire of a colour (Red, Blue, Green, Yellow Wrench), places actuators, or cuts both (Wire Cutter).</summary>
     public const string Wiring = "wiring";
 
     /// <summary>Swings a net that catches critters (Bug Net).</summary>
@@ -243,10 +243,21 @@ public sealed class IncinerationSummonParams : SpecParams, IValidatableSpec
 }
 
 /// <summary>Lays wire (using up <see cref="Wire"/> items) or, with <see cref="Cut"/>, removes it and gives the wire back.</summary>
-public sealed class WiringParams : SpecParams
+public sealed class WiringParams : SpecParams, IValidatableSpec
 {
+    /// <summary>Wire Cutter: removes every wire colour and the actuator from the aimed cell.</summary>
     public bool Cut { get; init; }
+
+    /// <summary>Item used up per placement (Wire for wrenches; the Actuator places itself).</summary>
     public string Wire { get; init; } = "wire";
+
+    /// <summary>Wire colour laid: "red", "blue", "green" or "yellow".</summary>
+    public string Color { get; init; } = "red";
+
+    /// <summary>Places an actuator on the aimed block instead of wire.</summary>
+    public bool Actuator { get; init; }
+
+    public string? Validate() => Color is "red" or "blue" or "green" or "yellow" ? null : $"unknown wire colour '{Color}'";
 }
 
 /// <summary>Catches the nearest creature with <see cref="Tag"/> in front of the player; it becomes its catch item.</summary>

@@ -16,14 +16,14 @@ public sealed partial class NpcSystem
         npc.Life = 0;
         var cell = npc.Cell;
         var drops = new List<ItemStack>();
-        if (npc.Def.Loot != null)
+        if (npc.Def.Loot != null && !npc.FromStatue)
         {
             var rng = new Pcg32(Hash.Combine((ulong)npc.Id, _world.Session.Clock.Tick));
             drops.AddRange(_loot.Roll(npc.Def.Loot, ref rng, _world.Session.ContextAt(cell)));
         }
         // Coins come from the loot table when it names them, else from the creature's value (never both).
         bool tableCoins = npc.Def.Loot != null && _world.Session.Content.LootTables.TryGet(npc.Def.Loot, out var table) && table.Coins != null;
-        if (npc.Def.Value > 0 && !tableCoins) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
+        if (npc.Def.Value > 0 && !tableCoins && !npc.FromStatue) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);

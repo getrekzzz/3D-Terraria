@@ -24,6 +24,12 @@
    ],
    "generator": "anvil"
   },
+  "bat_statue": {
+   "models": [
+    "assets/models/objects/bat_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
   "bed": {
    "models": [
     "assets/models/objects/bed_v0.glb"
@@ -36,11 +42,29 @@
    ],
    "generator": "larva"
   },
+  "bird_statue": {
+   "models": [
+    "assets/models/objects/bird_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
   "blinkroot_plant": {
    "models": [
     "assets/models/objects/blinkroot_plant_v0.glb"
    ],
    "generator": "flower"
+  },
+  "bomb_statue": {
+   "models": [
+    "assets/models/objects/bomb_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
+  "bunny_statue": {
+   "models": [
+    "assets/models/objects/bunny_statue_v0.glb"
+   ],
+   "generator": "statue"
   },
   "bush": {
    "models": [
@@ -75,6 +99,12 @@
     "assets/models/objects/cooking_pot_v0.glb"
    ],
    "generator": "pot"
+  },
+  "crab_statue": {
+   "models": [
+    "assets/models/objects/crab_statue_v0.glb"
+   ],
+   "generator": "statue"
   },
   "crimson_altar": {
    "models": [
@@ -248,6 +278,48 @@
    ],
    "generator": "stone_door"
   },
+  "logic_gate_and": {
+   "models": [
+    "assets/models/objects/logic_gate_and_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_lamp": {
+   "models": [
+    "assets/models/objects/logic_gate_lamp_v0.glb"
+   ],
+   "generator": "logic_lamp"
+  },
+  "logic_gate_nand": {
+   "models": [
+    "assets/models/objects/logic_gate_nand_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_nor": {
+   "models": [
+    "assets/models/objects/logic_gate_nor_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_or": {
+   "models": [
+    "assets/models/objects/logic_gate_or_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_xnor": {
+   "models": [
+    "assets/models/objects/logic_gate_xnor_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_xor": {
+   "models": [
+    "assets/models/objects/logic_gate_xor_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
   "loom": {
    "models": [
     "assets/models/objects/loom_v0.glb"
@@ -376,6 +448,18 @@
    ],
    "generator": "flower"
   },
+  "skeleton_statue": {
+   "models": [
+    "assets/models/objects/skeleton_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
+  "slime_statue": {
+   "models": [
+    "assets/models/objects/slime_statue_v0.glb"
+   ],
+   "generator": "statue"
+  },
   "stalactite": {
    "models": [
     "assets/models/objects/stalactite_v0.glb",
@@ -397,6 +481,30 @@
     "assets/models/objects/switch_v0.glb"
    ],
    "generator": "switch"
+  },
+  "teleporter": {
+   "models": [
+    "assets/models/objects/teleporter_v0.glb"
+   ],
+   "generator": "teleporter"
+  },
+  "timer_1_second": {
+   "models": [
+    "assets/models/objects/timer_1_second_v0.glb"
+   ],
+   "generator": "wiring_timer"
+  },
+  "timer_3_second": {
+   "models": [
+    "assets/models/objects/timer_3_second_v0.glb"
+   ],
+   "generator": "wiring_timer"
+  },
+  "timer_5_second": {
+   "models": [
+    "assets/models/objects/timer_5_second_v0.glb"
+   ],
+   "generator": "wiring_timer"
   },
   "tinkerers_workshop": {
    "models": [
@@ -457,6 +565,12 @@
     "assets/models/objects/work_bench_v0.glb"
    ],
    "generator": "workbench"
+  },
+  "zombie_statue": {
+   "models": [
+    "assets/models/objects/zombie_statue_v0.glb"
+   ],
+   "generator": "statue"
   }
  },
  "items": {
@@ -467,6 +581,10 @@
   "acorn": {
    "model": "assets/models/items/acorn.glb",
    "icon": "assets/icons/items/acorn.png"
+  },
+  "actuator": {
+   "model": "assets/models/items/actuator.glb",
+   "icon": "assets/icons/items/actuator.png"
   },
   "adamantite_axe": {
    "model": "assets/models/items/adamantite_axe.glb",
@@ -624,6 +742,10 @@
    "model": "assets/models/items/bat_scepter.glb",
    "icon": "assets/icons/items/bat_scepter.png"
   },
+  "bat_statue": {
+   "object": "bat_statue",
+   "icon": "assets/icons/items/bat_statue.png"
+  },
   "batfish": {
    "model": "assets/models/items/batfish.glb",
    "icon": "assets/icons/items/batfish.png"
@@ -692,6 +814,10 @@
    "model": "assets/models/items/bird.glb",
    "icon": "assets/icons/items/bird.png"
   },
+  "bird_statue": {
+   "object": "bird_statue",
+   "icon": "assets/icons/items/bird_statue.png"
+  },
   "black_paint": {
    "model": "assets/models/items/black_paint.glb",
    "icon": "assets/icons/items/black_paint.png"
@@ -732,9 +858,17 @@
    "model": "assets/models/items/blue_paint.glb",
    "icon": "assets/icons/items/blue_paint.png"
   },
+  "blue_wrench": {
+   "model": "assets/models/items/blue_wrench.glb",
+   "icon": "assets/icons/items/blue_wrench.png"
+  },
   "bomb": {
    "model": "assets/models/items/bomb.glb",
    "icon": "assets/icons/items/bomb.png"
+  },
+  "bomb_statue": {
+   "object": "bomb_statue",
+   "icon": "assets/icons/items/bomb_statue.png"
   },
   "bone": {
    "model": "assets/models/items/bone.glb",
@@ -803,6 +937,10 @@
   "bunny": {
    "model": "assets/models/items/bunny.glb",
    "icon": "assets/icons/items/bunny.png"
+  },
+  "bunny_statue": {
+   "object": "bunny_statue",
+   "icon": "assets/icons/items/bunny_statue.png"
   },
   "bunnyfish": {
    "model": "assets/models/items/bunnyfish.glb",
@@ -1015,6 +1153,10 @@
   "corrupt_crate": {
    "model": "assets/models/items/corrupt_crate.glb",
    "icon": "assets/icons/items/corrupt_crate.png"
+  },
+  "crab_statue": {
+   "object": "crab_statue",
+   "icon": "assets/icons/items/crab_statue.png"
   },
   "crate_potion": {
    "model": "assets/models/items/crate_potion.glb",
@@ -1512,6 +1654,10 @@
    "model": "assets/models/items/green_paint.glb",
    "icon": "assets/icons/items/green_paint.png"
   },
+  "green_wrench": {
+   "model": "assets/models/items/green_wrench.glb",
+   "icon": "assets/icons/items/green_wrench.png"
+  },
   "grenade": {
    "model": "assets/models/items/grenade.glb",
    "icon": "assets/icons/items/grenade.png"
@@ -1883,6 +2029,34 @@
   "lime_paint": {
    "model": "assets/models/items/lime_paint.glb",
    "icon": "assets/icons/items/lime_paint.png"
+  },
+  "logic_gate_and": {
+   "object": "logic_gate_and",
+   "icon": "assets/icons/items/logic_gate_and.png"
+  },
+  "logic_gate_lamp": {
+   "object": "logic_gate_lamp",
+   "icon": "assets/icons/items/logic_gate_lamp.png"
+  },
+  "logic_gate_nand": {
+   "object": "logic_gate_nand",
+   "icon": "assets/icons/items/logic_gate_nand.png"
+  },
+  "logic_gate_nor": {
+   "object": "logic_gate_nor",
+   "icon": "assets/icons/items/logic_gate_nor.png"
+  },
+  "logic_gate_or": {
+   "object": "logic_gate_or",
+   "icon": "assets/icons/items/logic_gate_or.png"
+  },
+  "logic_gate_xnor": {
+   "object": "logic_gate_xnor",
+   "icon": "assets/icons/items/logic_gate_xnor.png"
+  },
+  "logic_gate_xor": {
+   "object": "logic_gate_xor",
+   "icon": "assets/icons/items/logic_gate_xor.png"
   },
   "loom": {
    "object": "loom",
@@ -2696,6 +2870,10 @@
    "model": "assets/models/items/silver_shortsword.glb",
    "icon": "assets/icons/items/silver_shortsword.png"
   },
+  "skeleton_statue": {
+   "object": "skeleton_statue",
+   "icon": "assets/icons/items/skeleton_statue.png"
+  },
   "sky_blue_paint": {
    "model": "assets/models/items/sky_blue_paint.glb",
    "icon": "assets/icons/items/sky_blue_paint.png"
@@ -2711,6 +2889,10 @@
   "slime_staff": {
    "model": "assets/models/items/slime_staff.glb",
    "icon": "assets/icons/items/slime_staff.png"
+  },
+  "slime_statue": {
+   "object": "slime_statue",
+   "icon": "assets/icons/items/slime_statue.png"
   },
   "slimefish": {
    "model": "assets/models/items/slimefish.glb",
@@ -2972,6 +3154,10 @@
    "model": "assets/models/items/teal_paint.glb",
    "icon": "assets/icons/items/teal_paint.png"
   },
+  "teleporter": {
+   "object": "teleporter",
+   "icon": "assets/icons/items/teleporter.png"
+  },
   "tempest_staff": {
    "model": "assets/models/items/tempest_staff.glb",
    "icon": "assets/icons/items/tempest_staff.png"
@@ -3015,6 +3201,18 @@
   "throwing_knife": {
    "model": "assets/models/items/throwing_knife.glb",
    "icon": "assets/icons/items/throwing_knife.png"
+  },
+  "timer_1_second": {
+   "object": "timer_1_second",
+   "icon": "assets/icons/items/timer_1_second.png"
+  },
+  "timer_3_second": {
+   "object": "timer_3_second",
+   "icon": "assets/icons/items/timer_3_second.png"
+  },
+  "timer_5_second": {
+   "object": "timer_5_second",
+   "icon": "assets/icons/items/timer_5_second.png"
   },
   "tin_axe": {
    "model": "assets/models/items/tin_axe.glb",
@@ -3444,6 +3642,10 @@
    "model": "assets/models/items/yellow_paint.glb",
    "icon": "assets/icons/items/yellow_paint.png"
   },
+  "yellow_wrench": {
+   "model": "assets/models/items/yellow_wrench.glb",
+   "icon": "assets/icons/items/yellow_wrench.png"
+  },
   "zenith": {
    "model": "assets/models/items/zenith.glb",
    "icon": "assets/icons/items/zenith.png"
@@ -3451,6 +3653,10 @@
   "zombie_fish": {
    "model": "assets/models/items/zombie_fish.glb",
    "icon": "assets/icons/items/zombie_fish.png"
+  },
+  "zombie_statue": {
+   "object": "zombie_statue",
+   "icon": "assets/icons/items/zombie_statue.png"
   }
  },
  "creatures": {

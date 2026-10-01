@@ -32,6 +32,10 @@ public static partial class WorldLauncher
         {
             if (p == entity) player.Teleport(home, resolveSpawn: true);
         };
+        game.Wires.Teleported += (p, feet) =>
+        {
+            if (p == entity) player.Teleport(feet);
+        };
         return (entity, player);
     }
 

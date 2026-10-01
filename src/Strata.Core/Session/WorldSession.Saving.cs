@@ -40,7 +40,7 @@ public sealed partial class WorldSession
         Meta.LastPlayedUtc = DateTime.UtcNow;
         Meta.Flags = Flags.OrderBy(f => f, StringComparer.Ordinal).ToList();
         Meta.Counters = new Dictionary<string, int>(Counters, StringComparer.Ordinal);
-        Meta.Wires = Wires.OrderBy(c => c.Y).ThenBy(c => c.Z).ThenBy(c => c.X).SelectMany(c => new[] { c.X, c.Y, c.Z }).ToList();
+        Wires.Save(Meta, Content);
         Mutations.Persist(Meta);
         Meta.StoreIdTables(Ids);
         Store.SaveMeta(Meta);

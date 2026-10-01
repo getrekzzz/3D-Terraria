@@ -133,6 +133,20 @@
   tiers. Tables: `data/loot/fishing.json` (water/honey via `fishingLiquid`, lava, crates), crate contents in
   `data/loot/crates.json` (biome crates need their biome), tuning in `data/config/fishing.json`. Command `fishing`
   (`bite`, `bait always|normal`), probes `fishing.bobber|power|pool|catches`; smoke `fishing.cmds`.
+* **Wiring** — `Wiring.WireGrid` (in `WorldSession.Wires`) keeps a bit per wire colour (red, blue, green, yellow) and an
+  actuator bit per cell, plus the blocks actuators have switched off; world.json keeps red in `wires` (older saves load
+  unchanged) and the rest in `wiresBlue|Green|Yellow`, `actuators`, `inactiveBlocks`. `WireSystem.Signal` walks each
+  colour separately from wire inside or face-sharing the trigger (reused scratch collections, at most 4096 cells per
+  colour) and activates what it reaches: doors, lights, dart traps, actuators (toggles gathered per chain and applied in
+  one edit; a switched-off block is air, remembered with shape and paint, and drops as an item if something was built in
+  its place), timers (`timer` ticks; switched by hand or signal, fired from `WireSystem.Tick` over the placed timers
+  only), teleporter pads (the first two on a colour swap their occupants; `Teleported` moves the player's body),
+  statues (`statue`: creature or item with per-statue cap, radius and cooldown, at most 10 statue creatures world-wide;
+  `Npc.FromStatue` drops nothing) and logic lamps; a gate (`logicGate`) re-reads its lamp stack and, when its output
+  changes, fires its own wires (not those through its lamps) once per chain, at most 256 chained signals. Wrenches lay
+  their `color`, the Actuator places itself, the Wire Cutter removes everything in the cell. `game/Rendering/WireOverlay`
+  draws the wire view per colour (pooled MultiMeshes, rebuilt on change or after 8 cells of movement). Command
+  `wire … [colour|actuator|cut]`, probes `wires.<colour>|actuators|inactive|teleports|statue_npcs`.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 

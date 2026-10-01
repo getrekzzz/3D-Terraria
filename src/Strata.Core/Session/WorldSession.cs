@@ -38,8 +38,7 @@ public sealed partial class WorldSession
                 ? (plan.ColumnTop[plan.ColumnIndex(cx, cz)] - 1) >> ChunkMath.Shift
                 : plan.Bands.SeaLevel >> ChunkMath.Shift);
         Flags = new HashSet<string>(meta.Flags, StringComparer.Ordinal);
-        var wires = meta.Wires ?? new();
-        for (int i = 0; i + 2 < wires.Count; i += 3) Wires.Add(new Int3(wires[i], wires[i + 1], wires[i + 2]));
+        Wires.Load(meta, content);
         Counters = new Dictionary<string, int>(meta.Counters ?? new(), StringComparer.Ordinal);
         Mutations = new WorldGen.Mutations.MutationLog(Generator, content, Settings);
         Mutations.Load(meta, log);
@@ -65,7 +64,7 @@ public sealed partial class WorldSession
     public HashSet<string> Flags { get; }
 
     /// <summary>Cells carrying red wire (see <see cref="Gameplay.Wiring.WireSystem"/>).</summary>
-    public HashSet<Int3> Wires { get; } = new();
+    public Gameplay.Wiring.WireGrid Wires { get; } = new();
 
     /// <summary>World tallies kept across saves (orbs smashed, altars smashed).</summary>
     public Dictionary<string, int> Counters { get; }

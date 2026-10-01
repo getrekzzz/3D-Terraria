@@ -45,8 +45,18 @@ public sealed class WorldMeta
     /// <summary>World tallies (shadow orbs smashed, altars smashed…); added without a version bump.</summary>
     public Dictionary<string, int> Counters { get; set; } = new();
 
-    /// <summary>Wired cells as flattened x, y, z triples (added without a version bump).</summary>
+    /// <summary>Red-wired cells as flattened x, y, z triples (added without a version bump).</summary>
     public List<int> Wires { get; set; } = new();
+
+    /// <summary>Blue, green and yellow wire and actuators, as x, y, z triples (added without a version bump: older
+    /// saves have red wire only).</summary>
+    public List<int>? WiresBlue { get; set; }
+    public List<int>? WiresGreen { get; set; }
+    public List<int>? WiresYellow { get; set; }
+    public List<int>? Actuators { get; set; }
+
+    /// <summary>Blocks switched off by actuators (block id, shape and cell flags), restored when switched back on.</summary>
+    public List<InactiveBlockModel>? InactiveBlocks { get; set; }
     public List<string> ActiveEvents { get; set; } = new();
 
     /// <summary>Running events with their remaining time and kill progress.</summary>
@@ -73,6 +83,8 @@ public sealed class WorldMeta
         bool Windy, int WindyTicksLeft, bool Sandstorm, int SandstormTicksLeft, float[]? Wind, long LastHour);
 
     public sealed record MutationModel(string Id, ulong Seed);
+
+    public sealed record InactiveBlockModel(int X, int Y, int Z, string Block, byte Shape, byte Flags);
 
     public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks);
 
