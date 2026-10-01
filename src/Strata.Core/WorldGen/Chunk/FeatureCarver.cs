@@ -65,8 +65,10 @@ public static class FeatureCarver
         var padded = new Aabb3i(ctx.Origin, ctx.Origin + Int3.One * ChunkGenContext.Size);
         if (!padded.Intersects(blueprint.Bounds)) return;
         byte flag = (byte)blueprint.Flags;
-        foreach (var op in blueprint.Ops)
+        var ops = blueprint.Ops;
+        foreach (int opIndex in blueprint.OpIndicesFor(ctx.Coord))
         {
+            var op = ops[opIndex];
             if (!padded.Intersects(op.Bounds)) continue;
             switch (op)
             {

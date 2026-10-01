@@ -53,3 +53,13 @@ Evidence for a terrain change: run the report on the parent commit with `--out=b
 with `--out=build/wg-after --compare=build/wg-before/stats.json`, which prints metric / before / after / delta
 (overall, step buckets and per biome) and writes it to `terrain_compare.txt`. `build/` is gitignored, so paste the
 table and the two terrain PNGs into the PR or commit message. Options take `--key=value` or `--key value`.
+
+## Blueprint op index and zone fast path
+
+`Blueprint.Freeze()` (called by the `StructureFeature` constructor, idempotent and thread-safe) builds an immutable
+per-chunk index: every op is listed under each chunk whose padded generation volume (core plus `ChunkGenContext.Pad`)
+its bounds touch, in original op order. `FeatureCarver.Stamp` and `StructureFeature.InZone` only visit
+`OpIndicesFor(chunk)`, so a dungeon of thousands of ops costs a dictionary lookup per chunk or zone query. A frozen
+blueprint rejects new ops. `CarveOp`/`FillOp` carry `NoZone`: approach cuts and steps outside a building are stamped
+but are not "in the structure" for spawns, music or mining locks. The index changes no output (golden hashes
+unchanged; `BlueprintIndexTests` compares it with brute force).
