@@ -15,19 +15,22 @@ public sealed class TerrainField
     {
         _plan = plan;
         var seeds = plan.Seeds.Child("terrain_field");
-        _detail = NoiseField.Create(seeds, "detail", 26f, NoiseFractal.Fbm, 3);
+        _detail = NoiseField.Create(seeds, "detail", 40f, NoiseFractal.Fbm, 2);
         _overhang = NoiseField.Create(seeds, "overhang", 34f, NoiseFractal.Fbm, 3);
         _soil = NoiseField.Create(seeds, "soil", 48f, NoiseFractal.Fbm, 2);
     }
 
-    /// <summary>Surface height at a column (cells, fractional).</summary>
+    /// <summary>
+    /// Surface height at a column (cells, fractional): the plan height through a B-spline (no grid creases) plus gentle
+    /// two-octave detail of at most 2 cells, broad enough that it never raises single-cell pimples.
+    /// </summary>
     public float SurfaceHeight(float x, float z)
     {
         float land = _plan.Landness.Sample(x, z);
-        return _plan.Height.Sample(x, z) + _detail.Sample(x, z) * (1.2f + 1.6f * land);
+        return _plan.Height.SampleSmooth(x, z) + _detail.Sample(x, z) * (0.8f + 1.2f * land);
     }
 
-    public float Ruggedness(float x, float z) => _plan.Ruggedness.Sample(x, z);
+    public float Ruggedness(float x, float z) => _plan.Ruggedness.SampleSmooth(x, z);
 
     /// <summary>Amplitude (cells) of 3D overhang noise for a ruggedness value.</summary>
     public static float OverhangAmplitude(float ruggedness) => 1.5f + ruggedness * 11f;

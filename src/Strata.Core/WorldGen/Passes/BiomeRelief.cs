@@ -1,33 +1,72 @@
+using Strata.Core.Content.Defs;
 using Strata.Core.Determinism;
+using Strata.Core.Diagnostics;
 using Strata.Core.WorldGen.Plan;
 
 namespace Strata.Core.WorldGen.Passes;
 
-/// <summary>Per-biome surface relief (hills, mountains, dunes, jungle ruggedness) blended across borders.</summary>
+/// <summary>
+/// Per-biome surface relief from <see cref="BiomeDef.Relief"/> (rolling hills, soft snow ridges, jungle mounds, dunes,
+/// mountain ranges in the open forest) blended across wide borders and blurred, so landforms read as rounded hills
+/// instead of knife-edge ridges and biome borders ramp instead of stepping.
+/// </summary>
 internal sealed class BiomeRelief
 {
-    private readonly WorldPlan _plan;
-    private readonly NoiseField _hills, _ridges, _dunes, _jagged, _mountainMask, _mountains;
+    /// <summary>The biome of the open land outside every region (its relief also carries the mountain ranges).</summary>
+    private const string OpenLand = "forest";
 
-    public BiomeRelief(SeedTree seeds, WorldPlan plan)
+    private readonly WorldPlan _plan;
+    private readonly ReliefSpec _open;
+    private readonly ReliefSpec[] _specs;
+    private readonly NoiseField _hills, _ridges, _bumps, _dunes, _mountainMask, _mountains;
+    private readonly bool _useRolling, _useHills, _useRidges, _useBumps, _useDunes;
+
+    public BiomeRelief(SeedTree seeds, PlanContext ctx)
     {
-        _plan = plan;
-        _hills = NoiseField.Create(seeds, "hills", 190f, NoiseFractal.Fbm, 4);
-        _ridges = NoiseField.Create(seeds, "ridges", 240f, NoiseFractal.Ridged, 4);
-        _dunes = NoiseField.Create(seeds, "dunes", 70f, NoiseFractal.Ridged, 2);
-        _jagged = NoiseField.Create(seeds, "jagged", 80f, NoiseFractal.Ridged, 3);
+        _plan = ctx.Plan;
+        _hills = NoiseField.Create(seeds, "hills", 190f, NoiseFractal.Fbm, 3);
+        _ridges = NoiseField.Create(seeds, "ridges", 240f, NoiseFractal.Fbm, 3);
+        _bumps = NoiseField.Create(seeds, "bumps", 90f, NoiseFractal.Fbm, 2);
+        _dunes = NoiseField.Create(seeds, "dunes", 70f, NoiseFractal.Fbm, 2);
         _mountainMask = NoiseField.Create(seeds, "mountain_mask", 700f, NoiseFractal.Fbm, 2);
-        _mountains = NoiseField.Create(seeds, "mountains", 200f, NoiseFractal.Ridged, 5);
+        _mountains = NoiseField.Create(seeds, "mountains", 260f, NoiseFractal.Fbm, 3);
+
+        var biomes = ctx.Content.Biomes;
+        _open = biomes.TryGet(OpenLand, out var forest) && forest.Relief != null ? forest.Relief : Missing(ctx, OpenLand, new ReliefSpec());
+        var regions = _plan.Regions;
+        _specs = new ReliefSpec[regions.Count];
+        for (int i = 0; i < regions.Count; i++)
+        {
+            var r = regions[i];
+            _specs[i] = r.Profile == RegionProfile.Buried ? _open
+                : biomes.TryGet(r.Biome, out var def) && def.Relief != null ? def.Relief
+                : Missing(ctx, r.Biome, _open);
+        }
+        foreach (var s in _specs.Append(_open))
+        {
+            _useRolling |= s.Rolling != 0f;
+            _useHills |= s.Hills != 0f;
+            _useRidges |= s.Ridges != 0f;
+            _useBumps |= s.Bumps != 0f;
+            _useDunes |= s.Dunes != 0f;
+        }
     }
 
-    public void Apply(PlanContext ctx)
+    private static ReliefSpec Missing(PlanContext ctx, string biome, ReliefSpec fallback)
+    {
+        ctx.Log.Warn("worldgen", $"Biome '{biome}' is placed on the surface but has no relief; using the {OpenLand} relief.");
+        return fallback;
+    }
+
+    /// <summary>Adds the relief to the plan heights (scaled down towards the coast) and sets the ruggedness grid.</summary>
+    public void Apply()
     {
         var plan = _plan;
         var regions = plan.Regions;
         var weights = new float[regions.Count];
-        float cx = ctx.CenterX, cz = ctx.CenterZ;
         var relief = new Grid2D(plan.Size.X, plan.Size.Z, WorldPlan.HeightStep);
         var rugged = new Grid2D(plan.Size.X, plan.Size.Z, WorldPlan.HeightStep);
+        var mountains = _open.Mountains;
 
         for (int gz = 0; gz < relief.Depth; gz++)
             for (int gx = 0; gx < relief.Width; gx++)
@@ -36,33 +75,39 @@ internal sealed class BiomeRelief
                 float total = 0f;
                 for (int i = 0; i < regions.Count; i++)
                 {
-                    var r = regions[i];
-                    weights[i] = r.Profile == RegionProfile.Buried ? 0f : DetMath.Clamp01(r.Membership(x, z, 0f) * 3f);
+                    weights[i] = Weight(regions[i], x, z);
                     total += weights[i];
                 }
+                var terms = Sample(x, z);
                 float forest = MathF.Max(0f, 1f - total);
                 float norm = forest + total;
-                float h = forest * ForestRelief(x, z), rug = forest * 0.15f;
+                float h = forest * terms.Relief(_open), rug = forest * _open.Ruggedness;
                 for (int i = 0; i < regions.Count; i++)
                 {
                     if (weights[i] <= 0f) continue;
-                    h += weights[i] * Relief(regions[i].Biome, x, z);
-                    rug += weights[i] * Rugged(regions[i].Biome);
+                    h += weights[i] * terms.Relief(_specs[i]);
+                    rug += weights[i] * _specs[i].Ruggedness;
                 }
                 h /= norm;
                 rug /= norm;
 
-                float dx = x - cx, dz = z - cz;
-                float spawnCalm = DetMath.SmoothStep(30f, 140f, MathF.Sqrt(dx * dx + dz * dz));
-                float mask = DetMath.SmoothStep(0.25f, 0.55f, _mountainMask.Sample(x, z)) * spawnCalm * forest;
-                h += mask * (30f + 55f * _mountains.Sample01(x, z));
-                rug = DetMath.Lerp(rug, 0.8f, mask);
+                float spawnCalm = SpawnCalm(x, z);
+                float mask = MountainMask(x, z, spawnCalm, forest);
+                if (mask > 0f)
+                {
+                    h += mask * (mountains!.Height + mountains.Peak * DetMath.SoftRidge(_mountains.Sample(x, z), 0.3f));
+                    rug = DetMath.Lerp(rug, 0.5f, mask);
+                }
 
                 relief[gx, gz] = h * DetMath.Lerp(0.35f, 1f, spawnCalm);
                 rugged[gx, gz] = rug * spawnCalm;
             }
 
-        relief.Blur(1);
+        // Two radius-2 box passes approximate a Gaussian about 40 cells wide; ruggedness ramps too, so overhang
+        // amplitude never jumps at a biome border.
+        relief.Blur(2);
+        relief.Blur(2);
+        rugged.Blur(3);
         for (int i = 0; i < plan.Height.Values.Length; i++)
         {
             float land = plan.Landness.Values[i];
@@ -72,23 +117,51 @@ internal sealed class BiomeRelief
         }
     }
 
-    private float ForestRelief(float x, float z) => 7f + 24f * _hills.Sample01(x, z) * _hills.Sample01(z * 0.7f, x * 0.7f);
-
-    private float Relief(string biome, float x, float z) => biome switch
+    /// <summary>
+    /// 0–1: how strongly a mountain range rises at a point (before the blur): the large-scale mountain mask over open
+    /// land, faded out near spawn and inside biome regions.
+    /// </summary>
+    internal float MountainMask(float x, float z)
     {
-        "tundra" => 10f + 48f * _ridges.Sample01(x, z) + 6f * _hills.Sample(x, z),
-        "jungle" => 12f + 22f * _hills.Sample01(x, z) + 10f * _jagged.Sample01(x, z),
-        "desert" => 4f + 7f * _dunes.Sample01(x, z),
-        "corruption" or "crimson" => 9f + 14f * _hills.Sample01(x, z) + 12f * _jagged.Sample01(x, z),
-        _ => ForestRelief(x, z),
-    };
+        float total = 0f;
+        foreach (var r in _plan.Regions) total += Weight(r, x, z);
+        return MountainMask(x, z, SpawnCalm(x, z), MathF.Max(0f, 1f - total));
+    }
 
-    private static float Rugged(string biome) => biome switch
+    private float MountainMask(float x, float z, float spawnCalm, float openLand) =>
+        _open.Mountains == null || spawnCalm * openLand <= 0f ? 0f
+            : DetMath.SmoothStep(0.25f, 0.55f, _mountainMask.Sample(x, z)) * spawnCalm * openLand;
+
+    /// <summary>A region's share of the relief at a point: ramps in over a wide border (buried regions have none).</summary>
+    private static float Weight(BiomeRegion r, float x, float z) =>
+        r.Profile == RegionProfile.Buried ? 0f : DetMath.SmoothStep(0f, 0.55f, r.Membership(x, z, 0f));
+
+    /// <summary>0 at spawn rising to 1 by 140 cells out: the spawn area stays calm (lower relief, no mountains or overhangs).</summary>
+    private float SpawnCalm(float x, float z)
     {
-        "tundra" => 0.55f,
-        "jungle" => 0.6f,
-        "desert" => 0.05f,
-        "corruption" or "crimson" => 0.75f,
-        _ => 0.15f,
-    };
+        float dx = x - _plan.Size.X * 0.5f, dz = z - _plan.Size.Z * 0.5f;
+        return DetMath.SmoothStep(30f, 140f, MathF.Sqrt(dx * dx + dz * dz));
+    }
+
+    /// <summary>The relief noise terms at a point (only those some placed biome uses), each 0–1.</summary>
+    private Terms Sample(float x, float z)
+    {
+        float hills = _useHills || _useRolling ? _hills.Sample01(x, z) : 0f;
+        return new Terms
+        {
+            Hills = hills,
+            Rolling = _useRolling ? hills * _hills.Sample01(z * 0.7f, x * 0.7f) : 0f,
+            Ridges = _useRidges ? DetMath.SoftRidge(_ridges.Sample(x, z), 0.25f) : 0f,
+            Bumps = _useBumps ? _bumps.Sample01(x, z) : 0f,
+            Dunes = _useDunes ? DetMath.SoftRidge(_dunes.Sample(x, z), 0.12f) : 0f,
+        };
+    }
+
+    private struct Terms
+    {
+        public float Hills, Rolling, Ridges, Bumps, Dunes;
+
+        public readonly float Relief(ReliefSpec s) =>
+            s.Base + s.Rolling * Rolling + s.Hills * Hills + s.Ridges * Ridges + s.Bumps * Bumps + s.Dunes * Dunes;
+    }
 }

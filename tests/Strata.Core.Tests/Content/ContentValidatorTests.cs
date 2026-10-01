@@ -136,6 +136,21 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void BiomeReliefIsRangeChecked()
+    {
+        var db = Load("""
+        { "biomes": [
+            { "id": "peaks", "relief": { "base": 5, "ruggedness": 2, "ridges": 70, "mountains": { "height": 10, "peak": 90 } } },
+            { "id": "plains", "relief": { "base": 5, "rolling": 20, "ruggedness": 0.2, "cliffs": 0.1, "mountains": { "height": 20, "peak": 30 } } }
+        ] }
+        """);
+        AssertError(db, "relief.ruggedness must be within 0–1");
+        AssertError(db, "relief.ridges must be within 0–60");
+        AssertError(db, "relief.mountains.peak must be within 0–80");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":plains", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void RejectsBadIdsAndCovers()
     {
         var db = Load("""{ "items": [ { "id": "BadId", "covers": ["copper"] } ] }""");

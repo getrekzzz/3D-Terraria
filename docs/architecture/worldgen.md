@@ -24,7 +24,26 @@ Large 6144×1024×6144.
 Determinism rules: SplitMix/PCG32 streams derived from names (`SeedTree`), never call order; no
 `Math.Sin/Pow/Exp` in generation (polynomial `Trig`); vendored FastNoiseLite. Golden chunk hashes
 (`WorldGenTests.GeneratedChunksMatchTheirGoldenHashes`) guard unintended changes; a deliberate change bumps `GenVersion` (existing saves keep their edited chunks and
-regenerate the rest with the new generator, with a logged warning).
+regenerate the rest with the new generator, with a logged warning). The golden chunks include at least three surface
+chunks (spawn forest, tundra, jungle, desert) and hash blocks by string id, so adding block content that shifts runtime
+ids does not break them.
+
+**Outdated worlds.** A world whose `WorldMeta.GeneratorVersion` is older than `GenVersion.Current` is flagged by
+`SaveCatalog` (`WorldEntry.OldGenerator`): the world list shows "old terrain" and asks before playing ("Made with an older
+world generator - new terrain will not match"), and `WorldSession` logs a warning on load. Old worlds are disposable;
+nothing converts them.
+
+**Surface relief** (`BiomeRelief`, planned in pass 4) comes from data: each surface biome's `relief` in
+`data/biomes.json` (`ReliefSpec`: base rise plus rolling, hills, ridges, bumps and dunes amplitudes, ruggedness, cliff
+affinity; the forest's also carries `mountains`). The forest relief covers the open land outside every region. Ridges,
+dunes and mountains run fBm through `DetMath.SoftRidge`, which gives rounded crests where ridged fractals made knife
+edges. Regions ramp in with SmoothStep(0, 0.55, membership), so borders blend over a wide band, and mountain ranges rise
+under a λ700 mask away from spawn. The relief grid is box-blurred twice (radius 2, about a 40-cell Gaussian) and the
+ruggedness grid once (radius 3). `TerrainField` samples plan height and ruggedness with a cubic B-spline
+(`Grid2D.SampleSmooth`, continuous in value and slope), so slopes show no creases along the 8-cell plan grid. On top
+sits a gentle two-octave detail of at most 2 cells. Editing a relief value changes world output, so it needs a
+`GenVersion` bump and re-pinned golden hashes. `ReliefTests` keep inland slopes outside mountains below 0.9 and the
+hills around spawn from flattening.
 
 **World mutations** (hardmode) are a third, lazy tier: an ordered log of steps saved with the world, each a pure
 function of (world, mutation seed, chunk, blocks). `WorldSession.Produce` applies whatever a chunk is missing (freshly

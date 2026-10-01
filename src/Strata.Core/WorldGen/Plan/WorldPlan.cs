@@ -88,7 +88,7 @@ public sealed class WorldPlan
                     for (int x = -4; x <= ChunkMath.Size + 4; x += 4)
                     {
                         float wx = cx * ChunkMath.Size + x, wz = cz * ChunkMath.Size + z;
-                        float rug = Ruggedness.Sample(wx, wz);
+                        float rug = Ruggedness.SampleSmooth(wx, wz);
                         top = MathF.Max(top, surfaceHeight(wx, wz) + 3f + Fields.TerrainField.OverhangAmplitude(rug) + 2f);
                     }
                 int i = ColumnIndex(cx, cz);
