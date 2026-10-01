@@ -14,7 +14,10 @@ namespace Strata.Game.Player;
 /// raised over the shoulder through the wind-up, sweep across in the strike window and follow through, thrust weapons
 /// pull back and stab forward, everything else lifts, so every attack and dig is visible. The use's phase runs in real
 /// time between simulation ticks, the item eases out of and back to its rest pose, and a chained use carries on from
-/// the pose the last one ended in. Lit by the voxel light around the player.
+/// the pose the last one ended in. Ranged weapons are held aimed (ViewModel.Ranged): a bow upright with an arrow on the
+/// string, guns along the view at the crosshair with a recoil kick per shot, staffs tipped toward the crosshair. Lit by
+/// the voxel light around the player. Kept in step with the held item in either view, so switching to first person
+/// never loads a model.
 /// </summary>
 public sealed partial class ViewModel : Node3D
 {
@@ -53,6 +56,11 @@ public sealed partial class ViewModel : Node3D
     private ItemDef? _item;
     private float _bob;
 
+    // The held item's use style (PlayerAvatar.ActionFor) and the pose it rests in between uses.
+    private string _style = "use";
+    private bool _ranged;
+    private Pose _rest = Idle;
+
     // The use being shown: its serial and action, its phase (never runs backwards), how far the item is drawn out of
     // its rest pose, and the crossfade from the pose shown when a chained use began.
     private int _serial;
@@ -66,12 +74,21 @@ public sealed partial class ViewModel : Node3D
         _game = game;
         _props = props;
         Name = "ViewModel";
+        _game.ItemUse.Used += OnUsed;
+    }
+
+    public override void _ExitTree()
+    {
+        if (_game != null) _game.ItemUse.Used -= OnUsed;
     }
 
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.view_model");
         var entity = _controller.Entity;
+        float dt = (float)delta;
+        UpdateItem(entity.State.Inventory.Held.Item);
+        RefreshAmmo(entity, dt);
         Visible = _controller.Rig.FirstPerson && entity.Alive;
         if (!Visible)
         {
@@ -79,22 +96,30 @@ public sealed partial class ViewModel : Node3D
             _serial = int.MinValue;
             _engage = 0f;
             _chain = 1f;
+            _kick = 0f;
             return;
         }
-        UpdateItem(entity.State.Inventory.Held.Item);
         if (_model == null) return;
 
-        float dt = (float)delta;
         var v = _controller.Velocity;
         float speed = new Vector2(v.X, v.Z).Length();
         _bob += dt * speed * 1.6f;
         var bob = _controller.IsOnFloor() ? new Vector3(Mathf.Sin(_bob) * 0.012f, Mathf.Abs(Mathf.Cos(_bob)) * 0.016f, 0) * Mathf.Min(speed / 5f, 1.2f) : Vector3.Zero;
 
         var pose = Animate(entity, dt);
-        Position = Rest + pose.Offset + bob;
-        Rotation = pose.Rotation;
+        if (_ranged)
+        {
+            PlaceAimed(entity, pose, bob, dt);
+            UpdateArrow();
+        }
+        else
+        {
+            Position = Rest + pose.Offset + bob;
+            Rotation = pose.Rotation;
+        }
         var light = PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, _controller.GlobalPosition + Vector3.Up * 1.4f), entity);
         _geometry?.SetInstanceShaderParameter("voxel_light", light);
+        _arrow?.SetInstanceShaderParameter("voxel_light", light);
     }
 
     /// <summary>
@@ -129,7 +154,7 @@ public sealed partial class ViewModel : Node3D
         _engage = Mathf.MoveToward(_engage, active ? 1f : 0f, dt / (active ? EngageIn : EngageOut));
         _chain = Mathf.MoveToward(_chain, 1f, dt / ChainFade);
 
-        var pose = _engage > 0f ? Pose.Lerp(Idle, UsePose(_action, _phase), Mathf.SmoothStep(0f, 1f, _engage)) : Idle;
+        var pose = _engage > 0f ? Pose.Lerp(_rest, UsePose(_action, _phase), Mathf.SmoothStep(0f, 1f, _engage)) : _rest;
         if (_chain < 1f) pose = Pose.Lerp(_chainFrom, pose, Mathf.SmoothStep(0f, 1f, _chain));
         _shown = pose;
         return pose;
@@ -161,6 +186,8 @@ public sealed partial class ViewModel : Node3D
                 if (timing.Striking(action, t) || through >= 1f) return Lunge;
                 return Pose.Lerp(Lunge, Level, Ease((t - through) / (1f - through)));
             }
+            case UseTiming.Bow or Shoot or Cast:
+                return RangedPose(action, t);
             default:
             {
                 float lift = Mathf.Sin(t * Mathf.Pi);
@@ -178,7 +205,17 @@ public sealed partial class ViewModel : Node3D
         _model?.QueueFree();
         _model = null;
         _geometry = null;
+        _arrow = null;
         LightAnchor = null;
+        // A new item starts from its own rest pose: no crossfade from another item's.
+        _serial = int.MinValue;
+        _engage = 0f;
+        _chain = 1f;
+        _kick = 0f;
+        _style = item == null ? "use" : PlayerAvatar.ActionFor(item, _game.Uses[item]);
+        _ranged = _style is UseTiming.Bow or Shoot or Cast;
+        _rest = _ranged ? RangedRest(_style) : Idle;
+        _ammoClock = 0f; // look for arrows now: the nocked arrow is ready before the first shot
         if (item == null) return;
         var path = AssetPaths.ItemModel(item, _game.Session.Content);
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
@@ -188,6 +225,7 @@ public sealed partial class ViewModel : Node3D
             mi.Scale = Vector3.One * (item.PlaceObject == null ? 0.9f : item.HeldLight != null ? 0.8f : 0.3f);
             _geometry = mi;
             _model = mi;
+            if (_style == UseTiming.Bow) AddArrow(mi);
         }
         else
         {

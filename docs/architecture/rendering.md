@@ -183,6 +183,20 @@ only, its head at the sweep the melee system tests hits against (the same eased 
 damage number appears as the arc passes; it fades after the follow-through and takes the swing's `trailColor` when the
 item sets one.
 
+Ranged weapons are held aimed in first person (`ViewModel.Ranged`), in use or not. Their poses are in an aim frame
+(the view yawed and pitched from the item's rest position to the crosshair point at `AimDistance`, kept within
+2–60 m), so a barrel or an arrow laid along −Z points at what the crosshair is on. A bow stands upright right of
+centre, its back to the target, with an arrow on the string: the first arrows in the backpack (`ItemUseSystem.FindAmmo`,
+looked up four times a second and at once when a bow is taken out, in either view, so the model is loaded before the
+first shot). The arrow is gone from the bow clip's `release` to its `redrawStart` while the bow jolts 3 cm forward, then
+is laid on ahead of the string and slid back onto it by `redrawEnd`, so auto-fire keeps the arrow in step with the
+shots. Guns point along the view and kick 6° up and 4 cm back on every shot (each `ItemUse.Used` with a `Shot`, so a
+burst kicks per round), settling to about 5 % in 0.12 s. Staffs, wands and tomes lean their tip toward the crosshair and
+push toward it on a cast. In third person `PlayerAvatar.HeldPose` grips a bow by its riser, upright with its back on
+the aim while it is drawn (set 23° forward in the fist against the bow clip's raised hand); everything else keeps the
+point-forward grip. Probes `fp.arrow`, `fp.aim_error_deg`, `player.held_tilt_deg` and `player.held_aim_deg` report the
+result.
+
 The strafe clips run `HumanoidAnimator.StrafeAngle` (45°) to the side of the hips: with the legs turned that far
 toward the movement, the feet travel straight sideways.
 

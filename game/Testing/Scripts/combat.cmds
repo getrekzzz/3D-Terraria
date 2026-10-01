@@ -223,3 +223,45 @@ assert player.swings >= 2
 assert player.action_dips == 0
 camera first
 assert errors == 0
+
+# --- P1-14 ---
+# Ranged weapons in hand. First person: a bow shows the first arrows in the backpack on the string, loosed at the
+# release and laid back on by the re-draw end, and points at the crosshair; so does a gun, its recoil settled half a
+# second after a shot. Third person: a drawn bow stands upright with its back on the aim.
+killall
+heal
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+camera first
+give wooden_bow 1
+give wooden_arrow 20
+wield wooden_bow
+aim 0 0 1
+wait 0.3
+assert fp.arrow == 1
+assert fp.aim_error_deg < 3
+press use_primary
+wait 0.08
+assert fp.arrow == 0
+release use_primary
+wait 0.6
+assert fp.arrow == 1
+give flintlock_pistol 1
+give musket_ball 20
+wield flintlock_pistol
+wait 0.3
+assert fp.arrow == -1
+assert fp.aim_error_deg < 3
+use
+wait 0.5
+assert fp.aim_error_deg < 3
+camera third
+wield wooden_bow
+wait 0.5
+press use_primary
+wait 0.1
+assert player.held_tilt_deg < 15
+assert player.held_aim_deg < 15
+release use_primary
+camera first
+assert errors == 0

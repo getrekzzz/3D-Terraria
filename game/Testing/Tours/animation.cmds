@@ -1,5 +1,6 @@
 # Animation tour (timescale slows animation, not the simulation: waits after "use" are animation time): the player's body from the side while idling, running, swinging, mining, stabbing, shooting,
-# drawing a bow, casting, drinking and holding a torch; zombies shambling and dying; bosses turning to look.
+# drawing a bow, casting, drinking and holding a torch; first-person bow, gun and pickaxe; zombies shambling and dying;
+# bosses turning to look.
 #   godot --path . --rendering-driver vulkan -- --world=anim --size=tiny --new --player=anim --fresh-player \
 #         --view=2 --shots=/tmp/shots --smoke=res://game/Testing/Tours/animation.cmds
 wait_until player.frozen == 0 300
@@ -125,6 +126,27 @@ screenshot m_jump 0
 wait_until screenshot.pending == 0 900
 press jump off
 wait 1.5
+
+# First person: a bow held upright with an arrow on the string, the arrow gone just after the release, and a pistol
+# pointing along the view at the crosshair.
+camera first
+wield wooden_bow
+give wooden_arrow 20
+wait 0.5
+screenshot q_fp_bow_rest
+wait_until screenshot.pending == 0 900
+press use_primary
+wait 0.05
+screenshot q_fp_bow_release 0
+wait_until screenshot.pending == 0 900
+release use_primary
+wait 0.6
+wield flintlock_pistol
+wait 0.5
+screenshot r_fp_gun
+wait_until screenshot.pending == 0 900
+camera third
+wait 0.5
 
 # First person: a held pickaxe mid-chop (the view model eases up, strikes and settles on the use's timing).
 camera first

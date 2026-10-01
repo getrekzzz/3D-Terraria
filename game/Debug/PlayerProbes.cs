@@ -7,7 +7,8 @@ namespace Strata.Game.Debug;
 /// <summary>
 /// Probes on the player's physical body (floor contact, the terrain-loading freeze, flight time, the hook claw's snap
 /// onto the rendered surface; the hook's state is a Core probe), on how far the third-person body turns from the
-/// crosshair and how its item actions blend, and on the crosshair target.
+/// crosshair, how its item actions blend and how it holds its item, on the first-person view model (a bow's nocked
+/// arrow, a ranged weapon's aim) and on the crosshair target.
 /// </summary>
 [ProbeSource]
 public static class PlayerProbes
@@ -30,6 +31,16 @@ public static class PlayerProbes
             ctx.AddProbe("player.twist_deg", () => avatar.TwistDegrees);
             ctx.AddProbe("player.action_dips", () => avatar.ActionDips); // chained uses that faded toward locomotion between
             ctx.AddProbe("player.action_weight", () => avatar.ActionWeight);
+            // The item in the third-person hand: its limbs' or shaft's lean from upright, its business end's angle off the aim.
+            ctx.AddProbe("player.held_tilt_deg", () => avatar.HeldDegrees().Tilt);
+            ctx.AddProbe("player.held_aim_deg", () => avatar.HeldDegrees().Aim);
+        }
+        if (player.Rig.Camera.GetNodeOrNull<ViewModel>("ViewModel") is { } viewModel)
+        {
+            // First person: the bow's nocked arrow (1 on the string, 0 loosed, -1 none) and how far a bow or gun points
+            // off the crosshair point.
+            ctx.AddProbe("fp.arrow", () => viewModel.ArrowState);
+            ctx.AddProbe("fp.aim_error_deg", () => viewModel.AimErrorDegrees);
         }
         if (world.Interaction is not { } interaction) return;
         // 1 when there is no target or it lies ahead of the eye along the facing: nothing behind the player is selected.
