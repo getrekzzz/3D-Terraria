@@ -28,7 +28,7 @@ vec3 ore_info(float id) {
 }
 
 vec3 unpack_tint(float packed) {
-	int c = int(packed + 0.5);
+	int c = int(packed); // exact: 0xRRGGBB < 2^24 is an integer-valued float
 	return pow(vec3(float((c >> 16) & 255), float((c >> 8) & 255), float(c & 255)) / 255.0, vec3(2.2));
 }
 
@@ -45,14 +45,17 @@ float glint_octave(float freq, float density, vec3 view, float seed) {
 // preset's glint distance. Only ore flecks glint (`fleck`: the material's metallic channel). Bounded cost: two hashes,
 // no texture fetches, nothing past the distance.
 vec3 ore_glints(vec3 tint, float sparkle, float fleck, vec3 view, vec4 light) {
+	if (sparkle <= 0.0) return vec3(0.0);
 	float dist = length(v_world_pos - strata_camera); // built-ins like INV_VIEW_MATRIX exist only inside fragment()
 	float near = 1.0 - smoothstep(ore_glint_distance * 0.7, ore_glint_distance, dist);
-	if (sparkle <= 0.0 || near <= 0.0) return vec3(0.0);
+	if (near <= 0.0) return vec3(0.0);
+	// Far away the mipmapped mask averages the flecks out; the coarse glints stand for whole veins there.
+	float mask = mix(fleck, 1.0, smoothstep(6.0, 16.0, dist));
 	float fine = (1.0 - smoothstep(6.0, 12.0, dist)) * glint_octave(18.0, 0.16, view, 0.0);
 	float coarse = smoothstep(4.0, 10.0, dist) * glint_octave(5.0, 0.22, view, 17.0);
 	// Glints need light to catch (torchlight, daylight), with a floor so veins can be spotted in the dark.
 	float lit = max(max(light.r, max(light.g, light.b)), light.a * strata_daylight);
-	return mix(tint, vec3(1.0), 0.35) * (fine + coarse * 0.8) * sparkle * near * fleck * (0.5 + 3.0 * lit);
+	return mix(tint, vec3(1.0), 0.35) * (fine + coarse * 0.8) * sparkle * near * mask * (0.5 + 3.0 * lit);
 }
 
 void fragment() {
@@ -88,7 +91,8 @@ void fragment() {
 		bent = b0 * k.x + b1 * k.y + b2 * k.z;
 		vec3 o0 = ore_info(v_ids.x), o1 = ore_info(v_ids.y), o2 = ore_info(v_ids.z);
 		ore.xy = k.x * o0.xy + k.y * o1.xy + k.z * o2.xy;
-		if (ore.x > 0.0) tint = k.x * unpack_tint(o0.z) + k.y * unpack_tint(o1.z) + k.z * unpack_tint(o2.z);
+		if (ore.x > 0.0) // weighted by how much each surface glints, so the stone beside a vein does not darken it
+			tint = (k.x * o0.x * unpack_tint(o0.z) + k.y * o1.x * unpack_tint(o1.z) + k.z * o2.x * unpack_tint(o2.z)) / ore.x;
 	}
 	float ao = COLOR.a;
 	vec3 world_n = normalize(n + bent * 0.85 * normal_strength);
@@ -98,7 +102,9 @@ void fragment() {
 	METALLIC = mat.w;
 	NORMAL = normalize((VIEW_MATRIX * vec4(world_n, 0.0)).xyz);
 	// Ore flecks (metallic texels) shine and softly glow; the stone around them stays dark and lights nothing.
-	float fleck = clamp(mat.w * 2.5, 0.0, 1.0);
+	// Metal ores mark their flecks metallic (~0.9); gems and hellstone nuggets only a little (0.1-0.2), so any metallic
+	// texel counts fully.
+	float fleck = max(clamp(mat.w * 2.5, 0.0, 1.0), smoothstep(0.03, 0.08, mat.w));
 	EMISSION = strata_block_light(base, v_light, ao) + (ore_glints(tint, ore.x, fleck, VIEW, v_light) + base * ore.y * fleck) * ao;
 	AO = ao * strata_sky_visibility(v_light);
 	f_sun_gate = strata_sun_gate(v_light) * ao * strata_cloud_shadow(v_world_pos, strata_light_dir);

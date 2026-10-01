@@ -136,7 +136,7 @@ public sealed class GraphicsPreset
     /// <summary>How far the horizon (the world's surface beyond the streamed chunks) reaches, in metres; 0 = none.</summary>
     public float HorizonDistance { get; set; }
 
-    /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last quarter).</summary>
+    /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last 30 %).</summary>
     public float OreGlintDistance { get; set; } = 24f;
 
     /// <summary>A copy to edit into a custom preset.</summary>
@@ -164,7 +164,7 @@ public sealed class GraphicsPreset
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
-        if (OreGlintDistance is < 0f or > 60f) yield return "oreGlintDistance must be within 0–60 m";
+        if (OreGlintDistance is < 1f or > 60f) yield return "oreGlintDistance must be within 1–60 m";
     }
 
     private static bool PowerOfTwo(int v, int min, int max) => v >= min && v <= max && (v & (v - 1)) == 0;
