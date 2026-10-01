@@ -1,0 +1,39 @@
+{
+ "id": "P3-20",
+ "title": "Death bursts and gore chunks (voxel-lit, bouncing, pooled)",
+ "player_outcome": "Kills burst: a spray of blood, gel or bone dust plus a few chunks that tumble, bounce off the terrain and fade. There is no more white glowing sphere puff, and in dark caves the burst is dark too.",
+ "design": [
+  "Verified: Killed \u2192 Puff with an Unshaded sphere material (CombatEffects.cs:17, 94); non-human corpses just shrink.",
+  "New game/Entities/GoreSystem.cs: one MultiMesh (box and sphere shared meshes, prop shader with light_from_custom). Capacity by preset: 16/32/64/96 chunks.",
+  "Each chunk: position, velocity, angular velocity, life 2.5 s with fade in the final 0.4 s. Gravity is 18 m/s\u00b2. Voxel collision tests World.IsSolid at the next cell, bouncing 0.35 with ground friction. Custom data = voxel light (sampled every 4th frame) + colour. The oldest chunk is recycled.",
+  "On Killed: EffectKit.Burst(material dust recipe, count 25 \u00d7 scale) + GoreSystem.Spawn(material.gore.pieces (2\u20134; bosses 8), size from HalfExtents, colour from material/Tint).",
+  "Critters (tag critter): a small puff only. Humanoid corpses (KeepCorpse) get dust only.",
+  "Remove the remaining sphere Puff helper; liquid steam and burning items already use EffectKit (P3-08)."
+ ],
+ "files_modify": [
+  "game/Entities/CombatEffects.cs \u2014 Killed \u2192 burst + gore",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create GoreSystem",
+  "data/config/creature_materials.json \u2014 gore pieces, colours, shapes"
+ ],
+ "files_add": [
+  "game/Entities/GoreSystem.cs \u2014 pooled simulated gore chunks"
+ ],
+ "data_changes": [
+  "creature_materials.json gore per material: flesh 3 dark-red boxes; gel 3 tinted spheres; bone 4 ivory boxes; metal 3 grey boxes + sparks; plant 3 green leaves"
+ ],
+ "tests": [
+  "Smoke combat.cmds: 'spawn zombie 6 3' / 'slay' / 'wait 1' / 'assert errors == 0'",
+  "Smoke creatures.cmds PASS"
+ ],
+ "verification": [
+  "perf: slay 30 creatures at once \u2192 gd.gore < 0.5 ms and no frame > 25 ms (perf report max)",
+  "Lavapipe screenshots of kills at day and in a cave"
+ ],
+ "depends_on": [
+  "P3-19"
+ ],
+ "risks": [
+  "Voxel collision on unloaded chunks: treat unknown cells as air and kill chunks below y < 0."
+ ],
+ "effort": "M"
+}

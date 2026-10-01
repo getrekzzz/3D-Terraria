@@ -1,0 +1,44 @@
+{
+ "id": "P1b-08",
+ "title": "Streaming scheduler without per-frame LINQ, plus adaptive frame budgets",
+ "player_outcome": "Fewer micro-stutters while standing or walking. Streaming, uploads and colliders never add up to 19 ms or more in one frame during normal play; big budgets are used only while the world is loading.",
+ "design": [
+  "Checked in code: ScheduleMeshes runs `_entries.Where(...).OrderBy(...).ToList()` over roughly 2000-4700 entries every frame (ChunkStreamer.Scheduling.cs:101-102); ScheduleLoads does the same (:66-67); Retarget runs `_entries.ToList()`; LoadedCount and MeshedCount are LINQ Counts. WorldRuntime._Process gives jobs up to 14 ms, uploads 3 ms and colliders 2 ms plus unbounded urgent builds (WorldRuntime.cs:113-115).",
+  "ChunkStreamer: keep _loadQueue (HashSet<Int3> of Loading and not-yet-scheduled entries) and _meshCandidates (HashSet<Int3>), updated in Want, OnLoaded, MarkDirty, OnMeshed (null result), Retarget and Unload. ScheduleLoads and ScheduleMeshes fill a reusable List<(int Priority, Int3 Coord)> from those sets and sort it with a static comparer (priority, then X, Y, Z for determinism) before scheduling the top N.",
+  "Mesh candidates that fail NeighboursReady record BlockedEpoch = _readyEpoch and are skipped until _readyEpoch (incremented in OnLoaded) changes.",
+  "Keep _loaded and _meshed counters on state transitions, so LoadedCount and MeshedCount are O(1). IsIdle can stay LINQ (probes and tests only). Retarget uses a reusable _unloadScratch list.",
+  "Add src/Strata.Core/Streaming/FrameBudgetPlanner.cs: `FrameBudgets Plan(bool loading, int backlog, double lastFrameMs, double targetMs = 16.7)`. Loading: jobs 12, uploads 6, colliders 4, objects 3, grass 2 ms. Play: 3.0 / 2.0 / 1.5 / 1.0 / 0.8 (about 8.3 ms total). Backlog > 64 with a healthy frame raises jobs to 5. Last frame over 1.1\u00d7 target scales everything by 0.6, never below 0.5 ms each.",
+  "WorldRuntime: public FrameBudgets Budgets, computed first in _Process (loading = Focus is PlayerController { Frozen: true }). Game.Update uses Budgets.JobsMs, _renderer.ProcessUploads uses UploadsMs, _colliders.UpdateFocus uses CollidersMs. TileObjectRenderer and GrassRenderer read runtime.Budgets in P1b-10 and P1b-11."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Streaming/ChunkStreamer.cs \u2014 queues, counters, O(1) counts",
+  "src/Strata.Core/Streaming/ChunkStreamer.Scheduling.cs \u2014 set-based scheduling, epoch blocking, no LINQ",
+  "game/World/WorldRuntime.cs \u2014 Budgets from FrameBudgetPlanner"
+ ],
+ "files_add": [
+  "src/Strata.Core/Streaming/FrameBudgetPlanner.cs \u2014 per-frame main-thread budgets",
+  "tests/Strata.Core.Tests/Session/StreamerSchedulingTests.cs \u2014 allocation, counter and ordering tests",
+  "tests/Strata.Core.Tests/Session/FrameBudgetPlannerTests.cs \u2014 budget rules"
+ ],
+ "data_changes": [],
+ "tests": [
+  "StreamerSchedulingTests.SteadyStateDoesNotAllocate: after Pump settles, 200 streamer.Update(sameFocus) calls allocate < 2 KB (GC.GetAllocatedBytesForCurrentThread)",
+  "StreamerSchedulingTests.CountersMatchRecount: an internal RecountForTests() equals LoadedCount and MeshedCount after streaming, a 3-chunk focus move, edits and UnloadAll",
+  "StreamerSchedulingTests.UrgentEditsMeshFirst: after MarkDirty(urgent), the edited chunk's mesh job is scheduled before distance-ordered chunks",
+  "FrameBudgetPlannerTests: play budgets sum \u2264 9 ms; loading budgets are generous; a slow last frame shrinks budgets",
+  "Existing StreamingTests pass"
+ ],
+ "verification": [
+  "dotnet test; all smoke scripts (they use wait_until stream.idle, so a missed transition shows up as a timeout)",
+  "perf.cmds: add `assert perf.avg.gd.stream_and_jobs < 4`; rendering run shows lower gd.stream_and_jobs while idle; F3 managed memory flat while standing still"
+ ],
+ "depends_on": [
+  "P1b-07"
+ ],
+ "risks": [
+  "A missed flag transition leaves a chunk never meshed: keep the smoke wait_until stream.idle asserts",
+  "Tie-break ordering must be deterministic for tests",
+  "WorldRuntime.cs is also touched by P1b-09, P1b-10 and P1b-11: sequence"
+ ],
+ "effort": "M"
+}

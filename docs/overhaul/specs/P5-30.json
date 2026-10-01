@@ -1,0 +1,53 @@
+{
+ "id": "P5-30",
+ "title": "Guide book shell and Items tab (search, obtained from, crafted from, used in, stations)",
+ "player_outcome": "Press G (or the book button in the inventory) to open a Terraria-styled Guide book. The Items tab searches every item and shows where it drops (with %), who sells it, what it is crafted from and at which station, and what it is used in. Clicking an ingredient jumps to it.",
+ "design": [
+  "Input: add 'guide_book': ['key:G'] to data/config/input.json. Check for conflicts with other phases' new keys (H/J/B are Terraria quick heal/mana/buff, so G avoids them).",
+  "New game/UI/GuideBook/GuideBookScreen.cs (CanvasLayer, Layer 24, InputGate 'guide'). It is built lazily on first open: a dim backdrop and a centred two-page book panel (UiTheme blue panels, header font, page-turn SFX), with bookmark tabs across the top (Items, Bestiary, Bosses, NPCs, Tips, Achievements). Each tab is an IGuideTab control built on first selection. Esc or G closes it. The inventory gets a book button through InventoryScreen.Tabs.cs.",
+  "Build a Core GuideIndex (Gameplay/Guide/GuideIndex.cs: ItemSources (P5-24), RecipeLookup (P5-14), name/tag search keys) on a background Task at world launch (content is immutable, so this is thread-safe). The book shows 'Loading\u2026' until it completes.",
+  "ItemsTab (game/UI/GuideBook/ItemsTab.cs): a LineEdit search (sets InputGate.TextEntry while focused), a category OptionButton, and an ItemList virtual list of ~700 items (text immediately; icons lazily loaded for the visible range, 16 per frame via ItemIcons). The right page (ItemDetails.cs) shows a big icon and rarity-coloured name, the ItemTooltip lines, 'Obtained from' (source rows: enemy name + drop % from DropRates + conditions text; shops with seller and conditions; chests; crafting), 'Crafted from' (RecipeCards), 'Used in' (paged RecipeCards, 8 per page), and 'Crafting station for N recipes' when the item places a station. Rows link to items, and a back button keeps history.",
+  "Engine commands 'ui book [tab]' and 'ui book_item <id>'; probes ui.book_open and ui.book_sources (the source count for the shown item).",
+  "Perf: nothing built until first open; RecipeCards pooled; no per-frame rebuilds (the CraftingPanel audit issue); detail rebuilt only on selection."
+ ],
+ "files_modify": [
+  "data/config/input.json \u2014 guide_book",
+  "game/Bootstrap/InputSetup.cs (if actions need registration) \u2014 none expected",
+  "game/UI/InventoryScreen.Tabs.cs \u2014 book button",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create GuideBookScreen",
+  "game/Debug/EngineCommands.Town.cs (or a new EngineCommands.Guide.cs) \u2014 ui book",
+  "game/Debug/GodotCommandHost.cs \u2014 probes",
+  "tools/audio/sfx_recipes.py \u2014 page_turn"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Guide/GuideIndex.cs",
+  "game/UI/GuideBook/GuideBookScreen.cs",
+  "game/UI/GuideBook/IGuideTab.cs",
+  "game/UI/GuideBook/ItemsTab.cs",
+  "game/UI/GuideBook/ItemDetails.cs",
+  "game/UI/GuideBook/SourceRow.cs",
+  "game/Debug/EngineCommands.Guide.cs",
+  "assets/audio/sfx/page_turn.wav (generated)"
+ ],
+ "data_changes": [
+  "input.json guide_book binding"
+ ],
+ "tests": [
+  "GuideIndexTests: searching 'pick' returns copper_pickaxe; Build completes under 200 ms in the test (measure)",
+  "Smoke guide.cmds: 'ui book items' / 'assert ui.book_open == 1' / 'ui book_item torch' / 'assert ui.book_sources >= 2' / 'ui close'",
+  "Menu tour unaffected (MENU PASS)"
+ ],
+ "verification": [
+  "guide.cmds SMOKE PASS",
+  "In game: G opens the book with no hitch (F3 frame graph); search 'bar'; click Iron Bar \u2192 Used in lists anvils and tools with named stations; the Gel sources show slimes with %"
+ ],
+ "depends_on": [
+  "P5-24",
+  "P5-14"
+ ],
+ "risks": [
+  "The UI phase introduces the font and theme; the book must use UiTheme so it picks those up automatically.",
+  "The G key may collide with another phase's binding; settle it in the phase sync."
+ ],
+ "effort": "L"
+}

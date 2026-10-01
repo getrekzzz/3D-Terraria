@@ -1,0 +1,46 @@
+{
+ "id": "P3-41",
+ "title": "Wearable armour pieces in the Blender pipeline (per armour set)",
+ "player_outcome": "No direct change yet. Every armour set gets real wearable pieces (helmet, breastplate, pauldrons, bracers, belt, greaves, boots) in its own style, and the inventory icons show what you'll actually wear.",
+ "design": [
+  "Verified: the helmet/chest_armor/greaves generators are icon props (122/156/92 tris); nothing is wearable (items.py:172-190). There are 32 armour sets plus mining_helmet and wizard_hat.",
+  "New bgen/armor.py: rigid pieces authored in bone-local space of the shared human frame (frame_mod.Frame with default player params): head, chest, pauldron.L/R, bracer.L/R, belt, greave.L/R, boot.L/R.",
+  "Helmet styles: dome, full_helm (visor), hood, wizard cone, mask, horned/beetle, mining (lamp, prop:plain:glow). Chest styles: plate, chain, robe, carapace, scale, cloth. Uses prop layers (silver/copper/gold, cloth, leather, plain:glow) plus tints.",
+  "assets.json 'armor': {key: {head: {style, params}, body: {...}, legs: {...}}}. Keys are armorSet ids plus single items (mining_helmet, wizard_hat). The metal sets default from metalStyles/metals.",
+  "build_all.py builds assets/models/armor/<key>_<piece>.glb and records manifest 'armor' {key: {piece: {model, bone, refLength, hidesHair}}}. Move plan() into a new bgen/plan.py if build_all.py nears 400 lines.",
+  "Armour item icons render from the worn pieces (head piece for helmets; chest+pauldrons for body; greaves+boots for legs), replacing the old generators for set items.",
+  "Core AssetPaths.ArmorPiece(key, piece). ContentValidator warns when an armour item has no pieces in the manifest (warning until built).",
+  "Budget 400\u20132,000 tris per set."
+ ],
+ "files_modify": [
+  "tools/blender/build_all.py \u2014 armor build; manifest 'armor'",
+  "tools/blender/assets.json \u2014 'armor' table",
+  "src/Strata.Core/Content/AssetPaths.cs \u2014 ArmorPiece",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 armour pieces check",
+  "assets/icons/items/* \u2014 armour icons rebuilt"
+ ],
+ "files_add": [
+  "tools/blender/bgen/armor.py \u2014 wearable piece generators",
+  "tools/blender/bgen/plan.py \u2014 build planning (if needed for the line cap)",
+  "assets/models/armor/*.glb \u2014 generated pieces"
+ ],
+ "data_changes": [
+  "assets.json armor entries for 32 sets + 2 singles (styles: copper/tin plain helm; iron/lead chain; silver/tungsten; gold/platinum ornate; demonite/crimtane scale; meteor space helm with glow visor; molten (hellstone) horned plate with glow; jungle leaf; necro bone; bee; cobalt..titanium; hallowed; chlorophyte; turtle; beetle; spectre hood; shroomite; solar/vortex/nebula/stardust with glow)"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check (every armour item has an entry)",
+  "Strata.Tools validate"
+ ],
+ "verification": [
+  "preview.py: a new 'armor on player' preview (player mesh + pieces parented to bones) contact sheet per set"
+ ],
+ "depends_on": [
+  "P3-37",
+  "P3-38"
+ ],
+ "risks": [
+  "Male vs female and height variants: pieces are rigid and scaled at runtime per bone length (P3-42); check fit on m_* and f_* rigs.",
+  "Large asset growth (~34 \u00d7 10 GLBs); keep tris in budget."
+ ],
+ "effort": "L"
+}

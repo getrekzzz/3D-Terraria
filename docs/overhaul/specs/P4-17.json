@@ -1,0 +1,50 @@
+{
+ "id": "P4-17",
+ "title": "Dungeon furniture sets in blue, green and pink (doors, chairs, tables, bookcases, candelabras, chandeliers, lamps, vases)",
+ "player_outcome": "The dungeon is furnished with Terraria's dungeon furniture in its brick colour. Chandeliers and lamps light the halls, and you can carry any piece home once Skeletron falls.",
+ "design": [
+  "New data/tileobjects/dungeon.json with 24 objects: {blue,green,pink}_dungeon_ + door, chair, table, bookcase, candelabra, chandelier, lamp and vase.",
+  "door: interaction door, size like wooden_door, housing door.",
+  "chair: housing chair, interaction sit.",
+  "table: housing table.",
+  "bookcase: size [3,4,2], housing table.",
+  "candelabra: light [12,10,6], flame at three points, housing light.",
+  "chandelier: anchor Ceiling, size [3,3,3], light [15,13,8], three flames, housing light.",
+  "lamp: size [1,4,1], light [12,10,7].",
+  "vase: size [1,2,1].",
+  "All carry tags [world, dungeon], so their placing items count as obtainable. Use Terraria names ('Blue Dungeon Chair').",
+  "Blender: new tools/blender/bgen/dungeon_furniture.py with generators dungeon_chair, dungeon_table, bookcase (with book spines), candelabra, chandelier (iron ring, chains and candles), floor_lamp and vase. Params: palette (blue|green|pink) mapping to prop layers (stone/iron/gold) and tints. The door reuses the stone_door generator with palette params.",
+  "Tri budgets: chandelier \u2264 1500, the rest \u2264 800. \u2264 3 material slots so MultiMesh batching stays cheap.",
+  "assets.json: 24 object entries. Run build_all.py --only='*_dungeon_*'; object icons for the derived items render automatically.",
+  "Reference rows (24) in tools/content/reference/items_extra.py 'furniture'."
+ ],
+ "files_modify": [
+  "tools/blender/assets.json \u2014 24 objects",
+  "tools/blender/build_all.py \u2014 register dungeon_furniture generators",
+  "tools/content/reference/items_extra.py \u2014 rows",
+  "data/manifest.json \u2014 regenerated"
+ ],
+ "files_add": [
+  "data/tileobjects/dungeon.json \u2014 dungeon furniture",
+  "tools/blender/bgen/dungeon_furniture.py \u2014 furniture generators",
+  "assets/models/objects/*_dungeon_*_v0.glb and assets/icons/items/*_dungeon_*.png \u2014 generated"
+ ],
+ "data_changes": [
+  "24 tile objects plus 24 derived items."
+ ],
+ "tests": [
+  "AssetCoverageTests.EveryTileObjectVariantHasAModel passes.",
+  "HousingNavigationTests.DungeonFurnitureCountsForHousing: a room built with blue_dungeon_door, chair, table and candelabra is valid.",
+  "Smoke builder.cmds: 'give blue_dungeon_chandelier 1', 'wield blue_dungeon_chandelier', place under a ceiling, 'assert errors == 0'."
+ ],
+ "verification": [
+  "build_all.py --check; validate; dotnet test",
+  "tools/blender/preview.py contact sheet of the 8 generators \u00d7 3 palettes"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Blender time: 24 objects \u00d7 icons (use --samples=16).",
+  "The art phase may restyle furniture.py. Keep dungeon generators in their own module."
+ ],
+ "effort": "M"
+}

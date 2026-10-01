@@ -1,0 +1,48 @@
+{
+ "id": "P5-08",
+ "title": "Posture and rescue presentation: bound/sleep/sit rendering, rescue dialog, announcements",
+ "player_outcome": "Bound NPCs kneel tied up, the Stylist hangs in a web cocoon, the Tortured Soul looks ghostly, and the Angler sleeps on the sand. Name tags read 'Bound Goblin' and so on. Talking to them frees them with a thank-you line, and a message announces the rescue.",
+ "design": [
+  "Core: add enum ResidentPosture {Stand, Sit, Sleep, Bound, Lie} and TownNpc.Posture. Bound NPCs get it from Rescue.Pose (bound/webbed/tortured \u2192 Bound; sleeping/unconscious \u2192 Lie). TownDebugCommands: 'town pose <id> <posture>' for tours.",
+  "TownRenderer: map Posture \u2192 locomotion state (sit/sleep/bound/lie) before the walk/idle logic, and keep the yaw from Core. The name tag uses DisplayTitle. Webbed: a pooled translucent cocoon (the PropLibrary cobweb model scaled around the body, or a QuadMesh sphere with the cobweb material) attached while Bound and pose webbed. Tortured: SetTint(new Color(0.6,0.8,1.3)) and SetCastShadows(false). Cocoons live in a new TownRenderer.Props.cs partial and are pooled (no per-frame allocation).",
+  "TownDialog: Open(npc) first calls TryOpenRescue(npc), a new TownDialog.Rescue.cs partial. For a bound NPC it calls Game.Town.Rescue and shows Rescue.Thanks. When RequiresItem is missing it shows 'It needs to be purified...' and a 'Purify' button that appears once the item is carried.",
+  "New game/UI/TownAnnouncer.cs node subscribes to Town.Rescued and later visitor events, and posts through Hud.Announce, or ChatLog if the UI phase added one. Make Hud.Announce public (a one-line change; Hud.cs is 373 lines, so add nothing else there).",
+  "SoundEvents: Town.Rescued \u2192 Sfx.Play('npc_arrive')."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 Posture",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Rescues.cs \u2014 set Posture on bind and clear it on rescue",
+  "src/Strata.Core/Commands/TownDebugCommands.cs \u2014 pose",
+  "game/Entities/TownRenderer.cs \u2014 posture states, DisplayTitle, tint",
+  "game/UI/TownDialog.cs \u2014 rescue hook in Open",
+  "game/UI/Hud.cs \u2014 Announce public",
+  "game/Audio/SoundEvents.cs \u2014 rescue sound",
+  "game/Bootstrap/WorldLauncher.cs \u2014 add TownAnnouncer"
+ ],
+ "files_add": [
+  "game/Entities/TownRenderer.Props.cs \u2014 pooled cocoons",
+  "game/UI/TownDialog.Rescue.cs \u2014 rescue/purify flow",
+  "game/UI/TownAnnouncer.cs \u2014 town chat and announcement messages"
+ ],
+ "data_changes": [
+  "rescue.thanks and title strings (Terraria-flavoured) in data/town/*.json"
+ ],
+ "tests": [
+  "TownTests: DisplayTitle 'Bound Goblin' while bound, 'Name the Goblin Tinkerer' after rescue; Posture Bound \u2192 Stand",
+  "Smoke rescue.cmds: replace 'town rescue' with 'ui talk goblin_tinkerer' / 'assert flag.rescued_goblin_tinkerer == 1' / 'ui close'",
+  "Tour tour.cmds: 'town bind stylist 4 0 4' + screenshot (lavapipe, main only)"
+ ],
+ "verification": [
+  "rescue.cmds SMOKE PASS",
+  "In game: bound goblin kneels; talking frees him; announcement plus sound"
+ ],
+ "depends_on": [
+  "P5-06",
+  "P5-07"
+ ],
+ "risks": [
+  "TownDialog.cs is also restyled by the UI phase (chat box at top centre, text buttons). Keep rescue logic in its own partial so the restyle only touches layout.",
+  "Hud.cs is near the 400-line limit; any other Hud additions must go into new files."
+ ],
+ "effort": "M"
+}

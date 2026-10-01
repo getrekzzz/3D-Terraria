@@ -1,0 +1,51 @@
+{
+ "id": "P5-21",
+ "title": "Stylist: haircuts (style and colour) and hair dyes",
+ "player_outcome": "The Stylist's 'Haircut' opens a preview of your character. Pick a hairstyle and colour, see it live, and pay. Her shop sells Terraria hair dyes, including Life, Mana, Depth, Time and Money dyes that change colour as you play.",
+ "design": [
+  "Core: a new 'haircut' service {price, colorPrice} and a TownServices.Stylist.cs partial with Haircut(npc, player, string style, string colorHex) \u2192 TradeResult. It validates the style against Appearance.StylesFor(body) and the hex colour, charges happiness-scaled coins, sets Look.HairStyle/HairColor, and raises PlayerState.LookChanged (a new event).",
+  "Hair dyes: a new item behavior 'hairDye' {mode: static|life|mana|depth|time|money|speed|biome|rainbow, color} that sets Look.HairDye (string, serialised in PlayerSave.Look automatically). A static helper HairDyes.ColorFor(PlayerEntity, WorldSession) in Core/Gameplay/Player computes the dynamic colour as a pure function of vitals, depth, clock, coins and speed.",
+  "Game: a new PlayerAvatar.Look.cs partial. On LookChanged, rebuild the avatar CreatureVisual: preload the new model with ResourceLoader.LoadThreadedRequest and swap on completion, so the swap causes no spike. Every 0.5 s with a dynamic dye, call _visual.SetAppearance with the dyed hair colour.",
+  "HaircutPanel (game/UI/HaircutPanel.cs): a CharacterPreview (reused from game/Menu) showing a copy of the look, style buttons, the colour swatch palette used by the character-creation screen (MainMenu.Characters), a price label, and Buy/Cancel. TownDialog.Services registers 'haircut'.",
+  "Stylist shop: hair dyes (life/mana/depth/money/time/team?/speed/biome; rainbow/martian/twilight in hardmode, verify) and hair_dye_remover. Assets via the potion generator; reference concepts."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Player/Appearance.cs \u2014 HairDye",
+  "src/Strata.Core/Gameplay/Player/PlayerState.cs \u2014 LookChanged event + RaiseLookChanged()",
+  "src/Strata.Core/Content/Specs/TownServiceSpecs.cs \u2014 haircut params",
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 hairDye",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 dispatch hairDye (1 line)",
+  "game/Player/PlayerAvatar.cs \u2014 call the InitializeLook hook",
+  "game/UI/TownDialog.Services.cs \u2014 haircut entry",
+  "data/town/pre_hardmode.json \u2014 stylist services + shop",
+  "tools/blender/assets.json"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownServices.Stylist.cs",
+  "src/Strata.Core/Gameplay/Player/HairDyes.cs",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Looks.cs \u2014 hairDye handler",
+  "game/Player/PlayerAvatar.Look.cs",
+  "game/UI/HaircutPanel.cs",
+  "data/items/town_hair_dyes.json"
+ ],
+ "data_changes": [
+  "about 10 hair dye items; stylist services [haircut] and shop"
+ ],
+ "tests": [
+  "StylistTests.HaircutChangesLookAndCharges; an invalid style is refused and not charged; TooPoor",
+  "HairDyeTests: life dye at full vs 10% life gives different colours; the depth dye changes with depth",
+  "PlayerSave round-trip keeps HairDye",
+  "Smoke town.cmds: 'town summon stylist 1 0 -3' / 'ui talk stylist' / 'ui service haircut' / 'ui close' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "dotnet test; in game the haircut preview shows the new style and the avatar swaps without a frame hitch (F3 frame graph)"
+ ],
+ "depends_on": [
+  "P5-13"
+ ],
+ "risks": [
+  "PlayerAvatar is also modified by the facing phase (body always faces the crosshair); keep the look swap in its own partial.",
+  "Only the generated hairstyles exist (5 male, 4 female); more styles belong to the art pipeline."
+ ],
+ "effort": "M"
+}

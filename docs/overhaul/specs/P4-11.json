@@ -1,0 +1,63 @@
+{
+ "id": "P4-11",
+ "title": "Skeletron loot and presentation: mask, trophy, Skeletron Hand hook, Book of Skulls, Bone Glove bag, skull and slap cues",
+ "player_outcome": "Beating Skeletron can drop the Skeletron Mask (1/7), the Skeletron Hand grappling hook (1/8), the Book of Skulls (1/8) and a trophy (1/10), plus 5\u201315 Lesser Healing Potions and 5 gold. The Expert bag adds the Bone Glove, which throws crossbones as you attack. Its skulls whistle, its slaps crack, and its spin roars.",
+ "design": [
+  "New data/items/skeletron.json. skeletron_mask: armor, equipSlot head, defense 0, tags [vanity], rarity 1, value 7500.",
+  "skeletron_hand (item): category hook, rarity 2, value 20000, behaviors [{type grapple, reach 24, speed 25, pull 13, color #e8e0c8}].",
+  "bone_glove: accessory, rarity -12, tags [expert], equipEffects [{type attackProjectile, projectile bone_glove_bone, damage 25, cooldown 60}].",
+  "Projectile bone_glove_bone: friendly, visual item (bone), gravity 10, spinning, pierce 1.",
+  "New EffectSpec 'attackProjectile' {projectile, damage, cooldown, speed} in EffectSpecs.cs and EffectState.AttackProjectiles (list).",
+  "New partial src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Gloves.cs: LaunchAttackProjectiles(p, outcome). ItemUseSystem.Use calls it once after a successful weapon use (outcome Swung/Shot/Thrust). Cooldown per player via a new PlayerEntity.GloveCooldown decremented in GameWorld.TickPlayer. It fires along p.Aim from the hand height.",
+  "Loot (data/loot/bosses.json): skeletron = coins [45000,55000], lesser_healing_potion 5\u201315, skeletron_trophy 0.1, Classic \u2192 skeletron_drops, Expert \u2192 skeletron_treasure_bag.",
+  "skeletron_drops: skeletron_mask 1/7, skeletron_hand 1/8, book_of_skulls 1/8. The non-Terraria bone stack is removed. skeletron_bag = skeletron_drops + bone_glove.",
+  "The skeletron_trophy object is added to data/tileobjects/trophies.json.",
+  "Cues: HandBrain calls ctx.Cue(npc, 'hand_slap') at strike start. CryptWardenBrain calls ctx.Cue(npc, 'skull_shot') on each skull. tools/audio/sfx_recipes.py gains 'hand_slap' (bone clack plus thud) and 'skull_shot' (hollow whoosh with a rattle).",
+  "Blender assets.json: skeletron_mask uses the skeletron_skull generator at a radius of 0.17 m, hollowed. skeletron_hand item uses skeletron_hand_bones at size 0.3. bone_glove is a bone gauntlet (new 'bone_glove' generator in trophies.py). bone_glove_bone uses the 'bone' item generator. The trophy uses the 'trophy' generator.",
+  "Add bosses_pre2.GENERATORS to the item generator map in build_all.py so boss parts can be reused as item models.",
+  "Reference rows in tools/content/reference/items_extra.py: skeletron_mask, skeletron_hand, bone_glove, skeletron_trophy."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Specs/EffectSpecs.cs \u2014 attackProjectile",
+  "src/Strata.Core/Gameplay/Stats/EffectState.cs \u2014 AttackProjectiles",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 one call to LaunchAttackProjectiles",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 PlayerEntity.GloveCooldown field and tick",
+  "src/Strata.Core/AI/HandBrain.cs \u2014 slap cue",
+  "src/Strata.Core/AI/CryptWardenBrain.cs \u2014 skull cue",
+  "data/loot/bosses.json \u2014 Skeletron tables",
+  "data/tileobjects/trophies.json \u2014 skeletron_trophy",
+  "tools/blender/assets.json \u2014 items and trophy",
+  "tools/blender/build_all.py \u2014 boss generators for items",
+  "tools/content/reference/items_extra.py \u2014 rows",
+  "tools/audio/sfx_recipes.py \u2014 hand_slap, skull_shot"
+ ],
+ "files_add": [
+  "data/items/skeletron.json \u2014 mask, Skeletron Hand hook, Bone Glove, bone projectile",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Gloves.cs \u2014 attack projectiles",
+  "assets/models/items/{skeletron_mask,skeletron_hand,bone_glove,bone_glove_bone}.glb and icons \u2014 generated",
+  "assets/audio/sfx/{hand_slap,skull_shot}.wav \u2014 generated"
+ ],
+ "data_changes": [
+  "Skeletron loot restructured to Terraria 1.4 Classic odds and an Expert bag."
+ ],
+ "tests": [
+  "SkeletronTests.DropsFollowTerrariaOdds: roll skeletron_drops 2800 times with a fixed Pcg32; mask \u2248 1/7, hook \u2248 1/8, book \u2248 1/8 (\u00b10.03).",
+  "SkeletronTests.ExpertBagHoldsTheBoneGlove.",
+  "GearTests.BoneGloveThrowsACrossboneOnAttackWithCooldown: two sword uses within 60 ticks give exactly one bone_glove_bone.",
+  "Smoke dungeon.cmds: 'give bone_glove 1', 'equip bone_glove', 'give copper_broadsword 1', 'wield copper_broadsword', 'use', 'assert projectiles.count >= 1'."
+ ],
+ "verification": [
+  "dotnet test; validate; build_all.py --check; gen_reference.py --check",
+  "Headless dungeon.cmds; view the new icons"
+ ],
+ "depends_on": [
+  "P4-04",
+  "P4-10"
+ ],
+ "risks": [
+  "The Skeletron Hand hook only works once the items phase fixes grappling (audit F). Until then it behaves like the other hooks.",
+  "ItemUseSystem.cs (375 lines) is heavily edited by the items phase. Keep this to a single call line.",
+  "The mask is invisible on the body until armour rendering exists (audit K)."
+ ],
+ "effort": "M"
+}

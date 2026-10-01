@@ -1,0 +1,49 @@
+{
+ "id": "P1b-13",
+ "title": "Asset cache with threaded loading for creature models, prop models and animation sets",
+ "player_outcome": "A new creature type, town NPC, boss or piece of furniture appearing for the first time no longer freezes the game. Human NPC models are about 4 MB each; they now load in the background and show up a moment later.",
+ "design": [
+  "Checked in code: CreatureVisual.Create, PropLibrary.Model and HumanAnimations.For call GD.Load<PackedScene> synchronously on first use (CreatureVisual.cs:25-44, PropLibrary.cs:47-67, HumanAnimations.cs:20-34). Human GLBs are about 4 MB each (for example lunatic_cultist 4.8 MB); the 29 animation sets total 22 MB. PropLibrary caches a null result forever.",
+  "Add game/Rendering/AssetCache.cs. `AssetState TryGet<T>(string resPath, out T?)` returns Ready, Pending or Missing. Request(path) calls ResourceLoader.LoadThreadedRequest(path, \"\", false). Pump(maxPerFrame = 4) moves finished loads (LoadThreadedGetStatus \u2192 LoadThreadedGet) into a strong-reference cache. LoadNow(path) is for the player avatar and menus. ResourceLoader.Exists results are cached; Missing is reported once.",
+  "Add game/Rendering/AssetPump.cs, a Node that calls Pump every frame (added by WorldLauncher; CharacterPreview uses LoadNow).",
+  "PropLibrary.Model: go through AssetCache. Pending returns null without caching the null or adding a Problem; Missing records one problem; add IsPending(path).",
+  "CreatureVisual.Create returns null while its scene or its HumanAnimations set is pending. HumanAnimations.For requests sets through AssetCache.",
+  "Callers: NpcRenderer and TownRenderer already retry null every frame. ProjectileRenderer shows its glow fallback until the model is ready. TileObjectRenderer keeps a chunk dirty while any group model is pending. PlayerAvatar and CharacterPreview use LoadNow.",
+  "Probes assets.pending and assets.loaded; timer assets.instantiate. Smoke scripts that check visuals straight after spawning (creatures.cmds, bosses.cmds, town.cmds) add `wait_until assets.pending == 0 300`."
+ ],
+ "files_modify": [
+  "game/Rendering/PropLibrary.cs \u2014 AssetCache-backed Model and IsPending",
+  "game/Rendering/CreatureVisual.cs \u2014 pending-aware Create",
+  "game/Rendering/HumanAnimations.cs \u2014 threaded set loading",
+  "game/Entities/NpcRenderer.cs \u2014 pending handling in Acquire; single problem report",
+  "game/Entities/TownRenderer.cs \u2014 pending handling (verify)",
+  "game/Entities/ProjectileRenderer.cs \u2014 fallback while pending",
+  "game/World/TileObjectRenderer.cs \u2014 keep dirty while pending",
+  "game/Player/PlayerAvatar.cs, game/Menu/CharacterPreview.cs \u2014 LoadNow",
+  "game/Bootstrap/WorldLauncher.cs \u2014 add AssetPump",
+  "game/Debug/GodotCommandHost.cs \u2014 asset probes",
+  "game/Testing/Scripts/creatures.cmds, bosses.cmds, town.cmds \u2014 wait for assets where visuals are asserted"
+ ],
+ "files_add": [
+  "game/Rendering/AssetCache.cs \u2014 threaded resource cache",
+  "game/Rendering/AssetPump.cs \u2014 per-frame pump node"
+ ],
+ "data_changes": [],
+ "tests": [
+  "All smoke scripts pass; `props.problems == 0` still holds",
+  "perf.cmds: spawn 3 enemy types not seen before, then `assert perf.max.gd.npcs < 12`"
+ ],
+ "verification": [
+  "Rendering run: summoning a new boss or meeting a new human NPC shows no gd.npcs or assets entries above 16 ms in `perf spikes`",
+  "Visual: the creature appears within a few frames and animates correctly (humanoid sets attached)"
+ ],
+ "depends_on": [
+  "P1b-10"
+ ],
+ "risks": [
+  "Behaviour of ResourceLoader.LoadThreadedRequest for .glb-imported scenes under headless CI: verify, and fall back to LoadNow when the headless display server is detected, if needed",
+  "Instantiating a 4 MB human still costs time on main; P1b-14 pre-warms pools",
+  "Touches NpcRenderer, ProjectileRenderer and TileObjectRenderer, which are also edited by P1b-10, P1b-14 and P1b-15: sequence"
+ ],
+ "effort": "M"
+}

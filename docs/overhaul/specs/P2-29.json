@@ -1,0 +1,42 @@
+{
+ "id": "P2-29",
+ "title": "Smart Cursor toggle",
+ "player_outcome": "Pressing X toggles Smart Cursor, and the crosshair turns orange with a small icon. With a pickaxe it snaps to the nearest block you can actually mine near your aim within reach; with an axe, to the nearest tree. Mining an ore vein or chopping a forest stops needing pixel-perfect aim.",
+ "design": [
+  "Core: new src/Strata.Core/Gameplay/Interaction/SmartTargeting.cs. Targeting is a non-partial static class, so this is a separate class.\n- `Target? Find(VoxelWorld world, Vector3 eye, Vector3 aim, float reachM, ItemUseInfo info, int pickPower, int axePower, int hammerPower)`.\n- Mine: march the ray in 0.25 m steps; at each step test cells within lateral radius min(0.75 m, dist\u00b7tan 12\u00b0) for solid blocks where MiningRules.CanMine(block, pickPower). Return the one closest along the ray.\n- Chop/Hammer: the nearest TileObject within the cone that the tool can break.\n- Otherwise null, and the plain target is used.",
+  "Input: add \"smart_cursor\": [\"key:X\"] to input.json (Ctrl is already crouch). Add it to KeyBindings.Listed.\n- `UserSettings.SmartCursor` persists the toggle.\n- The Gameplay settings row gets 'Smart cursor'.",
+  "InteractionController (after P1's eye-ray targeting lands): when SmartCursor is on and the held item has Mine, Chop or Hammer, replace Target with SmartTargeting.Find and set InReach = true. The toggle writes 'Smart Cursor On'/'Off' to the StatusLine. Hud Crosshair tints orange and shows the smart_cursor sprite. TargetHighlight already follows Interaction.Target.",
+  "UiProbes gains `ui.smart_cursor`."
+ ],
+ "files_modify": [
+  "game/Player/InteractionController.cs \u2014 smart target branch and toggle",
+  "game/UI/Hud/Crosshair.cs \u2014 orange tint and icon",
+  "data/config/input.json \u2014 smart_cursor",
+  "game/Settings/KeyBindings.cs \u2014 Listed row",
+  "game/Settings/UserSettings.cs \u2014 SmartCursor",
+  "game/Menu/SettingsScreen.cs \u2014 Gameplay row",
+  "game/Debug/UiProbes.cs \u2014 ui.smart_cursor"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Interaction/SmartTargeting.cs",
+  "tests/Strata.Core.Tests/Gameplay/SmartTargetingTests.cs"
+ ],
+ "data_changes": [
+  "data/config/input.json: \"smart_cursor\": [\"key:X\"]"
+ ],
+ "tests": [
+  "SmartTargetingTests: FindsOreBesideTheRay (ore cell 0.5 m off-axis); IgnoresBlocksTooHardForThePick; ChopsNearestTreeInCone; NothingBeyondReach",
+  "ui.cmds: `press smart_cursor` / `press smart_cursor off` / `assert ui.smart_cursor == 1` / `wield copper_pickaxe` / `aim 0.3 -1 0.1` / `hold use_primary 1.5` / `assert inv.stone >= 1`"
+ ],
+ "verification": [
+  "dotnet test; headless smoke; manual mining in a cave with Smart Cursor on"
+ ],
+ "depends_on": [
+  "P2-12"
+ ],
+ "risks": [
+  "Depends on P1's targeting rewrite (the ray from the eye and entity picking, section G). Schedule after P1's targeting WP to avoid double-editing UpdateTarget.",
+  "Performance: the cone search is bounded (at most ~40 steps \u00d7 9 cells); run it only when the held tool or aim changes by more than 0.5\u00b0."
+ ],
+ "effort": "M"
+}

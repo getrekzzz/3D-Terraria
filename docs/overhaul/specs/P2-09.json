@@ -1,0 +1,29 @@
+{
+ "id": "P2-09",
+ "title": "Core UiLayout model: named screen regions that never overlap at any size or UI scale",
+ "player_outcome": "No panel ever covers another: crafting, chest, equipment and minimap, hearts and buffs, boss bar and chat. This holds at 1024\u00d7600 through 4K and at every UI scale, whether the inventory, chest, shop, boss and invasion bars are open or not.",
+ "design": [
+  "New src/Strata.Core/Presentation/UiLayout.cs (engine-free, System.Numerics only):\n- `readonly record struct UiRect(float X, float Y, float W, float H)` with Intersects and Inside.\n- `enum UiPanel { None, Chest, Shop, Service }`.\n- `sealed record UiState(bool InventoryOpen, UiPanel Panel, bool BossBar, bool EventBar, bool NpcChat, int BuffCount, int AccessoryRows, bool ShowMinimap, int InfoLines)`.\n- `static class UiRegion` string constants: ItemName, Hotbar, Buffs, LifeText, Hearts, Mana, Minimap, Info, Breath, StatusLine, Chat, BossBar, EventBar, NpcChat, Inventory, CoinAmmo, Trash, SortButtons, Panel, Crafting, Equipment.\n- `UiLayoutResult Compute(float width, float height, UiState s)` returns Rects, SlotScale and MinimapHidden.",
+  "Rules, in UiLayout.Regions.cs with logical px at scale 1 (Margin 20, Slot 52, Gap 4, SmallSlot 34, BuffIcon 32+14, HeartPitch 26, Minimap 210):\n- Top-left stack: ItemName (20,2); Hotbar (20,24, 556\u00d752); Buffs below, 11 per row.\n- Top-right: Mana column at the far right (28 px wide, 10\u00d726); Hearts (260\u00d752) left of it with LifeText above; Minimap under the hearts; Info under the minimap.\n- Breath: above the crosshair. StatusLine: under the crosshair.\n- Chat: bottom-left (560\u00d710 lines). BossBar: bottom-centre (500\u00d764). EventBar: bottom-right (300\u00d780).\n- NpcChat: top-centre, width 520, shifted right so it starts at least 16 px past the hotbar and ends before the hearts. When less than 400 px of width remains, it drops below the buff rows.\n- Inventory mode:\n  - The Inventory grid takes the hotbar origin (10\u00d75).\n  - CoinAmmo and Trash sit right of the grid, SortButtons beside them.\n  - Panel (chest, shop or service, 42 px slots) goes under the grid.\n  - Crafting runs from the bottom-left up to the panel, at minimum 1 slot plus materials.\n  - Equipment goes under the minimap on the right. When the column does not fit, the minimap is hidden while the inventory is open.\n  - Chat moves right of the crafting column.\n  - If anything still overflows, SlotScale drops to 0.85, then 0.75.",
+  "The Godot side (P2-12, P2-15) applies these rects on viewport resize and on state change only, never per frame."
+ ],
+ "files_modify": [],
+ "files_add": [
+  "src/Strata.Core/Presentation/UiLayout.cs \u2014 model, state, result",
+  "src/Strata.Core/Presentation/UiLayout.Regions.cs \u2014 placement rules",
+  "tests/Strata.Core.Tests/Presentation/UiLayoutTests.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "UiLayoutTests.NoVisibleRegionsOverlapOrLeaveTheScreen, over:\n- sizes 1024\u00d7600, 1280\u00d7720, 1366\u00d7768, 1600\u00d7900, 1920\u00d71080, 2560\u00d71440, 3840\u00d72160;\n- states: HUD only; boss + event + NPC chat + 44 buffs; inventory; inventory + chest; inventory + shop; inventory + service with 7 accessory rows.",
+  "UiLayoutTests.HotbarAndInventoryRowShareOrigin; MinimapHiddenOnlyWhenEquipmentCannotFit; NpcChatNeverOverlapsHotbarOrHearts"
+ ],
+ "verification": [
+  "dotnet test (pure Core; runs in CI on Linux and Windows)"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Real content (long chat lines, long names) can exceed the modelled sizes. Widgets must clip or autowrap inside their rects; the Godot ui.overlaps probe (P2-12) checks the live tree."
+ ],
+ "effort": "M"
+}

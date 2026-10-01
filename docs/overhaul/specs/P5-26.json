@@ -1,0 +1,51 @@
+{
+ "id": "P5-26",
+ "title": "Data-driven achievements with Terraria-style popups",
+ "player_outcome": "Terraria-style achievements ('Timber!!', 'Benched', 'Ooo! Shiny!', 'No Hobo', 'Eye on You', 'Hold on Tight!'...) unlock as you play, with a popup, icon and sound, and are remembered per character.",
+ "design": [
+  "New content category 'achievements' (AchievementDef: Id, Name, Description, Icon (item id), Category (explorer|collector|slayer|challenger), TypedSpec Trigger, int? Target). Registry in ContentDatabase, reader in ContentLoader, a new SpecKind.AchievementTrigger, and validation in a new ContentValidator.Guide.cs.",
+  "Trigger types (params classes in Content/Specs/AchievementSpecs.cs): flag{id}; obtainItem{item|tag|category}; craftItem{item|tag}; killEnemy{enemy|tag, count}; mineBlock{block|tag, count}; breakObject{tag, count}; housed{min}; rescued{id?}; bestiary{percent}; anglerQuests{min}; talkTo{resident}; buy{count}; reforge{count}; coins{min}; reachLayer{layer}; counter{key, min}.",
+  "New Gameplay/Guide/AchievementTracker.cs in GameWorld. On Journal.Changed(kind, key) it evaluates only triggers indexed by kind (Dictionary<string kind, List<def>>); state triggers (coins, housed, bestiary, reachLayer) are swept at 1 Hz. On unlock it writes Journal.Achievements[id] = now and raises Unlocked(PlayerEntity, AchievementDef). Progress(def, journal) \u2192 (current, target) for the book.",
+  "Data data/achievements.json: about 40 Terraria achievements that map to implemented mechanics (author from the wiki list; skip those needing absent features). Probes achievement.<id> (1/0), and command 'achievement grant <id>'.",
+  "Popup: game/UI/AchievementToast.cs, a CanvasLayer with a top-centre panel ('Achievement complete!' in Terraria gold, the name, the item icon). Queued, 4 s each, with a slide-in tween, pooled controls and a UiTheme panel. A chat line if the UI phase's ChatLog exists.",
+  "Sound: add an 'achievement' SFX recipe to tools/audio/sfx_recipes.py and regenerate with tools/audio/build_audio.py."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/ContentDatabase.cs \u2014 Achievements registry",
+  "src/Strata.Core/Content/Loading/ContentLoader.cs \u2014 'achievements' category",
+  "src/Strata.Core/Content/Specs/SpecCatalog.cs \u2014 SpecKind.AchievementTrigger + registration",
+  "src/Strata.Core/Content/Validation/ContentValidator.cs \u2014 call ValidateGuide",
+  "src/Strata.Core/Session/GameWorld.PlayerFiles.cs or a GameWorld.Guide.cs partial \u2014 Achievements property",
+  "src/Strata.Core/Commands/GuideProbes.cs \u2014 achievement.<id>",
+  "tools/audio/sfx_recipes.py \u2014 achievement",
+  "game/Bootstrap/WorldLauncher.cs \u2014 add AchievementToast",
+  "game/Audio/SoundEvents.cs \u2014 play on unlock"
+ ],
+ "files_add": [
+  "src/Strata.Core/Content/Defs/AchievementDef.cs",
+  "src/Strata.Core/Content/Specs/AchievementSpecs.cs",
+  "src/Strata.Core/Gameplay/Guide/AchievementTracker.cs",
+  "src/Strata.Core/Content/Validation/ContentValidator.Guide.cs",
+  "data/achievements.json",
+  "game/UI/AchievementToast.cs",
+  "assets/audio/sfx/achievement.wav (generated)",
+  "tests/Strata.Core.Tests/Gameplay/AchievementTests.cs"
+ ],
+ "data_changes": [
+  "about 40 achievements; manifest regenerated"
+ ],
+ "tests": [
+  "AchievementTests: crafting work_bench unlocks 'benched' once; killEnemy count progress 3/10; flag trigger on defeated_eye_of_cthulhu; persistence through PlayerSave; the validator rejects an unknown item in a trigger",
+  "Smoke guide.cmds: 'give wood 20' / 'place work_bench 2 0 0'? \u2014 no: 'craft work_bench' / 'assert achievement.benched == 1'"
+ ],
+ "verification": [
+  "dotnet test; validate; guide.cmds PASS; in game the toast shows once with sound"
+ ],
+ "depends_on": [
+  "P5-25"
+ ],
+ "risks": [
+  "Achievement names are Terraria's; the 'covers' links need reference concepts (add an 'achievements' reference category, or omit covers)."
+ ],
+ "effort": "M"
+}

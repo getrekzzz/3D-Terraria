@@ -1,0 +1,58 @@
+{
+ "id": "P4-04",
+ "title": "Treasure bags and trophies for the pre-hardmode bosses",
+ "player_outcome": "In Expert or Master, each early boss drops a rainbow 'Treasure Bag' holding its loot and an Expert-only item. Every boss can drop a wall trophy (1/10). Classic keeps Terraria's loose drops.",
+ "design": [
+  "New data/items/boss_bags.json with 8 bags: king_slime, eye_of_cthulhu, eater_of_worlds, brain_of_cthulhu, queen_bee, skeletron, deerclops and wall_of_flesh, each '<boss>_treasure_bag'.",
+  "Bag fields: name 'Treasure Bag (<Boss>)', description 'Right click to open', category container, rarity -12, maxStack 9999, useStyle consume, useTime/useAnimation 20, consumable, behaviors [{type: consume, loot: <boss>_bag}], tags [treasure_bag], covers terraria:treasure_bag.",
+  "New data/loot/bosses.json. Move each early boss's table here from data/loot/enemies.json and the tables in data/enemies/hive.json, evil.json, deerclops.json, underworld.json and dungeon.json. Keep the ids so enemy 'loot' references are unchanged.",
+  "Main boss table layout: coins; potions (always, as in Terraria); '<boss>_trophy' chance 0.1; {table <boss>_drops, conditions [{type: expert, is: false}]}; {item <boss>_treasure_bag, conditions [{type: expert}]}.",
+  "'<boss>_drops' holds the Classic items. '<boss>_bag' = {table <boss>_drops} plus the Expert item: royal_gel, shield_of_cthulhu, worm_scarf, brain_of_confusion or hive_pack. Skeletron's bone_glove arrives in P4-11 and the Wall of Flesh's demon_heart in P4-25; Deerclops' Bone Helm is deferred.",
+  "New data/tileobjects/trophies.json with 8 '<boss>_trophy' objects: size [3,3,1], anchor Wall, rotatable, hitPoints 1, itemValue 10000, tags [trophy, world].",
+  "tools/content/reference/items_extra.py: add rows for treasure_bag and the 8 trophies, then regenerate data/reference with gen_reference.py.",
+  "Blender: new tools/blender/bgen/trophies.py. 'trophy' is a walnut plaque with a bevelled gold frame and a bust made by running the boss's creature generator into a sub-MeshBuilder fitted into a 1.1 m square. 'treasure_bag' is a cloth sack with drawstring and gold clasp, with params color/trim/emblem.",
+  "Register both generators in build_all.py's object and item generator maps, add assets.json entries, and run build_all.py --only='*_treasure_bag,*_trophy'.",
+  "game/UI/UiTheme.cs Rarity: -12 (Expert) is a rainbow that cycles hue with time; -11 (Quest) is amber. Skip this if the UI phase already did it."
+ ],
+ "files_modify": [
+  "data/loot/enemies.json \u2014 boss tables moved out",
+  "data/enemies/hive.json, data/enemies/evil.json, data/enemies/deerclops.json, data/enemies/underworld.json, data/enemies/dungeon.json \u2014 boss tables moved out",
+  "data/manifest.json \u2014 regenerated with Strata.Tools manifest",
+  "tools/blender/assets.json \u2014 bag and trophy entries",
+  "tools/blender/build_all.py \u2014 register trophies generators",
+  "tools/content/reference/items_extra.py \u2014 rows",
+  "game/UI/UiTheme.cs \u2014 Expert/Quest rarity colours"
+ ],
+ "files_add": [
+  "data/items/boss_bags.json \u2014 early treasure bags",
+  "data/loot/bosses.json \u2014 boss loot tables (main, drops, bag)",
+  "data/tileobjects/trophies.json \u2014 boss trophies",
+  "tools/blender/bgen/trophies.py \u2014 trophy and treasure_bag generators",
+  "tests/Strata.Core.Tests/Gameplay/TreasureBagTests.cs \u2014 bag and trophy tests"
+ ],
+ "data_changes": [
+  "8 bag items, 8 trophy objects, boss loot tables restructured into main/_drops/_bag."
+ ],
+ "tests": [
+  "TreasureBagTests.ClassicBossesDropLooseLootAndNoBag.",
+  "TreasureBagTests.ExpertBossesDropOneBagAndNoLooseClassicItems: Expert TestGame; Kill each early boss; inspect g.World.Drops.Items.",
+  "TreasureBagTests.OpeningABagYieldsItsExpertItem: using king_slime_treasure_bag puts royal_gel in the inventory.",
+  "TreasureBagTests.TrophiesDropAboutOneInTen: LootRoller, 2000 rolls, rate within 0.07\u20130.13.",
+  "TreasureBagTests.JourneyWorldsDropNoBags.",
+  "Smoke bosses.cmds: 'give eye_of_cthulhu_treasure_bag 1', 'wield eye_of_cthulhu_treasure_bag', 'use', 'assert inv.shield_of_cthulhu == 1'."
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate (obtainability passes); gen_reference.py --check; build_all.py --check",
+  "Headless smoke bosses.cmds",
+  "Look at the icons in assets/icons/items; the tooltip name shows the rainbow colour"
+ ],
+ "depends_on": [
+  "P4-01"
+ ],
+ "risks": [
+  "Right-click opening from the inventory is a UI-phase feature. Until it lands, bags open by hotbar use.",
+  "tools/blender/assets.json is also edited by the art phase and many P4 WPs. Land sequentially.",
+  "Loot table ids must stay stable across the file move."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,56 @@
+{
+ "id": "P4-14",
+ "title": "Dungeon layout planner: winding sloped halls, side rooms, shafts, room roles (pure Core data)",
+ "player_outcome": "Groundwork for a Terraria-style dungeon: long winding brick halls stepping down toward the caverns, side rooms, vertical shafts, and rooms with roles (library, treasure, barracks, spike pit, vault, a bound prisoner). It is planned deterministically per seed and sized to the world.",
+ "design": [
+  "New folder src/Strata.Core/WorldGen/Structures/Dungeon/.",
+  "DungeonLayout.cs types:",
+  "  enum HallKind { Flat, Stairs, Shaft }.",
+  "  record DungeonHall(Id, Start, Dir (axis unit; (0,\u22121,0) for shafts), Length, Kind, Width, Height, FromNode, ToNode) with Interiors() (one box per stair step for Stairs) and FloorY(k).",
+  "  enum RoomKind { Keep, Junction, Hall, Library, Treasure, Barracks, SpikePit, Vault, Mechanic, Alcove }.",
+  "  record DungeonRoom(Id, Interior, Kind, Node, PanelStyle 0..2, Doorways).",
+  "  DungeonLayout { KeepInterior, Door, Inward, Halls, Rooms, Nodes, Edges, ChestSpots (with a ShadowKey flag), MechanicCell, VaultRoom, Bounds, Hash() }.",
+  "DungeonSite: Gate, Inward (the axis toward the world centre), WorldSize, LayerBands, Func surface(x,z), Func landness(x,z).",
+  "DungeonBudget.For(WorldSizePreset): Tiny {halls 260 cells, rooms \u2265 6, locked chests 4, branches 2, floor \u2265 CavernTop\u221210}; Small {700, 14, 8, 5, CavernTop\u221240}; Medium {1200, 22, 12, 8, CavernTop\u221260}; Large {1800, 30, 16, 11, CavernTop\u221280}. Never below UnderworldTop+40.",
+  "DungeonPlanner.Plan(site, budget, SeedTree seeds) uses named streams 'dungeon.trunk', 'dungeon.branches' and 'dungeon.roles', so later tweaks do not reshuffle the layout.",
+  "Trunk walk from the keep shaft's bottom. Kind weights: flat 0.5, stairs 0.35, shaft 0.15 (only while above the floor limit).",
+  "Direction: keep the heading (0.5) or turn \u00b190\u00b0 (0.25 each). Never head outward (dot with Inward < 0).",
+  "Lengths: flat 16\u201340, stairs 12\u201328 (1:1 descent along the axis), shaft 16\u201332 deep.",
+  "Segment cross-sections: interior width 7, height 9 (the player is 3.6 cells tall); shafts 8\u00d78.",
+  "Each segment must fit: inside the world with a 12-cell margin; top \u2264 surface \u2212 12 sampled every 6 cells (except under the keep); floor \u2265 budget floor; no interior overlap with earlier interiors in a coarse 8\u00b3 occupancy grid, except at the joining node.",
+  "On an invalid segment, try up to 6 alternatives, then stop the walk.",
+  "At each node: a room with probability 0.45 (14\u201326 \u00d7 10\u201316 \u00d7 14\u201326 interior; roles by quota: 1 library per 4 rooms, treasure until the chest quota, barracks, 1 spike pit per 5), otherwise a junction widened 1.4\u00d7.",
+  "Branches: at nodes with probability 0.3 while branches remain, walk 80\u2013160 cells ending in a Treasure or Library room.",
+  "Side rooms: 35% of flat halls \u2265 24 long get an Alcove or Treasure room on one side, joined by a 3\u00d75 doorway.",
+  "Post-pass: convert junctions/alcoves until quotas are met. The deepest room becomes the Vault. The room nearest the median depth becomes Mechanic. Chest spots: one per Treasure room plus alcove extras; exactly one has ShadowKey.",
+  "All integer math, axis-aligned, no trig (worldgen determinism)."
+ ],
+ "files_modify": [],
+ "files_add": [
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonLayout.cs \u2014 layout records and graph",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonPlanner.cs \u2014 trunk/branch walks, quotas",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonBudget.cs \u2014 per-size budgets and DungeonSite",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/OccupancyGrid.cs \u2014 coarse overlap grid",
+  "tests/Strata.Core.Tests/WorldGen/DungeonLayoutTests.cs \u2014 layout invariants"
+ ],
+ "data_changes": [],
+ "tests": [
+  "DungeonLayoutTests over seeds 1..24, Tiny and Small (all plan-only, fast):",
+  "  SameSeedSameLayout (Hash).",
+  "  EveryRoomIsReachableFromTheKeep (graph BFS).",
+  "  StaysInsideTheWorldAndUnderground.",
+  "  NeverReachesBelowItsFloor.",
+  "  MeetsItsQuotas: rooms \u2265 min, chest spots \u2265 quota, exactly one ShadowKey, one vault, one mechanic room, \u2265 1 library.",
+  "  StairsDescendOneCellPerStep.",
+  "  HallsHaveHeadroom (interior height \u2265 8)."
+ ],
+ "verification": [
+  "dotnet test; check_file_length (keep the planner files < 300 lines each)"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Tiny worlds (512\u00b3, LandRadius \u2248 215) are cramped. The planner must degrade gracefully (fewer rooms) rather than fail. Tests assert the Tiny quotas.",
+  "The occupancy grid may reject too much and leave short dungeons. Log the achieved budget in the worldgen-report tool."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,53 @@
+{
+ "id": "P1-06",
+ "title": "Engine: the body always faces the crosshair; interaction uses the eye-plane ray",
+ "player_outcome": "In third person the body always faces where the crosshair points: A/D strafes and S backpedals with the torso on target. Bushes or trees behind the player never become the target, so the player no longer swings or mines backwards. Close blocks no longer twist the body sideways.",
+ "design": [
+  "CameraRig: add public float Yaw => _yaw.",
+  "InteractionController.UpdateTarget, reach and filter: reach = ItemUseSystem.ReachMeters(Entity, held.Item); filter = ItemUseSystem.FilterFor(held info).",
+  "UpdateTarget, target: Target = Targeting.CastView(world, cam, dir, Entity.Eye, reach + 2, filter, out startT); InReach = Target.Distance <= reach.",
+  "UpdateTarget, convergence: a second Targeting.CastView(..., 60 m, TargetFilter.None) gives the crosshair world point (terrain or 60 m).",
+  "UpdateTarget, entity fields: Entity.ViewDirection = dir; Entity.Aim = Normalize(point - Eye); Entity.AimDistance = |point - Eye|. DigDownTarget is unchanged.",
+  "InteractionController.UpdateTalkTarget: skip residents with along < startT (interim; P1-07 replaces this with entity picking).",
+  "PlayerAvatar.Motion.Animate: facing yaw = _controller.Rig.Yaw (never the aim vector); the non-humanoid branch also uses the facing.",
+  "PlayerAvatar.Motion, rewrite TurnLegs(facing, v, ground, upright, alive, dt). Idle: target = facing, eased at rate 12/s, with no 55\u00b0 hysteresis. Upright (air, swim, rope): facing.",
+  "TurnLegs, moving: rel = AngleDifference(facing, moveYaw). If |rel| <= 100\u00b0 then legs = facing + Clamp(rel, \u00b145\u00b0) with a forward gait (A/D strafe). Else legs = facing + Clamp(AngleDifference(facing, move + \u03c0), \u00b145\u00b0) with _backwards = true.",
+  "AimModifier.Twist = AngleDifference(_legYaw, facing), always within 45\u00b0. Pitch stays from Aim.",
+  "PlayerAvatar: expose float FacingErrorDegrees = |AngleDifference(_legYaw + twist, facing)| in degrees.",
+  "SwingTrail.Start: yaw from player.Facing.",
+  "LaunchedWorld: add PlayerAvatar? Avatar; WorldLauncher fills it.",
+  "GodotCommandHost probes: target.front (1 if Target is null or Dot(targetPoint - Eye, Facing) > 0), target.dist (Target?.Distance ?? -1), avatar.facing_error.",
+  "docs/architecture/gameplay.md: document the view ray, filters and facing rule."
+ ],
+ "files_modify": [
+  "game/Player/CameraRig.cs \u2014 Yaw getter",
+  "game/Player/InteractionController.cs \u2014 CastView targeting, convergence cast, ViewDirection/Aim/AimDistance, reach helper",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 facing = camera yaw, strafe/backpedal legs, FacingErrorDegrees",
+  "game/Entities/SwingTrail.cs \u2014 yaw from Facing",
+  "game/Bootstrap/WorldLauncher.cs \u2014 LaunchedWorld.Avatar",
+  "game/Debug/GodotCommandHost.cs \u2014 target.front/target.dist/avatar.facing_error probes",
+  "game/Testing/Scripts/combat.cmds \u2014 facing/target asserts",
+  "docs/architecture/gameplay.md \u2014 targeting/facing"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "combat.cmds, after the arena setup: 'camera third' / 'wield copper_pickaxe' / 'fill -2 0 6 2 5 6 stone' / 'aim 0 0 1' / 'wait 0.3' / 'assert target.front == 1' / 'assert target.dist > 2' / 'assert avatar.facing_error < 5' / 'hold move_left 0.6' / 'assert avatar.facing_error < 5' / 'hold move_back 0.6' / 'assert avatar.facing_error < 5' / 'fill -2 0 6 2 5 6 air'",
+  "Core TargetingTests (P1-05) carry the behind-the-player logic"
+ ],
+ "verification": [
+  "Headless smoke combat.cmds and basic.cmds PASS",
+  "Manual third person: stand with a bush or tree right behind; the highlight and dig always land in front",
+  "Strafe with A/D and backpedal with S while aiming: the torso stays on the crosshair and the legs step sideways or backwards; mining a block right beside the right shoulder no longer spins the body",
+  "lavapipe animation.cmds l_strafe and j_run shots look natural"
+ ],
+ "depends_on": [
+  "P1-05"
+ ],
+ "risks": [
+  "Clamping leg offset to 45\u00b0 while strafing at 90\u00b0 gives a crab-walk; tune the 45\u00b0/100\u00b0 constants from the l_strafe screenshot.",
+  "The convergence cast adds one extra DDA of at most 120 cells per tick (negligible).",
+  "Hook and minecart facing paths were aim-based before; check the minecart ride visually."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,55 @@
+{
+ "id": "P3-29",
+ "title": "Hearts and mana stars from kills; magnet respects a full inventory; floating/glowing item flags",
+ "player_outcome": "Killing enemies while hurt sometimes drops a pulsing heart (+20 life), and while low on mana a mana star. Bosses spill several hearts. Items no longer orbit you when your inventory is full; they stay on the ground. Souls float.",
+ "design": [
+  "Verified: NpcSystem.Kill drops only loot and coins; no heart/star items exist. DroppedItemSystem magnetises regardless of space (DroppedItems.cs:155), so leftovers orbit the player.",
+  "ItemDef: Pickup (PickupEffect { HealLife, HealMana }; items with it are never stored), NoGravity (bool), Glows (bool).",
+  "New Core Gameplay/Items/PickupConfig.cs + data/config/pickups.json { dropChance: 1/6 (verify against Terraria), bossHearts [5, 9], magnetRange 3.2, pickupRange 1.0, pullSpeed 9 }. Loaded like SpawnConfig (NpcSystem.Pickups; defaults in code).",
+  "NpcSystem.Death (P3-19 file): unless critter or Damage == 0, roll dropChance for the nearest player. A mana star if mana < max (50%), else a heart if life < max. Bosses always spill bossHearts.",
+  "DroppedItemSystem.Tick(..., Func<ItemStack, bool> canTake): magnetise only when canTake. Otherwise apply normal gravity and ground friction (no orbit). Pickup items always 'fit'. NoGravity items drift with damping and bob.",
+  "GameWorld drop collector: items with Pickup \u2192 Vitals.Heal / RestoreMana, then raise a new event PickupApplied(p, item, life, mana). Show green/blue numbers via DamageEvent Kind Heal/Mana (P2 colours) and play 'heart_pickup' / 'mana_star_pickup'.",
+  "Canonical grab range via StatIds.GrabRange ('grabRange') added to magnetRange (Treasure Magnet later).",
+  "Assets: 'heart' and 'star' items in assets.json (existing heart/star generators, glow)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 Pickup, NoGravity, Glows",
+  "src/Strata.Core/Gameplay/Items/DroppedItems.cs \u2014 canTake; NoGravity",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 collector applies pickups; canTake from Backpack/Coins/Ammo CanFit",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Death.cs \u2014 heart/star rolls",
+  "src/Strata.Core/Gameplay/Stats/StatIds.cs \u2014 GrabRange",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 drops.<item> prefix probe",
+  "game/Entities/CombatEffects.cs \u2014 heal/mana numbers on PickupApplied",
+  "game/Audio/SoundEvents.cs \u2014 pickup sounds",
+  "game/Bootstrap/WorldLauncher.cs \u2014 load pickups.json",
+  "data/items/materials.json \u2014 heart, star; souls noGravity; fallen_star glows",
+  "tools/blender/assets.json \u2014 heart/star item entries"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Items/PickupConfig.cs \u2014 pickup tuning",
+  "data/config/pickups.json \u2014 pickup tuning values",
+  "tests/Strata.Core.Tests/Gameplay/PickupTests.cs \u2014 heart/magnet tests"
+ ],
+ "data_changes": [
+  "New items: heart ('Heart', pickup {healLife 20}, glows) and star ('Star', pickup {healMana 100}, glows); tag 'pickup' so the validator's obtainability check passes",
+  "noGravity true on soul_of_light, soul_of_night, soul_of_flight, soul_of_might, soul_of_sight, soul_of_fright (those present)"
+ ],
+ "tests": [
+  "PickupTests: with the player at 50/100 life and a seeded rng, 60 zombie kills produce \u2265 1 heart; touching it heals 20 and nothing enters the backpack",
+  "PickupTests: with a full backpack, a dirt drop 2 m away stays \u2265 1.5 m away after 120 ticks",
+  "PickupTests: a soul drop keeps its height (no gravity)",
+  "Smoke combat.cmds: 'hurt 50' (new command from P3-33, or add here) / 'spawn zombie 12 4' / 'slay' / 'wait 1' / 'probe drops.heart' (informative)"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate",
+  "Lavapipe screenshot of a heart drop"
+ ],
+ "depends_on": [
+  "P3-19"
+ ],
+ "risks": [
+  "The 'star' id may confuse with fallen_star; keep Terraria's display name 'Star' and document it.",
+  "Heal-number colours are P2's CombatText; coordinate the DamageKind usage."
+ ],
+ "effort": "M"
+}

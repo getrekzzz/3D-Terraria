@@ -1,0 +1,35 @@
+{
+ "id": "P2-17",
+ "title": "Chest panel: Terraria text buttons (Loot All, Deposit All, Quick Stack, Restock, Sort Items, Rename), favourites respected, close sound",
+ "player_outcome": "An open chest sits under your inventory in teal slots, with Terraria's white text buttons that glow gold on hover: Loot All, Deposit All, Quick Stack, Restock, Sort Items and Rename. Renaming shows the chest's own name. The chest creaks shut when you walk away.",
+ "design": [
+  "New game/UI/Inventory/ChestPanel.cs, shown in the panel host.\n- Title Label: CustomName ?? Def.DisplayName.\n- A grid of 40 pooled slot views (10 columns, SlotKind.Chest) at 42 \u00b7 SlotScale px.\n- A right-hand VBox of UiTheme TextButtons (theme variation 'TextButton') calling Core InventoryOps and GameWorld ops. Core already marks chunks modified, so the UI MarkContainerModified duplication is dropped.",
+  "Rename: swap the title for a themed LineEdit. On focus set InputGate.TextEntry and open a Modal gate 'rename', so typing never moves the player. Enter commits through GameWorld.RenameContainer; Esc cancels.",
+  "Move the chest open/close logic out of InventoryScreen.cs into ChestPanel: OpenContainer, CloseContainer, the 6 m distance check.",
+  "Sounds: chest_open (existing), plus a new 'chest_close' recipe (creak(180)) in tools/audio/sfx_recipes.py, played on close."
+ ],
+ "files_modify": [
+  "game/UI/InventoryScreen.cs \u2014 delegate container handling to ChestPanel",
+  "tools/audio/sfx_recipes.py \u2014 chest_close"
+ ],
+ "files_add": [
+  "game/UI/Inventory/ChestPanel.cs",
+  "assets/audio/sfx/chest_close.wav (+ .import)"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds:\n- `place wooden_chest 0 0 -3` / `interact 0 0 -3` / `assert ui.inventory == 1`.\n- `give wood 30` / `chest deposit` / `assert inv.wood == 0`.\n- `chest loot` / `assert inv.wood == 30`.\n- `chest rename Loot` / `ui close` / `assert errors == 0`."
+ ],
+ "verification": [
+  "Headless ui.cmds SMOKE PASS; build_audio.py --check",
+  "Lavapipe screenshot with the chest open: teal slots under the grid, text buttons on the right, crafting column still visible"
+ ],
+ "depends_on": [
+  "P2-08",
+  "P2-15"
+ ],
+ "risks": [
+  "The chest lid animation (critic) is art/object work, not included here."
+ ],
+ "effort": "S"
+}

@@ -1,0 +1,45 @@
+{
+ "id": "P3-39",
+ "title": "Distinct silhouettes per ore tier: swords, pickaxes, axes, hammers, bows",
+ "player_outcome": "Copper, iron, gold, demonite, hellstone and the hardmode tiers each have their own recognisable shapes: stubby copper picks, ornate gold guards, spiky evil blades, a flaming molten pick. They are no longer the same mesh in a new colour.",
+ "design": [
+  "Verified: all 42 swords are one 88-tri 5-vertex blade (items.py:22-25); picks, axes and hammers take only a tint; all 17 {metal}_bow share limbLayer iron.",
+  "New bgen/blade_profiles.py: named 2D blade profiles (straight, leaf, broad, katana, curved, serrated, hooked, jagged, cleaver, rapier), guards (bar, crescent, winged, disc, none) and pommels (ball, gem, ring).",
+  "items.sword becomes profile-driven: params profile, guard, pommel, fuller (bool), edge (hex), gem, curve (bend via bmesh). shortsword uses rapier/leaf.",
+  "Pick, axe and hammer heads get style variants: stubby, straight, ornate, spiky, flame. Picks are an extruded curved polygon with a bevel (not a 6-segment tube); hammers a bevelled lathe head.",
+  "Bows get limb curvature, tip ornaments and a grip wrap colour per style.",
+  "assets.json 'metalStyles' {metal: {sword, guard, pick, axe, hammer, bow}}: copper/tin simple, iron/lead straight, silver/tungsten fuller, gold/platinum ornate, demonite/crimtane spiky, hellstone flame, cobalt/palladium, mythril/orichalcum, adamantite/titanium distinct hardmode shapes. build_all.plan merges a metal's style into the pattern params.",
+  "Keep items.py under 400 lines: move tool heads into a new bgen/tools_heads.py if needed. Budget 200\u2013800 tris.",
+  "Rebuild the {metal}_* patterns (models + icons)."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/items.py \u2014 profile-driven sword; head variants (or delegate)",
+  "tools/blender/build_all.py \u2014 merge metalStyles",
+  "tools/blender/assets.json \u2014 metalStyles table",
+  "assets/models/items/*, assets/icons/items/* \u2014 rebuilt subset"
+ ],
+ "files_add": [
+  "tools/blender/bgen/blade_profiles.py \u2014 blade/guard/pommel profiles",
+  "tools/blender/bgen/tools_heads.py \u2014 pick/axe/hammer/bow tier heads"
+ ],
+ "data_changes": [
+  "assets.json metalStyles for all 17 metals"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check",
+  "Throwaway GLB check: distinct triangle counts/hashes across tiers (no two tiers identical)",
+  "Smoke basic.cmds: props.problems == 0 (sockets still present)"
+ ],
+ "verification": [
+  "preview.py contact sheet of the 17 swords and picks",
+  "In-game held views of three tiers (lavapipe)"
+ ],
+ "depends_on": [
+  "P3-37",
+  "P3-38"
+ ],
+ "risks": [
+  "Grip/tip sockets must follow new lengths (sockets.py defaults read the mesh extent)."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,42 @@
+{
+ "id": "P1b-14",
+ "title": "Preload by relevance, pre-warm pools, shader warm-up",
+ "player_outcome": "Monsters of the biome you are in, your town's NPCs, bosses you can summon and the items you carry are ready before you meet them. The first night or first boss has no hitch, even on a fresh install.",
+ "design": [
+  "Core: add SpawnDirector.LikelyEnemies(PlayerEntity p): enemies whose spawn rules pass at the player's context (current time, light ignored), plus rules naming a biome present in the context (the existing NamedBiomes helper). Add EnemyDef.ModelNames(): Model ?? Id, SegmentModel, TailModel, SegmentModels, ArmModel, BarrierModel.",
+  "Add game/Rendering/AssetPreloader.cs, a Node. At launch it requests all animation sets from anim/index.json, the models of current town residents, and the items in the local player's inventory and equipment with their projectile models. It requests tile-object models for chunks as Session.ChunkInstalled fires. Every 2 s it requests LikelyEnemies models near the player. When a summonBoss item (ItemBehaviorSpecs.SummonBoss) is in the inventory, it requests that boss's ModelNames.",
+  "Pool pre-warm: add NpcRenderer.Prewarm(model, count), which instantiates hidden visuals into the existing per-model pool at one per frame. Warm the top likely enemies: 1 each on low, 2 on other presets.",
+  "Add game/Rendering/ShaderWarmup.cs. Once the first asset batch is ready (while the player is frozen, or within the first 2 s), render for 2 frames a tiny (0.01 scale) instance, 1 m in front of the camera, of each distinct pipeline: a skinned human (character shader), each PropLibrary material in static and MultiMesh variants, card foliage, flame, sprite_lit, the projectile glow material, and one burst of the CombatEffects and BlockEffects emitters. Then free the instances or return them to pools."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Entities/SpawnDirector.cs \u2014 LikelyEnemies",
+  "src/Strata.Core/Content/Defs/EnemyDef.cs \u2014 ModelNames()",
+  "game/Entities/NpcRenderer.cs \u2014 Prewarm",
+  "game/Bootstrap/WorldLauncher.cs \u2014 add AssetPreloader and ShaderWarmup"
+ ],
+ "files_add": [
+  "game/Rendering/AssetPreloader.cs \u2014 relevance-driven threaded preloading",
+  "game/Rendering/ShaderWarmup.cs \u2014 one-time pipeline warm-up",
+  "tests/Strata.Core.Tests/Gameplay/SpawnPreloadTests.cs \u2014 LikelyEnemies and ModelNames tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "SpawnPreloadTests.ForestNightIncludesZombieAndDemonEye",
+  "SpawnPreloadTests.DesertContextIncludesDesertEnemies",
+  "SpawnPreloadTests.WormBossModelNamesIncludeSegmentsAndTail (Eater of Worlds or Destroyer data)",
+  "Smoke: bosses.cmds and creatures.cmds pass; `assert assets.pending == 0` after `wait 10`"
+ ],
+ "verification": [
+  "Rendering run on a fresh shader cache (delete user://shader_cache or the .godot shader cache): `perf spikes` during the first night and the first boss summon versus the P1b-05 baseline",
+  "F3 video and static memory rise by no more than about 300 MB"
+ ],
+ "depends_on": [
+  "P1b-13"
+ ],
+ "risks": [
+  "Preloading too much raises memory: stay relevance-based, never load everything",
+  "The warm-up must not be visible (tiny scale, 2 frames); verify on lavapipe",
+  "Godot 4.4+ ubershaders already reduce pipeline stutter; the warm-up mostly helps first-run shader compilation"
+ ],
+ "effort": "M"
+}

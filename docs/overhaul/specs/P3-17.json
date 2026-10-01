@@ -1,0 +1,47 @@
+{
+ "id": "P3-17",
+ "title": "Grappling hooks that work: click to throw, equipped hook for F, reliable latch on natural terrain/platforms/trees, per-hook heads and chains",
+ "player_outcome": "Hooks latch onto natural slopes, platforms and trees and stay latched. You can throw the held hook with a click or the equipped hook with F. Every hook looks like itself: gem hooks with gem chains, and the Ivy Whip as a green vine.",
+ "design": [
+  "Verified: ItemAction.Grapple is parsed (ItemUseTable.cs:159) but Use() has no branch. The attach check nudges 5 cm into a voxel cell (PlayerController.Grapple.cs:106-111) and releases on smoothed terrain. The ray excludes PlatformLayer (:64). There is one generic claw/chain for every hook (GrappleVisual.cs).",
+  "ItemUseSystem: ItemAction.Grapple raises GrappleRequested(p, ItemUseInfo) and returns a new UseOutcome.Grappled. WorldLauncher wires it to PlayerController.FireHook(info.Grapple).",
+  "BestHook: the Misc hook slot first (P3-16), else the strongest in the backpack (Terraria fallback).",
+  "FireHook ray mask adds PlatformLayer and ObjectLayer. On hit, compute an anchor: the solid cell at hit \u2212 normal\u00b70.1, else the nearest solid cell or tile object in the 3\u00d73\u00d73 around CellAt(hit). Store _hookAnchorCell or _hookAnchorObject.",
+  "Attached state re-validates only that anchor, every 10 frames; it releases only when the anchor is air or the object is gone.",
+  "GrappleParams: Head (item id; default the hook item) and Chain ('links' | 'vine' | 'gem').",
+  "GrappleVisual draws the head with PropLibrary.Model(ItemModel(head)) oriented along the chain, and the chain with ChainStrip (links), a twisted green strip (vine) or gem-coloured glowing links (gem).",
+  "Remove the keybind hint from the grappling_hook description; tooltips/hints are P2."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 Grapple branch, GrappleRequested, UseOutcome.Grappled",
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 GrappleParams Head/Chain (+validation)",
+  "game/Player/PlayerController.Grapple.cs \u2014 equipped hook, anchor search, throttled check, platform/object mask",
+  "game/Player/GrappleVisual.cs \u2014 head model and chain styles",
+  "game/Bootstrap/WorldLauncher.cs \u2014 wire GrappleRequested",
+  "data/items/mobility.json \u2014 chain styles; description fix",
+  "game/Testing/Scripts/movement.cmds \u2014 new hook cases"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "mobility.json: amethyst..diamond hooks chain 'gem'; ivy_whip chain 'vine'; grappling_hook and dual_hook chain 'links'; grappling_hook description without '(press F to throw)'"
+ ],
+ "tests": [
+  "ItemUseTests: using a held grappling_hook raises GrappleRequested",
+  "Smoke movement.cmds (click throw): 'wield grappling_hook' / 'aim 0 1 0' / 'hold use_primary 0.05' / 'wait 0.2' / 'assert player.hook >= 1'",
+  "Smoke movement.cmds (irregular ceiling): add a stepped ceiling with setblock at y 15/16/17, aim 0.3 1 0, hold grapple 0.05, wait 1.5, 'assert player.hook == 2'",
+  "Smoke movement.cmds (platform): place a wood platform row overhead, hold grapple, 'assert player.hook == 2'"
+ ],
+ "verification": [
+  "dotnet test; movement.cmds SMOKE PASS",
+  "Manual lavapipe run on a natural hillside: the hook stays latched"
+ ],
+ "depends_on": [
+  "P3-16",
+  "P3-13"
+ ],
+ "risks": [
+  "If P1 already reworked the grapple, merge the anchor logic instead of duplicating it.",
+  "Platform tiles may be crisp blocks vs objects; check both paths."
+ ],
+ "effort": "M"
+}

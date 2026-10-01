@@ -1,0 +1,46 @@
+{
+ "id": "P4-13",
+ "title": "Dungeon wall panels: brick, slab and tiled wall blocks in blue, green and pink",
+ "player_outcome": "Dungeon corridors are lined with Terraria's three dungeon wall styles in the dungeon's colour, instead of one flat brick.",
+ "design": [
+  "New data/blocks/dungeon.json with 9 crisp blocks: {blue,green,pink}_brick_wall, {\u2026}_slab_wall and {\u2026}_tiled_wall. Each has hardness 3.0, pickPower 65, sound stone, tags [dungeon, brick], a map colour, and covers terraria:<id>.",
+  "Texture layers in tools/textures/materials.json, type bricks:",
+  "  {azure,verdant,rose}_brick_wall: rows 4, cols 2, darker base.",
+  "  {\u2026}_slab: rows 2, cols 1, deep bevel, no stagger.",
+  "  {\u2026}_tiled: rows 4, cols 4, no stagger, glazed roughness 0.35.",
+  "Add stagger/bevel options to tools/textures/gen_built.bricks if missing (synth.bricks already supports stagger).",
+  "Rebuild: python3 tools/textures/build_textures.py --set=terrain, then python3 tools/textures/build_icons.py for the derived block items.",
+  "Reference rows in tools/content/reference/world_extra.py TILES, kind wall; regenerate data/reference.",
+  "Regenerate data/manifest.json with Strata.Tools manifest. The new file shifts runtime block ids, so re-pin the golden hashes in tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs. Output by name is unchanged, so GenVersion is not bumped here; P4-15 bumps it."
+ ],
+ "files_modify": [
+  "tools/textures/materials.json \u2014 9 layers",
+  "tools/textures/gen_built.py \u2014 stagger/bevel options",
+  "tools/content/reference/world_extra.py \u2014 rows",
+  "data/manifest.json \u2014 regenerated",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pinned hashes",
+  "docs/architecture/content-and-assets.md \u2014 layer count"
+ ],
+ "files_add": [
+  "data/blocks/dungeon.json \u2014 9 wall-panel blocks",
+  "assets/textures/terrain/* (regenerated array), assets/icons/items/*_wall.png \u2014 generated"
+ ],
+ "data_changes": [
+  "9 new blocks."
+ ],
+ "tests": [
+  "Existing ContentValidator texture-layer checks pass.",
+  "WorldGenTests re-pinned.",
+  "MeshingTests unaffected."
+ ],
+ "verification": [
+  "dotnet test; validate; gen_reference --check",
+  "lavapipe: 'setblock 2 0 0 blue_slab_wall' etc. and screenshot the three styles"
+ ],
+ "depends_on": [],
+ "risks": [
+  "The terrain texture array grows by 9 layers (memory). Check the low preset budget in data/config/graphics.json.",
+  "The terrain phase also re-pins hashes. Rebase carefully."
+ ],
+ "effort": "S"
+}

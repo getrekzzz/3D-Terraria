@@ -1,0 +1,37 @@
+{
+ "id": "P5-28",
+ "title": "NPC head portraits and bestiary thumbnails (Blender render pass)",
+ "player_outcome": "Housing banners, the Guide book's NPC tab and bestiary lists show proper head portraits and creature thumbnails instead of text.",
+ "design": [
+  "New tools/blender/bgen/portraits.py and a build_all.py option '--portraits [--only=GLOB]'. It imports an existing GLB from assets/models/creatures (no mesh rebuild), frames it with an orthographic camera (humanoids: the 'head' bone bounds plus a margin, 3/4 view; others: the whole-body bounds), renders with Eevee/Workbench and a transparent background at 128 px, and adds a 2 px dark outline in post (PIL) for the Terraria look.",
+  "Outputs: assets/icons/npcs/<town npc id>.png (29 + pets + visitors) and assets/icons/creatures/<enemy id>.png (about 229).",
+  "Core AssetPaths: TownNpcHead(def) and CreatureIcon(enemy). The validator reports a missing portrait as a warning (ctx.Asset style), and build_all.py --check verifies coverage.",
+  "Game: new game/Items/PortraitIcons.cs with a lazy texture cache (like ItemIcons) and a threaded preload helper, LoadThreadedRequest with a per-frame budget."
+ ],
+ "files_modify": [
+  "tools/blender/build_all.py \u2014 --portraits mode and --check coverage",
+  "src/Strata.Core/Content/AssetPaths.cs \u2014 portrait paths",
+  "src/Strata.Core/Content/Validation/ContentValidator.Town.cs \u2014 portrait asset check"
+ ],
+ "files_add": [
+  "tools/blender/bgen/portraits.py",
+  "game/Items/PortraitIcons.cs",
+  "assets/icons/npcs/*.png, assets/icons/creatures/*.png (generated)"
+ ],
+ "data_changes": [
+  "none"
+ ],
+ "tests": [
+  "build_all.py --check covers portraits",
+  "AssetCoverageTests: every town NPC has a head portrait"
+ ],
+ "verification": [
+  "Render the set; spot-check contact sheets; Godot import has no errors"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Rendering about 260 portraits takes minutes; shard like --anims.",
+  "Humanoid head-bone framing must match the 52-bone rig naming."
+ ],
+ "effort": "M"
+}

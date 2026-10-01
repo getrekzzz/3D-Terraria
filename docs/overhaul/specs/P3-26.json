@@ -1,0 +1,36 @@
+{
+ "id": "P3-26",
+ "title": "Jump, land and run dust; water and lava splashes",
+ "player_outcome": "Landing kicks up dust in the colour of the ground, sprinting leaves little puffs, and jumping into or out of water or lava throws a splash ring with a splash sound.",
+ "design": [
+  "Verified: landings/jumps only play audio (PlayerController.Sound.cs:27-29); _swimming flips silently (PlayerController.cs:134).",
+  "PlayerController gains events: Landed(float impactSpeed), Footstep, LiquidEntered(LiquidDef, float vy), LiquidExited(LiquidDef). The block under the feet comes from a new GroundBlock() helper (factored out of StepSound).",
+  "New game/Player/PlayerDust.cs (child of PlayerController) using EffectKit. Landing with impact > 8 \u2192 8 chips in the ground block colour; jump \u2192 4 dust puffs; Footstep while speed > 5.5 \u2192 2 dust puffs; Dashed \u2192 6.",
+  "Liquid edges: a 16-particle Splash ring in LiquidDef.Color plus Sfx 'splash' (volume by |vy|). Bobber landing splash comes from P3-11.",
+  "All counts scale with EffectsScale; no per-frame allocations."
+ ],
+ "files_modify": [
+  "game/Player/PlayerController.cs \u2014 liquid edge and landing events; GroundBlock()",
+  "game/Player/PlayerController.Sound.cs \u2014 Footstep event; use GroundBlock()",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create PlayerDust"
+ ],
+ "files_add": [
+  "game/Player/PlayerDust.cs \u2014 movement dust and splashes"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Smoke liquids.cmds (existing water sections): 'assert errors == 0'",
+  "Smoke movement.cmds PASS"
+ ],
+ "verification": [
+  "Lavapipe screenshots: landing on grass/sand, a water entry splash",
+  "perf: gd.player_dust < 0.05 ms"
+ ],
+ "depends_on": [
+  "P3-08"
+ ],
+ "risks": [
+  "PlayerController.cs overlaps P1/P3-25/P3-34; keep edits to small event hooks."
+ ],
+ "effort": "S"
+}

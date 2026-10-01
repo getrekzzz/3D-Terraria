@@ -1,0 +1,48 @@
+{
+ "id": "P3-13",
+ "title": "Real flails: spin while held, launch on release, drag and retract, visible chain",
+ "player_outcome": "Holding a flail swings the spiked ball around you, hitting anything close. Releasing hurls it at the cursor, where it drags along the ground before the chain reels it back. The chain from hand to ball is always visible.",
+ "design": [
+  "Verified: ball_o_hurt etc. are 'item' visual returning projectiles that tumble the whole handle+chain+ball model (ProjectileRenderer.cs:85, 106-107).",
+  "TetherDef kind 'flail' gets phases on Projectile (TetherPhase: Spin, Launched, Retract).",
+  "Spin (while UseHeld from the first press): orbit the owner's hand at 1.1 m and 12 rad/s in a tilted plane, clearing HitNpcs every 12 ticks.",
+  "On release \u2192 Launched: velocity = Aim\u00b7ShootSpeed. Fly up to Range; gravity kicks in after 0.3 s; slide along the ground with friction.",
+  "Retract: after 1.5 s, at Range, or on a new press \u2192 Returning.",
+  "Extract GrappleVisual's diamond-link chain into a shared game/Rendering/ChainStrip.cs (links, width, colour) for reuse by hooks (P3-17). ProjectileRenderer.Tethers draws the flail chain from the hand 'chain' socket to the ball; the ball uses the tumble spin from data.",
+  "Animation: Hold('flail') during Spin; the throw clip plays on launch.",
+  "Sounds: 'flail_spin' every revolution at \u22128 dB and 'chain' rattle on launch (recipes in P3-27)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.Tethers.cs \u2014 TickFlail phases",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 Projectile.TetherPhase field",
+  "game/Entities/ProjectileRenderer.Tethers.cs \u2014 flail chain",
+  "game/Player/GrappleVisual.cs \u2014 use ChainStrip",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 Hold('flail')",
+  "game/Audio/SoundEvents.cs \u2014 flail sounds"
+ ],
+ "files_add": [
+  "game/Rendering/ChainStrip.cs \u2014 reusable link-chain mesh writer",
+  "tests/Strata.Core.Tests/Gameplay/FlailTests.cs \u2014 flail phase tests"
+ ],
+ "data_changes": [
+  "ball_o_hurt, sunfury, blue_moon, flower_pow, flairon projectiles: drop 'returns'; add tether {kind: flail, range, speed}; model '<id>_ball'; spin 12 tumble; chain colour",
+  "solar_eruption stays a returning projectile until a bespoke lash (out of scope; note in docs)"
+ ],
+ "tests": [
+  "FlailTests: while held, a dummy 1 m away is hit repeatedly; after release the ball travels \u2265 4 m along the aim",
+  "FlailTests: the ball is removed within 180 ticks after launch; one flail at a time",
+  "Smoke combat.cmds: 'give ball_o_hurt 1' / 'wield ball_o_hurt' / 'press use_primary on' / 'wait 0.5' / 'assert projectiles.count == 1' / 'press use_primary off' / 'wait 3' / 'assert projectiles.count == 0'"
+ ],
+ "verification": [
+  "dotnet test",
+  "Lavapipe screenshots of the spin and launch phases with the chain visible"
+ ],
+ "depends_on": [
+  "P3-12"
+ ],
+ "risks": [
+  "Orbit collision against terrain: skip terrain collision in the Spin phase (Terraria does too).",
+  "GrappleVisual refactor overlaps P3-17; land P3-13 first."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,40 @@
+{
+ "id": "P3-36",
+ "title": "3D spinning dropped items with rarity glow and light",
+ "player_outcome": "Loot on the ground is the real 3D item, slowly spinning and bobbing: swords, coins, dirt cubes. Rare items glow in their rarity colour. Fallen Stars, torches and souls light up the ground around them.",
+ "design": [
+  "Verified: DroppedItemRenderer draws Y-billboard icon quads with glow = rarity > 0 ? 0.08 : 0 (DroppedItemRenderer.cs:50-56); nothing emits light.",
+  "Split DroppedItemRenderer.cs into lifecycle and a new DroppedItemRenderer.Visuals.cs.",
+  "Items with a GLB use a pooled MeshInstance3D with the cached PropLibrary mesh, scaled so the max AABB extent is 0.45 m. Blocks use BlockItemMeshes cubes (P3-06). The billboard stays as a fallback.",
+  "Spin at 1.5 rad/s about Y, always bobbing. NoGravity items (P3-29) float and pulse.",
+  "Rarity glow: an additive billboard halo from a pool with a shared material and instance colour = rarity colour \u00d7 pulse, for rarity \u2265 1 or Glows (expert \u221212 cycles hue).",
+  "Lights: DroppedItemRenderer.Lights provider for DynamicLights (items with HeldLight or Glows), so the count is limited by the preset.",
+  "Async model loads via ResourceLoader.LoadThreadedRequest; the billboard shows until ready; \u2264 1 new model instantiation per frame.",
+  "voxel_light updated round-robin (\u00bc of drops per frame)."
+ ],
+ "files_modify": [
+  "game/Items/DroppedItemRenderer.cs \u2014 lifecycle, round-robin light",
+  "game/Rendering/PropLibrary.cs \u2014 async load request API",
+  "game/Bootstrap/WorldLauncher.cs \u2014 register lights provider"
+ ],
+ "files_add": [
+  "game/Items/DroppedItemRenderer.Visuals.cs \u2014 mesh/cube/billboard visuals, halos"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Smoke basic.cmds: 'drop copper_broadsword 1 0 0 2' / 'drop gold_coin 5 1 0 2' / 'wait 1' / 'assert props.problems == 0' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "Lavapipe screenshots of mixed drops by day and a glowing fallen star at night",
+  "perf: 150 drops \u2192 gd.drops < 0.5 ms; no frame spike when a new item type drops (perf report max)"
+ ],
+ "depends_on": [
+  "P3-06",
+  "P3-29"
+ ],
+ "risks": [
+  "Async loading must not race QueueFree of pooled visuals.",
+  "The hover name label is P2 (crosshair names)."
+ ],
+ "effort": "M"
+}

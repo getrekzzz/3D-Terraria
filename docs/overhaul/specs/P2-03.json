@@ -1,0 +1,45 @@
+{
+ "id": "P2-03",
+ "title": "Buff and event icons from a glyph library, validated as content assets",
+ "player_outcome": "Every buff and debuff has a readable 32 px Terraria-style icon: a heart with a plus for Regeneration, a shield for Ironskin, a flame for On Fire!, and so on. Debuffs have a red frame. Invasions have icons for the progress panel.",
+ "design": [
+  "New tools/textures/ui_glyphs.py and ui_glyphs_b.py: 16\u00d716 ASCII glyphs.\n- Buffs: heart_plus, shield, sword, bow, magic_star, flame, poison_drop, blood_drop, skull, snowflake, boot, pickaxe, brick, eye, gem, feather, bubble, sun, campfire, lantern, minion, fist, rage, food, chain, swirl, ice_cube, water, honey, obsidian_skull, crosshair.\n- Events: moon, pumpkin, present, pirate_flag, ufo, goblin, slime, pillar, crystal.",
+  "New tools/textures/buff_icons.json maps each of the 39 buff ids to {glyph, fg, bg}. New tools/textures/event_icons.json does the same for each event (all nine with a killGoal at minimum). These are tool recipes; game content stays in data/.",
+  "build_ui.py (from P2-02) gains a `buffs` and an `events` pass.\n- Each icon: glyph upscaled \u00d72, 1 px outline, bevelled 32\u00d732 square in bg; debuffs (Debuff=true in data) get a 2 px red frame.\n- Output: assets/icons/buffs/<Icon ?? id>.png and assets/icons/events/<Icon ?? id>.png.\n- `--check` parses data via data/manifest.json (reuse load_json from build_icons.py). It fails when any buff or event has no recipe or no output file.",
+  "Core: add `string? Icon` to EventDef. Add AssetPaths.BuffIcon(BuffDef) => assets/icons/buffs/{Icon ?? Id}.png and AssetPaths.EventIcon(EventDef).",
+  "ContentValidator.World.cs:\n- ValidateProjectilesAndBuffs: `ctx.Asset(b, AssetPaths.BuffIcon(b), \"icon\")` for every buff.\n- ValidateEvents: the same for events with KillGoal > 0.\n- `Strata.Tools validate` already supplies AssetExists, so a missing icon becomes a CI error.",
+  "New game/UI/StatusIcons.cs: caches `BuffIcons.Get(BuffDef)` and `EventIcons.Get(EventDef)`, falling back to a coloured square with the first letter."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/EventDef.cs \u2014 Icon",
+  "src/Strata.Core/Content/AssetPaths.cs \u2014 BuffIcon, EventIcon",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 icon asset checks",
+  "tools/textures/build_ui.py \u2014 buffs/events passes and check",
+  "tests/Strata.Core.Tests/Content/AssetCoverageTests.cs \u2014 EveryBuffHasAnIcon, EveryEventWithAKillGoalHasAnIcon"
+ ],
+ "files_add": [
+  "tools/textures/ui_glyphs.py, tools/textures/ui_glyphs_b.py \u2014 16\u00d716 glyph library",
+  "tools/textures/buff_icons.json, tools/textures/event_icons.json \u2014 per-id recipes",
+  "assets/icons/buffs/*.png, assets/icons/events/*.png (+ .import)",
+  "game/UI/StatusIcons.cs \u2014 buff/event texture caches"
+ ],
+ "data_changes": [
+  "EventDef gains optional `icon` (defaults to the id); no data edits required"
+ ],
+ "tests": [
+  "AssetCoverageTests.EveryBuffHasAnIcon / EveryEventWithAKillGoalHasAnIcon",
+  "ContentValidatorTests: a buff whose icon file is missing (via an AssetExists predicate) reports an 'icon asset' error"
+ ],
+ "verification": [
+  "python3 tools/textures/build_ui.py && python3 tools/textures/build_ui.py --check",
+  "dotnet run --project tools/Strata.Tools -- validate \u2192 0 errors",
+  "Visual check of the generated icon PNGs in an image viewer"
+ ],
+ "depends_on": [
+  "P2-02"
+ ],
+ "risks": [
+  "Buffs added by P3 or P4 then need a recipe line, or CI fails. That is intended, and --check prints the exact missing id."
+ ],
+ "effort": "M"
+}

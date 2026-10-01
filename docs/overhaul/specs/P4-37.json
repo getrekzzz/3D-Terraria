@@ -1,0 +1,34 @@
+{
+ "id": "P4-37",
+ "title": "Realistic rebuild: Flying Dutchman and the four Celestial Pillars",
+ "player_outcome": "The Flying Dutchman is a ragged ghost ship with torn glowing sails and cannons. Each Celestial Pillar has its own silhouette (Solar, Vortex, Nebula, Stardust) inside a shimmering shield.",
+ "design": [
+  "New tools/blender/bgen/bosses_events2.py.",
+  "flying_dutchman: plank hull, masts, torn translucent sails, 4 cannon models (for future parts), lanterns with glow.",
+  "The four pillars: a carved core per style (solar flares, vortex spirals, nebula tendrils, stardust constellations), a floating ring, and a shield shell (prop:*:clear) whose visibility the renderer already ties to ShieldUp.",
+  "Tri targets 6\u201310k; update boss icons."
+ ],
+ "files_modify": [
+  "tools/blender/assets.json \u2014 generator switch",
+  "tools/blender/build_all.py \u2014 lookup",
+  "tools/blender/bgen/lunar.py \u2014 retire the celestial_pillar primitive"
+ ],
+ "files_add": [
+  "tools/blender/bgen/bosses_events2.py \u2014 Dutchman and pillars",
+  "assets/models/creatures/{flying_dutchman,solar_pillar,vortex_pillar,nebula_pillar,stardust_pillar}.glb \u2014 generated"
+ ],
+ "data_changes": [],
+ "tests": [
+  "build_all.py --check; LunarTests and invasion smoke stay green"
+ ],
+ "verification": [
+  "Preview sheets and boss gallery screenshots"
+ ],
+ "depends_on": [
+  "P4-03"
+ ],
+ "risks": [
+  "If the shield shell is a separate mesh that the pillar code does not toggle, add a model variant swap (ModelOverride) when the shield drops."
+ ],
+ "effort": "M"
+}

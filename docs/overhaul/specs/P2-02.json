@@ -1,0 +1,40 @@
+{
+ "id": "P2-02",
+ "title": "UI sprite generator: hearts, stars, bubbles, slot silhouettes, cursor, buttons, frames",
+ "player_outcome": "Hearts, mana stars, breath bubbles, the defence shield, trash can, empty-slot silhouettes, tab icons and the pointer look like crisp, dark-outlined Terraria pixel sprites instead of Godot defaults.",
+ "design": [
+  "New tools/textures/ui_sprites.py holds ASCII pixel maps with palette letters, split into ui_sprites_b.py so each file stays under 400 lines:\n- Vitals: heart (11\u00d711, drawn at 22), heart_gold (palette swap), star (11\u00d711, drawn at 22), bubble (9\u00d79, drawn at 18).\n- Inventory: shield (defence), trash; silhouettes slot_head, slot_body, slot_legs, slot_accessory, slot_dye, slot_pet, slot_light_pet, slot_minecart, slot_mount, slot_hook, slot_coin, slot_ammo; favourite_star.\n- Buttons: eye_open, eye_closed, sort, quick_stack, deposit, loot, reforge_hammer, toggle_on, toggle_off, tab_equipment, tab_misc.\n- Pointer and hints: cursor (Terraria's triangular pointer, white fill with a 2 px dark border, tinted at runtime), smart_cursor, talk_hint (speech bubble), open_hint (hand).\n- Frames: minimap_frame as a 24\u00d724 9-slice with 8 px margins.",
+  "New tools/textures/build_ui.py.\n- Import numpy and Pillow lazily, only when rendering.\n- For each map: nearest-neighbour upscale \u00d72, add a 1 px dark outline (alpha dilation, colour #1a1020), write assets/ui/<name>.png. Output is deterministic (no randomness).\n- `--check` needs no Pillow, so CI can run it. It verifies every sprite in the list exists and exits non-zero otherwise.\n- `--only=` rebuilds a subset.",
+  "New game/UI/UiSprites.cs: a static cache (`Get(string name)`) preloaded when the HUD initialises. It returns a magenta 'missing' texture and logs a warning once when a sprite is absent, like ItemIcons.Missing.",
+  "Core: add `AssetPaths.UiSprite(string name) => assets/ui/{name}.png`.",
+  "CI: append `python3 tools/textures/build_ui.py --check` to the 'Reference databases and asset coverage' step in .github/workflows/ci.yml.",
+  "Run a headless import and commit the PNGs with their .import files. Draw pixel sprites at integral sizes. Controls that only draw these sprites (hearts, stars, bubbles) set `TextureFilter = Nearest`."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/AssetPaths.cs \u2014 UiSprite path",
+  "tests/Strata.Core.Tests/Content/AssetCoverageTests.cs \u2014 UiSpritesUsedByCodeExist",
+  "ci.yml at .github/workflows/ci.yml \u2014 build_ui.py --check step"
+ ],
+ "files_add": [
+  "tools/textures/build_ui.py \u2014 renderer and --check",
+  "tools/textures/ui_sprites.py, tools/textures/ui_sprites_b.py \u2014 pixel maps and palette",
+  "assets/ui/*.png (+ .import) \u2014 generated sprites",
+  "game/UI/UiSprites.cs \u2014 texture cache"
+ ],
+ "data_changes": [],
+ "tests": [
+  "AssetCoverageTests.UiSpritesUsedByCodeExist: checks the names referenced by game code (heart, heart_gold, star, bubble, shield, trash, cursor, slot_*, eye_*, sort, quick_stack) exist under assets/ui",
+  "CI: build_ui.py --check exits 0"
+ ],
+ "verification": [
+  "python3 tools/textures/build_ui.py, then --check",
+  "Open assets/ui/heart.png, star.png and cursor.png at 400 % in an image viewer: clean outline, no anti-alias fringe",
+  "dotnet test"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Hand-authored pixel art quality: keep one shared palette and outline colour across files.",
+  "CI runners lack Pillow, so --check must never import it."
+ ],
+ "effort": "M"
+}

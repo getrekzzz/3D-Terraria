@@ -1,0 +1,54 @@
+{
+ "id": "P3-04",
+ "title": "Swing curve: melee hitbox, trail and first-person arc aligned to the clip; spears and shortswords extend",
+ "player_outcome": "What you see is what hits. The blade sweeps Terraria's overhead arc, from behind the head down in front, and the hit, the trail and the first-person arc all follow it with the same timing. The trail uses the weapon's colour and grows with size prefixes. Spear and shortsword heads visibly extend to the full reach of the hit.",
+ "design": [
+  "Verified: MeleeSystem.Connects (MeleeSystem.cs:103-106) sweeps a horizontal arc linearly from tick 0. SwingTrail (SwingTrail.cs:92-95) matches it, while the clip winds up until t 0.22. MeleeSwingParams.TrailColor is never read.",
+  "New Core Gameplay/Entities/SwingCurve.cs evaluates keyed curves [(t, deg, ease)] with the same easing names as motion.tl (in, out, io, lin). The swing curve comes from GameWorld.Styles swing.bladeCurve. Default keys: t0 150\u00b0 (behind/above), 0.2 165\u00b0, 0.46 0\u00b0 (forward, strike), 0.62 \u221260\u00b0 (low front), 1.0 \u221245\u00b0. A thrust curve (extension 0\u21921\u21920 with a hold) comes from rapier/spear 'extend'.",
+  "MeleeSystem swing plane: forward F is the aim yaw, U is world up, R = F\u00d7U. The plane is tilted by config planeTilt (15\u00b0) toward R. Pivot = Center + (0, 0.45, 0) + R\u00b70.2. The blade direction at angle \u03b8 is cos\u03b8\u00b7F + sin\u03b8\u00b7U (tilted). Reach = swing.Length\u00b7CellSize\u00b7Prefixes.Size + 0.6.",
+  "Each tick, sample the blade segment between \u03b8(t_prev) and \u03b8(t) in \u226415\u00b0 steps and test NPC volumes by distance from the box to the segment \u2264 bladeHalfWidth (0.15) + lateralTolerance (config 0.5 m, for 3D forgiveness). Keep the point-blank rule. MeleeSwingParams.Arc scales the curve's angles about the strike angle by Arc/150.",
+  "Thrust hits only while extension \u2265 0.6 along the aim (the existing tolerance stays).",
+  "SwingTrail samples the same SwingCurve and plane to build the ribbon. Colour = Swing.TrailColor ?? rarity colour; width scales with Prefixes.Size. The thrust streak is 0.2 m wide with a tip sparkle.",
+  "PlayerAvatar and ViewModel: melee models are scaled so the model tip matches the hit reach, clamped 0.75\u20131.6. Spears and shortswords translate the held node along its axis by (reach \u2212 modelLength)\u00b7extension(t).",
+  "FP: ViewModel maps the blade angle from the same curve onto a camera-space rotation, so the FP arc equals the gameplay arc."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Entities/MeleeSystem.cs \u2014 curve/plane sweep and thrust window",
+  "src/Strata.Core/Presentation/UseStyleConfig.cs \u2014 bladeCurve, planeTilt, lateralTolerance, extend",
+  "data/config/use_styles.json \u2014 swing curve and thrust extension keys",
+  "game/Entities/SwingTrail.cs \u2014 ribbon from SwingCurve; TrailColor; size",
+  "game/Player/PlayerAvatar.cs \u2014 melee model scale; spear extension (moved to PlayerAvatar.Held.cs if P3-06 has landed)",
+  "game/Player/ViewModel.cs \u2014 FP swing from SwingCurve; thrust extension"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/SwingCurve.cs \u2014 shared curve evaluation",
+  "tests/Strata.Core.Tests/Gameplay/SwingCurveTests.cs \u2014 geometry/timing tests"
+ ],
+ "data_changes": [
+  "Optional trailColor on signature swords (starfury #ffe070, terra_blade #6aff8a, nights_edge #b060ff, excalibur #ffe890, muramasa #5aa0ff, zenith #9affd8)"
+ ],
+ "tests": [
+  "SwingCurveTests: angle(0.46) == 0; the curve is continuous",
+  "SwingCurveTests: a dummy 1.5 m in front at feet level is hit within the first 60% of the swing, never during the wind-up",
+  "SwingCurveTests: a dummy 1.0 m to the side at 0.4 m lateral is hit; one at 1.5 m lateral is not",
+  "SwingCurveTests: a size prefix extends reach",
+  "Spear dummy at 2.1 m is hit only after extension \u2265 0.6",
+  "CombatTests.SwingsMissCreaturesBehindThePlayer, SwordSwingsHitOncePerSwing and ShortswordThrustsHitAndRepeatWhileHeld still pass",
+  "Smoke combat.cmds unchanged (the shortsword kills the slime)"
+ ],
+ "verification": [
+  "dotnet test",
+  "Animation tour: 3P and FP screenshots at t 0.2/0.46/0.62 show blade, trail and hit window aligned",
+  "Manual lavapipe run: a copper broadsword against a zombie"
+ ],
+ "depends_on": [
+  "P3-01",
+  "P3-02"
+ ],
+ "risks": [
+  "Vertical-plane hits may feel less forgiving than the old horizontal sweep; lateralTolerance and planeTilt are data-tunable.",
+  "The clip must visually match the curve; verify P3-03 against it.",
+  "Game files overlap P3-06/P3-07 (PlayerAvatar/ViewModel); do those after this, or rebase."
+ ],
+ "effort": "M"
+}

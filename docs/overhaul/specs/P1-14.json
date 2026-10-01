@@ -1,0 +1,40 @@
+{
+ "id": "P1-14",
+ "title": "Bows and ranged presentation: upright bow, first-person draw pose with a nocked arrow, gun aim and recoil",
+ "player_outcome": "Bows are held upright and show an arrow on the string that flies off as you click, then gets re-nocked. First-person guns point at the crosshair with a recoil kick instead of at the sky. Staffs tip toward the target.",
+ "design": [
+  "PlayerAvatar.UpdateHeld: add a small HeldPose(ItemDef, ItemUseInfo) keyed by ActionFor. Bow: upright, grip in the fist, belly (model -X) toward the aim. Shoot, cast and other styles keep the current (90,0,0)/(0,0.08,0). Tune against the animation.cmds f_bow shot.",
+  "New partial game/Player/ViewModel.Ranged.cs; ViewModel._Process dispatches ranged styles to it by PlayerAvatar.ActionFor.",
+  "'bow' pose: bow vertical at view centre-right, belly to -Z. A nocked-arrow MeshInstance3D uses the PropLibrary model of the first arrow from ItemUseSystem.FindAmmo, refreshed at most 4 times a second and preloaded when the bow is selected, never at shot time. The arrow is hidden from Timing.bow.release until redrawStart, slides back onto the string by redrawEnd, and the bow kicks 3 cm forward at release.",
+  "'shoot' pose: barrel (+Y) along -Z toward the screen centre, recoil 6\u00b0 up plus 4 cm back, decaying exponentially over 0.12 s from each UseSerial change or each Shot within a burst.",
+  "'cast' pose: staff tilted with its tip toward the crosshair and a small forward push on use.",
+  "animation.cmds: add first-person captures: 'camera first' / 'wield wooden_bow' / 'give wooden_arrow 20' / 'screenshot q_fp_bow_rest' / 'press use_primary' / 'wait 0.05' / 'screenshot q_fp_bow_release 0' / 'release use_primary' / 'wield flintlock_pistol' / 'screenshot r_fp_gun' / 'camera third'."
+ ],
+ "files_modify": [
+  "game/Player/PlayerAvatar.cs \u2014 per-style held orientation (bow upright)",
+  "game/Player/ViewModel.cs \u2014 dispatch to ranged poses",
+  "game/Testing/Tours/animation.cmds \u2014 first-person ranged captures"
+ ],
+ "files_add": [
+  "game/Player/ViewModel.Ranged.cs \u2014 bow draw/nock/release, gun aim/recoil, staff poses"
+ ],
+ "data_changes": [],
+ "tests": [
+  "No Core tests (visual); smoke combat.cmds bow section still passes",
+  "animation.cmds new q_fp_bow_rest / q_fp_bow_release / r_fp_gun captures"
+ ],
+ "verification": [
+  "lavapipe animation.cmds: f_bow shows an upright bow with the string hand at the cheek; the first-person shots show the nocked arrow at rest and gone at release; the first-person gun points at the crosshair",
+  "Manual: fire a Repeater (autoReuse) in both views; draw/release loops stay in sync with the arrows; no hitch when switching to a bow (arrow mesh preloaded)"
+ ],
+ "depends_on": [
+  "P1-11",
+  "P1-12",
+  "P1-13"
+ ],
+ "risks": [
+  "Hand-bone orientation differs between the male/female sets; verify on at least m_178_human and f_166_human.",
+  "Item models have no grip/muzzle sockets yet (items phase); the poses use per-style constants."
+ ],
+ "effort": "M"
+}

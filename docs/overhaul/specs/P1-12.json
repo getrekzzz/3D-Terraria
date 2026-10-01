@@ -1,0 +1,42 @@
+{
+ "id": "P1-12",
+ "title": "Re-author swing, mine and bow clips to the shared timing and rebuild the animation sets",
+ "player_outcome": "The third-person swing reads like Terraria's arc: a short wind-up and a long, visible strike instead of a 90 ms flick. Pickaxes bite on the first frame of the dig, and bows fire from a drawn string, then re-nock.",
+ "design": [
+  "tools/blender/bgen/human/actions.py: add a small JSONC loader that strips // comments and trailing commas, and read <repo>/data/config/use_timing.json (repo = Path(__file__).resolve().parents[4]).",
+  "swing: t=0 already raised (pitch about 195), a small wind-up to 205 by windupEnd, eased strike to about 45 at strikeEnd, follow-through to 26, then recover toward the raised pose by 1.0 so autoswing chains smoothly. Scale twist/lean/wrist keys to the same times.",
+  "mine: keys aligned to the mine timing, with impact at strikeEnd (about 0.32) and the bounce, then recover up.",
+  "bow: fully drawn at t=0, release snap at 'release', recovery, re-draw between redrawStart and redrawEnd, held drawn to 1.0 (matches the instant Core shot and chains for autoReuse bows).",
+  "thrust: windup and strike keys from its timing.",
+  "Update the module docstring to say timing comes from data/config/use_timing.json.",
+  "Rebuild: python3.13 tools/blender/build_all.py --anims, sharded with --shard=0/4 ... 3/4 in parallel. Commit assets/models/creatures/anim/*.glb and index.json, then run the Godot --import.",
+  "Run python3 tools/blender/build_all.py --check."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/human/actions.py \u2014 timing-driven swing/mine/thrust/bow keys",
+  "assets/models/creatures/anim/*.glb \u2014 regenerated 29 animation sets",
+  "assets/models/creatures/anim/index.json \u2014 regenerated (expected unchanged)"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "data/config/use_timing.json values may be nudged here after viewing the clips (keep P1-10 tests green)"
+ ],
+ "tests": [
+  "UseTimingTests.ShippedFileValidatesAndMatchesDefaults must still pass after any timing nudge",
+  "Smoke creatures.cmds and town.cmds PASS (NPC humans use the same sets)"
+ ],
+ "verification": [
+  "python3 tools/blender/build_all.py --check",
+  "Godot --headless --import completes without errors",
+  "lavapipe animation.cmds: b_swing, c_mine, f_bow, k_run_swing, and o_zombie_death for NPC regressions",
+  "Skeleton archers (dungeon.cmds area): the arrow appears as the string snaps"
+ ],
+ "depends_on": [
+  "P1-10"
+ ],
+ "risks": [
+  "Rebuilding 29 sets is slow (bpy) and produces large binary diffs; shard it and commit in one go.",
+  "The recovery-to-raised end pose must not look odd on NPCs that play a single swing (NpcRenderer.Motion plays swing 0.5 s); check zombie and skeleton melee visuals."
+ ],
+ "effort": "M"
+}

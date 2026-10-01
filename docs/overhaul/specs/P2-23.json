@@ -1,0 +1,46 @@
+{
+ "id": "P2-23",
+ "title": "Boss bar with head icon, numbers and damage trail; invasion progress bar",
+ "player_outcome": "A framed boss bar appears at the bottom-centre with the boss's head, a red fill that leaves a pale 'damage chunk' trailing behind, and 'current/max' life. Paired bosses share one bar. During invasions a bottom-right panel shows the event icon, its name and a progress bar with a percentage.",
+ "design": [
+  "Core: new src/Strata.Core/Presentation/BossBarModel.cs. `static BossBarState? Compute(IEnumerable<Npc> npcs)` returns (Title, IconId, Life, Max).\n- Picks the dominant non-minor living boss by MaxLife.\n- Sums every living npc sharing Boss.Flag, which covers pairs; worm segments are one Npc.\n- Moves the logic out of Hud.UpdateBossBar (Hud.cs:228-247).\n- Also add `ActiveEvent.Progress` (Kills / KillGoal).",
+  "BossInfo (EnemyDef.cs) gains `string? Icon` (default: the enemy id).",
+  "New game/UI/Hud/BossBar.cs in the BossBar rect.\n- A 40 px icon TextureRect from BossIcons (assets/icons/bosses/<icon>.png; fallback: a coloured disc with the initial).\n- A _Draw bar of 456\u00d722: bg Color8(30,10,20,200), fill (200,30,50), 3 px top highlight (255,120,120,160), 2 px black frame.\n- A damage chunk in (255,200,200,180) that MoveTowards the real value after 0.4 s.\n- A centred 14 px 'life/max' label and an 18 px title above.\n- Fades in when the boss spawns.",
+  "New game/UI/Hud/EventProgressPanel.cs in the EventBar rect, for the latest Events.Active with KillGoal > 0: icon (StatusIcons), name, bar, 'NN%'. On Events.Ended it shows 100%, then fades after 3 s.",
+  "Hud: remove the old boss panel. Setting BossBar and EventBar in UiState drives ApplyLayout.",
+  "UiProbes gains `ui.bossbar` and `ui.eventbar`."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/EnemyDef.cs \u2014 BossInfo.Icon",
+  "src/Strata.Core/Gameplay/Events/EventDirector.cs \u2014 ActiveEvent.Progress",
+  "game/UI/Hud.cs \u2014 BossBar and EventProgressPanel wiring, old panel removed",
+  "game/Debug/UiProbes.cs \u2014 ui.bossbar, ui.eventbar"
+ ],
+ "files_add": [
+  "src/Strata.Core/Presentation/BossBarModel.cs",
+  "game/UI/Hud/BossBar.cs",
+  "game/UI/Hud/EventProgressPanel.cs",
+  "game/UI/BossIcons.cs \u2014 texture cache with fallback",
+  "tests/Strata.Core.Tests/Presentation/BossBarModelTests.cs"
+ ],
+ "data_changes": [
+  "BossInfo optional `icon`; no edits needed (defaults to the id)"
+ ],
+ "tests": [
+  "BossBarModelTests: TwinsCombineIntoOneBar (retinazer + spazmatism share a flag); MinorBossesIgnored; WormCountsOnce",
+  "EventTests: ProgressFollowsKills",
+  "ui.cmds:\n- `boss king_slime 12` / `wait 1` / `assert ui.bossbar == 1` / `killall` / `wait 1` / `assert ui.bossbar == 0`.\n- `event goblin_army` / `wait 1` / `assert ui.eventbar == 1` / `event stop goblin_army`."
+ ],
+ "verification": [
+  "Headless smoke; lavapipe screenshots of the King Slime bar and the Goblin Army progress"
+ ],
+ "depends_on": [
+  "P2-03",
+  "P2-09",
+  "P2-12"
+ ],
+ "risks": [
+  "The bosses phase adds separately killable Parts (Skeletron hands, Golem fists). Agree that BossBarModel includes a part only when it has its own life and is flagged, e.g. `countsOnBar`; Terraria shows only Skeletron's head."
+ ],
+ "effort": "M"
+}

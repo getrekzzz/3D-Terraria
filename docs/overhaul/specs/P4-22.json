@@ -1,0 +1,48 @@
+{
+ "id": "P4-22",
+ "title": "Bound Mechanic in the dungeon: free her and she moves in",
+ "player_outcome": "Deep in the dungeon a Bound Mechanic begs for help. Talk to her and choose Free, and she thanks you, leaves, and later moves into town as the Mechanic.",
+ "design": [
+  "Town service 'rescue' {flag, label 'Free', message} in TownServiceSpecs.cs. Handler: TownServices.Rescue(npc, player) sets the flag through Progression.Set and calls TownSystem.UpdateLandmarks at once, so the LeavesWhen departure happens now.",
+  "TownNpcDef.DepartMessage (string?, placeholders {name}). Hud's Departed announcement uses it ('{name} has been rescued!').",
+  "Landmark residents respect Arrival when it is non-empty (TownSystem.Landmarks.UpdateLandmarks).",
+  "game/UI/TownDialog.cs: a Rescue button branch next to the others.",
+  "Planner room Mechanic: DungeonPass records the landmark 'dungeon_mechanic' (a floor cell in that room) in LandmarkIds.",
+  "Pose: add a 'bound' kneeling pose (hands behind the back) to tools/blender/bgen/human/actions.py and motion.py, and rebuild the mechanic's anim set (build_all.py --anims --only=mechanic). TownRenderer plays 'bound' for defs tagged bound. Until then fall back to idle.",
+  "If the NPC phase already delivered a generic bound-NPC system, reuse it and add only the data and the landmark."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Specs/TownServiceSpecs.cs \u2014 rescue",
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 DepartMessage",
+  "src/Strata.Core/Gameplay/Town/TownServices.cs \u2014 Rescue",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Landmarks.cs \u2014 arrival check for landmark residents",
+  "src/Strata.Core/WorldGen/Passes/DungeonPass.cs, src/Strata.Core/WorldGen/Plan/WorldPlan.cs \u2014 dungeon_mechanic landmark",
+  "game/UI/TownDialog.cs \u2014 Rescue button",
+  "game/UI/Hud.cs \u2014 DepartMessage",
+  "game/Entities/TownRenderer.cs \u2014 bound pose",
+  "data/town_residents.json \u2014 mechanic arrival",
+  "data/town.json \u2014 bound_mechanic",
+  "data/progression.json \u2014 rescued_mechanic",
+  "tools/blender/bgen/human/actions.py, motion.py \u2014 bound pose"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "bound_mechanic: name 'Bound Mechanic', model mechanic, tags [bound], landmark dungeon_mechanic, arrival [flag defeated_skeletron], leavesWhen [flag rescued_mechanic], departMessage 'The Mechanic has been rescued!', service {type rescue, flag rescued_mechanic, label 'Free'}. Lines: 'Help! I've been tied up down here for ages!' and 'Those skeletons took my wrench. Cut me loose?'.",
+  "mechanic.arrival becomes [flag rescued_mechanic].",
+  "Flag rescued_mechanic (kind world, stage dungeon)."
+ ],
+ "tests": [
+  "TownTests.BoundMechanicWaitsInTheDungeonAndMovesInOnceFreed: load the landmark; she appears after defeated_skeletron; Rescue sets the flag and she departs; with a valid house the mechanic arrives.",
+  "Smoke dungeon.cmds: 'tp landmark dungeon_mechanic', 'wait_until town.bound_mechanic == 1 60', 'town talk bound_mechanic' (or 'ui talk bound_mechanic'), 'assert errors == 0'."
+ ],
+ "verification": [
+  "dotnet test; headless dungeon.cmds and town.cmds"
+ ],
+ "depends_on": [
+  "P4-15"
+ ],
+ "risks": [
+  "Overlaps the NPC phase (audit H: bound Goblin/Mechanic/Wizard/Stylist/Angler/Golfer). Coordinate so that only one rescue system exists."
+ ],
+ "effort": "S"
+}

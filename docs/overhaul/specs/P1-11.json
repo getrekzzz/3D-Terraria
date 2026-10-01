@@ -1,0 +1,44 @@
+{
+ "id": "P1-11",
+ "title": "Engine swing visuals: clip per animation, real-time first-person view model, trail in the strike window",
+ "player_outcome": "Swings and mining look smooth at any frame rate. The third-person arm plays each swing once to the end, the first-person tool eases up, strikes and settles instead of snapping, and the white arc appears exactly when the blade comes down.",
+ "design": [
+  "PlayerAvatar.Motion: start the action when entity.UseSerial != _lastSerial via h.Play(ActionFor(...), entity.UseAnimationMax / 60f, timing). Drop the UseAnimation-jump detection (_lastUse). The ChooseClip fallback keeps UseAnimation > 0.",
+  "HumanoidAnimator.BuildTree: insert an AnimationNodeTimeSeek 'act_seek' between act_speed and pick.",
+  "HumanoidAnimator.Play(action, seconds, float maxRate, float windupEnd): rate = clip.Length / seconds. If rate > maxRate, use rate = maxRate and seek_request = windupEnd * clip.Length, so very fast weapons skip the wind-up and the strike still lands inside the use. Otherwise seek 0. _actionLeft = seconds.",
+  "ViewModel: phase t = Clamp((UseAnimationMax - UseAnimation + Engine.GetPhysicsInterpolationFraction()) / UseAnimationMax, 0, 1), which is sub-tick and real time.",
+  "ViewModel melee/tool pose: raised over the shoulder until windupEnd, strike driven by Timing.Sweep (\"swing\" for weapons, \"mine\" for tools), then follow-through.",
+  "ViewModel easing: an engage weight eases in (0.06 s) and out (0.15 s) with SmoothStep blending from Rest, so the model never snaps rest->raised in one frame. On a UseSerial change, crossfade from the last pose over 0.05 s (autoswing chains). Thrust uses the Striking window.",
+  "SwingTrail: Duration = entity.UseAnimationMax / 60; head = HalfArc - Sweep * 2 * HalfArc; nothing drawn before windupEnd; Reach multiplied by Prefixes.Size(held stack) so the trail matches the hitbox.",
+  "SwingTrail colour: Color.FromHtml(info.Swing.TrailColor) when set, else today's white/rarity mix (MeleeSwingParams.TrailColor is finally read).",
+  "docs/architecture/rendering.md: character animation paragraph (no restarts, seek cap)."
+ ],
+ "files_modify": [
+  "game/Player/PlayerAvatar.Motion.cs \u2014 play on UseSerial with the scaled duration",
+  "game/Rendering/HumanoidAnimator.cs \u2014 act_seek node, rate cap with wind-up skip",
+  "game/Player/ViewModel.cs \u2014 interpolated phase, timing-driven poses, eased engage, serial crossfade",
+  "game/Entities/SwingTrail.cs \u2014 scaled duration, strike-window sweep, prefix size, TrailColor",
+  "docs/architecture/rendering.md \u2014 animation notes"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "No engine unit tests. Core UseTimingTests (P1-10) cover timing.",
+  "animation.cmds (tour) captures b_swing, c_mine, k_run_swing at settle 0; add 's_fp_mine' ('camera first' / 'wield copper_pickaxe' / 'press use_primary' / 'wait 0.2' / 'screenshot s_fp_mine 0' / 'release use_primary' / 'camera third')",
+  "Smoke basic.cmds and combat.cmds still PASS (no errors from the new AnimationTree node)"
+ ],
+ "verification": [
+  "Manual at 30, 60 and 144 fps (Settings max FPS): hold a copper pickaxe and a Solar Flare Drill in first and third person; no restart stutter, no snap; with Feral Claws plus a Brisk prefix the swing is visibly faster and still completes",
+  "lavapipe animation.cmds screenshots compared with the pre-change run",
+  "Swing a sword at a slime standing on the far side of the arc; the damage number appears as the trail passes it"
+ ],
+ "depends_on": [
+  "P1-10",
+  "P1-06"
+ ],
+ "risks": [
+  "AnimationNodeTimeSeek plus OneShot ordering: if the seek does not apply on the fire frame, fall back to a plain rate cap (still no restarts, because Core only starts new animations at completion).",
+  "NPC humans share HumanoidAnimator; keep the old Play(action, seconds) overload for NpcRenderer."
+ ],
+ "effort": "M"
+}

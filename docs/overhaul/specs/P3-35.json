@@ -1,0 +1,49 @@
+{
+ "id": "P3-35",
+ "title": "Piggy Bank and Safe (personal storage shared across the world)",
+ "player_outcome": "Buy a Piggy Bank from the Merchant (and later a Safe from the Mechanic): opening any of your piggy banks shows the same 40 slots you carry with your character, and shops take coins stored there.",
+ "design": [
+  "Verified: no piggy/safe anywhere; only wooden and gold chests are containers.",
+  "TileObjectDef.SharedStorage ('piggy_bank' | 'safe') with interaction Chest; no container slots on the instance.",
+  "PlayerState.Banks: Dictionary<string, Inventory> (40 slots each), created on demand. PlayerSave.Banks keeps the slot lists.",
+  "ObjectInteraction Chest: for SharedStorage, raise ContainerOpened with the player's bank Inventory. Change the event to (PlayerEntity, TileObjectInstance, Inventory); normal chests pass new Inventory(obj.Container).",
+  "InventoryScreen opens whatever Inventory the event carries (small change; P2 overlap).",
+  "Breaking a shared-storage object never spills contents (they live on the character).",
+  "Coins.Total/Wallet include banks when paying at shops (Terraria 1.4 behaviour).",
+  "Assets: piggy_bank (pig) and safe (box with dial and handle) generators in bgen/items_misc.py or furniture.py; assets.json objects entries."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TileObjectDef.cs \u2014 SharedStorage",
+  "src/Strata.Core/Gameplay/Player/PlayerState.cs \u2014 Banks",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 Banks",
+  "src/Strata.Core/Gameplay/Interaction/ObjectInteraction.cs \u2014 shared storage open",
+  "src/Strata.Core/Gameplay/Items/Coins.cs, Wallet.cs \u2014 include banks",
+  "game/UI/InventoryScreen.cs \u2014 open event Inventory",
+  "data/tileobjects/furniture.json \u2014 piggy_bank, safe",
+  "data/town.json \u2014 merchant sells piggy_bank (1 gold)",
+  "data/town_residents.json \u2014 mechanic sells safe after defeated_skeletron (verify the Terraria seller)",
+  "tools/blender/assets.json \u2014 object entries"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/PersonalStorageTests.cs \u2014 bank tests"
+ ],
+ "data_changes": [
+  "Tile objects piggy_bank {size [2,2,2], interaction chest, sharedStorage piggy_bank, itemValue 10000} and safe {sharedStorage safe, itemValue 200000}; shop entries"
+ ],
+ "tests": [
+  "PersonalStorageTests: store 10 dirt via one piggy bank, open another \u2192 same contents; save round-trip; breaking the bank drops only the bank item",
+  "PersonalStorageTests: buying pays from coins in the piggy bank",
+  "Smoke builder.cmds: 'give piggy_bank 1' / 'place piggy_bank 2 0 0' / 'interact 2 0 0' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate; build_all --check"
+ ],
+ "depends_on": [
+  "P3-28"
+ ],
+ "risks": [
+  "The ContainerOpened signature change touches the UI and tests.",
+  "Shop data overlaps P4 (NPC shops)."
+ ],
+ "effort": "M"
+}

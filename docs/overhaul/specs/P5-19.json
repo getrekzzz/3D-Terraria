@@ -1,0 +1,53 @@
+{
+ "id": "P5-19",
+ "title": "Visiting merchants: the Travelling Merchant (dawn visits, rotating stock) and the Skeleton Merchant (underground, moon-phase stock)",
+ "player_outcome": "On some mornings the Travelling Merchant walks into town ('The Travelling Merchant has arrived!') with a different random stock each visit, then leaves at dusk. Deep underground you may meet the Skeleton Merchant, whose wares change with the moon phase. Rally becomes obtainable from him.",
+ "design": [
+  "TownNpcKind.Visitor. TownNpcParts.cs: VisitInfo { TypedSpec[] Requires (world facts, e.g. residents \u2265 2), string Mode (town|site), float DawnChance, float HourlyChance, TypedSpec[] Where (site mode), float ArriveHour, float LeaveHour, float WanderRadius, ShopPool[] Pools } with ShopPool { int Count; ShopEntry[] Entries }. Add TownNpcDef.Visit.",
+  "New TownSystem.Visitors.cs. At the dawn crossing, roll town visitors with Pcg32(seed, day, id). On arrival, place the visitor at a standable node 20\u201330 m outside a random housed resident's home, out of sight, and set r.VisitDay = day, r.Anchor = town centre (the mean of the homes); raise VisitorArrived. At LeaveHour, path away and remove once out of sight or more than 40 m away; raise VisitorLeft. Site visitors (Skeleton Merchant) roll HourlyChance while the player is in the Where layers, are placed with SiteFinder (P5-06), and leave when the player is more than 100 m away for 60 s or at the next dawn.",
+  "Stock: TownCommerce.Stock adds VisitorStock(npc) = the entries rolled from Pools with Pcg32(world seed, npc.VisitDay), whose conditions are evaluated normally. The stock is stable within a visit and changes the next visit.",
+  "Visitors never count as residents, never take homes and are excluded from happiness. TownRenderer and dialog work unchanged. TownAnnouncer shows the arrival/departure messages.",
+  "Persistence: ResidentModel gains Kind/VisitDay (optional). Commands: 'town visit <id>' forces an arrival, 'town leave <id>'. Probe town.<id> already covers presence.",
+  "Data (verify on the wiki): travelling_merchant with dawnChance ~0.225, requires residents \u2265 2, pools from Terraria's list limited to items that work (katana, lucky_horseshoe?, plus new ones such as pulse_bow, revolver, black_fairy_dust, gi, sitting_ducks_fishing_pole); skeleton_merchant with site mode, layer underground/cavern, entries gated by moon phase (wooden_yoyo, rally, magic_lantern at full moon (new light pet if pets exist, else defer), bone_arrow, lesser_healing_potion, bone_torch (new))."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 Visit; Kind derivation",
+  "src/Strata.Core/Content/Defs/TownNpcParts.cs \u2014 VisitInfo, ShopPool",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 Tick calls UpdateVisitors",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 VisitorStock",
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 VisitDay, Anchor",
+  "src/Strata.Core/Persistence/WorldMeta.cs \u2014 ResidentModel Kind/VisitDay",
+  "src/Strata.Core/Commands/TownDebugCommands.cs \u2014 visit/leave",
+  "src/Strata.Core/Content/Validation/ContentValidator.Town.cs \u2014 visit validation; no 'no arrival' warning for visitors",
+  "game/UI/TownAnnouncer.cs \u2014 arrival/departure",
+  "data/town/visitors.json \u2014 visit blocks and pools"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownSystem.Visitors.cs \u2014 visit scheduling",
+  "data/items/town_shop_visitors.json \u2014 new functional pool items",
+  "tests/Strata.Core.Tests/Gameplay/VisitorTests.cs"
+ ],
+ "data_changes": [
+  "visitors.json rewritten; new pool items with assets and reference"
+ ],
+ "tests": [
+  "VisitorTests.TravellingMerchantArrivesAtDawnAndLeavesAtDusk (DawnChance forced to 1 in a test config)",
+  "VisitorTests.StockIsStablePerVisitAndRotates: the same list twice on one day, a different set another day",
+  "VisitorTests.SkeletonMerchantSpawnsUnderground (SiteFinder stub)",
+  "VisitorTests.VisitorsDoNotCountOrTakeHomes",
+  "New smoke line in town.cmds: 'town visit travelling_merchant' / 'wait 0.5' / 'assert town.travelling_merchant == 1' / 'ui talk travelling_merchant' / 'ui shop' / 'ui close' / 'town leave travelling_merchant'"
+ ],
+ "verification": [
+  "dotnet test; validate",
+  "In game: skip days with 'time 4.4' then wait \u2192 the merchant arrives on some days with a different stock"
+ ],
+ "depends_on": [
+  "P5-13",
+  "P5-06",
+  "P5-04"
+ ],
+ "risks": [
+  "The visitor walks from outside town; if the path fails, fall back to teleporting to the anchor once out of sight."
+ ],
+ "effort": "M"
+}

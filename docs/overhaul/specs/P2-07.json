@@ -1,0 +1,45 @@
+{
+ "id": "P2-07",
+ "title": "Core click semantics: Terraria right-click (take one, equip swap, open crates and bags), Ctrl trash, Alt favourite, Shift quick-move, throw cursor, hold-repeat",
+ "player_outcome": "Right-click works like Terraria:\n- It takes one item at a time and speeds up while held.\n- It equips armor and accessories, swapping them out.\n- It swaps worn armor with its vanity counterpart.\n- It opens crates, bags and presents in place.\n\nCtrl+click trashes, Alt+click favourites, Shift+click quick-moves, and clicking the world throws the held stack.",
+ "design": [
+  "New src/Strata.Core/Gameplay/Items/SlotRef.cs:\n- `enum SlotArea { Backpack, Coins, Ammo, Trash, Armor, Accessories, VanityArmor, VanityAccessories, Dyes, Misc, MiscDyes, Service, Container, Shop }`.\n- `readonly record struct SlotRef(SlotArea Area, int Index)`.\n- `[Flags] enum ClickMods { None=0, Shift=1, Ctrl=2, Alt=4 }`.\n- `enum ClickOutcome { None, Moved, Equipped, Opened, Trashed, Favorited, Sold, Thrown }`.\n- `SlotFilters.For(SlotRef, PlayerInventory)` returns the accept predicate per area and index (armor kind per index, accessory without duplicates, coins only, ammo only, dyes, misc kind).",
+  "Rewrite SlotActions.RightClick to Terraria rules, returning a ClickOutcome:\n- An equippable item outside the equipment areas calls EquipFrom (swap).\n- An item in Armor or Accessories swaps with the same index in VanityArmor or VanityAccessories.\n- Otherwise take ONE onto the cursor, when the cursor is empty or CanStackWith with space left.\n- The Minecraft half-split and place-one behaviour is removed.\n- LeftClick is unchanged.",
+  "New partial src/Strata.Core/Session/GameWorld.InventoryActions.cs. `ClickOutcome ClickSlot(PlayerEntity p, SlotRef slot, bool right, ClickMods mods, SlotContext ctx)`, where `SlotContext(Inventory? Container, Town.TownNpc? Shop)`, routes clicks:\n- Alt toggles favourite (Backpack, Coins, Ammo only).\n- Ctrl (with no shop open) moves the stack to Trash[0], replacing the old trash item; favourites are refused.\n- Shift quick-moves: container \u2194 backpack; equip from backpack; unequip to backpack; sell when a shop is open (the Sell hook lands in P2-27).\n- Right-click on an item whose ItemUseInfo.Consume.Loot != null calls ItemUseSystem.OpenFromSlot.\n- Otherwise SlotActions.\n\nAlso add `ThrowCursor(PlayerEntity p, bool one)` and `ThrowStack(PlayerEntity p, ItemStack s)`: Drops.Spawn at Eye + Aim\u00b70.6 with velocity (aim.x, 0.4, aim.z)\u00b75 and pickupDelay 90. InteractionController.DropHeld (InteractionController.cs:193-202) reuses ThrowStack.",
+  "New partial src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Slots.cs (ItemUseSystem.cs is at 375 lines): `public bool OpenFromSlot(PlayerEntity p, Inventory inv, int slot)` takes 1 from the slot and calls the existing private Open(p, table). Raises a new `Opened(PlayerEntity, ItemDef)` event, used later for a sound.",
+  "New src/Strata.Core/Gameplay/Items/HoldRepeat.cs: `IntervalTicks(int repeats) = max(1, round(30 * 0.75^repeats))`. Shared by right-click hold, hold-to-craft and hold-to-buy.",
+  "New src/Strata.Core/Commands/InventoryCommands.cs, registered in BuiltinCommands.CreateRegistry, so smoke scripts and CommandTests drive the same code:\n- `invclick <area> <index> <left|right> [shift|ctrl|alt]`\n- `invthrow [one]`\n- `cursor` (prints the cursor stack)"
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Items/SlotActions.cs \u2014 Terraria right-click, filters moved to SlotFilters",
+  "src/Strata.Core/Commands/BuiltinCommands.cs \u2014 register InventoryCommands",
+  "game/Player/InteractionController.cs \u2014 DropHeld \u2192 GameWorld.ThrowStack (3 lines)",
+  "tests/Strata.Core.Tests/Gameplay/SlotAndCraftingUiTests.cs \u2014 RightClickSplitsAndDropsOne replaced by the Terraria semantics test"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Items/SlotRef.cs \u2014 SlotArea, SlotRef, ClickMods, ClickOutcome, SlotFilters",
+  "src/Strata.Core/Session/GameWorld.InventoryActions.cs \u2014 ClickSlot, ThrowCursor, ThrowStack",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Slots.cs \u2014 OpenFromSlot",
+  "src/Strata.Core/Gameplay/Items/HoldRepeat.cs \u2014 accelerating repeat intervals",
+  "src/Strata.Core/Commands/InventoryCommands.cs \u2014 invclick, invthrow, cursor",
+  "tests/Strata.Core.Tests/Gameplay/SlotClickTests.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "SlotClickTests:\n- RightClickTakesOneAtATime.\n- RightClickEquipsArmorAndSwapsOld (iron_helmet over copper_helmet).\n- RightClickEquippedArmorSwapsWithVanity.\n- RightClickAccessoryWhenFullRotates.\n- RightClickOpensWoodenCrate: crate count \u22121, loot and coins added.\n- CtrlClickTrashesAndReplacesOldTrash.\n- AltClickFavoritesAndTrashRefusesFavorites.\n- ShiftClickMovesToOpenContainer.\n- ThrowCursorSpawnsADrop (Drops count +1, cursor empty).\n- HoldRepeatAccelerates: 30, 22, 17 \u2026 1.",
+  "CommandTests: `invclick backpack 0 right` round-trip",
+  "ui.cmds: `give wooden_crate 1` / `select 1`? (not needed) / `invclick backpack <slotOfCrate> right` / `assert inv.wooden_crate == 0` / `assert inv.coins > 0`"
+ ],
+ "verification": [
+  "dotnet test; headless ui.cmds SMOKE PASS"
+ ],
+ "depends_on": [
+  "P2-05",
+  "P2-06"
+ ],
+ "risks": [
+  "P3 adds treasure bags and presents through ConsumeParams.Loot and gets right-click opening for free. Agree that any 'opens' item uses Consume.Loot.",
+  "InteractionController also changes in P1 (targeting). This WP changes only DropHeld."
+ ],
+ "effort": "M"
+}

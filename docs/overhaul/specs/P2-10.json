@@ -1,0 +1,54 @@
+{
+ "id": "P2-10",
+ "title": "ItemSlotView v2 with instant cursor-following tooltips, the held item drawn at the pointer on every screen, and a custom Terraria pointer",
+ "player_outcome": "Slots look and feel Terraria-like:\n- Coloured by kind: gold for the selected hotbar slot, teal for chests, violet for equipment.\n- Icons at the right size, with a bold outlined stack count and the ammo left on guns and bows.\n- A gold slot for favourites and faint silhouettes in empty slots.\n- A 'grab' sound when items move.\n\nTooltips appear instantly beside the pointer with coloured lines. The held stack follows the pink Terraria pointer over every panel.",
+ "design": [
+  "Rewrite game/UI/ItemSlotView.cs, with a split into ItemSlotView.Draw.cs.\n- ctor(Func<ItemStack> read, float size, SlotKind kind, TooltipSource? tooltip).\n- Properties: Kind, Selected, Locked, EmptyHint (Texture2D), AmmoCount (Func<int>?), Badge.\n- `event Action<MouseButton, ClickMods> Clicked`, with modifiers from InputEventMouseButton Shift, Ctrl and Alt.\n- Right-button hold while hovered fires Clicked(Right) again at Core HoldRepeat.IntervalTicks, counted in _Process.\n- _Process returns early when `!IsVisibleInTree()`. Today 50+ hidden slot views poll every frame.",
+  "Drawing, from cached styles:\n- UiTheme.SlotStyle(kind: Favorite when the stack is favourited, HotbarSelected when selected; hovered).\n- Icon rect is Size\u00b70.62, centred, with TextureFilter LinearWithMipmaps.\n- Count at bottom-left in white with a 4 px black outline, font size max(12, Size\u00b70.26), at (Size\u00b70.12, Size\u22126).\n- Badge at top-left, white, 12 px.\n- Ammo count (Core PlayerInventory.CountAmmo) at bottom-right, red when 0.\n- Empty hint at alpha 0.25; Locked dims the slot.",
+  "New game/UI/TooltipFollower.cs, a single instance on CanvasLayer 95.\n- A PanelContainer (TooltipPanel style) with a VBox of up to 24 pooled Labels.\n- `Show(Control owner, Func<IReadOnlyList<(string, TooltipKind)>> lines, int rarity)` and `Hide(Control owner)`.\n- Lines rebuild only when the hovered stack changes, or every 0.25 s for dynamic text.\n- Every frame: position = mouse + (16,16), clamped to the viewport. Animated rarities (UiTheme.IsAnimated) recolour the name line.\n- Colours: Name \u2192 rarity; Good/Bad \u2192 green/red; price kinds \u2192 coin colours; NoValue \u2192 grey; Flavor \u2192 Color8(190,200,255); Info \u2192 Muted.\n- Hides when a Modal gate opens.\n- Slot views call Show/Hide on MouseEntered/MouseExited. Godot TooltipText and _MakeCustomTooltip are removed.",
+  "New game/UI/CursorItemLayer.cs on CanvasLayer 90. It draws PlayerInventory.Cursor (40 px icon plus outlined count) at mouse + (10,10) whenever the mouse is visible and the cursor is not empty. It replaces the old cursor nodes at InventoryScreen.cs:95-98,146-156.",
+  "New game/UI/UiCursor.cs.\n- `Apply(UserSettings)`: load res://assets/ui/cursor.png as an Image, multiply by CursorColor, then call `Input.SetCustomMouseCursor(ImageTexture.CreateFromImage(img), Input.CursorShape.Arrow, new Vector2(1,1))`, and the same for PointingHand.\n- Called at boot and on UserSettings.Changed.\n- The CursorColor default becomes \"#ff325f\" (Terraria's pink-red).",
+  "Sounds: add a 'grab' recipe to tools/audio/sfx_recipes.py, e.g. `blip(900,0.05,'triangle',0.02)` plus a short noise tick, 2 variants, with a GAIN entry. Generate with `/root/bpyenv/bin/python tools/audio/build_audio.py --only=grab --sfx` and commit the WAVs and .import files. Play it on Moved, Equipped and Trashed outcomes.",
+  "Update the ctor call sites in Hud.cs:57 and InventoryScreen.cs:186. Create TooltipFollower and CursorItemLayer in WorldLauncher next to the HUD.",
+  "Optional, to stop 128\u219240 px shimmer: rewrite `mipmaps/generate=true` in assets/icons/items/*.png.import with a one-off script, reimport, and check that new icons from build_all.py get the same setting.",
+  "UiCommands gains `ui hover <area> <index>`, which shows the follower for that slot. UiProbes gains `ui.tooltip_lines` and `ui.cursor_count`."
+ ],
+ "files_modify": [
+  "game/UI/ItemSlotView.cs \u2014 v2 (split into partials)",
+  "game/UI/Hud.cs \u2014 ctor and SlotKind for the hotbar",
+  "game/UI/InventoryScreen.cs \u2014 ctor, remove cursor icon nodes",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create TooltipFollower and CursorItemLayer",
+  "game/Settings/UserSettings.cs \u2014 CursorColor default #ff325f",
+  "tools/audio/sfx_recipes.py \u2014 grab recipe",
+  "game/Debug/UiCommands.cs \u2014 ui hover",
+  "game/Debug/UiProbes.cs \u2014 ui.tooltip_lines, ui.cursor_count"
+ ],
+ "files_add": [
+  "game/UI/ItemSlotView.Draw.cs \u2014 drawing",
+  "game/UI/TooltipFollower.cs \u2014 instant, following, coloured tooltip",
+  "game/UI/CursorItemLayer.cs \u2014 held stack at the pointer on every screen",
+  "game/UI/UiCursor.cs \u2014 tinted custom OS cursor",
+  "assets/audio/sfx/grab_1.wav, grab_2.wav (+ .import)"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds:\n- `give torch 5` / `ui inventory` / `invclick backpack 3 right` / `assert ui.cursor_count == 1` (cursor probe).\n- `ui hover backpack 0` / `assert ui.tooltip_lines >= 3`.\n- `ui close` / `assert inv.cursor == 0`.",
+  "python3 tools/audio/build_audio.py --check (every Sfx.Play name has a recipe)"
+ ],
+ "verification": [
+  "dotnet build; headless ui.cmds SMOKE PASS",
+  "Lavapipe exec: `--exec=\"ui inventory;ui hover backpack 0;screenshot slot_tooltip\" --shots=$PWD/shots`. Tooltip beside the pointer, coloured name; slot colours match the palette",
+  "F3 perf overlay: gd.slot_views \u2248 0 with the inventory closed"
+ ],
+ "depends_on": [
+  "P2-01",
+  "P2-02",
+  "P2-04",
+  "P2-07"
+ ],
+ "risks": [
+  "Input.SetCustomMouseCursor needs a \u2264256 px texture; keep it at 32 px.",
+  "Hold-repeat must stop when the mouse leaves the slot or a modal opens."
+ ],
+ "effort": "M"
+}

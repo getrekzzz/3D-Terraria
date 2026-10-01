@@ -1,0 +1,43 @@
+{
+ "id": "P3-43",
+ "title": "Wrong-archetype creatures (1/2): spiders, wolves, mimic, shark, flinx, tortoise, salamander",
+ "player_outcome": "The Wolf and Hellhound are canines, not horned unicorns. The Black Recluse, Wall Creeper and Blood Crawler are eight-legged spiders. The Mimic is a toothy chest on legs, the Shark a shark, the Snow Flinx a fur ball, the Giant Tortoise a tortoise and the Salamander a lizard.",
+ "design": [
+  "Verified: the steed generator always builds the crystal horn (beasts.py:93-101); crab serves black_recluse/wall_creeper/salamander/giant_tortoise; present serves the mimic; gel serves snow_flinx; fish serves shark (assets.json creatures + data model refs).",
+  "Add props texture layers fur, chitin and bone to tools/textures/props.json (appended) and rebuild the props set.",
+  "beasts.steed: horn param (default false except unicorns) and head 'canine' (muzzle, pointed ears, fur tail) for wolf/hellhound.",
+  "New bgen/fauna2.py: spider (cephalothorax, abdomen, 8 jointed legs, fangs; rig with leg pairs and a skitter walk via creatures._action), lizard (salamander), tortoise (domed shell via detail.organic), mimic (chest from furniture.chest geometry + teeth_row + stubby legs, hop/bite clip), flinx (fur-ball organic with prop:fur), shark (fish variant: dorsal fin, grey, teeth).",
+  "assets.json creatures: new entries; data/enemies/*.json models re-pointed.",
+  "Target 1\u20133k tris each; small rigs with idle/walk/attack clips.",
+  "Rebuild the creatures and their preview sheets."
+ ],
+ "files_modify": [
+  "tools/textures/props.json \u2014 fur/chitin/bone layers",
+  "tools/blender/bgen/beasts.py \u2014 horn flag; canine head",
+  "tools/blender/build_all.py \u2014 register fauna2 generators",
+  "tools/blender/assets.json \u2014 creature entries",
+  "data/enemies/*.json \u2014 model refs (wolf, hellhound, black_recluse, wall_creeper, blood_crawler, mimic, shark, snow_flinx, giant_tortoise, salamander)",
+  "game/Testing/Scripts/creatures.cmds \u2014 spawn each new model"
+ ],
+ "files_add": [
+  "tools/blender/bgen/fauna2.py \u2014 spider, lizard, tortoise, mimic, flinx, shark"
+ ],
+ "data_changes": [
+  "Enemy 'model' fields for the listed enemies"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check; Strata.Tools validate",
+  "Smoke creatures.cmds: spawn each re-pointed enemy, 'wait 1', 'assert props.problems == 0', 'assert errors == 0'"
+ ],
+ "verification": [
+  "preview.py contact sheets (views + clip frames) for each new generator"
+ ],
+ "depends_on": [
+  "P3-37"
+ ],
+ "risks": [
+  "Props texture array rebuild (shared with P3-37); serialize.",
+  "Brain/pose names must match the new clips (walk/idle/attack)."
+ ],
+ "effort": "M"
+}

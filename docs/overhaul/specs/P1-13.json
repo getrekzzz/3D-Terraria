@@ -1,0 +1,40 @@
+{
+ "id": "P1-13",
+ "title": "Core: projectiles leave the hand and converge on the crosshair",
+ "player_outcome": "Arrows, bullets, magic bolts and thrown weapons come out of the weapon hand, not from the eyes, and still land where the crosshair points.",
+ "design": [
+  "New src/Strata.Core/Gameplay/Entities/ShotGeometry.cs with HandOffset = (right 0.22, up -0.3, forward 0.45) in the Facing frame; right = Normalize(Cross(Facing, UnitY)).",
+  "ShotGeometry.Origin(VoxelWorld w, PlayerEntity p): wanted = Eye + offset; Targeting.CastWhere(w, Eye, wanted - Eye, |wanted - Eye|, solid-cell predicate); on a hit, pull the origin back to 5 cm before the hit (never spawn inside a wall).",
+  "ShotGeometry.Direction(PlayerEntity p, Vector3 origin): Normalize(Eye + Aim * AimDistance - origin), falling back to Aim when AimDistance < 1.5 m or the vector degenerates.",
+  "ProjectileSystem.Fire: spawn at Origin and apply spread around Direction (replacing p.Eye + dir*0.4 at line 89).",
+  "docs/architecture/gameplay.md: shot origin."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 Fire uses ShotGeometry",
+  "docs/architecture/gameplay.md \u2014 shot origin"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/ShotGeometry.cs \u2014 hand origin with wall clamp, crosshair convergence",
+  "tests/Strata.Core.Tests/Gameplay/ShotGeometryTests.cs \u2014 origin/direction rules"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ShotGeometryTests.ArrowsLeaveFromTheHand: wooden_bow plus arrows, ViewDirection +Z, AimDistance 10; the spawned projectile is > 0.3 m from Eye and within 0.1 m of Eye + HandOffset",
+  "ShotGeometryTests.ShotsConvergeOnTheCrosshair: the initial velocity direction is within 1\u00b0 of Normalize(Eye + Aim*10 - origin)",
+  "ShotGeometryTests.NeverSpawnsInsideAWall: a stone column at the right shoulder keeps the origin cell non-solid",
+  "ArsenalTests (boomerang, bombs, minions) stay green; combat.cmds 'assert projectiles.count >= 1' still passes (release stays instant)"
+ ],
+ "verification": [
+  "dotnet test",
+  "Smoke combat.cmds PASS",
+  "Manual: shoot at a small target 20 m away in third person; arrows hit the crosshair"
+ ],
+ "depends_on": [
+  "P1-05"
+ ],
+ "risks": [
+  "Very close aim points give steep convergence angles; the 1.5 m fallback avoids arrows flying sideways.",
+  "Minion or bobber spawns also go through Spawn; only Fire changes, so fishing and minions are unaffected."
+ ],
+ "effort": "S"
+}

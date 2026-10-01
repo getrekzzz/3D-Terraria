@@ -1,0 +1,40 @@
+{
+ "id": "P2-21",
+ "title": "Chat/status log with Terraria colours ('X has awoken!' in purple) replacing the big banners",
+ "player_outcome": "World messages scroll up a chat log at the bottom-left in Terraria's colours and fade after 10 seconds:\n- 'Eye of Cthulhu has awoken!' and 'has been defeated!' in purple.\n- 'The Guide has arrived!' in blue.\n- 'was slain...' in red.\n- 'The Blood Moon is rising...' in green.\n\nEnter shows the last 50 messages.",
+ "design": [
+  "New game/UI/Hud/ChatLog.cs: a VBox in the Chat rect (bottom-left; moves right of the crafting column while the inventory is open) with 10 pooled autowrapping Labels (16 px, outline 4), newest at the bottom.\n- `Add(string text, Color color)`: each line lives 10 s, then fades over 1 s.\n- History mode on a new `chat` action (key Enter): shows the last 50 lines on a translucent backdrop as an Overlay gate, with no text input, until Enter or Esc.",
+  "Route messages in Hud.cs, replacing Announce and Toast:\n- npcs.BossSpawned 'has awoken!', BossDefeated 'has been defeated!', BossLeft 'has left!': UiTheme.BossPurple.\n- Town.Arrived 'has arrived!' and Departed 'has left!': NpcArrived blue.\n- Town.Died 'was slain...': NpcSlain red.\n- Events.Announced, Progression.Raised and npcs.Announced: EventGreen.\n- Objectives.Announced: its data colour.\n- ItemUse.Caught 'Caught X!': rarity colour.\n- Keep `Announce(text, color)` as a forwarding API.",
+  "Delete the 30 px centred banner stack (Hud.cs:88-92,282-294). Add an optional setting BigAnnouncements, default off, that shows only the boss-awoken banner at 24 px.",
+  "input.json: add \"chat\": [\"key:Enter\"]. Add it to KeyBindings.Listed.",
+  "UiCommands gains `ui chat <text>`. UiProbes gains `ui.chat_lines`."
+ ],
+ "files_modify": [
+  "game/UI/Hud.cs \u2014 message routing, remove banners",
+  "data/config/input.json \u2014 chat action",
+  "game/Settings/KeyBindings.cs \u2014 Listed row",
+  "game/Settings/UserSettings.cs \u2014 BigAnnouncements",
+  "game/Debug/UiCommands.cs, game/Debug/UiProbes.cs \u2014 chat command and probe"
+ ],
+ "files_add": [
+  "game/UI/Hud/ChatLog.cs \u2014 pooled fading log with history mode"
+ ],
+ "data_changes": [
+  "data/config/input.json: \"chat\": [\"key:Enter\"]"
+ ],
+ "tests": [
+  "ui.cmds: `boss king_slime 12` / `wait 0.5` / `assert ui.chat_lines >= 1` / `killall`",
+  "bosses.cmds and town.cmds still pass"
+ ],
+ "verification": [
+  "Lavapipe screenshot after summoning a boss: purple chat line at the bottom-left, no banner"
+ ],
+ "depends_on": [
+  "P2-01",
+  "P2-12"
+ ],
+ "risks": [
+  "The Enter key may conflict with the console LineEdit submit; the console is Modal and consumes it first."
+ ],
+ "effort": "S"
+}

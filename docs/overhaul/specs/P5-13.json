@@ -1,0 +1,53 @@
+{
+ "id": "P5-13",
+ "title": "Service framework: several services per NPC, shop tabs and currencies, Nurse progression pricing, Dryad world status",
+ "player_outcome": "NPCs offer every button Terraria gives them. The Painter has Shop and Decor, the Tavernkeep takes Defender Medals, the Nurse's price rises as you progress (and doubles in Expert), and the Dryad's 'Status' reports how pure, corrupt and hallowed the world is.",
+ "design": [
+  "Verified: TownNpcDef.Service is a single TypedSpec (TownNpcDef.cs:71) and TownDialog.RebuildButtons is a type if-chain (TownDialog.cs:101-130).",
+  "TownNpcDef: add Services (TypedSpec[]). Keep the legacy 'service' and normalise both into a [JsonIgnore] AllServices, with a FindService(string type) helper. TownCommerce/TownServices use FindService instead of 'npc.Def.Service is {Type: ...}'. Make TownServices partial so new services get their own files.",
+  "ShopEntry: add Tab (string, default 'shop') and Currency (item id; the price counts that item and is not happiness-scaled). TownCommerce: Stock(npc, player, tab = 'shop'), Tabs(npc) and Buy(npc, player, item, count, tab). Currency is removed from the backpack with inv.Remove(d => d.Id == currency, n).",
+  "Nurse: HealServiceParams gets Tiers [{flag, multiplier}] (the first set flag wins, ordered strongest first), PerDebuff (copper), ExpertMultiplier, and CostPerLife as the base. Data follows Terraria's Nurse formula (golem 200, plantera 150, mech 100, hardmode 60, skeleton or queen bee 25, evil boss 10, EoC 3, else 1; \u00d72 Expert; verify on the wiki).",
+  "New service 'worldStatus' (WorldStatusParams {evilBiomes, hallowBiomes, text}). Core Gameplay/Town/WorldStatus.cs is an incremental sampler that avoids spikes: a 32-cell XZ grid at surface and underground depths, 256 samples per tick, using Generator.Biomes.BiomeAt plus Session.ZonesAt (no TileObjects, so it is cheap), cached for one in-game hour. Text: '{world} is {pure}% pure, {evil}% {evilName} and {hallow}% hallowed.'",
+  "TownDialog split (it is 255 lines and every later package adds to it). TownDialog.cs keeps layout, open/close and Report. TownDialog.Shop.cs holds the tabbed lists (moved from ShowShop). TownDialog.Services.cs holds a static registry Dictionary<string, Func<TownDialog, TownNpc, TypedSpec, ServiceButton?>> keyed by service type (no switch), registering heal, craftHelp, summonBoss, reforge, taxes, anglerQuest, worldStatus and the implicit happiness.",
+  "EngineCommands 'ui': add 'ui shop <tab>' and 'ui service <type>' for smoke scripts. EngineCommands.cs is 157 lines; put them in a new EngineCommands.Town.cs."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 Services, AllServices, FindService",
+  "src/Strata.Core/Content/Defs/TownNpcParts.cs \u2014 ShopEntry.Tab/Currency",
+  "src/Strata.Core/Content/Specs/TownServiceSpecs.cs \u2014 Heal tiers, WorldStatusParams, registration",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 tabs, currency, tiered heal",
+  "src/Strata.Core/Gameplay/Town/TownServices.cs \u2014 partial; FindService",
+  "src/Strata.Core/Content/Validation/ContentValidator.Town.cs \u2014 all services, currency ref, tabs",
+  "game/UI/TownDialog.cs \u2014 slimmed",
+  "game/Debug/EngineCommands.cs \u2014 delegate to the Town partial",
+  "data/town/*.json \u2014 services arrays, nurse tiers, dryad worldStatus"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/WorldStatus.cs \u2014 incremental purity sampler",
+  "game/UI/TownDialog.Shop.cs \u2014 tabbed shop",
+  "game/UI/TownDialog.Services.cs \u2014 service button registry",
+  "game/Debug/EngineCommands.Town.cs \u2014 ui shop/service"
+ ],
+ "data_changes": [
+  "nurse services: heal with tiers; dryad services: worldStatus; painter shop entries later tagged tab 'decor'"
+ ],
+ "tests": [
+  "TownServicesTests.MultipleServices: an NPC with reforge + shop shows both",
+  "TownServicesTests.NurseTierPricing: the price rises after flag defeated_skeletron; \u00d72 on an Expert TestGame",
+  "TownServicesTests.CurrencyPurchase: a defender_medal priced entry consumes medals, not coins (use a test item until P5-16)",
+  "WorldStatusTests: after enough ticks the percentages sum to 100 and are cached",
+  "Smoke town.cmds: 'town summon dryad 0 0 -3' / 'ui talk dryad' / 'ui service worldStatus' / 'ui close' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "dotnet test; validate",
+  "town.cmds SMOKE PASS; in game the Dryad Status text appears and the Nurse price differs before and after Skeletron"
+ ],
+ "depends_on": [
+  "P5-04"
+ ],
+ "risks": [
+  "The UI phase restyles TownDialog (top-centre box, text buttons, grid shop with buyback). Land this split first or agree on the partial layout; the grid shop can then replace TownDialog.Shop.cs only.",
+  "WorldStatus sampling is approximate (biome-based, not a per-block count). Document that."
+ ],
+ "effort": "M"
+}

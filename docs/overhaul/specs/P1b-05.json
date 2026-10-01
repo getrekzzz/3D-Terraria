@@ -1,0 +1,48 @@
+{
+ "id": "P1b-05",
+ "title": "Spike instrumentation: F3 spike log, GC counters, perf probes and a perf.cmds baseline",
+ "player_outcome": "Pressing F3 shows the worst recent hitch and what caused it (for example 'save 40 ms, colliders 12 ms, GC gen2'). This lets every later fix be proven and regressions be caught.",
+ "design": [
+  "Add src/Strata.Core/Diagnostics/SpikeLog.cs. Metrics gets `TrackFrames`; while it is on, Record() also adds into the current frame's totals.",
+  "EndFrame(double frameMs) keeps counters for frames over 33, 50 and 100 ms and WorstMs. For frames of 33 ms or more it stores a Spike {frame, ms, top-5 timers, GC gen0/1/2 deltas from GC.CollectionCount, GC pause delta from GC.GetTotalPauseDuration()} in a 64-entry ring.",
+  "PerfCommands: add `perf spikes [n]`; `perf report` header adds spike counts and GC counts.",
+  "Probes: perf.frames_over_33, perf.frames_over_50, perf.worst_ms, perf.gc2, perf.gc_pause_ms, plus prefix probes perf.max.<timer>, perf.avg.<timer>, perf.calls.<timer> (CommandContext.AddPrefixProbe).",
+  "Add game/Debug/FrameProbe.cs, a Node with ProcessPriority = int.MaxValue. It measures the real frame time from Time.GetTicksUsec() deltas (physics + process) and calls Metrics.Frame.EndFrame. WorldLauncher.Launch adds it.",
+  "PerfOverlay (F3): opening it turns on Metrics.Frame (today the timers run only after `perf start`). Add the line 'spikes >33 ms N (worst X) \u00b7 last: 72 ms save.capture 40.1 gd.colliders 12.0 \u00b7 GC a/b/c pause y ms'.",
+  "Add timer scopes at the suspected sources: ColliderManager.Build \u2192 gd.colliders.build; TileObjectRenderer.Rebuild \u2192 gd.objects.rebuild; GrassRenderer.Create \u2192 gd.grass.create; NpcRenderer.Create/Acquire \u2192 gd.npcs.create; ProjectileRenderer.Create \u2192 gd.projectiles.create; GameWorld.Tick autosave \u2192 tick.autosave; ChunkStreamer.FlushSaves \u2192 stream.unload_flush; DynamicResolution change \u2192 gd.dynres.change.",
+  "Add game/Testing/Scripts/perf.cmds (CI runs every Scripts/*.cmds). Sequence: wait_until player.frozen == 0 300 and stream.idle 900; perf start; biome desert / biome tundra / tp spawn, each followed by wait_until stream.idle == 1 900; save; place torch at 10 offsets; liquid water 3 0 3 5 2 5 then wait 3; give a magic weapon, wield it and use \u00d720; spawn zombie 5; spawn demon_eye 3; perf report 40; perf spikes 10; assert errors == 0; assert perf.worst_ms < 5000 (smoke-only in headless CI). Later WPs add structural asserts.",
+  "docs/architecture/rendering.md: new 'Measuring hitches' section covering the F3 spike line, perf start/spikes/report, perf.cmds headless vs rendering runs (dev GPU: --graphics=medium --view=6), and before/after comparison."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Diagnostics/Metrics.cs \u2014 TrackFrames, per-frame totals, EndFrame delegate to SpikeLog",
+  "src/Strata.Core/Commands/PerfCommands.cs \u2014 perf spikes, report header, probes",
+  "game/UI/PerfOverlay.cs \u2014 spike and GC lines; auto-enable profiling while visible",
+  "game/Bootstrap/WorldLauncher.cs \u2014 add FrameProbe",
+  "game/World/ColliderManager.cs, game/World/TileObjectRenderer.cs, game/World/GrassRenderer.cs, game/Entities/NpcRenderer.cs, game/Entities/ProjectileRenderer.cs, src/Strata.Core/Session/GameWorld.cs, src/Strata.Core/Streaming/ChunkStreamer.Scheduling.cs, game/Rendering/DynamicResolution.cs \u2014 timer scopes only",
+  "docs/architecture/rendering.md \u2014 measuring hitches"
+ ],
+ "files_add": [
+  "src/Strata.Core/Diagnostics/SpikeLog.cs \u2014 per-frame totals and spike ring",
+  "game/Debug/FrameProbe.cs \u2014 end-of-frame timing hook",
+  "game/Testing/Scripts/perf.cmds \u2014 perf smoke / probe script",
+  "tests/Strata.Core.Tests/Diagnostics/SpikeLogTests.cs \u2014 spike logging tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "SpikeLogTests: frames under the threshold are not logged; a spike keeps its top-5 timers sorted by ms; the ring keeps the last 64; counters reset on perf start",
+  "SpikeLogTests: perf.max.<timer> probe returns the recorded max via CommandContext",
+  "Smoke: `game/Testing/Scripts/perf.cmds` ends with `assert errors == 0` and `assert perf.worst_ms < 5000`"
+ ],
+ "verification": [
+  "dotnet test; headless run of perf.cmds prints SMOKE PASS",
+  "Rendering run on a dev GPU or lavapipe: godot --path . -- --world=perf --size=small --new --view=6 --graphics=medium --smoke=res://game/Testing/Scripts/perf.cmds; save the `perf spikes` output as the baseline for P1b-06..16",
+  "In game: F3 shows the spike line; wait for the 2-minute autosave and confirm tick.autosave shows up (baseline)"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Frame timing in headless CI is CPU-only and noisy: CI asserts stay generous; the real evidence comes from rendering runs",
+  "Metrics.Record is on hot paths: keep per-frame tracking lock-free (ConcurrentDictionary) and off unless F3 or perf is active",
+  "Touches many files lightly (timer scopes only); land it early to avoid conflicts"
+ ],
+ "effort": "M"
+}

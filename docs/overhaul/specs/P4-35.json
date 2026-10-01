@@ -1,0 +1,40 @@
+{
+ "id": "P4-35",
+ "title": "Realistic rebuild: Pumpkin Moon and Frost Moon bosses (Mourning Wood, Pumpking, Everscream, Santa-NK1)",
+ "player_outcome": "The moon-event bosses stop looking like primitive assemblies. Mourning Wood is a gnarled haunted tree that stalks on its roots, Pumpking a cloaked jack-o'-lantern lord with scythe hands, Everscream an evil ornamented pine, and Santa-NK1 a festive war tank.",
+ "design": [
+  "New tools/blender/bgen/bosses_moons.py (split into bosses_moons2.py if near 400 lines).",
+  "mourning_wood: organic trunk (detail.organic), bark layer, carved glowing face, root legs rigged with a walk clip.",
+  "pumpking: a pumpkin head with a carved glowing face and stem crown, a tattered cloak body, and separate 'pumpking_blade' hand models so its hands can later become parts via HandBrain 'swipe'.",
+  "everscream: a pine with ornaments, glowing eyes and a maw.",
+  "santa_nk1: tank treads, a hull, a santa-faced turret on a rotating turret bone, and a rocket pod.",
+  "Tri targets 6\u201312k. Clips via bosses_pre2.clips.",
+  "Switch the assets.json generators, rebuild, and update the boss icons (P4-03 --boss-icons).",
+  "Retire festive.py's primitive generators once they are unused."
+ ],
+ "files_modify": [
+  "tools/blender/assets.json \u2014 generator switch",
+  "tools/blender/build_all.py \u2014 lookup",
+  "tools/blender/bgen/festive.py \u2014 remove superseded generators"
+ ],
+ "files_add": [
+  "tools/blender/bgen/bosses_moons.py \u2014 moon-event bosses",
+  "assets/models/creatures/{mourning_wood,pumpking,pumpking_blade,everscream,santa_nk1}.glb \u2014 generated"
+ ],
+ "data_changes": [
+  "Optional: pumpking parts [pumpking_blade \u00d72] with the HandBrain swipe style (a data follow-up)."
+ ],
+ "tests": [
+  "build_all.py --check; AssetCoverage; smoke hardmode/events scripts spawning them stay error-free"
+ ],
+ "verification": [
+  "tools/blender/preview.py contact sheets; the boss gallery tour (game/Testing/Tours/bosses.cmds) screenshots at medium graphics"
+ ],
+ "depends_on": [
+  "P4-03"
+ ],
+ "risks": [
+  "Rig clip names must match what NpcRenderer.Motion plays (idle/move/attack). Reuse bosses_pre2.clips naming."
+ ],
+ "effort": "M"
+}

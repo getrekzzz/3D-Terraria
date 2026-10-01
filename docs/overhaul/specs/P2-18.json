@@ -1,0 +1,41 @@
+{
+ "id": "P2-18",
+ "title": "Crafting panel: recipe slot column, materials row, 'Required Objects', craft to cursor, hold-to-craft, no flicker",
+ "player_outcome": "Crafting sits in a bottom-left column of item slots, as in Terraria. The selected recipe is enlarged, with its materials as small slots (red count when you are short) and 'Required Objects: Iron Anvil or Lead Anvil'. Clicking puts the result on your cursor; holding right-click crafts faster and faster. Tooltips stay put instead of vanishing every half second.",
+ "design": [
+  "Core: `RecipeBook.CraftInto(ref ItemStack cursor, CompiledRecipe r, Inventory inv, IReadOnlySet<string> stations, ConditionContext ctx)`. It merges into a cursor holding the same item with space left, refuses when the cursor holds something else, and uses the same atomic input removal as Craft. Also `CraftingEnvironment.Signature(List<Entry>)`, a stable hash of (recipe id, CanCraft, MaxCrafts).",
+  "Rewrite game/UI/CraftingPanel.cs and add CraftingPanel.Recipe.cs.\n- A ScrollContainer of pooled recipe ItemSlotViews (SlotKind.Crafting; the selected one CraftingSelected at 1.25\u00d7), scrolled with the mouse wheel.\n- Detail area: the output slot; a 'Materials' HBox of 32 px ingredient slots whose count label turns red when short (group ingredients read 'Any Wood'); 'Required Objects: \u2026' from Core StationNames; plus condition and liquid text.\n- A 'Show all' hammer toggle lists known but uncraftable recipes greyed. The default is craftable only.",
+  "Refresh only on change:\n- A dirty flag set from PlayerInventory.Backpack.Changed, rebuilding at most once per frame.\n- A 0.5 s poll of the station and liquid sets that dirties only when the HashSets differ.\n- Rebuild only when Signature differs; otherwise update counts in place.\n- Remove the unconditional 0.5 s Refresh (CraftingPanel.cs:38-43) and QueueFree loop (:51).",
+  "Actions:\n- Left-click on the output: CraftInto the cursor, with the craft sound.\n- Shift-click: craft as many as fit into the backpack (the existing loop).\n- Right-button hold: CraftInto repeatedly at HoldRepeat.IntervalTicks, with the sound throttled to one per 0.1 s.\n- Refusals go to the StatusLine.",
+  "UiCommands gains `ui craft <item> [n]`, which clicks the recipe's output via the panel path. UiProbes gains `ui.recipes`."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Crafting/RecipeBook.cs \u2014 CraftInto",
+  "src/Strata.Core/Gameplay/Crafting/CraftingEnvironment.cs \u2014 Signature",
+  "game/UI/CraftingPanel.cs \u2014 slot column, detail, refresh on change, hold-to-craft",
+  "game/Debug/UiCommands.cs \u2014 ui craft",
+  "game/Debug/UiProbes.cs \u2014 ui.recipes",
+  "tests/Strata.Core.Tests/Gameplay/InventoryCraftingTests.cs \u2014 CraftInto tests"
+ ],
+ "files_add": [
+  "game/UI/CraftingPanel.Recipe.cs \u2014 selected-recipe detail and materials row"
+ ],
+ "data_changes": [],
+ "tests": [
+  "InventoryCraftingTests: CraftIntoCursorMergesSameItem; CraftIntoRefusesDifferentCursorItemAndFullStack; SignatureStableAcrossIdenticalBrowses",
+  "ui.cmds:\n- `place work_bench 3 0 0` / `give wood 20` / `ui inventory` / `wait 0.6` / `assert ui.recipes > 0`.\n- `ui craft wooden_sword` / `assert inv.cursor == 1`.\n- `ui close` / `assert inv.wooden_sword == 1`."
+ ],
+ "verification": [
+  "Headless ui.cmds SMOKE PASS",
+  "Manual/lavapipe: hover a recipe for 3 s and the tooltip stays; the station line reads display names; F3 gd.inventory_ui stays low when idle"
+ ],
+ "depends_on": [
+  "P2-04",
+  "P2-10",
+  "P2-15"
+ ],
+ "risks": [
+  "The NPC phase's Guide 'help' slot should reuse the recipe slot view and detail builder; keep them public."
+ ],
+ "effort": "M"
+}

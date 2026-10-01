@@ -1,0 +1,44 @@
+{
+ "id": "P3-07",
+ "title": "First-person view model per use style (data-driven poses, aim at crosshair, recoil)",
+ "player_outcome": "In first person, guns and bows are held out and point exactly at the crosshair, with a recoil kick on every shot. Potions and food are raised to the mouth and crystals lifted into view. Staffs point, tomes are held open, and swords and tools sweep the same arc that hits. Motion is smooth, with no one-frame snaps.",
+ "design": [
+  "Verified: ViewModel.cs:51-72 has three hard-coded motions and 'everything else lifts 8 cm'. Rest rotation (\u22120.35, 0.25, 0.15) points guns roughly 70\u00b0 up.",
+  "Split game/Player/ViewModel.cs (setup, item, light) from a new ViewModel.Poses.cs (pose evaluation).",
+  "use_styles.json fp per style: rest {pos, rot}; keys [{t, pos, rot, ease}] relative to rest; aimAtCrosshair (bool); raiseToFace (bool); recoil {pos, rot, decay}. The Core UseStyleConfig gains the fp model and validation.",
+  "aimAtCrosshair: rotate so the model's muzzle/tip socket forward axis converges on the screen centre at 20 m.",
+  "Swing and tool styles sample SwingCurve (P3-04); rapier and spear extend along the view.",
+  "Phase: t = 1 \u2212 (UseAnimation \u2212 interpolation)/UseAnimationMax (from P3-01).",
+  "Recoil: a Kick() impulse on local ItemUse.Shot, decaying over recoil.decay.",
+  "Yoyo and flail keep the arm extended while the tether is out (query Projectiles.TetherOf later; stub now).",
+  "Expose TrySocket(name, out Transform3D) in FP for muzzle flashes and strings."
+ ],
+ "files_modify": [
+  "game/Player/ViewModel.cs \u2014 setup/model only; socket API; recoil hook",
+  "src/Strata.Core/Presentation/UseStyleConfig.cs \u2014 fp model + validation",
+  "data/config/use_styles.json \u2014 fp poses for all styles"
+ ],
+ "files_add": [
+  "game/Player/ViewModel.Poses.cs \u2014 keyed pose evaluation, aim-at-crosshair, recoil"
+ ],
+ "data_changes": [
+  "use_styles.json fp blocks for all 16 styles (swing, rapier, spear, gun, bow, staff, tome, throw, holdUp, drink, eat, yoyo, flail, whip, place, shoot)"
+ ],
+ "tests": [
+  "Validator: fp keys increasing in t (Strata.Tools validate)",
+  "Tour: 'camera first' plus a timescale-0.01 screenshot mid-use for gun, bow, staff, potion, crystal, sword and pickaxe"
+ ],
+ "verification": [
+  "FP screenshots: the gun barrel line passes through the crosshair; nothing clips the near plane at FOV 70\u2013110",
+  "No per-frame allocations (ViewModel profile gd.view_model < 0.1 ms)"
+ ],
+ "depends_on": [
+  "P3-04",
+  "P3-06"
+ ],
+ "risks": [
+  "Tuning time for 16 styles.",
+  "Near-plane clipping at high FOV; clamp the rest pose depth."
+ ],
+ "effort": "M"
+}

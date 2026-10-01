@@ -1,0 +1,48 @@
+{
+ "id": "P4-31",
+ "title": "Golem: sealed body, killable head that flies free, punching fists",
+ "player_outcome": "Golem's body is sealed while its head lives. The head spits fireballs and eye lasers, and when destroyed it flies free, still firing, until the body falls. Its stone fists punch out at you and can be broken. It enrages if you leave the temple.",
+ "design": [
+  "golem (model golem_body): pattern ground with walk and hop. Landings use slam or hop plus an AfterMove impact.",
+  "Phase shieldedBy 'golem_head'. Parts: golem_head [0, 2.6, 0.2] with Bar true; golem_fist [\u22122.0, 0.6, 0.4] mirror true; golem_fist [2.0, 0.6, 0.4].",
+  "Enrage {when [{type biome, none [temple]}], damage 1.5, speed 1.5} if a temple zone biome exists; else skip.",
+  "golem_head: anchored pattern brain with fireball and eye-laser volleys; boss block with the same flag so it shows on the bar. onDeath spawnEnemies golem_head_free, with a new SpawnEnemiesParams.Tether: the child is tethered to the dying npc's Leader and dies with the body.",
+  "golem_head_free: flyer brain with the golem_laser ranged attack; invulnerable.",
+  "golem_fist: skeletronHand brain, new style 'punch' (launch straight at the target at 20 m/s, hold 10 ticks, retract).",
+  "Terraria values (tune): body 39000/26 defense/72 damage; head 16000/20 defense; fists 6000/26 defense/59 damage.",
+  "Update bosses.cmds for the parts."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/HandBrain.Styles.cs \u2014 punch",
+  "src/Strata.Core/Content/Specs/CreatureEffectSpecs.cs \u2014 SpawnEnemiesParams.Tether",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Effects.cs \u2014 tethered death spawns",
+  "data/enemies/temple.json \u2014 Golem, head, free head, fist",
+  "game/Testing/Scripts/bosses.cmds \u2014 Golem part assertions"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/GolemTests.cs \u2014 Golem tests"
+ ],
+ "data_changes": [
+  "Golem restructured into body, head, free head and fists."
+ ],
+ "tests": [
+  "GolemTests.BodyIsSealedUntilItsHeadFalls.",
+  "GolemTests.TheFallenHeadFliesFreeUntilTheBodyDies.",
+  "GolemTests.FistsPunchAtTheTargetAndCanBeBroken.",
+  "GolemTests.SlayingTheBodyEndsTheFight.",
+  "Smoke bosses.cmds: 'boss golem 14', 'assert npcs.golem_head == 1', 'assert npcs.golem_fist == 2', 'slay golem_head', 'assert npcs.golem_head_free == 1', 'slay golem', 'assert flag.defeated_golem == 1', 'assert npcs.golem_head_free == 0'."
+ ],
+ "verification": [
+  "dotnet test; headless bosses.cmds; boss gallery screenshot"
+ ],
+ "depends_on": [
+  "P4-02",
+  "P4-28",
+  "P4-29"
+ ],
+ "risks": [
+  "The Lihzahrd Altar summon (ObjectInteraction.Activate) spawns 'golem'. Parts spawn with it automatically.",
+  "Confirm a 'temple' zone biome id exists before adding the enrage."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,57 @@
+{
+ "id": "P5-01",
+ "title": "Town population rules: count only living housed residents, day-only move-ins, respawn at dawn",
+ "player_outcome": "New residents only arrive during the day. Dead residents, the Old Man and bound NPCs no longer count toward requirements like 'needs N residents'. A slain resident returns the next morning instead of after a fixed 6-minute timer.",
+ "design": [
+  "Verified: TownSystem.cs:67 runs move-in checks at any hour. TownSystem.cs:141 counts every resident, dead ones and the Old Man included. TownSystem.Movement.cs:16-19 revives purely by RespawnTicks (21600). EventDirector.cs:130 builds its own resident set.",
+  "Move ShopEntry, DialogueLine and MoodEntry out of TownNpcDef.cs into a new TownNpcParts.cs to make room for later fields. Add enum TownNpcKind {Resident, Landmark} (later WPs add Visitor and Pet) and a [JsonIgnore] TownNpcDef.Kind derived from Landmark.",
+  "TownNpc: add Bound (bool), DiedAtTick (long, -1), CountsAsResident => Alive && !Bound && Def.Kind == Resident, and IsHoused => CountsAsResident && Home != null.",
+  "ConditionContext gets a ResidentCount (int) field, and the 'residents' condition in ConditionCompiler reads ResidentCount instead of Residents.Count. Add TownSystem.FillTownFacts(ctx): Residents = ids of CountsAsResident residents; ResidentCount = number of IsHoused residents. TownContext and EventDirector.Roll both call it.",
+  "TownSystem.CheckArrivals(bool force = false): homeless residents are re-housed at any hour, but new arrivals need force || Clock.IsDay. Tick passes false. The 'town check [force]' subcommand passes force.",
+  "New TownSystem.Life.cs partial: move Revive and Vanish here and add ShouldRevive(r). When TownConfig.RespawnAtDawn is set, revive once Tick >= the first dawn after DiedAtTick and Tick - DiedAtTick >= MinDeadTicks. The first dawn is dayStart + DawnHour*TicksPerHour, plus one day if the death came after that dawn. Otherwise keep the RespawnTicks delay. Damage() and Vanish() set DiedAtTick.",
+  "WorldMeta.ResidentModel: append the optional ctor params Bound = false and DiedAt = -1. System.Text.Json fills in defaults, so no version bump. Update Persist/Load to match.",
+  "TownCommands: add 'town slay <id>' (calls TownSystem.Slay) for smoke scripts. Keep TownCommands.cs under 150 lines by putting the new debug subcommands in a new TownDebugCommands.cs registered from TownCommands.Register."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 TownNpcKind + Kind; move helper classes out",
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 Bound, DiedAtTick, CountsAsResident, IsHoused",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 FillTownFacts, CheckArrivals(force), persist the new fields",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Movement.cs \u2014 dead branch calls ShouldRevive; Revive moves to Life.cs",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Combat.cs \u2014 set DiedAtTick on death",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Landmarks.cs \u2014 Vanish moves to Life.cs",
+  "src/Strata.Core/Gameplay/Town/TownConfig.cs \u2014 RespawnAtDawn, MinDeadTicks",
+  "src/Strata.Core/Conditions/ConditionContext.cs \u2014 ResidentCount",
+  "src/Strata.Core/Conditions/ConditionCompiler.cs \u2014 'residents' uses ResidentCount",
+  "src/Strata.Core/Gameplay/Events/EventDirector.cs \u2014 use Town.FillTownFacts",
+  "src/Strata.Core/Persistence/WorldMeta.cs \u2014 ResidentModel optional Bound/DiedAt",
+  "src/Strata.Core/Commands/TownCommands.cs \u2014 'check [force]'; register the debug commands"
+ ],
+ "files_add": [
+  "src/Strata.Core/Content/Defs/TownNpcParts.cs \u2014 ShopEntry, DialogueLine, MoodEntry (and the rescue/attack/visit blocks added later)",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Life.cs \u2014 death, dawn revive, vanish",
+  "src/Strata.Core/Commands/TownDebugCommands.cs \u2014 town slay/bind/rescue/pose/visit subcommands (filled in by later WPs)"
+ ],
+ "data_changes": [
+  "data/config/town.json: add \"respawnAtDawn\": true, \"minDeadTicks\": 1800"
+ ],
+ "tests": [
+  "TownTests.SlainResidentReturnsAtDawn: slay the guide at 20:00; still dead at 23:00 and 3:00; alive after 4:31 the next day",
+  "TownTests: replace the RespawnTicks assertions (TownTests.cs:186-187) with the dawn behaviour, and keep one test with RespawnAtDawn=false",
+  "TownTests.ArrivalsWaitForDaylight: hour 22 with a vacant home and 50 silver \u2192 CheckArrivals() == null; CheckArrivals(force:true) brings the merchant; ticking a night does not spawn",
+  "TownTests.DeadAndLandmarkResidentsDoNotCount: old_man placed and the guide dead \u2192 ResidentCount 0 and the 'residents min 1' condition is false",
+  "Persistence: a dead resident's DiedAtTick and Bound survive Persist/Load",
+  "Smoke game/Testing/Scripts/town.cmds (after the night-walk block): 'town slay guide' / 'assert town.guide.alive == 0' / 'time 3' / 'wait 1' / 'assert town.guide.alive == 0' / 'time 5' / 'wait_until town.guide.alive == 1 10'"
+ ],
+ "verification": [
+  "dotnet build Strata.sln; dotnet test tests/Strata.Core.Tests (TownTests, EventTests)",
+  "Godot headless: town.cmds prints SMOKE PASS",
+  "In game: kill the guide with lava at dusk. He does not return until morning, and 'town' lists him as dead until then."
+ ],
+ "depends_on": [],
+ "risks": [
+  "The party event (EventDirector) now sees only residents who count, so a party cannot start while the Party Girl is dead. That is intended.",
+  "The Old Man's Vanish now returns him at the next dawn instead of after 6 minutes, which is closer to Terraria.",
+  "Edits the same TownSystem files as P5-02, P5-05, P5-06 and P5-19; land this first."
+ ],
+ "effort": "M"
+}

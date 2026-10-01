@@ -1,0 +1,53 @@
+{
+ "id": "P4-24",
+ "title": "Wall of Flesh: Terraria life, The Tongued, Leeches, faster lasers as it weakens",
+ "player_outcome": "Run too far from the Wall and its tongue reels you in, helpless, toward the mouth. Leeches squirm out of its mouth more often as it weakens, and its eyes fire faster. Its 8000 life is shared by mouth and eyes, as in Terraria.",
+ "design": [
+  "MawwallParams additions (BrainSpecs.cs): TongueDistance (m, 50), TongueBuff ('the_tongued'), TonguePull (m/s, 14), Leech (enemy id), LeechInterval (ticks at full life; scaled by 0.4 + 0.6 \u00d7 life), MaxLeeches (4), ExpertSpeed (1.25).",
+  "MawwallBrain: when the target is farther than TongueDistance ahead of the wall face (along Direction.X), call ctx.Pulse on the target for the_tongued, 30 ticks, and set the new BrainContext.Pull(target, velocity toward the mouth).",
+  "Pull plumbing: NpcSystem sets PlayerEntity.ExternalVelocity (new Vector3, cleared each tick). game/Player/PlayerController.cs replaces horizontal velocity with it while it is non-zero; the buff also blocks item use.",
+  "Leeches: spawn at the mouth, tethered (they do not die with the wall in Terraria; untethered is fine).",
+  "RangedAttack.IntervalAtZeroLife (int?). NpcSystem.RangedAttack uses lerp(Interval, IntervalAtZeroLife, 1 \u2212 life).",
+  "Data: wall_of_flesh life 8000 (Terraria Classic), ranged intervalAtZeroLife 25, brain tongueDistance 50, leech 'leech', leechInterval 420, maxLeeches 4.",
+  "the_hungry life 240.",
+  "New buff the_tongued: debuff, effects [noItemUse], covers terraria:the_tongued.",
+  "New enemy leech: worm brain {speed 11, turnRate 3, digRadius 0, airGravity 0}, segments 4, segmentSpacing 0.5, segmentRadius 0.3, model leech_head, segmentModel leech_body, tailModel leech_tail, life 60, damage 26, defense 2, boss {minor true}, covers terraria:leech.",
+  "Models: assets.json creatures leech_head, leech_body and leech_tail reuse the eater_head/eater_segment generators with radius 0.32 and pink-red flesh params."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/MawwallBrain.cs \u2014 tongue and leeches",
+  "src/Strata.Core/AI/Brain.cs \u2014 BrainContext.Pull",
+  "src/Strata.Core/Content/Specs/BrainSpecs.cs \u2014 MawwallParams",
+  "src/Strata.Core/Content/Defs/BossInfo.cs (RangedAttack stays in EnemyDef.cs) \u2014 IntervalAtZeroLife",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Effects.cs \u2014 life-scaled interval, pull",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 PlayerEntity.ExternalVelocity",
+  "game/Player/PlayerController.cs \u2014 apply ExternalVelocity",
+  "data/enemies/underworld.json \u2014 WoF, hungry, leech, the_tongued",
+  "tools/blender/assets.json \u2014 leech models",
+  "tools/content/reference/world.py \u2014 rows if missing"
+ ],
+ "files_add": [
+  "assets/models/creatures/leech_{head,body,tail}.glb \u2014 generated"
+ ],
+ "data_changes": [
+  "WoF life 8000, tongue and leech params, the_hungry 240 life, leech enemy, the_tongued buff."
+ ],
+ "tests": [
+  "MawwallTests.FleeingPlayersAreTongued: player 60 m ahead; buff present and ExternalVelocity points at the mouth.",
+  "MawwallTests.LeechesCrawlOutMoreOftenAsItWeakens.",
+  "MawwallTests.EyesFireFasterWhenHurt.",
+  "MawwallTests.LifeIsSharedByMouthAndEyes.",
+  "Smoke mawwall.cmds: 'wait 8', 'assert npcs.leech >= 1', 'assert errors == 0'."
+ ],
+ "verification": [
+  "dotnet test; headless mawwall.cmds; manual run away from the Wall in the underworld"
+ ],
+ "depends_on": [
+  "P4-01"
+ ],
+ "risks": [
+  "The pull fights the player controller's own velocity smoothing. Apply it after movement input so the player cannot out-run it.",
+  "PlayerController is also edited by the feel/hook phases. Keep this a small isolated block."
+ ],
+ "effort": "M"
+}

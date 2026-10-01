@@ -1,0 +1,43 @@
+{
+ "id": "P3-23",
+ "title": "Swords and projectiles smash pots and cut grass",
+ "player_outcome": "Swinging a sword or firing an arrow through a pot shatters it and spills its loot. Sword swings mow tall grass, flowers and mushrooms, just like exploring caves in Terraria.",
+ "design": [
+  "Verified: HitObject is only reached from the tool path (ItemUseSystem.cs:107). MeleeSystem only sweeps NPCs; projectiles never touch objects.",
+  "TileObjectDef.BreakByAttack (bool).",
+  "MeleeSystem.Tick: for each active swing, compute the AABB (cells) of the blade segment samples (P3-04 geometry) and query World.TileObjects.InBox. BreakByAttack objects intersecting the segment \u2192 Editor.BreakObject(obj, dropItems: true), which raises ObjectHit Broken (P3-21).",
+  "ProjectileSystem: each tick, for friendly projectiles, check TileObjects.At(cell of position) for BreakByAttack \u2192 BreakObject. The projectile continues without losing pierce.",
+  "Optional grass seeds: a 'grass_cut' loot table (grass_seeds 5% if the item exists) on grass tufts."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TileObjectDef.cs \u2014 BreakByAttack",
+  "src/Strata.Core/Gameplay/Entities/MeleeSystem.cs \u2014 object sweep",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 object pass-through breaking",
+  "data/tileobjects/nature.json \u2014 breakByAttack flags",
+  "data/loot/containers.json \u2014 optional grass_cut"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/AttackBreaksObjectsTests.cs \u2014 pot/grass tests"
+ ],
+ "data_changes": [
+  "breakByAttack true: pot, grass_tuft, flower, fern, mushroom_plant, glowing_mushroom_plant (and other decor plants; not stalagmites or rubble)"
+ ],
+ "tests": [
+  "AttackBreaksObjectsTests: a copper_broadsword swing breaks a pot 1.5 m in front and spawns its loot",
+  "AttackBreaksObjectsTests: a wooden arrow through a grass_tuft removes it and keeps flying; hostile projectiles do not break pots",
+  "Smoke combat.cmds: 'place pot 0 0 3' / 'wield copper_broadsword' / 'aim 0 -0.3 1' / 'use' / 'wait 0.5' / 'assert objects.count == 0' (the arena is cleared of objects beforehand)"
+ ],
+ "verification": [
+  "dotnet test",
+  "Smoke PASS",
+  "Lavapipe: pot shatter with chips and sound"
+ ],
+ "depends_on": [
+  "P3-04",
+  "P3-21"
+ ],
+ "risks": [
+  "The TileObjects.InBox query per tick per swing: bound the box to \u2264 8\u00d78\u00d78 cells and only during active swings."
+ ],
+ "effort": "S"
+}

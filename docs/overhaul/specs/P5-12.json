@@ -1,0 +1,47 @@
+{
+ "id": "P5-12",
+ "title": "Terraria happiness: biome/neighbour love-hate, crowding, solitude, Princess, happiness dialogue",
+ "player_outcome": "Prices follow Terraria's happiness rules: loved biomes and neighbours give discounts, a crowded town costs more, living alone is a bonus, and the Princess makes everyone happier. A 'Happiness' button in each NPC's chat explains how they feel ('I love living in the Forest!', 'It's too crowded here.').",
+ "design": [
+  "Verified: TownCommerce.Mood/PriceFactor (TownCommerce.cs:77-99) is a linear score with a 25 m radius and no solitude or Princess factor.",
+  "New Gameplay/Town/TownHappiness.cs: Evaluate(TownNpc npc) \u2192 HappinessReport(float Factor, List<HappinessReason> Reasons). Multipliers from TownConfig.Happiness: love 0.88, like 0.94, dislike 1.06, hate 1.12 (scores \u00b12/\u00b11). Biome at home, layer at home (new MoodEntry.Layer, for Underground), neighbours within NearRadius (12.5 m = 25 tiles) and far counts within FarRadius (60 m). Crowded: +0.05 for each near neighbour over 3. Solitude: \u22642 near and \u22644 far gives 0.95. Princess (TownNpcDef.LovedByAll) nearby counts as loved. Homeless adds a penalty. Clamp to Min/MaxPriceFactor. Non-resident kinds get factor 1.",
+  "TownCommerce.PriceFactor delegates to TownHappiness; keep Mood(npc, out n) as a thin wrapper for existing tests or update them.",
+  "Dialogue: TownConfig.HappinessLines templates per reason key (loveBiome 'I love living in the {biome}!', hateNeighbor 'I can't stand being near {neighbor}.', crowded, solitude, homeless 'I need a place to call home.', princess 'The Princess brightens my day.', content 'I'm content.'). TownNpcDef.HappinessLines holds optional per-NPC overrides. TownHappiness.Describe(report) \u2192 string.",
+  "TownDialog: a 'Happiness' button for housed residents (through the P5-13 service registry as the implicit 'happiness' entry).",
+  "Data: rewrite every NPC's mood array from Terraria 1.4's happiness table (biome mapping: Forest\u2192forest, Underground\u2192layer underground/cavern, Desert\u2192desert, Snow\u2192tundra, Jungle\u2192jungle, Ocean\u2192ocean, Hallow\u2192hallow, Mushroom\u2192mushroom). Princess gets lovedByAll: true."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 delegate to TownHappiness",
+  "src/Strata.Core/Gameplay/Town/TownConfig.cs \u2014 happiness multipliers, radii, templates",
+  "src/Strata.Core/Content/Defs/TownNpcParts.cs \u2014 MoodEntry.Layer",
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 LovedByAll, HappinessLines",
+  "src/Strata.Core/Content/Validation/ContentValidator.Town.cs \u2014 exactly one of biome/neighbor/layer",
+  "src/Strata.Core/Commands/TownCommands.cs \u2014 the 'town' listing shows factor and reasons",
+  "data/config/town.json \u2014 happiness block",
+  "data/town/*.json \u2014 mood tables, Princess flag"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownHappiness.cs \u2014 report and describe",
+  "tests/Strata.Core.Tests/Gameplay/TownHappinessTests.cs"
+ ],
+ "data_changes": [
+  "all 29 mood arrays re-authored from the Terraria happiness table; town.json happiness config"
+ ],
+ "tests": [
+  "TownHappinessTests: a loved biome gives factor \u22480.88; a hated neighbour 1.12; 5 near neighbours \u22481.10; solitude 0.95; the Princess neighbour lowers the factor; clamping; Describe includes the biome line",
+  "TownTests.PriceFactor tests (TownTests.cs:134-137) updated to the new expectations"
+ ],
+ "verification": [
+  "dotnet test",
+  "In game: the 'town' console lists factors; the Happiness button text matches the NPC's situation"
+ ],
+ "depends_on": [
+  "P5-04",
+  "P5-13"
+ ],
+ "risks": [
+  "Terraria's exact solitude and crowding numbers need verifying on the wiki (Happiness page), and pylons are out of scope.",
+  "The 3D radius over-counts stacked houses; use a horizontal distance with a vertical cap (config)."
+ ],
+ "effort": "M"
+}

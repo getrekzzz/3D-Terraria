@@ -1,0 +1,59 @@
+{
+ "id": "P3-09",
+ "title": "Shots leave the weapon (Core): muzzle origin, sky/cursor spawns, max-active, ammo saving, sword+projectile, dry fire",
+ "player_outcome": "Arrows and bullets come from the bow or gun, not your eyes. Starfury and the Daedalus Stormbow rain from the sky onto the cursor. Minions appear where you point. Swords like Starfury, Enchanted Sword, Terra Blade and Zenith both swing and shoot, and Zenith is never 'blocked'. The Megashark and friends save ammo. Empty guns click.",
+ "design": [
+  "Verified: ProjectileSystem.Fire spawns at p.Eye + dir*0.4 (ProjectileSystem.cs:89). The melee gate (ItemUseSystem.cs:154) rejects the Shot outcome, so the 15 sword+projectile items never melee. Returning projectiles block re-use (line 335), which blocks Zenith.",
+  "PlayerEntity.AimPoint (metres): InteractionController sets it with Aim (hit point, else eye + aim\u00b740); the fallback is Eye + Aim\u00b720.",
+  "New Core Gameplay/Interaction/ShotOrigin.cs: For(VoxelWorld, PlayerEntity, Holdout) = Eye + R\u00b7right \u2212 U\u00b7down + Aim\u00b7forward, pulled back to the last clear sample (every 0.1 m) when a solid cell lies between Eye and the point.",
+  "ShotRequest gains Origin and Direction; ProjectileSystem.Fire uses them and applies spread. Projectile.SpawnOrigin is recorded for visuals.",
+  "ShootProjectileParams.From ('muzzle' default | 'sky' | 'cursor' | 'eye'), plus SkyHeight (16 m) and SkyScatter (3 m). Sky spawns above AimPoint and aims at it. Minion projectiles always spawn at AimPoint, clamped to 12 m and nudged 1 m off surfaces.",
+  "ShootProjectileParams.MaxActive (int?; null \u2192 1 for Returns/Tether projectiles, else unlimited) replaces the hard-coded 'Returns > 0 \u2192 Blocked'.",
+  "ItemDef.AmmoSaveChance; Shoot uses _ammoRng.Chance(AmmoSave stat + item.AmmoSaveChance), and FindAmmo is untouched here.",
+  "Sword+projectile: when an item has both Melee/Thrust and Shoot, Use() performs the swing (Swung event) and also Shoot. The outcome is Swung, and the Shot event still fires.",
+  "Dry fire: on a fresh press with NoAmmo/NoMana, set UseCooldown = useTime (no animation) and raise Used with that outcome, so SoundEvents can play 'dry_fire' or 'fizzle' once per press."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 AimPoint",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 combined melee+shoot gate; dry-fire outcome",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs \u2014 origin, From, MaxActive, AmmoSaveChance",
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 From, MaxActive, SkyHeight, SkyScatter (+validation)",
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 AmmoSaveChance",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 Fire uses origin/direction; SpawnOrigin",
+  "game/Player/InteractionController.cs \u2014 sets Entity.AimPoint",
+  "game/Audio/SoundEvents.cs \u2014 dry_fire / fizzle on NoAmmo / NoMana"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Interaction/ShotOrigin.cs \u2014 muzzle origin with wall pull-back",
+  "tests/Strata.Core.Tests/Gameplay/ShotTests.cs \u2014 shot tests"
+ ],
+ "data_changes": [
+  "starfury, daedalus_stormbow, star_wrath: shootProjectile from 'sky' (add the behavior where only inferred)",
+  "zenith: shootProjectile maxActive 0",
+  "ammoSaveChance: minishark 0.33, megashark 0.5, chain_gun 0.5, vortex_beater 0.66, phantasm 0.66, s_d_m_g 0.66",
+  "use_styles.json holdout: gun {0.55, 0.22, 0.25}, bow {0.35, 0.18, 0.2}, staff {0.9, 0.2, 0.1}, throw {0.3, 0.25, 0.1}, tome {0.4, 0.1, 0.2}"
+ ],
+ "tests": [
+  "ShotTests: a wooden_bow arrow spawns \u2265 0.15 m to the right of the eye and ahead of it",
+  "ShotTests: facing a wall at 0.3 m, the arrow spawns at the eye side of the wall",
+  "ShotTests: starfury swing damages a dummy in front AND spawns starfury_star above AimPoint",
+  "ShotTests: zenith can be re-used while blades are out; wooden_boomerang still one at a time",
+  "ShotTests: megashark with a seeded rng consumes 40\u201360% of 1000 shots",
+  "ShotTests: slime_staff minion spawns within 1.5 m of AimPoint",
+  "ShotTests: NoAmmo raises Used only on fresh press",
+  "Smoke combat.cmds: 'give starfury 1' / 'wield starfury' / 'spawn zombie 1 3' / 'aim 0 0 1' / 'use' / 'assert projectiles.count >= 1'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate",
+  "Godot smoke combat.cmds PASS"
+ ],
+ "depends_on": [
+  "P3-01",
+  "P3-02"
+ ],
+ "risks": [
+  "The 3P aim point comes from P1's reworked aim ray; before P1 lands, AimPoint may sit behind the player. Clamp it to \u22651 m in front of Eye along Aim.",
+  "The ShotRequest signature change touches Fish() in ItemUseSystem.Utility.cs (update the constructor)."
+ ],
+ "effort": "M"
+}

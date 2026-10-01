@@ -1,0 +1,40 @@
+{
+ "id": "P4-23",
+ "title": "Dungeon integration: smoke route, screenshot tour stops, performance pass, docs",
+ "player_outcome": "The whole Skeletron-and-Dungeon arc is exercised end to end on every CI run and stays smooth while exploring.",
+ "design": [
+  "game/Testing/Scripts/dungeon.cmds walks the arc:",
+  "  keeper at the gate at night, Skeletron with hands, hands then head;",
+  "  the Guardian is gone after the flag;",
+  "  shaft bottom, a library ('assert near.blue_brick > 0' or the matching colour via a zone probe), a spike strip hurting, a locked chest opened with a key, the bound mechanic present;",
+  "  'assert props.problems == 0' and 'assert errors == 0'.",
+  "game/Testing/Tours/tour.cmds gains dungeon stops: keep facade at noon, foyer, a winding hall with banners, a library, a treasure room. game/Testing/Tours/bosses.cmds shows Skeletron with detached hands.",
+  "Perf pass: with 'perf' commands on Small at the medium preset, walk from the gate to the vault. Targets: no frame over 33 ms attributable to gd.objects, prop loads or collider rebuilds; plan time for the Large dungeon < 150 ms. Fix hotspots, e.g. raise the preload distance or cut object variety.",
+  "Docs: docs/architecture/worldgen.md (the dungeon planner, builder phases, decorator, planned wires, NoZone). docs/architecture/gameplay.md (boss parts, Expert context, enrage, treasure bags, locks, hazards, natural arrivals). docs/architecture/content-and-assets.md (boss icons, trophies, dungeon generators). The docs/3D_TERRARIA_MASTER_PLAN.md status table."
+ ],
+ "files_modify": [
+  "game/Testing/Scripts/dungeon.cmds \u2014 full arc",
+  "game/Testing/Tours/tour.cmds \u2014 dungeon stops",
+  "game/Testing/Tours/bosses.cmds \u2014 Skeletron with parts",
+  "docs/architecture/worldgen.md, docs/architecture/gameplay.md, docs/architecture/content-and-assets.md, docs/3D_TERRARIA_MASTER_PLAN.md \u2014 documentation"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "Smoke dungeon.cmds (extended) prints SMOKE PASS in CI (Tiny).",
+  "Screenshot tour (Small, lavapipe) completes with the new shots."
+ ],
+ "verification": [
+  "Headless: timeout 600 godot --headless --path . --audio-driver Dummy -- --world=smoke-dungeon --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/dungeon.cmds",
+  "lavapipe tour: xvfb-run godot --rendering-driver vulkan ... --smoke=res://game/Testing/Tours/tour.cmds; review the dungeon shots against Terraria reference imagery"
+ ],
+ "depends_on": [
+  "P4-11",
+  "P4-21",
+  "P4-22"
+ ],
+ "risks": [
+  "Smoke runtime grows. Keep dungeon.cmds under the 600 s CI timeout by using landmarks rather than walking."
+ ],
+ "effort": "S"
+}

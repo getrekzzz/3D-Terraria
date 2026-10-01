@@ -1,0 +1,44 @@
+{
+ "id": "P4-27",
+ "title": "The Destroyer and the Twins at Terraria strength: segment defense, probe-less dark segments, 40% transformation",
+ "player_outcome": "The Destroyer has Terraria's 80,000 shared life. Its head is soft, but its body plates and tail are armoured. Each plate launches one Probe, then goes dark and stops firing. The Twins open up at 40% with Terraria's health pools.",
+ "design": [
+  "The Destroyer keeps Terraria's shared life. It uses P4-07's per-segment hit volumes with BossInfo.SegmentDefense [0,30,35] and SegmentDamage [70,50,35].",
+  "Per-segment life (segments breaking off) is not Terraria behaviour and stays off; it is a data switch if the player wants it.",
+  "WormBrain.ReleaseMinion picks a segment whose SegmentFlags bit 0 is clear, sets it and launches the probe from there.",
+  "NpcSystem.RangedAttack with FromParts skips segments whose probe is spent, as in Terraria.",
+  "game/Entities/NpcRenderer.cs darkens spent segments by tinting their visuals to 0.35, without a model swap or new materials.",
+  "Data: the_destroyer life 80000, segments 60 (3D-adapted length; Terraria has 80), segmentDefense, segmentDamage.",
+  "retinazer life 20000 and spazmatism life 23000 (Classic). WatcherParams phase2Life 0.4; phase2Defense 20 (Retinazer) and 28 (Spazmatism), tune if needed.",
+  "Expert: when one twin dies, the other gains SpeedScale 1.25 (WatcherBrain checks GroupAlive in Expert)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/WormBrain.cs \u2014 probe per segment",
+  "src/Strata.Core/AI/BossBrains.cs \u2014 twin Expert rage",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Effects.cs \u2014 skip spent segments",
+  "game/Entities/NpcRenderer.cs \u2014 dark segments",
+  "data/enemies/mechs.json \u2014 Destroyer and Twins values"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "Destroyer and Twins life, defense and segment arrays."
+ ],
+ "tests": [
+  "MechBossTests.DestroyerSegmentsHaveTheirOwnDefense: an equal hit on the head vs the tail gives different damage.",
+  "MechBossTests.EachSegmentLaunchesOneProbeThenStopsFiring.",
+  "MechBossTests.TwinsTransformAtFortyPercent.",
+  "MechBossTests.ExpertTwinRagesWhenItsSiblingFalls.",
+  "Smoke mechs.cmds: after 'boss the_destroyer 14': 'wait 5', 'assert npcs.probe >= 1', 'assert boss.the_destroyer.life > 0'."
+ ],
+ "verification": [
+  "dotnet test; headless mechs.cmds; boss gallery screenshot with dark segments"
+ ],
+ "depends_on": [
+  "P4-07"
+ ],
+ "risks": [
+  "Life \u00d74.4 changes the balance of existing hardmode gear. The player asked for Terraria-faithful fights; note it in the phase notes.",
+  "60 segments \u00d7 lasers: RangedAttack runs once per npc (the cursor rotates), so the cost is flat."
+ ],
+ "effort": "M"
+}

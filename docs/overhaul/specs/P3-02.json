@@ -1,0 +1,68 @@
+{
+ "id": "P3-02",
+ "title": "Terraria use-style vocabulary from data (use_styles.json + data migration)",
+ "player_outcome": "Every item uses the right body action. Boss summons, crystals and mirrors are held up; food is eaten; potions are drunk; boomerangs, shuriken and bombs are thrown; guns (including magic guns) are held like guns; staffs point and tomes are read. Yoyos, flails and whips each have their own style.",
+ "design": [
+  "Verified: UseStyle is { None, Swing, Thrust, Shoot, Hold, Consume, Place } (ItemDef.cs:15-18). Data uses swing 151, shoot 129, consume 54, thrust 22, place 1, hold 0. PlayerAvatar.ActionFor (Motion.cs:272-281) guesses 8 clips.",
+  "Replace the enum with { None, Swing, Rapier, Spear, Shoot, Gun, Bow, Staff, Tome, Throw, Yoyo, Flail, Whip, HoldUp, Drink, Eat, Place }. JSON uses camelCase names (holdUp). Thrust, Hold and Consume are removed after migration.",
+  "New Core Gameplay/Items/UseStyleRules.cs, part 1 (implied actions). Swing adds Melee only when DamageType == Melee, so summon staves and fishing rods don't melee. Rapier and Spear add Thrust. Shoot, Gun, Bow, Staff, Tome, Throw, Yoyo and Flail add Shoot when the item has a projectile or useAmmo. Whip adds Melee for now (P3-14 switches it to Whip). Drink, Eat and HoldUp add Consume when the item heals, buffs, or has consume/loot behaviours.",
+  "UseStyleRules, part 2: Infer(item, actions) resolves None. Tools \u2192 Swing, placers \u2192 Place, heal/buff \u2192 Drink, the well_fed buff \u2192 Eat, useAmmo arrow \u2192 Bow, other ammo \u2192 Gun, magic with projectile \u2192 Staff.",
+  "ItemUseTable.Resolve uses UseStyleRules and stores the result in a new ItemUseInfo.Style (never None for usable items).",
+  "New data/config/use_styles.json with one entry per style: clip (3P action name), armAim (AimModifier weight), hand {offset, euler} (grip frame, used by P3-06), holdout {forward, right, down} in metres (shot origin, used by P3-09), fp {...} (reserved for P3-07), and for swing a bladeCurve [[t, deg, ease], ...] seeded from actions.py (used by P3-04).",
+  "New Core Presentation/UseStyleConfig.cs (Load/Validate/Fallback, same pattern as GraphicsConfig). Every enum value must have an entry, curves must be increasing in t, and clip names non-empty. Hook it into tools/Strata.Tools/Commands/ValidateCommand.cs and GameRoot boot validation. GameWorld.Styles is set by WorldLauncher; TestGame loads the real file from TestPaths.ProjectRoot.",
+  "Migrate the data with a one-off in-session script (not committed; no mapping table in the repo). It must scan ALL data/**/*.json, since items live in enemy packs too (terra_blade in enemies/temple.json, ball_o_hurt in enemies/evil.json). Update tools/content/gen_ore_tiers.py: shortswords 'rapier', bows 'bow'. Regenerate data/items/generated/ore_tiers.json.",
+  "ContentValidator.Items: generalise the shoot rule to every shooting style. Warn when a weapon, tool or consumable resolves to None. Error when yoyo/flail/whip items lack damage.",
+  "Game: PlayerAvatar.ActionFor(item, info) returns _game.Styles.Clip(info.Style), falling back to 'use'. AimModifier.ArmAim comes from the style's armAim. Delete the old heuristic."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 new UseStyle enum",
+  "src/Strata.Core/Gameplay/Items/ItemUseTable.cs \u2014 rules-based inference; ItemUseInfo.Style",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 style rules",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 Styles property",
+  "tools/Strata.Tools/Commands/ValidateCommand.cs \u2014 validate use_styles.json",
+  "game/Bootstrap/GameRoot.cs \u2014 load and validate config at boot",
+  "game/Bootstrap/WorldLauncher.cs \u2014 game.Styles = UseStyleConfig.Load(services.Data)",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 ActionFor via config",
+  "tools/content/gen_ore_tiers.py \u2014 rapier/bow styles",
+  "tests/Strata.Core.Tests/Support/TestGame.cs \u2014 load real use_styles.json",
+  "docs/architecture/gameplay.md \u2014 use-style vocabulary"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Items/UseStyleRules.cs \u2014 actions implied by a style; inference for None",
+  "src/Strata.Core/Presentation/UseStyleConfig.cs \u2014 config model with Load/Validate/Fallback",
+  "data/config/use_styles.json \u2014 per-style clip, armAim, hand, holdout, fp, bladeCurve",
+  "tests/Strata.Core.Tests/Gameplay/UseStyleTests.cs \u2014 resolution tests"
+ ],
+ "data_changes": [
+  "holdUp: every summonBoss/startEvent item (slime_crown, suspicious_looking_eye, worm_food, bloody_spine, abeemination, deer_thing, mechanical summons, \u2026), life_crystal, mana_crystal, life_fruit, magic_mirror and the other recall items, crates and bags (consume.loot)",
+  "drink: potions (healLife/healMana/buff bottles); eat: well_fed foods (cooked_fish, \u2026)",
+  "rapier: shortswords (generated + explicit); spear: spear, trident, dark_lance, the_rotted_fork, starlight, daybreak, mushroom_spear, north_pole, unholy_trident",
+  "throw: wooden_boomerang, enchanted_boomerang, flamarang, shuriken, spiky_ball, throwing_knife, bomb, dynamite, grenade, beenade, paladins_hammer, possessed_hatchet",
+  "yoyo: wood_yoyo, rally, amazon, code_1, terrarian; flail: ball_o_hurt, sunfury, blue_moon, flower_pow, flairon, solar_eruption; whip: leather_whip, snapthorn",
+  "bow: every useAmmo 'arrow' weapon; gun: every bullet/rocket/dart/gel/snowball launcher plus magic guns (laser_rifle, space_gun, bee_gun, laser_machinegun, bubble_gun, leaf_blower, \u2026)",
+  "staff: magic items with the staff/wand generator; tome: tome-generator items (water_bolt, demon_scythe, book_of_skulls, crystal_storm, \u2026)",
+  "swing: swords, tools, summon staves, fishing rods, bug net, wiring/paint tools; place: explicit placers (derived items already use Place)"
+ ],
+ "tests": [
+  "UseStyleTests maps representative items to expected styles and actions: slime_crown\u2192HoldUp+SummonBoss; lesser_healing_potion\u2192Drink+Consume; cooked_fish\u2192Eat; wooden_boomerang\u2192Throw+Shoot; wood_yoyo\u2192Yoyo; ball_o_hurt\u2192Flail",
+  "UseStyleTests, more items: leather_whip\u2192Whip; minishark\u2192Gun; laser_rifle\u2192Gun; wooden_bow\u2192Bow; amethyst_staff\u2192Staff; water_bolt\u2192Tome; copper_shortsword\u2192Rapier+Thrust; spear\u2192Spear; copper_pickaxe\u2192Swing+Mine+Melee; finch_staff\u2192Swing+Shoot and not Melee",
+  "UseStyleTests: UseStyleConfig.Validate reports a missing style entry",
+  "ItemUseTests.ItemActionsAreInferredFromStats, ArsenalTests and CombatTests stay green",
+  "Smoke: no new lines; combat.cmds (shortsword/bow) still passes"
+ ],
+ "verification": [
+  "dotnet test",
+  "Strata.Tools validate (content plus use_styles.json)",
+  "python3 tools/content/gen_ore_tiers.py --check",
+  "Strata.Tools manifest --check",
+  "Godot smoke: all .cmds PASS"
+ ],
+ "depends_on": [
+  "P3-01"
+ ],
+ "risks": [
+  "Inference changes can silently drop an action from an item. Diff ItemUseInfo.Actions for all 667 items before and after, via a throwaway test that dumps them.",
+  "The hand/holdout/fp values are placeholders until P3-06, P3-07 and P3-09 tune them."
+ ],
+ "effort": "M"
+}

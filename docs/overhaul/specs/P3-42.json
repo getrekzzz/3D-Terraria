@@ -1,0 +1,40 @@
+{
+ "id": "P3-42",
+ "title": "Armour and key accessories visible on the character",
+ "player_outcome": "Your armour shows on your character in third person. Helmets hide your hair, and each set looks different, from copper to molten to solar flare. Shields sit on the left forearm and balloons float behind you.",
+ "design": [
+  "Verified: nothing reads Inventory.Armor for visuals; only held items and wings are attached (PlayerAvatar.Gear.cs:8-11).",
+  "New game/Player/PlayerAvatar.Armor.cs subscribes to Inventory.Armor.Changed, Accessories.Changed and Misc.Changed. It rebuilds attachments only on change.",
+  "For each worn piece: the mesh comes from PropLibrary (cached, non-multimesh) and is attached with CreatureVisual.AttachToBone(bone, node, lit: true) (P3-06), so it is voxel-lit and tinted.",
+  "Scale per piece = actual bone length \u00f7 manifest refLength, measured once from Skeleton3D rest poses.",
+  "Hair hiding: CreatureVisual.SetSlotVisible('char:hair', false) swaps the hair surfaces' override material to a shared discard material when the helmet has hidesHair.",
+  "Accessories: shield-generator items attach to forearm.L; balloons to the spine with a bob and a thin string; boots keep their particle effects.",
+  "Performance: \u2264 12 extra draw calls; no per-frame work beyond BoneAttachment updates."
+ ],
+ "files_modify": [
+  "game/Rendering/CreatureVisual.cs \u2014 SetSlotVisible",
+  "game/Player/PlayerAvatar.cs \u2014 initialise armour",
+  "game/Debug/GodotCommandHost.cs \u2014 probe avatar.armor_pieces"
+ ],
+ "files_add": [
+  "game/Player/PlayerAvatar.Armor.cs \u2014 armour and accessory attachments"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Smoke movement.cmds: 'equip copper_helmet' / 'equip copper_chainmail' / 'equip copper_greaves' / 'wait 0.2' / 'assert avatar.armor_pieces >= 8' / 'assert errors == 0'",
+  "Tour: 3P orbit screenshots of 5 sets (copper, gold, hellstone, hallowed, solar)"
+ ],
+ "verification": [
+  "Lavapipe screenshots reviewed on a male and a female player model",
+  "perf: gd.avatar change < 0.1 ms"
+ ],
+ "depends_on": [
+  "P3-41",
+  "P3-06"
+ ],
+ "risks": [
+  "Bone names or rest orientation differing between rigs; test all player_* models.",
+  "Vanity/dye slots are out of scope (P2 lists them as UI)."
+ ],
+ "effort": "M"
+}

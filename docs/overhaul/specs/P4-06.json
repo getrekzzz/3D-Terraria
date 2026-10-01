@@ -1,0 +1,54 @@
+{
+ "id": "P4-06",
+ "title": "King Slime and Eye of Cthulhu, Terraria-faithful with Expert behaviour",
+ "player_outcome": "King Slime shrinks as it loses life, teleports to a player it cannot reach and sheds slimes. In Expert it also sheds Spiked Slimes, and its landings shake the screen. The Eye tears open at half life: its defense drops to 0 and it bites harder. In Expert it chains more and faster dashes as it weakens.",
+ "design": [
+  "GelSovereignBrain (src/Strata.Core/AI/BossBrains.cs): npc.VisualScale = 0.55 + 0.45 \u00d7 lifeFraction. The hitbox stays the same size; this is presentation only.",
+  "Track ticks without line of sight (ctx.InSight from the head to target.Eye) and teleport when they exceed LostSightTicks (300) as well as on distance.",
+  "Landing: in AfterMove, when airborne-to-ground with intended vy < -8, call ctx.Impact(center, 0.3) and ctx.Cue(npc, 'land').",
+  "Expert: every third shed minion is ExpertMinion (spiked_slime) and the teleport telegraph is 35 ticks instead of 50.",
+  "GelSovereignParams (BrainSpecs.cs) gains LostSightTicks, ExpertMinion and ExpertTeleportTicks.",
+  "WatcherBrain: on entering phase 2, a transform lasting TransformTicks (60). The Eye spins in place (npc.Pose = 'transform', Velocity *= 0.9) and becomes invulnerable only during that window.",
+  "Phase 2: npc.DefenseOverride = Phase2Defense (0) and DamageScale = Phase2Damage (1.53, which turns Terraria's 15 into 23). Servants stop.",
+  "Expert, below Phase2Life: dashes per burst = min(ExpertMaxDashes (5), DashesPerBurst + floor((Phase2Life \u2212 life) / 0.1)), with the telegraph scaled by 0.6.",
+  "WatcherParams gains Phase2Defense (-1 means unchanged), Phase2Damage, TransformTicks, ExpertMaxDashes and ExpertTelegraphScale.",
+  "The Twins use the same brain; P4-27 sets their values.",
+  "game/Entities/NpcRenderer.cs: multiply the model scale by npc.VisualScale (visual.Scale = Def.Scale \u00d7 VisualScale)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/BossBrains.cs \u2014 KS shrink/sight-teleport/impact/Expert minions; Eye transform/phase-2 stats/Expert dashes",
+  "src/Strata.Core/Content/Specs/BrainSpecs.cs \u2014 GelSovereignParams, WatcherParams fields",
+  "game/Entities/NpcRenderer.cs \u2014 VisualScale",
+  "data/enemies/bosses.json \u2014 KS/EoC params",
+  "data/enemies/bestiary.json \u2014 spiked_slime enemy",
+  "tools/content/reference/world.py \u2014 spiked_slime row if missing"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "king_slime brain: add lostSightTicks 300, expertMinion 'spiked_slime', expertTeleportTicks 35. Stats unchanged: 2000 life, 32 damage, 10 defense.",
+  "eye_of_cthulhu: damage 15 (Terraria Classic), brain phase2Defense 0, phase2Damage 1.53, transformTicks 60, expertMaxDashes 5, expertTelegraphScale 0.6.",
+  "New enemy spiked_slime: model gel, tint #5a7ad8, life 60, damage 12, defense 6, slimeHop brain; ranged spike volley reusing ice_spike or a new 'slime_spike' projectile; loot slime_small; covers terraria:spiked_slime."
+ ],
+ "tests": [
+  "BossTests.KingSlimeShrinksAsItLosesLife.",
+  "BossTests.KingSlimeTeleportsToATargetItCannotSee: player behind a stone wall 10 m away; teleports within LostSightTicks + 60.",
+  "BossTests.KingSlimeShedsSpikedSlimesInExpert: Expert TestGame; hit to 40% life; spiked_slime count \u2265 1.",
+  "BossTests.KingSlimeLandingsRaiseImpacts.",
+  "BossTests.EyeLosesDefenseAndBitesHarderInPhaseTwo: boss.eye_of_cthulhu.defense is 0 after the transform.",
+  "BossTests.ExpertEyeChainsMoreDashesWhenLow.",
+  "Smoke bosses.cmds, after 'use' of suspicious_looking_eye: 'assert boss.eye_of_cthulhu.defense == 12'."
+ ],
+ "verification": [
+  "dotnet test; validate; headless bosses.cmds",
+  "Manual with lavapipe or on desktop: 'boss king_slime 15' in Expert; watch it shrink and shed spiked slimes, and feel the landing shake."
+ ],
+ "depends_on": [
+  "P4-01",
+  "P4-03"
+ ],
+ "risks": [
+  "VisualScale without a matching hitbox may look off at 55%. If players report it, shrink HalfExtents too; Npc.HalfExtents is currently get-only.",
+  "New spiked_slime needs a covers row and an icon only if it has a catch item (it does not)."
+ ],
+ "effort": "M"
+}

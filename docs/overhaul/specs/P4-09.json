@@ -1,0 +1,36 @@
+{
+ "id": "P4-09",
+ "title": "Queen Bee and Deerclops: Terraria tuning, biome enrage, Expert variants",
+ "player_outcome": "Queen Bee charges, rains stingers and calls bees as in Terraria, and grows furious if you drag her out of the jungle. Deerclops and Queen Bee hit harder and fire denser attacks in Expert.",
+ "design": [
+  "Data only, using P4-01 enrage and P4-02 Expert overrides.",
+  "queen_bee: phases per Terraria. Phase 1: 3\u20134 horizontal charges, then a hover above the player with stinger volleys, then a bee summon. Below 50%: faster charges and stinger volleys of 3.",
+  "queen_bee Expert: {speed 1.2, volleyCount +2, summonMax +3}. Enrage when the target stands outside the jungle: {when [{type biome, none [jungle, underground_jungle, hive]}], damage 2, speed 1.5, message 'Queen Bee is enraged!'}.",
+  "deerclops Expert: {speed 1.15, volleyCount +2}. Add expertOnly extra shadow-hand/ice-spike moves where its pattern has them. Use slam for its stomp so it raises an impact."
+ ],
+ "files_modify": [
+  "data/enemies/hive.json \u2014 queen_bee pattern, expert, enrage",
+  "data/enemies/deerclops.json \u2014 deerclops expert and slam"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "Queen Bee and Deerclops pattern data as described."
+ ],
+ "tests": [
+  "BossTests.QueenBeeEnragesOutsideTheJungle: TestGame arena is forest, so she should be Frenzied within 60 ticks.",
+  "BossTests.ExpertQueenBeeFiresDenserStingerVolleys.",
+  "BossTests.DeerclopsStompRaisesAnImpact.",
+  "Smoke bosses.cmds, after 'boss queen_bee 10': 'wait 1', 'assert boss.queen_bee.frenzied == 1'."
+ ],
+ "verification": [
+  "dotnet test; validate; smoke bosses.cmds"
+ ],
+ "depends_on": [
+  "P4-01",
+  "P4-02"
+ ],
+ "risks": [
+  "Queen Bee's jungle enrage in the smoke arena (forest) changes the existing smoke timing. Keep it in god mode as it already is."
+ ],
+ "effort": "S"
+}

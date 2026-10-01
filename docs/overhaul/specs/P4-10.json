@@ -1,0 +1,69 @@
+{
+ "id": "P4-10",
+ "title": "Skeletron core fight: separately killable hands that slap and swipe, spin defense, Expert skull volleys, lethal day rage",
+ "player_outcome": "Skeletron now fights as in Terraria. Its two hands (600 life each) can be destroyed separately and take turns: a slap dropping from above, and a sideways swipe. The skull spins every few seconds at lowered defense. In Expert, each living hand armours the skull (+25 defense), and once a hand falls or the skull is below 75% it fires homing skulls. By day it is lethal and all but invulnerable.",
+ "design": [
+  "New brain 'skeletronHand': new src/Strata.Core/AI/HandBrain.cs, params in new src/Strata.Core/Content/Specs/BossBrainSpecs.cs, registered in BrainSpecs.Register and BrainFactory.",
+  "HandParams: Style ('alternate'|'slap'|'swipe'; P4-28 and P4-31 add punch/saw/vice/hold), AttackInterval 300, WindupTicks 40, StrikeTicks 45, StrikeSpeed 16 m/s, ReturnSpeed 10, ExpertSpeed 1.25, ExpertInterval 0.7.",
+  "Hand state is Phase 0 rest, 1 windup, 2 strike, 3 recover. Rest follows Anchor (set by FollowLeader from the head's rotated offset) with a small bob. The side is sign(LeaderOffset.X); the right hand's first attack is delayed by half an interval so the hands alternate.",
+  "Slap: wind up to target + (0, 4 m, 0) + side\u00d71.5 m, then strike down through the captured target position.",
+  "Swipe: wind up to target + side\u00d75 m + (0, 1 m, 0), then sweep horizontally through the target at 1.1\u00d7 StrikeSpeed.",
+  "Hands are MovesFreely with no gravity (they pass through walls like Terraria's). Contact damage in all phases. They mirror the head's DamageScale and DefenseOverride (day rage).",
+  "CryptWardenBrain: move it to its own file src/Strata.Core/AI/CryptWardenBrain.cs, out of DungeonBrains.cs. HandsAlive = living IsPart followers when the boss has Parts; the legacy Segments path stays for Skeletron Prime until P4-28.",
+  "Spin cadence as Terraria: SpinInterval 800 and SpinDuration 400 ticks. While spinning, npc.DefenseDelta += SpinDefense (\u221210) and ctx.Cue(npc, 'boss_roar') plays at the start.",
+  "Expert, while hovering: DefenseDelta += ExpertDefensePerHand (25) \u00d7 HandsAlive.",
+  "Expert skulls: when HandsAlive < 2 or life < 75%, every SkullInterval (80, or 40 with no hands) fire ctx.Shoot(Skull, from the head, toward the target \u00d7 SkullSpeed, SkullDamage) if ctx.InSight.",
+  "When Frenzied (the day enrage from P4-01) it spins continuously at SpinSpeed \u00d7 SpeedScale. Speeds use npc.SpeedScale; the old DayEnrage branch is removed.",
+  "game/Entities/NpcRenderer.Arms.cs: draw arms from the head to each living IsPart follower when Boss.Parts is non-empty, keeping the segment path for Prime.",
+  "game/Entities/NpcRenderer.cs: when npc.Mirrored, scale the basis X by \u22121 after Orient.",
+  "Validator: CryptWarden needs \u2265 2 segments or \u2265 2 parts. skeletronHand enemies must be listed as some boss's part (warn otherwise).",
+  "Move the warden test out of tests/Strata.Core.Tests/Gameplay/DungeonTests.cs into SkeletonTests.cs, rewritten for parts."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/DungeonBrains.cs \u2014 CryptWarden moved out (Caster stays)",
+  "src/Strata.Core/AI/Brain.cs \u2014 BrainFactory registers skeletronHand",
+  "src/Strata.Core/Content/Specs/BrainSpecs.cs \u2014 CryptWardenParams gains SpinDefense, ExpertDefensePerHand, Skull, SkullDamage, SkullSpeed, SkullInterval; register skeletronHand",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 warden parts rule",
+  "game/Entities/NpcRenderer.Arms.cs \u2014 arms to parts",
+  "game/Entities/NpcRenderer.cs \u2014 mirrored parts",
+  "data/enemies/dungeon.json \u2014 skeletron, skeletron_hand, skeletron_skull",
+  "tests/Strata.Core.Tests/Gameplay/DungeonTests.cs \u2014 warden test moved out",
+  "game/Testing/Scripts/dungeon.cmds \u2014 hand assertions"
+ ],
+ "files_add": [
+  "src/Strata.Core/AI/HandBrain.cs \u2014 boss hand brain (slap/swipe)",
+  "src/Strata.Core/AI/CryptWardenBrain.cs \u2014 Skeletron head brain",
+  "src/Strata.Core/Content/Specs/BossBrainSpecs.cs \u2014 HandParams (and later hook params)",
+  "tests/Strata.Core.Tests/Gameplay/SkeletronTests.cs \u2014 Skeletron fight tests"
+ ],
+ "data_changes": [
+  "skeletron: life 4400, damage 32, defense 10. Brain: hoverHeight 6, spinInterval 800, spinDuration 400, spinSpeed 9, spinDefense \u221210, expertDefensePerHand 25, skull 'skeletron_skull', skullDamage 17, skullSpeed 8, skullInterval 80.",
+  "skeletron boss block: remove segments/segmentModels/dayEnrage. Add parts [{enemy skeletron_hand, offset [\u22122.8,\u22121.4,0.6], mirror true}, {enemy skeletron_hand, offset [2.8,\u22121.4,0.6]}], armModel skeletron_arm, enrage {when [{type time, is day}], setDamage 1000, setDefense 9999, speed 2.5}.",
+  "New enemy skeletron_hand: model skeletron_hand, tags [undead, lava_immune], life 600, damage 20, defense 14, knockbackResist 1, size [2.4,2.4], gravity false, collideTerrain false, brain {type skeletronHand, style alternate}, value 0, covers terraria:skeletron_hand.",
+  "New hostile projectile skeletron_skull: visual creature, model cursed_skull, scale 0.55, homing 1.4, lifetime 300, radius 0.45, light [6,5,3], trail #fff0c0."
+ ],
+ "tests": [
+  "SkeletronTests.ArrivesWithTwoKillableHands.",
+  "SkeletronTests.HandsSlapAndSwipeInTurn: each hand gets within 1.5 m of the player; the left strikes first and the right about 150 ticks later; slap strikes come from above, swipes horizontally.",
+  "SkeletronTests.KillingAHandLeavesTheSkullFighting.",
+  "SkeletronTests.KillingTheSkullRemovesTheHandsAndRaisesTheFlagOnce.",
+  "SkeletronTests.SpinLowersTheSkullsDefense: Classic Defense is 0 while Phase==1 and 10 while hovering.",
+  "SkeletronTests.ExpertHandsArmourTheSkullAndSkullsFlyOnceOneFalls: Defense 60 with two hands; no skeletron_skull in 400 hover ticks; after killing a hand a skull appears within 90 ticks and turns toward the player.",
+  "SkeletronTests.DaylightMakesItLethal: at noon Defense is 9999 and contact damage \u2265 1000.",
+  "Smoke dungeon.cmds, after 'town curse old_man': 'assert npcs.skeletron_hand == 2', 'slay skeletron_hand', 'assert npcs.skeletron == 1', 'assert flag.defeated_skeletron == 0', then the existing 'slay skeletron' and 'assert flag.defeated_skeletron == 1'."
+ ],
+ "verification": [
+  "dotnet test; validate; check_file_length",
+  "Headless dungeon.cmds prints SMOKE PASS",
+  "Boss gallery tour (game/Testing/Tours/bosses.cmds) screenshot: hands attached by bone arms, left hand mirrored"
+ ],
+ "depends_on": [
+  "P4-01"
+ ],
+ "risks": [
+  "Hands that pass through walls can hit the player through dungeon walls, which is Terraria-faithful but harsher in 3D corridors.",
+  "Removing DayEnrage affects Skeletron Prime's data too (it has despawnAtDay). Migrate Prime to enrage/despawn consistently in the same commit.",
+  "The feel phase may change boss knockback. Hands keep knockbackResist 1."
+ ],
+ "effort": "M"
+}
