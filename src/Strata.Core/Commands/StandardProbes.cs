@@ -22,6 +22,7 @@ internal static class StandardProbes
         ctx.AddProbe("player.z", () => ctx.Player.Position.Z);
         ctx.AddProbe("player.speed", () => ctx.Player.Velocity.Length());
         ctx.AddProbe("player.minecart", () => ctx.Player.Minecart != null ? 1 : 0);
+        ctx.AddProbe("player.hook", () => (int)ctx.Player.Hook.State); // 0 none, 1 flying, 2 latched, 3 returning
         ctx.AddProbe("wires.count", () => w.Wires.All.Count);
         ctx.AddProbe("player.alive", () => ctx.Player.Alive ? 1 : 0);
         ctx.AddProbe("player.cell_y", () => ctx.Player.FeetCell.Y);

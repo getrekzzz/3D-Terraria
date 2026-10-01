@@ -1,4 +1,5 @@
 using Godot;
+using Strata.Core.Gameplay.Player;
 using Strata.Game.Audio;
 
 namespace Strata.Game.Player;

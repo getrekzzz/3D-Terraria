@@ -1,6 +1,7 @@
 using System.Numerics;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Loot;
+using Strata.Core.Gameplay.Player;
 using Strata.Core.Session;
 
 namespace Strata.Core.Gameplay.Interaction;
@@ -60,8 +61,21 @@ public sealed partial class ItemUseSystem
         return false;
     }
 
+    /// <summary>
+    /// Throws the held hook along the crosshair, as the grapple key does, or lets go of one already flying or latched
+    /// (pressing again releases, as in Terraria).
+    /// </summary>
+    private UseOutcome Grapple(PlayerEntity p, ItemUseInfo info)
+    {
+        if (info.Grapple is not { } gp) return UseOutcome.None;
+        if (p.Hook.State is HookState.Flying or HookState.Attached) p.Hook.Release();
+        else p.Hook.Fire(_world.Session.World, gp, info.Item, p.Hand, p.Eye, p.Aim);
+        return UseOutcome.Grappled;
+    }
+
     private void Recall(PlayerEntity p)
     {
+        p.Hook.Reset();
         var home = _world.SpawnPositionFor(p.State);
         p.Position = home;
         p.Velocity = Vector3.Zero;

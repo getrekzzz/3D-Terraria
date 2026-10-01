@@ -29,8 +29,24 @@ wait 2.5
 assert player.on_floor == 1
 assert player.hook == 0
 
+# Clicking with the hook held throws it too; breaking the anchor block lets go (offsets follow the reeled-in body).
+wield grappling_hook
+mark
+aim 0 1 0
+hold use_primary 0.05
+wait 0.2
+assert player.hook >= 1
+wait 1.5
+assert player.hook == 2
+assert player.from_mark > 4
+fill -6 0 -6 6 8 6 air
+wait 0.3
+assert player.hook != 2
+wait 2.5
+assert player.on_floor == 1
+assert player.hook == 0
+
 # Rocket boots burn while jump is held in the air, and refill on landing.
-fill -4 16 -4 4 17 4 air
 equip rocket_boots
 wait 0.5
 assert player.flight_left > 1.5

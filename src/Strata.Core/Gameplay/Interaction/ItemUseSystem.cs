@@ -42,6 +42,9 @@ public enum UseOutcome
 
     /// <summary>A block was painted or scraped.</summary>
     Painted,
+
+    /// <summary>A grappling hook was thrown or let go.</summary>
+    Grappled,
 }
 
 /// <summary>A projectile launch requested by an item use (resolved by the projectile system).</summary>
@@ -159,6 +162,10 @@ public sealed partial class ItemUseSystem
         else if (info.Has(ItemAction.Release))
         {
             outcome = inReach == null ? UseOutcome.OutOfReach : Release(p, info.Release!, inReach);
+        }
+        else if (info.Has(ItemAction.Grapple))
+        {
+            outcome = Grapple(p, info);
         }
         else if (info.Has(ItemAction.Shoot))
         {

@@ -59,6 +59,31 @@ public sealed class PlayerEntity
         UseAnimation = 0;
     }
 
+    /// <summary>The grappling hook: thrown, latched or returning (see <see cref="GrappleHook"/>).</summary>
+    public GrappleHook Hook { get; } = new();
+
+    /// <summary>
+    /// An engine body owns this player's motion (the running game): it advances <see cref="Hook"/> in its physics step
+    /// and applies the pull. Without one (tests, headless runs) <see cref="GameWorld"/> advances the hook each tick.
+    /// </summary>
+    public bool HasBody { get; set; }
+
+    /// <summary>
+    /// The throwing hand (m): chest height, a little to the right of and ahead of the body along the horizontal
+    /// <see cref="Facing"/> (straight up or down counts as facing −Z). Hooks leave and return to it.
+    /// </summary>
+    public Vector3 Hand
+    {
+        get
+        {
+            var f = Facing;
+            var flat = new Vector3(f.X, 0, f.Z);
+            flat = flat.LengthSquared() > 1e-6f ? Vector3.Normalize(flat) : -Vector3.UnitZ;
+            var right = new Vector3(-flat.Z, 0, flat.X);
+            return Position + new Vector3(0, 1.25f, 0) + right * 0.28f + flat * 0.1f;
+        }
+    }
+
     /// <summary>Crisp shape used when placing blocks.</summary>
     public Voxels.CellShape BuildShape { get; set; } = Voxels.CellShape.Full;
 
