@@ -18,6 +18,7 @@ public sealed partial class SoundEvents : Node
     private ulong _lastPlaceFrame;
     private ulong _lastHitMs;
     private bool _wasAlive = true;
+    private int _lastSerial;
 
     public void Initialize(GameWorld game, PlayerEntity local)
     {
@@ -96,10 +97,16 @@ public sealed partial class SoundEvents : Node
     {
         if (p != _local) return;
         var item = info.Item;
+        // Every swing of a tool whooshes once, whether or not it also bites a block (that sound comes from the hit).
+        bool newSwing = p.UseSerial != _lastSerial;
+        _lastSerial = p.UseSerial;
         switch (outcome)
         {
             case UseOutcome.Swung:
                 Sfx.Play("swing", item.UseTime < 18 ? -3f : 0f);
+                break;
+            case UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool:
+                if (newSwing && info.IsTool) Sfx.Play("swing", item.UseTime < 18 ? -3f : 0f);
                 break;
             case UseOutcome.Shot:
                 Sfx.Play(ShotSound(item), item.UseTime <= 6 ? -5f : 0f);

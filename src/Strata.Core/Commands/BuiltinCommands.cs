@@ -203,11 +203,11 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "use", Usage = "use", Help = "Uses the held item once at the current aim (ignores the cooldown).",
+            Name = "use", Usage = "use", Help = "Uses the held item once at the current aim (ignores the cooldown and starts a fresh swing).",
             Run = (ctx, _) =>
             {
                 var p = ctx.Player;
-                p.UseCooldown = 0;
+                p.ResetUse();
                 var target = Targeting.Cast(ctx.World.Session.World, p.Eye, p.Aim, 30f);
                 var outcome = ctx.World.ItemUse.Use(p, target, freshPress: true);
                 return CommandResult.Success($"{outcome}" + (target != null ? $" at {target.Cell}" : ""));

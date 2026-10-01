@@ -88,14 +88,27 @@ public sealed partial class ItemUseSystem
         // Holding the button keeps tools, placeables and melee weapons going (every sword auto-swings, as in 1.4.4).
         bool repeats = item.AutoReuse || info.IsTool || info.Has(ItemAction.PlaceBlock | ItemAction.PlaceObject | ItemAction.Melee | ItemAction.Thrust);
         if (!freshPress && !repeats) return UseOutcome.None;
-        if (p.UseCooldown > 0) return UseOutcome.Cooldown;
+        // One animation per use, never restarted mid-arc: a new one starts once the last has played out (or for
+        // another item). A tool keeps swinging while its next hit cools down, and hits when its use time is up.
+        bool newAnimation = p.UseAnimation <= 0 || p.UseItem != item;
+        bool melee = info.Has(ItemAction.Melee | ItemAction.Thrust);
+        if (p.UseCooldown > 0 && !(newAnimation && info.IsTool)) return UseOutcome.Cooldown;
+        if (!newAnimation && melee && !info.IsTool) return UseOutcome.Cooldown; // one strike per swing
         if (p.State.Effects.NoItemUse) return UseOutcome.Blocked;
+        float speed = UseSpeed(p, held, info);
+        if (p.UseCooldown > 0)
+        {
+            StartAnimation(p, item, speed);
+            if (melee) Swung?.Invoke(p, info);
+            Used?.Invoke(p, info, UseOutcome.Swung);
+            return UseOutcome.Swung;
+        }
 
         float reach = ReachMeters(p, item);
         var inReach = target != null && target.Distance <= reach ? target : null;
         var outcome = UseOutcome.None;
         bool shotFailed = false;
-        int useTime = Prefixes.UseTime(held, item.UseTime);
+        float useTime = item.UseTime / speed;
 
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject))
         {
@@ -108,7 +121,7 @@ public sealed partial class ItemUseSystem
         else if (info.IsTool && inReach != null)
         {
             outcome = UseTool(p, info, inReach);
-            useTime = (int)MathF.Ceiling(useTime / (1f + p.State.Effects.Stats.Bonus(StatIds.MiningSpeed)));
+            useTime /= 1f + p.State.Effects.Stats.Bonus(StatIds.MiningSpeed); // more hits per swing, same swing
         }
         else if (info.Has(ItemAction.Bucket))
         {
@@ -152,18 +165,15 @@ public sealed partial class ItemUseSystem
             shotFailed = outcome is UseOutcome.NoAmmo or UseOutcome.NoMana or UseOutcome.Blocked;
         }
 
-        // Swings and thrusts (shortswords, spears) both attack through the melee system. A blade that also shoots
-        // (Starfury, Terra Blade) swings with every shot, and still swings when the shot cannot fire.
-        if (info.Has(ItemAction.Melee | ItemAction.Thrust)
-            && (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Shot or UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool))
-        {
-            Swung?.Invoke(p, info);
-            if (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach) outcome = UseOutcome.Swung;
-            useTime = (int)MathF.Ceiling(useTime / (1f + p.State.Effects.Stats.Bonus(StatIds.MeleeSpeed)));
-        }
+        // Swings and thrusts (shortswords, spears) both attack through the melee system, once per animation. A blade
+        // that also shoots (Starfury, Terra Blade) swings with every shot, and still swings when the shot cannot fire.
+        bool swings = melee && newAnimation
+            && (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Shot or UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool);
+        if (swings && (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach)) outcome = UseOutcome.Swung;
         if (outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Blocked or UseOutcome.NoAmmo or UseOutcome.NoMana) return outcome;
-        p.UseCooldown = Math.Max(1, useTime);
-        p.UseAnimation = Math.Max(1, item.UseAnimation);
+        p.UseCooldown = UseTicks(useTime);
+        if (newAnimation) StartAnimation(p, item, speed); // mid-animation digs and gun bursts leave the swing alone
+        if (swings) Swung?.Invoke(p, info);
         Used?.Invoke(p, info, outcome);
         return outcome;
     }

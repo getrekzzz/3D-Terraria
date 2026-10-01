@@ -48,7 +48,7 @@ public sealed partial class ViewModel : Node3D
         var bob = _controller.IsOnFloor() ? new Vector3(Mathf.Sin(_bob) * 0.012f, Mathf.Abs(Mathf.Cos(_bob)) * 0.016f, 0) * Mathf.Min(speed / 5f, 1.2f) : Vector3.Zero;
 
         var info = _game.Uses[_item!];
-        float t = entity.UseAnimation > 0 ? 1f - entity.UseAnimation / (float)Mathf.Max(1, _item!.UseAnimation) : 0f;
+        float t = entity.UseAnimation > 0 ? 1f - entity.UseAnimation / (float)Mathf.Max(1, entity.UseAnimationMax) : 0f;
         var position = Rest + bob;
         var rotation = new Vector3(-0.35f, 0.25f, 0.15f);
         if (t > 0)

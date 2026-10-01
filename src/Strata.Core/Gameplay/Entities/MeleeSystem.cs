@@ -7,8 +7,9 @@ using Strata.Core.Session;
 namespace Strata.Core.Gameplay.Entities;
 
 /// <summary>
-/// Resolves melee swings and thrusts over their use animation: the blade sweeps a horizontal arc in front of the
-/// player (or stabs along the aim) and each creature is hit at most once per swing.
+/// Resolves melee swings and thrusts over their use animation: after the clip's wind-up the blade sweeps a horizontal
+/// arc in front of the player through the strike window (or stabs along the aim inside it), and each creature is hit
+/// at most once per swing. Windows come from <see cref="Interaction.ItemUseSystem.Timing"/>.
 /// </summary>
 public sealed class MeleeSystem
 {
@@ -30,11 +31,13 @@ public sealed class MeleeSystem
     public const float VerticalReach = 1.4f;
 
     private readonly NpcSystem _npcs;
+    private readonly Interaction.ItemUseSystem _uses;
     private readonly List<Swing> _active = new();
 
     public MeleeSystem(NpcSystem npcs, Interaction.ItemUseSystem uses)
     {
         _npcs = npcs;
+        _uses = uses;
         uses.Swung += Start;
     }
 
@@ -51,7 +54,7 @@ public sealed class MeleeSystem
         {
             Player = player,
             Item = info,
-            Duration = Math.Max(2, info.Item.UseAnimation),
+            Duration = Math.Max(2, player.UseAnimationMax), // the animation after speed bonuses
             Yaw = MathF.Atan2(facing.X, facing.Z),
             Pitch = MathF.Asin(Math.Clamp(aim.Y, -1f, 1f)),
             Stack = player.State.Inventory.Held.Item == info.Item ? player.State.Inventory.Held : new Items.ItemStack(info.Item, 1),
@@ -60,21 +63,31 @@ public sealed class MeleeSystem
 
     public void Tick()
     {
+        var timing = _uses.Timing;
         for (int i = _active.Count - 1; i >= 0; i--)
         {
             var s = _active[i];
             s.Tick++;
             float t = s.Tick / (float)s.Duration;
-            foreach (var npc in _npcs.All.ToList())
-            {
-                if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
-                if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, t))) continue;
-                var item = s.Item.Item;
-                if (_npcs.Hit(npc, s.Player, Items.Prefixes.Damage(s.Stack), item.DamageType, Items.Prefixes.Crit(s.Stack) + Combat.DamageModel.BaseCritChance,
-                        Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true))
-                    s.Hit.Add(npc.Id);
-            }
+            // Nothing connects during the wind-up. A thrust then stabs inside its strike window; a swing's blade
+            // sweeps the arc over the strike window and stays dangerous through the follow-through.
+            bool thrust = s.Item.Has(ItemAction.Thrust);
+            if (thrust ? timing.Striking(UseTiming.Thrust, t) : t >= timing.StrikeStart(UseTiming.Swing))
+                HitCreatures(s, thrust ? 1f : timing.Sweep(UseTiming.Swing, t));
             if (s.Tick >= s.Duration) _active.RemoveAt(i);
+        }
+    }
+
+    private void HitCreatures(Swing s, float sweep)
+    {
+        foreach (var npc in _npcs.All.ToList())
+        {
+            if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
+            if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, sweep))) continue;
+            var item = s.Item.Item;
+            if (_npcs.Hit(npc, s.Player, Items.Prefixes.Damage(s.Stack), item.DamageType, Items.Prefixes.Crit(s.Stack) + Combat.DamageModel.BaseCritChance,
+                    Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true))
+                s.Hit.Add(npc.Id);
         }
     }
 
@@ -82,7 +95,8 @@ public sealed class MeleeSystem
     /// flyer in 3D is much harder than in the reference game's side view.</summary>
     public const float ThrustTolerance = 0.7f;
 
-    private static bool Connects(Swing s, Vector3 center, Vector3 half, float t)
+    /// <summary>Whether a creature volume is inside the blade's reach; <paramref name="sweep"/> is how far (0–1) the arc has swept.</summary>
+    private static bool Connects(Swing s, Vector3 center, Vector3 half, float sweep)
     {
         var origin = s.Player.Center + new Vector3(0, 0.3f, 0);
         var to = center - origin;
@@ -102,9 +116,9 @@ public sealed class MeleeSystem
         float aimPlaneY = MathF.Tan(s.Pitch) * flat.Length();
         if (MathF.Abs(to.Y - aimPlaneY) > VerticalReach + half.Y) return false;
         if (flat.Length() < 0.6f) return true; // point blank
-        // The blade sweeps from +arc/2 to −arc/2 around the aim yaw over the animation.
+        // The blade sweeps from +arc/2 to −arc/2 around the facing yaw over the strike window.
         float halfArc = swing.Arc * MathF.PI / 360f;
-        float current = halfArc - t * 2f * halfArc;
+        float current = halfArc - sweep * 2f * halfArc;
         float angle = WrapAngle(BrainFactory.YawOf(flat) - s.Yaw);
         return angle <= halfArc && angle >= current - 0.25f;
     }

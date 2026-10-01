@@ -34,11 +34,30 @@ public sealed class PlayerEntity
     /// <summary>Distance (m) from the eye to the crosshair point along <see cref="Aim"/> (terrain, or far away).</summary>
     public float AimDistance { get; set; } = 40f;
 
-    /// <summary>Ticks until the held item can be used again.</summary>
+    /// <summary>
+    /// Ticks until the held item acts again (Terraria's item time). Inside one animation a tool digs, and a gun whose
+    /// use time is shorter than its animation fires, each time this runs out.
+    /// </summary>
     public int UseCooldown { get; set; }
 
-    /// <summary>Ticks left in the current use animation (swing/shoot pose).</summary>
+    /// <summary>Ticks left in the current use animation (swing/shoot pose); a new animation starts only once it is 0.</summary>
     public int UseAnimation { get; set; }
+
+    /// <summary>Length (ticks) of the current use animation after speed bonuses; <see cref="UseAnimation"/> counts down from it.</summary>
+    public int UseAnimationMax { get; set; }
+
+    /// <summary>Goes up by one whenever a new use animation starts: presentation plays each clip once per change.</summary>
+    public int UseSerial { get; set; }
+
+    /// <summary>The item whose animation is (or was last) playing; using another item starts a new animation.</summary>
+    public Content.Defs.ItemDef? UseItem { get; set; }
+
+    /// <summary>Ends the current use so the next one starts a fresh animation at once (scripted uses, tests).</summary>
+    public void ResetUse()
+    {
+        UseCooldown = 0;
+        UseAnimation = 0;
+    }
 
     /// <summary>Crisp shape used when placing blocks.</summary>
     public Voxels.CellShape BuildShape { get; set; } = Voxels.CellShape.Full;

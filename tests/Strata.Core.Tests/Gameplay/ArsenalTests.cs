@@ -33,7 +33,7 @@ public class ArsenalTests
         g.Hold("wooden_boomerang");
         g.Player.Aim = Vector3.Normalize(gel.Center - g.Player.Eye);
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
-        g.Player.UseCooldown = 0;
+        g.Player.ResetUse();
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true)); // still out
         g.Ticks(30);
         Assert.True(gel.Life < 5000, "boomerang missed");
@@ -79,7 +79,7 @@ public class ArsenalTests
             MaxActive = 1,
         };
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
-        g.Player.UseCooldown = g.Player.UseAnimation = 0;
+        g.Player.ResetUse();
         Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true)); // the star is still out
         Assert.Single(g.World.Projectiles.All);
         Assert.Equal(1, g.World.Melee.ActiveSwings);
@@ -93,7 +93,7 @@ public class ArsenalTests
         g.Hold("zenith");
         g.Player.Aim = Vector3.UnitZ;
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
-        g.Player.UseCooldown = g.Player.UseAnimation = 0; // a fresh use while the first blades are still out
+        g.Player.ResetUse(); // a fresh use while the first blades are still out
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
         Assert.Equal(6, g.World.Projectiles.All.Count);
         Assert.Equal(0, g.World.Melee.ActiveSwings); // the swing is only an animation

@@ -17,7 +17,7 @@ public sealed partial class PlayerAvatar
     private static readonly float MaxTwist = Mathf.DegToRad(70f);
     private static readonly float Backpedal = Mathf.DegToRad(110f);
     private float _legYaw, _airTime, _fallSpeed, _landTimer;
-    private int _lastUse, _lastHurt = int.MaxValue;
+    private int _lastSerial, _lastHurt = int.MaxValue;
     private bool _backwards;
 
     private void Animate(PlayerEntity entity, float dt)
@@ -41,11 +41,11 @@ public sealed partial class PlayerAvatar
         string state = Locomotion(entity, h, v, ground, dt, out float rate);
         h.Locomotion(state, rate);
 
-        // Item actions: a new use (the use timer jumps back up) starts the item's action.
-        int use = entity.UseAnimation;
-        if (use > _lastUse && _heldItem != null && entity.Alive)
-            h.Play(ActionFor(_heldItem, _game.Uses[_heldItem]), use / (float)Strata.Core.Common.Units.TicksPerSecond);
-        _lastUse = use;
+        // Item actions: each new use animation (its serial changes) plays the item's action once, over the whole
+        // animation; tool hits and gun shots inside one animation never restart it.
+        if (entity.UseSerial != _lastSerial && _heldItem != null && entity.Alive && entity.UseAnimation > 0)
+            h.Play(ActionFor(_heldItem, _game.Uses[_heldItem]), entity.UseAnimationMax / (float)Strata.Core.Common.Units.TicksPerSecond);
+        _lastSerial = entity.UseSerial;
         int sinceHurt = entity.State.Vitals.TicksSinceHurt;
         if (sinceHurt < _lastHurt && entity.Alive) h.Hurt();
         _lastHurt = sinceHurt;

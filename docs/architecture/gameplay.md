@@ -8,6 +8,18 @@
   when the shot cannot fire; `noMelee` items (Zenith) only animate their swing. `shootProjectile.maxActive` caps
   how many of a weapon's projectiles one player has out (unset: one for returning projectiles, otherwise no cap;
   0: no cap); a capped use is refused before any ammo or mana is spent.
+* **Use timing** — as in Terraria, an item has a use *animation* (`useAnimation`; `PlayerEntity.UseAnimation`
+  counting down from `UseAnimationMax`) and a use *time* (`useTime`; `UseCooldown`, the action cadence). A new
+  animation starts only when the last one has played out (or for another item); it bumps `UseSerial`, which
+  presentation keys off to play each clip exactly once, so swings never restart mid-arc. Inside one animation a tool
+  digs, and a gun whose use time is shorter fires, whenever the use time runs out; a tool held down chains its next
+  swing as soon as the last ends, even while its next hit is still cooling down. Melee weapons strike once per
+  animation (`Swung`). Speed prefixes (`Prefixes.UseSpeed`) and melee speed divide both time and animation; mining
+  speed divides only a tool's use time (more hits per swing). `PlayerEntity.ResetUse()` ends the current use (the
+  `use` command and tests). Clip windows live in `data/config/use_styles.json` (`clips`: length, strike start/end,
+  release, bow re-draw; loaded by `Presentation.UseStyleConfig`, read through `Items.UseTiming`): a swing deals no
+  damage during its wind-up and sweeps its arc over the strike window (`UseTiming.Sweep`), a thrust connects only
+  while `UseTiming.Striking`.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor
@@ -22,8 +34,8 @@
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
-  resistance). `MeleeSystem` sweeps swing arcs/thrusts over the use animation (one hit per creature per
-  swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
+  resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
+  strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
 * **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
   brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage

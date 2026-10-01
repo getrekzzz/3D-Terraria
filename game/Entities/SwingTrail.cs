@@ -60,7 +60,7 @@ public sealed partial class SwingTrail : Node3D
             Pitch = Mathf.Clamp(Mathf.Asin(Mathf.Clamp(aim.Y, -1f, 1f)), -1.1f, 1.1f),
             HalfArc = thrust ? 0f : (info.Swing?.Arc ?? 150f) * Mathf.Pi / 360f,
             Reach = (thrust ? info.ThrustParams!.Length : info.Swing?.Length ?? 3f) * Units.CellSize + (thrust ? 0.4f : 0.6f),
-            Duration = Mathf.Max(0.12f, info.Item.UseAnimation / 60f),
+            Duration = Mathf.Max(0.12f, player.UseAnimationMax / 60f), // the animation after speed bonuses
             Color = new Color(1f, 1f, 1f).Lerp(rarity, 0.35f),
         });
     }

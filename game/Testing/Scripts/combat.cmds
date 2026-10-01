@@ -66,3 +66,25 @@ assert player.alive == 0
 wait_until player.alive == 1 10
 assert player.deaths >= 1
 assert errors == 0
+
+# --- P1-10 ---
+# Use time vs animation: a held pickaxe plays whole 21-tick swings and digs on its own 15-tick cadence inside them;
+# the wooden sword swings for 25 ticks, and Feral Claws (+12 % melee speed) shorten the whole swing to 22.
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+give copper_pickaxe 1
+wield copper_pickaxe
+aim 0.05 -1 0.05
+hold use_primary 1
+assert player.use_anim == 21
+assert player.swings >= 3
+give wooden_sword 1
+wield wooden_sword
+aim 0 0 1
+use
+assert player.use_anim == 25
+equip feral_claws
+use
+assert player.use_anim == 22
+assert melee.swings == 1
+assert errors == 0
