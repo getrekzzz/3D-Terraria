@@ -209,7 +209,7 @@ def mothron(mb: MeshBuilder, p, rng):
         b.ellipsoid((0, 0.08, 0.42), (0.085, 0.11, 0.085))               # thorax
         b.ellipsoid((0, -0.17, 0.39), (0.07, 0.17, 0.065), stiffness=2.5)  # abdomen
         b.ball((0, 0.21, 0.43), 0.06)                                    # head
-    organic(mb, body, "prop:fur", tris=2400, resolution=0.008,
+    organic(mb, body, "prop:fur", tris=3200, resolution=0.007,
             paint=lambda q, n: mix(FUZZ, FUZZ_LIGHT, 0.3 + 0.3 * noise3(q, 60) + (0.25 if math.sin(q.y * 70) > 0.6 and q.y < -0.05 else 0)),
             sculpt=lambda q, n: n * 0.012 * abs(noise3(q, 140)) ** 0.5)
     for sx in (-1, 1):
@@ -233,9 +233,9 @@ def mothron(mb: MeshBuilder, p, rng):
         mb.bone = f"wing.{s}"
         root = Vector((sx * 0.06, 0.07, 0.47))
         fan_wing(mb, root, sx, -0.75, 0.55, lambda th: 0.5 * (1 - 0.18 * math.sin((th + 0.75) / 1.3 * math.pi)) * (0.85 + 0.15 * math.cos(th)),
-                 "prop:fur", _moth_paint(base, dark, True), nu=12, nv=7, dihedral=0.05, camber=0.02, thickness=0.004)
+                 "prop:fur", _moth_paint(base, dark, True), nu=18, nv=10, dihedral=0.05, camber=0.02, thickness=0.004)
         fan_wing(mb, root + Vector((0, -0.07, -0.01)), sx, 0.45, 1.3, lambda th: 0.36 * (1 - 0.25 * math.sin((th - 0.45) / 0.85 * math.pi)),
-                 "prop:fur", _moth_paint(mix(base, "#c08a50", 0.3), dark, False), nu=8, nv=6, dihedral=0.0, camber=0.02, thickness=0.004)
+                 "prop:fur", _moth_paint(mix(base, "#c08a50", 0.3), dark, False), nu=12, nv=8, dihedral=0.0, camber=0.02, thickness=0.004)
     mb.bone = None
 
     def fly(t):
