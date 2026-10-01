@@ -148,11 +148,12 @@ public sealed partial class CreatureVisual : Node3D
     }
 
     /// <summary>
-    /// Colours a recolourable player model (generated with marker colours) to a character's look: hair, skin, shirt,
-    /// trousers and shoes.
+    /// Colours a recolourable player model (generated with marker colours) to a character's look: hair, skin, eyes,
+    /// shirt, undershirt, trousers and shoes; the chosen hair model is worn on the head.
     /// </summary>
     public void SetAppearance(Strata.Core.Gameplay.Player.Appearance look)
     {
+        WearHair(look.HairModelId);
         foreach (var g in _geometry)
         {
             g.SetInstanceShaderParameter("recolor", 1f);
@@ -161,6 +162,8 @@ public sealed partial class CreatureVisual : Node3D
             g.SetInstanceShaderParameter("shirt_color", Linear(look.ShirtColor));
             g.SetInstanceShaderParameter("pants_color", Linear(look.PantsColor));
             g.SetInstanceShaderParameter("shoe_color", Linear(look.ShoeColor));
+            g.SetInstanceShaderParameter("eye_color", Linear(look.EyeColor));
+            g.SetInstanceShaderParameter("undershirt_color", Linear(look.UndershirtColor));
         }
     }
 

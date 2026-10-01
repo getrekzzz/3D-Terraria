@@ -30,7 +30,8 @@ uniform float sss = 0.0;
 uniform float sheen = 0.0;
 instance uniform vec4 voxel_light = vec4(0.0, 0.0, 0.0, 1.0);
 instance uniform vec4 tint = vec4(1.0);
-// Player characters are generated with marker colours (grey hair, belt and boots, a red shirt, a green pair of trousers)
+// Player characters are generated with marker colours (grey hair, belt and boots, a red shirt, a green pair of trousers,
+// a blue undershirt and irises)
 // and recoloured to the character's chosen look; linear colours, recolor = 1 enables it.
 instance uniform float recolor = 0.0;
 instance uniform vec4 hair_color = vec4(0.216, 0.216, 0.216, 1.0);
@@ -38,6 +39,9 @@ instance uniform vec4 skin_color = vec4(0.745, 0.434, 0.279, 1.0);
 instance uniform vec4 shirt_color = vec4(0.434, 0.080, 0.080, 1.0);
 instance uniform vec4 pants_color = vec4(0.080, 0.352, 0.080, 1.0);
 instance uniform vec4 shoe_color = vec4(0.216, 0.216, 0.216, 1.0);
+// The undershirt (vest and coat clothing styles) is generated blue, the iris of the eyes the same blue.
+instance uniform vec4 undershirt_color = vec4(0.080, 0.080, 0.434, 1.0);
+instance uniform vec4 eye_color = vec4(0.080, 0.080, 0.434, 1.0);
 
 varying vec3 v_rest;
 varying vec3 v_rest_normal;
@@ -82,9 +86,12 @@ void fragment() {
 	if (recolor > 0.5) {
 		if (kind == 2) base = recolored(COLOR.rgb, vec3(0.216), hair_color.rgb) * tint.rgb;
 		else if (kind == 0) base = COLOR.rgb * skin_color.rgb / vec3(0.745, 0.434, 0.279) * tint.rgb;
-		else if (kind == 4) base = (COLOR.r > COLOR.g
+		else if (kind == 4) base = (COLOR.b > max(COLOR.r, COLOR.g)
+			? recolored(COLOR.rgb, vec3(0.080, 0.080, 0.434), undershirt_color.rgb)
+			: COLOR.r > COLOR.g
 			? recolored(COLOR.rgb, vec3(0.434, 0.080, 0.080), shirt_color.rgb)
 			: recolored(COLOR.rgb, vec3(0.080, 0.352, 0.080), pants_color.rgb)) * tint.rgb;
+		else if (kind == 1 && COLOR.b > max(COLOR.r, COLOR.g) * 1.6) base = recolored(COLOR.rgb, vec3(0.080, 0.080, 0.434), eye_color.rgb) * tint.rgb;
 		else if (kind == 5) base = recolored(COLOR.rgb, vec3(0.216), shoe_color.rgb) * tint.rgb;
 	}
 	vec3 n = normalize(v_rest_normal);

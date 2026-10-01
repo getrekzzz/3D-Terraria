@@ -11,6 +11,7 @@ Options:
   --no-icons       skip icon rendering
   --samples=N      Cycles samples per icon (default 24)
   --portraits      render only the town NPC head shots and bestiary thumbnails (assets/icons/{npcs,creatures})
+  --hair           build only the hair models (assets/models/hair; --only matches <m|f>_<style>)
   --boss-icons     render only the boss-bar head icons (assets/icons/bosses; --only matches boss ids)
   --anims          build only the human animation sets (assets/models/creatures/anim; --only matches characters or sets)
   --shard=I/N      with --anims: build every Nth set starting at I (to run several builds side by side)
@@ -39,7 +40,7 @@ GENERATOR_VERSION = 1
 
 def args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
-    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None, "boss_icons": False, "portraits": False}
+    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None, "boss_icons": False, "portraits": False, "hair": False}
     for a in argv:
         if a == "--check":
             opts["check"] = True
@@ -49,6 +50,8 @@ def args():
             opts["icons"] = False
         elif a.startswith("--samples="):
             opts["samples"] = int(a.split("=", 1)[1])
+        elif a == "--hair":
+            opts["hair"] = True
         elif a == "--portraits":
             opts["portraits"] = True
         elif a == "--boss-icons":
@@ -88,6 +91,8 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, it
     creature_generators.update(registry)
     manifest_path = REPO / "assets" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() and opts["only"] else {"objects": {}, "items": {}}
+    if not opts["only"] and manifest_path.exists():  # hair models are built by --hair alone; a full build keeps them
+        manifest["hair"] = json.loads(manifest_path.read_text(encoding="utf-8")).get("hair", {})
     wanted = (lambda i: any(fnmatch.fnmatch(i, pat) for pat in opts["only"].split(","))) if opts["only"] else (lambda i: True)
 
     def make(asset_id, job, variant, held=False):
@@ -253,6 +258,15 @@ def main() -> int:
         print("ERROR: missing portraits (build_all.py --portraits):", ", ".join(missing))
         return 1
     if opts["check"]:
+        return 0
+    if opts["hair"]:
+        import bpy  # noqa: F401
+        from bgen import hair_build
+        pats = opts["only"].split(",") if opts["only"] else ["*"]
+        manifest_path = REPO / "assets" / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        hair_build.build_hair(REPO, manifest, lambda i: any(fnmatch.fnmatch(i, p) for p in pats))
+        manifest_path.write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
         return 0
     if opts["portraits"]:
         import bpy  # noqa: F401

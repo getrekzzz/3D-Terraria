@@ -35,6 +35,35 @@ public sealed partial class CreatureVisual
         return best;
     }
 
+    private MeshInstance3D? _hair;
+    private string? _hairId;
+
+    /// <summary>
+    /// Wears a hair model (assets/models/hair/&lt;id&gt;.glb, built in the head bone's space by build_all.py --hair) on the
+    /// head, or none; it joins the model's geometry so light, tint and recolouring reach it.
+    /// </summary>
+    private void WearHair(string? id)
+    {
+        if (id == _hairId) return;
+        _hairId = id;
+        if (_hair != null)
+        {
+            _geometry.Remove(_hair);
+            _hair.GetParent()?.QueueFree();
+            _hair = null;
+        }
+        if (id == null || _props == null || _props.Model($"assets/models/hair/{id}.glb", multimesh: false) is not { } mesh) return;
+        var node = new MeshInstance3D { Mesh = mesh, Name = "Hair", LodBias = _geometry.Count > 0 ? _geometry[0].LodBias : 1f };
+        if (!AttachToBone("head", node))
+        {
+            node.QueueFree();
+            return;
+        }
+        _hair = node;
+        _geometry.Add(node);
+        if (_lit) node.SetInstanceShaderParameter("voxel_light", _light);
+    }
+
     /// <summary>The name of a bone's parent, or null.</summary>
     public string? ParentBone(string bone)
     {

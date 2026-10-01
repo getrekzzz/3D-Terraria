@@ -6,7 +6,7 @@ eyeballs (head) -> hands with fingers and nails (hands) -> skin painting (paint)
 with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
-hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat, hatColor, mask, horns, wings, tail, anatomy
+hair, hairStyle, beard, shirt, vest, pants, boots, coat, robe, trim, apron, hat, hatColor, mask, horns, wings, tail, anatomy
 (human|skeleton), undead.
 """
 import math
@@ -220,8 +220,14 @@ def dress(fr, head, parts, p):
     if not p.get("robe"):
         add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", cuts=w.pants_cuts()), w.in_pants)
     add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", folds=0.3, cuts=w.boot_cuts()), w.in_boots)
+    if "vest" in p:  # a sleeveless vest over the shirt (the shirt shows as sleeves and collar)
+        add(w.shell(body, lambda co: w.in_shirt(co) and not w._on_arm(co), "vest", 0.011, p["vest"], "char:cloth", folds=0.7,
+                    cuts=w.shirt_cuts()))
     if "coat" in p:
-        add(w.shell(body, w.in_shirt, "coat", 0.012, p["coat"], "char:cloth", folds=1.3, cuts=w.shirt_cuts()))
+        # coatOpen: the coat hangs open down the front, showing the shirt underneath.
+        front = (lambda co: co.y > 0 and abs(co.x) < 0.05 * fr.s) if p.get("coatOpen") else (lambda co: False)
+        add(w.shell(body, lambda co: w.in_shirt(co) and not front(co), "coat", 0.012, p["coat"], "char:cloth", folds=1.3,
+                    cuts=w.shirt_cuts()))
         add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True))
     if "robe" in p:
         add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim")))
