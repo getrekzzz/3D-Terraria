@@ -4,7 +4,10 @@
   healing) plus explicit `behaviors`. `ItemUseSystem` enforces use time, auto-reuse and reach, and performs
   mining (brush sized by `mineBrush`, precision mode = 1 cell), chopping, hammer reshaping, block/object
   placement (shape + facing rotation), consumption (healing fatigue, permanent life/mana caps) and shooting
-  (ammo classes, mana).
+  (ammo classes, mana). A sword that also shoots (Starfury, Terra Blade) swings with every shot and still swings
+  when the shot cannot fire; `noMelee` items (Zenith) only animate their swing. `shootProjectile.maxActive` caps
+  how many of a weapon's projectiles one player has out (unset: one for returning projectiles, otherwise no cap;
+  0: no cap); a capped use is refused before any ammo or mana is spent.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor

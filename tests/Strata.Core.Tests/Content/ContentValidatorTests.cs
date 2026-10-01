@@ -114,6 +114,28 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void NoMeleeBladesCannotSwingAndShotLimitsMustAllowAShot()
+    {
+        var db = Load("""
+        { "projectiles": [ { "id": "blade", "returns": 30 }, { "id": "beam" } ],
+          "items": [
+            { "id": "fake_zenith", "useStyle": "swing", "noMelee": true, "damage": 5, "damageType": "melee", "projectile": "beam",
+              "behaviors": [ { "type": "meleeSwing" }, { "type": "shootProjectile" } ] },
+            { "id": "triple_rang", "useStyle": "shoot", "damage": 5, "damageType": "melee", "projectile": "blade",
+              "behaviors": [ { "type": "shootProjectile", "count": 3 } ] },
+            { "id": "bad_limit", "useStyle": "shoot", "damage": 5, "damageType": "melee", "projectile": "beam",
+              "behaviors": [ { "type": "shootProjectile", "maxActive": -1 } ] },
+            { "id": "real_zenith", "useStyle": "swing", "noMelee": true, "damage": 5, "damageType": "melee", "projectile": "blade",
+              "behaviors": [ { "type": "shootProjectile", "count": 3, "maxActive": 0 } ] }
+          ] }
+        """);
+        AssertError(db, "noMelee items cannot have a meleeSwing behaviour");
+        AssertError(db, "fires 3 'blade' per use but only 1 may be out at once");
+        AssertError(db, "maxActive must be >= 0");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":real_zenith", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void RejectsBadIdsAndCovers()
     {
         var db = Load("""{ "items": [ { "id": "BadId", "covers": ["copper"] } ] }""");

@@ -94,6 +94,7 @@ public sealed partial class ItemUseSystem
         float reach = ReachMeters(p, item);
         var inReach = target != null && target.Distance <= reach ? target : null;
         var outcome = UseOutcome.None;
+        bool shotFailed = false;
         int useTime = Prefixes.UseTime(held, item.UseTime);
 
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject))
@@ -148,13 +149,16 @@ public sealed partial class ItemUseSystem
         else if (info.Has(ItemAction.Shoot))
         {
             outcome = Shoot(p, info);
+            shotFailed = outcome is UseOutcome.NoAmmo or UseOutcome.NoMana or UseOutcome.Blocked;
         }
 
-        // Swings and thrusts (shortswords, spears) both attack through the melee system.
-        if (info.Has(ItemAction.Melee | ItemAction.Thrust) && outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool)
+        // Swings and thrusts (shortswords, spears) both attack through the melee system. A blade that also shoots
+        // (Starfury, Terra Blade) swings with every shot, and still swings when the shot cannot fire.
+        if (info.Has(ItemAction.Melee | ItemAction.Thrust)
+            && (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Shot or UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool))
         {
             Swung?.Invoke(p, info);
-            if (outcome is UseOutcome.None or UseOutcome.OutOfReach) outcome = UseOutcome.Swung;
+            if (shotFailed || outcome is UseOutcome.None or UseOutcome.OutOfReach) outcome = UseOutcome.Swung;
             useTime = (int)MathF.Ceiling(useTime / (1f + p.State.Effects.Stats.Bonus(StatIds.MeleeSpeed)));
         }
         if (outcome is UseOutcome.None or UseOutcome.OutOfReach or UseOutcome.Blocked or UseOutcome.NoAmmo or UseOutcome.NoMana) return outcome;

@@ -60,7 +60,7 @@ public sealed partial class PlayerAvatar : Node3D
         if (entity.UseAnimation > 0 && _heldItem != null)
         {
             var info = _game.Uses[_heldItem];
-            return info.Has(ItemAction.Melee) || info.IsTool ? "swing" : "use";
+            return info.Has(ItemAction.Melee) || info.IsTool || _heldItem.UseStyle == UseStyle.Swing ? "swing" : "use";
         }
         var v = _controller.Velocity;
         if (!_controller.IsOnFloor() && !_controller.Frozen) return v.Y > 0 ? "jump" : "fall";

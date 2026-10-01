@@ -1,4 +1,5 @@
-# Combat smoke test: creatures spawn, chase and damage the player; melee, bows and loot work; respawn works.
+# Combat smoke test: creatures spawn, chase and damage the player; melee, swords that shoot, Zenith, bows and loot
+# work; respawn works.
 wait_until player.frozen == 0 180
 spawning off
 killall
@@ -20,6 +21,29 @@ repeat 12 use
 wait 1.5
 killall
 heal
+
+# A sword that shoots still swings: the blade hits a frozen slime at 2 m while the star flies on.
+give starfury 1
+wield starfury
+killall
+aim 0 0 1
+spawn green_slime 1 2
+ai off
+use
+assert projectiles.count >= 1
+wait 0.6
+assert npcs.alive_life < 14
+ai on
+killall
+
+# Zenith never blocks: a second use throws three more blades while the first three are still out.
+wait_until projectiles.count == 0 5
+give zenith 1
+wield zenith
+use
+use
+assert projectiles.count >= 6
+wait_until projectiles.count == 0 5
 
 # Arrows fly and hit.
 give wooden_bow 1
