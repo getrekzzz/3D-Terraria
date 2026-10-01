@@ -1,11 +1,17 @@
 """Upper-body item actions for generated humans. The game layers these over locomotion (filtered to the spine, head
-and arms) and time-scales each to the item's use time, so they only need the right shape and rhythm:
+and arms) and time-scales each to the item's use animation, so they only need the right shape and rhythm. The clips
+that gameplay times (swing, mine, thrust, bow) take their length and windows from data/config/use_styles.json, the
+file Core reads for the strike window (src/Strata.Core/Presentation/UseStyleConfig.cs), so what the body shows and
+what the game does line up:
 
-swing   Terraria's overhead arc: wind up behind the head, a fast arc over the top, follow through low, recover.
-mine    a tool chop from over the shoulder with a little bounce on impact.
-thrust  pull back to the hip, lunge the arm straight out, retract (spears, shortswords).
+swing   Terraria's overhead arc: raised behind the head at the start and end (autoswing chains seamlessly), a short
+        wind-up, the strike over the top and down in front through the strike window (eased like the gameplay sweep),
+        a follow-through low, then the blade brought back up.
+mine    a tool chop from over the shoulder that bites early (impact at the strike end), a bounce, then the pull back up.
+thrust  pull back to the hip through the wind-up, lunge the arm straight out by the strike end, hold, retract.
 shoot   both hands on the weapon at shoulder height, a recoil kick and settle (guns, launchers).
-bow     the bow arm held out, the other hand drawing the string back to the cheek and releasing.
+bow     drawn to the cheek at the start, the string snaps at the release (the arrow leaves at once, as in Terraria),
+        the hand settles, nocks and draws again through the re-draw window and holds drawn (auto-fire chains).
 cast    a gathering pull then a palm-forward push (staffs, wands, tomes).
 drink   the hand brought to the mouth, head tipped back.
 use     the item lifted out in front (placing, summoning, other uses).
@@ -16,7 +22,34 @@ over 180 reaching behind the head. Held items stick out of the fist at right ang
 point-forward, a torch upright); the wrist angle turns them in line with the arm (about -100 with the elbow's soft bend), so blades, shafts and barrels
 extend the arm at the moment of a strike, a thrust or a shot.
 """
+import json
+import math
+import pathlib
+import re
+
 from .motion import BACK, FWD, SIDE_AXIS, UP, deg, tl, wave
+
+USE_STYLES = pathlib.Path(__file__).resolve().parents[4] / "data" / "config" / "use_styles.json"
+_COMMENTS = re.compile(r'"(?:\\.|[^"\\])*"|//[^\n]*|/\*.*?\*/', re.S)
+_TRAILING = re.compile(r'"(?:\\.|[^"\\])*"|,(?=\s*[}\]])')
+
+
+def load_jsonc(path):
+    """Reads a data file: JSON with // and /* */ comments and trailing commas (strings are left alone)."""
+    keep = lambda m: m.group(0) if m.group(0).startswith('"') else ""
+    return json.loads(_TRAILING.sub(keep, _COMMENTS.sub(keep, path.read_text(encoding="utf-8"))))
+
+
+def timing():
+    """Clip name -> its entry in use_styles.json "clips" (length, strikeStart/strikeEnd, release/redrawStart/redrawEnd)."""
+    clips = load_jsonc(USE_STYLES)["clips"]
+    need = {"swing": ("strikeStart", "strikeEnd"), "mine": ("strikeStart", "strikeEnd"), "thrust": ("strikeStart", "strikeEnd"),
+            "bow": ("release", "redrawStart", "redrawEnd")}
+    for name, keys in need.items():
+        missing = [k for k in ("length",) + keys if k not in clips.get(name, {})]
+        if missing:
+            raise SystemExit(f"ERROR: {USE_STYLES}: clip '{name}' needs {', '.join(missing)}")
+    return clips
 
 
 def arm(pose, side, pitch, elbow, inward=0.0, wrist=0.0):
@@ -38,40 +71,63 @@ def torso(pose, twist=0.0, lean=0.0, look=True):
     return pose
 
 
-def swing(t):
-    pitch = tl(t, [(0, 178), (0.22, 208, "out"), (0.46, 72, "in"), (0.62, 26, "out"), (1, 34, "io")])
-    elbow = tl(t, [(0, 45), (0.22, 72, "out"), (0.46, 4, "in"), (0.62, 14), (1, 22)])
-    inward = tl(t, [(0, 0), (0.22, -4), (0.46, 10, "in"), (0.62, 22, "out"), (1, 10)])
-    wrist = tl(t, [(0, -30), (0.22, -10), (0.46, -75, "in"), (0.62, -80), (1, -45)])   # the blade extends the arm at the strike
-    twist = tl(t, [(0, -14), (0.22, -26, "out"), (0.46, 20, "in"), (0.62, 28, "out"), (1, 6)])
-    lean = tl(t, [(0, -3), (0.22, -7), (0.46, 12, "in"), (0.62, 15), (1, 3)])
+def keyed(t, keys, values):
+    """One channel over shared key times: keys = [(time, ease), ...], values = one value per key."""
+    return tl(t, [(k, v, e) for (k, e), v in zip(keys, values)])
+
+
+def hump(t, start, end):
+    """0 outside [start, end], rising smoothly to 1 halfway through."""
+    if not start < t < end:
+        return 0.0
+    return math.sin(math.pi * (t - start) / (end - start)) ** 2
+
+
+def swing(t, w):
+    a, b = w["strikeStart"], w["strikeEnd"]
+    f = b + 0.3 * (1 - b)                   # the end of the follow-through; the rest brings the blade back up
+    keys = [(0, "lin"), (a, "out"), (b, "io"), (f, "out"), (1, "io")]
+    #                       raised  wind-up  struck  follow  raised
+    pitch = keyed(t, keys, (195, 205, 45, 26, 195))
+    elbow = keyed(t, keys, (20, 30, 6, 14, 20)) + 85 * hump(t, f, 1)     # the elbow folds to lift the blade back
+    inward = keyed(t, keys, (0, -4, 12, 22, 0))
+    wrist = keyed(t, keys, (-95, -90, -78, -80, -95))   # the blade in line with the arm: raised up-back, extending the strike
+    twist = keyed(t, keys, (-20, -26, 22, 28, -20))
+    lean = keyed(t, keys, (-5, -7, 13, 15, -5))
     pose = torso({}, twist, lean)
     arm(pose, "R", pitch, elbow, inward, wrist)
-    counter = tl(t, [(0, 30), (0.22, 48), (0.46, -18, "in"), (0.62, -24), (1, 8)])
+    counter = keyed(t, keys, (42, 48, -18, -24, 42))
     arm(pose, "L", counter, 30 + 0.3 * max(0.0, counter), 14)
     return pose
 
 
-def mine(t):
-    pitch = tl(t, [(0, 110), (0.26, 168, "out"), (0.5, 58, "in"), (0.58, 70, "out"), (1, 100, "io")])
-    elbow = tl(t, [(0, 55), (0.26, 98, "out"), (0.5, 10, "in"), (0.58, 18), (1, 48)])
-    twist = tl(t, [(0, -8), (0.26, -18), (0.5, 14, "in"), (0.58, 12), (1, -2)])
-    lean = tl(t, [(0, 0), (0.26, -5), (0.5, 15, "in"), (0.58, 13), (1, 3)])
+def mine(t, w):
+    a, b = w["strikeStart"], w["strikeEnd"]
+    keys = [(0, "lin"), (a, "out"), (b, "in"), (min(b + 0.08, (b + 1) / 2), "out"), (1, "io")]
+    #                       raised  wind-up  impact  bounce  raised
+    pitch = keyed(t, keys, (160, 170, 50, 66, 160))
+    elbow = keyed(t, keys, (70, 80, 10, 18, 70))
+    twist = keyed(t, keys, (-15, -18, 14, 12, -15))
+    lean = keyed(t, keys, (-4, -5, 15, 13, -4))
+    wrist = keyed(t, keys, (-90, -85, -95, -88, -90))   # the handle over the shoulder, then in line at the bite
     pose = torso({}, twist, lean)
-    arm(pose, "R", pitch, elbow, 6, tl(t, [(0, -20), (0.26, -5), (0.5, -80, "in"), (0.58, -75), (1, -35)]))
+    arm(pose, "R", pitch, elbow, 6, wrist)
     arm(pose, "L", 38, 88, 26)            # the free hand braced at the chest
     return pose
 
 
-def thrust(t):
-    pitch = tl(t, [(0, 45), (0.3, 18, "out"), (0.5, 88, "in"), (0.66, 86), (1, 52, "io")])
-    elbow = tl(t, [(0, 60), (0.3, 100, "out"), (0.5, 0, "in"), (0.66, 3), (1, 50)])
-    twist = tl(t, [(0, 0), (0.3, -22, "out"), (0.5, 24, "in"), (0.66, 22), (1, 2)])
-    lean = tl(t, [(0, 0), (0.3, -4), (0.5, 12, "in"), (0.66, 10), (1, 1)])
+def thrust(t, w):
+    a, b = w["strikeStart"], w["strikeEnd"]
+    keys = [(0, "lin"), (a, "out"), (b, "in"), (min(b + 0.1, (b + 1) / 2), "lin"), (1, "io")]
+    #                       ready  pulled  lunged  held  ready
+    pitch = keyed(t, keys, (45, 18, 88, 86, 45))
+    elbow = keyed(t, keys, (60, 100, 0, 3, 60))
+    twist = keyed(t, keys, (0, -22, 24, 22, 0))
+    lean = keyed(t, keys, (0, -4, 12, 10, 0))
     pose = torso({}, twist, lean)
-    pose["clavicle.R"] = [("swing", FWD, deg(tl(t, [(0, 0), (0.3, -6), (0.5, 12, "in"), (1, 0)])))]
+    pose["clavicle.R"] = [("swing", FWD, deg(keyed(t, keys, (0, -6, 12, 11, 0))))]
     arm(pose, "R", pitch, elbow, 8, -104)         # the shaft in line with the arm, like a lance
-    arm(pose, "L", tl(t, [(0, 20), (0.3, 36), (0.5, -12, "in"), (1, 14)]), 34, 10)
+    arm(pose, "L", keyed(t, keys, (20, 36, -12, -10, 20)), 34, 10)
     return pose
 
 
@@ -84,13 +140,19 @@ def shoot(t):
     return pose
 
 
-def bow(t):
-    draw = tl(t, [(0, 0.1), (0.5, 1, "out"), (0.6, 1, "lin"), (0.66, -0.1, "in"), (1, 0.1, "io")])
+def bow(t, w, m):
+    r, a, b = w["release"], w["redrawStart"], w["redrawEnd"]
+    snap = min(r + 0.06, (r + a) / 2)
+    # 1 = drawn to the cheek; past 0 the hand follows the string forward. Drawn until the release, snaps, settles,
+    # takes the next arrow to the string at the re-draw start and is drawn again by its end.
+    draw = tl(t, [(0, 1), (r, 1, "lin"), (snap, -0.12, "out"), ((snap + a) / 2, 0.12, "io"), (a, 0.0, "io"), (b, 1, "io"), (1, 1, "lin")])
+    kick = tl(t, [(0, 0), (r, 0, "lin"), (snap, 1, "out"), (a, 0, "io")])
     pose = torso({}, 30, 0)
-    arm(pose, "R", 90, 2, -26)                       # the bow arm, square to the target
+    arm(pose, "R", 90 + 5 * kick, 2 + 6 * kick, -26)        # the bow arm, square to the target, jolted by the shot
     arm(pose, "L", 84 - 4 * draw, 30 + 115 * draw, 44 - 22 * draw)   # the string hand, drawn back to the cheek
-    pose["clavicle.L"] = [("swing", BACK, deg(10 * draw))]
-    return pose
+    pose["clavicle.L"] = [("swing", BACK, deg(10 * max(0.0, draw)))]
+    loose = tl(t, [(0, 0), (r, 0, "lin"), (snap, 1, "out"), (a, 0, "io")])
+    return {**pose, **m.fingers("L", -0.25 * loose, -0.3 * loose)}   # the fingers spring open as the string goes
 
 
 def cast(t):
@@ -127,8 +189,11 @@ def hold(t):
 
 
 def clips(m):
-    """name -> (length in seconds, pose function); the game rescales every action to its item's use time."""
+    """name -> (length in seconds, pose function); the game rescales every action to its item's use animation."""
+    w = timing()
+    timed = lambda name, fn: (w[name]["length"], lambda t: fn(t, w[name]))
     return {
-        "swing": (0.5, swing), "mine": (0.46, mine), "thrust": (0.4, thrust), "shoot": (0.5, shoot),
-        "bow": (0.7, bow), "cast": (0.5, cast), "drink": (0.8, drink), "use": (0.4, use), "hold": (2.0, hold),
+        "swing": timed("swing", swing), "mine": timed("mine", mine), "thrust": timed("thrust", thrust), "shoot": (0.5, shoot),
+        "bow": (w["bow"]["length"], lambda t: bow(t, w["bow"], m)), "cast": (0.5, cast), "drink": (0.8, drink),
+        "use": (0.4, use), "hold": (2.0, hold),
     }

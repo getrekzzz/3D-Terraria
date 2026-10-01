@@ -157,10 +157,14 @@ without hazing the image; a moonlit night keeps a blue ambient floor so shapes a
 
 ## Creature animation
 Generated humans (the player, town folk, humanoid enemies) play their shared animation set through a
-`HumanoidAnimator` (an `AnimationTree` built in code): a cross-faded locomotion state (idle, walk, run, sprint, jump,
-fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed so feet do not slide, negative
-when backpedalling), an upper-body `OneShot` for item actions stretched to the item's use time and restarted on
-every use (so you can swing while running), a right-arm blend that holds a carried torch up, and a hurt flinch. For
+`HumanoidAnimator` (an `AnimationTree` built in code): a cross-faded locomotion state (idle, walk, run, sprint,
+strafe_left, strafe_right, jump, fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed
+so feet do not slide, negative when backpedalling), an upper-body `OneShot` for item actions stretched to the item's
+use time and restarted on every use (so you can swing while running), a right-arm blend that holds a carried torch
+up, and a hurt flinch. The swing, chop and thrust start and end in their raised or ready pose, so chained uses flow
+into each other; their strike windows and the bow's release match `data/config/use_styles.json`. The strafe clips run
+`HumanoidAnimator.StrafeAngle` (45°) to the side of the hips: with the legs turned that far toward the movement, the
+feet travel straight sideways. For
 the player an `AimModifier` (`SkeletonModifier3D`) then turns the torso and head toward the aim while the legs face
 the way they walk, and brings the arms up to the aim for guns, bows, staffs and spears.
 

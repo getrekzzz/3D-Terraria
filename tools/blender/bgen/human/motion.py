@@ -1,7 +1,8 @@
 """Actions for generated humans, sampled every frame from pose functions (exact curves, authored easing, seamless
 loops).
 
-Whole-body clips: idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt, death. Upper-body actions that
+Whole-body clips: idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt, death, and strafe_left and
+strafe_right (runs at an angle to the hips, human/strafe.py). Upper-body actions that
 the game layers over them (swing, mine, thrust, shoot, bow, cast, drink, use, hold) live in human/actions.py. Undead
 folk (zombies, mummies) shamble with their arms held out; skeletons keep a hunch but walk normally.
 
@@ -146,7 +147,8 @@ class Motion:
             "hurt": (0.4, self.hurt),
             "death": (1.3, self.death),
         }
-        from . import actions     # (imports this module's helpers)
+        from . import actions, strafe     # (import this module's helpers)
+        clips.update(strafe.clips(walk, clips["run"][0]))
         clips.update(actions.clips(self))
         for name, (length, fn) in clips.items():
             self.clip(name, length, fn, base)
