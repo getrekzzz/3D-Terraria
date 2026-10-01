@@ -21,6 +21,10 @@ Art — X-09 character creator depth (after the integration UI push), X-17 hair/
 World & life — see the table. NPCs — X-05, X-10. Co-op multiplayer is NOT in scope unless the player asks.
 
 ## Rules for every session
+* **Screenshots to the player (standing rule):** after every major completion (each push and each notable feature),
+  send the player 1–3 screenshots with the SendUserFile tool (status "proactive", display "render", a one-line
+  plain-English caption). One short render per update (lavapipe in-game shot, Blender contact sheet or icon grid);
+  never a tuning loop; don't commit the PNGs.
 * Follow `docs/overhaul/_BRIEF.md` (LEAN MODE: no software-rendered tuning loops; adversarial review only for risky
   gameplay/Core/save/worldgen code; bundle small WPs; full headless CI before every push).
 * Setup (fresh container): `apt-get update && apt-get install -y dotnet-sdk-8.0 xvfb mesa-vulkan-drivers libvulkan1
