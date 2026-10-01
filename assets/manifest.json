@@ -462,6 +462,9 @@
  "items": {
   "abeemination": {
    "model": "assets/models/items/abeemination.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/abeemination.png"
   },
   "acorn": {
@@ -470,6 +473,10 @@
   },
   "adamantite_axe": {
    "model": "assets/models/items/adamantite_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/adamantite_axe.png"
   },
   "adamantite_bar": {
@@ -478,10 +485,18 @@
   },
   "adamantite_bow": {
    "model": "assets/models/items/adamantite_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/adamantite_bow.png"
   },
   "adamantite_broadsword": {
    "model": "assets/models/items/adamantite_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/adamantite_broadsword.png"
   },
   "adamantite_chainmail": {
@@ -490,10 +505,18 @@
   },
   "adamantite_chainsaw": {
    "model": "assets/models/items/adamantite_chainsaw.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.7 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/adamantite_chainsaw.png"
   },
   "adamantite_drill": {
    "model": "assets/models/items/adamantite_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/adamantite_drill.png"
   },
   "adamantite_forge": {
@@ -506,6 +529,10 @@
   },
   "adamantite_hammer": {
    "model": "assets/models/items/adamantite_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/adamantite_hammer.png"
   },
   "adamantite_helmet": {
@@ -514,10 +541,18 @@
   },
   "adamantite_pickaxe": {
    "model": "assets/models/items/adamantite_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/adamantite_pickaxe.png"
   },
   "adamantite_shortsword": {
    "model": "assets/models/items/adamantite_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/adamantite_shortsword.png"
   },
   "aglet": {
@@ -530,6 +565,10 @@
   },
   "amazon": {
    "model": "assets/models/items/amazon.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "string": "0 0.12 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/amazon.png"
   },
   "amber": {
@@ -542,10 +581,17 @@
   },
   "amethyst_hook": {
    "model": "assets/models/items/amethyst_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/amethyst_hook.png"
   },
   "amethyst_staff": {
    "model": "assets/models/items/amethyst_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/amethyst_staff.png"
   },
   "ancient_manipulator": {
@@ -558,6 +604,9 @@
   },
   "ankh_shield": {
    "model": "assets/models/items/ankh_shield.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/ankh_shield.png"
   },
   "anklet_of_the_wind": {
@@ -586,6 +635,10 @@
   },
   "ball_o_hurt": {
    "model": "assets/models/items/ball_o_hurt.glb",
+   "sockets": {
+    "chain": "0 0.08 0 > 0 1 0",
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/ball_o_hurt.png"
   },
   "band_of_regeneration": {
@@ -602,6 +655,10 @@
   },
   "bat_scepter": {
    "model": "assets/models/items/bat_scepter.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.46 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/bat_scepter.png"
   },
   "bed": {
@@ -618,6 +675,10 @@
   },
   "bee_gun": {
    "model": "assets/models/items/bee_gun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/bee_gun.png"
   },
   "bee_headgear": {
@@ -626,6 +687,10 @@
   },
   "bee_keeper": {
    "model": "assets/models/items/bee_keeper.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.95 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/bee_keeper.png"
   },
   "bee_wax": {
@@ -634,10 +699,17 @@
   },
   "beenade": {
    "model": "assets/models/items/beenade.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/beenade.png"
   },
   "bees_knees": {
    "model": "assets/models/items/bees_knees.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/bees_knees.png"
   },
   "beetle_helmet": {
@@ -662,6 +734,9 @@
   },
   "betsys_wrath": {
    "model": "assets/models/items/betsys_wrath.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/betsys_wrath.png"
   },
   "bird": {
@@ -670,14 +745,25 @@
   },
   "black_paint": {
    "model": "assets/models/items/black_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/black_paint.png"
   },
   "blade_of_grass": {
    "model": "assets/models/items/blade_of_grass.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.05 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/blade_of_grass.png"
   },
   "blade_staff": {
    "model": "assets/models/items/blade_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/blade_staff.png"
   },
   "blinkroot": {
@@ -694,6 +780,10 @@
   },
   "blizzard_staff": {
    "model": "assets/models/items/blizzard_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/blizzard_staff.png"
   },
   "bloody_spine": {
@@ -702,14 +792,24 @@
   },
   "blue_moon": {
    "model": "assets/models/items/blue_moon.glb",
+   "sockets": {
+    "chain": "0 0.08 0 > 0 1 0",
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/blue_moon.png"
   },
   "blue_paint": {
    "model": "assets/models/items/blue_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/blue_paint.png"
   },
   "bomb": {
    "model": "assets/models/items/bomb.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/bomb.png"
   },
   "bone": {
@@ -718,10 +818,17 @@
   },
   "book_of_skulls": {
    "model": "assets/models/items/book_of_skulls.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/book_of_skulls.png"
   },
   "boomstick": {
    "model": "assets/models/items/boomstick.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.7 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/boomstick.png"
   },
   "bottle": {
@@ -734,34 +841,62 @@
   },
   "bottomless_lava_bucket": {
    "model": "assets/models/items/bottomless_lava_bucket.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/bottomless_lava_bucket.png"
   },
   "bottomless_water_bucket": {
    "model": "assets/models/items/bottomless_water_bucket.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/bottomless_water_bucket.png"
   },
   "brain_of_confusion": {
    "model": "assets/models/items/brain_of_confusion.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/brain_of_confusion.png"
   },
   "breaker_blade": {
    "model": "assets/models/items/breaker_blade.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.3 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/breaker_blade.png"
   },
   "broken_hero_sword": {
    "model": "assets/models/items/broken_hero_sword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.6 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/broken_hero_sword.png"
   },
   "brown_paint": {
    "model": "assets/models/items/brown_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/brown_paint.png"
   },
   "bubble_gun": {
    "model": "assets/models/items/bubble_gun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/bubble_gun.png"
   },
   "bug_net": {
    "model": "assets/models/items/bug_net.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8368 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/bug_net.png"
   },
   "builder_potion": {
@@ -786,10 +921,18 @@
   },
   "cactus_pickaxe": {
    "model": "assets/models/items/cactus_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cactus_pickaxe.png"
   },
   "cactus_sword": {
    "model": "assets/models/items/cactus_sword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.85 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cactus_sword.png"
   },
   "campfire": {
@@ -806,14 +949,24 @@
   },
   "celestial_sigil": {
    "model": "assets/models/items/celestial_sigil.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/celestial_sigil.png"
   },
   "cell_phone": {
    "model": "assets/models/items/cell_phone.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cell_phone.png"
   },
   "chain_gun": {
    "model": "assets/models/items/chain_gun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.75 -0.04 > 0 1 0"
+   },
    "icon": "assets/icons/items/chain_gun.png"
   },
   "chlorophyte_bar": {
@@ -830,6 +983,10 @@
   },
   "chlorophyte_pickaxe": {
    "model": "assets/models/items/chlorophyte_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/chlorophyte_pickaxe.png"
   },
   "chlorophyte_plate_mail": {
@@ -838,10 +995,18 @@
   },
   "christmas_tree_sword": {
    "model": "assets/models/items/christmas_tree_sword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.2 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/christmas_tree_sword.png"
   },
   "clockwork_assault_rifle": {
    "model": "assets/models/items/clockwork_assault_rifle.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.85 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/clockwork_assault_rifle.png"
   },
   "cloud_in_a_balloon": {
@@ -854,6 +1019,10 @@
   },
   "cobalt_axe": {
    "model": "assets/models/items/cobalt_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_axe.png"
   },
   "cobalt_bar": {
@@ -862,10 +1031,18 @@
   },
   "cobalt_bow": {
    "model": "assets/models/items/cobalt_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/cobalt_bow.png"
   },
   "cobalt_broadsword": {
    "model": "assets/models/items/cobalt_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_broadsword.png"
   },
   "cobalt_chainmail": {
@@ -874,10 +1051,18 @@
   },
   "cobalt_chainsaw": {
    "model": "assets/models/items/cobalt_chainsaw.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.7 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_chainsaw.png"
   },
   "cobalt_drill": {
    "model": "assets/models/items/cobalt_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_drill.png"
   },
   "cobalt_greaves": {
@@ -886,6 +1071,10 @@
   },
   "cobalt_hammer": {
    "model": "assets/models/items/cobalt_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_hammer.png"
   },
   "cobalt_helmet": {
@@ -894,18 +1083,33 @@
   },
   "cobalt_pickaxe": {
    "model": "assets/models/items/cobalt_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_pickaxe.png"
   },
   "cobalt_shield": {
    "model": "assets/models/items/cobalt_shield.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_shield.png"
   },
   "cobalt_shortsword": {
    "model": "assets/models/items/cobalt_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cobalt_shortsword.png"
   },
   "code_1": {
    "model": "assets/models/items/code_1.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "string": "0 0.12 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/code_1.png"
   },
   "compass": {
@@ -922,6 +1126,10 @@
   },
   "copper_axe": {
    "model": "assets/models/items/copper_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/copper_axe.png"
   },
   "copper_bar": {
@@ -930,10 +1138,18 @@
   },
   "copper_bow": {
    "model": "assets/models/items/copper_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/copper_bow.png"
   },
   "copper_broadsword": {
    "model": "assets/models/items/copper_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/copper_broadsword.png"
   },
   "copper_chainmail": {
@@ -950,6 +1166,10 @@
   },
   "copper_hammer": {
    "model": "assets/models/items/copper_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/copper_hammer.png"
   },
   "copper_helmet": {
@@ -958,18 +1178,34 @@
   },
   "copper_pickaxe": {
    "model": "assets/models/items/copper_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/copper_pickaxe.png"
   },
   "copper_shortsword": {
    "model": "assets/models/items/copper_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/copper_shortsword.png"
   },
   "crimson_rod": {
    "model": "assets/models/items/crimson_rod.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.46 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/crimson_rod.png"
   },
   "crimtane_axe": {
    "model": "assets/models/items/crimtane_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/crimtane_axe.png"
   },
   "crimtane_bar": {
@@ -978,10 +1214,18 @@
   },
   "crimtane_bow": {
    "model": "assets/models/items/crimtane_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/crimtane_bow.png"
   },
   "crimtane_broadsword": {
    "model": "assets/models/items/crimtane_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/crimtane_broadsword.png"
   },
   "crimtane_chainmail": {
@@ -994,6 +1238,10 @@
   },
   "crimtane_hammer": {
    "model": "assets/models/items/crimtane_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/crimtane_hammer.png"
   },
   "crimtane_helmet": {
@@ -1002,10 +1250,18 @@
   },
   "crimtane_pickaxe": {
    "model": "assets/models/items/crimtane_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/crimtane_pickaxe.png"
   },
   "crimtane_shortsword": {
    "model": "assets/models/items/crimtane_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/crimtane_shortsword.png"
   },
   "cross_necklace": {
@@ -1018,10 +1274,17 @@
   },
   "crystal_storm": {
    "model": "assets/models/items/crystal_storm.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/crystal_storm.png"
   },
   "cursed_arrow": {
    "model": "assets/models/items/cursed_arrow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.38 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cursed_arrow.png"
   },
   "cursed_flame": {
@@ -1030,22 +1293,40 @@
   },
   "cursed_flames": {
    "model": "assets/models/items/cursed_flames.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cursed_flames.png"
   },
   "cutlass": {
    "model": "assets/models/items/cutlass.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.95 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cutlass.png"
   },
   "cyan_paint": {
    "model": "assets/models/items/cyan_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/cyan_paint.png"
   },
   "daedalus_stormbow": {
    "model": "assets/models/items/daedalus_stormbow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/daedalus_stormbow.png"
   },
   "dark_lance": {
    "model": "assets/models/items/dark_lance.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.52 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/dark_lance.png"
   },
   "dart_trap": {
@@ -1062,14 +1343,26 @@
   },
   "daybreak": {
    "model": "assets/models/items/daybreak.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.52 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/daybreak.png"
   },
   "deadly_sphere_staff": {
    "model": "assets/models/items/deadly_sphere_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/deadly_sphere_staff.png"
   },
   "death_sickle": {
    "model": "assets/models/items/death_sickle.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/death_sickle.png"
   },
   "deathweed": {
@@ -1082,10 +1375,16 @@
   },
   "deer_thing": {
    "model": "assets/models/items/deer_thing.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/deer_thing.png"
   },
   "demon_scythe": {
    "model": "assets/models/items/demon_scythe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/demon_scythe.png"
   },
   "demon_wings": {
@@ -1094,6 +1393,10 @@
   },
   "demonite_axe": {
    "model": "assets/models/items/demonite_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/demonite_axe.png"
   },
   "demonite_bar": {
@@ -1102,10 +1405,18 @@
   },
   "demonite_bow": {
    "model": "assets/models/items/demonite_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/demonite_bow.png"
   },
   "demonite_broadsword": {
    "model": "assets/models/items/demonite_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/demonite_broadsword.png"
   },
   "demonite_chainmail": {
@@ -1118,6 +1429,10 @@
   },
   "demonite_hammer": {
    "model": "assets/models/items/demonite_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/demonite_hammer.png"
   },
   "demonite_helmet": {
@@ -1126,10 +1441,18 @@
   },
   "demonite_pickaxe": {
    "model": "assets/models/items/demonite_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/demonite_pickaxe.png"
   },
   "demonite_shortsword": {
    "model": "assets/models/items/demonite_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/demonite_shortsword.png"
   },
   "depth_meter": {
@@ -1142,14 +1465,24 @@
   },
   "diamond_hook": {
    "model": "assets/models/items/diamond_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/diamond_hook.png"
   },
   "diamond_staff": {
    "model": "assets/models/items/diamond_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/diamond_staff.png"
   },
   "dual_hook": {
    "model": "assets/models/items/dual_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/dual_hook.png"
   },
   "duck": {
@@ -1158,6 +1491,9 @@
   },
   "dynamite": {
    "model": "assets/models/items/dynamite.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/dynamite.png"
   },
   "ebonkoi": {
@@ -1170,6 +1506,10 @@
   },
   "elf_melter": {
    "model": "assets/models/items/elf_melter.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.75 -0.04 > 0 1 0"
+   },
    "icon": "assets/icons/items/elf_melter.png"
   },
   "emerald": {
@@ -1178,10 +1518,17 @@
   },
   "emerald_hook": {
    "model": "assets/models/items/emerald_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/emerald_hook.png"
   },
   "emerald_staff": {
    "model": "assets/models/items/emerald_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/emerald_staff.png"
   },
   "empress_wings": {
@@ -1190,14 +1537,24 @@
   },
   "empty_bucket": {
    "model": "assets/models/items/empty_bucket.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/empty_bucket.png"
   },
   "enchanted_boomerang": {
    "model": "assets/models/items/enchanted_boomerang.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/enchanted_boomerang.png"
   },
   "enchanted_sword": {
    "model": "assets/models/items/enchanted_sword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/enchanted_sword.png"
   },
   "endurance_potion": {
@@ -1206,14 +1563,24 @@
   },
   "eternia_crystal": {
    "model": "assets/models/items/eternia_crystal.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/eternia_crystal.png"
   },
   "excalibur": {
    "model": "assets/models/items/excalibur.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.05 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/excalibur.png"
   },
   "eye_of_the_golem": {
    "model": "assets/models/items/eye_of_the_golem.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/eye_of_the_golem.png"
   },
   "faeling": {
@@ -1242,6 +1609,10 @@
   },
   "finch_staff": {
    "model": "assets/models/items/finch_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/finch_staff.png"
   },
   "fireblossom": {
@@ -1262,6 +1633,10 @@
   },
   "fisher_of_souls": {
    "model": "assets/models/items/fisher_of_souls.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/fisher_of_souls.png"
   },
   "fishron_wings": {
@@ -1270,18 +1645,33 @@
   },
   "flairon": {
    "model": "assets/models/items/flairon.glb",
+   "sockets": {
+    "chain": "0 0.08 0 > 0 1 0",
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/flairon.png"
   },
   "flamarang": {
    "model": "assets/models/items/flamarang.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/flamarang.png"
   },
   "flamelash": {
    "model": "assets/models/items/flamelash.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.46 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/flamelash.png"
   },
   "flaming_arrow": {
    "model": "assets/models/items/flaming_arrow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.38 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/flaming_arrow.png"
   },
   "fledgling_wings": {
@@ -1290,10 +1680,18 @@
   },
   "fleshcatcher": {
    "model": "assets/models/items/fleshcatcher.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/fleshcatcher.png"
   },
   "flintlock_pistol": {
    "model": "assets/models/items/flintlock_pistol.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/flintlock_pistol.png"
   },
   "flinx_fur": {
@@ -1306,10 +1704,18 @@
   },
   "flower_pow": {
    "model": "assets/models/items/flower_pow.glb",
+   "sockets": {
+    "chain": "0 0.08 0 > 0 1 0",
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/flower_pow.png"
   },
   "flying_dragon": {
    "model": "assets/models/items/flying_dragon.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.2 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/flying_dragon.png"
   },
   "frog": {
@@ -1338,6 +1744,10 @@
   },
   "gold_axe": {
    "model": "assets/models/items/gold_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/gold_axe.png"
   },
   "gold_bar": {
@@ -1346,10 +1756,18 @@
   },
   "gold_bow": {
    "model": "assets/models/items/gold_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/gold_bow.png"
   },
   "gold_broadsword": {
    "model": "assets/models/items/gold_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/gold_broadsword.png"
   },
   "gold_chainmail": {
@@ -1370,6 +1788,10 @@
   },
   "gold_hammer": {
    "model": "assets/models/items/gold_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/gold_hammer.png"
   },
   "gold_helmet": {
@@ -1378,10 +1800,18 @@
   },
   "gold_pickaxe": {
    "model": "assets/models/items/gold_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/gold_pickaxe.png"
   },
   "gold_shortsword": {
    "model": "assets/models/items/gold_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/gold_shortsword.png"
   },
   "golden_crate": {
@@ -1390,22 +1820,38 @@
   },
   "golden_fishing_rod": {
    "model": "assets/models/items/golden_fishing_rod.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/golden_fishing_rod.png"
   },
   "golden_shower": {
    "model": "assets/models/items/golden_shower.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/golden_shower.png"
   },
   "gps": {
    "model": "assets/models/items/gps.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/gps.png"
   },
   "grappling_hook": {
    "model": "assets/models/items/grappling_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/grappling_hook.png"
   },
   "gray_paint": {
    "model": "assets/models/items/gray_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/gray_paint.png"
   },
   "greater_healing_potion": {
@@ -1418,10 +1864,16 @@
   },
   "green_paint": {
    "model": "assets/models/items/green_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/green_paint.png"
   },
   "grenade": {
    "model": "assets/models/items/grenade.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/grenade.png"
   },
   "guide_voodoo_doll": {
@@ -1446,18 +1898,34 @@
   },
   "hallowed_repeater": {
    "model": "assets/models/items/hallowed_repeater.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/hallowed_repeater.png"
   },
   "hammush": {
    "model": "assets/models/items/hammush.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/hammush.png"
   },
   "handgun": {
    "model": "assets/models/items/handgun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/handgun.png"
   },
   "harpoon": {
    "model": "assets/models/items/harpoon.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.32 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/harpoon.png"
   },
   "healing_potion": {
@@ -1474,6 +1942,10 @@
   },
   "hellstone_axe": {
    "model": "assets/models/items/hellstone_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/hellstone_axe.png"
   },
   "hellstone_bar": {
@@ -1482,10 +1954,18 @@
   },
   "hellstone_bow": {
    "model": "assets/models/items/hellstone_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/hellstone_bow.png"
   },
   "hellstone_broadsword": {
    "model": "assets/models/items/hellstone_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/hellstone_broadsword.png"
   },
   "hellstone_chainmail": {
@@ -1498,6 +1978,10 @@
   },
   "hellstone_hammer": {
    "model": "assets/models/items/hellstone_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/hellstone_hammer.png"
   },
   "hellstone_helmet": {
@@ -1506,10 +1990,18 @@
   },
   "hellstone_pickaxe": {
    "model": "assets/models/items/hellstone_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/hellstone_pickaxe.png"
   },
   "hellstone_shortsword": {
    "model": "assets/models/items/hellstone_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/hellstone_shortsword.png"
   },
   "hemopiranha": {
@@ -1530,6 +2022,9 @@
   },
   "honey_bucket": {
    "model": "assets/models/items/honey_bucket.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/honey_bucket.png"
   },
   "honey_comb": {
@@ -1538,6 +2033,9 @@
   },
   "hook": {
    "model": "assets/models/items/hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/hook.png"
   },
   "ichor": {
@@ -1546,14 +2044,26 @@
   },
   "ichor_arrow": {
    "model": "assets/models/items/ichor_arrow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.38 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/ichor_arrow.png"
   },
   "imp_staff": {
    "model": "assets/models/items/imp_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/imp_staff.png"
   },
   "influx_waver": {
    "model": "assets/models/items/influx_waver.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.25 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/influx_waver.png"
   },
   "iron_anvil": {
@@ -1562,6 +2072,10 @@
   },
   "iron_axe": {
    "model": "assets/models/items/iron_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/iron_axe.png"
   },
   "iron_bar": {
@@ -1570,14 +2084,26 @@
   },
   "iron_bow": {
    "model": "assets/models/items/iron_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/iron_bow.png"
   },
   "iron_broadsword": {
    "model": "assets/models/items/iron_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/iron_broadsword.png"
   },
   "iron_chain": {
    "model": "assets/models/items/iron_chain.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "handle_end": "0 0.08 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/iron_chain.png"
   },
   "iron_chainmail": {
@@ -1594,6 +2120,10 @@
   },
   "iron_hammer": {
    "model": "assets/models/items/iron_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/iron_hammer.png"
   },
   "iron_helmet": {
@@ -1602,10 +2132,18 @@
   },
   "iron_pickaxe": {
    "model": "assets/models/items/iron_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/iron_pickaxe.png"
   },
   "iron_shortsword": {
    "model": "assets/models/items/iron_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/iron_shortsword.png"
   },
   "ironskin_potion": {
@@ -1614,10 +2152,18 @@
   },
   "ivy_whip": {
    "model": "assets/models/items/ivy_whip.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "handle_end": "0 0.08 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/ivy_whip.png"
   },
   "jesters_arrow": {
    "model": "assets/models/items/jesters_arrow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.38 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/jesters_arrow.png"
   },
   "jungle_hat": {
@@ -1638,22 +2184,40 @@
   },
   "katana": {
    "model": "assets/models/items/katana.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.1 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/katana.png"
   },
   "laser_machinegun": {
    "model": "assets/models/items/laser_machinegun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.75 -0.04 > 0 1 0"
+   },
    "icon": "assets/icons/items/laser_machinegun.png"
   },
   "laser_rifle": {
    "model": "assets/models/items/laser_rifle.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.85 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/laser_rifle.png"
   },
   "last_prism": {
    "model": "assets/models/items/last_prism.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/last_prism.png"
   },
   "lava_bucket": {
    "model": "assets/models/items/lava_bucket.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lava_bucket.png"
   },
   "lava_charm": {
@@ -1666,6 +2230,10 @@
   },
   "lead_axe": {
    "model": "assets/models/items/lead_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lead_axe.png"
   },
   "lead_bar": {
@@ -1674,10 +2242,18 @@
   },
   "lead_bow": {
    "model": "assets/models/items/lead_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/lead_bow.png"
   },
   "lead_broadsword": {
    "model": "assets/models/items/lead_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lead_broadsword.png"
   },
   "lead_chainmail": {
@@ -1690,6 +2266,10 @@
   },
   "lead_hammer": {
    "model": "assets/models/items/lead_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lead_hammer.png"
   },
   "lead_helmet": {
@@ -1698,14 +2278,26 @@
   },
   "lead_pickaxe": {
    "model": "assets/models/items/lead_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lead_pickaxe.png"
   },
   "lead_shortsword": {
    "model": "assets/models/items/lead_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lead_shortsword.png"
   },
   "leaf_blower": {
    "model": "assets/models/items/leaf_blower.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.8 -0.05 > 0 1 0"
+   },
    "icon": "assets/icons/items/leaf_blower.png"
   },
   "leaf_wings": {
@@ -1714,6 +2306,10 @@
   },
   "leather_whip": {
    "model": "assets/models/items/leather_whip.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "handle_end": "0 0.08 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/leather_whip.png"
   },
   "lens": {
@@ -1750,10 +2346,16 @@
   },
   "lihzahrd_power_cell": {
    "model": "assets/models/items/lihzahrd_power_cell.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lihzahrd_power_cell.png"
   },
   "lime_paint": {
    "model": "assets/models/items/lime_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lime_paint.png"
   },
   "loom": {
@@ -1766,6 +2368,10 @@
   },
   "lucy_the_axe": {
    "model": "assets/models/items/lucy_the_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lucy_the_axe.png"
   },
   "luminite_bar": {
@@ -1774,18 +2380,32 @@
   },
   "lunar_flare": {
    "model": "assets/models/items/lunar_flare.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lunar_flare.png"
   },
   "lunar_portal_staff": {
    "model": "assets/models/items/lunar_portal_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/lunar_portal_staff.png"
   },
   "magic_dagger": {
    "model": "assets/models/items/magic_dagger.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/magic_dagger.png"
   },
   "magic_mirror": {
    "model": "assets/models/items/magic_mirror.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/magic_mirror.png"
   },
   "magic_power_potion": {
@@ -1826,10 +2446,18 @@
   },
   "megashark": {
    "model": "assets/models/items/megashark.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.75 -0.04 > 0 1 0"
+   },
    "icon": "assets/icons/items/megashark.png"
   },
   "meowmere": {
    "model": "assets/models/items/meowmere.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.2 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/meowmere.png"
   },
   "meteor_helmet": {
@@ -1870,6 +2498,10 @@
   },
   "minishark": {
    "model": "assets/models/items/minishark.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.75 -0.04 > 0 1 0"
+   },
    "icon": "assets/icons/items/minishark.png"
   },
   "moonglow": {
@@ -1886,6 +2518,10 @@
   },
   "muramasa": {
    "model": "assets/models/items/muramasa.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/muramasa.png"
   },
   "mushroom": {
@@ -1894,10 +2530,18 @@
   },
   "mushroom_spear": {
    "model": "assets/models/items/mushroom_spear.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.52 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mushroom_spear.png"
   },
   "musket": {
    "model": "assets/models/items/musket.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.9 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/musket.png"
   },
   "musket_ball": {
@@ -1910,6 +2554,10 @@
   },
   "mythril_axe": {
    "model": "assets/models/items/mythril_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mythril_axe.png"
   },
   "mythril_bar": {
@@ -1918,10 +2566,18 @@
   },
   "mythril_bow": {
    "model": "assets/models/items/mythril_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/mythril_bow.png"
   },
   "mythril_broadsword": {
    "model": "assets/models/items/mythril_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mythril_broadsword.png"
   },
   "mythril_chainmail": {
@@ -1930,10 +2586,18 @@
   },
   "mythril_chainsaw": {
    "model": "assets/models/items/mythril_chainsaw.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.7 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mythril_chainsaw.png"
   },
   "mythril_drill": {
    "model": "assets/models/items/mythril_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mythril_drill.png"
   },
   "mythril_greaves": {
@@ -1942,6 +2606,10 @@
   },
   "mythril_hammer": {
    "model": "assets/models/items/mythril_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mythril_hammer.png"
   },
   "mythril_helmet": {
@@ -1950,10 +2618,18 @@
   },
   "mythril_pickaxe": {
    "model": "assets/models/items/mythril_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mythril_pickaxe.png"
   },
   "mythril_shortsword": {
    "model": "assets/models/items/mythril_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/mythril_shortsword.png"
   },
   "natures_gift": {
@@ -1966,10 +2642,17 @@
   },
   "nebula_arcanum": {
    "model": "assets/models/items/nebula_arcanum.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/nebula_arcanum.png"
   },
   "nebula_blaze": {
    "model": "assets/models/items/nebula_blaze.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.46 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/nebula_blaze.png"
   },
   "nebula_breastplate": {
@@ -1978,6 +2661,10 @@
   },
   "nebula_drill": {
    "model": "assets/models/items/nebula_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/nebula_drill.png"
   },
   "nebula_fragment": {
@@ -1986,6 +2673,10 @@
   },
   "nebula_hamaxe": {
    "model": "assets/models/items/nebula_hamaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/nebula_hamaxe.png"
   },
   "nebula_helmet": {
@@ -2002,6 +2693,10 @@
   },
   "nebula_pickaxe": {
    "model": "assets/models/items/nebula_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/nebula_pickaxe.png"
   },
   "necro_breastplate": {
@@ -2018,6 +2713,9 @@
   },
   "necromantic_scroll": {
    "model": "assets/models/items/necromantic_scroll.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/necromantic_scroll.png"
   },
   "neon_tetra": {
@@ -2030,18 +2728,33 @@
   },
   "nightglow": {
    "model": "assets/models/items/nightglow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/nightglow.png"
   },
   "nights_edge": {
    "model": "assets/models/items/nights_edge.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.1 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/nights_edge.png"
   },
   "north_pole": {
    "model": "assets/models/items/north_pole.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/north_pole.png"
   },
   "obsidian_shield": {
    "model": "assets/models/items/obsidian_shield.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/obsidian_shield.png"
   },
   "obsidian_skin_potion": {
@@ -2054,6 +2767,9 @@
   },
   "orange_paint": {
    "model": "assets/models/items/orange_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orange_paint.png"
   },
   "orichalcum_anvil": {
@@ -2062,6 +2778,10 @@
   },
   "orichalcum_axe": {
    "model": "assets/models/items/orichalcum_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orichalcum_axe.png"
   },
   "orichalcum_bar": {
@@ -2070,10 +2790,18 @@
   },
   "orichalcum_bow": {
    "model": "assets/models/items/orichalcum_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/orichalcum_bow.png"
   },
   "orichalcum_broadsword": {
    "model": "assets/models/items/orichalcum_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orichalcum_broadsword.png"
   },
   "orichalcum_chainmail": {
@@ -2082,10 +2810,18 @@
   },
   "orichalcum_chainsaw": {
    "model": "assets/models/items/orichalcum_chainsaw.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.7 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orichalcum_chainsaw.png"
   },
   "orichalcum_drill": {
    "model": "assets/models/items/orichalcum_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orichalcum_drill.png"
   },
   "orichalcum_greaves": {
@@ -2094,6 +2830,10 @@
   },
   "orichalcum_hammer": {
    "model": "assets/models/items/orichalcum_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orichalcum_hammer.png"
   },
   "orichalcum_helmet": {
@@ -2102,30 +2842,58 @@
   },
   "orichalcum_pickaxe": {
    "model": "assets/models/items/orichalcum_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orichalcum_pickaxe.png"
   },
   "orichalcum_shortsword": {
    "model": "assets/models/items/orichalcum_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/orichalcum_shortsword.png"
   },
   "paint_scraper": {
    "model": "assets/models/items/paint_scraper.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.3 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/paint_scraper.png"
   },
   "paint_sprayer": {
    "model": "assets/models/items/paint_sprayer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.34 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/paint_sprayer.png"
   },
   "paintbrush": {
    "model": "assets/models/items/paintbrush.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.36 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/paintbrush.png"
   },
   "paladins_hammer": {
    "model": "assets/models/items/paladins_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/paladins_hammer.png"
   },
   "palladium_axe": {
    "model": "assets/models/items/palladium_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/palladium_axe.png"
   },
   "palladium_bar": {
@@ -2134,10 +2902,18 @@
   },
   "palladium_bow": {
    "model": "assets/models/items/palladium_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/palladium_bow.png"
   },
   "palladium_broadsword": {
    "model": "assets/models/items/palladium_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/palladium_broadsword.png"
   },
   "palladium_chainmail": {
@@ -2146,10 +2922,18 @@
   },
   "palladium_chainsaw": {
    "model": "assets/models/items/palladium_chainsaw.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.7 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/palladium_chainsaw.png"
   },
   "palladium_drill": {
    "model": "assets/models/items/palladium_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/palladium_drill.png"
   },
   "palladium_greaves": {
@@ -2158,6 +2942,10 @@
   },
   "palladium_hammer": {
    "model": "assets/models/items/palladium_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/palladium_hammer.png"
   },
   "palladium_helmet": {
@@ -2166,10 +2954,18 @@
   },
   "palladium_pickaxe": {
    "model": "assets/models/items/palladium_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/palladium_pickaxe.png"
   },
   "palladium_shortsword": {
    "model": "assets/models/items/palladium_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/palladium_shortsword.png"
   },
   "panic_necklace": {
@@ -2178,30 +2974,57 @@
   },
   "pew_matic_horn": {
    "model": "assets/models/items/pew_matic_horn.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.8 -0.05 > 0 1 0"
+   },
    "icon": "assets/icons/items/pew_matic_horn.png"
   },
   "phantasm": {
    "model": "assets/models/items/phantasm.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/phantasm.png"
   },
   "phoenix_blaster": {
    "model": "assets/models/items/phoenix_blaster.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/phoenix_blaster.png"
   },
   "pickaxe_axe": {
    "model": "assets/models/items/pickaxe_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/pickaxe_axe.png"
   },
   "picksaw": {
    "model": "assets/models/items/picksaw.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/picksaw.png"
   },
   "pink_paint": {
    "model": "assets/models/items/pink_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/pink_paint.png"
   },
   "pirate_staff": {
    "model": "assets/models/items/pirate_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/pirate_staff.png"
   },
   "pixie_dust": {
@@ -2210,6 +3033,10 @@
   },
   "platinum_axe": {
    "model": "assets/models/items/platinum_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/platinum_axe.png"
   },
   "platinum_bar": {
@@ -2218,10 +3045,18 @@
   },
   "platinum_bow": {
    "model": "assets/models/items/platinum_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/platinum_bow.png"
   },
   "platinum_broadsword": {
    "model": "assets/models/items/platinum_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/platinum_broadsword.png"
   },
   "platinum_chainmail": {
@@ -2238,6 +3073,10 @@
   },
   "platinum_hammer": {
    "model": "assets/models/items/platinum_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/platinum_hammer.png"
   },
   "platinum_helmet": {
@@ -2246,14 +3085,26 @@
   },
   "platinum_pickaxe": {
    "model": "assets/models/items/platinum_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/platinum_pickaxe.png"
   },
   "platinum_shortsword": {
    "model": "assets/models/items/platinum_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/platinum_shortsword.png"
   },
   "possessed_hatchet": {
    "model": "assets/models/items/possessed_hatchet.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/possessed_hatchet.png"
   },
   "pressure_plate": {
@@ -2262,6 +3113,9 @@
   },
   "prismatic_lacewing": {
    "model": "assets/models/items/prismatic_lacewing.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/prismatic_lacewing.png"
   },
   "prismite": {
@@ -2270,14 +3124,24 @@
   },
   "pumpkin_moon_medallion": {
    "model": "assets/models/items/pumpkin_moon_medallion.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/pumpkin_moon_medallion.png"
   },
   "purple_paint": {
    "model": "assets/models/items/purple_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/purple_paint.png"
   },
   "pwnhammer": {
    "model": "assets/models/items/pwnhammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/pwnhammer.png"
   },
   "pygmy_necklace": {
@@ -2286,6 +3150,10 @@
   },
   "pygmy_staff": {
    "model": "assets/models/items/pygmy_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/pygmy_staff.png"
   },
   "rage_potion": {
@@ -2294,14 +3162,26 @@
   },
   "rainbow_crystal_staff": {
    "model": "assets/models/items/rainbow_crystal_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/rainbow_crystal_staff.png"
   },
   "rainbow_rod": {
    "model": "assets/models/items/rainbow_rod.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.46 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/rainbow_rod.png"
   },
   "rally": {
    "model": "assets/models/items/rally.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "string": "0 0.12 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/rally.png"
   },
   "ranger_emblem": {
@@ -2310,18 +3190,33 @@
   },
   "raven_staff": {
    "model": "assets/models/items/raven_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/raven_staff.png"
   },
   "razorblade_typhoon_book": {
    "model": "assets/models/items/razorblade_typhoon_book.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/razorblade_typhoon_book.png"
   },
   "razorpine": {
    "model": "assets/models/items/razorpine.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.46 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/razorpine.png"
   },
   "reaver_shark": {
    "model": "assets/models/items/reaver_shark.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/reaver_shark.png"
   },
   "recall_potion": {
@@ -2330,6 +3225,9 @@
   },
   "red_paint": {
    "model": "assets/models/items/red_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/red_paint.png"
   },
   "red_snapper": {
@@ -2338,6 +3236,10 @@
   },
   "red_wrench": {
    "model": "assets/models/items/red_wrench.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.34 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/red_wrench.png"
   },
   "regeneration_potion": {
@@ -2346,6 +3248,10 @@
   },
   "reinforced_fishing_pole": {
    "model": "assets/models/items/reinforced_fishing_pole.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/reinforced_fishing_pole.png"
   },
   "rocket_boots": {
@@ -2358,6 +3264,10 @@
   },
   "rocket_launcher": {
    "model": "assets/models/items/rocket_launcher.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.8 -0.05 > 0 1 0"
+   },
    "icon": "assets/icons/items/rocket_launcher.png"
   },
   "rotten_chunk": {
@@ -2374,14 +3284,25 @@
   },
   "ruby_hook": {
    "model": "assets/models/items/ruby_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/ruby_hook.png"
   },
   "ruby_staff": {
    "model": "assets/models/items/ruby_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/ruby_staff.png"
   },
   "s_d_m_g": {
    "model": "assets/models/items/s_d_m_g.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.75 -0.04 > 0 1 0"
+   },
    "icon": "assets/icons/items/s_d_m_g.png"
   },
   "salmon": {
@@ -2398,10 +3319,17 @@
   },
   "sapphire_hook": {
    "model": "assets/models/items/sapphire_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/sapphire_hook.png"
   },
   "sapphire_staff": {
    "model": "assets/models/items/sapphire_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/sapphire_staff.png"
   },
   "sawmill": {
@@ -2410,6 +3338,10 @@
   },
   "seedler": {
    "model": "assets/models/items/seedler.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.05 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/seedler.png"
   },
   "shadow_scale": {
@@ -2418,6 +3350,10 @@
   },
   "shadowbeam_staff": {
    "model": "assets/models/items/shadowbeam_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/shadowbeam_staff.png"
   },
   "shark_fin": {
@@ -2426,6 +3362,9 @@
   },
   "shield_of_cthulhu": {
    "model": "assets/models/items/shield_of_cthulhu.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/shield_of_cthulhu.png"
   },
   "shine_potion": {
@@ -2450,6 +3389,10 @@
   },
   "shotgun": {
    "model": "assets/models/items/shotgun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.7 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/shotgun.png"
   },
   "shrimpy_truffle": {
@@ -2474,6 +3417,9 @@
   },
   "shuriken": {
    "model": "assets/models/items/shuriken.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/shuriken.png"
   },
   "silk": {
@@ -2482,6 +3428,10 @@
   },
   "silver_axe": {
    "model": "assets/models/items/silver_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/silver_axe.png"
   },
   "silver_bar": {
@@ -2490,10 +3440,18 @@
   },
   "silver_bow": {
    "model": "assets/models/items/silver_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/silver_bow.png"
   },
   "silver_broadsword": {
    "model": "assets/models/items/silver_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/silver_broadsword.png"
   },
   "silver_bullet": {
@@ -2514,6 +3472,10 @@
   },
   "silver_hammer": {
    "model": "assets/models/items/silver_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/silver_hammer.png"
   },
   "silver_helmet": {
@@ -2522,14 +3484,25 @@
   },
   "silver_pickaxe": {
    "model": "assets/models/items/silver_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/silver_pickaxe.png"
   },
   "silver_shortsword": {
    "model": "assets/models/items/silver_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/silver_shortsword.png"
   },
   "sky_blue_paint": {
    "model": "assets/models/items/sky_blue_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/sky_blue_paint.png"
   },
   "slime_crown": {
@@ -2538,26 +3511,49 @@
   },
   "slime_staff": {
    "model": "assets/models/items/slime_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/slime_staff.png"
   },
   "snapthorn": {
    "model": "assets/models/items/snapthorn.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "handle_end": "0 0.08 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/snapthorn.png"
   },
   "sniper_rifle": {
    "model": "assets/models/items/sniper_rifle.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.85 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/sniper_rifle.png"
   },
   "snow_globe": {
    "model": "assets/models/items/snow_globe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/snow_globe.png"
   },
   "snowman_cannon": {
    "model": "assets/models/items/snowman_cannon.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.8 -0.05 > 0 1 0"
+   },
    "icon": "assets/icons/items/snowman_cannon.png"
   },
   "solar_eruption": {
    "model": "assets/models/items/solar_eruption.glb",
+   "sockets": {
+    "chain": "0 0.08 0 > 0 1 0",
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/solar_eruption.png"
   },
   "solar_flare_breastplate": {
@@ -2566,10 +3562,18 @@
   },
   "solar_flare_drill": {
    "model": "assets/models/items/solar_flare_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/solar_flare_drill.png"
   },
   "solar_flare_hamaxe": {
    "model": "assets/models/items/solar_flare_hamaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/solar_flare_hamaxe.png"
   },
   "solar_flare_helmet": {
@@ -2582,6 +3586,10 @@
   },
   "solar_flare_pickaxe": {
    "model": "assets/models/items/solar_flare_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/solar_flare_pickaxe.png"
   },
   "solar_fragment": {
@@ -2622,10 +3630,18 @@
   },
   "space_gun": {
    "model": "assets/models/items/space_gun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/space_gun.png"
   },
   "spear": {
    "model": "assets/models/items/spear.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.32 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/spear.png"
   },
   "spectre_bar": {
@@ -2638,6 +3654,10 @@
   },
   "spectre_hamaxe": {
    "model": "assets/models/items/spectre_hamaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/spectre_hamaxe.png"
   },
   "spectre_hood": {
@@ -2654,6 +3674,10 @@
   },
   "spectre_staff": {
    "model": "assets/models/items/spectre_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/spectre_staff.png"
   },
   "specular_fish": {
@@ -2662,6 +3686,9 @@
   },
   "spell_tome": {
    "model": "assets/models/items/spell_tome.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/spell_tome.png"
   },
   "spelunker_potion": {
@@ -2670,6 +3697,9 @@
   },
   "spiky_ball": {
    "model": "assets/models/items/spiky_ball.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/spiky_ball.png"
   },
   "spore_sac": {
@@ -2682,22 +3712,42 @@
   },
   "star_cannon": {
    "model": "assets/models/items/star_cannon.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.8 -0.05 > 0 1 0"
+   },
    "icon": "assets/icons/items/star_cannon.png"
   },
   "star_wrath": {
    "model": "assets/models/items/star_wrath.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.2 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/star_wrath.png"
   },
   "stardust_cell_staff": {
    "model": "assets/models/items/stardust_cell_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/stardust_cell_staff.png"
   },
   "stardust_dragon_staff": {
    "model": "assets/models/items/stardust_dragon_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/stardust_dragon_staff.png"
   },
   "stardust_drill": {
    "model": "assets/models/items/stardust_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/stardust_drill.png"
   },
   "stardust_fragment": {
@@ -2706,6 +3756,10 @@
   },
   "stardust_hamaxe": {
    "model": "assets/models/items/stardust_hamaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/stardust_hamaxe.png"
   },
   "stardust_helmet": {
@@ -2718,6 +3772,10 @@
   },
   "stardust_pickaxe": {
    "model": "assets/models/items/stardust_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/stardust_pickaxe.png"
   },
   "stardust_plate": {
@@ -2730,10 +3788,18 @@
   },
   "starfury": {
    "model": "assets/models/items/starfury.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.95 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/starfury.png"
   },
   "starlight": {
    "model": "assets/models/items/starlight.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.42 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/starlight.png"
   },
   "steampunk_wings": {
@@ -2746,6 +3812,10 @@
   },
   "stynger": {
    "model": "assets/models/items/stynger.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.8 -0.05 > 0 1 0"
+   },
    "icon": "assets/icons/items/stynger.png"
   },
   "summoner_emblem": {
@@ -2762,6 +3832,10 @@
   },
   "sunfury": {
    "model": "assets/models/items/sunfury.glb",
+   "sockets": {
+    "chain": "0 0.08 0 > 0 1 0",
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/sunfury.png"
   },
   "super_absorbant_sponge": {
@@ -2786,26 +3860,48 @@
   },
   "teal_paint": {
    "model": "assets/models/items/teal_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/teal_paint.png"
   },
   "tempest_staff": {
    "model": "assets/models/items/tempest_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tempest_staff.png"
   },
   "temple_key": {
    "model": "assets/models/items/temple_key.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/temple_key.png"
   },
   "terra_blade": {
    "model": "assets/models/items/terra_blade.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.2 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/terra_blade.png"
   },
   "terraprisma": {
    "model": "assets/models/items/terraprisma.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/terraprisma.png"
   },
   "terrarian": {
    "model": "assets/models/items/terrarian.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "string": "0 0.12 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/terrarian.png"
   },
   "terraspark_boots": {
@@ -2814,26 +3910,50 @@
   },
   "the_axe": {
    "model": "assets/models/items/the_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/the_axe.png"
   },
   "the_horsemans_blade": {
    "model": "assets/models/items/the_horsemans_blade.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.2 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/the_horsemans_blade.png"
   },
   "the_rotted_fork": {
    "model": "assets/models/items/the_rotted_fork.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.3 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/the_rotted_fork.png"
   },
   "the_undertaker": {
    "model": "assets/models/items/the_undertaker.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/the_undertaker.png"
   },
   "throwing_knife": {
    "model": "assets/models/items/throwing_knife.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.04 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/throwing_knife.png"
   },
   "tin_axe": {
    "model": "assets/models/items/tin_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tin_axe.png"
   },
   "tin_bar": {
@@ -2842,10 +3962,18 @@
   },
   "tin_bow": {
    "model": "assets/models/items/tin_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/tin_bow.png"
   },
   "tin_broadsword": {
    "model": "assets/models/items/tin_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tin_broadsword.png"
   },
   "tin_chainmail": {
@@ -2858,6 +3986,10 @@
   },
   "tin_hammer": {
    "model": "assets/models/items/tin_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tin_hammer.png"
   },
   "tin_helmet": {
@@ -2866,10 +3998,18 @@
   },
   "tin_pickaxe": {
    "model": "assets/models/items/tin_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tin_pickaxe.png"
   },
   "tin_shortsword": {
    "model": "assets/models/items/tin_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tin_shortsword.png"
   },
   "tinkerers_workshop": {
@@ -2886,6 +4026,10 @@
   },
   "titanium_axe": {
    "model": "assets/models/items/titanium_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/titanium_axe.png"
   },
   "titanium_bar": {
@@ -2894,10 +4038,18 @@
   },
   "titanium_bow": {
    "model": "assets/models/items/titanium_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/titanium_bow.png"
   },
   "titanium_broadsword": {
    "model": "assets/models/items/titanium_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/titanium_broadsword.png"
   },
   "titanium_chainmail": {
@@ -2906,10 +4058,18 @@
   },
   "titanium_chainsaw": {
    "model": "assets/models/items/titanium_chainsaw.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.7 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/titanium_chainsaw.png"
   },
   "titanium_drill": {
    "model": "assets/models/items/titanium_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/titanium_drill.png"
   },
   "titanium_forge": {
@@ -2922,6 +4082,10 @@
   },
   "titanium_hammer": {
    "model": "assets/models/items/titanium_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/titanium_hammer.png"
   },
   "titanium_helmet": {
@@ -2930,10 +4094,18 @@
   },
   "titanium_pickaxe": {
    "model": "assets/models/items/titanium_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/titanium_pickaxe.png"
   },
   "titanium_shortsword": {
    "model": "assets/models/items/titanium_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/titanium_shortsword.png"
   },
   "tombstone": {
@@ -2946,10 +4118,17 @@
   },
   "topaz_hook": {
    "model": "assets/models/items/topaz_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/topaz_hook.png"
   },
   "topaz_staff": {
    "model": "assets/models/items/topaz_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/topaz_staff.png"
   },
   "torch": {
@@ -2958,6 +4137,10 @@
   },
   "trident": {
    "model": "assets/models/items/trident.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.3 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/trident.png"
   },
   "trout": {
@@ -2966,10 +4149,18 @@
   },
   "true_excalibur": {
    "model": "assets/models/items/true_excalibur.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.15 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/true_excalibur.png"
   },
   "true_nights_edge": {
    "model": "assets/models/items/true_nights_edge.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.2 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/true_nights_edge.png"
   },
   "truffle_worm": {
@@ -2978,6 +4169,10 @@
   },
   "tsunami": {
    "model": "assets/models/items/tsunami.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/tsunami.png"
   },
   "tuna": {
@@ -2986,6 +4181,10 @@
   },
   "tungsten_axe": {
    "model": "assets/models/items/tungsten_axe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tungsten_axe.png"
   },
   "tungsten_bar": {
@@ -2994,10 +4193,18 @@
   },
   "tungsten_bow": {
    "model": "assets/models/items/tungsten_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/tungsten_bow.png"
   },
   "tungsten_broadsword": {
    "model": "assets/models/items/tungsten_broadsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tungsten_broadsword.png"
   },
   "tungsten_chainmail": {
@@ -3010,6 +4217,10 @@
   },
   "tungsten_hammer": {
    "model": "assets/models/items/tungsten_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tungsten_hammer.png"
   },
   "tungsten_helmet": {
@@ -3018,10 +4229,18 @@
   },
   "tungsten_pickaxe": {
    "model": "assets/models/items/tungsten_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tungsten_pickaxe.png"
   },
   "tungsten_shortsword": {
    "model": "assets/models/items/tungsten_shortsword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.55 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/tungsten_shortsword.png"
   },
   "turtle_helmet": {
@@ -3042,10 +4261,18 @@
   },
   "unholy_arrow": {
    "model": "assets/models/items/unholy_arrow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.38 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/unholy_arrow.png"
   },
   "unholy_trident": {
    "model": "assets/models/items/unholy_trident.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.52 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/unholy_trident.png"
   },
   "unicorn_horn": {
@@ -3054,6 +4281,10 @@
   },
   "venus_magnum": {
    "model": "assets/models/items/venus_magnum.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
    "icon": "assets/icons/items/venus_magnum.png"
   },
   "vertebra": {
@@ -3070,14 +4301,25 @@
   },
   "vilethorn": {
    "model": "assets/models/items/vilethorn.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/vilethorn.png"
   },
   "vine": {
    "model": "assets/models/items/vine.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "handle_end": "0 0.08 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/vine.png"
   },
   "violet_paint": {
    "model": "assets/models/items/violet_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/violet_paint.png"
   },
   "volatile_gelatin": {
@@ -3086,6 +4328,10 @@
   },
   "vortex_beater": {
    "model": "assets/models/items/vortex_beater.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.75 -0.04 > 0 1 0"
+   },
    "icon": "assets/icons/items/vortex_beater.png"
   },
   "vortex_booster": {
@@ -3098,6 +4344,10 @@
   },
   "vortex_drill": {
    "model": "assets/models/items/vortex_drill.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.62 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/vortex_drill.png"
   },
   "vortex_fragment": {
@@ -3106,6 +4356,10 @@
   },
   "vortex_hamaxe": {
    "model": "assets/models/items/vortex_hamaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/vortex_hamaxe.png"
   },
   "vortex_helmet": {
@@ -3118,10 +4372,18 @@
   },
   "vortex_pickaxe": {
    "model": "assets/models/items/vortex_pickaxe.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.8026 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/vortex_pickaxe.png"
   },
   "wand_of_sparking": {
    "model": "assets/models/items/wand_of_sparking.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.46 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wand_of_sparking.png"
   },
   "warmth_potion": {
@@ -3134,10 +4396,16 @@
   },
   "water_bolt": {
    "model": "assets/models/items/water_bolt.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/water_bolt.png"
   },
   "water_bucket": {
    "model": "assets/models/items/water_bucket.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/water_bucket.png"
   },
   "waterleaf": {
@@ -3150,10 +4418,17 @@
   },
   "weather_pain": {
    "model": "assets/models/items/weather_pain.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/weather_pain.png"
   },
   "white_paint": {
    "model": "assets/models/items/white_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/white_paint.png"
   },
   "wire": {
@@ -3162,6 +4437,10 @@
   },
   "wire_cutter": {
    "model": "assets/models/items/wire_cutter.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.3016 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wire_cutter.png"
   },
   "wizard_hat": {
@@ -3182,18 +4461,33 @@
   },
   "wood_yoyo": {
    "model": "assets/models/items/wood_yoyo.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "string": "0 0.12 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wood_yoyo.png"
   },
   "wooden_arrow": {
    "model": "assets/models/items/wooden_arrow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.38 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wooden_arrow.png"
   },
   "wooden_boomerang": {
    "model": "assets/models/items/wooden_boomerang.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wooden_boomerang.png"
   },
   "wooden_bow": {
    "model": "assets/models/items/wooden_bow.glb",
+   "sockets": {
+    "grip": "-0.17 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
    "icon": "assets/icons/items/wooden_bow.png"
   },
   "wooden_chair": {
@@ -3214,14 +4508,26 @@
   },
   "wooden_fishing_pole": {
    "model": "assets/models/items/wooden_fishing_pole.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wooden_fishing_pole.png"
   },
   "wooden_hammer": {
    "model": "assets/models/items/wooden_hammer.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.76 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wooden_hammer.png"
   },
   "wooden_sword": {
    "model": "assets/models/items/wooden_sword.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/wooden_sword.png"
   },
   "wooden_table": {
@@ -3254,14 +4560,25 @@
   },
   "xenopopper": {
    "model": "assets/models/items/xenopopper.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.8 -0.05 > 0 1 0"
+   },
    "icon": "assets/icons/items/xenopopper.png"
   },
   "yellow_paint": {
    "model": "assets/models/items/yellow_paint.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/yellow_paint.png"
   },
   "zenith": {
    "model": "assets/models/items/zenith.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.3 0 > 0 1 0"
+   },
    "icon": "assets/icons/items/zenith.png"
   }
  },
@@ -5505,5 +6822,77 @@
    ]
   }
  },
- "generatorVersion": 1
+ "generatorVersion": 1,
+ "projectiles": {
+  "amazon_head": {
+   "model": "assets/models/projectiles/amazon_head.glb",
+   "generator": "yoyo",
+   "sockets": {
+    "string": "0 0 0 > 0 1 0"
+   }
+  },
+  "ball_o_hurt_ball": {
+   "model": "assets/models/projectiles/ball_o_hurt_ball.glb",
+   "generator": "flail",
+   "sockets": {
+    "chain": "0 -0.08 0 > 0 -1 0"
+   }
+  },
+  "blue_moon_ball": {
+   "model": "assets/models/projectiles/blue_moon_ball.glb",
+   "generator": "flail",
+   "sockets": {
+    "chain": "0 -0.08 0 > 0 -1 0"
+   }
+  },
+  "code_1_head": {
+   "model": "assets/models/projectiles/code_1_head.glb",
+   "generator": "yoyo",
+   "sockets": {
+    "string": "0 0 0 > 0 1 0"
+   }
+  },
+  "flairon_ball": {
+   "model": "assets/models/projectiles/flairon_ball.glb",
+   "generator": "flail",
+   "sockets": {
+    "chain": "0 -0.08 0 > 0 -1 0"
+   }
+  },
+  "flower_pow_ball": {
+   "model": "assets/models/projectiles/flower_pow_ball.glb",
+   "generator": "flail",
+   "sockets": {
+    "chain": "0 -0.08 0 > 0 -1 0"
+   }
+  },
+  "rally_head": {
+   "model": "assets/models/projectiles/rally_head.glb",
+   "generator": "yoyo",
+   "sockets": {
+    "string": "0 0 0 > 0 1 0"
+   }
+  },
+  "sunfury_ball": {
+   "model": "assets/models/projectiles/sunfury_ball.glb",
+   "generator": "flail",
+   "sockets": {
+    "chain": "0 -0.08 0 > 0 -1 0"
+   }
+  },
+  "terrarian_head": {
+   "model": "assets/models/projectiles/terrarian_head.glb",
+   "generator": "yoyo",
+   "sockets": {
+    "string": "0 0 0 > 0 1 0"
+   }
+  },
+  "wood_yoyo_head": {
+   "model": "assets/models/projectiles/wood_yoyo_head.glb",
+   "generator": "yoyo",
+   "sockets": {
+    "string": "0 0 0 > 0 1 0"
+   }
+  }
+ }
 }
