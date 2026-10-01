@@ -11,8 +11,8 @@ namespace Strata.Game.Player;
 /// How the body moves: the chest, head and arms always face the camera's yaw (the crosshair), while the legs turn
 /// toward where the player walks (at most <see cref="BodyFacing.MaxTwist"/> away) and strafe sideways or backpedal
 /// (<see cref="BodyFacing"/>); locomotion follows the controller (walk, run, sprint, strafe, jump, fall, land, swim,
-/// climb, glide); every item use plays its action over the upper body, stretched to the item's use time; a carried
-/// torch is held up; hits make the body flinch.
+/// climb, glide); every item use plays its action once over the upper body, stretched to the item's use animation
+/// (chained uses flow on); a carried torch is held up; hits make the body flinch.
 /// </summary>
 public sealed partial class PlayerAvatar
 {
@@ -28,6 +28,12 @@ public sealed partial class PlayerAvatar
 
     /// <summary>The torso's twist from the legs onto the facing (degrees, + = to the left): the legs turn the other way.</summary>
     public float TwistDegrees => Mathf.RadToDeg(_visual?.Humanoid?.Aim?.AppliedTwist ?? 0f);
+
+    /// <summary>Chained uses whose upper-body action dipped toward the locomotion pose in between (0 when they flow on).</summary>
+    public int ActionDips => _visual?.Humanoid?.ActionDips ?? 0;
+
+    /// <summary>How much of the upper body the item action holds (0–1).</summary>
+    public float ActionWeight => _visual?.Humanoid?.ActionWeight ?? 0f;
 
     /// <summary>
     /// How far (degrees) the chest is turned from where the player looks: the body's yaw plus the torso twist the aim
@@ -65,10 +71,16 @@ public sealed partial class PlayerAvatar
         h.Locomotion(state, rate);
 
         // Item actions: each new use animation (its serial changes) plays the item's action once, over the whole
-        // animation; tool hits and gun shots inside one animation never restart it.
+        // animation after speed bonuses; tool hits and gun shots inside one animation never restart it. A use quicker
+        // than the clip's top rate (use_styles.json) starts past the wind-up, so the strike still lands inside it.
         if (entity.UseSerial != _lastSerial && _heldItem != null && entity.Alive && entity.UseAnimation > 0)
-            h.Play(ActionFor(_heldItem, _game.Uses[_heldItem]), entity.UseAnimationMax / (float)Strata.Core.Common.Units.TicksPerSecond);
+        {
+            string action = ActionFor(_heldItem, _game.Uses[_heldItem]);
+            var timing = _game.ItemUse.Timing;
+            h.Play(action, entity.UseAnimationMax / (float)Strata.Core.Common.Units.TicksPerSecond, timing.MaxClipRate, timing.StrikeStart(action));
+        }
         _lastSerial = entity.UseSerial;
+        if (entity.Alive && entity.UseAnimation > 0 && entity.UseItem == _heldItem) h.Sustain(); // timed by the simulation
         int sinceHurt = entity.State.Vitals.TicksSinceHurt;
         if (sinceHurt < _lastHurt && entity.Alive) h.Hurt();
         _lastHurt = sinceHurt;

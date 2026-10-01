@@ -196,3 +196,30 @@ ai on
 killall
 camera third
 assert errors == 0
+
+# --- P1-11 ---
+# Chained uses flow: held down, a sword autoswings and a pickaxe chops one use straight into the next without the
+# body's upper-body action fading toward the locomotion pose in between; it fades out only once the button is let go.
+killall
+heal
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+camera third
+give wooden_sword 1
+wield wooden_sword
+aim 0 0 1
+wait 0.5
+mark
+hold use_primary 1.2
+assert player.swings >= 3
+assert player.action_dips == 0
+wait 0.8
+assert player.action_weight == 0
+wield copper_pickaxe
+aim 0.05 -1 0.05
+mark
+hold use_primary 1
+assert player.swings >= 2
+assert player.action_dips == 0
+camera first
+assert errors == 0

@@ -126,6 +126,17 @@ wait_until screenshot.pending == 0 900
 press jump off
 wait 1.5
 
+# First person: a held pickaxe mid-chop (the view model eases up, strikes and settles on the use's timing).
+camera first
+wield copper_pickaxe
+press use_primary
+wait 0.2
+screenshot s_fp_mine 0
+wait_until screenshot.pending == 0 900
+release use_primary
+camera third
+wait 0.5
+
 camera orbit 0
 spawn zombie 3 6
 wait 1.5

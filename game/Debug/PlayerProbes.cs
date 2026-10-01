@@ -6,7 +6,8 @@ namespace Strata.Game.Debug;
 
 /// <summary>
 /// Probes on the player's physical body (floor contact, the terrain-loading freeze, flight time; the hook is a Core
-/// probe), on how far the third-person body turns from the crosshair, and on the crosshair target.
+/// probe), on how far the third-person body turns from the crosshair and how its item actions blend, and on the
+/// crosshair target.
 /// </summary>
 [ProbeSource]
 public static class PlayerProbes
@@ -25,6 +26,8 @@ public static class PlayerProbes
             ctx.AddProbe("player.facing_error_deg", () => avatar.FacingErrorDegrees);
             ctx.AddProbe("player.stride", () => (int)avatar.Stride); // 0 forward, 1 strafe left, 2 strafe right, 3 backpedal
             ctx.AddProbe("player.twist_deg", () => avatar.TwistDegrees);
+            ctx.AddProbe("player.action_dips", () => avatar.ActionDips); // chained uses that faded toward locomotion between
+            ctx.AddProbe("player.action_weight", () => avatar.ActionWeight);
         }
         if (world.Interaction is not { } interaction) return;
         // 1 when there is no target or it lies ahead of the eye along the facing: nothing behind the player is selected.

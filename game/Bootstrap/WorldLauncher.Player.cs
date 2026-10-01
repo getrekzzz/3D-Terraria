@@ -49,7 +49,7 @@ public static partial class WorldLauncher
         grapple.Initialize(player);
         var trail = new Entities.SwingTrail();
         runtime.AddChild(trail);
-        trail.Initialize(game);
+        trail.Initialize(game, entity, player);
         var carried = new PlayerLight();
         player.AddChild(carried);
         carried.Initialize(entity, services.Graphics, () => viewModel.LightAnchor, () => avatar.LightAnchor);
