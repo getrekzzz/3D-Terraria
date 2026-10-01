@@ -17,6 +17,8 @@ public sealed partial class WorldSession
         ctx.Layer = Generator.Plan.Bands.LayerAt(cell.Y);
         ctx.Biomes = ZonesAt(cell).Append(baseBiome).Concat(LayeredBiomes(cell, baseBiome, ctx.Layer)).Distinct().ToArray();
         ctx.Depth = surface - cell.Y;
+        ctx.Weather = Weather.LocalAt(ctx.Biomes, ctx.Layer);
+        ctx.Windy = Weather.Windy;
         ctx.Hour = Clock.Hour;
         ctx.IsDay = Clock.IsDay;
         ctx.MoonPhase = Clock.MoonPhase;

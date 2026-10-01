@@ -52,6 +52,9 @@ public sealed class WorldMeta
     /// <summary>Running events with their remaining time and kill progress.</summary>
     public List<EventStateModel> EventStates { get; set; } = new();
 
+    /// <summary>The weather when saved (added without a version bump: older saves start clear).</summary>
+    public WeatherModel? Weather { get; set; }
+
     /// <summary>Town residents (added without a version bump: older saves simply have none).</summary>
     public List<ResidentModel> Residents { get; set; } = new();
 
@@ -65,6 +68,9 @@ public sealed class WorldMeta
     public Dictionary<string, JsonElement>? Extra { get; set; }
 
     public sealed record EventStateModel(string Id, int TicksLeft, int Kills);
+
+    public sealed record WeatherModel(Gameplay.Weather.Precipitation Precipitation, float Intensity, float Current, int PrecipitationTicksLeft,
+        bool Windy, int WindyTicksLeft, bool Sandstorm, int SandstormTicksLeft, float[]? Wind, long LastHour);
 
     public sealed record MutationModel(string Id, ulong Seed);
 

@@ -8,6 +8,7 @@ public sealed partial class GameWorld
     public int SaveAll()
     {
         Events.Persist();
+        Weather.Persist();
         Town.Persist();
         int chunks = Session.SaveAll();
         foreach (var p in Players) SavePlayer(p.State);

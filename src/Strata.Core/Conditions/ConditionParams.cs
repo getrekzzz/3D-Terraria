@@ -34,6 +34,22 @@ public sealed class TimeConditionParams : SpecParams, IValidatableSpec
     public string? Validate() => Is is null or "day" or "night" ? null : $"time.is must be day|night, got '{Is}'";
 }
 
+/// <summary>The local weather is one of <see cref="Any"/> (clear, rain, storm, snow, blizzard, sandstorm, or windy).</summary>
+public sealed class WeatherConditionParams : SpecParams, IValidatableSpec
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+
+    /// <summary>False inverts it: none of the kinds holds.</summary>
+    public bool Active { get; init; } = true;
+
+    public string? Validate()
+    {
+        foreach (var k in Any)
+            if (k != "windy" && !Enum.TryParse<Gameplay.Weather.LocalWeather>(k, ignoreCase: true, out _)) return $"unknown weather '{k}'";
+        return Any.Length == 0 ? "weather condition needs 'any'" : null;
+    }
+}
+
 public sealed class FlagConditionParams : SpecParams
 {
     public string Id { get; init; } = "";

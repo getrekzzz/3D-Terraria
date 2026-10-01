@@ -22,6 +22,7 @@ public static partial class ContentValidator
         {
             if (e.Chance is < 0 or > 1) ctx.Error(e, "chance must be 0–1.");
             if (e.Phase == EventPhase.Manual && e.Duration <= 0 && e.KillGoal <= 0) ctx.Error(e, "manual events need a duration or a kill goal.");
+            if (e.Phase == EventPhase.Weather && e.Chance > 0) ctx.Error(e, "weather events start with the weather (data/config/weather.json), not by chance.");
             if (e.KillGoal > 0 && string.IsNullOrEmpty(e.KillTag)) ctx.Error(e, "killGoal needs killTag.");
             if (e.SpawnRateMultiplier <= 0) ctx.Error(e, "spawnRateMultiplier must be > 0.");
             ctx.Ref(e, ctx.Db.Enemies, e.FinaleEnemy, "finaleEnemy");

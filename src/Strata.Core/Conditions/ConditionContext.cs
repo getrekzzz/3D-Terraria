@@ -55,6 +55,12 @@ public sealed class ConditionContext
     /// <summary>The world's evil ("corruption" or "crimson").</summary>
     public string Evil { get; set; } = "";
 
+    /// <summary>The weather at the position (rain turns to snow over the tundra; clear underground).</summary>
+    public Gameplay.Weather.LocalWeather Weather { get; set; }
+
+    /// <summary>A windy day is blowing.</summary>
+    public bool Windy { get; set; }
+
     /// <summary>Fishing power of the rod making a catch (fishing loot only).</summary>
     public int FishingPower { get; set; }
 

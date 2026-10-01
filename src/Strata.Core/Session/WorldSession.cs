@@ -76,6 +76,9 @@ public sealed partial class WorldSession
     /// <summary>Ids of running world events (maintained by the event director).</summary>
     public HashSet<string> Events { get; }
 
+    /// <summary>The world's weather (scheduled by the weather system, saved in world.json).</summary>
+    public Gameplay.Weather.WeatherState Weather { get; } = new();
+
     /// <summary>Kills counted by each active event (kept by the event director).</summary>
     public Dictionary<string, int> EventKills { get; } = new(StringComparer.Ordinal);
 

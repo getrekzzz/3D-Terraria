@@ -112,6 +112,13 @@ public static class ConditionCompiler
             var p = s.Parse<EvilConditionParams>();
             return new DelegateCondition(c => string.Equals(c.Evil, p.Is, StringComparison.OrdinalIgnoreCase));
         },
+        ["weather"] = s =>
+        {
+            var p = s.Parse<WeatherConditionParams>();
+            var kinds = p.Any.Where(k => k != "windy").Select(k => Enum.Parse<Gameplay.Weather.LocalWeather>(k, ignoreCase: true)).ToArray();
+            bool windy = p.Any.Contains("windy");
+            return new DelegateCondition(c => (windy && c.Windy || Array.IndexOf(kinds, c.Weather) >= 0) == p.Active);
+        },
         ["fishingPower"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
@@ -156,6 +163,7 @@ public static class ConditionCompiler
         c.Register<HasItemConditionParams>(SpecKind.Condition, "hasItem");
         c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<RangeConditionParams>(SpecKind.Condition, "fishingPower");
+        c.Register<WeatherConditionParams>(SpecKind.Condition, "weather");
         c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");
