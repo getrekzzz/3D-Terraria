@@ -25,6 +25,9 @@ public sealed partial class PatternBrain : IBrain
     /// <summary>Per phase: the guardian ids of <see cref="PatternPhase.ShieldedBy"/> and the summon pool.</summary>
     private readonly string[][] _guards, _pools;
 
+    /// <summary>Per phase: its summon tethers minions, so only this boss's own followers guard it.</summary>
+    private readonly bool[] _tethered;
+
     public PatternBrain(PatternParams p)
     {
         _p = p;
@@ -33,6 +36,7 @@ public sealed partial class PatternBrain : IBrain
         _expert = new PatternMove[n][];
         _guards = new string[n][];
         _pools = new string[n][];
+        _tethered = new bool[n];
         for (int i = 0; i < n; i++)
         {
             var ph = p.Phases[i];
@@ -40,6 +44,7 @@ public sealed partial class PatternBrain : IBrain
             var classic = Array.FindAll(ph.Moves, m => !m.ExpertOnly);
             _classic[i] = classic.Length > 0 ? classic : ph.Moves;
             _guards[i] = (ph.ShieldedBy ?? "").Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            _tethered[i] = ph.Summon is { Tether: true };
             _pools[i] = ph.Summon is { } s ? (s.Pool.Length > 0 ? s.Pool : new[] { s.Enemy }) : Array.Empty<string>();
         }
     }
@@ -59,14 +64,14 @@ public sealed partial class PatternBrain : IBrain
             if (life <= (expert && ph.ExpertBelow is { } eb ? eb : ph.Below)) stage = i;
         }
         // A guarded phase ends once its guardians (summoned on entering it) have all fallen: the Brain is exposed at full life.
-        if (_p.Phases[stage].UntilGuardsFall && stage + 1 < _p.Phases.Length && npc.Stage >= stage && !Guarded(_guards[stage], ctx)) stage++;
+        if (_p.Phases[stage].UntilGuardsFall && stage + 1 < _p.Phases.Length && npc.Stage >= stage && !Guarded(npc, stage, ctx)) stage++;
         var phase = _p.Phases[stage];
         var ex = expert ? phase.Expert ?? Classic : Classic;
         if (stage != npc.Stage) Enter(npc, stage, phase, ex, ctx);
         npc.PhaseTimer++;
         npc.DamageScale = phase.Damage * ex.Damage;
         if (phase.Defense is { } defense) npc.DefenseOverride = defense;
-        bool shielded = Guarded(_guards[stage], ctx);
+        bool shielded = Guarded(npc, stage, ctx);
         Summon(npc, phase, _pools[stage], ex, ctx);
         var target = ctx.Target;
         if (target == null)
@@ -143,10 +148,21 @@ public sealed partial class PatternBrain : IBrain
     private static Vector3 OffsetOf(PatternSummon s) =>
         s.Offset.Length == 0 ? Vector3.Zero : new Vector3(s.Offset[0], s.Offset.Length > 1 ? s.Offset[1] : 0, s.Offset.Length > 2 ? s.Offset[2] : 0);
 
-    /// <summary>Any guardian of the phase's kinds lives.</summary>
-    private static bool Guarded(string[] kinds, BrainContext ctx)
+    /// <summary>
+    /// Any guardian of the phase's kinds lives. Tethered guardians (the Brain's Creepers) count only while they follow
+    /// this boss, so another boss's leftovers never shield it.
+    /// </summary>
+    private bool Guarded(Npc npc, int stage, BrainContext ctx)
     {
-        if (kinds.Length == 0 || ctx.CountAlive == null) return false;
+        var kinds = _guards[stage];
+        if (kinds.Length == 0) return false;
+        if (_tethered[stage])
+        {
+            foreach (var f in npc.Followers)
+                if (f.Alive && !f.Removed && Array.IndexOf(kinds, f.Def.Id) >= 0) return true;
+            return false;
+        }
+        if (ctx.CountAlive == null) return false;
         foreach (var id in kinds)
             if (ctx.CountAlive(id) > 0) return true;
         return false;
