@@ -87,7 +87,8 @@
   `incinerationSummon` items (burned in lava in a given layer, sacrificing a resident) spawn bosses.
 * **Boss framework** — `boss.parts` (`BossPart`: offset, `diesWithBody` default true, `inBossBar`, `mirror`) spawn
   fixed parts (`Npc.IsPart`) that skip far-despawn and the respawn clear; parts that die with the body never keep
-  `GroupAlive` true, so killing the body raises the defeat flag and its parts are removed next tick without loot.
+  `GroupAlive` true, so killing the body raises the defeat flag once; its parts die with it at once (no hits, no second
+  defeat when `slay` reaches them) and are removed next tick without loot. A reeling creature keeps its last scales.
   `boss.enrage` (`when` conditions at the target's feet every 30 ticks, `damage`/`speed` multipliers, `setDamage`,
   `setDefense`, `latch`, `message`) sets `Npc.Frenzied`; `SpeedScale` scales the movement step, `DefenseOverride` and
   `DefenseDelta` (zeroed before each think) feed `Npc.Defense`. `lootOnDefeat` rolls loot only for the last of a group.

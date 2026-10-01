@@ -21,10 +21,21 @@ public sealed partial class NpcSystem
 
     private static bool FallsWithBody(Npc n) => n.Leader != null && n.Part is { DiesWithBody: true };
 
-    /// <summary>Kills a creature: its drops and coins, death effects, and the boss defeat when its group has fallen.</summary>
+    /// <summary>
+    /// Kills a creature: its drops and coins, death effects, and the boss defeat when its group has fallen. A part whose
+    /// body already fell is only removed (no loot, effects or second defeat), and a body's falling parts die with it.
+    /// </summary>
     public void Kill(Npc npc)
     {
+        if (FallsWithBody(npc) && npc.Leader is { } body && (!body.Alive || body.Removed))
+        {
+            npc.Life = 0;
+            Despawn(npc);
+            return;
+        }
         npc.Life = 0;
+        foreach (var f in npc.Followers)
+            if (f.IsPart && f.Part is { DiesWithBody: true }) f.Life = 0; // FollowLeader removes them next tick
         var cell = npc.Cell;
         bool defeat = npc.Def.Boss is { Minor: false } group && !GroupAlive(group, npc);
         bool rolls = npc.Def.Boss is not { LootOnDefeat: true } || defeat;

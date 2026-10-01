@@ -15,7 +15,7 @@ public sealed partial class NpcSystem
         foreach (var tag in player.State.Effects.Pacified)
             if (npc.Def.HasTag(tag)) return;
         var pBox = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
-        if (!npc.Volumes().Any(v => Npc.Overlaps(v, pBox))) return;
+        if (!Touches(npc, pBox)) return;
         var state = player.State;
         var hit = DamageModel.Roll(ContactBase(npc), DamageClass.None, 0, 6f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
@@ -28,6 +28,17 @@ public sealed partial class NpcSystem
         ApplyContactEffects(npc, player);
         float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
         if (thorns > 0) Hit(npc, null, (int)(npc.Def.Damage * npc.DamageScale * thorns), DamageClass.None, 0, 0f, player.Center, melee: false);
+    }
+
+    /// <summary>Any of the creature's volumes (body, segments) overlaps a box; allocation-free (runs every tick).</summary>
+    private static bool Touches(Npc npc, (Vector3 Min, Vector3 Max) box)
+    {
+        if (Npc.Overlaps(npc.Box, box)) return true;
+        if (npc.Segments.Count == 0) return false;
+        var half = new Vector3(npc.Def.Boss?.SegmentRadius ?? 0.5f);
+        for (int i = 0; i < npc.Segments.Count; i++)
+            if (Npc.Overlaps((npc.Segments[i] - half, npc.Segments[i] + half), box)) return true;
+        return false;
     }
 
     /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>

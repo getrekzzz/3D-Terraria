@@ -15,9 +15,10 @@ public sealed partial class NpcSystem
 
     /// <summary>
     /// After the brain thinks: re-checks the boss's rage twice a second where its target stands (it stays set when
-    /// latched), then applies the rage's damage and speed multipliers and fixed defense.
+    /// latched), then applies the rage's damage and speed multipliers and fixed defense. The damage multiplier is applied
+    /// only after a think (which reset <see cref="Npc.DamageScale"/>), so it never compounds while the creature reels.
     /// </summary>
-    private void ApplyEnrage(Npc npc, ICombatTarget? target)
+    private void ApplyEnrage(Npc npc, ICombatTarget? target, bool thought)
     {
         if (npc.Def.Boss?.Enrage is not { } rage) return;
         if (target != null && npc.Age % 30 == 0 && !(rage.Latch && npc.Frenzied))
@@ -32,7 +33,7 @@ public sealed partial class NpcSystem
         }
         if (npc.Frenzied)
         {
-            npc.DamageScale *= rage.Damage;
+            if (thought) npc.DamageScale *= rage.Damage;
             npc.SpeedScale = rage.Speed;
             npc.DefenseOverride = rage.SetDefense;
         }

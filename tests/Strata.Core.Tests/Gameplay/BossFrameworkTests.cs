@@ -136,4 +136,48 @@ public class BossFrameworkTests
         Assert.Equal(3, ctx.ReadProbe("boss.moon_lord.parts"));
         Assert.Equal(0, ctx.ReadProbe("boss.king_slime.life"));
     }
+
+    [Fact]
+    public void SlayingEveryPieceDefeatsTheBossOnce()
+    {
+        using var g = Arena();
+        var core = MoonLord(g);
+        int defeats = 0, messages = 0;
+        g.World.Npcs.BossDefeated += _ => defeats++;
+        g.World.Npcs.Messaged += (_, kind) => messages += kind == MessageKind.BossDefeated ? 1 : 0;
+        var pieces = g.World.Npcs.All.Where(n => n == core || n.Leader == core).ToList();
+        foreach (var n in pieces) g.World.Npcs.Kill(n); // what `slay` does: the core first, then its parts
+        Assert.Equal(1, defeats);
+        Assert.Equal(1, messages);
+        Assert.DoesNotContain(g.World.Npcs.All, n => n.Def.Id == "true_eye_of_cthulhu");
+        Assert.DoesNotContain(g.World.Npcs.All, n => n.Leader == core);
+    }
+
+    [Fact]
+    public void PartsAreDeadTheMomentTheirBodyFalls()
+    {
+        using var g = Arena();
+        var core = MoonLord(g);
+        var hand = g.World.Npcs.All.First(n => n.Def.Id == "moon_lord_hand");
+        int defeats = 0;
+        g.World.Npcs.BossDefeated += _ => defeats++;
+        g.World.Npcs.Kill(core);
+        Assert.False(hand.Alive);
+        Assert.False(g.World.Npcs.Hit(hand, g.Player, 999_999, DamageClass.Melee, 0, 0f, g.Player.Center, melee: true));
+        Assert.Equal(1, defeats);
+    }
+
+    [Fact]
+    public void ReelingKeepsTheBrainsDamageScale()
+    {
+        using var g = Arena();
+        g.World.Session.Clock.SetHour(12f);
+        var boss = g.World.Npcs.Spawn(g.Content.Enemies.Get("skeletron"), g.Player.Position + new Vector3(0, 6f, 4f))!;
+        g.Ticks(2);
+        float enraged = boss.Def.Boss!.DayEnrage!.Damage;
+        Assert.Equal(enraged, boss.DamageScale);
+        boss.StunTicks = 5;
+        g.Ticks(3);
+        Assert.Equal(enraged, boss.DamageScale);
+    }
 }

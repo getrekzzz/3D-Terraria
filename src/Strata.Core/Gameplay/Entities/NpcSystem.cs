@@ -220,17 +220,23 @@ public sealed partial class NpcSystem
             _ctx.OnSurface = session.Generator.Plan.Bands.LayerAt(npc.Cell.Y) == World.WorldLayer.Surface;
             _ctx.Rng = _rng;
             var brain = BrainOf(npc.Def);
-            npc.DefenseDelta = 0;
-            npc.DamageScale = 1f;
-            if (npc.StunTicks > 0) Reel(npc, brain);
-            else brain.Think(npc, _ctx);
+            // A reeling creature keeps last think's scales (its phase damage, guard) rather than dropping to base.
+            bool thinks = npc.StunTicks <= 0;
+            if (thinks)
+            {
+                npc.DefenseDelta = 0;
+                npc.DamageScale = 1f;
+                brain.Think(npc, _ctx);
+            }
+            else Reel(npc, brain);
             _rng = _ctx.Rng;
-            ApplyEnrage(npc, target);
+            ApplyEnrage(npc, target, thinks);
             if (npc.Def.Shield != null && ShieldUp(npc)) npc.Invulnerable = true;
             if (brain.UsesGravityFor(npc) && npc.Def.Gravity) npc.Velocity.Y = MathF.Max(npc.Velocity.Y - BrainContext.Gravity * dt, -30f);
-            Move(npc, brain, dt * npc.SpeedScale);
+            Move(npc, brain, thinks ? dt * npc.SpeedScale : dt);
             if (npc.Def.Ranged != null && target != null) RangedAttack(npc, target, distance);
             if (npc.Def.ContactDamage && target != null) ContactDamage(npc, target);
+            if (npc.Removed) continue; // thorns killed it
             if (npc.Barrier != null) BarrierEffects(npc);
             if (npc.Position.Y < 0) Remove(i);
         }
