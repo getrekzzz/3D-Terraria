@@ -80,6 +80,7 @@ public sealed partial class ColliderManager : Node3D
 
     private void Build(Int3 coord, ChunkCollision c)
     {
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.colliders.build");
         FreeBody(c);
         c.Dirty = false;
         var origin = ChunkMath.ChunkOrigin(coord);

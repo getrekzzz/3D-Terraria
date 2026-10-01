@@ -53,3 +53,5 @@
    liquids (flow + contact effects), events, spawner, creatures, town residents, melee, projectiles, autosave.
 3. Presentation nodes (`TileObjectRenderer`, `NpcRenderer`, `DroppedItemRenderer`, HUD) read Core state and
    react to Core events (object added/removed, damage, kills, pickups).
+4. `FrameProbe` processes last and, while profiling is on (F3 or `perf start`), closes the frame for the spike log
+   (see rendering.md, *Measuring hitches*).

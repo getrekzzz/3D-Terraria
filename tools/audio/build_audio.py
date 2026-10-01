@@ -30,7 +30,7 @@ def check():
         names.update(re.findall(r'Sfx\.Play(?:At)?\("([a-z0-9_]+)"', path.read_text(encoding="utf-8")))
     missing = sorted(n for n in names if n not in sfx_recipes.RECIPES)
     for n in missing:
-        print(f"ERROR: game plays sound '{n}' but tools/audio/sfx_recipes.py has no recipe for it")
+        print(f"ERROR: game plays sound '{n}' but tools/audio/sfx_recipes*.py has no recipe for it")
     tracks = sorted(TRACKS)
     print(f"{len(names)} sounds referenced, {len(sfx_recipes.RECIPES)} recipes, {len(tracks)} music tracks")
     return 1 if missing else 0

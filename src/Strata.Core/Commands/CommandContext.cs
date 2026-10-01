@@ -35,6 +35,7 @@ public sealed class CommandContext
         World = world;
         Host = host;
         StandardProbes.Register(this);
+        ProbeSources.RegisterAll(this, typeof(CommandContext).Assembly); // [ProbeSource] classes in Strata.Core
     }
 
     public GameWorld World { get; }
@@ -46,8 +47,11 @@ public sealed class CommandContext
 
     public PlayerEntity Player => World.LocalPlayer ?? throw new CommandException("no player in this world");
 
-    /// <summary>Adds a fixed probe, e.g. <c>player.life</c>.</summary>
-    public void AddProbe(string name, Func<double> read) => _probes[name] = read;
+    /// <summary>Adds a fixed probe, e.g. <c>player.life</c>. A name is registered once (probe files must not shadow each other).</summary>
+    public void AddProbe(string name, Func<double> read)
+    {
+        if (!_probes.TryAdd(name, read)) throw new InvalidOperationException($"Probe '{name}' is registered twice.");
+    }
 
     /// <summary>Adds a parameterised probe, e.g. prefix <c>inv.</c> resolving <c>inv.torch</c>.</summary>
     public void AddPrefixProbe(string prefix, Func<string, double?> resolve) => _prefixProbes.Add((prefix, resolve));

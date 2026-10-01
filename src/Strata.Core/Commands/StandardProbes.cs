@@ -3,7 +3,10 @@ using Strata.Core.Voxels;
 
 namespace Strata.Core.Commands;
 
-/// <summary>Probes available in every context (engine hosts add their own, e.g. <c>player.on_floor</c>).</summary>
+/// <summary>
+/// Probes available in every context. Feature probes live in their own <see cref="ProbeSourceAttribute"/> classes
+/// (<see cref="TownProbes"/>); engine hosts add theirs the same way (e.g. <c>player.on_floor</c>).
+/// </summary>
 internal static class StandardProbes
 {
     public static void Register(CommandContext ctx)
@@ -36,20 +39,6 @@ internal static class StandardProbes
         ctx.AddProbe("projectiles.count", () => w.Projectiles.All.Count);
         ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
         ctx.AddProbe("house.valid", () => w.Housing.Scan(ctx.Player.FeetCell + Int3.Up).Valid ? 1 : 0);
-        ctx.AddProbe("town.residents", () => w.Town.Residents.Count);
-        ctx.AddProbe("town.homed", () => w.Town.Residents.Count(t => t.Home != null));
-        // town.<id>: 1 when the resident lives in town; town.<id>.home: metres from their home (−1 if homeless/absent);
-        // town.<id>.alive: 1 while they are alive.
-        ctx.AddPrefixProbe("town.", spec =>
-        {
-            var parts = spec.Split('.');
-            if (!w.Session.Content.TownNpcs.Contains(parts[0])) return null;
-            var t = w.Town.Find(parts[0]);
-            if (parts.Length == 1) return t != null ? 1 : 0;
-            if (parts is [_, "home"]) return t?.Home is { } h ? System.Numerics.Vector3.Distance(t.Position, Gameplay.Town.TownSystem.NodeFeet(h)) : -1;
-            if (parts is [_, "alive"]) return t is { Alive: true } ? 1 : 0;
-            return null;
-        });
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
         // Voxel light at the player's head (0–15; -1 before the chunk is lit) and the sky map's column top.
         ctx.AddProbe("light.sky", () => HeadLight(w, ctx, block: false));

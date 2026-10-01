@@ -1,13 +1,11 @@
 using System.Globalization;
 using Godot;
 using Strata.Core.Diagnostics;
-using Strata.Core.Gameplay.Player;
 using Strata.Core.Persistence;
 using Strata.Core.Session;
 using Strata.Core.Streaming;
 using Strata.Core.World;
 using Strata.Game.Debug;
-using Strata.Game.Items;
 using Strata.Game.Player;
 using Strata.Game.World;
 
@@ -50,8 +48,11 @@ public sealed record LaunchOptions
     public int ViewDistance { get; init; } = 5;
 }
 
-/// <summary>Creates or loads a world and assembles the scene nodes that present it.</summary>
-public static class WorldLauncher
+/// <summary>
+/// Creates or loads a world and assembles the scene nodes that present it. The wiring is grouped by concern in
+/// partials (Assets, Effects, Player, Ui); nodes are added in a fixed order, which also fixes their processing order.
+/// </summary>
+public static partial class WorldLauncher
 {
     public static LaunchedWorld Launch(Node parent, GameServices services, LaunchOptions o)
     {
@@ -72,123 +73,20 @@ public static class WorldLauncher
         var runtime = new WorldRuntime { Name = "World" };
         runtime.Initialize(services, game);
         parent.AddChild(runtime);
+        runtime.AddChild(new FrameProbe()); // processes last whatever its place: closes each frame for the spike log
 
-        var objectColliders = new ObjectColliders { Name = "ObjectColliders" };
-        runtime.AddChild(objectColliders);
-        objectColliders.Initialize(runtime);
-        var props = new Rendering.PropLibrary();
-        var objectRenderer = new TileObjectRenderer();
-        runtime.AddChild(objectRenderer);
-        objectRenderer.Initialize(runtime, props);
-        game.Spawner.Config = Strata.Core.Gameplay.Entities.SpawnConfig.Load(services.Data);
-        game.Housing.Config = Strata.Core.Gameplay.Housing.HousingConfig.Load(services.Data);
-        game.Town.Config = Strata.Core.Gameplay.Town.TownConfig.Load(services.Data);
-        game.Spread.Config = Strata.Core.Gameplay.Progression.SpreadConfig.Load(services.Data);
-        var creatures = new Entities.NpcRenderer();
-        runtime.AddChild(creatures);
-        creatures.Initialize(game, props);
-        var residents = new Entities.TownRenderer();
-        runtime.AddChild(residents);
-        residents.Initialize(game, props);
-        var projectiles = new Entities.ProjectileRenderer();
-        runtime.AddChild(projectiles);
-        projectiles.Initialize(game, props);
-        var effects = new Entities.CombatEffects();
-        runtime.AddChild(effects);
-        effects.Initialize(game);
-        var blockEffects = new Entities.BlockEffects();
-        runtime.AddChild(blockEffects);
-        blockEffects.Initialize(game);
-        var drops = new DroppedItemRenderer();
-        runtime.AddChild(drops);
-        drops.Initialize(game);
-        var lights = new Rendering.DynamicLights();
-        runtime.AddChild(lights);
-        lights.Initialize(services.Graphics);
-        lights.AddProvider((eye, radius) => Rendering.DynamicLights.PlacedLights(game, objectRenderer.Placement, eye, radius));
-        lights.AddProvider(creatures.Glows);
-        var lava = new Rendering.LavaEffects();
-        runtime.AddChild(lava);
-        lava.Initialize(runtime);
-        lights.AddProvider(lava.HeatLights);
+        var (props, objectRenderer) = AddWorldObjects(runtime);
+        LoadConfigs(game, services);
+        var creatures = AddCreatureRenderers(runtime, game, props);
+        AddWorldEffects(runtime, services, game, objectRenderer, creatures);
 
         if (o.FreeCamera) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
 
-        var playerName = o.PlayerName;
-        if (o.FreshPlayer) GameWorld.DeletePlayer(playerDir, playerName);
-        var state = GameWorld.LoadOrCreatePlayer(playerDir, playerName, services.Content);
-        var entity = game.AddPlayer(state, game.SpawnPositionFor(state));
-        var player = new PlayerController();
-        player.Initialize(runtime, entity, MovementConfig.Load(services.Data));
-        runtime.AddChild(player);
-        player.Rig.Camera.Current = true;
-        runtime.Focus = player;
-        game.Npcs.PlayerHurt += (p, _, knock) =>
-        {
-            if (p == entity) player.ApplyKnockback(new Vector3(knock.X, knock.Y, knock.Z));
-        };
-        game.PlayerRespawned += p =>
-        {
-            if (p == entity) player.Teleport(p.Position, resolveSpawn: true);
-        };
-        game.ItemUse.Recalled += (p, home) =>
-        {
-            if (p == entity) player.Teleport(home, resolveSpawn: true);
-        };
-
-        var sounds = new Audio.SoundEvents();
-        runtime.AddChild(sounds);
-        sounds.Initialize(game, entity);
-        Audio.MusicDirector.Instance?.Follow(game, entity);
-        var senses = new Rendering.PlayerSenses();
-        runtime.AddChild(senses);
-        senses.Initialize(game, entity);
-        var wires = new Rendering.WireOverlay();
-        runtime.AddChild(wires);
-        wires.Initialize(game, entity);
-
-        var avatar = new PlayerAvatar();
-        player.AddChild(avatar);
-        avatar.Initialize(player, game, props);
-        var viewModel = new ViewModel();
-        player.Rig.Camera.AddChild(viewModel);
-        viewModel.Initialize(player, game, props);
-        var grapple = new GrappleVisual();
-        runtime.AddChild(grapple);
-        grapple.Initialize(player);
-        var trail = new Entities.SwingTrail();
-        runtime.AddChild(trail);
-        trail.Initialize(game);
-        var carried = new PlayerLight();
-        player.AddChild(carried);
-        carried.Initialize(entity, services.Graphics, () => viewModel.LightAnchor, () => avatar.LightAnchor);
-
-        var interaction = new InteractionController();
-        interaction.Initialize(runtime, player);
-        runtime.AddChild(interaction);
-        var highlight = new TargetHighlight();
-        runtime.AddChild(highlight);
-        highlight.Initialize(game, interaction, entity);
-
-        var ui = new UI.UiContext(game, player, interaction);
-        var hud = new UI.Hud();
-        runtime.AddChild(hud);
-        hud.Initialize(ui);
-        var inventory = new UI.InventoryScreen();
-        runtime.AddChild(inventory);
-        inventory.Initialize(ui);
-        var worldMap = new UI.WorldMapScreen();
-        runtime.AddChild(worldMap);
-        worldMap.Initialize(ui);
-        var minimap = new UI.Minimap();
-        runtime.AddChild(minimap);
-        minimap.Initialize(ui, worldMap);
-        var townDialog = new UI.TownDialog();
-        runtime.AddChild(townDialog);
-        townDialog.Initialize(ui);
-        var perf = new UI.PerfOverlay();
-        runtime.AddChild(perf);
-        perf.Initialize(runtime, objectRenderer);
+        var (entity, player) = AddPlayer(runtime, services, game, o, playerDir);
+        AddPlayerEffects(runtime, game, entity);
+        AddPlayerVisuals(runtime, services, game, props, entity, player);
+        var interaction = AddInteraction(runtime, game, entity, player);
+        var (hud, inventory, worldMap, townDialog) = AddUi(runtime, game, player, interaction, objectRenderer);
         return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap };
     }
 

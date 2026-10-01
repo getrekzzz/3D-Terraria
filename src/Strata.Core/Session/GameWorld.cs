@@ -10,99 +10,10 @@ using Strata.Core.Gameplay.Navigation;
 using Strata.Core.Gameplay.Town;
 using Strata.Core.Gameplay.Player;
 using Strata.Core.Gameplay.Stats;
-using Strata.Core.Persistence;
 using Strata.Core.Simulation.Liquids;
 using Strata.Core.Streaming;
 
 namespace Strata.Core.Session;
-
-/// <summary>A player character inside a world: persistent state plus its live body (synced by the engine layer).</summary>
-public sealed class PlayerEntity
-{
-    public PlayerEntity(PlayerState state) => State = state;
-
-    public PlayerState State { get; }
-
-    /// <summary>Feet position in meters.</summary>
-    public Vector3 Position { get; set; }
-
-    public Vector3 Velocity { get; set; }
-
-    /// <summary>Normalized aim direction.</summary>
-    public Vector3 Aim { get; set; } = -Vector3.UnitZ;
-
-    /// <summary>Ticks until the held item can be used again.</summary>
-    public int UseCooldown { get; set; }
-
-    /// <summary>Ticks left in the current use animation (swing/shoot pose).</summary>
-    public int UseAnimation { get; set; }
-
-    /// <summary>Crisp shape used when placing blocks.</summary>
-    public Voxels.CellShape BuildShape { get; set; } = Voxels.CellShape.Full;
-
-    /// <summary>Quarter turns about +Y for shapes and objects (added to the facing direction).</summary>
-    public int BuildRotation { get; set; }
-
-    /// <summary>The minecart being ridden (the engine moves the body along it), or null.</summary>
-    public Gameplay.Mounts.MinecartRide? Minecart { get; set; }
-
-    /// <summary>Pressure plate currently under the feet (signals once per step onto it).</summary>
-    public long PressurePlate { get; set; } = -1;
-
-    /// <summary>Ticks until respawn while dead.</summary>
-    public int RespawnTicks { get; set; }
-
-    /// <summary>A hardcore character that died: it never respawns and is not saved again.</summary>
-    public bool Lost { get; set; }
-
-    /// <summary>Precision mode: tools affect a single cell.</summary>
-    public bool Precision { get; set; }
-
-    /// <summary>Liquid the body is standing or swimming in (null when dry). Set by the liquid effects each tick.</summary>
-    public Content.Defs.LiquidDef? Liquid { get; set; }
-
-    /// <summary>The head is under the liquid's surface.</summary>
-    public bool Submerged { get; set; }
-
-    public const int MaxBreath = 1200;
-
-    /// <summary>Ticks of air left while submerged (refills in the open).</summary>
-    public int Breath { get; set; } = MaxBreath;
-
-    public static readonly Vector3 HalfExtents = new(0.45f, 0.9f, 0.45f);
-
-    /// <summary>
-    /// The cell containing the feet. Bodies rest a few centimetres into the smoothed ground surface, so the cell is
-    /// taken slightly above the feet point.
-    /// </summary>
-    public Common.Int3 FeetCell => new(
-        (int)MathF.Floor(Position.X / Units.CellSize),
-        (int)MathF.Floor((Position.Y + 0.1f) / Units.CellSize),
-        (int)MathF.Floor(Position.Z / Units.CellSize));
-
-    /// <summary>Eye position in meters.</summary>
-    public Vector3 Eye => Position + new Vector3(0, 1.6f, 0);
-
-    /// <summary>
-    /// Horizontal facing as a <see cref="Voxels.ShapeCode"/> rotation: 0 = looking +Z, 1 = −X, 2 = −Z, 3 = +X.
-    /// Slopes placed with it rise away from the player; objects face the player.
-    /// </summary>
-    public int FacingQuarter
-    {
-        get
-        {
-            int q = (int)MathF.Round(MathF.Atan2(Aim.X, Aim.Z) / (MathF.PI / 2f));
-            return ((-q % 4) + 4) % 4;
-        }
-    }
-
-    public Vector3 Center => Position + new Vector3(0, HalfExtents.Y, 0);
-
-    public bool Alive => State.Vitals.Life > 0;
-
-    /// <summary>Box in cell units (for placement blocking).</summary>
-    public (Vector3 Min, Vector3 Max) CellBox => ((Center - HalfExtents) / Units.CellSize, (Center + HalfExtents) / Units.CellSize);
-}
 
 /// <summary>
 /// The simulation of one open world, independent of any engine: chunk streaming and jobs, the fixed-tick clock,
@@ -246,7 +157,7 @@ public sealed partial class GameWorld : IDisposable
         if (++_autosaveCounter >= AutosaveTicks)
         {
             _autosaveCounter = 0;
-            Autosaved?.Invoke(SaveAll());
+            using (prof.Time("tick.autosave")) Autosaved?.Invoke(SaveAll());
         }
     }
 
@@ -321,60 +232,6 @@ public sealed partial class GameWorld : IDisposable
         if (state.SpawnPoints.TryGetValue(Session.Settings.Name, out var bed) && bed.Length == 3) cell = new Int3(bed[0], bed[1], bed[2]);
         cell = Session.FindStandableNear(cell);
         return new Vector3(cell.X + 0.5f, cell.Y, cell.Z + 0.5f) * Units.CellSize;
-    }
-
-    /// <summary>Saves modified chunks, world metadata and every player. Returns chunks written.</summary>
-    public int SaveAll()
-    {
-        Events.Persist();
-        Town.Persist();
-        int chunks = Session.SaveAll();
-        foreach (var p in Players) SavePlayer(p.State);
-        Maps.Save();
-        return chunks;
-    }
-
-    public void SavePlayer(PlayerState state)
-    {
-        if (PlayerDirectory == null || Players.Any(p => p.State == state && p.Lost)) return;
-        WritePlayer(PlayerDirectory, state);
-    }
-
-    /// <summary>Writes a character's save file (new characters from the menu, saves during play).</summary>
-    public static void WritePlayer(string directory, PlayerState state)
-    {
-        Directory.CreateDirectory(directory);
-        state.LastPlayedUtc = DateTime.UtcNow;
-        AtomicFile.WriteAllText(PlayerPath(directory, state.Name), PlayerSave.From(state).Serialize());
-    }
-
-    /// <summary>Loads a player file, or creates a new character with the starting kit.</summary>
-    public static PlayerState LoadOrCreatePlayer(string? directory, string name, Content.ContentDatabase content)
-    {
-        if (directory != null)
-        {
-            var bytes = AtomicFile.ReadWithFallback(PlayerPath(directory, name));
-            if (bytes != null)
-            {
-                var save = PlayerSave.Deserialize(System.Text.Encoding.UTF8.GetString(bytes));
-                return save.ToState(content);
-            }
-        }
-        return PlayerState.CreateNew(name, content);
-    }
-
-    /// <summary>Deletes a player's file and its backup (fresh characters for tests).</summary>
-    public static void DeletePlayer(string directory, string name)
-    {
-        var path = PlayerPath(directory, name);
-        foreach (var p in new[] { path, path + ".bak", path + ".tmp" })
-            if (File.Exists(p)) File.Delete(p);
-    }
-
-    public static string PlayerPath(string directory, string name)
-    {
-        var safe = new string(name.Select(c => char.IsLetterOrDigit(c) || c is '_' or '-' ? c : '_').ToArray());
-        return Path.Combine(directory, safe + ".player.json");
     }
 
     public void Shutdown()

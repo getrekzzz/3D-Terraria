@@ -29,7 +29,9 @@ footprint's bottom centre, items at the grip with the business end along +Z. Mat
 `prop:<layer>[:glow]` (object-space triplanar props shader), `card:<layer>` (alpha-tested leaf cards with UVs and
 crown-shaped custom normals: tree crowns and bushes) or `char:<kind>` (people); vertex colour tints (written as
 sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `build_all.py --check` verifies
-every tile object, item and enemy has a generator (no Blender needed).
+every tile object, item and enemy has a generator (no Blender needed). The spec is `assets.json` merged with the
+drop-in files `assets.d/*.json` (`asset_spec.load_spec()`; duplicate ids fail), and generator modules can register
+functions with `@generator` (`bgen/__init__.py`), which `build_all.py` finds by importing every `bgen` module.
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
 weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and

@@ -78,6 +78,43 @@ Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class 
   bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync).
 * F3 shows GPU and render-CPU milliseconds, the current 3D scale and the preset.
 
+## Measuring hitches
+Every lag fix is proven with the frame profiler (`Metrics.Frame`, Core) and its spike log (`SpikeLog`). Timer
+scopes (`Metrics.Frame.Time("gd.colliders.build")`) cost nothing until profiling is on; while it is, each recorded
+timer also adds into the current frame, and `game/Debug/FrameProbe.cs` (process priority `int.MaxValue`, added by
+`WorldLauncher.Launch`) closes every frame with its real length from `Time.GetTicksUsec()` deltas. Frames of 33 ms or
+more are kept (last 64) with their five most expensive timers and the gen0/1/2 collections and GC pause during them;
+counters keep frames ≥33/≥50/≥100 ms, the worst frame and a frame-time histogram for p50/p95/p99 (0.5 ms steps to
+100 ms, 10 ms steps to 10 s). A spike lists causes: `frame.delta`, `tick.total` and `gd.world_runtime` (enclosing
+totals) are left out, as is a parent timer whose dotted child took all but 1 ms of it. On a software renderer
+(llvmpipe/lavapipe draws a frame in seconds, so every frame would be a spike) `FrameProbe` measures from the end of
+the last draw instead, i.e. the main thread's own work, and the summary says "frames (main thread, draw excluded)".
+* **F3** turns profiling on while it is open (a session `perf start` began, before or while it was open, keeps
+  running when it closes) and adds
+  `spikes >33 ms N (>50 M, worst X) of F frames · p99 … · GC a/b/c pause y ms` and `last: 72.0 ms: tick.autosave 40.1,
+  gd.colliders.build 12.0 · GC gen2 pause 8.0 ms`.
+* **Console**: `perf start` (reset, on), `perf stop`, `perf report [n]` (spike/GC summary, then the costliest timers
+  per frame or tick with average, worst and call count), `perf spikes [n]` (summary, then the last n spikes, newest
+  first).
+* **Probes** (`Commands/PerfProbes.cs`): `perf.frames`, `perf.frames_over_33|50|100`, `perf.worst_ms`, `perf.p99_ms`,
+  `perf.gc0|1|2`, `perf.gc_pause_ms`, and per timer `perf.max.<timer>` (longest call, ms), `perf.avg.<timer>`,
+  `perf.calls.<timer>` and `perf.max_calls.<timer>` (most calls in one frame); a timer that never ran reads 0.
+* Suspected sources carry their own timers: `gd.colliders.build`, `gd.objects.rebuild`, `gd.grass.create`,
+  `gd.npcs.create` (a creature-model pool miss), `gd.projectiles.create`, `tick.autosave`, `stream.unload_flush`,
+  `gd.dynres.change`.
+* **`game/Testing/Scripts/perf.cmds`** drives the usual hitch sources: three far teleports, a save, ten torches, flowing
+  water, twenty spell casts, eight creatures, then `perf report 40` and `perf spikes 10`, and finally the cost of one
+  block edit from a fresh profile. CI runs it headless with every other script, where frame times are CPU-only and
+  noisy, so it asserts only deterministic counters (frames closed, work that must have happened, `errors == 0`);
+  later work packages add structural bounds (rebuilds per edit, gen2 collections during travel). Timing evidence
+  comes from a rendering run, on a dev GPU (whole frames) or lavapipe (main-thread work, see above):
+  `godot --path . --rendering-driver vulkan -- --world=perf --size=small --new --player=perf --fresh-player --view=6
+  --graphics=medium --smoke=res://game/Testing/Scripts/perf.cmds`.
+* **Before/after**: run the same rendering command on the parent commit and on the fix, on the same machine, and
+  compare the `perf spikes` summary (p99, max, spike counts, GC) and which timers still appear in the spike list.
+  Lavapipe timings only compare with other lavapipe runs (they also share the CPU with the software rasteriser, and
+  physics runs its 8-step catch-up every frame). The W0 baseline, before any lag fix, is `docs/perf/perf-before.txt`.
+
 ## Global shader parameters (`project.godot`)
 `strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,
 `strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`.

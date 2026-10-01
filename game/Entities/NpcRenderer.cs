@@ -91,6 +91,8 @@ public sealed partial class NpcRenderer : Node3D
             pooled.Visible = true;
             return pooled;
         }
+        // A pool miss instantiates the model (and loads it the first time): the creature-side hitch source.
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.npcs.create");
         var visual = CreatureVisual.Create($"assets/models/creatures/{model}.glb", _props);
         if (visual != null) AddChild(visual);
         return visual;

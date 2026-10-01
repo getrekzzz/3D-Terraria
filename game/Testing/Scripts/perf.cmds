@@ -1,0 +1,91 @@
+# Perf smoke: the usual hitch sources (far travel, a save, torches, flowing water, magic, creatures) with the frame
+# profiler on, then `perf report` and `perf spikes`. Headless CI asserts only deterministic counters (frames closed,
+# work that must have happened); wall-clock thresholds belong to the rendering run, whose output is the baseline:
+#   godot --path . --rendering-driver vulkan -- --world=perf --size=small --new --player=perf --fresh-player \
+#         --view=6 --graphics=medium --smoke=res://game/Testing/Scripts/perf.cmds
+# Runs with: godot --headless --path . -- --world=smoke-perf --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/perf.cmds
+
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+spawning off
+town arrivals off
+perf start
+
+# Travel: each jump streams a whole new area in (loads, meshes, colliders, tile objects, grass).
+biome desert
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+biome tundra
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+tp spawn
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+assert perf.frames > 0
+assert perf.calls.gd.colliders.build > 0
+probe perf.gc2
+probe perf.calls.stream.unload_flush
+probe perf.max.stream.unload_flush
+
+# A full save on the main thread (what the autosave does every two minutes).
+save
+
+# A flat arena, then ten torches, one per frame (remeshes, collider and tile-object rebuilds, light).
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+wait 1.0
+place torch -8 0 -8
+place torch -4 0 -8
+place torch 0 0 -8
+place torch 4 0 -8
+place torch 8 0 -8
+place torch -8 0 8
+place torch -4 0 8
+place torch 0 0 8
+place torch 8 0 8
+place torch -8 0 0
+wait 1.0
+assert objects.count >= 10
+assert perf.calls.gd.objects.rebuild > 0
+
+# Water pours onto the floor and spreads.
+liquid water 3 0 3 5 2 5
+wait 3
+
+# Magic: twenty sparks (mana refilled halfway).
+give wand_of_sparking 1
+wield wand_of_sparking
+aim 0 0 1
+repeat 10 use
+heal
+repeat 10 use
+wait 1.0
+assert perf.calls.gd.projectiles.create > 0
+
+# Creatures appear (models instantiated on first sight).
+spawn zombie 5
+spawn demon_eye 3
+wait 2.0
+assert perf.calls.gd.npcs.create > 0
+
+perf report 40
+perf spikes 10
+probe perf.frames
+probe perf.frames_over_33
+probe perf.frames_over_50
+probe perf.worst_ms
+probe perf.p99_ms
+probe perf.gc2
+probe perf.gc_pause_ms
+probe perf.calls.tick.autosave
+assert errors == 0
+
+# One block edit from a fresh profile: what a single edit rebuilds (later work packages bound these).
+killall
+perf start
+setblock 6 0 -4 stone
+wait 1.0
+probe perf.calls.gd.colliders.build
+probe perf.calls.gd.objects.rebuild
+probe perf.max_calls.gd.grass.create
+assert errors == 0

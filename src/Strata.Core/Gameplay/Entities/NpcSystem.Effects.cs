@@ -72,26 +72,4 @@ public sealed partial class NpcSystem
             player.State.Recompute();
         }
     }
-
-    private void DeathEffects(Npc npc)
-    {
-        var content = _world.Session.Content;
-        foreach (var fx in npc.Def.OnDeath)
-        {
-            switch (fx.Type)
-            {
-                case CreatureEffectSpecs.PourLiquid:
-                    var pour = fx.Parse<PourLiquidParams>();
-                    if (content.Liquids.TryGet(pour.Liquid, out var liquid)) _world.Editor.PourLiquid(npc.Cell, liquid, pour.Amount);
-                    break;
-                case CreatureEffectSpecs.SpawnEnemies:
-                    var spawn = fx.Parse<SpawnEnemiesParams>();
-                    if (!content.Enemies.TryGet(spawn.Enemy, out var child)) break;
-                    for (int i = 0; i < spawn.Count; i++)
-                        if (Spawn(child, npc.Position + new Vector3(_rng.NextSigned() * 0.6f, 0.2f, _rng.NextSigned() * 0.6f)) is { } c)
-                            c.Velocity = new Vector3(_rng.NextSigned() * 3f, 4f, _rng.NextSigned() * 3f);
-                    break;
-            }
-        }
-    }
 }
