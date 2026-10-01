@@ -27,6 +27,12 @@
   `failMessage`). Placement, a boomerang already out and a crystal at its cap stay silent. A held button never
   reports, and the same text is not repeated to a player within 2 s. `SoundEvents` plays `use_fail` or `no_mana` for
   each failed press, and `tink` (recipes in `tools/audio/sfx_recipes_feedback.py`) when a tool is too weak for what it hits.
+* **Shot origin** — `ShotGeometry` places a player's shot at the weapon hand (`HandOffset`: 0.22 m right, 0.3 m down,
+  0.45 m ahead of the eye in the `Facing` frame) and aims it from there at the crosshair point (`Eye + Aim ·
+  AimDistance`, never nearer than `MinConvergence` = 2 m), so arrows, bolts and thrown weapons leave the hand and still
+  land on the crosshair. When a solid cell or blocking object lies between the eye and the hand (a wall at the
+  shoulder) the shot starts at the eye instead, never inside terrain. `ProjectileSystem.Fire` applies the weapon's
+  spread around that line; other spawns (creature volleys) keep their own origins.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor
