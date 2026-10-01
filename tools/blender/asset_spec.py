@@ -13,7 +13,7 @@ BASE = HERE / "assets.json"
 DROP_IN = HERE / "assets.d"
 
 # Id maps a drop-in file may add to, as key paths into the spec.
-SECTIONS = (("metals",), ("objects",), ("items", "patterns"), ("items", "explicit"), ("creatures",), ("projectiles",))
+SECTIONS = (("metals",), ("objects",), ("items", "patterns"), ("items", "explicit"), ("creatures",), ("projectiles",), ("armor",), ("metalStyles",))
 
 
 class SpecError(ValueError):

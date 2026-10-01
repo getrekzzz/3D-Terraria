@@ -6,6 +6,8 @@ import re
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
 CELL = 0.5
+# Which entry of a metal's "metalStyles" shapes each pattern generator (P3-39 per-tier silhouettes).
+STYLE_OF = {"sword": "sword", "shortsword": "sword", "pickaxe": "pick", "axe": "axe", "hammer": "hammer", "bow": "bow"}
 
 
 def load_json(path: pathlib.Path):
@@ -91,7 +93,8 @@ def plan(spec, blocks, items, objects, enemies):
         match = next(((m, t, s) for name, m, t, s in patterns if name == iid), None)
         if match:
             metal, (tint, accents), s = match
-            params = {"metal": tint, "metalLayer": "iron", **accents, **s.get("params", {})}
+            style = spec.get("metalStyles", {}).get(metal, {}).get(STYLE_OF.get(s["generator"], ""), {})
+            params = {"metal": tint, "metalLayer": "iron", **accents, **style, **s.get("params", {})}
             item_jobs[iid] = {"generator": s["generator"], "params": params}
             continue
         placed = items.get(iid, {}).get("placeObject") or placer_of_object.get(iid)
@@ -111,3 +114,11 @@ def portrait_models(enemies):
     """Town NPC head shots and bestiary thumbnails: (town npc id -> model, enemy id -> model)."""
     npcs = {i: e.get("model", i) for i, e in enemies.items() if e.get("_town")}
     return npcs, {i: e.get("model", i) for i, e in enemies.items() if not e.get("_town")}
+
+
+def plan_armor(spec, items):
+    """Every wearable armour item needs a worn-armour entry (its set id, or its own id for single pieces)."""
+    armor = spec.get("armor", {})
+    return [f"armour item '{iid}' has no entry in the asset spec's armor section ('{i.get('armorSet') or iid}')"
+            for iid, i in sorted(items.items()) if i.get("equipSlot") in ("head", "body", "legs")
+            and (i.get("armorSet") or iid) not in armor]
