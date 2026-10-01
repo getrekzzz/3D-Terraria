@@ -74,10 +74,10 @@ public sealed class WeatherPresentation
 {
     public Dictionary<string, WeatherBudget> Budgets { get; init; } = new(StringComparer.OrdinalIgnoreCase)
     {
-        ["low"] = new WeatherBudget { Rain = 1200, Snow = 700, Sand = 400, Splash = 160 },
-        ["medium"] = new WeatherBudget { Rain = 2600, Snow = 1400, Sand = 800, Splash = 320 },
-        ["high"] = new WeatherBudget { Rain = 4500, Snow = 2400, Sand = 1400, Splash = 600 },
-        ["ultra"] = new WeatherBudget { Rain = 6500, Snow = 3200, Sand = 2000, Splash = 900 },
+        ["low"] = new WeatherBudget { Rain = 1200, Snow = 700, Sand = 700, Splash = 160 },
+        ["medium"] = new WeatherBudget { Rain = 2600, Snow = 1400, Sand = 1500, Splash = 320 },
+        ["high"] = new WeatherBudget { Rain = 4500, Snow = 2400, Sand = 2500, Splash = 600 },
+        ["ultra"] = new WeatherBudget { Rain = 6500, Snow = 3200, Sand = 3500, Splash = 900 },
     };
 
     /// <summary>Seconds between lightning strikes in a full thunderstorm [min, max].</summary>
@@ -94,6 +94,6 @@ public sealed class WeatherBudget
 {
     public int Rain { get; init; } = 2600;
     public int Snow { get; init; } = 1400;
-    public int Sand { get; init; } = 800;
+    public int Sand { get; init; } = 1500;
     public int Splash { get; init; } = 320;
 }

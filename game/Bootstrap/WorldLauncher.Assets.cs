@@ -26,6 +26,7 @@ public static partial class WorldLauncher
         game.Housing.Config = Strata.Core.Gameplay.Housing.HousingConfig.Load(services.Data);
         game.Town.Config = Strata.Core.Gameplay.Town.TownConfig.Load(services.Data);
         game.Spread.Config = Strata.Core.Gameplay.Progression.SpreadConfig.Load(services.Data);
+        game.Weather.Config = Strata.Core.Gameplay.Weather.WeatherConfig.Load(services.Data);
     }
 
     /// <summary>Renderers for creatures, town residents and projectiles.</summary>

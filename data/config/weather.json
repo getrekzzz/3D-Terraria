@@ -27,10 +27,10 @@
   "presentation": {
     // Most particles alive per system at full intensity, by graphics preset (custom presets use medium).
     "budgets": {
-      "low": { "rain": 1200, "snow": 700, "sand": 400, "splash": 160 },
-      "medium": { "rain": 2600, "snow": 1400, "sand": 800, "splash": 320 },
-      "high": { "rain": 4500, "snow": 2400, "sand": 1400, "splash": 600 },
-      "ultra": { "rain": 6500, "snow": 3200, "sand": 2000, "splash": 900 }
+      "low": { "rain": 1200, "snow": 700, "sand": 700, "splash": 160 },
+      "medium": { "rain": 2600, "snow": 1400, "sand": 1500, "splash": 320 },
+      "high": { "rain": 4500, "snow": 2400, "sand": 2500, "splash": 600 },
+      "ultra": { "rain": 6500, "snow": 3200, "sand": 3500, "splash": 900 }
     },
     "lightningSeconds": [5, 16],
     "thunderDelay": [0.3, 2.6]

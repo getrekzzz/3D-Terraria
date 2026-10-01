@@ -5,6 +5,7 @@ render_mode blend_mix, depth_draw_opaque, cull_back;
 #include "res://shaders/include/voxel_brdf.gdshaderinc"
 #include "res://shaders/include/clouds.gdshaderinc"
 #include "res://shaders/include/terrain_common.gdshaderinc"
+#include "res://shaders/include/weather.gdshaderinc"
 
 global uniform float strata_time;
 global uniform vec3 strata_camera;
@@ -71,8 +72,10 @@ void fragment() {
 	float ao = COLOR.a;
 	vec3 world_n = normalize(n + bent * 0.85 * normal_strength);
 	vec3 base = strata_paint(strata_macro(albedo.rgb, v_world_pos), v_ids.w);
+	float roughness = mat.z;
+	strata_wet(n, v_world_pos, v_light.a, true, base, roughness, world_n);
 	ALBEDO = base;
-	ROUGHNESS = mat.z;
+	ROUGHNESS = roughness;
 	METALLIC = mat.w;
 	NORMAL = normalize((VIEW_MATRIX * vec4(world_n, 0.0)).xyz);
 	EMISSION = strata_block_light(base, v_light, ao) + ore_glints(base, sparkle, VIEW, v_light) * ao;

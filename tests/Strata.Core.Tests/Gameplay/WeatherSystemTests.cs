@@ -111,4 +111,19 @@ public class WeatherSystemTests
         Assert.True(s.Sandstorm && s.Windy);
         Assert.InRange(s.PrecipitationTicksLeft, 3 * GameClock.TicksPerHour - 40, 3 * GameClock.TicksPerHour);
     }
+
+    [Fact]
+    public void ShippedConfigNamesRealBiomesAndEvents()
+    {
+        var config = WeatherConfig.Load(new Strata.Core.Content.Loading.FileSystemDataSource(TestPaths.ProjectRoot));
+        foreach (var b in config.SnowBiomes.Concat(config.SandBiomes)) Assert.True(TestPaths.Content.Biomes.Contains(b), b);
+        foreach (var e in new[] { config.RainEvent, config.StormEvent, config.WindyEvent, config.SandstormEvent })
+            Assert.Equal(Strata.Core.Content.Defs.EventPhase.Weather, TestPaths.Content.Events.Get(e).Phase);
+        foreach (var preset in new[] { "low", "medium", "high", "ultra" })
+        {
+            var budget = config.Presentation.BudgetFor(preset);
+            Assert.InRange(budget.Rain + budget.Snow + budget.Sand + budget.Splash, 1000, 15000);
+        }
+        Assert.True(config.Presentation.BudgetFor("low").Rain < config.Presentation.BudgetFor("ultra").Rain);
+    }
 }

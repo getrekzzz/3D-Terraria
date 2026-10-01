@@ -149,7 +149,23 @@ the last draw instead, i.e. the main thread's own work, and the summary says "fr
 
 ## Global shader parameters (`project.godot`)
 `strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,
-`strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`.
+`strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`, `strata_weather` (wetness, puddles, lightning
+flash, snow; set by `WeatherRenderer`).
+
+## Weather and ambience
+`WeatherRenderer` (game/Ambience) draws rain streaks, splashes, snow and blowing sand as GPU particles
+(`weather_particles.gdshader` + `weather_drop.gdshader`) in a box that follows the camera. `SkyHeights` uploads the sky
+map around the camera as a 96×96 float texture (refreshed on a 4-cell move or twice a second); particles die below it
+and splashes are born on it, so rain stops at roofs and cave ceilings with no raycasts. Counts are the preset budget
+(`weather.json`) × the weather's strength via `amount_ratio` (no restarts); emitters stop when nothing falls. Wetness
+(`weather.gdshaderinc`) darkens and glosses sky-exposed terrain and pools puddles on flat tops. The weather feeds
+`EnvironmentController.Weather.cs`: overcast cover dims the sun, the wind drives clouds/grass/foliage/flames, sandstorms
+and blizzards pull the fog into a tinted haze, and lightning pulses a shadowless light and the exposure.
+`AmbienceDirector` picks sound beds and ambient particles by biome, layer and time from `data/config/ambience.json`
+(`AmbienceConfig.Select` in Core): loops (`tools/audio/ambience*.py`) fade on the Ambient bus or the Outdoors bus,
+which `AudioEnvironment` low-passes as the sky is lost; world sounds on the Sound bus get a reverb by enclosure and
+depth. `AmbientParticles` keeps one pooled GPU emitter per kind (dust, spores, embers, leaves, fireflies; counts ×
+preset scale) and `AmbientDrips` drips water from real ceilings near the camera.
 
 Look: AgX tonemapping with colour adjustment (saturation 1.22 by day, 0.85 at night; contrast 1.06) for the reference
 game's rich palette over realistic materials; glow in Screen blend so HDR emitters (flames, lava, glints, magic) bloom

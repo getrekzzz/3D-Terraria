@@ -120,6 +120,14 @@
   residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.
+* **Weather** — `WeatherSystem` (`Gameplay/Weather`) rolls once per in-game hour from the world seed and the hour
+  (deterministic, independent of frame timing): rain spells (a share are thunderstorms), windy days at the roll hour,
+  sandstorms on windy days, and the hour's wind; intensity and wind ease every tick. `WeatherState` lives on the session
+  (saved as `WorldMeta.Weather`); `LocalAt(biomes, layer)` turns it into the weather of a place (snow and blizzards over
+  snow biomes, sandstorms over sand biomes, nothing underground or in space), exposed as `ConditionContext.Weather` /
+  `Windy` and the `weather` condition. The `rain`, `thunderstorm`, `windy_day` and `sandstorm` events (phase `weather`)
+  start and stop with it, so announcements and `{ "type": "event" }` spawn rules follow. Tuning and presentation
+  budgets in `data/config/weather.json`; `weather` command and `weather.*` probes.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 

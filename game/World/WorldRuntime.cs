@@ -32,6 +32,12 @@ public sealed partial class WorldRuntime : Node3D
     public EnvironmentController Environment => _environment;
     public GameServices Services => _services;
 
+    /// <summary>Rain, snow and sand around the camera (added with the world effects).</summary>
+    public WeatherRenderer? Weather { get; set; }
+
+    /// <summary>Sound beds, cave acoustics and ambient particles (added with the world effects).</summary>
+    public AmbienceDirector? Ambience { get; set; }
+
     /// <summary>Node whose position drives streaming (player or camera).</summary>
     public Node3D? Focus { get; set; }
 

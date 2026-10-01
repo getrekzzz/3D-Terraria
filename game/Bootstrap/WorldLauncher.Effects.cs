@@ -27,6 +27,14 @@ public static partial class WorldLauncher
         runtime.AddChild(lava);
         lava.Initialize(runtime);
         lights.AddProvider(lava.HeatLights);
+        var weather = new Ambience.WeatherRenderer();
+        runtime.AddChild(weather);
+        weather.Initialize(runtime, services.Graphics, game.Weather.Config);
+        runtime.Weather = weather;
+        var ambience = new Ambience.AmbienceDirector();
+        runtime.AddChild(ambience);
+        ambience.Initialize(runtime, services.Graphics, Strata.Core.Presentation.AmbienceConfig.Load(services.Data));
+        runtime.Ambience = ambience;
     }
 
     /// <summary>What follows the local player: sounds, music, buff senses (night vision, Spelunker) and the wire overlay.</summary>
@@ -42,5 +50,8 @@ public static partial class WorldLauncher
         var wires = new Rendering.WireOverlay();
         runtime.AddChild(wires);
         wires.Initialize(game, entity);
+        var fishing = new Audio.FishingSounds();
+        runtime.AddChild(fishing);
+        fishing.Initialize(game, entity);
     }
 }
