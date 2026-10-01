@@ -30,5 +30,11 @@ public static class AssetPaths
     /// <summary>The boss bar's head icon of a (non-minor) boss, rendered from its model (build_all.py --boss-icons).</summary>
     public static string BossIcon(EnemyDef boss) => $"assets/icons/bosses/{boss.Id}.png";
 
+    /// <summary>A town NPC's head portrait (housing banners, the Guide book), rendered by build_all.py --portraits.</summary>
+    public static string TownNpcHead(TownNpcDef npc) => $"assets/icons/npcs/{npc.Id}.png";
+
+    /// <summary>A creature's bestiary thumbnail, rendered by build_all.py --portraits.</summary>
+    public static string CreatureIcon(EnemyDef enemy) => $"assets/icons/creatures/{enemy.Id}.png";
+
     public static string ProjectileModel(ProjectileDef projectile) => $"assets/models/projectiles/{projectile.Model ?? projectile.Id}.glb";
 }

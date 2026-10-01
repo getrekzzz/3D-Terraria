@@ -65,9 +65,12 @@ def apply_textured_materials(objects, props):
             obj.data.materials[i] = props.material(slot.name)
 
 
-def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples: int = 24, head_share: float = 1.0):
-    """Renders a transparent icon. view: 'object' (3/4 from the front), 'item' (tool laid diagonally) or 'boss' (a
-    head-on portrait framing the top ``head_share`` of the model's height)."""
+def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples: int = 24, head_share: float = 1.0,
+                head_from_z=None):
+    """Renders a transparent icon. view: 'object' (3/4 from the front), 'item' (tool laid diagonally), 'boss' (a
+    head-on portrait), 'portrait' (three-quarter head shot) or 'creature' (three-quarter, whole body). These three
+    frame the posed vertices: the top ``head_share`` of the model's height, or everything above world height
+    ``head_from_z`` (a humanoid's neck)."""
     scene = bpy.context.scene
     lo, hi = bounds(objects)
     center = (lo + hi) / 2
@@ -92,6 +95,10 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
         direction = Vector((0.0, -1.0, 0.05)).normalized()
     elif view == "boss":
         direction = Vector((0.0, 1.0, 0.15)).normalized()  # from the front, slightly above
+    elif view == "creature":
+        direction = Vector((0.55, 1.0, 0.35)).normalized()  # a bestiary thumbnail: three-quarter, framed on the pose
+    elif view == "portrait":
+        direction = Vector((0.5, 1.0, 0.12)).normalized()  # three-quarter, the left of the face toward the camera
     else:
         direction = Vector((0.55, 1.0, 0.55)).normalized()  # front (+Y) right-above
     distance = max(extent.length, 1.0) * 3
@@ -108,17 +115,22 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
             v = inv @ (obj.matrix_world @ Vector(corner))
             xs.append(v.x)
             ys.append(v.y)
-    if view == "boss":
-        # Frame the head: the vertices in the top ``head_share`` of the posed model (as seen by the camera).
-        pts = []
+    if view in ("boss", "portrait", "creature"):
+        # Frame the head: the vertices in the top ``head_share`` of the posed model (as seen by the camera), or above
+        # the neck.
+        world = []
         deps = bpy.context.evaluated_depsgraph_get()
         for obj in objects:
             if obj.type == "MESH":
                 ev = obj.evaluated_get(deps)
-                pts += [inv @ (ev.matrix_world @ v.co) for v in ev.data.vertices]
-        top, low = max(p.y for p in pts), min(p.y for p in pts)
-        bottom = top - (top - low) * head_share
-        band = [p for p in pts if p.y >= bottom]
+                world += [ev.matrix_world @ v.co for v in ev.data.vertices]
+        pts = [inv @ w for w in world]
+        if head_from_z is not None and any(w.z >= head_from_z for w in world):
+            band = [p for p, w in zip(pts, world) if w.z >= head_from_z]
+        else:
+            top, low = max(p.y for p in pts), min(p.y for p in pts)
+            bottom = top - (top - low) * head_share
+            band = [p for p in pts if p.y >= bottom]
         xs, ys = [p.x for p in band], [p.y for p in band]
     span = max(max(xs) - min(xs), max(ys) - min(ys)) * 1.08
     cam_data.ortho_scale = max(span, 0.05)

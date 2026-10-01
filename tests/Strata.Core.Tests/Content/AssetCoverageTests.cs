@@ -23,6 +23,14 @@ public class AssetCoverageTests
     }
 
     [Fact]
+    public void EveryTownNpcHasAHeadPortraitAndEveryCreatureAThumbnail()
+    {
+        var db = TestPaths.Content;
+        var missing = db.TownNpcs.All.Select(AssetPaths.TownNpcHead).Concat(db.Enemies.All.Select(AssetPaths.CreatureIcon)).Where(p => !Exists(p)).ToList();
+        Assert.True(missing.Count == 0, "missing portraits (build_all.py --portraits): " + string.Join(", ", missing));
+    }
+
+    [Fact]
     public void EveryTileObjectVariantHasAModel()
     {
         var missing = new List<string>();

@@ -10,6 +10,7 @@ Options:
   --only=GLOB      rebuild matching asset ids (fnmatch), keep the rest of the manifest
   --no-icons       skip icon rendering
   --samples=N      Cycles samples per icon (default 24)
+  --portraits      render only the town NPC head shots and bestiary thumbnails (assets/icons/{npcs,creatures})
   --boss-icons     render only the boss-bar head icons (assets/icons/bosses; --only matches boss ids)
   --anims          build only the human animation sets (assets/models/creatures/anim; --only matches characters or sets)
   --shard=I/N      with --anims: build every Nth set starting at I (to run several builds side by side)
@@ -39,7 +40,7 @@ CELL = 0.5
 
 def args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
-    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None, "boss_icons": False}
+    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None, "boss_icons": False, "portraits": False}
     for a in argv:
         if a == "--check":
             opts["check"] = True
@@ -49,6 +50,8 @@ def args():
             opts["icons"] = False
         elif a.startswith("--samples="):
             opts["samples"] = int(a.split("=", 1)[1])
+        elif a == "--portraits":
+            opts["portraits"] = True
         elif a == "--boss-icons":
             opts["boss_icons"] = True
         elif a == "--anims":
@@ -80,7 +83,7 @@ def load_content():
         for e in doc.get("enemies", []):
             enemies[e["id"]] = e
         for t in doc.get("townNpcs", []):  # town residents use rigged creature models too
-            enemies[t["id"]] = t
+            enemies[t["id"]] = {**t, "_town": True}
         for p in doc.get("projectiles", []):
             projectiles[p["id"]] = p
     return blocks, items, objects, enemies, projectiles
@@ -306,6 +309,12 @@ def boss_models(enemies):
     return {eid: e.get("model", eid) for eid, e in enemies.items() if e.get("boss") and not e["boss"].get("minor")}
 
 
+def portrait_models(enemies):
+    """Town NPC head shots and bestiary thumbnails: (town npc id -> model, enemy id -> model)."""
+    npcs = {i: e.get("model", i) for i, e in enemies.items() if e.get("_town")}
+    return npcs, {i: e.get("model", i) for i, e in enemies.items() if not e.get("_town")}
+
+
 def _view_for(generator: str, views: dict) -> str:
     """Icon framing for an item generator: the view given at @generator registration, else by the long-item list."""
     if generator in views:
@@ -335,7 +344,20 @@ def main() -> int:
     if missing and not opts["boss_icons"]:
         print("ERROR: bosses without a head icon (build_all.py --boss-icons):", ", ".join(missing))
         return 1
+    npcs, creatures = portrait_models(enemies)
+    missing = sorted(f"{d}/{i}" for d, ids in (("npcs", npcs), ("creatures", creatures)) for i in ids
+                     if not (REPO / "assets" / "icons" / d / f"{i}.png").exists())
+    if missing and not opts["portraits"]:
+        print("ERROR: missing portraits (build_all.py --portraits):", ", ".join(missing))
+        return 1
     if opts["check"]:
+        return 0
+    if opts["portraits"]:
+        import bpy  # noqa: F401
+        from bgen import portraits
+        pats = opts["only"].split(",") if opts["only"] else ["*"]
+        tints = {i: e["tint"] for i, e in enemies.items() if e.get("tint")}
+        portraits.render_portraits(REPO, npcs, creatures, lambda i: any(fnmatch.fnmatch(i, p) for p in pats), tints=tints)
         return 0
     if opts["boss_icons"]:
         import bpy  # noqa: F401
