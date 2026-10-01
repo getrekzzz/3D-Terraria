@@ -34,5 +34,8 @@
       "boss": { "title": "Eater of Worlds", "flag": "defeated_eater_of_worlds", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 140, "music": "boss_worm", "segments": 18, "segmentSpacing": 1.1, "segmentRadius": 0.7, "segmentModel": "eater_of_worlds_body", "tailModel": "eater_of_worlds_tail" },
       "covers": ["terraria:eater_of_worlds"]
     }
+  ],
+  "spawnRules": [
+    { "id": "king_slime_natural", "enemy": "king_slime", "weight": 0.015, "maxAlive": 1, "conditions": [{ "type": "layer", "any": ["surface"] }, { "type": "worldRing", "min": 0.66 }, { "type": "flag", "id": "defeated_king_slime", "set": false }] }
   ]
 }

@@ -85,6 +85,14 @@
   flesh: tiled `barrierModel`, hurts and throws out players behind it) and tether minions to it (`Leader`: their
   anchor follows it and they die with it). `summonBoss` items, the keeper's `summonBoss` service and
   `incinerationSummon` items (burned in lava in a given layer, sacrificing a resident) spawn bosses.
+* **Natural boss arrivals** — an event with `spawnBoss` is a warning plus a countdown (`duration`): "You feel an evil
+  presence watching you..." (1/3 of nights for a player with 200 life and 10 defense until the Eye is beaten) calls the
+  Eye; in hardmode after the first altar the `mech_night` `group` (one member picked per roll among the eligible, 1/10)
+  warns of an unbeaten mechanical boss. When the countdown ends the boss comes unless one lives or it was beaten (fliers
+  20 m ahead and 12 m up, walkers drop in from 12 m). `killGoalAfterFlag` lowers a goal once a flag is set
+  (`EventDirector.GoalOf`): Slime Rain calls King Slime after 150 gel kills, 75 once he is beaten. The `worldRing`
+  condition reads `ConditionContext.CentreDistance` (0 at the centre, 1 at the land radius): King Slime may wander
+  in on the outer third of the surface (`king_slime_natural`, about 1 in 300 surface spawns).
 * **Boss framework** — `boss.parts` (`BossPart`: offset, `diesWithBody` default true, `inBossBar`, `mirror`) spawn
   fixed parts (`Npc.IsPart`) that skip far-despawn and the respawn clear; parts that die with the body never keep
   `GroupAlive` true, so killing the body raises the defeat flag once; its parts die with it at once (no hits, no second

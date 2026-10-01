@@ -79,4 +79,19 @@ public class ConditionTests
         Assert.True(cond.Evaluate(new ConditionContext { PlayerDefense = 40 }));
         Assert.False(cond.Evaluate(new ConditionContext { PlayerDefense = 41 }));
     }
+
+    [Fact]
+    public void WorldRingMeasuresDistanceFromTheCentre()
+    {
+        using var g = Strata.Core.Tests.Support.TestGame.Create();
+        var session = g.World.Session;
+        var size = session.Generator.Plan.Size;
+        var cond = ConditionCompiler.Compile(Spec("""{ "type": "worldRing", "min": 0.66 }"""));
+        var centre = session.ContextAt(new Strata.Core.Common.Int3(size.X / 2, 40, size.Z / 2));
+        Assert.True(centre.CentreDistance < 0.01f);
+        Assert.False(cond.Evaluate(centre));
+        var edge = session.ContextAt(new Strata.Core.Common.Int3(size.X / 2 + (int)(session.Generator.Plan.LandRadius * 0.8f), 40, size.Z / 2));
+        Assert.InRange(edge.CentreDistance, 0.79f, 0.81f);
+        Assert.True(cond.Evaluate(edge));
+    }
 }

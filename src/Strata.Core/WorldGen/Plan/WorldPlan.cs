@@ -27,6 +27,9 @@ public sealed class WorldPlan
 
     public WorldSettings Settings { get; }
     public Int3 Size { get; }
+
+    /// <summary>Land radius (cells) of the continent around the centre.</summary>
+    public float LandRadius => MathF.Min(Size.X, Size.Z) * 0.42f;
     public SeedTree Seeds { get; }
     public LayerBands Bands { get; }
 
