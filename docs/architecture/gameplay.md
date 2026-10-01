@@ -89,6 +89,19 @@
   flesh: tiled `barrierModel`, hurts and throws out players behind it) and tether minions to it (`Leader`: their
   anchor follows it and they die with it). `summonBoss` items, the keeper's `summonBoss` service and
   `incinerationSummon` items (burned in lava in a given layer, sacrificing a resident) spawn bosses.
+* **Boss framework** — `boss.parts` (`BossPart`: offset, `diesWithBody` default true, `inBossBar`, `mirror`) spawn
+  fixed parts (`Npc.IsPart`) that skip far-despawn and the respawn clear; parts that die with the body never keep
+  `GroupAlive` true, so killing the body raises the defeat flag once; its parts die with it at once (no hits, no second
+  defeat when `slay` reaches them) and are removed next tick without loot. A reeling creature keeps its last scales.
+  `boss.enrage` (`when` conditions at the target's feet every 30 ticks, `damage`/`speed` multipliers, `setDamage`,
+  `setDefense`, `latch`, `message`) sets `Npc.Frenzied`; `SpeedScale` scales the movement step, `DefenseOverride` and
+  `DefenseDelta` (zeroed before each think) feed `Npc.Defense`. `lootOnDefeat` rolls loot only for the last of a group.
+  `BrainContext.Target` is an `ICombatTarget` (`TargetPlayer` for player-only effects); `Expert` is true only for
+  Expert and Master, as is the `expert` condition (Expert-only loot); `defense` reads `ConditionContext.PlayerDefense`.
+  Brains may raise `Impact`/`Cue` (`NpcSystem.Impacted`/`Cued`) and `Pulse` buffs to nearby players. Every creature
+  announcement also goes out on `NpcSystem.Messaged` with a `MessageKind` (`MessageColors`: boss purple), including
+  "<Title> has awoken!" / "has been defeated!". Probes: `boss.<enemyId>.<field>` (life, max, defense, stage, phase,
+  enraged, frenzied, illusions, parts, segments).
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and
   fires `Raised` (announcements; the hook for world mutations).

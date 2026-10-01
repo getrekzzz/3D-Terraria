@@ -5,7 +5,7 @@ using Strata.Core.Gameplay.Player;
 namespace Strata.Core.Session;
 
 /// <summary>A player character inside a world: persistent state plus its live body (synced by the engine layer).</summary>
-public sealed class PlayerEntity
+public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
 {
     public PlayerEntity(PlayerState state) => State = state;
 

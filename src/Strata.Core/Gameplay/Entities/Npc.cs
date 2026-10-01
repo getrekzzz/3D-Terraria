@@ -49,8 +49,17 @@ public sealed class Npc
     /// <summary>Effects of active buffs (damage over time, light), rebuilt when buffs change.</summary>
     public Stats.EffectState Effects { get; } = new();
 
-    /// <summary>Defense after buffs and debuffs (ichor, ironbark-like effects), never below zero.</summary>
-    public int Defense => Math.Max(0, (int)MathF.Round(Effects.Stats.Get(Stats.StatIds.Defense, Def.Defense)));
+    /// <summary>
+    /// Defense after buffs and debuffs (ichor, ironbark-like effects) and the brain's <see cref="DefenseDelta"/>, never
+    /// below zero; <see cref="DefenseOverride"/> (an enrage's lethal defense) replaces it outright.
+    /// </summary>
+    public int Defense => DefenseOverride ?? Math.Max(0, (int)MathF.Round(Effects.Stats.Get(Stats.StatIds.Defense, Def.Defense)) + DefenseDelta);
+
+    /// <summary>Defense the brain adds this tick (a guarding phase); zeroed before each think.</summary>
+    public int DefenseDelta { get; set; }
+
+    /// <summary>Fixed defense while set (written by the enrage step).</summary>
+    public int? DefenseOverride { get; set; }
 
     public void RecomputeEffects()
     {
@@ -65,6 +74,24 @@ public sealed class Npc
 
     /// <summary>Set by the brain in a creature's second phase (or day rage); switches to <see cref="Content.Defs.RangedAttack.Enraged"/>.</summary>
     public bool Enraged { get; set; }
+
+    /// <summary>Multiplier on how far the creature moves each tick (enraged speed); 1 = normal.</summary>
+    public float SpeedScale { get; set; } = 1f;
+
+    /// <summary>Presentation only: scale of the model (a boss swelling in a phase).</summary>
+    public float VisualScale { get; set; } = 1f;
+
+    /// <summary>Presentation only: the model is mirrored (a left hand).</summary>
+    public bool Mirrored { get; set; }
+
+    /// <summary>Its <see cref="Content.Defs.BossInfo.Enrage"/> conditions hold (or held, when latched).</summary>
+    public bool Frenzied { get; set; }
+
+    /// <summary>Presentation: decoy copies shown around the creature.</summary>
+    public int Illusions { get; set; }
+
+    /// <summary>Presentation: the point illusions are mirrored around.</summary>
+    public Vector3 MirrorAround { get; set; }
 
     /// <summary>Ticks until the next ranged volley.</summary>
     public int AttackTimer;
@@ -107,6 +134,15 @@ public sealed class Npc
 
     /// <summary>The offset is in the leader's own frame and turns with its facing (a boss's hands).</summary>
     public bool TurnsWithLeader { get; set; }
+
+    /// <summary>The boss part this creature was spawned as (null for anything else).</summary>
+    public BossPart? Part { get; set; }
+
+    /// <summary>A fixed part of a boss body (Moon Lord's hands): it stays and goes with its leader.</summary>
+    public bool IsPart => Leader != null && TurnsWithLeader;
+
+    /// <summary>Its life counts on its leader's boss bar.</summary>
+    public bool InBossBar => Part?.InBossBar ?? false;
 
     /// <summary>Live creatures tethered to this one.</summary>
     public List<Npc> Followers { get; } = new();
