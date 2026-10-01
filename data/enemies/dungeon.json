@@ -19,7 +19,6 @@
       "manaCost": 12, "projectile": "book_skull", "shootSpeed": 13, "covers": ["terraria:book_of_skulls"] }
   ],
   "lootTables": [
-    { "id": "skeletron", "coins": [10000, 15000], "entries": [{ "item": "book_of_skulls", "chance": 0.34 }, { "item": "bone", "min": 15, "max": 30 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 }] },
     { "id": "angry_bones", "coins": [80, 220], "entries": [{ "item": "bone", "min": 1, "max": 2, "chance": 0.6 }] },
     { "id": "dark_caster", "coins": [90, 240], "entries": [{ "item": "bone", "chance": 0.5 }, { "item": "lesser_mana_potion", "chance": 0.1 }] },
     { "id": "cursed_skull", "coins": [60, 180], "entries": [{ "item": "bone", "chance": 0.4 }] },

@@ -1,0 +1,12 @@
+{
+  "tileObjects": [
+    { "id": "king_slime_trophy", "name": "King Slime Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:king_slime_trophy"] },
+    { "id": "eye_of_cthulhu_trophy", "name": "Eye of Cthulhu Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:eye_of_cthulhu_trophy"] },
+    { "id": "eater_of_worlds_trophy", "name": "Eater of Worlds Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:eater_of_worlds_trophy"] },
+    { "id": "brain_of_cthulhu_trophy", "name": "Brain of Cthulhu Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:brain_of_cthulhu_trophy"] },
+    { "id": "queen_bee_trophy", "name": "Queen Bee Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:queen_bee_trophy"] },
+    { "id": "skeletron_trophy", "name": "Skeletron Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:skeletron_trophy"] },
+    { "id": "deerclops_trophy", "name": "Deerclops Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:deerclops_trophy"] },
+    { "id": "wall_of_flesh_trophy", "name": "Wall of Flesh Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:wall_of_flesh_trophy"] }
+  ]
+}

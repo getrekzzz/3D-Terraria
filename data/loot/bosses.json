@@ -1,0 +1,39 @@
+{
+  "lootTables": [
+    { "id": "king_slime", "coins": [8000, 12000], "entries": [{ "item": "lesser_healing_potion", "min": 5, "max": 15 }, { "item": "king_slime_trophy", "chance": 0.1 }, { "table": "king_slime_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "king_slime_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "king_slime_drops", "entries": [{ "item": "gel", "min": 40, "max": 80 }, { "item": "life_crystal", "chance": 0.5 }] },
+    { "id": "king_slime_bag", "entries": [{ "table": "king_slime_drops" }, { "item": "royal_gel" }] },
+
+    { "id": "eye_of_cthulhu", "coins": [10000, 15000], "entries": [{ "item": "lesser_healing_potion", "min": 5, "max": 15 }, { "item": "eye_of_cthulhu_trophy", "chance": 0.1 }, { "table": "eye_of_cthulhu_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "eye_of_cthulhu_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "eye_of_cthulhu_drops", "entries": [{ "item": "lens", "min": 3, "max": 6 }, { "item": "demonite_ore", "min": 30, "max": 90 }, { "item": "mana_crystal", "chance": 0.5 }, { "item": "code_1", "chance": 0.1 }] },
+    { "id": "eye_of_cthulhu_bag", "entries": [{ "table": "eye_of_cthulhu_drops" }, { "item": "shield_of_cthulhu" }] },
+
+    { "id": "eater_of_worlds", "coins": [9000, 14000], "entries": [{ "item": "lesser_healing_potion", "min": 5, "max": 15 }, { "item": "eater_of_worlds_trophy", "chance": 0.1 }, { "table": "eater_of_worlds_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "eater_of_worlds_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "eater_of_worlds_drops", "entries": [{ "item": "demonite_ore", "min": 40, "max": 100 }, { "item": "shadow_scale", "min": 10, "max": 20 }] },
+    { "id": "eater_of_worlds_bag", "entries": [{ "table": "eater_of_worlds_drops" }, { "item": "worm_scarf" }] },
+
+    { "id": "brain_of_cthulhu", "coins": [10000, 15000], "entries": [{ "item": "lesser_healing_potion", "min": 5, "max": 15 }, { "item": "brain_of_cthulhu_trophy", "chance": 0.1 }, { "table": "brain_of_cthulhu_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "brain_of_cthulhu_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "brain_of_cthulhu_drops", "entries": [{ "item": "crimtane_ore", "min": 40, "max": 110 }, { "item": "tissue_sample", "min": 10, "max": 20 }] },
+    { "id": "brain_of_cthulhu_bag", "entries": [{ "table": "brain_of_cthulhu_drops" }, { "item": "brain_of_confusion" }] },
+
+    { "id": "queen_bee", "coins": [10000, 16000], "entries": [{ "item": "lesser_healing_potion", "min": 5, "max": 15 }, { "item": "queen_bee_trophy", "chance": 0.1 }, { "table": "queen_bee_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "queen_bee_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "queen_bee_drops", "entries": [{ "table": "queen_bee_weapon" }, { "item": "bee_wax", "min": 17, "max": 29 }, { "item": "beenade", "min": 10, "max": 30, "chance": 0.5 }, { "item": "honey_comb", "chance": 0.33 }] },
+    { "id": "queen_bee_weapon", "mode": "weighted", "entries": [{ "item": "bee_gun" }, { "item": "bee_keeper" }, { "item": "bees_knees" }] },
+    { "id": "queen_bee_bag", "entries": [{ "table": "queen_bee_drops" }, { "item": "hive_pack" }] },
+
+    { "id": "skeletron", "coins": [10000, 15000], "entries": [{ "item": "lesser_healing_potion", "min": 5, "max": 15 }, { "item": "skeletron_trophy", "chance": 0.1 }, { "table": "skeletron_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "skeletron_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "skeletron_drops", "entries": [{ "item": "book_of_skulls", "chance": 0.34 }, { "item": "bone", "min": 15, "max": 30 }] },
+    { "id": "skeletron_bag", "entries": [{ "table": "skeletron_drops" }] },
+
+    { "id": "deerclops", "coins": [12000, 18000], "entries": [{ "item": "lesser_healing_potion", "min": 5, "max": 15 }, { "item": "deerclops_trophy", "chance": 0.1 }, { "table": "deerclops_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "deerclops_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "deerclops_drops", "entries": [{ "table": "deerclops_weapon" }] },
+    { "id": "deerclops_weapon", "mode": "weighted", "entries": [{ "item": "lucy_the_axe" }, { "item": "weather_pain" }, { "item": "pew_matic_horn" }] },
+    { "id": "deerclops_bag", "entries": [{ "table": "deerclops_drops" }] },
+
+    { "id": "wall_of_flesh", "coins": [60000, 90000], "entries": [{ "item": "healing_potion", "min": 5, "max": 15 }, { "item": "wall_of_flesh_trophy", "chance": 0.1 }, { "table": "wall_of_flesh_drops", "conditions": [{ "type": "expert", "is": false }] }, { "item": "wall_of_flesh_treasure_bag", "conditions": [{ "type": "expert" }] }] },
+    { "id": "wall_of_flesh_drops", "entries": [{ "item": "pwnhammer" }, { "table": "wall_of_flesh_emblems" }, { "table": "wall_of_flesh_weapons" }] },
+    { "id": "wall_of_flesh_emblems", "mode": "weighted", "rolls": 1, "entries": [{ "item": "warrior_emblem" }, { "item": "ranger_emblem" }, { "item": "sorcerer_emblem" }, { "item": "summoner_emblem" }] },
+    { "id": "wall_of_flesh_weapons", "mode": "weighted", "rolls": 1, "entries": [{ "item": "breaker_blade" }, { "item": "clockwork_assault_rifle" }, { "item": "laser_rifle" }] },
+    { "id": "wall_of_flesh_bag", "entries": [{ "table": "wall_of_flesh_drops" }] }
+  ]
+}

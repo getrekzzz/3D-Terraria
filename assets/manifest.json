@@ -42,6 +42,12 @@
    ],
    "generator": "flower"
   },
+  "brain_of_cthulhu_trophy": {
+   "models": [
+    "assets/models/objects/brain_of_cthulhu_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "bush": {
    "models": [
     "assets/models/objects/bush_v0.glb",
@@ -106,11 +112,23 @@
    ],
    "generator": "flower"
   },
+  "deerclops_trophy": {
+   "models": [
+    "assets/models/objects/deerclops_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "demon_altar": {
    "models": [
     "assets/models/objects/demon_altar_v0.glb"
    ],
    "generator": "altar"
+  },
+  "eater_of_worlds_trophy": {
+   "models": [
+    "assets/models/objects/eater_of_worlds_trophy_v0.glb"
+   ],
+   "generator": "trophy"
   },
   "ebonwood_tree": {
    "models": [
@@ -124,6 +142,12 @@
     "assets/models/objects/enchanted_sword_shrine_v0.glb"
    ],
    "generator": "shrine"
+  },
+  "eye_of_cthulhu_trophy": {
+   "models": [
+    "assets/models/objects/eye_of_cthulhu_trophy_v0.glb"
+   ],
+   "generator": "trophy"
   },
   "fern": {
    "models": [
@@ -205,6 +229,12 @@
     "assets/models/objects/iron_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "king_slime_trophy": {
+   "models": [
+    "assets/models/objects/king_slime_trophy_v0.glb"
+   ],
+   "generator": "trophy"
   },
   "lead_anvil": {
    "models": [
@@ -343,6 +373,12 @@
    ],
    "generator": "pressure_plate"
   },
+  "queen_bee_trophy": {
+   "models": [
+    "assets/models/objects/queen_bee_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "rubble": {
    "models": [
     "assets/models/objects/rubble_v0.glb",
@@ -375,6 +411,12 @@
     "assets/models/objects/shiverthorn_plant_v0.glb"
    ],
    "generator": "flower"
+  },
+  "skeletron_trophy": {
+   "models": [
+    "assets/models/objects/skeletron_trophy_v0.glb"
+   ],
+   "generator": "trophy"
   },
   "stalactite": {
    "models": [
@@ -421,6 +463,12 @@
     "assets/models/objects/torch_v0.glb"
    ],
    "generator": "torch"
+  },
+  "wall_of_flesh_trophy": {
+   "models": [
+    "assets/models/objects/wall_of_flesh_trophy_v0.glb"
+   ],
+   "generator": "trophy"
   },
   "waterleaf_plant": {
    "models": [
@@ -743,6 +791,14 @@
   "brain_of_confusion": {
    "model": "assets/models/items/brain_of_confusion.glb",
    "icon": "assets/icons/items/brain_of_confusion.png"
+  },
+  "brain_of_cthulhu_treasure_bag": {
+   "model": "assets/models/items/brain_of_cthulhu_treasure_bag.glb",
+   "icon": "assets/icons/items/brain_of_cthulhu_treasure_bag.png"
+  },
+  "brain_of_cthulhu_trophy": {
+   "object": "brain_of_cthulhu_trophy",
+   "icon": "assets/icons/items/brain_of_cthulhu_trophy.png"
   },
   "breaker_blade": {
    "model": "assets/models/items/breaker_blade.glb",
@@ -1084,6 +1140,14 @@
    "model": "assets/models/items/deer_thing.glb",
    "icon": "assets/icons/items/deer_thing.png"
   },
+  "deerclops_treasure_bag": {
+   "model": "assets/models/items/deerclops_treasure_bag.glb",
+   "icon": "assets/icons/items/deerclops_treasure_bag.png"
+  },
+  "deerclops_trophy": {
+   "object": "deerclops_trophy",
+   "icon": "assets/icons/items/deerclops_trophy.png"
+  },
   "demon_scythe": {
    "model": "assets/models/items/demon_scythe.glb",
    "icon": "assets/icons/items/demon_scythe.png"
@@ -1160,6 +1224,14 @@
    "model": "assets/models/items/dynamite.glb",
    "icon": "assets/icons/items/dynamite.png"
   },
+  "eater_of_worlds_treasure_bag": {
+   "model": "assets/models/items/eater_of_worlds_treasure_bag.glb",
+   "icon": "assets/icons/items/eater_of_worlds_treasure_bag.png"
+  },
+  "eater_of_worlds_trophy": {
+   "object": "eater_of_worlds_trophy",
+   "icon": "assets/icons/items/eater_of_worlds_trophy.png"
+  },
   "ebonkoi": {
    "model": "assets/models/items/ebonkoi.glb",
    "icon": "assets/icons/items/ebonkoi.png"
@@ -1211,6 +1283,14 @@
   "excalibur": {
    "model": "assets/models/items/excalibur.glb",
    "icon": "assets/icons/items/excalibur.png"
+  },
+  "eye_of_cthulhu_treasure_bag": {
+   "model": "assets/models/items/eye_of_cthulhu_treasure_bag.glb",
+   "icon": "assets/icons/items/eye_of_cthulhu_treasure_bag.png"
+  },
+  "eye_of_cthulhu_trophy": {
+   "object": "eye_of_cthulhu_trophy",
+   "icon": "assets/icons/items/eye_of_cthulhu_trophy.png"
   },
   "eye_of_the_golem": {
    "model": "assets/models/items/eye_of_the_golem.glb",
@@ -1639,6 +1719,14 @@
   "katana": {
    "model": "assets/models/items/katana.glb",
    "icon": "assets/icons/items/katana.png"
+  },
+  "king_slime_treasure_bag": {
+   "model": "assets/models/items/king_slime_treasure_bag.glb",
+   "icon": "assets/icons/items/king_slime_treasure_bag.png"
+  },
+  "king_slime_trophy": {
+   "object": "king_slime_trophy",
+   "icon": "assets/icons/items/king_slime_trophy.png"
   },
   "laser_machinegun": {
    "model": "assets/models/items/laser_machinegun.glb",
@@ -2288,6 +2376,14 @@
    "model": "assets/models/items/pygmy_staff.glb",
    "icon": "assets/icons/items/pygmy_staff.png"
   },
+  "queen_bee_treasure_bag": {
+   "model": "assets/models/items/queen_bee_treasure_bag.glb",
+   "icon": "assets/icons/items/queen_bee_treasure_bag.png"
+  },
+  "queen_bee_trophy": {
+   "object": "queen_bee_trophy",
+   "icon": "assets/icons/items/queen_bee_trophy.png"
+  },
   "rage_potion": {
    "model": "assets/models/items/rage_potion.glb",
    "icon": "assets/icons/items/rage_potion.png"
@@ -2527,6 +2623,14 @@
   "silver_shortsword": {
    "model": "assets/models/items/silver_shortsword.glb",
    "icon": "assets/icons/items/silver_shortsword.png"
+  },
+  "skeletron_treasure_bag": {
+   "model": "assets/models/items/skeletron_treasure_bag.glb",
+   "icon": "assets/icons/items/skeletron_treasure_bag.png"
+  },
+  "skeletron_trophy": {
+   "object": "skeletron_trophy",
+   "icon": "assets/icons/items/skeletron_trophy.png"
   },
   "sky_blue_paint": {
    "model": "assets/models/items/sky_blue_paint.glb",
@@ -3119,6 +3223,14 @@
   "vortex_pickaxe": {
    "model": "assets/models/items/vortex_pickaxe.glb",
    "icon": "assets/icons/items/vortex_pickaxe.png"
+  },
+  "wall_of_flesh_treasure_bag": {
+   "model": "assets/models/items/wall_of_flesh_treasure_bag.glb",
+   "icon": "assets/icons/items/wall_of_flesh_treasure_bag.png"
+  },
+  "wall_of_flesh_trophy": {
+   "object": "wall_of_flesh_trophy",
+   "icon": "assets/icons/items/wall_of_flesh_trophy.png"
   },
   "wand_of_sparking": {
    "model": "assets/models/items/wand_of_sparking.glb",

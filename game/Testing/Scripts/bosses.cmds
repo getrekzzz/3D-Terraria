@@ -47,6 +47,13 @@ assert npcs.deerclops == 1
 slay deerclops
 assert flag.defeated_deerclops == 1
 killall
+# An Expert treasure bag opens by using it.
+give eye_of_cthulhu_treasure_bag 1
+wield eye_of_cthulhu_treasure_bag
+use
+wait 0.5
+assert inv.shield_of_cthulhu == 1
+assert inv.eye_of_cthulhu_treasure_bag == 0
 # A meteorite strike leaves a crater of ore.
 meteor
 assert errors == 0

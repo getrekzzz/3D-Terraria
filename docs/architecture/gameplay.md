@@ -105,6 +105,13 @@
   the colour of the block under the point (8 pooled emitters); `NpcSystem.Cued` ids are sound ids played at the
   creature. Boss sounds live in `tools/audio/sfx_recipes_bosses.py`. Probes: `camera.trauma`, `music.silent`. The boss
   bar and messages are the HUD's (`NpcSystem.Messaged`).
+* **Boss loot** — boss tables live in `data/loot/bosses.json` under the boss's id (`loot` on the enemy). The main
+  table always rolls coins, the potions and the 1/10 `<boss>_trophy` (`data/tileobjects/trophies.json`, wall
+  hangings drawn flat on the wall face); Classic and Journey roll `<boss>_drops` loose (`expert` `is: false`), Expert
+  and Master drop one `<boss>_treasure_bag` instead (`data/items/boss_bags.json`, rarity -12, opened by using it: a
+  `consume` behaviour rolling `<boss>_bag` = the drops plus the Expert-only item). A new boss's bag is data only (bag
+  item, three tables, trophy, `tools/blender/assets.d/p4-04-boss-loot.json` rows: `trophy` builds the boss's own
+  creature generator into the plaque as a bust, `treasure_bag` takes colours; `bgen/trophies.py`).
 * **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
   at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
   `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster

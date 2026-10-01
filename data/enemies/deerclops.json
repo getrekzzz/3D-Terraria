@@ -25,11 +25,7 @@
     { "id": "any_evil_ore", "name": "Demonite or Crimtane Ore", "items": ["demonite_ore", "crimtane_ore"] }
   ],
   "lootTables": [
-    { "id": "snow_flinx", "coins": [40, 120], "entries": [{ "item": "flinx_fur", "chance": 0.6 }] },
-    { "id": "deerclops", "coins": [12000, 18000], "entries": [
-      { "table": "deerclops_weapon" }, { "item": "lesser_healing_potion", "min": 5, "max": 10 }
-    ] },
-    { "id": "deerclops_weapon", "mode": "weighted", "entries": [{ "item": "lucy_the_axe" }, { "item": "weather_pain" }, { "item": "pew_matic_horn" }] }
+    { "id": "snow_flinx", "coins": [40, 120], "entries": [{ "item": "flinx_fur", "chance": 0.6 }] }
   ],
   "enemies": [
     { "id": "snow_flinx", "model": "gel", "name": "Snow Flinx", "description": "A ball of fur that rolls down the snowdrifts.",
