@@ -161,7 +161,7 @@ def plan(spec, blocks, items, objects, enemies):
 def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
     import bgen
-    from bgen import sockets as socket_gen
+    from bgen import icon_views, sockets as socket_gen
     from bgen import beasts, bosses, bosses_hard, bosses_lunar, bosses_pre, bosses_pre2, bosses_pre3, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, bounds as mesh_bounds, reset_scene, rng_for
@@ -226,8 +226,16 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs):
                 entry["icon"] = entry.pop("icon")
         if opts["icons"]:
             icon = f"assets/icons/items/{iid}.png"
+            view, spot = "object", None
+            if "object" not in job:
+                gen = job["generator"]
+                view = icon_views.view_for(gen, bgen.VIEWS)
+                if gen in icon_views.ICON_POSES:  # the icon shows another pose of the item (a whip's lash laid out)
+                    obj, props, sockets = make(iid, {**job, "params": {**job["params"], **icon_views.ICON_POSES[gen]}}, 0, held=True)
+                if gen in icon_views.SPOTLIT and icon_views.SPOTLIT[gen] in sockets:
+                    spot = sockets[icon_views.SPOTLIT[gen]][0]
             export.apply_textured_materials([obj], props)
-            export.render_icon([obj], REPO / icon, "object" if "object" in job else _view_for(job["generator"], bgen.VIEWS), samples=opts["samples"])
+            export.render_icon([obj], REPO / icon, view, samples=opts["samples"], sprite=True, spot=spot)
             entry["icon"] = icon
         manifest["items"][iid] = entry
         print(f"item {iid}: {entry}")
@@ -313,14 +321,6 @@ def portrait_models(enemies):
     """Town NPC head shots and bestiary thumbnails: (town npc id -> model, enemy id -> model)."""
     npcs = {i: e.get("model", i) for i, e in enemies.items() if e.get("_town")}
     return npcs, {i: e.get("model", i) for i, e in enemies.items() if not e.get("_town")}
-
-
-def _view_for(generator: str, views: dict) -> str:
-    """Icon framing for an item generator: the view given at @generator registration, else by the long-item list."""
-    if generator in views:
-        return views[generator]
-    long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow", "gun", "rod", "whip", "red_wrench", "wire_cutter", "bug_net", "paintbrush", "paint_scraper"}
-    return "item" if generator in long_items else "object"
 
 
 def main() -> int:

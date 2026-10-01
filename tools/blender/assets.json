@@ -1412,7 +1412,8 @@
       "flintlock_pistol": {
         "generator": "gun",
         "params": {
-          "style": "pistol"
+          "style": "pistol",
+          "flintlock": true
         }
       },
       "minishark": {
@@ -1420,13 +1421,16 @@
         "params": {
           "style": "minigun",
           "metal": "#8a9aa8",
-          "accent": "#4a6a8a"
+          "accent": "#4a6a8a",
+          "shark": true,
+          "fin": "#8a9aa8"
         }
       },
       "boomstick": {
         "generator": "gun",
         "params": {
-          "style": "shotgun"
+          "style": "shotgun",
+          "double": true
         }
       },
       "handgun": {
@@ -1741,7 +1745,8 @@
       "musket": {
         "generator": "gun",
         "params": {
-          "style": "musket"
+          "style": "musket",
+          "flintlock": true
         }
       },
       "the_undertaker": {
@@ -1912,7 +1917,7 @@
       "space_gun": {
         "generator": "gun",
         "params": {
-          "style": "pistol",
+          "style": "raygun",
           "metal": "#8a3a2a",
           "accent": "#4aff6a",
           "glow": true
@@ -1924,7 +1929,8 @@
           "style": "launcher",
           "metal": "#3a4a8a",
           "accent": "#ffe860",
-          "glow": true
+          "glow": true,
+          "star": true
         }
       },
       "meteor_shot": {
@@ -2185,7 +2191,10 @@
         "params": {
           "style": "minigun",
           "metal": "#6a7a8a",
-          "accent": "#3a4a6a"
+          "accent": "#3a4a6a",
+          "shark": true,
+          "fin": "#4a5a78",
+          "length": 1.0
         }
       },
       "natures_gift": {
@@ -3395,7 +3404,8 @@
         "params": {
           "style": "rifle",
           "metal": "#3a3a3a",
-          "accent": "#6a4a2a"
+          "accent": "#6a4a2a",
+          "scope": true
         }
       },
       "shadowbeam_staff": {

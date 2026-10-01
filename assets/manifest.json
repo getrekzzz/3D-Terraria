@@ -827,7 +827,7 @@
    "model": "assets/models/items/boomstick.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.7 -0.045 > 0 1 0"
+    "muzzle": "0 0.75 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/boomstick.png"
   },
@@ -2448,7 +2448,7 @@
    "model": "assets/models/items/megashark.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.75 -0.04 > 0 1 0"
+    "muzzle": "0 1 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/megashark.png"
   },
@@ -2500,7 +2500,7 @@
    "model": "assets/models/items/minishark.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.75 -0.04 > 0 1 0"
+    "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/minishark.png"
   },
@@ -2540,7 +2540,7 @@
    "model": "assets/models/items/musket.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.9 -0.045 > 0 1 0"
+    "muzzle": "0 0.95 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/musket.png"
   },
@@ -3266,7 +3266,7 @@
    "model": "assets/models/items/rocket_launcher.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.8 -0.05 > 0 1 0"
+    "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/rocket_launcher.png"
   },
@@ -3632,7 +3632,7 @@
    "model": "assets/models/items/space_gun.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.3 -0.045 > 0 1 0"
+    "muzzle": "0 0.34 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/space_gun.png"
   },
@@ -3714,7 +3714,7 @@
    "model": "assets/models/items/star_cannon.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.8 -0.05 > 0 1 0"
+    "muzzle": "0 0.88 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/star_cannon.png"
   },

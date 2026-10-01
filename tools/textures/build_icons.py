@@ -88,6 +88,25 @@ def icon(atlas, meta, block) -> Image.Image:
     return canvas
 
 
+def outline(img: Image.Image, width: int = 2) -> Image.Image:
+    """The Terraria sprite outline item icons get too (tools/blender/bgen/export.sprite_finish): a ring in the icon's
+    darkened median colour under its silhouette."""
+    a = np.asarray(img).astype(np.float32) / 255.0
+    alpha = a[..., 3]
+    solid = alpha > 0.5
+    colour = np.median(a[solid][:, :3], axis=0) * 0.3 if solid.any() else np.array([0.08, 0.07, 0.1])
+    h, w = alpha.shape
+    padded = np.pad(alpha, width)
+    grown = alpha.copy()
+    for dy in range(-width, width + 1):
+        for dx in range(-width, width + 1):
+            if dx * dx + dy * dy <= width * width + 1:
+                grown = np.maximum(grown, padded[width + dy:width + dy + h, width + dx:width + dx + w])
+    out_a = alpha + grown * (1 - alpha)
+    rgb = (a[..., :3] * alpha[..., None] + colour * (grown * (1 - alpha))[..., None]) / np.maximum(out_a, 1e-6)[..., None]
+    return Image.fromarray(np.clip(np.dstack([rgb, out_a]) * 255, 0, 255).astype(np.uint8), "RGBA")
+
+
 def main() -> int:
     blocks = block_items()
     meta = json.loads((TERRAIN / "layers.json").read_text(encoding="utf-8"))
@@ -102,7 +121,7 @@ def main() -> int:
     atlas = Image.open(TERRAIN / "terrain_albedo.png").convert("RGBA")
     OUT.mkdir(parents=True, exist_ok=True)
     for bid, block in sorted(blocks.items()):
-        icon(atlas, meta, block).save(OUT / f"{bid}.png", optimize=True)
+        outline(icon(atlas, meta, block)).save(OUT / f"{bid}.png", optimize=True)
     print(f"wrote {len(blocks)} block icons to {OUT.relative_to(REPO)}")
     return 0
 

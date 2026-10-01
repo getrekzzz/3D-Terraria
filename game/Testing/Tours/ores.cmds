@@ -1,0 +1,35 @@
+# Ore tour (P3-37b): ore veins on the far wall of a sealed stone room, 6-12 m away, first pitch dark (no torch: the
+# veins' own glow and glints only, the stone around them must stay dark), then lit by two torches. Rendering required:
+#   xvfb-run -a -s "-screen 0 1600x900x24" godot --path . --rendering-driver vulkan --fixed-fps 10 --resolution 960x540 \
+#     -- --world=ores --size=tiny --new --player=t --fresh-player --view=2 --graphics=medium --shots=$PWD/shots \
+#     --smoke=res://game/Testing/Tours/ores.cmds
+wait_until player.frozen == 0 300
+spawning off
+town arrivals off
+god on
+camera third
+hud off
+time midnight
+fill -13 -2 -3 13 9 14 stone
+fill -12 0 -2 12 8 13 air
+fill -11 1 13 -9 4 13 copper_ore
+fill -7 1 13 -5 4 13 iron_ore
+fill -3 1 13 -1 4 13 gold_ore
+fill 1 1 13 3 4 13 demonite_ore
+fill 5 1 13 7 4 13 hellstone
+fill 9 1 13 11 4 13 cobalt_ore
+fill -11 5 13 -9 7 13 platinum_ore
+fill -3 5 13 -1 7 13 diamond_ore
+fill 5 5 13 7 7 13 luminite
+aim 0 0.05 1
+wait_until stream.idle == 1 300
+wait 6
+probe render.exposure
+screenshot ores_dark 0.5
+wait_until screenshot.pending == 0 900
+place torch -4 0 6
+place torch 4 0 6
+wait 4
+probe render.exposure
+screenshot ores_torch 0.5
+wait_until screenshot.pending == 0 900

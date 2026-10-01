@@ -5,6 +5,7 @@ import math
 
 from mathutils import Matrix, Vector
 
+from .guns import gun  # noqa: F401  (registered below)
 from .mesh import MeshBuilder
 
 
@@ -65,30 +66,6 @@ def balloon(mb: MeshBuilder, p, rng):
     """A balloon on a string."""
     mb.cylinder((0, 0, 0), (0, 0, 0.18), 0.003, None, "prop:plain", "#e8e8e8", segments=3)
     mb.sphere((0, 0, 0.28), 0.1, "prop:gel", p.get("color", "#e83040"), subdivisions=2, scale=(1, 1, 1.15))
-
-
-def gun(mb: MeshBuilder, p, rng):
-    """Firearms: pistol, musket/rifle, shotgun, minigun (rotating barrels) or launcher (a wide tube)."""
-    style = p.get("style", "pistol")
-    layer, tint = _metal(p, "#6a6e78")
-    wood = p.get("wood", "#6a4428")
-    length = {"pistol": 0.3, "musket": 0.9, "rifle": 0.85, "shotgun": 0.7, "minigun": 0.75, "launcher": 0.8}.get(style, 0.5)
-    mb.box((-0.025, -0.06, -0.08), (0.025, 0.02, 0.04), "prop:dark_planks", wood)  # grip
-    if style in ("musket", "rifle", "shotgun"):
-        mb.box((-0.03, -0.05, -0.28), (0.03, 0.04, 0.05), "prop:planks", wood)  # stock
-    if style == "minigun":
-        for k in range(6):
-            a = k * math.pi / 3
-            mb.cylinder((math.cos(a) * 0.025, 0.04 + math.sin(a) * 0.025, 0.0), (math.cos(a) * 0.025, 0.04 + math.sin(a) * 0.025, length), 0.01, None, layer, tint, segments=5)
-        mb.cylinder((0, 0.04, -0.05), (0, 0.04, 0.12), 0.05, None, layer, tint, segments=10)
-    elif style == "launcher":
-        mb.cylinder((0, 0.05, -0.2), (0, 0.05, length), 0.06, 0.065, layer, tint, segments=12)
-    else:
-        mb.box((-0.03, 0.0, 0.0), (0.03, 0.07, 0.12), layer, tint)  # receiver
-        mb.cylinder((0, 0.045, 0.1), (0, 0.045, length), 0.018 if style != "shotgun" else 0.024, None, layer, tint, segments=8)
-    if p.get("accent"):
-        mb.box((-0.035, 0.07, 0.02), (0.035, 0.085, length * 0.6), "prop:plain:glow" if p.get("glow") else "prop:plain", p["accent"])
-    mb.socket("muzzle", (0, 0.04 if style == "minigun" else (0.05 if style == "launcher" else 0.045), length))
 
 
 def bullet(mb: MeshBuilder, p, rng):
@@ -173,10 +150,15 @@ def key(mb: MeshBuilder, p, rng):
 
 
 def whip(mb: MeshBuilder, p, rng):
-    """A coiled whip with a handle."""
+    """A coiled whip with a handle; ``pose: s_curve`` (its icon) lays the lash out as an S-curve instead."""
     mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", p.get("handle", "#5a3a24"), segments=6)
-    coil = [Vector((math.cos(a) * (0.1 - a * 0.004), math.sin(a) * (0.1 - a * 0.004), 0.1 + a * 0.01)) for a in (i * 0.4 for i in range(40))]
-    mb.tube(coil, [0.01 - i * 0.0002 for i in range(40)], "prop:leather", p.get("color", "#6a4a2a"), segments=4)
+    if p.get("pose") == "s_curve":
+        lash = [Vector((math.sin(t * 2 * math.pi) * 0.14 * t, 0, 0.08 + t * 0.9)) for t in (i / 30 for i in range(31))]
+        mb.tube(lash, [0.016 - i * 0.00042 for i in range(31)], "prop:leather", p.get("color", "#6a4a2a"), segments=5)
+        mb.sphere(tuple(lash[-1]), 0.012, "prop:leather", p.get("color", "#6a4a2a"), subdivisions=1)
+    else:
+        coil = [Vector((math.cos(a) * (0.1 - a * 0.004), math.sin(a) * (0.1 - a * 0.004), 0.1 + a * 0.01)) for a in (i * 0.4 for i in range(40))]
+        mb.tube(coil, [0.01 - i * 0.0002 for i in range(40)], "prop:leather", p.get("color", "#6a4a2a"), segments=4)
     mb.socket("handle_end", (0, 0, 0.08))
 
 

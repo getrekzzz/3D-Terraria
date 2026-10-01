@@ -66,11 +66,14 @@ def apply_textured_materials(objects, props):
 
 
 def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples: int = 24, head_share: float = 1.0,
-                head_from_z=None):
-    """Renders a transparent icon. view: 'object' (3/4 from the front), 'item' (tool laid diagonally), 'boss' (a
-    head-on portrait), 'portrait' (three-quarter head shot) or 'creature' (three-quarter, whole body). These three
-    frame the posed vertices: the top ``head_share`` of the model's height, or everything above world height
-    ``head_from_z`` (a humanoid's neck)."""
+                head_from_z=None, sprite=False, spot=None):
+    """Renders a transparent icon. view: 'object' (3/4 from the front), 'item' (tool laid diagonally), 'side' (a gun
+    side-on, barrel to the right and up 30°), 'boss' (a head-on portrait), 'portrait' (three-quarter head shot) or
+    'creature' (three-quarter, whole body). These three frame the posed vertices: the top ``head_share`` of the
+    model's height, or everything above world height ``head_from_z`` (a humanoid's neck).
+    ``sprite``: the Terraria inventory look (P3-38): long items drawn 1.5x chunkier, rendered at twice the size with
+    denoising and a rim light, outlined in the item's darkened colour, then downsampled. ``spot``: a world point that
+    gets an extra fill light (a spear's head)."""
     scene = bpy.context.scene
     lo, hi = bounds(objects)
     center = (lo + hi) / 2
@@ -81,18 +84,27 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
     cam = bpy.data.objects.new("icon_cam", cam_data)
     scene.collection.objects.link(cam)
     scene.camera = cam
-    if view == "item":
-        # Items are modelled along +Z; lay them on the diagonal like classic inventory icons.
+    if view in ("item", "side"):
+        # Items are modelled along +Z; lay them on the diagonal like classic inventory icons. Guns (whose profile is
+        # the item's YZ plane) are seen from -X instead, turned so the barrel points right and up.
         pivot = bpy.data.objects.new("icon_pivot", None)
         scene.collection.objects.link(pivot)
         for obj in objects:
             if obj.parent is None:
                 obj.parent = pivot
-        pivot.rotation_euler = Euler((0, math.radians(-45), 0))
+        if view == "item":
+            pivot.rotation_euler = Euler((0, math.radians(-45), 0))
+            if sprite:
+                pivot.scale = (1.5, 1.0, 1.0)  # icon only: chunkier blades and hafts (their width is the item's X)
+            direction = Vector((0.0, -1.0, 0.05)).normalized()
+        else:
+            pivot.rotation_euler = Euler((math.radians(60), 0, 0))
+            if sprite:
+                pivot.scale = (1.0, 1.25, 1.0)  # a little deeper profile (grip, receiver) for readability
+            direction = Vector((-1.0, 0.0, 0.0))
         bpy.context.view_layer.update()
         lo, hi = bounds(objects)
         center, extent = (lo + hi) / 2, hi - lo
-        direction = Vector((0.0, -1.0, 0.05)).normalized()
     elif view == "boss":
         direction = Vector((0.0, 1.0, 0.15)).normalized()  # from the front, slightly above
     elif view == "creature":
@@ -145,6 +157,17 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
     fill.rotation_euler = Euler((math.radians(-60), 0, math.radians(-140)))
     scene.collection.objects.link(key)
     scene.collection.objects.link(fill)
+    if sprite:  # a rim from behind the top left so edges catch a highlight
+        rim = bpy.data.objects.new("rim", bpy.data.lights.new("rim", "SUN"))
+        rim.data.energy = 2.2
+        source = cam.matrix_world.to_3x3() @ Vector((-0.7, 0.6, -0.6))
+        rim.rotation_euler = (-source.normalized()).to_track_quat("-Z", "Y").to_euler()
+        scene.collection.objects.link(rim)
+    if spot is not None:
+        lamp = bpy.data.objects.new("spot", bpy.data.lights.new("spot", "POINT"))
+        lamp.data.energy = 25.0 * max(extent.length, 0.5) ** 2
+        lamp.location = Vector(spot) + (cam.location - Vector(spot)).normalized() * max(extent.length, 0.5) * 0.4
+        scene.collection.objects.link(lamp)
     if scene.world is None:
         scene.world = bpy.data.worlds.new("icon_world")
     scene.world.use_nodes = True
@@ -155,9 +178,9 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
     scene.cycles.samples = samples
-    scene.cycles.use_denoising = False
+    scene.cycles.use_denoising = sprite
     scene.render.film_transparent = True
-    scene.render.resolution_x = scene.render.resolution_y = size
+    scene.render.resolution_x = scene.render.resolution_y = size * (2 if sprite else 1)
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"
     scene.view_settings.view_transform = "Standard"
@@ -167,7 +190,35 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
     temp = path.with_suffix(".new.png")
     scene.render.filepath = str(temp)
     bpy.ops.render.render(write_still=True)
+    if sprite:
+        sprite_finish(temp, size)
     _replace_if_changed(temp, path)
+
+
+def sprite_finish(path: pathlib.Path, size: int, width: int = 3):
+    """Outlines a double-size render in its own darkened median colour (alpha-over under the item) and downsamples
+    it to ``size`` (in place): the chunky, outlined look of Terraria's item sprites."""
+    import numpy as np
+    from PIL import Image
+    img = Image.open(path).convert("RGBA")
+    a = np.asarray(img).astype(np.float32) / 255.0
+    alpha = a[..., 3]
+    solid = alpha > 0.5
+    colour = np.median(a[solid][:, :3], axis=0) * 0.3 if solid.any() else np.array([0.08, 0.07, 0.1])
+    h, w = alpha.shape
+    padded = np.pad(alpha, width)
+    grown = alpha.copy()
+    for dy in range(-width, width + 1):
+        for dx in range(-width, width + 1):
+            if dx * dx + dy * dy <= width * width + 1:
+                grown = np.maximum(grown, padded[width + dy:width + dy + h, width + dx:width + dx + w])
+    under = np.clip(grown, 0, 1)
+    out_a = alpha + under * (1 - alpha)
+    rgb = (a[..., :3] * alpha[..., None] + colour * (under * (1 - alpha))[..., None]) / np.maximum(out_a, 1e-6)[..., None]
+    out = np.dstack([rgb, out_a])
+    big = Image.fromarray(np.clip(out * 255, 0, 255).astype(np.uint8), "RGBA")
+    # Resample premultiplied so the transparent surround does not bleed dark fringes into the edge.
+    big.convert("RGBa").resize((size, size), Image.LANCZOS).convert("RGBA").save(path)
 
 
 def _pixels(path):
