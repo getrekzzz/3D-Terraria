@@ -40,6 +40,7 @@ public sealed partial class FrameProbe : Node
         ulong now = Time.GetTicksUsec();
         ulong from = _software && _drawn > _last ? _drawn : _last;
         if (_last != 0) Metrics.Frame.EndFrame((now - from) / 1000.0);
+        else if (Metrics.Frame.TrackFrames) Metrics.Frame.Spikes.DiscardFrame(); // the world's loading has no frame start
         _last = now;
     }
 

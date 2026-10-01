@@ -89,7 +89,8 @@ counters keep frames ≥33/≥50/≥100 ms, the worst frame and a frame-time his
 totals) are left out, as is a parent timer whose dotted child took all but 1 ms of it. On a software renderer
 (llvmpipe/lavapipe draws a frame in seconds, so every frame would be a spike) `FrameProbe` measures from the end of
 the last draw instead, i.e. the main thread's own work, and the summary says "frames (main thread, draw excluded)".
-* **F3** turns profiling on while it is open (unless `perf start` already did) and adds
+* **F3** turns profiling on while it is open (a session `perf start` began, before or while it was open, keeps
+  running when it closes) and adds
   `spikes >33 ms N (>50 M, worst X) of F frames · p99 … · GC a/b/c pause y ms` and `last: 72.0 ms: tick.autosave 40.1,
   gd.colliders.build 12.0 · GC gen2 pause 8.0 ms`.
 * **Console**: `perf start` (reset, on), `perf stop`, `perf report [n]` (spike/GC summary, then the costliest timers

@@ -117,6 +117,53 @@ public class SpikeLogTests
         Assert.Empty(Assert.Single(m.Spikes.Recent()).Top); // the 80 ms recorded before tracking is not blamed on it
     }
 
+    [Fact]
+    public void AFrameTrackingStoppedInIsNotBlamedOnTheNextSession()
+    {
+        var m = Tracking();
+        m.Record("gd.colliders.build", 80); // the frame `perf stop` (or closing F3) ran in never closes
+        m.TrackFrames = false;
+        m.TrackFrames = true;
+        m.EndFrame(90);
+        Assert.Empty(Assert.Single(m.Spikes.Recent()).Top);
+
+        m.Record("gd.objects.rebuild", 60); // the frame that loaded a world has no start: FrameProbe discards it
+        m.Spikes.DiscardFrame();
+        m.EndFrame(70);
+        Assert.Equal(2, m.Spikes.Frames);
+        Assert.Empty(m.Spikes.Recent(1)[0].Top);
+    }
+
+    [Fact]
+    public void ClosingAnOrdinaryFrameAllocatesNothing()
+    {
+        var m = Tracking();
+        void Frame()
+        {
+            for (int i = 0; i < 50; i++)
+            {
+                using (m.Time("gd.colliders")) m.Record("gd.colliders.build", 0.1);
+                m.Record("tick.total", 0.2);
+            }
+            m.EndFrame(16.7);
+        }
+        Frame(); // timers and their frame slots are created once
+        long before = GC.GetAllocatedBytesForCurrentThread();
+        for (int i = 0; i < 100; i++) Frame();
+        Assert.Equal(0, GC.GetAllocatedBytesForCurrentThread() - before);
+        Assert.Equal(101, m.Spikes.Frames);
+        Assert.Equal(50, m.Spikes.PeakCalls("gd.colliders.build"));
+    }
+
+    [Fact]
+    public void PerfStartCountsAsAReset()
+    {
+        var m = Tracking();
+        int before = m.Resets;
+        m.Reset();
+        Assert.Equal(before + 1, m.Resets); // the F3 overlay leaves a session started while it was open running
+    }
+
     /// <summary>A percentile is the upper edge of its 0.5 ms histogram step, never above the worst frame.</summary>
     [Fact]
     public void PercentilesComeFromTheFrameTimeHistogram()

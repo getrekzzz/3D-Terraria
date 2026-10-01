@@ -18,6 +18,7 @@ public sealed partial class PerfOverlay : CanvasLayer
     private Label _label = null!;
     private double _timer;
     private bool _profiling; // the overlay turned the frame profiler on (not perf start), so it turns it off again
+    private int _resets; // Metrics.Frame.Resets then: a `perf start` since then owns the session
 
     public void Initialize(WorldRuntime runtime, TileObjectRenderer? objects)
     {
@@ -40,7 +41,10 @@ public sealed partial class PerfOverlay : CanvasLayer
 
     public override void _ExitTree() => Profile(false);
 
-    /// <summary>Timers and the spike log run while the overlay is open, unless <c>perf start</c> already runs them.</summary>
+    /// <summary>
+    /// Timers and the spike log run while the overlay is open, unless <c>perf start</c> runs them: started before the
+    /// overlay opened or while it was open, that session keeps running when it closes.
+    /// </summary>
     private void Profile(bool on)
     {
         var m = Metrics.Frame;
@@ -49,12 +53,14 @@ public sealed partial class PerfOverlay : CanvasLayer
             m.Enabled = true;
             m.TrackFrames = true;
             _profiling = true;
+            _resets = m.Resets;
         }
         else if (!on && _profiling)
         {
+            _profiling = false;
+            if (m.Resets != _resets) return;
             m.Enabled = false;
             m.TrackFrames = false;
-            _profiling = false;
         }
     }
 

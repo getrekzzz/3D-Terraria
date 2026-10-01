@@ -36,6 +36,14 @@ public sealed class Metrics
         }
     }
 
+    /// <summary>
+    /// How often <see cref="Reset"/> ran (<c>perf start</c>): the F3 overlay, which profiles only while it is open, can
+    /// tell that a session it did not start took over and leave it running when it closes.
+    /// </summary>
+    public int Resets => Volatile.Read(ref _resets);
+
+    private int _resets;
+
     public void Count(string name, long delta = 1) => _counters.AddOrUpdate(name, delta, (_, v) => v + delta);
 
     public long Counter(string name) => _counters.TryGetValue(name, out var v) ? v : 0;
@@ -67,6 +75,7 @@ public sealed class Metrics
         _timers.Clear();
         _counters.Clear();
         Spikes.Reset();
+        Interlocked.Increment(ref _resets);
     }
 
     public readonly struct TimerScope : IDisposable

@@ -187,12 +187,7 @@ public sealed class SpikeLog
     /// <summary>Forgets every frame, spike and peak; collections are counted from now.</summary>
     public void Reset()
     {
-        foreach (var s in Volatile.Read(ref _order))
-        {
-            Interlocked.Exchange(ref s.FrameMs, 0);
-            Interlocked.Exchange(ref s.FrameCalls, 0);
-            Volatile.Write(ref s.PeakCalls, 0);
-        }
+        ClearFrame(peaks: true);
         lock (_gate)
         {
             Array.Clear(_ring);
@@ -204,15 +199,30 @@ public sealed class SpikeLog
         }
     }
 
-    /// <summary>Tracking resumes after a pause: collections made while nobody watched are not blamed on the next frame.</summary>
+    /// <summary>
+    /// Tracking resumes after a pause: neither the collections made while nobody watched nor timers left over from the
+    /// frame tracking stopped in are blamed on the next frame.
+    /// </summary>
     public void Resume()
     {
+        ClearFrame(peaks: false);
         var gc = GcSample.Now();
         lock (_gate)
         {
             _start = new GcSample(_start.Gen0 + gc.Gen0 - _last.Gen0, _start.Gen1 + gc.Gen1 - _last.Gen1, _start.Gen2 + gc.Gen2 - _last.Gen2, _start.PauseMs + gc.PauseMs - _last.PauseMs);
             _last = gc;
         }
+    }
+
+    /// <summary>
+    /// Drops the current frame without closing it (a frame with no known start, such as the one that loaded the world):
+    /// its timers and collections are not blamed on the next frame; the collections still count in the totals.
+    /// </summary>
+    public void DiscardFrame()
+    {
+        ClearFrame(peaks: false);
+        var gc = GcSample.Now();
+        lock (_gate) _last = gc;
     }
 
     /// <summary>Summary line: "spikes >=33 ms 12 (>=50 5, >=100 1) of 3000 frames · p50 … p99 … max … · GC 10/2/1 pause 30.2 ms".</summary>
@@ -252,6 +262,16 @@ public sealed class SpikeLog
             if (!explained) list.Add((_topNames[i], _topMs[i]));
         }
         return list.ToArray();
+    }
+
+    private void ClearFrame(bool peaks)
+    {
+        foreach (var s in Volatile.Read(ref _order))
+        {
+            Interlocked.Exchange(ref s.FrameMs, 0);
+            Interlocked.Exchange(ref s.FrameCalls, 0);
+            if (peaks) Volatile.Write(ref s.PeakCalls, 0);
+        }
     }
 
     private static int Bucket(double ms) => ms < FineLimitMs
