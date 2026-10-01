@@ -69,6 +69,15 @@ upscaler (FSR 1/2), anti-aliasing (FXAA/SMAA/TAA/MSAA), anisotropy, shadow atlas
 grass density and distance, mesh LOD threshold, horizon distance. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
 remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`.
 
+Light tuning shared by every preset is `LightingConfig` (Core, `data/config/lighting.json`, every value required and
+range-checked by `Strata.Tools validate`): eye adaptation, glow threshold/softness/levels, the fog near cap, SSIL and
+volumetric strengths, placed and held torch lights, and the block-light curve. `ExposureModel` (Core, pure) gives the
+exposure the eye wants (`caveBoost` sealed from the sky; in the open `nightBoost` at night and the biome's
+`exposureBias` by day, below 1 for desert, snow, sky, hallow and ocean) and eases toward it, opening up slowly and
+closing down fast so leaving a cave never flashes. `ExposureModel.AutoWindow` turns the `autoMin`–`autoMax`
+multiplier range into Godot's auto exposure ISO window (luminance = ISO × 12.5 / 100 / 100 at sensitivity 100). The
+renderer keeps its built-in exposure, glow and torch values until it is wired to this file.
+
 Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class GPU):
 * Chunks sealed from the sky sit on their own visual layer (`ChunkLayers.Sealed`) that the sun's and moon's
   `ShadowCasterMask` skips: they never draw into the 4-cascade sun shadow map, yet torches still cast their shadows.

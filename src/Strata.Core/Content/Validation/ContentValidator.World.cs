@@ -12,6 +12,7 @@ public static partial class ContentValidator
             ctx.Ref(b, ctx.Db.Flags, b.LockedUntil, "lockedUntil");
             ctx.Color(b, b.MapColor, "mapColor");
             ctx.Color(b, b.FogColor, "fogColor");
+            if (b.ExposureBias is < 0.4f or > 1.5f) ctx.Error(b, "exposureBias must be within 0.4–1.5.");
         }
     }
 

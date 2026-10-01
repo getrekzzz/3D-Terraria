@@ -1,0 +1,71 @@
+{
+  // Light tuning shared by every graphics preset (see src/Strata.Core/Presentation/LightingConfig.cs for each field
+  // and its range, and ExposureModel.cs for how exposure adapts). Every value lives here: calibrate from the lighting
+  // tour screenshots (game/Testing/Tours/lighting.cmds), never with constants in code.
+  "exposure": {
+    // Exposure multiplier in a cave sealed from the sky: the eye opens up so torch-lit rooms read.
+    "caveBoost": 1.7,
+    // Multiplier under the open night sky (moonlight reads dark blue, not black); at most caveBoost.
+    "nightBoost": 1.2,
+    // Rate (1/s) at which the eye opens up when it gets darker (entering a cave): slow, about 2 s to adapt.
+    "brightenPerSecond": 0.5,
+    // Rate (1/s) at which the eye closes down when it gets brighter (leaving a cave): fast, within 10% in under 1 s.
+    "darkenPerSecond": 2.5,
+    // Godot auto exposure scale (presets with autoExposure): the mid-grey luminance the metering aims for.
+    "autoKey": 0.35,
+    // Lowest multiplier Godot's auto exposure may apply (bright desert or snow at noon can darken to this).
+    "autoMin": 0.72,
+    // Highest multiplier Godot's auto exposure may apply (dim scenes brighten up to this).
+    "autoMax": 1.45,
+    // Godot auto exposure adaptation speed.
+    "autoSpeed": 1.0
+  },
+  "glow": {
+    // HDR luminance (after exposure) where bloom starts: above sunlit sand and snow, below flames, lava and magic.
+    "threshold": 1.6,
+    // Godot glow HDR scale: how softly light above the threshold ramps into bloom.
+    "softness": 2.5,
+    // Overall bloom strength.
+    "intensity": 0.6,
+    // Brightest luminance that feeds the bloom (keeps the sun's specular from flooding the screen).
+    "luminanceCap": 8,
+    // Weights of the 7 blur levels, fine to wide (normalized): mid-size halos, no full-screen haze.
+    "levels": [0, 0, 1, 1, 0.8, 0.5, 0.25]
+  },
+  "fog": {
+    // Distance fog starts no further than this many metres (divided by the biome's fog density), so far land fades.
+    "nearCap": 70
+  },
+  "screenSpace": {
+    // Screen-space indirect light (colour bleeding) strength on presets with SSIL.
+    "ssilIntensity": 0.9,
+    // Grey albedo of the volumetric fog on presets with volumetric fog (lower scatters less sunlight back).
+    "volumetricAlbedo": 0.8
+  },
+  "torch": {
+    // Energy of a placed torch's pooled light per unit of its peak light channel.
+    "placedEnergy": 1.5,
+    // Range of a placed torch's light in metres at zero peak; the range is base + perPeak * peak channel (0-1).
+    "placedRangeBase": 4,
+    // Metres of range added per unit of the placed torch's peak channel (a full torch reaches about 13 m).
+    "placedRangePerPeak": 9.5,
+    // Godot omni falloff of a placed torch's light (lower carries further before fading).
+    "placedAttenuation": 0.6,
+    // Energy of the torch carried in the hand per unit of its peak channel (at least the placed energy).
+    "heldEnergy": 2.0,
+    // Range of the carried torch's light in metres at zero peak; the range is base + perPeak * peak channel.
+    "heldRangeBase": 4,
+    // Metres of range added per unit of the carried torch's peak channel (a held torch reaches about 15 m).
+    "heldRangePerPeak": 12,
+    // Godot omni falloff of the carried torch's light.
+    "heldAttenuation": 0.6
+  },
+  "blockLight": {
+    // Linear share of the baked block-light curve, level * mix(linear, 1, level): higher keeps a long soft tail.
+    "linear": 0.62,
+    // Brightness of baked block light (torches, lava, glowing ores and fungi).
+    "gain": 1.35,
+    // Share of block light removed on surfaces in full daylight (the eye is adapted to the sun).
+    "daylitSuppression": 0.65
+  }
+}
