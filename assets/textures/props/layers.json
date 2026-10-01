@@ -58,11 +58,10 @@
    "mean": 0.228
   },
   {
-   "name": "leaves",
+   "name": "fur",
    "index": 9,
-   "type": "foliage",
-   "sway": 0.012,
-   "mean": 0.284
+   "type": "fur",
+   "mean": 0.728
   },
   {
    "name": "fronds",
@@ -119,10 +118,10 @@
    "mean": 0.439
   },
   {
-   "name": "red_cap",
+   "name": "chitin",
    "index": 18,
-   "type": "cap",
-   "mean": 0.411
+   "type": "chitin",
+   "mean": 0.63
   },
   {
    "name": "iron",
@@ -143,10 +142,10 @@
    "mean": 0.741
   },
   {
-   "name": "copper",
+   "name": "bone",
    "index": 22,
-   "type": "metal",
-   "mean": 0.523
+   "type": "bone",
+   "mean": 0.905
   },
   {
    "name": "cloth",
