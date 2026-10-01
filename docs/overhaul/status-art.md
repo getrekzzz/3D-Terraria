@@ -3,7 +3,7 @@
 | Push | WPs | CI |
 |---|---|---|
 | 1 | P3-05 | full headless CI green (416 Core tests, all checks, 14/14 smoke, MENU PASS) |
-| 2 | P3-37, P3-37b, P2-24, P5-28, P3-38, P3-39, P3-40, P3-41a/b, P3-42, P3-43, P3-44, P3-45, P3-50 | see below |
+| 2 | P3-37, P3-37b, P2-24, P5-28, P3-38, P3-39, P3-40, P3-41a/b, P3-42, P3-43, P3-44, P3-45, P3-50 | full headless CI green (422 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 3 | P4-35, P4-36, P4-37 | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
