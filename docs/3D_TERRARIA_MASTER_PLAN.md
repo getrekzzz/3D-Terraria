@@ -91,7 +91,7 @@ are in [`AUDIT.md`](AUDIT.md).
 | Progression | Flags, auto-set cascade, announcements, incineration summons | ✅ | `ProgressionSystem.Raised` is the hook for hardmode mutations |
 | Events | Event director | ✅ | Blood Moon, Slime Rain, 7 invasions (Goblin Army, Pirates, Martian Madness, Old One's Army, Frost Legion, Pumpkin Moon, Frost Moon), Solar Eclipse, lunar events, rain, wind, sandstorm, party, lantern night; no progress bar ⬜ |
 | Dungeon | Crypt zone, locked walls, guardian, roster, keeper + curse | ✅ | Boxy room grid; chests roll cave-cabin loot; locked chests and Golden Key, dungeon furniture, books, spike traps ⬜ (AUDIT §13) |
-| Hardmode | Trigger, lazy world mutations, spread, ore tiers, rosters, stations, mechanical bosses | ✅ | Wall of Flesh → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190 → 200); 12 hardmode creatures; cinder forge, hardmode anvils and forges; Twins, Destroyer, Skeletron Prime → radiant gear; 14 wings (13 hardmode); Plantera, chlorophyte, the Jungle Temple and Golem; hardmode variants of old creatures ⬜ |
+| Hardmode | Trigger, lazy world mutations, spread, ore tiers, rosters, stations, mechanical bosses | ✅ | Wall of Flesh → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190 → 200); 12 hardmode creatures; hellforge, hardmode anvils and forges; Twins, Destroyer, Skeletron Prime → radiant gear; 14 wings (13 hardmode); Plantera, chlorophyte, the Jungle Temple and Golem; hardmode variants of old creatures ⬜ |
 | Audio | Director + sounds | ✅ | Music director (boss > event > Blood Moon > biome > layer, 31 tracks) and 146 SFX files: 177 sound files. Generic creature hit sounds, silent object hits and an unused ambient bus 🟡 (AUDIT §10) |
 
 ## 4. Technical debt
@@ -177,7 +177,8 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 8. Next development targets (rest of M4)
 > Superseded on 2026-09-30 by the player-feedback overhaul (waves W0–W11, tracked in [`AUDIT.md`](AUDIT.md)). Of the
 > list below, wings, Plantera, chlorophyte, the temple, more residents and the audio director are done. Residents that
-> fight back and Dungeon keys/locked chests are planned (P5-10, P4-21). Cave culling is not planned yet.
+> fight back and Dungeon keys/locked chests are planned (P5-10, P4-21). Cave culling, hardmode wedges on the horizon
+> and hardmode variants of cavern/underworld creatures are not planned yet (AUDIT §17).
 
 M4 graphics delivered the physical sky and clouds, sky-lit PBR shading with graphics presets, synthesised
 materials with height blending, refractive water and crusted lava, instanced grass and flowers, leaf-card trees, and

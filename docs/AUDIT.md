@@ -56,17 +56,17 @@
 | 8 | The body faces the wrong way when aiming or interacting | The aim ray starts at the camera, 4.2 m behind and 0.55 m right of the player (`game/Player/CameraRig.cs:17,24`). It accepts hits behind the player, such as grass, bushes and tree boxes the camera probe ignores (`game/Player/InteractionController.cs:101-110`). The body then turns past 55° (`game/Player/PlayerAvatar.Motion.cs:84`). | P1-05 (W1a), P1-06 (W1b) | `player.facing_error_deg < 3` after `camera orbit 90`; a target behind the player is never selected |
 | 9 | The crosshair doesn't name mobs or bosses | The HUD names only blocks and objects within reach (`game/UI/Hud.cs:211`). There is no ray-vs-entity picking. | P1-07 (W1b) | `hud.target_name` for a slime, a worm segment and a resident |
 | 10 | Lag spikes | Synchronous autosave every 120 s (`src/Strata.Core/Session/GameWorld.cs:25,157-160`) rewrites whole region files (`src/Strata.Core/Persistence/RegionFile.cs:42-69`). Other causes: unbudgeted near-player collider builds, tile objects rebuilt twice per remesh, grass churn, first-use GLB loads, per-projectile materials and lights, per-frame LINQ, large-object-heap churn and dynamic-resolution oscillation (§6). | P1b-05 (W0); P1b-06…P1b-16 (W2) | Planned perf.cmds counters (P1b-05); before/after `perf spikes` p99 and max |
-| 11 | No guide book | Nothing exists: no bestiary, journal or achievements (§16). | P5-24a (W3), P5-24b…P5-32 (W11) | Planned ui.cmds book tabs; the bestiary unlocks after a kill |
+| 11 | No guide book | Nothing exists: no bestiary, journal or achievements (§16). | P5-24a (W3); P5-24b, P5-25, P5-26, P5-27, P5-30a/b, P5-31, P5-32 (W11) | Planned ui.cmds book tabs; the bestiary unlocks after a kill |
 | 12 | Bosses and the Dungeon should match the reference game, Skeletron 1:1 | Boss parts share one life pool (`src/Strata.Core/Gameplay/Entities/Npc.cs:132-140`). The Dungeon is a grid of boxy rooms that rolls cave-cabin loot (`src/Strata.Core/WorldGen/Structures/DungeonBuilder.cs:116`). See §12 and §13. | P4-01…P4-38 (W7–W9) | SkeletronTests, DungeonGenerationTests, LockedChestTests, `dungeon.cmds` route |
-| 13 | The NPC system should be complete | Move-in rules are approximate, there are no rescues, no housing UI, residents can't fight back, and many shops are empty (§14). | P5-01…P5-34 (W10) | `town.cmds`: day-only move-in, rescue, housing query/assign/evict, residents defending, Nurse heal |
-| 14 | UI, items and feel should be much more like Terraria (the top priority) | A generic dark-slate Godot UI with no font, progress-bar vitals and text buffs. Items share generic poses and meshes. Most "juice" is missing (§8–§11). | P2-* (W3–W4), P3-* (W5–W7) | UI tour at 1280×720 and 1920×1080, UI scale 1.0 and 1.5, `layout.overlaps == 0` |
+| 13 | The NPC system should be complete | Move-in rules are approximate, there are no rescues, no housing UI, residents can't fight back, and many shops are empty (§14). | P5-01…P5-16, P5-18…P5-23, P5-28, P5-29, P5-34 (W10); P5-17 (W11) | `town.cmds`: day-only move-in, rescue, housing query/assign/evict, residents defending, Nurse heal |
+| 14 | UI, items and feel should be much more like Terraria (the top priority) | A generic dark-slate Godot UI with no font, progress-bar vitals and text buffs. Items share generic poses and meshes. Most "juice" is missing (§8–§11). | P2-* (W2–W4), P3-* (W2, W4–W7) | UI tour at 1280×720 and 1920×1080, UI scale 1.0 and 1.5, `layout.overlaps == 0` |
 
 ## 3. Content at a glance
 
 | Content | Count | Notes |
 |---|---|---|
 | Items | 667 (plus derived block and object items) | 660 item GLBs (`assets/models/items/`), 777 icons (`assets/icons/items/`) |
-| Enemies | 229 | 216 creature GLBs (`assets/models/creatures/`), including boss parts and humans |
+| Enemies | 229 | 216 creature GLBs (`assets/models/creatures/`), including boss parts and humans, plus 29 shared animation sets in `assets/models/creatures/anim/` |
 | Bosses | 29 reference bosses | 13 brain types (`src/Strata.Core/Content/Specs/BrainSpecs.cs:6-18`). Five are hand-written boss brains; the other bosses run the data-driven `pattern` brain |
 | Town residents | 29 | `data/town.json` (6) and `data/town_residents.json` (23) |
 | Events | 16 | Seven invasions (Goblin Army, Pirates, Martian Madness, Old One's Army, Frost Legion, Pumpkin Moon, Frost Moon), Blood Moon, Slime Rain, Solar Eclipse, lunar events and five ambient events (`data/events.json`) |
@@ -99,6 +99,7 @@
 | Buff and debuff visuals (fire, poison, frost) on bodies | ⬜ | `game/Entities/NpcRenderer.cs:141-143` | P3-47 (W6) |
 | Dynamic resolution: on by default; CPU spikes step the scale down, so it can oscillate | 🟡 | `game/Rendering/DynamicResolution.cs:64`, `src/Strata.Core/Presentation/GraphicsConfig.cs:48` | P1b-16 (W2) |
 | Cave culling | ⬜ | master plan §8 | — |
+| Horizon heightfield samples generator fields only: no caves, structures, edits or hardmode wedges | 🟡 | `src/Strata.Core/Presentation/HorizonField.cs` | — |
 
 ## 5. Terrain
 
@@ -193,7 +194,7 @@ below are in behaviour and presentation, not in data.
 | Whips (2) | ❌ | Wide melee arcs; "summons focus struck enemies" and Snapthorn's poison exist only in the descriptions (`data/items/arsenal.json`) | P3-14 (W5), P3-15 (W5) |
 | Summons (15) | 🟡 | Minions and sentries work; they spawn at the eye, with no minion buff or count in the HUD | P3-10 (W5), P2-14 (W4) |
 | Grappling hooks (9) | ❌ | Click does nothing; the hook drops on natural terrain; one generic chain and claw | P1-08 (W1a), P1-09 (W1b), P3-17' (W5) |
-| Potions and consumables | 🟡 | Healing, mana, buffs and crystals work. Every use is "drink". 19 of 20 buff potions don't say what they do or for how long. Stack sizes mix versions. Life Fruit works before 400 max life (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs:14`). | P2-04 (W3), P3-02 (W4), P3-33 (W6) |
+| Potions and consumables | 🟡 | Healing, mana, buffs and crystals work. Every use is "drink". 19 of 21 buff potions don't say what they do or for how long. Stack sizes mix versions. Life Fruit works before 400 max life (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs:14`). | P2-04 (W3), P3-02 (W4), P3-33 (W6) |
 | Quick heal, quick mana, quick buff keys | ⬜ | `data/config/input.json` | P3-33 (W6) |
 | Accessories (66) | ✅ | Stat, flight, dash and info effects; set bonuses (`src/Strata.Core/Content/Specs/EffectSpecs.cs`) | 7 slots: P2-05 (W3) |
 | Armour (98 pieces) | 🟡 | Stats and set bonuses work; never drawn on the character | P3-41, P3-42 (W7) |
@@ -391,8 +392,8 @@ name is the resident's definition.
 | NPC | Move-in | Shop / service | Status | Fix |
 |---|---|---|---|---|
 | Guide (`data/town.json:6`) | Starter ✅ | Crafting help: one text line for the held item, raw station ids | 🟡 | P5-14 (W10), P5-27 (W11) |
-| Merchant (`data/town.json:18`) | 50 silver ✅ (backpack only) | 13 items | ✅ | P5-15 (W10) |
-| Nurse (`data/town.json:47`) | Max life ≥ 120 and Merchant ✅ | Heal and cure, flat 15 copper/HP; sells a potion (the reference Nurse doesn't) | 🟡 | P5-13 (W10) |
+| Merchant (`data/town.json:24`) | 50 silver ✅ (backpack only) | 13 items | ✅ | P5-15 (W10) |
+| Nurse (`data/town.json:54`) | Max life ≥ 120 and Merchant ✅ | Heal and cure, flat 15 copper/HP; sells a potion (the reference Nurse doesn't) | 🟡 | P5-13 (W10) |
 | Dryad (`data/town.json:72`) | King Slime, Eye or Eater (not any boss) 🟡 | 7 items; no world-status check | 🟡 | P5-04, P5-13, P5-15 (W10) |
 | Old Man (`data/town.json:99`) | Landmark at the Dungeon gate ✅ | Skeletron summon | ✅ | — |
 | Clothier (`data/town.json:115`) | Skeletron defeated ✅ | 3 items | 🟡 | P5-15 (W10) |
@@ -427,7 +428,7 @@ Items tagged `shop` that nobody sells: Leather Whip and Rally (P5-15, P5-17).
 | Feature | Status | Evidence | Fix |
 |---|---|---|---|
 | Progression flags, auto-set cascade, announcements; hardmode mutations, spread, ore tiers | ✅ | `src/Strata.Core/Gameplay/Progression/ProgressionSystem.cs`, `data/progression.json` | — |
-| Station chain: furnace, anvils, hellforge, hardmode anvils and forges, ancient manipulator | ✅ | `data/tileobjects/stations.json` | — |
+| Station chain: furnace, anvils, hellforge, hardmode anvils and forges, ancient manipulator | ✅ | `data/tileobjects/stations.json`, `data/items/lunar.json` | — |
 | Events: 7 invasions, moons, eclipse, Blood Moon, Slime Rain, ambient events; kill goals | ✅ | `data/events.json`, `src/Strata.Core/Gameplay/Events/EventDirector.cs` | Progress bar: P2-23 (W4) |
 | Plantera, the Jungle Temple, Golem and the lunar endgame | ✅ | `data/enemies/temple.json`, `data/enemies/lunar.json` | Fights: §12 |
 | Life Crystals, Mana Crystals, mana sickness; Life Fruit also works before 400 max life | 🟡 | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs:14` | Life Fruit gating: P3-33 (W6) |
@@ -439,6 +440,7 @@ Items tagged `shop` that nobody sells: Leather Whip and Rally (P5-15, P5-17).
 | Bed sleep skips time (`PreventsSleep` exists, nothing reads it) | ⬜ | `src/Strata.Core/Gameplay/Events/EventDirector.cs:75` | P3-34 (W6) |
 | Natural boss arrivals (Eye, King Slime, mechanical warnings) | ⬜ | `data/events.json` | P4-05 (W7) |
 | Buffs and debuffs: 39; missing Darkness, Silenced, Broken Armor, Weak, Venom, Shadowflame and others | 🟡 | `data/combat.json` and per-file buff lists | — |
+| Hardmode variants of cavern and underworld creatures | ⬜ | `data/enemies/hardmode.json` (adds 12 new creatures, no variants of old ones) | — |
 | Journey mode: listed as a difficulty only | 🟡 | `src/Strata.Core/World/WorldSettings.cs:19` | Powers out of scope (§17) |
 
 ## 16. Guide book, bestiary and achievements
@@ -461,6 +463,7 @@ Items tagged `shop` that nobody sells: Leather Whip and Rally (P5-15, P5-17).
 | Background walls | ⬜ | Voxel rooms already enclose space; the Dungeon uses wall panels (P4-13) |
 | Journey mode powers, wiring expansion | ⬜ | — |
 | Moon Lord's True Eye phase, event-boss behaviour beyond pattern upgrades | 🟡 | Not in the plan; models are rebuilt in W9 |
+| Cave culling, liquid pressure, the missing buffs and debuffs, hardmode variants of old creatures, a horizon with caves and hardmode wedges, measuring on the player's GPU | ⬜ / 🟡 | Not in the plan yet (rows marked `—` in §4, §6 and §15); cave culling and the variants are left over from master plan §8 |
 
 ## 18. Stale statements fixed in the master plan
 
@@ -473,5 +476,6 @@ On 2026-09-30, `docs/3D_TERRARIA_MASTER_PLAN.md` still said:
 * There are no hellforge or hardmode anvils; both exist.
 * Plantera and the temple are next targets; both are done.
 * Coverage is 54.3 %.
+* The hardmode station chain starts at a "cinder forge"; it is the hellforge.
 
-This WP corrected §3, the stale debt lines in §4 and §8, and added a decision-log entry.
+W0 corrected §3, the stale debt lines in §4 and §8, and added a decision-log entry.
