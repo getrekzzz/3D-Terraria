@@ -171,13 +171,13 @@ public class BossFrameworkTests
     public void ReelingKeepsTheBrainsDamageScale()
     {
         using var g = Arena();
-        g.World.Session.Clock.SetHour(12f);
-        var boss = g.World.Npcs.Spawn(g.Content.Enemies.Get("skeletron"), g.Player.Position + new Vector3(0, 6f, 4f))!;
+        var boss = g.World.Npcs.Spawn(g.Content.Enemies.Get("duke_fishron"), g.Player.Position + new Vector3(0, 6f, 4f))!;
+        boss.Life = boss.MaxLife * 4 / 10; // its furious phase hits harder
         g.Ticks(2);
-        float enraged = boss.Def.Boss!.DayEnrage!.Damage;
-        Assert.Equal(enraged, boss.DamageScale);
+        float furious = boss.DamageScale;
+        Assert.True(furious > 1f);
         boss.StunTicks = 5;
         g.Ticks(3);
-        Assert.Equal(enraged, boss.DamageScale);
+        Assert.Equal(furious, boss.DamageScale);
     }
 }

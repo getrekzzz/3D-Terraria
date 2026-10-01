@@ -191,36 +191,6 @@ public class DungeonTests
     }
 
     [Fact]
-    public void TheWardenSwipesWithAlternatingHandsSpinsAndRagesByDay()
-    {
-        using var g = Create();
-        g.World.Session.Clock.SetHour(22f);
-        var def = g.Content.Enemies.Get("skeletron");
-        var p = def.Brain.Parse<CryptWardenParams>();
-        var boss = g.World.Npcs.Spawn(def, g.Player.Position + new Vector3(0, 6f, 4f))!;
-        Assert.Equal(2, boss.Segments.Count);
-        var closest = new float[2] { float.MaxValue, float.MaxValue };
-        bool spun = false;
-        for (int i = 0; i < p.SpinInterval + 30; i++)
-        {
-            g.World.Tick();
-            g.Player.State.Vitals.Life = g.Player.State.Vitals.MaxLife;
-            for (int h = 0; h < 2; h++) closest[h] = MathF.Min(closest[h], Vector3.Distance(boss.Segments[h], g.Player.Center));
-            Assert.True(Vector3.Distance(boss.Segments[0], boss.Center) < p.HoverHeight + p.HandSpacing * 2f + 4f);
-            spun |= boss.Phase == 1;
-        }
-        Assert.True(spun, "never began a spin charge");
-        float rest = MathF.Sqrt(p.HoverHeight * p.HoverHeight + p.HandSpacing * p.HandSpacing);
-        Assert.True(closest[0] < rest - 1.5f && closest[1] < rest - 1.5f, $"both hands should swipe at the target ({closest[0]:0.0}, {closest[1]:0.0} vs rest {rest:0.0})");
-        Assert.Equal(1f, boss.DamageScale);
-
-        g.World.Session.Clock.SetHour(12f);
-        g.Ticks(2);
-        Assert.Equal(def.Boss!.DayEnrage!.Damage, boss.DamageScale);
-        Assert.Contains(boss, g.World.Npcs.All); // it does not leave at dawn
-    }
-
-    [Fact]
     public void CastersBlinkAroundTheirTargetAndHexStopsItemUse()
     {
         using var g = Create();

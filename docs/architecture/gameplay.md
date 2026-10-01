@@ -74,7 +74,7 @@
   (`WorldEditor.IsLocked`); one with `exclusiveSpawns` only spawns rules that name it, at closer range.
 * **Events and bosses** — `EventDirector` rolls data-driven events at dusk/dawn (`data/events.json`) and
   feeds them to spawn-rule conditions; bosses are enemies with a `boss` block (arena radius, day despawn,
-  segments for worms, per-part `segmentModels`, `dayEnrage`) driven by `GelSovereign`, `Eye of Cthulhu`, `Worm` and
+  segments for worms, per-part `segmentModels`, `parts`, `enrage`) driven by `GelSovereign`, `Eye of Cthulhu`, `Worm` and
   `CryptWarden` and `Wall of Flesh` brains (brains that `PositionsSegments` place free parts such as hands or eyes
   themselves; `ranged.fromParts` fires from them in turn, or only from `ranged.parts`). Brains mark a second phase
   with `Npc.Enraged`, which swaps in `ranged.enraged` (the Twins' rapid lasers and flamethrower). A boss may
@@ -98,6 +98,18 @@
   announcement also goes out on `NpcSystem.Messaged` with a `MessageKind` (`MessageColors`: boss purple), including
   "<Title> has awoken!" / "has been defeated!". Probes: `boss.<enemyId>.<field>` (life, max, defense, stage, phase,
   enraged, frenzied, illusions, parts, segments).
+* **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
+  at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
+  `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster
+  per lost hand. Its hands are boss parts (`skeletron_hand`, not in the boss bar, the left `mirror`ed) with the
+  `skeletronHand` brain (`HandParams`): rest at the turning offset, wind up, strike through the captured target
+  position (`hand_slap` cue), return; `alternate` hands start on different attacks and the right one half an interval
+  late, so they slap and swipe in turn. They hold while the skull spins and copy its rage (`Frenzied`, defense
+  override, speed; `ContactBase` uses the body's `setDamage`). Expert: `expertDefensePerHand` per living hand while
+  hovering, and once a hand falls or life < `skullLife` homing `skull`s every `skullInterval` (half with no hands) when
+  in sight (`skull_shot` cue). Day is a data `enrage` (9999 defense, 1000 damage, ×2.5 speed: it never stops
+  spinning), shared by Skeletron Prime, which still uses legacy segment hands. Arms are drawn to living parts
+  (`NpcRenderer.Arms`).
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and
   fires `Raised` (announcements; the hook for world mutations).

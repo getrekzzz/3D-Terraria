@@ -11,13 +11,13 @@ public sealed partial class NpcSystem
     /// <summary>
     /// Pushes a creature away from a hit. Ordinary creatures also reel for a moment (their brain stops steering, so
     /// the push carries them away and a dash is broken off), as knockback works in the reference game; bosses only
-    /// take the push.
+    /// and their parts only take the push.
     /// </summary>
     private static void Knock(Npc npc, Vector3 away, float knockback)
     {
         if (knockback <= 0f) return;
         var push = away * knockback * KnockbackSpeed + new Vector3(0, knockback * 0.4f, 0);
-        if (npc.IsBoss || knockback < 0.3f)
+        if (npc.IsBoss || npc.IsPart || knockback < 0.3f)
         {
             npc.Velocity += push;
             return;

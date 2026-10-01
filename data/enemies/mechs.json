@@ -44,7 +44,7 @@
         "enraged": { "projectile": "death_laser", "damage": 26, "speed": 34, "interval": 18, "range": 45 } },
       "life": 8000, "damage": 45, "defense": 12, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
       "loot": "the_twins", "value": 0,
-      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["spazmatism"] },
+      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "music": "boss_mech", "companions": ["spazmatism"] },
       "covers": ["terraria:the_twins"]
     },
     {
@@ -83,8 +83,9 @@
         "enraged": { "projectile": "death_laser", "damage": 30, "speed": 30, "interval": 20, "range": 40 } },
       "life": 14000, "damage": 55, "defense": 26, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
       "loot": "skeletron_prime", "value": 0,
-      "boss": { "title": "Skeletron Prime", "flag": "defeated_skeletron_prime", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech",
-        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"], "armModel": "prime_arm_strut" },
+      "boss": { "title": "Skeletron Prime", "flag": "defeated_skeletron_prime", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "music": "boss_mech",
+        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"], "armModel": "prime_arm_strut",
+        "enrage": { "when": [{ "type": "time", "is": "day" }], "setDamage": 1000, "setDefense": 9999, "speed": 2.5 } },
       "covers": ["terraria:skeletron_prime"]
     }
   ]

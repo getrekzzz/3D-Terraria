@@ -1,5 +1,5 @@
 # Dungeon: the keeper at the crypt gate, the guardian that only haunts the crypt, the curse broken at night and
-# the Crypt Warden's fall freeing the keeper.
+# Skeletron's hands falling on their own, and its skull's fall freeing the keeper.
 wait_until player.frozen == 0 180
 spawning off
 town arrivals off
@@ -18,10 +18,17 @@ assert npcs.dungeon_guardian == 0
 time 22
 town curse old_man
 assert npcs.skeletron == 1
+assert npcs.skeletron_hand == 2
 assert town.old_man.alive == 0
 wait 3
 heal
 assert npcs.skeletron == 1
+
+# Its hands fall on their own; the skull fights on and the curse holds.
+slay skeletron_hand
+assert npcs.skeletron_hand == 0
+assert npcs.skeletron == 1
+assert flag.defeated_skeletron == 0
 
 # Its fall lifts the curse: the keeper leaves town for good.
 slay skeletron

@@ -5,7 +5,9 @@
     { "id": "water_sphere", "name": "Water Sphere", "visual": "orb", "color": "#7a4ae0", "friendly": false, "lifetime": 300, "radius": 0.5, "light": [6, 3, 12], "trail": "#a080ff",
       "onHit": [{ "type": "applyBuff", "buff": "cursed", "ticks": 180, "chance": 0.25 }], "covers": ["terraria:water_sphere"] },
     { "id": "book_skull", "name": "Skull", "visual": "orb", "color": "#e8e0c8", "lifetime": 150, "radius": 0.45, "light": [8, 7, 5], "trail": "#fff0c0",
-      "covers": ["terraria:book_of_skulls_skull"] }
+      "covers": ["terraria:book_of_skulls_skull"] },
+    { "id": "skeletron_skull", "name": "Skull", "visual": "creature", "model": "cursed_skull", "scale": 0.55, "friendly": false, "homing": 1.4, "lifetime": 300, "radius": 0.45,
+      "light": [6, 5, 3], "trail": "#fff0c0" }
   ],
   "buffs": [
     { "id": "cursed", "name": "Cursed", "description": "Your hands will not obey you.", "debuff": true, "color": "#8060c0",
@@ -27,12 +29,20 @@
     {
       "id": "skeletron", "model": "skeletron_head", "tags": ["boss", "undead", "lava_immune"], "name": "Skeletron",
       "description": "The curse of the old dungeon, given a skull and two grasping hands.",
-      "brain": { "type": "skeletron", "hoverHeight": 6, "handSpacing": 2.6, "swipeInterval": 100, "spinInterval": 540, "spinDuration": 240, "spinSpeed": 9 },
+      "brain": { "type": "skeletron", "hoverHeight": 6, "spinInterval": 800, "spinDuration": 400, "spinSpeed": 9, "spinDefense": -10, "expertDefensePerHand": 25, "skull": "skeletron_skull", "skullDamage": 17, "skullSpeed": 8, "skullInterval": 80 },
       "life": 4400, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [3.2, 3.2], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
       "loot": "skeletron", "value": 10000, "light": [5, 4, 3],
       "boss": { "title": "Skeletron", "flag": "defeated_skeletron", "arenaRadius": 150, "music": "boss_crypt",
-        "segments": 2, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["skeletron_hand", "skeletron_hand"], "armModel": "skeletron_arm", "dayEnrage": { "damage": 4, "speed": 2.5 } },
+        "parts": [{ "enemy": "skeletron_hand", "offset": [-2.8, -1.4, 0.6], "mirror": true }, { "enemy": "skeletron_hand", "offset": [2.8, -1.4, 0.6] }], "armModel": "skeletron_arm",
+        "enrage": { "when": [{ "type": "time", "is": "day" }], "setDamage": 1000, "setDefense": 9999, "speed": 2.5 } },
       "covers": ["terraria:skeletron"]
+    },
+    {
+      "id": "skeletron_hand", "model": "skeletron_hand", "tags": ["undead", "lava_immune"], "name": "Skeletron Hand",
+      "description": "It slaps down from above and sweeps from the side, taking turns with the other.",
+      "brain": { "type": "skeletronHand", "style": "alternate" },
+      "life": 600, "damage": 20, "defense": 14, "knockbackResist": 1.0, "size": [2.4, 2.4], "gravity": false, "collideTerrain": false,
+      "value": 0
     },
     {
       "id": "dungeon_guardian", "model": "dungeon_guardian", "tags": ["undead", "lava_immune"], "name": "Dungeon Guardian",

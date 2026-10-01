@@ -52,7 +52,6 @@ public static partial class ContentValidator
                 if (boss.BarrierModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.BarrierModel}.glb", "boss.barrierModel");
                 if (boss.ArmModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.ArmModel}.glb", "boss.armModel");
                 if (boss.BarrierTile <= 0) ctx.Error(e, "boss.barrierTile must be > 0.");
-                if (boss.DayEnrage is { Damage: <= 0 } or { Speed: <= 0 }) ctx.Error(e, "boss.dayEnrage multipliers must be > 0.");
                 if (boss.Enrage is { } rage)
                 {
                     ctx.Specs(e, SpecKind.Condition, rage.When, "boss.enrage.when");
@@ -82,12 +81,21 @@ public static partial class ContentValidator
                         ctx.Error(e, $"boss.companions: '{companionId}' may not bring companions of its own.");
                 }
             }
-            if (e.Brain.Type is BrainSpecs.CryptWarden or BrainSpecs.Mawwall && e.Boss is not { Segments: >= 2 })
-                ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 (its hands or eyes).");
+            if (e.Brain.Type == BrainSpecs.Mawwall && e.Boss is not { Segments: >= 2 })
+                ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 (its eyes).");
+            if (e.Brain.Type == BrainSpecs.CryptWarden && e.Boss is not ({ Segments: >= 2 } or { Parts.Length: >= 2 }))
+                ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 or parts >= 2 (its hands).");
+            if (e.Brain.Type == BrainSpecs.Hand && !ctx.Db.Enemies.All.Any(b => b.Boss is { } bb && bb.Parts.Any(part => part.Enemy == e.Id)))
+                ctx.Warn(e, $"the {e.Brain.Type} brain only works as a boss part, but no boss lists it in boss.parts.");
             if (e.Brain.Type == BrainSpecs.Mawwall && e.Brain.Raw.TryGetProperty("minion", out var minion)) ctx.Ref(e, ctx.Db.Enemies, minion.GetString(), "brain.minion");
             if (e.Ranged is { FromParts: true } && e.Boss is not { Segments: > 0 }) ctx.Error(e, "ranged.fromParts needs body parts (boss.segments).");
             foreach (var key in new[] { "minion", "servant" })
                 if (e.Brain.Raw.TryGetProperty(key, out var refId) && refId.GetString() is { } id) ctx.Ref(e, ctx.Db.Enemies, id, $"brain.{key}");
+            if (e.Brain.Type == BrainSpecs.CryptWarden && e.Brain.Raw.TryGetProperty("skull", out var skull) && skull.GetString() is { } skullId)
+            {
+                ctx.Ref(e, ctx.Db.Projectiles, skullId, "brain.skull");
+                if (ctx.Db.Projectiles.TryGet(skullId, out var sp) && sp.Friendly) ctx.Error(e, $"brain.skull '{skullId}' must be hostile (friendly: false).");
+            }
             if (e.Brain.Raw.TryGetProperty("phase2Model", out var model) && model.GetString() is { } m)
                 ctx.Asset(e, $"assets/models/creatures/{m}.glb", "brain.phase2Model");
             foreach (var (r, field) in new[] { (e.Ranged, "ranged"), (e.Ranged?.Enraged, "ranged.enraged") })

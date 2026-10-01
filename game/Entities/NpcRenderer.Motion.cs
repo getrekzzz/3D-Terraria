@@ -56,7 +56,8 @@ public sealed partial class NpcRenderer
                 view.Turn = want;
                 return;
         }
-        view.Turn = view.Turn.Slerp(want, 1f - Mathf.Exp(-dt * 8f));
+        // Renormalised each frame: repeated slerps drift off unit length, which Godot rejects.
+        view.Turn = view.Turn.Normalized().Slerp(want.Normalized(), 1f - Mathf.Exp(-dt * 8f)).Normalized();
         view.Yaw = view.Turn.GetEuler().Y;
     }
 
@@ -108,6 +109,12 @@ public sealed partial class NpcRenderer
             view.Spin = Mathf.Max(0f, view.Spin - dt);
             turn = new Quaternion(Vector3.Up, Mathf.Tau * 3f * Mathf.Pow(view.Spin, 2f)) * turn;
         }
+        // A spinning skull whirls about its own axis (its simulated facing holds still so its hands keep their sides);
+        // after the spin it winds on to the next full turn.
+        view.Whirl = npc.Pose == "spin" ? (view.Whirl + dt * 18f) % Mathf.Tau
+            : view.Whirl > 0f ? Mathf.MoveToward(view.Whirl, Mathf.Tau, dt * 12f) % Mathf.Tau : 0f;
+        if (view.Whirl > 0f) turn = new Quaternion(Vector3.Up, view.Whirl) * turn;
+        if (npc.Mirrored) scale.X = -scale.X; // a left hand (after the facing, so it mirrors in the model's own frame)
         if (npc.Segments.Count == 0 || npc.Def.Boss!.SegmentModels.Length > 0) visual.Basis = new Basis(turn) * Basis.FromScale(scale);
         else visual.Scale = scale;
 

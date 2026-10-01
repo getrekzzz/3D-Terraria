@@ -13,6 +13,7 @@ public static class BrainSpecs
     public const string Swimmer = "swimmer";
     public const string Lunger = "lunger";
     public const string CryptWarden = "skeletron";
+    public const string Hand = "skeletronHand";
     public const string Caster = "caster";
     public const string Mawwall = "wallOfFlesh";
     public const string Pattern = "pattern";
@@ -29,6 +30,7 @@ public static class BrainSpecs
         c.Register<SwimmerParams>(SpecKind.Brain, Swimmer);
         c.Register<LungerParams>(SpecKind.Brain, Lunger);
         c.Register<CryptWardenParams>(SpecKind.Brain, CryptWarden);
+        c.Register<HandParams>(SpecKind.Brain, Hand);
         c.Register<CasterParams>(SpecKind.Brain, Caster);
         c.Register<MawwallParams>(SpecKind.Brain, Mawwall);
         c.Register<PatternParams>(SpecKind.Brain, Pattern);
@@ -163,25 +165,47 @@ public sealed class LungerParams : SpecParams, IValidatableSpec
     public string? Validate() => Reach <= 0 ? "reach must be > 0" : null;
 }
 
-/// <summary>A floating skull with two free hands: hovers over the target swiping, then spins through walls at it.</summary>
+/// <summary>
+/// A floating skull with two hands (boss parts, or legacy segments for Prime): hovers over the target, then spins
+/// through walls at it with lowered defense; in Expert its living hands armour it and it fires homing skulls.
+/// </summary>
 public sealed class CryptWardenParams : SpecParams
 {
     /// <summary>Hover height above the target (m).</summary>
     public float HoverHeight { get; init; } = 6f;
 
-    /// <summary>Distance of each hand from the skull (m).</summary>
+    /// <summary>Segment hands (Prime): distance of each hand from the skull (m).</summary>
     public float HandSpacing { get; init; } = 2.6f;
 
-    /// <summary>Ticks between hand swipes (hands alternate).</summary>
+    /// <summary>Segment hands (Prime): ticks between hand swipes (hands alternate).</summary>
     public int SwipeInterval { get; init; } = 100;
 
-    /// <summary>Ticks of hovering before a spin charge, and the charge's length.</summary>
-    public int SpinInterval { get; init; } = 540;
-    public int SpinDuration { get; init; } = 240;
+    /// <summary>Ticks of hovering before a spin charge, and the charge's length (Terraria: 800 and 400).</summary>
+    public int SpinInterval { get; init; } = 800;
+    public int SpinDuration { get; init; } = 400;
 
     public float SpinSpeed { get; init; } = 9f;
 
-    /// <summary>Only the first N hands swipe (the rest are guns that hold position); 0 = every hand.</summary>
+    /// <summary>Defense added while spinning (Terraria: −10).</summary>
+    public int SpinDefense { get; init; }
+
+    /// <summary>Movement speed added per lost hand (0.25 = a quarter faster for each).</summary>
+    public float SpeedPerLostHand { get; init; } = 0.25f;
+
+    /// <summary>Expert: defense each living hand adds while hovering.</summary>
+    public int ExpertDefensePerHand { get; init; }
+
+    /// <summary>
+    /// Expert: hostile projectile fired at the target every <see cref="SkullInterval"/> ticks (half that with no hands)
+    /// while hovering, once a hand has fallen or life is below <see cref="SkullLife"/>.
+    /// </summary>
+    public string? Skull { get; init; }
+    public int SkullDamage { get; init; } = 17;
+    public float SkullSpeed { get; init; } = 8f;
+    public int SkullInterval { get; init; } = 80;
+    public float SkullLife { get; init; } = 0.75f;
+
+    /// <summary>Segment hands (Prime): only the first N hands swipe (the rest are guns that hold position); 0 = every hand.</summary>
     public int SwipingHands { get; init; }
 
     /// <summary>Below this life fraction the warden is enraged (faster swipes, enraged ranged attack); 0 = never.</summary>

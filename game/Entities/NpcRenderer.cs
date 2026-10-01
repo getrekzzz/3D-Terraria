@@ -27,7 +27,7 @@ public sealed partial class NpcRenderer : Node3D
         public float Squash = 1f;
         public float LastVy;
         public Quaternion Turn = Quaternion.Identity;
-        public float Yaw, Bank, Stretch, Spin, Blink = 1f;
+        public float Yaw, Bank, Stretch, Spin, Whirl, Blink = 1f;
         public int LastAttackTimer, LastHurtFlash, LastSwing = -1000;
     }
 
@@ -131,6 +131,7 @@ public sealed partial class NpcRenderer : Node3D
                 UpdateSegments(npc, view, world);
                 UpdateArms(npc, view);
             }
+            else if (npc.Def.Boss is { Parts.Length: > 0, ArmModel: not null }) UpdatePartArms(npc, view);
             if (npc.Barrier != null) UpdateBarrier(npc, view, world);
             if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
             {

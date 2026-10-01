@@ -44,9 +44,15 @@ public sealed partial class NpcSystem
         }
     }
 
-    /// <summary>Base damage of touching the creature (or its barrier): the enrage's fixed damage while frenzied.</summary>
-    private int ContactBase(Npc npc) =>
-        npc.Frenzied && npc.Def.Boss?.Enrage?.SetDamage is { } set ? set : (int)(npc.Def.Damage * npc.DamageScale * Scale);
+    /// <summary>
+    /// Base damage of touching the creature (or its barrier): the enrage's fixed damage while frenzied. A boss part
+    /// without a rage of its own that its brain marks frenzied (Skeletron's hands) uses its body's.
+    /// </summary>
+    internal int ContactBase(Npc npc)
+    {
+        var rage = npc.Def.Boss?.Enrage ?? (npc.IsPart ? npc.Leader!.Def.Boss?.Enrage : null);
+        return npc.Frenzied && rage?.SetDamage is { } set ? set : (int)(npc.Def.Damage * npc.DamageScale * Scale);
+    }
 
     /// <summary>Raises <see cref="Announced"/> and <see cref="Messaged"/> with the message's kind.</summary>
     private void Announce(string text, MessageKind kind)

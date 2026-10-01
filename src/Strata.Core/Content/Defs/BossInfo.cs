@@ -1,12 +1,5 @@
 namespace Strata.Core.Content.Defs;
 
-/// <summary>Multipliers a boss gets while the sun is up.</summary>
-public sealed class DayEnrage
-{
-    public float Damage { get; init; } = 4f;
-    public float Speed { get; init; } = 2f;
-}
-
 /// <summary>
 /// Data-driven enrage: while <see cref="When"/> holds where the boss's target stands (checked twice a second), the boss
 /// is <see cref="Gameplay.Entities.Npc.Frenzied"/> and fights with these multipliers or fixed values (Terraria's
@@ -75,13 +68,10 @@ public sealed class BossInfo
     public string[] SegmentModels { get; init; } = Array.Empty<string>();
 
     /// <summary>
-    /// Model stretched from the head to each free part (<see cref="SegmentModels"/>) as a two-bone arm with an outward
+    /// Model stretched from the head to each free part (<see cref="Parts"/>, or <see cref="SegmentModels"/>) as a two-bone arm with an outward
     /// elbow (Skeletron's bones, Prime's struts); modelled along +Y, one unit long.
     /// </summary>
     public string? ArmModel { get; init; }
-
-    /// <summary>Stronger by day instead of leaving (the crypt's curse): multipliers on damage and speed.</summary>
-    public DayEnrage? DayEnrage { get; init; }
 
     /// <summary>Model tiled over the creature's <see cref="Gameplay.Entities.Npc.Barrier"/> (a wall's flesh), and its tile size (m).</summary>
     public string? BarrierModel { get; init; }

@@ -101,6 +101,7 @@ public static class BrainFactory
         BrainSpecs.Swimmer => new SwimmerBrain(spec.Parse<SwimmerParams>()),
         BrainSpecs.Lunger => new LungerBrain(spec.Parse<LungerParams>()),
         BrainSpecs.CryptWarden => new CryptWardenBrain(spec.Parse<CryptWardenParams>()),
+        BrainSpecs.Hand => new HandBrain(spec.Parse<HandParams>()),
         BrainSpecs.Caster => new CasterBrain(spec.Parse<CasterParams>()),
         BrainSpecs.Mawwall => new MawwallBrain(spec.Parse<MawwallParams>()),
         BrainSpecs.Pattern => new PatternBrain(spec.Parse<PatternParams>()),
