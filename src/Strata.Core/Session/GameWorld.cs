@@ -172,6 +172,7 @@ public sealed partial class GameWorld : IDisposable
                 p.RespawnTicks = RespawnDelayTicks;
                 state.Deaths++;
                 state.Buffs.ClearNonPersistent();
+                state.Recompute(); // no debuff effect (confusion) lingers on the corpse
                 ApplyDeathPenalty(p);
                 DropTombstone(p);
                 PlayerDied?.Invoke(p);

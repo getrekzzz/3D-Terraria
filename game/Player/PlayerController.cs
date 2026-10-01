@@ -143,7 +143,7 @@ public sealed partial class PlayerController : CharacterBody3D
         if (_climbing) speed *= 0.6f;
 
         bool blocked = UI.InputGate.GameplayBlocked;
-        var input = blocked ? Vector2.Zero : Input.GetVector("move_left", "move_right", "move_forward", "move_back");
+        var input = MoveInput(); // reversed while confused (Status)
         var wish = Rig.YawBasis * new Vector3(input.X, 0, input.Y);
         var v = Velocity;
         var horizontal = new Vector3(v.X, 0, v.Z);

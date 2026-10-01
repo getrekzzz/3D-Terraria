@@ -6,8 +6,8 @@
   "buffs": [
     { "id": "frostburn", "name": "Frostburn", "description": "It's either really hot or really cold. Either way it REALLY hurts.", "debuff": true, "color": "#8ae0ff", "tags": ["fire"],
       "effects": [{ "type": "damageOverTime", "perSecond": 8 }, { "type": "emitLight", "color": [4, 8, 12] }] },
-    { "id": "confused", "name": "Confused", "description": "Movement is disoriented.", "debuff": true, "color": "#c880ff",
-      "effects": [{ "type": "stat", "stat": "moveSpeed", "add": -0.4 }], "covers": ["terraria:confused"] }
+    { "id": "confused", "name": "Confused", "description": "Your movement keys are reversed.", "debuff": true, "color": "#c880ff",
+      "effects": [{ "type": "invertControls" }], "covers": ["terraria:confused"] }
   ],
   "projectiles": [
     { "id": "cultist_fireball", "name": "Fireball", "visual": "orb", "color": "#ff8a2a", "lifetime": 200, "radius": 0.5, "friendly": false, "hostile": true, "light": [14, 7, 2], "trail": "#ffb04a" },

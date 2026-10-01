@@ -36,6 +36,9 @@ public static class EffectSpecs
     /// <summary>An information readout on the HUD (Depth Meter: depth, Compass: position, GPS: both and time).</summary>
     public const string Info = "info";
 
+    /// <summary>Movement keys are reversed (Confused): strafe always, forward/back unless <c>forward</c> is false.</summary>
+    public const string InvertControls = "invertControls";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -54,6 +57,7 @@ public static class EffectSpecs
         c.Register<PacifyParams>(SpecKind.Effect, Pacify);
         c.Register<InflictParams>(SpecKind.Effect, Inflict);
         c.Register<InfoParams>(SpecKind.Effect, Info);
+        c.Register<InvertControlsParams>(SpecKind.Effect, InvertControls);
     }
 }
 
@@ -155,4 +159,10 @@ public sealed class InfoParams : SpecParams, IValidatableSpec
     public string[] Show { get; init; } = Array.Empty<string>();
 
     public string? Validate() => Show.All(k => Array.IndexOf(Kinds, k) >= 0) ? null : $"show must be of {string.Join(", ", Kinds)}";
+}
+
+public sealed class InvertControlsParams : SpecParams
+{
+    /// <summary>Also reverse forward and back (Terraria's 2D confusion only swaps left and right).</summary>
+    public bool Forward { get; init; } = true;
 }

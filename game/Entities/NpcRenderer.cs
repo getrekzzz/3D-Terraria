@@ -23,6 +23,8 @@ public sealed partial class NpcRenderer : Node3D
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public readonly List<CreatureVisual> Barrier = new();
         public readonly List<CreatureVisual> Arms = new();
+        public readonly List<CreatureVisual> Illusions = new();
+        public string? IllusionModel;
         public Vector3 Shown;
         public float Squash = 1f;
         public float LastVy;
@@ -70,6 +72,7 @@ public sealed partial class NpcRenderer : Node3D
             if (!KeepCorpse(npc, view)) Release(view.Visual, view.Model);
             foreach (var (seg, model) in view.Segments) Release(seg, model);
             ReleaseArms(npc, view);
+            ReleaseIllusions(view);
             if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
             view.Health.QueueFree();
             view.Stalk?.QueueFree();
@@ -139,6 +142,7 @@ public sealed partial class NpcRenderer : Node3D
             }
             else Orient(npc, view, dt);
             Animate(npc, view, dt);
+            if (npc.Illusions > 0 || view.Illusions.Count > 0) UpdateIllusions(npc, view);
             if (view.Stalk != null) UpdateStalk(npc, view);
             var tint = Color.FromHtml(npc.Def.Tint);
             if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);

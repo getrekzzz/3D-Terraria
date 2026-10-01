@@ -35,13 +35,18 @@ public sealed partial class NpcSystem
         {
             if (thought) npc.DamageScale *= rage.Damage;
             npc.SpeedScale = rage.Speed;
-            npc.DefenseOverride = rage.SetDefense;
+            if (rage.SetDefense is { } defense) npc.DefenseOverride = defense;
         }
-        else
-        {
-            npc.SpeedScale = 1f;
-            npc.DefenseOverride = null;
-        }
+        else npc.SpeedScale = 1f; // the override (an enrage's or a phase's) is cleared before each think
+    }
+
+    /// <summary>Living creatures of a kind (allocation-free: brains ask every tick).</summary>
+    private int CountAlive(string id)
+    {
+        int n = 0;
+        for (int i = 0; i < _npcs.Count; i++)
+            if (_npcs[i].Alive && _npcs[i].Def.Id == id) n++;
+        return n;
     }
 
     /// <summary>
