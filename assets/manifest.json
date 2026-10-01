@@ -475,7 +475,7 @@
    "model": "assets/models/items/adamantite_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.882 0 > 0 1 0"
    },
    "icon": "assets/icons/items/adamantite_axe.png"
   },
@@ -486,7 +486,7 @@
   "adamantite_bow": {
    "model": "assets/models/items/adamantite_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.18 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/adamantite_bow.png"
@@ -495,12 +495,13 @@
    "model": "assets/models/items/adamantite_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "-0.0672 1.098 0 > 0 1 0"
    },
    "icon": "assets/icons/items/adamantite_broadsword.png"
   },
   "adamantite_chainmail": {
    "model": "assets/models/items/adamantite_chainmail.glb",
+   "armor": "adamantite_armor",
    "icon": "assets/icons/items/adamantite_chainmail.png"
   },
   "adamantite_chainsaw": {
@@ -525,25 +526,27 @@
   },
   "adamantite_greaves": {
    "model": "assets/models/items/adamantite_greaves.glb",
+   "armor": "adamantite_armor",
    "icon": "assets/icons/items/adamantite_greaves.png"
   },
   "adamantite_hammer": {
    "model": "assets/models/items/adamantite_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.84 0 > 0 1 0"
    },
    "icon": "assets/icons/items/adamantite_hammer.png"
   },
   "adamantite_helmet": {
    "model": "assets/models/items/adamantite_helmet.glb",
+   "armor": "adamantite_armor",
    "icon": "assets/icons/items/adamantite_helmet.png"
   },
   "adamantite_pickaxe": {
    "model": "assets/models/items/adamantite_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.83 0 > 0 1 0"
    },
    "icon": "assets/icons/items/adamantite_pickaxe.png"
   },
@@ -551,7 +554,7 @@
    "model": "assets/models/items/adamantite_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 1.098 0 > 0 1 0"
    },
    "icon": "assets/icons/items/adamantite_shortsword.png"
   },
@@ -607,6 +610,7 @@
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
+   "worn": "shield",
    "icon": "assets/icons/items/ankh_shield.png"
   },
   "anklet_of_the_wind": {
@@ -667,10 +671,12 @@
   },
   "bee_breastplate": {
    "model": "assets/models/items/bee_breastplate.glb",
+   "armor": "bee_armor",
    "icon": "assets/icons/items/bee_breastplate.png"
   },
   "bee_greaves": {
    "model": "assets/models/items/bee_greaves.glb",
+   "armor": "bee_armor",
    "icon": "assets/icons/items/bee_greaves.png"
   },
   "bee_gun": {
@@ -683,13 +689,14 @@
   },
   "bee_headgear": {
    "model": "assets/models/items/bee_headgear.glb",
+   "armor": "bee_armor",
    "icon": "assets/icons/items/bee_headgear.png"
   },
   "bee_keeper": {
    "model": "assets/models/items/bee_keeper.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.95 0 > 0 1 0"
+    "tip": "0 0.948 0 > 0 1 0"
    },
    "icon": "assets/icons/items/bee_keeper.png"
   },
@@ -707,13 +714,14 @@
   "bees_knees": {
    "model": "assets/models/items/bees_knees.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/bees_knees.png"
   },
   "beetle_helmet": {
    "model": "assets/models/items/beetle_helmet.glb",
+   "armor": "beetle_armor",
    "icon": "assets/icons/items/beetle_helmet.png"
   },
   "beetle_husk": {
@@ -722,10 +730,12 @@
   },
   "beetle_leggings": {
    "model": "assets/models/items/beetle_leggings.glb",
+   "armor": "beetle_armor",
    "icon": "assets/icons/items/beetle_leggings.png"
   },
   "beetle_shell": {
    "model": "assets/models/items/beetle_shell.glb",
+   "armor": "beetle_armor",
    "icon": "assets/icons/items/beetle_shell.png"
   },
   "betsy_wings": {
@@ -754,7 +764,7 @@
    "model": "assets/models/items/blade_of_grass.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.05 0 > 0 1 0"
+    "tip": "0 1.048 0 > 0 1 0"
    },
    "icon": "assets/icons/items/blade_of_grass.png"
   },
@@ -864,7 +874,7 @@
    "model": "assets/models/items/breaker_blade.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.3 0 > 0 1 0"
+    "tip": "-0.1408 1.448 0 > 0 1 0"
    },
    "icon": "assets/icons/items/breaker_blade.png"
   },
@@ -872,7 +882,7 @@
    "model": "assets/models/items/broken_hero_sword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.6 0 > 0 1 0"
+    "tip": "0 0.598 0 > 0 1 0"
    },
    "icon": "assets/icons/items/broken_hero_sword.png"
   },
@@ -923,7 +933,7 @@
    "model": "assets/models/items/cactus_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cactus_pickaxe.png"
   },
@@ -931,7 +941,7 @@
    "model": "assets/models/items/cactus_sword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.85 0 > 0 1 0"
+    "tip": "0 0.848 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cactus_sword.png"
   },
@@ -965,7 +975,7 @@
    "model": "assets/models/items/chain_gun.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.75 -0.04 > 0 1 0"
+    "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/chain_gun.png"
   },
@@ -975,29 +985,32 @@
   },
   "chlorophyte_greaves": {
    "model": "assets/models/items/chlorophyte_greaves.glb",
+   "armor": "chlorophyte_armor",
    "icon": "assets/icons/items/chlorophyte_greaves.png"
   },
   "chlorophyte_mask": {
    "model": "assets/models/items/chlorophyte_mask.glb",
+   "armor": "chlorophyte_armor",
    "icon": "assets/icons/items/chlorophyte_mask.png"
   },
   "chlorophyte_pickaxe": {
    "model": "assets/models/items/chlorophyte_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/chlorophyte_pickaxe.png"
   },
   "chlorophyte_plate_mail": {
    "model": "assets/models/items/chlorophyte_plate_mail.glb",
+   "armor": "chlorophyte_armor",
    "icon": "assets/icons/items/chlorophyte_plate_mail.png"
   },
   "christmas_tree_sword": {
    "model": "assets/models/items/christmas_tree_sword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.2 0 > 0 1 0"
+    "tip": "0 1.198 0 > 0 1 0"
    },
    "icon": "assets/icons/items/christmas_tree_sword.png"
   },
@@ -1011,6 +1024,7 @@
   },
   "cloud_in_a_balloon": {
    "model": "assets/models/items/cloud_in_a_balloon.glb",
+   "worn": "balloon",
    "icon": "assets/icons/items/cloud_in_a_balloon.png"
   },
   "cloud_in_a_bottle": {
@@ -1021,7 +1035,7 @@
    "model": "assets/models/items/cobalt_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.8306 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cobalt_axe.png"
   },
@@ -1032,7 +1046,7 @@
   "cobalt_bow": {
    "model": "assets/models/items/cobalt_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.13 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/cobalt_bow.png"
@@ -1041,12 +1055,13 @@
    "model": "assets/models/items/cobalt_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 1.018 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cobalt_broadsword.png"
   },
   "cobalt_chainmail": {
    "model": "assets/models/items/cobalt_chainmail.glb",
+   "armor": "cobalt_armor",
    "icon": "assets/icons/items/cobalt_chainmail.png"
   },
   "cobalt_chainsaw": {
@@ -1067,25 +1082,27 @@
   },
   "cobalt_greaves": {
    "model": "assets/models/items/cobalt_greaves.glb",
+   "armor": "cobalt_armor",
    "icon": "assets/icons/items/cobalt_greaves.png"
   },
   "cobalt_hammer": {
    "model": "assets/models/items/cobalt_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7648 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cobalt_hammer.png"
   },
   "cobalt_helmet": {
    "model": "assets/models/items/cobalt_helmet.glb",
+   "armor": "cobalt_armor",
    "icon": "assets/icons/items/cobalt_helmet.png"
   },
   "cobalt_pickaxe": {
    "model": "assets/models/items/cobalt_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.8025 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cobalt_pickaxe.png"
   },
@@ -1094,13 +1111,14 @@
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
+   "worn": "shield",
    "icon": "assets/icons/items/cobalt_shield.png"
   },
   "cobalt_shortsword": {
    "model": "assets/models/items/cobalt_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 1.018 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cobalt_shortsword.png"
   },
@@ -1128,7 +1146,7 @@
    "model": "assets/models/items/copper_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.76 0 > 0 1 0"
    },
    "icon": "assets/icons/items/copper_axe.png"
   },
@@ -1139,7 +1157,7 @@
   "copper_bow": {
    "model": "assets/models/items/copper_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/copper_bow.png"
@@ -1148,12 +1166,13 @@
    "model": "assets/models/items/copper_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.778 0 > 0 1 0"
    },
    "icon": "assets/icons/items/copper_broadsword.png"
   },
   "copper_chainmail": {
    "model": "assets/models/items/copper_chainmail.glb",
+   "armor": "copper_armor",
    "icon": "assets/icons/items/copper_chainmail.png"
   },
   "copper_coin": {
@@ -1162,25 +1181,27 @@
   },
   "copper_greaves": {
    "model": "assets/models/items/copper_greaves.glb",
+   "armor": "copper_armor",
    "icon": "assets/icons/items/copper_greaves.png"
   },
   "copper_hammer": {
    "model": "assets/models/items/copper_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7648 0 > 0 1 0"
    },
    "icon": "assets/icons/items/copper_hammer.png"
   },
   "copper_helmet": {
    "model": "assets/models/items/copper_helmet.glb",
+   "armor": "copper_armor",
    "icon": "assets/icons/items/copper_helmet.png"
   },
   "copper_pickaxe": {
    "model": "assets/models/items/copper_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.75 0 > 0 1 0"
    },
    "icon": "assets/icons/items/copper_pickaxe.png"
   },
@@ -1188,7 +1209,7 @@
    "model": "assets/models/items/copper_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.778 0 > 0 1 0"
    },
    "icon": "assets/icons/items/copper_shortsword.png"
   },
@@ -1204,7 +1225,7 @@
    "model": "assets/models/items/crimtane_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.88 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crimtane_axe.png"
   },
@@ -1215,7 +1236,7 @@
   "crimtane_bow": {
    "model": "assets/models/items/crimtane_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/crimtane_bow.png"
@@ -1224,35 +1245,38 @@
    "model": "assets/models/items/crimtane_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.978 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crimtane_broadsword.png"
   },
   "crimtane_chainmail": {
    "model": "assets/models/items/crimtane_chainmail.glb",
+   "armor": "crimtane_armor",
    "icon": "assets/icons/items/crimtane_chainmail.png"
   },
   "crimtane_greaves": {
    "model": "assets/models/items/crimtane_greaves.glb",
+   "armor": "crimtane_armor",
    "icon": "assets/icons/items/crimtane_greaves.png"
   },
   "crimtane_hammer": {
    "model": "assets/models/items/crimtane_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.845 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crimtane_hammer.png"
   },
   "crimtane_helmet": {
    "model": "assets/models/items/crimtane_helmet.glb",
+   "armor": "crimtane_armor",
    "icon": "assets/icons/items/crimtane_helmet.png"
   },
   "crimtane_pickaxe": {
    "model": "assets/models/items/crimtane_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.8393 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crimtane_pickaxe.png"
   },
@@ -1260,7 +1284,7 @@
    "model": "assets/models/items/crimtane_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.978 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crimtane_shortsword.png"
   },
@@ -1302,7 +1326,7 @@
    "model": "assets/models/items/cutlass.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.95 0 > 0 1 0"
+    "tip": "0 0.948 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cutlass.png"
   },
@@ -1316,7 +1340,7 @@
   "daedalus_stormbow": {
    "model": "assets/models/items/daedalus_stormbow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/daedalus_stormbow.png"
@@ -1361,7 +1385,7 @@
    "model": "assets/models/items/death_sickle.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "-0.66 0.8 0 > -1 0 0"
    },
    "icon": "assets/icons/items/death_sickle.png"
   },
@@ -1395,7 +1419,7 @@
    "model": "assets/models/items/demonite_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.88 0 > 0 1 0"
    },
    "icon": "assets/icons/items/demonite_axe.png"
   },
@@ -1406,7 +1430,7 @@
   "demonite_bow": {
    "model": "assets/models/items/demonite_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.13 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/demonite_bow.png"
@@ -1415,35 +1439,38 @@
    "model": "assets/models/items/demonite_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.948 0 > 0 1 0"
    },
    "icon": "assets/icons/items/demonite_broadsword.png"
   },
   "demonite_chainmail": {
    "model": "assets/models/items/demonite_chainmail.glb",
+   "armor": "demonite_armor",
    "icon": "assets/icons/items/demonite_chainmail.png"
   },
   "demonite_greaves": {
    "model": "assets/models/items/demonite_greaves.glb",
+   "armor": "demonite_armor",
    "icon": "assets/icons/items/demonite_greaves.png"
   },
   "demonite_hammer": {
    "model": "assets/models/items/demonite_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.83 0 > 0 1 0"
    },
    "icon": "assets/icons/items/demonite_hammer.png"
   },
   "demonite_helmet": {
    "model": "assets/models/items/demonite_helmet.glb",
+   "armor": "demonite_armor",
    "icon": "assets/icons/items/demonite_helmet.png"
   },
   "demonite_pickaxe": {
    "model": "assets/models/items/demonite_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.83 0 > 0 1 0"
    },
    "icon": "assets/icons/items/demonite_pickaxe.png"
   },
@@ -1451,7 +1478,7 @@
    "model": "assets/models/items/demonite_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.948 0 > 0 1 0"
    },
    "icon": "assets/icons/items/demonite_shortsword.png"
   },
@@ -1508,7 +1535,7 @@
    "model": "assets/models/items/elf_melter.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.75 -0.04 > 0 1 0"
+    "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/elf_melter.png"
   },
@@ -1553,7 +1580,7 @@
    "model": "assets/models/items/enchanted_sword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1 0 > 0 1 0"
+    "tip": "0 0.998 0 > 0 1 0"
    },
    "icon": "assets/icons/items/enchanted_sword.png"
   },
@@ -1572,7 +1599,7 @@
    "model": "assets/models/items/excalibur.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.05 0 > 0 1 0"
+    "tip": "0 1.048 0 > 0 1 0"
    },
    "icon": "assets/icons/items/excalibur.png"
   },
@@ -1714,7 +1741,7 @@
    "model": "assets/models/items/flying_dragon.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.2 0 > 0 1 0"
+    "tip": "0 1.198 0 > 0 1 0"
    },
    "icon": "assets/icons/items/flying_dragon.png"
   },
@@ -1746,7 +1773,7 @@
    "model": "assets/models/items/gold_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.84 0 > 0 1 0"
    },
    "icon": "assets/icons/items/gold_axe.png"
   },
@@ -1757,7 +1784,7 @@
   "gold_bow": {
    "model": "assets/models/items/gold_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.13 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/gold_bow.png"
@@ -1766,12 +1793,13 @@
    "model": "assets/models/items/gold_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.958 0 > 0 1 0"
    },
    "icon": "assets/icons/items/gold_broadsword.png"
   },
   "gold_chainmail": {
    "model": "assets/models/items/gold_chainmail.glb",
+   "armor": "gold_armor",
    "icon": "assets/icons/items/gold_chainmail.png"
   },
   "gold_chest": {
@@ -1784,25 +1812,27 @@
   },
   "gold_greaves": {
    "model": "assets/models/items/gold_greaves.glb",
+   "armor": "gold_armor",
    "icon": "assets/icons/items/gold_greaves.png"
   },
   "gold_hammer": {
    "model": "assets/models/items/gold_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.761 0 > 0 1 0"
    },
    "icon": "assets/icons/items/gold_hammer.png"
   },
   "gold_helmet": {
    "model": "assets/models/items/gold_helmet.glb",
+   "armor": "gold_armor",
    "icon": "assets/icons/items/gold_helmet.png"
   },
   "gold_pickaxe": {
    "model": "assets/models/items/gold_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7825 0 > 0 1 0"
    },
    "icon": "assets/icons/items/gold_pickaxe.png"
   },
@@ -1810,7 +1840,7 @@
    "model": "assets/models/items/gold_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.958 0 > 0 1 0"
    },
    "icon": "assets/icons/items/gold_shortsword.png"
   },
@@ -1886,20 +1916,23 @@
   },
   "hallowed_greaves": {
    "model": "assets/models/items/hallowed_greaves.glb",
+   "armor": "radiant_armor",
    "icon": "assets/icons/items/hallowed_greaves.png"
   },
   "hallowed_helmet": {
    "model": "assets/models/items/hallowed_helmet.glb",
+   "armor": "radiant_armor",
    "icon": "assets/icons/items/hallowed_helmet.png"
   },
   "hallowed_plate_mail": {
    "model": "assets/models/items/hallowed_plate_mail.glb",
+   "armor": "radiant_armor",
    "icon": "assets/icons/items/hallowed_plate_mail.png"
   },
   "hallowed_repeater": {
    "model": "assets/models/items/hallowed_repeater.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/hallowed_repeater.png"
@@ -1908,7 +1941,7 @@
    "model": "assets/models/items/hammush.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7563 0 > 0 1 0"
    },
    "icon": "assets/icons/items/hammush.png"
   },
@@ -1944,7 +1977,7 @@
    "model": "assets/models/items/hellstone_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.88 0 > 0 1 0"
    },
    "icon": "assets/icons/items/hellstone_axe.png"
   },
@@ -1955,7 +1988,7 @@
   "hellstone_bow": {
    "model": "assets/models/items/hellstone_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.1 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/hellstone_bow.png"
@@ -1964,35 +1997,38 @@
    "model": "assets/models/items/hellstone_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "-0.0066 1.078 0 > 0 1 0"
    },
    "icon": "assets/icons/items/hellstone_broadsword.png"
   },
   "hellstone_chainmail": {
    "model": "assets/models/items/hellstone_chainmail.glb",
+   "armor": "hellstone_armor",
    "icon": "assets/icons/items/hellstone_chainmail.png"
   },
   "hellstone_greaves": {
    "model": "assets/models/items/hellstone_greaves.glb",
+   "armor": "hellstone_armor",
    "icon": "assets/icons/items/hellstone_greaves.png"
   },
   "hellstone_hammer": {
    "model": "assets/models/items/hellstone_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.82 0 > 0 1 0"
    },
    "icon": "assets/icons/items/hellstone_hammer.png"
   },
   "hellstone_helmet": {
    "model": "assets/models/items/hellstone_helmet.glb",
+   "armor": "hellstone_armor",
    "icon": "assets/icons/items/hellstone_helmet.png"
   },
   "hellstone_pickaxe": {
    "model": "assets/models/items/hellstone_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7771 0 > 0 1 0"
    },
    "icon": "assets/icons/items/hellstone_pickaxe.png"
   },
@@ -2000,7 +2036,7 @@
    "model": "assets/models/items/hellstone_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 1.078 0 > 0 1 0"
    },
    "icon": "assets/icons/items/hellstone_shortsword.png"
   },
@@ -2062,7 +2098,7 @@
    "model": "assets/models/items/influx_waver.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.25 0 > 0 1 0"
+    "tip": "0.03 1.25 0 > 0 1 0"
    },
    "icon": "assets/icons/items/influx_waver.png"
   },
@@ -2085,7 +2121,7 @@
   "iron_bow": {
    "model": "assets/models/items/iron_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.08 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/iron_bow.png"
@@ -2094,7 +2130,7 @@
    "model": "assets/models/items/iron_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.878 0 > 0 1 0"
    },
    "icon": "assets/icons/items/iron_broadsword.png"
   },
@@ -2108,6 +2144,7 @@
   },
   "iron_chainmail": {
    "model": "assets/models/items/iron_chainmail.glb",
+   "armor": "iron_armor",
    "icon": "assets/icons/items/iron_chainmail.png"
   },
   "iron_crate": {
@@ -2116,25 +2153,27 @@
   },
   "iron_greaves": {
    "model": "assets/models/items/iron_greaves.glb",
+   "armor": "iron_armor",
    "icon": "assets/icons/items/iron_greaves.png"
   },
   "iron_hammer": {
    "model": "assets/models/items/iron_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7563 0 > 0 1 0"
    },
    "icon": "assets/icons/items/iron_hammer.png"
   },
   "iron_helmet": {
    "model": "assets/models/items/iron_helmet.glb",
+   "armor": "iron_armor",
    "icon": "assets/icons/items/iron_helmet.png"
   },
   "iron_pickaxe": {
    "model": "assets/models/items/iron_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/iron_pickaxe.png"
   },
@@ -2142,7 +2181,7 @@
    "model": "assets/models/items/iron_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.878 0 > 0 1 0"
    },
    "icon": "assets/icons/items/iron_shortsword.png"
   },
@@ -2168,14 +2207,17 @@
   },
   "jungle_hat": {
    "model": "assets/models/items/jungle_hat.glb",
+   "armor": "jungle_armor",
    "icon": "assets/icons/items/jungle_hat.png"
   },
   "jungle_pants": {
    "model": "assets/models/items/jungle_pants.glb",
+   "armor": "jungle_armor",
    "icon": "assets/icons/items/jungle_pants.png"
   },
   "jungle_shirt": {
    "model": "assets/models/items/jungle_shirt.glb",
+   "armor": "jungle_armor",
    "icon": "assets/icons/items/jungle_shirt.png"
   },
   "jungle_spores": {
@@ -2186,7 +2228,7 @@
    "model": "assets/models/items/katana.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.1 0 > 0 1 0"
+    "tip": "0 1.098 0 > 0 1 0"
    },
    "icon": "assets/icons/items/katana.png"
   },
@@ -2194,7 +2236,7 @@
    "model": "assets/models/items/laser_machinegun.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.75 -0.04 > 0 1 0"
+    "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/laser_machinegun.png"
   },
@@ -2232,7 +2274,7 @@
    "model": "assets/models/items/lead_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.7864 0 > 0 1 0"
    },
    "icon": "assets/icons/items/lead_axe.png"
   },
@@ -2243,7 +2285,7 @@
   "lead_bow": {
    "model": "assets/models/items/lead_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.12 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/lead_bow.png"
@@ -2252,35 +2294,38 @@
    "model": "assets/models/items/lead_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.858 0 > 0 1 0"
    },
    "icon": "assets/icons/items/lead_broadsword.png"
   },
   "lead_chainmail": {
    "model": "assets/models/items/lead_chainmail.glb",
+   "armor": "lead_armor",
    "icon": "assets/icons/items/lead_chainmail.png"
   },
   "lead_greaves": {
    "model": "assets/models/items/lead_greaves.glb",
+   "armor": "lead_armor",
    "icon": "assets/icons/items/lead_greaves.png"
   },
   "lead_hammer": {
    "model": "assets/models/items/lead_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7648 0 > 0 1 0"
    },
    "icon": "assets/icons/items/lead_hammer.png"
   },
   "lead_helmet": {
    "model": "assets/models/items/lead_helmet.glb",
+   "armor": "lead_armor",
    "icon": "assets/icons/items/lead_helmet.png"
   },
   "lead_pickaxe": {
    "model": "assets/models/items/lead_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.75 0 > 0 1 0"
    },
    "icon": "assets/icons/items/lead_pickaxe.png"
   },
@@ -2288,7 +2333,7 @@
    "model": "assets/models/items/lead_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.858 0 > 0 1 0"
    },
    "icon": "assets/icons/items/lead_shortsword.png"
   },
@@ -2296,7 +2341,7 @@
    "model": "assets/models/items/leaf_blower.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.8 -0.05 > 0 1 0"
+    "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/leaf_blower.png"
   },
@@ -2370,7 +2415,7 @@
    "model": "assets/models/items/lucy_the_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0.33 0.62 0 > 1 0 0"
    },
    "icon": "assets/icons/items/lucy_the_axe.png"
   },
@@ -2397,7 +2442,7 @@
    "model": "assets/models/items/magic_dagger.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.548 0 > 0 1 0"
    },
    "icon": "assets/icons/items/magic_dagger.png"
   },
@@ -2462,10 +2507,12 @@
   },
   "meteor_helmet": {
    "model": "assets/models/items/meteor_helmet.glb",
+   "armor": "meteor_armor",
    "icon": "assets/icons/items/meteor_helmet.png"
   },
   "meteor_leggings": {
    "model": "assets/models/items/meteor_leggings.glb",
+   "armor": "meteor_armor",
    "icon": "assets/icons/items/meteor_leggings.png"
   },
   "meteor_shot": {
@@ -2474,6 +2521,7 @@
   },
   "meteor_suit": {
    "model": "assets/models/items/meteor_suit.glb",
+   "armor": "meteor_armor",
    "icon": "assets/icons/items/meteor_suit.png"
   },
   "meteorite_bar": {
@@ -2490,6 +2538,7 @@
   },
   "mining_helmet": {
    "model": "assets/models/items/mining_helmet.glb",
+   "armor": "mining_helmet",
    "icon": "assets/icons/items/mining_helmet.png"
   },
   "mining_potion": {
@@ -2520,7 +2569,7 @@
    "model": "assets/models/items/muramasa.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1 0 > 0 1 0"
+    "tip": "0.0898 1.05 0 > 0 1 0"
    },
    "icon": "assets/icons/items/muramasa.png"
   },
@@ -2556,7 +2605,7 @@
    "model": "assets/models/items/mythril_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.88 0 > 0 1 0"
    },
    "icon": "assets/icons/items/mythril_axe.png"
   },
@@ -2567,7 +2616,7 @@
   "mythril_bow": {
    "model": "assets/models/items/mythril_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.15 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/mythril_bow.png"
@@ -2576,12 +2625,13 @@
    "model": "assets/models/items/mythril_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0.0827 1.038 0 > 0 1 0"
    },
    "icon": "assets/icons/items/mythril_broadsword.png"
   },
   "mythril_chainmail": {
    "model": "assets/models/items/mythril_chainmail.glb",
+   "armor": "mythril_armor",
    "icon": "assets/icons/items/mythril_chainmail.png"
   },
   "mythril_chainsaw": {
@@ -2602,25 +2652,27 @@
   },
   "mythril_greaves": {
    "model": "assets/models/items/mythril_greaves.glb",
+   "armor": "mythril_armor",
    "icon": "assets/icons/items/mythril_greaves.png"
   },
   "mythril_hammer": {
    "model": "assets/models/items/mythril_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7489 0 > 0 1 0"
    },
    "icon": "assets/icons/items/mythril_hammer.png"
   },
   "mythril_helmet": {
    "model": "assets/models/items/mythril_helmet.glb",
+   "armor": "mythril_armor",
    "icon": "assets/icons/items/mythril_helmet.png"
   },
   "mythril_pickaxe": {
    "model": "assets/models/items/mythril_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.8125 0 > 0 1 0"
    },
    "icon": "assets/icons/items/mythril_pickaxe.png"
   },
@@ -2628,7 +2680,7 @@
    "model": "assets/models/items/mythril_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0.0485 1.038 0 > 0 1 0"
    },
    "icon": "assets/icons/items/mythril_shortsword.png"
   },
@@ -2657,6 +2709,7 @@
   },
   "nebula_breastplate": {
    "model": "assets/models/items/nebula_breastplate.glb",
+   "armor": "nebula_armor",
    "icon": "assets/icons/items/nebula_breastplate.png"
   },
   "nebula_drill": {
@@ -2681,10 +2734,12 @@
   },
   "nebula_helmet": {
    "model": "assets/models/items/nebula_helmet.glb",
+   "armor": "nebula_armor",
    "icon": "assets/icons/items/nebula_helmet.png"
   },
   "nebula_leggings": {
    "model": "assets/models/items/nebula_leggings.glb",
+   "armor": "nebula_armor",
    "icon": "assets/icons/items/nebula_leggings.png"
   },
   "nebula_mantle": {
@@ -2695,20 +2750,23 @@
    "model": "assets/models/items/nebula_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/nebula_pickaxe.png"
   },
   "necro_breastplate": {
    "model": "assets/models/items/necro_breastplate.glb",
+   "armor": "necro_armor",
    "icon": "assets/icons/items/necro_breastplate.png"
   },
   "necro_greaves": {
    "model": "assets/models/items/necro_greaves.glb",
+   "armor": "necro_armor",
    "icon": "assets/icons/items/necro_greaves.png"
   },
   "necro_helmet": {
    "model": "assets/models/items/necro_helmet.glb",
+   "armor": "necro_armor",
    "icon": "assets/icons/items/necro_helmet.png"
   },
   "necromantic_scroll": {
@@ -2738,7 +2796,7 @@
    "model": "assets/models/items/nights_edge.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.1 0 > 0 1 0"
+    "tip": "-0.005 1.098 0 > 0 1 0"
    },
    "icon": "assets/icons/items/nights_edge.png"
   },
@@ -2755,6 +2813,7 @@
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
+   "worn": "shield",
    "icon": "assets/icons/items/obsidian_shield.png"
   },
   "obsidian_skin_potion": {
@@ -2780,7 +2839,7 @@
    "model": "assets/models/items/orichalcum_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.8715 0 > 0 1 0"
    },
    "icon": "assets/icons/items/orichalcum_axe.png"
   },
@@ -2800,12 +2859,13 @@
    "model": "assets/models/items/orichalcum_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 1.038 0 > 0 1 0"
    },
    "icon": "assets/icons/items/orichalcum_broadsword.png"
   },
   "orichalcum_chainmail": {
    "model": "assets/models/items/orichalcum_chainmail.glb",
+   "armor": "orichalcum_armor",
    "icon": "assets/icons/items/orichalcum_chainmail.png"
   },
   "orichalcum_chainsaw": {
@@ -2826,25 +2886,27 @@
   },
   "orichalcum_greaves": {
    "model": "assets/models/items/orichalcum_greaves.glb",
+   "armor": "orichalcum_armor",
    "icon": "assets/icons/items/orichalcum_greaves.png"
   },
   "orichalcum_hammer": {
    "model": "assets/models/items/orichalcum_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7664 0 > 0 1 0"
    },
    "icon": "assets/icons/items/orichalcum_hammer.png"
   },
   "orichalcum_helmet": {
    "model": "assets/models/items/orichalcum_helmet.glb",
+   "armor": "orichalcum_armor",
    "icon": "assets/icons/items/orichalcum_helmet.png"
   },
   "orichalcum_pickaxe": {
    "model": "assets/models/items/orichalcum_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.785 0 > 0 1 0"
    },
    "icon": "assets/icons/items/orichalcum_pickaxe.png"
   },
@@ -2852,7 +2914,7 @@
    "model": "assets/models/items/orichalcum_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 1.038 0 > 0 1 0"
    },
    "icon": "assets/icons/items/orichalcum_shortsword.png"
   },
@@ -2884,7 +2946,7 @@
    "model": "assets/models/items/paladins_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7563 0 > 0 1 0"
    },
    "icon": "assets/icons/items/paladins_hammer.png"
   },
@@ -2892,7 +2954,7 @@
    "model": "assets/models/items/palladium_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.84 0 > 0 1 0"
    },
    "icon": "assets/icons/items/palladium_axe.png"
   },
@@ -2903,7 +2965,7 @@
   "palladium_bow": {
    "model": "assets/models/items/palladium_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.13 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/palladium_bow.png"
@@ -2912,12 +2974,13 @@
    "model": "assets/models/items/palladium_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.998 0 > 0 1 0"
    },
    "icon": "assets/icons/items/palladium_broadsword.png"
   },
   "palladium_chainmail": {
    "model": "assets/models/items/palladium_chainmail.glb",
+   "armor": "palladium_armor",
    "icon": "assets/icons/items/palladium_chainmail.png"
   },
   "palladium_chainsaw": {
@@ -2938,25 +3001,27 @@
   },
   "palladium_greaves": {
    "model": "assets/models/items/palladium_greaves.glb",
+   "armor": "palladium_armor",
    "icon": "assets/icons/items/palladium_greaves.png"
   },
   "palladium_hammer": {
    "model": "assets/models/items/palladium_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7718 0 > 0 1 0"
    },
    "icon": "assets/icons/items/palladium_hammer.png"
   },
   "palladium_helmet": {
    "model": "assets/models/items/palladium_helmet.glb",
+   "armor": "palladium_armor",
    "icon": "assets/icons/items/palladium_helmet.png"
   },
   "palladium_pickaxe": {
    "model": "assets/models/items/palladium_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.75 0 > 0 1 0"
    },
    "icon": "assets/icons/items/palladium_pickaxe.png"
   },
@@ -2964,7 +3029,7 @@
    "model": "assets/models/items/palladium_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.998 0 > 0 1 0"
    },
    "icon": "assets/icons/items/palladium_shortsword.png"
   },
@@ -2976,14 +3041,14 @@
    "model": "assets/models/items/pew_matic_horn.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.8 -0.05 > 0 1 0"
+    "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/pew_matic_horn.png"
   },
   "phantasm": {
    "model": "assets/models/items/phantasm.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/phantasm.png"
@@ -3000,7 +3065,7 @@
    "model": "assets/models/items/pickaxe_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/pickaxe_axe.png"
   },
@@ -3008,7 +3073,7 @@
    "model": "assets/models/items/picksaw.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/picksaw.png"
   },
@@ -3035,7 +3100,7 @@
    "model": "assets/models/items/platinum_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.8568 0 > 0 1 0"
    },
    "icon": "assets/icons/items/platinum_axe.png"
   },
@@ -3046,7 +3111,7 @@
   "platinum_bow": {
    "model": "assets/models/items/platinum_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/platinum_bow.png"
@@ -3055,12 +3120,13 @@
    "model": "assets/models/items/platinum_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.998 0 > 0 1 0"
    },
    "icon": "assets/icons/items/platinum_broadsword.png"
   },
   "platinum_chainmail": {
    "model": "assets/models/items/platinum_chainmail.glb",
+   "armor": "platinum_armor",
    "icon": "assets/icons/items/platinum_chainmail.png"
   },
   "platinum_coin": {
@@ -3069,25 +3135,27 @@
   },
   "platinum_greaves": {
    "model": "assets/models/items/platinum_greaves.glb",
+   "armor": "platinum_armor",
    "icon": "assets/icons/items/platinum_greaves.png"
   },
   "platinum_hammer": {
    "model": "assets/models/items/platinum_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.761 0 > 0 1 0"
    },
    "icon": "assets/icons/items/platinum_hammer.png"
   },
   "platinum_helmet": {
    "model": "assets/models/items/platinum_helmet.glb",
+   "armor": "platinum_armor",
    "icon": "assets/icons/items/platinum_helmet.png"
   },
   "platinum_pickaxe": {
    "model": "assets/models/items/platinum_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.77 0 > 0 1 0"
    },
    "icon": "assets/icons/items/platinum_pickaxe.png"
   },
@@ -3095,7 +3163,7 @@
    "model": "assets/models/items/platinum_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.998 0 > 0 1 0"
    },
    "icon": "assets/icons/items/platinum_shortsword.png"
   },
@@ -3140,7 +3208,7 @@
    "model": "assets/models/items/pwnhammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7563 0 > 0 1 0"
    },
    "icon": "assets/icons/items/pwnhammer.png"
   },
@@ -3215,7 +3283,7 @@
    "model": "assets/models/items/reaver_shark.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/reaver_shark.png"
   },
@@ -3301,7 +3369,7 @@
    "model": "assets/models/items/s_d_m_g.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.75 -0.04 > 0 1 0"
+    "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/s_d_m_g.png"
   },
@@ -3340,7 +3408,7 @@
    "model": "assets/models/items/seedler.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.05 0 > 0 1 0"
+    "tip": "0 1.048 0 > 0 1 0"
    },
    "icon": "assets/icons/items/seedler.png"
   },
@@ -3365,6 +3433,7 @@
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
+   "worn": "shield",
    "icon": "assets/icons/items/shield_of_cthulhu.png"
   },
   "shine_potion": {
@@ -3373,6 +3442,7 @@
   },
   "shiny_red_balloon": {
    "model": "assets/models/items/shiny_red_balloon.glb",
+   "worn": "balloon",
    "icon": "assets/icons/items/shiny_red_balloon.png"
   },
   "shiny_stone": {
@@ -3391,7 +3461,7 @@
    "model": "assets/models/items/shotgun.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.7 -0.045 > 0 1 0"
+    "muzzle": "0 0.75 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/shotgun.png"
   },
@@ -3405,14 +3475,17 @@
   },
   "shroomite_breastplate": {
    "model": "assets/models/items/shroomite_breastplate.glb",
+   "armor": "shroomite_armor",
    "icon": "assets/icons/items/shroomite_breastplate.png"
   },
   "shroomite_helmet": {
    "model": "assets/models/items/shroomite_helmet.glb",
+   "armor": "shroomite_armor",
    "icon": "assets/icons/items/shroomite_helmet.png"
   },
   "shroomite_leggings": {
    "model": "assets/models/items/shroomite_leggings.glb",
+   "armor": "shroomite_armor",
    "icon": "assets/icons/items/shroomite_leggings.png"
   },
   "shuriken": {
@@ -3430,7 +3503,7 @@
    "model": "assets/models/items/silver_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.8136 0 > 0 1 0"
    },
    "icon": "assets/icons/items/silver_axe.png"
   },
@@ -3441,7 +3514,7 @@
   "silver_bow": {
    "model": "assets/models/items/silver_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.11 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/silver_bow.png"
@@ -3450,7 +3523,7 @@
    "model": "assets/models/items/silver_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.918 0 > 0 1 0"
    },
    "icon": "assets/icons/items/silver_broadsword.png"
   },
@@ -3460,6 +3533,7 @@
   },
   "silver_chainmail": {
    "model": "assets/models/items/silver_chainmail.glb",
+   "armor": "silver_armor",
    "icon": "assets/icons/items/silver_chainmail.png"
   },
   "silver_coin": {
@@ -3468,25 +3542,27 @@
   },
   "silver_greaves": {
    "model": "assets/models/items/silver_greaves.glb",
+   "armor": "silver_armor",
    "icon": "assets/icons/items/silver_greaves.png"
   },
   "silver_hammer": {
    "model": "assets/models/items/silver_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7563 0 > 0 1 0"
    },
    "icon": "assets/icons/items/silver_hammer.png"
   },
   "silver_helmet": {
    "model": "assets/models/items/silver_helmet.glb",
+   "armor": "silver_armor",
    "icon": "assets/icons/items/silver_helmet.png"
   },
   "silver_pickaxe": {
    "model": "assets/models/items/silver_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7825 0 > 0 1 0"
    },
    "icon": "assets/icons/items/silver_pickaxe.png"
   },
@@ -3494,7 +3570,7 @@
    "model": "assets/models/items/silver_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.918 0 > 0 1 0"
    },
    "icon": "assets/icons/items/silver_shortsword.png"
   },
@@ -3544,7 +3620,7 @@
    "model": "assets/models/items/snowman_cannon.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.8 -0.05 > 0 1 0"
+    "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/snowman_cannon.png"
   },
@@ -3558,6 +3634,7 @@
   },
   "solar_flare_breastplate": {
    "model": "assets/models/items/solar_flare_breastplate.glb",
+   "armor": "solar_armor",
    "icon": "assets/icons/items/solar_flare_breastplate.png"
   },
   "solar_flare_drill": {
@@ -3578,17 +3655,19 @@
   },
   "solar_flare_helmet": {
    "model": "assets/models/items/solar_flare_helmet.glb",
+   "armor": "solar_armor",
    "icon": "assets/icons/items/solar_flare_helmet.png"
   },
   "solar_flare_leggings": {
    "model": "assets/models/items/solar_flare_leggings.glb",
+   "armor": "solar_armor",
    "icon": "assets/icons/items/solar_flare_leggings.png"
   },
   "solar_flare_pickaxe": {
    "model": "assets/models/items/solar_flare_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/solar_flare_pickaxe.png"
   },
@@ -3662,14 +3741,17 @@
   },
   "spectre_hood": {
    "model": "assets/models/items/spectre_hood.glb",
+   "armor": "spectre_armor",
    "icon": "assets/icons/items/spectre_hood.png"
   },
   "spectre_pants": {
    "model": "assets/models/items/spectre_pants.glb",
+   "armor": "spectre_armor",
    "icon": "assets/icons/items/spectre_pants.png"
   },
   "spectre_robe": {
    "model": "assets/models/items/spectre_robe.glb",
+   "armor": "spectre_armor",
    "icon": "assets/icons/items/spectre_robe.png"
   },
   "spectre_staff": {
@@ -3764,22 +3846,25 @@
   },
   "stardust_helmet": {
    "model": "assets/models/items/stardust_helmet.glb",
+   "armor": "stardust_armor",
    "icon": "assets/icons/items/stardust_helmet.png"
   },
   "stardust_leggings": {
    "model": "assets/models/items/stardust_leggings.glb",
+   "armor": "stardust_armor",
    "icon": "assets/icons/items/stardust_leggings.png"
   },
   "stardust_pickaxe": {
    "model": "assets/models/items/stardust_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/stardust_pickaxe.png"
   },
   "stardust_plate": {
    "model": "assets/models/items/stardust_plate.glb",
+   "armor": "stardust_armor",
    "icon": "assets/icons/items/stardust_plate.png"
   },
   "stardust_wings": {
@@ -3790,7 +3875,7 @@
    "model": "assets/models/items/starfury.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.95 0 > 0 1 0"
+    "tip": "0 0.948 0 > 0 1 0"
    },
    "icon": "assets/icons/items/starfury.png"
   },
@@ -3814,7 +3899,7 @@
    "model": "assets/models/items/stynger.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.8 -0.05 > 0 1 0"
+    "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/stynger.png"
   },
@@ -3884,7 +3969,7 @@
    "model": "assets/models/items/terra_blade.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.2 0 > 0 1 0"
+    "tip": "0 1.198 0 > 0 1 0"
    },
    "icon": "assets/icons/items/terra_blade.png"
   },
@@ -3892,7 +3977,7 @@
    "model": "assets/models/items/terraprisma.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.898 0 > 0 1 0"
    },
    "icon": "assets/icons/items/terraprisma.png"
   },
@@ -3920,7 +4005,7 @@
    "model": "assets/models/items/the_horsemans_blade.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.2 0 > 0 1 0"
+    "tip": "0 1.198 0 > 0 1 0"
    },
    "icon": "assets/icons/items/the_horsemans_blade.png"
   },
@@ -3952,7 +4037,7 @@
    "model": "assets/models/items/tin_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.773 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tin_axe.png"
   },
@@ -3963,7 +4048,7 @@
   "tin_bow": {
    "model": "assets/models/items/tin_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.13 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/tin_bow.png"
@@ -3972,35 +4057,38 @@
    "model": "assets/models/items/tin_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.798 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tin_broadsword.png"
   },
   "tin_chainmail": {
    "model": "assets/models/items/tin_chainmail.glb",
+   "armor": "tin_armor",
    "icon": "assets/icons/items/tin_chainmail.png"
   },
   "tin_greaves": {
    "model": "assets/models/items/tin_greaves.glb",
+   "armor": "tin_armor",
    "icon": "assets/icons/items/tin_greaves.png"
   },
   "tin_hammer": {
    "model": "assets/models/items/tin_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7542 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tin_hammer.png"
   },
   "tin_helmet": {
    "model": "assets/models/items/tin_helmet.glb",
+   "armor": "tin_armor",
    "icon": "assets/icons/items/tin_helmet.png"
   },
   "tin_pickaxe": {
    "model": "assets/models/items/tin_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7575 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tin_pickaxe.png"
   },
@@ -4008,7 +4096,7 @@
    "model": "assets/models/items/tin_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.798 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tin_shortsword.png"
   },
@@ -4028,7 +4116,7 @@
    "model": "assets/models/items/titanium_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.8425 0 > 0 1 0"
    },
    "icon": "assets/icons/items/titanium_axe.png"
   },
@@ -4039,7 +4127,7 @@
   "titanium_bow": {
    "model": "assets/models/items/titanium_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/titanium_bow.png"
@@ -4048,12 +4136,13 @@
    "model": "assets/models/items/titanium_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0.087 1.118 0 > 0 1 0"
    },
    "icon": "assets/icons/items/titanium_broadsword.png"
   },
   "titanium_chainmail": {
    "model": "assets/models/items/titanium_chainmail.glb",
+   "armor": "titanium_armor",
    "icon": "assets/icons/items/titanium_chainmail.png"
   },
   "titanium_chainsaw": {
@@ -4078,25 +4167,27 @@
   },
   "titanium_greaves": {
    "model": "assets/models/items/titanium_greaves.glb",
+   "armor": "titanium_armor",
    "icon": "assets/icons/items/titanium_greaves.png"
   },
   "titanium_hammer": {
    "model": "assets/models/items/titanium_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7754 0 > 0 1 0"
    },
    "icon": "assets/icons/items/titanium_hammer.png"
   },
   "titanium_helmet": {
    "model": "assets/models/items/titanium_helmet.glb",
+   "armor": "titanium_armor",
    "icon": "assets/icons/items/titanium_helmet.png"
   },
   "titanium_pickaxe": {
    "model": "assets/models/items/titanium_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.83 0 > 0 1 0"
    },
    "icon": "assets/icons/items/titanium_pickaxe.png"
   },
@@ -4104,7 +4195,7 @@
    "model": "assets/models/items/titanium_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0.042 1.118 0 > 0 1 0"
    },
    "icon": "assets/icons/items/titanium_shortsword.png"
   },
@@ -4151,7 +4242,7 @@
    "model": "assets/models/items/true_excalibur.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.15 0 > 0 1 0"
+    "tip": "0 1.148 0 > 0 1 0"
    },
    "icon": "assets/icons/items/true_excalibur.png"
   },
@@ -4159,7 +4250,7 @@
    "model": "assets/models/items/true_nights_edge.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 1.2 0 > 0 1 0"
+    "tip": "-0.006 1.248 0 > 0 1 0"
    },
    "icon": "assets/icons/items/true_nights_edge.png"
   },
@@ -4170,7 +4261,7 @@
   "tsunami": {
    "model": "assets/models/items/tsunami.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/tsunami.png"
@@ -4183,7 +4274,7 @@
    "model": "assets/models/items/tungsten_axe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8 0 > 0 1 0"
+    "tip": "0 0.8204 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tungsten_axe.png"
   },
@@ -4194,7 +4285,7 @@
   "tungsten_bow": {
    "model": "assets/models/items/tungsten_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.13 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/tungsten_bow.png"
@@ -4203,35 +4294,38 @@
    "model": "assets/models/items/tungsten_broadsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.938 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tungsten_broadsword.png"
   },
   "tungsten_chainmail": {
    "model": "assets/models/items/tungsten_chainmail.glb",
+   "armor": "tungsten_armor",
    "icon": "assets/icons/items/tungsten_chainmail.png"
   },
   "tungsten_greaves": {
    "model": "assets/models/items/tungsten_greaves.glb",
+   "armor": "tungsten_armor",
    "icon": "assets/icons/items/tungsten_greaves.png"
   },
   "tungsten_hammer": {
    "model": "assets/models/items/tungsten_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7701 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tungsten_hammer.png"
   },
   "tungsten_helmet": {
    "model": "assets/models/items/tungsten_helmet.glb",
+   "armor": "tungsten_armor",
    "icon": "assets/icons/items/tungsten_helmet.png"
   },
   "tungsten_pickaxe": {
    "model": "assets/models/items/tungsten_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.755 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tungsten_pickaxe.png"
   },
@@ -4239,20 +4333,23 @@
    "model": "assets/models/items/tungsten_shortsword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.55 0 > 0 1 0"
+    "tip": "0 0.938 0 > 0 1 0"
    },
    "icon": "assets/icons/items/tungsten_shortsword.png"
   },
   "turtle_helmet": {
    "model": "assets/models/items/turtle_helmet.glb",
+   "armor": "turtle_armor",
    "icon": "assets/icons/items/turtle_helmet.png"
   },
   "turtle_leggings": {
    "model": "assets/models/items/turtle_leggings.glb",
+   "armor": "turtle_armor",
    "icon": "assets/icons/items/turtle_leggings.png"
   },
   "turtle_scale_mail": {
    "model": "assets/models/items/turtle_scale_mail.glb",
+   "armor": "turtle_armor",
    "icon": "assets/icons/items/turtle_scale_mail.png"
   },
   "turtle_shell": {
@@ -4330,7 +4427,7 @@
    "model": "assets/models/items/vortex_beater.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.75 -0.04 > 0 1 0"
+    "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/vortex_beater.png"
   },
@@ -4340,6 +4437,7 @@
   },
   "vortex_breastplate": {
    "model": "assets/models/items/vortex_breastplate.glb",
+   "armor": "vortex_armor",
    "icon": "assets/icons/items/vortex_breastplate.png"
   },
   "vortex_drill": {
@@ -4364,17 +4462,19 @@
   },
   "vortex_helmet": {
    "model": "assets/models/items/vortex_helmet.glb",
+   "armor": "vortex_armor",
    "icon": "assets/icons/items/vortex_helmet.png"
   },
   "vortex_leggings": {
    "model": "assets/models/items/vortex_leggings.glb",
+   "armor": "vortex_armor",
    "icon": "assets/icons/items/vortex_leggings.png"
   },
   "vortex_pickaxe": {
    "model": "assets/models/items/vortex_pickaxe.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.8026 0 > 0 1 0"
+    "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/vortex_pickaxe.png"
   },
@@ -4445,18 +4545,22 @@
   },
   "wizard_hat": {
    "model": "assets/models/items/wizard_hat.glb",
+   "armor": "wizard_hat",
    "icon": "assets/icons/items/wizard_hat.png"
   },
   "wood_breastplate": {
    "model": "assets/models/items/wood_breastplate.glb",
+   "armor": "timber_armor",
    "icon": "assets/icons/items/wood_breastplate.png"
   },
   "wood_greaves": {
    "model": "assets/models/items/wood_greaves.glb",
+   "armor": "timber_armor",
    "icon": "assets/icons/items/wood_greaves.png"
   },
   "wood_helmet": {
    "model": "assets/models/items/wood_helmet.glb",
+   "armor": "timber_armor",
    "icon": "assets/icons/items/wood_helmet.png"
   },
   "wood_yoyo": {
@@ -4485,7 +4589,7 @@
   "wooden_bow": {
    "model": "assets/models/items/wooden_bow.glb",
    "sockets": {
-    "grip": "-0.17 0 0 > 0 1 0",
+    "grip": "-0.16 0 0 > 0 1 0",
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/wooden_bow.png"
@@ -4518,7 +4622,7 @@
    "model": "assets/models/items/wooden_hammer.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.76 0 > 0 1 0"
+    "tip": "0 0.7563 0 > 0 1 0"
    },
    "icon": "assets/icons/items/wooden_hammer.png"
   },
@@ -4526,7 +4630,7 @@
    "model": "assets/models/items/wooden_sword.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "tip": "0 0.9 0 > 0 1 0"
+    "tip": "0 0.898 0 > 0 1 0"
    },
    "icon": "assets/icons/items/wooden_sword.png"
   },
@@ -4562,7 +4666,7 @@
    "model": "assets/models/items/xenopopper.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0",
-    "muzzle": "0 0.8 -0.05 > 0 1 0"
+    "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/xenopopper.png"
   },
@@ -4615,10 +4719,10 @@
   },
   "antlion": {
    "model": "assets/models/creatures/antlion.glb",
-   "generator": "crab",
+   "generator": "antlion",
    "animations": [
-    "idle",
-    "walk"
+    "attack",
+    "idle"
    ]
   },
   "antlion_charger": {
@@ -4674,19 +4778,36 @@
   },
   "black_recluse": {
    "model": "assets/models/creatures/black_recluse.glb",
-   "generator": "crab",
+   "generator": "spider",
    "animations": [
+    "attack",
     "idle",
     "walk"
    ]
   },
   "blood_crawler": {
    "model": "assets/models/creatures/blood_crawler.glb",
-   "generator": "crab",
+   "generator": "spider",
    "animations": [
+    "attack",
     "idle",
     "walk"
    ]
+  },
+  "bone_serpent_body": {
+   "model": "assets/models/creatures/bone_serpent_body.glb",
+   "generator": "bone_serpent_vertebra",
+   "animations": []
+  },
+  "bone_serpent_head": {
+   "model": "assets/models/creatures/bone_serpent_head.glb",
+   "generator": "bone_serpent_head",
+   "animations": []
+  },
+  "bone_serpent_tail": {
+   "model": "assets/models/creatures/bone_serpent_tail.glb",
+   "generator": "bone_serpent_tail",
+   "animations": []
   },
   "brain_of_cthulhu": {
    "model": "assets/models/creatures/brain_of_cthulhu.glb",
@@ -4735,7 +4856,7 @@
   },
   "cave_bat": {
    "model": "assets/models/creatures/cave_bat.glb",
-   "generator": "bat",
+   "generator": "fur_bat",
    "animations": [
     "fly"
    ]
@@ -4785,7 +4906,7 @@
   },
   "crimera": {
    "model": "assets/models/creatures/crimera.glb",
-   "generator": "insect",
+   "generator": "crimera",
    "animations": [
     "fly"
    ]
@@ -4807,7 +4928,7 @@
   },
   "cursed_skull": {
    "model": "assets/models/creatures/cursed_skull.glb",
-   "generator": "skull",
+   "generator": "cursed_skull",
    "animations": []
   },
   "cyborg": {
@@ -4896,7 +5017,7 @@
   },
   "demon_eye": {
    "model": "assets/models/creatures/demon_eye.glb",
-   "generator": "eye",
+   "generator": "veined_eye",
    "animations": []
   },
   "derpling": {
@@ -4976,7 +5097,7 @@
   },
   "eater_of_souls": {
    "model": "assets/models/creatures/eater_of_souls.glb",
-   "generator": "insect",
+   "generator": "eater_of_souls",
    "animations": [
     "fly"
    ]
@@ -5004,13 +5125,27 @@
    "model": "assets/models/creatures/elf_archer.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5028,13 +5163,27 @@
    "model": "assets/models/creatures/etherian_goblin.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5121,10 +5270,10 @@
   },
   "flying_snake": {
    "model": "assets/models/creatures/flying_snake.glb",
-   "generator": "bird",
+   "generator": "flying_serpent",
    "animations": [
-    "fly",
-    "idle"
+    "attack",
+    "fly"
    ]
   },
   "frankenstein": {
@@ -5160,13 +5309,14 @@
   },
   "gel": {
    "model": "assets/models/creatures/gel.glb",
-   "generator": "gel",
+   "generator": "jelly_slime",
    "animations": []
   },
   "giant_tortoise": {
    "model": "assets/models/creatures/giant_tortoise.glb",
-   "generator": "crab",
+   "generator": "tortoise",
    "animations": [
+    "attack",
     "idle",
     "walk"
    ]
@@ -5205,13 +5355,27 @@
    "model": "assets/models/creatures/goblin_archer.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5220,13 +5384,27 @@
    "model": "assets/models/creatures/goblin_peon.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5235,13 +5413,27 @@
    "model": "assets/models/creatures/goblin_sorcerer.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5250,13 +5442,27 @@
    "model": "assets/models/creatures/goblin_thief.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5280,13 +5486,27 @@
    "model": "assets/models/creatures/goblin_warrior.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5313,10 +5533,9 @@
   },
   "granite_elemental": {
    "model": "assets/models/creatures/granite_elemental.glb",
-   "generator": "jelly",
+   "generator": "elemental",
    "animations": [
-    "fly",
-    "idle"
+    "fly"
    ]
   },
   "granite_golem": {
@@ -5374,8 +5593,9 @@
   },
   "hellhound": {
    "model": "assets/models/creatures/hellhound.glb",
-   "generator": "steed",
+   "generator": "canine",
    "animations": [
+    "attack",
     "idle",
     "walk"
    ]
@@ -5404,10 +5624,9 @@
   },
   "ice_elemental": {
    "model": "assets/models/creatures/ice_elemental.glb",
-   "generator": "jelly",
+   "generator": "elemental",
    "animations": [
-    "fly",
-    "idle"
+    "fly"
    ]
   },
   "ice_queen": {
@@ -5639,8 +5858,12 @@
   },
   "mimic": {
    "model": "assets/models/creatures/mimic.glb",
-   "generator": "present",
-   "animations": []
+   "generator": "mimic",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
   },
   "mister_stabby": {
    "model": "assets/models/creatures/mister_stabby.glb",
@@ -5875,13 +6098,27 @@
    "model": "assets/models/creatures/pirate_captain.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5890,13 +6127,27 @@
    "model": "assets/models/creatures/pirate_corsair.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5920,13 +6171,27 @@
    "model": "assets/models/creatures/pirate_deadeye.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -5935,13 +6200,27 @@
    "model": "assets/models/creatures/pirate_deckhand.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -6125,13 +6404,27 @@
    "model": "assets/models/creatures/possessed_armor.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -6259,8 +6552,9 @@
   },
   "salamander": {
    "model": "assets/models/creatures/salamander.glb",
-   "generator": "crab",
+   "generator": "lizard",
    "animations": [
+    "attack",
     "idle",
     "walk"
    ]
@@ -6313,6 +6607,14 @@
     "swing",
     "use",
     "walk"
+   ]
+  },
+  "shark": {
+   "model": "assets/models/creatures/shark.glb",
+   "generator": "shark",
+   "animations": [
+    "attack",
+    "fly"
    ]
   },
   "skeleton": {
@@ -6369,6 +6671,14 @@
    "model": "assets/models/creatures/snow_balla.glb",
    "generator": "snowman",
    "animations": []
+  },
+  "snow_flinx": {
+   "model": "assets/models/creatures/snow_flinx.glb",
+   "generator": "flinx",
+   "animations": [
+    "idle",
+    "walk"
+   ]
   },
   "snowman_gangsta": {
    "model": "assets/models/creatures/snowman_gangsta.glb",
@@ -6636,8 +6946,9 @@
   },
   "wall_creeper": {
    "model": "assets/models/creatures/wall_creeper.glb",
-   "generator": "crab",
+   "generator": "spider",
    "animations": [
+    "attack",
     "idle",
     "walk"
    ]
@@ -6717,8 +7028,9 @@
   },
   "wolf": {
    "model": "assets/models/creatures/wolf.glb",
-   "generator": "steed",
+   "generator": "canine",
    "animations": [
+    "attack",
     "idle",
     "walk"
    ]
@@ -6748,17 +7060,17 @@
   },
   "wyvern_body": {
    "model": "assets/models/creatures/wyvern_body.glb",
-   "generator": "worm_segment",
+   "generator": "wyvern_part",
    "animations": []
   },
   "wyvern_head": {
    "model": "assets/models/creatures/wyvern_head.glb",
-   "generator": "worm_segment",
+   "generator": "wyvern_part",
    "animations": []
   },
   "wyvern_tail": {
    "model": "assets/models/creatures/wyvern_tail.glb",
-   "generator": "worm_segment",
+   "generator": "wyvern_part",
    "animations": []
   },
   "yeti": {
@@ -6795,13 +7107,27 @@
    "model": "assets/models/creatures/zombie_elf.glb",
    "generator": "humanoid",
    "animations": [
+    "bow",
+    "cast",
+    "climb",
     "death",
+    "drink",
     "fall",
+    "glide",
+    "hold",
     "hurt",
     "idle",
     "jump",
+    "land",
+    "mine",
     "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
     "swing",
+    "thrust",
     "use",
     "walk"
    ]
@@ -6894,5 +7220,3372 @@
     "string": "0 0 0 > 0 1 0"
    }
   }
+ },
+ "armor": {
+  "adamantite_armor": {
+   "head": {
+    "model": "assets/models/armor/adamantite_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 454
+   },
+   "chest": {
+    "model": "assets/models/armor/adamantite_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 1552
+   },
+   "belt": {
+    "model": "assets/models/armor/adamantite_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/adamantite_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/adamantite_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/adamantite_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/adamantite_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/adamantite_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/adamantite_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/adamantite_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/adamantite_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/adamantite_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/adamantite_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "bee_armor": {
+   "head": {
+    "model": "assets/models/armor/bee_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/bee_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/bee_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/bee_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/bee_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/bee_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/bee_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/bee_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/bee_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/bee_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/bee_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/bee_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/bee_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "beetle_armor": {
+   "head": {
+    "model": "assets/models/armor/beetle_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 454
+   },
+   "chest": {
+    "model": "assets/models/armor/beetle_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/beetle_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/beetle_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/beetle_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/beetle_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/beetle_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/beetle_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/beetle_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/beetle_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/beetle_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/beetle_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/beetle_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "chlorophyte_armor": {
+   "head": {
+    "model": "assets/models/armor/chlorophyte_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": false,
+    "tris": 210
+   },
+   "chest": {
+    "model": "assets/models/armor/chlorophyte_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/chlorophyte_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/chlorophyte_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/chlorophyte_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/chlorophyte_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/chlorophyte_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/chlorophyte_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/chlorophyte_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/chlorophyte_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/chlorophyte_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/chlorophyte_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/chlorophyte_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "cobalt_armor": {
+   "head": {
+    "model": "assets/models/armor/cobalt_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/cobalt_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/cobalt_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/cobalt_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/cobalt_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/cobalt_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/cobalt_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/cobalt_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/cobalt_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/cobalt_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/cobalt_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/cobalt_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/cobalt_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "copper_armor": {
+   "head": {
+    "model": "assets/models/armor/copper_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/copper_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/copper_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/copper_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/copper_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/copper_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/copper_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/copper_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/copper_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/copper_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/copper_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "crimtane_armor": {
+   "head": {
+    "model": "assets/models/armor/crimtane_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 454
+   },
+   "chest": {
+    "model": "assets/models/armor/crimtane_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 1552
+   },
+   "belt": {
+    "model": "assets/models/armor/crimtane_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/crimtane_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/crimtane_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/crimtane_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/crimtane_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/crimtane_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/crimtane_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/crimtane_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/crimtane_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/crimtane_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/crimtane_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "demonite_armor": {
+   "head": {
+    "model": "assets/models/armor/demonite_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 454
+   },
+   "chest": {
+    "model": "assets/models/armor/demonite_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 1552
+   },
+   "belt": {
+    "model": "assets/models/armor/demonite_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/demonite_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/demonite_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/demonite_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/demonite_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/demonite_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/demonite_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/demonite_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/demonite_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/demonite_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/demonite_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "gold_armor": {
+   "head": {
+    "model": "assets/models/armor/gold_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/gold_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/gold_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/gold_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/gold_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/gold_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/gold_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/gold_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/gold_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/gold_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/gold_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/gold_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/gold_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "hellstone_armor": {
+   "head": {
+    "model": "assets/models/armor/hellstone_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 454
+   },
+   "chest": {
+    "model": "assets/models/armor/hellstone_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/hellstone_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/hellstone_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/hellstone_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/hellstone_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/hellstone_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/hellstone_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/hellstone_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/hellstone_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "greave.R": {
+    "model": "assets/models/armor/hellstone_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "boot.L": {
+    "model": "assets/models/armor/hellstone_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/hellstone_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "iron_armor": {
+   "head": {
+    "model": "assets/models/armor/iron_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 390
+   },
+   "chest": {
+    "model": "assets/models/armor/iron_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/iron_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/iron_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/iron_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/iron_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/iron_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/iron_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/iron_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/iron_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/iron_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/iron_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/iron_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "jungle_armor": {
+   "head": {
+    "model": "assets/models/armor/jungle_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 225
+   },
+   "chest": {
+    "model": "assets/models/armor/jungle_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/jungle_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/jungle_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/jungle_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/jungle_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/jungle_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/jungle_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/jungle_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/jungle_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/jungle_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   }
+  },
+  "lead_armor": {
+   "head": {
+    "model": "assets/models/armor/lead_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 390
+   },
+   "chest": {
+    "model": "assets/models/armor/lead_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/lead_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/lead_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/lead_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/lead_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/lead_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/lead_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/lead_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/lead_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/lead_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/lead_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/lead_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "meteor_armor": {
+   "head": {
+    "model": "assets/models/armor/meteor_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 542
+   },
+   "chest": {
+    "model": "assets/models/armor/meteor_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/meteor_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/meteor_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/meteor_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/meteor_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/meteor_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/meteor_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/meteor_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/meteor_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "greave.R": {
+    "model": "assets/models/armor/meteor_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "boot.L": {
+    "model": "assets/models/armor/meteor_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/meteor_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "mining_helmet": {
+   "head": {
+    "model": "assets/models/armor/mining_helmet_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 402
+   }
+  },
+  "mythril_armor": {
+   "head": {
+    "model": "assets/models/armor/mythril_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 390
+   },
+   "chest": {
+    "model": "assets/models/armor/mythril_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/mythril_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/mythril_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/mythril_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/mythril_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/mythril_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/mythril_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/mythril_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/mythril_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/mythril_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/mythril_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/mythril_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "nebula_armor": {
+   "head": {
+    "model": "assets/models/armor/nebula_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 225
+   },
+   "chest": {
+    "model": "assets/models/armor/nebula_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/nebula_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/nebula_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/nebula_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/nebula_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/nebula_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/nebula_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/nebula_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/nebula_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 124
+   },
+   "greave.R": {
+    "model": "assets/models/armor/nebula_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 124
+   },
+   "boot.L": {
+    "model": "assets/models/armor/nebula_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/nebula_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   }
+  },
+  "necro_armor": {
+   "head": {
+    "model": "assets/models/armor/necro_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 442
+   },
+   "chest": {
+    "model": "assets/models/armor/necro_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/necro_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/necro_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/necro_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/necro_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/necro_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/necro_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/necro_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/necro_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/necro_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/necro_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/necro_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   }
+  },
+  "orichalcum_armor": {
+   "head": {
+    "model": "assets/models/armor/orichalcum_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 510
+   },
+   "chest": {
+    "model": "assets/models/armor/orichalcum_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/orichalcum_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/orichalcum_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/orichalcum_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/orichalcum_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/orichalcum_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/orichalcum_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/orichalcum_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/orichalcum_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/orichalcum_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/orichalcum_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/orichalcum_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "palladium_armor": {
+   "head": {
+    "model": "assets/models/armor/palladium_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/palladium_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/palladium_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/palladium_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/palladium_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/palladium_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/palladium_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/palladium_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/palladium_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/palladium_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/palladium_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/palladium_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/palladium_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "platinum_armor": {
+   "head": {
+    "model": "assets/models/armor/platinum_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/platinum_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/platinum_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/platinum_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/platinum_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/platinum_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/platinum_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/platinum_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/platinum_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/platinum_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/platinum_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/platinum_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/platinum_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "radiant_armor": {
+   "head": {
+    "model": "assets/models/armor/radiant_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/radiant_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/radiant_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/radiant_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/radiant_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/radiant_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/radiant_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/radiant_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/radiant_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/radiant_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/radiant_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/radiant_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/radiant_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "shroomite_armor": {
+   "head": {
+    "model": "assets/models/armor/shroomite_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 542
+   },
+   "chest": {
+    "model": "assets/models/armor/shroomite_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/shroomite_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/shroomite_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/shroomite_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/shroomite_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/shroomite_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/shroomite_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/shroomite_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/shroomite_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "greave.R": {
+    "model": "assets/models/armor/shroomite_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "boot.L": {
+    "model": "assets/models/armor/shroomite_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/shroomite_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "silver_armor": {
+   "head": {
+    "model": "assets/models/armor/silver_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/silver_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/silver_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/silver_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/silver_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/silver_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/silver_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/silver_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/silver_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/silver_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/silver_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/silver_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/silver_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "solar_armor": {
+   "head": {
+    "model": "assets/models/armor/solar_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 542
+   },
+   "chest": {
+    "model": "assets/models/armor/solar_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/solar_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/solar_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/solar_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 102
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/solar_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/solar_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/solar_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/solar_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/solar_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "greave.R": {
+    "model": "assets/models/armor/solar_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "boot.L": {
+    "model": "assets/models/armor/solar_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/solar_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "spectre_armor": {
+   "head": {
+    "model": "assets/models/armor/spectre_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 225
+   },
+   "chest": {
+    "model": "assets/models/armor/spectre_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/spectre_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/spectre_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/spectre_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/spectre_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/spectre_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/spectre_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/spectre_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/spectre_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/spectre_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/spectre_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/spectre_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   }
+  },
+  "stardust_armor": {
+   "head": {
+    "model": "assets/models/armor/stardust_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/stardust_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/stardust_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/stardust_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/stardust_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/stardust_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/stardust_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/stardust_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/stardust_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/stardust_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "greave.R": {
+    "model": "assets/models/armor/stardust_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "boot.L": {
+    "model": "assets/models/armor/stardust_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/stardust_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "timber_armor": {
+   "head": {
+    "model": "assets/models/armor/timber_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/timber_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/timber_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/timber_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/timber_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/timber_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/timber_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/timber_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/timber_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/timber_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/timber_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   }
+  },
+  "tin_armor": {
+   "head": {
+    "model": "assets/models/armor/tin_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/tin_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/tin_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/tin_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/tin_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 72
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/tin_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/tin_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/tin_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/tin_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/tin_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/tin_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "titanium_armor": {
+   "head": {
+    "model": "assets/models/armor/titanium_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 542
+   },
+   "chest": {
+    "model": "assets/models/armor/titanium_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/titanium_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/titanium_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/titanium_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/titanium_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/titanium_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/titanium_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/titanium_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/titanium_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "greave.R": {
+    "model": "assets/models/armor/titanium_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 292
+   },
+   "boot.L": {
+    "model": "assets/models/armor/titanium_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/titanium_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "tungsten_armor": {
+   "head": {
+    "model": "assets/models/armor/tungsten_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 446
+   },
+   "chest": {
+    "model": "assets/models/armor/tungsten_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/tungsten_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/tungsten_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/tungsten_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/tungsten_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/tungsten_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/tungsten_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/tungsten_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 244
+   },
+   "greave.L": {
+    "model": "assets/models/armor/tungsten_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "greave.R": {
+    "model": "assets/models/armor/tungsten_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 264
+   },
+   "boot.L": {
+    "model": "assets/models/armor/tungsten_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/tungsten_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "turtle_armor": {
+   "head": {
+    "model": "assets/models/armor/turtle_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/turtle_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 528
+   },
+   "belt": {
+    "model": "assets/models/armor/turtle_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/turtle_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/turtle_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/turtle_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/turtle_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/turtle_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/turtle_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/turtle_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/turtle_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/turtle_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/turtle_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "vortex_armor": {
+   "head": {
+    "model": "assets/models/armor/vortex_armor_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/vortex_armor_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 616
+   },
+   "belt": {
+    "model": "assets/models/armor/vortex_armor_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "pauldron.L": {
+    "model": "assets/models/armor/vortex_armor_pauldron.L.glb",
+    "bone": "upper_arm.L",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "pauldron.R": {
+    "model": "assets/models/armor/vortex_armor_pauldron.R.glb",
+    "bone": "upper_arm.R",
+    "slot": "body",
+    "refLength": 0.298,
+    "hidesHair": false,
+    "tris": 220
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/vortex_armor_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/vortex_armor_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 184
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/vortex_armor_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/vortex_armor_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/vortex_armor_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 124
+   },
+   "greave.R": {
+    "model": "assets/models/armor/vortex_armor_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 124
+   },
+   "boot.L": {
+    "model": "assets/models/armor/vortex_armor_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   },
+   "boot.R": {
+    "model": "assets/models/armor/vortex_armor_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 206
+   }
+  },
+  "wizard_hat": {
+   "head": {
+    "model": "assets/models/armor/wizard_hat_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": false,
+    "tris": 318
+   }
+  }
+ },
+ "armorRig": {
+  "chest": 0.2153,
+  "foot.L": 0.1513,
+  "foot.R": 0.1513,
+  "forearm.L": 0.252,
+  "forearm.R": 0.252,
+  "head": 0.193,
+  "hips": 0.0953,
+  "neck": 0.1217,
+  "shin.L": 0.4281,
+  "shin.R": 0.4281,
+  "spine": 0.1702,
+  "thigh.L": 0.4302,
+  "thigh.R": 0.4302,
+  "upper_arm.L": 0.298,
+  "upper_arm.R": 0.298
  }
 }
