@@ -1,0 +1,9 @@
+{
+  // Seasonal events (src/Strata.Core/Gameplay/Seasons) by the system date, inclusive [month, day] windows. The player can
+  // switch them off in Settings > Gameplay; the console command `season halloween|christmas|off|auto` overrides.
+  "seasons": [
+    { "id": "halloween", "name": "Halloween", "from": [10, 10], "to": [11, 1] },
+    { "id": "christmas", "name": "Christmas", "from": [12, 15], "to": [12, 31] }
+  ],
+  "recheckSeconds": 30
+}

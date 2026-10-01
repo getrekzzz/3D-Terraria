@@ -66,6 +66,9 @@ public sealed partial class WorldSession
     /// <summary>Cells carrying red wire (see <see cref="Gameplay.Wiring.WireSystem"/>).</summary>
     public Gameplay.Wiring.WireGrid Wires { get; } = new();
 
+    /// <summary>The seasonal event by date (Halloween, Christmas), the player's setting and any console override.</summary>
+    public Gameplay.Seasons.SeasonState Seasons { get; } = new();
+
     /// <summary>World tallies kept across saves (orbs smashed, altars smashed).</summary>
     public Dictionary<string, int> Counters { get; }
 

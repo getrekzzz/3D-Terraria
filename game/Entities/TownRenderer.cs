@@ -7,13 +7,15 @@ using Strata.Game.Rendering;
 
 namespace Strata.Game.Entities;
 
-/// <summary>Presents town residents: their rigged model (walk/idle/jump), smoothed motion and a name tag.</summary>
+/// <summary>Presents town residents: their rigged model (walk/idle/jump), smoothed motion, a name tag and seasonal hats.</summary>
 public sealed partial class TownRenderer : Node3D
 {
     private sealed class View
     {
         public required CreatureVisual Visual;
         public required Label3D Tag;
+        public required TownNpc Npc;
+        public MeshInstance3D? Hat;
         public Vector3 Shown;
     }
 
@@ -39,6 +41,7 @@ public sealed partial class TownRenderer : Node3D
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.town");
         float dt = (float)delta;
         var world = _game.Session.World;
+        UpdateSeason();
         foreach (var npc in _game.Town.Residents)
         {
             if (!_views.TryGetValue(npc.Id, out var view))
@@ -82,6 +85,8 @@ public sealed partial class TownRenderer : Node3D
         };
         AddChild(tag);
         var pos = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
-        return new View { Visual = visual, Tag = tag, Shown = pos };
+        var view = new View { Visual = visual, Tag = tag, Npc = npc, Shown = pos };
+        ShowHat(view, npc);
+        return view;
     }
 }

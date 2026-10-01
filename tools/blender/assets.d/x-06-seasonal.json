@@ -1,0 +1,23 @@
+{
+ "comment": "X-06 seasonal events: Halloween and Christmas vanity, candy, pumpkins, decorations and Santa Claus.",
+ "objects": {
+  "jack_o_lantern": {"generator": "pumpkin", "params": {"radius": 0.2, "carved": true}},
+  "christmas_tree": {"generator": "christmas_tree", "params": {}},
+  "festive_lights": {"generator": "festive_lights", "params": {}}
+ },
+ "items": {"explicit": {
+  "goodie_bag": {"generator": "crate", "params": {"color": "#e8801a", "band": "iron"}},
+  "present": {"generator": "crate", "params": {"color": "#c81a1a", "band": "gold"}},
+  "witch_hat": {"generator": "seasonal_hat", "params": {"style": "witch"}},
+  "pumpkin_mask": {"generator": "seasonal_hat", "params": {"style": "pumpkin"}},
+  "santa_hat": {"generator": "seasonal_hat", "params": {"style": "santa"}},
+  "reindeer_antlers": {"generator": "seasonal_hat", "params": {"style": "antlers"}},
+  "witch_dress": {"generator": "chest_armor", "params": {"metalLayer": "cloth", "metal": "#3a2a4a"}},
+  "witch_boots": {"generator": "greaves", "params": {"metalLayer": "cloth", "metal": "#2a2030"}},
+  "santa_shirt": {"generator": "chest_armor", "params": {"metalLayer": "cloth", "metal": "#c81a1a"}},
+  "santa_pants": {"generator": "greaves", "params": {"metalLayer": "cloth", "metal": "#c81a1a"}},
+  "candy_corn": {"generator": "candy", "params": {"style": "corn"}},
+  "candy_cane": {"generator": "candy", "params": {"style": "cane"}},
+  "pumpkin": {"generator": "pumpkin", "params": {"radius": 0.14}}
+ }}
+}

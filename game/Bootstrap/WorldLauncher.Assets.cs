@@ -27,6 +27,8 @@ public static partial class WorldLauncher
         game.Town.Config = Strata.Core.Gameplay.Town.TownConfig.Load(services.Data);
         game.Spread.Config = Strata.Core.Gameplay.Progression.SpreadConfig.Load(services.Data);
         game.Projectiles.Fishing = Strata.Core.Gameplay.Fishing.FishingConfig.Load(services.Data);
+        game.Session.Seasons.Config = Strata.Core.Gameplay.Seasons.SeasonConfig.Load(services.Data);
+        game.Session.Seasons.Enabled = () => Settings.UserSettings.Current.SeasonalEvents;
     }
 
     /// <summary>Renderers for creatures, town residents and projectiles.</summary>

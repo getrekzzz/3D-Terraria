@@ -1,0 +1,53 @@
+{
+  // Seasonal events (data/config/seasons.json): Halloween (Oct 10 - Nov 1) and Christmas (Dec 15 - 31). Every hostile
+  // creature rolls "enemy_global_drops" (goodie bags at Halloween, presents at Christmas); seasonal vanity, food and
+  // decorations come out of them, and Santa Claus sells Christmas decorations while he visits.
+  "items": [
+    {"id": "goodie_bag", "name": "Goodie Bag", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 2000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "goodie_bag"}]},
+    {"id": "present", "name": "Present", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 2000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "present"}]},
+    {"id": "witch_hat", "name": "Witch Hat", "description": "Vanity. Bubble, bubble.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "head", "tags": ["vanity"]},
+    {"id": "witch_dress", "name": "Witch Dress", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "body", "tags": ["vanity"]},
+    {"id": "witch_boots", "name": "Witch Boots", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "legs", "tags": ["vanity"]},
+    {"id": "pumpkin_mask", "name": "Pumpkin Mask", "description": "Vanity. A carved pumpkin to wear.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "head", "tags": ["vanity"]},
+    {"id": "santa_hat", "name": "Santa Hat", "description": "Vanity. Ho ho ho!", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "head", "tags": ["vanity"]},
+    {"id": "santa_shirt", "name": "Santa Shirt", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "body", "tags": ["vanity"]},
+    {"id": "santa_pants", "name": "Santa Pants", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "legs", "tags": ["vanity"]},
+    {"id": "reindeer_antlers", "name": "Reindeer Antlers", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "head", "tags": ["vanity"]},
+    {"id": "candy_corn", "name": "Candy Corn", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "well_fed", "ticks": 18000}},
+    {"id": "candy_cane", "name": "Candy Cane", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "well_fed", "ticks": 18000}},
+    {"id": "pumpkin", "name": "Pumpkin", "description": "Carve it into a Jack 'O Lantern.", "category": "material", "maxStack": 9999, "value": 50}
+  ],
+  "tileObjects": [
+    {"id": "jack_o_lantern", "name": "Jack 'O Lantern", "description": "A grinning carved pumpkin with a candle inside.", "size": [1, 1, 1], "anchor": "floor", "light": [15, 9, 3], "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemValue": 500, "tags": ["halloween"]},
+    {"id": "christmas_tree", "name": "Christmas Tree", "description": "Festive.", "size": [2, 5, 2], "anchor": "floor", "light": [10, 9, 6], "hitPoints": 2, "itemCategory": "furniture", "itemValue": 2000, "tags": ["christmas"]},
+    {"id": "festive_lights", "name": "Festive Lights", "description": "A string of coloured lights.", "size": [3, 1, 1], "anchor": "wall", "light": [11, 8, 10], "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemValue": 500, "tags": ["christmas"]}
+  ],
+  "recipes": [
+    {"id": "jack_o_lantern", "output": "jack_o_lantern", "inputs": [{"item": "pumpkin", "count": 1}, {"item": "torch", "count": 1}], "stations": ["work_bench"]}
+  ],
+  "lootTables": [
+    {"id": "enemy_global_drops", "entries": [
+      {"item": "goodie_bag", "chance": 0.0125, "conditions": [{"type": "season", "is": "halloween"}]},
+      {"item": "present", "chance": 0.077, "conditions": [{"type": "season", "is": "christmas"}]}
+    ] },
+    {"id": "goodie_bag", "mode": "weighted", "rolls": 2, "entries": [
+      {"item": "candy_corn", "weight": 4, "min": 2, "max": 6},
+      {"item": "pumpkin", "weight": 3, "min": 2, "max": 5},
+      {"item": "jack_o_lantern", "weight": 2, "min": 1, "max": 3},
+      {"item": "witch_hat", "weight": 1},
+      {"item": "witch_dress", "weight": 1},
+      {"item": "witch_boots", "weight": 1},
+      {"item": "pumpkin_mask", "weight": 1}
+    ] },
+    {"id": "present", "mode": "weighted", "rolls": 2, "entries": [
+      {"item": "candy_cane", "weight": 4, "min": 2, "max": 6},
+      {"item": "festive_lights", "weight": 2, "min": 1, "max": 3},
+      {"item": "christmas_tree", "weight": 1},
+      {"item": "santa_hat", "weight": 1},
+      {"item": "santa_shirt", "weight": 1},
+      {"item": "santa_pants", "weight": 1},
+      {"item": "reindeer_antlers", "weight": 1},
+      {"item": "snow_globe", "weight": 0.5, "conditions": [{"type": "flag", "id": "hardmode"}]}
+    ] }
+  ]
+}

@@ -41,6 +41,7 @@ public sealed class TestGame : IDisposable
         var log = new MemoryLog();
         var settings = new WorldSettings { Name = "test", Seed = seed, Size = WorldSizePreset.Tiny, Difficulty = difficulty };
         var session = WorldSession.Create(TestPaths.Content, settings, saveDir, Tables, log);
+        session.Seasons.Clock = () => new DateTime(2026, 6, 1); // no seasonal event unless a test forces one
         var world = new GameWorld(session, new StreamingSettings { MeshRadius = 1, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1 }, 1, saveDir == null ? null : Path.Combine(saveDir, "players"));
         var center = session.SpawnCell;
         var chunk = ChunkMath.CellToChunk(center);

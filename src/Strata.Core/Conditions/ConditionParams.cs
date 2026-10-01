@@ -133,3 +133,9 @@ public sealed class AnglerQuestConditionParams : SpecParams
 {
     public string Fish { get; init; } = "";
 }
+
+/// <summary>The seasonal event running is <see cref="Is"/> ("halloween", "christmas", or "none").</summary>
+public sealed class SeasonConditionParams : SpecParams
+{
+    public string Is { get; init; } = "";
+}

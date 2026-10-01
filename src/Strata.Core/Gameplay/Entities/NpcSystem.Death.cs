@@ -24,6 +24,7 @@ public sealed partial class NpcSystem
         // Coins come from the loot table when it names them, else from the creature's value (never both).
         bool tableCoins = npc.Def.Loot != null && _world.Session.Content.LootTables.TryGet(npc.Def.Loot, out var table) && table.Coins != null;
         if (npc.Def.Value > 0 && !tableCoins && !npc.FromStatue) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
+        RollGlobalDrops(npc, cell, drops);
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);

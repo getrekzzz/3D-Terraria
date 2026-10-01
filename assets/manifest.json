@@ -94,6 +94,12 @@
    ],
    "generator": "candle"
   },
+  "christmas_tree": {
+   "models": [
+    "assets/models/objects/christmas_tree_v0.glb"
+   ],
+   "generator": "christmas_tree"
+  },
   "cooking_pot": {
    "models": [
     "assets/models/objects/cooking_pot_v0.glb"
@@ -162,6 +168,12 @@
     "assets/models/objects/fern_v2.glb"
    ],
    "generator": "fern"
+  },
+  "festive_lights": {
+   "models": [
+    "assets/models/objects/festive_lights_v0.glb"
+   ],
+   "generator": "festive_lights"
   },
   "fireblossom_plant": {
    "models": [
@@ -235,6 +247,12 @@
     "assets/models/objects/iron_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "jack_o_lantern": {
+   "models": [
+    "assets/models/objects/jack_o_lantern_v0.glb"
+   ],
+   "generator": "pumpkin"
   },
   "lead_anvil": {
    "models": [
@@ -974,6 +992,14 @@
    "object": "candle",
    "icon": "assets/icons/items/candle.png"
   },
+  "candy_cane": {
+   "model": "assets/models/items/candy_cane.glb",
+   "icon": "assets/icons/items/candy_cane.png"
+  },
+  "candy_corn": {
+   "model": "assets/models/items/candy_corn.glb",
+   "icon": "assets/icons/items/candy_corn.png"
+  },
   "catfish": {
    "model": "assets/models/items/catfish.glb",
    "icon": "assets/icons/items/catfish.png"
@@ -1013,6 +1039,10 @@
   "chlorophyte_plate_mail": {
    "model": "assets/models/items/chlorophyte_plate_mail.glb",
    "icon": "assets/icons/items/chlorophyte_plate_mail.png"
+  },
+  "christmas_tree": {
+   "object": "christmas_tree",
+   "icon": "assets/icons/items/christmas_tree.png"
   },
   "christmas_tree_sword": {
    "model": "assets/models/items/christmas_tree_sword.glb",
@@ -1458,6 +1488,10 @@
    "model": "assets/models/items/feral_claws.glb",
    "icon": "assets/icons/items/feral_claws.png"
   },
+  "festive_lights": {
+   "object": "festive_lights",
+   "icon": "assets/icons/items/festive_lights.png"
+  },
   "fiberglass_fishing_pole": {
    "model": "assets/models/items/fiberglass_fishing_pole.glb",
    "icon": "assets/icons/items/fiberglass_fishing_pole.png"
@@ -1629,6 +1663,10 @@
   "golden_shower": {
    "model": "assets/models/items/golden_shower.glb",
    "icon": "assets/icons/items/golden_shower.png"
+  },
+  "goodie_bag": {
+   "model": "assets/models/items/goodie_bag.glb",
+   "icon": "assets/icons/items/goodie_bag.png"
   },
   "gps": {
    "model": "assets/models/items/gps.glb",
@@ -1869,6 +1907,10 @@
   "ivy_whip": {
    "model": "assets/models/items/ivy_whip.glb",
    "icon": "assets/icons/items/ivy_whip.png"
+  },
+  "jack_o_lantern": {
+   "object": "jack_o_lantern",
+   "icon": "assets/icons/items/jack_o_lantern.png"
   },
   "jesters_arrow": {
    "model": "assets/models/items/jesters_arrow.glb",
@@ -2590,6 +2632,10 @@
    "model": "assets/models/items/possessed_hatchet.glb",
    "icon": "assets/icons/items/possessed_hatchet.png"
   },
+  "present": {
+   "model": "assets/models/items/present.glb",
+   "icon": "assets/icons/items/present.png"
+  },
   "pressure_plate": {
    "object": "pressure_plate",
    "icon": "assets/icons/items/pressure_plate.png"
@@ -2601,6 +2647,14 @@
   "prismite": {
    "model": "assets/models/items/prismite.glb",
    "icon": "assets/icons/items/prismite.png"
+  },
+  "pumpkin": {
+   "model": "assets/models/items/pumpkin.glb",
+   "icon": "assets/icons/items/pumpkin.png"
+  },
+  "pumpkin_mask": {
+   "model": "assets/models/items/pumpkin_mask.glb",
+   "icon": "assets/icons/items/pumpkin_mask.png"
   },
   "pumpkin_moon_medallion": {
    "model": "assets/models/items/pumpkin_moon_medallion.glb",
@@ -2678,6 +2732,10 @@
    "model": "assets/models/items/regeneration_potion.glb",
    "icon": "assets/icons/items/regeneration_potion.png"
   },
+  "reindeer_antlers": {
+   "model": "assets/models/items/reindeer_antlers.glb",
+   "icon": "assets/icons/items/reindeer_antlers.png"
+  },
   "reinforced_fishing_pole": {
    "model": "assets/models/items/reinforced_fishing_pole.glb",
    "icon": "assets/icons/items/reinforced_fishing_pole.png"
@@ -2725,6 +2783,18 @@
   "sandstorm_in_a_bottle": {
    "model": "assets/models/items/sandstorm_in_a_bottle.glb",
    "icon": "assets/icons/items/sandstorm_in_a_bottle.png"
+  },
+  "santa_hat": {
+   "model": "assets/models/items/santa_hat.glb",
+   "icon": "assets/icons/items/santa_hat.png"
+  },
+  "santa_pants": {
+   "model": "assets/models/items/santa_pants.glb",
+   "icon": "assets/icons/items/santa_pants.png"
+  },
+  "santa_shirt": {
+   "model": "assets/models/items/santa_shirt.glb",
+   "icon": "assets/icons/items/santa_shirt.png"
   },
   "sapphire": {
    "model": "assets/models/items/sapphire.glb",
@@ -3545,6 +3615,18 @@
   "wire_cutter": {
    "model": "assets/models/items/wire_cutter.glb",
    "icon": "assets/icons/items/wire_cutter.png"
+  },
+  "witch_boots": {
+   "model": "assets/models/items/witch_boots.glb",
+   "icon": "assets/icons/items/witch_boots.png"
+  },
+  "witch_dress": {
+   "model": "assets/models/items/witch_dress.glb",
+   "icon": "assets/icons/items/witch_dress.png"
+  },
+  "witch_hat": {
+   "model": "assets/models/items/witch_hat.glb",
+   "icon": "assets/icons/items/witch_hat.png"
   },
   "wizard_hat": {
    "model": "assets/models/items/wizard_hat.glb",

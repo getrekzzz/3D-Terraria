@@ -134,6 +134,12 @@ public static class ConditionCompiler
             var p = s.Parse<AnglerQuestConditionParams>();
             return new DelegateCondition(c => c.AnglerQuest == p.Fish);
         },
+        ["season"] = s =>
+        {
+            var p = s.Parse<SeasonConditionParams>();
+            string want = p.Is == "none" ? "" : p.Is;
+            return new DelegateCondition(c => c.Season == want);
+        },
         ["all"] = s => new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["any"] = s => new AnyCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["not"] = s => new NotCondition(new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray())),
@@ -176,6 +182,7 @@ public static class ConditionCompiler
         c.Register<WeatherConditionParams>(SpecKind.Condition, "weather");
         c.Register<FishingLiquidConditionParams>(SpecKind.Condition, "fishingLiquid");
         c.Register<AnglerQuestConditionParams>(SpecKind.Condition, "anglerQuest");
+        c.Register<SeasonConditionParams>(SpecKind.Condition, "season");
         c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");

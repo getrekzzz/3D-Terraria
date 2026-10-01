@@ -26,6 +26,9 @@ public sealed class UserSettings
     /// <summary>Pause the world while the inventory or a menu is open.</summary>
     public bool AutoPause { get; set; }
 
+    /// <summary>Halloween and Christmas follow the system date (off: no seasonal events).</summary>
+    public bool SeasonalEvents { get; set; } = true;
+
     // Camera and controls
     public float MouseSensitivity { get; set; } = 1f;
     public bool InvertY { get; set; }

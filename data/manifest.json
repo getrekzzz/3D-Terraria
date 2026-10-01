@@ -47,6 +47,7 @@
     "items/mobility.json",
     "items/paint.json",
     "items/radiant.json",
+    "items/seasonal.json",
     "items/town_goods.json",
     "items/utility.json",
     "items/wiring.json",
