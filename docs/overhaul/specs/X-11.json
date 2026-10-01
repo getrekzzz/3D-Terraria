@@ -1,0 +1,29 @@
+{
+ "id": "X-11",
+ "title": "Disguised mini-bosses: chest Mimics, the Nymph, the Wyvern",
+ "owner_session": "bosses",
+ "player_outcome": "Surprise moments like Terraria: some chests underground are Mimics that wake when you open or hit them and hop after you; the Nymph poses as a lost girl until approached; Wyverns sweep the sky islands as long segmented dragons with a real sky presence.",
+ "design": [
+  "Mimic: a chest-like tile object/NPC disguise state (looks like a chest, opening it triggers the mimic) placed by worldgen/treasure pass at a low rate; Nymph disguise as a town-like NPC until close; Wyvern uses the worm/segment framework with flight; loot per Terraria.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Interaction/ObjectInteraction.cs",
+  "src/Strata.Core/AI/*",
+  "data/enemies/*.json",
+  "src/Strata.Core/WorldGen/Passes/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "MimicTests"
+ ],
+ "verification": [
+  "creatures.cmds disguised mimic wakes on open"
+ ],
+ "depends_on": [
+  "P4-07"
+ ],
+ "risks": [],
+ "effort": "M"
+}
