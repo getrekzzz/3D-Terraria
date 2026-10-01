@@ -4,7 +4,9 @@ import math
 
 from mathutils import Matrix, Vector
 
+from . import blade_profiles as bp
 from .mesh import MeshBuilder, hex_color
+from .tools_heads import axe, bow, hammer, pickaxe
 
 HANDLE = "prop:dark_planks"
 
@@ -17,57 +19,34 @@ def _metal(p):
 
 
 def sword(mb: MeshBuilder, p, rng):
+    """Profile-driven sword (see blade_profiles): ``profile`` (straight, leaf, broad, katana, curved, serrated, hooked,
+    jagged, cleaver, rapier, flame), ``guard`` (bar, crescent, winged, disc, spiky, none; a hex value is read as the
+    guard colour, like ``guardColor``), ``pommel`` (ball, gem, ring, spike, star, none), ``fuller`` (bool), ``edge``
+    and ``gem`` (hex), ``curve`` (tip offset in blade lengths), ``length``, ``width``, ``wrap`` (grip leather hex),
+    ``glow`` (True: the whole blade glows, "edge": only the edge bands)."""
     layer, tint = _metal(p)
     length, width = p.get("length", 0.9), p.get("width", 0.09)
-    mb.cylinder((0, 0, -0.18), (0, 0, 0.02), 0.022, None, HANDLE, segments=8)
-    mb.sphere((0, 0, -0.2), 0.035, layer, tint, subdivisions=1)
-    mb.box((-width * 1.4, -0.025, 0.02), (width * 1.4, 0.025, 0.07), layer, p.get("guard", tint))
-    blade = [(-width / 2, 0.07), (width / 2, 0.07), (width / 2, length * 0.85), (0, length), (-width / 2, length * 0.85)]
-    glow = ":glow" if p.get("glow") else ""
-    mb.extrude_polygon(blade, 0.018, layer + glow, tint)
-    mb.extrude_polygon([(-0.008, 0.08), (0.008, 0.08), (0.008, length * 0.8), (-0.008, length * 0.8)], 0.024, layer, "#e8ecf0")
+    kind = p.get("guard", "bar")
+    guard_color = p.get("guardColor", kind if str(kind).startswith("#") else tint)
+    kind = "bar" if str(kind).startswith("#") else kind
+    glow = p.get("glow")
+    body = layer + (":glow" if glow is True else "")
+    edge_mat = layer + (":glow" if glow else "")
+    bp.grip(mb, -0.18, 0.02, p.get("wrap"))
+    bp.pommel(mb, p.get("pommel", "ball"), -0.205, layer, guard_color, p.get("gem"))
+    bp.guard(mb, kind, 0.02, width, layer, guard_color, p.get("gem") if p.get("pommel") != "gem" else None)
+    blade_len = length - 0.07
+    tip = bp.blade(mb, p.get("profile", "straight"), 0.068, blade_len, width, body, tint, p.get("edge"), edge_mat,
+                   thick=p.get("thick", 0.022), fuller=p.get("fuller", False), curve=p.get("curve", 0.0))
+    mb.socket("grip", (0, 0, 0))
+    mb.socket("tip", tip)
 
 
 def shortsword(mb: MeshBuilder, p, rng):
-    sword(mb, {**p, "length": p.get("length", 0.55), "width": p.get("width", 0.07)}, rng)
-
-
-def _haft(mb, length, wood="prop:planks", tint="#ffffff"):
-    mb.cylinder((0, 0, -0.1), (0, 0, length), 0.022, 0.02, wood, tint, segments=7)
-
-
-def pickaxe(mb: MeshBuilder, p, rng):
-    layer, tint = _metal(p)
-    _haft(mb, 0.75)
-    head = [Vector((-0.34, 0, 0.58)), Vector((-0.18, 0, 0.72)), Vector((0, 0, 0.76)), Vector((0.18, 0, 0.72)), Vector((0.34, 0, 0.58))]
-    mb.tube(head, [0.012, 0.035, 0.045, 0.035, 0.012], layer, tint, segments=6)
-
-
-def axe(mb: MeshBuilder, p, rng):
-    layer, tint = _metal(p)
-    _haft(mb, 0.7)
-    blade = [(0.0, 0.52), (0.1, 0.5), (0.22, 0.44), (0.24, 0.62), (0.22, 0.8), (0.1, 0.74), (0.0, 0.72)]
-    mb.extrude_polygon(blade, 0.03, layer, tint)
-    mb.box((-0.06, -0.035, 0.56), (0.02, 0.035, 0.7), layer, tint)
-
-
-def hammer(mb: MeshBuilder, p, rng):
-    layer, tint = _metal(p)
-    wood = p.get("headLayer")
-    _haft(mb, 0.65)
-    mb.box((-0.16, -0.07, 0.6), (0.16, 0.07, 0.76), f"prop:{wood}" if wood else layer, tint if not wood else "#ffffff")
-
-
-def bow(mb: MeshBuilder, p, rng):
-    layer = f"prop:{p.get('limbLayer', 'planks')}" + (":metal" if p.get("limbLayer") == "iron" else "")
-    tint = p.get("metal", "#ffffff") if p.get("limbLayer") in ("iron", "gold", "copper") else "#ffffff"
-    pts = [Vector((0.02 * math.sin(t * math.pi) - 0.0, 0, (t - 0.5) * 1.1)) + Vector((-0.18 * math.sin(t * math.pi), 0, 0)) for t in (i / 8 for i in range(9))]
-    mb.tube(pts, [0.012, 0.018, 0.022, 0.026, 0.03, 0.026, 0.022, 0.018, 0.012], layer, tint, segments=6)
-    mb.cylinder(pts[0], pts[-1], 0.004, None, "prop:cloth", "#f0f0e0", segments=4)
-    mb.cylinder((-0.17, 0, -0.08), (-0.17, 0, 0.08), 0.03, None, "prop:red_cloth", segments=8)
-    # The hand holds the riser; the arrow nocks at the string centre (the origin) and flies toward the riser (-X).
-    mb.socket("grip", (-0.17, 0, 0))
-    mb.socket("nock", (0, 0, 0), (-1, 0, 0), (0, 0, 1))
+    """A short blade: long-sword profiles map to a rapier or leaf blade (``shortProfile`` overrides)."""
+    profile = p.get("shortProfile") or bp.SHORT.get(p.get("profile", "straight"), p.get("profile", "leaf"))
+    sword(mb, {**p, "profile": profile, "length": p.get("length", 0.55), "width": p.get("width", 0.07),
+               "pommel": p.get("pommel", "ball")}, rng)
 
 
 def wand(mb: MeshBuilder, p, rng):
