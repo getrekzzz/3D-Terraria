@@ -53,16 +53,17 @@
     {
       "id": "queen_bee", "model": "queen_bee", "tags": ["boss", "lava_immune"], "name": "Queen Bee", "description": "The mother of the hive, furious at the loss of her larva.",
       "brain": { "type": "pattern", "phases": [
-        { "below": 1.0, "summon": { "enemy": "bee", "interval": 120, "max": 8, "count": 3 },
+        { "below": 1.0, "summon": { "enemy": "bee", "interval": 120, "max": 8, "count": 3 }, "expert": { "speed": 1.2, "volleyCount": 2, "summonMax": 3 },
           "moves": [{ "type": "dash", "count": 3, "telegraph": 30, "ticks": 45, "speed": 18 },
             { "type": "hover", "ticks": 220, "speed": 9, "height": 5, "distance": 5, "volley": { "projectile": "queen_stinger", "damage": 22, "speed": 16, "interval": 25, "spread": 6 } }] },
-        { "below": 0.5, "speed": 1.25, "damage": 1.15, "summon": { "enemy": "bee", "interval": 90, "max": 10, "count": 3 },
+        { "below": 0.5, "speed": 1.25, "damage": 1.15, "summon": { "enemy": "bee", "interval": 90, "max": 10, "count": 3 }, "expert": { "speed": 1.2, "volleyCount": 2, "summonMax": 3 },
           "moves": [{ "type": "dash", "count": 4, "telegraph": 22, "ticks": 40, "speed": 21 },
-            { "type": "hover", "ticks": 180, "speed": 10, "height": 5, "distance": 5, "volley": { "projectile": "queen_stinger", "damage": 24, "speed": 18, "interval": 18, "spread": 8 } }] }
+            { "type": "hover", "ticks": 180, "speed": 10, "height": 5, "distance": 5, "volley": { "projectile": "queen_stinger", "damage": 24, "speed": 18, "interval": 18, "count": 3, "spread": 8 } }] }
       ] },
       "life": 3400, "damage": 30, "defense": 8, "knockbackResist": 1.0, "size": [2, 1.7], "scale": 3, "moveSpeed": 9, "gravity": false, "collideTerrain": false,
       "loot": "queen_bee", "value": 10000,
-      "boss": { "title": "Queen Bee", "flag": "defeated_queen_bee", "arenaRadius": 150, "music": "boss_bee" },
+      "boss": { "title": "Queen Bee", "flag": "defeated_queen_bee", "arenaRadius": 150, "music": "boss_bee",
+        "enrage": { "when": [{ "type": "biome", "none": ["jungle", "underground_jungle", "hive"] }], "damage": 2, "speed": 1.5, "message": "Queen Bee is enraged!" } },
       "covers": ["terraria:queen_bee"]
     }
   ]

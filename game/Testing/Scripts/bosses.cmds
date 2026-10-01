@@ -40,6 +40,8 @@ killall
 boss queen_bee 10
 wait 3
 assert npcs.queen_bee == 1
+# Outside the jungle she is enraged.
+assert boss.queen_bee.frenzied == 1
 slay queen_bee
 assert flag.defeated_queen_bee == 1
 killall

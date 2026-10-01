@@ -3,6 +3,7 @@
   "projectiles": [
     { "id": "deerclops_ice", "name": "Ice Spike", "visual": "orb", "color": "#bfe8ff", "gravity": 16, "lifetime": 200, "radius": 0.5, "friendly": false, "hostile": true, "light": [6, 9, 12],
       "onHit": [{ "type": "applyBuff", "buff": "chilled", "ticks": 240, "chance": 0.5 }] },
+    { "id": "deerclops_shadow_hand", "name": "Shadow Hand", "visual": "bolt", "color": "#2a1838", "lifetime": 220, "radius": 0.6, "collideTerrain": false, "friendly": false, "hostile": true, "trail": "#5a3a78" },
     { "id": "weather_pain_bolt", "name": "Weather Pain", "visual": "bolt", "color": "#cfe8ff", "lifetime": 180, "radius": 0.9, "pierce": -1, "collideTerrain": false, "light": [8, 10, 12], "trail": "#ffffff" },
     { "id": "pew_matic_horn_shot", "name": "Pew-matic Horn", "visual": "bolt", "color": "#e8e0c8", "gravity": 10, "lifetime": 150, "radius": 0.45, "bounces": 2 }
   ],
@@ -40,14 +41,17 @@
       "id": "deerclops", "model": "deerclops", "tags": ["boss", "lava_immune"], "name": "Deerclops",
       "description": "A towering one-eyed beast of the tundra that hurls ice and stamps the ground to pieces.",
       "brain": { "type": "pattern", "ground": true, "phases": [
-        { "below": 1.0,
+        { "below": 1.0, "expert": { "speed": 1.15, "volleyCount": 2 },
           "moves": [{ "type": "walk", "ticks": 200, "speed": 3.2 },
             { "type": "wait", "ticks": 70, "pose": "attack", "volley": { "projectile": "deerclops_ice", "damage": 24, "speed": 13, "interval": 60, "count": 6, "spread": 18 } },
-            { "type": "hop", "count": 1, "height": 5, "speed": 7, "telegraph": 35 }] },
-        { "below": 0.5, "speed": 1.3, "damage": 1.2, "message": "Deerclops grows furious!",
+            { "type": "slam", "height": 3, "telegraph": 40, "speed": 14, "ticks": 60, "volley": { "projectile": "deerclops_ice", "damage": 26, "speed": 11, "count": 10, "ring": true } },
+            { "type": "wait", "ticks": 60, "pose": "attack", "expertOnly": true, "volley": { "projectile": "deerclops_shadow_hand", "damage": 30, "speed": 7, "interval": 30, "count": 3, "spread": 35 } }] },
+        { "below": 0.5, "speed": 1.3, "damage": 1.2, "message": "Deerclops grows furious!", "expert": { "speed": 1.15, "volleyCount": 2 },
           "moves": [{ "type": "walk", "ticks": 150, "speed": 3.8 },
             { "type": "wait", "ticks": 60, "pose": "attack", "volley": { "projectile": "deerclops_ice", "damage": 26, "speed": 12, "interval": 40, "count": 10, "ring": true } },
-            { "type": "hop", "count": 2, "height": 6, "speed": 8, "telegraph": 28 }] }
+            { "type": "slam", "height": 4, "telegraph": 30, "speed": 16, "ticks": 60, "volley": { "projectile": "deerclops_ice", "damage": 28, "speed": 12, "count": 14, "ring": true } },
+            { "type": "wait", "ticks": 50, "pose": "attack", "volley": { "projectile": "deerclops_shadow_hand", "damage": 32, "speed": 8, "interval": 25, "count": 2, "spread": 30 } },
+            { "type": "slam", "height": 3, "telegraph": 25, "speed": 16, "ticks": 60, "expertOnly": true, "volley": { "projectile": "deerclops_ice", "damage": 28, "speed": 12, "count": 14, "ring": true } }] }
       ] },
       "life": 7000, "damage": 28, "defense": 10, "knockbackResist": 1.0, "size": [4, 9], "moveSpeed": 3.5, "tint": "#ffffff",
       "loot": "deerclops", "value": 12000,

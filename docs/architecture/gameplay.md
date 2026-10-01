@@ -113,6 +113,11 @@
   only) sets `EffectState.InvertControls`; `PlayerController.Status` reads the movement keys (walking, minecarts,
   dashes) through `EffectState.SteerInput`, never the camera. Death recomputes effects after clearing debuffs, so
   confusion never outlives the player.
+* **Queen Bee and Deerclops** — Queen Bee (3400) alternates charges and a stinger hover (volleys of 3 below half life)
+  while calling bees; Expert adds speed, two stingers per volley and three more bees, and `boss.enrage` (target outside
+  jungle, underground jungle and hive) doubles her damage and speeds her up 1.5×. Deerclops (7000) walks, hurls debris,
+  stomps with a `slam` (impact + a ring of ice spikes) and, below half life or in Expert, sends shadow hands that pass
+  through walls; Expert also adds speed, denser volleys and an extra stomp.
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and
   fires `Raised` (announcements; the hook for world mutations).
