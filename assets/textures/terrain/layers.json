@@ -1,6 +1,6 @@
 {
  "columns": 8,
- "rows": 12,
+ "rows": 13,
  "size": 256,
  "layers": [
   {
@@ -459,211 +459,274 @@
    "detailStrength": 0.6
   },
   {
-   "name": "bone_block",
+   "name": "azure_brick_wall",
    "index": 65,
    "type": "bricks",
    "detail": 7,
    "detailStrength": 0.6
   },
   {
-   "name": "obsidian_brick",
+   "name": "azure_slab",
    "index": 66,
    "type": "bricks",
    "detail": 7,
    "detailStrength": 0.6
   },
   {
-   "name": "cinder_brick",
+   "name": "azure_tiled",
    "index": 67,
    "type": "bricks",
    "detail": 7,
    "detailStrength": 0.6
   },
   {
-   "name": "sky_brick",
+   "name": "verdant_brick_wall",
    "index": 68,
    "type": "bricks",
    "detail": 7,
    "detailStrength": 0.6
   },
   {
-   "name": "glass",
+   "name": "verdant_slab",
    "index": 69,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "verdant_tiled",
+   "index": 70,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "rose_brick_wall",
+   "index": 71,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "rose_slab",
+   "index": 72,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "rose_tiled",
+   "index": 73,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "bone_block",
+   "index": 74,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "obsidian_brick",
+   "index": 75,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "cinder_brick",
+   "index": 76,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "sky_brick",
+   "index": 77,
+   "type": "bricks",
+   "detail": 7,
+   "detailStrength": 0.6
+  },
+  {
+   "name": "glass",
+   "index": 78,
    "type": "translucent",
    "detail": 0,
    "detailStrength": 0.0
   },
   {
    "name": "cobweb",
-   "index": 70,
+   "index": 79,
    "type": "web",
    "detail": 0,
    "detailStrength": 0.0
   },
   {
    "name": "missing",
-   "index": 71,
+   "index": 80,
    "type": "missing",
    "detail": 0,
    "detailStrength": 0.0
   },
   {
    "name": "honey_block",
-   "index": 72,
+   "index": 81,
    "type": "hive",
    "detail": 6,
    "detailStrength": 0.3
   },
   {
    "name": "crispy_honey",
-   "index": 73,
+   "index": 82,
    "type": "hive",
    "detail": 6,
    "detailStrength": 0.3
   },
   {
    "name": "hallowed_grass",
-   "index": 74,
+   "index": 83,
    "type": "grass",
    "detail": 3,
    "detailStrength": 0.8
   },
   {
    "name": "pearlstone",
-   "index": 75,
+   "index": 84,
    "type": "rock",
    "detail": 0,
    "detailStrength": 0.8
   },
   {
    "name": "pearlsand",
-   "index": 76,
+   "index": 85,
    "type": "soil",
    "detail": 2,
    "detailStrength": 0.7
   },
   {
    "name": "pink_ice",
-   "index": 77,
+   "index": 86,
    "type": "rock",
    "detail": 6,
    "detailStrength": 0.3
   },
   {
    "name": "umbral_sand",
-   "index": 78,
+   "index": 87,
    "type": "soil",
    "detail": 2,
    "detailStrength": 0.7
   },
   {
    "name": "umbral_ice",
-   "index": 79,
+   "index": 88,
    "type": "rock",
    "detail": 6,
    "detailStrength": 0.3
   },
   {
    "name": "sanguine_sand",
-   "index": 80,
+   "index": 89,
    "type": "soil",
    "detail": 2,
    "detailStrength": 0.7
   },
   {
    "name": "sanguine_ice",
-   "index": 81,
+   "index": 90,
    "type": "rock",
    "detail": 6,
    "detailStrength": 0.3
   },
   {
    "name": "cerulite_ore",
-   "index": 82,
+   "index": 91,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "rosalite_ore",
-   "index": 83,
+   "index": 92,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "verdite_ore",
-   "index": 84,
+   "index": 93,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "orchidite_ore",
-   "index": 85,
+   "index": 94,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "crimsite_ore",
-   "index": 86,
+   "index": 95,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "stellite_ore",
-   "index": 87,
+   "index": 96,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "lihzahrd_brick",
-   "index": 88,
+   "index": 97,
    "type": "bricks",
    "detail": 7,
    "detailStrength": 0.6
   },
   {
    "name": "chlorophyte_ore",
-   "index": 89,
+   "index": 98,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "luminite",
-   "index": 90,
+   "index": 99,
    "type": "ore",
    "detail": 0,
    "detailStrength": 0.7
   },
   {
    "name": "ebonwood_planks",
-   "index": 91,
+   "index": 100,
    "type": "planks",
    "detail": 4,
    "detailStrength": 0.6
   },
   {
    "name": "shadewood_planks",
-   "index": 92,
+   "index": 101,
    "type": "planks",
    "detail": 4,
    "detailStrength": 0.6
   },
   {
    "name": "rope",
-   "index": 93,
+   "index": 102,
    "type": "rope",
    "detail": 0,
    "detailStrength": 0.0
   },
   {
    "name": "aetherium",
-   "index": 94,
+   "index": 103,
    "type": "speckled",
    "detail": 0,
    "detailStrength": 0.7
