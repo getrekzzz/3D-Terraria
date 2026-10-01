@@ -44,7 +44,10 @@ public sealed partial class WorldRuntime : Node3D
         Game = game;
 
         _renderer = new ChunkRenderer { Name = "Chunks" };
-        _renderer.Initialize(new TerrainMaterials(services.Render));
+        var terrain = new TerrainMaterials(services.Render);
+        terrain.ApplyGraphics(services.Graphics.Preset);
+        services.Graphics.Changed += terrain.ApplyGraphics;
+        _renderer.Initialize(terrain);
         AddChild(_renderer);
         if (services.Render.Grass is { } grass)
         {
