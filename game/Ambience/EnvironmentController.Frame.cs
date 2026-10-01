@@ -144,6 +144,10 @@ public sealed partial class EnvironmentController
         _env.FogDepthEnd = Mathf.Lerp(ViewDistance * 1.02f, 42f / Mathf.Max(_biomeDensity, 0.5f), deep);
         _env.FogDensity = Mathf.Lerp(1f, 0.92f, deep);
         _env.FogSunScatter = 0.08f * (1f - deep);
+        // Deep in a cave the sky background only shows past the streamed chunks (the far side of the underworld, a
+        // cavern's unloaded edge): the gloom covers it there, or the cave-adapted eye would see a white sky. A shaft or
+        // chasm open to the sky keeps its sky.
+        _env.FogSkyAffect = under * (1f - _outdoor);
 
         // Volumetric haze and light shafts outdoors; in caves only carried lights glow in a faint mist.
         _env.VolumetricFogDensity = Mathf.Lerp(0.006f, 0.004f, deep) * Mathf.Clamp(_biomeDensity, 0.5f, 3f);

@@ -18,8 +18,9 @@ tints (`data/biomes.json`) and the generated texture arrays.
 
 `EnvironmentController(.Frame).cs` drives time of day: sun and moon arcs, atmosphere-coloured light, night
 desaturation, fog (aerial perspective above ground, close biome-tinted gloom below; the gloom closes in at
-`fog.closePerSecond` when the camera loses the sky and clears at the faster `fog.clearPerSecond`), cloud cover
-drifting with the weather and the ground wind (`strata_wind`) that grass and foliage share.
+`fog.closePerSecond` when the camera loses the sky and clears at the faster `fog.clearPerSecond`; deep in a cave it
+also covers the sky background that shows past the streamed chunks, which the cave-adapted eye would see white),
+cloud cover drifting with the weather and the ground wind (`strata_wind`) that grass and foliage share.
 
 ## Sky (`sky.gdshader`)
 Single-scattering atmosphere (Rayleigh, Mie, ozone; quadratic sample spacing) evaluated in the quarter-resolution

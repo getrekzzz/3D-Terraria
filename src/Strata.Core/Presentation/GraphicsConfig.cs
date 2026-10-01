@@ -116,7 +116,10 @@ public sealed class GraphicsPreset
     /// <summary>Cloud light-marching steps (0 draws flat clouds).</summary>
     public int CloudSteps { get; set; } = 3;
 
-    /// <summary>Eye adaptation between bright surface and dark caves.</summary>
+    /// <summary>
+    /// Godot's metering on top of the eye adaptation every preset gets (<see cref="ExposureModel"/>): it fine-tunes
+    /// brightness to the frame within lighting.json's autoMin–autoMax window.
+    /// </summary>
     public bool AutoExposure { get; set; }
 
     /// <summary>Grass blade density (0 disables grass) and draw distance in metres.</summary>

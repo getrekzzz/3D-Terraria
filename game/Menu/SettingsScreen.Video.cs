@@ -58,7 +58,8 @@ public sealed partial class SettingsScreen
         Flag(box, "Reflections (SSR)", p => p.Ssr, (p, v) => p.Ssr = v, "Expensive.");
         Flag(box, "Volumetric fog", p => p.VolumetricFog, (p, v) => p.VolumetricFog = v, "Light shafts. Expensive.");
         Flag(box, "Bloom", p => p.Glow, (p, v) => p.Glow = v);
-        Flag(box, "Eye adaptation", p => p.AutoExposure, (p, v) => p.AutoExposure = v, "Brightness adapts between the surface and caves.");
+        Flag(box, "Auto exposure", p => p.AutoExposure, (p, v) => p.AutoExposure = v,
+            "Fine-tunes brightness to what is on screen. Eyes adjust to caves and bright sand on every setting.");
         Option(box, "Grass density", p => p.GrassDensity, (p, v) => p.GrassDensity = (float)v, 0, 1, 0.05, v => $"{v * 100:0}%");
         Option(box, "Grass distance", p => p.GrassDistance, (p, v) => p.GrassDistance = (float)v, 0, 80, 1, v => $"{v:0} m");
         Option(box, "Cloud detail", p => p.CloudSteps, (p, v) => p.CloudSteps = (int)v, 0, 8, 1, v => $"{v:0}");
