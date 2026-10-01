@@ -22,6 +22,7 @@ public static class BuiltinCommands
         TownCommands.Register(r);
         WorldCommands.Register(r);
         WeatherCommands.Register(r);
+        FishingCommands.Register(r);
         PerfCommands.Register(r);
         return r;
     }

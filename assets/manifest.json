@@ -528,6 +528,10 @@
    "object": "alchemy_table",
    "icon": "assets/icons/items/alchemy_table.png"
   },
+  "amanitia_fungifin": {
+   "model": "assets/models/items/amanitia_fungifin.glb",
+   "icon": "assets/icons/items/amanitia_fungifin.png"
+  },
   "amazon": {
    "model": "assets/models/items/amazon.glb",
    "icon": "assets/icons/items/amazon.png"
@@ -556,6 +560,18 @@
    "model": "assets/models/items/angel_wings.glb",
    "icon": "assets/icons/items/angel_wings.png"
   },
+  "angelfish": {
+   "model": "assets/models/items/angelfish.glb",
+   "icon": "assets/icons/items/angelfish.png"
+  },
+  "angler_earring": {
+   "model": "assets/models/items/angler_earring.glb",
+   "icon": "assets/icons/items/angler_earring.png"
+  },
+  "angler_tackle_bag": {
+   "model": "assets/models/items/angler_tackle_bag.glb",
+   "icon": "assets/icons/items/angler_tackle_bag.png"
+  },
   "ankh_shield": {
    "model": "assets/models/items/ankh_shield.glb",
    "icon": "assets/icons/items/ankh_shield.png"
@@ -567,6 +583,10 @@
   "antlion_mandible": {
    "model": "assets/models/items/antlion_mandible.glb",
    "icon": "assets/icons/items/antlion_mandible.png"
+  },
+  "apprentice_bait": {
+   "model": "assets/models/items/apprentice_bait.glb",
+   "icon": "assets/icons/items/apprentice_bait.png"
   },
   "archery_potion": {
    "model": "assets/models/items/archery_potion.glb",
@@ -603,6 +623,10 @@
   "bat_scepter": {
    "model": "assets/models/items/bat_scepter.glb",
    "icon": "assets/icons/items/bat_scepter.png"
+  },
+  "batfish": {
+   "model": "assets/models/items/batfish.glb",
+   "icon": "assets/icons/items/batfish.png"
   },
   "bed": {
    "object": "bed",
@@ -716,6 +740,10 @@
    "model": "assets/models/items/bone.glb",
    "icon": "assets/icons/items/bone.png"
   },
+  "bonefish": {
+   "model": "assets/models/items/bonefish.glb",
+   "icon": "assets/icons/items/bonefish.png"
+  },
   "book_of_skulls": {
    "model": "assets/models/items/book_of_skulls.glb",
    "icon": "assets/icons/items/book_of_skulls.png"
@@ -768,9 +796,17 @@
    "model": "assets/models/items/builder_potion.glb",
    "icon": "assets/icons/items/builder_potion.png"
   },
+  "bumblebee_tuna": {
+   "model": "assets/models/items/bumblebee_tuna.glb",
+   "icon": "assets/icons/items/bumblebee_tuna.png"
+  },
   "bunny": {
    "model": "assets/models/items/bunny.glb",
    "icon": "assets/icons/items/bunny.png"
+  },
+  "bunnyfish": {
+   "model": "assets/models/items/bunnyfish.glb",
+   "icon": "assets/icons/items/bunnyfish.png"
   },
   "butterfly": {
    "model": "assets/models/items/butterfly.glb",
@@ -799,6 +835,10 @@
   "candle": {
    "object": "candle",
    "icon": "assets/icons/items/candle.png"
+  },
+  "catfish": {
+   "model": "assets/models/items/catfish.glb",
+   "icon": "assets/icons/items/catfish.png"
   },
   "celestial_emblem": {
    "model": "assets/models/items/celestial_emblem.glb",
@@ -851,6 +891,14 @@
   "cloud_in_a_bottle": {
    "model": "assets/models/items/cloud_in_a_bottle.glb",
    "icon": "assets/icons/items/cloud_in_a_bottle.png"
+  },
+  "cloudfish": {
+   "model": "assets/models/items/cloudfish.glb",
+   "icon": "assets/icons/items/cloudfish.png"
+  },
+  "clownfish": {
+   "model": "assets/models/items/clownfish.glb",
+   "icon": "assets/icons/items/clownfish.png"
   },
   "cobalt_axe": {
    "model": "assets/models/items/cobalt_axe.glb",
@@ -963,6 +1011,18 @@
   "copper_shortsword": {
    "model": "assets/models/items/copper_shortsword.glb",
    "icon": "assets/icons/items/copper_shortsword.png"
+  },
+  "corrupt_crate": {
+   "model": "assets/models/items/corrupt_crate.glb",
+   "icon": "assets/icons/items/corrupt_crate.png"
+  },
+  "crate_potion": {
+   "model": "assets/models/items/crate_potion.glb",
+   "icon": "assets/icons/items/crate_potion.png"
+  },
+  "crimson_crate": {
+   "model": "assets/models/items/crimson_crate.glb",
+   "icon": "assets/icons/items/crimson_crate.png"
   },
   "crimson_rod": {
    "model": "assets/models/items/crimson_rod.glb",
@@ -1092,6 +1152,10 @@
    "model": "assets/models/items/demon_wings.glb",
    "icon": "assets/icons/items/demon_wings.png"
   },
+  "demonic_hellfish": {
+   "model": "assets/models/items/demonic_hellfish.glb",
+   "icon": "assets/icons/items/demonic_hellfish.png"
+  },
   "demonite_axe": {
    "model": "assets/models/items/demonite_axe.glb",
    "icon": "assets/icons/items/demonite_axe.png"
@@ -1156,9 +1220,17 @@
    "model": "assets/models/items/duck.glb",
    "icon": "assets/icons/items/duck.png"
   },
+  "dungeon_crate": {
+   "model": "assets/models/items/dungeon_crate.glb",
+   "icon": "assets/icons/items/dungeon_crate.png"
+  },
   "dynamite": {
    "model": "assets/models/items/dynamite.glb",
    "icon": "assets/icons/items/dynamite.png"
+  },
+  "dynamite_fish": {
+   "model": "assets/models/items/dynamite_fish.glb",
+   "icon": "assets/icons/items/dynamite_fish.png"
   },
   "ebonkoi": {
    "model": "assets/models/items/ebonkoi.glb",
@@ -1228,6 +1300,10 @@
    "model": "assets/models/items/fallen_star.glb",
    "icon": "assets/icons/items/fallen_star.png"
   },
+  "fallen_starfish": {
+   "model": "assets/models/items/fallen_starfish.glb",
+   "icon": "assets/icons/items/fallen_starfish.png"
+  },
   "feather": {
    "model": "assets/models/items/feather.glb",
    "icon": "assets/icons/items/feather.png"
@@ -1239,6 +1315,10 @@
   "feral_claws": {
    "model": "assets/models/items/feral_claws.glb",
    "icon": "assets/icons/items/feral_claws.png"
+  },
+  "fiberglass_fishing_pole": {
+   "model": "assets/models/items/fiberglass_fishing_pole.glb",
+   "icon": "assets/icons/items/fiberglass_fishing_pole.png"
   },
   "finch_staff": {
    "model": "assets/models/items/finch_staff.glb",
@@ -1264,6 +1344,10 @@
    "model": "assets/models/items/fisher_of_souls.glb",
    "icon": "assets/icons/items/fisher_of_souls.png"
   },
+  "fishing_potion": {
+   "model": "assets/models/items/fishing_potion.glb",
+   "icon": "assets/icons/items/fishing_potion.png"
+  },
   "fishron_wings": {
    "model": "assets/models/items/fishron_wings.glb",
    "icon": "assets/icons/items/fishron_wings.png"
@@ -1283,6 +1367,10 @@
   "flaming_arrow": {
    "model": "assets/models/items/flaming_arrow.glb",
    "icon": "assets/icons/items/flaming_arrow.png"
+  },
+  "flarefin_koi": {
+   "model": "assets/models/items/flarefin_koi.glb",
+   "icon": "assets/icons/items/flarefin_koi.png"
   },
   "fledgling_wings": {
    "model": "assets/models/items/fledgling_wings.glb",
@@ -1315,6 +1403,10 @@
   "frog": {
    "model": "assets/models/items/frog.glb",
    "icon": "assets/icons/items/frog.png"
+  },
+  "frozen_crate": {
+   "model": "assets/models/items/frozen_crate.glb",
+   "icon": "assets/icons/items/frozen_crate.png"
   },
   "furnace": {
    "object": "furnace",
@@ -1432,6 +1524,10 @@
    "model": "assets/models/items/hallowed_bar.glb",
    "icon": "assets/icons/items/hallowed_bar.png"
   },
+  "hallowed_crate": {
+   "model": "assets/models/items/hallowed_crate.glb",
+   "icon": "assets/icons/items/hallowed_crate.png"
+  },
   "hallowed_greaves": {
    "model": "assets/models/items/hallowed_greaves.glb",
    "icon": "assets/icons/items/hallowed_greaves.png"
@@ -1459,6 +1555,10 @@
   "harpoon": {
    "model": "assets/models/items/harpoon.glb",
    "icon": "assets/icons/items/harpoon.png"
+  },
+  "harpyfish": {
+   "model": "assets/models/items/harpyfish.glb",
+   "icon": "assets/icons/items/harpyfish.png"
   },
   "healing_potion": {
    "model": "assets/models/items/healing_potion.glb",
@@ -1536,9 +1636,17 @@
    "model": "assets/models/items/honey_comb.glb",
    "icon": "assets/icons/items/honey_comb.png"
   },
+  "honeyfin": {
+   "model": "assets/models/items/honeyfin.glb",
+   "icon": "assets/icons/items/honeyfin.png"
+  },
   "hook": {
    "model": "assets/models/items/hook.glb",
    "icon": "assets/icons/items/hook.png"
+  },
+  "hotline_fishing_hook": {
+   "model": "assets/models/items/hotline_fishing_hook.glb",
+   "icon": "assets/icons/items/hotline_fishing_hook.png"
   },
   "ichor": {
    "model": "assets/models/items/ichor.glb",
@@ -1620,6 +1728,18 @@
    "model": "assets/models/items/jesters_arrow.glb",
    "icon": "assets/icons/items/jesters_arrow.png"
   },
+  "jewelfish": {
+   "model": "assets/models/items/jewelfish.glb",
+   "icon": "assets/icons/items/jewelfish.png"
+  },
+  "journeyman_bait": {
+   "model": "assets/models/items/journeyman_bait.glb",
+   "icon": "assets/icons/items/journeyman_bait.png"
+  },
+  "jungle_crate": {
+   "model": "assets/models/items/jungle_crate.glb",
+   "icon": "assets/icons/items/jungle_crate.png"
+  },
   "jungle_hat": {
    "model": "assets/models/items/jungle_hat.glb",
    "icon": "assets/icons/items/jungle_hat.png"
@@ -1659,6 +1779,14 @@
   "lava_charm": {
    "model": "assets/models/items/lava_charm.glb",
    "icon": "assets/icons/items/lava_charm.png"
+  },
+  "lavaproof_fishing_hook": {
+   "model": "assets/models/items/lavaproof_fishing_hook.glb",
+   "icon": "assets/icons/items/lavaproof_fishing_hook.png"
+  },
+  "lavaproof_tackle_bag": {
+   "model": "assets/models/items/lavaproof_tackle_bag.glb",
+   "icon": "assets/icons/items/lavaproof_tackle_bag.png"
   },
   "lead_anvil": {
    "object": "lead_anvil",
@@ -1812,6 +1940,10 @@
    "model": "assets/models/items/mana_regeneration_potion.glb",
    "icon": "assets/icons/items/mana_regeneration_potion.png"
   },
+  "master_bait": {
+   "model": "assets/models/items/master_bait.glb",
+   "icon": "assets/icons/items/master_bait.png"
+  },
   "mechanical_eye": {
    "model": "assets/models/items/mechanical_eye.glb",
    "icon": "assets/icons/items/mechanical_eye.png"
@@ -1884,6 +2016,10 @@
    "model": "assets/models/items/mothron_wings.glb",
    "icon": "assets/icons/items/mothron_wings.png"
   },
+  "mudfish": {
+   "model": "assets/models/items/mudfish.glb",
+   "icon": "assets/icons/items/mudfish.png"
+  },
   "muramasa": {
    "model": "assets/models/items/muramasa.glb",
    "icon": "assets/icons/items/muramasa.png"
@@ -1903,6 +2039,10 @@
   "musket_ball": {
    "model": "assets/models/items/musket_ball.glb",
    "icon": "assets/icons/items/musket_ball.png"
+  },
+  "mutant_flinxfin": {
+   "model": "assets/models/items/mutant_flinxfin.glb",
+   "icon": "assets/icons/items/mutant_flinxfin.png"
   },
   "mythril_anvil": {
    "object": "mythril_anvil",
@@ -2040,6 +2180,14 @@
    "model": "assets/models/items/north_pole.glb",
    "icon": "assets/icons/items/north_pole.png"
   },
+  "oasis_crate": {
+   "model": "assets/models/items/oasis_crate.glb",
+   "icon": "assets/icons/items/oasis_crate.png"
+  },
+  "obsidian_crate": {
+   "model": "assets/models/items/obsidian_crate.glb",
+   "icon": "assets/icons/items/obsidian_crate.png"
+  },
   "obsidian_shield": {
    "model": "assets/models/items/obsidian_shield.glb",
    "icon": "assets/icons/items/obsidian_shield.png"
@@ -2051,6 +2199,14 @@
   "obsidian_skull": {
    "model": "assets/models/items/obsidian_skull.glb",
    "icon": "assets/icons/items/obsidian_skull.png"
+  },
+  "obsidifish": {
+   "model": "assets/models/items/obsidifish.glb",
+   "icon": "assets/icons/items/obsidifish.png"
+  },
+  "ocean_crate": {
+   "model": "assets/models/items/ocean_crate.glb",
+   "icon": "assets/icons/items/ocean_crate.png"
   },
   "orange_paint": {
    "model": "assets/models/items/orange_paint.glb",
@@ -2175,6 +2331,10 @@
   "panic_necklace": {
    "model": "assets/models/items/panic_necklace.glb",
    "icon": "assets/icons/items/panic_necklace.png"
+  },
+  "pengfish": {
+   "model": "assets/models/items/pengfish.glb",
+   "icon": "assets/icons/items/pengfish.png"
   },
   "pew_matic_horn": {
    "model": "assets/models/items/pew_matic_horn.glb",
@@ -2408,6 +2568,14 @@
    "object": "sawmill",
    "icon": "assets/icons/items/sawmill.png"
   },
+  "scarab_fish": {
+   "model": "assets/models/items/scarab_fish.glb",
+   "icon": "assets/icons/items/scarab_fish.png"
+  },
+  "scorpio_fish": {
+   "model": "assets/models/items/scorpio_fish.glb",
+   "icon": "assets/icons/items/scorpio_fish.png"
+  },
   "seedler": {
    "model": "assets/models/items/seedler.glb",
    "icon": "assets/icons/items/seedler.png"
@@ -2532,6 +2700,10 @@
    "model": "assets/models/items/sky_blue_paint.glb",
    "icon": "assets/icons/items/sky_blue_paint.png"
   },
+  "sky_crate": {
+   "model": "assets/models/items/sky_crate.glb",
+   "icon": "assets/icons/items/sky_crate.png"
+  },
   "slime_crown": {
    "model": "assets/models/items/slime_crown.glb",
    "icon": "assets/icons/items/slime_crown.png"
@@ -2539,6 +2711,10 @@
   "slime_staff": {
    "model": "assets/models/items/slime_staff.glb",
    "icon": "assets/icons/items/slime_staff.png"
+  },
+  "slimefish": {
+   "model": "assets/models/items/slimefish.glb",
+   "icon": "assets/icons/items/slimefish.png"
   },
   "snapthorn": {
    "model": "assets/models/items/snapthorn.glb",
@@ -2668,6 +2844,10 @@
    "model": "assets/models/items/spelunker_potion.glb",
    "icon": "assets/icons/items/spelunker_potion.png"
   },
+  "spiderfish": {
+   "model": "assets/models/items/spiderfish.glb",
+   "icon": "assets/icons/items/spiderfish.png"
+  },
   "spiky_ball": {
    "model": "assets/models/items/spiky_ball.glb",
    "icon": "assets/icons/items/spiky_ball.png"
@@ -2783,6 +2963,10 @@
   "tabi": {
    "model": "assets/models/items/tabi.glb",
    "icon": "assets/icons/items/tabi.png"
+  },
+  "tackle_box": {
+   "model": "assets/models/items/tackle_box.glb",
+   "icon": "assets/icons/items/tackle_box.png"
   },
   "teal_paint": {
    "model": "assets/models/items/teal_paint.glb",
@@ -3263,6 +3447,10 @@
   "zenith": {
    "model": "assets/models/items/zenith.glb",
    "icon": "assets/icons/items/zenith.png"
+  },
+  "zombie_fish": {
+   "model": "assets/models/items/zombie_fish.glb",
+   "icon": "assets/icons/items/zombie_fish.png"
   }
  },
  "creatures": {

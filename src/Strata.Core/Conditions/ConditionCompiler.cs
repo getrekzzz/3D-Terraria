@@ -124,6 +124,16 @@ public static class ConditionCompiler
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.FishingPower >= p.Min && c.FishingPower <= p.Max);
         },
+        ["fishingLiquid"] = s =>
+        {
+            var p = s.Parse<FishingLiquidConditionParams>();
+            return new DelegateCondition(c => Array.IndexOf(p.Any, c.FishingLiquid) >= 0);
+        },
+        ["anglerQuest"] = s =>
+        {
+            var p = s.Parse<AnglerQuestConditionParams>();
+            return new DelegateCondition(c => c.AnglerQuest == p.Fish);
+        },
         ["all"] = s => new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["any"] = s => new AnyCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["not"] = s => new NotCondition(new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray())),
@@ -164,6 +174,8 @@ public static class ConditionCompiler
         c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<RangeConditionParams>(SpecKind.Condition, "fishingPower");
         c.Register<WeatherConditionParams>(SpecKind.Condition, "weather");
+        c.Register<FishingLiquidConditionParams>(SpecKind.Condition, "fishingLiquid");
+        c.Register<AnglerQuestConditionParams>(SpecKind.Condition, "anglerQuest");
         c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");

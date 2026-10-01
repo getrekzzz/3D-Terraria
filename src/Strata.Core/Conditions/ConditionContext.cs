@@ -64,6 +64,12 @@ public sealed class ConditionContext
     /// <summary>Fishing power of the rod making a catch (fishing loot only).</summary>
     public int FishingPower { get; set; }
 
+    /// <summary>Liquid the catch comes from ("water", "honey", "lava"; fishing loot only).</summary>
+    public string FishingLiquid { get; set; } = "";
+
+    /// <summary>Quest fish the Angler wants today ("" when none; fishing loot only).</summary>
+    public string AnglerQuest { get; set; } = "";
+
     public Pcg32 Random;
 
     public bool HasBiome(string id)

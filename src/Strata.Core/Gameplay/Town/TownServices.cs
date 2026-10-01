@@ -96,6 +96,17 @@ public sealed class TownServices
         return Content.Items.Get(fish[(int)(day % fish.Length)]);
     }
 
+    /// <summary>
+    /// Id of the quest fish a living Angler wants today (null when no Angler lives here or today's quest is done):
+    /// quest fish can only be caught while they are wanted.
+    /// </summary>
+    public string? QuestFishToday()
+    {
+        foreach (var npc in _world.Town.Residents)
+            if (npc.Def.Service is { Type: TownServiceSpecs.AnglerQuest }) return AnglerWants(npc)?.Id;
+        return null;
+    }
+
     /// <summary>Hands in today's fish from the backpack for coins and a reward.</summary>
     public TradeResult TurnInFish(TownNpc npc, PlayerEntity player, out ItemStack reward)
     {
