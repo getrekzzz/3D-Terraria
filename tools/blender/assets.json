@@ -1,23 +1,23 @@
 {
   "comment": "Asset generation spec. Objects are keyed by tile-object id, items by item id or pattern ({metal} expands to every metal below). Block items get texture icons from tools/textures/build_icons.py; placeable-object items reuse their object's model for icons. build_all.py fails if any content is not covered.",
   "metals": {
-    "copper": "#e08c5a",
-    "tin": "#c4c0ae",
-    "iron": "#a8acb6",
-    "lead": "#6e7890",
-    "silver": "#e2e6ee",
-    "tungsten": "#94b08e",
-    "gold": "#f2c850",
-    "platinum": "#cfe0ee",
-    "demonite": "#7a5ab8",
-    "crimtane": "#c0404e",
-    "hellstone": "#e0602a",
-    "cobalt": "#3a86f0",
-    "palladium": "#f08a58",
-    "mythril": "#38d878",
-    "orichalcum": "#f06ac0",
-    "adamantite": "#e8283c",
-    "titanium": "#dce8f8"
+    "copper": "#e8804a",
+    "tin": "#d0c8a0",
+    "iron": "#a8acb4",
+    "lead": "#5a6680",
+    "silver": "#eef0f4",
+    "tungsten": "#8ac080",
+    "gold": "#ffd040",
+    "platinum": "#d8ecf8",
+    "demonite": {"tint": "#7a60d0", "edge": "#4a3088"},
+    "crimtane": {"tint": "#d03848", "edge": "#7a1a2a"},
+    "hellstone": {"tint": "#ff5a20", "edge": "#a02a10", "veins": "#ffd060"},
+    "cobalt": "#2a8cff",
+    "palladium": "#ff8a5a",
+    "mythril": "#3ae0b0",
+    "orichalcum": "#ff60c8",
+    "adamantite": "#ff2a40",
+    "titanium": "#c8dcf0"
   },
   "objects": {
     "oak_tree": {
@@ -1904,7 +1904,9 @@
         "generator": "bar",
         "params": {
           "metal": "#c8502a",
-          "count": 2
+          "count": 2,
+          "edge": "#7a2a14",
+          "veins": "#ffb040"
         }
       },
       "space_gun": {

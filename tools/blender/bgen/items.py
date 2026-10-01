@@ -4,13 +4,16 @@ import math
 
 from mathutils import Matrix, Vector
 
-from .mesh import MeshBuilder
+from .mesh import MeshBuilder, hex_color
 
 HANDLE = "prop:dark_planks"
 
 
 def _metal(p):
-    return f"prop:{p.get('metalLayer', 'iron')}", p.get("metal", "#c0c4cc")
+    """Slot and tint of an item's metal. The iron layer is read as neutral (``:metal``), so the tint is the metal's own
+    colour (Terraria-bright tiers instead of tints multiplied onto grey); other layers keep their texture colour."""
+    layer = p.get("metalLayer", "iron")
+    return f"prop:{layer}" + (":metal" if layer == "iron" else ""), p.get("metal", "#c0c4cc")
 
 
 def sword(mb: MeshBuilder, p, rng):
@@ -56,7 +59,7 @@ def hammer(mb: MeshBuilder, p, rng):
 
 
 def bow(mb: MeshBuilder, p, rng):
-    layer = f"prop:{p.get('limbLayer', 'planks')}"
+    layer = f"prop:{p.get('limbLayer', 'planks')}" + (":metal" if p.get("limbLayer") == "iron" else "")
     tint = p.get("metal", "#ffffff") if p.get("limbLayer") in ("iron", "gold", "copper") else "#ffffff"
     pts = [Vector((0.02 * math.sin(t * math.pi) - 0.0, 0, (t - 0.5) * 1.1)) + Vector((-0.18 * math.sin(t * math.pi), 0, 0)) for t in (i / 8 for i in range(9))]
     mb.tube(pts, [0.012, 0.018, 0.022, 0.026, 0.03, 0.026, 0.022, 0.018, 0.012], layer, tint, segments=6)
@@ -103,11 +106,51 @@ def essence(mb: MeshBuilder, p, rng):
         mb.tube(pts, [0.014, 0.01, 0.006, 0.001], "prop:plain:glow", color, segments=4)
 
 
+def _ingot(mb: MeshBuilder, off, layer, tint, top, edge):
+    """One chunky ingot (~60 tris): a chamfered trapezoid section lofted along X with sloped ends; the top face is
+    lighter, the chamfers take the edge colour."""
+    length, width, height, c = 0.28, 0.12, 0.075, 0.016
+    section = [(-width / 2 + c, 0.0), (width / 2 - c, 0.0), (width / 2, c), (width * 0.36, height - c),
+               (width * 0.36 - c, height), (-width * 0.36 + c, height), (-width * 0.36, height - c), (-width / 2, c)]
+    stations = [(-length / 2, 0.82), (-length / 2 + 0.03, 1.0), (length / 2 - 0.03, 1.0), (length / 2, 0.82)]
+    o = Vector(off)
+    rings = [[mb.bm.verts.new(o + Vector((x, y * k, z * (0.9 + 0.1 * k)))) for y, z in section] for x, k in stations]
+    n = len(section)
+    for a, b in zip(rings, rings[1:]):
+        for i in range(n):
+            j = (i + 1) % n
+            mb.bm.faces.new((a[i], a[j], b[j], b[i]))
+    mb.bm.faces.new(list(reversed(rings[0])))
+    mb.bm.faces.new(rings[-1])
+    verts = mb._finish_part([v for r in rings for v in r], layer, tint, False)
+    lit, rim = hex_color(top), hex_color(edge)
+    mb.bm.normal_update()
+    for f in {f for v in verts for f in v.link_faces}:
+        if f.normal.z > 0.9:
+            colour = lit
+        elif f.normal.z > 0.6:  # the 45° chamfers along the top
+            colour = rim
+        else:
+            continue
+        for loop in f.loops:
+            loop[mb.color_layer] = colour
+
+
 def bar(mb: MeshBuilder, p, rng):
+    """Stacked ingots. ``edge`` colours the chamfers (default the tint), ``veins`` adds glowing cracks on top
+    (hellstone, meteorite)."""
     layer, tint = _metal(p)
-    for i, off in enumerate([(0, 0, 0), (0.05, 0.02, 0.075)][: p.get("count", 1)]):
-        profile = [(-0.14, 0.0), (0.14, 0.0), (0.11, 0.07), (-0.11, 0.07)]
-        mb.extrude_polygon(profile, 0.1, layer, tint, matrix=Matrix.Translation(off))
+    base = hex_color(tint)
+    top = p.get("top") or tuple(min(1.0, c * 1.18 + 0.04) for c in base[:3])
+    edge = p.get("edge", tint)
+    offsets = [(0, 0, 0), (0.035, 0.03, 0.075)][: p.get("count", 1)]
+    for off in offsets:
+        _ingot(mb, off, layer, tint, top, edge)
+    if p.get("veins"):
+        ox, oy, oz = offsets[-1]
+        crack = [(-0.09, -0.012), (-0.04, 0.01), (0.0, -0.008), (0.05, 0.012), (0.09, -0.004)]
+        for (x0, y0), (x1, y1) in zip(crack, crack[1:]):
+            mb.cylinder((ox + x0, oy + y0, oz + 0.0752), (ox + x1, oy + y1, oz + 0.0752), 0.004, None, "prop:plain:glow", p["veins"], segments=4, caps=False)
 
 
 def gem(mb: MeshBuilder, p, rng):

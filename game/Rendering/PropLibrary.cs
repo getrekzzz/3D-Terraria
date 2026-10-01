@@ -6,7 +6,8 @@ namespace Strata.Game.Rendering;
 
 /// <summary>
 /// Loads generated GLB models and gives every surface the shared prop shader. GLB material names encode the
-/// texture layer and flags (<c>prop:planks</c>, <c>prop:plain:glow</c>, translucent <c>prop:gel:clear</c>); layers come from
+/// texture layer and flags (<c>prop:planks</c>, <c>prop:plain:glow</c>, translucent <c>prop:gel:clear</c>, tinted metal
+/// <c>prop:iron:metal</c>); layers come from
 /// res://assets/textures/props/layers.json. Tree crowns use alpha-tested leaf cards (<c>card:oak_sprig</c>); people use
 /// <c>char:&lt;kind&gt;</c> slots (see <see cref="CharacterMaterials"/>).
 /// Meshes and materials are cached.
@@ -18,7 +19,10 @@ public sealed partial class PropLibrary
     private static readonly Shader PropClearShader = GD.Load<Shader>("res://shaders/prop_clear.gdshader");
     private static readonly Shader CardShader = GD.Load<Shader>("res://shaders/foliage_card.gdshader");
 
+    // Brightness tinted metal slots are normalised to (sRGB): the tint is then the colour seen on a lit, average texel.
+    private const float MetalTarget = 0.85f;
     private readonly Dictionary<string, (int Index, float Sway)> _layers = new();
+    private readonly Dictionary<string, float> _means = new();
     private readonly Dictionary<(string Slot, bool Custom), ShaderMaterial> _materials = new();
     private readonly Dictionary<(string Path, bool Custom), Mesh?> _meshes = new();
     private readonly TextureLayered _albedo;
@@ -33,7 +37,9 @@ public sealed partial class PropLibrary
         foreach (var layer in doc.RootElement.GetProperty("layers").EnumerateArray())
         {
             float sway = layer.TryGetProperty("sway", out var s) ? s.GetSingle() : 0f;
-            _layers[layer.GetProperty("name").GetString()!] = (layer.GetProperty("index").GetInt32(), sway);
+            var name = layer.GetProperty("name").GetString()!;
+            _layers[name] = (layer.GetProperty("index").GetInt32(), sway);
+            if (layer.TryGetProperty("mean", out var mean)) _means[name] = mean.GetSingle();
         }
     }
 
@@ -99,6 +105,8 @@ public sealed partial class PropLibrary
         m.SetShaderParameter("sway", layer.Sway);
         m.SetShaderParameter("foliage", layer.Sway > 0f ? 0.6f : 0f); // swaying layers are leaves: light passes through
         m.SetShaderParameter("glow", System.Array.IndexOf(parts, "glow") > 0 ? 1.1f : 0f);
+        if (System.Array.IndexOf(parts, "metal") > 0 && _means.TryGetValue(parts[0], out var mean) && mean > 0.01f)
+            m.SetShaderParameter("neutral_gain", Mathf.Pow(MetalTarget / mean, 2.2f));
         m.SetShaderParameter("light_from_custom", multimesh);
         _materials[key] = m;
         return m;

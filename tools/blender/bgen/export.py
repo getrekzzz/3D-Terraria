@@ -7,6 +7,9 @@ from mathutils import Euler, Matrix, Vector
 
 from .mesh import bounds
 
+# Icon exposure in stops (see render_icon).
+ICON_EXPOSURE = 0.7
+
 
 def simple_material(slot: str) -> bpy.types.Material:
     """Export-side material: just the slot name plus vertex colour (the game supplies textures)."""
@@ -131,6 +134,8 @@ def render_icon(objects, path: pathlib.Path, view: str, size: int = 128, samples
     scene.render.image_settings.file_format = "PNG"
     scene.render.image_settings.color_mode = "RGBA"
     scene.view_settings.view_transform = "Standard"
+    # Terraria-bright icons: the median of a lit item lands near its albedo instead of ~60 % of it.
+    scene.view_settings.exposure = ICON_EXPOSURE
     path.parent.mkdir(parents=True, exist_ok=True)
     temp = path.with_suffix(".new.png")
     scene.render.filepath = str(temp)

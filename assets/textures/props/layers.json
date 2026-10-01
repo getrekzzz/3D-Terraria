@@ -6,169 +6,201 @@
   {
    "name": "planks",
    "index": 0,
-   "type": "planks"
+   "type": "planks",
+   "mean": 0.434
   },
   {
    "name": "dark_planks",
    "index": 1,
-   "type": "planks"
+   "type": "planks",
+   "mean": 0.284
   },
   {
    "name": "stone",
    "index": 2,
-   "type": "rock"
+   "type": "rock",
+   "mean": 0.514
   },
   {
    "name": "stone_brick",
    "index": 3,
-   "type": "bricks"
+   "type": "bricks",
+   "mean": 0.414
   },
   {
    "name": "bark",
    "index": 4,
-   "type": "bark"
+   "type": "bark",
+   "mean": 0.289
   },
   {
    "name": "pine_bark",
    "index": 5,
-   "type": "bark"
+   "type": "bark",
+   "mean": 0.24
   },
   {
    "name": "palm_bark",
    "index": 6,
-   "type": "bark"
+   "type": "bark",
+   "mean": 0.472
   },
   {
    "name": "mahoe_bark",
    "index": 7,
-   "type": "bark"
+   "type": "bark",
+   "mean": 0.228
   },
   {
    "name": "gloom_bark",
    "index": 8,
-   "type": "bark"
+   "type": "bark",
+   "mean": 0.228
   },
   {
    "name": "leaves",
    "index": 9,
    "type": "foliage",
-   "sway": 0.012
+   "sway": 0.012,
+   "mean": 0.284
   },
   {
    "name": "fronds",
    "index": 10,
    "type": "grass",
-   "sway": 0.02
+   "sway": 0.02,
+   "mean": 0.295
   },
   {
    "name": "jungle_leaves",
    "index": 11,
    "type": "foliage",
-   "sway": 0.012
+   "sway": 0.012,
+   "mean": 0.26
   },
   {
    "name": "oak_sprig",
    "index": 12,
    "type": "sprig",
-   "sway": 0.012
+   "sway": 0.012,
+   "mean": 0.234
   },
   {
    "name": "pine_sprig",
    "index": 13,
    "type": "sprig",
-   "sway": 0.01
+   "sway": 0.01,
+   "mean": 0.201
   },
   {
    "name": "jungle_sprig",
    "index": 14,
    "type": "sprig",
-   "sway": 0.012
+   "sway": 0.012,
+   "mean": 0.268
   },
   {
    "name": "gloom_sprig",
    "index": 15,
    "type": "sprig",
-   "sway": 0.012
+   "sway": 0.012,
+   "mean": 0.188
   },
   {
    "name": "cactus_skin",
    "index": 16,
-   "type": "ribbed"
+   "type": "ribbed",
+   "mean": 0.431
   },
   {
    "name": "glowcap",
    "index": 17,
-   "type": "cap"
+   "type": "cap",
+   "mean": 0.439
   },
   {
    "name": "red_cap",
    "index": 18,
-   "type": "cap"
+   "type": "cap",
+   "mean": 0.411
   },
   {
    "name": "iron",
    "index": 19,
-   "type": "metal"
+   "type": "metal",
+   "mean": 0.578
   },
   {
    "name": "dark_iron",
    "index": 20,
-   "type": "metal"
+   "type": "metal",
+   "mean": 0.311
   },
   {
    "name": "gold",
    "index": 21,
-   "type": "metal"
+   "type": "metal",
+   "mean": 0.741
   },
   {
    "name": "copper",
    "index": 22,
-   "type": "metal"
+   "type": "metal",
+   "mean": 0.523
   },
   {
    "name": "cloth",
    "index": 23,
-   "type": "cloth"
+   "type": "cloth",
+   "mean": 0.682
   },
   {
    "name": "red_cloth",
    "index": 24,
-   "type": "cloth"
+   "type": "cloth",
+   "mean": 0.279
   },
   {
    "name": "leather",
    "index": 25,
-   "type": "leather"
+   "type": "leather",
+   "mean": 0.358
   },
   {
    "name": "clay",
    "index": 26,
-   "type": "soil"
+   "type": "soil",
+   "mean": 0.375
   },
   {
    "name": "crystal",
    "index": 27,
-   "type": "translucent"
+   "type": "translucent",
+   "mean": 0.629
   },
   {
    "name": "flesh",
    "index": 28,
-   "type": "soil"
+   "type": "soil",
+   "mean": 0.571
   },
   {
    "name": "gel",
    "index": 29,
-   "type": "translucent"
+   "type": "translucent",
+   "mean": 0.833
   },
   {
    "name": "plain",
    "index": 30,
-   "type": "soil"
+   "type": "soil",
+   "mean": 0.8
   },
   {
    "name": "missing",
    "index": 31,
-   "type": "missing"
+   "type": "missing",
+   "mean": 0.193
   }
  ]
 }

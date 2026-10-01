@@ -31,8 +31,9 @@ from asset_spec import SpecError, load_spec  # noqa: E402
 GENERATOR_VERSION = 1
 CELL = 0.5
 
-# Metals with their own prop texture layer; the rest tint the iron layer.
-METAL_LAYERS = {"copper": "copper", "gold": "gold"}
+# Every metal tints the iron layer read as neutral (prop:iron:metal, see bgen/items._metal), so its colour is exactly
+# the "metals" hex. A metal's entry is a hex, or {"tint": hex, ...accent params} passed to every generator of its
+# patterns (e.g. "veins" for glowing ingot cracks, "edge" for darker chamfers).
 
 
 def args():
@@ -125,8 +126,9 @@ def plan(spec, blocks, items, objects, enemies):
 
     patterns = []
     for pattern, s in spec["items"]["patterns"].items():
-        for metal, tint in spec["metals"].items():
-            patterns.append((pattern.replace("{metal}", metal), metal, tint, s))
+        for metal, entry in spec["metals"].items():
+            tint, accents = (entry, {}) if isinstance(entry, str) else (entry["tint"], {k: v for k, v in entry.items() if k != "tint"})
+            patterns.append((pattern.replace("{metal}", metal), metal, (tint, accents), s))
     item_jobs = {}
     all_items = set(items) | set(placer_of_object) | set(block_icons)
     for iid in sorted(all_items):
@@ -138,8 +140,8 @@ def plan(spec, blocks, items, objects, enemies):
             continue
         match = next(((m, t, s) for name, m, t, s in patterns if name == iid), None)
         if match:
-            metal, tint, s = match
-            params = {"metal": tint, "metalLayer": METAL_LAYERS.get(metal, "iron"), **s.get("params", {})}
+            metal, (tint, accents), s = match
+            params = {"metal": tint, "metalLayer": "iron", **accents, **s.get("params", {})}
             item_jobs[iid] = {"generator": s["generator"], "params": params}
             continue
         placed = items.get(iid, {}).get("placeObject") or placer_of_object.get(iid)
