@@ -69,7 +69,9 @@ public sealed partial class GrappleVisual : Node3D
         var space = GetWorld3D()?.DirectSpaceState;
         if (n == Vector3.Zero || space == null) return false;
         var target = PlayerController.ToGodot(hook.Target);
-        _query ??= new PhysicsRayQueryParameters3D { CollisionMask = SnapMask };
+        // Front faces only: in a gap narrower than the reach the ray starts inside the opposite wall, whose inner side
+        // (a back face, the terrain collides both ways) must not catch the claw.
+        _query ??= new PhysicsRayQueryParameters3D { CollisionMask = SnapMask, HitBackFaces = false };
         _query.From = target + n * SnapReach;
         _query.To = target - n * SnapReach;
         var hit = space.IntersectRay(_query);
