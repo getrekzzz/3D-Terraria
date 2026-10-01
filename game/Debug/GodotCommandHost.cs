@@ -24,6 +24,7 @@ public sealed class GodotCommandHost : ICommandHost
     {
         var dir = System.Numerics.Vector3.Normalize(direction);
         player.Aim = dir;
+        player.ViewDirection = dir;
         if (_player != null && _player.Entity == player)
             _player.Rig.LookToward(_player.Rig.GlobalPosition + new Godot.Vector3(dir.X, dir.Y, dir.Z));
     }

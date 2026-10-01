@@ -111,8 +111,9 @@ public sealed class ItemUseTable
         if (item.PickPower > 0) a |= ItemAction.Mine;
         if (item.AxePower > 0) a |= ItemAction.Chop;
         if (item.HammerPower > 0) a |= ItemAction.Hammer;
-        if (item.UseStyle == UseStyle.Swing && item.Damage > 0) a |= ItemAction.Melee;
-        if (item.UseStyle == UseStyle.Thrust && item.Damage > 0) a |= ItemAction.Thrust;
+        bool melee = item.Damage > 0 && !item.NoMelee; // noMelee: the swing is only an animation
+        if (item.UseStyle == UseStyle.Swing && melee) a |= ItemAction.Melee;
+        if (item.UseStyle == UseStyle.Thrust && melee) a |= ItemAction.Thrust;
         if (item.UseStyle == UseStyle.Shoot && (item.Projectile != null || item.UseAmmo != null)) a |= ItemAction.Shoot;
         if (item.PlaceBlock != null && content.Blocks.TryGet(item.PlaceBlock, out var block))
         {

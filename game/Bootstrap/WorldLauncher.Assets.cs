@@ -22,6 +22,7 @@ public static partial class WorldLauncher
     private static void LoadConfigs(GameWorld game, GameServices services)
     {
         game.Spawner.Config = Strata.Core.Gameplay.Entities.SpawnConfig.Load(services.Data);
+        game.ItemUse.Timing = Strata.Core.Gameplay.Items.UseTiming.Load(services.Data);
         game.Housing.Config = Strata.Core.Gameplay.Housing.HousingConfig.Load(services.Data);
         game.Town.Config = Strata.Core.Gameplay.Town.TownConfig.Load(services.Data);
         game.Spread.Config = Strata.Core.Gameplay.Progression.SpreadConfig.Load(services.Data);

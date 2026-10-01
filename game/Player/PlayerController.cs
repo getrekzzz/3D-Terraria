@@ -46,6 +46,7 @@ public sealed partial class PlayerController : CharacterBody3D
     {
         _runtime = runtime;
         Entity = entity;
+        Entity.HasBody = true; // this body advances the hook and applies its pull (UpdateGrapple)
         _config = config;
         Name = "Player";
         CollisionLayer = 0;
@@ -82,6 +83,7 @@ public sealed partial class PlayerController : CharacterBody3D
         GlobalPosition = ToGodot(feet);
         Velocity = Vector3.Zero;
         Entity.Position = feet;
+        Entity.Hook.Reset(); // a latched hook would yank the body back across the world
         _airborne = false;
         Frozen = true;
         ResetPhysicsInterpolation();
@@ -124,8 +126,11 @@ public sealed partial class PlayerController : CharacterBody3D
             Entity.Minecart = null;
             return;
         }
-        if (UpdateMinecart(dt)) return;
-        if (UpdatePhase()) return;
+        if (UpdateMinecart(dt) || UpdatePhase())
+        {
+            ReelInHook(dt);
+            return;
+        }
 
         _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
         _swimming = _liquid != null;

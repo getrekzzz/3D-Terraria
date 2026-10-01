@@ -4,15 +4,63 @@
   healing) plus explicit `behaviors`. `ItemUseSystem` enforces use time, auto-reuse and reach, and performs
   mining (brush sized by `mineBrush`, precision mode = 1 cell), chopping, hammer reshaping, block/object
   placement (shape + facing rotation), consumption (healing fatigue, permanent life/mana caps) and shooting
-  (ammo classes, mana).
+  (ammo classes, mana). A sword that also shoots (Starfury, Terra Blade) swings with every shot and still swings
+  when the shot cannot fire; `noMelee` items (Zenith) only animate their swing. `shootProjectile.maxActive` caps
+  how many of a weapon's projectiles one player has out (unset: one for returning projectiles, otherwise no cap;
+  0: no cap); a capped use is refused before any ammo or mana is spent.
+* **Use timing** — as in Terraria, an item has a use *animation* (`useAnimation`; `PlayerEntity.UseAnimation`
+  counting down from `UseAnimationMax`) and a use *time* (`useTime`; `UseCooldown`, the action cadence). A new
+  animation starts only when the last one has played out (or for another item); it bumps `UseSerial`, which
+  presentation keys off to play each clip exactly once, so swings never restart mid-arc. Inside one animation a tool
+  digs, and a gun whose use time is shorter fires, whenever the use time runs out; a tool held down chains its next
+  swing as soon as the last ends, even while its next hit is still cooling down. Melee weapons strike once per
+  animation (`Swung`). Speed prefixes (`Prefixes.UseSpeed`) and melee speed divide both time and animation; mining
+  speed divides only a tool's use time (more hits per swing). `PlayerEntity.ResetUse()` ends the current use (the
+  `use` command and tests). Clip windows live in `data/config/use_styles.json` (`clips`: length, strike start/end,
+  release, bow re-draw; loaded by `Presentation.UseStyleConfig`, read through `Items.UseTiming`): a swing deals no
+  damage during its wind-up and sweeps its arc over the strike window (`UseTiming.Sweep`), a thrust connects only
+  while `UseTiming.Striking`.
+* **Failed-use feedback** — a fresh press that cannot be used raises `ItemUseSystem.Failed` (counted in `Failures`,
+  probe `use.failures`) and a message through `Refused`, which the HUD toasts: no ammo names the cheapest obtainable
+  item of the weapon's ammo class ("Needs Wooden Arrow", cached per class), no mana says "Not enough mana", and a
+  `Blocked` use speaks only when it recorded a reason with `Refuse` (Potion Sickness, a curse's `noItemUse`, a summon's
+  `failMessage`). Placement, a boomerang already out and a crystal at its cap stay silent. A held button never
+  reports, and the same text is not repeated to a player within 2 s. `SoundEvents` plays `use_fail` or `no_mana` for
+  each failed press, and `tink` (recipes in `tools/audio/sfx_recipes_feedback.py`) when a tool is too weak for what it hits.
+* **Shot origin** — `ShotGeometry` places a player's shot at the weapon hand (`HandOffset`: 0.22 m right, 0.3 m down,
+  0.45 m ahead of the eye in the `Facing` frame) and aims it from there at the crosshair point (`Eye + Aim ·
+  AimDistance`, never nearer than `MinConvergence` = 2 m), so arrows, bolts and thrown weapons leave the hand and still
+  land on the crosshair. When a solid cell or blocking object lies between the eye and the hand (a wall at the
+  shoulder) the shot starts at the eye instead, never inside terrain. `ProjectileSystem.Fire` applies the weapon's
+  spread around that line; other spawns (creature volleys) keep their own origins.
+* **Grappling hooks** — `GrappleHook` (`PlayerEntity.Hook`) is the hook's state machine (`None`, `Flying`, `Attached`,
+  `Retracting`; probe `player.hook` 0–3). A click with a hook held (`ItemUseSystem` grapple branch,
+  `UseOutcome.Grappled`) or the grapple key (`GrappleHook.Best`: longest reach, accessories then inventory) throws it
+  from `PlayerEntity.Hand`; pressing again lets go. The throw walks the voxel ray from the eye along `Aim`
+  (`Targeting.CastWhere`) to the first `Latchable` cell within reach: solid blocks (platforms included), shaped blocks
+  with a walkable top and colliding tile objects, a tree's whole box (canopy) too, but never liquids, cobwebs, decor,
+  open doors or an object the eye stands inside. It latches to that exact cell and lets go only when the cell stops
+  being latchable, the player jumps or presses again, so the offset between smoothed terrain and its cells cannot drop
+  it. Core decides anchor, state and `PullVelocity` (towards the anchor at the hook's pull speed, hanging within
+  1.1 m); the engine body (`PlayerEntity.HasBody`) advances the hook in `_PhysicsProcess` and applies the pull, while
+  `GameWorld` ticks it for bodiless (headless, test) players. Death, teleports and recalls put the hook away; nothing
+  is thrown from a minecart, and riding one or phasing lets go of a hook that is out.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
-  streamer. `Targeting` is a voxel DDA that also hits tile objects.
+  streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor
+  (grass, bushes, rubble) and tree canopies stop the ray: `ItemUseSystem.FilterFor` gives tools `Decor` and axes
+  `TreeCanopy` too; otherwise a tree only counts where the ray crosses `TileObjectInstance.TrunkBox` (an exact
+  ray-box test), the same column the body collider uses. `Targeting.CastView` starts the crosshair ray where it
+  crosses the eye's plane (nothing between the shoulder camera and the player can be selected) and measures
+  `Distance` from the eye; `CastWhere` exposes the raw walk with a custom stop test. `ItemUseSystem.ReachMeters`
+  (item reach plus the Reach stat) bounds both the use and the in-reach highlight. `PlayerEntity.ViewDirection`
+  (camera forward) feeds `Facing`, which drives `FacingQuarter` and the melee arc yaw; `Aim` (eye to crosshair
+  point) keeps the pitch, shots and drops.
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
-  resistance). `MeleeSystem` sweeps swing arcs/thrusts over the use animation (one hit per creature per
-  swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
+  resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
+  strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
 * **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
   brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage

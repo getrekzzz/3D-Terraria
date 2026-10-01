@@ -98,7 +98,9 @@ public sealed partial class InteractionController : Node
         var origin = cam.GlobalPosition;
         var dir = _player.Rig.Forward;
         var held = Entity.State.Inventory.Held;
-        float reach = (held.IsEmpty ? 10 : held.Item!.Reach) * Strata.Core.Common.Units.CellSize;
+        // The same reach as the use itself, so the Reach stat (Builder Potion) extends the highlight too.
+        float reach = ItemUseSystem.ReachMeters(Entity, held.IsEmpty ? null : held.Item);
+        Entity.ViewDirection = System.Numerics.Vector3.Normalize(ToCore(dir));
         float camOffset = origin.DistanceTo(ToGodot(Entity.Eye));
         var hit = Targeting.Cast(Game.Session.World, ToCore(origin), ToCore(dir), reach + camOffset + 2f);
         if (hit != null)
@@ -108,13 +110,15 @@ public sealed partial class InteractionController : Node
             Target = hit with { Distance = fromEye };
             InReach = fromEye <= reach;
             Entity.Aim = AimTowards(point, dir);
+            Entity.AimDistance = fromEye;
         }
         else
         {
             Target = null;
             InReach = false;
-            var far = origin + dir * 40f;
-            Entity.Aim = AimTowards(ToCore(far), dir);
+            var far = ToCore(origin + dir * 40f);
+            Entity.Aim = AimTowards(far, dir);
+            Entity.AimDistance = System.Numerics.Vector3.Distance(far, Entity.Eye);
         }
         if (DigDownTarget(dir) is { } below)
         {

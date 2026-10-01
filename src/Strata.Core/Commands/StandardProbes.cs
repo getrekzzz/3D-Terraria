@@ -22,6 +22,7 @@ internal static class StandardProbes
         ctx.AddProbe("player.z", () => ctx.Player.Position.Z);
         ctx.AddProbe("player.speed", () => ctx.Player.Velocity.Length());
         ctx.AddProbe("player.minecart", () => ctx.Player.Minecart != null ? 1 : 0);
+        ctx.AddProbe("player.hook", () => (int)ctx.Player.Hook.State); // 0 none, 1 flying, 2 latched, 3 returning
         ctx.AddProbe("wires.count", () => w.Wires.All.Count);
         ctx.AddProbe("player.alive", () => ctx.Player.Alive ? 1 : 0);
         ctx.AddProbe("player.cell_y", () => ctx.Player.FeetCell.Y);
@@ -37,6 +38,7 @@ internal static class StandardProbes
         ctx.AddProbe("npcs.count", () => w.Npcs.All.Count);
         ctx.AddProbe("npcs.alive_life", () => w.Npcs.All.Sum(n => n.Life));
         ctx.AddProbe("projectiles.count", () => w.Projectiles.All.Count);
+        ctx.AddProbe("melee.swings", () => w.Melee.ActiveSwings);
         ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
         ctx.AddProbe("house.valid", () => w.Housing.Scan(ctx.Player.FeetCell + Int3.Up).Valid ? 1 : 0);
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);

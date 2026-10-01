@@ -32,6 +32,9 @@ public sealed class ValidateCommand : IToolCommand
         var grass = Strata.Core.Presentation.GrassConfig.Load(source).Validate(db);
         foreach (var problem in grass) Console.WriteLine($"Error: {Strata.Core.Presentation.GrassConfig.Path}: {problem}");
         errors += grass.Count;
+        var useStyles = Strata.Core.Presentation.UseStyleConfig.Load(source).Validate();
+        foreach (var problem in useStyles) Console.WriteLine($"Error: {Strata.Core.Presentation.UseStyleConfig.Path}: {problem}");
+        errors += useStyles.Count;
         int warnings = db.Report.Warnings.Count();
         Console.WriteLine($"{errors} error(s), {warnings} warning(s)");
         return errors == 0 ? 0 : 1;

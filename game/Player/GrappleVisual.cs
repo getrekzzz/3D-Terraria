@@ -1,4 +1,5 @@
 using Godot;
+using Strata.Core.Gameplay.Player;
 
 namespace Strata.Game.Player;
 

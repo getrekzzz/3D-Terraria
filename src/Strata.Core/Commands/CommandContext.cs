@@ -19,9 +19,18 @@ public interface ICommandHost
 /// <summary>Host used by headless runs: moves the Core entity directly.</summary>
 public sealed class HeadlessCommandHost : ICommandHost
 {
-    public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false) => player.Position = feet;
+    public void Teleport(PlayerEntity player, Vector3 feet, bool settle = false)
+    {
+        player.Position = feet;
+        player.Hook.Reset(); // as the engine body does: a latched hook would pull back across the world
+    }
 
-    public void Aim(PlayerEntity player, Vector3 direction) => player.Aim = Vector3.Normalize(direction);
+    public void Aim(PlayerEntity player, Vector3 direction)
+    {
+        var dir = Vector3.Normalize(direction);
+        player.Aim = dir;
+        player.ViewDirection = dir;
+    }
 }
 
 /// <summary>What commands operate on, plus named numeric probes used by <c>assert</c> and <c>probe</c>.</summary>
@@ -44,6 +53,9 @@ public sealed class CommandContext
 
     /// <summary>Position stored by the <c>mark</c> command (probe <c>player.from_mark</c>).</summary>
     public Vector3? Mark { get; set; }
+
+    /// <summary>Use animations the player had started when <c>mark</c> ran (probe <c>player.swings</c> counts from it).</summary>
+    public int MarkSwings { get; set; }
 
     public PlayerEntity Player => World.LocalPlayer ?? throw new CommandException("no player in this world");
 

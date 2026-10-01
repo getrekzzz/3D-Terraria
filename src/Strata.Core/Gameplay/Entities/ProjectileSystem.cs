@@ -74,11 +74,13 @@ public sealed partial class ProjectileSystem
     /// <summary>An explosion went off (position, radius in metres) — flash, smoke and sound.</summary>
     public event Action<Vector3, float>? Exploded;
 
+    /// <summary>A shot leaves the weapon hand (<see cref="ShotGeometry"/>) and flies at the crosshair point, spread around that line.</summary>
     private void Fire(ShotRequest shot)
     {
         var p = shot.Player;
         var spread = shot.Weapon.Shoot!.Spread * MathF.PI / 180f;
-        var dir = p.Aim;
+        var from = ShotGeometry.Origin(_world.Session.World, p);
+        var dir = ShotGeometry.Direction(p, from);
         if (spread > 0)
         {
             var side = Vector3.Normalize(Vector3.Cross(dir, Vector3.UnitY) + new Vector3(1e-4f, 0, 0));
@@ -86,7 +88,7 @@ public sealed partial class ProjectileSystem
             dir = Vector3.Normalize(dir + side * _rng.NextSigned() * spread + up * _rng.NextSigned() * spread * 0.5f);
         }
         var item = shot.Weapon.Item;
-        Spawn(shot.Projectile, p.Eye + dir * 0.4f, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
+        Spawn(shot.Projectile, from, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
     }
 
     public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit, ItemDef? source = null)

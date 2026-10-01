@@ -59,8 +59,11 @@ public static class Prefixes
 
     public static float Knockback(ItemStack s) => s.Item!.Knockback * (1f + (s.Prefix?.Knockback ?? 0f));
 
+    /// <summary>The prefix's use speed as a factor (Brisk 1.1, Sluggish 0.8): it divides use time and animation alike.</summary>
+    public static float UseSpeed(ItemStack s) => 1f + (s.Prefix?.UseSpeed ?? 0f);
+
     /// <summary>Use time after the prefix's speed (positive = faster).</summary>
-    public static int UseTime(ItemStack s, int useTime) => s.Prefix is { UseSpeed: not 0 } p ? Math.Max(1, (int)MathF.Round(useTime / (1f + p.UseSpeed))) : useTime;
+    public static int UseTime(ItemStack s, int useTime) => s.Prefix is { UseSpeed: not 0 } ? Math.Max(1, (int)MathF.Round(useTime / UseSpeed(s))) : useTime;
 
     public static float ShootSpeed(ItemStack s) => s.Item!.ShootSpeed * (1f + (s.Prefix?.Velocity ?? 0f));
 

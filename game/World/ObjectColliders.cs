@@ -94,9 +94,9 @@ public sealed partial class ObjectColliders : Node3D
                 return ObjectInteraction.Blocks(obj) ? (min, max) : null;
             case TileCollision.Trunk:
             {
-                var c = (min + max) * 0.5f;
-                float half = Mathf.Max(0.5f, (max.X - min.X) / 6f);
-                return (new Vector3(c.X - half, min.Y, c.Z - half), new Vector3(c.X + half, min.Y + (max.Y - min.Y) * 0.55f, c.Z + half));
+                // Shared with targeting: only an axe can select the canopy, everything else stops at this column.
+                var (tMin, tMax) = obj.TrunkBox;
+                return (new Vector3(tMin.X, tMin.Y, tMin.Z), new Vector3(tMax.X, tMax.Y, tMax.Z));
             }
             case TileCollision.Platform:
                 layer = ColliderManager.PlatformLayer;

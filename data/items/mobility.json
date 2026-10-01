@@ -7,7 +7,7 @@
     { "id": "vine", "name": "Vine", "category": "material", "maxStack": 9999, "value": 50, "covers": ["terraria:vine"] },
     { "id": "jungle_spores", "name": "Jungle Spores", "category": "material", "maxStack": 9999, "value": 60, "covers": ["terraria:jungle_spores"] },
 
-    { "id": "grappling_hook", "name": "Grappling Hook", "description": "Get over here! (press F to throw)", "category": "hook", "rarity": 1, "value": 20000,
+    { "id": "grappling_hook", "name": "Grappling Hook", "description": "Get over here!", "category": "hook", "rarity": 1, "value": 20000,
       "behaviors": [{ "type": "grapple", "reach": 22, "speed": 26, "pull": 12, "color": "#8e8e96" }], "covers": ["terraria:grappling_hook"] },
     { "id": "amethyst_hook", "name": "Amethyst Hook", "category": "hook", "rarity": 1, "value": 20000,
       "behaviors": [{ "type": "grapple", "reach": 22.5, "speed": 22, "pull": 11, "color": "#b06aff" }], "covers": ["terraria:amethyst_hook"] },
