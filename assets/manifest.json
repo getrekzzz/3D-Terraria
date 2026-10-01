@@ -4764,8 +4764,12 @@
   },
   "betsy": {
    "model": "assets/models/creatures/betsy.glb",
-   "generator": "dragon",
-   "animations": []
+   "generator": "event_betsy",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
   },
   "bird": {
    "model": "assets/models/creatures/bird.glb",
@@ -5190,8 +5194,12 @@
   },
   "everscream": {
    "model": "assets/models/creatures/everscream.glb",
-   "generator": "haunted_tree",
-   "animations": []
+   "generator": "moon_everscream",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
   },
   "eye_of_cthulhu": {
    "model": "assets/models/creatures/eye_of_cthulhu.glb",
@@ -5265,8 +5273,12 @@
   },
   "flying_dutchman": {
    "model": "assets/models/creatures/flying_dutchman.glb",
-   "generator": "ghost_ship",
-   "animations": []
+   "generator": "event_flying_dutchman",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
   },
   "flying_snake": {
    "model": "assets/models/creatures/flying_snake.glb",
@@ -5803,8 +5815,12 @@
   },
   "martian_saucer": {
    "model": "assets/models/creatures/martian_saucer.glb",
-   "generator": "saucer",
-   "animations": []
+   "generator": "event_martian_saucer",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
   },
   "martian_walker": {
    "model": "assets/models/creatures/martian_walker.glb",
@@ -5894,15 +5910,21 @@
   },
   "mothron": {
    "model": "assets/models/creatures/mothron.glb",
-   "generator": "insect",
+   "generator": "event_mothron",
    "animations": [
-    "fly"
+    "attack",
+    "fly",
+    "idle"
    ]
   },
   "mourning_wood": {
    "model": "assets/models/creatures/mourning_wood.glb",
-   "generator": "haunted_tree",
-   "animations": []
+   "generator": "moon_mourning_wood",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
   },
   "mummy": {
    "model": "assets/models/creatures/mummy.glb",
@@ -5941,8 +5963,10 @@
   },
   "nebula_pillar": {
    "model": "assets/models/creatures/nebula_pillar.glb",
-   "generator": "celestial_pillar",
-   "animations": []
+   "generator": "event_celestial_pillar",
+   "animations": [
+    "idle"
+   ]
   },
   "necromancer": {
    "model": "assets/models/creatures/necromancer.glb",
@@ -6527,7 +6551,16 @@
   },
   "pumpking": {
    "model": "assets/models/creatures/pumpking.glb",
-   "generator": "pumpkin_lord",
+   "generator": "moon_pumpking",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
+  },
+  "pumpking_blade": {
+   "model": "assets/models/creatures/pumpking_blade.glb",
+   "generator": "moon_pumpking_blade",
    "animations": []
   },
   "queen_bee": {
@@ -6615,8 +6648,12 @@
   },
   "santa_nk1": {
    "model": "assets/models/creatures/santa_nk1.glb",
-   "generator": "tank",
-   "animations": []
+   "generator": "moon_santa_nk1",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
   },
   "scarecrow": {
    "model": "assets/models/creatures/scarecrow.glb",
@@ -6726,8 +6763,10 @@
   },
   "solar_pillar": {
    "model": "assets/models/creatures/solar_pillar.glb",
-   "generator": "celestial_pillar",
-   "animations": []
+   "generator": "event_celestial_pillar",
+   "animations": [
+    "idle"
+   ]
   },
   "spazmatism": {
    "model": "assets/models/creatures/spazmatism.glb",
@@ -6764,8 +6803,10 @@
   },
   "stardust_pillar": {
    "model": "assets/models/creatures/stardust_pillar.glb",
-   "generator": "celestial_pillar",
-   "animations": []
+   "generator": "event_celestial_pillar",
+   "animations": [
+    "idle"
+   ]
   },
   "stargazer": {
    "model": "assets/models/creatures/stargazer.glb",
@@ -6957,8 +6998,10 @@
   },
   "vortex_pillar": {
    "model": "assets/models/creatures/vortex_pillar.glb",
-   "generator": "celestial_pillar",
-   "animations": []
+   "generator": "event_celestial_pillar",
+   "animations": [
+    "idle"
+   ]
   },
   "vortexian": {
    "model": "assets/models/creatures/vortexian.glb",
@@ -10626,5 +10669,227 @@
   "thigh.R": 0.4302,
   "upper_arm.L": 0.298,
   "upper_arm.R": 0.298
+ },
+ "hair": {
+  "f_afro": {
+   "model": "assets/models/hair/f_afro.glb",
+   "bone": "head",
+   "tris": 3088
+  },
+  "f_bob": {
+   "model": "assets/models/hair/f_bob.glb",
+   "bone": "head",
+   "tris": 3798
+  },
+  "f_braid": {
+   "model": "assets/models/hair/f_braid.glb",
+   "bone": "head",
+   "tris": 4746
+  },
+  "f_bun": {
+   "model": "assets/models/hair/f_bun.glb",
+   "bone": "head",
+   "tris": 3484
+  },
+  "f_buzz": {
+   "model": "assets/models/hair/f_buzz.glb",
+   "bone": "head",
+   "tris": 3088
+  },
+  "f_curly": {
+   "model": "assets/models/hair/f_curly.glb",
+   "bone": "head",
+   "tris": 5338
+  },
+  "f_dreadlocks": {
+   "model": "assets/models/hair/f_dreadlocks.glb",
+   "bone": "head",
+   "tris": 5748
+  },
+  "f_long": {
+   "model": "assets/models/hair/f_long.glb",
+   "bone": "head",
+   "tris": 3608
+  },
+  "f_messy": {
+   "model": "assets/models/hair/f_messy.glb",
+   "bone": "head",
+   "tris": 3088
+  },
+  "f_mohawk": {
+   "model": "assets/models/hair/f_mohawk.glb",
+   "bone": "head",
+   "tris": 4068
+  },
+  "f_mullet": {
+   "model": "assets/models/hair/f_mullet.glb",
+   "bone": "head",
+   "tris": 3412
+  },
+  "f_pigtails": {
+   "model": "assets/models/hair/f_pigtails.glb",
+   "bone": "head",
+   "tris": 3552
+  },
+  "f_pixie": {
+   "model": "assets/models/hair/f_pixie.glb",
+   "bone": "head",
+   "tris": 3194
+  },
+  "f_ponytail": {
+   "model": "assets/models/hair/f_ponytail.glb",
+   "bone": "head",
+   "tris": 3248
+  },
+  "f_short": {
+   "model": "assets/models/hair/f_short.glb",
+   "bone": "head",
+   "tris": 3088
+  },
+  "f_side_part": {
+   "model": "assets/models/hair/f_side_part.glb",
+   "bone": "head",
+   "tris": 3112
+  },
+  "f_slicked_back": {
+   "model": "assets/models/hair/f_slicked_back.glb",
+   "bone": "head",
+   "tris": 3088
+  },
+  "f_spiky": {
+   "model": "assets/models/hair/f_spiky.glb",
+   "bone": "head",
+   "tris": 4726
+  },
+  "f_topknot": {
+   "model": "assets/models/hair/f_topknot.glb",
+   "bone": "head",
+   "tris": 3376
+  },
+  "f_twin_buns": {
+   "model": "assets/models/hair/f_twin_buns.glb",
+   "bone": "head",
+   "tris": 3664
+  },
+  "f_undercut": {
+   "model": "assets/models/hair/f_undercut.glb",
+   "bone": "head",
+   "tris": 4668
+  },
+  "f_wavy_long": {
+   "model": "assets/models/hair/f_wavy_long.glb",
+   "bone": "head",
+   "tris": 3954
+  },
+  "m_afro": {
+   "model": "assets/models/hair/m_afro.glb",
+   "bone": "head",
+   "tris": 2854
+  },
+  "m_bob": {
+   "model": "assets/models/hair/m_bob.glb",
+   "bone": "head",
+   "tris": 3557
+  },
+  "m_braid": {
+   "model": "assets/models/hair/m_braid.glb",
+   "bone": "head",
+   "tris": 4512
+  },
+  "m_bun": {
+   "model": "assets/models/hair/m_bun.glb",
+   "bone": "head",
+   "tris": 3250
+  },
+  "m_buzz": {
+   "model": "assets/models/hair/m_buzz.glb",
+   "bone": "head",
+   "tris": 2854
+  },
+  "m_curly": {
+   "model": "assets/models/hair/m_curly.glb",
+   "bone": "head",
+   "tris": 5104
+  },
+  "m_dreadlocks": {
+   "model": "assets/models/hair/m_dreadlocks.glb",
+   "bone": "head",
+   "tris": 5514
+  },
+  "m_long": {
+   "model": "assets/models/hair/m_long.glb",
+   "bone": "head",
+   "tris": 3374
+  },
+  "m_messy": {
+   "model": "assets/models/hair/m_messy.glb",
+   "bone": "head",
+   "tris": 2854
+  },
+  "m_mohawk": {
+   "model": "assets/models/hair/m_mohawk.glb",
+   "bone": "head",
+   "tris": 3659
+  },
+  "m_mullet": {
+   "model": "assets/models/hair/m_mullet.glb",
+   "bone": "head",
+   "tris": 3178
+  },
+  "m_pigtails": {
+   "model": "assets/models/hair/m_pigtails.glb",
+   "bone": "head",
+   "tris": 3318
+  },
+  "m_pixie": {
+   "model": "assets/models/hair/m_pixie.glb",
+   "bone": "head",
+   "tris": 2954
+  },
+  "m_ponytail": {
+   "model": "assets/models/hair/m_ponytail.glb",
+   "bone": "head",
+   "tris": 3014
+  },
+  "m_short": {
+   "model": "assets/models/hair/m_short.glb",
+   "bone": "head",
+   "tris": 2854
+  },
+  "m_side_part": {
+   "model": "assets/models/hair/m_side_part.glb",
+   "bone": "head",
+   "tris": 2876
+  },
+  "m_slicked_back": {
+   "model": "assets/models/hair/m_slicked_back.glb",
+   "bone": "head",
+   "tris": 2854
+  },
+  "m_spiky": {
+   "model": "assets/models/hair/m_spiky.glb",
+   "bone": "head",
+   "tris": 4492
+  },
+  "m_topknot": {
+   "model": "assets/models/hair/m_topknot.glb",
+   "bone": "head",
+   "tris": 3142
+  },
+  "m_twin_buns": {
+   "model": "assets/models/hair/m_twin_buns.glb",
+   "bone": "head",
+   "tris": 3430
+  },
+  "m_undercut": {
+   "model": "assets/models/hair/m_undercut.glb",
+   "bone": "head",
+   "tris": 4399
+  },
+  "m_wavy_long": {
+   "model": "assets/models/hair/m_wavy_long.glb",
+   "bone": "head",
+   "tris": 3718
+  }
  }
 }
