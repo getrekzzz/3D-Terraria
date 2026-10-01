@@ -58,6 +58,8 @@ public sealed partial class PatternBrain : IBrain
             var ph = _p.Phases[i];
             if (life <= (expert && ph.ExpertBelow is { } eb ? eb : ph.Below)) stage = i;
         }
+        // A guarded phase ends once its guardians (summoned on entering it) have all fallen: the Brain is exposed at full life.
+        if (_p.Phases[stage].UntilGuardsFall && stage + 1 < _p.Phases.Length && npc.Stage >= stage && !Guarded(_guards[stage], ctx)) stage++;
         var phase = _p.Phases[stage];
         var ex = expert ? phase.Expert ?? Classic : Classic;
         if (stage != npc.Stage) Enter(npc, stage, phase, ex, ctx);

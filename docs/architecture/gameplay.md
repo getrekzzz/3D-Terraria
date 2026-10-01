@@ -106,6 +106,13 @@
   minions followers on a ring that die with the boss and `leash` holds the boss near their centroid; `aura` pulses a
   buff (`expertOnly` optional); `illusions` sets `Npc.Illusions` with `MirrorAround` = the target (`AI.Illusions`
   places the copies a quarter turn apart); `defense` overrides defense (`DefenseOverride` is cleared before each think).
+* **Brain of Cthulhu and confusion** — the Brain (1000 life) hides behind 20 Creepers (100 life each); its first phase
+  is `untilGuardsFall`, so it is exposed (the next phase) at full life once they fall, as in Terraria: chase, teleport and
+  double dash with three illusions (`NpcRenderer.Illusions`: pooled, dimmed copies of its model, no collision) and, in
+  Expert, a confusion pulse; its touch may confuse. The `invertControls` effect (`forward: false` would reverse strafe
+  only) sets `EffectState.InvertControls`; `PlayerController.Status` reads the movement keys (walking, minecarts,
+  dashes) through `EffectState.SteerInput`, never the camera. Death recomputes effects after clearing debuffs, so
+  confusion never outlives the player.
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and
   fires `Raised` (announcements; the hook for world mutations).

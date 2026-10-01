@@ -30,6 +30,7 @@ public sealed class PatternParams : SpecParams, IValidatableSpec
             if (p.Aura is { } a && (a.Interval <= 0 || a.Radius <= 0)) return "aura needs interval and radius > 0";
             if (p.Leash is { } l && l.Radius <= 0) return "leash radius must be > 0";
             if (p.Illusions < 0) return "illusions must be >= 0";
+            if (p.UntilGuardsFall && string.IsNullOrEmpty(p.ShieldedBy)) return "untilGuardsFall needs shieldedBy";
         }
         return null;
     }
@@ -52,6 +53,9 @@ public sealed class PatternPhase
 
     /// <summary>Invulnerable while any creature of these kinds lives (the Brain's Creepers; comma-separated ids).</summary>
     public string? ShieldedBy { get; init; }
+
+    /// <summary>The phase ends (the next one begins, whatever the life) once its <see cref="ShieldedBy"/> guardians fall.</summary>
+    public bool UntilGuardsFall { get; init; }
 
     /// <summary>Contact damage and movement speed multipliers.</summary>
     public float Damage { get; init; } = 1f;
