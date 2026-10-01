@@ -12,6 +12,9 @@ public static partial class WorldLauncher
         var effects = new Entities.CombatEffects();
         runtime.AddChild(effects);
         effects.Initialize(game);
+        var bossEffects = new Entities.BossEffects();
+        runtime.AddChild(bossEffects);
+        bossEffects.Initialize(game);
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
         blockEffects.Initialize(game);

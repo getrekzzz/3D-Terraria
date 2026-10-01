@@ -11,6 +11,9 @@ public static class CameraShake
     private static float _trauma;
     private static float _time;
 
+    /// <summary>The trauma left now (0–1; the camera.trauma probe).</summary>
+    public static float Trauma => _trauma;
+
     public static void Kick(float amount) => _trauma = Mathf.Min(1f, _trauma + amount);
 
     /// <summary>The camera offset for this frame (metres).</summary>
