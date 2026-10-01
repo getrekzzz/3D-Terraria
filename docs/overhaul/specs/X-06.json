@@ -1,0 +1,28 @@
+{
+ "id": "X-06",
+ "title": "Seasonal events: Halloween and Christmas",
+ "owner_session": "world",
+ "player_outcome": "Around Halloween (Oct 10 \u2013 Nov 1) and Christmas (Dec 15 \u2013 Dec 31) by the system date (with a settings toggle and a console override): pumpkins and jack-o'-lanterns, festive lights, NPCs wear seasonal hats, enemies drop goodie bags/presents, seasonal vanity and furniture, Santa can move in at Christmas.",
+ "design": [
+  "Core: Season condition (date from an injectable clock, deterministic in tests) usable by spawn rules, loot, town rules, decorations; data for goodie bags/presents (bag loot tables), hats on NPCs (TownRenderer attachments), decorations as tile objects; seasonal music stinger optional.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Conditions/*",
+  "data/events.json",
+  "data/loot/*",
+  "data/items/*",
+  "game/Entities/TownRenderer.cs"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "SeasonTests (date windows, override)"
+ ],
+ "verification": [
+  "events.cmds `season halloween` probe"
+ ],
+ "depends_on": [],
+ "risks": [],
+ "effort": "M"
+}

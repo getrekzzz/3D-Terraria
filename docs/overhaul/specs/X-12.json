@@ -1,0 +1,28 @@
+{
+ "id": "X-12",
+ "title": "Polish bundle: photo mode, autosave indicator, colour-blind modes, subtitles",
+ "owner_session": "main",
+ "player_outcome": "A photo mode (pause, free camera, hide HUD, depth of field/exposure/filters, screenshot key), a small spinning autosave icon when saving, colour-blind filter options and subtitles for important sounds (boss roars, NPC voices, thunder).",
+ "design": [
+  "Photo mode from game/Debug/FreeCamera.cs made player-facing (key P, gamepad later), with DOF and exposure sliders; autosave indicator hooked to the async saver events (P1b-07); colour-blind post-process filters (deuteranopia/protanopia/tritanopia) + subtitles setting in UserSettings/SettingsScreen.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "game/Debug/FreeCamera.cs",
+  "game/UI/*",
+  "game/Settings/UserSettings.cs",
+  "game/Menu/SettingsScreen*.cs"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [],
+ "verification": [
+  "ui.cmds toggles photo mode and checks hud hidden"
+ ],
+ "depends_on": [
+  "P2-31",
+  "P1b-07"
+ ],
+ "risks": [],
+ "effort": "S"
+}

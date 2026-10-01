@@ -1,0 +1,27 @@
+{
+ "id": "X-15",
+ "title": "Wiring set: actuators, timers, teleporters, statues, wire colours",
+ "owner_session": "world",
+ "player_outcome": "Terraria wiring: red/blue/green/yellow wires, actuators that toggle blocks solid/passable, 1/3/5-second timers, teleporters, item/mob statues that spawn when powered, logic gates basics; a wire view while holding wiring tools.",
+ "design": [
+  "Extend src/Strata.Core/Gameplay/Wiring/WireSystem.cs (wire colours as separate layers, signal propagation per colour), actuator cell flag, timers, teleporter pairs, statue spawns with caps; data/items/wiring.json; wire overlay rendering per colour.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Wiring/*",
+  "data/items/wiring.json",
+  "data/tileobjects/*",
+  "game/World/WireOverlay*.cs"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "WiringTests (colours, actuators, timers, teleporters)"
+ ],
+ "verification": [
+  "builder.cmds wires a timer to a teleporter"
+ ],
+ "depends_on": [],
+ "risks": [],
+ "effort": "M"
+}
