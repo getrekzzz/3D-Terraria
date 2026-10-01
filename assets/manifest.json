@@ -42,6 +42,54 @@
    ],
    "generator": "flower"
   },
+  "blue_dungeon_bookcase": {
+   "models": [
+    "assets/models/objects/blue_dungeon_bookcase_v0.glb"
+   ],
+   "generator": "bookcase"
+  },
+  "blue_dungeon_candelabra": {
+   "models": [
+    "assets/models/objects/blue_dungeon_candelabra_v0.glb"
+   ],
+   "generator": "candelabra"
+  },
+  "blue_dungeon_chair": {
+   "models": [
+    "assets/models/objects/blue_dungeon_chair_v0.glb"
+   ],
+   "generator": "dungeon_chair"
+  },
+  "blue_dungeon_chandelier": {
+   "models": [
+    "assets/models/objects/blue_dungeon_chandelier_v0.glb"
+   ],
+   "generator": "chandelier"
+  },
+  "blue_dungeon_door": {
+   "models": [
+    "assets/models/objects/blue_dungeon_door_v0.glb"
+   ],
+   "generator": "dungeon_door"
+  },
+  "blue_dungeon_lamp": {
+   "models": [
+    "assets/models/objects/blue_dungeon_lamp_v0.glb"
+   ],
+   "generator": "floor_lamp"
+  },
+  "blue_dungeon_table": {
+   "models": [
+    "assets/models/objects/blue_dungeon_table_v0.glb"
+   ],
+   "generator": "dungeon_table"
+  },
+  "blue_dungeon_vase": {
+   "models": [
+    "assets/models/objects/blue_dungeon_vase_v0.glb"
+   ],
+   "generator": "vase"
+  },
   "bush": {
    "models": [
     "assets/models/objects/bush_v0.glb",
@@ -188,6 +236,54 @@
    ],
    "generator": "grass_tuft"
   },
+  "green_dungeon_bookcase": {
+   "models": [
+    "assets/models/objects/green_dungeon_bookcase_v0.glb"
+   ],
+   "generator": "bookcase"
+  },
+  "green_dungeon_candelabra": {
+   "models": [
+    "assets/models/objects/green_dungeon_candelabra_v0.glb"
+   ],
+   "generator": "candelabra"
+  },
+  "green_dungeon_chair": {
+   "models": [
+    "assets/models/objects/green_dungeon_chair_v0.glb"
+   ],
+   "generator": "dungeon_chair"
+  },
+  "green_dungeon_chandelier": {
+   "models": [
+    "assets/models/objects/green_dungeon_chandelier_v0.glb"
+   ],
+   "generator": "chandelier"
+  },
+  "green_dungeon_door": {
+   "models": [
+    "assets/models/objects/green_dungeon_door_v0.glb"
+   ],
+   "generator": "dungeon_door"
+  },
+  "green_dungeon_lamp": {
+   "models": [
+    "assets/models/objects/green_dungeon_lamp_v0.glb"
+   ],
+   "generator": "floor_lamp"
+  },
+  "green_dungeon_table": {
+   "models": [
+    "assets/models/objects/green_dungeon_table_v0.glb"
+   ],
+   "generator": "dungeon_table"
+  },
+  "green_dungeon_vase": {
+   "models": [
+    "assets/models/objects/green_dungeon_vase_v0.glb"
+   ],
+   "generator": "vase"
+  },
   "heart_lantern": {
    "models": [
     "assets/models/objects/heart_lantern_v0.glb"
@@ -316,6 +412,54 @@
     "assets/models/objects/pine_tree_v2.glb"
    ],
    "generator": "conifer"
+  },
+  "pink_dungeon_bookcase": {
+   "models": [
+    "assets/models/objects/pink_dungeon_bookcase_v0.glb"
+   ],
+   "generator": "bookcase"
+  },
+  "pink_dungeon_candelabra": {
+   "models": [
+    "assets/models/objects/pink_dungeon_candelabra_v0.glb"
+   ],
+   "generator": "candelabra"
+  },
+  "pink_dungeon_chair": {
+   "models": [
+    "assets/models/objects/pink_dungeon_chair_v0.glb"
+   ],
+   "generator": "dungeon_chair"
+  },
+  "pink_dungeon_chandelier": {
+   "models": [
+    "assets/models/objects/pink_dungeon_chandelier_v0.glb"
+   ],
+   "generator": "chandelier"
+  },
+  "pink_dungeon_door": {
+   "models": [
+    "assets/models/objects/pink_dungeon_door_v0.glb"
+   ],
+   "generator": "dungeon_door"
+  },
+  "pink_dungeon_lamp": {
+   "models": [
+    "assets/models/objects/pink_dungeon_lamp_v0.glb"
+   ],
+   "generator": "floor_lamp"
+  },
+  "pink_dungeon_table": {
+   "models": [
+    "assets/models/objects/pink_dungeon_table_v0.glb"
+   ],
+   "generator": "dungeon_table"
+  },
+  "pink_dungeon_vase": {
+   "models": [
+    "assets/models/objects/pink_dungeon_vase_v0.glb"
+   ],
+   "generator": "vase"
   },
   "placed_bottle": {
    "models": [
@@ -699,6 +843,38 @@
   "bloody_spine": {
    "model": "assets/models/items/bloody_spine.glb",
    "icon": "assets/icons/items/bloody_spine.png"
+  },
+  "blue_dungeon_bookcase": {
+   "object": "blue_dungeon_bookcase",
+   "icon": "assets/icons/items/blue_dungeon_bookcase.png"
+  },
+  "blue_dungeon_candelabra": {
+   "object": "blue_dungeon_candelabra",
+   "icon": "assets/icons/items/blue_dungeon_candelabra.png"
+  },
+  "blue_dungeon_chair": {
+   "object": "blue_dungeon_chair",
+   "icon": "assets/icons/items/blue_dungeon_chair.png"
+  },
+  "blue_dungeon_chandelier": {
+   "object": "blue_dungeon_chandelier",
+   "icon": "assets/icons/items/blue_dungeon_chandelier.png"
+  },
+  "blue_dungeon_door": {
+   "object": "blue_dungeon_door",
+   "icon": "assets/icons/items/blue_dungeon_door.png"
+  },
+  "blue_dungeon_lamp": {
+   "object": "blue_dungeon_lamp",
+   "icon": "assets/icons/items/blue_dungeon_lamp.png"
+  },
+  "blue_dungeon_table": {
+   "object": "blue_dungeon_table",
+   "icon": "assets/icons/items/blue_dungeon_table.png"
+  },
+  "blue_dungeon_vase": {
+   "object": "blue_dungeon_vase",
+   "icon": "assets/icons/items/blue_dungeon_vase.png"
   },
   "blue_moon": {
    "model": "assets/models/items/blue_moon.glb",
@@ -1415,6 +1591,38 @@
   "greater_mana_potion": {
    "model": "assets/models/items/greater_mana_potion.glb",
    "icon": "assets/icons/items/greater_mana_potion.png"
+  },
+  "green_dungeon_bookcase": {
+   "object": "green_dungeon_bookcase",
+   "icon": "assets/icons/items/green_dungeon_bookcase.png"
+  },
+  "green_dungeon_candelabra": {
+   "object": "green_dungeon_candelabra",
+   "icon": "assets/icons/items/green_dungeon_candelabra.png"
+  },
+  "green_dungeon_chair": {
+   "object": "green_dungeon_chair",
+   "icon": "assets/icons/items/green_dungeon_chair.png"
+  },
+  "green_dungeon_chandelier": {
+   "object": "green_dungeon_chandelier",
+   "icon": "assets/icons/items/green_dungeon_chandelier.png"
+  },
+  "green_dungeon_door": {
+   "object": "green_dungeon_door",
+   "icon": "assets/icons/items/green_dungeon_door.png"
+  },
+  "green_dungeon_lamp": {
+   "object": "green_dungeon_lamp",
+   "icon": "assets/icons/items/green_dungeon_lamp.png"
+  },
+  "green_dungeon_table": {
+   "object": "green_dungeon_table",
+   "icon": "assets/icons/items/green_dungeon_table.png"
+  },
+  "green_dungeon_vase": {
+   "object": "green_dungeon_vase",
+   "icon": "assets/icons/items/green_dungeon_vase.png"
   },
   "green_paint": {
    "model": "assets/models/items/green_paint.glb",
@@ -2195,6 +2403,38 @@
   "picksaw": {
    "model": "assets/models/items/picksaw.glb",
    "icon": "assets/icons/items/picksaw.png"
+  },
+  "pink_dungeon_bookcase": {
+   "object": "pink_dungeon_bookcase",
+   "icon": "assets/icons/items/pink_dungeon_bookcase.png"
+  },
+  "pink_dungeon_candelabra": {
+   "object": "pink_dungeon_candelabra",
+   "icon": "assets/icons/items/pink_dungeon_candelabra.png"
+  },
+  "pink_dungeon_chair": {
+   "object": "pink_dungeon_chair",
+   "icon": "assets/icons/items/pink_dungeon_chair.png"
+  },
+  "pink_dungeon_chandelier": {
+   "object": "pink_dungeon_chandelier",
+   "icon": "assets/icons/items/pink_dungeon_chandelier.png"
+  },
+  "pink_dungeon_door": {
+   "object": "pink_dungeon_door",
+   "icon": "assets/icons/items/pink_dungeon_door.png"
+  },
+  "pink_dungeon_lamp": {
+   "object": "pink_dungeon_lamp",
+   "icon": "assets/icons/items/pink_dungeon_lamp.png"
+  },
+  "pink_dungeon_table": {
+   "object": "pink_dungeon_table",
+   "icon": "assets/icons/items/pink_dungeon_table.png"
+  },
+  "pink_dungeon_vase": {
+   "object": "pink_dungeon_vase",
+   "icon": "assets/icons/items/pink_dungeon_vase.png"
   },
   "pink_paint": {
    "model": "assets/models/items/pink_paint.glb",

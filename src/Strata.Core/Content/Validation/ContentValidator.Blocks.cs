@@ -53,6 +53,7 @@ public static partial class ContentValidator
             if (t.Flame is { } flame)
             {
                 if (flame.At.Length != 3 || flame.At.Any(v => MathF.Abs(v) > 16f)) ctx.Error(t, "flame.at must be [x, y, z] within ±16 m.");
+                if (flame.Also.Any(a => a.Length != 3 || a.Any(v => MathF.Abs(v) > 16f))) ctx.Error(t, "flame.also points must be [x, y, z] within ±16 m.");
                 if (flame.Size is <= 0f or > 4f) ctx.Error(t, "flame.size must be within (0, 4] m.");
                 ctx.Color(t, flame.Color, "flame.color");
             }

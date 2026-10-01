@@ -85,6 +85,30 @@ dart_trap|Dart Trap|early|world
 """,
     "furniture": """
 firefly_in_a_bottle|Firefly in a Bottle|early|craft
+blue_dungeon_door|Blue Dungeon Door|prehardmode|dungeon
+blue_dungeon_chair|Blue Dungeon Chair|prehardmode|dungeon
+blue_dungeon_table|Blue Dungeon Table|prehardmode|dungeon
+blue_dungeon_bookcase|Blue Dungeon Bookcase|prehardmode|dungeon
+blue_dungeon_candelabra|Blue Dungeon Candelabra|prehardmode|dungeon
+blue_dungeon_chandelier|Blue Dungeon Chandelier|prehardmode|dungeon
+blue_dungeon_lamp|Blue Dungeon Lamp|prehardmode|dungeon
+blue_dungeon_vase|Blue Dungeon Vase|prehardmode|dungeon
+green_dungeon_door|Green Dungeon Door|prehardmode|dungeon
+green_dungeon_chair|Green Dungeon Chair|prehardmode|dungeon
+green_dungeon_table|Green Dungeon Table|prehardmode|dungeon
+green_dungeon_bookcase|Green Dungeon Bookcase|prehardmode|dungeon
+green_dungeon_candelabra|Green Dungeon Candelabra|prehardmode|dungeon
+green_dungeon_chandelier|Green Dungeon Chandelier|prehardmode|dungeon
+green_dungeon_lamp|Green Dungeon Lamp|prehardmode|dungeon
+green_dungeon_vase|Green Dungeon Vase|prehardmode|dungeon
+pink_dungeon_door|Pink Dungeon Door|prehardmode|dungeon
+pink_dungeon_chair|Pink Dungeon Chair|prehardmode|dungeon
+pink_dungeon_table|Pink Dungeon Table|prehardmode|dungeon
+pink_dungeon_bookcase|Pink Dungeon Bookcase|prehardmode|dungeon
+pink_dungeon_candelabra|Pink Dungeon Candelabra|prehardmode|dungeon
+pink_dungeon_chandelier|Pink Dungeon Chandelier|prehardmode|dungeon
+pink_dungeon_lamp|Pink Dungeon Lamp|prehardmode|dungeon
+pink_dungeon_vase|Pink Dungeon Vase|prehardmode|dungeon
 """,
     "paint": """
 paintbrush|Paintbrush|early|painter

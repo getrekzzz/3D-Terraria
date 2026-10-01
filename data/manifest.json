@@ -53,6 +53,7 @@
     "loot/enemies.json",
     "recipes/basic.json",
     "recipes/materials.json",
+    "tileobjects/dungeon.json",
     "tileobjects/furniture.json",
     "tileobjects/nature.json",
     "tileobjects/stations.json",

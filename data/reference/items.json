@@ -3778,6 +3778,174 @@
    "source": "craft"
   },
   {
+   "id": "terraria:blue_dungeon_door",
+   "name": "Blue Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_chair",
+   "name": "Blue Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_table",
+   "name": "Blue Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_bookcase",
+   "name": "Blue Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_candelabra",
+   "name": "Blue Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_chandelier",
+   "name": "Blue Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_lamp",
+   "name": "Blue Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_vase",
+   "name": "Blue Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_door",
+   "name": "Green Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_chair",
+   "name": "Green Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_table",
+   "name": "Green Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_bookcase",
+   "name": "Green Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_candelabra",
+   "name": "Green Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_chandelier",
+   "name": "Green Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_lamp",
+   "name": "Green Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_vase",
+   "name": "Green Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_door",
+   "name": "Pink Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_chair",
+   "name": "Pink Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_table",
+   "name": "Pink Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_bookcase",
+   "name": "Pink Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_candelabra",
+   "name": "Pink Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_chandelier",
+   "name": "Pink Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_lamp",
+   "name": "Pink Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_vase",
+   "name": "Pink Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
    "id": "terraria:paintbrush",
    "name": "Paintbrush",
    "kind": "paint",

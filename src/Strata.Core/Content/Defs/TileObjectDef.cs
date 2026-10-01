@@ -176,4 +176,7 @@ public sealed class FlameSpec
 
     /// <summary>Colour of the flame's body (its core burns near white).</summary>
     public string Color { get; init; } = "#ff8a2a";
+
+    /// <summary>More flame bases of the same size and colour (the other candles of a candelabra or chandelier).</summary>
+    public float[][] Also { get; init; } = Array.Empty<float[]>();
 }
