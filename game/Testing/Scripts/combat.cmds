@@ -103,3 +103,67 @@ assert use.failures == 1
 hold use_primary 0.5
 assert use.failures == 2
 assert errors == 0
+
+# --- P1-06 ---
+# The body faces the crosshair and nothing behind the player is the target. In third person a pickaxe (it selects
+# decor) targets the wall ahead, never the stalagmites right behind the player that the shoulder camera's ray passes
+# through when looking up. The chest stays on the camera's yaw standing, with the camera swung round the player (the
+# orbit keeps the aim), strafing (the legs turn 45 degrees toward the move and play strafe_left) and backpedalling.
+killall
+heal
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+camera third
+give copper_pickaxe 1
+wield copper_pickaxe
+fill -2 0 6 2 5 6 stone
+aim 0 0 1
+wait 0.3
+assert target.front == 1
+assert target.dist > 2
+assert player.facing_error_deg < 3
+place stalagmite -2 0 -3
+place stalagmite -1 0 -3
+place stalagmite 0 0 -3
+place stalagmite -2 0 -2
+place stalagmite -1 0 -2
+place stalagmite 0 0 -2
+aim 0 0.3 1
+wait 0.3
+assert target.front == 1
+assert target.dist > 2
+assert player.facing_error_deg < 3
+camera orbit 90
+wait 0.3
+assert target.front == 1
+assert target.dist > 2
+assert player.facing_error_deg < 3
+camera orbit 0
+aim 0 0 1
+press move_left
+wait 0.4
+assert player.stride == 1
+assert player.twist_deg < -40
+assert player.twist_deg > -50
+assert player.facing_error_deg < 3
+release move_left
+press move_back
+wait 0.4
+assert player.stride == 3
+assert player.twist_deg > -5
+assert player.twist_deg < 5
+assert player.facing_error_deg < 3
+release move_back
+wait 0.3
+# The crosshair point shots converge on is the terrain the view rests on past the reach (a wall 15 m ahead), not a
+# fixed 40 m away.
+fill -10 0 -10 10 7 10 air
+fill -3 0 11 3 8 29 air
+fill -3 0 30 3 8 30 stone
+aim 0 0 1
+wait 0.2
+assert player.aim_distance > 14
+assert player.aim_distance < 16
+fill -3 0 11 3 8 30 air
+camera first
+assert errors == 0

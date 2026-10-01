@@ -8,7 +8,7 @@ namespace Strata.Game.Entities;
 
 /// <summary>
 /// Makes melee attacks readable: a fading blade arc that follows the sweep the melee system tests hits against
-/// (from +arc/2 to −arc/2 around the aim, in the aim's plane) and a quick streak along the aim for thrusts.
+/// (from +arc/2 to −arc/2 around the facing, in the aim's plane) and a quick streak along the aim for thrusts.
 /// </summary>
 public sealed partial class SwingTrail : Node3D
 {
@@ -48,7 +48,9 @@ public sealed partial class SwingTrail : Node3D
     private void Start(PlayerEntity player, ItemUseInfo info)
     {
         if (info.IsTool) return; // pickaxes and axes show the block cursor instead
+        // As the melee system: the arc is centred on where the player looks (the body faces it) and pitched by the aim.
         var aim = player.Aim;
+        var facing = player.Facing;
         bool thrust = info.Has(ItemAction.Thrust) && !info.Has(ItemAction.Melee);
         var rarity = UI.UiTheme.Rarity(info.Item.Rarity);
         _trails.RemoveAll(t => t.Player == player);
@@ -56,7 +58,7 @@ public sealed partial class SwingTrail : Node3D
         {
             Player = player,
             Thrust = thrust,
-            Yaw = Mathf.Atan2(aim.X, aim.Z),
+            Yaw = Mathf.Atan2(facing.X, facing.Z),
             Pitch = Mathf.Clamp(Mathf.Asin(Mathf.Clamp(aim.Y, -1f, 1f)), -1.1f, 1.1f),
             HalfArc = thrust ? 0f : (info.Swing?.Arc ?? 150f) * Mathf.Pi / 360f,
             Reach = (thrust ? info.ThrustParams!.Length : info.Swing?.Length ?? 3f) * Units.CellSize + (thrust ? 0.4f : 0.6f),
@@ -116,7 +118,7 @@ public sealed partial class SwingTrail : Node3D
             new Color(t.Color, 0), new Color(t.Color, 0), new Color(t.Color, alpha), new Color(t.Color, alpha));
     }
 
-    /// <summary>A point on the sweep: flat distance <paramref name="r"/> at <paramref name="angle"/> from the aim yaw, on the aim plane.</summary>
+    /// <summary>A point on the sweep: flat distance <paramref name="r"/> at <paramref name="angle"/> from the facing yaw, on the aim plane.</summary>
     private static Vector3 Point(Trail t, Vector3 origin, float angle, float r)
     {
         float yaw = t.Yaw + angle;

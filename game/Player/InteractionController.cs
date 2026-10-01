@@ -85,47 +85,50 @@ public sealed partial class InteractionController : Node
         }
     }
 
-    /// <summary>Direction from the eye to a point; the camera's forward when the point is at the eye (standing in rope).</summary>
-    private System.Numerics.Vector3 AimTowards(System.Numerics.Vector3 point, Vector3 fallback)
+    /// <summary>How far (m) past the eye's plane the crosshair point is looked for: terrain, or this far away.</summary>
+    private const float ConvergenceMeters = 60f;
+
+    /// <summary>Direction from the eye to a point; the view direction when the point is at the eye (standing in rope).</summary>
+    private System.Numerics.Vector3 AimTowards(System.Numerics.Vector3 point, System.Numerics.Vector3 fallback)
     {
         var d = point - Entity.Eye;
-        return d.LengthSquared() > 1e-4f ? System.Numerics.Vector3.Normalize(d) : System.Numerics.Vector3.Normalize(ToCore(fallback));
+        return d.LengthSquared() > 1e-4f ? System.Numerics.Vector3.Normalize(d) : fallback;
     }
 
+    /// <summary>
+    /// The crosshair: the view ray (from the camera along its forward) is walked from where it crosses the eye's plane,
+    /// so nothing between the shoulder camera and the player is ever selected. A short cast with the held item's
+    /// filter (tools stop at decor, axes at canopies) gives the target; a long one that only terrain, trunks and
+    /// furniture stop gives the crosshair point the aim and shots converge on.
+    /// </summary>
     private void UpdateTarget()
     {
-        var cam = _player.Rig.Camera;
-        var origin = cam.GlobalPosition;
-        var dir = _player.Rig.Forward;
+        var rig = _player.Rig;
+        var origin = rig.ViewOrigin;
+        var dir = rig.Forward;
+        var camera = ToCore(origin);
+        var view = System.Numerics.Vector3.Normalize(ToCore(dir));
+        var eye = Entity.Eye;
+        var world = Game.Session.World;
         var held = Entity.State.Inventory.Held;
+        var item = held.IsEmpty ? null : held.Item;
         // The same reach as the use itself, so the Reach stat (Builder Potion) extends the highlight too.
-        float reach = ItemUseSystem.ReachMeters(Entity, held.IsEmpty ? null : held.Item);
-        Entity.ViewDirection = System.Numerics.Vector3.Normalize(ToCore(dir));
-        float camOffset = origin.DistanceTo(ToGodot(Entity.Eye));
-        var hit = Targeting.Cast(Game.Session.World, ToCore(origin), ToCore(dir), reach + camOffset + 2f);
-        if (hit != null)
-        {
-            var point = hit.HitCells * Strata.Core.Common.Units.CellSize;
-            float fromEye = System.Numerics.Vector3.Distance(point, Entity.Eye);
-            Target = hit with { Distance = fromEye };
-            InReach = fromEye <= reach;
-            Entity.Aim = AimTowards(point, dir);
-            Entity.AimDistance = fromEye;
-        }
-        else
-        {
-            Target = null;
-            InReach = false;
-            var far = ToCore(origin + dir * 40f);
-            Entity.Aim = AimTowards(far, dir);
-            Entity.AimDistance = System.Numerics.Vector3.Distance(far, Entity.Eye);
-        }
+        float reach = ItemUseSystem.ReachMeters(Entity, item);
+        var filter = ItemUseSystem.FilterFor(item == null ? null : Game.Uses[item]);
+        Entity.ViewDirection = view;
+        Target = Targeting.CastView(world, camera, view, eye, reach + 2f, filter, out float startT);
+        InReach = Target != null && Target.Distance <= reach;
+        var point = Targeting.CastView(world, camera, view, eye, ConvergenceMeters, TargetFilter.None, out _) is { } hit
+            ? hit.HitCells * Strata.Core.Common.Units.CellSize
+            : camera + view * (startT + ConvergenceMeters);
+        Entity.Aim = AimTowards(point, view);
+        Entity.AimDistance = System.Numerics.Vector3.Distance(point, eye);
         if (DigDownTarget(dir) is { } below)
         {
             Target = below;
             InReach = true;
         }
-        UpdateTalkTarget(origin, dir);
+        UpdateTalkTarget(origin, dir, startT, ToGodot(point));
     }
 
     public override void _UnhandledInput(InputEvent @event)

@@ -56,6 +56,16 @@
   (item reach plus the Reach stat) bounds both the use and the in-reach highlight. `PlayerEntity.ViewDirection`
   (camera forward) feeds `Facing`, which drives `FacingQuarter` and the melee arc yaw; `Aim` (eye to crosshair
   point) keeps the pitch, shots and drops.
+* **View ray and facing (engine)** — each physics tick `InteractionController.UpdateTarget` casts the view ray (from
+  `CameraRig.ViewOrigin`, the camera without its screenshot orbit, along `CameraRig.Forward`) twice with
+  `Targeting.CastView`: reach + 2 m with the held item's `FilterFor` filter gives `Target` (`InReach` when its eye
+  distance is within reach), and 60 m with `TargetFilter.None` gives the crosshair point (terrain, trunks and
+  furniture, or 60 m out) that sets `Aim` and `AimDistance`, so shots converge on what the crosshair rests on at any
+  range. Smart digging may still swap in the cell under the feet; residents are talked to between the eye's plane
+  and that point. In third person the body always faces the camera's yaw: the chest, arms and head stay on the
+  crosshair while the legs strafe or backpedal (`BodyFacing`, see rendering.md, Creature animation), and the swing
+  trail, like the melee arc, is centred on `Facing`. Probes: `target.front` (1 when the target is not behind the
+  eye along `Facing`), `target.dist`, `player.aim_distance`.
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback

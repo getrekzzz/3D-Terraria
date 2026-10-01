@@ -14,7 +14,7 @@ namespace Strata.Game.Rendering;
 /// <item>a carried light held up in the right hand (blended in and out);</item>
 /// <item>a hurt flinch over the upper body.</item>
 /// </list>
-/// An <see cref="AimModifier"/> then turns the torso and head toward the aim.
+/// An <see cref="AimModifier"/> then turns the torso (chest, arms and head) onto the aim.
 /// </summary>
 public sealed class HumanoidAnimator
 {
@@ -49,6 +49,9 @@ public sealed class HumanoidAnimator
 
     private readonly AnimationTree _tree;
     private readonly AnimationLibrary _library;
+
+    /// <summary>Undead sets shamble: a slower, longer walk (and no sprint).</summary>
+    private readonly bool _shambles;
     private string _state = ""; // nothing requested yet: the transition node starts with no current state
     private float _hold, _holdTarget, _actionLeft;
 
@@ -56,6 +59,8 @@ public sealed class HumanoidAnimator
     {
         _tree = tree;
         _library = library;
+        CanStrafe = library.HasAnimation("strafe_left") && library.HasAnimation("strafe_right");
+        _shambles = library.HasAnimation("walk") && library.GetAnimation("walk").Length > 1.2f;
     }
 
     public AimModifier? Aim { get; private set; }
@@ -161,6 +166,15 @@ public sealed class HumanoidAnimator
 
     public bool Has(string clip) => _library.HasAnimation(clip);
 
+    /// <summary>The set has both strafe clips (every generated set since the strafe rebuild).</summary>
+    public bool CanStrafe { get; }
+
+    /// <summary>
+    /// The playback rate of strafe_left and strafe_right at a ground speed (m/s): they cover run's ground per cycle, so
+    /// they follow run's rate (allowed a little faster, as there is no sprint strafe) and the feet do not slide.
+    /// </summary>
+    public float StrafeRate(float speed) => Mathf.Clamp(speed / (_shambles ? 1.9f : 2.9f), 0.5f, 2.4f);
+
     /// <summary>Switches the locomotion state (cross-fading) and sets its playback speed.</summary>
     public void Locomotion(string state, float speed = 1f)
     {
@@ -179,7 +193,7 @@ public sealed class HumanoidAnimator
     /// </summary>
     public string Gait(float speed, out float rate)
     {
-        if (_library.GetAnimation("walk").Length > 1.2f)
+        if (_shambles)
         {
             if (speed < 1.6f)
             {

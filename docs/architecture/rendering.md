@@ -167,9 +167,20 @@ their strike windows and the bow's release match `data/config/use_styles.json`. 
 shortest turn from its rest pose, so the action clips keep the upper arm short of straight up wherever they can be
 faded (an arm past it would flip round for a frame) and give every body, undead included, a living person's arms.
 The strafe clips run `HumanoidAnimator.StrafeAngle` (45°) to the side of the hips: with the legs turned that far
-toward the movement, the feet travel straight sideways. For the player an `AimModifier` (`SkeletonModifier3D`) then
-turns the torso and head toward the aim while the legs face the way they walk, and brings the arms up to the aim for
-guns, bows, staffs and spears.
+toward the movement, the feet travel straight sideways.
+
+The player's body always faces the crosshair (`PlayerAvatar.Motion`, rule in Core `Presentation/BodyFacing`): the
+chest, arms and head face the camera's yaw (`CameraRig.Yaw`), and the legs (the model's yaw) turn toward the movement
+by at most `BodyFacing.MaxTwist` (70°) and pick the stride that carries the feet along it: the forward gait within
+22.5° of the facing, `strafe_left`/`strafe_right` (playback rate `HumanoidAnimator.StrafeRate`, run's ground per
+cycle) out to 112.5°, the gait played backwards beyond; a playing stride keeps its band 8° longer so a move along an
+edge does not flicker. W+A runs the strafe clip with the hips square, A or D turns the legs 45°, S backpedals. Standing,
+in the air, in water, on a rope or in a minecart the legs ease onto the facing (12/s), and however fast the camera
+turns the legs are dragged to within the twist limit, so the chest never leaves the crosshair. An `AimModifier`
+(`SkeletonModifier3D`) then twists the torso back onto the facing (the spine and chest share the twist, so the
+shoulders, arms and head face it exactly), bends the spine and head to the aim's pitch, and brings the arms up to the
+aim for guns, bows, staffs and spears. Probes `player.facing_error_deg`, `player.twist_deg` and `player.stride`
+report the result.
 
 `NpcRenderer.Motion` adds presence to everything else: `facing` look (eyes stare at their target) or velocity (fish),
 fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a
