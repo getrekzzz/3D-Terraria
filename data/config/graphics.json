@@ -9,7 +9,7 @@
     "low": {
       "renderScale": 0.8, "upscaler": "fsr1", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 4,
       "shadowAtlas": 2048, "shadowDistance": 50, "shadowSplits": 2, "shadowFilter": 1, "sunSize": 0, "torchShadows": false,
-      "dynamicLights": 0,
+      "dynamicLights": 4,
       "ssao": false, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
       "skyRadiance": 64, "cloudSteps": 0, "autoExposure": false,
       "grassDensity": 0, "grassDistance": 0, "lodThreshold": 4, "horizonDistance": 0

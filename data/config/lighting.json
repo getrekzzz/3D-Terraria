@@ -1,0 +1,87 @@
+{
+  // Light tuning shared by every graphics preset (see src/Strata.Core/Presentation/LightingConfig.cs for each field
+  // and its range, and ExposureModel.cs for how exposure adapts). Every value lives here: calibrate from the lighting
+  // tour screenshots (game/Testing/Tours/lighting.cmds), never with constants in code.
+  "exposure": {
+    // Exposure multiplier in a cave sealed from the sky: the eye opens up so torch-lit rooms read. With Godot's
+    // metering on top (medium and up), caves there stay at least as bright as before the exposure model.
+    "caveBoost": 2.8,
+    // Multiplier under the open night sky (moonlight reads dark blue, not black); at most caveBoost.
+    "nightBoost": 1.2,
+    // Rate (1/s) at which the eye opens up when it gets darker (entering a cave): slow, 63% of the way every 2 s.
+    "brightenPerSecond": 0.5,
+    // Rate (1/s) at which the eye closes down when it gets brighter (leaving a cave): fast, within 10% in 0.25 s, so
+    // the first frames in the sun are never a white wash.
+    "darkenPerSecond": 10,
+    // Godot auto exposure scale (presets with autoExposure): the mid-grey luminance the metering aims for. The game
+    // scales it (and the window) by the model's multiplier, so Godot meters the scene as if at exposure 1.
+    "autoKey": 0.4,
+    // Lowest multiplier Godot's auto exposure may apply. Sunlit sand and snow sit at this floor; close to 1, so the
+    // biome exposure bias (the same on every preset) does the darkening and medium and up read like low.
+    "autoMin": 0.95,
+    // Highest multiplier Godot's auto exposure may apply: shaded forest and caves reach this ceiling, a small lift
+    // over low.
+    "autoMax": 1.4,
+    // Godot auto exposure adaptation speed: quick, so the metering lift from a cave is gone within a second of leaving
+    // it; the window is narrow, so turning between sky and ground cannot pump the brightness much.
+    "autoSpeed": 3
+  },
+  "glow": {
+    // HDR luminance (after exposure) where bloom starts: above sunlit sand and snow, below flames, lava and magic.
+    "threshold": 1.6,
+    // Godot glow HDR scale: how softly light above the threshold ramps into bloom.
+    "softness": 2.5,
+    // Overall bloom strength.
+    "intensity": 0.6,
+    // Brightest luminance that feeds the bloom (keeps the sun's specular from flooding the screen).
+    "luminanceCap": 8,
+    // Weights of the 7 blur levels, fine to wide (normalized): mid-size halos, no full-screen haze.
+    "levels": [0, 0, 1, 1, 0.8, 0.5, 0.25]
+  },
+  "fog": {
+    // Distance fog starts no further than this many metres (divided by the biome's fog density), so far land fades.
+    "nearCap": 70,
+    // Rate (1/s) at which the close, dark cave gloom closes in when the camera loses the open sky.
+    "closePerSecond": 2,
+    // Rate (1/s) at which the gloom clears again under the open sky: fast, like the eye, so the first frames after
+    // leaving a cave are not a bright haze.
+    "clearPerSecond": 6
+  },
+  "screenSpace": {
+    // Screen-space indirect light (colour bleeding) strength on presets with SSIL.
+    "ssilIntensity": 0.9,
+    // Grey albedo of the volumetric fog on presets with volumetric fog (lower scatters less sunlight back).
+    "volumetricAlbedo": 0.5
+  },
+  "torch": {
+    // Energy of a placed torch's pooled light per unit of its peak light channel (the nearest few placed lights get a
+    // real light on every preset, see graphics.json dynamicLights).
+    "placedEnergy": 1.35,
+    // Range of a placed torch's light in metres at zero peak; the range is base + perPeak * peak channel (0-1).
+    "placedRangeBase": 4,
+    // Metres of range added per unit of the placed torch's peak channel (a full torch reaches about 13.5 m, well past
+    // the 7.5 m edge of its baked light).
+    "placedRangePerPeak": 9.5,
+    // Godot omni falloff of a placed torch's light (2 is inverse-square; lower carries further before fading, so the
+    // torch lights the cave 8-10 m out and not just the wall beside it).
+    "placedAttenuation": 0.8,
+    // Energy of the torch carried in the hand per unit of its peak channel (at least the placed energy).
+    "heldEnergy": 1.8,
+    // Range of the carried torch's light in metres at zero peak; the range is base + perPeak * peak channel.
+    "heldRangeBase": 4,
+    // Metres of range added per unit of the carried torch's peak channel (a held torch reaches about 16 m).
+    "heldRangePerPeak": 12,
+    // Godot omni falloff of the carried torch's light: flatter than a placed torch's, so it lights the way ahead.
+    "heldAttenuation": 0.75
+  },
+  "blockLight": {
+    // Linear share of the baked block-light curve, level * mix(linear, 1, level) (0 = level squared, 1 = linear):
+    // higher keeps a long soft tail out to the 7.5 m edge of a torch's baked light.
+    "linear": 0.62,
+    // Brightness of baked block light (torches, lava, glowing ores and fungi); lower it if lava or glowing mushrooms
+    // wash out (lighting tour lava_cave and mushroom_cave shots).
+    "gain": 1.35,
+    // Share of block light removed on surfaces in full daylight (the eye is adapted to the sun).
+    "daylitSuppression": 0.65
+  }
+}

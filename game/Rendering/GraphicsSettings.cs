@@ -10,19 +10,24 @@ namespace Strata.Game.Rendering;
 /// Applies graphics presets from data/config/graphics.json to the renderer: viewport anti-aliasing and scaling,
 /// global shadow and screen-space effect quality. Scene parts (environment, lights, grass) follow
 /// <see cref="Changed"/>. The chosen preset is remembered in user://graphics.cfg; --graphics=NAME overrides it.
+/// <see cref="Lighting"/> (data/config/lighting.json) holds the light tuning every preset shares.
 /// </summary>
 public sealed class GraphicsSettings
 {
     private const string SettingsFile = "user://graphics.cfg";
 
-    private GraphicsSettings(GraphicsConfig config, string name)
+    private GraphicsSettings(GraphicsConfig config, LightingConfig lighting, string name)
     {
         Config = config;
+        Lighting = lighting;
         Name = name;
         Preset = config.Get(name);
     }
 
     public GraphicsConfig Config { get; }
+
+    /// <summary>Exposure, glow, fog and torch tuning shared by every preset (validated at load).</summary>
+    public LightingConfig Lighting { get; }
 
     public string Name { get; private set; }
 
@@ -38,6 +43,9 @@ public sealed class GraphicsSettings
         var config = GraphicsConfig.Load(data);
         var problems = config.Validate();
         if (problems.Count > 0) throw new InvalidOperationException($"{GraphicsConfig.Path}: {string.Join("; ", problems)}");
+        var lighting = LightingConfig.Load(data);
+        problems = lighting.Validate();
+        if (problems.Count > 0) throw new InvalidOperationException($"{LightingConfig.Path}: {string.Join("; ", problems)}");
         string? wanted = args.Get("graphics");
         GraphicsPreset? custom = null;
         if (wanted == null)
@@ -49,7 +57,7 @@ public sealed class GraphicsSettings
                 if (wanted == Custom) custom = ReadCustom(file, config.Get(config.Default), log);
             }
         }
-        if (custom != null) return new GraphicsSettings(config, config.Default) { Preset = custom, Name = Custom };
+        if (custom != null) return new GraphicsSettings(config, lighting, config.Default) { Preset = custom, Name = Custom };
         // First launch: integrated and software GPUs start on the low preset.
         if (wanted == null && config.Presets.ContainsKey("low") && RenderingServer.GetVideoAdapterType() is RenderingDevice.DeviceType.IntegratedGpu or RenderingDevice.DeviceType.Cpu)
         {
@@ -61,7 +69,7 @@ public sealed class GraphicsSettings
             if (wanted != null) log.Write(Strata.Core.Diagnostics.LogLevel.Warning, "graphics", $"Unknown graphics preset '{wanted}', using '{config.Default}'.");
             wanted = config.Default;
         }
-        return new GraphicsSettings(config, wanted);
+        return new GraphicsSettings(config, lighting, wanted);
     }
 
     /// <summary>Switches preset; <paramref name="remember"/> stores it for the next start.</summary>

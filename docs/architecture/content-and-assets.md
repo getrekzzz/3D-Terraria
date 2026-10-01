@@ -41,10 +41,13 @@ boots, hats, masks), and a 52-bone rig (fingers included) with heat/chain weight
 the same rig. Params per character live in `assets.json`. They export rest-pose UVs and tangents for the character
 shader.
 
-Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
-(exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,
-death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,
-hold. Characters with the same skeleton (body, height, gait) share one animation set,
+Human motion (`human/motion.py`, `human/strafe.py`, `human/actions.py`) is authored as pose functions sampled every
+frame at 30 fps (exact curves, eased keys, seamless loops): idle, walk, run, sprint, strafe_left and strafe_right
+(runs 45° to the side of the hips), jump, fall, land, swim, climb, glide, hurt, death (plus an undead shamble), and
+upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use, hold. Swing, mine, thrust and bow take
+their length and timing from the `clips` of `data/config/use_styles.json` (the swing's wind-up and strike window, the
+chop's impact, the bow's release and re-draw), the same windows Core strikes in; after changing them, rebuild the
+sets. Characters with the same skeleton (body, height, gait) share one animation set,
 `assets/models/creatures/anim/<set>.glb`, with `index.json` naming each character's set; rebuild them with
 `build_all.py --anims [--shard=I/N]` (seconds each, no character meshes touched).
 
@@ -57,4 +60,5 @@ raw `generator:params`) as a Workbench contact sheet of views or clip frames, wi
 
 Rendering-only settings: `data/config/graphics.json` (presets) and `data/config/grass.json` (grass kinds per grass
 block) are validated by `Strata.Tools validate` and at boot, as is `data/config/use_styles.json` (the human clips'
-strike, release and re-draw windows, shared by gameplay and presentation).
+strike, release and re-draw windows, shared by gameplay and presentation); `data/config/lighting.json` (exposure,
+glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools validate`.

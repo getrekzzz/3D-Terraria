@@ -73,6 +73,10 @@ strata_light_dir={
 "type": "vec3",
 "value": Vector3(0, 1, 0)
 }
+strata_block_response={
+"type": "vec4",
+"value": Vector4(0.62, 1.35, 0.65, 0)
+}
 strata_clouds={
 "type": "vec4",
 "value": Vector4(0, 0, 0.4, 1600)

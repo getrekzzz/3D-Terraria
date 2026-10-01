@@ -1,0 +1,472 @@
+# Lighting tour: noon in the forest, the desert and the snow, and an underground cave, on every preset; then the
+# frames after the walls of a sealed room vanish in the desert sun (leaving a cave) on medium, high and ultra; then
+# torches: a torch-lit corridor with its end wall 1-10 m out, the held torch, lava, glowing mushrooms, a sandstone
+# room and a torch at noon (see the torch section for its acceptance).
+# Rendering required. --fixed-fps makes every frame 1/10 s of game time, so the exit frames land at +0.5 s and +2 s
+# however slowly a software renderer draws (each shot logs render.exposure after it). The HUD is hidden so the shots
+# measure only the scene. Lavapipe needs about an hour and a half:
+#   xvfb-run -a -s "-screen 0 1600x900x24" godot --path . --rendering-driver vulkan --fixed-fps 10 --resolution 640x360 \
+#     -- --world=light --size=small --new --player=t --fresh-player --view=3 --shots=$PWD/shots \
+#     --smoke=res://game/Testing/Tours/lighting.cmds
+# Acceptance (desert and snow in [0.35, 0.6] mean luma with under 2% clipped pixels on medium, high and ultra, and the
+# exit frames no brighter):
+#   python3 tools/ci/shot_stats.py shots/*.png --check '[mhu]*_desert*' --check '[mhu]*_tundra*' --check '[mhu]*_exit_*'
+wait_until player.frozen == 0 300
+spawning off
+town arrivals off
+god on
+camera third
+hud off
+aim 0 -0.12 1
+
+# Forest at spawn.
+wait_until stream.idle == 1 900
+graphics low
+time 12
+wait 2
+screenshot low_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+time 12
+wait 2
+screenshot medium_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+time 12
+wait 2
+screenshot high_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+time 12
+wait 2
+screenshot ultra_forest 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# Desert: the biome's exposure bias settles over a few seconds after the teleport.
+biome desert
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+aim 0 -0.12 1
+graphics low
+time 12
+wait 4
+screenshot low_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+time 12
+wait 2
+screenshot medium_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+time 12
+wait 2
+screenshot high_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+time 12
+wait 2
+screenshot ultra_desert 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# Leaving a cave: a sealed room around the player and the camera lets the eyes adapt to the dark, then its walls and
+# roof vanish (a sand floor stays) and the frames 0.5 s and 2 s later are kept. The room is under 12 cells tall: a
+# taller one counts as outdoor shade under a floating roof (SkyMap.ShadeGap), not as a cave. Time runs at a quarter
+# speed meanwhile (40 frames per game second), so remeshing the opened room costs game time as it would at 40 fps.
+graphics medium
+fill -21 -1 -21 21 10 21 stone
+fill -20 0 -20 20 9 20 air
+wait_until stream.idle == 1 300
+time 12
+wait 8
+probe render.exposure
+timescale 0.25
+fill -21 0 -21 21 10 21 air
+fill -21 -1 -21 21 -1 21 sand
+wait 0.5
+probe render.exposure
+screenshot medium_exit_05 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+wait 1.4
+probe render.exposure
+screenshot medium_exit_2 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+timescale 1
+
+graphics high
+fill -21 -1 -21 21 10 21 stone
+fill -20 0 -20 20 9 20 air
+wait_until stream.idle == 1 300
+time 12
+wait 8
+probe render.exposure
+timescale 0.25
+fill -21 0 -21 21 10 21 air
+fill -21 -1 -21 21 -1 21 sand
+wait 0.5
+probe render.exposure
+screenshot high_exit_05 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+wait 1.4
+probe render.exposure
+screenshot high_exit_2 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+timescale 1
+
+graphics ultra
+fill -21 -1 -21 21 10 21 stone
+fill -20 0 -20 20 9 20 air
+wait_until stream.idle == 1 300
+time 12
+wait 8
+probe render.exposure
+timescale 0.25
+fill -21 0 -21 21 10 21 air
+fill -21 -1 -21 21 -1 21 sand
+wait 0.5
+probe render.exposure
+screenshot ultra_exit_05 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+wait 1.4
+probe render.exposure
+screenshot ultra_exit_2 0
+wait_until screenshot.pending == 0 60
+probe render.exposure
+timescale 1
+
+# Snow.
+biome tundra
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 900
+aim 0 -0.12 1
+graphics low
+time 12
+wait 4
+screenshot low_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+time 12
+wait 2
+screenshot medium_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+time 12
+wait 2
+screenshot high_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+time 12
+wait 2
+screenshot ultra_tundra 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# An underground cave lit by the held torch: the eyes have opened up (cave boost) on every preset.
+select 4
+tp cave underground
+wait_until player.frozen == 0 300
+aim 0 -0.05 1
+wait_until stream.idle == 1 900
+graphics low
+wait 4
+screenshot low_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+wait 2
+screenshot ultra_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# Torches: a sealed stone corridor 2.5 m wide and tall, a torch on the floor at the player's feet and an end wall
+# 1, 4, 6, 8 and 10 m ahead (cells of 0.5 m), seen in first person with nothing in hand. The middle of each frame
+# is the end wall, facing the torch; beyond 7.5 m only the torch's pooled real light reaches it (the baked light
+# stops there). The shell is built around the player, who is then centred in their cell once the new colliders
+# are in (tp ~ ~ ~), so later edits relative to the feet cannot slip a cell. Acceptance (shot_stats.py's centre is
+# the mean luma of the middle tenth of the frame): on medium the wall at 8 m keeps at least 20% of the 1 m wall's
+# luma and at 10 m at least 10%, the 6 m wall reads clearly (centre luma 0.25) on low and medium, and low is within
+# 30% of medium from 4 m out:
+#   python3 tools/ci/shot_stats.py shots/*_corridor_*.png --ratio medium_corridor_8m medium_corridor_1m 0.2 1 \
+#     --ratio medium_corridor_10m medium_corridor_1m 0.1 1 --ratio low_corridor_4m medium_corridor_4m 0.7 1.3 \
+#     --ratio low_corridor_8m medium_corridor_8m 0.7 1.3 --centre-min medium_corridor_6m 0.25 \
+#     --centre-min low_corridor_6m 0.25
+select 10
+camera first
+time midnight
+fill -4 -1 -5 4 -1 27 stone
+fill -4 5 -5 4 5 27 stone
+fill -3 0 -5 -3 4 27 stone
+fill 3 0 -5 3 4 27 stone
+fill -2 0 -5 2 4 -3 stone
+fill -2 0 25 2 4 27 stone
+fill -2 0 -2 2 4 24 air
+wait_until stream.idle == 1 300
+wait 1
+tp ~ ~ ~
+wait_until player.frozen == 0 300
+fill -2 0 2 2 4 2 stone
+place torch 0 0 0
+aim 0 -0.05 1
+wait_until stream.idle == 1 300
+wait 6
+graphics low
+wait 2
+screenshot low_corridor_1m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_corridor_1m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_corridor_1m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+wait 2
+screenshot ultra_corridor_1m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+fill -2 0 2 2 4 2 air
+fill -2 0 8 2 4 8 stone
+wait_until stream.idle == 1 300
+graphics low
+wait 2
+screenshot low_corridor_4m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_corridor_4m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+fill -2 0 8 2 4 8 air
+fill -2 0 12 2 4 12 stone
+wait_until stream.idle == 1 300
+graphics low
+wait 2
+screenshot low_corridor_6m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_corridor_6m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+fill -2 0 12 2 4 12 air
+fill -2 0 16 2 4 16 stone
+wait_until stream.idle == 1 300
+graphics low
+wait 2
+screenshot low_corridor_8m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_corridor_8m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_corridor_8m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+wait 2
+screenshot ultra_corridor_8m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+fill -2 0 16 2 4 16 air
+fill -2 0 20 2 4 20 stone
+wait_until stream.idle == 1 300
+graphics low
+wait 2
+screenshot low_corridor_10m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_corridor_10m 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# The held torch alone, the end wall 8 m ahead (high gives it shadows).
+fill -2 0 20 2 4 20 air
+fill -2 0 16 2 4 16 stone
+fill 0 0 0 0 0 0 air
+select 4
+wait_until stream.idle == 1 300
+graphics low
+wait 2
+screenshot low_corridor_held 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_corridor_held 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_corridor_held 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# Light sources under the flatter block-light curve, with the held torch: a lava pool in the underworld, the glowing
+# mushroom caverns and an underground desert room must not wash out (compare mean and clipped pixels between
+# versions).
+camera third
+tp cave underworld
+wait_until player.frozen == 0 300
+fill -5 0 -3 5 4 12 air
+wait_until stream.idle == 1 300
+wait 1
+tp ~ ~ ~
+wait_until player.frozen == 0 300
+fill -5 -3 2 5 -1 12 stone
+fill -4 -2 3 4 -1 11 air
+liquid lava -4 -2 3 4 -1 11
+aim 0 -0.25 1
+wait_until stream.idle == 1 900
+graphics low
+wait 4
+screenshot low_lava_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_lava_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_lava_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+wait 2
+screenshot ultra_lava_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+tp zone mushroom
+wait_until player.frozen == 0 300
+probe zone.mushroom
+aim 0 -0.12 1
+wait_until stream.idle == 1 900
+graphics low
+wait 4
+screenshot low_mushroom_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_mushroom_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_mushroom_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+wait 2
+screenshot ultra_mushroom_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+# The underground desert's pale sand and sandstone (rebuilt as a sealed room in a cave: no desert cave is reliably
+# reachable by teleport) under the held torch.
+tp cave underground
+wait_until player.frozen == 0 300
+fill -6 0 -3 6 5 12 air
+wait_until stream.idle == 1 300
+wait 1
+tp ~ ~ ~
+wait_until player.frozen == 0 300
+fill -7 -1 -4 7 -1 13 hardened_sand
+fill -7 6 -4 7 6 13 sandstone
+fill -7 0 -4 -7 5 13 hardened_sand
+fill 7 0 -4 7 5 13 hardened_sand
+fill -6 0 -4 6 5 -4 sandstone
+fill -6 0 13 6 5 13 sandstone
+fill -6 0 -3 6 5 12 air
+aim 0 -0.12 1
+wait_until stream.idle == 1 900
+graphics low
+wait 6
+screenshot low_sand_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_sand_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics high
+wait 2
+screenshot high_sand_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics ultra
+wait 2
+screenshot ultra_sand_cave 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+# Noon: a torch at the foot of a sunlit wall 2 m ahead, beside the player, on a platform built over the forest at
+# spawn so nothing shades it (third person, nothing in hand). Daylight suppresses its light, so the wall shows a
+# small warm tint at most, not a glowing patch (compare shot_stats.py --profile between versions).
+select 10
+tp spawn
+wait_until player.frozen == 0 300
+time 12
+fill -4 3 -6 4 3 6 stone
+fill -4 4 -6 4 10 6 air
+wait_until stream.idle == 1 300
+wait 1
+tp ~ ~4 ~
+wait_until player.frozen == 0 300
+fill -3 0 4 3 4 4 stone
+place torch 2 0 3
+aim 0 -0.12 1
+wait_until stream.idle == 1 900
+graphics low
+wait 4
+screenshot low_noon_torch 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+graphics medium
+wait 2
+screenshot medium_noon_torch 0.5
+wait_until screenshot.pending == 0 900
+probe render.exposure
+
+graphics medium
+hud on
+assert errors == 0

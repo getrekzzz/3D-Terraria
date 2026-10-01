@@ -77,7 +77,10 @@ public sealed class GraphicsPreset
     /// <summary>Carried torches cast shadows.</summary>
     public bool TorchShadows { get; set; }
 
-    /// <summary>Real lights for the nearest placed torches, lava and glowing creatures (0 = baked light only).</summary>
+    /// <summary>
+    /// Real (shadowless) lights for the nearest placed torches, lava and glowing creatures (0 = baked light only, which
+    /// stops 7.5 m from a torch).
+    /// </summary>
     public int DynamicLights { get; set; } = 8;
 
     public bool Ssao { get; set; } = true;
@@ -116,7 +119,10 @@ public sealed class GraphicsPreset
     /// <summary>Cloud light-marching steps (0 draws flat clouds).</summary>
     public int CloudSteps { get; set; } = 3;
 
-    /// <summary>Eye adaptation between bright surface and dark caves.</summary>
+    /// <summary>
+    /// Godot's metering on top of the eye adaptation every preset gets (<see cref="ExposureModel"/>): it fine-tunes
+    /// brightness to the frame within lighting.json's autoMin–autoMax window.
+    /// </summary>
     public bool AutoExposure { get; set; }
 
     /// <summary>Grass blade density (0 disables grass) and draw distance in metres.</summary>

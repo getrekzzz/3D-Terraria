@@ -1,6 +1,7 @@
 using Strata.Core.Content;
 using Strata.Core.Content.Loading;
 using Strata.Core.Content.Validation;
+using Strata.Core.Presentation;
 
 namespace Strata.Tools.Commands;
 
@@ -26,18 +27,23 @@ public sealed class ValidateCommand : IToolCommand
         foreach (var reg in db.AllRegistries) Console.WriteLine($"  {reg.Category,-12} {reg.Count,5}");
         int errors = db.Report.Errors.Count();
         // Engine-side configuration that is not part of the content database.
-        var graphics = Strata.Core.Presentation.GraphicsConfig.Load(source).Validate();
-        foreach (var problem in graphics) Console.WriteLine($"Error: {Strata.Core.Presentation.GraphicsConfig.Path}: {problem}");
-        errors += graphics.Count;
-        var grass = Strata.Core.Presentation.GrassConfig.Load(source).Validate(db);
-        foreach (var problem in grass) Console.WriteLine($"Error: {Strata.Core.Presentation.GrassConfig.Path}: {problem}");
-        errors += grass.Count;
-        var useStyles = Strata.Core.Presentation.UseStyleConfig.Load(source).Validate();
-        foreach (var problem in useStyles) Console.WriteLine($"Error: {Strata.Core.Presentation.UseStyleConfig.Path}: {problem}");
-        errors += useStyles.Count;
+        errors += ConfigErrors(GraphicsConfig.Path, () => GraphicsConfig.Load(source).Validate());
+        errors += ConfigErrors(GrassConfig.Path, () => GrassConfig.Load(source).Validate(db));
+        errors += ConfigErrors(LightingConfig.Path, () => LightingConfig.Load(source).Validate());
+        errors += ConfigErrors(UseStyleConfig.Path, () => UseStyleConfig.Load(source).Validate());
         int warnings = db.Report.Warnings.Count();
         Console.WriteLine($"{errors} error(s), {warnings} warning(s)");
         return errors == 0 ? 0 : 1;
+    }
+
+    /// <summary>Prints a config file's problems (or why it does not parse) as errors and returns how many there were.</summary>
+    private static int ConfigErrors(string path, Func<List<string>> validate)
+    {
+        List<string> problems;
+        try { problems = validate(); }
+        catch (System.Text.Json.JsonException e) { problems = new List<string> { e.Message }; }
+        foreach (var problem in problems) Console.WriteLine($"Error: {path}: {problem}");
+        return problems.Count;
     }
 }
 

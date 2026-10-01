@@ -7,8 +7,8 @@ namespace Strata.Game.Rendering;
 /// Plays a generated human's animation set (assets/models/creatures/anim, see tools/blender/bgen/human/motion.py)
 /// through an <see cref="AnimationTree"/> built in code:
 /// <list type="bullet">
-/// <item>locomotion: one cross-faded state (idle, walk, run, sprint, jump, fall, land, swim, climb, glide, death)
-/// played at a speed (negative walks backwards);</item>
+/// <item>locomotion: one cross-faded state (idle, walk, run, sprint, strafe_left, strafe_right, jump, fall, land,
+/// swim, climb, glide, death) played at a speed (negative walks backwards);</item>
 /// <item>an action over the upper body (swing, mine, thrust, shoot, bow, cast, drink, use) stretched to the item's
 /// use time and restarted on every use, so you can swing while running;</item>
 /// <item>a carried light held up in the right hand (blended in and out);</item>
@@ -21,9 +21,24 @@ public sealed class HumanoidAnimator
     /// <summary>The armature node name the animation sets' tracks use; every character's armature is renamed to it.</summary>
     public const string Rig = "anim_rig";
 
-    public static readonly string[] States = { "idle", "walk", "run", "sprint", "jump", "fall", "land", "swim", "climb", "glide", "death" };
+    public static readonly string[] States =
+    {
+        "idle", "walk", "run", "sprint", "strafe_left", "strafe_right", "jump", "fall", "land", "swim", "climb", "glide", "death",
+    };
+
     public static readonly string[] Actions = { "swing", "mine", "thrust", "shoot", "bow", "cast", "drink", "use" };
-    private static readonly HashSet<string> Looping = new() { "idle", "walk", "run", "sprint", "fall", "swim", "climb", "glide", "hold" };
+
+    private static readonly HashSet<string> Looping = new()
+    {
+        "idle", "walk", "run", "sprint", "strafe_left", "strafe_right", "fall", "swim", "climb", "glide", "hold",
+    };
+
+    /// <summary>
+    /// The strafe clips run at this angle (degrees) to the left or right of where the hips face, covering the same
+    /// ground per cycle as run (tools/blender/bgen/human/strafe.py): turning the legs this far toward the movement and
+    /// playing strafe_left or strafe_right moves the feet exactly sideways while the aim keeps the torso on target.
+    /// </summary>
+    public const float StrafeAngle = 45f;
 
     private static readonly string[] UpperBody =
     {

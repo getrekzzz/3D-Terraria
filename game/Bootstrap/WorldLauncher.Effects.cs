@@ -21,7 +21,7 @@ public static partial class WorldLauncher
         var lights = new Rendering.DynamicLights();
         runtime.AddChild(lights);
         lights.Initialize(services.Graphics);
-        lights.AddProvider((eye, radius) => Rendering.DynamicLights.PlacedLights(game, objectRenderer.Placement, eye, radius));
+        lights.AddProvider((eye, radius) => lights.PlacedLights(game, objectRenderer.Placement, eye, radius));
         lights.AddProvider(creatures.Glows);
         var lava = new Rendering.LavaEffects();
         runtime.AddChild(lava);

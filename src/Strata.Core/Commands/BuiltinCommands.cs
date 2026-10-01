@@ -137,7 +137,7 @@ public static class BuiltinCommands
         r.Register(new CommandDef
         {
             Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface | tp cave <underground|cavern|underworld> | tp landmark <id> | tp zone <biome>",
-            Help = "Teleports the player (cell coordinates).",
+            Help = "Teleports the player (cell coordinates; ~ or ~n is relative to the feet cell, so tp ~ ~ ~ centres the player in it).",
             Run = Teleport,
         });
         r.Register(new CommandDef
@@ -311,13 +311,27 @@ public static class BuiltinCommands
                 break;
             }
             default:
-                cell = new Int3(a.Int(0, "x"), a.Int(1, "y"), a.Int(2, "z"));
+            {
+                var feet = ctx.Player.FeetCell;
+                cell = new Int3(Coordinate(a, 0, "x", feet.X), Coordinate(a, 1, "y", feet.Y), Coordinate(a, 2, "z", feet.Z));
                 break;
+            }
         }
         if (!s.World.InBounds(cell.X, cell.Y, cell.Z)) throw new CommandException($"{cell} is outside the world");
         // Named surface targets are estimates; exact coordinates and caves are taken as given.
         ctx.Host.Teleport(ctx.Player, Feet(cell), settle: a.Str(0, "x") is "spawn" or "surface" or "landmark" or "zone");
         return CommandResult.Success($"Teleported to {cell}.");
+    }
+
+    /// <summary>A cell coordinate: a whole number, or ~ / ~n relative to <paramref name="here"/>.</summary>
+    private static int Coordinate(CommandArgs a, int i, string name, int here)
+    {
+        var text = a.Str(i, name);
+        if (!text.StartsWith('~')) return a.Int(i, name);
+        if (text.Length == 1) return here;
+        return int.TryParse(text.AsSpan(1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int offset)
+            ? here + offset
+            : throw new CommandException($"<{name}> must be an integer or ~[offset], got '{text}'");
     }
 
     private static string Inspect(CommandContext ctx)

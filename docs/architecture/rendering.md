@@ -9,14 +9,18 @@ tints (`data/biomes.json`) and the generated texture arrays.
 |---|---|---|
 | Sun / moon | `DirectionalLight3D`, colour and irradiance from `Atmosphere.cs` (CPU port of the sky's scattering) | Custom `light()`: GGX (height-correlated Smith, Schlick, Burley diffuse) in `voxel_brdf.gdshaderinc`, gated by the baked sky exposure (`strata_sun_gate`) and by cloud shadows (`clouds.gdshaderinc`) |
 | Sky ambient and reflections | Godot environment, ambient = sky, reflections = sky radiance cubemap | Multiplied per surface by `AO = strata_sky_visibility(voxel light)`, so a sealed cave gets none; Godot also derives specular occlusion from it |
-| Block light (torches, lava, glowing ores and fungi) | Baked RGB voxel light per vertex / instance | `EMISSION = strata_block_light(albedo, light, ao)`; its curve (`strata_block_curve`, level^1.5) is gentler than the sky's so a torch's glow carries across a room |
-| Nearest light sources | `DynamicLights`: a pool of shadowless `OmniLight3D` (size = preset `dynamicLights`, 0 on low) given each ¼ s to the nearest placed lights, lava hotspots (`LavaEffects`) and glowing creatures (`NpcRenderer.Glows`, fireflies blink) | Regular Godot lights: longer reach and directional shading on top of the baked glow; a firefly swarm never costs more than the pool |
-| Carried torch | `PlayerLight`: an `OmniLight3D` at the flame in the hand (first or third person), ~15 m reach, a fire's flicker (shadows on high/ultra) | Regular Godot light through the same `light()` |
-| Screen space | SSAO, SSIL (colour bleeding), SSR, volumetric fog with light shafts, auto exposure, glow | Environment settings per preset |
+| Block light (torches, lava, glowing ores and fungi) | Baked RGB voxel light per vertex / instance | `EMISSION = strata_block_light(albedo, light, ao)`; its curve (`strata_block_curve`: level × mix(`linear`, 1, level) × `gain`, from `lighting.json` `blockLight` through the `strata_block_response` shader global) is much flatter than the sky's, so a torch's glow carries across a cave with a soft tail out to the 7.5 m edge of the baked light; surfaces in full daylight lose `daylitSuppression` of it |
+| Nearest light sources | `DynamicLights`: a pool of shadowless `OmniLight3D` (size = preset `dynamicLights`: 4 on low, 8/16/24 above) given each ¼ s to the nearest placed lights, lava hotspots (`LavaEffects`) and glowing creatures (`NpcRenderer.Glows`, fireflies blink); ranking the candidates allocates nothing | Regular Godot lights: longer reach and directional shading on top of the baked glow; a placed torch's light reaches about 13 m (`lighting.json` `torch.placed*`: energy and range scale with the light's peak channel, each source has its own attenuation); a firefly swarm never costs more than the pool |
+| Carried torch | `PlayerLight`: an `OmniLight3D` at the flame in the hand (first or third person), about 16 m reach, at least a placed torch's energy (`torch.held*`), a fire's flicker (shadows on high/ultra) | Regular Godot light through the same `light()` |
+| Screen space | SSAO, SSIL (colour bleeding), SSR, volumetric fog with light shafts | Environment settings per preset; SSIL strength and the fog's albedo from `lighting.json` `screenSpace` |
+| Eye adaptation | `EnvironmentController.Exposure.cs` steps `ExposureModel` (Core) each frame from the camera's unsmoothed sky exposure, the daylight and the eased biome `exposureBias`, and writes the camera's exposure multiplier when it moves by more than 0.002. Presets with `autoExposure` add Godot's metering, confined to `autoMin`–`autoMax` (`ExposureModel.AutoWindow`). Godot applies the multiplier to lights, sky and emission before it meters, so the metering key and window are scaled by the multiplier too: Godot meters the scene as if at exposure 1 and its correction multiplies with the model instead of undoing it | Scales all light before AgX tone mapping and before the glow threshold. The same on every preset: a cave opens the eye up to `caveBoost` at `brightenPerSecond`, leaving it closes down at `darkenPerSecond` (no flashbang), by day desert and snow are dimmed by their bias. Probe `render.exposure` |
+| Glow | Environment glow from `lighting.json` `glow`: HDR `threshold`, `softness` (HDR scale), `intensity`, `luminanceCap`, normalized level weights; screen blend | Only light above the threshold after exposure blooms (flames, lava, magic, glowing ores); sunlit sand and snow stay under it |
 
 `EnvironmentController(.Frame).cs` drives time of day: sun and moon arcs, atmosphere-coloured light, night
-desaturation, fog (aerial perspective above ground, close biome-tinted gloom below), cloud cover drifting with the
-weather and the ground wind (`strata_wind`) that grass and foliage share.
+desaturation, fog (aerial perspective above ground, close biome-tinted gloom below; the gloom closes in at
+`fog.closePerSecond` when the camera loses the sky and clears at the faster `fog.clearPerSecond`; deep in a cave it
+also covers the sky background that shows past the streamed chunks, which the cave-adapted eye would see white),
+cloud cover drifting with the weather and the ground wind (`strata_wind`) that grass and foliage share.
 
 ## Sky (`sky.gdshader`)
 Single-scattering atmosphere (Rayleigh, Mie, ozone; quadratic sample spacing) evaluated in the quarter-resolution
@@ -58,7 +62,9 @@ the generator's `TerrainField`, the surface biome's map colour, and the sea over
 `Build` makes a polar mesh whose rings widen with distance (a continuous level of detail: about 3 m cells at the
 streamed edge, tens of metres at the horizon). `HorizonRenderer` rebuilds it on a worker thread when the focus drifts
 48 m from its centre; `horizon.gdshader` discards it inside the loaded chunk box (real voxels take over there), adds
-macro variation and rock on steep slopes, and lets the fog's aerial perspective melt it into the sky. The preset's
+macro variation and rock on steep slopes, and lets the fog's aerial perspective melt it into the sky. Land albedo is
+clamped to luminance 0.42 and its ambient occlusion to 0.8, so distant sand and snow never outshine the streamed
+terrain; the fog starts within `fog.nearCap` metres (divided by the biome's fog density) on every preset. The preset's
 `horizonDistance` (0 = off) also sets the fog reach and the camera's far plane. It samples fields, not voxels:
 caves, structures, edits and hardmode wedges are not in it.
 
@@ -67,7 +73,33 @@ caves, structures, edits and hardmode wedges are not in it.
 upscaler (FSR 1/2), anti-aliasing (FXAA/SMAA/TAA/MSAA), anisotropy, shadow atlas, distance and filter, sun size
 (PCSS), torch shadows, SSAO/SSIL/SSR quality, volumetric fog grid, sky radiance size, cloud steps, auto exposure,
 grass density and distance, mesh LOD threshold, horizon distance. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
-remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`.
+remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`. Auto exposure (medium and
+up) only fine-tunes within the narrow window from `lighting.json`; cave adaptation and the biome bias come from the
+CPU model on every preset, so desert and snow read the same on low and ultra. The lighting tour
+(`game/Testing/Tours/lighting.cmds`, HUD hidden with `hud off`, run with `--fixed-fps 10` so frames land at exact game
+times however slowly lavapipe draws) shoots forest, desert, snow and a cave on each preset plus the frames 0.5 s and
+2 s after the walls of a sealed room vanish in the desert (at a quarter time scale, so remeshing the room costs game
+time as at 40 fps); `tools/ci/shot_stats.py --check` holds desert, snow and exit frames on medium, high and ultra to a
+mean luma of 0.35–0.6 with under 2% clipped pixels. Its torch part builds a sealed 2.5 m stone corridor with a torch
+at the player's feet and an end wall 1, 4, 6, 8 and 10 m ahead (`*_corridor_*`, plus the held torch alone at 8 m);
+`shot_stats.py --ratio/--centre-min` compare the luma of the frame's middle tenth (the end wall): on medium the 8 m
+wall keeps at least 20% of the 1 m wall and the 10 m wall 10%, the 6 m wall reads (0.25) on low and medium, and low
+stays within 30% of medium. Further stops check that the flatter block-light curve does not wash out a lava pool in
+the underworld, the glowing mushroom caverns or a sandstone room under the held torch, and that a torch by a sunlit
+wall at noon stays a faint tint. Edits in tours are relative to the feet cell, so the tour centres the player in it
+(`tp ~ ~ ~`, relative coordinates) once the colliders of a freshly built room are in.
+
+Light tuning shared by every preset is `LightingConfig` (Core, `data/config/lighting.json`, every value required and
+range-checked by `Strata.Tools validate`): eye adaptation, glow threshold/softness/levels, the fog near cap and
+cave-gloom rates, SSIL and volumetric strengths, placed and held torch lights, and the block-light curve.
+`ExposureModel` (Core, pure) gives the exposure the eye wants (`caveBoost` sealed from the sky; in the open
+`nightBoost` at night and the biome's `exposureBias` by day, below 1 for desert, snow, sky, hallow and ocean) and
+eases toward it, opening up slowly and closing down fast so leaving a cave never flashes. `ExposureModel.AutoWindow`
+turns the `autoMin`–`autoMax` multiplier range into Godot's auto exposure ISO window (luminance = ISO × 12.5 / 100 /
+100 at sensitivity 100). `GraphicsSettings` loads and validates the file at start (a bad value stops the game, like a
+bad `graphics.json`); `EnvironmentController` takes exposure, glow, the fog section, SSIL and the volumetric albedo
+from it, `DynamicLights` and `PlayerLight` the torch section, and `EnvironmentController` sets the
+`strata_block_response` shader global (linear share, gain, daylit suppression) from the block-light section.
 
 Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class GPU):
 * Chunks sealed from the sky sit on their own visual layer (`ChunkLayers.Sealed`) that the sun's and moon's
@@ -125,12 +157,19 @@ without hazing the image; a moonlit night keeps a blue ambient floor so shapes a
 
 ## Creature animation
 Generated humans (the player, town folk, humanoid enemies) play their shared animation set through a
-`HumanoidAnimator` (an `AnimationTree` built in code): a cross-faded locomotion state (idle, walk, run, sprint, jump,
-fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed so feet do not slide, negative
-when backpedalling), an upper-body `OneShot` for item actions stretched to the item's use time and restarted on
-every use (so you can swing while running), a right-arm blend that holds a carried torch up, and a hurt flinch. For
-the player an `AimModifier` (`SkeletonModifier3D`) then turns the torso and head toward the aim while the legs face
-the way they walk, and brings the arms up to the aim for guns, bows, staffs and spears.
+`HumanoidAnimator` (an `AnimationTree` built in code): a cross-faded locomotion state (idle, walk, run, sprint,
+strafe_left, strafe_right, jump, fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed
+so feet do not slide, negative when backpedalling), an upper-body `OneShot` for item actions stretched to the item's
+use time and restarted on every use (so you can swing while running), a right-arm blend that holds a carried torch
+up, and a hurt flinch. The swing, chop and thrust start and end in their raised or ready pose, so a chained use picks
+up where the last one ended (the `OneShot` still fades each use out over its last 0.16 s and in again on the next);
+their strike windows and the bow's release match `data/config/use_styles.json`. The tree blends each bone by the
+shortest turn from its rest pose, so the action clips keep the upper arm short of straight up wherever they can be
+faded (an arm past it would flip round for a frame) and give every body, undead included, a living person's arms.
+The strafe clips run `HumanoidAnimator.StrafeAngle` (45°) to the side of the hips: with the legs turned that far
+toward the movement, the feet travel straight sideways. For the player an `AimModifier` (`SkeletonModifier3D`) then
+turns the torso and head toward the aim while the legs face the way they walk, and brings the arms up to the aim for
+guns, bows, staffs and spears.
 
 `NpcRenderer.Motion` adds presence to everything else: `facing` look (eyes stare at their target) or velocity (fish),
 fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a

@@ -1,6 +1,7 @@
 {
   // How items are used on screen, shared by gameplay (src/Strata.Core/Gameplay/Items/UseTiming.cs) and the engine, and
-  // the timing the human clips in tools/blender/bgen/human/actions.py are keyed to. Loaded and validated by
+  // the timing the human clips in tools/blender/bgen/human/actions.py are keyed to (after changing a clip's timing,
+  // rebuild them with `python3.13 tools/blender/build_all.py --anims`). Loaded and validated by
   // src/Strata.Core/Presentation/UseStyleConfig.cs.
   //
   // clips: the timing of each authored body clip. Times are fractions of the clip (0 = start, 1 = end); the engine

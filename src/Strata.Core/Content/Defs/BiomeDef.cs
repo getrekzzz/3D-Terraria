@@ -33,6 +33,9 @@ public sealed class BiomeDef : ContentDef
     /// <summary>Ambient light tint applied underground in this biome.</summary>
     public string AmbientTint { get; init; } = "#ffffff";
 
+    /// <summary>Open-air daytime exposure multiplier; bright sand and snow &lt; 1 (0.4–1.5, see Presentation.ExposureModel).</summary>
+    public float ExposureBias { get; init; } = 1f;
+
     public string? Music { get; init; }
     public string? Ambience { get; init; }
 
