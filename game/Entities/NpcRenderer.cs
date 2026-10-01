@@ -131,7 +131,6 @@ public sealed partial class NpcRenderer : Node3D
                 UpdateSegments(npc, view, world);
                 UpdateArms(npc, view);
             }
-            else if (npc.Def.Boss is { Parts.Length: > 0, ArmModel: not null }) UpdatePartArms(npc, view);
             if (npc.Barrier != null) UpdateBarrier(npc, view, world);
             if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
             {
@@ -152,6 +151,10 @@ public sealed partial class NpcRenderer : Node3D
                 view.Health.Position = view.Shown + new Vector3(0, npc.HalfExtents.Y * 2f + 0.35f, 0);
             }
         }
+        // Arms to boss parts once every view has moved this frame (a hand listed after its body would trail a frame).
+        foreach (var npc in _game.Npcs.All)
+            if (npc.Segments.Count == 0 && npc.Def.Boss is { Parts.Length: > 0, ArmModel: not null } && _views.TryGetValue(npc.Id, out var view))
+                UpdatePartArms(npc, view);
     }
 
     /// <summary>

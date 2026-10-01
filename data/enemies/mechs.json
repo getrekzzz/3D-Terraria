@@ -44,7 +44,7 @@
         "enraged": { "projectile": "death_laser", "damage": 26, "speed": 34, "interval": 18, "range": 45 } },
       "life": 8000, "damage": 45, "defense": 12, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
       "loot": "the_twins", "value": 0,
-      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "music": "boss_mech", "companions": ["spazmatism"] },
+      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["spazmatism"] },
       "covers": ["terraria:the_twins"]
     },
     {

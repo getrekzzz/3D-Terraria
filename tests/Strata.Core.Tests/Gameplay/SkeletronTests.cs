@@ -211,4 +211,16 @@ public class SkeletronTests
         }
         Assert.Contains(head, g.World.Npcs.All); // it does not leave by day
     }
+
+    [Fact]
+    public void PrimeRagesByDayWhileTheTwinsStillLeave()
+    {
+        using var g = Arena();
+        var prime = g.Content.Enemies.Get("skeletron_prime").Boss!;
+        Assert.False(prime.DespawnAtDay);
+        Assert.NotNull(prime.Enrage);
+        // Both eyes of the pair fly off at dawn (one staying behind would hold the fight open by day).
+        Assert.True(g.Content.Enemies.Get("retinazer").Boss!.DespawnAtDay);
+        Assert.True(g.Content.Enemies.Get("spazmatism").Boss!.DespawnAtDay);
+    }
 }
