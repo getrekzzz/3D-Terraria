@@ -48,14 +48,22 @@ public static class EditCommands
         });
         r.Register(new CommandDef
         {
-            Name = "fill", Usage = "fill <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> <block|air>",
-            Help = "Fills a box relative to the player's feet.",
+            Name = "fill", Usage = "fill <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> <block|air> [natural]",
+            Help = "Fills a box relative to the player's feet. Blocks are placed by hand (crisp) unless 'natural' is given: "
+                + "then they are unflagged like generated terrain and mesh smooth.",
             Run = (ctx, a) =>
             {
                 var here = Here(ctx);
                 var p0 = here + new Int3(a.Int(0, "dx0"), a.Int(1, "dy0"), a.Int(2, "dz0"));
                 var p1 = here + new Int3(a.Int(3, "dx1"), a.Int(4, "dy1"), a.Int(5, "dz1"));
                 var (id, def) = Block(ctx, a.Str(6, "block"));
+                bool natural = a.OptStr(7) switch
+                {
+                    null => false,
+                    "natural" => true,
+                    var other => throw new CommandException($"unknown fill option '{other}' (expected 'natural')"),
+                };
+                var flags = id == 0 || natural ? CellFlags.None : CellFlags.PlayerPlaced;
                 bool displaces = def is { IsSolid: true };
                 var min = Int3.Min(p0, p1);
                 var max = Int3.Max(p0, p1);
@@ -66,7 +74,8 @@ public static class EditCommands
                     for (int z = min.Z; z <= max.Z; z++)
                         for (int x = min.X; x <= max.X; x++)
                         {
-                            batch.SetBlock(x, y, z, id, 0, id == 0 ? CellFlags.None : CellFlags.PlayerPlaced);
+                            batch.SetBlock(x, y, z, id, 0, flags);
+                            if (natural && id != 0) batch.ClearFlags(x, y, z); // a hand-placed block it replaces was flagged
                             if (displaces) batch.SetLiquid(x, y, z, 0);
                         }
                 int changed = batch.PendingChanges;

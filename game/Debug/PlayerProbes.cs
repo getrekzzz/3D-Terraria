@@ -5,9 +5,9 @@ using Strata.Game.Player;
 namespace Strata.Game.Debug;
 
 /// <summary>
-/// Probes on the player's physical body (floor contact, the terrain-loading freeze, flight time; the hook is a Core
-/// probe), on how far the third-person body turns from the crosshair and how its item actions blend, and on the
-/// crosshair target.
+/// Probes on the player's physical body (floor contact, the terrain-loading freeze, flight time, the hook claw's snap
+/// onto the rendered surface; the hook's state is a Core probe), on how far the third-person body turns from the
+/// crosshair and how its item actions blend, and on the crosshair target.
 /// </summary>
 [ProbeSource]
 public static class PlayerProbes
@@ -21,6 +21,8 @@ public static class PlayerProbes
         ctx.AddProbe("player.frozen", () => player.Frozen ? 1 : 0);
         ctx.AddProbe("player.flight_left", () => player.FlightLeft);
         ctx.AddProbe("player.area_ready", () => runtime.IsAreaReady(PlayerController.CellAt(player.GlobalPosition)) ? 1 : 0);
+        // How far (m) the hook's claw was moved from its voxel hit onto the rendered surface; -1 when none was found.
+        ctx.AddProbe("player.hook_snap", () => runtime.GetNodeOrNull<GrappleVisual>("GrappleVisual")?.SnapDistance ?? -1);
         if (world.Avatar is { } avatar)
         {
             ctx.AddProbe("player.facing_error_deg", () => avatar.FacingErrorDegrees);

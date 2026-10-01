@@ -44,7 +44,13 @@
   it. Core decides anchor, state and `PullVelocity` (towards the anchor at the hook's pull speed, hanging within
   1.1 m); the engine body (`PlayerEntity.HasBody`) advances the hook in `_PhysicsProcess` and applies the pull, while
   `GameWorld` ticks it for bodiless (headless, test) players. Death, teleports and recalls put the hook away; nothing
-  is thrown from a minecart, and riding one or phasing lets go of a hook that is out.
+  is thrown from a minecart, and riding one or phasing lets go of a hook that is out. `GrappleVisual` draws the chain
+  from the drawn (interpolated) hand and moves the claw from the voxel hit onto the rendered surface: one physics ray
+  across the struck face (terrain, platform and object colliders, ±0.6 m) when a throw starts and when it latches, kept
+  only within 0.5 m and eased on over the head's last metre of flight (probe `player.hook_snap`, -1 when nothing was
+  found, e.g. a canopy). The third-person body throws a clicked hook with the `thrust` clip. `movement.cmds` covers the
+  key, the click, a crisp slab, a natural (smooth-meshed, `fill … natural`) sloped ceiling that must stay latched while
+  reeling in, a broken anchor and platforms.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor
