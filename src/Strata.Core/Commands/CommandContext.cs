@@ -50,6 +50,9 @@ public sealed class CommandContext
     /// <summary>Position stored by the <c>mark</c> command (probe <c>player.from_mark</c>).</summary>
     public Vector3? Mark { get; set; }
 
+    /// <summary>Use animations the player had started when <c>mark</c> ran (probe <c>player.swings</c> counts from it).</summary>
+    public int MarkSwings { get; set; }
+
     public PlayerEntity Player => World.LocalPlayer ?? throw new CommandException("no player in this world");
 
     /// <summary>Adds a fixed probe, e.g. <c>player.life</c>. A name is registered once (probe files must not shadow each other).</summary>

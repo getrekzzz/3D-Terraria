@@ -1,4 +1,5 @@
 using System.Numerics;
+using Strata.Core.Commands;
 using Strata.Core.Common;
 using Strata.Core.Content.Loading;
 using Strata.Core.Gameplay.Entities;
@@ -187,6 +188,24 @@ public class UseTimingTests
         g.Player.ResetUse();
         Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
         Assert.Equal(2, g.Player.UseSerial);
+    }
+
+    [Fact]
+    public void TheUseCommandStartsAFreshSwingAndTheSwingProbeCountsFromTheMark()
+    {
+        using var g = Arena();
+        var ctx = new CommandContext(g.World, new HeadlessCommandHost()) { Registry = BuiltinCommands.CreateRegistry() };
+        var r = ctx.Registry!;
+        g.Hold("wooden_sword");
+        g.Player.Aim = Vector3.UnitZ;
+        Assert.True(r.Execute(ctx, "use").Ok);
+        Assert.True(r.Execute(ctx, "use").Ok); // mid-swing, yet a scripted use starts a new one
+        Assert.Equal(2, ctx.ReadProbe("player.swings"));
+        Assert.Equal(g.Content.Items.Get("wooden_sword").UseAnimation, ctx.ReadProbe("player.use_anim"));
+        Assert.True(r.Execute(ctx, "mark").Ok);
+        Assert.Equal(0, ctx.ReadProbe("player.swings"));
+        Assert.True(r.Execute(ctx, "use").Ok);
+        Assert.Equal(1, ctx.ReadProbe("player.swings"));
     }
 
     private static Npc Dummy(TestGame g, float yawDegrees, float meters)

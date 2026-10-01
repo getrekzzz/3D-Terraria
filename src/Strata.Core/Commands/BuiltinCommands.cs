@@ -96,10 +96,11 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "mark", Usage = "mark", Help = "Remembers the player's position (probe player.from_mark).",
+            Name = "mark", Usage = "mark", Help = "Remembers the player's position and swing count (probes player.from_mark, player.swings).",
             Run = (ctx, _) =>
             {
                 ctx.Mark = ctx.Player.Position;
+                ctx.MarkSwings = ctx.Player.UseSerial;
                 return CommandResult.Success($"Marked {ctx.Mark}.");
             },
         });
