@@ -8,7 +8,7 @@ Owner: World & life session. Order: X-01 → X-08 (+P3-49) → X-06 → X-13 →
 | X-01 weather | done | Core `Gameplay/Weather` (deterministic hourly rolls per seed, rain/thunderstorm/windy/sandstorm, snow and blizzards over snow biomes, nothing underground), `weather` condition + `ConditionContext.Weather/Windy`, mirrored `phase: "weather"` events (rain/thunderstorm/windy_day/sandstorm), saved in `WorldMeta.Weather`. Engine: GPU rain/snow/sand/splash particles in a camera box cut off by the sky map (`SkyHeights` texture), per-preset budgets in `data/config/weather.json`, terrain wetness + puddles, overcast sky, wind on clouds/grass/foliage/flames, sandstorm/blizzard haze, lightning + thunder, weather loops on the new `Outdoors` bus. |
 | X-08 ambience (+P3-49) | done | `data/config/ambience.json` + Core `AmbienceConfig.Select` (tested): 16 synthesised beds (birds, crickets, frogs, surf, wind, caves, cavern, lava, mushroom, evil, hallow, dungeon, sky, hive); cave reverb and outdoor low-pass by enclosure/depth (`AudioEnvironment`); pooled GPU dust/spores/embers/leaves (from real nearby tree canopies)/fireflies per preset; cave drips from real ceilings; music variants (rain, town day/night, night versions, underground jungle/ice/blight/rot/radiant, space); fishing bite sound. |
 
-CI: see the latest push section below.
+CI (push 1): GREEN — file length, build, 426 Core tests, ore tiers/manifest/validate/coverage/gen_reference/build_all/audio checks, Godot import, all 15 smoke scripts (incl. new weather.cmds) SMOKE PASS, menu tour MENU PASS.
 
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
