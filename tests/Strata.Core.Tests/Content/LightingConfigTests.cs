@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Strata.Core.Content.Loading;
 using Strata.Core.Presentation;
 using Strata.Core.Tests.Support;
@@ -39,6 +40,19 @@ public class LightingConfigTests
         var config = Shipped();
         config.Exposure.DarkenPerSecond = config.Exposure.BrightenPerSecond * 0.5f;
         Assert.Contains(config.Validate(), p => p.StartsWith("exposure.darkenPerSecond", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void NullValuesAreReportedNotThrown()
+    {
+        // The shipped file with "levels" and the whole "fog" section written as null (`required` accepts both).
+        var text = File.ReadAllText(System.IO.Path.Combine(TestPaths.ProjectRoot, LightingConfig.Path));
+        text = Regex.Replace(text, @"""levels"":\s*\[[^\]]*\]", "\"levels\": null");
+        text = Regex.Replace(text, @"""fog"":\s*\{[^}]*\}", "\"fog\": null");
+        var problems = LightingConfig.Load(new MemoryDataSource(LightingConfig.Path, text)).Validate();
+        Assert.Contains(problems, p => p.StartsWith("glow.levels", StringComparison.Ordinal));
+        Assert.Contains(problems, p => p.StartsWith("fog must be an object", StringComparison.Ordinal));
+        Assert.Equal(2, problems.Count);
     }
 
     [Fact]

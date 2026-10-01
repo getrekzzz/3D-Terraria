@@ -7,7 +7,7 @@
     "caveBoost": 1.7,
     // Multiplier under the open night sky (moonlight reads dark blue, not black); at most caveBoost.
     "nightBoost": 1.2,
-    // Rate (1/s) at which the eye opens up when it gets darker (entering a cave): slow, about 2 s to adapt.
+    // Rate (1/s) at which the eye opens up when it gets darker (entering a cave): slow, 63% of the way every 2 s.
     "brightenPerSecond": 0.5,
     // Rate (1/s) at which the eye closes down when it gets brighter (leaving a cave): fast, within 10% in under 1 s.
     "darkenPerSecond": 2.5,

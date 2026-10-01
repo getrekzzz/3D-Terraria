@@ -23,22 +23,24 @@ public sealed class LightingConfig
     public static LightingConfig Load(IDataSource data) =>
         JsonSerializer.Deserialize<LightingConfig>(data.ReadText(Path), ContentJson.Options) ?? throw new JsonException($"{Path} is empty");
 
-    /// <summary>Problems with the file (values out of range); empty when valid.</summary>
+    /// <summary>Problems with the file (values out of range, a section written as null); empty when valid.</summary>
     public List<string> Validate()
     {
         var problems = new List<string>();
-        Add(problems, "exposure", Exposure.Validate());
-        Add(problems, "glow", Glow.Validate());
-        Add(problems, "fog", Fog.Validate());
-        Add(problems, "screenSpace", ScreenSpace.Validate());
-        Add(problems, "torch", Torch.Validate());
-        Add(problems, "blockLight", BlockLight.Validate());
+        // `required` only demands the key: "exposure": null still parses, so a null section is reported, not thrown.
+        Add(problems, "exposure", Exposure?.Validate());
+        Add(problems, "glow", Glow?.Validate());
+        Add(problems, "fog", Fog?.Validate());
+        Add(problems, "screenSpace", ScreenSpace?.Validate());
+        Add(problems, "torch", Torch?.Validate());
+        Add(problems, "blockLight", BlockLight?.Validate());
         return problems;
     }
 
-    private static void Add(List<string> problems, string section, IEnumerable<string> found)
+    private static void Add(List<string> problems, string section, IEnumerable<string>? found)
     {
-        foreach (var problem in found) problems.Add($"{section}.{problem}");
+        if (found is null) problems.Add($"{section} must be an object, not null");
+        else foreach (var problem in found) problems.Add($"{section}.{problem}");
     }
 }
 
@@ -111,7 +113,7 @@ public sealed class GlowSettings
         if (Softness is < 0f or > 4f) yield return "softness must be within 0–4";
         if (Intensity is < 0f or > 8f) yield return "intensity must be within 0–8";
         if (LuminanceCap <= Threshold || LuminanceCap > 256f) yield return "luminanceCap must be above threshold and at most 256";
-        if (Levels.Length != LevelCount) yield return $"levels must hold {LevelCount} values";
+        if (Levels is null || Levels.Length != LevelCount) yield return $"levels must hold {LevelCount} values";
         else if (Array.Exists(Levels, l => l < 0f) || Levels.Sum() <= 0f) yield return "levels must be non-negative with a positive sum";
     }
 }
