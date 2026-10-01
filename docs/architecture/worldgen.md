@@ -63,3 +63,33 @@ its bounds touch, in original op order. `FeatureCarver.Stamp` and `StructureFeat
 blueprint rejects new ops. `CarveOp`/`FillOp` carry `NoZone`: approach cuts and steps outside a building are stamped
 but are not "in the structure" for spawns, music or mining locks. The index changes no output (golden hashes
 unchanged; `BlueprintIndexTests` compares it with brute force).
+
+## Dungeon layout planner
+
+`WorldGen/Structures/Dungeon/` plans the Terraria-style dungeon as pure data (`DungeonPlanner.Plan(site, budget,
+seeds)` returns a `DungeonLayout`); it is not wired into `DungeonPass` yet (the carver, P4-15, does that with a
+GenVersion bump). `DungeonSite` gives the gate (ground cell at the keep centre), the inward axis, world size, layer
+bands and surface/landness samplers; `DungeonBudget.For(size)` sets trunk length, room/chest/branch quotas and the
+floor limit (`CavernTop - n`, never below `UnderworldTop + 40`).
+
+* Keep (room 0, 20 x 16 x 20) and an entrance shaft (hall 0, 10 wide) to a 16-wide junction (node 1) under the lowest
+  ground near the keep. `Door` is the floor cell in the keep wall facing `Inward`.
+* Trunk walk: flat 16-40 / stairs 12-28 (one cell down per step, one interior box per step) / shafts 16-32 (8 x 8,
+  dug just outside a node box's wall), weights 0.5 / 0.35 / 0.15. It keeps its heading (0.5) or turns 90 degrees,
+  never against `Inward`, never twice through the same wall, and paces its descent over its length. Halls are 7 wide
+  with 9 of headroom. A node gets a room (14-26 x 10-16 x 14-26, more often while behind the room quota) or a
+  10 x 12 x 10 junction; a horizontal arrival enters through the box's near wall, a shaft through its ceiling. When
+  stuck short of its length or room quota, the trunk resumes from an earlier node (a fork).
+* Every interior must stay 12 cells inside the world, above the floor limit and, outside the keep footprint, 12 cells
+  under the ground (sampled every 6 cells) and under land. Overlaps: `OccupancyGrid` (8-cell broad phase, exact boxes
+  with a 2-cell wall gap) except with the pieces at the node a hall leaves from.
+* Branches (p 0.3 per trunk node, 80-160 cells) end in a room; dead-end junctions grow into rooms until the room quota
+  is met; 35% of flat halls of 24+ get a side room behind a 2-cell wall with a 3 x 5 doorway.
+* Roles (`dungeon.roles` stream, geometry never depends on it): the deepest room is the Vault (6 `VaultChestSpots`
+  against doorless walls), the room nearest the median depth is the Mechanic room, the `bound_npc` site for the bound
+  Mechanic (`MechanicCell`), branch ends are Treasure or Library, then libraries (1 per 4), spike pits (1 per 5),
+  treasure until the locked-chest quota, barracks. `ChestSpots` (one per treasure room, chest alcoves, extra spots
+  until the quota) carry exactly one `ShadowKey`. Rooms list their `Doorways` (cuts through the 2-cell shell).
+* Seed streams `dungeon.trunk`, `dungeon.branches`, `dungeon.side`, `dungeon.roles`; integer geometry only. A Large
+  plan takes a few milliseconds. `DungeonLayoutTests` check determinism, reachability, cover, floor, quotas, stairs,
+  headroom and that interiors only meet where joined.
