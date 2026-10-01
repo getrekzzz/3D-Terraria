@@ -13,6 +13,28 @@ public static partial class ContentValidator
             ctx.Color(b, b.MapColor, "mapColor");
             ctx.Color(b, b.FogColor, "fogColor");
             if (b.ExposureBias is < 0.4f or > 1.5f) ctx.Error(b, "exposureBias must be within 0.4–1.5.");
+            if (b.Relief is { } r) ValidateRelief(ctx, b, r);
+        }
+    }
+
+    private static void ValidateRelief(Ctx ctx, BiomeDef b, ReliefSpec r)
+    {
+        void Range(float v, float max, string name)
+        {
+            if (v < 0f || v > max || float.IsNaN(v)) ctx.Error(b, $"relief.{name} must be within 0–{max}.");
+        }
+        Range(r.Base, 40f, "base");
+        Range(r.Rolling, 60f, "rolling");
+        Range(r.Hills, 60f, "hills");
+        Range(r.Ridges, 60f, "ridges");
+        Range(r.Bumps, 60f, "bumps");
+        Range(r.Dunes, 60f, "dunes");
+        Range(r.Ruggedness, 1f, "ruggedness");
+        Range(r.Cliffs, 1f, "cliffs");
+        if (r.Mountains is { } m)
+        {
+            Range(m.Height, 60f, "mountains.height");
+            Range(m.Peak, 80f, "mountains.peak");
         }
     }
 

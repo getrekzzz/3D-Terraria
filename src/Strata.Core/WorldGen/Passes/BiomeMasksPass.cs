@@ -17,6 +17,9 @@ public sealed class BiomeMasksPass : GenPass
     private BiomeRelief? _relief;
     private BiomeMaterials? _materials;
 
+    /// <summary>The surface relief shaped while planning (tests and analysis).</summary>
+    internal BiomeRelief? Relief => _relief;
+
     public override string Name => "biomes";
     public override int Number => 4;
 
@@ -54,8 +57,8 @@ public sealed class BiomeMasksPass : GenPass
         }
 
         plan.Regions.Sort((a, b) => b.Priority.CompareTo(a.Priority));
-        _relief = new BiomeRelief(seeds, plan);
-        _relief.Apply(ctx);
+        _relief = new BiomeRelief(seeds, ctx);
+        _relief.Apply();
         _materials = new BiomeMaterials(seeds, ctx.Content);
 
         int cx = (int)ctx.CenterX, cz = (int)ctx.CenterZ;

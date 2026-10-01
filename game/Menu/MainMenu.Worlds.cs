@@ -20,6 +20,9 @@ public sealed partial class MainMenu
         "Master: the ultimate challenge.",
     };
 
+    private const string OldGeneratorWarning =
+        "Made with an older world generator - new terrain will not match.\nPlaces you have not explored yet will not line up with the saved ones. Play anyway?";
+
     private void ShowWorlds()
     {
         if (_character == null)
@@ -56,10 +59,15 @@ public sealed partial class MainMenu
         info.AddChild(MenuKit.Text(w.Name, 24, MenuKit.Idle));
         string evil = w.Evil == EvilKind.Corruption ? "Corruption" : "Crimson";
         string difficulty = w.Difficulty switch { Difficulty.Expert => "Expert", Difficulty.Master => "Master", _ => "Classic" };
-        var detail = $"{w.Size} · {difficulty} · {evil}{(w.Hardmode ? " · Hardmode" : "")} · {SaveCatalog.PlayTime(w.PlayTicks)} played · seed {w.Seed}";
+        var detail = $"{w.Size} · {difficulty} · {evil}{(w.Hardmode ? " · Hardmode" : "")} · {SaveCatalog.PlayTime(w.PlayTicks)} played · seed {w.Seed}{(w.OldGenerator ? " · old terrain" : "")}";
         info.AddChild(MenuKit.Text(detail, 15, w.Difficulty == Difficulty.Master ? new Color(1f, 0.45f, 0.4f) : w.Difficulty == Difficulty.Expert ? new Color(1f, 0.75f, 0.3f) : new Color(0.8f, 0.85f, 0.9f)));
         row.AddChild(info);
-        row.AddChild(MenuKit.Small("Play", () => PlayRequested?.Invoke(new LaunchRequest(w.Directory, _character!.Name)), 100));
+        void Play() => PlayRequested?.Invoke(new LaunchRequest(w.Directory, _character!.Name));
+        row.AddChild(MenuKit.Small("Play", () =>
+        {
+            if (w.OldGenerator) Confirm(OldGeneratorWarning, Play);
+            else Play();
+        }, 100));
         row.AddChild(MenuKit.Small("Delete", () => Confirm($"Delete the world {w.Name}? This cannot be undone.", () =>
         {
             SaveCatalog.DeleteWorld(w.Directory);
