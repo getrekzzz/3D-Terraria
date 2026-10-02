@@ -50,7 +50,6 @@ assert errors == 0
 # Creatures with their own bodies now (canines, spiders, mimic, shark, flinx, tortoise, lizard, winged serpent, bone
 # serpent, eater of souls, crimera, elementals, antlion), the reworked common enemies and the themed humanoids load
 # and animate without problems.
-god on # nineteen creatures at once would otherwise kill the player
 god on
 spawn wolf 1
 spawn black_recluse 1
