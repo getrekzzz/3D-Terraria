@@ -54,6 +54,7 @@ public static partial class ContentValidator
             ctx.Color(b, b.Color, "color");
             ctx.Specs(b, SpecKind.Effect, b.Effects, "effects");
             ctx.Asset(b, AssetPaths.BuffIcon(b), "icon");
+            if (b.FoodTier is < 0 or > 3) ctx.Error(b, "foodTier must be 0 (not food) to 3 (Exquisitely Stuffed).");
         }
         foreach (var p in ctx.Db.Prefixes.All)
         {

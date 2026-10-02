@@ -7,12 +7,13 @@ namespace Strata.Game.UI;
 
 /// <summary>
 /// Terraria's pickup popups (<see cref="PickupFeed"/>): what the player collects floats up from their head as
-/// "Wood (37)" in its rarity colour (the Expert and Master tiers cycle every frame), and coins as one line in the colour
-/// of their largest coin ("1 gold 23 silver"). Picking up more of the same while its popup is kept grows that popup
-/// with a little pop, so mining a vein shows one line. The anchor is the point 0.9 m over the head, projected, in third
-/// person; in first person, or when that point is behind the camera, a fixed point at (W/2, 0.38 H); kept inside the
-/// screen. Drawn straight onto this full-screen control (no node or tween per popup); a popup's text is rebuilt only
-/// when its count changes, and nothing runs while none is shown.
+/// "Wood (37)" in its rarity colour (the Expert and Master tiers cycle every frame), a potion a quick key drinks as
+/// "Used Healing Potion", and coins as one line in the colour of their largest coin ("1 gold 23 silver"). Picking up
+/// more of the same while its popup is kept grows that popup with a little pop, so mining a vein shows one line. The
+/// anchor is the point 0.9 m over the head, projected, in third person; in first person, or when that point is behind
+/// the camera, a fixed point at (W/2, 0.38 H); kept inside the screen. Drawn straight onto this full-screen control
+/// (no node or tween per popup); a popup's text is rebuilt only when its count changes, and nothing runs while none
+/// is shown.
 /// </summary>
 public sealed partial class PickupPopups : Control
 {
@@ -42,6 +43,13 @@ public sealed partial class PickupPopups : Control
         {
             if (p != ui.Entity || stack.IsEmpty) return;
             _feed.Add(stack);
+            _active = true;
+        };
+        // A potion drunk with a quick key (H, J, B) floats as "Used Healing Potion".
+        ui.Game.ItemUse.QuickUsed += (p, item) =>
+        {
+            if (p != ui.Entity) return;
+            _feed.AddUsed(item);
             _active = true;
         };
     }

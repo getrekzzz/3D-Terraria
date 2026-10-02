@@ -149,6 +149,18 @@ public sealed class ConsumeParams : SpecParams
 
     public int ManaCap { get; init; } = 200;
 
+    /// <summary>
+    /// Usable only once the player's max life (crystals and fruit, not buffs) is at least this much (Life Fruit: 400);
+    /// otherwise the use is refused with "Requires N maximum life".
+    /// </summary>
+    public int RequiresLife { get; init; }
+
+    /// <summary>Usable only once this progression flag is set (Life Fruit: a mechanical boss defeated).</summary>
+    public string? RequiresFlag { get; init; }
+
+    /// <summary>What a use refused for <see cref="RequiresFlag"/> says (silent when null).</summary>
+    public string? FlagMessage { get; init; }
+
     /// <summary>Returns the user to their spawn point (Magic Mirror, Recall Potion).</summary>
     public bool Recall { get; init; }
 

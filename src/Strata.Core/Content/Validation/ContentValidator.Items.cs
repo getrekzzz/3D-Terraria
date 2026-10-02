@@ -53,6 +53,8 @@ public static partial class ContentValidator
                     ctx.Ref(i, ctx.Db.Items, wiring.Wire, "wiring.wire");
                 if (b.Type == Specs.ItemBehaviorSpecs.ReleaseCritter && ctx.TryParse<Specs.ReleaseCritterParams>(SpecKind.ItemBehavior, b) is { } release)
                     ctx.Ref(i, ctx.Db.Enemies, release.Enemy, "releaseCritter.enemy");
+                if (b.Type == Specs.ItemBehaviorSpecs.Consume && ctx.TryParse<Specs.ConsumeParams>(SpecKind.ItemBehavior, b) is { } consume)
+                    ctx.Ref(i, ctx.Db.Flags, consume.RequiresFlag, "consume.requiresFlag");
                 if (i.NoMelee && b.Type is Specs.ItemBehaviorSpecs.MeleeSwing or Specs.ItemBehaviorSpecs.Thrust)
                     ctx.Error(i, $"noMelee items cannot have a {b.Type} behaviour (their swing is animation only).");
                 if (b.Type == Specs.ItemBehaviorSpecs.ShootProjectile && ctx.TryParse<Specs.ShootProjectileParams>(SpecKind.ItemBehavior, b) is { } shoot

@@ -108,6 +108,19 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "hurt", Usage = "hurt <amount>", Help = "Hurts the player, ignoring defense and invulnerability (a number shows and the hurt sound plays).",
+            Run = (ctx, a) =>
+            {
+                int amount = a.Int(0, "amount");
+                if (amount <= 0) throw new CommandException("amount must be positive");
+                var p = ctx.Player;
+                if (!p.Alive) throw new CommandException("the player is dead");
+                ctx.World.HurtPlayerDirect(p, amount, harm: Gameplay.Combat.Harm.Other);
+                return CommandResult.Success($"Life {p.State.Vitals.Life}/{p.State.Vitals.MaxLife}.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "wound", Usage = "wound <enemy id> <amount>", Help = "Takes life from every living creature of a kind (never below 1): puts a boss into a later phase.",
             Run = (ctx, a) =>
             {

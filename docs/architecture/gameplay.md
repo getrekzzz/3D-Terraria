@@ -41,6 +41,17 @@
   `failMessage`). Placement, a boomerang already out and a crystal at its cap stay silent. A held button never
   reports, and the same text is not repeated to a player within 2 s. `SoundEvents` plays `use_fail` or `no_mana` for
   each failed press, and `tink` (recipes in `tools/audio/sfx_recipes_feedback.py`) when a tool is too weak for what it hits.
+* **Quick heal, mana and buff** — `ItemUseSystem.Quick` (keys `quick_heal` H, `quick_mana` J, `quick_buff` B, polled
+  by `InteractionController.Quick`) uses items from anywhere in the backpack through the slot-aware `ConsumeAt`, never
+  changing the selected slot. Quick heal/mana take Terraria's pick (`BestFit`): the potion with the smallest
+  non-negative overheal, else the strongest; Potion Sickness refuses quick heal with its name, and a mana potion that
+  also heals waits it out. Quick buff eats the best food only while no food buff is on (`BuffDef.FoodTier`: Well Fed 1,
+  Plenty Satisfied 2, Exquisitely Stuffed 3; eating replaces any other tier) and drinks one of every buff item whose
+  buff is not active or immune. The first item used per press starts its own use animation (`PlayerEntity.UseItem`,
+  so `PlayerAvatar` plays the drink while the held item stays in hand) and plays its sound through `Used`; every item
+  raises `QuickUsed`, which `PickupFeed.AddUsed` floats as "Used Healing Potion". `ConsumeParams.RequiresLife` and
+  `RequiresFlag`/`FlagMessage` gate Life Fruit (400 max life from crystals, a mechanical boss down). The `hurt <amount>`
+  command takes life directly for scripts.
 * **Shot origin** — `ShotGeometry` places a player's shot at the weapon hand (`HandOffset`: 0.22 m right, 0.3 m down,
   0.45 m ahead of the eye in the `Facing` frame) and aims it from there at the crosshair point (`Eye + Aim ·
   AimDistance`, never nearer than `MinConvergence` = 2 m), so arrows, bolts and thrown weapons leave the hand and still

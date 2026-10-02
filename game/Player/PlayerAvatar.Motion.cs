@@ -86,11 +86,13 @@ public sealed partial class PlayerAvatar
         // Item actions: each new use animation (its serial changes) plays the item's action once, over the whole
         // animation after speed bonuses; tool hits and gun shots inside one animation never restart it. A use quicker
         // than the clip's top rate (use_styles.json) starts past the wind-up, so the strike still lands inside it.
-        // A flail's or a yoyo's clip loops on the right arm for as long as its use lasts instead.
+        // A flail's or a yoyo's clip loops on the right arm for as long as its use lasts instead. A potion drunk with a
+        // quick key (H, J, B) plays its own action while the held item stays in hand.
         string? looped = null;
-        if (_heldItem != null && entity.Alive && entity.UseAnimation > 0)
+        var acting = entity.UseItem ?? _heldItem;
+        if (acting != null && entity.Alive && entity.UseAnimation > 0)
         {
-            var info = _game.Uses[_heldItem];
+            var info = _game.Uses[acting];
             string action = ActionFor(_game, info);
             bool loops = HumanoidAnimator.Holds(action);
             if (entity.UseSerial != _lastSerial)

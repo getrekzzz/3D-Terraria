@@ -9,7 +9,8 @@ namespace Strata.Game.Player;
 
 /// <summary>
 /// Turns input into gameplay: crosshair targeting (with the Smart Cursor), item use (mine, chop, place, consume,
-/// attack), object interaction, hotbar selection, build shape and rotation, precision mode and item dropping.
+/// attack), the quick heal, mana and buff keys, object interaction, hotbar selection, build shape and rotation,
+/// precision mode and item dropping.
 /// </summary>
 public sealed partial class InteractionController : Node
 {
@@ -75,6 +76,7 @@ public sealed partial class InteractionController : Node
         PollSmartCursorKey();
         UpdateTarget();
         PollHotbarKeys();
+        PollQuickKeys();
         // With the inventory, a chest or a chat open, Input reports the button down for clicks the panels took too:
         // only a press on empty screen (the click catcher's WorldPointer) uses the item, toward the crosshair; a tap
         // already released by this tick still counts once.

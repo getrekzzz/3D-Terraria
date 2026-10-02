@@ -57,16 +57,20 @@ public sealed partial class ItemUseSystem
         if (!freshPress || message == null) return outcome;
         Failures++;
         Failed?.Invoke(p, info, outcome);
+        Say(p, message);
+        return outcome;
+    }
+
+    /// <summary>Raises <see cref="Refused"/> unless the same player just heard the same message.</summary>
+    private void Say(PlayerEntity p, string message)
+    {
         long now = _world.Session.Clock.Tick;
         bool repeat = p == _messaged && message == _lastMessage && now >= _lastMessageTick && now - _lastMessageTick < RepeatMessageTicks;
-        if (!repeat)
-        {
-            _messaged = p;
-            _lastMessage = message;
-            _lastMessageTick = now;
-            Refused?.Invoke(p, message);
-        }
-        return outcome;
+        if (repeat) return;
+        _messaged = p;
+        _lastMessage = message;
+        _lastMessageTick = now;
+        Refused?.Invoke(p, message);
     }
 
     /// <summary>

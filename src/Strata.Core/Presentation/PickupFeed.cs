@@ -7,8 +7,9 @@ namespace Strata.Core.Presentation;
 /// Terraria's pickup popups, engine-neutral: what the player just collected floats up from their head as "Wood (37)".
 /// A pickup of the same item and prefix while its popup is still kept (<see cref="MergeWindow"/>) adds to its count,
 /// starts it over and pops it, so mining a vein grows one popup instead of flooding the screen; coins of every kind
-/// share one popup that sums their value ("1 gold 23 silver"). A popup shows for <see cref="Life"/> seconds after its
-/// last pickup, rising <see cref="RisePixels"/> and fading over the last <see cref="FadeTime"/>. At most
+/// share one popup that sums their value ("1 gold 23 silver"). Items drunk with a quick key float the same way as
+/// "Used Healing Potion" (<see cref="AddUsed"/>), joining only other uses. A popup shows for <see cref="Life"/> seconds
+/// after its last pickup, rising <see cref="RisePixels"/> and fading over the last <see cref="FadeTime"/>. At most
 /// <see cref="Capacity"/> are kept; a new item takes the oldest one's place. The game samples the motion every frame
 /// and rebuilds a popup's text only when its <see cref="Popup.Version"/> changes.
 /// </summary>
@@ -36,12 +37,15 @@ public sealed class PickupFeed
     /// <summary>Pixels between stacked popups.</summary>
     public const float RowPitch = 22;
 
-    /// <summary>One popup: an item and prefix with a count, or coins with their total value in copper.</summary>
+    /// <summary>One popup: an item and prefix with a count, coins with their total value in copper, or an item used.</summary>
     public sealed class Popup
     {
         public ItemDef? Item { get; internal set; }
         public PrefixDef? Prefix { get; internal set; }
         public bool IsCoins { get; internal set; }
+
+        /// <summary>Items used up (a quick heal), not collected: "Used Healing Potion".</summary>
+        public bool IsUsed { get; internal set; }
 
         /// <summary>Items collected, or the copper value for coins.</summary>
         public long Amount { get; internal set; }
@@ -56,10 +60,12 @@ public sealed class PickupFeed
 
         internal bool Kept => Age < MergeWindow;
 
-        /// <summary>"Wood (37)", "Legendary Muramasa", or the coins as "1 gold 23 silver".</summary>
+        /// <summary>"Wood (37)", "Legendary Muramasa", the coins as "1 gold 23 silver", or "Used Healing Potion (2)".</summary>
         public string Text => IsCoins
             ? Coins.Format(Amount)
-            : ItemTooltip.NameLine(new ItemStack(Item!, (int)Math.Min(Amount, int.MaxValue), Prefix));
+            : IsUsed
+                ? "Used " + ItemTooltip.NameLine(new ItemStack(Item!, (int)Math.Min(Amount, int.MaxValue)))
+                : ItemTooltip.NameLine(new ItemStack(Item!, (int)Math.Min(Amount, int.MaxValue), Prefix));
     }
 
     private readonly Popup[] _popups = new Popup[Capacity];
@@ -92,20 +98,40 @@ public sealed class PickupFeed
         long amount = coins ? (long)stack.Item!.Value * stack.Count : stack.Count;
         Popup? target = null;
         foreach (var p in _popups)
-            if (p.Kept && (coins ? p.IsCoins : !p.IsCoins && p.Item == stack.Item && p.Prefix == stack.Prefix))
+            if (p.Kept && !p.IsUsed && (coins ? p.IsCoins : !p.IsCoins && p.Item == stack.Item && p.Prefix == stack.Prefix))
             {
                 target = p;
                 break;
             }
+        return Show(target, stack.Item!, coins ? null : stack.Prefix, coins, used: false, amount);
+    }
+
+    /// <summary>Shows one of <paramref name="item"/> used up (quick heal, mana, buff): joins the kept use of the same item.</summary>
+    public Popup AddUsed(ItemDef item)
+    {
+        Popup? target = null;
+        foreach (var p in _popups)
+            if (p.Kept && p.IsUsed && p.Item == item)
+            {
+                target = p;
+                break;
+            }
+        return Show(target, item, null, coins: false, used: true, 1);
+    }
+
+    /// <summary>Adds to <paramref name="target"/>, or fills a free (else the oldest) popup; then pops it.</summary>
+    private Popup Show(Popup? target, ItemDef item, PrefixDef? prefix, bool coins, bool used, long amount)
+    {
         if (target != null) target.Amount += amount;
         else
         {
             target = _popups[0];
             foreach (var p in _popups)
                 if (p.Age > target.Age) target = p; // a spent popup's age keeps growing, so it goes before any kept one
-            target.Item = stack.Item;
-            target.Prefix = coins ? null : stack.Prefix;
+            target.Item = item;
+            target.Prefix = prefix;
             target.IsCoins = coins;
+            target.IsUsed = used;
             target.Amount = amount;
         }
         target.Age = 0;

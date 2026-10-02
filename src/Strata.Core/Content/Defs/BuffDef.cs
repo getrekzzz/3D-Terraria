@@ -13,6 +13,12 @@ public sealed class BuffDef : ContentDef
     /// <summary>Default duration in ticks when applied by a rule rather than an explicit source.</summary>
     public int Duration { get; init; } = 600;
 
+    /// <summary>
+    /// The food tier (Terraria's Well Fed 1, Plenty Satisfied 2, Exquisitely Stuffed 3; 0 for anything else). Food
+    /// buffs replace each other, and quick buff eats nothing while any of them is on.
+    /// </summary>
+    public int FoodTier { get; init; }
+
     /// <summary>Removed on death / cannot be cancelled by the player.</summary>
     public bool Persistent { get; init; }
 
