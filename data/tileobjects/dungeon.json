@@ -30,7 +30,6 @@
     { "id": "ragged_brotherhood_sigil", "name": "Ragged Brotherhood Sigil", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:ragged_brotherhood_sigil"]},
     { "id": "molten_legion_flag", "name": "Molten Legion Flag", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:molten_legion_flag"]},
     { "id": "diabolic_sigil", "name": "Diabolic Sigil", "size": [2, 4, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "tags": ["world", "banner"], "covers": ["terraria:diabolic_sigil"]},
-    { "id": "skeleton_statue", "name": "Skeleton Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:skeleton_statue"]},
     { "id": "armor_statue", "name": "Armor Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:armor_statue"]},
     { "id": "angel_statue", "name": "Angel Statue", "size": [2, 4, 2], "breakTool": "pick", "hitPoints": 3, "itemValue": 60, "tags": ["world"], "covers": ["terraria:angel_statue"]},
     { "id": "book", "name": "Book", "size": [1, 1, 1], "variants": 4, "natural": true, "loot": "book", "hitPoints": 1},

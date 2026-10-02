@@ -77,6 +77,21 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Only created by world generation (cannot be crafted/placed by players).</summary>
     public bool Natural { get; init; }
 
+    /// <summary>Material sound of hits and breaks (dig_/break_&lt;sound&gt;); null: wood for axe objects, stone for pick ones.</summary>
+    public string? Sound { get; init; }
+
+    /// <summary>Colour of the chips a hit knocks off (#RRGGBB); null: a neutral wood or stone tone.</summary>
+    public string? DustColor { get; init; }
+
+    /// <summary>Leaf colour shed by hits on a tree (#RRGGBB), or null.</summary>
+    public string? Leaves { get; init; }
+
+    /// <summary>Falls over when felled (trees).</summary>
+    public bool Topple { get; init; }
+
+    /// <summary>The material sound with its default.</summary>
+    public string HitSound => Sound ?? (BreakTool == BreakTool.Pick ? "stone" : "wood");
+
     /// <summary>Automatically derive the placing item (id = <see cref="Item"/> or this id) unless natural.</summary>
     public bool AutoItem { get; init; } = true;
 
@@ -96,6 +111,9 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>A buff it gives players nearby (a campfire's Cozy Fire, a heart lantern's Heart Lamp).</summary>
     public AuraBuff? Aura { get; init; }
 
+    /// <summary>An enemy banner: counts and empowers against these creatures (X-03).</summary>
+    public BannerSpec? Banner { get; init; }
+
     /// <summary>A door that stays locked until this flag is set; using it with <see cref="Key"/> sets the flag.</summary>
     public string? LockedUntil { get; init; }
 
@@ -113,6 +131,21 @@ public sealed class TileObjectDef : ContentDef
 
     /// <summary>Fires this projectile when a wire signal reaches it (dart traps).</summary>
     public TrapDef? Trap { get; init; }
+
+    /// <summary>A timer: while switched on (by hand or by a signal) it signals its wires every this many ticks.</summary>
+    public int Timer { get; init; }
+
+    /// <summary>A teleporter pad: a signal swaps whoever stands on it with whoever stands on the other pad it reaches.</summary>
+    public bool Teleporter { get; init; }
+
+    /// <summary>A statue: a signal makes it release a creature or drop an item (with caps).</summary>
+    public StatueDef? Statue { get; init; }
+
+    /// <summary>A logic gate ("and", "or", "nand", "nor", "xor", "xnor") reading the logic lamps stacked on it.</summary>
+    public string? LogicGate { get; init; }
+
+    /// <summary>A logic gate lamp: a signal toggles it; the gate beneath it re-evaluates.</summary>
+    public bool LogicLamp { get; init; }
 
     /// <summary>Hurts players who touch it (dungeon spikes).</summary>
     public HazardSpec? Hazard { get; init; }
@@ -156,6 +189,12 @@ public sealed class BreakEffect
     public string? Release { get; init; }
 
     public float ReleaseChance { get; init; }
+}
+
+/// <summary>The creatures an enemy banner counts kills of and empowers nearby players against.</summary>
+public sealed class BannerSpec
+{
+    public string[] Enemies { get; init; } = Array.Empty<string>();
 }
 
 /// <summary>A buff granted to players within <see cref="Radius"/> cells, refreshed while they stay close.</summary>
@@ -211,4 +250,24 @@ public sealed class FlameSpec
 
     /// <summary>More flame bases of the same size and colour (the other candles of a candelabra or chandelier).</summary>
     public float[][] Also { get; init; } = Array.Empty<float[]>();
+}
+
+/// <summary>What a wired statue releases when signalled, and its caps.</summary>
+public sealed class StatueDef
+{
+    /// <summary>Creature released (it drops no loot or coins).</summary>
+    public string? Enemy { get; init; }
+
+    /// <summary>Item dropped instead (heart, star, bomb statues).</summary>
+    public string? Item { get; init; }
+
+    public int Count { get; init; } = 1;
+
+    /// <summary>Most of its creatures (or dropped items) allowed within <see cref="Radius"/> cells.</summary>
+    public int Cap { get; init; } = 3;
+
+    public int Radius { get; init; } = 100;
+
+    /// <summary>Ticks before the same statue may release again.</summary>
+    public int Cooldown { get; init; } = 30;
 }

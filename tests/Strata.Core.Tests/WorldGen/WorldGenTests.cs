@@ -67,7 +67,7 @@ public class WorldGenTests
     [MemberData(nameof(Golden))]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(11, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(12, GenVersion.Current); // bumping the generator version means re-recording these hashes
         Assert.Equal(new Int3(256, 349, 256), Tiny.Value.Plan.Spawn);
         Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
     }

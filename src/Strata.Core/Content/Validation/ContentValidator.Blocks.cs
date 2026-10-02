@@ -11,6 +11,7 @@ public static partial class ContentValidator
             if (b.Id == ContentDatabase.AirId) continue;
             if (b.Render == BlockRender.None) ctx.Warn(b, "render 'none' block other than air.");
             if (b.Hardness <= 0) ctx.Error(b, "hardness must be > 0.");
+            if (!(b.PickDamageScale > 0 && b.PickDamageScale <= 10)) ctx.Error(b, "pickDamageScale must be within (0, 10].");
             if (b.PickPower < 0) ctx.Error(b, "pickPower must be >= 0.");
             ctx.Light(b, b.Light, "light");
             if (b.Glow is < 0f or > 1f) ctx.Error(b, "glow must be within 0–1.");
@@ -49,7 +50,15 @@ public static partial class ContentValidator
             if (t.Size.Length != 3 || t.Size.Any(v => v < 1 || v > 64)) ctx.Error(t, "size must be [x, y, z] with values 1–64.");
             ctx.Ref(t, ctx.Db.Items, t.Item, "item");
             ctx.Ref(t, ctx.Db.LootTables, t.Loot, "loot");
+            ctx.Color(t, t.DustColor, "dustColor");
+            ctx.Color(t, t.Leaves, "leaves");
             ctx.Ref(t, ctx.Db.Projectiles, t.Trap?.Projectile, "trap.projectile");
+            ValidateWiringObject(ctx, t);
+            if (t.Banner is { } banner)
+            {
+                if (banner.Enemies.Length == 0) ctx.Error(t, "banner needs at least one enemy.");
+                foreach (var e in banner.Enemies) ctx.Ref(t, ctx.Db.Enemies, e, "banner.enemies");
+            }
             ctx.Light(t, t.Light, "light");
             if (t.Flame is { } flame)
             {

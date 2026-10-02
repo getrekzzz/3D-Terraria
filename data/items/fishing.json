@@ -1,0 +1,64 @@
+{
+  // Fishing depth (data/config/fishing.json for the tuning): bait (worms, fireflies, butterflies and frogs caught with a
+  // Bug Net are bait too, see enemies/critters.json), rods, fishing accessories and potions, biome crates (loot in
+  // loot/crates.json), lava and honey fish, and the Angler's quest fish (caught only while the Angler wants them).
+  "buffs": [
+    {"id": "fishing", "name": "Fishing", "description": "Increased fishing level.", "color": "#60a8e0", "effects": [{"type": "stat", "stat": "fishingPower", "add": 15}]},
+    {"id": "crate", "name": "Crate", "description": "Greater chance of fishing up a crate.", "color": "#c09050", "effects": [{"type": "stat", "stat": "crateChance", "add": 0.15}]}
+  ],
+  "items": [
+    {"id": "apprentice_bait", "name": "Apprentice Bait", "description": "15% bait power.", "category": "material", "rarity": 0, "maxStack": 9999, "value": 100, "behaviors": [{"type": "bait", "power": 15}], "tags": ["bait"]},
+    {"id": "journeyman_bait", "name": "Journeyman Bait", "description": "30% bait power.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 500, "behaviors": [{"type": "bait", "power": 30}], "tags": ["bait"]},
+    {"id": "master_bait", "name": "Master Bait", "description": "50% bait power.", "category": "material", "rarity": 2, "maxStack": 9999, "value": 1500, "behaviors": [{"type": "bait", "power": 50}], "tags": ["bait"]},
+    {"id": "fiberglass_fishing_pole", "name": "Fiberglass Fishing Pole", "category": "fishing", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8, "projectile": "bobber", "shootSpeed": 14, "behaviors": [{"type": "fishing", "power": 25}]},
+    {"id": "hotline_fishing_hook", "name": "Hotline Fishing Hook", "description": "Fishes in lava.", "category": "fishing", "rarity": 3, "value": 100000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8, "projectile": "bobber", "shootSpeed": 15, "behaviors": [{"type": "fishing", "power": 45, "lava": true}]},
+    {"id": "angler_earring", "name": "Angler Earring", "description": "Increases fishing power by 10.", "category": "accessory", "rarity": 2, "value": 50000, "equipSlot": "accessory", "equipEffects": [{"type": "stat", "stat": "fishingPower", "add": 10}]},
+    {"id": "tackle_box", "name": "Tackle Box", "description": "Decreases chance of bait consumption.", "category": "accessory", "rarity": 2, "value": 50000, "equipSlot": "accessory", "equipEffects": [{"type": "stat", "stat": "baitSaving", "add": 1}]},
+    {"id": "lavaproof_fishing_hook", "name": "Lavaproof Fishing Hook", "description": "Allows fishing in lava.", "category": "accessory", "rarity": 3, "value": 50000, "equipSlot": "accessory", "equipEffects": [{"type": "stat", "stat": "lavaFishing", "add": 1}]},
+    {"id": "angler_tackle_bag", "name": "Angler Tackle Bag", "description": "Increases fishing power by 10 and decreases chance of bait consumption.", "category": "accessory", "rarity": 4, "value": 100000, "equipSlot": "accessory", "equipEffects": [{"type": "stat", "stat": "fishingPower", "add": 10}, {"type": "stat", "stat": "baitSaving", "add": 1}]},
+    {"id": "lavaproof_tackle_bag", "name": "Lavaproof Tackle Bag", "description": "Increases fishing power by 10, decreases chance of bait consumption and allows fishing in lava.", "category": "accessory", "rarity": 5, "value": 150000, "equipSlot": "accessory", "equipEffects": [{"type": "stat", "stat": "fishingPower", "add": 10}, {"type": "stat", "stat": "baitSaving", "add": 1}, {"type": "stat", "stat": "lavaFishing", "add": 1}]},
+    {"id": "fishing_potion", "name": "Fishing Potion", "description": "Increases fishing power.", "category": "potion", "maxStack": 30, "value": 1000, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "fishing", "ticks": 28800}},
+    {"id": "crate_potion", "name": "Crate Potion", "description": "Increases chance to get a crate.", "category": "potion", "maxStack": 30, "value": 1000, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "crate", "ticks": 14400}},
+    {"id": "honeyfin", "name": "Honeyfin", "description": "Caught in honey.", "category": "material", "maxStack": 9999, "value": 1500, "tags": ["fish"]},
+    {"id": "obsidifish", "name": "Obsidifish", "description": "Caught in lava.", "category": "material", "rarity": 2, "maxStack": 9999, "value": 2500, "tags": ["fish"]},
+    {"id": "flarefin_koi", "name": "Flarefin Koi", "description": "Caught in lava.", "category": "material", "rarity": 2, "maxStack": 9999, "value": 5000, "tags": ["fish"]},
+    {"id": "jungle_crate", "name": "Jungle Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "jungle_crate"}], "tags": ["crate"]},
+    {"id": "sky_crate", "name": "Sky Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "sky_crate"}], "tags": ["crate"]},
+    {"id": "corrupt_crate", "name": "Corrupt Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "corrupt_crate"}], "tags": ["crate"]},
+    {"id": "crimson_crate", "name": "Crimson Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "crimson_crate"}], "tags": ["crate"]},
+    {"id": "hallowed_crate", "name": "Hallowed Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "hallowed_crate"}], "tags": ["crate"]},
+    {"id": "dungeon_crate", "name": "Dungeon Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "dungeon_crate"}], "tags": ["crate"]},
+    {"id": "frozen_crate", "name": "Frozen Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "frozen_crate"}], "tags": ["crate"]},
+    {"id": "oasis_crate", "name": "Oasis Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "oasis_crate"}], "tags": ["crate"]},
+    {"id": "ocean_crate", "name": "Ocean Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "ocean_crate"}], "tags": ["crate"]},
+    {"id": "obsidian_crate", "name": "Obsidian Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "obsidian_crate"}], "tags": ["crate"]},
+    {"id": "bunnyfish", "name": "Bunnyfish", "description": "Quest fish. Found: Surface forest.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "slimefish", "name": "Slimefish", "description": "Quest fish. Found: Surface forest.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "dynamite_fish", "name": "Dynamite Fish", "description": "Quest fish. Found: Surface forest.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "zombie_fish", "name": "Zombie Fish", "description": "Quest fish. Found: Surface forest at night.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "fallen_starfish", "name": "Fallen Starfish", "description": "Quest fish. Found: Surface or sky.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "catfish", "name": "Catfish", "description": "Quest fish. Found: Surface jungle.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "mudfish", "name": "Mudfish", "description": "Quest fish. Found: Jungle.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "pengfish", "name": "Pengfish", "description": "Quest fish. Found: Surface snow.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "mutant_flinxfin", "name": "Mutant Flinxfin", "description": "Quest fish. Found: Underground ice.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "scarab_fish", "name": "Scarab Fish", "description": "Quest fish. Found: Desert.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "scorpio_fish", "name": "Scorpio Fish", "description": "Quest fish. Found: Desert.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "clownfish", "name": "Clownfish", "description": "Quest fish. Found: Ocean.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "angelfish", "name": "Angelfish", "description": "Quest fish. Found: Sky.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "cloudfish", "name": "Cloudfish", "description": "Quest fish. Found: Sky.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "harpyfish", "name": "Harpyfish", "description": "Quest fish. Found: Sky.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "batfish", "name": "Batfish", "description": "Quest fish. Found: Underground or caverns.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "spiderfish", "name": "Spiderfish", "description": "Quest fish. Found: Caverns.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "jewelfish", "name": "Jewelfish", "description": "Quest fish. Found: Underground or caverns.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "bonefish", "name": "Bonefish", "description": "Quest fish. Found: Underground or caverns.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "amanitia_fungifin", "name": "Amanitia Fungifin", "description": "Quest fish. Found: Glowing mushroom biome.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "demonic_hellfish", "name": "Demonic Hellfish", "description": "Quest fish. Found: Underworld lava.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]},
+    {"id": "bumblebee_tuna", "name": "Bumblebee Tuna", "description": "Quest fish. Found: Honey.", "category": "material", "rarity": 1, "maxStack": 1, "value": 0, "tags": ["quest_fish"]}
+  ],
+  "recipes": [
+    {"id": "fishing_potion", "output": "fishing_potion", "inputs": [{"item": "bottled_water", "count": 1}, {"item": "crispy_honey", "count": 1}, {"item": "waterleaf", "count": 1}], "stations": ["alchemy"]},
+    {"id": "crate_potion", "output": "crate_potion", "inputs": [{"item": "bottled_water", "count": 1}, {"item": "amber", "count": 1}, {"item": "moonglow", "count": 1}, {"item": "waterleaf", "count": 1}], "stations": ["alchemy"]},
+    {"id": "angler_tackle_bag", "output": "angler_tackle_bag", "inputs": [{"item": "angler_earring", "count": 1}, {"item": "tackle_box", "count": 1}], "stations": ["tinkerers_workshop"]},
+    {"id": "lavaproof_tackle_bag", "output": "lavaproof_tackle_bag", "inputs": [{"item": "angler_tackle_bag", "count": 1}, {"item": "lavaproof_fishing_hook", "count": 1}], "stations": ["tinkerers_workshop"]}
+  ]
+}

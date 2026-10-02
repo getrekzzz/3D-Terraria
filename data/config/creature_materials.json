@@ -1,0 +1,35 @@
+{
+  // What creatures are made of (src/Strata.Core/Presentation/CreatureMaterialsConfig.cs): the sound of a hit and of a
+  // death, the dust a hit throws (an EffectKit recipe: Chips, Dust, Sparks, Puff, Splash, Leaves; useTint takes the
+  // creature's tint) and the gore of a death (pieces, colour, box or sphere). An enemy's own "material" wins, then its
+  // model, then its tags; anything else is flesh. Its own hitSound/deathSound override the material's.
+  "materials": {
+    "flesh":  { "hitSound": "hit", "deathSound": "npc_death", "dust": { "recipe": "Dust", "color": "#a01818" }, "gore": { "pieces": 3, "color": "#8a2424", "shape": "box" } },
+    "gel":    { "hitSound": "hit_squish", "deathSound": "slime_death", "dust": { "recipe": "Splash", "useTint": true }, "gore": { "pieces": 3, "useTint": true, "shape": "sphere" } },
+    "bone":   { "hitSound": "hit_bone", "deathSound": "death_bone", "dust": { "recipe": "Chips", "color": "#e8e0c8" }, "gore": { "pieces": 4, "color": "#e4dcc4", "shape": "box" } },
+    "metal":  { "hitSound": "hit_metal", "deathSound": "death_metal", "dust": { "recipe": "Sparks", "color": "#ffd080" }, "gore": { "pieces": 4, "color": "#8a8e96", "shape": "box" } },
+    "plant":  { "hitSound": "hit_plant", "deathSound": "death_plant", "dust": { "recipe": "Leaves", "color": "#5a9a3a" }, "gore": { "pieces": 3, "color": "#4a7a2a", "shape": "box" } },
+    "stone":  { "hitSound": "hit_stone", "deathSound": "death_stone", "dust": { "recipe": "Chips", "color": "#80808a" }, "gore": { "pieces": 4, "color": "#6a6a74", "shape": "box" } },
+    "spirit": { "hitSound": "hit_spirit", "deathSound": "death_spirit", "dust": { "recipe": "Sparks", "useTint": true }, "gore": { "pieces": 0, "shape": "sphere" } },
+    "chitin": { "hitSound": "hit_chitin", "deathSound": "death_chitin", "dust": { "recipe": "Chips", "useTint": true }, "gore": { "pieces": 3, "useTint": true, "shape": "box" } }
+  },
+  "byModel": {
+    "gel": "gel", "king_slime": "gel", "queen_slime": "gel", "queen_slime_winged": "gel", "jellyfish": "gel",
+    "skeleton": "bone", "cursed_skull": "bone", "dungeon_guardian": "bone", "skeletron_head": "bone", "skeletron_prime_head": "metal",
+    "probe": "metal", "the_destroyer_head": "metal", "retinazer": "metal", "spazmatism": "metal", "tesla_turret": "metal",
+    "martian_walker": "metal", "martian_saucer": "metal", "gigazapper": "metal", "ray_gunner": "metal", "martian_officer": "metal",
+    "possessed_armor": "metal", "paladin": "metal", "mister_stabby": "metal", "blade_staff": "metal", "terraprisma": "metal",
+    "man_eater": "plant", "plantera": "plant", "plantera_open": "plant", "mourning_wood": "plant", "everscream": "plant",
+    "splinterling": "plant", "scarecrow": "plant", "anomura_fungus": "plant", "mushi_ladybug": "chitin",
+    "granite_golem": "stone", "granite_elemental": "stone", "golem": "stone", "medusa": "stone", "mysterious_tablet": "stone",
+    "wraith": "spirit", "pixie": "spirit", "reaper": "spirit", "chaos_elemental": "spirit", "ice_elemental": "spirit",
+    "nebula_floater": "spirit", "flow_invader": "spirit", "empress_of_light": "spirit", "lunatic_cultist": "flesh",
+    "hornet": "chitin", "beetle": "chitin", "bee": "chitin", "queen_bee": "chitin", "moth": "chitin", "mothron": "chitin",
+    "antlion": "chitin", "black_recluse": "chitin", "wall_creeper": "chitin", "lacewing": "chitin", "alien_hornet": "chitin",
+    "crab": "chitin", "giant_tortoise": "chitin", "blood_crawler": "chitin", "storm_diver": "metal", "vortexian": "chitin",
+    "selenian": "metal", "predictor": "metal", "solar_pillar": "stone", "vortex_pillar": "stone", "nebula_pillar": "stone",
+    "stardust_pillar": "stone", "snowman_gangsta": "gel", "snow_balla": "gel", "nutcracker": "plant", "present_mimic": "plant",
+    "mimic": "plant", "ice_queen": "spirit", "pumpking": "plant", "headless_horseman": "flesh", "gingerbread_man": "plant"
+  },
+  "byTag": { "gel": "gel", "undead_skeleton": "bone", "construct": "metal" }
+}

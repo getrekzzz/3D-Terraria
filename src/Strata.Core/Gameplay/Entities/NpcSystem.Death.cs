@@ -43,15 +43,19 @@ public sealed partial class NpcSystem
         bool defeat = npc.Def.Boss is { Minor: false } group && !GroupAlive(group, npc);
         bool rolls = npc.Def.Boss is not { LootOnDefeat: true } || defeat;
         var drops = new List<ItemStack>();
-        if (npc.Def.Loot != null && rolls)
+        if (npc.Def.Loot != null && rolls && !npc.FromStatue)
         {
             var rng = new Pcg32(Hash.Combine((ulong)npc.Id, _world.Session.Clock.Tick));
             drops.AddRange(_loot.Roll(npc.Def.Loot, ref rng, _world.Session.ContextAt(cell)));
         }
         // Coins come from the loot table when it names them, else from the creature's value (never both).
         bool tableCoins = npc.Def.Loot != null && _world.Session.Content.LootTables.TryGet(npc.Def.Loot, out var table) && table.Coins != null;
-        if (npc.Def.Value > 0 && !tableCoins && rolls) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
-        if (rolls) RollGlobalKill(npc, drops);
+        if (npc.Def.Value > 0 && !tableCoins && rolls && !npc.FromStatue) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
+        if (rolls && !npc.FromStatue)
+        {
+            RollGlobalDrops(npc, cell, drops);
+            RollGlobalKill(npc, drops);
+        }
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);

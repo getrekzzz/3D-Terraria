@@ -156,6 +156,10 @@ public sealed partial class ItemUseSystem
         {
             outcome = inReach == null ? UseOutcome.OutOfReach : UsePaint(p, info.Painting!, inReach);
         }
+        else if (info.Has(ItemAction.Ride))
+        {
+            outcome = ToggleMount(p, info);
+        }
         else if (info.Has(ItemAction.Mount))
         {
             outcome = Mount(p, info.Minecart!, inReach);

@@ -49,6 +49,7 @@ public sealed partial class PlayerAvatar : Node3D
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
         ExtendThrust(entity);
         UpdateCart(entity.Minecart);
+        UpdateMount(entity.Mount);
         UpdateGear(delta);
         Animate(entity, (float)delta);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));

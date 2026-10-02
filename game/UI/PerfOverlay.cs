@@ -86,6 +86,8 @@ public sealed partial class PerfOverlay : CanvasLayer
         sb.AppendLine($"video mem {RenderingServer.GetRenderingInfo(RenderingServer.RenderingInfo.VideoMemUsed) / (1024 * 1024)} MB  static {OS.GetStaticMemoryUsage() / (1024 * 1024)} MB  managed {System.GC.GetTotalMemory(false) / (1024 * 1024)} MB");
         sb.AppendLine($"cell {focus}  chunk {ChunkMath.CellToChunk(focus)}  {string.Join('/', ctx.Biomes)} {ctx.Layer} depth {ctx.Depth:0}");
         sb.AppendLine($"light sky {light.A * 15:0} block {light.R * 15:0}/{light.G * 15:0}/{light.B * 15:0}  time {session.Clock.Hour:00.00}h {(session.Clock.IsDay ? "day" : "night")} moon {session.Clock.MoonPhase}");
+        if (_runtime.Weather is { } w)
+            sb.AppendLine($"weather {session.Weather.Precipitation} {session.Weather.Current:0.00} here {w.Local}  wind {session.Weather.WindSpeed:0.00}  particles {w.ActiveParticles}/{w.BudgetTotal}  ambient {_runtime.Ambience?.Particles.Alive ?? 0}  wet {w.Wetness:0.00}");
         _label.Text = sb.ToString();
     }
 

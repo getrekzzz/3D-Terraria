@@ -1,0 +1,52 @@
+{
+ "comment": "X-06 seasonal vanity worn on the body (bgen/armor.py presets): witch and Santa costumes, the Pumpkin Mask and Reindeer Antlers.",
+ "armor": {
+  "witch_costume": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#2e2440",
+   "trim": "#7a4aa0",
+   "styles": {
+    "head": "wizard"
+   }
+  },
+  "santa_costume": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#c8202a",
+   "trim": "#f4f0ea",
+   "styles": {
+    "head": "wizard"
+   }
+  },
+  "pumpkin_mask": {
+   "preset": "bone",
+   "layer": "plain",
+   "metal": "#e8781a",
+   "trim": "#3a6a20",
+   "dark": "#2a1404",
+   "glow": "#ffc040",
+   "styles": {
+    "chest": "none",
+    "pauldron": "none",
+    "bracer": "none",
+    "legs": "none",
+    "boot": "none"
+   }
+  },
+  "reindeer_antlers": {
+   "preset": "scale",
+   "layer": "plain",
+   "metal": "#7a5030",
+   "trim": "#c8a070",
+   "styles": {
+    "head": "horned",
+    "chest": "none",
+    "pauldron": "none",
+    "bracer": "none",
+    "legs": "none",
+    "boot": "none"
+   }
+  }
+ }
+}

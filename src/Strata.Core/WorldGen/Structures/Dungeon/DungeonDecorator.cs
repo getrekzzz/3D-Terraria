@@ -27,9 +27,10 @@ public static partial class DungeonDecorator
     public const string WaterBoltLoot = "water_bolt_book";
 
     /// <summary>Decorates the open blueprint and returns the planned wire cells (plates to their traps).</summary>
-    public static HashSet<Int3> Decorate(ContentDatabase content, Blueprint bp, DungeonLayout layout, DungeonStyle style, SeedTree seeds)
+    /// <param name="trapScale">Multiplies the halls' dart-trap chance (the No Traps secret seed).</param>
+    public static HashSet<Int3> Decorate(ContentDatabase content, Blueprint bp, DungeonLayout layout, DungeonStyle style, SeedTree seeds, float trapScale = 1f)
     {
-        var d = new Decor(content, bp, layout, style, seeds.Rng("dungeon.decor"));
+        var d = new Decor(content, bp, layout, style, seeds.Rng("dungeon.decor")) { TrapScale = trapScale };
         foreach (var room in layout.Rooms) d.ReserveRoom(room);
         Keep(d);
         foreach (var room in layout.Rooms) Room(d, room);
@@ -52,6 +53,9 @@ public static partial class DungeonDecorator
         private readonly List<BlueprintOp> _pending = new();
         private readonly List<int> _bookOps = new();
         public Pcg32 Rng;
+
+        /// <summary>Multiplies the dart-trap chance of halls.</summary>
+        public float TrapScale = 1f;
 
         public Decor(ContentDatabase content, Blueprint bp, DungeonLayout layout, DungeonStyle style, Pcg32 rng)
         {

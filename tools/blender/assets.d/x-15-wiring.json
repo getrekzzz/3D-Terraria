@@ -1,0 +1,29 @@
+{
+ "comment": "X-15 wiring set: timers, teleporter, statues, logic gates and lamps; coloured wrenches and the Actuator.",
+ "objects": {
+  "timer_1_second": {"generator": "wiring_timer", "params": {"hand": 0.0}},
+  "timer_3_second": {"generator": "wiring_timer", "params": {"hand": 0.25}},
+  "timer_5_second": {"generator": "wiring_timer", "params": {"hand": 0.5}},
+  "teleporter": {"generator": "teleporter", "params": {}},
+  "slime_statue": {"generator": "critter_statue", "params": {"shape": "slime"}},
+  "bunny_statue": {"generator": "critter_statue", "params": {"shape": "bunny"}},
+  "zombie_statue": {"generator": "critter_statue", "params": {"shape": "zombie"}},
+  "bat_statue": {"generator": "critter_statue", "params": {"shape": "bat"}},
+  "crab_statue": {"generator": "critter_statue", "params": {"shape": "crab"}},
+  "bird_statue": {"generator": "critter_statue", "params": {"shape": "bird"}},
+  "bomb_statue": {"generator": "critter_statue", "params": {"shape": "bomb"}},
+  "logic_gate_and": {"generator": "logic_gate", "params": {"color": "#d02a20"}},
+  "logic_gate_or": {"generator": "logic_gate", "params": {"color": "#2a6ad0"}},
+  "logic_gate_nand": {"generator": "logic_gate", "params": {"color": "#e87a1a"}},
+  "logic_gate_nor": {"generator": "logic_gate", "params": {"color": "#3ab83a"}},
+  "logic_gate_xor": {"generator": "logic_gate", "params": {"color": "#a83ad0"}},
+  "logic_gate_xnor": {"generator": "logic_gate", "params": {"color": "#e8c020"}},
+  "logic_gate_lamp": {"generator": "logic_lamp", "params": {}}
+ },
+ "items": {"explicit": {
+  "blue_wrench": {"generator": "wrench", "params": {"color": "#2a6ad0"}},
+  "green_wrench": {"generator": "wrench", "params": {"color": "#3ab83a"}},
+  "yellow_wrench": {"generator": "wrench", "params": {"color": "#e8c020"}},
+  "actuator": {"generator": "actuator", "params": {}}
+ }}
+}

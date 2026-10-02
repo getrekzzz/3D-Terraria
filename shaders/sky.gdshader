@@ -28,6 +28,14 @@ uniform vec3 airglow = vec3(0.0035, 0.0055, 0.011);
 uniform float night = 0.0;
 uniform float star_rotation = 0.0;
 uniform int cloud_steps = 3;
+// Rain clouds (0 clear .. 1 a dark downpour sky): the whole sky turns a heavy grey, the sun and stars are hidden.
+uniform float overcast = 0.0;
+
+vec3 overcast_sky(vec3 col) {
+	float lum = dot(col, vec3(0.2126, 0.7152, 0.0722));
+	vec3 grey = vec3(lum) * vec3(0.92, 0.96, 1.04);
+	return mix(col, grey * 0.55, overcast * 0.85);
+}
 
 const float RP = 6360.0;
 const float RA = 6420.0;
@@ -192,7 +200,7 @@ void sky() {
 	if (AT_CUBEMAP_PASS) {
 		vec3 col = sky_color(d, 8, 3);
 		vec4 cl = cloud_layer(d, 0.0, 1);
-		col = mix(col, cl.rgb, cl.a);
+		col = overcast_sky(mix(col, cl.rgb, cl.a));
 		COLOR = col * tint * ambient_tint;
 	} else if (AT_QUARTER_RES_PASS) {
 		COLOR = sky_color(d, 16, 6);
@@ -202,11 +210,12 @@ void sky() {
 		float above = smoothstep(-0.01, 0.03, d.y);
 		// Stars and the discs sit behind the air: dimmed by the airmass near the horizon.
 		float airmass = exp(-0.12 / max(d.y, 0.02));
-		col += star_field(d) * night * airmass * above;
-		col += moon_disc(d) * airmass * above;
-		col += sun_disc(d) * above;
+		float clear = 1.0 - overcast;
+		col += star_field(d) * night * airmass * above * clear;
+		col += moon_disc(d) * airmass * above * clear;
+		col += sun_disc(d) * above * clear;
 		vec4 cl = cloud_layer(d, 1.0, cloud_steps);
-		col = mix(col, cl.rgb, cl.a);
+		col = overcast_sky(mix(col, cl.rgb, cl.a));
 		COLOR = col * tint;
 	}
 }

@@ -60,6 +60,9 @@ public sealed partial class ObjectInteraction
                 return InteractOutcome.DoorToggled;
             case TileInteraction.Activate when obj.Def.Summon != null:
                 return Activate(p, obj);
+            case TileInteraction.Switch when obj.Def.Timer > 0:
+                _world.Wires.SetTimer(obj, !obj.Active); // timers start and stop by hand; they signal when they run out
+                return InteractOutcome.Switched;
             case TileInteraction.Switch:
                 obj.Active = !obj.Active;
                 NotifyChanged(obj);

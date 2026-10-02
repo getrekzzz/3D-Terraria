@@ -64,6 +64,7 @@ assert player.submerged == 1
 liquid none -10 0 -10 10 8 10
 wait 0.2
 assert player.in_liquid == 0
+assert player.splashes > 0
 heal
 assert player.alive == 1
 assert errors == 0

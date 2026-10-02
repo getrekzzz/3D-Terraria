@@ -10,15 +10,30 @@ public static partial class WorldLauncher
     private static Entities.CombatEffects AddWorldEffects(WorldRuntime runtime, GameServices services, GameWorld game, TileObjectRenderer objectRenderer, Entities.NpcRenderer creatures,
         Entities.ProjectileRenderer projectiles)
     {
+        var kit = new Rendering.EffectKit();
+        runtime.AddChild(kit);
+        kit.Initialize(game.Session.World, services.Graphics);
+        var flashes = new Rendering.FlashLights();
+        runtime.AddChild(flashes);
+        flashes.Initialize(services.Graphics);
+        var gore = new Entities.GoreSystem();
+        runtime.AddChild(gore);
+        gore.Initialize(game.Session.World, services.Graphics);
         var effects = new Entities.CombatEffects();
         runtime.AddChild(effects);
-        effects.Initialize(game, services.Graphics);
+        effects.Initialize(game, services.Graphics, kit, flashes, gore);
         var bossEffects = new Entities.BossEffects();
         runtime.AddChild(bossEffects);
         bossEffects.Initialize(game);
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
-        blockEffects.Initialize(game);
+        blockEffects.Initialize(game, kit);
+        var cracks = new Rendering.BlockCracks();
+        runtime.AddChild(cracks);
+        cracks.Initialize(game);
+        var trees = new TreeEffects();
+        runtime.AddChild(trees);
+        trees.Initialize(game, objectRenderer);
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
         drops.Initialize(game);
@@ -32,6 +47,14 @@ public static partial class WorldLauncher
         runtime.AddChild(lava);
         lava.Initialize(runtime);
         lights.AddProvider(lava.HeatLights);
+        var weather = new Ambience.WeatherRenderer();
+        runtime.AddChild(weather);
+        weather.Initialize(runtime, services.Graphics, game.Weather.Config);
+        runtime.Weather = weather;
+        var ambience = new Ambience.AmbienceDirector();
+        runtime.AddChild(ambience);
+        ambience.Initialize(runtime, services.Graphics, Strata.Core.Presentation.AmbienceConfig.Load(services.Data));
+        runtime.Ambience = ambience;
         return effects;
     }
 
@@ -48,5 +71,8 @@ public static partial class WorldLauncher
         var wires = new Rendering.WireOverlay();
         runtime.AddChild(wires);
         wires.Initialize(game, entity);
+        var fishing = new Audio.FishingSounds();
+        runtime.AddChild(fishing);
+        fishing.Initialize(game, entity);
     }
 }

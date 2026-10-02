@@ -14,6 +14,9 @@ public static partial class WorldLauncher
         var hud = new UI.Hud();
         runtime.AddChild(hud);
         hud.Initialize(ui);
+        var hurt = new UI.HurtOverlay();
+        runtime.AddChild(hurt);
+        hurt.Initialize(game, player.Entity, player.Rig);
         var inventory = new UI.InventoryScreen();
         runtime.AddChild(inventory);
         inventory.Initialize(ui);

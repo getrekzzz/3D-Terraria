@@ -87,6 +87,9 @@ public sealed class EnemyDef : ContentDef
     /// <summary>Coins dropped (copper).</summary>
     public int Value { get; init; }
 
+    /// <summary>What it is made of (data/config/creature_materials.json); null: from its model or tags.</summary>
+    public string? Material { get; init; }
+
     public string? HitSound { get; init; }
     public string? DeathSound { get; init; }
 

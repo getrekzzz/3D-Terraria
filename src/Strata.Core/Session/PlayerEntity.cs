@@ -107,6 +107,9 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
     /// <summary>The minecart being ridden (the engine moves the body along it), or null.</summary>
     public Gameplay.Mounts.MinecartRide? Minecart { get; set; }
 
+    /// <summary>The mount being ridden (the engine moves the body with <see cref="Gameplay.Mounts.MountMotion"/>), or null.</summary>
+    public Gameplay.Mounts.MountRide? Mount { get; set; }
+
     /// <summary>Pressure plate currently under the feet (signals once per step onto it).</summary>
     public long PressurePlate { get; set; } = -1;
 

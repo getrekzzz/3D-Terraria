@@ -84,7 +84,9 @@ public sealed partial class MainMenu
         var (panel, box) = MenuKit.Panel(new Vector2(720, 0), 10);
         box.AddChild(MenuKit.Title("Create World", 40));
         box.AddChild(MenuKit.Row("World Name", MenuKit.Field("", "Enter a world name", t => name = t.Trim())));
-        box.AddChild(MenuKit.Row("Seed", MenuKit.Field("", "Random", t => seedText = t.Trim(), 32), "Leave empty for a random world. Numbers or any text."));
+        var found = Settings.UserSettings.Current.DiscoveredSeeds;
+        box.AddChild(MenuKit.Row("Seed", MenuKit.Field("", "Random", t => seedText = t.Trim(), 32), "Leave empty for a random world. Numbers or any text."
+            + (found.Length > 0 ? $"\nSecret seeds found: {found.Replace("|", ", ")}." : "")));
         box.AddChild(MenuKit.Row("Size", MenuKit.Choice(Sizes, 0, i => size = i),
             "Small is about 1 km across, Medium 2 km, Large 3 km (streamed as you explore)."));
         var note = MenuKit.Text(DifficultyInfo[0], 15, new Color(0.8f, 0.85f, 0.95f));
@@ -104,16 +106,17 @@ public sealed partial class MainMenu
                 1 => EvilKind.Corruption,
                 2 => EvilKind.Crimson,
                 _ => GD.Randi() % 2 == 0 ? EvilKind.Corruption : EvilKind.Crimson,
-            }), 26));
+            }, SecretSeeds.Parse(seedText)), 26));
         box.AddChild(buttons);
         Show(MenuKit.Centered(panel));
     }
 
     /// <summary>Generates the world plan and saves the new world (off the main thread), then returns to the list.</summary>
-    private void CreateWorld(string name, long seed, WorldSizePreset size, Difficulty difficulty, EvilKind evil)
+    private void CreateWorld(string name, long seed, WorldSizePreset size, Difficulty difficulty, EvilKind evil, SecretSeed secret = SecretSeed.None)
     {
         var done = Busy("Generating world...");
-        var settings = new WorldSettings { Name = name, Seed = seed, Size = size, Difficulty = difficulty, Evil = evil };
+        var settings = new WorldSettings { Name = name, Seed = seed, Size = size, Difficulty = difficulty, Evil = evil, Secret = secret };
+        RememberSecret(secret);
         var dir = SaveCatalog.NewWorldDirectory(WorldsDirectory, name);
         var services = _services;
         Task.Run(() => WorldSession.Create(services.Content, settings, dir, services.Render, services.Log)).ContinueWith(t =>
@@ -131,12 +134,27 @@ public sealed partial class MainMenu
         });
     }
 
-    /// <summary>A number seed as typed, or a stable hash of any other text; random when empty.</summary>
+    /// <summary>
+    /// A number seed as typed, or a stable hash of any other text; random when empty or a secret seed name (secret
+    /// worlds differ every time, as in Terraria).
+    /// </summary>
     private static long ParseSeed(string text)
     {
-        if (text.Length == 0) return (long)(GD.Randi() & 0x7fffffff);
+        if (text.Length == 0 || SecretSeeds.Parse(text) != SecretSeed.None) return (long)(GD.Randi() & 0x7fffffff);
         if (long.TryParse(text, out long n)) return n;
         return (long)(Strata.Core.Determinism.Hash.String(text) & 0x7fffffff);
+    }
+
+    /// <summary>Secret seeds stay secret until found: once used, they are listed under the seed field.</summary>
+    private static void RememberSecret(SecretSeed secret)
+    {
+        if (secret == SecretSeed.None) return;
+        var s = Settings.UserSettings.Current;
+        var found = new System.Collections.Generic.List<string>(s.DiscoveredSeeds.Split('|', StringSplitOptions.RemoveEmptyEntries));
+        foreach (var title in SecretSeeds.Titles(secret))
+            if (!found.Contains(title)) found.Add(title);
+        s.DiscoveredSeeds = string.Join("|", found);
+        s.Save();
     }
 
     private static string RandomWorldName()

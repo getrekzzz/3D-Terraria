@@ -133,7 +133,7 @@ public class DungeonDecorTests
         var traps = ops.Where(o => o.ObjectId == "dart_trap").Select(o => o.Anchor).ToHashSet();
         Assert.NotEmpty(plates);
         Assert.Equal(plates.Count, traps.Count);
-        Assert.True(plan.PlannedWires.IsSubsetOf(g.World.Session.Wires), "a new world starts with the planned wires");
+        Assert.True(plan.PlannedWires.All(c => g.World.Session.Wires.Has(c, Strata.Core.Gameplay.Wiring.WireColor.Red)), "a new world starts with the planned wires");
         foreach (var plate in plates)
         {
             var start = plate.Anchor + Int3.Down;
