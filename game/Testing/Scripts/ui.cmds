@@ -474,3 +474,54 @@ wait 0.2
 assert ui.talk_open == 0
 god off
 assert errors == 0
+
+# --- P2-27 ---
+# Shop opens the inventory with the merchant's 10×4 grid in the panel host. Shift-clicking a backpack slot sells the
+# stack (wood has no value: it goes for nothing, as on Terraria's shop) into the buyback cells, and 'ui buyback' buys
+# it back into the backpack. Clicking a ware buys one onto the cursor and again stacks it; closing the inventory stows
+# what is held. Walking out of talking range puts the shop away.
+god on
+spawning off
+killall
+clear
+town dismiss merchant
+town summon merchant 0 0 -3
+give silver_coin 50
+give wood 10
+wait 0.3
+ui talk merchant
+ui shop
+wait 0.3
+assert ui.talk_open == 0
+assert ui.inventory == 1
+assert ui.panel == 2
+assert ui.shop_slots > 0
+assert ui.overlaps == 0
+ui hover shop 0
+assert ui.tooltip_lines > 1
+ui sell backpack 0
+assert ui.buyback == 1
+assert inv.wood == 0
+ui buyback 0
+assert ui.buyback == 0
+assert inv.wood == 10
+ui buy torch 2
+assert inv.cursor == 2
+assert inv.coins < 5000
+ui close
+wait 0.2
+assert ui.panel == 0
+assert inv.torch == 2
+ui talk merchant
+ui shop
+wait 0.3
+assert ui.panel == 2
+aim 0 0 1
+press move_forward
+wait_until ui.panel == 0 8
+press move_forward off
+assert ui.inventory == 1
+ui close
+wait 0.2
+god off
+assert errors == 0

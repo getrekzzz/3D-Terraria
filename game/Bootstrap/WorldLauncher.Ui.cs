@@ -32,6 +32,7 @@ public static partial class WorldLauncher
         var townDialog = new UI.TownDialog();
         runtime.AddChild(townDialog);
         townDialog.Initialize(ui);
+        townDialog.ShopRequested += inventory.OpenShop; // the chat box's Shop opens the inventory with the grid shop
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);

@@ -21,6 +21,7 @@ public sealed partial class InventoryScreen
     /// <summary>The view showing <paramref name="slot"/> now (the <c>ui hover</c> command), or null.</summary>
     public ItemSlotView? FindSlot(SlotRef slot)
     {
+        if (slot.Area == SlotArea.Shop) return _shop.View(slot.Index);
         foreach (var (at, view) in _slots)
             if (at() == slot) return view;
         return null;

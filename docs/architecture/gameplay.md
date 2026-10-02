@@ -313,8 +313,10 @@
   `coins`, `maxLife`, `resident`, `flag`) when a vacant valid home exists (rooms found from chairs), re-validates
   homes, and drives residents: stroll by day, walk home at night along A* paths, opening and closing doors, stop
   and face the player while talking. `TownCommerce` picks dialogue lines by condition (placeholders for names),
-  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys and sells
-  (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
+  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys into the
+  backpack or onto the cursor (`BuyTarget`), sells from a slot or the cursor at `sellRatio` (favourites and coins
+  refuse; an item of no value goes for nothing), keeps each player's last 40 sold stacks for buyback at what they
+  fetched (`TownCommerce.Trade.cs`; not saved), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
   residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.

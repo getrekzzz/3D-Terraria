@@ -9,8 +9,8 @@ namespace Strata.Game.UI;
 /// <summary>
 /// The inventory screen (Tab/I), laid out like Terraria's on the HUD's <see cref="UiLayout"/>: the 10×5 backpack on
 /// the hotbar's spot (its first row is the hotbar), the coin and ammo columns right of it with the trash under them and
-/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest
-/// today; shops and services plug in through <see cref="ShowPanel"/>), the crafting column bottom-left and the
+/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest or a
+/// resident's shop; services plug in through <see cref="ShowPanel"/>), the crafting column bottom-left and the
 /// equipment column (<see cref="EquipmentPanel"/>) on the right under the minimap. Each part is a registered layout
 /// widget placed by <see cref="Place"/> (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the
 /// pointer by <see cref="CursorItemLayer"/> and clicks are routed by <c>GameWorld.ClickSlot</c>
@@ -40,6 +40,11 @@ public sealed partial class InventoryScreen : CanvasLayer
         ui.Game.Interaction.ContainerOpened += (p, obj) =>
         {
             if (p == ui.Entity) OpenChest(obj);
+        };
+        // Talking to a resident puts an open shop away (the chat box takes over; it runs before the box opens).
+        ui.Interaction.TalkRequested += _ =>
+        {
+            if (_panel == _shop) ClosePanel();
         };
     }
 
@@ -104,6 +109,21 @@ public sealed partial class InventoryScreen : CanvasLayer
             HidePanel();
             _chest.Open(obj);
             ShowPanel(_chest, UiPanel.Chest);
+        }
+        SetOpen(true);
+    }
+
+    /// <summary>
+    /// Shows <paramref name="npc"/>'s shop under the grid where a chest would be (the chat box's Shop button) and opens
+    /// the screen; the one already shown just stays.
+    /// </summary>
+    public void OpenShop(Strata.Core.Gameplay.Town.TownNpc npc)
+    {
+        if (_panel != _shop || _shop.Npc != npc)
+        {
+            HidePanel();
+            _shop.Open(npc);
+            ShowPanel(_shop, UiPanel.Shop);
         }
         SetOpen(true);
     }

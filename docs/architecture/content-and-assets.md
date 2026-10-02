@@ -217,8 +217,8 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   `LayoutApplied`; `LayoutChanged` lays it out at once on open, close or a panel change). The backpack's 10×5 grid
   sits on the hotbar's origin (first row = hotbar, selected slot gold); `CoinAmmoColumns` holds the coin and ammo
   columns, the trash slot under them (saved with the player) and the `sort`/`quick_stack` buttons; the panel host
-  under the grid shows one panel at a time through `ShowPanel(Control, UiPanel)`/`ClosePanel()` (the chest today,
-  with 40 pooled slot views rebound on open; the shop and service panels plug in here) and sizes its slots by
+  under the grid shows one panel at a time through `ShowPanel(Control, UiPanel)`/`ClosePanel()` (the chest, with 40
+  pooled slot views rebound on open, or a resident's shop via `OpenShop(TownNpc)`; the service panel plugs in here) and sizes its slots by
   `SlotScale`; `CraftingPanel` takes the Crafting region (below); the equipment column takes the
   Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
   so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
@@ -267,3 +267,15 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   (`TownSystem.HoldTalk`), and walking out of `TalkRange` or Esc closes it. Shop hides the box and raises
   `ShopRequested` (the inventory's shop panel). Probe `ui.npc_chat_top` (open in the top third, overlapping no HUD
   widget; `LayoutWidgets.CountOverlapsWith`).
+* **Shop panel** (`game/UI/Inventory/ShopPanel.cs`): a resident's shop in the panel host, opened by the chat box's
+  Shop (`InventoryScreen.OpenShop`): their name over a 10×4 grid of 40 pooled read-only `ItemSlotView`s, the stock
+  (`TownCommerce.Stock`, read again every second) in `SlotKind.Shop` cells and then the player's sold stacks
+  (`TownCommerce.Buyback`, newest first) in amber `SlotKind.Buyback` cells, paged with `<`/`>` links past 40.
+  Tooltips end with 'Buy price' (`UiContext.Tooltip(stack, price)`). Left click buys one onto the cursor
+  (`BuyTarget.Cursor`, stacking on the same item), a held right button repeats at `HoldRepeat`'s pace, Shift buys into
+  the backpack, a sold stack is bought back whole; holding anything else, a click on a cell or between the cells sells
+  it (`SellCursor`), and Shift-clicking a backpack, coin or ammo slot sells through `GameWorld.ClickSlot` with the shop
+  as its `SlotContext`. Coins jingle (at most every 50 ms); refusals go to the status line. The resident waits while
+  the shop is open; out of `TalkRange` it closes, and putting it away (or talking to a resident) ends the
+  conversation. Smoke: `ui shop`, `ui buy <item> [n]`, `ui sell <area> <slot>`, `ui buyback <i>`, `ui hover shop <i>`;
+  probes `ui.shop_slots`, `ui.buyback`.

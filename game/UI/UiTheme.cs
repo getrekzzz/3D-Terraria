@@ -22,6 +22,7 @@ public enum SlotKind
     Crafting,
     CraftingSelected,
     Locked,
+    Buyback,
 }
 
 /// <summary>
@@ -78,6 +79,7 @@ public static partial class UiTheme
         (Color.Color8(52, 60, 150, 210), Color.Color8(22, 26, 70)), //     Crafting
         (Color.Color8(80, 95, 190, 225), Color.Color8(230, 190, 50)), //   CraftingSelected
         (Color.Color8(40, 40, 50, 160), Color.Color8(16, 16, 22)), //      Locked
+        (Color.Color8(115, 95, 55, 205), Color.Color8(50, 40, 18)), //     Buyback (sold items in a shop)
     };
 
     private static readonly StyleBoxFlat?[] SlotStyles = new StyleBoxFlat?[SlotColors.Length * 2];

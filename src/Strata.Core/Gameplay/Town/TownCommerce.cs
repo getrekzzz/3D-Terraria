@@ -27,10 +27,10 @@ public sealed record ShopOffer(ItemDef Item, long Price);
 
 /// <summary>
 /// Conversation and trade with residents: dialogue lines chosen by condition, shop stock and prices scaled by
-/// happiness (liked biomes and neighbours make things cheaper, crowding dearer), selling at a fraction of value,
-/// and services (healing for coins, crafting help).
+/// happiness (liked biomes and neighbours make things cheaper, crowding dearer), and services (healing for coins,
+/// crafting help). Buying, selling and buyback are in TownCommerce.Trade.cs.
 /// </summary>
-public sealed class TownCommerce
+public sealed partial class TownCommerce
 {
     private static readonly Regex Placeholder = new(@"\{(player|name|resident:([a-z0-9_]+))\}", RegexOptions.Compiled);
 
@@ -105,40 +105,27 @@ public sealed class TownCommerce
         float factor = PriceFactor(npc);
         return npc.Def.Shop
             .Where(e => Condition(e.Conditions).Evaluate(ctx))
-            .Select(e => new ShopOffer(Content.Items.Get(e.Item), Math.Max(1, (long)MathF.Round((e.Price ?? Content.Items.Get(e.Item).Value) * factor))))
+            .Select(e => Offer(e, factor))
             .ToList();
     }
 
-    public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count = 1)
+    /// <summary>The resident's offer of <paramref name="item"/> right now, or null when they do not sell it now.</summary>
+    public ShopOffer? Offer(TownNpc npc, PlayerEntity player, ItemDef item)
     {
-        var offer = Stock(npc, player).FirstOrDefault(o => o.Item == item);
-        if (offer == null) return TradeResult.Unavailable;
-        var inv = player.State.Inventory;
-        var goods = new ItemStack(item, count);
-        if (!inv.CanTake(goods)) return TradeResult.NoRoom;
-        if (!Wallet.TrySpend(inv, Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
-        var rest = inv.Pickup(goods);
-        foreach (var s in change.Append(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
-        return TradeResult.Ok;
+        ConditionContext? ctx = null;
+        foreach (var e in npc.Def.Shop)
+        {
+            if (e.Item != item.Id) continue;
+            ctx ??= ContextFor(npc, player);
+            if (Condition(e.Conditions).Evaluate(ctx)) return Offer(e, PriceFactor(npc));
+        }
+        return null;
     }
 
-    /// <summary>Sale value of a stack (copper).</summary>
-    public long SaleValue(ItemStack stack) => Prefixes.SellValue(stack, Config.SellRatio);
-
-    /// <summary>Sells the whole stack in a backpack slot.</summary>
-    public TradeResult Sell(PlayerEntity player, int slot) => Sell(player, player.State.Inventory.Backpack, slot);
-
-    /// <summary>Sells the whole stack in a slot of one of the player's storages (backpack or ammo; coins never sell).</summary>
-    public TradeResult Sell(PlayerEntity player, Inventory from, int slot)
+    private ShopOffer Offer(ShopEntry e, float factor)
     {
-        var inv = player.State.Inventory;
-        var stack = from[slot];
-        if (stack.IsEmpty || stack.Item!.HasTag("coin")) return TradeResult.NotSold;
-        long value = SaleValue(stack);
-        if (value <= 0) return TradeResult.NotSold;
-        from.Take(slot, stack.Count);
-        foreach (var s in Wallet.Give(inv, Content, value)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
-        return TradeResult.Ok;
+        var item = Content.Items.Get(e.Item);
+        return new ShopOffer(item, Math.Max(1, (long)MathF.Round((e.Price ?? item.Value) * factor)));
     }
 
     /// <summary>Cost of the resident's healing service for this player now (0 = nothing to heal or no such service).</summary>

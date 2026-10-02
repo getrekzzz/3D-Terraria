@@ -18,15 +18,25 @@ public sealed partial class InventoryScreen
 
     private ulong _lastGrabMs;
 
-    /// <summary>The chest open under the inventory, if any.</summary>
-    private SlotContext Context => _chest.Container is { } chest && _chest.ContainerInventory is { } inv ? new SlotContext(inv, null, chest) : SlotContext.None;
+    /// <summary>The chest open under the inventory (Shift moves to it), or the shop (Shift sells), if any.</summary>
+    private SlotContext Context =>
+        _chest.Container is { } chest && _chest.ContainerInventory is { } inv ? new SlotContext(inv, null, chest)
+        : _panel == _shop && _shop.Npc is { } npc ? new SlotContext(Shop: npc)
+        : SlotContext.None;
 
     private void Click(ItemSlotView view, SlotRef slot, bool right, ClickMods mods)
     {
-        var outcome = _ui.Game.ClickSlot(_ui.Entity, slot, right, mods, Context);
-        PlaySound(outcome);
+        var outcome = PressSlot(slot, right, mods);
         // Only taking items one at a time repeats; equipping, opening a crate or a refused take ends the hold.
         if (right && outcome != ClickOutcome.Moved) view.StopRepeat();
+    }
+
+    /// <summary>One click on a slot as the player makes it, with its sound (the views and the <c>ui sell</c> command).</summary>
+    public ClickOutcome PressSlot(SlotRef slot, bool right, ClickMods mods)
+    {
+        var outcome = _ui.Game.ClickSlot(_ui.Entity, slot, right, mods, Context);
+        PlaySound(outcome);
+        return outcome;
     }
 
     /// <summary>Terraria's grab for items moving, a tick for a favourite mark, coins for a sale.</summary>

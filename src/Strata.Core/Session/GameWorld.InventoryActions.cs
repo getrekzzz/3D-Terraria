@@ -120,7 +120,7 @@ public sealed partial class GameWorld
         switch (slot.Area)
         {
             case SlotArea.Backpack or SlotArea.Coins or SlotArea.Ammo when ctx.Shop != null:
-                if (storage.IsFavorite(i)) return ClickOutcome.None;
+                // Sold for its value (favourites and coins refuse) and kept in the shop's buyback slots.
                 return Commerce.Sell(p, storage, i) == TradeResult.Ok ? ClickOutcome.Sold : ClickOutcome.None;
             case SlotArea.Backpack or SlotArea.Coins or SlotArea.Ammo when ctx.Container != null:
                 storage[i] = ctx.Container.Add(s);
