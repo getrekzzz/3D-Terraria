@@ -20,6 +20,7 @@ public static class BuiltinCommands
         CombatCommands.Register(r);
         LiquidCommands.Register(r);
         TownCommands.Register(r);
+        InventoryCommands.Register(r);
         WorldCommands.Register(r);
         PerfCommands.Register(r);
         return r;

@@ -31,17 +31,16 @@ public class SlotAndCraftingUiTests
     }
 
     [Fact]
-    public void RightClickSplitsAndDropsOne()
+    public void RightClickTakesOneInsteadOfSplitting()
     {
-        var inv = new Inventory(2);
-        inv[0] = S("torch", 9);
-        var cursor = ItemStack.Empty;
-        SlotActions.RightClick(ref cursor, inv, 0);
-        Assert.Equal(5, cursor.Count);
-        Assert.Equal(4, inv[0].Count);
-        SlotActions.RightClick(ref cursor, inv, 1);
-        Assert.Equal(1, inv[1].Count);
-        Assert.Equal(4, cursor.Count);
+        var inv = new PlayerInventory();
+        inv.Backpack[12] = S("torch", 9);
+        Assert.Equal(ClickOutcome.Moved, SlotActions.RightClick(inv, new SlotRef(SlotArea.Backpack, 12), inv.Backpack));
+        Assert.Equal(1, inv.Cursor.Count);
+        Assert.Equal(8, inv.Backpack[12].Count);
+        // An empty slot takes nothing from the cursor.
+        Assert.Equal(ClickOutcome.None, SlotActions.RightClick(inv, new SlotRef(SlotArea.Backpack, 13), inv.Backpack));
+        Assert.True(inv.Backpack[13].IsEmpty);
     }
 
     [Fact]

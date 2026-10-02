@@ -2,12 +2,6 @@ using Strata.Core.Content.Defs;
 
 namespace Strata.Core.Gameplay.Items;
 
-/// <summary>Every slot group a click can address. Container and Shop belong to the screen that opened them.</summary>
-public enum SlotArea
-{
-    Backpack, Coins, Ammo, Trash, Armor, Accessories, VanityArmor, VanityAccessories, Dyes, Misc, MiscDyes, Service, Container, Shop,
-}
-
 public sealed partial class PlayerInventory
 {
     /// <summary>The equipment storages (armor, accessories, vanity, dyes, misc and misc dyes); a change raises <see cref="EquipmentChanged"/>.</summary>

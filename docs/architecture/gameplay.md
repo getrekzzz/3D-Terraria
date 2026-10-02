@@ -171,6 +171,15 @@
   `CanTake` is the pickup-aware room check. Player crafting (`RecipeBook.CanCraft/Craft(PlayerInventory, …)`,
   `CraftingEnvironment.Browse(…, PlayerInventory)`) counts and consumes the backpack, ammo and coin slots (wooden
   arrows for flaming arrows) and picks the output up.
+* **Slot clicks** — `GameWorld.ClickSlot(p, SlotRef(area, index), right, ClickMods, SlotContext)` (partial
+  `.InventoryActions`) is the one entry point for the inventory screen, `invclick` and tests. With an empty cursor
+  Alt toggles the favourite (backpack/coins/ammo), Ctrl (no shop) moves the stack to the trash slot (favourites
+  refuse), Shift quick-moves (chest ↔ backpack via `Pickup`, equip from the backpack, unequip, sell with a shop
+  open). Right click opens anything whose consume behaviour has a `loot` table (`ItemUseSystem.OpenFromSlot`, event
+  `Opened`), else `SlotActions.RightClick`: equip and swap from backpack/chest, armor/accessory ↔ vanity swap at the
+  same index, otherwise take ONE onto the cursor (held: `HoldRepeat.IntervalTicks` 30, 22, 17 … 1). Left clicks are
+  `SlotActions.LeftClick` with `SlotFilters.For(slot)` (coins only in coin slots, `FitsAmmoSlot` in ammo slots, armor
+  kind, accessory without duplicate, dye, misc kind). `ThrowCursor`/`ThrowStack` toss stacks the way the drop key does.
 * **Tooltips and display helpers** — `ItemTooltip.Lines(stack, info, TooltipContext)` builds Terraria-ordered
   lines: name with prefix and count, damage/crit/speed/knockback after the prefix and the viewer's class bonuses
   (`DamageModel.DamageMultiplier`/`CritBonus`, the same maths a hit uses), info lines, the description or the buff's

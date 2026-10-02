@@ -34,8 +34,11 @@ public sealed partial class ItemSlotView : Control
     /// <summary>Icon shown dimmed when empty (armor slot silhouettes).</summary>
     public Texture2D? EmptyHint { get; set; }
 
-    /// <summary>(button, shift) on click.</summary>
-    public event Action<MouseButton, bool>? Clicked;
+    /// <summary>(button, modifier keys) on click.</summary>
+    public event Action<MouseButton, ClickMods>? Clicked;
+
+    /// <summary>Whether the mouse is over the slot (a held right click keeps repeating only while it is).</summary>
+    public bool Hovered => _hovered;
 
     public override void _Process(double delta)
     {
@@ -53,7 +56,8 @@ public sealed partial class ItemSlotView : Control
     {
         if (e is InputEventMouseButton { Pressed: true } mb && (mb.ButtonIndex == MouseButton.Left || mb.ButtonIndex == MouseButton.Right))
         {
-            Clicked?.Invoke(mb.ButtonIndex, mb.ShiftPressed);
+            var mods = (mb.ShiftPressed ? ClickMods.Shift : 0) | (mb.CtrlPressed || mb.MetaPressed ? ClickMods.Ctrl : 0) | (mb.AltPressed ? ClickMods.Alt : 0);
+            Clicked?.Invoke(mb.ButtonIndex, mods);
             AcceptEvent();
         }
     }

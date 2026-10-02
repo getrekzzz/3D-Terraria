@@ -126,14 +126,17 @@ public sealed class TownCommerce
     public long SaleValue(ItemStack stack) => Prefixes.SellValue(stack, Config.SellRatio);
 
     /// <summary>Sells the whole stack in a backpack slot.</summary>
-    public TradeResult Sell(PlayerEntity player, int slot)
+    public TradeResult Sell(PlayerEntity player, int slot) => Sell(player, player.State.Inventory.Backpack, slot);
+
+    /// <summary>Sells the whole stack in a slot of one of the player's storages (backpack or ammo; coins never sell).</summary>
+    public TradeResult Sell(PlayerEntity player, Inventory from, int slot)
     {
         var inv = player.State.Inventory;
-        var stack = inv.Backpack[slot];
+        var stack = from[slot];
         if (stack.IsEmpty || stack.Item!.HasTag("coin")) return TradeResult.NotSold;
         long value = SaleValue(stack);
         if (value <= 0) return TradeResult.NotSold;
-        inv.Backpack.Take(slot, stack.Count);
+        from.Take(slot, stack.Count);
         foreach (var s in Wallet.Give(inv, Content, value)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         return TradeResult.Ok;
     }
