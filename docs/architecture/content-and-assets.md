@@ -18,11 +18,18 @@
 | Terrain texture array (71 layers; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
 | Prop texture array (bark, leaf-card sprigs, metals, cloth, leather…) | `--set=props` | `assets/textures/props/` |
 | Block item icons | `tools/textures/build_icons.py` | `assets/icons/items/<block>.png` |
+| UI pixel sprites (hearts, stars, bubbles, slot silhouettes, buttons, pointer, frames) | `tools/textures/build_ui.py` | `assets/ui/<name>.png` |
 | Tile objects, items, creatures + icons | `tools/blender/build_all.py` (+ `assets.json`) | `assets/models/{objects,items,creatures}/*.glb`, icons, `assets/manifest.json` |
 
 Textures are synthesised in numpy (`tools/textures/gen_{natural,rock,built,plants,detail}.py` on `synth.py`):
 stones, soils, bark, bricks, planks, metals, cloth and leather with their height (albedo alpha for opaque layers),
 roughness and metalness; cut-out and translucent layers keep opacity in alpha instead.
+
+UI sprites are ASCII pixel maps (`tools/textures/ui_sprites.py`, `ui_sprites_b.py`) on one shared palette: each cell
+becomes 2x2 pixels and gets a 1 px `#1a1020` outline, except silhouettes, the pointer and 9-slice frames, which carry
+their own edges. The game reads them through `UiSprites.Get(name)` (`AssetPaths.UiSprite`), which the HUD preloads;
+draw them at integral sizes (`TextureFilter = Nearest` when scaled). `build_ui.py --check` runs in CI without Pillow,
+and `AssetCoverageTests.UiSpritesUsedByCodeExist` checks every name the game code asks for.
 
 Blender conventions: 1 unit = 1 m, Z up, front faces +Y (glTF −Z); tile objects have their origin at the
 footprint's bottom centre, items at the grip with the business end along +Z. Material slots are named

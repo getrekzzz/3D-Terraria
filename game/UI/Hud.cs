@@ -43,6 +43,7 @@ public sealed partial class Hud : CanvasLayer
         _ui = ui;
         Name = "Hud";
         Layer = 10;
+        UiSprites.Preload();
         var root = new Control { MouseFilter = Control.MouseFilterEnum.Ignore, Theme = UiTheme.Theme };
         root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(root);

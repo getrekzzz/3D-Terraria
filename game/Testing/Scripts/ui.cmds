@@ -28,3 +28,8 @@ wait 0.2
 ui close
 wait 0.2
 assert errors == 0
+
+# --- P2-02 ---
+# The HUD preloaded every generated UI sprite (tools/textures/build_ui.py) and none fell back to "missing".
+assert ui.sprites_missing == 0
+assert ui.sprites >= 35
