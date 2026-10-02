@@ -74,7 +74,7 @@ public sealed partial class InventoryScreen
 
     private ItemStack Read(SlotRef slot)
     {
-        var inv = slot.Area == SlotArea.Container ? _containerInv : _ui.Inventory.Resolve(slot.Area);
+        var inv = slot.Area == SlotArea.Container ? _chest.ContainerInventory : _ui.Inventory.Resolve(slot.Area);
         return inv != null && slot.Index < inv.Size ? inv[slot.Index] : ItemStack.Empty;
     }
 

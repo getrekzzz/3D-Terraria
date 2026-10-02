@@ -21,6 +21,8 @@ public sealed partial class InventoryScreen
     private CoinAmmoColumns _coinAmmo = null!;
     private Control _panelHost = null!;
     private Control? _panel;
+    private ChestPanel _chest = null!;
+    private UiLayoutResult? _layout;
     private CraftingPanel _crafting = null!;
     private EquipmentPanel _equipment = null!;
 
@@ -35,6 +37,9 @@ public sealed partial class InventoryScreen
 
     /// <summary>Accessory rows of the equipment column: the slots the world unlocked, and a locked one still holding an item.</summary>
     public int AccessoryRows => _equipment.AccessoryRows;
+
+    /// <summary>The chest panel shown under the grid while a chest is open.</summary>
+    public ChestPanel Chest => _chest;
 
     /// <summary>The equipment column (tabs, Dye | Vanity | Equip, Misc page, defence shield).</summary>
     public EquipmentPanel Equipment => _equipment;
@@ -63,7 +68,10 @@ public sealed partial class InventoryScreen
 
         _panelHost = Region("Panel");
         _panelHost.Visible = false;
-        BuildChestPanel();
+        _chest = new ChestPanel(_ui, (area, index) => Slot(area, index));
+        _chest.Shown += (obj, shown) => ContainerShown?.Invoke(obj, shown);
+        _chest.ItemsMoved += () => _crafting.Refresh();
+        _chest.CloseRequested += ClosePanel;
 
         _crafting = LayoutWidgets.Register(new CraftingPanel { Name = "Crafting" });
         _root.AddChild(_crafting);
@@ -141,7 +149,14 @@ public sealed partial class InventoryScreen
         Panel = UiPanel.None;
         panel.Visible = false;
         _panelHost.Visible = false;
-        if (panel == _chestPanel) ReleaseContainer();
+        if (panel == _chest) _chest.Release();
+    }
+
+    /// <summary>Places the host on the last layout's Panel region (hidden without a panel or a region) and the chest in it.</summary>
+    private void PlacePanel()
+    {
+        _panelHost.Visible = _panel != null && _layout != null && LayoutWidgets.Place(_panelHost, _layout, UiRegion.Panel);
+        if (_panelHost.Visible && _panel == _chest) _chest.Arrange(SlotScale);
     }
 
     /// <summary>Positions and sizes a slot inside its region (its minimum size too, so it can shrink).</summary>

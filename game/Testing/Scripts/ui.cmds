@@ -361,3 +361,60 @@ ui tab equipment
 ui close
 wait 0.1
 assert errors == 0
+
+# --- P2-17 ---
+# The chest panel: its links move items through Core (Deposit All leaves the hotbar and favourites; Loot All brings
+# everything back); Rename opens a field that holds the keyboard behind a modal gate, so typing never moves the
+# player; Esc keeps the old name and Enter the new one. Walking out of reach puts the chest away with its creak.
+god on
+spawning off
+killall
+clear
+fill -3 0 -6 3 3 20 air
+fill -3 -1 -6 3 -1 20 dirt
+wait 0.5
+place wooden_chest 0 0 -3
+interact 0 0 -3
+wait 0.2
+assert ui.inventory == 1
+assert ui.panel == 1
+give wood 30
+invclick backpack 0 left
+invclick backpack 20 left
+give torch 5
+invclick backpack 0 left
+invclick backpack 21 left
+invclick backpack 21 left alt
+ui chest deposit
+assert inv.wood == 0
+assert inv.torch == 5
+ui chest loot
+assert inv.wood == 30
+ui chest rename
+assert ui.renaming == 1
+assert ui.modal == 1
+mark
+aim 0 0 1
+press move_forward
+wait 0.3
+press move_forward off
+assert player.from_mark < 0.2
+ui chest cancel
+assert ui.renaming == 0
+assert ui.modal == 0
+assert ui.chest_named == 0
+ui chest rename
+ui chest name Loot
+assert ui.renaming == 0
+assert ui.chest_named == 1
+chest
+aim 0 0 1
+press move_forward
+wait_until ui.panel == 0 6
+press move_forward off
+assert ui.chests_closed >= 1
+assert ui.inventory == 1
+ui close
+wait 0.2
+god off
+assert errors == 0

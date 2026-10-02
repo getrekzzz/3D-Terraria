@@ -83,5 +83,10 @@ public static class UiProbes
         ctx.AddProbe("ui.equip_rows", () => world.Inventory?.AccessoryRows ?? 0);
         ctx.AddProbe("ui.defense_badge", () => world.Inventory?.Equipment.Defense.Shown ?? -1);
         ctx.AddProbe("ui.misc_tab", () => world.Inventory?.Equipment.MiscShown == true ? 1 : 0);
+        // P2-17: the chest panel. Its name field is open, the shown chest has a name of its own, and the chests put
+        // away (each with the chest_close creak).
+        ctx.AddProbe("ui.renaming", () => world.Inventory?.Chest.Renaming == true ? 1 : 0);
+        ctx.AddProbe("ui.chest_named", () => world.Inventory?.Chest.Container?.CustomName != null ? 1 : 0);
+        ctx.AddProbe("ui.chests_closed", () => world.Inventory?.Chest.ClosedCount ?? 0);
     }
 }

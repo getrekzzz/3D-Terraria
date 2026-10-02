@@ -1,6 +1,7 @@
 using Godot;
 using Strata.Core.Commands;
 using Strata.Core.Gameplay.Items;
+using Strata.Core.Session;
 using Strata.Game.Bootstrap;
 using Strata.Game.Settings;
 using Strata.Game.UI;
@@ -14,8 +15,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|close|export-theme>",
-            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|close|export-theme>",
+            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -76,12 +77,13 @@ public static class UiCommands
                         int row = a.Int(1, "accessory");
                         if (!screen.Equipment.PressEye(row)) return CommandResult.Fail($"Accessory row {row} has no eye on screen (open the inventory on the equipment page).");
                         return CommandResult.Success($"Accessory {row} {(ctx.Player.State.Inventory.IsAccessoryHidden(row) ? "hidden" : "shown")}.");
+                    case "chest": return ChestPanelCommand(screen.Chest, a.Str(1, "button"), a.Count > 2 ? a.Rest(2) : "");
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, close or export-theme");
                 }
             },
         });
@@ -100,5 +102,32 @@ public static class UiCommands
                     : $"UI scale {DisplaySettings.EffectiveUiScale:0.##}.");
             },
         });
+    }
+
+    /// <summary>The <c>ui chest</c> command: the open chest panel's links and its name field, as the player presses them.</summary>
+    private static CommandResult ChestPanelCommand(ChestPanel chest, string button, string text)
+    {
+        if (chest.Container == null || !chest.IsVisibleInTree()) return CommandResult.Fail("No chest is shown (interact with one first).");
+        ChestOp? op = button switch
+        {
+            "loot" => ChestOp.LootAll,
+            "deposit" => ChestOp.DepositAll,
+            "quickstack" => ChestOp.QuickStack,
+            "restock" => ChestOp.Restock,
+            "sort" => ChestOp.Sort,
+            _ => null,
+        };
+        if (op is { } pressed) return CommandResult.Success($"{pressed}: {chest.Press(pressed)} items moved.");
+        switch (button)
+        {
+            case "rename":
+                chest.StartRename();
+                return CommandResult.Success("Typing the chest's name.");
+            case "name":
+                return chest.SubmitRename(text) ? CommandResult.Success($"Named \"{chest.Title}\".") : CommandResult.Fail("The name field is not open (ui chest rename first).");
+            case "cancel":
+                return chest.CancelRename() ? CommandResult.Success("Renaming cancelled.") : CommandResult.Fail("The name field is not open.");
+            default: throw new CommandException("expected loot, deposit, quickstack, restock, sort, rename, name or cancel");
+        }
     }
 }

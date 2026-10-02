@@ -20,11 +20,8 @@ namespace Strata.Game.UI;
 public sealed partial class InventoryScreen : CanvasLayer
 {
     private const string Gate = "inventory";
-    private const float ContainerReach = 6f; // metres from the chest's centre before it closes
     private UiContext _ui = null!;
     private Control _root = null!;
-    private TileObjectInstance? _container;
-    private Inventory? _containerInv;
 
     public bool IsOpen => _root.Visible;
 
@@ -42,7 +39,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         BuildLayout();
         ui.Game.Interaction.ContainerOpened += (p, obj) =>
         {
-            if (p == ui.Entity) OpenContainer(obj);
+            if (p == ui.Entity) OpenChest(obj);
         };
     }
 
@@ -101,13 +98,15 @@ public sealed partial class InventoryScreen : CanvasLayer
         _equipment.Refresh(_ui.Entity.State);
         int selected = _ui.Inventory.SelectedHotbar;
         for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
-        if (_container != null)
-        {
-            var world = _ui.Game.Session.World;
-            var center = new System.Numerics.Vector3(_container.Anchor.X + 1, _container.Anchor.Y + 1, _container.Anchor.Z + 1) * Strata.Core.Common.Units.CellSize;
-            if (world.TileObjects.Get(_container.Id) == null || System.Numerics.Vector3.Distance(center, _ui.Entity.Center) > ContainerReach)
-                ClosePanel();
-        }
+    }
+
+    /// <summary>Shows a chest the player opened under the grid (another one is put away first) and opens the screen.</summary>
+    private void OpenChest(TileObjectInstance obj)
+    {
+        HidePanel();
+        _chest.Open(obj);
+        ShowPanel(_chest, UiPanel.Chest);
+        SetOpen(true);
     }
 
     /// <summary>Puts <paramref name="stack"/> back into the player's storage; what does not fit is thrown.</summary>
@@ -115,19 +114,5 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         if (stack.IsEmpty) return;
         _ui.Game.ThrowStack(_ui.Entity, _ui.Inventory.Pickup(stack));
-    }
-
-    /// <summary>A bare text button in the small UI font, white turning gold under the mouse (Terraria's chest links).</summary>
-    private static Button TextButton(string text, Action onPressed, string? tooltip = null)
-    {
-        // No keyboard focus: the player walks and jumps with the inventory open, and Space (ui_accept) would press it again.
-        var b = new Button
-        {
-            Text = text, TooltipText = tooltip ?? "", FocusMode = Control.FocusModeEnum.None, ThemeTypeVariation = UiTheme.TextButton,
-            Alignment = HorizontalAlignment.Left, ClipText = true,
-        };
-        b.AddThemeFontSizeOverride("font_size", UiFonts.Small);
-        b.Pressed += onPressed;
-        return b;
     }
 }

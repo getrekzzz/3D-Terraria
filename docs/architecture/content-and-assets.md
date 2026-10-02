@@ -222,8 +222,17 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   `SlotScale`; `CraftingPanel` takes the Crafting region (pooled rows, no fixed size); the equipment column takes the
   Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
   so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
-  (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack), `.Chest`.
+  (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack).
   Smoke: `ui sort`, `ui quickstack`; probes `ui.grid_on_hotbar`, `ui.panel`, `ui.slot_scale`.
+* **Chest panel** (`game/UI/Inventory/ChestPanel*.cs`): the open chest in the panel host, its name (custom, else the
+  chest's) over 40 pooled teal slots and Terraria's white-to-gold text links Loot All, Deposit All, Quick Stack,
+  Restock, Sort Items (`GameWorld.ChestAction`: favourites and the hotbar stay, Core marks the chunk) and Rename. Rename
+  turns the title into a field that sets `InputGate.TextEntry` and opens a modal `rename` gate while it has the
+  keyboard (typing never moves the player); Enter or a click elsewhere keeps the name (`GameWorld.RenameContainer`),
+  Esc cancels. The panel owns opening and putting the chest away: `Shown` drives the lid (`TileObjectRenderer`), the
+  6 m reach check closes it, and putting it away plays `chest_close` at the chest (`tools/audio/sfx_recipes_chests.py`;
+  `chest_open` plays on interact). Smoke: `ui chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>`;
+  probes `ui.renaming`, `ui.chest_named`, `ui.chests_closed`.
 * **Equipment column** (`game/UI/Inventory/EquipmentPanel*.cs`, `DefenseBadge.cs`): tabs `tab_equipment`,
   `tab_misc` and a disabled `tab_housing` for the town phase over two pages. Equipment: Dye | Vanity | Equip for the
   helmet, shirt and pants and one row per accessory slot (`GameWorld.AccessorySlotsFor(difficulty, demonHeart)`: 5 in
