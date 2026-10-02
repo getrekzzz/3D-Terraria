@@ -62,6 +62,18 @@ assert ui.bestiary_unlock >= 2
 book entry shelter
 assert ui.book_tab == 2
 assert ui.book_guide == 1
+# P5-32 tabs: NPCs (an entry by resident id), Tips, Achievements.
+book npcs
+assert ui.book_tab == 3
+book entry merchant
+assert ui.book_tab == 3
+book entry controls_move
+assert ui.book_tab == 4
+book entry benched
+assert ui.book_tab == 5
+book progress
+assert ui.book_tab == 2
+assert errors == 0
 book close
 assert ui.book_open == 0
 wait 0.5

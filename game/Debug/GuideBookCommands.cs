@@ -7,7 +7,7 @@ namespace Strata.Game.Debug;
 /// <summary>The <c>book</c> command: open the Guide book at a tab or entry, or close it (smoke scripts, screenshots).</summary>
 public static class GuideBookCommands
 {
-    private const string Usage = "book <items|bestiary|guide|item <id>|bestiary <id>|entry <id>|close>";
+    private const string Usage = "book <items|bestiary|progress|npcs|tips|achievements|item <id>|bestiary <id>|entry <id>|close>";
 
     public static GuideBookScreen? Find(LaunchedWorld world) => world.Runtime.GetNodeOrNull<GuideBookScreen>(GuideBookScreen.NodeName);
 

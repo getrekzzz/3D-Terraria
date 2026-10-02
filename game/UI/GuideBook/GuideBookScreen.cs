@@ -7,7 +7,7 @@ using Strata.Core.Session;
 namespace Strata.Game.UI.GuideBook;
 
 /// <summary>
-/// The Guide book (P5-30): a themed two-page book with bookmark tabs (Items, Bestiary, Guide). Toggled with the
+/// The Guide book (P5-30): a themed two-page book with bookmark tabs (Items, Bestiary, Progress, NPCs, Tips, Achievements). Toggled with the
 /// guide_book key (Esc closes); nothing is built until it first opens, and each tab builds on its first selection.
 /// The Items index is built on a worker thread at world launch; the Items tab says "Loading…" until it is ready.
 /// A hint's Guide link (X-10) opens the book at that entry when the key is pressed while the hint is up.
@@ -33,7 +33,13 @@ public partial class GuideBookScreen : CanvasLayer
     public IGuideTab? Current => _current;
     public ItemsTab Items { get; } = new();
     public BestiaryTab Bestiary { get; } = new();
-    public GuideTab Guide { get; } = new();
+    public ProgressTab Progress { get; } = new();
+    public NpcsTab Npcs { get; } = new();
+    public TipsTab Tips { get; } = new();
+    public AchievementsTab Achievements { get; } = new();
+
+    /// <summary>Index of the shown tab (probe ui.book_tab): items 0, bestiary 1, progress 2, npcs 3, tips 4, achievements 5.</summary>
+    public int TabIndex => IsOpen && _current != null ? _tabs.IndexOf(_current) : -1;
 
     public void Initialize(UiContext ui)
     {
@@ -42,7 +48,10 @@ public partial class GuideBookScreen : CanvasLayer
         _ctx = new GuideBookContext { Ui = ui, Book = this };
         _tabs.Add(Items);
         _tabs.Add(Bestiary);
-        _tabs.Add(Guide);
+        _tabs.Add(Progress);
+        _tabs.Add(Npcs);
+        _tabs.Add(Tips);
+        _tabs.Add(Achievements);
         _indexTask = GuideIndex.BuildAsync(ui.Game.Session.Content);
         ui.Game.Hints.Shown += OnHint;
     }
@@ -101,8 +110,11 @@ public partial class GuideBookScreen : CanvasLayer
     public bool OpenEntry(string id)
     {
         var content = _ctx.Ui.Game.Session.Content;
-        IGuideTab? tab = content.GuideSteps.Contains(id) || content.GuideTips.Contains(id) ? Guide
-            : content.Enemies.Contains(id) || content.TownNpcs.Contains(id) ? Bestiary
+        IGuideTab? tab = content.GuideSteps.Contains(id) ? Progress
+            : content.GuideTips.Contains(id) ? Tips
+            : content.Achievements.Contains(id) ? Achievements
+            : content.TownNpcs.Contains(id) ? Npcs
+            : content.Enemies.Contains(id) ? Bestiary
             : content.Items.Contains(id) ? Items : null;
         if (tab == null || !Open(tab.Key)) return false;
         return tab.Show(id);
@@ -155,7 +167,7 @@ public partial class GuideBookScreen : CanvasLayer
         header.AddChild(title);
         foreach (var tab in _tabs)
         {
-            var b = new Button { Text = tab.Title, ToggleMode = true, CustomMinimumSize = new Vector2(120, 34), FocusMode = Control.FocusModeEnum.None };
+            var b = new Button { Text = tab.Title, ToggleMode = true, CustomMinimumSize = new Vector2(104, 34), FocusMode = Control.FocusModeEnum.None };
             var t = tab;
             b.Pressed += () => Select(t);
             _buttons.Add(b);

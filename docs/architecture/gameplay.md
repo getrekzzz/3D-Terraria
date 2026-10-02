@@ -583,7 +583,7 @@ search keys, `ItemSourceIndex` rows as `SourceView` with `DropRates` chances and
 then. Items tab: search (sets `InputGate.TextEntry` while focused), category filter, names at once and icons 16 a
 frame; `ItemDetails` shows the tooltip lines, "Obtained from" (rows link to creatures and items), "Crafted from",
 "Used in" (8 recipe cards a page; ingredients link) and "Crafting station for N recipes", with Back history; rebuilt
-only on selection. Guide tab: the advisor's steps (✓ done, ▶ next) and the tips. A hint's Guide link (X-10): pressing
+only on selection. Steps and tips moved to the P5-32 tabs. A hint's Guide link (X-10): pressing
 K while a hint with a `guide` entry is up opens the book there. Command `book <tab|item|bestiary|entry <id>|close>`;
 probes `ui.book_open`, `ui.book_ready`, `ui.book_tab`, `ui.book_items`, `ui.book_sources`, `ui.book_guide`.
 Not yet: Bosses/NPCs/Achievements tabs, the inventory's book button (InventoryScreen is W4-owned), a page-turn sound.
@@ -665,3 +665,15 @@ in. Probe `ui.bestiary_unlock`. Not yet: the rotating 3D preview (thumbnails sta
 `Conditions.IPlayerRecords`), so the town's `bestiary`, `killed`, `obtained` and `achieved` conditions (the
 Zoologist's 10% bestiary arrival) read it. `Town.Rescued` counts `rescued` and `rescued:<resident>` in the rescuer's
 journal; achievement/guide trigger `rescued{resident?|min}` reads them.
+
+## Book tabs: progress, NPCs, tips, achievements (P5-32)
+
+`ListTab<T>` (list left, page right, icons a few per frame) backs four tabs: `ProgressTab` (the advisor's steps by
+stage, ✓ done / ▶ next in gold / grey not yet; boss portraits; related item and enemy links), `NpcsTab` (every
+`TownNpcDef`: status Living here / Homeless / Dead until dawn / Bound somewhere / Not yet, arrival text or the
+rescue's pose, `Where` and `Requires` through `ConditionDescriber`, loves/likes/dislikes/hates from `Mood`, current
+happiness via `TownCommerce.DescribeHappiness`, services, the whole shop with prices, tabs and conditions),
+`TipsTab` (by topic, `{key:}` and the action resolved from the live InputMap) and `AchievementsTab` (gold with
+date when unlocked, else a progress bar from `AchievementTracker.Progress`). `OpenEntry` routes guide steps,
+tips, achievements, residents, enemies and items to their tab; `ui.book_tab` is the tab index (0 items … 5
+achievements). Not yet: the screenshot-tour line (main-only lavapipe tour).
