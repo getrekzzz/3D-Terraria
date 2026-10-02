@@ -35,8 +35,7 @@ public sealed partial class MenuTour : Node
             await Shot("m01_title", 1.5);
             menu.Open("create_character");
             await Shot("m02_create_character", 2.5);
-            var look = new Appearance { Body = "female", HairStyle = "ponytail", HairColor = "#c89050", ShirtColor = "#c04040", PantsColor = "#303038" };
-            menu.CreateAndSelectCharacter("Tour Hero", look);
+            await CreateRandomCharacter(menu, "Tour Hero");
             menu.Open("characters");
             await Shot("m03_characters", 2.5);
             menu.Open("create_world");
@@ -72,6 +71,29 @@ public sealed partial class MenuTour : Node
             GD.PrintErr($"MENU FAIL {ex}");
             GetTree().Quit(1);
         }
+    }
+
+    /// <summary>Drives the creator's rows like a player: Randomize, a non-default clothing style, a name, Create.</summary>
+    private async Task CreateRandomCharacter(MainMenu menu, string name)
+    {
+        T Find<T>(string nodeName) where T : Node =>
+            menu.FindChild(nodeName, true, false) as T ?? throw new Exception($"creator row {nodeName} is missing");
+        if (System.IO.File.Exists(Core.Session.GameWorld.PlayerPath(MainMenu.PlayersDirectory, name)))
+            Core.Session.GameWorld.DeletePlayer(MainMenu.PlayersDirectory, name);
+        Find<Button>("Randomize").EmitSignal(BaseButton.SignalName.Pressed);
+        await Shot("m02b_randomized", 1.0);
+        var clothing = Find<OptionButton>("ClothingStyle");
+        int style = clothing.Selected == 0 ? 1 + (int)(Time.GetTicksMsec() % 2) : clothing.Selected;
+        clothing.Select(style);
+        clothing.EmitSignal(OptionButton.SignalName.ItemSelected, style);
+        var field = Find<LineEdit>("NameField");
+        field.Text = name;
+        field.EmitSignal(LineEdit.SignalName.TextChanged, name);
+        await Shot("m02c_creator_rows", 2.0);
+        Find<Button>("Create").EmitSignal(BaseButton.SignalName.Pressed);
+        var saved = menu.SelectCharacter(name) ?? throw new Exception("the Create button saved no character");
+        if (saved.Look.ClothingStyle == Appearance.ClothingStyles[0]) throw new Exception("the created character kept the default clothing");
+        GD.Print($"[menu-tour] created {name}: {saved.Look.Body} {saved.Look.HairStyle} {saved.Look.ClothingStyle} eyes {saved.Look.EyeColor}");
     }
 
     private static TabContainer? FindTabs(Node node)

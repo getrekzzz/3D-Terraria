@@ -74,6 +74,10 @@ public sealed partial class MainMenu : CanvasLayer
         _character = SaveCatalog.Characters(PlayersDirectory).Find(c => c.Name == name);
     }
 
+    /// <summary>Selects a saved character by name and returns it, or null when none has that name (automated tours).</summary>
+    public CharacterEntry? SelectCharacter(string name) =>
+        _character = SaveCatalog.Characters(PlayersDirectory).Find(c => c.Name == name);
+
     /// <summary>Creates a world synchronously and returns its directory (automated tours).</summary>
     public string CreateWorldNow(Strata.Core.World.WorldSettings settings)
     {
