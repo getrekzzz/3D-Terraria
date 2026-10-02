@@ -561,3 +561,14 @@ for the ground; teleports under 0.3 s don't flash it) are added in `WorldLaunche
 former and saves it. Command `hint [list|reset|show <id>|due <id>|on|off]`; probes `hints.shown`,
 `hints.enabled`, `hint.<id>[.due]`. Not yet: rows in the settings screen (sequenced with P2-30), the menu's own
 "Generating world..." overlay has no tip (MainMenu is integration-owned), the Guide book pages (P5-30).
+
+## Guide crafting help, Core part (P5-14)
+
+`RecipeLookup` (`GameWorld.RecipeLookup`, over the `RecipeBook` indexes): `Making(item)` / `Using(item)` →
+`RecipeView` (output, count, `IngredientView`s labelled "Any Wood" for groups, station names from `StationNames`,
+condition text, `StationLine` "Required objects: Iron Anvil or Lead Anvil"), `StationFor(item)` (recipes a placed
+item serves as station); views are cached per recipe and thread-safe. `ConditionDescriber` turns every condition
+type into English ("at night", "after the Eye of Cthulhu is defeated", "during a Blood Moon", "The Merchant lives in
+town", "carrying 50 silver"); unknown types read as their name. `TownCommerce.RecipesUsing` now reads the index.
+Not yet: the Guide's TownDialog slot panel (GuideCraftPanel, `ui guide_craft`) waits for the W4 TownDialog; the
+Guide book's Items tab shows the same views.

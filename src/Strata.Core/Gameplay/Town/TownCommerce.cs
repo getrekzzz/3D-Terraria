@@ -203,12 +203,9 @@ public sealed class TownCommerce
         return true;
     }
 
-    /// <summary>Recipes that use an item (the guide's crafting help), as output item names with their stations.</summary>
-    public List<RecipeDef> RecipesUsing(ItemDef item)
-    {
-        var groups = Content.RecipeGroups.All.Where(g => g.Items.Contains(item.Id)).Select(g => g.Id).ToHashSet();
-        return Content.Recipes.All.Where(r => r.Inputs.Any(i => i.Item == item.Id || (i.Group != null && groups.Contains(i.Group)))).ToList();
-    }
+    /// <summary>Recipes that use an item (the guide's crafting help). Kept for the current TownDialog until the W4 dialog
+    /// shows <see cref="Crafting.RecipeLookup"/> views; now answered from the recipe book's ingredient index.</summary>
+    public List<RecipeDef> RecipesUsing(ItemDef item) => _world.Recipes.RecipesUsing(item).Select(r => r.Def).ToList();
 
     private ICondition Condition(TypedSpec[] specs)
     {

@@ -8,9 +8,13 @@ public sealed partial class GameWorld
 {
     private RecipeBook? _recipes;
     private ProgressionAdvisor? _advisor;
+    private RecipeLookup? _recipeLookup;
 
     /// <summary>Every recipe, compiled once (shared by the crafting menu, commands and the guide).</summary>
     public RecipeBook Recipes => _recipes ??= new RecipeBook(Session.Content);
+
+    /// <summary>Readable recipe views (ingredients, named stations, conditions) for the Guide; built on first use.</summary>
+    public RecipeLookup RecipeLookup => _recipeLookup ??= new RecipeLookup(Recipes, Session.Content);
 
     /// <summary>Records what each player sees, kills, catches, meets, obtains and crafts.</summary>
     public JournalSystem Journal { get; }
