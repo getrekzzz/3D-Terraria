@@ -5169,6 +5169,62 @@
    "kind": "town_goods",
    "stage": "early",
    "source": "zoologist"
+  },
+  {
+   "id": "terraria:forest_pylon",
+   "name": "Forest Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:snow_pylon",
+   "name": "Snow Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:desert_pylon",
+   "name": "Desert Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:jungle_pylon",
+   "name": "Jungle Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:ocean_pylon",
+   "name": "Ocean Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:mushroom_pylon",
+   "name": "Mushroom Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:hallow_pylon",
+   "name": "Hallow Pylon",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "any resident"
+  },
+  {
+   "id": "terraria:cavern_pylon",
+   "name": "Cavern Pylon",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "any resident"
   }
  ]
 }

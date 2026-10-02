@@ -123,6 +123,9 @@ public sealed class ItemSourceIndex
                 foreach (var id in t.Banner.Enemies)
                     if (db.Enemies.TryGet(id, out var enemy))
                         index.Add(t.PlacingItemId, new(ItemSourceKind.Drop, enemy, null, 1, 1, Array.Empty<TypedSpec>()));
+            // Biome pylons are sold by any content resident living in their biome (Gameplay/Town/PylonNetwork).
+            if (t.PlacingItemId != null && t.HasTag("pylon"))
+                index.Add(t.PlacingItemId, new(ItemSourceKind.Shop, null, "pylon", 1, 1, Array.Empty<TypedSpec>()));
         }
         // A bug net turns critters into their catch items.
         foreach (var e in db.Enemies.All)

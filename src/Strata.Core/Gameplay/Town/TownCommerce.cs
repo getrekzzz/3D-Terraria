@@ -105,6 +105,10 @@ public sealed class TownCommerce
                 ? new ShopOffer(item, Math.Max(1, e.Price ?? 1), Content.Items.Get(cur))
                 : new ShopOffer(item, Math.Max(1, (long)MathF.Round((e.Price ?? item.Value) * factor))));
         }
+        // Terraria: a content resident with a neighbour also sells their biome's pylon (shop tab).
+        if (tab == ShopTabs.Shop && npc.Def.Kind == TownNpcKind.Resident && _town.Pylons.ForSale(npc, ctx, factor) is { } pylon
+            && Content.Items.TryGet(pylon.Item ?? pylon.Id, out var pylonItem) && !offers.Exists(o => o.Item == pylonItem))
+            offers.Add(new ShopOffer(pylonItem, Math.Max(1, (long)MathF.Round(_town.Config.Pylons.Price * factor))));
         return offers;
     }
 

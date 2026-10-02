@@ -762,3 +762,17 @@ refused ("This license has already been used.") and kept. The Zoologist sells th
 `Petted` event drives `game/Entities/TownPetHearts` (pooled heart sprites, sfx `pet`). Models from
 `tools/blender/bgen/town_pets.py` (one quadruped rig, walk/idle/sit/lie). Gaps: no player petting arm pose; pets use
 the humanoid nav agent and box.
+
+## Biome pylons (P5-34)
+
+Eight pylon tile objects (`data/tileobjects/pylons.json`, tag `pylon`, `bgen/pylons.py`). `TownSystem.Pylons`
+(`PylonNetwork`, rules in `data/config/town.json` "pylons", defaults in `PylonConfig`) decides: a housed resident whose
+happiness price factor is at most `maxFactor` (content or better) and who has another resident within
+`neighbourRadius` sells the pylon of their home's biome (rules in order, specific biomes before the forest; the Cavern
+Pylon anywhere below the surface) for 10 gold scaled by happiness, appended by `TownCommerce.Stock`. A pylon works
+with `minResidents` residents within `activeRadius`; `Teleport(player, pylon)` needs a working pylon within
+`useRadius` of the player and a working destination, and puts the player on a standable node beside it. The world
+map marks pylons (`game/UI/PylonMap.cs`) and a click on one travels there; commands `town pylons`, `town pylon <n>`;
+probes `town.pylons`, `town.pylon_teleports`. Item sources list pylons as "Sold by content residents living in its
+biome". Gaps: the one-of-each-type placement limit and Terraria's "no bosses or invasions nearby" rule are not
+enforced; no Universal Pylon.

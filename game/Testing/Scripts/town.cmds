@@ -153,3 +153,11 @@ assert flag.license_cat == 1
 town summon town_cat 2 0 0
 assert town.town_cat == 1
 assert errors == 0
+
+# --- P5-34 ---
+# Pylons are placeable items; the network lists them (none placed in the smoke world).
+give forest_pylon
+assert inv.forest_pylon == 1
+town pylons
+assert town.pylons == 0
+assert errors == 0

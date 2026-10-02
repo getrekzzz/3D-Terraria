@@ -32,13 +32,14 @@ public sealed partial class WorldMapScreen : CanvasLayer
         _view.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _view.Initialize(ui.Game.Session.Content);
         _view.Markers = () => Markers(ui);
+        _view.Clicked += at => PylonMap.TryTeleport(_ui, _view, at, () => SetOpen(false));
         _root.AddChild(_view);
         _title = new Label { Position = new Vector2(24, 18), Theme = UiTheme.Theme };
         _title.AddThemeFontSizeOverride("font_size", 22);
         _root.AddChild(_title);
         var help = new Label
         {
-            Text = "Drag to move · wheel to zoom · U surface / caves · C centre on you · M or Esc to close",
+            Text = "Drag to move · wheel to zoom · click a pylon to travel · U surface / caves · C centre on you · M or Esc to close",
             Theme = UiTheme.Theme,
         };
         help.AddThemeFontSizeOverride("font_size", 15);
@@ -106,6 +107,7 @@ public sealed partial class WorldMapScreen : CanvasLayer
         yield return new MapMarker(new Vector2(spawn.X, spawn.Z) / ExploredMap.CellsPerPixel, new Color(0.35f, 0.9f, 0.4f), "Spawn", Size: 4f);
         if (ui.Entity.State.SpawnPoints.TryGetValue(session.Settings.Name, out var bed) && bed.Length == 3)
             yield return new MapMarker(new Vector2(bed[0], bed[2]) / ExploredMap.CellsPerPixel, new Color(0.4f, 0.65f, 1f), "Bed", Size: 4f);
+        foreach (var m in PylonMap.Markers(ui)) yield return m;
         foreach (var r in ui.Game.Town.Residents)
             if (r.Alive) yield return new MapMarker(new Vector2(r.Position.X, r.Position.Z) / perPixel, new Color(1f, 0.92f, 0.75f), r.Title, Size: 3.5f);
         var p = ui.Entity.Position;

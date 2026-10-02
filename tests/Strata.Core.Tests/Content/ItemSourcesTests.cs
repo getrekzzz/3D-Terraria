@@ -53,7 +53,7 @@ public class ItemSourcesTests
         Assert.NotEmpty(gained);
         // Visitors' rotating pools (P5-19) were not read by the old check.
         Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward
-            || (s.Kind == ItemSourceKind.Shop && s.Owner is TownNpcDef { Visit: not null })
+            || (s.Kind == ItemSourceKind.Shop && (s.Owner is TownNpcDef { Visit: not null } || s.Label == "pylon"))
             || (s.Kind == ItemSourceKind.Drop && db.TileObjects.TryGet(id, out var t) && t.Banner != null)));
     }
 

@@ -9,6 +9,20 @@
   // neighbours; radii in metres (25 and 120 tiles); more than crowdLimit near neighbours cost crowdStep each.
   "happiness": { "love": 0.88, "like": 0.94, "dislike": 1.06, "hate": 1.12, "nearRadius": 12.5, "farRadius": 60, "verticalCap": 15,
     "crowdLimit": 3, "crowdStep": 0.05, "solitudeNear": 2, "solitudeFar": 4, "solitude": 0.95, "homeless": 1.1 },
+  // Biome pylons (Gameplay/Town/PylonNetwork, P5-34): a resident content or happier (price factor <= maxFactor) with
+  // another resident within neighbourRadius sells the pylon of the biome their home is in (10 gold before happiness).
+  // A pylon works with 2+ residents within activeRadius; the player teleports from within useRadius of a working one.
+  "pylons": { "price": 100000, "maxFactor": 1.0, "neighbourRadius": 12.5, "activeRadius": 40, "minResidents": 2, "useRadius": 30,
+    "rules": [
+      { "object": "hallow_pylon", "biome": "hallow" },
+      { "object": "mushroom_pylon", "biome": "mushroom" },
+      { "object": "jungle_pylon", "biome": "jungle" },
+      { "object": "desert_pylon", "biome": "desert" },
+      { "object": "snow_pylon", "biome": "tundra" },
+      { "object": "ocean_pylon", "biome": "ocean" },
+      { "object": "forest_pylon", "biome": "forest" },
+      { "object": "cavern_pylon", "layer": "underground" }
+    ] },
   "minPriceFactor": 0.75,
   "maxPriceFactor": 1.5,
   "sellRatio": 0.2,

@@ -77,5 +77,13 @@ bone_arrow|Bone Arrow|early|skeleton merchant
 license_cat|Cat License|early|zoologist
 license_dog|Dog License|early|zoologist
 license_bunny|Bunny License|early|zoologist
+forest_pylon|Forest Pylon|early|any resident
+snow_pylon|Snow Pylon|early|any resident
+desert_pylon|Desert Pylon|early|any resident
+jungle_pylon|Jungle Pylon|early|any resident
+ocean_pylon|Ocean Pylon|early|any resident
+mushroom_pylon|Mushroom Pylon|early|any resident
+hallow_pylon|Hallow Pylon|hardmode|any resident
+cavern_pylon|Cavern Pylon|early|any resident
 """,
 }

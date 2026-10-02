@@ -6,7 +6,7 @@ namespace Strata.Core.Commands;
 /// </summary>
 internal static class TownDebugCommands
 {
-    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | visit <id> | leave <id>";
+    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | visit <id> | leave <id> | pylons | pylon <n>";
 
     public static CommandResult? TryRun(CommandContext ctx, CommandArgs a)
     {
@@ -41,6 +41,17 @@ internal static class TownDebugCommands
             case "leave":
                 var leaving = TownCommands.Resident(ctx, a);
                 return town.SendAway(leaving) ? CommandResult.Success($"{leaving.Title} is leaving.") : CommandResult.Fail($"{leaving.Title} is not a visitor.");
+            case "pylons":
+                var all = town.Pylons.All();
+                return CommandResult.Success(all.Count == 0 ? "No pylons placed." : string.Join("; ", all.Select((o, i) =>
+                    $"{i + 1}: {o.DisplayName} at {o.Anchor} ({(town.Pylons.IsActive(o) ? "working" : "needs residents")})")));
+            case "pylon":
+                var pylons = town.Pylons.All();
+                int n = a.Int(1, "n");
+                if (n < 1 || n > pylons.Count) return CommandResult.Fail($"pylon must be 1..{pylons.Count}");
+                var to = pylons[n - 1];
+                var r = town.Pylons.Teleport(ctx.Player, to);
+                return r == Gameplay.Town.PylonTeleport.Teleported ? CommandResult.Success($"Teleported to the {to.DisplayName}.") : CommandResult.Fail(r.ToString());
             default:
                 return null;
         }

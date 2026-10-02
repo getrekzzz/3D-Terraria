@@ -90,7 +90,7 @@ public sealed class GuideIndex
             ItemSourceKind.Object => "Breaking " + owner,
             ItemSourceKind.Block => "Mining " + owner,
             ItemSourceKind.Catch => "Catching " + owner,
-            ItemSourceKind.Shop => "Sold by the " + owner,
+            ItemSourceKind.Shop => s.Owner == null && s.Label == "pylon" ? "Sold by content residents living in its biome" : "Sold by the " + owner,
             ItemSourceKind.Fishing => "Fishing",
             ItemSourceKind.Opened => "Opening " + owner,
             ItemSourceKind.AnglerReward => "Angler quest reward",

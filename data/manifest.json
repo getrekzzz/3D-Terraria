@@ -85,6 +85,7 @@
     "tileobjects/dungeon.json",
     "tileobjects/furniture.json",
     "tileobjects/nature.json",
+    "tileobjects/pylons.json",
     "tileobjects/stations.json",
     "tileobjects/town_decor.json",
     "tileobjects/town_decor2.json",

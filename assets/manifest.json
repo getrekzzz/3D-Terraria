@@ -595,6 +595,12 @@
    ],
    "generator": "banner"
   },
+  "cavern_pylon": {
+   "models": [
+    "assets/models/objects/cavern_pylon_v0.glb"
+   ],
+   "generator": "pylon"
+  },
   "chaos_elemental_banner": {
    "models": [
     "assets/models/objects/chaos_elemental_banner_v0.glb"
@@ -798,6 +804,12 @@
     "assets/models/objects/desert_chest_v0.glb"
    ],
    "generator": "chest"
+  },
+  "desert_pylon": {
+   "models": [
+    "assets/models/objects/desert_pylon_v0.glb"
+   ],
+   "generator": "pylon"
   },
   "destroyer_trophy": {
    "models": [
@@ -1116,6 +1128,12 @@
     "assets/models/objects/flying_snake_banner_v0.glb"
    ],
    "generator": "banner"
+  },
+  "forest_pylon": {
+   "models": [
+    "assets/models/objects/forest_pylon_v0.glb"
+   ],
+   "generator": "pylon"
   },
   "frankenstein_banner": {
    "models": [
@@ -1523,6 +1541,12 @@
    ],
    "generator": "vase"
   },
+  "hallow_pylon": {
+   "models": [
+    "assets/models/objects/hallow_pylon_v0.glb"
+   ],
+   "generator": "pylon"
+  },
   "hallowed_chest": {
    "models": [
     "assets/models/objects/hallowed_chest_v0.glb"
@@ -1642,6 +1666,12 @@
     "assets/models/objects/jungle_chest_v0.glb"
    ],
    "generator": "chest"
+  },
+  "jungle_pylon": {
+   "models": [
+    "assets/models/objects/jungle_pylon_v0.glb"
+   ],
+   "generator": "pylon"
   },
   "jungle_slime_banner": {
    "models": [
@@ -2197,6 +2227,12 @@
    ],
    "generator": "furniture_piece"
   },
+  "mushroom_pylon": {
+   "models": [
+    "assets/models/objects/mushroom_pylon_v0.glb"
+   ],
+   "generator": "pylon"
+  },
   "mushroom_sofa": {
    "models": [
     "assets/models/objects/mushroom_sofa_v0.glb"
@@ -2361,6 +2397,12 @@
     "assets/models/objects/obsidian_workbench_v0.glb"
    ],
    "generator": "furniture_piece"
+  },
+  "ocean_pylon": {
+   "models": [
+    "assets/models/objects/ocean_pylon_v0.glb"
+   ],
+   "generator": "pylon"
   },
   "orichalcum_anvil": {
    "models": [
@@ -3060,6 +3102,12 @@
     "assets/models/objects/snow_flinx_banner_v0.glb"
    ],
    "generator": "banner"
+  },
+  "snow_pylon": {
+   "models": [
+    "assets/models/objects/snow_pylon_v0.glb"
+   ],
+   "generator": "pylon"
   },
   "snowman_gangsta_banner": {
    "models": [
@@ -4427,6 +4475,10 @@
    "object": "cave_bat_banner",
    "icon": "assets/icons/items/cave_bat_banner.png"
   },
+  "cavern_pylon": {
+   "object": "cavern_pylon",
+   "icon": "assets/icons/items/cavern_pylon.png"
+  },
   "celestial_emblem": {
    "model": "assets/models/items/celestial_emblem.glb",
    "icon": "assets/icons/items/celestial_emblem.png"
@@ -5180,6 +5232,10 @@
    },
    "icon": "assets/icons/items/desert_key.png"
   },
+  "desert_pylon": {
+   "object": "desert_pylon",
+   "icon": "assets/icons/items/desert_pylon.png"
+  },
   "desert_tiger_staff": {
    "model": "assets/models/items/desert_tiger_staff.glb",
    "sockets": {
@@ -5702,6 +5758,10 @@
    "object": "flying_snake_banner",
    "icon": "assets/icons/items/flying_snake_banner.png"
   },
+  "forest_pylon": {
+   "object": "forest_pylon",
+   "icon": "assets/icons/items/forest_pylon.png"
+  },
   "frankenstein_banner": {
    "object": "frankenstein_banner",
    "icon": "assets/icons/items/frankenstein_banner.png"
@@ -6217,6 +6277,10 @@
    "model": "assets/models/items/guide_voodoo_doll.glb",
    "icon": "assets/icons/items/guide_voodoo_doll.png"
   },
+  "hallow_pylon": {
+   "object": "hallow_pylon",
+   "icon": "assets/icons/items/hallow_pylon.png"
+  },
   "hallowed_bar": {
    "model": "assets/models/items/hallowed_bar.glb",
    "icon": "assets/icons/items/hallowed_bar.png"
@@ -6657,6 +6721,10 @@
    "model": "assets/models/items/jungle_pants.glb",
    "armor": "jungle_armor",
    "icon": "assets/icons/items/jungle_pants.png"
+  },
+  "jungle_pylon": {
+   "object": "jungle_pylon",
+   "icon": "assets/icons/items/jungle_pylon.png"
   },
   "jungle_shirt": {
    "model": "assets/models/items/jungle_shirt.glb",
@@ -7449,6 +7517,10 @@
    "object": "mushroom_platform",
    "icon": "assets/icons/items/mushroom_platform.png"
   },
+  "mushroom_pylon": {
+   "object": "mushroom_pylon",
+   "icon": "assets/icons/items/mushroom_pylon.png"
+  },
   "mushroom_sofa": {
    "object": "mushroom_sofa",
    "icon": "assets/icons/items/mushroom_sofa.png"
@@ -7819,6 +7891,10 @@
   "ocean_crate": {
    "model": "assets/models/items/ocean_crate.glb",
    "icon": "assets/icons/items/ocean_crate.png"
+  },
+  "ocean_pylon": {
+   "object": "ocean_pylon",
+   "icon": "assets/icons/items/ocean_pylon.png"
   },
   "orange_dye": {
    "model": "assets/models/items/orange_dye.glb",
@@ -9263,6 +9339,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/snow_globe.png"
+  },
+  "snow_pylon": {
+   "object": "snow_pylon",
+   "icon": "assets/icons/items/snow_pylon.png"
   },
   "snowman_cannon": {
    "model": "assets/models/items/snowman_cannon.glb",
