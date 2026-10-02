@@ -44,7 +44,13 @@
   it. Core decides anchor, state and `PullVelocity` (towards the anchor at the hook's pull speed, hanging within
   1.1 m); the engine body (`PlayerEntity.HasBody`) advances the hook in `_PhysicsProcess` and applies the pull, while
   `GameWorld` ticks it for bodiless (headless, test) players. Death, teleports and recalls put the hook away; nothing
-  is thrown from a minecart, and riding one or phasing lets go of a hook that is out.
+  is thrown from a minecart, and riding one or phasing lets go of a hook that is out. `GrappleVisual` draws the chain
+  from the drawn (interpolated) hand and moves the claw from the voxel hit onto the rendered surface: one physics ray
+  across the struck face (terrain, platform and object colliders, ±0.6 m) when a throw starts and when it latches, kept
+  only within 0.5 m and eased on over the head's last metre of flight (probe `player.hook_snap`, -1 when nothing was
+  found, e.g. a canopy). The third-person body throws a clicked hook with the `thrust` clip. `movement.cmds` covers the
+  key, the click, a crisp slab, a natural (smooth-meshed, `fill … natural`) sloped ceiling that must stay latched while
+  reeling in, a broken anchor and platforms.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor
@@ -56,6 +62,26 @@
   (item reach plus the Reach stat) bounds both the use and the in-reach highlight. `PlayerEntity.ViewDirection`
   (camera forward) feeds `Facing`, which drives `FacingQuarter` and the melee arc yaw; `Aim` (eye to crosshair
   point) keeps the pitch, shots and drops.
+* **View ray and facing (engine)** — each physics tick `InteractionController.UpdateTarget` casts the view ray (from
+  `CameraRig.ViewOrigin`, the camera without its screenshot orbit, along `CameraRig.Forward`) twice with
+  `Targeting.CastView`: reach + 2 m with the held item's `FilterFor` filter gives `Target` (`InReach` when its eye
+  distance is within reach), and 60 m with `TargetFilter.None` gives the crosshair point (terrain, trunks and
+  furniture, or 60 m out) that sets `Aim` and `AimDistance`, so shots converge on what the crosshair rests on at any
+  range. Smart digging may still swap in the cell under the feet. In third person the body always faces the camera's yaw: the chest, arms and head stay on the
+  crosshair while the legs strafe or backpedal (`BodyFacing`, see rendering.md, Creature animation), and the swing
+  trail, like the melee arc, is centred on `Facing`. Probes: `target.front` (1 when the target is not behind the
+  eye along `Facing`), `target.dist`, `player.aim_distance`.
+* **Entity picking (crosshair names)** — `EntityPicking.Pick` (Core) finds the creature or town resident the view
+  ray enters first between the eye's plane and the terrain the crosshair rests on (so walls hide names), up to 60 m:
+  a slab test against each live creature's padded volumes (`Npc.VolumeCount`/`VolumeAt`, the allocation-free form of
+  `Volumes()`: the body, then each worm segment, which resolves to its worm) and each live resident's body. It
+  allocates nothing per tick. `InteractionController.Hovered` holds the pick; the crosshair point moves onto it (at
+  least a metre past the eye's plane), and a hovered resident within `TownConfig.TalkRange` is the `TalkTarget`
+  right-click talks to. `EntityPicking.Describe` gives the label: a boss's title, a creature's name or a resident's
+  title ("Andrew the Guide") with its life; the HUD's `TargetLabel` shows it at any distance ("Blue Slime 25/25",
+  tinted by life, bosses in the boss bar's red), else the block or object in reach, rebuilding its text only when
+  that changes. Probes: `hover.npc`, `hover.resident`, `hover.talk`, `hover.<enemy id>`, `hud.target_name`,
+  `hud.target_name.<words>` (the label in snake case contains them), `ui.talk_open`.
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback

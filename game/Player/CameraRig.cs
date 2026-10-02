@@ -5,10 +5,12 @@ using Strata.Game.World;
 namespace Strata.Game.Player;
 
 /// <summary>
-/// Over-the-shoulder third-person camera and a first-person mode. Mouse look drives yaw/pitch; the player body does not
-/// rotate with the camera (the model faces the aim). The camera is kept out of terrain every rendered frame with a
-/// sphere cast from the head to the shoulder and on to the camera, so turning quickly can never swing it through the
-/// ground (a physics-tick spring arm lags the view by up to a tick). Collisions pull it in at once; it eases back out.
+/// Over-the-shoulder third-person camera and a first-person mode. Mouse look drives yaw/pitch; the third-person body
+/// faces the camera's <see cref="Yaw"/> (its chest is always on the crosshair, see PlayerAvatar.Motion), and the
+/// crosshair ray runs from <see cref="ViewOrigin"/> along <see cref="Forward"/>. The camera is kept out of terrain every
+/// rendered frame with a sphere cast from the head to the shoulder and on to the camera, so turning quickly can never
+/// swing it through the ground (a physics-tick spring arm lags the view by up to a tick). Collisions pull it in at
+/// once; it eases back out.
 /// </summary>
 public sealed partial class CameraRig : Node3D
 {
@@ -46,6 +48,15 @@ public sealed partial class CameraRig : Node3D
     public float Orbit { get; set; }
 
     public float Pitch => _pitch;
+
+    /// <summary>The view's yaw (radians, Godot convention: 0 looks along −Z, + turns left): where the body faces.</summary>
+    public float Yaw => Mathf.Wrap(_yaw, -Mathf.Pi, Mathf.Pi);
+
+    /// <summary>
+    /// Where the crosshair ray starts: the camera as placed this frame, but un-swung by <see cref="Orbit"/>, so orbiting
+    /// for a screenshot changes neither the target nor the aim. The eye in first person.
+    /// </summary>
+    public Vector3 ViewOrigin => GlobalTransform * (_pivot.Position + new Vector3(0, 0, _current));
 
     public void Initialize(CharacterBody3D body)
     {

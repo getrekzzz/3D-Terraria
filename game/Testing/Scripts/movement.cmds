@@ -14,11 +14,28 @@ fill -4 16 -4 4 17 4 stone
 wait 1.0
 assert player.on_floor == 1
 
-# The hook flies up, latches onto the ceiling and reels the player in; jumping lets go.
+# The hook flies up, latches onto the ceiling (its claw on the slab's face) and reels the player in; jumping lets go.
 give grappling_hook 1
 mark
 aim 0 1 0
 hold grapple 0.05
+wait 0.2
+assert player.hook >= 1
+wait 1.5
+assert player.hook == 2
+assert player.from_mark > 4
+assert player.hook_snap >= 0
+assert player.hook_snap < 0.05
+hold jump 0.05
+wait 2.5
+assert player.on_floor == 1
+assert player.hook == 0
+
+# Clicking with the hook held throws it too, and jumping lets go of that one as well.
+wield grappling_hook
+mark
+aim 0 1 0
+hold use_primary 0.05
 wait 0.2
 assert player.hook >= 1
 wait 1.5
@@ -29,22 +46,71 @@ wait 2.5
 assert player.on_floor == 1
 assert player.hook == 0
 
-# Clicking with the hook held throws it too; breaking the anchor block lets go (offsets follow the reeled-in body).
-wield grappling_hook
+# Natural terrain: a stepped ceiling filled unflagged meshes smooth like generated rock, so its rendered surface sits off
+# the cell grid. The hook thrown at its slope latches (its claw moved onto that surface) and stays latched while it
+# reels the player in.
+fill -6 16 -6 6 17 6 air
+fill -5 14 -5 5 15 5 stone natural
+fill -3 13 -3 3 13 3 stone natural
+fill -1 12 -1 1 12 1 stone natural
+wait 1.0
 mark
-aim 0 1 0
-hold use_primary 0.05
-wait 0.2
-assert player.hook >= 1
-wait 1.5
+aim 0.35 1 0.2
+hold grapple 0.05
+wait 1.8
 assert player.hook == 2
-assert player.from_mark > 4
-fill -10 0 -10 10 8 10 air
+wait 1.0
+assert player.hook == 2
+assert player.from_mark > 3
+assert player.hook_snap >= 0
+
+# Breaking the anchor lets go (offsets follow the reeled-in body: the box covers the ceiling, not the floor).
+fill -10 -4 -10 10 12 10 air
 wait 0.3
 assert player.hook != 2
 wait 2.5
 assert player.on_floor == 1
 assert player.hook == 0
+
+# Platforms hold a hook too; jumping lets go and the player drops back to the floor. The hook flies where the
+# crosshair points, and the third-person crosshair ray is offset from the eye by the shoulder camera, so the
+# platform patch is wide enough (5x5 cells) to be hit whichever way the camera faces.
+setblock -2 12 -2 wood platform
+setblock -2 12 -1 wood platform
+setblock -2 12 0 wood platform
+setblock -2 12 1 wood platform
+setblock -2 12 2 wood platform
+setblock -1 12 -2 wood platform
+setblock -1 12 -1 wood platform
+setblock -1 12 0 wood platform
+setblock -1 12 1 wood platform
+setblock -1 12 2 wood platform
+setblock 0 12 -2 wood platform
+setblock 0 12 -1 wood platform
+setblock 0 12 0 wood platform
+setblock 0 12 1 wood platform
+setblock 0 12 2 wood platform
+setblock 1 12 -2 wood platform
+setblock 1 12 -1 wood platform
+setblock 1 12 0 wood platform
+setblock 1 12 1 wood platform
+setblock 1 12 2 wood platform
+setblock 2 12 -2 wood platform
+setblock 2 12 -1 wood platform
+setblock 2 12 0 wood platform
+setblock 2 12 1 wood platform
+setblock 2 12 2 wood platform
+wait 0.5
+aim 0 1 0
+hold grapple 0.05
+wait 1.5
+assert player.hook == 2
+assert player.hook_snap >= 0
+hold jump 0.05
+wait 2.5
+assert player.on_floor == 1
+assert player.hook == 0
+fill -4 8 -4 4 16 4 air
 
 # Rocket boots burn while jump is held in the air, and refill on landing.
 equip rocket_boots

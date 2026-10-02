@@ -1,0 +1,29 @@
+{
+ "id": "X-09",
+ "title": "Character creator depth",
+ "owner_session": "art",
+ "player_outcome": "Character creation like Terraria 1.4: eye colour, undershirt/shirt/pants/shoe colours and clothing styles, more hair styles (20+), accessories at creation, a randomize button and a live rotating preview.",
+ "design": [
+  "Gameplay/Player/Appearance.cs gains eye colour, undershirt colour, clothing style index; tools/blender human generator exports more hair styles and clothing style variants (reuse the hat/clothing system); MainMenu.Characters UI rows (themed with P2 UI \u2014 merge origin/claude/clever-goodall-kgex45 after its UI wave push before touching menus); old character saves default the new fields.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Player/Appearance.cs",
+  "game/Menu/MainMenu.Characters.cs",
+  "game/Player/CharacterMaterials.cs",
+  "tools/blender/bgen/human/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "AppearanceTests (save compat)"
+ ],
+ "verification": [
+  "menu tour creates a randomised character"
+ ],
+ "depends_on": [
+  "P2-30"
+ ],
+ "risks": [],
+ "effort": "M"
+}

@@ -1,0 +1,29 @@
+{
+ "id": "X-10",
+ "title": "Onboarding hints and loading tips",
+ "owner_session": "npcs",
+ "player_outcome": "New players are guided like a modern game: unobtrusive contextual hints ('Hold LMB to chop the tree', 'Night is coming \u2014 build a shelter', 'Place a torch', 'Talk to the Guide'), first-boss and progression nudges that link into the Guide book, and loading-screen tips; all can be turned off.",
+ "design": [
+  "Core HintDirector driven by milestones/journal (P5-25) and the progression advisor (P5-27); data/hints.json; game/UI hint toast layer (theme); loading tips on world load screen; setting to disable.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/GameWorld.Milestones.cs",
+  "game/UI/*",
+  "data/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "HintDirectorTests"
+ ],
+ "verification": [
+  "ui.cmds probe hints.shown"
+ ],
+ "depends_on": [
+  "P5-25",
+  "P5-27"
+ ],
+ "risks": [],
+ "effort": "M"
+}

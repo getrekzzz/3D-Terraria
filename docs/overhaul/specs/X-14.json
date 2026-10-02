@@ -1,0 +1,29 @@
+{
+ "id": "X-14",
+ "title": "Mounts: Slimy Saddle, Fuzzy Carrot, Honeyed Goggles and flying mounts",
+ "owner_session": "world",
+ "player_outcome": "Mounts like Terraria: the Slimy Saddle (bouncy slime mount, from King Slime), Fuzzy Carrot (fast bunny), Honeyed Goggles (bee, flying, from Queen Bee), and hardmode flying mounts (e.g. Cosmic Car Key UFO); mounted movement, animations, mount slot use and a quick-mount key.",
+ "design": [
+  "Core mount framework generalised from Gameplay/Mounts/Minecart.cs (data-driven MountDef: speed, jump, flight time, gravity, bounce), mount buff, mount slot (P2-05 EquippedMount; merge origin/claude/clever-goodall-kgex45 after its W3 push before starting), player controller integration in a new PlayerController.Mounts partial, mount models (Blender) and rider pose, drops added to boss loot (coordinate: add to data files with one entry per line).",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Mounts/*",
+  "game/Player/PlayerController.Ride.cs",
+  "data/items/*",
+  "tools/blender/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "MountTests"
+ ],
+ "verification": [
+  "movement.cmds mounts the Slimy Saddle and jumps higher"
+ ],
+ "depends_on": [
+  "P2-05"
+ ],
+ "risks": [],
+ "effort": "L"
+}
