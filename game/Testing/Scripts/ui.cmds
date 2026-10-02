@@ -895,6 +895,7 @@ wait 0.2
 assert layout.overlaps == 0
 ui close
 wait 0.2
+town dismiss merchant
 town summon merchant 0 0 -2
 wait 0.3
 ui talk merchant
@@ -925,6 +926,7 @@ god on
 spawning off
 killall
 clear
+town dismiss goblin_tinkerer
 town summon goblin_tinkerer 0 0 -3
 give copper_broadsword 1
 give wood 5
