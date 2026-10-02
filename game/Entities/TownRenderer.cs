@@ -73,16 +73,20 @@ public sealed partial class TownRenderer : Node3D
         if (visual == null) return null;
         AddChild(visual);
         visual.SetTint(Colors.White);
+        // A small name at one size on screen (about 16 px on a 900 px view), only near the resident: up close a
+        // world-sized tag grew into a huge label over the screen centre, where Terraria shows no name at all.
         var tag = new Label3D
         {
             Text = npc.Title,
             Font = UI.UiFonts.Bold,
             Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
-            PixelSize = 0.003f,
+            FixedSize = true,
+            PixelSize = 0.00065f,
             FontSize = 40,
             OutlineSize = 10,
             Modulate = new Color(0.85f, 0.95f, 1f),
             NoDepthTest = false,
+            VisibilityRangeEnd = 24f,
         };
         AddChild(tag);
         var pos = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
