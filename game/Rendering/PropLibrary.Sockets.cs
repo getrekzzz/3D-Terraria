@@ -34,6 +34,29 @@ public sealed partial class PropLibrary
         return _bounds.TryGetValue(projectPath, out var box) ? box : new Aabb();
     }
 
+    /// <summary>
+    /// A moving part of a model (a chest lid: a child mesh node the pipeline exports with its origin at the hinge,
+    /// tools/blender/bgen/mesh.py <c>part</c>) and its rest transform relative to the model's mesh, or null when the
+    /// model has none. Loads the model once.
+    /// </summary>
+    public (Mesh Mesh, Transform3D Hinge)? Part(string projectPath, string name, bool multimesh)
+    {
+        var key = (projectPath, multimesh);
+        if (!_parts.ContainsKey(key)) Model(projectPath, multimesh);
+        return _parts.TryGetValue(key, out var parts) && parts != null && parts.TryGetValue(name, out var part) ? part : null;
+    }
+
+    private readonly Dictionary<(string, bool), Dictionary<string, (Mesh, Transform3D)>?> _parts = new();
+
+    private void CollectParts((string Path, bool Custom) key, MeshInstance3D mesh, string path)
+    {
+        Dictionary<string, (Mesh, Transform3D)>? found = null;
+        foreach (var child in mesh.GetChildren())
+            if (child is MeshInstance3D part && part.Mesh != null)
+                (found ??= new())[part.Name] = (Retarget(part.Mesh, key.Custom, path), part.Transform);
+        _parts[key] = found;
+    }
+
     private void CollectSockets(string projectPath, MeshInstance3D mesh)
     {
         _bounds[projectPath] = mesh.Mesh.GetAabb();

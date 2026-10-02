@@ -32,6 +32,9 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     public bool IsOpen => _root.Visible;
 
+    /// <summary>A container's contents were shown (true) or put away (false); its lid follows.</summary>
+    public event Action<TileObjectInstance, bool>? ContainerShown;
+
     public void Initialize(UiContext ui)
     {
         _ui = ui;
@@ -166,6 +169,7 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         CloseContainer();
         _container = obj;
+        ContainerShown?.Invoke(obj, true);
         _containerInv = new Inventory(obj.Container!);
         _chestTitle.Text = obj.Def.DisplayName;
         for (int i = 0; i < obj.Container!.Length; i++) _chestGrid.AddChild(Slot(_containerInv, i, null, null, markChunk: true));
@@ -175,6 +179,7 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     private void CloseContainer()
     {
+        if (_container != null) ContainerShown?.Invoke(_container, false);
         _container = null;
         _containerInv = null;
         _chestPanel.Visible = false;

@@ -62,7 +62,11 @@ public sealed partial class TileObjectRenderer : Node3D
         Name = "TileObjects";
         var store = _game.Session.World.TileObjects;
         store.Added += o => Mark(ChunkOf(o), DirtyKind.Structure);
-        store.Removed += o => Mark(ChunkOf(o), DirtyKind.Structure);
+        store.Removed += o =>
+        {
+            Mark(ChunkOf(o), DirtyKind.Structure);
+            ForgetLid(o);
+        };
         _game.Interaction.StateChanged += o => Mark(ChunkOf(o), DirtyKind.Structure);
         // A remesh whose collision changed waits for the new bodies (placement rays hit them), so the chunk is
         // re-placed once; one with the same collision only changed light (or liquids).
@@ -92,6 +96,7 @@ public sealed partial class TileObjectRenderer : Node3D
 
     public override void _Process(double delta)
     {
+        AnimateLids(delta);
         if (_dirty.Count == 0) return;
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects");
         long start = System.Diagnostics.Stopwatch.GetTimestamp();

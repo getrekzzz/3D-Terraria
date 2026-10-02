@@ -127,7 +127,8 @@ def chest(mb: MeshBuilder, p, rng):
     body_h = h * 0.58
     mb.box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood)
     lid = [(-d * 0.4, 0), (d * 0.4, 0), (d * 0.38, h * 0.18), (d * 0.25, h * 0.3), (0, h * 0.36), (-d * 0.25, h * 0.3), (-d * 0.38, h * 0.18)]
-    mb.extrude_polygon(lid, w * 0.92, wood, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"))
+    # The lid is its own node hinged at the back top edge of the body (the game swings it open).
+    mb.part("lid", (0, -d * 0.4, body_h)).extrude_polygon(lid, w * 0.92, wood, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"))
     for x in (-w * 0.3, w * 0.3):
         mb.box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band)
     mb.box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"))

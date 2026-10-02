@@ -98,6 +98,7 @@ public sealed partial class PropLibrary
             {
                 result = Retarget(source.Mesh, key.Custom, path);
                 CollectSockets(key.Path, source);
+                CollectParts(key, source, path);
             }
             scene.Free();
         }

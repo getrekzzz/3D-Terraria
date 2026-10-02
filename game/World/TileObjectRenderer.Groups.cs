@@ -29,6 +29,7 @@ public sealed partial class TileObjectRenderer
         public bool Seen;
         public MultiMeshInstance3D? FlameNode;
         public readonly List<Vector3> FlameBases = new();
+        public LidPart? Lid;
     }
 
     private sealed class ChunkObjects
@@ -86,6 +87,7 @@ public sealed partial class TileObjectRenderer
                 var mesh = _props.Model(AssetPaths.ObjectModel(o.Def, o.Variant), multimesh: true);
                 if (mesh == null) continue;
                 state.Groups[key] = g = NewGroup(o.Def, mesh, visible);
+                AttachLid(g, o);
             }
             g.Seen = true;
             g.Objects.Add(o);
@@ -148,6 +150,7 @@ public sealed partial class TileObjectRenderer
         for (int o = used; count > 0 && o < b.Length; o += Stride) System.Array.Copy(b, used - Stride, b, o, Stride);
         g.Mesh.VisibleInstanceCount = count;
         RenderingServer.MultimeshSetBuffer(g.Mesh.GetRid(), b);
+        WriteLids(g);
     }
 
     /// <summary>Light-only refresh: rewrites the instances' light in the existing buffer.</summary>
@@ -156,6 +159,7 @@ public sealed partial class TileObjectRenderer
         var b = g.Buffer;
         for (int i = 0; i < g.Count; i++) WriteLightAt(b, i * Stride, g.Objects[i]);
         RenderingServer.MultimeshSetBuffer(g.Mesh.GetRid(), b);
+        WriteLidLight(g);
     }
 
     private void WriteLightAt(float[] b, int o, TileObjectInstance obj)
@@ -209,6 +213,7 @@ public sealed partial class TileObjectRenderer
         InstanceCount -= g.Count;
         g.Count = 0;
         g.Node.QueueFree();
+        g.Lid?.Node.QueueFree();
     }
 
     private static void SetVisible(ChunkObjects chunk, bool show)
@@ -216,6 +221,7 @@ public sealed partial class TileObjectRenderer
         foreach (var g in chunk.Groups.Values)
         {
             g.Node.Visible = show;
+            if (g.Lid != null) g.Lid.Node.Visible = show;
             if (g.FlameNode != null) g.FlameNode.Visible = show;
         }
     }

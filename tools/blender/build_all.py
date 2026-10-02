@@ -103,7 +103,8 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, it
         for slot in mb.materials:
             props.validate(slot)
         obj = mb.build(export.simple_material)
-        return obj, props, socket_gen.resolve(job["generator"], mb, job["params"], *mesh_bounds([obj]), held=held)
+        parts = mb.build_parts(export.simple_material, obj)  # moving parts (a chest lid) are children of obj
+        return obj, props, socket_gen.resolve(job["generator"], mb, job["params"], *mesh_bounds([obj, *parts]), held=held)
 
     for oid, job in sorted(object_jobs.items()):
         if not wanted(oid):
@@ -112,9 +113,9 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, it
         for v in range(job["variants"]):
             obj, props, _ = make(oid, job, v)
             rel = f"assets/models/objects/{oid}_v{v}.glb"
-            export.export_glb([obj], REPO / rel)
+            export.export_glb([obj, *obj.children], REPO / rel)
             models.append(rel)
-            tris = sum(len(p.vertices) - 2 for p in obj.data.polygons)
+            tris = sum(len(p.vertices) - 2 for o in (obj, *obj.children) for p in o.data.polygons)
             print(f"object {oid} v{v}: {tris} tris")
         manifest["objects"][oid] = {"models": models, "generator": job["generator"]}
 
@@ -150,8 +151,9 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, it
                     obj, props, sockets = make(iid, {**job, "params": {**job["params"], **icon_views.ICON_POSES[gen]}}, 0, held=True)
                 if gen in icon_views.SPOTLIT and icon_views.SPOTLIT[gen] in sockets:
                     spot = sockets[icon_views.SPOTLIT[gen]][0]
-            export.apply_textured_materials([obj], props)
-            export.render_icon([obj], REPO / icon, view, samples=opts["samples"], sprite=True, spot=spot)
+            shown = [obj, *(c for c in obj.children if c.type == "MESH")]  # with its moving parts, not socket empties
+            export.apply_textured_materials(shown, props)
+            export.render_icon(shown, REPO / icon, view, samples=opts["samples"], sprite=True, spot=spot)
             entry["icon"] = icon
         manifest["items"][iid] = entry
         print(f"item {iid}: {entry}")
