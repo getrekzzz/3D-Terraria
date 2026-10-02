@@ -13,7 +13,7 @@ public sealed partial class PlayerInventory
     public const int AmmoSlots = 4;
     public const int ArmorSlots = 3;
 
-    /// <summary>Accessory slots every world has; Expert worlds unlock a 6th and Master worlds a 7th.</summary>
+    /// <summary>Accessory slots every world has; Master worlds unlock a 6th and a Demon Heart one more in Expert and Master.</summary>
     public const int BaseAccessorySlots = 5;
     public const int MaxAccessorySlots = 7;
 
@@ -59,6 +59,9 @@ public sealed partial class PlayerInventory
 
     /// <summary>The item handed to a town service (the Goblin Tinkerer's reforge slot); the service UI stows it when it closes.</summary>
     public Inventory Service { get; } = new(1);
+
+    /// <summary>What the service slot is for while a resident's service is open; it decides what the slot accepts.</summary>
+    public ServiceMode ServiceMode { get; set; } = ServiceMode.Reforge;
 
     /// <summary>Stack held by the mouse cursor while rearranging.</summary>
     public ItemStack Cursor { get; set; }

@@ -41,6 +41,9 @@ public sealed class Projectile
     /// <summary>The item that fired it (fishing rods, boomerangs).</summary>
     public ItemDef? Source { get; init; }
 
+    /// <summary>The creature that fired it (named by a death message), or null.</summary>
+    public EnemyDef? Shooter { get; set; }
+
     /// <summary>A boomerang on its way back.</summary>
     public bool Returning { get; set; }
 
@@ -269,7 +272,7 @@ public sealed partial class ProjectileSystem
             if (Vector3.DistanceSquared(Vector3.Clamp(p.Position, box.Item1, box.Item2), p.Position) > r * r) continue;
             var state = player.State;
             if (state.Vitals.ImmunityTicks > 0) return true; // absorbed by i-frames
-            if (HurtPlayer(player, p.Damage, p.Knockback, new Vector3(p.Velocity.X, 0, p.Velocity.Z))) ApplyOnHitPlayer(p, player);
+            if (HurtPlayer(player, p, p.Damage, p.Knockback, new Vector3(p.Velocity.X, 0, p.Velocity.Z))) ApplyOnHitPlayer(p, player);
             return true;
         }
         foreach (var resident in _world.Town.Residents)
@@ -283,8 +286,11 @@ public sealed partial class ProjectileSystem
         return false;
     }
 
-    /// <summary>Damages a player (defense, endurance and i-frames apply) and knocks them along <paramref name="push"/>.</summary>
-    private bool HurtPlayer(PlayerEntity player, int damage, float knockback, Vector3 push)
+    /// <summary>
+    /// Damages a player (defense, endurance and i-frames apply) and knocks them along <paramref name="push"/>; the harm
+    /// names the creature that fired <paramref name="p"/>, else the shot itself.
+    /// </summary>
+    private bool HurtPlayer(PlayerEntity player, Projectile p, int damage, float knockback, Vector3 push)
     {
         var state = player.State;
         var hit = Combat.DamageModel.Roll(damage, DamageClass.None, 0, knockback, null, state.Defense,
@@ -293,7 +299,7 @@ public sealed partial class ProjectileSystem
         if (!state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return false;
         float stand = 1f - Math.Clamp(state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), 0f, 1f);
         var knock = ((push.LengthSquared() > 1e-4f ? Vector3.Normalize(push) : Vector3.Zero) * (3.5f + hit.Knockback * 0.6f) + new Vector3(0, 5f, 0)) * stand;
-        _npcs.ReportPlayerDamage(player, hit.Damage, knock);
+        _npcs.ReportPlayerDamage(player, hit.Damage, knock, p.Shooter != null ? Combat.Harm.By(p.Shooter, Combat.HarmKind.Projectile) : Combat.Harm.By(p.Def));
         return true;
     }
 
@@ -351,7 +357,7 @@ public sealed partial class ProjectileSystem
         if (e.HurtsPlayers)
             foreach (var player in _world.Players)
                 if (player.Alive && Vector3.Distance(player.Center, p.Position) <= radius + 0.4f)
-                    HurtPlayer(player, e.Damage > 0 ? e.Damage : p.Damage, p.Knockback + 4, player.Center - p.Position);
+                    HurtPlayer(player, p, e.Damage > 0 ? e.Damage : p.Damage, p.Knockback + 4, player.Center - p.Position);
         Exploded?.Invoke(p.Position, radius);
         if (!e.DestroyTerrain) return;
         var center = VoxelMotion.CellOf(p.Position);

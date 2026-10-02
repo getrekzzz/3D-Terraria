@@ -8,8 +8,8 @@ using Strata.Game.World;
 namespace Strata.Game.Player;
 
 /// <summary>
-/// Turns input into gameplay: crosshair targeting, item use (mine, chop, place, consume, attack), object
-/// interaction, hotbar selection, build shape and rotation, precision mode and item dropping.
+/// Turns input into gameplay: crosshair targeting (with the Smart Cursor), item use (mine, chop, place, consume,
+/// attack), object interaction, hotbar selection, build shape and rotation, precision mode and item dropping.
 /// </summary>
 public sealed partial class InteractionController : Node
 {
@@ -19,8 +19,18 @@ public sealed partial class InteractionController : Node
         CellShape.Platform, CellShape.Post, CellShape.HalfTop, CellShape.SlopeCeiling, CellShape.StairCeiling,
     };
 
+    private static readonly StringName UsePrimary = "use_primary";
+    private static readonly StringName UseSecondary = "use_secondary";
+    private static readonly StringName InteractAction = "interact";
+    private static readonly StringName PrecisionMode = "precision_mode";
+    private static readonly StringName HotbarNext = "hotbar_next";
+    private static readonly StringName HotbarPrev = "hotbar_prev";
+    private static readonly StringName[] HotbarKeys = HotbarActions();
+
     private WorldRuntime _runtime = null!;
     private PlayerController _player = null!;
+    private readonly bool[] _hotbarKeyDown = new bool[PlayerInventory.HotbarSize];
+    private bool _useHeld;
 
     /// <summary>The current crosshair target (null when pointing at nothing within range).</summary>
     public Target? Target { get; private set; }
@@ -54,25 +64,37 @@ public sealed partial class InteractionController : Node
         _runtime = runtime;
         _player = player;
         Name = "Interaction";
+        WatchWorldForSmartCursor(true);
     }
 
     public override void _PhysicsProcess(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.interaction.physics");
         // Grid blocks (1 m) by default, single cells when the setting says so; holding the precision key swaps.
-        Entity.Precision = Settings.UserSettings.Current.SmallBlocks != (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("precision_mode"));
+        Entity.Precision = Settings.UserSettings.Current.SmallBlocks != (!UI.InputGate.HotkeysBlocked && Input.IsActionPressed(PrecisionMode));
+        PollSmartCursorKey();
         UpdateTarget();
+        PollHotbarKeys();
+        // With the inventory, a chest or a chat open, Input reports the button down for clicks the panels took too:
+        // only a press on empty screen (the click catcher's WorldPointer) uses the item, toward the crosshair; a tap
+        // already released by this tick still counts once.
+        bool overlay = UI.InputGate.OverlayOpen;
+        bool useBlocked = UI.InputGate.ItemUseBlocked;
+        bool tapped = UI.InputGate.TakeWorldPress();
+        bool held = overlay ? UI.InputGate.WorldPointer : Input.IsActionPressed(UsePrimary);
+        bool fresh = overlay ? tapped || (held && !_useHeld) : Input.IsActionJustPressed(UsePrimary);
+        _useHeld = held;
         Entity.UseHeld = false; // yoyos and flails stay out only while the button is held (P3-12)
-        if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.GameplayBlocked) return;
+        if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.HotkeysBlocked) return;
+        Entity.UseHeld = (fresh || held) && !useBlocked;
 
-        bool fresh = Input.IsActionJustPressed("use_primary");
-        Entity.UseHeld = fresh || Input.IsActionPressed("use_primary");
-        if (fresh || Input.IsActionPressed("use_primary"))
+        if ((fresh || held) && !useBlocked)
         {
             var outcome = Game.ItemUse.Use(Entity, Target, fresh);
             if (outcome is not (UseOutcome.None or UseOutcome.Cooldown)) Used?.Invoke(outcome);
         }
-        bool interact = Input.IsActionJustPressed("use_secondary") || Input.IsActionJustPressed("interact");
+        // A right click on a panel is not one on the world: with a screen open only the interact key reaches objects.
+        bool interact = (!overlay && Input.IsActionJustPressed(UseSecondary)) || Input.IsActionJustPressed(InteractAction);
         if (interact && TalkTarget is { } resident && Game.Town.BeginTalk(resident, Entity))
         {
             TalkRequested?.Invoke(resident);
@@ -141,10 +163,12 @@ public sealed partial class InteractionController : Node
         TalkTarget = Hovered?.Resident is { } resident && System.Numerics.Vector3.Distance(resident.Center, Entity.Center) <= Game.Town.Config.TalkRange
             ? resident
             : null;
+        ApplySmartCursor(item, reach);
         if (DigDownTarget(dir) is { } below)
         {
             Target = below;
             InReach = true;
+            SmartTarget = false;
         }
         // Disguised creatures (mimics, Nymph) on the view ray in front of the terrain: right-click opens/greets them.
         DisguiseTarget = ObjectInteraction.DisguisedAlong(Game.Npcs.All, camera, view, terrainT + 0.5f);
@@ -152,19 +176,9 @@ public sealed partial class InteractionController : Node
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (!Enabled || UI.InputGate.GameplayBlocked) return;
-        var inv = Entity.State.Inventory;
-        for (int i = 0; i < PlayerInventory.HotbarSize; i++)
-            if (@event.IsActionPressed($"hotbar_{i + 1}"))
-            {
-                inv.Select(i);
-                return;
-            }
-        if (@event is InputEventMouseButton { Pressed: true, CtrlPressed: false } mb)
-        {
-            if (mb.ButtonIndex == MouseButton.WheelDown) inv.Select(inv.SelectedHotbar + 1);
-            else if (mb.ButtonIndex == MouseButton.WheelUp) inv.Select(inv.SelectedHotbar - 1);
-        }
+        if (!Enabled || UI.InputGate.HotkeysBlocked || @event is InputEventMouseMotion) return;
+        // Over a panel (a scroll list, slots) the wheel is the panel's, not the hotbar's.
+        if (!(@event is InputEventMouseButton && UI.InputGate.PointerOverPanel(GetViewport())) && ScrollHotbar(@event)) return;
         if (@event.IsActionPressed("cycle_shape"))
         {
             int i = System.Array.IndexOf(ShapeCycle, Entity.BuildShape);
@@ -173,6 +187,42 @@ public sealed partial class InteractionController : Node
         }
         if (@event.IsActionPressed("rotate_shape")) Entity.BuildRotation = (Entity.BuildRotation + 1) & 3;
         if (@event.IsActionPressed("drop_item")) DropHeld(@event is InputEventKey { CtrlPressed: true });
+    }
+
+    /// <summary>
+    /// The hotbar_next / hotbar_prev actions (the mouse wheel by default, rebindable) step the hotbar slot; Ctrl with
+    /// the wheel zooms the camera instead. Returns true when the slot changed.
+    /// </summary>
+    public bool ScrollHotbar(InputEvent e)
+    {
+        if (!Enabled || UI.InputGate.HotkeysBlocked || e is InputEventMouseButton { CtrlPressed: true }) return false;
+        int step = e.IsActionPressed(HotbarNext) ? 1 : e.IsActionPressed(HotbarPrev) ? -1 : 0;
+        if (step == 0) return false;
+        var inv = Entity.State.Inventory;
+        inv.Select(inv.SelectedHotbar + step);
+        return true;
+    }
+
+    /// <summary>
+    /// The number keys pick a hotbar slot. Polled rather than read from events, so they work with any screen open and
+    /// from smoke scripts (which press actions without events); a press is seen once, on its first tick.
+    /// </summary>
+    private void PollHotbarKeys()
+    {
+        bool live = Enabled && !UI.InputGate.HotkeysBlocked;
+        for (int i = 0; i < HotbarKeys.Length; i++)
+        {
+            bool down = Input.IsActionPressed(HotbarKeys[i]);
+            if (live && ((down && !_hotbarKeyDown[i]) || Input.IsActionJustPressed(HotbarKeys[i]))) Entity.State.Inventory.Select(i);
+            _hotbarKeyDown[i] = down;
+        }
+    }
+
+    private static StringName[] HotbarActions()
+    {
+        var names = new StringName[PlayerInventory.HotbarSize];
+        for (int i = 0; i < names.Length; i++) names[i] = $"hotbar_{i + 1}";
+        return names;
     }
 
     private void DropHeld(bool wholeStack)

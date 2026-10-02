@@ -1,0 +1,23 @@
+{
+  "id": "W4-POLISH",
+  "title": "Terraria UI polish pass after W4: minimap, hover names, slot overlaps, boss bars, small UX gaps",
+  "phase": "W5i",
+  "depends_on": ["P2-10", "P2-12", "P2-15", "P2-16", "P2-17", "P2-23", "P2-28", "P2-30"],
+  "source": "Integration session review of the W4 UI screenshots (baselines/ui-shots/1920x1080) plus the W4 work-package gaps.",
+  "design": [
+    "1. Minimap is black at spawn on a fresh world (pre-existing, P2-12 noted it): Terraria reveals the map around the player as they explore (light radius). Make the minimap and the full map show explored terrain colours immediately around the player on a fresh world and keep revealing while moving; verify the map texture actually uploads/draws (not just markers). Probe: map.revealed_cells > 0 right after spawn; minimap pixel coverage > 0.",
+    "2. Minimap markers: Terraria draws NPC head icons (no text) on the minimap; names only on the full map when hovered. Replace the overlapping text labels ('Cletus the Merch' over 'Spawn') with icons (resident portraits from P5-28 / PortraitIcons, boss head icons for bosses, a spawn icon); show the name on hover in the full map.",
+    "3. Crosshair hover name: the entity/NPC name currently shows as a very large outlined label in the middle of the screen. Terraria shows hover names small, next to the cursor. Draw it in the UI font at the normal tooltip size (~18 px at UI scale 1) offset from the crosshair, coloured by kind (resident white, enemy by threat/rarity-ish white, boss purple), with life for creatures as now ('King Slime 2000/2000'). Keep Hud.TargetText and the hud.target_name probe working.",
+    "4. Inventory layout overlaps: at 1920x1080 UI scale 1.0 with a chest open, the Coins and Ammo columns overlap each other and the trash slot; at UI scale 1.5 the crafting panel covers the HUD 'Depth' info rows; the chest rename field grows over the first chest row. Put the InventoryScreen panels (inventory grid, coins/ammo, trash, panel host, crafting, equipment) into the UiLayout overlap check so layout.overlaps counts them, then fix the layout so it reports 0 at 1280x720 and 1920x1080 at UI scales 1.0 and 1.5.",
+    "5. Boss bar: Terraria stacks one bar per boss alive at once (e.g. Twins, mech bosses together, event minibosses) — stack up to 3 bars bottom-centre, each with its head icon; fade out over ~0.5 s when a group dies or leaves.",
+    "6. Locked accessory slot tooltip says why: 'Requires Expert Mode and a Demon Heart' / 'Requires Master Mode' (Terraria wording).",
+    "7. Shift-click quick-moves a backpack item into the reforge slot while the reforge panel is open (Terraria 1.4), and into the open chest/shop sell like Terraria's shift-click rules already used elsewhere.",
+    "8. Item icon mipmaps: regenerate item icon .import files with mipmaps/generate=true (scripted edit of the 1554 .import files + reimport) so scaled-down icons stay crisp, no visual tuning loop."
+  ],
+  "tests": [
+    "ui.cmds: assert layout.overlaps == 0 with the inventory + chest open and with the inventory + shop open (headless at the default size), map.revealed_cells > 0 after spawn",
+    "Core/unit tests where logic is added (map reveal radius, boss bar grouping)"
+  ],
+  "verification": "ONE short rendered run (lavapipe) at 1920x1080 UI scale 1.0 and 1.5 with the inventory + chest open and a boss present, to confirm 1-4 visually; no tuning loop. Save the shots to /root/.claude/plans/overhaul-specs/baselines/ui-shots/polish/.",
+  "risks": ["InventoryScreen is a hub file: keep changes in partials", "Map reveal must stay cheap (budgeted per frame)"]
+}

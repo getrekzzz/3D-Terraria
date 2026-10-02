@@ -1,4 +1,5 @@
 using Strata.Core.Content;
+using Strata.Core.Content.Defs;
 using Strata.Core.Content.Specs;
 
 namespace Strata.Core.Gameplay.Stats;
@@ -35,6 +36,11 @@ public sealed class EffectState
     /// <summary>Liquids whose contact damage is ignored.</summary>
     public HashSet<string> LiquidImmunities { get; } = new(StringComparer.Ordinal);
     public int DamagePerSecond { get; set; }
+
+    /// <summary>The buff dealing the most of <see cref="DamagePerSecond"/> (named when it kills), or null.</summary>
+    public BuffDef? DotSource { get; private set; }
+
+    private int _dotSourcePerSecond;
 
     /// <summary>Brightest emitted light [r,g,b] (0–15), or null.</summary>
     public int[]? Light { get; set; }
@@ -76,6 +82,8 @@ public sealed class EffectState
         Immunities.Clear();
         LiquidImmunities.Clear();
         DamagePerSecond = 0;
+        DotSource = null;
+        _dotSourcePerSecond = 0;
         Light = null;
         Wings = null;
         RocketBoots = null;
@@ -85,6 +93,17 @@ public sealed class EffectState
         Info.Clear();
         AttackProjectiles.Clear();
         MinionTagDamage = 0;
+    }
+
+    /// <summary>Applies one of a buff's effects, remembering the buff when it is the strongest damage over time.</summary>
+    public void Apply(TypedSpec spec, BuffDef buff)
+    {
+        int before = DamagePerSecond;
+        Apply(spec);
+        int dealt = DamagePerSecond - before;
+        if (dealt <= _dotSourcePerSecond) return;
+        _dotSourcePerSecond = dealt;
+        DotSource = buff;
     }
 
     /// <summary>Applies one effect spec (validated at content load).</summary>

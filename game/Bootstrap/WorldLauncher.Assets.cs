@@ -37,6 +37,7 @@ public static partial class WorldLauncher
         // Scripted runs (smoke tests, screenshots) never follow the calendar: a goodie bag dropping in October would make
         // them depend on the date. Scripts that need a season set it with `season <id>`.
         if (services.Args.Get("smoke") != null) game.Session.Seasons.Override = "";
+        game.Deaths = Strata.Core.Presentation.DeathMessages.Load(services.Data);
     }
 
     /// <summary>Renderers for creatures, town residents and projectiles.</summary>

@@ -16,7 +16,11 @@ public sealed partial class ItemUseSystem
         if (cfg.ExtraAccessorySlot && (state.ExtraAccessorySlot || _world.Session.Settings.EffectiveDifficulty is not (World.Difficulty.Expert or World.Difficulty.Master)))
             return UseOutcome.Blocked;
         if (cfg.MinecartUpgrade && state.MinecartUpgrade) return UseOutcome.Blocked;
-        if (cfg.ExtraAccessorySlot) state.ExtraAccessorySlot = true;
+        if (cfg.ExtraAccessorySlot)
+        {
+            state.ExtraAccessorySlot = true;
+            _world.UnlockAccessorySlots(state); // the new slot shows at once
+        }
         if (cfg.MinecartUpgrade) state.MinecartUpgrade = true;
 
         if (cfg.PermanentLife > 0) state.BonusLife += cfg.PermanentLife;

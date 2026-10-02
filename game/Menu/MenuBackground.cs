@@ -12,6 +12,9 @@ public sealed partial class MenuBackground : Control
     private float _time = DayLength * 0.3f;
     private float _scroll;
 
+    /// <summary>How light the sky is now: 1 by day, 0 at night (the logo dims with it).</summary>
+    public float Daylight { get; private set; } = 1f;
+
     public override void _Ready()
     {
         SetAnchorsPreset(LayoutPreset.FullRect);
@@ -31,6 +34,7 @@ public sealed partial class MenuBackground : Control
         float phase = (_time % DayLength) / DayLength;           // 0 dawn, 0.25 noon, 0.5 dusk, 0.75 midnight
         float sunHeight = Mathf.Sin(phase * Mathf.Tau);
         float day = Mathf.SmoothStep(-0.15f, 0.25f, sunHeight);
+        Daylight = day;
         float dusk = Mathf.Clamp(1f - Mathf.Abs(sunHeight) * 4f, 0f, 1f);
 
         var top = new Color(0.02f, 0.03f, 0.09f).Lerp(new Color(0.22f, 0.45f, 0.85f), day);

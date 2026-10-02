@@ -15,8 +15,9 @@ public static partial class UiTheme
 
     /// <summary>
     /// Builds the theme for every control type the game uses: panels, labels, buttons (and the <see cref="TextButton"/>
-    /// variation), toggles, dropdowns and popups, tabs, sliders, scrollbars, progress bars, text fields, rich text and
-    /// tooltips. All text is white with a black outline in the UI font.
+    /// variation), toggles (the toggle_on/off sprites), dropdowns and popups, tabs, sliders (a gold knob sprite),
+    /// scrollbars, progress bars, text fields, rich text and tooltips. All text is white with a black outline in the UI
+    /// font.
     /// </summary>
     private static Theme Build()
     {
@@ -74,13 +75,17 @@ public static partial class UiTheme
         States(t, TextButton, bare, bare, bare, bare);
         ButtonColors(t, TextButton, Gold, Gold.Darkened(0.2f));
 
-        // Toggles draw their switch or box icon on bare text, not on a framed button.
+        // Toggles draw their switch or box icon on bare text, not on a framed button; switches are the pixel toggle sprites.
         var toggle = new StyleBoxEmpty { ContentMarginLeft = 4, ContentMarginRight = 4, ContentMarginTop = 2, ContentMarginBottom = 2 };
         foreach (var type in new[] { "CheckButton", "CheckBox" })
         {
             States(t, type, toggle, toggle, toggle, toggle);
             ButtonColors(t, type, Gold, Text);
         }
+        Texture2D on = UiSprites.Get("toggle_on"), off = UiSprites.Get("toggle_off");
+        foreach (var (name, icon) in new[] { ("checked", on), ("unchecked", off), ("checked_disabled", on), ("unchecked_disabled", off),
+                     ("checked_mirrored", on), ("unchecked_mirrored", off), ("checked_disabled_mirrored", on), ("unchecked_disabled_mirrored", off) })
+            t.SetIcon(name, "CheckButton", icon);
         ButtonColors(t, "OptionButton", Text, Gold);
 
         var popup = Box(new Color(PanelBlue, 0.95f), PanelBorder, 2, 8, 6, 6);
@@ -110,6 +115,9 @@ public static partial class UiTheme
         t.SetStylebox("slider", "HSlider", Box(Well, PanelBorder, 2, 4, 0, 3));
         t.SetStylebox("grabber_area", "HSlider", Box(Grabber, Colors.Transparent, 0, 4, 0, 3));
         t.SetStylebox("grabber_area_highlight", "HSlider", Box(GrabberHighlight, Colors.Transparent, 0, 4, 0, 3));
+        t.SetIcon("grabber", "HSlider", UiSprites.Get("slider_grabber"));
+        t.SetIcon("grabber_highlight", "HSlider", UiSprites.Get("slider_grabber_hover"));
+        t.SetIcon("grabber_disabled", "HSlider", UiSprites.Get("slider_grabber"));
     }
 
     private static void BuildTabs(Theme t)

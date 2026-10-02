@@ -8,7 +8,8 @@ public static partial class UiLayout
     /// ammo columns right of it with the trash under the ammo and the sort buttons beside them, the chest, shop or
     /// service panel under the grid, the crafting column from the bottom-left up to the panel and the equipment column
     /// under the minimap on the right (the minimap hides while the inventory is open when the column does not fit under
-    /// it). Chat moves right of the crafting column and the buffs right of the panel. False when a required region does
+    /// it), and the 'Settings' button in the bottom-right corner. Chat moves right of the crafting column and the buffs
+    /// right of the panel. False when a required region does
     /// not fit, so the caller retries with smaller slots.
     /// </summary>
     private static bool PlaceInventory(UiLayoutPass p, UiState s, float scale)
@@ -52,6 +53,9 @@ public static partial class UiLayout
         var crosshair = new UiRect(p.Width / 2 - CrosshairWidth / 2, h / 2 - CrosshairTop, CrosshairWidth, CrosshairHeight);
         PlaceCentre(p, crosshair, new UiRect(p.Width / 2 - BreathWidth / 2, crosshair.Y - Gap - BreathHeight, BreathWidth, BreathHeight));
         PlaceBars(p, s, chatMin);
+        // Terraria's 'Settings' text in the bottom-right corner (above the event bar when that is up).
+        var settings = new UiRect(p.Width - Margin - SettingsButtonWidth, h - Margin - SettingsButtonHeight, SettingsButtonWidth, SettingsButtonHeight);
+        if (!p.PutNear(UiRegion.SettingsButton, settings)) return false;
         if (s.DebugOverlay)
         {
             float y = (p.Has(UiRegion.Buffs) ? p.Get(UiRegion.Buffs).Bottom : clusterBottom) + 2 * Gap;

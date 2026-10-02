@@ -22,8 +22,8 @@ public sealed partial class PlayerController
         if (_airborne && !_swimming)
         {
             int damage = _config.FallDamage(_peakY - y, Entity.State.Effects.NoFallDamage);
-            // Through Core, so the fall shows a number and sounds like a hurt.
-            if (damage > 0) _runtime.Game.HurtPlayerDirect(Entity, damage);
+            // Through Core, so the fall shows a number and sounds like a hurt; the death screen names the fall.
+            if (damage > 0) _runtime.Game.HurtPlayerDirect(Entity, damage, harm: Strata.Core.Gameplay.Combat.Harm.Fall);
         }
         _airborne = false;
         _peakY = y;

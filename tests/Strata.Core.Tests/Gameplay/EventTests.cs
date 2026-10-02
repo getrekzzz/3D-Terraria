@@ -69,6 +69,26 @@ public class EventTests
     }
 
     [Fact]
+    public void ProgressFollowsKills()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        Assert.Null(g.World.Events.LatestInvasion);
+        Assert.True(g.World.Events.Start(g.Content.Events.Get("blood_moon"))); // no kill goal: no progress bar
+        Assert.Null(g.World.Events.LatestInvasion);
+        Assert.True(g.World.Events.Start(g.Content.Events.Get("goblin_army")));
+        var army = g.World.Events.LatestInvasion!;
+        Assert.Equal("goblin_army", army.Def.Id);
+        Assert.Equal(0f, g.World.Events.Progress(army));
+        var peon = g.Content.Enemies.Get("goblin_peon");
+        for (int i = 0; i < 20; i++)
+            g.World.Npcs.Kill(g.World.Npcs.Spawn(peon, g.Player.Position + new System.Numerics.Vector3(3, 0, 3))!);
+        Assert.Equal(20f / army.Def.KillGoal, g.World.Events.Progress(army), 4);
+        g.World.Npcs.Kill(g.World.Npcs.Spawn(g.Content.Enemies.Get("green_slime"), g.Player.Position + new System.Numerics.Vector3(3, 0, 3))!);
+        Assert.Equal(20, army.Kills); // only goblins count
+    }
+
+    [Fact]
     public void ActiveEventsPersistInWorldMeta()
     {
         using var g = TestGame.Create();

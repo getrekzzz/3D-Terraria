@@ -92,8 +92,10 @@ public class HardmodeLootTests
         }
         using var g = TestGame.Create(difficulty: Difficulty.Expert);
         g.Hold("demon_heart", 2, slot: 2);
+        Assert.Equal(5, g.Player.State.Inventory.AccessorySlotsUnlocked);
         Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, true));
         Assert.True(g.Player.State.ExtraAccessorySlot);
+        Assert.Equal(6, g.Player.State.Inventory.AccessorySlotsUnlocked); // the slot opens at once
         Assert.Equal(1, g.Player.State.Inventory.Backpack[2].Count);
         g.Ticks(40);
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true)); // once per character

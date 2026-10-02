@@ -48,6 +48,7 @@ public sealed partial class NpcSystem
     private readonly LootRoller _loot;
     private readonly BrainContext _ctx;
     private long _nextId = 1;
+    private Npc? _thinking;
     private Pcg32 _rng;
 
     public NpcSystem(GameWorld world)
@@ -71,7 +72,8 @@ public sealed partial class NpcSystem
             },
             Shoot = (id, from, velocity, damage) =>
             {
-                if (world.Session.Content.Projectiles.TryGet(id, out var def)) world.Projectiles.Spawn(def, from, velocity, null, (int)(damage * Scale), 3f, Content.Defs.DamageClass.None, 0);
+                if (world.Session.Content.Projectiles.TryGet(id, out var def))
+                    world.Projectiles.Spawn(def, from, velocity, null, (int)(damage * Scale), 3f, Content.Defs.DamageClass.None, 0).Shooter = _thinking?.Def;
             },
             Announce = text => Announce(text, Messages.MessageKind.Boss),
             Impact = (at, strength) => Impacted?.Invoke(at, strength),
@@ -251,7 +253,9 @@ public sealed partial class NpcSystem
                 npc.DefenseDelta = 0;
                 npc.DefenseOverride = null;
                 npc.DamageScale = 1f;
+                _thinking = npc; // the brain's shots name it
                 brain.Think(npc, _ctx);
+                _thinking = null;
             }
             else Reel(npc, brain);
             _rng = _ctx.Rng;

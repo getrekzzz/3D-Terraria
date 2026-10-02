@@ -1,4 +1,5 @@
 using Strata.Core.Content.Defs;
+using Strata.Core.Presentation;
 
 namespace Strata.Core.Gameplay.Buffs;
 
@@ -43,6 +44,20 @@ public sealed class BuffSet
     public void Remove(string id)
     {
         if (_buffs.RemoveAll(b => b.Def.Id == id) > 0) Changed?.Invoke();
+    }
+
+    /// <summary>
+    /// The player right-clicked the buff's icon: removes it and raises <see cref="Changed"/>, unless it is a debuff or a
+    /// buff the player cannot shed (<see cref="BuffDisplay.CanCancel"/>) or is not active. The caller recomputes the
+    /// stats (<c>PlayerState.Recompute</c>) when this returns true.
+    /// </summary>
+    public bool TryCancel(string id)
+    {
+        int index = _buffs.FindIndex(b => b.Def.Id == id);
+        if (index < 0 || !BuffDisplay.CanCancel(_buffs[index].Def)) return false;
+        _buffs.RemoveAt(index);
+        Changed?.Invoke();
+        return true;
     }
 
     /// <summary>Counts down one tick; returns true if any buff expired.</summary>
