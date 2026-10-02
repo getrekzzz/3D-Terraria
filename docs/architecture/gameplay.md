@@ -124,6 +124,14 @@
   in sight (`skull_shot` cue). Day is a data `enrage` (9999 defense, 1000 damage, ×2.5 speed: it never stops
   spinning), shared by Skeletron Prime, which still uses legacy segment hands. Arms are drawn to living parts
   (`NpcRenderer.Arms`).
+* **Wall of Flesh** — 8000 life shared by the mouth (body) and its two eye segments; lasers come from the eyes in turn,
+  `ranged.intervalAtZeroLife` easing the interval from 70 to 25 ticks as it weakens (any creature may use it). A target
+  more than `tongueDistance` (50 m) ahead of the face is Tongued: `the_tongued` (`noItemUse`) is pulsed each tick and
+  `BrainContext.Pull` sets `PlayerEntity.ExternalVelocity` (cleared at the start of every `NpcSystem.Tick`) towards the
+  mouth at `tonguePull` m/s until the player reaches it. `PlayerController.Status.UpdateTongue` replaces all movement
+  with it after input (hooks let go, minecarts are left; headless players are moved by `GameWorld`). Leeches (a small
+  `worm`, not tethered) crawl out every `leechInterval` × (0.4 + 0.6 × life) ticks, `maxLeeches` alive; The Hungry
+  (240 life) stay tethered and die with it. Expert sweeps `expertSpeed` (×1.25) faster.
 * **Pattern bosses** — `PatternBrain` (+`.Moves`) plays `brain.phases` (`PatternSpecs`, `PatternExtras`): in Expert a
   phase's `expert` block scales move speed, contact damage, volley interval/count (`expertCount`/`expertInterval` per
   volley win), summon caps and wind-ups, `expertBelow` replaces `below`, and `expertOnly` moves join the loop (the

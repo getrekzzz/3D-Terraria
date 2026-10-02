@@ -12,6 +12,7 @@ frog|Frog|early|jungle|critter
 duck|Duck|early|ocean|critter
 faeling|Faeling|early|aether|critter
 ghost|Ghost|early|graveyard|flyer
+leech|Leech|prehardmode|wall of flesh|segmented
 """
 
 # id|Name|stage|kind
@@ -23,4 +24,5 @@ aetherium_block|Aetherium Block|early|natural
 # id|Name|kind
 BUFFS = """
 shimmering|Shimmering|liquid
+the_tongued|The Tongued|debuff
 """

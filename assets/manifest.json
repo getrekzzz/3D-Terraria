@@ -4301,6 +4301,25 @@
     "fly"
    ]
   },
+  "leech_body": {
+   "model": "assets/models/creatures/leech_body.glb",
+   "generator": "eater_segment",
+   "animations": []
+  },
+  "leech_head": {
+   "model": "assets/models/creatures/leech_head.glb",
+   "generator": "eater_head",
+   "animations": [
+    "fly",
+    "idle",
+    "walk"
+   ]
+  },
+  "leech_tail": {
+   "model": "assets/models/creatures/leech_tail.glb",
+   "generator": "eater_tail",
+   "animations": []
+  },
   "lihzahrd": {
    "model": "assets/models/creatures/lihzahrd.glb",
    "generator": "humanoid",

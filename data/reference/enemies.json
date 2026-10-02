@@ -1948,6 +1948,16 @@
    "mechanics": [
     "flyer"
    ]
+  },
+  {
+   "id": "terraria:leech",
+   "name": "Leech",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "wall of flesh",
+   "mechanics": [
+    "segmented"
+   ]
   }
  ]
 }

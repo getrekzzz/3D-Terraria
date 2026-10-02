@@ -190,6 +190,7 @@ public sealed partial class GameWorld : IDisposable
         if (p.UseAnimation > 0) p.UseAnimation--;
         // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
         if (!p.HasBody && p.Hook.Active) p.Hook.Tick(Session.World, Units.SecondsPerTick, p.Hand);
+        if (!p.HasBody && p.ExternalVelocity != Vector3.Zero) p.Position += p.ExternalVelocity * Units.SecondsPerTick; // a tongue's drag
         if (state.Buffs.Tick()) state.Recompute();
         int dps = state.Effects.DamagePerSecond;
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);

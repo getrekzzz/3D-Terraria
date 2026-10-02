@@ -54,6 +54,12 @@ public sealed class BrainContext
     /// <summary>Gives a buff (id, ticks) to every living player within a radius of a point, honouring their immunities.</summary>
     public Action<Vector3, float, string, int>? Pulse { get; set; }
 
+    /// <summary>
+    /// Drags a player this tick (m/s, replacing their own movement): the Wall of Flesh's tongue. Sets
+    /// <see cref="PlayerEntity.ExternalVelocity"/>, which the creature system clears at the start of every tick.
+    /// </summary>
+    public Action<PlayerEntity, Vector3>? Pull { get; set; }
+
     /// <summary>Removes natural terrain in a sphere (radius in cells) — burrowing creatures.</summary>
     public Action<Vector3, float>? Carve { get; set; }
 

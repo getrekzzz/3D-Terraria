@@ -19,6 +19,20 @@ public sealed partial class PlayerController
         return new Vector2(x, y);
     }
 
+    /// <summary>
+    /// A creature dragging the body (the Wall of Flesh's tongue, <c>Entity.ExternalVelocity</c>) replaces every other
+    /// movement this step: input, jumps, dashes and wings. A hook that is out lets go. Returns whether it is dragging.
+    /// </summary>
+    private bool UpdateTongue(ref Vector3 v)
+    {
+        var pull = Entity.ExternalVelocity;
+        if (pull == System.Numerics.Vector3.Zero) return false;
+        if (Entity.Hook.Active) Entity.Hook.Release();
+        v = ToGodot(pull);
+        _peakY = GlobalPosition.Y; // no fall damage from being reeled in
+        return true;
+    }
+
     /// <summary>A key's local direction (x = right, z = back) through the player's status: a confused dash goes the other way.</summary>
     private Vector3 StatusDirection(Vector3 local)
     {

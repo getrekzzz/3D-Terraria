@@ -258,8 +258,28 @@ public sealed class MawwallParams : SpecParams, IValidatableSpec
     public int MinionInterval { get; init; } = 300;
     public int MaxMinions { get; init; } = 5;
 
+    /// <summary>
+    /// A target farther than this (m) ahead of the wall face is Tongued: <see cref="TongueBuff"/> (no item use) and reeled
+    /// at <see cref="TonguePull"/> m/s into the mouth, helpless, until it reaches it (Terraria's The Tongued).
+    /// </summary>
+    public float TongueDistance { get; init; } = 50f;
+    public string TongueBuff { get; init; } = "the_tongued";
+    public float TonguePull { get; init; } = 14f;
+
+    /// <summary>
+    /// Free creature crawling out of the mouth every <see cref="LeechInterval"/> ticks at full life (scaled by
+    /// 0.4 + 0.6 × life, so more often as the wall weakens), up to <see cref="MaxLeeches"/> alive.
+    /// </summary>
+    public string? Leech { get; init; }
+    public int LeechInterval { get; init; } = 420;
+    public int MaxLeeches { get; init; } = 4;
+
+    /// <summary>Sweep speed multiplier in Expert and Master.</summary>
+    public float ExpertSpeed { get; init; } = 1.25f;
+
     public string? Validate() =>
         Width <= 0 || Thickness <= 0 ? "width and thickness must be > 0"
         : MaxSpeed < BaseSpeed ? "maxSpeed must be >= baseSpeed"
-        : MinionInterval < 1 ? "minionInterval must be >= 1" : null;
+        : MinionInterval < 1 || LeechInterval < 1 ? "minionInterval and leechInterval must be >= 1"
+        : TongueDistance <= 0 || TonguePull <= 0 ? "tongueDistance and tonguePull must be > 0" : null;
 }

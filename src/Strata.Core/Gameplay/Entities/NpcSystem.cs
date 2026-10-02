@@ -65,6 +65,7 @@ public sealed partial class NpcSystem
             InSight = InSight,
             Cue = (npc, sfx) => Cued?.Invoke(npc, sfx),
             Pulse = Pulse,
+            Pull = Pull,
             Bands = world.Session.Generator.Plan.Bands,
         };
         _ctx.Expert = world.Session.Settings.Difficulty is World.Difficulty.Expert or World.Difficulty.Master;
@@ -158,6 +159,7 @@ public sealed partial class NpcSystem
 
     public void Tick()
     {
+        foreach (var p in _world.Players) p.ExternalVelocity = Vector3.Zero; // a tongue pulls again this tick or lets go
         if (Paused) return;
         const float dt = 1f / Units.TicksPerSecond;
         var session = _world.Session;

@@ -66,6 +66,13 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
     public GrappleHook Hook { get; } = new();
 
     /// <summary>
+    /// A velocity (m/s) a creature forces on the player this tick, replacing their own movement (the Wall of Flesh's
+    /// tongue); zero when nothing drags them. The creature system clears it each tick; the body (or, headless,
+    /// <see cref="GameWorld"/>) applies it.
+    /// </summary>
+    public Vector3 ExternalVelocity { get; set; }
+
+    /// <summary>
     /// An engine body owns this player's motion (the running game): it advances <see cref="Hook"/> in its physics step
     /// and applies the pull. Without one (tests, headless runs) <see cref="GameWorld"/> advances the hook each tick.
     /// </summary>

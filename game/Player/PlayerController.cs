@@ -126,6 +126,7 @@ public sealed partial class PlayerController : CharacterBody3D
             Entity.Minecart = null;
             return;
         }
+        if (Entity.ExternalVelocity != System.Numerics.Vector3.Zero) Entity.Minecart = null; // the tongue drags you out of a cart
         if (UpdateMinecart(dt) || UpdatePhase())
         {
             ReelInHook(dt);
@@ -163,6 +164,7 @@ public sealed partial class PlayerController : CharacterBody3D
         v.X = horizontal.X;
         v.Z = horizontal.Z;
         if (UpdateGrapple(dt, ref v)) onFloor = false;
+        if (UpdateTongue(ref v)) onFloor = false; // after all input, so it cannot be out-run (Status)
         Velocity = v;
 
         bool dropThrough = !blocked && Input.IsActionPressed("crouch");

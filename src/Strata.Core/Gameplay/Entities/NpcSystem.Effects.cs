@@ -25,7 +25,9 @@ public sealed partial class NpcSystem
         var from = parts ? npc.Segments[part] : npc.Center + new Vector3(0, npc.HalfExtents.Y * 0.4f, 0);
         if (!target.Alive || Vector3.Distance(from, target.Center) > r.Range || !InSight(from, target.Eye)) return;
         if (!_world.Session.Content.Projectiles.TryGet(r.Projectile, out var def)) return;
-        npc.AttackTimer = r.Interval;
+        npc.AttackTimer = r.IntervalAtZeroLife is int fastest && npc.MaxLife > 0
+            ? (int)MathF.Round(r.Interval + (fastest - r.Interval) * (1f - npc.Life / (float)npc.MaxLife))
+            : r.Interval;
         if (parts) npc.PartCursor++;
         var to = target.Center + new Vector3(0, 0.3f, 0);
         float flight = Vector3.Distance(from, to) / r.Speed;
@@ -46,6 +48,9 @@ public sealed partial class NpcSystem
         }
         npc.Pose = "attack";
     }
+
+    /// <summary>A brain drags a player this tick (the tongue); cleared at the start of every tick.</summary>
+    private static void Pull(PlayerEntity player, Vector3 velocity) => player.ExternalVelocity = velocity;
 
     /// <summary>No solid cell between two points (sampled every quarter metre).</summary>
     public bool InSight(Vector3 a, Vector3 b)
