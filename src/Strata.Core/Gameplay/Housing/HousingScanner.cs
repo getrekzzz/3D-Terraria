@@ -25,6 +25,15 @@ public sealed class Room
 
     public Aabb3i Bounds { get; set; }
 
+    /// <summary>The housing query answer: the first problem, or the "suitable" message.</summary>
+    public string Message { get; set; } = "";
+
+    /// <summary>The fill stopped early (open to the world, too large, or not air): no measurements.</summary>
+    public bool Open { get; set; }
+
+    /// <summary>Clock tick of the scan (set by <see cref="HousingCache"/>).</summary>
+    public long ScannedTick { get; set; }
+
     public override string ToString() => Valid ? $"valid home ({Interior.Count} cells)" : "not a home: " + string.Join(", ", Problems);
 }
 
@@ -38,6 +47,13 @@ public sealed class HousingScanner
     private readonly VoxelWorld _world;
     private readonly VoxelNavigator _nav;
 
+    private readonly HashSet<Int3> _boundary = new();
+    private readonly Queue<Int3> _queue = new();
+    private readonly Dictionary<(int, int), int> _columns = new();
+    private readonly HashSet<long> _seenObjects = new();
+    private HousingConfig _config = null!;
+    private bool[] _isEvil = Array.Empty<bool>();
+
     public HousingScanner(VoxelWorld world, HousingConfig? config = null)
     {
         _world = world;
@@ -45,18 +61,27 @@ public sealed class HousingScanner
         Config = config ?? new HousingConfig();
     }
 
-    public HousingConfig Config { get; set; }
+    public HousingConfig Config
+    {
+        get => _config;
+        set
+        {
+            _config = value;
+            var blocks = _world.Content.Blocks;
+            _isEvil = new bool[blocks.Count];
+            for (int i = 0; i < blocks.Count; i++)
+                _isEvil[i] = blocks[i].HasTag(value.EvilTag) && !blocks[i].HasTag(value.EvilIgnoreTag);
+        }
+    }
 
     public Room Scan(Int3 start)
     {
         var room = new Room();
-        if (!IsAir(start))
-        {
-            room.Problems.Add("not an open space");
-            return room;
-        }
-        var boundary = new HashSet<Int3>();
-        var queue = new Queue<Int3>();
+        if (!IsAir(start)) return Abort(room, "notOpen");
+        var boundary = _boundary;
+        var queue = _queue;
+        boundary.Clear();
+        queue.Clear();
         room.Interior.Add(start);
         queue.Enqueue(start);
         while (queue.Count > 0)
@@ -67,27 +92,53 @@ public sealed class HousingScanner
                 var n = c + o;
                 if (room.Interior.Contains(n) || boundary.Contains(n)) continue;
                 if (_world.GetBlock(n) == VoxelWorld.Unknown || !_world.InBounds(n.X, n.Y, n.Z))
-                {
-                    room.Problems.Add("not enclosed");
-                    return room;
-                }
+                    return Abort(room, "notEnclosed");
                 if (!IsAir(n))
                 {
                     boundary.Add(n);
                     continue;
                 }
                 room.Interior.Add(n);
-                if (room.Interior.Count > Config.MaxVolume)
-                {
-                    room.Problems.Add("not enclosed or too large");
-                    return room;
-                }
+                if (room.Interior.Count > Config.MaxVolume) return Abort(room, "tooLarge");
                 queue.Enqueue(n);
             }
         }
         Measure(room, boundary);
         Check(room, boundary);
+        room.Message = room.Valid ? Config.Message("suitable") : room.Problems[0];
         return room;
+    }
+
+    /// <summary>The fill stopped early: the explored cells' bounds still locate the result for cache invalidation.</summary>
+    private Room Abort(Room room, string key)
+    {
+        room.Open = true;
+        room.Problems.Add(Config.Message(key));
+        room.Message = room.Problems[0];
+        var min = new Int3(int.MaxValue, int.MaxValue, int.MaxValue);
+        var max = new Int3(int.MinValue, int.MinValue, int.MinValue);
+        foreach (var c in room.Interior)
+        {
+            min = Int3.Min(min, c);
+            max = Int3.Max(max, c);
+        }
+        room.Bounds = room.Interior.Count == 0 ? default : new Aabb3i(min, max + Int3.One);
+        return room;
+    }
+
+    /// <summary>Corruption or Crimson blocks around the room (every other column sampled) reaching the limit.</summary>
+    private bool IsCorrupted(Room room)
+    {
+        int m = Config.EvilMargin, hits = 0;
+        var b = room.Bounds;
+        for (int y = b.Min.Y - m; y < b.Max.Y + m; y++)
+            for (int z = b.Min.Z - m; z < b.Max.Z + m; z += 2)
+                for (int x = b.Min.X - m; x < b.Max.X + m; x += 2)
+                {
+                    ushort id = _world.GetBlock(new Int3(x, y, z));
+                    if (id < _isEvil.Length && _isEvil[id] && ++hits >= Config.EvilLimit) return true;
+                }
+        return false;
     }
 
     /// <summary>Air for housing: no solid block, and no door (doors belong to the walls).</summary>
@@ -101,37 +152,48 @@ public sealed class HousingScanner
     {
         var min = new Int3(int.MaxValue, int.MaxValue, int.MaxValue);
         var max = new Int3(int.MinValue, int.MinValue, int.MinValue);
-        var columns = new Dictionary<(int, int), int>();
+        var columns = _columns;
+        columns.Clear();
+        var key = new Int3(int.MaxValue, int.MaxValue, int.MaxValue);
         foreach (var c in room.Interior)
         {
             min = Int3.Min(min, c);
             max = Int3.Max(max, c);
+            if (c.Y < key.Y || (c.Y == key.Y && (c.Z < key.Z || (c.Z == key.Z && c.X < key.X)))) key = c;
             if (!room.Interior.Contains(c + Int3.Down) && _world.IsSolid(c.X, c.Y - 1, c.Z)) room.FloorCells++;
             columns[(c.X, c.Z)] = columns.GetValueOrDefault((c.X, c.Z)) + 1;
         }
         room.Bounds = new Aabb3i(min, max + Int3.One);
-        room.Headroom = columns.Count == 0 ? 0 : columns.Values.Max();
-        room.Key = room.Interior.OrderBy(c => c.Y).ThenBy(c => c.Z).ThenBy(c => c.X).First();
-        int built = boundary.Count(c => (_world.GetFlags(c.X, c.Y, c.Z) & CellFlags.PlayerPlaced) != 0 || _world.TileObjects.IsOccupied(c));
+        int headroom = 0;
+        foreach (int h in columns.Values) headroom = Math.Max(headroom, h);
+        room.Headroom = headroom;
+        room.Key = key;
+        int built = 0;
+        foreach (var c in boundary)
+            if ((_world.GetFlags(c.X, c.Y, c.Z) & CellFlags.PlayerPlaced) != 0 || _world.TileObjects.IsOccupied(c)) built++;
         room.BuiltBoundary = boundary.Count == 0 ? 0 : built / (float)boundary.Count;
 
-        var seen = new HashSet<long>();
-        foreach (var c in room.Interior.Concat(boundary))
+        var seen = _seenObjects;
+        seen.Clear();
+        foreach (var c in room.Interior)
+            if (_world.TileObjects.At(c) is { } obj && seen.Add(obj.Id)) room.Furniture.Add(obj);
+        foreach (var c in boundary)
             if (_world.TileObjects.At(c) is { } obj && seen.Add(obj.Id)) room.Furniture.Add(obj);
         room.HomeNode = FindHomeNode(room);
     }
 
     private void Check(Room room, HashSet<Int3> boundary)
     {
-        if (room.FloorCells < Config.MinFloorCells) room.Problems.Add("too small");
-        if (room.Headroom < Config.MinHeadroom) room.Problems.Add("ceiling too low");
-        if (room.BuiltBoundary < Config.MinBuiltBoundary) room.Problems.Add("walls must be built, not natural");
+        if (room.FloorCells < Config.MinFloorCells) room.Problems.Add(Config.Message("tooSmall"));
+        if (room.Headroom < Config.MinHeadroom) room.Problems.Add(Config.Message("lowCeiling"));
+        if (room.BuiltBoundary < Config.MinBuiltBoundary) room.Problems.Add(Config.Message("natural"));
+        if (IsCorrupted(room)) room.Problems.Add(Config.Message("corrupted"));
         foreach (var req in Config.Requirements)
         {
             bool found = room.Furniture.Any(o => Array.IndexOf(o.Def.Housing, req.Role) >= 0 && Placed(o, room, boundary, req.Where));
             if (!found) room.Problems.Add(req.Message);
         }
-        if (room.HomeNode == null && room.Problems.Count == 0) room.Problems.Add("no space to stand");
+        if (room.HomeNode == null && room.Problems.Count == 0) room.Problems.Add(Config.Message("noStand"));
     }
 
     private static bool Placed(TileObjectInstance obj, Room room, HashSet<Int3> boundary, RequirementPlace where)

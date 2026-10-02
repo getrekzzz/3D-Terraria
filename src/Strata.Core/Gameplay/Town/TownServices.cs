@@ -10,7 +10,7 @@ namespace Strata.Core.Gameplay.Town;
 /// The residents' paid and quest services beyond healing and summoning: the Goblin Tinkerer's reforging, the Tax
 /// Collector's rent and the Angler's daily fishing quest. State lives in the world's counters.
 /// </summary>
-public sealed class TownServices
+public sealed partial class TownServices
 {
     public const string TaxCounter = "taxes_hour";
     public const string AnglerCounter = "angler_done_day";
@@ -34,7 +34,7 @@ public sealed class TownServices
     /// <summary>What reforging the held item costs now, or 0 when it cannot be reforged here.</summary>
     public long ReforgeCost(TownNpc npc, PlayerEntity player)
     {
-        if (npc.Def.Service is not { Type: TownServiceSpecs.Reforge } spec) return 0;
+        if (npc.Def.FindService(TownServiceSpecs.Reforge) is not { } spec) return 0;
         var held = player.State.Inventory.Held;
         if (held.IsEmpty || !Prefixes.CanHave(held.Item!)) return 0;
         float factor = spec.Parse<ReforgeServiceParams>().CostFactor * _commerce.PriceFactor(npc);
@@ -68,14 +68,14 @@ public sealed class TownServices
     /// <summary>Rent collected since the last visit (copper), capped.</summary>
     public long TaxesDue(TownNpc npc)
     {
-        if (npc.Def.Service is not { Type: TownServiceSpecs.Taxes } spec) return 0;
+        if (npc.Def.FindService(TownServiceSpecs.Taxes) is not { } spec) return 0;
         var p = spec.Parse<TaxServiceParams>();
         if (!Counters.TryGetValue(TaxCounter, out int last))
         {
             Counters[TaxCounter] = (int)Hour; // the collector starts counting from the day he moves in
             return 0;
         }
-        int housed = _world.Town.Residents.Count(r => r.Alive && r.Home != null);
+        int housed = _world.Town.Residents.Count(r => r.IsHoused);
         return Math.Min(p.Cap, Math.Max(0, Hour - last) * housed * (long)p.PerResidentHour);
     }
 
@@ -93,7 +93,7 @@ public sealed class TownServices
     /// <summary>Today's wanted fish, or null (no quest service, or already done today).</summary>
     public Content.Defs.ItemDef? AnglerWants(TownNpc npc)
     {
-        if (npc.Def.Service is not { Type: TownServiceSpecs.AnglerQuest } spec) return null;
+        if (npc.Def.FindService(TownServiceSpecs.AnglerQuest) is not { } spec) return null;
         long day = _world.Session.Clock.Day;
         if (Counters.TryGetValue(AnglerCounter, out int done) && done == (int)day) return null;
         var fish = spec.Parse<AnglerQuestParams>().Fish;
@@ -107,7 +107,7 @@ public sealed class TownServices
     public string? QuestFishToday()
     {
         foreach (var npc in _world.Town.Residents)
-            if (npc.Def.Service is { Type: TownServiceSpecs.AnglerQuest }) return AnglerWants(npc)?.Id;
+            if (npc.Def.FindService(TownServiceSpecs.AnglerQuest) != null) return AnglerWants(npc)?.Id;
         return null;
     }
 
@@ -121,7 +121,7 @@ public sealed class TownServices
         if (inv.Backpack.Count(wanted) < 1) return TradeResult.Unavailable;
         inv.Backpack.Remove(d => d == wanted, 1);
         Counters[AnglerCounter] = (int)_world.Session.Clock.Day;
-        var p = npc.Def.Service!.Parse<AnglerQuestParams>();
+        var p = npc.Def.FindService(TownServiceSpecs.AnglerQuest)!.Parse<AnglerQuestParams>();
         long coins = p.Coins.Length >= 2 ? _rng.Range((int)p.Coins[0], (int)p.Coins[1]) : p.Coins.FirstOrDefault();
         foreach (var s in Wallet.Give(inv, Content, coins)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         foreach (var r in p.Rewards)

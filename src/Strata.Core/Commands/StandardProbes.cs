@@ -43,7 +43,8 @@ internal static class StandardProbes
         ctx.AddProbe("pets.lights", () => w.Projectiles.PetCount(lights: true));
         ctx.AddProbe("melee.swings", () => w.Melee.ActiveSwings);
         ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
-        ctx.AddProbe("house.valid", () => w.Housing.Scan(ctx.Player.FeetCell + Int3.Up).Valid ? 1 : 0);
+        ctx.AddProbe("house.valid", () => w.Rooms.Get(ctx.Player.FeetCell + Int3.Up)!.Valid ? 1 : 0);
+        ctx.AddProbe("house.scans", () => w.Rooms.Scans);
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
         // Voxel light at the player's head (0–15; -1 before the chunk is lit) and the sky map's column top.
         ctx.AddProbe("light.sky", () => HeadLight(w, ctx, block: false));

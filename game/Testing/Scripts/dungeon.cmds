@@ -71,6 +71,15 @@ wait 1
 assert player.life < 100
 heal
 
+# --- P5-06b ---
+# The bound Mechanic waits in the Mechanic room once Skeletron is down; talking frees her.
+tp landmark dungeon_mechanic
+wait_until player.frozen == 0 180
+wait_until town.mechanic.bound == 1 15
+town rescue mechanic
+assert flag.rescued_mechanic == 1
+assert town.mechanic.bound == 0
+
 # Deep in the Dungeon: the vault floor is inside the zone, and so is the floor in front of a locked chest.
 tp landmark dungeon_bottom
 wait_until player.frozen == 0 180

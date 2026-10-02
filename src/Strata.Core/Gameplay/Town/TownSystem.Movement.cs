@@ -15,10 +15,20 @@ public sealed partial class TownSystem
         const float dt = 1f / Units.TicksPerSecond;
         if (!r.Alive)
         {
-            if (r.RespawnTicks > 0 && --r.RespawnTicks == 0) Revive(r);
+            if (r.RespawnTicks > 0) r.RespawnTicks--; // waiting for an unloaded landmark
+            else if (ShouldRevive(r)) Revive(r);
             return;
         }
         if (World.GetBlock(VoxelMotion.CellOf(r.Center)) == VoxelWorld.Unknown) return; // frozen while unloaded
+        if (r.Bound)
+        {
+            // Tied up: no errands and no harm, only gravity.
+            r.Velocity = new Vector3(0, MathF.Max(r.Velocity.Y - Gravity * dt, -30f), 0);
+            var c = r.Center;
+            r.OnGround = VoxelMotion.Move(World, ref c, ref r.Velocity, TownNpc.HalfExtents, dt);
+            r.Position = c - new Vector3(0, TownNpc.HalfExtents.Y, 0);
+            return;
+        }
         TakeContactHits(r);
         if (!r.Alive) return;
         Decide(r);
@@ -174,26 +184,11 @@ public sealed partial class TownSystem
         return _world.Navigator.IsStandable(guess, Agent) ? guess : _world.Navigator.NearestStandable(guess, Agent, 2) ?? guess;
     }
 
-    private void Revive(TownNpc r)
-    {
-        var at = r.Home ?? LandmarkNode(r.Def);
-        if (at == null && r.Def.Landmark != null)
-        {
-            r.RespawnTicks = LandmarkInterval; // their place is not loaded: come back once it is
-            return;
-        }
-        at ??= _world.Navigator.NearestStandable(_world.Session.SpawnCell, Agent, 6) ?? _world.Session.SpawnCell;
-        r.Life = r.Def.Life;
-        r.Position = NodeFeet(at.Value);
-        r.Velocity = Vector3.Zero;
-        r.Path = null;
-        Spawned?.Invoke(r);
-    }
-
     /// <summary>Starts a conversation: the resident stops and faces the player for a while.</summary>
     public bool BeginTalk(TownNpc r, Session.PlayerEntity p)
     {
         if (!r.Alive || Vector3.Distance(p.Center, r.Center) > Config.TalkRange) return false;
+        if (r.Bound) Rescue(r, p, out _); // Terraria: talking to a bound NPC frees them
         r.TalkingTo = p;
         r.TalkTicks = Config.TalkTicks;
         r.Path = null;

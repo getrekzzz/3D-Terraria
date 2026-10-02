@@ -3820,6 +3820,13 @@
    "source": "moth"
   },
   {
+   "id": "terraria:purification_powder",
+   "name": "Purification Powder",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
    "id": "terraria:wire_cutter",
    "name": "Wire Cutter",
    "kind": "tool",

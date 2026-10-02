@@ -7979,6 +7979,10 @@
    },
    "icon": "assets/icons/items/pumpkin_moon_medallion.png"
   },
+  "purification_powder": {
+   "model": "assets/models/items/purification_powder.glb",
+   "icon": "assets/icons/items/purification_powder.png"
+  },
   "purple_paint": {
    "model": "assets/models/items/purple_paint.glb",
    "sockets": {

@@ -239,8 +239,9 @@ public sealed partial class NpcSystem
                 if (npc.Position.Y < 0) Remove(i);
                 continue;
             }
-            _ctx.Target = target;
-            _ctx.TargetDistance = distance;
+            var aim = ChooseTarget(npc, target, distance, out float aimDistance); // a resident, when nearer
+            _ctx.Target = aim;
+            _ctx.TargetDistance = aimDistance;
             _ctx.OnSurface = session.Generator.Plan.Bands.LayerAt(npc.Cell.Y) == World.WorldLayer.Surface;
             _ctx.Rng = _rng;
             var brain = BrainOf(npc.Def);
@@ -259,7 +260,7 @@ public sealed partial class NpcSystem
             if (npc.Def.Shield != null && ShieldUp(npc)) npc.Invulnerable = true;
             if (brain.UsesGravityFor(npc) && npc.Def.Gravity) npc.Velocity.Y = MathF.Max(npc.Velocity.Y - BrainContext.Gravity * dt, -30f);
             Move(npc, brain, thinks ? dt * npc.SpeedScale : dt);
-            if (npc.Def.Ranged != null && target != null) RangedAttack(npc, target, distance);
+            if (npc.Def.Ranged != null && aim != null) RangedAttack(npc, aim, aimDistance);
             if (npc.Def.ContactDamage && target != null) ContactDamage(npc, target);
             if (npc.Removed) continue; // thorns killed it
             if (npc.Barrier != null) BarrierEffects(npc);

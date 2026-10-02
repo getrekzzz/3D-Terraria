@@ -31,6 +31,48 @@ wait 2
 assert town.guide.home < 0.3
 time noon
 
+# --- P5-01 ---
+# A slain resident stays dead through the night and returns at dawn.
+town slay guide
+assert town.guide.alive == 0
+time 3
+wait 1
+assert town.guide.alive == 0
+time 5
+wait_until town.guide.alive == 1 10
+time noon
+
+# --- P5-02 ---
+# Corruption under the house makes it invalid ("This housing is corrupted."); cleansed, the guide moves back in.
+fill 3 -3 -5 13 -2 5 ebonstone
+wait_until town.guide.home < 0 20
+fill 3 -3 -5 13 -2 5 stone
+town check force
+assert town.homed == 1
+
+# --- P5-03 ---
+season christmas
+assert season.id == 2
+season off
+assert season.id == 0
+season auto
+
+# --- P5-05 ---
+# The housing API: evict the guide (the room reads suitable again), then assign him back.
+housing evict guide
+assert town.guide.homed == 0
+housing query 8 1 0
+housing assign guide 8 1 0
+assert town.guide.homed == 1
+
+# --- P5-13 ---
+# The Dryad's Status service reports the world's purity (the chat button arrives with the W4 dialog).
+town summon dryad 0 0 -3
+town services dryad
+town status dryad
+town dismiss dryad
+assert errors == 0
+
 # Talking and trading with the peddler.
 give silver_coin 60
 town summon merchant 0 0 -3

@@ -132,7 +132,7 @@ public class TownTests
         var commerce = g.World.Commerce;
         var peddler = Summon(g, "merchant", new Int3(2, 1, 2));
         float alone = commerce.PriceFactor(peddler);
-        Summon(g, "nurse", new Int3(-2, 1, 2)); // the peddler dislikes the mender
+        Summon(g, "tax_collector", new Int3(-2, 1, 2)); // the Merchant dislikes the Tax Collector
         Assert.True(commerce.PriceFactor(peddler) > alone);
         Assert.InRange(commerce.PriceFactor(peddler), g.World.Town.Config.MinPriceFactor, g.World.Town.Config.MaxPriceFactor);
 
@@ -183,8 +183,8 @@ public class TownTests
         town.Damage(guide, 100_000, guide.Position);
         Assert.False(guide.Alive);
         Assert.Contains(guide, died);
-        Assert.Equal(town.Config.RespawnTicks, guide.RespawnTicks);
-        guide.RespawnTicks = 3;
+        Assert.Equal(g.World.Session.Clock.Tick, guide.DiedAtTick);
+        town.Config = new TownConfig { RespawnAtDawn = false, RespawnTicks = 3 }; // the fixed-delay mode
         g.Ticks(4);
         Assert.True(guide.Alive);
         Assert.Equal(guide.Def.Life, guide.Life);

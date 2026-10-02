@@ -26,10 +26,14 @@ public static partial class ContentValidator
                 var e = t.Shop[i];
                 ctx.Ref(t, ctx.Db.Items, e.Item, $"shop[{i}].item");
                 if (e.Price is < 0) ctx.Error(t, $"shop[{i}].price must be >= 0.");
+                if (string.IsNullOrWhiteSpace(e.Tab)) ctx.Error(t, $"shop[{i}].tab must not be empty.");
+                ctx.Ref(t, ctx.Db.Items, e.Currency, $"shop[{i}].currency");
                 ctx.Specs(t, SpecKind.Condition, e.Conditions, $"shop[{i}].conditions");
             }
-            if (t.Service is { } service)
+            if (t.Service != null && t.Services.Length > 0) ctx.Warn(t, "both 'service' and 'services' are set; prefer 'services'.");
+            foreach (var service in t.AllServices)
             {
+                if (t.AllServices.Count(o => o.Type == service.Type) > 1) ctx.Error(t, $"service '{service.Type}' is listed twice.");
                 ctx.Spec(t, SpecKind.TownService, service, "service");
                 if (service.Type == TownServiceSpecs.SummonBoss && ctx.TryParse<SummonServiceParams>(SpecKind.TownService, service) is { } summon)
                 {
@@ -59,12 +63,15 @@ public static partial class ContentValidator
             }
             foreach (var m in t.Mood)
             {
-                if ((m.Biome == null) == (m.Neighbor == null)) ctx.Error(t, "each mood entry needs exactly one of 'biome' or 'neighbor'.");
+                if ((m.Biome != null ? 1 : 0) + (m.Neighbor != null ? 1 : 0) + (m.Layer != null ? 1 : 0) != 1)
+                    ctx.Error(t, "each mood entry needs exactly one of 'biome', 'neighbor' or 'layer'.");
+                if (m.Layer is { } layer && layer != "underground") ctx.Error(t, $"mood layer '{layer}' must be 'underground'.");
                 if (m.Score is < -2 or > 2 or 0) ctx.Error(t, "mood score must be −2, −1, 1 or 2.");
                 ctx.Ref(t, ctx.Db.Biomes, m.Biome, "mood.biome");
                 ctx.Ref(t, ctx.Db.TownNpcs, m.Neighbor, "mood.neighbor");
             }
             foreach (var c in AllConditions(t)) CheckTownCondition(ctx, t, c);
+            ValidateTownRescue(ctx, t);
         }
         foreach (var r in ctx.Db.SpawnRules.All)
             foreach (var c in r.Conditions) CheckTownCondition(ctx, r, c);
@@ -78,7 +85,7 @@ public static partial class ContentValidator
     private static IEnumerable<TypedSpec> AllConditions(TownNpcDef t) =>
         t.Arrival.Concat(t.LeavesWhen).Concat(t.Shop.SelectMany(s => s.Conditions)).Concat(t.Lines.SelectMany(l => l.Conditions));
 
-    /// <summary>References inside resident/hasItem conditions (also nested in all/any/not).</summary>
+    /// <summary>References inside resident/hasItem/wearing/rescued/killed/obtained conditions (also nested in all/any/not).</summary>
     private static void CheckTownCondition(Ctx ctx, ContentDef owner, TypedSpec c)
     {
         string? Str(string name) => c.Raw.TryGetProperty(name, out var v) && v.ValueKind == System.Text.Json.JsonValueKind.String ? v.GetString() : null;
@@ -92,6 +99,17 @@ public static partial class ContentValidator
                 break;
             case "wearing":
                 ctx.Ref(owner, ctx.Db.Items, Str("item"), "wearing condition");
+                break;
+            case "rescued":
+                ctx.Ref(owner, ctx.Db.TownNpcs, Str("id"), "rescued condition");
+                if (ctx.Db.TownNpcs.TryGet(Str("id") ?? "", out var rescued) && rescued.Rescue == null)
+                    ctx.Error(owner, $"rescued condition: '{Str("id")}' has no rescue block, so nothing in the world can free them.");
+                break;
+            case "killed":
+                ctx.Ref(owner, ctx.Db.Enemies, Str("enemy"), "killed condition");
+                break;
+            case "obtained":
+                ctx.Ref(owner, ctx.Db.Items, Str("item"), "obtained condition");
                 break;
             case "all" or "any" or "not" when c.Raw.TryGetProperty("of", out var of) && of.ValueKind == System.Text.Json.JsonValueKind.Array:
                 foreach (var inner in of.EnumerateArray())

@@ -13,7 +13,7 @@ internal static class TownProbes
         ctx.AddProbe("town.residents", () => w.Town.Residents.Count);
         ctx.AddProbe("town.homed", () => w.Town.Residents.Count(t => t.Home != null));
         // town.<id>: 1 when the resident lives in town; town.<id>.home: metres from their home (−1 if homeless/absent);
-        // town.<id>.alive: 1 while they are alive.
+        // town.<id>.alive: 1 while they are alive; town.<id>.homed: 1 while they have a home.
         ctx.AddPrefixProbe("town.", spec =>
         {
             var parts = spec.Split('.');
@@ -22,6 +22,8 @@ internal static class TownProbes
             if (parts.Length == 1) return t != null ? 1 : 0;
             if (parts is [_, "home"]) return t?.Home is { } h ? Vector3.Distance(t.Position, TownSystem.NodeFeet(h)) : -1;
             if (parts is [_, "alive"]) return t is { Alive: true } ? 1 : 0;
+            if (parts is [_, "homed"]) return t?.Home != null ? 1 : 0;
+            if (parts is [_, "bound"]) return t is { Bound: true } ? 1 : 0;
             return null;
         });
     }

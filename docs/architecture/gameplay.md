@@ -596,3 +596,65 @@ portrait and habitat (Core `Habitat.For`: each spawn rule of the entry through `
 summon items from `summonBoss` behaviours); stats → life, defence, damage (scaled by `NpcSystem.Scale`), knockback
 resist, coins, description; full → every drop with its chance. Residents show the description and when they move
 in. Probe `ui.bestiary_unlock`. Not yet: the rotating 3D preview (thumbnails stand in), biome filter.
+
+## Town population and housing (P5-01..P5-05)
+
+* **Population** (`TownSystem.FillTownFacts`): a resident counts (`TownNpc.CountsAsResident`) while alive, not `Bound`
+  (awaiting rescue) and of kind `Resident` (landmark keepers such as the Old Man never count). The `residents`
+  condition reads `ConditionContext.ResidentCount`, the number of counting residents with a home; `resident <id>`
+  reads the counting ids. Events (the party) use the same facts.
+* **Move-ins** happen only by day (`CheckArrivals(force)`; `town check force` for tests); homeless residents are
+  re-housed at any hour. A fallen or vanished resident returns at the first dawn after `DiedAtTick` once
+  `minDeadTicks` have passed (`TownSystem.Life.cs`; `respawnAtDawn: false` restores the fixed delay). Setting the
+  clock back clamps `DiedAtTick`. `Bound`/`DiedAt` are optional `ResidentModel` fields (old saves load with defaults).
+* **Housing validity** (`HousingScanner`): Corruption/Crimson blocks (tag `evil`, not `ore`) within `evilMargin` of a
+  room, sampled every other column, make it "This housing is corrupted." at `evilLimit` hits. Problems and
+  `Room.Message` use Terraria's query wording from `housing.json` `messages`.
+* **Room cache** (`GameWorld.Rooms`, `HousingCache`): rooms are cached by every interior cell and dropped when a block
+  edit (liquids ignored) or a tile object add/remove touches their bounds grown by `evilMargin + 1`; open results
+  expire after `openRoomTtl`. The town's background checks are budgeted (`maxScansPerTick`, retried next interval)
+  and one home per check is re-scanned regardless. Probe `house.scans` counts flood fills.
+* **Town conditions** (`ConditionCompiler.Town.cs`): `rescued {id}` (world flag `rescued_<id>`, `TownRescue`),
+  `hasItem {category}` (an `ItemCategory`, item-count key `@<category>`), `bestiary {min,max}`, `killed {enemy,min}`,
+  `obtained {item}`, `achieved {id}` (read `ConditionContext.Records`, an `IPlayerRecords` the journal supplies
+  through `TownSystem.PlayerRecords`; null reads 0/false) and `anglerQuests {min,max}`. Seasons (Santa) use the
+  World slice's `season` condition and `SeasonState`.
+* **Housing API** (`TownSystem.Housing.cs`): `QueryHousing(cell)` (room, suitable, Terraria message, occupant),
+  `AssignHome(npc, cell)` (Assigned / Swapped: the occupant takes the npc's old home or becomes homeless /
+  NotSuitable / NotAResident for landmark keepers and bound NPCs / AlreadyHome) and `Evict(npc)`; valid homes are
+  kept until the room breaks. `TownNpc.BannerCell` marks the banner spot (found again after load). Console:
+  `housing query|assign|evict`; probe `town.<id>.homed`.
+* **Town data** lives in `data/town/pre_hardmode.json`, `hardmode.json` and `visitors.json`, one NPC per line, with
+  Terraria 1.4.4 move-in rules: rescued NPCs (Angler, Golfer, Stylist, Goblin Tinkerer, Mechanic, Tavernkeep, Wizard,
+  Tax Collector) need `rescued`; Demolitionist and Nurse need the Merchant; the Dryad any boss; the Zoologist 10%
+  bestiary; the Dye Trader a dye and 4 residents; the Party Girl 14 residents and a 2.5% roll (drawn from the town
+  stream); Santa the Frost Legion and Christmas (he leaves after); the Princess 3 residents. Visiting merchants are
+  inert (`flag never`) until visits exist.
+* **Services** (P5-13): `TownNpcDef.Services` (plus the legacy `service`, merged in `AllServices`/`FindService`).
+  Shop entries have a `tab` (default "shop"; `TownCommerce.Tabs/Stock/Buy` take it) and an optional `currency`
+  item paid by count, unscaled by happiness. The Nurse's heal is base × the first set progression tier (Golem 200 …
+  Eye 3) × the Expert multiplier × happiness. The Dryad's `worldStatus` reads `WorldStatus`, an incremental biome
+  sampler (256 samples per tick, approximate, fresh for an hour); `town status <id>` forces it. The chat buttons for
+  `services` arrive with the W4 TownDialog.
+* **Happiness** (P5-12, `TownHappiness`): Terraria 1.4 multipliers (love 0.88, like 0.94, dislike 1.06, hate 1.12)
+  for the home's biome or the underground layer (`mood.layer`) and for neighbours within 25 tiles horizontally
+  (vertical cap); the Princess (`lovedByAll`) counts as loved; more than 3 near neighbours +5% each; solitude (≤2 near,
+  ≤4 within 120 tiles) 0.95; homeless 1.1; clamped to the price range. `TownCommerce.PriceFactor/Happiness/
+  DescribeHappiness`; lines from `town.json` `happiness.lines` or per-NPC `happinessLines`. Mood tables follow
+  Terraria's happiness table. The chat's Happiness button arrives with the W4 TownDialog.
+* **Rescues** (P5-06a, `TownSystem.Rescues.cs`, `SiteFinder`): an NPC with a `rescue` block appears `Bound` once its
+  `requires` hold and its flag `rescued_<id>` is unset, at an unseen standable node in a loaded chunk where `where`
+  holds (rare zones are sampled inside plan features carrying them; otherwise a 30–70 m shell around the player) or
+  at its planned `landmark`. Bound NPCs do not count, cannot be hurt, only fall, and show the rescue title. Talking
+  (`BeginTalk`) frees them (`requiresItem` is used up: the Tortured Soul's Purification Powder); the next move-in
+  check houses them. Console: `town bind|rescue <id>`; probe `town.<id>.bound`; smoke `rescue.cmds`.
+* **Rescue sites** (P5-06b): the Dungeon plans landmark `dungeon_mechanic` at `DungeonLayout.MechanicCell` (the
+  `RoomKind.Mechanic` room); the Mechanic's rescue uses it once Skeletron is down and waits there even in plain view
+  (a reserved site). The other rescues search: Goblin and Wizard in the caverns, Stylist in spider nests (sampled
+  inside the nest features), Golfer in the underground desert, Angler on the ocean surface, Tavernkeep on the
+  surface, the Tortured Soul in the underworld. A `rescued` condition on an NPC without a rescue block is an error.
+* **Residents as targets** (P5-09, `NpcSystem.Targeting.cs`): `TownNpc` is an `ICombatTarget`. Ordinary hostile
+  creatures go after the nearest counting resident within `residentAggroRange` (14 m) when it is `playerPreference`
+  (4 m) nearer than the nearest player, re-chosen every 15 ticks; bosses, parts, critters, passive, harmless,
+  invulnerable and disguised creatures stay on players, and bound NPCs are never targets. Despawn, enrage and contact
+  damage still follow the nearest player; residents take contact hits through `TownSystem`.

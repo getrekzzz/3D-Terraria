@@ -2,6 +2,10 @@
   // Natural enemy spawning around players (see SpawnDirector). Distances in metres, intervals in ticks (60/s).
   // Rates follow the reference game: about one attempt every 10 s by day and every 6 s at night.
   "checkInterval": 60,
+  // Town defence (P5-09): hostile creatures go after residents within residentAggroRange when no player is
+  // playerPreference metres nearer.
+  "residentAggroRange": 14,
+  "playerPreference": 4,
   "chance": 0.10,
   "nightChance": 0.17,
   // Hostile creatures near a player; critters (fireflies, bunnies…) have their own small allowance.
