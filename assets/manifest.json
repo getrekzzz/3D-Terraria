@@ -4107,6 +4107,31 @@
    "generator": "golem_idol",
    "animations": []
   },
+  "golem_body": {
+   "model": "assets/models/creatures/golem_body.glb",
+   "generator": "golem_body",
+   "animations": [
+    "attack",
+    "idle",
+    "jump",
+    "walk"
+   ]
+  },
+  "golem_fist": {
+   "model": "assets/models/creatures/golem_fist.glb",
+   "generator": "golem_fist",
+   "animations": []
+  },
+  "golem_head": {
+   "model": "assets/models/creatures/golem_head.glb",
+   "generator": "golem_head",
+   "animations": []
+  },
+  "golem_head_free": {
+   "model": "assets/models/creatures/golem_head_free.glb",
+   "generator": "golem_head",
+   "animations": []
+  },
   "golfer": {
    "model": "assets/models/creatures/golfer.glb",
    "generator": "humanoid",
@@ -4773,9 +4798,23 @@
     "idle"
    ]
   },
+  "plantera_hook": {
+   "model": "assets/models/creatures/plantera_hook.glb",
+   "generator": "plantera_hook",
+   "animations": []
+  },
   "plantera_open": {
    "model": "assets/models/creatures/plantera_open.glb",
    "generator": "plantera_bulb",
+   "animations": [
+    "attack",
+    "fly",
+    "idle"
+   ]
+  },
+  "plantera_tentacle": {
+   "model": "assets/models/creatures/plantera_tentacle.glb",
+   "generator": "plantera_tentacle",
    "animations": [
     "attack",
     "fly",

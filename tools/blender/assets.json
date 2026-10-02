@@ -4439,6 +4439,32 @@
       "generator": "golem_idol",
       "params": {}
     },
+    "golem_body": {
+      "generator": "golem_body",
+      "params": {}
+    },
+    "golem_head": {
+      "generator": "golem_head",
+      "params": {}
+    },
+    "golem_head_free": {
+      "generator": "golem_head",
+      "params": {
+        "free": true
+      }
+    },
+    "golem_fist": {
+      "generator": "golem_fist",
+      "params": {}
+    },
+    "plantera_hook": {
+      "generator": "plantera_hook",
+      "params": {}
+    },
+    "plantera_tentacle": {
+      "generator": "plantera_tentacle",
+      "params": {}
+    },
     "queen_slime": {
       "generator": "slime_queen",
       "params": {}
