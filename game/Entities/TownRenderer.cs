@@ -72,6 +72,25 @@ public sealed partial class TownRenderer : Node3D
         }
     }
 
+    /// <summary>
+    /// Index in <see cref="HumanoidAnimator.States"/> of the clip a resident's body is playing (probe
+    /// <c>town.&lt;id&gt;.clip</c>): -1 when not shown, -2 for a body without the humanoid set.
+    /// </summary>
+    public int PlayingClip(string id)
+    {
+        if (_game.Town.Find(id) is not { } npc || !_views.TryGetValue(npc.Id, out var view)) return -1;
+        if (view.Visual.Humanoid is not { } h) return -2;
+        return System.Array.IndexOf(HumanoidAnimator.States, h.PlayingState);
+    }
+
+    /// <summary>Height (m) of a resident's hips bone above their feet as posed now (probe <c>town.&lt;id&gt;.hips</c>), or -1.</summary>
+    public float HipsHeight(string id)
+    {
+        if (_game.Town.Find(id) is not { } npc || !_views.TryGetValue(npc.Id, out var view) || view.Visual.Skeleton is not { } sk) return -1;
+        int bone = sk.FindBone("hips");
+        return bone < 0 ? -1 : (sk.GlobalTransform * sk.GetBoneGlobalPose(bone)).Origin.Y - view.Visual.GlobalPosition.Y;
+    }
+
     /// <summary>The locomotion state for a resident: a rest pose (sit, sleep, bound, lie) when resting, else walk/jump/idle.</summary>
     private static string Clip(TownNpc npc, CreatureVisual visual)
     {
