@@ -1,3 +1,4 @@
+using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Session;
 
@@ -5,12 +6,34 @@ namespace Strata.Core.Gameplay.Interaction;
 
 public sealed partial class ItemUseSystem
 {
-    private UseOutcome Consume(PlayerEntity p, ItemUseInfo info)
+    /// <summary>
+    /// Consumes one of the stack in <paramref name="inv"/> at <paramref name="slot"/> as if it were used, without
+    /// selecting it: quick heal, mana and buff drink from anywhere in the backpack. Returns
+    /// <see cref="UseOutcome.Consumed"/>, <see cref="UseOutcome.Blocked"/> (the refusal is reported like a failed press)
+    /// or <see cref="UseOutcome.None"/> when the slot holds nothing consumable.
+    /// </summary>
+    public UseOutcome ConsumeAt(PlayerEntity p, Inventory inv, int slot)
+    {
+        var stack = inv[slot];
+        if (stack.IsEmpty || !p.Alive) return UseOutcome.None;
+        var info = _world.Uses[stack.Item!];
+        if (!info.Has(ItemAction.Consume)) return UseOutcome.None;
+        _refusal = null;
+        var outcome = Consume(p, info, inv, slot);
+        return outcome == UseOutcome.Blocked ? Report(p, info, outcome, freshPress: true) : outcome;
+    }
+
+    private UseOutcome Consume(PlayerEntity p, ItemUseInfo info) => Consume(p, info, p.State.Inventory.Backpack, p.State.Inventory.SelectedHotbar);
+
+    private UseOutcome Consume(PlayerEntity p, ItemUseInfo info, Inventory inv, int slot)
     {
         var item = info.Item;
         var state = p.State;
         var cfg = info.Consume!;
         if (item.HealLife > 0 && _healingCooldown != null && state.Buffs.Has(_healingCooldown.Id)) return Refuse(_healingCooldown.DisplayName);
+        // Life Fruit: only once every Life Crystal is in (400 max life), and only after a mechanical boss.
+        if (cfg.RequiresLife > 0 && Player.PlayerState.BaseLife + state.BonusLife < cfg.RequiresLife) return Refuse($"Requires {cfg.RequiresLife} maximum life");
+        if (cfg.RequiresFlag != null && !_world.Progression.IsSet(cfg.RequiresFlag)) return cfg.FlagMessage != null ? Refuse(cfg.FlagMessage) : UseOutcome.Blocked;
         if (cfg.PermanentLife > 0 && Player.PlayerState.BaseLife + state.BonusLife >= cfg.LifeCap) return UseOutcome.Blocked;
         if (cfg.PermanentMana > 0 && Player.PlayerState.BaseMana + state.BonusMana >= cfg.ManaCap) return UseOutcome.Blocked;
         if (cfg.ExtraAccessorySlot && (state.ExtraAccessorySlot || _world.Session.Settings.EffectiveDifficulty is not (World.Difficulty.Expert or World.Difficulty.Master)))
@@ -37,7 +60,10 @@ public sealed partial class ItemUseSystem
             if (_manaCooldown != null) state.Buffs.Add(_manaCooldown, _manaCooldown.Duration);
         }
         if (item.Buff != null && _world.Session.Content.Buffs.TryGet(item.Buff.Id, out var buff))
+        {
+            if (buff.FoodTier > 0) ReplaceFood(state.Buffs, buff); // one food buff at a time
             state.Buffs.Add(buff, item.Buff.Ticks, state.Effects.Immunities);
+        }
         state.Recompute();
         // Crystals fill the life or mana they add, and float it like a potion does (Terraria's HealEffect / ManaEffect).
         if (cfg.PermanentLife > 0) life += state.Vitals.Heal(cfg.PermanentLife);
@@ -46,8 +72,16 @@ public sealed partial class ItemUseSystem
         _world.ReportHeal(p, mana, mana: true);
         if (cfg.Recall) Recall(p);
         if (cfg.Loot != null) Open(p, cfg.Loot);
-        if (item.Consumable) ConsumeHeld(p);
+        if (item.Consumable) inv.Take(slot, 1);
         return UseOutcome.Consumed;
+    }
+
+    /// <summary>Eating removes any other food buff (Well Fed, Plenty Satisfied and Exquisitely Stuffed never stack).</summary>
+    private static void ReplaceFood(Buffs.BuffSet buffs, BuffDef food)
+    {
+        var active = buffs.Active;
+        for (int i = active.Count - 1; i >= 0; i--)
+            if (active[i].Def.FoodTier > 0 && active[i].Def != food) buffs.Remove(active[i].Def.Id);
     }
 
     private UseOutcome Summon(PlayerEntity p, ItemUseInfo info)

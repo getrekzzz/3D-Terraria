@@ -144,3 +144,18 @@ wait 1.5
 assert player.hold_clip == 0
 assert anim.missing_clips == 0
 assert errors == 0
+
+# --- P3-33 ---
+# Quick heal (H) drinks the best healing potion from the backpack without changing the held item (the Sunfury stays
+# selected); the drink floats over the head as "Used Lesser Healing Potion".
+give lesser_healing_potion 2
+hurt 50
+assert player.life <= 50
+press quick_heal
+wait 0.1
+press quick_heal off
+wait 0.3
+assert player.life >= 95
+assert inv.lesser_healing_potion == 1
+assert player.held_count == 1
+assert errors == 0

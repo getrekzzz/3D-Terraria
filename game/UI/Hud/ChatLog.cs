@@ -21,6 +21,7 @@ public sealed partial class ChatLog : Control
     private readonly ScrollContainer _scroll;
     private double _now;
     private int _shownFrom = -1, _shownAdded = -1; // the first line the labels show and the history they were built from
+    private int _vision; // the colour-blind palette the lines are tinted for (X-12)
     private bool _open;
 
     public ChatLog()
@@ -105,6 +106,12 @@ public sealed partial class ChatLog : Control
     public override void _Process(double delta)
     {
         _now += delta;
+        if (_vision != UiTheme.VisionVersion)
+        {
+            _vision = UiTheme.VisionVersion; // the colour-blind mode changed: recolour the lines
+            _shownAdded = -1;
+            if (_open) Show(0);
+        }
         if (_open) return; // the history shows every line at full strength
         int from = _history.FirstShown(_now);
         if (from != _shownFrom || _history.Added != _shownAdded) Show(from);
@@ -129,7 +136,7 @@ public sealed partial class ChatLog : Control
             if (!shown) continue;
             var line = _history[i];
             label.Text = line.Text;
-            label.SelfModulate = Color.Color8(line.Color.R, line.Color.G, line.Color.B);
+            label.SelfModulate = UiTheme.Vision(Color.Color8(line.Color.R, line.Color.G, line.Color.B));
             if (_open) label.Modulate = Colors.White;
         }
     }

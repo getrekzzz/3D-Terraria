@@ -1166,3 +1166,61 @@ assert hud.prompt_pad == 0
 pad release
 god off
 assert errors == 0
+
+# --- X-12 ---
+# Accessibility. Subtitles are off by default; on, a resident's arrival is captioned without an arrow and a creature's
+# hit beside the camera with one, above the chat log and clear of every widget (also with the inventory open), and rain
+# while it falls; off, the lines go. A background save shows the spinning autosave icon in the bottom-right corner for at least a moment.
+# A colour-blind mode turns the world filter on and swaps the interface palette; off turns both back.
+weather clear
+access hear npc_arrive
+wait 0.1
+assert ui.captions == 0
+access subtitles on
+access hear npc_arrive
+access hear hit_squish right
+wait 0.1
+assert ui.captions >= 2
+assert ui.caption_arrows == 1
+access hear thunder_near
+wait 0.1
+assert ui.captions >= 3
+assert ui.caption_arrows == 1
+assert ui.overlaps == 0
+ui inventory
+wait 0.2
+assert ui.overlaps == 0
+ui close
+wait 0.2
+access subtitles off
+wait 0.1
+assert ui.captions == 0
+# Rain is captioned while it can be heard (the weather loops report themselves once a second).
+access subtitles on
+weather rain
+wait 2
+assert ui.captions_weather >= 1
+weather clear
+access subtitles off
+wait 0.1
+assert ui.captions == 0
+save async
+wait 0.1
+assert ui.saving == 1
+assert ui.overlaps == 0
+wait_until ui.saving == 0 60
+assert ui.save_icons >= 1
+access colorblind deuteranopia 0.8
+wait 0.1
+assert ui.colorblind == 2
+assert ui.colorblind_pass == 1
+assert ui.palette_swapped == 1
+access colorblind tritanopia
+wait 0.1
+assert ui.colorblind == 3
+access colorblind off
+wait 0.1
+assert ui.colorblind == 0
+assert ui.colorblind_pass == 0
+assert ui.palette_swapped == 0
+assert errors == 0

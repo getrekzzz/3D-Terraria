@@ -89,7 +89,7 @@ public sealed partial class Hud
     {
         if (!Settings.UserSettings.Current.BigAnnouncements) return;
         _banner.Text = text;
-        _banner.SelfModulate = color;
+        _banner.SelfModulate = UiTheme.Vision(color);
         _banner.Modulate = Colors.White;
         _banner.Visible = true;
         _bannerTween?.Kill();

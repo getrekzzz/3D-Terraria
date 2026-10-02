@@ -84,6 +84,16 @@ public sealed partial class UserSettings
     public const string ClassicLifeDisplay = "classic";
     public const string BarsLifeDisplay = "bars";
 
+    // Accessibility (X-12)
+    /// <summary>Colour-blind mode: "off", "protanopia", "deuteranopia" or "tritanopia" (Strata.Core.Presentation.ColorVision).</summary>
+    public string ColorBlindMode { get; set; } = "off";
+
+    /// <summary>How strongly the colour-blind filter recolours the world view (0–1); the interface palette swaps fully.</summary>
+    public float ColorBlindStrength { get; set; } = 1f;
+
+    /// <summary>Captions for important sounds (bosses, arrivals, weather, nearby creatures) above the chat log.</summary>
+    public bool Subtitles { get; set; }
+
     /// <summary>Terraria's pink-red pointer.</summary>
     public const string DefaultCursorColor = "#ff325f";
 

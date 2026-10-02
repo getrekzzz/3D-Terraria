@@ -1,0 +1,54 @@
+{
+  // Subtitles for sounds (X-12; Settings > Accessibility > Subtitles): the line shown above the chat log when a listed
+  // sound plays, coloured by its kind. Positional sounds farther than their range (metres) are not captioned and get an
+  // arrow pointing to where they came from. Weather loops are captioned while they can be heard.
+  "seconds": 3,
+  "fadeSeconds": 0.6,
+  "maxLines": 5,
+  "range": 32,
+  "colors": {
+    "world": "#ffffff",
+    "boss": "#af4bff",
+    "enemy": "#ffaa78",
+    "town": "#327dff",
+    "weather": "#96d2ff"
+  },
+  "sounds": {
+    "boss_roar": { "text": "Boss roars", "kind": "boss", "range": 96 },
+    "boss_defeated": { "text": "Boss falls", "kind": "boss" },
+    "boss_slam": { "text": "Ground shakes", "kind": "boss", "range": 64 },
+    "hand_slap": { "text": "Giant hand slams", "kind": "boss", "range": 64 },
+    "skull_shot": { "text": "Cursed skull fires", "kind": "boss", "range": 64 },
+    "npc_arrive": { "text": "Resident arrives", "kind": "town" },
+    "event_start": { "text": "Event begins", "kind": "world" },
+    "thunder_near": { "text": "Thunder cracks", "kind": "weather" },
+    "thunder_far": { "text": "Distant thunder", "kind": "weather" },
+    "rain_light": { "text": "Rain falls", "kind": "weather" },
+    "rain_heavy": { "text": "Heavy rain pours", "kind": "weather" },
+    "wind": { "text": "Wind howls", "kind": "weather" },
+    "blizzard": { "text": "Blizzard roars", "kind": "weather" },
+    "sandstorm": { "text": "Sand whips past", "kind": "weather" },
+    "explosion": { "text": "Explosion", "kind": "world", "range": 48 },
+    "dart_trap": { "text": "Dart trap fires", "kind": "world", "range": 24 },
+    "tree_fall": { "text": "Tree falls", "kind": "world" },
+    "door_open": { "text": "Door opens", "kind": "world", "range": 16 },
+    "door_close": { "text": "Door closes", "kind": "world", "range": 16 },
+    "fish_bite": { "text": "Fish bites", "kind": "world" },
+    "hit": { "text": "Creature hurt", "kind": "enemy" },
+    "hit_squish": { "text": "Gel squelches", "kind": "enemy" },
+    "hit_bone": { "text": "Bones rattle", "kind": "enemy" },
+    "hit_metal": { "text": "Metal clangs", "kind": "enemy" },
+    "hit_chitin": { "text": "Shell cracks", "kind": "enemy" },
+    "hit_plant": { "text": "Plant tears", "kind": "enemy" },
+    "hit_spirit": { "text": "Spirit wails", "kind": "enemy" },
+    "hit_stone": { "text": "Stone chips", "kind": "enemy" },
+    "npc_death": { "text": "Creature dies", "kind": "enemy" },
+    "slime_death": { "text": "Slime bursts", "kind": "enemy" },
+    "death_bone": { "text": "Skeleton collapses", "kind": "enemy" },
+    "death_chitin": { "text": "Bug crunches", "kind": "enemy" },
+    "death_metal": { "text": "Metal crashes", "kind": "enemy" },
+    "death_plant": { "text": "Plant withers", "kind": "enemy" },
+    "death_spirit": { "text": "Spirit fades", "kind": "enemy" },
+    "death_stone": { "text": "Stone shatters", "kind": "enemy" }
+  }
+}

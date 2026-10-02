@@ -33,10 +33,20 @@ public static class Sfx
         }
     }
 
+    /// <summary>
+    /// A sound was played, or a loop or thunder clap is being heard (<see cref="Report"/>): its id and world position
+    /// (null for sounds without one). The subtitles (X-12) caption the ids data/config/captions.json lists.
+    /// </summary>
+    public static event System.Action<string, Vector3?>? Heard;
+
+    /// <summary>Tells the subtitles a sound played outside the pools (weather loops, thunder) is being heard.</summary>
+    public static void Report(string id, Vector3? at = null) => Heard?.Invoke(id, at);
+
     /// <summary>Plays a sound without position (UI, the local player's own actions).</summary>
     public static void Play(string id, float volumeDb = 0f, float pitchJitter = 0.06f)
     {
         if (_host == null || Streams(id) is not { Length: > 0 } streams) return;
+        Heard?.Invoke(id, null);
         var p = Free(Pool);
         if (p == null) return;
         p.Stream = streams[Rng.RandiRange(0, streams.Length - 1)];
@@ -49,6 +59,7 @@ public static class Sfx
     public static void PlayAt(string id, Vector3 position, float volumeDb = 0f, float pitchJitter = 0.08f)
     {
         if (_host == null || Streams(id) is not { Length: > 0 } streams) return;
+        Heard?.Invoke(id, position);
         var p = Free(Pool3D);
         if (p == null) return;
         p.Stream = streams[Rng.RandiRange(0, streams.Length - 1)];

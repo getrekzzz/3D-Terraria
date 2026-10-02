@@ -6,7 +6,7 @@
     { "id": "bobber", "name": "Bobber", "visual": "orb", "color": "#e83a3a", "gravity": 12, "lifetime": 60, "radius": 0.3, "contact": false, "bobber": true }
   ],
   "buffs": [
-    { "id": "well_fed", "name": "Well Fed", "description": "Minor improvements to all stats.", "color": "#e0b070",
+    { "id": "well_fed", "name": "Well Fed", "description": "Minor improvements to all stats.", "color": "#e0b070", "foodTier": 1,
       "effects": [{ "type": "stat", "stat": "defense", "add": 2 }, { "type": "stat", "stat": "genericDamage", "add": 0.05 }, { "type": "stat", "stat": "genericCrit", "add": 2 },
         { "type": "stat", "stat": "meleeSpeed", "add": 0.05 }, { "type": "stat", "stat": "moveSpeed", "add": 0.2 }, { "type": "stat", "stat": "lifeRegen", "add": 1 }],
       "covers": ["terraria:well_fed"] }

@@ -60,9 +60,9 @@ public sealed partial class PlayerAvatar : Node3D
     {
         speed = 1f;
         if (!entity.Alive) return "death";
-        if (entity.UseAnimation > 0 && _heldItem != null)
+        if (entity.UseAnimation > 0 && (entity.UseItem ?? _heldItem) is { } acting)
         {
-            var info = _game.Uses[_heldItem];
+            var info = _game.Uses[acting]; // a quick-key drink animates its potion, not the held item
             return info.Has(ItemAction.Melee) || info.IsTool || info.Style == UseStyle.Swing ? "swing" : "use";
         }
         var v = _controller.Velocity;

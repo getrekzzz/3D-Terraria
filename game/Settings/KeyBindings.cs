@@ -26,6 +26,7 @@ public static class KeyBindings
         ("inventory", "Inventory"), ("map", "World map"), ("toggle_camera", "Toggle first/third person"), ("precision_mode", "Precision (small blocks)"),
         ("cycle_shape", "Cycle block shape"), ("rotate_shape", "Rotate block shape"), ("drop_item", "Drop item"), ("grapple", "Grappling hook"),
         ("quick_mount", "Quick mount"), ("smart_cursor", "Smart cursor"),
+        ("quick_heal", "Quick heal"), ("quick_mana", "Quick mana"), ("quick_buff", "Quick buff"),
         ("pause", "Menu / pause"), ("chat", "Chat history"), ("console", "Console"), ("debug_overlay", "Performance overlay"),
         ("photo_mode", "Photo mode"), ("photo_shot", "Photo mode: take picture"),
         ("hotbar_1", "Hotbar 1"), ("hotbar_2", "Hotbar 2"), ("hotbar_3", "Hotbar 3"), ("hotbar_4", "Hotbar 4"), ("hotbar_5", "Hotbar 5"),

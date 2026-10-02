@@ -34,10 +34,18 @@ public sealed class ValidateCommand : IToolCommand
         errors += ConfigErrors(CreatureMaterialsConfig.Path, () => CreatureMaterialsConfig.Load(source).Validate(db));
         errors += ConfigErrors(AmbienceConfig.Path, () => AmbienceConfig.Load(source).Validate(db));
         errors += ConfigErrors(InputConfig.Path, () => InputConfig.Load(source).Validate());
+        Func<string, bool>? soundExists = context.Options.Flag("no-assets") ? null : id => SoundExists(context, id);
+        errors += ConfigErrors(CaptionsConfig.Path, () => CaptionsConfig.Load(source).Validate(soundExists));
+        errors += ConfigErrors(ColorVisionPalette.Path, () => ColorVisionPalette.Load(source).Validate());
         int warnings = db.Report.Warnings.Count();
         Console.WriteLine($"{errors} error(s), {warnings} warning(s)");
         return errors == 0 ? 0 : 1;
     }
+
+    /// <summary>A sound id the game can play: an sfx (or its first variant) or an ambience loop.</summary>
+    private static bool SoundExists(ToolContext context, string id) =>
+        File.Exists(context.PathOf($"assets/audio/sfx/{id}.wav")) || File.Exists(context.PathOf($"assets/audio/sfx/{id}_1.wav")) ||
+        File.Exists(context.PathOf($"assets/audio/ambience/{id}.ogg"));
 
     /// <summary>Prints a config file's problems (or why it does not parse) as errors and returns how many there were.</summary>
     private static int ConfigErrors(string path, Func<List<string>> validate)

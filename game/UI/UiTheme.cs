@@ -111,11 +111,11 @@ public static partial class UiTheme
     /// <summary>Item name colour by rarity tier now (Expert and Master tiers animate; see <see cref="RarityColors"/>).</summary>
     public static Color Rarity(int rarity) => Rarity(rarity, Time.GetTicksMsec() / 1000.0);
 
-    /// <summary>Item name colour by rarity tier at <paramref name="seconds"/>.</summary>
+    /// <summary>Item name colour by rarity tier at <paramref name="seconds"/> (in the colour-blind palette when one is on).</summary>
     public static Color Rarity(int rarity, double seconds)
     {
         var c = RarityColors.Of(rarity, seconds);
-        return Color.Color8(c.R, c.G, c.B);
+        return Vision(Color.Color8(c.R, c.G, c.B));
     }
 
     /// <summary>True when the rarity colour changes over time, so its text must be recoloured every frame.</summary>
@@ -132,8 +132,8 @@ public static partial class UiTheme
     public static Color TooltipColor(TooltipKind kind, int rarity) => kind switch
     {
         TooltipKind.Name => Rarity(rarity),
-        TooltipKind.Good => Good,
-        TooltipKind.Bad => Bad,
+        TooltipKind.Good => Vision(Good),
+        TooltipKind.Bad => Vision(Bad),
         TooltipKind.PriceCopper => Copper,
         TooltipKind.PriceSilver => Silver,
         TooltipKind.PriceGold => GoldCoin,
