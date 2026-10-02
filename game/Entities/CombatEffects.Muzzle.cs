@@ -53,7 +53,9 @@ public sealed partial class CombatEffects
             bool heavy = p.Source.UseTime >= HeavyUseTime;
             _muzzle.Flash(at + dir * 0.05f, color, heavy ? 0.45f : 0.3f);
             _flashes.Flash(at, new Color(1f, 0.85f, 0.55f).Lerp(color, 0.3f), 2f, 4f, 0.06f);
-            _kit.Burst(EffectRecipe.Puff, at + dir * 0.1f, new Color(0.62f, 0.6f, 0.58f), heavy ? 6 : 3, 0.6f, dir);
+            // A wisp of smoke, kept out of a first-person view (a puff that close to the eye fills the screen grey).
+            var eye = GetViewport()?.GetCamera3D()?.GlobalPosition;
+            if (eye == null || eye.Value.DistanceTo(at) > 1.5f) _kit.Burst(EffectRecipe.Puff, at + dir * 0.15f, new Color(0.7f, 0.68f, 0.66f), heavy ? 4 : 2, 0.5f, dir);
             if (heavy) CameraShake.Punch(0.18f, 0.12f, 0.6f);
         }
         else

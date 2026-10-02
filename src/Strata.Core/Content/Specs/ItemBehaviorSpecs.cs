@@ -105,7 +105,17 @@ public sealed class GrappleParams : SpecParams, IValidatableSpec
     /// <summary>Chain colour (hex).</summary>
     public string Color { get; init; } = "#9a9aa4";
 
-    public string? Validate() => Reach <= 0 || Speed <= 0 || Pull <= 0 ? "reach, speed and pull must be > 0" : null;
+    /// <summary>The item whose model is drawn as the hook's head (null = the hook item itself; P3-17').</summary>
+    public string? Head { get; init; }
+
+    /// <summary>How the line is drawn: <c>links</c> (a metal chain), <c>vine</c> (Ivy Whip) or <c>gem</c> (glowing gem links).</summary>
+    public string Chain { get; init; } = "links";
+
+    public static readonly string[] Chains = { "links", "vine", "gem" };
+
+    public string? Validate() =>
+        Reach <= 0 || Speed <= 0 || Pull <= 0 ? "reach, speed and pull must be > 0"
+        : Array.IndexOf(Chains, Chain) < 0 ? $"chain must be one of {string.Join(", ", Chains)}" : null;
 }
 
 public sealed class ThrustParams : SpecParams
