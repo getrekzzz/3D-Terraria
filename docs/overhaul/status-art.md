@@ -18,7 +18,9 @@
 | 14 | P3-18 pets and light pets, burst test isolation fix | full headless CI green (658 Core tests, 16/16 smoke, MENU PASS) |
 | 15 | X-12 photo mode, Bosses + Dungeon integration merge | full headless CI green (1234 Core tests, 17/17 smoke, MENU PASS) |
 | 16 | P3-04 swing curve (reviewed + fixed) | full headless CI green (1246 Core tests, 17/17 smoke, MENU PASS) |
-| 17 | P3-47, P3-06, P3-07 (after P3-02/03), X-09 creator menu rows (after P2-30) | pending |
+| 17 | World integration merge | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 18 | P3-47 buff and debuff visuals | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 19 | P3-06, P3-07 (after P3-02/03), X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -143,3 +145,12 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   behind-the-player hits from the scaled 165° wind-up. Gaps: the third-person body clip still lags the curve (needs
   P3-03's clips); curve constants are code, not use_styles.json (P3-02 owns that file); reforge while held does not
   rescale the third-person blade.
+
+## Push 18 notes
+* **Status visuals (P3-47)**: `BuffDef.visual` (tint, tintStrength, particle = EffectKit recipe, color, rate, rise,
+  light). `StatusVisuals` multiplies status tints into the instance `tint` uniform (NPCs, player via
+  `PlayerAvatar.Status.cs`) and runs pooled looping emitters (`EffectKit.Status.cs`), scaled by `effectsScale`, capped by
+  presets `statusEmitters` (8/16/32/48, first come first served) and `statusLights` (0/1/2/3). 13 buffs covered; new
+  Shadowflame debuff (applied by `shadowflame_bolt`). Command `buff <id|clear> [seconds] [player|npcs]`, probe
+  `fx.status_emitters`. Gaps: no venom/electrified buffs exist; only the main body of multi-part creatures is tinted;
+  night visibility of fire sparks untuned.
