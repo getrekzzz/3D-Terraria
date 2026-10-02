@@ -180,7 +180,8 @@
   same index, otherwise take ONE onto the cursor (held: `HoldRepeat.IntervalTicks` 30, 22, 17 … 1). Left clicks are
   `SlotActions.LeftClick` with `SlotFilters.For(slot)` (coins only in coin slots, `FitsAmmoSlot` in ammo slots, armor
   kind, accessory without duplicate, dye, misc kind). `ThrowCursor`/`ThrowStack` toss stacks the way the drop key does.
-  Favourited slots draw a gold wash on the inventory screen and the hotbar (`ItemSlotView.Favorite`).
+  Favourited slots draw gold with a gold wash on the inventory screen and the hotbar (`ItemSlotView.Favorite`); the
+  view itself repeats a held right click, and the screen stops the repeat once a click no longer moves items.
 * **Chest and inventory buttons** — `InventoryOps`: `LootAll` (via `Pickup`, coins to the purse), `DepositAll` and
   `QuickStack` (backpack 10–49 only, never favourites or coins; quick stack only items the chest already holds,
   topping up its stacks first), `Restock` (tops up backpack and ammo stacks from the chest), `Sort(inv, from, to)`

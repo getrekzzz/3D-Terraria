@@ -6,8 +6,11 @@ namespace Strata.Game.Bootstrap;
 
 public static partial class WorldLauncher
 {
-    /// <summary>HUD, inventory, world map and minimap, town dialog and the performance overlay.</summary>
-    private static (UI.Hud Hud, UI.InventoryScreen Inventory, UI.WorldMapScreen WorldMap, UI.TownDialog TownDialog) AddUi(
+    /// <summary>
+    /// HUD, inventory, world map and minimap, town dialog, the performance overlay, and above every screen the held
+    /// stack at the pointer and the item tooltip that follows it.
+    /// </summary>
+    private static (UI.Hud Hud, UI.InventoryScreen Inventory, UI.WorldMapScreen WorldMap, UI.TownDialog TownDialog, UI.TooltipFollower Tooltip, UI.CursorItemLayer CursorItem) AddUi(
         WorldRuntime runtime, GameWorld game, PlayerController player, InteractionController interaction, TileObjectRenderer objectRenderer)
     {
         var ui = new UI.UiContext(game, player, interaction);
@@ -30,6 +33,12 @@ public static partial class WorldLauncher
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
-        return (hud, inventory, worldMap, townDialog);
+        var cursorItem = new UI.CursorItemLayer();
+        cursorItem.Initialize(ui);
+        runtime.AddChild(cursorItem);
+        var tooltip = new UI.TooltipFollower();
+        tooltip.Initialize(cursorItem);
+        runtime.AddChild(tooltip);
+        return (hud, inventory, worldMap, townDialog, tooltip, cursorItem);
     }
 }

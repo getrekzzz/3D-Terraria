@@ -55,7 +55,15 @@ public sealed class UserSettings
     public bool ShowFps { get; set; }
     public bool ShowMinimap { get; set; } = true;
     public bool ShowTargetName { get; set; } = true;
-    public string CursorColor { get; set; } = "#ffffff";
+    public string CursorColor { get; set; } = DefaultCursorColor;
+
+    /// <summary>Terraria's pink-red pointer.</summary>
+    public const string DefaultCursorColor = "#ff325f";
+
+    /// <summary>The settings file's format; files from before version 2 kept the old white pointer as their default.</summary>
+    public int Version { get; set; } = CurrentVersion;
+
+    private const int CurrentVersion = 2;
 
     public event Action<UserSettings>? Changed;
 
@@ -83,6 +91,9 @@ public sealed class UserSettings
                     GD.PushWarning($"settings: ignoring {prop.Name}: {ex.Message}");
                 }
             }
+            // Older files saved the then-default white pointer: give it Terraria's colour (a chosen colour stays).
+            if (!file.HasSectionKey("settings", ToKey(nameof(Version))) && s.CursorColor == "#ffffff") s.CursorColor = DefaultCursorColor;
+            s.Version = CurrentVersion;
         }
         Current = s;
         return s;

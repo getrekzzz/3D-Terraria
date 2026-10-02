@@ -107,3 +107,28 @@ wait 0.3
 assert fx.heal_numbers >= 1
 assert fx.number_labels <= 80
 assert errors == 0
+
+# --- P2-10 ---
+# Hidden slot views do no work: with the inventory closed only the hotbar's 10 process. Taking one torch with a right
+# click holds it at the pointer; hovering a slot shows its tooltip at once, in coloured lines; closing the inventory
+# puts the held torch back and hides both.
+wait 0.2
+assert ui.slot_views == 10
+give torch 5
+ui inventory
+wait 0.2
+assert ui.slot_views >= 60
+invclick backpack 3 right
+wait 0.1
+assert ui.cursor_count == 1
+ui hover backpack 0
+assert ui.tooltip_lines >= 3
+wait 0.3
+assert ui.tooltip_lines >= 3
+ui close
+wait 0.2
+assert inv.cursor == 0
+assert ui.cursor_count == 0
+assert ui.tooltip_lines == 0
+assert ui.slot_views == 10
+assert errors == 0

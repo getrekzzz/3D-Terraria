@@ -41,6 +41,9 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>Active buffs shown with their generated icon (not the letter fallback); the hud.buff_icons probe.</summary>
     public int BuffIconsShown { get; private set; }
 
+    /// <summary>The hotbar slot view at <paramref name="index"/> (the <c>ui hover hotbar</c> command), or null.</summary>
+    public ItemSlotView? HotbarSlot(int index) => (uint)index < (uint)_hotbar.Count ? _hotbar[index] : null;
+
     public void Initialize(UiContext ui)
     {
         _ui = ui;
@@ -61,10 +64,11 @@ public sealed partial class Hud : CanvasLayer
         for (int i = 0; i < PlayerInventory.HotbarSize; i++)
         {
             int slot = i;
-            var view = new ItemSlotView(() => ui.Inventory.Backpack[slot], 58, ui.Tooltip)
+            var view = new ItemSlotView(() => ui.Inventory.Backpack[slot], 58, SlotKind.Inventory, ui.Tooltip)
             {
                 Badge = ((i + 1) % 10).ToString(),
                 Favorite = () => ui.Inventory.Backpack.IsFavorite(slot),
+                AmmoCount = ammoClass => ui.Inventory.CountAmmo(ammoClass),
             };
             view.Clicked += (_, _) => ui.Inventory.Select(slot);
             hotbar.AddChild(view);
@@ -176,12 +180,7 @@ public sealed partial class Hud : CanvasLayer
         var inv = _ui.Inventory;
         for (int i = 0; i < _hotbar.Count; i++)
         {
-            bool sel = inv.SelectedHotbar == i;
-            if (_hotbar[i].Selected != sel)
-            {
-                _hotbar[i].Selected = sel;
-                _hotbar[i].QueueRedraw();
-            }
+            _hotbar[i].Selected = inv.SelectedHotbar == i;
         }
         var held = inv.Held.Item;
         if (held != _lastHeld)

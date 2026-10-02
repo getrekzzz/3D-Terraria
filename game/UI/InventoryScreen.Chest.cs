@@ -70,6 +70,7 @@ public sealed partial class InventoryScreen
         _containerInv = null;
         _chestPanel.Visible = false;
         foreach (var child in _chestGrid.GetChildren()) child.QueueFree();
+        ForgetFreedSlots();
     }
 
     private void Chest(ChestOp op)

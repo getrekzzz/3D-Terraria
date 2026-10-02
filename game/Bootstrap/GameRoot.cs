@@ -99,6 +99,8 @@ public partial class GameRoot : Node
         var user = Settings.UserSettings.Current;
         user.Changed += ApplyDisplay;
         if (!IsAutomated(args)) ApplyDisplay(user);
+        UI.UiCursor.Apply(user); // Terraria's pointer on every screen, recoloured with the setting
+        user.Changed += UI.UiCursor.Apply;
         GetTree().Root.SizeChanged += () => Settings.DisplaySettings.ApplyUiScale(GetTree().Root, Settings.UserSettings.Current);
 
         if (args.Flag("no-world")) return;
@@ -132,6 +134,8 @@ public partial class GameRoot : Node
     }
 
     /// <summary>Scripted runs (smoke tests, screenshots) skip the menu and keep the window as launched.</summary>
+    public override void _ExitTree() => UI.UiCursor.Reset();
+
     private static bool IsAutomated(CommandLine args) =>
         args.Get("smoke") != null || args.Get("screenshot") != null || args.Get("exec") != null || args.Get("shots") != null;
 

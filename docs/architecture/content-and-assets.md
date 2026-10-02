@@ -131,6 +131,16 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   `godot --headless --path . -- --export-theme` (or `ui export-theme` in the console); the `ui.theme_synced` probe in
   `ui.cmds` fails while the file is stale. Slot styles are cached per `SlotKind` (`UiTheme.SlotStyle`), so drawing a
   slot allocates nothing.
+* **Slots, tooltips and the pointer**: `ItemSlotView` (drawing in `ItemSlotView.Draw.cs`) tints each slot by
+  `SlotKind` (gold when selected or favourited, dark when locked), centres the icon at 62% of the slot, writes the
+  stack count bottom-left in outlined white (a bow's or gun's rounds from `PlayerInventory.CountAmmo` in the same
+  corner, red at 0) and a faint native-size silhouette in empty slots; a held right button repeats the click at
+  `HoldRepeat` pace; hidden views stop processing (probe `ui.slot_views`). `TooltipFollower` (CanvasLayer 95) is
+  the only item tooltip: shown instantly on hover beside the pointer, lines coloured by `UiTheme.TooltipColor`,
+  rebuilt only when the stack changes or every 0.25 s. `CursorItemLayer` (CanvasLayer 90) draws the held cursor
+  stack at the pointer over every screen. `UiCursor` makes the generated `assets/ui/cursor.png` the system pointer,
+  tinted by the cursor colour setting (Terraria's `#ff325f` by default; settings files without a `version` key move
+  from the old white default) and scaled with the UI. Moving items plays `grab` (`tools/audio/sfx_recipes_ui.py`).
 * **Rarity colours** live in Core (`Strata.Core.Presentation.RarityColors`): tiers -1 and 0–11 with Terraria's RGB,
   Quest (-11) amber, Expert (-12) a cycling rainbow and Master (-13) a red-orange pulse; `UiTheme.Rarity` converts.
 * **UI scale**: `Strata.Core.Presentation.UiScale` lowers the UI scale setting so the logical viewport never drops

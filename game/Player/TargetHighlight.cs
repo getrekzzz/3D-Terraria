@@ -20,7 +20,8 @@ namespace Strata.Game.Player;
 /// </summary>
 public sealed partial class TargetHighlight : Node3D
 {
-    private static Color Neutral => Color.FromHtml(Settings.UserSettings.Current.CursorColor) with { A = 0.95f };
+    // White, not the pointer's colour: Terraria's pink-red pointer would read as the red "too hard" outline.
+    private static readonly Color Neutral = new(1f, 1f, 1f, 0.95f);
     private static readonly Color Working = new(1f, 0.78f, 0.25f, 1f);
     private static readonly Color Invalid = new(1f, 0.3f, 0.25f, 0.95f);
     private static readonly Color Place = new(0.45f, 0.9f, 1f, 0.95f);

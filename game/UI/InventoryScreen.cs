@@ -2,14 +2,14 @@ using System;
 using Godot;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Voxels.TileObjects;
-using Strata.Game.Items;
 
 namespace Strata.Game.UI;
 
 /// <summary>
 /// The inventory screen (Tab/I): backpack, equipment (armor, the accessory slots the world unlocks and the misc row:
 /// pet, light pet, minecart, mount, hook), trash and coins, the crafting list for the current environment and an open
-/// container. Items move with a cursor stack; clicks are routed by <c>GameWorld.ClickSlot</c> (InventoryScreen.Slots.cs).
+/// container. Items move with a cursor stack (drawn at the pointer by <see cref="CursorItemLayer"/>); clicks are routed by
+/// <c>GameWorld.ClickSlot</c> (InventoryScreen.Slots.cs).
 /// </summary>
 public sealed partial class InventoryScreen : CanvasLayer
 {
@@ -21,10 +21,9 @@ public sealed partial class InventoryScreen : CanvasLayer
     private Label _coins = null!;
     private Label _defense = null!;
     private Label _setBonus = null!;
-    private TextureRect _cursorIcon = null!;
-    private Label _cursorCount = null!;
     private Button _vanityToggle = null!;
     private readonly ItemSlotView[] _accessoryViews = new ItemSlotView[PlayerInventory.MaxAccessorySlots];
+    private readonly ItemSlotView[] _hotbarViews = new ItemSlotView[PlayerInventory.HotbarSize];
     private TileObjectInstance? _container;
     private Inventory? _containerInv;
 
@@ -47,7 +46,12 @@ public sealed partial class InventoryScreen : CanvasLayer
         var grid = new GridContainer { Columns = 10 };
         grid.AddThemeConstantOverride("h_separation", 4);
         grid.AddThemeConstantOverride("v_separation", 4);
-        for (int i = 0; i < PlayerInventory.BackpackSize; i++) grid.AddChild(Slot(SlotArea.Backpack, i, i < PlayerInventory.HotbarSize ? ((i + 1) % 10).ToString() : null));
+        for (int i = 0; i < PlayerInventory.BackpackSize; i++)
+        {
+            var view = Slot(SlotArea.Backpack, i, i < PlayerInventory.HotbarSize ? ((i + 1) % 10).ToString() : null);
+            if (i < PlayerInventory.HotbarSize) _hotbarViews[i] = view;
+            grid.AddChild(view);
+        }
         backpack.AddChild(grid);
 
         var equipment = Panel(new Vector2(24 + 10 * 54 + 40, 24));
@@ -91,11 +95,6 @@ public sealed partial class InventoryScreen : CanvasLayer
         _root.AddChild(_crafting);
         _crafting.Initialize(ui, new Vector2(24 + 10 * 54 + 40 + 180, 96));
 
-        _cursorIcon = new TextureRect { MouseFilter = Control.MouseFilterEnum.Ignore, Size = new Vector2(44, 44), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered, ZIndex = 10 };
-        _cursorCount = new Label { MouseFilter = Control.MouseFilterEnum.Ignore, ZIndex = 11 };
-        _root.AddChild(_cursorIcon);
-        _root.AddChild(_cursorCount);
-
         ui.Game.Interaction.ContainerOpened += (p, obj) =>
         {
             if (p == ui.Entity) OpenContainer(obj);
@@ -134,7 +133,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         var rest = _ui.Inventory.Pickup(_ui.Inventory.Cursor);
         _ui.Inventory.Cursor = ItemStack.Empty;
         _ui.Game.ThrowStack(_ui.Entity, rest);
-        _repeatView = null;
+        _craftingStale = false;
         CloseContainer();
     }
 
@@ -142,7 +141,12 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.inventory_ui");
         if (!IsOpen) return;
-        RepeatRightClick(delta);
+        // Taking one at a time with a held right click refreshes the crafting list once, when the button comes up.
+        if (_craftingStale && !Input.IsMouseButtonPressed(MouseButton.Right))
+        {
+            _craftingStale = false;
+            _crafting.Refresh();
+        }
         var state = _ui.Entity.State;
         _defense.Text = $"Defense {state.Defense}";
         _setBonus.Text = state.SetBonus != null ? $"Set bonus: {state.SetBonus}" : "";
@@ -150,18 +154,12 @@ public sealed partial class InventoryScreen : CanvasLayer
         // Expert and Master worlds unlock the 6th and 7th accessory slots; a locked slot still shows an item left in it.
         var row = _showVanity ? state.Inventory.VanityAccessories : state.Inventory.Accessories;
         for (int i = 0; i < _accessoryViews.Length; i++)
-            _accessoryViews[i].Visible = i < state.Inventory.AccessorySlotsUnlocked || !row[i].IsEmpty;
-        var cursor = _ui.Inventory.Cursor;
-        _cursorIcon.Visible = !cursor.IsEmpty;
-        _cursorCount.Visible = cursor.Count > 1;
-        if (!cursor.IsEmpty)
         {
-            var mouse = _root.GetLocalMousePosition();
-            _cursorIcon.Texture = ItemIcons.Get(cursor.Item!);
-            _cursorIcon.Position = mouse + new Vector2(6, 6);
-            _cursorCount.Text = cursor.Count.ToString();
-            _cursorCount.Position = mouse + new Vector2(8, 30);
+            bool unlocked = i < state.Inventory.AccessorySlotsUnlocked;
+            _accessoryViews[i].Visible = unlocked || !row[i].IsEmpty;
+            _accessoryViews[i].Locked = !unlocked;
         }
+        for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = state.Inventory.SelectedHotbar == i;
         if (_container != null)
         {
             var world = _ui.Game.Session.World;

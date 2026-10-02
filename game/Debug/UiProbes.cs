@@ -9,8 +9,8 @@ namespace Strata.Game.Debug;
 /// <summary>
 /// Probes on the global UI look (P2-01): the shipped font is ThemeDB's fallback, an unthemed panel resolves to
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
-/// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; and on
-/// the floating combat numbers (P2-19).
+/// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
+/// the floating combat numbers (P2-19); and on the slots, the following tooltip and the held stack (P2-10).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -49,5 +49,8 @@ public static class UiProbes
         ctx.AddProbe("fx.numbers", () => Effects()?.NumbersShown ?? 0);
         ctx.AddProbe("fx.heal_numbers", () => Effects()?.HealNumbersShown ?? 0);
         ctx.AddProbe("fx.number_labels", () => Effects()?.NumberLabels ?? 0);
+        ctx.AddProbe("ui.tooltip_lines", () => world.Tooltip?.LineCount ?? 0);
+        ctx.AddProbe("ui.cursor_count", () => world.CursorItem?.ShownCount ?? 0);
+        ctx.AddProbe("ui.slot_views", () => ItemSlotView.ActiveViews);
     }
 }

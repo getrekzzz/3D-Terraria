@@ -1,5 +1,6 @@
 using Godot;
 using Strata.Core.Commands;
+using Strata.Core.Gameplay.Items;
 using Strata.Game.Bootstrap;
 using Strata.Game.Settings;
 using Strata.Game.UI;
@@ -13,8 +14,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close|export-theme>",
-            Help = "Opens or closes gameplay screens; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|close|export-theme>",
+            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -41,12 +42,21 @@ public static class UiCommands
                         if (!dialog.IsOpen) return CommandResult.Fail("Not talking to anyone.");
                         dialog.OpenShop();
                         return CommandResult.Success("Shop open.");
+                    case "hover":
+                        string area = a.Str(1, "area");
+                        int index = a.Int(2, "index");
+                        var view = area == "hotbar"
+                            ? world.Hud?.HotbarSlot(index)
+                            : screen.FindSlot(new SlotRef(InventoryCommands.Area(area), index));
+                        if (view == null || !view.IsVisibleInTree()) return CommandResult.Fail($"No {area} slot {index} on screen (open the inventory first).");
+                        view.ShowTooltip();
+                        return CommandResult.Success($"Tooltip: {world.Tooltip?.LineCount ?? 0} lines.");
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, hover, close or export-theme");
                 }
             },
         });
