@@ -63,7 +63,8 @@ public sealed class MapSystem
     public bool IsOutdoors(PlayerEntity player)
     {
         var feet = player.FeetCell;
-        return feet.Y >= _world.Session.Sky.SkyTop(feet.X, feet.Z) - 2;
+        var sky = _world.Session.Sky;
+        return feet.Y >= sky.OpenTop(feet.X, feet.Z) - 2 && feet.Y < sky.ShadeCap(feet.X, feet.Z);
     }
 
     private void RevealSurface(ExploredMap map, Int3 center, int radius)
@@ -72,7 +73,7 @@ public sealed class MapSystem
         var sky = _world.Session.Sky;
         ForPixels(map, center, radius, (px, pz, x, z) =>
         {
-            int top = sky.SkyTop(x, z);
+            int top = sky.OpenTop(x, z);
             // The first known non-air cell at or just below the sky top (the top block of the column).
             for (int y = top + 1; y >= top - 4; y--)
             {

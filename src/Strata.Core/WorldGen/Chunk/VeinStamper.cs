@@ -34,7 +34,9 @@ public static class VeinStamper
         var bands = gen.Plan.Bands;
         float yTop = bands.YForNormalizedDepth(rule.Def.DepthMin);
         float yBottom = bands.YForNormalizedDepth(rule.Def.DepthMax);
-        if (buf.Origin.Y > yTop + 16 || buf.Origin.Y + buf.Size < yBottom - 16) return;
+        // Don't Dig Up: depth is not monotonic in y (it grows down under the bottom surface and up above the roof), so
+        // each vein's depth is tested instead (no quick reject).
+        if (!bands.Inverted && (buf.Origin.Y > yTop + 16 || buf.Origin.Y + buf.Size < yBottom - 16)) return;
         for (int dy = -1; dy <= 1; dy++)
             for (int dz = -1; dz <= 1; dz++)
                 for (int dx = -1; dx <= 1; dx++)
@@ -57,7 +59,7 @@ public static class VeinStamper
             float heading = rng.NextFloat();
             float tilt = rng.Range(-0.3f, 0.3f);
             uint salt = rng.NextUInt(); // draw every random value before any chunk-dependent rejection
-            if (cy > yTop || cy < yBottom) continue;
+            if (gen.Plan.Bands.Inverted ? !InDepth(gen.Plan.Bands, cy, rule) : cy > yTop || cy < yBottom) continue;
             float reach = r * rule.Def.Stretch + 1f;
             if (cx + reach < o.X || cx - reach > o.X + size
                 || cy + reach < o.Y || cy - reach > o.Y + size
@@ -65,6 +67,12 @@ public static class VeinStamper
             if (rule.Biomes.Count > 0 && !rule.Biomes.Contains(gen.Biomes.BiomeAt(cx, cy, cz))) continue;
             Place(ref buf, rule, cx, cy, cz, r, heading, tilt, salt);
         }
+    }
+
+    private static bool InDepth(Plan.LayerBands bands, float y, VeinRule rule)
+    {
+        float d = bands.NormalizedDepth(y);
+        return d >= rule.Def.DepthMin && d <= rule.Def.DepthMax;
     }
 
     private static void Place<T>(ref T buf, VeinRule rule, float cx, float cy, float cz, float r, float heading, float tilt, uint salt) where T : struct, IBlockBuffer

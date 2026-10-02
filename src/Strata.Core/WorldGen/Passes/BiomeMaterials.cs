@@ -46,9 +46,15 @@ internal sealed class BiomeMaterials
                     ushort b = ctx.Blocks[i];
                     if (b == p.Air || b == p.Bedrock || b == p.Ash) continue;
                     int wy = ctx.Origin.Y + ly;
-                    float sd = h - wy;
+                    float sd = ctx.SurfaceDepth(col, wy);
                     byte biome = ctx.Biome[i];
                     ushort result = b;
+                    if (ctx.AboveRoofPocket(col, wy))
+                    {
+                        // Don't Dig Up: no loose sand or slush in the rock roof hanging over the bottom surface.
+                        ctx.Blocks[i] = Roof(p, b, biome, sd, mix, wx, wy, wz);
+                        continue;
+                    }
                     if (biome == _forest || biome == _ocean)
                     {
                         if ((beach || biome == _ocean) && sd < soil + 4) result = p.Sand;
@@ -63,6 +69,18 @@ internal sealed class BiomeMaterials
                     ctx.Blocks[i] = result;
                 }
             }
+    }
+
+    private ushort Roof(BlockPalette p, ushort b, byte biome, float sd, LatticeSampler mix, int wx, int wy, int wz)
+    {
+        if (biome == _tundra) { ushort t = Tundra(p, b, mix.Sample(wx, wy, wz)); return t == p.Slush ? p.Ice : t; }
+        if (biome == _jungle) return Jungle(p, b, mix.Sample(wx, wy, wz));
+        if (biome == _desert) return sd < 32 ? p.Sandstone : b;
+        if (biome == _undergroundDesert) { ushort u = Buried(p, mix.Sample(wx, wy, wz)); return u == p.Sand ? p.Sandstone : u; }
+        if (biome == _umbral) return b == p.Loam ? b : p.UmbralStone;
+        if (biome == _sanguine) return b == p.Loam ? b : p.SanguineStone;
+        if (biome == _mushroom) return p.Mud;
+        return b;
     }
 
     private static ushort Tundra(BlockPalette p, ushort b, float m)

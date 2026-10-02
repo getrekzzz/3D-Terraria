@@ -21,7 +21,26 @@ public sealed class CommandLine
         }
     }
 
-    public static CommandLine FromOs() => new(OS.GetCmdlineUserArgs());
+    /// <summary>
+    /// The OS arguments, plus launch arguments a smoke script declares on <c>#!</c> header lines (e.g.
+    /// <c>#! --secret=dontdigup</c>, for a script that needs a special world); arguments on the command line win.
+    /// </summary>
+    public static CommandLine FromOs()
+    {
+        var line = new CommandLine(OS.GetCmdlineUserArgs());
+        if (line.Get("smoke") is { } script && FileAccess.FileExists(script))
+        {
+            using var file = FileAccess.Open(script, FileAccess.ModeFlags.Read);
+            var header = new List<string>();
+            while (file != null && !file.EofReached())
+            {
+                string text = file.GetLine().Trim();
+                if (text.StartsWith("#!")) header.AddRange(text.Substring(2).Split(' ', System.StringSplitOptions.RemoveEmptyEntries));
+            }
+            foreach (var (key, value) in new CommandLine(header)._values) line._values.TryAdd(key, value);
+        }
+        return line;
+    }
 
     public string? Get(string key) => _values.TryGetValue(key, out var v) ? v : null;
 
