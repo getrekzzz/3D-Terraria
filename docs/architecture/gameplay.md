@@ -106,6 +106,14 @@
   announcement also goes out on `NpcSystem.Messaged` with a `MessageKind` (`MessageColors`: boss purple), including
   "<Title> has awoken!" / "has been defeated!". Probes: `boss.<enemyId>.<field>` (life, max, defense, stage, phase,
   enraged, frenzied, illusions, parts, segments).
+* **King Slime and the Eye** — King Slime (2000 life) shrinks with its life (`Npc.VisualScale` and the collision box,
+  `HalfExtents` from `BaseHalfExtents`; 1 → 0.6 as Terraria's 1.25 → 0.75), sheds a slime per 6 % of life lost (in
+  Expert every third is a Spiked Slime), teleports when the target is beyond `teleportDistance` or out of its sight for
+  `lostSightTicks` (reappearing beside the target, or right above it when that spot is behind a wall; 35-tick wind-up in
+  Expert) and raises an impact and the `land` cue when it lands faster than `impactSpeed` (`Npc.LandingSpeed`, set by
+  every move). The Eye (2800 life, 12 defense, 15 damage) tears open at half life: `transformTicks` spinning in place,
+  untouchable, into its mouth model, then `phase2Defense` 0 and ×`phase2Damage` (23) without servants; in Expert each
+  tenth of life lost below half adds a dash to its bursts (up to `expertMaxDashes`) with shorter wind-ups.
 * **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
   at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
   `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster

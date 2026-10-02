@@ -15,17 +15,24 @@ public sealed class Npc
         Position = feet;
         Anchor = feet;
         Life = MaxLife = def.Life;
-        HalfExtents = new Vector3(def.Width * 0.25f * def.Scale, def.Height * 0.25f * def.Scale, def.Width * 0.25f * def.Scale);
+        BaseHalfExtents = HalfExtents = new Vector3(def.Width * 0.25f * def.Scale, def.Height * 0.25f * def.Scale, def.Width * 0.25f * def.Scale);
     }
 
     public long Id { get; }
     public EnemyDef Def { get; }
     public Vector3 Position { get; set; }
     public Vector3 Velocity;
-    public Vector3 HalfExtents { get; }
+    /// <summary>Half the collision box (m); a brain may shrink it from <see cref="BaseHalfExtents"/> (King Slime losing gel).</summary>
+    public Vector3 HalfExtents { get; set; }
+
+    /// <summary>Half the box the definition gives.</summary>
+    public Vector3 BaseHalfExtents { get; }
     public int Life { get; set; }
     public int MaxLife { get; set; }
     public bool OnGround { get; set; }
+
+    /// <summary>Downward speed (m/s) with which it came to rest on the ground on its last move; 0 when it did not land.</summary>
+    public float LandingSpeed { get; set; }
 
     /// <summary>Horizontal facing (radians, 0 = +Z).</summary>
     public float Yaw { get; set; }

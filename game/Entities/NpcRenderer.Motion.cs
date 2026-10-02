@@ -78,7 +78,7 @@ public sealed partial class NpcRenderer
     private void Animate(Npc npc, View view, float dt)
     {
         var visual = view.Visual;
-        float s = npc.Def.Scale;
+        float s = npc.Def.Scale * npc.VisualScale;
         var scale = Vector3.One * s;
         if (npc.Def.Squash || npc.Def.Brain.Type == BrainSpecs.SlimeHop)
         {

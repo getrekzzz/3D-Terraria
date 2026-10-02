@@ -17,6 +17,7 @@ give suspicious_looking_eye 1
 wield suspicious_looking_eye
 use
 assert npcs.eye_of_cthulhu == 1
+assert boss.eye_of_cthulhu.defense == 12
 wait 3
 killall
 boss eater_of_worlds 10

@@ -247,6 +247,7 @@ public sealed partial class NpcSystem
     {
         var intended = npc.Velocity;
         var center = npc.Center;
+        bool wasOnGround = npc.OnGround;
         if (brain.MovesFreely)
         {
             center += npc.Velocity * dt;
@@ -262,6 +263,7 @@ public sealed partial class NpcSystem
             npc.OnGround = false;
         }
         npc.Position = center - new Vector3(0, npc.HalfExtents.Y, 0);
+        npc.LandingSpeed = npc.OnGround && !wasOnGround && intended.Y < 0 ? -intended.Y : 0f;
         brain.AfterMove(npc, intended);
         if (!brain.PositionsSegments) FollowSegments(npc);
     }

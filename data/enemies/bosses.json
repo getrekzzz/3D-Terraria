@@ -4,7 +4,7 @@
     {
       "id": "king_slime", "squash": true, "model": "king_slime", "tags": ["gel", "boss", "lava_immune"], "name": "King Slime",
       "description": "A monarch of gel that crushes intruders beneath its bulk.",
-      "brain": { "type": "kingSlime", "jumpHeight": 8, "jumpSpeed": 5.5, "hopInterval": 55, "teleportDistance": 26, "minion": "green_slime", "minionEveryLife": 0.06 },
+      "brain": { "type": "kingSlime", "jumpHeight": 8, "jumpSpeed": 5.5, "hopInterval": 55, "teleportDistance": 26, "minion": "green_slime", "minionEveryLife": 0.06, "lostSightTicks": 300, "expertMinion": "spiked_slime", "expertTeleportTicks": 35 },
       "life": 2000, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [7, 6], "moveSpeed": 4, "tint": "#ffffff",
       "loot": "king_slime", "value": 5000, "light": [2, 4, 8],
       "boss": { "title": "King Slime", "flag": "defeated_king_slime", "arenaRadius": 120, "music": "boss_gel" },
@@ -13,8 +13,9 @@
     {
       "id": "eye_of_cthulhu", "facing": "look", "model": "eye_of_cthulhu", "tags": ["boss", "lava_immune"], "name": "Eye of Cthulhu",
       "description": "It has been watching since the first night.",
-      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 16, "dashSpeed": 15, "dashesPerBurst": 3, "telegraphTicks": 30, "servant": "servant_of_cthulhu", "servantInterval": 100, "phase2Life": 0.5, "phase2Model": "eye_of_cthulhu_mouth" },
-      "life": 2800, "damage": 18, "defense": 12, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
+      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 16, "dashSpeed": 15, "dashesPerBurst": 3, "telegraphTicks": 30, "servant": "servant_of_cthulhu", "servantInterval": 100, "phase2Life": 0.5, "phase2Model": "eye_of_cthulhu_mouth",
+        "phase2Defense": 0, "phase2Damage": 1.53, "phase2ExtraDashes": 0, "transformTicks": 60, "expertMaxDashes": 5, "expertTelegraphScale": 0.6 },
+      "life": 2800, "damage": 15, "defense": 12, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
       "loot": "eye_of_cthulhu", "value": 8000,
       "boss": { "title": "The Eye of Cthulhu", "flag": "defeated_eye_of_cthulhu", "arenaRadius": 150, "despawnAtDay": true, "music": "boss_eye" },
       "covers": ["terraria:eye_of_cthulhu"]

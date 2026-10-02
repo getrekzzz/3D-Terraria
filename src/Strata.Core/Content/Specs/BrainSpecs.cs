@@ -104,6 +104,25 @@ public sealed class GelSovereignParams : SpecParams
     /// <summary>Minion enemy shed every <see cref="MinionEveryLife"/> fraction of life lost.</summary>
     public string? Minion { get; init; }
     public float MinionEveryLife { get; init; } = 0.08f;
+
+    /// <summary>Teleports to a target it has not seen (from its head to their eyes) for this long (ticks).</summary>
+    public int LostSightTicks { get; init; } = 300;
+
+    /// <summary>Expert: every third shed minion is this one instead (Spiked Slimes).</summary>
+    public string? ExpertMinion { get; init; }
+
+    /// <summary>Teleport wind-up (ticks) in Classic and in Expert.</summary>
+    public int TeleportTicks { get; init; } = 50;
+
+    public int ExpertTeleportTicks { get; init; } = 35;
+
+    /// <summary>Model scale (and collision box) at full life and at none: it shrinks as it loses gel.</summary>
+    public float FullScale { get; init; } = 1f;
+
+    public float EmptyScale { get; init; } = 0.6f;
+
+    /// <summary>Landing faster than this (m/s) shakes the ground (an impact and the "land" cue).</summary>
+    public float ImpactSpeed { get; init; } = 8f;
 }
 
 /// <summary>Floating eye boss: orbits and summons servants, then dashes in bursts; phase 2 below a life fraction.</summary>
@@ -119,6 +138,23 @@ public sealed class WatcherParams : SpecParams
 
     /// <summary>Model shown in phase 2 (the eye opens into a maw).</summary>
     public string? Phase2Model { get; init; }
+
+    /// <summary>Defense in phase 2 (−1 = unchanged; the Eye's falls to 0) and the contact damage multiplier.</summary>
+    public int Phase2Defense { get; init; } = -1;
+
+    public float Phase2Damage { get; init; } = 1f;
+
+    /// <summary>Extra dashes per burst in phase 2.</summary>
+    public int Phase2ExtraDashes { get; init; } = 2;
+
+    /// <summary>Entering phase 2 it spins in place, untouchable, for this long (0 = no transformation).</summary>
+    public int TransformTicks { get; init; }
+
+    /// <summary>Expert, below phase 2: one more dash per tenth of life lost, up to this many per burst (0 = off).</summary>
+    public int ExpertMaxDashes { get; init; }
+
+    /// <summary>Expert phase 2: wind-up before each dash scaled by this.</summary>
+    public float ExpertTelegraphScale { get; init; } = 1f;
 }
 
 /// <summary>Burrowing worm: steers its head towards the target through terrain, carving a tunnel.</summary>
