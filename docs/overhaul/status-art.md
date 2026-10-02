@@ -16,7 +16,8 @@
 | 12 | P3-35 Piggy Bank and Safe | full headless CI green (642 Core tests, 16/16 smoke, MENU PASS) |
 | 13 | P3-01' bursts and reuseDelay | full headless CI green (654 Core tests, 16/16 smoke, MENU PASS) |
 | 14 | P3-18 pets and light pets, burst test isolation fix | full headless CI green (658 Core tests, 16/16 smoke, MENU PASS) |
-| 15 | X-09 creator menu rows (after P2-30) | pending |
+| 15 | X-12 photo mode, Bosses + Dungeon integration merge | full headless CI green (1234 Core tests, 17/17 smoke, MENU PASS) |
+| 16 | X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -125,3 +126,11 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   chest and Wisp 2% are estimates; no pet buffs or visibility toggle.
 * Fix found by the pets screenshot: projectiles created while their model was loading stayed a glow for life (P1b-13);
   `ProjectileRenderer` now rebuilds them a few times a second until the model is ready.
+
+## Push 15 notes
+* **Photo mode (X-12, photo part only)**: `game/UI/PhotoMode/` (controller, overlay, filter layer, commands) over
+  `FreeCamera` (now tetherable). P toggles (rebindable `photo_mode`), F12/Enter take a picture (`photo_shot`) to
+  `user://screenshots/<timestamp>.png`; pauses the simulation, hides every CanvasLayer from outside (no Hud files
+  touched), lens maths in `Strata.Core.Presentation.PhotoLens`. Smoke `photo.cmds`. Gaps: Tab still opens the
+  inventory in photo mode; free look ignores sensitivity/invert-Y; no gamepad; warm/cool filters are subtle.
+  Autosave indicator, colour-blind filters and subtitles left to the integration session.
