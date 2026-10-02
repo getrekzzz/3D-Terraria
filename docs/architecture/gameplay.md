@@ -845,3 +845,12 @@ preset, 12 otherwise, icons `assets/icons/emotes/*.png` from `tools/textures/bui
 "emotes.voices", played on `InteractionController.TalkRequested` and softly on chat bubbles), and
 `game/UI/EmoteWheel` (hold T, move the mouse, release). The emote wheel takes T; block-shape cycling moved to Y.
 Probe `town.emotes_shown`; command `town emote <emote> [id]`.
+
+## Town services and shop tabs in the W4 chat box and grid shop
+
+`TownDialog.Services.cs` shows one button per entry of `TownNpcDef.AllServices` (Heal, Crafting, Help = the advisor's
+next step, summon, Reforge, Taxes, Quest with the player's count, Status) and a Shop button plus one per further tab
+(the Painter's Decor); residents with only visitor pools or a pylon for sale still get Shop. A tab button sets
+`UiContext.ShopTab`, which `ShopPanel.Open` reads (and resets), so the grid shop lists and buys from that tab;
+currency wares (Defender Medals) show their cost in the tooltip and `TownCommerce.Buy` takes the medals. Commands
+`ui service <type>`, `ui shop [tab]`.

@@ -6,7 +6,7 @@ namespace Strata.Core.Commands;
 /// </summary>
 internal static class TownDebugCommands
 {
-    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | visit <id> | leave <id> | pylons | pylon <n> | emote <emote> [id]";
+    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | visit <id> [near] | leave <id> | pylons | pylon <n> | emote <emote> [id]";
 
     public static CommandResult? TryRun(CommandContext ctx, CommandArgs a)
     {
@@ -37,7 +37,13 @@ internal static class TownDebugCommands
             case "visit":
                 var vdef = ctx.World.Session.Content.TownNpcs.TryGet(a.Str(1, "id"), out var vd) ? vd : throw new CommandException($"unknown visitor '{a.Str(1, "id")}'");
                 if (vdef.Visit == null) return CommandResult.Fail($"{vdef.DisplayName} is not a visitor.");
-                return town.ArriveVisitor(vdef) is { } visitor ? CommandResult.Success($"{visitor.Title} has arrived.") : CommandResult.Fail("no place to arrive at (needs a housed resident, or a site underground).");
+                if (town.ArriveVisitor(vdef) is not { } visitor) return CommandResult.Fail("no place to arrive at (needs a housed resident, or a site underground).");
+                if (a.OptStr(2) == "near" && ctx.World.Navigator.NearestStandable(ctx.Player.FeetCell + new Common.Int3(3, 0, 0), Gameplay.Navigation.NavAgent.Humanoid, 4) is { } spot)
+                {
+                    visitor.Position = Gameplay.Town.TownSystem.NodeFeet(spot); // tests: skip the walk in from the outskirts
+                    visitor.Path = null;
+                }
+                return CommandResult.Success($"{visitor.Title} has arrived.");
             case "leave":
                 var leaving = TownCommands.Resident(ctx, a);
                 return town.SendAway(leaving) ? CommandResult.Success($"{leaving.Title} is leaving.") : CommandResult.Fail($"{leaving.Title} is not a visitor.");

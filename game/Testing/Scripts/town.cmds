@@ -70,6 +70,11 @@ assert town.guide.homed == 1
 town summon dryad 0 0 -3
 town services dryad
 town status dryad
+# W4 chat box: the Dryad's Status button answers in the box.
+ui talk dryad
+ui service worldStatus
+assert ui.talk_open == 1
+ui close
 # --- P5-15 ---
 # The Dryad sells Terraria's grass seeds.
 give copper_coin 30
@@ -81,12 +86,20 @@ town dismiss dryad
 town summon painter 2 0 -3
 give copper_coin 99
 give silver_coin 14
-town buy painter land
+# W4 grid shop: the Decor button opens the Painter's paintings tab, and a click buys one.
+ui talk painter
+ui shop decor
+assert ui.shop_slots > 0
+ui buy land
+ui close
 assert inv.land == 1
 town dismiss painter
 give defender_medal 3
 town summon tavernkeep 2 0 -3
-town buy tavernkeep ale
+ui talk tavernkeep
+ui shop
+ui buy ale
+ui close
 assert inv.ale == 1
 assert inv.defender_medal == 2
 town dismiss tavernkeep
@@ -135,7 +148,7 @@ assert errors == 0
 
 # --- P5-19 ---
 # The Travelling Merchant walks in (forced), trades from his rotating stock and walks off again.
-town visit travelling_merchant
+town visit travelling_merchant near
 wait 0.5
 assert town.travelling_merchant == 1
 ui talk travelling_merchant

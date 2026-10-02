@@ -55,7 +55,7 @@ public sealed partial class ShopPanel : Control
         {
             int cell = i;
             ItemSlotView view = null!;
-            view = new ItemSlotView(() => Cell(cell), UiLayout.PanelSlot, SlotKind.Shop, s => _ui.Tooltip(s, PriceOf(cell))) { RepeatRight = true };
+            view = new ItemSlotView(() => Cell(cell), UiLayout.PanelSlot, SlotKind.Shop, s => TooltipOf(s, cell)) { RepeatRight = true };
             view.Clicked += (button, mods) => Click(cell, button == MouseButton.Right, mods, view);
             AddChild(view);
             _views[i] = view;
@@ -64,6 +64,9 @@ public sealed partial class ShopPanel : Control
         AddChild(_next = ChestPanel.TextButton(">", () => Turn(1), "Next page"));
         AddChild(_pageText = new OutlinedText { FontSize = UiFonts.Small });
     }
+
+    /// <summary>The shop tab shown ("shop", or e.g. the Painter's "decor").</summary>
+    public string Tab { get; private set; } = Strata.Core.Content.Defs.ShopTabs.Shop;
 
     /// <summary>The resident whose shop is shown, if any.</summary>
     public TownNpc? Npc { get; private set; }
@@ -83,7 +86,9 @@ public sealed partial class ShopPanel : Control
     {
         Npc = npc;
         _page = 0;
-        _title.Text = npc.Title;
+        Tab = _ui.ShopTab;
+        _ui.ShopTab = Strata.Core.Content.Defs.ShopTabs.Shop;
+        _title.Text = Tab == Strata.Core.Content.Defs.ShopTabs.Shop ? npc.Title : $"{npc.Title} — {char.ToUpperInvariant(Tab[0])}{Tab[1..]}";
         Restock();
         Refresh();
     }
@@ -196,7 +201,7 @@ public sealed partial class ShopPanel : Control
         {
             var ware = _wares[at];
             if (cursor.IsEmpty || cursor.CanStackWith(ware))
-                return commerce.Buy(npc, _ui.Entity, ware.Item!, 1, shift && cursor.IsEmpty ? BuyTarget.Backpack : BuyTarget.Cursor);
+                return commerce.Buy(npc, _ui.Entity, ware.Item!, 1, shift && cursor.IsEmpty ? BuyTarget.Backpack : BuyTarget.Cursor, Tab);
         }
         else if (cursor.IsEmpty)
         {
@@ -236,7 +241,7 @@ public sealed partial class ShopPanel : Control
     {
         _restockWait = RestockSeconds;
         _offers.Clear();
-        _offers.AddRange(_ui.Game.Commerce.Stock(Npc!, _ui.Entity));
+        _offers.AddRange(_ui.Game.Commerce.Stock(Npc!, _ui.Entity, Tab));
         _wares.Clear();
         foreach (var offer in _offers) _wares.Add(new ItemStack(offer.Item, 1));
     }
@@ -271,6 +276,22 @@ public sealed partial class ShopPanel : Control
         var sold = Sold;
         at -= _wares.Count;
         return at < sold.Count ? sold[at] : ItemStack.Empty;
+    }
+
+    /// <summary>
+    /// A cell's tooltip: coin prices as 'Buy price'; a ware paid in another item (the Tavernkeep's Defender Medals)
+    /// shows that cost instead.
+    /// </summary>
+    private List<(string Text, TooltipKind Kind)> TooltipOf(ItemStack stack, int cell)
+    {
+        int at = _page * Cells + cell;
+        if (at < _offers.Count && _offers[at].Currency is { } currency)
+        {
+            var lines = _ui.Tooltip(stack, null);
+            lines.Add(($"Buy price: {_offers[at].Price} {currency.DisplayName}", TooltipKind.Info));
+            return lines;
+        }
+        return _ui.Tooltip(stack, PriceOf(cell));
     }
 
     /// <summary>The 'Buy price' in a cell's tooltip: the offer's price for one, or what a sold stack fetched.</summary>
