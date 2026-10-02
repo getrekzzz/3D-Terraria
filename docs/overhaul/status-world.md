@@ -17,7 +17,7 @@ CI (push 1): GREEN — file length, build, 426 Core tests, ore tiers/manifest/va
 | X-15 wiring set | done | Red/blue/green/yellow wire networks, actuators, 1/3/5 s timers, teleporter pads, mob/bomb statues with caps, logic gates, per-colour wire view; additive save fields (old red-only saves load). Adversarially reviewed: fixes for stale timers after unloads, mid-tick switch-off, statue critters (no netting, no event kills), actuator removal in unloaded chunks. |
 | X-06 seasons | done | Halloween (Oct 10–Nov 1) / Christmas (Dec 15–31) from the system date (`data/config/seasons.json`), settings toggle, `season` command/probe/condition; goodie bags and presents, seasonal vanity and decor, NPC hats, Santa at Christmas. Scripted runs (`--smoke`) ignore the calendar unless a script sets `season`. |
 
-CI (push 2, merge): GREEN — 467 Core tests, all 16 smoke scripts (incl. new fishing.cmds) and menu tour pass. Review-fix commit: see push 3 line below once verified.
+CI (push 2, merge): GREEN — 467 Core tests, all 16 smoke scripts (incl. new fishing.cmds) and menu tour pass. Review-fix commit 76f92be: GREEN (470 Core tests, 16 smoke scripts, menu tour).
 
 Gaps: no junk catches or hardmode crates; statues are crafted (no worldgen placement); lamp models do not show on/off;
 mining a block does not drop its actuator; no season-only enemies; seasonal vanity not drawn on the avatar yet.
