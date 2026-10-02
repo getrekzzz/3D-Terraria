@@ -16,7 +16,7 @@ public sealed partial class WorldSession
         string baseBiome = Generator.Biomes.IdOf(Generator.Biomes.BiomeAt(cell.X, cell.Y, cell.Z, surface));
         ctx.Layer = Generator.Plan.Bands.LayerAt(cell.Y);
         ctx.Biomes = ZonesAt(cell).Append(baseBiome).Concat(LayeredBiomes(cell, baseBiome, ctx.Layer)).Distinct().ToArray();
-        ctx.Depth = surface - cell.Y;
+        ctx.Depth = WorldGen.Fields.TerrainField.SurfaceDepth(cell.Y, surface, Generator.Terrain.CeilingHeight(cell.X, cell.Z));
         ctx.Weather = Weather.LocalAt(ctx.Biomes, ctx.Layer);
         ctx.Windy = Weather.Windy;
         ctx.Season = Seasons.Current;

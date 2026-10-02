@@ -14,13 +14,7 @@ public sealed partial class WorldSession
     public Int3? FindCave(Int3 near, WorldLayer layer, int headroom = 8, int radiusChunks = 2)
     {
         var bands = Generator.Plan.Bands;
-        var (yMin, yMax) = layer switch
-        {
-            WorldLayer.Underground => (bands.CavernTop, bands.UndergroundTop - 1),
-            WorldLayer.Cavern => (bands.UnderworldTop, bands.CavernTop - 1),
-            WorldLayer.Underworld => (bands.LavaLevel + 2, bands.UnderworldCeiling - 1),
-            _ => throw new ArgumentException($"no caves in layer {layer}", nameof(layer)),
-        };
+        var (yMin, yMax) = bands.CaveRange(layer);
         var home = ChunkMath.CellToChunk(near);
         int cyMin = Math.Max(0, yMin >> ChunkMath.Shift), cyMax = Math.Min(World.ChunkCounts.Y - 1, yMax >> ChunkMath.Shift);
         for (int r = 0; r <= radiusChunks; r++)

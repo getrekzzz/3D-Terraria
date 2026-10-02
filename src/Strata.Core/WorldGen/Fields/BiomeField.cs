@@ -34,6 +34,7 @@ public sealed class BiomeField
     public byte BiomeAt(float x, float y, float z, float surfaceHeight)
     {
         var bands = _plan.Bands;
+        if (bands.Inverted) return BiomeAtInverted(x, y, z, surfaceHeight, _terrain.CeilingHeight(x, z));
         if (y < bands.UnderworldTop) return Underworld;
         if (y >= bands.SkyStart && y > surfaceHeight + 16f) return Sky;
         float depth = bands.NormalizedDepth(MathF.Min(y, surfaceHeight));
@@ -41,6 +42,25 @@ public sealed class BiomeField
         for (int i = 0; i < regions.Count; i++)
             if (regions[i].Membership(x, z, depth) > 0f) return regions[i].BiomeId;
         if (_plan.Landness.Sample(x, z) < 0.5f && y > bands.CavernTop) return Ocean;
+        return Forest;
+    }
+
+    /// <summary>
+    /// Don't Dig Up: the underworld above <c>UnderworldTop</c>; the sky in the upper open air over the bottom surface
+    /// (below the rock roof); a column's biomes by depth below the bottom surface and, in the roof's rock, by depth into the
+    /// rock (the underground jungle over the jungle, the ocean's column up to the cavern layer).
+    /// </summary>
+    private byte BiomeAtInverted(float x, float y, float z, float surfaceHeight, float ceiling)
+    {
+        var bands = _plan.Bands;
+        if (y >= bands.UnderworldTop) return Underworld;
+        bool upper = y >= ceiling;
+        if (!upper && y >= bands.SkyStart && y > surfaceHeight + 16f) return Sky;
+        float depth = bands.NormalizedDepth(upper ? MathF.Max(y, bands.UndergroundTop) : MathF.Min(y, surfaceHeight));
+        var regions = _plan.Regions;
+        for (int i = 0; i < regions.Count; i++)
+            if (regions[i].Membership(x, z, depth) > 0f) return regions[i].BiomeId;
+        if (_plan.Landness.Sample(x, z) < 0.5f && y < bands.CavernTop) return Ocean;
         return Forest;
     }
 
@@ -54,13 +74,29 @@ public sealed class BiomeField
         Span<(float, float)> terms = regions.Count <= 32 ? stackalloc (float, float)[regions.Count] : new (float, float)[regions.Count];
         for (int r = 0; r < regions.Count; r++) terms[r] = regions[r].ColumnTerms(x, z);
         bool ocean = _plan.Landness.Sample(x, z) < 0.5f;
+        bool inverted = bands.Inverted;
+        float ceiling = inverted ? _terrain.CeilingHeight(x, z) : 0f;
         for (int k = 0; k < ys.Length; k++)
         {
             float y = ys[k];
-            if (y < bands.UnderworldTop) { result[k] = Underworld; continue; }
-            if (y >= bands.SkyStart && y > surfaceHeight + 16f) { result[k] = Sky; continue; }
-            float depth = bands.NormalizedDepth(MathF.Min(y, surfaceHeight));
-            byte biome = ocean && y > bands.CavernTop ? Ocean : Forest;
+            float depth;
+            byte biome;
+            if (inverted)
+            {
+                // Don't Dig Up (see BiomeAtInverted).
+                if (y >= bands.UnderworldTop) { result[k] = Underworld; continue; }
+                bool upper = y >= ceiling;
+                if (!upper && y >= bands.SkyStart && y > surfaceHeight + 16f) { result[k] = Sky; continue; }
+                depth = bands.NormalizedDepth(upper ? MathF.Max(y, bands.UndergroundTop) : MathF.Min(y, surfaceHeight));
+                biome = ocean && y < bands.CavernTop ? Ocean : Forest;
+            }
+            else
+            {
+                if (y < bands.UnderworldTop) { result[k] = Underworld; continue; }
+                if (y >= bands.SkyStart && y > surfaceHeight + 16f) { result[k] = Sky; continue; }
+                depth = bands.NormalizedDepth(MathF.Min(y, surfaceHeight));
+                biome = ocean && y > bands.CavernTop ? Ocean : Forest;
+            }
             for (int r = 0; r < regions.Count; r++)
             {
                 if (terms[r].Item1 >= 0f && regions[r].MembershipAt(terms[r], depth) > 0f)

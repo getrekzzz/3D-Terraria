@@ -33,6 +33,11 @@ public sealed record DungeonBudget(int HallCells, int MinRooms, int LockedChests
         _ => new DungeonBudget(1800, 30, 16, 11, 80),
     };
 
-    /// <summary>Lowest interior floor: CavernTop - FloorBelowCavernTop, never below UnderworldTop + 40.</summary>
-    public int FloorY(LayerBands bands) => Math.Max(bands.CavernTop - FloorBelowCavernTop, bands.UnderworldTop + 40);
+    /// <summary>Lowest interior floor: CavernTop - FloorBelowCavernTop, never below UnderworldTop + 40. A Don't Dig Up
+    /// world's dungeon stands on the bottom surface and descends into the ground under it, down to just above the bedrock.</summary>
+    public int FloorY(LayerBands bands) =>
+        bands.Inverted ? InvertedFloor : Math.Max(bands.CavernTop - FloorBelowCavernTop, bands.UnderworldTop + 40);
+
+    /// <summary>Lowest interior floor in a Don't Dig Up world.</summary>
+    public const int InvertedFloor = 14;
 }

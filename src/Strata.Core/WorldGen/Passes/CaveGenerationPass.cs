@@ -35,6 +35,7 @@ public sealed class CaveGenerationPass : GenPass
             if (!ctx.TryRandomLandPoint(ref rng, 0.9f, 60f, out float x, out float z)) continue;
             float top = ctx.Terrain.SurfaceHeight(x, z) + 3f;
             float depth = rng.Range(60f, 200f);
+            if (plan.Bands.Inverted) depth = MathF.Min(depth, top - 16f); // Don't Dig Up: the ground under the bottom surface is shallow
             var a = new Vector3(x, top, z);
             float r = rng.Range(2.6f, 4.2f);
             int segments = (int)(depth / 16f) + 1;
@@ -50,6 +51,7 @@ public sealed class CaveGenerationPass : GenPass
             if (!ctx.TryRandomLandPoint(ref rng, 0.92f, 90f, out float x, out float z)) continue;
             float top = ctx.Terrain.SurfaceHeight(x, z) + 6f;
             float depth = rng.Range(40f, 90f);
+            if (plan.Bands.Inverted) depth = MathF.Min(depth, top - 36f);
             float topRadius = rng.Range(10f, 18f);
             plan.AddFeature(new ConeFeature(new Vector3(x, top, z), topRadius, rng.Range(4f, 6f), depth) { Kind = "sinkhole" });
             float cr = rng.Range(14f, 24f);
@@ -68,7 +70,7 @@ public sealed class CaveGenerationPass : GenPass
         int segments = rng.Range(14, 42);
         float radius = rng.Range(2.6f, 4.4f);
         var p = start;
-        float floor = ctx.Plan.Bands.YForNormalizedDepth(rng.Range(0.25f, 0.8f));
+        float floor = ctx.Plan.Bands.DescentY(rng.Range(0.25f, 0.8f));
         if (mouth) heading = Uphill(ctx, start.X, start.Z, heading);
         for (int s = 0; s < segments && p.Y > floor; s++)
         {
@@ -133,7 +135,9 @@ public sealed class CaveGenerationPass : GenPass
         var spagA = Dense(new LatticeSampler(ctx.Origin, size, caves.SpaghettiA), ref _spagA);
         var spagB = Dense(new LatticeSampler(ctx.Origin, size, caves.SpaghettiB), ref _spagB);
         // Cheese caverns only exist below depth 0.12; the box bottom is its deepest cell.
-        bool deep = ctx.Depth(ctx.Origin.Y) > 0.12f;
+        var bands = ctx.Plan.Bands;
+        bool deep = ctx.Depth(ctx.Origin.Y) > 0.12f || (bands.Inverted && ctx.Depth(ctx.Origin.Y + ChunkGenContext.Size - 1) > 0.12f);
+        var roof = ctx.Ceiling; // Don't Dig Up: caves keep a floor over the rock roof's underside too
         var cheese = deep ? Dense(new LatticeSampler(ctx.Origin, size, caves.Cheese, 8), ref _cheese) : null;
         var spawn = ctx.Plan.Spawn;
         int n = ChunkGenContext.Size;
@@ -154,8 +158,8 @@ public sealed class CaveGenerationPass : GenPass
                     ushort b = ctx.Blocks[i];
                     if (b == p.Air || b == p.Bedrock) continue;
                     int wy = ctx.Origin.Y + ly;
-                    if (wy < ctx.Plan.Bands.UnderworldTop + 6) continue;
-                    float sd = h - wy - spawnGuard;
+                    if (roof == null ? wy < bands.UnderworldTop + 6 : wy > bands.UnderworldTop - 6) continue;
+                    float sd = (roof != null && wy + wy > ctx.SurfaceHeight[col] + roof[col] ? wy - roof[col] : h - wy) - spawnGuard;
                     float depth = ctx.Depth(wy);
                     if (caves.Carves(spagA[i], spagB[i], cheese?[i] ?? -1f, depth, sd, abundance)
                         || (crackColumn && sd > 8f && caves.Crack(wx, wy, wz, depth)))
