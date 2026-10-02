@@ -63,7 +63,7 @@ public class TownServicesTests
     {
         using var g = Create();
         var p = g.Player.State;
-        p.Inventory.Accessories[0] = new ItemStack(g.Content.Items.Get("hermes_boots"), 1, g.Content.Prefixes.Get("sturdy"));
+        p.Inventory.Accessories[0] = new ItemStack(g.Content.Items.Get("hermes_boots"), 1, g.Content.Prefixes.Get("guarding"));
         p.Recompute();
         Assert.Equal(g.Content.Items.Get("hermes_boots").Defense + 2, p.Defense);
     }

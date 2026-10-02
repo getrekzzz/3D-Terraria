@@ -57,6 +57,27 @@ public class ChunkCodecTests
     }
 
     [Fact]
+    public void ChestPrefixesFromOldSavesMapOrDropButKeepTheItem()
+    {
+        // Chests written before P3-31 hold invented prefix ids: they resolve through the aliases, and one that no
+        // longer fits its item (Mythic on a spear, the old magic Arcane on a staff) is dropped, never the item.
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        static Strata.Core.Content.Defs.PrefixDef Old(string id) => new() { Id = id, Name = id };
+        var chest = new TileObjectInstance(db.TileObjects.Get("wooden_chest"), new Int3(3, 4, 5), 0, 0) { Active = true };
+        chest.Container![0] = new ItemStack(db.Items.Get("copper_broadsword"), 1, Old("towering"));
+        chest.Container[1] = new ItemStack(db.Items.Get("spear"), 1, Old("mythic"));
+        chest.Container[2] = new ItemStack(db.Items.Get("amethyst_staff"), 1, Old("arcane"));
+        var blob = ChunkCodec.Encode(RandomChunk(db, 2), 0, new[] { chest }, db, ids);
+        var c = Assert.Single(ChunkCodec.Decode(blob, db, ids).TileObjects).Container!;
+        Assert.Equal("massive", c[0].Prefix!.Id);
+        Assert.Equal("spear", c[1].Item!.Id);
+        Assert.Null(c[1].Prefix);
+        Assert.Equal("amethyst_staff", c[2].Item!.Id);
+        Assert.Null(c[2].Prefix);
+    }
+
+    [Fact]
     public void UniformChunksAreTiny()
     {
         var db = TestPaths.Content;

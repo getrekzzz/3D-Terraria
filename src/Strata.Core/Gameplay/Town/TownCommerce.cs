@@ -114,11 +114,11 @@ public sealed class TownCommerce
         var offer = Stock(npc, player).FirstOrDefault(o => o.Item == item);
         if (offer == null) return TradeResult.Unavailable;
         var inv = player.State.Inventory.Backpack;
-        var goods = new ItemStack(item, count);
-        if (!inv.CanFit(goods)) return TradeResult.NoRoom;
+        if (!inv.CanFit(new ItemStack(item, count))) return TradeResult.NoRoom;
         if (!Wallet.TrySpend(inv, Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
-        var rest = inv.Add(goods);
-        foreach (var s in change.Append(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
+        // Bought weapons and accessories come with a prefix too, each one rolled separately.
+        var rest = Prefixes.Made(item, count, Content, ref _rng).Select(g => inv.Add(g)).ToList();
+        foreach (var s in change.Concat(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         return TradeResult.Ok;
     }
 

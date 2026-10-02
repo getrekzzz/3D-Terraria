@@ -165,12 +165,13 @@ public class UseTimingTests
     {
         using var g = Arena();
         var sword = g.Content.Items.Get("wooden_sword");
-        g.Player.State.Inventory.Backpack[0] = new ItemStack(sword, 1, g.Content.Prefixes.Get("brisk"));
+        g.Player.State.Inventory.Backpack[0] = new ItemStack(sword, 1, g.Content.Prefixes.Get("quick"));
         g.Player.State.Inventory.Select(0);
         g.Player.Aim = Vector3.UnitZ;
         g.World.ItemUse.Use(g.Player, null, true);
-        Assert.Equal((int)MathF.Round(sword.UseAnimation / 1.1f), g.Player.UseAnimationMax);
-        Assert.Equal((int)MathF.Ceiling(sword.UseTime / 1.1f), g.Player.UseCooldown);
+        float speed = 1f / (1f - 0.1f); // Quick: Terraria use time x 0.9
+        Assert.Equal((int)MathF.Round(sword.UseAnimation / speed), g.Player.UseAnimationMax);
+        Assert.Equal((int)MathF.Ceiling(sword.UseTime / speed - 1e-3f), g.Player.UseCooldown);
     }
 
     [Fact]

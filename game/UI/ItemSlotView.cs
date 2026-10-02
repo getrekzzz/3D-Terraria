@@ -102,6 +102,8 @@ public sealed partial class ItemSlotView : Control
                 TooltipKind.Flavor => new Color(0.75f, 0.8f, 0.95f),
                 TooltipKind.Price => new Color(0.95f, 0.85f, 0.5f),
                 TooltipKind.Info => UiTheme.Muted,
+                TooltipKind.Modifier => new Color(0.45f, 0.9f, 0.45f),
+                TooltipKind.ModifierBad => new Color(0.95f, 0.4f, 0.4f),
                 _ => UiTheme.Text,
             });
             box.AddChild(label);

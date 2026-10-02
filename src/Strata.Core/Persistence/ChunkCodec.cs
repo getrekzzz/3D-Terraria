@@ -223,6 +223,7 @@ public static class ChunkCodec
                 int stackCount = r.ReadVar();
                 int prefixId = r.ReadVar();
                 var prefix = prefixId == 0 ? null : db.GetOrAddPlaceholderPrefix(ids.Prefixes.NameOf(prefixId - 1));
+                if (prefix != null && !Prefixes.Fits(item, prefix)) prefix = null; // an old prefix that no longer fits
                 if (obj.Container != null && i < obj.Container.Length) obj.Container[i] = new ItemStack(item, stackCount, prefix);
             }
             into.Add(obj);

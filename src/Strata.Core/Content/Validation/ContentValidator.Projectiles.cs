@@ -4,7 +4,7 @@ namespace Strata.Core.Content.Validation;
 
 public static partial class ContentValidator
 {
-    private static readonly HashSet<string> PrefixGroups = new() { "melee", "ranged", "magic", "summon", "tool", "accessory", "universal" };
+    private static readonly HashSet<string> PrefixGroups = new() { "universal", "common", "melee", "ranged", "magic", "accessory" };
 
     private static void ValidateProjectilesAndBuffs(Ctx ctx)
     {
