@@ -20,7 +20,8 @@
 | 16 | P3-04 swing curve (reviewed + fixed) | full headless CI green (1246 Core tests, 17/17 smoke, MENU PASS) |
 | 17 | World integration merge | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
 | 18 | P3-47 buff and debuff visuals | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
-| 19 | P3-06, P3-07 (after P3-02/03), X-09 creator menu rows (after P2-30) | pending |
+| 19 | P3-06 part 1 (voxel-lit held items and wings, real block cubes in hand) | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 20 | P3-06 grip per use style, P3-07 (after P3-02/03), X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -154,3 +155,11 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   Shadowflame debuff (applied by `shadowflame_bolt`). Command `buff <id|clear> [seconds] [player|npcs]`, probe
   `fx.status_emitters`. Gaps: no venom/electrified buffs exist; only the main body of multi-part creatures is tinted;
   night visibility of fire sparks untuned.
+
+## Push 19 notes
+* **Held items (P3-06 part 1)**: `CreatureVisual.Lit.cs` lit attachments (held item and wings take the body's eased
+  voxel light and tint); `BlockItemMeshes` builds one cached 0.2 m cube per block id with the terrain layers
+  (`shaders/block_item.gdshader` samples the terrain arrays, no new arrays; in the shader warm-up); third person
+  `PlayerAvatar.Held.cs`, first person `ViewModel.Block.cs`. Probes `avatar.held_lit`, `avatar.wings_lit`,
+  `avatar.held_block_cube`, `view.held_block_cube`. Gaps: glass-like blocks render opaque; model-less non-block items
+  still use an unlit sprite card; grip per use style waits for P3-02.
