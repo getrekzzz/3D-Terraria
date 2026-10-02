@@ -54,7 +54,10 @@ public sealed class LootRoller
             return;
         }
         int count = rng.Range(e.Min, e.Max);
-        if (count > 0) into.Add(new ItemStack(_content.Items.Get(e.Item!), count));
+        if (count <= 0) return;
+        var stack = new ItemStack(_content.Items.Get(e.Item!), count);
+        Prefixes.Apply(ref stack, _content, ref rng); // a single weapon, tool or accessory usually rolls a prefix
+        into.Add(stack);
     }
 
     private ICondition Condition(LootEntry e)
@@ -66,18 +69,18 @@ public sealed class LootRoller
         }
     }
 
-    /// <summary>Combines duplicate items and splits stacks above max size.</summary>
+    /// <summary>Combines duplicate items (same prefix) and splits stacks above max size.</summary>
     private static List<ItemStack> Merge(List<ItemStack> stacks)
     {
         var result = new List<ItemStack>();
-        foreach (var group in stacks.GroupBy(s => s.Item))
+        foreach (var group in stacks.GroupBy(s => (s.Item, s.Prefix)))
         {
             int total = group.Sum(s => s.Count);
-            var item = group.Key!;
+            var (item, prefix) = group.Key;
             while (total > 0)
             {
-                int n = Math.Min(total, item.MaxStack);
-                result.Add(new ItemStack(item, n));
+                int n = Math.Min(total, item!.MaxStack);
+                result.Add(new ItemStack(item, n, prefix));
                 total -= n;
             }
         }

@@ -116,7 +116,10 @@ public sealed class PlayerSave
         {
             if (s.Slot < 0 || s.Slot >= inv.Size) continue;
             var item = content.GetOrAddPlaceholderItem(s.Item);
+            // Old ids resolve through the aliases; a prefix that no longer fits the item (an accessory prefix on a
+            // weapon) is dropped, never the item.
             var prefix = s.Prefix == null ? null : content.GetOrAddPlaceholderPrefix(s.Prefix);
+            if (prefix != null && !Prefixes.Fits(item, prefix)) prefix = null;
             inv[s.Slot] = new ItemStack(item, s.Count, prefix);
         }
     }

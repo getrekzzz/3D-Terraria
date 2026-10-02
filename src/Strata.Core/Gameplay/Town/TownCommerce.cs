@@ -115,6 +115,7 @@ public sealed class TownCommerce
         if (offer == null) return TradeResult.Unavailable;
         var inv = player.State.Inventory.Backpack;
         var goods = new ItemStack(item, count);
+        Prefixes.Apply(ref goods, Content, ref _rng); // bought weapons and accessories come with a prefix too
         if (!inv.CanFit(goods)) return TradeResult.NoRoom;
         if (!Wallet.TrySpend(inv, Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
         var rest = inv.Add(goods);

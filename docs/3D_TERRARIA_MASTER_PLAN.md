@@ -78,7 +78,7 @@ are in [`AUDIT.md`](AUDIT.md).
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
 | Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink |
 | Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds |
-| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; 18 prefixes (invented names) and Goblin Tinkerer reforging (no reforge slot). Hooks don't fire on click, use animations restart mid-swing (AUDIT §8) |
+| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; Terraria's 83 prefixes (data/prefixes.json; rolled on crafts, drops, chest loot and shop buys; tooltip modifier lines) and Goblin Tinkerer reforging (no reforge slot). Hooks don't fire on click, use animations restart mid-swing (AUDIT §8) |
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
 | UI | HUD, inventory, equipment, chests, crafting, console, perf overlay, menus, settings, character/world select, map | ✅ | Generic dark theme with no UI font; no hearts/stars, buff icons, coin/ammo slots, chat log or housing menu (AUDIT §9) |
 | Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Summons ✅; whips, yoyos and flails are stand-ins 🟡 (AUDIT §8) |
@@ -100,8 +100,8 @@ are in [`AUDIT.md`](AUDIT.md).
 * Screenshot runs on software Vulkan (llvmpipe) are slow (frame-rate-bound job completion); budget is adaptive now.
 * Streaming once failed to reach idle in a rendered run (not reproduced since); `ChunkStreamer.DebugState()` is logged by the screenshot tool to catch it.
 * Item held-in-hand orientation is generic (+90° about X); per-item grip data would improve swords/bows.
-* Reforging is a Goblin Tinkerer service on the held item: no reforge slot, and the 18 prefixes use invented names
-  (P2-28, P3-31).
+* Reforging is a Goblin Tinkerer service on the held item: no reforge slot yet (P2-28). Prefixes are Terraria's 1.4.4
+  table since P3-31; old invented ids load through data/config/aliases.json.
 * Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
   until disturbed.
 * Skeletron hands share the skull's life (the reference boss has separately killable hands).

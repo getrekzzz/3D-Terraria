@@ -165,7 +165,7 @@ public class UseTimingTests
     {
         using var g = Arena();
         var sword = g.Content.Items.Get("wooden_sword");
-        g.Player.State.Inventory.Backpack[0] = new ItemStack(sword, 1, g.Content.Prefixes.Get("brisk"));
+        g.Player.State.Inventory.Backpack[0] = new ItemStack(sword, 1, g.Content.Prefixes.Get("quick"));
         g.Player.State.Inventory.Select(0);
         g.Player.Aim = Vector3.UnitZ;
         g.World.ItemUse.Use(g.Player, null, true);
