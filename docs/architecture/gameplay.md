@@ -168,7 +168,9 @@
   from the coin slots first, break backpack coins only when needed and return change to the coin slots; shops,
   services, the Nurse, taxes, the Angler, Classic death and town `coins` conditions use it. Shots take
   `PlayerInventory.FindAmmo` (ammo slots top to bottom, then the backpack); `CountAmmo` is the hotbar count;
-  `CanTake` is the pickup-aware room check.
+  `CanTake` is the pickup-aware room check. Player crafting (`RecipeBook.CanCraft/Craft(PlayerInventory, …)`,
+  `CraftingEnvironment.Browse(…, PlayerInventory)`) counts and consumes the backpack, ammo and coin slots (wooden
+  arrows for flaming arrows) and picks the output up.
 * **Tooltips and display helpers** — `ItemTooltip.Lines(stack, info, TooltipContext)` builds Terraria-ordered
   lines: name with prefix and count, damage/crit/speed/knockback after the prefix and the viewer's class bonuses
   (`DamageModel.DamageMultiplier`/`CritBonus`, the same maths a hit uses), info lines, the description or the buff's

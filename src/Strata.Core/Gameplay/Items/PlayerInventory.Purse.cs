@@ -32,12 +32,15 @@ public sealed partial class PlayerInventory
     public static bool FitsAmmoSlot(ItemDef item) => item.AmmoClass != null && item.Category == ItemCategory.Ammo;
 
     /// <summary>Would <see cref="Pickup"/> take the whole stack? (Coins turning into fewer coins only make more room.)</summary>
-    public bool CanTake(ItemStack stack)
+    public bool CanTake(ItemStack stack) => CanTake(Backpack, Coins, Ammo, stack);
+
+    /// <summary><see cref="CanTake(ItemStack)"/> over stand-in storages (a crafting trial's copies).</summary>
+    internal static bool CanTake(Inventory backpack, Inventory coins, Inventory ammo, ItemStack stack)
     {
         if (stack.IsEmpty) return true;
-        long space = SpaceFor(Backpack, stack);
-        if (CoinMath.IsCoin(stack)) space += SpaceFor(Coins, stack);
-        else if (FitsAmmoSlot(stack.Item!)) space += SpaceFor(Ammo, stack);
+        long space = SpaceFor(backpack, stack);
+        if (CoinMath.IsCoin(stack)) space += SpaceFor(coins, stack);
+        else if (FitsAmmoSlot(stack.Item!)) space += SpaceFor(ammo, stack);
         return space >= stack.Count;
     }
 

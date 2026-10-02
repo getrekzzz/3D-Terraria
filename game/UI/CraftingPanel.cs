@@ -48,7 +48,7 @@ public sealed partial class CraftingPanel : PanelContainer
         _refreshTimer = 0.5;
         var env = CraftingEnvironment.Around(_ui.Game, _ui.Entity);
         _stations.Text = env.Stations.Count == 0 ? "No crafting stations nearby" : "Near: " + string.Join(", ", env.Stations.OrderBy(s => s));
-        var entries = env.Browse(_ui.Recipes, _ui.Inventory.Backpack);
+        var entries = env.Browse(_ui.Recipes, _ui.Inventory);
         foreach (var child in _list.GetChildren()) child.QueueFree();
         foreach (var entry in entries)
         {
@@ -75,7 +75,7 @@ public sealed partial class CraftingPanel : PanelContainer
         var env = CraftingEnvironment.Around(_ui.Game, _ui.Entity);
         int times = many ? System.Math.Max(1, recipe.Output.MaxStack / System.Math.Max(1, recipe.Def.Count)) : 1;
         int crafted = 0;
-        for (int i = 0; i < times && _ui.Recipes.Craft(recipe, _ui.Inventory.Backpack, env.Stations, env.Context); i++) crafted++;
+        for (int i = 0; i < times && _ui.Recipes.Craft(recipe, _ui.Inventory, env.Stations, env.Context); i++) crafted++;
         if (crafted > 0) Audio.Sfx.Play("craft");
         if (crafted > 0) _ui.Notify($"Crafted {crafted * recipe.Def.Count} {recipe.Output.DisplayName}", UiTheme.Text);
         else _ui.Notify("Not enough room in the backpack", UiTheme.Life);

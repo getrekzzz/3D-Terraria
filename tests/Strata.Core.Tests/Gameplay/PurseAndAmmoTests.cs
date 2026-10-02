@@ -211,6 +211,24 @@ public class PurseAndAmmoTests
     }
 
     [Fact]
+    public void CraftingUsesArrowsInTheAmmoSlots()
+    {
+        var inv = NewInventory();
+        var arrow = TestPaths.Content.Items.Get("wooden_arrow");
+        Assert.True(inv.Pickup(S("wooden_arrow", 12)).IsEmpty);
+        Assert.Equal(0, inv.Backpack.Count(arrow)); // all in the ammo slots; the starting torches are in the backpack
+        var book = new Strata.Core.Gameplay.Crafting.RecipeBook(TestPaths.Content);
+        var recipe = book.RecipesFor(TestPaths.Content.Items.Get("flaming_arrow")).First(r => r.Inputs.Any(i => i.Accepts.Contains(arrow)));
+        var stations = new HashSet<string>(recipe.Def.Stations);
+        var ctx = new Strata.Core.Conditions.ConditionContext();
+        Assert.False(book.CanCraft(recipe, inv.Backpack, stations, ctx));
+        Assert.True(book.CanCraft(recipe, inv, stations, ctx));
+        Assert.True(book.Craft(recipe, inv, stations, ctx));
+        Assert.Equal(2, inv.CountAll(arrow));
+        Assert.Equal(recipe.Def.Count, CountIn(inv.Ammo, "flaming_arrow")); // the output is picked up into the ammo slots
+    }
+
+    [Fact]
     public void LoadedCharacterConvertsCoins()
     {
         var state = NewOwner();

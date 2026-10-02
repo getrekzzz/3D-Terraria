@@ -30,16 +30,21 @@ public sealed class CraftingEnvironment
     /// <summary>
     /// Recipes available here (stations and conditions met), craftable first; each with how many times it could be crafted.
     /// </summary>
-    public List<Entry> Browse(RecipeBook book, Items.Inventory inventory)
+    public List<Entry> Browse(RecipeBook book, Items.Inventory inventory) => Browse(book, inventory.Count);
+
+    /// <summary>The same over a player's backpack, coin and ammo slots (arrows in the ammo slots craft too).</summary>
+    public List<Entry> Browse(RecipeBook book, Items.PlayerInventory inventory) => Browse(book, inventory.CountAll);
+
+    private List<Entry> Browse(RecipeBook book, Func<Func<Content.Defs.ItemDef, bool>, int> count)
     {
         var list = new List<Entry>();
         foreach (var r in book.All)
         {
             if (!book.StationsAndConditionsMet(r, Stations, Context)) continue;
             int max = int.MaxValue;
-            foreach (var ing in r.Inputs) max = Math.Min(max, inventory.Count(d => ing.Accepts.Contains(d)) / ing.Count);
+            foreach (var ing in r.Inputs) max = Math.Min(max, count(d => ing.Accepts.Contains(d)) / ing.Count);
             // Only list recipes whose ingredients the player has seen at least one of (keeps the list relevant).
-            if (r.Inputs.All(ing => inventory.Count(d => ing.Accepts.Contains(d)) == 0)) continue;
+            if (r.Inputs.All(ing => count(d => ing.Accepts.Contains(d)) == 0)) continue;
             list.Add(new Entry(r, max > 0, max == int.MaxValue ? 0 : max));
         }
         return list.OrderByDescending(e => e.CanCraft).ThenBy(e => e.Recipe.Output.DisplayName, StringComparer.Ordinal).ToList();

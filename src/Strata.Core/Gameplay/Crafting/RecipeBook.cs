@@ -63,6 +63,37 @@ public sealed class RecipeBook
         return true;
     }
 
+    /// <summary>Whether a player can craft it: ingredients count in the backpack, coin and ammo slots, as in the reference game.</summary>
+    public bool CanCraft(CompiledRecipe r, PlayerInventory inventory, IReadOnlySet<string> stations, ConditionContext context) =>
+        StationsAndConditionsMet(r, stations, context) && r.Inputs.All(i => inventory.CountAll(d => i.Accepts.Contains(d)) >= i.Count);
+
+    /// <summary>
+    /// Crafts once for a player: ingredients come from the backpack, then the ammo and coin slots (wooden arrows for
+    /// flaming arrows), and the output is picked up (arrows to the ammo slots). Returns false (changing nothing) if
+    /// requirements fail or the output does not fit.
+    /// </summary>
+    public bool Craft(CompiledRecipe r, PlayerInventory inventory, IReadOnlySet<string> stations, ConditionContext context)
+    {
+        if (!CanCraft(r, inventory, stations, context)) return false;
+        var output = Prefixes.Fresh(r.Output, r.Def.Count, _content, ref _rng);
+        var backpack = new Inventory(inventory.Backpack.ToArray());
+        var ammo = new Inventory(inventory.Ammo.ToArray());
+        var coins = new Inventory(inventory.Coins.ToArray());
+        foreach (var ing in r.Inputs) Consume(ing, backpack, ammo, coins);
+        if (!PlayerInventory.CanTake(backpack, coins, ammo, output)) return false;
+        foreach (var ing in r.Inputs) Consume(ing, inventory.Backpack, inventory.Ammo, inventory.Coins);
+        inventory.Pickup(output);
+        return true;
+    }
+
+    private static void Consume(Ingredient ing, Inventory first, Inventory second, Inventory third)
+    {
+        Func<ItemDef, bool> match = ing.Accepts.Contains;
+        int left = ing.Count - first.Remove(match, ing.Count);
+        if (left > 0) left -= second.Remove(match, left);
+        if (left > 0) third.Remove(match, left);
+    }
+
     private static void Index(Dictionary<ItemDef, List<CompiledRecipe>> index, ItemDef key, CompiledRecipe r)
     {
         if (!index.TryGetValue(key, out var list)) index[key] = list = new List<CompiledRecipe>();
