@@ -240,6 +240,22 @@ public class PurseAndAmmoTests
         Assert.Equal(S("gold_coin", 1), loaded.Inventory.Coins[0]);
     }
 
+    [Fact]
+    public void TidyCoinSlotsStayPutAndSplitStacksMerge()
+    {
+        var inv = NewInventory();
+        inv.Coins[0] = S("copper_coin", 40);
+        inv.Coins[2] = S("gold_coin", 3);
+        var tidy = inv.Coins.ToArray();
+        Assert.True(Coins.Normalize(inv, TestPaths.Content));
+        Assert.Equal(tidy, inv.Coins.ToArray());
+
+        // Two copper stacks (placed by hand) become one in the first copper slot.
+        inv.Coins[3] = S("copper_coin", 70);
+        Assert.True(Coins.Normalize(inv, TestPaths.Content));
+        Assert.Equal(new[] { S("copper_coin", 10), S("silver_coin", 1), S("gold_coin", 3), ItemStack.Empty }, inv.Coins.ToArray());
+    }
+
     private static int Slot(Inventory inv, string id)
     {
         for (int i = 0; i < inv.Size; i++)

@@ -14,7 +14,27 @@ public static partial class Coins
     /// four slots go to the backpack. Changes nothing and returns false when the backpack cannot take them either, or
     /// when the content lacks a coin.
     /// </summary>
-    public static bool Normalize(PlayerInventory inv, ContentDatabase content) => Layout(inv, content, Total(inv.Coins), null);
+    public static bool Normalize(PlayerInventory inv, ContentDatabase content) =>
+        IsTidy(inv.Coins) || Layout(inv, content, Total(inv.Coins), null);
+
+    /// <summary>
+    /// Each denomination in one slot at most, and fewer than 100 of all but platinum: laying out again would change
+    /// nothing. Checked without allocating, since a full inventory standing on coins retries the pickup every tick.
+    /// </summary>
+    private static bool IsTidy(Inventory slots)
+    {
+        int seen = 0;
+        for (int i = 0; i < slots.Size; i++)
+        {
+            var s = slots[i];
+            if (!IsCoin(s)) continue;
+            int tier = Array.IndexOf(Ids, s.Item!.Id);
+            if (tier < 0 || (seen & (1 << tier)) != 0) return false;
+            seen |= 1 << tier;
+            if (tier > 0 && (long)s.Count * Values[tier] >= Values[tier - 1]) return false;
+        }
+        return true;
+    }
 
     /// <summary>
     /// Replaces the coins in the coin slots with <paramref name="copper"/> worth of the fewest coins. Each denomination

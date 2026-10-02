@@ -10,9 +10,8 @@ public sealed partial class GameWorld
     public event Action<PlayerEntity>? PlayerLost;
 
     /// <summary>
-    /// What death costs by character difficulty, as in the reference game: Classic drops half the coins carried (coin slots and
-    /// backpack),
-    /// Mediumcore drops the whole inventory, Hardcore drops everything and deletes the character.
+    /// What death costs by character difficulty, as in the reference game: Classic drops half the coins carried (coin
+    /// slots and backpack), Mediumcore drops the whole inventory, Hardcore drops everything and deletes the character.
     /// </summary>
     private void ApplyDeathPenalty(PlayerEntity p)
     {
