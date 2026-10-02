@@ -179,3 +179,13 @@ wait 1
 assert banners.near >= 1
 assert buff.monster_banner == 1
 assert errors == 0
+
+# --- X-03 signs ---
+# A sign keeps what it says (object meta): write two lines, read them back.
+give sign 1
+place sign 2 0 2
+sign Welcome|to Strata
+assert signs.text == 17
+sign clear
+assert signs.text == 0
+assert errors == 0

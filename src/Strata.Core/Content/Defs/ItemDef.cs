@@ -91,6 +91,9 @@ public sealed class ItemDef : ContentDef
 
     // --- Use ---
     public UseStyle UseStyle { get; init; } = UseStyle.None;
+
+    /// <summary>Chance (0–1) a shot keeps its ammo (Megashark 0.5), on top of ammo-saving gear.</summary>
+    public float AmmoSaveChance { get; init; }
     public int UseTime { get; init; } = 20;
     public int UseAnimation { get; init; } = 20;
     public bool AutoReuse { get; init; }
@@ -186,6 +189,9 @@ public sealed class ItemDef : ContentDef
 
     /// <summary>Light emitted while held, [r, g, b] 0–15.</summary>
     public int[]? HeldLight { get; init; }
+
+    /// <summary>Left on the ground, it vanishes when day breaks (Fallen Stars, P3-30).</summary>
+    public bool FadesAtDawn { get; init; }
 
     // --- Presentation ---
     public string? Model { get; init; }

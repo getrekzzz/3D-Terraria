@@ -30,12 +30,13 @@ public sealed partial class ProjectileRenderer
     {
         if (!_retryNow) return false;
         _awaiting.Remove(p.Id);
-        var fresh = Create(p);
+        var fresh = Build(p);
         if (_awaiting.Contains(p.Id))
         {
             fresh.Free(); // still loading: keep the current glow
             return false;
         }
+        if (Poolable(p)) _pooledType[fresh] = p.Def.Id; // the finished model may go back to the pool
         node?.QueueFree();
         _petAnims.Remove(p.Id);
         node = fresh;

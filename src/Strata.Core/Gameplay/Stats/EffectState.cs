@@ -65,6 +65,9 @@ public sealed class EffectState
     /// <summary>Projectiles thrown with weapon attacks (Bone Glove).</summary>
     public List<Content.Specs.AttackProjectileParams> AttackProjectiles { get; } = new();
 
+    /// <summary>Extra damage minion hits deal to this creature (whip tags; the strongest tag counts).</summary>
+    public int MinionTagDamage { get; set; }
+
     public void Clear()
     {
         Stats.Clear();
@@ -89,6 +92,7 @@ public sealed class EffectState
         Inflicts.Clear();
         Info.Clear();
         AttackProjectiles.Clear();
+        MinionTagDamage = 0;
     }
 
     /// <summary>Applies one of a buff's effects, remembering the buff when it is the strongest damage over time.</summary>
@@ -163,6 +167,9 @@ public sealed class EffectState
                 break;
             case EffectSpecs.AttackProjectile:
                 AttackProjectiles.Add(Parsed<AttackProjectileParams>(spec));
+                break;
+            case EffectSpecs.MinionTag:
+                MinionTagDamage = Math.Max(MinionTagDamage, Parsed<MinionTagParams>(spec).Damage);
                 break;
             case EffectSpecs.Pacify:
                 Pacified.Add(Parsed<PacifyParams>(spec).Tag);

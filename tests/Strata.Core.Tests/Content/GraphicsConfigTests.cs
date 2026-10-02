@@ -57,9 +57,12 @@ public class GraphicsConfigTests
     {
         Assert.Contains(new GraphicsPreset { EffectsScale = 2.5f }.Validate(), e => e.Contains("effectsScale"));
         Assert.Contains(new GraphicsPreset { FlashLights = 17 }.Validate(), e => e.Contains("flashLights"));
+        Assert.Contains(new GraphicsPreset { ProjectileLights = 33 }.Validate(), e => e.Contains("projectileLights"));
+        Assert.Contains(new GraphicsPreset { ProjectileLights = -1 }.Validate(), e => e.Contains("projectileLights"));
         Assert.DoesNotContain(new GraphicsPreset().Validate(), e => e.Contains("effectsScale") || e.Contains("flashLights"));
         var config = GraphicsConfig.Load(new Strata.Core.Content.Loading.FileSystemDataSource(TestPaths.ProjectRoot));
         Assert.True(config.Get("low").EffectsScale < config.Get("ultra").EffectsScale);
         Assert.Equal(0, config.Get("low").FlashLights);
+        Assert.Equal((0, 12), (config.Get("low").ProjectileLights, config.Get("ultra").ProjectileLights));
     }
 }

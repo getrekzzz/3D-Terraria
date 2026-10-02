@@ -204,6 +204,15 @@ public sealed partial class GameWorld
         return true;
     }
 
+    /// <summary>Writes a sign's text (see <see cref="TileObjectInstance.SignText"/>) and marks its chunk for saving; false for other objects.</summary>
+    public bool EditSign(TileObjectInstance sign, string? text)
+    {
+        if (sign.Def.Interaction != Content.Defs.TileInteraction.Read) return false;
+        sign.SignText = text;
+        Session.World.GetChunk(ChunkMath.CellToChunk(sign.Anchor))?.MarkModified();
+        return true;
+    }
+
     /// <summary>
     /// The slots a container object shows <paramref name="owner"/>: a chest's own, or for a Piggy Bank or Safe the
     /// character's personal storage of that kind (created on first use). Null for objects without storage.

@@ -52,6 +52,7 @@ public sealed partial class PlayerAvatar : Node3D
         UpdateMount(entity.Mount);
         UpdateGear(delta);
         Animate(entity, (float)delta);
+        UpdateRagdoll(entity);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
         UpdateArmor((float)delta);
         UpdateStatus();

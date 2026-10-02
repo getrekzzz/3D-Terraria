@@ -58,12 +58,39 @@ assert projectiles.count >= 1
 wait 1.0
 assert inv.wooden_arrow == 49
 
+# P3-09': Starfury swings and rains a star from the sky onto the crosshair.
+killall
+give starfury 1
+wield starfury
+spawn zombie 1 3
+aim 0 0 1
+use
+wait 0.05
+assert projectiles.count >= 1
+wait 1
+killall
+assert errors == 0
+
+# P3-14: a leather whip lashes the zombie ahead (and tags it for minions).
+give leather_whip 1
+wield leather_whip
+spawn zombie 1 3
+aim 0 0 1
+use
+wait 0.8
+assert whips.hits >= 1
+killall
+assert errors == 0
+
 # Death and respawn.
 killall
 kill
 wait 0.5
 assert player.alive == 0
+assert avatar.ragdoll == 1
 wait_until player.alive == 1 10
+wait 0.1
+assert avatar.ragdoll == 0
 assert player.deaths >= 1
 assert errors == 0
 
@@ -368,6 +395,81 @@ assert fx.status_emitters >= 4
 killall
 wait 0.3
 assert fx.status_emitters == 0
+# Swings and shots smash pots and cut grass (P3-23); a chair stands.
+killall
+fill -3 0 1 3 3 8 air
+place pot 0 0 2
+place wooden_chair 2 0 2
+smashed reset
+give copper_broadsword 1
+wield copper_broadsword
+aim 0 -0.3 1
+use
+wait 0.6
+assert objects.smashed == 1
+place grass_tuft 0 0 6
+give wooden_bow 1
+give wooden_arrow 20
+wield wooden_bow
+aim 0 -0.42 1
+use
+wait 1
+assert objects.smashed == 2
+# Yoyos (P3-12): held out on a string while the button is down, striking the zombie again and again; home when let go.
+killall
+give wood_yoyo 1
+wield wood_yoyo
+spawn zombie 1 3
+aim 0 0 1
+press use_primary on
+wait 0.6
+assert projectiles.count == 1
+assert projectiles.strings == 1
+wait 1.5
+press use_primary off
+wait 2
+assert projectiles.count == 0
+assert npcs.zombie == 0
+# Whip lashes are drawn and crack (P3-15).
+give leather_whip 1
+wield leather_whip
+use
+wait 0.2
+assert whips.drawn == 1
+wait 0.6
+assert whips.cracks >= 1
+# Flails (P3-13): whirled on the chain while held, flung when let go, reeled back in.
+give ball_o_hurt 1
+wield ball_o_hurt
+press use_primary on
+wait 0.5
+assert projectiles.count == 1
+assert projectiles.strings == 1
+press use_primary off
+wait 3
+assert projectiles.count == 0
+# Projectile views are pooled (P1b-15): forty sparks in volleys reuse the views of the ones that burned out, and the
+# glowing ones near the camera share the preset's few lights. Shots leave the held wand's tip (P3-10).
+give wand_of_sparking 1
+wield wand_of_sparking
+aim 0 0.1 1
+probe projectiles.nodes_created
+repeat 10 use
+heal
+wait 2
+repeat 10 use
+heal
+wait 2
+repeat 10 use
+heal
+wait 2
+repeat 10 use
+wait 0.1
+assert projectiles.nodes_created <= 34
+probe projectiles.lights
+assert projectiles.from_muzzle >= 1
+assert fx.muzzle_flashes >= 1
+assert projectiles.pooled >= 1
 ai on
 killall
 assert errors == 0

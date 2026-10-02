@@ -89,6 +89,9 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Falls over when felled (trees).</summary>
     public bool Topple { get; init; }
 
+    /// <summary>Weapons break it: sword swings and friendly projectiles smash pots and mow grass and flowers (P3-23).</summary>
+    public bool BreakByAttack { get; init; }
+
     /// <summary>The material sound with its default.</summary>
     public string HitSound => Sound ?? (BreakTool == BreakTool.Pick ? "stone" : "wood");
 

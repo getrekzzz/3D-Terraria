@@ -21,6 +21,7 @@ public sealed partial class NpcRenderer
         public float Age;
         public Vector3 Scale;
         public bool Human;
+        public Rendering.Ragdoll? Ragdoll;
     }
 
     private const float CorpseTime = 1.7f, SinkTime = 0.6f, ShrinkTime = 0.3f, PunchTime = 0.1f;
@@ -178,8 +179,9 @@ public sealed partial class NpcRenderer
     {
         if (npc.Alive || npc.Segments.Count > 0 || npc.Barrier != null) return false;
         var visual = view.Visual;
-        visual.Humanoid?.Locomotion("death");
-        _corpses.Add(new Corpse { Visual = visual, Model = view.Model, Scale = visual.Scale, Human = visual.Humanoid != null });
+        var ragdoll = TryRagdoll(npc, visual);
+        if (ragdoll == null) visual.Humanoid?.Locomotion("death");
+        _corpses.Add(new Corpse { Visual = visual, Model = view.Model, Scale = visual.Scale, Human = visual.Humanoid != null, Ragdoll = ragdoll });
         return true;
     }
 
@@ -189,12 +191,18 @@ public sealed partial class NpcRenderer
         {
             var c = _corpses[i];
             c.Age += dt;
-            float end = c.Human ? CorpseTime + SinkTime : ShrinkTime;
+            float end = c.Ragdoll != null ? RagdollTime + DropTime : c.Human ? CorpseTime + SinkTime : ShrinkTime;
             if (c.Age >= end)
             {
                 c.Visual.Scale = c.Scale;
+                EndRagdoll(c);
                 Release(c.Visual, c.Model);
                 _corpses.RemoveAt(i);
+                continue;
+            }
+            if (c.Ragdoll != null)
+            {
+                if (c.Age >= RagdollTime && c.Age - dt < RagdollTime) c.Ragdoll.Drop(); // it sinks through the ground
                 continue;
             }
             if (c.Human)

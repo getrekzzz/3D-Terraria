@@ -12,7 +12,7 @@
   "projectiles": [
     {"id": "magic_dagger_throw", "name": "Magic Dagger", "visual": "item", "model": "magic_dagger", "lifetime": 100, "radius": 0.4, "pierce": 1},
     {"id": "trident_bolt", "name": "Unholy Trident", "visual": "bolt", "color": "#c83a3a", "lifetime": 100, "radius": 0.45, "pierce": 3, "light": [12, 3, 3]},
-    {"id": "paladins_hammer_throw", "name": "Paladin's Hammer", "visual": "item", "model": "paladins_hammer", "lifetime": 120, "radius": 0.8, "returns": 30, "pierce": -1},
+    {"id": "paladins_hammer_throw", "name": "Paladin's Hammer", "spin": 22, "spinAxis": "flat", "visual": "item", "model": "paladins_hammer", "lifetime": 120, "radius": 0.8, "returns": 30, "pierce": -1},
     {"id": "shadowbeam", "name": "Shadowbeam", "visual": "bolt", "color": "#9a3aff", "lifetime": 90, "radius": 0.35, "bounces": 6, "pierce": 5, "light": [8, 2, 14], "trail": "#c8a0ff"},
     {"id": "lost_soul", "name": "Lost Soul", "visual": "orb", "color": "#8ac8ff", "lifetime": 200, "radius": 0.5, "homing": 3, "light": [6, 10, 15], "trail": "#b0e0ff"},
     {"id": "jesters_arrow", "name": "Jester's Arrow", "visual": "arrow", "color": "#ffd040", "lifetime": 200, "radius": 0.3, "pierce": -1, "collideTerrain": false, "light": [10, 8, 4]},

@@ -76,3 +76,18 @@ assert props.problems == 0
 assert errors == 0
 killall
 assert errors == 0
+
+# X-16: a slain zombie crumples into a ragdoll that tumbles, then sinks away and returns to the pool.
+spawning off
+spawn zombie 1
+wait 1.5
+wait_until assets.pending == 0 60
+slay
+wait 0.3
+assert fx.ragdolls_started >= 1
+assert fx.ragdolls >= 1
+wait 1.5
+assert fx.ragdoll_drop > 0.4
+wait 3
+assert fx.ragdolls == 0
+assert errors == 0

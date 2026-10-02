@@ -28,6 +28,9 @@ public static partial class WorldLauncher
         var bossEffects = new Entities.BossEffects();
         runtime.AddChild(bossEffects);
         bossEffects.Initialize(game);
+        var whips = new Entities.WhipRenderer();
+        runtime.AddChild(whips);
+        whips.Initialize(game, kit); // lashes in the air (P3-15)
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
         blockEffects.Initialize(game, kit);
@@ -45,7 +48,10 @@ public static partial class WorldLauncher
         lights.Initialize(services.Graphics);
         lights.AddProvider((eye, radius) => lights.PlacedLights(game, objectRenderer.Placement, eye, radius));
         lights.AddProvider(creatures.Glows);
+        creatures.RagdollBudget = services.Graphics.Preset.Ragdolls;
+        services.Graphics.Changed += p => creatures.RagdollBudget = p.Ragdolls;
         lights.AddProvider(projectiles.PetLights(services.Graphics)); // light pets, at most the preset's petLights
+        projectiles.UseLights(services.Graphics); // glowing shots nearest the camera, at most the preset's projectileLights
         var lava = new Rendering.LavaEffects();
         runtime.AddChild(lava);
         lava.Initialize(runtime);

@@ -62,6 +62,9 @@ public static class StatIds
     /// <summary>Added chance (0–1) that a catch is a crate (Crate Potion).</summary>
     public const string CrateChance = "crateChance";
 
+    /// <summary>Holding the button repeats whips too (Feral Claws and its upgrades; melee always auto-swings).</summary>
+    public const string Autoswing = "autoswing";
+
     /// <summary>Metres added to the item magnet's reach (Treasure Magnet).</summary>
     public const string GrabRange = "grabRange";
 
@@ -71,6 +74,7 @@ public static class StatIds
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
         Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal, FishingPower, BaitSaving, LavaFishing, CrateChance,
+        Autoswing,
         GrabRange,
     };
 

@@ -18,6 +18,8 @@ public sealed partial class CombatEffects : Node3D
         _gore = gore;
         InitializeDust(game); // hit dust, death bursts and gore (CombatEffects.Dust.cs)
         InitializeNumbers(game, graphics);
+        InitializeMuzzle(game); // muzzle flashes, tip sparks and summon puffs (CombatEffects.Muzzle.cs)
+        InitializeImpacts(game); // chips where shots strike the terrain (CombatEffects.Impacts.cs)
         game.Liquids.Mixed += (cell, _) => Puff((new Vector3(cell.X, cell.Y, cell.Z) + new Vector3(0.5f, 1f, 0.5f)) * Strata.Core.Common.Units.CellSize, new Color(0.85f, 0.85f, 0.88f), 0.6f, rise: true);
         game.LiquidEffects.ItemDestroyed += (item, liquid) => Puff(new Vector3(item.Position.X, item.Position.Y, item.Position.Z), Color.FromHtml(liquid.Color), 0.2f, rise: true);
         game.Projectiles.Exploded += (at, radius) => Explosion(new Vector3(at.X, at.Y, at.Z), radius);

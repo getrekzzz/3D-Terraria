@@ -23,6 +23,8 @@ public static class BuiltinCommands
         InventoryCommands.Register(r);
         WorldCommands.Register(r);
         WeatherCommands.Register(r);
+        SignCommands.Register(r);
+        StarfallCommands.Register(r);
         FishingCommands.Register(r);
         SeasonCommands.Register(r);
         PerfCommands.Register(r);

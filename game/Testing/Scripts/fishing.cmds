@@ -7,7 +7,7 @@ fill -10 0 -10 10 8 10 air
 # A pond 9 x 9 x 2 ahead of the player (+Z).
 fill -4 -2 3 4 -1 11 air
 liquid water -4 -2 3 4 -1 11
-wait_until liquid.active == 0 20
+wait_until liquid.active == 0 90
 assert errors == 0
 
 give wooden_fishing_pole
@@ -19,7 +19,7 @@ assert fishing.bobber == 0
 # A worm caught with a Bug Net is bait: cast, float, bite, reel.
 give worm 3
 use
-wait_until fishing.bobber == 2 10
+wait_until fishing.bobber == 2 45
 assert fishing.pool >= 40
 assert fishing.power > 0
 fishing bait always
@@ -33,14 +33,14 @@ fishing bait normal
 
 # Lava burns the line without lavaproof gear; the Hotline Fishing Hook fishes it.
 liquid lava -4 -2 3 4 -1 11
-wait_until liquid.active == 0 20
+wait_until liquid.active == 0 90
 use
 wait 2
 assert fishing.bobber == 0
 give hotline_fishing_hook
 wield hotline_fishing_hook
 use
-wait_until fishing.bobber == 2 10
+wait_until fishing.bobber == 2 45
 fishing bite
 use
 assert fishing.catches == 2

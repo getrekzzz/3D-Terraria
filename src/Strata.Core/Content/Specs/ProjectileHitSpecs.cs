@@ -7,6 +7,7 @@ public static class ProjectileHitSpecs
     public const string ApplyBuff = "applyBuff";
     public const string LifeSteal = "lifeSteal";
     public const string SpawnProjectiles = "spawnProjectiles";
+    public const string DropItem = "dropItem";
 
     public static void Register(SpecCatalog c)
     {
@@ -14,6 +15,7 @@ public static class ProjectileHitSpecs
         c.Register<ApplyBuffParams>(SpecKind.ProjectileHit, ApplyBuff);
         c.Register<LifeStealParams>(SpecKind.ProjectileHit, LifeSteal);
         c.Register<SpawnProjectilesParams>(SpecKind.ProjectileHit, SpawnProjectiles);
+        c.Register<DropItemParams>(SpecKind.ProjectileHit, DropItem);
     }
 }
 
@@ -67,4 +69,13 @@ public sealed class SpawnProjectilesParams : SpecParams, IValidatableSpec
         string.IsNullOrEmpty(Projectile) ? "projectile is required"
         : Count < 1 ? "count must be >= 1"
         : DamageScale < 0 ? "damageScale must be >= 0" : null;
+}
+
+/// <summary>Leaves an item where the projectile comes to rest on the ground (a Fallen Star landing, P3-30).</summary>
+public sealed class DropItemParams : SpecParams, IValidatableSpec
+{
+    public string Item { get; init; } = "";
+    public int Count { get; init; } = 1;
+
+    public string? Validate() => string.IsNullOrEmpty(Item) ? "item is required" : Count < 1 ? "count must be >= 1" : null;
 }

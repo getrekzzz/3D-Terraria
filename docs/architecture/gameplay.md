@@ -387,6 +387,10 @@
   start without the Party Girl (`secretSeed` condition). Don't Dig Up is recognised and saved only (no upside-down
   generation yet). The menu picks a random number for a secret name and lists found secret seeds under the seed field
   (`UserSettings.DiscoveredSeeds`); `--secret=` for dev starts and `worldgen-report`.
+* **Signs** (X-03) — tile objects with `interaction: "read"` (the Sign: 6 wood at a work bench). Interacting raises
+  `ObjectInteraction.SignOpened`; `game/UI/SignDialog` edits the text and `GameWorld.EditSign` stores it in
+  `TileObjectInstance.SignText` (up to 6 lines, 240 characters, control characters dropped), saved as chunk object-meta
+  tag 3. The target label shows the text under the sign's name. Command `sign [text|clear]`, probe `signs.text`.
 * **Enemy banners** — `Banners.BannerSystem` (`GameWorld.Banners`): kills of a banner's creatures (`TileObjectDef.Banner`)
   are tallied world-wide in `Session.Counters["banner:<id>"]` (statue creatures, parts and bosses never count) and every
   `killsPerBanner` (50) drops the banner. Every `refreshTicks` it rescans each player's surroundings (`radius` cells) for

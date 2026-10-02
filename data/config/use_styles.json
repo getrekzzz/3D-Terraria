@@ -30,6 +30,8 @@
   //               default, [0, 0.08, 0] / [90, 0, 0], carries an item's business end (+Y) out of the thumb side; a bow
   //               stands upright with its back on the aim (the bow clip holds the hand 23° above it)
   //   holdout     optional business-end offset from the eye: { "forward", "right", "down" } m
+  //   muzzleFlash shots flash at the held item's muzzle with a wisp of smoke and a brief light (P3-10)
+  //   tipSparks   shots throw sparks from the held item's tip in the projectile's colour (P3-10)
   //   bladeCurve  swing only: the blade's pitch over the swing, [t, degrees, ease into the key] (ease: in, out, io,
   //               lin); 0° hangs down, 90° points ahead, 180° is overhead; the swing clip's arm pitch is keyed to it
   //               (rebuild the sets after changing it)
@@ -67,23 +69,23 @@
     "shoot":  { "clip": "gun", "armAim": 1,
                 "fp": { "rest": { "pos": [-0.1, 0.1, 0.08], "rot": [90, 180, 0] }, "aimAtCrosshair": true,
                         "recoil": { "pos": [0, 0, 0.03], "rot": [4, 0, 0], "decay": 0.12 } } },
-    "gun":    { "clip": "gun", "sound": "gun", "heavySound": "gun_heavy", "armAim": 1,
+    "gun":    { "clip": "gun", "sound": "gun", "heavySound": "gun_heavy", "armAim": 1, "muzzleFlash": true, "holdout": { "forward": 0.55, "right": 0.22, "down": 0.25 },
                 "fp": { "rest": { "pos": [-0.1, 0.1, 0.08], "rot": [90, 180, 0] }, "aimAtCrosshair": true,
                         "recoil": { "pos": [0, 0, 0.04], "rot": [6, 0, 0], "decay": 0.12 } } },
-    "bow":    { "clip": "bow", "sound": "bow", "armAim": 1,
+    "bow":    { "clip": "bow", "sound": "bow", "armAim": 1, "holdout": { "forward": 0.35, "right": 0.18, "down": 0.2 },
                 "hand": { "offset": [0, 0.08, 0], "euler": [0, -90, -67] },
                 "fp": { "rest": { "pos": [-0.2, 0.18, -0.07], "rot": [-10.3, -90, 0] }, "aimAtCrosshair": true,
                         "recoil": { "pos": [0, 0, -0.03], "rot": [0, 0, 0], "decay": 0.2 } } },
-    "staff":  { "clip": "staff", "sound": "magic", "heavySound": "magic_heavy", "armAim": 1,
+    "staff":  { "clip": "staff", "sound": "magic", "heavySound": "magic_heavy", "armAim": 1, "tipSparks": true, "holdout": { "forward": 0.9, "right": 0.2, "down": 0.1 },
                 "hand": { "offset": [0, 0.08, 0], "euler": [60, 0, 0] },
                 "fp": { "rest": { "pos": [-0.04, -0.02, 0], "rot": [-54.4, 14.3, 0] }, "aimAtCrosshair": true,
                         "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.12, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "out" },
                                  { "t": 0.3, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "lin" }, { "t": 1 }] } },
-    "tome":   { "clip": "tome", "sound": "magic", "heavySound": "magic_heavy", "armAim": 1,
+    "tome":   { "clip": "tome", "sound": "magic", "heavySound": "magic_heavy", "armAim": 1, "tipSparks": true, "holdout": { "forward": 0.4, "right": 0.1, "down": 0.2 },
                 "fp": { "rest": { "pos": [-0.04, -0.02, 0], "rot": [-54.4, 14.3, 0] }, "aimAtCrosshair": true,
                         "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.12, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "out" },
                                  { "t": 0.3, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "lin" }, { "t": 1 }] } },
-    "throw":  { "clip": "throw", "sound": "throw", "armAim": 0.5,
+    "throw":  { "clip": "throw", "sound": "throw", "armAim": 0.5, "holdout": { "forward": 0.3, "right": 0.25, "down": 0.1 },
                 "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "curve": "blade" } },
     "yoyo":   { "clip": "yoyo", "sound": "yoyo_throw", "armAim": 1,
                 "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.15, "pos": [-0.08, 0.06, -0.12], "rot": [-50, 0, 0], "ease": "out" },

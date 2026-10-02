@@ -1,0 +1,78 @@
+# Weapons tour (rendered, P3-10..P3-15): a flintlock's muzzle flash in third and first person, an amethyst staff's
+# sparks and trailing bolt, a yoyo on its string, a flail's chain and a whip's lash, each frozen mid-action.
+wait_until player.frozen == 0 300
+spawning off
+town arrivals off
+time 20.5
+killall
+fill -10 -1 -10 10 -1 16 stone
+fill -10 0 -10 10 14 16 air
+camera third
+give flintlock_pistol 1
+give musket_ball 200
+wield flintlock_pistol
+aim 0.15 0.05 1
+wait_until stream.idle == 1 900
+wait 1
+wait_until assets.pending == 0 60
+use
+wait 0.02
+timescale 0.01
+screenshot a_flintlock_third 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 1
+camera first
+wait 0.5
+use
+wait 0.02
+timescale 0.01
+screenshot b_flintlock_first 0
+wait_until screenshot.pending == 0 900
+timescale 1
+camera third
+give amethyst_staff 1
+wield amethyst_staff
+heal
+wait 0.5
+use
+wait 0.15
+timescale 0.01
+screenshot c_staff 0
+wait_until screenshot.pending == 0 900
+timescale 1
+give wood_yoyo 1
+wield wood_yoyo
+aim 0.3 -0.1 1
+press use_primary on
+wait 0.8
+timescale 0.01
+screenshot d_yoyo 0
+wait_until screenshot.pending == 0 900
+timescale 1
+press use_primary off
+wait 1.5
+give blue_moon 1
+wield blue_moon
+press use_primary on
+wait 0.6
+press use_primary off
+wait 0.15
+timescale 0.01
+screenshot e_flail 0
+wait_until screenshot.pending == 0 900
+timescale 1
+wait 2
+give leather_whip 1
+wield leather_whip
+aim 0.2 0 1
+use
+wait 0.27
+timescale 0.01
+screenshot f_whip 0
+wait_until screenshot.pending == 0 900
+timescale 1
+probe projectiles.from_muzzle
+probe fx.muzzle_flashes
+probe projectiles.strings
+probe whips.cracks

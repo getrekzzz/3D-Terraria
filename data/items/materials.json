@@ -144,6 +144,7 @@
       "damageType": "ranged",
       "ammoClass": "star",
       "projectile": "starfury_star",
+      "fadesAtDawn": true,
       "heldLight": [
         9,
         8,

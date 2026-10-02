@@ -262,6 +262,13 @@ public sealed partial class HumanoidAnimator
         Action = null;
     }
 
+    /// <summary>Runs or halts the animation tree (a ragdoll takes the bones while it is off).</summary>
+    public bool Animating
+    {
+        get => _tree.Active;
+        set => _tree.Active = value;
+    }
+
     public void Hurt() => _tree.Set(HurtRequest, (int)AnimationNodeOneShot.OneShotRequest.Fire);
 
     /// <summary>A clip the right arm loops while it is wanted (<see cref="HoldClips"/>) rather than playing once per use.</summary>

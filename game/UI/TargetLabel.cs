@@ -19,6 +19,7 @@ public sealed partial class TargetLabel : Label
 
     private UiContext _ui = null!;
     private object? _shown;
+    private string? _sign;
     private int _life = -1, _max = -1;
 
     public void Initialize(UiContext ui)
@@ -51,8 +52,12 @@ public sealed partial class TargetLabel : Label
         else if (interaction.InReach && interaction.Target is { } t)
         {
             object? what = t.Object != null ? t.Object.Def : t.Block is 0 or VoxelWorld.Unknown ? null : _ui.Game.Session.Content.Blocks[t.Block];
-            if (!Show(what, 0, 0) || what == null) return;
-            Text = t.Object?.Def.DisplayName ?? _ui.Game.Session.Content.Blocks[t.Block].DisplayName;
+            // A sign shows what it says under its name (the text instance changes when it is edited).
+            string? sign = t.Object?.SignText;
+            if ((!Show(what, 0, 0) && ReferenceEquals(sign, _sign)) || what == null) return;
+            _sign = sign;
+            Text = t.Object?.DisplayName ?? _ui.Game.Session.Content.Blocks[t.Block].DisplayName;
+            if (sign != null) Text += "\n\"" + sign + "\"";
             AddThemeColorOverride("font_color", UiTheme.Text);
         }
         else Show(null, 0, 0);

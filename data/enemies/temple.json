@@ -12,7 +12,7 @@
     { "id": "leaf", "name": "Leaf", "visual": "bolt", "color": "#6ad04a", "lifetime": 90, "radius": 0.35, "trail": "#9ae070" },
     { "id": "pygmy_minion", "name": "Pygmy", "visual": "creature", "model": "lihzahrd", "color": "#6a9a4a", "scale": 0.35, "lifetime": 60, "radius": 0.7, "pierce": -1,
       "minion": { "speed": 10, "range": 26, "shoot": "seedler_seed", "shootInterval": 50, "shootSpeed": 20 } },
-    { "id": "flower_pow", "name": "Flower Pow", "visual": "item", "lifetime": 120, "radius": 0.8, "returns": 28, "pierce": -1 },
+    { "id": "flower_pow", "name": "Flower Pow", "visual": "item", "lifetime": 120, "radius": 0.8, "pierce": -1, "spin": 12, "tether": { "kind": "flail", "range": 22, "speed": 15, "string": "#4a9a3a" } },
     { "id": "stynger_bolt", "name": "Stynger Bolt", "visual": "bolt", "color": "#e8c83a", "lifetime": 150, "radius": 0.4, "onHit": [{ "type": "explode", "radius": 3, "damage": 0 }] },
     { "id": "possessed_hatchet", "name": "Possessed Hatchet", "visual": "item", "lifetime": 200, "radius": 0.6, "returns": 60, "homing": 6, "pierce": -1 },
     { "id": "terra_beam", "name": "Terra Beam", "visual": "bolt", "color": "#5aff8a", "lifetime": 60, "radius": 0.7, "pierce": 3, "collideTerrain": false, "light": [3, 12, 5], "trail": "#b0ffc0" },

@@ -75,6 +75,7 @@ public sealed partial class InteractionController : Node
         PollSmartCursorKey();
         UpdateTarget();
         PollHotbarKeys();
+        Entity.UseHeld = false; // yoyos and flails stay out only while the button is held (P3-12)
         // With the inventory, a chest or a chat open, Input reports the button down for clicks the panels took too:
         // only a press on empty screen (the click catcher's WorldPointer) uses the item, toward the crosshair; a tap
         // already released by this tick still counts once.
@@ -87,7 +88,8 @@ public sealed partial class InteractionController : Node
         if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.HotkeysBlocked) return;
         if (Entity.Sleeping || _player.WokeFrame == Engine.GetPhysicsFrames()) return; // in bed, or the press got them up (P3-34)
 
-        if ((fresh || held) && !useBlocked)
+        Entity.UseHeld = (fresh || held) && !useBlocked;
+        if (Entity.UseHeld)
         {
             var outcome = Game.ItemUse.Use(Entity, Target, fresh);
             if (outcome is not (UseOutcome.None or UseOutcome.Cooldown)) Used?.Invoke(outcome);

@@ -41,12 +41,14 @@ public sealed partial class GameWorld : IDisposable
         Spread = new Gameplay.Progression.SpreadSystem(this);
         Maps = new Gameplay.Map.MapSystem(this);
         Npcs = new NpcSystem(this);
-        Melee = new MeleeSystem(Npcs, ItemUse);
+        Melee = new MeleeSystem(Npcs, ItemUse) { World = this };
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
+        Starfall = new StarfallDirector(this);
         Weather = new Gameplay.Weather.WeatherSystem(this);
         Banners = new Gameplay.Banners.BannerSystem(this);
+        Whips = new Gameplay.Entities.WhipSystem(this);
         Liquids = new LiquidSimulator(session);
         Housing = new HousingScanner(session.World);
         Navigator = new VoxelNavigator(session.World);
@@ -89,11 +91,17 @@ public sealed partial class GameWorld : IDisposable
     public SpawnDirector Spawner { get; }
     public EventDirector Events { get; }
 
+    /// <summary>Fallen Stars at night (P3-30).</summary>
+    public StarfallDirector Starfall { get; }
+
     /// <summary>Rain, storms, snow, sandstorms and wind (state in <see cref="WorldSession.Weather"/>).</summary>
     public Gameplay.Weather.WeatherSystem Weather { get; }
 
     /// <summary>Enemy banners: kill tallies, banner drops and the nearby-banner bonus.</summary>
     public Gameplay.Banners.BannerSystem Banners { get; }
+
+    /// <summary>Whip lashes in the air (P3-14).</summary>
+    public Gameplay.Entities.WhipSystem Whips { get; }
     public LiquidSimulator Liquids { get; }
     public HousingScanner Housing { get; }
     public VoxelNavigator Navigator { get; }
@@ -151,12 +159,17 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.map")) Maps.Tick();
         using (prof.Time("tick.liquids")) Liquids.Tick(Session.Clock.Tick);
         using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
-        using (prof.Time("tick.events")) Events.Tick();
+        using (prof.Time("tick.events"))
+        {
+            Events.Tick();
+            Starfall.Tick();
+        }
         using (prof.Time("tick.weather")) Weather.Tick();
         using (prof.Time("tick.banners")) Banners.Tick();
         using (prof.Time("tick.wires")) Wires.Tick();
         using (prof.Time("tick.spawner")) Spawner.Tick();
         using (prof.Time("tick.npcs")) Npcs.Tick();
+        using (prof.Time("tick.whips")) Whips.Tick();
         using (prof.Time("tick.town")) Town.Tick();
         using (prof.Time("tick.melee")) Melee.Tick();
         using (prof.Time("tick.projectiles")) Projectiles.Tick();

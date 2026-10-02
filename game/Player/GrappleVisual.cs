@@ -98,39 +98,17 @@ public sealed partial class GrappleVisual : Node3D
         float length = along.Length();
         if (length < 0.05f) return;
         var dir = along / length;
-        var side = dir.Cross(Mathf.Abs(dir.Y) > 0.95f ? Vector3.Right : Vector3.Up).Normalized();
-        var up = side.Cross(dir).Normalized();
         var color = _player.HookColor;
         _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
-        // Chain links: alternating flat diamonds a few centimetres long.
-        const float link = 0.09f;
-        int links = Mathf.Min(400, (int)(length / link));
-        _mesh.SurfaceSetColor(color);
-        for (int i = 0; i < links; i++)
-        {
-            var c = hand + dir * (i + 0.5f) * link;
-            var w = (i % 2 == 0 ? side : up) * 0.022f;
-            Diamond(c - dir * link * 0.5f, c + w, c + dir * link * 0.5f, c - w);
-        }
+        var (side, up) = Rendering.ChainStrip.Links(_mesh, hand, head, color); // chain links: alternating flat diamonds
         // The claw: three prongs around the head.
         _mesh.SurfaceSetColor(color.Darkened(0.2f));
         for (int k = 0; k < 3; k++)
         {
             float a = k * Mathf.Tau / 3f;
             var spoke = (side * Mathf.Cos(a) + up * Mathf.Sin(a)) * 0.12f;
-            Diamond(head - dir * 0.05f, head + spoke * 0.3f + dir * 0.05f, head + spoke - dir * 0.06f, head + spoke * 0.3f - dir * 0.02f);
+            Rendering.ChainStrip.Quad(_mesh, head - dir * 0.05f, head + spoke * 0.3f + dir * 0.05f, head + spoke - dir * 0.06f, head + spoke * 0.3f - dir * 0.02f);
         }
         _mesh.SurfaceEnd();
-    }
-
-    /// <summary>A flat quad as two triangles in the colour set last (the vertices go straight in, nothing is allocated).</summary>
-    private void Diamond(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
-    {
-        _mesh.SurfaceAddVertex(a);
-        _mesh.SurfaceAddVertex(b);
-        _mesh.SurfaceAddVertex(c);
-        _mesh.SurfaceAddVertex(a);
-        _mesh.SurfaceAddVertex(c);
-        _mesh.SurfaceAddVertex(d);
     }
 }

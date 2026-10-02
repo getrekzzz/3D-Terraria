@@ -1,0 +1,20 @@
+# Ragdoll tour (rendered): slain zombies crumple to the ground as physics ragdolls.
+wait_until player.frozen == 0 300
+spawning off
+town arrivals off
+time 12
+killall
+fill -10 -1 -10 10 -1 14 stone
+fill -10 0 -10 10 14 14 air
+camera third
+aim 0 -0.3 1
+wait_until stream.idle == 1 900
+spawn zombie 1 2.5
+wait 2
+wait_until assets.pending == 0 60
+slay
+wait 1.2
+timescale 0.02
+screenshot a_ragdoll 0
+wait_until screenshot.pending == 0 900
+timescale 1

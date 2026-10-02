@@ -30,6 +30,7 @@ public static partial class WorldLauncher
         game.Spread.Config = Strata.Core.Gameplay.Progression.SpreadConfig.Load(services.Data);
         game.Weather.Config = Strata.Core.Gameplay.Weather.WeatherConfig.Load(services.Data);
         game.Banners.Config = Strata.Core.Gameplay.Banners.BannerConfig.Load(services.Data);
+        game.Starfall.Config = Strata.Core.Gameplay.Events.StarfallConfig.Load(services.Data);
         game.Projectiles.Fishing = Strata.Core.Gameplay.Fishing.FishingConfig.Load(services.Data);
         game.Session.Seasons.Config = Strata.Core.Gameplay.Seasons.SeasonConfig.Load(services.Data);
         game.Session.Seasons.Enabled = () => Settings.UserSettings.Current.SeasonalEvents;
