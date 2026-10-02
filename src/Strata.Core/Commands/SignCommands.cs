@@ -4,7 +4,10 @@ using Strata.Core.Voxels.TileObjects;
 
 namespace Strata.Core.Commands;
 
-/// <summary><c>sign</c>: reads or writes the nearest sign (X-03); probe <c>signs.text</c> (its text length).</summary>
+/// <summary>
+/// <c>sign</c>: reads or writes the nearest sign (X-03); probe <c>signs.text</c> (its text length). <c>smashed</c>: the
+/// count of objects weapons have smashed (P3-23), or <c>smashed reset</c> to start counting afresh.
+/// </summary>
 public static class SignCommands
 {
     private const int Reach = 12;
@@ -22,6 +25,16 @@ public static class SignCommands
                 string text = a.Rest(0);
                 ctx.World.EditSign(sign, text == "clear" ? null : text.Replace('|', '\n'));
                 return CommandResult.Success(sign.SignText is { } now ? $"The sign now says \"{now}\"." : "The sign is blank.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "smashed", Usage = "smashed [reset]",
+            Help = "How many pots, tufts and other breakByAttack objects weapons have smashed; 'reset' starts the count afresh.",
+            Run = (ctx, a) =>
+            {
+                if (a.Count > 0 && a.Str(0, "reset") == "reset") ctx.World.Editor.Smashed = 0;
+                return CommandResult.Success($"{ctx.World.Editor.Smashed} objects smashed.");
             },
         });
     }
