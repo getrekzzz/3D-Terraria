@@ -15,6 +15,8 @@ public sealed partial class CombatEffects
 {
     private CreatureMaterialsConfig _materials = null!;
     private GameWorld _game = null!;
+    private GoreSystem _gore = null!;
+    private readonly RandomNumberGenerator _rng = new();
 
     public CreatureMaterialsConfig Materials => _materials;
 
@@ -23,6 +25,28 @@ public sealed partial class CombatEffects
         _game = game;
         _materials = CreatureMaterialsConfig.Load(new Bootstrap.GodotDataSource());
         game.Npcs.Damaged += HitDust;
+        game.Npcs.Killed += DeathBurst;
+    }
+
+    /// <summary>
+    /// A death: a burst of the material's dust (25 before the preset scale) and gore chunks sized to the creature (2–4,
+    /// bosses 8); critters only puff.
+    /// </summary>
+    private void DeathBurst(Npc npc)
+    {
+        var center = new Vector3(npc.Center.X, npc.Center.Y, npc.Center.Z);
+        var half = new Vector3(npc.HalfExtents.X, npc.HalfExtents.Y, npc.HalfExtents.Z);
+        if (npc.Def.HasTag("critter"))
+        {
+            _kit.Burst(EffectRecipe.Puff, center, new Color(0.85f, 0.85f, 0.82f), 6, 1.2f);
+            return;
+        }
+        var m = _materials.Resolve(npc.Def);
+        _kit.Burst(Recipe(m.Dust.Recipe), center, DustColor(m.Dust.UseTint, m.Dust.Color, npc), npc.IsBoss ? 40 : 25, 3.5f, null, 0.2f);
+        int pieces = npc.IsBoss ? 8 : m.Gore.Pieces;
+        if (pieces <= 0) return;
+        float size = Mathf.Clamp(Mathf.Max(half.X, half.Y) * 0.45f, 0.08f, npc.IsBoss ? 0.6f : 0.3f);
+        _gore.Spawn(center, half, pieces, size, DustColor(m.Gore.UseTint, m.Gore.Color, npc), m.Gore.Shape == "sphere", _rng);
     }
 
     private void HitDust(DamageEvent e)

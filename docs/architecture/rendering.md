@@ -161,7 +161,8 @@ is reused). `FlashLights` is a pool of `flashLights` short omni lights that fade
 because DynamicLights re-ranks its providers only a few times a second. Creature materials
 (data/config/creature_materials.json, Core `CreatureMaterialsConfig`: the enemy's `material`, else its model, else its
 tags, else flesh) pick each creature's hit and death sounds, hit dust (blood, gel, bone chips, sparks, leaves) and death
-gore; `DamageEvent` carries `NpcId` and `Kind` (Hit, Periodic, Player…) so damage over time stays quiet. SoundEvents is split into World, Weapons,
+gore (`GoreSystem`: up to 16–96 pooled chunks by preset, simulated against the voxels, voxel-lit through MultiMesh custom
+data, faded after 2.5 s); `DamageEvent` carries `NpcId` and `Kind` (Hit, Periodic, Player…) so damage over time stays quiet. SoundEvents is split into World, Weapons,
 Creatures and Player partials, each wired once.
 
 ## Weather and ambience

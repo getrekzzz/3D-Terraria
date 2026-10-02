@@ -15,9 +15,12 @@ public static partial class WorldLauncher
         var flashes = new Rendering.FlashLights();
         runtime.AddChild(flashes);
         flashes.Initialize(services.Graphics);
+        var gore = new Entities.GoreSystem();
+        runtime.AddChild(gore);
+        gore.Initialize(game.Session.World, services.Graphics);
         var effects = new Entities.CombatEffects();
         runtime.AddChild(effects);
-        effects.Initialize(game, kit, flashes);
+        effects.Initialize(game, kit, flashes, gore);
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
         blockEffects.Initialize(game, kit);

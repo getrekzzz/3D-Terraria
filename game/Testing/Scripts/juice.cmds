@@ -1,0 +1,35 @@
+# Game feel (P3-08 … P3-26): mining throws lit chips, creature hits throw material dust, deaths burst into dust and gore
+# chunks that bounce and fade, a blast flashes and smokes; nothing errors.
+wait_until player.frozen == 0 180
+spawning off
+killall
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+wait 1.0
+heal
+god on
+mark
+# Mining a block throws chips and dust.
+wield copper_pickaxe
+aim 0.05 -1 0.05
+hold use_primary 1.5
+wait 0.5
+assert effects.bursts > 0
+# Creatures of different materials take hits and die: dust, then gore.
+spawn zombie 4 3
+spawn skeleton -4 3
+spawn green_slime 0 4
+wait 0.5
+slay
+wait 0.2
+assert effects.gore > 0
+wait 3
+assert effects.gore == 0
+# A bomb: a flash, sparks and smoke.
+give bomb 1
+wield bomb
+aim 0 0.3 1
+use
+wait 4
+assert player.alive == 1
+assert errors == 0
