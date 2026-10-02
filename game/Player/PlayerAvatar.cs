@@ -47,6 +47,7 @@ public sealed partial class PlayerAvatar : Node3D
         int immune = entity.State.Vitals.ImmunityTicks;
         Visible = !_controller.Rig.FirstPerson && (immune <= 0 || (immune / 4) % 2 == 0); // blink while invulnerable
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
+        ExtendThrust(entity);
         UpdateCart(entity.Minecart);
         UpdateMount(entity.Mount);
         UpdateGear(delta);
@@ -54,6 +55,7 @@ public sealed partial class PlayerAvatar : Node3D
         UpdateRagdoll(entity);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
         UpdateArmor((float)delta);
+        UpdateStatus();
     }
 
     /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>
@@ -87,7 +89,7 @@ public sealed partial class PlayerAvatar : Node3D
         var item = held.Item;
         if (item == _heldItem) return;
         _heldItem = item;
-        _held?.QueueFree();
+        ReleaseHeld();
         _held = null;
         LightAnchor = null;
         if (item == null || _visual == null) return;
@@ -97,13 +99,14 @@ public sealed partial class PlayerAvatar : Node3D
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
         {
             node = new MeshInstance3D { Mesh = mesh };
-            scale = HeldScale(item);
+            scale = HeldScale(item) * MeleeScale(_game, _game.Uses[item], _props, path, HeldSize(held));
         }
         else
         {
-            node = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.25f / 128f, Shaded = true };
+            node = HeldFallback(item); // a block's textured cube (PlayerAvatar.Held), else the icon
         }
         node.Transform = HeldPose(_game.Uses[item], scale);
+        RememberHeld(node, item, path, scale, HeldSize(held));
         _held = node;
         LightAnchor = node;
         if (Flames.Of(item, _game.Session.Content) is { } flame)
@@ -112,7 +115,7 @@ public sealed partial class PlayerAvatar : Node3D
             node.AddChild(fire);
             LightAnchor = fire;
         }
-        if (!_visual.AttachToBone("hand.R", node))
+        if (!AttachHeld(node))
         {
             node.QueueFree();
             LightAnchor = null;

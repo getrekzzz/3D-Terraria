@@ -64,6 +64,7 @@ public sealed partial class ShaderWarmup : Node3D
         materials.Add(Flames.Material("#ffa040"));
         materials.Add(new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/sprite_lit.gdshader") });
         materials.Add(Entities.ProjectileRenderer.Glow(Colors.White, 3f));
+        materials.Add(Items.BlockItemMeshes.Material); // held block cubes (P3-06)
         var box = new BoxMesh { Size = Vector3.One };
         foreach (var material in materials)
         {

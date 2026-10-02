@@ -1,17 +1,19 @@
 using System.Collections.Generic;
 using Godot;
 using Strata.Core.Common;
+using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Session;
 
 namespace Strata.Game.Entities;
 
 /// <summary>
-/// Makes melee attacks readable: a fading blade arc that follows the sweep the melee system tests hits against
-/// (from +arc/2 to −arc/2 around the facing, in the aim's plane, as far as the prefix-sized blade reaches), drawn only
-/// once the wind-up is over and swept by the same eased strike window (<see cref="UseTiming.Sweep"/>), so the arc
-/// passes a creature as it is hit; and a quick streak along the aim for thrusts in their strike window. Coloured by
-/// the swing's trail colour when the item sets one, else white tinted by rarity.
+/// Makes melee attacks readable: a fading ribbon behind the blade that follows the sweep the melee system tests hits
+/// against (the same <see cref="SwingCurve.Blade"/> angle in the same <see cref="SwingPlane"/>, out to the
+/// prefix-sized reach, so it widens with size prefixes), drawn from the end of the wind-up through the follow-through,
+/// so the ribbon's head passes a creature as it is hit; and for thrusts a 0.2 m streak along the aim that extends with
+/// <see cref="SwingCurve.Extension"/>, a sparkle at its tip. Coloured by the swing's trail colour when the item sets
+/// one, else white tinted by rarity.
 /// </summary>
 public sealed partial class SwingTrail : Node3D
 {
@@ -19,8 +21,8 @@ public sealed partial class SwingTrail : Node3D
     {
         public PlayerEntity Player = null!;
         public bool Thrust;
-        public string Clip = UseTiming.Swing; // the clip whose window times it (a thrust's rapier or spear)
-        public float Yaw, Pitch, HalfArc, Reach, Duration, StrikeStart, StrikeEnd;
+        public float Yaw, Pitch, Arc, Reach, Duration, StrikeStart, StrikeEnd;
+        public SwingCurve Curve = null!;
         public Color Color;
         public float Age;
     }
@@ -66,7 +68,7 @@ public sealed partial class SwingTrail : Node3D
         // As the melee system: the arc is centred on where the player looks (the body faces it) and pitched by the aim.
         var aim = player.Aim;
         var facing = player.Facing;
-        bool thrust = info.Has(ItemAction.Thrust) && !info.Has(ItemAction.Melee);
+        bool thrust = info.Has(ItemAction.Thrust); // as the melee system
         var held = player.State.Inventory.Held;
         float size = held.Item == info.Item ? Prefixes.Size(held) : 1f;
         string clipName = thrust ? _game.ItemUse.Timing.ThrustClip(info) : UseTiming.Swing;
@@ -76,11 +78,11 @@ public sealed partial class SwingTrail : Node3D
         var t = _pool.Count > 0 ? _pool.Pop() : new Trail();
         t.Player = player;
         t.Thrust = thrust;
-        t.Clip = clipName;
         t.Yaw = Mathf.Atan2(facing.X, facing.Z);
         t.Pitch = Mathf.Clamp(Mathf.Asin(Mathf.Clamp(aim.Y, -1f, 1f)), -1.1f, 1.1f);
-        t.HalfArc = thrust ? 0f : (info.Swing?.Arc ?? 150f) * Mathf.Pi / 360f;
-        t.Reach = (thrust ? info.ThrustParams!.Length : info.Swing?.Length ?? 3f) * size * Units.CellSize + (thrust ? 0.4f : 0.6f);
+        t.Arc = info.Swing?.Arc ?? 150f;
+        t.Reach = thrust ? SwingPlane.ThrustReach(info.ThrustParams!.Length, size) : SwingPlane.SwingReach(info.Swing?.Length ?? 3f, size);
+        t.Curve = thrust ? SwingCurve.Extension(clip) : SwingCurve.Blade(clip);
         t.Duration = Mathf.Max(2, player.UseAnimationMax) / (float)Units.TicksPerSecond; // the animation after speed bonuses
         t.StrikeStart = clip.StrikeStart ?? 0f;
         t.StrikeEnd = clip.StrikeEnd ?? 1f;
@@ -108,7 +110,6 @@ public sealed partial class SwingTrail : Node3D
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.swing_trail");
         _mesh.ClearSurfaces();
-        var timing = _game.ItemUse.Timing;
         for (int i = _trails.Count - 1; i >= 0; i--)
         {
             var t = _trails[i];
@@ -120,17 +121,16 @@ public sealed partial class SwingTrail : Node3D
         foreach (var t in _trails)
         {
             float phase = t.Age / t.Duration;
-            float sweep = timing.Sweep(t.Clip, phase);
-            if (phase < t.StrikeStart || sweep <= 0f) continue; // nothing to show through the wind-up
+            if (phase < t.StrikeStart) continue; // nothing to show through the wind-up
+            if (t.Thrust && t.Curve.Evaluate(phase) <= 0.01f) continue;
             if (!begun) _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
             begun = true;
             var c = t.Player == _local && _localBody != null
                 ? _localBody.GetGlobalTransformInterpolated().Origin + new Vector3(0, PlayerEntity.HalfExtents.Y, 0)
                 : new Vector3(t.Player.Center.X, t.Player.Center.Y, t.Player.Center.Z);
-            var origin = c + new Vector3(0, 0.3f, 0);
             float fade = Fade(t);
-            if (t.Thrust) DrawThrust(t, origin, sweep, fade);
-            else DrawArc(t, origin, sweep, fade);
+            if (t.Thrust) DrawThrust(t, c + new Vector3(0, 0.3f, 0), t.Curve.Evaluate(phase), fade);
+            else DrawArc(t, new SwingPlane(new System.Numerics.Vector3(c.X, c.Y, c.Z), t.Yaw, t.Reach, t.Arc), phase, fade);
         }
         if (begun) _mesh.SurfaceEnd();
     }
@@ -143,39 +143,46 @@ public sealed partial class SwingTrail : Node3D
 
     private static float Fade(Trail t) => 1f - Mathf.SmoothStep(FadeFrom(t), End(t), t.Age);
 
-    /// <summary>The arc: its head at the blade (where the melee system tests hits), a tail fading behind it.</summary>
-    private void DrawArc(Trail t, Vector3 origin, float sweep, float fade)
+    /// <summary>How far back (use phase) the ribbon's tail trails the blade.</summary>
+    private const float TrailLag = 0.14f;
+
+    /// <summary>The ribbon: its head at the blade (where the melee system tests hits), a tail fading behind it.</summary>
+    private void DrawArc(Trail t, SwingPlane plane, float phase, float fade)
     {
-        float head = t.HalfArc - sweep * 2f * t.HalfArc;
-        float tail = Mathf.Min(t.HalfArc, head + 1.4f);
+        float end = Mathf.Min(1f, t.StrikeEnd + UseTiming.FollowThrough);
+        float head = t.Curve.Evaluate(Mathf.Min(phase, end));
+        float tail = t.Curve.Evaluate(Mathf.Clamp(phase - TrailLag, t.StrikeStart, end));
         const int steps = 14;
         float inner = t.Reach * 0.35f;
         for (int k = 0; k < steps; k++)
         {
             float a0 = Mathf.Lerp(head, tail, k / (float)steps), a1 = Mathf.Lerp(head, tail, (k + 1) / (float)steps);
             float alpha0 = (1f - k / (float)steps) * 0.55f * fade, alpha1 = (1f - (k + 1) / (float)steps) * 0.55f * fade;
-            Quad(Point(t, origin, a0, inner), Point(t, origin, a0, t.Reach), Point(t, origin, a1, t.Reach), Point(t, origin, a1, inner),
+            Quad(Gd(plane.Point(a0, inner)), Gd(plane.Point(a0, t.Reach)), Gd(plane.Point(a1, t.Reach)), Gd(plane.Point(a1, inner)),
                 new Color(t.Color, alpha0 * 0.2f), new Color(t.Color, alpha0), new Color(t.Color, alpha1), new Color(t.Color, alpha1 * 0.2f));
         }
     }
 
-    /// <summary>The thrust: a streak along the aim reaching out as the stab extends through its strike window.</summary>
+    private static Vector3 Gd(System.Numerics.Vector3 v) => new(v.X, v.Y, v.Z);
+
+    /// <summary>The thrust: a 0.2 m streak along the aim reaching out as far as the stab has extended, a sparkle at its tip.</summary>
     private void DrawThrust(Trail t, Vector3 origin, float extend, float fade)
     {
         float alpha = 0.6f * fade * Mathf.Min(1f, extend * 3f);
         var dir = Direction(t.Yaw, t.Pitch);
-        var side = dir.Cross(Vector3.Up).Normalized() * 0.07f;
-        var a = origin + dir * 0.4f;
-        var b = origin + dir * (0.4f + t.Reach * extend);
-        Quad(a - side, a + side, b + side * 0.2f, b - side * 0.2f,
+        var side = dir.Cross(Vector3.Up).Normalized() * 0.1f;
+        var a = origin + dir * SwingPlane.ThrustArm;
+        var b = origin + dir * (SwingPlane.ThrustArm + (t.Reach - SwingPlane.ThrustArm) * extend);
+        Quad(a - side, a + side, b + side * 0.3f, b - side * 0.3f,
             new Color(t.Color, 0), new Color(t.Color, 0), new Color(t.Color, alpha), new Color(t.Color, alpha));
-    }
-
-    /// <summary>A point on the sweep: flat distance <paramref name="r"/> at <paramref name="angle"/> from the facing yaw, on the aim plane.</summary>
-    private static Vector3 Point(Trail t, Vector3 origin, float angle, float r)
-    {
-        float yaw = t.Yaw + angle;
-        return origin + new Vector3(Mathf.Sin(yaw) * r, Mathf.Tan(t.Pitch) * r, Mathf.Cos(yaw) * r);
+        // The tip sparkle: two crossed diamonds, brightest at full extension.
+        float s = 0.14f * extend;
+        var up = side.Cross(dir).Normalized() * s;
+        var across = side.Normalized() * s;
+        var bright = new Color(t.Color.Lerp(Colors.White, 0.6f), alpha * extend);
+        var clear = new Color(t.Color, 0f);
+        Quad(b - across, b + up, b + across, b - up, clear, bright, clear, bright);
+        Quad(b - dir * s, b + up, b + dir * s, b - up, clear, bright, clear, bright);
     }
 
     private static Vector3 Direction(float yaw, float pitch) =>

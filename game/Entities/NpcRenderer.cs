@@ -152,8 +152,10 @@ public sealed partial class NpcRenderer : Node3D
             if (view.Stalk != null) UpdateStalk(npc, view);
             var tint = Color.FromHtml(npc.Def.Tint);
             // The hurt flash fades with the hit's flash timer instead of blinking off.
+            tint = StatusVisuals.Tint(npc.Buffs, tint, (npc.Id * 0.618034f) % 1f);
             if (npc.HurtFlash > 0) tint = tint.Lerp(new Color(2.2f, 0.7f, 0.7f), Mathf.Clamp(npc.HurtFlash / 8f, 0f, 1f));
             visual.SetTint(tint);
+            if (npc.Alive && npc.Buffs.Active.Count > 0) TrackStatus(npc, view);
             visual.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, view.Shown + Vector3.Up * 0.5f)));
             UpdateHealthBar(npc, view);
         }
@@ -223,6 +225,14 @@ public sealed partial class NpcRenderer : Node3D
             Release(view.Segments[i].Visual, view.Segments[i].Model);
             view.Segments[i] = (swapped, want);
         }
+    }
+
+    /// <summary>Buff and debuff particles follow the creature's body (StatusVisuals hands them back once it is gone).</summary>
+    private static void TrackStatus(Npc npc, View view)
+    {
+        var half = new Vector3(npc.HalfExtents.X, npc.HalfExtents.Y, npc.HalfExtents.Z);
+        var center = npc.Segments.Count > 0 ? view.Shown : view.Shown + Vector3.Up * half.Y;
+        StatusVisuals.Instance?.Track(npc.Id, npc.Buffs, center, half, view.Visual.Visible);
     }
 
     private View? Create(Npc npc)

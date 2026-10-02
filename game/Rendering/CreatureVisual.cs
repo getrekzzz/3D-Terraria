@@ -150,6 +150,7 @@ public sealed partial class CreatureVisual : Node3D
     public void SetTint(Color tint)
     {
         foreach (var g in _geometry) g.SetInstanceShaderParameter("tint", tint);
+        TintLit(tint);
     }
 
     private Color _light;
@@ -167,6 +168,7 @@ public sealed partial class CreatureVisual : Node3D
         _light = _lit && !immediate ? _light.Lerp(voxelLight, 0.18f) : voxelLight;
         _lit = true;
         foreach (var g in _geometry) g.SetInstanceShaderParameter("voxel_light", _light);
+        ApplyLit(_light);
     }
 
     /// <summary>Attaches a node to a bone (held items); returns false if the bone does not exist.</summary>

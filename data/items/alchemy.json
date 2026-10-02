@@ -32,8 +32,8 @@
     {"id": "wrath", "name": "Wrath", "description": "10% increased damage.", "color": "#c83a3a", "effects": [{"type": "stat", "stat": "genericDamage", "add": 0.1}], "covers": ["terraria:wrath"]},
     {"id": "warmth", "name": "Warmth", "description": "Immune to cold.", "color": "#ff9a4a", "effects": [{"type": "immune", "buff": "chilled"}, {"type": "immune", "buff": "frozen"}, {"type": "immune", "buff": "frostburn"}], "covers": ["terraria:warmth"]},
     {"id": "heart_lamp", "name": "Heart Lamp", "hideTimer": true, "description": "Life regen is increased.", "color": "#ff4a6a", "effects": [{"type": "stat", "stat": "lifeRegen", "add": 2}], "covers": ["terraria:heart_lamp"]},
-    {"id": "frozen", "name": "Frozen", "description": "You can't move!", "color": "#9ae8ff", "debuff": true, "effects": [{"type": "stat", "stat": "moveSpeed", "add": -1}, {"type": "noItemUse"}], "covers": ["terraria:frozen"]},
-    {"id": "wet", "name": "Wet", "description": "You are dripping water.", "color": "#6ab0ff", "effects": [{"type": "immune", "buff": "on_fire"}], "covers": ["terraria:wet"]}
+    {"id": "frozen", "name": "Frozen", "description": "You can't move!", "color": "#9ae8ff", "visual": { "tint": "#9ae8ff", "tintStrength": 0.85, "particle": "sparks", "color": "#e0f8ff", "rate": 3, "rise": 0.3 }, "debuff": true, "effects": [{"type": "stat", "stat": "moveSpeed", "add": -1}, {"type": "noItemUse"}], "covers": ["terraria:frozen"]},
+    {"id": "wet", "name": "Wet", "description": "You are dripping water.", "color": "#6ab0ff", "visual": { "particle": "splash", "color": "#6ab0ff", "rate": 5, "rise": -2 }, "effects": [{"type": "immune", "buff": "on_fire"}], "covers": ["terraria:wet"]}
   ],
   "projectiles": [
     {"id": "sand_ball", "name": "Sand Ball", "visual": "orb", "color": "#d8c27a", "lifetime": 150, "radius": 0.4, "friendly": false, "hostile": true, "gravity": 10}

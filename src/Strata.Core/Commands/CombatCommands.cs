@@ -181,6 +181,37 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "buff", Usage = "buff <id|clear> [seconds] [player|npcs]",
+            Help = "Applies a buff or debuff (default duration) to the player or every living creature; 'clear' removes all non-persistent ones.",
+            Run = (ctx, a) =>
+            {
+                var id = a.Str(0, "id");
+                bool npcs = a.OptStr(2) == "npcs";
+                if (id == "clear")
+                {
+                    if (npcs) foreach (var n in ctx.World.Npcs.All) n.Buffs.ClearNonPersistent();
+                    else ctx.Player.State.Buffs.ClearNonPersistent();
+                    return CommandResult.Success("Buffs cleared.");
+                }
+                var content = ctx.World.Session.Content;
+                if (!content.Buffs.TryGet(id, out var def)) throw new CommandException($"unknown buff '{id}'");
+                int ticks = a.Count > 1 ? (int)(a.Float(1, "seconds") * 60) : def.Duration;
+                if (!npcs)
+                {
+                    ctx.Player.State.Buffs.Add(def, ticks);
+                    return CommandResult.Success($"{def.DisplayName} on the player.");
+                }
+                int count = 0;
+                foreach (var n in ctx.World.Npcs.All.Where(n => n.Alive).ToList())
+                {
+                    ctx.World.Npcs.AddBuff(n, def, ticks);
+                    count++;
+                }
+                return CommandResult.Success($"{def.DisplayName} on {count} creatures.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "spawning", Usage = "spawning <on|off|now>", Help = "Toggles natural spawning or forces one spawn attempt.",
             Run = (ctx, a) =>
             {

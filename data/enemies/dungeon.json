@@ -10,7 +10,7 @@
       "light": [6, 5, 3], "trail": "#fff0c0" }
   ],
   "buffs": [
-    { "id": "cursed", "name": "Cursed", "description": "Your hands will not obey you.", "debuff": true, "color": "#8060c0",
+    { "id": "cursed", "name": "Cursed", "description": "Your hands will not obey you.", "debuff": true, "color": "#8060c0", "visual": { "tint": "#a890d8", "tintStrength": 0.35, "particle": "puff", "color": "#6040a0", "rate": 3, "rise": 0.5 },
       "effects": [{ "type": "noItemUse" }], "covers": ["terraria:cursed"] }
   ],
   "items": [

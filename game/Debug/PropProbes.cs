@@ -6,7 +6,8 @@ namespace Strata.Game.Debug;
 
 /// <summary>
 /// Probes on generated models: <c>sockets.&lt;item&gt;</c> counts a held item's sockets (grip, muzzle, tip, …);
-/// <c>avatar.armor_pieces</c> the armour pieces and accessories worn on the third-person body.
+/// <c>avatar.armor_pieces</c> the armour pieces and accessories worn on the third-person body; <c>avatar.held_lit</c>,
+/// <c>avatar.wings_lit</c>, <c>avatar.held_block_cube</c> and <c>view.held_block_cube</c> the P3-06 held-item looks.
 /// </summary>
 [ProbeSource]
 public static class PropProbes
@@ -21,5 +22,12 @@ public static class PropProbes
             return path == null ? 0 : world.Props.Sockets(path).Count;
         });
         ctx.AddProbe("avatar.armor_pieces", () => world.Player?.GetNodeOrNull<Strata.Game.Player.PlayerAvatar>("Avatar")?.WornCount ?? 0);
+        // P3-06: the held item and wings take the body's voxel light; a held block is a textured cube in both views.
+        ctx.AddProbe("avatar.held_lit", () => Avatar(world)?.HeldLit == true ? 1 : 0);
+        ctx.AddProbe("avatar.wings_lit", () => Avatar(world)?.WingsLit == true ? 1 : 0);
+        ctx.AddProbe("avatar.held_block_cube", () => Avatar(world)?.HeldBlockCube == true ? 1 : 0);
+        ctx.AddProbe("view.held_block_cube", () => world.Player?.Rig.Camera.GetNodeOrNull<Strata.Game.Player.ViewModel>("ViewModel")?.HeldBlockCube == true ? 1 : 0);
     }
+
+    private static Strata.Game.Player.PlayerAvatar? Avatar(LaunchedWorld world) => world.Player?.GetNodeOrNull<Strata.Game.Player.PlayerAvatar>("Avatar");
 }

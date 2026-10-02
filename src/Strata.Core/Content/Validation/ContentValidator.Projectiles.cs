@@ -54,6 +54,7 @@ public static partial class ContentValidator
             ctx.Color(b, b.Color, "color");
             ctx.Specs(b, SpecKind.Effect, b.Effects, "effects");
             ctx.Asset(b, AssetPaths.BuffIcon(b), "icon");
+            if (b.Visual is { } v) ValidateBuffVisual(ctx, b, v);
         }
         foreach (var p in ctx.Db.Prefixes.All)
         {
@@ -61,6 +62,19 @@ public static partial class ContentValidator
             foreach (var a in p.Applies)
                 if (!PrefixGroups.Contains(a)) ctx.Error(p, $"unknown prefix group '{a}'.");
         }
+    }
+
+    private static void ValidateBuffVisual(Ctx ctx, BuffDef b, BuffVisualDef v)
+    {
+        ctx.Color(b, v.Tint, "visual.tint");
+        ctx.Color(b, v.Color, "visual.color");
+        ctx.Light(b, v.Light, "visual.light");
+        if (v.Particle != null && Array.IndexOf(BuffVisualDef.Particles, v.Particle) < 0)
+            ctx.Error(b, $"visual.particle '{v.Particle}' must be one of {string.Join(", ", BuffVisualDef.Particles)}.");
+        if (v.TintStrength is < 0f or > 1f) ctx.Error(b, "visual.tintStrength must be within 0–1.");
+        if (v.Rate is < 0f or > 60f) ctx.Error(b, "visual.rate must be within 0–60 particles per second.");
+        if (v.Rise is < -4f or > 4f) ctx.Error(b, "visual.rise must be within -4–4.");
+        if (v.Tint == null && v.Particle == null && v.Light == null) ctx.Warn(b, "visual block shows nothing (no tint, particle or light).");
     }
 
     private static void ValidateLoot(Ctx ctx)

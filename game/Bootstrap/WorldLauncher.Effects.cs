@@ -16,6 +16,9 @@ public static partial class WorldLauncher
         var flashes = new Rendering.FlashLights();
         runtime.AddChild(flashes);
         flashes.Initialize(services.Graphics);
+        var status = new Rendering.StatusVisuals();
+        runtime.AddChild(status);
+        status.Initialize(kit, services.Graphics);
         var gore = new Entities.GoreSystem();
         runtime.AddChild(gore);
         gore.Initialize(game.Session.World, services.Graphics);
@@ -49,6 +52,7 @@ public static partial class WorldLauncher
         runtime.AddChild(lava);
         lava.Initialize(runtime);
         lights.AddProvider(lava.HeatLights);
+        lights.AddProvider(status.Lights); // burning statuses, at most the preset's statusLights
         var weather = new Ambience.WeatherRenderer();
         runtime.AddChild(weather);
         weather.Initialize(runtime, services.Graphics, game.Weather.Config);

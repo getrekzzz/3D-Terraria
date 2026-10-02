@@ -17,7 +17,11 @@
 | 13 | P3-01' bursts and reuseDelay | full headless CI green (654 Core tests, 16/16 smoke, MENU PASS) |
 | 14 | P3-18 pets and light pets, burst test isolation fix | full headless CI green (658 Core tests, 16/16 smoke, MENU PASS) |
 | 15 | X-12 photo mode, Bosses + Dungeon integration merge | full headless CI green (1234 Core tests, 17/17 smoke, MENU PASS) |
-| 16 | X-09 creator menu rows (after P2-30) | pending |
+| 16 | P3-04 swing curve (reviewed + fixed) | full headless CI green (1246 Core tests, 17/17 smoke, MENU PASS) |
+| 17 | World integration merge | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 18 | P3-47 buff and debuff visuals | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 19 | P3-06 part 1 (voxel-lit held items and wings, real block cubes in hand) | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 20 | P3-06 grip per use style, P3-07 (after P3-02/03), X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -134,3 +138,28 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   touched), lens maths in `Strata.Core.Presentation.PhotoLens`. Smoke `photo.cmds`. Gaps: Tab still opens the
   inventory in photo mode; free look ignores sensitivity/invert-Y; no gamepad; warm/cool filters are subtle.
   Autosave indicator, colour-blind filters and subtitles left to the integration session.
+
+## Push 16 notes
+* **Swing curve (P3-04)**: `SwingCurve` / `SwingPlane` in Core drive the melee hitbox (`MeleeSystem.Curve.cs`, tick-to-tick
+  sweep in 15° steps, damaging angles capped at 80° above level so wide arcs never hit behind), the trail
+  (`SwingTrail`) and the first-person arc (`ViewModel.Swing.cs`); thrusts hit only at extension ≥ 0.6. Review fix:
+  behind-the-player hits from the scaled 165° wind-up. Gaps: the third-person body clip still lags the curve (needs
+  P3-03's clips); curve constants are code, not use_styles.json (P3-02 owns that file); reforge while held does not
+  rescale the third-person blade.
+
+## Push 18 notes
+* **Status visuals (P3-47)**: `BuffDef.visual` (tint, tintStrength, particle = EffectKit recipe, color, rate, rise,
+  light). `StatusVisuals` multiplies status tints into the instance `tint` uniform (NPCs, player via
+  `PlayerAvatar.Status.cs`) and runs pooled looping emitters (`EffectKit.Status.cs`), scaled by `effectsScale`, capped by
+  presets `statusEmitters` (8/16/32/48, first come first served) and `statusLights` (0/1/2/3). 13 buffs covered; new
+  Shadowflame debuff (applied by `shadowflame_bolt`). Command `buff <id|clear> [seconds] [player|npcs]`, probe
+  `fx.status_emitters`. Gaps: no venom/electrified buffs exist; only the main body of multi-part creatures is tinted;
+  night visibility of fire sparks untuned.
+
+## Push 19 notes
+* **Held items (P3-06 part 1)**: `CreatureVisual.Lit.cs` lit attachments (held item and wings take the body's eased
+  voxel light and tint); `BlockItemMeshes` builds one cached 0.2 m cube per block id with the terrain layers
+  (`shaders/block_item.gdshader` samples the terrain arrays, no new arrays; in the shader warm-up); third person
+  `PlayerAvatar.Held.cs`, first person `ViewModel.Block.cs`. Probes `avatar.held_lit`, `avatar.wings_lit`,
+  `avatar.held_block_cube`, `view.held_block_cube`. Gaps: glass-like blocks render opaque; model-less non-block items
+  still use an unlit sprite card; grip per use style waits for P3-02.
