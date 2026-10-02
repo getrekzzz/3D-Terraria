@@ -27,6 +27,8 @@ public static class BuiltinCommands
         FishingCommands.Register(r);
         SeasonCommands.Register(r);
         PerfCommands.Register(r);
+        GuideCommands.Register(r);
+        HintCommands.Register(r);
         return r;
     }
 
@@ -129,6 +131,7 @@ public static class BuiltinCommands
             Name = "kill", Usage = "kill", Help = "Kills the player (tests respawn).",
             Run = (ctx, _) =>
             {
+                ctx.Player.LastHarm = Gameplay.Combat.Harm.Other;
                 ctx.Player.State.Vitals.Kill();
                 return CommandResult.Success("Killed.");
             },

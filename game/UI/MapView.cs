@@ -24,6 +24,10 @@ public sealed partial class MapView : Control
     private Color[] _blockColors = Array.Empty<Color>();
     private Color[] _liquidColors = Array.Empty<Color>();
     private bool _dragging;
+    private float _dragged;
+
+    /// <summary>A left click that did not drag the map, at a map position (pixels of <see cref="Map"/>).</summary>
+    public event Action<Vector2>? Clicked;
 
     public ExploredMap? Map { get; set; }
 
@@ -98,7 +102,7 @@ public sealed partial class MapView : Control
         }
         if (m.Label != null && Zoom >= 1.5f)
         {
-            var font = GetThemeDefaultFont();
+            var font = UiFonts.Bold; // the theme's face, also on the minimap's own layer
             var at = p + new Vector2(m.Size + 4, 5);
             DrawStringOutline(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, UiFonts.Outline, UiFonts.OutlineColor);
             DrawString(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, Colors.White);
@@ -181,11 +185,14 @@ public sealed partial class MapView : Control
                 AcceptEvent();
                 break;
             case InputEventMouseButton { ButtonIndex: MouseButton.Left } button:
+                if (button.Pressed) _dragged = 0f;
+                else if (_dragging && _dragged < 4f) Clicked?.Invoke(ToMap(button.Position));
                 _dragging = button.Pressed;
                 AcceptEvent();
                 break;
             case InputEventMouseMotion motion when _dragging:
                 Center -= motion.Relative / Zoom;
+                _dragged += motion.Relative.Length();
                 AcceptEvent();
                 break;
         }

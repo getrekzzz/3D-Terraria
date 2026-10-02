@@ -7,6 +7,11 @@ using Strata.Core.Session;
 
 namespace Strata.Game.Menu;
 
+/// <summary>
+/// The character creator: a turntable preview beside a form of labelled rows (name, body, hair, colours, difficulty).
+/// Each row is one <see cref="MenuKit.Row"/> added to the form, so more options slot in as further rows; every change
+/// calls Refresh to redraw the preview. The character list is MainMenu.CharacterList.cs.
+/// </summary>
 public sealed partial class MainMenu
 {
     private static readonly string[] HairColors = { "#1a1410", "#3b2616", "#5a3a20", "#8a5a30", "#c89050", "#e8d090", "#a0302a", "#d8d8d8", "#6040a0", "#3050c0" };
@@ -18,60 +23,6 @@ public sealed partial class MainMenu
         "Mediumcore: drops all items on death.",
         "Hardcore: death is permanent — the character is lost.",
     };
-
-    private void ShowCharacters()
-    {
-        var (panel, box) = MenuKit.Panel(new Vector2(760, 520));
-        box.AddChild(MenuKit.Title("Select Player", 40));
-        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 360), SizeFlagsVertical = Control.SizeFlags.ExpandFill };
-        var list = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        list.AddThemeConstantOverride("separation", 8);
-        scroll.AddChild(list);
-        box.AddChild(scroll);
-        var characters = SaveCatalog.Characters(PlayersDirectory, (path, ex) => _services.Log.Error("menu", $"Unreadable character {path}", ex));
-        if (characters.Count == 0) list.AddChild(MenuKit.Text("No characters yet — create one!", 18, MenuKit.Idle));
-        foreach (var c in characters) list.AddChild(CharacterRow(c));
-        var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
-        buttons.AddThemeConstantOverride("separation", 24);
-        buttons.AddChild(MenuKit.Big("Back", ShowTitle, 26));
-        buttons.AddChild(MenuKit.Big("New", ShowCharacterCreate, 26));
-        box.AddChild(buttons);
-        Show(MenuKit.Centered(panel));
-    }
-
-    private Control CharacterRow(CharacterEntry c)
-    {
-        var (panel, _) = MenuKit.Panel(new Vector2(0, 0), 2);
-        var row = new HBoxContainer();
-        row.AddThemeConstantOverride("separation", 14);
-        panel.GetChild(0).QueueFree();
-        panel.AddChild(row);
-        var preview = new CharacterPreview();
-        preview.Initialize(new Vector2(70, 90));
-        row.AddChild(preview);
-        preview.Show(c.Look);
-        var info = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        info.AddChild(MenuKit.Text(c.Name, 24, MenuKit.Idle));
-        var difficultyColor = c.Difficulty switch
-        {
-            CharacterDifficulty.Mediumcore => new Color(0.7f, 0.6f, 1f),
-            CharacterDifficulty.Hardcore => new Color(1f, 0.4f, 0.35f),
-            _ => new Color(0.8f, 0.85f, 0.9f),
-        };
-        info.AddChild(MenuKit.Text($"{c.Difficulty}   ·   {c.MaxLife} life   ·   {c.MaxMana} mana   ·   {SaveCatalog.PlayTime(c.PlayTicks)} played", 15, difficultyColor));
-        row.AddChild(info);
-        row.AddChild(MenuKit.Small("Play", () =>
-        {
-            _character = c;
-            ShowWorlds();
-        }, 100));
-        row.AddChild(MenuKit.Small("Delete", () => Confirm($"Delete {c.Name}? This cannot be undone.", () =>
-        {
-            SaveCatalog.DeleteCharacter(c.Path);
-            ShowCharacters();
-        }), 100));
-        return panel;
-    }
 
     private void ShowCharacterCreate()
     {

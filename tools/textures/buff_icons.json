@@ -49,5 +49,10 @@
   "bee_mount":         { "glyph": "honey",          "fg": "#f0c030", "bg": "#4e3410" },
   "ufo_mount":         { "glyph": "ufo",            "fg": "#80e0a0", "bg": "#123a24" },
   "monster_banner":    { "glyph": "pirate_flag",    "fg": "#d8c070", "bg": "#3a2a14" },
-  "dryads_ward":       { "glyph": "shield",         "fg": "#90e070", "bg": "#1e3a16" }
+  "dryads_ward":       { "glyph": "shield",         "fg": "#90e070", "bg": "#1e3a16" },
+  "happy":             { "glyph": "sun",            "fg": "#ffe050", "bg": "#4a3a10" },
+  "bewitched":         { "glyph": "minion",         "fg": "#c090ff", "bg": "#2c1a48" },
+  "tipsy":             { "glyph": "food",           "fg": "#e0a040", "bg": "#4a2e10" },
+  "clairvoyance":      { "glyph": "crystal",        "fg": "#c0a0ff", "bg": "#2a1a4a" },
+  "sugar_rush":        { "glyph": "food",           "fg": "#ff90c0", "bg": "#4a1a32" }
 }

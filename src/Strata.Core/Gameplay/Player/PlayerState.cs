@@ -57,6 +57,12 @@ public sealed class PlayerState
 
     public int Deaths { get; set; }
 
+    /// <summary>Angler quests completed by this character (P5-23).</summary>
+    public int AnglerQuests { get; set; }
+
+    /// <summary>Creatures seen, killed and caught, townsfolk met, items obtained and crafted, achievements.</summary>
+    public Guide.PlayerJournal Journal { get; } = new();
+
     /// <summary>Demon Heart used: the sixth accessory slot is open while in an Expert or Master world.</summary>
     public bool ExtraAccessorySlot { get; set; }
 
@@ -102,7 +108,7 @@ public sealed class PlayerState
             SetBonus ??= piece.SetBonus;
         }
         foreach (var b in Buffs.Active)
-            foreach (var e in b.Def.Effects) Effects.Apply(e);
+            foreach (var e in b.Def.Effects) Effects.Apply(e, b.Def);
         Defense = (int)Effects.Stats.Get(StatIds.Defense, defense);
         Vitals.MaxLife = (int)Effects.Stats.Get(StatIds.MaxLife, BaseLife + BonusLife);
         Vitals.MaxMana = (int)Effects.Stats.Get(StatIds.MaxMana, BaseMana + BonusMana);

@@ -8,23 +8,35 @@ namespace Strata.Core.Session;
 
 public sealed partial class GameWorld
 {
-    /// <summary>Puts a character into this world, with the accessory slots the world's difficulty unlocks (and coins that convert).</summary>
+    /// <summary>Puts a character into this world, with the accessory slots the world and the character unlock (and coins that convert).</summary>
     public PlayerEntity AddPlayer(PlayerState state, Vector3 feet)
     {
-        state.Inventory.AccessorySlotsUnlocked = AccessorySlotsFor(Session.Settings.EffectiveDifficulty);
+        UnlockAccessorySlots(state);
         state.Inventory.Content ??= Session.Content;
+        state.Journal.Bestiary = Journal.Bestiary;
         var p = new PlayerEntity(state) { Position = feet };
         Players.Add(p);
         return p;
     }
 
-    /// <summary>Accessory slots a world grants, as in the reference game: 5, a 6th in Expert and a 7th in Master (Journey has 5).</summary>
-    public static int AccessorySlotsFor(Difficulty difficulty) => difficulty switch
+    /// <summary>
+    /// Accessory slots a character has in a world, as in the reference game: 5 in Classic and Journey worlds, 6 in
+    /// Master; a consumed Demon Heart (<paramref name="demonHeart"/>) adds one more in Expert and Master worlds only
+    /// (it stays greyed out in a Classic world).
+    /// </summary>
+    public static int AccessorySlotsFor(Difficulty difficulty, bool demonHeart = false) => difficulty switch
     {
-        Difficulty.Expert => PlayerInventory.BaseAccessorySlots + 1,
-        Difficulty.Master => PlayerInventory.BaseAccessorySlots + 2,
+        Difficulty.Expert => PlayerInventory.BaseAccessorySlots + (demonHeart ? 1 : 0),
+        Difficulty.Master => PlayerInventory.BaseAccessorySlots + 1 + (demonHeart ? 1 : 0),
         _ => PlayerInventory.BaseAccessorySlots,
     };
+
+    /// <summary>
+    /// Sets the accessory slots <paramref name="state"/> may use in this world (on joining, and as soon as a Demon Heart
+    /// is consumed). Items in a slot that locks stay there, greyed out, and can still be taken out.
+    /// </summary>
+    public void UnlockAccessorySlots(PlayerState state) =>
+        state.Inventory.AccessorySlotsUnlocked = AccessorySlotsFor(Session.Settings.EffectiveDifficulty, state.ExtraAccessorySlot);
 
     /// <summary>Respawn position in meters (bed spawn if set and valid, else world spawn).</summary>
     public Vector3 SpawnPositionFor(PlayerState state)

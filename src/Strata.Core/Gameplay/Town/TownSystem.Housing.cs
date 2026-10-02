@@ -22,7 +22,7 @@ public sealed partial class TownSystem
     /// <summary>Moves a resident into the room around a cell; its occupant takes the resident's old home.</summary>
     public AssignResult AssignHome(TownNpc npc, Int3 cell, out string message)
     {
-        if (npc.Def.Kind != TownNpcKind.Resident || npc.Bound)
+        if (npc.Bound || npc.Def.Kind is not (TownNpcKind.Resident or TownNpcKind.Pet))
         {
             message = Format(HousingMessage("notResident"), npc);
             return AssignResult.NotAResident;

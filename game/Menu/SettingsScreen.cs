@@ -79,6 +79,8 @@ public sealed partial class SettingsScreen : PanelContainer
             "Blocks are mined and placed as 1 m grid blocks, or as single 0.5 m cells. Holding Alt swaps while held."));
         box.AddChild(MenuKit.Row("Smart dig", MenuKit.Toggle(S.SmartDig, v => { S.SmartDig = v; Changed(); }),
             "Looking steeply down with a pickaxe digs the ground under your feet."));
+        box.AddChild(MenuKit.Row("Smart cursor", MenuKit.Toggle(S.SmartCursor, v => { S.SmartCursor = v; Changed(); }),
+            $"Pickaxes snap to the nearest block they can mine near your aim (ores first), axes to the nearest tree. {KeyBindings.Label("smart_cursor")} toggles it in game."));
         box.AddChild(Header("Camera"));
         box.AddChild(MenuKit.Row("First person by default", MenuKit.Toggle(S.FirstPerson, v => { S.FirstPerson = v; Changed(); })));
         box.AddChild(MenuKit.Row("Field of view", MenuKit.Slider(50, 110, 1, S.FieldOfView, v => { S.FieldOfView = (float)v; Changed(); }, v => $"{v:0}°")));
@@ -148,8 +150,13 @@ public sealed partial class SettingsScreen : PanelContainer
             "The interface never grows past what fits a 1024×600 layout in the window; a smaller effective scale is shown."));
         box.AddChild(MenuKit.Row("Show target name", MenuKit.Toggle(S.ShowTargetName, v => { S.ShowTargetName = v; Changed(); }),
             "Names the block or object under the crosshair."));
+        box.AddChild(MenuKit.Row("Boss banners", MenuKit.Toggle(S.BigAnnouncements, v => { S.BigAnnouncements = v; Changed(); }),
+            "Also shows \"… has awoken!\" as a big banner at the top; every message is in the chat log (Enter for the history)."));
         box.AddChild(MenuKit.Row("Show FPS", MenuKit.Toggle(S.ShowFps, v => { S.ShowFps = v; Changed(); })));
         box.AddChild(MenuKit.Row("Minimap", MenuKit.Toggle(S.ShowMinimap, v => { S.ShowMinimap = v; Changed(); }), "The discovered map around you, top right. M opens the full map."));
+        box.AddChild(MenuKit.Row("Life display", MenuKit.Choice(new[] { "Hearts and stars", "Bars" }, S.LifeDisplay == UserSettings.BarsLifeDisplay ? 1 : 0,
+            i => { S.LifeDisplay = i == 1 ? UserSettings.BarsLifeDisplay : UserSettings.ClassicLifeDisplay; Changed(); }),
+            "Life as rows of hearts (20 each, golden with Life Fruit) and mana as a column of stars, or as two bars."));
         box.AddChild(MenuKit.Row("Cursor colour", MenuKit.ColorField(S.CursorColor, h => { S.CursorColor = h; Changed(); })));
     }
 }

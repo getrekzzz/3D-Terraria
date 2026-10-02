@@ -14,8 +14,9 @@ public sealed partial class PlayerInventory
     public event Action? EquipmentChanged;
 
     /// <summary>
-    /// Accessory slots that count (5–7, set by the world's difficulty). Items left in a locked slot stay there but grant
-    /// nothing until the character plays a world that unlocks it again.
+    /// Accessory slots that count (5–7, set by the world's difficulty and the Demon Heart: <c>GameWorld.AccessorySlotsFor</c>).
+    /// Items left in a locked slot stay there, grant nothing and take no new item (<see cref="IsAccessorySlotLocked"/>)
+    /// until the character plays a world that unlocks it again; they can still be taken out.
     /// </summary>
     public int AccessorySlotsUnlocked
     {
@@ -41,6 +42,9 @@ public sealed partial class PlayerInventory
             EquipmentChanged?.Invoke();
         }
     }
+
+    /// <summary>An accessory slot (and its vanity and dye slots) beyond the unlocked ones.</summary>
+    public bool IsAccessorySlotLocked(int slot) => slot >= _accessorySlotsUnlocked;
 
     public bool IsAccessoryHidden(int slot) => (_hiddenAccessories & (1 << slot)) != 0;
 

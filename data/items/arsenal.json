@@ -62,7 +62,7 @@
       "behaviors": [{ "type": "thrust", "length": 3.6 }], "covers": ["terraria:trident"] },
     { "id": "dark_lance", "name": "Dark Lance", "category": "weapon", "rarity": 3, "value": 27000, "useStyle": "spear", "useTime": 23, "useAnimation": 23, "damage": 34, "damageType": "melee", "knockback": 5,
       "behaviors": [{ "type": "thrust", "length": 4.2 }], "covers": ["terraria:dark_lance"] },
-    { "id": "leather_whip", "name": "Leather Whip", "description": "Your summons will focus struck enemies.", "category": "weapon", "value": 10000, "tags": ["shop"], "useStyle": "whip", "useTime": 30, "useAnimation": 30,
+    { "id": "leather_whip", "name": "Leather Whip", "description": "Your summons will focus struck enemies.", "category": "weapon", "value": 10000, "useStyle": "whip", "useTime": 30, "useAnimation": 30,
       "damage": 14, "damageType": "summon", "knockback": 0.5, "behaviors": [{ "type": "meleeSwing", "arc": 110, "length": 5.5 }], "covers": ["terraria:leather_whip"] },
     { "id": "snapthorn", "name": "Snapthorn", "description": "Inflicts poison on struck enemies.", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "whip", "useTime": 30, "useAnimation": 30,
       "damage": 18, "damageType": "summon", "knockback": 0.5, "behaviors": [{ "type": "meleeSwing", "arc": 110, "length": 6.5 }], "covers": ["terraria:snapthorn"] },

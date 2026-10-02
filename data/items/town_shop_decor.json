@@ -1,0 +1,27 @@
+{
+  // P5-16: the Dye Trader's basic dyes (cosmetic until dye slots exist), the Party Girl's confetti and Party Hat, the
+  // Tavernkeep's Defender Medals (Old One's Army drops; his shop currency) and Ale. One entry per line.
+  "projectiles": [
+    {"id": "confetti", "name": "Confetti", "visual": "orb", "color": "#ff70d0", "gravity": 6, "drag": 0.8, "lifetime": 60, "radius": 0.2, "friendly": false, "contact": false, "light": [8, 4, 8]}
+  ],
+  "items": [
+    {"id": "silver_dye", "name": "Silver Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:silver_dye"]},
+    {"id": "brown_dye", "name": "Brown Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:brown_dye"]},
+    {"id": "black_dye", "name": "Black Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:black_dye"]},
+    {"id": "red_dye", "name": "Red Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:red_dye"]},
+    {"id": "orange_dye", "name": "Orange Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:orange_dye"]},
+    {"id": "yellow_dye", "name": "Yellow Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:yellow_dye"]},
+    {"id": "green_dye", "name": "Green Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:green_dye"]},
+    {"id": "blue_dye", "name": "Blue Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:blue_dye"]},
+    {"id": "purple_dye", "name": "Purple Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:purple_dye"]},
+    {"id": "pink_dye", "name": "Pink Dye", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 5000, "tags": ["dye"], "covers": ["terraria:pink_dye"]},
+    {"id": "confetti", "name": "Confetti", "description": "Throw to celebrate.", "category": "consumable", "maxStack": 9999, "value": 100, "useStyle": "throw", "useTime": 20, "useAnimation": 20, "consumable": true, "projectile": "confetti", "shootSpeed": 8, "covers": ["terraria:confetti"]},
+    {"id": "confetti_gun", "name": "Confetti Gun", "description": "Party time!", "category": "misc", "value": 4000, "useStyle": "gun", "useTime": 20, "useAnimation": 20, "autoReuse": true, "projectile": "confetti", "shootSpeed": 10, "covers": ["terraria:confetti_gun"]},
+    {"id": "party_hat", "name": "Party Hat", "description": "Vanity.", "category": "vanity", "value": 10000, "equipSlot": "head", "tags": ["vanity"], "covers": ["terraria:party_hat"]},
+    {"id": "defender_medal", "name": "Defender Medal", "description": "Currency for trading with the Tavernkeep.", "category": "misc", "maxStack": 9999, "value": 0, "covers": ["terraria:defender_medal"]},
+    {"id": "ale", "name": "Ale", "description": "Increased melee abilities, lowered defense.", "category": "consumable", "maxStack": 9999, "value": 100, "useStyle": "drink", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "tipsy", "ticks": 7200}, "covers": ["terraria:ale"]}
+  ],
+  "buffs": [
+    {"id": "tipsy", "name": "Tipsy", "description": "Increased melee abilities, lowered defense", "color": "#e0a040", "effects": [{"type": "stat", "stat": "meleeDamage", "add": 0.1}, {"type": "stat", "stat": "meleeSpeed", "add": 0.1}, {"type": "stat", "stat": "meleeCrit", "add": 2}, {"type": "stat", "stat": "defense", "add": -4}]}
+  ]
+}

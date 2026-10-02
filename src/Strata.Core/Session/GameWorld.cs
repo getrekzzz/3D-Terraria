@@ -58,6 +58,8 @@ public sealed partial class GameWorld : IDisposable
         Objectives = new Gameplay.Progression.WorldObjectives(this);
         Rituals = new Gameplay.Progression.Rituals(this);
         Wires = new Gameplay.Wiring.WireSystem(this);
+        Journal = new Gameplay.Guide.JournalSystem(this);
+        Achievements = new Gameplay.Guide.AchievementTracker(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
         Editor.LightDirty += dirty => Streamer.MarkDirty(dirty, urgent: true, ChunkStreamer.LightPriority);
@@ -164,6 +166,11 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.town")) Town.Tick();
         using (prof.Time("tick.melee")) Melee.Tick();
         using (prof.Time("tick.projectiles")) Projectiles.Tick();
+        using (prof.Time("tick.journal"))
+        {
+            Journal.Tick();
+            Achievements.Tick();
+        }
         using (prof.Time("tick.world"))
         {
             Mutations.Tick();
@@ -195,6 +202,7 @@ public sealed partial class GameWorld : IDisposable
                 state.Recompute(); // no debuff effect (confusion) lingers on the corpse
                 ApplyDeathPenalty(p);
                 DropTombstone(p);
+                PlayerSlain?.Invoke(p, DeathMessage(p));
                 PlayerDied?.Invoke(p);
             }
             else if (--p.RespawnTicks == 0 && !p.Lost)
@@ -219,7 +227,9 @@ public sealed partial class GameWorld : IDisposable
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
         if (Session.Clock.Tick % Units.TicksPerSecond == 0)
         {
-            if (dps > 0 && p.Alive) HurtPlayerDirect(p, dps, DamageKind.Periodic);
+            if (dps > 0 && p.Alive)
+                HurtPlayerDirect(p, dps, DamageKind.Periodic,
+                    state.Effects.DotSource is { } dot ? Gameplay.Combat.Harm.By(dot) : new Gameplay.Combat.Harm(Gameplay.Combat.HarmKind.Debuff));
             state.Recompute();
             CheckMilestones(p);
         }
@@ -229,17 +239,19 @@ public sealed partial class GameWorld : IDisposable
     /// Damage that ignores invulnerability and defense (debuffs ticking, falling), announced like any other hurt so it
     /// shows a number and plays the hurt sound; no knockback.
     /// </summary>
-    public void HurtPlayerDirect(PlayerEntity p, int damage, DamageKind kind = DamageKind.Player)
+    public void HurtPlayerDirect(PlayerEntity p, int damage, DamageKind kind = DamageKind.Player, Gameplay.Combat.Harm? harm = null)
     {
         if (!p.Alive || damage <= 0) return;
+        if (harm is { } h) p.LastHarm = h; // named by the death message
         p.State.Vitals.DamageDirect(damage);
-        Npcs.ReportPlayerDamage(p, damage, Vector3.Zero, kind);
+        Npcs.ReportPlayerDamage(p, damage, Vector3.Zero, kind: kind);
     }
 
     public void Respawn(PlayerEntity p)
     {
         p.RespawnTicks = 0;
         p.Breath = PlayerEntity.MaxBreath;
+        p.LastHarm = Gameplay.Combat.Harm.Other;
         p.State.Recompute();
         p.State.Vitals.Life = p.State.Vitals.MaxLife;
         p.State.Vitals.Mana = p.State.Vitals.MaxMana;
@@ -260,6 +272,7 @@ public sealed partial class GameWorld : IDisposable
 
     public void Dispose()
     {
+        Achievements.Detach();
         Jobs.Dispose();
         Session.Dispose();
     }

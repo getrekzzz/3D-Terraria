@@ -1,0 +1,144 @@
+{
+ "comment": "P5-15 shops I: the Merchant's Glowstick and mining clothes, the Dryad's seeds, Herb Bag and Sunflower, the Arms Dealer's materials, the Clothier's tuxedo and the Witch Doctor's Bewitching Table (bgen/town_shop.py and reused generators).",
+ "objects": {
+  "sunflower": {
+   "generator": "flower",
+   "params": {
+    "colors": [
+     "#f0c020"
+    ]
+   }
+  },
+  "bewitching_table": {
+   "generator": "table",
+   "params": {}
+  }
+ },
+ "items": {
+  "explicit": {
+   "glowstick": {
+    "generator": "bullet",
+    "params": {
+     "color": "#7aff6a",
+     "glow": true
+    }
+   },
+   "grass_seeds": {
+    "generator": "seed_packet",
+    "params": {
+     "color": "#5aa83a"
+    }
+   },
+   "jungle_grass_seeds": {
+    "generator": "seed_packet",
+    "params": {
+     "color": "#3a8a2a",
+     "seed": "#8a6a30"
+    }
+   },
+   "mushroom_grass_seeds": {
+    "generator": "seed_packet",
+    "params": {
+     "color": "#3a6ad0",
+     "seed": "#a0c0ff"
+    }
+   },
+   "corrupt_seeds": {
+    "generator": "seed_packet",
+    "params": {
+     "color": "#6a4a8a",
+     "seed": "#9a7ab0"
+    }
+   },
+   "crimson_seeds": {
+    "generator": "seed_packet",
+    "params": {
+     "color": "#a02a2a",
+     "seed": "#d06050"
+    }
+   },
+   "hallowed_seeds": {
+    "generator": "seed_packet",
+    "params": {
+     "color": "#5ac8d8",
+     "seed": "#f0d0ff"
+    }
+   },
+   "herb_bag": {
+    "generator": "crate",
+    "params": {
+     "color": "#6a8a3a",
+     "band": "iron"
+    }
+   },
+   "empty_bullet": {
+    "generator": "bullet",
+    "params": {
+     "color": "#c8a050"
+    }
+   },
+   "illegal_gun_parts": {
+    "generator": "chunk",
+    "params": {
+     "layer": "iron",
+     "color": "#5a5e66"
+    }
+   },
+   "top_hat": {
+    "generator": "helmet",
+    "params": {
+     "metal": "#1e1e24",
+     "metalLayer": "cloth"
+    }
+   },
+   "tuxedo_shirt": {
+    "generator": "chest_armor",
+    "params": {
+     "metal": "#1e1e24",
+     "metalLayer": "cloth"
+    }
+   },
+   "tuxedo_pants": {
+    "generator": "greaves",
+    "params": {
+     "metal": "#1e1e24",
+     "metalLayer": "cloth"
+    }
+   },
+   "mining_shirt": {
+    "generator": "chest_armor",
+    "params": {
+     "metal": "#8a6a3a",
+     "metalLayer": "cloth"
+    }
+   },
+   "mining_pants": {
+    "generator": "greaves",
+    "params": {
+     "metal": "#6a5030",
+     "metalLayer": "cloth"
+    }
+   }
+  }
+ },
+ "armor": {
+  "mining_outfit": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#8a6a3a",
+   "trim": "#5a4020",
+   "styles": {
+    "head": "none"
+   }
+  },
+  "tuxedo": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#1e1e24",
+   "trim": "#f0f0f0",
+   "styles": {
+    "head": "dome"
+   }
+  }
+ }
+}

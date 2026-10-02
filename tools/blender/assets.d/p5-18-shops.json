@@ -1,0 +1,135 @@
+{
+ "comment": "P5-18 shops IV: the hardmode residents' goods (Crystal Ball, Star Topper, Magic Hat, Cog, Rockets, Nanites, outfits, dessert).",
+ "objects": {
+  "crystal_ball": {
+   "generator": "crystal_ball",
+   "params": {
+    "color": "#b090ff"
+   }
+  },
+  "star_topper": {
+   "generator": "star_topper",
+   "params": {
+    "color": "#ffe060"
+   }
+  }
+ },
+ "items": {
+  "explicit": {
+   "magic_hat": {
+    "generator": "seasonal_hat",
+    "params": {
+     "style": "witch"
+    }
+   },
+   "cog": {
+    "generator": "cog",
+    "params": {}
+   },
+   "rocket_ii": {
+    "generator": "bullet",
+    "params": {
+     "color": "#c84a2a"
+    }
+   },
+   "rocket_iii": {
+    "generator": "bullet",
+    "params": {
+     "color": "#e8802a"
+    }
+   },
+   "nanites": {
+    "generator": "bottled",
+    "params": {
+     "color": "#60d0ff"
+    }
+   },
+   "mushroom_cap": {
+    "generator": "helmet",
+    "params": {
+     "metal": "#3a6ad0",
+     "metalLayer": "cloth"
+    }
+   },
+   "pirate_hat": {
+    "generator": "helmet",
+    "params": {
+     "metal": "#2a2a2a",
+     "metalLayer": "cloth"
+    }
+   },
+   "pirate_shirt": {
+    "generator": "chest_armor",
+    "params": {
+     "metal": "#e8e0d0",
+     "metalLayer": "cloth"
+    }
+   },
+   "pirate_pants": {
+    "generator": "greaves",
+    "params": {
+     "metal": "#3a2a1a",
+     "metalLayer": "cloth"
+    }
+   },
+   "princess_hat": {
+    "generator": "crown",
+    "params": {}
+   },
+   "princess_dress": {
+    "generator": "chest_armor",
+    "params": {
+     "metal": "#ff90c8",
+     "metalLayer": "cloth"
+    }
+   },
+   "resplendent_dessert": {
+    "generator": "candy",
+    "params": {
+     "style": "corn"
+    }
+   }
+  }
+ },
+ "armor": {
+  "magic_hat": {
+   "preset": "wizard",
+   "layer": "cloth",
+   "metal": "#5a3ab0",
+   "glow": "#ffe860"
+  },
+  "mushroom_cap": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#3a6ad0",
+   "trim": "#e8e0d0",
+   "styles": {
+    "chest": "none",
+    "legs": "none",
+    "boot": "none",
+    "bracer": "none",
+    "pauldron": "none"
+   }
+  },
+  "pirate_outfit": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#3a2a1a",
+   "trim": "#c8a040",
+   "styles": {
+    "head": "wizard"
+   }
+  },
+  "princess_outfit": {
+   "preset": "hood",
+   "layer": "cloth",
+   "metal": "#ff90c8",
+   "trim": "#ffe060",
+   "styles": {
+    "head": "dome",
+    "legs": "none",
+    "boot": "none"
+   }
+  }
+ }
+}

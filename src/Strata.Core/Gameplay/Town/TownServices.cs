@@ -31,31 +31,57 @@ public sealed partial class TownServices
 
     // ---- Reforging -------------------------------------------------------------------------------------------
 
+    /// <summary>A reforge went through: the player and the stack as it came back (the panel's clang and tooltip follow it).</summary>
+    public event Action<PlayerEntity, ItemStack>? Reforged;
+
     /// <summary>What reforging the held item costs now, or 0 when it cannot be reforged here.</summary>
-    public long ReforgeCost(TownNpc npc, PlayerEntity player)
+    public long ReforgeCost(TownNpc npc, PlayerEntity player) => ReforgeCost(npc, player, player.State.Inventory.Held);
+
+    /// <summary>
+    /// What reforging <paramref name="stack"/> costs now: its value with its current prefix times the resident's cost
+    /// factor and mood price factor (at least one copper); 0 when the resident does not reforge or the item takes no
+    /// prefix (the reforge slot's cost line hides then).
+    /// </summary>
+    public long ReforgeCost(TownNpc npc, PlayerEntity player, ItemStack stack)
     {
         if (npc.Def.FindService(TownServiceSpecs.Reforge) is not { } spec) return 0;
-        var held = player.State.Inventory.Held;
-        if (held.IsEmpty || !Prefixes.CanHave(held.Item!)) return 0;
+        if (stack.IsEmpty || !Prefixes.CanHave(stack.Item!)) return 0;
         float factor = spec.Parse<ReforgeServiceParams>().CostFactor * _commerce.PriceFactor(npc);
-        return Math.Max(1, (long)MathF.Round(Prefixes.Value(held) * factor));
+        return Math.Max(1, (long)MathF.Round(Prefixes.Value(stack) * factor));
     }
 
     /// <summary>Re-rolls the held item's prefix (never the same one twice in a row).</summary>
     public TradeResult Reforge(TownNpc npc, PlayerEntity player, out ItemStack result)
     {
-        result = ItemStack.Empty;
-        long cost = ReforgeCost(npc, player);
-        if (cost == 0) return TradeResult.NothingToDo;
         var inv = player.State.Inventory;
-        if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, cost, out var change)) return TradeResult.TooPoor;
+        return Reforge(npc, player, inv.Backpack, inv.SelectedHotbar, out result);
+    }
+
+    /// <summary>
+    /// Re-rolls the prefix of the stack in <paramref name="slot"/> of <paramref name="storage"/> (the reforge slot,
+    /// <see cref="PlayerInventory.Service"/>, or the held item), never landing on the same one twice in a row. The cost
+    /// is paid from the purse (coin slots, backpack coins, then the Piggy Bank and Safe; change that does not fit drops at the feet) and the
+    /// stats are recomputed in case the stack is worn or held. Raises <see cref="Reforged"/>.
+    /// </summary>
+    public TradeResult Reforge(TownNpc npc, PlayerEntity player, Inventory storage, int slot, out ItemStack result)
+    {
+        result = ItemStack.Empty;
+        if ((uint)slot >= (uint)storage.Size) return TradeResult.NothingToDo;
+        var stack = storage[slot];
+        long cost = ReforgeCost(npc, player, stack);
+        if (cost == 0) return TradeResult.NothingToDo;
+        if (!Wallet.TrySpend(player.State.Inventory, player.State.BanksForPaying(), Content, cost, out var change)) return TradeResult.TooPoor;
         foreach (var s in change) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
-        var held = inv.Held;
-        result = new ItemStack(held.Item!, held.Count, Prefixes.Roll(held.Item!, Content, ref _rng, held.Prefix));
-        inv.Backpack[inv.SelectedHotbar] = result;
+        result = new ItemStack(stack.Item!, stack.Count, Prefixes.Roll(stack.Item!, Content, ref _rng, stack.Prefix));
+        storage[slot] = result;
         player.State.Recompute();
+        Reforged?.Invoke(player, result);
         return TradeResult.Ok;
     }
+
+
+    /// <summary>A player completed an Angler quest (their new total).</summary>
+    public event Action<PlayerEntity, int>? AnglerQuestDone;
 
     // ---- Taxes -----------------------------------------------------------------------------------------------
 
@@ -118,16 +144,27 @@ public sealed partial class TownServices
         inv.Backpack.Remove(d => d == wanted, 1);
         Counters[AnglerCounter] = (int)_world.Session.Clock.Day;
         var p = npc.Def.FindService(TownServiceSpecs.AnglerQuest)!.Parse<AnglerQuestParams>();
+        int done = ++player.State.AnglerQuests;
         long coins = p.Coins.Length >= 2 ? _rng.Range((int)p.Coins[0], (int)p.Coins[1]) : p.Coins.FirstOrDefault();
+        coins = (long)(coins * (1f + p.CoinGrowth * Math.Min(done, p.CoinQuestCap)));
         foreach (var s in Wallet.Give(inv, Content, coins)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
+        foreach (var r in p.Rewards) // milestones first: certain, on every multiple of EveryQuests
+            if (r.EveryQuests > 0 && done >= Math.Max(r.MinQuests, r.EveryQuests) && done % r.EveryQuests == 0) Give(r, ref reward);
         foreach (var r in p.Rewards)
         {
-            if (!_rng.Chance(r.Chance) || !Content.Items.TryGet(r.Item, out var item)) continue;
-            reward = Prefixes.Fresh(item, r.Count, Content, ref _rng);
-            var rest = inv.Pickup(reward);
-            if (!rest.IsEmpty) _world.Drops.Spawn(rest, player.Center, System.Numerics.Vector3.Zero);
-            break;
+            if (r.EveryQuests > 0 || done < r.MinQuests || !_rng.Chance(r.Chance)) continue;
+            if (Give(r, ref reward)) break;
         }
+        AnglerQuestDone?.Invoke(player, done);
         return TradeResult.Ok;
+
+        bool Give(AnglerReward r, ref ItemStack last)
+        {
+            if (!Content.Items.TryGet(r.Item, out var item)) return false;
+            last = Prefixes.Fresh(item, r.Count, Content, ref _rng);
+            var rest = inv.Pickup(last);
+            if (!rest.IsEmpty) _world.Drops.Spawn(rest, player.Center, System.Numerics.Vector3.Zero);
+            return true;
+        }
     }
 }

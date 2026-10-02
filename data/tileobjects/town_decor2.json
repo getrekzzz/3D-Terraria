@@ -1,0 +1,17 @@
+{
+  // P5-16: the Painter's paintings (Decor tab; wall hangings, bgen/town_shop.py painting), the Dye Trader's Dye Vat,
+  // the Party Girl's Bubble Machine and the Tavernkeep's Eternia Crystal Stand (decor: the crystal item starts the
+  // Old One's Army). One entry per line.
+  "tileObjects": [
+    {"id": "land", "name": "Land", "description": "Painting.", "size": [3, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "itemMaxStack": 9999, "tags": ["decor", "painting"]},
+    {"id": "trapped_ghost", "name": "Trapped Ghost", "description": "Painting.", "size": [2, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "itemMaxStack": 9999, "tags": ["decor", "painting"]},
+    {"id": "outcast", "name": "Outcast", "description": "Painting.", "size": [2, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "itemMaxStack": 9999, "tags": ["decor", "painting"]},
+    {"id": "dark_soul_reaper", "name": "Dark Soul Reaper", "description": "Painting.", "size": [2, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "itemMaxStack": 9999, "tags": ["decor", "painting"]},
+    {"id": "waldo", "name": "Waldo", "description": "Painting.", "size": [2, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "itemMaxStack": 9999, "tags": ["decor", "painting"]},
+    {"id": "sparky", "name": "Sparky", "description": "Painting.", "size": [2, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 1000, "itemMaxStack": 9999, "tags": ["decor", "painting"]},
+    {"id": "the_truth_is_up_there", "name": "The Truth Is Up There", "description": "Painting.", "size": [3, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "itemMaxStack": 9999, "tags": ["decor", "painting"]},
+    {"id": "dye_vat", "name": "Dye Vat", "description": "Used to craft dyes.", "size": [2, 2, 2], "interaction": "station", "stations": ["dye_vat"], "hitPoints": 2, "itemCategory": "station", "itemValue": 50000, "itemMaxStack": 9999, "covers": ["terraria:dye_vat"]},
+    {"id": "bubble_machine", "name": "Bubble Machine", "description": "Blows bubbles.", "size": [2, 2, 2], "hitPoints": 2, "itemCategory": "furniture", "itemValue": 40000, "itemMaxStack": 9999, "tags": ["decor"], "covers": ["terraria:bubble_machine"]},
+    {"id": "eternia_crystal_stand", "name": "Eternia Crystal Stand", "description": "Place an Eternia Crystal on it to call the Old One's Army.", "size": [3, 2, 2], "hitPoints": 3, "itemCategory": "furniture", "itemValue": 2500, "itemMaxStack": 9999, "covers": ["terraria:eternia_crystal_stand"]}
+  ]
+}

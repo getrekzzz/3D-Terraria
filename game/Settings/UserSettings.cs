@@ -21,6 +21,12 @@ public sealed class UserSettings
     /// <summary>Looking steeply down with a pickaxe digs the ground under your feet (a shaft you drop into).</summary>
     public bool SmartDig { get; set; } = true;
 
+    /// <summary>
+    /// Terraria's Smart Cursor (X toggles it in game): pickaxes snap to the nearest block they can mine near the aim,
+    /// axes to the nearest tree.
+    /// </summary>
+    public bool SmartCursor { get; set; }
+
     public bool DamageNumbers { get; set; } = true;
 
     /// <summary>Pause the world while the inventory or a menu is open.</summary>
@@ -64,7 +70,30 @@ public sealed class UserSettings
     public bool ShowFps { get; set; }
     public bool ShowMinimap { get; set; } = true;
     public bool ShowTargetName { get; set; } = true;
-    public string CursorColor { get; set; } = "#ffffff";
+
+    /// <summary>Besides its chat line, "X has awoken!" also shows as a big banner at the top centre.</summary>
+    public bool BigAnnouncements { get; set; }
+    public string CursorColor { get; set; } = DefaultCursorColor;
+
+    /// <summary>How life and mana show: "classic" (Terraria's hearts and stars) or "bars".</summary>
+    public string LifeDisplay { get; set; } = ClassicLifeDisplay;
+
+    public const string ClassicLifeDisplay = "classic";
+    public const string BarsLifeDisplay = "bars";
+
+    /// <summary>Terraria's pink-red pointer.</summary>
+    public const string DefaultCursorColor = "#ff325f";
+
+    /// <summary>The settings file's format; files from before version 2 kept the old white pointer as their default.</summary>
+    public int Version { get; set; } = CurrentVersion;
+
+    private const int CurrentVersion = 2;
+
+    /// <summary>Onboarding hints (the hint toast); also <c>hint on|off</c> in the console.</summary>
+    public bool ShowHints { get; set; } = true;
+
+    /// <summary>Tips on the world loading screen.</summary>
+    public bool LoadingTips { get; set; } = true;
 
     public event Action<UserSettings>? Changed;
 
@@ -92,6 +121,9 @@ public sealed class UserSettings
                     GD.PushWarning($"settings: ignoring {prop.Name}: {ex.Message}");
                 }
             }
+            // Older files saved the then-default white pointer: give it Terraria's colour (a chosen colour stays).
+            if (!file.HasSectionKey("settings", ToKey(nameof(Version))) && s.CursorColor == "#ffffff") s.CursorColor = DefaultCursorColor;
+            s.Version = CurrentVersion;
         }
         Current = s;
         return s;

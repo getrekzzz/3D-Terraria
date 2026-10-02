@@ -27,6 +27,7 @@ public static partial class WorldLauncher
         game.Housing.Config = Strata.Core.Gameplay.Housing.HousingConfig.Load(services.Data);
         game.Town.Config = Strata.Core.Gameplay.Town.TownConfig.Load(services.Data);
         game.Spread.Config = Strata.Core.Gameplay.Progression.SpreadConfig.Load(services.Data);
+        game.Journal.Config = Strata.Core.Gameplay.Guide.BestiaryConfig.Load(services.Data);
         game.Weather.Config = Strata.Core.Gameplay.Weather.WeatherConfig.Load(services.Data);
         game.Banners.Config = Strata.Core.Gameplay.Banners.BannerConfig.Load(services.Data);
         game.Projectiles.Fishing = Strata.Core.Gameplay.Fishing.FishingConfig.Load(services.Data);
@@ -35,6 +36,7 @@ public static partial class WorldLauncher
         // Scripted runs (smoke tests, screenshots) never follow the calendar: a goodie bag dropping in October would make
         // them depend on the date. Scripts that need a season set it with `season <id>`.
         if (services.Args.Get("smoke") != null) game.Session.Seasons.Override = "";
+        game.Deaths = Strata.Core.Presentation.DeathMessages.Load(services.Data);
     }
 
     /// <summary>Renderers for creatures, town residents and projectiles.</summary>
@@ -46,6 +48,12 @@ public static partial class WorldLauncher
         var residents = new Entities.TownRenderer();
         runtime.AddChild(residents);
         residents.Initialize(game, props);
+        var hearts = new Entities.TownPetHearts();
+        runtime.AddChild(hearts);
+        hearts.Initialize(game);
+        var bubbles = new Entities.TownEmoteBubbles();
+        runtime.AddChild(bubbles);
+        bubbles.Initialize(game, runtime.Services.Graphics.Name == "low");
         var projectiles = new Entities.ProjectileRenderer();
         runtime.AddChild(projectiles);
         projectiles.Initialize(game, props);

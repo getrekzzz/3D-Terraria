@@ -27,6 +27,12 @@ public sealed class TownConfig
     /// <summary>Terraria happiness: biome and neighbour preferences, crowding, solitude (prices).</summary>
     public HappinessConfig Happiness { get; init; } = new();
 
+    /// <summary>Biome pylons: which resident sells which pylon, and when a pylon works (P5-34).</summary>
+    public PylonConfig Pylons { get; init; } = new();
+
+    /// <summary>Emote bubbles and voice blips (X-05).</summary>
+    public EmoteConfig Emotes { get; init; } = new();
+
     public float MinPriceFactor { get; init; } = 0.75f;
     public float MaxPriceFactor { get; init; } = 1.5f;
 

@@ -92,7 +92,7 @@ public sealed partial class TownSystem
         r.IdleTicks = _rng.Range(Config.IdleTicksMin, Config.IdleTicksMax);
         if (r.Home != null && TrySit(r)) return; // a rest in a chair at home now and then
         var landmark = r.Home == null ? LandmarkNode(r.Def) : null;
-        var anchor = r.Home ?? landmark ?? CurrentNode(r);
+        var anchor = r.Home ?? landmark ?? r.Anchor ?? CurrentNode(r);
         int reach = (int)((landmark != null ? Config.LandmarkRadius : Config.WanderRadius) / Units.CellSize);
         var target = anchor + new Int3(_rng.Range(-reach, reach), 0, _rng.Range(-reach, reach));
         if (_world.Navigator.NearestStandable(target, Agent, 3) is { } node)
@@ -204,6 +204,15 @@ public sealed partial class TownSystem
         r.TalkTicks = Config.TalkTicks;
         r.Path = null;
         return true;
+    }
+
+    /// <summary>
+    /// Keeps a conversation going while its chat box or shop is open: the resident waits, facing the player, until
+    /// the window closes (Terraria's talk target).
+    /// </summary>
+    public void HoldTalk(TownNpc r, Session.PlayerEntity p)
+    {
+        if (r.TalkingTo == p) r.TalkTicks = Config.TalkTicks;
     }
 
     public void EndTalk(TownNpc r)

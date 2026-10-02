@@ -1,0 +1,8 @@
+{
+  // P5-20: town pet licenses, sold by the Zoologist. Using one sets the pet's flag; the pet then moves into a free house.
+  "items": [
+    {"id": "license_cat", "name": "Cat License", "description": "Use to receive a cat\nIf you already have a cat, the license is not used.", "category": "consumable", "maxStack": 9999, "rarity": 1, "value": 50000, "useStyle": "holdUp", "useTime": 30, "useAnimation": 30, "behaviors": [{"type": "license", "flag": "license_cat"}], "covers": ["terraria:license_cat"]},
+    {"id": "license_dog", "name": "Dog License", "description": "Use to receive a dog\nIf you already have a dog, the license is not used.", "category": "consumable", "maxStack": 9999, "rarity": 1, "value": 50000, "useStyle": "holdUp", "useTime": 30, "useAnimation": 30, "behaviors": [{"type": "license", "flag": "license_dog"}], "covers": ["terraria:license_dog"]},
+    {"id": "license_bunny", "name": "Bunny License", "description": "Use to receive a bunny\nIf you already have a bunny, the license is not used.", "category": "consumable", "maxStack": 9999, "rarity": 1, "value": 50000, "useStyle": "holdUp", "useTime": 30, "useAnimation": 30, "behaviors": [{"type": "license", "flag": "license_bunny"}], "covers": ["terraria:license_bunny"]}
+  ]
+}

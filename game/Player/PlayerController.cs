@@ -144,7 +144,7 @@ public sealed partial class PlayerController : CharacterBody3D
         speed *= AirSpeedFactor();
         if (_climbing) speed *= 0.6f;
 
-        bool blocked = UI.InputGate.GameplayBlocked;
+        bool blocked = UI.InputGate.MovementBlocked;
         var input = MoveInput(); // reversed while confused (Status)
         var wish = Rig.YawBasis * new Vector3(input.X, 0, input.Y);
         var v = Velocity;
@@ -198,7 +198,7 @@ public sealed partial class PlayerController : CharacterBody3D
     private void UpdateJump(float dt, bool onFloor, ref Vector3 v)
     {
         _coyote = onFloor ? _config.CoyoteTime : _coyote - dt;
-        bool blocked = UI.InputGate.GameplayBlocked;
+        bool blocked = UI.InputGate.MovementBlocked;
         _jumpBuffer = !blocked && Input.IsActionJustPressed("jump") ? _config.JumpBuffer : _jumpBuffer - dt;
         bool held = !blocked && Input.IsActionPressed("jump");
         float jumpScale = 1f + Entity.State.Effects.Stats.Bonus(StatIds.JumpHeight);

@@ -28,6 +28,8 @@ public enum ItemAction
     Mount = 1 << 16,
     Paint = 1 << 17,
     Ride = 1 << 18,
+    PlantGrass = 1 << 19,
+    License = 1 << 20,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -65,6 +67,8 @@ public sealed class ItemUseInfo
     /// <summary>A mount summoned by this item (<see cref="ItemAction.Ride"/>).</summary>
     public Mounts.MountParams? Ride { get; internal set; }
     public PaintToolParams? Painting { get; internal set; }
+    public PlantGrassParams? Garden { get; internal set; }
+    public LicenseParams? License { get; internal set; }
 
     /// <summary>Fishing bait (worms, fireflies, Master Bait).</summary>
     public BaitParams? Bait { get; internal set; }
@@ -175,6 +179,8 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.Minecart: a |= ItemAction.Mount; info.Minecart = spec.Parse<MinecartParams>(); break;
                 case ItemBehaviorSpecs.Mount: a |= ItemAction.Ride; info.Ride = spec.Parse<Mounts.MountParams>(); break;
                 case ItemBehaviorSpecs.PaintTool: a |= ItemAction.Paint; info.Painting = spec.Parse<PaintToolParams>(); break;
+                case ItemBehaviorSpecs.PlantGrass: a |= ItemAction.PlantGrass; info.Garden = spec.Parse<PlantGrassParams>(); break;
+                case ItemBehaviorSpecs.License: a |= ItemAction.License; info.License = spec.Parse<LicenseParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

@@ -96,8 +96,21 @@
   tinted by life, bosses in the boss bar's red), else the block or object in reach, rebuilding its text only when
   that changes. Probes: `hover.npc`, `hover.resident`, `hover.talk`, `hover.<enemy id>`, `hud.target_name`,
   `hud.target_name.<words>` (the label in snake case contains them), `ui.talk_open`.
-* **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
-  nearby liquids, biome/time conditions).
+* **Smart Cursor** — X (`smart_cursor`, saved as `UserSettings.SmartCursor`, also in Settings → Gameplay) toggles it.
+  `SmartTargeting.Find` (Core) samples a cone round `Aim` from the eye (12° half-angle, at most 0.75 m wide, every
+  0.25 m up to the reach and at most 0.75 m past the first solid cell on the aim line): a pickaxe takes the block it
+  can mine (`MiningRules.CanMine`) with a face open toward the eye that is closest along the aim, `ore`/`gem`-tagged
+  blocks first; an axe the nearest `BreakTool.Axe` object (trees), a hammer a `BreakTool.Hammer` one. It allocates
+  nothing. `InteractionController.ApplySmartCursor` swaps it in as `Target` (always in reach) unless the crosshair
+  already rests on a non-decor object in reach, and reruns it only when the item, eye (5 cm) or aim (0.5°) moved, the
+  world was edited, the pick went stale or 15 ticks passed; smart digging still wins when looking down. The crosshair
+  turns orange with the smart cursor icon, the pointer uses its smart sprite, and the status line says "Smart Cursor
+  On/Off". Scripted runs keep the toggle in memory (`GameRoot.Automated`). Probes: `ui.smart_cursor`,
+  `ui.smart_target`.
+* **Crafting** — `RecipeBook` (indexed, atomic crafts; `CraftInto` crafts onto the cursor, merging into the same
+  stackable item and refusing anything else) + `CraftingEnvironment` (stations within reach and the objects providing
+  them, nearby liquids, biome/time conditions; `Browse` tallies the slots once; `Signature` is a stable FNV hash of a
+  browse so the UI rebuilds only on change) + `RecipeText` (group and condition wording).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
   strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
@@ -311,8 +324,10 @@
   `coins`, `maxLife`, `resident`, `flag`) when a vacant valid home exists (rooms found from chairs), re-validates
   homes, and drives residents: stroll by day, walk home at night along A* paths, opening and closing doors, stop
   and face the player while talking. `TownCommerce` picks dialogue lines by condition (placeholders for names),
-  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys and sells
-  (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
+  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys into the
+  backpack or onto the cursor (`BuyTarget`), sells from a slot or the cursor at `sellRatio` (favourites and coins
+  refuse; an item of no value goes for nothing), keeps each player's last 40 sold stacks for buyback at what they
+  fetched (`TownCommerce.Trade.cs`; not saved), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
   residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.
@@ -419,7 +434,8 @@
   same index, otherwise take ONE onto the cursor (held: `HoldRepeat.IntervalTicks` 30, 22, 17 … 1). Left clicks are
   `SlotActions.LeftClick` with `SlotFilters.For(slot)` (coins only in coin slots, `FitsAmmoSlot` in ammo slots, armor
   kind, accessory without duplicate, dye, misc kind). `ThrowCursor`/`ThrowStack` toss stacks the way the drop key does.
-  Favourited slots draw a gold wash on the inventory screen and the hotbar (`ItemSlotView.Favorite`).
+  Favourited slots draw gold with a gold wash on the inventory screen and the hotbar (`ItemSlotView.Favorite`); the
+  view itself repeats a held right click, and the screen stops the repeat once a click no longer moves items.
 * **Chest and inventory buttons** — `InventoryOps`: `LootAll` (via `Pickup`, coins to the purse), `DepositAll` and
   `QuickStack` (backpack 10–49 only, never favourites or coins; quick stack only items the chest already holds,
   topping up its stacks first), `Restock` (tops up backpack and ammo stacks from the chest), `Sort(inv, from, to)`
@@ -438,6 +454,45 @@
   `TownCommerce.SaleValue`; kind by `Coins.TopTier`, "No value" at 0). `BuffDisplay` (timer text, cancel/timer
   rules incl. `hideTimer`), `VitalsDisplay` (hearts, golden hearts, stars, bubbles) and `Content.Index.StationNames`
   ("Iron Anvil or Lead Anvil", cached per database) are the Core maths the HUD, crafting and the Guide read.
+* **Chat log** — world messages go to `ChatLog` (game/UI/Hud/ChatLog.cs) in the layout's Chat region, never a
+  centred banner: `NpcSystem.Messaged` (coloured by `MessageColors.Hex(MessageKind)`; it carries "has awoken!" and
+  "has been defeated!" too), `BossLeft`, town arrivals/departures (blue) and deaths (red), events (invasions purple,
+  others green), progression and objective lines, and catches in rarity colour — wired in `Hud.Messages.cs`
+  (`Hud.Announce(text, colour)` forwards there). `ChatHistory` (Core) keeps the last 50 lines and the fade maths (10 s
+  hold, 1 s fade, the last 10 shown); the `chat` action (Enter) opens the history as an overlay gate. The optional
+  `BigAnnouncements` setting adds a 24 px banner for "has awoken!" only. Command `ui chat <text>`/`ui history`, probes
+  `ui.chat_lines`/`ui.chat_open`.
+* **Pickup popups** — `GameWorld.ItemPickedUp` feeds `PickupPopups` (game/UI/Hud/PickupPopups.cs), drawn over the
+  player's head (0.9 m above it, projected; a fixed point at W/2, 0.38 H in first person or behind the camera).
+  `PickupFeed` (Core) keeps 8 popups keyed by item and prefix (all coins share one, summing copper for
+  `Coins.Format`): a pickup within 2 s joins its popup, restarts it and pops it (1.25 → 1 over 0.12 s); each shows
+  1.5 s, rising 40 px and fading over the last 0.5 s, the latest at the bottom row (22 px apart). Text in rarity
+  colour (Expert/Master animate each frame) or the largest coin's colour. `drop … <delay ticks>` and probe
+  `ui.popups` test it.
+* **Boss bar and invasion progress** — `BossBarModel.Compute(npcs)` (Core, allocation-free, run each frame) picks
+  the strongest living non-minor boss (a body before its parts, by maximum life, a worm counted whole) and sums
+  everything sharing its defeat flag: a pair (the Twins) adds up, a cut worm counts its arrival life once, and a
+  boss's parts count only when flagged `BossPart.InBossBar` (Golem's head, Moon Lord's head and hands; never
+  Skeletron's hands or Golem's fists, which keep their floating mini bars); a fallen part drops out. `BossBar`
+  (game/UI/Hud/BossBar.cs, the layout's BossBar region) draws the title, the head icon (`PortraitIcons.Boss`,
+  preloaded by the HUD; a disc with the initial if missing), a framed red bar with "life/max" and a pale damage
+  chunk that holds 0.4 s, then slides down; it fades in on arrival. `EventProgressPanel` (EventBar region) follows
+  `EventDirector.LatestInvasion` (latest event with a kill goal) with its `StatusIcons` icon, name and
+  `EventDirector.Progress(a)` (kills over `GoalOf`) as "NN%", and holds its last value 3 s after the event ends, then
+  fades. Their `Active` flags feed `UiState.BossBar/EventBar`. Probes `ui.bossbar`, `ui.bossbar_fill`,
+  `ui.eventbar`, `ui.eventbar_percent`.
+* **Death messages and the death screen** — every hurt records `PlayerEntity.LastHarm` (`Harm(HarmKind, Source,
+  Id)`, Gameplay/Combat/Harm.cs): `NpcSystem.ReportPlayerDamage(player, damage, knock, harm)` takes it from creature
+  contact and walls (`Harm.By(EnemyDef)`: bosses by name, others "a Zombie"), shots (`Projectile.Shooter`, set for
+  creature volleys and brain shots, else the projectile's own name), spikes (`Trap`), lava and drowning
+  (`LiquidEffects`); falls set it in `PlayerController.Fall`, damage over time in `GameWorld.TickPlayer` from
+  `EffectState.DotSource` (the buff dealing the most), and the `kill` command `Other`. On death `GameWorld.PlayerSlain(p,
+  text)` fires next to `PlayerDied` with `DeathMessages.Format(name, harm, deaths − 1)` (Core/Presentation,
+  data/config/deaths.json: lines per kind plus per-source lines such as `on_fire`; picked by death count; `Load`
+  rejects a kind without a line; loaded by the launcher into `GameWorld.Deaths`). `DeathScreen` (game/UI/Hud) dims the
+  view to 55 % over 1 s under "You were slain..." (48 px, `UiTheme.Death`; hardcore: "Name has perished..." and
+  "Hardcore characters do not return."), the cause and "Respawning in N", and fades out on respawn; the cause also goes
+  to the chat log in red. Probes `ui.death_dim`, `ui.death_cause`.
 * **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance
@@ -504,6 +559,112 @@ lock's message while `requiresFlag` is unset, then "It's locked." without the ke
 chest, rolls an unopened chest's loot before the not-empty check, `BreakObject` rolls it before spilling, and locked
 chests are never broken for lost support, so generated loot is never lost. `interact nearest <objectId> [radius]
 [expectedOutcome]` drives it from smoke scripts.
+
+## Player journal and bestiary (P5-25)
+
+`PlayerState.Journal` (`Gameplay/Guide/PlayerJournal.cs`) records per character — not per world, unlike the
+reference game — kills per enemy id, creatures seen and caught, residents met, items obtained and crafted, named
+counters (`mined`, `mined:<block>`, `mined:#<tag>`, `broken:…`, `trees_chopped`, `purchases`, `reforges`,
+`deaths`, `catches`) and unlocked achievements. It implements `IPlayerRecords` for conditions and raises
+`Changed(kind, key)`. `JournalSystem` (on `GameWorld.Journal`) feeds it: `Npcs.Killed` credits players within
+`creditRadius` (bosses and parts credit everyone), `ItemUse.NetCaught`, `GameWorld.Crafted` (raised by
+`GameWorld.Craft`, which the crafting menu and the `craft` command use), `Commerce.Traded`, `Services.Reforged`,
+block/object breaks (nearest player), deaths, plus sweeps: creatures within `seenRadius` every 30 ticks, residents
+talking to the player (met), and every carried item once a second (obtained). Recording an existing key allocates
+nothing; counter keys are cached per def. `Bestiary` lists enemies (minus `bestiaryAs` parts and `no_bestiary`) and
+town residents; `Unlock` gives None/Seen/Stats/Full from `data/config/bestiary.json`; parts' kills count for their
+entry. `BestiaryPercent` is cached until the journal changes; `JournalSystem.BestBestiaryPercent()` is the
+world-wide value for town conditions. Saved as `PlayerSave.Journal` (additive; unknown ids kept). Probes
+`bestiary.percent`, `bestiary.<entry>[.unlock]`, `journal.<obtained|crafted|seen|caught|met|kills|counter>.<id>`;
+commands `journal [reset|unlock <enemy> [n]]`, `craft <item> [times]`.
+
+## Achievements (P5-26)
+
+`data/achievements.json` (category `achievements`, `AchievementDef`: name, description, icon item, category,
+`trigger`) lists ~45 of the reference game's achievements that map to implemented mechanics. Triggers
+(`SpecKind.AchievementTrigger`, `Content/Specs/AchievementSpecs.cs`): `flag{id|all}`, `obtainItem` / `craftItem`
+`{item|tag|category}`, `killEnemy{enemy|tag,count}`, `mineBlock{block|tag,count}`, `breakObject{object|tag,count}`,
+`housed{min}`, `bestiary{min}`, `talkTo{resident?}`, `buy{min}`, `reforge{min}`, `coins{min}`, `reachLayer{layer}`,
+`counter{key,min}`; `GuideTrigger` parses one and measures progress allocation-free (the guide's steps reuse it).
+`AchievementTracker` (`GameWorld.Achievements`) indexes triggers by the `JournalKind` that can advance them and
+evaluates only those on `Journal.Changed`; world-state triggers are swept at 1 Hz, and a player's first sweep
+evaluates all. Unlocks are stored in `Journal.Achievements` (Unix seconds) and raise `Unlocked(player, def)`:
+`game/UI/AchievementToast.cs` (one pooled panel, queued, 4 s, slide tween) and the `achievement` sound
+(`tools/audio/sfx_recipes_guide.py`). Probes `achievement.<id>`, `achievements`; command
+`achievement [grant|progress <id>]`. Not yet: `rescued` and `anglerQuests` triggers (no per-player record of
+rescues or completed quests on this branch), a chat line (no chat log yet).
+
+## Guide progression and tips (P5-27)
+
+`data/guide/steps.json` (`guideSteps`, `GuideStepDef`: text, order, `after`, `doneWhen`/`showWhen` achievement
+triggers, related items/enemies, stage) holds ~30 steps of the reference game's progression; `data/guide/tips.json`
+(`guideTips`: text with `{key:<input action>}` placeholders, topic, controls action) ~40 tips. The validator checks
+references, trigger shapes and `after` cycles (`ContentValidator.Guide.cs`). `ProgressionAdvisor`
+(`GameWorld.Advisor`): `Steps(player)` (done / available), `Next(player, n)`, `Advice(player)` — the Guide's Help
+line. A town service type `advice` (`AdviceParams`) is registered for it, but the conversation UI
+(`TownDialog.Services`) is not wired yet: the Guide keeps `craftHelp` until the W4 dialog lands. Command `advice
+[steps]`; probes `guide.next.<step>`, `guide.done.<step>`.
+
+## Drop rates (P5-24b)
+
+`Gameplay/Loot/DropRates.cs` mirrors `LootRoller`: an each-mode entry drops with its `chance`, a weighted entry with
+1 − (1 − weight/total)^rolls over all entries (conditional ones listed with their conditions), nested tables multiply.
+`DropRates.For(content, table)` flattens a table into `DropInfo(item, chance, min, max, conditions)`;
+`DropRates.Coins(table|enemy)` gives the copper range (table coins, else the enemy's value ±25%). `ItemSourceIndex`
+now fills `ItemSource.Chance` for every loot-derived source with the same maths (null for recipes, shops, tags, …).
+
+## Onboarding hints and loading tips (X-10)
+
+`data/hints.json` (`hints`, `HintDef`: text with `{key:action}`, `priority`, `delay`, `duration`, `when`/`unless`
+achievement triggers, `time` any/day/night/dusk, `carrying` item, `near` {object|tag|tree|resident, radius m},
+`step` = the Guide's next step, `guide` = the Guide book entry, a guide step or tip id) holds ~17 hints: chop the
+tree, night is coming, place a torch underground, talk to the Guide, first death, boss nudges per advisor step,
+hardmode. `HintDirector` (`GameWorld.Hints`, checked with the milestones once a second per player) shows the
+highest-priority due hint (ties by id) once per character, at most one per `CooldownSeconds` (25) and none in the
+first `StartSeconds`; timing counts checks, not the world clock, so time skips never stall or flood it. Shown ids
+are `PlayerJournal.HintsShown`, saved as `JournalModel.Hints` (additive). `Enabled` off shows and marks nothing.
+`game/UI/HintToast.cs` (pooled themed panel above the hotbar, fade, "Guide book: <entry>" line) and
+`game/UI/LoadingTips.cs` (cover with "Loading world..." and rotating guide tips while the player is frozen waiting
+for the ground; teleports under 0.3 s don't flash it) are added in `WorldLauncher.AddUi`. Settings
+`UserSettings.ShowHints` / `LoadingTips` (settings.cfg `showHints` / `loadingTips`); `hint on|off` sets the
+former and saves it. Command `hint [list|reset|show <id>|due <id>|on|off]`; probes `hints.shown`,
+`hints.enabled`, `hint.<id>[.due]`. Not yet: rows in the settings screen (sequenced with P2-30), the menu's own
+"Generating world..." overlay has no tip (MainMenu is integration-owned), the Guide book pages (P5-30).
+
+## Guide crafting help, Core part (P5-14)
+
+`RecipeLookup` (`GameWorld.RecipeLookup`, over the `RecipeBook` indexes): `Making(item)` / `Using(item)` →
+`RecipeView` (output, count, `IngredientView`s labelled "Any Wood" for groups, station names from `StationNames`,
+condition text, `StationLine` "Required objects: Iron Anvil or Lead Anvil"), `StationFor(item)` (recipes a placed
+item serves as station); views are cached per recipe and thread-safe. `ConditionDescriber` turns every condition
+type into English ("at night", "after the Eye of Cthulhu is defeated", "during a Blood Moon", "The Merchant lives in
+town", "carrying 50 silver"); unknown types read as their name. `TownCommerce.RecipesUsing` now reads the index.
+Not yet: the Guide's TownDialog slot panel (GuideCraftPanel, `ui guide_craft`) waits for the W4 TownDialog; the
+Guide book's Items tab shows the same views.
+
+## Guide book and Items tab (P5-30)
+
+`game/UI/GuideBook/GuideBookScreen.cs` (CanvasLayer 24, gate `guide`, node `GuideBook`, added in
+`WorldLauncher.AddUi`) toggles with `guide_book` (K; G is the quick mount) and closes on Esc. It is built on first
+open; each `IGuideTab` (Items, Bestiary, Guide) builds on its first selection. Core `GuideIndex` (items by name with
+search keys, `ItemSourceIndex` rows as `SourceView` with `DropRates` chances and `ConditionDescriber` text, its own
+`RecipeLookup`) is built by `GuideIndex.BuildAsync` on a worker thread at launch; the Items tab says "Loading…" until
+then. Items tab: search (sets `InputGate.TextEntry` while focused), category filter, names at once and icons 16 a
+frame; `ItemDetails` shows the tooltip lines, "Obtained from" (rows link to creatures and items), "Crafted from",
+"Used in" (8 recipe cards a page; ingredients link) and "Crafting station for N recipes", with Back history; rebuilt
+only on selection. Steps and tips moved to the P5-32 tabs. A hint's Guide link (X-10): pressing
+K while a hint with a `guide` entry is up opens the book there. Command `book <tab|item|bestiary|entry <id>|close>`;
+probes `ui.book_open`, `ui.book_ready`, `ui.book_tab`, `ui.book_items`, `ui.book_sources`, `ui.book_guide`.
+Not yet: Bosses/NPCs/Achievements tabs, the inventory's book button (InventoryScreen is W4-owned), a page-turn sound.
+
+## Bestiary tab (P5-31)
+
+`BestiaryTab` lists `Bestiary.Entries` ("???" until seen) with filters All/Unlocked/Bosses/Critters/Town, search over
+known names, completion % and portraits (`PortraitIcons`) loaded a few per frame. `BestiaryDetails` by tier: seen →
+portrait and habitat (Core `Habitat.For`: each spawn rule of the entry through `ConditionDescriber`, events it ends,
+summon items from `summonBoss` behaviours); stats → life, defence, damage (scaled by `NpcSystem.Scale`), knockback
+resist, coins, description; full → every drop with its chance. Residents show the description and when they move
+in. Probe `ui.bestiary_unlock`. Not yet: the rotating 3D preview (thumbnails stand in), biome filter.
 
 ## Town population and housing (P5-01..P5-05)
 
@@ -595,3 +756,131 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   Sleep; no errands or steering while seated. They get up at dawn plus a personal delay of up to an hour, when talked
   to, when a threat comes into sight, when the seat disappears, or when they die. Residents never share a seat
   (`Taken`). Probe `town.<id>.sitting`.
+
+
+## Journal feeds town conditions (P5-25/P5-03)
+
+`JournalSystem` sets `TownSystem.PlayerRecords` to the player's journal (`PlayerJournal` also implements
+`Conditions.IPlayerRecords`), so the town's `bestiary`, `killed`, `obtained` and `achieved` conditions (the
+Zoologist's 10% bestiary arrival) read it. `Town.Rescued` counts `rescued` and `rescued:<resident>` in the rescuer's
+journal; achievement/guide trigger `rescued{resident?|min}` reads them.
+
+## Book tabs: progress, NPCs, tips, achievements (P5-32)
+
+`ListTab<T>` (list left, page right, icons a few per frame) backs four tabs: `ProgressTab` (the advisor's steps by
+stage, ✓ done / ▶ next in gold / grey not yet; boss portraits; related item and enemy links), `NpcsTab` (every
+`TownNpcDef`: status Living here / Homeless / Dead until dawn / Bound somewhere / Not yet, arrival text or the
+rescue's pose, `Where` and `Requires` through `ConditionDescriber`, loves/likes/dislikes/hates from `Mood`, current
+happiness via `TownCommerce.DescribeHappiness`, services, the whole shop with prices, tabs and conditions),
+`TipsTab` (by topic, `{key:}` and the action resolved from the live InputMap) and `AchievementsTab` (gold with
+date when unlocked, else a progress bar from `AchievementTracker.Progress`). `OpenEntry` routes guide steps,
+tips, achievements, residents, enemies and items to their tab; `ui.book_tab` is the tab index (0 items … 5
+achievements). Not yet: the screenshot-tour line (main-only lavapipe tour).
+
+## Angler quest log, milestones and shop (P5-23)
+
+`PlayerState.AnglerQuests` (saved as `PlayerSave.AnglerQuests`, additive) counts a character's completed quests;
+`TownServices.TurnInFish` increments it, scales the coins by `coinGrowth` per quest (to `coinQuestCap`), gives every
+`AnglerReward` with `everyQuests` on its multiples (from `minQuests`: Crate Potions every 5th, the Golden Fishing Rod
+every 30th) and then rolls the chance rewards allowed by `minQuests`, and raises `AnglerQuestDone` (journal counter
+`angler_quests`: the reference game's five Angler achievements). `TownContext` fills `AnglerQuests` from the player,
+so the Angler's shop sells the fishing decor of `data/tileobjects/angler_decor.json` (seashells, treasure map,
+seaweed planter, lifebuoy, ship's wheel, wall anchor, bass/trout/tuna plaques; `bgen/angler_decor.py`) by
+`anglerQuests` conditions. Not yet: the quest count in the dialog's quest text and its Shop button (TownDialog, W4).
+
+## Resident shops (P5-15..P5-18)
+
+Terraria 1.4.4 stock lives in each NPC's `shop` (data/town/*.json, one NPC per line), with conditions on time, flags
+(hardmode, bosses), the world's evil, the biome at the resident's home, moon, season and bestiary; prices are the
+item value unless given, scaled by happiness (currency prices are not). New goods are in
+`data/items/town_shop_*.json` and `data/tileobjects/town_decor*.json`; their models come from reused generators and
+`tools/blender/bgen/town_shop.py` (specs in `tools/blender/assets.d/p5-1*-shops.json`).
+* **Shops I** (P5-15): Merchant (mining clothes, anvil, shuriken, Glowsticks at night), Dryad (powders by evil, grass
+  seeds; jungle/mushroom seeds by home biome; corrupt/crimson/hallowed seeds in hardmode; Sunflower; Herb Bag), Arms
+  Dealer (Illegal Gun Parts at night, Empty Bullets in hardmode), Clothier (tuxedo), Goblin (Spiky Ball), Witch
+  Doctor (Bewitching Table at night). The Nurse has no shop. Behavior `plantGrass {grass, on}`
+  (`ItemUseSystem.Garden.cs`): the aimed block, if it is in `on` and uncovered, becomes `grass`; one seed is used.
+  The Sunflower's aura gives Happy!, the Bewitching Table's Bewitched (+1 minion).
+* **Use styles**: items may name Terraria's 1.4.4 use styles (`gun`, `throw`, `drink`, `holdUp`…); until the use-style
+  rework lands on this branch `UseStyles.Family` maps each to the legacy style it behaves as.
+* **Shops II** (P5-16): the Painter's Decor tab sells seven wall paintings (`painting` generator; The Truth Is Up There
+  after the Martians); the Dye Trader the Dye Vat (a station without recipes yet) and ten basic dyes (category dye,
+  cosmetic until dye slots exist; they satisfy his arrival rule); the Party Girl Confetti, the Confetti Gun (both a
+  harmless glowing puff), the Party Hat and a decor Bubble Machine (no bubbles yet); the Tavernkeep Ale (Tipsy) for a
+  Defender Medal (dropped by the Old One's Army: 50% per soldier, 5/10/20 from Dark Mage/Ogre/Betsy) and a decor
+  Eternia Crystal Stand (the crystal item still starts the event). `town buy` finds the tab that lists the item.
+* **Shops IV** (P5-18): Wizard (Crystal Ball, an aura giving Clairvoyance; Magic Hat), Steampunker (Cog; wings after
+  Golem), Cyborg (Rocket II in a Blood Moon, digs; Rocket III at night or in an eclipse, wider blast; Nanites as a
+  material), Truffle (Mushroom Cap; Mushroom Spear and Hammush after a mechanical boss), Pirate outfit, Santa's whole
+  stock only at Christmas (plus a Star Topper), Princess outfit and Resplendent Dessert (Sugar Rush). Deferred: the
+  Pirate's Cannon (needs an activatable launcher tile), Steampunker solutions and Clentaminator (no conversion
+  spray), sentry staves and Defender armour (no sentries yet), the Stylist's hair dyes.
+* **Shops III** (P5-17): the Zoologist's stock grows with the bestiary (`bestiary {min}`: Leather Whip at 10%, Critter
+  Shampoo at 30%, Fairy Glowstick, a floating light, at 45%; the pet licenses wait for P5-20). The Golfer sells four
+  clubs (swung; each knocks a Golf Ball, ammo class `golf_ball`, off along the aim at its own speed: driver fastest,
+  putter slowest), the bouncing `golf_ball_shot` (6 bounces, light damage), Golf Cup and Tee decor and the golf
+  outfit. Golf scoring is not modelled.
+
+## Visiting merchants (P5-19)
+
+`TownNpcDef.Visit` (`VisitInfo`) makes a town NPC a `TownNpcKind.Visitor`: never counted, never housed, no happiness
+(`TownNpc.NeedsHome` is false). `TownSystem.Visitors.cs` runs every `VisitInterval` ticks. Town visitors (the Travelling
+Merchant, `data/town/visitors.json`) roll `dawnChance` once a day with Pcg32(seed, day, id) once `visit.requires` holds
+(2+ housed residents), appear 20–30 m out from the town centre (the mean of the homes), walk in and stroll there
+(`TownNpc.Anchor`), and at `leaveHour` walk out and are removed beyond 40 m (or after a timeout while unseen).
+Site visitors (the Skeleton Merchant) roll `hourlyChance` per check while the player is where `visit.where` holds, are
+placed out of sight with `SiteFinder`, and vanish after the player has been 100 m away for a minute or at the next dawn.
+Arrival and departure raise `Arrived`/`Departed` (HUD announcements) plus `VisitorArrived`/`VisitorLeft`.
+`TownCommerce.VisitorStock` adds each `visit.pools[]` entry draw (Pcg32(seed, visit day, id)), stable per visit;
+`TownNpcDef.AllShopEntries` feeds item sources and validation. `ResidentModel.VisitDay` persists the visit.
+Commands: `town visit <id>`, `town leave <id>`. Gaps: no charged arrows for the Pulse Bow, no Bone Torch, the stock
+pools are a functional subset of Terraria's list.
+
+## Town pets (P5-20)
+
+`TownNpcDef.Pet` makes a `TownNpcKind.Pet` (`data/town/pets.json`: town_cat, town_dog, town_bunny). Pets arrive like
+residents (a free house, arrival `[{flag license_<pet>}]`), keep and are re-housed into homes (`TownNpc.NeedsHome`), can
+be assigned in the housing UI, but never count as residents (so they are never targeted), cannot be hurt and have no
+shop or happiness. The `license` item behaviour (`ItemUseSystem.Town.cs`) sets the flag and is used up; a second use is
+refused ("This license has already been used.") and kept. The Zoologist sells the licenses (bestiary 25 % / 25 % /
+45 %). Interacting with a pet calls `TownSystem.PetAnimal` instead of opening the dialog (InteractionController); the
+`Petted` event drives `game/Entities/TownPetHearts` (pooled heart sprites, sfx `pet`). Models from
+`tools/blender/bgen/town_pets.py` (one quadruped rig, walk/idle/sit/lie). Gaps: no player petting arm pose; pets use
+the humanoid nav agent and box.
+
+## Biome pylons (P5-34)
+
+Eight pylon tile objects (`data/tileobjects/pylons.json`, tag `pylon`, `bgen/pylons.py`). `TownSystem.Pylons`
+(`PylonNetwork`, rules in `data/config/town.json` "pylons", defaults in `PylonConfig`) decides: a housed resident whose
+happiness price factor is at most `maxFactor` (content or better) and who has another resident within
+`neighbourRadius` sells the pylon of their home's biome (rules in order, specific biomes before the forest; the Cavern
+Pylon anywhere below the surface) for 10 gold scaled by happiness, appended by `TownCommerce.Stock`. A pylon works
+with `minResidents` residents within `activeRadius`; `Teleport(player, pylon)` needs a working pylon within
+`useRadius` of the player and a working destination, and puts the player on a standable node beside it. The world
+map marks pylons (`game/UI/PylonMap.cs`) and a click on one travels there; commands `town pylons`, `town pylon <n>`;
+probes `town.pylons`, `town.pylon_teleports`. Item sources list pylons as "Sold by content residents living in its
+biome". Gaps: the one-of-each-type placement limit and Terraria's "no bosses or invasions nearby" rule are not
+enforced; no Universal Pylon.
+
+## Emotes and NPC voices (X-05)
+
+`TownSystem.Emotes.cs` checks `residentsPerCheck` residents every `interval` ticks (config `data/config/town.json`
+"emotes", `EmoteConfig`); a ready one emotes with `chance`, then cools down. `EmoteRules.Pick` (pure, tested) maps
+`EmoteInput` (happiness factor, sleeping at home at night, danger/party/rain events, loved or hated neighbours within
+`replyRadius`, a chat partner within `chatRadius`, talking to the player, pets) to an emote id; a "chat" partner
+answers with `EmoteRules.Reply`. `PlayerEmote` (the wheel) raises `PlayerEmoted` and nearby ready residents reply;
+petting makes the pet show "love". Game side: `game/Entities/TownEmoteBubbles` (pooled billboard sprites, 4 on the low
+preset, 12 otherwise, icons `assets/icons/emotes/*.png` from `tools/textures/build_emotes.py`),
+`game/Audio/NpcVoice` (voice blips `voice_*` from `tools/audio/sfx_recipes_town.py`, per-NPC sound and pitch in
+"emotes.voices", played on `InteractionController.TalkRequested` and softly on chat bubbles), and
+`game/UI/EmoteWheel` (hold T, move the mouse, release). The emote wheel takes T; block-shape cycling moved to Y.
+Probe `town.emotes_shown`; command `town emote <emote> [id]`.
+
+## Town services and shop tabs in the W4 chat box and grid shop
+
+`TownDialog.Services.cs` shows one button per entry of `TownNpcDef.AllServices` (Heal, Crafting, Help = the advisor's
+next step, summon, Reforge, Taxes, Quest with the player's count, Status) and a Shop button plus one per further tab
+(the Painter's Decor); residents with only visitor pools or a pylon for sale still get Shop. A tab button sets
+`UiContext.ShopTab`, which `ShopPanel.Open` reads (and resets), so the grid shop lists and buys from that tab;
+currency wares (Defender Medals) show their cost in the tooltip and `TownCommerce.Buy` takes the medals. Commands
+`ui service <type>`, `ui shop [tab]`.

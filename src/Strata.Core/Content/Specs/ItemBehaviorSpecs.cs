@@ -47,6 +47,12 @@ public static class ItemBehaviorSpecs
     /// <summary>Paints the aimed block with the first paint in the backpack, or scrapes paint off (Paintbrush, Paint Scraper).</summary>
     public const string PaintTool = "paint";
 
+    /// <summary>Grass seeds: the aimed top block (one of <c>on</c>) turns into <c>grass</c>; one seed is used.</summary>
+    public const string PlantGrass = "plantGrass";
+
+    /// <summary>A town pet license (Cat, Dog, Bunny): sets world flag <c>flag</c> once; a used license is refused.</summary>
+    public const string License = "license";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
@@ -72,6 +78,8 @@ public static class ItemBehaviorSpecs
         c.Register<MinecartParams>(SpecKind.ItemBehavior, Minecart);
         c.Register<Gameplay.Mounts.MountParams>(SpecKind.ItemBehavior, Mount);
         c.Register<PaintToolParams>(SpecKind.ItemBehavior, PaintTool);
+        c.Register<PlantGrassParams>(SpecKind.ItemBehavior, PlantGrass);
+        c.Register<LicenseParams>(SpecKind.ItemBehavior, License);
     }
 }
 
@@ -307,4 +315,23 @@ public sealed class MinecartParams : SpecParams
 public sealed class PaintToolParams : SpecParams
 {
     public bool Scrape { get; init; }
+}
+
+public sealed class PlantGrassParams : SpecParams, IValidatableSpec
+{
+    /// <summary>The grass block the seeds grow into.</summary>
+    public string Grass { get; init; } = "";
+
+    /// <summary>Blocks the seeds take on (dirt for Grass Seeds, mud for Jungle and Mushroom Grass Seeds).</summary>
+    public string[] On { get; init; } = Array.Empty<string>();
+
+    public string? Validate() => Grass.Length == 0 || On.Length == 0 ? "plantGrass needs grass and on" : null;
+}
+
+public sealed class LicenseParams : SpecParams, IValidatableSpec
+{
+    /// <summary>The world flag the license sets (a pet's arrival waits for it).</summary>
+    public string Flag { get; init; } = "";
+
+    public string? Validate() => Flag.Length == 0 ? "license needs a flag" : null;
 }
