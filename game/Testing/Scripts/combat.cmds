@@ -415,6 +415,61 @@ aim 0 -0.42 1
 use
 wait 1
 assert objects.smashed == 2
+# Yoyos (P3-12): held out on a string while the button is down, striking the zombie again and again; home when let go.
+killall
+give wood_yoyo 1
+wield wood_yoyo
+spawn zombie 1 3
+aim 0 0 1
+press use_primary on
+wait 0.6
+assert projectiles.count == 1
+assert projectiles.strings == 1
+wait 1.5
+press use_primary off
+wait 2
+assert projectiles.count == 0
+assert npcs.zombie == 0
+# Whip lashes are drawn and crack (P3-15).
+give leather_whip 1
+wield leather_whip
+use
+wait 0.2
+assert whips.drawn == 1
+wait 0.6
+assert whips.cracks >= 1
+# Flails (P3-13): whirled on the chain while held, flung when let go, reeled back in.
+give ball_o_hurt 1
+wield ball_o_hurt
+press use_primary on
+wait 0.5
+assert projectiles.count == 1
+assert projectiles.strings == 1
+press use_primary off
+wait 3
+assert projectiles.count == 0
+# Projectile views are pooled (P1b-15): forty sparks in volleys reuse the views of the ones that burned out, and the
+# glowing ones near the camera share the preset's few lights. Shots leave the held wand's tip (P3-10).
+give wand_of_sparking 1
+wield wand_of_sparking
+aim 0 0.1 1
+probe projectiles.nodes_created
+repeat 10 use
+heal
+wait 2
+repeat 10 use
+heal
+wait 2
+repeat 10 use
+heal
+wait 2
+repeat 10 use
+wait 0.1
+assert projectiles.nodes_created <= 34
+probe projectiles.lights
+probe projectiles.from_muzzle
+probe fx.muzzle_flashes
+assert projectiles.pooled >= 1
 ai on
 killall
 assert errors == 0

@@ -28,6 +28,7 @@ public sealed partial class SoundEvents : Node
         _game = game;
         _local = local;
         WireWorld(game);
+        WireImpacts(game);
         WireWeapons(game);
         WireCreatures(game);
         WirePlayer(game);

@@ -111,7 +111,7 @@ public class UseStyleTests
         foreach (var (name, entry) in shipped.Styles)
         {
             var d = fallback.Styles[name];
-            Assert.Equal((d.Clip, d.ToolClip, d.ArmAim), (entry.Clip, entry.ToolClip, entry.ArmAim));
+            Assert.Equal((d.Clip, d.ToolClip, d.ArmAim, d.MuzzleFlash, d.TipSparks), (entry.Clip, entry.ToolClip, entry.ArmAim, entry.MuzzleFlash, entry.TipSparks));
             Assert.Equal(d.BladeCurve ?? Array.Empty<CurveKey>(), entry.BladeCurve ?? Array.Empty<CurveKey>());
         }
     }

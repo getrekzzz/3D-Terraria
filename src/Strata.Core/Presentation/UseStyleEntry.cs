@@ -33,6 +33,12 @@ public sealed class UseStyleEntry
     /// <summary>How the style is held and moved in first person (P3-07); null = a plain lift from the default rest.</summary>
     public FpStyle? Fp { get; init; }
 
+    /// <summary>Shots flash at the muzzle with a wisp of smoke and a brief light (guns, P3-10).</summary>
+    public bool MuzzleFlash { get; init; }
+
+    /// <summary>Shots throw sparks from the tip in the projectile's colour (staves and tomes, P3-10).</summary>
+    public bool TipSparks { get; init; }
+
     public IEnumerable<string> Validate()
     {
         if (string.IsNullOrWhiteSpace(Clip)) yield return "clip must not be empty";

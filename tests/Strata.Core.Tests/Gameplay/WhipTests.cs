@@ -1,6 +1,7 @@
 using System.Numerics;
 using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Interaction;
+using Strata.Core.Gameplay.Items;
 using Strata.Core.Tests.Support;
 
 namespace Strata.Core.Tests.Gameplay;
@@ -59,6 +60,18 @@ public class WhipTests
         Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
         g.Ticks(g.Player.UseAnimationMax + 2);
         Assert.Equal(UseOutcome.None, g.World.ItemUse.Use(g.Player, null, false));
+    }
+
+    [Fact]
+    public void FeralClawsLetHoldingRepeatTheWhip()
+    {
+        using var g = Arena();
+        g.Player.State.Inventory.Accessories[0] = new ItemStack(g.Content.Items.Get("feral_claws"), 1);
+        g.Player.State.Recompute();
+        g.Player.ResetUse();
+        Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
+        g.Ticks(g.Player.UseAnimationMax + 2);
+        Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, false));
     }
 
     [Fact]

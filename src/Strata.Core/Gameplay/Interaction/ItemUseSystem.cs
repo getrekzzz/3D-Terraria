@@ -89,8 +89,10 @@ public sealed partial class ItemUseSystem
         var info = _world.Uses[held.Item!];
         var item = info.Item;
         _refusal = null;
-        // Holding the button keeps tools, placeables and melee weapons going (every sword auto-swings, as in 1.4.4).
-        bool repeats = item.AutoReuse || info.IsTool || info.Has(ItemAction.PlaceBlock | ItemAction.PlaceObject | ItemAction.Melee | ItemAction.Thrust);
+        // Holding the button keeps tools, placeables and melee weapons going (every sword auto-swings, as in 1.4.4);
+        // whips repeat only with autoswing (Feral Claws, P3-15).
+        bool repeats = item.AutoReuse || info.IsTool || info.Has(ItemAction.PlaceBlock | ItemAction.PlaceObject | ItemAction.Melee | ItemAction.Thrust)
+            || (info.Has(ItemAction.Whip) && p.State.Effects.Stats.Bonus(StatIds.Autoswing) > 0);
         if (!freshPress && !repeats) return UseOutcome.None;
         // One animation per use, never restarted mid-arc: a new one starts once the last has played out (or for
         // another item). A tool keeps swinging while its next hit cools down, and hits when its use time is up.
@@ -174,7 +176,7 @@ public sealed partial class ItemUseSystem
         }
         else if (info.Has(ItemAction.Whip))
         {
-            // One crack per use animation; holding repeats only with autoReuse (the Autoswing rule of P3-15).
+            // One crack per use animation; holding repeats only with autoswing (P3-15).
             if (!newAnimation) return UseOutcome.Cooldown;
             outcome = UseOutcome.Swung;
         }

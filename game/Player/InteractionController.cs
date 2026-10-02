@@ -62,9 +62,11 @@ public sealed partial class InteractionController : Node
         // Grid blocks (1 m) by default, single cells when the setting says so; holding the precision key swaps.
         Entity.Precision = Settings.UserSettings.Current.SmallBlocks != (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("precision_mode"));
         UpdateTarget();
+        Entity.UseHeld = false; // yoyos and flails stay out only while the button is held (P3-12)
         if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.GameplayBlocked) return;
 
         bool fresh = Input.IsActionJustPressed("use_primary");
+        Entity.UseHeld = fresh || Input.IsActionPressed("use_primary");
         if (fresh || Input.IsActionPressed("use_primary"))
         {
             var outcome = Game.ItemUse.Use(Entity, Target, fresh);

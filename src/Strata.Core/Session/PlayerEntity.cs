@@ -40,6 +40,9 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
     /// </summary>
     public int UseCooldown { get; set; }
 
+    /// <summary>The use button is held down this tick (set by the input layer; yoyos and flails stay out while it is).</summary>
+    public bool UseHeld { get; set; }
+
     /// <summary>Ticks before equipment may throw its next attack projectile (Bone Glove).</summary>
     public int GloveCooldown { get; set; }
 

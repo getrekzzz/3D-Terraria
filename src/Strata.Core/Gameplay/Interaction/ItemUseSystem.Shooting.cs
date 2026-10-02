@@ -44,7 +44,7 @@ public sealed partial class ItemUseSystem
         }
         if (projectile == null) return UseOutcome.None;
         // Boomerangs and flails: one out at a time unless the weapon says otherwise (Zenith: no limit).
-        int limit = shot.Limit(projectile.Returns);
+        int limit = shot.Limit(projectile.OneAtATime ? 1 : 0);
         if (limit > 0 && LiveShots(p, projectile) + shot.Count > limit) return UseOutcome.Blocked;
         var held = state.Inventory.Held.Item == item ? state.Inventory.Held : new ItemStack(item, 1);
         if (item.ManaCost > 0)

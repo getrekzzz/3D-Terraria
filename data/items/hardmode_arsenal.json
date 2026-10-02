@@ -38,8 +38,8 @@
     { "id": "rainbow_rod", "name": "Rainbow Rod", "description": "Casts a controllable rainbow.", "category": "weapon", "rarity": 5, "value": 150000, "useStyle": "staff", "useTime": 22,
       "useAnimation": 22, "autoReuse": true, "damage": 55, "damageType": "magic", "manaCost": 18, "projectile": "rainbow_bolt", "shootSpeed": 14, "covers": ["terraria:rainbow_rod"] },
 
-    { "id": "feral_claws", "name": "Feral Claws", "description": "12% increased melee speed.", "category": "accessory", "rarity": 2, "value": 20000, "equipSlot": "accessory",
-      "equipEffects": [{ "type": "stat", "stat": "meleeSpeed", "add": 0.12 }], "covers": ["terraria:feral_claws"] },
+    { "id": "feral_claws", "name": "Feral Claws", "description": "12% increased melee speed. Enables auto swing for melee weapons and whips.", "category": "accessory", "rarity": 2, "value": 20000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "meleeSpeed", "add": 0.12 }, { "type": "stat", "stat": "autoswing", "add": 1 }], "covers": ["terraria:feral_claws"] },
     { "id": "magma_stone", "name": "Magma Stone", "description": "Melee attacks inflict fire damage.", "category": "accessory", "rarity": 3, "value": 20000, "equipSlot": "accessory",
       "equipEffects": [{ "type": "inflict", "buff": "on_fire", "ticks": 300, "chance": 0.5 }], "covers": ["terraria:magma_stone"] },
     { "id": "natures_gift", "name": "Nature's Gift", "description": "6% reduced mana usage.", "category": "accessory", "rarity": 2, "value": 20000, "equipSlot": "accessory",

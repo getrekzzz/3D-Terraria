@@ -62,7 +62,7 @@ public static partial class ContentValidator
                 if (i.NoMelee && b.Type is Specs.ItemBehaviorSpecs.MeleeSwing or Specs.ItemBehaviorSpecs.Thrust)
                     ctx.Error(i, $"noMelee items cannot have a {b.Type} behaviour (their swing is animation only).");
                 if (b.Type == Specs.ItemBehaviorSpecs.ShootProjectile && ctx.TryParse<Specs.ShootProjectileParams>(SpecKind.ItemBehavior, b) is { } shoot
-                    && i.Projectile != null && ctx.Db.Projectiles.TryGet(i.Projectile, out var shot) && shoot.Limit(shot.Returns) is > 0 and var limit && shoot.Count > limit)
+                    && i.Projectile != null && ctx.Db.Projectiles.TryGet(i.Projectile, out var shot) && shoot.Limit(shot.OneAtATime ? 1 : 0) is > 0 and var limit && shoot.Count > limit)
                     ctx.Error(i, $"shootProjectile fires {shoot.Count} '{shot.Id}' per use but only {limit} may be out at once (set maxActive).");
             }
             ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");

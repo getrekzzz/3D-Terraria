@@ -22,6 +22,8 @@ public sealed partial class ProjectileSystem
         if (p.Def.Minion != null) return owner is { Alive: true } && TickMinion(p, owner, dt);
         if (p.Def.Bobber) return owner is { Alive: true } && TickBobber(p, owner, dt);
         if (p.LatchedTo != null) return TickLatched(p);
+        if (p.Def.Tether is { } tether && !p.Returning)
+            return owner is { Alive: true } && (tether.Kind == "flail" ? TickFlail(p, owner, dt) : TickYoyo(p, owner, dt));
         // Returning boomerang: fly straight back through anything, still striking what it meets.
         if (owner == null || !owner.Alive) return false;
         var to = owner.Center - p.Position;

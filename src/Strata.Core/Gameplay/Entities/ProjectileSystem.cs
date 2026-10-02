@@ -20,6 +20,12 @@ public sealed class Projectile
     /// <summary>Where the shot started (the muzzle, the sky…), for muzzle flashes and trails.</summary>
     public Vector3 SpawnOrigin;
 
+    /// <summary>A flail's phase (P3-13): whirling at the hand while held, then flying out once let go.</summary>
+    public bool Launched;
+
+    /// <summary>Ticks since the flail was let go.</summary>
+    public int LaunchedAge;
+
     /// <summary>Fired by a minion (counts as a minion hit: whip tags add their damage).</summary>
     public bool FromMinion;
     public required PlayerEntity? Owner { get; init; }
@@ -97,6 +103,9 @@ public sealed partial class ProjectileSystem
     /// <summary>A projectile came to rest on the terrain and left its <c>dropItem</c> there (a Fallen Star landing; before <see cref="Removed"/>).</summary>
     public event Action<Projectile>? Landed;
 
+    /// <summary>A projectile struck the terrain (once per bounce): the point struck and the block there — impact dust and sound.</summary>
+    public event Action<Projectile, Vector3, ushort>? HitTerrain;
+
     /// <summary>An explosion went off (position, radius in metres) — flash, smoke and sound.</summary>
     public event Action<Vector3, float>? Exploded;
 
@@ -146,7 +155,7 @@ public sealed partial class ProjectileSystem
                 if (!TickPet(p, dt)) End(i);
                 continue;
             }
-            if (p.Def.Minion != null || p.Def.Bobber || p.Returning || p.LatchedTo != null)
+            if (p.Def.Minion != null || p.Def.Bobber || p.Returning || p.LatchedTo != null || p.Def.Tether != null)
             {
                 if (!TickSpecial(p, dt)) End(i);
                 continue;
@@ -200,6 +209,12 @@ public sealed partial class ProjectileSystem
         VoxelMotion.Move(_world.Session.World, ref p.Position, ref p.Velocity, half, dt);
         bool collided = p.Velocity.X != before.X || p.Velocity.Y != before.Y || p.Velocity.Z != before.Z;
         if (!collided) return true;
+        if (HitTerrain != null)
+        {
+            // The block struck: the cell just ahead along the incoming flight.
+            var ahead = before.LengthSquared() > 1e-6f ? Vector3.Normalize(before) * (r + 0.1f) : Vector3.Zero;
+            HitTerrain(p, p.Position + ahead, _world.Session.World.GetBlock(VoxelMotion.CellOf(p.Position + ahead)));
+        }
         if (p.BouncesLeft-- <= 0)
         {
             ApplyOnHit(p, null);

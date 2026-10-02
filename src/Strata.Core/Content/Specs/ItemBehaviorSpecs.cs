@@ -169,8 +169,12 @@ public sealed class WhipParams : SpecParams, IValidatableSpec
 
     public int InflictTicks { get; init; } = 240;
 
+    /// <summary>The lash's colour on screen (P3-15).</summary>
+    public string Color { get; init; } = "#7a5232";
+
     public string? Validate() =>
-        Length is <= 0f or > 40f ? "length must be within (0, 40] cells"
+        !System.Text.RegularExpressions.Regex.IsMatch(Color, "^#[0-9a-fA-F]{6}$") ? "color must be #RRGGBB"
+        : Length is <= 0f or > 40f ? "length must be within (0, 40] cells"
         : Segments is < 4 or > 64 ? "segments must be within 4–64"
         : Falloff is < 0f or >= 1f ? "falloff must be within [0, 1)"
         : TagTicks < 1 || InflictTicks < 1 ? "tagTicks and inflictTicks must be >= 1" : null;

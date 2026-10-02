@@ -93,6 +93,7 @@ heal
 repeat 10 use
 wait 1.0
 assert perf.calls.gd.projectiles.create > 0
+assert perf.max.gd.projectiles < 6
 
 # Creatures appear (models instantiated on first sight).
 spawn zombie 5

@@ -15,6 +15,17 @@ public static partial class ContentValidator
             if (p.Radius <= 0) ctx.Error(p, "radius must be > 0.");
             ctx.Light(p, p.Light, "light");
             ctx.Color(p, p.Color, "color");
+            if (p.Trail != null) ctx.Color(p, p.Trail, "trail");
+            if (p.TrailWidth is <= 0 or > 2) ctx.Error(p, "trailWidth must be within (0, 2] m.");
+            if (p.TrailTime is <= 0 or > 3) ctx.Error(p, "trailTime must be within (0, 3] s.");
+            if (p.Tether is { } tether)
+            {
+                if (Array.IndexOf(TetherDef.Kinds, tether.Kind) < 0) ctx.Error(p, $"tether.kind must be one of {string.Join(", ", TetherDef.Kinds)}.");
+                if (tether.Range <= 0 || tether.Speed <= 0 || tether.Lifetime < 0) ctx.Error(p, "tether range and speed must be > 0, lifetime >= 0.");
+                ctx.Color(p, tether.String, "tether.string");
+                if (p.Returns > 0) ctx.Error(p, "a tethered projectile comes back on its own: drop 'returns'.");
+            }
+            if (Array.IndexOf(ProjectileDef.SpinAxes, p.SpinAxis) < 0) ctx.Error(p, $"spinAxis must be one of {string.Join(", ", ProjectileDef.SpinAxes)}.");
             switch (p.Visual)
             {
                 case "creature": ctx.Asset(p, $"assets/models/creatures/{p.Model ?? p.Id}.glb", "model"); break;

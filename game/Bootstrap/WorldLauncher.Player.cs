@@ -52,6 +52,7 @@ public static partial class WorldLauncher
         var viewModel = new ViewModel();
         player.Rig.Camera.AddChild(viewModel);
         viewModel.Initialize(player, game, props);
+        HeldSockets.Register(viewModel, avatar); // shot effects at the muzzle in either view (P3-10)
         var grapple = new GrappleVisual();
         runtime.AddChild(grapple);
         grapple.Initialize(player);
