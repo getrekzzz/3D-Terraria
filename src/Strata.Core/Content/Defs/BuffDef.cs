@@ -13,4 +13,10 @@ public sealed class BuffDef : ContentDef
 
     /// <summary>Removed on death / cannot be cancelled by the player.</summary>
     public bool Persistent { get; init; }
+
+    /// <summary>
+    /// The buff bar shows no countdown (aura and liquid buffs such as Cozy Fire, Heart Lamp and Honey, which are
+    /// refreshed every few ticks while the source is near and would otherwise flicker).
+    /// </summary>
+    public bool HideTimer { get; init; }
 }

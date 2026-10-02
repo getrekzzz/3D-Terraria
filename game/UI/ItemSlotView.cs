@@ -100,8 +100,14 @@ public sealed partial class ItemSlotView : Control
             {
                 TooltipKind.Name => UiTheme.Rarity(s.Item!.Rarity),
                 TooltipKind.Flavor => new Color(0.75f, 0.8f, 0.95f),
-                TooltipKind.Price => new Color(0.95f, 0.85f, 0.5f),
                 TooltipKind.Info => UiTheme.Muted,
+                TooltipKind.Good => new Color(0.47f, 0.75f, 0.47f),
+                TooltipKind.Bad => new Color(0.75f, 0.47f, 0.47f),
+                TooltipKind.PriceCopper => new Color(0.96f, 0.54f, 0.38f),
+                TooltipKind.PriceSilver => new Color(0.71f, 0.75f, 0.76f),
+                TooltipKind.PriceGold => new Color(0.88f, 0.79f, 0.36f),
+                TooltipKind.PricePlatinum => new Color(0.86f, 0.86f, 0.78f),
+                TooltipKind.NoValue => new Color(0.47f, 0.47f, 0.47f),
                 _ => UiTheme.Text,
             });
             box.AddChild(label);

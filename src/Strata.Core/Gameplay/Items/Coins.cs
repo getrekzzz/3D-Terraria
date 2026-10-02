@@ -2,6 +2,18 @@ using Strata.Core.Content;
 
 namespace Strata.Core.Gameplay.Items;
 
+/// <summary>The four coin denominations, cheapest first.</summary>
+public enum CoinTier
+{
+    Copper,
+    Silver,
+    Gold,
+    Platinum,
+}
+
+/// <summary>A copper amount split into whole coins of each denomination.</summary>
+public readonly record struct CoinParts(long Platinum, int Gold, int Silver, int Copper);
+
 /// <summary>Converts copper values to coin stacks (100 copper = 1 silver, 100 silver = 1 gold, 100 gold = 1 platinum).</summary>
 public static class Coins
 {
@@ -27,6 +39,22 @@ public static class Coins
         foreach (var s in inv.Stacks)
             if (s.Item!.HasTag("coin")) total += (long)s.Item.Value * s.Count;
         return total;
+    }
+
+    /// <summary>The largest coin in the amount (prices are coloured by it); copper for zero or less.</summary>
+    public static CoinTier TopTier(long copper) => copper switch
+    {
+        >= 1_000_000 => CoinTier.Platinum,
+        >= 10_000 => CoinTier.Gold,
+        >= 100 => CoinTier.Silver,
+        _ => CoinTier.Copper,
+    };
+
+    /// <summary>The amount as platinum, gold, silver and copper coins (each below 100 except platinum).</summary>
+    public static CoinParts Parts(long copper)
+    {
+        if (copper <= 0) return default;
+        return new CoinParts(copper / 1_000_000, (int)(copper / 10_000 % 100), (int)(copper / 100 % 100), (int)(copper % 100));
     }
 
     public static string Format(long copper)

@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Text;
 using Godot;
+using Strata.Core.Content.Index;
 using Strata.Core.Gameplay.Crafting;
 using Strata.Game.Items;
 
@@ -81,13 +82,13 @@ public sealed partial class CraftingPanel : PanelContainer
         Refresh();
     }
 
-    private static string Describe(CompiledRecipe r)
+    private string Describe(CompiledRecipe r)
     {
         var sb = new StringBuilder();
         sb.AppendLine("Requires:");
         foreach (var ing in r.Inputs)
             sb.AppendLine($"  {ing.Count}x {(ing.Group != null ? $"any {ing.Group.Replace('_', ' ')}" : ing.Accepts.First().DisplayName)}");
-        if (r.Def.Stations.Length > 0) sb.AppendLine("At: " + string.Join(", ", r.Def.Stations));
+        if (r.Def.Stations.Length > 0) sb.AppendLine("At: " + StationNames.Describe(r.Def.Stations, _ui.Game.Session.Content));
         return sb.ToString().TrimEnd();
     }
 }

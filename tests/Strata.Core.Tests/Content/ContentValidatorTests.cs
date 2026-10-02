@@ -157,4 +157,16 @@ public class ContentValidatorTests
         AssertError(db, "snake_case");
         AssertError(db, "terraria:<concept>");
     }
+
+    [Fact]
+    public void RarityOutsideTerrariaTiersIsAnErrorAndSilentBuffsWarn()
+    {
+        var db = Load("""
+        { "buffs": [ { "id": "mystery" } ],
+          "items": [ { "id": "relic", "rarity": 20 }, { "id": "odd_potion", "rarity": -12, "buff": { "id": "mystery", "ticks": 60 } } ] }
+        """);
+        AssertError(db, "rarity must be -13–13");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("rarity") && e.Message.Contains("odd_potion"));
+        Assert.Contains(db.Report.Warnings, w => w.Message.Contains("buff 'mystery' has no description"));
+    }
 }
