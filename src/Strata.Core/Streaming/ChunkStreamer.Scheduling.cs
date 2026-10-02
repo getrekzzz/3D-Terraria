@@ -152,8 +152,7 @@ public sealed partial class ChunkStreamer
     {
         if (!_entries.Remove(coord, out var e)) return;
         if (e.Data == DataState.Loading) return; // in-flight load result will be discarded
-        var blob = _session.Unload(coord);
-        if (blob != null) _pendingSaves[coord] = blob;
+        if (_session.Unload(coord) is { } snapshot) _pendingSaves.Add(snapshot);
         if (e.HasMesh) ChunkRemoved?.Invoke(coord);
     }
 
@@ -161,7 +160,7 @@ public sealed partial class ChunkStreamer
     {
         if (_pendingSaves.Count == 0) return;
         using var profile = Diagnostics.Metrics.Frame.Time("stream.unload_flush");
-        _session.SaveUnloaded(_pendingSaves);
+        _session.SaveUnloaded(_pendingSaves, wait: true);
         _pendingSaves.Clear();
     }
 }

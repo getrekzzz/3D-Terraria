@@ -29,6 +29,7 @@ public sealed partial class GameWorld : IDisposable
     {
         Session = session;
         Jobs = new JobSystem(Math.Max(1, workers), session.Log);
+        if (session.Saver != null) session.Saver.Post = Jobs.Completions.Enqueue;
         Streamer = new ChunkStreamer(session, Jobs, streaming);
         Drops = new DroppedItemSystem();
         Editor = new WorldEditor(session, Drops);
@@ -243,5 +244,9 @@ public sealed partial class GameWorld : IDisposable
         Streamer.UnloadAll();
     }
 
-    public void Dispose() => Jobs.Dispose();
+    public void Dispose()
+    {
+        Jobs.Dispose();
+        Session.Dispose();
+    }
 }

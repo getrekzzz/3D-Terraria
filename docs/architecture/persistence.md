@@ -12,3 +12,12 @@
   their string so re-saving never loses data.
 * All writes are atomic (temp file + rename) with a `.bak` of the previous version read as a fallback.
 * Autosave every 2 minutes and on exit; chunks leaving the streaming range are saved when modified.
+* Single writer: every world file (regions, `world.json`, and from P1b-07 the player and map files written during
+  play) goes through `WorldSaver`, one background thread (`strata-saver`). The main thread only captures
+  `ChunkSnapshot`s (immutable voxel data + the encoded object section, `WorldSession.Capture`); the saver encodes them,
+  publishes the blobs to `WorldSaveStore`'s region cache (copy-on-write, authoritative for this session, so loads
+  never wait on disk), writes region files, then `world.json` with the current id tables (after the blobs, so every id
+  a blob uses is in the table; unload-only batches rewrite it when encoding interned new ids), then extra files.
+  Until a snapshot reaches the cache it stays readable through `WorldSaver.TryGetPending`, and `WorldSession.Produce`
+  builds a chunk streamed back in from it. The newest capture of a chunk always wins (`Seq`); failed writes are
+  logged and retried with the next batch. `WorldSession.SaveAll`/`SaveMetaOnly` stay synchronous (enqueue + flush).

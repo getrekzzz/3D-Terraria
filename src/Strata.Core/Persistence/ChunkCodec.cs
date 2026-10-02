@@ -22,7 +22,14 @@ public static class ChunkCodec
 
     private const byte TagEnd = 0, TagBlocks = 1, TagShapes = 2, TagLiquids = 3, TagFlags = 4, TagObjects = 5;
 
-    public static byte[] Encode(ChunkData data, int mutationLevel, IReadOnlyList<TileObjectInstance> objects, ContentDatabase db, WorldIdTables ids)
+    public static byte[] Encode(ChunkData data, int mutationLevel, IReadOnlyList<TileObjectInstance> objects, ContentDatabase db, WorldIdTables ids) =>
+        Encode(data, mutationLevel, EncodeObjects(objects, ids), db, ids);
+
+    /// <summary>
+    /// Encodes a chunk whose object section was already captured with <see cref="EncodeObjects"/> (objects are live and
+    /// mutable, so they are captured on the main thread; the voxel data is an immutable snapshot that any thread may encode).
+    /// </summary>
+    public static byte[] Encode(ChunkData data, int mutationLevel, byte[] objectSection, ContentDatabase db, WorldIdTables ids)
     {
         using var raw = new MemoryStream();
         using (var w = new BinaryWriter(raw, System.Text.Encoding.UTF8, leaveOpen: true))
@@ -34,7 +41,12 @@ public static class ChunkCodec
             if (data.Shapes != null) w.WriteSection(TagShapes, s => s.WriteByteRuns(data.Shapes));
             if (data.Liquids != null) w.WriteSection(TagLiquids, s => s.WriteByteRuns(data.Liquids));
             if (data.Flags != null) w.WriteSection(TagFlags, s => s.WriteByteRuns(data.Flags));
-            if (objects.Count > 0) w.WriteSection(TagObjects, s => WriteObjects(s, objects, ids));
+            if (objectSection.Length > 0)
+            {
+                w.Write(TagObjects);
+                w.WriteVar(objectSection.Length);
+                w.Write(objectSection);
+            }
             w.Write(TagEnd);
         }
 
@@ -42,6 +54,25 @@ public static class ChunkCodec
         using (var z = new ZLibStream(compressed, CompressionLevel.Optimal, leaveOpen: true))
             z.Write(raw.GetBuffer(), 0, (int)raw.Length);
         return compressed.ToArray();
+    }
+
+    /// <summary>The body of a chunk's object section (empty when there are no objects).</summary>
+    public static byte[] EncodeObjects(IReadOnlyList<TileObjectInstance> objects, WorldIdTables ids)
+    {
+        if (objects.Count == 0) return Array.Empty<byte>();
+        using var ms = new MemoryStream();
+        using (var w = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true)) WriteObjects(w, objects, ids);
+        return ms.ToArray();
+    }
+
+    /// <summary>Reads an object section body written by <see cref="EncodeObjects"/>.</summary>
+    public static List<TileObjectInstance> DecodeObjects(byte[] section, ContentDatabase db, WorldIdTables ids)
+    {
+        var list = new List<TileObjectInstance>();
+        if (section.Length == 0) return list;
+        using var r = new BinaryReader(new MemoryStream(section));
+        ReadObjects(r, db, ids, list);
+        return list;
     }
 
     public static DecodedChunk Decode(byte[] blob, ContentDatabase db, WorldIdTables ids)

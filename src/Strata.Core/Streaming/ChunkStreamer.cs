@@ -30,7 +30,7 @@ public sealed partial class ChunkStreamer
     private readonly WorldSession _session;
     private readonly JobSystem _jobs;
     private readonly RenderTables _tables;
-    private readonly Dictionary<Int3, byte[]> _pendingSaves = new();
+    private readonly List<Persistence.ChunkSnapshot> _pendingSaves = new();
     private Int3 _focusChunk = new(int.MinValue, 0, 0);
     private int _loadsInFlight, _meshesInFlight;
 

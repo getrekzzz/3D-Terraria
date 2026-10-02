@@ -16,7 +16,7 @@ namespace Strata.Core.Session;
 /// A live world: content, generator, loaded voxels, tile objects, sky map, clock and persistence.
 /// Engine-agnostic; the Godot layer only renders it and feeds input.
 /// </summary>
-public sealed partial class WorldSession
+public sealed partial class WorldSession : IDisposable
 {
     private WorldSession(ContentDatabase content, WorldMeta meta, WorldSaveStore? store, RenderTables render, ILog log)
     {
@@ -44,6 +44,11 @@ public sealed partial class WorldSession
         Mutations = new WorldGen.Mutations.MutationLog(Generator, content, Settings);
         Mutations.Load(meta, log);
         Events = new HashSet<string>(StringComparer.Ordinal);
+        if (store != null)
+        {
+            Saver = new WorldSaver(store, content, Ids, log);
+            Saver.SetBaseMeta(SerializeMeta());
+        }
         World.TileObjects.Added += o => MarkModified(o);
         World.TileObjects.Removed += o => MarkModified(o);
 
@@ -57,6 +62,9 @@ public sealed partial class WorldSession
     public WorldMeta Meta { get; }
     public WorldSettings Settings { get; }
     public WorldSaveStore? Store { get; }
+
+    /// <summary>The single background writer of this world's files (null for unsaved worlds).</summary>
+    public WorldSaver? Saver { get; }
     public WorldIdTables Ids { get; }
     public RenderTables Render { get; }
     public ILog Log { get; }
@@ -118,6 +126,13 @@ public sealed partial class WorldSession
     /// <summary>Loads or generates a chunk. Thread-safe; runs on workers.</summary>
     public ChunkProduct Produce(Int3 coord)
     {
+        if (Saver != null && Saver.TryGetPending(coord, out var pending))
+        {
+            // Unloaded but not yet written: rebuild from the snapshot so the edits survive the round trip.
+            var steps = Mutations.Steps;
+            return new ChunkProduct(coord, WorldGen.Mutations.MutationLog.Apply(pending.Data, coord, steps, pending.MutationLevel),
+                ChunkCodec.DecodeObjects(pending.Objects, Content, Ids), Math.Max(pending.MutationLevel, steps.Count), FromSave: true);
+        }
         var blob = Store?.LoadChunk(coord);
         if (blob != null)
         {
@@ -163,12 +178,12 @@ public sealed partial class WorldSession
         return sky;
     }
 
-    /// <summary>Removes a chunk from memory, returning its encoded blob when it must be saved.</summary>
-    public byte[]? Unload(Int3 coord)
+    /// <summary>Removes a chunk from memory, returning its snapshot when it must be saved (see <see cref="SaveUnloaded"/>).</summary>
+    public ChunkSnapshot? Unload(Int3 coord)
     {
-        byte[]? blob = null;
+        ChunkSnapshot? snapshot = null;
         var chunk = World.GetChunk(coord);
-        if (chunk != null && chunk.Modified) blob = Encode(chunk);
+        if (chunk != null && chunk.Modified && Saver != null) snapshot = Capture(chunk);
         _installing = true;
         try
         {
@@ -179,11 +194,8 @@ public sealed partial class WorldSession
             _installing = false;
         }
         World.RemoveChunk(coord, out _);
-        return blob;
+        return snapshot;
     }
-
-    public byte[] Encode(Chunk chunk) =>
-        ChunkCodec.Encode(chunk.Capture(), chunk.MutationLevel, World.TileObjects.InChunk(chunk.Coord), Content, Ids);
 
     private void MarkModified(TileObjectInstance obj)
     {
