@@ -98,6 +98,7 @@ public sealed partial class ItemUseSystem
         bool melee = info.Has(ItemAction.Melee | ItemAction.Thrust);
         if (p.UseCooldown > 0 && !(newAnimation && info.IsTool)) return UseOutcome.Cooldown;
         if (!newAnimation && melee && !info.IsTool) return UseOutcome.Cooldown; // one strike per swing
+        if (newAnimation && p.ReuseDelay > 0) return UseOutcome.Cooldown; // the pause between bursts
         if (p.State.Effects.NoItemUse) return Report(p, info, Refuse("You can't use items right now"), freshPress);
         float speed = UseSpeed(p, held, info);
         if (p.UseCooldown > 0)
@@ -169,7 +170,7 @@ public sealed partial class ItemUseSystem
         }
         else if (info.Has(ItemAction.Shoot))
         {
-            outcome = Shoot(p, info);
+            outcome = Shoot(p, info, followUp: !newAnimation);
             shotFailed = outcome is UseOutcome.NoAmmo or UseOutcome.NoMana or UseOutcome.Blocked;
         }
 

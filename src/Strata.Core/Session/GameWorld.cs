@@ -187,7 +187,9 @@ public sealed partial class GameWorld : IDisposable
         state.PlayTicks++;
         StepOnPlates(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
-        if (p.UseAnimation > 0) p.UseAnimation--;
+        if (p.ReuseDelay > 0) p.ReuseDelay--;
+        if (p.UseAnimation > 0 && --p.UseAnimation == 0) p.ReuseDelay = p.UseItem?.ReuseDelay ?? 0;
+        ItemUse.Continue(p); // a started burst always completes, button held or not
         // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
         if (!p.HasBody && p.Hook.Active) p.Hook.Tick(Session.World, Units.SecondsPerTick, p.Hand);
         if (state.Buffs.Tick()) state.Recompute();
