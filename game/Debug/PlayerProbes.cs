@@ -44,6 +44,10 @@ public static class PlayerProbes
             // off the crosshair point.
             ctx.AddProbe("fp.arrow", () => viewModel.ArrowState);
             ctx.AddProbe("fp.aim_error_deg", () => viewModel.AimErrorDegrees);
+            // P3-07: shots that kicked the held item (per item), the recoil left, and how far ahead of the eye it is.
+            ctx.AddProbe("fp.kicks", () => viewModel.Kicks);
+            ctx.AddProbe("fp.recoil", () => viewModel.RecoilWeight);
+            ctx.AddProbe("fp.depth", () => viewModel.Depth);
         }
         if (world.Interaction is not { } interaction) return;
         // 1 when there is no target or it lies ahead of the eye along the facing: nothing behind the player is selected.

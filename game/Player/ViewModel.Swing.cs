@@ -20,6 +20,11 @@ public sealed partial class ViewModel
     /// <summary>Twist of the blade about its own axis so its flat catches the eye rather than showing only the edge.</summary>
     private static readonly float FlatTwist = Mathf.DegToRad(35f);
 
+    // Thrust weapons: level, pulled back through the wind-up, lunging forward through the strike window.
+    private static readonly Pose Level = new(Vector3.Zero, new Vector3(-1.45f, 0.1f, 0f));
+    private static readonly Pose Couched = new(new Vector3(0.02f, -0.01f, 0.07f), new Vector3(-1.45f, 0.1f, 0f));
+    private static readonly Pose Lunge = new(new Vector3(-0.12f, 0.05f, -0.35f), new Vector3(-1.45f, 0.1f, 0f));
+
     private SwingCurve? _extension;
     private ClipTiming? _thrustClip;
 

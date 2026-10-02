@@ -255,6 +255,25 @@ assert fp.aim_error_deg < 3
 use
 wait 0.5
 assert fp.aim_error_deg < 3
+# P3-07: every shot kicks the first-person gun (settled again by now); each shot of a burst kicks on its own.
+assert fp.kicks == 1
+assert fp.recoil < 0.05
+give clockwork_assault_rifle 1
+wield clockwork_assault_rifle
+wait 0.3
+use
+wait 0.5
+assert fp.kicks == 3
+assert fp.aim_error_deg < 3
+# Food is raised to the mouth, kept clear of the near plane.
+give cooked_fish 3
+wield cooked_fish
+wait 0.3
+use
+wait 0.15
+assert fp.depth >= 0.24
+assert fp.depth < 0.4
+wait 0.5
 camera third
 wield wooden_bow
 wait 0.5

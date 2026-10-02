@@ -30,6 +30,9 @@ public sealed class UseStyleEntry
     /// <summary>The blade's pitch over a swing (swing only): keys [t, degrees, ease into the key].</summary>
     public CurveKey[]? BladeCurve { get; init; }
 
+    /// <summary>How the style is held and moved in first person (P3-07); null = a plain lift from the default rest.</summary>
+    public FpStyle? Fp { get; init; }
+
     public IEnumerable<string> Validate()
     {
         if (string.IsNullOrWhiteSpace(Clip)) yield return "clip must not be empty";
@@ -53,6 +56,8 @@ public sealed class UseStyleEntry
                 if (Array.IndexOf(Eases, key.Ease) < 0) yield return $"bladeCurve key {k}: ease must be one of {string.Join(", ", Eases)}";
             }
         }
+        if (Fp != null)
+            foreach (var problem in Fp.Validate()) yield return $"fp {problem}";
     }
 }
 
