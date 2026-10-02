@@ -41,6 +41,14 @@ assert boss.mimic.disguised == 0
 wait 1
 assert npcs.mimic == 1
 assert errors == 0
+# The biome Mimics sit as their biome's chest the same way.
+killall
+spawn hallowed_mimic 1 3.5
+spawn ice_mimic 1 6
+wait 1
+assert boss.hallowed_mimic.disguised == 1
+assert boss.ice_mimic.disguised == 1
+assert errors == 0
 # Clearing up.
 killall
 assert npcs.count == 0

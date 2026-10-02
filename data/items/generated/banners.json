@@ -431,6 +431,28 @@
    ]
   },
   {
+   "id": "corrupt_mimic_banner",
+   "name": "Corrupt Mimic Banner",
+   "description": "Nearby players deal more damage to and take less from: Corrupt Mimic.",
+   "size": [
+    2,
+    4,
+    1
+   ],
+   "anchor": "wall",
+   "hitPoints": 1,
+   "itemCategory": "furniture",
+   "itemValue": 1000,
+   "banner": {
+    "enemies": [
+     "corrupt_mimic"
+    ]
+   },
+   "tags": [
+    "banner"
+   ]
+  },
+  {
    "id": "corrupt_slime_banner",
    "name": "Corrupt Slime Banner",
    "description": "Nearby players deal more damage to and take less from: Corrupt Slime.",
@@ -556,6 +578,28 @@
    "banner": {
     "enemies": [
      "crimslime"
+    ]
+   },
+   "tags": [
+    "banner"
+   ]
+  },
+  {
+   "id": "crimson_mimic_banner",
+   "name": "Crimson Mimic Banner",
+   "description": "Nearby players deal more damage to and take less from: Crimson Mimic.",
+   "size": [
+    2,
+    4,
+    1
+   ],
+   "anchor": "wall",
+   "hitPoints": 1,
+   "itemCategory": "furniture",
+   "itemValue": 1000,
+   "banner": {
+    "enemies": [
+     "crimson_mimic"
     ]
    },
    "tags": [
@@ -1553,6 +1597,28 @@
    ]
   },
   {
+   "id": "hallowed_mimic_banner",
+   "name": "Hallowed Mimic Banner",
+   "description": "Nearby players deal more damage to and take less from: Hallowed Mimic.",
+   "size": [
+    2,
+    4,
+    1
+   ],
+   "anchor": "wall",
+   "hitPoints": 1,
+   "itemCategory": "furniture",
+   "itemValue": 1000,
+   "banner": {
+    "enemies": [
+     "hallowed_mimic"
+    ]
+   },
+   "tags": [
+    "banner"
+   ]
+  },
+  {
    "id": "harpy_banner",
    "name": "Harpy Banner",
    "description": "Nearby players deal more damage to and take less from: Harpy.",
@@ -1744,6 +1810,28 @@
    "banner": {
     "enemies": [
      "ice_elemental"
+    ]
+   },
+   "tags": [
+    "banner"
+   ]
+  },
+  {
+   "id": "ice_mimic_banner",
+   "name": "Ice Mimic Banner",
+   "description": "Nearby players deal more damage to and take less from: Ice Mimic.",
+   "size": [
+    2,
+    4,
+    1
+   ],
+   "anchor": "wall",
+   "hitPoints": 1,
+   "itemCategory": "furniture",
+   "itemValue": 1000,
+   "banner": {
+    "enemies": [
+     "ice_mimic"
     ]
    },
    "tags": [

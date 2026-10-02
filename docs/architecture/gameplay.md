@@ -529,6 +529,16 @@ cells, `ObjectProbes`), `props.problems` and `errors`.
   sits as `mimic_chest` (built by the Wooden Chest's own generator, yaw squared to 90°; wakes at 1.4 m, lunges); the
   Nymph stands as the `lost_girl` (wakes at 4.5 m). Mimics spawn from the hardmode cavern spawn rule (no worldgen
   placement). Console: `open_disguised`; probe `boss.<id>.disguised`.
+* **Biome Mimics** (`data/enemies/biome_mimics.json`) — Ice, Corrupt, Crimson and Hallowed Mimics: hardmode, rare
+  (`maxAlive` 1), in the underground/cavern layers of their biome; the Ice Mimic replaces the plain Mimic under the snow
+  (the `mimic_cavern` rule excludes `tundra`). Each sits as `<id>_chest`, the `mimic_chest` generator with the exact
+  params of the vault's biome chest (P4-34), so it is indistinguishable from the real one. Loot: the Mimic (and Ice
+  Mimic) roll one of six (`mimic_treasure`); the Ice Mimic adds the Toy Sled; the biome Mimics roll one of their four
+  plus 5–10 Greater Healing Potions. Accessories (`data/items/mimic_loot.json`): Titan Glove = stat `meleeKnockback`
+  (applied to melee hits in `DamageModel.Roll`; every melee weapon already auto-swings here), Philosopher's Stone =
+  stat `potionDelay` (−25 %: `ItemUseSystem.PotionSicknessTicks`), Star Cloak = effect `hurtProjectile`
+  (`ProjectileSystem.CallHurtProjectiles`, run from `NpcSystem.ReportPlayerDamage` for every non-periodic hurt: three
+  stars fall from 16 m onto the ground around the wearer).
 * **Wyvern** — the worm brain with `fly` (`WormBrain.Fly`): constant speed and a limited turn rate so it overshoots and
   loops, a vertical `weave`, ×`catchUp` beyond `farRange`, circling its spawn point without a target; never leaps or
   falls and ignores terrain. `boss.segmentPattern` cycles models along the body (legs every eighth piece; tail last) via

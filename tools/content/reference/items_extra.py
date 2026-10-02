@@ -58,6 +58,20 @@ paladins_hammer|Paladin's Hammer|post-plantera|paladin
 sniper_rifle|Sniper Rifle|post-plantera|skeleton sniper
 shadowbeam_staff|Shadowbeam Staff|post-plantera|necromancer
 cross_necklace|Cross Necklace|hardmode|mimic
+titan_glove|Titan Glove|hardmode|mimic
+philosophers_stone|Philosopher's Stone|hardmode|mimic
+star_cloak|Star Cloak|hardmode|mimic
+worm_hook|Worm Hook|hardmode|corrupt mimic
+chain_guillotines|Chain Guillotines|hardmode|corrupt mimic
+clinger_staff|Clinger Staff|hardmode|corrupt mimic
+putrid_scent|Putrid Scent|hardmode|corrupt mimic
+tendon_hook|Tendon Hook|hardmode|crimson mimic
+fetid_baghnakhs|Fetid Baghnakhs|hardmode|crimson mimic
+life_drain|Life Drain|hardmode|crimson mimic
+flesh_knuckles|Flesh Knuckles|hardmode|crimson mimic
+flying_knife|Flying Knife|hardmode|hallowed mimic
+crystal_vile_shard|Crystal Vile Shard|hardmode|hallowed mimic
+illuminant_hook|Illuminant Hook|hardmode|hallowed mimic
 wizard_hat|Wizard Hat|early|clothier
 """,
     "consumable": """
@@ -180,6 +194,7 @@ gray_paint|Gray Paint|early|painter
 brown_paint|Brown Paint|early|painter
 """,
     "pet": """
+toy_sled|Toy Sled|hardmode|ice mimic
 shadow_orb_light_pet|Shadow Orb (light pet)|early|shadow orb
 crimson_heart_light_pet|Crimson Heart (light pet)|early|crimson heart
 fairy_bell|Fairy Bell|early|gold chest

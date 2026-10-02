@@ -42,6 +42,9 @@ public static class EffectSpecs
     /// <summary>Throws a projectile along the aim with weapon attacks, on its own cooldown (Bone Glove).</summary>
     public const string AttackProjectile = "attackProjectile";
 
+    /// <summary>Projectiles called down on the wearer's surroundings whenever it is hurt (Star Cloak).</summary>
+    public const string HurtProjectile = "hurtProjectile";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -62,6 +65,7 @@ public static class EffectSpecs
         c.Register<InfoParams>(SpecKind.Effect, Info);
         c.Register<InvertControlsParams>(SpecKind.Effect, InvertControls);
         c.Register<AttackProjectileParams>(SpecKind.Effect, AttackProjectile);
+        c.Register<HurtProjectileParams>(SpecKind.Effect, HurtProjectile);
     }
 }
 
@@ -184,4 +188,27 @@ public sealed class AttackProjectileParams : SpecParams, IValidatableSpec
     public float Speed { get; init; } = 14f;
 
     public string? Validate() => Projectile.Length == 0 ? "projectile is required" : Cooldown <= 0 ? "cooldown must be > 0" : null;
+}
+
+/// <summary>
+/// Projectiles that fall on the wearer's surroundings when it is hurt (Terraria's Star Cloak: three stars from above
+/// strike near the player).
+/// </summary>
+public sealed class HurtProjectileParams : SpecParams, IValidatableSpec
+{
+    public string Projectile { get; init; } = "";
+    public int Count { get; init; } = 3;
+    public int Damage { get; init; } = 75;
+    public float Knockback { get; init; } = 5f;
+
+    /// <summary>Height (m) above the wearer they start from.</summary>
+    public float Height { get; init; } = 16f;
+
+    /// <summary>Horizontal scatter (m) of where they start and land.</summary>
+    public float Spread { get; init; } = 5f;
+
+    /// <summary>Fall speed (m/s).</summary>
+    public float Speed { get; init; } = 26f;
+
+    public string? Validate() => Projectile.Length == 0 ? "projectile is required" : Count <= 0 ? "count must be > 0" : null;
 }

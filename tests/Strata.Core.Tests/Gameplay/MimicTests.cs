@@ -1,4 +1,7 @@
 using System.Numerics;
+using System.Text.Json;
+using Strata.Core.Conditions;
+using Strata.Core.World;
 using Strata.Core.Content.Specs;
 using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Entities;
@@ -138,5 +141,78 @@ public class MimicTests
         using var g = Arena();
         foreach (var id in new[] { "devourer", "bone_serpent" })
             Assert.False(g.Content.Enemies.Get(id).Brain.Parse<WormParams>().Fly);
+    }
+    // Biome Mimic -> the vault chest whose look its disguise copies, and the name it passes for.
+    private static readonly (string Mimic, string Chest, string Name)[] BiomeMimics =
+    {
+        ("ice_mimic", "frozen_chest", "Frozen Chest"), ("corrupt_mimic", "corruption_chest", "Corruption Chest"),
+        ("crimson_mimic", "crimson_chest", "Crimson Chest"), ("hallowed_mimic", "hallowed_chest", "Hallowed Chest"),
+    };
+
+    [Fact]
+    public void BiomeMimicsSitDisguisedAsTheirBiomesChest()
+    {
+        using var g = Arena();
+        foreach (var (id, _, name) in BiomeMimics)
+        {
+            var mimic = Spawn(g, id, new Vector3(0, 0.05f, 3f));
+            g.Ticks(5);
+            Assert.True(mimic.Disguised, id);
+            Assert.Equal(id + "_chest", mimic.ShownModel);
+            Assert.Equal(name, mimic.Def.Disguise!.Name);
+            Assert.Equal(InteractOutcome.Unmasked, g.World.Interaction.Interact(g.Player, mimic, Reach(g)));
+            Assert.Equal(id, mimic.ShownModel);
+            mimic.Life = 0;
+            g.Ticks(2);
+        }
+    }
+
+    [Fact]
+    public void EachDisguiseIsBuiltExactlyLikeItsBiomeChest()
+    {
+        static JsonElement Doc(string file) => JsonDocument.Parse(File.ReadAllText(Path.Combine(TestPaths.ProjectRoot, "tools", "blender", "assets.d", file))).RootElement;
+        var chests = Doc("p4-34-biome-chests.json").GetProperty("objects");
+        var disguises = Doc("x-11-biome-mimics.json").GetProperty("creatures");
+        foreach (var (id, chest, _) in BiomeMimics)
+        {
+            var d = disguises.GetProperty(id + "_chest");
+            Assert.Equal("mimic_chest", d.GetProperty("generator").GetString());
+            Assert.Equal(chests.GetProperty(chest).GetProperty("params").GetRawText(), d.GetProperty("params").GetRawText());
+        }
+    }
+
+    private static HashSet<string> Eligible(string biome, WorldLayer layer, bool hardmode)
+    {
+        var ctx = new ConditionContext
+        {
+            Biomes = new[] { biome }, Layer = layer, IsDay = true, Light = 0,
+            Flags = hardmode ? new HashSet<string> { "hardmode" } : new HashSet<string>(),
+        };
+        return TestPaths.Content.SpawnRules.All.Where(r => ConditionCompiler.CompileAll(r.Conditions).Evaluate(ctx)).Select(r => r.Enemy).ToHashSet();
+    }
+
+    [Theory]
+    [InlineData("tundra", WorldLayer.Cavern, "ice_mimic")]
+    [InlineData("tundra", WorldLayer.Underground, "ice_mimic")]
+    [InlineData("corruption", WorldLayer.Underground, "corrupt_mimic")]
+    [InlineData("crimson", WorldLayer.Cavern, "crimson_mimic")]
+    [InlineData("hallow", WorldLayer.Underground, "hallowed_mimic")]
+    public void BiomeMimicsLurkUndergroundInTheirBiomeInHardmode(string biome, WorldLayer layer, string mimic)
+    {
+        Assert.Contains(mimic, Eligible(biome, layer, hardmode: true));
+        Assert.DoesNotContain(mimic, Eligible(biome, layer, hardmode: false));
+        Assert.DoesNotContain(mimic, Eligible(biome, WorldLayer.Surface, hardmode: true));
+        Assert.DoesNotContain(mimic, Eligible("forest", WorldLayer.Cavern, hardmode: true));
+        var rule = TestPaths.Content.SpawnRules.All.Single(r => r.Enemy == mimic);
+        Assert.True(rule.Weight <= 0.12f, "rare");
+        Assert.Equal(1, rule.MaxAlive);
+    }
+
+    [Fact]
+    public void TheIceMimicTakesThePlainMimicsPlaceUnderTheSnow()
+    {
+        Assert.DoesNotContain("mimic", Eligible("tundra", WorldLayer.Cavern, hardmode: true));
+        Assert.Contains("mimic", Eligible("forest", WorldLayer.Cavern, hardmode: true));
+        Assert.Contains("mimic", Eligible("corruption", WorldLayer.Cavern, hardmode: true));
     }
 }

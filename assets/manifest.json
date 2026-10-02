@@ -637,6 +637,12 @@
    ],
    "generator": "banner"
   },
+  "corrupt_mimic_banner": {
+   "models": [
+    "assets/models/objects/corrupt_mimic_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "corrupt_slime_banner": {
    "models": [
     "assets/models/objects/corrupt_slime_banner_v0.glb"
@@ -702,6 +708,12 @@
     "assets/models/objects/crimson_heart_v0.glb"
    ],
    "generator": "evil_orb"
+  },
+  "crimson_mimic_banner": {
+   "models": [
+    "assets/models/objects/crimson_mimic_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "crystal_ball": {
    "models": [
@@ -1553,6 +1565,12 @@
    ],
    "generator": "chest"
   },
+  "hallowed_mimic_banner": {
+   "models": [
+    "assets/models/objects/hallowed_mimic_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "harpy_banner": {
    "models": [
     "assets/models/objects/harpy_banner_v0.glb"
@@ -1616,6 +1634,12 @@
   "ice_elemental_banner": {
    "models": [
     "assets/models/objects/ice_elemental_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ice_mimic_banner": {
+   "models": [
+    "assets/models/objects/ice_mimic_banner_v0.glb"
    ],
    "generator": "banner"
   },
@@ -4497,6 +4521,14 @@
    },
    "icon": "assets/icons/items/cell_phone.png"
   },
+  "chain_guillotines": {
+   "model": "assets/models/items/chain_guillotines.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.04 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/chain_guillotines.png"
+  },
   "chain_gun": {
    "model": "assets/models/items/chain_gun.glb",
    "sockets": {
@@ -4551,6 +4583,14 @@
   "clinger_banner": {
    "object": "clinger_banner",
    "icon": "assets/icons/items/clinger_banner.png"
+  },
+  "clinger_staff": {
+   "model": "assets/models/items/clinger_staff.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/clinger_staff.png"
   },
   "clockwork_assault_rifle": {
    "model": "assets/models/items/clockwork_assault_rifle.glb",
@@ -4794,6 +4834,10 @@
    "model": "assets/models/items/corrupt_crate.glb",
    "icon": "assets/icons/items/corrupt_crate.png"
   },
+  "corrupt_mimic_banner": {
+   "object": "corrupt_mimic_banner",
+   "icon": "assets/icons/items/corrupt_mimic_banner.png"
+  },
   "corrupt_seeds": {
    "model": "assets/models/items/corrupt_seeds.glb",
    "sockets": {
@@ -4869,6 +4913,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crimson_key.png"
+  },
+  "crimson_mimic_banner": {
+   "object": "crimson_mimic_banner",
+   "icon": "assets/icons/items/crimson_mimic_banner.png"
   },
   "crimson_rod": {
    "model": "assets/models/items/crimson_rod.glb",
@@ -4978,6 +5026,14 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crystal_storm.png"
+  },
+  "crystal_vile_shard": {
+   "model": "assets/models/items/crystal_vile_shard.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/crystal_vile_shard.png"
   },
   "cultist_archer_banner": {
    "object": "cultist_archer_banner",
@@ -5607,6 +5663,13 @@
    "object": "festive_lights",
    "icon": "assets/icons/items/festive_lights.png"
   },
+  "fetid_baghnakhs": {
+   "model": "assets/models/items/fetid_baghnakhs.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/fetid_baghnakhs.png"
+  },
   "fiberglass_fishing_pole": {
    "model": "assets/models/items/fiberglass_fishing_pole.glb",
    "icon": "assets/icons/items/fiberglass_fishing_pole.png"
@@ -5698,6 +5761,13 @@
    "model": "assets/models/items/fledgling_wings.glb",
    "icon": "assets/icons/items/fledgling_wings.png"
   },
+  "flesh_knuckles": {
+   "model": "assets/models/items/flesh_knuckles.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/flesh_knuckles.png"
+  },
   "fleshcatcher": {
    "model": "assets/models/items/fleshcatcher.glb",
    "sockets": {
@@ -5753,6 +5823,14 @@
   "flying_fish_banner": {
    "object": "flying_fish_banner",
    "icon": "assets/icons/items/flying_fish_banner.png"
+  },
+  "flying_knife": {
+   "model": "assets/models/items/flying_knife.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.04 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/flying_knife.png"
   },
   "flying_snake_banner": {
    "object": "flying_snake_banner",
@@ -6310,6 +6388,10 @@
    },
    "icon": "assets/icons/items/hallowed_key.png"
   },
+  "hallowed_mimic_banner": {
+   "object": "hallowed_mimic_banner",
+   "icon": "assets/icons/items/hallowed_mimic_banner.png"
+  },
   "hallowed_plate_mail": {
    "model": "assets/models/items/hallowed_plate_mail.glb",
    "armor": "radiant_armor",
@@ -6523,6 +6605,10 @@
    "object": "ice_elemental_banner",
    "icon": "assets/icons/items/ice_elemental_banner.png"
   },
+  "ice_mimic_banner": {
+   "object": "ice_mimic_banner",
+   "icon": "assets/icons/items/ice_mimic_banner.png"
+  },
   "ice_slime_banner": {
    "object": "ice_slime_banner",
    "icon": "assets/icons/items/ice_slime_banner.png"
@@ -6550,6 +6636,13 @@
   "illegal_gun_parts": {
    "model": "assets/models/items/illegal_gun_parts.glb",
    "icon": "assets/icons/items/illegal_gun_parts.png"
+  },
+  "illuminant_hook": {
+   "model": "assets/models/items/illuminant_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/illuminant_hook.png"
   },
   "illuminant_slime_banner": {
    "object": "illuminant_slime_banner",
@@ -6955,6 +7048,14 @@
   "life_crystal": {
    "model": "assets/models/items/life_crystal.glb",
    "icon": "assets/icons/items/life_crystal.png"
+  },
+  "life_drain": {
+   "model": "assets/models/items/life_drain.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 1.18 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/life_drain.png"
   },
   "life_fruit": {
    "model": "assets/models/items/life_fruit.glb",
@@ -8222,6 +8323,10 @@
    },
    "icon": "assets/icons/items/phantasm.png"
   },
+  "philosophers_stone": {
+   "model": "assets/models/items/philosophers_stone.glb",
+   "icon": "assets/icons/items/philosophers_stone.png"
+  },
   "phoenix_blaster": {
    "model": "assets/models/items/phoenix_blaster.glb",
    "sockets": {
@@ -8533,6 +8638,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/purple_paint.png"
+  },
+  "putrid_scent": {
+   "model": "assets/models/items/putrid_scent.glb",
+   "icon": "assets/icons/items/putrid_scent.png"
   },
   "pwnhammer": {
    "model": "assets/models/items/pwnhammer.glb",
@@ -9576,6 +9685,10 @@
    },
    "icon": "assets/icons/items/star_cannon.png"
   },
+  "star_cloak": {
+   "model": "assets/models/items/star_cloak.glb",
+   "icon": "assets/icons/items/star_cloak.png"
+  },
   "star_topper": {
    "object": "star_topper",
    "icon": "assets/icons/items/star_topper.png"
@@ -9773,6 +9886,13 @@
    },
    "icon": "assets/icons/items/temple_key.png"
   },
+  "tendon_hook": {
+   "model": "assets/models/items/tendon_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/tendon_hook.png"
+  },
   "terra_blade": {
    "model": "assets/models/items/terra_blade.glb",
    "sockets": {
@@ -9958,6 +10078,13 @@
    "model": "assets/models/items/tissue_sample.glb",
    "icon": "assets/icons/items/tissue_sample.png"
   },
+  "titan_glove": {
+   "model": "assets/models/items/titan_glove.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/titan_glove.png"
+  },
   "titan_potion": {
    "model": "assets/models/items/titan_potion.glb",
    "icon": "assets/icons/items/titan_potion.png"
@@ -10080,6 +10207,10 @@
   "torch": {
    "object": "torch",
    "icon": "assets/icons/items/torch.png"
+  },
+  "toy_sled": {
+   "model": "assets/models/items/toy_sled.glb",
+   "icon": "assets/icons/items/toy_sled.png"
   },
   "trapped_ghost": {
    "object": "trapped_ghost",
@@ -10680,6 +10811,13 @@
    "model": "assets/models/items/worm_food.glb",
    "icon": "assets/icons/items/worm_food.png"
   },
+  "worm_hook": {
+   "model": "assets/models/items/worm_hook.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/worm_hook.png"
+  },
   "worm_scarf": {
    "model": "assets/models/items/worm_scarf.glb",
    "icon": "assets/icons/items/worm_scarf.png"
@@ -11005,6 +11143,20 @@
     "walk"
    ]
   },
+  "corrupt_mimic": {
+   "model": "assets/models/creatures/corrupt_mimic.glb",
+   "generator": "mimic",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
+  },
+  "corrupt_mimic_chest": {
+   "model": "assets/models/creatures/corrupt_mimic_chest.glb",
+   "generator": "mimic_chest",
+   "animations": []
+  },
   "crab": {
    "model": "assets/models/creatures/crab.glb",
    "generator": "crab",
@@ -11024,6 +11176,20 @@
    "animations": [
     "fly"
    ]
+  },
+  "crimson_mimic": {
+   "model": "assets/models/creatures/crimson_mimic.glb",
+   "generator": "mimic",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
+  },
+  "crimson_mimic_chest": {
+   "model": "assets/models/creatures/crimson_mimic_chest.glb",
+   "generator": "mimic_chest",
+   "animations": []
   },
   "cultist_archer": {
    "model": "assets/models/creatures/cultist_archer.glb",
@@ -11799,6 +11965,20 @@
     "walk"
    ]
   },
+  "hallowed_mimic": {
+   "model": "assets/models/creatures/hallowed_mimic.glb",
+   "generator": "mimic",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
+  },
+  "hallowed_mimic_chest": {
+   "model": "assets/models/creatures/hallowed_mimic_chest.glb",
+   "generator": "mimic_chest",
+   "animations": []
+  },
   "harpy": {
    "model": "assets/models/creatures/harpy.glb",
    "generator": "humanoid",
@@ -11859,6 +12039,20 @@
    "animations": [
     "fly"
    ]
+  },
+  "ice_mimic": {
+   "model": "assets/models/creatures/ice_mimic.glb",
+   "generator": "mimic",
+   "animations": [
+    "attack",
+    "idle",
+    "walk"
+   ]
+  },
+  "ice_mimic_chest": {
+   "model": "assets/models/creatures/ice_mimic_chest.glb",
+   "generator": "mimic_chest",
+   "animations": []
   },
   "ice_queen": {
    "model": "assets/models/creatures/ice_queen.glb",

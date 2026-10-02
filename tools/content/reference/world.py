@@ -86,6 +86,10 @@ giant_shelly|Giant Shelly|early|cavern|walker
 nymph|Nymph|early|cavern|walker,rare
 tim|Tim|early|cavern|caster,rare
 mimic|Mimic|early|cavern|hop,rare
+ice_mimic|Ice Mimic|hardmode|underground snow|hop,rare
+corrupt_mimic|Corrupt Mimic|hardmode|underground corruption|hop,rare
+crimson_mimic|Crimson Mimic|hardmode|underground crimson|hop,rare
+hallowed_mimic|Hallowed Mimic|hardmode|underground hallow|hop,rare
 unicorn|Unicorn|hardmode|hallow|charger
 pixie|Pixie|hardmode|hallow|flyer
 illuminant_slime|Illuminant Slime|hardmode|underground hallow|hop
