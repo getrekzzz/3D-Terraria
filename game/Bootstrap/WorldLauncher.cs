@@ -30,6 +30,12 @@ public sealed class LaunchedWorld
     public UI.WorldMapScreen? WorldMap { get; init; }
     public UI.PhotoMode.PhotoModeController? PhotoMode { get; init; }
 
+    /// <summary>The item tooltip that follows the pointer.</summary>
+    public UI.TooltipFollower? Tooltip { get; init; }
+
+    /// <summary>The stack held on the cursor, drawn at the pointer.</summary>
+    public UI.CursorItemLayer? CursorItem { get; init; }
+
     /// <summary>The haircut and housing screens (P5-21, P5-29).</summary>
     public UI.TownPanels? TownPanels { get; init; }
 }
@@ -96,8 +102,13 @@ public static partial class WorldLauncher
         combatEffects.Follow(entity, player);
         var avatar = AddPlayerVisuals(runtime, services, game, props, entity, player);
         var interaction = AddInteraction(runtime, game, entity, player);
-        var (hud, inventory, worldMap, townDialog, photo, town) = AddUi(runtime, game, player, interaction, objectRenderer);
-        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap, PhotoMode = photo, TownPanels = town };
+        var (hud, inventory, worldMap, townDialog, photo, tooltip, cursorItem, town) = AddUi(runtime, game, player, interaction, objectRenderer);
+        return new LaunchedWorld
+        {
+            Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction,
+            Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap, PhotoMode = photo, Tooltip = tooltip,
+            CursorItem = cursorItem, TownPanels = town,
+        };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

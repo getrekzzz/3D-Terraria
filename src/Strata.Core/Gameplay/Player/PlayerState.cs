@@ -107,7 +107,7 @@ public sealed class PlayerState
             SetBonus ??= piece.SetBonus;
         }
         foreach (var b in Buffs.Active)
-            foreach (var e in b.Def.Effects) Effects.Apply(e);
+            foreach (var e in b.Def.Effects) Effects.Apply(e, b.Def);
         Defense = (int)Effects.Stats.Get(StatIds.Defense, defense);
         Vitals.MaxLife = (int)Effects.Stats.Get(StatIds.MaxLife, BaseLife + BonusLife);
         Vitals.MaxMana = (int)Effects.Stats.Get(StatIds.MaxMana, BaseMana + BonusMana);

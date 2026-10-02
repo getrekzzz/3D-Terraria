@@ -54,7 +54,7 @@ public sealed partial class DebugConsole : CanvasLayer
     public void Toggle()
     {
         _panel.Visible = !_panel.Visible;
-        InputGate.SetOpen(GateName, _panel.Visible);
+        InputGate.SetOpen(GateName, _panel.Visible, GateKind.Modal);
         InputGate.TextEntry = _panel.Visible;
         if (_panel.Visible)
         {

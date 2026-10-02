@@ -9,8 +9,10 @@
 │ Player: PlayerController, CameraRig, PlayerAvatar,                │
 │         InteractionController, TargetHighlight                    │
 │ Entities: NpcRenderer, TownRenderer, ProjectileRenderer, effects  │
-│ UI: Hud, InventoryScreen, CraftingPanel, TownDialog, DebugConsole,│
-│     PerfOverlay                                                   │
+│ UI (see ui.md): UiTheme, UiFonts, Hud and its layout widgets,     │
+│     InventoryScreen (chest, shop, reforge, crafting, equipment),  │
+│     TownDialog, TooltipFollower, CursorItemLayer, PauseMenu,      │
+│     DebugConsole, PerfOverlay · Menu: MainMenu, SettingsScreen    │
 │ Rendering: PropLibrary, CharacterMaterials, CreatureVisual,       │
 │        LightProbe, GraphicsSettings, shaders/ (see rendering.md)  │
 │ Ambience: EnvironmentController, Atmosphere, SkyNoise             │

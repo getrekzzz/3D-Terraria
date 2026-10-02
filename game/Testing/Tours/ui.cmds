@@ -1,0 +1,143 @@
+# UI screenshot tour: the Terraria-style HUD, buffs, the chest and crafting columns, the NPC chat box and shop, the boss
+# and invasion bars and the death screen, then the HUD, the inventory and the pause menu at UI scale 1.5. Every shot
+# first asserts that no two layout widgets overlap (ui.overlaps == 0).
+# Rendering required for images (headless runs only exercise the route); run it once per resolution:
+#   godot --path . --rendering-driver vulkan --resolution 1280x720 -- --world=ui-tour --size=tiny --new --player=tour \
+#         --fresh-player --view=2 --graphics=medium --shots=/tmp/shots --smoke=res://game/Testing/Tours/ui.cmds
+wait_until player.frozen == 0 300
+perf start
+spawning off
+town arrivals off
+god on
+killall
+camera third
+time noon
+uiscale 1
+
+# A small stone arena with open air above it.
+fill -8 -3 -8 8 -1 8 stone
+fill -8 0 -8 8 7 8 air
+aim 0 -0.15 1
+heal
+wait 1
+wait_until stream.idle == 1 900
+assert ui.overlaps == 0
+screenshot ui_01_hud
+wait_until screenshot.pending == 0 900
+
+# Three potions put three icons with timers on the buff bar.
+give swiftness_potion 1
+wield swiftness_potion
+use
+wait 0.4
+give ironskin_potion 1
+wield ironskin_potion
+use
+wait 0.4
+give regeneration_potion 1
+wield regeneration_potion
+use
+wait 0.4
+select 0
+assert hud.buffs >= 3
+assert ui.overlaps == 0
+screenshot ui_02_buffs
+wait_until screenshot.pending == 0 900
+
+# A work bench and a wooden chest: interacting opens the chest under the grid, with the crafting column bottom-left.
+place work_bench 3 0 -3
+place wooden_chest 0 0 -3
+give wood 30
+give gel 4
+interact 0 0 -3
+wait 0.6
+assert ui.panel == 1
+assert ui.overlaps == 0
+screenshot ui_03_chest
+wait_until screenshot.pending == 0 900
+ui close
+wait 0.2
+ui inventory
+wait 0.6
+ui craft torch 1
+assert ui.recipes > 0
+assert ui.overlaps == 0
+screenshot ui_04_crafting
+wait_until screenshot.pending == 0 900
+ui close
+wait 0.2
+
+# The merchant's chat box at the top centre, then his shop in the inventory's panel host.
+town summon merchant 0 0 -4
+wait 0.5
+ui talk merchant
+wait 0.4
+assert ui.talk_open == 1
+assert ui.overlaps == 0
+screenshot ui_05_npc_chat
+wait_until screenshot.pending == 0 900
+give silver_coin 50
+ui shop
+wait 0.4
+assert ui.panel == 2
+assert ui.overlaps == 0
+screenshot ui_06_shop
+wait_until screenshot.pending == 0 900
+ui close
+wait 0.2
+town dismiss merchant
+
+# King Slime's boss bar bottom-centre, then the Goblin Army's progress bottom-right beside it.
+boss king_slime 12
+wait 1.5
+assert ui.bossbar == 1
+assert ui.overlaps == 0
+screenshot ui_07_bossbar
+wait_until screenshot.pending == 0 900
+event goblin_army
+wait 1
+assert ui.eventbar == 1
+assert ui.overlaps == 0
+screenshot ui_08_invasion
+wait_until screenshot.pending == 0 900
+event stop goblin_army
+killall
+wait 0.5
+
+# The death screen.
+god off
+heal
+kill
+wait 0.8
+assert ui.death_dim == 1
+screenshot ui_09_death
+wait_until screenshot.pending == 0 900
+wait_until player.alive == 1 30
+god on
+wait 1.5
+
+# The HUD and the inventory at UI scale 1.5 (the window may lower the effective scale; probe ui.scale).
+uiscale 1.5
+heal
+wait 0.5
+assert ui.overlaps == 0
+screenshot ui_10_hud_150
+wait_until screenshot.pending == 0 900
+ui inventory
+wait 0.6
+assert ui.overlaps == 0
+assert ui.settings_button == 1
+screenshot ui_11_inventory_150
+wait_until screenshot.pending == 0 900
+
+# The inventory's Settings button opens the pause menu over it: a centred blue panel of text buttons.
+ui settings
+wait 0.4
+assert ui.paused == 1
+screenshot ui_12_pause_150
+wait_until screenshot.pending == 0 900
+ui close
+uiscale 1
+# Where the frame time went (gd.hud, gd.inventory_ui, gd.slot_views, gd.tooltip: the UI's own work per frame).
+perf report 60
+assert errors == 0

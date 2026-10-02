@@ -70,6 +70,17 @@ public class ProbeSourceTests
     }
 
     [Fact]
+    public void HotbarProbeReadsTheSelectedSlotZeroBased()
+    {
+        var (g, ctx) = Setup();
+        using var _ = g;
+        g.Player.State.Inventory.Select(2);
+        Assert.Equal(2, ctx.ReadProbe("player.hotbar"));
+        g.Player.State.Inventory.Select(-1); // the wheel wraps
+        Assert.Equal(9, ctx.ReadProbe("player.hotbar"));
+    }
+
+    [Fact]
     public void SourcesRegisterInFullNameOrder()
     {
         var sources = ProbeSources.In(typeof(ProbeSourceTests).Assembly);
