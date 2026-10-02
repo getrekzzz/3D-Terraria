@@ -16,6 +16,12 @@ public sealed class SpawnConfig
 {
     public int CheckInterval { get; init; } = 60;
 
+    /// <summary>Hostile creatures go after town residents within this distance (m) when no player is closer.</summary>
+    public float ResidentAggroRange { get; init; } = 14f;
+
+    /// <summary>A resident is chosen only when nearer than the player by this much (m).</summary>
+    public float PlayerPreference { get; init; } = 4f;
+
     /// <summary>Chance per check that a spawn is attempted by day.</summary>
     public float Chance { get; init; } = 0.10f;
 

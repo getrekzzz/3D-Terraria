@@ -14,7 +14,7 @@ public enum ResidentActivity
 }
 
 /// <summary>A town resident living in the world: identity, home, body and current errand.</summary>
-public sealed class TownNpc
+public sealed class TownNpc : Combat.ICombatTarget
 {
     public static readonly Vector3 HalfExtents = new(0.35f, 0.9f, 0.35f);
 
@@ -77,6 +77,14 @@ public sealed class TownNpc
     internal List<Voxels.TileObjects.TileObjectInstance> OpenedDoors { get; } = new();
 
     public Vector3 Center => Position + new Vector3(0, HalfExtents.Y, 0);
+
+    public Vector3 Eye => Position + new Vector3(0, 1.5f, 0);
+
+    public Int3 FeetCell => Physics.VoxelMotion.CellOf(Position + new Vector3(0, 0.05f, 0));
+
+    Vector3 Combat.ICombatTarget.Position => Position;
+
+    Vector3 Combat.ICombatTarget.Velocity => Velocity;
 
     /// <summary>Animation pose for the renderer: idle, walk, jump.</summary>
     public string Pose => !OnGround ? "jump" : new Vector2(Velocity.X, Velocity.Z).LengthSquared() > 0.05f ? "walk" : "idle";

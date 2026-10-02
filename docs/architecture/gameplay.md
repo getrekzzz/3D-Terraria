@@ -547,3 +547,8 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   (a reserved site). The other rescues search: Goblin and Wizard in the caverns, Stylist in spider nests (sampled
   inside the nest features), Golfer in the underground desert, Angler on the ocean surface, Tavernkeep on the
   surface, the Tortured Soul in the underworld. A `rescued` condition on an NPC without a rescue block is an error.
+* **Residents as targets** (P5-09, `NpcSystem.Targeting.cs`): `TownNpc` is an `ICombatTarget`. Ordinary hostile
+  creatures go after the nearest counting resident within `residentAggroRange` (14 m) when it is `playerPreference`
+  (4 m) nearer than the nearest player, re-chosen every 15 ticks; bosses, parts, critters, passive, harmless,
+  invulnerable and disguised creatures stay on players, and bound NPCs are never targets. Despawn, enrage and contact
+  damage still follow the nearest player; residents take contact hits through `TownSystem`.

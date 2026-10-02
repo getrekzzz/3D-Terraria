@@ -8,7 +8,7 @@ namespace Strata.Core.Gameplay.Entities;
 public sealed partial class NpcSystem
 {
     /// <summary>Fires the creature's ranged volley at its target when in range, in sight and off cooldown.</summary>
-    private void RangedAttack(Npc npc, PlayerEntity target, float distance)
+    private void RangedAttack(Npc npc, Combat.ICombatTarget target, float distance)
     {
         var r = npc.Def.Ranged!;
         if (npc.Enraged && r.Enraged != null) r = r.Enraged;
