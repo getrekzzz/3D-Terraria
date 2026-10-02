@@ -46,5 +46,20 @@ assert hints.enabled == 0
 hint on
 assert hints.enabled == 1
 hint
+# The Guide book (P5-30/31): Items tab with sources, Bestiary tab after the zombie kill, the Guide tab, closing.
+wait_until ui.book_ready == 1 20
+book items
+assert ui.book_open == 1
+assert ui.book_tab == 0
+assert ui.book_items > 100
+book item torch
+assert ui.book_sources >= 2
+book item gel
+assert ui.book_sources >= 2
+book entry shelter
+assert ui.book_tab == 2
+assert ui.book_guide == 1
+book close
+assert ui.book_open == 0
 wait 0.5
 assert errors == 0

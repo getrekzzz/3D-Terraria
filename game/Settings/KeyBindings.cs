@@ -19,7 +19,7 @@ public static class KeyBindings
         ("move_forward", "Move forward"), ("move_back", "Move back"), ("move_left", "Move left"), ("move_right", "Move right"),
         ("jump", "Jump"), ("sprint", "Sprint"), ("crouch", "Drop through platforms"),
         ("use_primary", "Use item / attack"), ("use_secondary", "Interact / place"), ("interact", "Interact"),
-        ("inventory", "Inventory"), ("toggle_camera", "Toggle first/third person"), ("precision_mode", "Precision (small blocks)"),
+        ("inventory", "Inventory"), ("guide_book", "Guide book"), ("toggle_camera", "Toggle first/third person"), ("precision_mode", "Precision (small blocks)"),
         ("cycle_shape", "Cycle block shape"), ("rotate_shape", "Rotate block shape"), ("drop_item", "Drop item"), ("grapple", "Grappling hook"),
         ("quick_mount", "Quick mount"), ("pause", "Menu / pause"), ("console", "Console"), ("debug_overlay", "Performance overlay"),
         ("photo_mode", "Photo mode"), ("photo_shot", "Photo mode: take picture"),

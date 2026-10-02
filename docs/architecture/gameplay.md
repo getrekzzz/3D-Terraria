@@ -572,3 +572,19 @@ type into English ("at night", "after the Eye of Cthulhu is defeated", "during a
 town", "carrying 50 silver"); unknown types read as their name. `TownCommerce.RecipesUsing` now reads the index.
 Not yet: the Guide's TownDialog slot panel (GuideCraftPanel, `ui guide_craft`) waits for the W4 TownDialog; the
 Guide book's Items tab shows the same views.
+
+## Guide book and Items tab (P5-30)
+
+`game/UI/GuideBook/GuideBookScreen.cs` (CanvasLayer 24, gate `guide`, node `GuideBook`, added in
+`WorldLauncher.AddUi`) toggles with `guide_book` (K; G is the quick mount) and closes on Esc. It is built on first
+open; each `IGuideTab` (Items, Bestiary, Guide) builds on its first selection. Core `GuideIndex` (items by name with
+search keys, `ItemSourceIndex` rows as `SourceView` with `DropRates` chances and `ConditionDescriber` text, its own
+`RecipeLookup`) is built by `GuideIndex.BuildAsync` on a worker thread at launch; the Items tab says "Loading…" until
+then. Items tab: search (sets `InputGate.TextEntry` while focused), category filter, names at once and icons 16 a
+frame; `ItemDetails` shows the tooltip lines, "Obtained from" (rows link to creatures and items), "Crafted from",
+"Used in" (8 recipe cards a page; ingredients link) and "Crafting station for N recipes", with Back history; rebuilt
+only on selection. Guide tab: the advisor's steps (✓ done, ▶ next) and the tips. A hint's Guide link (X-10): pressing
+K while a hint with a `guide` entry is up opens the book there. Command `book <tab|item|bestiary|entry <id>|close>`;
+probes `ui.book_open`, `ui.book_ready`, `ui.book_tab`, `ui.book_items`, `ui.book_sources`, `ui.book_guide`.
+Not yet: Bosses/NPCs/Achievements tabs, the inventory's book button (InventoryScreen is W4-owned), a page-turn sound.
+

@@ -92,7 +92,7 @@ public partial class HintToast : CanvasLayer
         if (!_game.Hints.Enabled) { _queue.Clear(); return; }
         _text.Text = Format(def.Text);
         string? guide = GuideName(def.Guide);
-        _guide.Text = guide != null ? $"Guide book: {guide}" : "";
+        _guide.Text = guide != null ? $"Guide book: {guide}  [{KeyBindings.Label("guide_book")}]" : "";
         _guide.Visible = guide != null;
         _panel.Visible = true;
         _panel.ResetSize();
