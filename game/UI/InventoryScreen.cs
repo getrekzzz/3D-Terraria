@@ -100,12 +100,18 @@ public sealed partial class InventoryScreen : CanvasLayer
         for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
     }
 
-    /// <summary>Shows a chest the player opened under the grid (another one is put away first) and opens the screen.</summary>
+    /// <summary>
+    /// Shows a chest the player opened under the grid (another one is put away first, with its creak; the one already
+    /// shown just stays) and opens the screen.
+    /// </summary>
     private void OpenChest(TileObjectInstance obj)
     {
-        HidePanel();
-        _chest.Open(obj);
-        ShowPanel(_chest, UiPanel.Chest);
+        if (_panel != _chest || _chest.Container != obj)
+        {
+            HidePanel();
+            _chest.Open(obj);
+            ShowPanel(_chest, UiPanel.Chest);
+        }
         SetOpen(true);
     }
 

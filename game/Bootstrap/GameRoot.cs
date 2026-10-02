@@ -124,6 +124,7 @@ public partial class GameRoot : Node
             {
                 Name = name, Seed = args.Long("seed", 1234),
                 Size = System.Enum.Parse<WorldSizePreset>(args.Get("size") ?? "small", ignoreCase: true),
+                Difficulty = System.Enum.Parse<Difficulty>(args.Get("difficulty") ?? "classic", ignoreCase: true),
             },
             ForceNew = args.Flag("new"),
             PlayerName = args.Get("player") ?? "Wanderer",
