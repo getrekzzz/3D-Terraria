@@ -93,8 +93,18 @@ killall
 boss golem 14
 wait 2
 assert npcs.golem == 1
+# Golem's sealed body carries its head and two punching fists; the broken head flies free until the body falls (P4-31).
+assert npcs.golem_head == 1
+assert npcs.golem_fist == 2
+slay golem_head
+assert npcs.golem_head_free == 1
+assert flag.defeated_golem == 0
+wait 1
 slay golem
 assert flag.defeated_golem == 1
+wait 0.5
+assert npcs.golem_head_free == 0
+assert npcs.golem_fist == 0
 killall
 boss duke_fishron 14
 wait 2

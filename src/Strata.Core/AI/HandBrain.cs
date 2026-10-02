@@ -11,8 +11,9 @@ namespace Strata.Core.AI;
 /// strikes through where the target stood — a slap dropping from above, or a sideways swipe — then flies back. It holds
 /// its rest while its leader spins, flies through walls, and takes its leader's rage (damage, defense and speed).
 /// Prime's tools use the same phases in their own styles (<c>HandBrain.Styles</c>): the saw jabs without a wind-up,
-/// the vice creeps up before its lunge, and gun arms hold their place while their ranged attack fires.
-/// Phase: 0 rest, 1 wind-up, 2 strike, 3 recover. Counter = attacks made; Direction = strike velocity.
+/// the vice creeps up before its lunge, and gun arms hold their place while their ranged attack fires; Golem's fists
+/// punch out like a jab and hold there a moment before they retract.
+/// Phase: 0 rest, 1 wind-up, 2 strike, 3 recover, 4 hold (a punch). Counter = attacks made; Direction = strike velocity.
 /// </summary>
 public sealed partial class HandBrain : IBrain
 {
@@ -45,7 +46,7 @@ public sealed partial class HandBrain : IBrain
         int interval = Math.Max(1, (int)(_p.AttackInterval * (ctx.Expert ? _p.ExpertInterval : 1f)));
         var target = ctx.Target;
         bool leaderSpins = leader is { Phase: 1 } && leader.Def.Brain.Type == BrainSpecs.CryptWarden;
-        if (target == null && npc.Phase is 1 or 2) Begin(npc, 3);
+        if (target == null && npc.Phase is 1 or 2 or 4) Begin(npc, 3);
         npc.Timer++;
         switch (npc.Phase)
         {
@@ -72,7 +73,12 @@ public sealed partial class HandBrain : IBrain
             case 2:
                 npc.Velocity = npc.Direction;
                 npc.Pose = "attack";
-                if (npc.Timer >= npc.Counter2) Begin(npc, 3);
+                if (npc.Timer >= npc.Counter2) Begin(npc, _p.Style == HandParams.Punch && _p.HoldTicks > 0 ? 4 : 3);
+                return;
+            case 4:
+                npc.Velocity = Vector3.Zero; // a punch stays out a moment
+                npc.Pose = "attack";
+                if (npc.Timer >= _p.HoldTicks) Begin(npc, 3);
                 return;
             case 3:
             {
@@ -107,7 +113,7 @@ public sealed partial class HandBrain : IBrain
         }
         int wait = interval + (npc.Counter == 0 && side > 0 ? interval / 2 : 0);
         if (npc.Timer < wait) return;
-        if (_p.Style == HandParams.Saw) Jab(npc, ctx, target.Center, speedMul);
+        if (_p.Style is HandParams.Saw or HandParams.Punch) Jab(npc, ctx, target.Center, speedMul);
         else Begin(npc, 1);
     }
 

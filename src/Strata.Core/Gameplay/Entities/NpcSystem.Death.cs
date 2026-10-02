@@ -36,6 +36,8 @@ public sealed partial class NpcSystem
         npc.Life = 0;
         foreach (var f in npc.Followers)
             if (f.IsPart && f.Part is { DiesWithBody: true }) f.Life = 0; // FollowLeader removes them next tick
+        foreach (var n in _npcs)
+            if (n.BoundTo == npc) n.Life = 0; // bound children (Golem's freed head) fall with it, removed the same way
         if (npc.Def.Boss is { SegmentLife.Length: > 0, SegmentLoot: not null }) RollSegmentLoot(npc, npc.Center); // the head is a segment too
         var cell = npc.Cell;
         bool defeat = npc.Def.Boss is { Minor: false } group && !GroupAlive(group, npc);
@@ -80,6 +82,14 @@ public sealed partial class NpcSystem
                 case CreatureEffectSpecs.SpawnEnemies:
                     var spawn = fx.Parse<SpawnEnemiesParams>();
                     if (!content.Enemies.TryGet(spawn.Enemy, out var child)) break;
+                    if (spawn.Tether)
+                    {
+                        // Bound to the body: rises where the part fell, without the scatter or the toss.
+                        var body = npc.Leader is { Alive: true, Removed: false } l ? l : null;
+                        for (int i = 0; i < spawn.Count; i++)
+                            if (Spawn(child, npc.Position) is { } bound) bound.BoundTo = body;
+                        break;
+                    }
                     for (int i = 0; i < spawn.Count; i++)
                         if (Spawn(child, npc.Position + new Vector3(_rng.NextSigned() * 0.6f, 0.2f, _rng.NextSigned() * 0.6f)) is { } c)
                             c.Velocity = new Vector3(_rng.NextSigned() * 3f, 4f, _rng.NextSigned() * 3f);

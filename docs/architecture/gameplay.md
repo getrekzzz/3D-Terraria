@@ -167,6 +167,15 @@
   holds while her target is outside `underground_jungle`. `NpcRenderer.Tethers` draws a pooled vine cylinder (one
   material per `tetherColor`) from a living leader's centre to every tethered follower with a tether colour, and from
   the anchor for rooted lungers.
+* **Golem** — the `golem` body (`golem_body` model, ground pattern of walks and hops) has boss `parts`: `golem_head`
+  (an anchored pattern brain firing fireballs, eye beams below half life; it carries the same boss flag, `inBossBar`)
+  and two `golem_fist`s (`skeletronHand` style `punch`: the saw's jab, reach 16 m, held `holdTicks` before it
+  retracts; chains via `tetherColor`). The body's first phase is `shieldedBy` the head with `untilGuardsFall`, so it is
+  sealed until the head dies. The head's `onDeath` `spawnEnemies` with `tether: true` raises `golem_head_free`
+  (invulnerable flyer with a laser `ranged`) bound to the body through `Npc.BoundTo`: it moves on its own, is removed
+  without loot once the body dies or goes, and holds no boss flag, so the body's death is the one defeat. Outside
+  `jungle_temple` Golem and its parts are enraged (×1.5 damage and speed). The old one-piece `golem` creature model is
+  retired; its `golem_idol` generator stays for the trophy.
 * **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
   at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
   `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster

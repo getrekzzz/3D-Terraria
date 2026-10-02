@@ -5,11 +5,14 @@ using Strata.Core.Gameplay.Entities;
 
 namespace Strata.Core.AI;
 
-/// <summary>Skeletron Prime's tools: the saw's jabs and the vice's creeping wind-up ("hold" needs no motion of its own).</summary>
+/// <summary>
+/// Skeletron Prime's tools: the saw's jabs and the vice's creeping wind-up ("hold" needs no motion of its own). Golem's
+/// "punch" is the same jab (its reach is the chain's length), followed by a hold in <c>HandBrain.Think</c>.
+/// </summary>
 public sealed partial class HandBrain
 {
     /// <summary>
-    /// "saw": no wind-up, a straight jab at the target that stops <see cref="HandParams.Reach"/> from the arm's place on
+    /// "saw" and "punch": no wind-up, a straight jab at the target that stops <see cref="HandParams.Reach"/> from the arm's place on
     /// the body (or just past the target when nearer), then the usual return.
     /// </summary>
     private void Jab(Npc npc, BrainContext ctx, Vector3 target, float speedMul)

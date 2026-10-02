@@ -4435,10 +4435,6 @@
         "open": true
       }
     },
-    "golem": {
-      "generator": "golem_idol",
-      "params": {}
-    },
     "golem_body": {
       "generator": "golem_body",
       "params": {}

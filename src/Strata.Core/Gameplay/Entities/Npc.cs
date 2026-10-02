@@ -139,6 +139,12 @@ public sealed class Npc
     /// <summary>The creature this one is tethered to (a boss's hungry mouths): its anchor follows the leader and it dies with it.</summary>
     public Npc? Leader { get; set; }
 
+    /// <summary>
+    /// A creature this one lives and dies with but does not follow (Golem's freed head): it is removed, without loot,
+    /// once that creature dies or goes.
+    /// </summary>
+    public Npc? BoundTo { get; set; }
+
     /// <summary>Anchor offset from the leader's centre.</summary>
     public Vector3 LeaderOffset { get; set; }
 

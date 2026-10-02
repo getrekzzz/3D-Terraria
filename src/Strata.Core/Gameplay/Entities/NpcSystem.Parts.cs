@@ -11,11 +11,12 @@ public sealed partial class NpcSystem
     private const float BarrierThrow = 16f;
 
     /// <summary>
-    /// Keeps a tethered follower's anchor on its leader; false when the leader is gone (it goes too, without loot). A
+    /// Keeps a tethered follower's anchor on its leader; false when the leader (or the creature it is bound to) is gone (it goes too, without loot). A
     /// boss part that does not die with its body is cut loose instead and fights on.
     /// </summary>
     private static bool FollowLeader(Npc npc)
     {
+        if (npc.BoundTo is { } bound && (!bound.Alive || bound.Removed)) return false;
         if (npc.Leader is not { } leader) return true;
         if (!leader.Alive || leader.Removed)
         {

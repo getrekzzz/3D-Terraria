@@ -4268,11 +4268,6 @@
     "walk"
    ]
   },
-  "golem": {
-   "model": "assets/models/creatures/golem.glb",
-   "generator": "golem_idol",
-   "animations": []
-  },
   "golem_body": {
    "model": "assets/models/creatures/golem_body.glb",
    "generator": "golem_body",
