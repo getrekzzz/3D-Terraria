@@ -23,7 +23,8 @@ public enum UiPanel { None, Chest, Shop, Service }
 /// <summary>
 /// What the interface is showing, which decides where everything goes. <see cref="BuffCount"/> is the number of buff
 /// icons, <see cref="AccessoryRows"/> the accessory rows of the equipment column (5–7), <see cref="InfoLines"/> the
-/// rows of the info panel and <see cref="DebugOverlay"/> whether the F3 performance overlay is open.
+/// rows of the info panel, <see cref="DebugOverlay"/> whether the F3 performance overlay is open and
+/// <see cref="BossBars"/> how many boss bars are stacked while <see cref="BossBar"/> is up (1–3).
 /// </summary>
 public sealed record UiState(
     bool InventoryOpen = false,
@@ -35,7 +36,8 @@ public sealed record UiState(
     int AccessoryRows = 5,
     bool ShowMinimap = true,
     int InfoLines = 0,
-    bool DebugOverlay = false);
+    bool DebugOverlay = false,
+    int BossBars = 1);
 
 /// <summary>The named screen regions of <see cref="UiLayout"/>; each widget reads the rectangle of its own region.</summary>
 public static class UiRegion
@@ -143,7 +145,7 @@ public static partial class UiLayout
     public const float InfoWidth = MinimapSize;
     public const float InfoMinWidth = 160;
     public const float InfoLine = 18;
-    public const float CrosshairWidth = 240; // reticle, the interact key hint to its right and the target label below
+    public const float CrosshairWidth = 480; // reticle, the interact key hint to its right and the hover name below-right
     public const float CrosshairHeight = 56;
     public const float CrosshairTop = 16; // the reticle sits this far below the region's top
     public const float BreathWidth = 200;
@@ -217,6 +219,13 @@ public static partial class UiLayout
     {
         int rows = 3 + Math.Clamp(accessoryRows, 0, 7);
         return SortButton + Gap + rows * EquipSlot * scale + (rows - 1) * Gap;
+    }
+
+    /// <summary>Height of <paramref name="bars"/> boss bars stacked with a gap between them (one at least).</summary>
+    public static float BossBarsHeight(int bars)
+    {
+        int n = Math.Clamp(bars, 1, BossBarModel.MaxBars);
+        return n * BossBarHeight + (n - 1) * Gap;
     }
 
     /// <summary>Width of the equipment column: the defense badge, Dye | Vanity | Equip and the visibility toggles.</summary>

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Numerics;
 using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Entities;
@@ -109,5 +110,58 @@ public class BossBarModelTests
         Assert.Equal("Moon Lord", bar.Title);
         Assert.Equal("moon_lord", bar.IconId);
         Assert.Equal(core.MaxLife + parts.Where(p => p != hand).Sum(p => (long)p.MaxLife), bar.Max);
+    }
+
+    private static List<BossBarState> Bars(TestGame g)
+    {
+        var bars = new List<BossBarState>();
+        BossBarModel.Compute(g.World.Npcs.All, bars);
+        return bars;
+    }
+
+    [Fact]
+    public void EachBossGroupGetsItsOwnBarLargestFirst()
+    {
+        using var g = Arena();
+        var slime = Boss(g, "king_slime");
+        var eye = Boss(g, "eye_of_cthulhu");
+        var bars = Bars(g);
+        Assert.Equal(2, bars.Count);
+        var (big, small) = eye.MaxLife >= slime.MaxLife ? (eye, slime) : (slime, eye);
+        Assert.Equal(big.Def.Boss!.Title, bars[0].Title);
+        Assert.Equal(small.Def.Boss!.Title, bars[1].Title);
+        Assert.Equal(small.MaxLife, bars[1].Max);
+        Assert.NotEqual(bars[0].Group, bars[1].Group);
+        // The single-bar form is the first of them.
+        Assert.Equal(bars[0], Bar(g));
+    }
+
+    [Fact]
+    public void TheTwinsShareOneBarBesideAnotherMechanicalBoss()
+    {
+        using var g = Arena();
+        Boss(g, "retinazer");
+        var prime = Boss(g, "skeletron_prime");
+        var bars = Bars(g);
+        Assert.Equal(2, bars.Count);
+        Assert.Contains(bars, b => b.Title == "The Twins");
+        var primeBar = Assert.Single(bars, b => b.Title == prime.Def.Boss!.Title);
+        Assert.Equal("skeletron_prime", primeBar.IconId);
+        Assert.Equal(BossBarModel.Compute(g.World.Npcs.All)!.Value.Group, bars[0].Group);
+    }
+
+    [Fact]
+    public void UnflaggedMinibossesEachGetABarAndAtMostThreeShow()
+    {
+        using var g = Arena();
+        Boss(g, "mourning_wood");
+        Boss(g, "mourning_wood");
+        Assert.Equal(2, Bars(g).Count);
+        Boss(g, "pumpking");
+        Boss(g, "king_slime");
+        var bars = Bars(g);
+        Assert.Equal(BossBarModel.MaxBars, bars.Count);
+        Assert.True(bars[0].Max >= bars[1].Max && bars[1].Max >= bars[2].Max);
+        Assert.DoesNotContain(bars, b => b.Title == "King Slime"); // the smallest group is left off
     }
 }

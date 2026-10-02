@@ -9,8 +9,8 @@ namespace Strata.Game.UI;
 /// The in-game overlay on the <see cref="UiLayout"/> model, laid out like Terraria's: the selected item's name and the
 /// hotbar top-left with the buff row under them, the hearts and mana stars top-right above the minimap and the info
 /// panel, the crosshair with its interaction hint and target name at the centre, the breath bubbles above it and the
-/// status line under it, the chat log bottom-left (Hud.Messages), pickup popups over the player's head, the boss bar
-/// bottom-centre, an invasion's progress bottom-right and the death screen.
+/// status line under it, the chat log bottom-left (Hud.Messages), pickup popups over the player's head, the boss bars
+/// stacked bottom-centre, an invasion's progress bottom-right and the death screen.
 /// <see cref="ApplyLayout"/> places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3
 /// overlay) when the window, the UI scale or what is shown changes (the inventory and its panel and accessory rows, an
 /// NPC chat, a boss, an invasion, the buff count, the info rows, the minimap setting, the F3 overlay), never per frame; the inventory
@@ -38,7 +38,9 @@ public sealed partial class Hud : CanvasLayer
 
     /// <summary>What decides the layout; a change re-runs <see cref="ApplyLayout"/>.</summary>
     private readonly record struct LayoutKey(Vector2 Size, bool Inventory, UiPanel Panel, int AccessoryRows, bool Chat, bool Boss, bool Event,
-        int Buffs, bool Minimap, int Info, bool Debug);
+        int Buffs, bool Minimap, int Info, bool Debug, int BossBars);
+
+    private readonly System.Collections.Generic.List<BossBarState> _bossStates = new();
 
     /// <summary>The layout in effect (null until the first frame).</summary>
     public UiLayoutResult? Layout { get; private set; }
@@ -48,6 +50,9 @@ public sealed partial class Hud : CanvasLayer
 
     /// <summary>What the crosshair label shows ("Blue Slime 25/25", a block's name, or empty).</summary>
     public string TargetText => _crosshair.TargetText;
+
+    /// <summary>The crosshair's hover name is a boss's (drawn in boss purple).</summary>
+    public bool TargetIsBoss => _crosshair.TargetIsBoss;
 
     /// <summary>The line above the hotbar: the held item's name, or "Inventory" (the <c>hud.item_name</c> probe).</summary>
     public string ItemName => _itemName.Text;
@@ -135,7 +140,8 @@ public sealed partial class Hud : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.hud");
         Strata.Game.Items.PortraitIcons.Pump();
-        _bossBar.Refresh(BossBarModel.Compute(_ui.Game.Npcs.All), delta); // before the layout, which reads what is shown
+        BossBarModel.Compute(_ui.Game.Npcs.All, _bossStates);
+        _bossBar.Refresh(_bossStates, delta); // before the layout, which reads what is shown
         _eventBar.Refresh(_ui.Game.Events, delta);
         _buffBar.Refresh(delta);
         UpdateLayout();
@@ -150,7 +156,7 @@ public sealed partial class Hud : CanvasLayer
         bool inventory = _inventory?.IsOpen == true;
         var key = new LayoutKey(LayoutWidgets.LogicalSize(GetViewport()), inventory, inventory ? _inventory!.Panel : UiPanel.None,
             _inventory?.AccessoryRows ?? Strata.Core.Gameplay.Items.PlayerInventory.BaseAccessorySlots, _dialog?.IsOpen == true, _bossBar.Active,
-            _eventBar.Active, _buffBar.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
+            _eventBar.Active, _buffBar.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true, _bossBar.Count);
         if (!key.Equals(_key)) ApplyLayout(key);
     }
 
@@ -159,7 +165,7 @@ public sealed partial class Hud : CanvasLayer
     {
         _key = key;
         var state = new UiState(InventoryOpen: key.Inventory, Panel: key.Panel, BossBar: key.Boss, EventBar: key.Event, NpcChat: key.Chat, BuffCount: key.Buffs,
-            AccessoryRows: key.AccessoryRows, ShowMinimap: key.Minimap, InfoLines: key.Info, DebugOverlay: key.Debug);
+            AccessoryRows: key.AccessoryRows, ShowMinimap: key.Minimap, InfoLines: key.Info, DebugOverlay: key.Debug, BossBars: key.BossBars);
         var layout = UiLayout.Compute(key.Size.X, key.Size.Y, state);
         Layout = layout;
         _itemName.InventoryOpen = key.Inventory;

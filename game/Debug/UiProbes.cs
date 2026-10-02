@@ -81,6 +81,7 @@ public static class UiProbes
             foreach (var pair in pairs) log.Warn("ui", $"content overlap: {pair}");
             return count;
         });
+        ctx.AddProbe("hud.target_boss", () => world.Hud?.TargetIsBoss == true ? 1 : 0); // W4-POLISH: a boss's hover name, in purple
         ctx.AddProbe("hud.item_name", () => world.Hud?.ItemName.Length > 0 ? 1 : 0);
         ctx.AddProbe("hud.status", () => world.Hud?.Status.Length > 0 ? 1 : 0);
         ctx.AddProbe("ui.layout_width", () => world.Hud?.Layout?.Width ?? 0);
@@ -130,6 +131,7 @@ public static class UiProbes
         // P2-23: the boss bar (a boss group is up) and the invasion progress panel (an invasion runs or just ended).
         ctx.AddProbe("ui.bossbar", () => world.Hud?.BossBar.Active == true ? 1 : 0);
         ctx.AddProbe("ui.bossbar_fill", () => world.Hud?.BossBar.Fraction ?? 0);
+        ctx.AddProbe("ui.bossbars", () => world.Hud?.BossBar.Count ?? 0); // W4-POLISH: one per boss group, fading ones too
         ctx.AddProbe("ui.eventbar", () => world.Hud?.EventBar.Active == true ? 1 : 0);
         ctx.AddProbe("ui.eventbar_percent", () => world.Hud?.EventBar.Percent ?? -1);
         // P2-25: the death screen is up (the player is dead; 0 again once they respawn).

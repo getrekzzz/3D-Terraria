@@ -8,7 +8,7 @@ namespace Strata.Game.UI;
 /// The crosshair in the Crosshair region: a small cross in the cursor colour (Settings → Interface), brighter when the
 /// target is within reach. Pointing at a town resident within talking range shows the speech-bubble hint and, at a
 /// door, chest, bed, chair, lever or altar within reach, the hand hint, each with the interact key to its right; the
-/// <see cref="TargetLabel"/> names what is under it below. With Smart Cursor on the cross turns orange and the smart
+/// <see cref="TargetLabel"/> names what is under it beside the cross, below and to the right, as Terraria's hover text. With Smart Cursor on the cross turns orange and the smart
 /// cursor icon sits to its left. With no region (the inventory's layout) only the cross shows.
 /// </summary>
 public sealed partial class Crosshair : Control
@@ -35,8 +35,11 @@ public sealed partial class Crosshair : Control
         AddChild(_target);
     }
 
-    /// <summary>What the label under the crosshair shows (the <c>hud.target_name</c> probes).</summary>
+    /// <summary>What the hover name beside the crosshair shows (the <c>hud.target_name</c> probes).</summary>
     public string TargetText => _target.Text;
+
+    /// <summary>The hover name is a boss's, drawn in boss purple (the <c>hud.target_boss</c> probe).</summary>
+    public bool TargetIsBoss => _target.Text.Length > 0 && _target.TextColor == TargetLabel.BossColor;
 
     /// <summary>
     /// Takes the Crosshair region of <paramref name="layout"/>; without one, the cross alone stays at the centre of
@@ -51,8 +54,8 @@ public sealed partial class Crosshair : Control
             Size = Vector2.Zero;
         }
         _target.Visible = _placed;
-        _target.Position = new Vector2(0, UiLayout.CrosshairTop + Arm + 4);
-        _target.Size = new Vector2(Size.X, Mathf.Max(0, Size.Y - _target.Position.Y));
+        _target.Position = Vector2.Zero; // over the whole region: it draws the name beside the cross
+        _target.Size = Size;
         QueueRedraw();
     }
 

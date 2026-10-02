@@ -1,37 +1,42 @@
 using Godot;
 using Strata.Core.Gameplay.Interaction;
+using Strata.Core.Presentation;
 using Strata.Core.Voxels;
 
 namespace Strata.Game.UI;
 
 /// <summary>
-/// The name under the crosshair. A creature, boss or town resident shows at any distance with its life ("Blue Slime
-/// 25/25", "Eater of Worlds 3920/4000", "Andrew the Guide 250/250"), tinted green, then yellow, then red as it is hurt
-/// (bosses in the boss bar's red); otherwise the block or object within reach is named. Hidden when the "Show target
-/// name" setting is off. The text is rebuilt only when what it shows changes. <see cref="Crosshair"/> holds and places it.
+/// The name under the crosshair, drawn as Terraria draws hover names: small, in the UI font at hover size, beside the
+/// cursor (below and right of the cross, slid left when it would leave the region). A creature, boss or town resident
+/// shows at any distance with its life ("Blue Slime 25/25", "King Slime 2000/2000", "Andrew the Guide 250/250"),
+/// residents and creatures in white, bosses in the purple of their awakening message; otherwise the block or object
+/// within reach is named in white. Hidden when the "Show target name" setting is off. The text is rebuilt only when
+/// what it shows changes. <see cref="Crosshair"/> holds it over its whole region.
 /// </summary>
-public sealed partial class TargetLabel : Label
+public sealed partial class TargetLabel : Control
 {
-    private static readonly Color Healthy = new(0.5f, 1f, 0.45f);
-    private static readonly Color Hurt = new(1f, 0.92f, 0.35f);
-    private static readonly Color Dying = new(1f, 0.35f, 0.3f);
-    private static readonly Color Boss = new Color(0.75f, 0.12f, 0.2f).Lightened(0.25f); // the boss bar, legible as text
+    /// <summary>The name's top-left corner from the centre of the cross, as Terraria offsets mouse text from the cursor.</summary>
+    public static readonly Vector2 Offset = new(12, 11);
+
+    /// <summary>A boss's name: the purple of "King Slime has awoken!".</summary>
+    public static readonly Color BossColor = Color.Color8(190, 110, 255);
 
     private UiContext _ui = null!;
     private object? _shown;
     private int _life = -1, _max = -1;
+    private Color _color = UiTheme.Text;
+
+    /// <summary>What the label shows ("King Slime 2000/2000", a block's name, or empty; the <c>hud.target_name</c> probes).</summary>
+    public string Text { get; private set; } = "";
+
+    /// <summary>The colour the name is drawn in.</summary>
+    public Color TextColor => _color;
 
     public void Initialize(UiContext ui)
     {
         _ui = ui;
         Name = "TargetLabel";
-        HorizontalAlignment = HorizontalAlignment.Center;
         MouseFilter = MouseFilterEnum.Ignore;
-        ClipText = true; // the crosshair places it in its region, under the cross
-        TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
-        AddThemeFontSizeOverride("font_size", 14);
-        AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
-        AddThemeConstantOverride("outline_size", 4);
     }
 
     public override void _Process(double delta)
@@ -45,17 +50,34 @@ public sealed partial class TargetLabel : Label
             int max = pick.Npc?.MaxLife ?? pick.Resident!.Def.Life;
             if (!Show(who, life, max)) return;
             var (name, l, m) = EntityPicking.Describe(pick);
-            Text = $"{name} {l}/{m}";
-            AddThemeColorOverride("font_color", pick.Npc is { IsBoss: true } ? Boss : LifeColor(m > 0 ? (float)l / m : 0f));
+            Set($"{name} {l}/{m}", pick.Npc is { IsBoss: true } ? BossColor : UiTheme.Text);
         }
         else if (interaction.InReach && interaction.Target is { } t)
         {
             object? what = t.Object != null ? t.Object.Def : t.Block is 0 or VoxelWorld.Unknown ? null : _ui.Game.Session.Content.Blocks[t.Block];
             if (!Show(what, 0, 0) || what == null) return;
-            Text = t.Object?.Def.DisplayName ?? _ui.Game.Session.Content.Blocks[t.Block].DisplayName;
-            AddThemeColorOverride("font_color", UiTheme.Text);
+            Set(t.Object?.Def.DisplayName ?? _ui.Game.Session.Content.Blocks[t.Block].DisplayName, UiTheme.Text);
         }
         else Show(null, 0, 0);
+    }
+
+    public override void _Draw()
+    {
+        if (Text.Length == 0) return;
+        var font = UiFonts.Bold;
+        float width = font.GetStringSize(Text, HorizontalAlignment.Left, -1, UiFonts.Hover).X;
+        var cross = new Vector2(Size.X / 2, UiLayout.CrosshairTop);
+        float x = Mathf.Max(0, Mathf.Min(cross.X + Offset.X, Size.X - width - UiFonts.Outline / 2f));
+        var baseline = new Vector2(x, cross.Y + Offset.Y + font.GetAscent(UiFonts.Hover)).Round();
+        DrawStringOutline(font, baseline, Text, HorizontalAlignment.Left, -1, UiFonts.Hover, UiFonts.Outline, UiFonts.OutlineColor);
+        DrawString(font, baseline, Text, HorizontalAlignment.Left, -1, UiFonts.Hover, _color);
+    }
+
+    private void Set(string text, Color color)
+    {
+        Text = text;
+        _color = color;
+        QueueRedraw();
     }
 
     /// <summary>Records what is shown; false when it is unchanged. Showing nothing clears the text at once.</summary>
@@ -65,14 +87,7 @@ public sealed partial class TargetLabel : Label
         _shown = what;
         _life = life;
         _max = max;
-        if (what == null) Text = "";
+        if (what == null) Set("", UiTheme.Text);
         return true;
-    }
-
-    /// <summary>Green at full life, yellow at half, red near death.</summary>
-    private static Color LifeColor(float fraction)
-    {
-        fraction = Mathf.Clamp(fraction, 0f, 1f);
-        return fraction >= 0.5f ? Hurt.Lerp(Healthy, (fraction - 0.5f) * 2f) : Dying.Lerp(Hurt, fraction * 2f);
     }
 }

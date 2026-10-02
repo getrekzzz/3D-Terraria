@@ -823,6 +823,42 @@ assert ui.inventory == 0
 assert ui.settings_button == 0
 assert errors == 0
 
+# --- W4-POLISH (hover name, boss bars) ---
+# The crosshair names a boss beside the cross, small and in boss purple, with its life. Each boss group alive gets its
+# own bar, stacked bottom-centre (King Slime and the Eye of Cthulhu: two), nothing overlapping; when they are gone the
+# bars fade out and the region is freed.
+god on
+spawning off
+killall
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 8 12 air
+camera first
+aim 0 0 1
+spawn king_slime 1 7
+ai off
+wait 0.3
+assert hover.king_slime == 1
+assert hud.target_name.king_slime == 1
+assert hud.target_boss == 1
+aim 0 0 -1
+spawn eye_of_cthulhu 1 9
+ai off
+wait 0.6
+assert ui.bossbar == 1
+assert ui.bossbars == 2
+assert ui.overlaps == 0
+assert layout.overlaps == 0
+killall
+wait 0.2
+assert ui.bossbars == 2
+wait 0.8
+assert ui.bossbars == 0
+assert ui.bossbar == 0
+ai on
+camera third
+god off
+assert errors == 0
+
 # --- W4-POLISH (layout) ---
 # What each inventory widget draws (its slots, captions and the chest's name field) stays inside its own region and
 # off every other widget, with a chest or a shop open, at 1280x720 and 1920x1080 and UI scales 1 and 1.5

@@ -27,7 +27,22 @@ public class UiLayoutTests
         Hud with { BuffCount = 11, BossBar = true, DebugOverlay = true }, Hud with { NpcChat = true, BuffCount = 3 },
         Hud with { ShowMinimap = false, BossBar = true, EventBar = true },
         Crowded with { InventoryOpen = true, Panel = UiPanel.Chest, AccessoryRows = 7 },
+        Crowded with { BossBars = 3 }, Hud with { BossBar = true, BossBars = 3, EventBar = true, BuffCount = 22 },
     };
+
+    [Fact]
+    public void StackedBossBarsTakeOneBarHeightEachBottomCentre()
+    {
+        foreach (int bars in new[] { 1, 2, 3 })
+        {
+            var layout = UiLayout.Compute(1920, 1080, new UiState(BossBar: true, BossBars: bars));
+            var r = layout.Get(UiRegion.BossBar);
+            Assert.Equal(UiLayout.BossBarsHeight(bars), r.H);
+            Assert.Equal(bars * UiLayout.BossBarHeight + (bars - 1) * UiLayout.Gap, r.H);
+            Assert.Equal(1080 - UiLayout.Margin, r.Bottom, 2);
+            Assert.Equal(960, r.X + r.W / 2, 2);
+        }
+    }
 
     /// <summary>Every window from 1024×600 to 3840×2160 at UI scales 0.75–2, as the logical viewport the engine lays out.</summary>
     public static IEnumerable<(float W, float H, string Name)> Viewports()

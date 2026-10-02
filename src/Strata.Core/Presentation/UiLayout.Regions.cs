@@ -93,9 +93,10 @@ public static partial class UiLayout
     }
 
     /// <summary>
-    /// The event bar bottom-right and the boss bar bottom-centre. When the bottom row is too narrow for the reserved chat,
-    /// the boss bar and the event bar, the boss bar narrows to <see cref="BossBarMinWidth"/> between them, then stacks
-    /// above the event bar; failing all that, both move to the nearest free spot.
+    /// The event bar bottom-right and the boss bars bottom-centre, stacked upward one per boss group (as many as fit,
+    /// down to one). When the bottom row is too narrow for the reserved chat, the boss bars and the event bar, the boss
+    /// bars narrow to <see cref="BossBarMinWidth"/> between them, then stack above the event bar; failing all that, both
+    /// move to the nearest free spot.
     /// </summary>
     private static void PlaceBars(UiLayoutPass p, UiState s, UiRect chatMin)
     {
@@ -109,17 +110,24 @@ public static partial class UiLayout
                 right = p.Get(UiRegion.EventBar).X - Gap;
         }
         if (!s.BossBar) return;
-        float y = h - Margin - BossBarHeight;
-        var centre = new UiRect(w / 2 - BossBarWidth / 2, y, BossBarWidth, BossBarHeight);
+        for (int n = Math.Clamp(s.BossBars, 1, BossBarModel.MaxBars); n >= 1; n--)
+            if (TryBossBars(p, BossBarsHeight(n), right, chatMin)) return;
+        p.PutNear(UiRegion.BossBar, new UiRect(w / 2 - BossBarWidth / 2, h - Margin - BossBarHeight, BossBarWidth, BossBarHeight));
+    }
+
+    /// <summary>The boss bars, <paramref name="height"/> tall: centred at the bottom, squeezed, or above the event bar.</summary>
+    private static bool TryBossBars(UiLayoutPass p, float height, float right, UiRect chatMin)
+    {
+        float w = p.Width, y = p.Height - Margin - height;
+        var centre = new UiRect(w / 2 - BossBarWidth / 2, y, BossBarWidth, height);
         float left = chatMin.Right + Gap;
         float between = MathF.Min(BossBarWidth, right - left);
-        var squeezed = new UiRect(MathF.Max(left, MathF.Min(centre.X, right - between)), y, between, BossBarHeight);
-        var ev2 = p.Get(UiRegion.EventBar);
-        var stacked = new UiRect(w - Margin - BossBarWidth, ev2.Y - Gap - BossBarHeight, BossBarWidth, BossBarHeight);
-        if (p.TryPut(UiRegion.BossBar, centre)) return;
-        if (between >= BossBarMinWidth && p.TryPut(UiRegion.BossBar, squeezed)) return;
-        if (p.Has(UiRegion.EventBar) && p.TryPut(UiRegion.BossBar, stacked)) return;
-        p.PutNear(UiRegion.BossBar, centre);
+        var squeezed = new UiRect(MathF.Max(left, MathF.Min(centre.X, right - between)), y, between, height);
+        if (p.TryPut(UiRegion.BossBar, centre)) return true;
+        if (between >= BossBarMinWidth && p.TryPut(UiRegion.BossBar, squeezed)) return true;
+        if (!p.Has(UiRegion.EventBar)) return false;
+        var ev = p.Get(UiRegion.EventBar);
+        return p.TryPut(UiRegion.BossBar, new UiRect(w - Margin - BossBarWidth, ev.Y - Gap - height, BossBarWidth, height));
     }
 
     /// <summary>The info panel under the minimap (or the hearts), cut short when something sits below it.</summary>
