@@ -4644,6 +4644,125 @@
    "kind": "furniture",
    "stage": "hardmode",
    "source": "moon lord"
+  },
+  {
+   "id": "terraria:glowstick",
+   "name": "Glowstick",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "merchant"
+  },
+  {
+   "id": "terraria:mining_shirt",
+   "name": "Mining Shirt",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "merchant"
+  },
+  {
+   "id": "terraria:mining_pants",
+   "name": "Mining Pants",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "merchant"
+  },
+  {
+   "id": "terraria:grass_seeds",
+   "name": "Grass Seeds",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:jungle_grass_seeds",
+   "name": "Jungle Grass Seeds",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:mushroom_grass_seeds",
+   "name": "Mushroom Grass Seeds",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:corrupt_seeds",
+   "name": "Corrupt Seeds",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:crimson_seeds",
+   "name": "Crimson Seeds",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:hallowed_seeds",
+   "name": "Hallowed Seeds",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:herb_bag",
+   "name": "Herb Bag",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:sunflower",
+   "name": "Sunflower",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dryad"
+  },
+  {
+   "id": "terraria:empty_bullet",
+   "name": "Empty Bullet",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:illegal_gun_parts",
+   "name": "Illegal Gun Parts",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "arms dealer"
+  },
+  {
+   "id": "terraria:top_hat",
+   "name": "Top Hat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:tuxedo_shirt",
+   "name": "Tuxedo Shirt",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:tuxedo_pants",
+   "name": "Tuxedo Pants",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:bewitching_table",
+   "name": "Bewitching Table",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "witch doctor"
   }
  ]
 }

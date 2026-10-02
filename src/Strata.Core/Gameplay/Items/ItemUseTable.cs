@@ -28,6 +28,7 @@ public enum ItemAction
     Mount = 1 << 16,
     Paint = 1 << 17,
     Ride = 1 << 18,
+    PlantGrass = 1 << 19,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -62,6 +63,7 @@ public sealed class ItemUseInfo
     /// <summary>A mount summoned by this item (<see cref="ItemAction.Ride"/>).</summary>
     public Mounts.MountParams? Ride { get; internal set; }
     public PaintToolParams? Painting { get; internal set; }
+    public PlantGrassParams? Garden { get; internal set; }
 
     /// <summary>Fishing bait (worms, fireflies, Master Bait).</summary>
     public BaitParams? Bait { get; internal set; }
@@ -119,9 +121,9 @@ public sealed class ItemUseTable
         if (item.AxePower > 0) a |= ItemAction.Chop;
         if (item.HammerPower > 0) a |= ItemAction.Hammer;
         bool melee = item.Damage > 0 && !item.NoMelee; // noMelee: the swing is only an animation
-        if (item.UseStyle == UseStyle.Swing && melee) a |= ItemAction.Melee;
-        if (item.UseStyle == UseStyle.Thrust && melee) a |= ItemAction.Thrust;
-        if (item.UseStyle == UseStyle.Shoot && (item.Projectile != null || item.UseAmmo != null)) a |= ItemAction.Shoot;
+        if (item.UseStyle.Family() == UseStyle.Swing && melee) a |= ItemAction.Melee;
+        if (item.UseStyle.Family() == UseStyle.Thrust && melee) a |= ItemAction.Thrust;
+        if (item.UseStyle.Family() == UseStyle.Shoot && (item.Projectile != null || item.UseAmmo != null)) a |= ItemAction.Shoot;
         if (item.PlaceBlock != null && content.Blocks.TryGet(item.PlaceBlock, out var block))
         {
             a |= ItemAction.PlaceBlock;
@@ -132,7 +134,7 @@ public sealed class ItemUseTable
             a |= ItemAction.PlaceObject;
             info.Object = obj;
         }
-        if (item.UseStyle == UseStyle.Consume || item.HealLife > 0 || item.HealMana > 0 || item.Buff != null) a |= ItemAction.Consume;
+        if (item.UseStyle.Family() == UseStyle.Consume || item.HealLife > 0 || item.HealMana > 0 || item.Buff != null) a |= ItemAction.Consume;
         if (item.Projectile != null && content.Projectiles.TryGet(item.Projectile, out var proj)) info.Projectile = proj;
 
         foreach (var spec in item.Behaviors)
@@ -174,6 +176,7 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.Minecart: a |= ItemAction.Mount; info.Minecart = spec.Parse<MinecartParams>(); break;
                 case ItemBehaviorSpecs.Mount: a |= ItemAction.Ride; info.Ride = spec.Parse<Mounts.MountParams>(); break;
                 case ItemBehaviorSpecs.PaintTool: a |= ItemAction.Paint; info.Painting = spec.Parse<PaintToolParams>(); break;
+                case ItemBehaviorSpecs.PlantGrass: a |= ItemAction.PlantGrass; info.Garden = spec.Parse<PlantGrassParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }

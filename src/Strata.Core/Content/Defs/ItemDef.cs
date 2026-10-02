@@ -15,6 +15,23 @@ public enum DamageClass
 public enum UseStyle
 {
     None, Swing, Thrust, Shoot, Hold, Consume, Place,
+
+    // Terraria's 1.4.4 use styles (data/config/use_styles.json names). Until the use-style rework lands on this
+    // branch each one behaves like its legacy family (UseStyles.Family): thrusts, shots, swings or consumes.
+    Rapier, Spear, Gun, Bow, Staff, Tome, Throw, Yoyo, Flail, Whip, HoldUp, Drink, Eat,
+}
+
+public static class UseStyles
+{
+    /// <summary>The legacy style a Terraria use style behaves as (Gun → Shoot, Drink → Consume, Rapier → Thrust…).</summary>
+    public static UseStyle Family(this UseStyle s) => s switch
+    {
+        UseStyle.Rapier or UseStyle.Spear => UseStyle.Thrust,
+        UseStyle.Gun or UseStyle.Bow or UseStyle.Staff or UseStyle.Tome or UseStyle.Throw or UseStyle.Yoyo or UseStyle.Flail => UseStyle.Shoot,
+        UseStyle.Whip => UseStyle.Swing,
+        UseStyle.HoldUp or UseStyle.Drink or UseStyle.Eat => UseStyle.Consume,
+        _ => s,
+    };
 }
 
 /// <summary>

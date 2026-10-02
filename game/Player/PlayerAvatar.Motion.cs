@@ -162,13 +162,13 @@ public sealed partial class PlayerAvatar
     /// <summary>The upper-body action for using an item (Terraria's use styles, told apart by what the item does).</summary>
     public static string ActionFor(ItemDef item, ItemUseInfo info)
     {
-        if (info.Has(ItemAction.Consume) || item.UseStyle == UseStyle.Consume) return "drink";
+        if (info.Has(ItemAction.Consume) || item.UseStyle.Family() == UseStyle.Consume) return "drink";
         if (info.IsTool) return "mine";
         if (info.Grapple != null) return "thrust"; // a hook is flung out along the aim, arm at full length
-        if (info.Has(ItemAction.Thrust) || item.UseStyle == UseStyle.Thrust) return "thrust";
-        if (info.Has(ItemAction.Melee) || info.Has(ItemAction.Fish) || item.UseStyle == UseStyle.Swing) return "swing";
+        if (info.Has(ItemAction.Thrust) || item.UseStyle.Family() == UseStyle.Thrust) return "thrust";
+        if (info.Has(ItemAction.Melee) || info.Has(ItemAction.Fish) || item.UseStyle.Family() == UseStyle.Swing) return "swing";
         if (item.DamageType is DamageClass.Magic or DamageClass.Summon || item.ManaCost > 0) return "cast";
-        if (info.Has(ItemAction.Shoot) || item.UseStyle == UseStyle.Shoot) return item.UseAmmo == "arrow" ? "bow" : "shoot";
+        if (info.Has(ItemAction.Shoot) || item.UseStyle.Family() == UseStyle.Shoot) return item.UseAmmo == "arrow" ? "bow" : "shoot";
         return "use";
     }
 }

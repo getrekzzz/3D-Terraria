@@ -70,6 +70,11 @@ assert town.guide.homed == 1
 town summon dryad 0 0 -3
 town services dryad
 town status dryad
+# --- P5-15 ---
+# The Dryad sells Terraria's grass seeds.
+give copper_coin 30
+town buy dryad grass_seeds
+assert inv.grass_seeds == 1
 town dismiss dryad
 assert errors == 0
 

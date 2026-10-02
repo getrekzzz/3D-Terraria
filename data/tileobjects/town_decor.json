@@ -1,0 +1,8 @@
+{
+  // P5-15: decor sold by the early residents. The Sunflower (Dryad) makes nearby players Happy!; the Bewitching
+  // Table (Witch Doctor) gives one more minion. Models: tools/blender/assets.d/p5-15-shops.json.
+  "tileObjects": [
+    {"id": "sunflower", "name": "Sunflower", "description": "Makes you happy when nearby.", "size": [1, 3, 1], "aura": {"buff": "happy", "radius": 30, "ticks": 120}, "hitPoints": 1, "itemCategory": "placeable", "itemValue": 200, "itemMaxStack": 9999, "tags": ["decor"], "covers": ["terraria:sunflower"]},
+    {"id": "bewitching_table", "name": "Bewitching Table", "description": "Right click to have more minions.", "size": [3, 2, 2], "aura": {"buff": "bewitched", "radius": 8, "ticks": 36000}, "hitPoints": 2, "itemCategory": "furniture", "itemValue": 150000, "itemMaxStack": 9999, "covers": ["terraria:bewitching_table"]}
+  ]
+}

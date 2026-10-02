@@ -688,3 +688,19 @@ every 30th) and then rolls the chance rewards allowed by `minQuests`, and raises
 so the Angler's shop sells the fishing decor of `data/tileobjects/angler_decor.json` (seashells, treasure map,
 seaweed planter, lifebuoy, ship's wheel, wall anchor, bass/trout/tuna plaques; `bgen/angler_decor.py`) by
 `anglerQuests` conditions. Not yet: the quest count in the dialog's quest text and its Shop button (TownDialog, W4).
+
+## Resident shops (P5-15..P5-18)
+
+Terraria 1.4.4 stock lives in each NPC's `shop` (data/town/*.json, one NPC per line), with conditions on time, flags
+(hardmode, bosses), the world's evil, the biome at the resident's home, moon, season and bestiary; prices are the
+item value unless given, scaled by happiness (currency prices are not). New goods are in
+`data/items/town_shop_*.json` and `data/tileobjects/town_decor*.json`; their models come from reused generators and
+`tools/blender/bgen/town_shop.py` (specs in `tools/blender/assets.d/p5-1*-shops.json`).
+* **Shops I** (P5-15): Merchant (mining clothes, anvil, shuriken, Glowsticks at night), Dryad (powders by evil, grass
+  seeds; jungle/mushroom seeds by home biome; corrupt/crimson/hallowed seeds in hardmode; Sunflower; Herb Bag), Arms
+  Dealer (Illegal Gun Parts at night, Empty Bullets in hardmode), Clothier (tuxedo), Goblin (Spiky Ball), Witch
+  Doctor (Bewitching Table at night). The Nurse has no shop. Behavior `plantGrass {grass, on}`
+  (`ItemUseSystem.Garden.cs`): the aimed block, if it is in `on` and uncovered, becomes `grass`; one seed is used.
+  The Sunflower's aura gives Happy!, the Bewitching Table's Bewitched (+1 minion).
+* **Use styles**: items may name Terraria's 1.4.4 use styles (`gun`, `throw`, `drink`, `holdUp`…); until the use-style
+  rework lands on this branch `UseStyles.Family` maps each to the legacy style it behaves as.

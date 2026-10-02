@@ -114,6 +114,12 @@
    ],
    "generator": "larva"
   },
+  "bewitching_table": {
+   "models": [
+    "assets/models/objects/bewitching_table_v0.glb"
+   ],
+   "generator": "table"
+  },
   "bird_statue": {
    "models": [
     "assets/models/objects/bird_statue_v0.glb"
@@ -3071,6 +3077,12 @@
    ],
    "generator": "banner"
   },
+  "sunflower": {
+   "models": [
+    "assets/models/objects/sunflower_v0.glb"
+   ],
+   "generator": "flower"
+  },
   "swamp_thing_banner": {
    "models": [
     "assets/models/objects/swamp_thing_banner_v0.glb"
@@ -3761,6 +3773,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/betsys_wrath.png"
+  },
+  "bewitching_table": {
+   "object": "bewitching_table",
+   "icon": "assets/icons/items/bewitching_table.png"
   },
   "bird": {
    "model": "assets/models/items/bird.glb",
@@ -4595,6 +4611,13 @@
    "model": "assets/models/items/corrupt_crate.glb",
    "icon": "assets/icons/items/corrupt_crate.png"
   },
+  "corrupt_seeds": {
+   "model": "assets/models/items/corrupt_seeds.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/corrupt_seeds.png"
+  },
   "corrupt_slime_banner": {
    "object": "corrupt_slime_banner",
    "icon": "assets/icons/items/corrupt_slime_banner.png"
@@ -4671,6 +4694,13 @@
     "tip": "0 0.46 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crimson_rod.png"
+  },
+  "crimson_seeds": {
+   "model": "assets/models/items/crimson_seeds.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/crimson_seeds.png"
   },
   "crimtane_axe": {
    "model": "assets/models/items/crimtane_axe.glb",
@@ -5243,6 +5273,10 @@
    },
    "icon": "assets/icons/items/empty_bucket.png"
   },
+  "empty_bullet": {
+   "model": "assets/models/items/empty_bullet.glb",
+   "icon": "assets/icons/items/empty_bullet.png"
+  },
   "enchanted_boomerang": {
    "model": "assets/models/items/enchanted_boomerang.glb",
    "sockets": {
@@ -5656,6 +5690,10 @@
    "model": "assets/models/items/glowing_mushroom.glb",
    "icon": "assets/icons/items/glowing_mushroom.png"
   },
+  "glowstick": {
+   "model": "assets/models/items/glowstick.glb",
+   "icon": "assets/icons/items/glowstick.png"
+  },
   "goblin_archer_banner": {
    "object": "goblin_archer_banner",
    "icon": "assets/icons/items/goblin_archer_banner.png"
@@ -5882,6 +5920,13 @@
    },
    "icon": "assets/icons/items/grappling_hook.png"
   },
+  "grass_seeds": {
+   "model": "assets/models/items/grass_seeds.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/grass_seeds.png"
+  },
   "gray_paint": {
    "model": "assets/models/items/gray_paint.glb",
    "sockets": {
@@ -5992,6 +6037,13 @@
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/hallowed_repeater.png"
+  },
+  "hallowed_seeds": {
+   "model": "assets/models/items/hallowed_seeds.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/hallowed_seeds.png"
   },
   "hammush": {
    "model": "assets/models/items/hammush.glb",
@@ -6120,6 +6172,10 @@
    "model": "assets/models/items/hemopiranha.glb",
    "icon": "assets/icons/items/hemopiranha.png"
   },
+  "herb_bag": {
+   "model": "assets/models/items/herb_bag.glb",
+   "icon": "assets/icons/items/herb_bag.png"
+  },
   "hercules_beetle": {
    "model": "assets/models/items/hercules_beetle.glb",
    "icon": "assets/icons/items/hercules_beetle.png"
@@ -6205,6 +6261,10 @@
   "ichor_sticker_banner": {
    "object": "ichor_sticker_banner",
    "icon": "assets/icons/items/ichor_sticker_banner.png"
+  },
+  "illegal_gun_parts": {
+   "model": "assets/models/items/illegal_gun_parts.glb",
+   "icon": "assets/icons/items/illegal_gun_parts.png"
   },
   "illuminant_slime_banner": {
    "object": "illuminant_slime_banner",
@@ -6352,6 +6412,13 @@
   "jungle_crate": {
    "model": "assets/models/items/jungle_crate.glb",
    "icon": "assets/icons/items/jungle_crate.png"
+  },
+  "jungle_grass_seeds": {
+   "model": "assets/models/items/jungle_grass_seeds.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/jungle_grass_seeds.png"
   },
   "jungle_hat": {
    "model": "assets/models/items/jungle_hat.glb",
@@ -6978,9 +7045,19 @@
    "armor": "mining_helmet",
    "icon": "assets/icons/items/mining_helmet.png"
   },
+  "mining_pants": {
+   "model": "assets/models/items/mining_pants.glb",
+   "armor": "mining_outfit",
+   "icon": "assets/icons/items/mining_pants.png"
+  },
   "mining_potion": {
    "model": "assets/models/items/mining_potion.glb",
    "icon": "assets/icons/items/mining_potion.png"
+  },
+  "mining_shirt": {
+   "model": "assets/models/items/mining_shirt.glb",
+   "armor": "mining_outfit",
+   "icon": "assets/icons/items/mining_shirt.png"
   },
   "minishark": {
    "model": "assets/models/items/minishark.glb",
@@ -7092,6 +7169,13 @@
   "mushroom_door": {
    "object": "mushroom_door",
    "icon": "assets/icons/items/mushroom_door.png"
+  },
+  "mushroom_grass_seeds": {
+   "model": "assets/models/items/mushroom_grass_seeds.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/mushroom_grass_seeds.png"
   },
   "mushroom_lamp": {
    "object": "mushroom_lamp",
@@ -9178,6 +9262,10 @@
    "model": "assets/models/items/sun_stone.glb",
    "icon": "assets/icons/items/sun_stone.png"
   },
+  "sunflower": {
+   "object": "sunflower",
+   "icon": "assets/icons/items/sunflower.png"
+  },
   "sunfury": {
    "model": "assets/models/items/sunfury.glb",
    "sockets": {
@@ -9516,6 +9604,11 @@
    "object": "tombstone",
    "icon": "assets/icons/items/tombstone.png"
   },
+  "top_hat": {
+   "model": "assets/models/items/top_hat.glb",
+   "armor": "tuxedo",
+   "icon": "assets/icons/items/top_hat.png"
+  },
   "topaz": {
    "model": "assets/models/items/topaz.glb",
    "icon": "assets/icons/items/topaz.png"
@@ -9680,6 +9773,16 @@
   "turtle_shell": {
    "model": "assets/models/items/turtle_shell.glb",
    "icon": "assets/icons/items/turtle_shell.png"
+  },
+  "tuxedo_pants": {
+   "model": "assets/models/items/tuxedo_pants.glb",
+   "armor": "tuxedo",
+   "icon": "assets/icons/items/tuxedo_pants.png"
+  },
+  "tuxedo_shirt": {
+   "model": "assets/models/items/tuxedo_shirt.glb",
+   "armor": "tuxedo",
+   "icon": "assets/icons/items/tuxedo_shirt.png"
   },
   "twinkle_popper_banner": {
    "object": "twinkle_popper_banner",
@@ -14763,6 +14866,88 @@
     "tris": 402
    }
   },
+  "mining_outfit": {
+   "chest": {
+    "model": "assets/models/armor/mining_outfit_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/mining_outfit_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/mining_outfit_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/mining_outfit_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/mining_outfit_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/mining_outfit_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/mining_outfit_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/mining_outfit_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/mining_outfit_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/mining_outfit_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   }
+  },
   "mythril_armor": {
    "head": {
     "model": "assets/models/armor/mythril_armor_head.glb",
@@ -16661,6 +16846,96 @@
     "refLength": 0.1513,
     "hidesHair": false,
     "tris": 206
+   }
+  },
+  "tuxedo": {
+   "head": {
+    "model": "assets/models/armor/tuxedo_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/tuxedo_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/tuxedo_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/tuxedo_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/tuxedo_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/tuxedo_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/tuxedo_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/tuxedo_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/tuxedo_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/tuxedo_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/tuxedo_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
    }
   },
   "vortex_armor": {
