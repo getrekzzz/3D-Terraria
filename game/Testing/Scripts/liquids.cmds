@@ -4,6 +4,9 @@ spawning off
 time noon
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 8 10 air
+# Let the player land on the new floor first: the basins below are placed relative to the feet.
+wait_until player.on_floor == 1 5
+wait 0.3
 # Two low basins: water on +X, lava on -X.
 fill 3 0 -3 7 0 3 stone
 fill 4 0 -2 6 0 2 air

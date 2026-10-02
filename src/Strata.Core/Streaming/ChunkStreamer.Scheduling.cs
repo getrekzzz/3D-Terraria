@@ -187,7 +187,13 @@ public sealed partial class ChunkStreamer
         TouchMesh(coord, e); // dirtied again while the job ran
         var chunk = _session.World.GetChunk(coord);
         chunk?.SetLight(result.Light, result.Version);
-        if (!e.MeshWanted) return;
+        if (!e.MeshWanted)
+        {
+            // Out of mesh range when the job finished: the result is dropped, so mesh it again once it is wanted
+            // (otherwise a chunk teleported away from mid-job never meshes, or keeps its stale mesh).
+            e.MeshDirty = true;
+            return;
+        }
         if (!e.HasMesh) _meshed++;
         e.HasMesh = true;
         MeshReady?.Invoke(result);

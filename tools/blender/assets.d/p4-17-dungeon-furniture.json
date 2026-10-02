@@ -1,0 +1,29 @@
+{
+ "comment": "P4-17: Dungeon furniture sets in the blue, green and pink brick colours (bgen/dungeon_furniture.py).",
+ "objects": {
+  "blue_dungeon_door": {"generator": "dungeon_door", "params": {"palette": "blue"}},
+  "blue_dungeon_chair": {"generator": "dungeon_chair", "params": {"palette": "blue"}},
+  "blue_dungeon_table": {"generator": "dungeon_table", "params": {"palette": "blue"}},
+  "blue_dungeon_bookcase": {"generator": "bookcase", "params": {"palette": "blue"}},
+  "blue_dungeon_candelabra": {"generator": "candelabra", "params": {"palette": "blue"}},
+  "blue_dungeon_chandelier": {"generator": "chandelier", "params": {"palette": "blue"}},
+  "blue_dungeon_lamp": {"generator": "floor_lamp", "params": {"palette": "blue"}},
+  "blue_dungeon_vase": {"generator": "vase", "params": {"palette": "blue"}},
+  "green_dungeon_door": {"generator": "dungeon_door", "params": {"palette": "green"}},
+  "green_dungeon_chair": {"generator": "dungeon_chair", "params": {"palette": "green"}},
+  "green_dungeon_table": {"generator": "dungeon_table", "params": {"palette": "green"}},
+  "green_dungeon_bookcase": {"generator": "bookcase", "params": {"palette": "green"}},
+  "green_dungeon_candelabra": {"generator": "candelabra", "params": {"palette": "green"}},
+  "green_dungeon_chandelier": {"generator": "chandelier", "params": {"palette": "green"}},
+  "green_dungeon_lamp": {"generator": "floor_lamp", "params": {"palette": "green"}},
+  "green_dungeon_vase": {"generator": "vase", "params": {"palette": "green"}},
+  "pink_dungeon_door": {"generator": "dungeon_door", "params": {"palette": "pink"}},
+  "pink_dungeon_chair": {"generator": "dungeon_chair", "params": {"palette": "pink"}},
+  "pink_dungeon_table": {"generator": "dungeon_table", "params": {"palette": "pink"}},
+  "pink_dungeon_bookcase": {"generator": "bookcase", "params": {"palette": "pink"}},
+  "pink_dungeon_candelabra": {"generator": "candelabra", "params": {"palette": "pink"}},
+  "pink_dungeon_chandelier": {"generator": "chandelier", "params": {"palette": "pink"}},
+  "pink_dungeon_lamp": {"generator": "floor_lamp", "params": {"palette": "pink"}},
+  "pink_dungeon_vase": {"generator": "vase", "params": {"palette": "pink"}}
+ }
+}

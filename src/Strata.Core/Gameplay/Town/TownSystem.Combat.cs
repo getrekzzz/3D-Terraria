@@ -51,6 +51,7 @@ public sealed partial class TownSystem
         r.RespawnTicks = Config.RespawnTicks;
         r.Path = null;
         if (r.TalkingTo != null) EndTalk(r);
+        DropDeathLoot(r);
         Died?.Invoke(r);
     }
 }

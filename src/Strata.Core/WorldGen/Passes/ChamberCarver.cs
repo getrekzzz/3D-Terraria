@@ -14,7 +14,7 @@ internal static class ChamberCarver
         ulong seed = ch.Seed;
         FeatureCarver.ForEachCell(ctx, ch.Bounds, (x, y, z, i) =>
         {
-            if (ctx.Blocks[i] == p.Bedrock) return;
+            if (ctx.Blocks[i] == p.Bedrock || ctx.IsStructure(i)) return;
             float d = ch.Distance(x + 0.5f, y + 0.5f, z + 0.5f);
             float jitter = (Hash.ToUnitFloat(Hash.Cell(seed, x >> 2, y >> 2, z >> 2)) - 0.5f) * 0.12f;
             d += jitter;

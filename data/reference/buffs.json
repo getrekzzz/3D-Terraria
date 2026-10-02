@@ -25,6 +25,11 @@
    "kind": "debuff"
   },
   {
+   "id": "terraria:weak",
+   "name": "Weak",
+   "kind": "debuff"
+  },
+  {
    "id": "terraria:frozen",
    "name": "Frozen",
    "kind": "debuff"
@@ -193,6 +198,11 @@
    "id": "terraria:shimmering",
    "name": "Shimmering",
    "kind": "liquid"
+  },
+  {
+   "id": "terraria:the_tongued",
+   "name": "The Tongued",
+   "kind": "debuff"
   }
  ]
 }

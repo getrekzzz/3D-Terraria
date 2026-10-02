@@ -180,6 +180,7 @@ public sealed partial class GameWorld : IDisposable
                 p.RespawnTicks = RespawnDelayTicks;
                 state.Deaths++;
                 state.Buffs.ClearNonPersistent();
+                state.Recompute(); // no debuff effect (confusion) lingers on the corpse
                 ApplyDeathPenalty(p);
                 DropTombstone(p);
                 PlayerDied?.Invoke(p);
@@ -192,10 +193,13 @@ public sealed partial class GameWorld : IDisposable
         }
         state.PlayTicks++;
         StepOnPlates(p);
+        TouchHazards(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
+        if (p.GloveCooldown > 0) p.GloveCooldown--;
         if (p.UseAnimation > 0) p.UseAnimation--;
         // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
         if (!p.HasBody && p.Hook.Active) p.Hook.Tick(Session.World, Units.SecondsPerTick, p.Hand);
+        if (!p.HasBody && p.ExternalVelocity != Vector3.Zero) p.Position += p.ExternalVelocity * Units.SecondsPerTick; // a tongue's drag
         if (state.Buffs.Tick()) state.Recompute();
         int dps = state.Effects.DamagePerSecond;
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
@@ -218,7 +222,7 @@ public sealed partial class GameWorld : IDisposable
         p.Velocity = Vector3.Zero;
         p.State.Vitals.ImmunityTicks = RespawnImmunityTicks;
         // Whatever was waiting at the spawn point (usually what killed the player) wanders off.
-        foreach (var npc in Npcs.All.Where(n => !n.IsBoss && !n.Def.HasTag("critter") && Vector3.Distance(n.Center, p.Center) < RespawnClearRadius).ToList())
+        foreach (var npc in Npcs.All.Where(n => !n.IsBoss && !n.IsPart && !n.Def.HasTag("critter") && Vector3.Distance(n.Center, p.Center) < RespawnClearRadius).ToList())
             Npcs.Despawn(npc);
         PlayerRespawned?.Invoke(p);
     }

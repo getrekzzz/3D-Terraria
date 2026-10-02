@@ -140,13 +140,15 @@ def fish(mb: MeshBuilder, p, rng):
 
 
 def key(mb: MeshBuilder, p, rng):
-    """An ornate key."""
+    """An ornate key; ``gem`` sets a glowing jewel at the bow."""
     layer, tint = _metal(p, "#d8b860")
     ring = [Vector((math.cos(a) * 0.05, 0, 0.26 + math.sin(a) * 0.05)) for a in (i * 2 * math.pi / 14 for i in range(15))]
     mb.tube(ring, [0.012] * len(ring), layer, tint, segments=5)
     mb.cylinder((0, 0, 0.0), (0, 0, 0.21), 0.013, None, layer, tint, segments=6)
     mb.box((0.0, -0.01, 0.02), (0.05, 0.01, 0.05), layer, tint)
     mb.box((0.0, -0.01, 0.07), (0.035, 0.01, 0.09), layer, tint)
+    if "gem" in p:  # a jewel set where the bow meets the shaft (Shadow Key)
+        mb.sphere((0, 0, 0.21), 0.022, "prop:crystal:glow", p["gem"], subdivisions=1)
 
 
 def whip(mb: MeshBuilder, p, rng):

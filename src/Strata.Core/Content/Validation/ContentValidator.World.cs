@@ -56,6 +56,19 @@ public static partial class ContentValidator
             ctx.Specs(e, SpecKind.Condition, e.Conditions, "conditions");
             // Invasions show their icon on the progress panel.
             if (e.KillGoal > 0) ctx.Asset(e, AssetPaths.EventIcon(e), "icon");
+            if (e.SpawnBoss != null)
+            {
+                ctx.Ref(e, ctx.Db.Enemies, e.SpawnBoss, "spawnBoss");
+                if (ctx.Db.Enemies.TryGet(e.SpawnBoss, out var boss) && boss.Boss is not { Minor: false }) ctx.Error(e, $"spawnBoss '{e.SpawnBoss}' is not a boss.");
+                if (e.Duration <= 0) ctx.Error(e, "spawnBoss needs a duration (the countdown).");
+                if (e.KillGoal > 0) ctx.Error(e, "spawnBoss events have no kill goal.");
+            }
+            if (e.KillGoalAfterFlag is { } after)
+            {
+                ctx.Ref(e, ctx.Db.Flags, after.Flag, "killGoalAfterFlag.flag");
+                if (e.KillGoal <= 0 || after.Goal <= 0) ctx.Error(e, "killGoalAfterFlag needs a kill goal and a goal > 0.");
+            }
+            if (e.Group is "") ctx.Error(e, "group must not be empty.");
         }
         foreach (var s in ctx.Db.SpawnRules.All)
             foreach (var c in s.Conditions.Where(c => c.Type == "event"))

@@ -22,7 +22,7 @@
 ## Assets
 | Asset | Tool | Output |
 |---|---|---|
-| Terrain texture array (71 layers; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
+| Terrain texture array (104 layers, among them the Dungeon wall panels and Bone Block; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
 | Prop texture array (bark, leaf-card sprigs, metals, cloth, leather…) | `--set=props` | `assets/textures/props/` |
 | Block item icons | `tools/textures/build_icons.py` | `assets/icons/items/<block>.png` |
 | UI pixel sprites (hearts, stars, bubbles, slot silhouettes, buttons, pointer, frames) | `tools/textures/build_ui.py` | `assets/ui/<name>.png` |
@@ -53,6 +53,12 @@ sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `
 every tile object, item and enemy has a generator (no Blender needed). The spec is `assets.json` merged with the
 drop-in files `assets.d/*.json` (`asset_spec.load_spec()`; duplicate ids fail), and generator modules can register
 functions with `@generator` (`bgen/__init__.py`), which `build_all.py` finds by importing every `bgen` module.
+
+Bevels: `MeshBuilder.box(..., bevel=r, bevel_segments=n)` / `bevel_box(lo, hi, material, color, radius, segments)` and
+`extrude_polygon(..., bevel=r)` (convex outlines) chamfer (1 segment, 44 tris per box) or round (2, 108 tris) every edge,
+the radius clamped to 45 % of the thinnest extent. `bgen/furniture.py` uses two shared radii, `SOFT` (0.018 m, 2
+segments: tops, seats, chest bodies, frames) and `EDGE` (0.010 m chamfer: legs, slats, bands, planks), scaled per entry
+by `params.bevel` (0 = hard boxes); other furniture modules should import those constants and `bevels(p)`.
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
 weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and
@@ -122,6 +128,25 @@ glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools va
   (red shirt/vest/coat, blue undershirt and irises, green trousers, grey hair, belt and boots); hair is a separate model
   per body and style (`build_all.py --hair`, `bgen/human/hair_styles*.py`) worn on the head bone.
 
+### Palette furniture (dungeon sets)
+`bgen/dungeon_furniture.py` holds a palette-driven furniture family (door, chair, table, bookcase, candelabra,
+chandelier, floor lamp, vase) registered with `@generator`. Every generator reads `palette` (a name from `PALETTES`
+or an inline dict) with per-key overrides (`body`/`bodyTint`, `trim`/`trimTint`, `metal`/`metalTint`, `wax`,
+`books`), so other furniture families reuse it with other layers and tints; `resolve_palette`, `plinth` and
+`candle_cup` are shared helpers. The blue, green and pink Dungeon sets live in `data/tileobjects/dungeon.json`
+(specs in `tools/blender/assets.d/p4-17-dungeon-furniture.json`). A tile object's `flame.also` lists more flame bases
+(same size and colour) for multi-candle lights; keep them in sync with the candle tops the generator places.
+
+### Dungeon and boss generators
+Besides the palette furniture above, the Dungeon draws on `banner` (the six hall banners: Marching Bones, Necromantic
+Sign, Rusted Company Standard, Ragged Brotherhood Sigil, Molten Legion Flag, Diabolic Sigil, 2 x 4 wall hangings
+drawn flush, back to the wall), `statue` (angel, armor and skeleton statues), `book` (shelf books), `spike_strip`
+(`spike`, one MultiMesh per chunk), `chest` (the six vault biome chests and the locked Gold and Shadow chests),
+`bone_welder`, and the bosses' `trophy` generator (3 x 3 wall hangings, front turned away from the wall). Each boss's
+treasure bag, masks and Expert items are items in the boss's data file with models from the boss generator modules.
+Rebuild only what you add: `python3.13 tools/blender/build_all.py --only=<ids>`, which keeps the rest of
+`assets/manifest.json` (when two branches both add assets, take one side's manifest and rebuild the other side's ids).
+
 ## UI look (fonts and theme)
 The interface follows Terraria's look: see-through royal-blue panels (`#3F5297` at ~70%), white text with a black
 outline in a bold rounded face, slot tints by kind and Terraria's rarity colours.
@@ -136,6 +161,16 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   `godot --headless --path . -- --export-theme` (or `ui export-theme` in the console); the `ui.theme_synced` probe in
   `ui.cmds` fails while the file is stale. Slot styles are cached per `SlotKind` (`UiTheme.SlotStyle`), so drawing a
   slot allocates nothing.
+* **Slots, tooltips and the pointer**: `ItemSlotView` (drawing in `ItemSlotView.Draw.cs`) tints each slot by
+  `SlotKind` (gold when selected or favourited, dark when locked), centres the icon at 62% of the slot, writes the
+  stack count bottom-left in outlined white (a bow's or gun's rounds from `PlayerInventory.CountAmmo` in the same
+  corner, red at 0) and a faint native-size silhouette in empty slots; a held right button repeats the click at
+  `HoldRepeat` pace; hidden views stop processing (probe `ui.slot_views`). `TooltipFollower` (CanvasLayer 95) is
+  the only item tooltip: shown instantly on hover beside the pointer, lines coloured by `UiTheme.TooltipColor`,
+  rebuilt only when the stack changes or every 0.25 s. `CursorItemLayer` (CanvasLayer 90) draws the held cursor
+  stack at the pointer over every screen. `UiCursor` makes the generated `assets/ui/cursor.png` the system pointer,
+  tinted by the cursor colour setting (Terraria's `#ff325f` by default; settings files without a `version` key move
+  from the old white default) and scaled with the UI. Moving items plays `grab` (`tools/audio/sfx_recipes_ui.py`).
 * **Rarity colours** live in Core (`Strata.Core.Presentation.RarityColors`): tiers -1 and 0–11 with Terraria's RGB,
   Quest (-11) amber, Expert (-12) a cycling rainbow and Master (-13) a red-orange pulse; `UiTheme.Rarity` converts.
 * **UI scale**: `Strata.Core.Presentation.UiScale` lowers the UI scale setting so the logical viewport never drops
@@ -150,3 +185,42 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   and buff rows. A region with no room is left out of `Rects` (the widget hides). Engine code calls it on viewport
   resize and on state changes only; `UiLayoutTests` checks every window size from 1024×600 to 3840×2160 at every UI
   scale step.
+* **Input gate** (`game/UI/InputGate.cs`): screens register as `GateKind.Modal` (pause menu and settings, console,
+  world map: `GameplayBlocked`, everything stops) or `GateKind.Overlay` (inventory with its chest, town dialog with
+  its shop: `OverlayOpen`, the pointer is free but `MovementBlocked`/`HotkeysBlocked` stay false, so the player walks,
+  jumps, grapples, picks hotbar slots and fights). `MouseFree` (either kind) shows the pointer and stops mouse look
+  (`LookBlocked`); `TextEntry` blocks movement and hotkeys too. With an overlay open the item is used only while the
+  button is held on empty screen: `WorldClickCatcher`, a full-screen control on CanvasLayer 9 under the HUD and every
+  overlay, takes exactly the clicks no panel or slot took and sets `WorldPointer` (left: use toward the crosshair, or throw the cursor
+  stack; right: throw one, or drag to turn the camera through `CameraRig.AddLook` with `CameraDrag`). The number keys
+  are polled (`InteractionController.PollHotbarKeys`), the wheel reads the rebindable `hotbar_next`/`hotbar_prev`
+  actions and is left to a panel under the pointer (`InputGate.PointerOverPanel`). Smoke: `ui click`/`ui drag`
+  press on empty screen through the GUI (`PointerInput`); probes `ui.inventory`, `ui.overlay`, `ui.modal`,
+  `ui.world_clicks`, `camera.yaw`, `player.hotbar`.
+* **HUD** (`game/UI/Hud.cs`, widgets in `game/UI/Hud/`): `Hud.ApplyLayout` builds a `UiState` and places every widget
+  on its `UiLayout` region whenever the logical viewport, the UI scale or what is shown changes (inventory, NPC chat,
+  boss, buff count, info rows, minimap setting, F3), never per frame; `Hud.LayoutApplied` moves the `Minimap` and the
+  `PerfOverlay` on their own canvas layers. A headless run lays out for the project window over the UI scale
+  (`LayoutWidgets.LogicalSize`). Widgets: `ItemNameLabel` (held stack's `ItemTooltip.NameLine` in its rarity colour,
+  "Inventory" while open), `HotbarBar` (top-left, unselected slots ease to 0.78 scale, `hotbar_tick` on every
+  switch, hidden while the inventory is open), `Crosshair` (cursor colour; `talk_hint`/`open_hint` with the interact
+  key; holds the `TargetLabel`), `StatusLine` (refusals and notices for 2 s under the crosshair, else the build-shape
+  hint), `InfoPanel` (info-accessory rows with the accessory's icon, FPS last, 4 Hz), `VitalsBars` (life, mana and
+  breath bars until the hearts, stars and bubbles), the buff row (`Hud.Buffs.cs`), the pickup feed in the chat region
+  and the boss bar. Text widgets draw through `OutlinedText` (no minimum size, clipped), so nothing outgrows its
+  region; the minimap has a 9-slice `minimap_frame` and +/− buttons (zoom 0.5–6) on CanvasLayer 10, above the click
+  catcher. Every placed control joins `LayoutWidgets.Group`; probe `ui.overlaps` counts intersecting pairs in the live
+  tree (and logs them). Smoke: `ui f3`, `ui minimap in|out`; probes `hud.item_name`, `hud.status`,
+  `ui.layout_width`, `ui.minimap_zoom`.
+* **Inventory screen** (`game/UI/InventoryScreen*.cs`, `game/UI/Inventory/`): Terraria's layout on the HUD's
+  `UiLayout` (the HUD feeds it `InventoryScreen.Panel` and `AccessoryRows` and calls `InventoryScreen.Place` from
+  `LayoutApplied`; `LayoutChanged` lays it out at once on open, close or a panel change). The backpack's 10×5 grid
+  sits on the hotbar's origin (first row = hotbar, selected slot gold); `CoinAmmoColumns` holds the coin and ammo
+  columns, the trash slot under them (saved with the player) and the `sort`/`quick_stack` buttons; the panel host
+  under the grid shows one panel at a time through `ShowPanel(Control, UiPanel)`/`ClosePanel()` (the chest today,
+  with 40 pooled slot views rebound on open; the shop and service panels plug in here) and sizes its slots by
+  `SlotScale`; `CraftingPanel` takes the Crafting region (pooled rows, no fixed size); the equipment column takes the
+  Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
+  so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
+  (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack), `.Chest`,
+  `.Equipment`. Smoke: `ui sort`, `ui quickstack`; probes `ui.grid_on_hotbar`, `ui.panel`, `ui.slot_scale`.

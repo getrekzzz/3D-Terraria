@@ -6,9 +6,10 @@ using Strata.Core.Gameplay.Entities;
 namespace Strata.Core.AI;
 
 /// <summary>
-/// Gel Sovereign: charges up big hops towards the target, slams down, sheds minion gels as it loses life and
-/// teleports beside a target that runs too far (shrinking first as a telegraph, invulnerable meanwhile).
-/// Phase: 0 = hopping, 1 = teleport shrink, 2 = reappear.
+/// Gel Sovereign (King Slime): charges up big hops towards the target, slams down (an impact), sheds minion gels as it
+/// loses life and shrinks with it (model and box), and teleports beside a target that runs too far or stays out of
+/// sight (shrinking first as a telegraph, invulnerable meanwhile). Expert: every third minion is a Spiked Slime and the
+/// teleport winds up faster. Phase: 0 = hopping, 1 = teleport shrink, 2 = reappear; PhaseTimer = ticks without sight.
 /// </summary>
 public sealed class GelSovereignBrain : IBrain
 {
@@ -20,22 +21,31 @@ public sealed class GelSovereignBrain : IBrain
 
     public void Think(Npc npc, BrainContext ctx)
     {
+        Shrink(npc);
         ShedMinions(npc, ctx);
+        if (npc.LandingSpeed > _p.ImpactSpeed)
+        {
+            ctx.Impact?.Invoke(npc.Position, 0.3f);
+            ctx.Cue?.Invoke(npc, "land");
+        }
         if (ctx.Target == null) return;
         npc.TargetPlayer = 0;
+        var head = npc.Center + new Vector3(0, npc.HalfExtents.Y * 0.8f, 0);
+        npc.PhaseTimer = ctx.InSight?.Invoke(head, ctx.Target.Eye) ?? true ? 0 : npc.PhaseTimer + 1;
         if (npc.Phase == 1)
         {
             npc.Pose = "teleport";
             npc.Invulnerable = true;
             npc.Velocity = new Vector3(0, npc.Velocity.Y, 0);
-            if (++npc.Timer < 50) return;
-            // Reappear on the ground next to the target.
+            if (++npc.Timer < (ctx.Expert ? _p.ExpertTeleportTicks : _p.TeleportTicks)) return;
+            // Reappear beside the target, or right above it when that spot is still behind a wall.
             var dir = BrainFactory.Flat(npc.Position - ctx.Target.Position);
             if (dir == Vector3.Zero) dir = Vector3.UnitX;
-            npc.Position = ctx.Target.Position + dir * 5f + new Vector3(0, 3f, 0);
+            if (TeleportSpot(npc, ctx, dir) is { } spot) npc.Position = spot; // nowhere free: it reappears where it was
             npc.Velocity = Vector3.Zero;
             npc.Phase = 2;
             npc.Timer = 0;
+            npc.PhaseTimer = 0;
             return;
         }
         if (npc.Phase == 2)
@@ -49,7 +59,7 @@ public sealed class GelSovereignBrain : IBrain
             }
             return;
         }
-        if (ctx.TargetDistance > _p.TeleportDistance && npc.OnGround)
+        if ((ctx.TargetDistance > _p.TeleportDistance || npc.PhaseTimer > _p.LostSightTicks) && npc.OnGround)
         {
             npc.Phase = 1;
             npc.Timer = 0;
@@ -75,6 +85,41 @@ public sealed class GelSovereignBrain : IBrain
         npc.Pose = "jump";
     }
 
+    /// <summary>
+    /// Where the teleport lands (feet): beside the target when that spot sees it, else right above it, else on the ground
+    /// around it; never a spot whose box is in terrain (it would be stuck there). Null when nothing near is free.
+    /// </summary>
+    private static Vector3? TeleportSpot(Npc npc, BrainContext ctx, Vector3 dir)
+    {
+        var target = ctx.Target!;
+        var up = new Vector3(0, npc.HalfExtents.Y, 0);
+        var beside = target.Position + dir * 5f + new Vector3(0, 3f, 0);
+        if (Free(beside) && (ctx.InSight?.Invoke(beside + up, target.Eye) ?? true)) return beside;
+        var above = target.Position + new Vector3(0, 2.5f, 0);
+        if (Free(above)) return above;
+        if (Free(target.Position + new Vector3(0, 0.05f, 0))) return target.Position + new Vector3(0, 0.05f, 0);
+        for (int k = 0; k < 8; k++)
+        {
+            float a = k * MathF.PI / 4f;
+            var around = target.Position + new Vector3(MathF.Sin(a), 0, MathF.Cos(a)) * 4f;
+            if (ctx.Ground?.Invoke(around) is { } feet && Free(feet + new Vector3(0, 0.05f, 0))
+                && (ctx.InSight?.Invoke(feet + up, target.Eye) ?? true)) return feet + new Vector3(0, 0.05f, 0);
+        }
+        return null;
+
+        bool Free(Vector3 feet) => ctx.Fits?.Invoke(feet + up, npc.HalfExtents) ?? true;
+    }
+
+    /// <summary>Model and box scale with the life left (Terraria's King Slime goes from 1.25 to 0.75).</summary>
+    private void Shrink(Npc npc)
+    {
+        float life = Math.Clamp(npc.Life / (float)Math.Max(1, npc.MaxLife), 0f, 1f);
+        float scale = _p.EmptyScale + (_p.FullScale - _p.EmptyScale) * life;
+        if (MathF.Abs(scale - npc.VisualScale) < 0.005f) return;
+        npc.VisualScale = scale;
+        npc.HalfExtents = npc.BaseHalfExtents * scale; // the feet stay put, so a shrinking box never sinks into terrain
+    }
+
     private void ShedMinions(Npc npc, BrainContext ctx)
     {
         if (_p.Minion == null || ctx.Spawn == null || !ctx.Content.Enemies.TryGet(_p.Minion, out var minion)) return;
@@ -83,16 +128,20 @@ public sealed class GelSovereignBrain : IBrain
         while (npc.Counter2 < due)
         {
             npc.Counter2++;
+            var kind = minion;
+            if (ctx.Expert && npc.Counter2 % 3 == 0 && _p.ExpertMinion != null && ctx.Content.Enemies.TryGet(_p.ExpertMinion, out var spiked)) kind = spiked;
             var offset = new Vector3(ctx.Rng.NextSigned(), 0.5f, ctx.Rng.NextSigned()) * 1.5f;
-            if (ctx.Spawn(minion, npc.Center + offset) is { } m) m.Velocity = new Vector3(offset.X * 3f, 6f, offset.Z * 3f);
+            if (ctx.Spawn(kind, npc.Center + offset) is { } m) m.Velocity = new Vector3(offset.X * 3f, 6f, offset.Z * 3f);
         }
     }
 }
 
 /// <summary>
-/// The Watcher: phase 1 orbits the target summoning servant eyes, then telegraphs (stares) and dashes in bursts;
-/// below a life fraction it transforms (phase 2 model) and dashes faster and more often.
-/// Phase: 0 = orbit, 1 = telegraph, 2 = dash; <see cref="Npc.Counter"/> counts dashes in the burst.
+/// The Watcher (Eye of Cthulhu, the Twins): phase 1 orbits the target summoning servant eyes, then telegraphs (stares)
+/// and dashes in bursts. Below a life fraction it transforms (spinning in place, untouchable, into its phase 2 model),
+/// then fights with its phase 2 defense and damage, dashing faster and more often; in Expert it chains more dashes as it
+/// weakens. Phase: 0 = orbit, 1 = telegraph, 2 = dash; <see cref="Npc.Counter"/> counts dashes in the burst;
+/// <see cref="Npc.Stage"/>: 0 = phase 1, 1 = transforming (Counter2 = ticks left), 2 = phase 2.
 /// </summary>
 public sealed class WatcherBrain : IBrain
 {
@@ -104,11 +153,53 @@ public sealed class WatcherBrain : IBrain
 
     public void Think(Npc npc, BrainContext ctx)
     {
+        float life = npc.Life / (float)Math.Max(1, npc.MaxLife);
+        if (npc.Stage < 0) npc.Stage = 0;
+        // Expert: a twin whose sibling has fallen fights on faster.
+        if (_p.Sibling != null && _p.ExpertLoneSpeed != 1f)
+            npc.SpeedScale = ctx.Expert && (ctx.CountAlive?.Invoke(_p.Sibling) ?? 1) == 0 ? _p.ExpertLoneSpeed : 1f;
+        if (npc.Stage == 0 && life <= _p.Phase2Life)
+        {
+            npc.Stage = 1;
+            npc.Counter2 = _p.TransformTicks;
+            npc.Phase = 0;
+            npc.Timer = 0;
+            npc.Counter = 0;
+            if (_p.Phase2Model != null) npc.ModelOverride = _p.Phase2Model;
+            if (_p.TransformTicks > 0) ctx.Cue?.Invoke(npc, "boss_roar");
+        }
+        if (npc.Stage == 1)
+        {
+            if (npc.Counter2 > 0)
+            {
+                // Tearing open: it spins in place and cannot be hurt.
+                npc.Counter2--;
+                npc.Velocity *= 0.9f;
+                npc.Yaw += 0.45f;
+                npc.Pose = "transform";
+                npc.Invulnerable = true;
+                return;
+            }
+            npc.Invulnerable = false;
+            npc.Stage = 2;
+        }
+        bool enraged = npc.Stage == 2;
+        npc.Enraged = enraged;
+        if (enraged)
+        {
+            if (npc.ModelOverride == null && _p.Phase2Model != null) npc.ModelOverride = _p.Phase2Model;
+            if (_p.Phase2Defense >= 0) npc.DefenseOverride = _p.Phase2Defense;
+            npc.DamageScale = _p.Phase2Damage;
+        }
         if (ctx.Target == null) return;
         npc.TargetPlayer = 0;
-        bool enraged = npc.Life <= npc.MaxLife * _p.Phase2Life;
-        npc.Enraged = enraged;
-        if (enraged && npc.ModelOverride == null && _p.Phase2Model != null) npc.ModelOverride = _p.Phase2Model;
+        int dashes = _p.DashesPerBurst + (enraged ? _p.Phase2ExtraDashes : 0);
+        int telegraph = enraged ? _p.TelegraphTicks * 2 / 3 : _p.TelegraphTicks;
+        if (enraged && ctx.Expert && _p.ExpertMaxDashes > 0)
+        {
+            dashes = Math.Max(dashes, Math.Min(_p.ExpertMaxDashes, _p.DashesPerBurst + (int)((_p.Phase2Life - life) / 0.1f + 1e-3f)));
+            telegraph = Math.Max(1, (int)MathF.Round(telegraph * _p.ExpertTelegraphScale));
+        }
         var toTarget = ctx.Target.Center - npc.Center;
         npc.Timer++;
         switch (npc.Phase)
@@ -135,7 +226,7 @@ public sealed class WatcherBrain : IBrain
             case 1: // telegraph: brake and stare
                 npc.Velocity *= 0.85f;
                 npc.Pose = "telegraph";
-                if (npc.Timer >= (enraged ? _p.TelegraphTicks * 2 / 3 : _p.TelegraphTicks))
+                if (npc.Timer >= telegraph)
                 {
                     npc.Phase = 2;
                     npc.Timer = 0;
@@ -148,7 +239,7 @@ public sealed class WatcherBrain : IBrain
                 {
                     npc.Counter++;
                     npc.Timer = 0;
-                    npc.Phase = npc.Counter >= _p.DashesPerBurst + (enraged ? 2 : 0) ? 0 : 1;
+                    npc.Phase = npc.Counter >= dashes ? 0 : 1;
                 }
                 break;
         }

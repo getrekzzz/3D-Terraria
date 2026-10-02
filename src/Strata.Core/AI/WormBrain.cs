@@ -25,6 +25,12 @@ public sealed class WormBrain : IBrain
     public void Think(Npc npc, BrainContext ctx)
     {
         const float dt = 1f / Common.Units.TicksPerSecond;
+        if (_p.Fly)
+        {
+            Fly(npc, ctx, dt);
+            Spit(npc, ctx);
+            return;
+        }
         var head = npc.Center;
         bool buried = ctx.World.IsSolid(VoxelMotion.CellOf(head).X, VoxelMotion.CellOf(head).Y, VoxelMotion.CellOf(head).Z);
         var velocity = npc.Velocity.LengthSquared() > 1e-4f ? npc.Velocity : new Vector3(0, -_p.Speed, 0);
@@ -47,17 +53,95 @@ public sealed class WormBrain : IBrain
         if (_p.DigRadius > 0 && ctx.Carve != null && (npc.Age % _p.DigInterval) == 0 && (buried || NearTerrain(ctx, head)))
             ctx.Carve(head, _p.DigRadius);
         ReleaseMinion(npc, ctx);
+        Spit(npc, ctx);
     }
 
-    /// <summary>Drones launched from a random segment while fewer than the cap are alive.</summary>
+    /// <summary>
+    /// Sky-serpent flight at constant speed with a limited turn rate, so it overshoots and loops back like Terraria's
+    /// Wyvern; the heading bobs up and down on a slow wave. Without a target it circles its spawn point.
+    /// </summary>
+    private void Fly(Npc npc, BrainContext ctx, float dt)
+    {
+        var head = npc.Center;
+        var dir = npc.Velocity.LengthSquared() > 1e-4f ? Vector3.Normalize(npc.Velocity) : new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
+        float speed = _p.Speed;
+        Vector3 want;
+        if (ctx.Target != null)
+        {
+            npc.TargetPlayer = 0;
+            var to = ctx.Target.Center - head;
+            float distance = to.Length();
+            want = distance > 1e-3f ? to / distance : dir;
+            if (distance > _p.FarRange) speed *= _p.CatchUp;
+        }
+        else
+        {
+            // Bank around the spawn point: turn sideways, drift back toward it.
+            var side = Vector3.Normalize(new Vector3(dir.Z, 0, -dir.X) + new Vector3(1e-4f, 0, 0));
+            want = Vector3.Normalize(dir + side * 0.6f + (npc.Anchor + new Vector3(0, 6f, 0) - head) * 0.03f);
+        }
+        if (_p.Weave > 0)
+            want = Vector3.Normalize(want + new Vector3(0, _p.Weave * MathF.Sin(npc.Age * MathF.Tau / Math.Max(1, _p.WeavePeriod) + npc.Id), 0));
+        var turned = dir + (want - dir) * MathF.Min(1f, _p.TurnRate * dt);
+        if (turned.LengthSquared() > 1e-6f) dir = Vector3.Normalize(turned);
+        npc.Velocity = dir * speed;
+        npc.Yaw = BrainFactory.YawOf(dir);
+        npc.Pose = "attack";
+    }
+
+    /// <summary>A random body segment spits at the target when it can see it (each piece of a split worm on its own clock).</summary>
+    private void Spit(Npc npc, BrainContext ctx)
+    {
+        if (_p.SpitProjectile == null || ctx.Shoot == null || ctx.Target == null || npc.Segments.Count < 2) return;
+        if (_p.SpitExpertOnly && !ctx.Expert) return;
+        int interval = Math.Max(1, _p.SpitInterval);
+        if (npc.Age == 0 || (npc.Age + (int)(npc.Id % interval)) % interval != 0) return;
+        // A few random body segments (never the tail) are tried; the first that sees the target spits.
+        for (int tries = 0; tries < 6; tries++)
+        {
+            var from = npc.Segments[ctx.Rng.NextInt(npc.Segments.Count - 1)];
+            var aim = ctx.Target.Center - from;
+            if (aim.LengthSquared() < 1e-4f || !(ctx.InSight?.Invoke(from, ctx.Target.Eye) ?? true)) continue;
+            ctx.Shoot(_p.SpitProjectile, from, Vector3.Normalize(aim) * _p.SpitSpeed, _p.SpitDamage);
+            return;
+        }
+    }
+
+    /// <summary>Bit of <see cref="Npc.SegmentFlags"/>: this segment has launched its probe (it goes dark and stops firing).</summary>
+    public const byte ProbeSpent = 1;
+
+    /// <summary>
+    /// Drones launched while fewer than the cap are alive. Each body segment (never the tail) carries one: a random segment
+    /// that still has its drone launches it and is marked spent, so a long fight leaves the worm dark.
+    /// </summary>
     private void ReleaseMinion(Npc npc, BrainContext ctx)
     {
-        if (_p.Minion == null || ctx.Spawn == null || ctx.Target == null || npc.Segments.Count == 0) return;
+        if (_p.Minion == null || npc.Segments.Count < 2) return;
+        while (npc.SegmentFlags.Count < npc.Segments.Count) npc.SegmentFlags.Add(0); // marks the worm as a probe carrier
+        if (ctx.Spawn == null || ctx.Target == null) return;
         if (npc.Age == 0 || npc.Age % Math.Max(1, _p.MinionInterval) != 0) return;
         if (!ctx.Content.Enemies.TryGet(_p.Minion, out var minion) || (ctx.CountAlive?.Invoke(minion.Id) ?? 0) >= _p.MaxMinions) return;
-        var from = npc.Segments[ctx.Rng.NextInt(npc.Segments.Count)];
-        if (ctx.Spawn(minion, from) is { } m) m.Velocity = new Vector3(ctx.Rng.NextSigned(), 1f, ctx.Rng.NextSigned()) * 4f;
+        var flags = npc.SegmentFlags;
+        int body = npc.Segments.Count - 1, start = ctx.Rng.NextInt(body);
+        for (int k = 0; k < body; k++)
+        {
+            int i = (start + k) % body;
+            if ((flags[i] & ProbeSpent) != 0) continue;
+            if (ctx.Spawn(minion, npc.Segments[i]) is not { } m) return; // the creature cap: the segment keeps its drone
+            m.Velocity = new Vector3(ctx.Rng.NextSigned(), 1f, ctx.Rng.NextSigned()) * 4f;
+            flags[i] |= ProbeSpent;
+            return;
+        }
     }
+
+    /// <summary>Whether body segment <paramref name="i"/> has launched its drone.</summary>
+    public static bool Spent(Npc npc, int i) => i < npc.SegmentFlags.Count && (npc.SegmentFlags[i] & ProbeSpent) != 0;
+
+    /// <summary>
+    /// Whether segment <paramref name="i"/> may fire a part's volley: on a probe carrier only body plates that still hold
+    /// their probe (the tail never fires); any segment of other creatures.
+    /// </summary>
+    public static bool Fires(Npc npc, int i) => npc.SegmentFlags.Count == 0 || (i < npc.Segments.Count - 1 && !Spent(npc, i));
 
     private static bool NearTerrain(BrainContext ctx, Vector3 point)
     {

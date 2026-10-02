@@ -1,0 +1,6 @@
+{
+  // Loot rolled where a worm boss's segment dies (each segment on its own), apart from the boss's own loot table.
+  "lootTables": [
+    { "id": "eater_segment", "entries": [{ "item": "demonite_ore", "min": 1, "max": 2, "chance": 0.5 }, { "item": "shadow_scale", "min": 1, "max": 2, "chance": 0.5 }] }
+  ]
+}

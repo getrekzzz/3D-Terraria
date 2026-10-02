@@ -49,6 +49,12 @@ public sealed class EventConditionParams : SpecParams
     public int MinKills { get; init; }
 }
 
+/// <summary>The world is (or is not) an Expert-rules world: Expert or Master, never Classic or Journey.</summary>
+public sealed class ExpertConditionParams : SpecParams
+{
+    public bool Is { get; init; } = true;
+}
+
 public sealed class RangeConditionParams : SpecParams
 {
     public float Min { get; init; } = float.MinValue;
@@ -98,6 +104,12 @@ public sealed class HasItemConditionParams : SpecParams, IValidatableSpec
     public int Count { get; init; } = 1;
 
     public string? Validate() => (Item == null) == (Tag == null) ? "hasItem needs exactly one of 'item' or 'tag'" : null;
+}
+
+/// <summary>A player wears an item (armor or accessory slot): the Clothier's Red Hat.</summary>
+public sealed class WearingConditionParams : SpecParams
+{
+    public string Item { get; init; } = "";
 }
 
 /// <summary>The world's evil: "corruption" or "crimson".</summary>

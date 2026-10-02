@@ -8,9 +8,9 @@
   zlib with a format byte and the applied world-mutation level — a chunk behind the log catches up when it loads; tile objects with state, containers and
   pending loot). Unmodified chunks regenerate from the seed. An object record whose state byte has bit 4 is followed
   (after `PendingLoot`) by an object-meta list of `tag, length, payload` entries ending in tag 0: tag 1 is the chest's
-  `CustomName`. The format byte is 2 since the meta list (a v1 reader refuses such chunks instead of misreading
-  them); v1 chunks never set the bit and still read. Readers skip unknown tags, so later fields (chest locks) append a
-  tag without another format bump. The background saver captures the object section with `ChunkCodec.EncodeObjects`
+  `CustomName`, tag 2 (no payload) marks a locked chest (`Locked`). The format byte is 2 since the meta list (a v1
+  reader refuses such chunks instead of misreading them); v1 chunks never set the bit and still read. Readers skip
+  unknown tags, so later fields append a tag without another format bump. The background saver captures the object section with `ChunkCodec.EncodeObjects`
   on the main thread, so the meta list is part of every snapshot.
 * `user://players/<name>.player.json` — `PlayerSave` (format `strata-player` v1): inventory, equipment,
   buffs, permanent upgrades, deaths, bed spawn per world. Unknown item ids become placeholders that keep

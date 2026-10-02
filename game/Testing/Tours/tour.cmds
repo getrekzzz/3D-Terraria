@@ -1,4 +1,4 @@
-# Screenshot tour: surface biomes, caves at three depths, the underworld, a town, night, the crypt, the Mawwall
+# Screenshot tour: surface biomes, caves at three depths, the underworld, a town, night, the crypt and its halls, the Mawwall
 # and the hardmode world.
 # Rendering required for images (headless runs only exercise the route):
 #   godot --path . --rendering-driver vulkan -- --world=tour --size=small --new --player=tour --fresh-player \
@@ -111,6 +111,40 @@ heal
 screenshot 12_crypt_warden
 wait_until screenshot.pending == 0 900
 killall
+
+# Inside the Dungeon (spawning is off, so the guardian stays away): the keep's facade at noon, the pillared foyer over the
+# entrance shaft, a winding hall hung with banners, a library and a treasure room.
+time 12
+tp landmark dungeon_gate
+wait_until player.frozen == 0 300
+aim landmark dungeon_shaft 0.35
+wait_until stream.idle == 1 900
+screenshot 12a_keep_facade
+wait_until screenshot.pending == 0 900
+tp landmark dungeon_foyer
+wait_until player.frozen == 0 300
+aim landmark dungeon_shaft -0.3
+wait_until stream.idle == 1 900
+screenshot 12b_keep_foyer
+wait_until screenshot.pending == 0 900
+tp landmark dungeon_hall
+wait_until player.frozen == 0 300
+aim landmark dungeon_banner 0.1
+wait_until stream.idle == 1 900
+screenshot 12c_banner_hall
+wait_until screenshot.pending == 0 900
+tp landmark dungeon_library
+wait_until player.frozen == 0 300
+aim 1 0.1 0.3
+wait_until stream.idle == 1 900
+screenshot 12d_library
+wait_until screenshot.pending == 0 900
+tp landmark dungeon_treasure
+wait_until player.frozen == 0 300
+aim 0.3 0 1
+wait_until stream.idle == 1 900
+screenshot 12e_treasure_room
+wait_until screenshot.pending == 0 900
 
 # The Mawwall rising over an obsidian ledge in the underworld (god mode keeps the camera alive).
 god on

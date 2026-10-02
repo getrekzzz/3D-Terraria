@@ -140,8 +140,17 @@ public class TerrainShapeTests
         var spawn = gen.Plan.Spawn;
         var profile = SurfaceProfile.Measure(gen, spawn.X - 80, spawn.Z - 80, 160, 160, threads: Environment.ProcessorCount);
         var all = profile.Stats();
-        var features = gen.Plan.Features.All;
-        var terrain = profile.Stats((x, z) => !features.Any(f => x >= f.Bounds.Min.X && x < f.Bounds.Max.X && z >= f.Bounds.Min.Z && z < f.Bounds.Max.Z));
+        // A feature's footprint near the surface: the Dungeon's box spans its deep halls under spawn too, so it counts
+        // op by op (the keep, the shaft), and only boxes that reach the surface band mark their columns.
+        var boxes = new List<Aabb3i>();
+        foreach (var f in gen.Plan.Features.All)
+            if (f is Strata.Core.WorldGen.Structures.Dungeon.DungeonFeature d) foreach (var op in d.Blueprint.Ops) boxes.Add(op.Bounds);
+            else boxes.Add(f.Bounds);
+        var terrain = profile.Stats((x, z) =>
+        {
+            float top = gen.Terrain.SurfaceHeight(x, z);
+            return !boxes.Any(b => x >= b.Min.X && x < b.Max.X && z >= b.Min.Z && z < b.Max.Z && b.Max.Y >= top - 12 && b.Min.Y <= top + 12);
+        });
         Assert.True(terrain.Columns > 160 * 160 / 2, $"only {terrain.Columns} columns away from features");
         Assert.Equal(0.0, terrain.LipPercent);
         Assert.Equal(0.0, terrain.BreachPercent);

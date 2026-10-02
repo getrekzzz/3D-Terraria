@@ -9,8 +9,10 @@ namespace Strata.Game.Debug;
 /// <summary>
 /// Probes on the global UI look (P2-01): the shipped font is ThemeDB's fallback, an unthemed panel resolves to
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
-/// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; and on
-/// the floating combat numbers (P2-19).
+/// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
+/// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
+/// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); and on the inventory
+/// screen's layout (P2-15).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -49,5 +51,32 @@ public static class UiProbes
         ctx.AddProbe("fx.numbers", () => Effects()?.NumbersShown ?? 0);
         ctx.AddProbe("fx.heal_numbers", () => Effects()?.HealNumbersShown ?? 0);
         ctx.AddProbe("fx.number_labels", () => Effects()?.NumberLabels ?? 0);
+        ctx.AddProbe("ui.tooltip_lines", () => world.Tooltip?.LineCount ?? 0);
+        ctx.AddProbe("ui.cursor_count", () => world.CursorItem?.ShownCount ?? 0);
+        ctx.AddProbe("ui.slot_views", () => ItemSlotView.ActiveViews);
+        // P2-11: the inventory is an overlay (the player keeps moving); presses that landed on empty screen; the view's yaw.
+        ctx.AddProbe("ui.inventory", () => world.Inventory?.IsOpen == true ? 1 : 0);
+        ctx.AddProbe("ui.overlay", () => InputGate.OverlayOpen ? 1 : 0);
+        ctx.AddProbe("ui.modal", () => InputGate.GameplayBlocked ? 1 : 0);
+        ctx.AddProbe("ui.world_clicks", () => world.Runtime.GetNodeOrNull<WorldClickCatcher>(WorldClickCatcher.NodePath)?.Presses ?? 0);
+        ctx.AddProbe("camera.yaw", () => world.Player is { } p ? Mathf.RadToDeg(p.Rig.Yaw) : 0);
+        // P2-12: the HUD on the layout model. Overlapping widgets (each pair is logged), the line above the hotbar, a
+        // message on the status line, the logical viewport the layout was computed for and the minimap's zoom.
+        ctx.AddProbe("ui.overlaps", () =>
+        {
+            var pairs = new System.Collections.Generic.List<string>();
+            int count = LayoutWidgets.CountOverlaps(world.Runtime.GetTree(), pairs);
+            foreach (var pair in pairs) log.Warn("ui", $"overlap: {pair}");
+            return count;
+        });
+        ctx.AddProbe("hud.item_name", () => world.Hud?.ItemName.Length > 0 ? 1 : 0);
+        ctx.AddProbe("hud.status", () => world.Hud?.Status.Length > 0 ? 1 : 0);
+        ctx.AddProbe("ui.layout_width", () => world.Hud?.Layout?.Width ?? 0);
+        ctx.AddProbe("ui.minimap_zoom", () => world.Runtime.GetNodeOrNull<Minimap>("Minimap")?.Zoom ?? 0);
+        // P2-15: the inventory screen on the layout. Its grid sits on the hotbar's origin; the panel under it (0 none,
+        // 1 chest, 2 shop, 3 service); the slot scale the layout chose.
+        ctx.AddProbe("ui.grid_on_hotbar", () => world.Inventory?.GridOnHotbar == true ? 1 : 0);
+        ctx.AddProbe("ui.panel", () => (int)(world.Inventory?.Panel ?? Strata.Core.Presentation.UiPanel.None));
+        ctx.AddProbe("ui.slot_scale", () => world.Inventory?.SlotScale ?? 0);
     }
 }

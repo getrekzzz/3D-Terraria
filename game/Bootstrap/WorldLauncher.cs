@@ -28,6 +28,12 @@ public sealed class LaunchedWorld
     public UI.Hud? Hud { get; init; }
     public UI.TownDialog? TownDialog { get; init; }
     public UI.WorldMapScreen? WorldMap { get; init; }
+
+    /// <summary>The item tooltip that follows the pointer.</summary>
+    public UI.TooltipFollower? Tooltip { get; init; }
+
+    /// <summary>The stack held on the cursor, drawn at the pointer.</summary>
+    public UI.CursorItemLayer? CursorItem { get; init; }
 }
 
 /// <summary>What to open: a world directory (created from <see cref="NewWorld"/> when missing) and a character.</summary>
@@ -92,8 +98,12 @@ public static partial class WorldLauncher
         combatEffects.Follow(entity, player);
         var avatar = AddPlayerVisuals(runtime, services, game, props, entity, player);
         var interaction = AddInteraction(runtime, game, entity, player);
-        var (hud, inventory, worldMap, townDialog) = AddUi(runtime, game, player, interaction, objectRenderer);
-        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap };
+        var (hud, inventory, worldMap, townDialog, tooltip, cursorItem) = AddUi(runtime, game, player, interaction, objectRenderer);
+        return new LaunchedWorld
+        {
+            Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction,
+            Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap, Tooltip = tooltip, CursorItem = cursorItem,
+        };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

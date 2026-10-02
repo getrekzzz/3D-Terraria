@@ -45,7 +45,7 @@ public sealed class PlanContext
     public SeedTree SeedsFor(GenPass pass) => Plan.Seeds.Child(pass.Name);
 
     /// <summary>World-space land radius (cells) of the continent around the centre.</summary>
-    public float LandRadius => MathF.Min(Plan.Size.X, Plan.Size.Z) * 0.42f;
+    public float LandRadius => Plan.LandRadius;
 
     public float CenterX => Plan.Size.X * 0.5f;
     public float CenterZ => Plan.Size.Z * 0.5f;

@@ -83,25 +83,32 @@ public sealed partial class CameraRig : Node3D
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (UI.InputGate.GameplayBlocked) return;
-        var s = UserSettings.Current;
-        if (@event is InputEventMouseMotion m && Input.MouseMode == Input.MouseModeEnum.Captured)
+        if (UI.InputGate.HotkeysBlocked) return;
+        if (@event is InputEventMouseMotion m)
         {
-            float k = Sensitivity * Mathf.Max(0.05f, s.MouseSensitivity);
-            _yaw -= m.Relative.X * k;
-            _pitch = Mathf.Clamp(_pitch - m.Relative.Y * k * (s.InvertY ? -1f : 1f), -1.45f, 1.45f);
+            // With a screen open the free pointer does not look around (a right drag on empty screen does, AddLook).
+            if (!UI.InputGate.LookBlocked && Input.MouseMode == Input.MouseModeEnum.Captured) AddLook(m.Relative);
         }
         else if (@event.IsActionPressed("toggle_camera"))
         {
             FirstPerson = !FirstPerson;
         }
-        else if (@event is InputEventMouseButton { Pressed: true, CtrlPressed: true } wheel && !_firstPerson)
+        else if (@event is InputEventMouseButton { Pressed: true, CtrlPressed: true } wheel && !_firstPerson && !UI.InputGate.PointerOverPanel(GetViewport()))
         {
             if (wheel.ButtonIndex == MouseButton.WheelUp) _distance = Mathf.Max(1.5f, _distance - 0.4f);
             if (wheel.ButtonIndex == MouseButton.WheelDown) _distance = Mathf.Min(9f, _distance + 0.4f);
-            s.CameraDistance = _distance;
+            UserSettings.Current.CameraDistance = _distance;
             GetViewport().SetInputAsHandled();
         }
+    }
+
+    /// <summary>Turns the view by a mouse movement in pixels: the captured mouse, or a right-button drag on empty screen.</summary>
+    public void AddLook(Vector2 relative)
+    {
+        var s = UserSettings.Current;
+        float k = Sensitivity * Mathf.Max(0.05f, s.MouseSensitivity);
+        _yaw -= relative.X * k;
+        _pitch = Mathf.Clamp(_pitch - relative.Y * k * (s.InvertY ? -1f : 1f), -1.45f, 1.45f);
     }
 
     public override void _Process(double delta)

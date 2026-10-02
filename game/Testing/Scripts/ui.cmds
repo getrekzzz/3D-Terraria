@@ -107,3 +107,210 @@ wait 0.3
 assert fx.heal_numbers >= 1
 assert fx.number_labels <= 80
 assert errors == 0
+
+# --- P2-10 ---
+# Hidden slot views do no work: with the inventory closed only the hotbar's 10 process. Taking one torch with a right
+# click holds it at the pointer; hovering a slot shows its tooltip at once, in coloured lines; closing the inventory
+# puts the held torch back and hides both.
+wait 0.2
+assert ui.slot_views == 10
+give torch 5
+ui inventory
+wait 0.2
+assert ui.slot_views >= 60
+invclick backpack 3 right
+wait 0.1
+assert ui.cursor_count == 1
+ui hover backpack 0
+assert ui.tooltip_lines >= 3
+wait 0.3
+assert ui.tooltip_lines >= 3
+ui close
+wait 0.2
+assert inv.cursor == 0
+assert ui.cursor_count == 0
+assert ui.tooltip_lines == 0
+assert ui.slot_views == 10
+assert errors == 0
+
+# --- P2-11 ---
+# The inventory is an overlay, not a freeze: with it open the player walks, the number keys pick the hotbar slot, a
+# click on empty screen (routed through the GUI) throws the held stack (right: one), a held left button there swings
+# the item toward the crosshair, and a right drag turns the camera; a press the panels took swings nothing. The map
+# is modal and still stops everything.
+god on
+spawning off
+killall
+clear
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+wait 1.0
+ui inventory
+wait 0.2
+assert ui.inventory == 1
+assert ui.overlay == 1
+assert ui.modal == 0
+mark
+aim 0 0 1
+press move_forward
+wait 0.5
+assert player.speed > 0
+press move_forward off
+wait 0.3
+assert player.from_mark > 1.5
+press hotbar_3
+press hotbar_3 off
+wait 0.1
+assert player.hotbar == 2
+press hotbar_1
+press hotbar_1 off
+wait 0.1
+assert player.hotbar == 0
+give dirt 10
+invclick backpack 0 left
+assert inv.cursor == 10
+ui click right
+assert inv.cursor == 9
+ui click left
+assert inv.cursor == 0
+assert ui.world_clicks >= 2
+wait 0.2
+assert drops.count >= 1
+assert inv.dirt == 0
+give copper_shortsword 1
+wield copper_shortsword
+aim 0 -0.2 1
+mark
+press use_primary
+wait 0.4
+press use_primary off
+assert player.swings == 0
+ui click left down
+wait 0.4
+ui click left up
+assert player.swings >= 1
+# A tap pressed and released within one tick still swings once.
+wait 0.6
+mark
+ui click left
+wait 0.1
+assert player.swings >= 1
+aim 1 0 0
+ui drag 400 0
+assert camera.yaw < -110
+ui map
+wait 0.1
+assert ui.modal == 1
+mark
+press move_forward
+wait 0.4
+press move_forward off
+assert player.from_mark < 0.3
+ui close
+wait 0.2
+assert ui.overlay == 0
+assert ui.modal == 0
+god off
+assert errors == 0
+
+# --- P2-12 ---
+# The HUD on the layout model: no two widgets overlap at UI scale 1 and 1.5, with the inventory open or the F3 overlay
+# up (the layout is computed on the logical viewport); the held item's name stays over the hotbar; the minimap's zoom
+# buttons take clicks beside the open inventory; shooting a bow with no arrows says so under the crosshair; with
+# arrows it shows its name and rounds without errors.
+wait 0.2
+assert ui.overlaps == 0
+assert hud.item_name == 1
+assert ui.layout_width > 1500
+ui f3
+wait 0.3
+assert ui.overlaps == 0
+ui f3
+uiscale 1.5
+wait 0.2
+assert ui.layout_width < 1100
+assert ui.overlaps == 0
+ui inventory
+wait 0.2
+assert ui.overlaps == 0
+ui f3
+wait 0.3
+assert ui.overlaps == 0
+ui f3
+ui close
+wait 0.1
+uiscale 1
+wait 0.2
+ui inventory
+wait 0.2
+ui minimap in
+assert ui.minimap_zoom > 2
+ui close
+wait 0.1
+give wooden_bow 1
+wield wooden_bow
+use
+wait 0.1
+assert hud.status == 1
+give wooden_arrow 20
+wait 0.2
+assert hud.item_name == 1
+assert ui.overlaps == 0
+assert errors == 0
+
+# --- P2-15 ---
+# The inventory screen on the layout: the grid's first row on the hotbar's spot, the coin and ammo columns right of it
+# with the trash under them and the sort buttons beside, crafting bottom-left and equipment under the minimap, none of
+# them overlapping (each is a layout widget). Coins merge in their slots; Ctrl+click puts a stack in the saved trash;
+# Sort Inventory runs. A chest opens in the panel host under the grid with nothing overlapping, at UI scale 1 and 1.5;
+# walking off closes the chest but not the inventory, and closing the inventory puts the chest away.
+clear
+ui inventory
+wait 0.2
+assert ui.overlaps == 0
+assert ui.grid_on_hotbar == 1
+assert ui.slot_scale == 1
+give copper_coin 250
+assert inv.silver_coin == 2
+assert inv.copper_coin == 50
+give dirt 10
+give torch 5
+give wood 5
+give gel 5
+give copper_shortsword 1
+invclick backpack 4 left ctrl
+assert inv.trash >= 1
+ui sort
+assert errors == 0
+ui close
+wait 0.1
+god on
+spawning off
+killall
+fill -3 0 -6 3 3 3 air
+fill -3 -1 -6 3 -1 3 dirt
+wait 0.5
+place wooden_chest 0 0 -4
+interact 0 0 -4
+wait 0.2
+assert ui.inventory == 1
+assert ui.panel == 1
+assert ui.overlaps == 0
+invclick backpack 1 left
+invclick chest 0 left
+assert inv.torch == 0
+ui quickstack
+uiscale 1.5
+wait 0.2
+assert ui.panel == 1
+assert ui.slot_scale < 1
+assert ui.overlaps == 0
+uiscale 1
+wait 0.2
+assert ui.overlaps == 0
+ui close
+wait 0.2
+assert ui.panel == 0
+assert ui.inventory == 0
+god off
+assert errors == 0

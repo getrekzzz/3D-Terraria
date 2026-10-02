@@ -35,7 +35,7 @@ public sealed partial class PauseMenu : CanvasLayer
     public override void _UnhandledInput(InputEvent e)
     {
         if (!e.IsActionPressed("pause") || InputGate.TextEntry) return;
-        if (!IsOpen && InputGate.GameplayBlocked) return; // an inventory or dialog closes itself on Esc
+        if (!IsOpen && InputGate.MouseFree) return; // an inventory, dialog or the map closes itself on Esc
         GetViewport().SetInputAsHandled();
         SetOpen(!IsOpen);
     }
@@ -44,7 +44,7 @@ public sealed partial class PauseMenu : CanvasLayer
     {
         _root.Visible = open;
         _runtime.Simulating = !open;
-        InputGate.SetOpen(Gate, open);
+        InputGate.SetOpen(Gate, open, GateKind.Modal);
         if (open) ShowMain();
     }
 

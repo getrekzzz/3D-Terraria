@@ -1,5 +1,6 @@
 using Godot;
 using Strata.Core.Commands;
+using Strata.Core.Gameplay.Items;
 using Strata.Game.Bootstrap;
 using Strata.Game.Settings;
 using Strata.Game.UI;
@@ -13,8 +14,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close|export-theme>",
-            Help = "Opens or closes gameplay screens; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|close|export-theme>",
+            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -41,12 +42,37 @@ public static class UiCommands
                         if (!dialog.IsOpen) return CommandResult.Fail("Not talking to anyone.");
                         dialog.OpenShop();
                         return CommandResult.Success("Shop open.");
+                    case "hover":
+                        string area = a.Str(1, "area");
+                        int index = a.Int(2, "index");
+                        var view = area == "hotbar"
+                            ? world.Hud?.HotbarSlot(index)
+                            : screen.FindSlot(new SlotRef(InventoryCommands.Area(area), index));
+                        if (view == null || !view.IsVisibleInTree()) return CommandResult.Fail($"No {area} slot {index} on screen (open the inventory first).");
+                        view.ShowTooltip();
+                        return CommandResult.Success($"Tooltip: {world.Tooltip?.LineCount ?? 0} lines.");
+                    case "click": return PointerInput.Click(world, a.Str(1, "button"), a.OptStr(2));
+                    case "drag": return PointerInput.Drag(world, a.Float(1, "dx"), a.Float(2, "dy"));
+                    case "minimap":
+                        var mini = world.Runtime.GetNodeOrNull<Minimap>("Minimap") ?? throw new CommandException("no minimap in this mode");
+                        if (!mini.Press(a.Str(1, "in|out") == "in")) return CommandResult.Fail("The minimap's buttons take no clicks now (hidden, or the mouse is captured).");
+                        return CommandResult.Success($"Minimap zoom {mini.Zoom:0.##}.");
+                    case "f3":
+                        var perf = world.Runtime.GetNodeOrNull<PerfOverlay>("PerfOverlay") ?? throw new CommandException("no performance overlay in this mode");
+                        perf.Toggle();
+                        return CommandResult.Success(perf.IsOpen ? "Performance overlay open." : "Performance overlay closed.");
+                    case "sort":
+                        screen.Sort();
+                        return CommandResult.Success("Backpack sorted.");
+                    case "quickstack":
+                        int chests = screen.QuickStack();
+                        return CommandResult.Success(chests > 0 ? $"Quick stacked into {chests} chest(s)." : "No nearby chest holds any of these items.");
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, minimap, f3, sort, quickstack, close or export-theme");
                 }
             },
         });

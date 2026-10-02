@@ -184,9 +184,19 @@ public sealed class TownCommerce
             message = p.FailMessage;
             return TradeResult.Refused;
         }
-        if (_world.Npcs.Spawn(boss, npc.Position + new System.Numerics.Vector3(0, p.Height, 0)) == null) return TradeResult.Unavailable;
-        if (p.Transforms) _town.Vanish(npc);
-        return TradeResult.Ok;
+        if (p.Transforms) return Curse(npc, boss, p.Height) ? TradeResult.Ok : TradeResult.Unavailable;
+        return _world.Npcs.Spawn(boss, npc.Position + new System.Numerics.Vector3(0, p.Height, 0)) != null ? TradeResult.Ok : TradeResult.Unavailable;
+    }
+
+    /// <summary>
+    /// A resident is cursed into a boss (the keeper's curse, the Clothier Voodoo Doll): the boss appears
+    /// <paramref name="height"/> m above them and they vanish into it, returning after the respawn delay.
+    /// </summary>
+    public bool Curse(TownNpc npc, EnemyDef boss, float height)
+    {
+        if (!npc.Alive || _world.Npcs.Spawn(boss, npc.Position + new System.Numerics.Vector3(0, height, 0)) == null) return false;
+        _town.Vanish(npc);
+        return true;
     }
 
     /// <summary>Recipes that use an item (the guide's crafting help), as output item names with their stations.</summary>

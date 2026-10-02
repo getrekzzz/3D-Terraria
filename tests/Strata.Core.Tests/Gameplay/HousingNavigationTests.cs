@@ -29,6 +29,16 @@ public class HousingNavigationTests
     }
 
     [Fact]
+    public void DungeonFurnitureCountsForHousing()
+    {
+        using var g = TestGame.Create();
+        TestHouses.Build(g, g.Floor, set: new[] { "blue_dungeon_door", "blue_dungeon_candelabra", "blue_dungeon_table", "blue_dungeon_chair" });
+        var room = new HousingScanner(g.World.Session.World).Scan(Inside(g));
+        Assert.True(room.Valid, room.ToString());
+        Assert.Contains(room.Furniture, o => o.Def.Id == "blue_dungeon_candelabra");
+    }
+
+    [Fact]
     public void ShippedHousingRulesLoadAndMatchTheDefaults()
     {
         var shipped = HousingConfig.Load(new Strata.Core.Content.Loading.FileSystemDataSource(TestPaths.ProjectRoot));

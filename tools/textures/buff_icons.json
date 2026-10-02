@@ -4,6 +4,7 @@
   "on_fire":           { "glyph": "flame",          "fg": "#ff9a2a", "bg": "#5a1a0c" },
   "poisoned":          { "glyph": "poison_drop",    "fg": "#8ad048", "bg": "#1e3a12" },
   "bleeding":          { "glyph": "blood_drop",     "fg": "#e02828", "bg": "#3a1214" },
+  "weak":              { "glyph": "fist",           "fg": "#a8a878", "bg": "#2a2a18" },
   "chilled":           { "glyph": "snowflake",      "fg": "#c8ecff", "bg": "#1c3a5c" },
   "regeneration":      { "glyph": "heart_plus",     "fg": "#ff4a6a", "bg": "#4a1a2c" },
   "swiftness":         { "glyph": "boot",           "fg": "#58d898", "bg": "#123e2c" },
@@ -39,5 +40,6 @@
   "frozen":            { "glyph": "ice_cube",       "fg": "#9ae0ff", "bg": "#1a3450" },
   "wet":               { "glyph": "water",          "fg": "#5aa8ff", "bg": "#102a4c" },
   "well_fed":          { "glyph": "food",           "fg": "#c87a3a", "bg": "#3e3018" },
-  "shimmering":        { "glyph": "crystal",        "fg": "#d8b8ff", "bg": "#2e2050" }
+  "shimmering":        { "glyph": "crystal",        "fg": "#d8b8ff", "bg": "#2e2050" },
+  "the_tongued":       { "glyph": "chain",          "fg": "#e05a6a", "bg": "#3a0c14" }
 }

@@ -126,6 +126,7 @@ public sealed partial class PlayerController : CharacterBody3D
             Entity.Minecart = null;
             return;
         }
+        if (Entity.ExternalVelocity != System.Numerics.Vector3.Zero) Entity.Minecart = null; // the tongue drags you out of a cart
         if (UpdateMinecart(dt) || UpdatePhase())
         {
             ReelInHook(dt);
@@ -141,8 +142,8 @@ public sealed partial class PlayerController : CharacterBody3D
         speed *= AirSpeedFactor();
         if (_climbing) speed *= 0.6f;
 
-        bool blocked = UI.InputGate.GameplayBlocked;
-        var input = blocked ? Vector2.Zero : Input.GetVector("move_left", "move_right", "move_forward", "move_back");
+        bool blocked = UI.InputGate.MovementBlocked;
+        var input = MoveInput(); // reversed while confused (Status)
         var wish = Rig.YawBasis * new Vector3(input.X, 0, input.Y);
         var v = Velocity;
         var horizontal = new Vector3(v.X, 0, v.Z);
@@ -163,6 +164,7 @@ public sealed partial class PlayerController : CharacterBody3D
         v.X = horizontal.X;
         v.Z = horizontal.Z;
         if (UpdateGrapple(dt, ref v)) onFloor = false;
+        if (UpdateTongue(ref v)) onFloor = false; // after all input, so it cannot be out-run (Status)
         Velocity = v;
 
         bool dropThrough = !blocked && Input.IsActionPressed("crouch");
@@ -193,7 +195,7 @@ public sealed partial class PlayerController : CharacterBody3D
     private void UpdateJump(float dt, bool onFloor, ref Vector3 v)
     {
         _coyote = onFloor ? _config.CoyoteTime : _coyote - dt;
-        bool blocked = UI.InputGate.GameplayBlocked;
+        bool blocked = UI.InputGate.MovementBlocked;
         _jumpBuffer = !blocked && Input.IsActionJustPressed("jump") ? _config.JumpBuffer : _jumpBuffer - dt;
         bool held = !blocked && Input.IsActionPressed("jump");
         float jumpScale = 1f + Entity.State.Effects.Stats.Bonus(StatIds.JumpHeight);

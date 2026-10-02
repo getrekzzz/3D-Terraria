@@ -1,0 +1,11 @@
+{
+  // P4-34: biome keys (1 in 2500 from hardmode kills in their biome) for the vault's biome chests.
+  "items": [
+    { "id": "jungle_key", "name": "Jungle Key", "description": "Unlocks a Jungle Chest in the dungeon.", "category": "key", "rarity": 8, "covers": ["terraria:jungle_key"] },
+    { "id": "corruption_key", "name": "Corruption Key", "description": "Unlocks a Corruption Chest in the dungeon.", "category": "key", "rarity": 8, "covers": ["terraria:corruption_key"] },
+    { "id": "crimson_key", "name": "Crimson Key", "description": "Unlocks a Crimson Chest in the dungeon.", "category": "key", "rarity": 8, "covers": ["terraria:crimson_key"] },
+    { "id": "hallowed_key", "name": "Hallowed Key", "description": "Unlocks a Hallowed Chest in the dungeon.", "category": "key", "rarity": 8, "covers": ["terraria:hallowed_key"] },
+    { "id": "frozen_key", "name": "Frozen Key", "description": "Unlocks a Frozen Chest in the dungeon.", "category": "key", "rarity": 8, "covers": ["terraria:frozen_key"] },
+    { "id": "desert_key", "name": "Desert Key", "description": "Unlocks a Desert Chest in the dungeon.", "category": "key", "rarity": 8, "covers": ["terraria:desert_key"] }
+  ]
+}

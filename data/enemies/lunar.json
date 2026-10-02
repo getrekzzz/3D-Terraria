@@ -6,8 +6,8 @@
   "buffs": [
     { "id": "frostburn", "name": "Frostburn", "description": "It's either really hot or really cold. Either way it REALLY hurts.", "debuff": true, "color": "#8ae0ff", "tags": ["fire"],
       "effects": [{ "type": "damageOverTime", "perSecond": 8 }, { "type": "emitLight", "color": [4, 8, 12] }] },
-    { "id": "confused", "name": "Confused", "description": "Movement is disoriented.", "debuff": true, "color": "#c880ff",
-      "effects": [{ "type": "stat", "stat": "moveSpeed", "add": -0.4 }], "covers": ["terraria:confused"] }
+    { "id": "confused", "name": "Confused", "description": "Your movement keys are reversed.", "debuff": true, "color": "#c880ff",
+      "effects": [{ "type": "invertControls" }], "covers": ["terraria:confused"] }
   ],
   "projectiles": [
     { "id": "cultist_fireball", "name": "Fireball", "visual": "orb", "color": "#ff8a2a", "lifetime": 200, "radius": 0.5, "friendly": false, "hostile": true, "light": [14, 7, 2], "trail": "#ffb04a" },
@@ -29,7 +29,6 @@
     { "id": "phantasmal_deathray", "name": "Phantasmal Deathray", "visual": "bolt", "color": "#b8fff8", "lifetime": 60, "radius": 0.9, "friendly": false, "hostile": true, "light": [10, 15, 15], "trail": "#4affd8" }
   ],
   "lootTables": [
-    { "id": "lunatic_cultist", "coins": [100000, 100000], "entries": [{ "item": "ancient_manipulator" }, { "item": "greater_healing_potion", "min": 5, "max": 15 }] },
     { "id": "cultist_archer", "coins": [500, 1500], "entries": [{ "item": "greater_healing_potion", "chance": 0.1 }] },
     { "id": "solar_pillar", "entries": [{ "item": "solar_fragment", "min": 25, "max": 40 }] },
     { "id": "vortex_pillar", "entries": [{ "item": "vortex_fragment", "min": 25, "max": 40 }] },
@@ -39,9 +38,6 @@
     { "id": "vortex_legion", "coins": [500, 1200], "entries": [{ "item": "vortex_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
     { "id": "nebula_legion", "coins": [500, 1200], "entries": [{ "item": "nebula_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
     { "id": "stardust_legion", "coins": [500, 1200], "entries": [{ "item": "stardust_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
-    { "id": "moon_lord", "coins": [200000, 200000], "entries": [
-      { "item": "luminite", "min": 70, "max": 90 }, { "table": "moon_lord_weapon" }, { "item": "greater_healing_potion", "min": 5, "max": 15 }
-    ] },
     { "id": "moon_lord_weapon", "mode": "weighted", "entries": [
       { "item": "meowmere" }, { "item": "terrarian" }, { "item": "star_wrath" }, { "item": "s_d_m_g" }, { "item": "last_prism" },
       { "item": "lunar_flare" }, { "item": "rainbow_crystal_staff" }, { "item": "lunar_portal_staff" }
@@ -180,7 +176,7 @@
       "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [8, 10], "moveSpeed": 4, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
       "loot": "moon_lord", "value": 200000,
       "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220, "music": "boss_moon_lord",
-        "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5] }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2] }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2] }] },
+        "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5], "inBossBar": true }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2], "inBossBar": true, "mirror": true }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2], "inBossBar": true }] },
       "covers": ["terraria:moon_lord"]
     },
     {

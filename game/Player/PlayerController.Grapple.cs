@@ -34,7 +34,7 @@ public sealed partial class PlayerController
         var world = _runtime.Session.World;
         var hand = HandPosition;
         var coreHand = new System.Numerics.Vector3(hand.X, hand.Y, hand.Z);
-        if (!UI.InputGate.GameplayBlocked && Input.IsActionJustPressed("grapple"))
+        if (!UI.InputGate.MovementBlocked && Input.IsActionJustPressed("grapple"))
         {
             if (hook.State is HookState.Flying or HookState.Attached) hook.Release();
             else if (GrappleHook.Best(Entity.State, _runtime.Game.Uses, out var item) is { } best)
@@ -42,7 +42,7 @@ public sealed partial class PlayerController
         }
         hook.Tick(world, dt, coreHand);
         if (hook.State != HookState.Attached) return false;
-        if (!UI.InputGate.GameplayBlocked && Input.IsActionJustPressed("jump"))
+        if (!UI.InputGate.MovementBlocked && Input.IsActionJustPressed("jump"))
         {
             hook.Release();
             v.Y = Mathf.Max(v.Y, _config.JumpSpeed);

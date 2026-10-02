@@ -83,10 +83,11 @@ public sealed class MeleeSystem
         foreach (var npc in _npcs.All.ToList())
         {
             if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
-            if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, sweep))) continue;
+            int volume = npc.FirstVolume((min, max) => Connects(s, (min + max) * 0.5f, (max - min) * 0.5f, sweep));
+            if (volume < 0) continue;
             var item = s.Item.Item;
             if (_npcs.Hit(npc, s.Player, Items.Prefixes.Damage(s.Stack), item.DamageType, Items.Prefixes.Crit(s.Stack) + Combat.DamageModel.BaseCritChance,
-                    Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true))
+                    Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true, segment: volume - 1))
                 s.Hit.Add(npc.Id);
         }
     }
