@@ -128,7 +128,7 @@ public static class UiCommands
                         world.WorldMap?.SetOpen(false);
                         world.TownPanels?.CloseAll();
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, reforge, hover, buff, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, chat, history, settings, close or export-theme");
+                    default: return TownUiCommands.TryRun(ctx, a, world) ?? throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, reforge, hover, buff, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, chat, history, settings, close, export-theme or " + TownUiCommands.Usage);
                 }
             },
         });

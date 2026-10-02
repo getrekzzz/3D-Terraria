@@ -9,11 +9,14 @@ namespace Strata.Game.UI;
 public sealed class TownPanels
 {
     public required HaircutPanel Haircut { get; init; }
+    public required HousingPanel Housing { get; init; }
+    public required Entities.HousingBannerRenderer Banners { get; init; }
 
     /// <summary>Closes every town panel (the console's <c>ui close</c>).</summary>
     public void CloseAll()
     {
         Haircut.Close();
+        Housing.Close();
     }
 
     /// <summary>Opens the screen for a chat-box service (<see cref="TownDialog.PanelRequested"/>).</summary>
@@ -27,6 +30,12 @@ public sealed class TownPanels
         var haircut = new HaircutPanel();
         parent.AddChild(haircut);
         haircut.Initialize(ui);
-        return new TownPanels { Haircut = haircut };
+        var banners = new Entities.HousingBannerRenderer();
+        parent.AddChild(banners);
+        banners.Initialize(ui.Game);
+        var housing = new HousingPanel();
+        parent.AddChild(housing);
+        housing.Initialize(ui, banners);
+        return new TownPanels { Haircut = haircut, Housing = housing, Banners = banners };
     }
 }

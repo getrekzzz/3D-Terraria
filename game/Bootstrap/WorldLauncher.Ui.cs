@@ -39,6 +39,8 @@ public static partial class WorldLauncher
         townDialog.ServiceRequested += inventory.OpenService; // and Reforge with the reforge slot
         var town = UI.TownPanels.Create(runtime, ui);
         townDialog.PanelRequested += town.Open; // the Stylist's Haircut
+        inventory.Equipment.HousingPressed += town.Housing.Toggle; // the equipment column's Housing tab
+        town.Housing.SetAnchor(inventory.Equipment);
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);

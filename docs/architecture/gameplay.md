@@ -671,3 +671,14 @@ golden hashes differ only where a plant grew). Each drops its `strange_plant_N` 
 Trader's `dyeTrade` service (`DyeTradeParams`: accepted tag, loot table `dye_trader_trade`) takes one plant from the
 backpack for a weighted roll of nine rare dyes (`TownServices.TradeStrangePlant`); the chat box shows 'Trade' only while
 a plant is carried; console `town trade <id>`.
+
+## Housing menu (P5-29)
+
+`HousingPanel` (game/UI) lists a portrait banner per resident (`PortraitIcons.TownNpc`, preloaded on open and pumped
+per frame; greyed while dead or homeless). '?' then a click on a room runs `TownSystem.QueryHousing` and shows the
+message in Terraria's yellow; a banner then a room runs `AssignHome` (swapping with the occupant); right-clicking a
+banner evicts. World clicks are taken by a full-screen catcher while picking and cast through `WorldPicker` (camera
+ray → `Targeting.Cast` → the open cell in front). `HousingBannerRenderer` hangs pooled head sprites at each housed
+resident's `BannerCell` while the menu is open. Opened by the equipment column's Housing tab (beside it), the Housing
+key (H) or `ui housing`; `ui housing_query dx dy dz`; probes `ui.housing_open`, `ui.housing_banners`,
+`ui.housing_room_banners`.

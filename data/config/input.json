@@ -13,6 +13,7 @@
     "interact": ["key:E"],
     "inventory": ["key:Tab", "key:I"],
     "map": ["key:M"],
+    "housing": ["key:H"],
     "toggle_camera": ["key:V"],
     "precision_mode": ["key:Alt"],
     "rotate_shape": ["key:R"],
