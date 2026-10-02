@@ -16,6 +16,12 @@ public sealed class TownPanels
         Haircut.Close();
     }
 
+    /// <summary>Opens the screen for a chat-box service (<see cref="TownDialog.PanelRequested"/>).</summary>
+    public void Open(Strata.Core.Gameplay.Town.TownNpc npc, string service)
+    {
+        if (service == Strata.Core.Content.Specs.TownServiceSpecs.Haircut) Haircut.Open(npc);
+    }
+
     public static TownPanels Create(Node parent, UiContext ui)
     {
         var haircut = new HaircutPanel();

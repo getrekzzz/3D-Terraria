@@ -19,10 +19,24 @@ public sealed partial class TownDialog
     /// <summary>A service with a panel of its own was pressed (Reforge): the inventory opens with it in its panel host.</summary>
     public event Action<TownNpc, ServiceMode>? ServiceRequested;
 
+    /// <summary>A service with a screen of its own outside the inventory was pressed (the Stylist's Haircut): the box hides.</summary>
+    public event Action<TownNpc, string>? PanelRequested;
+
+    /// <summary>The service the chat box's button runs: the legacy single service, else the first of the list.</summary>
+    private static Strata.Core.Content.TypedSpec? MainService(TownNpc npc) => npc.Def.AllServices.Length > 0 ? npc.Def.AllServices[0] : null;
+
+    private void OpenPanel()
+    {
+        var npc = _npc!;
+        var type = MainService(npc)!.Type;
+        HideBox();
+        PanelRequested?.Invoke(npc, type);
+    }
+
     /// <summary>The service button's label for <paramref name="npc"/> now, or null when they offer none.</summary>
     private string? ServiceLabel(TownNpc npc)
     {
-        if (npc.Def.Service is not { } service) return null;
+        if (MainService(npc) is not { } service) return null;
         switch (service.Type)
         {
             case TownServiceSpecs.Heal:
@@ -39,6 +53,8 @@ public sealed partial class TownDialog
                 return due > 0 ? $"Taxes ({Coins.Format(due)})" : "Taxes";
             case TownServiceSpecs.AnglerQuest:
                 return "Quest";
+            case TownServiceSpecs.Haircut:
+                return "Haircut";
             default:
                 return null;
         }
@@ -47,7 +63,7 @@ public sealed partial class TownDialog
     /// <summary>Presses the service button.</summary>
     private void RunService()
     {
-        if (_npc?.Def.Service is not { } service) return;
+        if (_npc is null || MainService(_npc) is not { } service) return;
         switch (service.Type)
         {
             case TownServiceSpecs.Heal: Heal(); break;
@@ -56,6 +72,7 @@ public sealed partial class TownDialog
             case TownServiceSpecs.Reforge: OpenService(ServiceMode.Reforge); break;
             case TownServiceSpecs.Taxes: CollectTaxes(); break;
             case TownServiceSpecs.AnglerQuest: AnglerQuest(); break;
+            case TownServiceSpecs.Haircut: OpenPanel(); break;
         }
         if (_npc != null && _serviceButton != null && ServiceLabel(_npc) is { } label) SetLabel(_serviceButton, label);
     }

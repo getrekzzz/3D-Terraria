@@ -38,6 +38,7 @@ public static partial class WorldLauncher
         townDialog.ShopRequested += inventory.OpenShop; // the chat box's Shop opens the inventory with the grid shop
         townDialog.ServiceRequested += inventory.OpenService; // and Reforge with the reforge slot
         var town = UI.TownPanels.Create(runtime, ui);
+        townDialog.PanelRequested += town.Open; // the Stylist's Haircut
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
