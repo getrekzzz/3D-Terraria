@@ -54,7 +54,17 @@ public static partial class DungeonBuilder
         KeepFixtures(b);
         var chest = content.TileObjects.Get("gold_chest");
         foreach (var spot in layout.ChestSpots)
-            bp.Object(chest, ChestAnchor(content, layout, spot), RotationToward(spot.Facing), 0, spot.ShadowKey ? "dungeon_chest_shadow_key" : "dungeon_chest");
+        {
+            var anchor = ChestAnchor(content, layout, spot);
+            if (OnDais(layout, spot))
+            {
+                // A treasure room's own chest stands on a one-cell brick dais reaching a cell past it.
+                var size = TileObjectInstance.FootprintOf(chest, RotationToward(spot.Facing));
+                var dais = new Aabb3i(anchor - new Int3(1, 1, 1), anchor + new Int3(size.X + 1, 0, size.Z + 1));
+                bp.Fill(dais.Intersection(layout.Rooms[spot.Room].Interior), style.Brick);
+            }
+            bp.Object(chest, anchor, RotationToward(spot.Facing), 0, spot.ShadowKey ? "dungeon_chest_shadow_key" : "dungeon_chest");
+        }
         return bp;
     }
 
@@ -83,12 +93,21 @@ public static partial class DungeonBuilder
     /// matching ShapeGeometry and BlockGrid: rotation 0 faces +Z, 1 faces -X, 2 faces -Z, 3 faces +X.</summary>
     public static int RotationToward(Int3 dir) => dir.Z > 0 ? 0 : dir.X < 0 ? 1 : dir.Z < 0 ? 2 : 3;
 
-    /// <summary>Where a planned gold chest stands: the spot's cell, its footprint kept inside the room.</summary>
+    /// <summary>Whether a chest spot is a treasure room's centre spot, which stands on a dais.</summary>
+    public static bool OnDais(DungeonLayout layout, DungeonChestSpot spot)
+    {
+        var room = layout.Rooms[spot.Room];
+        return room.Kind == RoomKind.Treasure && spot.Cell == room.CenterFloor;
+    }
+
+    /// <summary>Where a planned gold chest stands: the spot's cell, its footprint kept inside the room (on top of the
+    /// dais for a treasure room's centre spot).</summary>
     public static Int3 ChestAnchor(ContentDatabase content, DungeonLayout layout, DungeonChestSpot spot)
     {
         var size = TileObjectInstance.FootprintOf(content.TileObjects.Get("gold_chest"), RotationToward(spot.Facing));
         var room = layout.Rooms[spot.Room].Interior;
-        return new Int3(Math.Clamp(spot.Cell.X, room.Min.X, room.Max.X - size.X), room.Min.Y, Math.Clamp(spot.Cell.Z, room.Min.Z, room.Max.Z - size.Z));
+        int y = room.Min.Y + (OnDais(layout, spot) ? 1 : 0);
+        return new Int3(Math.Clamp(spot.Cell.X, room.Min.X, room.Max.X - size.X), y, Math.Clamp(spot.Cell.Z, room.Min.Z, room.Max.Z - size.Z));
     }
 
     /// <summary>Fills the vertical side faces of <paramref name="interior"/> grown by one cell with a panel block, over

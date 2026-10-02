@@ -53,6 +53,10 @@ public sealed class WorldPlan
     /// <summary>Named places found while planning (see <see cref="LandmarkIds"/>), for residents and commands.</summary>
     public Dictionary<string, Int3> Landmarks { get; } = new(StringComparer.Ordinal);
 
+    /// <summary>Wire cells structures lay at generation (dungeon pressure plates to their dart traps); a new world's
+    /// session starts with them wired.</summary>
+    public HashSet<Int3> PlannedWires { get; } = new();
+
     /// <summary>Direction (turns) from the centre towards the tundra; the jungle lies opposite.</summary>
     public float SnowAngle { get; set; }
 

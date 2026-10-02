@@ -61,6 +61,7 @@ public sealed partial class TileObjectRenderer : Node3D
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects");
+        PreloadNearDungeon();
         int budget = 8;
         var done = new List<Int3>();
         foreach (var c in _dirty)

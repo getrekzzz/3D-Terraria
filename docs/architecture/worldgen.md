@@ -131,3 +131,35 @@ Every cell is flagged `CellFlags.Structure` (locked until Skeletron falls). Late
 the dungeon stamp drops objects earlier passes left inside its zone. A Large dungeon is ~6000 ops, planned and built in
 ~15 ms. `DungeonGenerationTests` check shells and flags, platforms, stair shapes and walking, reachability on foot from
 the entrance junction and open crossings on the real seed-1234 Tiny world.
+
+## Dungeon decorator
+
+`DungeonDecorator.Decorate` (run by `DungeonPass.Plan` between `DungeonBuilder.Build` and the feature, rng stream
+`dungeon.decor`) appends object ops and small fills to the open blueprint. `BlueprintProbe` answers what a cell will
+be once stamped (ops scanned last to first over a 16-cell index; the decorator's own fills and carves are added as it
+goes), so every placement is checked: footprint in carved air, floor objects on full brick, wall objects against solid
+wall, ceiling objects under solid ceiling, books on platform shelves. A global occupied set keeps objects from sharing
+a cell across chunk borders; reserved cells keep doorways (3 cells round), hall mouths and shafts through rooms, the
+bound Mechanic's spot and the vault's six chest spots clear. Budgets per anchor chunk: 40 objects, 6 lights, 64 spikes
+(hazards are counted apart: one MultiMesh per chunk).
+
+* Rooms by role, in the dungeon colour's set (`<colour>_dungeon_<piece>`): libraries (3-6 bookcases, platform shelves
+  6 long at +3/+6/+9 with books on 60% of their cells, a table with a chair and a candle; about 1 book in 40, and at
+  least one per dungeon, carries `PendingLoot` `water_bolt_book`), treasure rooms (the centre chest stands on a 1-cell
+  brick dais, `DungeonBuilder.OnDais`; statues and candelabras either side, a banner behind), barracks (2 tables with
+  chairs, vases, pots, a chandelier), spike pits (two rows of spikes across the middle under a 3-wide platform bridge
+  at +3), plain halls, alcoves, the vault (light and banners; chests are P4-34's) and the keep foyer (2 chandeliers,
+  4 banners, 2 statues inside the door).
+* Mechanic room (`RoomKind.Mechanic`, the `bound_npc` site for P5-06b): a 5 x 5 x 5 box round `MechanicCell` is kept
+  empty of objects and fixtures (pillars already avoid it); the room gets a chandelier, a table with a chair and a
+  candle off to one side, a bookcase and a banner, so the bound Mechanic stands in a lived-in room. SiteFinder should
+  use `DungeonLayout.MechanicCell`.
+* Flat halls: banners (both walls), lamps and candelabras in turn every 12-16 cells, 1-3 pot clusters, cobwebs (2x2x2,
+  only-air fills) in upper corners at 40%; 15% of halls of 20+ get a 3-long spike strip across the hall, else 10% of
+  halls of 16+ get a pressure plate on the centre line and a dart trap set into the side wall at +2 (its panel cell
+  carved, brick left behind) aimed across. The wire runs under the floor to the wall and up to the trap; the cells go
+  to `WorldPlan.PlannedWires`, which `WorldSession.Create` copies into `Session.Wires` (new worlds only).
+* `DungeonFeature.ObjectIds` lists the object ids placed; `TileObjectRenderer` queues their models
+  (`PropLibrary.Preload`, one GLB per frame) once the player is within 64 m of `dungeon_gate` or inside the zone.
+* `DungeonDecorTests`: no overlaps and every op installed, support (wall/ceiling/floor) on stamped chunks, libraries and
+  the Water Bolt, treasure chests, the Mechanic's spot, budgets, plate-to-trap wire BFS, and a plate firing its dart.

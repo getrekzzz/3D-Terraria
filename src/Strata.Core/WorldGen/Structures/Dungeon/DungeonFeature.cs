@@ -8,7 +8,13 @@ public sealed class DungeonFeature : StructureFeature
     {
         Layout = layout;
         Style = style;
+        var ids = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (var op in blueprint.Ops) if (op is ObjectOp o) ids.Add(o.ObjectId);
+        ObjectIds = ids.ToArray();
     }
+
+    /// <summary>Every tile object id the dungeon places (sorted), so the renderer can preload their models.</summary>
+    public IReadOnlyList<string> ObjectIds { get; }
 
     public DungeonLayout Layout { get; }
     public DungeonStyle Style { get; }

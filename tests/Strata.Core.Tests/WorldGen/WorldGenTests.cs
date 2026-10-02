@@ -43,12 +43,12 @@ public class WorldGenTests
     [Theory]
     [InlineData(8, 10, 8, 4397078274275958443UL)]
     [InlineData(8, 9, 8, 16207009510407108961UL)]
-    [InlineData(8, 7, 8, 3282678591356587638UL)]
+    [InlineData(8, 7, 8, 2990207566688666459UL)]
     [InlineData(8, 4, 8, 3494435149473940947UL)]
     [InlineData(2, 4, 9, 17334305573271451792UL)]
     [InlineData(12, 1, 5, 12384916426225855034UL)]
-    [InlineData(8, 7, 12, 7667736912130785385UL)] // the Dungeon's vault
-    [InlineData(3, 11, 11, 10522532040234478090UL)] // the Dungeon's keep
+    [InlineData(8, 7, 12, 12714577129569773090UL)] // the Dungeon's vault
+    [InlineData(3, 11, 11, 15258059975597628175UL)] // the Dungeon's keep
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
         Assert.Equal(11, GenVersion.Current); // bumping the generator version means re-recording these hashes
