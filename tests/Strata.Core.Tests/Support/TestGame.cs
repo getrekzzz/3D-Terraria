@@ -36,11 +36,11 @@ public sealed class TestGame : IDisposable
     public PlayerEntity Player => World.LocalPlayer!;
     public Strata.Core.Content.ContentDatabase Content => World.Session.Content;
 
-    public static TestGame Create(string? saveDir = null, long seed = 42, Difficulty difficulty = Difficulty.Classic)
+    public static TestGame Create(string? saveDir = null, long seed = 42, Difficulty difficulty = Difficulty.Classic, Strata.Core.Content.ContentDatabase? content = null)
     {
         var log = new MemoryLog();
         var settings = new WorldSettings { Name = "test", Seed = seed, Size = WorldSizePreset.Tiny, Difficulty = difficulty };
-        var session = WorldSession.Create(TestPaths.Content, settings, saveDir, Tables, log);
+        var session = WorldSession.Create(content ?? TestPaths.Content, settings, saveDir, Tables, log);
         var world = new GameWorld(session, new StreamingSettings { MeshRadius = 1, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1 }, 1, saveDir == null ? null : Path.Combine(saveDir, "players"));
         var center = session.SpawnCell;
         var chunk = ChunkMath.CellToChunk(center);

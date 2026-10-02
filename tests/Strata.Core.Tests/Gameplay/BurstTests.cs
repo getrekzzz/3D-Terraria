@@ -14,9 +14,9 @@ public class BurstTests
 {
     private const string Rifle = "clockwork_assault_rifle";
 
-    private static TestGame Range(int bullets = 100)
+    private static TestGame Range(int bullets = 100, Strata.Core.Content.ContentDatabase? content = null)
     {
-        var g = TestGame.Create();
+        var g = TestGame.Create(content: content);
         g.World.Spawner.Enabled = false;
         g.Player.Aim = Vector3.UnitZ;
         g.Player.State.Inventory.Backpack[20] = new ItemStack(g.Content.Items.Get("musket_ball"), bullets);
@@ -114,7 +114,8 @@ public class BurstTests
     [Fact]
     public void OtherBurstsUseAmmoPerShot()
     {
-        using var g = Range(10);
+        // A private content copy: adding an item to the shared one would leak into the shipped-content tests.
+        using var g = Range(10, Strata.Core.Content.Loading.ContentLoader.Load(new Strata.Core.Content.Loading.FileSystemDataSource(TestPaths.ProjectRoot)));
         var rifle = g.Content.Items.Get(Rifle);
         var burst = g.Content.Items.AddLate(new ItemDef
         {
