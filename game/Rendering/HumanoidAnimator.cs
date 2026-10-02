@@ -302,6 +302,13 @@ public sealed class HumanoidAnimator
         Action = null;
     }
 
+    /// <summary>Runs or halts the animation tree (a ragdoll takes the bones while it is off).</summary>
+    public bool Animating
+    {
+        get => _tree.Active;
+        set => _tree.Active = value;
+    }
+
     public void Hurt() => _tree.Set(HurtRequest, (int)AnimationNodeOneShot.OneShotRequest.Fire);
 
     /// <summary>Raises (1) or lowers (0) a carried light in the right hand; eased by <see cref="Update"/>.</summary>

@@ -41,6 +41,8 @@ public static partial class WorldLauncher
         lights.Initialize(services.Graphics);
         lights.AddProvider((eye, radius) => lights.PlacedLights(game, objectRenderer.Placement, eye, radius));
         lights.AddProvider(creatures.Glows);
+        creatures.RagdollBudget = services.Graphics.Preset.Ragdolls;
+        services.Graphics.Changed += p => creatures.RagdollBudget = p.Ragdolls;
         var lava = new Rendering.LavaEffects();
         runtime.AddChild(lava);
         lava.Initialize(runtime);

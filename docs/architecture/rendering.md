@@ -212,6 +212,15 @@ gore (`GoreSystem`: up to 16–96 pooled chunks by preset, simulated against the
 data, faded after 2.5 s); `DamageEvent` carries `NpcId` and `Kind` (Hit, Periodic, Player…) so damage over time stays quiet. SoundEvents is split into World, Weapons,
 Creatures and Player partials, each wired once.
 
+Ragdolls (X-16, game/Rendering/Ragdoll.cs): a human skeleton gets a `PhysicalBoneSimulator3D` with fifteen capsule
+`PhysicalBone3D`s (built once per pooled visual, idle until a death), on their own physics layer colliding with terrain and
+placed objects only; cones swing 75°, elbow/knee/ankle hinges bend 140°. When a life-size human creature dies and fewer
+than the preset's `ragdolls` (0/3/6/10) lie, `NpcRenderer` switches its AnimationTree off and starts the simulation with
+the killing knockback (plus a backwards topple on the chest and head); after 3 s the bodies drop through the ground and
+the visual returns to the pool. Past the budget, or for scaled bodies, the death clip plays; creatures without a
+skeleton keep their gore. The player's body ragdolls on death until the respawn. Probes `fx.ragdolls`,
+`fx.ragdolls_started`, `fx.ragdoll_drop`, `avatar.ragdoll`.
+
 ## Weather and ambience
 `WeatherRenderer` (game/Ambience) draws rain streaks, splashes, snow and blowing sand as GPU particles
 (`weather_particles.gdshader` + `weather_drop.gdshader`) in a box that follows the camera. `SkyHeights` uploads the sky

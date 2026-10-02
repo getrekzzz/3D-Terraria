@@ -20,6 +20,20 @@ public sealed partial class CreatureVisual : Node3D
     /// <summary>Set for generated humans with an animation set (see <see cref="HumanAnimations"/>).</summary>
     public HumanoidAnimator? Humanoid { get; private set; }
 
+    private Ragdoll? _ragdoll;
+    private bool _ragdollTried;
+
+    /// <summary>This human's ragdoll (built on first use and kept with the pooled visual), or null for other creatures.</summary>
+    public Ragdoll? Ragdoll
+    {
+        get
+        {
+            if (!_ragdollTried && Humanoid != null && Skeleton != null) _ragdoll = Rendering.Ragdoll.Build(Skeleton);
+            _ragdollTried = true;
+            return _ragdoll;
+        }
+    }
+
     /// <summary>
     /// Instantiates a creature model; returns null (recording a problem once) if the file is missing, and null while
     /// the model or its animation set is still loading on a loader thread (callers retry on a later frame).

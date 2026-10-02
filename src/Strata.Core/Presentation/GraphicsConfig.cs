@@ -148,6 +148,9 @@ public sealed class GraphicsPreset
     /// <summary>Short-lived flash lights (explosions, sparks) alive at once; 0 disables them.</summary>
     public int FlashLights { get; set; } = 2;
 
+    /// <summary>Human creatures that can lie as physics ragdolls at once (X-16); past it they play their death clip.</summary>
+    public int Ragdolls { get; set; } = 3;
+
     /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last 30 %).</summary>
     public float OreGlintDistance { get; set; } = 24f;
 
@@ -181,6 +184,7 @@ public sealed class GraphicsPreset
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
         if (EffectsScale is < 0f or > 2f) yield return "effectsScale must be within 0–2";
         if (FlashLights is < 0 or > 16) yield return "flashLights must be within 0–16";
+        if (Ragdolls is < 0 or > 32) yield return "ragdolls must be within 0–32";
 
         if (CombatNumbers is < 8 or > 256) yield return "combatNumbers must be within 8–256";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";

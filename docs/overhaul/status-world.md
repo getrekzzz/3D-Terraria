@@ -109,6 +109,11 @@ Review-fix commit: 1313 Core tests, validate, basic smoke and menu tour pass.
 |---|---|---|
 | X-03 signs | done | Sign (6 wood, work bench; `signpost` model) with `interaction: read`; `SignText` (6 lines / 240 chars) saved as P2-08 object-meta tag 3; `SignDialog` to edit, the target label shows the text; `sign` command, `signs.text` probe, `SignTests`, `builder.cmds` section. |
 
+## Push 9 (cont.) — ragdolls (X-16)
+| WP | State | Notes |
+|---|---|---|
+| X-16 ragdolls | done | `Ragdoll` (PhysicalBoneSimulator3D, 15 capsules, terrain/object collision only); human creatures ragdoll on death within the preset's `ragdolls` budget (0/3/6/10), thrown by the killing knockback, 3 s then sink; others keep P3-20 gore; the player ragdolls until respawn. `creatures.cmds` and `combat.cmds` assert it (`fx.ragdoll_drop` shows the body really falls); tour `Tours/ragdoll.cmds`. |
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and

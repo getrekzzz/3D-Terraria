@@ -63,7 +63,10 @@ killall
 kill
 wait 0.5
 assert player.alive == 0
+assert avatar.ragdoll == 1
 wait_until player.alive == 1 10
+wait 0.1
+assert avatar.ragdoll == 0
 assert player.deaths >= 1
 assert errors == 0
 
