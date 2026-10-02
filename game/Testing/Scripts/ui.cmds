@@ -314,3 +314,45 @@ assert ui.panel == 0
 assert ui.inventory == 0
 god off
 assert errors == 0
+
+# --- P2-13 ---
+# Life as Terraria's hearts (20 each), mana as a column of stars and breath as bubbles shown only underwater: three
+# Life Crystals add three hearts, and holding your breath in a flooded shaft pops the bubbles one by one; back in the
+# air they refill and hide.
+heal
+wait 0.2
+assert hud.hearts == 5
+assert hud.golden_hearts == 0
+assert hud.stars == 1
+assert hud.bubbles == 0
+give life_crystal 3
+wield life_crystal
+use
+wait 0.5
+use
+wait 0.5
+use
+wait 0.5
+assert hud.hearts == 8
+assert ui.overlaps == 0
+god on
+spawning off
+killall
+fill -6 -3 -6 6 -1 6 stone
+fill -6 0 -6 6 7 6 air
+wait_until player.on_floor == 1 5
+fill -2 0 -2 2 5 -2 stone
+fill -2 0 2 2 5 2 stone
+fill -2 0 -1 -2 5 1 stone
+fill 2 0 -1 2 5 1 stone
+liquids off
+liquid water -1 0 -1 1 4 1
+wait 2.5
+assert player.submerged == 1
+assert hud.bubbles >= 8
+assert hud.bubbles <= 9
+liquid none -1 0 -1 1 5 1
+liquids on
+wait_until hud.bubbles == 0 5
+god off
+assert errors == 0

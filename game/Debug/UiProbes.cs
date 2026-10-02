@@ -11,8 +11,8 @@ namespace Strata.Game.Debug;
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
-/// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); and on the inventory
-/// screen's layout (P2-15).
+/// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); on the inventory
+/// screen's layout (P2-15); and on the hearts, mana stars and breath bubbles (P2-13).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -78,5 +78,10 @@ public static class UiProbes
         ctx.AddProbe("ui.grid_on_hotbar", () => world.Inventory?.GridOnHotbar == true ? 1 : 0);
         ctx.AddProbe("ui.panel", () => (int)(world.Inventory?.Panel ?? Strata.Core.Presentation.UiPanel.None));
         ctx.AddProbe("ui.slot_scale", () => world.Inventory?.SlotScale ?? 0);
+        // P2-13: Terraria's hearts (20 life each, golden past 400), mana stars and breath bubbles (0 at full breath).
+        ctx.AddProbe("hud.hearts", () => world.Hud?.HeartsShown ?? 0);
+        ctx.AddProbe("hud.golden_hearts", () => world.Hud?.GoldenHeartsShown ?? 0);
+        ctx.AddProbe("hud.stars", () => world.Hud?.StarsShown ?? 0);
+        ctx.AddProbe("hud.bubbles", () => world.Hud?.BubblesShown ?? 0);
     }
 }

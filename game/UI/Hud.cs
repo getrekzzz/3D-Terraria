@@ -7,13 +7,13 @@ namespace Strata.Game.UI;
 
 /// <summary>
 /// The in-game overlay on the <see cref="UiLayout"/> model, laid out like Terraria's: the selected item's name and the
-/// hotbar top-left with the buff row under them, life and mana top-right above the minimap and the info panel, the
-/// crosshair with its interaction hint and target name at the centre, the breath bar above it and the status line under
-/// it, the pickup feed bottom-left, the boss bar bottom-centre, event banners and the death screen. <see cref="ApplyLayout"/>
-/// places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3 overlay) when the window, the UI
-/// scale or what is shown changes (the inventory and its panel and accessory rows, an NPC chat, a boss, the buff count,
-/// the info rows, the minimap setting, the F3 overlay), never per frame; the inventory screen's parts take their regions
-/// from it too.
+/// hotbar top-left with the buff row under them, the hearts and mana stars top-right above the minimap and the info
+/// panel, the crosshair with its interaction hint and target name at the centre, the breath bubbles above it and the
+/// status line under it, the pickup feed bottom-left, the boss bar bottom-centre, event banners and the death screen.
+/// <see cref="ApplyLayout"/> places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3
+/// overlay) when the window, the UI scale or what is shown changes (the inventory and its panel and accessory rows, an
+/// NPC chat, a boss, the buff count, the info rows, the minimap setting, the F3 overlay), never per frame; the inventory
+/// screen's parts take their regions from it too.
 /// </summary>
 public sealed partial class Hud : CanvasLayer
 {
@@ -22,7 +22,6 @@ public sealed partial class Hud : CanvasLayer
     private UiContext _ui = null!;
     private ItemNameLabel _itemName = null!;
     private HotbarBar _hotbar = null!;
-    private VitalsBars _vitals = null!;
     private Crosshair _crosshair = null!;
     private StatusLine _status = null!;
     private InfoPanel _info = null!;
@@ -79,7 +78,7 @@ public sealed partial class Hud : CanvasLayer
         root.AddChild(_itemName = LayoutWidgets.Register(new ItemNameLabel(ui)));
         root.AddChild(_hotbar = LayoutWidgets.Register(new HotbarBar(ui)));
         root.AddChild(_buffs = LayoutWidgets.Register(new Control { Name = "Buffs", MouseFilter = Control.MouseFilterEnum.Ignore }));
-        _vitals = new VitalsBars(ui, root);
+        BuildVitals(root);
         root.AddChild(_crosshair = LayoutWidgets.Register(new Crosshair(ui)));
         root.AddChild(_status = LayoutWidgets.Register(new StatusLine()));
         root.AddChild(_info = LayoutWidgets.Register(new InfoPanel(ui)));
@@ -137,7 +136,7 @@ public sealed partial class Hud : CanvasLayer
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.hud");
         UpdateBossBar();
         UpdateLayout();
-        _vitals.Update();
+        UpdateVitals(delta);
         UpdateBuffs();
         UpdateBuildHint();
         _death.Visible = !_ui.Entity.Alive;
@@ -169,7 +168,7 @@ public sealed partial class Hud : CanvasLayer
         _itemName.Visible = LayoutWidgets.Place(_itemName, layout, UiRegion.ItemName);
         _hotbar.Visible = LayoutWidgets.Place(_hotbar, layout, UiRegion.Hotbar);
         _buffs.Visible = LayoutWidgets.Place(_buffs, layout, UiRegion.Buffs);
-        _vitals.Place(layout);
+        PlaceVitals(layout);
         _crosshair.Place(layout, key.Size);
         _status.Visible = LayoutWidgets.Place(_status, layout, UiRegion.StatusLine);
         _info.Visible = LayoutWidgets.Place(_info, layout, UiRegion.Info);

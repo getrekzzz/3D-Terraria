@@ -57,6 +57,12 @@ public sealed class UserSettings
     public bool ShowTargetName { get; set; } = true;
     public string CursorColor { get; set; } = DefaultCursorColor;
 
+    /// <summary>How life and mana show: "classic" (Terraria's hearts and stars) or "bars".</summary>
+    public string LifeDisplay { get; set; } = ClassicLifeDisplay;
+
+    public const string ClassicLifeDisplay = "classic";
+    public const string BarsLifeDisplay = "bars";
+
     /// <summary>Terraria's pink-red pointer.</summary>
     public const string DefaultCursorColor = "#ff325f";
 
