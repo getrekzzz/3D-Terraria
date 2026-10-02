@@ -119,6 +119,19 @@ public sealed class DroppedItemSystem
         return true;
     }
 
+    /// <summary>Removes every dropped item that matches (Fallen Stars fading at dawn); returns how many went.</summary>
+    public int RemoveWhere(Func<DroppedItem, bool> match)
+    {
+        int n = 0;
+        for (int i = _items.Count - 1; i >= 0; i--)
+            if (match(_items[i]))
+            {
+                RemoveAt(i);
+                n++;
+            }
+        return n;
+    }
+
     private void RemoveAt(int i)
     {
         var it = _items[i];

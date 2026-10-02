@@ -45,6 +45,7 @@ public sealed partial class GameWorld : IDisposable
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
+        Starfall = new StarfallDirector(this);
         Weather = new Gameplay.Weather.WeatherSystem(this);
         Banners = new Gameplay.Banners.BannerSystem(this);
         Whips = new Gameplay.Entities.WhipSystem(this);
@@ -89,6 +90,9 @@ public sealed partial class GameWorld : IDisposable
     public ProjectileSystem Projectiles { get; }
     public SpawnDirector Spawner { get; }
     public EventDirector Events { get; }
+
+    /// <summary>Fallen Stars at night (P3-30).</summary>
+    public StarfallDirector Starfall { get; }
 
     /// <summary>Rain, storms, snow, sandstorms and wind (state in <see cref="WorldSession.Weather"/>).</summary>
     public Gameplay.Weather.WeatherSystem Weather { get; }
@@ -159,7 +163,11 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.map")) Maps.Tick();
         using (prof.Time("tick.liquids")) Liquids.Tick(Session.Clock.Tick);
         using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
-        using (prof.Time("tick.events")) Events.Tick();
+        using (prof.Time("tick.events"))
+        {
+            Events.Tick();
+            Starfall.Tick();
+        }
         using (prof.Time("tick.weather")) Weather.Tick();
         using (prof.Time("tick.banners")) Banners.Tick();
         using (prof.Time("tick.wires")) Wires.Tick();

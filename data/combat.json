@@ -1,5 +1,6 @@
 {
   "projectiles": [
+    { "id": "falling_star", "name": "Falling Star", "visual": "item", "model": "fallen_star", "color": "#fff4b0", "lifetime": 900, "radius": 0.4, "pierce": 99, "light": [15, 14, 8], "trail": "#fff4b0", "onHit": [{ "type": "dropItem", "item": "fallen_star" }] },
     { "id": "wooden_arrow", "name": "Wooden Arrow", "visual": "arrow", "color": "#b08a5a", "gravity": 14, "lifetime": 600, "radius": 0.3, "pierce": 1, "covers": ["terraria:wooden_arrow"] },
     { "id": "spark", "name": "Spark", "visual": "spark", "color": "#ff8a2a", "gravity": 6, "lifetime": 90, "radius": 0.3, "bounces": 2, "light": [9, 4, 1], "trail": "#ffb060", "onHit": [{ "type": "applyBuff", "buff": "on_fire", "ticks": 180, "chance": 0.33 }], "covers": ["terraria:spark"] },
     { "id": "amethyst_bolt", "name": "Amethyst Bolt", "visual": "bolt", "color": "#b06aff", "lifetime": 120, "radius": 0.35, "light": [6, 2, 9], "trail": "#c890ff", "covers": ["terraria:amethyst_bolt"] },

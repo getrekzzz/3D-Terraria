@@ -28,6 +28,9 @@ public static partial class ContentValidator
             foreach (var h in p.OnHit.Where(h => h.Type == ProjectileHitSpecs.SpawnProjectiles))
                 if (h.Parse<SpawnProjectilesParams>().Projectile is { Length: > 0 } child && !ctx.Db.Projectiles.Contains(child))
                     ctx.Error(p, $"spawnProjectiles releases unknown projectile '{child}'.");
+            foreach (var h in p.OnHit.Where(h => h.Type == ProjectileHitSpecs.DropItem))
+                if (h.Parse<DropItemParams>().Item is { Length: > 0 } item && !ctx.Db.Items.Contains(item))
+                    ctx.Error(p, $"dropItem leaves unknown item '{item}'.");
             if (p.Latch && p.LatchInterval < 1) ctx.Error(p, "latchInterval must be >= 1.");
             if (p.Minion is { Shoot: { } shot } && !ctx.Db.Projectiles.Contains(shot)) ctx.Error(p, $"minion shoots unknown projectile '{shot}'.");
             if (p.Minion is { Speed: < 0 } or { Range: <= 0 }) ctx.Error(p, "minion speed must be >= 0 (0 = a sentry) and range > 0.");

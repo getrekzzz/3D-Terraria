@@ -38,4 +38,13 @@ wait 0.2
 season off
 assert season.id == 0
 season auto
+# Fallen Stars (P3-30): one streaks down at night and lies on the ground until dawn.
+time midnight
+starfall now
+assert stars.fallen >= 1
+wait_until drops.fallen_star >= 1 10
+time dawn
+wait 1
+assert drops.fallen_star == 0
+assert stars.faded >= 1
 assert errors == 0

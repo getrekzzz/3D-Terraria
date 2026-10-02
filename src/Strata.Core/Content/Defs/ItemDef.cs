@@ -174,6 +174,9 @@ public sealed class ItemDef : ContentDef
     /// <summary>Light emitted while held, [r, g, b] 0–15.</summary>
     public int[]? HeldLight { get; init; }
 
+    /// <summary>Left on the ground, it vanishes when day breaks (Fallen Stars, P3-30).</summary>
+    public bool FadesAtDawn { get; init; }
+
     // --- Presentation ---
     public string? Model { get; init; }
     public string? Icon { get; init; }

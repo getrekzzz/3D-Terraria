@@ -94,6 +94,9 @@ public sealed partial class ProjectileSystem
     /// <summary>A projectile ended (hit, expired or stopped) at its current position.</summary>
     public event Action<Projectile>? Removed;
 
+    /// <summary>A projectile came to rest on the terrain and left its <c>dropItem</c> there (a Fallen Star landing; before <see cref="Removed"/>).</summary>
+    public event Action<Projectile>? Landed;
+
     /// <summary>An explosion went off (position, radius in metres) — flash, smoke and sound.</summary>
     public event Action<Vector3, float>? Exploded;
 
@@ -172,7 +175,11 @@ public sealed partial class ProjectileSystem
             if (!moved)
             {
                 if (p.Def.Returns > 0) p.Returning = true;
-                else End(i);
+                else
+                {
+                    Land(p);
+                    End(i);
+                }
                 continue;
             }
             if (p.Def.Contact && (p.Def.Friendly ? HitCreatures(p) : HitPlayers(p)))
