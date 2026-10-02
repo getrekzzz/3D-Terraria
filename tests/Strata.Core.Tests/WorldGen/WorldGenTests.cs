@@ -47,7 +47,7 @@ public class WorldGenTests
     [InlineData(8, 4, 8, 3494435149473940947UL)]
     [InlineData(2, 4, 9, 17334305573271451792UL)]
     [InlineData(12, 1, 5, 12384916426225855034UL)]
-    [InlineData(8, 7, 12, 12714577129569773090UL)] // the Dungeon's vault
+    [InlineData(8, 7, 12, 11631658341848478373UL)] // the Dungeon's vault
     [InlineData(3, 11, 11, 15258059975597628175UL)] // the Dungeon's keep
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {

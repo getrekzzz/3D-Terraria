@@ -175,4 +175,17 @@ public class DungeonDecorTests
         g.Ticks(2);
         Assert.True(g.World.Projectiles.All.Count(p => p.Def.Id == "trap_dart") > before, "the dart trap did not fire");
     }
+
+    [Fact]
+    public void TheVaultHoldsAllSixChests()
+    {
+        var g = DungeonGenerationTests.Loaded();
+        var f = DungeonGenerationTests.Feature(g);
+        var vault = f.Layout.Rooms[f.Layout.VaultRoom].Interior;
+        var chests = Objects(f).Where(o => o.ObjectId.EndsWith("_chest") && o.ObjectId != "gold_chest" && vault.Contains(o.Anchor)).ToList();
+        Assert.Equal(DungeonDecorator.BiomeChests.Select(b => b + "_chest").OrderBy(x => x), chests.Select(c => c.ObjectId).OrderBy(x => x));
+        Assert.All(chests, c => Assert.True(c.Locked && c.Loot == c.ObjectId));
+        var world = g.World.Session.World;
+        foreach (var c in chests) Assert.True(world.TileObjects.At(c.Anchor)?.Locked == true, $"{c.ObjectId} is not installed locked");
+    }
 }

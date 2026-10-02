@@ -131,11 +131,23 @@ angel_statue|Angel Statue|early|world
 spike|Spike|prehardmode|dungeon
 bone_welder|Bone Welder|prehardmode|dungeon
 shadow_chest|Shadow Chest|prehardmode|underworld
+jungle_chest|Jungle Chest|hardmode|dungeon
+corruption_chest|Corruption Chest|hardmode|dungeon
+crimson_chest|Crimson Chest|hardmode|dungeon
+hallowed_chest|Hallowed Chest|hardmode|dungeon
+frozen_chest|Frozen Chest|hardmode|dungeon
+desert_chest|Desert Chest|hardmode|dungeon
 """,
     "material": """
 book|Book|prehardmode|dungeon
 golden_key|Golden Key|prehardmode|dungeon
 shadow_key|Shadow Key|prehardmode|dungeon
+jungle_key|Jungle Key|hardmode|biome
+corruption_key|Corruption Key|hardmode|biome
+crimson_key|Crimson Key|hardmode|biome
+hallowed_key|Hallowed Key|hardmode|biome
+frozen_key|Frozen Key|hardmode|biome
+desert_key|Desert Key|hardmode|biome
 """,
     "armor": """
 red_hat|Red Hat|prehardmode|craft

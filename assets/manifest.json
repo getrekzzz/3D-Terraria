@@ -151,11 +151,23 @@
    ],
    "generator": "pot"
   },
+  "corruption_chest": {
+   "models": [
+    "assets/models/objects/corruption_chest_v0.glb"
+   ],
+   "generator": "chest"
+  },
   "crimson_altar": {
    "models": [
     "assets/models/objects/crimson_altar_v0.glb"
    ],
    "generator": "altar"
+  },
+  "crimson_chest": {
+   "models": [
+    "assets/models/objects/crimson_chest_v0.glb"
+   ],
+   "generator": "chest"
   },
   "crimson_heart": {
    "models": [
@@ -186,6 +198,12 @@
     "assets/models/objects/demon_altar_v0.glb"
    ],
    "generator": "altar"
+  },
+  "desert_chest": {
+   "models": [
+    "assets/models/objects/desert_chest_v0.glb"
+   ],
+   "generator": "chest"
   },
   "diabolic_sigil": {
    "models": [
@@ -234,6 +252,12 @@
     "assets/models/objects/flower_v3.glb"
    ],
    "generator": "flower"
+  },
+  "frozen_chest": {
+   "models": [
+    "assets/models/objects/frozen_chest_v0.glb"
+   ],
+   "generator": "chest"
   },
   "furnace": {
    "models": [
@@ -317,6 +341,12 @@
    ],
    "generator": "vase"
   },
+  "hallowed_chest": {
+   "models": [
+    "assets/models/objects/hallowed_chest_v0.glb"
+   ],
+   "generator": "chest"
+  },
   "heart_lantern": {
    "models": [
     "assets/models/objects/heart_lantern_v0.glb"
@@ -334,6 +364,12 @@
     "assets/models/objects/iron_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "jungle_chest": {
+   "models": [
+    "assets/models/objects/jungle_chest_v0.glb"
+   ],
+   "generator": "chest"
   },
   "lead_anvil": {
    "models": [
@@ -1241,6 +1277,22 @@
    "model": "assets/models/items/copper_shortsword.glb",
    "icon": "assets/icons/items/copper_shortsword.png"
   },
+  "corruption_chest": {
+   "object": "corruption_chest",
+   "icon": "assets/icons/items/corruption_chest.png"
+  },
+  "corruption_key": {
+   "model": "assets/models/items/corruption_key.glb",
+   "icon": "assets/icons/items/corruption_key.png"
+  },
+  "crimson_chest": {
+   "object": "crimson_chest",
+   "icon": "assets/icons/items/crimson_chest.png"
+  },
+  "crimson_key": {
+   "model": "assets/models/items/crimson_key.glb",
+   "icon": "assets/icons/items/crimson_key.png"
+  },
   "crimson_rod": {
    "model": "assets/models/items/crimson_rod.glb",
    "icon": "assets/icons/items/crimson_rod.png"
@@ -1412,6 +1464,14 @@
   "depth_meter": {
    "model": "assets/models/items/depth_meter.glb",
    "icon": "assets/icons/items/depth_meter.png"
+  },
+  "desert_chest": {
+   "object": "desert_chest",
+   "icon": "assets/icons/items/desert_chest.png"
+  },
+  "desert_key": {
+   "model": "assets/models/items/desert_key.glb",
+   "icon": "assets/icons/items/desert_key.png"
   },
   "desert_tiger_staff": {
    "model": "assets/models/items/desert_tiger_staff.glb",
@@ -1601,6 +1661,14 @@
    "model": "assets/models/items/frog.glb",
    "icon": "assets/icons/items/frog.png"
   },
+  "frozen_chest": {
+   "object": "frozen_chest",
+   "icon": "assets/icons/items/frozen_chest.png"
+  },
+  "frozen_key": {
+   "model": "assets/models/items/frozen_key.glb",
+   "icon": "assets/icons/items/frozen_key.png"
+  },
   "furnace": {
    "object": "furnace",
    "icon": "assets/icons/items/furnace.png"
@@ -1753,6 +1821,10 @@
    "model": "assets/models/items/hallowed_bar.glb",
    "icon": "assets/icons/items/hallowed_bar.png"
   },
+  "hallowed_chest": {
+   "object": "hallowed_chest",
+   "icon": "assets/icons/items/hallowed_chest.png"
+  },
   "hallowed_greaves": {
    "model": "assets/models/items/hallowed_greaves.glb",
    "icon": "assets/icons/items/hallowed_greaves.png"
@@ -1760,6 +1832,10 @@
   "hallowed_helmet": {
    "model": "assets/models/items/hallowed_helmet.glb",
    "icon": "assets/icons/items/hallowed_helmet.png"
+  },
+  "hallowed_key": {
+   "model": "assets/models/items/hallowed_key.glb",
+   "icon": "assets/icons/items/hallowed_key.png"
   },
   "hallowed_plate_mail": {
    "model": "assets/models/items/hallowed_plate_mail.glb",
@@ -1941,9 +2017,17 @@
    "model": "assets/models/items/jesters_arrow.glb",
    "icon": "assets/icons/items/jesters_arrow.png"
   },
+  "jungle_chest": {
+   "object": "jungle_chest",
+   "icon": "assets/icons/items/jungle_chest.png"
+  },
   "jungle_hat": {
    "model": "assets/models/items/jungle_hat.glb",
    "icon": "assets/icons/items/jungle_hat.png"
+  },
+  "jungle_key": {
+   "model": "assets/models/items/jungle_key.glb",
+   "icon": "assets/icons/items/jungle_key.png"
   },
   "jungle_pants": {
    "model": "assets/models/items/jungle_pants.glb",

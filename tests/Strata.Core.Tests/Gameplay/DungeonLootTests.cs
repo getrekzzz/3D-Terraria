@@ -72,6 +72,25 @@ public class DungeonLootTests
     }
 
     [Fact]
+    public void BiomeKeysDropOnlyInHardmodeInTheirBiome()
+    {
+        var loot = new LootRoller(Db);
+        int Keys(string biome, bool hardmode)
+        {
+            var rng = new Pcg32(11);
+            var ctx = new ConditionContext { Biomes = new[] { biome }, Flags = hardmode ? new HashSet<string> { "hardmode" } : new HashSet<string>() };
+            int keys = 0;
+            for (int i = 0; i < 50_000; i++)
+                foreach (var s in loot.Roll(NpcSystem.GlobalKillTable, ref rng, ctx))
+                    if (s.Item!.Id == "jungle_key") keys += s.Count;
+            return keys;
+        }
+        Assert.InRange(Keys("underground_jungle", true), 8, 40); // 1 in 2500
+        Assert.Equal(0, Keys("underground_jungle", false));
+        Assert.Equal(0, Keys("desert", true));
+    }
+
+    [Fact]
     public void DungeonSlimesAlwaysCarryAKey()
     {
         var loot = new LootRoller(Db);

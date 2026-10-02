@@ -166,7 +166,7 @@ public static partial class DungeonDecorator
         /// Places an object if its footprint is clear, it is held up the <paramref name="hold"/> way (a wall object
         /// against <paramref name="wall"/>, the outward direction of the wall it hangs on) and its chunk has budget.
         /// </summary>
-        public bool TryPlace(TileObjectDef def, Int3 anchor, int rotation, Hold hold, Int3 wall = default, int variant = 0, string? loot = null, bool reserved = true)
+        public bool TryPlace(TileObjectDef def, Int3 anchor, int rotation, Hold hold, Int3 wall = default, int variant = 0, string? loot = null, bool reserved = true, bool locked = false)
         {
             var size = TileObjectInstance.FootprintOf(def, rotation);
             var box = new Aabb3i(anchor, anchor + size);
@@ -183,7 +183,7 @@ public static partial class DungeonDecorator
             Occupy(box);
             Count(def, anchor);
             int at = _pending.Count;
-            _pending.Add(new ObjectOp(box, def.Id, anchor, rotation, variant, loot));
+            _pending.Add(new ObjectOp(box, def.Id, anchor, rotation, variant, loot, locked));
             if (def.Id == "book") _bookOps.Add(at);
             return true;
         }

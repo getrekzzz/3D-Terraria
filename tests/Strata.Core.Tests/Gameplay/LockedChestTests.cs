@@ -92,4 +92,20 @@ public class LockedChestTests
         Assert.Contains(chest.Container!, s => !s.IsEmpty);
         Assert.NotNull(g.World.Session.World.TileObjects.Get(chest.Id));
     }
+
+    [Fact]
+    public void BiomeChestsWaitForPlantera()
+    {
+        using var g = TestGame.Create();
+        var chest = Chest(g, "jungle_chest", locked: true, loot: "jungle_chest");
+        g.Hold("jungle_key", 1, 5);
+        var refused = Refusals(g);
+        Assert.Equal(InteractOutcome.Refused, g.World.Interaction.Interact(g.Player, chest));
+        Assert.Contains("Plantera", Assert.Single(refused));
+        Assert.Equal(1, Count(g, "jungle_key"));
+        g.World.Session.Flags.Add("defeated_plantera");
+        Assert.Equal(InteractOutcome.ContainerOpened, g.World.Interaction.Interact(g.Player, chest));
+        Assert.Equal(0, Count(g, "jungle_key"));
+        Assert.Contains(chest.Container!, s => s.Item?.Id == "piranha_gun");
+    }
 }

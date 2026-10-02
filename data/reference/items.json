@@ -4100,6 +4100,48 @@
    "source": "underworld"
   },
   {
+   "id": "terraria:jungle_chest",
+   "name": "Jungle Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:corruption_chest",
+   "name": "Corruption Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:crimson_chest",
+   "name": "Crimson Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:hallowed_chest",
+   "name": "Hallowed Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:frozen_chest",
+   "name": "Frozen Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:desert_chest",
+   "name": "Desert Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
    "id": "terraria:book",
    "name": "Book",
    "kind": "material",
@@ -4119,6 +4161,48 @@
    "kind": "material",
    "stage": "prehardmode",
    "source": "dungeon"
+  },
+  {
+   "id": "terraria:jungle_key",
+   "name": "Jungle Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:corruption_key",
+   "name": "Corruption Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:crimson_key",
+   "name": "Crimson Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:hallowed_key",
+   "name": "Hallowed Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:frozen_key",
+   "name": "Frozen Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:desert_key",
+   "name": "Desert Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
   },
   {
    "id": "terraria:red_hat",

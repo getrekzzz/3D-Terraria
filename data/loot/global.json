@@ -1,6 +1,12 @@
 {
   // Rolled after every kill that counts (worth coins, not a critter or a part): NpcSystem.GlobalKillTable.
   "lootTables": [
-    { "id": "global_kill", "entries": [{ "item": "golden_key", "chance": 0.015384615, "conditions": [{ "type": "biome", "any": ["dungeon"] }] }] }
+    { "id": "global_kill", "entries": [{ "item": "golden_key", "chance": 0.015384615, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+      { "item": "jungle_key", "chance": 0.0004, "conditions": [{ "type": "flag", "id": "hardmode" }, { "type": "biome", "any": ["jungle", "underground_jungle"] }] },
+      { "item": "corruption_key", "chance": 0.0004, "conditions": [{ "type": "flag", "id": "hardmode" }, { "type": "biome", "any": ["corruption"] }] },
+      { "item": "crimson_key", "chance": 0.0004, "conditions": [{ "type": "flag", "id": "hardmode" }, { "type": "biome", "any": ["crimson"] }] },
+      { "item": "hallowed_key", "chance": 0.0004, "conditions": [{ "type": "flag", "id": "hardmode" }, { "type": "biome", "any": ["hallow"] }] },
+      { "item": "frozen_key", "chance": 0.0004, "conditions": [{ "type": "flag", "id": "hardmode" }, { "type": "biome", "any": ["tundra", "ice_biome"] }] },
+      { "item": "desert_key", "chance": 0.0004, "conditions": [{ "type": "flag", "id": "hardmode" }, { "type": "biome", "any": ["desert", "underground_desert"] }] }] }
   ]
 }

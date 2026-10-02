@@ -44,6 +44,7 @@ public static partial class DungeonDecorator
                 SpikePit(d, room);
                 break;
             case RoomKind.Vault:
+                VaultChests(d);
                 Chandelier(d, room, centre);
                 AlongWalls(d, room, d.Def(Banner(d)), 5, Hold.Wall, 2, 6);
                 break;
@@ -260,6 +261,21 @@ public static partial class DungeonDecorator
             : new Aabb3i(new Int3(cc - 1, y, mid - 3), new Int3(cc + 2, y + 1, mid + 3));
         if (d.Clear(bridge)) d.Fill(bridge, d.Style.Brick, d.Platform);
         Chandelier(d, room, room.CenterFloor + (alongX ? new Int3(5, 0, 0) : new Int3(0, 0, 5)));
+    }
+
+    /// <summary>The six biome chests (locked until Plantera falls, each by its hardmode biome key) on the vault's
+    /// reserved spots, facing into the room, each rolling its biome's weapon.</summary>
+    public static readonly string[] BiomeChests = { "jungle", "corruption", "crimson", "hallowed", "frozen", "desert" };
+
+    private static void VaultChests(Decor d)
+    {
+        var spots = d.Layout.VaultChestSpots;
+        for (int i = 0; i < spots.Count && i < BiomeChests.Length; i++)
+        {
+            var id = BiomeChests[i] + "_chest";
+            var box = d.ChestBox(spots[i]);
+            d.TryPlace(d.Def(id), box.Min, DungeonBuilder.RotationToward(spots[i].Facing), Hold.Floor, loot: id, reserved: false, locked: true);
+        }
     }
 
     /// <summary>When no library got a book, one Water Bolt book still waits on a room floor.</summary>

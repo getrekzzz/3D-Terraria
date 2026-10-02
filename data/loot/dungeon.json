@@ -1,5 +1,11 @@
 {
   "lootTables": [
+    { "id": "jungle_chest", "entries": [{ "item": "piranha_gun" }] },
+    { "id": "corruption_chest", "entries": [{ "item": "scourge_of_the_corruptor" }] },
+    { "id": "crimson_chest", "entries": [{ "item": "vampire_knives" }] },
+    { "id": "hallowed_chest", "entries": [{ "item": "rainbow_gun" }] },
+    { "id": "frozen_chest", "entries": [{ "item": "staff_of_the_frost_hydra" }] },
+    { "id": "desert_chest", "entries": [{ "item": "desert_tiger_staff" }] },
     { "id": "book", "entries": [{ "item": "book" }] },
     { "id": "water_bolt_book", "entries": [{ "item": "water_bolt" }] },
     { "id": "dungeon_chest_primary", "mode": "weighted", "entries": [{ "item": "muramasa" }, { "item": "cobalt_shield" }, { "item": "aqua_scepter" }, { "item": "handgun" }, { "item": "blue_moon" }, { "item": "magic_missile" }, { "item": "valor" }] },

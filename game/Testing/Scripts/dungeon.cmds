@@ -39,6 +39,10 @@ assert zone.dungeon == 1
 # The furnished halls stream in with every prop model found (preloaded near the gate).
 wait_until stream.idle == 1 600
 assert props.problems == 0
+# The vault's biome chests wait for Plantera.
+give jungle_key 1
+interact nearest jungle_chest 16 refused
+assert inv.jungle_key == 1
 tp landmark dungeon_chest
 wait_until player.frozen == 0 180
 assert zone.dungeon == 1

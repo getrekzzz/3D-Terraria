@@ -163,3 +163,8 @@ bound Mechanic's spot and the vault's six chest spots clear. Budgets per anchor 
   (`PropLibrary.Preload`, one GLB per frame) once the player is within 64 m of `dungeon_gate` or inside the zone.
 * `DungeonDecorTests`: no overlaps and every op installed, support (wall/ceiling/floor) on stamped chunks, libraries and
   the Water Bolt, treasure chests, the Mechanic's spot, budgets, plate-to-trap wire BFS, and a plate firing its dart.
+* Vault biome chests (P4-34): `DungeonDecorator.VaultChests` puts the jungle, corruption, crimson, hallowed, frozen and
+  desert chests (`data/tileobjects/biome_chests.json`) Locked on the six `VaultChestSpots` (footprint clamped as
+  `DungeonBuilder.ChestAnchor`), each rolling its `<biome>_chest` table (the P4-33 weapon). Their locks need the
+  matching biome key (`data/items/biome_keys.json`; `global_kill` drops each at 1 in 2500 in hardmode in its biome)
+  and refuse until `defeated_plantera`.
