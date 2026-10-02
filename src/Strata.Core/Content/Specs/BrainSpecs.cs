@@ -226,19 +226,13 @@ public sealed class CryptWardenParams : SpecParams
     /// <summary>Hover height above the target (m).</summary>
     public float HoverHeight { get; init; } = 6f;
 
-    /// <summary>Segment hands (Prime): distance of each hand from the skull (m).</summary>
-    public float HandSpacing { get; init; } = 2.6f;
-
-    /// <summary>Segment hands (Prime): ticks between hand swipes (hands alternate).</summary>
-    public int SwipeInterval { get; init; } = 100;
-
     /// <summary>Ticks of hovering before a spin charge, and the charge's length (Terraria: 800 and 400).</summary>
     public int SpinInterval { get; init; } = 800;
     public int SpinDuration { get; init; } = 400;
 
     public float SpinSpeed { get; init; } = 9f;
 
-    /// <summary>Defense added while spinning (Terraria: −10).</summary>
+    /// <summary>Defense added while spinning (Terraria: −10 for Skeletron; Prime's doubles, +24).</summary>
     public int SpinDefense { get; init; }
 
     /// <summary>Movement speed added per lost hand (0.25 = a quarter faster for each).</summary>
@@ -257,10 +251,7 @@ public sealed class CryptWardenParams : SpecParams
     public int SkullInterval { get; init; } = 80;
     public float SkullLife { get; init; } = 0.75f;
 
-    /// <summary>Segment hands (Prime): only the first N hands swipe (the rest are guns that hold position); 0 = every hand.</summary>
-    public int SwipingHands { get; init; }
-
-    /// <summary>Below this life fraction the warden is enraged (faster swipes, enraged ranged attack); 0 = never.</summary>
+    /// <summary>Below this life fraction the warden is enraged (its arms copy it: their enraged ranged attacks); 0 = never.</summary>
     public float Phase2Life { get; init; }
 }
 
@@ -310,8 +301,28 @@ public sealed class MawwallParams : SpecParams, IValidatableSpec
     public int MinionInterval { get; init; } = 300;
     public int MaxMinions { get; init; } = 5;
 
+    /// <summary>
+    /// A target farther than this (m) ahead of the wall face is Tongued: <see cref="TongueBuff"/> (no item use) and reeled
+    /// at <see cref="TonguePull"/> m/s into the mouth, helpless, until it reaches it (Terraria's The Tongued).
+    /// </summary>
+    public float TongueDistance { get; init; } = 50f;
+    public string TongueBuff { get; init; } = "the_tongued";
+    public float TonguePull { get; init; } = 14f;
+
+    /// <summary>
+    /// Free creature crawling out of the mouth every <see cref="LeechInterval"/> ticks at full life (scaled by
+    /// 0.4 + 0.6 × life, so more often as the wall weakens), up to <see cref="MaxLeeches"/> alive.
+    /// </summary>
+    public string? Leech { get; init; }
+    public int LeechInterval { get; init; } = 420;
+    public int MaxLeeches { get; init; } = 4;
+
+    /// <summary>Sweep speed multiplier in Expert and Master.</summary>
+    public float ExpertSpeed { get; init; } = 1.25f;
+
     public string? Validate() =>
         Width <= 0 || Thickness <= 0 ? "width and thickness must be > 0"
         : MaxSpeed < BaseSpeed ? "maxSpeed must be >= baseSpeed"
-        : MinionInterval < 1 ? "minionInterval must be >= 1" : null;
+        : MinionInterval < 1 || LeechInterval < 1 ? "minionInterval and leechInterval must be >= 1"
+        : TongueDistance <= 0 || TonguePull <= 0 ? "tongueDistance and tonguePull must be > 0" : null;
 }

@@ -53,6 +53,9 @@ public sealed partial class ItemUseSystem
         return UseOutcome.Caught;
     }
 
+    /// <summary>The Minecart Upgrade Kit's Mechanical Cart: 25% faster top speed and acceleration.</summary>
+    public const float MechanicalCartSpeed = 1.25f;
+
     /// <summary>Boards a minecart on the clicked track piece (or the track underfoot), or climbs out of the one being ridden.</summary>
     private UseOutcome Mount(PlayerEntity p, MinecartParams cfg, Target? target)
     {
@@ -63,6 +66,7 @@ public sealed partial class ItemUseSystem
         }
         var near = target?.Object is { Def.Track: true } piece ? piece.Anchor : p.FeetCell;
         p.Minecart = Mounts.Minecarts.Board(_world.Session.World, near, p.Aim, cfg);
+        if (p.Minecart != null && p.State.MinecartUpgrade) p.Minecart.SpeedScale = MechanicalCartSpeed;
         return p.Minecart != null ? UseOutcome.Mounted : UseOutcome.Blocked;
     }
 

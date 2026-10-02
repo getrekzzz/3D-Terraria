@@ -7,6 +7,17 @@
     { "id": "queen_bee_trophy", "name": "Queen Bee Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:queen_bee_trophy"] },
     { "id": "skeletron_trophy", "name": "Skeletron Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:skeletron_trophy"] },
     { "id": "deerclops_trophy", "name": "Deerclops Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:deerclops_trophy"] },
-    { "id": "wall_of_flesh_trophy", "name": "Wall of Flesh Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:wall_of_flesh_trophy"] }
+    { "id": "wall_of_flesh_trophy", "name": "Wall of Flesh Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:wall_of_flesh_trophy"] },
+    { "id": "queen_slime_trophy", "name": "Queen Slime Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:queen_slime_trophy"] },
+    { "id": "retinazer_trophy", "name": "Retinazer Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:retinazer_trophy"] },
+    { "id": "spazmatism_trophy", "name": "Spazmatism Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:spazmatism_trophy"] },
+    { "id": "destroyer_trophy", "name": "Destroyer Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:destroyer_trophy"] },
+    { "id": "skeletron_prime_trophy", "name": "Skeletron Prime Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:skeletron_prime_trophy"] },
+    { "id": "plantera_trophy", "name": "Plantera Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:plantera_trophy"] },
+    { "id": "golem_trophy", "name": "Golem Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:golem_trophy"] },
+    { "id": "duke_fishron_trophy", "name": "Duke Fishron Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:duke_fishron_trophy"] },
+    { "id": "empress_of_light_trophy", "name": "Empress of Light Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:empress_of_light_trophy"] },
+    { "id": "ancient_cultist_trophy", "name": "Ancient Cultist Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:ancient_cultist_trophy"] },
+    { "id": "moon_lord_trophy", "name": "Moon Lord Trophy", "tags": ["trophy", "world"], "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "covers": ["terraria:moon_lord_trophy"] }
   ]
 }

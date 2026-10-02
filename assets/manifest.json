@@ -12,6 +12,12 @@
    ],
    "generator": "workbench"
   },
+  "ancient_cultist_trophy": {
+   "models": [
+    "assets/models/objects/ancient_cultist_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "ancient_manipulator": {
    "models": [
     "assets/models/objects/ancient_manipulator_v0.glb"
@@ -124,6 +130,18 @@
    ],
    "generator": "altar"
   },
+  "destroyer_trophy": {
+   "models": [
+    "assets/models/objects/destroyer_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
+  "duke_fishron_trophy": {
+   "models": [
+    "assets/models/objects/duke_fishron_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "eater_of_worlds_trophy": {
    "models": [
     "assets/models/objects/eater_of_worlds_trophy_v0.glb"
@@ -136,6 +154,12 @@
     "assets/models/objects/ebonwood_tree_v1.glb"
    ],
    "generator": "twisted"
+  },
+  "empress_of_light_trophy": {
+   "models": [
+    "assets/models/objects/empress_of_light_trophy_v0.glb"
+   ],
+   "generator": "trophy"
   },
   "enchanted_sword_shrine": {
    "models": [
@@ -202,6 +226,12 @@
     "assets/models/objects/gold_chest_v0.glb"
    ],
    "generator": "chest"
+  },
+  "golem_trophy": {
+   "models": [
+    "assets/models/objects/golem_trophy_v0.glb"
+   ],
+   "generator": "trophy"
   },
   "grass_tuft": {
    "models": [
@@ -298,6 +328,12 @@
    ],
    "generator": "rail"
   },
+  "moon_lord_trophy": {
+   "models": [
+    "assets/models/objects/moon_lord_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "moonglow_plant": {
    "models": [
     "assets/models/objects/moonglow_plant_v0.glb"
@@ -359,6 +395,12 @@
    ],
    "generator": "bulb"
   },
+  "plantera_trophy": {
+   "models": [
+    "assets/models/objects/plantera_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "pot": {
    "models": [
     "assets/models/objects/pot_v0.glb",
@@ -376,6 +418,18 @@
   "queen_bee_trophy": {
    "models": [
     "assets/models/objects/queen_bee_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
+  "queen_slime_trophy": {
+   "models": [
+    "assets/models/objects/queen_slime_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
+  "retinazer_trophy": {
+   "models": [
+    "assets/models/objects/retinazer_trophy_v0.glb"
    ],
    "generator": "trophy"
   },
@@ -412,9 +466,21 @@
    ],
    "generator": "flower"
   },
+  "skeletron_prime_trophy": {
+   "models": [
+    "assets/models/objects/skeletron_prime_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
   "skeletron_trophy": {
    "models": [
     "assets/models/objects/skeletron_trophy_v0.glb"
+   ],
+   "generator": "trophy"
+  },
+  "spazmatism_trophy": {
+   "models": [
+    "assets/models/objects/spazmatism_trophy_v0.glb"
    ],
    "generator": "trophy"
   },
@@ -595,6 +661,10 @@
   "amethyst_staff": {
    "model": "assets/models/items/amethyst_staff.glb",
    "icon": "assets/icons/items/amethyst_staff.png"
+  },
+  "ancient_cultist_trophy": {
+   "object": "ancient_cultist_trophy",
+   "icon": "assets/icons/items/ancient_cultist_trophy.png"
   },
   "ancient_manipulator": {
    "object": "ancient_manipulator",
@@ -1156,6 +1226,10 @@
    "object": "deerclops_trophy",
    "icon": "assets/icons/items/deerclops_trophy.png"
   },
+  "demon_heart": {
+   "model": "assets/models/items/demon_heart.glb",
+   "icon": "assets/icons/items/demon_heart.png"
+  },
   "demon_scythe": {
    "model": "assets/models/items/demon_scythe.glb",
    "icon": "assets/icons/items/demon_scythe.png"
@@ -1208,6 +1282,10 @@
    "model": "assets/models/items/depth_meter.glb",
    "icon": "assets/icons/items/depth_meter.png"
   },
+  "destroyer_trophy": {
+   "object": "destroyer_trophy",
+   "icon": "assets/icons/items/destroyer_trophy.png"
+  },
   "diamond": {
    "model": "assets/models/items/diamond.glb",
    "icon": "assets/icons/items/diamond.png"
@@ -1227,6 +1305,14 @@
   "duck": {
    "model": "assets/models/items/duck.glb",
    "icon": "assets/icons/items/duck.png"
+  },
+  "duke_fishron_treasure_bag": {
+   "model": "assets/models/items/duke_fishron_treasure_bag.glb",
+   "icon": "assets/icons/items/duke_fishron_treasure_bag.png"
+  },
+  "duke_fishron_trophy": {
+   "object": "duke_fishron_trophy",
+   "icon": "assets/icons/items/duke_fishron_trophy.png"
   },
   "dynamite": {
    "model": "assets/models/items/dynamite.glb",
@@ -1263,6 +1349,14 @@
   "emerald_staff": {
    "model": "assets/models/items/emerald_staff.glb",
    "icon": "assets/icons/items/emerald_staff.png"
+  },
+  "empress_of_light_treasure_bag": {
+   "model": "assets/models/items/empress_of_light_treasure_bag.glb",
+   "icon": "assets/icons/items/empress_of_light_treasure_bag.png"
+  },
+  "empress_of_light_trophy": {
+   "object": "empress_of_light_trophy",
+   "icon": "assets/icons/items/empress_of_light_trophy.png"
   },
   "empress_wings": {
    "model": "assets/models/items/empress_wings.glb",
@@ -1483,6 +1577,14 @@
   "golden_shower": {
    "model": "assets/models/items/golden_shower.glb",
    "icon": "assets/icons/items/golden_shower.png"
+  },
+  "golem_treasure_bag": {
+   "model": "assets/models/items/golem_treasure_bag.glb",
+   "icon": "assets/icons/items/golem_treasure_bag.png"
+  },
+  "golem_trophy": {
+   "object": "golem_trophy",
+   "icon": "assets/icons/items/golem_trophy.png"
   },
   "gps": {
    "model": "assets/models/items/gps.glb",
@@ -1908,6 +2010,10 @@
    "model": "assets/models/items/mana_regeneration_potion.glb",
    "icon": "assets/icons/items/mana_regeneration_potion.png"
   },
+  "mechanical_battery_piece": {
+   "model": "assets/models/items/mechanical_battery_piece.glb",
+   "icon": "assets/icons/items/mechanical_battery_piece.png"
+  },
   "mechanical_eye": {
    "model": "assets/models/items/mechanical_eye.glb",
    "icon": "assets/icons/items/mechanical_eye.png"
@@ -1915,6 +2021,14 @@
   "mechanical_skull": {
    "model": "assets/models/items/mechanical_skull.glb",
    "icon": "assets/icons/items/mechanical_skull.png"
+  },
+  "mechanical_wagon_piece": {
+   "model": "assets/models/items/mechanical_wagon_piece.glb",
+   "icon": "assets/icons/items/mechanical_wagon_piece.png"
+  },
+  "mechanical_wheel_piece": {
+   "model": "assets/models/items/mechanical_wheel_piece.glb",
+   "icon": "assets/icons/items/mechanical_wheel_piece.png"
   },
   "mechanical_worm": {
    "model": "assets/models/items/mechanical_worm.glb",
@@ -1956,6 +2070,10 @@
    "object": "minecart_track",
    "icon": "assets/icons/items/minecart_track.png"
   },
+  "minecart_upgrade_kit": {
+   "model": "assets/models/items/minecart_upgrade_kit.glb",
+   "icon": "assets/icons/items/minecart_upgrade_kit.png"
+  },
   "mining_helmet": {
    "model": "assets/models/items/mining_helmet.glb",
    "icon": "assets/icons/items/mining_helmet.png"
@@ -1967,6 +2085,14 @@
   "minishark": {
    "model": "assets/models/items/minishark.glb",
    "icon": "assets/icons/items/minishark.png"
+  },
+  "moon_lord_treasure_bag": {
+   "model": "assets/models/items/moon_lord_treasure_bag.glb",
+   "icon": "assets/icons/items/moon_lord_treasure_bag.png"
+  },
+  "moon_lord_trophy": {
+   "object": "moon_lord_trophy",
+   "icon": "assets/icons/items/moon_lord_trophy.png"
   },
   "moonglow": {
    "model": "assets/models/items/moonglow.glb",
@@ -2304,6 +2430,14 @@
    "model": "assets/models/items/pixie_dust.glb",
    "icon": "assets/icons/items/pixie_dust.png"
   },
+  "plantera_treasure_bag": {
+   "model": "assets/models/items/plantera_treasure_bag.glb",
+   "icon": "assets/icons/items/plantera_treasure_bag.png"
+  },
+  "plantera_trophy": {
+   "object": "plantera_trophy",
+   "icon": "assets/icons/items/plantera_trophy.png"
+  },
   "platinum_axe": {
    "model": "assets/models/items/platinum_axe.glb",
    "icon": "assets/icons/items/platinum_axe.png"
@@ -2392,6 +2526,14 @@
    "object": "queen_bee_trophy",
    "icon": "assets/icons/items/queen_bee_trophy.png"
   },
+  "queen_slime_treasure_bag": {
+   "model": "assets/models/items/queen_slime_treasure_bag.glb",
+   "icon": "assets/icons/items/queen_slime_treasure_bag.png"
+  },
+  "queen_slime_trophy": {
+   "object": "queen_slime_trophy",
+   "icon": "assets/icons/items/queen_slime_trophy.png"
+  },
   "rage_potion": {
    "model": "assets/models/items/rage_potion.glb",
    "icon": "assets/icons/items/rage_potion.png"
@@ -2451,6 +2593,10 @@
   "reinforced_fishing_pole": {
    "model": "assets/models/items/reinforced_fishing_pole.glb",
    "icon": "assets/icons/items/reinforced_fishing_pole.png"
+  },
+  "retinazer_trophy": {
+   "object": "retinazer_trophy",
+   "icon": "assets/icons/items/retinazer_trophy.png"
   },
   "rocket_boots": {
    "model": "assets/models/items/rocket_boots.glb",
@@ -2640,6 +2786,14 @@
    "model": "assets/models/items/skeletron_mask.glb",
    "icon": "assets/icons/items/skeletron_mask.png"
   },
+  "skeletron_prime_treasure_bag": {
+   "model": "assets/models/items/skeletron_prime_treasure_bag.glb",
+   "icon": "assets/icons/items/skeletron_prime_treasure_bag.png"
+  },
+  "skeletron_prime_trophy": {
+   "object": "skeletron_prime_trophy",
+   "icon": "assets/icons/items/skeletron_prime_trophy.png"
+  },
   "skeletron_treasure_bag": {
    "model": "assets/models/items/skeletron_treasure_bag.glb",
    "icon": "assets/icons/items/skeletron_treasure_bag.png"
@@ -2743,6 +2897,10 @@
   "space_gun": {
    "model": "assets/models/items/space_gun.glb",
    "icon": "assets/icons/items/space_gun.png"
+  },
+  "spazmatism_trophy": {
+   "object": "spazmatism_trophy",
+   "icon": "assets/icons/items/spazmatism_trophy.png"
   },
   "spear": {
    "model": "assets/models/items/spear.glb",
@@ -2936,6 +3094,10 @@
    "model": "assets/models/items/the_axe.glb",
    "icon": "assets/icons/items/the_axe.png"
   },
+  "the_destroyer_treasure_bag": {
+   "model": "assets/models/items/the_destroyer_treasure_bag.glb",
+   "icon": "assets/icons/items/the_destroyer_treasure_bag.png"
+  },
   "the_horsemans_blade": {
    "model": "assets/models/items/the_horsemans_blade.glb",
    "icon": "assets/icons/items/the_horsemans_blade.png"
@@ -2943,6 +3105,10 @@
   "the_rotted_fork": {
    "model": "assets/models/items/the_rotted_fork.glb",
    "icon": "assets/icons/items/the_rotted_fork.png"
+  },
+  "the_twins_treasure_bag": {
+   "model": "assets/models/items/the_twins_treasure_bag.glb",
+   "icon": "assets/icons/items/the_twins_treasure_bag.png"
   },
   "the_undertaker": {
    "model": "assets/models/items/the_undertaker.glb",
@@ -4325,6 +4491,25 @@
    "animations": [
     "fly"
    ]
+  },
+  "leech_body": {
+   "model": "assets/models/creatures/leech_body.glb",
+   "generator": "eater_segment",
+   "animations": []
+  },
+  "leech_head": {
+   "model": "assets/models/creatures/leech_head.glb",
+   "generator": "eater_head",
+   "animations": [
+    "fly",
+    "idle",
+    "walk"
+   ]
+  },
+  "leech_tail": {
+   "model": "assets/models/creatures/leech_tail.glb",
+   "generator": "eater_tail",
+   "animations": []
   },
   "lihzahrd": {
    "model": "assets/models/creatures/lihzahrd.glb",

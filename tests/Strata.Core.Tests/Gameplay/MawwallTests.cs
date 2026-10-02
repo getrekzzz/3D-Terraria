@@ -11,9 +11,9 @@ using Strata.Core.World;
 
 namespace Strata.Core.Tests.Gameplay;
 
-public class MawwallTests
+public partial class MawwallTests
 {
-    private static TestGame Create()
+    internal static TestGame Create()
     {
         var g = TestGame.Create();
         g.World.Spawner.Enabled = false;
@@ -25,7 +25,7 @@ public class MawwallTests
     }
 
     /// <summary>Moves the player into an open spot of the underworld cavity, with the chunks around it loaded.</summary>
-    private static Vector3 IntoUnderworld(TestGame g)
+    internal static Vector3 IntoUnderworld(TestGame g)
     {
         var session = g.World.Session;
         var bands = session.Generator.Plan.Bands;

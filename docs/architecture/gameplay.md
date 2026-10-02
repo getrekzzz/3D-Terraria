@@ -120,6 +120,15 @@
   `consume` behaviour rolling `<boss>_bag` = the drops plus the Expert-only item). A new boss's bag is data only (bag
   item, three tables, trophy, `tools/blender/assets.d/p4-04-boss-loot.json` rows: `trophy` builds the boss's own
   creature generator into the plaque as a bust, `treasure_bag` takes colours; `bgen/trophies.py`).
+* **Hardmode boss loot** — every hardmode boss table moved to `data/loot/bosses.json` in the same main/`_drops`/`_bag`
+  layout (Queen Slime, the Twins, the Destroyer, Skeletron Prime, Plantera, Golem, Duke Fishron, Empress of Light, Moon
+  Lord; the Lunatic Cultist has a trophy but no bag, as in Terraria). The Twins share `the_twins` with `lootOnDefeat`, so
+  the last to fall drops one bag (and rolls both twins' trophies). Expert items: Volatile Gelatin, the three mechanical
+  pieces (wheel, battery, wagon; `data/items/expert_items.json`) that make the Minecart Upgrade Kit at a Tinkerer's
+  Workshop, Spore Sac, Shiny Stone, Shrimpy Truffle and the Wall of Flesh's Demon Heart. `consume` behaviours
+  `extraAccessorySlot` (Expert/Master worlds only, once) and `minecartUpgrade` (once) set the saved
+  `PlayerState.ExtraAccessorySlot` / `MinecartUpgrade`; an upgraded player's carts get `MinecartRide.SpeedScale` 1.25.
+  The sixth accessory slot itself is not drawn or equipped yet (inventory UI gap).
 * **King Slime and the Eye** — King Slime (2000 life) shrinks with its life (`Npc.VisualScale` and the collision box,
   `HalfExtents` from `BaseHalfExtents`; 1 → 0.6 as Terraria's 1.25 → 0.75), sheds a slime per 6 % of life lost (in
   Expert every third is a Spiked Slime), teleports when the target is beyond `teleportDistance` or out of its sight for
@@ -168,8 +177,22 @@
   override, speed; `ContactBase` uses the body's `setDamage`). Expert: `expertDefensePerHand` per living hand while
   hovering, and once a hand falls or life < `skullLife` homing `skull`s every `skullInterval` (half with no hands) when
   in sight (`skull_shot` cue). Day is a data `enrage` (9999 defense, 1000 damage, ×2.5 speed: it never stops
-  spinning), shared by Skeletron Prime, which still uses legacy segment hands. Arms are drawn to living parts
-  (`NpcRenderer.Arms`).
+  spinning), shared by Skeletron Prime. Arms are drawn to living parts (`NpcRenderer.Arms`; the legacy segment-hand
+  path is gone).
+* **Skeletron Prime** — a 28,000-life skull (defense 24, doubled while spinning: `spinDefense` 24) with four boss parts
+  on `skeletronHand` brains in Prime styles (`HandBrain.Styles`): `prime_saw` (9000, `saw`: jabs straight at the target
+  every `attackInterval`, at most `reach` from its place), `prime_vice` (9000, `vice`: creeps up through its wind-up,
+  then lunges), `prime_cannon` (7000) and `prime_laser` (6000), both `hold` (stay in place; their own `ranged` fires
+  bombs and death lasers). Arms copy the skull's `Enraged` (below `phase2Life`), which swaps in their faster enraged
+  volleys. Killing an arm leaves the fight going; killing the skull ends it and the arms die with it.
+* **Wall of Flesh** — 8000 life shared by the mouth (body) and its two eye segments; lasers come from the eyes in turn,
+  `ranged.intervalAtZeroLife` easing the interval from 70 to 25 ticks as it weakens (any creature may use it). A target
+  more than `tongueDistance` (50 m) ahead of the face is Tongued: `the_tongued` (`noItemUse`) is pulsed each tick and
+  `BrainContext.Pull` sets `PlayerEntity.ExternalVelocity` (cleared at the start of every `NpcSystem.Tick`) towards the
+  mouth at `tonguePull` m/s until the player reaches it. `PlayerController.Status.UpdateTongue` replaces all movement
+  with it after input (hooks let go, minecarts are left; headless players are moved by `GameWorld`). Leeches (a small
+  `worm`, not tethered) crawl out every `leechInterval` × (0.4 + 0.6 × life) ticks, `maxLeeches` alive; The Hungry
+  (240 life) stay tethered and die with it. Expert sweeps `expertSpeed` (×1.25) faster.
 * **Pattern bosses** — `PatternBrain` (+`.Moves`) plays `brain.phases` (`PatternSpecs`, `PatternExtras`): in Expert a
   phase's `expert` block scales move speed, contact damage, volley interval/count (`expertCount`/`expertInterval` per
   volley win), summon caps and wind-ups, `expertBelow` replaces `below`, and `expertOnly` moves join the loop (the
@@ -179,6 +202,14 @@
   minions followers on a ring that die with the boss and `leash` holds the boss near their centroid; `aura` pulses a
   buff (`expertOnly` optional); `illusions` sets `Npc.Illusions` with `MirrorAround` = the target (`AI.Illusions`
   places the copies a quarter turn apart); `defense` overrides defense (`DefenseOverride` is cleared before each think).
+* **Queen Slime** — phase one hops three times, then rings crystals while her court (`summon.pool`: Crystal, Bouncy
+  and Heavenly Slimes) gathers; below half life (`fly`, `queen_slime_winged`) she hovers 8 m over the target spraying
+  bouncing Regal Gel (`queen_slime_gel`), slams down (impact + crystal ring) twice, then dashes. Expert: ×1.2 speed and
+  +2 per volley. The `damage <enemy> <amount>` command takes life without killing, to reach later phases in smokes.
+* **Duke Fishron and the Empress of Light** — the Duke has a third phase below 15% (×1.7 speed, teleport-dash chains)
+  and an `enrage` outside the ocean (×2 damage, ×1.5 speed, defense 100); Expert ×1.15 speed. The Empress no longer
+  leaves at dawn: a latched day `enrage` (`setDamage` 9999, ×1.2 speed) makes her lethal for the rest of the fight —
+  `PatternBrain` volleys use a rage's `setDamage` too, so her shots kill like her touch. Expert: +2 per volley.
 * **Brain of Cthulhu and confusion** — the Brain (1000 life) hides behind 20 Creepers (100 life each); its first phase
   is `untilGuardsFall`, so it is exposed (the next phase) at full life once they fall, as in Terraria: chase, teleport and
   double dash with three illusions (`NpcRenderer.Illusions`: pooled, dimmed copies of its model, no collision) and, in

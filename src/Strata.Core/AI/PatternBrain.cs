@@ -179,7 +179,7 @@ public sealed partial class PatternBrain : IBrain
         var offset = OffsetOf(s);
         for (int i = 0; i < s.Count && alive + i < max; i++)
         {
-            if (!ctx.Content.Enemies.TryGet(pool.Length == 1 ? pool[0] : pool[ctx.Rng.Range(0, pool.Length)], out var def)) continue;
+            if (!ctx.Content.Enemies.TryGet(pool.Length == 1 ? pool[0] : pool[ctx.Rng.NextInt(pool.Length)], out var def)) continue;
             if (s.Tether)
             {
                 var o = Ring(alive + i, max, s.Radius) + offset;
@@ -242,6 +242,8 @@ public sealed partial class PatternBrain : IBrain
         var aim = target.Center - from;
         var dir = aim.LengthSquared() > 1e-4f ? Vector3.Normalize(aim) : Vector3.UnitX;
         float spread = v.Spread * MathF.PI / 180f;
+        // A rage with a fixed damage (the Empress by day) makes every shot as lethal as her touch.
+        int damage = npc.Frenzied && npc.Def.Boss?.Enrage?.SetDamage is { } set ? set : v.Damage;
         for (int i = 0; i < count; i++)
         {
             Vector3 d;
@@ -256,7 +258,7 @@ public sealed partial class PatternBrain : IBrain
                 var up = Vector3.Cross(side, dir);
                 d = spread > 0 ? Vector3.Normalize(dir + side * ctx.Rng.NextSigned() * spread + up * ctx.Rng.NextSigned() * spread * 0.5f) : dir;
             }
-            ctx.Shoot(v.Projectile, from + d * (npc.HalfExtents.X + 0.3f), d * v.Speed, v.Damage);
+            ctx.Shoot(v.Projectile, from + d * (npc.HalfExtents.X + 0.3f), d * v.Speed, damage);
         }
         npc.Pose = "attack";
     }

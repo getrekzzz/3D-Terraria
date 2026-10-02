@@ -146,6 +146,12 @@ public sealed class ConsumeParams : SpecParams
 
     /// <summary>Opens into this loot table (crates, treasure bags).</summary>
     public string? Loot { get; init; }
+
+    /// <summary>Permanently unlocks the Expert-only sixth accessory slot (Demon Heart); usable once, only in Expert and Master worlds.</summary>
+    public bool ExtraAccessorySlot { get; init; }
+
+    /// <summary>Permanently upgrades the player's minecart (Minecart Upgrade Kit): faster; usable once.</summary>
+    public bool MinecartUpgrade { get; init; }
 }
 
 public sealed class BaitSummonParams : SpecParams

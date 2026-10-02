@@ -7,8 +7,9 @@ namespace Strata.Core.AI;
 
 /// <summary>
 /// Skeletron (and Skeletron Prime): a skull hovering over its target, faster for every hand it has lost, that spins
-/// through walls at the target every <see cref="CryptWardenParams.SpinInterval"/> ticks with its defense lowered. Its
-/// hands are boss parts with their own brain (<see cref="HandBrain"/>); Prime's are still segments it swings itself.
+/// through walls at the target every <see cref="CryptWardenParams.SpinInterval"/> ticks with its defense changed
+/// (lowered for Skeletron, doubled for Prime). Its hands and Prime's four arms are boss parts with their own brain
+/// (<see cref="HandBrain"/>).
 /// In Expert each living hand armours the skull, and once a hand falls or the skull is hurt it fires homing skulls.
 /// While frenzied (its day rage, <see cref="Content.Defs.BossInfo.Enrage"/>) it never stops spinning.
 /// Phase: 0 = hover, 1 = spin.
@@ -24,13 +25,10 @@ public sealed class CryptWardenBrain : IBrain
 
     public bool UsesGravity => false;
     public bool MovesFreely => true;
-    public bool PositionsSegments => true;
-
     public void Think(Npc npc, BrainContext ctx)
     {
-        bool parts = npc.Def.Boss is { Parts.Length: > 0 };
-        int hands = parts ? HandsAlive(npc) : npc.Segments.Count;
-        int lost = parts ? Math.Max(0, npc.Def.Boss!.Parts.Length - hands) : 0;
+        int hands = HandsAlive(npc);
+        int lost = Math.Max(0, (npc.Def.Boss?.Parts.Length ?? 0) - hands);
         float pace = 1f + _p.SpeedPerLostHand * lost;
         bool hurt = _p.Phase2Life > 0 && npc.Life <= npc.MaxLife * _p.Phase2Life;
         npc.Enraged = npc.Frenzied || hurt;
@@ -41,7 +39,6 @@ public sealed class CryptWardenBrain : IBrain
             npc.Pose = "move";
             npc.Phase = 0;
             npc.Timer = 0;
-            PlaceHands(npc, npc.Center + Vector3.UnitX, 0.5f, -1, 0);
             return;
         }
         npc.TargetPlayer = 0;
@@ -58,17 +55,8 @@ public sealed class CryptWardenBrain : IBrain
             npc.DefenseDelta += _p.SpinDefense;
             var dir = to.LengthSquared() > 1e-4f ? Vector3.Normalize(to) : Vector3.Zero;
             npc.Velocity += (dir * _p.SpinSpeed * pace - npc.Velocity) * 0.08f;
-            if (parts)
-            {
-                Face(npc, to); // the skull's frame holds still so its hands stay at its sides; the spin is drawn
-                npc.Pose = "spin";
-            }
-            else
-            {
-                npc.Yaw = (npc.Yaw + 0.35f) % MathF.Tau;
-                npc.Pose = "attack";
-            }
-            PlaceHands(npc, target.Center, 0.45f, -1, 0);
+            Face(npc, to); // the skull's frame holds still so its hands stay at its sides; the spin is drawn
+            npc.Pose = "spin";
             if (npc.Timer >= _p.SpinDuration && !npc.Frenzied)
             {
                 npc.Phase = 0;
@@ -87,18 +75,7 @@ public sealed class CryptWardenBrain : IBrain
         npc.Velocity += (want - npc.Velocity) * 0.06f;
         npc.Pose = "move";
         if (ctx.Expert) npc.DefenseDelta += _p.ExpertDefensePerHand * hands;
-        if (parts)
-        {
-            Skulls(npc, ctx, target, hands, lost);
-            return;
-        }
-        // Segment hands (Prime) take turns: the active one reaches for the target in the second half of each interval.
-        int interval = Math.Max(20, npc.Enraged ? _p.SwipeInterval / 2 : _p.SwipeInterval);
-        int cycle = npc.Timer / interval;
-        float t = (npc.Timer % interval) / (float)interval;
-        float reach = t < 0.5f ? 0f : MathF.Sin((t - 0.5f) * 2f * MathF.PI);
-        int swipers = _p.SwipingHands > 0 ? Math.Min(_p.SwipingHands, npc.Segments.Count) : npc.Segments.Count;
-        PlaceHands(npc, target.Center, 1f, swipers > 0 ? cycle % swipers : -1, reach);
+        Skulls(npc, ctx, target, hands, lost);
     }
 
     /// <summary>Living hands (boss parts) still on the skull.</summary>
@@ -137,24 +114,5 @@ public sealed class CryptWardenBrain : IBrain
         ctx.Shoot(_p.Skull, from, Vector3.Normalize(d) * _p.SkullSpeed, _p.SkullDamage);
         ctx.Cue?.Invoke(npc, "skull_shot");
         npc.Counter = 0;
-    }
-
-    /// <summary>
-    /// Segment hands (Prime) rest in pairs either side of the skull, each further pair lower and wider; the swiping
-    /// hand (index) is pulled towards the target.
-    /// </summary>
-    private void PlaceHands(Npc npc, Vector3 target, float spread, int swiping, float reach)
-    {
-        if (npc.Segments.Count < 2) return;
-        var facing = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
-        var side = Vector3.Normalize(Vector3.Cross(Vector3.UnitY, facing));
-        for (int i = 0; i < npc.Segments.Count; i++)
-        {
-            int row = i / 2;
-            var rest = npc.Center + side * (i % 2 == 0 ? 1f : -1f) * _p.HandSpacing * spread * (1f + row * 0.35f)
-                + new Vector3(0, -1.2f - row * 1.4f, 0) + facing * (0.6f - row * 0.3f);
-            var goal = i == swiping ? Vector3.Lerp(rest, target, reach) : rest;
-            npc.Segments[i] = Vector3.Lerp(npc.Segments[i], goal, 0.25f);
-        }
     }
 }

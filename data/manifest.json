@@ -39,6 +39,7 @@
     "items/boss_bags.json",
     "items/consumables.json",
     "items/equipment.json",
+    "items/expert_items.json",
     "items/gear.json",
     "items/hardmode.json",
     "items/hardmode_arsenal.json",

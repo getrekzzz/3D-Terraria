@@ -105,17 +105,8 @@
     { "id": "beetle_leggings", "output": "beetle_leggings", "inputs": [{ "item": "chlorophyte_greaves", "count": 1 }, { "item": "beetle_husk", "count": 10 }], "stations": ["hardmode_anvil"] }
   ],
   "lootTables": [
-    { "id": "plantera", "coins": [50000, 80000], "entries": [
-      { "item": "temple_key" }, { "table": "plantera_weapon" }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
-      { "item": "spore_sac", "conditions": [{ "type": "expert" }] }
-    ] },
     { "id": "plantera_weapon", "mode": "weighted", "entries": [
       { "item": "seedler" }, { "item": "venus_magnum" }, { "item": "leaf_blower" }, { "item": "pygmy_staff" }, { "item": "flower_pow" }, { "item": "the_axe", "weight": 0.5 }
-    ] },
-    { "id": "golem", "coins": [60000, 100000], "entries": [
-      { "item": "picksaw", "chance": 0.33 }, { "table": "golem_weapon" }, { "item": "beetle_husk", "min": 18, "max": 23 }, { "item": "sun_stone", "chance": 0.15 },
-      { "item": "eye_of_the_golem", "chance": 0.15 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
-      { "item": "shiny_stone", "conditions": [{ "type": "expert" }] }
     ] },
     { "id": "golem_weapon", "mode": "weighted", "entries": [{ "item": "stynger" }, { "item": "possessed_hatchet" }] },
     { "id": "temple_chest", "coins": [5000, 20000], "entries": [

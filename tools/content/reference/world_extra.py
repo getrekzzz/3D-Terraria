@@ -12,6 +12,13 @@ frog|Frog|early|jungle|critter
 duck|Duck|early|ocean|critter
 faeling|Faeling|early|aether|critter
 ghost|Ghost|early|graveyard|flyer
+leech|Leech|prehardmode|wall of flesh|segmented
+prime_saw|Prime Saw|hardmode|skeletron prime|boss part
+prime_vice|Prime Vice|hardmode|skeletron prime|boss part
+prime_cannon|Prime Cannon|hardmode|skeletron prime|boss part,projectiles
+prime_laser|Prime Laser|hardmode|skeletron prime|boss part,projectiles
+bouncy_slime|Bouncy Slime|hardmode|queen slime|slime
+heavenly_slime|Heavenly Slime|hardmode|queen slime|flyer
 """
 
 # id|Name|stage|kind
@@ -23,4 +30,5 @@ aetherium_block|Aetherium Block|early|natural
 # id|Name|kind
 BUFFS = """
 shimmering|Shimmering|liquid
+the_tongued|The Tongued|debuff
 """

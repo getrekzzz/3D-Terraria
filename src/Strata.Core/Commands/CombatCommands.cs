@@ -93,6 +93,24 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
+            Name = "wound", Usage = "wound <enemy id> <amount>", Help = "Takes life from every living creature of a kind (never below 1): puts a boss into a later phase.",
+            Run = (ctx, a) =>
+            {
+                var id = a.Str(0, "enemy");
+                int amount = a.Int(1, "amount");
+                if (!ctx.World.Session.Content.Enemies.Contains(id)) throw new CommandException($"unknown enemy '{id}'");
+                int n = 0;
+                foreach (var npc in ctx.World.Npcs.All)
+                    if (npc.Alive && npc.Def.Id == id)
+                    {
+                        npc.Life = Math.Max(1, npc.Life - amount);
+                        n++;
+                    }
+                return CommandResult.Success($"Hurt {n} creatures.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "damage", Usage = "damage <enemy> <amount> [segment]", Help = "Hits the first living creature of a kind (a worm's segment, 0 = the first behind the head); defense applies.",
             Run = (ctx, a) =>
             {

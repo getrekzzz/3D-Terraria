@@ -6,29 +6,12 @@ using Strata.Game.Rendering;
 namespace Strata.Game.Entities;
 
 /// <summary>
-/// Arms for bosses whose hands fly free (Skeletron's bone hands, boss parts; Prime's weapons, segments): each hand is joined to the
+/// Arms for bosses whose hands fly free (boss parts: Skeletron's bone hands, Prime's four tools): each hand is joined to the
 /// head's shoulder on its side by two stretched copies of the boss's <c>armModel</c> (modelled one unit long along
 /// +Y), bending at an elbow that swings outward and down so the arm reads as reaching rather than a stick.
 /// </summary>
 public sealed partial class NpcRenderer
 {
-    private void UpdateArms(Npc npc, View view)
-    {
-        if (npc.Def.Boss?.ArmModel is not { } model || npc.Def.Boss.SegmentModels.Length == 0) return;
-        int parts = System.Math.Min(npc.Segments.Count, npc.Def.Boss.SegmentModels.Length);
-        if (!EnsureArms(view, model, parts)) return;
-        float radius = npc.Def.Boss.SegmentRadius;
-        var head = view.Shown;
-        var right = new Basis(Vector3.Up, npc.Yaw + Mathf.Pi) * Vector3.Right;
-        for (int i = 0; i < parts; i++)
-        {
-            var hand = new Vector3(npc.Segments[i].X, npc.Segments[i].Y, npc.Segments[i].Z);
-            float side = Mathf.Sign((hand - head).Dot(right));
-            if (side == 0f) side = i % 2 == 0 ? 1f : -1f;
-            Arm(view, i, npc, head, hand, right, side, radius, npc.Def.Boss.SegmentSpacing * 0.6f);
-        }
-    }
-
     /// <summary>
     /// Arms to a boss's living hand parts (Skeletron's): from the skull's centre to each hand's, on the side the hand
     /// is fixed to (so a swipe across the body crosses the arm over instead of flipping the shoulder); spare arms hide.
