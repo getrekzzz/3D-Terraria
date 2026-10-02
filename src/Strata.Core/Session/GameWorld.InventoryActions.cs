@@ -14,9 +14,12 @@ public readonly record struct SlotContext(Inventory? Container = null, TownNpc? 
 {
     public static SlotContext None => default;
 
-    /// <summary>A placed chest (or other container object) open beside the inventory.</summary>
-    public static SlotContext Of(TileObjectInstance chest) =>
-        chest.Container == null ? default : new SlotContext(new Inventory(chest.Container), null, chest);
+    /// <summary>
+    /// A placed chest (or other container object) open beside the inventory; a Piggy Bank or Safe shows the
+    /// <paramref name="owner"/>'s personal storage of that kind.
+    /// </summary>
+    public static SlotContext Of(TileObjectInstance chest, Gameplay.Player.PlayerState? owner = null) =>
+        GameWorld.Storage(chest, owner) is { } box ? new SlotContext(box, null, chest) : default;
 }
 
 /// <summary>The buttons of an open chest.</summary>
@@ -143,10 +146,9 @@ public sealed partial class GameWorld
     /// </summary>
     public int ChestAction(PlayerEntity p, TileObjectInstance chest, ChestOp op)
     {
-        if (chest.Container == null) return 0;
+        if (Storage(chest, p.State) is not { } box) return 0;
         Editor.EnsureContainerLoot(chest);
         var inv = p.State.Inventory;
-        var box = new Inventory(chest.Container);
         int moved = op switch
         {
             ChestOp.LootAll => InventoryOps.LootAll(box, inv),
@@ -175,7 +177,7 @@ public sealed partial class GameWorld
         var near = new List<(TileObjectInstance Obj, float Distance)>();
         foreach (var obj in Session.World.TileObjects.InBox(Aabb3i.FromCenter(cell, new Int3(r, r, r))))
         {
-            if (obj.Container == null || obj.Locked) continue;
+            if (Storage(obj, p.State) == null || obj.Locked) continue;
             var b = obj.Bounds;
             var mid = new Vector3(b.Min.X + b.Max.X, b.Min.Y + b.Max.Y, b.Min.Z + b.Max.Z) * (0.5f * Units.CellSize);
             float d = Vector3.Distance(mid, center);
@@ -196,12 +198,23 @@ public sealed partial class GameWorld
     /// </summary>
     public bool RenameContainer(TileObjectInstance chest, string? name)
     {
-        if (chest.Container == null) return false;
+        if (chest.Container == null) return false; // personal storage keeps its own name
         chest.CustomName = name;
         MarkObjectModified(chest);
         return true;
     }
 
-    private void MarkObjectModified(TileObjectInstance obj) =>
-        Session.World.GetChunk(ChunkMath.CellToChunk(obj.Anchor))?.MarkModified();
+    /// <summary>
+    /// The slots a container object shows <paramref name="owner"/>: a chest's own, or for a Piggy Bank or Safe the
+    /// character's personal storage of that kind (created on first use). Null for objects without storage.
+    /// </summary>
+    public static Inventory? Storage(TileObjectInstance obj, Gameplay.Player.PlayerState? owner) =>
+        obj.Def.SharedStorage is { } kind
+            ? owner?.Bank(kind)
+            : obj.Container == null ? null : new Inventory(obj.Container);
+
+    private void MarkObjectModified(TileObjectInstance obj)
+    {
+        if (obj.Container != null) Session.World.GetChunk(ChunkMath.CellToChunk(obj.Anchor))?.MarkModified();
+    }
 }

@@ -308,6 +308,8 @@ loom|Loom|early|craft
 placed_bottle|Placed Bottle|early|craft
 chest|Chest|early|craft
 gold_chest|Gold Chest|early|world
+piggy_bank|Piggy Bank|early|shop
+safe|Safe|prehardmode|shop
 wooden_door|Wooden Door|early|craft
 wooden_table|Wooden Table|early|craft
 wooden_chair|Wooden Chair|early|craft

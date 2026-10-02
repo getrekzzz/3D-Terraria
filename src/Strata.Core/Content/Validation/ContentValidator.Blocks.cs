@@ -60,7 +60,8 @@ public static partial class ContentValidator
             if (t.Variants < 1) ctx.Error(t, "variants must be >= 1.");
             for (int v = 0; v < t.Variants; v++) ctx.Asset(t, AssetPaths.ObjectModel(t, v), $"model (variant {v})");
             if (t.HitPoints < 1) ctx.Error(t, "hitPoints must be >= 1.");
-            if (t.Interaction == TileInteraction.Chest && t.ContainerSlots <= 0) ctx.Error(t, "chest needs containerSlots.");
+            if (t.Interaction == TileInteraction.Chest && t.ContainerSlots <= 0 && string.IsNullOrEmpty(t.SharedStorage)) ctx.Error(t, "chest needs containerSlots or sharedStorage.");
+            if (t.SharedStorage != null && (t.Interaction != TileInteraction.Chest || t.ContainerSlots > 0)) ctx.Error(t, "sharedStorage needs interaction chest and no containerSlots.");
             if (t.Interaction == TileInteraction.Station && t.Stations.Length == 0) ctx.Error(t, "station needs 'stations'.");
             foreach (var h in t.Housing)
                 if (h is not ("door" or "light" or "table" or "chair" or "bed" or "comfort"))

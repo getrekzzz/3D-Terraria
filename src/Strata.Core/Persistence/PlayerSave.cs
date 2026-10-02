@@ -51,6 +51,9 @@ public sealed class PlayerSave
     public List<SlotModel> Service { get; set; } = new();
     public int HiddenAccessories { get; set; }
 
+    /// <summary>Personal storages (Piggy Bank, Safe) by kind; additive, older saves load with none.</summary>
+    public Dictionary<string, List<SlotModel>> Banks { get; set; } = new();
+
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
 
@@ -82,6 +85,7 @@ public sealed class PlayerSave
         MiscDyes = Slots(p.Inventory.MiscDyes),
         Service = Slots(p.Inventory.Service),
         HiddenAccessories = p.Inventory.HiddenAccessories,
+        Banks = p.Banks.ToDictionary(kv => kv.Key, kv => Slots(kv.Value)),
         Buffs = p.Buffs.Active.Where(b => !b.Def.Debuff).Select(b => new BuffModel(b.Def.Id, b.TicksLeft)).ToList(),
         SpawnPoints = new Dictionary<string, int[]>(p.SpawnPoints),
         Look = p.Look.Clone(),
@@ -114,6 +118,8 @@ public sealed class PlayerSave
         Fill(p.Inventory.MiscDyes, MiscDyes, content);
         Fill(p.Inventory.Service, Service, content);
         p.Inventory.HiddenAccessories = HiddenAccessories;
+        if (Banks != null)
+            foreach (var kv in Banks) Fill(p.Bank(kv.Key), kv.Value, content);
         foreach (var b in Buffs)
             if (content.Buffs.TryGet(content.Current(b.Id), out var def)) p.Buffs.Add(def, b.Ticks);
         foreach (var kv in SpawnPoints) p.SpawnPoints[kv.Key] = kv.Value;

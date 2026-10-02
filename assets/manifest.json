@@ -309,6 +309,12 @@
    ],
    "generator": "palm"
   },
+  "piggy_bank": {
+   "models": [
+    "assets/models/objects/piggy_bank_v0.glb"
+   ],
+   "generator": "piggy_bank"
+  },
   "pine_tree": {
    "models": [
     "assets/models/objects/pine_tree_v0.glb",
@@ -350,6 +356,12 @@
     "assets/models/objects/rubble_v2.glb"
    ],
    "generator": "rubble"
+  },
+  "safe": {
+   "models": [
+    "assets/models/objects/safe_v0.glb"
+   ],
+   "generator": "safe"
   },
   "sawmill": {
    "models": [
@@ -3077,6 +3089,10 @@
    },
    "icon": "assets/icons/items/picksaw.png"
   },
+  "piggy_bank": {
+   "object": "piggy_bank",
+   "icon": "assets/icons/items/piggy_bank.png"
+  },
   "pink_paint": {
    "model": "assets/models/items/pink_paint.glb",
    "sockets": {
@@ -3372,6 +3388,10 @@
     "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/s_d_m_g.png"
+  },
+  "safe": {
+   "object": "safe",
+   "icon": "assets/icons/items/safe.png"
   },
   "salmon": {
    "model": "assets/models/items/salmon.glb",

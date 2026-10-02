@@ -3036,6 +3036,20 @@
    "source": "world"
   },
   {
+   "id": "terraria:piggy_bank",
+   "name": "Piggy Bank",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "shop"
+  },
+  {
+   "id": "terraria:safe",
+   "name": "Safe",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "shop"
+  },
+  {
    "id": "terraria:wooden_door",
    "name": "Wooden Door",
    "kind": "furniture",

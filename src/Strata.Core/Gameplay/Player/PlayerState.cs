@@ -29,6 +29,26 @@ public sealed class PlayerState
     public BuffSet Buffs { get; } = new();
     public EffectState Effects { get; } = new();
 
+    /// <summary>Slots in each personal storage (Piggy Bank, Safe), as in the reference game.</summary>
+    public const int BankSize = 40;
+
+    /// <summary>
+    /// Personal storages carried with the character, keyed by <see cref="Content.Defs.TileObjectDef.SharedStorage"/>
+    /// ("piggy_bank", "safe"): every placed object of that kind opens the same slots, in any world.
+    /// </summary>
+    public Dictionary<string, Inventory> Banks { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>The personal storage of that kind, created empty on first use.</summary>
+    public Inventory Bank(string kind)
+    {
+        if (!Banks.TryGetValue(kind, out var bank)) Banks[kind] = bank = new Inventory(BankSize);
+        return bank;
+    }
+
+    /// <summary>The storages a shop may take coins from after the purse, in the reference game's order (Piggy Bank, then Safe).</summary>
+    public IEnumerable<Inventory> BanksForPaying() =>
+        Banks.OrderBy(kv => kv.Key == "piggy_bank" ? 0 : kv.Key == "safe" ? 1 : 2).ThenBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => kv.Value);
+
     /// <summary>Permanent max-life bonus from vital crystals.</summary>
     public int BonusLife { get; set; }
 
