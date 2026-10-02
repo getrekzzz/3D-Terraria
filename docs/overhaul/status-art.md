@@ -12,7 +12,9 @@
 | 8 | P3-48 chest lids | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
 | 9 | P3-46 movement feel | full headless CI green (14/14 smoke, MENU PASS) |
 | 10 | P3-31 Terraria prefixes (reviewed + fixed) | full headless CI green (533 Core tests, 14/14 smoke, MENU PASS) |
-| 11 | P3-35 (after P2-06/P2-08), X-09 creator menu rows (after P2-30) | pending |
+| 11 | W3 merge (P2-05..08) | full headless CI green (640 Core tests, 16/16 smoke, MENU PASS) |
+| 12 | P3-35 Piggy Bank and Safe | full headless CI green (642 Core tests, 16/16 smoke, MENU PASS) |
+| 13 | X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -102,3 +104,10 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   crate, chest) and shop buys; prefixes that no longer fit their item are dropped on player and chest load (item kept).
   Use time = base × (1 − useSpeed). Review fixes: chest-load fit check, Deadly/Celestial stats, use-time math, per-unit
   rolls. Shop prefix rolls consume the commerce RNG, so shopkeeper dialogue order shifts.
+
+## Push 12 notes
+* **Piggy Bank and Safe (P3-35)**: `TileObjectDef.SharedStorage`, `PlayerState.Banks` (40 slots per kind, saved in
+  `PlayerSave.Banks`), `GameWorld.Storage(obj, owner)` used by the W3 container ops; `Wallet.TrySpend` pays purse →
+  piggy bank → safe (shops, Nurse, reforge). Merchant sells the Piggy Bank, Mechanic the Safe. Gaps: the piggy bank is
+  2×1×1 on the floor anchor (not table-top yet); town NPC arrival checks count purse coins only; no Defender's Forge /
+  Void Vault.
