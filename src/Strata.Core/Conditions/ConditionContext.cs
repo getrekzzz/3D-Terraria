@@ -49,6 +49,9 @@ public sealed class ConditionContext
     /// <summary>How many of an item (or items with a tag, "#tag") the players carry; null = unknown (0).</summary>
     public Func<string, int>? ItemCount { get; set; }
 
+    /// <summary>Whether a player has an item equipped (armor or accessory); null = unknown (no).</summary>
+    public Func<string, bool>? Wearing { get; set; }
+
     /// <summary>Defense of the player the check is made for (boss enrage).</summary>
     public int PlayerDefense { get; set; }
 

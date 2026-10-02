@@ -1,0 +1,31 @@
+{
+ "id": "X-07",
+ "title": "Secret world seeds (for the worthy, drunk world, not the bees, don't dig up, the constant, celebrationmk10, no traps, get fixed boi)",
+ "owner_session": "world",
+ "player_outcome": "Typing a special seed creates Terraria's famous special worlds: For the Worthy (harder enemies and bosses), Drunk World (both evils, odd dungeon), Not the Bees (jungle/hive world), Don't Dig Up (upside-down progression), The Constant (darkness/hunger), Celebration (party), No Traps (traps everywhere), plus 'get fixed boi' combining them.",
+ "design": [
+  "MainMenu.Worlds ParseSeed recognises the names (case/space-insensitive) and sets WorldSettings flags; worldgen passes read the flags deterministically (bump GenVersion once); gameplay modifiers read flags via ConditionContext/DamageModel; a menu hint lists unlocked secret seeds only after discovery (keep them secret).",
+  "Start only after the bosses session's W8 Dungeon rewrite is merged (merge origin/claude/ovh-bosses) so seed variants modify the final generator.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "game/Menu/MainMenu.Worlds.cs",
+  "src/Strata.Core/Session/WorldSettings.cs",
+  "src/Strata.Core/WorldGen/Passes/*",
+  "src/Strata.Core/WorldGen/GenVersion.cs",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "SecretSeedTests (parse, flags, deterministic generation per seed)"
+ ],
+ "verification": [
+  "worldgen-report for each seed"
+ ],
+ "depends_on": [
+  "P4-15"
+ ],
+ "risks": [],
+ "effort": "M"
+}

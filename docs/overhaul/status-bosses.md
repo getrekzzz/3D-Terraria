@@ -21,12 +21,15 @@ rather than pounces; Spiked Slime reuses the gel model; Demon Heart/Bone Helm Ex
 treasure bags drop one per kill (no per-player bags); Angry Bones variants reuse the skeleton model (helmet geometry
 needs an --anims rebuild owned by the integration session).
 
-## W8 — 1:1 Dungeon (in progress)
-Done on lane branches: P4-12 (blueprint op index, NoZone), P4-14 (layout planner; `RoomKind.Mechanic` +
-`MechanicCell` is the reserved `bound_npc` site for P5-06b), P4-17 furniture, P4-18 decor/hazards, P4-20 dungeon loot
-(+Clothier Voodoo Doll drop, red_hat), P4-13 wall panels, P4-33 biome chest weapons. In progress: P4-15/P4-16.
-GenVersion: Phase 1 terrain was not on origin when W8 started, so P4-15 sets GenVersion 11 directly (10 reserved for
-Phase 1); golden hashes are re-pinned again after merging Phase 1.
+## W8 — 1:1 Dungeon (pushed)
+WPs done: P4-12, P4-13, P4-14, P4-15, P4-16, P4-17, P4-18, P4-19 (`bound_npc` site: `RoomKind.Mechanic` +
+`MechanicCell`, a kept-clear 5x5x5 room documented in worldgen.md for P5-06b), P4-20 (+Clothier Voodoo Doll drop:
+`clothier_death` table, `wearing red_hat`), P4-21, P4-33, P4-34, P4-23 (minus the bound Mechanic, which is P5-06b).
+Merged onto Phase 1 terrain from origin/claude/clever-goodall-kgex45: GenVersion 10 → 11, golden hashes re-pinned
+(dungeon halls, vault and keep chunks pinned). Adversarial review on the new relief: keep site picks the flattest
+spot and cuts a terraced clearing (seeds 4/11 sat in hillsides); seeds 1–12 Tiny + 1–2 Small walk every room.
+CI: full headless CI PASS (993 Core tests, all 14 smokes incl. the full dungeon route, menu tour).
+Gaps: perf walk skipped (lean); dart traps only in flat halls; decor tuned from numbers (no render loop).
 
 Reusable Blender helpers (for the World & life session): `tools/blender/bgen/dungeon_furniture.py` — every generator
 takes `palette` (a `PALETTES` name or an inline dict: body/bodyTint, trim/trimTint, metal/metalTint, wax, books);
@@ -35,4 +38,4 @@ generators dungeon_door, dungeon_chair, dungeon_table, bookcase, candelabra, cha
 trim, emblem colours; shape, hem, rod), `statue` (pose, stone, tint, base), `book`, `spike_strip`; helpers
 `emblem_outline`, `hanging_cloth`.
 
-## W9 — hardmode bosses (in progress on a lane branch). X-11 (mimics, Nymph, Wyvern) queued after W9.
+## W9 — hardmode bosses + X-11 + P4-38: done on a lane branch, merged after the W8 push.

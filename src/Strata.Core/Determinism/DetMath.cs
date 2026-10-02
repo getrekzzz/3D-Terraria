@@ -43,6 +43,17 @@ public static class DetMath
 
     public static float SmoothMax(float a, float b, float k) => -SmoothMin(-a, -b, k);
 
+    /// <summary>
+    /// Ridge shape with a rounded crest: 1 at n = 0 falling to 0 at |n| = 1 like 1 − |n|, but rounded over a width of
+    /// about <paramref name="k"/> around the crest (1 − √(n² + k²), normalised), so noise fed through it makes soft
+    /// ridgelines instead of knife edges.
+    /// </summary>
+    public static float SoftRidge(float n, float k)
+    {
+        float top = MathF.Sqrt(1f + k * k);
+        return (top - MathF.Sqrt(n * n + k * k)) / (top - k);
+    }
+
     /// <summary>Distance from point p to segment ab (3D).</summary>
     public static float DistanceToSegment(
         float px, float py, float pz, float ax, float ay, float az, float bx, float by, float bz, out float t)

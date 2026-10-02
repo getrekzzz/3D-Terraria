@@ -25,13 +25,6 @@ public sealed partial class InteractionController
         return Targeting.UnderFeet(Game.Session.World, Entity.Position);
     }
 
-    /// <summary>The nearest disguised creature along the aim ray, closer than the terrain the ray hits.</summary>
-    private void UpdateDisguiseTarget(Vector3 origin, Vector3 dir)
-    {
-        float limit = Target != null ? origin.DistanceTo(ToGodot(Target.HitCells * Strata.Core.Common.Units.CellSize)) + 0.5f : 40f;
-        DisguiseTarget = ObjectInteraction.DisguisedAlong(Game.Npcs.All, ToCore(origin), ToCore(dir), limit);
-    }
-
     /// <summary>Tries to open (or greet) a disguised creature within reach; it wakes. True when it did.</summary>
     private bool OpenDisguised(Strata.Core.Gameplay.Entities.Npc npc)
     {
@@ -39,27 +32,5 @@ public sealed partial class InteractionController
         if (Game.Interaction.Interact(Entity, npc, reach) != InteractOutcome.Unmasked) return false;
         Interacted?.Invoke(InteractOutcome.Unmasked);
         return true;
-    }
-
-    /// <summary>The nearest resident whose body the aim ray passes close to, in front of any terrain hit.</summary>
-    private void UpdateTalkTarget(Vector3 origin, Vector3 dir)
-    {
-        TalkTarget = null;
-        float limit = Target != null ? origin.DistanceTo(ToGodot(Target.HitCells * Strata.Core.Common.Units.CellSize)) + 0.5f : 40f;
-        float best = float.MaxValue;
-        foreach (var npc in Game.Town.Residents)
-        {
-            if (!npc.Alive) continue;
-            var center = ToGodot(npc.Center);
-            float along = (center - origin).Dot(dir);
-            if (along <= 0 || along > limit) continue;
-            float off = (origin + dir * along).DistanceTo(center);
-            if (off > 0.7f || center.DistanceTo(ToGodot(Entity.Center)) > Game.Town.Config.TalkRange) continue;
-            if (along < best)
-            {
-                best = along;
-                TalkTarget = npc;
-            }
-        }
     }
 }

@@ -44,7 +44,13 @@
   it. Core decides anchor, state and `PullVelocity` (towards the anchor at the hook's pull speed, hanging within
   1.1 m); the engine body (`PlayerEntity.HasBody`) advances the hook in `_PhysicsProcess` and applies the pull, while
   `GameWorld` ticks it for bodiless (headless, test) players. Death, teleports and recalls put the hook away; nothing
-  is thrown from a minecart, and riding one or phasing lets go of a hook that is out.
+  is thrown from a minecart, and riding one or phasing lets go of a hook that is out. `GrappleVisual` draws the chain
+  from the drawn (interpolated) hand and moves the claw from the voxel hit onto the rendered surface: one physics ray
+  across the struck face (terrain, platform and object colliders, ±0.6 m) when a throw starts and when it latches, kept
+  only within 0.5 m and eased on over the head's last metre of flight (probe `player.hook_snap`, -1 when nothing was
+  found, e.g. a canopy). The third-person body throws a clicked hook with the `thrust` clip. `movement.cmds` covers the
+  key, the click, a crisp slab, a natural (smooth-meshed, `fill … natural`) sloped ceiling that must stay latched while
+  reeling in, a broken anchor and platforms.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks
   falling, objects losing support, object hit points and loot, container contents, remeshing via the
   streamer. `Targeting` is a voxel DDA that also hits tile objects. A `TargetFilter` decides whether decor
@@ -56,11 +62,35 @@
   (item reach plus the Reach stat) bounds both the use and the in-reach highlight. `PlayerEntity.ViewDirection`
   (camera forward) feeds `Facing`, which drives `FacingQuarter` and the melee arc yaw; `Aim` (eye to crosshair
   point) keeps the pitch, shots and drops.
+* **View ray and facing (engine)** — each physics tick `InteractionController.UpdateTarget` casts the view ray (from
+  `CameraRig.ViewOrigin`, the camera without its screenshot orbit, along `CameraRig.Forward`) twice with
+  `Targeting.CastView`: reach + 2 m with the held item's `FilterFor` filter gives `Target` (`InReach` when its eye
+  distance is within reach), and 60 m with `TargetFilter.None` gives the crosshair point (terrain, trunks and
+  furniture, or 60 m out) that sets `Aim` and `AimDistance`, so shots converge on what the crosshair rests on at any
+  range. Smart digging may still swap in the cell under the feet. In third person the body always faces the camera's yaw: the chest, arms and head stay on the
+  crosshair while the legs strafe or backpedal (`BodyFacing`, see rendering.md, Creature animation), and the swing
+  trail, like the melee arc, is centred on `Facing`. Probes: `target.front` (1 when the target is not behind the
+  eye along `Facing`), `target.dist`, `player.aim_distance`.
+* **Entity picking (crosshair names)** — `EntityPicking.Pick` (Core) finds the creature or town resident the view
+  ray enters first between the eye's plane and the terrain the crosshair rests on (so walls hide names), up to 60 m:
+  a slab test against each live creature's padded volumes (`Npc.VolumeCount`/`VolumeAt`, the allocation-free form of
+  `Volumes()`: the body, then each worm segment, which resolves to its worm) and each live resident's body. It
+  allocates nothing per tick. `InteractionController.Hovered` holds the pick; the crosshair point moves onto it (at
+  least a metre past the eye's plane), and a hovered resident within `TownConfig.TalkRange` is the `TalkTarget`
+  right-click talks to. `EntityPicking.Describe` gives the label: a boss's title, a creature's name or a resident's
+  title ("Andrew the Guide") with its life; the HUD's `TargetLabel` shows it at any distance ("Blue Slime 25/25",
+  tinted by life, bosses in the boss bar's red), else the block or object in reach, rebuilding its text only when
+  that changes. Probes: `hover.npc`, `hover.resident`, `hover.talk`, `hover.<enemy id>`, `hud.target_name`,
+  `hud.target_name.<words>` (the label in snake case contains them), `ui.talk_open`.
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
   strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
+  On-hit effects include `explode`, `applyBuff`, `lifeSteal {fraction}` (heals the owner by a share of the damage
+  dealt) and `spawnProjectiles {projectile, count, speed, homing, damageScale}`; a `latch` projectile sticks to the
+  creature it bites and strikes again every `latchInterval` ticks until its lifetime ends (the Piranha Gun).
+  Minions with speed 0 are sentries, which have their own single slot apart from the minion slots.
 * **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
   brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
@@ -274,6 +304,30 @@
   `data/town.json`, tuning in `data/config/town.json`.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
+* **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
+  (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
+  and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance
+  `PendingLoot` replaces its kind's `loot` when broken (the one Water Bolt among the Dungeon's shelf books).
+* **Dungeon loot and keys** — dungeon rooms place `dungeon_chest` (one weighted treasure: Muramasa, Cobalt Shield,
+  Aqua Scepter, Handgun, Blue Moon, Magic Missile, Valor; Bone Welder 14 %) and one `dungeon_chest_shadow_key` per world
+  (`data/loot/dungeon.json`). `NpcSystem.Kill` rolls `global_kill` (`data/loot/global.json`: Golden Key 1/65 in the
+  dungeon zone) after a creature's own loot for kills worth coins, never critters or parts. `ProjectileDef.guided`
+  (Magic Missile) steers toward the owner's aim ray at the projectile's own distance from the eye while the owner holds
+  the item that fired it. A fallen town resident drops table `<id>_death` when it exists; its conditions may test
+  `wearing` (an equipped item, the Clothier's Red Hat).
+
+## Bosses and the Dungeon (summary)
+
+Where to look: boss bodies, parts and brains (fixed `parts` such as Skeletron's two hands on bone arms, which fall on
+their own while the skull fights on; segmented worms), `boss.enrage` and Expert context (`BrainContext.Expert`, the
+`expert` loot condition), treasure bags (`<boss>_bag`, Expert and Master) and natural arrivals are in the creature
+notes above; the Dungeon's zone, crypt-wall locks (picks bounce until `defeated_skeletron`), the invulnerable
+Guardian (spawn rule `dungeon_guardian_trespass`, only while the flag is unset, despawns outside the zone), the Old
+Man at `dungeon_gate` (curses into Skeletron at night, leaves when it falls) and the exclusive roster in
+`data/enemies/dungeon.json`; spikes and dart traps under *Object hazards*; locked chests and keys below. The
+smoke `dungeon.cmds` drives the whole arc through landmarks (`tp landmark dungeon_shaft`, `dungeon_library`,
+`dungeon_spikes`, `dungeon_bottom`, `dungeon_chest`) and checks `near_object.book` (tile objects of an id within 16
+cells, `ObjectProbes`), `props.problems` and `errors`.
 
 ## Disguised creatures and the Wyvern
 
@@ -293,7 +347,7 @@
 
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
-`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …); debug commands such as
+`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `near_object.<object>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …); debug commands such as
 `god`, `drop`, `slay` and `tp landmark` make fights and summons scriptable used by `assert` and `wait_until`.
 `game/Testing/Scripts/*.cmds` run headless in CI with `--smoke=` and print `SMOKE PASS`/`SMOKE FAIL`;
 `--exec="cmd;cmd"` runs commands at startup (screenshots, manual testing). Runner directives: `wait`,
@@ -302,3 +356,17 @@ Probes come from `StandardProbes` and from `[ProbeSource]` classes (static `Regi
 `CommandContext` registers those in Strata.Core (e.g. `TownProbes`), `GodotCommandHost.CreateContext` those in the game
 assembly (e.g. `PlayerProbes`, which also takes the `LaunchedWorld`), in full-type-name order (`ProbeSources`). A
 probe name is registered once; new probes go in a new source file (docs/CONVENTIONS.md, *Extension points*).
+
+## Locked chests and keys
+
+A chest definition may carry `lock` (`key`, `consume` default true, `requiresFlag`, `message`); it only applies to
+instances with `TileObjectInstance.Locked`, persisted as bit 4 of the object state byte in `ChunkCodec` (old chunks
+read unlocked). Generation places them through `ObjectOp.Locked` (`Blueprint.Object(..., locked: true)`, copied by
+`FeatureCarver.Stamp`): every dungeon Gold Chest (Golden Key, used up; one rolls `dungeon_chest_shadow_key`) and the
+underworld towers' Shadow Chests (Shadow Key, kept; table `shadow_chest` with Sunfury, Dark Lance or Flamelash,
+hellstone bars and potions, which left `cabin_chest_primary`). `ObjectInteraction` (Locks partial) refuses with the
+lock's message while `requiresFlag` is unset, then "It's locked." without the key; opening raises `Unlocked`
+(`SoundEvents.Locks`: `unlock`; any refusal plays `locked`). `WorldEditor.HitObject` returns `Locked` for a locked
+chest, rolls an unopened chest's loot before the not-empty check, `BreakObject` rolls it before spilling, and locked
+chests are never broken for lost support, so generated loot is never lost. `interact nearest <objectId> [radius]
+[expectedOutcome]` drives it from smoke scripts.

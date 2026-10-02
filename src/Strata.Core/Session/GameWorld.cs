@@ -185,6 +185,7 @@ public sealed partial class GameWorld : IDisposable
         }
         state.PlayTicks++;
         StepOnPlates(p);
+        TouchHazards(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.GloveCooldown > 0) p.GloveCooldown--;
         if (p.UseAnimation > 0) p.UseAnimation--;

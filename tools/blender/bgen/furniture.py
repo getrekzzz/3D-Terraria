@@ -143,16 +143,18 @@ def door(mb: MeshBuilder, p, rng):
 
 
 def chest(mb: MeshBuilder, p, rng):
+    # Optional tints (woodTint, bandTint, latchTint) colour the shared layers for locked and biome chests.
     w, h, d = p["size"]
     wood, band = f"prop:{p.get('wood', 'planks')}", f"prop:{p.get('band', 'dark_iron')}"
+    wt, bt, lt = p.get("woodTint", "#ffffff"), p.get("bandTint", "#ffffff"), p.get("latchTint", "#ffffff")
     soft, edge = bevels(p)
     body_h = h * 0.58
-    mb.bevel_box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood, radius=soft, segments=SOFT_SEGMENTS)
+    mb.bevel_box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood, wt, radius=soft, segments=SOFT_SEGMENTS)
     lid = [(-d * 0.4, 0), (d * 0.4, 0), (d * 0.38, h * 0.18), (d * 0.25, h * 0.3), (0, h * 0.36), (-d * 0.25, h * 0.3), (-d * 0.38, h * 0.18)]
-    mb.extrude_polygon(lid, w * 0.92, wood, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"), bevel=edge)
+    mb.extrude_polygon(lid, w * 0.92, wood, wt, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"), bevel=edge)
     for x in (-w * 0.3, w * 0.3):
-        mb.bevel_box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band, radius=edge)
-    mb.bevel_box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"), radius=edge)
+        mb.bevel_box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band, bt, radius=edge)
+    mb.bevel_box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"), lt, radius=edge)
 
 
 def torch(mb: MeshBuilder, p, rng):

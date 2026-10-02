@@ -2031,6 +2031,36 @@
    "mechanics": [
     "flyer"
    ]
+  },
+  {
+   "id": "terraria:angry_bones_big",
+   "name": "Angry Bones (big)",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "dungeon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:angry_bones_big_muscle",
+   "name": "Angry Bones (muscle)",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "dungeon",
+   "mechanics": [
+    "walker"
+   ]
+  },
+  {
+   "id": "terraria:angry_bones_big_helmet",
+   "name": "Angry Bones (helmet)",
+   "kind": "enemy",
+   "stage": "prehardmode",
+   "source": "dungeon",
+   "mechanics": [
+    "walker"
+   ]
   }
  ]
 }

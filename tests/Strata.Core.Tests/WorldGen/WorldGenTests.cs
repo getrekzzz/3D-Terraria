@@ -13,12 +13,19 @@ public class WorldGenTests
 {
     private static readonly Lazy<WorldGenerator> Tiny = new(() => new WorldGenerator(TestPaths.Content, new WorldSettings { Seed = 1234, Size = WorldSizePreset.Tiny }));
 
+    /// <summary>
+    /// Hash of a chunk's blocks (by string id, so adding block content that sorts earlier and shifts runtime ids does
+    /// not change it), liquids and tile objects.
+    /// </summary>
     private static ulong ChunkHash(GeneratedChunk c)
     {
+        var blocks = TestPaths.Content.Blocks;
+        var ids = new ulong[blocks.Count];
+        for (int b = 0; b < ids.Length; b++) ids[b] = Hash.String(blocks[b].Id);
         ulong h = Hash.String("chunk");
         for (int i = 0; i < ChunkMath.Volume; i++)
         {
-            h = Hash.Combine(h, c.Data.GetBlock(i));
+            h = Hash.Combine(h, ids[c.Data.GetBlock(i)]);
             h = Hash.Combine(h, c.Data.Liquids?[i] ?? 0);
         }
         foreach (var o in c.Objects) h = Hash.Combine(Hash.Combine(h, Hash.String(o.Def.Id)), o.Anchor.X * 7919 + o.Anchor.Y * 104729 + o.Anchor.Z);
@@ -37,21 +44,57 @@ public class WorldGenTests
     }
 
     /// <summary>
-    /// Golden chunk hashes (seed 1234, tiny, generator version <see cref="GenVersion.Current"/>): any change to world
-    /// generation output fails here. A deliberate change bumps GenVersion and updates these values in the same commit.
+    /// Golden chunks (seed 1234, tiny, generator version <see cref="GenVersion.Current"/>): the spawn forest, tundra,
+    /// jungle and desert surfaces, two cavern chunks near spawn, one far out, one at the underworld's top, and the
+    /// Dungeon's vault and keep. Any change to world generation output fails here. A deliberate change bumps GenVersion and updates these values in
+    /// the same commit (keep at least three surface chunks: <see cref="GoldenChunksCoverTheSurface"/>).
     /// </summary>
+    public static readonly TheoryData<int, int, int, ulong> Golden = new()
+    {
+        { 8, 10, 8, 1658534350731430268UL },
+        { 4, 11, 8, 14139425615911629870UL },
+        { 11, 11, 6, 571984169707453842UL },
+        { 9, 11, 11, 5935961065046386009UL },
+        { 8, 7, 8, 1248400004488476377UL },
+        { 8, 4, 8, 15051355963523294477UL },
+        { 2, 4, 9, 63819815911648630UL },
+        { 12, 1, 5, 16627187558847016073UL },
+        { 8, 7, 12, 7931888006566429743UL }, // the Dungeon's vault
+        { 3, 11, 11, 16913084954196634421UL }, // the Dungeon's keep
+    };
+
     [Theory]
-    [InlineData(8, 10, 8, 11137789750146089947UL)]
-    [InlineData(8, 9, 8, 9898080192801599494UL)]
-    [InlineData(8, 7, 8, 2339553099039670698UL)]
-    [InlineData(8, 4, 8, 5603505991156344888UL)]
-    [InlineData(2, 4, 9, 14208479395055082940UL)]
-    [InlineData(12, 1, 5, 15020070613740224912UL)]
+    [MemberData(nameof(Golden))]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(9, GenVersion.Current); // bumping the generator version means re-recording these hashes
-        Assert.Equal(new Int3(8, 10, 8), ChunkMath.CellToChunk(Tiny.Value.Plan.Spawn));
+        Assert.Equal(11, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(new Int3(256, 349, 256), Tiny.Value.Plan.Spawn);
         Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
+    }
+
+    /// <summary>At least three golden chunks hold the surface: the terrain surface crosses them, open above and solid below.</summary>
+    [Fact]
+    public void GoldenChunksCoverTheSurface()
+    {
+        var gen = Tiny.Value;
+        int surfaceChunks = 0;
+        foreach (var row in Golden)
+        {
+            var chunk = gen.Generate(new Int3((int)row[0], (int)row[1], (int)row[2]));
+            int columns = 0;
+            for (int lz = 0; lz < ChunkMath.Size; lz++)
+                for (int lx = 0; lx < ChunkMath.Size; lx++)
+                {
+                    bool openTop = !gen.Content.Blocks[chunk.Data.GetBlock(ChunkMath.Index(new Int3(lx, ChunkMath.Size - 1, lz)))].IsSolid;
+                    bool solidBottom = gen.Content.Blocks[chunk.Data.GetBlock(ChunkMath.Index(new Int3(lx, 0, lz)))].IsSolid;
+                    if (openTop && solidBottom) columns++;
+                }
+            var origin = ChunkMath.ChunkOrigin(chunk.Coord);
+            float surface = gen.Terrain.SurfaceHeight(origin.X + ChunkMath.Size / 2, origin.Z + ChunkMath.Size / 2);
+            bool holdsSurface = surface >= origin.Y && surface < origin.Y + ChunkMath.Size;
+            if (columns >= ChunkMath.Size * ChunkMath.Size / 2 && holdsSurface) surfaceChunks++;
+        }
+        Assert.True(surfaceChunks >= 3, $"only {surfaceChunks} golden chunks hold the surface");
     }
 
     [Fact]
@@ -71,6 +114,9 @@ public class WorldGenTests
         yield return new object[] { spawn.X + 3, spawn.Y - 4, spawn.Z - 2 };
         yield return new object[] { 5, uw, 9 };
         yield return new object[] { 1, spawn.Y - 1, 8 };
+        yield return new object[] { 8, 7, 12 }; // the Dungeon's vault
+        yield return new object[] { 6, 9, 13 }; // Dungeon stairs crossing a chunk face
+        yield return new object[] { 3, 11, 11 }; // the Dungeon's keep
     }
 
     [Theory]

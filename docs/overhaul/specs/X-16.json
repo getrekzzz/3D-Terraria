@@ -1,0 +1,26 @@
+{
+ "id": "X-16",
+ "title": "Ragdolls and death physics",
+ "owner_session": "main",
+ "player_outcome": "Deaths look physical: humanoid enemies and the player crumple into ragdolls that tumble down slopes (short-lived, pooled), creatures without skeletons break into gore chunks (P3-20).",
+ "design": [
+  "Godot PhysicalBone3D ragdolls for human-skeleton creatures (pooled, max N per preset, 3 s then fade), impulse from the killing hit direction; fallback to the P3-20 gore for others; budgeted.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "game/Entities/NpcRenderer*.cs",
+  "game/Rendering/CreatureVisual.cs",
+  "game/Entities/CombatEffects*.cs"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [],
+ "verification": [
+  "creatures.cmds kills a zombie and probes fx.ragdolls"
+ ],
+ "depends_on": [
+  "P3-20"
+ ],
+ "risks": [],
+ "effort": "M"
+}

@@ -1,0 +1,25 @@
+{
+ "id": "X-17",
+ "title": "Hair and cloth physics",
+ "owner_session": "art",
+ "player_outcome": "Hair, capes, robes and banners move: hair sways with movement and wind, capes/robes flutter, NPC clothes react to walking.",
+ "design": [
+  "Lightweight bone-chain springs (verlet) on hair/cape/robe bones exported by the human generator (tools/blender human rig gets a few dangle bones), simulated in game code with LOD (near only), wind from strata_wind; budgeted per preset.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/human/*",
+  "game/Rendering/HumanoidAnimator.cs (or a new SpringBones.cs)"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [],
+ "verification": [
+  "animation tour shows hair sway (one short shot)"
+ ],
+ "depends_on": [
+  "X-09"
+ ],
+ "risks": [],
+ "effort": "M"
+}

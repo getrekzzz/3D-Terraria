@@ -8,8 +8,9 @@ namespace Strata.Game.World;
 
 /// <summary>
 /// Where an object's model is drawn: footprint centre with its quarter-turn yaw, doors swung open, lights mounted on
-/// the wall they hang from (tilted away from it, base against the face), and floor objects settled onto smoothed
-/// ground (natural terrain renders up to half a cell off the grid, so a model on the cell top can float or sink).
+/// the wall they hang from (tilted away from it, base against the face; tall hangings such as banners flush), and
+/// floor objects settled onto smoothed ground (natural terrain renders up to half a cell off the grid, so a model on
+/// the cell top can float or sink).
 /// </summary>
 public sealed class ObjectPlacement
 {
@@ -35,6 +36,8 @@ public sealed class ObjectPlacement
         {
             // Lean away from the wall with the base on its face, a little above the cell floor.
             var d = new Vector3(wall.X, 0, wall.Z);
+            // Tall hangings (banners) hang flush and upright, turned so their back (model +Z) faces the wall.
+            if (o.Def.SizeY > 1 && o.Def.HasTag("banner")) return new Transform3D(new Basis(Vector3.Up, Mathf.Atan2(d.X, d.Z)), origin);
             if (o.Def.Anchor == TileAnchor.Wall && o.Def.SizeX * o.Def.SizeY > 1)
             {
                 // A wall hanging (trophies): flat against the face, its front (-Z) turned away from the wall.
