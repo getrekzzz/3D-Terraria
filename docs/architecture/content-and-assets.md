@@ -11,6 +11,13 @@
   conventional asset paths (every tile-object variant, item icon/model, creature and projectile model).
 * `data/reference/*.json`: Terraria concepts (names only) generated from `tools/content/reference/`.
   Content links to them with `covers`; `Strata.Tools coverage` reports coverage and CI publishes it.
+* Furniture families (X-03): `tools/content/furniture_families.json` lists the pieces (door, chair, table, bed, chest,
+  work bench, bookcase, piano, sofa, bathtub, lamp, lantern, candle, candelabra, chandelier, grandfather clock,
+  platform: size, recipe, housing roles, light) and the materials (wood, boreal, palm, rich mahogany, ebonwood,
+  shadewood, cactus, mushroom, granite, marble, obsidian, glass, bone, lihzahrd: material item, look, flame colour);
+  `tools/content/gen_furniture.py` writes `data/items/generated/furniture_families.json` and the model specs
+  `tools/blender/assets.d/x-03-families.json` (generator `furniture_piece`, `bgen/furniture_family.py`). The plain
+  wooden set keeps its original ids. `FurnitureFamilyTests` checks every family is complete, craftable and up to date.
 
 ## Assets
 | Asset | Tool | Output |

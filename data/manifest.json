@@ -63,6 +63,7 @@
     "tileobjects/stations.json",
     "worldgen/aether.json",
     "worldgen/ores.json",
+    "items/generated/furniture_families.json",
     "items/generated/ore_tiers.json"
   ]
 }

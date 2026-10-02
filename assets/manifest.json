@@ -60,6 +60,210 @@
    ],
    "generator": "statue"
   },
+  "bone_bathtub": {
+   "models": [
+    "assets/models/objects/bone_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_bed": {
+   "models": [
+    "assets/models/objects/bone_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_bookcase": {
+   "models": [
+    "assets/models/objects/bone_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_candelabra": {
+   "models": [
+    "assets/models/objects/bone_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_candle": {
+   "models": [
+    "assets/models/objects/bone_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_chair": {
+   "models": [
+    "assets/models/objects/bone_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_chandelier": {
+   "models": [
+    "assets/models/objects/bone_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_chest": {
+   "models": [
+    "assets/models/objects/bone_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_clock": {
+   "models": [
+    "assets/models/objects/bone_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_door": {
+   "models": [
+    "assets/models/objects/bone_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_lamp": {
+   "models": [
+    "assets/models/objects/bone_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_lantern": {
+   "models": [
+    "assets/models/objects/bone_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_piano": {
+   "models": [
+    "assets/models/objects/bone_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_platform": {
+   "models": [
+    "assets/models/objects/bone_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_sofa": {
+   "models": [
+    "assets/models/objects/bone_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_table": {
+   "models": [
+    "assets/models/objects/bone_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_workbench": {
+   "models": [
+    "assets/models/objects/bone_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_bathtub": {
+   "models": [
+    "assets/models/objects/boreal_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_bed": {
+   "models": [
+    "assets/models/objects/boreal_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_bookcase": {
+   "models": [
+    "assets/models/objects/boreal_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_candelabra": {
+   "models": [
+    "assets/models/objects/boreal_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_candle": {
+   "models": [
+    "assets/models/objects/boreal_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_chair": {
+   "models": [
+    "assets/models/objects/boreal_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_chandelier": {
+   "models": [
+    "assets/models/objects/boreal_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_chest": {
+   "models": [
+    "assets/models/objects/boreal_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_clock": {
+   "models": [
+    "assets/models/objects/boreal_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_door": {
+   "models": [
+    "assets/models/objects/boreal_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_lamp": {
+   "models": [
+    "assets/models/objects/boreal_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_lantern": {
+   "models": [
+    "assets/models/objects/boreal_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_piano": {
+   "models": [
+    "assets/models/objects/boreal_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_platform": {
+   "models": [
+    "assets/models/objects/boreal_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_sofa": {
+   "models": [
+    "assets/models/objects/boreal_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_table": {
+   "models": [
+    "assets/models/objects/boreal_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_workbench": {
+   "models": [
+    "assets/models/objects/boreal_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "bunny_statue": {
    "models": [
     "assets/models/objects/bunny_statue_v0.glb"
@@ -81,6 +285,108 @@
     "assets/models/objects/cactus_v2.glb"
    ],
    "generator": "cactus"
+  },
+  "cactus_bathtub": {
+   "models": [
+    "assets/models/objects/cactus_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_bed": {
+   "models": [
+    "assets/models/objects/cactus_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_bookcase": {
+   "models": [
+    "assets/models/objects/cactus_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_candelabra": {
+   "models": [
+    "assets/models/objects/cactus_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_candle": {
+   "models": [
+    "assets/models/objects/cactus_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_chair": {
+   "models": [
+    "assets/models/objects/cactus_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_chandelier": {
+   "models": [
+    "assets/models/objects/cactus_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_chest": {
+   "models": [
+    "assets/models/objects/cactus_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_clock": {
+   "models": [
+    "assets/models/objects/cactus_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_door": {
+   "models": [
+    "assets/models/objects/cactus_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_lamp": {
+   "models": [
+    "assets/models/objects/cactus_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_lantern": {
+   "models": [
+    "assets/models/objects/cactus_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_piano": {
+   "models": [
+    "assets/models/objects/cactus_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_platform": {
+   "models": [
+    "assets/models/objects/cactus_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_sofa": {
+   "models": [
+    "assets/models/objects/cactus_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_table": {
+   "models": [
+    "assets/models/objects/cactus_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_workbench": {
+   "models": [
+    "assets/models/objects/cactus_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "campfire": {
    "models": [
@@ -148,12 +454,114 @@
    ],
    "generator": "altar"
   },
+  "ebonwood_bathtub": {
+   "models": [
+    "assets/models/objects/ebonwood_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_bed": {
+   "models": [
+    "assets/models/objects/ebonwood_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_bookcase": {
+   "models": [
+    "assets/models/objects/ebonwood_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_candelabra": {
+   "models": [
+    "assets/models/objects/ebonwood_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_candle": {
+   "models": [
+    "assets/models/objects/ebonwood_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_chair": {
+   "models": [
+    "assets/models/objects/ebonwood_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_chandelier": {
+   "models": [
+    "assets/models/objects/ebonwood_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_chest": {
+   "models": [
+    "assets/models/objects/ebonwood_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_clock": {
+   "models": [
+    "assets/models/objects/ebonwood_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_door": {
+   "models": [
+    "assets/models/objects/ebonwood_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_lamp": {
+   "models": [
+    "assets/models/objects/ebonwood_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_lantern": {
+   "models": [
+    "assets/models/objects/ebonwood_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_piano": {
+   "models": [
+    "assets/models/objects/ebonwood_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_platform": {
+   "models": [
+    "assets/models/objects/ebonwood_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_sofa": {
+   "models": [
+    "assets/models/objects/ebonwood_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_table": {
+   "models": [
+    "assets/models/objects/ebonwood_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "ebonwood_tree": {
    "models": [
     "assets/models/objects/ebonwood_tree_v0.glb",
     "assets/models/objects/ebonwood_tree_v1.glb"
    ],
    "generator": "twisted"
+  },
+  "ebonwood_workbench": {
+   "models": [
+    "assets/models/objects/ebonwood_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "enchanted_sword_shrine": {
    "models": [
@@ -209,6 +617,108 @@
    ],
    "generator": "giant_mushroom"
   },
+  "glass_bathtub": {
+   "models": [
+    "assets/models/objects/glass_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_bed": {
+   "models": [
+    "assets/models/objects/glass_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_bookcase": {
+   "models": [
+    "assets/models/objects/glass_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_candelabra": {
+   "models": [
+    "assets/models/objects/glass_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_candle": {
+   "models": [
+    "assets/models/objects/glass_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_chair": {
+   "models": [
+    "assets/models/objects/glass_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_chandelier": {
+   "models": [
+    "assets/models/objects/glass_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_chest": {
+   "models": [
+    "assets/models/objects/glass_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_clock": {
+   "models": [
+    "assets/models/objects/glass_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_door": {
+   "models": [
+    "assets/models/objects/glass_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_lamp": {
+   "models": [
+    "assets/models/objects/glass_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_lantern": {
+   "models": [
+    "assets/models/objects/glass_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_piano": {
+   "models": [
+    "assets/models/objects/glass_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_platform": {
+   "models": [
+    "assets/models/objects/glass_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_sofa": {
+   "models": [
+    "assets/models/objects/glass_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_table": {
+   "models": [
+    "assets/models/objects/glass_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_workbench": {
+   "models": [
+    "assets/models/objects/glass_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "glowing_mushroom_plant": {
    "models": [
     "assets/models/objects/glowing_mushroom_plant_v0.glb"
@@ -220,6 +730,108 @@
     "assets/models/objects/gold_chest_v0.glb"
    ],
    "generator": "chest"
+  },
+  "granite_bathtub": {
+   "models": [
+    "assets/models/objects/granite_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_bed": {
+   "models": [
+    "assets/models/objects/granite_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_bookcase": {
+   "models": [
+    "assets/models/objects/granite_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_candelabra": {
+   "models": [
+    "assets/models/objects/granite_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_candle": {
+   "models": [
+    "assets/models/objects/granite_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_chair": {
+   "models": [
+    "assets/models/objects/granite_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_chandelier": {
+   "models": [
+    "assets/models/objects/granite_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_chest": {
+   "models": [
+    "assets/models/objects/granite_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_clock": {
+   "models": [
+    "assets/models/objects/granite_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_door": {
+   "models": [
+    "assets/models/objects/granite_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_lamp": {
+   "models": [
+    "assets/models/objects/granite_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_lantern": {
+   "models": [
+    "assets/models/objects/granite_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_piano": {
+   "models": [
+    "assets/models/objects/granite_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_platform": {
+   "models": [
+    "assets/models/objects/granite_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_sofa": {
+   "models": [
+    "assets/models/objects/granite_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_table": {
+   "models": [
+    "assets/models/objects/granite_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_workbench": {
+   "models": [
+    "assets/models/objects/granite_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "grass_tuft": {
    "models": [
@@ -290,11 +902,113 @@
    ],
    "generator": "altar"
   },
+  "lihzahrd_bathtub": {
+   "models": [
+    "assets/models/objects/lihzahrd_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_bed": {
+   "models": [
+    "assets/models/objects/lihzahrd_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_bookcase": {
+   "models": [
+    "assets/models/objects/lihzahrd_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_candelabra": {
+   "models": [
+    "assets/models/objects/lihzahrd_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_candle": {
+   "models": [
+    "assets/models/objects/lihzahrd_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_chair": {
+   "models": [
+    "assets/models/objects/lihzahrd_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_chandelier": {
+   "models": [
+    "assets/models/objects/lihzahrd_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_chest": {
+   "models": [
+    "assets/models/objects/lihzahrd_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_clock": {
+   "models": [
+    "assets/models/objects/lihzahrd_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "lihzahrd_door": {
    "models": [
     "assets/models/objects/lihzahrd_door_v0.glb"
    ],
    "generator": "stone_door"
+  },
+  "lihzahrd_house_door": {
+   "models": [
+    "assets/models/objects/lihzahrd_house_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_lamp": {
+   "models": [
+    "assets/models/objects/lihzahrd_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_lantern": {
+   "models": [
+    "assets/models/objects/lihzahrd_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_piano": {
+   "models": [
+    "assets/models/objects/lihzahrd_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_platform": {
+   "models": [
+    "assets/models/objects/lihzahrd_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_sofa": {
+   "models": [
+    "assets/models/objects/lihzahrd_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_table": {
+   "models": [
+    "assets/models/objects/lihzahrd_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_workbench": {
+   "models": [
+    "assets/models/objects/lihzahrd_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "logic_gate_and": {
    "models": [
@@ -352,6 +1066,108 @@
    ],
    "generator": "jungle"
   },
+  "marble_bathtub": {
+   "models": [
+    "assets/models/objects/marble_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_bed": {
+   "models": [
+    "assets/models/objects/marble_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_bookcase": {
+   "models": [
+    "assets/models/objects/marble_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_candelabra": {
+   "models": [
+    "assets/models/objects/marble_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_candle": {
+   "models": [
+    "assets/models/objects/marble_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_chair": {
+   "models": [
+    "assets/models/objects/marble_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_chandelier": {
+   "models": [
+    "assets/models/objects/marble_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_chest": {
+   "models": [
+    "assets/models/objects/marble_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_clock": {
+   "models": [
+    "assets/models/objects/marble_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_door": {
+   "models": [
+    "assets/models/objects/marble_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_lamp": {
+   "models": [
+    "assets/models/objects/marble_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_lantern": {
+   "models": [
+    "assets/models/objects/marble_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_piano": {
+   "models": [
+    "assets/models/objects/marble_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_platform": {
+   "models": [
+    "assets/models/objects/marble_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_sofa": {
+   "models": [
+    "assets/models/objects/marble_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_table": {
+   "models": [
+    "assets/models/objects/marble_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_workbench": {
+   "models": [
+    "assets/models/objects/marble_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "minecart_track": {
    "models": [
     "assets/models/objects/minecart_track_v0.glb"
@@ -364,11 +1180,113 @@
    ],
    "generator": "flower"
   },
+  "mushroom_bathtub": {
+   "models": [
+    "assets/models/objects/mushroom_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_bed": {
+   "models": [
+    "assets/models/objects/mushroom_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_bookcase": {
+   "models": [
+    "assets/models/objects/mushroom_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_candelabra": {
+   "models": [
+    "assets/models/objects/mushroom_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_candle": {
+   "models": [
+    "assets/models/objects/mushroom_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_chair": {
+   "models": [
+    "assets/models/objects/mushroom_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_chandelier": {
+   "models": [
+    "assets/models/objects/mushroom_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_chest": {
+   "models": [
+    "assets/models/objects/mushroom_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_clock": {
+   "models": [
+    "assets/models/objects/mushroom_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_door": {
+   "models": [
+    "assets/models/objects/mushroom_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_lamp": {
+   "models": [
+    "assets/models/objects/mushroom_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_lantern": {
+   "models": [
+    "assets/models/objects/mushroom_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_piano": {
+   "models": [
+    "assets/models/objects/mushroom_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "mushroom_plant": {
    "models": [
     "assets/models/objects/mushroom_plant_v0.glb"
    ],
    "generator": "small_mushroom"
+  },
+  "mushroom_platform": {
+   "models": [
+    "assets/models/objects/mushroom_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_sofa": {
+   "models": [
+    "assets/models/objects/mushroom_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_table": {
+   "models": [
+    "assets/models/objects/mushroom_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_workbench": {
+   "models": [
+    "assets/models/objects/mushroom_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "mythril_anvil": {
    "models": [
@@ -385,11 +1303,209 @@
    ],
    "generator": "broadleaf"
   },
+  "obsidian_bathtub": {
+   "models": [
+    "assets/models/objects/obsidian_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_bed": {
+   "models": [
+    "assets/models/objects/obsidian_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_bookcase": {
+   "models": [
+    "assets/models/objects/obsidian_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_candelabra": {
+   "models": [
+    "assets/models/objects/obsidian_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_candle": {
+   "models": [
+    "assets/models/objects/obsidian_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_chair": {
+   "models": [
+    "assets/models/objects/obsidian_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_chandelier": {
+   "models": [
+    "assets/models/objects/obsidian_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_chest": {
+   "models": [
+    "assets/models/objects/obsidian_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_clock": {
+   "models": [
+    "assets/models/objects/obsidian_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_door": {
+   "models": [
+    "assets/models/objects/obsidian_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_lamp": {
+   "models": [
+    "assets/models/objects/obsidian_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_lantern": {
+   "models": [
+    "assets/models/objects/obsidian_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_piano": {
+   "models": [
+    "assets/models/objects/obsidian_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_platform": {
+   "models": [
+    "assets/models/objects/obsidian_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_sofa": {
+   "models": [
+    "assets/models/objects/obsidian_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_table": {
+   "models": [
+    "assets/models/objects/obsidian_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_workbench": {
+   "models": [
+    "assets/models/objects/obsidian_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "orichalcum_anvil": {
    "models": [
     "assets/models/objects/orichalcum_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "palm_bathtub": {
+   "models": [
+    "assets/models/objects/palm_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_bed": {
+   "models": [
+    "assets/models/objects/palm_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_bookcase": {
+   "models": [
+    "assets/models/objects/palm_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_candelabra": {
+   "models": [
+    "assets/models/objects/palm_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_candle": {
+   "models": [
+    "assets/models/objects/palm_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_chair": {
+   "models": [
+    "assets/models/objects/palm_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_chandelier": {
+   "models": [
+    "assets/models/objects/palm_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_chest": {
+   "models": [
+    "assets/models/objects/palm_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_clock": {
+   "models": [
+    "assets/models/objects/palm_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_door": {
+   "models": [
+    "assets/models/objects/palm_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_lamp": {
+   "models": [
+    "assets/models/objects/palm_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_lantern": {
+   "models": [
+    "assets/models/objects/palm_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_piano": {
+   "models": [
+    "assets/models/objects/palm_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_platform": {
+   "models": [
+    "assets/models/objects/palm_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_sofa": {
+   "models": [
+    "assets/models/objects/palm_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_table": {
+   "models": [
+    "assets/models/objects/palm_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "palm_tree": {
    "models": [
@@ -398,6 +1514,12 @@
     "assets/models/objects/palm_tree_v2.glb"
    ],
    "generator": "palm"
+  },
+  "palm_workbench": {
+   "models": [
+    "assets/models/objects/palm_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "pine_tree": {
    "models": [
@@ -433,6 +1555,108 @@
    ],
    "generator": "pressure_plate"
   },
+  "rich_mahogany_bathtub": {
+   "models": [
+    "assets/models/objects/rich_mahogany_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_bed": {
+   "models": [
+    "assets/models/objects/rich_mahogany_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_bookcase": {
+   "models": [
+    "assets/models/objects/rich_mahogany_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_candelabra": {
+   "models": [
+    "assets/models/objects/rich_mahogany_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_candle": {
+   "models": [
+    "assets/models/objects/rich_mahogany_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_chair": {
+   "models": [
+    "assets/models/objects/rich_mahogany_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_chandelier": {
+   "models": [
+    "assets/models/objects/rich_mahogany_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_chest": {
+   "models": [
+    "assets/models/objects/rich_mahogany_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_clock": {
+   "models": [
+    "assets/models/objects/rich_mahogany_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_door": {
+   "models": [
+    "assets/models/objects/rich_mahogany_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_lamp": {
+   "models": [
+    "assets/models/objects/rich_mahogany_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_lantern": {
+   "models": [
+    "assets/models/objects/rich_mahogany_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_piano": {
+   "models": [
+    "assets/models/objects/rich_mahogany_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_platform": {
+   "models": [
+    "assets/models/objects/rich_mahogany_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_sofa": {
+   "models": [
+    "assets/models/objects/rich_mahogany_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_table": {
+   "models": [
+    "assets/models/objects/rich_mahogany_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_workbench": {
+   "models": [
+    "assets/models/objects/rich_mahogany_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "rubble": {
    "models": [
     "assets/models/objects/rubble_v0.glb",
@@ -447,12 +1671,114 @@
    ],
    "generator": "sawmill"
   },
+  "shadewood_bathtub": {
+   "models": [
+    "assets/models/objects/shadewood_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_bed": {
+   "models": [
+    "assets/models/objects/shadewood_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_bookcase": {
+   "models": [
+    "assets/models/objects/shadewood_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_candelabra": {
+   "models": [
+    "assets/models/objects/shadewood_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_candle": {
+   "models": [
+    "assets/models/objects/shadewood_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_chair": {
+   "models": [
+    "assets/models/objects/shadewood_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_chandelier": {
+   "models": [
+    "assets/models/objects/shadewood_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_chest": {
+   "models": [
+    "assets/models/objects/shadewood_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_clock": {
+   "models": [
+    "assets/models/objects/shadewood_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_door": {
+   "models": [
+    "assets/models/objects/shadewood_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_lamp": {
+   "models": [
+    "assets/models/objects/shadewood_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_lantern": {
+   "models": [
+    "assets/models/objects/shadewood_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_piano": {
+   "models": [
+    "assets/models/objects/shadewood_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_platform": {
+   "models": [
+    "assets/models/objects/shadewood_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_sofa": {
+   "models": [
+    "assets/models/objects/shadewood_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_table": {
+   "models": [
+    "assets/models/objects/shadewood_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "shadewood_tree": {
    "models": [
     "assets/models/objects/shadewood_tree_v0.glb",
     "assets/models/objects/shadewood_tree_v1.glb"
    ],
    "generator": "twisted"
+  },
+  "shadewood_workbench": {
+   "models": [
+    "assets/models/objects/shadewood_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "shadow_orb": {
    "models": [
@@ -554,11 +1880,35 @@
    ],
    "generator": "flower"
   },
+  "wooden_bathtub": {
+   "models": [
+    "assets/models/objects/wooden_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_bookcase": {
+   "models": [
+    "assets/models/objects/wooden_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_candelabra": {
+   "models": [
+    "assets/models/objects/wooden_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "wooden_chair": {
    "models": [
     "assets/models/objects/wooden_chair_v0.glb"
    ],
    "generator": "chair"
+  },
+  "wooden_chandelier": {
+   "models": [
+    "assets/models/objects/wooden_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "wooden_chest": {
    "models": [
@@ -566,11 +1916,47 @@
    ],
    "generator": "chest"
   },
+  "wooden_clock": {
+   "models": [
+    "assets/models/objects/wooden_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "wooden_door": {
    "models": [
     "assets/models/objects/wooden_door_v0.glb"
    ],
    "generator": "door"
+  },
+  "wooden_lamp": {
+   "models": [
+    "assets/models/objects/wooden_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_lantern": {
+   "models": [
+    "assets/models/objects/wooden_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_piano": {
+   "models": [
+    "assets/models/objects/wooden_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_platform": {
+   "models": [
+    "assets/models/objects/wooden_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_sofa": {
+   "models": [
+    "assets/models/objects/wooden_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "wooden_table": {
    "models": [
@@ -892,6 +2278,74 @@
    "model": "assets/models/items/bone.glb",
    "icon": "assets/icons/items/bone.png"
   },
+  "bone_bathtub": {
+   "object": "bone_bathtub",
+   "icon": "assets/icons/items/bone_bathtub.png"
+  },
+  "bone_bed": {
+   "object": "bone_bed",
+   "icon": "assets/icons/items/bone_bed.png"
+  },
+  "bone_bookcase": {
+   "object": "bone_bookcase",
+   "icon": "assets/icons/items/bone_bookcase.png"
+  },
+  "bone_candelabra": {
+   "object": "bone_candelabra",
+   "icon": "assets/icons/items/bone_candelabra.png"
+  },
+  "bone_candle": {
+   "object": "bone_candle",
+   "icon": "assets/icons/items/bone_candle.png"
+  },
+  "bone_chair": {
+   "object": "bone_chair",
+   "icon": "assets/icons/items/bone_chair.png"
+  },
+  "bone_chandelier": {
+   "object": "bone_chandelier",
+   "icon": "assets/icons/items/bone_chandelier.png"
+  },
+  "bone_chest": {
+   "object": "bone_chest",
+   "icon": "assets/icons/items/bone_chest.png"
+  },
+  "bone_clock": {
+   "object": "bone_clock",
+   "icon": "assets/icons/items/bone_clock.png"
+  },
+  "bone_door": {
+   "object": "bone_door",
+   "icon": "assets/icons/items/bone_door.png"
+  },
+  "bone_lamp": {
+   "object": "bone_lamp",
+   "icon": "assets/icons/items/bone_lamp.png"
+  },
+  "bone_lantern": {
+   "object": "bone_lantern",
+   "icon": "assets/icons/items/bone_lantern.png"
+  },
+  "bone_piano": {
+   "object": "bone_piano",
+   "icon": "assets/icons/items/bone_piano.png"
+  },
+  "bone_platform": {
+   "object": "bone_platform",
+   "icon": "assets/icons/items/bone_platform.png"
+  },
+  "bone_sofa": {
+   "object": "bone_sofa",
+   "icon": "assets/icons/items/bone_sofa.png"
+  },
+  "bone_table": {
+   "object": "bone_table",
+   "icon": "assets/icons/items/bone_table.png"
+  },
+  "bone_workbench": {
+   "object": "bone_workbench",
+   "icon": "assets/icons/items/bone_workbench.png"
+  },
   "bonefish": {
    "model": "assets/models/items/bonefish.glb",
    "icon": "assets/icons/items/bonefish.png"
@@ -903,6 +2357,74 @@
   "boomstick": {
    "model": "assets/models/items/boomstick.glb",
    "icon": "assets/icons/items/boomstick.png"
+  },
+  "boreal_bathtub": {
+   "object": "boreal_bathtub",
+   "icon": "assets/icons/items/boreal_bathtub.png"
+  },
+  "boreal_bed": {
+   "object": "boreal_bed",
+   "icon": "assets/icons/items/boreal_bed.png"
+  },
+  "boreal_bookcase": {
+   "object": "boreal_bookcase",
+   "icon": "assets/icons/items/boreal_bookcase.png"
+  },
+  "boreal_candelabra": {
+   "object": "boreal_candelabra",
+   "icon": "assets/icons/items/boreal_candelabra.png"
+  },
+  "boreal_candle": {
+   "object": "boreal_candle",
+   "icon": "assets/icons/items/boreal_candle.png"
+  },
+  "boreal_chair": {
+   "object": "boreal_chair",
+   "icon": "assets/icons/items/boreal_chair.png"
+  },
+  "boreal_chandelier": {
+   "object": "boreal_chandelier",
+   "icon": "assets/icons/items/boreal_chandelier.png"
+  },
+  "boreal_chest": {
+   "object": "boreal_chest",
+   "icon": "assets/icons/items/boreal_chest.png"
+  },
+  "boreal_clock": {
+   "object": "boreal_clock",
+   "icon": "assets/icons/items/boreal_clock.png"
+  },
+  "boreal_door": {
+   "object": "boreal_door",
+   "icon": "assets/icons/items/boreal_door.png"
+  },
+  "boreal_lamp": {
+   "object": "boreal_lamp",
+   "icon": "assets/icons/items/boreal_lamp.png"
+  },
+  "boreal_lantern": {
+   "object": "boreal_lantern",
+   "icon": "assets/icons/items/boreal_lantern.png"
+  },
+  "boreal_piano": {
+   "object": "boreal_piano",
+   "icon": "assets/icons/items/boreal_piano.png"
+  },
+  "boreal_platform": {
+   "object": "boreal_platform",
+   "icon": "assets/icons/items/boreal_platform.png"
+  },
+  "boreal_sofa": {
+   "object": "boreal_sofa",
+   "icon": "assets/icons/items/boreal_sofa.png"
+  },
+  "boreal_table": {
+   "object": "boreal_table",
+   "icon": "assets/icons/items/boreal_table.png"
+  },
+  "boreal_workbench": {
+   "object": "boreal_workbench",
+   "icon": "assets/icons/items/boreal_workbench.png"
   },
   "bottle": {
    "object": "placed_bottle",
@@ -976,13 +2498,81 @@
    "model": "assets/models/items/cactus.glb",
    "icon": "assets/icons/items/cactus.png"
   },
+  "cactus_bathtub": {
+   "object": "cactus_bathtub",
+   "icon": "assets/icons/items/cactus_bathtub.png"
+  },
+  "cactus_bed": {
+   "object": "cactus_bed",
+   "icon": "assets/icons/items/cactus_bed.png"
+  },
+  "cactus_bookcase": {
+   "object": "cactus_bookcase",
+   "icon": "assets/icons/items/cactus_bookcase.png"
+  },
+  "cactus_candelabra": {
+   "object": "cactus_candelabra",
+   "icon": "assets/icons/items/cactus_candelabra.png"
+  },
+  "cactus_candle": {
+   "object": "cactus_candle",
+   "icon": "assets/icons/items/cactus_candle.png"
+  },
+  "cactus_chair": {
+   "object": "cactus_chair",
+   "icon": "assets/icons/items/cactus_chair.png"
+  },
+  "cactus_chandelier": {
+   "object": "cactus_chandelier",
+   "icon": "assets/icons/items/cactus_chandelier.png"
+  },
+  "cactus_chest": {
+   "object": "cactus_chest",
+   "icon": "assets/icons/items/cactus_chest.png"
+  },
+  "cactus_clock": {
+   "object": "cactus_clock",
+   "icon": "assets/icons/items/cactus_clock.png"
+  },
+  "cactus_door": {
+   "object": "cactus_door",
+   "icon": "assets/icons/items/cactus_door.png"
+  },
+  "cactus_lamp": {
+   "object": "cactus_lamp",
+   "icon": "assets/icons/items/cactus_lamp.png"
+  },
+  "cactus_lantern": {
+   "object": "cactus_lantern",
+   "icon": "assets/icons/items/cactus_lantern.png"
+  },
+  "cactus_piano": {
+   "object": "cactus_piano",
+   "icon": "assets/icons/items/cactus_piano.png"
+  },
   "cactus_pickaxe": {
    "model": "assets/models/items/cactus_pickaxe.glb",
    "icon": "assets/icons/items/cactus_pickaxe.png"
   },
+  "cactus_platform": {
+   "object": "cactus_platform",
+   "icon": "assets/icons/items/cactus_platform.png"
+  },
+  "cactus_sofa": {
+   "object": "cactus_sofa",
+   "icon": "assets/icons/items/cactus_sofa.png"
+  },
   "cactus_sword": {
    "model": "assets/models/items/cactus_sword.glb",
    "icon": "assets/icons/items/cactus_sword.png"
+  },
+  "cactus_table": {
+   "object": "cactus_table",
+   "icon": "assets/icons/items/cactus_table.png"
+  },
+  "cactus_workbench": {
+   "object": "cactus_workbench",
+   "icon": "assets/icons/items/cactus_workbench.png"
   },
   "campfire": {
    "object": "campfire",
@@ -1412,6 +3002,74 @@
    "model": "assets/models/items/ebonkoi.glb",
    "icon": "assets/icons/items/ebonkoi.png"
   },
+  "ebonwood_bathtub": {
+   "object": "ebonwood_bathtub",
+   "icon": "assets/icons/items/ebonwood_bathtub.png"
+  },
+  "ebonwood_bed": {
+   "object": "ebonwood_bed",
+   "icon": "assets/icons/items/ebonwood_bed.png"
+  },
+  "ebonwood_bookcase": {
+   "object": "ebonwood_bookcase",
+   "icon": "assets/icons/items/ebonwood_bookcase.png"
+  },
+  "ebonwood_candelabra": {
+   "object": "ebonwood_candelabra",
+   "icon": "assets/icons/items/ebonwood_candelabra.png"
+  },
+  "ebonwood_candle": {
+   "object": "ebonwood_candle",
+   "icon": "assets/icons/items/ebonwood_candle.png"
+  },
+  "ebonwood_chair": {
+   "object": "ebonwood_chair",
+   "icon": "assets/icons/items/ebonwood_chair.png"
+  },
+  "ebonwood_chandelier": {
+   "object": "ebonwood_chandelier",
+   "icon": "assets/icons/items/ebonwood_chandelier.png"
+  },
+  "ebonwood_chest": {
+   "object": "ebonwood_chest",
+   "icon": "assets/icons/items/ebonwood_chest.png"
+  },
+  "ebonwood_clock": {
+   "object": "ebonwood_clock",
+   "icon": "assets/icons/items/ebonwood_clock.png"
+  },
+  "ebonwood_door": {
+   "object": "ebonwood_door",
+   "icon": "assets/icons/items/ebonwood_door.png"
+  },
+  "ebonwood_lamp": {
+   "object": "ebonwood_lamp",
+   "icon": "assets/icons/items/ebonwood_lamp.png"
+  },
+  "ebonwood_lantern": {
+   "object": "ebonwood_lantern",
+   "icon": "assets/icons/items/ebonwood_lantern.png"
+  },
+  "ebonwood_piano": {
+   "object": "ebonwood_piano",
+   "icon": "assets/icons/items/ebonwood_piano.png"
+  },
+  "ebonwood_platform": {
+   "object": "ebonwood_platform",
+   "icon": "assets/icons/items/ebonwood_platform.png"
+  },
+  "ebonwood_sofa": {
+   "object": "ebonwood_sofa",
+   "icon": "assets/icons/items/ebonwood_sofa.png"
+  },
+  "ebonwood_table": {
+   "object": "ebonwood_table",
+   "icon": "assets/icons/items/ebonwood_table.png"
+  },
+  "ebonwood_workbench": {
+   "object": "ebonwood_workbench",
+   "icon": "assets/icons/items/ebonwood_workbench.png"
+  },
   "ectoplasm": {
    "model": "assets/models/items/ectoplasm.glb",
    "icon": "assets/icons/items/ectoplasm.png"
@@ -1608,6 +3266,74 @@
    "model": "assets/models/items/gills_potion.glb",
    "icon": "assets/icons/items/gills_potion.png"
   },
+  "glass_bathtub": {
+   "object": "glass_bathtub",
+   "icon": "assets/icons/items/glass_bathtub.png"
+  },
+  "glass_bed": {
+   "object": "glass_bed",
+   "icon": "assets/icons/items/glass_bed.png"
+  },
+  "glass_bookcase": {
+   "object": "glass_bookcase",
+   "icon": "assets/icons/items/glass_bookcase.png"
+  },
+  "glass_candelabra": {
+   "object": "glass_candelabra",
+   "icon": "assets/icons/items/glass_candelabra.png"
+  },
+  "glass_candle": {
+   "object": "glass_candle",
+   "icon": "assets/icons/items/glass_candle.png"
+  },
+  "glass_chair": {
+   "object": "glass_chair",
+   "icon": "assets/icons/items/glass_chair.png"
+  },
+  "glass_chandelier": {
+   "object": "glass_chandelier",
+   "icon": "assets/icons/items/glass_chandelier.png"
+  },
+  "glass_chest": {
+   "object": "glass_chest",
+   "icon": "assets/icons/items/glass_chest.png"
+  },
+  "glass_clock": {
+   "object": "glass_clock",
+   "icon": "assets/icons/items/glass_clock.png"
+  },
+  "glass_door": {
+   "object": "glass_door",
+   "icon": "assets/icons/items/glass_door.png"
+  },
+  "glass_lamp": {
+   "object": "glass_lamp",
+   "icon": "assets/icons/items/glass_lamp.png"
+  },
+  "glass_lantern": {
+   "object": "glass_lantern",
+   "icon": "assets/icons/items/glass_lantern.png"
+  },
+  "glass_piano": {
+   "object": "glass_piano",
+   "icon": "assets/icons/items/glass_piano.png"
+  },
+  "glass_platform": {
+   "object": "glass_platform",
+   "icon": "assets/icons/items/glass_platform.png"
+  },
+  "glass_sofa": {
+   "object": "glass_sofa",
+   "icon": "assets/icons/items/glass_sofa.png"
+  },
+  "glass_table": {
+   "object": "glass_table",
+   "icon": "assets/icons/items/glass_table.png"
+  },
+  "glass_workbench": {
+   "object": "glass_workbench",
+   "icon": "assets/icons/items/glass_workbench.png"
+  },
   "glowing_mushroom": {
    "model": "assets/models/items/glowing_mushroom.glb",
    "icon": "assets/icons/items/glowing_mushroom.png"
@@ -1679,6 +3405,74 @@
   "gps": {
    "model": "assets/models/items/gps.glb",
    "icon": "assets/icons/items/gps.png"
+  },
+  "granite_bathtub": {
+   "object": "granite_bathtub",
+   "icon": "assets/icons/items/granite_bathtub.png"
+  },
+  "granite_bed": {
+   "object": "granite_bed",
+   "icon": "assets/icons/items/granite_bed.png"
+  },
+  "granite_bookcase": {
+   "object": "granite_bookcase",
+   "icon": "assets/icons/items/granite_bookcase.png"
+  },
+  "granite_candelabra": {
+   "object": "granite_candelabra",
+   "icon": "assets/icons/items/granite_candelabra.png"
+  },
+  "granite_candle": {
+   "object": "granite_candle",
+   "icon": "assets/icons/items/granite_candle.png"
+  },
+  "granite_chair": {
+   "object": "granite_chair",
+   "icon": "assets/icons/items/granite_chair.png"
+  },
+  "granite_chandelier": {
+   "object": "granite_chandelier",
+   "icon": "assets/icons/items/granite_chandelier.png"
+  },
+  "granite_chest": {
+   "object": "granite_chest",
+   "icon": "assets/icons/items/granite_chest.png"
+  },
+  "granite_clock": {
+   "object": "granite_clock",
+   "icon": "assets/icons/items/granite_clock.png"
+  },
+  "granite_door": {
+   "object": "granite_door",
+   "icon": "assets/icons/items/granite_door.png"
+  },
+  "granite_lamp": {
+   "object": "granite_lamp",
+   "icon": "assets/icons/items/granite_lamp.png"
+  },
+  "granite_lantern": {
+   "object": "granite_lantern",
+   "icon": "assets/icons/items/granite_lantern.png"
+  },
+  "granite_piano": {
+   "object": "granite_piano",
+   "icon": "assets/icons/items/granite_piano.png"
+  },
+  "granite_platform": {
+   "object": "granite_platform",
+   "icon": "assets/icons/items/granite_platform.png"
+  },
+  "granite_sofa": {
+   "object": "granite_sofa",
+   "icon": "assets/icons/items/granite_sofa.png"
+  },
+  "granite_table": {
+   "object": "granite_table",
+   "icon": "assets/icons/items/granite_table.png"
+  },
+  "granite_workbench": {
+   "object": "granite_workbench",
+   "icon": "assets/icons/items/granite_workbench.png"
   },
   "grappling_hook": {
    "model": "assets/models/items/grappling_hook.glb",
@@ -2076,9 +3870,77 @@
    "model": "assets/models/items/lightning_boots.glb",
    "icon": "assets/icons/items/lightning_boots.png"
   },
+  "lihzahrd_bathtub": {
+   "object": "lihzahrd_bathtub",
+   "icon": "assets/icons/items/lihzahrd_bathtub.png"
+  },
+  "lihzahrd_bed": {
+   "object": "lihzahrd_bed",
+   "icon": "assets/icons/items/lihzahrd_bed.png"
+  },
+  "lihzahrd_bookcase": {
+   "object": "lihzahrd_bookcase",
+   "icon": "assets/icons/items/lihzahrd_bookcase.png"
+  },
+  "lihzahrd_candelabra": {
+   "object": "lihzahrd_candelabra",
+   "icon": "assets/icons/items/lihzahrd_candelabra.png"
+  },
+  "lihzahrd_candle": {
+   "object": "lihzahrd_candle",
+   "icon": "assets/icons/items/lihzahrd_candle.png"
+  },
+  "lihzahrd_chair": {
+   "object": "lihzahrd_chair",
+   "icon": "assets/icons/items/lihzahrd_chair.png"
+  },
+  "lihzahrd_chandelier": {
+   "object": "lihzahrd_chandelier",
+   "icon": "assets/icons/items/lihzahrd_chandelier.png"
+  },
+  "lihzahrd_chest": {
+   "object": "lihzahrd_chest",
+   "icon": "assets/icons/items/lihzahrd_chest.png"
+  },
+  "lihzahrd_clock": {
+   "object": "lihzahrd_clock",
+   "icon": "assets/icons/items/lihzahrd_clock.png"
+  },
+  "lihzahrd_house_door": {
+   "object": "lihzahrd_house_door",
+   "icon": "assets/icons/items/lihzahrd_house_door.png"
+  },
+  "lihzahrd_lamp": {
+   "object": "lihzahrd_lamp",
+   "icon": "assets/icons/items/lihzahrd_lamp.png"
+  },
+  "lihzahrd_lantern": {
+   "object": "lihzahrd_lantern",
+   "icon": "assets/icons/items/lihzahrd_lantern.png"
+  },
+  "lihzahrd_piano": {
+   "object": "lihzahrd_piano",
+   "icon": "assets/icons/items/lihzahrd_piano.png"
+  },
+  "lihzahrd_platform": {
+   "object": "lihzahrd_platform",
+   "icon": "assets/icons/items/lihzahrd_platform.png"
+  },
   "lihzahrd_power_cell": {
    "model": "assets/models/items/lihzahrd_power_cell.glb",
    "icon": "assets/icons/items/lihzahrd_power_cell.png"
+  },
+  "lihzahrd_sofa": {
+   "object": "lihzahrd_sofa",
+   "icon": "assets/icons/items/lihzahrd_sofa.png"
+  },
+  "lihzahrd_table": {
+   "object": "lihzahrd_table",
+   "icon": "assets/icons/items/lihzahrd_table.png"
+  },
+  "lihzahrd_workbench": {
+   "object": "lihzahrd_workbench",
+   "icon": "assets/icons/items/lihzahrd_workbench.png"
   },
   "lime_paint": {
    "model": "assets/models/items/lime_paint.glb",
@@ -2168,6 +4030,74 @@
    "model": "assets/models/items/mana_regeneration_potion.glb",
    "icon": "assets/icons/items/mana_regeneration_potion.png"
   },
+  "marble_bathtub": {
+   "object": "marble_bathtub",
+   "icon": "assets/icons/items/marble_bathtub.png"
+  },
+  "marble_bed": {
+   "object": "marble_bed",
+   "icon": "assets/icons/items/marble_bed.png"
+  },
+  "marble_bookcase": {
+   "object": "marble_bookcase",
+   "icon": "assets/icons/items/marble_bookcase.png"
+  },
+  "marble_candelabra": {
+   "object": "marble_candelabra",
+   "icon": "assets/icons/items/marble_candelabra.png"
+  },
+  "marble_candle": {
+   "object": "marble_candle",
+   "icon": "assets/icons/items/marble_candle.png"
+  },
+  "marble_chair": {
+   "object": "marble_chair",
+   "icon": "assets/icons/items/marble_chair.png"
+  },
+  "marble_chandelier": {
+   "object": "marble_chandelier",
+   "icon": "assets/icons/items/marble_chandelier.png"
+  },
+  "marble_chest": {
+   "object": "marble_chest",
+   "icon": "assets/icons/items/marble_chest.png"
+  },
+  "marble_clock": {
+   "object": "marble_clock",
+   "icon": "assets/icons/items/marble_clock.png"
+  },
+  "marble_door": {
+   "object": "marble_door",
+   "icon": "assets/icons/items/marble_door.png"
+  },
+  "marble_lamp": {
+   "object": "marble_lamp",
+   "icon": "assets/icons/items/marble_lamp.png"
+  },
+  "marble_lantern": {
+   "object": "marble_lantern",
+   "icon": "assets/icons/items/marble_lantern.png"
+  },
+  "marble_piano": {
+   "object": "marble_piano",
+   "icon": "assets/icons/items/marble_piano.png"
+  },
+  "marble_platform": {
+   "object": "marble_platform",
+   "icon": "assets/icons/items/marble_platform.png"
+  },
+  "marble_sofa": {
+   "object": "marble_sofa",
+   "icon": "assets/icons/items/marble_sofa.png"
+  },
+  "marble_table": {
+   "object": "marble_table",
+   "icon": "assets/icons/items/marble_table.png"
+  },
+  "marble_workbench": {
+   "object": "marble_workbench",
+   "icon": "assets/icons/items/marble_workbench.png"
+  },
   "master_bait": {
    "model": "assets/models/items/master_bait.glb",
    "icon": "assets/icons/items/master_bait.png"
@@ -2256,9 +4186,77 @@
    "model": "assets/models/items/mushroom.glb",
    "icon": "assets/icons/items/mushroom.png"
   },
+  "mushroom_bathtub": {
+   "object": "mushroom_bathtub",
+   "icon": "assets/icons/items/mushroom_bathtub.png"
+  },
+  "mushroom_bed": {
+   "object": "mushroom_bed",
+   "icon": "assets/icons/items/mushroom_bed.png"
+  },
+  "mushroom_bookcase": {
+   "object": "mushroom_bookcase",
+   "icon": "assets/icons/items/mushroom_bookcase.png"
+  },
+  "mushroom_candelabra": {
+   "object": "mushroom_candelabra",
+   "icon": "assets/icons/items/mushroom_candelabra.png"
+  },
+  "mushroom_candle": {
+   "object": "mushroom_candle",
+   "icon": "assets/icons/items/mushroom_candle.png"
+  },
+  "mushroom_chair": {
+   "object": "mushroom_chair",
+   "icon": "assets/icons/items/mushroom_chair.png"
+  },
+  "mushroom_chandelier": {
+   "object": "mushroom_chandelier",
+   "icon": "assets/icons/items/mushroom_chandelier.png"
+  },
+  "mushroom_chest": {
+   "object": "mushroom_chest",
+   "icon": "assets/icons/items/mushroom_chest.png"
+  },
+  "mushroom_clock": {
+   "object": "mushroom_clock",
+   "icon": "assets/icons/items/mushroom_clock.png"
+  },
+  "mushroom_door": {
+   "object": "mushroom_door",
+   "icon": "assets/icons/items/mushroom_door.png"
+  },
+  "mushroom_lamp": {
+   "object": "mushroom_lamp",
+   "icon": "assets/icons/items/mushroom_lamp.png"
+  },
+  "mushroom_lantern": {
+   "object": "mushroom_lantern",
+   "icon": "assets/icons/items/mushroom_lantern.png"
+  },
+  "mushroom_piano": {
+   "object": "mushroom_piano",
+   "icon": "assets/icons/items/mushroom_piano.png"
+  },
+  "mushroom_platform": {
+   "object": "mushroom_platform",
+   "icon": "assets/icons/items/mushroom_platform.png"
+  },
+  "mushroom_sofa": {
+   "object": "mushroom_sofa",
+   "icon": "assets/icons/items/mushroom_sofa.png"
+  },
   "mushroom_spear": {
    "model": "assets/models/items/mushroom_spear.glb",
    "icon": "assets/icons/items/mushroom_spear.png"
+  },
+  "mushroom_table": {
+   "object": "mushroom_table",
+   "icon": "assets/icons/items/mushroom_table.png"
+  },
+  "mushroom_workbench": {
+   "object": "mushroom_workbench",
+   "icon": "assets/icons/items/mushroom_workbench.png"
   },
   "musket": {
    "model": "assets/models/items/musket.glb",
@@ -2412,9 +4410,65 @@
    "model": "assets/models/items/oasis_crate.glb",
    "icon": "assets/icons/items/oasis_crate.png"
   },
+  "obsidian_bathtub": {
+   "object": "obsidian_bathtub",
+   "icon": "assets/icons/items/obsidian_bathtub.png"
+  },
+  "obsidian_bed": {
+   "object": "obsidian_bed",
+   "icon": "assets/icons/items/obsidian_bed.png"
+  },
+  "obsidian_bookcase": {
+   "object": "obsidian_bookcase",
+   "icon": "assets/icons/items/obsidian_bookcase.png"
+  },
+  "obsidian_candelabra": {
+   "object": "obsidian_candelabra",
+   "icon": "assets/icons/items/obsidian_candelabra.png"
+  },
+  "obsidian_candle": {
+   "object": "obsidian_candle",
+   "icon": "assets/icons/items/obsidian_candle.png"
+  },
+  "obsidian_chair": {
+   "object": "obsidian_chair",
+   "icon": "assets/icons/items/obsidian_chair.png"
+  },
+  "obsidian_chandelier": {
+   "object": "obsidian_chandelier",
+   "icon": "assets/icons/items/obsidian_chandelier.png"
+  },
+  "obsidian_chest": {
+   "object": "obsidian_chest",
+   "icon": "assets/icons/items/obsidian_chest.png"
+  },
+  "obsidian_clock": {
+   "object": "obsidian_clock",
+   "icon": "assets/icons/items/obsidian_clock.png"
+  },
   "obsidian_crate": {
    "model": "assets/models/items/obsidian_crate.glb",
    "icon": "assets/icons/items/obsidian_crate.png"
+  },
+  "obsidian_door": {
+   "object": "obsidian_door",
+   "icon": "assets/icons/items/obsidian_door.png"
+  },
+  "obsidian_lamp": {
+   "object": "obsidian_lamp",
+   "icon": "assets/icons/items/obsidian_lamp.png"
+  },
+  "obsidian_lantern": {
+   "object": "obsidian_lantern",
+   "icon": "assets/icons/items/obsidian_lantern.png"
+  },
+  "obsidian_piano": {
+   "object": "obsidian_piano",
+   "icon": "assets/icons/items/obsidian_piano.png"
+  },
+  "obsidian_platform": {
+   "object": "obsidian_platform",
+   "icon": "assets/icons/items/obsidian_platform.png"
   },
   "obsidian_shield": {
    "model": "assets/models/items/obsidian_shield.glb",
@@ -2427,6 +4481,18 @@
   "obsidian_skull": {
    "model": "assets/models/items/obsidian_skull.glb",
    "icon": "assets/icons/items/obsidian_skull.png"
+  },
+  "obsidian_sofa": {
+   "object": "obsidian_sofa",
+   "icon": "assets/icons/items/obsidian_sofa.png"
+  },
+  "obsidian_table": {
+   "object": "obsidian_table",
+   "icon": "assets/icons/items/obsidian_table.png"
+  },
+  "obsidian_workbench": {
+   "object": "obsidian_workbench",
+   "icon": "assets/icons/items/obsidian_workbench.png"
   },
   "obsidifish": {
    "model": "assets/models/items/obsidifish.glb",
@@ -2555,6 +4621,74 @@
   "palladium_shortsword": {
    "model": "assets/models/items/palladium_shortsword.glb",
    "icon": "assets/icons/items/palladium_shortsword.png"
+  },
+  "palm_bathtub": {
+   "object": "palm_bathtub",
+   "icon": "assets/icons/items/palm_bathtub.png"
+  },
+  "palm_bed": {
+   "object": "palm_bed",
+   "icon": "assets/icons/items/palm_bed.png"
+  },
+  "palm_bookcase": {
+   "object": "palm_bookcase",
+   "icon": "assets/icons/items/palm_bookcase.png"
+  },
+  "palm_candelabra": {
+   "object": "palm_candelabra",
+   "icon": "assets/icons/items/palm_candelabra.png"
+  },
+  "palm_candle": {
+   "object": "palm_candle",
+   "icon": "assets/icons/items/palm_candle.png"
+  },
+  "palm_chair": {
+   "object": "palm_chair",
+   "icon": "assets/icons/items/palm_chair.png"
+  },
+  "palm_chandelier": {
+   "object": "palm_chandelier",
+   "icon": "assets/icons/items/palm_chandelier.png"
+  },
+  "palm_chest": {
+   "object": "palm_chest",
+   "icon": "assets/icons/items/palm_chest.png"
+  },
+  "palm_clock": {
+   "object": "palm_clock",
+   "icon": "assets/icons/items/palm_clock.png"
+  },
+  "palm_door": {
+   "object": "palm_door",
+   "icon": "assets/icons/items/palm_door.png"
+  },
+  "palm_lamp": {
+   "object": "palm_lamp",
+   "icon": "assets/icons/items/palm_lamp.png"
+  },
+  "palm_lantern": {
+   "object": "palm_lantern",
+   "icon": "assets/icons/items/palm_lantern.png"
+  },
+  "palm_piano": {
+   "object": "palm_piano",
+   "icon": "assets/icons/items/palm_piano.png"
+  },
+  "palm_platform": {
+   "object": "palm_platform",
+   "icon": "assets/icons/items/palm_platform.png"
+  },
+  "palm_sofa": {
+   "object": "palm_sofa",
+   "icon": "assets/icons/items/palm_sofa.png"
+  },
+  "palm_table": {
+   "object": "palm_table",
+   "icon": "assets/icons/items/palm_table.png"
+  },
+  "palm_workbench": {
+   "object": "palm_workbench",
+   "icon": "assets/icons/items/palm_workbench.png"
   },
   "panic_necklace": {
    "model": "assets/models/items/panic_necklace.glb",
@@ -2752,6 +4886,74 @@
    "model": "assets/models/items/reinforced_fishing_pole.glb",
    "icon": "assets/icons/items/reinforced_fishing_pole.png"
   },
+  "rich_mahogany_bathtub": {
+   "object": "rich_mahogany_bathtub",
+   "icon": "assets/icons/items/rich_mahogany_bathtub.png"
+  },
+  "rich_mahogany_bed": {
+   "object": "rich_mahogany_bed",
+   "icon": "assets/icons/items/rich_mahogany_bed.png"
+  },
+  "rich_mahogany_bookcase": {
+   "object": "rich_mahogany_bookcase",
+   "icon": "assets/icons/items/rich_mahogany_bookcase.png"
+  },
+  "rich_mahogany_candelabra": {
+   "object": "rich_mahogany_candelabra",
+   "icon": "assets/icons/items/rich_mahogany_candelabra.png"
+  },
+  "rich_mahogany_candle": {
+   "object": "rich_mahogany_candle",
+   "icon": "assets/icons/items/rich_mahogany_candle.png"
+  },
+  "rich_mahogany_chair": {
+   "object": "rich_mahogany_chair",
+   "icon": "assets/icons/items/rich_mahogany_chair.png"
+  },
+  "rich_mahogany_chandelier": {
+   "object": "rich_mahogany_chandelier",
+   "icon": "assets/icons/items/rich_mahogany_chandelier.png"
+  },
+  "rich_mahogany_chest": {
+   "object": "rich_mahogany_chest",
+   "icon": "assets/icons/items/rich_mahogany_chest.png"
+  },
+  "rich_mahogany_clock": {
+   "object": "rich_mahogany_clock",
+   "icon": "assets/icons/items/rich_mahogany_clock.png"
+  },
+  "rich_mahogany_door": {
+   "object": "rich_mahogany_door",
+   "icon": "assets/icons/items/rich_mahogany_door.png"
+  },
+  "rich_mahogany_lamp": {
+   "object": "rich_mahogany_lamp",
+   "icon": "assets/icons/items/rich_mahogany_lamp.png"
+  },
+  "rich_mahogany_lantern": {
+   "object": "rich_mahogany_lantern",
+   "icon": "assets/icons/items/rich_mahogany_lantern.png"
+  },
+  "rich_mahogany_piano": {
+   "object": "rich_mahogany_piano",
+   "icon": "assets/icons/items/rich_mahogany_piano.png"
+  },
+  "rich_mahogany_platform": {
+   "object": "rich_mahogany_platform",
+   "icon": "assets/icons/items/rich_mahogany_platform.png"
+  },
+  "rich_mahogany_sofa": {
+   "object": "rich_mahogany_sofa",
+   "icon": "assets/icons/items/rich_mahogany_sofa.png"
+  },
+  "rich_mahogany_table": {
+   "object": "rich_mahogany_table",
+   "icon": "assets/icons/items/rich_mahogany_table.png"
+  },
+  "rich_mahogany_workbench": {
+   "object": "rich_mahogany_workbench",
+   "icon": "assets/icons/items/rich_mahogany_workbench.png"
+  },
   "rocket_boots": {
    "model": "assets/models/items/rocket_boots.glb",
    "icon": "assets/icons/items/rocket_boots.png"
@@ -2835,6 +5037,74 @@
   "seedler": {
    "model": "assets/models/items/seedler.glb",
    "icon": "assets/icons/items/seedler.png"
+  },
+  "shadewood_bathtub": {
+   "object": "shadewood_bathtub",
+   "icon": "assets/icons/items/shadewood_bathtub.png"
+  },
+  "shadewood_bed": {
+   "object": "shadewood_bed",
+   "icon": "assets/icons/items/shadewood_bed.png"
+  },
+  "shadewood_bookcase": {
+   "object": "shadewood_bookcase",
+   "icon": "assets/icons/items/shadewood_bookcase.png"
+  },
+  "shadewood_candelabra": {
+   "object": "shadewood_candelabra",
+   "icon": "assets/icons/items/shadewood_candelabra.png"
+  },
+  "shadewood_candle": {
+   "object": "shadewood_candle",
+   "icon": "assets/icons/items/shadewood_candle.png"
+  },
+  "shadewood_chair": {
+   "object": "shadewood_chair",
+   "icon": "assets/icons/items/shadewood_chair.png"
+  },
+  "shadewood_chandelier": {
+   "object": "shadewood_chandelier",
+   "icon": "assets/icons/items/shadewood_chandelier.png"
+  },
+  "shadewood_chest": {
+   "object": "shadewood_chest",
+   "icon": "assets/icons/items/shadewood_chest.png"
+  },
+  "shadewood_clock": {
+   "object": "shadewood_clock",
+   "icon": "assets/icons/items/shadewood_clock.png"
+  },
+  "shadewood_door": {
+   "object": "shadewood_door",
+   "icon": "assets/icons/items/shadewood_door.png"
+  },
+  "shadewood_lamp": {
+   "object": "shadewood_lamp",
+   "icon": "assets/icons/items/shadewood_lamp.png"
+  },
+  "shadewood_lantern": {
+   "object": "shadewood_lantern",
+   "icon": "assets/icons/items/shadewood_lantern.png"
+  },
+  "shadewood_piano": {
+   "object": "shadewood_piano",
+   "icon": "assets/icons/items/shadewood_piano.png"
+  },
+  "shadewood_platform": {
+   "object": "shadewood_platform",
+   "icon": "assets/icons/items/shadewood_platform.png"
+  },
+  "shadewood_sofa": {
+   "object": "shadewood_sofa",
+   "icon": "assets/icons/items/shadewood_sofa.png"
+  },
+  "shadewood_table": {
+   "object": "shadewood_table",
+   "icon": "assets/icons/items/shadewood_table.png"
+  },
+  "shadewood_workbench": {
+   "object": "shadewood_workbench",
+   "icon": "assets/icons/items/shadewood_workbench.png"
   },
   "shadow_scale": {
    "model": "assets/models/items/shadow_scale.glb",
@@ -3668,6 +5938,14 @@
    "model": "assets/models/items/wooden_arrow.glb",
    "icon": "assets/icons/items/wooden_arrow.png"
   },
+  "wooden_bathtub": {
+   "object": "wooden_bathtub",
+   "icon": "assets/icons/items/wooden_bathtub.png"
+  },
+  "wooden_bookcase": {
+   "object": "wooden_bookcase",
+   "icon": "assets/icons/items/wooden_bookcase.png"
+  },
   "wooden_boomerang": {
    "model": "assets/models/items/wooden_boomerang.glb",
    "icon": "assets/icons/items/wooden_boomerang.png"
@@ -3676,13 +5954,25 @@
    "model": "assets/models/items/wooden_bow.glb",
    "icon": "assets/icons/items/wooden_bow.png"
   },
+  "wooden_candelabra": {
+   "object": "wooden_candelabra",
+   "icon": "assets/icons/items/wooden_candelabra.png"
+  },
   "wooden_chair": {
    "object": "wooden_chair",
    "icon": "assets/icons/items/wooden_chair.png"
   },
+  "wooden_chandelier": {
+   "object": "wooden_chandelier",
+   "icon": "assets/icons/items/wooden_chandelier.png"
+  },
   "wooden_chest": {
    "object": "wooden_chest",
    "icon": "assets/icons/items/wooden_chest.png"
+  },
+  "wooden_clock": {
+   "object": "wooden_clock",
+   "icon": "assets/icons/items/wooden_clock.png"
   },
   "wooden_crate": {
    "model": "assets/models/items/wooden_crate.glb",
@@ -3699,6 +5989,26 @@
   "wooden_hammer": {
    "model": "assets/models/items/wooden_hammer.glb",
    "icon": "assets/icons/items/wooden_hammer.png"
+  },
+  "wooden_lamp": {
+   "object": "wooden_lamp",
+   "icon": "assets/icons/items/wooden_lamp.png"
+  },
+  "wooden_lantern": {
+   "object": "wooden_lantern",
+   "icon": "assets/icons/items/wooden_lantern.png"
+  },
+  "wooden_piano": {
+   "object": "wooden_piano",
+   "icon": "assets/icons/items/wooden_piano.png"
+  },
+  "wooden_platform": {
+   "object": "wooden_platform",
+   "icon": "assets/icons/items/wooden_platform.png"
+  },
+  "wooden_sofa": {
+   "object": "wooden_sofa",
+   "icon": "assets/icons/items/wooden_sofa.png"
   },
   "wooden_sword": {
    "model": "assets/models/items/wooden_sword.glb",
