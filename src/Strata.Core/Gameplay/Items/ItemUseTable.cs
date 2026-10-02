@@ -28,12 +28,12 @@ public enum ItemAction
     Mount = 1 << 16,
     Paint = 1 << 17,
     Ride = 1 << 18,
-    PlantGrass = 1 << 19,
-    License = 1 << 20,
-    HairDye = 1 << 21,
 
     /// <summary>A whip's lash (P3-14).</summary>
-    Whip = 1 << 22,
+    Whip = 1 << 19,
+    PlantGrass = 1 << 20,
+    License = 1 << 21,
+    HairDye = 1 << 22,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>

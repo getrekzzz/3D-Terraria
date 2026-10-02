@@ -29,7 +29,8 @@
 | 25 | W4 integration merge | full headless CI green (1458 Core tests, 21/21 smoke, MENU PASS) |
 | 26 | P3-34 bed sleep (reviewed + fixed) | full headless CI green (juice smoke re-run alone after a concurrent-run flake) |
 | 27 | X-09 creator menu rows, World slice merge, held model hidden while a yoyo/flail/whip is out | full headless CI green (1493 Core tests, 21/21 smoke, MENU PASS) |
-| 28 | P5-30 Guide book shell + Items tab, then P5-31, P5-32; per-style hand frames (needs a tuning pass) | pending |
+| 28 | NPC/Bosses slice merge (Guide book), creatures.cmds keeps the player alive | full headless CI green (1639 Core tests, 23/23 smoke, MENU PASS) |
+| — | per-style hand frames (needs a tuning pass) | open |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -214,3 +215,12 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   Randomize (`Appearance.Random`); the menu tour randomises and checks the saved clothing. Gap: accessories at creation.
 * **Tethered weapons**: `HeldTether.Out` hides the held model (third and first person) while a yoyo or flail is out or a
   whip lash is drawn; probes `avatar.held_hidden`, `view.held_hidden`.
+
+## Push 28 notes
+* P5-30..32 were already built by the NPC session; the art slice's start on them was discarded. Merged
+  origin/claude/ovh-bosses: `ItemUseTable` bit 19 stays `Whip` (PlantGrass/License/HairDye moved up one); prefix melee
+  groups use `UseStyleRules.Resolve` (swing or rapier). creatures.cmds turns god mode on from the start (the player
+  could die in the first section, after which every later spawn walks off; chance, not a regression).
+* Guide book art check: portrait paths are correct (assets/icons/npcs, creatures, bosses). Tinted creatures that reuse
+  a dark model (giant worm/devourer on the Eater, pinky on gel) look only faintly tinted in their portraits: the tint
+  multiplies the vertex colours exactly as in game (re-rendered: identical), so this is the look, not a bug.
