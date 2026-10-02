@@ -70,6 +70,7 @@ public sealed partial class ViewModel : Node3D
             return;
         }
         if (_model == null) return;
+        _model.Visible = !HeldTether.Out(_game, entity); // the yoyo, flail or whip is out of the hand (HeldTether)
 
         var v = _controller.Velocity;
         float speed = new Vector2(v.X, v.Z).Length();

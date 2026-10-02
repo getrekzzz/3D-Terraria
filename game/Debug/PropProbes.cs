@@ -28,6 +28,9 @@ public static class PropProbes
         ctx.AddProbe("avatar.held_block_cube", () => Avatar(world)?.HeldBlockCube == true ? 1 : 0);
         // P3-06: the held model's grip socket lands on its use style's hand frame (cm; -1 without a grip socket).
         ctx.AddProbe("avatar.grip_error_cm", () => Avatar(world)?.GripErrorCm() ?? -1f);
+        // The held model hides while a yoyo, flail or whip is out of the hand, in both views; back once it is gone.
+        ctx.AddProbe("avatar.held_hidden", () => Avatar(world)?.HeldHidden == true ? 1 : 0);
+        ctx.AddProbe("view.held_hidden", () => world.Player?.Rig.Camera.GetNodeOrNull<Strata.Game.Player.ViewModel>("ViewModel")?.HeldHidden == true ? 1 : 0);
         ctx.AddProbe("view.held_block_cube", () => world.Player?.Rig.Camera.GetNodeOrNull<Strata.Game.Player.ViewModel>("ViewModel")?.HeldBlockCube == true ? 1 : 0);
     }
 

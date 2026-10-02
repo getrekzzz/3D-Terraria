@@ -2,6 +2,7 @@ using Godot;
 using Strata.Core.Content;
 using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Items;
+using Strata.Core.Session;
 using Strata.Game.Items;
 
 namespace Strata.Game.Player;
@@ -25,6 +26,19 @@ public sealed partial class PlayerAvatar
     /// <summary>Whether the held item is drawn as a textured block cube (probe <c>avatar.held_block_cube</c>).</summary>
     public bool HeldBlockCube => _held is { } held && IsInstanceValid(held) && HeldGeometry(held) is MeshInstance3D { Mesh: ArrayMesh } mi
         && mi.Mesh.SurfaceGetMaterial(0) == BlockItemMeshes.Material;
+
+    /// <summary>Whether the held model is hidden now (probe <c>avatar.held_hidden</c>): in bed, or with the weapon out.</summary>
+    public bool HeldHidden => _held is { } held && IsInstanceValid(held) && !held.Visible;
+
+    /// <summary>
+    /// Shows the held model unless the player is in bed (P3-34) or their yoyo, flail or whip is out of the hand
+    /// (<see cref="HeldTether"/>): the weapon is drawn on its string, chain or lash instead, and back in the fist once
+    /// that is gone. Hidden, it stays in the tree, so its sockets still place the string and the lash.
+    /// </summary>
+    private void ShowHeld(PlayerEntity entity)
+    {
+        if (_held != null && IsInstanceValid(_held)) _held.Visible = !entity.Sleeping && !HeldTether.Out(_game, entity);
+    }
 
     /// <summary>
     /// The held item when it has no model: a block's cube (its near face in the fist, the cube along the item's +Y),

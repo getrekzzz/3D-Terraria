@@ -6,8 +6,8 @@ namespace Strata.Game.Player;
 
 /// <summary>
 /// Asleep in a bed (P3-34): the body plays the "sleep" rest pose (on the back, hips on the mattress) turned so the
-/// head lies towards the headboard, the torso no longer follows the camera, the held item is hidden, and a soft puff
-/// rises now and then.
+/// head lies towards the headboard, the torso no longer follows the camera, the held item is hidden (ShowHeld), and
+/// a soft puff rises now and then.
 /// </summary>
 public sealed partial class PlayerAvatar
 {
@@ -16,7 +16,7 @@ public sealed partial class PlayerAvatar
 
     private void UpdateSleep(PlayerEntity entity, HumanoidAnimator h, float dt)
     {
-        if (_held != null && IsInstanceValid(_held)) _held.Visible = !entity.Sleeping;
+        ShowHeld(entity); // hidden in bed, and while a yoyo, flail or whip is out (PlayerAvatar.Held)
         if (entity.Sleeping) LieInBed(entity, h, dt);
     }
 
