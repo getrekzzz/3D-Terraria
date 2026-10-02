@@ -29,6 +29,9 @@ assert player.on_floor == 1
 
 # Mining the stone floor drops stone that we collect.
 wield copper_pickaxe
+wait 0.2
+assert avatar.held_lit == 1
+assert avatar.held_block_cube == 0
 aim 0.05 -1 0.05
 hold use_primary 2.5
 wait 1.5
@@ -45,6 +48,11 @@ fill -10 0 -10 10 7 10 air
 wait 0.5
 give gray_brick 20
 wield gray_brick
+# P3-06: a held block is a textured cube in both views, lit with the body like any held model.
+wait 0.2
+assert avatar.held_block_cube == 1
+assert view.held_block_cube == 1
+assert avatar.held_lit == 1
 aim 0 -0.8 1
 use
 assert player.held_count < 20

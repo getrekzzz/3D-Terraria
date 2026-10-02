@@ -88,7 +88,7 @@ public sealed partial class PlayerAvatar : Node3D
         var item = held.Item;
         if (item == _heldItem) return;
         _heldItem = item;
-        _held?.QueueFree();
+        ReleaseHeld();
         _held = null;
         LightAnchor = null;
         if (item == null || _visual == null) return;
@@ -102,7 +102,7 @@ public sealed partial class PlayerAvatar : Node3D
         }
         else
         {
-            node = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.25f / 128f, Shaded = true };
+            node = HeldFallback(item); // a block's textured cube (PlayerAvatar.Held), else the icon
         }
         node.Transform = HeldPose(item, _game.Uses[item], scale);
         RememberHeld(node, item, path, scale, HeldSize(held));
@@ -114,7 +114,7 @@ public sealed partial class PlayerAvatar : Node3D
             node.AddChild(fire);
             LightAnchor = fire;
         }
-        if (!_visual.AttachToBone("hand.R", node))
+        if (!AttachHeld(node))
         {
             node.QueueFree();
             LightAnchor = null;

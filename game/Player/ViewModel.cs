@@ -223,7 +223,7 @@ public sealed partial class ViewModel : Node3D
         }
         else
         {
-            _model = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.18f / 128f, Shaded = false };
+            _model = FallbackModel(item); // a block's textured cube (ViewModel.Block), else the icon
         }
         AddChild(_model);
         LightAnchor = _model;
