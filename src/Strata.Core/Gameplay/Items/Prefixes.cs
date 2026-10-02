@@ -22,7 +22,7 @@ public static class Prefixes
         {
             DamageClass.Ranged => new[] { "universal", "common", "ranged" },
             DamageClass.Magic or DamageClass.Summon => new[] { "universal", "common", "magic" },
-            _ when item.IsTool || item.DamageType == DamageClass.Melee && item.UseStyle.Family() == UseStyle.Swing => new[] { "universal", "common", "melee" },
+            _ when item.IsTool || item.DamageType == DamageClass.Melee && UseStyleRules.Resolve(item) == UseStyle.Swing => new[] { "universal", "common", "melee" },
             _ => new[] { "universal", "common" },
         };
     }

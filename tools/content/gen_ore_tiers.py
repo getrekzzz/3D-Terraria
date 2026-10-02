@@ -81,7 +81,7 @@ def build(table: dict) -> dict:
 
         dmg, use, kb = t["short"]
         items.append({"id": f"{m}_shortsword", "name": label(t, "shortsword"), "category": "weapon", "rarity": r,
-                      "value": v * 3, "useStyle": "thrust", "useTime": use, "useAnimation": use, "damage": dmg,
+                      "value": v * 3, "useStyle": "rapier", "useTime": use, "useAnimation": use, "damage": dmg,
                       "damageType": "melee", "knockback": kb, "autoReuse": True,
                       "covers": covers(t, "shortsword"), "behaviors": [{"type": "thrust", "length": 2.4}]})
         recipes.append({"id": f"{m}_shortsword", "output": f"{m}_shortsword", "inputs": [{"item": bar, "count": 7}],
@@ -89,7 +89,7 @@ def build(table: dict) -> dict:
 
         dmg, use, speed = t["bow"]
         items.append({"id": f"{m}_bow", "name": label(t, "bow"), "category": "weapon", "rarity": r, "value": v * 3,
-                      "useStyle": "shoot", "useTime": use, "useAnimation": use, "damage": dmg,
+                      "useStyle": "bow", "useTime": use, "useAnimation": use, "damage": dmg,
                       "damageType": "ranged", "knockback": 0.5, "useAmmo": "arrow", "shootSpeed": speed * 3.0,
                       "covers": covers(t, "bow")})
         recipes.append({"id": f"{m}_bow", "output": f"{m}_bow", "inputs": [{"item": bar, "count": 7}],

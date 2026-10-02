@@ -7,7 +7,7 @@
       "onHit": [{ "type": "applyBuff", "buff": "ichor", "ticks": 420, "chance": 1.0 }], "covers": ["terraria:ichor_arrow"] }
   ],
   "items": [
-    { "id": "greater_healing_potion", "name": "Greater Healing Potion", "category": "potion", "rarity": 3, "maxStack": 30, "value": 1500, "useStyle": "consume", "useTime": 17, "useAnimation": 17,
+    { "id": "greater_healing_potion", "name": "Greater Healing Potion", "category": "potion", "rarity": 3, "maxStack": 9999, "value": 1500, "useStyle": "drink", "useTime": 17, "useAnimation": 17,
       "consumable": true, "healLife": 150, "covers": ["terraria:greater_healing_potion"] },
     { "id": "cursed_arrow", "name": "Cursed Arrow", "description": "Sets its target alight with green fire.", "category": "ammo", "rarity": 3, "maxStack": 9999, "value": 40, "damage": 17, "damageType": "ranged",
       "knockback": 3, "ammoClass": "arrow", "projectile": "cursed_arrow", "consumable": true, "covers": ["terraria:cursed_arrow"] },

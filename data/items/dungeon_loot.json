@@ -8,13 +8,13 @@
     { "id": "valor", "name": "Valor", "visual": "item", "model": "valor", "lifetime": 150, "radius": 0.5, "returns": 50, "pierce": -1, "light": [2, 4, 10] }
   ],
   "items": [
-    { "id": "aqua_scepter", "name": "Aqua Scepter", "description": "Sprays out a shower of water.", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "shoot",
+    { "id": "aqua_scepter", "name": "Aqua Scepter", "description": "Sprays out a shower of water.", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "staff",
       "useTime": 16, "useAnimation": 16, "autoReuse": true, "damage": 15, "damageType": "magic", "knockback": 5, "manaCost": 7, "projectile": "aqua_stream", "shootSpeed": 20,
       "covers": ["terraria:aqua_scepter"] },
-    { "id": "magic_missile", "name": "Magic Missile", "description": "Casts a controllable missile.", "category": "weapon", "rarity": 2, "value": 10000, "useStyle": "shoot",
+    { "id": "magic_missile", "name": "Magic Missile", "description": "Casts a controllable missile.", "category": "weapon", "rarity": 2, "value": 10000, "useStyle": "staff",
       "useTime": 20, "useAnimation": 20, "damage": 22, "damageType": "magic", "knockback": 3, "manaCost": 10, "projectile": "magic_missile", "shootSpeed": 12,
       "behaviors": [{ "type": "shootProjectile", "maxActive": 1 }], "covers": ["terraria:magic_missile"] },
-    { "id": "valor", "name": "Valor", "category": "weapon", "rarity": 2, "value": 50000, "useStyle": "shoot", "useTime": 25, "useAnimation": 25, "damage": 22, "damageType": "melee",
+    { "id": "valor", "name": "Valor", "category": "weapon", "rarity": 2, "value": 50000, "useStyle": "yoyo", "useTime": 25, "useAnimation": 25, "damage": 22, "damageType": "melee",
       "knockback": 3.5, "projectile": "valor", "shootSpeed": 14, "covers": ["terraria:valor"] },
     { "id": "golden_key", "name": "Golden Key", "description": "Opens one locked Gold Chest or Lock Box.", "category": "key", "rarity": 0, "maxStack": 9999, "covers": ["terraria:golden_key"] },
     { "id": "shadow_key", "name": "Shadow Key", "description": "Opens all Shadow Chests and Obsidian Lock Boxes.", "category": "key", "rarity": 3, "covers": ["terraria:shadow_key"] },

@@ -12,14 +12,21 @@ namespace Strata.Game.Player;
 /// toward where the player walks (at most <see cref="BodyFacing.MaxTwist"/> away) and strafe sideways or backpedal
 /// (<see cref="BodyFacing"/>); locomotion follows the controller (walk, run, sprint, strafe, jump, fall, land, swim,
 /// climb, glide); every item use plays its action once over the upper body, stretched to the item's use animation
-/// (chained uses flow on); a carried torch is held up; hits make the body flinch.
+/// (chained uses flow on), except a flail's or a yoyo's, which loops on the right arm while the use lasts; a carried
+/// torch is held up; hits make the body flinch.
 /// </summary>
 public sealed partial class PlayerAvatar
 {
     /// <summary>How fast (per second) the legs ease toward their yaw.</summary>
     private const float LegTurnRate = 12f;
 
+    /// <summary>How much of the aim pitch the arms take between uses.</summary>
+    private const float RestArmAim = 0.15f;
+
     private float _legYaw, _airTime, _fallSpeed, _landTimer;
+
+    /// <summary>The arm aim of the style whose action is playing (use_styles.json armAim).</summary>
+    private float _actionArmAim = RestArmAim;
     private int _lastSerial, _lastHurt = int.MaxValue;
     private Stride _stride;
 
@@ -34,6 +41,12 @@ public sealed partial class PlayerAvatar
 
     /// <summary>How much of the upper body the item action holds (0–1).</summary>
     public float ActionWeight => _visual?.Humanoid?.ActionWeight ?? 0f;
+
+    /// <summary>How far the right arm's looping clip (a raised torch, a spun flail, a worked yoyo) is blended in (0–1).</summary>
+    public float HoldWeight => _visual?.Humanoid?.HoldWeight ?? 0f;
+
+    /// <summary>Which looping clip the right arm holds: 0 a raised light, 1 a flail, 2 a yoyo, −1 none.</summary>
+    public int HoldClip => _visual?.Humanoid?.HoldIndex ?? -1;
 
     /// <summary>
     /// How far (degrees) the chest is turned from where the player looks: the body's yaw plus the torso twist the aim
@@ -73,25 +86,37 @@ public sealed partial class PlayerAvatar
         // Item actions: each new use animation (its serial changes) plays the item's action once, over the whole
         // animation after speed bonuses; tool hits and gun shots inside one animation never restart it. A use quicker
         // than the clip's top rate (use_styles.json) starts past the wind-up, so the strike still lands inside it.
-        if (entity.UseSerial != _lastSerial && _heldItem != null && entity.Alive && entity.UseAnimation > 0)
+        // A flail's or a yoyo's clip loops on the right arm for as long as its use lasts instead.
+        string? looped = null;
+        if (_heldItem != null && entity.Alive && entity.UseAnimation > 0)
         {
-            string action = ActionFor(_heldItem, _game.Uses[_heldItem]);
-            var timing = _game.ItemUse.Timing;
-            h.Play(action, entity.UseAnimationMax / (float)Strata.Core.Common.Units.TicksPerSecond, timing.MaxClipRate, timing.StrikeStart(action));
+            var info = _game.Uses[_heldItem];
+            string action = ActionFor(_game, info);
+            bool loops = HumanoidAnimator.Holds(action);
+            if (entity.UseSerial != _lastSerial)
+            {
+                _actionArmAim = _game.Styles.Style(info.Style).ArmAim;
+                var timing = _game.ItemUse.Timing;
+                if (!loops) h.Play(action, entity.UseAnimationMax / (float)Strata.Core.Common.Units.TicksPerSecond, timing.MaxClipRate, timing.StrikeStart(action));
+            }
+            if (entity.UseItem == _heldItem)
+            {
+                if (loops) looped = action;
+                else h.Sustain(); // timed by the simulation
+            }
         }
         _lastSerial = entity.UseSerial;
-        if (entity.Alive && entity.UseAnimation > 0 && entity.UseItem == _heldItem) h.Sustain(); // timed by the simulation
         int sinceHurt = entity.State.Vitals.TicksSinceHurt;
         if (sinceHurt < _lastHurt && entity.Alive) h.Hurt();
         _lastHurt = sinceHurt;
-        h.Hold(_heldItem?.HeldLight != null && h.Action == null && entity.Alive);
+        h.Hold(looped ?? (_heldItem?.HeldLight != null && h.Action == null && entity.Alive ? "hold" : null));
 
         if (h.Aim is { } aimMod)
         {
             var aim = entity.Aim;
             aimMod.Twist = entity.Alive ? BodyFacing.Twist(_legYaw, facing) : 0f;
             aimMod.Pitch = entity.Alive ? Mathf.Atan2(aim.Y, new Vector2(aim.X, aim.Z).Length()) : 0f;
-            aimMod.ArmAim = h.Action is "shoot" or "bow" or "cast" or "thrust" ? 1f : h.Action != null ? 0.5f : 0.15f;
+            aimMod.ArmAim = h.Action != null || looped != null ? _actionArmAim : RestArmAim;
         }
     }
 
@@ -159,16 +184,9 @@ public sealed partial class PlayerAvatar
         return gait;
     }
 
-    /// <summary>The upper-body action for using an item (Terraria's use styles, told apart by what the item does).</summary>
-    public static string ActionFor(ItemDef item, ItemUseInfo info)
-    {
-        if (info.Has(ItemAction.Consume) || item.UseStyle.Family() == UseStyle.Consume) return "drink";
-        if (info.IsTool) return "mine";
-        if (info.Grapple != null) return "thrust"; // a hook is flung out along the aim, arm at full length
-        if (info.Has(ItemAction.Thrust) || item.UseStyle.Family() == UseStyle.Thrust) return "thrust";
-        if (info.Has(ItemAction.Melee) || info.Has(ItemAction.Fish) || item.UseStyle.Family() == UseStyle.Swing) return "swing";
-        if (item.DamageType is DamageClass.Magic or DamageClass.Summon || item.ManaCost > 0) return "cast";
-        if (info.Has(ItemAction.Shoot) || item.UseStyle.Family() == UseStyle.Shoot) return item.UseAmmo == "arrow" ? "bow" : "shoot";
-        return "use";
-    }
+    /// <summary>
+    /// The upper-body action for using an item: its use style's clip (data/config/use_styles.json), the tool clip
+    /// for tools, "use" for a style without one.
+    /// </summary>
+    public static string ActionFor(GameWorld game, ItemUseInfo info) => game.Styles.ClipFor(info);
 }

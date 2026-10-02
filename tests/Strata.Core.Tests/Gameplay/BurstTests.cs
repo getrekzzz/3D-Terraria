@@ -122,7 +122,7 @@ public class BurstTests
             Id = "test_burst_gun",
             Name = "Test Burst Gun",
             Category = ItemCategory.Weapon,
-            UseStyle = UseStyle.Shoot,
+            UseStyle = UseStyle.Gun,
             UseTime = rifle.UseTime,
             UseAnimation = rifle.UseAnimation,
             ReuseDelay = rifle.ReuseDelay,
