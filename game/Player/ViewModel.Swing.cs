@@ -9,7 +9,7 @@ namespace Strata.Game.Player;
 /// First-person melee from the shared swing curve (P3-04): the blade angle of <see cref="SwingCurve.Blade"/> at the
 /// use's phase is turned into the same direction in camera space as <see cref="SwingPlane"/> gives in the world (cos θ
 /// ahead plus sin θ up, the plane leaning <see cref="SwingPlane.PlaneTilt"/> toward the right), so the arc on screen
-/// is the gameplay arc: raised behind the head, over the top and down in front, low through the follow-through. A
+/// is the gameplay arc: raised high in front, over and down, low through the follow-through. A
 /// thrust lunges by its <see cref="SwingCurve.Extension"/>, so the point is out exactly while the stab can hit.
 /// </summary>
 public sealed partial class ViewModel
@@ -20,8 +20,8 @@ public sealed partial class ViewModel
     /// <summary>Twist of the blade about its own axis so its flat catches the eye rather than showing only the edge.</summary>
     private static readonly float FlatTwist = Mathf.DegToRad(35f);
 
-    private SwingCurve? _blade, _extension;
-    private ClipTiming? _bladeClip, _thrustClip;
+    private SwingCurve? _extension;
+    private ClipTiming? _thrustClip;
 
     /// <summary>The blade direction in camera space at curve angle <paramref name="deg"/> (as SwingPlane.Direction, ahead = −Z).</summary>
     public static Vector3 BladeDirection(float deg, float arcScale = 1f)
@@ -33,10 +33,9 @@ public sealed partial class ViewModel
 
     private Pose BladePose(float t)
     {
-        var clip = _game.ItemUse.Timing.Clip(UseTiming.Swing);
-        if (clip != _bladeClip || _blade == null) _blade = SwingCurve.Blade(_bladeClip = clip);
+        var blade = _game.ItemUse.Timing.BladeCurve;
         float arc = (_item != null ? _game.Uses[_item].Swing?.Arc : null) ?? 150f;
-        float deg = _blade.Evaluate(t);
+        float deg = blade.Evaluate(t);
         var d = BladeDirection(deg, arc / 150f);
         // The model's +Y (grip to tip) along the blade, its flat across the swing plane, twisted toward the eye.
         var normal = new Vector3(0, 0, -1).Cross(BladeDirection(90f)).Normalized();
@@ -44,7 +43,7 @@ public sealed partial class ViewModel
         var z = x.Cross(d).Normalized();
         var basis = new Basis(x, d, z).Orthonormalized() * new Basis(Vector3.Up, FlatTwist);
         // The hand follows the blade a little, drifting across the view as it comes down.
-        float progress = Mathf.Clamp((SwingCurve.WindupDeg - deg) / (SwingCurve.WindupDeg - SwingCurve.FollowDeg), 0f, 1f);
+        float progress = Mathf.Clamp((blade.Max - deg) / Mathf.Max(1f, blade.Max - blade.Min), 0f, 1f);
         var offset = d * HandReach + new Vector3(-HandAcross * progress, 0.04f, 0f);
         return new Pose(offset, basis.GetEuler());
     }

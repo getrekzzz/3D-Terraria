@@ -16,11 +16,15 @@ public class SwingCurveTests
     [Fact]
     public void TheBladeComesOverTheTopAndDownInFrontInsideTheStrikeWindow()
     {
-        var curve = SwingCurve.Blade(SwingClip);
+        var curve = SwingCurve.Blade(UseStyleConfig.Fallback());
         float a = SwingClip.StrikeStart!.Value, b = SwingClip.StrikeEnd!.Value;
-        Assert.Equal(SwingCurve.WindupDeg, curve.Evaluate(a), 3);
-        Assert.Equal(SwingCurve.StruckDeg, curve.Evaluate(b), 3);
-        Assert.True(curve.Evaluate(0f) > 90f, "the swing starts with the blade behind the head");
+        // The style's bladeCurve (0° hangs down, 90° ahead) in swing-plane degrees (0° ahead, 90° up).
+        var data = UseStyleConfig.Fallback().Styles["swing"].BladeCurve!;
+        Assert.Equal(data[1].Degrees - 90f, curve.Evaluate(a), 3);
+        Assert.Equal(data[2].Degrees - 90f, curve.Evaluate(b), 3);
+        Assert.Equal(-45f, curve.Evaluate(b), 3);
+        Assert.True(curve.Evaluate(0f) > 60f, "the swing starts with the blade raised high");
+        Assert.True(curve.Max < MeleeSystem.HighestDamagingDeg + 10f, "the blade never swings round behind the player");
         // Straight ahead (0°) is passed inside the strike window, and the strike only ever comes down.
         float forward = -1f;
         for (int i = 0; i <= 200; i++)
@@ -38,10 +42,10 @@ public class SwingCurveTests
     [Fact]
     public void TheHitboxSweepsTheArcInTimeOrder()
     {
-        var curve = SwingCurve.Blade(SwingClip);
+        var curve = SwingCurve.Blade(UseStyleConfig.Fallback());
         var plane = new SwingPlane(Vector3.Zero, 0f, SwingPlane.SwingReach(3f, 1f));
-        // Small boxes on the arc, 1.4 m from the pivot: overhead, ahead and up, ahead, low ahead.
-        float[] angles = { 110f, 50f, 0f, -40f };
+        // Small boxes on the arc, 1.4 m from the pivot: high ahead, ahead and up, ahead, low ahead.
+        float[] angles = { 70f, 40f, 0f, -40f };
         var first = new int[angles.Length];
         const int duration = 25;
         for (int k = 0; k < angles.Length; k++)
@@ -80,7 +84,7 @@ public class SwingCurveTests
     [Fact]
     public void ASizePrefixExtendsTheReach()
     {
-        var curve = SwingCurve.Blade(SwingClip);
+        var curve = SwingCurve.Blade(UseStyleConfig.Fallback());
         float normal = SwingPlane.SwingReach(3f, 1f), massive = SwingPlane.SwingReach(3f, 1.18f);
         Assert.True(massive > normal);
         var small = new SwingPlane(Vector3.Zero, 0f, normal);
@@ -148,7 +152,7 @@ public class SwingCurveTests
         var a = SwingHit("legendary");
         var b = SwingHit("legendary");
         Assert.Equal(a, b);
-        Assert.Equal(SwingCurve.Blade(SwingClip).Evaluate(0.37f), SwingCurve.Blade(SwingClip).Evaluate(0.37f));
+        Assert.Equal(SwingCurve.Blade(UseStyleConfig.Fallback()).Evaluate(0.37f), SwingCurve.Blade(UseStyleConfig.Fallback()).Evaluate(0.37f));
     }
 
     private static TestGame Arena()
