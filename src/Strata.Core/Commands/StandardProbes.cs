@@ -31,6 +31,7 @@ internal static class StandardProbes
         ctx.AddProbe("time.hour", () => w.Session.Clock.Hour);
         ctx.AddProbe("time.day", () => w.Session.Clock.IsDay ? 1 : 0);
         ctx.AddProbe("drops.count", () => w.Drops.Items.Count);
+        ctx.AddPrefixProbe("drops.", id => w.Session.Content.Items.Contains(id) ? w.Drops.Items.Where(d => d.Stack.Item?.Id == id).Sum(d => d.Stack.Count) : null);
         ctx.AddProbe("chunks.loaded", () => w.Streamer.LoadedCount);
         ctx.AddProbe("chunks.meshed", () => w.Streamer.MeshedCount);
         ctx.AddProbe("stream.idle", () => w.Streamer.IsIdle && w.Jobs.Idle ? 1 : 0);

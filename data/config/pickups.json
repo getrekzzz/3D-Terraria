@@ -1,0 +1,13 @@
+{
+  // Heart and Star drops from kills, and item magnetism (P3-29; see PickupConfig). Terraria 1.4.4: one kill in 6 rolls;
+  // a Star (1/2) when the killer's mana is not full, else a Heart (1/2) when their life is not full; a magic last hit
+  // adds a 1/2 Star; a boss defeat spills 5-9 Hearts. Distances in metres, speed in m/s.
+  "dropOneIn": 6,
+  "starChance": 0.5,
+  "heartChance": 0.5,
+  "magicStarChance": 0.5,
+  "bossHearts": [5, 9],
+  "magnetRange": 3.2,
+  "pickupRange": 1.0,
+  "pullSpeed": 9
+}

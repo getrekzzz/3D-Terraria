@@ -17,8 +17,8 @@
   "items": [
     { "id": "pixie_dust", "name": "Pixie Dust", "description": "Shed by pixies of the Hallow. Sparkles faintly.", "category": "material", "maxStack": 9999, "value": 250, "rarity": 4, "covers": ["terraria:pixie_dust"] },
     { "id": "unicorn_horn", "name": "Unicorn Horn", "description": "The spiralled horn of a unicorn.", "category": "material", "maxStack": 9999, "value": 1500, "rarity": 4, "covers": ["terraria:unicorn_horn"] },
-    { "id": "soul_of_light", "name": "Soul of Light", "description": "Gathered from the creatures beneath the hallowed land.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "covers": ["terraria:soul_of_light"] },
-    { "id": "soul_of_night", "name": "Soul of Night", "description": "The essence of dark creatures.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "covers": ["terraria:soul_of_night"] },
+    { "id": "soul_of_light", "name": "Soul of Light", "description": "Gathered from the creatures beneath the hallowed land.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "noGravity": true, "covers": ["terraria:soul_of_light"] },
+    { "id": "soul_of_night", "name": "Soul of Night", "description": "The essence of dark creatures.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "noGravity": true, "covers": ["terraria:soul_of_night"] },
     { "id": "cursed_flame", "name": "Cursed Flame", "description": "It burns green and does not go out.", "category": "material", "maxStack": 9999, "value": 400, "rarity": 4, "covers": ["terraria:cursed_flame"] },
     { "id": "ichor", "name": "Ichor", "description": "Golden, sticky and corrosive to armour.", "category": "material", "maxStack": 9999, "value": 400, "rarity": 4 }
   ],

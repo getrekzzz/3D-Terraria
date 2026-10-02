@@ -473,3 +473,41 @@ assert projectiles.pooled >= 1
 ai on
 killall
 assert errors == 0
+# --- P3-29 ---
+# Hearts: a slime slain while hurt drops a Heart that flies in, heals 20 and takes no slot.
+clear
+heal
+pickups always
+hurt 50
+assert player.life <= 50
+spawn green_slime 1 2
+ai off
+slay green_slime
+assert drops.heart == 1
+probe drops.heart
+wait_until drops.heart == 0 3
+assert player.life >= 70
+assert inv.heart == 0
+# A full backpack: the Heart is still taken, but the slime's gel is not pulled and stays on the ground.
+wait 1
+assert drops.gel == 0
+clear
+give stone 99999
+give stone 99999
+give stone 99999
+give stone 99999
+give stone 99999
+give stone 99999
+hurt 30
+spawn green_slime 1 2
+slay green_slime
+assert drops.heart == 1
+wait_until drops.heart == 0 3
+wait 1
+assert drops.gel >= 1
+assert inv.gel == 0
+pickups default
+clear
+ai on
+killall
+assert errors == 0

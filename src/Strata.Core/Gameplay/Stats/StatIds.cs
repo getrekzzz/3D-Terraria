@@ -65,6 +65,9 @@ public static class StatIds
     /// <summary>Holding the button repeats whips too (Feral Claws and its upgrades; melee always auto-swings).</summary>
     public const string Autoswing = "autoswing";
 
+    /// <summary>Metres added to the item magnet's reach (Treasure Magnet).</summary>
+    public const string GrabRange = "grabRange";
+
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
         MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, RunSpeed, Acceleration, JumpHeight, GenericDamage,
@@ -72,6 +75,7 @@ public static class StatIds
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
         Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal, FishingPower, BaitSaving, LavaFishing, CrateChance,
         Autoswing,
+        GrabRange,
     };
 
     public static bool IsKnown(string id) => Known.Contains(id);

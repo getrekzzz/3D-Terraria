@@ -47,12 +47,23 @@ public sealed class DroppedItemSystem
         return item;
     }
 
+    /// <summary>Magnet and pickup ranges and pull speed (data/config/pickups.json).</summary>
+    public PickupConfig Config { get; set; } = new();
+
+    /// <summary>Advances one tick for a collector with room for anything.</summary>
+    public void Tick(VoxelWorld world, float dt, Vector3 collector, Func<ItemStack, ItemStack> tryCollect) =>
+        Tick(world, dt, collector, _ => true, tryCollect);
+
     /// <summary>
-    /// Advances one tick. <paramref name="collector"/> is the collecting entity's centre; <paramref name="tryCollect"/>
-    /// stores a stack and returns what did not fit.
+    /// Advances one tick. <paramref name="collector"/> is the collecting entity's centre; <paramref name="canTake"/> says
+    /// whether it has room for any of a stack (an item it cannot take is not pulled and stays on the ground, as in
+    /// Terraria; pickups such as Hearts always fit); <paramref name="tryCollect"/> stores a stack and returns what did not
+    /// fit. <paramref name="grabBonus"/> (m) widens the magnet (the grabRange stat).
     /// </summary>
-    public void Tick(VoxelWorld world, float dt, Vector3 collector, Func<ItemStack, ItemStack> tryCollect)
+    public void Tick(VoxelWorld world, float dt, Vector3 collector, Func<ItemStack, bool> canTake, Func<ItemStack, ItemStack> tryCollect,
+        float grabBonus = 0f)
     {
+        float magnet = Config.MagnetRange + grabBonus;
         for (int i = _items.Count - 1; i >= 0; i--)
         {
             var it = _items[i];
@@ -66,9 +77,9 @@ public sealed class DroppedItemSystem
 
             var toCollector = collector - it.Position;
             float dist = toCollector.Length();
-            if (it.PickupDelay == 0 && dist < MagnetRange)
+            if (it.PickupDelay == 0 && dist < magnet && canTake(it.Stack))
             {
-                if (dist < PickupRange)
+                if (dist < Config.PickupRange)
                 {
                     var rest = tryCollect(it.Stack);
                     if (rest.IsEmpty)
@@ -80,8 +91,12 @@ public sealed class DroppedItemSystem
                 }
                 else
                 {
-                    it.Velocity = Vector3.Lerp(it.Velocity, Vector3.Normalize(toCollector) * 9f, 0.25f);
+                    it.Velocity = Vector3.Lerp(it.Velocity, Vector3.Normalize(toCollector) * Config.PullSpeed, 0.25f);
                 }
+            }
+            else if (it.Stack.Item?.NoGravity == true)
+            {
+                it.Velocity *= 0.92f; // souls drift to a stop where they fell and hang there
             }
             else
             {

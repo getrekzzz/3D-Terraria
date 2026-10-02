@@ -8,7 +8,8 @@ using Strata.Game.Rendering;
 namespace Strata.Game.Items;
 
 /// <summary>
-/// Draws dropped items as upright, gently bobbing icon sprites lit by the voxel light at their position.
+/// Draws dropped items as upright, gently bobbing icon sprites lit by the voxel light at their position; items that
+/// glow (Hearts, Stars) hover, pulse and shine, and floating items (souls) bob in mid-air.
 /// Visuals are pooled; the simulation lives in the Core <see cref="DroppedItemSystem"/>.
 /// </summary>
 public sealed partial class DroppedItemRenderer : Node3D
@@ -48,11 +49,16 @@ public sealed partial class DroppedItemRenderer : Node3D
                 _visuals[item.Id] = mi;
             }
             var p = item.Position;
-            float bob = item.Grounded ? 0.05f + 0.04f * Mathf.Sin(_time * 2.5f + item.Id) : 0f;
-            float size = item.Stack.Item!.Category == ItemCategory.Block ? 0.3f : 0.38f;
+            var def = item.Stack.Item!;
+            float phase = _time * 2.5f + item.Id;
+            // Glowing pickups (Hearts, Stars) hover higher and pulse like Terraria's; floating items (souls) bob in the air.
+            bool floats = def.Glows || def.NoGravity;
+            float bob = item.Grounded || def.NoGravity ? (floats ? 0.18f : 0.05f) + (floats ? 0.08f : 0.04f) * Mathf.Sin(phase) : 0f;
+            float pulse = def.Glows ? 1f + 0.12f * Mathf.Sin(_time * 5f + item.Id) : 1f;
+            float size = (def.Category == ItemCategory.Block ? 0.3f : 0.38f) * pulse;
             mi.Transform = new Transform3D(Basis.Identity.Scaled(Vector3.One * size), new Vector3(p.X, p.Y - 0.15f + bob, p.Z));
             mi.SetInstanceShaderParameter("voxel_light", LightProbe.SampleSmooth(world, mi.Position + Vector3.Up * 0.1f));
-            mi.SetInstanceShaderParameter("glow", item.Stack.Item.Rarity > 0 ? 0.08f : 0f);
+            mi.SetInstanceShaderParameter("glow", def.Glows ? 0.9f + 0.4f * Mathf.Sin(_time * 5f + item.Id) : def.Rarity > 0 ? 0.08f : 0f);
         }
     }
 
