@@ -17,6 +17,7 @@ public static class BrainSpecs
     public const string Caster = "caster";
     public const string Mawwall = "wallOfFlesh";
     public const string Pattern = "pattern";
+    public const string PlanteraHook = "planteraHook";
 
     public static void Register(SpecCatalog c)
     {
@@ -34,6 +35,7 @@ public static class BrainSpecs
         c.Register<CasterParams>(SpecKind.Brain, Caster);
         c.Register<MawwallParams>(SpecKind.Brain, Mawwall);
         c.Register<PatternParams>(SpecKind.Brain, Pattern);
+        c.Register<PlanteraHookParams>(SpecKind.Brain, PlanteraHook);
     }
 }
 

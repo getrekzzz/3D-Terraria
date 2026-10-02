@@ -148,6 +148,16 @@
   `NpcRenderer` tints spent plates 0.35. Retinazer 20000 / Spazmatism 23000 open at 40% (`transformTicks` 60, phase 2
   defense 20 / 28, ×1.5 contact); in Expert a twin whose `sibling` died moves at `expertLoneSpeed` 1.25
   (`Npc.SpeedScale`). Balance note: these pools are ×2.5–4.4 the old ones, Terraria-faithful by player request.
+* **Plantera** — phase 1 summons three tethered `plantera_hook`s (`planteraHook` brain, `PlanteraHookParams` in
+  `Content/Specs/PlantBrainSpecs.cs`, `AI/PlantBrains.cs`): invulnerable, no contact damage, dying with her. Each casts
+  up to 12 rays along random axis combinations from the target, latches on the face of the first solid cell within
+  `reach` (fallback: the floor under the target), and moves on every `relocateInterval` ± a quarter (faster in phase 2,
+  or at once when its block is mined); the latch point is `Npc.Direction`, `Phase` 1 = latched. The pattern `leash`
+  (radius 9, then 12) holds her near the hooks' centroid. At half life `plantera_open` sprouts eight tethered
+  `plantera_tentacle` lungers (twelve in Expert, which also speeds her ×1.2). The boss `enrage` (×2 damage, ×1.6 speed)
+  holds while her target is outside `underground_jungle`. `NpcRenderer.Tethers` draws a pooled vine cylinder (one
+  material per `tetherColor`) from a living leader's centre to every tethered follower with a tether colour, and from
+  the anchor for rooted lungers.
 * **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
   at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
   `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster

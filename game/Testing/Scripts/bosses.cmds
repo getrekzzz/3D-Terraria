@@ -79,8 +79,11 @@ killall
 boss plantera 12
 wait 2
 assert npcs.plantera == 1
+assert npcs.plantera_hook == 3
 slay plantera
 assert flag.defeated_plantera == 1
+wait 1
+assert npcs.plantera_hook == 0
 killall
 boss golem 14
 wait 2

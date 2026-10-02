@@ -134,16 +134,26 @@
       "id": "plantera", "facing": "look", "model": "plantera", "tags": ["boss", "lava_immune"], "name": "Plantera", "description": "The jungle's heart, awake and very hungry.",
       "brain": { "type": "pattern", "phases": [
         { "below": 1.0, "volley": { "projectile": "plantera_seed", "damage": 40, "speed": 16, "interval": 45, "spread": 8 },
+          "summon": { "enemy": "plantera_hook", "once": true, "max": 3, "tether": true }, "leash": { "kind": "plantera_hook", "radius": 9 },
           "moves": [{ "type": "chase", "ticks": 240, "speed": 4.5 }, { "type": "orbit", "ticks": 150, "speed": 7, "distance": 8, "height": 1 }] },
         { "below": 0.5, "model": "plantera_open", "speed": 1.6, "damage": 1.4, "message": "Plantera's bulb bursts open!",
           "volley": { "projectile": "thorn_ball", "damage": 50, "speed": 12, "interval": 90, "count": 6, "ring": true },
+          "summon": { "enemy": "plantera_tentacle", "once": true, "max": 8, "tether": true, "radius": 2.5 }, "leash": { "kind": "plantera_hook", "radius": 12 },
+          "expert": { "speed": 1.2, "summonMax": 4 },
           "moves": [{ "type": "chase", "ticks": 180, "speed": 8 }, { "type": "dash", "count": 2, "telegraph": 25, "ticks": 35, "speed": 18 }] }
       ] },
       "life": 30000, "damage": 50, "defense": 14, "knockbackResist": 1.0, "size": [7, 7], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 3, 6],
       "loot": "plantera", "value": 50000,
-      "boss": { "title": "Plantera", "flag": "defeated_plantera", "arenaRadius": 160, "music": "boss_plantera" },
+      "boss": { "title": "Plantera", "flag": "defeated_plantera", "arenaRadius": 160, "music": "boss_plantera",
+        "enrage": { "when": [{ "type": "biome", "none": ["underground_jungle"] }], "damage": 2, "speed": 1.6 } },
       "covers": ["terraria:plantera"]
     },
+    { "id": "plantera_hook", "model": "plantera_hook", "name": "Plantera's Hook", "description": "A thorned vine claw that grips the jungle and drags its mistress along.",
+      "brain": { "type": "planteraHook", "reach": 14, "relocateInterval": 180, "speed": 12 }, "invulnerable": true, "contactDamage": false, "tetherColor": "#3a6a2a",
+      "life": 1, "damage": 0, "defense": 0, "knockbackResist": 1.0, "size": [1.6, 1.6], "moveSpeed": 12, "gravity": false, "collideTerrain": false, "value": 0 },
+    { "id": "plantera_tentacle", "model": "plantera_tentacle", "name": "Plantera's Tentacle", "description": "A snapping bud on a fleshy stalk, sprouted when her bulb bursts.",
+      "brain": { "type": "lunger", "reach": 7, "aggroRange": 20 }, "tetherColor": "#3a6a2a",
+      "life": 1000, "damage": 60, "defense": 20, "knockbackResist": 1.0, "size": [1.4, 1.4], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "value": 0 },
     {
       "id": "golem", "model": "golem", "tags": ["boss", "lava_immune"], "name": "Golem", "description": "The Lihzahrds' idol, animated by the sun.",
       "brain": { "type": "pattern", "ground": true, "phases": [

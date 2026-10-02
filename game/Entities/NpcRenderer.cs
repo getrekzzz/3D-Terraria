@@ -75,7 +75,7 @@ public sealed partial class NpcRenderer : Node3D
             ReleaseIllusions(view);
             if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
             view.Health.QueueFree();
-            view.Stalk?.QueueFree();
+            ReleaseTether(view.Stalk);
         };
     }
 
@@ -225,27 +225,6 @@ public sealed partial class NpcRenderer : Node3D
         }
     }
 
-    /// <summary>Rooted creatures (snatchers): a vine from the anchor to the head.</summary>
-    private static void UpdateStalk(Npc npc, View view)
-    {
-        var root = new Vector3(npc.Anchor.X, npc.Anchor.Y, npc.Anchor.Z);
-        var head = view.Shown + new Vector3(0, npc.HalfExtents.Y * 0.8f, 0);
-        var span = head - root;
-        float len = span.Length();
-        view.Stalk!.Visible = len > 0.05f;
-        if (len <= 0.05f) return;
-        var up = span / len;
-        var side = Mathf.Abs(up.Y) > 0.95f ? Vector3.Right : up.Cross(Vector3.Up).Normalized();
-        var basis = new Basis(side, up, side.Cross(up)).Scaled(new Vector3(1, len, 1));
-        view.Stalk.GlobalTransform = new Transform3D(basis, root + span * 0.5f);
-    }
-
-    private static MeshInstance3D NewStalk(string? color) => new()
-    {
-        Mesh = new CylinderMesh { TopRadius = 0.05f, BottomRadius = 0.09f, Height = 1f, RadialSegments = 6, Rings = 1 },
-        MaterialOverride = new StandardMaterial3D { AlbedoColor = color != null ? Color.FromHtml(color) : new Color(0.25f, 0.45f, 0.15f), Roughness = 0.9f },
-    };
-
     private View? Create(Npc npc)
     {
         var model = npc.Def.Model ?? npc.Def.Id;
@@ -254,12 +233,7 @@ public sealed partial class NpcRenderer : Node3D
         // Glowing creatures get their light from the shared pool (Rendering.DynamicLights, see Glows); visuals made
         // before that carried their own light, which a pooled visual may still hold.
         if (visual.GetNodeOrNull<OmniLight3D>("Glow") is { } oldGlow) oldGlow.QueueFree();
-        MeshInstance3D? stalk = null;
-        if (npc.Def.Brain.Type == Strata.Core.Content.Specs.BrainSpecs.Lunger)
-        {
-            stalk = NewStalk(npc.Def.TetherColor);
-            AddChild(stalk);
-        }
+        var stalk = HasTether(npc) ? AcquireTether(npc.Def.TetherColor) : null;
         var health = new Label3D
         {
             Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,

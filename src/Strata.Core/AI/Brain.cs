@@ -108,6 +108,7 @@ public static class BrainFactory
         BrainSpecs.Caster => new CasterBrain(spec.Parse<CasterParams>()),
         BrainSpecs.Mawwall => new MawwallBrain(spec.Parse<MawwallParams>()),
         BrainSpecs.Pattern => new PatternBrain(spec.Parse<PatternParams>()),
+        BrainSpecs.PlanteraHook => new PlanteraHookBrain(spec.Parse<PlanteraHookParams>()),
         _ => throw new InvalidOperationException($"Unknown brain '{spec.Type}' (the content validator should have rejected it)."),
     };
 
