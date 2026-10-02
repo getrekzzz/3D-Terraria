@@ -3,6 +3,9 @@
 > An audit of `main` at M4 (commit `15bf3f4`), written in W0 of the player-feedback overhaul (2026-09-30). It answers three questions: what works, what doesn't, and what's missing. Each row names the
 > planned fix. It is refreshed at every phase gate. When a work package (WP) lands, update its rows' status and
 > evidence. The summary table in [`3D_TERRARIA_MASTER_PLAN.md`](3D_TERRARIA_MASTER_PLAN.md) §3 points here.
+>
+> Last refresh: the W3 gate (2026-10-02), covering Phase 1 (W1a, W1b) and the W3 UI foundations. W2 (lag spikes) is
+> being done in the Art session and is not merged yet.
 
 ## 1. How to read
 
@@ -74,7 +77,7 @@
 | Buffs, prefixes, tile objects | 39, 18, 71 | 103 object GLBs (`assets/models/objects/`) |
 | Audio | 146 SFX files (75 sound ids) and 31 music tracks | 177 files under `assets/audio/` |
 | Reference coverage | 100 % of 1,025 concepts | The reference list is hand-picked. Magic Missile, Aqua Scepter, Valor, the Golden Key, the Bone Welder, spikes, bookcases and pylons are not on it, so 100 % hides real gaps |
-| Core tests | 325 | `tests/Strata.Core.Tests`, W0 lane B |
+| Core tests | 325 at W0; 574 at the W3 gate | `tests/Strata.Core.Tests` |
 
 ## 4. Rendering and lighting
 
@@ -198,18 +201,18 @@ below are in behaviour and presentation, not in data.
 | Whips (2) | ❌ | Wide melee arcs; "summons focus struck enemies" and Snapthorn's poison exist only in the descriptions (`data/items/arsenal.json`) | P3-14 (W5), P3-15 (W5) |
 | Summons (15) | 🟡 | Minions and sentries work; they spawn at the eye, with no minion buff or count in the HUD | P3-10 (W5), P2-14 (W4) |
 | Grappling hooks (9) | 🟡 | Fixed: click throws, the hook holds on natural terrain, platforms and trees, and the claw sits on the rendered surface (P1-08, P1-09; `src/Strata.Core/Gameplay/Player/GrappleHook.cs`). Left: one generic chain and claw | P3-17' (W5) |
-| Potions and consumables | 🟡 | Healing, mana, buffs and crystals work. Every use is "drink". 19 of 21 buff potions don't say what they do or for how long. Stack sizes mix versions. Life Fruit works before 400 max life (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs:14`). | P2-04 (W3), P3-02 (W4), P3-33 (W6) |
+| Potions and consumables | 🟡 | Healing, mana, buffs and crystals work. Every use is "drink". Stack sizes mix versions. Life Fruit works before 400 max life (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs:14`). Tooltips now say what every buff potion does and for how long (P2-04, `src/Strata.Core/Gameplay/Buffs/BuffText.cs`). | P3-02 (W4), P3-33 (W6) |
 | Quick heal, quick mana, quick buff keys | ⬜ | `data/config/input.json` | P3-33 (W6) |
-| Accessories (66) | ✅ | Stat, flight, dash and info effects; set bonuses (`src/Strata.Core/Content/Specs/EffectSpecs.cs`) | 7 slots: P2-05 (W3) |
+| Accessories (66) | ✅ | Stat, flight, dash and info effects; set bonuses (`src/Strata.Core/Content/Specs/EffectSpecs.cs`); up to 7 slots as the world unlocks them, each with a vanity slot (P2-05, `src/Strata.Core/Gameplay/Items/PlayerInventory.Equipment.cs`) | — |
 | Armour (98 pieces) | 🟡 | Stats and set bonuses work; never drawn on the character | P3-41, P3-42 (W7) |
 | Wings (14) | ✅ | Flight works and wings are drawn | — |
-| Mounts | 🟡 | Minecart only (`src/Strata.Core/Gameplay/Mounts/Minecart.cs`) | Slot: P2-05 (W3); more mounts out of scope (§17) |
+| Mounts | 🟡 | Minecart only (`src/Strata.Core/Gameplay/Mounts/Minecart.cs`); the misc row has a mount slot (P2-05) | More mounts out of scope (§17) |
 | Pets and light pets | ⬜ | `Pet` category exists, zero items (`src/Strata.Core/Content/Defs/ItemDef.cs:3-8`) | P3-18 (W5) |
-| Vanity and dyes | ⬜ | Categories exist, zero items | Slots: P2-05 (W3), P2-16 (W4); dyes: P5-16 (W10) |
+| Vanity and dyes | ⬜ | Categories exist, zero items. Vanity and dye slots are modelled and saved (P2-05); the inventory shows vanity slots, not dye slots | Dye slot UI: P2-16 (W4); dyes: P5-16 (W10) |
 | Prefixes: 18 with invented names; rolled only on crafted items | 🟡 | `data/combat.json`, `src/Strata.Core/Gameplay/Crafting/RecipeBook.cs:56`, `src/Strata.Core/Gameplay/Loot/LootRoller.cs:57,80`, `src/Strata.Core/Gameplay/Town/TownCommerce.cs:117` | P3-31 (W6) |
-| Rarity colours: tiers 9 and 10 (52 items) show as tier-8 yellow; no Expert/Master/Quest tiers | ❌ | `game/UI/UiTheme.cs:51` | P2-01 (W3) |
-| Coins never auto-convert; no coin slots | ⬜ | `src/Strata.Core/Gameplay/Items/Coins.cs`, `src/Strata.Core/Gameplay/Items/PlayerInventory.cs` | P2-05, P2-06 (W3) |
-| Ammo: searched hotbar-first; no ammo slots | 🟡 | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs:44-46` | P2-06 (W3) |
+| Rarity colours: every tier, plus Quest, Expert (rainbow) and Master (fiery pulse), in Core; the Expert and Master names are coloured once, not animated yet | ✅ | `src/Strata.Core/Presentation/RarityColors.cs`, `game/UI/UiTheme.cs` | P2-01 (W3); animated names with the tooltip follower P2-10 (W4) |
+| Coins: four coin slots that convert upwards; the wallet spans the coin slots and the backpack. The screen still shows coins as a text label | 🟡 | `src/Strata.Core/Gameplay/Items/PlayerInventory.Purse.cs`, `src/Strata.Core/Gameplay/Items/Coins.Purse.cs` | P2-05, P2-06 (W3); coin slot UI P2-15 (W4) |
+| Ammo: four ammo slots fire first, and crafting counts arrows in them; no ammo slot UI yet | 🟡 | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs`, `src/Strata.Core/Gameplay/Items/PlayerInventory.Purse.cs` | P2-06 (W3); ammo slot UI P2-15 (W4) |
 | Per-item use sounds (`ItemDef.SoundSet` has no readers) | ⬜ | `src/Strata.Core/Content/Defs/ItemDef.cs:118` | P3-27 (W6) |
 | Autoswing: every melee weapon repeats, so `autoReuse` is dead data for melee | ✅ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:89` | Whip and Feral Claws rule: P3-15 (W5) |
 | Failed uses say why once per press ("Needs Wooden Arrow", "Not enough mana", Potion Sickness) with a dry click, mana fizzle or tink | ✅ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs` (`Failed`), `game/Audio/SoundEvents.cs` | P1-15 (W1a) |
@@ -224,37 +227,37 @@ below are in behaviour and presentation, not in data.
 
 | Feature | Status | Evidence | Fix |
 |---|---|---|---|
-| Theme: dark slate (0.07, 0.09, 0.14) instead of translucent royal blue; covers only 4 control types; attached per root | 🟡 | `game/UI/UiTheme.cs:8-16,54-71` | P2-01 (W3) |
-| UI font: none in the repo; Godot's fallback font everywhere | ⬜ | `project.godot`, `game/UI/UiTheme.cs` | P2-01 (W3) |
-| UI sprites (hearts, stars, bubbles, slot silhouettes, cursor, frames) | ⬜ | `assets/` (no UI sprites) | P2-02 (W3) |
+| Theme: translucent Terraria blue panels, slot kinds and gold hover text as one global theme; check boxes keep Godot's default icons | ✅ | `game/UI/UiTheme.cs`, `game/UI/UiTheme.Build.cs`, `assets/ui/strata_theme.tres` | P2-01 (W3) |
+| UI font: Comic Neue Bold (SIL OFL) with Andika Bold as the glyph fallback, everywhere, with a UI-scale guard | ✅ | `assets/fonts/`, `game/UI/UiFonts.cs` | P2-01 (W3) |
+| UI sprites (hearts, stars, bubbles, slot silhouettes, buttons, pointer, frames) and 39 buff and 16 event icons, generated and validated; the HUD does not draw them yet | ✅ | `tools/textures/build_ui.py`, `game/UI/UiSprites.cs`, `game/UI/StatusIcons.cs` | P2-02, P2-03 (W3); shown by P2-10, P2-13, P2-14, P2-23 (W4) |
 | **HUD**: life and mana are 260 px progress bars, not hearts (golden past 400) and stars | 🟡 | `game/UI/Hud.cs:68-77` | P2-13 (W4) |
 | Breath is a third bar that overlaps the minimap | 🟡 | `game/UI/Hud.cs:75-76` | P2-13 (W4) |
 | Hotbar: bottom-centre, no selected-slot scale, name fades, shown twice with the inventory open | 🟡 | `game/UI/Hud.cs:48-62,171-189` | P2-12 (W4) |
-| Buffs: text chips with dead tooltips; no icons or right-click cancel; overlaps the FPS label | 🟡 | `game/UI/Hud.cs:249-267`, `src/Strata.Core/Content/Defs/BuffDef.cs` | P2-03 (W3), P2-14 (W4) |
+| Buffs: text chips with dead tooltips; no right-click cancel; overlaps the FPS label. Icons, buff text and `BuffDisplay` (timer, cancel) exist in Core but the HUD does not use them yet | 🟡 | `game/UI/Hud.cs`, `src/Strata.Core/Presentation/BuffDisplay.cs` | P2-14 (W4) |
 | Boss bar: plain bar, no head icon, life numbers discarded | 🟡 | `game/UI/Hud.cs:128` | P2-24 (W2), P2-23 (W4), P4-03 (W7) |
 | Invasion and event progress bar | ⬜ | `src/Strata.Core/Gameplay/Events/EventDirector.cs` (kills are tracked) | P2-23 (W4) |
 | Status messages: big centred banners, non-Terraria colours, no chat log | 🟡 | `game/UI/Hud.cs:133-160` | P2-21 (W4) |
 | Pickup feedback: corner toasts ("+1 Dirt Block" ×30) instead of merged popups | 🟡 | `game/UI/Hud.cs:161-164,269-279` | P2-22 (W4) |
-| Floating combat text: no pop, no heal or mana numbers, non-Terraria colours | 🟡 | `game/Entities/CombatEffects.cs:38-72` | P2-19 (W3) |
-| Enemy health: red "life/max" text instead of a small bar | 🟡 | `game/Entities/NpcRenderer.cs:145-150` | P2-20 (W3) |
+| Floating combat text: Terraria colours, pop-in, fixed screen size, green heal and blue mana numbers | ✅ | `src/Strata.Core/Presentation/CombatText.cs`, `game/Entities/CombatEffects.cs` | P2-19 (W3); heart and star pickups P3-29 (W6) |
+| Enemy health: a small green-to-red billboard bar under hurt enemies (bosses keep the HUD bar) | ✅ | `game/Entities/NpcRenderer.HealthBar.cs`, `shaders/ui_healthbar.gdshader` | P2-20 (W3) |
 | Death screen: plain red text, no dim, no cause | 🟡 | `game/UI/Hud.cs:114-118,213-217` | P2-25 (W4) |
 | Custom cursor; held item at the pointer on every screen | ⬜ | `game/UI/Hud.cs:321-344`, `game/UI/InventoryScreen.cs:146-156` | P2-10 (W4) |
-| Info accessories readout overlaps the F3 overlay | 🟡 | `game/UI/Hud.cs:108-112` | P2-09 (W3), P2-12 (W4) |
-| Layout: absolute pixels; the crafting panel covers the minimap below 1340 logical px | ❌ | `game/UI/InventoryScreen.cs:45-93`, `game/UI/CraftingPanel.cs:23-24` | P2-09 (W3), P2-15 (W4) |
+| Info accessories readout overlaps the F3 overlay (Core layout regions exist, P2-09; not applied yet) | 🟡 | `game/UI/Hud.cs`, `src/Strata.Core/Presentation/UiLayout.cs` | P2-12 (W4) |
+| Layout: absolute pixels; the crafting panel covers the minimap below 1340 logical px. Core `UiLayout` gives named regions that never overlap at any size or UI scale (P2-09), but the screens do not use them yet | ❌ | `game/UI/InventoryScreen.cs`, `game/UI/CraftingPanel.cs`, `src/Strata.Core/Presentation/UiLayout.cs` | P2-12, P2-15 (W4) |
 | **Inventory**: 50-slot backpack, Loot all / Deposit all, split and merge | ✅ | `src/Strata.Core/Gameplay/Items/SlotActions.cs` | — |
-| Right-click follows Minecraft rules: takes half or places one; can't equip or open crates; no hold to take more | ❌ | `src/Strata.Core/Gameplay/Items/SlotActions.cs:46-47` | P2-07 (W3) |
-| Trash slot lives in the UI only (lost on exit); shift-click silently trashes | 🟡 | `game/UI/InventoryScreen.cs:29,206` | P2-05, P2-07 (W3), P2-15 (W4) |
-| Coin and ammo slots; coins as a text label | ⬜ | `game/UI/InventoryScreen.cs:145` | P2-06 (W3), P2-15 (W4) |
-| Sort, quick stack, restock, rename, favourites, quick stack to nearby chests | ⬜ | `game/UI/InventoryScreen.cs:216-230` | P2-08 (W3), P2-17 (W4) |
-| Throw the cursor item by clicking outside the inventory | ⬜ | `game/UI/InventoryScreen.cs:126-135` | P2-11 (W4) |
-| Equipment: 3 armour and 5 accessory slots, no silhouettes, text defense; no vanity, dye or misc slots | 🟡 | `src/Strata.Core/Gameplay/Items/PlayerInventory.cs`, `game/UI/InventoryScreen.cs:52-74` | P2-05 (W3), P2-16 (W4) |
+| Terraria slot clicks: right-click takes one (held: faster), equips, swaps vanity and opens crates; Ctrl trashes, Alt favourites, Shift quick-moves | ✅ | `src/Strata.Core/Gameplay/Items/SlotActions.cs`, `game/UI/InventoryScreen.Slots.cs` | P2-07 (W3); Shift-sell in shops P2-27 (W4) |
+| Trash slot is saved with the player; Ctrl+click trashes, Shift+click quick-moves | ✅ | `src/Strata.Core/Gameplay/Items/PlayerInventory.cs`, `game/UI/InventoryScreen.cs` | P2-05, P2-07 (W3); placement P2-15 (W4) |
+| Coin and ammo slots: modelled, saved and used in Core (P2-05, P2-06); the screen still shows coins as a text label and no ammo slots | 🟡 | `game/UI/InventoryScreen.cs` | P2-15 (W4) |
+| Sort (favourites stay put), quick stack, restock, Loot All, Deposit All, saved chest names, favourites (gold wash), quick stack to nearby chests | ✅ | `src/Strata.Core/Gameplay/Items/InventoryOps.cs`, `game/UI/InventoryScreen.Chest.cs` | P2-07, P2-08 (W3); chest panel look P2-17 (W4) |
+| Throw the cursor item by clicking outside the inventory (right click: one) | ✅ | `game/UI/InventoryScreen.Slots.cs` (`ThrowCursor`) | P2-07 (W3) |
+| Equipment: armour and up to 7 accessory slots with a vanity toggle, and the misc row (pet, light pet, minecart, mount, hook); no silhouettes, text defense, no dye slots on screen | 🟡 | `src/Strata.Core/Gameplay/Items/PlayerInventory.Equipment.cs`, `game/UI/InventoryScreen.cs` | P2-05 (W3); P2-16 (W4) |
 | **Crafting**: rebuilds every 0.5 s, destroying its own tooltips (the only place ingredients show) | ❌ | `game/UI/CraftingPanel.cs:41-51` | P2-18 (W4) |
-| Crafting shows raw station ids (`hardmode_anvil`, `alchemy`) | ❌ | `game/UI/CraftingPanel.cs:49,90`, `game/UI/TownDialog.cs:186` | P2-04 (W3), P2-18 (W4) |
+| Crafting tooltips and the Guide name stations ("Iron Anvil or Lead Anvil"); the "Near:" line still lists raw ids | 🟡 | `src/Strata.Core/Content/Index/StationNames.cs`, `game/UI/CraftingPanel.cs:51` | P2-04 (W3); P2-18 (W4) |
 | Craft to cursor, material slots, hold-to-craft | ⬜ | `game/UI/CraftingPanel.cs:72-82` | P2-18 (W4) |
 | **Chests**: open, Loot all, Deposit all; chest lid stays shut | 🟡 | `game/UI/InventoryScreen.cs:76-89`, `game/World/ObjectPlacement.cs:26-30` | P2-17 (W4), P3-48 (W6) |
 | Piggy Bank and Safe | ⬜ | no `piggy` anywhere in `data/` | P3-35 (W6) |
 | **Tooltips**: speed and knockback words match the reference game | ✅ | `src/Strata.Core/Gameplay/Items/ItemTooltip.cs` | — |
-| Tooltips ignore prefix stats and value; no green/red modifier lines; sell price disagrees with the shop | ❌ | `src/Strata.Core/Gameplay/Items/ItemTooltip.cs:20-43` | P2-04 (W3), P3-31 (W6) |
+| Tooltips show prefix-adjusted stats with green/red modifier lines, buff text and duration, and the shop's coin-tier price | ✅ | `src/Strata.Core/Gameplay/Items/ItemTooltip.cs`, `src/Strata.Core/Gameplay/Items/ItemTooltip.Extras.cs` | P2-04 (W3); Terraria prefixes P3-31 (W6) |
 | Tooltips on Labels (shop rows, buff row) can never appear; default 0.5 s delay; not following the mouse | ❌ | `game/UI/TownDialog.cs:148`, `game/UI/Hud.cs:265` | P2-10 (W4) |
 | **NPC chat and shop**: bottom-anchored box spills off-screen; framed buttons | 🟡 | `game/UI/TownDialog.cs:37-38` | P2-26 (W4) |
 | Shop: a list, sell held stack only, no buyback | 🟡 | `game/UI/TownDialog.cs:138-166` | P2-27 (W4) |
@@ -452,7 +455,7 @@ Items tagged `shop` that nobody sells: Leather Whip and Rally (P5-15, P5-17).
 | Feature | Status | Evidence | Fix |
 |---|---|---|---|
 | In-game help: the Guide's one-line help and item tooltips | 🟡 | `game/UI/TownDialog.cs:174-187` | P5-14 (W10), P5-27 (W11) |
-| Item-source reverse index (lives in the validator only) | 🟡 | `src/Strata.Core/Content/Validation/ContentValidator.World.cs:73` | P5-24a (W3) |
+| Item-source reverse index: a Core `ItemSourceIndex` that the obtainability check uses | ✅ | `src/Strata.Core/Content/Index/ItemSources.cs` | P5-24a (W3) |
 | Drop-rate computation | ⬜ | `src/Strata.Core/Gameplay/Loot/LootRoller.cs` (rolls only) | P5-24b (W11) |
 | Player journal: kills, seen, caught, met, obtained, crafted | ⬜ | — | P5-25 (W11) |
 | Achievements and popups | ⬜ | no `achievement` in `src/`, `game/` or `data/` | P5-26 (W11) |
