@@ -105,6 +105,7 @@ public sealed partial class TileObjectRenderer : Node3D
             {
                 var o = list[i];
                 mm.SetInstanceTransform(i, Placement.TransformOf(o));
+                Track(chunk, o.Id, mm, i, Placement.TransformOf(o));
                 var fp = o.Footprint;
                 var probe = new Vector3(o.Anchor.X + fp.X * 0.5f, o.Anchor.Y + 0.5f, o.Anchor.Z + fp.Z * 0.5f) * Units.CellSize;
                 mm.SetInstanceCustomData(i, LightProbe.Sample(world, probe));
@@ -136,6 +137,7 @@ public sealed partial class TileObjectRenderer : Node3D
 
     private void Clear(Int3 chunk)
     {
+        Untrack(chunk);
         if (!_chunks.Remove(chunk, out var nodes)) return;
         foreach (var n in nodes)
         {
