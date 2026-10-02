@@ -109,4 +109,26 @@ public class SecretSeedTests
         int plain = Traps(SecretSeed.None), traps = Traps(SecretSeed.NoTraps);
         Assert.True(traps >= plain * 2 && traps > plain + 2, $"plain {plain}, no traps {traps}");
     }
+
+    [Fact]
+    public void ShapingSeedsChangeThePlanHash()
+    {
+        Assert.NotEqual(Gen(SecretSeed.None).Plan.Hash, Gen(SecretSeed.NoTraps).Plan.Hash);
+        Assert.NotEqual(Gen(SecretSeed.Drunk).Plan.Hash, Gen(SecretSeed.Drunk | SecretSeed.NoTraps).Plan.Hash);
+    }
+
+    [Fact]
+    public void ForTheWorthyUnlocksExpertsExtraAccessorySlot()
+    {
+        using var normal = TestGame.Create();
+        using var worthy = TestGame.Create(secret: SecretSeed.ForTheWorthy);
+        Assert.Equal(normal.Player.State.Inventory.AccessorySlotsUnlocked + 1, worthy.Player.State.Inventory.AccessorySlotsUnlocked);
+    }
+
+    [Fact]
+    public void UnknownSecretSeedIdsAreRejected()
+    {
+        Assert.Null(new Strata.Core.Conditions.SecretSeedConditionParams { Is = "celebration" }.Validate());
+        Assert.NotNull(new Strata.Core.Conditions.SecretSeedConditionParams { Is = "celebraton" }.Validate());
+    }
 }

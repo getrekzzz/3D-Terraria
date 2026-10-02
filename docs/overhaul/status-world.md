@@ -88,6 +88,22 @@ project renderer on every preset).
 CI (push 7): GREEN — 1123 Core tests, content checks (incl. furniture/banner generators), Godot import, all 18 smoke
 scripts, menu tour.
 
+## Push 8 — W3 merged (X-14 slot, P2-19 numbers); secret seeds (X-07)
+| WP | State | Notes |
+|---|---|---|
+| merge `origin/claude/clever-goodall-kgex45` (W3 + Bosses/Dungeon) | done | `DamageEvent` keeps `NpcId`/`Kind` and gains `Player`; hurt, fall and debuff numbers go through P2-19 (periodic ticks at 75% size); `CombatEffects` = P2-19 numbers + EffectKit dust/gore; tree wobble works on the grouped object renderer; `WireGrid` saves through `RefreshMeta`. Item-source index learns tiered fishing tables, `extra_<enemy>`, `enemy_global_drops` and banner drops; an object named like its station names it alone ("Work Bench"). Buff icons for fishing/crate/mount/banner buffs, thunderstorm event icon, worn models for the seasonal vanity. |
+| X-14 mount slot | done | Quick-mount prefers `EquippedMount` (P2-05); mount items carry `equipSlot: mount`; the `MountRules.SlotMount` hook is gone. |
+| X-07 secret seeds | done (Don't Dig Up: name only) | `SecretSeed` flags from Terraria's names (saved as `WorldMeta.Secrets`); GenVersion 12, ordinary seeds unchanged (golden hashes hold). Drunk World: both evils and both altars; Not the Bees: 1.5× jungle, 4× hives; No Traps: 6× Dungeon dart traps; For the Worthy: one difficulty step harder (`EffectiveDifficulty`); The Constant: dimmer sky light; Celebration: Party without the Party Girl (`secretSeed` condition); found seeds listed under the menu's seed field; `--secret=` for dev starts and `worldgen-report`. `SecretSeedTests`. Don't Dig Up's upside-down world is not generated (it would need its own generator pass set). |
+
+X-07 adversarially reviewed: fixes for the found-seeds hint not persisting (UserSettings saves strings only), For the
+Worthy's Demon Heart and extra accessory slot (now `EffectiveDifficulty`), the plan hash (includes generation-shaping
+flags), and unknown `secretSeed` ids (validated). Known: a Drunk World's hardmode stripe uses its primary evil only;
+composite conditions (`any`/`all`/`not`) do not validate nested specs (pre-existing). The GenVersion 11 → 12 bump
+(asked by integration) marks pre-12 worlds "old terrain" though ordinary seeds generate identically.
+
+CI (push 8, merge commit): GREEN — 1310 Core tests, content checks, Godot import, all 20 smoke scripts, menu tour.
+Review-fix commit: 1313 Core tests, validate, basic smoke and menu tour pass.
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and

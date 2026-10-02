@@ -86,7 +86,7 @@ public sealed partial class MainMenu
         box.AddChild(MenuKit.Row("World Name", MenuKit.Field("", "Enter a world name", t => name = t.Trim())));
         var found = Settings.UserSettings.Current.DiscoveredSeeds;
         box.AddChild(MenuKit.Row("Seed", MenuKit.Field("", "Random", t => seedText = t.Trim(), 32), "Leave empty for a random world. Numbers or any text."
-            + (found.Count > 0 ? $"\nSecret seeds found: {string.Join(", ", found)}." : "")));
+            + (found.Length > 0 ? $"\nSecret seeds found: {found.Replace("|", ", ")}." : "")));
         box.AddChild(MenuKit.Row("Size", MenuKit.Choice(Sizes, 0, i => size = i),
             "Small is about 1 km across, Medium 2 km, Large 3 km (streamed as you explore)."));
         var note = MenuKit.Text(DifficultyInfo[0], 15, new Color(0.8f, 0.85f, 0.95f));
@@ -150,8 +150,10 @@ public sealed partial class MainMenu
     {
         if (secret == SecretSeed.None) return;
         var s = Settings.UserSettings.Current;
+        var found = new System.Collections.Generic.List<string>(s.DiscoveredSeeds.Split('|', StringSplitOptions.RemoveEmptyEntries));
         foreach (var title in SecretSeeds.Titles(secret))
-            if (!s.DiscoveredSeeds.Contains(title)) s.DiscoveredSeeds.Add(title);
+            if (!found.Contains(title)) found.Add(title);
+        s.DiscoveredSeeds = string.Join("|", found);
         s.Save();
     }
 
