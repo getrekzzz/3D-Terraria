@@ -85,7 +85,13 @@ assert objects.open_lids == 0
 assert errors == 0
 
 # Piggy Bank and Safe: every Piggy Bank opens the character's own 40 slots, so what goes into one comes out of
-# another; the Safe is a separate storage. Neither has a lid.
+# another; the Safe is a separate storage. Neither has a lid. A fresh floor first: the dart above knocks the player
+# back (P3-25), so offsets from where it left them would land on the pressure plate.
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+wait 0.5
 clear
 give gel 10
 give piggy_bank 1
