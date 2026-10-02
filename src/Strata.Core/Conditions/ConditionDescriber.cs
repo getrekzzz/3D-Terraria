@@ -109,6 +109,22 @@ public static class ConditionDescriber
                 string what = p.Item != null ? Name(c.Items, p.Item) : "any " + Humanize(p.Tag!);
                 return p.Count > 1 ? $"carrying {p.Count} {what}" : $"carrying {what}";
             }
+            case "rescued":
+                return $"after rescuing {Article(Name(c.TownNpcs, s.Parse<RescuedConditionParams>().Id))}";
+            case "bestiary":
+                return $"bestiary {s.Parse<RangeConditionParams>().Min:0}% complete";
+            case "anglerQuests":
+                return $"after {s.Parse<RangeConditionParams>().Min:0} Angler quests";
+            case "killed":
+            {
+                var p = s.Parse<KilledConditionParams>();
+                string who = Name(c.Enemies, p.Enemy);
+                return p.Min > 1 ? $"after defeating {p.Min} {who}" : $"after defeating {Article(who, "a")}";
+            }
+            case "obtained":
+                return "once you have found " + Name(c.Items, s.Parse<ObtainedConditionParams>().Item);
+            case "achieved":
+                return "after the achievement " + Name(c.Achievements, s.Parse<AchievedConditionParams>().Id);
             case "wearing":
                 return "wearing " + Name(c.Items, s.Parse<WearingConditionParams>().Item);
             case "difficulty":

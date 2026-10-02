@@ -58,6 +58,8 @@ public class RecipeLookupTests
             ["defense"] = new { Min = 10f }, ["evil"] = new { Is = "crimson" }, ["secretSeed"] = new { Is = "drunk" },
             ["weather"] = new { Any = new[] { "rain" } }, ["fishingPower"] = new { Min = 50f }, ["fishingLiquid"] = new { Any = new[] { "lava" } },
             ["anglerQuest"] = new { Fish = "torch" }, ["season"] = new { Is = "christmas" }, ["worldRing"] = new { Min = 100f },
+            ["rescued"] = new { Id = "goblin_tinkerer" }, ["bestiary"] = new { Min = 10f }, ["anglerQuests"] = new { Min = 5f },
+            ["killed"] = new { Enemy = "zombie" }, ["obtained"] = new { Item = "torch" }, ["achieved"] = new { Id = "benched" },
             ["all"] = new { Of = Array.Empty<object>() }, ["any"] = new { Of = Array.Empty<object>() }, ["not"] = new { Of = Array.Empty<object>() },
         };
         foreach (var type in ConditionCompiler.Types)
@@ -71,6 +73,7 @@ public class RecipeLookupTests
         Assert.Equal("after the Eye of Cthulhu is defeated", ConditionDescriber.Describe(TypedSpec.Of("flag", samples["flag"]), g.Content));
         Assert.Equal("during a Blood Moon", ConditionDescriber.Describe(TypedSpec.Of("event", samples["event"]), g.Content));
         Assert.Equal("The Merchant lives in town", ConditionDescriber.Describe(TypedSpec.Of("resident", samples["resident"]), g.Content));
+        Assert.Equal("bestiary 10% complete", ConditionDescriber.Describe(TypedSpec.Of("bestiary", samples["bestiary"]), g.Content));
         Assert.Equal("carrying 50 silver", ConditionDescriber.Describe(TypedSpec.Of("coins", samples["coins"]), g.Content));
     }
 }
