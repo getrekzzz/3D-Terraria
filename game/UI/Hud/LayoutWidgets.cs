@@ -48,6 +48,21 @@ public static class LayoutWidgets
         return true;
     }
 
+    /// <summary>Visible registered controls whose screen rectangles share area with <paramref name="control"/>'s.</summary>
+    public static int CountOverlapsWith(SceneTree tree, Control control)
+    {
+        var g = control.GetGlobalRect();
+        var rect = new UiRect(g.Position.X, g.Position.Y, g.Size.X, g.Size.Y);
+        int count = 0;
+        foreach (var node in tree.GetNodesInGroup(Group))
+        {
+            if (node == control || node is not Control { } c || !c.IsVisibleInTree()) continue;
+            var o = c.GetGlobalRect();
+            if (rect.Intersects(new UiRect(o.Position.X, o.Position.Y, o.Size.X, o.Size.Y))) count++;
+        }
+        return count;
+    }
+
     /// <summary>
     /// Pairs of visible registered controls whose screen rectangles share area (touching edges do not count); each pair
     /// is added to <paramref name="pairs"/> as "A (rect) × B (rect)" when given.

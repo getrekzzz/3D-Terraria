@@ -12,7 +12,8 @@ namespace Strata.Game.Debug;
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); and on the inventory
-/// screen's layout (P2-15), the equipment column (P2-16), the chest panel (P2-17) and the crafting column (P2-18).
+/// screen's layout (P2-15), the equipment column (P2-16), the chest panel (P2-17), the crafting column (P2-18) and the
+/// NPC chat box (P2-26).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -92,5 +93,7 @@ public static class UiProbes
         // idle screen rebuilds nothing, so a hovered recipe's tooltip stays).
         ctx.AddProbe("ui.recipes", () => world.Inventory?.Crafting.RecipesShown ?? 0);
         ctx.AddProbe("ui.recipe_rebuilds", () => world.Inventory?.Crafting.Rebuilds ?? 0);
+        // P2-26: the NPC chat box is open in the top third of the screen and overlaps no other HUD widget.
+        ctx.AddProbe("ui.npc_chat_top", () => world.TownDialog?.AtTopClear() == true ? 1 : 0);
     }
 }

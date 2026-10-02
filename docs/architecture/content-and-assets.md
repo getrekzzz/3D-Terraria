@@ -257,3 +257,13 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   `Changed` events dirty the list (once a frame at most), a 0.5 s poll dirties it only when the station or liquid sets
   differ, and the column is rebuilt only when `CraftingEnvironment.Signature` changes (else the counts update in place).
   Smoke: `ui craft <item> [n]`; probes `ui.recipes`, `ui.recipe_rebuilds` (since the inventory opened).
+* **NPC chat box** (`game/UI/TownDialog*.cs`): Terraria's dark-blue chat box (`UiTheme.ChatPanel`, light rim) on the
+  layout's `NpcChat` region at the top centre (the HUD lays out again on `TownDialog.LayoutChanged` and places it from
+  `LayoutApplied`): a region-sized pass-through host shrinks the box to the resident's name (14 px, muted), their line
+  (16 px, wrapped, cut to the rows that fit) and a flow of `TextButton` words that turn gold and grow to 1.1× under
+  the mouse (`ui_hover`/`ui_click`). The buttons come from the resident's definition: Shop when `shop` is not empty,
+  the `service` (`TownDialog.Services.cs`: label with its live price and handler; extend `ServiceLabel`/`RunService`
+  for more buttons) and Close. An overlay gate; the resident waits facing the player while it is open
+  (`TownSystem.HoldTalk`), and walking out of `TalkRange` or Esc closes it. Shop hides the box and raises
+  `ShopRequested` (the inventory's shop panel). Probe `ui.npc_chat_top` (open in the top third, overlapping no HUD
+  widget; `LayoutWidgets.CountOverlapsWith`).

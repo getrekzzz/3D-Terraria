@@ -127,8 +127,10 @@ public sealed partial class Hud : CanvasLayer
         LayoutApplied += inventory.Place;
         LayoutApplied += minimap.Place;
         LayoutApplied += perf.Place;
-        // Opening the inventory or a chest lays the screen out at once, so no frame shows it unplaced.
+        LayoutApplied += dialog.Place;
+        // Opening the inventory, a chest or the NPC chat box lays the screen out at once, so no frame shows it unplaced.
         inventory.LayoutChanged += UpdateLayout;
+        dialog.LayoutChanged += UpdateLayout;
         _key = default; // laid out again on the next frame, with them
     }
 
