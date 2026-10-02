@@ -165,11 +165,27 @@
   enraged, frenzied, illusions, parts, segments).
 * **Boss presentation** — `game/Entities/BossEffects` (beside `CombatEffects`): a boss arriving kicks the camera
   (`CameraShake.Kick` 0.45), its defeat kicks 0.7 and `MusicDirector.Silence(3 s)` fades the soundtrack out over a
-  second and holds it (the `boss_defeated` fanfare is the stinger) before the fitting track fades back in.
+  second and holds it while `MusicDirector.Sting("victory")` plays the victory sting on the music bus (the
+  `boss_defeated` sound is a boom under it, no longer a tune) before the fitting track fades back in.
   `NpcSystem.Impacted` shakes by distance to the camera (none past 40 m), plays `boss_slam` and throws a dust ring in
   the colour of the block under the point (8 pooled emitters); `NpcSystem.Cued` ids are sound ids played at the
   creature. Boss sounds live in `tools/audio/sfx_recipes_bosses.py`. Probes: `camera.trauma`, `music.silent`. The boss
   bar and messages are the HUD's (`NpcSystem.Messaged`).
+* **Boss intros (X-02)** — a boss block's optional `intro` (`subtitle`, `color`, `framing` m, `letterbox` s; validated,
+  one per defeat-flag group, on the 18 progression bosses) drives `game/UI/BossIntro` on the Core
+  `BossIntroModel` timeline (real seconds): on `BossSpawned` a title card (head icon, name settling from 1.12×, a rule
+  and diamond in the boss colour, the subtitle) fades in for 0.35 s, holds 2.4 s and fades 0.8 s; thin cinema bars (6.5%
+  of the screen height, under the HUD on layer 9) ease in for the letterbox seconds; `CameraRig.Framing` pulls the
+  third-person camera back (and widens the view 1.6° per metre) and is fully back within 1.5 s — the view is never
+  turned. On `BossDefeated` the name over a gold "Defeated" and a 0.4 s `Engine.TimeScale` dip (0.35, easing back; never
+  over a scale the `timescale` command set). The existing spawn/defeat punches and kicks are not doubled. A new press
+  of `use_primary` or the player being hurt skips the card (after 0.5 s shown; everything fades in 0.3 s). The card
+  waits while the world is paused or photo mode is on (which hides the layer); the HUD's optional awoken banner is left
+  out while a card shows; the "Boss intros" setting turns it off. Every major boss has its own theme
+  (`tools/audio/music_tracks.py`; composer variations `octave`, `stabs`, `drums="blast"`) and `MusicDirector.Aliases`
+  chains a state without a track to its family track (`boss_worm` → `boss_evil` → `boss_1`). Probes:
+  `boss.intro_active`, `boss.intro_defeated`, `boss.intro_cards`, `boss.intro_skips`, `boss.intro_bars`,
+  `camera.framing`, `time.scale`, `music.track.<id>`, `music.stings`. `MusicDirector.Stung` reports stings (captions).
 * **Boss loot** — boss tables live in `data/loot/bosses.json` under the boss's id (`loot` on the enemy). The main
   table always rolls coins, the potions and the 1/10 `<boss>_trophy` (`data/tileobjects/trophies.json`, wall
   hangings drawn flat on the wall face); Classic and Journey roll `<boss>_drops` loose (`expert` `is: false`), Expert

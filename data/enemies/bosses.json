@@ -10,7 +10,7 @@
       "brain": { "type": "kingSlime", "jumpHeight": 8, "jumpSpeed": 5.5, "hopInterval": 55, "teleportDistance": 26, "minion": "green_slime", "minionEveryLife": 0.06, "lostSightTicks": 300, "expertMinion": "spiked_slime", "expertTeleportTicks": 35 },
       "life": 2000, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [7, 6], "moveSpeed": 4, "tint": "#ffffff",
       "loot": "king_slime", "value": 5000, "light": [2, 4, 8],
-      "boss": { "title": "King Slime", "flag": "defeated_king_slime", "arenaRadius": 120, "music": "boss_gel" },
+      "boss": { "title": "King Slime", "flag": "defeated_king_slime", "arenaRadius": 120, "music": "boss_gel", "intro": { "subtitle": "Sovereign of the Gel", "color": "#4f8cff", "framing": 2.0, "letterbox": 1.6 } },
       "covers": ["terraria:king_slime"]
     },
     {
@@ -20,7 +20,7 @@
         "phase2Defense": 0, "phase2Damage": 1.53, "phase2ExtraDashes": 0, "transformTicks": 60, "expertMaxDashes": 5, "expertTelegraphScale": 0.6 },
       "life": 2800, "damage": 15, "defense": 12, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
       "loot": "eye_of_cthulhu", "value": 8000,
-      "boss": { "title": "The Eye of Cthulhu", "flag": "defeated_eye_of_cthulhu", "arenaRadius": 150, "despawnAtDay": true, "music": "boss_eye" },
+      "boss": { "title": "The Eye of Cthulhu", "flag": "defeated_eye_of_cthulhu", "arenaRadius": 150, "despawnAtDay": true, "music": "boss_eye", "intro": { "subtitle": "The Watcher in the Dark", "color": "#e04848", "framing": 2.5, "letterbox": 1.8 } },
       "covers": ["terraria:eye_of_cthulhu"]
     },
     {
@@ -35,7 +35,7 @@
       "brain": { "type": "worm", "speed": 9, "turnRate": 2.5, "digRadius": 1.8, "digInterval": 6, "airGravity": 14, "spitProjectile": "eater_spit", "spitInterval": 180, "spitDamage": 18, "spitSpeed": 8, "spitExpertOnly": true },
       "life": 7485, "damage": 22, "defense": 0, "knockbackResist": 1.0, "size": [3, 3], "moveSpeed": 9, "gravity": false, "collideTerrain": false,
       "loot": "eater_of_worlds", "value": 6000,
-      "boss": { "title": "Eater of Worlds", "flag": "defeated_eater_of_worlds", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 140, "music": "boss_worm", "segments": 49, "segmentSpacing": 1.1, "segmentRadius": 0.7, "segmentModel": "eater_of_worlds_body", "tailModel": "eater_of_worlds_tail",
+      "boss": { "title": "Eater of Worlds", "flag": "defeated_eater_of_worlds", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 140, "music": "boss_worm", "intro": { "subtitle": "Devourer of the Corruption", "color": "#a77fe0", "framing": 2.5, "letterbox": 1.8 }, "segments": 49, "segmentSpacing": 1.1, "segmentRadius": 0.7, "segmentModel": "eater_of_worlds_body", "tailModel": "eater_of_worlds_tail",
         "segmentLife": [65, 150, 220], "segmentDefense": [0, 4, 8], "segmentDamage": [22, 13, 11], "splits": true, "segmentLoot": "eater_segment", "lootOnDefeat": true },
       "covers": ["terraria:eater_of_worlds"]
     }

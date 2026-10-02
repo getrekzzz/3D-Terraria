@@ -55,7 +55,7 @@
       ] },
       "life": 3400, "damage": 30, "defense": 8, "knockbackResist": 1.0, "size": [2, 1.7], "scale": 3, "moveSpeed": 9, "gravity": false, "collideTerrain": false,
       "loot": "queen_bee", "value": 10000,
-      "boss": { "title": "Queen Bee", "flag": "defeated_queen_bee", "arenaRadius": 150, "music": "boss_bee",
+      "boss": { "title": "Queen Bee", "flag": "defeated_queen_bee", "arenaRadius": 150, "music": "boss_bee", "intro": { "subtitle": "Matriarch of the Hive", "color": "#f5bd3c", "framing": 2.0, "letterbox": 1.6 },
         "enrage": { "when": [{ "type": "biome", "none": ["jungle", "underground_jungle", "hive"] }], "damage": 2, "speed": 1.5, "message": "Queen Bee is enraged!" } },
       "covers": ["terraria:queen_bee"]
     }

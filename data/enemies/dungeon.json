@@ -31,7 +31,7 @@
       "brain": { "type": "skeletron", "hoverHeight": 6, "spinInterval": 800, "spinDuration": 400, "spinSpeed": 5.5, "spinDefense": -10, "expertDefensePerHand": 25, "skull": "skeletron_skull", "skullDamage": 17, "skullSpeed": 8, "skullInterval": 80 },
       "life": 4400, "damage": 32, "defense": 10, "knockbackResist": 1.0, "size": [3.2, 3.2], "moveSpeed": 7, "gravity": false, "collideTerrain": false,
       "loot": "skeletron", "value": 10000, "light": [5, 4, 3],
-      "boss": { "title": "Skeletron", "flag": "defeated_skeletron", "arenaRadius": 150, "music": "boss_crypt",
+      "boss": { "title": "Skeletron", "flag": "defeated_skeletron", "arenaRadius": 150, "music": "boss_crypt", "intro": { "subtitle": "Curse of the Old Man", "color": "#e0d6bc", "framing": 2.5, "letterbox": 2.0 },
         "parts": [{ "enemy": "skeletron_hand", "offset": [-2.8, -1.4, 0.6], "mirror": true }, { "enemy": "skeletron_hand", "offset": [2.8, -1.4, 0.6] }], "armModel": "skeletron_arm",
         "enrage": { "when": [{ "type": "time", "is": "day" }], "setDamage": 1000, "setDefense": 9999, "speed": 2.5 } },
       "covers": ["terraria:skeletron"]

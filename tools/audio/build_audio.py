@@ -15,12 +15,13 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 import ambience  # noqa: E402
 import composer  # noqa: E402
 import sfx_recipes  # noqa: E402
-from music_tracks import TRACKS  # noqa: E402
+from music_tracks import STINGS, TRACKS  # noqa: E402
 from synth import SR  # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parents[2]
 SFX_DIR = REPO / "assets" / "audio" / "sfx"
 MUSIC_DIR = REPO / "assets" / "audio" / "music"
+STING_DIR = MUSIC_DIR / "stings"
 AMBIENCE_DIR = REPO / "assets" / "audio" / "ambience"
 
 
@@ -45,7 +46,11 @@ def check():
         print(f"ERROR: game plays ambience loop '{n}' but tools/audio/ambience.py has no recipe for it")
         missing.append(n)
     tracks = sorted(TRACKS)
-    print(f"{len(names)} sounds referenced, {len(sfx_recipes.RECIPES)} recipes, {len(tracks)} music tracks")
+    stings = set(re.findall(r'\.Sting\("([a-z0-9_]+)"', "".join(p.read_text(encoding="utf-8") for p in (REPO / "game").rglob("*.cs"))))
+    for n in sorted(stings - set(STINGS)):
+        print(f"ERROR: game plays music sting '{n}' but tools/audio/music_tracks.py has no STINGS entry for it")
+        missing.append(n)
+    print(f"{len(names)} sounds referenced, {len(sfx_recipes.RECIPES)} recipes, {len(tracks)} music tracks, {len(STINGS)} stings")
     return 1 if missing else 0
 
 
@@ -78,6 +83,13 @@ def main(argv):
             x = composer.build(spec, seed=hash_id(name))
             sf.write(MUSIC_DIR / f"{name}.ogg", x, SR, format="OGG", subtype="VORBIS")
             print(f"music {name}: {len(x) / SR:.1f}s")
+        STING_DIR.mkdir(parents=True, exist_ok=True)
+        for name, spec in STINGS.items():
+            if not want(name):
+                continue
+            x = composer.build_sting(spec, seed=hash_id(name))
+            sf.write(STING_DIR / f"{name}.ogg", x, SR, format="OGG", subtype="VORBIS")
+            print(f"sting {name}: {len(x) / SR:.1f}s")
     if do_ambience:
         AMBIENCE_DIR.mkdir(parents=True, exist_ok=True)
         for name in sorted(ambience.LOOPS):

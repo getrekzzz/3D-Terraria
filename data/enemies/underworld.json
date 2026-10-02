@@ -37,7 +37,7 @@
       "despawnWhen": [{ "type": "not", "of": [{ "type": "layer", "any": ["underworld"] }] }],
       "life": 8000, "damage": 50, "defense": 12, "knockbackResist": 1.0, "size": [10, 10], "moveSpeed": 2, "gravity": false, "collideTerrain": false,
       "loot": "wall_of_flesh", "value": 0, "light": [8, 3, 3],
-      "boss": { "title": "The Wall of Flesh", "flag": "defeated_wall_of_flesh", "arenaRadius": 250, "music": "boss_maw",
+      "boss": { "title": "The Wall of Flesh", "flag": "defeated_wall_of_flesh", "arenaRadius": 250, "music": "boss_maw", "intro": { "subtitle": "Master of the Underworld", "color": "#d4523f", "framing": 3.0, "letterbox": 2.2 },
         "segments": 2, "segmentRadius": 1.4, "segmentModels": ["wall_of_flesh_eye", "wall_of_flesh_eye"], "barrierModel": "wall_of_flesh_flesh", "barrierTile": 4 },
       "covers": ["terraria:wall_of_flesh"]
     },

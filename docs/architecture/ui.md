@@ -104,6 +104,7 @@ lines for other controls (the defence shield, buff icons).
 | Layer | Node | Contents |
 |---|---|---|
 | 9 | `WorldClicks` | `WorldClickCatcher`: clicks that land on empty screen |
+| 9 | `BossIntro` | a boss's title card and thin cinema bars (X-02); takes no clicks, the HUD draws over it |
 | 10 | `Hud` | item name, hotbar, buff bar, life text, hearts, mana stars, breath bubbles, crosshair with the hover name and hints, status line, info panel, chat log, pickup popups (over the player, not a region), boss bar, invasion bar, NPC chat placement, death screen |
 | 10 | `Minimap` | the framed minimap and its zoom buttons (above the click catcher) |
 | 20 | `Inventory` | backpack grid, coin/ammo/trash/sort, panel host (chest, shop, reforge), crafting column, equipment column, Settings button |

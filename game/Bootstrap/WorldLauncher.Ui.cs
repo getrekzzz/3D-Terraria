@@ -7,7 +7,7 @@ namespace Strata.Game.Bootstrap;
 public static partial class WorldLauncher
 {
     /// <summary>
-    /// HUD, inventory, world map and minimap, town dialog, the performance overlay, photo mode, and above every screen
+    /// HUD, inventory, world map and minimap, town dialog, the performance overlay, photo mode, boss title cards, and above every screen
     /// the held stack at the pointer and the item tooltip that follows it. Under the inventory and the town dialog, the
     /// empty screen catches the clicks their panels do not take (throw, use, camera drag).
     /// </summary>
@@ -43,6 +43,9 @@ public static partial class WorldLauncher
         var photo = new UI.PhotoMode.PhotoModeController();
         runtime.AddChild(photo);
         photo.Initialize(runtime, player);
+        var bossIntro = new UI.BossIntro(); // under the HUD; photo mode hides it with the other world layers
+        runtime.AddChild(bossIntro);
+        bossIntro.Initialize(ui, photo);
         hud.Connect(inventory, townDialog, minimap, perf); // the minimap and F3 overlay take their regions of the HUD layout
         var cursorItem = new UI.CursorItemLayer();
         cursorItem.Initialize(ui);

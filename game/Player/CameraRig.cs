@@ -10,12 +10,16 @@ namespace Strata.Game.Player;
 /// crosshair ray runs from <see cref="ViewOrigin"/> along <see cref="Forward"/>. The camera is kept out of terrain every
 /// rendered frame with a sphere cast from the head to the shoulder and on to the camera, so turning quickly can never
 /// swing it through the ground (a physics-tick spring arm lags the view by up to a tick). Collisions pull it in at
-/// once; it eases back out.
+/// once; it eases back out. <see cref="Framing"/> pulls it back and widens the view a little while a boss arrives
+/// (UI.BossIntro); it never turns the view, so the player keeps control.
 /// </summary>
 public sealed partial class CameraRig : Node3D
 {
     private const float EyeHeight = 1.6f;
     private const float ProbeRadius = 0.22f;
+
+    /// <summary>Degrees of extra field of view per metre of <see cref="Framing"/>.</summary>
+    private const float FramingFov = 1.6f;
     private static readonly Vector3 Shoulder = new(0.55f, 0.1f, 0);
 
     private CharacterBody3D _body = null!;
@@ -26,6 +30,7 @@ public sealed partial class CameraRig : Node3D
     private float _distance = 4.2f;
     private float _current = 4.2f;
     private bool _firstPerson;
+    private float _fov = 72f;
 
     public Camera3D Camera { get; private set; } = null!;
 
@@ -48,6 +53,9 @@ public sealed partial class CameraRig : Node3D
     public float Orbit { get; set; }
 
     public float Pitch => _pitch;
+
+    /// <summary>Extra metres the third-person camera pulls back (and a slightly wider view in either mode): a boss's arena framing.</summary>
+    public float Framing { get; set; }
 
     /// <summary>The view's yaw (radians, Godot convention: 0 looks along −Z, + turns left): where the body faces.</summary>
     public float Yaw => Mathf.Wrap(_yaw, -Mathf.Pi, Mathf.Pi);
@@ -77,7 +85,8 @@ public sealed partial class CameraRig : Node3D
 
     private void ApplySettings(UserSettings s)
     {
-        Camera.Fov = Mathf.Clamp(s.FieldOfView, 50f, 110f);
+        _fov = Mathf.Clamp(s.FieldOfView, 50f, 110f);
+        Camera.Fov = _fov;
         _distance = Mathf.Clamp(s.CameraDistance, 1.5f, 9f);
     }
 
@@ -120,6 +129,8 @@ public sealed partial class CameraRig : Node3D
         Camera.VOffset = shake.Y;
         Camera.Rotation = new Vector3(0, 0, CameraShake.Roll);
         _pivot.Rotation = new Vector3(0, _firstPerson ? 0f : Orbit, 0);
+        float fov = Mathf.Min(_fov + Framing * FramingFov, 120f);
+        if (Camera.Fov != fov) Camera.Fov = fov;
         if (_firstPerson)
         {
             _pivot.Position = Vector3.Zero;
@@ -134,7 +145,8 @@ public sealed partial class CameraRig : Node3D
         _pivot.Position = Shoulder * shoulderT;
         var pivotWorld = head + (shoulderWorld - head) * shoulderT;
         var back = GlobalTransform.Basis.Z.Normalized();
-        float free = _distance * SafeFraction(pivotWorld, pivotWorld + back * _distance);
+        float reach = _distance + Framing;
+        float free = reach * SafeFraction(pivotWorld, pivotWorld + back * reach);
         // Snap in immediately (never inside terrain), ease back out so the view does not pump.
         _current = free < _current ? free : Mathf.MoveToward(_current, free, (float)delta * 6f);
         Camera.Position = new Vector3(0, 0, _current);
