@@ -21,6 +21,7 @@ public static class AchievementSpecs
     public const string Coins = "coins";
     public const string ReachLayer = "reachLayer";
     public const string Counter = "counter";
+    public const string Rescued = "rescued";
 
     public static void Register(SpecCatalog c)
     {
@@ -38,6 +39,7 @@ public static class AchievementSpecs
         c.Register<CountTrigger>(SpecKind.AchievementTrigger, Coins);
         c.Register<LayerTrigger>(SpecKind.AchievementTrigger, ReachLayer);
         c.Register<CounterTrigger>(SpecKind.AchievementTrigger, Counter);
+        c.Register<RescuedTrigger>(SpecKind.AchievementTrigger, Rescued);
     }
 }
 
@@ -110,4 +112,11 @@ public sealed class CounterTrigger : SpecParams, IValidatableSpec
     public long Min { get; init; } = 1;
 
     public string? Validate() => Key.Length == 0 ? "key is required" : Min < 1 ? "min must be >= 1" : null;
+}
+
+/// <summary>The player freed bound townsfolk: any (<see cref="Min"/> of them) or one <see cref="Resident"/>.</summary>
+public sealed class RescuedTrigger : SpecParams
+{
+    public string? Resident { get; init; }
+    public long Min { get; init; } = 1;
 }

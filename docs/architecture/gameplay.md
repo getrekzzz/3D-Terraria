@@ -658,3 +658,10 @@ in. Probe `ui.bestiary_unlock`. Not yet: the rotating 3D preview (thumbnails sta
   (4 m) nearer than the nearest player, re-chosen every 15 ticks; bosses, parts, critters, passive, harmless,
   invulnerable and disguised creatures stay on players, and bound NPCs are never targets. Despawn, enrage and contact
   damage still follow the nearest player; residents take contact hits through `TownSystem`.
+
+## Journal feeds town conditions (P5-25/P5-03)
+
+`JournalSystem` sets `TownSystem.PlayerRecords` to the player's journal (`PlayerJournal` also implements
+`Conditions.IPlayerRecords`), so the town's `bestiary`, `killed`, `obtained` and `achieved` conditions (the
+Zoologist's 10% bestiary arrival) read it. `Town.Rescued` counts `rescued` and `rescued:<resident>` in the rescuer's
+journal; achievement/guide trigger `rescued{resident?|min}` reads them.

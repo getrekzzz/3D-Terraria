@@ -19,7 +19,7 @@ public sealed class JournalSystem
 {
     /// <summary>Counter names (<see cref="PlayerJournal.Counters"/>).</summary>
     public const string Mined = "mined", Broken = "broken", TreesChopped = "trees_chopped", Purchases = "purchases",
-        Reforges = "reforges", Deaths = "deaths", Catches = "catches";
+        Reforges = "reforges", Deaths = "deaths", Catches = "catches", Rescued = "rescued";
 
     public const int SeenInterval = 30;
 
@@ -45,6 +45,12 @@ public sealed class JournalSystem
         };
         world.Services.Reforged += (p, _) => p.State.Journal.Count(Reforges);
         world.PlayerDied += p => p.State.Journal.Count(Deaths);
+        world.Town.Rescued += (npc, p) =>
+        {
+            p.State.Journal.Count(Rescued + ":" + npc.Def.Id);
+            p.State.Journal.Count(Rescued);
+        };
+        world.Town.PlayerRecords = p => { p.State.Journal.Bestiary ??= Bestiary; return p.State.Journal; }; // the town's bestiary/kill/item/achievement conditions (P5-03)
         world.Editor.BlockBroken += (cell, block) => CountNear(cell, block, Mined, false);
         world.Editor.ObjectBroken += obj => CountNear(obj.Anchor, obj.Def, Broken, obj.Def.Collision == TileCollision.Trunk && obj.Def.BreakTool == BreakTool.Axe);
     }

@@ -65,6 +65,9 @@ public static partial class ContentValidator
                 if (brk.Tag != null && !(blocks ? ctx.Db.Blocks.All.Any(b => b.HasTag(brk.Tag)) : ctx.Db.TileObjects.All.Any(t => t.HasTag(brk.Tag))))
                     ctx.Error(owner, $"{field}.tag '{brk.Tag}' is on no {(blocks ? "block" : "tile object")}.");
                 break;
+            case AchievementSpecs.Rescued:
+                ctx.Ref(owner, ctx.Db.TownNpcs, spec.Parse<RescuedTrigger>().Resident, $"{field}.resident");
+                break;
             case AchievementSpecs.TalkTo:
                 ctx.Ref(owner, ctx.Db.TownNpcs, spec.Parse<TalkTrigger>().Resident, $"{field}.resident");
                 break;

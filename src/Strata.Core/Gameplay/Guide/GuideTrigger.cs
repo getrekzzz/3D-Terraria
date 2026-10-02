@@ -41,6 +41,8 @@ public sealed class GuideTrigger
         AchievementSpecs.TalkTo => Make<TalkTrigger>(spec, JournalKind.Met, _ => 1, null),
         AchievementSpecs.ReachLayer => Make<LayerTrigger>(spec, null, _ => 1, null),
         AchievementSpecs.Counter => Make<CounterTrigger>(spec, JournalKind.Counter, p => p.Min, p => p.Key),
+        AchievementSpecs.Rescued => Make<RescuedTrigger>(spec, JournalKind.Counter, p => p.Resident != null ? 1 : p.Min,
+            p => p.Resident != null ? JournalSystem.Rescued + ":" + p.Resident : JournalSystem.Rescued),
         _ => throw new InvalidOperationException($"Unknown achievement trigger '{spec.Type}'."),
     };
 

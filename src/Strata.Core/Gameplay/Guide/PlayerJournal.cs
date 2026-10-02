@@ -34,7 +34,7 @@ public interface IPlayerRecords
 /// loses a record. Recording an existing key allocates nothing; <see cref="Changed"/> fires only on news (and on every
 /// kill and counter step).
 /// </summary>
-public sealed class PlayerJournal : IPlayerRecords
+public sealed class PlayerJournal : IPlayerRecords, Conditions.IPlayerRecords
 {
     private float _percent = -1f;
 
@@ -107,6 +107,7 @@ public sealed class PlayerJournal : IPlayerRecords
     public bool HasMet(string resident) => Met.Contains(resident);
     public long Counter(string key) => Counters.TryGetValue(key, out long n) ? n : 0;
     public bool Achieved(string achievement) => Achievements.ContainsKey(achievement);
+    bool Conditions.IPlayerRecords.Obtained(string item) => Obtained.Contains(item);
 
     public float BestiaryPercent
     {
