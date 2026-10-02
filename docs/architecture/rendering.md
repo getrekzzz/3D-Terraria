@@ -55,6 +55,11 @@ light is interpolated from the mesh. The output is shuffled so any prefix is an 
 near chunks draw the detailed clump (9 curved blades), far ones a 5-blade clump and a shrinking prefix; the shader
 widens far blades so the cover stays even, sinks them into the ground at the distance limit, bends them with gusts
 travelling downwind and parts them around the player (`strata_trample`). Grass casts no shadows.
+`GrassScatter.Hashes` gives every mesh result a grass shape hash and light hash: a remesh with both unchanged does
+nothing, otherwise the chunk is marked for a rebuild that reuses its multimesh RIDs (reallocated only when the count
+changes) and one pooled scratch buffer, while the old grass stays visible. Builds run nearest first, at most
+`grassBuildsPerFrame` (preset) a frame within `Budgets.GrassMs`; chunks are created within the grass distance and
+released 8 m beyond it. Probes `grass.live`, `grass.builds`, `grass.pending`.
 
 ## Tile objects
 `TileObjectRenderer` draws one MultiMesh per chunk and model variant and updates it in place: one float buffer per

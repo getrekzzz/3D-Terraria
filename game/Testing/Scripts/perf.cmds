@@ -30,6 +30,11 @@ assert perf.avg.gd.stream_and_jobs < 14
 probe perf.gc2
 probe perf.calls.stream.unload_flush
 probe perf.max.stream.unload_flush
+# Grass is built nearest first, at most grassBuildsPerFrame chunks a frame (4 on ultra), even after a teleport.
+probe grass.live
+probe grass.builds
+probe perf.max.gd.grass
+assert perf.max_calls.gd.grass.create <= 4
 
 # A full synchronous save (Save & Quit), then the autosave path: captured on the main thread, written in the background.
 save

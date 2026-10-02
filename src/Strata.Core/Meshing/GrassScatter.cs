@@ -94,6 +94,28 @@ public static class GrassScatter
         Shuffle(output, Hash.Cell(Salt, worldOrigin.X, worldOrigin.Y, worldOrigin.Z));
     }
 
+    /// <summary>
+    /// Hashes of scattered grass: <c>Shape</c> covers what the clumps look like and where they stand (count,
+    /// positions, normals, facing, height, kinds, flowers), <c>Light</c> only their root light. A remesh with the
+    /// same shape but different light can rewrite the instance buffer in place; the same both needs no work.
+    /// </summary>
+    public static (ulong Shape, ulong Light) Hashes(List<GrassClump> clumps)
+    {
+        ulong shape = Hash.Combine(Salt, clumps.Count), light = Hash.Combine(Salt ^ 1, clumps.Count);
+        foreach (var c in clumps)
+        {
+            shape = Hash.Combine(shape, Bits(c.Position.X) | (ulong)Bits(c.Position.Y) << 32);
+            shape = Hash.Combine(shape, Bits(c.Position.Z) | (ulong)Bits(c.Normal.X) << 32);
+            shape = Hash.Combine(shape, Bits(c.Normal.Y) | (ulong)Bits(c.Normal.Z) << 32);
+            shape = Hash.Combine(shape, Bits(c.Yaw) | (ulong)Bits(c.Height) << 32);
+            shape = Hash.Combine(shape, c.Kind | (ulong)c.Flower << 8 | (ulong)c.Shade << 16);
+            light = Hash.Combine(light, c.Light);
+        }
+        return (shape, light);
+    }
+
+    private static uint Bits(float f) => BitConverter.SingleToUInt32Bits(f);
+
     /// <summary>Material weights at a point: the vertex colours carry per-corner material barycentrics.</summary>
     private static Vector3 Weights(MeshSurface surface, int i0, int i1, int i2, float u, float v, float w)
     {
