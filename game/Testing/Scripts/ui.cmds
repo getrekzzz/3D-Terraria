@@ -44,3 +44,27 @@ wait_until buff.regeneration == 1 5
 wait 0.2
 assert hud.buff_icons >= 1
 assert errors == 0
+
+# --- P2-20 ---
+# A hurt enemy shows a mini health bar (no 'life/max' text); it goes when the enemy does.
+god on
+spawning off
+killall
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+wait 1.0
+wield copper_shortsword
+aim 0 -0.2 1
+spawn green_slime 1 1.5
+wait 0.5
+ai off
+use
+wait 0.3
+assert npcs.alive_life < 14
+assert fx.health_bars >= 1
+killall
+wait 0.2
+assert fx.health_bars == 0
+ai on
+god off
+assert errors == 0
