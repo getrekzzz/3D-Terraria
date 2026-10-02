@@ -57,6 +57,80 @@ public class ChunkCodecTests
     }
 
     [Fact]
+    public void ChestNameRoundTrips()
+    {
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        var named = new TileObjectInstance(db.TileObjects.Get("wooden_chest"), new Int3(3, 4, 5), 0, 0) { LootRolled = true, CustomName = "Ore stash" };
+        named.Container![2] = new ItemStack(db.Items.Get("torch"), 9);
+        var plain = new TileObjectInstance(db.TileObjects.Get("wooden_chest"), new Int3(10, 4, 5), 0, 0);
+        var decoded = ChunkCodec.Decode(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, new[] { named, plain }, db, ids), db, ids);
+        Assert.Equal(2, decoded.TileObjects.Count);
+        var a = decoded.TileObjects[0];
+        Assert.Equal("Ore stash", a.CustomName);
+        Assert.True(a.LootRolled);
+        Assert.False(a.Active);
+        Assert.Equal(9, a.Container![2].Count);
+        Assert.Null(decoded.TileObjects[1].CustomName); // the second record still lines up after the first one's meta
+        Assert.Equal(new Int3(10, 4, 5), decoded.TileObjects[1].Anchor);
+    }
+
+    [Fact]
+    public void ChunkWithoutNameStillReads()
+    {
+        // A chunk written before chest names: the object record ends with PendingLoot and the slots, state bits 1 and 2 only.
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        var raw = Inflate(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, Array.Empty<TileObjectInstance>(), db, ids));
+        using var ms = new MemoryStream();
+        ms.Write(raw, 0, raw.Length - 1); // drop the end tag, append an old-style object section
+        using (var w = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true))
+        {
+            w.WriteSection(5, s =>
+            {
+                s.WriteVar(1);
+                s.WriteVar(ids.TileObjects.Intern("wooden_chest"));
+                s.WriteZig(3);
+                s.WriteZig(-4);
+                s.WriteZig(5);
+                s.Write((byte)0);
+                s.Write((byte)0);
+                s.WriteVar(3);
+                s.Write((byte)3);
+                s.Write("cabin_chest");
+                s.WriteVar(40);
+                s.WriteVar(ids.Items.Intern("torch") + 1);
+                s.WriteVar(17);
+                s.WriteVar(0);
+                for (int i = 1; i < 40; i++) s.WriteVar(0);
+            });
+            w.Write((byte)0);
+        }
+        var obj = Assert.Single(ChunkCodec.Decode(Deflate(ms.ToArray()), db, ids).TileObjects);
+        Assert.Null(obj.CustomName);
+        Assert.True(obj.Active);
+        Assert.True(obj.LootRolled);
+        Assert.Equal("cabin_chest", obj.PendingLoot);
+        Assert.Equal(new Int3(3, -4, 5), obj.Anchor);
+        Assert.Equal(17, obj.Container![0].Count);
+    }
+
+    private static byte[] Inflate(byte[] blob)
+    {
+        using var z = new System.IO.Compression.ZLibStream(new MemoryStream(blob), System.IO.Compression.CompressionMode.Decompress);
+        using var o = new MemoryStream();
+        z.CopyTo(o);
+        return o.ToArray();
+    }
+
+    private static byte[] Deflate(byte[] raw)
+    {
+        using var o = new MemoryStream();
+        using (var z = new System.IO.Compression.ZLibStream(o, System.IO.Compression.CompressionLevel.Fastest, leaveOpen: true)) z.Write(raw);
+        return o.ToArray();
+    }
+
+    [Fact]
     public void UniformChunksAreTiny()
     {
         var db = TestPaths.Content;

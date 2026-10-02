@@ -9,7 +9,14 @@ public sealed partial class GameWorld
     private void CheckMilestones(PlayerEntity p)
     {
         if (Session.Content.Flags.Contains(NewWorldFlag) && !Progression.IsSet(NewWorldFlag)) Progression.Set(NewWorldFlag);
-        foreach (var stack in p.State.Inventory.Backpack.Stacks)
-            if (stack.Item!.Milestone is { } flag && !Progression.IsSet(flag)) Progression.Set(flag);
+        var inv = p.State.Inventory;
+        Check(inv.Backpack);
+        Check(inv.Ammo);
+
+        void Check(Gameplay.Items.Inventory storage)
+        {
+            for (int i = 0; i < storage.Size; i++)
+                if (storage[i].Item?.Milestone is { } flag && !Progression.IsSet(flag)) Progression.Set(flag);
+        }
     }
 }

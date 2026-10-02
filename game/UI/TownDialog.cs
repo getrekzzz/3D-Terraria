@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Godot;
+using Strata.Core.Content.Index;
 using Strata.Core.Content.Specs;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Town;
@@ -88,7 +89,7 @@ public sealed partial class TownDialog : CanvasLayer
     public override void _Process(double delta)
     {
         if (!IsOpen || _npc == null) return;
-        _coins.Text = $"Coins: {Coins.Format(Coins.Total(_ui.Inventory.Backpack))}";
+        _coins.Text = $"Coins: {Coins.Format(Coins.Total(_ui.Inventory))}";
         var far = System.Numerics.Vector3.Distance(_npc.Center, _ui.Entity.Center) > _ui.Game.Town.Config.TalkRange + 1f;
         if (far || !_npc.Alive || !_ui.Entity.Alive || !_ui.Game.Town.Residents.Contains(_npc)) Close();
     }
@@ -183,7 +184,7 @@ public sealed partial class TownDialog : CanvasLayer
         _text.Text = recipes.Count == 0
             ? $"I know of nothing made from {held.Item!.DisplayName}."
             : $"{held.Item!.DisplayName} goes into: " + string.Join(", ", recipes.Select(r =>
-                $"{_ui.Game.Session.Content.Items.Get(r.Output).DisplayName}{(r.Stations.Length > 0 ? $" (at {string.Join(" or ", r.Stations)})" : "")}").Distinct());
+                $"{_ui.Game.Session.Content.Items.Get(r.Output).DisplayName}{(r.Stations.Length > 0 ? $" (at {StationNames.Describe(r.Stations, _ui.Game.Session.Content)})" : "")}").Distinct());
     }
 
     private void Summon()

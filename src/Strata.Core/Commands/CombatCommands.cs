@@ -103,7 +103,7 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
-            Name = "equip", Usage = "equip <item>", Help = "Gives an item and equips it (armor or accessory).",
+            Name = "equip", Usage = "equip <item>", Help = "Gives an item and equips it (armor, accessory, vanity, dye, pet, mount or hook).",
             Run = (ctx, a) =>
             {
                 var content = ctx.World.Session.Content;
@@ -115,7 +115,6 @@ public static class CombatCommands
                 for (int i = 0; i < inv.Backpack.Size; i++)
                     if (inv.Backpack[i].Item == item) slot = i;
                 if (slot < 0 || !inv.Equip(slot)) throw new CommandException($"'{id}' cannot be equipped");
-                ctx.Player.State.Recompute();
                 return CommandResult.Success($"Equipped {item.DisplayName}.");
             },
         });

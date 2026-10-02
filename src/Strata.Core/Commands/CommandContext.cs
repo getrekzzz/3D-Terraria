@@ -45,6 +45,10 @@ public sealed class CommandContext
         Host = host;
         StandardProbes.Register(this);
         ProbeSources.RegisterAll(this, typeof(CommandContext).Assembly); // [ProbeSource] classes in Strata.Core
+        world.Interaction.ContainerOpened += (p, obj) =>
+        {
+            if (p == world.LocalPlayer) OpenContainer = obj;
+        };
     }
 
     public GameWorld World { get; }
@@ -56,6 +60,9 @@ public sealed class CommandContext
 
     /// <summary>Use animations the player had started when <c>mark</c> ran (probe <c>player.swings</c> counts from it).</summary>
     public int MarkSwings { get; set; }
+
+    /// <summary>The chest the player opened last (<c>interact</c>); <c>invclick container</c> and <c>chest</c> act on it.</summary>
+    public Voxels.TileObjects.TileObjectInstance? OpenContainer { get; set; }
 
     public PlayerEntity Player => World.LocalPlayer ?? throw new CommandException("no player in this world");
 

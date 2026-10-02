@@ -130,6 +130,9 @@ public sealed class GraphicsPreset
 
     public float GrassDistance { get; set; } = 30f;
 
+    /// <summary>Floating combat numbers on screen at once (8–256); past it the oldest number is reused.</summary>
+    public int CombatNumbers { get; set; } = 48;
+
     /// <summary>Mesh LOD switch threshold in pixels (lower keeps detail further away).</summary>
     public float LodThreshold { get; set; } = 1f;
 
@@ -160,6 +163,7 @@ public sealed class GraphicsPreset
         if (GrassDistance is < 0f or > 200f) yield return "grassDistance must be within 0–200 m";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
+        if (CombatNumbers is < 8 or > 256) yield return "combatNumbers must be within 8–256";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
     }
 

@@ -9,6 +9,6 @@
     { "id": "candle", "name": "Candle", "size": [1, 1, 1], "anchor": "floor", "light": [11, 9, 6], "flame": { "at": [0, 0.2, 0], "size": 0.09, "color": "#ffa040" }, "housing": ["light"], "hitPoints": 1, "itemCategory": "light", "itemValue": 30, "covers": ["terraria:candle"] },
     { "id": "bed", "name": "Bed", "size": [3, 2, 5], "interaction": "sleep", "housing": ["bed", "comfort"], "hitPoints": 3, "itemValue": 400, "covers": ["terraria:bed"] },
     { "id": "tombstone", "name": "Tombstone", "description": "Here lies a fallen adventurer. Several together make a Graveyard.", "tags": ["tombstone", "world"], "size": [1, 2, 1], "anchor": "floor", "collision": "solid", "hitPoints": 3, "breakTool": "pick", "itemCategory": "furniture", "itemValue": 100, "covers": ["terraria:tombstone"] },
-    { "id": "minecart_track", "name": "Minecart Track", "description": "Lay it down and ride a minecart along it.", "size": [1, 1, 1], "anchor": "floor", "track": true, "hitPoints": 1, "itemCategory": "minecart", "itemMaxStack": 9999, "itemValue": 50, "covers": ["terraria:minecart_track"] }
+    { "id": "minecart_track", "name": "Minecart Track", "description": "Lay it down and ride a minecart along it.", "size": [1, 1, 1], "anchor": "floor", "track": true, "hitPoints": 1, "itemCategory": "placeable", "itemMaxStack": 9999, "itemValue": 50, "covers": ["terraria:minecart_track"] }
   ]
 }

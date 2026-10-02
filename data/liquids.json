@@ -32,7 +32,7 @@
     { "id": "crispy_honey", "name": "Crispy Honey Block", "render": "crisp", "textures": { "all": "crispy_honey" }, "hardness": 1.5, "sound": "stone", "color": "#8a4a14", "tags": ["built", "liquid_mix"], "covers": ["terraria:crispy_honey_block"] }
   ],
   "buffs": [
-    { "id": "honey", "name": "Honey", "description": "Honey mends wounds.", "color": "#f0b040", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 2 }], "covers": ["terraria:honey"] },
+    { "id": "honey", "name": "Honey", "description": "Honey mends wounds.", "hideTimer": true, "color": "#f0b040", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 2 }], "covers": ["terraria:honey"] },
     { "id": "gills", "name": "Gills", "description": "Breathe under liquid.", "color": "#60c0d0", "effects": [{ "type": "waterBreathing" }], "covers": ["terraria:gills"] },
     { "id": "obsidian_skin", "name": "Obsidian Skin", "description": "Immune to lava.", "color": "#a04060", "effects": [{ "type": "liquidImmune", "liquid": "lava" }, { "type": "immune", "buff": "on_fire" }], "covers": ["terraria:obsidian_skin"] }
   ],

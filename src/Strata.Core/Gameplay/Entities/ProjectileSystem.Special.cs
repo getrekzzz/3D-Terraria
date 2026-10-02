@@ -15,7 +15,7 @@ namespace Strata.Core.Gameplay.Entities;
 public sealed partial class ProjectileSystem
 {
     /// <summary>Table rolled for a catch (conditions see the bobber's biome, depth and the rod's fishing power).</summary>
-    public const string FishingTable = "fishing";
+    public const string FishingTable = Content.Index.ItemSourceIndex.FishingTable;
 
     private LootRoller? _loot;
 

@@ -72,7 +72,7 @@ caves, structures, edits and hardmode wedges are not in it.
 `GraphicsConfig` (Core, validated with ranges, tested) → `GraphicsSettings` (game) applies them: render scale and
 upscaler (FSR 1/2), anti-aliasing (FXAA/SMAA/TAA/MSAA), anisotropy, shadow atlas, distance and filter, sun size
 (PCSS), torch shadows, SSAO/SSIL/SSR quality, volumetric fog grid, sky radiance size, cloud steps, auto exposure,
-grass density and distance, mesh LOD threshold, horizon distance. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
+grass density and distance, mesh LOD threshold, horizon distance, floating combat numbers on screen. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
 remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`. Auto exposure (medium and
 up) only fine-tunes within the narrow window from `lighting.json`; cave adaptation and the biome bias come from the
 CPU model on every preset, so desert and snow read the same on low and ultra. The lighting tour
@@ -219,4 +219,22 @@ dash, a shrink on teleport, a spin when a boss changes form; humanoid enemies sw
 when hit and fall dead (corpses sink after a moment, other creatures shrink away). Models built around their centre
 are raised onto their feet by their bounds (`CreatureVisual.LiftFor`, only for centred, box-sized models). `NpcRenderer.Arms` stretches a boss's `armModel`
 from its shoulders to each free-flying hand with an outward elbow.
+
+`NpcRenderer.HealthBar` draws a mini health bar over every hurt, living non-boss creature (bosses use the HUD's boss
+bar): a camera-facing quad (`shaders/ui_healthbar.gdshader`) with a dark frame of equal thickness on both axes (at
+least one screen pixel) and a fill that slides from green through yellow to red. All bars share one unit `QuadMesh`
+and one `ShaderMaterial`; the node's scale is the bar's size (width follows the creature, 0.6–2 m), `fraction` is an
+instance uniform sent only when the life changes, and beyond 9 m the shader grows the bar with distance so it keeps
+its on-screen size. Bar nodes are pooled with the creature views. Probe `fx.health_bars` counts the bars shown.
+
+`CombatEffects.Numbers` floats Terraria's combat text: orange hits, red-orange crits at 1.25× (with a little sideways
+jitter), pink-red damage to players and residents, and green life and blue mana gains ("+50"). Core holds the colours,
+text and motion (`Presentation/CombatText`: a 0.08 s back-eased pop from 0.3×, a 0.9 m rise whose speed falls to zero
+over 0.9 s, a fade from 0.4 s) and raises the gains through `GameWorld.ReportHeal` / `PlayerHealed` (potions,
+crystals, life steal, the nurse; natural regeneration stays silent). Labels are `FixedSize` billboards (pixel size
+0.0011 at font size 56, about 38 px tall on a 900 px view at any distance), drawn over walls, sampled every frame
+instead of tweened, and pooled up to the preset's `combatNumbers` (24 / 48 / 80 / 80); past it the oldest number is
+reused. The digits are rasterised at start. In first person the local player's own hurt and heal numbers float
+1.2 m ahead of the eye and 0.3 m up, rising less so they fade before leaving the top of the screen. Probes:
+`fx.numbers`, `fx.heal_numbers`, `fx.number_labels`.
 

@@ -6,11 +6,12 @@ Output: assets/icons/items/<block>.png (128x128). Model-based item icons come fr
 """
 import json
 import pathlib
-import re
 import sys
 
 import numpy as np
 from PIL import Image, ImageDraw
+
+from content_data import load_json
 
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parents[1]
@@ -24,11 +25,6 @@ FACES = {
     "left": ((10, 37), (54, 27), (0, 56), 0.78),
     "right": ((64, 64), (54, -27), (0, 56), 0.6),
 }
-
-
-def load_json(path):
-    text = re.sub(r"^\s*//.*$", "", path.read_text(encoding="utf-8"), flags=re.M)
-    return json.loads(re.sub(r",(\s*[}\]])", r"\1", text))
 
 
 def block_items():

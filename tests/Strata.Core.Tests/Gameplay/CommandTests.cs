@@ -102,4 +102,28 @@ public class CommandTests
             Assert.Equal(expected.GetBlock(ChunkMath.Index(x, y, z)), world.GetBlock(origin.X + x, origin.Y + y, origin.Z + z));
         }
     }
+
+    [Fact]
+    public void InvclickRightClickRoundTrips()
+    {
+        var (g, r, ctx) = Setup();
+        using var _ = g;
+        Assert.True(r.Execute(ctx, "clear").Ok);
+        Assert.True(r.Execute(ctx, "give torch 5").Ok);
+        var took = r.Execute(ctx, "invclick backpack 0 right");
+        Assert.True(took.Ok, took.Output);
+        Assert.StartsWith("Moved", took.Output);
+        Assert.True(r.Execute(ctx, "assert inv.cursor == 1").Ok);
+        Assert.Contains("Torch", r.Execute(ctx, "cursor").Output);
+        Assert.True(r.Execute(ctx, "invclick backpack 0 left").Ok); // merges back
+        Assert.True(r.Execute(ctx, "assert inv.cursor == 0").Ok);
+        Assert.True(r.Execute(ctx, "assert inv.torch == 5").Ok);
+        Assert.True(r.Execute(ctx, "invclick vanity_armor 0 right").Ok);
+        Assert.False(r.Execute(ctx, "invclick pocket 0 left").Ok);
+        Assert.False(r.Execute(ctx, "invclick container 0 left").Ok); // no chest open
+        Assert.False(r.Execute(ctx, "invclick backpack 0 middle").Ok);
+        Assert.True(r.Execute(ctx, "invclick backpack 0 right").Ok);
+        Assert.Equal("Thrown", r.Execute(ctx, "invthrow one").Output);
+        Assert.True(r.Execute(ctx, "assert inv.torch == 4").Ok);
+    }
 }
