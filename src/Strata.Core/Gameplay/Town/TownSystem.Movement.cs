@@ -15,7 +15,8 @@ public sealed partial class TownSystem
         const float dt = 1f / Units.TicksPerSecond;
         if (!r.Alive)
         {
-            if (r.RespawnTicks > 0 && --r.RespawnTicks == 0) Revive(r);
+            if (r.RespawnTicks > 0) r.RespawnTicks--; // waiting for an unloaded landmark
+            else if (ShouldRevive(r)) Revive(r);
             return;
         }
         if (World.GetBlock(VoxelMotion.CellOf(r.Center)) == VoxelWorld.Unknown) return; // frozen while unloaded
@@ -172,22 +173,6 @@ public sealed partial class TownSystem
     {
         var guess = new Int3((int)MathF.Round(r.Position.X / Units.CellSize), (int)MathF.Floor((r.Position.Y + 0.05f) / Units.CellSize), (int)MathF.Round(r.Position.Z / Units.CellSize));
         return _world.Navigator.IsStandable(guess, Agent) ? guess : _world.Navigator.NearestStandable(guess, Agent, 2) ?? guess;
-    }
-
-    private void Revive(TownNpc r)
-    {
-        var at = r.Home ?? LandmarkNode(r.Def);
-        if (at == null && r.Def.Landmark != null)
-        {
-            r.RespawnTicks = LandmarkInterval; // their place is not loaded: come back once it is
-            return;
-        }
-        at ??= _world.Navigator.NearestStandable(_world.Session.SpawnCell, Agent, 6) ?? _world.Session.SpawnCell;
-        r.Life = r.Def.Life;
-        r.Position = NodeFeet(at.Value);
-        r.Velocity = Vector3.Zero;
-        r.Path = null;
-        Spawned?.Invoke(r);
     }
 
     /// <summary>Starts a conversation: the resident stops and faces the player for a while.</summary>

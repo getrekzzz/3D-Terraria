@@ -15,8 +15,14 @@ public sealed class TownConfig
     /// <summary>Ticks between re-validating residents' homes.</summary>
     public int HomeCheckInterval { get; init; } = 900;
 
-    /// <summary>Ticks before a fallen resident returns.</summary>
+    /// <summary>Ticks before a fallen resident returns (only when <see cref="RespawnAtDawn"/> is off).</summary>
     public int RespawnTicks { get; init; } = 21600;
+
+    /// <summary>Fallen residents return at the first dawn after their death (Terraria), not after a fixed delay.</summary>
+    public bool RespawnAtDawn { get; init; } = true;
+
+    /// <summary>A resident stays dead at least this long even if dawn comes sooner.</summary>
+    public int MinDeadTicks { get; init; } = 1800;
 
     /// <summary>Residents within this distance of a home are its neighbours (happiness, crowding).</summary>
     public float NeighborRadius { get; init; } = 25f;

@@ -1,36 +1,5 @@
 namespace Strata.Core.Content.Defs;
 
-/// <summary>Something a resident sells. Price defaults to the item's value.</summary>
-public sealed class ShopEntry
-{
-    public string Item { get; init; } = "";
-
-    /// <summary>Price in copper before happiness scaling (null = item value).</summary>
-    public long? Price { get; init; }
-
-    /// <summary>Stock appears only while these hold (time, flags, biome of the home…).</summary>
-    public TypedSpec[] Conditions { get; init; } = Array.Empty<TypedSpec>();
-}
-
-/// <summary>A chat line; the first matching conditions are eligible and one is picked.</summary>
-public sealed class DialogueLine
-{
-    /// <summary>Text with placeholders: {player}, {name} (the resident), {resident:&lt;id&gt;} (another resident's name).</summary>
-    public string Text { get; init; } = "";
-
-    public TypedSpec[] Conditions { get; init; } = Array.Empty<TypedSpec>();
-}
-
-/// <summary>A happiness preference: a biome around the home or a neighbour. Positive scores are liked.</summary>
-public sealed class MoodEntry
-{
-    public string? Biome { get; init; }
-    public string? Neighbor { get; init; }
-
-    /// <summary>+2 loves, +1 likes, −1 dislikes, −2 hates.</summary>
-    public int Score { get; init; }
-}
-
 /// <summary>
 /// A town resident (guide, merchant, nurse…): arrives when its conditions hold and a vacant valid home exists, lives
 /// in that home, wanders by day and goes home at night, talks, sells, and may offer a service. Prices scale with
@@ -58,6 +27,10 @@ public sealed class TownNpcDef : ContentDef
 
     /// <summary>Once these hold the resident leaves for good (the crypt's keeper after its warden falls).</summary>
     public TypedSpec[] LeavesWhen { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>Derived kind: landmark keepers never count toward town population or take a house.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public TownNpcKind Kind => Landmark != null ? TownNpcKind.Landmark : TownNpcKind.Resident;
 
     public int Life { get; init; } = 250;
     public int Defense { get; init; } = 15;

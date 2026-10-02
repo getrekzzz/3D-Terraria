@@ -68,7 +68,8 @@ public sealed class WorldMeta
 
     public sealed record MutationModel(string Id, ulong Seed);
 
-    public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks);
+    public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks,
+        bool Bound = false, long DiedAt = -1);
 
     public sealed class IdTablesModel
     {

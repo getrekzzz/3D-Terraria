@@ -70,19 +70,23 @@ public sealed partial class TownSystem
         foreach (var r in _residents) TickResident(r);
     }
 
-    /// <summary>Runs the move-in check now (commands, tests). Returns the resident that arrived, if any.</summary>
-    public TownNpc? CheckArrivals()
+    /// <summary>
+    /// Runs the move-in check now (commands, tests). Homeless residents are re-housed at any hour; new residents only
+    /// arrive by day unless <paramref name="force"/> is set. Returns the resident that arrived, if any.
+    /// </summary>
+    public TownNpc? CheckArrivals(bool force = false)
     {
         var player = _world.LocalPlayer;
         if (player == null) return null;
         var rooms = VacantRooms();
         // Homeless residents are housed first.
-        foreach (var r in _residents.Where(r => r.Home == null && r.Alive && r.Def.Landmark == null))
+        foreach (var r in _residents.Where(r => r.Home == null && r.CountsAsResident))
         {
             if (rooms.Count == 0) break;
             AssignHome(r, rooms[0]);
             rooms.RemoveAt(0);
         }
+        if (!force && !_world.Session.Clock.IsDay) return null; // Terraria: nobody new moves in at night
         // Each vacant home is judged by its own surroundings (a mushroom house draws Truffle).
         foreach (var room in rooms)
         {
@@ -138,11 +142,26 @@ public sealed partial class TownSystem
         var ctx = _world.Session.ContextAt(player.FeetCell);
         ctx.PlayerCoins = _world.Players.Max(p => Coins.Total(p.State.Inventory));
         ctx.PlayerMaxLife = _world.Players.Max(p => p.State.Vitals.MaxLife);
-        ctx.Residents = _residents.Select(r => r.Def.Id).ToHashSet();
+        FillTownFacts(ctx);
         ctx.ItemCount = key => _world.Players.Sum(p => key.StartsWith('#')
             ? p.State.Inventory.CountAll(d => d.HasTag(key[1..]))
             : _world.Session.Content.Items.TryGet(key, out var item) ? p.State.Inventory.CountAll(item) : 0);
         return ctx;
+    }
+
+    /// <summary>Town population facts: who counts as a resident, and how many of them are housed.</summary>
+    public void FillTownFacts(ConditionContext ctx)
+    {
+        var ids = new HashSet<string>();
+        int housed = 0;
+        foreach (var r in _residents)
+        {
+            if (!r.CountsAsResident) continue;
+            ids.Add(r.Def.Id);
+            if (r.IsHoused) housed++;
+        }
+        ctx.Residents = ids;
+        ctx.ResidentCount = housed;
     }
 
     private void TryPlaceStarters()
@@ -200,7 +219,8 @@ public sealed partial class TownSystem
             r.Def.Id, r.Name,
             r.Home is { } h ? new[] { h.X, h.Y, h.Z } : null,
             r.HomeRoom is { } k ? new[] { k.X, k.Y, k.Z } : null,
-            new[] { r.Position.X, r.Position.Y, r.Position.Z }, r.Life, r.RespawnTicks)).ToList();
+            new[] { r.Position.X, r.Position.Y, r.Position.Z }, r.Life, r.RespawnTicks,
+            r.Bound, r.DiedAtTick)).ToList();
     }
 
     private void Load(WorldMeta meta)
@@ -220,7 +240,9 @@ public sealed partial class TownSystem
                 HomeRoom = m.HomeRoom is { Length: 3 } k ? new Int3(k[0], k[1], k[2]) : null,
                 Position = m.Position is { Length: 3 } p ? new Vector3(p[0], p[1], p[2]) : Vector3.Zero,
                 Life = Math.Clamp(m.Life, 0, def.Life),
-                RespawnTicks = m.RespawnTicks,
+                RespawnTicks = Math.Min(m.RespawnTicks, LandmarkInterval), // old saves counted the whole delay here
+                Bound = m.Bound,
+                DiedAtTick = m.DiedAt,
                 IdleTicks = Config.IdleTicksMin,
             };
             _residents.Add(npc);

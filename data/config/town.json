@@ -3,6 +3,8 @@
   "arrivalInterval": 600,
   "homeCheckInterval": 900,
   "respawnTicks": 21600,
+  "respawnAtDawn": true,
+  "minDeadTicks": 1800,
   "neighborRadius": 25,
   "crowdLimit": 3,
   "moodStep": 0.06,

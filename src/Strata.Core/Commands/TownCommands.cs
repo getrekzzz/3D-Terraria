@@ -25,7 +25,7 @@ public static class TownCommands
         });
         r.Register(new CommandDef
         {
-            Name = "town", Usage = "town [check | summon <id> [dx dy dz] | dismiss <id> | talk <id> | buy <id> <item> [count] | sell <slot 1-50> | heal <id> | curse <id> | arrivals on|off]",
+            Name = "town", Usage = "town [check [force] | summon <id> [dx dy dz] | dismiss <id> | talk <id> | buy <id> <item> [count] | sell <slot 1-50> | heal <id> | curse <id> | arrivals on|off | " + TownDebugCommands.Usage + "]",
             Help = "Lists residents with their homes and prices, or manages the town.",
             Run = (ctx, a) =>
             {
@@ -38,7 +38,7 @@ public static class TownCommands
                         return CommandResult.Success(string.Join("\n", town.Residents.Select(t =>
                             $"{t.Title}: {(t.Home is { } h ? $"home {h}" : "homeless")}, {t.Activity}, mood {commerce.Mood(t, out _):+0;-0;0}, prices ×{commerce.PriceFactor(t):0.00}")));
                     case "check":
-                        var arrived = town.CheckArrivals();
+                        var arrived = town.CheckArrivals(force: a.OptStr(1) == "force");
                         return CommandResult.Success(arrived != null ? $"{arrived.Title} has arrived." : "Nobody moved in.");
                     case "summon":
                         var def = ctx.World.Session.Content.TownNpcs.TryGet(a.Str(1, "id"), out var d) ? d : throw new CommandException($"unknown resident '{a.Str(1, "id")}'");
@@ -69,13 +69,13 @@ public static class TownCommands
                         town.ArrivalsEnabled = a.Str(1, "on|off") == "on";
                         return CommandResult.Success($"Arrivals {(town.ArrivalsEnabled ? "on" : "off")}.");
                     default:
-                        throw new CommandException("unknown town subcommand");
+                        return TownDebugCommands.TryRun(ctx, a) ?? throw new CommandException("unknown town subcommand");
                 }
             },
         });
     }
 
-    private static TownNpc Resident(CommandContext ctx, CommandArgs a)
+    internal static TownNpc Resident(CommandContext ctx, CommandArgs a)
     {
         var id = a.Str(1, "id");
         return ctx.World.Town.Find(id) ?? throw new CommandException($"'{id}' does not live in town");

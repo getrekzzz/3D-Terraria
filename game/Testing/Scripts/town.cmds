@@ -31,6 +31,17 @@ wait 2
 assert town.guide.home < 0.3
 time noon
 
+# --- P5-01 ---
+# A slain resident stays dead through the night and returns at dawn.
+town slay guide
+assert town.guide.alive == 0
+time 3
+wait 1
+assert town.guide.alive == 0
+time 5
+wait_until town.guide.alive == 1 10
+time noon
+
 # Talking and trading with the peddler.
 give silver_coin 60
 town summon merchant 0 0 -3

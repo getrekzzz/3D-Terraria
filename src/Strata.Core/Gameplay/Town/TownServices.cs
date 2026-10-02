@@ -71,7 +71,7 @@ public sealed class TownServices
             Counters[TaxCounter] = (int)Hour; // the collector starts counting from the day he moves in
             return 0;
         }
-        int housed = _world.Town.Residents.Count(r => r.Alive && r.Home != null);
+        int housed = _world.Town.Residents.Count(r => r.IsHoused);
         return Math.Min(p.Cap, Math.Max(0, Hour - last) * housed * (long)p.PerResidentHour);
     }
 

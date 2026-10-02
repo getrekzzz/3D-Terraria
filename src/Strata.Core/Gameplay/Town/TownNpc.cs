@@ -45,7 +45,20 @@ public sealed class TownNpc
 
     public int Life { get; set; }
     public bool Alive => Life > 0;
+    /// <summary>Retry delay while a fallen resident's place is not loaded (ticks).</summary>
     public int RespawnTicks { get; set; }
+
+    /// <summary>World tick of the last death or vanishing (−1 = never); the resident returns at the next dawn.</summary>
+    public long DiedAtTick { get; set; } = -1;
+
+    /// <summary>Tied up somewhere, waiting for a rescue: does not count as a resident until freed.</summary>
+    public bool Bound { get; set; }
+
+    /// <summary>Counts toward the town's population: alive, free, and a housed kind (not a landmark keeper).</summary>
+    public bool CountsAsResident => Alive && !Bound && Def.Kind == TownNpcKind.Resident;
+
+    /// <summary>A counting resident with a home ("needs N residents" counts these).</summary>
+    public bool IsHoused => CountsAsResident && Home != null;
     public int ImmuneTicks { get; set; }
 
     public ResidentActivity Activity { get; set; }

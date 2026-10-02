@@ -94,7 +94,7 @@ public static class ConditionCompiler
         ["residents"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
-            return new DelegateCondition(c => c.Residents.Count >= p.Min && c.Residents.Count <= p.Max);
+            return new DelegateCondition(c => c.ResidentCount >= p.Min && c.ResidentCount <= p.Max);
         },
         ["hasItem"] = s =>
         {

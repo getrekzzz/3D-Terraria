@@ -183,8 +183,8 @@ public class TownTests
         town.Damage(guide, 100_000, guide.Position);
         Assert.False(guide.Alive);
         Assert.Contains(guide, died);
-        Assert.Equal(town.Config.RespawnTicks, guide.RespawnTicks);
-        guide.RespawnTicks = 3;
+        Assert.Equal(g.World.Session.Clock.Tick, guide.DiedAtTick);
+        town.Config = new TownConfig { RespawnAtDawn = false, RespawnTicks = 3 }; // the fixed-delay mode
         g.Ticks(4);
         Assert.True(guide.Alive);
         Assert.Equal(guide.Def.Life, guide.Life);

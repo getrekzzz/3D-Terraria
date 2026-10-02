@@ -421,3 +421,14 @@ lock's message while `requiresFlag` is unset, then "It's locked." without the ke
 chest, rolls an unopened chest's loot before the not-empty check, `BreakObject` rolls it before spilling, and locked
 chests are never broken for lost support, so generated loot is never lost. `interact nearest <objectId> [radius]
 [expectedOutcome]` drives it from smoke scripts.
+
+## Town population and housing (P5-01..P5-05)
+
+* **Population** (`TownSystem.FillTownFacts`): a resident counts (`TownNpc.CountsAsResident`) while alive, not `Bound`
+  (awaiting rescue) and of kind `Resident` (landmark keepers such as the Old Man never count). The `residents`
+  condition reads `ConditionContext.ResidentCount`, the number of counting residents with a home; `resident <id>`
+  reads the counting ids. Events (the party) use the same facts.
+* **Move-ins** happen only by day (`CheckArrivals(force)`; `town check force` for tests); homeless residents are
+  re-housed at any hour. A fallen or vanished resident returns at the first dawn after `DiedAtTick` once
+  `minDeadTicks` have passed (`TownSystem.Life.cs`; `respawnAtDawn: false` restores the fixed delay). Setting the
+  clock back clamps `DiedAtTick`. `Bound`/`DiedAt` are optional `ResidentModel` fields (old saves load with defaults).

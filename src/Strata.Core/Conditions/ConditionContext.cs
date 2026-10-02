@@ -43,8 +43,11 @@ public sealed class ConditionContext
     /// <summary>Highest maximum life among the players.</summary>
     public int PlayerMaxLife { get; set; }
 
-    /// <summary>Town residents currently living in the world (town NPC ids).</summary>
+    /// <summary>Town residents who count (alive, not bound, not landmark keepers), by town NPC id.</summary>
     public IReadOnlySet<string> Residents { get; set; } = Empty;
+
+    /// <summary>Housed residents who count toward the town's population (the 'residents' condition).</summary>
+    public int ResidentCount { get; set; }
 
     /// <summary>How many of an item (or items with a tag, "#tag") the players carry; null = unknown (0).</summary>
     public Func<string, int>? ItemCount { get; set; }
