@@ -356,3 +356,45 @@ liquids on
 wait_until hud.bubbles == 0 5
 god off
 assert errors == 0
+
+# --- P2-14 ---
+# The buff bar: a potion's buff shows its icon and timer; with the inventory open hovering names it and its effect,
+# and a right click cancels it, but never a debuff (Potion Sickness stays). A summoned minion shows as one more icon,
+# and cancelling it sends the minion home.
+heal
+ui close
+give swiftness_potion 1
+wield swiftness_potion
+use
+wait 0.3
+assert buff.swiftness == 1
+assert hud.buffs >= 1
+assert hud.buff_icons >= 1
+ui inventory
+wait 0.2
+ui buff hover swiftness
+assert ui.tooltip_lines >= 2
+assert ui.overlaps == 0
+ui buff cancel swiftness
+wait 0.1
+assert buff.swiftness == 0
+assert ui.tooltip_lines == 0
+ui close
+give lesser_healing_potion 1
+wield lesser_healing_potion
+use
+wait 0.3
+assert buff.potion_sickness == 1
+ui buff cancel potion_sickness
+assert buff.potion_sickness == 1
+spawning off
+killall
+give slime_staff 1
+wield slime_staff
+use
+wait 0.5
+assert hud.buffs >= 2
+ui buff cancel slime_minion
+wait 0.2
+assert projectiles.count == 0
+assert errors == 0

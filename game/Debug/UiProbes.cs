@@ -12,7 +12,7 @@ namespace Strata.Game.Debug;
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); on the inventory
-/// screen's layout (P2-15); and on the hearts, mana stars and breath bubbles (P2-13).
+/// screen's layout (P2-15); on the hearts, mana stars and breath bubbles (P2-13); and on the buff bar (P2-14).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -83,5 +83,7 @@ public static class UiProbes
         ctx.AddProbe("hud.golden_hearts", () => world.Hud?.GoldenHeartsShown ?? 0);
         ctx.AddProbe("hud.stars", () => world.Hud?.StarsShown ?? 0);
         ctx.AddProbe("hud.bubbles", () => world.Hud?.BubblesShown ?? 0);
+        // P2-14: icons on the buff bar (buffs, minion kinds, the minecart).
+        ctx.AddProbe("hud.buffs", () => world.Hud?.Buffs.Count ?? 0);
     }
 }

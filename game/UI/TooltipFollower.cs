@@ -76,6 +76,36 @@ public sealed partial class TooltipFollower : CanvasLayer
         Follow();
     }
 
+    /// <summary>
+    /// Shows fixed lines for as long as <paramref name="owner"/> is hovered (a buff's name over its effect): the title,
+    /// then <paramref name="body"/> split at '\n', in the plain tooltip colour.
+    /// </summary>
+    public void ShowText(Control owner, string title, string? body)
+    {
+        _owner = owner;
+        _read = null;
+        _source = null;
+        _stack = ItemStack.Empty;
+        _nameLine = -1;
+        _lines = 0;
+        AddLine(title);
+        if (!string.IsNullOrEmpty(body))
+            foreach (var line in body.Split('\n')) AddLine(line);
+        for (int i = _lines; i < MaxLines && _labels[i].Visible; i++) _labels[i].Visible = false;
+        _panel.Visible = true;
+        _panel.ResetSize();
+        Follow();
+    }
+
+    private void AddLine(string text)
+    {
+        if (_lines == MaxLines) return;
+        var label = _labels[_lines++];
+        if (label.Text != text) label.Text = text;
+        label.Modulate = UiTheme.Text;
+        label.Visible = true;
+    }
+
     /// <summary>Hides the tooltip if <paramref name="owner"/> is the control it belongs to.</summary>
     public void Hide(Control owner)
     {
@@ -90,7 +120,12 @@ public sealed partial class TooltipFollower : CanvasLayer
             Clear();
             return;
         }
-        var stack = _read!();
+        if (_read == null)
+        {
+            Follow(); // fixed lines
+            return;
+        }
+        var stack = _read();
         _refresh -= delta;
         if (!stack.Equals(_stack) || _refresh <= 0) Rebuild(stack);
         if (!_panel.Visible) return;

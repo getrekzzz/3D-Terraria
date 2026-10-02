@@ -22,6 +22,7 @@ public sealed partial class Hud : CanvasLayer
     private UiContext _ui = null!;
     private ItemNameLabel _itemName = null!;
     private HotbarBar _hotbar = null!;
+    private BuffBar _buffBar = null!;
     private Crosshair _crosshair = null!;
     private StatusLine _status = null!;
     private InfoPanel _info = null!;
@@ -59,7 +60,10 @@ public sealed partial class Hud : CanvasLayer
     public string Status => _status.Message;
 
     /// <summary>Active buffs shown with their generated icon (not the letter fallback); the hud.buff_icons probe.</summary>
-    public int BuffIconsShown { get; private set; }
+    public int BuffIconsShown => _buffBar.IconsShown;
+
+    /// <summary>The buff bar (the <c>ui buff cancel</c> command and the <c>hud.buffs</c> probe).</summary>
+    public BuffBar Buffs => _buffBar;
 
     /// <summary>The hotbar slot view at <paramref name="index"/> (the <c>ui hover hotbar</c> command), or null.</summary>
     public ItemSlotView? HotbarSlot(int index) => _hotbar.Slot(index);
@@ -77,7 +81,7 @@ public sealed partial class Hud : CanvasLayer
 
         root.AddChild(_itemName = LayoutWidgets.Register(new ItemNameLabel(ui)));
         root.AddChild(_hotbar = LayoutWidgets.Register(new HotbarBar(ui)));
-        root.AddChild(_buffs = LayoutWidgets.Register(new Control { Name = "Buffs", MouseFilter = Control.MouseFilterEnum.Ignore }));
+        root.AddChild(_buffBar = LayoutWidgets.Register(new BuffBar(ui)));
         BuildVitals(root);
         root.AddChild(_crosshair = LayoutWidgets.Register(new Crosshair(ui)));
         root.AddChild(_status = LayoutWidgets.Register(new StatusLine()));
@@ -135,9 +139,9 @@ public sealed partial class Hud : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.hud");
         UpdateBossBar();
+        _buffBar.Refresh(delta); // before the layout, which reads its icon count
         UpdateLayout();
         UpdateVitals(delta);
-        UpdateBuffs();
         UpdateBuildHint();
         _death.Visible = !_ui.Entity.Alive;
         if (_death.Visible)
@@ -152,7 +156,7 @@ public sealed partial class Hud : CanvasLayer
         bool inventory = _inventory?.IsOpen == true;
         var key = new LayoutKey(LayoutWidgets.LogicalSize(GetViewport()), inventory, inventory ? _inventory!.Panel : UiPanel.None,
             _inventory?.AccessoryRows ?? Strata.Core.Gameplay.Items.PlayerInventory.BaseAccessorySlots, _dialog?.IsOpen == true, _bossShown,
-            _ui.Entity.State.Buffs.Active.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
+            _buffBar.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
         if (!key.Equals(_key)) ApplyLayout(key);
     }
 
@@ -167,7 +171,7 @@ public sealed partial class Hud : CanvasLayer
         _itemName.InventoryOpen = key.Inventory;
         _itemName.Visible = LayoutWidgets.Place(_itemName, layout, UiRegion.ItemName);
         _hotbar.Visible = LayoutWidgets.Place(_hotbar, layout, UiRegion.Hotbar);
-        _buffs.Visible = LayoutWidgets.Place(_buffs, layout, UiRegion.Buffs);
+        _buffBar.Visible = LayoutWidgets.Place(_buffBar, layout, UiRegion.Buffs);
         PlaceVitals(layout);
         _crosshair.Place(layout, key.Size);
         _status.Visible = LayoutWidgets.Place(_status, layout, UiRegion.StatusLine);
@@ -175,7 +179,7 @@ public sealed partial class Hud : CanvasLayer
         _feed.Visible = LayoutWidgets.Place(_feed, layout, UiRegion.Chat);
         _bossPlaced = LayoutWidgets.Place(_bossPanel, layout, UiRegion.BossBar);
         _bossPanel.Visible = _bossPlaced && _bossShown;
-        ArrangeBuffs();
+        _buffBar.Arrange();
         LayoutApplied?.Invoke(layout);
     }
 
