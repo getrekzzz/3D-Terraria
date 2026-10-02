@@ -4763,6 +4763,181 @@
    "kind": "town_goods",
    "stage": "early",
    "source": "witch doctor"
+  },
+  {
+   "id": "terraria:land",
+   "name": "Land",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:trapped_ghost",
+   "name": "Trapped Ghost",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:outcast",
+   "name": "Outcast",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:dark_soul_reaper",
+   "name": "Dark Soul Reaper",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:waldo",
+   "name": "Waldo",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:sparky",
+   "name": "Sparky",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:the_truth_is_up_there",
+   "name": "The Truth Is Up There",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "painter"
+  },
+  {
+   "id": "terraria:silver_dye",
+   "name": "Silver Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:brown_dye",
+   "name": "Brown Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:black_dye",
+   "name": "Black Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:red_dye",
+   "name": "Red Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:orange_dye",
+   "name": "Orange Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:yellow_dye",
+   "name": "Yellow Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:green_dye",
+   "name": "Green Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:blue_dye",
+   "name": "Blue Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:purple_dye",
+   "name": "Purple Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:pink_dye",
+   "name": "Pink Dye",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:dye_vat",
+   "name": "Dye Vat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "dye trader"
+  },
+  {
+   "id": "terraria:confetti",
+   "name": "Confetti",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:confetti_gun",
+   "name": "Confetti Gun",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:party_hat",
+   "name": "Party Hat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:bubble_machine",
+   "name": "Bubble Machine",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "party girl"
+  },
+  {
+   "id": "terraria:defender_medal",
+   "name": "Defender Medal",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "old one's army"
+  },
+  {
+   "id": "terraria:ale",
+   "name": "Ale",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "tavernkeep"
+  },
+  {
+   "id": "terraria:eternia_crystal_stand",
+   "name": "Eternia Crystal Stand",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "tavernkeep"
   }
  ]
 }

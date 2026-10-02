@@ -704,3 +704,9 @@ item value unless given, scaled by happiness (currency prices are not). New good
   The Sunflower's aura gives Happy!, the Bewitching Table's Bewitched (+1 minion).
 * **Use styles**: items may name Terraria's 1.4.4 use styles (`gun`, `throw`, `drink`, `holdUp`…); until the use-style
   rework lands on this branch `UseStyles.Family` maps each to the legacy style it behaves as.
+* **Shops II** (P5-16): the Painter's Decor tab sells seven wall paintings (`painting` generator; The Truth Is Up There
+  after the Martians); the Dye Trader the Dye Vat (a station without recipes yet) and ten basic dyes (category dye,
+  cosmetic until dye slots exist; they satisfy his arrival rule); the Party Girl Confetti, the Confetti Gun (both a
+  harmless glowing puff), the Party Hat and a decor Bubble Machine (no bubbles yet); the Tavernkeep Ale (Tipsy) for a
+  Defender Medal (dropped by the Old One's Army: 50% per soldier, 5/10/20 from Dark Mage/Ogre/Betsy) and a decor
+  Eternia Crystal Stand (the crystal item still starts the event). `town buy` finds the tab that lists the item.

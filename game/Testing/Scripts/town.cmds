@@ -76,6 +76,23 @@ give copper_coin 30
 town buy dryad grass_seeds
 assert inv.grass_seeds == 1
 town dismiss dryad
+# --- P5-16 ---
+# The Painter's paintings are under his Decor tab; the Tavernkeep takes Defender Medals for Ale.
+town summon painter 2 0 -3
+give copper_coin 99
+give silver_coin 14
+town buy painter land
+assert inv.land == 1
+town dismiss painter
+give defender_medal 3
+town summon tavernkeep 2 0 -3
+town buy tavernkeep ale
+assert inv.ale == 1
+assert inv.defender_medal == 2
+town dismiss tavernkeep
+# Back to the starting kit's 25 torches and an empty purse for the trading checks below.
+clear
+give torch 25
 assert errors == 0
 
 # Talking and trading with the peddler.

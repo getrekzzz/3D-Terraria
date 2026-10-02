@@ -92,4 +92,46 @@ public class ShopDataTests
         var offer = g.World.Commerce.Stock(merchant, g.Player).First(o => o.Item.Id == "mining_shirt");
         Assert.Equal(Math.Max(1, (long)MathF.Round(offer.Item.Value * factor)), offer.Price);
     }
+
+    [Fact]
+    public void ThePainterHasADecorTab()
+    {
+        using var g = Create();
+        var painter = Summon(g, "painter");
+        Assert.Equal(new[] { "shop", "decor" }, g.World.Commerce.Tabs(painter));
+        Assert.Contains("red_paint", Stock(g, painter));
+        var decor = Stock(g, painter, "decor");
+        Assert.Contains("land", decor);
+        Assert.DoesNotContain("the_truth_is_up_there", decor);
+        Assert.All(decor, id => Assert.Equal(Strata.Core.Content.Defs.TileAnchor.Wall, g.Content.TileObjects.Get(id).Anchor));
+        g.World.Progression.Set("defeated_martians");
+        Assert.Contains("the_truth_is_up_there", Stock(g, painter, "decor"));
+    }
+
+    [Fact]
+    public void TheTavernkeepSellsAleForMedals()
+    {
+        using var g = Create();
+        var keep = Summon(g, "tavernkeep");
+        var inv = g.Player.State.Inventory;
+        var ale = g.Content.Items.Get("ale");
+        var medal = g.Content.Items.Get("defender_medal");
+        var offer = g.World.Commerce.Stock(keep, g.Player).Single(o => o.Item == ale);
+        Assert.Equal(medal, offer.Currency);
+        long coins = Strata.Core.Gameplay.Items.Coins.Total(inv);
+        Assert.Equal(TradeResult.TooPoor, g.World.Commerce.Buy(keep, g.Player, ale));
+        inv.Backpack.Add(new Strata.Core.Gameplay.Items.ItemStack(medal, 10));
+        Assert.Equal(TradeResult.Ok, g.World.Commerce.Buy(keep, g.Player, ale));
+        Assert.Equal(10 - offer.Price, inv.Backpack.Count(medal));
+        Assert.Equal(1, inv.CountAll(ale));
+        Assert.Equal(coins, Strata.Core.Gameplay.Items.Coins.Total(inv));
+    }
+
+    [Fact]
+    public void TheOldOnesArmyDropsDefenderMedals()
+    {
+        var db = TestPaths.Content;
+        foreach (var table in new[] { "old_ones_army", "dark_mage", "ogre", "betsy" })
+            Assert.Contains(db.LootTables.Get(table).Entries, e => e.Item == "defender_medal");
+    }
 }

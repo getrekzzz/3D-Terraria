@@ -81,9 +81,17 @@ public class TownArrivalRulesTests
     }
 
     [Fact]
-    public void TheDyeTraderAsksForADye() => // no dye items exist yet (Strange Plants, P5-22)
-        Assert.Contains(Support.TestPaths.Content.TownNpcs.Get("dye_trader").Arrival,
+    public void TheDyeTraderAsksForADye()
+    {
+        // The Dye Trader's own basic dyes (P5-16) satisfy his 'hasItem category dye' arrival rule.
+        var rule = Assert.Single(Support.TestPaths.Content.TownNpcs.Get("dye_trader").Arrival,
             a => a.Type == "hasItem" && a.Raw.GetProperty("category").GetString() == "dye");
+        var cond = Strata.Core.Conditions.ConditionCompiler.Compile(rule);
+        using var g = Create(0);
+        Assert.False(cond.Evaluate(g.World.Town.TownContext(g.Player)));
+        Give(g, "red_dye");
+        Assert.True(cond.Evaluate(g.World.Town.TownContext(g.Player)));
+    }
 
     [Fact]
     public void VisitingMerchantsNeverMoveIn()

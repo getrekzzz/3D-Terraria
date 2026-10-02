@@ -50,5 +50,6 @@
   "ufo_mount":         { "glyph": "ufo",            "fg": "#80e0a0", "bg": "#123a24" },
   "monster_banner":    { "glyph": "pirate_flag",    "fg": "#d8c070", "bg": "#3a2a14" },
   "happy":             { "glyph": "sun",            "fg": "#ffe050", "bg": "#4a3a10" },
-  "bewitched":         { "glyph": "minion",         "fg": "#c090ff", "bg": "#2c1a48" }
+  "bewitched":         { "glyph": "minion",         "fg": "#c090ff", "bg": "#2c1a48" },
+  "tipsy":             { "glyph": "food",           "fg": "#e0a040", "bg": "#4a2e10" }
 }

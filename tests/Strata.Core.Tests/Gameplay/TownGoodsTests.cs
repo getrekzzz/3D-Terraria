@@ -79,4 +79,13 @@ public class TownGoodsTests
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, g.Target(), freshPress: true));
         Assert.Equal(2, g.Player.State.Inventory.Backpack[0].Count);
     }
+
+    [Fact]
+    public void AleMakesYouTipsy()
+    {
+        using var g = Arena();
+        g.Hold("ale", 2);
+        Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, freshPress: true));
+        Assert.Contains(g.Player.State.Buffs.Active, b => b.Def.Id == "tipsy");
+    }
 }

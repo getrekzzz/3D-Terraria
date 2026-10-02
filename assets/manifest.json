@@ -441,6 +441,12 @@
    ],
    "generator": "banner"
   },
+  "bubble_machine": {
+   "models": [
+    "assets/models/objects/bubble_machine_v0.glb"
+   ],
+   "generator": "safe"
+  },
   "bunny_statue": {
    "models": [
     "assets/models/objects/bunny_statue_v0.glb"
@@ -721,6 +727,12 @@
    ],
    "generator": "banner"
   },
+  "dark_soul_reaper": {
+   "models": [
+    "assets/models/objects/dark_soul_reaper_v0.glb"
+   ],
+   "generator": "painting"
+  },
   "dart_trap": {
    "models": [
     "assets/models/objects/dart_trap_v0.glb"
@@ -828,6 +840,12 @@
     "assets/models/objects/dungeon_spirit_banner_v0.glb"
    ],
    "generator": "banner"
+  },
+  "dye_vat": {
+   "models": [
+    "assets/models/objects/dye_vat_v0.glb"
+   ],
+   "generator": "pot"
   },
   "eater_of_souls_banner": {
    "models": [
@@ -973,6 +991,12 @@
     "assets/models/objects/enchanted_sword_shrine_v0.glb"
    ],
    "generator": "shrine"
+  },
+  "eternia_crystal_stand": {
+   "models": [
+    "assets/models/objects/eternia_crystal_stand_v0.glb"
+   ],
+   "generator": "altar"
   },
   "etherian_goblin_banner": {
    "models": [
@@ -1630,6 +1654,12 @@
     "assets/models/objects/lac_beetle_banner_v0.glb"
    ],
    "generator": "banner"
+  },
+  "land": {
+   "models": [
+    "assets/models/objects/land_v0.glb"
+   ],
+   "generator": "painting"
   },
   "lava_bat_banner": {
    "models": [
@@ -2319,6 +2349,12 @@
     "assets/models/objects/orichalcum_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "outcast": {
+   "models": [
+    "assets/models/objects/outcast_v0.glb"
+   ],
+   "generator": "painting"
   },
   "paladin_banner": {
    "models": [
@@ -3013,6 +3049,12 @@
    ],
    "generator": "banner"
   },
+  "sparky": {
+   "models": [
+    "assets/models/objects/sparky_v0.glb"
+   ],
+   "generator": "painting"
+  },
   "spazmatism_trophy": {
    "models": [
     "assets/models/objects/spazmatism_trophy_v0.glb"
@@ -3113,6 +3155,12 @@
    ],
    "generator": "banner"
   },
+  "the_truth_is_up_there": {
+   "models": [
+    "assets/models/objects/the_truth_is_up_there_v0.glb"
+   ],
+   "generator": "painting"
+  },
   "tim_banner": {
    "models": [
     "assets/models/objects/tim_banner_v0.glb"
@@ -3160,6 +3208,12 @@
     "assets/models/objects/torch_v0.glb"
    ],
    "generator": "torch"
+  },
+  "trapped_ghost": {
+   "models": [
+    "assets/models/objects/trapped_ghost_v0.glb"
+   ],
+   "generator": "painting"
   },
   "treasure_map": {
    "models": [
@@ -3226,6 +3280,12 @@
     "assets/models/objects/vulture_banner_v0.glb"
    ],
    "generator": "banner"
+  },
+  "waldo": {
+   "models": [
+    "assets/models/objects/waldo_v0.glb"
+   ],
+   "generator": "painting"
   },
   "wall_anchor": {
    "models": [
@@ -3507,6 +3567,10 @@
    "object": "alchemy_table",
    "icon": "assets/icons/items/alchemy_table.png"
   },
+  "ale": {
+   "model": "assets/models/items/ale.glb",
+   "icon": "assets/icons/items/ale.png"
+  },
   "alien_hornet_banner": {
    "object": "alien_hornet_banner",
    "icon": "assets/icons/items/alien_hornet_banner.png"
@@ -3786,6 +3850,10 @@
    "object": "bird_statue",
    "icon": "assets/icons/items/bird_statue.png"
   },
+  "black_dye": {
+   "model": "assets/models/items/black_dye.glb",
+   "icon": "assets/icons/items/black_dye.png"
+  },
   "black_paint": {
    "model": "assets/models/items/black_paint.glb",
    "sockets": {
@@ -3876,6 +3944,10 @@
   "blue_dungeon_vase": {
    "object": "blue_dungeon_vase",
    "icon": "assets/icons/items/blue_dungeon_vase.png"
+  },
+  "blue_dye": {
+   "model": "assets/models/items/blue_dye.glb",
+   "icon": "assets/icons/items/blue_dye.png"
   },
   "blue_jellyfish_banner": {
    "object": "blue_jellyfish_banner",
@@ -4148,6 +4220,10 @@
    },
    "icon": "assets/icons/items/broken_hero_sword.png"
   },
+  "brown_dye": {
+   "model": "assets/models/items/brown_dye.glb",
+   "icon": "assets/icons/items/brown_dye.png"
+  },
   "brown_paint": {
    "model": "assets/models/items/brown_paint.glb",
    "sockets": {
@@ -4162,6 +4238,10 @@
     "muzzle": "0 0.3 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/bubble_gun.png"
+  },
+  "bubble_machine": {
+   "object": "bubble_machine",
+   "icon": "assets/icons/items/bubble_machine.png"
   },
   "bug_net": {
    "model": "assets/models/items/bug_net.glb",
@@ -4524,6 +4604,18 @@
    "model": "assets/models/items/compass.glb",
    "icon": "assets/icons/items/compass.png"
   },
+  "confetti": {
+   "model": "assets/models/items/confetti.glb",
+   "icon": "assets/icons/items/confetti.png"
+  },
+  "confetti_gun": {
+   "model": "assets/models/items/confetti_gun.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.3 -0.045 > 0 1 0"
+   },
+   "icon": "assets/icons/items/confetti_gun.png"
+  },
   "cooked_fish": {
    "model": "assets/models/items/cooked_fish.glb",
    "icon": "assets/icons/items/cooked_fish.png"
@@ -4854,6 +4946,10 @@
    },
    "icon": "assets/icons/items/dark_lance.png"
   },
+  "dark_soul_reaper": {
+   "object": "dark_soul_reaper",
+   "icon": "assets/icons/items/dark_soul_reaper.png"
+  },
   "dart_trap": {
    "object": "dart_trap",
    "icon": "assets/icons/items/dart_trap.png"
@@ -4919,6 +5015,10 @@
   "deerclops_trophy": {
    "object": "deerclops_trophy",
    "icon": "assets/icons/items/deerclops_trophy.png"
+  },
+  "defender_medal": {
+   "model": "assets/models/items/defender_medal.glb",
+   "icon": "assets/icons/items/defender_medal.png"
   },
   "demon_banner": {
    "object": "demon_banner",
@@ -5114,6 +5214,10 @@
    "object": "dungeon_spirit_banner",
    "icon": "assets/icons/items/dungeon_spirit_banner.png"
   },
+  "dye_vat": {
+   "object": "dye_vat",
+   "icon": "assets/icons/items/dye_vat.png"
+  },
   "dynamite": {
    "model": "assets/models/items/dynamite.glb",
    "sockets": {
@@ -5302,6 +5406,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/eternia_crystal.png"
+  },
+  "eternia_crystal_stand": {
+   "object": "eternia_crystal_stand",
+   "icon": "assets/icons/items/eternia_crystal_stand.png"
   },
   "etherian_goblin_banner": {
    "object": "etherian_goblin_banner",
@@ -5974,6 +6082,10 @@
    "object": "green_dungeon_vase",
    "icon": "assets/icons/items/green_dungeon_vase.png"
   },
+  "green_dye": {
+   "model": "assets/models/items/green_dye.glb",
+   "icon": "assets/icons/items/green_dye.png"
+  },
   "green_paint": {
    "model": "assets/models/items/green_paint.glb",
    "sockets": {
@@ -6480,6 +6592,10 @@
   "lac_beetle_banner": {
    "object": "lac_beetle_banner",
    "icon": "assets/icons/items/lac_beetle_banner.png"
+  },
+  "land": {
+   "object": "land",
+   "icon": "assets/icons/items/land.png"
   },
   "laser_machinegun": {
    "model": "assets/models/items/laser_machinegun.glb",
@@ -7560,6 +7676,10 @@
    "model": "assets/models/items/ocean_crate.glb",
    "icon": "assets/icons/items/ocean_crate.png"
   },
+  "orange_dye": {
+   "model": "assets/models/items/orange_dye.glb",
+   "icon": "assets/icons/items/orange_dye.png"
+  },
   "orange_paint": {
    "model": "assets/models/items/orange_paint.glb",
    "sockets": {
@@ -7653,6 +7773,10 @@
     "tip": "0 1.038 0 > 0 1 0"
    },
    "icon": "assets/icons/items/orichalcum_shortsword.png"
+  },
+  "outcast": {
+   "object": "outcast",
+   "icon": "assets/icons/items/outcast.png"
   },
   "paint_scraper": {
    "model": "assets/models/items/paint_scraper.glb",
@@ -7849,6 +7973,11 @@
    "object": "parrot_banner",
    "icon": "assets/icons/items/parrot_banner.png"
   },
+  "party_hat": {
+   "model": "assets/models/items/party_hat.glb",
+   "armor": "party_hat",
+   "icon": "assets/icons/items/party_hat.png"
+  },
   "pengfish": {
    "model": "assets/models/items/pengfish.glb",
    "icon": "assets/icons/items/pengfish.png"
@@ -7932,6 +8061,10 @@
   "pink_dungeon_vase": {
    "object": "pink_dungeon_vase",
    "icon": "assets/icons/items/pink_dungeon_vase.png"
+  },
+  "pink_dye": {
+   "model": "assets/models/items/pink_dye.glb",
+   "icon": "assets/icons/items/pink_dye.png"
   },
   "pink_paint": {
    "model": "assets/models/items/pink_paint.glb",
@@ -8133,6 +8266,10 @@
    "model": "assets/models/items/purification_powder.glb",
    "icon": "assets/icons/items/purification_powder.png"
   },
+  "purple_dye": {
+   "model": "assets/models/items/purple_dye.glb",
+   "icon": "assets/icons/items/purple_dye.png"
+  },
   "purple_paint": {
    "model": "assets/models/items/purple_paint.glb",
    "sockets": {
@@ -8276,6 +8413,10 @@
   "red_devil_banner": {
    "object": "red_devil_banner",
    "icon": "assets/icons/items/red_devil_banner.png"
+  },
+  "red_dye": {
+   "model": "assets/models/items/red_dye.glb",
+   "icon": "assets/icons/items/red_dye.png"
   },
   "red_hat": {
    "model": "assets/models/items/red_hat.glb",
@@ -8761,6 +8902,10 @@
    "model": "assets/models/items/silver_coin.glb",
    "icon": "assets/icons/items/silver_coin.png"
   },
+  "silver_dye": {
+   "model": "assets/models/items/silver_dye.glb",
+   "icon": "assets/icons/items/silver_dye.png"
+  },
   "silver_greaves": {
    "model": "assets/models/items/silver_greaves.glb",
    "armor": "silver_armor",
@@ -9013,6 +9158,10 @@
     "muzzle": "0 0.34 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/space_gun.png"
+  },
+  "sparky": {
+   "object": "sparky",
+   "icon": "assets/icons/items/sparky.png"
   },
   "spazmatism_trophy": {
    "object": "spazmatism_trophy",
@@ -9395,6 +9544,10 @@
    },
    "icon": "assets/icons/items/the_rotted_fork.png"
   },
+  "the_truth_is_up_there": {
+   "object": "the_truth_is_up_there",
+   "icon": "assets/icons/items/the_truth_is_up_there.png"
+  },
   "the_twins_treasure_bag": {
    "model": "assets/models/items/the_twins_treasure_bag.glb",
    "sockets": {
@@ -9631,6 +9784,10 @@
   "torch": {
    "object": "torch",
    "icon": "assets/icons/items/torch.png"
+  },
+  "trapped_ghost": {
+   "object": "trapped_ghost",
+   "icon": "assets/icons/items/trapped_ghost.png"
   },
   "treasure_map": {
    "object": "treasure_map",
@@ -9954,6 +10111,10 @@
    "object": "vulture_banner",
    "icon": "assets/icons/items/vulture_banner.png"
   },
+  "waldo": {
+   "object": "waldo",
+   "icon": "assets/icons/items/waldo.png"
+  },
   "wall_anchor": {
    "object": "wall_anchor",
    "icon": "assets/icons/items/wall_anchor.png"
@@ -10246,6 +10407,10 @@
     "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/xenopopper.png"
+  },
+  "yellow_dye": {
+   "model": "assets/models/items/yellow_dye.glb",
+   "icon": "assets/icons/items/yellow_dye.png"
   },
   "yellow_paint": {
    "model": "assets/models/items/yellow_paint.glb",
@@ -15476,6 +15641,16 @@
     "refLength": 0.1513,
     "hidesHair": false,
     "tris": 206
+   }
+  },
+  "party_hat": {
+   "head": {
+    "model": "assets/models/armor/party_hat_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": false,
+    "tris": 258
    }
   },
   "platinum_armor": {

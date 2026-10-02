@@ -19,5 +19,30 @@ top_hat|Top Hat|early|clothier
 tuxedo_shirt|Tuxedo Shirt|early|clothier
 tuxedo_pants|Tuxedo Pants|early|clothier
 bewitching_table|Bewitching Table|early|witch doctor
+land|Land|early|painter
+trapped_ghost|Trapped Ghost|early|painter
+outcast|Outcast|early|painter
+dark_soul_reaper|Dark Soul Reaper|early|painter
+waldo|Waldo|early|painter
+sparky|Sparky|early|painter
+the_truth_is_up_there|The Truth Is Up There|hardmode|painter
+silver_dye|Silver Dye|early|dye trader
+brown_dye|Brown Dye|early|dye trader
+black_dye|Black Dye|early|dye trader
+red_dye|Red Dye|early|dye trader
+orange_dye|Orange Dye|early|dye trader
+yellow_dye|Yellow Dye|early|dye trader
+green_dye|Green Dye|early|dye trader
+blue_dye|Blue Dye|early|dye trader
+purple_dye|Purple Dye|early|dye trader
+pink_dye|Pink Dye|early|dye trader
+dye_vat|Dye Vat|early|dye trader
+confetti|Confetti|early|party girl
+confetti_gun|Confetti Gun|early|party girl
+party_hat|Party Hat|early|party girl
+bubble_machine|Bubble Machine|early|party girl
+defender_medal|Defender Medal|early|old one's army
+ale|Ale|early|tavernkeep
+eternia_crystal_stand|Eternia Crystal Stand|early|tavernkeep
 """,
 }
