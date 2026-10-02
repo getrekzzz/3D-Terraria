@@ -42,6 +42,14 @@ time 5
 wait_until town.guide.alive == 1 10
 time noon
 
+# --- P5-02 ---
+# Corruption under the house makes it invalid ("This housing is corrupted."); cleansed, the guide moves back in.
+fill 3 -3 -5 13 -2 5 ebonstone
+wait_until town.guide.home < 0 20
+fill 3 -3 -5 13 -2 5 stone
+town check force
+assert town.homed == 1
+
 # Talking and trading with the peddler.
 give silver_coin 60
 town summon merchant 0 0 -3

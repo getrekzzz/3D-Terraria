@@ -24,6 +24,7 @@ public sealed partial class TownSystem
     private readonly List<TownNpc> _residents = new();
     private readonly Dictionary<string, ICondition> _arrival = new();
     private long _nextId = 1;
+    private long _homeAudit;
     private Pcg32 _rng;
 
     public TownSystem(GameWorld world, TownConfig? config = null)
@@ -64,7 +65,7 @@ public sealed partial class TownSystem
     {
         long tick = _world.Session.Clock.Tick;
         if (!_world.Session.Meta.TownStarted) TryPlaceStarters();
-        if (ArrivalsEnabled && tick % Config.ArrivalInterval == 0) CheckArrivals();
+        if (ArrivalsEnabled && tick % Config.ArrivalInterval == 0) Arrivals(force: false, budgeted: true);
         if (tick % LandmarkInterval == 0) UpdateLandmarks();
         if (tick % Config.HomeCheckInterval == 0) CheckHomes();
         foreach (var r in _residents) TickResident(r);
@@ -74,11 +75,13 @@ public sealed partial class TownSystem
     /// Runs the move-in check now (commands, tests). Homeless residents are re-housed at any hour; new residents only
     /// arrive by day unless <paramref name="force"/> is set. Returns the resident that arrived, if any.
     /// </summary>
-    public TownNpc? CheckArrivals(bool force = false)
+    public TownNpc? CheckArrivals(bool force = false) => Arrivals(force, budgeted: false);
+
+    private TownNpc? Arrivals(bool force, bool budgeted)
     {
         var player = _world.LocalPlayer;
         if (player == null) return null;
-        var rooms = VacantRooms();
+        var rooms = VacantRooms(budgeted);
         // Homeless residents are housed first.
         foreach (var r in _residents.Where(r => r.Home == null && r.CountsAsResident))
         {
@@ -120,18 +123,24 @@ public sealed partial class TownSystem
         return true;
     }
 
-    /// <summary>Valid rooms nobody lives in, found from chairs in loaded chunks (every home needs one).</summary>
-    public List<Room> VacantRooms()
+    /// <summary>
+    /// Valid rooms nobody lives in, found from chairs in loaded chunks (every home needs one), through the room cache.
+    /// <paramref name="budgeted"/> (the background check) scans only a few new rooms per tick; the rest wait.
+    /// </summary>
+    public List<Room> VacantRooms(bool budgeted = false)
     {
-        var taken = _residents.Where(r => r.HomeRoom != null).Select(r => r.HomeRoom!.Value).ToHashSet();
-        var seen = new HashSet<Int3>();
+        var taken = new HashSet<Int3>();
+        foreach (var r in _residents)
+            if (r.HomeRoom is { } k) taken.Add(k);
         var rooms = new List<Room>();
-        foreach (var obj in World.TileObjects.All.Where(o => o.Def.Housing.Contains("chair")).OrderBy(o => o.Id).ToList())
+        var chairs = new List<Voxels.TileObjects.TileObjectInstance>();
+        foreach (var o in World.TileObjects.All)
+            if (Array.IndexOf(o.Def.Housing, "chair") >= 0) chairs.Add(o);
+        chairs.Sort((a, b) => a.Id.CompareTo(b.Id));
+        foreach (var obj in chairs)
         {
-            if (seen.Contains(obj.Anchor)) continue;
-            var room = _world.Housing.Scan(obj.Anchor);
-            foreach (var c in room.Interior) seen.Add(c);
-            if (room.Valid && room.HomeNode != null && !taken.Contains(room.Key) && rooms.All(r => r.Key != room.Key)) rooms.Add(room);
+            if (_world.Rooms.Get(obj.Anchor, budgeted) is not { } room) continue; // over budget: next interval
+            if (room.Valid && room.HomeNode != null && !taken.Contains(room.Key) && !rooms.Exists(r => r.Key == room.Key)) rooms.Add(room);
         }
         return rooms;
     }
@@ -192,20 +201,29 @@ public sealed partial class TownSystem
         npc.HomeRoom = room.Key;
     }
 
+    /// <summary>
+    /// Re-validates homes through the room cache (edits near a home drop its cached room). One home per check is
+    /// rescanned regardless, in case an edit path slipped past the invalidation.
+    /// </summary>
     private void CheckHomes()
     {
+        if (_residents.Count > 0 && _residents[(int)(_homeAudit++ % _residents.Count)].Home is { } audited)
+            _world.Rooms.Invalidate(HomeCell(audited));
         foreach (var r in _residents)
         {
             if (r.Home is not { } home) continue;
-            var cell = home + new Int3(-1, 1, -1);
+            var cell = HomeCell(home);
             if (World.GetBlock(cell) == VoxelWorld.Unknown) continue; // cannot judge an unloaded home
-            var room = _world.Housing.Scan(cell);
+            if (_world.Rooms.Get(cell, budgeted: true) is not { } room) continue; // over budget: judged next time
             if (room.Valid && room.Key == r.HomeRoom) continue;
             r.Home = null;
             r.HomeRoom = null;
             HomeLost?.Invoke(r);
         }
     }
+
+    /// <summary>An air cell inside the room of a home node (the node is the corner of four body columns).</summary>
+    private static Int3 HomeCell(Int3 home) => home + new Int3(-1, 1, -1);
 
     /// <summary>Feet position (m) of a navigation node (grid vertex).</summary>
     public static Vector3 NodeFeet(Int3 node) => new Vector3(node.X, node.Y, node.Z) * Units.CellSize;

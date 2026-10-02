@@ -432,3 +432,10 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   re-housed at any hour. A fallen or vanished resident returns at the first dawn after `DiedAtTick` once
   `minDeadTicks` have passed (`TownSystem.Life.cs`; `respawnAtDawn: false` restores the fixed delay). Setting the
   clock back clamps `DiedAtTick`. `Bound`/`DiedAt` are optional `ResidentModel` fields (old saves load with defaults).
+* **Housing validity** (`HousingScanner`): Corruption/Crimson blocks (tag `evil`, not `ore`) within `evilMargin` of a
+  room, sampled every other column, make it "This housing is corrupted." at `evilLimit` hits. Problems and
+  `Room.Message` use Terraria's query wording from `housing.json` `messages`.
+* **Room cache** (`GameWorld.Rooms`, `HousingCache`): rooms are cached by every interior cell and dropped when a block
+  edit (liquids ignored) or a tile object add/remove touches their bounds grown by `evilMargin + 1`; open results
+  expire after `openRoomTtl`. The town's background checks are budgeted (`maxScansPerTick`, retried next interval)
+  and one home per check is re-scanned regardless. Probe `house.scans` counts flood fills.

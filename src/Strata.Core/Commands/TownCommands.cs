@@ -16,11 +16,11 @@ public static class TownCommands
             Run = (ctx, a) =>
             {
                 var cell = ctx.Player.FeetCell + (a.Count >= 3 ? new Int3(a.Int(0, "dx"), a.Int(1, "dy"), a.Int(2, "dz")) : new Int3(0, 1, 0));
-                var room = ctx.World.Housing.Scan(cell);
-                var owner = ctx.World.Town.Residents.FirstOrDefault(t => t.HomeRoom == room.Key && room.Valid);
-                return room.Valid
-                    ? CommandResult.Success($"This room is a valid home ({room.Interior.Count} cells, {room.FloorCells} floor){(owner != null ? $", home of {owner.Title}" : ", vacant")}.")
-                    : CommandResult.Success($"This room is not a valid home: {string.Join(", ", room.Problems)}.");
+                var room = ctx.World.Rooms.Get(cell)!;
+                var owner = room.Valid ? ctx.World.Town.Residents.FirstOrDefault(t => t.HomeRoom == room.Key) : null;
+                return CommandResult.Success(room.Valid
+                    ? $"{room.Message} {room.Interior.Count} cells, {room.FloorCells} floor, {(owner != null ? $"home of {owner.Title}" : "vacant")}."
+                    : string.Join(" ", room.Problems.Distinct()));
             },
         });
         r.Register(new CommandDef
