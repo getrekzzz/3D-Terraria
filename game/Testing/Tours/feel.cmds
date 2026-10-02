@@ -13,9 +13,10 @@ place oak_tree 3 0 0
 wield copper_axe
 aim 0.9 0.15 0.35
 timescale 0.25
-hold use_primary 4
+press use_primary on
 wait_until effects.tree_falls > 0 20
-wait 0.1
+press use_primary off
+wait 0.15
 timescale 0.02
 screenshot a_tree_fall 0
 wait_until screenshot.pending == 0 900
@@ -23,9 +24,9 @@ timescale 1
 wait 2
 camera first
 heal
-spawn zombie 0 1.2
-aim 0 0 1
-wait_until hud.hurt_flashes > 0 10
+aim 0.3 -0.3 1
+tp ~ ~40 ~
+wait_until hud.hurt_flashes > 0 30
 timescale 0.02
 screenshot b_hurt 0
 wait_until screenshot.pending == 0 900

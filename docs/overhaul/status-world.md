@@ -61,9 +61,15 @@ cells"); it passed on the re-run — a pre-existing timing weakness in that scri
 | P3-22 falling trees | done | `TreeEffects`: the tree instance hides while a pooled copy wobbles ±3° per chop; a felled tree topples away from the player (0.9 s), crashes with leaves, chips, `tree_fall` and a small camera kick, then sinks. |
 | P3-24 mining hits and cracks | done | Every block has 100 health; `BlockDef.pickDamageScale` (soft tiles 2×, evil stone/hellstone/dungeon brick ½, hardmode ores ⅓–⅕) — copper: dirt 2 hits, stone 3; `hardness` now only flavours sounds/particles. `BlockCracks`: ≤ 64 depth-reconstructed box decals (`block_crack.gdshader`, atlas from `tools/textures/gen_fx.py`, set `fx`) on every damaged block within 24 m, staged at 0/50/75/90%, fading over the last second; the cursor keeps only its colour ramp. Tink already existed. `MiningHitsTests`. |
 | P3-26 movement dust and splashes | done | `PlayerController` events (`Landed`, `Jumped`, `Footstep`, `LiquidEntered/Exited`) and `GroundBlock()`; `PlayerDust`: landing chips in the ground colour, jump/dash/sprint puffs, splash rings + `splash` by plunge speed. |
-| P3-25 hurt and impact | done | `GameWorld.HurtPlayerDirect` (debuff ticks report `Periodic`; fall damage goes through Core — `FallDamaged` removed); quieter periodic hurt sound (≤ 1 per 0.8 s); `HurtOverlay` red vignette (`HurtFlash` setting; Camera shake toggle added to Settings too); `CameraShake.Punch` with roll: boss spawn 0.45, defeat 0.7, hits 0.1–0.35, landings over 14 m/s 0.15; player knockback away·(4 + kb·0.6) + 5.5 up (projectiles 3.5/5); grounded creatures hop ≥ 2.5 m/s, crits knock ×1.4; `jump` sound only on real jumps; creatures swell 12% and fade their red tint when hit. `HurtFeelTests`. |
+| P3-25 hurt and impact | done | `GameWorld.HurtPlayerDirect` (debuff ticks report `Periodic`; fall damage goes through Core — `FallDamaged` removed); quieter periodic hurt sound (≤ 1 per 0.8 s); `HurtOverlay` red vignette (`HurtFlash` setting; Camera shake toggle added to Settings too); `CameraShake.Punch` with roll: boss spawn 0.45, defeat 0.7, hits 0.1–0.35, landings over 14 m/s 0.15; player knockback away·(4 + kb·0.6) + 5.5 up (projectiles 3.5/5), scaled by 1 − knockback resistance; grounded creatures hop 2.5–8 m/s (never stacked by several hits in one tick; crits already knock ×1.4 in `DamageModel`); `jump` sound only on real jumps; creatures swell 12% and fade their red tint when hit. `HurtFeelTests`. |
 
-New probes: `effects.cracks`, `player.splashes`, `camera.punches`, `hud.hurt_flashes`. Smoke: `juice.cmds` (tree chop,
+Adversarially reviewed (P3-24/P3-25): fixes for doubled crit knockback, stacking hops, unvalidated `pickDamageScale`,
+knockback resistance, drowning via `HurtPlayerDirect`, far cracks appearing as you approach and the newest cracks first
+past the cap. Known: crack decals draw over water/glass in front of a damaged block.
+
+CI (push 6): GREEN — 552 Core tests, content checks, Godot import, all 18 smoke scripts, menu tour.
+
+New probes: `effects.cracks`, `effects.tree_falls`, `player.splashes`, `camera.punches`, `hud.hurt_flashes`. Smoke: `juice.cmds` (tree chop,
 cracks), `liquids.cmds` (splash), `movement.cmds` (fall damage + hurt flash). Tours: `Tours/juice.cmds` (cracks),
 `Tours/feel.cmds` (tree fall, hurt flash).
 
