@@ -5,6 +5,9 @@
     { "id": "wall_of_flesh_laser", "name": "Laser", "visual": "bolt", "color": "#ff3050", "friendly": false, "lifetime": 150, "radius": 0.35,
       "collideTerrain": false, "light": [12, 2, 4], "trail": "#ff8090", "covers": ["terraria:eye_laser"] }
   ],
+  "buffs": [
+    { "id": "the_tongued", "name": "The Tongued", "description": "Being reeled into the mouth.", "debuff": true, "color": "#c03a4a", "effects": [{ "type": "noItemUse" }], "covers": ["terraria:the_tongued"] }
+  ],
   "items": [
     { "id": "guide_voodoo_doll", "name": "Guide Voodoo Doll", "description": "It feels warm, and a little too familiar. Keep it away from lava.",
       "category": "bossSummon", "maxStack": 20, "value": 5000,
@@ -21,9 +24,6 @@
       "equipSlot": "accessory", "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.15 }], "covers": ["terraria:sorcerer_emblem"] }
   ],
   "lootTables": [
-    { "id": "wall_of_flesh_emblems", "mode": "weighted", "rolls": 1, "entries": [{ "item": "warrior_emblem" }, { "item": "ranger_emblem" }, { "item": "sorcerer_emblem" }, { "item": "summoner_emblem" }] },
-    { "id": "wall_of_flesh_weapons", "mode": "weighted", "rolls": 1, "entries": [{ "item": "breaker_blade" }, { "item": "clockwork_assault_rifle" }, { "item": "laser_rifle" }] },
-    { "id": "wall_of_flesh", "coins": [60000, 90000], "entries": [{ "item": "pwnhammer" }, { "table": "wall_of_flesh_emblems" }, { "table": "wall_of_flesh_weapons" }, { "item": "lesser_healing_potion", "min": 5, "max": 15 }] },
     { "id": "voodoo_demon", "coins": [300, 800], "entries": [{ "item": "guide_voodoo_doll" }, { "item": "demon_scythe", "chance": 0.03 }] }
   ],
   "enemies": [
@@ -31,10 +31,11 @@
       "id": "wall_of_flesh", "model": "wall_of_flesh_mouth", "tags": ["boss", "lava_immune", "demon"], "name": "Wall of Flesh",
       "description": "The underworld's own flesh, risen to keep the world as it is.",
       "brain": { "type": "wallOfFlesh", "startDistance": 45, "width": 40, "thickness": 3, "baseSpeed": 1.6, "maxSpeed": 5, "catchUpDistance": 60,
-        "trackSpeed": 3, "eyeSpacing": 7, "minion": "the_hungry", "minionInterval": 300, "maxMinions": 5 },
-      "ranged": { "projectile": "wall_of_flesh_laser", "damage": 22, "speed": 18, "interval": 70, "range": 60, "fromParts": true },
+        "trackSpeed": 3, "eyeSpacing": 7, "minion": "the_hungry", "minionInterval": 300, "maxMinions": 5,
+        "tongueDistance": 50, "tongueBuff": "the_tongued", "tonguePull": 14, "leech": "leech", "leechInterval": 420, "maxLeeches": 4, "expertSpeed": 1.25 },
+      "ranged": { "projectile": "wall_of_flesh_laser", "damage": 22, "speed": 18, "interval": 70, "intervalAtZeroLife": 25, "range": 60, "fromParts": true },
       "despawnWhen": [{ "type": "not", "of": [{ "type": "layer", "any": ["underworld"] }] }],
-      "life": 6000, "damage": 50, "defense": 12, "knockbackResist": 1.0, "size": [10, 10], "moveSpeed": 2, "gravity": false, "collideTerrain": false,
+      "life": 8000, "damage": 50, "defense": 12, "knockbackResist": 1.0, "size": [10, 10], "moveSpeed": 2, "gravity": false, "collideTerrain": false,
       "loot": "wall_of_flesh", "value": 0, "light": [8, 3, 3],
       "boss": { "title": "The Wall of Flesh", "flag": "defeated_wall_of_flesh", "arenaRadius": 250, "music": "boss_maw",
         "segments": 2, "segmentRadius": 1.4, "segmentModels": ["wall_of_flesh_eye", "wall_of_flesh_eye"], "barrierModel": "wall_of_flesh_flesh", "barrierTile": 4 },
@@ -43,9 +44,10 @@
     {
       "id": "the_hungry", "model": "the_hungry", "tags": ["lava_immune", "demon"], "name": "The Hungry",
       "brain": { "type": "lunger", "reach": 9, "aggroRange": 26 },
-      "life": 120, "damage": 30, "defense": 10, "knockbackResist": 0.8, "size": [2.2, 2.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false,
+      "life": 240, "damage": 30, "defense": 10, "knockbackResist": 0.8, "size": [2.2, 2.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false,
       "tetherColor": "#8a2a34", "value": 0, "covers": ["terraria:the_hungry"]
     },
+    { "id": "leech", "model": "leech_head", "tags": ["lava_immune", "demon"], "name": "Leech", "description": "Squirms out of the Wall of Flesh's mouth.", "brain": { "type": "worm", "speed": 11, "turnRate": 3, "digRadius": 0, "airGravity": 0 }, "life": 60, "damage": 26, "defense": 2, "knockbackResist": 1.0, "size": [0.8, 0.8], "moveSpeed": 11, "tint": "#e07a8a", "gravity": false, "collideTerrain": false, "value": 0, "boss": { "minor": true, "segments": 4, "segmentSpacing": 0.5, "segmentRadius": 0.3, "segmentModel": "leech_body", "tailModel": "leech_tail" }, "covers": ["terraria:leech"] },
     {
       "id": "voodoo_demon", "model": "imp", "tags": ["lava_immune", "demon"], "name": "Voodoo Demon",
       "description": "Clutches a small, familiar doll.",

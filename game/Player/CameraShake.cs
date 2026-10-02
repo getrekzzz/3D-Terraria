@@ -20,6 +20,9 @@ public static class CameraShake
     /// <summary>Punches so far (probe <c>camera.punches</c>).</summary>
     public static int Punches { get; private set; }
 
+    /// <summary>The trauma left now (0–1; the camera.trauma probe).</summary>
+    public static float Trauma => _trauma;
+
     public static void Kick(float amount) => _trauma = Mathf.Min(1f, _trauma + amount);
 
     /// <summary>A jolt of <paramref name="strength"/> (0–1) that settles over <paramref name="seconds"/>, rolling up to <paramref name="rollDeg"/>.</summary>

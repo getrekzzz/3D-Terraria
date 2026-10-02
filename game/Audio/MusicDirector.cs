@@ -34,6 +34,10 @@ public sealed partial class MusicDirector : Node
     private GameWorld? _game;
     private PlayerEntity? _player;
     private Tween? _fade;
+    private double _silence;
+
+    /// <summary>True while <see cref="Silence"/> holds the soundtrack back.</summary>
+    public bool Silent => _silence > 0;
 
     /// <summary>The one director (created by the game root at boot).</summary>
     public static MusicDirector? Instance { get; private set; }
@@ -68,11 +72,35 @@ public sealed partial class MusicDirector : Node
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.music");
+        if (_silence > 0)
+        {
+            _silence -= delta;
+            if (_silence > 0) return;
+            _check = 0;
+        }
         if (_game == null || _player == null) return;
         _check -= delta;
         if (_check > 0) return;
         _check = 0.75;
         Play(Choose(_game, _player));
+    }
+
+    /// <summary>
+    /// Fades the soundtrack out over a second and holds it silent for <paramref name="seconds"/> (the hush after a boss
+    /// falls, as in Terraria); then the track that fits is chosen again and fades in as usual.
+    /// </summary>
+    public void Silence(double seconds)
+    {
+        _silence = System.Math.Max(_silence, seconds);
+        _current = null; // whatever fits afterwards fades back in, even the track that was playing
+        _fade?.Kill();
+        var tween = _fade = CreateTween().SetParallel();
+        foreach (var p in _players)
+            tween.TweenProperty(p, "volume_db", -60f, 1.0);
+        tween.Chain().TweenCallback(Callable.From(() =>
+        {
+            foreach (var p in _players) p.Stop();
+        }));
     }
 
     /// <summary>The track that fits the player's situation now.</summary>

@@ -49,3 +49,15 @@ assert npcs.unicorn == 1
 assert errors == 0
 killall
 assert errors == 0
+
+# P4-25: the Demon Heart (Expert-only: refused here without errors) and a hardmode treasure bag opening.
+give demon_heart 1
+wield demon_heart
+use
+wait 0.5
+give plantera_treasure_bag 1
+wield plantera_treasure_bag
+use
+wait 0.5
+assert inv.plantera_treasure_bag == 0
+assert errors == 0

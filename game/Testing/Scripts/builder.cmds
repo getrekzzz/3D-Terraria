@@ -103,3 +103,20 @@ mark
 wait_until wires.teleports >= 1 3
 assert player.from_mark > 4
 assert errors == 0
+
+# --- P4-17 ---
+# A Blue Dungeon Chandelier placed by hand hangs from a stone ceiling.
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+fill -6 6 -8 6 6 -1 stone
+wait 0.5
+clear
+give blue_dungeon_chandelier 1
+wield blue_dungeon_chandelier
+aim 0 1 -1
+use
+wait 0.1
+assert inv.blue_dungeon_chandelier == 0
+assert errors == 0

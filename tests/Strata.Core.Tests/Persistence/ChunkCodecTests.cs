@@ -57,6 +57,24 @@ public class ChunkCodecTests
     }
 
     [Fact]
+    public void LockedStateRoundTrips()
+    {
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        var data = RandomChunk(db, 2);
+        var locked = new TileObjectInstance(db.TileObjects.Get("gold_chest"), new Int3(1, 2, 3), 0, 0) { Locked = true, PendingLoot = "dungeon_chest" };
+        var open = new TileObjectInstance(db.TileObjects.Get("shadow_chest"), new Int3(8, 2, 3), 2, 0) { LootRolled = true, Active = true };
+        var decoded = ChunkCodec.Decode(ChunkCodec.Encode(data, 0, new[] { locked, open }, db, ids), db, ids).TileObjects;
+        var a = decoded.Single(o => o.Def.Id == "gold_chest");
+        var b = decoded.Single(o => o.Def.Id == "shadow_chest");
+        Assert.True(a.Locked);
+        Assert.False(a.LootRolled);
+        Assert.Equal("dungeon_chest", a.PendingLoot);
+        Assert.False(b.Locked);
+        Assert.True(b.LootRolled && b.Active);
+    }
+
+    [Fact]
     public void UniformChunksAreTiny()
     {
         var db = TestPaths.Content;

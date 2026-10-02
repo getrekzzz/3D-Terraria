@@ -102,10 +102,25 @@ public static class ConditionCompiler
             string key = p.Item ?? "#" + p.Tag;
             return new DelegateCondition(c => (c.ItemCount?.Invoke(key) ?? 0) >= p.Count);
         },
+        ["wearing"] = s =>
+        {
+            var p = s.Parse<WearingConditionParams>();
+            return new DelegateCondition(c => c.Wearing?.Invoke(p.Item) ?? false);
+        },
         ["difficulty"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.Difficulty >= p.Min && c.Difficulty <= p.Max);
+        },
+        ["expert"] = s =>
+        {
+            var p = s.Parse<ExpertConditionParams>();
+            return new DelegateCondition(c => (c.Difficulty is 1 or 2) == p.Is);
+        },
+        ["defense"] = s =>
+        {
+            var p = s.Parse<RangeConditionParams>();
+            return new DelegateCondition(c => c.PlayerDefense >= p.Min && c.PlayerDefense <= p.Max);
         },
         ["evil"] = s =>
         {
@@ -139,6 +154,11 @@ public static class ConditionCompiler
             var p = s.Parse<SeasonConditionParams>();
             string want = p.Is == "none" ? "" : p.Is;
             return new DelegateCondition(c => c.Season == want);
+        },
+        ["worldRing"] = s =>
+        {
+            var p = s.Parse<RangeConditionParams>();
+            return new DelegateCondition(c => c.CentreDistance >= p.Min && c.CentreDistance <= p.Max);
         },
         ["all"] = s => new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["any"] = s => new AnyCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
@@ -177,13 +197,17 @@ public static class ConditionCompiler
         c.Register<ResidentConditionParams>(SpecKind.Condition, "resident");
         c.Register<RangeConditionParams>(SpecKind.Condition, "residents");
         c.Register<HasItemConditionParams>(SpecKind.Condition, "hasItem");
+        c.Register<WearingConditionParams>(SpecKind.Condition, "wearing");
         c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<RangeConditionParams>(SpecKind.Condition, "fishingPower");
         c.Register<WeatherConditionParams>(SpecKind.Condition, "weather");
         c.Register<FishingLiquidConditionParams>(SpecKind.Condition, "fishingLiquid");
         c.Register<AnglerQuestConditionParams>(SpecKind.Condition, "anglerQuest");
         c.Register<SeasonConditionParams>(SpecKind.Condition, "season");
+        c.Register<ExpertConditionParams>(SpecKind.Condition, "expert");
+        c.Register<RangeConditionParams>(SpecKind.Condition, "defense");
         c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
+        c.Register<RangeConditionParams>(SpecKind.Condition, "worldRing");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "not");

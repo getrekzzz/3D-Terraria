@@ -21,6 +21,21 @@ public static class CombatCommands
     {
         r.Register(new CommandDef
         {
+            Name = "open_disguised", Usage = "open_disguised",
+            Help = "Interacts with the nearest disguised creature within reach, as opening its chest (a Mimic wakes).",
+            Run = (ctx, a) =>
+            {
+                var p = ctx.Player;
+                var npc = ctx.World.Npcs.All.Where(n => n.Disguised).OrderBy(n => Vector3.DistanceSquared(n.Center, p.Center)).FirstOrDefault()
+                    ?? throw new CommandException("nothing disguised nearby");
+                var outcome = ctx.World.Interaction.Interact(p, npc, Gameplay.Interaction.ItemUseSystem.ReachMeters(p, null));
+                return outcome == Gameplay.Interaction.InteractOutcome.Unmasked
+                    ? CommandResult.Success($"The {npc.Def.Disguise!.Name ?? "thing"} was a {npc.Def.DisplayName}!")
+                    : CommandResult.Fail("Out of reach.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "spawn", Usage = "spawn <enemy> [count] [distance]", Help = "Spawns creatures in front of the player (distance in metres, default 5).",
             Run = (ctx, a) =>
             {
@@ -89,6 +104,38 @@ public static class CombatCommands
                 var victims = ctx.World.Npcs.All.Where(n => n.Alive && (id == null || n.Def.Id == id)).ToList();
                 foreach (var n in victims) ctx.World.Npcs.Kill(n);
                 return CommandResult.Success($"Slew {victims.Count} creatures.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "wound", Usage = "wound <enemy id> <amount>", Help = "Takes life from every living creature of a kind (never below 1): puts a boss into a later phase.",
+            Run = (ctx, a) =>
+            {
+                var id = a.Str(0, "enemy");
+                int amount = a.Int(1, "amount");
+                if (!ctx.World.Session.Content.Enemies.Contains(id)) throw new CommandException($"unknown enemy '{id}'");
+                int n = 0;
+                foreach (var npc in ctx.World.Npcs.All)
+                    if (npc.Alive && npc.Def.Id == id)
+                    {
+                        npc.Life = Math.Max(1, npc.Life - amount);
+                        n++;
+                    }
+                return CommandResult.Success($"Hurt {n} creatures.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "damage", Usage = "damage <enemy> <amount> [segment]", Help = "Hits the first living creature of a kind (a worm's segment, 0 = the first behind the head); defense applies.",
+            Run = (ctx, a) =>
+            {
+                var id = a.Str(0, "enemy");
+                var npc = ctx.World.Npcs.All.FirstOrDefault(n => n.Alive && n.Def.Id == id) ?? throw new CommandException($"no living '{id}'");
+                int amount = a.Int(1, "amount");
+                int segment = a.Count > 2 ? a.Int(2, "segment") : -1;
+                if (segment >= npc.Segments.Count) throw new CommandException($"'{id}' has {npc.Segments.Count} segments");
+                bool hit = ctx.World.Npcs.Hit(npc, null, amount, Content.Defs.DamageClass.None, 0, 0f, npc.Center, melee: false, segment: segment);
+                return hit ? CommandResult.Success($"Hit {npc.Def.DisplayName} for up to {amount}.") : CommandResult.Fail("it is immune");
             },
         });
         r.Register(new CommandDef

@@ -1,0 +1,8 @@
+{
+ "comment": "P4-24: the Wall of Flesh's Leeches, a small worm built from the Eater of Worlds generators (tinted pink-red in data).",
+ "creatures": {
+  "leech_head": {"generator": "eater_head", "params": {"radius": 0.32, "length": 0.5}},
+  "leech_body": {"generator": "eater_segment", "params": {"radius": 0.3, "length": 0.48}},
+  "leech_tail": {"generator": "eater_tail", "params": {"radius": 0.3, "length": 0.48}}
+ }
+}

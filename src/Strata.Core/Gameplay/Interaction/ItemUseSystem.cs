@@ -188,6 +188,7 @@ public sealed partial class ItemUseSystem
         if (newAnimation) StartAnimation(p, item, speed); // mid-animation digs and gun bursts leave the swing alone
         if (swings) Swung?.Invoke(p, info);
         Used?.Invoke(p, info, outcome);
+        if (outcome is UseOutcome.Swung or UseOutcome.Shot) LaunchAttackProjectiles(p, info);
         return outcome;
     }
 
@@ -219,7 +220,7 @@ public sealed partial class ItemUseSystem
             {
                 ObjectHitResult.WrongTool => UseOutcome.WrongTool,
                 ObjectHitResult.TooWeak => UseOutcome.TooHard,
-                ObjectHitResult.NotEmpty => UseOutcome.Blocked,
+                ObjectHitResult.NotEmpty or ObjectHitResult.Locked => UseOutcome.Blocked,
                 _ => UseOutcome.HitObject,
             };
         }

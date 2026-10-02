@@ -50,7 +50,7 @@ public sealed class UnderworldPass : GenPass
             bp.Fill(new Aabb3i(new Int3(box.Min.X + 1, y, box.Min.Z + 1), new Int3(box.Max.X - 1, y + 1, box.Max.Z - 1)), "obsidian_brick", ShapeCode.Pack(CellShape.Platform, 0));
         bp.Carve(new Aabb3i(new Int3(ground.X - 1, ground.Y - 1, box.Min.Z), new Int3(ground.X + 2, ground.Y + 4, box.Min.Z + 1)));
         if (rng.Chance(0.5f)) bp.Carve(new Aabb3i(new Int3(box.Min.X, box.Max.Y - 6, box.Min.Z + 2), new Int3(box.Min.X + 3, box.Max.Y, box.Max.Z - 2)));
-        bp.Object(ctx.Content.TileObjects.Get("gold_chest"), new Int3(ground.X - 1, ground.Y - 1, ground.Z + 1), 0, 0, "cabin_chest");
+        bp.Object(ctx.Content.TileObjects.Get("shadow_chest"), new Int3(ground.X - 1, ground.Y - 1, ground.Z + 1), 0, 0, "shadow_chest", locked: true);
         return bp;
     }
 

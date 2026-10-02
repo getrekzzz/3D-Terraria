@@ -264,4 +264,29 @@ assert player.held_tilt_deg < 15
 assert player.held_aim_deg < 15
 release use_primary
 camera first
+
+# --- P4-18 ---
+# A spike beside the player bites once they step onto it.
+tp spawn
+wait 1
+fill -6 -3 -6 6 -1 6 stone
+fill -6 0 -6 6 6 6 air
+heal
+place spike 1 0 0
+wait 0.5
+tp ~1 ~ ~
+wait 0.3
+assert player.life < 100
+tp ~-3 ~ ~
+heal
+assert errors == 0
+
+# --- P4-20 ---
+# The Magic Missile casts one guided missile (it follows the crosshair while the wand is held).
+wait_until projectiles.count == 0 5
+give magic_missile 1
+wield magic_missile
+aim 0 0.3 1
+use
+assert projectiles.count >= 1
 assert errors == 0

@@ -49,6 +49,12 @@ public sealed class ConditionContext
     /// <summary>How many of an item (or items with a tag, "#tag") the players carry; null = unknown (0).</summary>
     public Func<string, int>? ItemCount { get; set; }
 
+    /// <summary>Whether a player has an item equipped (armor or accessory); null = unknown (no).</summary>
+    public Func<string, bool>? Wearing { get; set; }
+
+    /// <summary>Defense of the player the check is made for (boss enrage).</summary>
+    public int PlayerDefense { get; set; }
+
     /// <summary>World difficulty (0 Classic, 1 Expert, 2 Master, 3 Journey).</summary>
     public int Difficulty { get; set; }
 
@@ -72,6 +78,9 @@ public sealed class ConditionContext
 
     /// <summary>Quest fish the Angler wants today ("" when none; fishing loot only).</summary>
     public string AnglerQuest { get; set; } = "";
+
+    /// <summary>How far out the position lies: 0 at the world's centre, 1 at the edge of its land (outer thirds ≥ 0.66).</summary>
+    public float CentreDistance { get; set; }
 
     public Pcg32 Random;
 

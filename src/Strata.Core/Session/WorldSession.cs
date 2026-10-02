@@ -107,6 +107,7 @@ public sealed partial class WorldSession
         var spawn = session.Generator.Plan.Spawn;
         meta.Spawn = new[] { spawn.X, spawn.Y, spawn.Z };
         meta.PlanHash = session.Generator.Plan.Hash;
+        foreach (var cell in session.Generator.Plan.PlannedWires) session.Wires.Add(cell, Gameplay.Wiring.WireColor.Red); // new worlds only: a loaded world keeps its own
         session.SaveMetaOnly();
         return session;
     }

@@ -154,6 +154,12 @@ public sealed class ConsumeParams : SpecParams
 
     /// <summary>Opens into this loot table (crates, treasure bags).</summary>
     public string? Loot { get; init; }
+
+    /// <summary>Permanently unlocks the Expert-only sixth accessory slot (Demon Heart); usable once, only in Expert and Master worlds.</summary>
+    public bool ExtraAccessorySlot { get; init; }
+
+    /// <summary>Permanently upgrades the player's minecart (Minecart Upgrade Kit): faster; usable once.</summary>
+    public bool MinecartUpgrade { get; init; }
 }
 
 public sealed class BaitSummonParams : SpecParams
@@ -204,6 +210,17 @@ public sealed class SummonBossParams : SpecParams
 
     /// <summary>Message shown when the conditions fail.</summary>
     public string? FailMessage { get; init; }
+
+    /// <summary>
+    /// A town resident cursed into the boss instead (the Clothier Voodoo Doll): it appears <see cref="Height"/> m
+    /// above them while they live, and they vanish into it.
+    /// </summary>
+    public string? Curse { get; init; }
+
+    public float Height { get; init; } = 7f;
+
+    /// <summary>Message shown when the cursed resident is not alive in the world.</summary>
+    public string? CurseFailMessage { get; init; }
 }
 
 /// <summary>

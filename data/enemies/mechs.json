@@ -30,42 +30,40 @@
     { "id": "mechanical_worm", "output": "mechanical_worm", "inputs": [{ "item": "soul_of_night", "count": 6 }, { "item": "iron_bar", "count": 5 }, { "item": "demonite_ore", "count": 10 }], "stations": ["hardmode_anvil"] },
     { "id": "mechanical_skull", "output": "mechanical_skull", "inputs": [{ "item": "bone", "count": 30 }, { "item": "iron_bar", "count": 5 }, { "item": "soul_of_light", "count": 3 }, { "item": "soul_of_night", "count": 3 }], "stations": ["hardmode_anvil"] }
   ],
-  "lootTables": [
-    { "id": "the_twins", "coins": [15000, 22000], "entries": [{ "item": "hallowed_bar", "min": 8, "max": 15 }, { "item": "soul_of_sight", "min": 12, "max": 20 }, { "item": "greater_healing_potion", "min": 3, "max": 8 }] },
-    { "id": "the_destroyer", "coins": [30000, 45000], "entries": [{ "item": "hallowed_bar", "min": 15, "max": 30 }, { "item": "soul_of_might", "min": 25, "max": 40 }, { "item": "greater_healing_potion", "min": 5, "max": 15 }] },
-    { "id": "skeletron_prime", "coins": [30000, 45000], "entries": [{ "item": "hallowed_bar", "min": 15, "max": 30 }, { "item": "soul_of_fright", "min": 25, "max": 40 }, { "item": "greater_healing_potion", "min": 5, "max": 15 }] }
-  ],
   "enemies": [
     {
       "id": "retinazer", "facing": "look", "model": "retinazer", "tags": ["boss", "lava_immune", "mechanical"], "name": "Retinazer",
       "description": "The cold eye of the pair: it keeps its distance and burns with light.",
-      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 22, "dashSpeed": 14, "dashesPerBurst": 1, "telegraphTicks": 40, "phase2Life": 0.45, "phase2Model": "retinazer_open" },
+      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 22, "dashSpeed": 14, "dashesPerBurst": 1, "telegraphTicks": 40, "phase2Life": 0.4, "phase2Model": "retinazer_open",
+        "phase2Defense": 20, "phase2Damage": 1.5, "transformTicks": 60, "sibling": "spazmatism", "expertLoneSpeed": 1.25 },
       "ranged": { "projectile": "death_laser", "damage": 32, "speed": 30, "interval": 75, "range": 45,
         "enraged": { "projectile": "death_laser", "damage": 26, "speed": 34, "interval": 18, "range": 45 } },
-      "life": 8000, "damage": 45, "defense": 12, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
+      "life": 20000, "damage": 45, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
       "loot": "the_twins", "value": 0,
-      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["spazmatism"] },
+      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "lootOnDefeat": true, "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["spazmatism"] },
       "covers": ["terraria:the_twins"]
     },
     {
       "id": "spazmatism", "facing": "look", "model": "spazmatism", "tags": ["boss", "lava_immune", "mechanical"], "name": "Spazmatism",
       "description": "The hot eye of the pair: it charges, and when it opens it breathes green fire.",
-      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 14, "dashSpeed": 19, "dashesPerBurst": 3, "telegraphTicks": 26, "phase2Life": 0.45, "phase2Model": "spazmatism_open" },
+      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 14, "dashSpeed": 19, "dashesPerBurst": 3, "telegraphTicks": 26, "phase2Life": 0.4, "phase2Model": "spazmatism_open",
+        "phase2Defense": 28, "phase2Damage": 1.5, "transformTicks": 60, "sibling": "retinazer", "expertLoneSpeed": 1.25 },
       "ranged": { "projectile": "cursed_fireball", "damage": 36, "speed": 14, "interval": 95, "range": 30,
         "enraged": { "projectile": "eye_fire", "damage": 22, "speed": 17, "interval": 6, "count": 2, "spread": 8, "range": 12 } },
-      "life": 8000, "damage": 50, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 10, "gravity": false, "collideTerrain": false, "light": [2, 10, 2],
+      "life": 23000, "damage": 50, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 10, "gravity": false, "collideTerrain": false, "light": [2, 10, 2],
       "loot": "the_twins", "value": 0,
-      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech" }
+      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "lootOnDefeat": true, "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech" }
     },
     {
       "id": "the_destroyer", "model": "the_destroyer_head", "tags": ["boss", "lava_immune", "mechanical"], "name": "The Destroyer",
-      "description": "A clockwork worm long enough to ring a hill; every plate of it carries a laser.",
+      "description": "A clockwork worm long enough to ring a hill; every plate of it carries a laser and a probe.",
       "brain": { "type": "worm", "speed": 12, "turnRate": 2.8, "digRadius": 0, "airGravity": 3, "minion": "probe", "minionInterval": 200, "maxMinions": 6 },
       "ranged": { "projectile": "death_laser", "damage": 28, "speed": 26, "interval": 22, "range": 40, "fromParts": true },
-      "life": 18000, "damage": 55, "defense": 24, "knockbackResist": 1.0, "size": [4, 4], "moveSpeed": 12, "gravity": false, "collideTerrain": false,
+      "life": 80000, "damage": 70, "defense": 0, "knockbackResist": 1.0, "size": [4, 4], "moveSpeed": 12, "gravity": false, "collideTerrain": false,
       "loot": "the_destroyer", "value": 0,
       "boss": { "title": "The Destroyer", "flag": "defeated_the_destroyer", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 220, "despawnAtDay": true, "music": "boss_mech",
-        "segments": 50, "segmentSpacing": 1.3, "segmentRadius": 0.9, "segmentModel": "the_destroyer_body", "tailModel": "the_destroyer_tail" },
+        "segments": 60, "segmentSpacing": 1.3, "segmentRadius": 0.9, "segmentModel": "the_destroyer_body", "tailModel": "the_destroyer_tail",
+        "segmentDefense": [0, 30, 35], "segmentDamage": [70, 50, 35] },
       "covers": ["terraria:the_destroyer"]
     },
     {
@@ -78,14 +76,18 @@
     {
       "id": "skeletron_prime", "model": "skeletron_prime_head", "tags": ["boss", "lava_immune", "mechanical"], "name": "Skeletron Prime",
       "description": "The dungeon's curse, rebuilt in steel with a saw, a vice, a cannon and a laser.",
-      "brain": { "type": "skeletron", "hoverHeight": 7, "handSpacing": 3.2, "swipeInterval": 70, "spinInterval": 600, "spinDuration": 300, "spinSpeed": 12, "swipingHands": 2, "phase2Life": 0.5 },
-      "ranged": { "projectile": "prime_bomb", "damage": 40, "speed": 15, "interval": 55, "range": 36, "fromParts": true, "parts": [2, 3],
-        "enraged": { "projectile": "death_laser", "damage": 30, "speed": 30, "interval": 20, "range": 40 } },
-      "life": 14000, "damage": 55, "defense": 26, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
+      "brain": { "type": "skeletron", "hoverHeight": 7, "spinInterval": 600, "spinDuration": 300, "spinSpeed": 12, "spinDefense": 24, "speedPerLostHand": 0, "phase2Life": 0.5 },
+      "life": 28000, "damage": 50, "defense": 24, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
       "loot": "skeletron_prime", "value": 0,
-      "boss": { "title": "Skeletron Prime", "flag": "defeated_skeletron_prime", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech",
-        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"], "armModel": "prime_arm_strut" },
+      "boss": { "title": "Skeletron Prime", "flag": "defeated_skeletron_prime", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "music": "boss_mech",
+        "parts": [{ "enemy": "prime_saw", "offset": [-3.2, -1.2, 0.8] }, { "enemy": "prime_vice", "offset": [3.2, -1.2, 0.8] }, { "enemy": "prime_cannon", "offset": [-3.6, -2.6, -0.4], "mirror": true }, { "enemy": "prime_laser", "offset": [3.6, -2.6, -0.4] }],
+        "armModel": "prime_arm_strut",
+        "enrage": { "when": [{ "type": "time", "is": "day" }], "setDamage": 1000, "setDefense": 9999, "speed": 2.5 } },
       "covers": ["terraria:skeletron_prime"]
-    }
+    },
+    { "id": "prime_saw", "model": "prime_saw", "tags": ["lava_immune", "mechanical"], "name": "Prime Saw", "description": "Jabs a whirring saw at whatever is near.", "brain": { "type": "skeletronHand", "style": "saw", "attackInterval": 36, "strikeSpeed": 16, "returnSpeed": 12, "strikeTicks": 40, "reach": 8 }, "life": 9000, "damage": 50, "defense": 38, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_saw"] },
+    { "id": "prime_vice", "model": "prime_vice", "tags": ["lava_immune", "mechanical"], "name": "Prime Vice", "description": "Creeps closer, then snaps shut on you.", "brain": { "type": "skeletronHand", "style": "vice", "attackInterval": 150, "windupTicks": 70, "strikeSpeed": 22, "returnSpeed": 10 }, "life": 9000, "damage": 30, "defense": 34, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_vice"] },
+    { "id": "prime_cannon", "model": "prime_cannon", "tags": ["lava_immune", "mechanical"], "name": "Prime Cannon", "description": "Lobs bombs from below the skull.", "brain": { "type": "skeletronHand", "style": "hold" }, "ranged": { "projectile": "prime_bomb", "damage": 30, "speed": 15, "interval": 90, "range": 40, "enraged": { "projectile": "prime_bomb", "damage": 30, "speed": 17, "interval": 45, "range": 40 } }, "life": 7000, "damage": 30, "defense": 23, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_cannon"] },
+    { "id": "prime_laser", "model": "prime_laser", "tags": ["lava_immune", "mechanical"], "name": "Prime Laser", "description": "Fires death lasers, faster once the skull is hurt.", "brain": { "type": "skeletronHand", "style": "hold" }, "ranged": { "projectile": "death_laser", "damage": 25, "speed": 30, "interval": 60, "range": 45, "enraged": { "projectile": "death_laser", "damage": 25, "speed": 32, "interval": 20, "range": 45 } }, "life": 6000, "damage": 30, "defense": 20, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_laser"] }
   ]
 }

@@ -6,11 +6,13 @@ namespace Strata.Core.WorldGen.Structures;
 /// <summary>One primitive operation of a structure blueprint, applied in order.</summary>
 public abstract record BlueprintOp(Aabb3i Bounds);
 
-/// <summary>Fills a box with a block (optionally only replacing air, or only its shell).</summary>
-public sealed record FillOp(Aabb3i Bounds, string Block, byte Shape = 0, bool OnlyAir = false, bool ShellOnly = false) : BlueprintOp(Bounds);
+/// <summary>Fills a box with a block (optionally only replacing air, or only its shell). <see cref="NoZone"/> fills
+/// (e.g. steps up to a door) are stamped but do not count as inside the structure's zone.</summary>
+public sealed record FillOp(Aabb3i Bounds, string Block, byte Shape = 0, bool OnlyAir = false, bool ShellOnly = false, bool NoZone = false) : BlueprintOp(Bounds);
 
-/// <summary>Carves a box to air (optionally filling with a liquid).</summary>
-public sealed record CarveOp(Aabb3i Bounds, byte Liquid = 0) : BlueprintOp(Bounds);
+/// <summary>Carves a box to air (optionally filling with a liquid). <see cref="NoZone"/> carves (approach cuts
+/// outside a building) are stamped but do not count as inside the structure's zone.</summary>
+public sealed record CarveOp(Aabb3i Bounds, byte Liquid = 0, bool NoZone = false) : BlueprintOp(Bounds);
 
 /// <summary>Replaces natural (non-air) cells in a box with a block — e.g. evil conversion, lining.</summary>
 public sealed record ReplaceOp(Aabb3i Bounds, string Block, string[]? OnlyReplace = null) : BlueprintOp(Bounds);
@@ -22,10 +24,12 @@ public sealed record EllipsoidOp(Aabb3i Bounds, System.Numerics.Vector3 Center, 
 public sealed record CylinderOp(Aabb3i Bounds, float CenterX, float CenterZ, float Radius, string? Block, bool OnlyAir = false) : BlueprintOp(Bounds);
 
 /// <summary>Places a tile object anchored at <see cref="Anchor"/>.</summary>
-public sealed record ObjectOp(Aabb3i Bounds, string ObjectId, Int3 Anchor, int Rotation, int Variant = 0, string? Loot = null) : BlueprintOp(Bounds);
+public sealed record ObjectOp(Aabb3i Bounds, string ObjectId, Int3 Anchor, int Rotation, int Variant = 0, string? Loot = null, bool Locked = false) : BlueprintOp(Bounds);
 
-/// <summary>A deterministic list of operations describing a structure, produced during planning.</summary>
-public sealed class Blueprint
+/// <summary>A deterministic list of operations describing a structure, produced during planning. Once
+/// <see cref="Freeze"/>d it is immutable and carries a per-chunk op index, so chunk stamping and zone queries only
+/// visit the ops that can touch a chunk (a large dungeon has thousands).</summary>
+public sealed partial class Blueprint
 {
     private readonly List<BlueprintOp> _ops = new();
     private Aabb3i _bounds = Aabb3i.Empty;
@@ -36,11 +40,11 @@ public sealed class Blueprint
     /// <summary>Cells written by this structure are flagged (e.g. protected dungeon walls).</summary>
     public CellFlags Flags { get; init; } = CellFlags.Structure;
 
-    public void Fill(Aabb3i box, string block, byte shape = 0, bool onlyAir = false) => Add(new FillOp(box, block, shape, onlyAir));
+    public void Fill(Aabb3i box, string block, byte shape = 0, bool onlyAir = false, bool noZone = false) => Add(new FillOp(box, block, shape, onlyAir, NoZone: noZone));
 
     public void Shell(Aabb3i box, string block) => Add(new FillOp(box, block, 0, false, true));
 
-    public void Carve(Aabb3i box, byte liquid = 0) => Add(new CarveOp(box, liquid));
+    public void Carve(Aabb3i box, byte liquid = 0, bool noZone = false) => Add(new CarveOp(box, liquid, noZone));
 
     public void Replace(Aabb3i box, string block, params string[] only) => Add(new ReplaceOp(box, block, only.Length == 0 ? null : only));
 
@@ -71,8 +75,13 @@ public sealed class Blueprint
     public void Object(Content.Defs.TileObjectDef def, Int3 anchor, int rotation = 0, int variant = 0, string? loot = null) =>
         Object(def.Id, anchor, Voxels.TileObjects.TileObjectInstance.FootprintOf(def, rotation), rotation, variant, loot);
 
+    /// <summary>Places a tile object that starts <paramref name="locked"/> (a chest needing its key).</summary>
+    public void Object(Content.Defs.TileObjectDef def, Int3 anchor, int rotation, int variant, string? loot, bool locked) =>
+        Add(new ObjectOp(new Aabb3i(anchor, anchor + Voxels.TileObjects.TileObjectInstance.FootprintOf(def, rotation)), def.Id, anchor, rotation, variant, loot, locked));
+
     public void Add(BlueprintOp op)
     {
+        if (_index != null) throw new InvalidOperationException("Blueprint is frozen.");
         _ops.Add(op);
         _bounds = _bounds.Union(op.Bounds);
     }

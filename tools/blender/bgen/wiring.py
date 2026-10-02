@@ -30,8 +30,8 @@ def teleporter(mb, p, rng):
 
 
 @generator
-def statue(mb, p, rng):
-    """A stone statue: a plinth and a rough carving of what it releases."""
+def critter_statue(mb, p, rng):
+    """A stone wiring statue: a plinth and a rough carving of what it releases (the skeleton uses the Dungeon's statue)."""
     stone, tint = "prop:stone", p.get("color", "#9a9a96")
     mb.box((-0.45, -0.45, 0), (0.45, 0.45, 0.25), stone, "#7a7a76")
     shape = p.get("shape", "slime")

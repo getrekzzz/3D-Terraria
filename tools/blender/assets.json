@@ -230,6 +230,17 @@
         "latch": "prop:iron"
       }
     },
+    "shadow_chest": {
+      "generator": "chest",
+      "params": {
+        "wood": "dark_planks",
+        "woodTint": "#b8a0d0",
+        "band": "dark_iron",
+        "bandTint": "#8070a0",
+        "latch": "prop:plain:glow",
+        "latchTint": "#b060ff"
+      }
+    },
     "torch": {
       "generator": "torch",
       "params": {}
@@ -4376,28 +4387,23 @@
       }
     },
     "wyvern_head": {
-      "generator": "worm_segment",
+      "generator": "sky_dragon",
       "params": {
         "part": "head",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8"
+        "radius": 0.6
       }
     },
     "wyvern_body": {
-      "generator": "worm_segment",
+      "generator": "sky_dragon",
       "params": {
-        "part": "segment",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8",
+        "part": "body",
         "radius": 0.6
       }
     },
     "wyvern_tail": {
-      "generator": "worm_segment",
+      "generator": "sky_dragon",
       "params": {
         "part": "tail",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8",
         "radius": 0.55
       }
     },
@@ -4435,8 +4441,30 @@
         "open": true
       }
     },
-    "golem": {
-      "generator": "golem_idol",
+    "golem_body": {
+      "generator": "golem_body",
+      "params": {}
+    },
+    "golem_head": {
+      "generator": "golem_head",
+      "params": {}
+    },
+    "golem_head_free": {
+      "generator": "golem_head",
+      "params": {
+        "free": true
+      }
+    },
+    "golem_fist": {
+      "generator": "golem_fist",
+      "params": {}
+    },
+    "plantera_hook": {
+      "generator": "plantera_hook",
+      "params": {}
+    },
+    "plantera_tentacle": {
+      "generator": "plantera_tentacle",
       "params": {}
     },
     "queen_slime": {
@@ -5844,11 +5872,8 @@
       }
     },
     "mimic": {
-      "generator": "present",
-      "params": {
-        "color": "#8a5a2a",
-        "ribbon": "#c8a040"
-      }
+      "generator": "mimic",
+      "params": {}
     },
     "bunny": {
       "generator": "bunny",

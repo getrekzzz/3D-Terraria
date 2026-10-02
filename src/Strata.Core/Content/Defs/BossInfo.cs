@@ -1,10 +1,26 @@
 namespace Strata.Core.Content.Defs;
 
-/// <summary>Multipliers a boss gets while the sun is up.</summary>
-public sealed class DayEnrage
+/// <summary>
+/// Data-driven enrage: while <see cref="When"/> holds where the boss's target stands (checked twice a second), the boss
+/// is <see cref="Gameplay.Entities.Npc.Frenzied"/> and fights with these multipliers or fixed values (Terraria's
+/// lethal daylight or out-of-biome rages).
+/// </summary>
+public sealed class Enrage
 {
-    public float Damage { get; init; } = 4f;
-    public float Speed { get; init; } = 2f;
+    public TypedSpec[] When { get; init; } = Array.Empty<TypedSpec>();
+    public float Damage { get; init; } = 1f;
+    public float Speed { get; init; } = 1f;
+
+    /// <summary>Contact and barrier damage while frenzied, replacing the scaled base damage.</summary>
+    public int? SetDamage { get; init; }
+
+    public int? SetDefense { get; init; }
+
+    /// <summary>Once frenzied it stays so until it dies or leaves.</summary>
+    public bool Latch { get; init; }
+
+    /// <summary>Announced once each time the rage begins.</summary>
+    public string? Message { get; init; }
 }
 
 /// <summary>Boss metadata: presentation, arena, progression and body segments (worms).</summary>
@@ -48,17 +64,25 @@ public sealed class BossInfo
 
     public string? TailModel { get; init; }
 
+    /// <summary>
+    /// Models cycled along a worm's body before the tail (segment i wears <c>SegmentPattern[i % length]</c>), e.g. a
+    /// Wyvern's legs every eighth piece; empty = every segment wears <see cref="SegmentModel"/>.
+    /// </summary>
+    public string[] SegmentPattern { get; init; } = Array.Empty<string>();
+
+    /// <summary>The model a chain segment wears: the tail model on the last, else the pattern's, else the body's.</summary>
+    public string ChainModel(int index, int count, string fallback) =>
+        index == count - 1 ? TailModel ?? SegmentModel ?? fallback
+        : SegmentPattern.Length > 0 ? SegmentPattern[index % SegmentPattern.Length] : SegmentModel ?? fallback;
+
     /// <summary>Model per segment index (free parts such as hands); overrides SegmentModel/TailModel.</summary>
     public string[] SegmentModels { get; init; } = Array.Empty<string>();
 
     /// <summary>
-    /// Model stretched from the head to each free part (<see cref="SegmentModels"/>) as a two-bone arm with an outward
+    /// Model stretched from the head to each free part (<see cref="Parts"/>, or <see cref="SegmentModels"/>) as a two-bone arm with an outward
     /// elbow (Skeletron's bones, Prime's struts); modelled along +Y, one unit long.
     /// </summary>
     public string? ArmModel { get; init; }
-
-    /// <summary>Stronger by day instead of leaving (the crypt's curse): multipliers on damage and speed.</summary>
-    public DayEnrage? DayEnrage { get; init; }
 
     /// <summary>Model tiled over the creature's <see cref="Gameplay.Entities.Npc.Barrier"/> (a wall's flesh), and its tile size (m).</summary>
     public string? BarrierModel { get; init; }
@@ -77,6 +101,32 @@ public sealed class BossInfo
     /// </summary>
     public BossPart[] Parts { get; init; } = Array.Empty<BossPart>();
 
+    /// <summary>Condition-driven rage (see <see cref="Defs.Enrage"/>).</summary>
+    public Enrage? Enrage { get; init; }
+
+    /// <summary>Boss head icon id (map and boss bar); defaults to the enemy id.</summary>
+    public string? Icon { get; init; }
+
+    /// <summary>Roll the loot table only when the whole group falls (a pair's last eye), not for every member.</summary>
+    public bool LootOnDefeat { get; init; }
+
+    /// <summary>
+    /// Per-segment life [head, body, tail] (the Eater of Worlds): every segment is hit and dies on its own. Empty = the
+    /// head's life is the whole worm's.
+    /// </summary>
+    public int[] SegmentLife { get; init; } = Array.Empty<int>();
+
+    /// <summary>Defense and contact damage per segment kind [head, body, tail]; empty = the creature's own.</summary>
+    public int[] SegmentDefense { get; init; } = Array.Empty<int>();
+
+    public int[] SegmentDamage { get; init; } = Array.Empty<int>();
+
+    /// <summary>A killed body segment cuts the worm in two (each piece its own worm of the same boss group).</summary>
+    public bool Splits { get; init; }
+
+    /// <summary>Loot table rolled where each segment dies (Shadow Scales and Demonite Ore).</summary>
+    public string? SegmentLoot { get; init; }
+
     /// <summary>A gathering at a landmark that calls this boss up when disturbed (the Lunatic Cultist's devotees).</summary>
     public BossRitual? Ritual { get; init; }
 }
@@ -87,6 +137,18 @@ public sealed class BossPart
 
     /// <summary>Offset from the body's centre in metres [right, up, forward], turned with the body's facing.</summary>
     public float[] Offset { get; init; } = { 0f, 0f, 0f };
+
+    /// <summary>
+    /// The part falls with the body: it does not keep the group's defeat flag from being raised, and it is removed
+    /// (without loot) once the body dies. When false it fights on alone after the body falls.
+    /// </summary>
+    public bool DiesWithBody { get; init; } = true;
+
+    /// <summary>The part's life counts on the boss bar (Moon Lord's hands and head; not Skeletron's hands).</summary>
+    public bool InBossBar { get; init; }
+
+    /// <summary>A left-hand part: presentation mirrors its model (<see cref="Gameplay.Entities.Npc.Mirrored"/>).</summary>
+    public bool Mirror { get; init; }
 }
 
 /// <summary>

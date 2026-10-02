@@ -21,7 +21,7 @@ public sealed partial class PlayerController
     {
         if (Entity.Minecart is not { } ride) return false;
         bool blocked = UI.InputGate.GameplayBlocked;
-        var input = blocked ? Vector2.Zero : Input.GetVector("move_left", "move_right", "move_forward", "move_back");
+        var input = MoveInput(); // reversed while confused (Status)
         var wish = Rig.YawBasis * new Vector3(input.X, 0, input.Y);
         var h = ride.Heading;
         float throttle = Mathf.Clamp(wish.Dot(new Vector3(h.X, 0, h.Z).Normalized()), -1f, 1f);

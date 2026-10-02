@@ -22,7 +22,7 @@
 ## Assets
 | Asset | Tool | Output |
 |---|---|---|
-| Terrain texture array (71 layers; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
+| Terrain texture array (104 layers, among them the Dungeon wall panels and Bone Block; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
 | Prop texture array (bark, leaf-card sprigs, metals, cloth, leather…) | `--set=props` | `assets/textures/props/` |
 | Block item icons | `tools/textures/build_icons.py` | `assets/icons/items/<block>.png` |
 | Tile objects, items, creatures + icons | `tools/blender/build_all.py` (+ `assets.json`) | `assets/models/{objects,items,creatures}/*.glb`, icons, `assets/manifest.json` |
@@ -39,6 +39,12 @@ sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `
 every tile object, item and enemy has a generator (no Blender needed). The spec is `assets.json` merged with the
 drop-in files `assets.d/*.json` (`asset_spec.load_spec()`; duplicate ids fail), and generator modules can register
 functions with `@generator` (`bgen/__init__.py`), which `build_all.py` finds by importing every `bgen` module.
+
+Bevels: `MeshBuilder.box(..., bevel=r, bevel_segments=n)` / `bevel_box(lo, hi, material, color, radius, segments)` and
+`extrude_polygon(..., bevel=r)` (convex outlines) chamfer (1 segment, 44 tris per box) or round (2, 108 tris) every edge,
+the radius clamped to 45 % of the thinnest extent. `bgen/furniture.py` uses two shared radii, `SOFT` (0.018 m, 2
+segments: tops, seats, chest bodies, frames) and `EDGE` (0.010 m chamfer: legs, slats, bands, planks), scaled per entry
+by `params.bevel` (0 = hard boxes); other furniture modules should import those constants and `bevels(p)`.
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
 weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and
@@ -69,3 +75,22 @@ Rendering-only settings: `data/config/graphics.json` (presets) and `data/config/
 block) are validated by `Strata.Tools validate` and at boot, as is `data/config/use_styles.json` (the human clips'
 strike, release and re-draw windows, shared by gameplay and presentation); `data/config/lighting.json` (exposure,
 glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools validate`.
+
+### Palette furniture (dungeon sets)
+`bgen/dungeon_furniture.py` holds a palette-driven furniture family (door, chair, table, bookcase, candelabra,
+chandelier, floor lamp, vase) registered with `@generator`. Every generator reads `palette` (a name from `PALETTES`
+or an inline dict) with per-key overrides (`body`/`bodyTint`, `trim`/`trimTint`, `metal`/`metalTint`, `wax`,
+`books`), so other furniture families reuse it with other layers and tints; `resolve_palette`, `plinth` and
+`candle_cup` are shared helpers. The blue, green and pink Dungeon sets live in `data/tileobjects/dungeon.json`
+(specs in `tools/blender/assets.d/p4-17-dungeon-furniture.json`). A tile object's `flame.also` lists more flame bases
+(same size and colour) for multi-candle lights; keep them in sync with the candle tops the generator places.
+
+### Dungeon and boss generators
+Besides the palette furniture above, the Dungeon draws on `banner` (the six hall banners: Marching Bones, Necromantic
+Sign, Rusted Company Standard, Ragged Brotherhood Sigil, Molten Legion Flag, Diabolic Sigil, 2 x 4 wall hangings
+drawn flush, back to the wall), `statue` (angel, armor and skeleton statues), `book` (shelf books), `spike_strip`
+(`spike`, one MultiMesh per chunk), `chest` (the six vault biome chests and the locked Gold and Shadow chests),
+`bone_welder`, and the bosses' `trophy` generator (3 x 3 wall hangings, front turned away from the wall). Each boss's
+treasure bag, masks and Expert items are items in the boss's data file with models from the boss generator modules.
+Rebuild only what you add: `python3.13 tools/blender/build_all.py --only=<ids>`, which keeps the rest of
+`assets/manifest.json` (when two branches both add assets, take one side's manifest and rebuild the other side's ids).

@@ -16,6 +16,7 @@ sand_slime|Sand Slime|early|desert|hop
 lava_slime|Lava Slime|prehardmode|underworld|hop,lava
 dungeon_slime|Dungeon Slime|prehardmode|dungeon|hop
 spiked_ice_slime|Spiked Ice Slime|early|snow|hop,projectiles
+spiked_slime|Spiked Slime|early|king slime (expert)|hop,projectiles
 zombie|Zombie|early|surface night|walker
 bald_zombie|Bald Zombie|early|surface night|walker
 frozen_zombie|Frozen Zombie|early|snow night|walker
@@ -315,6 +316,7 @@ on_fire|On Fire!|debuff
 poisoned|Poisoned|debuff
 bleeding|Bleeding|debuff
 chilled|Chilled|debuff
+weak|Weak|debuff
 frozen|Frozen|debuff
 confused|Confused|debuff
 cursed_inferno|Cursed Inferno|debuff

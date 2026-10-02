@@ -175,9 +175,11 @@ public static class EditCommands
         });
         r.Register(new CommandDef
         {
-            Name = "interact", Usage = "interact <dx> <dy> <dz>", Help = "Interacts with the tile object at a cell relative to the player's feet (doors, levers).",
+            Name = "interact", Usage = "interact <dx> <dy> <dz> | interact nearest <objectId> [radius] [expectedOutcome]",
+            Help = "Interacts with the tile object at a cell relative to the player's feet (doors, levers), or with the nearest object of a kind within a radius (default 8 cells); fails when the outcome is not the expected one (e.g. refused, containeropened).",
             Run = (ctx, a) =>
             {
+                if (a.Str(0, "dx") == "nearest") return InteractNearest(ctx, a.Str(1, "objectId"), a.OptInt(2, 8), a.Count > 3 ? a.Str(3, "expectedOutcome") : null);
                 var cell = Here(ctx) + new Int3(a.Int(0, "dx"), a.Int(1, "dy"), a.Int(2, "dz"));
                 var obj = ctx.World.Session.World.TileObjects.At(cell) ?? throw new CommandException($"no object at {cell}");
                 return CommandResult.Success($"{obj.Def.Id}: {ctx.World.Interaction.Interact(ctx.Player, obj)}");
@@ -186,6 +188,27 @@ public static class EditCommands
     }
 
     private static Int3 Here(CommandContext ctx) => ctx.Player.FeetCell;
+
+    private static CommandResult InteractNearest(CommandContext ctx, string id, int radius, string? expect)
+    {
+        var here = Here(ctx);
+        var box = new Aabb3i(here - Int3.One * radius, here + Int3.One * (radius + 1));
+        Voxels.TileObjects.TileObjectInstance? best = null;
+        long bestDist = long.MaxValue;
+        foreach (var o in ctx.World.Session.World.TileObjects.InBox(box))
+        {
+            if (o.Def.Id != id) continue;
+            var d = o.Anchor - here;
+            long dist = (long)d.X * d.X + (long)d.Y * d.Y + (long)d.Z * d.Z;
+            if (dist < bestDist || (dist == bestDist && o.Id < best!.Id)) (best, bestDist) = (o, dist);
+        }
+        if (best == null) throw new CommandException($"no {id} within {radius} cells of {here}");
+        var outcome = ctx.World.Interaction.Interact(ctx.Player, best);
+        var text = $"{best.Def.Id}@{best.Anchor}: {outcome}";
+        if (expect != null && !string.Equals(expect, outcome.ToString(), StringComparison.OrdinalIgnoreCase))
+            throw new CommandException($"{text}, expected {expect}");
+        return CommandResult.Success(text);
+    }
 
     private static (ushort Id, BlockDef? Def) Block(CommandContext ctx, string name)
     {

@@ -61,6 +61,7 @@ public sealed partial class TileObjectRenderer : Node3D
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects");
+        PreloadNearDungeon();
         int budget = 8;
         var done = new List<Int3>();
         foreach (var c in _dirty)
@@ -126,7 +127,12 @@ public sealed partial class TileObjectRenderer : Node3D
     {
         var bases = new List<Vector3>();
         foreach (var o in objects)
-            if (!o.Active || o.IsDoor) bases.Add(Flames.BaseOf(flame, Placement.TransformOf(o)));
+        {
+            if (o.Active && !o.IsDoor) continue;
+            var t = Placement.TransformOf(o);
+            bases.Add(Flames.BaseOf(flame, t));
+            foreach (var at in flame.Also) bases.Add(t * new Vector3(at[0], at[1], at[2]));
+        }
         if (bases.Count == 0) return;
         var node = Flames.Batch(flame, bases);
         node.Visible = _chunkRenderer?.IsShown(chunk) ?? true;

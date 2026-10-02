@@ -150,7 +150,7 @@ public static class ChunkCodec
             w.Write((byte)o.Rotation);
             w.Write((byte)o.Variant);
             w.WriteVar(Math.Max(0, o.HitPoints));
-            w.Write((byte)((o.Active ? 1 : 0) | (o.LootRolled ? 2 : 0)));
+            w.Write((byte)((o.Active ? 1 : 0) | (o.LootRolled ? 2 : 0) | (o.Locked ? 4 : 0)));
             w.Write(o.PendingLoot ?? "");
             int slots = o.Container?.Length ?? 0;
             w.WriteVar(slots);
@@ -181,6 +181,7 @@ public static class ChunkCodec
             byte state = r.ReadByte();
             obj.Active = (state & 1) != 0;
             obj.LootRolled = (state & 2) != 0;
+            obj.Locked = (state & 4) != 0;
             var loot = r.ReadString();
             obj.PendingLoot = loot.Length == 0 ? null : loot;
             int slots = r.ReadVar();
