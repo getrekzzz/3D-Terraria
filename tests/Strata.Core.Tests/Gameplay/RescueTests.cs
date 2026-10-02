@@ -50,6 +50,7 @@ public class RescueTests
         var goblin = Bind(g, "goblin_tinkerer");
         Assert.True(goblin.Bound);
         Assert.Equal("Bound Goblin", goblin.Title);
+        Assert.Equal(ResidentPosture.Bound, goblin.Posture); // kneels tied up (P5-07)
         Assert.False(goblin.CountsAsResident);
         Assert.DoesNotContain("goblin_tinkerer", g.World.Town.TownContext(g.Player).Residents);
         g.World.Town.Slay(goblin);
@@ -64,6 +65,7 @@ public class RescueTests
         g.Ticks(10);
         Assert.True(g.World.Town.BeginTalk(goblin, g.Player));
         Assert.False(goblin.Bound);
+        Assert.Equal(ResidentPosture.Stand, goblin.Posture);
         Assert.Contains(TownRescue.FlagFor("goblin_tinkerer"), g.World.Session.Flags);
         Assert.EndsWith("the Goblin Tinkerer", goblin.Title);
         TestHouses.Build(g, g.Floor + new Int3(7, 0, 0));

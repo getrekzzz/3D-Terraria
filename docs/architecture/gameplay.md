@@ -566,3 +566,7 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   (4 m) nearer than the nearest player, re-chosen every 15 ticks; bosses, parts, critters, passive, harmless,
   invulnerable and disguised creatures stay on players, and bound NPCs are never targets. Despawn, enrage and contact
   damage still follow the nearest player; residents take contact hits through `TownSystem`.
+* **Postures** (P5-07): `TownNpc.Posture` (`ResidentPosture` Stand, Sit, Sleep, Bound, Lie) picks the human rest pose
+  (`TownRenderer.Clip`: sit, sleep, bound, lie; Stand falls through to walk/jump/idle). A bound NPC takes it from its
+  rescue pose (`TownNpc.BoundPosture`: bound/webbed/tortured kneel tied, sleeping/unconscious lie) on bind and load,
+  and stands once freed.

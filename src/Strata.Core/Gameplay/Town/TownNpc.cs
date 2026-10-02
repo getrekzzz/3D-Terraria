@@ -13,6 +13,16 @@ public enum ResidentActivity
     Talking,
 }
 
+/// <summary>How a resident's body rests (the renderer's sit/sleep/bound/lie rest poses); Stand walks and idles.</summary>
+public enum ResidentPosture
+{
+    Stand,
+    Sit,
+    Sleep,
+    Bound,
+    Lie,
+}
+
 /// <summary>A town resident living in the world: identity, home, body and current errand.</summary>
 public sealed class TownNpc : Combat.ICombatTarget
 {
@@ -85,6 +95,12 @@ public sealed class TownNpc : Combat.ICombatTarget
     Vector3 Combat.ICombatTarget.Position => Position;
 
     Vector3 Combat.ICombatTarget.Velocity => Velocity;
+
+    /// <summary>Resting posture (seated, asleep in bed, tied up, lying on the ground); Stand for walking and idling.</summary>
+    public ResidentPosture Posture { get; set; }
+
+    /// <summary>The posture a rescue pose shows while bound (bound/webbed/tortured kneel tied; sleeping/unconscious lie).</summary>
+    public static ResidentPosture BoundPosture(string? pose) => pose is "sleeping" or "unconscious" ? ResidentPosture.Lie : ResidentPosture.Bound;
 
     /// <summary>Animation pose for the renderer: idle, walk, jump.</summary>
     public string Pose => !OnGround ? "jump" : new Vector2(Velocity.X, Velocity.Z).LengthSquared() > 0.05f ? "walk" : "idle";

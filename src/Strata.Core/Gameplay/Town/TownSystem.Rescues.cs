@@ -71,6 +71,7 @@ public sealed partial class TownSystem
     {
         var npc = Find(def.Id) ?? Create(def, node, bound: true);
         npc.Bound = true;
+        npc.Posture = TownNpc.BoundPosture(def.Rescue?.Pose);
         return npc;
     }
 
@@ -92,6 +93,7 @@ public sealed partial class TownSystem
         }
         _world.Progression.Set(TownRescue.FlagFor(npc.Def.Id));
         npc.Bound = false;
+        npc.Posture = ResidentPosture.Stand;
         npc.Activity = ResidentActivity.Idle;
         npc.IdleTicks = Config.IdleTicksMin;
         message = (info?.Thanks ?? "").Replace("{player}", player.State.Name);

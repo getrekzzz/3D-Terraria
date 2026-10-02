@@ -207,7 +207,8 @@ public sealed partial class TownSystem
     private TownNpc Create(TownNpcDef def, Int3 node, bool bound = false)
     {
         var name = def.Names.Length > 0 ? def.Names[_rng.Range(0, def.Names.Length - 1)] : def.DisplayName;
-        var npc = new TownNpc(def, name) { Id = _nextId++, Position = NodeFeet(node), IdleTicks = Config.IdleTicksMin, Bound = bound };
+        var npc = new TownNpc(def, name) { Id = _nextId++, Position = NodeFeet(node), IdleTicks = Config.IdleTicksMin, Bound = bound,
+            Posture = bound ? TownNpc.BoundPosture(def.Rescue?.Pose) : ResidentPosture.Stand };
         _residents.Add(npc);
         Spawned?.Invoke(npc);
         return npc;
@@ -284,6 +285,7 @@ public sealed partial class TownSystem
                 Life = Math.Clamp(m.Life, 0, def.Life),
                 RespawnTicks = Math.Min(m.RespawnTicks, LandmarkInterval), // old saves counted the whole delay here
                 Bound = m.Bound,
+                Posture = m.Bound ? TownNpc.BoundPosture(def.Rescue?.Pose) : ResidentPosture.Stand,
                 DiedAtTick = m.DiedAt,
                 IdleTicks = Config.IdleTicksMin,
             };
