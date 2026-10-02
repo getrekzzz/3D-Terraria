@@ -220,3 +220,10 @@ when hit and fall dead (corpses sink after a moment, other creatures shrink away
 are raised onto their feet by their bounds (`CreatureVisual.LiftFor`, only for centred, box-sized models). `NpcRenderer.Arms` stretches a boss's `armModel`
 from its shoulders to each free-flying hand with an outward elbow.
 
+`NpcRenderer.HealthBar` draws a mini health bar over every hurt, living non-boss creature (bosses use the HUD's boss
+bar): a camera-facing quad (`shaders/ui_healthbar.gdshader`) with a dark frame of equal thickness on both axes (at
+least one screen pixel) and a fill that slides from green through yellow to red. All bars share one unit `QuadMesh`
+and one `ShaderMaterial`; the node's scale is the bar's size (width follows the creature, 0.6–2 m), `fraction` is an
+instance uniform sent only when the life changes, and beyond 9 m the shader grows the bar with distance so it keeps
+its on-screen size. Bar nodes are pooled with the creature views. Probe `fx.health_bars` counts the bars shown.
+

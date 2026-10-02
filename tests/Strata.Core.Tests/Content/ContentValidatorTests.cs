@@ -1,5 +1,6 @@
 using Strata.Core.Content;
 using Strata.Core.Content.Loading;
+using Strata.Core.Content.Validation;
 
 namespace Strata.Core.Tests.Content;
 
@@ -148,6 +149,22 @@ public class ContentValidatorTests
         AssertError(db, "relief.ridges must be within 0–60");
         AssertError(db, "relief.mountains.peak must be within 0–80");
         Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":plains", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void BuffsAndInvasionsNeedIcons()
+    {
+        var db = ContentLoader.LoadFromTexts(new[] { ("test.json", """
+        { "buffs": [ { "id": "glowing", "name": "Glowing" }, { "id": "drawn", "name": "Drawn", "icon": "drawn_icon" } ],
+          "events": [
+            { "id": "raid", "phase": "manual", "killGoal": 5, "killTag": "raider" },
+            { "id": "drizzle", "chance": 0.1 }
+          ] }
+        """) }, new ContentValidationOptions { AssetExists = p => p == "assets/icons/buffs/drawn_icon.png" });
+        AssertError(db, "icon asset 'assets/icons/buffs/glowing.png' does not exist");
+        AssertError(db, "icon asset 'assets/icons/events/raid.png' does not exist");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":drawn", StringComparison.Ordinal));
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":drizzle", StringComparison.Ordinal));
     }
 
     [Fact]

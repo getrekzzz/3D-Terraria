@@ -40,6 +40,9 @@ public sealed class EventDef : ContentDef
     public float SpawnRateMultiplier { get; init; } = 1f;
     public int MaxNearbyBonus { get; init; }
 
+    /// <summary>Icon image name under assets/icons/events (defaults to the id); drawn by the invasion progress panel.</summary>
+    public string? Icon { get; init; }
+
     /// <summary>Sky/fog tint while active (#RRGGBB).</summary>
     public string? SkyTint { get; init; }
 
