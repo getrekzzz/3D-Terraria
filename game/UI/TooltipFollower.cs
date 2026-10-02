@@ -30,6 +30,7 @@ public sealed partial class TooltipFollower : CanvasLayer
     private Func<ItemStack>? _read;
     private TooltipSource? _source;
     private string? _emptyText;
+    private string? _footer;
     private Func<string>? _text;
     private string? _textShown;
     private ItemStack _stack;
@@ -73,14 +74,16 @@ public sealed partial class TooltipFollower : CanvasLayer
 
     /// <summary>
     /// Shows the tooltip of the stack <paramref name="read"/> returns, for as long as <paramref name="owner"/> is hovered;
-    /// while the slot is empty, <paramref name="emptyText"/> (the slot's name) if given.
+    /// while the slot is empty, <paramref name="emptyText"/> (the slot's name) if given. <paramref name="footer"/> ends
+    /// it in red when given (why a locked slot is locked).
     /// </summary>
-    public void Show(Control owner, Func<ItemStack> read, TooltipSource source, string? emptyText = null)
+    public void Show(Control owner, Func<ItemStack> read, TooltipSource source, string? emptyText = null, string? footer = null)
     {
         _owner = owner;
         _read = read;
         _source = source;
         _emptyText = emptyText;
+        _footer = footer;
         _text = null;
         Rebuild(read());
         Follow();
@@ -96,6 +99,7 @@ public sealed partial class TooltipFollower : CanvasLayer
         _read = null;
         _source = null;
         _emptyText = null;
+        _footer = null;
         _text = text;
         RebuildText(text());
         Follow();
@@ -111,6 +115,7 @@ public sealed partial class TooltipFollower : CanvasLayer
         _read = null;
         _source = null;
         _emptyText = null;
+        _footer = null;
         _text = null;
         RebuildText(string.IsNullOrEmpty(body) ? title : title + "\n" + body);
         Follow();
@@ -168,6 +173,7 @@ public sealed partial class TooltipFollower : CanvasLayer
                 SetLine(text, kind, rarity);
             }
         }
+        if (_footer != null && _lines < MaxLines && (_lines > 0 || !stack.IsEmpty)) SetLine(_footer, TooltipKind.Bad, 0);
         FinishLines();
     }
 
@@ -213,6 +219,7 @@ public sealed partial class TooltipFollower : CanvasLayer
         _read = null;
         _source = null;
         _emptyText = null;
+        _footer = null;
         _text = null;
         _textShown = null;
         _stack = ItemStack.Empty;

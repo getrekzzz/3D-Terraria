@@ -75,7 +75,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         PausesWorld = open && autoPause;
         if (open)
         {
-            _equipment.Refresh(_ui.Entity.State);
+            _equipment.Refresh(_ui.Entity.State, _ui.Game.Session.Settings.EffectiveDifficulty);
             _crafting.Refresh();
             LayoutChanged?.Invoke();
             return;
@@ -95,7 +95,7 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.inventory_ui");
         if (!IsOpen) return;
-        _equipment.Refresh(_ui.Entity.State);
+        _equipment.Refresh(_ui.Entity.State, _ui.Game.Session.Settings.EffectiveDifficulty);
         int selected = _ui.Inventory.SelectedHotbar;
         for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
     }

@@ -31,6 +31,19 @@ public sealed partial class GameWorld
     };
 
     /// <summary>
+    /// Why accessory slot <paramref name="slot"/> (0-based) is locked in a world of <paramref name="difficulty"/>, in the
+    /// reference game's words: the sixth wants Expert Mode and a Demon Heart, the seventh Master Mode (and, there, the
+    /// Demon Heart). Null when the slot is open.
+    /// </summary>
+    public static string? AccessorySlotRequirement(Difficulty difficulty, bool demonHeart, int slot)
+    {
+        if (slot < AccessorySlotsFor(difficulty, demonHeart)) return null;
+        bool expert = difficulty is Difficulty.Expert or Difficulty.Master;
+        if (slot <= PlayerInventory.BaseAccessorySlots) return expert ? "Requires a Demon Heart" : "Requires Expert Mode and a Demon Heart";
+        return difficulty == Difficulty.Master ? "Requires a Demon Heart" : "Requires Master Mode";
+    }
+
+    /// <summary>
     /// Sets the accessory slots <paramref name="state"/> may use in this world (on joining, and as soon as a Demon Heart
     /// is consumed). Items in a slot that locks stay there, greyed out, and can still be taken out.
     /// </summary>
