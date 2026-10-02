@@ -20,6 +20,7 @@ public static class BuiltinCommands
         CombatCommands.Register(r);
         LiquidCommands.Register(r);
         TownCommands.Register(r);
+        InventoryCommands.Register(r);
         WorldCommands.Register(r);
         WeatherCommands.Register(r);
         FishingCommands.Register(r);
@@ -52,7 +53,7 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "give", Usage = "give <item> [count]", Help = "Adds items to the backpack.",
+            Name = "give", Usage = "give <item> [count]", Help = "Picks up items (coins to the coin slots, ammo to the ammo slots, the rest to the backpack).",
             Run = (ctx, a) =>
             {
                 var content = ctx.World.Session.Content;
@@ -65,11 +66,15 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "clear", Usage = "clear", Help = "Empties the backpack.",
+            Name = "clear", Usage = "clear", Help = "Empties the backpack, coin, ammo and trash slots.",
             Run = (ctx, _) =>
             {
-                ctx.Player.State.Inventory.Backpack.Clear();
-                return CommandResult.Success("Backpack cleared.");
+                var inv = ctx.Player.State.Inventory;
+                inv.Backpack.Clear();
+                inv.Coins.Clear();
+                inv.Ammo.Clear();
+                inv.Trash.Clear();
+                return CommandResult.Success("Inventory cleared.");
             },
         });
         r.Register(new CommandDef
@@ -242,8 +247,10 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "save", Usage = "save", Help = "Saves the world and players now.",
-            Run = (ctx, _) => CommandResult.Success($"Saved ({ctx.World.SaveAll()} chunks)."),
+            Name = "save", Usage = "save [async]", Help = "Saves the world and players now (async: in the background, like the autosave).",
+            Run = (ctx, a) => a.OptStr(0) == "async"
+                ? CommandResult.Success(ctx.World.BeginAutosave() ? "Autosave started." : "An autosave is still being written.")
+                : CommandResult.Success($"Saved ({ctx.World.SaveAll()} chunks)."),
         });
         r.Register(new CommandDef
         {

@@ -29,6 +29,7 @@ public sealed partial class GameWorld : IDisposable
     {
         Session = session;
         Jobs = new JobSystem(Math.Max(1, workers), session.Log);
+        if (session.Saver != null) session.Saver.Post = Jobs.Completions.Enqueue;
         Streamer = new ChunkStreamer(session, Jobs, streaming);
         Drops = new DroppedItemSystem();
         Editor = new WorldEditor(session, Drops);
@@ -59,6 +60,7 @@ public sealed partial class GameWorld : IDisposable
         Wires = new Gameplay.Wiring.WireSystem(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
+        Editor.LightDirty += dirty => Streamer.MarkDirty(dirty, urgent: true, ChunkStreamer.LightPriority);
         Liquids.ChunksDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
     }
 
@@ -104,7 +106,7 @@ public sealed partial class GameWorld : IDisposable
 
     public PlayerEntity? LocalPlayer => Players.Count > 0 ? Players[0] : null;
 
-    /// <summary>Raised after an autosave with the number of chunks written.</summary>
+    /// <summary>Raised on the main thread when an autosave has been written, with the number of chunks saved.</summary>
     public event Action<int>? Autosaved;
 
     public event Action<PlayerEntity>? PlayerDied;
@@ -167,8 +169,8 @@ public sealed partial class GameWorld : IDisposable
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
         if (++_autosaveCounter >= AutosaveTicks)
         {
-            _autosaveCounter = 0;
-            using (prof.Time("tick.autosave")) Autosaved?.Invoke(SaveAll());
+            // Captures on this thread, writes in the background; retried next tick while the last one is still landing.
+            if (BeginAutosave()) _autosaveCounter = 0;
         }
     }
 
@@ -248,27 +250,9 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Ordinary creatures this close to the respawn point leave when a player respawns.</summary>
     public const float RespawnClearRadius = 20f;
 
-    public PlayerEntity AddPlayer(PlayerState state, Vector3 feet)
+    public void Dispose()
     {
-        var p = new PlayerEntity(state) { Position = feet };
-        Players.Add(p);
-        return p;
+        Jobs.Dispose();
+        Session.Dispose();
     }
-
-    /// <summary>Respawn position in meters (bed spawn if set and valid, else world spawn).</summary>
-    public Vector3 SpawnPositionFor(PlayerState state)
-    {
-        var cell = Session.SpawnCell;
-        if (state.SpawnPoints.TryGetValue(Session.Settings.Name, out var bed) && bed.Length == 3) cell = new Int3(bed[0], bed[1], bed[2]);
-        cell = Session.FindStandableNear(cell);
-        return new Vector3(cell.X + 0.5f, cell.Y, cell.Z + 0.5f) * Units.CellSize;
-    }
-
-    public void Shutdown()
-    {
-        SaveAll();
-        Streamer.UnloadAll();
-    }
-
-    public void Dispose() => Jobs.Dispose();
 }

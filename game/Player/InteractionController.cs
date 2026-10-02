@@ -178,10 +178,7 @@ public sealed partial class InteractionController : Node
         var inv = Entity.State.Inventory;
         var held = inv.Held;
         if (held.IsEmpty) return;
-        var stack = inv.Backpack.Take(inv.SelectedHotbar, wholeStack ? held.Count : 1);
-        var aim = Entity.Aim;
-        var velocity = new System.Numerics.Vector3(aim.X, 0.4f, aim.Z) * 5f;
-        Game.Drops.Spawn(stack, Entity.Eye + aim * 0.6f, velocity, pickupDelay: 90);
+        Game.ThrowStack(Entity, inv.Backpack.Take(inv.SelectedHotbar, wholeStack ? held.Count : 1));
     }
 
     private static System.Numerics.Vector3 ToCore(Vector3 v) => new(v.X, v.Y, v.Z);

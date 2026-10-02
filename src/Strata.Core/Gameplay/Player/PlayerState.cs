@@ -19,6 +19,8 @@ public sealed class PlayerState
     {
         Name = name;
         Vitals = new Vitals(BaseLife, BaseMana);
+        // Whatever changes the gear (the inventory screen, commands, a death drop, loading) updates the stats at once.
+        Inventory.EquipmentChanged += Recompute;
     }
 
     public string Name { get; set; }
@@ -92,6 +94,7 @@ public sealed class PlayerState
     public static PlayerState CreateNew(string name, ContentDatabase content)
     {
         var p = new PlayerState(name);
+        p.Inventory.Content = content;
         foreach (var (id, count) in new[] { ("copper_shortsword", 1), ("copper_pickaxe", 1), ("copper_axe", 1), ("torch", 25), ("wood", 20) })
             if (content.Items.TryGet(id, out var item)) p.Inventory.Backpack.Add(new ItemStack(item, count));
         p.Recompute();

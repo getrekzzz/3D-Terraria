@@ -87,3 +87,11 @@ fill -10 8 -10 10 9 10 air
 wait 1.5
 assert render.exposure < 1.15
 assert errors == 0
+
+# --- P3-05 ---
+# Held-item sockets: a gun knows its grip and muzzle, a bow its grip and nock; models load without problems.
+assert sockets.minishark >= 2
+assert sockets.wooden_bow >= 2
+assert sockets.copper_shortsword >= 2
+wait_until assets.pending == 0 60
+assert props.problems == 0

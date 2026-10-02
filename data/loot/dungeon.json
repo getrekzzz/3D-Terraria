@@ -1,15 +1,15 @@
 {
   "lootTables": [
-    { "id": "jungle_chest", "entries": [{ "item": "piranha_gun" }] },
-    { "id": "corruption_chest", "entries": [{ "item": "scourge_of_the_corruptor" }] },
-    { "id": "crimson_chest", "entries": [{ "item": "vampire_knives" }] },
-    { "id": "hallowed_chest", "entries": [{ "item": "rainbow_gun" }] },
-    { "id": "frozen_chest", "entries": [{ "item": "staff_of_the_frost_hydra" }] },
-    { "id": "desert_chest", "entries": [{ "item": "desert_tiger_staff" }] },
+    { "id": "jungle_chest", "name": "Jungle Chests", "entries": [{ "item": "piranha_gun" }] },
+    { "id": "corruption_chest", "name": "Corruption Chests", "entries": [{ "item": "scourge_of_the_corruptor" }] },
+    { "id": "crimson_chest", "name": "Crimson Chests", "entries": [{ "item": "vampire_knives" }] },
+    { "id": "hallowed_chest", "name": "Hallowed Chests", "entries": [{ "item": "rainbow_gun" }] },
+    { "id": "frozen_chest", "name": "Frozen Chests", "entries": [{ "item": "staff_of_the_frost_hydra" }] },
+    { "id": "desert_chest", "name": "Desert Chests", "entries": [{ "item": "desert_tiger_staff" }] },
     { "id": "book", "entries": [{ "item": "book" }] },
-    { "id": "water_bolt_book", "entries": [{ "item": "water_bolt" }] },
+    { "id": "water_bolt_book", "name": "Dungeon Books", "entries": [{ "item": "water_bolt" }] },
     { "id": "dungeon_chest_primary", "mode": "weighted", "entries": [{ "item": "muramasa" }, { "item": "cobalt_shield" }, { "item": "aqua_scepter" }, { "item": "handgun" }, { "item": "blue_moon" }, { "item": "magic_missile" }, { "item": "valor" }] },
-    { "id": "dungeon_chest", "coins": [10000, 30000], "entries": [
+    { "id": "dungeon_chest", "name": "Dungeon Chests", "coins": [10000, 30000], "entries": [
       { "table": "dungeon_chest_primary" },
       { "item": "bone_welder", "chance": 0.14 },
       { "item": "healing_potion", "min": 2, "max": 4, "chance": 0.5 },
@@ -24,7 +24,7 @@
       { "item": "bomb", "min": 5, "max": 10, "chance": 0.3 },
       { "item": "torch", "min": 15, "max": 30, "chance": 0.7 }
     ] },
-    { "id": "dungeon_chest_shadow_key", "entries": [{ "table": "dungeon_chest" }, { "item": "shadow_key" }] },
+    { "id": "dungeon_chest_shadow_key", "name": "Dungeon Chests", "entries": [{ "table": "dungeon_chest" }, { "item": "shadow_key" }] },
     { "id": "clothier_death", "entries": [{ "item": "clothier_voodoo_doll", "conditions": [{ "type": "wearing", "item": "red_hat" }] }] }
   ]
 }

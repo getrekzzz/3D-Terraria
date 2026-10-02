@@ -220,10 +220,10 @@ public class ArsenalTests
     {
         using var g = Arena();
         g.Hold("golden_crate", 2);
-        long before = Coins.Total(g.Player.State.Inventory.Backpack);
+        long before = Coins.Total(g.Player.State.Inventory);
         Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, true));
         Assert.Equal(1, g.Player.State.Inventory.Held.Count);
-        Assert.True(Coins.Total(g.Player.State.Inventory.Backpack) > before, "a golden crate always holds coins");
+        Assert.True(Coins.Total(g.Player.State.Inventory) > before, "a golden crate always holds coins");
     }
 
     [Fact]

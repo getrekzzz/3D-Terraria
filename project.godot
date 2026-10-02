@@ -22,6 +22,12 @@ window/vsync/vsync_mode=1
 
 project/assembly_name="Strata"
 
+[gui]
+
+theme/custom="res://assets/ui/strata_theme.tres"
+theme/custom_font="res://assets/fonts/ComicNeue-Bold.otf"
+timers/tooltip_delay_sec=0.15
+
 [filesystem]
 
 import/blender/enabled=false

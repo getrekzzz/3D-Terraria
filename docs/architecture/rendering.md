@@ -55,6 +55,21 @@ light is interpolated from the mesh. The output is shuffled so any prefix is an 
 near chunks draw the detailed clump (9 curved blades), far ones a 5-blade clump and a shrinking prefix; the shader
 widens far blades so the cover stays even, sinks them into the ground at the distance limit, bends them with gusts
 travelling downwind and parts them around the player (`strata_trample`). Grass casts no shadows.
+`GrassScatter.Hashes` gives every mesh result a grass shape hash and light hash: a remesh with both unchanged does
+nothing, otherwise the chunk is marked for a rebuild that reuses its multimesh RIDs (reallocated only when the count
+changes) and one pooled scratch buffer, while the old grass stays visible. Builds run nearest first, at most
+`grassBuildsPerFrame` (preset) a frame within `Budgets.GrassMs`; chunks are created within the grass distance and
+released 8 m beyond it. Probes `grass.live`, `grass.builds`, `grass.pending`.
+
+## Tile objects
+`TileObjectRenderer` draws one MultiMesh per chunk and model variant and updates it in place: one float buffer per
+group (3×4 transform plus light as custom data) goes up with a single `MultimeshSetBuffer`; capacity grows by 1.5× and
+`VisibleInstanceCount` hides the spare. A chunk is marked by the cheapest update that covers the change: structure
+(objects added or removed, a door or wire toggled) regroups it, placement (its collision changed: wait for
+`ColliderManager.BodyBuilt`, which `WorldRuntime.MeshApplied` reports as `Pending`) re-places it once, light (a remesh
+with unchanged collision) only rewrites the light. Flames are rebuilt only when their bases move. Updates run nearest
+the camera first within `Budgets.ObjectsMs` (at least one chunk a frame); probes `objects.rebuilds`,
+`objects.light_refreshes`, `objects.pending` (`colliders reset` also zeroes the object counters).
 
 ## Horizon
 Beyond the streamed chunks the world continues as a heightfield (`HorizonField`, Core, tested): terrain height from
@@ -72,7 +87,7 @@ caves, structures, edits and hardmode wedges are not in it.
 `GraphicsConfig` (Core, validated with ranges, tested) → `GraphicsSettings` (game) applies them: render scale and
 upscaler (FSR 1/2), anti-aliasing (FXAA/SMAA/TAA/MSAA), anisotropy, shadow atlas, distance and filter, sun size
 (PCSS), torch shadows, SSAO/SSIL/SSR quality, volumetric fog grid, sky radiance size, cloud steps, auto exposure,
-grass density and distance, mesh LOD threshold, horizon distance. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
+grass density and distance, mesh LOD threshold, horizon distance, floating combat numbers on screen. `graphics <preset>` / `--graphics=` switch at runtime; the choice is
 remembered in `user://graphics.cfg`. CI screenshots use `medium`; lavapipe QA uses `high`. Auto exposure (medium and
 up) only fine-tunes within the narrow window from `lighting.json`; cave adaptation and the biome bias come from the
 CPU model on every preset, so desert and snow read the same on low and ultra. The lighting tour
@@ -107,7 +122,12 @@ Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class 
 * Only one sky light casts shadows at a time (the moon waits for sunset).
 * SSAO/SSIL can run at half resolution (`ssaoHalf`/`ssilHalf`); high and ultra do.
 * `DynamicResolution` lowers the 3D resolution (FSR, down to 60%) only when the measured GPU time shows the GPU is the
-  bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync).
+  bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync). The
+  decisions are `Strata.Core.Presentation.ResolutionGovernor`'s (tested): 30-frame windows without hitch frames over
+  50 ms, one level down after 2 slow GPU-bound windows, one up only when the GPU time predicted at the next level
+  (gpu × (next/current)²) stays under 12 ms for 4 windows and 8 s after the last step down, levels 1.0/0.9/0.8/0.7/0.6
+  capped at the preset's scale, 3 s between changes; so it no longer flips (each change reallocates buffers). Probe
+  `render.scale_changes`, timer `gd.dynres.change`.
 * F3 shows GPU and render-CPU milliseconds, the current 3D scale and the preset.
 
 ## Measuring hitches
@@ -142,10 +162,37 @@ the last draw instead, i.e. the main thread's own work, and the summary says "fr
   comes from a rendering run, on a dev GPU (whole frames) or lavapipe (main-thread work, see above):
   `godot --path . --rendering-driver vulkan -- --world=perf --size=small --new --player=perf --fresh-player --view=6
   --graphics=medium --smoke=res://game/Testing/Scripts/perf.cmds`.
+* **GC**: while a world runs `GameRoot` sets `GCSettings.LatencyMode = SustainedLowLatency` (concurrent GC and
+  tiered PGO are on in `Strata.csproj`; probe `gc.latency_mode`, 3 in a world). Large per-job buffers stay off the
+  large-object heap: `MeshVolume.Rent` and the cave pass's dense noise fields are per-thread scratch, and
+  `MeshUpload` passes the Core vertex lists to Godot as spans (`Variant.CreateFrom`) instead of copying them
+  (`AllocationTests` pin both).
 * **Before/after**: run the same rendering command on the parent commit and on the fix, on the same machine, and
   compare the `perf spikes` summary (p99, max, spike counts, GC) and which timers still appear in the spike list.
   Lavapipe timings only compare with other lavapipe runs (they also share the CPU with the software rasteriser, and
   physics runs its 8-step catch-up every frame). The W0 baseline, before any lag fix, is `docs/perf/perf-before.txt`.
+
+## Threaded asset loading
+`game/Rendering/AssetCache.cs` loads creature models, animation sets and prop models on Godot's loader threads
+(`ResourceLoader.LoadThreadedRequest`); `AssetPump` (added by the world launcher, process priority -100) moves up to
+four finished loads per frame into a strong-reference cache. Everything else stays on the main thread: the loader only
+parses resources, nodes are instantiated by callers (timer `assets.instantiate`). `CreatureVisual.Create` returns null
+while a model or its animation set is pending (creature and town renderers retry every frame), projectiles show their
+glow fallback until a model is ready, and `PropLibrary.TryModel` reports Pending without caching a null. The player's
+own body, held items, armour, hair and the menu preview load synchronously (`LoadNow`, `PropLibrary.Model`), which
+also finishes a pending request. Missing files are cached and reported once. Probes: `assets.pending`,
+`assets.loaded`; smoke scripts that assert on fresh creature visuals first `wait_until assets.pending == 0 60`.
+The cache is cleared when the world closes.
+
+`AssetPreloader` requests by relevance, never everything: at launch every humans' animation set, town residents and
+the carried items with their projectiles; each streamed-in chunk's tile-object models; every 2 s the residents, the
+carried items, the bosses of carried summoning items, and `SpawnDirector.LikelyEnemies` (rules passing where the
+player stands, light ignored, plus rules naming a biome there) with `EnemyDef.ModelNames()` (head, segments, tail,
+parts, arms, barrier). The first six likely kinds are pre-warmed into `NpcRenderer`'s pool (`Prewarm`, one visual
+per frame; 1 per kind on the low preset, 2 otherwise); pooled visuals have processing disabled. `ShaderWarmup` draws
+every prop-library material plus the flame, lit-sprite and projectile-glow materials, as a mesh and a MultiMesh, at
+0.01 scale 1 m before the camera for two frames once the first batch is in (or after 2 s). Probes
+`assets.preloaded`, `npcs.prewarmed`, `render.warmed`.
 
 ## Global shader parameters (`project.godot`)
 `strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,
@@ -248,4 +295,22 @@ dash, a shrink on teleport, a spin when a boss changes form; humanoid enemies sw
 when hit and fall dead (corpses sink after a moment, other creatures shrink away). Models built around their centre
 are raised onto their feet by their bounds (`CreatureVisual.LiftFor`, only for centred, box-sized models). `NpcRenderer.Arms` stretches a boss's `armModel`
 from its shoulders to each free-flying hand with an outward elbow.
+
+`NpcRenderer.HealthBar` draws a mini health bar over every hurt, living non-boss creature (bosses use the HUD's boss
+bar): a camera-facing quad (`shaders/ui_healthbar.gdshader`) with a dark frame of equal thickness on both axes (at
+least one screen pixel) and a fill that slides from green through yellow to red. All bars share one unit `QuadMesh`
+and one `ShaderMaterial`; the node's scale is the bar's size (width follows the creature, 0.6–2 m), `fraction` is an
+instance uniform sent only when the life changes, and beyond 9 m the shader grows the bar with distance so it keeps
+its on-screen size. Bar nodes are pooled with the creature views. Probe `fx.health_bars` counts the bars shown.
+
+`CombatEffects.Numbers` floats Terraria's combat text: orange hits, red-orange crits at 1.25× (with a little sideways
+jitter), pink-red damage to players and residents, and green life and blue mana gains ("+50"). Core holds the colours,
+text and motion (`Presentation/CombatText`: a 0.08 s back-eased pop from 0.3×, a 0.9 m rise whose speed falls to zero
+over 0.9 s, a fade from 0.4 s) and raises the gains through `GameWorld.ReportHeal` / `PlayerHealed` (potions,
+crystals, life steal, the nurse; natural regeneration stays silent). Labels are `FixedSize` billboards (pixel size
+0.0011 at font size 56, about 38 px tall on a 900 px view at any distance), drawn over walls, sampled every frame
+instead of tweened, and pooled up to the preset's `combatNumbers` (24 / 48 / 80 / 80); past it the oldest number is
+reused. The digits are rasterised at start. In first person the local player's own hurt and heal numbers float
+1.2 m ahead of the eye and 0.3 m up, rising less so they fade before leaving the top of the screen. Probes:
+`fx.numbers`, `fx.heal_numbers`, `fx.number_labels`.
 

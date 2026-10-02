@@ -47,13 +47,10 @@ public static class MountRules
             Dismount(world, rider);
             return true;
         }
-        var item = SlotMount?.Invoke(rider) ?? FirstMountItem(world, rider);
+        var item = rider.State.Inventory.EquippedMount ?? FirstMountItem(world, rider);
         if (item == null || world.Uses[item].Ride is not { } mount) return false;
         return Toggle(world, rider, item, mount);
     }
-
-    /// <summary>The item in a player's mount equipment slot, when the inventory has one (hooked up by the equipment UI).</summary>
-    public static Func<PlayerEntity, ItemDef?>? SlotMount { get; set; }
 
     private static ItemDef? FirstMountItem(GameWorld world, PlayerEntity rider)
     {

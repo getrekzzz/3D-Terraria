@@ -53,7 +53,7 @@ public sealed partial class NpcSystem
     /// </summary>
     public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock, DamageKind kind = DamageKind.Player)
     {
-        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, kind));
+        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, kind, player));
         PlayerHurt?.Invoke(player, damage, knock);
     }
 }

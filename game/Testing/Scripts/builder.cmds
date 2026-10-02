@@ -1,4 +1,5 @@
-# Builder's gear: climbing rope, riding a minecart along its track, wiring a lever to a door and a pressure plate to a dart trap.
+# Builder's gear: climbing rope, riding a minecart along its track, wiring a lever to a door and a pressure plate to a dart trap,
+# and a chest whose lid swings open while it is shown.
 # Runs with: godot --headless --path . -- --world=smoke-builder --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/builder.cmds
 
 wait_until player.frozen == 0 180
@@ -69,6 +70,18 @@ wait 0.02
 assert projectiles.count >= 1
 wait 0.5
 assert player.life < 100
+assert errors == 0
+
+# Chest lid: opening the chest swings its lid up (drawn as its own MultiMesh), putting the chest away shuts it again.
+place wooden_chest -4 0 -3
+wait 0.5
+assert objects.open_lids == 0
+interact -4 0 -3
+wait 0.4
+assert objects.open_lids == 1
+ui close
+wait 0.4
+assert objects.open_lids == 0
 assert errors == 0
 
 # --- X-15 ---

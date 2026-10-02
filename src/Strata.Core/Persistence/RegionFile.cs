@@ -47,13 +47,25 @@ public static class RegionFile
             if (blob == null) blobs.Remove(index);
             else blobs[index] = blob;
         }
+        Write(path, blobs);
+    }
+
+    /// <summary>Rewrites a region file atomically with exactly these blobs (an empty set deletes the file).</summary>
+    public static void Write(string path, IReadOnlyDictionary<int, byte[]> blobs)
+    {
         if (blobs.Count == 0)
         {
             if (File.Exists(path)) File.Delete(path);
             return;
         }
+        AtomicFile.WriteAllBytes(path, Serialize(blobs));
+    }
 
-        int total = HeaderBytes + blobs.Values.Sum(b => b.Length);
+    /// <summary>The file image of a region: header, offset/length table, then the blobs in index order.</summary>
+    public static byte[] Serialize(IReadOnlyDictionary<int, byte[]> blobs)
+    {
+        int total = HeaderBytes;
+        foreach (var blob in blobs.Values) total += blob.Length;
         var output = new byte[total];
         var span = output.AsSpan();
         BinaryPrimitives.WriteUInt32LittleEndian(span, Magic);
@@ -66,7 +78,7 @@ public static class RegionFile
             blob.CopyTo(span.Slice(cursor));
             cursor += blob.Length;
         }
-        AtomicFile.WriteAllBytes(path, output);
+        return output;
     }
 
     private static bool IsValid(byte[] bytes) =>

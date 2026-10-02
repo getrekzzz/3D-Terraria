@@ -1,0 +1,71 @@
+# Inventory smoke test: Terraria slot clicks, throwing, crates and chest operations, driven through the same Core
+# calls the inventory screen makes (GameWorld.ClickSlot and friends).
+# Runs with: godot --headless --path . -- --world=smoke-inventory --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/inventory.cmds
+
+wait_until player.frozen == 0 180
+wait 0.5
+assert errors == 0
+clear
+
+# --- P2-07 ---
+# Right click takes one at a time; left click puts the stack back.
+give torch 10
+invclick backpack 0 right
+invclick backpack 0 right
+assert inv.cursor == 2
+invclick backpack 0 left
+assert inv.cursor == 0
+assert inv.torch == 10
+# Right click equips armor, and the equipped piece swaps with its vanity slot.
+give copper_helmet 1
+invclick backpack 1 right
+assert player.defense >= 1
+invclick armor 0 right
+assert player.defense == 0
+invclick vanity_armor 0 right
+assert player.defense >= 1
+# A crate opens in place: coins to the coin slots.
+give wooden_crate 1
+invclick backpack 1 right
+assert inv.wooden_crate == 0
+assert inv.coins > 0
+# Alt favourites, Ctrl trashes (favourites refuse), and a thrown cursor stack lands in the world.
+invclick backpack 0 left alt
+invclick backpack 0 left ctrl
+assert inv.trash == 0
+invclick backpack 0 left alt
+invclick backpack 0 left ctrl
+assert inv.trash == 10
+invclick trash 0 left shift
+assert inv.torch == 10
+invclick backpack 0 right
+invthrow
+assert inv.cursor == 0
+assert inv.torch == 9
+assert errors == 0
+
+# --- P2-08 ---
+# Chest buttons on the chest opened last: deposit (not the hotbar), loot, quick stack to nearby chests, sort, rename.
+clear
+fill -1 0 -5 2 2 -2 air
+fill -1 -1 -5 2 -1 -2 dirt
+place wooden_chest 0 0 -4
+interact 0 0 -4
+give wood 30
+invclick backpack 0 left
+invclick backpack 20 left
+chest deposit
+assert inv.wood == 0
+chest loot
+assert inv.wood == 30
+invclick backpack 0 right
+invclick chest 0 left
+invclick backpack 0 left
+invclick backpack 20 left
+quickstack
+assert inv.wood == 0
+chest sort
+invsort
+chest rename Loot
+chest
+assert errors == 0

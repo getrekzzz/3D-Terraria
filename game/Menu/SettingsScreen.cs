@@ -20,8 +20,8 @@ public sealed partial class SettingsScreen : PanelContainer
     {
         _services = services;
         _viewport = viewport;
-        CustomMinimumSize = new Vector2(900, 620);
-        Theme = UI.UiTheme.Theme;
+        // fits the smallest logical viewport the UI scale guard allows (1024×600) with a margin; the tabs scroll
+        CustomMinimumSize = new Vector2(900, 560);
         var style = UI.UiTheme.Panel(0.96f);
         style.ContentMarginLeft = style.ContentMarginRight = 20;
         style.ContentMarginTop = style.ContentMarginBottom = 16;
@@ -30,7 +30,7 @@ public sealed partial class SettingsScreen : PanelContainer
         box.AddThemeConstantOverride("separation", 10);
         AddChild(box);
         box.AddChild(MenuKit.Title("Settings", 40));
-        var tabs = new TabContainer { SizeFlagsVertical = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(0, 460) };
+        var tabs = new TabContainer { SizeFlagsVertical = SizeFlags.ExpandFill, CustomMinimumSize = new Vector2(0, 400) };
         tabs.AddThemeFontSizeOverride("font_size", 18);
         box.AddChild(tabs);
         tabs.AddChild(Tab("Gameplay", Gameplay));
@@ -134,10 +134,18 @@ public sealed partial class SettingsScreen : PanelContainer
         return text;
     }
 
+    /// <summary>"125%", or "150% (effective 125%)" when the window is too small for the chosen scale.</summary>
+    private static string UiScaleText(double v)
+    {
+        float effective = DisplaySettings.Effective((float)v, (Engine.GetMainLoop() as SceneTree)?.Root.Size ?? Vector2I.Zero);
+        return effective < v - 0.001 ? $"{v * 100:0}% (effective {effective * 100:0}%)" : $"{v * 100:0}%";
+    }
+
     private void Interface(VBoxContainer box)
     {
         box.AddChild(Header("Interface"));
-        box.AddChild(MenuKit.Row("UI scale", MenuKit.Slider(0.75, 2, 0.05, S.UiScale, v => { S.UiScale = (float)v; Changed(); }, v => $"{v * 100:0}%")));
+        box.AddChild(MenuKit.Row("UI scale", MenuKit.Slider(0.75, 2, 0.05, S.UiScale, v => { S.UiScale = (float)v; Changed(); }, UiScaleText),
+            "The interface never grows past what fits a 1024×600 layout in the window; a smaller effective scale is shown."));
         box.AddChild(MenuKit.Row("Show target name", MenuKit.Toggle(S.ShowTargetName, v => { S.ShowTargetName = v; Changed(); }),
             "Names the block or object under the crosshair."));
         box.AddChild(MenuKit.Row("Show FPS", MenuKit.Toggle(S.ShowFps, v => { S.ShowFps = v; Changed(); })));

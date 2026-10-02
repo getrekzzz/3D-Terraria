@@ -9,13 +9,13 @@ public sealed partial class NpcSystem
     /// Loot table every hostile creature also rolls when slain (seasonal goodie bags and presents; its entries carry
     /// their own conditions). Critters, statue creatures and town residents never roll it.
     /// </summary>
-    public const string GlobalDropTable = "enemy_global_drops";
+    public const string GlobalDropTable = Content.Index.ItemSourceIndex.GlobalDropTable;
 
     /// <summary>
     /// Prefix of a creature's extra loot table ("extra_king_slime"): drops added by other content (mounts) on top of the
     /// creature's own table, so they need not edit it.
     /// </summary>
-    public const string ExtraDropPrefix = "extra_";
+    public const string ExtraDropPrefix = Content.Index.ItemSourceIndex.ExtraTablePrefix;
 
     private void RollGlobalDrops(Npc npc, Common.Int3 cell, List<ItemStack> drops)
     {

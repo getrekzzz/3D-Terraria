@@ -9,8 +9,8 @@ namespace Strata.Game.Entities;
 
 /// <summary>
 /// Presents creatures: an animated model per creature (pooled by model), smoothed between simulation ticks,
-/// tinted per definition, flashing when hurt, plus a small health readout. Motion on top of the clips (facing,
-/// banking, squash, attacks, deaths): NpcRenderer.Motion.
+/// tinted per definition, flashing when hurt, plus a mini health bar (NpcRenderer.HealthBar). Motion on top of the
+/// clips (facing, banking, squash, attacks, deaths): NpcRenderer.Motion.
 /// </summary>
 public sealed partial class NpcRenderer : Node3D
 {
@@ -18,7 +18,8 @@ public sealed partial class NpcRenderer : Node3D
     {
         public required CreatureVisual Visual;
         public required string Model;
-        public required Label3D Health;
+        public required MeshInstance3D Health;
+        public float BarFraction = -1f;
         public MeshInstance3D? Stalk;
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public readonly List<CreatureVisual> Barrier = new();
@@ -66,6 +67,7 @@ public sealed partial class NpcRenderer : Node3D
         _game = game;
         _props = props;
         Name = "Creatures";
+        InitializeHealthBars();
         game.Npcs.Removed += npc =>
         {
             if (!_views.Remove(npc.Id, out var view)) return;
@@ -74,7 +76,7 @@ public sealed partial class NpcRenderer : Node3D
             ReleaseArms(npc, view);
             ReleaseIllusions(view);
             if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
-            view.Health.QueueFree();
+            ReleaseBar(view);
             ReleaseTether(view.Stalk);
         };
     }
@@ -82,6 +84,7 @@ public sealed partial class NpcRenderer : Node3D
     private void Release(CreatureVisual visual, string model)
     {
         visual.Visible = false;
+        visual.ProcessMode = ProcessModeEnum.Disabled; // pooled visuals neither animate nor sway
         if (!_pool.TryGetValue(model, out var stack)) _pool[model] = stack = new Stack<CreatureVisual>();
         stack.Push(visual);
     }
@@ -92,12 +95,15 @@ public sealed partial class NpcRenderer : Node3D
         {
             var pooled = stack.Pop();
             pooled.Visible = true;
+            pooled.ProcessMode = ProcessModeEnum.Inherit;
             return pooled;
         }
         // A pool miss instantiates the model (and loads it the first time): the creature-side hitch source.
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.npcs.create");
         var visual = CreatureVisual.Create($"assets/models/creatures/{model}.glb", _props);
-        if (visual != null) AddChild(visual);
+        if (visual == null) return null;
+        AddChild(visual);
+        CountMade(model);
         return visual;
     }
 
@@ -107,6 +113,8 @@ public sealed partial class NpcRenderer : Node3D
         float dt = (float)delta;
         var world = _game.Session.World;
         UpdateCorpses(dt);
+        HealthBarsShown = 0;
+        if (_prewarm.Count > 0) PrewarmStep();
         foreach (var npc in _game.Npcs.All)
         {
             if (!_views.TryGetValue(npc.Id, out var view))
@@ -147,12 +155,7 @@ public sealed partial class NpcRenderer : Node3D
             if (npc.HurtFlash > 0) tint = tint.Lerp(new Color(2.2f, 0.7f, 0.7f), Mathf.Clamp(npc.HurtFlash / 8f, 0f, 1f));
             visual.SetTint(tint);
             visual.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, view.Shown + Vector3.Up * 0.5f)));
-            view.Health.Visible = npc.Life < npc.MaxLife;
-            if (view.Health.Visible)
-            {
-                view.Health.Text = $"{npc.Life}/{npc.MaxLife}";
-                view.Health.Position = view.Shown + new Vector3(0, npc.HalfExtents.Y * 2f + 0.35f, 0);
-            }
+            UpdateHealthBar(npc, view);
         }
         // Arms to boss parts once every view has moved this frame (a hand listed after its body would trail a frame).
         foreach (var npc in _game.Npcs.All)
@@ -231,17 +234,7 @@ public sealed partial class NpcRenderer : Node3D
         // before that carried their own light, which a pooled visual may still hold.
         if (visual.GetNodeOrNull<OmniLight3D>("Glow") is { } oldGlow) oldGlow.QueueFree();
         var stalk = HasTether(npc) ? AcquireTether(npc.Def.TetherColor) : null;
-        var health = new Label3D
-        {
-            Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
-            PixelSize = 0.004f,
-            FontSize = 48,
-            OutlineSize = 12,
-            Modulate = new Color(1f, 0.45f, 0.45f),
-            NoDepthTest = false,
-            Visible = false,
-        };
-        AddChild(health);
+        var health = AcquireBar();
         var pos = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
         float yaw = npc.Yaw + Mathf.Pi;
         return new View { Visual = visual, Model = model, Health = health, Shown = pos, Stalk = stalk, Yaw = yaw, Turn = new Quaternion(Vector3.Up, yaw) };

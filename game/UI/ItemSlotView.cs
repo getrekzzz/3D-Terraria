@@ -13,8 +13,11 @@ public sealed partial class ItemSlotView : Control
 {
     private readonly Func<ItemStack> _read;
     private readonly Func<ItemStack, System.Collections.Generic.List<(string Text, TooltipKind Kind)>>? _tooltip;
+    // The reference game's favourite slot: a gold wash behind the icon.
+    private static readonly Color FavoriteTint = new(1f, 0.78f, 0.25f, 0.3f);
     private bool _hovered;
     private ItemStack _shown;
+    private bool _favoriteShown;
 
     public ItemSlotView(Func<ItemStack> read, float size, Func<ItemStack, System.Collections.Generic.List<(string, TooltipKind)>>? tooltip = null)
     {
@@ -34,16 +37,24 @@ public sealed partial class ItemSlotView : Control
     /// <summary>Icon shown dimmed when empty (armor slot silhouettes).</summary>
     public Texture2D? EmptyHint { get; set; }
 
-    /// <summary>(button, shift) on click.</summary>
-    public event Action<MouseButton, bool>? Clicked;
+    /// <summary>Whether the slot is favourited (Alt+click): drawn gold; null for slots that cannot be.</summary>
+    public Func<bool>? Favorite { get; set; }
+
+    /// <summary>(button, modifier keys) on click.</summary>
+    public event Action<MouseButton, ClickMods>? Clicked;
+
+    /// <summary>Whether the mouse is over the slot (a held right click keeps repeating only while it is).</summary>
+    public bool Hovered => _hovered;
 
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.slot_views");
         var s = _read();
-        if (!s.Equals(_shown))
+        bool favorite = Favorite != null && !s.IsEmpty && Favorite();
+        if (!s.Equals(_shown) || favorite != _favoriteShown)
         {
             _shown = s;
+            _favoriteShown = favorite;
             TooltipText = s.IsEmpty ? "" : s.Item!.DisplayName;
             QueueRedraw();
         }
@@ -53,7 +64,8 @@ public sealed partial class ItemSlotView : Control
     {
         if (e is InputEventMouseButton { Pressed: true } mb && (mb.ButtonIndex == MouseButton.Left || mb.ButtonIndex == MouseButton.Right))
         {
-            Clicked?.Invoke(mb.ButtonIndex, mb.ShiftPressed);
+            var mods = (mb.ShiftPressed ? ClickMods.Shift : 0) | (mb.CtrlPressed || mb.MetaPressed ? ClickMods.Ctrl : 0) | (mb.AltPressed ? ClickMods.Alt : 0);
+            Clicked?.Invoke(mb.ButtonIndex, mods);
             AcceptEvent();
         }
     }
@@ -62,6 +74,7 @@ public sealed partial class ItemSlotView : Control
     {
         var rect = new Rect2(Vector2.Zero, Size);
         DrawStyleBox(UiTheme.Slot(Selected, _hovered), rect);
+        if (_favoriteShown) DrawRect(rect.Grow(-3), FavoriteTint);
         var s = _shown;
         var inner = rect.Grow(-Size.X * 0.14f);
         if (!s.IsEmpty)
@@ -100,8 +113,14 @@ public sealed partial class ItemSlotView : Control
             {
                 TooltipKind.Name => UiTheme.Rarity(s.Item!.Rarity),
                 TooltipKind.Flavor => new Color(0.75f, 0.8f, 0.95f),
-                TooltipKind.Price => new Color(0.95f, 0.85f, 0.5f),
                 TooltipKind.Info => UiTheme.Muted,
+                TooltipKind.Good => new Color(0.47f, 0.75f, 0.47f),
+                TooltipKind.Bad => new Color(0.75f, 0.47f, 0.47f),
+                TooltipKind.PriceCopper => new Color(0.96f, 0.54f, 0.38f),
+                TooltipKind.PriceSilver => new Color(0.71f, 0.75f, 0.76f),
+                TooltipKind.PriceGold => new Color(0.88f, 0.79f, 0.36f),
+                TooltipKind.PricePlatinum => new Color(0.86f, 0.86f, 0.78f),
+                TooltipKind.NoValue => new Color(0.47f, 0.47f, 0.47f),
                 _ => UiTheme.Text,
             });
             box.AddChild(label);

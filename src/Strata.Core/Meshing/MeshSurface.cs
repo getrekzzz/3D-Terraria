@@ -59,6 +59,10 @@ public sealed class MeshSurface
     public ReadOnlySpan<Vector4> ColorSpan => CollectionsMarshal.AsSpan(Colors);
     public ReadOnlySpan<int> IndexSpan => CollectionsMarshal.AsSpan(Indices);
 
+    /// <summary>The custom streams as bytes, without a copy (valid until the surface changes).</summary>
+    public Span<byte> Custom0ByteSpan => MemoryMarshal.AsBytes(CollectionsMarshal.AsSpan(Custom0));
+    public Span<byte> Custom1ByteSpan => MemoryMarshal.AsBytes(CollectionsMarshal.AsSpan(Custom1));
+
     public byte[] Custom0Bytes() => MemoryMarshal.AsBytes(CollectionsMarshal.AsSpan(Custom0)).ToArray();
     public byte[] Custom1Bytes() => MemoryMarshal.AsBytes(CollectionsMarshal.AsSpan(Custom1)).ToArray();
 }

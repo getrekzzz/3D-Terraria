@@ -7,7 +7,9 @@ public sealed partial class PlayerController
     private void TrackFall()
     {
         float y = GlobalPosition.Y;
-        if (!IsOnFloor() && !_swimming && !_climbing)
+        bool airborne = !IsOnFloor() && !_swimming && !_climbing;
+        TrackJumpApex(y, airborne);
+        if (airborne)
         {
             if (!_airborne)
             {

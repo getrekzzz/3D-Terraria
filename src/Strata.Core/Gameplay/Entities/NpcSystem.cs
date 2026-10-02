@@ -11,17 +11,20 @@ using Strata.Core.Voxels;
 
 namespace Strata.Core.Gameplay.Entities;
 
-/// <summary>A damage event for presentation (damage numbers, sounds, flashes).</summary>
-public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer, long NpcId = 0, DamageKind Kind = DamageKind.Hit);
+/// <summary>
+/// A damage event for presentation (damage numbers, sounds, flashes): <paramref name="NpcId"/> the creature struck (0 for
+/// players and residents), <paramref name="Kind"/> what it reports, and <paramref name="Player"/> the player who was hurt
+/// (null otherwise), so a first-person view can float the number in front of the eye.
+/// </summary>
+public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer, long NpcId = 0, DamageKind Kind = DamageKind.Hit,
+    PlayerEntity? Player = null);
 
-/// <summary>What a damage number reports: a hit, damage over time, harm to a player, or healing.</summary>
+/// <summary>What a damage event reports: a hit, damage over time, or harm to a player.</summary>
 public enum DamageKind
 {
     Hit,
     Periodic,
     Player,
-    Heal,
-    Mana,
 }
 
 /// <summary>
@@ -326,7 +329,7 @@ public sealed partial class NpcSystem
             : npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0);
         Damaged?.Invoke(new DamageEvent(shown, hit.Damage, hit.Crit, false, npc.Id));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
-            attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
+            _world.ReportHeal(attacker, attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal))), mana: false);
         if (npc.Life <= 0) Die(npc);
         else if (melee && attacker != null)
             foreach (var inflict in attacker.State.Effects.Inflicts)

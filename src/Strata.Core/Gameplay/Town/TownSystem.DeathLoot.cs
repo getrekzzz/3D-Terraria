@@ -12,7 +12,7 @@ public sealed partial class TownSystem
     /// The table a fallen resident drops from, when it exists: "&lt;resident id&gt;_death" (the Clothier's Voodoo Doll when he
     /// dies while a player wears the Red Hat). Its conditions see the spot and what the players wear ("wearing").
     /// </summary>
-    public static string DeathTable(string residentId) => residentId + "_death";
+    public static string DeathTable(string residentId) => residentId + Content.Index.ItemSourceIndex.DeathTableSuffix;
 
     private void DropDeathLoot(TownNpc r)
     {

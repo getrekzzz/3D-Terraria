@@ -175,6 +175,13 @@ class Wardrobe:
                 if min(v.co.z for v in f.verts) < bottom_z + 0.05 * s:
                     for loop in f.loops:
                         loop[layer] = (*c, 1.0)
+        # Loose cloth for the game's sway (X-17): vertex alpha 1 - weight / 2, from 0 at the waist to 0.9 at the hem.
+        layer = bm.loops.layers.color["Color"]
+        for f in bm.faces:
+            for loop in f.loops:
+                t = max(0.0, min(1.0, (top - loop.vert.co.z) / max(top - bottom_z, 1e-3)))
+                c = loop[layer]
+                loop[layer] = (c[0], c[1], c[2], 1.0 - 0.45 * t ** 1.2)
         obj = mesh_from(bm, name)
         set_slot(obj, "char:cloth")
         # Weights: hips at the waist, sharing with each thigh lower down.

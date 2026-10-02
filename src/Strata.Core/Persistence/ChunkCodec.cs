@@ -18,11 +18,29 @@ public sealed record DecodedChunk(ChunkData Data, int MutationLevel, IReadOnlyLi
 public static class ChunkCodec
 {
     public const uint Magic = 0x314B4353; // "SCK1"
-    public const byte FormatVersion = 1;
+
+    /// <summary>
+    /// v2: object records may carry a meta list (saved chest names, locked dungeon chests), flagged by a state bit. v1 chunks (no meta) still
+    /// read; a v1 reader refuses v2 chunks instead of misreading their object records.
+    /// </summary>
+    public const byte FormatVersion = 2;
 
     private const byte TagEnd = 0, TagBlocks = 1, TagShapes = 2, TagLiquids = 3, TagFlags = 4, TagObjects = 5;
 
-    public static byte[] Encode(ChunkData data, int mutationLevel, IReadOnlyList<TileObjectInstance> objects, ContentDatabase db, WorldIdTables ids)
+    // Object state bits; HasMeta means a tagged meta list follows PendingLoot (v1 chunks never set it).
+    private const byte StateActive = 1, StateLootRolled = 2, StateHasMeta = 4;
+
+    // Object meta entries: tag, length, payload, ended by MetaEnd; readers skip tags they do not know.
+    private const byte MetaEnd = 0, MetaName = 1, MetaLocked = 2;
+
+    public static byte[] Encode(ChunkData data, int mutationLevel, IReadOnlyList<TileObjectInstance> objects, ContentDatabase db, WorldIdTables ids) =>
+        Encode(data, mutationLevel, EncodeObjects(objects, ids), db, ids);
+
+    /// <summary>
+    /// Encodes a chunk whose object section was already captured with <see cref="EncodeObjects"/> (objects are live and
+    /// mutable, so they are captured on the main thread; the voxel data is an immutable snapshot that any thread may encode).
+    /// </summary>
+    public static byte[] Encode(ChunkData data, int mutationLevel, byte[] objectSection, ContentDatabase db, WorldIdTables ids)
     {
         using var raw = new MemoryStream();
         using (var w = new BinaryWriter(raw, System.Text.Encoding.UTF8, leaveOpen: true))
@@ -34,7 +52,12 @@ public static class ChunkCodec
             if (data.Shapes != null) w.WriteSection(TagShapes, s => s.WriteByteRuns(data.Shapes));
             if (data.Liquids != null) w.WriteSection(TagLiquids, s => s.WriteByteRuns(data.Liquids));
             if (data.Flags != null) w.WriteSection(TagFlags, s => s.WriteByteRuns(data.Flags));
-            if (objects.Count > 0) w.WriteSection(TagObjects, s => WriteObjects(s, objects, ids));
+            if (objectSection.Length > 0)
+            {
+                w.Write(TagObjects);
+                w.WriteVar(objectSection.Length);
+                w.Write(objectSection);
+            }
             w.Write(TagEnd);
         }
 
@@ -42,6 +65,25 @@ public static class ChunkCodec
         using (var z = new ZLibStream(compressed, CompressionLevel.Optimal, leaveOpen: true))
             z.Write(raw.GetBuffer(), 0, (int)raw.Length);
         return compressed.ToArray();
+    }
+
+    /// <summary>The body of a chunk's object section (empty when there are no objects).</summary>
+    public static byte[] EncodeObjects(IReadOnlyList<TileObjectInstance> objects, WorldIdTables ids)
+    {
+        if (objects.Count == 0) return Array.Empty<byte>();
+        using var ms = new MemoryStream();
+        using (var w = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true)) WriteObjects(w, objects, ids);
+        return ms.ToArray();
+    }
+
+    /// <summary>Reads an object section body written by <see cref="EncodeObjects"/>.</summary>
+    public static List<TileObjectInstance> DecodeObjects(byte[] section, ContentDatabase db, WorldIdTables ids)
+    {
+        var list = new List<TileObjectInstance>();
+        if (section.Length == 0) return list;
+        using var r = new BinaryReader(new MemoryStream(section));
+        ReadObjects(r, db, ids, list);
+        return list;
     }
 
     public static DecodedChunk Decode(byte[] blob, ContentDatabase db, WorldIdTables ids)
@@ -150,8 +192,10 @@ public static class ChunkCodec
             w.Write((byte)o.Rotation);
             w.Write((byte)o.Variant);
             w.WriteVar(Math.Max(0, o.HitPoints));
-            w.Write((byte)((o.Active ? 1 : 0) | (o.LootRolled ? 2 : 0) | (o.Locked ? 4 : 0)));
+            bool meta = o.CustomName != null || o.Locked;
+            w.Write((byte)((o.Active ? StateActive : 0) | (o.LootRolled ? StateLootRolled : 0) | (meta ? StateHasMeta : 0)));
             w.Write(o.PendingLoot ?? "");
+            if (meta) WriteObjectMeta(w, o);
             int slots = o.Container?.Length ?? 0;
             w.WriteVar(slots);
             for (int i = 0; i < slots; i++)
@@ -179,11 +223,11 @@ public static class ChunkCodec
             int rotation = r.ReadByte(), variant = r.ReadByte();
             var obj = new TileObjectInstance(def, anchor, rotation, variant) { HitPoints = r.ReadVar() };
             byte state = r.ReadByte();
-            obj.Active = (state & 1) != 0;
-            obj.LootRolled = (state & 2) != 0;
-            obj.Locked = (state & 4) != 0;
+            obj.Active = (state & StateActive) != 0;
+            obj.LootRolled = (state & StateLootRolled) != 0;
             var loot = r.ReadString();
             obj.PendingLoot = loot.Length == 0 ? null : loot;
+            if ((state & StateHasMeta) != 0) ReadObjectMeta(r, obj);
             int slots = r.ReadVar();
             for (int i = 0; i < slots; i++)
             {
@@ -196,6 +240,31 @@ public static class ChunkCodec
                 if (obj.Container != null && i < obj.Container.Length) obj.Container[i] = new ItemStack(item, stackCount, prefix);
             }
             into.Add(obj);
+        }
+    }
+
+    private static void WriteObjectMeta(BinaryWriter w, TileObjectInstance o)
+    {
+        if (o.CustomName != null) w.WriteSection(MetaName, s => s.Write(o.CustomName));
+        if (o.Locked)
+        {
+            w.Write(MetaLocked); // a flag entry: no payload
+            w.WriteVar(0);
+        }
+        w.Write(MetaEnd);
+    }
+
+    private static void ReadObjectMeta(BinaryReader r, TileObjectInstance obj)
+    {
+        while (true)
+        {
+            byte tag = r.ReadByte();
+            if (tag == MetaEnd) return;
+            int length = r.ReadVar();
+            long end = r.BaseStream.Position + length;
+            if (tag == MetaName) obj.CustomName = r.ReadString();
+            else if (tag == MetaLocked) obj.Locked = true;
+            r.BaseStream.Position = end;
         }
     }
 }

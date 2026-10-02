@@ -1,5 +1,6 @@
 using Strata.Core.Content;
 using Strata.Core.Content.Loading;
+using Strata.Core.Content.Validation;
 
 namespace Strata.Core.Tests.Content;
 
@@ -151,10 +152,38 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void BuffsAndInvasionsNeedIcons()
+    {
+        var db = ContentLoader.LoadFromTexts(new[] { ("test.json", """
+        { "buffs": [ { "id": "glowing", "name": "Glowing" }, { "id": "drawn", "name": "Drawn", "icon": "drawn_icon" } ],
+          "events": [
+            { "id": "raid", "phase": "manual", "killGoal": 5, "killTag": "raider" },
+            { "id": "drizzle", "chance": 0.1 }
+          ] }
+        """) }, new ContentValidationOptions { AssetExists = p => p == "assets/icons/buffs/drawn_icon.png" });
+        AssertError(db, "icon asset 'assets/icons/buffs/glowing.png' does not exist");
+        AssertError(db, "icon asset 'assets/icons/events/raid.png' does not exist");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":drawn", StringComparison.Ordinal));
+        Assert.DoesNotContain(db.Report.Errors, e => e.Subject.EndsWith(":drizzle", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void RejectsBadIdsAndCovers()
     {
         var db = Load("""{ "items": [ { "id": "BadId", "covers": ["copper"] } ] }""");
         AssertError(db, "snake_case");
         AssertError(db, "terraria:<concept>");
+    }
+
+    [Fact]
+    public void RarityOutsideTerrariaTiersIsAnErrorAndSilentBuffsWarn()
+    {
+        var db = Load("""
+        { "buffs": [ { "id": "mystery" } ],
+          "items": [ { "id": "relic", "rarity": 20 }, { "id": "odd_potion", "rarity": -12, "buff": { "id": "mystery", "ticks": 60 } } ] }
+        """);
+        AssertError(db, "rarity must be -13–13");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("rarity") && e.Message.Contains("odd_potion"));
+        Assert.Contains(db.Report.Warnings, w => w.Message.Contains("buff 'mystery' has no description"));
     }
 }

@@ -31,6 +31,9 @@ public enum LootMode
 /// <summary>A drop table for enemies, chests, pots, bosses and structures.</summary>
 public sealed class LootTableDef : ContentDef
 {
+    /// <summary>Deepest nested table that is still rolled (the top table is depth 0); deeper ones give nothing.</summary>
+    public const int MaxNesting = 8;
+
     public LootMode Mode { get; init; } = LootMode.Each;
     public int Rolls { get; init; } = 1;
     public LootEntry[] Entries { get; init; } = Array.Empty<LootEntry>();

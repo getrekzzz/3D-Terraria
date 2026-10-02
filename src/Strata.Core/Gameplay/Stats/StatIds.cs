@@ -12,6 +12,9 @@ public static class StatIds
     public const string LifeRegen = "lifeRegen";
     public const string ManaRegen = "manaRegen";
     public const string MoveSpeed = "moveSpeed";
+
+    /// <summary>Running-speed bonus of speed boots (Hermes Boots and up): reached after a run-up, boosted by Sprint.</summary>
+    public const string RunSpeed = "runSpeed";
     public const string Acceleration = "acceleration";
     public const string JumpHeight = "jumpHeight";
     public const string GenericDamage = "genericDamage";
@@ -61,7 +64,7 @@ public static class StatIds
 
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
-        MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, Acceleration, JumpHeight, GenericDamage,
+        MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, RunSpeed, Acceleration, JumpHeight, GenericDamage,
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
         Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal, FishingPower, BaitSaving, LavaFishing, CrateChance,

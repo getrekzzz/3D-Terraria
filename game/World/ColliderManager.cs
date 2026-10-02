@@ -1,14 +1,28 @@
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 using Strata.Core.Common;
 using Strata.Core.Meshing;
 
 namespace Strata.Game.World;
 
+/// <summary>What <see cref="ColliderManager.SetData"/> did with a chunk's new collision data.</summary>
+public enum ColliderChange
+{
+    /// <summary>Same geometry as the built bodies (liquid- or light-only remesh): no work at all.</summary>
+    Unchanged,
+
+    /// <summary>Some bucket changed; its body is rebuilt by <see cref="ColliderManager.UpdateFocus"/>.</summary>
+    Pending,
+
+    /// <summary>The chunk has no bodies yet; the data is kept until the player comes near.</summary>
+    Stored,
+}
+
 /// <summary>
-/// Static trimesh colliders for chunks near the physics focus only (the player). Collision data is kept for
-/// every meshed chunk so bodies can be created instantly when the player approaches.
+/// Static trimesh colliders for chunks near the physics focus only (the player). Collision data is kept for every
+/// meshed chunk so bodies can be created when the player approaches. Each chunk has one static body per non-empty
+/// collision bucket (8 solid and 8 platform sub-chunks of 16³ cells); a remesh rebuilds only the buckets whose geometry
+/// hash changed, and the old body stays until its replacement exists, so the ground never has holes.
 /// </summary>
 public sealed partial class ColliderManager : Node3D
 {
@@ -18,124 +32,178 @@ public sealed partial class ColliderManager : Node3D
     /// <summary>Solid tile objects (closed doors, chests, tree trunks).</summary>
     public const uint ObjectLayer = 4;
 
+    private const int AllBuckets = (1 << CollisionBuilder.HashCount) - 1;
+
     private sealed class ChunkCollision
     {
         public CollisionBuilder Data = null!;
-        public Rid Body;
-        public Rid PlatformBody;
-        public readonly List<Shape3D> Shapes = new();
-        public bool Dirty = true;
+        public ulong[] Hashes = null!;
+        public readonly ulong[] BuiltHashes = new ulong[CollisionBuilder.HashCount];
+        public readonly Rid[] Bodies = new Rid[CollisionBuilder.HashCount];
+        public readonly Rid[] Shapes = new Rid[CollisionBuilder.HashCount];
+
+        /// <summary>Buckets whose built body differs from <see cref="Hashes"/>.</summary>
+        public int DirtyMask;
+
+        /// <summary>Bodies exist for this chunk (possibly for slightly older data while a rebuild is pending).</summary>
+        public bool Built;
+
+        /// <summary>A player edit touched the chunk: its next rebuild goes before the distance-ordered ones.</summary>
+        public bool Prioritized;
+
+        /// <summary>Chunk version of the prioritizing edit: only data at least this new satisfies it.</summary>
+        public int PriorityVersion;
+
+        /// <summary>Chunk version the stored <see cref="Data"/> was meshed from.</summary>
+        public int DataVersion;
     }
 
     private readonly Dictionary<Int3, ChunkCollision> _chunks = new();
+    private readonly HashSet<Int3> _built = new();
+    private readonly List<(int Stage, int Distance, Int3 Coord)> _work = new();
+    private readonly List<Int3> _scratch = new();
 
     /// <summary>Chunks (Chebyshev distance) around the focus that get physics bodies.</summary>
     public int Radius { get; set; } = 2;
 
-    public int BodyCount { get; private set; }
+    /// <summary>Chunks that currently have bodies (the <c>colliders.bodies</c> probe).</summary>
+    public int BodyCount => _built.Count;
 
-    /// <summary>A chunk's terrain body was (re)built (objects resting on it can settle onto the smoothed ground).</summary>
+    /// <summary>Chunk builds (first builds and bucket rebuilds) since the last <see cref="ResetCounters"/>.</summary>
+    public int Rebuilt { get; private set; }
+
+    /// <summary>Remeshes whose collision geometry was unchanged (no work) since the last <see cref="ResetCounters"/>.</summary>
+    public int Skipped { get; private set; }
+
+    /// <summary>Chunks near the focus waiting for a build or rebuild after the last <see cref="UpdateFocus"/>.</summary>
+    public int PendingCount { get; private set; }
+
+    /// <summary>A chunk's terrain bodies were built or some bucket's geometry changed (resting objects can settle).</summary>
     public event System.Action<Int3>? BodyBuilt;
 
     /// <summary>Version counter per chunk, bumped whenever its collider is rebuilt (tests assert on it).</summary>
     public Dictionary<Int3, int> Versions { get; } = new();
 
-    public void SetData(Int3 coord, CollisionBuilder data)
+    public void ResetCounters() => Rebuilt = Skipped = 0;
+
+    /// <param name="version">Chunk version the data was meshed from (settles a <see cref="Prioritize"/> request).</param>
+    public ColliderChange SetData(Int3 coord, CollisionBuilder data, int version = int.MaxValue)
     {
+        var hashes = data.Hashes ?? data.ComputeHashes();
         if (!_chunks.TryGetValue(coord, out var c)) _chunks[coord] = c = new ChunkCollision();
+        c.DataVersion = version;
+        if (!c.Built)
+        {
+            c.Data = data;
+            c.Hashes = hashes;
+            return ColliderChange.Stored;
+        }
+        int mask = 0;
+        for (int i = 0; i < hashes.Length; i++)
+            if (hashes[i] != c.BuiltHashes[i]) mask |= 1 << i;
+        if (mask == 0)
+        {
+            // Keep the old data object: same triangles, and any pending mask stays valid against it.
+            if (c.DirtyMask != 0)
+            {
+                c.Data = data;
+                c.Hashes = hashes;
+                c.DirtyMask = 0;
+            }
+            // The edit's own remesh came back with the same geometry: nothing left to hurry. (An older remesh still
+            // in flight when the edit happened does not count.)
+            if (version >= c.PriorityVersion) c.Prioritized = false;
+            Skipped++;
+            return ColliderChange.Unchanged;
+        }
         c.Data = data;
-        c.Dirty = true;
+        c.Hashes = hashes;
+        c.DirtyMask = mask;
+        return ColliderChange.Pending;
+    }
+
+    /// <summary>
+    /// Player edits: these chunks' rebuilds go first until data meshed from at least the chunk's current version
+    /// (<paramref name="version"/>) is built or comes back unchanged.
+    /// </summary>
+    public void Prioritize(IEnumerable<Int3> chunks, System.Func<Int3, int>? version = null)
+    {
+        foreach (var coord in chunks)
+            if (_chunks.TryGetValue(coord, out var c))
+            {
+                c.Prioritized = true;
+                c.PriorityVersion = version?.Invoke(coord) ?? 0;
+            }
     }
 
     public void Remove(Int3 coord)
     {
-        if (_chunks.Remove(coord, out var c)) FreeBody(c);
+        if (_chunks.Remove(coord, out var c)) FreeBodies(coord, c);
     }
 
-    public bool HasBody(Int3 coord) => _chunks.TryGetValue(coord, out var c) && c.Body.IsValid;
+    /// <summary>The chunk has had its bodies built near the player (empty chunks count: they need none).</summary>
+    public bool HasBody(Int3 coord) => _chunks.TryGetValue(coord, out var c) && c.Built;
 
-    /// <summary>Creates, rebuilds or frees bodies according to distance from the focus chunk.</summary>
+    /// <summary>The chunk is near enough for bodies but its build or rebuild has not run yet.</summary>
+    public bool IsPending(Int3 coord) => _chunks.TryGetValue(coord, out var c) && (!c.Built || c.DirtyMask != 0);
+
     /// <summary>
-    /// Keeps bodies for chunks near the focus. Chunks touching the focus chunk are built at once; the rest share a
-    /// small per-frame time budget so walking into new ground never stalls a frame.
+    /// Keeps bodies for chunks near the focus. Frees far bodies, then builds (a) the focus chunk and never-built
+    /// chunks touching it at once, (b) chunks edited by the player, (c) the rest nearest-first while the time budget
+    /// lasts. Prioritized edits next to the focus are also built at once.
     /// </summary>
     public void UpdateFocus(Int3 focusChunk, double budgetMs = 2.0)
     {
         long start = System.Diagnostics.Stopwatch.GetTimestamp();
-        foreach (var (coord, c) in _chunks)
+        FreeFar(focusChunk);
+
+        _work.Clear();
+        for (int dy = -Radius; dy <= Radius; dy++)
+            for (int dz = -Radius; dz <= Radius; dz++)
+                for (int dx = -Radius; dx <= Radius; dx++)
+                {
+                    var coord = focusChunk + new Int3(dx, dy, dz);
+                    if (!_chunks.TryGetValue(coord, out var c) || (c.Built && c.DirtyMask == 0)) continue;
+                    int distance = System.Math.Max(System.Math.Abs(dx), System.Math.Max(System.Math.Abs(dy), System.Math.Abs(dz)));
+                    bool immediate = distance == 0 || (distance == 1 && (!c.Built || c.Prioritized));
+                    _work.Add((immediate ? 0 : c.Prioritized ? 1 : 2, distance, coord));
+                }
+        _work.Sort(WorkComparer.Instance);
+        PendingCount = _work.Count;
+        foreach (var (stage, _, coord) in _work)
         {
-            var d = coord - focusChunk;
-            bool near = d.ChebyshevLength <= Radius;
-            if (!near)
-            {
-                if (c.Body.IsValid) FreeBody(c);
-                continue;
-            }
-            if (!c.Dirty && c.Body.IsValid) continue;
-            bool urgent = d.ChebyshevLength <= 1;
-            if (!urgent && System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds >= budgetMs) continue;
-            Build(coord, c);
+            if (stage > 0 && System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds >= budgetMs) break;
+            Build(coord, _chunks[coord]);
+            PendingCount--;
         }
     }
 
-    private void Build(Int3 coord, ChunkCollision c)
+    private void FreeFar(Int3 focusChunk)
     {
-        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.colliders.build");
-        FreeBody(c);
-        c.Dirty = false;
-        var origin = ChunkMath.ChunkOrigin(coord);
-        var transform = new Transform3D(Basis.Identity, new Vector3(origin.X, origin.Y, origin.Z) * Units.CellSize);
-        var body = PhysicsServer3D.BodyCreate();
-        PhysicsServer3D.BodySetMode(body, PhysicsServer3D.BodyMode.Static);
-        PhysicsServer3D.BodySetSpace(body, GetWorld3D().Space);
-        PhysicsServer3D.BodySetState(body, PhysicsServer3D.BodyState.Transform, transform);
-        PhysicsServer3D.BodySetCollisionLayer(body, TerrainLayer);
-        PhysicsServer3D.BodySetCollisionMask(body, 0);
-        AddShapes(body, c, c.Data.Solid);
-        c.Body = body;
-        if (c.Data.Platforms.Any(l => l.Count > 0))
-        {
-            // One-way platforms live on their own layer; bodies moving upwards drop it from their mask.
-            var platforms = PhysicsServer3D.BodyCreate();
-            PhysicsServer3D.BodySetMode(platforms, PhysicsServer3D.BodyMode.Static);
-            PhysicsServer3D.BodySetSpace(platforms, GetWorld3D().Space);
-            PhysicsServer3D.BodySetState(platforms, PhysicsServer3D.BodyState.Transform, transform);
-            PhysicsServer3D.BodySetCollisionLayer(platforms, PlatformLayer);
-            PhysicsServer3D.BodySetCollisionMask(platforms, 0);
-            AddShapes(platforms, c, c.Data.Platforms);
-            c.PlatformBody = platforms;
-        }
-        BodyCount++;
-        Versions[coord] = Versions.GetValueOrDefault(coord) + 1;
-        BodyBuilt?.Invoke(coord);
+        _scratch.Clear();
+        foreach (var coord in _built)
+            if ((coord - focusChunk).ChebyshevLength > Radius) _scratch.Add(coord);
+        foreach (var coord in _scratch) FreeBodies(coord, _chunks[coord]);
     }
 
-    private static void AddShapes(Rid body, ChunkCollision c, List<System.Numerics.Vector3>[] buckets)
+    /// <summary>Stage, then distance, then X, Y, Z (deterministic order).</summary>
+    private sealed class WorkComparer : IComparer<(int Stage, int Distance, Int3 Coord)>
     {
-        foreach (var tris in buckets)
-        {
-            if (tris.Count == 0) continue;
-            var shape = new ConcavePolygonShape3D { BackfaceCollision = true };
-            shape.SetFaces(MeshUpload.Faces(tris));
-            PhysicsServer3D.BodyAddShape(body, shape.GetRid());
-            c.Shapes.Add(shape);
-        }
-    }
+        public static readonly WorkComparer Instance = new();
 
-    private void FreeBody(ChunkCollision c)
-    {
-        if (!c.Body.IsValid) return;
-        PhysicsServer3D.FreeRid(c.Body);
-        c.Body = default;
-        if (c.PlatformBody.IsValid) PhysicsServer3D.FreeRid(c.PlatformBody);
-        c.PlatformBody = default;
-        c.Shapes.Clear();
-        BodyCount--;
+        public int Compare((int Stage, int Distance, Int3 Coord) a, (int Stage, int Distance, Int3 Coord) b)
+        {
+            if (a.Stage != b.Stage) return a.Stage.CompareTo(b.Stage);
+            if (a.Distance != b.Distance) return a.Distance.CompareTo(b.Distance);
+            if (a.Coord.X != b.Coord.X) return a.Coord.X.CompareTo(b.Coord.X);
+            if (a.Coord.Y != b.Coord.Y) return a.Coord.Y.CompareTo(b.Coord.Y);
+            return a.Coord.Z.CompareTo(b.Coord.Z);
+        }
     }
 
     public override void _ExitTree()
     {
-        foreach (var c in _chunks.Values) FreeBody(c);
+        foreach (var (coord, c) in _chunks) FreeBodies(coord, c);
         _chunks.Clear();
     }
 }

@@ -14,6 +14,7 @@ public static partial class ContentValidator
             if (!(b.PickDamageScale > 0 && b.PickDamageScale <= 10)) ctx.Error(b, "pickDamageScale must be within (0, 10].");
             if (b.PickPower < 0) ctx.Error(b, "pickPower must be >= 0.");
             ctx.Light(b, b.Light, "light");
+            if (b.Glow is < 0f or > 1f) ctx.Error(b, "glow must be within 0–1.");
             ctx.Color(b, b.Color, "color");
             ctx.Ref(b, ctx.Db.Items, b.Drop, "drop");
             if (b.Render != BlockRender.None)

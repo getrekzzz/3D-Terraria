@@ -104,7 +104,7 @@ public sealed partial class NpcSystem
     }
 
     /// <summary>Table rolled after a creature's own loot for every kill that counts: the Dungeon's Golden Keys.</summary>
-    public const string GlobalKillTable = "global_kill";
+    public const string GlobalKillTable = Content.Index.ItemSourceIndex.GlobalKillTable;
 
     /// <summary>
     /// Rolls <see cref="GlobalKillTable"/> (when it exists) for kills worth coins, never critters or parts; its

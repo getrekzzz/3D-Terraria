@@ -57,6 +57,12 @@ public sealed class BlockDef : ContentDef
     /// <summary>Emitted light as [r, g, b], each 0–15.</summary>
     public int[]? Light { get; init; }
 
+    /// <summary>
+    /// Soft self-glow of the block's surface (0–1, shader only): ore flecks stay visible in a dark cave without lighting
+    /// anything around them (unlike <see cref="Light"/>, it never enters the baked block light).
+    /// </summary>
+    public float? Glow { get; init; }
+
     public string Sound { get; init; } = "stone";
 
     /// <summary>Particle/minimap colour as #RRGGBB.</summary>

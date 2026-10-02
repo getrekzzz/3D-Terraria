@@ -42,7 +42,13 @@
 ## Threading
 * Worker threads (`JobSystem`) generate/load chunks and build meshes + light. Chunk data is copy-on-write,
   so jobs read neighbours lock-free; results carry the chunk version and stale ones are dropped.
-* Completions drain on the main thread within a per-frame budget (adaptive to the backlog).
+* Completions drain on the main thread within a per-frame budget. `FrameBudgetPlanner` (Core) sets the budgets for
+  jobs, mesh uploads, colliders, tile objects and grass each frame: generous while the player is frozen behind the
+  loading screen (12/6/4/3/2 ms), about 8 ms in total during play, 5 ms for jobs on a big backlog, and scaled by 0.6
+  after a slow frame. `WorldRuntime.Budgets` exposes them to presentation nodes.
+* `ChunkStreamer` schedules from two incrementally maintained sets (unscheduled loads, mesh candidates) sorted with a
+  static comparer (priority, then X, Y, Z); chunks blocked on missing neighbours wait for the next chunk to become
+  Ready. Loaded and meshed counts are kept as counters, so a settled frame allocates nothing.
 * Everything in `GameWorld.Tick` is main-thread only.
 
 ## Frame flow

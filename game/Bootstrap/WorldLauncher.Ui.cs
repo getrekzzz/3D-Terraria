@@ -20,6 +20,7 @@ public static partial class WorldLauncher
         var inventory = new UI.InventoryScreen();
         runtime.AddChild(inventory);
         inventory.Initialize(ui);
+        inventory.ContainerShown += objectRenderer.SetLidOpen; // the chest's lid swings open while it is shown
         var worldMap = new UI.WorldMapScreen();
         runtime.AddChild(worldMap);
         worldMap.Initialize(ui);

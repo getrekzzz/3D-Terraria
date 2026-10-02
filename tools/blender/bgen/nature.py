@@ -228,6 +228,9 @@ def small_mushroom(mb: MeshBuilder, p, rng):
     mb.lathe([(0.03, 0.0), (0.025, h), (0.0, h + 0.01)], "prop:plain", "#e8e0d0", segments=8)
     glow = ":glow" if p.get("glow") else ""
     mb.lathe([(0.1, h - 0.01), (0.09, h + 0.04), (0.05, h + 0.08), (0.0, h + 0.09)], f"prop:{p['capLayer']}{glow}", p.get("tint", "#ffffff"), segments=10)
+    for k in range(p.get("spots", 0)):  # pale flecks on a toadstool cap
+        a = k * 2.4
+        mb.sphere((math.cos(a) * 0.055, math.sin(a) * 0.055, h + 0.06 - (k % 2) * 0.02), 0.014, "prop:plain", "#f4efe0", subdivisions=1, scale=(1, 1, 0.4))
 
 
 def spike(mb: MeshBuilder, p, rng):

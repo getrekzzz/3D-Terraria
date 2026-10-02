@@ -164,8 +164,13 @@ def build_set(set_name: str) -> int:
         entry = {"name": name, "index": i, "type": recipe["type"]}
         if "sway" in recipe:
             entry["sway"] = recipe["sway"]  # foliage wind sway used by the prop shader
+        if set_name == "props":
+            # Mean sRGB luminance: tinted metal slots (prop:<layer>:metal) divide it out so the tint shows as given.
+            entry["mean"] = round(float((a[..., :3].astype(np.float64) / 255.0 @ np.array([0.2126, 0.7152, 0.0722])).mean()), 3)
         if set_name == "terrain":
             entry["detail"], entry["detailStrength"] = gen_detail.detail_for(recipe)  # fine grain layer under it
+            if "ore" in recipe:
+                entry["ore"] = recipe["ore"]  # ore tint: the terrain shader colours glints by it
         layers.append(entry)
     # Unused slices repeat the "missing" layer so sampling never returns garbage.
     missing_index = names.index("missing")

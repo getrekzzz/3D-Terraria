@@ -151,7 +151,8 @@ def chest(mb: MeshBuilder, p, rng):
     body_h = h * 0.58
     mb.bevel_box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood, wt, radius=soft, segments=SOFT_SEGMENTS)
     lid = [(-d * 0.4, 0), (d * 0.4, 0), (d * 0.38, h * 0.18), (d * 0.25, h * 0.3), (0, h * 0.36), (-d * 0.25, h * 0.3), (-d * 0.38, h * 0.18)]
-    mb.extrude_polygon(lid, w * 0.92, wood, wt, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"), bevel=edge)
+    # The lid is its own node hinged at the back top edge of the body (the game swings it open).
+    mb.part("lid", (0, -d * 0.4, body_h)).extrude_polygon(lid, w * 0.92, wood, wt, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"), bevel=edge)
     for x in (-w * 0.3, w * 0.3):
         mb.bevel_box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band, bt, radius=edge)
     mb.bevel_box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"), lt, radius=edge)
@@ -168,7 +169,7 @@ def torch(mb: MeshBuilder, p, rng):
 
 def candle(mb: MeshBuilder, p, rng):
     # Holder, wax and a blackened wick; the flame is drawn live by the game.
-    mb.cylinder((0, 0, 0), (0, 0, 0.02), 0.09, 0.1, "prop:copper", segments=10)
+    mb.cylinder((0, 0, 0), (0, 0, 0.02), 0.09, 0.1, "prop:iron:metal", "#e8804a", segments=10)
     mb.cylinder((0, 0, 0.02), (0, 0, 0.2), 0.035, None, "prop:plain", "#f0ead8", segments=8)
     mb.cylinder((0, 0, 0.2), (0, 0, 0.222), 0.004, 0.003, "prop:plain", "#1a1410", segments=4)
 

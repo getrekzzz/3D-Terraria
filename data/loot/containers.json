@@ -10,7 +10,7 @@
     { "id": "plant_glowing_mushroom", "entries": [{ "item": "glowing_mushroom" }] },
     { "id": "life_crystal_node", "entries": [{ "item": "life_crystal" }] },
     { "id": "enchanted_sword_shrine", "mode": "weighted", "entries": [{ "item": "enchanted_sword", "weight": 1 }, { "item": "wooden_sword", "weight": 2 }] },
-    { "id": "pot", "mode": "weighted", "rolls": 1, "coins": [10, 300], "entries": [
+    { "id": "pot", "name": "Pots", "mode": "weighted", "rolls": 1, "coins": [10, 300], "entries": [
       { "item": "torch", "min": 4, "max": 12, "weight": 3 },
       { "item": "lesser_healing_potion", "min": 1, "max": 2, "weight": 2 },
       { "item": "wooden_arrow", "min": 10, "max": 25, "weight": 2 },
@@ -36,7 +36,7 @@
       { "item": "lava_charm", "weight": 3, "conditions": [{ "type": "biome", "any": ["underworld"] }] }
     ] },
     { "id": "shadow_chest_primary", "mode": "weighted", "entries": [{ "item": "sunfury", "weight": 1 }, { "item": "dark_lance", "weight": 1 }, { "item": "flamelash", "weight": 1 }] },
-    { "id": "shadow_chest", "coins": [3000, 10000], "entries": [
+    { "id": "shadow_chest", "name": "Shadow Chests", "coins": [3000, 10000], "entries": [
       { "table": "shadow_chest_primary" },
       { "item": "hellstone_bar", "min": 10, "max": 20, "chance": 0.5 },
       { "item": "healing_potion", "min": 3, "max": 5, "chance": 0.5 },
@@ -46,7 +46,7 @@
       { "item": "recall_potion", "min": 1, "max": 3, "chance": 0.33 },
       { "item": "bomb", "min": 10, "max": 19, "chance": 0.3 }
     ] },
-    { "id": "cabin_chest", "coins": [500, 3000], "entries": [
+    { "id": "cabin_chest", "name": "Cabin Chests", "coins": [500, 3000], "entries": [
       { "table": "cabin_chest_primary" },
       { "item": "torch", "min": 10, "max": 25, "chance": 0.7 },
       { "item": "lesser_healing_potion", "min": 2, "max": 5, "chance": 0.6 },
@@ -61,7 +61,7 @@
       { "item": "musket_ball", "min": 30, "max": 60, "chance": 0.2 },
       { "item": "throwing_knife", "min": 25, "max": 50, "chance": 0.15 }
     ] },
-    { "id": "gold_chest", "coins": [1500, 6000], "entries": [
+    { "id": "gold_chest", "name": "Gold Chests", "coins": [1500, 6000], "entries": [
       { "table": "cabin_chest_primary" },
       { "item": "torch", "min": 15, "max": 30, "chance": 0.7 },
       { "item": "healing_potion", "min": 2, "max": 4, "chance": 0.5 },
@@ -78,14 +78,14 @@
       { "item": "bomb", "min": 5, "max": 10, "chance": 0.3 },
       { "item": "rope", "min": 50, "max": 100, "chance": 0.3 }
     ] },
-    { "id": "surface_chest", "coins": [200, 1200], "entries": [
+    { "id": "surface_chest", "name": "Surface Chests", "coins": [200, 1200], "entries": [
       { "item": "wooden_sword", "chance": 0.3 }, { "item": "wooden_bow", "chance": 0.3 },
       { "item": "torch", "min": 5, "max": 15, "chance": 0.8 }, { "item": "lesser_healing_potion", "min": 1, "max": 3, "chance": 0.5 },
       { "item": "copper_bar", "min": 3, "max": 9, "chance": 0.4 },
       { "item": "wooden_boomerang", "chance": 0.2 }, { "item": "spear", "chance": 0.2 }, { "item": "wood_yoyo", "chance": 0.15 },
       { "item": "shuriken", "min": 15, "max": 40, "chance": 0.25 }, { "item": "throwing_knife", "min": 15, "max": 40, "chance": 0.2 }
     ] },
-    { "id": "sky_chest", "coins": [1500, 5000], "entries": [
+    { "id": "sky_chest", "name": "Skyware Chests", "coins": [1500, 5000], "entries": [
       { "item": "lucky_horseshoe", "chance": 0.4 }, { "item": "shiny_red_balloon", "chance": 0.4 }, { "item": "starfury", "chance": 0.35 }, { "item": "fledgling_wings", "chance": 0.25 },
       { "item": "cloud_in_a_bottle", "chance": 0.3 }, { "item": "fallen_star", "min": 3, "max": 8 }
     ] }

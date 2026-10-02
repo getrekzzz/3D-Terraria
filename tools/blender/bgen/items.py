@@ -4,69 +4,55 @@ import math
 
 from mathutils import Matrix, Vector
 
-from .mesh import MeshBuilder
+from . import blade_profiles as bp
+from .mesh import MeshBuilder, hex_color
+from .tools_heads import axe, bow, hammer, pickaxe
 
 HANDLE = "prop:dark_planks"
 
 
 def _metal(p):
-    return f"prop:{p.get('metalLayer', 'iron')}", p.get("metal", "#c0c4cc")
+    """Slot and tint of an item's metal. The iron layer is read as neutral (``:metal``), so the tint is the metal's own
+    colour (Terraria-bright tiers instead of tints multiplied onto grey); other layers keep their texture colour."""
+    layer = p.get("metalLayer", "iron")
+    return f"prop:{layer}" + (":metal" if layer == "iron" else ""), p.get("metal", "#c0c4cc")
 
 
 def sword(mb: MeshBuilder, p, rng):
+    """Profile-driven sword (see blade_profiles): ``profile`` (straight, leaf, broad, katana, curved, serrated, hooked,
+    jagged, cleaver, rapier, flame), ``guard`` (bar, crescent, winged, disc, spiky, none; a hex value is read as the
+    guard colour, like ``guardColor``), ``pommel`` (ball, gem, ring, spike, star, none), ``fuller`` (bool), ``edge``
+    and ``gem`` (hex), ``curve`` (tip offset in blade lengths), ``length``, ``width``, ``wrap`` (grip leather hex),
+    ``glow`` (True: the whole blade glows, "edge": only the edge bands)."""
     layer, tint = _metal(p)
     length, width = p.get("length", 0.9), p.get("width", 0.09)
-    mb.cylinder((0, 0, -0.18), (0, 0, 0.02), 0.022, None, HANDLE, segments=8)
-    mb.sphere((0, 0, -0.2), 0.035, layer, tint, subdivisions=1)
-    mb.box((-width * 1.4, -0.025, 0.02), (width * 1.4, 0.025, 0.07), layer, p.get("guard", tint))
-    blade = [(-width / 2, 0.07), (width / 2, 0.07), (width / 2, length * 0.85), (0, length), (-width / 2, length * 0.85)]
-    glow = ":glow" if p.get("glow") else ""
-    mb.extrude_polygon(blade, 0.018, layer + glow, tint)
-    mb.extrude_polygon([(-0.008, 0.08), (0.008, 0.08), (0.008, length * 0.8), (-0.008, length * 0.8)], 0.024, layer, "#e8ecf0")
+    kind = p.get("guard", "bar")
+    guard_color = p.get("guardColor", kind if str(kind).startswith("#") else tint)
+    kind = "bar" if str(kind).startswith("#") else kind
+    glow = p.get("glow")
+    body = layer + (":glow" if glow is True else "")
+    edge_mat = layer + (":glow" if glow else "")
+    bp.grip(mb, -0.18, 0.02, p.get("wrap"))
+    bp.pommel(mb, p.get("pommel", "ball"), -0.205, layer, guard_color, p.get("gem"))
+    bp.guard(mb, kind, 0.02, width, layer, guard_color, p.get("gem") if p.get("pommel") != "gem" else None)
+    blade_len = length - 0.07
+    tip = bp.blade(mb, p.get("profile", "straight"), 0.068, blade_len, width, body, tint, p.get("edge"), edge_mat,
+                   thick=p.get("thick", 0.022), fuller=p.get("fuller", False), curve=p.get("curve", 0.0))
+    mb.socket("grip", (0, 0, 0))
+    mb.socket("tip", tip)
 
 
 def shortsword(mb: MeshBuilder, p, rng):
-    sword(mb, {**p, "length": p.get("length", 0.55), "width": p.get("width", 0.07)}, rng)
-
-
-def _haft(mb, length, wood="prop:planks", tint="#ffffff"):
-    mb.cylinder((0, 0, -0.1), (0, 0, length), 0.022, 0.02, wood, tint, segments=7)
-
-
-def pickaxe(mb: MeshBuilder, p, rng):
-    layer, tint = _metal(p)
-    _haft(mb, 0.75)
-    head = [Vector((-0.34, 0, 0.58)), Vector((-0.18, 0, 0.72)), Vector((0, 0, 0.76)), Vector((0.18, 0, 0.72)), Vector((0.34, 0, 0.58))]
-    mb.tube(head, [0.012, 0.035, 0.045, 0.035, 0.012], layer, tint, segments=6)
-
-
-def axe(mb: MeshBuilder, p, rng):
-    layer, tint = _metal(p)
-    _haft(mb, 0.7)
-    blade = [(0.0, 0.52), (0.1, 0.5), (0.22, 0.44), (0.24, 0.62), (0.22, 0.8), (0.1, 0.74), (0.0, 0.72)]
-    mb.extrude_polygon(blade, 0.03, layer, tint)
-    mb.box((-0.06, -0.035, 0.56), (0.02, 0.035, 0.7), layer, tint)
-
-
-def hammer(mb: MeshBuilder, p, rng):
-    layer, tint = _metal(p)
-    wood = p.get("headLayer")
-    _haft(mb, 0.65)
-    mb.box((-0.16, -0.07, 0.6), (0.16, 0.07, 0.76), f"prop:{wood}" if wood else layer, tint if not wood else "#ffffff")
-
-
-def bow(mb: MeshBuilder, p, rng):
-    layer = f"prop:{p.get('limbLayer', 'planks')}"
-    tint = p.get("metal", "#ffffff") if p.get("limbLayer") in ("iron", "gold", "copper") else "#ffffff"
-    pts = [Vector((0.02 * math.sin(t * math.pi) - 0.0, 0, (t - 0.5) * 1.1)) + Vector((-0.18 * math.sin(t * math.pi), 0, 0)) for t in (i / 8 for i in range(9))]
-    mb.tube(pts, [0.012, 0.018, 0.022, 0.026, 0.03, 0.026, 0.022, 0.018, 0.012], layer, tint, segments=6)
-    mb.cylinder(pts[0], pts[-1], 0.004, None, "prop:cloth", "#f0f0e0", segments=4)
-    mb.cylinder((-0.17, 0, -0.08), (-0.17, 0, 0.08), 0.03, None, "prop:red_cloth", segments=8)
+    """A short blade: long-sword profiles map to a rapier or leaf blade (``shortProfile`` overrides)."""
+    profile = p.get("shortProfile") or bp.SHORT.get(p.get("profile", "straight"), p.get("profile", "leaf"))
+    sword(mb, {**p, "profile": profile, "length": p.get("length", 0.55), "width": p.get("width", 0.07),
+               "pommel": p.get("pommel", "ball")}, rng)
 
 
 def wand(mb: MeshBuilder, p, rng):
     mb.cylinder((0, 0, -0.1), (0, 0, 0.42), 0.016, 0.012, "prop:bark", segments=6)
     mb.sphere((0, 0, 0.46), 0.04, "prop:plain:glow", p.get("gem", "#ff8a2a"), subdivisions=1)
+    mb.socket("tip", (0, 0, 0.46))
 
 
 def staff(mb: MeshBuilder, p, rng):
@@ -76,6 +62,7 @@ def staff(mb: MeshBuilder, p, rng):
         mb.tube([(0, 0, 1.05), (math.cos(a) * 0.06, math.sin(a) * 0.06, 1.15), (math.cos(a) * 0.03, math.sin(a) * 0.03, 1.25)],
                 [0.012, 0.01, 0.004], "prop:gold", segments=4)
     mb.sphere((0, 0, 1.18), 0.055, "prop:crystal:glow", p.get("gem", "#b06aff"), subdivisions=1, scale=(1, 1, 1.4))
+    mb.socket("tip", (0, 0, 1.18))
 
 
 def arrow(mb: MeshBuilder, p, rng):
@@ -98,11 +85,51 @@ def essence(mb: MeshBuilder, p, rng):
         mb.tube(pts, [0.014, 0.01, 0.006, 0.001], "prop:plain:glow", color, segments=4)
 
 
+def _ingot(mb: MeshBuilder, off, layer, tint, top, edge):
+    """One chunky ingot (~60 tris): a chamfered trapezoid section lofted along X with sloped ends; the top face is
+    lighter, the chamfers take the edge colour."""
+    length, width, height, c = 0.28, 0.12, 0.075, 0.016
+    section = [(-width / 2 + c, 0.0), (width / 2 - c, 0.0), (width / 2, c), (width * 0.36, height - c),
+               (width * 0.36 - c, height), (-width * 0.36 + c, height), (-width * 0.36, height - c), (-width / 2, c)]
+    stations = [(-length / 2, 0.82), (-length / 2 + 0.03, 1.0), (length / 2 - 0.03, 1.0), (length / 2, 0.82)]
+    o = Vector(off)
+    rings = [[mb.bm.verts.new(o + Vector((x, y * k, z * (0.9 + 0.1 * k)))) for y, z in section] for x, k in stations]
+    n = len(section)
+    for a, b in zip(rings, rings[1:]):
+        for i in range(n):
+            j = (i + 1) % n
+            mb.bm.faces.new((a[i], a[j], b[j], b[i]))
+    mb.bm.faces.new(list(reversed(rings[0])))
+    mb.bm.faces.new(rings[-1])
+    verts = mb._finish_part([v for r in rings for v in r], layer, tint, False)
+    lit, rim = hex_color(top), hex_color(edge)
+    mb.bm.normal_update()
+    for f in {f for v in verts for f in v.link_faces}:
+        if f.normal.z > 0.9:
+            colour = lit
+        elif f.normal.z > 0.6:  # the 45° chamfers along the top
+            colour = rim
+        else:
+            continue
+        for loop in f.loops:
+            loop[mb.color_layer] = colour
+
+
 def bar(mb: MeshBuilder, p, rng):
+    """Stacked ingots. ``edge`` colours the chamfers (default the tint), ``veins`` adds glowing cracks on top
+    (hellstone, meteorite)."""
     layer, tint = _metal(p)
-    for i, off in enumerate([(0, 0, 0), (0.05, 0.02, 0.075)][: p.get("count", 1)]):
-        profile = [(-0.14, 0.0), (0.14, 0.0), (0.11, 0.07), (-0.11, 0.07)]
-        mb.extrude_polygon(profile, 0.1, layer, tint, matrix=Matrix.Translation(off))
+    base = hex_color(tint)
+    top = p.get("top") or tuple(min(1.0, c * 1.18 + 0.04) for c in base[:3])
+    edge = p.get("edge", tint)
+    offsets = [(0, 0, 0), (0.035, 0.03, 0.075)][: p.get("count", 1)]
+    for off in offsets:
+        _ingot(mb, off, layer, tint, top, edge)
+    if p.get("veins"):
+        ox, oy, oz = offsets[-1]
+        crack = [(-0.09, -0.012), (-0.04, 0.01), (0.0, -0.008), (0.05, 0.012), (0.09, -0.004)]
+        for (x0, y0), (x1, y1) in zip(crack, crack[1:]):
+            mb.cylinder((ox + x0, oy + y0, oz + 0.0752), (ox + x1, oy + y1, oz + 0.0752), 0.004, None, "prop:plain:glow", p["veins"], segments=4, caps=False)
 
 
 def gem(mb: MeshBuilder, p, rng):

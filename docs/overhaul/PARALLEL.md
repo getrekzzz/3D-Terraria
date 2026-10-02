@@ -8,17 +8,16 @@ integration session merges every branch into `claude/clever-goodall-kgex45` with
 | Session | Branch | Owns (in this order) |
 |---|---|---|
 | Integration (original) | `claude/clever-goodall-kgex45` | W1b Phase 1 → W3/W4 Terraria UI → X-02 → W5/W6 items & feel (minus the art items below; P3-49 and the juice chain P3-08/19/20/21/22/24/25/26 moved to World; P3-31/35/46/48 moved to Art) → X-16 → X-12 → X-04 → final integration (W2 lag spikes moved to the Art session, except P1b-15 which rides with P3-10/P3-11 in W5) |
-| Bosses + Dungeon | `claude/ovh-bosses` | W7: P4-01, P4-02, P4-03', P4-04 (+P3-32 bags), P4-05 … P4-11 (+Clothier Voodoo Doll use) · W8: P4-12, P4-13, P4-14, P4-15, P4-16, P4-17, P4-18, P4-19, P4-20 (+Voodoo Doll item/drop), P4-21, P4-33, P4-34, P4-23 · W9: P4-24, P4-25, P4-26, P4-27, P4-28, P4-29, P4-30, P4-31, P4-32, P4-38 |
-| Art | `claude/ovh-art` | (then X-17, then W2 lag spikes P1b-06…P1b-14 + P1b-16 [done], then P3-48 chest lids, P3-46 movement feel, P3-31 Terraria prefixes, P3-35 Piggy Bank/Safe, then the X-09 creator menu rows after P2-30) P3-05 (held-item sockets, FIRST), P3-37 metal colours, P3-37b vibrant glowing world ores, P2-24 boss head icons, P5-28 NPC portraits + bestiary thumbnails, P3-38, P3-39, P3-40, P3-41a/b, P3-42, P3-43, P3-44, P3-45, P3-50, P4-35, P4-36, P4-37 |
-| NPCs + Guide book (starts after the UI wave lands) | `claude/ovh-npcs` | W10 + W11 minus P5-28, then X-05 emotes + NPC voices, X-10 onboarding hints + loading tips |
-| World & life | `claude/ovh-world` | (+ game-feel chain moved from Integration: P3-08, P3-19, P3-20, P3-21, P3-22, P3-24, P3-26, P3-25 — done while X-14's slot hook-up waits for P2-05 and X-03/X-07 wait for the bosses W8 push) X-01 weather, X-08 ambience + cave audio + music variants (absorbs P3-49), X-06 seasonal events, X-13 fishing depth, X-15 wiring set, X-14 mounts (after the integration session pushes W3), X-03 furniture families + decor + signs (after the Bosses session pushes W8), X-07 secret seeds (after the Bosses W8 Dungeon push) |
+| Bosses + Dungeon, then NPCs + Guide book | `claude/ovh-bosses` | **[W7–W9 done, merged at be46b873; now W10 + W11 minus P5-28, then X-05 emotes + NPC voices, X-10 onboarding hints + loading tips, then X-11]** W7: P4-01, P4-02, P4-03', P4-04 (+P3-32 bags), P4-05 … P4-11 (+Clothier Voodoo Doll use) · W8: P4-12, P4-13, P4-14, P4-15, P4-16, P4-17, P4-18, P4-19, P4-20 (+Voodoo Doll item/drop), P4-21, P4-33, P4-34, P4-23 · W9: P4-24, P4-25, P4-26, P4-27, P4-28, P4-29, P4-30, P4-31, P4-32, P4-38 |
+| Art | `claude/ovh-art` | (**also taken over from Integration (2026-10-02): P3-18 pets, P3-01' gun bursts, X-12 photo mode**; then X-17, then W2 lag spikes P1b-06…P1b-14 + P1b-16 [done], then P3-48 chest lids, P3-46 movement feel, P3-31 Terraria prefixes, P3-35 Piggy Bank/Safe, then the X-09 creator menu rows after P2-30) P3-05 (held-item sockets, FIRST), P3-37 metal colours, P3-37b vibrant glowing world ores, P2-24 boss head icons, P5-28 NPC portraits + bestiary thumbnails, P3-38, P3-39, P3-40, P3-41a/b, P3-42, P3-43, P3-44, P3-45, P3-50, P4-35, P4-36, P4-37 |
+| World & life | `claude/ovh-world` | (+ game-feel chain moved from Integration: P3-08, P3-19, P3-20, P3-21, P3-22, P3-24, P3-26, P3-25 — done while X-14's slot hook-up waits for P2-05 and X-03/X-07 wait for the bosses W8 push) X-01 weather, X-08 ambience + cave audio + music variants (absorbs P3-49), X-06 seasonal events, X-13 fishing depth, X-15 wiring set, X-14 mounts (after the integration session pushes W3), X-03 furniture families + decor + signs, X-07 secret seeds (GenVersion 11 → 12) — both unblocked: the Bosses W7–W9 slice is on the integration branch at be46b873 |
 
 ### AAA additions (2026-10-01, player: "anything a AAA realistic Terraria from the original creators would need")
 Specs `docs/overhaul/specs/X-*.json`. Owners: Integration — X-02 boss intro card / arena framing / victory sting /
-per-boss themes (after W4), X-12 photo mode / autosave icon / colour-blind / subtitles, X-16 ragdolls (after P3-20),
+per-boss themes (after W4), X-12 autosave icon / colour-blind / subtitles (photo mode moved to Art), X-16 ragdolls (after P3-20),
 X-04 gamepad support (last, after every UI exists). Bosses — X-11 disguised Mimics, Nymph, Wyvern (after W9).
 Art — X-09 character creator depth (after the integration UI push), X-17 hair/cloth physics (last).
-World & life — see the table. NPCs — X-05, X-10. Co-op multiplayer is NOT in scope unless the player asks.
+World & life — see the table. NPCs (the Bosses session, after W9) — X-05, X-10. Co-op multiplayer is NOT in scope unless the player asks.
 
 ## Rules for every session
 * **Screenshots to the player (standing rule):** after every major completion (each push and each notable feature),
@@ -48,7 +47,8 @@ World & life — see the table. NPCs — X-05, X-10. Co-op multiplayer is NOT in
     message kind/colour (boss awoken = purple, defeated = purple), use the existing CameraShake API; the integration
     session's ChatLog/BossBar (P2-21/P2-23) will consume them.
   - Integration W5 (P3-06 grips) needs Art's P3-05 sockets: Art does P3-05 first and pushes it early.
-  - NPCs P5-09 needs Bosses P4-01's `ICombatTarget`: merge `origin/claude/ovh-bosses` before P5-09.
+  - NPCs P5-09 needs Bosses P4-01's `ICombatTarget`: done in-session (the Bosses session owns the NPC slice).
+  - NPC chat box / grid shop (P2-26/P2-27) land with Integration W4; NPC UI work stays in new files until W4 is on origin.
   - Bosses P4-19 reserves a `bound_npc` room role in the Dungeon plan for the NPC session's bound Mechanic (P5-06b).
 * Commit messages: WP id first (`P4-10: ...`), end with your own session's attribution lines. Push your branch after
   each wave with `git push -u origin <your branch>` and update `docs/overhaul/status-<slice>.md` on your branch

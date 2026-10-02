@@ -1,5 +1,5 @@
 {
- "comment": "P4-20: Dungeon chest treasures, keys, the Red Hat and the Bone Welder (new bone_welder generator in bgen/dungeon_decor.py).",
+ "comment": "P4-20: Dungeon chest treasures, keys, the Red Hat and the Bone Welder (new bone_welder generator in bgen/dungeon_decor.py). The Red Hat is worn as a red cloth wizard-cut hat (armor section), which also gives its dropped model and icon.",
  "objects": {
   "bone_welder": {"generator": "bone_welder", "params": {}}
  },
@@ -10,5 +10,8 @@
   "golden_key": {"generator": "key", "params": {"metalLayer": "plain", "metal": "#f2c850"}},
   "shadow_key": {"generator": "key", "params": {"metalLayer": "plain", "metal": "#4a3e5a", "gem": "#a04aff"}},
   "red_hat": {"generator": "helmet", "params": {"metalLayer": "red_cloth", "metal": "#c82a2a"}}
- }}
+ }},
+ "armor": {
+  "red_hat": {"preset": "wizard", "layer": "cloth", "metal": "#c82a2a"}
+ }
 }

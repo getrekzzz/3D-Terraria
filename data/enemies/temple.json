@@ -109,7 +109,7 @@
       { "item": "seedler" }, { "item": "venus_magnum" }, { "item": "leaf_blower" }, { "item": "pygmy_staff" }, { "item": "flower_pow" }, { "item": "the_axe", "weight": 0.5 }
     ] },
     { "id": "golem_weapon", "mode": "weighted", "entries": [{ "item": "stynger" }, { "item": "possessed_hatchet" }] },
-    { "id": "temple_chest", "coins": [5000, 20000], "entries": [
+    { "id": "temple_chest", "name": "Lihzahrd Chests", "coins": [5000, 20000], "entries": [
       { "item": "lihzahrd_power_cell", "min": 1, "max": 2 }, { "item": "greater_healing_potion", "min": 2, "max": 5, "chance": 0.6 }
     ] },
     { "id": "lihzahrd", "coins": [300, 800], "entries": [{ "item": "lihzahrd_power_cell", "chance": 0.02 }] }

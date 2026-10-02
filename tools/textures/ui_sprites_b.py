@@ -1,0 +1,208 @@
+"""Pixel maps for UI buttons, the pointer, interaction hints and frames (see ui_sprites.py for the format)."""
+
+SPRITES = {
+    # --- Buttons ---
+    "eye_open": """
+        ...www...
+        .wwlllww.
+        wllbbbllw
+        wlbbkbblw
+        wllbbbllw
+        .wwlllww.
+        ...www...
+    """,
+    "eye_closed": """
+        ...ggg..d
+        .ggllldd.
+        glldddllg
+        gldddkdlg
+        gddgggllg
+        .dglllgg.
+        d..ggg...
+    """,
+    "sort": """
+        .........y..
+        .llllll..y..
+        .gggggg..y..
+        .........y..
+        .lllll...y..
+        .ggggg...y..
+        .........y..
+        .llll..yyyyy
+        .gggg...yyy.
+        .........y..
+        .ll.........
+        .gg.........
+    """,
+    "quick_stack": """
+        .....ee.....
+        ...e.ee.e...
+        ....eeee....
+        .....ee.....
+        ............
+        .nnnnnnnnnn.
+        .nuuuuuuuun.
+        .ttttyyttttt
+        .nuuuyyuuun.
+        .nuuuuuuuun.
+        .nnnnnnnnnn.
+        ............
+    """,
+    "deposit": """
+        .....bb.....
+        .....bb.....
+        ...bbbbbb...
+        ....bbbb....
+        .....bb.....
+        .nnnnnnnnnn.
+        .nuuuuuuuun.
+        .ttttyyttttt
+        .nuuuyyuuun.
+        .nuuuuuuuun.
+        .nnnnnnnnnn.
+        ............
+    """,
+    "loot": """
+        .....yy.....
+        ....yyyy....
+        ...yyyyyy...
+        .....yy.....
+        .....yy.....
+        .nnnnnnnnnn.
+        .nuuuuuuuun.
+        .ttttyyttttt
+        .nuuuyyuuun.
+        .nuuuuuuuun.
+        .nnnnnnnnnn.
+        ............
+    """,
+    "reforge_hammer": """
+        ............
+        ..gggggggg..
+        .gllllllllg.
+        .glwllllllgd
+        .gllllllllgd
+        ..ddddnndddd
+        .....nn.....
+        .....nn.....
+        .....nn.....
+        .....nn.....
+        .....tn.....
+        .....tt.....
+    """,
+    "toggle_on": """
+        ........llll..
+        .eeeeeelwwllg.
+        eeeeeeelwlllg.
+        eeeeeeellllllg
+        eeeeeeellllllg
+        eeeeeeelllllgg
+        .fffffffllggg.
+        ........gggg..
+    """,
+    "toggle_off": """
+        ..llll........
+        .lwwllgddddd..
+        lwlllllgddddd.
+        llllllldddddd.
+        llllllldddddd.
+        llllllgdddddd.
+        .llgggdddddd..
+        ..gggg........
+    """,
+    "tab_equipment": """
+        ............
+        ..ggg..ggg..
+        .glllggllgd.
+        glwllllllldd
+        gllllllllldd
+        gd.glllgd.dd
+        ...glllgd...
+        ...glllgd...
+        ...ggggdd...
+        ...glllgd...
+        ...gddddd...
+        ............
+    """,
+    "tab_misc": """
+        ............
+        ............
+        n..........n
+        nnnnnnnnnnnn
+        .nuuuuuuuun.
+        .nuuuuuuuun.
+        .nuuuuuuuun.
+        ..tttttttt..
+        ..dd....dd..
+        .dggd..dggd.
+        ..dd....dd..
+        ............
+    """,
+    # --- Pointer (no outline: the 'k' cells are its 2 px dark border; white is tinted at runtime) ---
+    "cursor": """
+        kk.......
+        kwk......
+        kwwk.....
+        kwwwk....
+        kwwwwk...
+        kwwwwwk..
+        kwwwlllk.
+        kwlllkkkk
+        klkkk....
+        kk.......
+    """,
+    "smart_cursor": """
+        yy.......
+        ywy......
+        ywwy.....
+        ywwwy....
+        ywwwwy...
+        ywwwwwy..
+        ywwwqqqy.
+        ywqqqyyyy
+        yqyyy....
+        yy.......
+    """,
+    # --- Interaction hints ---
+    "talk_hint": """
+        .wwwwwwwww.
+        wwwwwwwwwww
+        wwwwwwwwwww
+        wwdwwdwwdwl
+        wwwwwwwwwwl
+        .wllllllll.
+        ..wl.......
+        .wl........
+        w..........
+    """,
+    "open_hint": """
+        ....u.u...
+        ..u.u.u...
+        ..u.u.u.u.
+        ..u.u.u.u.
+        ..uuuuuuu.
+        u.uuuuuuu.
+        uuuuuuuun.
+        .uuuuuuun.
+        .uuuuuuun.
+        ..uuuuunn.
+        ...uuunn..
+    """,
+    # --- Frames (no outline; 9-slice with 4-cell = 8 px margins) ---
+    "minimap_frame": """
+        kkkkkkkkkkkk
+        kqyyyyyyyyqk
+        kyooooooooyk
+        kyokkkkkkoyk
+        kyok....koyk
+        kyok....koyk
+        kyok....koyk
+        kyok....koyk
+        kyokkkkkkoyk
+        kyooooooooyk
+        kqyyyyyyyyqk
+        kkkkkkkkkkkk
+    """,
+}
+
+PLAIN = {"cursor", "smart_cursor", "minimap_frame"}

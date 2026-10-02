@@ -260,7 +260,7 @@ def plantera_tentacle(mb: MeshBuilder, p, rng):
         a = 2 * math.pi * k / 5
         base = Vector((math.cos(a) * 0.12, -0.3, math.sin(a) * 0.12))
         mb.tube([base, base + Vector((math.cos(a) * 0.18, 0.12, math.sin(a) * 0.18)), base + Vector((math.cos(a) * 0.22, 0.3, math.sin(a) * 0.22))],
-                [0.05, 0.035, 0.005], "prop:leaves", VINE, segments=4)
+                [0.05, 0.035, 0.005], "prop:jungle_leaves", VINE, segments=4)
     for side, sz in (("U", 1), ("D", -1)):
         mb.bone = f"jaw.{side}"
 

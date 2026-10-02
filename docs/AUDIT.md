@@ -3,6 +3,9 @@
 > An audit of `main` at M4 (commit `15bf3f4`), written in W0 of the player-feedback overhaul (2026-09-30). It answers three questions: what works, what doesn't, and what's missing. Each row names the
 > planned fix. It is refreshed at every phase gate. When a work package (WP) lands, update its rows' status and
 > evidence. The summary table in [`3D_TERRARIA_MASTER_PLAN.md`](3D_TERRARIA_MASTER_PLAN.md) §3 points here.
+>
+> Last refresh: the W3 gate (2026-10-02), covering Phase 1 (W1a, W1b) and the W3 UI foundations. W2 (lag spikes) is
+> being done in the Art session and is not merged yet.
 
 ## 1. How to read
 
@@ -46,15 +49,15 @@
 
 | # | Complaint | Root cause (evidence) | Fix | Acceptance check |
 |---|---|---|---|---|
-| 1 | The desert flashbangs on every preset except low | Auto-exposure is on from medium up. Its ISO window (85–170) pins the tonemap multiplier to 1.65–3.3×, so it can only brighten (`game/Ambience/EnvironmentController.cs:94-97`, `data/config/graphics.json:22`). Glow uses an HDR threshold of 1.0, Screen blend and level weights summing to 4.5 (`EnvironmentController.cs:63,90`). Fog starts about 149 m out on medium and up (`game/Ambience/EnvironmentController.Frame.cs:135-136`, `game/World/WorldRuntime.cs:140`). The horizon is fully lit. | P1-02, P1-03 (W1a) | Planned shot_stats.py (P1-03): desert and snow noon mean luminance in [0.35, 0.6] with under 2 % clipped pixels |
-| 2 | Torches light only a tiny radius | 4-bit baked light loses 1 level per 0.5 m cell (`src/Strata.Core/Lighting/LightEngine.cs:131`). The fill is octahedral, so diagonals reach about 4 m. The `x*sqrt(x)` curve (`shaders/include/voxel_light.gdshaderinc:26-37`) adds to the falloff. Placed-light energy is 0.79 with attenuation 1.1 (`game/Rendering/DynamicLights.cs:65,127`). The pool is 0 lights on low (`data/config/graphics.json:12`). | P1-04 (W1a); P1b-17 (W2, optional) | Lighting tour: a torch room lit to about 8–10 m |
-| 3 | Terrain is jagged and unpredictable | A 3D overhang density `1.5 + rug*11` over 3 octaves (`src/Strata.Core/WorldGen/Fields/TerrainField.cs:33-42`). Ridged 5-octave mountains on a bilinear 8-cell grid (`src/Strata.Core/WorldGen/Passes/BiomeRelief.cs:20,57-58`, `src/Strata.Core/WorldGen/Plan/WorldPlan.cs:14`). Biome ramps at `Membership*3` (`BiomeRelief.cs:40`). Caves are carved from the 2D height. A binary solid/air threshold gives stair ripples. | P1b-02, P1b-03, P1b-04 (W1b) | `worldgen-report --compare` against the W0 baseline (§5) shows lower roughness, lip, floating and breach |
-| 4 | Tool swings look fast-forwarded | The avatar replays the clip whenever `UseAnimation` jumps back up (`game/Player/PlayerAvatar.Motion.cs:44-47`). A new use starts every `useTime` ticks (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:161-162`), so tools restart at 71–79 % of the clip. Speed bonuses shorten only the cooldown (`ItemUseSystem.cs:97,110,158`). The strike is about 90 ms of the clip (`tools/blender/bgen/human/actions.py`). The first-person phase snaps (`game/Player/ViewModel.cs:51`). | P1-10, P1-12 (W1a); P1-11 (W1b) | UseTimingTests: one clip per swing, no restart; mining speed leaves `useAnimation` unchanged |
-| 5 | Grappling hooks don't work | `ItemAction.Grapple` is parsed (`src/Strata.Core/Gameplay/Items/ItemUseTable.cs:159`), but `ItemUseSystem.Use` has no branch for it, so clicking does nothing. On F, the anchor test nudges 5 cm into a voxel, while the smooth collider sits up to 0.25 m off, so the hook lets go at once on natural terrain (`game/Player/PlayerController.Grapple.cs:106-111`). | P1-08 (W1a), P1-09 (W1b), P3-17' (W5) | `movement.cmds` latches on a natural slope and stays latched while reeling in |
-| 6 | The bow has no animation | The arrow spawns on tick 0 from the eye (`src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs:89`), but the clip releases at t 0.6. First person is an 8 cm lift (`game/Player/ViewModel.cs:69-72`). No ammo, no mana and Blocked are silent (`ItemUseSystem.cs:160`). | P1-13, P1-15 (W1a); P1-14 (W1b) | First-person draw-pose probe; a no-ammo shot sets `msg.last` and `sfx.last` |
-| 7 | Swords that shoot never melee | `Shot` fails the melee gate (`ItemUseSystem.cs:154`). Zenith's returning blades make the one-at-a-time rule return `Blocked` (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs:27`). | P1-16 (W1a) | Core test: Starfury swings and shoots; Zenith never blocks |
-| 8 | The body faces the wrong way when aiming or interacting | The aim ray starts at the camera, 4.2 m behind and 0.55 m right of the player (`game/Player/CameraRig.cs:17,24`). It accepts hits behind the player, such as grass, bushes and tree boxes the camera probe ignores (`game/Player/InteractionController.cs:101-110`). The body then turns past 55° (`game/Player/PlayerAvatar.Motion.cs:84`). | P1-05 (W1a), P1-06 (W1b) | `player.facing_error_deg < 3` after `camera orbit 90`; a target behind the player is never selected |
-| 9 | The crosshair doesn't name mobs or bosses | The HUD names only blocks and objects within reach (`game/UI/Hud.cs:211`). There is no ray-vs-entity picking. | P1-07 (W1b) | `hud.target_name` for a slime, a worm segment and a resident |
+| 1 | The desert flashbangs on every preset except low | Auto-exposure is on from medium up. Its ISO window (85–170) pins the tonemap multiplier to 1.65–3.3×, so it can only brighten (`game/Ambience/EnvironmentController.cs:94-97`, `data/config/graphics.json:22`). Glow uses an HDR threshold of 1.0, Screen blend and level weights summing to 4.5 (`EnvironmentController.cs:63,90`). Fog starts about 149 m out on medium and up (`game/Ambience/EnvironmentController.Frame.cs:135-136`, `game/World/WorldRuntime.cs:140`). The horizon is fully lit. | ✅ P1-02, P1-03 (W1a) | `shot_stats.py --check` passes: medium desert 0.39 mean luma, 0 % clipped (was 0.89, 3.9 %); cave exit +0.5 s 0.54, 0 % (was 99.8 % clipped) |
+| 2 | Torches light only a tiny radius | 4-bit baked light loses 1 level per 0.5 m cell (`src/Strata.Core/Lighting/LightEngine.cs:131`). The fill is octahedral, so diagonals reach about 4 m. The `x*sqrt(x)` curve (`shaders/include/voxel_light.gdshaderinc:26-37`) adds to the falloff. Placed-light energy is 0.79 with attenuation 1.1 (`game/Rendering/DynamicLights.cs:65,127`). The pool is 0 lights on low (`data/config/graphics.json:12`). | ✅ P1-04 (W1a); P1b-17 (W2, optional) | Lighting tour: the 10 m end wall of a torch corridor gets 29 % of the 1 m wall's light (was 0.3 %); low has 4 real lights |
+| 3 | Terrain is jagged and unpredictable | A 3D overhang density `1.5 + rug*11` over 3 octaves (`src/Strata.Core/WorldGen/Fields/TerrainField.cs:33-42`). Ridged 5-octave mountains on a bilinear 8-cell grid (`src/Strata.Core/WorldGen/Passes/BiomeRelief.cs:20,57-58`, `src/Strata.Core/WorldGen/Plan/WorldPlan.cs:14`). Biome ramps at `Membership*3` (`BiomeRelief.cs:40`). Caves are carved from the 2D height. A binary solid/air threshold gives stair ripples. | ✅ P1b-02, P1b-03, P1b-04 (W1b) | `worldgen-report --compare` against the W0 baseline (§5): roughness 0.53 → 0.31, lip 0.71 → 0.13 %, floating 205 → 91, breach 3.88 → 0.35 % |
+| 4 | Tool swings look fast-forwarded | The avatar replays the clip whenever `UseAnimation` jumps back up (`game/Player/PlayerAvatar.Motion.cs:44-47`). A new use starts every `useTime` ticks (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:161-162`), so tools restart at 71–79 % of the clip. Speed bonuses shorten only the cooldown (`ItemUseSystem.cs:97,110,158`). The strike is about 90 ms of the clip (`tools/blender/bgen/human/actions.py`). The first-person phase snaps (`game/Player/ViewModel.cs:51`). | ✅ P1-10, P1-12 (W1a); P1-11 (W1b) | UseTimingTests: one clip per swing, no restart; mining speed leaves `useAnimation` unchanged; `combat.cmds` sees no action dips in chained swings |
+| 5 | Grappling hooks don't work | `ItemAction.Grapple` is parsed (`src/Strata.Core/Gameplay/Items/ItemUseTable.cs:159`), but `ItemUseSystem.Use` has no branch for it, so clicking does nothing. On F, the anchor test nudges 5 cm into a voxel, while the smooth collider sits up to 0.25 m off, so the hook lets go at once on natural terrain (`game/Player/PlayerController.Grapple.cs:106-111`). | ✅ P1-08 (W1a), P1-09 (W1b); per-hook heads and chains P3-17' (W5) | `movement.cmds` latches on a natural slope and stays latched while reeling in |
+| 6 | The bow has no animation | The arrow spawns on tick 0 from the eye (`src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs:89`), but the clip releases at t 0.6. First person is an 8 cm lift (`game/Player/ViewModel.cs:69-72`). No ammo, no mana and Blocked are silent (`ItemUseSystem.cs:160`). | ✅ P1-13, P1-15 (W1a); P1-14 (W1b) | First-person draw-pose probe (`fp.arrow`, `fp.aim_error_deg`); a no-ammo shot sets `msg.last` and `sfx.last` |
+| 7 | Swords that shoot never melee | `Shot` fails the melee gate (`ItemUseSystem.cs:154`). Zenith's returning blades make the one-at-a-time rule return `Blocked` (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs:27`). | ✅ P1-16 (W1a) | Core test: Starfury swings and shoots; Zenith never blocks |
+| 8 | The body faces the wrong way when aiming or interacting | The aim ray starts at the camera, 4.2 m behind and 0.55 m right of the player (`game/Player/CameraRig.cs:17,24`). It accepts hits behind the player, such as grass, bushes and tree boxes the camera probe ignores (`game/Player/InteractionController.cs:101-110`). The body then turns past 55° (`game/Player/PlayerAvatar.Motion.cs:84`). | ✅ P1-05 (W1a), P1-06 (W1b) | `player.facing_error_deg < 3` after `camera orbit 90`; a target behind the player is never selected |
+| 9 | The crosshair doesn't name mobs or bosses | The HUD names only blocks and objects within reach (`game/UI/Hud.cs:211`). There is no ray-vs-entity picking. | ✅ P1-07 (W1b) | `hud.target_name` for a slime, a worm segment and a resident |
 | 10 | Lag spikes | Synchronous autosave every 120 s (`src/Strata.Core/Session/GameWorld.cs:25,157-160`) rewrites whole region files (`src/Strata.Core/Persistence/RegionFile.cs:42-69`). Other causes: unbudgeted near-player collider builds, tile objects rebuilt twice per remesh, grass churn, first-use GLB loads, per-projectile materials and lights, per-frame LINQ, large-object-heap churn and dynamic-resolution oscillation (§6). | P1b-05 (W0); P1b-06…P1b-16 (W2) | Planned perf.cmds counters (P1b-05); before/after `perf spikes` p99 and max |
 | 11 | No guide book | Nothing exists: no bestiary, journal or achievements (§16). | P5-24a (W3); P5-24b, P5-25, P5-26, P5-27, P5-30a/b, P5-31, P5-32 (W11) | Planned ui.cmds book tabs; the bestiary unlocks after a kill |
 | 12 | Bosses and the Dungeon should match the reference game, Skeletron 1:1 | Boss parts share one life pool (`src/Strata.Core/Gameplay/Entities/Npc.cs:132-140`). The Dungeon is a grid of boxy rooms that rolls cave-cabin loot (`src/Strata.Core/WorldGen/Structures/DungeonBuilder.cs:116`). See §12 and §13. | P4-01…P4-38 (W7–W9) | SkeletronTests, DungeonGenerationTests, LockedChestTests, `dungeon.cmds` route |
@@ -74,7 +77,7 @@
 | Buffs, prefixes, tile objects | 39, 18, 71 | 103 object GLBs (`assets/models/objects/`) |
 | Audio | 146 SFX files (75 sound ids) and 31 music tracks | 177 files under `assets/audio/` |
 | Reference coverage | 100 % of 1,025 concepts | The reference list is hand-picked. Magic Missile, Aqua Scepter, Valor, the Golden Key, the Bone Welder, spikes, bookcases and pylons are not on it, so 100 % hides real gaps |
-| Core tests | 325 | `tests/Strata.Core.Tests`, W0 lane B |
+| Core tests | 325 at W0; 574 at the W3 gate | `tests/Strata.Core.Tests` |
 
 ## 4. Rendering and lighting
 
@@ -82,15 +85,15 @@
 |---|---|---|---|
 | Physical sky, clouds, sky-lit PBR, graphics presets as data | ✅ | `game/Ambience/EnvironmentController.cs`, `data/config/graphics.json` | — |
 | Water, lava, grass, leaf-card trees, character shader, horizon heightfield | ✅ | `docs/architecture/rendering.md` | — |
-| Auto-exposure: only brightens (1.65–3.3×), slow adaptation (speed 0.3) | ❌ | `game/Ambience/EnvironmentController.cs:94-97` | P1-02, P1-03 (W1a) |
-| Glow: threshold 1.0, Screen blend, level weights sum to 4.5 | ❌ | `game/Ambience/EnvironmentController.cs:63,90` | P1-03 (W1a) |
-| Fog reach: `ViewDistance = max(stream, 0.85*horizon)` puts fog about 149 m out in the desert on medium and up | 🟡 | `game/World/WorldRuntime.cs:140`, `game/Ambience/EnvironmentController.Frame.cs:135-136` | P1-03 (W1a) |
-| Horizon mesh paints biome `mapColor` fully lit (AO 1) | 🟡 | `shaders/horizon.gdshader` | P1-03 (W1a) |
-| SSIL (radius 6, intensity 1.2) and volumetric fog (albedo 0.92) brighten bright biomes on high and ultra | 🟡 | `game/Ambience/EnvironmentController.cs:75-81`, `game/Ambience/EnvironmentController.Frame.cs:141` | P1-03 (W1a) |
-| Per-biome exposure bias | ⬜ | `data/biomes.json` (the desert entry only tints colours) | P1-02 (W1a) |
-| Baked block light: 1 level per cell, octahedral spread, `x*sqrt(x)` curve, 15-cell cap | 🟡 | `src/Strata.Core/Lighting/LightEngine.cs:131`, `shaders/include/voxel_light.gdshaderinc:26-37` | P1-04 (W1a); P1b-17 (W2, optional) |
-| Placed dynamic lights: energy `0.85*peak`, range `3 + 8.5*peak`, attenuation 1.1; pool 0/8/16/24 by preset | 🟡 | `game/Rendering/DynamicLights.cs:65,127`, `data/config/graphics.json:12` | P1-04 (W1a) |
-| Held torch: energy 1.26, range 15 m, not baked into voxel light | 🟡 | `game/Player/PlayerLight.cs:31,64,70` | P1-04 (W1a) |
+| Exposure: a deterministic model (cave and night boost, biome bias) that darkens fast and brightens slowly, on every preset | ✅ | `src/Strata.Core/Presentation/ExposureModel.cs`, `game/Ambience/EnvironmentController.Exposure.cs`, `data/config/lighting.json` | P1-02, P1-03 (W1a) |
+| Glow: normalised levels, HDR threshold, softness and luminance cap from data | ✅ | `data/config/lighting.json` (`glow`), `game/Ambience/EnvironmentController.cs` | P1-03 (W1a) |
+| Fog reach: fog starts within `fog.nearCap` even when the horizon pushes its end out; deep caves fog the sky background | ✅ | `game/Ambience/EnvironmentController.Frame.cs`, `data/config/lighting.json` (`fog`) | P1-03 (W1a) |
+| Horizon mesh: land albedo clamped to luminance 0.42, AO 0.8 | ✅ | `shaders/horizon.gdshader` | P1-03 (W1a) |
+| SSIL and volumetric fog strengths from data (volumetric albedo 0.5) | ✅ | `data/config/lighting.json`, `game/Ambience/EnvironmentController.cs` | P1-03 (W1a) |
+| Per-biome exposure bias (desert 0.45, snow, sky, hallow and ocean dimmed) | ✅ | `data/biomes.json` (`exposureBias`), `src/Strata.Core/Content/Defs/BiomeDef.cs` | P1-02 (W1a) |
+| Baked block light: flatter curve (`level * mix(linear, 1, level)` times gain, from data) carries torch light to the 7.5 m edge; still 1 level per cell, 15-cell cap | ✅ | `shaders/include/voxel_light.gdshaderinc`, `data/config/lighting.json` (`blockLight`) | P1-04 (W1a); longer reach P1b-17 (W2, optional) |
+| Placed dynamic lights: a torch reaches 13.5 m with a flatter falloff (from data); pool 4/8/16/24 by preset | ✅ | `game/Rendering/DynamicLights.cs`, `data/config/lighting.json` (`torch`), `data/config/graphics.json` | P1-04 (W1a) |
+| Held torch: energy 1.8, range 16 m, from data (a real light, not baked into voxel light) | ✅ | `game/Player/PlayerLight.cs`, `data/config/lighting.json` (`torch.held*`) | P1-04 (W1a) |
 | Torch, fire and lava flicker; flame shader; embers | ✅ | `game/Rendering/DynamicLights.cs:141-149`, `game/Rendering/Flames.cs`, `game/Rendering/LavaEffects.cs` | — |
 | Held item and worn wings ignore voxel light (sky-lit in caves) | ❌ | `game/Player/PlayerAvatar.cs:52`, `game/Rendering/CreatureVisual.cs:63-72` | P3-06 (W5) |
 | Block chips and death puffs are not voxel-lit (death puff is unshaded) | 🟡 | `game/Entities/BlockEffects.cs:23-24`, `game/Entities/CombatEffects.cs:94` | P3-08 (W5), P3-20 (W5) |
@@ -106,15 +109,15 @@
 | Feature | Status | Evidence | Fix |
 |---|---|---|---|
 | Generation pipeline: 20 passes, plan and chunk tiers, structures, ores, liquids, hardmode mutations | ✅ | `src/Strata.Core/WorldGen/`, `docs/architecture/worldgen.md` | — |
-| Determinism: golden chunk hashes, `GenVersion` 9 | ✅ | `src/Strata.Core/WorldGen/GenVersion.cs:8`, `tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs` | Bumped by P1b-02 (W1b), P4-15 (W8), P5-22 (W10) |
+| Determinism: golden chunk hashes (block ids by name, spawn forest, tundra, jungle and desert surfaces), `GenVersion` 10 | ✅ | `src/Strata.Core/WorldGen/GenVersion.cs:8`, `tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs` | 10 since P1b-02 (W1b); next bumps P4-15 (W8), P5-22 (W10) |
 | Terrain metrics: SurfaceProfile, TerrainStats, `worldgen-report` terrain section and `--compare` | ✅ | `src/Strata.Core/WorldGen/Analysis/SurfaceProfile.cs`, `src/Strata.Core/WorldGen/Analysis/TerrainStats.cs` | P1b-01 (W0) |
-| 3D overhang density: amplitude `1.5 + rug*11` cells, 3 octaves, y stretched 1.4×; floating blobs, fins and holes | ❌ | `src/Strata.Core/WorldGen/Fields/TerrainField.cs:33-42` | P1b-03 (W1b) |
-| Mountains and tundra: ridged fractals (5 and 4 octaves) on a bilinear 8-cell grid; creases every 4 m | 🟡 | `src/Strata.Core/WorldGen/Passes/BiomeRelief.cs:16-20,57-58`, `src/Strata.Core/WorldGen/Plan/WorldPlan.cs:14`, `src/Strata.Core/WorldGen/Plan/Grid2D.cs:25-26` | P1b-02 (W1b) |
-| Biome relief blends over a third of a region (`Membership*3`); walls between forest and tundra | 🟡 | `src/Strata.Core/WorldGen/Passes/BiomeRelief.cs:40` | P1b-02 (W1b) |
-| Relief is code constants, not data | 🟡 | `src/Strata.Core/WorldGen/Passes/BiomeRelief.cs:15-20` | P1b-02 (W1b) |
-| Caves use the 2D column height, not the true surface, so tunnels break through as pits | 🟡 | `src/Strata.Core/WorldGen/Fields/CaveField.cs:41`, `src/Strata.Core/WorldGen/Passes/CaveGenerationPass.cs:128` | P1b-03 (W1b) |
-| Binary solid/air threshold, then Taubin smoothing with drift ≤ 0.45 cells; gentle slopes keep 0.25 m stair ripples | 🟡 | `src/Strata.Core/Meshing/SurfaceNetsMesher.cs:16-21` | P1b-04 (W1b) |
-| Old worlds after a generator change: a plan-hash mismatch only logs a warning, edited chunks seam | 🟡 | `src/Strata.Core/Session/WorldSession.cs` | P1b-02 (W1b) (outdated-world warning in the menu) |
+| Surface: a heightfield with at most ~2 cells of overhang noise; terraced cliffs and undercuts only in rare cliff zones (~5 % of land) | ✅ | `src/Strata.Core/WorldGen/Fields/TerrainTuning.cs`, `src/Strata.Core/WorldGen/Fields/TerrainField.cs` | P1b-03 (W1b) |
+| Mountains and tundra: rounded soft ridges sampled with a cubic B-spline (no grid creases) | ✅ | `src/Strata.Core/WorldGen/Passes/BiomeRelief.cs`, `src/Strata.Core/WorldGen/Plan/Grid2D.cs` (`SampleSmooth`) | P1b-02 (W1b) |
+| Biome relief blends with wide smoothstep ramps and blurred relief; no walls at biome borders | ✅ | `src/Strata.Core/WorldGen/Passes/BiomeRelief.cs` | P1b-02 (W1b) |
+| Relief is data (`relief` per biome, validated) | ✅ | `data/biomes.json`, `src/Strata.Core/Content/Defs/BiomeDef.cs` (`ReliefSpec`) | P1b-02 (W1b) |
+| Caves measure depth from the lowest the true surface can dip, so they keep a roof; worm tunnels start as cave mouths in hillsides or buried | ✅ | `src/Strata.Core/WorldGen/Fields/CaveField.cs`, `src/Strata.Core/WorldGen/Passes/CaveGenerationPass.cs` | P1b-03 (W1b) |
+| Smooth ground: up-facing vertices take their height from nearby column tops after Taubin smoothing, so gentle slopes have no stair ripples (RMS 3.19 → 1.67 cm) | ✅ | `src/Strata.Core/Meshing/HeightfieldSmoothing.cs`, `src/Strata.Core/Meshing/SurfaceNetsMesher.cs` | P1b-04 (W1b) |
+| Old worlds after a generator change: the world list marks them "old terrain" and asks before playing; edited chunks still seam (old worlds are disposable) | ✅ | `src/Strata.Core/Persistence/SaveCatalog.cs`, `src/Strata.Core/Session/WorldSession.cs` | P1b-02 (W1b) |
 
 W0 baseline: seed 1234, Small, a 512×512-column window at spawn. Reproduce it, or compare a later build against a saved
 stats.json with `--compare`, using:
@@ -132,12 +135,16 @@ dotnet run --project tools/Strata.Tools -c Debug -- worldgen-report --seed=1234 
 | Roughness (mean second difference) | 0.53 | 0.52 | 0.68 | 0.67 |
 | Relief (std-dev of Top in blocks) | 8.0 | 7.5 | 12.7 | 5.7 |
 
+After W1b (P1b-02, P1b-03; same window, all biomes): step p99 1, lip 0.13 %, floating 91 per 10k columns, breach
+0.35 %, roughness 0.31, relief 6.36 (79 % of before). Outside the rare cliff zones the whole Small map has no lips or
+breaches.
+
 ## 6. Performance
 
 | Feature | Status | Evidence | Fix |
 |---|---|---|---|
 | F3 overlay timers (`gd.mesh_uploads`, `gd.colliders`, `gd.objects`, `gd.grass`, `tick.*`) | ✅ | `game/UI/PerfOverlay.cs` | — |
-| Spike log, GC counters, perf probes, a perf.cmds smoke baseline | ⬜ | `game/Testing/Scripts/` (no perf script yet) | P1b-05 (W0) |
+| Spike log, GC counters, perf probes, a perf.cmds smoke baseline | ✅ | `game/Testing/Scripts/perf.cmds` | P1b-05 (W0) |
 | Autosave every 120 s runs inside the physics tick and rewrites whole region files under the store lock | ❌ | `src/Strata.Core/Session/GameWorld.cs:157-160`, `src/Strata.Core/Persistence/RegionFile.cs:42-69` | P1b-06, P1b-07 (W2) |
 | Unload flushes rewrite regions on the main thread | ❌ | `src/Strata.Core/Streaming/ChunkStreamer.cs:99,118`, `src/Strata.Core/Session/WorldSession.cs:169` | P1b-07 (W2) |
 | Streaming scheduler: LINQ `Where`/`OrderBy`/`ToList` over every entry, every frame | 🟡 | `src/Strata.Core/Streaming/ChunkStreamer.Scheduling.cs:42,66-67,101-102` | P1b-08 (W2) |
@@ -159,12 +166,12 @@ dotnet run --project tools/Strata.Tools -c Debug -- worldgen-report --seed=1234 
 | Controller: step-up, variable jump, coyote time, swimming, breath, fall damage, knockback, i-frame blink | ✅ | `game/Player/PlayerController.cs`, `data/config/movement.json` | — |
 | Jump about half as high as the reference game relative to the body (apex 2.4 m = 1.35 bodies); auto-step clears 0.5 m, not a 1 m block | 🟡 | `data/config/movement.json` | P3-46 (W6) |
 | Hermes Boots are an instant +45 %; Shift sprint speeds everyone up | 🟡 | `data/items/mobility.json`, `data/config/movement.json` | P3-46 (W6) |
-| Aim ray starts at the camera and accepts hits behind the player | ❌ | `game/Player/InteractionController.cs:101-110` | P1-05 (W1a), P1-06 (W1b) |
-| Targeting hits decor, grass and tree boxes that the camera probe and colliders ignore | ❌ | `src/Strata.Core/Gameplay/Interaction/Targeting.cs:28,39`, `game/World/ObjectColliders.cs:95` | P1-05 (W1a) |
-| Body turns to the aim point only past 55°; close targets pull the yaw right through the 0.55 m shoulder offset | ❌ | `game/Player/PlayerAvatar.Motion.cs:84`, `game/Player/CameraRig.cs:17` | P1-06 (W1b) (body always faces the crosshair, strafe clips) |
-| Talking is blocked by anything the ray hits first | 🟡 | `game/Player/InteractionController.Talk.cs:29` | P1-06 (W1b) |
-| Cursor reach ignores the Reach stat (Builder), so the highlight dims where use still works | ❌ | `game/Player/InteractionController.cs:101`, `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:94` | P1-05 (W1a) |
-| Crosshair names: blocks and objects only | 🟡 | `game/UI/Hud.cs:211` | P1-07 (W1b) |
+| Aim ray starts at the eye plane (`Targeting.CastView`), so nothing behind the player is selected | ✅ | `src/Strata.Core/Gameplay/Interaction/Targeting.cs`, `game/Player/InteractionController.cs` | P1-05 (W1a), P1-06 (W1b) |
+| Targeting filters decor and tree canopies by held item (trees stop the ray only in their trunk column, as their colliders do) | ✅ | `src/Strata.Core/Gameplay/Interaction/Targeting.cs` (`TargetFilter`), `game/World/ObjectColliders.cs` | P1-05 (W1a) |
+| The body always faces the crosshair; legs follow the movement with strafe and backpedal clips | ✅ | `src/Strata.Core/Presentation/BodyFacing.cs`, `game/Player/PlayerAvatar.Motion.cs` | P1-06 (W1b) |
+| Talking: the hovered resident within talking range is who right-click talks to | ✅ | `game/Player/InteractionController.Talk.cs`, `src/Strata.Core/Gameplay/Interaction/EntityPicking.cs` | P1-06, P1-07 (W1b) |
+| Cursor reach and use share `ItemUseSystem.ReachMeters` (item reach + Reach stat) | ✅ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs`, `game/Player/InteractionController.cs` | P1-05 (W1a) |
+| Crosshair names creatures, bosses, worm segments and residents with their life at any distance (walls hide names), else the block or object in reach | ✅ | `src/Strata.Core/Gameplay/Interaction/EntityPicking.cs`, `game/UI/Hud.cs` (`TargetLabel`) | P1-07 (W1b) |
 | Smart Dig (look down with a pickaxe) | ✅ | `game/Player/InteractionController.Talk.cs:15` | — |
 | Smart Cursor and auto-select | ⬜ | `data/config/input.json` | P2-29 (W4) |
 | Opening the inventory freezes the player (no moving, hotbar keys or use) while the world keeps running; auto-pause is off by default | ❌ | `game/UI/InputGate.cs:13`, `game/Player/PlayerController.cs:141`, `game/Settings/UserSettings.cs:27` | P2-11 (W4) |
@@ -179,12 +186,12 @@ below are in behaviour and presentation, not in data.
 | Category | Status | Evidence | Fix |
 |---|---|---|---|
 | Use-style vocabulary: 7 styles (`hold` unused); crowns, crystals, mirrors and crates "drink"; thrown items and boomerangs play the gun kick | ❌ | `src/Strata.Core/Content/Defs/ItemDef.cs:15-18`, `game/Player/PlayerAvatar.Motion.cs:124-133` | P3-02, P3-03 (W4) |
-| Use timing: the animation restarts mid-swing; speed bonuses don't scale `useAnimation` | ❌ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:97,110,158,161-162` | P1-10 (W1a), P3-01' (W5) |
-| Tools (86 pickaxes, axes, hammers and drills) | 🟡 | Mining works. Swings restart, and stone and ores take 1.7–2× the reference hits (`src/Strata.Core/Gameplay/Mining/MiningRules.cs:11`). | P1-10 (W1a), P3-24 (W5) |
-| Swords (41) | 🟡 | Hitbox and trail sweep flat and linear from tick 0 while the arm winds up (`src/Strata.Core/Gameplay/Entities/MeleeSystem.cs`, `game/Entities/SwingTrail.cs`) | P1-10 (W1a), P1-11 (W1b), P3-04 (W5) |
+| Use timing: one animation per swing (never restarts), speed prefixes and melee speed scale it, mining speed scales only use time | ✅ | `src/Strata.Core/Gameplay/Items/UseTiming.cs`, `data/config/use_styles.json` (`clips`) | P1-10 (W1a); bursts P3-01' (W5) |
+| Tools (86 pickaxes, axes, hammers and drills) | 🟡 | Mining works and swings no longer restart (P1-10). Stone and ores take 1.7–2× the reference hits (`src/Strata.Core/Gameplay/Mining/MiningRules.cs:11`). | P3-24 (W5) |
+| Swords (41) | 🟡 | Hitbox and trail sweep the clip's strike window, not the wind-up (P1-10, P1-11; `src/Strata.Core/Gameplay/Entities/MeleeSystem.cs`, `game/Entities/SwingTrail.cs`). The first-person arc and swing curve are not yet aligned to the clip. | P3-04 (W5) |
 | Swords that also shoot (Starfury, Terra Blade, Zenith and 12 more) | ✅ | The 14 swords swing with every shot; Zenith is `noMelee` with `maxActive: 0` and never blocks (`ItemUseSystem.cs:155-163`, `ItemUseSystem.Shooting.cs:27-29`; `ArsenalTests`, `combat.cmds`) | P1-16 (W1a) |
 | Spears and shortswords (22) | 🟡 | Thrust works, but the model never reaches the 1.6–2.1 m hitbox (`src/Strata.Core/Gameplay/Entities/MeleeSystem.cs`) | P3-04 (W5) |
-| Bows (23) | ❌ | Arrow leaves before the draw; all metal bows are one mesh; Daedalus Stormbow fires from the eye | P1-13 (W1a), P1-14 (W1b), P3-39 (W2), P3-09' (W5) |
+| Bows (23) | 🟡 | Fixed: the arrow leaves the hand at the string's release and converges on the crosshair; the bow is held upright with a nocked arrow (P1-13, P1-14). Left: all metal bows are one mesh; Daedalus Stormbow fires from the eye | P3-39 (W2), P3-09' (W5) |
 | Guns (17) | 🟡 | Fire and recoil work. Missing: muzzle flash, real bursts, ammo count on the slot, Megashark/Minishark ammo saving (`ItemUseSystem.Shooting.cs:18-23`). Icons render edge-on. | P3-38 (W2), P2-06 (W3), P3-01', P3-09', P3-10 (W5) |
 | Magic (38) | 🟡 | Works (mana, mana sickness). Bolts are tiny spheres, trails are never drawn, magic guns use the cast pose. | P3-02 (W4), P3-11 (W5) |
 | Thrown (shuriken, knives, bombs, grenades) | 🟡 | Work, but play the gun pose; shuriken don't spin (`game/Entities/ProjectileRenderer.cs:85`) | P3-02, P3-03 (W4), P3-11 (W5) |
@@ -193,24 +200,24 @@ below are in behaviour and presentation, not in data.
 | Flails (5) | ❌ | Stand-in: the whole flail model flies and tumbles, no chain | P3-13 (W5) |
 | Whips (2) | ❌ | Wide melee arcs; "summons focus struck enemies" and Snapthorn's poison exist only in the descriptions (`data/items/arsenal.json`) | P3-14 (W5), P3-15 (W5) |
 | Summons (15) | 🟡 | Minions and sentries work; they spawn at the eye, with no minion buff or count in the HUD | P3-10 (W5), P2-14 (W4) |
-| Grappling hooks (9) | ❌ | Click does nothing; the hook drops on natural terrain; one generic chain and claw | P1-08 (W1a), P1-09 (W1b), P3-17' (W5) |
-| Potions and consumables | 🟡 | Healing, mana, buffs and crystals work. Every use is "drink". 19 of 21 buff potions don't say what they do or for how long. Stack sizes mix versions. Life Fruit works before 400 max life (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs:14`). | P2-04 (W3), P3-02 (W4), P3-33 (W6) |
+| Grappling hooks (9) | 🟡 | Fixed: click throws, the hook holds on natural terrain, platforms and trees, and the claw sits on the rendered surface (P1-08, P1-09; `src/Strata.Core/Gameplay/Player/GrappleHook.cs`). Left: one generic chain and claw | P3-17' (W5) |
+| Potions and consumables | 🟡 | Healing, mana, buffs and crystals work. Every use is "drink". Stack sizes mix versions. Life Fruit works before 400 max life (`src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs:14`). Tooltips now say what every buff potion does and for how long (P2-04, `src/Strata.Core/Gameplay/Buffs/BuffText.cs`). | P3-02 (W4), P3-33 (W6) |
 | Quick heal, quick mana, quick buff keys | ⬜ | `data/config/input.json` | P3-33 (W6) |
-| Accessories (66) | ✅ | Stat, flight, dash and info effects; set bonuses (`src/Strata.Core/Content/Specs/EffectSpecs.cs`) | 7 slots: P2-05 (W3) |
+| Accessories (66) | ✅ | Stat, flight, dash and info effects; set bonuses (`src/Strata.Core/Content/Specs/EffectSpecs.cs`); up to 7 slots as the world unlocks them, each with a vanity slot (P2-05, `src/Strata.Core/Gameplay/Items/PlayerInventory.Equipment.cs`) | — |
 | Armour (98 pieces) | 🟡 | Stats and set bonuses work; never drawn on the character | P3-41, P3-42 (W7) |
 | Wings (14) | ✅ | Flight works and wings are drawn | — |
-| Mounts | 🟡 | Minecart only (`src/Strata.Core/Gameplay/Mounts/Minecart.cs`) | Slot: P2-05 (W3); more mounts out of scope (§17) |
+| Mounts | 🟡 | Minecart only (`src/Strata.Core/Gameplay/Mounts/Minecart.cs`); the misc row has a mount slot (P2-05) | More mounts out of scope (§17) |
 | Pets and light pets | ⬜ | `Pet` category exists, zero items (`src/Strata.Core/Content/Defs/ItemDef.cs:3-8`) | P3-18 (W5) |
-| Vanity and dyes | ⬜ | Categories exist, zero items | Slots: P2-05 (W3), P2-16 (W4); dyes: P5-16 (W10) |
+| Vanity and dyes | ⬜ | Categories exist, zero items. Vanity and dye slots are modelled and saved (P2-05); the inventory shows vanity slots, not dye slots | Dye slot UI: P2-16 (W4); dyes: P5-16 (W10) |
 | Prefixes: 18 with invented names; rolled only on crafted items | 🟡 | `data/combat.json`, `src/Strata.Core/Gameplay/Crafting/RecipeBook.cs:56`, `src/Strata.Core/Gameplay/Loot/LootRoller.cs:57,80`, `src/Strata.Core/Gameplay/Town/TownCommerce.cs:117` | P3-31 (W6) |
-| Rarity colours: tiers 9 and 10 (52 items) show as tier-8 yellow; no Expert/Master/Quest tiers | ❌ | `game/UI/UiTheme.cs:51` | P2-01 (W3) |
-| Coins never auto-convert; no coin slots | ⬜ | `src/Strata.Core/Gameplay/Items/Coins.cs`, `src/Strata.Core/Gameplay/Items/PlayerInventory.cs` | P2-05, P2-06 (W3) |
-| Ammo: searched hotbar-first; no ammo slots | 🟡 | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs:44-46` | P2-06 (W3) |
+| Rarity colours: every tier, plus Quest, Expert (rainbow) and Master (fiery pulse), in Core; the Expert and Master names are coloured once, not animated yet | ✅ | `src/Strata.Core/Presentation/RarityColors.cs`, `game/UI/UiTheme.cs` | P2-01 (W3); animated names with the tooltip follower P2-10 (W4) |
+| Coins: four coin slots that convert upwards; the wallet spans the coin slots and the backpack. The screen still shows coins as a text label | 🟡 | `src/Strata.Core/Gameplay/Items/PlayerInventory.Purse.cs`, `src/Strata.Core/Gameplay/Items/Coins.Purse.cs` | P2-05, P2-06 (W3); coin slot UI P2-15 (W4) |
+| Ammo: four ammo slots fire first, and crafting counts arrows in them; no ammo slot UI yet | 🟡 | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs`, `src/Strata.Core/Gameplay/Items/PlayerInventory.Purse.cs` | P2-06 (W3); ammo slot UI P2-15 (W4) |
 | Per-item use sounds (`ItemDef.SoundSet` has no readers) | ⬜ | `src/Strata.Core/Content/Defs/ItemDef.cs:118` | P3-27 (W6) |
 | Autoswing: every melee weapon repeats, so `autoReuse` is dead data for melee | ✅ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:89` | Whip and Feral Claws rule: P3-15 (W5) |
-| Failed uses (no ammo, no mana, blocked) give no feedback | ❌ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs:160` | P1-15 (W1a) |
-| Shots spawn at the eye, not the weapon | ❌ | `src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs:89` | P1-13 (W1a), P3-05 (W2), P3-09' (W5) |
-| Held-item grip: one +90° rotation for everything; first-person guns point skyward | 🟡 | `game/Player/PlayerAvatar.cs:90-102`, `game/Player/ViewModel.cs:69-72` | P3-05 (W2), P3-06, P3-07 (W5) |
+| Failed uses say why once per press ("Needs Wooden Arrow", "Not enough mana", Potion Sickness) with a dry click, mana fizzle or tink | ✅ | `src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs` (`Failed`), `game/Audio/SoundEvents.cs` | P1-15 (W1a) |
+| Shots leave the weapon hand and converge on the crosshair (the eye only when the hand is inside terrain) | ✅ | `src/Strata.Core/Gameplay/Entities/ShotGeometry.cs` | P1-13 (W1a); muzzle sockets P3-05 (W2), P3-09' (W5) |
+| Held-item grip: one +90° rotation for most items. Ranged weapons are aimed at the crosshair (bows upright, guns along the view with recoil, staffs tipped; P1-14) | 🟡 | `game/Player/PlayerAvatar.cs`, `game/Player/ViewModel.Ranged.cs` | P3-05 (W2), P3-06, P3-07 (W5) |
 | Held blocks: a flat unlit icon card | 🟡 | `game/Player/PlayerAvatar.cs:96-102`, `game/Player/ViewModel.cs:98-101` | P3-06 (W5) |
 | Dropped items: flat billboards, no spin, faint rarity glow, no light | 🟡 | `game/Items/DroppedItemRenderer.cs:50-56` | P3-36 (W6) |
 | The item magnet pulls items in when the inventory is full (they orbit the player) | ❌ | `src/Strata.Core/Gameplay/Items/DroppedItems.cs:69` | P3-29 (W6) |
@@ -220,37 +227,37 @@ below are in behaviour and presentation, not in data.
 
 | Feature | Status | Evidence | Fix |
 |---|---|---|---|
-| Theme: dark slate (0.07, 0.09, 0.14) instead of translucent royal blue; covers only 4 control types; attached per root | 🟡 | `game/UI/UiTheme.cs:8-16,54-71` | P2-01 (W3) |
-| UI font: none in the repo; Godot's fallback font everywhere | ⬜ | `project.godot`, `game/UI/UiTheme.cs` | P2-01 (W3) |
-| UI sprites (hearts, stars, bubbles, slot silhouettes, cursor, frames) | ⬜ | `assets/` (no UI sprites) | P2-02 (W3) |
+| Theme: translucent Terraria blue panels, slot kinds and gold hover text as one global theme; check boxes keep Godot's default icons | ✅ | `game/UI/UiTheme.cs`, `game/UI/UiTheme.Build.cs`, `assets/ui/strata_theme.tres` | P2-01 (W3) |
+| UI font: Comic Neue Bold (SIL OFL) with Andika Bold as the glyph fallback, everywhere, with a UI-scale guard | ✅ | `assets/fonts/`, `game/UI/UiFonts.cs` | P2-01 (W3) |
+| UI sprites (hearts, stars, bubbles, slot silhouettes, buttons, pointer, frames) and 39 buff and 16 event icons, generated and validated; the HUD does not draw them yet | ✅ | `tools/textures/build_ui.py`, `game/UI/UiSprites.cs`, `game/UI/StatusIcons.cs` | P2-02, P2-03 (W3); shown by P2-10, P2-13, P2-14, P2-23 (W4) |
 | **HUD**: life and mana are 260 px progress bars, not hearts (golden past 400) and stars | 🟡 | `game/UI/Hud.cs:68-77` | P2-13 (W4) |
 | Breath is a third bar that overlaps the minimap | 🟡 | `game/UI/Hud.cs:75-76` | P2-13 (W4) |
 | Hotbar: bottom-centre, no selected-slot scale, name fades, shown twice with the inventory open | 🟡 | `game/UI/Hud.cs:48-62,171-189` | P2-12 (W4) |
-| Buffs: text chips with dead tooltips; no icons or right-click cancel; overlaps the FPS label | 🟡 | `game/UI/Hud.cs:249-267`, `src/Strata.Core/Content/Defs/BuffDef.cs` | P2-03 (W3), P2-14 (W4) |
+| Buffs: text chips with dead tooltips; no right-click cancel; overlaps the FPS label. Icons, buff text and `BuffDisplay` (timer, cancel) exist in Core but the HUD does not use them yet | 🟡 | `game/UI/Hud.cs`, `src/Strata.Core/Presentation/BuffDisplay.cs` | P2-14 (W4) |
 | Boss bar: plain bar, no head icon, life numbers discarded | 🟡 | `game/UI/Hud.cs:128` | P2-24 (W2), P2-23 (W4), P4-03 (W7) |
 | Invasion and event progress bar | ⬜ | `src/Strata.Core/Gameplay/Events/EventDirector.cs` (kills are tracked) | P2-23 (W4) |
 | Status messages: big centred banners, non-Terraria colours, no chat log | 🟡 | `game/UI/Hud.cs:133-160` | P2-21 (W4) |
 | Pickup feedback: corner toasts ("+1 Dirt Block" ×30) instead of merged popups | 🟡 | `game/UI/Hud.cs:161-164,269-279` | P2-22 (W4) |
-| Floating combat text: no pop, no heal or mana numbers, non-Terraria colours | 🟡 | `game/Entities/CombatEffects.cs:38-72` | P2-19 (W3) |
-| Enemy health: red "life/max" text instead of a small bar | 🟡 | `game/Entities/NpcRenderer.cs:145-150` | P2-20 (W3) |
+| Floating combat text: Terraria colours, pop-in, fixed screen size, green heal and blue mana numbers | ✅ | `src/Strata.Core/Presentation/CombatText.cs`, `game/Entities/CombatEffects.cs` | P2-19 (W3); heart and star pickups P3-29 (W6) |
+| Enemy health: a small green-to-red billboard bar under hurt enemies (bosses keep the HUD bar) | ✅ | `game/Entities/NpcRenderer.HealthBar.cs`, `shaders/ui_healthbar.gdshader` | P2-20 (W3) |
 | Death screen: plain red text, no dim, no cause | 🟡 | `game/UI/Hud.cs:114-118,213-217` | P2-25 (W4) |
 | Custom cursor; held item at the pointer on every screen | ⬜ | `game/UI/Hud.cs:321-344`, `game/UI/InventoryScreen.cs:146-156` | P2-10 (W4) |
-| Info accessories readout overlaps the F3 overlay | 🟡 | `game/UI/Hud.cs:108-112` | P2-09 (W3), P2-12 (W4) |
-| Layout: absolute pixels; the crafting panel covers the minimap below 1340 logical px | ❌ | `game/UI/InventoryScreen.cs:45-93`, `game/UI/CraftingPanel.cs:23-24` | P2-09 (W3), P2-15 (W4) |
+| Info accessories readout overlaps the F3 overlay (Core layout regions exist, P2-09; not applied yet) | 🟡 | `game/UI/Hud.cs`, `src/Strata.Core/Presentation/UiLayout.cs` | P2-12 (W4) |
+| Layout: absolute pixels; the crafting panel covers the minimap below 1340 logical px. Core `UiLayout` gives named regions that never overlap at any size or UI scale (P2-09), but the screens do not use them yet | ❌ | `game/UI/InventoryScreen.cs`, `game/UI/CraftingPanel.cs`, `src/Strata.Core/Presentation/UiLayout.cs` | P2-12, P2-15 (W4) |
 | **Inventory**: 50-slot backpack, Loot all / Deposit all, split and merge | ✅ | `src/Strata.Core/Gameplay/Items/SlotActions.cs` | — |
-| Right-click follows Minecraft rules: takes half or places one; can't equip or open crates; no hold to take more | ❌ | `src/Strata.Core/Gameplay/Items/SlotActions.cs:46-47` | P2-07 (W3) |
-| Trash slot lives in the UI only (lost on exit); shift-click silently trashes | 🟡 | `game/UI/InventoryScreen.cs:29,206` | P2-05, P2-07 (W3), P2-15 (W4) |
-| Coin and ammo slots; coins as a text label | ⬜ | `game/UI/InventoryScreen.cs:145` | P2-06 (W3), P2-15 (W4) |
-| Sort, quick stack, restock, rename, favourites, quick stack to nearby chests | ⬜ | `game/UI/InventoryScreen.cs:216-230` | P2-08 (W3), P2-17 (W4) |
-| Throw the cursor item by clicking outside the inventory | ⬜ | `game/UI/InventoryScreen.cs:126-135` | P2-11 (W4) |
-| Equipment: 3 armour and 5 accessory slots, no silhouettes, text defense; no vanity, dye or misc slots | 🟡 | `src/Strata.Core/Gameplay/Items/PlayerInventory.cs`, `game/UI/InventoryScreen.cs:52-74` | P2-05 (W3), P2-16 (W4) |
+| Terraria slot clicks: right-click takes one (held: faster), equips, swaps vanity and opens crates; Ctrl trashes, Alt favourites, Shift quick-moves | ✅ | `src/Strata.Core/Gameplay/Items/SlotActions.cs`, `game/UI/InventoryScreen.Slots.cs` | P2-07 (W3); Shift-sell in shops P2-27 (W4) |
+| Trash slot is saved with the player; Ctrl+click trashes, Shift+click quick-moves | ✅ | `src/Strata.Core/Gameplay/Items/PlayerInventory.cs`, `game/UI/InventoryScreen.cs` | P2-05, P2-07 (W3); placement P2-15 (W4) |
+| Coin and ammo slots: modelled, saved and used in Core (P2-05, P2-06); the screen still shows coins as a text label and no ammo slots | 🟡 | `game/UI/InventoryScreen.cs` | P2-15 (W4) |
+| Sort (favourites stay put), quick stack, restock, Loot All, Deposit All, saved chest names, favourites (gold wash), quick stack to nearby chests | ✅ | `src/Strata.Core/Gameplay/Items/InventoryOps.cs`, `game/UI/InventoryScreen.Chest.cs` | P2-07, P2-08 (W3); chest panel look P2-17 (W4) |
+| Throw the cursor item by clicking outside the inventory (right click: one) | ✅ | `game/UI/InventoryScreen.Slots.cs` (`ThrowCursor`) | P2-07 (W3) |
+| Equipment: armour and up to 7 accessory slots with a vanity toggle, and the misc row (pet, light pet, minecart, mount, hook); no silhouettes, text defense, no dye slots on screen | 🟡 | `src/Strata.Core/Gameplay/Items/PlayerInventory.Equipment.cs`, `game/UI/InventoryScreen.cs` | P2-05 (W3); P2-16 (W4) |
 | **Crafting**: rebuilds every 0.5 s, destroying its own tooltips (the only place ingredients show) | ❌ | `game/UI/CraftingPanel.cs:41-51` | P2-18 (W4) |
-| Crafting shows raw station ids (`hardmode_anvil`, `alchemy`) | ❌ | `game/UI/CraftingPanel.cs:49,90`, `game/UI/TownDialog.cs:186` | P2-04 (W3), P2-18 (W4) |
+| Crafting tooltips and the Guide name stations ("Iron Anvil or Lead Anvil"); the "Near:" line still lists raw ids | 🟡 | `src/Strata.Core/Content/Index/StationNames.cs`, `game/UI/CraftingPanel.cs:51` | P2-04 (W3); P2-18 (W4) |
 | Craft to cursor, material slots, hold-to-craft | ⬜ | `game/UI/CraftingPanel.cs:72-82` | P2-18 (W4) |
 | **Chests**: open, Loot all, Deposit all; chest lid stays shut | 🟡 | `game/UI/InventoryScreen.cs:76-89`, `game/World/ObjectPlacement.cs:26-30` | P2-17 (W4), P3-48 (W6) |
 | Piggy Bank and Safe | ⬜ | no `piggy` anywhere in `data/` | P3-35 (W6) |
 | **Tooltips**: speed and knockback words match the reference game | ✅ | `src/Strata.Core/Gameplay/Items/ItemTooltip.cs` | — |
-| Tooltips ignore prefix stats and value; no green/red modifier lines; sell price disagrees with the shop | ❌ | `src/Strata.Core/Gameplay/Items/ItemTooltip.cs:20-43` | P2-04 (W3), P3-31 (W6) |
+| Tooltips show prefix-adjusted stats with green/red modifier lines, buff text and duration, and the shop's coin-tier price | ✅ | `src/Strata.Core/Gameplay/Items/ItemTooltip.cs`, `src/Strata.Core/Gameplay/Items/ItemTooltip.Extras.cs` | P2-04 (W3); Terraria prefixes P3-31 (W6) |
 | Tooltips on Labels (shop rows, buff row) can never appear; default 0.5 s delay; not following the mouse | ❌ | `game/UI/TownDialog.cs:148`, `game/UI/Hud.cs:265` | P2-10 (W4) |
 | **NPC chat and shop**: bottom-anchored box spills off-screen; framed buttons | 🟡 | `game/UI/TownDialog.cs:37-38` | P2-26 (W4) |
 | Shop: a list, sell held stack only, no buyback | 🟡 | `game/UI/TownDialog.cs:138-166` | P2-27 (W4) |
@@ -448,7 +455,7 @@ Items tagged `shop` that nobody sells: Leather Whip and Rally (P5-15, P5-17).
 | Feature | Status | Evidence | Fix |
 |---|---|---|---|
 | In-game help: the Guide's one-line help and item tooltips | 🟡 | `game/UI/TownDialog.cs:174-187` | P5-14 (W10), P5-27 (W11) |
-| Item-source reverse index (lives in the validator only) | 🟡 | `src/Strata.Core/Content/Validation/ContentValidator.World.cs:73` | P5-24a (W3) |
+| Item-source reverse index: a Core `ItemSourceIndex` that the obtainability check uses | ✅ | `src/Strata.Core/Content/Index/ItemSources.cs` | P5-24a (W3) |
 | Drop-rate computation | ⬜ | `src/Strata.Core/Gameplay/Loot/LootRoller.cs` (rolls only) | P5-24b (W11) |
 | Player journal: kills, seen, caught, met, obtained, crafted | ⬜ | — | P5-25 (W11) |
 | Achievements and popups | ⬜ | no `achievement` in `src/`, `game/` or `data/` | P5-26 (W11) |

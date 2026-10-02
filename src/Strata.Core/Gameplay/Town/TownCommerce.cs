@@ -113,27 +113,30 @@ public sealed class TownCommerce
     {
         var offer = Stock(npc, player).FirstOrDefault(o => o.Item == item);
         if (offer == null) return TradeResult.Unavailable;
-        var inv = player.State.Inventory.Backpack;
+        var inv = player.State.Inventory;
         var goods = new ItemStack(item, count);
-        if (!inv.CanFit(goods)) return TradeResult.NoRoom;
+        if (!inv.CanTake(goods)) return TradeResult.NoRoom;
         if (!Wallet.TrySpend(inv, Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
-        var rest = inv.Add(goods);
+        var rest = inv.Pickup(goods);
         foreach (var s in change.Append(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         return TradeResult.Ok;
     }
 
     /// <summary>Sale value of a stack (copper).</summary>
-    public long SaleValue(ItemStack stack) => (long)MathF.Floor(Prefixes.Value(stack) * Config.SellRatio) * stack.Count;
+    public long SaleValue(ItemStack stack) => Prefixes.SellValue(stack, Config.SellRatio);
 
     /// <summary>Sells the whole stack in a backpack slot.</summary>
-    public TradeResult Sell(PlayerEntity player, int slot)
+    public TradeResult Sell(PlayerEntity player, int slot) => Sell(player, player.State.Inventory.Backpack, slot);
+
+    /// <summary>Sells the whole stack in a slot of one of the player's storages (backpack or ammo; coins never sell).</summary>
+    public TradeResult Sell(PlayerEntity player, Inventory from, int slot)
     {
-        var inv = player.State.Inventory.Backpack;
-        var stack = inv[slot];
+        var inv = player.State.Inventory;
+        var stack = from[slot];
         if (stack.IsEmpty || stack.Item!.HasTag("coin")) return TradeResult.NotSold;
         long value = SaleValue(stack);
         if (value <= 0) return TradeResult.NotSold;
-        inv.Take(slot, stack.Count);
+        from.Take(slot, stack.Count);
         foreach (var s in Wallet.Give(inv, Content, value)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         return TradeResult.Ok;
     }
@@ -155,14 +158,13 @@ public sealed class TownCommerce
         if (npc.Def.Service is not { Type: TownServiceSpecs.Heal } spec) return TradeResult.Unavailable;
         long cost = HealCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
-        var inv = player.State.Inventory.Backpack;
-        if (!Wallet.TrySpend(inv, Content, cost, out var change)) return TradeResult.TooPoor;
+        if (!Wallet.TrySpend(player.State.Inventory, Content, cost, out var change)) return TradeResult.TooPoor;
         foreach (var s in change) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         var state = player.State;
         if (spec.Parse<HealServiceParams>().ClearsDebuffs)
             foreach (var b in state.Buffs.Active.Where(b => b.Def.Debuff && !b.Def.Persistent).ToList()) state.Buffs.Remove(b.Def.Id);
         state.Recompute();
-        state.Vitals.Life = state.Vitals.MaxLife;
+        _world.ReportHeal(player, state.Vitals.Heal(state.Vitals.MaxLife), mana: false);
         return TradeResult.Ok;
     }
 

@@ -48,7 +48,7 @@ public sealed class TownServices
         long cost = ReforgeCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
         var inv = player.State.Inventory;
-        if (!Wallet.TrySpend(inv.Backpack, Content, cost, out var change)) return TradeResult.TooPoor;
+        if (!Wallet.TrySpend(inv, Content, cost, out var change)) return TradeResult.TooPoor;
         foreach (var s in change) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         var held = inv.Held;
         result = new ItemStack(held.Item!, held.Count, Prefixes.Roll(held.Item!, Content, ref _rng, held.Prefix));
@@ -79,7 +79,7 @@ public sealed class TownServices
     {
         amount = TaxesDue(npc);
         if (amount <= 0) return TradeResult.NothingToDo;
-        foreach (var s in Wallet.Give(player.State.Inventory.Backpack, Content, amount)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
+        foreach (var s in Wallet.Give(player.State.Inventory, Content, amount)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         Counters[TaxCounter] = (int)Hour;
         return TradeResult.Ok;
     }
@@ -113,9 +113,9 @@ public sealed class TownServices
         reward = ItemStack.Empty;
         var wanted = AnglerWants(npc);
         if (wanted == null) return TradeResult.NothingToDo;
-        var inv = player.State.Inventory.Backpack;
-        if (inv.Count(wanted) < 1) return TradeResult.Unavailable;
-        inv.Remove(d => d == wanted, 1);
+        var inv = player.State.Inventory;
+        if (inv.Backpack.Count(wanted) < 1) return TradeResult.Unavailable;
+        inv.Backpack.Remove(d => d == wanted, 1);
         Counters[AnglerCounter] = (int)_world.Session.Clock.Day;
         var p = npc.Def.Service!.Parse<AnglerQuestParams>();
         long coins = p.Coins.Length >= 2 ? _rng.Range((int)p.Coins[0], (int)p.Coins[1]) : p.Coins.FirstOrDefault();
@@ -124,7 +124,7 @@ public sealed class TownServices
         {
             if (!_rng.Chance(r.Chance) || !Content.Items.TryGet(r.Item, out var item)) continue;
             reward = Prefixes.Fresh(item, r.Count, Content, ref _rng);
-            var rest = inv.Add(reward);
+            var rest = inv.Pickup(reward);
             if (!rest.IsEmpty) _world.Drops.Spawn(rest, player.Center, System.Numerics.Vector3.Zero);
             break;
         }

@@ -103,13 +103,18 @@ public sealed partial class ProjectileRenderer : Node3D
             AddLight(root, p);
             return root;
         }
+        // Models still loading on a loader thread leave this projectile with the glow fallback (later ones get the model).
         Mesh? mesh = null;
-        if (p.Def.Visual == "item" && content.Items.TryGet(p.Def.Model ?? p.Def.Id, out var thrown) && AssetPaths.ItemModel(thrown, content) is { } itemPath)
-            mesh = _props.Model(itemPath, multimesh: false);
+        string? modelPath = null;
+        bool creatureLoading = p.Def.Visual == "creature"; // its model is pending: glow until it is ready
+        if (creatureLoading) modelPath = null;
+        else if (p.Def.Visual == "item" && content.Items.TryGet(p.Def.Model ?? p.Def.Id, out var thrown) && AssetPaths.ItemModel(thrown, content) is { } itemPath)
+            modelPath = itemPath;
         else if (p.Def.Model != null)
-            mesh = _props.Model(AssetPaths.ProjectileModel(p.Def), multimesh: false);
+            modelPath = AssetPaths.ProjectileModel(p.Def);
         else if (p.Def.Visual == "arrow" && content.Items.TryGet(p.Def.Id, out var ammo) && AssetPaths.ItemModel(ammo, content) is { } path)
-            mesh = _props.Model(path, multimesh: false); // ammo projectiles reuse their ammo item's model
+            modelPath = path; // ammo projectiles reuse their ammo item's model
+        if (modelPath != null) _props.TryModel(modelPath, multimesh: false, out mesh);
         if (mesh != null)
         {
             root.AddChild(new MeshInstance3D { Mesh = mesh, Position = new Vector3(0, -0.1f, 0), Scale = Vector3.One * p.Def.Scale });
@@ -137,7 +142,7 @@ public sealed partial class ProjectileRenderer : Node3D
         return root;
     }
 
-    private static StandardMaterial3D Glow(Color color, float energy) => new()
+    internal static StandardMaterial3D Glow(Color color, float energy) => new()
     {
         AlbedoColor = color, EmissionEnabled = true, Emission = color, EmissionEnergyMultiplier = energy, ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
     };

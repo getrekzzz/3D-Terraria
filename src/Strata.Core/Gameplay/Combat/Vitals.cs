@@ -57,7 +57,13 @@ public sealed class Vitals
         TicksSinceHurt = 0;
     }
 
-    public void Heal(int amount) => Life = Math.Min(MaxLife, Life + Math.Max(0, amount));
+    /// <summary>Restores life up to the maximum; returns the life actually gained (0 at full life).</summary>
+    public int Heal(int amount)
+    {
+        int before = Life;
+        Life = Math.Min(MaxLife, Life + Math.Max(0, amount));
+        return Math.Max(0, Life - before);
+    }
 
     public bool TrySpendMana(int amount)
     {
@@ -67,7 +73,13 @@ public sealed class Vitals
         return true;
     }
 
-    public void RestoreMana(int amount) => Mana = Math.Min(MaxMana, Mana + Math.Max(0, amount));
+    /// <summary>Restores mana up to the maximum; returns the mana actually gained (0 at full mana).</summary>
+    public int RestoreMana(int amount)
+    {
+        int before = Mana;
+        Mana = Math.Min(MaxMana, Mana + Math.Max(0, amount));
+        return Math.Max(0, Mana - before);
+    }
 
     /// <summary>One tick of natural regeneration; <paramref name="bonusLifePerSecond"/> comes from effects.</summary>
     public void Tick(float bonusLifePerSecond, bool suppressNatural = false)

@@ -60,6 +60,17 @@ public class MountTests
     }
 
     [Fact]
+    public void QuickMountPrefersTheMountSlot()
+    {
+        using var g = TestGame.Create();
+        var inv = g.Player.State.Inventory;
+        inv.Backpack.Add(new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("fuzzy_carrot"), 1));
+        inv.Misc[(int)Strata.Core.Gameplay.Items.MiscSlot.Mount] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("cosmic_car_key"), 1);
+        Assert.True(MountRules.QuickMount(g.World, g.Player));
+        Assert.Equal("ufo", g.Player.Mount!.Config.Id);
+    }
+
+    [Fact]
     public void TheSlimeJumpsFarHigherThanOnFoot()
     {
         using var g = TestGame.Create();

@@ -21,21 +21,25 @@ public sealed partial class ItemUseSystem
 
         if (cfg.PermanentLife > 0) state.BonusLife += cfg.PermanentLife;
         if (cfg.PermanentMana > 0) state.BonusMana += cfg.PermanentMana;
+        int life = 0, mana = 0;
         if (item.HealLife > 0)
         {
-            state.Vitals.Heal(item.HealLife);
+            life += state.Vitals.Heal(item.HealLife);
             if (_healingCooldown != null) state.Buffs.Add(_healingCooldown, _healingCooldown.Duration);
         }
         if (item.HealMana > 0)
         {
-            state.Vitals.RestoreMana(item.HealMana);
+            mana += state.Vitals.RestoreMana(item.HealMana);
             if (_manaCooldown != null) state.Buffs.Add(_manaCooldown, _manaCooldown.Duration);
         }
         if (item.Buff != null && _world.Session.Content.Buffs.TryGet(item.Buff.Id, out var buff))
             state.Buffs.Add(buff, item.Buff.Ticks, state.Effects.Immunities);
         state.Recompute();
-        if (cfg.PermanentLife > 0) state.Vitals.Heal(cfg.PermanentLife);
-        if (cfg.PermanentMana > 0) state.Vitals.RestoreMana(cfg.PermanentMana);
+        // Crystals fill the life or mana they add, and float it like a potion does (Terraria's HealEffect / ManaEffect).
+        if (cfg.PermanentLife > 0) life += state.Vitals.Heal(cfg.PermanentLife);
+        if (cfg.PermanentMana > 0) mana += state.Vitals.RestoreMana(cfg.PermanentMana);
+        _world.ReportHeal(p, life, mana: false);
+        _world.ReportHeal(p, mana, mana: true);
         if (cfg.Recall) Recall(p);
         if (cfg.Loot != null) Open(p, cfg.Loot);
         if (item.Consumable) ConsumeHeld(p);

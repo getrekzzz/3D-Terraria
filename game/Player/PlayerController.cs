@@ -139,8 +139,7 @@ public sealed partial class PlayerController : CharacterBody3D
         _swimming = _liquid != null;
         _climbing = !_swimming && OnRope();
         var stats = Entity.State.Effects.Stats;
-        float speed = _config.WalkSpeed * (1f + stats.Bonus(StatIds.MoveSpeed)) * stats.Multiplier(StatIds.MoveSpeed);
-        if (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint")) speed *= _config.SprintMultiplier;
+        float speed = RunSpeed(stats) * stats.Multiplier(StatIds.MoveSpeed);
         if (_liquid != null) speed = Mathf.Min(speed * _liquid.MoveSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)), _config.SwimSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)));
         speed *= AirSpeedFactor();
         if (_climbing) speed *= 0.6f;
@@ -161,6 +160,7 @@ public sealed partial class PlayerController : CharacterBody3D
         }
         if (UpdateDash(dt, ref horizontal)) accel *= 0.08f; // a dash carries its own momentum
         horizontal = horizontal.MoveToward(target, accel * dt);
+        TrackRunUp(dt, onFloor, wish, horizontal, stats);
 
         UpdateJump(dt, onFloor, ref v);
         v.X = horizontal.X;
@@ -214,6 +214,7 @@ public sealed partial class PlayerController : CharacterBody3D
         if (_jumpBuffer > 0 && _coyote > 0)
         {
             v.Y = _config.JumpSpeed * Mathf.Sqrt(jumpScale);
+            StartJumpApex();
             _jumpHold = _config.JumpHoldTime;
             _jumpBuffer = 0;
             _coyote = 0;

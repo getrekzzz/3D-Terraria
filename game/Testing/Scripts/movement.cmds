@@ -14,8 +14,18 @@ fill -4 16 -4 4 17 4 stone
 wait 1.0
 assert player.on_floor == 1
 
+# --- P3-46 ---
+# A full held jump peaks about 5-6 cells above takeoff (Terraria's height relative to the 3.6-cell body).
+hold jump 0.7
+wait 1.2
+assert player.on_floor == 1
+assert player.jump_apex_cells >= 5
+assert player.jump_apex_cells <= 6
+
 # The hook flies up, latches onto the ceiling (its claw on the slab's face) and reels the player in; jumping lets go.
-give grappling_hook 1
+# It is worn in the hook slot and the grapple key throws the worn one. (Each script line takes a physics frame and the
+# throws below are sensitive to where the player stands, so extra lines go where the player is at rest.)
+equip grappling_hook
 mark
 aim 0 1 0
 hold grapple 0.05
@@ -31,7 +41,9 @@ wait 2.5
 assert player.on_floor == 1
 assert player.hook == 0
 
-# Clicking with the hook held throws it too, and jumping lets go of that one as well.
+# A worn hook no longer counts as carried. Clicking with a hook held throws it too, and jumping lets go of that one too.
+assert inv.grappling_hook == 0
+give grappling_hook 1
 wield grappling_hook
 mark
 aim 0 1 0
@@ -73,8 +85,9 @@ assert player.on_floor == 1
 assert player.hook == 0
 
 # Platforms hold a hook too; jumping lets go and the player drops back to the floor. The hook flies where the
-# crosshair points, and the third-person crosshair ray is offset from the eye by the shoulder camera, so the
-# platform patch is wide enough (5x5 cells) to be hit whichever way the camera faces.
+# crosshair points: the third-person crosshair ray is offset from the eye by the shoulder camera, and "aim 0 1 0"
+# leans 0.12 m per metre towards +z (the view's pitch stops at 1.45 rad), so the platform patch is 5x5 cells wide
+# and is hit whichever way the camera faces and wherever in its cell the player stands.
 setblock -2 12 -2 wood platform
 setblock -2 12 -1 wood platform
 setblock -2 12 0 wood platform
@@ -140,4 +153,16 @@ assert player.life < player.max_life
 assert hud.hurt_flashes > 0
 heal
 assert player.alive == 1
+assert errors == 0
+
+# --- P3-42 ---
+# Armour shows on the third-person body: a full copper set is at least 8 pieces (helmet, chainmail, belt, pauldrons,
+# leg pieces and boots), and taking it off removes them.
+equip copper_helmet
+equip copper_chainmail
+equip copper_greaves
+wait 0.2
+assert avatar.armor_pieces >= 8
+wait_until assets.pending == 0 60
+assert props.problems == 0
 assert errors == 0

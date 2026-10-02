@@ -10,31 +10,37 @@ Options:
   --only=GLOB      rebuild matching asset ids (fnmatch), keep the rest of the manifest
   --no-icons       skip icon rendering
   --samples=N      Cycles samples per icon (default 24)
+  --portraits      render only the town NPC head shots and bestiary thumbnails (assets/icons/{npcs,creatures})
+  --hair           build only the hair models (assets/models/hair; --only matches <m|f>_<style>)
+  --boss-icons     render only the boss-bar head icons (assets/icons/bosses; --only matches boss ids)
   --anims          build only the human animation sets (assets/models/creatures/anim; --only matches characters or sets)
   --shard=I/N      with --anims: build every Nth set starting at I (to run several builds side by side)
-Outputs: assets/models/{objects,items,creatures}/*.glb, assets/icons/items/*.png, assets/manifest.json
+Held items export their sockets (grip, muzzle, tip, nock, string, chain; bgen/sockets.py) as empties next to the mesh
+and list them in the manifest. The "projectiles" section builds projectile models (yoyo heads, flail balls) for
+content projectiles (an entry's "projectile", default its id).
+Outputs: assets/models/{objects,items,creatures,projectiles}/*.glb, assets/icons/items/*.png, assets/manifest.json
 """
 import fnmatch
 import json
 import pathlib
-import re
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
+from asset_plan import boss_models, load_content, plan, plan_armor, plan_projectiles, portrait_models  # noqa: E402
 from asset_spec import SpecError, load_spec  # noqa: E402
 
 GENERATOR_VERSION = 1
-CELL = 0.5
 
-# Metals with their own prop texture layer; the rest tint the iron layer.
-METAL_LAYERS = {"copper": "copper", "gold": "gold"}
+# Every metal tints the iron layer read as neutral (prop:iron:metal, see bgen/items._metal), so its colour is exactly
+# the "metals" hex. A metal's entry is a hex, or {"tint": hex, ...accent params} passed to every generator of its
+# patterns (e.g. "veins" for glowing ingot cracks, "edge" for darker chamfers).
 
 
 def args():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
-    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None}
+    opts = {"check": False, "only": None, "icons": True, "samples": 24, "anims": False, "shard": None, "boss_icons": False, "portraits": False, "hair": False}
     for a in argv:
         if a == "--check":
             opts["check"] = True
@@ -44,6 +50,12 @@ def args():
             opts["icons"] = False
         elif a.startswith("--samples="):
             opts["samples"] = int(a.split("=", 1)[1])
+        elif a == "--hair":
+            opts["hair"] = True
+        elif a == "--portraits":
+            opts["portraits"] = True
+        elif a == "--boss-icons":
+            opts["boss_icons"] = True
         elif a == "--anims":
             opts["anims"] = True
         elif a.startswith("--shard="):
@@ -54,91 +66,13 @@ def args():
     return opts
 
 
-def load_json(path: pathlib.Path):
-    text = re.sub(r"^\s*//.*$", "", path.read_text(encoding="utf-8"), flags=re.M)
-    return json.loads(re.sub(r",(\s*[}\]])", r"\1", text))
-
-
-def load_content():
-    manifest = load_json(REPO / "data" / "manifest.json")
-    blocks, items, objects, enemies = {}, {}, {}, {}
-    for rel in manifest["files"]:
-        doc = load_json(REPO / "data" / rel)
-        for b in doc.get("blocks", []):
-            blocks[b["id"]] = b
-        for i in doc.get("items", []):
-            items[i["id"]] = i
-        for o in doc.get("tileObjects", []):
-            objects[o["id"]] = o
-        for e in doc.get("enemies", []):
-            enemies[e["id"]] = e
-        for t in doc.get("townNpcs", []):  # town residents use rigged creature models too
-            enemies[t["id"]] = t
-    return blocks, items, objects, enemies
-
-
-def plan(spec, blocks, items, objects, enemies):
-    """Decides how every model and icon is produced. Returns (object_jobs, item_jobs, block_icons, creature_jobs, errors)."""
-    errors = []
-    creature_jobs = dict(spec.get("creatures", {}))
-    for eid, e in enemies.items():
-        if e.get("model", eid) not in creature_jobs:
-            errors.append(f"creature '{eid}' uses model '{e.get('model', eid)}' missing from assets.json creatures")
-    if "player" not in creature_jobs:
-        errors.append("assets.json creatures needs a 'player' model")
-    object_jobs = {}
-    for oid, o in objects.items():
-        s = spec["objects"].get(oid)
-        if s is None:
-            errors.append(f"tile object '{oid}' has no entry in assets.json objects")
-            continue
-        size = o.get("size", [1, 1, 1])
-        object_jobs[oid] = {"generator": s["generator"], "params": {**s.get("params", {}), "size": (size[0] * CELL, size[1] * CELL, size[2] * CELL)},
-                            "variants": o.get("variants", 1)}
-    for extra in sorted(set(spec["objects"]) - set(objects)):
-        errors.append(f"assets.json object '{extra}' does not exist in content")
-
-    # Derived items: placeable blocks (block icons) and placeable objects (object icons).
-    placer_of_object = {}
-    for oid, o in objects.items():
-        if o.get("natural") or o.get("autoItem") is False:
-            continue
-        placer_of_object[o.get("item") or oid] = oid
-    block_icons = sorted(bid for bid, b in blocks.items() if b.get("autoItem", True) and "drop" not in b and bid not in items)
-
-    patterns = []
-    for pattern, s in spec["items"]["patterns"].items():
-        for metal, tint in spec["metals"].items():
-            patterns.append((pattern.replace("{metal}", metal), metal, tint, s))
-    item_jobs = {}
-    all_items = set(items) | set(placer_of_object) | set(block_icons)
-    for iid in sorted(all_items):
-        if iid in block_icons:
-            continue
-        if iid in spec["items"]["explicit"]:
-            s = spec["items"]["explicit"][iid]
-            item_jobs[iid] = {"generator": s["generator"], "params": dict(s.get("params", {}))}
-            continue
-        match = next(((m, t, s) for name, m, t, s in patterns if name == iid), None)
-        if match:
-            metal, tint, s = match
-            params = {"metal": tint, "metalLayer": METAL_LAYERS.get(metal, "iron"), **s.get("params", {})}
-            item_jobs[iid] = {"generator": s["generator"], "params": params}
-            continue
-        placed = items.get(iid, {}).get("placeObject") or placer_of_object.get(iid)
-        if placed and placed in object_jobs:
-            item_jobs[iid] = {"object": placed}
-            continue
-        errors.append(f"item '{iid}' has no model/icon source (add it to assets.json items)")
-    return object_jobs, item_jobs, block_icons, creature_jobs, errors
-
-
-def build(opts, spec, object_jobs, item_jobs, creature_jobs):
+def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, items):
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
     import bgen
+    from bgen import icon_views, sockets as socket_gen
     from bgen import beasts, bosses, bosses_hard, bosses_lunar, bosses_pre, bosses_pre2, bosses_pre3, bosses_temple, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
     from bgen.materials import PropMaterials
-    from bgen.mesh import MeshBuilder, reset_scene, rng_for
+    from bgen.mesh import MeshBuilder, bounds as mesh_bounds, reset_scene, rng_for
 
     generators = {**nature.GENERATORS, **furniture.GENERATORS, **item_gen.GENERATORS, **bosses.GENERATORS, **mechs.GENERATORS,
                   **gear.GENERATORS, **horrors.GENERATORS, **lunar.GENERATORS, **festive.GENERATORS, **critters.ITEM_GENERATORS, **mechanisms.GENERATORS}
@@ -157,49 +91,84 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     creature_generators.update(registry)
     manifest_path = REPO / "assets" / "manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() and opts["only"] else {"objects": {}, "items": {}}
+    if not opts["only"] and manifest_path.exists():  # hair models are built by --hair alone; a full build keeps them
+        manifest["hair"] = json.loads(manifest_path.read_text(encoding="utf-8")).get("hair", {})
     wanted = (lambda i: any(fnmatch.fnmatch(i, pat) for pat in opts["only"].split(","))) if opts["only"] else (lambda i: True)
 
-    def make(asset_id, job, variant):
+    def make(asset_id, job, variant, held=False):
         reset_scene()
         props = PropMaterials(REPO)
         mb = MeshBuilder(f"{asset_id}_v{variant}")
         generators[job["generator"]](mb, job["params"], rng_for(asset_id, variant))
         for slot in mb.materials:
             props.validate(slot)
-        return mb.build(export.simple_material), props
+        obj = mb.build(export.simple_material)
+        parts = mb.build_parts(export.simple_material, obj)  # moving parts (a chest lid) are children of obj
+        return obj, props, socket_gen.resolve(job["generator"], mb, job["params"], *mesh_bounds([obj, *parts]), held=held)
 
     for oid, job in sorted(object_jobs.items()):
         if not wanted(oid):
             continue
         models = []
         for v in range(job["variants"]):
-            obj, props = make(oid, job, v)
+            obj, props, _ = make(oid, job, v)
             rel = f"assets/models/objects/{oid}_v{v}.glb"
-            export.export_glb([obj], REPO / rel)
+            export.export_glb([obj, *obj.children], REPO / rel)
             models.append(rel)
-            tris = sum(len(p.vertices) - 2 for p in obj.data.polygons)
+            tris = sum(len(p.vertices) - 2 for o in (obj, *obj.children) for p in o.data.polygons)
             print(f"object {oid} v{v}: {tris} tris")
         manifest["objects"][oid] = {"models": models, "generator": job["generator"]}
 
+    from bgen import armor_build
+    worn = {i for slots in armor_build.armor_items(spec.get("armor", {}), items).values() for i in slots.values()}
     for iid, job in sorted(item_jobs.items()):
+        if iid in worn:  # armour items get their model and icon from the worn pieces (below)
+            continue
         if not wanted(iid) and not (job.get("object") and wanted(job["object"])):
             continue
         entry = {k: v for k, v in manifest["items"].get(iid, {}).items() if k == "icon" and not opts["icons"]}
         if "object" in job:
-            obj, props = make(job["object"], object_jobs[job["object"]], 0)
+            obj, props, _ = make(job["object"], object_jobs[job["object"]], 0)
             entry["object"] = job["object"]
         else:
-            obj, props = make(iid, job, 0)
+            obj, props, sockets = make(iid, job, 0, held=True)
             rel = f"assets/models/items/{iid}.glb"
-            export.export_glb([obj], REPO / rel)
+            export.export_glb([obj, *socket_gen.empties(obj, sockets)], REPO / rel)
             entry["model"] = rel
+            if sockets:
+                entry["sockets"] = socket_gen.y_up(sockets)
+            if job["generator"] in ("shield", "balloon"):  # accessories the avatar wears (game/Player/PlayerAvatar.Armor.cs)
+                entry["worn"] = job["generator"]
+            if "icon" in entry:  # icon last, whether or not icons are re-rendered (stable manifest key order)
+                entry["icon"] = entry.pop("icon")
         if opts["icons"]:
             icon = f"assets/icons/items/{iid}.png"
-            export.apply_textured_materials([obj], props)
-            export.render_icon([obj], REPO / icon, "object" if "object" in job else _view_for(job["generator"], bgen.VIEWS), samples=opts["samples"])
+            view, spot = "object", None
+            if "object" not in job:
+                gen = job["generator"]
+                view = icon_views.view_for(gen, bgen.VIEWS)
+                if gen in icon_views.ICON_POSES:  # the icon shows another pose of the item (a whip's lash laid out)
+                    obj, props, sockets = make(iid, {**job, "params": {**job["params"], **icon_views.ICON_POSES[gen]}}, 0, held=True)
+                if gen in icon_views.SPOTLIT and icon_views.SPOTLIT[gen] in sockets:
+                    spot = sockets[icon_views.SPOTLIT[gen]][0]
+            shown = [obj, *(c for c in obj.children if c.type == "MESH")]  # with its moving parts, not socket empties
+            export.apply_textured_materials(shown, props)
+            export.render_icon(shown, REPO / icon, view, samples=opts["samples"], sprite=True, spot=spot)
             entry["icon"] = icon
         manifest["items"][iid] = entry
         print(f"item {iid}: {entry}")
+
+    armor_build.build_armor(REPO, spec.get("armor", {}), items, wanted, manifest, icons=opts["icons"], samples=opts["samples"])
+
+    manifest.setdefault("projectiles", {})
+    for mid, job in sorted(projectile_jobs.items()):
+        if not wanted(mid):
+            continue
+        obj, _props, sockets = make(mid, job, 0)
+        rel = f"assets/models/projectiles/{mid}.glb"
+        export.export_glb([obj, *socket_gen.empties(obj, sockets)], REPO / rel)
+        manifest["projectiles"][mid] = {"model": rel, "generator": job["generator"], "sockets": socket_gen.y_up(sockets)}
+        print(f"projectile {mid}: {rel}")
 
     manifest.setdefault("creatures", {})
     for name, job in sorted(creature_jobs.items()):
@@ -231,6 +200,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs):
     manifest["objects"] = dict(sorted(manifest["objects"].items()))
     manifest["items"] = dict(sorted(manifest["items"].items()))
     manifest["creatures"] = dict(sorted(manifest["creatures"].items()))
+    manifest["projectiles"] = dict(sorted(manifest["projectiles"].items()))
     manifest_path.write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
     print(f"wrote {manifest_path.relative_to(REPO)}")
 
@@ -262,14 +232,6 @@ def build_anims(opts, creature_jobs):
         print(f"anim {key}: {sorted(a.name for a in bpy.data.actions)}")
 
 
-def _view_for(generator: str, views: dict) -> str:
-    """Icon framing for an item generator: the view given at @generator registration, else by the long-item list."""
-    if generator in views:
-        return views[generator]
-    long_items = {"sword", "shortsword", "pickaxe", "axe", "hammer", "bow", "wand", "staff", "arrow", "gun", "rod", "whip", "red_wrench", "wire_cutter", "bug_net", "paintbrush", "paint_scraper"}
-    return "item" if generator in long_items else "object"
-
-
 def main() -> int:
     opts = args()
     try:
@@ -277,19 +239,54 @@ def main() -> int:
     except SpecError as e:
         print("ERROR:", e)
         return 1
-    blocks, items, objects, enemies = load_content()
+    blocks, items, objects, enemies, projectiles = load_content()
     object_jobs, item_jobs, block_icons, creature_jobs, errors = plan(spec, blocks, items, objects, enemies)
+    projectile_jobs, projectile_errors = plan_projectiles(spec, projectiles)
+    errors += projectile_errors + plan_armor(spec, items)
     for e in errors:
         print("ERROR:", e)
     if errors:
         return 1
-    print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(creature_jobs)} creatures, {len(block_icons)} block icons (tools/textures/build_icons.py)")
+    print(f"{len(object_jobs)} objects, {len(item_jobs)} item models/icons, {len(creature_jobs)} creatures, {len(projectile_jobs)} projectiles, {len(block_icons)} block icons (tools/textures/build_icons.py)")
+    bosses = boss_models(enemies)
+    missing = sorted(b for b in bosses if not (REPO / "assets" / "icons" / "bosses" / f"{b}.png").exists())
+    if missing and not opts["boss_icons"]:
+        print("ERROR: bosses without a head icon (build_all.py --boss-icons):", ", ".join(missing))
+        return 1
+    npcs, creatures = portrait_models(enemies)
+    missing = sorted(f"{d}/{i}" for d, ids in (("npcs", npcs), ("creatures", creatures)) for i in ids
+                     if not (REPO / "assets" / "icons" / d / f"{i}.png").exists())
+    if missing and not opts["portraits"]:
+        print("ERROR: missing portraits (build_all.py --portraits):", ", ".join(missing))
+        return 1
     if opts["check"]:
+        return 0
+    if opts["hair"]:
+        import bpy  # noqa: F401
+        from bgen import hair_build
+        pats = opts["only"].split(",") if opts["only"] else ["*"]
+        manifest_path = REPO / "assets" / "manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        hair_build.build_hair(REPO, manifest, lambda i: any(fnmatch.fnmatch(i, p) for p in pats))
+        manifest_path.write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
+        return 0
+    if opts["portraits"]:
+        import bpy  # noqa: F401
+        from bgen import portraits
+        pats = opts["only"].split(",") if opts["only"] else ["*"]
+        tints = {i: e["tint"] for i, e in enemies.items() if e.get("tint")}
+        portraits.render_portraits(REPO, npcs, creatures, lambda i: any(fnmatch.fnmatch(i, p) for p in pats), tints=tints)
+        return 0
+    if opts["boss_icons"]:
+        import bpy  # noqa: F401
+        from bgen import boss_icons
+        pats = opts["only"].split(",") if opts["only"] else ["*"]
+        boss_icons.render_boss_icons(REPO, bosses, lambda i: any(fnmatch.fnmatch(i, p) for p in pats), samples=16)
         return 0
     if opts["anims"]:
         build_anims(opts, creature_jobs)
         return 0
-    build(opts, spec, object_jobs, item_jobs, creature_jobs)
+    build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, items)
     return 0
 
 

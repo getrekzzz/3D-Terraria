@@ -35,7 +35,7 @@
   spread around that line; other spawns (creature volleys) keep their own origins.
 * **Grappling hooks** — `GrappleHook` (`PlayerEntity.Hook`) is the hook's state machine (`None`, `Flying`, `Attached`,
   `Retracting`; probe `player.hook` 0–3). A click with a hook held (`ItemUseSystem` grapple branch,
-  `UseOutcome.Grappled`) or the grapple key (`GrappleHook.Best`: longest reach, accessories then inventory) throws it
+  `UseOutcome.Grappled`) or the grapple key (`GrappleHook.Best`: the hook slot, else the longest reach carried) throws it
   from `PlayerEntity.Hand`; pressing again lets go. The throw walks the voxel ray from the eye along `Aim`
   (`Targeting.CastWhere`) to the first `Latchable` cell within reach: solid blocks (platforms included), shaped blocks
   with a walkable top and colliding tile objects, a tree's whole box (canopy) too, but never liquids, cobwebs, decor,
@@ -373,6 +373,57 @@
   drop mounts through `extra_<enemy>` loot tables rolled on top of their own.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
+* **Slot model** — `PlayerInventory` (partials `.Equipment`, `.Storage`) holds Terraria's storages: backpack 50,
+  coins 4, ammo 4, a saved trash slot, armor 3, accessories 7 (`AccessorySlotsUnlocked` 5–7, set by
+  `GameWorld.AddPlayer` from the world difficulty: Expert 6, Master 7), vanity armor 3 and accessories 7, dyes 10
+  (armor 0–2, accessories 3–9), the misc row (`MiscSlot`: pet, light pet, minecart, mount, hook; `EquippedHook`,
+  `EquippedMount`…) with its dyes, and a service slot. Only armor and unlocked accessories grant stats
+  (`EquippedStacks`); any equipment change raises `EquipmentChanged`, which `PlayerState` answers with `Recompute`.
+  `EquipFrom` routes an item by `EquipSlot`/category (vanity row, rotating accessory swap when full, first free
+  dye, misc slot); `ArmorFilter`/`AccessoryFilter`/`DyeFilter`/`MiscFilter` gate clicks. Favourites are per slot
+  (`Inventory.IsFavorite`, only backpack/coins/ammo keep them; `Transfer` carries them, chests drop them), never on
+  `ItemStack`. `AllStorages` is what a Mediumcore death drops (not the trash); `CountAll` plus the trash backs the
+  `inv.<item>` probe (`inv.trash`, `inv.cursor`, `inv.coins` too). Content items of category hook/mount/minecart/pet
+  must name the matching `equipSlot`.
+* **Purse and ammo** — `PlayerInventory.Pickup` (partial `.Purse`) routes like Terraria: coins merge into the coin
+  slots and `Coins.Normalize` turns each 100 into 1 of the next (each denomination keeps its slot; overflow to the
+  backpack; it needs `PlayerInventory.Content`, set by `CreateNew`, `PlayerSave.ToState` and `AddPlayer`), ammo
+  (category ammo with an `ammoClass`; Fallen Stars stay in the backpack) fills the ammo slots, the rest the backpack.
+  The purse is `Coins.Total(PlayerInventory)` (coin slots + backpack): `Wallet.TrySpend/Give(PlayerInventory, …)` pay
+  from the coin slots first, break backpack coins only when needed and return change to the coin slots; shops,
+  services, the Nurse, taxes, the Angler, Classic death and town `coins` conditions use it. Shots take
+  `PlayerInventory.FindAmmo` (ammo slots top to bottom, then the backpack); `CountAmmo` is the hotbar count;
+  `CanTake` is the pickup-aware room check. Player crafting (`RecipeBook.CanCraft/Craft(PlayerInventory, …)`,
+  `CraftingEnvironment.Browse(…, PlayerInventory)`) counts and consumes the backpack, ammo and coin slots (wooden
+  arrows for flaming arrows) and picks the output up.
+* **Slot clicks** — `GameWorld.ClickSlot(p, SlotRef(area, index), right, ClickMods, SlotContext)` (partial
+  `.InventoryActions`) is the one entry point for the inventory screen, `invclick` and tests. With an empty cursor
+  Alt toggles the favourite (backpack/coins/ammo), Ctrl (no shop) moves the stack to the trash slot (favourites
+  refuse), Shift quick-moves (chest ↔ backpack via `Pickup`, equip from the backpack, unequip, sell with a shop
+  open). Right click opens anything whose consume behaviour has a `loot` table (`ItemUseSystem.OpenFromSlot`, event
+  `Opened`), else `SlotActions.RightClick`: equip and swap from backpack/chest, armor/accessory ↔ vanity swap at the
+  same index, otherwise take ONE onto the cursor (held: `HoldRepeat.IntervalTicks` 30, 22, 17 … 1). Left clicks are
+  `SlotActions.LeftClick` with `SlotFilters.For(slot)` (coins only in coin slots, `FitsAmmoSlot` in ammo slots, armor
+  kind, accessory without duplicate, dye, misc kind). `ThrowCursor`/`ThrowStack` toss stacks the way the drop key does.
+  Favourited slots draw a gold wash on the inventory screen and the hotbar (`ItemSlotView.Favorite`).
+* **Chest and inventory buttons** — `InventoryOps`: `LootAll` (via `Pickup`, coins to the purse), `DepositAll` and
+  `QuickStack` (backpack 10–49 only, never favourites or coins; quick stack only items the chest already holds,
+  topping up its stacks first), `Restock` (tops up backpack and ammo stacks from the chest), `Sort(inv, from, to)`
+  (merge, then group weapons/ammo, tools, armor/accessories, potions, placeables, materials, misc; rarer first; then
+  id; favourites keep their slot). `GameWorld.ChestAction(p, chest, ChestOp)` runs a button (rolling world loot
+  first) and marks the chunk modified; `QuickStackNearby(p, 12 m)` does it for every unlocked container in range,
+  nearest first, returning `(chest, moved)`. `TileObjectInstance.CustomName` (≤ 20 printable characters,
+  sanitised on assignment; `DisplayName` falls back to the object's name) is set by `GameWorld.RenameContainer` and
+  saved in the chunk's object meta; locked chests (`Locked`, see *Locked chests and keys*) are skipped. Commands: `chest [loot|deposit|
+  quickstack|restock|sort|rename <name>]` (the chest opened last), `invsort`, `quickstack`; smoke `inventory.cmds`.
+* **Tooltips and display helpers** — `ItemTooltip.Lines(stack, info, TooltipContext)` builds Terraria-ordered
+  lines: name with prefix and count, damage/crit/speed/knockback after the prefix and the viewer's class bonuses
+  (`DamageModel.DamageMultiplier`/`CritBonus`, the same maths a hit uses), info lines, the description or the buff's
+  text (`BuffText.Describe`: data wording, else derived from effects) with `BuffDisplay.Duration`, one green/red
+  line per non-zero `PrefixDef` field, the worn set bonus, and the price (`Prefixes.SellValue`, shared with
+  `TownCommerce.SaleValue`; kind by `Coins.TopTier`, "No value" at 0). `BuffDisplay` (timer text, cancel/timer
+  rules incl. `hideTimer`), `VitalsDisplay` (hearts, golden hearts, stars, bubbles) and `Content.Index.StationNames`
+  ("Iron Anvil or Lead Anvil", cached per database) are the Core maths the HUD, crafting and the Guide read.
 * **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance
@@ -429,8 +480,8 @@ probe name is registered once; new probes go in a new source file (docs/CONVENTI
 ## Locked chests and keys
 
 A chest definition may carry `lock` (`key`, `consume` default true, `requiresFlag`, `message`); it only applies to
-instances with `TileObjectInstance.Locked`, persisted as bit 4 of the object state byte in `ChunkCodec` (old chunks
-read unlocked). Generation places them through `ObjectOp.Locked` (`Blueprint.Object(..., locked: true)`, copied by
+instances with `TileObjectInstance.Locked`, persisted as meta tag 2 of the object record in `ChunkCodec` (beside the
+chest name; old chunks read unlocked). Generation places them through `ObjectOp.Locked` (`Blueprint.Object(..., locked: true)`, copied by
 `FeatureCarver.Stamp`): every dungeon Gold Chest (Golden Key, used up; one rolls `dungeon_chest_shadow_key`) and the
 underworld towers' Shadow Chests (Shadow Key, kept; table `shadow_chest` with Sunfury, Dark Lance or Flamelash,
 hellstone bars and potions, which left `cabin_chest_primary`). `ObjectInteraction` (Locks partial) refuses with the

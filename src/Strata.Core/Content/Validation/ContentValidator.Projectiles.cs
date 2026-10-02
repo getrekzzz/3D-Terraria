@@ -37,6 +37,7 @@ public static partial class ContentValidator
         {
             ctx.Color(b, b.Color, "color");
             ctx.Specs(b, SpecKind.Effect, b.Effects, "effects");
+            ctx.Asset(b, AssetPaths.BuffIcon(b), "icon");
         }
         foreach (var p in ctx.Db.Prefixes.All)
         {

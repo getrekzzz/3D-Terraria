@@ -76,6 +76,7 @@ public sealed partial class TownRenderer : Node3D
         var tag = new Label3D
         {
             Text = npc.Title,
+            Font = UI.UiFonts.Bold,
             Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
             PixelSize = 0.003f,
             FontSize = 40,

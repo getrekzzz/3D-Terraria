@@ -4,6 +4,9 @@ spawning off
 time noon
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 8 10 air
+# Let the player land on the new floor first: the basins below are placed relative to the feet.
+wait_until player.on_floor == 1 5
+wait 0.3
 # Two low basins: water on +X, lava on -X.
 fill 3 0 -3 7 0 3 stone
 fill 4 0 -2 6 0 2 air
@@ -12,10 +15,13 @@ fill -6 0 -2 -4 0 2 air
 wait 0.5
 assert errors == 0
 
-# Poured water falls into the basin, spreads and settles.
+# Poured water falls into the basin, spreads and settles. Liquid-only remeshes leave the colliders alone.
+colliders reset
 liquid water 5 5 0
 assert liquid.5.5.0 == 31
 wait_until liquid.active == 0 20
+wait 3
+assert colliders.skipped > 0
 assert liquid.5.5.0 == 0
 assert liquid.5.0.0 > 0
 liquids

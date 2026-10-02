@@ -53,9 +53,41 @@ public sealed class TileObjectInstance
     /// <summary>Loot table to roll into the container the first time it is opened (world-generated chests).</summary>
     public string? PendingLoot { get; set; }
 
-    /// <summary>A world chest that only opens with its definition's <see cref="TileObjectDef.Lock"/> key (and cannot
-    /// be broken until then).</summary>
+    public const int MaxNameLength = 20;
+
+    private string? _customName;
+
+    /// <summary>
+    /// The player's name for a chest (shown instead of the object's name), saved with the chunk. Assigning trims it,
+    /// drops control characters and keeps at most <see cref="MaxNameLength"/> characters; blank clears it.
+    /// </summary>
+    public string? CustomName
+    {
+        get => _customName;
+        set => _customName = SanitizeName(value);
+    }
+
+    /// <summary>
+    /// A world chest that only opens with its definition's <see cref="TileObjectDef.Lock"/> key (and cannot be broken
+    /// until then); bulk operations such as quick stack to nearby chests skip it. Saved in the chunk's object meta.
+    /// </summary>
     public bool Locked { get; set; }
+
+    public string DisplayName => _customName ?? Def.DisplayName;
+
+    public static string? SanitizeName(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var sb = new System.Text.StringBuilder(MaxNameLength);
+        foreach (char c in raw.Trim())
+        {
+            if (char.IsControl(c) || char.IsSurrogate(c)) continue;
+            sb.Append(c);
+            if (sb.Length == MaxNameLength) break;
+        }
+        var name = sb.ToString().Trim();
+        return name.Length == 0 ? null : name;
+    }
 
     /// <summary>
     /// The trunk column of a tree-like object (<see cref="TileCollision.Trunk"/>) in cell units: centred on the

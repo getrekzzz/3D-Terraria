@@ -9,11 +9,11 @@ namespace Strata.Core.Gameplay.Entities;
 /// </summary>
 public sealed partial class ProjectileSystem
 {
-    /// <summary>Heals the owner by <see cref="LifeStealParams.Fraction"/> of the damage dealt (at least 1).</summary>
-    private static void StealLife(Projectile p, int dealt, LifeStealParams s)
+    /// <summary>Heals the owner by <see cref="LifeStealParams.Fraction"/> of the damage dealt (at least 1), floating the heal.</summary>
+    private void StealLife(Projectile p, int dealt, LifeStealParams s)
     {
         if (p.Owner is not { Alive: true } owner) return;
-        owner.State.Vitals.Heal(Math.Max(1, (int)MathF.Round(dealt * s.Fraction)));
+        _world.ReportHeal(owner, owner.State.Vitals.Heal(Math.Max(1, (int)MathF.Round(dealt * s.Fraction))), mana: false);
     }
 
     /// <summary>Releases <see cref="SpawnProjectilesParams.Count"/> projectiles around the struck creature.</summary>

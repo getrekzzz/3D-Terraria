@@ -53,7 +53,7 @@ public sealed partial class NpcRenderer
                     view.Bank = Mathf.Lerp(view.Bank, bank, 1f - Mathf.Exp(-dt * 4f));
                     want *= new Quaternion(Vector3.Right, pitch) * new Quaternion(Vector3.Back, view.Bank);
                 }
-                view.Turn = want;
+                view.Turn = want.Normalized();
                 return;
         }
         // Renormalised each frame: repeated slerps drift off unit length, which Godot rejects.

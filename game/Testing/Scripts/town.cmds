@@ -54,3 +54,17 @@ town buy merchant torch
 assert inv.torch == 26
 ui close
 assert errors == 0
+
+# --- P2-06 ---
+# The purchase was paid from the coin slots. Coins fly into the coin slots, 100 of one become 1 of the next, and the
+# purse counts every slot; arrows fill the ammo slots and still count as carried.
+assert inv.coins < 6000
+assert inv.coins > 0
+clear
+give copper_coin 250
+assert inv.silver_coin == 2
+assert inv.copper_coin == 50
+assert inv.coins == 250
+give wooden_arrow 30
+assert inv.wooden_arrow == 30
+assert errors == 0
