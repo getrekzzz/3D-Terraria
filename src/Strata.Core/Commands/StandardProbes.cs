@@ -51,6 +51,11 @@ internal static class StandardProbes
         ctx.AddProbe("light.sky", () => HeadLight(w, ctx, block: false));
         ctx.AddProbe("light.block", () => HeadLight(w, ctx, block: true));
         ctx.AddProbe("sky.top", () => w.Session.Sky.SkyTop(ctx.Player.FeetCell.X, ctx.Player.FeetCell.Z));
+        // Where the player is in the world's layers (0 space, 1 sky, 2 surface, 3 underground, 4 cavern, 5 underworld), cells
+        // into the ground from the nearest exposed surface, and whether the world is a Don't Dig Up one (layers inverted).
+        ctx.AddProbe("player.layer", () => (int)w.Session.ContextAt(ctx.Player.FeetCell).Layer);
+        ctx.AddProbe("player.depth", () => w.Session.ContextAt(ctx.Player.FeetCell).Depth);
+        ctx.AddProbe("world.inverted", () => w.Session.Generator.Plan.Bands.Inverted ? 1 : 0);
         ctx.AddProbe("mutation.level", () => w.Session.Mutations.Level);
         ctx.AddProbe("mutation.behind", () => w.Mutations.Behind);
         ctx.AddProbe("spread.conversions", () => w.Spread.Conversions);

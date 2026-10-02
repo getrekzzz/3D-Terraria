@@ -36,7 +36,8 @@ public sealed class DecorationPass : GenPass
         for (int lz = 0; lz < n; lz++)
             for (int lx = 0; lx < n; lx++)
             {
-                float h = ctx.SurfaceHeight[ChunkGenContext.Column(lx, lz)];
+                int col = ChunkGenContext.Column(lx, lz);
+                float h = ctx.SurfaceHeight[col];
                 for (int ly = 0; ly < n - 1; ly++)
                 {
                     int i = ChunkGenContext.Index(lx, ly, lz);
@@ -44,7 +45,8 @@ public sealed class DecorationPass : GenPass
                     if (b == p.Air || ctx.Blocks[ChunkGenContext.Index(lx, ly + 1, lz)] != p.Air) continue;
                     int wy = ctx.Origin.Y + ly;
                     byte biome = ctx.Biome[i];
-                    bool nearSurface = wy >= h - 8f;
+                    // Don't Dig Up: the rock over the open-air pocket is cave, not surface (no grass, moss as usual).
+                    bool nearSurface = wy >= h - 8f && !ctx.AboveRoofPocket(col, wy);
                     if (b == p.Loam && nearSurface)
                         ctx.Blocks[i] = biome == d.Umbral ? p.UmbralTurf : biome == d.Sanguine ? p.SanguineTurf : p.Turf;
                     else if (b == p.Mud && biome == d.Jungle) ctx.Blocks[i] = p.JungleTurf;

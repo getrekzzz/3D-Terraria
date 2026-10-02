@@ -1,0 +1,32 @@
+#! --secret=dontdigup
+# Don't Dig Up (X-07): the secret seed's upside-down world. The player starts in the underworld near the world's top,
+# safely on dry ash, with the cavern layers below and the surface (grass, open air under the rock roof) at the bottom.
+wait_until player.frozen == 0 180
+spawning off
+wait 1.5
+assert errors == 0
+assert world.inverted == 1
+assert player.alive == 1
+assert player.on_floor == 1
+assert player.in_liquid == 0
+assert player.layer == 5
+assert zone.underworld == 1
+assert player.depth > 100
+
+# A little walk on the ash floor: still alive, not in lava.
+aim 0 0 1
+hold move_forward 0.8
+wait 0.5
+assert player.alive == 1
+assert player.in_liquid == 0
+
+# The surface is at the bottom: open, lit air over the ground, the surface layer, no depth.
+tp surface
+wait_until stream.idle == 1 120
+wait 1.5
+assert player.alive == 1
+assert player.on_floor == 1
+assert player.layer == 2
+assert player.depth < 3
+assert light.sky > 6
+assert errors == 0

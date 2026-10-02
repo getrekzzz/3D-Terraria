@@ -33,6 +33,12 @@ public sealed class GeologicalLayersPass : GenPass
                 float wobble = _boundary!.Sample(wx, wz);
                 float cavernLine = bands.CavernTop + wobble * 10f;
                 float ashLine = bands.UnderworldTop + 14f + wobble * 8f;
+                if (bands.Inverted)
+                {
+                    // Don't Dig Up: the same boundaries, deeper upwards (ash just under the underworld above).
+                    InvertedColumn(ctx, lx, lz, col, soil, bands.Deeper(bands.UnderworldTop, 14f) + wobble * 8f, cavernLine);
+                    continue;
+                }
                 for (int ly = 0; ly < size; ly++)
                 {
                     int i = ChunkGenContext.Index(lx, ly, lz);
@@ -44,5 +50,19 @@ public sealed class GeologicalLayersPass : GenPass
                     else if (wy < cavernLine) ctx.Blocks[i] = p.Deepstone;
                 }
             }
+    }
+
+    private static void InvertedColumn(ChunkGenContext ctx, int lx, int lz, int col, float soil, float ashLine, float cavernLine)
+    {
+        var p = ctx.Palette;
+        for (int ly = 0; ly < ChunkGenContext.Size; ly++)
+        {
+            int i = ChunkGenContext.Index(lx, ly, lz);
+            if (ctx.Blocks[i] != p.Stone) continue;
+            int wy = ctx.Origin.Y + ly;
+            if (ctx.SurfaceDepth(col, wy) < soil) ctx.Blocks[i] = p.Loam;
+            else if (wy > ashLine) ctx.Blocks[i] = p.Ash;
+            else if (wy > cavernLine) ctx.Blocks[i] = p.Deepstone;
+        }
     }
 }

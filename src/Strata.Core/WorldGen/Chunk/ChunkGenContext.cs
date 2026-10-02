@@ -30,6 +30,7 @@ public sealed class ChunkGenContext
         OverhangAmp = new float[Size * Size];
         SoilDepth = new float[Size * Size];
         Biome = new byte[Volume];
+        if (generator.Plan.Bands.Inverted) Ceiling = new float[Size * Size];
         for (int lz = 0; lz < Size; lz++)
             for (int lx = 0; lx < Size; lx++)
             {
@@ -40,6 +41,7 @@ public sealed class ChunkGenContext
                 Cliff[c] = generator.Terrain.Cliff(wx, wz);
                 OverhangAmp[c] = Fields.TerrainField.OverhangAmplitude(Ruggedness[c], Cliff[c]);
                 SoilDepth[c] = generator.Terrain.SoilDepth(wx, wz);
+                if (Ceiling != null) Ceiling[c] = generator.Terrain.CeilingHeight(wx, wz);
             }
     }
 
@@ -70,6 +72,17 @@ public sealed class ChunkGenContext
     /// </summary>
     public float[] OverhangAmp { get; }
     public float[] SoilDepth { get; }
+
+    /// <summary>Don't Dig Up only: the rock roof's underside per padded column (null in ordinary worlds).</summary>
+    public float[]? Ceiling { get; }
+
+    /// <summary>Cells into the ground from the column's nearest exposed surface (see <see cref="Fields.TerrainField.SurfaceDepth(float, float, float)"/>).</summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public float SurfaceDepth(int col, int wy) =>
+        Ceiling == null ? SurfaceHeight[col] - wy : Fields.TerrainField.SurfaceDepth(wy, SurfaceHeight[col], Ceiling[col]);
+
+    /// <summary>Don't Dig Up: whether a cell lies in the rock mass above the open-air pocket (always false otherwise).</summary>
+    public bool AboveRoofPocket(int col, int wy) => Ceiling != null && wy + wy > SurfaceHeight[col] + Ceiling[col];
 
     /// <summary>Biome runtime id per padded cell (filled by the biome pass).</summary>
     public byte[] Biome { get; }

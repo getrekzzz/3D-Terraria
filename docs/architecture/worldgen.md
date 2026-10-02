@@ -220,3 +220,54 @@ bound Mechanic's spot and the vault's six chest spots clear. Budgets per anchor 
   `DungeonBuilder.ChestAnchor`), each rolling its `<biome>_chest` table (the P4-33 weapon). Their locks need the
   matching biome key (`data/items/biome_keys.json`; `global_kill` drops each at 1 in 2500 in hardmode in its biome)
   and refuse until `defeated_plantera`.
+
+## Don't Dig Up (X-07 secret seed, GenVersion 14)
+
+The `dont_dig_up` secret seed generates Terraria's upside-down world by reordering the plan's layer bands, not by
+flipping finished chunks: every pass still builds in real orientation (+Y up, normal gravity), so floors are floors,
+liquids pool at the bottom of their basins, grass grows on top of ground and trees stand upright.
+
+**Layout** (`LayerBands(height, inverted: true)`, fractions of the world height): bedrock at y 0–2; the ground under
+the bottom surface; the surface around `SeaLevel` (0.20) with open air above it (`SkyStart` 0.29 starts the Sky layer)
+up to the rock roof at `UndergroundTop` (0.37); the underground and cavern layers (`CavernTop` 0.49); the Underworld
+above `UnderworldTop` (0.82): an ash floor, the lava sea at `LavaLevel` (0.86), the cavity up to about
+`UnderworldCeiling` (0.955) + 10, a thin ash crust and bedrock in the top three rows. There is no Space layer
+(`SpaceStart` = the height): the open air is under rock. `LayerAt` returns Underground for the ground below
+`SurfaceFloor` under the bottom surface.
+
+**Depth.** `NormalizedDepth` keeps the ordinary values at each layer boundary (0 at sea level, the ordinary
+underground/cavern values at their tops, 1 at `UnderworldTop`) but grows upwards above the roof; under the bottom
+surface it grows downwards as usual, reaching about the cavern's depth at the bedrock. So every depth-driven placement
+(`YForNormalizedDepth`: caverns, lakes, rivers and lava tubes, ores, hives, the temple, spider nests, the Aether,
+mini-biomes, cabins, mineshafts) lands in the matching layer unchanged. Features dug down *from the surface* (worm
+tunnels, evil chasms, hardmode wedges) use `DescentY`, which in an inverted world bottoms out in the ground under the
+bottom surface; shafts and sinkholes are clamped above the bedrock. Ore veins test each vein's depth (depth is not
+monotonic in y there). `IsDeeper`/`Deeper` express "deeper than" comparisons (strata lines).
+
+**Per pass.** Density adds the roof: `TerrainField.CeilingHeight` (the underground's base plus up to 16 cells of noise,
+at least `RoofClearance` = 48 cells above the ground; +infinity in ordinary worlds). "Cells below the surface" becomes
+`SurfaceDepth` — below the bottom surface as usual, and above the open air the height into the roof's rock — so soil,
+cave roofs (caves stay 5+ cells off the roof's underside), biome materials and grass/moss read the nearest exposed
+surface. The roof never holds loose sand or slush (sandstone/ice instead). Biomes: columns read their depth below the
+bottom surface or into the roof's rock, so the underground jungle and ice lie above the jungle and the tundra; the Sky
+biome is the upper open air; the ocean's column runs up to the cavern layer. The Underworld pass builds the same
+floor, lava sea and ruined towers under the world's top, all ash around the cavity. Floating islands float in the
+open air between `SkyStart` and the roof (skipped where they would not fit). The Dungeon stands on the bottom surface
+and descends into the ground under it, its deepest floor at y 14 (`DungeonBudget.InvertedFloor`) — reachable on foot
+from the surface like an ordinary one. Ocean, structures on the surface (living trees, pyramids, cabins), decoration
+and liquids need no changes.
+
+**Spawn.** The player starts in the Underworld near the top (as in Terraria): `UnderworldPass` spirals out from the
+centre for a column of dry ash floor with no lava sea within 12 cells, level ground, 14+ cells of headroom and no
+ruined tower nearby. The Wall of Flesh is fought in that top cavity (its band comes from `LavaLevel` and
+`UnderworldCeiling`).
+
+**Gameplay probes.** `LayerAt` (spawns, music, conditions, the Guide), `ConditionContext.Depth` (`SurfaceDepth`), cave
+finders (`CaveRange`) and the camera's environment depth all read the inverted layout. Light: there is no open sky;
+`SkyMap` gets the roof and lights the open air between the ground and the roof as outdoor shade (`ShadeTop` up to
+`ShadeCap`; the caves above stay dark); the map treats that air as outdoors. Gravity is unchanged.
+
+**Compatibility and gaps.** Ordinary seeds generate identically (golden hashes unchanged); the plan hash includes the
+flag. A Don't Dig Up world saved before GenVersion 14 keeps the ordinary layout (`WorldMeta.ToSettings`). Not
+inverted: weather (no rain or snow under the roof — the sky top is the world's top), invasions and meteors arrive at
+the bottom surface, hardmode wedges reach down from the bottom surface only, and nothing renders a sky above the roof.
