@@ -96,3 +96,13 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   Quest (-11) amber, Expert (-12) a cycling rainbow and Master (-13) a red-orange pulse; `UiTheme.Rarity` converts.
 * **UI scale**: `Strata.Core.Presentation.UiScale` lowers the UI scale setting so the logical viewport never drops
   below 1024×600; `DisplaySettings.ApplyUiScale` re-applies it whenever the window is resized.
+* **Layout**: `Strata.Core.Presentation.UiLayout.Compute(width, height, UiState)` places every HUD and inventory
+  region (`UiRegion`: hotbar, buffs, hearts, mana, minimap, info, crosshair, breath, status line, chat, boss and
+  event bars, NPC chat, the F3 `debug` overlay, and the inventory's grid, coin/ammo, trash, sort buttons, panel,
+  crafting and equipment) on the logical viewport, so nothing ever overlaps or leaves the screen from 1024×600 up.
+  Fixed regions keep Terraria's places; chat, info, crafting and the F3 overlay shrink around them; breath, status
+  line and bars move to the nearest free spot; the inventory's slots drop to 0.85 and 0.75 (`SlotScale`) and the
+  minimap hides (`MinimapHidden`) when the equipment column cannot fit under it. The F3 overlay goes below the hotbar
+  and buff rows. A region with no room is left out of `Rects` (the widget hides). Engine code calls it on viewport
+  resize and on state changes only; `UiLayoutTests` checks every window size from 1024×600 to 3840×2160 at every UI
+  scale step.
