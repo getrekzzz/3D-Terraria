@@ -18,7 +18,7 @@ public sealed partial class NpcSystem
         int volume = Touched(npc, pBox);
         if (volume < 0) return;
         var state = player.State;
-        var hit = DamageModel.Roll(ContactOf(npc, volume), DamageClass.None, 0, 6f, null, state.Defense,
+        var hit = DamageModel.Roll(_world.Banners.Taken(player, npc, ContactOf(npc, volume)), DamageClass.None, 0, 6f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
         if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;

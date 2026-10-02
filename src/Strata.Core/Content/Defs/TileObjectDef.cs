@@ -105,6 +105,9 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>A buff it gives players nearby (a campfire's Cozy Fire, a heart lantern's Heart Lamp).</summary>
     public AuraBuff? Aura { get; init; }
 
+    /// <summary>An enemy banner: counts and empowers against these creatures (X-03).</summary>
+    public BannerSpec? Banner { get; init; }
+
     /// <summary>A door that stays locked until this flag is set; using it with <see cref="Key"/> sets the flag.</summary>
     public string? LockedUntil { get; init; }
 
@@ -180,6 +183,12 @@ public sealed class BreakEffect
     public string? Release { get; init; }
 
     public float ReleaseChance { get; init; }
+}
+
+/// <summary>The creatures an enemy banner counts kills of and empowers nearby players against.</summary>
+public sealed class BannerSpec
+{
+    public string[] Enemies { get; init; } = Array.Empty<string>();
 }
 
 /// <summary>A buff granted to players within <see cref="Radius"/> cells, refreshed while they stay close.</summary>

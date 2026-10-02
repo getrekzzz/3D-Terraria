@@ -18,6 +18,11 @@
   `tools/content/gen_furniture.py` writes `data/items/generated/furniture_families.json` and the model specs
   `tools/blender/assets.d/x-03-families.json` (generator `furniture_piece`, `bgen/furniture_family.py`). The plain
   wooden set keeps its original ids. `FurnitureFamilyTests` checks every family is complete, craftable and up to date.
+* **Enemy banners** (X-03) are generated too: `tools/content/banners.json` (variant groups, emblems, palette) →
+  `tools/content/gen_banners.py` → `data/items/generated/banners.json` (one wall banner per coin-worthy enemy, its
+  `banner.enemies`, and the Monster Banner buff) and `tools/blender/assets.d/x-03-banners.json` (the Dungeon's `banner`
+  generator, cloth in the enemy's tint, emblem by its tags). CI runs `gen_furniture.py --check` and
+  `gen_banners.py --check`.
 
 ## Assets
 | Asset | Tool | Output |

@@ -53,6 +53,11 @@ public static partial class ContentValidator
             ctx.Color(t, t.Leaves, "leaves");
             ctx.Ref(t, ctx.Db.Projectiles, t.Trap?.Projectile, "trap.projectile");
             ValidateWiringObject(ctx, t);
+            if (t.Banner is { } banner)
+            {
+                if (banner.Enemies.Length == 0) ctx.Error(t, "banner needs at least one enemy.");
+                foreach (var e in banner.Enemies) ctx.Ref(t, ctx.Db.Enemies, e, "banner.enemies");
+            }
             ctx.Light(t, t.Light, "light");
             if (t.Flame is { } flame)
             {

@@ -120,6 +120,8 @@ public static partial class ContentValidator
         {
             // Breaking a world-generated object yields its placing item.
             if (t.PlacingItemId != null && (t.Natural || t.HasTag("world"))) sources.Add(t.PlacingItemId);
+            // Enemy banners drop from kills of their creatures (BannerSystem).
+            if (t.PlacingItemId != null && t.Banner != null) sources.Add(t.PlacingItemId);
         }
         // A bug net turns critters into their catch items.
         foreach (var e in ctx.Db.Enemies.All)

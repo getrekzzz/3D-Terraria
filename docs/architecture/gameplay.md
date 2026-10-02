@@ -348,6 +348,12 @@
   at Christmas) with seasonal vanity, candy and decorations inside. Santa Claus moves in at Christmas once the Frost
   Legion is beaten and leaves when it ends; `TownRenderer.Hats` puts witch or Santa hats on the other residents (shared
   procedural meshes on the head bone, toggled on season change).
+* **Enemy banners** — `Banners.BannerSystem` (`GameWorld.Banners`): kills of a banner's creatures (`TileObjectDef.Banner`)
+  are tallied world-wide in `Session.Counters["banner:<id>"]` (statue creatures, parts and bosses never count) and every
+  `killsPerBanner` (50) drops the banner. Every `refreshTicks` it rescans each player's surroundings (`radius` cells) for
+  placed banners: `Dealt` raises player damage to those creatures (×1.5, in `NpcSystem.Hit`), `Taken` lowers their
+  contact damage (×0.9, `NpcSystem.Contact`), and the Monster Banner buff shows. Tuning in `data/config/banners.json`;
+  probes `banners.near|dropped`. Enemy projectiles carry no source creature, so they are not reduced.
 * **Mounts** — the `mount` item behaviour (`MountParams`, data/items/mounts.json) summons a ride: `MountRules` toggles,
   swaps and quick-mounts (the `quick_mount` key; the equipment mount slot plugs in through `MountRules.SlotMount`),
   shows the mount's buff and dismounts on death; `MountMotion` (engine independent, tested) gives each mount its run

@@ -45,6 +45,7 @@ public sealed partial class GameWorld : IDisposable
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
         Weather = new Gameplay.Weather.WeatherSystem(this);
+        Banners = new Gameplay.Banners.BannerSystem(this);
         Liquids = new LiquidSimulator(session);
         Housing = new HousingScanner(session.World);
         Navigator = new VoxelNavigator(session.World);
@@ -82,6 +83,9 @@ public sealed partial class GameWorld : IDisposable
 
     /// <summary>Rain, storms, snow, sandstorms and wind (state in <see cref="WorldSession.Weather"/>).</summary>
     public Gameplay.Weather.WeatherSystem Weather { get; }
+
+    /// <summary>Enemy banners: kill tallies, banner drops and the nearby-banner bonus.</summary>
+    public Gameplay.Banners.BannerSystem Banners { get; }
     public LiquidSimulator Liquids { get; }
     public HousingScanner Housing { get; }
     public VoxelNavigator Navigator { get; }
@@ -145,6 +149,7 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
         using (prof.Time("tick.events")) Events.Tick();
         using (prof.Time("tick.weather")) Weather.Tick();
+        using (prof.Time("tick.banners")) Banners.Tick();
         using (prof.Time("tick.wires")) Wires.Tick();
         using (prof.Time("tick.spawner")) Spawner.Tick();
         using (prof.Time("tick.npcs")) Npcs.Tick();

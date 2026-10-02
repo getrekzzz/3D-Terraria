@@ -120,3 +120,18 @@ use
 wait 0.1
 assert inv.blue_dungeon_chandelier == 0
 assert errors == 0
+
+# --- X-03 banners ---
+# A Zombie Banner hung on a wall empowers the player against zombies (the Monster Banner buff shows).
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+fill -3 0 -5 3 6 -5 stone
+wait 0.5
+give zombie_banner 1
+place zombie_banner 0 2 -4
+wait 1
+assert banners.near >= 1
+assert buff.monster_banner == 1
+assert errors == 0
