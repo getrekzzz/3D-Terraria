@@ -6,7 +6,8 @@
 | 2 | P3-37, P3-37b, P2-24, P5-28, P3-38, P3-39, P3-40, P3-41a/b, P3-42, P3-43, P3-44, P3-45, P3-50 | full headless CI green (422 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 3 | P4-35, P4-36, P4-37, X-09 (all but the creator menu rows) | full headless CI green (426 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 4 | X-17 hair/cloth motion | full headless CI green (430 Core tests, all checks, 14/14 smoke, MENU PASS) |
-| 5 | X-09 creator menu rows (after the integration UI push, P2-30) | waiting for P2-30 |
+| 5 | P1b-06, P1b-07 (async saves, reviewed + fixed), P1b-08, P1b-09 (scheduler, budgets, colliders) | full headless CI green (501 Core tests, 14/14 smoke, MENU PASS); P1b-08/09 review fixes pending |
+| 6 | P1b-10..14, P1b-16, X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -62,3 +63,11 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   preset `swayDistance` (low 0 = off, medium 20 m, high 35 m, ultra 50 m). Deviation from the spec: no dangle bones or
   per-strand chains (one spring per character, applied per vertex by weight), so long hair swings as one piece; capes
   and banners do not exist yet. No rendered verification (a still shot cannot show motion).
+
+## Lag-spike wave (taken over from the integration session)
+* Baseline before any change (headless perf.cmds, small world, view 6): 95 frames >=33 ms of ~11,600, p99 30.5 ms,
+  max 492.6 ms, 30 gen-2 GCs (1,217 ms pauses). Saved in `/root/.claude/plans/overhaul-specs/baselines/perf-before.txt`.
+* Follow-up outside the P1b list: `tick.liquids` peaks at 97.7 ms in that run (liquid steps); not addressed yet.
+* P1b-08/09 review findings being fixed: frame budgets drop to play level as soon as the player unfreezes and shrink
+  on vsync-inclusive slow frames (slow pop-in after load/teleport); a stuck collider priority flag; an undisposed
+  Variant; light seams at chunk borders.
