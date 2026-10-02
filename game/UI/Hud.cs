@@ -56,7 +56,11 @@ public sealed partial class Hud : CanvasLayer
         for (int i = 0; i < PlayerInventory.HotbarSize; i++)
         {
             int slot = i;
-            var view = new ItemSlotView(() => ui.Inventory.Backpack[slot], 58, ui.Tooltip) { Badge = ((i + 1) % 10).ToString() };
+            var view = new ItemSlotView(() => ui.Inventory.Backpack[slot], 58, ui.Tooltip)
+            {
+                Badge = ((i + 1) % 10).ToString(),
+                Favorite = () => ui.Inventory.Backpack.IsFavorite(slot),
+            };
             view.Clicked += (_, _) => ui.Inventory.Select(slot);
             hotbar.AddChild(view);
             _hotbar.Add(view);

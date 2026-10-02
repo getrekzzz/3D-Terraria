@@ -30,7 +30,7 @@ public sealed partial class InventoryScreen
     private ItemSlotView Slot(Func<SlotRef> slot, string? badge)
     {
         ItemSlotView view = null!;
-        view = new ItemSlotView(() => Read(slot()), SlotSize, _ui.Tooltip) { Badge = badge };
+        view = new ItemSlotView(() => Read(slot()), SlotSize, _ui.Tooltip) { Badge = badge, Favorite = () => IsFavorite(slot()) };
         view.Clicked += (button, mods) => Click(view, slot(), button == MouseButton.Right, mods);
         return view;
     }
@@ -40,6 +40,9 @@ public sealed partial class InventoryScreen
         var inv = slot.Area == SlotArea.Container ? _containerInv : _ui.Inventory.Resolve(slot.Area);
         return inv != null && slot.Index < inv.Size ? inv[slot.Index] : ItemStack.Empty;
     }
+
+    private bool IsFavorite(SlotRef slot) =>
+        slot.Area != SlotArea.Container && _ui.Inventory.Resolve(slot.Area) is { } inv && slot.Index < inv.Size && inv.IsFavorite(slot.Index);
 
     private void Click(ItemSlotView view, SlotRef slot, bool right, ClickMods mods)
     {
