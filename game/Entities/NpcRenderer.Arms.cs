@@ -81,16 +81,18 @@ public sealed partial class NpcRenderer
         Place(view.Arms[index * 2 + 1], elbow, hand, npc);
     }
 
-    /// <summary>Stretches a unit-long +Y arm piece from <paramref name="a"/> to <paramref name="b"/>.</summary>
+    /// <summary>Stretches a unit-long arm piece (Blender +Y, Godot −Z) from <paramref name="a"/> to <paramref name="b"/>.</summary>
     private void Place(CreatureVisual piece, Vector3 a, Vector3 b, Npc npc)
     {
         var y = b - a;
         float len = y.Length();
         piece.Visible = len > 1e-3f;
         if (!piece.Visible) return;
-        var up = y / len;
-        var side = Mathf.Abs(up.Y) > 0.95f ? Vector3.Right : up.Cross(Vector3.Up).Normalized();
-        piece.Transform = new Transform3D(new Basis(side, up * len, side.Cross(up)), a);
+        // Bones are modelled along Blender's +Y, which glTF export turns into Godot's −Z: map −Z onto a→b.
+        var along = y / len;
+        var side = Mathf.Abs(along.Y) > 0.95f ? Vector3.Right : along.Cross(Vector3.Up).Normalized();
+        var back = -along;
+        piece.Transform = new Transform3D(new Basis(side, back.Cross(side), back * len), a);
         piece.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
         piece.SetLight(OwnLight(npc, LightProbe.SampleSmooth(_game.Session.World, a.Lerp(b, 0.5f))));
     }
