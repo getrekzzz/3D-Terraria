@@ -25,6 +25,9 @@ public sealed partial class WorldSession
         ctx.EventKills = EventKills;
         ctx.Difficulty = (int)Settings.Difficulty;
         ctx.Evil = Settings.Evil.ToString().ToLowerInvariant();
+        var size = Generator.Plan.Size;
+        float dx = cell.X - size.X * 0.5f, dz = cell.Z - size.Z * 0.5f, land = Generator.Plan.LandRadius;
+        ctx.CentreDistance = land > 0 ? MathF.Sqrt(dx * dx + dz * dz) / land : 0f;
         return ctx;
     }
 

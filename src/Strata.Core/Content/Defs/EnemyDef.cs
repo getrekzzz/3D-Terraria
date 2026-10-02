@@ -14,6 +14,9 @@ public sealed class RangedAttack
     /// <summary>Ticks between volleys.</summary>
     public int Interval { get; init; } = 120;
 
+    /// <summary>Ticks between volleys at no life: the interval eases from <see cref="Interval"/> to this as the creature weakens.</summary>
+    public int? IntervalAtZeroLife { get; init; }
+
     /// <summary>Fires only within this distance (m) and with a clear line of sight.</summary>
     public float Range { get; init; } = 18f;
 
@@ -77,6 +80,9 @@ public sealed class EnemyDef : ContentDef
 
     /// <summary>Set for bosses (boss bar, arena, defeat flag, segments).</summary>
     public BossInfo? Boss { get; init; }
+
+    /// <summary>Spawns posing as something harmless (a chest, a lost girl) until woken.</summary>
+    public DisguiseInfo? Disguise { get; init; }
 
     /// <summary>Coins dropped (copper).</summary>
     public int Value { get; init; }

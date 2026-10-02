@@ -10,7 +10,7 @@ public enum ItemSourceKind
     /// <summary>Crafted (owner: the recipe; conditions: the recipe's).</summary>
     Recipe,
 
-    /// <summary>Dropped by an enemy (owner: the enemy).</summary>
+    /// <summary>Dropped by an enemy or a fallen resident (owner: it; none, labelled "Any enemy", for every kill's table).</summary>
     Drop,
 
     /// <summary>Dropped by a boss (owner: the boss).</summary>
@@ -64,6 +64,12 @@ public sealed class ItemSourceIndex
 {
     /// <summary>Loot table rolled for a fishing catch.</summary>
     public const string FishingTable = "fishing";
+
+    /// <summary>Loot table rolled after every kill that counts (worth coins, not a critter or a part).</summary>
+    public const string GlobalKillTable = "global_kill";
+
+    /// <summary>A fallen town resident drops table "&lt;resident id&gt;" + this suffix, when it exists.</summary>
+    public const string DeathTableSuffix = "_death";
 
     /// <summary>Item tags that are a source by themselves (handed out at player creation, or placed by world generation).</summary>
     public static readonly string[] SourceTags = { "starter", "world" };
@@ -132,8 +138,9 @@ public sealed class ItemSourceIndex
     }
 
     /// <summary>
-    /// Resolves every loot table to its owners: enemies and bosses, tile objects, items that open into a table, the
-    /// fishing table, then named tables nothing else uses (the chests world generation fills, e.g. "Gold Chests").
+    /// Resolves every loot table to its owners: enemies and bosses (with a worm boss's per-segment loot), fallen town
+    /// residents, tile objects, items that open into a table, the fishing table and the table rolled after every kill
+    /// ("Any enemy"), then named tables nothing else uses (the chests world generation fills, e.g. "Gold Chests").
     /// </summary>
     private void AddLoot(ContentDatabase db)
     {
@@ -149,13 +156,20 @@ public sealed class ItemSourceIndex
             Walk(db, def, kind, owner, label, Array.Empty<TypedSpec>(), 0);
         }
 
-        foreach (var e in db.Enemies.All) Root(e.Loot, e.Boss != null ? ItemSourceKind.BossDrop : ItemSourceKind.Drop, e, null);
+        foreach (var e in db.Enemies.All)
+        {
+            var kind = e.Boss != null ? ItemSourceKind.BossDrop : ItemSourceKind.Drop;
+            Root(e.Loot, kind, e, null);
+            Root(e.Boss?.SegmentLoot, kind, e, null);
+        }
+        foreach (var npc in db.TownNpcs.All) Root(npc.Id + DeathTableSuffix, ItemSourceKind.Drop, npc, null);
         foreach (var t in db.TileObjects.All) Root(t.Loot, ItemSourceKind.Object, t, null);
         foreach (var i in db.Items.All)
             foreach (var b in i.Behaviors)
                 if (b.Type == ItemBehaviorSpecs.Consume && b.Raw.TryGetProperty("loot", out var loot) && loot.ValueKind == JsonValueKind.String)
                     Root(loot.GetString(), ItemSourceKind.Opened, i, null);
         Root(FishingTable, ItemSourceKind.Fishing, null, "Fishing");
+        Root(GlobalKillTable, ItemSourceKind.Drop, null, "Any enemy");
         foreach (var t in db.LootTables.All)
             if (t.Name != null && !claimed.Contains(t.Id)) Walk(db, t, ItemSourceKind.Container, t, t.Name, Array.Empty<TypedSpec>(), 0);
     }

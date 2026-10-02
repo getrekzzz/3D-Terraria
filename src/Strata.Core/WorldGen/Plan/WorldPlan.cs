@@ -28,6 +28,9 @@ public sealed class WorldPlan
 
     public WorldSettings Settings { get; }
     public Int3 Size { get; }
+
+    /// <summary>Land radius (cells) of the continent around the centre.</summary>
+    public float LandRadius => MathF.Min(Size.X, Size.Z) * 0.42f;
     public SeedTree Seeds { get; }
     public LayerBands Bands { get; }
 
@@ -56,6 +59,10 @@ public sealed class WorldPlan
 
     /// <summary>Named places found while planning (see <see cref="LandmarkIds"/>), for residents and commands.</summary>
     public Dictionary<string, Int3> Landmarks { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>Wire cells structures lay at generation (dungeon pressure plates to their dart traps); a new world's
+    /// session starts with them wired.</summary>
+    public HashSet<Int3> PlannedWires { get; } = new();
 
     /// <summary>Direction (turns) from the centre towards the tundra; the jungle lies opposite.</summary>
     public float SnowAngle { get; set; }
@@ -110,7 +117,13 @@ public sealed class WorldPlan
     public void AddFeature(WorldFeature feature)
     {
         Features.Add(feature);
-        RaiseColumnTop(feature.Bounds);
+        if (feature is Structures.Dungeon.DungeonFeature dungeon)
+        {
+            // Op by op: the dungeon's bounding box spans a wide stretch of open ground beside its tall keep, which
+            // would otherwise all count as content up to the turrets (more chunks streamed, sky columns misjudged).
+            foreach (var op in dungeon.Blueprint.Ops) RaiseColumnTop(op.Bounds);
+        }
+        else RaiseColumnTop(feature.Bounds);
     }
 }
 
@@ -120,5 +133,35 @@ public static class LandmarkIds
     /// <summary>Open ground just outside the crypt's gatehouse door.</summary>
     public const string DungeonGate = "dungeon_gate";
 
-    public static readonly IReadOnlySet<string> All = new HashSet<string> { DungeonGate };
+    /// <summary>The floor of the Dungeon's deepest room (the vault).</summary>
+    public const string DungeonBottom = "dungeon_bottom";
+
+    /// <summary>A floor cell in front of the Dungeon's first locked gold chest.</summary>
+    public const string DungeonChest = "dungeon_chest";
+
+    /// <summary>The keep's floor just inside its door (the foyer round the shaft's mouth).</summary>
+    public const string DungeonFoyer = "dungeon_foyer";
+
+    /// <summary>The floor at the foot of the Dungeon's entrance shaft (its first junction).</summary>
+    public const string DungeonShaft = "dungeon_shaft";
+
+    /// <summary>The floor in the middle of the Dungeon's first library.</summary>
+    public const string DungeonLibrary = "dungeon_library";
+
+    /// <summary>The middle of the Dungeon's first treasure room.</summary>
+    public const string DungeonTreasure = "dungeon_treasure";
+
+    /// <summary>The cell of the Dungeon's first banner hanging in a hall.</summary>
+    public const string DungeonBanner = "dungeon_banner";
+
+    /// <summary>The floor in the middle of the hall stretch that banner hangs in.</summary>
+    public const string DungeonHall = "dungeon_hall";
+
+    /// <summary>The cell of the Dungeon's first spike (planned only when it has any).</summary>
+    public const string DungeonSpikes = "dungeon_spikes";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string>
+    {
+        DungeonGate, DungeonBottom, DungeonChest, DungeonFoyer, DungeonShaft, DungeonLibrary, DungeonTreasure, DungeonBanner, DungeonHall, DungeonSpikes,
+    };
 }

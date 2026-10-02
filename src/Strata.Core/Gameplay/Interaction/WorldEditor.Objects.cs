@@ -23,6 +23,9 @@ public enum ObjectHitResult
 
     /// <summary>The tool is the right kind but too weak (a Pwnhammer is needed for altars).</summary>
     TooWeak,
+
+    /// <summary>A locked chest: it cannot be broken until its key opens it.</summary>
+    Locked,
 }
 
 public sealed partial class WorldEditor
@@ -60,6 +63,9 @@ public sealed partial class WorldEditor
         if (power <= 0) return ObjectHitResult.WrongTool;
         if (power < obj.Def.MinPower) return ObjectHitResult.TooWeak;
         if (obj.Def.RequiresFlag is { } flag && !_session.Flags.Contains(flag)) return ObjectHitResult.TooWeak;
+        if (obj.Locked) return ObjectHitResult.Locked;
+        // An unopened world chest rolls its loot first, so breaking it never throws the loot away.
+        EnsureContainerLoot(obj);
         if (obj.Container != null && obj.Container.Any(s => !s.IsEmpty)) return ObjectHitResult.NotEmpty;
         obj.HitPoints -= Math.Max(1, power / 40);
         if (obj.HitPoints > 0) return ObjectHitResult.Damaged;
@@ -70,6 +76,7 @@ public sealed partial class WorldEditor
     /// <summary>Removes an object, dropping its item, rolled loot and any container contents.</summary>
     public void BreakObject(TileObjectInstance obj, bool dropItems)
     {
+        if (dropItems) EnsureContainerLoot(obj); // an unopened world chest spills what it was generated with
         if (!World.TileObjects.Remove(obj)) return;
         DirtyForLight(obj);
         if (dropItems)
@@ -78,10 +85,12 @@ public sealed partial class WorldEditor
             var content = _session.Content;
             if (obj.Def.PlacingItemId is { } itemId && content.Items.TryGet(itemId, out var item) && !obj.Def.Natural)
                 SpawnDrop(new ItemStack(item, 1), center);
-            if (obj.Def.Loot != null)
+            // A non-container's own pending loot (the one Water Bolt among a shelf of books) replaces its kind's table.
+            var table = obj.Container == null && obj.PendingLoot != null ? obj.PendingLoot : obj.Def.Loot;
+            if (table != null)
             {
                 var rng = NextRng(center);
-                foreach (var stack in _loot.Roll(obj.Def.Loot, ref rng, LootContext(center))) SpawnDrop(stack, center);
+                foreach (var stack in _loot.Roll(table, ref rng, LootContext(center))) SpawnDrop(stack, center);
             }
             if (obj.Container != null)
                 foreach (var stack in obj.Container.Where(s => !s.IsEmpty)) SpawnDrop(stack, center);
@@ -115,7 +124,8 @@ public sealed partial class WorldEditor
                 if (World.TileObjects.At(cell + o) is { } obj) candidates.Add(obj);
         foreach (var obj in candidates)
         {
-            if (World.TileObjects.Get(obj.Id) == null || PlacementRules.IsSupported(World, obj)) continue;
+            // A locked chest stays put (it cannot be broken until opened).
+            if (World.TileObjects.Get(obj.Id) == null || obj.Locked || PlacementRules.IsSupported(World, obj)) continue;
             broken.Add(obj);
             BreakObject(obj, dropItems: true);
         }

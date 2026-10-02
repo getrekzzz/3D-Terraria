@@ -19,6 +19,8 @@ public static partial class ContentValidator
             if (phase.Summon is { } s)
                 foreach (var id in s.Pool.Length > 0 ? s.Pool : new[] { s.Enemy })
                     if (!ctx.Db.Enemies.Contains(id)) ctx.Error(e, $"summons unknown enemy '{id}'.");
+            if (phase.Aura is { } aura && !ctx.Db.Buffs.Contains(aura.Buff)) ctx.Error(e, $"aura pulses unknown buff '{aura.Buff}'.");
+            if (phase.Leash is { } leash && !ctx.Db.Enemies.Contains(leash.Kind)) ctx.Error(e, $"leash names unknown enemy '{leash.Kind}'.");
             foreach (var v in phase.Moves.Select(m => m.Volley).Append(phase.Volley))
                 if (v != null && !ctx.Db.Projectiles.Contains(v.Projectile)) ctx.Error(e, $"volley fires unknown projectile '{v.Projectile}'.");
         }
@@ -41,19 +43,33 @@ public static partial class ContentValidator
             ctx.Light(e, e.Light, "light");
             ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
             if (e.Boss is { Minor: false }) ctx.Asset(e, AssetPaths.BossIcon(e), "boss head icon");
+            if (e.Disguise is { } disguise)
+            {
+                if (string.IsNullOrWhiteSpace(disguise.Model)) ctx.Error(e, "disguise.model is required.");
+                else ctx.Asset(e, $"assets/models/creatures/{disguise.Model}.glb", "disguise.model");
+                if (disguise.WakeRange < 0 || disguise.Lunge < 0) ctx.Error(e, "disguise.wakeRange and disguise.lunge must be >= 0.");
+                if (disguise.WakeRange == 0 && !disguise.WakeOnInteract) ctx.Error(e, "a disguise that ignores interaction needs a wakeRange (hits alone rarely find it).");
+            }
             if (e.Boss is { } boss)
             {
                 ctx.Ref(e, ctx.Db.Flags, boss.Flag, "boss.flag");
                 if (string.IsNullOrWhiteSpace(boss.Title) && !boss.Minor) ctx.Error(e, "boss.title is required.");
                 foreach (var (part, field) in new[] { (boss.SegmentModel, "segmentModel"), (boss.TailModel, "tailModel") })
                     if (part != null) ctx.Asset(e, $"assets/models/creatures/{part}.glb", $"boss.{field}");
+                for (int i = 0; i < boss.SegmentPattern.Length; i++)
+                    ctx.Asset(e, $"assets/models/creatures/{boss.SegmentPattern[i]}.glb", $"boss.segmentPattern[{i}]");
                 for (int i = 0; i < boss.SegmentModels.Length; i++)
                     ctx.Asset(e, $"assets/models/creatures/{boss.SegmentModels[i]}.glb", $"boss.segmentModels[{i}]");
                 if (boss.SegmentModels.Length > boss.Segments) ctx.Error(e, "boss.segmentModels lists more models than boss.segments.");
                 if (boss.BarrierModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.BarrierModel}.glb", "boss.barrierModel");
                 if (boss.ArmModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.ArmModel}.glb", "boss.armModel");
                 if (boss.BarrierTile <= 0) ctx.Error(e, "boss.barrierTile must be > 0.");
-                if (boss.DayEnrage is { Damage: <= 0 } or { Speed: <= 0 }) ctx.Error(e, "boss.dayEnrage multipliers must be > 0.");
+                if (boss.Enrage is { } rage)
+                {
+                    ctx.Specs(e, SpecKind.Condition, rage.When, "boss.enrage.when");
+                    if (rage.Damage <= 0 || rage.Speed <= 0) ctx.Error(e, "boss.enrage multipliers must be > 0.");
+                    if (rage.SetDamage < 0 || rage.SetDefense < 0) ctx.Error(e, "boss.enrage setDamage and setDefense must be >= 0.");
+                }
                 foreach (var part in boss.Parts)
                 {
                     ctx.Ref(e, ctx.Db.Enemies, part.Enemy, "boss.parts");
@@ -77,12 +93,21 @@ public static partial class ContentValidator
                         ctx.Error(e, $"boss.companions: '{companionId}' may not bring companions of its own.");
                 }
             }
-            if (e.Brain.Type is BrainSpecs.CryptWarden or BrainSpecs.Mawwall && e.Boss is not { Segments: >= 2 })
-                ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 (its hands or eyes).");
+            if (e.Brain.Type == BrainSpecs.Mawwall && e.Boss is not { Segments: >= 2 })
+                ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 (its eyes).");
+            if (e.Brain.Type == BrainSpecs.CryptWarden && e.Boss is not ({ Segments: >= 2 } or { Parts.Length: >= 2 }))
+                ctx.Error(e, $"the {e.Brain.Type} brain needs a boss block with segments >= 2 or parts >= 2 (its hands).");
+            if (e.Brain.Type == BrainSpecs.Hand && !ctx.Db.Enemies.All.Any(b => b.Boss is { } bb && bb.Parts.Any(part => part.Enemy == e.Id)))
+                ctx.Warn(e, $"the {e.Brain.Type} brain only works as a boss part, but no boss lists it in boss.parts.");
             if (e.Brain.Type == BrainSpecs.Mawwall && e.Brain.Raw.TryGetProperty("minion", out var minion)) ctx.Ref(e, ctx.Db.Enemies, minion.GetString(), "brain.minion");
             if (e.Ranged is { FromParts: true } && e.Boss is not { Segments: > 0 }) ctx.Error(e, "ranged.fromParts needs body parts (boss.segments).");
             foreach (var key in new[] { "minion", "servant" })
                 if (e.Brain.Raw.TryGetProperty(key, out var refId) && refId.GetString() is { } id) ctx.Ref(e, ctx.Db.Enemies, id, $"brain.{key}");
+            if (e.Brain.Type == BrainSpecs.CryptWarden && e.Brain.Raw.TryGetProperty("skull", out var skull) && skull.GetString() is { } skullId)
+            {
+                ctx.Ref(e, ctx.Db.Projectiles, skullId, "brain.skull");
+                if (ctx.Db.Projectiles.TryGet(skullId, out var sp) && sp.Friendly) ctx.Error(e, $"brain.skull '{skullId}' must be hostile (friendly: false).");
+            }
             if (e.Brain.Raw.TryGetProperty("phase2Model", out var model) && model.GetString() is { } m)
                 ctx.Asset(e, $"assets/models/creatures/{m}.glb", "brain.phase2Model");
             foreach (var (r, field) in new[] { (e.Ranged, "ranged"), (e.Ranged?.Enraged, "ranged.enraged") })

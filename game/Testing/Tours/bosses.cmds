@@ -67,6 +67,8 @@ time 12
 aim 0 0.2 1
 boss skeletron 16
 wait 0.5
+# Its two hands come apart from the skull, hanging either side on their own bone arms.
+assert npcs.skeletron_hand == 2
 screenshot 06_skeletron 0.5
 wait_until screenshot.pending == 0 900
 killall

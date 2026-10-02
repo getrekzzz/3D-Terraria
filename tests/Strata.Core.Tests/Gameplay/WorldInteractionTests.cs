@@ -118,4 +118,20 @@ public class WorldInteractionTests
         Assert.Empty(sys.Items);
         Assert.Equal(5, collected.Count(db.Items.Get("gel")));
     }
+
+    [Fact]
+    public void BreakingAWaterBoltBookDropsTheWaterBolt()
+    {
+        using var g = TestGame.Create();
+        var store = g.World.Session.World.TileObjects;
+        var plain = new TileObjectInstance(g.Content.TileObjects.Get("book"), g.Floor + new Int3(2, 1, 0), 0, 1);
+        var special = new TileObjectInstance(g.Content.TileObjects.Get("book"), g.Floor + new Int3(-2, 1, 0), 0, 2) { PendingLoot = "water_bolt_book" };
+        Assert.True(store.TryAdd(plain));
+        Assert.True(store.TryAdd(special));
+        g.World.Editor.BreakObject(special, dropItems: true);
+        Assert.Contains(g.World.Drops.Items, d => d.Stack.Item!.Id == "water_bolt");
+        Assert.DoesNotContain(g.World.Drops.Items, d => d.Stack.Item!.Id == "book");
+        g.World.Editor.BreakObject(plain, dropItems: true);
+        Assert.Contains(g.World.Drops.Items, d => d.Stack.Item!.Id == "book");
+    }
 }

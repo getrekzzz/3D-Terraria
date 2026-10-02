@@ -93,10 +93,10 @@ are in [`AUDIT.md`](AUDIT.md).
 | Assets | Blender pipeline, icons, synthesised textures | ✅ | 103 object models, 660 item models, 777 icons, 216 creature models; 97 procedural humans with faces, hands, hair, clothing, 52-bone rig. Weapon classes share one mesh, icons unoutlined, some creatures use the wrong archetype (AUDIT §11) |
 | NPCs | Town residents, 3D housing, shops, services, happiness, landmark residents | ✅ | All 29 of the reference game's town NPCs; rescues, housing menu, residents fighting back, day-only move-in and 8 empty shops ⬜ (AUDIT §14) |
 | Liquids | Flow, mixing, contact effects, buckets | ✅ | Active-cell automaton per liquid; pressure/U-tubes, sponges, shimmer ⬜ |
-| Bosses | Framework + bosses | ✅ | 29 bosses (5 hand-written boss brains, the rest on the data-driven `pattern` brain): King Slime, The Eye of Cthulhu, Eater of Worlds (tunnels), Brain of Cthulhu, Queen Bee, Skeletron (hands, spin, day rage), Deerclops, The Wall of Flesh (sweeping barrier, eye lasers, tethered hungry maws), Queen Slime, Twins (paired eyes, phase-2 lasers and flamethrower), Destroyer (50-segment flying worm, part lasers, probes), Skeletron Prime (four tools, gun arms fire), Plantera, Golem, Duke Fishron, Empress of Light, Lunatic Cultist, pillars, Moon Lord and event bosses; arenas, boss bar, boss music. Parts share one life pool except Moon Lord's; no Expert behaviour or treasure bags (AUDIT §12) |
+| Bosses | Framework + bosses | ✅ | 29 bosses (5 hand-written boss brains, the rest on the data-driven `pattern` brain): King Slime, The Eye of Cthulhu, Eater of Worlds (tunnels), Brain of Cthulhu, Queen Bee, Skeletron (hands, spin, day rage), Deerclops, The Wall of Flesh (sweeping barrier, eye lasers, tethered hungry maws), Queen Slime, Twins (paired eyes, phase-2 lasers and flamethrower), Destroyer (50-segment flying worm, part lasers, probes), Skeletron Prime (four tools, gun arms fire), Plantera, Golem, Duke Fishron, Empress of Light, Lunatic Cultist, pillars, Moon Lord and event bosses; arenas, boss bar, boss music. Skeletron's hands are their own creatures on bone arms (they fall first, the skull fights on); Expert context, enrage, treasure bags, trophies and masks (W7). Other parts share one life pool except Moon Lord's (AUDIT §12) |
 | Progression | Flags, auto-set cascade, announcements, incineration summons | ✅ | `ProgressionSystem.Raised` is the hook for hardmode mutations |
 | Events | Event director | ✅ | Blood Moon, Slime Rain, 7 invasions (Goblin Army, Pirates, Martian Madness, Old One's Army, Frost Legion, Pumpkin Moon, Frost Moon), Solar Eclipse, lunar events, rain, wind, sandstorm, party, lantern night; no progress bar ⬜ |
-| Dungeon | Crypt zone, locked walls, guardian, roster, keeper + curse | ✅ | Boxy room grid; chests roll cave-cabin loot; locked chests and Golden Key, dungeon furniture, books, spike traps ⬜ (AUDIT §13) |
+| Dungeon | 1:1 Dungeon (GenVersion 11): keep, winding halls, stairs and shafts, rooms by role, wall panels, zone, locks, guardian, roster, keeper + curse | ✅ | Flattest keep site plus a terraced clearing on the Phase 1 relief; blue/green/pink furniture sets, libraries with the Water Bolt, spikes and wired dart traps, locked Gold Chests and Golden/Shadow Keys, dungeon loot, the vault's six biome chests (Plantera lock). The bound Mechanic (P5-06b) ⬜ (AUDIT §13) |
 | Hardmode | Trigger, lazy world mutations, spread, ore tiers, rosters, stations, mechanical bosses | ✅ | Wall of Flesh → `hardmode` → 3 ore tiers (2 alternates each), radiant + blighted wedges (zones), spreading biomes; evil/cinder/hardmode metal families (pick chain 65 → 100 → 110 → 150 → 190 → 200); 12 hardmode creatures; hellforge, hardmode anvils and forges; Twins, Destroyer, Skeletron Prime → radiant gear; 14 wings (13 hardmode); Plantera, chlorophyte, the Jungle Temple and Golem; hardmode variants of old creatures ⬜ |
 | Audio | Director + sounds | ✅ | Music director (boss > event > Blood Moon > biome > layer, 31 tracks) and 146 SFX files: 177 sound files. Generic creature hit sounds, silent object hits and an unused ambient bus 🟡 (AUDIT §10) |
 
@@ -111,11 +111,9 @@ are in [`AUDIT.md`](AUDIT.md).
   (P2-28, P3-31).
 * Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
   until disturbed.
-* Skeletron hands share the skull's life (the reference boss has separately killable hands).
 * The Wall of Flesh only sweeps along X and only its mouth and eyes take hits; its flesh tiles are separate pooled visuals
   (a MultiMesh would be cheaper for very tall cavities).
-* Zone membership scans a structure's blueprint ops per query (hundreds for the Dungeon); fine at spawn/lock rates,
-  would want a coarse occupancy grid if queried per frame.
+* Zone membership walks the blueprint ops indexed under the queried chunk (`Blueprint.Freeze`); fine at spawn/lock rates.
 * Outdoor shade considers only the first roof in a column (stacked islands shade as one).
 * Spreading only visits loaded chunks, and spread land outside a wedge does not count as that zone (zones are the
   wedges); trees, grass tufts and flowers on converted land keep their forest look.
@@ -162,7 +160,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: liquid flow, lava + water → obsidian, buckets, burning/dousing, submersion | `liquids.cmds` | ✅ CI |
 | Engine smoke: starter guide, built home, move-in, walking home through a door at night, talk/shop UI, buying | `town.cmds` | ✅ CI |
 | Engine smoke: every biome creature spawns, moves and renders; ranged attackers | `creatures.cmds` | ✅ CI |
-| Engine smoke: keeper at the Dungeon gate, guardian leaves outside, night summon, warden defeat frees the keeper | `dungeon.cmds` | ✅ CI |
+| Engine smoke: the Dungeon arc (keeper at night, Skeletron's hands then skull, guardian gone after the flag, shaft, library, spikes, vault and a locked chest opened with a key, props and errors clean) | `dungeon.cmds` | ✅ CI |
 | Engine smoke: effigy burned in underworld lava calls the Wall of Flesh (guide sacrificed), the fight runs, defeat raises hardmode | `mawwall.cmds` | ✅ CI |
 | Engine smoke: hardmode appends mutations, loaded chunks catch up, the Hallow wedge streams in converted and is a zone, spread runs; hardmode stations place and every hardmode creature spawns | `hardmode.cmds` | ✅ CI |
 | Engine smoke: clockwork eye brings both Twins (flag on the second death), Destroyer releases probes, Skeletron Prime, all-mechs flag | `mechs.cmds` | ✅ CI |
@@ -187,7 +185,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 8. Next development targets (rest of M4)
 > Superseded on 2026-09-30 by the player-feedback overhaul (waves W0–W11, tracked in [`AUDIT.md`](AUDIT.md)). Of the
 > list below, wings, Plantera, chlorophyte, the temple, more residents and the audio director are done. Residents that
-> fight back and Dungeon keys/locked chests are planned (P5-10, P4-21). Cave culling, hardmode wedges on the horizon
+> fight back are planned (P5-10); Dungeon keys and locked chests are done (P4-21). Cave culling, hardmode wedges on the horizon
 > and hardmode variants of cavern/underworld creatures are not planned yet (AUDIT §17).
 
 M4 graphics delivered the physical sky and clouds, sky-lit PBR shading with graphics presets, synthesised

@@ -1,6 +1,7 @@
 using System.Numerics;
 using Strata.Core.Content.Specs;
 using Strata.Core.Determinism;
+using Strata.Core.Gameplay.Combat;
 using Strata.Core.Gameplay.Entities;
 using Strata.Core.Session;
 using Strata.Core.Voxels;
@@ -11,10 +12,19 @@ namespace Strata.Core.AI;
 public sealed class BrainContext
 {
     public required VoxelWorld World { get; init; }
-    public PlayerEntity? Target { get; set; }
+    /// <summary>The nearest living thing to fight (a player today); null when there is none.</summary>
+    public ICombatTarget? Target { get; set; }
+
+    /// <summary>The target when it is a player, for player-only effects (confusion, the tongue, buffs).</summary>
+    public PlayerEntity? TargetPlayer => Target as PlayerEntity;
+
     public float TargetDistance { get; set; }
     public bool IsDay { get; set; }
     public bool OnSurface { get; set; }
+
+    /// <summary>Expert or Master world (never Journey or Classic): Expert-only attacks and phases.</summary>
+    public bool Expert { get; set; }
+
     public Pcg32 Rng;
 
     /// <summary>Spawns a minion (bosses); returns null when the creature cap is reached.</summary>
@@ -32,6 +42,27 @@ public sealed class BrainContext
     /// <summary>Announces a message to every player (a boss changing phase).</summary>
     public Action<string>? Announce { get; set; }
 
+    /// <summary>A heavy landing or slam at a point with a strength 0–1 (camera shake, dust): raises NpcSystem.Impacted.</summary>
+    public Action<Vector3, float>? Impact { get; set; }
+
+    /// <summary>No solid cell between two points.</summary>
+    public Func<Vector3, Vector3, bool>? InSight { get; set; }
+
+    /// <summary>A box (centre, half-extents) overlaps no solid terrain: somewhere a creature can be placed without sticking.</summary>
+    public Func<Vector3, Vector3, bool>? Fits { get; set; }
+
+    /// <summary>Plays a sound cue at a creature (a roar, a telegraph): raises NpcSystem.Cued.</summary>
+    public Action<Npc, string>? Cue { get; set; }
+
+    /// <summary>Gives a buff (id, ticks) to every living player within a radius of a point, honouring their immunities.</summary>
+    public Action<Vector3, float, string, int>? Pulse { get; set; }
+
+    /// <summary>
+    /// Drags a player this tick (m/s, replacing their own movement): the Wall of Flesh's tongue. Sets
+    /// <see cref="PlayerEntity.ExternalVelocity"/>, which the creature system clears at the start of every tick.
+    /// </summary>
+    public Action<PlayerEntity, Vector3>? Pull { get; set; }
+
     /// <summary>Removes natural terrain in a sphere (radius in cells) — burrowing creatures.</summary>
     public Action<Vector3, float>? Carve { get; set; }
 
@@ -48,6 +79,9 @@ public interface IBrain
 {
     /// <summary>Whether gravity applies to this creature.</summary>
     bool UsesGravity { get; }
+
+    /// <summary>Whether gravity applies to this creature right now (it can change by phase).</summary>
+    bool UsesGravityFor(Npc npc) => UsesGravity;
 
     /// <summary>Moves through terrain without collision (burrowers); the brain handles everything.</summary>
     bool MovesFreely => false;
@@ -76,9 +110,11 @@ public static class BrainFactory
         BrainSpecs.Swimmer => new SwimmerBrain(spec.Parse<SwimmerParams>()),
         BrainSpecs.Lunger => new LungerBrain(spec.Parse<LungerParams>()),
         BrainSpecs.CryptWarden => new CryptWardenBrain(spec.Parse<CryptWardenParams>()),
+        BrainSpecs.Hand => new HandBrain(spec.Parse<HandParams>()),
         BrainSpecs.Caster => new CasterBrain(spec.Parse<CasterParams>()),
         BrainSpecs.Mawwall => new MawwallBrain(spec.Parse<MawwallParams>()),
         BrainSpecs.Pattern => new PatternBrain(spec.Parse<PatternParams>()),
+        BrainSpecs.PlanteraHook => new PlanteraHookBrain(spec.Parse<PlanteraHookParams>()),
         _ => throw new InvalidOperationException($"Unknown brain '{spec.Type}' (the content validator should have rejected it)."),
     };
 
