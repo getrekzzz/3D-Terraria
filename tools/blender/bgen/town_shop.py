@@ -103,3 +103,21 @@ def star_topper(mb: MeshBuilder, p, rng):
     m = Matrix.Translation((0, 0.03, h * 0.5)) @ Matrix.Rotation(math.pi / 2, 4, "X")
     mb.extrude_polygon(pts, 0.06, "prop:gold", p.get("color", "#ffe060"), matrix=m)
     mb.cylinder((0, 0, 0), (0, 0, h * 0.5 - s * 0.4), 0.02, None, "prop:gold", "#c8a040", segments=6)
+
+
+@generator
+def golf_cup(mb: MeshBuilder, p, rng):
+    """A white cup sunk flush with a turf disc, a little red flag on a pin."""
+    w, h, d = p["size"]
+    r = min(w, d) * 0.4
+    mb.cylinder((0, 0, 0), (0, 0, 0.02), r, None, "prop:plain", p.get("turf", "#4a9a3a"), segments=16)
+    mb.cylinder((0, 0, 0.005), (0, 0, 0.025), r * 0.35, None, "prop:plain", "#f0f0f0", segments=12)
+    mb.cylinder((0, 0, 0.02), (0, 0, h * 0.9), 0.008, None, "prop:plain", "#e8e8e8", segments=6)
+    mb.box((0.0, -0.004, h * 0.65), (r * 0.8, 0.004, h * 0.88), "prop:cloth", p.get("flag", "#e02a2a"))
+
+
+@generator
+def golf_tee(mb: MeshBuilder, p, rng):
+    """A small wooden tee with a ball on top."""
+    mb.cylinder((0, 0, 0), (0, 0, 0.08), 0.008, 0.02, "prop:planks", p.get("wood", "#e0c080"), segments=8)
+    mb.sphere((0, 0, 0.12), 0.04, "prop:plain", "#f4f4f0", subdivisions=2)

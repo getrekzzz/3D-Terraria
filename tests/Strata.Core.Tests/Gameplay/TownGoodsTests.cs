@@ -106,4 +106,16 @@ public class TownGoodsTests
         Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, freshPress: true));
         Assert.Contains(g.Player.State.Buffs.Active, b => b.Def.Id == "sugar_rush");
     }
+
+    [Fact]
+    public void AGolfClubLaunchesABall()
+    {
+        using var g = Arena();
+        g.Hold("golf_club_driver");
+        g.Player.State.Inventory.Backpack[5] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("golf_ball"), 3);
+        g.AimAt(g.Player.Eye + new System.Numerics.Vector3(0, 0.3f, 1));
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, g.Target(), freshPress: true));
+        Assert.Equal(2, g.Player.State.Inventory.CountAll(g.Content.Items.Get("golf_ball")));
+        Assert.Contains(g.World.Projectiles.All, pr => pr.Def.Id == "golf_ball_shot");
+    }
 }

@@ -14,7 +14,6 @@ public class ItemSourcesTests
     /// </summary>
     private static readonly string[] Pending =
     {
-        "leather_whip", // sold by the Zoologist (P5-17)
         "rally", // sold by the Skeleton Merchant (P5-19)
     };
 

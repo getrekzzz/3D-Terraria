@@ -1340,6 +1340,18 @@
    ],
    "generator": "trophy"
   },
+  "golf_cup": {
+   "models": [
+    "assets/models/objects/golf_cup_v0.glb"
+   ],
+   "generator": "golf_cup"
+  },
+  "golf_tee": {
+   "models": [
+    "assets/models/objects/golf_tee_v0.glb"
+   ],
+   "generator": "golf_tee"
+  },
   "granite_bathtub": {
    "models": [
     "assets/models/objects/granite_bathtub_v0.glb"
@@ -4880,6 +4892,10 @@
    },
    "icon": "assets/icons/items/crimtane_shortsword.png"
   },
+  "critter_shampoo": {
+   "model": "assets/models/items/critter_shampoo.glb",
+   "icon": "assets/icons/items/critter_shampoo.png"
+  },
   "cross_necklace": {
    "model": "assets/models/items/cross_necklace.glb",
    "icon": "assets/icons/items/cross_necklace.png"
@@ -5495,6 +5511,10 @@
    },
    "icon": "assets/icons/items/fairy_bell.png"
   },
+  "fairy_glowstick": {
+   "model": "assets/models/items/fairy_glowstick.glb",
+   "icon": "assets/icons/items/fairy_glowstick.png"
+  },
   "fairy_wings": {
    "model": "assets/models/items/fairy_wings.glb",
    "icon": "assets/icons/items/fairy_wings.png"
@@ -5956,6 +5976,64 @@
   "golem_trophy": {
    "object": "golem_trophy",
    "icon": "assets/icons/items/golem_trophy.png"
+  },
+  "golf_ball": {
+   "model": "assets/models/items/golf_ball.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/golf_ball.png"
+  },
+  "golf_club_driver": {
+   "model": "assets/models/items/golf_club_driver.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/golf_club_driver.png"
+  },
+  "golf_club_iron": {
+   "model": "assets/models/items/golf_club_iron.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/golf_club_iron.png"
+  },
+  "golf_club_putter": {
+   "model": "assets/models/items/golf_club_putter.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/golf_club_putter.png"
+  },
+  "golf_club_wedge": {
+   "model": "assets/models/items/golf_club_wedge.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/golf_club_wedge.png"
+  },
+  "golf_cup": {
+   "object": "golf_cup",
+   "icon": "assets/icons/items/golf_cup.png"
+  },
+  "golf_pants": {
+   "model": "assets/models/items/golf_pants.glb",
+   "armor": "golf_outfit",
+   "icon": "assets/icons/items/golf_pants.png"
+  },
+  "golf_shirt": {
+   "model": "assets/models/items/golf_shirt.glb",
+   "armor": "golf_outfit",
+   "icon": "assets/icons/items/golf_shirt.png"
+  },
+  "golf_tee": {
+   "object": "golf_tee",
+   "icon": "assets/icons/items/golf_tee.png"
+  },
+  "golf_visor": {
+   "model": "assets/models/items/golf_visor.glb",
+   "armor": "golf_outfit",
+   "icon": "assets/icons/items/golf_visor.png"
   },
   "goodie_bag": {
    "model": "assets/models/items/goodie_bag.glb",
@@ -14586,6 +14664,96 @@
     "refLength": 0.1513,
     "hidesHair": false,
     "tris": 206
+   }
+  },
+  "golf_outfit": {
+   "head": {
+    "model": "assets/models/armor/golf_outfit_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/golf_outfit_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/golf_outfit_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/golf_outfit_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/golf_outfit_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/golf_outfit_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/golf_outfit_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/golf_outfit_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/golf_outfit_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/golf_outfit_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/golf_outfit_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
    }
   },
   "hellstone_armor": {

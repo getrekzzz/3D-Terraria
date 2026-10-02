@@ -716,3 +716,8 @@ item value unless given, scaled by happiness (currency prices are not). New good
   stock only at Christmas (plus a Star Topper), Princess outfit and Resplendent Dessert (Sugar Rush). Deferred: the
   Pirate's Cannon (needs an activatable launcher tile), Steampunker solutions and Clentaminator (no conversion
   spray), sentry staves and Defender armour (no sentries yet), the Stylist's hair dyes.
+* **Shops III** (P5-17): the Zoologist's stock grows with the bestiary (`bestiary {min}`: Leather Whip at 10%, Critter
+  Shampoo at 30%, Fairy Glowstick, a floating light, at 45%; the pet licenses wait for P5-20). The Golfer sells four
+  clubs (swung; each knocks a Golf Ball, ammo class `golf_ball`, off along the aim at its own speed: driver fastest,
+  putter slowest), the bouncing `golf_ball_shot` (6 bounces, light damage), Golf Cup and Tee decor and the golf
+  outfit. Golf scoring is not modelled.

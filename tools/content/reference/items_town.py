@@ -58,5 +58,17 @@ star_topper|Star Topper|hardmode|santa claus
 princess_hat|Princess Hat|early|princess
 princess_dress|Princess Dress|early|princess
 resplendent_dessert|Resplendent Dessert|early|princess
+golf_club_iron|Golf Club (Iron)|early|golfer
+golf_club_driver|Golf Club (Driver)|early|golfer
+golf_club_wedge|Golf Club (Wedge)|early|golfer
+golf_club_putter|Golf Club (Putter)|early|golfer
+golf_ball|Golf Ball|early|golfer
+golf_cup|Golf Cup|early|golfer
+golf_tee|Golf Tee|early|golfer
+golf_visor|Golf Visor|early|golfer
+golf_shirt|Golf Shirt|early|golfer
+golf_pants|Golf Pants|early|golfer
+fairy_glowstick|Fairy Glowstick|early|zoologist
+critter_shampoo|Critter Shampoo|early|zoologist
 """,
 }

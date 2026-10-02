@@ -136,7 +136,7 @@ public class ShopDataTests
     }
 
     /// <summary>Residents without goods in Terraria (or whose goods do not exist yet: the Stylist's hair dyes).</summary>
-    private static readonly string[] ServiceOnly = { "guide", "nurse", "old_man", "tax_collector", "stylist", "zoologist", "golfer" };
+    private static readonly string[] ServiceOnly = { "guide", "nurse", "old_man", "tax_collector", "stylist" };
 
     [Fact]
     public void EveryResidentExceptServiceOnlyOnesHasAShop()
@@ -170,5 +170,37 @@ public class ShopDataTests
         Assert.DoesNotContain("rocket_iii", day);
         g.World.Session.Clock.SetHour(22);
         Assert.Contains("rocket_iii", Stock(g, cyborg));
+    }
+
+    private sealed class FakeRecords : Strata.Core.Conditions.IPlayerRecords
+    {
+        public float BestiaryPercent { get; set; }
+        public int Kills(string enemy) => 0;
+        public bool Obtained(string item) => false;
+        public bool Achieved(string id) => false;
+    }
+
+    [Fact]
+    public void TheZoologistsStockGrowsWithTheBestiary()
+    {
+        using var g = Create();
+        var records = new FakeRecords { BestiaryPercent = 9 };
+        g.World.Town.PlayerRecords = _ => records;
+        var zoologist = Summon(g, "zoologist");
+        Assert.DoesNotContain("leather_whip", Stock(g, zoologist));
+        records.BestiaryPercent = 10;
+        Assert.Equal(new[] { "leather_whip" }, Stock(g, zoologist));
+        records.BestiaryPercent = 50;
+        Assert.Contains("fairy_glowstick", Stock(g, zoologist));
+        Assert.Contains("critter_shampoo", Stock(g, zoologist));
+    }
+
+    [Fact]
+    public void TheGolferSellsClubsBallsAndCourseObjects()
+    {
+        using var g = Create();
+        var stock = Stock(g, Summon(g, "golfer"));
+        foreach (var id in new[] { "golf_club_iron", "golf_club_driver", "golf_club_wedge", "golf_club_putter", "golf_ball", "golf_cup", "golf_tee" })
+            Assert.Contains(id, stock);
     }
 }
