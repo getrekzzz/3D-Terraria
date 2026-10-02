@@ -3,32 +3,32 @@ using Godot;
 using Strata.Core.Common;
 using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Session;
+using Strata.Game.Rendering;
 
 namespace Strata.Game.Entities;
 
 /// <summary>
-/// Mining feedback: a puff of dust in the block's colour on every pickaxe hit and a burst of chips when it breaks.
-/// Emitters are pooled one-shot CPU particles.
+/// Mining feedback: a puff of dust in the block's colour on every pickaxe hit and a burst of chips when it breaks, lit
+/// by the voxel light where they fly (EffectKit), with a lighter and darker spread of the block's colour.
 /// </summary>
 public sealed partial class BlockEffects : Node3D
 {
-    private readonly Queue<CpuParticles3D> _pool = new();
-    private StandardMaterial3D _material = null!;
-    private BoxMesh _chip = null!;
+    private EffectKit _kit = null!;
     private ulong _lastPlaceFrame = ulong.MaxValue;
 
-    public void Initialize(GameWorld game)
+    public void Initialize(GameWorld game, EffectKit kit)
     {
         Name = "BlockEffects";
-        _material = new StandardMaterial3D { VertexColorUseAsAlbedo = true, Roughness = 1f };
-        _chip = new BoxMesh { Size = Vector3.One * 0.07f, Material = _material };
+        _kit = kit;
         game.Editor.Struck += OnStruck;
+        game.Editor.ObjectHit += OnObjectHit;
+        game.Editor.ObjectBroken += obj => ObjectBurst(obj, broke: true);
         game.Editor.BlockPlaced += (cell, def) =>
         {
             // One puff per placement (a grid block reports each of its cells).
             if (Engine.GetProcessFrames() == _lastPlaceFrame) return;
             _lastPlaceFrame = Engine.GetProcessFrames();
-            Burst(CellCenter(cell), Color.FromHtml(def.Color), 6, 1.2f, 0.4);
+            _kit.Burst(EffectRecipe.Dust, CellCenter(cell), Color.FromHtml(def.Color), 6, 1.2f);
         };
     }
 
@@ -46,50 +46,39 @@ public sealed partial class BlockEffects : Node3D
         center /= n;
         var color = Color.FromHtml(outcome.Material!.Color);
         bool broke = outcome.Broken.Count > 0;
-        Burst(center, color, broke ? 22 : outcome.TooHard.Count > 0 && outcome.Damaged.Count == 0 ? 3 : 7, broke ? 3.2f : 1.8f, broke ? 0.9 : 0.5);
+        bool tink = !broke && outcome.TooHard.Count > 0 && outcome.Damaged.Count == 0;
+        if (tink)
+        {
+            _kit.Burst(EffectRecipe.Sparks, center, new Color(1f, 0.85f, 0.5f), 5, 3f);
+            return;
+        }
+        _kit.Burst(EffectRecipe.Chips, center, color, broke ? 22 : 7, broke ? 3.2f : 1.8f);
+        _kit.Burst(EffectRecipe.Dust, center, color.Lightened(0.15f), broke ? 10 : 4, 1.2f);
+    }
+
+    private void OnObjectHit(Strata.Core.Voxels.TileObjects.TileObjectInstance obj, ObjectHitResult result)
+    {
+        if (result == ObjectHitResult.Damaged) ObjectBurst(obj, broke: false);
+    }
+
+    /// <summary>Chips from an object struck (5) or broken (20) in its dust colour; trees also shed leaves (8, 30).</summary>
+    private void ObjectBurst(Strata.Core.Voxels.TileObjects.TileObjectInstance obj, bool broke)
+    {
+        var b = obj.Bounds;
+        var def = obj.Def;
+        float height = def.Topple ? Mathf.Min(b.Max.Y - b.Min.Y, 6) : (b.Max.Y - b.Min.Y) * 0.5f;
+        var center = new Vector3((b.Min.X + b.Max.X) * 0.5f, b.Min.Y + height * 0.5f, (b.Min.Z + b.Max.Z) * 0.5f) * Units.CellSize;
+        var dust = Color.FromHtml(def.DustColor ?? (def.HitSound == "stone" ? "#7a7a80" : "#8a6040"));
+        _kit.Burst(EffectRecipe.Chips, center, dust, broke ? 20 : 5, broke ? 3f : 2f);
+        if (def.Leaves == null) return;
+        var canopy = new Vector3(center.X, (b.Max.Y - 2) * Units.CellSize, center.Z);
+        _kit.Burst(EffectRecipe.Leaves, canopy, Color.FromHtml(def.Leaves), broke ? 30 : 8, 1.5f);
     }
 
     private static IEnumerable<Int3> DamagedCells(MineOutcome o)
     {
         foreach (var (c, _) in o.Damaged) yield return c;
         foreach (var c in o.TooHard) yield return c;
-    }
-
-    private void Burst(Vector3 at, Color color, int amount, float speed, double life)
-    {
-        var p = _pool.Count > 0 ? _pool.Dequeue() : Create();
-        p.GlobalPosition = at;
-        p.Amount = amount;
-        p.Lifetime = life;
-        p.InitialVelocityMin = speed * 0.4f;
-        p.InitialVelocityMax = speed;
-        p.Color = color.Darkened(0.1f);
-        p.Restart();
-        p.Emitting = true;
-    }
-
-    private CpuParticles3D Create()
-    {
-        var p = new CpuParticles3D
-        {
-            Emitting = false,
-            OneShot = true,
-            Explosiveness = 0.9f,
-            Direction = Vector3.Up,
-            Spread = 75f,
-            Gravity = new Vector3(0, -12f, 0),
-            ScaleAmountMin = 0.5f,
-            ScaleAmountMax = 1.3f,
-            AngularVelocityMin = -360f,
-            AngularVelocityMax = 360f,
-            EmissionShape = CpuParticles3D.EmissionShapeEnum.Box,
-            EmissionBoxExtents = Vector3.One * 0.25f,
-            Mesh = _chip,
-            CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
-        };
-        AddChild(p);
-        p.Finished += () => _pool.Enqueue(p);
-        return p;
     }
 
     private static Vector3 CellCenter(Int3 c) => (new Vector3(c.X, c.Y, c.Z) + Vector3.One * 0.5f) * Units.CellSize;

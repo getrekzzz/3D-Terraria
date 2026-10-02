@@ -216,7 +216,7 @@ public class CharacterTests
         Assert.Equal("copper_pickaxe", inv.Backpack[0].Item!.Id);
         Assert.Equal(99, inv.Backpack[49].Count);
         Assert.Equal("wood_helmet", inv.Armor[0].Item!.Id);
-        Assert.Equal("sturdy", inv.Accessories[4].Prefix!.Id);
+        Assert.Equal("guarding", inv.Accessories[4].Prefix!.Id); // the old invented id maps through the aliases
         Assert.Equal(2, inv.SelectedHotbar);
         Assert.Equal(120, state.Vitals.Life);
         Assert.True(state.Defense > 0);

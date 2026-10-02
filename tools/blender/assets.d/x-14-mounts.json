@@ -1,0 +1,9 @@
+{
+ "comment": "X-14 mounts: the summoning items (the mounts themselves ride existing creature models, scaled).",
+ "items": {"explicit": {
+  "slimy_saddle": {"generator": "slimy_saddle", "params": {}},
+  "fuzzy_carrot": {"generator": "fuzzy_carrot", "params": {}},
+  "honeyed_goggles": {"generator": "honeyed_goggles", "params": {}},
+  "cosmic_car_key": {"generator": "cosmic_car_key", "params": {}}
+ }}
+}

@@ -38,8 +38,7 @@ public sealed partial class WorldSession : IDisposable
                 ? (plan.ColumnTop[plan.ColumnIndex(cx, cz)] - 1) >> ChunkMath.Shift
                 : plan.Bands.SeaLevel >> ChunkMath.Shift);
         Flags = new HashSet<string>(meta.Flags, StringComparer.Ordinal);
-        var wires = meta.Wires ?? new();
-        for (int i = 0; i + 2 < wires.Count; i += 3) Wires.Add(new Int3(wires[i], wires[i + 1], wires[i + 2]));
+        Wires.Load(meta, content);
         Counters = new Dictionary<string, int>(meta.Counters ?? new(), StringComparer.Ordinal);
         Mutations = new WorldGen.Mutations.MutationLog(Generator, content, Settings);
         Mutations.Load(meta, log);
@@ -75,7 +74,10 @@ public sealed partial class WorldSession : IDisposable
     public HashSet<string> Flags { get; }
 
     /// <summary>Cells carrying red wire (see <see cref="Gameplay.Wiring.WireSystem"/>).</summary>
-    public HashSet<Int3> Wires { get; } = new();
+    public Gameplay.Wiring.WireGrid Wires { get; } = new();
+
+    /// <summary>The seasonal event by date (Halloween, Christmas), the player's setting and any console override.</summary>
+    public Gameplay.Seasons.SeasonState Seasons { get; } = new();
 
     /// <summary>World tallies kept across saves (orbs smashed, altars smashed).</summary>
     public Dictionary<string, int> Counters { get; }
@@ -85,6 +87,9 @@ public sealed partial class WorldSession : IDisposable
 
     /// <summary>Ids of running world events (maintained by the event director).</summary>
     public HashSet<string> Events { get; }
+
+    /// <summary>The world's weather (scheduled by the weather system, saved in world.json).</summary>
+    public Gameplay.Weather.WeatherState Weather { get; } = new();
 
     /// <summary>Kills counted by each active event (kept by the event director).</summary>
     public Dictionary<string, int> EventKills { get; } = new(StringComparer.Ordinal);
@@ -101,6 +106,7 @@ public sealed partial class WorldSession : IDisposable
             Size = settings.Size,
             Difficulty = settings.Difficulty,
             Evil = settings.Evil,
+            Secrets = settings.Secret == SecretSeed.None ? null : SecretSeeds.Ids(settings.Secret),
             GeneratorVersion = GenVersion.Current,
             CreatedUtc = DateTime.UtcNow,
             LastPlayedUtc = DateTime.UtcNow,
@@ -110,7 +116,7 @@ public sealed partial class WorldSession : IDisposable
         var spawn = session.Generator.Plan.Spawn;
         meta.Spawn = new[] { spawn.X, spawn.Y, spawn.Z };
         meta.PlanHash = session.Generator.Plan.Hash;
-        session.Wires.UnionWith(session.Generator.Plan.PlannedWires); // new worlds only: a loaded world keeps its own
+        foreach (var cell in session.Generator.Plan.PlannedWires) session.Wires.Add(cell, Gameplay.Wiring.WireColor.Red); // new worlds only: a loaded world keeps its own
         session.SaveMetaOnly();
         return session;
     }

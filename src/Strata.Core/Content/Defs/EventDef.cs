@@ -10,6 +10,9 @@ public enum EventPhase
 
     /// <summary>Only started explicitly (items, commands, progression triggers).</summary>
     Manual,
+
+    /// <summary>Mirrors the weather: started and stopped by the weather system (rain, thunderstorm, windy day, sandstorm).</summary>
+    Weather,
 }
 
 /// <summary>

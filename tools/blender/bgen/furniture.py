@@ -158,6 +158,53 @@ def chest(mb: MeshBuilder, p, rng):
     mb.bevel_box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"), lt, radius=edge)
 
 
+def piggy_bank(mb: MeshBuilder, p, rng):
+    """A pink ceramic pig (snout to +X) with a coin slot on its back; low-poly to sit among the furniture."""
+    w, h, d = p["size"]
+    pink, dark = "#f2a0b4", "#3a2028"
+    body_l, body_r = min(w * 0.62, 0.62), min(h * 0.42, d * 0.42, 0.22)
+    cz = body_r + 0.06
+    mb.sphere((0, 0, cz), body_r, "prop:plain", pink, subdivisions=2, scale=(body_l / (2 * body_r), 1, 0.95))
+    nose_x = body_l / 2 - 0.01
+    mb.cylinder((nose_x, 0, cz), (nose_x + 0.07, 0, cz), body_r * 0.38, body_r * 0.36, "prop:plain", "#e88aa0", segments=8)
+    for y in (-0.025, 0.025):
+        mb.sphere((nose_x + 0.072, y, cz), 0.014, "prop:plain", dark, subdivisions=1, scale=(0.4, 1, 1.3))
+    for y in (-body_r * 0.45, body_r * 0.45):
+        mb.sphere((nose_x - 0.06, y, cz + body_r * 0.42), 0.022, "prop:plain", dark, subdivisions=1)  # eyes
+        ear = [(-0.03, 0), (0.03, 0), (0.0, 0.07)]  # upright, facing the snout
+        mb.extrude_polygon(ear, 0.015, "prop:plain", pink,
+                           matrix=Matrix.Translation((nose_x - 0.16, y, cz + body_r * 0.72)) @ Matrix.Rotation(math.pi / 2, 4, "Z"))
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            x, y = sx * body_l * 0.27, sy * body_r * 0.5
+            mb.cylinder((x, y, 0), (x, y, cz - body_r * 0.6), 0.04, 0.045, "prop:plain", pink, segments=6)
+    mb.box((-0.06, -0.008, cz + body_r * 0.9), (0.06, 0.008, cz + body_r * 1.0), "prop:plain", dark)  # coin slot
+    mb.tube([(-body_l / 2, 0, cz + 0.02), (-body_l / 2 - 0.05, 0, cz + 0.05), (-body_l / 2 - 0.04, 0, cz + 0.09)], [0.012, 0.01, 0.008],
+            "prop:plain", pink, segments=4)
+
+
+def safe(mb: MeshBuilder, p, rng):
+    """A squat steel box with a round combination dial and a lever handle on its door (front +Y)."""
+    w, h, d = p["size"]
+    steel, trim = "prop:iron:metal", "prop:dark_iron"
+    bw, bh, bd = w * 0.84, h * 0.82, d * 0.72
+    mb.box((-bw / 2, -bd / 2, 0.06), (bw / 2, bd / 2, 0.06 + bh), steel, "#5c636c")
+    for sx in (-1, 1):  # feet
+        for sy in (-1, 1):
+            mb.box((sx * bw * 0.4 - 0.05, sy * bd * 0.4 - 0.05, 0), (sx * bw * 0.4 + 0.05, sy * bd * 0.4 + 0.05, 0.06), trim)
+    door_y = bd / 2
+    mb.box((-bw * 0.42, door_y, 0.06 + bh * 0.08), (bw * 0.42, door_y + 0.03, 0.06 + bh * 0.92), steel, "#6c747e")
+    for x in (-bw * 0.42, bw * 0.42 - 0.03):  # hinges and jamb
+        mb.box((x, door_y + 0.03, 0.06 + bh * 0.08), (x + 0.03, door_y + 0.05, 0.06 + bh * 0.92), trim)
+    cz = 0.06 + bh * 0.62
+    mb.cylinder((0, door_y + 0.03, cz), (0, door_y + 0.07, cz), 0.13, 0.12, "prop:gold", segments=16)  # dial
+    mb.cylinder((0, door_y + 0.07, cz), (0, door_y + 0.1, cz), 0.05, 0.04, trim, segments=8)
+    mb.box((-0.008, door_y + 0.07, cz + 0.08), (0.008, door_y + 0.075, cz + 0.115), trim)  # dial mark
+    hz = 0.06 + bh * 0.3
+    mb.cylinder((0, door_y + 0.03, hz), (0, door_y + 0.1, hz), 0.035, None, trim, segments=8)  # handle hub
+    mb.box((-0.03, door_y + 0.08, hz - 0.012), (0.2, door_y + 0.11, hz + 0.012), "prop:iron:metal", "#a0a4ac")
+
+
 def torch(mb: MeshBuilder, p, rng):
     # Stick, cloth wrap and a charred head with a glowing ember core; the flame itself is drawn live by the game
     # (shaders/flame.gdshader, placed by the object's "flame" data).
@@ -198,5 +245,5 @@ def rail(mb: MeshBuilder, p, rng):
 GENERATORS = {
     "table": table, "workbench": workbench, "furnace": furnace, "anvil": anvil, "sawmill": sawmill, "loom": loom,
     "bottle": bottle, "chair": chair, "door": door, "chest": chest, "torch": torch, "candle": candle, "bed": bed,
-    "rail": rail,
+    "rail": rail, "piggy_bank": piggy_bank, "safe": safe,
 }

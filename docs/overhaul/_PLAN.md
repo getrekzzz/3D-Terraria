@@ -148,6 +148,32 @@ Sources:
   silhouettes, P3-41a/b + P3-42 visible armour, P3-43/44/45/50 creature models, P4-35..38). Script:
   `/root/.claude/plans/overhaul-specs/_wave_lean.js`.
 
+## Parallel sessions (player asked for more speed without lower quality, 2026-10-01)
+Slices, branches and rules: `docs/overhaul/PARALLEL.md` (pushed, commit 508ff3b).
+- **Bosses + Dungeon** (W7–W9, plus P4-29 and P4-38): session_01UZumEtLLjARMvU5vJPAkgE on `claude/ovh-bosses`.
+- **Art** (P3-05 first, P3-37, P3-37b ores, P2-24, P5-28, W12): session_01JsSQnzkocPjTeHJVzDc1gE on `claude/ovh-art`.
+- **NPCs + Guide book** (W10–W11): a third session, created after the W4 UI push.
+
+- **World & life** (X-01, X-08, X-06, X-13, X-15, X-14, X-03, X-07): session_01Hhweod2WDaG1QE1rou5pQY on `claude/ovh-world`.
+
+AAA additions X-01..X-17 (specs in `docs/overhaul/specs/X-*.json`, owners in PARALLEL.md). This session adds X-02 boss intros (after W4), X-16 ragdolls (after P3-20), X-12 photo mode/accessibility, and X-04 gamepad (last). Co-op multiplayer is not in scope unless the player asks.
+
+This session runs W1b → W3 → W4 → W5/W6 (merge `origin/claude/ovh-art` before P3-06) → W2. It then merges every branch with full CI and pushes.
+
+## Never stall again (2026-10-01)
+* **Root cause of the ~9.5 h stall** (11:00 → 20:35 UTC):
+  - The cloud kept this session's permission mode as "plan" from its first turn, even after plan mode was exited locally.
+  - When the container restarted at ~11:00, the session came back in plan mode and stopped at a plan-approval prompt until the player returned.
+  - The player re-saved the mode as Auto; the server record now reads `auto`.
+* **Watchdog**: trigger `trig_018u3n44soKiE37wQbq7KBKx` fires hourly (minute 4). Each run it:
+  - relaunches interrupted waves from committed lane state;
+  - nudges idle sub-sessions;
+  - never waits for approval;
+  - stays silent while all is well.
+  
+  Delete it when the overhaul is fully merged.
+* Lean wave script: `/root/.claude/projects/-home-user-3D-Terraria/dc0e60bf-573e-514c-9491-842b6315cce6/workflows/scripts/overhaul-wave-lean-wf_08d16710-07f.js`.
+
 ## Recovery after the 2nd container restart (W1b interrupted, 2026-10-01)
 State on disk (toolchain, worktrees, specs and journals all survived):
 - `ovh/laneA` @ da9dc16: P1-06 is committed and reported done. Its review was interrupted, leaving untracked `game/Debug/TmpFacingProbe.cs` and `game/Testing/Scripts/tmpfacing.cmds`.
@@ -246,3 +272,10 @@ Reuse:
 * Lavapipe cannot run ultra at real speed, so visual thresholds are relative and GPU frame times on the player's machine are unmeasured. Performance counters are deterministic stand-ins.
 * The 22 MB animation GLB rebuilds bloat the history; only two rebuilds are allowed.
 * A merge conflict in a hub file is caught by the gate integrator; a WP that fails review is re-run rather than pushed.
+
+## W4 amendments (2026-10-02, after the Bosses + Dungeon slice merged into the integration branch at be46b873)
+* **P2-15, P2-16, P2-13, P2-14, P2-21, P2-22, P2-23, P2-25, P2-29, P2-26, P2-27, P2-28, P2-18, P2-17, P2-30, P2-31** (every W4 WP that has not started yet): BEFORE coding, check `git merge-base --is-ancestor be46b873 HEAD` in your lane dir; if it fails, run `git merge --no-edit claude/clever-goodall-kgex45` (it brings in the Bosses slice: boss framework, Skeletron, the Dungeon, NpcSystem.Messaged, BossInfo/GroupLife). Resolve conflicts keeping both sides (UI files: keep the W4 lane's version and re-apply the Bosses side's small additions), build + Core tests, commit "Wave W4: merge integration (Bosses slice)" with the attribution lines.
+* **P2-21** chat log: consume `NpcSystem.Messaged` with `MessageKind` + `MessageColors` (boss awoken/defeated purple, invasion, resident arrival/death, etc.) and REPLACE the Hud's fixed-colour `npcs.Announced` path (`Hud.cs` ~157) so every announcement shows once, coloured, in the chat log.
+* **P2-23** boss bar: sum life with `NpcSystem.GroupLife(BossInfo)` and include parts flagged `InBossBar` (Skeletron's hands, Prime's arms, Golem parts, worm segments) — one bar per boss group with the P2-24 head icon; a defeated part drops out. Keep small floating bars over non-boss parts (Terraria behaviour).
+* **P2-22 / P2-10 tooltips**: Expert items use rarity -12 (rainbow); pickup popups and tooltips must animate it each frame (not freeze one colour); Master rarity -13 (fiery red/orange) likewise if present.
+* **P2-16** accessory slots, Terraria-accurate: Normal/Journey 5; Expert 5 (+1 when the Demon Heart was consumed: `PlayerState.ExtraAccessorySlot`); Master 6 (+1 with the heart). Change `GameWorld.AccessorySlotsFor(Difficulty)` to also take the heart flag, recompute `Inventory.AccessorySlotsUnlocked` right after the heart is consumed (`ItemUseSystem.Consume.cs`), keep items in a slot that becomes locked (they stay, greyed, and can be taken out — never deleted), Core test for all 3 difficulties × heart.

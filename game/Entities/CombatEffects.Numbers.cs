@@ -35,6 +35,9 @@ public sealed partial class CombatEffects
     private const float EyeAhead = 1.2f;
 
     private const float EyeUp = 0.3f;
+
+    /// <summary>Damage-over-time ticks show at this share of the normal size.</summary>
+    private const float PeriodicScale = 0.75f;
     private const float EyeRise = 0.4f;
 
     private static readonly Color NumberOutlineColor = new(0f, 0f, 0f, 0.85f);
@@ -101,8 +104,9 @@ public sealed partial class CombatEffects
     private void OnDamaged(DamageEvent e)
     {
         var kind = CombatText.KindOf(e.Crit, e.ToPlayer);
-        if (e.Player != null && InFirstPerson(e.Player)) ShowNumber(InFrontOfEye(), e.Amount, kind, scatter: false, rise: EyeRise);
-        else ShowNumber(ToGodot(e.Position), e.Amount, kind, scatter: true);
+        float scale = e.Kind == DamageKind.Periodic ? PeriodicScale : 1f; // burning, poison: smaller ticks
+        if (e.Player != null && InFirstPerson(e.Player)) ShowNumber(InFrontOfEye(), e.Amount, kind, scatter: false, rise: EyeRise, scale: scale);
+        else ShowNumber(ToGodot(e.Position), e.Amount, kind, scatter: true, scale: scale);
     }
 
     private void OnHealed(PlayerEntity p, int amount, bool mana)
@@ -120,7 +124,7 @@ public sealed partial class CombatEffects
         return camera.Origin - camera.Basis.Z * EyeAhead + new Vector3(0, EyeUp, 0);
     }
 
-    private void ShowNumber(Vector3 at, int amount, CombatTextKind kind, bool scatter, float rise = 1f)
+    private void ShowNumber(Vector3 at, int amount, CombatTextKind kind, bool scatter, float rise = 1f, float scale = 1f)
     {
         if (!Settings.UserSettings.Current.DamageNumbers) return;
         if (scatter) at += new Vector3((float)GD.RandRange(-NumberScatter, NumberScatter), 0, (float)GD.RandRange(-NumberScatter, NumberScatter));
@@ -130,7 +134,7 @@ public sealed partial class CombatEffects
         number.Start = at;
         number.Color = Color.Color8(rgb.R, rgb.G, rgb.B);
         number.Age = 0f;
-        number.Size = CombatText.Scale(kind);
+        number.Size = CombatText.Scale(kind) * scale;
         number.Rise = rise;
         number.Heal = kind is CombatTextKind.HealLife or CombatTextKind.HealMana;
         number.Label.Text = CombatText.Text(amount, kind);

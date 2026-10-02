@@ -39,6 +39,8 @@ internal static class StandardProbes
         ctx.AddProbe("npcs.count", () => w.Npcs.All.Count);
         ctx.AddProbe("npcs.alive_life", () => w.Npcs.All.Sum(n => n.Life));
         ctx.AddProbe("projectiles.count", () => w.Projectiles.All.Count);
+        ctx.AddProbe("pets.active", () => w.Projectiles.PetCount(lights: false));
+        ctx.AddProbe("pets.lights", () => w.Projectiles.PetCount(lights: true));
         ctx.AddProbe("melee.swings", () => w.Melee.ActiveSwings);
         ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
         ctx.AddProbe("house.valid", () => w.Rooms.Get(ctx.Player.FeetCell + Int3.Up)!.Valid ? 1 : 0);
@@ -65,8 +67,6 @@ internal static class StandardProbes
             : null);
         ctx.AddPrefixProbe("event.", id => w.Session.Content.Events.Contains(id) ? (w.Events.IsActive(id) ? 1 : 0) : null);
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
-        ctx.AddPrefixProbe("season.", id => Array.IndexOf(Conditions.SeasonConditionParams.Values, id) < 0 ? (double?)null
-            : (w.Session.Season.Length == 0 ? "none" : w.Session.Season) == id ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);
         // zone.<biome>: 1 while the player stands in a zone (the crypt, spider nests…).
         ctx.AddPrefixProbe("zone.", id => w.Session.Content.Biomes.Contains(id) ? (w.Session.ContextAt(ctx.Player.FeetCell).Biomes.Contains(id) ? 1 : 0) : null);

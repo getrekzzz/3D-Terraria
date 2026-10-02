@@ -1,10 +1,11 @@
+using Strata.Core.Content.Defs;
 using Strata.Core.Content.Specs;
 
 namespace Strata.Core.Content.Validation;
 
 public static partial class ContentValidator
 {
-    private static readonly HashSet<string> PrefixGroups = new() { "melee", "ranged", "magic", "summon", "tool", "accessory", "universal" };
+    private static readonly HashSet<string> PrefixGroups = new() { "universal", "common", "melee", "ranged", "magic", "accessory" };
 
     private static void ValidateProjectilesAndBuffs(Ctx ctx)
     {
@@ -31,7 +32,22 @@ public static partial class ContentValidator
             if (p.Minion is { Shoot: { } shot } && !ctx.Db.Projectiles.Contains(shot)) ctx.Error(p, $"minion shoots unknown projectile '{shot}'.");
             if (p.Minion is { Speed: < 0 } or { Range: <= 0 }) ctx.Error(p, "minion speed must be >= 0 (0 = a sentry) and range > 0.");
             if (p.Minion is { Speed: 0, Shoot: null }) ctx.Error(p, "a sentry (minion speed 0) needs something to shoot.");
+            if (p.Pet is { } pet)
+            {
+                if (p.Friendly || p.Contact || p.Hostile) ctx.Error(p, "pets are harmless: set friendly and contact to false.");
+                if (p.Minion != null) ctx.Error(p, "a projectile cannot be both a pet and a minion.");
+                if (pet.Speed <= 0 || pet.Follow < 0 || pet.Hover < 0) ctx.Error(p, "pet speed must be > 0, follow and hover >= 0.");
+            }
             if (p.Fuse && !p.OnHit.Any(h => h.Type == Specs.ProjectileHitSpecs.Explode)) ctx.Warn(p, "fuse without an explode effect does nothing.");
+        }
+        // Pet and light-pet items summon a pet projectile from their misc slot.
+        foreach (var i in ctx.Db.Items.All)
+        {
+            if (i.EquipSlot is not (EquipSlot.Pet or EquipSlot.LightPet)) continue;
+            if (i.Projectile == null || !ctx.Db.Projectiles.TryGet(i.Projectile, out var pet) || pet.Pet == null)
+                ctx.Error(i, "pet items need a projectile with 'pet' movement.");
+            else if (i.EquipSlot == EquipSlot.LightPet && pet.Light is not { Length: 3 })
+                ctx.Error(i, $"light pet '{pet.Id}' needs a light.");
         }
         foreach (var b in ctx.Db.Buffs.All)
         {

@@ -46,17 +46,6 @@ public sealed class RescuedConditionParams : SpecParams
     public string Id { get; init; } = "";
 }
 
-/// <summary>The calendar season: "christmas", "halloween" or "none".</summary>
-public sealed class SeasonConditionParams : SpecParams, IValidatableSpec
-{
-    public const string None = "none";
-    public static readonly string[] Values = { "christmas", "halloween", None };
-
-    public string Is { get; init; } = None;
-
-    public string? Validate() => Array.IndexOf(Values, Is) < 0 ? $"season must be one of {string.Join(", ", Values)}" : null;
-}
-
 /// <summary>Players have killed at least <see cref="Min"/> of an enemy (journal).</summary>
 public sealed class KilledConditionParams : SpecParams
 {

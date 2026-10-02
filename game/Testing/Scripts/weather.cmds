@@ -1,0 +1,53 @@
+# Weather: rain, storms, snow and sandstorms start their events and conditions, the camera's particles stay within the
+# graphics preset's budget, the ground gets wet, and the sky clears again. Ambience: beds play on the surface; in a
+# cavern no rain falls (even while it rains above), the cave beds play and world sounds get the cave reverb.
+wait_until player.frozen == 0 180
+spawning off
+time 12
+weather rain
+assert weather.kind == 1
+assert event.rain == 1
+assert weather.intensity > 0.3
+wait 1.5
+assert weather.particles > 0
+assert weather.particles <= weather.budget
+assert weather.wetness > 0
+weather storm
+assert weather.kind == 2
+assert event.thunderstorm == 1
+assert weather.wind >= 0
+weather snow
+assert weather.local == 3
+weather blizzard
+assert weather.local == 4
+wait 1
+assert weather.particles <= weather.budget
+weather sandstorm
+assert weather.local == 5
+assert event.sandstorm == 1
+assert weather.windy == 1
+weather clear
+assert weather.kind == 0
+assert event.rain == 0
+assert event.thunderstorm == 0
+assert event.sandstorm == 0
+weather windy
+assert weather.windy == 1
+assert event.windy_day == 1
+weather calm
+assert weather.windy == 0
+wait 1.5
+assert ambience.loops >= 1
+weather rain
+tp cave cavern
+wait_until player.frozen == 0 300
+wait_until stream.idle == 1 300
+wait 4
+assert weather.local == 0
+assert weather.particles == 0
+assert ambience.loops >= 1
+assert audio.reverb > 0.05
+assert audio.muffle < 5000
+probe ambience.particles
+weather clear
+assert errors == 0

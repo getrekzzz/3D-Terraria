@@ -9,24 +9,6 @@ public static class WorldCommands
     {
         r.Register(new CommandDef
         {
-            Name = "season", Usage = "season <auto|none|christmas|halloween>",
-            Help = "Forces the world's season (Santa, seasonal stock) or returns it to the real date.",
-            Run = (ctx, a) =>
-            {
-                var meta = ctx.World.Session.Meta;
-                meta.ForcedSeason = a.Str(0, "season") switch
-                {
-                    "auto" => null,
-                    "none" => "",
-                    "christmas" or "halloween" => a.Str(0, "season"),
-                    var other => throw new CommandException($"unknown season '{other}'"),
-                };
-                var now = ctx.World.Session.Season;
-                return CommandResult.Success($"Season: {(now.Length == 0 ? "none" : now)}{(meta.ForcedSeason == null ? " (real date)" : "")}.");
-            },
-        });
-        r.Register(new CommandDef
-        {
             Name = "meteor", Usage = "meteor", Help = "Drops a meteorite now (a crater of meteorite ore) and reports where.",
             Run = (ctx, _) =>
             {

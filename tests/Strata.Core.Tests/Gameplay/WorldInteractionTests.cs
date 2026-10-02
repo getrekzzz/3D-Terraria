@@ -53,7 +53,7 @@ public class WorldInteractionTests
         Assert.Equal(70, t.Hit(c, 35, 50));
         Assert.Equal(35, t.Hit(c, 35, 500));
         var stone = TestPaths.Content.Blocks.Get("stone");
-        Assert.Equal(150f, MiningRules.Health(stone));
+        Assert.Equal(100f, MiningRules.Health(stone));
         Assert.False(MiningRules.CanMine(TestPaths.Content.Blocks.Get("obsidian"), 35));
         Assert.True(MiningRules.CanMine(TestPaths.Content.Blocks.Get("obsidian"), 55));
     }

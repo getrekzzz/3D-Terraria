@@ -1,0 +1,49 @@
+# World & life tour (rendered): a Christmas town (residents in Santa hats, a tree and lanterns), then the same town at
+# Halloween at night, then a wired actuator wall and teleporter pads seen through the wire view.
+#   godot --path . --rendering-driver vulkan -- --world=life --size=tiny --new --player=tour --fresh-player \
+#         --view=3 --shots=/tmp/shots --smoke=res://game/Testing/Tours/world_life.cmds
+wait_until player.frozen == 0 300
+spawning off
+town arrivals off
+god on
+time 11
+tp spawn
+wait_until player.frozen == 0 300
+fill -8 -1 -2 8 -1 22 stone
+fill -8 0 -2 8 9 22 air
+town dismiss guide
+wait_until stream.idle == 1 900
+season christmas
+place christmas_tree 3 0 9
+place jack_o_lantern -5 0 7
+town summon guide -2 0 6
+town summon merchant 1 0 5
+town summon nurse 4 0 7
+town talk guide
+town talk merchant
+town talk nurse
+camera third
+aim 0 -0.15 1
+wait 2
+screenshot a_christmas
+wait_until screenshot.pending == 0 900
+season halloween
+time 21
+wait 2
+screenshot b_halloween
+wait_until screenshot.pending == 0 900
+time 12
+fill 3 0 -3 3 2 -1 stone
+wire 3 0 -3 3 2 -1 actuator
+place lever 0 0 -3
+wire 0 -1 -3 3 -1 -3 yellow
+wire 3 0 -3 3 2 -3 yellow
+place teleporter -6 0 1
+place teleporter 5 0 1
+wire -5 0 2 6 0 2 red
+give red_wrench
+wield red_wrench
+aim 0 -0.3 -1
+wait 2
+screenshot c_wiring
+wait_until screenshot.pending == 0 900

@@ -93,6 +93,12 @@ switch|Switch|prehardmode|mechanic
 red_pressure_plate|Red Pressure Plate|prehardmode|mechanic
 dart_trap|Dart Trap|early|world
 """,
+    "mount": """
+slimy_saddle|Slimy Saddle|prehardmode|king slime
+fuzzy_carrot|Fuzzy Carrot|prehardmode|goodie bag
+honeyed_goggles|Honeyed Goggles|prehardmode|queen bee
+cosmic_car_key|Cosmic Car Key|hardmode|martian saucer
+""",
     "furniture": """
 firefly_in_a_bottle|Firefly in a Bottle|early|craft
 blue_dungeon_door|Blue Dungeon Door|prehardmode|dungeon
@@ -171,5 +177,15 @@ black_paint|Black Paint|early|painter
 white_paint|White Paint|early|painter
 gray_paint|Gray Paint|early|painter
 brown_paint|Brown Paint|early|painter
+""",
+    "pet": """
+shadow_orb_light_pet|Shadow Orb (light pet)|early|shadow orb
+crimson_heart_light_pet|Crimson Heart (light pet)|early|crimson heart
+fairy_bell|Fairy Bell|early|gold chest
+magic_lantern|Magic Lantern|early|skeleton merchant
+wisp_in_a_bottle|Wisp in a Bottle|post-plantera|dungeon spirit
+fish|Fish|early|fishing
+zephyr_fish|Zephyr Fish|early|fishing
+strange_glowing_mushroom|Strange Glowing Mushroom|hardmode|truffle
 """,
 }

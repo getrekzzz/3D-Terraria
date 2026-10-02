@@ -302,6 +302,75 @@
   residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.
+* **Weather** — `WeatherSystem` (`Gameplay/Weather`) rolls once per in-game hour from the world seed and the hour
+  (deterministic, independent of frame timing): rain spells (a share are thunderstorms), windy days at the roll hour,
+  sandstorms on windy days, and the hour's wind; intensity and wind ease every tick. `WeatherState` lives on the session
+  (saved as `WorldMeta.Weather`); `LocalAt(biomes, layer)` turns it into the weather of a place (snow and blizzards over
+  snow biomes, sandstorms over sand biomes, nothing underground or in space), exposed as `ConditionContext.Weather` /
+  `Windy` and the `weather` condition. The `rain`, `thunderstorm`, `windy_day` and `sandstorm` events (phase `weather`)
+  start and stop with it, so announcements and `{ "type": "event" }` spawn rules follow. Tuning and presentation
+  budgets in `data/config/weather.json`; `weather` command and `weather.*` probes.
+* **Fishing** — rods (`fishing` behaviour: `power`, `lava` for the Hotline hook) cast a bobber that floats on water,
+  honey and (with a `lava` rod or the `lavaFishing` stat of the Lavaproof Fishing Hook) lava; without that gear lava
+  burns the line. Casting needs bait (`bait` behaviour with Terraria's bait power; worms, fireflies, butterflies and
+  frogs from the Bug Net are bait too). `Fishing.FishingPower` is the pure math: (rod + bait + `fishingPower` stat) ×
+  rain/storm (world-wide) × dawn/dusk/midday hours × moon phase × events (Blood Moon), scaled by the bobber's pool
+  (6-neighbour flood fill once when it lands, capped at `fullPoolCells`; below `minPoolCells` nothing bites); bait is
+  used up per catch with chance 1 / (1 + power/6 + `baitSaving`). `ProjectileSystem.Fishing` times bites by power and
+  on reeling rolls a rarity tier (uncommon … legendary, chance 1 / max(floor, odds/power)), then lands today's Angler
+  quest fish (`fishing_quest`, `anglerQuest` condition; only while a living Angler wants it), a crate (`crateChance`
+  + the Crate Potion's `crateChance` stat) or a catch; each table is tried as `<table>_<tier>` falling back to commoner
+  tiers. Tables: `data/loot/fishing.json` (water/honey via `fishingLiquid`, lava, crates), crate contents in
+  `data/loot/crates.json` (biome crates need their biome), tuning in `data/config/fishing.json`. Command `fishing`
+  (`bite`, `bait always|normal`), probes `fishing.bobber|power|pool|catches`; smoke `fishing.cmds`.
+* **Wiring** — `Wiring.WireGrid` (in `WorldSession.Wires`) keeps a bit per wire colour (red, blue, green, yellow) and an
+  actuator bit per cell, plus the blocks actuators have switched off; world.json keeps red in `wires` (older saves load
+  unchanged) and the rest in `wiresBlue|Green|Yellow`, `actuators`, `inactiveBlocks`. `WireSystem.Signal` walks each
+  colour separately from wire inside or face-sharing the trigger (reused scratch collections, at most 4096 cells per
+  colour) and activates what it reaches: doors, lights, dart traps, actuators (toggles gathered per chain and applied in
+  one edit; a switched-off block is air, remembered with shape and paint, and drops as an item if something was built in
+  its place), timers (`timer` ticks; switched by hand or signal, fired from `WireSystem.Tick` over the placed timers
+  only), teleporter pads (the first two on a colour swap their occupants; `Teleported` moves the player's body),
+  statues (`statue`: creature or item with per-statue cap, radius and cooldown, at most 10 statue creatures world-wide;
+  `Npc.FromStatue` drops nothing) and logic lamps; a gate (`logicGate`) re-reads its lamp stack and, when its output
+  changes, fires its own wires (not those through its lamps) once per chain, at most 256 chained signals. Wrenches lay
+  their `color`, the Actuator places itself, the Wire Cutter removes everything in the cell. `game/Rendering/WireOverlay`
+  draws the wire view per colour (pooled MultiMeshes, rebuilt on change or after 8 cells of movement). Command
+  `wire … [colour|actuator|cut]`, probes `wires.<colour>|actuators|inactive|teleports|statue_npcs`.
+* **Seasons** — `Seasons.SeasonState` (`WorldSession.Seasons`) names the seasonal event running: Halloween (Oct 10 –
+  Nov 1) or Christmas (Dec 15 – 31) from inclusive date windows in `data/config/seasons.json`, read through an
+  injectable `Clock` (tests pin it; `TestGame` uses a date outside every season) and rechecked every `recheckSeconds`;
+  the player's "Seasonal events" setting (`UserSettings.SeasonalEvents`, Settings > Gameplay) switches it off, and the
+  `season halloween|christmas|off|auto` command forces it for the session (probe `season.id`). `ContextAt` fills
+  `ConditionContext.Season`, so any spawn rule, loot entry, shop entry or town rule can use
+  `{ "type": "season", "is": "halloween" }`. Every slain hostile creature (not critters or statue creatures) also rolls
+  `NpcSystem.GlobalDropTable` (`enemy_global_drops` in `data/items/seasonal.json`: goodie bags at Halloween, presents
+  at Christmas) with seasonal vanity, candy and decorations inside. Santa Claus moves in at Christmas once the Frost
+  Legion is beaten and leaves when it ends; `TownRenderer.Hats` puts witch or Santa hats on the other residents (shared
+  procedural meshes on the head bone, toggled on season change).
+* **Secret seeds** (X-07) — `World.SecretSeeds.Parse` recognises Terraria's special seed names (any case, spaces and
+  punctuation ignored; "get fixed boi" sets all) into `WorldSettings.Secret` (`SecretSeed` flags, saved as
+  `WorldMeta.Secrets` ids). Generation reads `Plan.Settings.Has(…)`, so ordinary seeds generate exactly as before:
+  Drunk World alternates Corruption and Crimson regions (at least one of each) and both altars; Not the Bees makes the
+  jungle 1.5× wider with 4× the hives; No Traps multiplies the Dungeon halls' dart-trap chance by 6. Gameplay: For the
+  Worthy plays one difficulty step harder (`WorldSettings.EffectiveDifficulty` drives enemy scaling, defense factors and
+  `ConditionContext.Difficulty`); The Constant dims sky light (`EnvironmentController.Dim`); Celebration lets the Party
+  start without the Party Girl (`secretSeed` condition). Don't Dig Up is recognised and saved only (no upside-down
+  generation yet). The menu picks a random number for a secret name and lists found secret seeds under the seed field
+  (`UserSettings.DiscoveredSeeds`); `--secret=` for dev starts and `worldgen-report`.
+* **Enemy banners** — `Banners.BannerSystem` (`GameWorld.Banners`): kills of a banner's creatures (`TileObjectDef.Banner`)
+  are tallied world-wide in `Session.Counters["banner:<id>"]` (statue creatures, parts and bosses never count) and every
+  `killsPerBanner` (50) drops the banner. Every `refreshTicks` it rescans each player's surroundings (`radius` cells) for
+  placed banners: `Dealt` raises player damage to those creatures (×1.5, in `NpcSystem.Hit`), `Taken` lowers their
+  contact damage (×0.9, `NpcSystem.Contact`), and the Monster Banner buff shows. Tuning in `data/config/banners.json`;
+  probes `banners.near|dropped`. Enemy projectiles carry no source creature, so they are not reduced.
+* **Mounts** — the `mount` item behaviour (`MountParams`, data/items/mounts.json) summons a ride: `MountRules` toggles,
+  swaps and quick-mounts (the `quick_mount` key; the equipment mount slot plugs in through `MountRules.SlotMount`),
+  shows the mount's buff and dismounts on death; `MountMotion` (engine independent, tested) gives each mount its run
+  speed, jump (with a light-gravity hold), limited flight (refilled on landing) or free hovering flight, and the
+  Slimy Saddle's stomp. `PlayerController.Mounts.cs` drives the body with it (no fall damage while riding);
+  `PlayerAvatar.Mount.cs` draws the creature model scaled to the mount's height with the rider in the saddle. Bosses
+  drop mounts through `extra_<enemy>` loot tables rolled on top of their own.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 * **Slot model** — `PlayerInventory` (partials `.Equipment`, `.Storage`) holds Terraria's storages: backpack 50,
@@ -442,8 +511,8 @@ chests are never broken for lost support, so generated loot is never lost. `inte
 * **Town conditions** (`ConditionCompiler.Town.cs`): `rescued {id}` (world flag `rescued_<id>`, `TownRescue`),
   `hasItem {category}` (an `ItemCategory`, item-count key `@<category>`), `bestiary {min,max}`, `killed {enemy,min}`,
   `obtained {item}`, `achieved {id}` (read `ConditionContext.Records`, an `IPlayerRecords` the journal supplies
-  through `TownSystem.PlayerRecords`; null reads 0/false), `season {is}` and `anglerQuests {min,max}`. The season is
-  `WorldMeta.ForcedSeason` (the `season` command) or the real date (`SeasonCalendar`); it never affects generation.
+  through `TownSystem.PlayerRecords`; null reads 0/false) and `anglerQuests {min,max}`. Seasons (Santa) use the
+  World slice's `season` condition and `SeasonState`.
 * **Housing API** (`TownSystem.Housing.cs`): `QueryHousing(cell)` (room, suitable, Terraria message, occupant),
   `AssignHome(npc, cell)` (Assigned / Swapped: the occupant takes the npc's old home or becomes homeless /
   NotSuitable / NotAResident for landmark keepers and bound NPCs / AlreadyHome) and `Evict(npc)`; valid homes are

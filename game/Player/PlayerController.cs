@@ -127,13 +127,15 @@ public sealed partial class PlayerController : CharacterBody3D
             return;
         }
         if (Entity.ExternalVelocity != System.Numerics.Vector3.Zero) Entity.Minecart = null; // the tongue drags you out of a cart
-        if (UpdateMinecart(dt) || UpdatePhase())
+        if (UpdateMinecart(dt) || UpdateMount(dt) || UpdatePhase())
         {
             ReelInHook(dt);
             return;
         }
 
-        _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
+        var liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
+        if (liquid != _liquid) LiquidEdge(_liquid, liquid);
+        _liquid = liquid;
         _swimming = _liquid != null;
         _climbing = !_swimming && OnRope();
         var stats = Entity.State.Effects.Stats;
@@ -216,6 +218,7 @@ public sealed partial class PlayerController : CharacterBody3D
             _jumpHold = _config.JumpHoldTime;
             _jumpBuffer = 0;
             _coyote = 0;
+            Jumped?.Invoke();
         }
         else if (!blocked && Input.IsActionJustPressed("jump") && !onFloor && _coyote <= 0 && TryAirJump(ref v))
         {

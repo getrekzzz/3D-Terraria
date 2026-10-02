@@ -13,6 +13,7 @@
   "martian_madness": { "glyph": "ufo",         "fg": "#a0a8b8", "bg": "#0e2a20" },
   "old_ones_army":   { "glyph": "crystal",     "fg": "#c070ff", "bg": "#2a1830" },
   "rain":            { "glyph": "water",       "fg": "#7ab8ff", "bg": "#1c2c40" },
+  "thunderstorm":    { "glyph": "water",       "fg": "#c8d8ff", "bg": "#121a2c" },
   "windy_day":       { "glyph": "swirl",       "fg": "#e8f4ff", "bg": "#3a6aa0" },
   "sandstorm":       { "glyph": "swirl",       "fg": "#f0d8a0", "bg": "#7a5a30" },
   "party":           { "glyph": "present",     "fg": "#ff70c0", "bg": "#2a1e50" },

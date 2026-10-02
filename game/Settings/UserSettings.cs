@@ -26,6 +26,9 @@ public sealed class UserSettings
     /// <summary>Pause the world while the inventory or a menu is open.</summary>
     public bool AutoPause { get; set; }
 
+    /// <summary>Halloween and Christmas follow the system date (off: no seasonal events).</summary>
+    public bool SeasonalEvents { get; set; } = true;
+
     // Camera and controls
     public float MouseSensitivity { get; set; } = 1f;
     public bool InvertY { get; set; }
@@ -33,6 +36,12 @@ public sealed class UserSettings
     public float CameraDistance { get; set; } = 4.2f;
     public bool FirstPerson { get; set; }
     public bool CameraShake { get; set; } = true;
+
+    /// <summary>Red screen edges when hurt (strongest in first person).</summary>
+    public bool HurtFlash { get; set; } = true;
+
+    /// <summary>Secret world seeds the player has used, "|"-separated (shown as a hint on the world creation screen).</summary>
+    public string DiscoveredSeeds { get; set; } = "";
 
     // Display
     public string WindowMode { get; set; } = "windowed";

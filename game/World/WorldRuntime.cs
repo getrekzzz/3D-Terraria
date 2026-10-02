@@ -33,6 +33,12 @@ public sealed partial class WorldRuntime : Node3D
     public EnvironmentController Environment => _environment;
     public GameServices Services => _services;
 
+    /// <summary>Rain, snow and sand around the camera (added with the world effects).</summary>
+    public WeatherRenderer? Weather { get; set; }
+
+    /// <summary>Sound beds, cave acoustics and ambient particles (added with the world effects).</summary>
+    public AmbienceDirector? Ambience { get; set; }
+
     /// <summary>Node whose position drives streaming (player or camera).</summary>
     public Node3D? Focus { get; set; }
 
@@ -69,6 +75,7 @@ public sealed partial class WorldRuntime : Node3D
         AddChild(_colliders);
         _environment = new EnvironmentController { Name = "Environment" };
         _environment.Initialize(services.Graphics, game.Session.Settings.Seed);
+        if (game.Session.Settings.Has(Strata.Core.World.SecretSeed.TheConstant)) _environment.Dim = 0.6f; // a dim world (X-07)
         _renderer.SetSealedShadows(services.Graphics.Preset.TorchShadows);
         services.Graphics.Changed += p => _renderer.SetSealedShadows(p.TorchShadows);
         _streamDistance = game.Streamer.Settings.MeshRadius * ChunkMath.Size * Units.CellSize;

@@ -53,6 +53,19 @@ public sealed class WorldSettings
     public Difficulty Difficulty { get; init; } = Difficulty.Classic;
     public EvilKind Evil { get; init; } = EvilKind.Corruption;
 
+    /// <summary>Secret seed twists the world was created with (X-07).</summary>
+    public SecretSeed Secret { get; init; }
+
+    public bool Has(SecretSeed flag) => (Secret & flag) != 0;
+
+    /// <summary>The difficulty enemies and damage play at: For the Worthy plays one step harder.</summary>
+    public Difficulty EffectiveDifficulty => !Has(SecretSeed.ForTheWorthy) ? Difficulty : Difficulty switch
+    {
+        Difficulty.Classic => Difficulty.Expert,
+        Difficulty.Expert => Difficulty.Master,
+        _ => Difficulty,
+    };
+
     public Int3 Dimensions => DimensionsOf(Size);
 
     /// <summary>World extent in cells. Multiples of the chunk size.</summary>

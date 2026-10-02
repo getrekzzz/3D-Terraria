@@ -1,0 +1,48 @@
+# Fishing: no bait, no cast; with a worm the bobber floats on a pond, a fish bites, the catch lands and the bait is used.
+wait_until player.frozen == 0 180
+spawning off
+time noon
+fill -10 -4 -10 10 -1 10 stone
+fill -10 0 -10 10 8 10 air
+# A pond 9 x 9 x 2 ahead of the player (+Z).
+fill -4 -2 3 4 -1 11 air
+liquid water -4 -2 3 4 -1 11
+wait_until liquid.active == 0 20
+assert errors == 0
+
+give wooden_fishing_pole
+wield wooden_fishing_pole
+aim 0 -0.35 1
+use
+assert fishing.bobber == 0
+
+# A worm caught with a Bug Net is bait: cast, float, bite, reel.
+give worm 3
+use
+wait_until fishing.bobber == 2 10
+assert fishing.pool >= 40
+assert fishing.power > 0
+fishing bait always
+fishing bite
+assert fishing.bobber == 3
+use
+assert fishing.catches == 1
+assert fishing.bobber == 0
+assert inv.worm == 2
+fishing bait normal
+
+# Lava burns the line without lavaproof gear; the Hotline Fishing Hook fishes it.
+liquid lava -4 -2 3 4 -1 11
+wait_until liquid.active == 0 20
+use
+wait 2
+assert fishing.bobber == 0
+give hotline_fishing_hook
+wield hotline_fishing_hook
+use
+wait_until fishing.bobber == 2 10
+fishing bite
+use
+assert fishing.catches == 2
+liquid none -4 -2 3 4 -1 11
+assert errors == 0

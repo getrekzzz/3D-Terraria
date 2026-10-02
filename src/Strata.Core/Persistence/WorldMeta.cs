@@ -22,6 +22,9 @@ public sealed class WorldMeta
     public Difficulty Difficulty { get; set; }
     public EvilKind Evil { get; set; }
 
+    /// <summary>Secret seed ids (X-07), absent for ordinary worlds.</summary>
+    public List<string>? Secrets { get; set; }
+
     /// <summary>World generator version that produced unmodified regions.</summary>
     public int GeneratorVersion { get; set; }
 
@@ -45,12 +48,25 @@ public sealed class WorldMeta
     /// <summary>World tallies (shadow orbs smashed, altars smashed…); added without a version bump.</summary>
     public Dictionary<string, int> Counters { get; set; } = new();
 
-    /// <summary>Wired cells as flattened x, y, z triples (added without a version bump).</summary>
+    /// <summary>Red-wired cells as flattened x, y, z triples (added without a version bump).</summary>
     public List<int> Wires { get; set; } = new();
+
+    /// <summary>Blue, green and yellow wire and actuators, as x, y, z triples (added without a version bump: older
+    /// saves have red wire only).</summary>
+    public List<int>? WiresBlue { get; set; }
+    public List<int>? WiresGreen { get; set; }
+    public List<int>? WiresYellow { get; set; }
+    public List<int>? Actuators { get; set; }
+
+    /// <summary>Blocks switched off by actuators (block id, shape and cell flags), restored when switched back on.</summary>
+    public List<InactiveBlockModel>? InactiveBlocks { get; set; }
     public List<string> ActiveEvents { get; set; } = new();
 
     /// <summary>Running events with their remaining time and kill progress.</summary>
     public List<EventStateModel> EventStates { get; set; } = new();
+
+    /// <summary>The weather when saved (added without a version bump: older saves start clear).</summary>
+    public WeatherModel? Weather { get; set; }
 
     /// <summary>Town residents (added without a version bump: older saves simply have none).</summary>
     public List<ResidentModel> Residents { get; set; } = new();
@@ -58,8 +74,6 @@ public sealed class WorldMeta
     /// <summary>Starter residents (the guide) have been placed.</summary>
     public bool TownStarted { get; set; }
 
-    /// <summary>Season forced by the season command ("" = none); null follows the real date (no version bump).</summary>
-    public string? ForcedSeason { get; set; }
     public int[] Spawn { get; set; } = { 0, 0, 0 };
 
     public IdTablesModel IdTables { get; set; } = new();
@@ -69,7 +83,12 @@ public sealed class WorldMeta
 
     public sealed record EventStateModel(string Id, int TicksLeft, int Kills);
 
+    public sealed record WeatherModel(Gameplay.Weather.Precipitation Precipitation, float Intensity, float Current, int PrecipitationTicksLeft,
+        bool Windy, int WindyTicksLeft, bool Sandstorm, int SandstormTicksLeft, float[]? Wind, long LastHour);
+
     public sealed record MutationModel(string Id, ulong Seed);
+
+    public sealed record InactiveBlockModel(int X, int Y, int Z, string Block, byte Shape, byte Flags);
 
     public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks,
         bool Bound = false, long DiedAt = -1);
@@ -85,7 +104,8 @@ public sealed class WorldMeta
         public Dictionary<string, JsonElement>? Extra { get; set; }
     }
 
-    public WorldSettings ToSettings() => new() { Name = Name, Seed = Seed, Size = Size, Difficulty = Difficulty, Evil = Evil };
+    public WorldSettings ToSettings() =>
+        new() { Name = Name, Seed = Seed, Size = Size, Difficulty = Difficulty, Evil = Evil, Secret = SecretSeeds.FromIds(Secrets) };
 
     public WorldIdTables CreateIdTables() => new()
     {

@@ -52,9 +52,9 @@ assert town.homed == 1
 
 # --- P5-03 ---
 season christmas
-assert season.christmas == 1
-season none
-assert season.none == 1
+assert season.id == 2
+season off
+assert season.id == 0
 season auto
 
 # --- P5-05 ---

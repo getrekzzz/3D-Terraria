@@ -245,13 +245,6 @@ def splash(rng):
     return bandpass(_noise(dur, rng), 400, 4000, S) * decay(n, 0.15, S) * 0.9 + osc("sine", 300 * np.exp(-seconds(n, S) / 0.1), dur, S) * decay(n, 0.05, S) * 0.4
 
 
-def bloop(rng):
-    dur = 0.2
-    n = samples(dur, S)
-    f = 400 * (1 + 1.2 * seconds(n, S) / dur)
-    return osc("sine", f, dur, S) * decay(n, 0.06, S) * 0.6
-
-
 def creak(pitch):
     def make(rng):
         dur = 0.35
@@ -310,7 +303,7 @@ RECIPES = {
     "mana": (chime(880), 1), "heal": (chime(660), 1), "teleport": (shimmer, 1), "jump": (whoosh(600, 1800, 0.18, 0.5), 2),
     "land": (land, 1), "double_jump": (whoosh(900, 3000, 0.25, 0.7), 1), "wings": (whoosh(300, 900, 0.3, 0.6), 2),
     "rocket": (whoosh(1500, 5000, 0.35, 0.6), 1), "dash": (whoosh(700, 4000, 0.3, 0.9), 1), "grapple": (grapple, 1),
-    "splash": (splash, 2), "fish_bite": (bloop, 1), "door_open": (creak(140), 1), "door_close": (creak(110), 1),
+    "splash": (splash, 2), "door_open": (creak(140), 1), "door_close": (creak(110), 1),
     "chest_open": (creak(220), 1), "craft": (craft, 2), "summon": (summon, 1), "place": (lambda r: dig("wood")(r) * 0.8, 2),
     "lever": (clack, 1), "wire": (blip(2400, 0.05, "square", 0.012), 1), "net": (whoosh(1200, 2600, 0.2, 0.6), 1),
     "minecart": (creak(300), 1), "dart_trap": (bow, 1),
@@ -324,7 +317,7 @@ for _m in ("grass", "stone", "sand", "wood", "snow"):
 
 # Peak level per sound (quiet cues stay quiet; the rest land around -2 dBFS).
 GAIN = {"ui_hover": 0.25, "ui_click": 0.4, "ui_open": 0.4, "ui_close": 0.4, "pickup": 0.45, "coins": 0.55, "jump": 0.4, "land": 0.5,
-        "swing": 0.55, "grapple": 0.6, "fish_bite": 0.6, "place": 0.6, "mana": 0.5, "heal": 0.5,
+        "swing": 0.55, "grapple": 0.6, "place": 0.6, "mana": 0.5, "heal": 0.5,
         "wire": 0.3, "net": 0.5, "lever": 0.6}
 for _m in ("grass", "stone", "sand", "wood", "snow"):
     GAIN[f"step_{_m}"] = 0.3

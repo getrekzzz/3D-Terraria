@@ -1,6 +1,5 @@
 using Strata.Core.Conditions;
 using Strata.Core.Content;
-using Strata.Core.Simulation;
 
 namespace Strata.Core.Tests.Content;
 
@@ -63,14 +62,4 @@ public class TownConditionTests
         Assert.False(C("""{"type":"killed","enemy":"zombie"}""").Evaluate(new ConditionContext()));
     }
 
-    [Theory]
-    [InlineData(12, 14, "")]
-    [InlineData(12, 15, "christmas")]
-    [InlineData(12, 31, "christmas")]
-    [InlineData(10, 9, "")]
-    [InlineData(10, 31, "halloween")]
-    [InlineData(11, 1, "halloween")]
-    [InlineData(11, 2, "")]
-    public void SeasonCalendarFollowsTheDate(int month, int day, string season) =>
-        Assert.Equal(season, SeasonCalendar.Of(new DateOnly(2026, month, day)));
 }

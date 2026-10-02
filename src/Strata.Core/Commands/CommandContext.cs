@@ -45,7 +45,7 @@ public sealed class CommandContext
         Host = host;
         StandardProbes.Register(this);
         ProbeSources.RegisterAll(this, typeof(CommandContext).Assembly); // [ProbeSource] classes in Strata.Core
-        world.Interaction.ContainerOpened += (p, obj) =>
+        world.Interaction.ContainerOpened += (p, obj, _) =>
         {
             if (p == world.LocalPlayer) OpenContainer = obj;
         };

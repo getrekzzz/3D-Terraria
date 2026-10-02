@@ -36,7 +36,7 @@ public static partial class ConditionCompiler
             return new DelegateCondition(c => (c.ItemCount?.Invoke(key) ?? 0) >= p.Count);
         };
 
-        // --- P5-03: rescues, journal facts (bestiary, kills, pickups, achievements), season, angler quests ---
+        // --- P5-03: rescues, journal facts (bestiary, kills, pickups, achievements), angler quests ---
         f["rescued"] = s =>
         {
             string flag = TownRescue.FlagFor(s.Parse<RescuedConditionParams>().Id);
@@ -46,12 +46,6 @@ public static partial class ConditionCompiler
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.Records is { } r && r.BestiaryPercent >= p.Min && r.BestiaryPercent <= p.Max);
-        };
-        f["season"] = s =>
-        {
-            var p = s.Parse<SeasonConditionParams>();
-            string want = p.Is == SeasonConditionParams.None ? "" : p.Is;
-            return new DelegateCondition(c => c.Season == want);
         };
         f["anglerQuests"] = s =>
         {
@@ -86,7 +80,6 @@ public static partial class ConditionCompiler
         // --- P5-03 ---
         c.Register<RescuedConditionParams>(SpecKind.Condition, "rescued");
         c.Register<RangeConditionParams>(SpecKind.Condition, "bestiary");
-        c.Register<SeasonConditionParams>(SpecKind.Condition, "season");
         c.Register<RangeConditionParams>(SpecKind.Condition, "anglerQuests");
         c.Register<KilledConditionParams>(SpecKind.Condition, "killed");
         c.Register<ObtainedConditionParams>(SpecKind.Condition, "obtained");

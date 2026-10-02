@@ -41,5 +41,12 @@
   "wet":               { "glyph": "water",          "fg": "#5aa8ff", "bg": "#102a4c" },
   "well_fed":          { "glyph": "food",           "fg": "#c87a3a", "bg": "#3e3018" },
   "shimmering":        { "glyph": "crystal",        "fg": "#d8b8ff", "bg": "#2e2050" },
-  "the_tongued":       { "glyph": "chain",          "fg": "#e05a6a", "bg": "#3a0c14" }
+  "the_tongued":       { "glyph": "chain",          "fg": "#e05a6a", "bg": "#3a0c14" },
+  "fishing":           { "glyph": "water",          "fg": "#7ad8e8", "bg": "#123444" },
+  "crate":             { "glyph": "present",        "fg": "#c89a5a", "bg": "#3a2a16" },
+  "slime_mount":       { "glyph": "slime",          "fg": "#4aa0ff", "bg": "#102a4c" },
+  "bunny_mount":       { "glyph": "boot",           "fg": "#e8dcc8", "bg": "#3a3226" },
+  "bee_mount":         { "glyph": "honey",          "fg": "#f0c030", "bg": "#4e3410" },
+  "ufo_mount":         { "glyph": "ufo",            "fg": "#80e0a0", "bg": "#123a24" },
+  "monster_banner":    { "glyph": "pirate_flag",    "fg": "#d8c070", "bg": "#3a2a14" }
 }

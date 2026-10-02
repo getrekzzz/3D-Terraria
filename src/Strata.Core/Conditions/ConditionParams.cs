@@ -34,6 +34,22 @@ public sealed class TimeConditionParams : SpecParams, IValidatableSpec
     public string? Validate() => Is is null or "day" or "night" ? null : $"time.is must be day|night, got '{Is}'";
 }
 
+/// <summary>The local weather is one of <see cref="Any"/> (clear, rain, storm, snow, blizzard, sandstorm, or windy).</summary>
+public sealed class WeatherConditionParams : SpecParams, IValidatableSpec
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+
+    /// <summary>False inverts it: none of the kinds holds.</summary>
+    public bool Active { get; init; } = true;
+
+    public string? Validate()
+    {
+        foreach (var k in Any)
+            if (k != "windy" && !Enum.TryParse<Gameplay.Weather.LocalWeather>(k, ignoreCase: true, out _)) return $"unknown weather '{k}'";
+        return Any.Length == 0 ? "weather condition needs 'any'" : null;
+    }
+}
+
 public sealed class FlagConditionParams : SpecParams
 {
     public string Id { get; init; } = "";
@@ -93,4 +109,34 @@ public sealed class WearingConditionParams : SpecParams
 public sealed class EvilConditionParams : SpecParams
 {
     public string Is { get; init; } = "";
+}
+
+/// <summary>The catch comes from one of these liquids ("water", "honey", "lava").</summary>
+public sealed class FishingLiquidConditionParams : SpecParams
+{
+    public string[] Any { get; init; } = Array.Empty<string>();
+}
+
+/// <summary>A quest fish entry: holds only while the Angler wants <see cref="Fish"/> today.</summary>
+public sealed class AnglerQuestConditionParams : SpecParams
+{
+    public string Fish { get; init; } = "";
+}
+
+/// <summary>True in worlds created with this secret seed ("for_the_worthy", "drunk_world", "celebration", …).</summary>
+public sealed class SecretSeedConditionParams : SpecParams, Content.Specs.IValidatableSpec
+{
+    public string Is { get; init; } = "";
+
+    public string? Validate() => World.SecretSeeds.FromId(Is) == World.SecretSeed.None ? $"unknown secret seed '{Is}'" : null;
+}
+
+/// <summary>The seasonal event running is <see cref="Is"/> ("halloween", "christmas", or "none").</summary>
+public sealed class SeasonConditionParams : SpecParams, Content.Specs.IValidatableSpec
+{
+    public static readonly string[] Values = { "halloween", "christmas", "none" };
+
+    public string Is { get; init; } = "";
+
+    public string? Validate() => Array.IndexOf(Values, Is) < 0 ? $"season must be one of {string.Join(", ", Values)}" : null;
 }

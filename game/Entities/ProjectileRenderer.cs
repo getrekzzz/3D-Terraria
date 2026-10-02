@@ -11,7 +11,7 @@ namespace Strata.Game.Entities;
 /// Projectiles: arrows and thrown items use their item model aligned with the flight direction (boomerangs spin);
 /// minions with a creature model face where they fly; magic bolts are glowing orbs with a dynamic light (the plan
 /// reserves dynamic lights for moving sources like these). Fishing bobbers bob on the water, dip when a fish bites,
-/// and hang from a line to the rod tip.
+/// and hang from a line to the rod tip. Pets: ProjectileRenderer.Pets.cs.
 /// </summary>
 public sealed partial class ProjectileRenderer : Node3D
 {
@@ -29,6 +29,8 @@ public sealed partial class ProjectileRenderer : Node3D
         game.Projectiles.Removed += p =>
         {
             if (_views.Remove(p.Id, out var node)) node.QueueFree();
+            _petAnims.Remove(p.Id);
+            _awaiting.Remove(p.Id);
         };
         AddChild(new MeshInstance3D
         {
@@ -43,11 +45,13 @@ public sealed partial class ProjectileRenderer : Node3D
         _clock += (float)delta;
         _lines.ClearSurfaces();
         bool anyLine = false;
+        _retryNow = _awaiting.Count > 0 && _clock - _retryClock >= 0.25f;
+        if (_retryNow) _retryClock = _clock;
         foreach (var p in _game.Projectiles.All)
         {
-            if (!_views.TryGetValue(p.Id, out var node))
+            if (!_views.TryGetValue(p.Id, out var node) || (_awaiting.Contains(p.Id) && RetryModel(p, ref node)))
             {
-                node = Create(p);
+                node ??= Create(p);
                 AddChild(node);
                 _views[p.Id] = node;
             }
@@ -69,6 +73,11 @@ public sealed partial class ProjectileRenderer : Node3D
                 continue;
             }
             node.Position = pos;
+            if (p.PetSlot != null)
+            {
+                AnimatePet(p, node, vel);
+                continue;
+            }
             if (p.Def.Minion != null)
             {
                 // Creatures stay upright and turn to face their flight.
@@ -107,14 +116,18 @@ public sealed partial class ProjectileRenderer : Node3D
         Mesh? mesh = null;
         string? modelPath = null;
         bool creatureLoading = p.Def.Visual == "creature"; // its model is pending: glow until it is ready
-        if (creatureLoading) modelPath = null;
+        if (creatureLoading)
+        {
+            modelPath = null;
+            _awaiting.Add(p.Id);
+        }
         else if (p.Def.Visual == "item" && content.Items.TryGet(p.Def.Model ?? p.Def.Id, out var thrown) && AssetPaths.ItemModel(thrown, content) is { } itemPath)
             modelPath = itemPath;
         else if (p.Def.Model != null)
             modelPath = AssetPaths.ProjectileModel(p.Def);
         else if (p.Def.Visual == "arrow" && content.Items.TryGet(p.Def.Id, out var ammo) && AssetPaths.ItemModel(ammo, content) is { } path)
             modelPath = path; // ammo projectiles reuse their ammo item's model
-        if (modelPath != null) _props.TryModel(modelPath, multimesh: false, out mesh);
+        if (modelPath != null && _props.TryModel(modelPath, multimesh: false, out mesh) == AssetState.Pending) _awaiting.Add(p.Id);
         if (mesh != null)
         {
             root.AddChild(new MeshInstance3D { Mesh = mesh, Position = new Vector3(0, -0.1f, 0), Scale = Vector3.One * p.Def.Scale });
@@ -149,6 +162,7 @@ public sealed partial class ProjectileRenderer : Node3D
 
     private static void AddLight(Node3D root, Projectile p)
     {
+        if (p.PetSlot != null) return; // light pets shine from the shared pool (PetLights)
         if (p.Def.Light is { Length: 3 } l)
             root.AddChild(new OmniLight3D { LightColor = new Color(l[0] / 15f, l[1] / 15f, l[2] / 15f), OmniRange = 4f, LightEnergy = 1.5f, ShadowEnabled = false });
     }

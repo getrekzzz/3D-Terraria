@@ -84,6 +84,70 @@ wait 0.4
 assert objects.open_lids == 0
 assert errors == 0
 
+# Piggy Bank and Safe: every Piggy Bank opens the character's own 40 slots, so what goes into one comes out of
+# another; the Safe is a separate storage. Neither has a lid. A fresh floor first: the dart above knocks the player
+# back (P3-25), so offsets from where it left them would land on the pressure plate.
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+wait 0.5
+clear
+give gel 10
+give piggy_bank 1
+place piggy_bank 2 0 0
+place piggy_bank -1 0 4
+place safe -4 0 5
+invclick backpack 0 left
+invclick backpack 20 left
+interact 2 0 0
+chest deposit
+ui close
+assert inv.gel == 0
+interact -4 0 5
+chest loot
+ui close
+assert inv.gel == 0
+interact -1 0 4
+assert objects.open_lids == 0
+chest loot
+ui close
+assert inv.gel == 10
+assert errors == 0
+
+# --- X-15 ---
+# Wire colours, actuators, a timer and teleporters. A lever on yellow wire switches an actuated wall off and on; a running
+# 1 second timer on green wire swaps whoever stands on one teleporter pad to the other.
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+wait 0.5
+heal
+fill 3 0 -3 3 2 -3 stone
+wire 3 0 -3 3 2 -3 actuator
+assert wires.actuators == 3
+place lever 0 0 -3
+wire 0 -1 -3 3 -1 -3 yellow
+wire 3 0 -3 3 2 -3 yellow
+interact 0 0 -3
+assert wires.inactive == 3
+interact 0 0 -3
+assert wires.inactive == 0
+place teleporter -6 0 4
+place teleporter 4 0 4
+place timer_1_second 0 0 2
+wire -5 0 5 5 0 5 green
+wire 0 0 2 0 0 4 green
+assert wires.green >= 13
+interact 0 0 2
+tp ~-5 ~1 ~5
+wait 0.2
+mark
+wait_until wires.teleports >= 1 3
+assert player.from_mark > 4
+assert errors == 0
+
 # --- P4-17 ---
 # A Blue Dungeon Chandelier placed by hand hangs from a stone ceiling.
 tp spawn
@@ -99,4 +163,19 @@ aim 0 1 -1
 use
 wait 0.1
 assert inv.blue_dungeon_chandelier == 0
+assert errors == 0
+
+# --- X-03 banners ---
+# A Zombie Banner hung on a wall empowers the player against zombies (the Monster Banner buff shows).
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+fill -3 0 -5 3 6 -5 stone
+wait 0.5
+give zombie_banner 1
+place zombie_banner 0 2 -4
+wait 1
+assert banners.near >= 1
+assert buff.monster_banner == 1
 assert errors == 0

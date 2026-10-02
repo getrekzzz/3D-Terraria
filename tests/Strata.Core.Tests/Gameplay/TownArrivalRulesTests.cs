@@ -49,12 +49,12 @@ public class TownArrivalRulesTests
     public void SantaComesOnlyAtChristmasAndLeavesAfter()
     {
         using var g = Create(1);
-        g.World.Session.Meta.ForcedSeason = "";
+        g.World.Session.Seasons.Override = "";
         g.World.Progression.Set("defeated_frost_legion");
         Assert.Null(Arrives(g));
-        g.World.Session.Meta.ForcedSeason = "christmas";
+        g.World.Session.Seasons.Override = "christmas";
         Assert.Equal("santa_claus", Arrives(g));
-        g.World.Session.Meta.ForcedSeason = "";
+        g.World.Session.Seasons.Override = "";
         g.World.Town.UpdateLandmarks();
         Assert.Null(g.World.Town.Find("santa_claus"));
     }
