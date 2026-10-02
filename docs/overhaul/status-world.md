@@ -114,6 +114,8 @@ Review-fix commit: 1313 Core tests, validate, basic smoke and menu tour pass.
 |---|---|---|
 | X-16 ragdolls | done | `Ragdoll` (PhysicalBoneSimulator3D, 15 capsules, terrain/object collision only); human creatures ragdoll on death within the preset's `ragdolls` budget (0/3/6/10), thrown by the killing knockback, 3 s then sink; others keep P3-20 gore; the player ragdolls until respawn. `creatures.cmds` and `combat.cmds` assert it (`fx.ragdoll_drop` shows the body really falls); tour `Tours/ragdoll.cmds`. |
 
+CI (push 9): GREEN — 1315 Core tests, content checks, Godot import, all smoke scripts, menu tour.
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and
