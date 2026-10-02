@@ -59,7 +59,7 @@ public sealed partial class ViewModel : Node3D
         float dt = (float)delta;
         UpdateItem(entity.State.Inventory.Held.Item);
         RefreshAmmo(entity, dt);
-        Visible = _controller.Rig.FirstPerson && entity.Alive;
+        Visible = _controller.Rig.FirstPerson && entity.Alive && !entity.Sleeping; // nothing in hand in bed (P3-34)
         if (!Visible)
         {
             // Out of view: the next time it shows, a use in progress is picked up at its phase and eased into.

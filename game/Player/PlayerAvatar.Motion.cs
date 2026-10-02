@@ -118,7 +118,7 @@ public sealed partial class PlayerAvatar
             aimMod.Pitch = entity.Alive ? Mathf.Atan2(aim.Y, new Vector2(aim.X, aim.Z).Length()) : 0f;
             aimMod.ArmAim = h.Action != null || looped != null ? _actionArmAim : RestArmAim;
         }
-        if (entity.Sleeping) LieInBed(entity, h, dt);
+        UpdateSleep(entity, h, dt);
     }
 
     /// <summary>

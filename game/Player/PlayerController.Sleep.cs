@@ -12,6 +12,9 @@ public sealed partial class PlayerController
 {
     private bool _wasSleeping;
 
+    /// <summary>The lying head (where the camera sits while asleep): along the bed from the hips, and above them (m).</summary>
+    private const float LyingHeadReach = 0.75f, LyingHeadHeight = 0.25f;
+
     /// <summary>The physics frame the player last got up on: the press that woke them does nothing else.</summary>
     public ulong WokeFrame { get; private set; }
 
@@ -31,8 +34,9 @@ public sealed partial class PlayerController
             Stand();
             return false;
         }
-        var (feet, _) = GameWorld.BedRest(Entity.SleepBed!);
+        var (feet, head) = GameWorld.BedRest(Entity.SleepBed!);
         GlobalPosition = ToGodot(feet);
+        Rig.Position = new Vector3(head.X, 0, head.Z) * LyingHeadReach + Vector3.Up * LyingHeadHeight; // the eye at the pillow
         Velocity = Vector3.Zero;
         _peakY = GlobalPosition.Y;
         Sync();
@@ -49,6 +53,7 @@ public sealed partial class PlayerController
     {
         _wasSleeping = false;
         WokeFrame = Engine.GetPhysicsFrames();
+        Rig.Position = new Vector3(0, CameraRig.EyeHeight, 0);
         GlobalPosition = ToGodot(Entity.Position);
         Velocity = Vector3.Zero;
         _peakY = GlobalPosition.Y;
