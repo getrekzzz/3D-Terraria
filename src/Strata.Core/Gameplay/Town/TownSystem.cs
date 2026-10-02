@@ -77,6 +77,7 @@ public sealed partial class TownSystem
         if (tick % LandmarkInterval == 0) UpdateLandmarks();
         if (tick % RescueInterval == 0) UpdateRescues();
         if (tick % VisitInterval == 0) UpdateVisitors();
+        if (tick % Math.Max(1, Config.Emotes.Interval) == 0) UpdateEmotes();
         if (tick % Config.HomeCheckInterval == 0) CheckHomes();
         foreach (var r in _residents) TickResident(r);
         _status?.Tick();

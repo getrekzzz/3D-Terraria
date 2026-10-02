@@ -161,3 +161,10 @@ assert inv.forest_pylon == 1
 town pylons
 assert town.pylons == 0
 assert errors == 0
+
+# --- X-05 ---
+# Emote bubbles: a resident emotes, the player emotes, and the counter rises.
+town emote love merchant
+town emote happy
+assert town.emotes_shown > 0
+assert errors == 0

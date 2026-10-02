@@ -28,6 +28,7 @@ public sealed partial class TownSystem
         pet.Path = null;
         PetCount++;
         Petted?.Invoke(pet, p);
+        Emote(pet, "love");
         return true;
     }
 }

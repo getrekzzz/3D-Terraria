@@ -45,6 +45,12 @@ public static partial class WorldLauncher
         var loading = new UI.LoadingTips();
         runtime.AddChild(loading);
         loading.Initialize(game, player);
+        var emotes = new UI.EmoteWheel();
+        runtime.AddChild(emotes);
+        emotes.Initialize(ui);
+        var voice = new Audio.NpcVoice();
+        runtime.AddChild(voice);
+        voice.Initialize(game, interaction);
         var photo = new UI.PhotoMode.PhotoModeController();
         runtime.AddChild(photo);
         photo.Initialize(runtime, player);

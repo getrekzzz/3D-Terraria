@@ -13,6 +13,7 @@ internal static class TownProbes
         ctx.AddProbe("town.residents", () => w.Town.Residents.Count);
         ctx.AddProbe("town.homed", () => w.Town.Residents.Count(t => t.Home != null));
         ctx.AddProbe("town.petted", () => w.Town.PetCount);
+        ctx.AddProbe("town.emotes_shown", () => w.Town.EmotesShown);
         ctx.AddProbe("town.pylons", () => w.Town.Pylons.All().Count);
         ctx.AddProbe("town.pylon_teleports", () => w.Town.Pylons.Teleports);
         // town.<id>: 1 when the resident lives in town; town.<id>.home: metres from their home (−1 if homeless/absent);

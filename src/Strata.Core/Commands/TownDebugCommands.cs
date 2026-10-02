@@ -6,7 +6,7 @@ namespace Strata.Core.Commands;
 /// </summary>
 internal static class TownDebugCommands
 {
-    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | visit <id> | leave <id> | pylons | pylon <n>";
+    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | visit <id> | leave <id> | pylons | pylon <n> | emote <emote> [id]";
 
     public static CommandResult? TryRun(CommandContext ctx, CommandArgs a)
     {
@@ -52,6 +52,13 @@ internal static class TownDebugCommands
                 var to = pylons[n - 1];
                 var r = town.Pylons.Teleport(ctx.Player, to);
                 return r == Gameplay.Town.PylonTeleport.Teleported ? CommandResult.Success($"Teleported to the {to.DisplayName}.") : CommandResult.Fail(r.ToString());
+            case "emote":
+                string emote = a.Str(1, "emote");
+                if (Array.IndexOf(town.Config.Emotes.Ids, emote) < 0) return CommandResult.Fail($"unknown emote '{emote}' ({string.Join(", ", town.Config.Emotes.Ids)})");
+                if (a.Count < 3) return town.PlayerEmote(ctx.Player, emote) ? CommandResult.Success($"You emote: {emote}.") : CommandResult.Fail("cannot emote");
+                var emoter = town.Find(a.Str(2, "id")) ?? throw new CommandException($"'{a.Str(2, "id")}' does not live in town");
+                town.Emote(emoter, emote);
+                return CommandResult.Success($"{emoter.Title} emotes: {emote}.");
             default:
                 return null;
         }

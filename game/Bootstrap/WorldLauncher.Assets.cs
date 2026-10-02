@@ -50,6 +50,9 @@ public static partial class WorldLauncher
         var hearts = new Entities.TownPetHearts();
         runtime.AddChild(hearts);
         hearts.Initialize(game);
+        var bubbles = new Entities.TownEmoteBubbles();
+        runtime.AddChild(bubbles);
+        bubbles.Initialize(game, runtime.Services.Graphics.Name == "low");
         var projectiles = new Entities.ProjectileRenderer();
         runtime.AddChild(projectiles);
         projectiles.Initialize(game, props);

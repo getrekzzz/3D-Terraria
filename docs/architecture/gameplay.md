@@ -776,3 +776,17 @@ map marks pylons (`game/UI/PylonMap.cs`) and a click on one travels there; comma
 probes `town.pylons`, `town.pylon_teleports`. Item sources list pylons as "Sold by content residents living in its
 biome". Gaps: the one-of-each-type placement limit and Terraria's "no bosses or invasions nearby" rule are not
 enforced; no Universal Pylon.
+
+## Emotes and NPC voices (X-05)
+
+`TownSystem.Emotes.cs` checks `residentsPerCheck` residents every `interval` ticks (config `data/config/town.json`
+"emotes", `EmoteConfig`); a ready one emotes with `chance`, then cools down. `EmoteRules.Pick` (pure, tested) maps
+`EmoteInput` (happiness factor, sleeping at home at night, danger/party/rain events, loved or hated neighbours within
+`replyRadius`, a chat partner within `chatRadius`, talking to the player, pets) to an emote id; a "chat" partner
+answers with `EmoteRules.Reply`. `PlayerEmote` (the wheel) raises `PlayerEmoted` and nearby ready residents reply;
+petting makes the pet show "love". Game side: `game/Entities/TownEmoteBubbles` (pooled billboard sprites, 4 on the low
+preset, 12 otherwise, icons `assets/icons/emotes/*.png` from `tools/textures/build_emotes.py`),
+`game/Audio/NpcVoice` (voice blips `voice_*` from `tools/audio/sfx_recipes_town.py`, per-NPC sound and pitch in
+"emotes.voices", played on `InteractionController.TalkRequested` and softly on chat bubbles), and
+`game/UI/EmoteWheel` (hold T, move the mouse, release). The emote wheel takes T; block-shape cycling moved to Y.
+Probe `town.emotes_shown`; command `town emote <emote> [id]`.
