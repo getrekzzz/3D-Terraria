@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Strata.Core.Content.Index;
 using Strata.Core.Content.Specs;
@@ -8,12 +9,16 @@ namespace Strata.Game.UI;
 
 /// <summary>
 /// The resident's service, read from their definition (<c>service.type</c>): its button label, with the price where
-/// there is one ('Heal (4 silver)', 'Reforge (1 gold)', 'Taxes (2 silver)'), and what pressing it does. Each answer
-/// replaces the line in the box; a trade that went through jingles coins. Residents with several services or
+/// there is one ('Heal (4 silver)', 'Taxes (2 silver)'), and what pressing it does. Each answer replaces the line in the
+/// box; a trade that went through jingles coins. Reforge hides the box and asks for the reforge slot in the inventory
+/// (<see cref="ServiceRequested"/>), where the price of the item placed in it shows. Residents with several services or
 /// happiness and housing buttons extend <see cref="ServiceLabel"/> and <see cref="RunService"/> here.
 /// </summary>
 public sealed partial class TownDialog
 {
+    /// <summary>A service with a panel of its own was pressed (Reforge): the inventory opens with it in its panel host.</summary>
+    public event Action<TownNpc, ServiceMode>? ServiceRequested;
+
     /// <summary>The service button's label for <paramref name="npc"/> now, or null when they offer none.</summary>
     private string? ServiceLabel(TownNpc npc)
     {
@@ -28,8 +33,7 @@ public sealed partial class TownDialog
             case TownServiceSpecs.SummonBoss:
                 return service.Parse<SummonServiceParams>().Label;
             case TownServiceSpecs.Reforge:
-                long reforge = _ui.Game.Services.ReforgeCost(npc, _ui.Entity);
-                return reforge > 0 ? $"Reforge ({Coins.Format(reforge)})" : "Reforge";
+                return "Reforge";
             case TownServiceSpecs.Taxes:
                 long due = _ui.Game.Services.TaxesDue(npc);
                 return due > 0 ? $"Taxes ({Coins.Format(due)})" : "Taxes";
@@ -49,7 +53,7 @@ public sealed partial class TownDialog
             case TownServiceSpecs.Heal: Heal(); break;
             case TownServiceSpecs.CraftHelp: CraftHelp(); break;
             case TownServiceSpecs.SummonBoss: Summon(); break;
-            case TownServiceSpecs.Reforge: Reforge(); break;
+            case TownServiceSpecs.Reforge: OpenService(ServiceMode.Reforge); break;
             case TownServiceSpecs.Taxes: CollectTaxes(); break;
             case TownServiceSpecs.AnglerQuest: AnglerQuest(); break;
         }
@@ -81,18 +85,24 @@ public sealed partial class TownDialog
         else Report(result, "So be it.");
     }
 
-    private void Reforge()
+    /// <summary>
+    /// Reforge: the box hides and the inventory shows the resident's reforge slot (the conversation goes on there);
+    /// commands and tests press it too. False when the resident offers no such service.
+    /// </summary>
+    public bool OpenService(ServiceMode mode)
     {
-        var services = _ui.Game.Services;
-        var held = _ui.Inventory.Held;
-        if (services.ReforgeCost(_npc!, _ui.Entity) == 0)
-        {
-            Say(held.IsEmpty ? "Hold a weapon, tool or accessory and I'll tinker with it." : $"I can't improve a {held.Item!.DisplayName}.");
-            return;
-        }
-        var result = services.Reforge(_npc!, _ui.Entity, out var made);
-        Report(result, $"Reforged: {made}.");
+        if (_npc is not { } npc || npc.Def.Service?.Type != ServiceType(mode)) return false;
+        HideBox();
+        ServiceRequested?.Invoke(npc, mode);
+        return true;
     }
+
+    /// <summary>The <c>service.type</c> that offers <paramref name="mode"/>.</summary>
+    private static string ServiceType(ServiceMode mode) => mode switch
+    {
+        ServiceMode.Reforge => TownServiceSpecs.Reforge,
+        _ => "",
+    };
 
     private void CollectTaxes()
     {

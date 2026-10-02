@@ -8,7 +8,7 @@ namespace Strata.Game.UI;
 /// <summary>
 /// Building the screen's parts and placing them on the layout's regions: the backpack grid (<see cref="UiRegion.Inventory"/>,
 /// on the HUD hotbar's origin), the coin and ammo columns, trash and sort buttons (<see cref="CoinAmmoColumns"/>), the
-/// panel host (<see cref="UiRegion.Panel"/>), the crafting column and the equipment column. The HUD computes the layout
+/// panel host (<see cref="UiRegion.Panel"/>: a chest, a shop or a resident's service), the crafting column and the equipment column. The HUD computes the layout
 /// from <see cref="Panel"/> and <see cref="AccessoryRows"/> and calls <see cref="Place"/> when it changes (the window,
 /// the UI scale, opening, a panel shown or closed, an accessory row appearing), never per frame. Slots are sized by the
 /// layout's slot scale.
@@ -23,6 +23,7 @@ public sealed partial class InventoryScreen
     private Control? _panel;
     private ChestPanel _chest = null!;
     private ShopPanel _shop = null!;
+    private ServicePanel _service = null!;
     private UiLayoutResult? _layout;
     private CraftingPanel _crafting = null!;
     private EquipmentPanel _equipment = null!;
@@ -44,6 +45,9 @@ public sealed partial class InventoryScreen
 
     /// <summary>The shop panel shown under the grid while a resident's shop is open.</summary>
     public ShopPanel Shop => _shop;
+
+    /// <summary>The service panel shown under the grid while a resident's service (the reforge slot) is open.</summary>
+    public ServicePanel Service => _service;
 
     /// <summary>The crafting column bottom-left (recipe slots, the selected recipe's materials and stations).</summary>
     public CraftingPanel Crafting => _crafting;
@@ -80,6 +84,8 @@ public sealed partial class InventoryScreen
         _chest.CloseRequested += ClosePanel;
         _shop = new ShopPanel(_ui);
         _shop.CloseRequested += ClosePanel;
+        _service = new ServicePanel(_ui, Slot(SlotArea.Service, 0));
+        _service.CloseRequested += ClosePanel;
 
         _crafting = LayoutWidgets.Register(new CraftingPanel { Name = "Crafting" });
         _root.AddChild(_crafting);
@@ -160,15 +166,17 @@ public sealed partial class InventoryScreen
         _panelHost.Visible = false;
         if (panel == _chest) _chest.Release();
         else if (panel == _shop) _shop.Release();
+        else if (panel == _service) _service.Release();
     }
 
-    /// <summary>Places the host on the last layout's Panel region (hidden without a panel or a region) and the chest or shop in it.</summary>
+    /// <summary>Places the host on the last layout's Panel region (hidden without a panel or a region) and the panel in it.</summary>
     private void PlacePanel()
     {
         _panelHost.Visible = _panel != null && _layout != null && LayoutWidgets.Place(_panelHost, _layout, UiRegion.Panel);
         if (!_panelHost.Visible) return;
         if (_panel == _chest) _chest.Arrange(SlotScale);
         else if (_panel == _shop) _shop.Arrange(SlotScale);
+        else if (_panel == _service) _service.Arrange(SlotScale);
     }
 
     /// <summary>Positions and sizes a slot inside its region (its minimum size too, so it can shrink).</summary>

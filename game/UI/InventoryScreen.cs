@@ -9,8 +9,8 @@ namespace Strata.Game.UI;
 /// <summary>
 /// The inventory screen (Tab/I), laid out like Terraria's on the HUD's <see cref="UiLayout"/>: the 10×5 backpack on
 /// the hotbar's spot (its first row is the hotbar), the coin and ammo columns right of it with the trash under them and
-/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest or a
-/// resident's shop; services plug in through <see cref="ShowPanel"/>), the crafting column bottom-left and the
+/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest, a
+/// resident's shop or their service: the reforge slot), the crafting column bottom-left and the
 /// equipment column (<see cref="EquipmentPanel"/>) on the right under the minimap. Each part is a registered layout
 /// widget placed by <see cref="Place"/> (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the
 /// pointer by <see cref="CursorItemLayer"/> and clicks are routed by <c>GameWorld.ClickSlot</c>
@@ -41,10 +41,10 @@ public sealed partial class InventoryScreen : CanvasLayer
         {
             if (p == ui.Entity) OpenChest(obj);
         };
-        // Talking to a resident puts an open shop away (the chat box takes over; it runs before the box opens).
+        // Talking to a resident puts an open shop or service away (the chat box takes over; it runs before the box opens).
         ui.Interaction.TalkRequested += _ =>
         {
-            if (_panel == _shop) ClosePanel();
+            if (_panel == _shop || _panel == _service) ClosePanel();
         };
     }
 
@@ -76,16 +76,14 @@ public sealed partial class InventoryScreen : CanvasLayer
             LayoutChanged?.Invoke();
             return;
         }
-        // The held stack and the service slot's item (a reforge) go back into the storage (coins and ammo to their
-        // slots); what does not fit is thrown.
+        // The held stack goes back into the storage (coins and ammo to their slots; what does not fit is thrown), and
+        // the service slot's item too (the reforge panel puts it away as it closes; what does not fit drops at the feet).
         var inv = _ui.Inventory;
         var held = inv.Cursor;
         inv.Cursor = ItemStack.Empty;
         Stow(held);
-        var serviced = inv.Service[0];
-        inv.Service[0] = ItemStack.Empty;
-        Stow(serviced);
         HidePanel();
+        ServicePanel.StowSlot(_ui);
         LayoutChanged?.Invoke();
     }
 
@@ -124,6 +122,21 @@ public sealed partial class InventoryScreen : CanvasLayer
             HidePanel();
             _shop.Open(npc);
             ShowPanel(_shop, UiPanel.Shop);
+        }
+        SetOpen(true);
+    }
+
+    /// <summary>
+    /// Shows <paramref name="npc"/>'s service under the grid in <paramref name="mode"/> (the chat box's Reforge) and opens
+    /// the screen; the one already shown just stays.
+    /// </summary>
+    public void OpenService(Strata.Core.Gameplay.Town.TownNpc npc, ServiceMode mode)
+    {
+        if (_panel != _service || _service.Npc != npc || _service.Mode != mode)
+        {
+            HidePanel();
+            _service.Open(npc, mode);
+            ShowPanel(_service, UiPanel.Service);
         }
         SetOpen(true);
     }

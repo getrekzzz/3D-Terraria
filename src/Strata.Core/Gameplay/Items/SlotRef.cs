@@ -39,12 +39,14 @@ public static class SlotFilters
     private static readonly Func<ItemDef, bool> Nothing = _ => false;
     private static readonly Func<ItemDef, bool> CoinsOnly = item => item.HasTag("coin");
     private static readonly Func<ItemDef, bool> AmmoOnly = PlayerInventory.FitsAmmoSlot;
+    private static readonly Func<ItemDef, bool> Reforgeable = Prefixes.CanHave;
 
     /// <summary>
-    /// The accept predicate of a slot, or null when anything fits (backpack, trash, service, containers): coins only in
-    /// the coin slots, ammunition only in the ammo slots, the matching armor piece per armor index (vanity items only
-    /// in the vanity row), accessories without a duplicate in their row, dyes and the misc kind per misc index. Shop
-    /// slots and locked accessory rows (their vanity and dye slots too) take nothing; what is in them can be taken out.
+    /// The accept predicate of a slot, or null when anything fits (backpack, trash, containers): coins only in the coin
+    /// slots, ammunition only in the ammo slots, the matching armor piece per armor index (vanity items only in the
+    /// vanity row), accessories without a duplicate in their row, dyes and the misc kind per misc index, and in the
+    /// service slot what its <see cref="ServiceMode"/> works on (reforging: items that can carry a prefix). Shop slots
+    /// and locked accessory rows (their vanity and dye slots too) take nothing; what is in them can be taken out.
     /// </summary>
     public static Func<ItemDef, bool>? For(SlotRef slot, PlayerInventory inv) => slot.Area switch
     {
@@ -58,6 +60,7 @@ public static class SlotFilters
         SlotArea.VanityAccessories => PlayerInventory.AccessoryFilter(inv.VanityAccessories, slot.Index, vanityRow: true),
         SlotArea.Dyes or SlotArea.MiscDyes => PlayerInventory.DyeFilter,
         SlotArea.Misc => PlayerInventory.MiscFilter((MiscSlot)slot.Index),
+        SlotArea.Service when inv.ServiceMode == ServiceMode.Reforge => Reforgeable,
         SlotArea.Shop => Nothing,
         _ => null,
     };

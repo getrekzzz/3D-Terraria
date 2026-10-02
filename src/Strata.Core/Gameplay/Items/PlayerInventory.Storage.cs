@@ -2,6 +2,13 @@ using Strata.Core.Content.Defs;
 
 namespace Strata.Core.Gameplay.Items;
 
+/// <summary>What a resident's service does with the item in <see cref="PlayerInventory.Service"/>.</summary>
+public enum ServiceMode
+{
+    /// <summary>The Goblin Tinkerer re-rolls its prefix: only items that can carry one fit.</summary>
+    Reforge,
+}
+
 public sealed partial class PlayerInventory
 {
     /// <summary>The equipment storages (armor, accessories, vanity, dyes, misc and misc dyes); a change raises <see cref="EquipmentChanged"/>.</summary>
@@ -18,6 +25,18 @@ public sealed partial class PlayerInventory
 
     /// <summary>How many matching items the character carries in the backpack, coin and ammo slots.</summary>
     public int CountAll(Func<ItemDef, bool> match) => Backpack.Count(match) + Coins.Count(match) + Ammo.Count(match);
+
+    /// <summary>
+    /// Puts the service slot's item back into the storage (<see cref="Pickup"/>: coins and ammo to their slots, the rest
+    /// hotbar first) when its service closes, and returns what did not fit (the caller drops it at the player's feet).
+    /// </summary>
+    public ItemStack StowService()
+    {
+        var stack = Service[0];
+        if (stack.IsEmpty) return ItemStack.Empty;
+        Service[0] = ItemStack.Empty;
+        return Pickup(stack);
+    }
 
     /// <summary>The storage behind a player slot area; null for <see cref="SlotArea.Container"/> and <see cref="SlotArea.Shop"/>.</summary>
     public Inventory? Resolve(SlotArea area) => area switch

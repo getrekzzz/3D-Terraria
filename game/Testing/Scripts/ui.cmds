@@ -525,3 +525,49 @@ ui close
 wait 0.2
 god off
 assert errors == 0
+
+# --- P2-28 ---
+# The Goblin Tinkerer's Reforge opens the inventory with the reforge slot under the grid ('Place an item here to
+# reforge'). Wood is refused; the sword goes in and its cost shows in coin colours. Each press of the hammer reforges
+# it, charges the purse and clangs; hovering the slot shows its tooltip. Closing the inventory puts the sword back in
+# the backpack.
+god on
+spawning off
+killall
+clear
+town summon goblin_tinkerer 0 0 -3
+give copper_broadsword 1
+give gold_coin 5
+give wood 5
+wait 0.3
+ui talk goblin_tinkerer
+ui reforge
+wait 0.3
+assert ui.talk_open == 0
+assert ui.inventory == 1
+assert ui.panel == 3
+assert ui.service_cost == 0
+assert ui.overlaps == 0
+invclick backpack 1 left
+invclick service 0 left
+assert ui.service_item == 0
+invclick backpack 1 left
+invclick backpack 0 left
+invclick service 0 left
+assert ui.service_item == 1
+assert inv.copper_broadsword == 0
+wait 0.1
+assert ui.service_cost > 0
+ui hover service 0
+assert ui.tooltip_lines > 1
+ui reforge hit
+ui reforge hit
+assert ui.reforges == 2
+assert inv.coins < 50000
+ui close
+wait 0.2
+assert ui.panel == 0
+assert ui.service_item == 0
+assert inv.copper_broadsword == 1
+god off
+assert errors == 0

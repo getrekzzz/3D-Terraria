@@ -33,6 +33,7 @@ public static partial class WorldLauncher
         runtime.AddChild(townDialog);
         townDialog.Initialize(ui);
         townDialog.ShopRequested += inventory.OpenShop; // the chat box's Shop opens the inventory with the grid shop
+        townDialog.ServiceRequested += inventory.OpenService; // and Reforge with the reforge slot
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);

@@ -69,6 +69,10 @@ public sealed partial class SoundEvents : Node
             if (def.KillGoal > 0 || def.SkyTint != null) Sfx.Play("event_start", -2f);
         };
         game.Town.Arrived += _ => Sfx.Play("npc_arrive");
+        game.Services.Reforged += (p, _) =>
+        {
+            if (p == _local) Sfx.Play("reforge"); // the hammer on the anvil
+        };
         game.ItemPickedUp += (p, stack) =>
         {
             if (p == _local) Sfx.Play(stack.Item!.HasTag("coin") ? "coins" : "pickup");

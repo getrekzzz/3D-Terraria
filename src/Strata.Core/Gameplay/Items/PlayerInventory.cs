@@ -60,6 +60,9 @@ public sealed partial class PlayerInventory
     /// <summary>The item handed to a town service (the Goblin Tinkerer's reforge slot); the service UI stows it when it closes.</summary>
     public Inventory Service { get; } = new(1);
 
+    /// <summary>What the service slot is for while a resident's service is open; it decides what the slot accepts.</summary>
+    public ServiceMode ServiceMode { get; set; } = ServiceMode.Reforge;
+
     /// <summary>Stack held by the mouse cursor while rearranging.</summary>
     public ItemStack Cursor { get; set; }
 

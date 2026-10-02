@@ -218,7 +218,8 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   sits on the hotbar's origin (first row = hotbar, selected slot gold); `CoinAmmoColumns` holds the coin and ammo
   columns, the trash slot under them (saved with the player) and the `sort`/`quick_stack` buttons; the panel host
   under the grid shows one panel at a time through `ShowPanel(Control, UiPanel)`/`ClosePanel()` (the chest, with 40
-  pooled slot views rebound on open, or a resident's shop via `OpenShop(TownNpc)`; the service panel plugs in here) and sizes its slots by
+  pooled slot views rebound on open, a resident's shop via `OpenShop(TownNpc)`, or their service via
+  `OpenService(TownNpc, ServiceMode)`) and sizes its slots by
   `SlotScale`; `CraftingPanel` takes the Crafting region (below); the equipment column takes the
   Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
   so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
@@ -265,7 +266,7 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   the `service` (`TownDialog.Services.cs`: label with its live price and handler; extend `ServiceLabel`/`RunService`
   for more buttons) and Close. An overlay gate; the resident waits facing the player while it is open
   (`TownSystem.HoldTalk`), and walking out of `TalkRange` or Esc closes it. Shop hides the box and raises
-  `ShopRequested` (the inventory's shop panel). Probe `ui.npc_chat_top` (open in the top third, overlapping no HUD
+  `ShopRequested` (the inventory's shop panel), Reforge likewise `ServiceRequested` (the reforge slot). Probe `ui.npc_chat_top` (open in the top third, overlapping no HUD
   widget; `LayoutWidgets.CountOverlapsWith`).
 * **Shop panel** (`game/UI/Inventory/ShopPanel.cs`): a resident's shop in the panel host, opened by the chat box's
   Shop (`InventoryScreen.OpenShop`): their name over a 10×4 grid of 40 pooled read-only `ItemSlotView`s, the stock
@@ -279,3 +280,18 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   the shop is open; out of `TalkRange` it closes, and putting it away (or talking to a resident) ends the
   conversation. Smoke: `ui shop`, `ui buy <item> [n]`, `ui sell <area> <slot>`, `ui buyback <i>`, `ui hover shop <i>`;
   probes `ui.shop_slots`, `ui.buyback`.
+* **Reforge slot** (`game/UI/Inventory/ServicePanel.cs`, `CoinText.cs`): the chat box's Reforge
+  (`TownDialog.ServiceRequested`) opens the inventory with the Goblin Tinkerer's service in the panel host
+  (`InventoryScreen.OpenService(npc, ServiceMode.Reforge)`, the layout's `UiPanel.Service` region): their name over one
+  slot bound to `PlayerInventory.Service[0]` (`SlotFilters` takes only `Prefixes.CanHave` items while
+  `PlayerInventory.ServiceMode` is `Reforge`), 'Place an item here to reforge' under it while empty, else the
+  `reforge_hammer` button beside it and 'Cost:' with each coin in its colour (`CoinText`; `TownServices.ReforgeCost` on
+  the stack, worked out again on a change and once a second for the resident's mood). The hammer calls
+  `TownServices.Reforge(npc, player, inv.Service, 0, …)` (paid from the purse; the held-item overloads delegate to it),
+  which raises `Reforged`: `SoundEvents` plays the `reforge` anvil clang (`tools/audio/sfx_recipes_reforge.py`), the
+  slot pops 1.1× → 1 and the tooltip is read again at once (hovering the hammer shows the item's tooltip too). The
+  resident waits; out of `TalkRange` the panel closes, and putting it away (or closing the inventory) stows the item
+  (`PlayerInventory.StowService`, dropped at the feet when the backpack is full) and ends the conversation. Another
+  service (the Guide's help slot) adds a `ServiceMode`, its slot filter and its content beside the slot. Smoke:
+  `ui reforge`, `ui reforge hit`, `invclick service 0 left`, `ui hover service 0`; probes `ui.service_cost`,
+  `ui.reforges`, `ui.service_item`.

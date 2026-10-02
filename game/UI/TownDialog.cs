@@ -14,7 +14,8 @@ namespace Strata.Game.UI;
 /// service (TownDialog.Services.cs: Heal with its price, Help, Reforge, Taxes, Quest, a summon) and Close. The box
 /// grows down from the top to fit its text and never spills off its region. It is an overlay: the player keeps moving,
 /// the resident waits facing them while it is open, and walking away (or Esc) closes it. Shop hides the box and asks
-/// for the shop in the inventory (<see cref="ShopRequested"/>); the conversation goes on there.
+/// for the shop in the inventory (<see cref="ShopRequested"/>), and Reforge for the reforge slot there
+/// (<see cref="ServiceRequested"/>); the conversation goes on there.
 /// </summary>
 public sealed partial class TownDialog : CanvasLayer
 {

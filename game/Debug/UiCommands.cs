@@ -17,8 +17,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|buy <item> [n]|sell <area> <slot>|buyback <i>|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|craft <item> [n]|close|export-theme>",
-            Help = "Opens or closes gameplay screens; shop opens the shop of the resident being talked to (the chat box's Shop); buy clicks a ware's shop slot n times (onto the cursor); sell Shift-clicks a slot with the shop open; buyback Shift-clicks sold stack i (back into the backpack); hover shows a slot's tooltip (areas as invclick, plus hotbar and shop); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); craft clicks the crafting column's recipe for an item as the player does (selecting it, then crafting onto the cursor n times); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|buy <item> [n]|sell <area> <slot>|buyback <i>|reforge [hit]|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|craft <item> [n]|close|export-theme>",
+            Help = "Opens or closes gameplay screens; shop opens the shop of the resident being talked to (the chat box's Shop); buy clicks a ware's shop slot n times (onto the cursor); sell Shift-clicks a slot with the shop open; buyback Shift-clicks sold stack i (back into the backpack); reforge opens the reforge slot of the resident being talked to (the chat box's Reforge) and reforge hit presses its hammer; hover shows a slot's tooltip (areas as invclick, plus hotbar and shop); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); craft clicks the crafting column's recipe for an item as the player does (selecting it, then crafting onto the cursor n times); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -50,6 +50,8 @@ public static class UiCommands
                             : CommandResult.Fail("This resident sells nothing.");
                     case "buy" or "sell" or "buyback":
                         return ShopCommand(screen, ctx, what, a);
+                    case "reforge":
+                        return ReforgeCommand(screen, dialog, ctx, a.OptStr(1));
                     case "hover":
                         string area = a.Str(1, "area");
                         int index = a.Int(2, "index");
@@ -98,7 +100,7 @@ public static class UiCommands
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, reforge, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, close or export-theme");
                 }
             },
         });
@@ -143,6 +145,33 @@ public static class UiCommands
                     ? CommandResult.Success("Bought back.")
                     : CommandResult.Fail(result?.ToString() ?? "No such sold stack, or something is held on the cursor.");
         }
+    }
+
+    /// <summary>
+    /// The <c>ui reforge</c> command: opens the reforge slot as the chat box's Reforge does (or for the resident still
+    /// being talked to), and <c>ui reforge hit</c> presses the panel's hammer.
+    /// </summary>
+    private static CommandResult ReforgeCommand(InventoryScreen screen, TownDialog dialog, CommandContext ctx, string? button)
+    {
+        var inv = ctx.Player.State.Inventory;
+        var panel = screen.Service;
+        if (button == "hit")
+        {
+            if (panel.Npc == null || !panel.IsVisibleInTree()) return CommandResult.Fail("No reforge slot is open (ui talk <resident>, then ui reforge).");
+            var result = panel.Hit();
+            return result == Strata.Core.Gameplay.Town.TradeResult.Ok
+                ? CommandResult.Success($"Reforged: {inv.Service[0]}; the next one costs {Coins.Format(panel.CostShown)}.")
+                : CommandResult.Fail($"Not reforged ({result}): {(inv.Service[0].IsEmpty ? "the slot is empty" : inv.Service[0].ToString())}.");
+        }
+        if (button != null) throw new CommandException("expected ui reforge or ui reforge hit");
+        if (dialog.IsOpen) dialog.OpenService(ServiceMode.Reforge);
+        else if (ctx.World.Town.Residents.FirstOrDefault(t => t.TalkingTo == ctx.Player) is { } npc
+                 && npc.Def.Service?.Type == Strata.Core.Content.Specs.TownServiceSpecs.Reforge)
+            screen.OpenService(npc, ServiceMode.Reforge);
+        else return CommandResult.Fail("Not talking to anyone who reforges.");
+        return screen.Panel == UiPanel.Service
+            ? CommandResult.Success($"Reforge slot open{(inv.Service[0].IsEmpty ? "" : $": {inv.Service[0]}, cost {Coins.Format(panel.CostShown)}")}.")
+            : CommandResult.Fail("This resident does not reforge.");
     }
 
     /// <summary>The <c>ui chest</c> command: the open chest panel's links and its name field, as the player presses them.</summary>

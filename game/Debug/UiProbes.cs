@@ -13,7 +13,7 @@ namespace Strata.Game.Debug;
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); and on the inventory
 /// screen's layout (P2-15), the equipment column (P2-16), the chest panel (P2-17), the crafting column (P2-18), the
-/// NPC chat box (P2-26) and the grid shop (P2-27).
+/// NPC chat box (P2-26), the grid shop (P2-27) and the reforge slot (P2-28).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -98,5 +98,10 @@ public static class UiProbes
         // P2-27: the grid shop. Cells showing a ware or a sold stack on its page, and the stacks waiting to be bought back.
         ctx.AddProbe("ui.shop_slots", () => world.Inventory?.Shop.SlotsShown ?? 0);
         ctx.AddProbe("ui.buyback", () => ctx.World.Commerce.Buyback(ctx.Player).Count);
+        // P2-28: the reforge slot. The cost shown under it (copper, 0 while hidden), the hammer presses that reforged,
+        // and whether the service slot holds an item (closing the inventory stows it).
+        ctx.AddProbe("ui.service_cost", () => world.Inventory?.Service.CostShown ?? 0);
+        ctx.AddProbe("ui.reforges", () => world.Inventory?.Service.Reforges ?? 0);
+        ctx.AddProbe("ui.service_item", () => ctx.Player.State.Inventory.Service[0].IsEmpty ? 0 : 1);
     }
 }
