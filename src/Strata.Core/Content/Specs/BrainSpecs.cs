@@ -155,6 +155,11 @@ public sealed class WatcherParams : SpecParams
 
     /// <summary>Expert phase 2: wind-up before each dash scaled by this.</summary>
     public float ExpertTelegraphScale { get; init; } = 1f;
+
+    /// <summary>The other of a pair (the Twins): in Expert, once it has fallen this one moves at <see cref="ExpertLoneSpeed"/>.</summary>
+    public string? Sibling { get; init; }
+
+    public float ExpertLoneSpeed { get; init; } = 1f;
 }
 
 /// <summary>Burrowing worm: steers its head towards the target through terrain, carving a tunnel.</summary>

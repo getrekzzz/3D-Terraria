@@ -39,10 +39,11 @@
     {
       "id": "retinazer", "facing": "look", "model": "retinazer", "tags": ["boss", "lava_immune", "mechanical"], "name": "Retinazer",
       "description": "The cold eye of the pair: it keeps its distance and burns with light.",
-      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 22, "dashSpeed": 14, "dashesPerBurst": 1, "telegraphTicks": 40, "phase2Life": 0.45, "phase2Model": "retinazer_open" },
+      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 22, "dashSpeed": 14, "dashesPerBurst": 1, "telegraphTicks": 40, "phase2Life": 0.4, "phase2Model": "retinazer_open",
+        "phase2Defense": 20, "phase2Damage": 1.5, "transformTicks": 60, "sibling": "spazmatism", "expertLoneSpeed": 1.25 },
       "ranged": { "projectile": "death_laser", "damage": 32, "speed": 30, "interval": 75, "range": 45,
         "enraged": { "projectile": "death_laser", "damage": 26, "speed": 34, "interval": 18, "range": 45 } },
-      "life": 8000, "damage": 45, "defense": 12, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
+      "life": 20000, "damage": 45, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
       "loot": "the_twins", "value": 0,
       "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["spazmatism"] },
       "covers": ["terraria:the_twins"]
@@ -50,22 +51,24 @@
     {
       "id": "spazmatism", "facing": "look", "model": "spazmatism", "tags": ["boss", "lava_immune", "mechanical"], "name": "Spazmatism",
       "description": "The hot eye of the pair: it charges, and when it opens it breathes green fire.",
-      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 14, "dashSpeed": 19, "dashesPerBurst": 3, "telegraphTicks": 26, "phase2Life": 0.45, "phase2Model": "spazmatism_open" },
+      "brain": { "type": "eyeOfCthulhu", "orbitRadius": 14, "dashSpeed": 19, "dashesPerBurst": 3, "telegraphTicks": 26, "phase2Life": 0.4, "phase2Model": "spazmatism_open",
+        "phase2Defense": 28, "phase2Damage": 1.5, "transformTicks": 60, "sibling": "retinazer", "expertLoneSpeed": 1.25 },
       "ranged": { "projectile": "cursed_fireball", "damage": 36, "speed": 14, "interval": 95, "range": 30,
         "enraged": { "projectile": "eye_fire", "damage": 22, "speed": 17, "interval": 6, "count": 2, "spread": 8, "range": 12 } },
-      "life": 8000, "damage": 50, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 10, "gravity": false, "collideTerrain": false, "light": [2, 10, 2],
+      "life": 23000, "damage": 50, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 10, "gravity": false, "collideTerrain": false, "light": [2, 10, 2],
       "loot": "the_twins", "value": 0,
       "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech" }
     },
     {
       "id": "the_destroyer", "model": "the_destroyer_head", "tags": ["boss", "lava_immune", "mechanical"], "name": "The Destroyer",
-      "description": "A clockwork worm long enough to ring a hill; every plate of it carries a laser.",
+      "description": "A clockwork worm long enough to ring a hill; every plate of it carries a laser and a probe.",
       "brain": { "type": "worm", "speed": 12, "turnRate": 2.8, "digRadius": 0, "airGravity": 3, "minion": "probe", "minionInterval": 200, "maxMinions": 6 },
       "ranged": { "projectile": "death_laser", "damage": 28, "speed": 26, "interval": 22, "range": 40, "fromParts": true },
-      "life": 18000, "damage": 55, "defense": 24, "knockbackResist": 1.0, "size": [4, 4], "moveSpeed": 12, "gravity": false, "collideTerrain": false,
+      "life": 80000, "damage": 70, "defense": 0, "knockbackResist": 1.0, "size": [4, 4], "moveSpeed": 12, "gravity": false, "collideTerrain": false,
       "loot": "the_destroyer", "value": 0,
       "boss": { "title": "The Destroyer", "flag": "defeated_the_destroyer", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 220, "despawnAtDay": true, "music": "boss_mech",
-        "segments": 50, "segmentSpacing": 1.3, "segmentRadius": 0.9, "segmentModel": "the_destroyer_body", "tailModel": "the_destroyer_tail" },
+        "segments": 60, "segmentSpacing": 1.3, "segmentRadius": 0.9, "segmentModel": "the_destroyer_body", "tailModel": "the_destroyer_tail",
+        "segmentDefense": [0, 30, 35], "segmentDamage": [70, 50, 35] },
       "covers": ["terraria:the_destroyer"]
     },
     {

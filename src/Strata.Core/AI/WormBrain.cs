@@ -68,15 +68,41 @@ public sealed class WormBrain : IBrain
         }
     }
 
-    /// <summary>Drones launched from a random segment while fewer than the cap are alive.</summary>
+    /// <summary>Bit of <see cref="Npc.SegmentFlags"/>: this segment has launched its probe (it goes dark and stops firing).</summary>
+    public const byte ProbeSpent = 1;
+
+    /// <summary>
+    /// Drones launched while fewer than the cap are alive. Each body segment (never the tail) carries one: a random segment
+    /// that still has its drone launches it and is marked spent, so a long fight leaves the worm dark.
+    /// </summary>
     private void ReleaseMinion(Npc npc, BrainContext ctx)
     {
-        if (_p.Minion == null || ctx.Spawn == null || ctx.Target == null || npc.Segments.Count == 0) return;
+        if (_p.Minion == null || npc.Segments.Count < 2) return;
+        while (npc.SegmentFlags.Count < npc.Segments.Count) npc.SegmentFlags.Add(0); // marks the worm as a probe carrier
+        if (ctx.Spawn == null || ctx.Target == null) return;
         if (npc.Age == 0 || npc.Age % Math.Max(1, _p.MinionInterval) != 0) return;
         if (!ctx.Content.Enemies.TryGet(_p.Minion, out var minion) || (ctx.CountAlive?.Invoke(minion.Id) ?? 0) >= _p.MaxMinions) return;
-        var from = npc.Segments[ctx.Rng.NextInt(npc.Segments.Count)];
-        if (ctx.Spawn(minion, from) is { } m) m.Velocity = new Vector3(ctx.Rng.NextSigned(), 1f, ctx.Rng.NextSigned()) * 4f;
+        var flags = npc.SegmentFlags;
+        int body = npc.Segments.Count - 1, start = ctx.Rng.NextInt(body);
+        for (int k = 0; k < body; k++)
+        {
+            int i = (start + k) % body;
+            if ((flags[i] & ProbeSpent) != 0) continue;
+            if (ctx.Spawn(minion, npc.Segments[i]) is not { } m) return; // the creature cap: the segment keeps its drone
+            m.Velocity = new Vector3(ctx.Rng.NextSigned(), 1f, ctx.Rng.NextSigned()) * 4f;
+            flags[i] |= ProbeSpent;
+            return;
+        }
     }
+
+    /// <summary>Whether body segment <paramref name="i"/> has launched its drone.</summary>
+    public static bool Spent(Npc npc, int i) => i < npc.SegmentFlags.Count && (npc.SegmentFlags[i] & ProbeSpent) != 0;
+
+    /// <summary>
+    /// Whether segment <paramref name="i"/> may fire a part's volley: on a probe carrier only body plates that still hold
+    /// their probe (the tail never fires); any segment of other creatures.
+    /// </summary>
+    public static bool Fires(Npc npc, int i) => npc.SegmentFlags.Count == 0 || (i < npc.Segments.Count - 1 && !Spent(npc, i));
 
     private static bool NearTerrain(BrainContext ctx, Vector3 point)
     {

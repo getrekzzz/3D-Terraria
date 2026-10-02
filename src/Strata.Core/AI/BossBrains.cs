@@ -155,6 +155,9 @@ public sealed class WatcherBrain : IBrain
     {
         float life = npc.Life / (float)Math.Max(1, npc.MaxLife);
         if (npc.Stage < 0) npc.Stage = 0;
+        // Expert: a twin whose sibling has fallen fights on faster.
+        if (_p.Sibling != null && _p.ExpertLoneSpeed != 1f)
+            npc.SpeedScale = ctx.Expert && (ctx.CountAlive?.Invoke(_p.Sibling) ?? 1) == 0 ? _p.ExpertLoneSpeed : 1f;
         if (npc.Stage == 0 && life <= _p.Phase2Life)
         {
             npc.Stage = 1;

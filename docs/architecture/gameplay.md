@@ -139,6 +139,15 @@
   the last piece dies. Each piece is its own `WormBrain`; in Expert a body segment that sees the target spits Vile Spit
   (`eater_spit`, Weak) every `spitInterval`. `NpcRenderer.SyncSegmentViews` returns lost segment visuals to the pool
   and keeps the tail model on the last one.
+* **The Destroyer and the Twins** — the Destroyer keeps Terraria's shared life (80000 over 60 segments; no
+  `segmentLife`, so nothing breaks off — adding `segmentLife` with `splits: false` is the data switch for a chain that
+  closes over dead segments) but `segmentDefense` [0, 30, 35] / `segmentDamage` [70, 50, 35] still apply per struck
+  volume (`NpcSystem.Hit` uses `SegmentDefense` whenever the table exists). A worm with a `minion` is a probe carrier:
+  `Npc.SegmentFlags` bit `WormBrain.ProbeSpent` marks a body plate that launched its probe (one each, never the tail;
+  a capped spawn keeps it), `RangedAttack` with `fromParts` skips spent plates and the tail (`WormBrain.Fires`), and
+  `NpcRenderer` tints spent plates 0.35. Retinazer 20000 / Spazmatism 23000 open at 40% (`transformTicks` 60, phase 2
+  defense 20 / 28, ×1.5 contact); in Expert a twin whose `sibling` died moves at `expertLoneSpeed` 1.25
+  (`Npc.SpeedScale`). Balance note: these pools are ×2.5–4.4 the old ones, Terraria-faithful by player request.
 * **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
   at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
   `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster

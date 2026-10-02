@@ -293,13 +293,17 @@ public sealed partial class NpcSystem
     {
         if (!npc.Alive || npc.Invulnerable || (melee && npc.ImmuneTicks > 0)) return false;
         if (segment >= 0 && segment < npc.SegmentLife.Count) return HitSegment(npc, segment, attacker, baseDamage, damageClass, critChance, melee);
-        var hit = DamageModel.Roll(baseDamage, damageClass, critChance, knockback, attacker?.State.Effects.Stats, npc.Defense,
-            0.5f, 0f, npc.Def.KnockbackResist, ref _rng);
+        // A shared-life worm (the Destroyer) still armours each segment kind on its own: soft head, plated body and tail.
+        bool plated = npc.Def.Boss is { SegmentDefense.Length: >= 3 } && segment < npc.Segments.Count;
+        var hit = DamageModel.Roll(baseDamage, damageClass, critChance, knockback, attacker?.State.Effects.Stats,
+            plated ? SegmentDefense(npc, segment) : npc.Defense, 0.5f, 0f, npc.Def.KnockbackResist, ref _rng);
         npc.Life -= hit.Damage;
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
         Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback);
-        Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
+        var shown = segment >= 0 && segment < npc.Segments.Count ? npc.Segments[segment] + new Vector3(0, 0.9f, 0)
+            : npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0);
+        Damaged?.Invoke(new DamageEvent(shown, hit.Damage, hit.Crit, false));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
         if (npc.Life <= 0) Die(npc);

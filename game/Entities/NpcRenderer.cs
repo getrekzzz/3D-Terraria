@@ -192,7 +192,8 @@ public sealed partial class NpcRenderer : Node3D
             }
             var dir = ahead - p;
             if (!freeParts && dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
-            seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
+            // A plate that launched its probe goes dark (and no longer fires).
+            seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Strata.Core.AI.WormBrain.Spent(npc, i) ? SpentTint : Colors.White);
             seg.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, p)));
             ahead = p;
         }
@@ -202,6 +203,8 @@ public sealed partial class NpcRenderer : Node3D
     /// A worm that lost segments (split, or its head handed on) drops the extra visuals back into the pool, and its
     /// last visual wears the tail model while the others wear the body's.
     /// </summary>
+    private static readonly Color SpentTint = new(0.35f, 0.35f, 0.35f);
+
     private void SyncSegmentViews(Npc npc, View view, string segModel)
     {
         while (view.Segments.Count > npc.Segments.Count)

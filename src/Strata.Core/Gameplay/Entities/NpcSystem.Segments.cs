@@ -121,6 +121,7 @@ public sealed partial class NpcSystem
         {
             piece.Segments.Add(src.Segments[k]);
             piece.SegmentLife.Add(src.SegmentLife[k]);
+            if (k < src.SegmentFlags.Count) piece.SegmentFlags.Add(src.SegmentFlags[k]); // spent probes stay spent
         }
         _npcs.Add(piece);
         Spawned?.Invoke(piece);

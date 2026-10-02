@@ -26,6 +26,8 @@ boss the_destroyer 14
 wait 5
 assert npcs.the_destroyer == 1
 assert npcs.probe >= 1
+assert boss.the_destroyer.life > 0
+assert boss.the_destroyer.segments == 60
 slay the_destroyer
 assert flag.defeated_the_destroyer == 1
 killall
