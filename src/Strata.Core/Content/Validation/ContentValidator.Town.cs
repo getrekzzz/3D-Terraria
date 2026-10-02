@@ -78,7 +78,7 @@ public static partial class ContentValidator
     private static IEnumerable<TypedSpec> AllConditions(TownNpcDef t) =>
         t.Arrival.Concat(t.LeavesWhen).Concat(t.Shop.SelectMany(s => s.Conditions)).Concat(t.Lines.SelectMany(l => l.Conditions));
 
-    /// <summary>References inside resident/hasItem conditions (also nested in all/any/not).</summary>
+    /// <summary>References inside resident/hasItem/wearing/rescued/killed/obtained conditions (also nested in all/any/not).</summary>
     private static void CheckTownCondition(Ctx ctx, ContentDef owner, TypedSpec c)
     {
         string? Str(string name) => c.Raw.TryGetProperty(name, out var v) && v.ValueKind == System.Text.Json.JsonValueKind.String ? v.GetString() : null;
@@ -92,6 +92,15 @@ public static partial class ContentValidator
                 break;
             case "wearing":
                 ctx.Ref(owner, ctx.Db.Items, Str("item"), "wearing condition");
+                break;
+            case "rescued":
+                ctx.Ref(owner, ctx.Db.TownNpcs, Str("id"), "rescued condition");
+                break;
+            case "killed":
+                ctx.Ref(owner, ctx.Db.Enemies, Str("enemy"), "killed condition");
+                break;
+            case "obtained":
+                ctx.Ref(owner, ctx.Db.Items, Str("item"), "obtained condition");
                 break;
             case "all" or "any" or "not" when c.Raw.TryGetProperty("of", out var of) && of.ValueKind == System.Text.Json.JsonValueKind.Array:
                 foreach (var inner in of.EnumerateArray())

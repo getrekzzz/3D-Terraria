@@ -65,6 +65,8 @@ internal static class StandardProbes
             : null);
         ctx.AddPrefixProbe("event.", id => w.Session.Content.Events.Contains(id) ? (w.Events.IsActive(id) ? 1 : 0) : null);
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
+        ctx.AddPrefixProbe("season.", id => Array.IndexOf(Conditions.SeasonConditionParams.Values, id) < 0 ? (double?)null
+            : (w.Session.Season.Length == 0 ? "none" : w.Session.Season) == id ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);
         // zone.<biome>: 1 while the player stands in a zone (the crypt, spider nests…).
         ctx.AddPrefixProbe("zone.", id => w.Session.Content.Biomes.Contains(id) ? (w.Session.ContextAt(ctx.Player.FeetCell).Biomes.Contains(id) ? 1 : 0) : null);

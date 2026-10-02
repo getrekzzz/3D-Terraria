@@ -20,6 +20,7 @@ public sealed partial class WorldSession
         ctx.Hour = Clock.Hour;
         ctx.IsDay = Clock.IsDay;
         ctx.MoonPhase = Clock.MoonPhase;
+        ctx.Season = Season;
         ctx.Flags = Flags;
         ctx.Events = Events;
         ctx.EventKills = EventKills;

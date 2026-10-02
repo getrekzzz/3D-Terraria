@@ -47,6 +47,9 @@ public sealed partial class TownSystem
 
     public IReadOnlyList<TownNpc> Residents => _residents;
 
+    /// <summary>The player's journal for town conditions (bestiary, kills, achievements); set by the journal.</summary>
+    public Func<PlayerEntity, IPlayerRecords?>? PlayerRecords { get; set; }
+
     private NavAgent Agent => NavAgent.Humanoid;
     private VoxelWorld World => _world.Session.World;
 
@@ -154,7 +157,11 @@ public sealed partial class TownSystem
         FillTownFacts(ctx);
         ctx.ItemCount = key => _world.Players.Sum(p => key.StartsWith('#')
             ? p.State.Inventory.CountAll(d => d.HasTag(key[1..]))
-            : _world.Session.Content.Items.TryGet(key, out var item) ? p.State.Inventory.CountAll(item) : 0);
+            : key.StartsWith('@')
+                ? Enum.TryParse<ItemCategory>(key[1..], ignoreCase: true, out var cat) ? p.State.Inventory.CountAll(d => d.Category == cat) : 0
+                : _world.Session.Content.Items.TryGet(key, out var item) ? p.State.Inventory.CountAll(item) : 0);
+        ctx.AnglerQuests = 0; // per-player quest counts arrive with the Angler's quest log (P5-23)
+        ctx.Records = PlayerRecords?.Invoke(player);
         return ctx;
     }
 

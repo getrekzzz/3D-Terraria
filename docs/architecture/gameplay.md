@@ -439,3 +439,8 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   edit (liquids ignored) or a tile object add/remove touches their bounds grown by `evilMargin + 1`; open results
   expire after `openRoomTtl`. The town's background checks are budgeted (`maxScansPerTick`, retried next interval)
   and one home per check is re-scanned regardless. Probe `house.scans` counts flood fills.
+* **Town conditions** (`ConditionCompiler.Town.cs`): `rescued {id}` (world flag `rescued_<id>`, `TownRescue`),
+  `hasItem {category}` (an `ItemCategory`, item-count key `@<category>`), `bestiary {min,max}`, `killed {enemy,min}`,
+  `obtained {item}`, `achieved {id}` (read `ConditionContext.Records`, an `IPlayerRecords` the journal supplies
+  through `TownSystem.PlayerRecords`; null reads 0/false), `season {is}` and `anglerQuests {min,max}`. The season is
+  `WorldMeta.ForcedSeason` (the `season` command) or the real date (`SeasonCalendar`); it never affects generation.

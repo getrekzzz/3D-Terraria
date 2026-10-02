@@ -57,6 +57,9 @@ public sealed class WorldMeta
 
     /// <summary>Starter residents (the guide) have been placed.</summary>
     public bool TownStarted { get; set; }
+
+    /// <summary>Season forced by the season command ("" = none); null follows the real date (no version bump).</summary>
+    public string? ForcedSeason { get; set; }
     public int[] Spawn { get; set; } = { 0, 0, 0 };
 
     public IdTablesModel IdTables { get; set; } = new();

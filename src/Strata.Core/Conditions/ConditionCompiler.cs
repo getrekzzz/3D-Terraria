@@ -5,11 +5,23 @@ using Strata.Core.World;
 namespace Strata.Core.Conditions;
 
 /// <summary>Compiles condition specs from content into <see cref="ICondition"/> objects.</summary>
-public static class ConditionCompiler
+public static partial class ConditionCompiler
 {
-    private static readonly Dictionary<string, Func<TypedSpec, ICondition>> Factories = new(StringComparer.Ordinal)
+    private static readonly Dictionary<string, Func<TypedSpec, ICondition>> Factories = Build();
+
+    private static Dictionary<string, Func<TypedSpec, ICondition>> Build()
     {
-        ["biome"] = s =>
+        var f = new Dictionary<string, Func<TypedSpec, ICondition>>(StringComparer.Ordinal);
+        AddWorld(f);
+        AddTown(f);
+        AddComposites(f);
+        return f;
+    }
+
+    /// <summary>Place, time, world progress and combat conditions.</summary>
+    private static void AddWorld(Dictionary<string, Func<TypedSpec, ICondition>> f)
+    {
+        f["biome"] = s =>
         {
             var p = s.Parse<BiomeConditionParams>();
             return new DelegateCondition(c =>
@@ -21,14 +33,14 @@ public static class ConditionCompiler
                     if (c.HasBiome(a)) return true;
                 return false;
             });
-        },
-        ["layer"] = s =>
+        };
+        f["layer"] = s =>
         {
             var p = s.Parse<LayerConditionParams>();
             var layers = p.Any.Select(l => Enum.Parse<WorldLayer>(l, ignoreCase: true)).ToArray();
             return new DelegateCondition(c => Array.IndexOf(layers, c.Layer) >= 0);
-        },
-        ["time"] = s =>
+        };
+        f["time"] = s =>
         {
             var p = s.Parse<TimeConditionParams>();
             return p.Is switch
@@ -39,108 +51,86 @@ public static class ConditionCompiler
                     ? c.Hour >= p.FromHour && c.Hour < p.ToHour
                     : c.Hour >= p.FromHour || c.Hour < p.ToHour),
             };
-        },
-        ["flag"] = s =>
+        };
+        f["flag"] = s =>
         {
             var p = s.Parse<FlagConditionParams>();
             return new DelegateCondition(c => c.Flags.Contains(p.Id) == p.Set);
-        },
-        ["event"] = s =>
+        };
+        f["event"] = s =>
         {
             var p = s.Parse<EventConditionParams>();
             if (p.MinKills <= 0) return new DelegateCondition(c => c.Events.Contains(p.Id) == p.Active);
             return new DelegateCondition(c => c.Events.Contains(p.Id) && c.EventKills.TryGetValue(p.Id, out int k) && k >= p.MinKills);
-        },
-        ["depth"] = s =>
+        };
+        f["depth"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.Depth >= p.Min && c.Depth <= p.Max);
-        },
-        ["light"] = s =>
+        };
+        f["light"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.Light >= p.Min && c.Light <= p.Max);
-        },
-        ["moon"] = s =>
+        };
+        f["moon"] = s =>
         {
             var p = s.Parse<MoonConditionParams>();
             return new DelegateCondition(c => Array.IndexOf(p.Phases, c.MoonPhase) >= 0);
-        },
-        ["nearLiquid"] = s =>
+        };
+        f["nearLiquid"] = s =>
         {
             var p = s.Parse<NearLiquidParams>();
             return new DelegateCondition(c => c.NearbyLiquids.Contains(p.Liquid));
-        },
-        ["chance"] = s =>
+        };
+        f["chance"] = s =>
         {
             var p = s.Parse<ChanceConditionParams>();
             return new DelegateCondition(c => c.Random.NextFloat() < p.P);
-        },
-        ["coins"] = s =>
-        {
-            var p = s.Parse<CoinsConditionParams>();
-            return new DelegateCondition(c => c.PlayerCoins >= p.Min);
-        },
-        ["maxLife"] = s =>
-        {
-            var p = s.Parse<RangeConditionParams>();
-            return new DelegateCondition(c => c.PlayerMaxLife >= p.Min && c.PlayerMaxLife <= p.Max);
-        },
-        ["resident"] = s =>
-        {
-            var p = s.Parse<ResidentConditionParams>();
-            return new DelegateCondition(c => c.Residents.Contains(p.Id) == p.Present);
-        },
-        ["residents"] = s =>
-        {
-            var p = s.Parse<RangeConditionParams>();
-            return new DelegateCondition(c => c.ResidentCount >= p.Min && c.ResidentCount <= p.Max);
-        },
-        ["hasItem"] = s =>
-        {
-            var p = s.Parse<HasItemConditionParams>();
-            string key = p.Item ?? "#" + p.Tag;
-            return new DelegateCondition(c => (c.ItemCount?.Invoke(key) ?? 0) >= p.Count);
-        },
-        ["wearing"] = s =>
+        };
+        f["wearing"] = s =>
         {
             var p = s.Parse<WearingConditionParams>();
             return new DelegateCondition(c => c.Wearing?.Invoke(p.Item) ?? false);
-        },
-        ["difficulty"] = s =>
+        };
+        f["difficulty"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.Difficulty >= p.Min && c.Difficulty <= p.Max);
-        },
-        ["expert"] = s =>
+        };
+        f["expert"] = s =>
         {
             var p = s.Parse<ExpertConditionParams>();
             return new DelegateCondition(c => (c.Difficulty is 1 or 2) == p.Is);
-        },
-        ["defense"] = s =>
+        };
+        f["defense"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.PlayerDefense >= p.Min && c.PlayerDefense <= p.Max);
-        },
-        ["evil"] = s =>
+        };
+        f["evil"] = s =>
         {
             var p = s.Parse<EvilConditionParams>();
             return new DelegateCondition(c => string.Equals(c.Evil, p.Is, StringComparison.OrdinalIgnoreCase));
-        },
-        ["fishingPower"] = s =>
+        };
+        f["fishingPower"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.FishingPower >= p.Min && c.FishingPower <= p.Max);
-        },
-        ["worldRing"] = s =>
+        };
+        f["worldRing"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.CentreDistance >= p.Min && c.CentreDistance <= p.Max);
-        },
-        ["all"] = s => new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
-        ["any"] = s => new AnyCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
-        ["not"] = s => new NotCondition(new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray())),
-    };
+        };
+    }
+
+    private static void AddComposites(Dictionary<string, Func<TypedSpec, ICondition>> f)
+    {
+        f["all"] = s => new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray());
+        f["any"] = s => new AnyCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray());
+        f["not"] = s => new NotCondition(new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()));
+    }
 
     public static IEnumerable<string> Types => Factories.Keys;
 
@@ -159,6 +149,7 @@ public static class ConditionCompiler
 
     internal static void RegisterSpecs(SpecCatalog c)
     {
+        RegisterTownSpecs(c);
         c.Register<BiomeConditionParams>(SpecKind.Condition, "biome");
         c.Register<LayerConditionParams>(SpecKind.Condition, "layer");
         c.Register<TimeConditionParams>(SpecKind.Condition, "time");
@@ -169,11 +160,6 @@ public static class ConditionCompiler
         c.Register<MoonConditionParams>(SpecKind.Condition, "moon");
         c.Register<NearLiquidParams>(SpecKind.Condition, "nearLiquid");
         c.Register<ChanceConditionParams>(SpecKind.Condition, "chance");
-        c.Register<CoinsConditionParams>(SpecKind.Condition, "coins");
-        c.Register<RangeConditionParams>(SpecKind.Condition, "maxLife");
-        c.Register<ResidentConditionParams>(SpecKind.Condition, "resident");
-        c.Register<RangeConditionParams>(SpecKind.Condition, "residents");
-        c.Register<HasItemConditionParams>(SpecKind.Condition, "hasItem");
         c.Register<WearingConditionParams>(SpecKind.Condition, "wearing");
         c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<RangeConditionParams>(SpecKind.Condition, "fishingPower");

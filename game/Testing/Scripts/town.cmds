@@ -50,6 +50,13 @@ fill 3 -3 -5 13 -2 5 stone
 town check force
 assert town.homed == 1
 
+# --- P5-03 ---
+season christmas
+assert season.christmas == 1
+season none
+assert season.none == 1
+season auto
+
 # Talking and trading with the peddler.
 give silver_coin 60
 town summon merchant 0 0 -3

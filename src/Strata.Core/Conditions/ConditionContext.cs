@@ -70,6 +70,15 @@ public sealed class ConditionContext
     /// <summary>How far out the position lies: 0 at the world's centre, 1 at the edge of its land (outer thirds ≥ 0.66).</summary>
     public float CentreDistance { get; set; }
 
+    /// <summary>The calendar season: "christmas", "halloween" or "" (none).</summary>
+    public string Season { get; set; } = "";
+
+    /// <summary>Angler quests the player has finished.</summary>
+    public int AnglerQuests { get; set; }
+
+    /// <summary>The player's journal (kills, pickups, bestiary, achievements); null = unknown (0 / false).</summary>
+    public IPlayerRecords? Records { get; set; }
+
     public Pcg32 Random;
 
     public bool HasBiome(string id)
