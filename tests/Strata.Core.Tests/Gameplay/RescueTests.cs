@@ -106,4 +106,17 @@ public class RescueTests
             if (Directory.Exists(dir)) Directory.Delete(dir, recursive: true);
         }
     }
+
+    [Fact]
+    public void TheBoundMechanicWaitsAtTheDungeonsMechanicRoom()
+    {
+        using var g = Create();
+        var plan = g.World.Session.Generator.Plan;
+        Assert.True(plan.Landmarks.ContainsKey(Strata.Core.WorldGen.Plan.LandmarkIds.DungeonMechanic));
+        var rescue = g.Content.TownNpcs.Get("mechanic").Rescue!;
+        Assert.Equal(Strata.Core.WorldGen.Plan.LandmarkIds.DungeonMechanic, rescue.Landmark);
+        Assert.Equal("Bound Mechanic", rescue.Title);
+        foreach (var id in new[] { "goblin_tinkerer", "mechanic", "wizard", "stylist", "golfer", "angler", "tavernkeep", "tax_collector" })
+            Assert.NotNull(g.Content.TownNpcs.Get(id).Rescue);
+    }
 }

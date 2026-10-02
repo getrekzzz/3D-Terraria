@@ -542,3 +542,8 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   at its planned `landmark`. Bound NPCs do not count, cannot be hurt, only fall, and show the rescue title. Talking
   (`BeginTalk`) frees them (`requiresItem` is used up: the Tortured Soul's Purification Powder); the next move-in
   check houses them. Console: `town bind|rescue <id>`; probe `town.<id>.bound`; smoke `rescue.cmds`.
+* **Rescue sites** (P5-06b): the Dungeon plans landmark `dungeon_mechanic` at `DungeonLayout.MechanicCell` (the
+  `RoomKind.Mechanic` room); the Mechanic's rescue uses it once Skeletron is down and waits there even in plain view
+  (a reserved site). The other rescues search: Goblin and Wizard in the caverns, Stylist in spider nests (sampled
+  inside the nest features), Golfer in the underground desert, Angler on the ocean surface, Tavernkeep on the
+  surface, the Tortured Soul in the underworld. A `rescued` condition on an NPC without a rescue block is an error.

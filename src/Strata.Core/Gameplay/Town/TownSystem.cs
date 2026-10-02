@@ -75,7 +75,7 @@ public sealed partial class TownSystem
         if (!_world.Session.Meta.TownStarted) TryPlaceStarters();
         if (ArrivalsEnabled && tick % Config.ArrivalInterval == 0) Arrivals(force: false, budgeted: true);
         if (tick % LandmarkInterval == 0) UpdateLandmarks();
-        if (ArrivalsEnabled && tick % RescueInterval == 0) UpdateRescues();
+        if (tick % RescueInterval == 0) UpdateRescues();
         if (tick % Config.HomeCheckInterval == 0) CheckHomes();
         foreach (var r in _residents) TickResident(r);
         _status?.Tick();

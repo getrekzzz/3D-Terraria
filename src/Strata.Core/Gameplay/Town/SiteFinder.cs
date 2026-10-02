@@ -52,14 +52,14 @@ public sealed class SiteFinder
     }
 
     /// <summary>A standable, unseen node near a cell where the conditions hold (null otherwise).</summary>
-    public Int3? Accept(Int3 cell, ICondition where, ConditionContext ctx, PlayerEntity player, int radius = 6)
+    public Int3? Accept(Int3 cell, ICondition where, ConditionContext ctx, PlayerEntity player, int radius = 6, bool unseen = true)
     {
         var world = _world.Session.World;
         if (!world.InBounds(cell.X, cell.Y, cell.Z) || world.GetBlock(cell) == VoxelWorld.Unknown) return null;
         if (!where.Evaluate(_world.Session.ContextAt(cell, ctx))) return null;
         if (_world.Navigator.NearestStandable(cell, NavAgent.Humanoid, radius) is not { } node) return null;
         var center = TownSystem.NodeFeet(node) + new Vector3(0, TownNpc.HalfExtents.Y, 0);
-        return _world.Npcs.InSight(player.Eye, center) ? null : node;
+        return unseen && _world.Npcs.InSight(player.Eye, center) ? null : node;
     }
 
     private void NearbyFeatures(IReadOnlyList<string> zones, float reach, PlayerEntity player)

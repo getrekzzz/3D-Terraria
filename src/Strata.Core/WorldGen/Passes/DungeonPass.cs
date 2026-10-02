@@ -43,6 +43,7 @@ public sealed class DungeonPass : GenPass
         }
         else marks[LandmarkIds.DungeonChest] = bottom.CenterFloor;
         marks[LandmarkIds.DungeonGate] = DungeonBuilder.GateCell(layout, site.Surface);
+        if (layout.MechanicRoom >= 0) marks[LandmarkIds.DungeonMechanic] = layout.MechanicCell; // the bound Mechanic (P5-06b)
         TourMarks(marks, layout, bp, ctx.Content);
     }
 

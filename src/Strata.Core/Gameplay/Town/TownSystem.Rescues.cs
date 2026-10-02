@@ -62,7 +62,8 @@ public sealed partial class TownSystem
     private Int3? LandmarkSite(string landmark, ICondition where, PlayerEntity player)
     {
         if (!_world.Session.Generator.Plan.Landmarks.TryGetValue(landmark, out var cell) || World.GetBlock(cell) == VoxelWorld.Unknown) return null;
-        return Sites.Accept(cell + Int3.Up, where, new ConditionContext(), player, radius: 8);
+        // A planned site (the Dungeon's Mechanic room) is reserved for them: they wait there even in plain view.
+        return Sites.Accept(cell + Int3.Up, where, new ConditionContext(), player, radius: 8, unseen: false);
     }
 
     /// <summary>Places an NPC bound at a node (commands and tests skip the requirements).</summary>

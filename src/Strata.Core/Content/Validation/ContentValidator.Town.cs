@@ -102,9 +102,8 @@ public static partial class ContentValidator
                 break;
             case "rescued":
                 ctx.Ref(owner, ctx.Db.TownNpcs, Str("id"), "rescued condition");
-                // A warning until every rescued NPC has its site (P5-06b), then an error.
                 if (ctx.Db.TownNpcs.TryGet(Str("id") ?? "", out var rescued) && rescued.Rescue == null)
-                    ctx.Warn(owner, $"rescued condition: '{Str("id")}' has no rescue block, so nothing in the world can free them.");
+                    ctx.Error(owner, $"rescued condition: '{Str("id")}' has no rescue block, so nothing in the world can free them.");
                 break;
             case "killed":
                 ctx.Ref(owner, ctx.Db.Enemies, Str("enemy"), "killed condition");
