@@ -32,6 +32,8 @@ public static class PlayerProbes
             ctx.AddProbe("player.twist_deg", () => avatar.TwistDegrees);
             ctx.AddProbe("player.action_dips", () => avatar.ActionDips); // chained uses that faded toward locomotion between
             ctx.AddProbe("player.action_weight", () => avatar.ActionWeight);
+            ctx.AddProbe("player.hold_weight", () => avatar.HoldWeight); // the right arm's looping clip (torch, flail, yoyo)
+            ctx.AddProbe("player.hold_clip", () => avatar.HoldClip); // 0 raised light, 1 flail, 2 yoyo, -1 lowered
             // The item in the third-person hand: its limbs' or shaft's lean from upright, its business end's angle off the aim.
             ctx.AddProbe("player.held_tilt_deg", () => avatar.HeldDegrees().Tilt);
             ctx.AddProbe("player.held_aim_deg", () => avatar.HeldDegrees().Aim);

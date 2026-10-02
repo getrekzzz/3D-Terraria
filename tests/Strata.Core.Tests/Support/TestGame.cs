@@ -45,6 +45,7 @@ public sealed class TestGame : IDisposable
         var session = WorldSession.Create(content ?? TestPaths.Content, settings, saveDir, content == null ? Tables : new RenderTables(content, _ => 0), log);
         session.Seasons.Clock = () => new DateTime(2026, 6, 1); // no seasonal event unless a test forces one
         var world = new GameWorld(session, new StreamingSettings { MeshRadius = 1, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1 }, 1, saveDir == null ? null : Path.Combine(saveDir, "players"));
+        world.ItemUse.Timing = TestPaths.Timing; // the shipped use styles, as the game loads them
         var center = session.SpawnCell;
         var chunk = ChunkMath.CellToChunk(center);
         for (int y = -1; y <= 1; y++)

@@ -9,9 +9,9 @@
   ],
   "items": [
     { "id": "meteorite_bar", "name": "Meteorite Bar", "description": "Warm to the touch.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 700, "covers": ["terraria:meteorite_bar"] },
-    { "id": "space_gun", "name": "Space Gun", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "shoot", "useTime": 16, "useAnimation": 16, "autoReuse": true,
+    { "id": "space_gun", "name": "Space Gun", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "gun", "useTime": 16, "useAnimation": 16, "autoReuse": true,
       "damage": 17, "damageType": "magic", "knockback": 1, "manaCost": 6, "projectile": "space_laser", "shootSpeed": 38, "covers": ["terraria:space_gun"] },
-    { "id": "star_cannon", "name": "Star Cannon", "description": "Shoots fallen stars.", "category": "weapon", "rarity": 2, "value": 30000, "useStyle": "shoot", "useTime": 12, "useAnimation": 12, "autoReuse": true,
+    { "id": "star_cannon", "name": "Star Cannon", "description": "Shoots fallen stars.", "category": "weapon", "rarity": 2, "value": 30000, "useStyle": "gun", "useTime": 12, "useAnimation": 12, "autoReuse": true,
       "damage": 55, "damageType": "ranged", "knockback": 4, "useAmmo": "star", "shootSpeed": 22, "covers": ["terraria:star_cannon"] },
     { "id": "meteor_shot", "name": "Meteor Shot", "category": "ammo", "maxStack": 9999, "value": 10, "damage": 9, "damageType": "ranged", "knockback": 1,
       "ammoClass": "bullet", "projectile": "meteor_shot", "consumable": true, "covers": ["terraria:meteor_shot"] },
@@ -21,9 +21,9 @@
       "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.07 }] },
     { "id": "meteor_leggings", "name": "Meteor Leggings", "description": "7% increased magic damage.", "category": "armor", "rarity": 1, "value": 25000, "equipSlot": "legs", "defense": 3, "armorSet": "meteor_armor",
       "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.07 }] },
-    { "id": "spiky_ball", "name": "Spiky Ball", "category": "weapon", "maxStack": 9999, "value": 80, "useStyle": "shoot", "useTime": 15, "useAnimation": 15, "consumable": true,
+    { "id": "spiky_ball", "name": "Spiky Ball", "category": "weapon", "maxStack": 9999, "value": 80, "useStyle": "throw", "useTime": 15, "useAnimation": 15, "consumable": true,
       "damage": 15, "damageType": "ranged", "projectile": "shuriken", "shootSpeed": 12 },
-    { "id": "harpoon", "name": "Harpoon", "category": "weapon", "rarity": 2, "value": 27000, "useStyle": "shoot", "useTime": 30, "useAnimation": 30,
+    { "id": "harpoon", "name": "Harpoon", "category": "weapon", "rarity": 2, "value": 27000, "useStyle": "gun", "useTime": 30, "useAnimation": 30,
       "damage": 25, "damageType": "ranged", "knockback": 6, "projectile": "throwing_knife", "shootSpeed": 24 }
   ],
   "recipes": [

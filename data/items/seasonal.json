@@ -3,8 +3,8 @@
   // creature rolls "enemy_global_drops" (goodie bags at Halloween, presents at Christmas); seasonal vanity, food and
   // decorations come out of them, and Santa Claus sells Christmas decorations while he visits.
   "items": [
-    {"id": "goodie_bag", "name": "Goodie Bag", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 2000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "goodie_bag"}]},
-    {"id": "present", "name": "Present", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 2000, "useStyle": "consume", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "present"}]},
+    {"id": "goodie_bag", "name": "Goodie Bag", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 2000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "goodie_bag"}]},
+    {"id": "present", "name": "Present", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 2000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "present"}]},
     {"id": "witch_hat", "armorSet": "witch_costume", "name": "Witch Hat", "description": "Vanity. Bubble, bubble.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "head", "tags": ["vanity"]},
     {"id": "witch_dress", "armorSet": "witch_costume", "name": "Witch Dress", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "body", "tags": ["vanity"]},
     {"id": "witch_boots", "armorSet": "witch_costume", "name": "Witch Boots", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "legs", "tags": ["vanity"]},
@@ -13,8 +13,8 @@
     {"id": "santa_shirt", "armorSet": "santa_costume", "name": "Santa Shirt", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "body", "tags": ["vanity"]},
     {"id": "santa_pants", "armorSet": "santa_costume", "name": "Santa Pants", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "legs", "tags": ["vanity"]},
     {"id": "reindeer_antlers", "name": "Reindeer Antlers", "description": "Vanity.", "category": "vanity", "rarity": 1, "value": 5000, "equipSlot": "head", "tags": ["vanity"]},
-    {"id": "candy_corn", "name": "Candy Corn", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "well_fed", "ticks": 18000}},
-    {"id": "candy_cane", "name": "Candy Cane", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "well_fed", "ticks": 18000}},
+    {"id": "candy_corn", "name": "Candy Corn", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 9999, "value": 200, "useStyle": "eat", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "well_fed", "ticks": 18000}},
+    {"id": "candy_cane", "name": "Candy Cane", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 9999, "value": 200, "useStyle": "eat", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "well_fed", "ticks": 18000}},
     {"id": "pumpkin", "name": "Pumpkin", "description": "Carve it into a Jack 'O Lantern.", "category": "material", "maxStack": 9999, "value": 50}
   ],
   "tileObjects": [

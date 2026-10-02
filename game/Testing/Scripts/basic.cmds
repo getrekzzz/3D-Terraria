@@ -106,4 +106,41 @@ assert pets.active == 1
 assert projectiles.count >= 2
 wait 1
 assert lights.pets == 1
+
+# --- P3-03 ---
+# Every use style has its own clip in every human animation set (none falls back to idle), and the new clips play:
+# a throw, a bite of food, a yoyo worked and a flail spun on the right arm while they are used (a glowing flail is held
+# up like a torch between uses).
+assert anim.missing_clips == 0
+give shuriken 20
+wield shuriken
+aim 0 0 1
+use
+wait 0.1
+assert player.action_weight > 0.5
+wait 1
+give cooked_fish 2
+wield cooked_fish
+use
+wait 0.15
+assert player.action_weight > 0.5
+wait 1.5
+give wood_yoyo 1
+wield wood_yoyo
+press use_primary
+wait 0.3
+assert player.hold_clip == 2
+assert player.hold_weight > 0.5
+release use_primary
+wait 1.5
+assert player.hold_weight < 0.1
+give sunfury 1
+wield sunfury
+press use_primary
+wait 0.5
+assert player.hold_clip == 1
+release use_primary
+wait 1.5
+assert player.hold_clip == 0
+assert anim.missing_clips == 0
 assert errors == 0

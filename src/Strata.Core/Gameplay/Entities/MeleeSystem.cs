@@ -72,7 +72,7 @@ public sealed class MeleeSystem
             // Nothing connects during the wind-up. A thrust then stabs inside its strike window; a swing's blade
             // sweeps the arc over the strike window and stays dangerous through the follow-through.
             bool thrust = s.Item.Has(ItemAction.Thrust);
-            if (thrust ? timing.Striking(UseTiming.Thrust, t) : t >= timing.StrikeStart(UseTiming.Swing))
+            if (thrust ? timing.Striking(timing.ThrustClip(s.Item), t) : t >= timing.StrikeStart(UseTiming.Swing))
                 HitCreatures(s, thrust ? 1f : timing.Sweep(UseTiming.Swing, t));
             if (s.Tick >= s.Duration) _active.RemoveAt(i);
         }

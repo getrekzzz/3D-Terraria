@@ -6,14 +6,15 @@ namespace Strata.Core.Gameplay.Items;
 /// <summary>
 /// Where in a use animation things happen, from the clip windows in data/config/use_styles.json. A swing's blade
 /// waits out the wind-up, then sweeps its arc between the clip's strike start and end (<see cref="Sweep"/>); a thrust
-/// connects only in its strike window (<see cref="Striking"/>). Times are animation phases: 0 when the use starts, 1
-/// when its (speed-scaled) animation ends.
+/// (a rapier's jab or a spear's lunge, <see cref="ThrustClip"/>) connects only in its strike window
+/// (<see cref="Striking"/>). Times are animation phases: 0 when the use starts, 1 when its (speed-scaled) animation ends.
 /// </summary>
 public sealed class UseTiming
 {
     public const string Swing = "swing";
     public const string Mine = "mine";
-    public const string Thrust = "thrust";
+    public const string Rapier = "rapier";
+    public const string Spear = "spear";
     public const string Bow = "bow";
 
     /// <summary>How long past the strike end (phase) a strike still connects: the follow-through.</summary>
@@ -41,6 +42,16 @@ public sealed class UseTiming
 
     /// <summary>A clip's timing; a clip without an entry strikes over its whole length.</summary>
     public ClipTiming Clip(string clip) => Config.Clips.TryGetValue(clip, out var timing) ? timing : Whole;
+
+    /// <summary>
+    /// The clip whose strike window times an item's thrust: its use style's clip (a rapier's jab, a spear's lunge) when
+    /// that clip has a strike window, else the spear's.
+    /// </summary>
+    public string ThrustClip(ItemUseInfo info)
+    {
+        string clip = Config.ClipFor(info);
+        return Config.Clips.TryGetValue(clip, out var c) && c.StrikeStart != null ? clip : Spear;
+    }
 
     /// <summary>Phase at which the wind-up ends and the strike begins.</summary>
     public float StrikeStart(string clip) => Clip(clip).StrikeStart ?? 0f;
