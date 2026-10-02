@@ -299,6 +299,36 @@
    "mechanics": [
     "shop"
    ]
+  },
+  {
+   "id": "terraria:town_cat",
+   "name": "Town Cat",
+   "kind": "town_npc",
+   "stage": "early",
+   "source": "cat license",
+   "mechanics": [
+    "pet"
+   ]
+  },
+  {
+   "id": "terraria:town_dog",
+   "name": "Town Dog",
+   "kind": "town_npc",
+   "stage": "early",
+   "source": "dog license",
+   "mechanics": [
+    "pet"
+   ]
+  },
+  {
+   "id": "terraria:town_bunny",
+   "name": "Town Bunny",
+   "kind": "town_npc",
+   "stage": "early",
+   "source": "bunny license",
+   "mechanics": [
+    "pet"
+   ]
   }
  ]
 }

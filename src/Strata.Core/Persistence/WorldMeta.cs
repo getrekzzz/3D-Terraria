@@ -91,7 +91,7 @@ public sealed class WorldMeta
     public sealed record InactiveBlockModel(int X, int Y, int Z, string Block, byte Shape, byte Flags);
 
     public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks,
-        bool Bound = false, long DiedAt = -1);
+        bool Bound = false, long DiedAt = -1, long VisitDay = -1);
 
     public sealed class IdTablesModel
     {

@@ -1,6 +1,9 @@
 using System;
 using System.Linq;
 using Strata.Core.Content.Index;
+using Godot;
+using Strata.Core.Content;
+using Strata.Core.Content.Defs;
 using Strata.Core.Content.Specs;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Gameplay.Town;
@@ -19,36 +22,63 @@ public sealed partial class TownDialog
     /// <summary>A service with a panel of its own was pressed (Reforge): the inventory opens with it in its panel host.</summary>
     public event Action<TownNpc, ServiceMode>? ServiceRequested;
 
-    /// <summary>A service with a screen of its own outside the inventory was pressed (the Stylist's Haircut): the box hides.</summary>
-    public event Action<TownNpc, string>? PanelRequested;
+    private readonly System.Collections.Generic.List<(Button Button, TypedSpec Service)> _serviceButtons = new();
 
-    /// <summary>The service the chat box's button runs: the legacy single service, else the first of the list.</summary>
-    private static Strata.Core.Content.TypedSpec? MainService(TownNpc npc) => npc.Def.AllServices.Length > 0 ? npc.Def.AllServices[0] : null;
+    /// <summary>Whether the resident sells anything: their shop, a visitor's rotating pools, or their biome's pylon.</summary>
+    private bool HasShop(TownNpc npc) =>
+        npc.Def.Kind != Strata.Core.Content.Defs.TownNpcKind.Pet
+        && (npc.Def.AllShopEntries.Length > 0 || _ui.Game.Commerce.Stock(npc, _ui.Entity).Count > 0);
 
-    private void TradeStrangePlant()
+    /// <summary>"Shop", then one button per further tab (the Painter's "Decor"), each opening the shop on that tab.</summary>
+    private void AddShopButtons(TownNpc npc)
     {
-        var result = _ui.Game.Services.TradeStrangePlant(_npc!, _ui.Entity, out var dye);
-        Say(result == TradeResult.Ok ? $"A Strange Plant! For you, a {dye.Item!.DisplayName}." : "Bring me Strange Plants and I will make you wonders.");
+        AddButton("Shop", () => OpenShopTab(ShopTabs.Shop));
+        foreach (var tab in _ui.Game.Commerce.Tabs(npc))
+            if (tab != ShopTabs.Shop) AddButton(TabLabel(tab), () => OpenShopTab(tab));
     }
 
-    private void OpenPanel()
+    private static string TabLabel(string tab) => tab.Length == 0 ? tab : char.ToUpperInvariant(tab[0]) + tab[1..];
+
+    /// <summary>Opens the grid shop on <paramref name="tab"/> (the shop panel reads <see cref="UiContext.ShopTab"/>).</summary>
+    public void OpenShopTab(string tab)
     {
-        var npc = _npc!;
-        var type = MainService(npc)!.Type;
-        HideBox();
-        PanelRequested?.Invoke(npc, type);
+        _ui.ShopTab = tab;
+        OpenShop();
     }
 
-    /// <summary>The service button's label for <paramref name="npc"/> now, or null when they offer none.</summary>
-    private string? ServiceLabel(TownNpc npc)
+    /// <summary>One button per service the resident offers (Terraria gives some several: the Guide's Help and Advice).</summary>
+    private void AddServiceButtons(TownNpc npc)
     {
-        if (MainService(npc) is not { } service) return null;
+        _serviceButtons.Clear();
+        foreach (var service in npc.Def.AllServices)
+            if (ServiceLabel(npc, service) is { } label)
+            {
+                var spec = service;
+                Button? made = null;
+                made = AddButton(label, () => RunService(spec, made!));
+                _serviceButtons.Add((made, spec));
+            }
+    }
+
+    /// <summary>Prices on service buttons follow the player (the Nurse's heal shrinks as life regenerates).</summary>
+    private void RefreshServiceLabels()
+    {
+        if (_npc == null) return;
+        foreach (var (button, service) in _serviceButtons)
+            if (ServiceLabel(_npc, service) is { } label && label != button.Text) SetLabel(button, label);
+    }
+
+    /// <summary>A service button's label for <paramref name="npc"/> now, or null when it shows no button.</summary>
+    private string? ServiceLabel(TownNpc npc, TypedSpec service)
+    {
         switch (service.Type)
         {
             case TownServiceSpecs.Heal:
                 long heal = _ui.Game.Commerce.HealCost(npc, _ui.Entity);
                 return heal > 0 ? $"Heal ({Coins.Format(heal)})" : "Heal";
             case TownServiceSpecs.CraftHelp:
+                return "Crafting";
+            case TownServiceSpecs.Advice:
                 return "Help";
             case TownServiceSpecs.SummonBoss:
                 return service.Parse<SummonServiceParams>().Label;
@@ -58,7 +88,9 @@ public sealed partial class TownDialog
                 long due = _ui.Game.Services.TaxesDue(npc);
                 return due > 0 ? $"Taxes ({Coins.Format(due)})" : "Taxes";
             case TownServiceSpecs.AnglerQuest:
-                return "Quest";
+                return $"Quest ({_ui.Entity.State.AnglerQuests} done)";
+            case TownServiceSpecs.WorldStatus:
+                return "Status";
             case TownServiceSpecs.Haircut:
                 return "Haircut";
             case TownServiceSpecs.DyeTrade:
@@ -68,22 +100,58 @@ public sealed partial class TownDialog
         }
     }
 
-    /// <summary>Presses the service button.</summary>
-    private void RunService()
+    /// <summary>A service with a screen of its own outside the inventory was pressed (the Stylist's Haircut): the box hides.</summary>
+    public event Action<TownNpc, string>? PanelRequested;
+
+    private void OpenPanel(string type)
     {
-        if (_npc is null || MainService(_npc) is not { } service) return;
+        var npc = _npc!;
+        HideBox();
+        PanelRequested?.Invoke(npc, type);
+    }
+
+    private void TradeStrangePlant()
+    {
+        var result = _ui.Game.Services.TradeStrangePlant(_npc!, _ui.Entity, out var dye);
+        Say(result == TradeResult.Ok ? $"A Strange Plant! For you, a {dye.Item!.DisplayName}." : "Bring me Strange Plants and I will make you wonders.");
+    }
+
+    /// <summary>Presses a service button.</summary>
+    private void RunService(TypedSpec service, Button button)
+    {
+        if (_npc == null) return;
         switch (service.Type)
         {
             case TownServiceSpecs.Heal: Heal(); break;
             case TownServiceSpecs.CraftHelp: CraftHelp(); break;
+            case TownServiceSpecs.Advice: Say(_ui.Game.Advisor.Advice(_ui.Entity)); break;
             case TownServiceSpecs.SummonBoss: Summon(); break;
             case TownServiceSpecs.Reforge: OpenService(ServiceMode.Reforge); break;
             case TownServiceSpecs.Taxes: CollectTaxes(); break;
             case TownServiceSpecs.AnglerQuest: AnglerQuest(); break;
-            case TownServiceSpecs.Haircut: OpenPanel(); break;
+            case TownServiceSpecs.WorldStatus: WorldStatus(); break;
+            case TownServiceSpecs.Haircut: OpenPanel(service.Type); break;
             case TownServiceSpecs.DyeTrade: TradeStrangePlant(); break;
         }
-        if (_npc != null && _serviceButton != null && ServiceLabel(_npc) is { } label) SetLabel(_serviceButton, label);
+        if (_npc != null && ServiceLabel(_npc, service) is { } label) SetLabel(button, label);
+    }
+
+    /// <summary>Presses the first service of a type (commands and tests); false when the resident has none.</summary>
+    public bool PressService(string type)
+    {
+        foreach (var (button, service) in _serviceButtons)
+            if (service.Type == type)
+            {
+                RunService(service, button);
+                return true;
+            }
+        return false;
+    }
+
+    private void WorldStatus()
+    {
+        var text = _ui.Game.Services.WorldStatusText(_npc!);
+        Say(text ?? "Give me a moment to feel the world around us...");
     }
 
     private void Heal() => Report(_ui.Game.Commerce.Heal(_npc!, _ui.Entity), "You feel much better.");
@@ -117,7 +185,7 @@ public sealed partial class TownDialog
     /// </summary>
     public bool OpenService(ServiceMode mode)
     {
-        if (_npc is not { } npc || npc.Def.Service?.Type != ServiceType(mode)) return false;
+        if (_npc is not { } npc || npc.Def.FindService(ServiceType(mode)) == null) return false;
         HideBox();
         ServiceRequested?.Invoke(npc, mode);
         return true;

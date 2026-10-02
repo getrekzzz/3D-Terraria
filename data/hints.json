@@ -1,0 +1,25 @@
+{
+  // Onboarding hints (X-10, Core HintDirector): each shows once per character in the hint toast while its conditions
+  // hold. when/unless are achievement triggers (Content/Specs/AchievementSpecs.cs); near {object|tag|tree|resident,
+  // radius m}; time any|day|night|dusk; carrying an item; step = the Guide's next step; guide = the Guide book entry
+  // (guide step or tip id). {key:action} shows the bound key. Higher priority first; delay = seconds in the world.
+  "hints": [
+    { "id": "move", "name": "Moving", "priority": 100, "delay": 3, "guide": "controls_move", "text": "Walk with {key:move_forward} {key:move_left} {key:move_back} {key:move_right} and jump with {key:jump}." },
+    { "id": "chop_tree", "name": "Chop a tree", "priority": 90, "delay": 8, "near": { "tree": true, "radius": 5 }, "unless": [{ "type": "counter", "key": "trees_chopped", "min": 1 }], "guide": "work_bench", "text": "Hold {key:use_primary} with your axe to chop down the tree. Wood builds almost everything." },
+    { "id": "night_shelter", "name": "Night is coming", "priority": 95, "time": "dusk", "unless": [{ "type": "housed", "min": 1 }], "guide": "shelter", "text": "Night is coming — build a shelter. Walls, a roof, a door and a torch keep the monsters out." },
+    { "id": "talk_guide", "name": "Talk to the Guide", "priority": 88, "delay": 10, "near": { "resident": "guide", "radius": 6 }, "unless": [{ "type": "talkTo", "resident": "guide" }], "guide": "controls_interact", "text": "Talk to the Guide with {key:interact} — he knows what you should do next." },
+    { "id": "place_torch", "name": "Place a torch", "priority": 85, "carrying": "torch", "when": [{ "type": "reachLayer", "layer": "underground" }], "guide": "building_torches", "text": "It's dark down here. Hold a torch and press {key:use_primary} to place it on a wall or the ground." },
+    { "id": "first_death", "name": "Defeated", "priority": 92, "when": [{ "type": "counter", "key": "deaths", "min": 1 }], "guide": "combat_armor", "text": "You were defeated. Craft armor, keep healing potions on your hotbar and stay near light at night." },
+    { "id": "open_inventory", "name": "Your inventory", "priority": 80, "when": [{ "type": "obtainItem", "item": "wood" }], "guide": "controls_inventory", "text": "Press {key:inventory} to open your inventory. Crafting recipes for what you carry are listed there." },
+    { "id": "craft_bench", "name": "Craft a Work Bench", "priority": 75, "delay": 45, "when": [{ "type": "obtainItem", "item": "wood" }], "unless": [{ "type": "craftItem", "item": "work_bench" }], "step": "work_bench", "guide": "work_bench", "text": "Craft a Work Bench from wood in your inventory ({key:inventory}) and place it. It unlocks furniture and doors." },
+    { "id": "night_danger", "name": "Night", "priority": 70, "time": "night", "unless": [{ "type": "housed", "min": 1 }], "guide": "combat_night", "text": "Zombies and Demon Eyes roam at night. Stay inside, or fight with your back to a wall." },
+    { "id": "life_crystal", "name": "Life Crystal", "priority": 72, "carrying": "life_crystal", "guide": "combat_life", "text": "Use the Life Crystal ({key:use_primary} while holding it) to raise your maximum life for good." },
+    { "id": "grapple", "name": "Grappling Hook", "priority": 65, "carrying": "grappling_hook", "guide": "controls_grapple", "text": "Press {key:grapple} to throw your hook and pull yourself up cliffs and shafts." },
+    { "id": "world_map", "name": "World map", "priority": 40, "delay": 240, "guide": "controls_map", "text": "Press {key:map} to open the world map; places you have seen stay on it." },
+    { "id": "boss_king_slime", "name": "A slimy challenge", "priority": 60, "step": "king_slime", "guide": "king_slime", "text": "Feeling stronger? Read the Guide book's King Slime page before you take on your first boss." },
+    { "id": "boss_eye", "name": "Something is watching", "priority": 60, "step": "eye_of_cthulhu", "guide": "eye_of_cthulhu", "text": "Ready for a real fight? The Guide book's Eye of Cthulhu page tells you how to summon it at night." },
+    { "id": "boss_skeletron", "name": "The old man", "priority": 60, "step": "skeletron", "guide": "skeletron", "text": "An old man guards the Dungeon. The Guide book's Skeletron page tells you how to free him." },
+    { "id": "boss_wall", "name": "The Underworld", "priority": 60, "step": "wall_of_flesh", "guide": "wall_of_flesh", "text": "The Wall of Flesh waits in the Underworld. Read its Guide book page and build a long bridge first." },
+    { "id": "hardmode", "name": "The world has changed", "priority": 99, "when": [{ "type": "flag", "id": "hardmode" }], "guide": "smash_altar", "text": "The ancient spirits of light and dark have been released. See the Guide book's Hardmode steps." }
+  ]
+}

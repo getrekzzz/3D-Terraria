@@ -10,6 +10,7 @@ public static class EngineCommands
     public static void Register(CommandRegistry r, LaunchedWorld world)
     {
         UiCommands.Register(r, world);
+        GuideBookCommands.Register(r, world);
         UI.PhotoMode.PhotoCommands.Register(r, world);
         r.Register(new CommandDef
         {

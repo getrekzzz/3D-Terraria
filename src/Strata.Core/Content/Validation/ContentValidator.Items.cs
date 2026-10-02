@@ -51,6 +51,8 @@ public static partial class ContentValidator
             {
                 if (b.Type == Specs.ItemBehaviorSpecs.Wiring && ctx.TryParse<Specs.WiringParams>(SpecKind.ItemBehavior, b) is { } wiring)
                     ctx.Ref(i, ctx.Db.Items, wiring.Wire, "wiring.wire");
+                if (b.Type == Specs.ItemBehaviorSpecs.PlantGrass && ctx.TryParse<Specs.PlantGrassParams>(SpecKind.ItemBehavior, b) is { } garden)
+                    foreach (var block in garden.On.Append(garden.Grass)) ctx.Ref(i, ctx.Db.Blocks, block, "plantGrass");
                 if (b.Type == Specs.ItemBehaviorSpecs.ReleaseCritter && ctx.TryParse<Specs.ReleaseCritterParams>(SpecKind.ItemBehavior, b) is { } release)
                     ctx.Ref(i, ctx.Db.Enemies, release.Enemy, "releaseCritter.enemy");
                 if (i.NoMelee && b.Type is Specs.ItemBehaviorSpecs.MeleeSwing or Specs.ItemBehaviorSpecs.Thrust)

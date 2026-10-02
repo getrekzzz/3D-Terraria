@@ -25,13 +25,43 @@ public sealed partial class TownCommerce
 
     private readonly Dictionary<PlayerEntity, List<ItemStack>> _buyback = new();
 
-    /// <summary>Buys <paramref name="count"/> of <paramref name="item"/> from the resident's current stock.</summary>
-    public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count = 1, BuyTarget target = BuyTarget.Backpack)
+    /// <summary>
+    /// Buys <paramref name="count"/> of <paramref name="item"/> from the resident's current stock (on <paramref name="tab"/>,
+    /// or any tab). Coin prices are paid from the purse; an entry with a currency (the Tavernkeep's Defender Medals) takes
+    /// that many of the currency item from the backpack instead.
+    /// </summary>
+    public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count = 1, BuyTarget target = BuyTarget.Backpack, string? tab = null)
     {
         if (count <= 0) return TradeResult.NothingToDo;
-        var offer = Offer(npc, player, item);
+        var offer = tab == null ? Offer(npc, player, item) : Stock(npc, player, tab).Find(o => o.Item == item);
         if (offer == null) return TradeResult.Unavailable;
-        return Deliver(player, new ItemStack(item, count), offer.Price * count, target, rollPrefixes: true, offer.Currency);
+        var result = offer.Currency is { } currency
+            ? DeliverForCurrency(player, new ItemStack(item, count), currency, offer.Price * count, target)
+            : Deliver(player, new ItemStack(item, count), offer.Price * count, target, rollPrefixes: true);
+        if (result == TradeResult.Ok) Traded?.Invoke(player, item, count);
+        return result;
+    }
+
+    /// <summary>Buys from a named shop tab into the backpack (commands, tests).</summary>
+    public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count, string tab) =>
+        Buy(npc, player, item, count, BuyTarget.Backpack, tab);
+
+    private TradeResult DeliverForCurrency(PlayerEntity player, ItemStack goods, ItemDef currency, long cost, BuyTarget target)
+    {
+        var inv = player.State.Inventory;
+        if (inv.Backpack.Count(currency) < cost) return TradeResult.TooPoor;
+        var cursor = inv.Cursor;
+        bool fits = target == BuyTarget.Cursor
+            ? (cursor.IsEmpty && goods.Count <= goods.Item!.MaxStack) || (cursor.CanStackWith(goods) && cursor.SpaceLeft >= goods.Count)
+            : inv.CanTake(goods);
+        if (!fits) return TradeResult.NoRoom;
+        inv.Backpack.Remove(d => d == currency, (int)cost);
+        var units = Prefixes.Made(goods.Item!, goods.Count, Content, ref _rng);
+        if (target == BuyTarget.Cursor) inv.Cursor = cursor.IsEmpty && units.Count == 1 ? units[0] : cursor.IsEmpty ? goods : cursor.WithCount(cursor.Count + goods.Count);
+        else
+            foreach (var unit in units)
+                if (inv.Pickup(unit) is { IsEmpty: false } rest) _world.Drops.Spawn(rest, player.Center, System.Numerics.Vector3.Zero);
+        return TradeResult.Ok;
     }
 
     /// <summary>Sale value of a stack (copper).</summary>
@@ -89,8 +119,7 @@ public sealed partial class TownCommerce
     /// or changes nothing. New goods (<paramref name="rollPrefixes"/>) come with a prefix as crafted ones do, each
     /// weapon or accessory rolled separately; a stack bought back keeps its own.
     /// </summary>
-    /// <param name="currency">Paid in this item from the backpack instead of coins (Defender Medals and the like).</param>
-    private TradeResult Deliver(PlayerEntity player, ItemStack goods, long price, BuyTarget target, bool rollPrefixes = false, ItemDef? currency = null)
+    private TradeResult Deliver(PlayerEntity player, ItemStack goods, long price, BuyTarget target, bool rollPrefixes = false)
     {
         var inv = player.State.Inventory;
         var cursor = inv.Cursor;
@@ -98,16 +127,8 @@ public sealed partial class TownCommerce
             ? (cursor.IsEmpty && goods.Count <= goods.Item!.MaxStack) || (cursor.CanStackWith(goods) && cursor.SpaceLeft >= goods.Count)
             : inv.CanTake(goods);
         if (!fits) return TradeResult.NoRoom;
-        if (currency != null)
-        {
-            if (inv.Backpack.Count(currency) < price) return TradeResult.TooPoor;
-            inv.Backpack.Remove(d => d == currency, (int)price);
-        }
-        else
-        {
-            if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, price, out var change)) return TradeResult.TooPoor;
-            Drop(player, change);
-        }
+        if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, price, out var change)) return TradeResult.TooPoor;
+        Drop(player, change);
         var units = rollPrefixes ? Prefixes.Made(goods.Item!, goods.Count, Content, ref _rng) : new List<ItemStack> { goods };
         if (target == BuyTarget.Cursor) inv.Cursor = cursor.IsEmpty && units.Count == 1 ? units[0] : cursor.IsEmpty ? goods : cursor.WithCount(cursor.Count + goods.Count);
         else

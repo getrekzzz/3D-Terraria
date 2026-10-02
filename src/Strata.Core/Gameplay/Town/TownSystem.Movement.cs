@@ -92,7 +92,7 @@ public sealed partial class TownSystem
         r.IdleTicks = _rng.Range(Config.IdleTicksMin, Config.IdleTicksMax);
         if (r.Home != null && TrySit(r)) return; // a rest in a chair at home now and then
         var landmark = r.Home == null ? LandmarkNode(r.Def) : null;
-        var anchor = r.Home ?? landmark ?? CurrentNode(r);
+        var anchor = r.Home ?? landmark ?? r.Anchor ?? CurrentNode(r);
         int reach = (int)((landmark != null ? Config.LandmarkRadius : Config.WanderRadius) / Units.CellSize);
         var target = anchor + new Int3(_rng.Range(-reach, reach), 0, _rng.Range(-reach, reach));
         if (_world.Navigator.NearestStandable(target, Agent, 3) is { } node)

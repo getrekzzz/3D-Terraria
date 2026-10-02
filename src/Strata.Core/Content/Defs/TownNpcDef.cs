@@ -28,9 +28,15 @@ public sealed class TownNpcDef : ContentDef
     /// <summary>Once these hold the resident leaves for good (the crypt's keeper after its warden falls).</summary>
     public TypedSpec[] LeavesWhen { get; init; } = Array.Empty<TypedSpec>();
 
-    /// <summary>Derived kind: landmark keepers never count toward town population or take a house.</summary>
+    /// <summary>Comes and goes instead of moving in (the Travelling Merchant); null for everyone else.</summary>
+    public VisitInfo? Visit { get; init; }
+
+    /// <summary>A town pet (the licensed Cat, Dog and Bunny).</summary>
+    public bool Pet { get; init; }
+
+    /// <summary>Derived kind: landmark keepers, visitors and pets never count toward town population.</summary>
     [System.Text.Json.Serialization.JsonIgnore]
-    public TownNpcKind Kind => Landmark != null ? TownNpcKind.Landmark : TownNpcKind.Resident;
+    public TownNpcKind Kind => Landmark != null ? TownNpcKind.Landmark : Visit != null ? TownNpcKind.Visitor : Pet ? TownNpcKind.Pet : TownNpcKind.Resident;
 
     public int Life { get; init; } = 250;
     public int Defense { get; init; } = 15;
@@ -39,6 +45,12 @@ public sealed class TownNpcDef : ContentDef
     public float Speed { get; init; } = 1.6f;
 
     public ShopEntry[] Shop { get; init; } = Array.Empty<ShopEntry>();
+
+    private ShopEntry[]? _allShop;
+
+    /// <summary><see cref="Shop"/> plus every entry a visitor's rotating pools can bring (sources, validation).</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public ShopEntry[] AllShopEntries => _allShop ??= Visit == null ? Shop : Shop.Concat(Visit.Pools.SelectMany(p => p.Entries)).ToArray();
 
     /// <summary>Extra action offered in conversation (see <see cref="Specs.TownServiceSpecs"/>); legacy single form.</summary>
     public TypedSpec? Service { get; init; }

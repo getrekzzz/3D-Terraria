@@ -1,0 +1,24 @@
+{
+  // P5-17: the Golfer's clubs (they swing a golf ball off along the aim; balls are ammo and bounce), balls, cup, tee
+  // and outfit, and the Zoologist's bestiary-gated Fairy Glowstick and Critter Shampoo. No golf scoring yet.
+  "projectiles": [
+    {"id": "golf_ball_shot", "name": "Golf Ball", "visual": "orb", "color": "#f4f4f0", "gravity": 14, "drag": 0.1, "lifetime": 360, "radius": 0.25, "bounces": 6, "pierce": 1},
+    {"id": "fairy_glowstick", "name": "Fairy Glowstick", "visual": "orb", "color": "#ff90f0", "drag": 4, "lifetime": 3600, "radius": 0.2, "collideTerrain": true, "friendly": false, "contact": false, "light": [13, 7, 13]}
+  ],
+  "items": [
+    {"id": "golf_club_iron", "name": "Golf Club (Iron)", "description": "A well-rounded club for middle distances.", "category": "weapon", "value": 20000, "useStyle": "swing", "useTime": 30, "useAnimation": 30, "damage": 6, "damageType": "ranged", "knockback": 4, "useAmmo": "golf_ball", "shootSpeed": 11, "behaviors": [{"type": "shootProjectile"}], "covers": ["terraria:golf_club_iron"]},
+    {"id": "golf_club_driver", "name": "Golf Club (Driver)", "description": "For long distance drives.", "category": "weapon", "value": 50000, "useStyle": "swing", "useTime": 30, "useAnimation": 30, "damage": 6, "damageType": "ranged", "knockback": 4, "useAmmo": "golf_ball", "shootSpeed": 16, "behaviors": [{"type": "shootProjectile"}], "covers": ["terraria:golf_club_driver"]},
+    {"id": "golf_club_wedge", "name": "Golf Club (Wedge)", "description": "Lofts the ball over obstacles.", "category": "weapon", "value": 20000, "useStyle": "swing", "useTime": 30, "useAnimation": 30, "damage": 6, "damageType": "ranged", "knockback": 4, "useAmmo": "golf_ball", "shootSpeed": 8, "behaviors": [{"type": "shootProjectile"}], "covers": ["terraria:golf_club_wedge"]},
+    {"id": "golf_club_putter", "name": "Golf Club (Putter)", "description": "For short, precise shots.", "category": "weapon", "value": 20000, "useStyle": "swing", "useTime": 30, "useAnimation": 30, "damage": 6, "damageType": "ranged", "knockback": 4, "useAmmo": "golf_ball", "shootSpeed": 5, "behaviors": [{"type": "shootProjectile"}], "covers": ["terraria:golf_club_putter"]},
+    {"id": "golf_ball", "name": "Golf Ball", "description": "Knocked about by golf clubs.", "category": "ammo", "maxStack": 9999, "value": 100, "damage": 4, "damageType": "ranged", "ammoClass": "golf_ball", "projectile": "golf_ball_shot", "consumable": true, "covers": ["terraria:golf_ball"]},
+    {"id": "golf_visor", "armorSet": "golf_outfit", "name": "Golf Visor", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "head", "tags": ["vanity"], "covers": ["terraria:golf_visor"]},
+    {"id": "golf_shirt", "armorSet": "golf_outfit", "name": "Golf Shirt", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "body", "tags": ["vanity"], "covers": ["terraria:golf_shirt"]},
+    {"id": "golf_pants", "armorSet": "golf_outfit", "name": "Golf Pants", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "legs", "tags": ["vanity"], "covers": ["terraria:golf_pants"]},
+    {"id": "fairy_glowstick", "name": "Fairy Glowstick", "description": "Floats where it is thrown. Works when wet.", "category": "light", "maxStack": 9999, "value": 100, "useStyle": "throw", "useTime": 15, "useAnimation": 15, "consumable": true, "projectile": "fairy_glowstick", "shootSpeed": 7, "covers": ["terraria:fairy_glowstick"]},
+    {"id": "critter_shampoo", "name": "Critter Shampoo", "description": "Dye", "category": "dye", "maxStack": 9999, "value": 50000, "tags": ["dye"], "covers": ["terraria:critter_shampoo"]}
+  ],
+  "tileObjects": [
+    {"id": "golf_cup", "name": "Golf Cup", "description": "Sink a ball in it.", "size": [1, 1, 1], "hitPoints": 1, "itemCategory": "furniture", "itemValue": 1000, "itemMaxStack": 9999, "tags": ["decor", "golf"], "covers": ["terraria:golf_cup"]},
+    {"id": "golf_tee", "name": "Golf Tee", "description": "Tee up a ball.", "size": [1, 1, 1], "hitPoints": 1, "itemCategory": "furniture", "itemValue": 100, "itemMaxStack": 9999, "tags": ["decor", "golf"], "covers": ["terraria:golf_tee"]}
+  ]
+}

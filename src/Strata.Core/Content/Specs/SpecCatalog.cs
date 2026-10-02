@@ -13,6 +13,7 @@ public enum SpecKind
     TownService,
     CreatureEffect,
     Mutation,
+    AchievementTrigger,
 }
 
 /// <summary>
@@ -59,6 +60,7 @@ public sealed class SpecCatalog
         TownServiceSpecs.Register(c);
         CreatureEffectSpecs.Register(c);
         MutationSpecs.Register(c);
+        AchievementSpecs.Register(c);
         Conditions.ConditionCompiler.RegisterSpecs(c);
         return c;
     }

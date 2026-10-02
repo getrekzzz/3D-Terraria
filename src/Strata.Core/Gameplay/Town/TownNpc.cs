@@ -75,6 +75,19 @@ public sealed class TownNpc : Combat.ICombatTarget
     public bool IsHoused => CountsAsResident && Home != null;
     public int ImmuneTicks { get; set; }
 
+    /// <summary>Needs a house: free residents and town pets.</summary>
+    public bool NeedsHome => Alive && !Bound && Def.Kind is TownNpcKind.Resident or TownNpcKind.Pet;
+
+    /// <summary>The day a visitor arrived (−1 = not a visitor); seeds their stock for this visit.</summary>
+    public long VisitDay { get; set; } = -1;
+
+    /// <summary>Where a homeless NPC strolls around (a visitor: the town centre). Null = where they stand.</summary>
+    public Int3? Anchor { get; set; }
+
+    /// <summary>A visitor on the way out of town (or a site visitor about to vanish).</summary>
+    public bool Leaving { get; set; }
+    internal int LeaveTicks { get; set; }
+
     public ResidentActivity Activity { get; set; }
     public PlayerEntity? TalkingTo { get; set; }
     public int TalkTicks { get; set; }

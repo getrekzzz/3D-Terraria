@@ -16,14 +16,16 @@ public static partial class ContentValidator
             if (t.Life < 1) ctx.Error(t, "life must be >= 1.");
             if (t.Speed <= 0) ctx.Error(t, "speed must be > 0.");
             if (t.Lines.Length == 0) ctx.Error(t, "lines must contain at least one dialogue line.");
-            if (!t.Starter && t.Landmark == null && t.Arrival.Length == 0) ctx.Warn(t, "no arrival conditions: arrives as soon as a home exists.");
+            if (!t.Starter && t.Landmark == null && t.Visit == null && t.Arrival.Length == 0) ctx.Warn(t, "no arrival conditions: arrives as soon as a home exists.");
             ctx.Asset(t, AssetPaths.TownNpcModel(t), "model");
             if (ctx.Options.AssetExists is { } exists && !exists(AssetPaths.TownNpcHead(t)))
                 ctx.Warn(t, $"head portrait '{AssetPaths.TownNpcHead(t)}' is missing (build_all.py --portraits).");
             ctx.Specs(t, SpecKind.Condition, t.Arrival, "arrival");
-            for (int i = 0; i < t.Shop.Length; i++)
+            if (t.Visit is { } visit) CheckVisit(ctx, t, visit);
+            var shop = t.AllShopEntries;
+            for (int i = 0; i < shop.Length; i++)
             {
-                var e = t.Shop[i];
+                var e = shop[i];
                 ctx.Ref(t, ctx.Db.Items, e.Item, $"shop[{i}].item");
                 if (e.Price is < 0) ctx.Error(t, $"shop[{i}].price must be >= 0.");
                 if (string.IsNullOrWhiteSpace(e.Tab)) ctx.Error(t, $"shop[{i}].tab must not be empty.");
@@ -83,8 +85,21 @@ public static partial class ContentValidator
                 foreach (var c in e.Conditions) CheckTownCondition(ctx, t, c);
     }
 
+    private static void CheckVisit(Ctx ctx, TownNpcDef t, VisitInfo v)
+    {
+        if (v.Mode is not (VisitInfo.TownMode or VisitInfo.SiteMode)) ctx.Error(t, $"visit.mode '{v.Mode}' must be 'town' or 'site'.");
+        if (v.DawnChance is < 0 or > 1 || v.HourlyChance is < 0 or > 1) ctx.Error(t, "visit chances must be within 0..1.");
+        if (v.Mode == VisitInfo.SiteMode && v.Where.Length == 0) ctx.Error(t, "a site visitor needs visit.where.");
+        if (v.LeaveHour <= v.ArriveHour) ctx.Error(t, "visit.leaveHour must be after arriveHour.");
+        if (t.Pet || t.Rescue != null) ctx.Error(t, "a visitor cannot also be a pet or a rescue.");
+        ctx.Specs(t, SpecKind.Condition, v.Requires, "visit.requires");
+        ctx.Specs(t, SpecKind.Condition, v.Where, "visit.where");
+        foreach (var p in v.Pools)
+            if (p.Count < 1 || p.Count > p.Entries.Length) ctx.Error(t, "visit.pools[].count must be within 1..entries.");
+    }
+
     private static IEnumerable<TypedSpec> AllConditions(TownNpcDef t) =>
-        t.Arrival.Concat(t.LeavesWhen).Concat(t.Shop.SelectMany(s => s.Conditions)).Concat(t.Lines.SelectMany(l => l.Conditions));
+        t.Arrival.Concat(t.LeavesWhen).Concat(t.Visit?.Requires ?? Array.Empty<TypedSpec>()).Concat(t.AllShopEntries.SelectMany(s => s.Conditions)).Concat(t.Lines.SelectMany(l => l.Conditions));
 
     /// <summary>References inside resident/hasItem/wearing/rescued/killed/obtained conditions (also nested in all/any/not).</summary>
     private static void CheckTownCondition(Ctx ctx, ContentDef owner, TypedSpec c)

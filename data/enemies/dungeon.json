@@ -37,7 +37,7 @@
       "covers": ["terraria:skeletron"]
     },
     {
-      "id": "skeletron_hand", "model": "skeletron_hand", "tags": ["undead", "lava_immune"], "name": "Skeletron Hand",
+      "id": "skeletron_hand", "bestiaryAs": "skeletron", "model": "skeletron_hand", "tags": ["undead", "lava_immune"], "name": "Skeletron Hand",
       "description": "It slaps down from above and sweeps from the side, taking turns with the other.",
       "brain": { "type": "skeletronHand", "style": "alternate" },
       "life": 600, "damage": 20, "defense": 14, "knockbackResist": 1.0, "size": [2.4, 2.4], "gravity": false, "collideTerrain": false,

@@ -73,7 +73,42 @@ assert town.guide.homed == 1
 town summon dryad 0 0 -3
 town services dryad
 town status dryad
+# W4 chat box: the Dryad's Status button answers in the box.
+ui talk dryad
+ui service worldStatus
+assert ui.talk_open == 1
+ui close
+# --- P5-15 ---
+# The Dryad sells Terraria's grass seeds.
+give copper_coin 30
+town buy dryad grass_seeds
+assert inv.grass_seeds == 1
 town dismiss dryad
+# --- P5-16 ---
+# The Painter's paintings are under his Decor tab; the Tavernkeep takes Defender Medals for Ale.
+town summon painter 2 0 -3
+give copper_coin 99
+give silver_coin 14
+# W4 grid shop: the Decor button opens the Painter's paintings tab, and a click buys one.
+ui talk painter
+ui shop decor
+assert ui.shop_slots > 0
+ui buy land
+ui close
+assert inv.land == 1
+town dismiss painter
+give defender_medal 3
+town summon tavernkeep 2 0 -3
+ui talk tavernkeep
+ui shop
+ui buy ale
+ui close
+assert inv.ale == 1
+assert inv.defender_medal == 2
+town dismiss tavernkeep
+# Back to the starting kit's 25 torches and an empty purse for the trading checks below.
+clear
+give torch 25
 assert errors == 0
 
 # Talking and trading with the peddler.
@@ -124,6 +159,41 @@ spawn zombie 1 9
 wait_until town.arms_dealer.attacks > 0 15
 killall
 god off
+
+# --- P5-19 ---
+# The Travelling Merchant walks in (forced), trades from his rotating stock and walks off again.
+town visit travelling_merchant near
+wait 0.5
+assert town.travelling_merchant == 1
+ui talk travelling_merchant
+ui shop
+ui close
+town leave travelling_merchant
+assert errors == 0
+
+# --- P5-20 ---
+# A Cat License sets its flag once; a summoned cat can be petted and never counts as a resident.
+give license_cat
+wield license_cat
+use
+assert flag.license_cat == 1
+town summon town_cat 2 0 0
+assert town.town_cat == 1
+assert errors == 0
+
+# --- P5-34 ---
+# Pylons are placeable items; the network lists them (none placed in the smoke world).
+give forest_pylon
+assert inv.forest_pylon == 1
+town pylons
+assert town.pylons == 0
+assert errors == 0
+
+# --- X-05 ---
+# Emote bubbles: a resident emotes, the player emotes, and the counter rises.
+town emote love merchant
+town emote happy
+assert town.emotes_shown > 0
 assert errors == 0
 
 # --- P5-21 ---

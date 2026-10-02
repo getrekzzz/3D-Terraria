@@ -27,6 +27,8 @@ public static class BuiltinCommands
         FishingCommands.Register(r);
         SeasonCommands.Register(r);
         PerfCommands.Register(r);
+        GuideCommands.Register(r);
+        HintCommands.Register(r);
         return r;
     }
 

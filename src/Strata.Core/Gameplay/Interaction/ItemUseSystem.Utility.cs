@@ -17,6 +17,9 @@ public sealed partial class ItemUseSystem
     /// <summary>A catch was reeled in (item, count) — for the pickup message.</summary>
     public event Action<PlayerEntity, ItemStack>? Caught;
 
+    /// <summary>A bug net caught a critter (before it is removed) — for the journal.</summary>
+    public event Action<PlayerEntity, Entities.Npc>? NetCaught;
+
     /// <summary>
     /// Fishing rods: the first use casts the bobber; the next reels it in, landing whatever is biting. The catch goes
     /// to the backpack (or drops at the player's feet when it is full).

@@ -89,6 +89,12 @@ public sealed class UserSettings
 
     private const int CurrentVersion = 2;
 
+    /// <summary>Onboarding hints (the hint toast); also <c>hint on|off</c> in the console.</summary>
+    public bool ShowHints { get; set; } = true;
+
+    /// <summary>Tips on the world loading screen.</summary>
+    public bool LoadingTips { get; set; } = true;
+
     public event Action<UserSettings>? Changed;
 
     public static UserSettings Load()

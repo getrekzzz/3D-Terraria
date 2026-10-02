@@ -58,6 +58,7 @@ public sealed partial class ItemUseSystem
             bestDistance = d;
         }
         if (best == null || !_world.Session.Content.Items.TryGet(best.Def.CatchItem!, out var item)) return UseOutcome.Swung;
+        NetCaught?.Invoke(p, best);
         _world.Npcs.Despawn(best);
         Give(p, new ItemStack(item, 1));
         return UseOutcome.Caught;
