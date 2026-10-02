@@ -20,6 +20,15 @@ public sealed partial class TownSystem
             return;
         }
         if (World.GetBlock(VoxelMotion.CellOf(r.Center)) == VoxelWorld.Unknown) return; // frozen while unloaded
+        if (r.Bound)
+        {
+            // Tied up: no errands and no harm, only gravity.
+            r.Velocity = new Vector3(0, MathF.Max(r.Velocity.Y - Gravity * dt, -30f), 0);
+            var c = r.Center;
+            r.OnGround = VoxelMotion.Move(World, ref c, ref r.Velocity, TownNpc.HalfExtents, dt);
+            r.Position = c - new Vector3(0, TownNpc.HalfExtents.Y, 0);
+            return;
+        }
         TakeContactHits(r);
         if (!r.Alive) return;
         Decide(r);
@@ -179,6 +188,7 @@ public sealed partial class TownSystem
     public bool BeginTalk(TownNpc r, Session.PlayerEntity p)
     {
         if (!r.Alive || Vector3.Distance(p.Center, r.Center) > Config.TalkRange) return false;
+        if (r.Bound) Rescue(r, p, out _); // Terraria: talking to a bound NPC frees them
         r.TalkingTo = p;
         r.TalkTicks = Config.TalkTicks;
         r.Path = null;

@@ -23,6 +23,7 @@ internal static class TownProbes
             if (parts is [_, "home"]) return t?.Home is { } h ? Vector3.Distance(t.Position, TownSystem.NodeFeet(h)) : -1;
             if (parts is [_, "alive"]) return t is { Alive: true } ? 1 : 0;
             if (parts is [_, "homed"]) return t?.Home != null ? 1 : 0;
+            if (parts is [_, "bound"]) return t is { Bound: true } ? 1 : 0;
             return null;
         });
     }

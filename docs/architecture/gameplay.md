@@ -536,3 +536,9 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   ≤4 within 120 tiles) 0.95; homeless 1.1; clamped to the price range. `TownCommerce.PriceFactor/Happiness/
   DescribeHappiness`; lines from `town.json` `happiness.lines` or per-NPC `happinessLines`. Mood tables follow
   Terraria's happiness table. The chat's Happiness button arrives with the W4 TownDialog.
+* **Rescues** (P5-06a, `TownSystem.Rescues.cs`, `SiteFinder`): an NPC with a `rescue` block appears `Bound` once its
+  `requires` hold and its flag `rescued_<id>` is unset, at an unseen standable node in a loaded chunk where `where`
+  holds (rare zones are sampled inside plan features carrying them; otherwise a 30–70 m shell around the player) or
+  at its planned `landmark`. Bound NPCs do not count, cannot be hurt, only fall, and show the rescue title. Talking
+  (`BeginTalk`) frees them (`requiresItem` is used up: the Tortured Soul's Purification Powder); the next move-in
+  check houses them. Console: `town bind|rescue <id>`; probe `town.<id>.bound`; smoke `rescue.cmds`.

@@ -39,7 +39,7 @@ public sealed partial class TownSystem
     /// <summary>Applies a hit to a resident from a point (knockback away from it).</summary>
     public void Damage(TownNpc r, int amount, Vector3 from)
     {
-        if (!r.Alive) return;
+        if (!r.Alive || r.Bound) return; // bound NPCs cannot be hurt
         int dealt = Math.Max(1, amount - r.Def.Defense / 2);
         r.Life -= dealt;
         r.ImmuneTicks = HitImmunity;

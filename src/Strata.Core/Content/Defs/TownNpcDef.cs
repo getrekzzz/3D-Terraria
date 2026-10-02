@@ -69,6 +69,9 @@ public sealed class TownNpcDef : ContentDef
     public DialogueLine[] Lines { get; init; } = Array.Empty<DialogueLine>();
     public MoodEntry[] Mood { get; init; } = Array.Empty<MoodEntry>();
 
+    /// <summary>Found bound somewhere and freed by talking (null = moves in on <see cref="Arrival"/> alone).</summary>
+    public RescueInfo? Rescue { get; init; }
+
     /// <summary>Everyone nearby loves this resident (the Princess).</summary>
     public bool LovedByAll { get; init; }
 

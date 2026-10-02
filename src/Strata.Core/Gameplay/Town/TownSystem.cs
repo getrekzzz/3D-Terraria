@@ -40,6 +40,7 @@ public sealed partial class TownSystem
         {
             _arrival[def.Id] = ConditionCompiler.CompileAll(def.Arrival);
             _leaves[def.Id] = ConditionCompiler.CompileAll(def.LeavesWhen);
+            CompileRescue(def);
         }
         Load(world.Session.Meta);
     }
@@ -74,6 +75,7 @@ public sealed partial class TownSystem
         if (!_world.Session.Meta.TownStarted) TryPlaceStarters();
         if (ArrivalsEnabled && tick % Config.ArrivalInterval == 0) Arrivals(force: false, budgeted: true);
         if (tick % LandmarkInterval == 0) UpdateLandmarks();
+        if (ArrivalsEnabled && tick % RescueInterval == 0) UpdateRescues();
         if (tick % Config.HomeCheckInterval == 0) CheckHomes();
         foreach (var r in _residents) TickResident(r);
         _status?.Tick();
@@ -202,10 +204,10 @@ public sealed partial class TownSystem
         _world.Session.Meta.TownStarted = true;
     }
 
-    private TownNpc Create(TownNpcDef def, Int3 node)
+    private TownNpc Create(TownNpcDef def, Int3 node, bool bound = false)
     {
         var name = def.Names.Length > 0 ? def.Names[_rng.Range(0, def.Names.Length - 1)] : def.DisplayName;
-        var npc = new TownNpc(def, name) { Id = _nextId++, Position = NodeFeet(node), IdleTicks = Config.IdleTicksMin };
+        var npc = new TownNpc(def, name) { Id = _nextId++, Position = NodeFeet(node), IdleTicks = Config.IdleTicksMin, Bound = bound };
         _residents.Add(npc);
         Spawned?.Invoke(npc);
         return npc;

@@ -64,6 +64,9 @@ public sealed class TownCommerce
     /// <summary>A line to say to the player, placeholders filled in.</summary>
     public string Greet(TownNpc npc, PlayerEntity player)
     {
+        if (npc.Bound && npc.Def.Rescue is { } rescue)
+            return rescue.RequiresItem != null && Content.Items.TryGet(rescue.RequiresItem, out var needed)
+                ? rescue.NeedsItemText.Replace("{item}", needed.DisplayName) : "Help!";
         var ctx = ContextFor(npc, player);
         var lines = npc.Def.Lines.Where(l => Condition(l.Conditions).Evaluate(ctx)).ToList();
         if (lines.Count == 0) return "...";

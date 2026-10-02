@@ -31,7 +31,8 @@ public sealed class TownNpc
     /// <summary>Personal name ("Corwin").</summary>
     public string Name { get; }
 
-    public string Title => $"{Name} the {Def.DisplayName}";
+    /// <summary>"Corwin the Goblin Tinkerer", or the rescue title ("Bound Goblin") while bound.</summary>
+    public string Title => Bound && Def.Rescue is { Title.Length: > 0 } rescue ? rescue.Title : $"{Name} the {Def.DisplayName}";
 
     /// <summary>Home navigation node (null = homeless) and the key of its room.</summary>
     public Int3? Home { get; set; }

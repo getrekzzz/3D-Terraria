@@ -54,3 +54,40 @@ public static class ShopTabs
 {
     public const string Shop = "shop";
 }
+
+/// <summary>
+/// A town NPC that must be found and freed before moving in (Terraria's bound Goblin, Mechanic, Wizard…): appears
+/// bound somewhere out of the player's sight once <see cref="Requires"/> holds, at a cell where <see cref="Where"/>
+/// holds (or at a planned <see cref="Landmark"/>), and talking to them frees them (flag "rescued_&lt;id&gt;").
+/// </summary>
+public sealed class RescueInfo
+{
+    public static readonly string[] Poses = { "bound", "sleeping", "webbed", "unconscious", "tortured" };
+
+    /// <summary>World conditions for the bound NPC to appear at all.</summary>
+    public TypedSpec[] Requires { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>Conditions judged at a candidate cell (biome, layer…).</summary>
+    public TypedSpec[] Where { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>A planned landmark to appear at instead of searching (the Dungeon's Mechanic room).</summary>
+    public string? Landmark { get; init; }
+
+    public string Pose { get; init; } = "bound";
+
+    /// <summary>Name while bound ("Bound Goblin").</summary>
+    public string Title { get; init; } = "";
+
+    /// <summary>Freeing needs (and uses up) one of this item (the Tortured Soul's Purification Powder).</summary>
+    public string? RequiresItem { get; init; }
+
+    /// <summary>Said when the player cannot free them yet ({item}).</summary>
+    public string NeedsItemText { get; init; } = "Maybe some {item} would help.";
+
+    /// <summary>Said when freed ({player}).</summary>
+    public string Thanks { get; init; } = "Thank you, {player}!";
+
+    /// <summary>Horizontal search shell around the player (m).</summary>
+    public float MinDistance { get; init; } = 30f;
+    public float MaxDistance { get; init; } = 70f;
+}

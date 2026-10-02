@@ -71,6 +71,7 @@ public static partial class ContentValidator
                 ctx.Ref(t, ctx.Db.TownNpcs, m.Neighbor, "mood.neighbor");
             }
             foreach (var c in AllConditions(t)) CheckTownCondition(ctx, t, c);
+            ValidateTownRescue(ctx, t);
         }
         foreach (var r in ctx.Db.SpawnRules.All)
             foreach (var c in r.Conditions) CheckTownCondition(ctx, r, c);
@@ -101,9 +102,9 @@ public static partial class ContentValidator
                 break;
             case "rescued":
                 ctx.Ref(owner, ctx.Db.TownNpcs, Str("id"), "rescued condition");
-                // Until rescue blocks exist (P5-06) nothing in the world sets the flag; then this becomes an error.
-                if (ctx.Db.TownNpcs.Contains(Str("id") ?? ""))
-                    ctx.Warn(owner, $"rescued condition: '{Str("id")}' has no rescue block yet, so only 'flag rescued_{Str("id")}' frees them.");
+                // A warning until every rescued NPC has its site (P5-06b), then an error.
+                if (ctx.Db.TownNpcs.TryGet(Str("id") ?? "", out var rescued) && rescued.Rescue == null)
+                    ctx.Warn(owner, $"rescued condition: '{Str("id")}' has no rescue block, so nothing in the world can free them.");
                 break;
             case "killed":
                 ctx.Ref(owner, ctx.Db.Enemies, Str("enemy"), "killed condition");

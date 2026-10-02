@@ -6,7 +6,7 @@ namespace Strata.Core.Commands;
 /// </summary>
 internal static class TownDebugCommands
 {
-    public const string Usage = "slay <id> | services <id> | status <id>";
+    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id>";
 
     public static CommandResult? TryRun(CommandContext ctx, CommandArgs a)
     {
@@ -26,6 +26,14 @@ internal static class TownDebugCommands
                 var dryad = TownCommands.Resident(ctx, a);
                 if (ctx.World.Services.WorldStatusText(dryad) == null) town.Status.CompleteNow(); // the console waits for the sampler
                 return ctx.World.Services.WorldStatusText(dryad) is { } text ? CommandResult.Success(text) : CommandResult.Fail($"{dryad.Title} offers no world status.");
+            case "bind":
+                var def = ctx.World.Session.Content.TownNpcs.TryGet(a.Str(1, "id"), out var d) ? d : throw new CommandException($"unknown resident '{a.Str(1, "id")}'");
+                var offset = a.Count >= 5 ? new Common.Int3(a.Int(2, "dx"), a.Int(3, "dy"), a.Int(4, "dz")) : new Common.Int3(3, 0, 0);
+                var node = ctx.World.Navigator.NearestStandable(ctx.Player.FeetCell + offset, Gameplay.Navigation.NavAgent.Humanoid, 4) ?? throw new CommandException("no room to stand nearby");
+                return CommandResult.Success($"{town.Bind(def, node).Title} waits to be freed.");
+            case "rescue":
+                var bound = TownCommands.Resident(ctx, a);
+                return town.Rescue(bound, ctx.Player, out var said) ? CommandResult.Success($"{bound.Title}: {said}") : CommandResult.Fail(said.Length > 0 ? said : $"{bound.Title} is not bound.");
             default:
                 return null;
         }
