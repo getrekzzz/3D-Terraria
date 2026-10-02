@@ -10,6 +10,7 @@ public static class PlanHasher
         ulong h = Hash.Combine(Hash.String("plan"), (long)GenVersion.Current);
         h = Hash.Combine(h, plan.Settings.Seed);
         foreach (var v in plan.Height.Values) h = Hash.Combine(h, (long)MathF.Round(v * 16f));
+        foreach (var v in plan.Cliffs.Values) h = Hash.Combine(h, (long)MathF.Round(v * 64f));
         foreach (var r in plan.Regions)
         {
             h = Hash.Combine(h, Hash.String(r.Biome));

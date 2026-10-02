@@ -26,6 +26,8 @@ public sealed class ChunkGenContext
         Blocks = new ushort[Volume];
         SurfaceHeight = new float[Size * Size];
         Ruggedness = new float[Size * Size];
+        Cliff = new float[Size * Size];
+        OverhangAmp = new float[Size * Size];
         SoilDepth = new float[Size * Size];
         Biome = new byte[Volume];
         for (int lz = 0; lz < Size; lz++)
@@ -35,6 +37,8 @@ public sealed class ChunkGenContext
                 int c = lz * Size + lx;
                 SurfaceHeight[c] = generator.Terrain.SurfaceHeight(wx, wz);
                 Ruggedness[c] = generator.Terrain.Ruggedness(wx, wz);
+                Cliff[c] = generator.Terrain.Cliff(wx, wz);
+                OverhangAmp[c] = Fields.TerrainField.OverhangAmplitude(Ruggedness[c], Cliff[c]);
                 SoilDepth[c] = generator.Terrain.SoilDepth(wx, wz);
             }
     }
@@ -56,6 +60,15 @@ public sealed class ChunkGenContext
     /// <summary>Surface height per padded column (index = lz * Size + lx).</summary>
     public float[] SurfaceHeight { get; }
     public float[] Ruggedness { get; }
+
+    /// <summary>Cliff-zone strength per padded column (0–1).</summary>
+    public float[] Cliff { get; }
+
+    /// <summary>
+    /// 3D overhang amplitude per padded column (cells): the terrain is solid everywhere below SurfaceHeight − OverhangAmp
+    /// (the true surface can dip that far), and open above SurfaceHeight + OverhangAmp.
+    /// </summary>
+    public float[] OverhangAmp { get; }
     public float[] SoilDepth { get; }
 
     /// <summary>Biome runtime id per padded cell (filled by the biome pass).</summary>

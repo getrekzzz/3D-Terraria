@@ -39,8 +39,8 @@ public static partial class WorldLauncher
         return (entity, player);
     }
 
-    /// <summary>Third-person avatar, first-person view model, grapple chain, swing trail and carried light.</summary>
-    private static void AddPlayerVisuals(WorldRuntime runtime, GameServices services, GameWorld game, Rendering.PropLibrary props, PlayerEntity entity, PlayerController player)
+    /// <summary>Third-person avatar (returned), first-person view model, grapple chain, swing trail and carried light.</summary>
+    private static PlayerAvatar AddPlayerVisuals(WorldRuntime runtime, GameServices services, GameWorld game, Rendering.PropLibrary props, PlayerEntity entity, PlayerController player)
     {
         var avatar = new PlayerAvatar();
         player.AddChild(avatar);
@@ -53,10 +53,11 @@ public static partial class WorldLauncher
         grapple.Initialize(player);
         var trail = new Entities.SwingTrail();
         runtime.AddChild(trail);
-        trail.Initialize(game);
+        trail.Initialize(game, entity, player);
         var carried = new PlayerLight();
         player.AddChild(carried);
         carried.Initialize(entity, services.Graphics, () => viewModel.LightAnchor, () => avatar.LightAnchor);
+        return avatar;
     }
 
     /// <summary>Targeting and use input, and the highlight on the targeted cell.</summary>

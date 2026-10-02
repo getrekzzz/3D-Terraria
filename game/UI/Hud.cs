@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using Godot;
 using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Items;
-using Strata.Core.Voxels;
 
 namespace Strata.Game.UI;
 
@@ -29,12 +28,15 @@ public sealed partial class Hud : CanvasLayer
     private VBoxContainer _announcements = null!;
     private Label _death = null!;
     private Crosshair _crosshair = null!;
-    private Label _targetName = null!;
+    private TargetLabel _targetName = null!;
     private Label _fps = null!;
     private Label _info = null!;
     private PanelContainer _bossPanel = null!;
     private Label _bossName = null!;
     private ProgressBar _bossBar = null!;
+
+    /// <summary>What the crosshair label shows ("Blue Slime 25/25", a block's name, or empty).</summary>
+    public string TargetText => _targetName.Text;
 
     public void Initialize(UiContext ui)
     {
@@ -94,13 +96,8 @@ public sealed partial class Hud : CanvasLayer
         _crosshair = new Crosshair { MouseFilter = Control.MouseFilterEnum.Ignore };
         _crosshair.SetAnchorsPreset(Control.LayoutPreset.Center);
         root.AddChild(_crosshair);
-        _targetName = new Label { HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = Control.MouseFilterEnum.Ignore };
-        _targetName.SetAnchorsPreset(Control.LayoutPreset.Center);
-        _targetName.GrowHorizontal = Control.GrowDirection.Both;
-        _targetName.OffsetTop = 16;
-        _targetName.AddThemeFontSizeOverride("font_size", 14);
-        _targetName.AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
-        _targetName.AddThemeConstantOverride("outline_size", 4);
+        _targetName = new TargetLabel();
+        _targetName.Initialize(ui);
         root.AddChild(_targetName);
         _fps = new Label { Position = new Vector2(16, 44), MouseFilter = Control.MouseFilterEnum.Ignore };
         _fps.AddThemeFontSizeOverride("font_size", 14);
@@ -208,21 +205,12 @@ public sealed partial class Hud : CanvasLayer
         _crosshair.InReach = _ui.Interaction.InReach;
         _fps.Visible = Settings.UserSettings.Current.ShowFps;
         if (_fps.Visible) _fps.Text = $"{Engine.GetFramesPerSecond():0} FPS";
-        _targetName.Text = Settings.UserSettings.Current.ShowTargetName && _ui.Interaction.InReach ? TargetName() : "";
         _info.Text = InfoText();
         _death.Visible = !_ui.Entity.Alive;
         if (_death.Visible)
             _death.Text = _ui.Entity.Lost
                 ? $"{_ui.Entity.State.Name} has perished.\nHardcore characters do not return."
                 : $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
-    }
-
-    private string TargetName()
-    {
-        var t = _ui.Interaction.Target;
-        if (t == null) return "";
-        if (t.Object is { } o) return o.Def.DisplayName;
-        return t.Block is 0 or VoxelWorld.Unknown ? "" : _ui.Game.Session.Content.Blocks[t.Block].DisplayName;
     }
 
     private void UpdateBossBar()

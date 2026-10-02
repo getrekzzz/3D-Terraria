@@ -22,6 +22,7 @@ public sealed class WorldPlan
         Landness = new Grid2D(Size.X, Size.Z, HeightStep);
         Height = new Grid2D(Size.X, Size.Z, HeightStep);
         Ruggedness = new Grid2D(Size.X, Size.Z, HeightStep);
+        Cliffs = new Grid2D(Size.X, Size.Z, HeightStep);
         ColumnTop = new int[(Size.X / ChunkMath.Size) * (Size.Z / ChunkMath.Size)];
     }
 
@@ -36,8 +37,11 @@ public sealed class WorldPlan
     /// <summary>Surface height (cells) before fine detail.</summary>
     public Grid2D Height { get; }
 
-    /// <summary>0–1: how much 3D overhang/cliff noise is applied near the surface.</summary>
+    /// <summary>0–1: how much 3D jitter is applied near the surface (at most about 2 cells outside cliff zones).</summary>
     public Grid2D Ruggedness { get; }
+
+    /// <summary>0–1: cliff-zone strength (steep walls and occasional undercuts); 0 over most of the land.</summary>
+    public Grid2D Cliffs { get; }
 
     /// <summary>Biome regions, highest priority first.</summary>
     public List<BiomeRegion> Regions { get; } = new();
@@ -77,7 +81,7 @@ public sealed class WorldPlan
     }
 
     /// <summary>Raises each chunk column's content top to cover the terrain surface (plus overhang margin and sea level).</summary>
-    public void RaiseTerrainColumnTops(Func<float, float, float> surfaceHeight)
+    public void RaiseTerrainColumnTops(Fields.TerrainField terrain)
     {
         int cw = Size.X / ChunkMath.Size, cd = Size.Z / ChunkMath.Size;
         for (int cz = 0; cz < cd; cz++)
@@ -88,8 +92,8 @@ public sealed class WorldPlan
                     for (int x = -4; x <= ChunkMath.Size + 4; x += 4)
                     {
                         float wx = cx * ChunkMath.Size + x, wz = cz * ChunkMath.Size + z;
-                        float rug = Ruggedness.Sample(wx, wz);
-                        top = MathF.Max(top, surfaceHeight(wx, wz) + 3f + Fields.TerrainField.OverhangAmplitude(rug) + 2f);
+                        float amp = Fields.TerrainField.OverhangAmplitude(terrain.Ruggedness(wx, wz), terrain.Cliff(wx, wz));
+                        top = MathF.Max(top, terrain.SurfaceHeight(wx, wz) + 3f + amp + 2f);
                     }
                 int i = ColumnIndex(cx, cz);
                 ColumnTop[i] = Math.Max(ColumnTop[i], (int)MathF.Ceiling(top));

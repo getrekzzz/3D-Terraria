@@ -175,17 +175,59 @@ without hazing the image; a moonlit night keeps a blue ambient floor so shapes a
 Generated humans (the player, town folk, humanoid enemies) play their shared animation set through a
 `HumanoidAnimator` (an `AnimationTree` built in code): a cross-faded locomotion state (idle, walk, run, sprint,
 strafe_left, strafe_right, jump, fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed
-so feet do not slide, negative when backpedalling), an upper-body `OneShot` for item actions stretched to the item's
-use time and restarted on every use (so you can swing while running), a right-arm blend that holds a carried torch
-up, and a hurt flinch. The swing, chop and thrust start and end in their raised or ready pose, so a chained use picks
-up where the last one ended (the `OneShot` still fades each use out over its last 0.16 s and in again on the next);
-their strike windows and the bow's release match `data/config/use_styles.json`. The tree blends each bone by the
+so feet do not slide, negative when backpedalling), an upper-body action blend for item actions, a right-arm blend
+that holds a carried torch up, and a hurt flinch. Each use animation (a new `PlayerEntity.UseSerial`; Core never
+restarts one mid-arc) plays its clip once, stretched to the use after speed bonuses (so you can swing while running):
+an `AnimationNodeTimeSeek` under the clip's time scale seeks it to its start, or, when the use is quicker than
+`maxClipRate` times the clip's authored speed, past the wind-up to the clip's `strikeStart`, and the rest plays over
+the use, so the strike lands inside it and the clip still ends with it. The action is a plain `Blend2` whose weight
+`HumanoidAnimator` eases (in over 0.05 s, out over 0.16 s): it stays fully in while the simulation's use runs
+(`Sustain`; the simulation can fall behind real time) and for 0.08 s (and two frames) after, so a chained autoswing
+or chop starts from the pose the last one ended in instead of dipping toward the locomotion pose (probe
+`player.action_dips` counts chained uses that did dip; creatures' actions are timed alone). The swing, chop and thrust start and end in
+their raised or ready pose; their strike windows and the bow's release match `data/config/use_styles.json`. The tree blends each bone by the
 shortest turn from its rest pose, so the action clips keep the upper arm short of straight up wherever they can be
 faded (an arm past it would flip round for a frame) and give every body, undead included, a living person's arms.
+In first person the `ViewModel` poses the held item on the same timing: the use's phase is
+`(UseAnimationMax − UseAnimation + physics interpolation fraction) / UseAnimationMax`, so it moves every frame between
+ticks at any frame rate and never runs backwards. Blades and tools rise from half raised to over the shoulder
+through the wind-up, come down and across by `UseTiming.Sweep` in the strike window, carry on (a blade) or bounce
+off the block (a tool), and return to half raised for the next use; thrusts pull back, lunge in the strike window and
+hold through the follow-through. An engage weight eases the item out of its rest pose (0.06 s) and back (0.15 s), and a
+new use while engaged crossfades from the pose on screen (0.05 s). The `SwingTrail` arc is drawn from the strike start
+only, its head at the sweep the melee system tests hits against (the same eased window, the prefix-sized reach), so the
+damage number appears as the arc passes; it fades after the follow-through and takes the swing's `trailColor` when the
+item sets one.
+
+Ranged weapons are held aimed in first person (`ViewModel.Ranged`), in use or not. Their poses are in an aim frame
+(the view yawed and pitched from the item's rest position to the crosshair point at `AimDistance`, kept within
+2–60 m), so a barrel or an arrow laid along −Z points at what the crosshair is on. A bow stands upright right of
+centre, its back to the target, with an arrow on the string: the first arrows in the backpack (`ItemUseSystem.FindAmmo`,
+looked up four times a second and at once when a bow is taken out, in either view, so the model is loaded before the
+first shot). The arrow is gone from the bow clip's `release` to its `redrawStart` while the bow jolts 3 cm forward, then
+is laid on ahead of the string and slid back onto it by `redrawEnd`, so auto-fire keeps the arrow in step with the
+shots. Guns point along the view and kick 6° up and 4 cm back on every shot (each `ItemUse.Used` with a `Shot`, so a
+burst kicks per round), settling to about 5 % in 0.12 s. Staffs, wands and tomes lean their tip toward the crosshair and
+push toward it on a cast. In third person `PlayerAvatar.HeldPose` grips a bow by its riser, upright with its back on
+the aim while it is drawn (set 23° forward in the fist against the bow clip's raised hand); everything else keeps the
+point-forward grip. Probes `fp.arrow`, `fp.aim_error_deg`, `player.held_tilt_deg` and `player.held_aim_deg` report the
+result.
+
 The strafe clips run `HumanoidAnimator.StrafeAngle` (45°) to the side of the hips: with the legs turned that far
-toward the movement, the feet travel straight sideways. For the player an `AimModifier` (`SkeletonModifier3D`) then
-turns the torso and head toward the aim while the legs face the way they walk, and brings the arms up to the aim for
-guns, bows, staffs and spears.
+toward the movement, the feet travel straight sideways.
+
+The player's body always faces the crosshair (`PlayerAvatar.Motion`, rule in Core `Presentation/BodyFacing`): the
+chest, arms and head face the camera's yaw (`CameraRig.Yaw`), and the legs (the model's yaw) turn toward the movement
+by at most `BodyFacing.MaxTwist` (70°) and pick the stride that carries the feet along it: the forward gait within
+22.5° of the facing, `strafe_left`/`strafe_right` (playback rate `HumanoidAnimator.StrafeRate`, run's ground per
+cycle) out to 112.5°, the gait played backwards beyond; a playing stride keeps its band 8° longer so a move along an
+edge does not flicker. W+A runs the strafe clip with the hips square, A or D turns the legs 45°, S backpedals. Standing,
+in the air, in water, on a rope or in a minecart the legs ease onto the facing (12/s), and however fast the camera
+turns the legs are dragged to within the twist limit, so the chest never leaves the crosshair. An `AimModifier`
+(`SkeletonModifier3D`) then twists the torso back onto the facing (the spine and chest share the twist, so the
+shoulders, arms and head face it exactly), bends the spine and head to the aim's pitch, and brings the arms up to the
+aim for guns, bows, staffs and spears. Probes `player.facing_error_deg`, `player.twist_deg` and `player.stride`
+report the result.
 
 `NpcRenderer.Motion` adds presence to everything else: `facing` look (eyes stare at their target) or velocity (fish),
 fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a

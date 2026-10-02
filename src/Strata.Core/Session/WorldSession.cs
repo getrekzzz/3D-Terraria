@@ -46,7 +46,9 @@ public sealed partial class WorldSession
         World.TileObjects.Added += o => MarkModified(o);
         World.TileObjects.Removed += o => MarkModified(o);
 
-        if (meta.PlanHash.Length > 0 && meta.PlanHash != plan.Hash)
+        if (SaveCatalog.IsOldGenerator(meta))
+            log.Warn("session", $"World made with generator version {meta.GeneratorVersion} (current {GenVersion.Current}); newly explored terrain will not match the saved regions.");
+        else if (meta.PlanHash.Length > 0 && meta.PlanHash != plan.Hash)
             log.Warn("session", $"World plan hash changed ({meta.PlanHash} -> {plan.Hash}); unexplored regions will differ from the original generator.");
     }
 

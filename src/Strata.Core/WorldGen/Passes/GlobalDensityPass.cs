@@ -1,5 +1,4 @@
 using Strata.Core.WorldGen.Chunk;
-using Strata.Core.WorldGen.Fields;
 
 namespace Strata.Core.WorldGen.Passes;
 
@@ -23,17 +22,18 @@ public sealed class GlobalDensityPass : GenPass
             {
                 int col = ChunkGenContext.Column(lx, lz);
                 float h = ctx.SurfaceHeight[col];
-                float rug = ctx.Ruggedness[col];
-                float amp = TerrainField.OverhangAmplitude(rug) + 1f;
+                float amp = ctx.OverhangAmp[col];
+                float band = amp + 1f;
+                float cliff = ctx.Cliff[col];
                 int wx = ctx.Origin.X + lx, wz = ctx.Origin.Z + lz;
                 for (int ly = 0; ly < size; ly++)
                 {
                     int wy = ctx.Origin.Y + ly;
                     ushort block;
                     if (wy < 3) block = p.Bedrock;
-                    else if (wy < h - amp) block = p.Stone;
-                    else if (wy > h + amp) block = p.Air;
-                    else block = terrain.Density(wx, wy, wz, h, rug) > 0f ? p.Stone : p.Air;
+                    else if (wy < h - band) block = p.Stone;
+                    else if (wy > h + band) block = p.Air;
+                    else block = terrain.Density(wx, wy, wz, h, amp, cliff) > 0f ? p.Stone : p.Air;
                     ctx.Blocks[ChunkGenContext.Index(lx, ly, lz)] = block;
                     anySolid |= block != p.Air;
                 }

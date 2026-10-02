@@ -38,8 +38,10 @@ probe player.y
 probe block.0.-1.0
 assert player.alive == 1
 
-# Building: place a brick grid block (1 m, one brick per cell) on the floor in front of us.
+# Building: place a brick grid block (1 m, one brick per cell) on the floor in front of us. The arena is rebuilt
+# around our feet first: standing on the rim of the pit we just dug can leave the body a little lower, one cell down.
 fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
 wait 0.5
 give gray_brick 20
 wield gray_brick

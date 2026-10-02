@@ -103,9 +103,11 @@ public class ArsenalTests
     public void BombsExplodeOnTheirFuseDiggingAndHurting()
     {
         using var g = Arena();
-        var gel = Dummy(g, 2.5f);
+        var gel = Dummy(g, 1.5f);
         g.Hold("bomb", 3);
-        g.Player.Aim = Vector3.Normalize(new Vector3(0, -0.2f, 1));
+        // Dropped almost straight down: it bounces through the slime and settles beside it instead of rolling off the
+        // arena across whatever terrain lies beyond.
+        g.Player.Aim = Vector3.Normalize(new Vector3(0, -1f, 0.1f));
         int life = g.Player.State.Vitals.Life;
         int stone = CountSolid(g, 8);
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));

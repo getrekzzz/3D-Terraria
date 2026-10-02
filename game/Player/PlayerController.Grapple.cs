@@ -19,7 +19,13 @@ public sealed partial class PlayerController
     /// <summary>The chain colour of the hook in use.</summary>
     public Color HookColor => Color.FromHtml(Entity.Hook.Params?.Color ?? "#9a9aa4");
 
-    public Vector3 HandPosition => GlobalPosition + Vector3.Up * 1.25f + Rig.YawBasis * new Vector3(0.28f, 0, -0.1f);
+    /// <summary>The throwing hand (world metres) at this physics step: hooks leave from and come back to it.</summary>
+    public Vector3 HandPosition => GlobalPosition + HandOffset;
+
+    /// <summary>The hand where the body is drawn this frame (between physics steps); the chain hangs from it.</summary>
+    public Vector3 DrawnHandPosition => GetGlobalTransformInterpolated().Origin + HandOffset;
+
+    private Vector3 HandOffset => Vector3.Up * 1.25f + Rig.YawBasis * new Vector3(0.28f, 0, -0.1f);
 
     /// <summary>Advances the hook; while latched it drives the velocity and returns true.</summary>
     private bool UpdateGrapple(float dt, ref Vector3 v)
