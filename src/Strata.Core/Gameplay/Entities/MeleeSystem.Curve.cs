@@ -26,6 +26,12 @@ public sealed partial class MeleeSystem
     /// <summary>Horizontal distance (m) inside which a swing always connects: a creature in the player's face.</summary>
     public const float PointBlank = 0.6f;
 
+    /// <summary>
+    /// The highest blade angle (degrees after the arc scaling; 90 is straight up) that deals damage: a little forward
+    /// of vertical, so the blade raised behind the head never hits creatures behind the player.
+    /// </summary>
+    public const float HighestDamagingDeg = 80f;
+
     /// <summary>The most recent hit of any swing or thrust (probes and tests); null before the first.</summary>
     public MeleeHit? LastHit { get; private set; }
 
@@ -61,10 +67,14 @@ public sealed partial class MeleeSystem
         float start = clip.StrikeStart ?? 0f, end = MathF.Min(1f, (clip.StrikeEnd ?? 1f) + UseTiming.FollowThrough);
         if (t < start || tPrev > end) return;
         var curve = BladeCurve(clip);
-        float from = float.IsNaN(s.LastDeg) ? curve.Evaluate(MathF.Max(tPrev, start)) : s.LastDeg;
-        float to = curve.Evaluate(MathF.Min(t, end));
-        s.LastDeg = to;
         var swing = s.Item.Swing!;
+        // Only the part of the arc in front of the player damages: the curve starts raised behind the head (scaled
+        // further back by wide arcs), so the swept angles are capped short of straight up. The trail still draws the
+        // whole curve.
+        float cap = HighestDamagingDeg * 150f / swing.Arc;
+        float from = MathF.Min(cap, float.IsNaN(s.LastDeg) ? curve.Evaluate(MathF.Max(tPrev, start)) : s.LastDeg);
+        float to = MathF.Min(cap, curve.Evaluate(MathF.Min(t, end)));
+        s.LastDeg = to;
         var plane = PlaneFor(s.Player.Center, s.Yaw, new MeleeSwingInfo(swing.Arc, swing.Length, Prefixes.Size(s.Stack)));
         var center = s.Player.Center;
         _hitPivot = plane.Pivot;

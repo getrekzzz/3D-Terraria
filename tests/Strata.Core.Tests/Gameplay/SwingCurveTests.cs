@@ -103,6 +103,24 @@ public class SwingCurveTests
         Assert.False(HitsAt(-1.5f, 1.0f), "a slime 1.5 m to the other side was hit");
     }
 
+    [Theory]
+    [InlineData("wooden_sword", "zombie", 1.2f)]
+    [InlineData("breaker_blade", "green_slime", 1.5f)]
+    [InlineData("breaker_blade", "green_slime", 2.0f)]
+    [InlineData("breaker_blade", "green_slime", 2.5f)]
+    public void TheBladeRaisedBehindTheHeadNeverHitsCreaturesBehind(string item, string enemy, float behind)
+    {
+        using var g = Arena();
+        var npc = g.World.Npcs.Spawn(g.Content.Enemies.Get(enemy), g.Player.Position + new Vector3(0, 0.05f, -behind))!;
+        npc.Life = npc.MaxLife = 5000;
+        npc.Timer = -100_000; // sit still
+        g.Hold(item);
+        g.Player.Aim = Vector3.UnitZ;
+        Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
+        g.Ticks(g.Player.UseAnimationMax + 1);
+        Assert.Equal(5000, npc.Life);
+    }
+
     [Fact]
     public void ASpearReachesFurtherThanAShortswordOnlyOnceExtended()
     {

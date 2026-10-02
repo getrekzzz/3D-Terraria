@@ -42,7 +42,7 @@ internal static class StandardProbes
         ctx.AddProbe("pets.active", () => w.Projectiles.PetCount(lights: false));
         ctx.AddProbe("pets.lights", () => w.Projectiles.PetCount(lights: true));
         ctx.AddProbe("melee.swings", () => w.Melee.ActiveSwings);
-        // The last melee hit: the blade's curve angle (0 ahead, 90 up; -999 for a thrust or before any hit) and the
+        // The last melee hit only (any player, any creature; a later hit overwrites it): the blade's curve angle (0 ahead, 90 up; -999 for a thrust or before any hit) and the
         // struck creature's distance from the swing pivot or thrust origin (m; -1 before any hit).
         ctx.AddProbe("melee.hit_deg", () => w.Melee.LastHit is { BladeDeg: var d } && !float.IsNaN(d) ? d : -999);
         ctx.AddProbe("melee.hit_dist", () => w.Melee.LastHit?.Distance ?? -1);
