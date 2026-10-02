@@ -39,7 +39,7 @@ public static partial class WorldLauncher
         trees.Initialize(game, objectRenderer);
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
-        drops.Initialize(game);
+        drops.Initialize(game, objectRenderer.Props, services.Render, services.Graphics);
         var lights = new Rendering.DynamicLights();
         runtime.AddChild(lights);
         lights.Initialize(services.Graphics);
@@ -51,6 +51,7 @@ public static partial class WorldLauncher
         lava.Initialize(runtime);
         lights.AddProvider(lava.HeatLights);
         lights.AddProvider(status.Lights); // burning statuses, at most the preset's statusLights
+        lights.AddProvider(drops.Lights); // glowing and light-giving drops, at most the preset's dropLights
         var weather = new Ambience.WeatherRenderer();
         runtime.AddChild(weather);
         weather.Initialize(runtime, services.Graphics, game.Weather.Config);
