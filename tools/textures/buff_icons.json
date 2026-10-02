@@ -48,5 +48,6 @@
   "bunny_mount":       { "glyph": "boot",           "fg": "#e8dcc8", "bg": "#3a3226" },
   "bee_mount":         { "glyph": "honey",          "fg": "#f0c030", "bg": "#4e3410" },
   "ufo_mount":         { "glyph": "ufo",            "fg": "#80e0a0", "bg": "#123a24" },
-  "monster_banner":    { "glyph": "pirate_flag",    "fg": "#d8c070", "bg": "#3a2a14" }
+  "monster_banner":    { "glyph": "pirate_flag",    "fg": "#d8c070", "bg": "#3a2a14" },
+  "dryads_ward":       { "glyph": "shield",         "fg": "#90e070", "bg": "#1e3a16" }
 }

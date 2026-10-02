@@ -11,6 +11,8 @@ public sealed partial class TownSystem
         r.DiedAtTick = _world.Session.Clock.Tick;
         r.RespawnTicks = 0;
         r.Path = null;
+        ClearDefense(r); // a fallen resident comes back calm, standing and unwarded
+        r.Posture = ResidentPosture.Stand;
     }
 
     /// <summary>

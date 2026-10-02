@@ -110,3 +110,15 @@ assert inv.coins == 250
 give wooden_arrow 30
 assert inv.wooden_arrow == 30
 assert errors == 0
+
+# --- P5-10 ---
+# Residents fight back: the Arms Dealer shoots a zombie that comes near.
+god on
+time noon
+town summon arms_dealer 0 0 2
+aim 0 0 -1
+spawn zombie 1 9
+wait_until town.arms_dealer.attacks > 0 15
+killall
+god off
+assert errors == 0

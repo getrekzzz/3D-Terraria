@@ -24,6 +24,7 @@ internal static class TownProbes
             if (parts is [_, "alive"]) return t is { Alive: true } ? 1 : 0;
             if (parts is [_, "homed"]) return t?.Home != null ? 1 : 0;
             if (parts is [_, "bound"]) return t is { Bound: true } ? 1 : 0;
+            if (parts is [_, "attacks"]) return t?.Attacks ?? 0;
             if (parts is [_, "posture"]) return t != null ? (int)t.Posture : -1; // ResidentPosture: 0 stand, 1 sit, 2 sleep, 3 bound, 4 lie
             return null;
         });

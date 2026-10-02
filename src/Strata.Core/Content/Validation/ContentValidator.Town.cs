@@ -72,6 +72,7 @@ public static partial class ContentValidator
             }
             foreach (var c in AllConditions(t)) CheckTownCondition(ctx, t, c);
             ValidateTownRescue(ctx, t);
+            ValidateTownAttack(ctx, t);
         }
         foreach (var r in ctx.Db.SpawnRules.All)
             foreach (var c in r.Conditions) CheckTownCondition(ctx, r, c);

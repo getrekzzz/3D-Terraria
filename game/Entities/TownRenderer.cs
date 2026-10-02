@@ -31,6 +31,7 @@ public sealed partial class TownRenderer : Node3D
         _game = game;
         _props = props;
         Name = "Residents";
+        game.Town.ResidentAttacked += OnResidentAttacked;
         game.Town.Removed += npc =>
         {
             if (!_views.Remove(npc.Id, out var view)) return;

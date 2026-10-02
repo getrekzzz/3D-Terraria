@@ -78,6 +78,7 @@
     "tileobjects/trophies.json",
     "town/hardmode.json",
     "town/pre_hardmode.json",
+    "town/projectiles.json",
     "town/visitors.json",
     "worldgen/aether.json",
     "worldgen/ores.json",

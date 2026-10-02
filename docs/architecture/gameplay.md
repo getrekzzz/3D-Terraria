@@ -576,3 +576,14 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   posts "<Title> has been rescued!" through `NpcSystem.Broadcast` with `MessageKind.Town` (Terraria's arrival blue),
   the same path boss messages take to the HUD and chat log. `town pose <id> <posture>` and probe
   `town.<id>.posture` serve tours and smokes. The talk-to-free dialog page (thanks / purify) waits for the W4 chat box.
+* **Residents fight back** (P5-10, `TownSystem.Defense.cs`): `TownNpcDef.Attack` (`TownAttack`: style throw, shoot,
+  magic, melee, heal or ward; projectile, damage ×`hardmodeMultiplier` in hardmode, speed, range, interval, count,
+  spread, buff). Every 6 ticks (staggered by id) a free resident picks the nearest live hostile creature within range
+  that `NpcSystem.InSight` confirms (critters, passive, harmless, invulnerable and disguised ones ignored), faces it
+  and pauses 20 ticks while it attacks: shots are friendly, ownerless projectiles (`Ballistics.Aim` lobs
+  gravity-bound ones, shared with creature ranged attacks) that only hit creatures; melee strikes within 1.8 m; the
+  Nurse heals the most hurt resident in range (no threat needed; players pay her as in Terraria); the Dryad gives players `dryads_ward`
+  and residents `WardDefense`. Residents without an attack flee threats within 5 m. The validator requires attack
+  projectiles to be friendly with no player- or terrain-harming blast (`data/town/projectiles.json` holds the npc_*
+  shots). Dying clears the fight state. `ResidentAttacked` drives the action clip (throw, bow/gun, tome, hold_up,
+  swing) and sound; probe `town.<id>.attacks`.

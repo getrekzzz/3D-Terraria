@@ -91,3 +91,44 @@ public sealed class RescueInfo
     public float MinDistance { get; init; } = 30f;
     public float MaxDistance { get; init; } = 70f;
 }
+
+/// <summary>
+/// How a resident defends itself when hostile creatures come near (Terraria's town NPC attacks): throw, shoot or
+/// magic launch <see cref="Projectile"/> (a friendly projectile that never hurts players or terrain), melee strikes
+/// within reach, heal mends the most hurt resident or player in range, ward gives <see cref="Buff"/> to players and
+/// residents nearby while a threat is about. Damage doubles in hardmode (<see cref="HardmodeMultiplier"/>).
+/// </summary>
+public sealed class TownAttack
+{
+    public static readonly string[] Styles = { "throw", "shoot", "magic", "melee", "heal", "ward" };
+
+    public string Style { get; init; } = "throw";
+    public string? Projectile { get; init; }
+    public int Damage { get; init; }
+    public float HardmodeMultiplier { get; init; } = 2f;
+    public float Knockback { get; init; } = 3f;
+
+    /// <summary>Launch speed (m/s).</summary>
+    public float Speed { get; init; } = 14f;
+
+    /// <summary>Threat detection range (m); also the reach of heal and ward.</summary>
+    public float Range { get; init; } = 14f;
+
+    /// <summary>Ticks between attacks.</summary>
+    public int Interval { get; init; } = 60;
+
+    public int Count { get; init; } = 1;
+
+    /// <summary>Random spread per shot (degrees).</summary>
+    public float Spread { get; init; }
+
+    /// <summary>The ward's buff and how long each pulse lasts.</summary>
+    public string? Buff { get; init; }
+    public int BuffTicks { get; init; } = 120;
+
+    /// <summary>Extra defense a ward gives residents (players get <see cref="Buff"/>).</summary>
+    public int WardDefense { get; init; } = 8;
+
+    /// <summary>Life a heal restores.</summary>
+    public int Heal { get; init; }
+}

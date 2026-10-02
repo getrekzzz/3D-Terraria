@@ -79,6 +79,25 @@ public sealed class TownNpc : Combat.ICombatTarget
     public PlayerEntity? TalkingTo { get; set; }
     public int TalkTicks { get; set; }
 
+    /// <summary>Defense (P5-10): ticks until the next attack, ticks standing still to attack, attacks made so far.</summary>
+    public int AttackCooldown { get; set; }
+    public int AttackTicks { get; set; }
+    public int Attacks { get; set; }
+
+    /// <summary>Ticks left running from <see cref="FleeFrom"/> (residents without an attack).</summary>
+    public int FleeTicks { get; set; }
+    public Vector3 FleeFrom { get; set; }
+
+    /// <summary>The nearest hostile creature in sight at the last scan (null = none).</summary>
+    public Entities.Npc? Threat { get; set; }
+
+    /// <summary>Ticks left of a Dryad's ward and the defense it adds.</summary>
+    public int WardTicks { get; set; }
+    public int WardDefense { get; set; }
+
+    /// <summary>Defense now: the resident's own plus a ward's.</summary>
+    public int Defense => Def.Defense + (WardTicks > 0 ? WardDefense : 0);
+
     internal List<Int3>? Path { get; set; }
     internal int PathIndex { get; set; }
     internal int IdleTicks { get; set; }

@@ -40,7 +40,7 @@ public sealed partial class TownSystem
     public void Damage(TownNpc r, int amount, Vector3 from)
     {
         if (!r.Alive || r.Bound) return; // bound NPCs cannot be hurt
-        int dealt = Math.Max(1, amount - r.Def.Defense / 2);
+        int dealt = Math.Max(1, amount - r.Defense / 2);
         r.Life -= dealt;
         r.ImmuneTicks = HitImmunity;
         var away = BrainFactory.Flat(r.Position - from);

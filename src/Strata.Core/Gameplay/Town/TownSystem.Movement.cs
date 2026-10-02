@@ -32,7 +32,9 @@ public sealed partial class TownSystem
         TakeContactHits(r);
         if (!r.Alive) return;
         Decide(r);
-        var wish = Steer(r);
+        TickDefense(r);
+        // Attacking residents stand still for the moment of the attack; unarmed ones run from threats (P5-10).
+        var wish = r.AttackTicks > 0 ? Vector3.Zero : r.FleeTicks > 0 ? FleeWish(r) : Steer(r);
         if (r.ImmuneTicks < HitImmunity - 12)
         {
             r.Velocity.X = wish.X;
