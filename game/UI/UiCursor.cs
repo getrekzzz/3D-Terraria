@@ -35,8 +35,15 @@ public static class UiCursor
             for (int x = 0; x < image.GetWidth(); x++)
             {
                 var px = image.GetPixel(x, y);
-                bool rim = s.SmartCursor && (Mathf.Abs(px.R - px.G) > 0.05f || Mathf.Abs(px.R - px.B) > 0.05f);
-                image.SetPixel(x, y, rim ? px : px * tint);
+                if (!s.SmartCursor) image.SetPixel(x, y, px * tint);
+                // The smart sprite's saturated gold rim keeps its colour; its fill (white, pale-gold shading) takes the
+                // tint by brightness, so the shading matches the plain pointer's.
+                else if (px.R - px.B > 0.5f) image.SetPixel(x, y, px);
+                else
+                {
+                    float l = (px.R + px.G + px.B) / 3f;
+                    image.SetPixel(x, y, new Color(l, l, l, px.A) * tint);
+                }
             }
         if (scale > 1 && image.GetWidth() * scale <= MaxSize)
             image.Resize(image.GetWidth() * scale, image.GetHeight() * scale, Image.Interpolation.Nearest);
