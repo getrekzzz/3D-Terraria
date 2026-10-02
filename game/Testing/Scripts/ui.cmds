@@ -68,3 +68,42 @@ assert fx.health_bars == 0
 ai on
 god off
 assert errors == 0
+
+# --- P2-19 ---
+# A hit floats an orange number; drinking a healing potion while hurt floats a green heal number over the player, and
+# a mana potion after spending mana a blue one. The label pool stays within the graphics preset's cap.
+spawning off
+killall
+heal
+wield copper_shortsword
+aim 0 -0.2 1
+spawn green_slime 1 1.5
+ai off
+use
+wait 0.1
+assert fx.numbers >= 1
+killall
+ai on
+spawn green_slime 1 3
+wait_until player.life < 100 12
+killall
+give lesser_healing_potion 1
+wield lesser_healing_potion
+use
+wait 0.3
+assert fx.heal_numbers >= 1
+assert errors == 0
+wait 1.0
+assert fx.heal_numbers == 0
+give amethyst_staff 1
+wield amethyst_staff
+use
+wait 0.3
+assert player.mana < 20
+give lesser_mana_potion 1
+wield lesser_mana_potion
+use
+wait 0.3
+assert fx.heal_numbers >= 1
+assert fx.number_labels <= 80
+assert errors == 0

@@ -6,12 +6,12 @@ namespace Strata.Game.Bootstrap;
 
 public static partial class WorldLauncher
 {
-    /// <summary>Hit and block effects, dropped items, dynamic lights and lava glow.</summary>
-    private static void AddWorldEffects(WorldRuntime runtime, GameServices services, GameWorld game, TileObjectRenderer objectRenderer, Entities.NpcRenderer creatures)
+    /// <summary>Hit and block effects, dropped items, dynamic lights and lava glow; returns the combat effects (numbers follow the player).</summary>
+    private static Entities.CombatEffects AddWorldEffects(WorldRuntime runtime, GameServices services, GameWorld game, TileObjectRenderer objectRenderer, Entities.NpcRenderer creatures)
     {
         var effects = new Entities.CombatEffects();
         runtime.AddChild(effects);
-        effects.Initialize(game);
+        effects.Initialize(game, services.Graphics);
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
         blockEffects.Initialize(game);
@@ -27,6 +27,7 @@ public static partial class WorldLauncher
         runtime.AddChild(lava);
         lava.Initialize(runtime);
         lights.AddProvider(lava.HeatLights);
+        return effects;
     }
 
     /// <summary>What follows the local player: sounds, music, buff senses (night vision, Spelunker) and the wire overlay.</summary>

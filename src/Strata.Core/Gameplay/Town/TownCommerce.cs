@@ -164,7 +164,7 @@ public sealed class TownCommerce
         if (spec.Parse<HealServiceParams>().ClearsDebuffs)
             foreach (var b in state.Buffs.Active.Where(b => b.Def.Debuff && !b.Def.Persistent).ToList()) state.Buffs.Remove(b.Def.Id);
         state.Recompute();
-        state.Vitals.Life = state.Vitals.MaxLife;
+        _world.ReportHeal(player, state.Vitals.Heal(state.Vitals.MaxLife), mana: false);
         return TradeResult.Ok;
     }
 
