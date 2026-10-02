@@ -444,3 +444,8 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   `obtained {item}`, `achieved {id}` (read `ConditionContext.Records`, an `IPlayerRecords` the journal supplies
   through `TownSystem.PlayerRecords`; null reads 0/false), `season {is}` and `anglerQuests {min,max}`. The season is
   `WorldMeta.ForcedSeason` (the `season` command) or the real date (`SeasonCalendar`); it never affects generation.
+* **Housing API** (`TownSystem.Housing.cs`): `QueryHousing(cell)` (room, suitable, Terraria message, occupant),
+  `AssignHome(npc, cell)` (Assigned / Swapped: the occupant takes the npc's old home or becomes homeless /
+  NotSuitable / NotAResident for landmark keepers and bound NPCs / AlreadyHome) and `Evict(npc)`; valid homes are
+  kept until the room breaks. `TownNpc.BannerCell` marks the banner spot (found again after load). Console:
+  `housing query|assign|evict`; probe `town.<id>.homed`.

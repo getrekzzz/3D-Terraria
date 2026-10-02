@@ -89,7 +89,7 @@ public sealed partial class TownSystem
         foreach (var r in _residents.Where(r => r.Home == null && r.CountsAsResident))
         {
             if (rooms.Count == 0) break;
-            AssignHome(r, rooms[0]);
+            SetHome(r, rooms[0]);
             rooms.RemoveAt(0);
         }
         if (!force && !_world.Session.Clock.IsDay) return null; // Terraria: nobody new moves in at night
@@ -102,7 +102,7 @@ public sealed partial class TownSystem
             {
                 if (Find(def.Id) != null || def.Starter || def.Landmark != null || !_arrival[def.Id].Evaluate(ctx) || HasLeft(def, ctx)) continue;
                 var npc = Create(def, room.HomeNode!.Value);
-                AssignHome(npc, room);
+                SetHome(npc, room);
                 Arrived?.Invoke(npc);
                 return npc;
             }
@@ -202,10 +202,11 @@ public sealed partial class TownSystem
         return npc;
     }
 
-    private static void AssignHome(TownNpc npc, Room room)
+    private static void SetHome(TownNpc npc, Room room)
     {
         npc.Home = room.HomeNode;
         npc.HomeRoom = room.Key;
+        npc.BannerCell = BannerOf(room);
     }
 
     /// <summary>
@@ -222,9 +223,14 @@ public sealed partial class TownSystem
             var cell = HomeCell(home);
             if (World.GetBlock(cell) == VoxelWorld.Unknown) continue; // cannot judge an unloaded home
             if (_world.Rooms.Get(cell, budgeted: true) is not { } room) continue; // over budget: judged next time
-            if (room.Valid && room.Key == r.HomeRoom) continue;
+            if (room.Valid && room.Key == r.HomeRoom)
+            {
+                r.BannerCell ??= BannerOf(room); // not saved: found again once the home is loaded
+                continue;
+            }
             r.Home = null;
             r.HomeRoom = null;
+            r.BannerCell = null;
             HomeLost?.Invoke(r);
         }
     }

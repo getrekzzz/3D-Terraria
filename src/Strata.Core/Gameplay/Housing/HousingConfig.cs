@@ -81,6 +81,8 @@ public sealed class HousingConfig
         ["natural"] = "This is not valid housing.",
         ["corrupted"] = "This housing is corrupted.",
         ["noStand"] = "This room is too small.",
+        ["occupied"] = "This housing is occupied by {name}.",
+        ["notResident"] = "{name} cannot live in a house.",
     };
 
     public string Message(string key) =>

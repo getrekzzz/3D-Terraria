@@ -30,6 +30,8 @@
     "lowCeiling": "This room is too small.",
     "natural": "This is not valid housing.",
     "corrupted": "This housing is corrupted.",
-    "noStand": "This room is too small."
+    "noStand": "This room is too small.",
+    "occupied": "This housing is occupied by {name}.",
+    "notResident": "{name} cannot live in a house."
   }
 }

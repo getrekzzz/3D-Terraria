@@ -37,6 +37,9 @@ public sealed class TownNpc
     public Int3? Home { get; set; }
     public Int3? HomeRoom { get; set; }
 
+    /// <summary>Where the housing banner hangs: the highest room cell above the home node (null until known).</summary>
+    public Int3? BannerCell { get; set; }
+
     /// <summary>Feet position (m).</summary>
     public Vector3 Position;
     public Vector3 Velocity;

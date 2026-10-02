@@ -57,6 +57,14 @@ season none
 assert season.none == 1
 season auto
 
+# --- P5-05 ---
+# The housing API: evict the guide (the room reads suitable again), then assign him back.
+housing evict guide
+assert town.guide.homed == 0
+housing query 8 1 0
+housing assign guide 8 1 0
+assert town.guide.homed == 1
+
 # Talking and trading with the peddler.
 give silver_coin 60
 town summon merchant 0 0 -3
