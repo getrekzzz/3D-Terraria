@@ -22,6 +22,9 @@ public sealed class PlayerSave
     public int BonusLife { get; set; }
     public int BonusMana { get; set; }
     public int Deaths { get; set; }
+
+    /// <summary>Angler quests completed (additive; older saves read 0).</summary>
+    public int AnglerQuests { get; set; }
     public int SelectedHotbar { get; set; }
     public List<SlotModel> Backpack { get; set; } = new();
     public List<SlotModel> Armor { get; set; } = new();
@@ -53,6 +56,9 @@ public sealed class PlayerSave
     public List<SlotModel> Service { get; set; } = new();
     public int HiddenAccessories { get; set; }
 
+    /// <summary>The character's journal (additive: older saves load with an empty one).</summary>
+    public JournalModel? Journal { get; set; }
+
     /// <summary>Personal storages (Piggy Bank, Safe) by kind; additive, older saves load with none.</summary>
     public Dictionary<string, List<SlotModel>> Banks { get; set; } = new();
 
@@ -73,6 +79,7 @@ public sealed class PlayerSave
         BonusLife = p.BonusLife,
         BonusMana = p.BonusMana,
         Deaths = p.Deaths,
+        AnglerQuests = p.AnglerQuests,
         SelectedHotbar = p.Inventory.SelectedHotbar,
         Backpack = Slots(p.Inventory.Backpack),
         Armor = Slots(p.Inventory.Armor),
@@ -99,13 +106,14 @@ public sealed class PlayerSave
         MaxMana = p.Vitals.MaxMana,
         ExtraAccessorySlot = p.ExtraAccessorySlot,
         MinecartUpgrade = p.MinecartUpgrade,
+        Journal = JournalModel.From(p.Journal),
     };
 
     public PlayerState ToState(ContentDatabase content)
     {
         var p = new PlayerState(Name)
         {
-            BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, Look = Look ?? new Appearance(), Difficulty = Difficulty,
+            BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, AnglerQuests = Math.Max(0, AnglerQuests), Look = Look ?? new Appearance(), Difficulty = Difficulty,
             PlayTicks = PlayTicks, CreatedUtc = CreatedUtc, LastPlayedUtc = LastPlayedUtc,
             ExtraAccessorySlot = ExtraAccessorySlot, MinecartUpgrade = MinecartUpgrade,
         };
@@ -128,6 +136,7 @@ public sealed class PlayerSave
         foreach (var b in Buffs)
             if (content.Buffs.TryGet(content.Current(b.Id), out var def)) p.Buffs.Add(def, b.Ticks);
         foreach (var kv in SpawnPoints) p.SpawnPoints[kv.Key] = kv.Value;
+        Journal?.Fill(p.Journal);
         p.Inventory.Select(SelectedHotbar);
         p.Recompute();
         p.Vitals.Life = Math.Clamp(Life, 1, p.Vitals.MaxLife);

@@ -14,7 +14,7 @@ public sealed class UiContext
         Game = game;
         Player = player;
         Interaction = interaction;
-        Recipes = new RecipeBook(game.Session.Content);
+        Recipes = game.Recipes;
     }
 
     public GameWorld Game { get; }
@@ -25,6 +25,9 @@ public sealed class UiContext
     public PlayerInventory Inventory => Entity.State.Inventory;
 
     /// <summary>Short on-screen notification (crafting results, warnings); the HUD shows them on the status line under the crosshair.</summary>
+    /// <summary>The shop tab the next opened shop shows (the town dialog's tab buttons set it; the shop resets it).</summary>
+    public string ShopTab { get; set; } = Strata.Core.Content.Defs.ShopTabs.Shop;
+
     public event System.Action<string, Godot.Color>? Notified;
 
     public void Notify(string text, Godot.Color color) => Notified?.Invoke(text, color);

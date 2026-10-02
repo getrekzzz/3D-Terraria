@@ -7,7 +7,7 @@ namespace Strata.Game.Bootstrap;
 public static partial class WorldLauncher
 {
     /// <summary>
-    /// HUD, inventory, world map and minimap, town dialog, the performance overlay, photo mode, and above every screen
+    /// HUD, inventory, world map and minimap, town dialog, the performance overlay, the emote wheel and NPC voices, photo mode, and above every screen
     /// the held stack at the pointer and the item tooltip that follows it. Under the inventory and the town dialog, the
     /// empty screen catches the clicks their panels do not take (throw, use, camera drag).
     /// </summary>
@@ -43,6 +43,24 @@ public static partial class WorldLauncher
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
+        var toast = new UI.AchievementToast();
+        runtime.AddChild(toast);
+        toast.Initialize(game, player.Entity);
+        var book = new UI.GuideBook.GuideBookScreen();
+        runtime.AddChild(book);
+        book.Initialize(ui);
+        var hints = new UI.HintToast();
+        runtime.AddChild(hints);
+        hints.Initialize(game, player.Entity);
+        var loading = new UI.LoadingTips();
+        runtime.AddChild(loading);
+        loading.Initialize(game, player);
+        var emotes = new UI.EmoteWheel();
+        runtime.AddChild(emotes);
+        emotes.Initialize(ui);
+        var voice = new Audio.NpcVoice();
+        runtime.AddChild(voice);
+        voice.Initialize(game, interaction);
         var photo = new UI.PhotoMode.PhotoModeController();
         runtime.AddChild(photo);
         photo.Initialize(runtime, player);

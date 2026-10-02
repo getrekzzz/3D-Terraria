@@ -1,0 +1,14 @@
+{
+ "comment": "P5-23: the Angler's fishing decor sold by quest count (bgen/angler_decor.py).",
+ "objects": {
+  "pile_of_seashells": {"generator": "seashells", "params": {}},
+  "treasure_map": {"generator": "treasure_map", "params": {}},
+  "seaweed_planter": {"generator": "seaweed_planter", "params": {}},
+  "lifebuoy": {"generator": "lifebuoy", "params": {}},
+  "ships_wheel": {"generator": "ships_wheel", "params": {}},
+  "wall_anchor": {"generator": "wall_anchor", "params": {}},
+  "bass_plaque": {"generator": "fish_plaque", "params": {"body": "#4a6a3a", "belly": "#c8c890"}},
+  "trout_plaque": {"generator": "fish_plaque", "params": {"body": "#7a8a9a", "belly": "#e8a0a0"}},
+  "tuna_plaque": {"generator": "fish_plaque", "params": {"body": "#2a3a6a", "belly": "#d0d8e0"}}
+ }
+}

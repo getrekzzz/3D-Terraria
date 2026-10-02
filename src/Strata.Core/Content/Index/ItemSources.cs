@@ -49,9 +49,11 @@ public enum ItemSourceKind
 
 /// <summary>
 /// One way to obtain an item. <see cref="Min"/>–<see cref="Max"/> is the stack size; <see cref="Conditions"/> are the
-/// loot entry's (outer tables first), the shop stock's or the recipe's.
+/// loot entry's (outer tables first), the shop stock's or the recipe's. <see cref="Chance"/> is set for loot: the
+/// chance per kill, break, catch or opening (<see cref="Gameplay.Loot.DropRates"/>, multiplied through nested tables).
 /// </summary>
-public sealed record ItemSource(ItemSourceKind Kind, ContentDef? Owner, string? Label, int Min, int Max, TypedSpec[] Conditions);
+public sealed record ItemSource(ItemSourceKind Kind, ContentDef? Owner, string? Label, int Min, int Max, TypedSpec[] Conditions,
+    float? Chance = null);
 
 /// <summary>
 /// Reverse lookup from an item to every way it can be obtained: recipes, enemy and boss loot, world-generated chests,
@@ -122,13 +124,16 @@ public sealed class ItemSourceIndex
                 foreach (var id in t.Banner.Enemies)
                     if (db.Enemies.TryGet(id, out var enemy))
                         index.Add(t.PlacingItemId, new(ItemSourceKind.Drop, enemy, null, 1, 1, Array.Empty<TypedSpec>()));
+            // Biome pylons are sold by any content resident living in their biome (Gameplay/Town/PylonNetwork).
+            if (t.PlacingItemId != null && t.HasTag("pylon"))
+                index.Add(t.PlacingItemId, new(ItemSourceKind.Shop, null, "pylon", 1, 1, Array.Empty<TypedSpec>()));
         }
         // A bug net turns critters into their catch items.
         foreach (var e in db.Enemies.All)
             if (e.CatchItem != null) index.Add(e.CatchItem, new(ItemSourceKind.Catch, e, null, 1, 1, Array.Empty<TypedSpec>()));
         foreach (var npc in db.TownNpcs.All)
         {
-            foreach (var s in npc.Shop) index.Add(s.Item, new(ItemSourceKind.Shop, npc, null, 1, 1, s.Conditions));
+            foreach (var s in npc.AllShopEntries) index.Add(s.Item, new(ItemSourceKind.Shop, npc, null, 1, 1, s.Conditions));
             foreach (var (item, count) in AnglerRewards(npc))
                 index.Add(item, new(ItemSourceKind.AnglerReward, npc, null, count, count, Array.Empty<TypedSpec>()));
         }
@@ -165,7 +170,7 @@ public sealed class ItemSourceIndex
         {
             if (table == null || !db.LootTables.TryGet(table, out var def)) return;
             claimed.Add(table);
-            Walk(db, def, kind, owner, label, Array.Empty<TypedSpec>(), 0);
+            Walk(db, def, kind, owner, label, Array.Empty<TypedSpec>(), 1f, 0);
         }
 
         foreach (var e in db.Enemies.All)
@@ -189,18 +194,19 @@ public sealed class ItemSourceIndex
         foreach (var e in db.Enemies.All)
             Root(ExtraTablePrefix + e.Id, e.Boss != null ? ItemSourceKind.BossDrop : ItemSourceKind.Drop, e, null);
         foreach (var t in db.LootTables.All)
-            if (t.Name != null && !claimed.Contains(t.Id)) Walk(db, t, ItemSourceKind.Container, t, t.Name, Array.Empty<TypedSpec>(), 0);
+            if (t.Name != null && !claimed.Contains(t.Id)) Walk(db, t, ItemSourceKind.Container, t, t.Name, Array.Empty<TypedSpec>(), 1f, 0);
     }
 
-    private void Walk(ContentDatabase db, LootTableDef table, ItemSourceKind kind, ContentDef? owner, string? label, TypedSpec[] outer, int depth)
+    private void Walk(ContentDatabase db, LootTableDef table, ItemSourceKind kind, ContentDef? owner, string? label, TypedSpec[] outer, float scale, int depth)
     {
         if (depth > LootTableDef.MaxNesting) return; // as deep as LootRoller rolls; the validator reports loot cycles
         _ownedTables.Add(table.Id);
         foreach (var e in table.Entries)
         {
             var conditions = outer.Length == 0 ? e.Conditions : e.Conditions.Length == 0 ? outer : outer.Concat(e.Conditions).ToArray();
-            if (e.Item != null) Add(e.Item, new(kind, owner, label, e.Min, e.Max, conditions));
-            else if (e.Table != null && db.LootTables.TryGet(e.Table, out var nested)) Walk(db, nested, kind, owner, label, conditions, depth + 1);
+            float chance = scale * Gameplay.Loot.DropRates.EntryChance(table, e);
+            if (e.Item != null) Add(e.Item, new(kind, owner, label, e.Min, e.Max, conditions, chance));
+            else if (e.Table != null && db.LootTables.TryGet(e.Table, out var nested)) Walk(db, nested, kind, owner, label, conditions, chance, depth + 1);
         }
     }
 
@@ -216,7 +222,7 @@ public sealed class ItemSourceIndex
     /// <summary>Items an Angler-quest service hands out (malformed specs are left to the validator).</summary>
     private static IEnumerable<(string Item, int Count)> AnglerRewards(TownNpcDef npc)
     {
-        if (npc.Service is not { Type: TownServiceSpecs.AnglerQuest } spec
+        if (npc.FindService(TownServiceSpecs.AnglerQuest) is not { } spec
             || !spec.Raw.TryGetProperty("rewards", out var rewards) || rewards.ValueKind != JsonValueKind.Array) yield break;
         foreach (var r in rewards.EnumerateArray())
         {

@@ -1,0 +1,80 @@
+# Guide: the player journal (kills, sightings, crafting) and the bestiary.
+wait_until player.frozen == 0 180
+spawning off
+time noon
+killall
+journal reset
+spawn zombie 1 4
+wait 1
+assert journal.seen.zombie == 1
+assert bestiary.zombie == 0
+slay zombie
+wait 0.2
+assert bestiary.zombie == 1
+assert bestiary.zombie.unlock == 2
+assert bestiary.percent > 0
+give wood 20
+craft work_bench
+assert journal.crafted.work_bench == 1
+assert journal.obtained.work_bench == 1
+wait 1.1
+assert journal.obtained.copper_pickaxe == 1
+assert errors == 0
+
+# Achievements: crafting the bench unlocked Benched (swept within a second); grant shows the popup.
+wait 1.1
+assert achievement.benched == 1
+assert achievement.eye_on_you == 0
+achievement grant eye_on_you
+assert achievement.eye_on_you == 1
+
+# The Guide's Help: the work bench step is done; defeating the Eye completes its step.
+assert guide.done.work_bench == 1
+assert guide.next.work_bench == 0
+advice
+assert guide.done.eye_of_cthulhu == 0
+flag defeated_eye_of_cthulhu
+assert guide.done.eye_of_cthulhu == 1
+# Onboarding hints (X-10): the highest-priority hint shows a few seconds in, once; the toggle round-trips.
+hint reset
+wait_until hints.shown >= 1 10
+assert hint.move == 1
+hint show hardmode
+assert hint.hardmode == 1
+hint off
+assert hints.enabled == 0
+hint on
+assert hints.enabled == 1
+hint
+# The Guide book (P5-30/31): Items tab with sources, Bestiary tab after the zombie kill, the Guide tab, closing.
+wait_until ui.book_ready == 1 20
+book items
+assert ui.book_open == 1
+assert ui.book_tab == 0
+assert ui.book_items > 100
+book item torch
+assert ui.book_sources >= 2
+book item gel
+assert ui.book_sources >= 2
+book bestiary zombie
+assert ui.book_tab == 1
+assert ui.bestiary_unlock >= 2
+book entry shelter
+assert ui.book_tab == 2
+assert ui.book_guide == 1
+# P5-32 tabs: NPCs (an entry by resident id), Tips, Achievements.
+book npcs
+assert ui.book_tab == 3
+book entry merchant
+assert ui.book_tab == 3
+book entry controls_move
+assert ui.book_tab == 4
+book entry benched
+assert ui.book_tab == 5
+book progress
+assert ui.book_tab == 2
+assert errors == 0
+book close
+assert ui.book_open == 0
+wait 0.5
+assert errors == 0

@@ -49,7 +49,8 @@ internal static class StandardProbes
         ctx.AddProbe("melee.hit_deg", () => w.Melee.LastHit is { BladeDeg: var d } && !float.IsNaN(d) ? d : -999);
         ctx.AddProbe("melee.hit_dist", () => w.Melee.LastHit?.Distance ?? -1);
         ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
-        ctx.AddProbe("house.valid", () => w.Housing.Scan(ctx.Player.FeetCell + Int3.Up).Valid ? 1 : 0);
+        ctx.AddProbe("house.valid", () => w.Rooms.Get(ctx.Player.FeetCell + Int3.Up)!.Valid ? 1 : 0);
+        ctx.AddProbe("house.scans", () => w.Rooms.Scans);
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
         // Voxel light at the player's head (0–15; -1 before the chunk is lit) and the sky map's column top.
         ctx.AddProbe("light.sky", () => HeadLight(w, ctx, block: false));

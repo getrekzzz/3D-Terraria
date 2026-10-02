@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.AI;
+using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Entities;
 
 namespace Strata.Core.Gameplay.Town;
@@ -9,7 +10,7 @@ public sealed partial class TownSystem
     /// <summary>Ticks of immunity after a resident is hit.</summary>
     public const int HitImmunity = 30;
 
-    /// <summary>A resident was slain (they return after <see cref="TownConfig.RespawnTicks"/>).</summary>
+    /// <summary>A resident was slain (they return at the next dawn, see <see cref="ShouldRevive"/>).</summary>
     public event Action<TownNpc>? Died;
 
     /// <summary>A resident took damage (numbers, flashes).</summary>
@@ -39,8 +40,8 @@ public sealed partial class TownSystem
     /// <summary>Applies a hit to a resident from a point (knockback away from it).</summary>
     public void Damage(TownNpc r, int amount, Vector3 from)
     {
-        if (!r.Alive) return;
-        int dealt = Math.Max(1, amount - r.Def.Defense / 2);
+        if (!r.Alive || r.Bound || r.Def.Kind == TownNpcKind.Pet) return; // bound NPCs and town pets cannot be hurt
+        int dealt = Math.Max(1, amount - r.Defense / 2);
         r.Life -= dealt;
         r.ImmuneTicks = HitImmunity;
         var away = BrainFactory.Flat(r.Position - from);
@@ -48,8 +49,7 @@ public sealed partial class TownSystem
         Hurt?.Invoke(r, dealt);
         if (r.Life > 0) return;
         r.Life = 0;
-        r.RespawnTicks = Config.RespawnTicks;
-        r.Path = null;
+        MarkDead(r);
         if (r.TalkingTo != null) EndTalk(r);
         DropDeathLoot(r);
         Died?.Invoke(r);

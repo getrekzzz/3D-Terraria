@@ -39,6 +39,7 @@ public sealed partial class SoundEvents
         {
             if (p.Def.Id == game.Starfall.Config.Projectile) Sfx.PlayAt("star_land", ToGodot(p.Position));
         };
+        game.Town.Rescued += (_, _) => Sfx.Play("npc_arrive");
         game.Services.Reforged += (p, _) =>
         {
             if (p == _local) Sfx.Play("reforge"); // the hammer on the anvil

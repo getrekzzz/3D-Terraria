@@ -16,20 +16,26 @@ public static partial class ContentValidator
             if (t.Life < 1) ctx.Error(t, "life must be >= 1.");
             if (t.Speed <= 0) ctx.Error(t, "speed must be > 0.");
             if (t.Lines.Length == 0) ctx.Error(t, "lines must contain at least one dialogue line.");
-            if (!t.Starter && t.Landmark == null && t.Arrival.Length == 0) ctx.Warn(t, "no arrival conditions: arrives as soon as a home exists.");
+            if (!t.Starter && t.Landmark == null && t.Visit == null && t.Arrival.Length == 0) ctx.Warn(t, "no arrival conditions: arrives as soon as a home exists.");
             ctx.Asset(t, AssetPaths.TownNpcModel(t), "model");
             if (ctx.Options.AssetExists is { } exists && !exists(AssetPaths.TownNpcHead(t)))
                 ctx.Warn(t, $"head portrait '{AssetPaths.TownNpcHead(t)}' is missing (build_all.py --portraits).");
             ctx.Specs(t, SpecKind.Condition, t.Arrival, "arrival");
-            for (int i = 0; i < t.Shop.Length; i++)
+            if (t.Visit is { } visit) CheckVisit(ctx, t, visit);
+            var shop = t.AllShopEntries;
+            for (int i = 0; i < shop.Length; i++)
             {
-                var e = t.Shop[i];
+                var e = shop[i];
                 ctx.Ref(t, ctx.Db.Items, e.Item, $"shop[{i}].item");
                 if (e.Price is < 0) ctx.Error(t, $"shop[{i}].price must be >= 0.");
+                if (string.IsNullOrWhiteSpace(e.Tab)) ctx.Error(t, $"shop[{i}].tab must not be empty.");
+                ctx.Ref(t, ctx.Db.Items, e.Currency, $"shop[{i}].currency");
                 ctx.Specs(t, SpecKind.Condition, e.Conditions, $"shop[{i}].conditions");
             }
-            if (t.Service is { } service)
+            if (t.Service != null && t.Services.Length > 0) ctx.Warn(t, "both 'service' and 'services' are set; prefer 'services'.");
+            foreach (var service in t.AllServices)
             {
+                if (t.AllServices.Count(o => o.Type == service.Type) > 1) ctx.Error(t, $"service '{service.Type}' is listed twice.");
                 ctx.Spec(t, SpecKind.TownService, service, "service");
                 if (service.Type == TownServiceSpecs.SummonBoss && ctx.TryParse<SummonServiceParams>(SpecKind.TownService, service) is { } summon)
                 {
@@ -59,12 +65,16 @@ public static partial class ContentValidator
             }
             foreach (var m in t.Mood)
             {
-                if ((m.Biome == null) == (m.Neighbor == null)) ctx.Error(t, "each mood entry needs exactly one of 'biome' or 'neighbor'.");
+                if ((m.Biome != null ? 1 : 0) + (m.Neighbor != null ? 1 : 0) + (m.Layer != null ? 1 : 0) != 1)
+                    ctx.Error(t, "each mood entry needs exactly one of 'biome', 'neighbor' or 'layer'.");
+                if (m.Layer is { } layer && layer != "underground") ctx.Error(t, $"mood layer '{layer}' must be 'underground'.");
                 if (m.Score is < -2 or > 2 or 0) ctx.Error(t, "mood score must be −2, −1, 1 or 2.");
                 ctx.Ref(t, ctx.Db.Biomes, m.Biome, "mood.biome");
                 ctx.Ref(t, ctx.Db.TownNpcs, m.Neighbor, "mood.neighbor");
             }
             foreach (var c in AllConditions(t)) CheckTownCondition(ctx, t, c);
+            ValidateTownRescue(ctx, t);
+            ValidateTownAttack(ctx, t);
         }
         foreach (var r in ctx.Db.SpawnRules.All)
             foreach (var c in r.Conditions) CheckTownCondition(ctx, r, c);
@@ -75,10 +85,23 @@ public static partial class ContentValidator
                 foreach (var c in e.Conditions) CheckTownCondition(ctx, t, c);
     }
 
-    private static IEnumerable<TypedSpec> AllConditions(TownNpcDef t) =>
-        t.Arrival.Concat(t.LeavesWhen).Concat(t.Shop.SelectMany(s => s.Conditions)).Concat(t.Lines.SelectMany(l => l.Conditions));
+    private static void CheckVisit(Ctx ctx, TownNpcDef t, VisitInfo v)
+    {
+        if (v.Mode is not (VisitInfo.TownMode or VisitInfo.SiteMode)) ctx.Error(t, $"visit.mode '{v.Mode}' must be 'town' or 'site'.");
+        if (v.DawnChance is < 0 or > 1 || v.HourlyChance is < 0 or > 1) ctx.Error(t, "visit chances must be within 0..1.");
+        if (v.Mode == VisitInfo.SiteMode && v.Where.Length == 0) ctx.Error(t, "a site visitor needs visit.where.");
+        if (v.LeaveHour <= v.ArriveHour) ctx.Error(t, "visit.leaveHour must be after arriveHour.");
+        if (t.Pet || t.Rescue != null) ctx.Error(t, "a visitor cannot also be a pet or a rescue.");
+        ctx.Specs(t, SpecKind.Condition, v.Requires, "visit.requires");
+        ctx.Specs(t, SpecKind.Condition, v.Where, "visit.where");
+        foreach (var p in v.Pools)
+            if (p.Count < 1 || p.Count > p.Entries.Length) ctx.Error(t, "visit.pools[].count must be within 1..entries.");
+    }
 
-    /// <summary>References inside resident/hasItem conditions (also nested in all/any/not).</summary>
+    private static IEnumerable<TypedSpec> AllConditions(TownNpcDef t) =>
+        t.Arrival.Concat(t.LeavesWhen).Concat(t.Visit?.Requires ?? Array.Empty<TypedSpec>()).Concat(t.AllShopEntries.SelectMany(s => s.Conditions)).Concat(t.Lines.SelectMany(l => l.Conditions));
+
+    /// <summary>References inside resident/hasItem/wearing/rescued/killed/obtained conditions (also nested in all/any/not).</summary>
     private static void CheckTownCondition(Ctx ctx, ContentDef owner, TypedSpec c)
     {
         string? Str(string name) => c.Raw.TryGetProperty(name, out var v) && v.ValueKind == System.Text.Json.JsonValueKind.String ? v.GetString() : null;
@@ -92,6 +115,17 @@ public static partial class ContentValidator
                 break;
             case "wearing":
                 ctx.Ref(owner, ctx.Db.Items, Str("item"), "wearing condition");
+                break;
+            case "rescued":
+                ctx.Ref(owner, ctx.Db.TownNpcs, Str("id"), "rescued condition");
+                if (ctx.Db.TownNpcs.TryGet(Str("id") ?? "", out var rescued) && rescued.Rescue == null)
+                    ctx.Error(owner, $"rescued condition: '{Str("id")}' has no rescue block, so nothing in the world can free them.");
+                break;
+            case "killed":
+                ctx.Ref(owner, ctx.Db.Enemies, Str("enemy"), "killed condition");
+                break;
+            case "obtained":
+                ctx.Ref(owner, ctx.Db.Items, Str("item"), "obtained condition");
                 break;
             case "all" or "any" or "not" when c.Raw.TryGetProperty("of", out var of) && of.ValueKind == System.Text.Json.JsonValueKind.Array:
                 foreach (var inner in of.EnumerateArray())

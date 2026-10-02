@@ -95,6 +95,11 @@ public sealed partial class InteractionController : Node
         }
         // A right click on a panel is not one on the world: with a screen open only the interact key reaches objects.
         bool interact = (!overlay && Input.IsActionJustPressed(UseSecondary)) || Input.IsActionJustPressed(InteractAction);
+        if (interact && TalkTarget is { Def.Kind: Strata.Core.Content.Defs.TownNpcKind.Pet } pet)
+        {
+            Game.Town.PetAnimal(pet, Entity); // Terraria: a town pet is petted, not talked to
+            return;
+        }
         if (interact && TalkTarget is { } resident && Game.Town.BeginTalk(resident, Entity))
         {
             TalkRequested?.Invoke(resident);

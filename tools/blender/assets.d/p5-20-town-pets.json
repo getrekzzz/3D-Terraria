@@ -1,0 +1,13 @@
+{
+ "comment": "P5-20: the licensed town pets (bgen/town_pets.py quadruped) and their licence cards.",
+ "items": {"explicit": {
+  "license_cat": {"generator": "pet_license", "params": {"paw": "#c8783a"}},
+  "license_dog": {"generator": "pet_license", "params": {"paw": "#6a4a2a", "color": "#e8eef8"}},
+  "license_bunny": {"generator": "pet_license", "params": {"paw": "#d88a9a", "color": "#f4f0e0"}}
+ }},
+ "creatures": {
+  "town_cat": {"generator": "town_pet", "params": {"species": "cat", "fur": "#e0a050", "belly": "#f8ecd8", "eyes": "#5ab04a"}},
+  "town_dog": {"generator": "town_pet", "params": {"species": "dog", "fur": "#b07a4a", "belly": "#f0e0c8", "eyes": "#3a2a1a", "size": 1.25}},
+  "town_bunny": {"generator": "town_pet", "params": {"species": "bunny", "fur": "#e8e4dc", "belly": "#ffffff", "eyes": "#3a2030", "size": 1.1}}
+ }
+}

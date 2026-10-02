@@ -22,8 +22,8 @@ public enum TradeResult
     Refused,
 }
 
-/// <summary>An item on offer with its current price (copper).</summary>
-public sealed record ShopOffer(ItemDef Item, long Price);
+/// <summary>An item on offer with its current price (copper, or a count of <see cref="Currency"/> when set).</summary>
+public sealed record ShopOffer(ItemDef Item, long Price, ItemDef? Currency = null);
 
 /// <summary>
 /// Conversation and trade with residents: dialogue lines chosen by condition, shop stock and prices scaled by
@@ -37,12 +37,14 @@ public sealed partial class TownCommerce
     private readonly GameWorld _world;
     private readonly TownSystem _town;
     private readonly Dictionary<TypedSpec[], ICondition> _compiled = new(ReferenceEqualityComparer.Instance);
+    private readonly TownHappiness _happiness;
     private Pcg32 _rng;
 
     public TownCommerce(GameWorld world, TownSystem town)
     {
         _world = world;
         _town = town;
+        _happiness = new TownHappiness(world, town);
         _rng = new Pcg32(Hash.Combine((ulong)world.Session.Settings.Seed, 0x54524144UL));
     }
 
@@ -62,6 +64,9 @@ public sealed partial class TownCommerce
     /// <summary>A line to say to the player, placeholders filled in.</summary>
     public string Greet(TownNpc npc, PlayerEntity player)
     {
+        if (npc.Bound && npc.Def.Rescue is { } rescue)
+            return rescue.RequiresItem != null && Content.Items.TryGet(rescue.RequiresItem, out var needed)
+                ? rescue.NeedsItemText.Replace("{item}", needed.DisplayName) : "Help!";
         var ctx = ContextFor(npc, player);
         var lines = npc.Def.Lines.Where(l => Condition(l.Conditions).Evaluate(ctx)).ToList();
         if (lines.Count == 0) return "...";
@@ -74,75 +79,102 @@ public sealed partial class TownCommerce
         });
     }
 
-    /// <summary>Happiness score: liked/disliked biome at home and neighbours nearby.</summary>
-    public int Mood(TownNpc npc, out int neighbours)
-    {
-        var biomes = _world.Session.ContextAt(npc.Home is { } h ? h + Common.Int3.Up : Physics.VoxelMotion.CellOf(npc.Center)).Biomes;
-        var near = _town.Residents.Where(o => o != npc && o.Alive && System.Numerics.Vector3.Distance(o.Position, npc.Position) <= Config.NeighborRadius).ToList();
-        neighbours = near.Count;
-        int score = 0;
-        foreach (var m in npc.Def.Mood)
-        {
-            if (m.Biome != null && biomes.Contains(m.Biome)) score += m.Score;
-            if (m.Neighbor != null && near.Any(o => o.Def.Id == m.Neighbor)) score += m.Score;
-        }
-        return score;
-    }
+    /// <summary>Terraria happiness (biomes, neighbours, crowding, solitude): a report with the price factor and reasons.</summary>
+    public HappinessReport Happiness(TownNpc npc) => _happiness.Evaluate(npc);
 
-    /// <summary>Price multiplier from mood and crowding, clamped to the configured range.</summary>
-    public float PriceFactor(TownNpc npc)
-    {
-        int mood = Mood(npc, out int neighbours);
-        float factor = 1f - mood * Config.MoodStep + Math.Max(0, neighbours - Config.CrowdLimit) * Config.CrowdStep;
-        if (npc.Home == null) factor += Config.CrowdStep * 2f; // homeless residents charge more
-        return Math.Clamp(factor, Config.MinPriceFactor, Config.MaxPriceFactor);
-    }
+    /// <summary>What the resident says about how they feel.</summary>
+    public string DescribeHappiness(TownNpc npc) => _happiness.Describe(npc, _happiness.Evaluate(npc));
 
-    /// <summary>What the resident sells right now.</summary>
-    public List<ShopOffer> Stock(TownNpc npc, PlayerEntity player)
+    /// <summary>Price multiplier from happiness, clamped to the configured range.</summary>
+    public float PriceFactor(TownNpc npc) => _happiness.Evaluate(npc).Factor;
+
+    /// <summary>The resident's shop tabs ("shop", "decor"…), in data order.</summary>
+    public IReadOnlyList<string> Tabs(TownNpc npc) => npc.Def.ShopTabs;
+
+    /// <summary>What the resident sells right now under a tab. Coin prices scale with happiness; currency prices do not.</summary>
+    public List<ShopOffer> Stock(TownNpc npc, PlayerEntity player, string tab = ShopTabs.Shop)
     {
         var ctx = ContextFor(npc, player);
         float factor = PriceFactor(npc);
-        return npc.Def.Shop
-            .Where(e => Condition(e.Conditions).Evaluate(ctx))
-            .Select(e => Offer(e, factor))
-            .ToList();
+        var offers = new List<ShopOffer>();
+        foreach (var e in npc.Def.Visit == null ? npc.Def.Shop : npc.Def.Shop.Concat(VisitorStock(npc)))
+        {
+            if (e.Tab != tab || !Condition(e.Conditions).Evaluate(ctx)) continue;
+            var item = Content.Items.Get(e.Item);
+            offers.Add(e.Currency is { } cur
+                ? new ShopOffer(item, Math.Max(1, e.Price ?? 1), Content.Items.Get(cur))
+                : new ShopOffer(item, Math.Max(1, (long)MathF.Round((e.Price ?? item.Value) * factor))));
+        }
+        // Terraria: a content resident with a neighbour also sells their biome's pylon (shop tab).
+        if (tab == ShopTabs.Shop && npc.Def.Kind == TownNpcKind.Resident && _town.Pylons.ForSale(npc, ctx, factor) is { } pylon
+            && Content.Items.TryGet(pylon.Item ?? pylon.Id, out var pylonItem) && !offers.Exists(o => o.Item == pylonItem))
+            offers.Add(new ShopOffer(pylonItem, Math.Max(1, (long)MathF.Round(_town.Config.Pylons.Price * factor))));
+        return offers;
     }
 
-    /// <summary>The resident's offer of <paramref name="item"/> right now, or null when they do not sell it now.</summary>
+    private (long Npc, long Day, List<ShopEntry> Entries) _visitStock = (-1, -1, new());
+
+    /// <summary>
+    /// A visitor's rotating stock for this visit: each pool's <see cref="ShopPool.Count"/> entries drawn with
+    /// Pcg32(world seed, visit day, id), so it holds for the whole visit and changes the next. Conditions apply as usual.
+    /// </summary>
+    public List<ShopEntry> VisitorStock(TownNpc npc)
+    {
+        if (npc.Def.Visit is not { } visit) return new List<ShopEntry>();
+        if (_visitStock.Npc == npc.Id && _visitStock.Day == npc.VisitDay) return _visitStock.Entries;
+        var rng = new Determinism.Pcg32(Determinism.Hash.Combine(Determinism.Hash.Combine((ulong)_world.Session.Settings.Seed, npc.VisitDay), Determinism.Hash.String(npc.Def.Id)));
+        var entries = new List<ShopEntry>();
+        var bag = new List<ShopEntry>();
+        foreach (var pool in visit.Pools)
+        {
+            bag.Clear();
+            bag.AddRange(pool.Entries);
+            for (int i = 0; i < pool.Count && bag.Count > 0; i++)
+            {
+                int k = rng.NextInt(bag.Count);
+                entries.Add(bag[k]);
+                bag.RemoveAt(k);
+            }
+        }
+        _visitStock = (npc.Id, npc.VisitDay, entries);
+        return entries;
+    }
+
+    /// <summary>The resident's offer of <paramref name="item"/> right now on any tab, or null when they do not sell it now.</summary>
     public ShopOffer? Offer(TownNpc npc, PlayerEntity player, ItemDef item)
     {
-        ConditionContext? ctx = null;
-        foreach (var e in npc.Def.Shop)
-        {
-            if (e.Item != item.Id) continue;
-            ctx ??= ContextFor(npc, player);
-            if (Condition(e.Conditions).Evaluate(ctx)) return Offer(e, PriceFactor(npc));
-        }
+        foreach (var tab in Tabs(npc).DefaultIfEmpty(ShopTabs.Shop))
+            if (Stock(npc, player, tab).Find(o => o.Item == item) is { } offer) return offer;
         return null;
     }
 
-    private ShopOffer Offer(ShopEntry e, float factor)
-    {
-        var item = Content.Items.Get(e.Item);
-        return new ShopOffer(item, Math.Max(1, (long)MathF.Round((e.Price ?? item.Value) * factor)));
-    }
+    /// <summary>A player bought goods from a resident (item, count) — for the journal.</summary>
+    public event Action<PlayerEntity, ItemDef, int>? Traded;
 
     /// <summary>Cost of the resident's healing service for this player now (0 = nothing to heal or no such service).</summary>
     public long HealCost(TownNpc npc, PlayerEntity player)
     {
-        if (npc.Def.Service is not { Type: TownServiceSpecs.Heal } spec) return 0;
+        if (npc.Def.FindService(TownServiceSpecs.Heal) is not { } spec) return 0;
         var p = spec.Parse<HealServiceParams>();
         var v = player.State.Vitals;
         int missing = v.MaxLife - v.Life;
         int debuffs = p.ClearsDebuffs ? player.State.Buffs.Active.Count(b => b.Def.Debuff && !b.Def.Persistent) : 0;
         if (missing <= 0 && debuffs == 0) return 0;
-        return Math.Max(1, (long)MathF.Round((missing + debuffs * 10) * p.CostPerLife * PriceFactor(npc)));
+        float tier = 1f;
+        foreach (var t in p.Tiers)
+            if (_world.Session.Flags.Contains(t.Flag))
+            {
+                tier = t.Multiplier;
+                break;
+            }
+        float expert = _world.Session.Settings.EffectiveDifficulty is World.Difficulty.Expert or World.Difficulty.Master ? p.ExpertMultiplier : 1f;
+        long baseCost = missing * (long)p.CostPerLife + debuffs * (long)(p.PerDebuff ?? p.CostPerLife * 10);
+        return Math.Max(1, (long)MathF.Round(baseCost * tier * expert * PriceFactor(npc)));
     }
 
     public TradeResult Heal(TownNpc npc, PlayerEntity player)
     {
-        if (npc.Def.Service is not { Type: TownServiceSpecs.Heal } spec) return TradeResult.Unavailable;
+        if (npc.Def.FindService(TownServiceSpecs.Heal) is not { } spec) return TradeResult.Unavailable;
         long cost = HealCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
         if (!Wallet.TrySpend(player.State.Inventory, player.State.BanksForPaying(), Content, cost, out var change)) return TradeResult.TooPoor;
@@ -162,7 +194,7 @@ public sealed partial class TownCommerce
     public TradeResult Summon(TownNpc npc, PlayerEntity player, out string? message)
     {
         message = null;
-        if (npc.Def.Service is not { Type: TownServiceSpecs.SummonBoss } spec || !npc.Alive) return TradeResult.Unavailable;
+        if (npc.Def.FindService(TownServiceSpecs.SummonBoss) is not { } spec || !npc.Alive) return TradeResult.Unavailable;
         var p = spec.Parse<SummonServiceParams>();
         var boss = Content.Enemies.Get(p.Enemy);
         if (_world.Npcs.All.Any(n => n.Def == boss && n.Alive)) return TradeResult.NothingToDo;
@@ -186,12 +218,9 @@ public sealed partial class TownCommerce
         return true;
     }
 
-    /// <summary>Recipes that use an item (the guide's crafting help), as output item names with their stations.</summary>
-    public List<RecipeDef> RecipesUsing(ItemDef item)
-    {
-        var groups = Content.RecipeGroups.All.Where(g => g.Items.Contains(item.Id)).Select(g => g.Id).ToHashSet();
-        return Content.Recipes.All.Where(r => r.Inputs.Any(i => i.Item == item.Id || (i.Group != null && groups.Contains(i.Group)))).ToList();
-    }
+    /// <summary>Recipes that use an item (the guide's crafting help). Kept for the current TownDialog until the W4 dialog
+    /// shows <see cref="Crafting.RecipeLookup"/> views; now answered from the recipe book's ingredient index.</summary>
+    public List<RecipeDef> RecipesUsing(ItemDef item) => _world.Recipes.RecipesUsing(item).Select(r => r.Def).ToList();
 
     private ICondition Condition(TypedSpec[] specs)
     {

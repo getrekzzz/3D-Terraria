@@ -16,6 +16,9 @@ public sealed partial class TownRenderer : Node3D
         public required Label3D Tag;
         public required TownNpc Npc;
         public MeshInstance3D? Hat;
+        public MeshInstance3D? Cocoon;
+        public bool? ShownBound;
+        public bool Ghost;
         public Vector3 Shown;
     }
 
@@ -28,6 +31,7 @@ public sealed partial class TownRenderer : Node3D
         _game = game;
         _props = props;
         Name = "Residents";
+        game.Town.ResidentAttacked += OnResidentAttacked;
         game.Town.Removed += npc =>
         {
             if (!_views.Remove(npc.Id, out var view)) return;
@@ -58,13 +62,29 @@ public sealed partial class TownRenderer : Node3D
             var visual = view.Visual;
             visual.Position = view.Shown;
             visual.Rotation = new Vector3(0, Mathf.LerpAngle(visual.Rotation.Y, npc.Yaw + Mathf.Pi, 1f - Mathf.Exp(-dt * 10f)), 0);
-            string clip = npc.Pose == "walk" ? "walk" : npc.Pose == "jump" && visual.HasAnimation("jump") ? "jump" : "idle";
+            string clip = Clip(npc, visual);
             float speed = clip == "walk" ? Mathf.Max(0.6f, new Vector2(npc.Velocity.X, npc.Velocity.Z).Length() / 1.6f) : 1f;
             visual.Play(clip, speed: speed);
-            visual.SetTint(npc.ImmuneTicks > TownSystem.HitImmunity - 8 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
+            UpdateRescueLook(view, npc);
+            visual.SetTint(TintOf(view, npc));
             visual.SetLight(LightProbe.SampleSmooth(world, view.Shown + Vector3.Up));
             view.Tag.Position = view.Shown + new Vector3(0, 2.15f, 0);
         }
+    }
+
+    /// <summary>The locomotion state for a resident: a rest pose (sit, sleep, bound, lie) when resting, else walk/jump/idle.</summary>
+    private static string Clip(TownNpc npc, CreatureVisual visual)
+    {
+        string? rest = npc.Posture switch
+        {
+            ResidentPosture.Sit => "sit",
+            ResidentPosture.Sleep => "sleep",
+            ResidentPosture.Bound => "bound",
+            ResidentPosture.Lie => "lie",
+            _ => null,
+        };
+        if (rest != null && visual.HasAnimation(rest)) return rest;
+        return npc.Pose == "walk" ? "walk" : npc.Pose == "jump" && visual.HasAnimation("jump") ? "jump" : "idle";
     }
 
     private View? Create(TownNpc npc)

@@ -85,6 +85,7 @@ worm_tooth|Worm Tooth|early|devourer
 ectoplasm|Ectoplasm|post-plantera|dungeon spirit
 turtle_shell|Turtle Shell|hardmode|giant tortoise
 butterfly_dust|Butterfly Dust|hardmode|moth
+purification_powder|Purification Powder|early|dryad
 """,
     "tool": """
 wire_cutter|Wire Cutter|prehardmode|mechanic
