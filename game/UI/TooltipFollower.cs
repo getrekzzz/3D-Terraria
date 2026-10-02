@@ -202,12 +202,12 @@ public sealed partial class TooltipFollower : CanvasLayer
         if (_panel.Visible) _panel.ResetSize(); // shrink to the new lines
     }
 
-    /// <summary>Beside the pointer (below the held stack), kept inside the screen.</summary>
+    /// <summary>Beside the pointer (the controller cursor's while it drives a screen; below the held stack), kept inside the screen.</summary>
     private void Follow()
     {
         var size = _panel.Size;
         var view = _root.Size;
-        var pos = _root.GetLocalMousePosition() + (_cursor is { ShownCount: > 0 } ? HoldingOffset : PointerOffset);
+        var pos = (PadCursor.Pointer ?? _root.GetLocalMousePosition()) + (_cursor is { ShownCount: > 0 } ? HoldingOffset : PointerOffset);
         pos.X = Mathf.Max(Margin, Mathf.Min(pos.X, view.X - size.X - Margin));
         pos.Y = Mathf.Max(Margin, Mathf.Min(pos.Y, view.Y - size.Y - Margin));
         _panel.Position = pos;

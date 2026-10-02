@@ -54,6 +54,9 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>The crosshair's hover name is a boss's (drawn in boss purple).</summary>
     public bool TargetIsBoss => _crosshair.TargetIsBoss;
 
+    /// <summary>The crosshair's interact hint shows the controller's button.</summary>
+    public bool PromptOnPad => _crosshair.PromptOnPad;
+
     /// <summary>The line above the hotbar: the held item's name, or "Inventory" (the <c>hud.item_name</c> probe).</summary>
     public string ItemName => _itemName.Text;
 

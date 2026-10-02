@@ -25,6 +25,12 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     public bool IsOpen => _root.Visible;
 
+    /// <summary>The input gate the screen holds while open.</summary>
+    public const string GateName = Gate;
+
+    /// <summary>Everything the screen shows (the controller cursor walks it for slots and buttons).</summary>
+    public Control PadRoot => _root;
+
     /// <summary>The screen is open with auto-pause on, so the world waits until it closes.</summary>
     public bool PausesWorld { get; private set; }
 

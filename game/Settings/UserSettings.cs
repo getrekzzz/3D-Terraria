@@ -8,7 +8,7 @@ namespace Strata.Game.Settings;
 /// interface and display options. Changes apply live through <see cref="Changed"/> and are saved with
 /// <see cref="Save"/>. Key bindings are stored by <see cref="KeyBindings"/>.
 /// </summary>
-public sealed class UserSettings
+public sealed partial class UserSettings
 {
     private const string FilePath = "user://settings.cfg";
 

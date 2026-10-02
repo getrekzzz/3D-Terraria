@@ -5,7 +5,8 @@ using Strata.Game.World;
 namespace Strata.Game.Player;
 
 /// <summary>
-/// Over-the-shoulder third-person camera and a first-person mode. Mouse look drives yaw/pitch; the third-person body
+/// Over-the-shoulder third-person camera and a first-person mode. Mouse look (or the controller's right stick with aim
+/// assist, CameraRig.Pad.cs) drives yaw/pitch; the third-person body
 /// faces the camera's <see cref="Yaw"/> (its chest is always on the crosshair, see PlayerAvatar.Motion), and the
 /// crosshair ray runs from <see cref="ViewOrigin"/> along <see cref="Forward"/>. The camera is kept out of terrain every
 /// rendered frame with a sphere cast from the head to the shoulder and on to the camera, so turning quickly can never
@@ -123,6 +124,7 @@ public sealed partial class CameraRig : Node3D
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.camera");
+        PadLook((float)delta); // the controller's look stick and aim assist (CameraRig.Pad.cs)
         Rotation = new Vector3(_pitch, _yaw, 0);
         var shake = CameraShake.Sample(delta);
         Camera.HOffset = shake.X;

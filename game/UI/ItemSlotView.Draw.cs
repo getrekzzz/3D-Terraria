@@ -23,7 +23,7 @@ public sealed partial class ItemSlotView
     public override void _Draw()
     {
         var rect = new Rect2(Vector2.Zero, Size);
-        DrawStyleBox(UiTheme.SlotStyle(StyleKind, _hovered && !_locked), rect);
+        DrawStyleBox(UiTheme.SlotStyle(StyleKind, (_hovered || _padFocused) && !_locked), rect);
         if (_favoriteShown && !_selected && !_locked) DrawRect(rect.Grow(-3), FavoriteTint);
         var icon = new Vector2(Size.X * IconFraction, Size.Y * IconFraction);
         var iconRect = new Rect2((Size - icon) * 0.5f, icon);

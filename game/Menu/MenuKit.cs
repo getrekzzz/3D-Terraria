@@ -66,7 +66,8 @@ public static class MenuKit
 
     /// <summary>
     /// A 32 px pixel-sprite button (the select screens' play, favourite and delete icons): <paramref name="sprite"/> from
-    /// assets/ui, brighter and growing under the mouse, with <paramref name="tooltip"/> as its hover text.
+    /// assets/ui, brighter and growing under the mouse (brighter with the controller's focus too), with
+    /// <paramref name="tooltip"/> as its hover text.
     /// </summary>
     public static TextureButton Icon(string sprite, string tooltip, Action pressed)
     {
@@ -74,7 +75,7 @@ public static class MenuKit
         {
             TextureNormal = UiSprites.Get(sprite), TooltipText = tooltip, CustomMinimumSize = new Vector2(32, 32),
             StretchMode = TextureButton.StretchModeEnum.KeepCentered, TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-            MouseDefaultCursorShape = Control.CursorShape.PointingHand, FocusMode = Control.FocusModeEnum.None,
+            MouseDefaultCursorShape = Control.CursorShape.PointingHand, FocusMode = Control.FocusModeEnum.All,
             SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
         };
         b.MouseEntered += () =>
@@ -82,7 +83,10 @@ public static class MenuKit
             b.Modulate = new Color(1.25f, 1.25f, 1.25f);
             Audio.Sfx.Play("ui_hover");
         };
-        b.MouseExited += () => b.Modulate = Colors.White;
+        b.MouseExited += () => b.Modulate = b.HasFocus() ? b.Modulate : Colors.White;
+        // A controller reaches it by focus (the D-pad): it brightens as under the mouse.
+        b.FocusEntered += () => b.Modulate = new Color(1.25f, 1.25f, 1.25f);
+        b.FocusExited += () => b.Modulate = Colors.White;
         b.Pressed += () => { Audio.Sfx.Play("ui_click"); pressed(); };
         HoverGrow(b);
         return b;

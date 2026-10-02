@@ -33,6 +33,7 @@ public sealed class ValidateCommand : IToolCommand
         errors += ConfigErrors(UseStyleConfig.Path, () => UseStyleConfig.Load(source).Validate());
         errors += ConfigErrors(CreatureMaterialsConfig.Path, () => CreatureMaterialsConfig.Load(source).Validate(db));
         errors += ConfigErrors(AmbienceConfig.Path, () => AmbienceConfig.Load(source).Validate(db));
+        errors += ConfigErrors(InputConfig.Path, () => InputConfig.Load(source).Validate());
         int warnings = db.Report.Warnings.Count();
         Console.WriteLine($"{errors} error(s), {warnings} warning(s)");
         return errors == 0 ? 0 : 1;

@@ -85,6 +85,10 @@ public partial class GameRoot : Node
         var render = new RenderTables(content, layers.IndexOf, grass);
         InputSetup.Register(data);
         Settings.KeyBindings.Load();
+        // Controller support for every screen; a child of the window after this root, so it sees each event first.
+        var pad = new PadInput();
+        pad.Initialize(() => World != null);
+        GetTree().Root.CallDeferred(Node.MethodName.AddChild, pad);
         var graphics = Rendering.GraphicsSettings.Load(data, args, log);
         graphics.Apply(GetViewport());
         Services = new GameServices(log, data, content, layers, render, args, graphics);

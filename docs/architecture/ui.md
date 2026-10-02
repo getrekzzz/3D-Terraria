@@ -82,6 +82,23 @@ hotkeys and item use stop. An **Overlay** (the inventory, the NPC chat box, the 
 only while a button is held on empty screen, which `WorldClickCatcher` (CanvasLayer 9, under every panel) reports as
 `WorldPointer`. `TextEntry` (a focused text field) blocks movement and hotkeys too.
 
+## Controller (X-04)
+Bindings live in `data/config/input.json` (`InputConfig`, checked by `Strata.Tools validate` and Core tests): every
+action has keyboard/mouse bindings (`key:W`, `mouse:1`) and controller ones (`pad:a`, `axis:left_y-`, `axis:rt+`), the
+menu actions `ui_*` included; a controller button may serve one gameplay action and one `ui_*` action, never two of
+either. `KeyBindings` rebinds and saves the two devices separately (Settings → Controls has a column each, plus look
+sensitivity, inverted look, stick dead zone and aim assist). `InputDevice` follows whichever device was used last
+(every event passes `PadInput`, a child of the window); prompts (the crosshair's interact hint, drawn by `PadGlyph`)
+follow it. On menus `PadInput` focuses the topmost menu's first control on the first D-pad/stick/A press, frames the
+focus in gold and turns B into Esc; the engine's focus navigation does the rest. On the gameplay screens `PadCursor`
+drives a cursor over every visible slot and button of the inventory (chest, shop, reforge, crafting, equipment) and the
+chat box, stepping with `FocusNavigation` (Core: nearest in the direction, same row first); A/X/RB/LB click as the mouse
+would (`ItemSlotView.Press` with Shift or Alt), B closes, the held stack and tooltip follow `PadCursor.Pointer`, and
+`InputGate.PadNavigating` keeps the world from reacting (the player stands still, as on Terraria's gamepad inventory).
+`CameraRig.Pad.cs` turns the right stick into look rates (`PadLook`: radial dead zone, curve) and applies `AimAssist`
+(Core: friction near a creature in a small cone, magnetism toward it while steering; never on the mouse). The `pad`
+smoke command sends real controller events (`Input.ParseInputEvent`), and `pad.*` probes report the cursor and assist.
+
 ## Slots and click routing
 A slot is a `SlotRef(SlotArea, index)` over the player's storage (backpack, coins, ammo, trash, armour, accessories,
 vanity, dyes, misc, misc dyes, the service slot), an open container or a shop. `ItemSlotView` draws one (tint by

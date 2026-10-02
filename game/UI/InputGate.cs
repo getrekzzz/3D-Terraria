@@ -39,17 +39,23 @@ public static class InputGate
     /// <summary>True when a text field has focus (even hotkeys must be ignored).</summary>
     public static bool TextEntry { get; set; }
 
+    /// <summary>
+    /// A controller drives an open overlay's cursor (<see cref="PadCursor"/>): its buttons and sticks work the screen,
+    /// so the player stands still and nothing in the world reacts to them, as on Terraria's gamepad inventory.
+    /// </summary>
+    public static bool PadNavigating { get; set; }
+
     /// <summary>Walking, jumping, the hook, sprint and dashes are ignored.</summary>
-    public static bool MovementBlocked => GameplayBlocked || TextEntry;
+    public static bool MovementBlocked => GameplayBlocked || TextEntry || PadNavigating;
 
     /// <summary>The hotbar keys and wheel, the build shape keys, dropping the held item and the camera keys are ignored.</summary>
-    public static bool HotkeysBlocked => GameplayBlocked || TextEntry;
+    public static bool HotkeysBlocked => GameplayBlocked || TextEntry || PadNavigating;
 
     /// <summary>The held item is not used: a modal is open, or an overlay is open and the button is not held on empty screen.</summary>
-    public static bool ItemUseBlocked => GameplayBlocked || TextEntry || (OverlayOpen && !_worldPointer && !_worldPress);
+    public static bool ItemUseBlocked => GameplayBlocked || TextEntry || PadNavigating || (OverlayOpen && !_worldPointer && !_worldPress);
 
     /// <summary>Mouse motion does not turn the camera: the pointer is free and no right-button drag is turning it.</summary>
-    public static bool LookBlocked => GameplayBlocked || (OverlayOpen && !_cameraDrag);
+    public static bool LookBlocked => GameplayBlocked || PadNavigating || (OverlayOpen && !_cameraDrag);
 
     /// <summary>The use button is held on empty screen while an overlay is open: the item is used toward the crosshair.</summary>
     public static bool WorldPointer
@@ -88,11 +94,14 @@ public static class InputGate
         Overlays.Remove(layer);
         if (open) (kind == GateKind.Overlay ? Overlays : Modals).Add(layer);
         // A press or drag on empty screen ends with the last overlay, or when a modal opens over it.
-        if (!OverlayOpen || GameplayBlocked) _worldPointer = _worldPress = _cameraDrag = false;
+        if (!OverlayOpen || GameplayBlocked) _worldPointer = _worldPress = _cameraDrag = PadNavigating = false;
         Input.MouseMode = MouseFree ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
     }
 
     public static bool IsOpen(string layer) => Modals.Contains(layer) || Overlays.Contains(layer);
+
+    /// <summary>A modal other than <paramref name="layer"/> is open (the pause menu over an auto-pausing inventory).</summary>
+    public static bool ModalOtherThan(string layer) => Modals.Count > (Modals.Contains(layer) ? 1 : 0);
 
     /// <summary>
     /// The pointer is over a panel of an open screen (slots, a scroll list, buttons): the mouse wheel belongs to the
@@ -112,6 +121,7 @@ public static class InputGate
         Modals.Clear();
         Overlays.Clear();
         TextEntry = false;
+        PadNavigating = false;
         _worldPointer = _worldPress = _cameraDrag = false;
         Input.MouseMode = Input.MouseModeEnum.Visible;
     }
