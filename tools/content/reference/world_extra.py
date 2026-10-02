@@ -17,6 +17,8 @@ prime_saw|Prime Saw|hardmode|skeletron prime|boss part
 prime_vice|Prime Vice|hardmode|skeletron prime|boss part
 prime_cannon|Prime Cannon|hardmode|skeletron prime|boss part,projectiles
 prime_laser|Prime Laser|hardmode|skeletron prime|boss part,projectiles
+bouncy_slime|Bouncy Slime|hardmode|queen slime|slime
+heavenly_slime|Heavenly Slime|hardmode|queen slime|flyer
 """
 
 # id|Name|stage|kind

@@ -67,6 +67,11 @@ assert errors == 0
 boss queen_slime 12
 wait 2
 assert npcs.queen_slime == 1
+# Below half life she takes wing (P4-26).
+damage queen_slime 9500
+wait 3
+assert boss.queen_slime.stage == 1
+assert errors == 0
 slay queen_slime
 assert flag.defeated_queen_slime == 1
 killall

@@ -163,7 +163,7 @@ public sealed partial class PatternBrain : IBrain
         var offset = OffsetOf(s);
         for (int i = 0; i < s.Count && alive + i < max; i++)
         {
-            if (!ctx.Content.Enemies.TryGet(pool.Length == 1 ? pool[0] : pool[ctx.Rng.Range(0, pool.Length)], out var def)) continue;
+            if (!ctx.Content.Enemies.TryGet(pool.Length == 1 ? pool[0] : pool[ctx.Rng.NextInt(pool.Length)], out var def)) continue;
             if (s.Tether)
             {
                 var o = Ring(alive + i, max, s.Radius) + offset;

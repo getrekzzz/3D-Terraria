@@ -2000,6 +2000,26 @@
     "boss part",
     "projectiles"
    ]
+  },
+  {
+   "id": "terraria:bouncy_slime",
+   "name": "Bouncy Slime",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "queen slime",
+   "mechanics": [
+    "slime"
+   ]
+  },
+  {
+   "id": "terraria:heavenly_slime",
+   "name": "Heavenly Slime",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "queen slime",
+   "mechanics": [
+    "flyer"
+   ]
   }
  ]
 }
