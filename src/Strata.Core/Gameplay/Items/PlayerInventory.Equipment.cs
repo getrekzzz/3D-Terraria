@@ -119,8 +119,10 @@ public sealed partial class PlayerInventory
     {
         if (from == row) return false;
         var item = from[slot].Item;
+        // The whole row, locked slots included (as AccessoryFilter does): a copy left in a locked slot would otherwise
+        // stack its effects once a harder world unlocks that slot again.
         if (noDuplicates)
-            for (int i = 0; i < usable; i++)
+            for (int i = 0; i < row.Size; i++)
                 if (row[i].Item == item) return false;
         for (int i = 0; i < usable; i++)
             if (row[i].IsEmpty)

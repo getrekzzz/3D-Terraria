@@ -188,6 +188,12 @@ public class PlayerInventoryTests
         Assert.Equal(accessories[6], inv.Accessories[1].Item);
         Assert.Equal(accessories[1], inv.Backpack[1].Item);
         Assert.True(inv.Accessories[5].IsEmpty); // locked slots are never filled
+
+        // A copy left in a locked slot still blocks a second one, or both would count once the slot unlocks.
+        inv.Accessories[6] = new ItemStack(accessories[7], 1);
+        inv.Backpack[2] = new ItemStack(accessories[7], 1);
+        Assert.False(inv.Equip(2));
+        Assert.False(PlayerInventory.AccessoryFilter(inv.Accessories, 0)(accessories[7]));
     }
 
     private static ItemDef[] Accessories(int n) => TestPaths.Content.Items.All
