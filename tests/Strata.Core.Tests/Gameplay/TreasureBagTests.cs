@@ -24,7 +24,7 @@ public class TreasureBagTests
     private static readonly Dictionary<string, string> ExpertItem = new()
     {
         ["king_slime"] = "royal_gel", ["eye_of_cthulhu"] = "shield_of_cthulhu", ["eater_of_worlds"] = "worm_scarf",
-        ["brain_of_cthulhu"] = "brain_of_confusion", ["queen_bee"] = "hive_pack",
+        ["brain_of_cthulhu"] = "brain_of_confusion", ["queen_bee"] = "hive_pack", ["skeletron"] = "bone_glove",
     };
 
     private static TestGame Arena(Difficulty difficulty)
@@ -87,7 +87,8 @@ public class TreasureBagTests
             Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, true));
             var inv = g.Player.State.Inventory.Backpack;
             Assert.Equal(1, inv.Count(g.Content.Items.Get(expert)));
-            Assert.True(inv.Count(g.Content.Items.Get(Signature[boss])) > 0, $"{boss}'s bag held no {Signature[boss]}");
+            if (g.Content.LootTables.Get(boss + "_drops").Entries.Any(e => e.Item == Signature[boss] && e.Chance >= 1f))
+                Assert.True(inv.Count(g.Content.Items.Get(Signature[boss])) > 0, $"{boss}'s bag held no {Signature[boss]}");
             Assert.Equal(1, inv[3].Count); // one bag used
             inv[3] = default;
             g.Ticks(30);

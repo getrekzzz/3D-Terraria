@@ -124,6 +124,12 @@
   in sight (`skull_shot` cue). Day is a data `enrage` (9999 defense, 1000 damage, ×2.5 speed: it never stops
   spinning), shared by Skeletron Prime, which still uses legacy segment hands. Arms are drawn to living parts
   (`NpcRenderer.Arms`).
+* **Skeletron loot** — Terraria 1.4 odds (`skeletron_drops`: mask 1/7, Skeletron Hand hook 1/8, Book of Skulls 1/8;
+  5–15 Lesser Healing Potions and about 5 gold always); the Expert bag adds the Bone Glove, whose `attackProjectile`
+  effect (`ItemUseSystem.Gloves`) throws a `bone_glove_bone` from the hand along the aim after a weapon swing or shot,
+  then waits `cooldown` ticks (`PlayerEntity.GloveCooldown`). The Clothier Voodoo Doll is a `summonBoss` item with
+  `curse: clothier`: at night, while the Clothier lives and Skeletron does not, it curses the Clothier into Skeletron
+  through the keeper's path (`TownCommerce.Curse`: the boss appears above them and they vanish until respawn).
 * **Progression** — `ProgressionSystem` is the only way flags are raised (boss defeats, event completions, the `flag`
   command); raising one raises every `autoSet` flag whose requirements are met (`hardmode` after the Wall of Flesh) and
   fires `Raised` (announcements; the hook for world mutations).

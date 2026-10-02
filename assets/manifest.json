@@ -764,6 +764,10 @@
    "model": "assets/models/items/bone.glb",
    "icon": "assets/icons/items/bone.png"
   },
+  "bone_glove": {
+   "model": "assets/models/items/bone_glove.glb",
+   "icon": "assets/icons/items/bone_glove.png"
+  },
   "book_of_skulls": {
    "model": "assets/models/items/book_of_skulls.glb",
    "icon": "assets/icons/items/book_of_skulls.png"
@@ -899,6 +903,10 @@
   "clockwork_assault_rifle": {
    "model": "assets/models/items/clockwork_assault_rifle.glb",
    "icon": "assets/icons/items/clockwork_assault_rifle.png"
+  },
+  "clothier_voodoo_doll": {
+   "model": "assets/models/items/clothier_voodoo_doll.glb",
+   "icon": "assets/icons/items/clothier_voodoo_doll.png"
   },
   "cloud_in_a_balloon": {
    "model": "assets/models/items/cloud_in_a_balloon.glb",
@@ -2623,6 +2631,14 @@
   "silver_shortsword": {
    "model": "assets/models/items/silver_shortsword.glb",
    "icon": "assets/icons/items/silver_shortsword.png"
+  },
+  "skeletron_hand": {
+   "model": "assets/models/items/skeletron_hand.glb",
+   "icon": "assets/icons/items/skeletron_hand.png"
+  },
+  "skeletron_mask": {
+   "model": "assets/models/items/skeletron_mask.glb",
+   "icon": "assets/icons/items/skeletron_mask.png"
   },
   "skeletron_treasure_bag": {
    "model": "assets/models/items/skeletron_treasure_bag.glb",

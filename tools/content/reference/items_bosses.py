@@ -5,6 +5,16 @@ NOTABLE = {
     "consumable": """
 treasure_bag|Treasure Bag|early|boss (expert)
 """,
+    "armor": """
+skeletron_mask|Skeletron Mask|early|skeletron
+""",
+    "accessory": """
+bone_glove|Bone Glove|early|skeletron (expert)
+""",
+    "tool": """
+skeletron_hand|Skeletron Hand|early|skeletron
+clothier_voodoo_doll|Clothier Voodoo Doll|early|clothier
+""",
     "furniture": """
 king_slime_trophy|King Slime Trophy|early|king slime
 eye_of_cthulhu_trophy|Eye of Cthulhu Trophy|early|eye of cthulhu

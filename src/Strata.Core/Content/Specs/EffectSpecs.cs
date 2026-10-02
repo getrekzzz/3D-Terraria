@@ -36,6 +36,9 @@ public static class EffectSpecs
     /// <summary>An information readout on the HUD (Depth Meter: depth, Compass: position, GPS: both and time).</summary>
     public const string Info = "info";
 
+    /// <summary>Throws a projectile along the aim with weapon attacks, on its own cooldown (Bone Glove).</summary>
+    public const string AttackProjectile = "attackProjectile";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -54,6 +57,7 @@ public static class EffectSpecs
         c.Register<PacifyParams>(SpecKind.Effect, Pacify);
         c.Register<InflictParams>(SpecKind.Effect, Inflict);
         c.Register<InfoParams>(SpecKind.Effect, Info);
+        c.Register<AttackProjectileParams>(SpecKind.Effect, AttackProjectile);
     }
 }
 
@@ -155,4 +159,19 @@ public sealed class InfoParams : SpecParams, IValidatableSpec
     public string[] Show { get; init; } = Array.Empty<string>();
 
     public string? Validate() => Show.All(k => Array.IndexOf(Kinds, k) >= 0) ? null : $"show must be of {string.Join(", ", Kinds)}";
+}
+
+public sealed class AttackProjectileParams : SpecParams, IValidatableSpec
+{
+    public string Projectile { get; init; } = "";
+    public int Damage { get; init; } = 10;
+    public float Knockback { get; init; } = 3f;
+
+    /// <summary>Ticks before the next throw (shared by every attack projectile the wearer has).</summary>
+    public int Cooldown { get; init; } = 60;
+
+    /// <summary>Launch speed (m/s).</summary>
+    public float Speed { get; init; } = 14f;
+
+    public string? Validate() => Projectile.Length == 0 ? "projectile is required" : Cooldown <= 0 ? "cooldown must be > 0" : null;
 }

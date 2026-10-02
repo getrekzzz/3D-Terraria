@@ -36,5 +36,12 @@ assert flag.defeated_skeletron == 1
 assert npcs.skeletron == 0
 wait 1.5
 assert town.old_man == 0
+
+# The Expert Bone Glove throws a crossbone with a sword swing.
+equip bone_glove
+give copper_broadsword 1
+wield copper_broadsword
+use
+assert projectiles.count >= 1
 time noon
 assert errors == 0

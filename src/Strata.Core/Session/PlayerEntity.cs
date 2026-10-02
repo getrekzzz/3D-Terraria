@@ -40,6 +40,9 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
     /// </summary>
     public int UseCooldown { get; set; }
 
+    /// <summary>Ticks before equipment may throw its next attack projectile (Bone Glove).</summary>
+    public int GloveCooldown { get; set; }
+
     /// <summary>Ticks left in the current use animation (swing/shoot pose); a new animation starts only once it is 0.</summary>
     public int UseAnimation { get; set; }
 

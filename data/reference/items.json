@@ -3911,6 +3911,34 @@
    "source": "boss (expert)"
   },
   {
+   "id": "terraria:skeletron_mask",
+   "name": "Skeletron Mask",
+   "kind": "armor",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:bone_glove",
+   "name": "Bone Glove",
+   "kind": "accessory",
+   "stage": "early",
+   "source": "skeletron (expert)"
+  },
+  {
+   "id": "terraria:skeletron_hand",
+   "name": "Skeletron Hand",
+   "kind": "tool",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:clothier_voodoo_doll",
+   "name": "Clothier Voodoo Doll",
+   "kind": "tool",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
    "id": "terraria:king_slime_trophy",
    "name": "King Slime Trophy",
    "kind": "furniture",

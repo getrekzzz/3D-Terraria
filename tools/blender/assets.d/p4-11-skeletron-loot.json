@@ -1,0 +1,11 @@
+{
+ "comment": "P4-11: Skeletron's drops (mask and hook built from its own skull and hand generators) and the Clothier Voodoo Doll.",
+ "items": {
+  "explicit": {
+   "skeletron_mask": {"generator": "boss_part", "params": {"creature": "skeletron_skull", "creatureParams": {"radius": 0.17}}},
+   "skeletron_hand": {"generator": "boss_part", "params": {"creature": "skeletron_hand_bones", "creatureParams": {"size": 0.3}}},
+   "bone_glove": {"generator": "bone_glove", "params": {}},
+   "clothier_voodoo_doll": {"generator": "doll", "params": {"shirt": "#b02a2a", "pants": "#3a2a5a", "skin": "#e8c098", "hair": "#e8e8e8"}}
+  }
+ }
+}

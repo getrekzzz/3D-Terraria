@@ -85,3 +85,44 @@ def treasure_bag(mb: MeshBuilder, p, rng):
     mb.cylinder((0, 0, 0.1), (0, 0, 0.125), 0.147, 0.142, "prop:cloth", trim, segments=18)  # band
     mb.box((-0.035, 0.12, 0.085), (0.035, 0.15, 0.14), "prop:gold", "#ffffff")  # clasp
     mb.sphere((0, 0.152, 0.112), 0.02, "prop:crystal:glow", emblem, subdivisions=1, scale=(1, 0.5, 1))
+
+
+@generator
+def boss_part(mb: MeshBuilder, p, rng):
+    """A boss's creature model as a held or worn item (Skeletron Mask, Skeletron Hand): params creature,
+    creatureParams, and fit (the largest extent in metres, default: keep the generator's size). Rigid, no rig."""
+    before = set(mb.bm.verts)
+    _creature_generator(p["creature"])(mb, p.get("creatureParams", {}), rng)
+    mb.bone, mb.bones[:] = None, []
+    verts = [v for v in mb.bm.verts if v not in before]
+    for v in verts:
+        v[mb.deform].clear()
+    if verts and p.get("fit"):
+        lo = Vector((min(v.co.x for v in verts), min(v.co.y for v in verts), min(v.co.z for v in verts)))
+        hi = Vector((max(v.co.x for v in verts), max(v.co.y for v in verts), max(v.co.z for v in verts)))
+        s = p["fit"] / max(*(hi - lo), 1e-4)
+        mid = Vector(((lo.x + hi.x) / 2, (lo.y + hi.y) / 2, lo.z))
+        for v in verts:
+            v.co = (v.co - mid) * s
+
+
+@generator
+def bone_glove(mb: MeshBuilder, p, rng):
+    """A gauntlet of bones: a cuff of bound bone around the wrist, a palm plate, knuckles and four jointed fingers."""
+    bone, wrap, glow = p.get("bone", "#e8e0c8"), p.get("wrap", "#5a4030"), p.get("glow", "#ff5030")
+    mb.cylinder((0, 0, 0.0), (0, 0, 0.1), 0.06, 0.065, "prop:leather", wrap, segments=10)
+    for z in (0.025, 0.075):
+        mb.cylinder((0, 0, z - 0.008), (0, 0, z + 0.008), 0.068, 0.068, "prop:plain", bone, segments=10)
+    mb.box((-0.06, -0.025, 0.1), (0.06, 0.025, 0.2), "prop:plain", bone)
+    mb.sphere((0, 0.03, 0.15), 0.014, "prop:plain:glow", glow, subdivisions=1)
+    for k in range(4):
+        x = -0.045 + k * 0.03
+        length = (0.05, 0.06, 0.058, 0.045)[k]
+        base = (x, 0, 0.205)
+        mb.sphere(base, 0.012, "prop:plain", bone, subdivisions=1)
+        mid = (x, 0.012, 0.205 + length)
+        mb.cylinder(base, mid, 0.01, 0.009, "prop:plain", bone, segments=6)
+        mb.sphere(mid, 0.01, "prop:plain", bone, subdivisions=1)
+        mb.cylinder(mid, (x, 0.03, 0.205 + length * 1.7), 0.009, 0.005, "prop:plain", bone, segments=6)
+    mb.cylinder((0.06, 0, 0.12), (0.085, 0.02, 0.17), 0.011, 0.009, "prop:plain", bone, segments=6)  # thumb
+    mb.cylinder((0.085, 0.02, 0.17), (0.09, 0.035, 0.21), 0.009, 0.005, "prop:plain", bone, segments=6)
