@@ -7,7 +7,8 @@ namespace Strata.Game.Bootstrap;
 public static partial class WorldLauncher
 {
     /// <summary>Hit and block effects, dropped items, dynamic lights and lava glow; returns the combat effects (numbers follow the player).</summary>
-    private static Entities.CombatEffects AddWorldEffects(WorldRuntime runtime, GameServices services, GameWorld game, TileObjectRenderer objectRenderer, Entities.NpcRenderer creatures)
+    private static Entities.CombatEffects AddWorldEffects(WorldRuntime runtime, GameServices services, GameWorld game, TileObjectRenderer objectRenderer, Entities.NpcRenderer creatures,
+        Entities.ProjectileRenderer projectiles)
     {
         var effects = new Entities.CombatEffects();
         runtime.AddChild(effects);
@@ -23,6 +24,7 @@ public static partial class WorldLauncher
         lights.Initialize(services.Graphics);
         lights.AddProvider((eye, radius) => lights.PlacedLights(game, objectRenderer.Placement, eye, radius));
         lights.AddProvider(creatures.Glows);
+        lights.AddProvider(projectiles.PetLights(services.Graphics)); // light pets, at most the preset's petLights
         var lava = new Rendering.LavaEffects();
         runtime.AddChild(lava);
         lava.Initialize(runtime);

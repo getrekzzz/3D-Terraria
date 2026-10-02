@@ -43,7 +43,8 @@
     {"id": "marble", "coins": [150, 400], "entries": []},
     {"id": "spider", "coins": [150, 400], "entries": [{"item": "cobweb", "min": 2, "max": 6, "chance": 0.5}]},
     {"id": "fish_big", "coins": [300, 900], "entries": []},
-    {"id": "dungeon_spirit", "coins": [800, 2000], "entries": [{"item": "ectoplasm", "chance": 0.8}]}
+    {"id": "dungeon_spirit", "coins": [800, 2000], "entries": [{"item": "ectoplasm", "chance": 0.8},
+      {"item": "wisp_in_a_bottle", "chance": 0.02}]}
   ],
   "enemies": [
     {"id": "yellow_slime", "model": "gel", "tags": ["gel"], "name": "Yellow Slime", "description": "A sunny slime of the underground.", "brain": {"type": "slimeHop", "jumpHeight": 5, "jumpSpeed": 3.6, "hopInterval": 70}, "life": 45, "damage": 15, "defense": 7, "knockbackResist": 0.4, "size": [2.2, 1.8], "moveSpeed": 3, "tint": "#f0e040", "loot": "slime_small", "value": 80, "covers": ["terraria:yellow_slime"]},

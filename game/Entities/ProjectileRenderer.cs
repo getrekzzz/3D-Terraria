@@ -11,7 +11,7 @@ namespace Strata.Game.Entities;
 /// Projectiles: arrows and thrown items use their item model aligned with the flight direction (boomerangs spin);
 /// minions with a creature model face where they fly; magic bolts are glowing orbs with a dynamic light (the plan
 /// reserves dynamic lights for moving sources like these). Fishing bobbers bob on the water, dip when a fish bites,
-/// and hang from a line to the rod tip.
+/// and hang from a line to the rod tip. Pets: ProjectileRenderer.Pets.cs.
 /// </summary>
 public sealed partial class ProjectileRenderer : Node3D
 {
@@ -29,6 +29,7 @@ public sealed partial class ProjectileRenderer : Node3D
         game.Projectiles.Removed += p =>
         {
             if (_views.Remove(p.Id, out var node)) node.QueueFree();
+            _petAnims.Remove(p.Id);
         };
         AddChild(new MeshInstance3D
         {
@@ -69,6 +70,11 @@ public sealed partial class ProjectileRenderer : Node3D
                 continue;
             }
             node.Position = pos;
+            if (p.PetSlot != null)
+            {
+                AnimatePet(p, node, vel);
+                continue;
+            }
             if (p.Def.Minion != null)
             {
                 // Creatures stay upright and turn to face their flight.
@@ -149,6 +155,7 @@ public sealed partial class ProjectileRenderer : Node3D
 
     private static void AddLight(Node3D root, Projectile p)
     {
+        if (p.PetSlot != null) return; // light pets shine from the shared pool (PetLights)
         if (p.Def.Light is { Length: 3 } l)
             root.AddChild(new OmniLight3D { LightColor = new Color(l[0] / 15f, l[1] / 15f, l[2] / 15f), OmniRange = 4f, LightEnergy = 1.5f, ShadowEnabled = false });
     }

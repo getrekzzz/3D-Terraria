@@ -60,6 +60,7 @@
     ] },
     { "id": "gold_chest", "name": "Gold Chests", "coins": [1500, 6000], "entries": [
       { "table": "cabin_chest_primary" },
+      { "item": "fairy_bell", "chance": 0.04 },
       { "item": "torch", "min": 15, "max": 30, "chance": 0.7 },
       { "item": "healing_potion", "min": 2, "max": 4, "chance": 0.5 },
       { "item": "lesser_healing_potion", "min": 3, "max": 6, "chance": 0.4 },

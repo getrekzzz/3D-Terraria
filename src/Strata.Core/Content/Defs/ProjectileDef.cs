@@ -56,6 +56,27 @@ public sealed class ProjectileDef : ContentDef
 
     /// <summary>Summoned minion behaviour (summon staves); null for ordinary projectiles.</summary>
     public MinionDef? Minion { get; init; }
+
+    /// <summary>A pet or light pet summoned by the item in a misc slot (never expires, harmless); null for other projectiles.</summary>
+    public PetDef? Pet { get; init; }
+}
+
+/// <summary>
+/// A pet's movement (Core ProjectileSystem.Pets.cs): fliers hover behind the owner's shoulder with a gentle bob; walkers
+/// follow on the ground, hopping one-cell steps. Both catch up at once when left more than 30 m behind.
+/// </summary>
+public sealed class PetDef
+{
+    public bool Flies { get; init; }
+
+    /// <summary>Top speed (m/s) when the owner is a little way off; it runs faster the further behind it falls.</summary>
+    public float Speed { get; init; } = 6f;
+
+    /// <summary>How far behind the owner it settles (m).</summary>
+    public float Follow { get; init; } = 1.6f;
+
+    /// <summary>Fliers: height of its hover above the owner's centre (m).</summary>
+    public float Hover { get; init; } = 0.9f;
 }
 
 /// <summary>A summoned minion: follows its owner and attacks creatures near them until the owner dies.</summary>

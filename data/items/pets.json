@@ -1,0 +1,47 @@
+{
+  // P3-18 pets and light pets. Worn in the misc row's Pet / Light Pet slots: each summons its projectile (which has
+  // "pet" movement) for as long as it is equipped. Light pets shine through the dynamic light pool (graphics.json
+  // petLights caps how many pets may take a pooled light). Sources, as in Terraria (one line each in the source files):
+  //   shadow_orb / crimson_heart   one of the five Shadow Orb / Crimson Heart smash rewards (data/enemies/evil.json)
+  //   fairy_bell                   Gold Chests (data/loot/containers.json)
+  //   magic_lantern                Skeleton Merchant during a full moon (data/town_residents.json)
+  //   wisp_in_a_bottle             Dungeon Spirits, 2% (data/enemies/bestiary.json)
+  //   fish / zephyr_fish           fishing: Fish in the Tundra, Zephyr Fish anywhere and rare (data/items/utility.json)
+  //   strange_glowing_mushroom     sold by the Truffle (data/town_residents.json)
+  "projectiles": [
+    { "id": "shadow_orb_pet", "name": "Shadow Orb", "visual": "item", "model": "shadow_orb", "color": "#9a5aff", "scale": 0.8, "radius": 0.4, "lifetime": 60,
+      "friendly": false, "contact": false, "collideTerrain": false, "light": [9, 4, 14], "pet": { "flies": true, "speed": 8, "follow": 1.1, "hover": 1.0 } },
+    { "id": "crimson_heart_pet", "name": "Crimson Heart", "visual": "item", "model": "crimson_heart", "color": "#ff4a4a", "scale": 0.8, "radius": 0.4, "lifetime": 60,
+      "friendly": false, "contact": false, "collideTerrain": false, "light": [14, 4, 4], "pet": { "flies": true, "speed": 8, "follow": 1.1, "hover": 1.0 } },
+    { "id": "fairy_pet", "name": "Fairy", "visual": "orb", "color": "#ff9ae8", "radius": 0.5, "lifetime": 60,
+      "friendly": false, "contact": false, "collideTerrain": false, "light": [13, 8, 13], "pet": { "flies": true, "speed": 9, "follow": 1.3, "hover": 1.2 } },
+    { "id": "magic_lantern_pet", "name": "Magic Lantern", "visual": "item", "model": "magic_lantern", "color": "#ffd070", "scale": 0.9, "radius": 0.4, "lifetime": 60,
+      "friendly": false, "contact": false, "collideTerrain": false, "light": [14, 12, 7], "pet": { "flies": true, "speed": 7, "follow": 1.0, "hover": 0.9 } },
+    { "id": "wisp_pet", "name": "Wisp", "visual": "orb", "color": "#8affe8", "radius": 0.6, "lifetime": 60,
+      "friendly": false, "contact": false, "collideTerrain": false, "light": [8, 15, 13], "pet": { "flies": true, "speed": 10, "follow": 1.3, "hover": 1.3 } },
+    { "id": "baby_penguin", "name": "Baby Penguin", "visual": "creature", "model": "baby_penguin", "color": "#ffffff", "scale": 1.0, "radius": 0.5, "lifetime": 60,
+      "friendly": false, "contact": false, "pet": { "speed": 6, "follow": 1.6 } },
+    { "id": "zephyr_fish_pet", "name": "Zephyr Fish", "visual": "creature", "model": "fish", "color": "#d8f0ff", "scale": 0.35, "radius": 0.4, "lifetime": 60,
+      "friendly": false, "contact": false, "collideTerrain": false, "pet": { "flies": true, "speed": 7, "follow": 1.5, "hover": 0.4 } },
+    { "id": "baby_truffle", "name": "Baby Truffle", "visual": "creature", "model": "baby_truffle", "color": "#ffffff", "scale": 1.0, "radius": 0.5, "lifetime": 60,
+      "friendly": false, "contact": false, "pet": { "speed": 6, "follow": 1.6 } }
+  ],
+  "items": [
+    { "id": "shadow_orb", "name": "Shadow Orb", "description": "Creates a magical shadow orb.", "category": "pet", "equipSlot": "lightPet", "rarity": 1, "value": 20000,
+      "projectile": "shadow_orb_pet", "covers": ["terraria:shadow_orb_light_pet"] },
+    { "id": "crimson_heart", "name": "Crimson Heart", "description": "Creates a heart to provide light.", "category": "pet", "equipSlot": "lightPet", "rarity": 1, "value": 20000,
+      "projectile": "crimson_heart_pet", "covers": ["terraria:crimson_heart_light_pet"] },
+    { "id": "fairy_bell", "name": "Fairy Bell", "description": "Summons a magical fairy.", "category": "pet", "equipSlot": "lightPet", "rarity": 3, "value": 20000,
+      "projectile": "fairy_pet", "covers": ["terraria:fairy_bell"] },
+    { "id": "magic_lantern", "name": "Magic Lantern", "description": "Summons a magic lantern that lights the way.", "category": "pet", "equipSlot": "lightPet", "rarity": 3, "value": 50000,
+      "projectile": "magic_lantern_pet", "covers": ["terraria:magic_lantern"] },
+    { "id": "wisp_in_a_bottle", "name": "Wisp in a Bottle", "description": "Summons a Wisp to provide light.", "category": "pet", "equipSlot": "lightPet", "rarity": 8, "value": 100000,
+      "projectile": "wisp_pet", "covers": ["terraria:wisp_in_a_bottle"] },
+    { "id": "fish", "name": "Fish", "description": "Summons a Baby Penguin.", "category": "pet", "equipSlot": "pet", "rarity": 3, "value": 20000,
+      "projectile": "baby_penguin", "covers": ["terraria:fish"] },
+    { "id": "zephyr_fish", "name": "Zephyr Fish", "description": "Summons a pet Zephyr Fish.", "category": "pet", "equipSlot": "pet", "rarity": 3, "value": 20000,
+      "projectile": "zephyr_fish_pet", "covers": ["terraria:zephyr_fish"] },
+    { "id": "strange_glowing_mushroom", "name": "Strange Glowing Mushroom", "description": "Summons a Baby Truffle.", "category": "pet", "equipSlot": "pet", "rarity": 3, "value": 100000,
+      "projectile": "baby_truffle", "covers": ["terraria:strange_glowing_mushroom"] }
+  ]
+}

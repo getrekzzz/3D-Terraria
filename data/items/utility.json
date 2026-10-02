@@ -80,7 +80,9 @@
       { "item": "hemopiranha", "weight": 25, "conditions": [{ "type": "biome", "any": ["crimson"] }] },
       { "item": "prismite", "weight": 8, "conditions": [{ "type": "biome", "any": ["hallow"] }] },
       { "item": "specular_fish", "weight": 25, "conditions": [{ "type": "depth", "min": 30 }] },
-      { "item": "armored_cavefish", "weight": 20, "conditions": [{ "type": "depth", "min": 30 }] }
+      { "item": "armored_cavefish", "weight": 20, "conditions": [{ "type": "depth", "min": 30 }] },
+      { "item": "fish", "weight": 1, "conditions": [{ "type": "biome", "any": ["tundra"] }] },
+      { "item": "zephyr_fish", "weight": 0.2 }
     ] },
     { "id": "wooden_crate", "coins": [1000, 5000], "entries": [
       { "table": "wooden_crate_treasure", "chance": 0.25 },
