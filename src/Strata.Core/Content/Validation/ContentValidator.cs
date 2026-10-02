@@ -95,6 +95,13 @@ public static partial class ContentValidator
             if (color != null && !HexColor.IsMatch(color)) Error(owner, $"{field} '{color}' must be #RRGGBB.");
         }
 
+        /// <summary>A sound id must name a sound file (assets/audio/sfx/&lt;id&gt;.wav or &lt;id&gt;_1.wav).</summary>
+        public void Sound(ContentDef owner, string? id, string field)
+        {
+            if (id == null || Options.AssetExists is not { } exists) return;
+            if (!AssetPaths.SoundExists(id, exists)) Error(owner, $"{field} sound '{id}' has no assets/audio/sfx/{id}.wav or {id}_1.wav.");
+        }
+
         public void Asset(ContentDef owner, string? path, string field)
         {
             if (path == null || Options.AssetExists == null) return;

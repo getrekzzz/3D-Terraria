@@ -168,6 +168,16 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void SoundSetsMustNameASoundFile()
+    {
+        var db = ContentLoader.LoadFromTexts(new[] { ("test.json", """
+        { "items": [ { "id": "boomer", "soundSet": "shotgun" }, { "id": "typo", "soundSet": "shotgnu" }, { "id": "single", "soundSet": "crystal" } ] }
+        """) }, new ContentValidationOptions { AssetExists = p => p is "assets/audio/sfx/shotgun_1.wav" or "assets/audio/sfx/crystal.wav" });
+        AssertError(db, "soundSet sound 'shotgnu' has no assets/audio/sfx/shotgnu.wav");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("sound 'shotgun'") || e.Message.Contains("sound 'crystal'"));
+    }
+
+    [Fact]
     public void RejectsBadIdsAndCovers()
     {
         var db = Load("""{ "items": [ { "id": "BadId", "covers": ["copper"] } ] }""");
