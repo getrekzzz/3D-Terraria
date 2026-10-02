@@ -143,3 +143,13 @@ ui shop
 ui close
 town leave travelling_merchant
 assert errors == 0
+
+# --- P5-20 ---
+# A Cat License sets its flag once; a summoned cat can be petted and never counts as a resident.
+give license_cat
+wield license_cat
+use
+assert flag.license_cat == 1
+town summon town_cat 2 0 0
+assert town.town_cat == 1
+assert errors == 0

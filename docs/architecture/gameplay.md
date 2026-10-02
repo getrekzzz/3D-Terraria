@@ -750,3 +750,15 @@ Arrival and departure raise `Arrived`/`Departed` (HUD announcements) plus `Visit
 `TownNpcDef.AllShopEntries` feeds item sources and validation. `ResidentModel.VisitDay` persists the visit.
 Commands: `town visit <id>`, `town leave <id>`. Gaps: no charged arrows for the Pulse Bow, no Bone Torch, the stock
 pools are a functional subset of Terraria's list.
+
+## Town pets (P5-20)
+
+`TownNpcDef.Pet` makes a `TownNpcKind.Pet` (`data/town/pets.json`: town_cat, town_dog, town_bunny). Pets arrive like
+residents (a free house, arrival `[{flag license_<pet>}]`), keep and are re-housed into homes (`TownNpc.NeedsHome`), can
+be assigned in the housing UI, but never count as residents (so they are never targeted), cannot be hurt and have no
+shop or happiness. The `license` item behaviour (`ItemUseSystem.Town.cs`) sets the flag and is used up; a second use is
+refused ("This license has already been used.") and kept. The Zoologist sells the licenses (bestiary 25 % / 25 % /
+45 %). Interacting with a pet calls `TownSystem.PetAnimal` instead of opening the dialog (InteractionController); the
+`Petted` event drives `game/Entities/TownPetHearts` (pooled heart sprites, sfx `pet`). Models from
+`tools/blender/bgen/town_pets.py` (one quadruped rig, walk/idle/sit/lie). Gaps: no player petting arm pose; pets use
+the humanoid nav agent and box.

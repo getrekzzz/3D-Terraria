@@ -6863,6 +6863,27 @@
    "object": "lever",
    "icon": "assets/icons/items/lever.png"
   },
+  "license_bunny": {
+   "model": "assets/models/items/license_bunny.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/license_bunny.png"
+  },
+  "license_cat": {
+   "model": "assets/models/items/license_cat.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/license_cat.png"
+  },
+  "license_dog": {
+   "model": "assets/models/items/license_dog.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/license_dog.png"
+  },
   "life_crystal": {
    "model": "assets/models/items/life_crystal.glb",
    "icon": "assets/icons/items/life_crystal.png"
@@ -13318,6 +13339,36 @@
    "model": "assets/models/creatures/the_hungry.glb",
    "generator": "wof_hungry",
    "animations": []
+  },
+  "town_bunny": {
+   "model": "assets/models/creatures/town_bunny.glb",
+   "generator": "town_pet",
+   "animations": [
+    "idle",
+    "lie",
+    "sit",
+    "walk"
+   ]
+  },
+  "town_cat": {
+   "model": "assets/models/creatures/town_cat.glb",
+   "generator": "town_pet",
+   "animations": [
+    "idle",
+    "lie",
+    "sit",
+    "walk"
+   ]
+  },
+  "town_dog": {
+   "model": "assets/models/creatures/town_dog.glb",
+   "generator": "town_pet",
+   "animations": [
+    "idle",
+    "lie",
+    "sit",
+    "walk"
+   ]
   },
   "travelling_merchant": {
    "model": "assets/models/creatures/travelling_merchant.glb",

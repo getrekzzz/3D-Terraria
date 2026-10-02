@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.AI;
+using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Entities;
 
 namespace Strata.Core.Gameplay.Town;
@@ -39,7 +40,7 @@ public sealed partial class TownSystem
     /// <summary>Applies a hit to a resident from a point (knockback away from it).</summary>
     public void Damage(TownNpc r, int amount, Vector3 from)
     {
-        if (!r.Alive || r.Bound) return; // bound NPCs cannot be hurt
+        if (!r.Alive || r.Bound || r.Def.Kind == TownNpcKind.Pet) return; // bound NPCs and town pets cannot be hurt
         int dealt = Math.Max(1, amount - r.Def.Defense / 2);
         r.Life -= dealt;
         r.ImmuneTicks = HitImmunity;

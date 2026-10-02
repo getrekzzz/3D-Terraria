@@ -47,6 +47,9 @@ public static partial class WorldLauncher
         var residents = new Entities.TownRenderer();
         runtime.AddChild(residents);
         residents.Initialize(game, props);
+        var hearts = new Entities.TownPetHearts();
+        runtime.AddChild(hearts);
+        hearts.Initialize(game);
         var projectiles = new Entities.ProjectileRenderer();
         runtime.AddChild(projectiles);
         projectiles.Initialize(game, props);

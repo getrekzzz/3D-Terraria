@@ -5148,6 +5148,27 @@
    "kind": "town_goods",
    "stage": "early",
    "source": "skeleton merchant"
+  },
+  {
+   "id": "terraria:license_cat",
+   "name": "Cat License",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
+  },
+  {
+   "id": "terraria:license_dog",
+   "name": "Dog License",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
+  },
+  {
+   "id": "terraria:license_bunny",
+   "name": "Bunny License",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "zoologist"
   }
  ]
 }

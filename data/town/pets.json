@@ -1,0 +1,9 @@
+{
+  // P5-20: town pets. They move into a free house once their license has been used, wander the town, can be petted,
+  // and never count as residents. Moods and shops do not apply.
+  "townNpcs": [
+    {"id": "town_cat", "name": "Cat", "model": "town_cat", "pet": true, "names": ["Whiskers", "Mittens", "Shadow", "Tigger", "Smokey", "Socks", "Luna", "Felix"], "arrival": [{"type": "flag", "id": "license_cat"}], "life": 250, "defense": 15, "speed": 1.4, "lines": [{"text": "Meow."}, {"text": "Mrrrow?"}, {"text": "Purrrr..."}], "covers": ["terraria:town_cat"]},
+    {"id": "town_dog", "name": "Dog", "model": "town_dog", "pet": true, "names": ["Rex", "Buddy", "Max", "Biscuit", "Scout", "Rufus", "Bailey", "Ziggy"], "arrival": [{"type": "flag", "id": "license_dog"}], "life": 250, "defense": 15, "speed": 1.8, "lines": [{"text": "Woof!"}, {"text": "Arf arf!"}, {"text": "*happy panting*"}], "covers": ["terraria:town_dog"]},
+    {"id": "town_bunny", "name": "Bunny", "model": "town_bunny", "pet": true, "names": ["Thumper", "Clover", "Hopper", "Cottontail", "Daisy", "Pip", "Nibbles", "Snowball"], "arrival": [{"type": "flag", "id": "license_bunny"}], "life": 250, "defense": 15, "speed": 1.5, "lines": [{"text": "*twitches nose*"}, {"text": "*thump thump*"}, {"text": "*nibbles happily*"}], "covers": ["terraria:town_bunny"]}
+  ]
+}

@@ -71,6 +71,11 @@ public sealed partial class InteractionController : Node
             if (outcome is not (UseOutcome.None or UseOutcome.Cooldown)) Used?.Invoke(outcome);
         }
         bool interact = Input.IsActionJustPressed("use_secondary") || Input.IsActionJustPressed("interact");
+        if (interact && TalkTarget is { Def.Kind: Strata.Core.Content.Defs.TownNpcKind.Pet } pet)
+        {
+            Game.Town.PetAnimal(pet, Entity); // Terraria: a town pet is petted, not talked to
+            return;
+        }
         if (interact && TalkTarget is { } resident && Game.Town.BeginTalk(resident, Entity))
         {
             TalkRequested?.Invoke(resident);

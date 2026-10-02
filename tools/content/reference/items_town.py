@@ -74,5 +74,8 @@ revolver|Revolver|early|travelling merchant
 pulse_bow|Pulse Bow|hardmode|travelling merchant
 sitting_ducks_fishing_pole|Sitting Duck's Fishing Pole|early|travelling merchant
 bone_arrow|Bone Arrow|early|skeleton merchant
+license_cat|Cat License|early|zoologist
+license_dog|Dog License|early|zoologist
+license_bunny|Bunny License|early|zoologist
 """,
 }
