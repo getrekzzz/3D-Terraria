@@ -75,6 +75,40 @@ public sealed class TileObjectInstance
 
     public string DisplayName => _customName ?? Def.DisplayName;
 
+    public const int MaxSignLength = 240, MaxSignLines = 6;
+
+    private string? _signText;
+
+    /// <summary>
+    /// What a sign says (X-03), saved with the chunk. Assigning keeps at most <see cref="MaxSignLines"/> lines and
+    /// <see cref="MaxSignLength"/> characters, drops other control characters; blank clears it.
+    /// </summary>
+    public string? SignText
+    {
+        get => _signText;
+        set => _signText = SanitizeSign(value);
+    }
+
+    public static string? SanitizeSign(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var sb = new System.Text.StringBuilder(Math.Min(raw.Length, MaxSignLength));
+        int lines = 1;
+        foreach (char c in raw.Replace("\r\n", "\n"))
+        {
+            if (c == '\n')
+            {
+                if (lines == MaxSignLines) break;
+                lines++;
+                sb.Append(c);
+            }
+            else if (!char.IsControl(c) && !char.IsSurrogate(c)) sb.Append(c);
+            if (sb.Length == MaxSignLength) break;
+        }
+        var text = sb.ToString().Trim();
+        return text.Length == 0 ? null : text;
+    }
+
     public static string? SanitizeName(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw)) return null;

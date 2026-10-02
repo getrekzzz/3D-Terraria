@@ -2905,6 +2905,12 @@
    ],
    "generator": "flower"
   },
+  "sign": {
+   "models": [
+    "assets/models/objects/sign_v0.glb"
+   ],
+   "generator": "signpost"
+  },
   "skeleton_banner": {
    "models": [
     "assets/models/objects/skeleton_banner_v0.glb"
@@ -8501,6 +8507,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/shuriken.png"
+  },
+  "sign": {
+   "object": "sign",
+   "icon": "assets/icons/items/sign.png"
   },
   "silk": {
    "model": "assets/models/items/silk.glb",

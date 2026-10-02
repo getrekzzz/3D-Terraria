@@ -202,6 +202,15 @@ public sealed partial class GameWorld
         return true;
     }
 
+    /// <summary>Writes a sign's text (see <see cref="TileObjectInstance.SignText"/>) and marks its chunk for saving; false for other objects.</summary>
+    public bool EditSign(TileObjectInstance sign, string? text)
+    {
+        if (sign.Def.Interaction != Content.Defs.TileInteraction.Read) return false;
+        sign.SignText = text;
+        MarkObjectModified(sign);
+        return true;
+    }
+
     private void MarkObjectModified(TileObjectInstance obj) =>
         Session.World.GetChunk(ChunkMath.CellToChunk(obj.Anchor))?.MarkModified();
 }

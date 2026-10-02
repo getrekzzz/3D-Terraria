@@ -31,7 +31,7 @@ public static class ChunkCodec
     private const byte StateActive = 1, StateLootRolled = 2, StateHasMeta = 4;
 
     // Object meta entries: tag, length, payload, ended by MetaEnd; readers skip tags they do not know.
-    private const byte MetaEnd = 0, MetaName = 1, MetaLocked = 2;
+    private const byte MetaEnd = 0, MetaName = 1, MetaLocked = 2, MetaSign = 3;
 
     public static byte[] Encode(ChunkData data, int mutationLevel, IReadOnlyList<TileObjectInstance> objects, ContentDatabase db, WorldIdTables ids) =>
         Encode(data, mutationLevel, EncodeObjects(objects, ids), db, ids);
@@ -192,7 +192,7 @@ public static class ChunkCodec
             w.Write((byte)o.Rotation);
             w.Write((byte)o.Variant);
             w.WriteVar(Math.Max(0, o.HitPoints));
-            bool meta = o.CustomName != null || o.Locked;
+            bool meta = o.CustomName != null || o.Locked || o.SignText != null;
             w.Write((byte)((o.Active ? StateActive : 0) | (o.LootRolled ? StateLootRolled : 0) | (meta ? StateHasMeta : 0)));
             w.Write(o.PendingLoot ?? "");
             if (meta) WriteObjectMeta(w, o);
@@ -246,6 +246,7 @@ public static class ChunkCodec
     private static void WriteObjectMeta(BinaryWriter w, TileObjectInstance o)
     {
         if (o.CustomName != null) w.WriteSection(MetaName, s => s.Write(o.CustomName));
+        if (o.SignText != null) w.WriteSection(MetaSign, s => s.Write(o.SignText));
         if (o.Locked)
         {
             w.Write(MetaLocked); // a flag entry: no payload
@@ -264,6 +265,7 @@ public static class ChunkCodec
             long end = r.BaseStream.Position + length;
             if (tag == MetaName) obj.CustomName = r.ReadString();
             else if (tag == MetaLocked) obj.Locked = true;
+            else if (tag == MetaSign) obj.SignText = r.ReadString();
             r.BaseStream.Position = end;
         }
     }

@@ -30,6 +30,9 @@ public static partial class WorldLauncher
         var townDialog = new UI.TownDialog();
         runtime.AddChild(townDialog);
         townDialog.Initialize(ui);
+        var signs = new UI.SignDialog();
+        runtime.AddChild(signs);
+        signs.Initialize(ui);
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);

@@ -25,6 +25,9 @@ public enum InteractOutcome
 
     /// <summary>What looked like a chest (or a lost girl) was a disguised creature, and it woke.</summary>
     Unmasked,
+
+    /// <summary>A sign was read (the UI shows its text for editing).</summary>
+    SignOpened,
 }
 
 /// <summary>"Interact" on tile objects: doors, containers, beds and seats.</summary>
@@ -36,6 +39,9 @@ public sealed partial class ObjectInteraction
 
     /// <summary>A container was opened by a player (the UI shows it).</summary>
     public event Action<PlayerEntity, TileObjectInstance>? ContainerOpened;
+
+    /// <summary>A player read a sign (the UI shows its text and lets them edit it).</summary>
+    public event Action<PlayerEntity, TileObjectInstance>? SignOpened;
 
     /// <summary>An object's state (door open/closed) changed; colliders and visuals update.</summary>
     public event Action<TileObjectInstance>? StateChanged;
@@ -82,6 +88,9 @@ public sealed partial class ObjectInteraction
                 return InteractOutcome.SpawnSet;
             case TileInteraction.Sit:
                 return InteractOutcome.Seated;
+            case TileInteraction.Read:
+                SignOpened?.Invoke(p, obj);
+                return InteractOutcome.SignOpened;
             default:
                 return InteractOutcome.None;
         }

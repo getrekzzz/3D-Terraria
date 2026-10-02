@@ -83,7 +83,7 @@ project renderer on every preset).
 |---|---|---|
 | merge `origin/claude/ovh-bosses` | done | Contact damage lives in `NpcSystem.Contact.cs` (P3-25 knockback and damage kinds ported); segment hits report the creature id; planned Dungeon wires go on the red `WireGrid` layer. One `skeleton_statue` (the wireable statue, 2×4×2, also placed by the Dungeon decorator) with the Dungeon's statue model; the wiring statues' Blender generator is renamed `critter_statue` (generator names must be unique). |
 | X-03 enemy banners | done | 162 banners from `tools/content/banners.json` via `gen_banners.py` (one per coin-worthy enemy; slimes, zombies and Angry Bones grouped), models from the Dungeon's `banner` generator; `BannerSystem`: world kill tallies, a banner every 50 kills, ×1.5 damage dealt / ×0.9 contact damage taken near a placed banner, Monster Banner buff; `BannerTests`, `builder.cmds` section, probes `banners.near|dropped`. |
-| X-03 editable signs | waiting | Needs P2-08's object meta in the chunk codec (not on the integration branch yet). |
+| X-03 editable signs | done (push 9) | See push 9. |
 
 CI (push 7): GREEN — 1123 Core tests, content checks (incl. furniture/banner generators), Godot import, all 18 smoke
 scripts, menu tour.
@@ -103,6 +103,11 @@ composite conditions (`any`/`all`/`not`) do not validate nested specs (pre-exist
 
 CI (push 8, merge commit): GREEN — 1310 Core tests, content checks, Godot import, all 20 smoke scripts, menu tour.
 Review-fix commit: 1313 Core tests, validate, basic smoke and menu tour pass.
+
+## Push 9 — editable signs (X-03 done)
+| WP | State | Notes |
+|---|---|---|
+| X-03 signs | done | Sign (6 wood, work bench; `signpost` model) with `interaction: read`; `SignText` (6 lines / 240 chars) saved as P2-08 object-meta tag 3; `SignDialog` to edit, the target label shows the text; `sign` command, `signs.text` probe, `SignTests`, `builder.cmds` section. |
 
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.

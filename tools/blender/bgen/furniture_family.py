@@ -238,3 +238,17 @@ PIECES = {
     "bookcase": _bookcase, "piano": _piano, "sofa": _sofa, "bathtub": _bathtub, "lamp": _lamp, "lantern": _lantern,
     "candle": _candle, "candelabra": _candelabra, "chandelier": _chandelier, "clock": _clock, "platform": _platform,
 }
+
+
+@generator
+def signpost(mb, p, rng):
+    """A wooden sign (X-03): a board on two posts, its face (+Y) blank for the game to letter."""
+    w, h, d = p["size"]
+    mat, tint = p.get("mat", "prop:planks"), p.get("tint", "#9a6a3c")
+    post = 0.06
+    for sx in (-1, 1):
+        x = sx * (w * 0.34)
+        _soft(mb, (x - post, -post, 0), (x + post, post, h * 0.62), mat, p.get("postTint", "#7a5230"), r=0.012)
+    _soft(mb, (-w * 0.46, -0.05, h * 0.38), (w * 0.46, 0.05, h * 0.92), mat, tint, r=0.02)
+    for z in (h * 0.42, h * 0.88):  # nailed battens across the back
+        mb.box((-w * 0.44, -0.085, z - 0.025), (w * 0.44, -0.05, z + 0.025), mat, p.get("postTint", "#7a5230"))
