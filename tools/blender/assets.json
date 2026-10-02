@@ -4376,28 +4376,23 @@
       }
     },
     "wyvern_head": {
-      "generator": "worm_segment",
+      "generator": "sky_dragon",
       "params": {
         "part": "head",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8"
+        "radius": 0.6
       }
     },
     "wyvern_body": {
-      "generator": "worm_segment",
+      "generator": "sky_dragon",
       "params": {
-        "part": "segment",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8",
+        "part": "body",
         "radius": 0.6
       }
     },
     "wyvern_tail": {
-      "generator": "worm_segment",
+      "generator": "sky_dragon",
       "params": {
         "part": "tail",
-        "shell": "#f0f0f8",
-        "flesh": "#9ab8e8",
         "radius": 0.55
       }
     },
@@ -5844,11 +5839,8 @@
       }
     },
     "mimic": {
-      "generator": "present",
-      "params": {
-        "color": "#8a5a2a",
-        "ribbon": "#c8a040"
-      }
+      "generator": "mimic",
+      "params": {}
     },
     "bunny": {
       "generator": "bunny",

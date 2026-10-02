@@ -116,6 +116,7 @@ public sealed partial class NpcSystem
         if (_npcs.Count >= MaxNpcs) return null;
         var npc = new Npc(_nextId++, def, feet) { Yaw = _rng.NextFloat() * MathF.Tau, Invulnerable = def.Invulnerable };
         if (Scale > 1f) npc.Life = npc.MaxLife = (int)(def.Life * Scale);
+        if (def.Disguise != null) npc.Yaw = MathF.Round(npc.Yaw / (MathF.PI / 2)) * (MathF.PI / 2); // squared up like a placed chest
         if (def.Boss is { Segments: > 0 } boss)
             for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
         InitSegmentLife(npc);
@@ -181,6 +182,7 @@ public sealed partial class NpcSystem
             if (npc.Buffs.Tick()) npc.RecomputeEffects();
             if (npc.Effects.DamagePerSecond > 0 && npc.Age % Units.TicksPerSecond == 0)
             {
+                if (npc.Disguised) Wake(npc, null); // a burning chest gives itself away
                 npc.Life -= npc.Effects.DamagePerSecond;
                 Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false));
                 if (npc.Life <= 0)
@@ -219,6 +221,11 @@ public sealed partial class NpcSystem
             }
             // Terrain-bound creatures wait while their chunk is not loaded; fliers that ignore terrain keep going.
             if (npc.Def.CollideTerrain && session.World.GetBlock(VoxelMotion.CellOf(npc.Center)) == VoxelWorld.Unknown) continue;
+            if (npc.Disguised && SitDisguised(npc, target, distance, dt))
+            {
+                if (npc.Position.Y < 0) Remove(i);
+                continue;
+            }
             _ctx.Target = target;
             _ctx.TargetDistance = distance;
             _ctx.OnSurface = session.Generator.Plan.Bands.LayerAt(npc.Cell.Y) == World.WorldLayer.Surface;
@@ -294,6 +301,7 @@ public sealed partial class NpcSystem
     public bool Hit(Npc npc, PlayerEntity? attacker, int baseDamage, DamageClass damageClass, int critChance, float knockback, Vector3 from, bool melee, int segment = -1)
     {
         if (!npc.Alive || npc.Invulnerable || (melee && npc.ImmuneTicks > 0)) return false;
+        if (npc.Disguised) Wake(npc, attacker);
         if (segment >= 0 && segment < npc.SegmentLife.Count) return HitSegment(npc, segment, attacker, baseDamage, damageClass, critChance, melee);
         var hit = DamageModel.Roll(baseDamage, damageClass, critChance, knockback, attacker?.State.Effects.Stats, npc.Defense,
             0.5f, 0f, npc.Def.KnockbackResist, ref _rng);

@@ -25,6 +25,12 @@ public sealed class WormBrain : IBrain
     public void Think(Npc npc, BrainContext ctx)
     {
         const float dt = 1f / Common.Units.TicksPerSecond;
+        if (_p.Fly)
+        {
+            Fly(npc, ctx, dt);
+            Spit(npc, ctx);
+            return;
+        }
         var head = npc.Center;
         bool buried = ctx.World.IsSolid(VoxelMotion.CellOf(head).X, VoxelMotion.CellOf(head).Y, VoxelMotion.CellOf(head).Z);
         var velocity = npc.Velocity.LengthSquared() > 1e-4f ? npc.Velocity : new Vector3(0, -_p.Speed, 0);
@@ -48,6 +54,39 @@ public sealed class WormBrain : IBrain
             ctx.Carve(head, _p.DigRadius);
         ReleaseMinion(npc, ctx);
         Spit(npc, ctx);
+    }
+
+    /// <summary>
+    /// Sky-serpent flight at constant speed with a limited turn rate, so it overshoots and loops back like Terraria's
+    /// Wyvern; the heading bobs up and down on a slow wave. Without a target it circles its spawn point.
+    /// </summary>
+    private void Fly(Npc npc, BrainContext ctx, float dt)
+    {
+        var head = npc.Center;
+        var dir = npc.Velocity.LengthSquared() > 1e-4f ? Vector3.Normalize(npc.Velocity) : new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
+        float speed = _p.Speed;
+        Vector3 want;
+        if (ctx.Target != null)
+        {
+            npc.TargetPlayer = 0;
+            var to = ctx.Target.Center - head;
+            float distance = to.Length();
+            want = distance > 1e-3f ? to / distance : dir;
+            if (distance > _p.FarRange) speed *= _p.CatchUp;
+        }
+        else
+        {
+            // Bank around the spawn point: turn sideways, drift back toward it.
+            var side = Vector3.Normalize(new Vector3(dir.Z, 0, -dir.X) + new Vector3(1e-4f, 0, 0));
+            want = Vector3.Normalize(dir + side * 0.6f + (npc.Anchor + new Vector3(0, 6f, 0) - head) * 0.03f);
+        }
+        if (_p.Weave > 0)
+            want = Vector3.Normalize(want + new Vector3(0, _p.Weave * MathF.Sin(npc.Age * MathF.Tau / Math.Max(1, _p.WeavePeriod) + npc.Id), 0));
+        var turned = dir + (want - dir) * MathF.Min(1f, _p.TurnRate * dt);
+        if (turned.LengthSquared() > 1e-6f) dir = Vector3.Normalize(turned);
+        npc.Velocity = dir * speed;
+        npc.Yaw = BrainFactory.YawOf(dir);
+        npc.Pose = "attack";
     }
 
     /// <summary>A random body segment spits at the target when it can see it (each piece of a split worm on its own clock).</summary>

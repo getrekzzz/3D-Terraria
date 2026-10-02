@@ -42,12 +42,21 @@ public static partial class ContentValidator
             if (e.Facing is not ("yaw" or "look" or "velocity")) ctx.Error(e, $"facing '{e.Facing}' must be yaw, look or velocity.");
             ctx.Light(e, e.Light, "light");
             ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
+            if (e.Disguise is { } disguise)
+            {
+                if (string.IsNullOrWhiteSpace(disguise.Model)) ctx.Error(e, "disguise.model is required.");
+                else ctx.Asset(e, $"assets/models/creatures/{disguise.Model}.glb", "disguise.model");
+                if (disguise.WakeRange < 0 || disguise.Lunge < 0) ctx.Error(e, "disguise.wakeRange and disguise.lunge must be >= 0.");
+                if (disguise.WakeRange == 0 && !disguise.WakeOnInteract) ctx.Error(e, "a disguise that ignores interaction needs a wakeRange (hits alone rarely find it).");
+            }
             if (e.Boss is { } boss)
             {
                 ctx.Ref(e, ctx.Db.Flags, boss.Flag, "boss.flag");
                 if (string.IsNullOrWhiteSpace(boss.Title) && !boss.Minor) ctx.Error(e, "boss.title is required.");
                 foreach (var (part, field) in new[] { (boss.SegmentModel, "segmentModel"), (boss.TailModel, "tailModel") })
                     if (part != null) ctx.Asset(e, $"assets/models/creatures/{part}.glb", $"boss.{field}");
+                for (int i = 0; i < boss.SegmentPattern.Length; i++)
+                    ctx.Asset(e, $"assets/models/creatures/{boss.SegmentPattern[i]}.glb", $"boss.segmentPattern[{i}]");
                 for (int i = 0; i < boss.SegmentModels.Length; i++)
                     ctx.Asset(e, $"assets/models/creatures/{boss.SegmentModels[i]}.glb", $"boss.segmentModels[{i}]");
                 if (boss.SegmentModels.Length > boss.Segments) ctx.Error(e, "boss.segmentModels lists more models than boss.segments.");

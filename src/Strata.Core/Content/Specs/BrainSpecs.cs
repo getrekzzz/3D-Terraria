@@ -185,6 +185,20 @@ public sealed class WormParams : SpecParams
 
     /// <summary>Spits only in Expert (the Eater of Worlds).</summary>
     public bool SpitExpertOnly { get; init; }
+
+    /// <summary>
+    /// A sky serpent (the Wyvern): it never leaps or falls but flies through air and terrain alike, sweeping past its
+    /// target in wide undulating arcs, hurrying back when far, and circling its spawn point while it has no target.
+    /// </summary>
+    public bool Fly { get; init; }
+
+    /// <summary>Flight: vertical undulation of the heading (0 = straight lines), and its period in ticks.</summary>
+    public float Weave { get; init; } = 0.35f;
+    public int WeavePeriod { get; init; } = 150;
+
+    /// <summary>Flight: beyond this distance (m) from its target it flies <see cref="CatchUp"/> times faster.</summary>
+    public float FarRange { get; init; } = 30f;
+    public float CatchUp { get; init; } = 1.6f;
 }
 
 /// <summary>Lives in liquid: chases targets through water, flops helplessly on land.</summary>

@@ -28,6 +28,16 @@ heal
 wait 3
 assert npcs.hornet == 1
 assert errors == 0
+# A disguised Mimic sits as a chest (harmless, still) until the player opens it, then wakes and hops after them.
+killall
+spawn mimic 1 3.5
+wait 1
+assert boss.mimic.disguised == 1
+open_disguised
+assert boss.mimic.disguised == 0
+wait 1
+assert npcs.mimic == 1
+assert errors == 0
 # Clearing up.
 killall
 assert npcs.count == 0

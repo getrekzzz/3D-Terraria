@@ -119,13 +119,15 @@ public sealed partial class NpcRenderer : Node3D
                 ? new Vector3(npc.Center.X, npc.Center.Y, npc.Center.Z)
                 : new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
             view.Shown = view.Shown.DistanceSquaredTo(target) > 4f ? target : view.Shown.Lerp(target, 1f - Mathf.Exp(-dt * 25f));
-            var wanted = npc.ModelOverride ?? npc.Def.Model ?? npc.Def.Id;
+            var wanted = npc.ShownModel;
             if (wanted != view.Model && Acquire(wanted) is { } swapped)
             {
+                // A phase change spins into the new form; a disguise drops at once (the chest simply bites).
+                bool unmasked = view.Model == npc.Def.Disguise?.Model;
                 Release(view.Visual, view.Model);
                 view.Visual = swapped;
                 view.Model = wanted;
-                view.Spin = 1f;
+                if (!unmasked) view.Spin = 1f;
             }
             var visual = view.Visual;
             visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.LiftFor(npc.HalfExtents.Y * 2f, npc.Def.Scale * npc.VisualScale) : view.Shown;
@@ -170,8 +172,7 @@ public sealed partial class NpcRenderer : Node3D
         while (view.Segments.Count < npc.Segments.Count)
         {
             int index = view.Segments.Count;
-            bool tail = index == npc.Segments.Count - 1;
-            var model = index < boss.SegmentModels.Length ? boss.SegmentModels[index] : tail ? boss.TailModel ?? segModel : segModel;
+            var model = index < boss.SegmentModels.Length ? boss.SegmentModels[index] : boss.ChainModel(index, npc.Segments.Count, segModel);
             if (Acquire(model) is not { } seg) return;
             view.Segments.Add((seg, model));
         }
@@ -206,11 +207,10 @@ public sealed partial class NpcRenderer : Node3D
             Release(visual, model);
             view.Segments.RemoveAt(view.Segments.Count - 1);
         }
-        var tailModel = npc.Def.Boss!.TailModel ?? segModel;
-        int last = npc.Segments.Count - 1;
+        var boss = npc.Def.Boss!;
         for (int i = 0; i < view.Segments.Count; i++)
         {
-            var want = i == last ? tailModel : segModel;
+            var want = boss.ChainModel(i, npc.Segments.Count, segModel);
             if (view.Segments[i].Model == want) continue;
             if (Acquire(want) is not { } swapped) continue;
             Release(view.Segments[i].Visual, view.Segments[i].Model);
@@ -241,7 +241,7 @@ public sealed partial class NpcRenderer : Node3D
 
     private View? Create(Npc npc)
     {
-        var model = npc.Def.Model ?? npc.Def.Id;
+        var model = npc.ShownModel;
         var visual = Acquire(model);
         if (visual == null) return null;
         // Glowing creatures get their light from the shared pool (Rendering.DynamicLights, see Glows); visuals made

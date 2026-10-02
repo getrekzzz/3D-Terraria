@@ -4501,6 +4501,35 @@
     "walk"
    ]
   },
+  "lost_girl": {
+   "model": "assets/models/creatures/lost_girl.glb",
+   "generator": "humanoid",
+   "animations": [
+    "bow",
+    "cast",
+    "climb",
+    "death",
+    "drink",
+    "fall",
+    "glide",
+    "hold",
+    "hurt",
+    "idle",
+    "jump",
+    "land",
+    "mine",
+    "run",
+    "shoot",
+    "sprint",
+    "strafe_left",
+    "strafe_right",
+    "swim",
+    "swing",
+    "thrust",
+    "use",
+    "walk"
+   ]
+  },
   "lunatic_cultist": {
    "model": "assets/models/creatures/lunatic_cultist.glb",
    "generator": "humanoid",
@@ -4635,7 +4664,12 @@
   },
   "mimic": {
    "model": "assets/models/creatures/mimic.glb",
-   "generator": "present",
+   "generator": "mimic",
+   "animations": []
+  },
+  "mimic_chest": {
+   "model": "assets/models/creatures/mimic_chest.glb",
+   "generator": "mimic_chest",
    "animations": []
   },
   "mister_stabby": {
@@ -5744,17 +5778,22 @@
   },
   "wyvern_body": {
    "model": "assets/models/creatures/wyvern_body.glb",
-   "generator": "worm_segment",
+   "generator": "sky_dragon",
    "animations": []
   },
   "wyvern_head": {
    "model": "assets/models/creatures/wyvern_head.glb",
-   "generator": "worm_segment",
+   "generator": "sky_dragon",
+   "animations": []
+  },
+  "wyvern_legs": {
+   "model": "assets/models/creatures/wyvern_legs.glb",
+   "generator": "sky_dragon",
    "animations": []
   },
   "wyvern_tail": {
    "model": "assets/models/creatures/wyvern_tail.glb",
-   "generator": "worm_segment",
+   "generator": "sky_dragon",
    "animations": []
   },
   "yeti": {

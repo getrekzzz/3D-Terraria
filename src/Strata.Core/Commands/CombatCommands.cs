@@ -21,6 +21,21 @@ public static class CombatCommands
     {
         r.Register(new CommandDef
         {
+            Name = "open_disguised", Usage = "open_disguised",
+            Help = "Interacts with the nearest disguised creature within reach, as opening its chest (a Mimic wakes).",
+            Run = (ctx, a) =>
+            {
+                var p = ctx.Player;
+                var npc = ctx.World.Npcs.All.Where(n => n.Disguised).OrderBy(n => Vector3.DistanceSquared(n.Center, p.Center)).FirstOrDefault()
+                    ?? throw new CommandException("nothing disguised nearby");
+                var outcome = ctx.World.Interaction.Interact(p, npc, Gameplay.Interaction.ItemUseSystem.ReachMeters(p, null));
+                return outcome == Gameplay.Interaction.InteractOutcome.Unmasked
+                    ? CommandResult.Success($"The {npc.Def.Disguise!.Name ?? "thing"} was a {npc.Def.DisplayName}!")
+                    : CommandResult.Fail("Out of reach.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "spawn", Usage = "spawn <enemy> [count] [distance]", Help = "Spawns creatures in front of the player (distance in metres, default 5).",
             Run = (ctx, a) =>
             {
