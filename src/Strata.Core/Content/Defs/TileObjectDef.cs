@@ -71,6 +71,21 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Only created by world generation (cannot be crafted/placed by players).</summary>
     public bool Natural { get; init; }
 
+    /// <summary>Material sound of hits and breaks (dig_/break_&lt;sound&gt;); null: wood for axe objects, stone for pick ones.</summary>
+    public string? Sound { get; init; }
+
+    /// <summary>Colour of the chips a hit knocks off (#RRGGBB); null: a neutral wood or stone tone.</summary>
+    public string? DustColor { get; init; }
+
+    /// <summary>Leaf colour shed by hits on a tree (#RRGGBB), or null.</summary>
+    public string? Leaves { get; init; }
+
+    /// <summary>Falls over when felled (trees).</summary>
+    public bool Topple { get; init; }
+
+    /// <summary>The material sound with its default.</summary>
+    public string HitSound => Sound ?? (BreakTool == BreakTool.Pick ? "stone" : "wood");
+
     /// <summary>Automatically derive the placing item (id = <see cref="Item"/> or this id) unless natural.</summary>
     public bool AutoItem { get; init; } = true;
 

@@ -41,6 +41,8 @@ def build(table: dict):
             obj["hitPoints"] = spec["hitPoints"]
             if fam["material"] in ("granite", "marble", "obsidian", "glass", "lihzahrd_brick"):
                 obj["breakTool"] = "pick"
+            if fam["material"] in ("glass",):
+                obj["sound"] = "glass"
             obj["itemCategory"] = spec.get("category", "light" if "light" in spec else "furniture")
             if "maxStack" in spec:
                 obj["itemMaxStack"] = spec["maxStack"]

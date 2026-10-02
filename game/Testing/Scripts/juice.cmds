@@ -9,6 +9,13 @@ wait 1.0
 heal
 god on
 mark
+# Chopping a tree: chips and leaves on every hit, cracks spread, then it falls and drops wood.
+place oak_tree 3 0 0
+wield copper_axe
+aim 0.9 0.2 0
+hold use_primary 4
+wait 2
+assert inv.wood > 20
 # Mining a block throws chips and dust.
 wield copper_pickaxe
 aim 0.05 -1 0.05

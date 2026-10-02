@@ -21,6 +21,8 @@ public sealed partial class BlockEffects : Node3D
         Name = "BlockEffects";
         _kit = kit;
         game.Editor.Struck += OnStruck;
+        game.Editor.ObjectHit += OnObjectHit;
+        game.Editor.ObjectBroken += obj => ObjectBurst(obj, broke: true);
         game.Editor.BlockPlaced += (cell, def) =>
         {
             // One puff per placement (a grid block reports each of its cells).
@@ -52,6 +54,25 @@ public sealed partial class BlockEffects : Node3D
         }
         _kit.Burst(EffectRecipe.Chips, center, color, broke ? 22 : 7, broke ? 3.2f : 1.8f);
         _kit.Burst(EffectRecipe.Dust, center, color.Lightened(0.15f), broke ? 10 : 4, 1.2f);
+    }
+
+    private void OnObjectHit(Strata.Core.Voxels.TileObjects.TileObjectInstance obj, ObjectHitResult result)
+    {
+        if (result == ObjectHitResult.Damaged) ObjectBurst(obj, broke: false);
+    }
+
+    /// <summary>Chips from an object struck (5) or broken (20) in its dust colour; trees also shed leaves (8, 30).</summary>
+    private void ObjectBurst(Strata.Core.Voxels.TileObjects.TileObjectInstance obj, bool broke)
+    {
+        var b = obj.Bounds;
+        var def = obj.Def;
+        float height = def.Topple ? Mathf.Min(b.Max.Y - b.Min.Y, 6) : (b.Max.Y - b.Min.Y) * 0.5f;
+        var center = new Vector3((b.Min.X + b.Max.X) * 0.5f, b.Min.Y + height * 0.5f, (b.Min.Z + b.Max.Z) * 0.5f) * Units.CellSize;
+        var dust = Color.FromHtml(def.DustColor ?? (def.HitSound == "stone" ? "#7a7a80" : "#8a6040"));
+        _kit.Burst(EffectRecipe.Chips, center, dust, broke ? 20 : 5, broke ? 3f : 2f);
+        if (def.Leaves == null) return;
+        var canopy = new Vector3(center.X, (b.Max.Y - 2) * Units.CellSize, center.Z);
+        _kit.Burst(EffectRecipe.Leaves, canopy, Color.FromHtml(def.Leaves), broke ? 30 : 8, 1.5f);
     }
 
     private static IEnumerable<Int3> DamagedCells(MineOutcome o)

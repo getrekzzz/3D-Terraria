@@ -14,7 +14,12 @@ public sealed partial class SoundEvents
         game.Editor.Struck += OnStruck;
         game.Editor.BlockPlaced += (cell, _) => Placed(cell);
         game.Editor.ObjectPlaced += obj => Placed(obj.Anchor);
-        game.Editor.ObjectBroken += obj => Sfx.PlayAt("break_wood", Cell(obj.Anchor), -3f);
+        game.Editor.ObjectBroken += obj => Sfx.PlayAt(ObjectSound("break", obj.Def), ObjectCenter(obj), -3f);
+        game.Editor.ObjectHit += (obj, result) =>
+        {
+            if (result == ObjectHitResult.Damaged) Sfx.PlayAt(ObjectSound("dig", obj.Def), ObjectCenter(obj));
+            else if (result == ObjectHitResult.TooWeak) Sfx.PlayAt("tink", ObjectCenter(obj), -6f);
+        };
         game.Projectiles.Exploded += (at, radius) =>
         {
             _blastFrame = Engine.GetProcessFrames(); // the blast's own strike on the terrain follows at once
@@ -25,6 +30,20 @@ public sealed partial class SoundEvents
             if (def.KillGoal > 0 || def.SkyTint != null) Sfx.Play("event_start", -2f);
         };
         game.Town.Arrived += _ => Sfx.Play("npc_arrive");
+    }
+
+    /// <summary>dig_/break_ sound of an object's material (pots shatter), falling back to wood.</summary>
+    private static string ObjectSound(string action, TileObjectDef def)
+    {
+        if (action == "break" && def.HitSound == "pot") return "pot_shatter";
+        string id = $"{action}_{def.HitSound}";
+        return Sfx.Has(id) ? id : $"{action}_wood";
+    }
+
+    private static Vector3 ObjectCenter(Strata.Core.Voxels.TileObjects.TileObjectInstance o)
+    {
+        var b = o.Bounds;
+        return new Vector3((b.Min.X + b.Max.X) * 0.5f, b.Min.Y + 0.5f, (b.Min.Z + b.Max.Z) * 0.5f) * Strata.Core.Common.Units.CellSize;
     }
 
     private void OnStruck(MineOutcome o)

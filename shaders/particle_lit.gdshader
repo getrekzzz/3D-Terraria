@@ -32,8 +32,9 @@ void fragment() {
 	} else {
 		// Block light through the shared response curve plus the sky's share of daylight.
 		vec3 block = strata_block_light(vec3(1.0), voxel_light, 1.0);
-		vec3 sky = strata_sky_ambient.rgb * strata_sky_visibility(voxel_light) * 1.6;
-		ALBEDO = col * clamp(block + sky + vec3(0.02), vec3(0.0), vec3(1.6));
+		// Neutral daylight (the sky ambient's brightness, not its blue) so colours stay true outdoors.
+		vec3 sky = vec3(dot(strata_sky_ambient.rgb, vec3(0.3, 0.5, 0.2))) * strata_sky_visibility(voxel_light) * 1.5;
+		ALBEDO = col * clamp(block + sky + vec3(0.02), vec3(0.0), vec3(1.15));
 	}
 	ALPHA = a;
 }

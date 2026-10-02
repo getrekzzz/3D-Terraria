@@ -36,7 +36,7 @@ public sealed partial class SoundEvents
                 Sfx.Play("swing", item.UseTime < 18 ? -3f : 0f);
                 break;
             case UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool:
-                if (newSwing && info.IsTool) Sfx.Play("swing", item.UseTime < 18 ? -3f : 0f);
+                if (newSwing && info.IsTool) Sfx.Play("swing", -6f); // the tool's whoosh under the bite of the hit
                 // An object too tough for the tool (an altar before its time) tinks too; blocks already did where struck.
                 if (outcome == UseOutcome.TooHard && Engine.GetProcessFrames() != _tinkFrame) Sfx.Play("tink", -6f);
                 break;

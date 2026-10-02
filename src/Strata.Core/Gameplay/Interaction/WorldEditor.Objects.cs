@@ -30,6 +30,9 @@ public sealed partial class WorldEditor
     /// <summary>Raised after an object is broken by gameplay (not by chunk unloading).</summary>
     public event Action<TileObjectInstance>? ObjectBroken;
 
+    /// <summary>A tool struck an object: Damaged, Broken or TooWeak (sounds, chips, leaves, crack progress, falling trees).</summary>
+    public event Action<TileObjectInstance, ObjectHitResult>? ObjectHit;
+
     public event Action<TileObjectInstance>? ObjectPlaced;
 
     /// <summary>Places a tile object whose minimum corner is <paramref name="anchor"/>.</summary>
@@ -49,6 +52,13 @@ public sealed partial class WorldEditor
     /// furniture); decor breaks from any hit.
     /// </summary>
     public ObjectHitResult HitObject(TileObjectInstance obj, ItemDef? tool)
+    {
+        var result = HitObjectQuietly(obj, tool);
+        if (result is ObjectHitResult.Damaged or ObjectHitResult.Broken or ObjectHitResult.TooWeak) ObjectHit?.Invoke(obj, result);
+        return result;
+    }
+
+    private ObjectHitResult HitObjectQuietly(TileObjectInstance obj, ItemDef? tool)
     {
         int power = obj.Def.Decor ? 100 : obj.Def.BreakTool switch
         {

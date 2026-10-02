@@ -45,7 +45,7 @@ public sealed partial class CombatEffects
         _kit.Burst(Recipe(m.Dust.Recipe), center, DustColor(m.Dust.UseTint, m.Dust.Color, npc), npc.IsBoss ? 40 : 25, 3.5f, null, 0.2f);
         int pieces = npc.IsBoss ? 8 : m.Gore.Pieces;
         if (pieces <= 0) return;
-        float size = Mathf.Clamp(Mathf.Max(half.X, half.Y) * 0.45f, 0.08f, npc.IsBoss ? 0.6f : 0.3f);
+        float size = Mathf.Clamp(Mathf.Max(half.X, half.Y) * 0.22f, 0.06f, npc.IsBoss ? 0.45f : 0.18f);
         _gore.Spawn(center, half, pieces, size, DustColor(m.Gore.UseTint, m.Gore.Color, npc), m.Gore.Shape == "sphere", _rng);
     }
 
