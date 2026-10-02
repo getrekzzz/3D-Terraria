@@ -37,6 +37,8 @@ public sealed class PlayerSave
     public DateTime LastPlayedUtc { get; set; }
     public int MaxLife { get; set; }
     public int MaxMana { get; set; }
+    public bool ExtraAccessorySlot { get; set; }
+    public bool MinecartUpgrade { get; set; }
 
     // The full slot model (also additive): coin, ammo and trash slots, vanity, dyes, the misc row, the service slot and
     // which accessories are hidden.
@@ -91,6 +93,8 @@ public sealed class PlayerSave
         LastPlayedUtc = p.LastPlayedUtc,
         MaxLife = p.Vitals.MaxLife,
         MaxMana = p.Vitals.MaxMana,
+        ExtraAccessorySlot = p.ExtraAccessorySlot,
+        MinecartUpgrade = p.MinecartUpgrade,
     };
 
     public PlayerState ToState(ContentDatabase content)
@@ -99,6 +103,7 @@ public sealed class PlayerSave
         {
             BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, Look = Look ?? new Appearance(), Difficulty = Difficulty,
             PlayTicks = PlayTicks, CreatedUtc = CreatedUtc, LastPlayedUtc = LastPlayedUtc,
+            ExtraAccessorySlot = ExtraAccessorySlot, MinecartUpgrade = MinecartUpgrade,
         };
         p.Inventory.Content = content;
         Fill(p.Inventory.Backpack, Backpack, content);

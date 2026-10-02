@@ -232,6 +232,17 @@
         "latch": "prop:iron"
       }
     },
+    "shadow_chest": {
+      "generator": "chest",
+      "params": {
+        "wood": "dark_planks",
+        "woodTint": "#b8a0d0",
+        "band": "dark_iron",
+        "bandTint": "#8070a0",
+        "latch": "prop:plain:glow",
+        "latchTint": "#b060ff"
+      }
+    },
     "torch": {
       "generator": "torch",
       "params": {}
@@ -4119,9 +4130,27 @@
         "height": 1.6
       }
     },
-    "wyvern_head": {"generator": "wyvern_part", "params": {"part": "head", "scales": "#f0f0f8", "mane": "#9ab8e8", "radius": 0.55}},
-    "wyvern_body": {"generator": "wyvern_part", "params": {"part": "segment", "scales": "#f0f0f8", "mane": "#9ab8e8", "radius": 0.45}},
-    "wyvern_tail": {"generator": "wyvern_part", "params": {"part": "tail", "scales": "#f0f0f8", "mane": "#9ab8e8", "radius": 0.42}},
+    "wyvern_head": {
+      "generator": "sky_dragon",
+      "params": {
+        "part": "head",
+        "radius": 0.6
+      }
+    },
+    "wyvern_body": {
+      "generator": "sky_dragon",
+      "params": {
+        "part": "body",
+        "radius": 0.6
+      }
+    },
+    "wyvern_tail": {
+      "generator": "sky_dragon",
+      "params": {
+        "part": "tail",
+        "radius": 0.55
+      }
+    },
     "lihzahrd": {
       "generator": "humanoid",
       "params": {
@@ -4149,8 +4178,30 @@
         "open": true
       }
     },
-    "golem": {
-      "generator": "golem_idol",
+    "golem_body": {
+      "generator": "golem_body",
+      "params": {}
+    },
+    "golem_head": {
+      "generator": "golem_head",
+      "params": {}
+    },
+    "golem_head_free": {
+      "generator": "golem_head",
+      "params": {
+        "free": true
+      }
+    },
+    "golem_fist": {
+      "generator": "golem_fist",
+      "params": {}
+    },
+    "plantera_hook": {
+      "generator": "plantera_hook",
+      "params": {}
+    },
+    "plantera_tentacle": {
+      "generator": "plantera_tentacle",
       "params": {}
     },
     "queen_slime": {

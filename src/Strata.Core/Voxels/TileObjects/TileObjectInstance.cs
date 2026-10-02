@@ -68,8 +68,8 @@ public sealed class TileObjectInstance
     }
 
     /// <summary>
-    /// A locked container (dungeon chests until a key opens them): bulk operations such as quick stack to nearby
-    /// chests skip it. Nothing sets it yet; the locked-chest work fills it in and saves it with the object meta.
+    /// A world chest that only opens with its definition's <see cref="TileObjectDef.Lock"/> key (and cannot be broken
+    /// until then); bulk operations such as quick stack to nearby chests skip it. Saved in the chunk's object meta.
     /// </summary>
     public bool Locked { get; set; }
 

@@ -176,7 +176,12 @@ public sealed partial class TileObjectRenderer
         if (g.Objects.Count == 0 || g.Objects[0].Def.Flame is not { } flame) return;
         _bases.Clear();
         foreach (var o in g.Objects)
-            if (!o.Active || o.IsDoor) _bases.Add(Flames.BaseOf(flame, Placement.TransformOf(o)));
+        {
+            if (o.Active && !o.IsDoor) continue;
+            var t = Placement.TransformOf(o);
+            _bases.Add(Flames.BaseOf(flame, t));
+            foreach (var at in flame.Also) _bases.Add(t * new Vector3(at[0], at[1], at[2]));
+        }
         if (Same(_bases, g.FlameBases)) return;
         FreeFlames(g);
         g.FlameBases.AddRange(_bases);

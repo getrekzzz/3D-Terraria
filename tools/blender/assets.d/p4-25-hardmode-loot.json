@@ -1,0 +1,201 @@
+{
+ "comment": "P4-25: hardmode treasure bags and trophies (busts from each boss's own creature generator), the Demon Heart, the mechanical pieces and the Minecart Upgrade Kit.",
+ "objects": {
+  "queen_slime_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "slime_queen",
+    "creatureParams": {}
+   }
+  },
+  "retinazer_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "twin_eye",
+    "creatureParams": {
+     "iris": "#ff2a2a",
+     "variant": "ray",
+     "radius": 1.3
+    }
+   }
+  },
+  "spazmatism_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "twin_eye",
+    "creatureParams": {
+     "iris": "#50f040",
+     "variant": "flare",
+     "thrust": "#80ff60",
+     "radius": 1.3
+    }
+   }
+  },
+  "destroyer_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "destroyer_part",
+    "creatureParams": {
+     "part": "head"
+    }
+   }
+  },
+  "skeletron_prime_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "prime_head",
+    "creatureParams": {
+     "radius": 1.2
+    }
+   }
+  },
+  "plantera_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "plantera_bulb",
+    "creatureParams": {}
+   }
+  },
+  "golem_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "golem_idol",
+    "creatureParams": {}
+   }
+  },
+  "duke_fishron_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "duke_fishron_detailed",
+    "creatureParams": {}
+   }
+  },
+  "empress_of_light_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "empress_detailed",
+    "creatureParams": {}
+   }
+  },
+  "ancient_cultist_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "celestial_pillar",
+    "creatureParams": {}
+   }
+  },
+  "moon_lord_trophy": {
+   "generator": "trophy",
+   "params": {
+    "creature": "moon_lord_head_detailed",
+    "creatureParams": {}
+   }
+  }
+ },
+ "items": {
+  "explicit": {
+   "queen_slime_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#e07ad0",
+     "trim": "#80e0ff",
+     "emblem": "#ff80e0"
+    }
+   },
+   "the_twins_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#5a5a6a",
+     "trim": "#c0c0c8",
+     "emblem": "#ff3030"
+    }
+   },
+   "the_destroyer_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#4a4a56",
+     "trim": "#c0c0c8",
+     "emblem": "#ff4040"
+    }
+   },
+   "skeletron_prime_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#5a5a62",
+     "trim": "#e0b040",
+     "emblem": "#ff3030"
+    }
+   },
+   "plantera_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#3a8a3a",
+     "trim": "#e060a0",
+     "emblem": "#ff80c0"
+    }
+   },
+   "golem_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#8a5a2a",
+     "trim": "#e0a040",
+     "emblem": "#ffd040"
+    }
+   },
+   "duke_fishron_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#3a8a8a",
+     "trim": "#e0b040",
+     "emblem": "#80e0ff"
+    }
+   },
+   "empress_of_light_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#e0c0ff",
+     "trim": "#ffe080",
+     "emblem": "#80ffff"
+    }
+   },
+   "moon_lord_treasure_bag": {
+    "generator": "treasure_bag",
+    "params": {
+     "color": "#3a6a6a",
+     "trim": "#80ffd0",
+     "emblem": "#40ffe0"
+    }
+   },
+   "demon_heart": {
+    "generator": "heart",
+    "params": {
+     "color": "#8a1a3a"
+    }
+   },
+   "mechanical_wheel_piece": {
+    "generator": "clockwork",
+    "params": {
+     "kind": "eye",
+     "glow": "#40c0ff"
+    }
+   },
+   "mechanical_battery_piece": {
+    "generator": "clockwork",
+    "params": {
+     "kind": "worm",
+     "glow": "#40c0ff"
+    }
+   },
+   "mechanical_wagon_piece": {
+    "generator": "clockwork",
+    "params": {
+     "kind": "skull",
+     "glow": "#40c0ff"
+    }
+   },
+   "minecart_upgrade_kit": {
+    "generator": "minecart"
+   }
+  }
+ }
+}

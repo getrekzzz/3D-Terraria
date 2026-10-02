@@ -172,9 +172,11 @@ public sealed class SpawnDirector
             ctx.Light = EffectiveLight(cell.Value);
             ctx.Random = _rng;
             ctx.PlayerMaxLife = player.State.Vitals.MaxLife;
+            ctx.PlayerDefense = player.State.Defense;
             var atPlayer = session.ContextAt(origin);
             atPlayer.Light = EffectiveLight(origin);
             atPlayer.PlayerMaxLife = player.State.Vitals.MaxLife;
+            atPlayer.PlayerDefense = player.State.Defense;
             var exclusive = ctx.Biomes.Where(_exclusive.Contains).ToList();
             bool hostileHere = hostiles && !IsSafe(cell.Value, ctx.Layer);
             var eligible = _rules.Where(r => (r.Enemy.HasTag("critter") ? critters : hostileHere)

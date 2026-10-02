@@ -167,4 +167,32 @@ public class StreamerSchedulingTests
         }
         Assert.Equal(orders[0], orders[1]);
     }
+
+    [Fact]
+    public void MeshDroppedOutOfRangeIsRedoneWhenBackInRange()
+    {
+        // A remesh finishing after the focus moved away is dropped; coming back must mesh the chunk again (a dungeon
+        // teleport used to leave such chunks unmeshed forever and streaming never idle).
+        var (session, jobs, streamer) = Create();
+        using var _ = jobs;
+        var spawn = session.FindStandableNear(session.SpawnCell);
+        Pump(streamer, jobs, spawn);
+        var edge = ChunkMath.CellToChunk(spawn) + new Int3(1, 0, 0);
+        var away = spawn - new Int3(2 * ChunkMath.Size, 0, 0);
+        if (!session.World.InBounds(away.X, away.Y, away.Z) || !session.World.ChunkInBounds(edge))
+        {
+            edge = ChunkMath.CellToChunk(spawn) - new Int3(1, 0, 0);
+            away = spawn + new Int3(2 * ChunkMath.Size, 0, 0);
+        }
+        Assert.True(streamer.IsMeshed(edge));
+        streamer.MarkDirty(new[] { edge });
+        Assert.True(streamer.MeshesInFlight > 0);
+        streamer.Update(away); // out of mesh range (still loaded) before the job's result is applied
+        Pump(streamer, jobs, away);
+        var order = new List<Int3>();
+        streamer.MeshScheduled = order.Add;
+        Pump(streamer, jobs, spawn);
+        Assert.Contains(edge, order);
+        AssertCounters(streamer);
+    }
 }

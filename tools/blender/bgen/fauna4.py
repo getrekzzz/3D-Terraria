@@ -1,7 +1,7 @@
 """Common enemies at boss quality (P3-45), on the boss helpers but with modest triangle budgets (they come in crowds):
 slimes of translucent jelly with something visible inside, veined demon eyes with coloured irises and optic nerves,
-furred bats with membrane wings on finger struts, cursed skulls and the wyvern (a dragon head, legged body segments and
-a finned tail). Front faces Blender +Y."""
+furred bats with membrane wings on finger struts and cursed skulls (the Wyvern is bgen/sky_dragon.py). Front faces
+Blender +Y."""
 import math
 
 from mathutils import Vector
@@ -115,43 +115,4 @@ def cursed_skull(mb: MeshBuilder, p, rng):
         for _ in range(3):
             pts.append(pts[-1] + Vector((rng.uniform(-0.15, 0.15), rng.uniform(-0.15, 0.15), -0.18)) * r)
         mb.tube([c + (q - c).normalized() * r * 0.97 for q in pts], [r * 0.018, r * 0.014, r * 0.01, r * 0.005], "prop:plain", "#2a1e18", segments=3)
-    return None
-
-
-@generator
-def wyvern_part(mb: MeshBuilder, p, rng):
-    """The wyvern, modelled along +Y: ``part`` head (a horned dragon head with a fur mane and toothy jaws), segment
-    (a scaled ring with two small clawed legs and a mane tuft) or tail (tapering to a finned tip)."""
-    part = p.get("part", "segment")
-    scale, fur, belly = p.get("scales", "#f0f0f8"), p.get("mane", "#9ab8e8"), p.get("belly", "#c8d8f0")
-    r = p.get("radius", 0.42)
-    if part == "head":
-        organic(mb, lambda b: (b.ellipsoid((0, 0.1, 0.05), (r * 0.8, r * 1.3, r * 0.65)), b.ellipsoid((0, r * 1.2, -0.05), (r * 0.5, r * 0.8, r * 0.38))),
-                "prop:chitin", scale, tris=1300, resolution=r / 14, smooth=1, paint=lambda q, n: mix(belly, scale, 0.5 + 0.5 * n.z))
-        for sx in (-1, 1):
-            mb.sphere((sx * r * 0.4, r * 0.75, r * 0.35), r * 0.1, "prop:plain:glow", p.get("eyes", "#5ad8ff"), subdivisions=1)
-            mb.tube([Vector((sx * r * 0.35, -r * 0.1, r * 0.5)), Vector((sx * r * 0.55, -r * 0.6, r * 0.9)), Vector((sx * r * 0.5, -r * 1.1, r * 1.1))],
-                    [r * 0.12, r * 0.07, r * 0.01], "prop:bone", "#f4f0e0", segments=6)   # swept horns
-        teeth_row(mb, (-r * 0.35, r * 1.4, -r * 0.2), (r * 0.35, r * 1.4, -r * 0.2), 8, r * 0.16, (0, 0.2, -1), r * 0.05, rng)
-        for k in range(8):  # the mane
-            a = (k - 3.5) * 0.35
-            base = Vector((math.sin(a) * r * 0.6, -r * 0.3, r * 0.45 + math.cos(a) * r * 0.1))
-            mb.cylinder(tuple(base), tuple(base + Vector((math.sin(a) * r * 0.5, -r * 0.9, r * 0.35))), r * 0.12, 0.0, "prop:fur", fur, segments=5)
-        return None
-    length = p.get("length", r * 2.0)
-    taper = 0.55 if part == "tail" else 1.0
-    mb.cylinder((0, -length * 0.5, 0), (0, length * 0.5, 0), r * 0.8 * taper, r * 0.85, "prop:chitin", scale, segments=12)
-    mb.cylinder((0, -length * 0.45, -r * 0.3 * taper), (0, length * 0.45, -r * 0.35), r * 0.55 * taper, r * 0.6, "prop:chitin", belly, segments=10)
-    if part == "tail":
-        for sx in (-1, 1):  # the tail fin
-            mb.extrude_polygon([(0, -length * 0.4), (sx * r * 1.2, -length * 1.1), (sx * r * 0.2, -length * 0.1)], 0.02, "prop:fur", fur)
-        return None
-    mb.cylinder((0, 0, r * 0.75), (0, -length * 0.3, r * 1.25), r * 0.18, 0.0, "prop:fur", fur, segments=5)  # mane tuft
-    for sx in (-1, 1):
-        hip = Vector((sx * r * 0.7, 0, -r * 0.3))
-        knee = hip + Vector((sx * r * 0.45, r * 0.1, -r * 0.35))
-        mb.tube([hip, knee, knee + Vector((0, r * 0.35, -r * 0.3))], [r * 0.14, r * 0.1, r * 0.05], "prop:chitin", scale, segments=6)
-        for k in range(3):
-            tip = knee + Vector((0, r * 0.35, -r * 0.3))
-            mb.cylinder(tuple(tip), tuple(tip + Vector(((k - 1) * r * 0.08, r * 0.15, -r * 0.08))), r * 0.035, 0.0, "prop:bone", "#f4f0e0", segments=4)
     return None

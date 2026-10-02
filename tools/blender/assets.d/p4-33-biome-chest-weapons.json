@@ -1,0 +1,11 @@
+{
+ "comment": "P4-33: the six Dungeon biome-chest weapons, built with the existing gun, spear, knife and staff generators.",
+ "items": {"explicit": {
+  "piranha_gun": {"generator": "gun", "params": {"style": "rifle", "metal": "#3a8a6a", "accent": "#e8d8a8", "wood": "#2a5a4a"}},
+  "scourge_of_the_corruptor": {"generator": "spear", "params": {"metal": "#6a4a8a", "darkShaft": true, "glow": "#b06aff", "length": 1.2}},
+  "vampire_knives": {"generator": "knife", "params": {"color": "#c8303a"}},
+  "rainbow_gun": {"generator": "gun", "params": {"style": "pistol", "metal": "#e86aa8", "accent": "#7ae8ff", "glow": true}},
+  "staff_of_the_frost_hydra": {"generator": "staff", "params": {"gem": "#6ad8ff"}},
+  "desert_tiger_staff": {"generator": "staff", "params": {"gem": "#e8a040"}}
+ }}
+}

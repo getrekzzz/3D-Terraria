@@ -20,7 +20,7 @@ public static class ChunkCodec
     public const uint Magic = 0x314B4353; // "SCK1"
 
     /// <summary>
-    /// v2: object records may carry a meta list (saved chest names), flagged by a state bit. v1 chunks (no meta) still
+    /// v2: object records may carry a meta list (saved chest names, locked dungeon chests), flagged by a state bit. v1 chunks (no meta) still
     /// read; a v1 reader refuses v2 chunks instead of misreading their object records.
     /// </summary>
     public const byte FormatVersion = 2;
@@ -31,7 +31,7 @@ public static class ChunkCodec
     private const byte StateActive = 1, StateLootRolled = 2, StateHasMeta = 4;
 
     // Object meta entries: tag, length, payload, ended by MetaEnd; readers skip tags they do not know.
-    private const byte MetaEnd = 0, MetaName = 1;
+    private const byte MetaEnd = 0, MetaName = 1, MetaLocked = 2;
 
     public static byte[] Encode(ChunkData data, int mutationLevel, IReadOnlyList<TileObjectInstance> objects, ContentDatabase db, WorldIdTables ids) =>
         Encode(data, mutationLevel, EncodeObjects(objects, ids), db, ids);
@@ -192,7 +192,7 @@ public static class ChunkCodec
             w.Write((byte)o.Rotation);
             w.Write((byte)o.Variant);
             w.WriteVar(Math.Max(0, o.HitPoints));
-            bool meta = o.CustomName != null;
+            bool meta = o.CustomName != null || o.Locked;
             w.Write((byte)((o.Active ? StateActive : 0) | (o.LootRolled ? StateLootRolled : 0) | (meta ? StateHasMeta : 0)));
             w.Write(o.PendingLoot ?? "");
             if (meta) WriteObjectMeta(w, o);
@@ -246,6 +246,11 @@ public static class ChunkCodec
     private static void WriteObjectMeta(BinaryWriter w, TileObjectInstance o)
     {
         if (o.CustomName != null) w.WriteSection(MetaName, s => s.Write(o.CustomName));
+        if (o.Locked)
+        {
+            w.Write(MetaLocked); // a flag entry: no payload
+            w.WriteVar(0);
+        }
         w.Write(MetaEnd);
     }
 
@@ -258,6 +263,7 @@ public static class ChunkCodec
             int length = r.ReadVar();
             long end = r.BaseStream.Position + length;
             if (tag == MetaName) obj.CustomName = r.ReadString();
+            else if (tag == MetaLocked) obj.Locked = true;
             r.BaseStream.Position = end;
         }
     }

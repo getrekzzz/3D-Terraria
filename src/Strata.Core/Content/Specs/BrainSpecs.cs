@@ -13,9 +13,11 @@ public static class BrainSpecs
     public const string Swimmer = "swimmer";
     public const string Lunger = "lunger";
     public const string CryptWarden = "skeletron";
+    public const string Hand = "skeletronHand";
     public const string Caster = "caster";
     public const string Mawwall = "wallOfFlesh";
     public const string Pattern = "pattern";
+    public const string PlanteraHook = "planteraHook";
 
     public static void Register(SpecCatalog c)
     {
@@ -29,9 +31,11 @@ public static class BrainSpecs
         c.Register<SwimmerParams>(SpecKind.Brain, Swimmer);
         c.Register<LungerParams>(SpecKind.Brain, Lunger);
         c.Register<CryptWardenParams>(SpecKind.Brain, CryptWarden);
+        c.Register<HandParams>(SpecKind.Brain, Hand);
         c.Register<CasterParams>(SpecKind.Brain, Caster);
         c.Register<MawwallParams>(SpecKind.Brain, Mawwall);
         c.Register<PatternParams>(SpecKind.Brain, Pattern);
+        c.Register<PlanteraHookParams>(SpecKind.Brain, PlanteraHook);
     }
 }
 
@@ -102,6 +106,25 @@ public sealed class GelSovereignParams : SpecParams
     /// <summary>Minion enemy shed every <see cref="MinionEveryLife"/> fraction of life lost.</summary>
     public string? Minion { get; init; }
     public float MinionEveryLife { get; init; } = 0.08f;
+
+    /// <summary>Teleports to a target it has not seen (from its head to their eyes) for this long (ticks).</summary>
+    public int LostSightTicks { get; init; } = 300;
+
+    /// <summary>Expert: every third shed minion is this one instead (Spiked Slimes).</summary>
+    public string? ExpertMinion { get; init; }
+
+    /// <summary>Teleport wind-up (ticks) in Classic and in Expert.</summary>
+    public int TeleportTicks { get; init; } = 50;
+
+    public int ExpertTeleportTicks { get; init; } = 35;
+
+    /// <summary>Model scale (and collision box) at full life and at none: it shrinks as it loses gel.</summary>
+    public float FullScale { get; init; } = 1f;
+
+    public float EmptyScale { get; init; } = 0.6f;
+
+    /// <summary>Landing faster than this (m/s) shakes the ground (an impact and the "land" cue).</summary>
+    public float ImpactSpeed { get; init; } = 8f;
 }
 
 /// <summary>Floating eye boss: orbits and summons servants, then dashes in bursts; phase 2 below a life fraction.</summary>
@@ -117,6 +140,28 @@ public sealed class WatcherParams : SpecParams
 
     /// <summary>Model shown in phase 2 (the eye opens into a maw).</summary>
     public string? Phase2Model { get; init; }
+
+    /// <summary>Defense in phase 2 (−1 = unchanged; the Eye's falls to 0) and the contact damage multiplier.</summary>
+    public int Phase2Defense { get; init; } = -1;
+
+    public float Phase2Damage { get; init; } = 1f;
+
+    /// <summary>Extra dashes per burst in phase 2.</summary>
+    public int Phase2ExtraDashes { get; init; } = 2;
+
+    /// <summary>Entering phase 2 it spins in place, untouchable, for this long (0 = no transformation).</summary>
+    public int TransformTicks { get; init; }
+
+    /// <summary>Expert, below phase 2: one more dash per tenth of life lost, up to this many per burst (0 = off).</summary>
+    public int ExpertMaxDashes { get; init; }
+
+    /// <summary>Expert phase 2: wind-up before each dash scaled by this.</summary>
+    public float ExpertTelegraphScale { get; init; } = 1f;
+
+    /// <summary>The other of a pair (the Twins): in Expert, once it has fallen this one moves at <see cref="ExpertLoneSpeed"/>.</summary>
+    public string? Sibling { get; init; }
+
+    public float ExpertLoneSpeed { get; init; } = 1f;
 }
 
 /// <summary>Burrowing worm: steers its head towards the target through terrain, carving a tunnel.</summary>
@@ -138,6 +183,29 @@ public sealed class WormParams : SpecParams
     public string? Minion { get; init; }
     public int MinionInterval { get; init; } = 240;
     public int MaxMinions { get; init; } = 6;
+
+    /// <summary>Spat from a random body segment that sees the target every <see cref="SpitInterval"/> ticks (Vile Spit).</summary>
+    public string? SpitProjectile { get; init; }
+    public int SpitInterval { get; init; } = 180;
+    public int SpitDamage { get; init; } = 18;
+    public float SpitSpeed { get; init; } = 8f;
+
+    /// <summary>Spits only in Expert (the Eater of Worlds).</summary>
+    public bool SpitExpertOnly { get; init; }
+
+    /// <summary>
+    /// A sky serpent (the Wyvern): it never leaps or falls but flies through air and terrain alike, sweeping past its
+    /// target in wide undulating arcs, hurrying back when far, and circling its spawn point while it has no target.
+    /// </summary>
+    public bool Fly { get; init; }
+
+    /// <summary>Flight: vertical undulation of the heading (0 = straight lines), and its period in ticks.</summary>
+    public float Weave { get; init; } = 0.35f;
+    public int WeavePeriod { get; init; } = 150;
+
+    /// <summary>Flight: beyond this distance (m) from its target it flies <see cref="CatchUp"/> times faster.</summary>
+    public float FarRange { get; init; } = 30f;
+    public float CatchUp { get; init; } = 1.6f;
 }
 
 /// <summary>Lives in liquid: chases targets through water, flops helplessly on land.</summary>
@@ -163,28 +231,41 @@ public sealed class LungerParams : SpecParams, IValidatableSpec
     public string? Validate() => Reach <= 0 ? "reach must be > 0" : null;
 }
 
-/// <summary>A floating skull with two free hands: hovers over the target swiping, then spins through walls at it.</summary>
+/// <summary>
+/// A floating skull with two hands (boss parts, or legacy segments for Prime): hovers over the target, then spins
+/// through walls at it with lowered defense; in Expert its living hands armour it and it fires homing skulls.
+/// </summary>
 public sealed class CryptWardenParams : SpecParams
 {
     /// <summary>Hover height above the target (m).</summary>
     public float HoverHeight { get; init; } = 6f;
 
-    /// <summary>Distance of each hand from the skull (m).</summary>
-    public float HandSpacing { get; init; } = 2.6f;
-
-    /// <summary>Ticks between hand swipes (hands alternate).</summary>
-    public int SwipeInterval { get; init; } = 100;
-
-    /// <summary>Ticks of hovering before a spin charge, and the charge's length.</summary>
-    public int SpinInterval { get; init; } = 540;
-    public int SpinDuration { get; init; } = 240;
+    /// <summary>Ticks of hovering before a spin charge, and the charge's length (Terraria: 800 and 400).</summary>
+    public int SpinInterval { get; init; } = 800;
+    public int SpinDuration { get; init; } = 400;
 
     public float SpinSpeed { get; init; } = 9f;
 
-    /// <summary>Only the first N hands swipe (the rest are guns that hold position); 0 = every hand.</summary>
-    public int SwipingHands { get; init; }
+    /// <summary>Defense added while spinning (Terraria: −10 for Skeletron; Prime's doubles, +24).</summary>
+    public int SpinDefense { get; init; }
 
-    /// <summary>Below this life fraction the warden is enraged (faster swipes, enraged ranged attack); 0 = never.</summary>
+    /// <summary>Movement speed added per lost hand (0.25 = a quarter faster for each).</summary>
+    public float SpeedPerLostHand { get; init; } = 0.25f;
+
+    /// <summary>Expert: defense each living hand adds while hovering.</summary>
+    public int ExpertDefensePerHand { get; init; }
+
+    /// <summary>
+    /// Expert: hostile projectile fired at the target every <see cref="SkullInterval"/> ticks (half that with no hands)
+    /// while hovering, once a hand has fallen or life is below <see cref="SkullLife"/>.
+    /// </summary>
+    public string? Skull { get; init; }
+    public int SkullDamage { get; init; } = 17;
+    public float SkullSpeed { get; init; } = 8f;
+    public int SkullInterval { get; init; } = 80;
+    public float SkullLife { get; init; } = 0.75f;
+
+    /// <summary>Below this life fraction the warden is enraged (its arms copy it: their enraged ranged attacks); 0 = never.</summary>
     public float Phase2Life { get; init; }
 }
 
@@ -234,8 +315,28 @@ public sealed class MawwallParams : SpecParams, IValidatableSpec
     public int MinionInterval { get; init; } = 300;
     public int MaxMinions { get; init; } = 5;
 
+    /// <summary>
+    /// A target farther than this (m) ahead of the wall face is Tongued: <see cref="TongueBuff"/> (no item use) and reeled
+    /// at <see cref="TonguePull"/> m/s into the mouth, helpless, until it reaches it (Terraria's The Tongued).
+    /// </summary>
+    public float TongueDistance { get; init; } = 50f;
+    public string TongueBuff { get; init; } = "the_tongued";
+    public float TonguePull { get; init; } = 14f;
+
+    /// <summary>
+    /// Free creature crawling out of the mouth every <see cref="LeechInterval"/> ticks at full life (scaled by
+    /// 0.4 + 0.6 × life, so more often as the wall weakens), up to <see cref="MaxLeeches"/> alive.
+    /// </summary>
+    public string? Leech { get; init; }
+    public int LeechInterval { get; init; } = 420;
+    public int MaxLeeches { get; init; } = 4;
+
+    /// <summary>Sweep speed multiplier in Expert and Master.</summary>
+    public float ExpertSpeed { get; init; } = 1.25f;
+
     public string? Validate() =>
         Width <= 0 || Thickness <= 0 ? "width and thickness must be > 0"
         : MaxSpeed < BaseSpeed ? "maxSpeed must be >= baseSpeed"
-        : MinionInterval < 1 ? "minionInterval must be >= 1" : null;
+        : MinionInterval < 1 || LeechInterval < 1 ? "minionInterval and leechInterval must be >= 1"
+        : TongueDistance <= 0 || TonguePull <= 0 ? "tongueDistance and tonguePull must be > 0" : null;
 }

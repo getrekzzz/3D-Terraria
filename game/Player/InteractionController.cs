@@ -40,6 +40,9 @@ public sealed partial class InteractionController : Node
     /// <summary>The town resident under the crosshair within talking range (null if none).</summary>
     public Strata.Core.Gameplay.Town.TownNpc? TalkTarget { get; private set; }
 
+    /// <summary>The disguised creature (a Mimic's chest, the Lost Girl) under the crosshair, in front of any terrain hit.</summary>
+    public Strata.Core.Gameplay.Entities.Npc? DisguiseTarget { get; private set; }
+
     /// <summary>The player asked to talk to a resident (the dialog opens).</summary>
     public event System.Action<Strata.Core.Gameplay.Town.TownNpc>? TalkRequested;
 
@@ -73,6 +76,7 @@ public sealed partial class InteractionController : Node
             TalkRequested?.Invoke(resident);
             return;
         }
+        if (interact && DisguiseTarget is { } poser && OpenDisguised(poser)) return;
         if (interact && Target?.Object is { } obj && InReach)
         {
             var r = Game.Interaction.Interact(Entity, obj);
@@ -140,6 +144,8 @@ public sealed partial class InteractionController : Node
             Target = below;
             InReach = true;
         }
+        // Disguised creatures (mimics, Nymph) on the view ray in front of the terrain: right-click opens/greets them.
+        DisguiseTarget = ObjectInteraction.DisguisedAlong(Game.Npcs.All, camera, view, terrainT + 0.5f);
     }
 
     public override void _UnhandledInput(InputEvent @event)

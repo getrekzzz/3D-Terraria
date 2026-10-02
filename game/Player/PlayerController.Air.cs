@@ -142,15 +142,15 @@ public sealed partial class PlayerController
         }
         var dash = Entity.State.Effects.Dash;
         if (dash == null || UI.InputGate.GameplayBlocked) return false;
-        string[] actions = { "move_forward", "move_back", "move_left", "move_right" };
-        Vector3[] local = { Vector3.Forward, Vector3.Back, Vector3.Left, Vector3.Right };
+        var actions = DashActions;
+        var local = DashDirections;
         for (int i = 0; i < actions.Length; i++)
         {
             if (!Input.IsActionJustPressed(actions[i])) continue;
             bool doubleTap = _clock - _lastTap[i] < DoubleTapWindow;
             _lastTap[i] = _clock;
             if (!doubleTap || _dashCooldown > 0) continue;
-            horizontal = (Rig.YawBasis * local[i]).Normalized() * dash.Speed;
+            horizontal = (Rig.YawBasis * StatusDirection(local[i])).Normalized() * dash.Speed;
             _dashCooldown = dash.Cooldown / (float)Units.TicksPerSecond;
             _dashTime = 0.22f;
             _lastTap[i] = -1f;
@@ -159,6 +159,9 @@ public sealed partial class PlayerController
         }
         return false;
     }
+
+    private static readonly string[] DashActions = { "move_forward", "move_back", "move_left", "move_right" };
+    private static readonly Vector3[] DashDirections = { Vector3.Forward, Vector3.Back, Vector3.Left, Vector3.Right };
 
     /// <summary>Raised when a dash starts.</summary>
     public event System.Action? Dashed;

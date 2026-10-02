@@ -70,7 +70,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, it
     import bpy  # noqa: F401  (must load before mathutils/bmesh when running as the standalone bpy module)
     import bgen
     from bgen import icon_views, sockets as socket_gen
-    from bgen import beasts, bosses, bosses_hard, bosses_lunar, bosses_pre, bosses_pre2, bosses_pre3, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
+    from bgen import beasts, bosses, bosses_hard, bosses_lunar, bosses_pre, bosses_pre2, bosses_pre3, bosses_temple, creatures, critters, export, fauna, mechanisms, furniture, gear, horrors, human, items as item_gen, festive, lunar, mechs, nature
     from bgen.materials import PropMaterials
     from bgen.mesh import MeshBuilder, bounds as mesh_bounds, reset_scene, rng_for
 
@@ -78,7 +78,7 @@ def build(opts, spec, object_jobs, item_jobs, creature_jobs, projectile_jobs, it
                   **gear.GENERATORS, **horrors.GENERATORS, **lunar.GENERATORS, **festive.GENERATORS, **critters.ITEM_GENERATORS, **mechanisms.GENERATORS}
     # Creature generators, first module wins (creatures, fauna, beasts, …, bosses_lunar, then bosses).
     creature_generators = {}
-    for module in (bosses, bosses_lunar, bosses_hard, bosses_pre3, bosses_pre2, bosses_pre, critters, festive, lunar, horrors, mechs,
+    for module in (bosses, bosses_temple, bosses_lunar, bosses_hard, bosses_pre3, bosses_pre2, bosses_pre, critters, festive, lunar, horrors, mechs,
                    beasts, fauna, creatures):
         creature_generators.update(module.GENERATORS)
     # Generators registered with @bgen.generator (load_all imports every bgen module) join both tables; reusing a name
