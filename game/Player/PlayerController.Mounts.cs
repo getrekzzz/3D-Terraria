@@ -13,7 +13,8 @@ public sealed partial class PlayerController
     /// <summary>Handles the quick-mount key; returns true while riding (normal movement is skipped).</summary>
     private bool UpdateMount(float dt)
     {
-        bool blocked = UI.InputGate.GameplayBlocked;
+        // As walking: a modal, a text field or the controller's screen cursor (the D-pad steps it) stops the ride and the mount key.
+        bool blocked = UI.InputGate.MovementBlocked;
         if (!blocked && Input.IsActionJustPressed("quick_mount")) MountRules.QuickMount(_runtime.Game, Entity);
         if (Entity.Mount is not { } ride) return false;
         if (Entity.Minecart != null) Entity.Minecart = null;

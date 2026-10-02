@@ -1142,6 +1142,24 @@ wait 0.3
 pad rb
 wait 0.3
 assert hud.prompt_pad == 1
+# X opens the chest with the cursor on the selected hotbar slot: that press does not also take one from the slot, and
+# B closing it is not also a drop through platforms while it stays down.
+clear
+give torch 5
+select 1
+pad x
+wait 0.3
+assert ui.inventory == 1
+assert pad.cursor == 1
+assert inv.cursor == 0
+pad b down
+wait 0.2
+assert ui.inventory == 0
+assert pad.navigating == 1
+pad b up
+wait 0.2
+assert pad.navigating == 0
+assert inv.torch == 5
 pad mouse
 wait 0.2
 assert hud.prompt_pad == 0

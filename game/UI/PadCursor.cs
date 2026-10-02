@@ -40,6 +40,7 @@ public sealed partial class PadCursor : CanvasLayer
     private Control? _focus;
     private NavDirection? _heldDirection;
     private double _repeatWait;
+    private bool _closeHeld;
 
     /// <summary>Where the held stack and the tooltip follow while the controller drives a screen (null otherwise).</summary>
     public static Vector2? Pointer { get; private set; }
@@ -83,13 +84,21 @@ public sealed partial class PadCursor : CanvasLayer
     {
         bool open = _inventory.IsOpen || _dialog.IsOpen;
         bool active = open && InputDevice.UsingPad && !InputGate.ModalOtherThan(InventoryScreen.GateName) && !InputGate.TextEntry;
+        bool opened = false;
         if (active != Active)
         {
             Active = active;
+            opened = active;
             if (active) _heldDirection = HeldDirection(); // a stick already held (walking) does not step the cursor at once
-            else Release();
+            else
+            {
+                Release();
+                // B closed the screen: while it stays down it is not also "drop through platforms" in the world.
+                _closeHeld = InputDevice.UsingPad && Input.IsActionPressed(Buttons[1]);
+            }
         }
-        InputGate.PadNavigating = active;
+        if (_closeHeld && (active || !Input.IsActionPressed(Buttons[1]))) _closeHeld = false;
+        InputGate.PadNavigating = active || _closeHeld;
         if (!active)
         {
             PollButtons(false);
@@ -98,7 +107,8 @@ public sealed partial class PadCursor : CanvasLayer
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.pad_cursor");
         if (!Usable(_focus)) SetFocus(DefaultFocus(), sound: false);
         if (Direction(delta) is { } dir) Step(dir);
-        PollButtons(true);
+        // The press that opened the screen (X on a chest is also take-one) does not click the slot the cursor starts on.
+        PollButtons(!opened);
         Track();
     }
 

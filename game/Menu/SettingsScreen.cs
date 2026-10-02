@@ -50,7 +50,8 @@ public sealed partial class SettingsScreen : PanelContainer
 
     private static ScrollContainer Tab(string name, Action<VBoxContainer> build)
     {
-        var scroll = new ScrollContainer { Name = name, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        // FollowFocus: a controller stepping the focus down a long tab (Controls) scrolls it into view.
+        var scroll = new ScrollContainer { Name = name, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled, FollowFocus = true };
         var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         margin.AddThemeConstantOverride("margin_left", 12);
         margin.AddThemeConstantOverride("margin_right", 18);
