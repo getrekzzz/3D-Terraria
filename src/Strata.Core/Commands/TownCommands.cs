@@ -25,7 +25,7 @@ public static class TownCommands
         });
         r.Register(new CommandDef
         {
-            Name = "town", Usage = "town [check [force] | summon <id> [dx dy dz] | dismiss <id> | talk <id> | buy <id> <item> [count] | sell <slot 1-50> | heal <id> | curse <id> | arrivals on|off | " + TownDebugCommands.Usage + "]",
+            Name = "town", Usage = "town [check [force] | summon <id> [dx dy dz] | dismiss <id> | talk <id> | buy <id> <item> [count] | sell <slot 1-50> | heal <id> | curse <id> | arrivals on|off | " + TownDebugCommands.Usage + " | " + TownServiceCommands.Usage + "]",
             Help = "Lists residents with their homes and prices, or manages the town.",
             Run = (ctx, a) =>
             {
@@ -69,7 +69,7 @@ public static class TownCommands
                         town.ArrivalsEnabled = a.Str(1, "on|off") == "on";
                         return CommandResult.Success($"Arrivals {(town.ArrivalsEnabled ? "on" : "off")}.");
                     default:
-                        return TownDebugCommands.TryRun(ctx, a) ?? throw new CommandException("unknown town subcommand");
+                        return TownDebugCommands.TryRun(ctx, a) ?? TownServiceCommands.TryRun(ctx, a) ?? throw new CommandException("unknown town subcommand");
                 }
             },
         });

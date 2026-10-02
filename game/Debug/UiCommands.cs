@@ -13,7 +13,7 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close|export-theme>",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close|export-theme|" + TownUiCommands.Usage + ">",
             Help = "Opens or closes gameplay screens; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
@@ -45,8 +45,9 @@ public static class UiCommands
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
+                        world.TownPanels?.CloseAll();
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, close or export-theme");
+                    default: return TownUiCommands.TryRun(ctx, a, world) ?? throw new CommandException("expected inventory, map, talk, shop, close, export-theme or " + TownUiCommands.Usage);
                 }
             },
         });

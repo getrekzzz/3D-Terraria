@@ -37,6 +37,7 @@ public sealed partial class PlayerAvatar : Node3D
         if (ResourceLoader.Exists("res://" + model)) _visual.SetAppearance(look);
         // Full detail up close: simplified LODs let the hair shell sink into the scalp.
         _visual.SetLodBias(8f);
+        InitializeLook(ResourceLoader.Exists("res://" + model));
     }
 
     public override void _Process(double delta)
@@ -53,6 +54,7 @@ public sealed partial class PlayerAvatar : Node3D
         Animate(entity, (float)delta);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
         UpdateArmor((float)delta);
+        UpdateLook(delta);
     }
 
     /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>

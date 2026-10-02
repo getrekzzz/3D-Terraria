@@ -10,6 +10,7 @@ public static class TownServiceSpecs
     public const string Taxes = "taxes";
     public const string AnglerQuest = "anglerQuest";
     public const string WorldStatus = "worldStatus";
+    public const string Haircut = "haircut";
 
     public static void Register(SpecCatalog c)
     {
@@ -20,6 +21,7 @@ public static class TownServiceSpecs
         c.Register<TaxServiceParams>(SpecKind.TownService, Taxes);
         c.Register<AnglerQuestParams>(SpecKind.TownService, AnglerQuest);
         c.Register<WorldStatusParams>(SpecKind.TownService, WorldStatus);
+        c.Register<HaircutParams>(SpecKind.TownService, Haircut);
     }
 }
 

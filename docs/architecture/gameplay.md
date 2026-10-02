@@ -595,3 +595,14 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   Sleep; no errands or steering while seated. They get up at dawn plus a personal delay of up to an hour, when talked
   to, when a threat comes into sight, when the seat disappears, or when they die. Residents never share a seat
   (`Taken`). Probe `town.<id>.sitting`.
+
+## The Stylist and hair dyes (P5-21)
+
+`TownServices.Haircut(npc, player, style, colorHex)` (the `haircut` service, `HaircutParams` price per new style
+plus a colour price, times the happiness price factor) validates the style against `Appearance.StylesFor` and the
+hex colour, charges like the other services and raises `PlayerState.LookChanged`. Hair dyes are items with the
+`hairDye` behaviour (`HairDyeParams.Mode`: static, life, mana, depth, time, money, speed, rainbow, remove); using one
+sets `Appearance.HairDye` (saved with the look) and `HairDyes.ColorFor` computes the colour as a pure function of
+life, mana, world layer, hour, coins, speed and tick. `PlayerAvatar.Look` re-applies the look on `LookChanged` (the
+hair model swaps in place) and re-tints a dynamic dye twice a second. `HaircutPanel` (preview, styles, swatches,
+price, Buy) is opened through `TownPanels`; console `ui haircut <id>`, `town haircut <id> <style> <#rrggbb>`.

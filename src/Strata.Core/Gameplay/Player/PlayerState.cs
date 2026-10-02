@@ -65,6 +65,11 @@ public sealed class PlayerState
 
     public Appearance Look { get; set; } = new();
 
+    /// <summary>The look changed in play (a haircut, a hair dye): the avatar re-applies it.</summary>
+    public event Action? LookChanged;
+
+    public void RaiseLookChanged() => LookChanged?.Invoke();
+
     public CharacterDifficulty Difficulty { get; set; }
 
     /// <summary>Time played with this character (ticks), shown in the character list.</summary>

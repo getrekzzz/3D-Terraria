@@ -4926,6 +4926,10 @@
    },
    "icon": "assets/icons/items/demonite_shortsword.png"
   },
+  "depth_hair_dye": {
+   "model": "assets/models/items/depth_hair_dye.glb",
+   "icon": "assets/icons/items/depth_hair_dye.png"
+  },
   "depth_meter": {
    "model": "assets/models/items/depth_meter.glb",
    "icon": "assets/icons/items/depth_meter.png"
@@ -5893,6 +5897,10 @@
    "model": "assets/models/items/guide_voodoo_doll.glb",
    "icon": "assets/icons/items/guide_voodoo_doll.png"
   },
+  "hair_dye_remover": {
+   "model": "assets/models/items/hair_dye_remover.glb",
+   "icon": "assets/icons/items/hair_dye_remover.png"
+  },
   "hallowed_bar": {
    "model": "assets/models/items/hallowed_bar.glb",
    "icon": "assets/icons/items/hallowed_bar.png"
@@ -6521,6 +6529,10 @@
    "model": "assets/models/items/life_fruit.glb",
    "icon": "assets/icons/items/life_fruit.png"
   },
+  "life_hair_dye": {
+   "model": "assets/models/items/life_hair_dye.glb",
+   "icon": "assets/icons/items/life_hair_dye.png"
+  },
   "lifeforce_potion": {
    "model": "assets/models/items/lifeforce_potion.glb",
    "icon": "assets/icons/items/lifeforce_potion.png"
@@ -6728,6 +6740,10 @@
    "model": "assets/models/items/mana_flower.glb",
    "icon": "assets/icons/items/mana_flower.png"
   },
+  "mana_hair_dye": {
+   "model": "assets/models/items/mana_hair_dye.glb",
+   "icon": "assets/icons/items/mana_hair_dye.png"
+  },
   "mana_potion": {
    "model": "assets/models/items/mana_potion.glb",
    "icon": "assets/icons/items/mana_potion.png"
@@ -6811,6 +6827,10 @@
   "martian_drone_banner": {
    "object": "martian_drone_banner",
    "icon": "assets/icons/items/martian_drone_banner.png"
+  },
+  "martian_hair_dye": {
+   "model": "assets/models/items/martian_hair_dye.glb",
+   "icon": "assets/icons/items/martian_hair_dye.png"
   },
   "martian_officer_banner": {
    "object": "martian_officer_banner",
@@ -6935,6 +6955,10 @@
   "molten_legion_flag": {
    "object": "molten_legion_flag",
    "icon": "assets/icons/items/molten_legion_flag.png"
+  },
+  "money_hair_dye": {
+   "model": "assets/models/items/money_hair_dye.glb",
+   "icon": "assets/icons/items/money_hair_dye.png"
   },
   "moon_lord_treasure_bag": {
    "model": "assets/models/items/moon_lord_treasure_bag.glb",
@@ -8056,6 +8080,10 @@
    },
    "icon": "assets/icons/items/rainbow_gun.png"
   },
+  "rainbow_hair_dye": {
+   "model": "assets/models/items/rainbow_hair_dye.glb",
+   "icon": "assets/icons/items/rainbow_hair_dye.png"
+  },
   "rainbow_rod": {
    "model": "assets/models/items/rainbow_rod.glb",
    "sockets": {
@@ -8911,6 +8939,10 @@
    "model": "assets/models/items/specular_fish.glb",
    "icon": "assets/icons/items/specular_fish.png"
   },
+  "speed_hair_dye": {
+   "model": "assets/models/items/speed_hair_dye.glb",
+   "icon": "assets/icons/items/speed_hair_dye.png"
+  },
   "spell_tome": {
    "model": "assets/models/items/spell_tome.glb",
    "sockets": {
@@ -9260,6 +9292,10 @@
    "object": "tim_banner",
    "icon": "assets/icons/items/tim_banner.png"
   },
+  "time_hair_dye": {
+   "model": "assets/models/items/time_hair_dye.glb",
+   "icon": "assets/icons/items/time_hair_dye.png"
+  },
   "timer_1_second": {
    "object": "timer_1_second",
    "icon": "assets/icons/items/timer_1_second.png"
@@ -9594,6 +9630,10 @@
   "turtle_shell": {
    "model": "assets/models/items/turtle_shell.glb",
    "icon": "assets/icons/items/turtle_shell.png"
+  },
+  "twilight_hair_dye": {
+   "model": "assets/models/items/twilight_hair_dye.glb",
+   "icon": "assets/icons/items/twilight_hair_dye.png"
   },
   "twinkle_popper_banner": {
    "object": "twinkle_popper_banner",

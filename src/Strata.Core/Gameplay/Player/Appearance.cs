@@ -51,6 +51,9 @@ public sealed class Appearance
     public string PantsColor { get; set; } = "#3a4a6a";
     public string ShoeColor { get; set; } = "#5a3c26";
 
+    /// <summary>The hair dye last used (an item id with a <c>hairDye</c> behaviour), or null for natural hair.</summary>
+    public string? HairDye { get; set; }
+
     /// <summary>The hair styles offered for a body (every style suits either).</summary>
     public static string[] StylesFor(string body) => HairStyles;
 

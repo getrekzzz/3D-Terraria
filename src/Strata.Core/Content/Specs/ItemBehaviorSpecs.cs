@@ -47,6 +47,9 @@ public static class ItemBehaviorSpecs
     /// <summary>Paints the aimed block with the first paint in the backpack, or scrapes paint off (Paintbrush, Paint Scraper).</summary>
     public const string PaintTool = "paint";
 
+    /// <summary>Dyes the user's hair (Life, Mana, Depth, Money, Time… Hair Dye; the remover clears it).</summary>
+    public const string HairDye = "hairDye";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
@@ -72,6 +75,7 @@ public static class ItemBehaviorSpecs
         c.Register<MinecartParams>(SpecKind.ItemBehavior, Minecart);
         c.Register<Gameplay.Mounts.MountParams>(SpecKind.ItemBehavior, Mount);
         c.Register<PaintToolParams>(SpecKind.ItemBehavior, PaintTool);
+        c.Register<HairDyeParams>(SpecKind.ItemBehavior, HairDye);
     }
 }
 

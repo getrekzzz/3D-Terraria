@@ -125,3 +125,18 @@ wait_until town.arms_dealer.attacks > 0 15
 killall
 god off
 assert errors == 0
+
+# --- P5-21 ---
+# The Stylist's haircut: the panel opens, a paid cut changes the look, and a hair dye is used.
+town summon stylist 1 0 -3
+town services stylist
+ui haircut stylist
+assert ui.haircut_open == 1
+ui close
+assert ui.haircut_open == 0
+give gold_coin 10
+town haircut stylist mohawk #3a6ab0
+give life_hair_dye 1
+assert inv.life_hair_dye == 1
+town dismiss stylist
+assert errors == 0
