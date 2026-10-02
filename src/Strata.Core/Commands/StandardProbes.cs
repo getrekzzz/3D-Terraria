@@ -31,6 +31,8 @@ internal static class StandardProbes
         ctx.AddProbe("player.hotbar", () => ctx.Player.State.Inventory.SelectedHotbar); // 0-based
         ctx.AddProbe("time.hour", () => w.Session.Clock.Hour);
         ctx.AddProbe("time.day", () => w.Session.Clock.IsDay ? 1 : 0);
+        ctx.AddProbe("time.scale", () => w.TimeScale);
+        ctx.AddProbe("player.sleeping", () => ctx.Player.Sleeping ? 1 : 0);
         ctx.AddProbe("drops.count", () => w.Drops.Items.Count);
         ctx.AddPrefixProbe("drops.", id => w.Session.Content.Items.Contains(id) ? w.Drops.Items.Where(d => d.Stack.Item?.Id == id).Sum(d => d.Stack.Count) : null);
         ctx.AddProbe("chunks.loaded", () => w.Streamer.LoadedCount);

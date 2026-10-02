@@ -14,7 +14,7 @@ namespace Strata.Game.Player;
 /// </summary>
 public sealed partial class CameraRig : Node3D
 {
-    private const float EyeHeight = 1.6f;
+    public const float EyeHeight = 1.6f;
     private const float ProbeRadius = 0.22f;
     private static readonly Vector3 Shoulder = new(0.55f, 0.1f, 0);
 

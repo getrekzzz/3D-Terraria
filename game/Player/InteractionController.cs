@@ -85,6 +85,7 @@ public sealed partial class InteractionController : Node
         bool fresh = overlay ? tapped || (held && !_useHeld) : Input.IsActionJustPressed(UsePrimary);
         _useHeld = held;
         if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.HotkeysBlocked) return;
+        if (Entity.Sleeping || _player.WokeFrame == Engine.GetPhysicsFrames()) return; // in bed, or the press got them up (P3-34)
 
         if ((fresh || held) && !useBlocked)
         {

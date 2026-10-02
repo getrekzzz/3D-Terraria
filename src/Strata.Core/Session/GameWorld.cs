@@ -174,11 +174,13 @@ public sealed partial class GameWorld : IDisposable
             // Captures on this thread, writes in the background; retried next tick while the last one is still landing.
             if (BeginAutosave()) _autosaveCounter = 0;
         }
+        AdvanceSleepClock();
     }
 
     private void TickPlayer(PlayerEntity p)
     {
         var state = p.State;
+        TickSleep(p);
         if (!p.Alive)
         {
             p.Hook.Reset(); // the chain does not hang from a corpse or follow it to the respawn point
@@ -214,7 +216,7 @@ public sealed partial class GameWorld : IDisposable
         if (state.Buffs.Tick()) state.Recompute();
         int dps = state.Effects.DamagePerSecond;
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
-        if (Session.Clock.Tick % Units.TicksPerSecond == 0)
+        if (RealTick % Units.TicksPerSecond == 0) // real seconds, also while sleep runs the clock fast
         {
             if (dps > 0 && p.Alive)
                 HurtPlayerDirect(p, dps, DamageKind.Periodic,
