@@ -8,8 +8,6 @@
     "liquids.json",
     "mutations.json",
     "progression.json",
-    "town.json",
-    "town_residents.json",
     "blocks/built.json",
     "blocks/dungeon.json",
     "blocks/hardmode.json",
@@ -70,6 +68,9 @@
     "tileobjects/nature.json",
     "tileobjects/stations.json",
     "tileobjects/trophies.json",
+    "town/hardmode.json",
+    "town/pre_hardmode.json",
+    "town/visitors.json",
     "worldgen/aether.json",
     "worldgen/ores.json",
     "items/generated/ore_tiers.json"

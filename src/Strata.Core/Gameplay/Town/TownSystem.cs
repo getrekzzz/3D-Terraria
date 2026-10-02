@@ -98,9 +98,13 @@ public sealed partial class TownSystem
         {
             var ctx = TownContext(player);
             ctx.Biomes = _world.Session.ContextAt(room.HomeNode!.Value + Int3.Up).Biomes;
+            ctx.Random = _rng; // chance conditions (the Party Girl) draw from the town's stream
             foreach (var def in _world.Session.Content.TownNpcs.All)
             {
-                if (Find(def.Id) != null || def.Starter || def.Landmark != null || !_arrival[def.Id].Evaluate(ctx) || HasLeft(def, ctx)) continue;
+                if (Find(def.Id) != null || def.Starter || def.Landmark != null) continue;
+                bool ok = _arrival[def.Id].Evaluate(ctx) && !HasLeft(def, ctx);
+                _rng = ctx.Random;
+                if (!ok) continue;
                 var npc = Create(def, room.HomeNode!.Value);
                 SetHome(npc, room);
                 Arrived?.Invoke(npc);

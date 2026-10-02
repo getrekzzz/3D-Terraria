@@ -449,3 +449,9 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   NotSuitable / NotAResident for landmark keepers and bound NPCs / AlreadyHome) and `Evict(npc)`; valid homes are
   kept until the room breaks. `TownNpc.BannerCell` marks the banner spot (found again after load). Console:
   `housing query|assign|evict`; probe `town.<id>.homed`.
+* **Town data** lives in `data/town/pre_hardmode.json`, `hardmode.json` and `visitors.json`, one NPC per line, with
+  Terraria 1.4.4 move-in rules: rescued NPCs (Angler, Golfer, Stylist, Goblin Tinkerer, Mechanic, Tavernkeep, Wizard,
+  Tax Collector) need `rescued`; Demolitionist and Nurse need the Merchant; the Dryad any boss; the Zoologist 10%
+  bestiary; the Dye Trader a dye and 4 residents; the Party Girl 14 residents and a 2.5% roll (drawn from the town
+  stream); Santa the Frost Legion and Christmas (he leaves after); the Princess 3 residents. Visiting merchants are
+  inert (`flag never`) until visits exist.

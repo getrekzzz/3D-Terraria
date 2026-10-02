@@ -95,6 +95,9 @@ public static partial class ContentValidator
                 break;
             case "rescued":
                 ctx.Ref(owner, ctx.Db.TownNpcs, Str("id"), "rescued condition");
+                // Until rescue blocks exist (P5-06) nothing in the world sets the flag; then this becomes an error.
+                if (ctx.Db.TownNpcs.Contains(Str("id") ?? ""))
+                    ctx.Warn(owner, $"rescued condition: '{Str("id")}' has no rescue block yet, so only 'flag rescued_{Str("id")}' frees them.");
                 break;
             case "killed":
                 ctx.Ref(owner, ctx.Db.Enemies, Str("enemy"), "killed condition");
