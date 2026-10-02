@@ -25,7 +25,8 @@
 | 21 | P3-06 grip per use style, P3-07 first-person poses, swing curve from `bladeCurve`, rapier melee prefixes, mounted `sit` | full headless CI green (1390 Core tests, 21/21 smoke, MENU PASS) |
 | 22 | P3-29 hearts and mana stars (reviewed) | full headless CI green (1396 Core tests, 21/21 smoke, MENU PASS) |
 | 23 | P3-29 review fixes, P3-36 3D dropped items | full headless CI green (1398 Core tests, 21/21 smoke, MENU PASS) |
-| 24 | X-09 creator menu rows (after P2-30); per-style hand frames (needs a tuning pass) | pending |
+| 24 | P3-27 sound sets and SFX voice pool | full headless CI green (1403 Core tests, 21/21 smoke, MENU PASS) |
+| 25 | W4 merge, P3-34 bed sleep, X-09 creator menu rows; per-style hand frames (needs a tuning pass) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -192,3 +193,10 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   billboard only as a fallback; spin + bob; additive rarity halo (`shaders/drop_halo.gdshader`); lights from the
   DynamicLights pool capped by preset `dropLights` (0/2/4/6). Probes `dropvis.*`. Perf (headless, 150 drops spread 2 cells apart, 108 drawn after stack merging: 92 models + 16 cubes, 23 halos, 2 lights): `gd.drops` 0.172 ms/frame avg, 1.89 ms max (target < 0.5 ms met); `tick.drops` peaks 2.8 ms; two 160-200 ms frames in that run are not attributed to drops (largest listed counter 2.8 ms; not investigated). Gaps:
   drops cast no shadows; thin swords read narrow edge-on.
+
+## Push 24 notes
+* **Sound sets (P3-27)**: `Strata.Core.Presentation.ItemSounds` (item `soundSet` > use-style `sound`/`heavySound` >
+  old fallback), `SfxVoicePool` (3 voices per sound id, steal oldest, 24 voices per 2D/3D bus, far 3D sounds skipped),
+  validator checks sound ids. 12 new synthesised sounds (`tools/audio/sfx_recipes_items.py`). Probes `sfx.*`. Gaps: no
+  listening pass; buff potions now play `potion` (louder than the old `heal`); stars/snore/piggy-bank sounds left to
+  their WPs.
