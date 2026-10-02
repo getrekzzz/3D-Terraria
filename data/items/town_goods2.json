@@ -1,7 +1,6 @@
 {
-  // Town goods added with the NPC slice. Purification Powder frees the Tortured Soul (it borrows Butterfly Dust's art
-  // until its own model and icon are built). One item per line.
+  // Town goods added with the NPC slice. Purification Powder frees the Tortured Soul. One item per line.
   "items": [
-    {"id": "purification_powder", "name": "Purification Powder", "description": "Cleanses the evil", "category": "consumable", "maxStack": 9999, "value": 75, "model": "items/butterfly_dust", "icon": "butterfly_dust", "covers": ["terraria:purification_powder"]}
+    {"id": "purification_powder", "name": "Purification Powder", "description": "Cleanses the evil", "category": "consumable", "maxStack": 9999, "value": 75, "covers": ["terraria:purification_powder"]}
   ]
 }
