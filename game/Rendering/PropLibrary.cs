@@ -46,8 +46,17 @@ public sealed partial class PropLibrary
     /// <summary>Errors found while loading (missing files, unknown layers); surfaced by the smoke test.</summary>
     public List<string> Problems { get; } = new();
 
+    /// <summary>Records a problem once (a missing model asked for every frame is reported a single time).</summary>
+    public void Report(string problem)
+    {
+        if (_reported.Add(problem)) Problems.Add(problem);
+    }
+
+    private readonly HashSet<string> _reported = new();
+
     /// <summary>
     /// The mesh of a model with prop materials, or null when the file is missing (reported in <see cref="Problems"/>).
+    /// Loads synchronously (finishing a pending threaded load): for the player's own gear, which must show at once.
     /// <paramref name="multimesh"/> selects materials that read light from MultiMesh custom data.
     /// </summary>
     public Mesh? Model(string projectPath, bool multimesh)
@@ -55,26 +64,49 @@ public sealed partial class PropLibrary
         var key = (projectPath, multimesh);
         if (_meshes.TryGetValue(key, out var cached)) return cached;
         var path = "res://" + projectPath;
+        return Build(key, AssetCache.LoadNow<PackedScene>(path), path);
+    }
+
+    /// <summary>
+    /// Like <see cref="Model"/>, but a model not loaded yet is requested on a loader thread and reported Pending (nothing
+    /// is cached or reported); ask again on a later frame. Sockets and bounds are available once it is Ready.
+    /// </summary>
+    public AssetState TryModel(string projectPath, bool multimesh, out Mesh? mesh)
+    {
+        var key = (projectPath, multimesh);
+        if (_meshes.TryGetValue(key, out mesh)) return mesh != null ? AssetState.Ready : AssetState.Missing;
+        var path = "res://" + projectPath;
+        if (AssetCache.TryGet<PackedScene>(path, out var scene) == AssetState.Pending) return AssetState.Pending;
+        mesh = Build(key, scene, path);
+        return mesh != null ? AssetState.Ready : AssetState.Missing;
+    }
+
+    /// <summary>True while a model is loading on a loader thread.</summary>
+    public static bool IsPending(string projectPath) => AssetCache.IsPending("res://" + projectPath);
+
+    private Mesh? Build((string Path, bool Custom) key, PackedScene? packed, string path)
+    {
         Mesh? result = null;
-        if (!ResourceLoader.Exists(path))
-        {
-            Problems.Add($"missing model {path}");
-        }
+        if (packed == null) Report($"missing model {path}");
         else
         {
-            var scene = GD.Load<PackedScene>(path).Instantiate();
+            using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("assets.instantiate");
+            var scene = packed.Instantiate();
             var source = FindMesh(scene);
-            if (source == null) Problems.Add($"model {path} contains no mesh");
+            if (source == null) Report($"model {path} contains no mesh");
             else
             {
-                result = Retarget(source.Mesh, multimesh, path);
-                CollectSockets(projectPath, source);
+                result = Retarget(source.Mesh, key.Custom, path);
+                CollectSockets(key.Path, source);
             }
             scene.Free();
         }
         _meshes[key] = result;
         return result;
     }
+
+    /// <summary>The materials made so far (shader warm-up).</summary>
+    public IEnumerable<ShaderMaterial> Materials => _materials.Values;
 
     public ShaderMaterial Material(string slot, bool multimesh)
     {

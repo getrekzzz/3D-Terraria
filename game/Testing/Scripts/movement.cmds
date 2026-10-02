@@ -141,5 +141,6 @@ equip copper_chainmail
 equip copper_greaves
 wait 0.2
 assert avatar.armor_pieces >= 8
+wait_until assets.pending == 0 60
 assert props.problems == 0
 assert errors == 0

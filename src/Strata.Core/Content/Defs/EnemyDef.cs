@@ -109,6 +109,28 @@ public sealed class EnemyDef : ContentDef
 
     public float Width => Size.Length > 0 ? Size[0] : 2f;
     public float Height => Size.Length > 1 ? Size[1] : 2f;
+
+    /// <summary>
+    /// Every creature model this enemy shows (head, body segments, tail, free parts, arms, barrier), distinct, for
+    /// preloading.
+    /// </summary>
+    public IReadOnlyList<string> ModelNames()
+    {
+        var names = new List<string> { Model ?? Id };
+        void Add(string? name)
+        {
+            if (name != null && !names.Contains(name)) names.Add(name);
+        }
+        if (Boss is { } boss)
+        {
+            Add(boss.SegmentModel);
+            Add(boss.TailModel);
+            foreach (var part in boss.SegmentModels) Add(part);
+            Add(boss.ArmModel);
+            Add(boss.BarrierModel);
+        }
+        return names;
+    }
 }
 
 public enum SpawnPlacement

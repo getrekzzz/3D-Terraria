@@ -82,6 +82,7 @@ public static partial class WorldLauncher
         var (props, objectRenderer) = AddWorldObjects(runtime);
         LoadConfigs(game, services);
         var creatures = AddCreatureRenderers(runtime, game, props);
+        AddPreloading(runtime, services, game, props, creatures);
         AddWorldEffects(runtime, services, game, objectRenderer, creatures);
 
         if (o.FreeCamera) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };

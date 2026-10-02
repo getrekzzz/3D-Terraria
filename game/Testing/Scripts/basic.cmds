@@ -93,4 +93,5 @@ assert errors == 0
 assert sockets.minishark >= 2
 assert sockets.wooden_bow >= 2
 assert sockets.copper_shortsword >= 2
+wait_until assets.pending == 0 60
 assert props.problems == 0

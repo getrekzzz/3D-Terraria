@@ -122,7 +122,12 @@ Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class 
 * Only one sky light casts shadows at a time (the moon waits for sunset).
 * SSAO/SSIL can run at half resolution (`ssaoHalf`/`ssilHalf`); high and ultra do.
 * `DynamicResolution` lowers the 3D resolution (FSR, down to 60%) only when the measured GPU time shows the GPU is the
-  bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync).
+  bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync). The
+  decisions are `Strata.Core.Presentation.ResolutionGovernor`'s (tested): 30-frame windows without hitch frames over
+  50 ms, one level down after 2 slow GPU-bound windows, one up only when the GPU time predicted at the next level
+  (gpu × (next/current)²) stays under 12 ms for 4 windows and 8 s after the last step down, levels 1.0/0.9/0.8/0.7/0.6
+  capped at the preset's scale, 3 s between changes; so it no longer flips (each change reallocates buffers). Probe
+  `render.scale_changes`, timer `gd.dynres.change`.
 * F3 shows GPU and render-CPU milliseconds, the current 3D scale and the preset.
 
 ## Measuring hitches
@@ -166,6 +171,28 @@ the last draw instead, i.e. the main thread's own work, and the summary says "fr
   compare the `perf spikes` summary (p99, max, spike counts, GC) and which timers still appear in the spike list.
   Lavapipe timings only compare with other lavapipe runs (they also share the CPU with the software rasteriser, and
   physics runs its 8-step catch-up every frame). The W0 baseline, before any lag fix, is `docs/perf/perf-before.txt`.
+
+## Threaded asset loading
+`game/Rendering/AssetCache.cs` loads creature models, animation sets and prop models on Godot's loader threads
+(`ResourceLoader.LoadThreadedRequest`); `AssetPump` (added by the world launcher, process priority -100) moves up to
+four finished loads per frame into a strong-reference cache. Everything else stays on the main thread: the loader only
+parses resources, nodes are instantiated by callers (timer `assets.instantiate`). `CreatureVisual.Create` returns null
+while a model or its animation set is pending (creature and town renderers retry every frame), projectiles show their
+glow fallback until a model is ready, and `PropLibrary.TryModel` reports Pending without caching a null. The player's
+own body, held items, armour, hair and the menu preview load synchronously (`LoadNow`, `PropLibrary.Model`), which
+also finishes a pending request. Missing files are cached and reported once. Probes: `assets.pending`,
+`assets.loaded`; smoke scripts that assert on fresh creature visuals first `wait_until assets.pending == 0 60`.
+The cache is cleared when the world closes.
+
+`AssetPreloader` requests by relevance, never everything: at launch every humans' animation set, town residents and
+the carried items with their projectiles; each streamed-in chunk's tile-object models; every 2 s the residents, the
+carried items, the bosses of carried summoning items, and `SpawnDirector.LikelyEnemies` (rules passing where the
+player stands, light ignored, plus rules naming a biome there) with `EnemyDef.ModelNames()` (head, segments, tail,
+parts, arms, barrier). The first six likely kinds are pre-warmed into `NpcRenderer`'s pool (`Prewarm`, one visual
+per frame; 1 per kind on the low preset, 2 otherwise); pooled visuals have processing disabled. `ShaderWarmup` draws
+every prop-library material plus the flame, lit-sprite and projectile-glow materials, as a mesh and a MultiMesh, at
+0.01 scale 1 m before the camera for two frames once the first batch is in (or after 2 s). Probes
+`assets.preloaded`, `npcs.prewarmed`, `render.warmed`.
 
 ## Global shader parameters (`project.godot`)
 `strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,
