@@ -133,7 +133,7 @@ public sealed partial class ViewModel : Node3D
         if (active && entity.UseSerial != _serial)
         {
             _serial = entity.UseSerial;
-            _action = PlayerAvatar.ActionFor(_item!, _game.Uses[_item!]);
+            _action = PlayerAvatar.ActionFor(_game, _game.Uses[_item!]);
             _phase = 0f;
             if (_engage > 0f)
             {
@@ -212,7 +212,7 @@ public sealed partial class ViewModel : Node3D
         _engage = 0f;
         _chain = 1f;
         _kick = 0f;
-        _style = item == null ? "use" : PlayerAvatar.ActionFor(item, _game.Uses[item]);
+        _style = item == null ? "use" : PlayerAvatar.ActionFor(_game, _game.Uses[item]);
         _ranged = _style is UseTiming.Bow or Shoot or Cast;
         _rest = _ranged ? RangedRest(_style) : Idle;
         _ammoClock = 0f; // look for arrows now: the nocked arrow is ready before the first shot

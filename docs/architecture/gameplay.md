@@ -1,13 +1,26 @@
 # Gameplay systems
 
-* **Items** — `ItemUseTable` infers actions from stats (pick/axe/hammer power, place targets, projectiles,
-  healing) plus explicit `behaviors`. `ItemUseSystem` enforces use time, auto-reuse and reach, and performs
+* **Items** — `ItemUseTable` infers actions from stats (pick/axe/hammer power, place targets) and the use style
+  (below) plus explicit `behaviors`. `ItemUseSystem` enforces use time, auto-reuse and reach, and performs
   mining (brush sized by `mineBrush`, precision mode = 1 cell), chopping, hammer reshaping, block/object
   placement (shape + facing rotation), consumption (healing fatigue, permanent life/mana caps) and shooting
   (ammo classes, mana). A sword that also shoots (Starfury, Terra Blade) swings with every shot and still swings
   when the shot cannot fire; `noMelee` items (Zenith) only animate their swing. `shootProjectile.maxActive` caps
   how many of a weapon's projectiles one player has out (unset: one for returning projectiles, otherwise no cap;
   0: no cap); a capped use is refused before any ammo or mana is spent.
+* **Use styles** — `ItemDef.UseStyle` is Terraria's vocabulary: `swing` (swords, tools, summon staves, fishing rods,
+  nets, buckets, wiring and paint tools), `rapier` (shortswords), `spear`, `shoot`, `gun` (magic guns too), `bow`,
+  `staff`, `tome`, `throw` (boomerangs, shuriken, knives, bombs), `yoyo`, `flail`, `whip`, `holdUp` (boss and event
+  summons, crystals, mirrors, crates), `drink`, `eat` and `place`. `UseStyleRules` resolves an item's style
+  (`ItemUseInfo.Style`; data without one is inferred: tools swing, placers place, Well Fed food is eaten, other
+  healing and buffs are drunk, summons are held up, hooks shoot, arrow weapons are bows, other ammo weapons guns, magic
+  weapons with a projectile staffs) and the actions it implies: a swing hits only with a melee weapon, a rapier or
+  spear thrusts only then (`noMelee` spears hit with their projectile), every releasing style shoots when the item has
+  a projectile or ammo, a whip lashes as melee, and drinking, eating or holding up uses an item that heals or buffs.
+  How each style looks is data (`data/config/use_styles.json` `styles`: clip, tool clip, arm aim, optional grip,
+  hold-out and swing blade curve, every style required). The validator requires a projectile or ammo on releasing
+  styles and damage on yoyos, flails and whips, warns when a weapon, tool or consumable has no style, and holds every
+  stackable item but the coins to 9999 (`ItemDef.CommonMaxStack`, Terraria 1.4.4).
 * **Use timing** — as in Terraria, an item has a use *animation* (`useAnimation`; `PlayerEntity.UseAnimation`
   counting down from `UseAnimationMax`) and a use *time* (`useTime`; `UseCooldown`, the action cadence). A new
   animation starts only when the last one has played out (or for another item); it bumps `UseSerial`, which

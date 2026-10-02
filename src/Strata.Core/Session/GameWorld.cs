@@ -69,6 +69,12 @@ public sealed partial class GameWorld : IDisposable
     public WorldEditor Editor { get; }
     public ItemUseTable Uses { get; }
     public ItemUseSystem ItemUse { get; }
+
+    /// <summary>
+    /// How items are used on screen (data/config/use_styles.json): each use style's clip and arm aim, plus the clip
+    /// timing gameplay strikes by. The same config <see cref="ItemUseSystem.Timing"/> holds; set it through that.
+    /// </summary>
+    public Presentation.UseStyleConfig Styles => ItemUse.Timing.Config;
     public ObjectInteraction Interaction { get; }
     public Gameplay.Progression.ProgressionSystem Progression { get; }
     public Gameplay.Progression.MutationDirector Mutations { get; }

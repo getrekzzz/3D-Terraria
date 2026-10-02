@@ -13,7 +13,7 @@
   ],
   "items": [
     { "id": "book_of_skulls", "name": "Book of Skulls", "description": "Hurls the dungeon's grinning dead.", "category": "weapon", "rarity": 2, "value": 25000,
-      "useStyle": "shoot", "useTime": 28, "useAnimation": 28, "autoReuse": true, "damage": 29, "damageType": "magic", "knockback": 3.5,
+      "useStyle": "tome", "useTime": 28, "useAnimation": 28, "autoReuse": true, "damage": 29, "damageType": "magic", "knockback": 3.5,
       "manaCost": 12, "projectile": "book_skull", "shootSpeed": 13, "covers": ["terraria:book_of_skulls"] }
   ],
   "lootTables": [

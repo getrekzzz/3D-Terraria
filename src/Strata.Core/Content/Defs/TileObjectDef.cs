@@ -75,7 +75,7 @@ public sealed class TileObjectDef : ContentDef
     public bool AutoItem { get; init; } = true;
 
     public int ItemValue { get; init; }
-    public int ItemMaxStack { get; init; } = 99;
+    public int ItemMaxStack { get; init; } = ItemDef.CommonMaxStack;
     public ItemCategory ItemCategory { get; init; } = ItemCategory.Furniture;
 
     /// <summary>Least tool power (of the break tool's kind) that can break it: demon altars need a Pwnhammer (80).</summary>

@@ -42,6 +42,7 @@ public sealed class TestGame : IDisposable
         var settings = new WorldSettings { Name = "test", Seed = seed, Size = WorldSizePreset.Tiny, Difficulty = difficulty };
         var session = WorldSession.Create(TestPaths.Content, settings, saveDir, Tables, log);
         var world = new GameWorld(session, new StreamingSettings { MeshRadius = 1, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1 }, 1, saveDir == null ? null : Path.Combine(saveDir, "players"));
+        world.ItemUse.Timing = TestPaths.Timing; // the shipped use styles, as the game loads them
         var center = session.SpawnCell;
         var chunk = ChunkMath.CellToChunk(center);
         for (int y = -1; y <= 1; y++)

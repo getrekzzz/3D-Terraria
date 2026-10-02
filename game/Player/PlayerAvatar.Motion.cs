@@ -19,7 +19,13 @@ public sealed partial class PlayerAvatar
     /// <summary>How fast (per second) the legs ease toward their yaw.</summary>
     private const float LegTurnRate = 12f;
 
+    /// <summary>How much of the aim pitch the arms take between uses.</summary>
+    private const float RestArmAim = 0.15f;
+
     private float _legYaw, _airTime, _fallSpeed, _landTimer;
+
+    /// <summary>The arm aim of the style whose action is playing (use_styles.json armAim).</summary>
+    private float _actionArmAim = RestArmAim;
     private int _lastSerial, _lastHurt = int.MaxValue;
     private Stride _stride;
 
@@ -75,7 +81,9 @@ public sealed partial class PlayerAvatar
         // than the clip's top rate (use_styles.json) starts past the wind-up, so the strike still lands inside it.
         if (entity.UseSerial != _lastSerial && _heldItem != null && entity.Alive && entity.UseAnimation > 0)
         {
-            string action = ActionFor(_heldItem, _game.Uses[_heldItem]);
+            var info = _game.Uses[_heldItem];
+            string action = ActionFor(_game, info);
+            _actionArmAim = _game.Styles.Style(info.Style).ArmAim;
             var timing = _game.ItemUse.Timing;
             h.Play(action, entity.UseAnimationMax / (float)Strata.Core.Common.Units.TicksPerSecond, timing.MaxClipRate, timing.StrikeStart(action));
         }
@@ -91,7 +99,7 @@ public sealed partial class PlayerAvatar
             var aim = entity.Aim;
             aimMod.Twist = entity.Alive ? BodyFacing.Twist(_legYaw, facing) : 0f;
             aimMod.Pitch = entity.Alive ? Mathf.Atan2(aim.Y, new Vector2(aim.X, aim.Z).Length()) : 0f;
-            aimMod.ArmAim = h.Action is "shoot" or "bow" or "cast" or "thrust" ? 1f : h.Action != null ? 0.5f : 0.15f;
+            aimMod.ArmAim = h.Action != null ? _actionArmAim : RestArmAim;
         }
     }
 
@@ -158,16 +166,9 @@ public sealed partial class PlayerAvatar
         return gait;
     }
 
-    /// <summary>The upper-body action for using an item (Terraria's use styles, told apart by what the item does).</summary>
-    public static string ActionFor(ItemDef item, ItemUseInfo info)
-    {
-        if (info.Has(ItemAction.Consume) || item.UseStyle == UseStyle.Consume) return "drink";
-        if (info.IsTool) return "mine";
-        if (info.Grapple != null) return "thrust"; // a hook is flung out along the aim, arm at full length
-        if (info.Has(ItemAction.Thrust) || item.UseStyle == UseStyle.Thrust) return "thrust";
-        if (info.Has(ItemAction.Melee) || info.Has(ItemAction.Fish) || item.UseStyle == UseStyle.Swing) return "swing";
-        if (item.DamageType is DamageClass.Magic or DamageClass.Summon || item.ManaCost > 0) return "cast";
-        if (info.Has(ItemAction.Shoot) || item.UseStyle == UseStyle.Shoot) return item.UseAmmo == "arrow" ? "bow" : "shoot";
-        return "use";
-    }
+    /// <summary>
+    /// The upper-body action for using an item: its use style's clip (data/config/use_styles.json), the tool clip
+    /// for tools, "use" for a style without one.
+    /// </summary>
+    public static string ActionFor(GameWorld game, ItemUseInfo info) => game.Styles.ClipFor(info);
 }

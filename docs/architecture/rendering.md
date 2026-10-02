@@ -208,7 +208,9 @@ Generated humans (the player, town folk, humanoid enemies) play their shared ani
 strafe_left, strafe_right, jump, fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed
 so feet do not slide, negative when backpedalling), an upper-body action blend for item actions, a right-arm blend
 that holds a carried torch up, and a hurt flinch. Each use animation (a new `PlayerEntity.UseSerial`; Core never
-restarts one mid-arc) plays its clip once, stretched to the use after speed bonuses (so you can swing while running):
+restarts one mid-arc) plays its clip once (the item's use style's `clip`, or `toolClip` for tools, from
+`data/config/use_styles.json` `styles`; the arms follow the aim by the style's `armAim` while it plays), stretched to the
+use after speed bonuses (so you can swing while running):
 an `AnimationNodeTimeSeek` under the clip's time scale seeks it to its start, or, when the use is quicker than
 `maxClipRate` times the clip's authored speed, past the wind-up to the clip's `strikeStart`, and the rest plays over
 the use, so the strike lands inside it and the clip still ends with it. The action is a plain `Blend2` whose weight

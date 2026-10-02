@@ -7,7 +7,7 @@
   ],
   "items": [
     { "id": "guide_voodoo_doll", "name": "Guide Voodoo Doll", "description": "It feels warm, and a little too familiar. Keep it away from lava.",
-      "category": "bossSummon", "maxStack": 20, "value": 5000,
+      "category": "bossSummon", "maxStack": 9999, "value": 5000,
       "behaviors": [{ "type": "incinerationSummon", "enemy": "wall_of_flesh", "layer": "underworld", "killsResident": "guide" }],
       "covers": ["terraria:guide_voodoo_doll"] },
     { "id": "pwnhammer", "name": "Pwnhammer", "description": "Strong enough to crack what the old seals hold.", "category": "tool", "rarity": 4, "value": 39000,
