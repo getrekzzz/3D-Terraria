@@ -33,6 +33,12 @@ every tile object, item and enemy has a generator (no Blender needed). The spec 
 drop-in files `assets.d/*.json` (`asset_spec.load_spec()`; duplicate ids fail), and generator modules can register
 functions with `@generator` (`bgen/__init__.py`), which `build_all.py` finds by importing every `bgen` module.
 
+Bevels: `MeshBuilder.box(..., bevel=r, bevel_segments=n)` / `bevel_box(lo, hi, material, color, radius, segments)` and
+`extrude_polygon(..., bevel=r)` (convex outlines) chamfer (1 segment, 44 tris per box) or round (2, 108 tris) every edge,
+the radius clamped to 45 % of the thinnest extent. `bgen/furniture.py` uses two shared radii, `SOFT` (0.018 m, 2
+segments: tops, seats, chest bodies, frames) and `EDGE` (0.010 m chamfer: legs, slats, bands, planks), scaled per entry
+by `params.bevel` (0 = hard boxes); other furniture modules should import those constants and `bevels(p)`.
+
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
 weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and
 lashes), hands with jointed fingers and nails, painted skin (lips, flush, knuckles, stubble), hair styles and

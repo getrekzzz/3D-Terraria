@@ -77,14 +77,39 @@ class MeshBuilder:
         return verts
 
     # ------------------------------------------------------------------ primitives
-    def box(self, lo, hi, material, color="#ffffff", matrix: Matrix | None = None):
+    def _bevel(self, verts, radius, segments):
+        """Chamfers (segments=1) or rounds (2+) every edge of a freshly built closed part before it is finished;
+        ``radius`` is clamped to 45 % of the part's thinnest extent. Returns the part's vertices after the bevel.
+        Cost per box: 1 segment = 44 triangles (a plain box has 12), 2 segments = 108."""
+        lo = Vector(map(min, *(v.co for v in verts))) if len(verts) > 1 else verts[0].co
+        hi = Vector(map(max, *(v.co for v in verts))) if len(verts) > 1 else verts[0].co
+        radius = min(radius, 0.45 * min(hi - lo))
+        if radius <= 1e-4 or segments < 1:
+            return verts
+        edges = list({e for v in verts for e in v.link_edges})
+        out = bmesh.ops.bevel(self.bm, geom=list(verts) + edges, offset=radius, offset_type="OFFSET", segments=segments,
+                              profile=0.5, affect="EDGES", clamp_overlap=True)
+        return list({v for f in out["faces"] for v in f.verts})
+
+    def box(self, lo, hi, material, color="#ffffff", matrix: Matrix | None = None, bevel=0.0, bevel_segments=1):
+        """Axis-aligned box from corner ``lo`` to ``hi`` (then ``matrix``). ``bevel`` (m) softens its edges: a thin
+        chamfer that catches the light the way sanded wood and cast metal do (see _bevel for the triangle cost)."""
         lo, hi = Vector(lo), Vector(hi)
         res = bmesh.ops.create_cube(self.bm, size=1.0)
         scale = Matrix.Diagonal((*(hi - lo), 1.0))
         m = Matrix.Translation((lo + hi) / 2) @ scale
-        if matrix is not None:
-            m = matrix @ m
-        return self._finish_part(res["verts"], material, color, False, m)
+        if bevel <= 0:
+            if matrix is not None:
+                m = matrix @ m
+            return self._finish_part(res["verts"], material, color, False, m)
+        # Scale first so the bevel is measured in metres, then bevel, then the caller's matrix.
+        bmesh.ops.transform(self.bm, matrix=m, verts=res["verts"])
+        verts = self._bevel(res["verts"], bevel, bevel_segments)
+        return self._finish_part(verts, material, color, False, matrix)
+
+    def bevel_box(self, lo, hi, material, color="#ffffff", radius=0.02, segments=1, matrix: Matrix | None = None):
+        """Shorthand for ``box(..., bevel=radius, bevel_segments=segments)`` — the default for furniture and stations."""
+        return self.box(lo, hi, material, color, matrix, bevel=radius, bevel_segments=segments)
 
     def cylinder(self, p0, p1, r0, r1=None, material="plain", color="#ffffff", segments=10, smooth=True, caps=True, shade=0.0):
         """Tapered cylinder (or cone when r1 == 0) between two points."""
@@ -130,8 +155,9 @@ class MeshBuilder:
         verts = [v for ring in rings for v in ring]
         return self._finish_part(verts, material, color, smooth, matrix)
 
-    def extrude_polygon(self, points2d, depth, material, color="#ffffff", matrix: Matrix | None = None):
-        """Flat polygon in the XZ plane (x, z) extruded along Y by depth (centred)."""
+    def extrude_polygon(self, points2d, depth, material, color="#ffffff", matrix: Matrix | None = None, bevel=0.0, bevel_segments=1):
+        """Flat polygon in the XZ plane (x, z) extruded along Y by depth (centred); ``bevel`` softens its edges (convex
+        outlines only — a concave notch would fold)."""
         front = [self.bm.verts.new((x, -depth / 2, z)) for x, z in points2d]
         back = [self.bm.verts.new((x, depth / 2, z)) for x, z in points2d]
         self.bm.faces.new(front)
@@ -140,7 +166,8 @@ class MeshBuilder:
         for i in range(n):
             j = (i + 1) % n
             self.bm.faces.new((front[i], back[i], back[j], front[j]))
-        return self._finish_part(front + back, material, color, False, matrix)
+        verts = self._bevel(front + back, bevel, bevel_segments) if bevel > 0 else front + back
+        return self._finish_part(verts, material, color, False, matrix)
 
     def tube(self, points, radii, material, color="#ffffff", segments=8, smooth=True):
         """Swept tube along a polyline with per-point radius (branches, trunks, roots, tentacles)."""
