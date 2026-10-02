@@ -96,9 +96,9 @@ public sealed partial class InventoryScreen : CanvasLayer
         _root.AddChild(_cursorIcon);
         _root.AddChild(_cursorCount);
 
-        ui.Game.Interaction.ContainerOpened += (p, obj) =>
+        ui.Game.Interaction.ContainerOpened += (p, obj, storage) =>
         {
-            if (p == ui.Entity) OpenContainer(obj);
+            if (p == ui.Entity) OpenContainer(obj, storage);
         };
     }
 

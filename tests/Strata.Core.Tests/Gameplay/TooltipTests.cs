@@ -38,8 +38,8 @@ public class TooltipTests
         Assert.Contains(("+18% damage", TooltipKind.Good), ruthless);
         Assert.Contains(("-10% knockback", TooltipKind.Bad), ruthless);
 
-        var frugal = new ItemStack(Db.Items.All.First(i => i.ManaCost > 0 && Prefixes.Groups(i).Contains("magic")), 1, Db.Prefixes.Get("frugal"));
-        Assert.Contains(("-15% mana cost", TooltipKind.Good), Lines(frugal)); // less mana is better
+        var adept = new ItemStack(Db.Items.All.First(i => i.ManaCost > 0 && Prefixes.Groups(i).Contains("magic")), 1, Db.Prefixes.Get("adept"));
+        Assert.Contains(("-15% mana cost", TooltipKind.Good), Lines(adept)); // less mana is better
     }
 
     [Fact]

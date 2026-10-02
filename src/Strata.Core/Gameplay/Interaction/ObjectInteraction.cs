@@ -37,8 +37,11 @@ public sealed partial class ObjectInteraction
 
     public ObjectInteraction(GameWorld world) => _world = world;
 
-    /// <summary>A container was opened by a player (the UI shows it).</summary>
-    public event Action<PlayerEntity, TileObjectInstance>? ContainerOpened;
+    /// <summary>
+    /// A container was opened by a player (the UI shows it): the object and the slots it shows that player (a chest's
+    /// own, or the player's personal storage for a Piggy Bank or Safe).
+    /// </summary>
+    public event Action<PlayerEntity, TileObjectInstance, Items.Inventory>? ContainerOpened;
 
     /// <summary>A player read a sign (the UI shows its text and lets them edit it).</summary>
     public event Action<PlayerEntity, TileObjectInstance>? SignOpened;
@@ -80,8 +83,9 @@ public sealed partial class ObjectInteraction
                 return InteractOutcome.DoorToggled;
             case TileInteraction.Chest:
                 if (obj.Locked && !Unlock(p, obj)) return InteractOutcome.Refused;
+                if (GameWorld.Storage(obj, p.State) is not { } storage) return InteractOutcome.None;
                 _world.Editor.EnsureContainerLoot(obj);
-                ContainerOpened?.Invoke(p, obj);
+                ContainerOpened?.Invoke(p, obj, storage);
                 return InteractOutcome.ContainerOpened;
             case TileInteraction.Sleep:
                 p.State.SpawnPoints[_world.Session.Settings.Name] = new[] { obj.Anchor.X, obj.Anchor.Y + obj.Footprint.Y, obj.Anchor.Z };

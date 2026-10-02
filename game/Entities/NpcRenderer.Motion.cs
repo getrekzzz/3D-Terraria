@@ -158,7 +158,7 @@ public sealed partial class NpcRenderer
         if (fired && npc.Def.Ranged != null)
         {
             bool magic = npc.Def.Ranged.Projectile.Contains("bolt") || npc.Def.Ranged.Projectile.Contains("magic") || npc.Def.HasTag("caster");
-            h.Play(magic ? "cast" : npc.Def.Ranged.Projectile.Contains("arrow") ? "bow" : "shoot", 0.5f);
+            h.Play(magic ? "staff" : npc.Def.Ranged.Projectile.Contains("arrow") ? "bow" : "gun", 0.5f);
         }
         else if (npc.Def.Ranged == null && Target(npc) is { } target && npc.Def.ContactDamage)
         {

@@ -14,7 +14,7 @@ public static partial class ItemTooltip
     /// Every prefix field in Terraria's tooltip order and wording. Lines come from the fields, not the prefix ids, so
     /// any prefix table in data (Legendary, Warding, Menacing…) shows its modifiers without code changes.
     /// </summary>
-    private static readonly Modifier[] Modifiers =
+    private static readonly Modifier[] ModifierFields =
     {
         new(p => p.Damage, 100f, "%", "damage"),
         new(p => p.UseSpeed, 100f, "%", "speed"),
@@ -26,18 +26,24 @@ public static partial class ItemTooltip
         new(p => p.Defense, 1f, "", "defense"),
         new(p => p.MaxMana, 1f, "", "mana"),
         new(p => p.MoveSpeed, 100f, "%", "movement speed"),
+        new(p => p.MeleeSpeed, 100f, "%", "melee speed"),
     };
 
     /// <summary>"+15% damage" in green, "-10% knockback" in red: one line per non-zero prefix field.</summary>
     private static void ModifierLines(PrefixDef? prefix, List<(string, TooltipKind)> lines)
     {
-        if (prefix == null) return;
-        foreach (var m in Modifiers)
+        if (prefix != null) lines.AddRange(Modifiers(prefix));
+    }
+
+    /// <summary>A prefix's modifier lines alone, in tooltip order.</summary>
+    public static IEnumerable<(string Text, TooltipKind Kind)> Modifiers(PrefixDef prefix)
+    {
+        foreach (var m in ModifierFields)
         {
             int shown = (int)MathF.Round(m.Value(prefix) * m.Scale);
             if (shown == 0) continue;
             bool good = m.LowerIsBetter ? shown < 0 : shown > 0;
-            lines.Add(($"{(shown > 0 ? "+" : "-")}{Math.Abs(shown)}{m.Unit} {m.Text}", good ? TooltipKind.Good : TooltipKind.Bad));
+            yield return ($"{(shown > 0 ? "+" : "-")}{Math.Abs(shown)}{m.Unit} {m.Text}", good ? TooltipKind.Good : TooltipKind.Bad);
         }
     }
 

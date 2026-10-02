@@ -37,6 +37,9 @@ public sealed class ItemUseInfo
 
     public ItemDef Item { get; }
     public ItemAction Actions { get; internal set; }
+
+    /// <summary>How the item is used on screen: its data style, or one inferred from its stats (<see cref="UseStyleRules"/>).</summary>
+    public UseStyle Style { get; internal set; }
     public MeleeSwingParams? Swing { get; internal set; }
     public ThrustParams? ThrustParams { get; internal set; }
     public ShootProjectileParams? Shoot { get; internal set; }
@@ -86,8 +89,9 @@ public sealed class ItemUseInfo
 }
 
 /// <summary>
-/// Resolves every item's use actions once. Actions are inferred from item stats (pick power, place targets,
-/// projectiles, healing) so data does not repeat itself; explicit <c>behaviors</c> add or tune actions.
+/// Resolves every item's use actions once. Actions are inferred from item stats (pick power, place targets) and the
+/// use style (a swing hits, a bow shoots, a potion is drunk: <see cref="UseStyleRules"/>) so data does not repeat
+/// itself; explicit <c>behaviors</c> add or tune actions.
 /// </summary>
 public sealed class ItemUseTable
 {
@@ -118,10 +122,8 @@ public sealed class ItemUseTable
         if (item.PickPower > 0) a |= ItemAction.Mine;
         if (item.AxePower > 0) a |= ItemAction.Chop;
         if (item.HammerPower > 0) a |= ItemAction.Hammer;
-        bool melee = item.Damage > 0 && !item.NoMelee; // noMelee: the swing is only an animation
-        if (item.UseStyle == UseStyle.Swing && melee) a |= ItemAction.Melee;
-        if (item.UseStyle == UseStyle.Thrust && melee) a |= ItemAction.Thrust;
-        if (item.UseStyle == UseStyle.Shoot && (item.Projectile != null || item.UseAmmo != null)) a |= ItemAction.Shoot;
+        info.Style = UseStyleRules.Resolve(item);
+        a |= UseStyleRules.Implied(info.Style, item); // a sword's swing hits, a gun shoots, a potion is drunk
         if (item.PlaceBlock != null && content.Blocks.TryGet(item.PlaceBlock, out var block))
         {
             a |= ItemAction.PlaceBlock;
@@ -132,7 +134,6 @@ public sealed class ItemUseTable
             a |= ItemAction.PlaceObject;
             info.Object = obj;
         }
-        if (item.UseStyle == UseStyle.Consume || item.HealLife > 0 || item.HealMana > 0 || item.Buff != null) a |= ItemAction.Consume;
         if (item.Projectile != null && content.Projectiles.TryGet(item.Projectile, out var proj)) info.Projectile = proj;
 
         foreach (var spec in item.Behaviors)

@@ -57,6 +57,12 @@ public sealed class TileObjectDef : ContentDef
 
     public int ContainerSlots { get; init; }
 
+    /// <summary>
+    /// Personal storage kind ("piggy_bank", "safe"): a chest-like object whose slots live on the character
+    /// (<see cref="Gameplay.Player.PlayerState.Banks"/>), so every one of that kind opens the same contents.
+    /// </summary>
+    public string? SharedStorage { get; init; }
+
     public int HitPoints { get; init; } = 1;
 
     /// <summary>Item that places this object and is dropped when broken.</summary>
@@ -90,7 +96,7 @@ public sealed class TileObjectDef : ContentDef
     public bool AutoItem { get; init; } = true;
 
     public int ItemValue { get; init; }
-    public int ItemMaxStack { get; init; } = 99;
+    public int ItemMaxStack { get; init; } = ItemDef.CommonMaxStack;
     public ItemCategory ItemCategory { get; init; } = ItemCategory.Furniture;
 
     /// <summary>Least tool power (of the break tool's kind) that can break it: demon altars need a Pwnhammer (80).</summary>

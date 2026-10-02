@@ -243,10 +243,17 @@ without hazing the image; a moonlit night keeps a blue ambient floor so shapes a
 ## Creature animation
 Generated humans (the player, town folk, humanoid enemies) play their shared animation set through a
 `HumanoidAnimator` (an `AnimationTree` built in code): a cross-faded locomotion state (idle, walk, run, sprint,
-strafe_left, strafe_right, jump, fall, land, swim, climb, glide, death; gait and playback rate chosen from ground speed
-so feet do not slide, negative when backpedalling), an upper-body action blend for item actions, a right-arm blend
-that holds a carried torch up, and a hurt flinch. Each use animation (a new `PlayerEntity.UseSerial`; Core never
-restarts one mid-arc) plays its clip once, stretched to the use after speed bonuses (so you can swing while running):
+strafe_left, strafe_right, jump, fall, land, swim, climb, glide, death, and the rest poses sit, sleep, bound and lie;
+gait and playback rate chosen from ground speed so feet do not slide, negative when backpedalling), an upper-body
+action blend for item actions (one clip per use style), a right-arm blend over a transition that loops one of
+`HoldClips` (a carried torch held up, a flail spun overhead, a yoyo worked by the wrist; `Hold(clip)`, cross-faded
+0.12 s between them), and a hurt flinch. A flail's or a yoyo's use loops its clip on that blend while it lasts instead
+of playing once. Each set is checked once for the clips the tree plays: a missing one plays idle and is counted
+(probe `anim.missing_clips`, 0 once every set is rebuilt; `player.hold_clip` and `player.hold_weight` report the
+right-arm loop). Each use animation (a new `PlayerEntity.UseSerial`; Core never
+restarts one mid-arc) plays its clip once (the item's use style's `clip`, or `toolClip` for tools, from
+`data/config/use_styles.json` `styles`; the arms follow the aim by the style's `armAim` while it plays), stretched to the
+use after speed bonuses (so you can swing while running):
 an `AnimationNodeTimeSeek` under the clip's time scale seeks it to its start, or, when the use is quicker than
 `maxClipRate` times the clip's authored speed, past the wind-up to the clip's `strikeStart`, and the rest plays over
 the use, so the strike lands inside it and the clip still ends with it. The action is a plain `Blend2` whose weight
@@ -261,8 +268,9 @@ In first person the `ViewModel` poses the held item on the same timing: the use'
 `(UseAnimationMax − UseAnimation + physics interpolation fraction) / UseAnimationMax`, so it moves every frame between
 ticks at any frame rate and never runs backwards. Blades and tools rise from half raised to over the shoulder
 through the wind-up, come down and across by `UseTiming.Sweep` in the strike window, carry on (a blade) or bounce
-off the block (a tool), and return to half raised for the next use; thrusts pull back, lunge in the strike window and
-hold through the follow-through. An engage weight eases the item out of its rest pose (0.06 s) and back (0.15 s), and a
+off the block (a tool), and return to half raised for the next use; throws and whips rise and come over like a swing;
+rapier jabs and spear lunges (each timed by its own clip's window, `UseTiming.ThrustClip`) pull back, lunge in the
+strike window and hold through the follow-through. An engage weight eases the item out of its rest pose (0.06 s) and back (0.15 s), and a
 new use while engaged crossfades from the pose on screen (0.05 s). The `SwingTrail` arc is drawn from the strike start
 only, its head at the sweep the melee system tests hits against (the same eased window, the prefix-sized reach), so the
 damage number appears as the arc passes; it fades after the follow-through and takes the swing's `trailColor` when the

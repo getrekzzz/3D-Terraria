@@ -28,6 +28,7 @@ public sealed class LaunchedWorld
     public UI.Hud? Hud { get; init; }
     public UI.TownDialog? TownDialog { get; init; }
     public UI.WorldMapScreen? WorldMap { get; init; }
+    public UI.PhotoMode.PhotoModeController? PhotoMode { get; init; }
 }
 
 /// <summary>What to open: a world directory (created from <see cref="NewWorld"/> when missing) and a character.</summary>
@@ -81,9 +82,9 @@ public static partial class WorldLauncher
 
         var (props, objectRenderer) = AddWorldObjects(runtime);
         LoadConfigs(game, services);
-        var creatures = AddCreatureRenderers(runtime, game, props);
+        var (creatures, projectiles) = AddCreatureRenderers(runtime, game, props);
         AddPreloading(runtime, services, game, props, creatures);
-        var combatEffects = AddWorldEffects(runtime, services, game, objectRenderer, creatures);
+        var combatEffects = AddWorldEffects(runtime, services, game, objectRenderer, creatures, projectiles);
 
         if (o.FreeCamera) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
 
@@ -92,8 +93,8 @@ public static partial class WorldLauncher
         combatEffects.Follow(entity, player);
         var avatar = AddPlayerVisuals(runtime, services, game, props, entity, player);
         var interaction = AddInteraction(runtime, game, entity, player);
-        var (hud, inventory, worldMap, townDialog) = AddUi(runtime, game, player, interaction, objectRenderer);
-        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap };
+        var (hud, inventory, worldMap, townDialog, photo) = AddUi(runtime, game, player, interaction, objectRenderer);
+        return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction, Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap, PhotoMode = photo };
     }
 
     private static FreeCamera AddFreeCamera(WorldRuntime runtime, WorldSession session, CommandLine args)

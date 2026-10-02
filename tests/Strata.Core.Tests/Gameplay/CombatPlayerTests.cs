@@ -82,7 +82,7 @@ public class CombatPlayerTests
         var db = TestPaths.Content;
         var p = PlayerState.CreateNew("hero", db);
         p.BonusLife = 40;
-        p.Inventory.Backpack[20] = new ItemStack(db.Items.Get("iron_broadsword"), 1, db.Prefixes.Get("mythic"));
+        p.Inventory.Backpack[20] = new ItemStack(db.Items.Get("iron_broadsword"), 1, db.Prefixes.Get("legendary"));
         p.SpawnPoints["dev"] = new[] { 1, 2, 3 };
         p.Recompute();
         p.Vitals.Life = 77;
@@ -90,7 +90,7 @@ public class CombatPlayerTests
         var back = PlayerSave.Deserialize(json).ToState(db);
         Assert.Equal(140, back.Vitals.MaxLife);
         Assert.Equal(77, back.Vitals.Life);
-        Assert.Equal("mythic", back.Inventory.Backpack[20].Prefix!.Id);
+        Assert.Equal("legendary", back.Inventory.Backpack[20].Prefix!.Id);
         Assert.Equal(new[] { 1, 2, 3 }, back.SpawnPoints["dev"]);
         Assert.Equal(p.Inventory.Backpack.Stacks.Count(), back.Inventory.Backpack.Stacks.Count());
     }

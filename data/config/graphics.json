@@ -9,7 +9,7 @@
     "low": {
       "renderScale": 0.8, "upscaler": "fsr1", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 4,
       "shadowAtlas": 2048, "shadowDistance": 50, "shadowSplits": 2, "shadowFilter": 1, "sunSize": 0, "torchShadows": false,
-      "dynamicLights": 4,
+      "dynamicLights": 4, "petLights": 1,
       "ssao": false, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
       "skyRadiance": 64, "cloudSteps": 0, "autoExposure": false,
       "grassDensity": 0, "grassDistance": 0, "combatNumbers": 24, "grassBuildsPerFrame": 0, "lodThreshold": 4, "horizonDistance": 0, "oreGlintDistance": 16, "swayDistance": 0, "effectsScale": 0.4, "flashLights": 0, "ragdolls": 0
@@ -17,7 +17,7 @@
     "medium": {
       "renderScale": 1.0, "upscaler": "none", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 8,
       "shadowAtlas": 4096, "shadowDistance": 70, "shadowSplits": 2, "shadowFilter": 2, "sunSize": 0, "torchShadows": false,
-      "dynamicLights": 8,
+      "dynamicLights": 8, "petLights": 2,
       "ssao": true, "ssaoQuality": 1, "ssaoHalf": true, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
       "skyRadiance": 128, "cloudSteps": 2, "autoExposure": true,
       "grassDensity": 0.35, "grassDistance": 22, "combatNumbers": 48, "grassBuildsPerFrame": 2, "lodThreshold": 2, "horizonDistance": 700, "oreGlintDistance": 22, "swayDistance": 20, "effectsScale": 0.7, "flashLights": 2, "ragdolls": 3
@@ -25,7 +25,7 @@
     "high": {
       "renderScale": 1.0, "upscaler": "none", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
       "shadowAtlas": 4096, "shadowDistance": 120, "shadowSplits": 4, "shadowFilter": 3, "sunSize": 0.5, "torchShadows": true,
-      "dynamicLights": 16,
+      "dynamicLights": 16, "petLights": 3,
       "ssao": true, "ssaoQuality": 2, "ssaoHalf": true, "ssil": true, "ssilQuality": 1, "ssilHalf": true, "ssr": true, "ssrSteps": 48,
       "volumetricFog": true, "volumetricFogSize": 64, "volumetricFogDepth": 64, "glow": true,
       "skyRadiance": 128, "cloudSteps": 3, "autoExposure": true,
@@ -34,7 +34,7 @@
     "ultra": {
       "renderScale": 1.0, "upscaler": "fsr2", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
       "shadowAtlas": 4096, "shadowDistance": 150, "shadowSplits": 4, "shadowFilter": 4, "sunSize": 0.6, "torchShadows": true,
-      "dynamicLights": 24,
+      "dynamicLights": 24, "petLights": 4,
       "ssao": true, "ssaoQuality": 3, "ssaoHalf": true, "ssil": true, "ssilQuality": 2, "ssilHalf": true, "ssr": true, "ssrSteps": 64,
       "volumetricFog": true, "volumetricFogSize": 96, "volumetricFogDepth": 64, "glow": true,
       "skyRadiance": 128, "cloudSteps": 4, "autoExposure": true,

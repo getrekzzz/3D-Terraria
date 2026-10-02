@@ -19,25 +19,5 @@
     { "id": "cozy_fire", "name": "Cozy Fire", "description": "Life regen is slightly increased", "hideTimer": true, "color": "#ffb070", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 1 }], "covers": ["terraria:cozy_fire"] },
     { "id": "potion_sickness", "name": "Potion Sickness", "description": "Cannot drink another restorative yet.", "debuff": true, "duration": 3600, "color": "#c08080", "tags": ["healing_cooldown"], "covers": ["terraria:potion_sickness"] },
     { "id": "mana_sickness", "name": "Mana Sickness", "description": "Magic damage reduced.", "debuff": true, "duration": 300, "color": "#8080c0", "tags": ["mana_cooldown"], "effects": [{ "type": "stat", "stat": "magicDamage", "mul": 0.75 }], "covers": ["terraria:mana_sickness"] }
-  ],
-  "prefixes": [
-    { "id": "keen", "name": "Keen", "applies": ["universal"], "crit": 3 },
-    { "id": "stout", "name": "Stout", "applies": ["universal"], "damage": 0.05, "knockback": 0.1 },
-    { "id": "brisk", "name": "Brisk", "applies": ["universal"], "useSpeed": 0.1 },
-    { "id": "ruthless", "name": "Ruthless", "applies": ["universal"], "damage": 0.18, "knockback": -0.1 },
-    { "id": "broken", "name": "Broken", "applies": ["universal"], "damage": -0.3, "knockback": -0.2, "weight": 0.5 },
-    { "id": "sluggish", "name": "Sluggish", "applies": ["universal"], "useSpeed": -0.2 },
-    { "id": "towering", "name": "Towering", "applies": ["melee"], "size": 0.18, "damage": 0.05 },
-    { "id": "stubby", "name": "Stubby", "applies": ["melee"], "size": -0.18 },
-    { "id": "mythic", "name": "Mythic", "applies": ["melee"], "damage": 0.15, "useSpeed": 0.1, "crit": 5, "size": 0.1, "knockback": 0.15, "weight": 0.2 },
-    { "id": "farsighted", "name": "Farsighted", "applies": ["ranged"], "velocity": 0.15, "damage": 0.1 },
-    { "id": "unerring", "name": "Unerring", "applies": ["ranged"], "damage": 0.15, "useSpeed": 0.1, "crit": 5, "velocity": 0.1, "knockback": 0.15, "weight": 0.2 },
-    { "id": "arcane", "name": "Arcane", "applies": ["magic"], "maxMana": 20, "damage": 0.1 },
-    { "id": "frugal", "name": "Frugal", "applies": ["magic"], "manaCost": -0.15 },
-    { "id": "transcendent", "name": "Transcendent", "applies": ["magic"], "damage": 0.15, "useSpeed": 0.1, "crit": 5, "manaCost": -0.15, "knockback": 0.05, "weight": 0.2 },
-    { "id": "sturdy", "name": "Sturdy", "applies": ["accessory"], "defense": 2 },
-    { "id": "fleet", "name": "Fleet", "applies": ["accessory"], "moveSpeed": 0.04 },
-    { "id": "lucky", "name": "Lucky", "applies": ["accessory"], "crit": 4 },
-    { "id": "swift_tool", "name": "Deft", "applies": ["tool"], "useSpeed": 0.15 }
   ]
 }

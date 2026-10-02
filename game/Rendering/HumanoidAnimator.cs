@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Godot;
 
@@ -8,16 +9,19 @@ namespace Strata.Game.Rendering;
 /// through an <see cref="AnimationTree"/> built in code:
 /// <list type="bullet">
 /// <item>locomotion: one cross-faded state (idle, walk, run, sprint, strafe_left, strafe_right, jump, fall, land,
-/// swim, climb, glide, death) played at a speed (negative walks backwards);</item>
-/// <item>an action over the upper body (swing, mine, thrust, shoot, bow, cast, drink, use) played once per use,
-/// stretched to the use animation (a use too quick for the clip skips its wind-up), so you can swing while running;
-/// chained uses flow on without fading back to the locomotion pose in between;</item>
-/// <item>a carried light held up in the right hand (blended in and out);</item>
+/// swim, climb, glide, death, and the rest poses sit, sleep, bound and lie) played at a speed (negative walks
+/// backwards);</item>
+/// <item>an action over the upper body (one per item use style: swing, mine, rapier, spear, whip, throw, gun, bow,
+/// staff, tome, hold_up, drink, eat, place, use, and a wave) played once per use, stretched to the use animation (a use
+/// too quick for the clip skips its wind-up), so you can swing while running; chained uses flow on without fading back
+/// to the locomotion pose in between;</item>
+/// <item>a looping clip on the right arm, blended in and out: a carried light held up, a flail spun overhead or a yoyo
+/// worked by the wrist (<see cref="HoldClips"/>);</item>
 /// <item>a hurt flinch over the upper body.</item>
 /// </list>
 /// An <see cref="AimModifier"/> then turns the torso (chest, arms and head) onto the aim.
 /// </summary>
-public sealed class HumanoidAnimator
+public sealed partial class HumanoidAnimator
 {
     /// <summary>The armature node name the animation sets' tracks use; every character's armature is renamed to it.</summary>
     public const string Rig = "anim_rig";
@@ -25,14 +29,33 @@ public sealed class HumanoidAnimator
     public static readonly string[] States =
     {
         "idle", "walk", "run", "sprint", "strafe_left", "strafe_right", "jump", "fall", "land", "swim", "climb", "glide", "death",
+        "sit", "sleep", "bound", "lie",
     };
 
-    public static readonly string[] Actions = { "swing", "mine", "thrust", "shoot", "bow", "cast", "drink", "use" };
+    public static readonly string[] Actions =
+    {
+        "swing", "mine", "rapier", "spear", "whip", "throw", "gun", "bow", "staff", "tome", "hold_up", "drink", "eat", "place", "use", "wave",
+    };
+
+    /// <summary>Looping right-arm clips, held for as long as they are wanted (<see cref="Hold"/>) rather than played once per use.</summary>
+    public static readonly string[] HoldClips = { "hold", "flail", "yoyo" };
 
     private static readonly HashSet<string> Looping = new()
     {
-        "idle", "walk", "run", "sprint", "strafe_left", "strafe_right", "fall", "swim", "climb", "glide", "hold",
+        "idle", "walk", "run", "sprint", "strafe_left", "strafe_right", "fall", "swim", "climb", "glide", "sit", "sleep", "bound", "lie",
+        "hold", "flail", "yoyo",
     };
+
+    /// <summary>Every clip the tree plays; a set without one falls back to idle for it (see <see cref="MissingClips"/>).</summary>
+    private static readonly string[] Required = Concat(States, Actions, HoldClips, new[] { "hurt" });
+
+    private static readonly HashSet<ulong> Checked = new();
+
+    /// <summary>
+    /// Clips the animation sets in use lack, each set counted once (probe <c>anim.missing_clips</c>): 0 once every set
+    /// has been rebuilt with the clips the animator plays (tools/blender/build_all.py --anims).
+    /// </summary>
+    public static int MissingClips { get; private set; }
 
     /// <summary>
     /// The strafe clips run at this angle (degrees) to the left or right of where the hips face, covering the same
@@ -50,6 +73,7 @@ public sealed class HumanoidAnimator
 
     // Tree parameters set every frame or every use (cached: a string converts to a new StringName on each call).
     private static readonly StringName HoldBlend = "parameters/hold/blend_amount", ActionBlend = "parameters/action/blend_amount";
+    private static readonly StringName HoldRequest = "parameters/hold_pick/transition_request";
     private static readonly StringName PickRequest = "parameters/pick/transition_request", ActionSpeed = "parameters/act_speed/scale";
     private static readonly StringName ActionSeek = "parameters/act_seek/seek_request", HurtRequest = "parameters/hurt/request";
     private static readonly StringName LocoRequest = "parameters/loco/transition_request", LocoSpeed = "parameters/loco_speed/scale";
@@ -60,6 +84,7 @@ public sealed class HumanoidAnimator
     /// <summary>Undead sets shamble: a slower, longer walk (and no sprint).</summary>
     private readonly bool _shambles;
     private string _state = ""; // nothing requested yet: the transition node starts with no current state
+    private string _holdClip = "";
     private float _hold, _holdTarget, _actionLeft = -1f, _actionWeight, _sincePlay;
     private int _framesEnded = int.MaxValue;
     private bool _sustain;
@@ -85,6 +110,12 @@ public sealed class HumanoidAnimator
     /// <summary>How much of the upper body the action holds (0–1).</summary>
     public float ActionWeight => _actionWeight;
 
+    /// <summary>How far the right arm's looping clip (<see cref="Hold"/>) is blended in (0–1).</summary>
+    public float HoldWeight => _hold;
+
+    /// <summary>The looping clip the right arm holds, as an index into <see cref="HoldClips"/>; −1 while it is lowered.</summary>
+    public int HoldIndex => _holdTarget > 0f ? Array.IndexOf(HoldClips, _holdClip) : -1;
+
     /// <summary>
     /// Chained uses (started before, or within 0.15 s after, the last one ended) that found the action no longer fully
     /// blended in: the upper body dipped toward the locomotion pose in between (probe <c>player.action_dips</c>; 0 when
@@ -108,6 +139,7 @@ public sealed class HumanoidAnimator
     public static HumanoidAnimator Create(Node3D root, Skeleton3D skeleton, AnimationLibrary library, AnimationPlayer? old, bool aim)
     {
         if (old != null) old.Active = false;
+        CheckClips(library);
         foreach (var name in library.GetAnimationList())
             if (Looping.Contains(name)) library.GetAnimation(name).LoopMode = Animation.LoopModeEnum.Linear;
         var tree = new AnimationTree { Name = "Motion", Deterministic = true };
@@ -118,85 +150,13 @@ public sealed class HumanoidAnimator
         tree.Active = true;
         var animator = new HumanoidAnimator(tree, library);
         animator.Locomotion("idle");
+        animator.PickHold(HoldClips[0]);
         if (aim)
         {
             animator.Aim = new AimModifier { Name = "Aim" };
             skeleton.AddChild(animator.Aim);
         }
         return animator;
-    }
-
-    private static AnimationNodeBlendTree BuildTree(AnimationLibrary library)
-    {
-        var bt = new AnimationNodeBlendTree();
-        var loco = new AnimationNodeTransition { XfadeTime = 0.18f };
-        foreach (var state in States)
-        {
-            loco.AddInput(state);
-            bt.AddNode("s_" + state, Clip(library, state));
-        }
-        bt.AddNode("loco", loco);
-        for (int i = 0; i < States.Length; i++) bt.ConnectNode("loco", i, "s_" + States[i]);
-        bt.AddNode("loco_speed", new AnimationNodeTimeScale());
-        bt.ConnectNode("loco_speed", 0, "loco");
-
-        var pick = new AnimationNodeTransition { XfadeTime = 0f };
-        foreach (var name in Actions)
-        {
-            pick.AddInput(name);
-            bt.AddNode("a_" + name, Clip(library, name));
-        }
-        bt.AddNode("pick", pick);
-        for (int i = 0; i < Actions.Length; i++) bt.ConnectNode("pick", i, "a_" + Actions[i]);
-        // Each use seeks the clip (to its start, or past the wind-up for a quick use); the seek sits below the time
-        // scale, so its position is in the clip's own seconds.
-        bt.AddNode("act_seek", new AnimationNodeTimeSeek());
-        bt.ConnectNode("act_seek", 0, "pick");
-        bt.AddNode("act_speed", new AnimationNodeTimeScale());
-        bt.ConnectNode("act_speed", 0, "act_seek");
-
-        // A plain blend rather than a OneShot (which fades every use out over its end and in again on the next):
-        // Update eases the weight, so a chained use carries on from the pose the last one ended in.
-        var action = new AnimationNodeBlend2();
-        Filter(action, UpperBody, both: true);
-        bt.AddNode("action", action);
-        bt.ConnectNode("action", 0, "loco_speed");
-        bt.ConnectNode("action", 1, "act_speed");
-
-        var hold = new AnimationNodeBlend2();
-        Filter(hold, new[] { "clavicle.R", "upper_arm.R", "forearm.R", "hand.R" }, both: false);
-        bt.AddNode("hold", hold);
-        bt.AddNode("a_hold", Clip(library, "hold"));
-        bt.ConnectNode("hold", 0, "action");
-        bt.ConnectNode("hold", 1, "a_hold");
-
-        var hurt = new AnimationNodeOneShot { FadeInTime = 0.04f, FadeOutTime = 0.14f };
-        Filter(hurt, UpperBody, both: false);
-        bt.AddNode("hurt", hurt);
-        bt.AddNode("a_hurt", Clip(library, "hurt"));
-        bt.ConnectNode("hurt", 0, "hold");
-        bt.ConnectNode("hurt", 1, "a_hurt");
-        bt.ConnectNode("output", 0, "hurt");
-        return bt;
-    }
-
-    private static AnimationNodeAnimation Clip(AnimationLibrary library, string name) =>
-        new() { Animation = library.HasAnimation(name) ? name : "idle" };
-
-    private static void Filter(AnimationNode node, IEnumerable<string> bones, bool both)
-    {
-        node.FilterEnabled = true;
-        foreach (var bone in bones)
-        {
-            node.SetFilterPath(new NodePath($"{Rig}/Skeleton3D:{bone}"), true);
-            if (!bone.StartsWith("hand.")) continue;
-            // The hand's fingers follow the hand (a drawn bowstring, an open palm); the other hand's too when both are filtered.
-            string side = bone[^1..];
-            if (!both && side == "L") continue;
-            foreach (var f in Fingers)
-                for (int k = 1; k <= 3; k++)
-                    node.SetFilterPath(new NodePath($"{Rig}/Skeleton3D:{f}.0{k}.{side}"), true);
-        }
     }
 
     public bool Has(string clip) => _library.HasAnimation(clip);
@@ -311,8 +271,30 @@ public sealed class HumanoidAnimator
 
     public void Hurt() => _tree.Set(HurtRequest, (int)AnimationNodeOneShot.OneShotRequest.Fire);
 
-    /// <summary>Raises (1) or lowers (0) a carried light in the right hand; eased by <see cref="Update"/>.</summary>
-    public void Hold(bool on) => _holdTarget = on ? 1f : 0f;
+    /// <summary>A clip the right arm loops while it is wanted (<see cref="HoldClips"/>) rather than playing once per use.</summary>
+    public static bool Holds(string clip) => Array.IndexOf(HoldClips, clip) >= 0;
+
+    /// <summary>
+    /// Loops one of <see cref="HoldClips"/> on the right arm (a carried light raised, a flail spun, a yoyo worked), or
+    /// lowers the arm (null); eased in and out by <see cref="Update"/>, a switch between clips cross-fades.
+    /// </summary>
+    public void Hold(string? clip)
+    {
+        if (clip == null || !Holds(clip))
+        {
+            _holdTarget = 0f; // lowered with the clip it was holding
+            return;
+        }
+        _holdTarget = 1f;
+        PickHold(clip);
+    }
+
+    private void PickHold(string clip)
+    {
+        if (clip == _holdClip) return;
+        _holdClip = clip;
+        _tree.Set(HoldRequest, clip);
+    }
 
     public void Update(float dt)
     {

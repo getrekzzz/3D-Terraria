@@ -71,6 +71,12 @@ public sealed partial class GameWorld : IDisposable
     public WorldEditor Editor { get; }
     public ItemUseTable Uses { get; }
     public ItemUseSystem ItemUse { get; }
+
+    /// <summary>
+    /// How items are used on screen (data/config/use_styles.json): each use style's clip and arm aim, plus the clip
+    /// timing gameplay strikes by. The same config <see cref="ItemUseSystem.Timing"/> holds; set it through that.
+    /// </summary>
+    public Presentation.UseStyleConfig Styles => ItemUse.Timing.Config;
     public ObjectInteraction Interaction { get; }
     public Gameplay.Progression.ProgressionSystem Progression { get; }
     public Gameplay.Progression.MutationDirector Mutations { get; }
@@ -202,7 +208,9 @@ public sealed partial class GameWorld : IDisposable
         TouchHazards(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.GloveCooldown > 0) p.GloveCooldown--;
-        if (p.UseAnimation > 0) p.UseAnimation--;
+        if (p.ReuseDelay > 0) p.ReuseDelay--;
+        if (p.UseAnimation > 0 && --p.UseAnimation == 0) p.ReuseDelay = p.UseItem?.ReuseDelay ?? 0;
+        ItemUse.Continue(p); // a started burst always completes, button held or not
         // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
         if (!p.HasBody && p.Hook.Active) p.Hook.Tick(Session.World, Units.SecondsPerTick, p.Hand);
         if (!p.HasBody && p.ExternalVelocity != Vector3.Zero) p.Position += p.ExternalVelocity * Units.SecondsPerTick; // a tongue's drag

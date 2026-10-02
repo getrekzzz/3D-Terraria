@@ -2424,6 +2424,12 @@
    ],
    "generator": "banner"
   },
+  "piggy_bank": {
+   "models": [
+    "assets/models/objects/piggy_bank_v0.glb"
+   ],
+   "generator": "piggy_bank"
+  },
   "pine_tree": {
    "models": [
     "assets/models/objects/pine_tree_v0.glb",
@@ -2741,6 +2747,12 @@
     "assets/models/objects/rusted_company_standard_v0.glb"
    ],
    "generator": "banner"
+  },
+  "safe": {
+   "models": [
+    "assets/models/objects/safe_v0.glb"
+   ],
+   "generator": "safe"
   },
   "salamander_banner": {
    "models": [
@@ -4586,6 +4598,13 @@
    "model": "assets/models/items/crimson_crate.glb",
    "icon": "assets/icons/items/crimson_crate.png"
   },
+  "crimson_heart": {
+   "model": "assets/models/items/crimson_heart.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/crimson_heart.png"
+  },
   "crimson_key": {
    "model": "assets/models/items/crimson_key.glb",
    "sockets": {
@@ -5252,6 +5271,13 @@
    "model": "assets/models/items/faeling.glb",
    "icon": "assets/icons/items/faeling.png"
   },
+  "fairy_bell": {
+   "model": "assets/models/items/fairy_bell.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/fairy_bell.png"
+  },
   "fairy_wings": {
    "model": "assets/models/items/fairy_wings.glb",
    "icon": "assets/icons/items/fairy_wings.png"
@@ -5311,6 +5337,10 @@
   "firefly_in_a_bottle": {
    "object": "firefly_in_a_bottle",
    "icon": "assets/icons/items/firefly_in_a_bottle.png"
+  },
+  "fish": {
+   "model": "assets/models/items/fish.glb",
+   "icon": "assets/icons/items/fish.png"
   },
   "fisher_of_souls": {
    "model": "assets/models/items/fisher_of_souls.glb",
@@ -6662,6 +6692,13 @@
    },
    "icon": "assets/icons/items/magic_dagger.png"
   },
+  "magic_lantern": {
+   "model": "assets/models/items/magic_lantern.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/magic_lantern.png"
+  },
   "magic_mirror": {
    "model": "assets/models/items/magic_mirror.glb",
    "sockets": {
@@ -7716,6 +7753,10 @@
    },
    "icon": "assets/icons/items/picksaw.png"
   },
+  "piggy_bank": {
+   "object": "piggy_bank",
+   "icon": "assets/icons/items/piggy_bank.png"
+  },
   "pink_dungeon_bookcase": {
    "object": "pink_dungeon_bookcase",
    "icon": "assets/icons/items/pink_dungeon_bookcase.png"
@@ -8256,6 +8297,10 @@
    },
    "icon": "assets/icons/items/s_d_m_g.png"
   },
+  "safe": {
+   "object": "safe",
+   "icon": "assets/icons/items/safe.png"
+  },
   "salamander_banner": {
    "object": "salamander_banner",
    "icon": "assets/icons/items/salamander_banner.png"
@@ -8420,6 +8465,13 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/shadow_key.png"
+  },
+  "shadow_orb": {
+   "model": "assets/models/items/shadow_orb.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/shadow_orb.png"
   },
   "shadow_scale": {
    "model": "assets/models/items/shadow_scale.glb",
@@ -9033,6 +9085,10 @@
   "storm_diver_banner": {
    "object": "storm_diver_banner",
    "icon": "assets/icons/items/storm_diver_banner.png"
+  },
+  "strange_glowing_mushroom": {
+   "model": "assets/models/items/strange_glowing_mushroom.glb",
+   "icon": "assets/icons/items/strange_glowing_mushroom.png"
   },
   "stynger": {
    "model": "assets/models/items/stynger.glb",
@@ -9803,6 +9859,13 @@
    },
    "icon": "assets/icons/items/wire_cutter.png"
   },
+  "wisp_in_a_bottle": {
+   "model": "assets/models/items/wisp_in_a_bottle.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/wisp_in_a_bottle.png"
+  },
   "witch_boots": {
    "model": "assets/models/items/witch_boots.glb",
    "armor": "witch_costume",
@@ -10020,6 +10083,10 @@
    },
    "icon": "assets/icons/items/zenith.png"
   },
+  "zephyr_fish": {
+   "model": "assets/models/items/zephyr_fish.glb",
+   "icon": "assets/icons/items/zephyr_fish.png"
+  },
   "zombie_banner": {
    "object": "zombie_banner",
    "icon": "assets/icons/items/zombie_banner.png"
@@ -10096,6 +10163,22 @@
     "run",
     "swing",
     "use",
+    "walk"
+   ]
+  },
+  "baby_penguin": {
+   "model": "assets/models/creatures/baby_penguin.glb",
+   "generator": "baby_penguin",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "baby_truffle": {
+   "model": "assets/models/creatures/baby_truffle.glb",
+   "generator": "baby_truffle",
+   "animations": [
+    "idle",
     "walk"
    ]
   },

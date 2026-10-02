@@ -27,6 +27,37 @@ public static class Wallet
         return true;
     }
 
+    /// <summary>
+    /// Pays as a shop does in the reference game (1.4): the purse first (<see cref="TrySpend(PlayerInventory, ContentDatabase, long, out List{ItemStack})"/>),
+    /// then the coins kept in personal storage (<paramref name="savings"/>, Piggy Bank before Safe), each storage
+    /// emptied of coins only while the price is still not met. The change goes to the coin slots. Fails (changes
+    /// nothing) when the purse and savings together are too poor.
+    /// </summary>
+    public static bool TrySpend(PlayerInventory inv, IEnumerable<Inventory> savings, ContentDatabase content, long copper, out List<ItemStack> overflow)
+    {
+        if (copper < 0) throw new ArgumentOutOfRangeException(nameof(copper));
+        long purse = Coins.Total(inv);
+        if (purse >= copper) return TrySpend(inv, content, copper, out overflow);
+        overflow = new List<ItemStack>();
+        var banks = savings.ToList();
+        if (purse + banks.Sum(Coins.Total) < copper) return false;
+        long need = copper - purse, taken = 0;
+        foreach (var bank in banks)
+        {
+            if (taken >= need) break;
+            long held = Coins.Total(bank);
+            if (held == 0) continue;
+            bank.Remove(d => d.HasTag("coin"), int.MaxValue);
+            taken += held;
+        }
+        inv.Backpack.Remove(d => d.HasTag("coin"), int.MaxValue);
+        Coins.Layout(inv, content, taken - need, overflow);
+        return true;
+    }
+
+    /// <summary>What the player can spend at a shop: the purse plus the coins kept in personal storage.</summary>
+    public static long Funds(PlayerInventory inv, IEnumerable<Inventory> savings) => Coins.Total(inv) + savings.Sum(Coins.Total);
+
     /// <summary>Adds coins worth <paramref name="copper"/> to the coin slots (converting as they fill), then the backpack; returns what did not fit.</summary>
     public static List<ItemStack> Give(PlayerInventory inv, ContentDatabase content, long copper)
     {

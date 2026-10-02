@@ -142,7 +142,7 @@ public sealed class ContentDatabase
     public ItemDef GetOrAddPlaceholderItem(string id) =>
         Items.TryGet(id = Current(id), out var existing)
             ? existing
-            : Items.AddLate(new ItemDef { Id = id, Name = $"Missing item ({id})", MaxStack = 9999, Tags = new[] { "placeholder" } });
+            : Items.AddLate(new ItemDef { Id = id, Name = $"Missing item ({id})", MaxStack = ItemDef.CommonMaxStack, Tags = new[] { "placeholder" } });
 
     public TileObjectDef GetOrAddPlaceholderTileObject(string id) =>
         TileObjects.TryGet(id = Current(id), out var existing)

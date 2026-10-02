@@ -9,14 +9,14 @@
   ],
   "items": [
     { "id": "flinx_fur", "name": "Flinx Fur", "category": "material", "maxStack": 9999, "value": 500 },
-    { "id": "deer_thing", "name": "Deer Thing", "description": "Summons Deerclops. Use in the snow.", "category": "bossSummon", "rarity": 1, "maxStack": 20, "value": 5000,
-      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+    { "id": "deer_thing", "name": "Deer Thing", "description": "Summons Deerclops. Use in the snow.", "category": "bossSummon", "rarity": 1, "maxStack": 9999, "value": 5000,
+      "useStyle": "holdUp", "useTime": 45, "useAnimation": 45, "consumable": true,
       "behaviors": [{ "type": "summonBoss", "enemy": "deerclops", "conditions": [{ "type": "biome", "any": ["tundra"] }], "failMessage": "It only stirs in the snow." }] },
     { "id": "lucy_the_axe", "name": "Lucy the Axe", "description": "A talkative axe. It chops trees and foes alike.", "category": "tool", "rarity": 3, "value": 20000, "useStyle": "swing", "useTime": 20, "useAnimation": 20,
       "autoReuse": true, "damage": 35, "damageType": "melee", "knockback": 6, "axePower": 150 },
-    { "id": "weather_pain", "name": "Weather Pain", "description": "Summons a slow-moving tempest that tears through enemies.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "shoot", "useTime": 30, "useAnimation": 30,
+    { "id": "weather_pain", "name": "Weather Pain", "description": "Summons a slow-moving tempest that tears through enemies.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "staff", "useTime": 30, "useAnimation": 30,
       "damage": 20, "damageType": "magic", "manaCost": 10, "projectile": "weather_pain_bolt", "shootSpeed": 5 },
-    { "id": "pew_matic_horn", "name": "Pew-matic Horn", "description": "Fires loose junk.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "shoot", "useTime": 20, "useAnimation": 20,
+    { "id": "pew_matic_horn", "name": "Pew-matic Horn", "description": "Fires loose junk.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "gun", "useTime": 20, "useAnimation": 20,
       "autoReuse": true, "damage": 24, "damageType": "ranged", "knockback": 4, "projectile": "pew_matic_horn_shot", "shootSpeed": 16 }
   ],
   "recipes": [

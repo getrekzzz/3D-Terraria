@@ -81,14 +81,14 @@ public class InventoryOpsTests
         chest[1] = S("wooden_arrow", 100);
         chest[2] = S("copper_shortsword");
         chest[3] = S("gel", 50);
-        inv.Backpack[3] = S("lesser_healing_potion", 25); // stacks to 30
+        inv.Backpack[3] = S("lesser_healing_potion", 9995); // stacks to 9999
         inv.Ammo[0] = S("wooden_arrow", 9950);
         inv.Backpack[4] = S("copper_shortsword");
 
-        Assert.Equal(5 + 49, InventoryOps.Restock(chest, inv));
-        Assert.Equal(30, inv.Backpack[3].Count);
+        Assert.Equal(4 + 49, InventoryOps.Restock(chest, inv));
+        Assert.Equal(9999, inv.Backpack[3].Count);
         Assert.Equal(9999, inv.Ammo[0].Count);
-        Assert.Equal(15, chest[0].Count);
+        Assert.Equal(16, chest[0].Count);
         Assert.Equal(51, chest[1].Count);
         Assert.Equal(1, Count(chest, "copper_shortsword")); // unstackable items stay
         Assert.Equal(50, Count(chest, "gel")); // and nothing the player does not already carry
