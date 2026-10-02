@@ -6,7 +6,7 @@ namespace Strata.Game.UI;
 /// <summary>
 /// Where the game's messages go, in Terraria's colours. World messages scroll up the <see cref="ChatLog"/>:
 /// - boss messages ("has awoken!", "has been defeated!", phases and rages, "has left!") and invasions in purple;
-/// - residents arriving or leaving in blue, and their deaths ("was slain...") in red;
+/// - residents arriving or leaving in blue, and their deaths ("was slain...") and the player's own in red;
 /// - other events (the Blood Moon, an eclipse) and world changes (hardmode, a meteorite) in green;
 /// - a catch ("Caught Bass!") in the item's rarity colour.
 /// Refusals and notices take the status line under the crosshair; pickups float over the player's head
@@ -43,6 +43,12 @@ public sealed partial class Hud
             if (f.Announce != null) Announce(f.Announce, UiTheme.EventGreen);
         };
         ui.Game.Objectives.Announced += (text, color) => Announce(text, Color.FromHtml(color));
+        // "Wanderer was slain by a Zombie." in red, and under the death screen's title.
+        ui.Game.PlayerSlain += (p, text) =>
+        {
+            Announce(text, UiTheme.Death);
+            if (p == ui.Entity) _death.Cause = text;
+        };
         ui.Game.ItemUse.Caught += (p, stack) =>
         {
             if (p == ui.Entity) Announce($"Caught {stack.Item!.DisplayName}!", UiTheme.Rarity(stack.Item.Rarity));

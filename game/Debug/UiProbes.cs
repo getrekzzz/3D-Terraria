@@ -13,7 +13,8 @@ namespace Strata.Game.Debug;
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); on the inventory
 /// screen's layout (P2-15); on the hearts, mana stars and breath bubbles (P2-13); on the buff bar (P2-14); on the
-/// chat log (P2-21); on the pickup popups (P2-22); and on the boss bar and the invasion progress (P2-23).
+/// chat log (P2-21); on the pickup popups (P2-22); on the boss bar and the invasion progress (P2-23); and on the
+/// death screen (P2-25).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -96,5 +97,9 @@ public static class UiProbes
         ctx.AddProbe("ui.bossbar_fill", () => world.Hud?.BossBar.Fraction ?? 0);
         ctx.AddProbe("ui.eventbar", () => world.Hud?.EventBar.Active == true ? 1 : 0);
         ctx.AddProbe("ui.eventbar_percent", () => world.Hud?.EventBar.Percent ?? -1);
+        // P2-25: the death screen is up (the player is dead; 0 again once they respawn).
+        ctx.AddProbe("ui.death_dim", () => world.Hud?.Death.Shown == true ? 1 : 0);
+        // The cause under the title ("smoke was slain.") is also the chat log's newest line.
+        ctx.AddProbe("ui.death_cause", () => world.Hud is { } hud && hud.Death.Cause.Length > 0 && hud.Chat.LastLine == hud.Death.Cause ? 1 : 0);
     }
 }

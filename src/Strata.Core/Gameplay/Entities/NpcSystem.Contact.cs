@@ -25,7 +25,7 @@ public sealed partial class NpcSystem
         var away = BrainFactory.Flat(player.Position - npc.Position);
         if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
         var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);
-        ReportPlayerDamage(player, hit.Damage, knock);
+        ReportPlayerDamage(player, hit.Damage, knock, Harm.By(npc.Def));
         ApplyContactEffects(npc, player);
         float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
         if (thorns > 0) Hit(npc, null, (int)(npc.Def.Damage * npc.DamageScale * thorns), DamageClass.None, 0, 0f, player.Center, melee: false);
@@ -45,9 +45,13 @@ public sealed partial class NpcSystem
         return -1;
     }
 
-    /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
-    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock)
+    /// <summary>
+    /// Announces damage a player took from any source (numbers, knockback, hurt effects) and remembers what dealt it
+    /// (<see cref="PlayerEntity.LastHarm"/>, named by the death message).
+    /// </summary>
+    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock, Harm harm)
     {
+        player.LastHarm = harm;
         Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, player));
         PlayerHurt?.Invoke(player, damage, knock);
     }

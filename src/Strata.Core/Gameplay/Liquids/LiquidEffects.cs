@@ -110,7 +110,7 @@ public sealed partial class LiquidEffects
         }
         if (tick % 30 != 0) return;
         p.State.Vitals.DamageDirect(DrownDamage);
-        _world.Npcs.ReportPlayerDamage(p, DrownDamage, Vector3.Zero);
+        _world.Npcs.ReportPlayerDamage(p, DrownDamage, Vector3.Zero, Harm.Drowning);
     }
 
     private void TouchPlayer(PlayerEntity p, LiquidDef liquid, long tick)
@@ -140,7 +140,8 @@ public sealed partial class LiquidEffects
         var hit = DamageModel.Roll(liquid.ContactDamage, DamageClass.None, 0, 0f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref rng);
         if (state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity))
-            _world.Npcs.ReportPlayerDamage(p, hit.Damage, new Vector3(0, 7f, 0)); // lava throws you upward
+            _world.Npcs.ReportPlayerDamage(p, hit.Damage, new Vector3(0, 7f, 0), // lava throws you upward
+                liquid.Id == "lava" ? Harm.Lava : new Harm(HarmKind.Other, liquid.DisplayName, liquid.Id));
     }
 
     private void TouchCreature(Npc npc, LiquidDef liquid)

@@ -487,3 +487,18 @@ wait 4.5
 assert ui.eventbar == 0
 god off
 assert errors == 0
+
+# --- P2-25 ---
+# Dying darkens the screen under "You were slain..." with the cause of death and the respawn countdown; the same line
+# goes to the chat log; on respawn the screen fades away.
+heal
+kill
+wait 0.5
+assert ui.death_dim == 1
+assert ui.death_cause == 1
+assert ui.chat_lines >= 1
+assert player.alive == 0
+wait 6
+assert player.alive == 1
+assert ui.death_dim == 0
+assert errors == 0

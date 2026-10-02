@@ -69,6 +69,9 @@ public sealed partial class ChatLog : Control
     /// <summary>Lines on show now (the <c>ui.chat_lines</c> probe): every kept line in the history, else those not faded.</summary>
     public int LinesShown => _history.Count - (_open ? 0 : _history.FirstShown(_now));
 
+    /// <summary>The newest line's text, or "".</summary>
+    public string LastLine => _history.Count > 0 ? _history[_history.Count - 1].Text : "";
+
     /// <summary>Adds a message at the bottom of the log in <paramref name="color"/>.</summary>
     public void Add(string text, Color color)
     {

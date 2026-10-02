@@ -27,6 +27,7 @@ public sealed partial class PlayerController
             int damage = _config.FallDamage(_peakY - y, Entity.State.Effects.NoFallDamage);
             if (damage > 0)
             {
+                Entity.LastHarm = Strata.Core.Gameplay.Combat.Harm.Fall;
                 Entity.State.Vitals.DamageDirect(damage);
                 FallDamaged?.Invoke(damage);
             }

@@ -383,6 +383,18 @@
   `EventDirector.Progress(a)` (kills over `GoalOf`) as "NN%", and holds its last value 3 s after the event ends, then
   fades. Their `Active` flags feed `UiState.BossBar/EventBar`. Probes `ui.bossbar`, `ui.bossbar_fill`,
   `ui.eventbar`, `ui.eventbar_percent`.
+* **Death messages and the death screen** — every hurt records `PlayerEntity.LastHarm` (`Harm(HarmKind, Source,
+  Id)`, Gameplay/Combat/Harm.cs): `NpcSystem.ReportPlayerDamage(player, damage, knock, harm)` takes it from creature
+  contact and walls (`Harm.By(EnemyDef)`: bosses by name, others "a Zombie"), shots (`Projectile.Shooter`, set for
+  creature volleys and brain shots, else the projectile's own name), spikes (`Trap`), lava and drowning
+  (`LiquidEffects`); falls set it in `PlayerController.Fall`, damage over time in `GameWorld.TickPlayer` from
+  `EffectState.DotSource` (the buff dealing the most), and the `kill` command `Other`. On death `GameWorld.PlayerSlain(p,
+  text)` fires next to `PlayerDied` with `DeathMessages.Format(name, harm, deaths − 1)` (Core/Presentation,
+  data/config/deaths.json: lines per kind plus per-source lines such as `on_fire`; picked by death count; `Load`
+  rejects a kind without a line; loaded by the launcher into `GameWorld.Deaths`). `DeathScreen` (game/UI/Hud) dims the
+  view to 55 % over 1 s under "You were slain..." (48 px, `UiTheme.Death`; hardcore: "Name has perished..." and
+  "Hardcore characters do not return."), the cause and "Respawning in N", and fades out on respawn; the cause also goes
+  to the chat log in red. Probes `ui.death_dim`, `ui.death_cause`.
 * **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance

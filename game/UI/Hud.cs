@@ -27,7 +27,7 @@ public sealed partial class Hud : CanvasLayer
     private InfoPanel _info = null!;
     private ChatLog _chat = null!;
     private PickupPopups _popups = null!;
-    private Label _death = null!;
+    private DeathScreen _death = null!;
     private BossBar _bossBar = null!;
     private EventProgressPanel _eventBar = null!;
     private InventoryScreen? _inventory;
@@ -67,6 +67,9 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>Pickup popups on screen over the player's head (the <c>ui.popups</c> probe).</summary>
     public int PopupsShown => _popups.Shown;
 
+    /// <summary>The death screen (the <c>ui.death_dim</c> probe).</summary>
+    public DeathScreen Death => _death;
+
     /// <summary>The boss bar (the <c>ui.bossbar</c> probe).</summary>
     public BossBar BossBar => _bossBar;
 
@@ -98,12 +101,6 @@ public sealed partial class Hud : CanvasLayer
         root.AddChild(_popups = new PickupPopups(ui)); // full screen, anchored to the player: not a layout region
         BuildBanner(root);
 
-        _death = new Label { Visible = false, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-        _death.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        _death.AddThemeFontSizeOverride("font_size", 44);
-        _death.AddThemeColorOverride("font_color", new Color(0.9f, 0.25f, 0.25f));
-        root.AddChild(_death);
-
         root.AddChild(_bossBar = LayoutWidgets.Register(new BossBar()));
         root.AddChild(_eventBar = LayoutWidgets.Register(new EventProgressPanel(ui.Game.Events)));
         // Boss head icons load in the background now, so a boss's arrival never waits on the disk.
@@ -111,6 +108,7 @@ public sealed partial class Hud : CanvasLayer
         foreach (var e in ui.Game.Session.Content.Enemies.All)
             if (e.Boss is { Minor: false }) bossIcons.Add(Strata.Core.Content.AssetPaths.BossIcon(e));
         Strata.Game.Items.PortraitIcons.Preload(bossIcons);
+        root.AddChild(_death = new DeathScreen()); // last: over every widget
         WireMessages(ui);
     }
 
@@ -141,11 +139,7 @@ public sealed partial class Hud : CanvasLayer
         UpdateLayout();
         UpdateVitals(delta);
         UpdateBuildHint();
-        _death.Visible = !_ui.Entity.Alive;
-        if (_death.Visible)
-            _death.Text = _ui.Entity.Lost
-                ? $"{_ui.Entity.State.Name} has perished.\nHardcore characters do not return."
-                : $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
+        _death.Refresh(_ui.Entity, delta);
     }
 
     /// <summary>Lays the screen out again when what decides the layout changed (the window, the UI scale or what is shown).</summary>

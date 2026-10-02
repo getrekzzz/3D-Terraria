@@ -177,6 +177,7 @@ public sealed partial class GameWorld : IDisposable
                 state.Recompute(); // no debuff effect (confusion) lingers on the corpse
                 ApplyDeathPenalty(p);
                 DropTombstone(p);
+                PlayerSlain?.Invoke(p, DeathMessage(p));
                 PlayerDied?.Invoke(p);
             }
             else if (--p.RespawnTicks == 0 && !p.Lost)
@@ -199,7 +200,11 @@ public sealed partial class GameWorld : IDisposable
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
         if (Session.Clock.Tick % Units.TicksPerSecond == 0)
         {
-            if (dps > 0 && p.Alive) state.Vitals.DamageDirect(dps);
+            if (dps > 0 && p.Alive)
+            {
+                p.LastHarm = state.Effects.DotSource is { } dot ? Gameplay.Combat.Harm.By(dot) : new(Gameplay.Combat.HarmKind.Debuff);
+                state.Vitals.DamageDirect(dps);
+            }
             state.Recompute();
             CheckMilestones(p);
         }
@@ -209,6 +214,7 @@ public sealed partial class GameWorld : IDisposable
     {
         p.RespawnTicks = 0;
         p.Breath = PlayerEntity.MaxBreath;
+        p.LastHarm = Gameplay.Combat.Harm.Other;
         p.State.Recompute();
         p.State.Vitals.Life = p.State.Vitals.MaxLife;
         p.State.Vitals.Mana = p.State.Vitals.MaxMana;

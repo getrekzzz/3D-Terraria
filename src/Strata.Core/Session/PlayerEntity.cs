@@ -112,6 +112,9 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
     /// <summary>A hardcore character that died: it never respawns and is not saved again.</summary>
     public bool Lost { get; set; }
 
+    /// <summary>What hurt the player last (the cause named by the death message); not saved.</summary>
+    public Gameplay.Combat.Harm LastHarm { get; set; } = Gameplay.Combat.Harm.Other;
+
     /// <summary>Precision mode: tools affect a single cell.</summary>
     public bool Precision { get; set; }
 
