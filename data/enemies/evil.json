@@ -102,7 +102,7 @@
       "id": "brain_of_cthulhu", "model": "brain_of_cthulhu", "tags": ["boss", "lava_immune"], "name": "Brain of Cthulhu",
       "description": "A disembodied brain that commands the Crimson; its Creepers guard it until they fall.",
       "brain": { "type": "pattern", "phases": [
-        { "below": 1.0, "shieldedBy": "creeper", "untilGuardsFall": true, "summon": { "enemy": "creeper", "max": 20, "once": true },
+        { "below": 1.0, "shieldedBy": "creeper", "untilGuardsFall": true, "summon": { "enemy": "creeper", "max": 20, "once": true, "tether": true, "radius": 5 },
           "moves": [{ "type": "hover", "ticks": 150, "speed": 4, "height": 3, "distance": 9 }, { "type": "teleport", "ticks": 60, "telegraph": 45, "distance": 10, "height": 2 }] },
         { "below": 0.99, "model": "brain_of_cthulhu_exposed", "illusions": 3, "message": "The Brain of Cthulhu is exposed!",
           "expert": { "speed": 1.25, "telegraphScale": 0.8 }, "aura": { "buff": "confused", "ticks": 120, "interval": 360, "radius": 22, "expertOnly": true },

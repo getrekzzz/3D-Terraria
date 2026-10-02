@@ -85,6 +85,14 @@
   flesh: tiled `barrierModel`, hurts and throws out players behind it) and tether minions to it (`Leader`: their
   anchor follows it and they die with it). `summonBoss` items, the keeper's `summonBoss` service and
   `incinerationSummon` items (burned in lava in a given layer, sacrificing a resident) spawn bosses.
+* **Natural boss arrivals** — an event with `spawnBoss` is a warning plus a countdown (`duration`): "You feel an evil
+  presence watching you..." (1/3 of nights for a player with 200 life and 10 defense until the Eye is beaten) calls the
+  Eye; in hardmode after the first altar the `mech_night` `group` (one member picked per roll among the eligible, 1/10)
+  warns of an unbeaten mechanical boss. When the countdown ends the boss comes unless one lives or it was beaten (fliers
+  20 m ahead and 12 m up, walkers drop in from 12 m). `killGoalAfterFlag` lowers a goal once a flag is set
+  (`EventDirector.GoalOf`): Slime Rain calls King Slime after 150 gel kills, 75 once he is beaten. The `worldRing`
+  condition reads `ConditionContext.CentreDistance` (0 at the centre, 1 at the land radius): King Slime may wander
+  in on the outer third of the surface (`king_slime_natural`, about 1 in 300 surface spawns).
 * **Boss framework** — `boss.parts` (`BossPart`: offset, `diesWithBody` default true, `inBossBar`, `mirror`) spawn
   fixed parts (`Npc.IsPart`) that skip far-despawn and the respawn clear; parts that die with the body never keep
   `GroupAlive` true, so killing the body raises the defeat flag once; its parts die with it at once (no hits, no second
@@ -112,6 +120,25 @@
   `consume` behaviour rolling `<boss>_bag` = the drops plus the Expert-only item). A new boss's bag is data only (bag
   item, three tables, trophy, `tools/blender/assets.d/p4-04-boss-loot.json` rows: `trophy` builds the boss's own
   creature generator into the plaque as a bust, `treasure_bag` takes colours; `bgen/trophies.py`).
+* **King Slime and the Eye** — King Slime (2000 life) shrinks with its life (`Npc.VisualScale` and the collision box,
+  `HalfExtents` from `BaseHalfExtents`; 1 → 0.6 as Terraria's 1.25 → 0.75), sheds a slime per 6 % of life lost (in
+  Expert every third is a Spiked Slime), teleports when the target is beyond `teleportDistance` or out of its sight for
+  `lostSightTicks` (reappearing beside the target, or right above it when that spot is behind a wall; 35-tick wind-up in
+  Expert) and raises an impact and the `land` cue when it lands faster than `impactSpeed` (`Npc.LandingSpeed`, set by
+  every move). The Eye (2800 life, 12 defense, 15 damage) tears open at half life: `transformTicks` spinning in place,
+  untouchable, into its mouth model, then `phase2Defense` 0 and ×`phase2Damage` (23) without servants; in Expert each
+  tenth of life lost below half adds a dash to its bursts (up to `expertMaxDashes`) with shorter wind-ups.
+* **Eater of Worlds segments** — `boss.segmentLife`/`segmentDefense`/`segmentDamage` ([head, body, tail]; Terraria's
+  65/150/220 life, 0/4/8 defense, 22/13/11 damage over 49 segments) give every segment its own life (`Npc.SegmentLife`,
+  parallel to `Segments`; `TotalLife`, `WholeMaxLife`, `NpcSystem.GroupLife` for a bar, probe `boss.<id>.total`).
+  Hits carry the struck volume (`Npc.FirstVolume`: melee, projectiles, the `damage <enemy> <amount> [segment]`
+  command; contact damage per touched volume). `NpcSystem.Segments`: a dead segment rolls `segmentLoot` where it died
+  (`eater_segment` in `data/loot/segments.json`) and, with `splits`, the segments behind it crawl off as a new worm of
+  the same group (silently; it keeps the swing's immunity); a lone tail behind the cut or a head left with no body dies
+  outright. A dead head hands its place and life to the next segment. The boss table rolls once (`lootOnDefeat`) when
+  the last piece dies. Each piece is its own `WormBrain`; in Expert a body segment that sees the target spits Vile Spit
+  (`eater_spit`, Weak) every `spitInterval`. `NpcRenderer.SyncSegmentViews` returns lost segment visuals to the pool
+  and keeps the tail model on the last one.
 * **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
   at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
   `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster

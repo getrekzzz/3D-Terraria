@@ -61,6 +61,9 @@ public sealed class ConditionContext
     /// <summary>Fishing power of the rod making a catch (fishing loot only).</summary>
     public int FishingPower { get; set; }
 
+    /// <summary>How far out the position lies: 0 at the world's centre, 1 at the edge of its land (outer thirds ≥ 0.66).</summary>
+    public float CentreDistance { get; set; }
+
     public Pcg32 Random;
 
     public bool HasBiome(string id)

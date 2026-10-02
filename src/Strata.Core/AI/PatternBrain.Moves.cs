@@ -87,7 +87,20 @@ public sealed partial class PatternBrain
                 done = npc.Timer >= telegraph + m.Ticks;
                 break;
             case "hop":
-                if (!ground || npc.OnGround)
+                if (!ground)
+                {
+                    // Flying (no gravity to bring it down): a braked lunge that climbs only to Height above the target.
+                    npc.Velocity *= 0.9f;
+                    if (npc.Timer >= telegraph)
+                    {
+                        float rise = target.Center.Y + m.Height * Common.Units.CellSize - npc.Center.Y;
+                        npc.Velocity = flat * speed + new Vector3(0, Math.Clamp(rise * 2f, -speed, speed), 0);
+                        npc.Timer = 0;
+                        done = ++npc.Counter2 >= m.Count;
+                    }
+                    else npc.Pose = "telegraph";
+                }
+                else if (npc.OnGround)
                 {
                     npc.Velocity.X *= 0.6f;
                     npc.Velocity.Z *= 0.6f;

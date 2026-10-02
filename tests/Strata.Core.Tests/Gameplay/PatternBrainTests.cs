@@ -200,4 +200,19 @@ public class PatternBrainTests
         g.Ticks(2);
         Assert.Equal(0, npc.Illusions);
     }
+
+    [Fact]
+    public void AHopInAFlyPhaseStaysNearTheTarget()
+    {
+        var def = Boss("{'type':'pattern','ground':true,'phases':[{'fly':true,'moves':[{'type':'hop','count':50,'telegraph':10,'height':6,'speed':6}]}]}", ground: true);
+        using var g = Arena();
+        var npc = Spawn(g, def, new Vector3(0, 3, 5));
+        float top = float.MinValue;
+        for (int t = 0; t < 600; t++)
+        {
+            g.World.Tick();
+            top = MathF.Max(top, npc.Center.Y - g.Player.Center.Y);
+        }
+        Assert.True(top < 8f, $"rose {top:0.0} m above the target");
+    }
 }

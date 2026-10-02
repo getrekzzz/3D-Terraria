@@ -91,7 +91,7 @@ public class BossTests
             g.World.Tick();
             if (i % 20 == 0) trace.Append($"[{i}: rel={boss.Center - g.Player.Position} vel={boss.Velocity} target={boss.TargetPlayer} solid={g.World.Session.World.IsSolid(Strata.Core.Physics.VoxelMotion.CellOf(boss.Center).X, Strata.Core.Physics.VoxelMotion.CellOf(boss.Center).Y, Strata.Core.Physics.VoxelMotion.CellOf(boss.Center).Z)}] ");
         }
-        Assert.Equal(18, boss.Segments.Count);
+        Assert.Equal(49, boss.Segments.Count);
         for (int i = 1; i < boss.Segments.Count; i++)
             Assert.InRange(Vector3.Distance(boss.Segments[i], boss.Segments[i - 1]), 0.5f, 1.2f);
 
@@ -103,14 +103,15 @@ public class BossTests
                     if (world.GetBlock(g.Floor + new Strata.Core.Common.Int3(x, y, z)) == 0) open++;
         Assert.True(open > 0, "the worm did not dig " + trace);
 
-        // A projectile at a body segment damages the shared life pool (fresh worm inside the loaded arena).
+        // A projectile at a body segment damages that segment (fresh worm inside the loaded arena).
         g.World.Npcs.Clear();
         boss = Boss(g, "eater_of_worlds", new Vector3(0, 5f, 6f));
-        int life = boss.Life;
+        int life = boss.TotalLife, head = boss.Life;
         var seg = boss.Segments[1];
         g.World.Projectiles.Spawn(g.Content.Projectiles.Get("wooden_arrow"), seg + new Vector3(0, 0, -0.1f), Vector3.Zero, g.Player, 20, 1, Strata.Core.Content.Defs.DamageClass.Ranged, 0);
         g.World.Projectiles.Tick();
-        Assert.True(boss.Life < life);
+        Assert.True(boss.TotalLife < life);
+        Assert.Equal(head, boss.Life);
     }
 
     [Fact]

@@ -14,4 +14,11 @@ event slime_rain
 assert event.slime_rain == 1
 event stop slime_rain
 assert event.slime_rain == 0
+# A natural arrival: the warning, then the Eye after the countdown.
+time 21
+event evil_presence
+assert event.evil_presence == 1
+wait_until npcs.eye_of_cthulhu == 1 15
+assert event.evil_presence == 0
+killall
 assert errors == 0

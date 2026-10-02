@@ -18,11 +18,17 @@ give suspicious_looking_eye 1
 wield suspicious_looking_eye
 use
 assert npcs.eye_of_cthulhu == 1
+assert boss.eye_of_cthulhu.defense == 12
 wait 3
 killall
 boss eater_of_worlds 10
 wait 3
 assert npcs.eater_of_worlds == 1
+# Cutting a body segment splits the Eater; it falls with its last piece.
+damage eater_of_worlds 9999 20
+assert npcs.eater_of_worlds == 2
+slay eater_of_worlds
+assert flag.defeated_eater_of_worlds == 1
 killall
 # The pattern bosses: the Brain behind its Creepers, the Queen Bee and her bees, Deerclops; slaying raises their flags.
 # (God mode: a boss leaves once every player is dead.)

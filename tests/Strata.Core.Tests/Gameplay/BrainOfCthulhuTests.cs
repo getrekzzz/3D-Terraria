@@ -90,4 +90,25 @@ public class BrainOfCthulhuTests
         // The aura's confusion lasts 120 ticks; a touch's only 90.
         Assert.Equal(pulses, longest > 100);
     }
+
+    [Fact]
+    public void CreepersFollowTheirBrainAndLeaveWithIt()
+    {
+        using var g = Arena();
+        var first = Brain(g);
+        g.Ticks(3);
+        Assert.Equal(20, first.Followers.Count(f => f.Def.Id == "creeper"));
+        g.World.Npcs.Despawn(first); // the Brain leaves (the player fled the arena)
+        g.Ticks(2);
+        Assert.Equal(0, g.World.Npcs.All.Count(n => n.Def.Id == "creeper"));
+        // A Creeper outliving its Brain never shields the next one.
+        var stray = g.World.Npcs.Spawn(g.Content.Enemies.Get("creeper"), g.Player.Position + new Vector3(8, 3, 0))!;
+        var second = Brain(g);
+        g.Ticks(3);
+        foreach (var c in second.Followers.ToList()) g.World.Npcs.Kill(c);
+        g.Ticks(3);
+        Assert.True(stray.Alive);
+        Assert.Equal(1, second.Stage);
+        Assert.False(second.Invulnerable);
+    }
 }

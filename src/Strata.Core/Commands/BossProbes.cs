@@ -2,7 +2,7 @@ namespace Strata.Core.Commands;
 
 /// <summary>
 /// Boss probes: <c>boss.&lt;enemyId&gt;.&lt;field&gt;</c> reads the first living creature of that id (0 when none
-/// lives). Fields: life, max, defense, stage, phase, enraged, frenzied, illusions, parts (living fixed parts), segments.
+/// lives). Fields: life, max, defense, stage, phase, enraged, frenzied, illusions, parts (living fixed parts), segments, total (life summed over a split worm's pieces).
 /// </summary>
 [ProbeSource]
 internal static class BossProbes
@@ -17,7 +17,7 @@ internal static class BossProbes
             string id = spec[..dot], field = spec[(dot + 1)..];
             if (!w.Session.Content.Enemies.Contains(id)) return null;
             var npc = w.Npcs.All.FirstOrDefault(n => n.Alive && n.Def.Id == id);
-            if (npc == null) return field is "life" or "max" or "defense" or "stage" or "phase" or "enraged" or "frenzied" or "illusions" or "parts" or "segments" ? 0 : null;
+            if (npc == null) return field is "life" or "max" or "defense" or "stage" or "phase" or "enraged" or "frenzied" or "illusions" or "parts" or "segments" or "total" ? 0 : null;
             return field switch
             {
                 "life" => npc.Life,
@@ -30,6 +30,7 @@ internal static class BossProbes
                 "illusions" => npc.Illusions,
                 "parts" => npc.Followers.Count(f => f.Alive && f.IsPart),
                 "segments" => npc.Segments.Count,
+                "total" => npc.Def.Boss != null ? w.Npcs.GroupLife(npc.Def.Boss).Life : npc.TotalLife,
                 _ => null,
             };
         });
