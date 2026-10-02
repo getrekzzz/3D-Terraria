@@ -1,6 +1,8 @@
 using System.Text.Json;
 using Strata.Core.Content;
+using Strata.Core.Content.Defs;
 using Strata.Core.Content.Loading;
+using Strata.Core.Gameplay.Items;
 
 namespace Strata.Core.Presentation;
 
@@ -9,13 +11,17 @@ namespace Strata.Core.Presentation;
 /// body clip as fractions of the clip: the strike window of a swing, a mining chop or a thrust, and a bow's release
 /// and re-draw. Gameplay reads it through <see cref="Gameplay.Items.UseTiming"/> (a swing only deals damage once its
 /// wind-up is over), the engine poses the view model and trails by it, and the Blender clips are keyed to it.
+/// <see cref="Styles"/> says how each <see cref="UseStyle"/> looks: the clip it plays and how far the arms follow the aim.
 /// </summary>
 public sealed class UseStyleConfig
 {
     public const string Path = "data/config/use_styles.json";
 
-    /// <summary>Clips that must be present, with the windows gameplay and presentation read from them.</summary>
-    public static readonly string[] StrikeClips = { "swing", "mine", "thrust" };
+    /// <summary>Clips that must be present with a strike window (gameplay strikes in it; the body clips are keyed to it).</summary>
+    public static readonly string[] StrikeClips = { "swing", "mine", "rapier", "spear", "whip" };
+
+    /// <summary>Clips that must be present with a release (the item leaves the hand).</summary>
+    public static readonly string[] ReleaseClips = { "throw", "bow" };
 
     public const string BowClip = "bow";
 
@@ -24,6 +30,35 @@ public sealed class UseStyleConfig
 
     /// <summary>Timing per clip, keyed by the clip (animation) name.</summary>
     public Dictionary<string, ClipTiming> Clips { get; init; } = new();
+
+    /// <summary>How each use style looks, keyed by its JSON name ("swing", "holdUp"); every style has an entry.</summary>
+    public Dictionary<string, UseStyleEntry> Styles { get; init; } = new();
+
+    private static readonly UseStyle[] AllStyles = Enum.GetValues<UseStyle>();
+    private static readonly UseStyleEntry Plain = new();
+    private UseStyleEntry[]? _byStyle;
+
+    /// <summary>The JSON name of a style ("holdUp").</summary>
+    public static string Key(UseStyle style) => JsonNamingPolicy.CamelCase.ConvertName(style.ToString());
+
+    /// <summary>A style's entry (a plain "use" when the file has none for it).</summary>
+    public UseStyleEntry Style(UseStyle style)
+    {
+        if (_byStyle == null)
+        {
+            var table = new UseStyleEntry[AllStyles.Length];
+            foreach (var s in AllStyles) table[(int)s] = Styles.TryGetValue(Key(s), out var e) ? e : Plain;
+            _byStyle = table;
+        }
+        return _byStyle[(int)style];
+    }
+
+    /// <summary>The upper-body clip an item's use plays: its style's clip, or the style's tool clip for tools.</summary>
+    public string ClipFor(ItemUseInfo info)
+    {
+        var entry = Style(info.Style);
+        return info.IsTool && entry.ToolClip != null ? entry.ToolClip : entry.Clip;
+    }
 
     public static UseStyleConfig Load(IDataSource data) =>
         JsonSerializer.Deserialize<UseStyleConfig>(data.ReadText(Path), ContentJson.Options) ?? throw new JsonException($"{Path} is empty");
@@ -36,8 +71,35 @@ public sealed class UseStyleConfig
         {
             ["swing"] = new ClipTiming { Length = 0.5f, StrikeStart = 0.1f, StrikeEnd = 0.6f },
             ["mine"] = new ClipTiming { Length = 0.46f, StrikeStart = 0.18f, StrikeEnd = 0.32f },
-            ["thrust"] = new ClipTiming { Length = 0.4f, StrikeStart = 0.25f, StrikeEnd = 0.5f },
+            ["rapier"] = new ClipTiming { Length = 0.25f, StrikeStart = 0.05f, StrikeEnd = 0.15f },
+            ["spear"] = new ClipTiming { Length = 0.4f, StrikeStart = 0.12f, StrikeEnd = 0.3f },
+            ["whip"] = new ClipTiming { Length = 0.6f, StrikeStart = 0.35f, StrikeEnd = 0.55f },
+            ["throw"] = new ClipTiming { Length = 0.45f, Release = 0.1f },
             ["bow"] = new ClipTiming { Length = 0.7f, Release = 0.06f, RedrawStart = 0.3f, RedrawEnd = 0.85f },
+        },
+        Styles = new()
+        {
+            ["none"] = new UseStyleEntry { Clip = "use", ArmAim = 0.5f },
+            ["swing"] = new UseStyleEntry
+            {
+                Clip = "swing", ToolClip = "mine", ArmAim = 0.5f,
+                BladeCurve = new CurveKey[] { new(0f, 158f, "lin"), new(0.1f, 166f, "out"), new(0.6f, 45f, "io"), new(0.72f, 26f, "out"), new(1f, 158f, "io") },
+            },
+            ["rapier"] = new UseStyleEntry { Clip = "rapier", ArmAim = 1f },
+            ["spear"] = new UseStyleEntry { Clip = "spear", ArmAim = 1f },
+            ["shoot"] = new UseStyleEntry { Clip = "gun", ArmAim = 1f },
+            ["gun"] = new UseStyleEntry { Clip = "gun", ArmAim = 1f },
+            ["bow"] = new UseStyleEntry { Clip = "bow", ArmAim = 1f },
+            ["staff"] = new UseStyleEntry { Clip = "staff", ArmAim = 1f },
+            ["tome"] = new UseStyleEntry { Clip = "tome", ArmAim = 1f },
+            ["throw"] = new UseStyleEntry { Clip = "throw", ArmAim = 0.5f },
+            ["yoyo"] = new UseStyleEntry { Clip = "yoyo", ArmAim = 1f },
+            ["flail"] = new UseStyleEntry { Clip = "flail", ArmAim = 0.3f },
+            ["whip"] = new UseStyleEntry { Clip = "whip", ArmAim = 0.5f },
+            ["holdUp"] = new UseStyleEntry { Clip = "hold_up", ArmAim = 0.2f },
+            ["drink"] = new UseStyleEntry { Clip = "drink", ArmAim = 0.5f },
+            ["eat"] = new UseStyleEntry { Clip = "eat", ArmAim = 0.5f },
+            ["place"] = new UseStyleEntry { Clip = "place", ArmAim = 0.5f },
         },
     };
 
@@ -49,12 +111,21 @@ public sealed class UseStyleConfig
         foreach (var name in StrikeClips)
             if (!Clips.TryGetValue(name, out var clip)) problems.Add($"clip '{name}' is missing");
             else if (clip.StrikeStart == null) problems.Add($"{name}: needs strikeStart and strikeEnd");
-        if (!Clips.TryGetValue(BowClip, out var bow)) problems.Add($"clip '{BowClip}' is missing");
-        else if (bow.Release == null || bow.RedrawStart == null) problems.Add($"{BowClip}: needs release, redrawStart and redrawEnd");
+        foreach (var name in ReleaseClips)
+            if (!Clips.TryGetValue(name, out var clip)) problems.Add($"clip '{name}' is missing");
+            else if (clip.Release == null) problems.Add($"{name}: needs a release");
+        if (Clips.TryGetValue(BowClip, out var bow) && bow.RedrawStart == null) problems.Add($"{BowClip}: needs redrawStart and redrawEnd");
         foreach (var (name, clip) in Clips)
         {
             if (name.Length == 0) problems.Add("a clip has an empty name");
             foreach (var problem in clip.Validate()) problems.Add($"{name}: {problem}");
+        }
+        foreach (var style in AllStyles)
+            if (!Styles.ContainsKey(Key(style))) problems.Add($"style '{Key(style)}' is missing");
+        foreach (var (name, entry) in Styles)
+        {
+            if (!Array.Exists(AllStyles, s => Key(s) == name)) problems.Add($"style '{name}' is not a use style");
+            foreach (var problem in entry.Validate()) problems.Add($"style {name}: {problem}");
         }
         return problems;
     }

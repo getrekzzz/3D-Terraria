@@ -53,7 +53,7 @@ public sealed partial class MeleeSystem
     {
         if (s.Item.Has(ItemAction.Thrust))
         {
-            float ext = ExtensionCurve(timing.Clip(UseTiming.Thrust)).Evaluate(t);
+            float ext = ExtensionCurve(timing.Clip(timing.ThrustClip(s.Item))).Evaluate(t);
             if (ext < ThrustLive) return;
             float reach = SwingPlane.ThrustReach(s.Item.ThrustParams!.Length, Prefixes.Size(s.Stack)) * ext;
             var origin = s.Player.Center + new Vector3(0, 0.3f, 0);

@@ -49,12 +49,11 @@ public sealed partial class ViewModel
         return new Pose(offset, basis.GetEuler());
     }
 
-    private Pose ThrustPose(float t)
+    private Pose ThrustPose(string action, float t)
     {
-        var clip = _game.ItemUse.Timing.Clip(UseTiming.Thrust);
-        if (clip != _thrustClip || _extension == null) _extension = SwingCurve.Extension(_thrustClip = clip);
+        var a = _game.ItemUse.Timing.Clip(action); // the rapier's jab or the spear's lunge
+        if (a != _thrustClip || _extension == null) _extension = SwingCurve.Extension(_thrustClip = a);
         float ext = _extension.Evaluate(t);
-        var a = _game.ItemUse.Timing.Clip(UseTiming.Thrust);
         // Pulled back to the couch through the wind-up, out to the lunge as far as the stab has extended.
         if (t < (a.StrikeStart ?? 0f)) return Pose.Lerp(Level, Couched, Ease(t / Mathf.Max(1e-3f, a.StrikeStart ?? 0f)));
         return Pose.Lerp(t < (a.StrikeEnd ?? 1f) ? Couched : Level, Lunge, ext);

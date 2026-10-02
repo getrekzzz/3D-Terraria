@@ -65,7 +65,7 @@ public sealed partial class PlayerAvatar : Node3D
         if (entity.UseAnimation > 0 && _heldItem != null)
         {
             var info = _game.Uses[_heldItem];
-            return info.Has(ItemAction.Melee) || info.IsTool || _heldItem.UseStyle == UseStyle.Swing ? "swing" : "use";
+            return info.Has(ItemAction.Melee) || info.IsTool || info.Style == UseStyle.Swing ? "swing" : "use";
         }
         var v = _controller.Velocity;
         if (!_controller.IsOnFloor() && !_controller.Frozen) return v.Y > 0 ? "jump" : "fall";
@@ -98,13 +98,13 @@ public sealed partial class PlayerAvatar : Node3D
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
         {
             node = new MeshInstance3D { Mesh = mesh };
-            scale = HeldScale(item) * MeleeScale(item, _game.Uses[item], _props, path, HeldSize(held));
+            scale = HeldScale(item) * MeleeScale(_game, _game.Uses[item], _props, path, HeldSize(held));
         }
         else
         {
             node = HeldFallback(item); // a block's textured cube (PlayerAvatar.Held), else the icon
         }
-        node.Transform = HeldPose(item, _game.Uses[item], scale);
+        node.Transform = HeldPose(_game.Uses[item], scale);
         RememberHeld(node, item, path, scale, HeldSize(held));
         _held = node;
         LightAnchor = node;
@@ -133,7 +133,7 @@ public sealed partial class PlayerAvatar : Node3D
         if (_held == null || _heldItem == null || !IsInstanceValid(_held) || !_held.IsInsideTree()) return (-1f, -1f);
         var b = _held.GlobalBasis.Orthonormalized();
         var a = _controller.Entity.Aim;
-        var axis = ActionFor(_heldItem, _game.Uses[_heldItem]) == UseTiming.Bow ? -b.X : b.Y;
+        var axis = _game.Uses[_heldItem].Style == UseStyle.Bow ? -b.X : b.Y;
         return (Mathf.RadToDeg(b.Y.AngleTo(Vector3.Up)), Mathf.RadToDeg(axis.AngleTo(new Vector3(a.X, a.Y, a.Z))));
     }
 
@@ -177,9 +177,9 @@ public sealed partial class PlayerAvatar : Node3D
     /// (limbs along ±Y, its back toward −X, the string on the origin) is gripped by its riser and stands upright with its
     /// back toward the target when the bow arm is held out: limbs along the thumb side, back along the fingers.
     /// </summary>
-    private static Transform3D HeldPose(ItemDef item, ItemUseInfo info, float scale)
+    private static Transform3D HeldPose(ItemUseInfo info, float scale)
     {
-        if (ActionFor(item, info) == UseTiming.Bow)
+        if (info.Style == UseStyle.Bow)
         {
             var upright = new Basis(Vector3.Right, -BowSet) * new Basis(new Vector3(0, -1, 0), new Vector3(0, 0, 1), new Vector3(-1, 0, 0));
             var riser = upright * new Vector3(-BowGrip * scale, 0, 0);

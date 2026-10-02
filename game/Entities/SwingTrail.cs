@@ -71,7 +71,8 @@ public sealed partial class SwingTrail : Node3D
         bool thrust = info.Has(ItemAction.Thrust); // as the melee system
         var held = player.State.Inventory.Held;
         float size = held.Item == info.Item ? Prefixes.Size(held) : 1f;
-        var clip = _game.ItemUse.Timing.Clip(thrust ? UseTiming.Thrust : UseTiming.Swing);
+        string clipName = thrust ? _game.ItemUse.Timing.ThrustClip(info) : UseTiming.Swing;
+        var clip = _game.ItemUse.Timing.Clip(clipName);
         for (int i = _trails.Count - 1; i >= 0; i--)
             if (_trails[i].Player == player) Recycle(i);
         var t = _pool.Count > 0 ? _pool.Pop() : new Trail();

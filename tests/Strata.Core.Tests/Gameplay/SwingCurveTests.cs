@@ -11,7 +11,7 @@ namespace Strata.Core.Tests.Gameplay;
 public class SwingCurveTests
 {
     private static readonly ClipTiming SwingClip = UseStyleConfig.Fallback().Clips["swing"];
-    private static readonly ClipTiming ThrustClip = UseStyleConfig.Fallback().Clips["thrust"];
+    private static readonly ClipTiming ThrustClip = UseStyleConfig.Fallback().Clips["spear"]; // the spear's lunge (a rapier jabs on its own, shorter window);
 
     [Fact]
     public void TheBladeComesOverTheTopAndDownInFrontInsideTheStrikeWindow()

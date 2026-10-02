@@ -28,17 +28,17 @@ public sealed partial class PlayerAvatar
     }
 
     /// <summary>The scale that brings a swung blade's tip to its hit reach (1 for anything else).</summary>
-    public static float MeleeScale(ItemDef item, ItemUseInfo info, PropLibrary props, string path, float size)
+    public static float MeleeScale(GameWorld game, ItemUseInfo info, PropLibrary props, string path, float size)
     {
-        if (ActionFor(item, info) != Strata.Core.Gameplay.Items.UseTiming.Swing || info.Swing == null) return 1f;
+        if (ActionFor(game, info) != UseTiming.Swing || info.Swing == null) return 1f;
         float blade = SwingPlane.SwingReach(info.Swing.Length, size) - SwingPlane.SwingArm;
         return Mathf.Clamp(blade / ModelLength(props, path), 0.75f, 1.6f);
     }
 
     /// <summary>How much further (m) a thrust reaches than the (scaled) model: the slide at full extension.</summary>
-    public static float ThrustSlide(ItemDef item, ItemUseInfo info, PropLibrary props, string? path, float scale, float size)
+    public static float ThrustSlide(GameWorld game, ItemUseInfo info, PropLibrary props, string? path, float scale, float size)
     {
-        if (path == null || ActionFor(item, info) != Strata.Core.Gameplay.Items.UseTiming.Thrust || info.ThrustParams == null) return 0f;
+        if (path == null || ActionFor(game, info) is not (UseTiming.Rapier or UseTiming.Spear) || info.ThrustParams == null) return 0f;
         float reach = SwingPlane.ThrustReach(info.ThrustParams.Length, size) - SwingPlane.ThrustArm;
         return Mathf.Max(0f, reach - ModelLength(props, path) * scale);
     }
@@ -47,8 +47,9 @@ public sealed partial class PlayerAvatar
     private void RememberHeld(Node3D node, ItemDef item, string? path, float scale, float size)
     {
         _heldRest = node.Transform;
-        _thrustOut = ThrustSlide(item, _game.Uses[item], _props, path, scale, size);
-        _extension = _thrustOut > 0f ? SwingCurve.Extension(_game.ItemUse.Timing.Clip(Strata.Core.Gameplay.Items.UseTiming.Thrust)) : null;
+        var info = _game.Uses[item];
+        _thrustOut = ThrustSlide(_game, info, _props, path, scale, size);
+        _extension = _thrustOut > 0f ? SwingCurve.Extension(_game.ItemUse.Timing.Clip(_game.ItemUse.Timing.ThrustClip(info))) : null;
     }
 
     /// <summary>Slides a held spear or shortsword out along its shaft as the thrust extends.</summary>

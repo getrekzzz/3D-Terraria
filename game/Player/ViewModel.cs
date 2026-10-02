@@ -133,7 +133,7 @@ public sealed partial class ViewModel : Node3D
         if (active && entity.UseSerial != _serial)
         {
             _serial = entity.UseSerial;
-            _action = PlayerAvatar.ActionFor(_item!, _game.Uses[_item!]);
+            _action = PlayerAvatar.ActionFor(_game, _game.Uses[_item!]);
             _phase = 0f;
             if (_engage > 0f)
             {
@@ -160,12 +160,14 @@ public sealed partial class ViewModel : Node3D
         return pose;
     }
 
-    /// <summary>The held item's pose for an action (the body's clip: swing, mine, thrust, …) at use phase <paramref name="t"/>.</summary>
+    /// <summary>The held item's pose for an action (the body's clip: swing, mine, rapier, …) at use phase <paramref name="t"/>.</summary>
     private Pose UsePose(string action, float t)
     {
         var timing = _game.ItemUse.Timing;
         switch (action)
         {
+            case Throw or Whip:
+                return UsePose(UseTiming.Swing, t); // flung or lashed over the shoulder like a swing
             case UseTiming.Swing:
                 return BladePose(t); // the shared swing curve (ViewModel.Swing)
             case UseTiming.Mine:
@@ -178,9 +180,9 @@ public sealed partial class ViewModel : Node3D
                 if (t < through || through >= 1f) return Pose.Lerp(Struck, after, Ease((t - end) / Mathf.Max(1e-3f, through - end)));
                 return Pose.Lerp(after, Poised, Ease((t - through) / (1f - through)));
             }
-            case UseTiming.Thrust:
-                return ThrustPose(t);
-            case UseTiming.Bow or Shoot or Cast:
+            case UseTiming.Rapier or UseTiming.Spear:
+                return ThrustPose(action, t); // the shared extension curve (ViewModel.Swing)
+            case UseTiming.Bow or Gun or Staff or Tome:
                 return RangedPose(action, t);
             default:
             {
@@ -206,8 +208,8 @@ public sealed partial class ViewModel : Node3D
         _engage = 0f;
         _chain = 1f;
         _kick = 0f;
-        _style = item == null ? "use" : PlayerAvatar.ActionFor(item, _game.Uses[item]);
-        _ranged = _style is UseTiming.Bow or Shoot or Cast;
+        _style = item == null ? "use" : PlayerAvatar.ActionFor(_game, _game.Uses[item]);
+        _ranged = _style is UseTiming.Bow or Gun or Staff or Tome;
         _rest = _ranged ? RangedRest(_style) : Idle;
         _ammoClock = 0f; // look for arrows now: the nocked arrow is ready before the first shot
         if (item == null) return;

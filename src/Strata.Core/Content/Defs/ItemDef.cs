@@ -12,9 +12,40 @@ public enum DamageClass
     None, Melee, Ranged, Magic, Summon, Generic,
 }
 
+/// <summary>
+/// How an item is used on screen, Terraria's use styles (JSON camelCase, e.g. "holdUp"). The style also implies some
+/// actions (<see cref="Gameplay.Items.UseStyleRules"/>): a melee swing, a thrust, a shot, drinking a potion.
+/// <see cref="None"/> in data is resolved from the item's stats (tools swing, placers place, potions are drunk).
+/// Each style's body clip, arm aim and grip live in data/config/use_styles.json.
+/// </summary>
 public enum UseStyle
 {
-    None, Swing, Thrust, Shoot, Hold, Consume, Place,
+    None,
+    /// <summary>Overhead swing: swords, tools, summon staves, fishing rods, nets, buckets, wiring and paint tools.</summary>
+    Swing,
+    /// <summary>A quick jab: shortswords.</summary>
+    Rapier,
+    /// <summary>A two-handed thrust along the aim: spears and tridents.</summary>
+    Spear,
+    /// <summary>Held out along the aim (grappling hooks and anything without a better style).</summary>
+    Shoot,
+    /// <summary>Held like a gun, including magic guns.</summary>
+    Gun,
+    Bow,
+    /// <summary>Staffs and wands point at the target.</summary>
+    Staff,
+    /// <summary>Spell tomes are read from the off hand.</summary>
+    Tome,
+    /// <summary>Boomerangs, shuriken, throwing knives, bombs and grenades.</summary>
+    Throw,
+    Yoyo,
+    Flail,
+    Whip,
+    /// <summary>Raised overhead: boss and event summons, life and mana crystals, mirrors, crates.</summary>
+    HoldUp,
+    Drink,
+    Eat,
+    Place,
 }
 
 /// <summary>
@@ -38,6 +69,12 @@ public sealed class BuffApplication
 /// </summary>
 public sealed class ItemDef : ContentDef
 {
+    /// <summary>
+    /// What every stackable item stacks to (Terraria 1.4.4: potions, ammo, blocks, materials, summons, furniture);
+    /// only the copper, silver and gold coins stop at 100. Checked by the content validator.
+    /// </summary>
+    public const int CommonMaxStack = 9999;
+
     public ItemCategory Category { get; init; } = ItemCategory.Material;
     public int Rarity { get; init; }
     public int MaxStack { get; init; } = 1;
