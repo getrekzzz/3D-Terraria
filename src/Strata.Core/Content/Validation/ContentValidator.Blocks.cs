@@ -11,6 +11,7 @@ public static partial class ContentValidator
             if (b.Id == ContentDatabase.AirId) continue;
             if (b.Render == BlockRender.None) ctx.Warn(b, "render 'none' block other than air.");
             if (b.Hardness <= 0) ctx.Error(b, "hardness must be > 0.");
+            if (!(b.PickDamageScale > 0 && b.PickDamageScale <= 10)) ctx.Error(b, "pickDamageScale must be within (0, 10].");
             if (b.PickPower < 0) ctx.Error(b, "pickPower must be >= 0.");
             ctx.Light(b, b.Light, "light");
             ctx.Color(b, b.Color, "color");

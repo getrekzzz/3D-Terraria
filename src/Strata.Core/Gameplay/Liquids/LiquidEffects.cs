@@ -109,8 +109,7 @@ public sealed partial class LiquidEffects
             return;
         }
         if (tick % 30 != 0) return;
-        p.State.Vitals.DamageDirect(DrownDamage);
-        _world.Npcs.ReportPlayerDamage(p, DrownDamage, Vector3.Zero);
+        _world.HurtPlayerDirect(p, DrownDamage);
     }
 
     private void TouchPlayer(PlayerEntity p, LiquidDef liquid, long tick)

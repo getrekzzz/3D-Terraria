@@ -8,8 +8,8 @@ namespace Strata.Game.Rendering;
 /// <summary>
 /// Cracks on every damaged block near the camera, not only the one under the cursor: up to 64 box decals
 /// (<c>block_crack.gdshader</c>) in one MultiMesh, staged by damage (any, 50%, 75%, 90%) and fading out over the last
-/// second before the block forgets its damage. Rebuilt when the damage tracker changes, and four times a second while
-/// any crack is fading.
+/// second before the block forgets its damage (the newest hits first past the cap). Rebuilt when the damage tracker
+/// changes, and four times a second while any damage is on record.
 /// </summary>
 public sealed partial class BlockCracks : Node3D
 {
@@ -22,6 +22,9 @@ public sealed partial class BlockCracks : Node3D
     private int _version = -1;
     private float _timer;
     private bool _fading;
+    private readonly (Vector3 Center, float Damage, long Tick)[] _cells = new (Vector3, float, long)[512];
+    private readonly long[] _order = new long[512];
+    private readonly int[] _index = new int[512];
 
     public static BlockCracks? Instance { get; private set; }
 
@@ -67,24 +70,35 @@ public sealed partial class BlockCracks : Node3D
     {
         var eye = GetViewport().GetCamera3D()?.GlobalPosition ?? Vector3.Zero;
         long tick = _game.Session.Clock.Tick;
-        float size = Units.CellSize * BoxScale;
+        // Candidates in range, newest hit first when there are more than the cap (the block being mined always shows).
         int n = 0;
         foreach (var (cell, (damage, hitTick)) in tracker)
         {
-            if (n >= MaxCracks) break;
-            long left = tracker.ForgetAfterTicks - (tick - hitTick);
-            if (left <= 0) continue;
+            if (n >= _cells.Length) break;
+            if (tick - hitTick >= tracker.ForgetAfterTicks) continue;
             var center = (new Vector3(cell.X, cell.Y, cell.Z) + Vector3.One * 0.5f) * Units.CellSize;
             if (center.DistanceSquaredTo(eye) > Range * Range) continue;
-            float fraction = damage / MiningRules.TileHealth;
-            int stage = fraction >= 0.9f ? 3 : fraction >= 0.75f ? 2 : fraction >= 0.5f ? 1 : 0;
-            float fade = Mathf.Clamp(left / (float)FadeTicks, 0f, 1f);
-            _mm.SetInstanceTransform(n, new Transform3D(Basis.FromScale(Vector3.One * size), center));
-            _mm.SetInstanceCustomData(n, new Color(stage / 3f, fade, 0f, 0f));
+            _cells[n] = (center, damage, hitTick);
+            _order[n] = -hitTick;
+            _index[n] = n;
             n++;
         }
-        // While any crack shows, the timer keeps rebuilding so fades start and end on time.
-        _fading = n > 0;
-        _mm.VisibleInstanceCount = n;
+        if (n > MaxCracks) System.Array.Sort(_order, _index, 0, n);
+        int shown = Mathf.Min(n, MaxCracks);
+        float size = Units.CellSize * BoxScale;
+        for (int i = 0; i < shown; i++)
+        {
+            var (center, damage, hitTick) = _cells[_index[i]];
+            float fraction = damage / MiningRules.TileHealth;
+            int stage = fraction >= 0.9f ? 3 : fraction >= 0.75f ? 2 : fraction >= 0.5f ? 1 : 0;
+            long left = tracker.ForgetAfterTicks - (tick - hitTick);
+            float fade = Mathf.Clamp(left / (float)FadeTicks, 0f, 1f);
+            _mm.SetInstanceTransform(i, new Transform3D(Basis.FromScale(Vector3.One * size), center));
+            _mm.SetInstanceCustomData(i, new Color(stage / 3f, fade, 0f, 0f));
+        }
+        // While any damage is on record the timer keeps rebuilding: fades run on time and far cracks appear as you
+        // walk up to them.
+        _fading = tracker.Count > 0;
+        _mm.VisibleInstanceCount = shown;
     }
 }

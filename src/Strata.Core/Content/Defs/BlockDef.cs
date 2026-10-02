@@ -39,7 +39,7 @@ public sealed class BlockDef : ContentDef
 
     public BlockTextures Textures { get; init; } = new();
 
-    /// <summary>How solid the block feels: scales mining sounds and particles (hits needed come from <see cref="PickDamageScale"/>).</summary>
+    /// <summary>How solid the block is (descriptive; mining speed comes from <see cref="PickDamageScale"/> and <see cref="PickPower"/>).</summary>
     public float Hardness { get; init; } = 1f;
 
     /// <summary>

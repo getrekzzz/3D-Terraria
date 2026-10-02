@@ -59,6 +59,9 @@ public sealed class BlockDamageTracker
     /// <summary>Bumped on every change, so renderers rebuild their crack decals only when needed.</summary>
     public int Version { get; private set; }
 
+    /// <summary>Cells with damage on record (stale ones included until pruned).</summary>
+    public int Count => _damage.Count;
+
     /// <summary>Ticks after which partial damage resets (≈6 s).</summary>
     public int ForgetAfterTicks { get; init; } = 360;
 

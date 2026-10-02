@@ -16,6 +16,7 @@ aim 0.9 0.2 0
 hold use_primary 4
 wait 2
 assert inv.wood > 20
+assert effects.tree_falls == 1
 # Mining a block throws chips and dust.
 wield copper_pickaxe
 aim 0.05 -1 0.05

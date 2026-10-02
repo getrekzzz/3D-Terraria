@@ -267,8 +267,9 @@ public sealed partial class NpcSystem
         if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;
         var away = BrainFactory.Flat(player.Position - npc.Position);
         if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
-        // Terraria-like: a clear shove away from the creature with a hop.
-        var knock = away * (4f + hit.Knockback * 0.6f) + new Vector3(0, 5.5f, 0);
+        // Terraria-like: a clear shove away from the creature with a hop (none at full knockback resistance).
+        float stand = 1f - Math.Clamp(state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), 0f, 1f);
+        var knock = (away * (4f + hit.Knockback * 0.6f) + new Vector3(0, 5.5f, 0)) * stand;
         ReportPlayerDamage(player, hit.Damage, knock);
         ApplyContactEffects(npc, player);
         float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
@@ -294,7 +295,7 @@ public sealed partial class NpcSystem
         npc.Life -= hit.Damage;
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
-        Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Crit ? hit.Knockback * CritKnockback : hit.Knockback);
+        Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback); // crits already knock 1.4x (DamageModel)
         Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false, npc.Id));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));

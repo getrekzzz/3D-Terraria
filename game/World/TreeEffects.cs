@@ -34,6 +34,9 @@ public sealed partial class TreeEffects : Node3D
     private TileObjectRenderer _objects = null!;
     private readonly Copy[] _wobbles = new Copy[Slots], _falls = new Copy[Slots];
 
+    /// <summary>Trees felled so far (probe <c>effects.tree_falls</c>).</summary>
+    public int Falls { get; private set; }
+
     public void Initialize(GameWorld game, TileObjectRenderer objects)
     {
         Name = "TreeEffects";
@@ -98,6 +101,7 @@ public sealed partial class TreeEffects : Node3D
         var away = AwayFromPlayer(slot.Pivot);
         slot.Axis = new Vector3(away.Z, 0, -away.X);
         slot.Landed = false;
+        Falls++;
     }
 
     private bool Setup(Copy c, TileObjectInstance obj)

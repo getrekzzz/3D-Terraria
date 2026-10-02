@@ -221,7 +221,8 @@ public sealed partial class ProjectileSystem
             Combat.DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
         if (!state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return false;
-        var knock = (push.LengthSquared() > 1e-4f ? Vector3.Normalize(push) : Vector3.Zero) * (3.5f + hit.Knockback * 0.6f) + new Vector3(0, 5f, 0);
+        float stand = 1f - Math.Clamp(state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), 0f, 1f);
+        var knock = ((push.LengthSquared() > 1e-4f ? Vector3.Normalize(push) : Vector3.Zero) * (3.5f + hit.Knockback * 0.6f) + new Vector3(0, 5f, 0)) * stand;
         _npcs.ReportPlayerDamage(player, hit.Damage, knock);
         return true;
     }

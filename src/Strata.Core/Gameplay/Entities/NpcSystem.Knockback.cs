@@ -8,11 +8,11 @@ public sealed partial class NpcSystem
     /// <summary>Knockback speed per point of (resisted) knockback, in m/s.</summary>
     public const float KnockbackSpeed = 2.0f;
 
-    /// <summary>Critical hits knock harder.</summary>
-    public const float CritKnockback = 1.4f;
-
     /// <summary>The least upward speed (m/s) a grounded creature hops when knocked back, so every blow reads.</summary>
     public const float KnockHop = 2.5f;
+
+    /// <summary>The highest hop a knockback gives, however heavy the blow (or how many land at once).</summary>
+    public const float MaxKnockHop = 8f;
 
     /// <summary>
     /// Pushes a creature away from a hit. Ordinary creatures also reel for a moment (their brain stops steering, so
@@ -30,8 +30,19 @@ public sealed partial class NpcSystem
         }
         // The push replaces the creature's own horizontal motion, so walking into the blow cannot cancel it; a creature
         // on the ground hops back (at least KnockHop, more for heavy blows).
-        float up = npc.OnGround && npc.Def.Gravity ? Math.Max(KnockHop, knockback * 1.1f) : push.Y;
-        npc.Velocity = new Vector3(push.X, Math.Max(npc.Velocity.Y, 0f) + up, push.Z);
+        // Several hits in one tick (shotgun pellets, piercing shots) do not stack the hop.
+        if (npc.OnGround && npc.Def.Gravity)
+        {
+            float hop = Math.Clamp(knockback * 1.1f, KnockHop, MaxKnockHop);
+            npc.Velocity = new Vector3(push.X, Math.Max(npc.Velocity.Y, hop), push.Z);
+            npc.OnGround = false;
+        }
+        else
+        {
+            // In the air each blow lifts a little more, but stacked blows never launch it past the hop limit.
+            float vy = Math.Max(npc.Velocity.Y, Math.Min(Math.Max(npc.Velocity.Y, 0f) + push.Y, MaxKnockHop));
+            npc.Velocity = new Vector3(push.X, vy, push.Z);
+        }
         npc.StunTicks = Math.Max(npc.StunTicks, (int)(6 + knockback * 2f));
         npc.Phase = 0;
         npc.Timer = 0;

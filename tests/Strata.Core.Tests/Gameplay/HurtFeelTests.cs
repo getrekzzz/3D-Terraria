@@ -51,4 +51,31 @@ public class HurtFeelTests
         Assert.True(zombie.Velocity.Y >= NpcSystem.KnockHop, $"vy {zombie.Velocity.Y}");
         Assert.True(zombie.Velocity.X > 0f);
     }
+
+    [Fact]
+    public void HitsInOneTickDoNotStackTheHop()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        var zombie = g.World.Npcs.Spawn(g.Content.Enemies.Get("zombie"), g.Player.Position + new Vector3(4, 1, 0))!;
+        zombie.Life = zombie.MaxLife = 10000;
+        for (int i = 0; i < 120 && !zombie.OnGround; i++) g.Ticks(1);
+        for (int i = 0; i < 4; i++) g.World.Npcs.Hit(zombie, null, 1, DamageClass.Ranged, 0, 8f, g.Player.Center, melee: false);
+        Assert.InRange(zombie.Velocity.Y, NpcSystem.KnockHop, NpcSystem.MaxKnockHop);
+    }
+
+    [Fact]
+    public void FullKnockbackResistanceStandsFirm()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        var knocks = new List<Vector3>();
+        g.World.Npcs.PlayerHurt += (_, _, k) => knocks.Add(k);
+        g.Player.State.Inventory.Accessories[0] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("cobalt_shield"), 1);
+        g.Player.State.Recompute();
+        g.World.Npcs.Spawn(g.Content.Enemies.Get("zombie"), g.Player.Position + new Vector3(0.3f, 0.05f, 0));
+        g.Ticks(30);
+        Assert.NotEmpty(knocks);
+        Assert.All(knocks, k => Assert.True(k.Length() < 1e-3f));
+    }
 }
