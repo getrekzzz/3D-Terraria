@@ -10,10 +10,10 @@ namespace Strata.Game.UI;
 /// hotbar top-left with the buff row under them, the hearts and mana stars top-right above the minimap and the info
 /// panel, the crosshair with its interaction hint and target name at the centre, the breath bubbles above it and the
 /// status line under it, the chat log bottom-left (Hud.Messages), pickup popups over the player's head, the boss bar
-/// bottom-centre and the death screen.
+/// bottom-centre, an invasion's progress bottom-right and the death screen.
 /// <see cref="ApplyLayout"/> places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3
 /// overlay) when the window, the UI scale or what is shown changes (the inventory and its panel and accessory rows, an
-/// NPC chat, a boss, the buff count, the info rows, the minimap setting, the F3 overlay), never per frame; the inventory
+/// NPC chat, a boss, an invasion, the buff count, the info rows, the minimap setting, the F3 overlay), never per frame; the inventory
 /// screen's parts take their regions from it too.
 /// </summary>
 public sealed partial class Hud : CanvasLayer
@@ -28,19 +28,17 @@ public sealed partial class Hud : CanvasLayer
     private ChatLog _chat = null!;
     private PickupPopups _popups = null!;
     private Label _death = null!;
-    private PanelContainer _bossPanel = null!;
-    private Label _bossName = null!;
-    private ProgressBar _bossBar = null!;
+    private BossBar _bossBar = null!;
+    private EventProgressPanel _eventBar = null!;
     private InventoryScreen? _inventory;
     private TownDialog? _dialog;
     private PerfOverlay? _perf;
     private LayoutKey _key;
-    private bool _bossShown, _bossPlaced;
     private (ItemDef? Item, Strata.Core.Voxels.CellShape Shape, int Turn) _hintFor;
 
     /// <summary>What decides the layout; a change re-runs <see cref="ApplyLayout"/>.</summary>
-    private readonly record struct LayoutKey(Vector2 Size, bool Inventory, UiPanel Panel, int AccessoryRows, bool Chat, bool Boss, int Buffs,
-        bool Minimap, int Info, bool Debug);
+    private readonly record struct LayoutKey(Vector2 Size, bool Inventory, UiPanel Panel, int AccessoryRows, bool Chat, bool Boss, bool Event,
+        int Buffs, bool Minimap, int Info, bool Debug);
 
     /// <summary>The layout in effect (null until the first frame).</summary>
     public UiLayoutResult? Layout { get; private set; }
@@ -68,6 +66,12 @@ public sealed partial class Hud : CanvasLayer
 
     /// <summary>Pickup popups on screen over the player's head (the <c>ui.popups</c> probe).</summary>
     public int PopupsShown => _popups.Shown;
+
+    /// <summary>The boss bar (the <c>ui.bossbar</c> probe).</summary>
+    public BossBar BossBar => _bossBar;
+
+    /// <summary>The invasion progress panel (the <c>ui.eventbar</c> probe).</summary>
+    public EventProgressPanel EventBar => _eventBar;
 
     /// <summary>The hotbar slot view at <paramref name="index"/> (the <c>ui hover hotbar</c> command), or null.</summary>
     public ItemSlotView? HotbarSlot(int index) => _hotbar.Slot(index);
@@ -100,17 +104,13 @@ public sealed partial class Hud : CanvasLayer
         _death.AddThemeColorOverride("font_color", new Color(0.9f, 0.25f, 0.25f));
         root.AddChild(_death);
 
-        _bossPanel = LayoutWidgets.Register(new PanelContainer { Name = "BossBar", Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore });
-        var bossBox = new VBoxContainer();
-        _bossName = new Label { HorizontalAlignment = HorizontalAlignment.Center, ClipText = true };
-        _bossName.AddThemeFontSizeOverride("font_size", 18);
-        bossBox.AddChild(_bossName);
-        _bossBar = new ProgressBar { ShowPercentage = false, CustomMinimumSize = new Vector2(0, 18), MouseFilter = Control.MouseFilterEnum.Ignore };
-        _bossBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = new Color(0, 0, 0, 0.55f) });
-        _bossBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = new Color(0.75f, 0.12f, 0.2f) });
-        bossBox.AddChild(_bossBar);
-        _bossPanel.AddChild(bossBox);
-        root.AddChild(_bossPanel);
+        root.AddChild(_bossBar = LayoutWidgets.Register(new BossBar()));
+        root.AddChild(_eventBar = LayoutWidgets.Register(new EventProgressPanel(ui.Game.Events)));
+        // Boss head icons load in the background now, so a boss's arrival never waits on the disk.
+        var bossIcons = new System.Collections.Generic.List<string>();
+        foreach (var e in ui.Game.Session.Content.Enemies.All)
+            if (e.Boss is { Minor: false }) bossIcons.Add(Strata.Core.Content.AssetPaths.BossIcon(e));
+        Strata.Game.Items.PortraitIcons.Preload(bossIcons);
         WireMessages(ui);
     }
 
@@ -134,8 +134,10 @@ public sealed partial class Hud : CanvasLayer
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.hud");
-        UpdateBossBar();
-        _buffBar.Refresh(delta); // before the layout, which reads its icon count
+        Strata.Game.Items.PortraitIcons.Pump();
+        _bossBar.Refresh(BossBarModel.Compute(_ui.Game.Npcs.All), delta); // before the layout, which reads what is shown
+        _eventBar.Refresh(_ui.Game.Events, delta);
+        _buffBar.Refresh(delta);
         UpdateLayout();
         UpdateVitals(delta);
         UpdateBuildHint();
@@ -151,8 +153,8 @@ public sealed partial class Hud : CanvasLayer
     {
         bool inventory = _inventory?.IsOpen == true;
         var key = new LayoutKey(LayoutWidgets.LogicalSize(GetViewport()), inventory, inventory ? _inventory!.Panel : UiPanel.None,
-            _inventory?.AccessoryRows ?? Strata.Core.Gameplay.Items.PlayerInventory.BaseAccessorySlots, _dialog?.IsOpen == true, _bossShown,
-            _buffBar.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
+            _inventory?.AccessoryRows ?? Strata.Core.Gameplay.Items.PlayerInventory.BaseAccessorySlots, _dialog?.IsOpen == true, _bossBar.Active,
+            _eventBar.Active, _buffBar.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
         if (!key.Equals(_key)) ApplyLayout(key);
     }
 
@@ -160,7 +162,7 @@ public sealed partial class Hud : CanvasLayer
     private void ApplyLayout(LayoutKey key)
     {
         _key = key;
-        var state = new UiState(InventoryOpen: key.Inventory, Panel: key.Panel, BossBar: key.Boss, NpcChat: key.Chat, BuffCount: key.Buffs,
+        var state = new UiState(InventoryOpen: key.Inventory, Panel: key.Panel, BossBar: key.Boss, EventBar: key.Event, NpcChat: key.Chat, BuffCount: key.Buffs,
             AccessoryRows: key.AccessoryRows, ShowMinimap: key.Minimap, InfoLines: key.Info, DebugOverlay: key.Debug);
         var layout = UiLayout.Compute(key.Size.X, key.Size.Y, state);
         Layout = layout;
@@ -173,8 +175,8 @@ public sealed partial class Hud : CanvasLayer
         _status.Visible = LayoutWidgets.Place(_status, layout, UiRegion.StatusLine);
         _info.Visible = LayoutWidgets.Place(_info, layout, UiRegion.Info);
         _chat.Visible = LayoutWidgets.Place(_chat, layout, UiRegion.Chat);
-        _bossPlaced = LayoutWidgets.Place(_bossPanel, layout, UiRegion.BossBar);
-        _bossPanel.Visible = _bossPlaced && _bossShown;
+        _bossBar.Visible = LayoutWidgets.Place(_bossBar, layout, UiRegion.BossBar);
+        _eventBar.Visible = LayoutWidgets.Place(_eventBar, layout, UiRegion.EventBar);
         _buffBar.Arrange();
         LayoutApplied?.Invoke(layout);
     }
@@ -189,27 +191,5 @@ public sealed partial class Hud : CanvasLayer
         _hintFor = at;
         var info = held != null ? _ui.Game.Uses[held] : null;
         _status.Hint = info?.Block is { Render: BlockRender.Crisp } ? $"{at.Shape} ({at.Turn}) — T shape, R rotate" : "";
-    }
-
-    private void UpdateBossBar()
-    {
-        Strata.Core.Gameplay.Entities.Npc? boss = null;
-        foreach (var n in _ui.Game.Npcs.All)
-            if (n.IsBoss && n.Alive && (boss == null || n.Life > boss.Life)) boss = n;
-        _bossShown = boss != null;
-        _bossPanel.Visible = _bossPlaced && _bossShown;
-        if (boss == null) return;
-        // A pair of bosses (companions share the defeat flag) shows as one bar with their combined life.
-        var flag = boss.Def.Boss!.Flag;
-        long life = 0, max = 0;
-        foreach (var n in _ui.Game.Npcs.All)
-            if (n.Alive && (n == boss || (flag != null && n.Def.Boss?.Flag == flag)))
-            {
-                life += n.Life;
-                max += n.MaxLife;
-            }
-        _bossName.Text = boss.Def.Boss.Title;
-        _bossBar.MaxValue = max;
-        _bossBar.Value = life;
     }
 }

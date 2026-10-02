@@ -13,7 +13,7 @@ namespace Strata.Game.Debug;
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); on the inventory
 /// screen's layout (P2-15); on the hearts, mana stars and breath bubbles (P2-13); on the buff bar (P2-14); on the
-/// chat log (P2-21); and on the pickup popups (P2-22).
+/// chat log (P2-21); on the pickup popups (P2-22); and on the boss bar and the invasion progress (P2-23).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -91,5 +91,10 @@ public static class UiProbes
         ctx.AddProbe("ui.chat_open", () => world.Hud?.Chat.IsOpen == true ? 1 : 0);
         // P2-22: pickup popups on screen (repeat pickups of one item, and all coins, share one).
         ctx.AddProbe("ui.popups", () => world.Hud?.PopupsShown ?? 0);
+        // P2-23: the boss bar (a boss group is up) and the invasion progress panel (an invasion runs or just ended).
+        ctx.AddProbe("ui.bossbar", () => world.Hud?.BossBar.Active == true ? 1 : 0);
+        ctx.AddProbe("ui.bossbar_fill", () => world.Hud?.BossBar.Fraction ?? 0);
+        ctx.AddProbe("ui.eventbar", () => world.Hud?.EventBar.Active == true ? 1 : 0);
+        ctx.AddProbe("ui.eventbar_percent", () => world.Hud?.EventBar.Percent ?? -1);
     }
 }

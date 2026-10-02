@@ -455,3 +455,35 @@ assert ui.popups == 1
 assert ui.overlaps == 0
 god off
 assert errors == 0
+
+# --- P2-23 ---
+# A boss shows Terraria's boss bar bottom-centre (head icon, name, life numbers) and it goes with the boss; an invasion
+# shows its icon, name and kill progress bottom-right beside it, lingering a few seconds after it ends; nothing overlaps.
+god on
+spawning off
+killall
+boss king_slime 12
+wait 1
+assert ui.bossbar == 1
+assert ui.bossbar_fill == 1
+assert ui.overlaps == 0
+killall
+wait 1
+assert ui.bossbar == 0
+event goblin_army
+wait 1
+assert ui.eventbar == 1
+assert ui.eventbar_percent == 0
+assert ui.overlaps == 0
+boss king_slime 12
+wait 0.5
+assert ui.bossbar == 1
+assert ui.overlaps == 0
+killall
+event stop goblin_army
+wait 0.5
+assert ui.eventbar == 1
+wait 4.5
+assert ui.eventbar == 0
+god off
+assert errors == 0

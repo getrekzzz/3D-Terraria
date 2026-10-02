@@ -371,6 +371,18 @@
   1.5 s, rising 40 px and fading over the last 0.5 s, the latest at the bottom row (22 px apart). Text in rarity
   colour (Expert/Master animate each frame) or the largest coin's colour. `drop … <delay ticks>` and probe
   `ui.popups` test it.
+* **Boss bar and invasion progress** — `BossBarModel.Compute(npcs)` (Core, allocation-free, run each frame) picks
+  the strongest living non-minor boss (a body before its parts, by maximum life, a worm counted whole) and sums
+  everything sharing its defeat flag: a pair (the Twins) adds up, a cut worm counts its arrival life once, and a
+  boss's parts count only when flagged `BossPart.InBossBar` (Golem's head, Moon Lord's head and hands; never
+  Skeletron's hands or Golem's fists, which keep their floating mini bars); a fallen part drops out. `BossBar`
+  (game/UI/Hud/BossBar.cs, the layout's BossBar region) draws the title, the head icon (`PortraitIcons.Boss`,
+  preloaded by the HUD; a disc with the initial if missing), a framed red bar with "life/max" and a pale damage
+  chunk that holds 0.4 s, then slides down; it fades in on arrival. `EventProgressPanel` (EventBar region) follows
+  `EventDirector.LatestInvasion` (latest event with a kill goal) with its `StatusIcons` icon, name and
+  `EventDirector.Progress(a)` (kills over `GoalOf`) as "NN%", and holds its last value 3 s after the event ends, then
+  fades. Their `Active` flags feed `UiState.BossBar/EventBar`. Probes `ui.bossbar`, `ui.bossbar_fill`,
+  `ui.eventbar`, `ui.eventbar_percent`.
 * **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance

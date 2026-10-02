@@ -103,6 +103,24 @@ public sealed class EventDirector
     public int GoalOf(ActiveEvent a) =>
         a.Def.KillGoalAfterFlag is { } after && _world.Progression.IsSet(after.Flag) ? after.Goal : a.Def.KillGoal;
 
+    /// <summary>How far an invasion is towards its kill goal (0–1; 0 for an event without one): the HUD's progress bar.</summary>
+    public float Progress(ActiveEvent a)
+    {
+        int goal = GoalOf(a);
+        return goal > 0 ? Math.Clamp((float)a.Kills / goal, 0f, 1f) : 0f;
+    }
+
+    /// <summary>The latest invasion with a kill goal still going (the one the HUD's progress bar follows), or null.</summary>
+    public ActiveEvent? LatestInvasion
+    {
+        get
+        {
+            for (int i = _active.Count - 1; i >= 0; i--)
+                if (_active[i].Def.KillGoal > 0) return _active[i];
+            return null;
+        }
+    }
+
     /// <summary>
     /// An arrival's countdown ran out: the boss comes for the player unless one already lives or it was beaten
     /// meanwhile. Fliers appear 20 m ahead of the player and 12 m up; walkers drop in from 12 m overhead.
