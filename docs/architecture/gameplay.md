@@ -914,5 +914,5 @@ message in Terraria's yellow; a banner then a room runs `AssignHome` (swapping w
 banner evicts. World clicks are taken by a full-screen catcher while picking and cast through `WorldPicker` (camera
 ray → `Targeting.Cast` → the open cell in front). `HousingBannerRenderer` hangs pooled head sprites at each housed
 resident's `BannerCell` while the menu is open. Opened by the equipment column's Housing tab (beside it), the Housing
-key (H) or `ui housing`; `ui housing_query dx dy dz`; probes `ui.housing_open`, `ui.housing_banners`,
+key (unbound by default: H is Terraria's quick heal) or `ui housing`; `ui housing_query dx dy dz`; probes `ui.housing_open`, `ui.housing_banners`,
 `ui.housing_room_banners`.

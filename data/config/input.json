@@ -13,7 +13,7 @@
     "interact": ["key:E"],
     "inventory": ["key:Tab", "key:I"],
     "map": ["key:M"],
-    "housing": ["key:H"],
+    "housing": [],
     "guide_book": ["key:K"],
     "toggle_camera": ["key:V"],
     "precision_mode": ["key:Alt"],
