@@ -18,6 +18,7 @@ public sealed partial class CombatEffects : Node3D
         Name = "CombatEffects";
         _kit = kit;
         _flashes = flashes;
+        InitializeDust(game);
         game.Npcs.Damaged += e => Number(e);
         game.Npcs.Killed += npc => Puff(new Vector3(npc.Center.X, npc.Center.Y, npc.Center.Z), Color.FromHtml(npc.Def.Tint), npc.HalfExtents.Y);
         game.Town.Hurt += (t, dmg) => Number(new DamageEvent(t.Center + new System.Numerics.Vector3(0, 1.1f, 0), dmg, false, true));
@@ -43,7 +44,7 @@ public sealed partial class CombatEffects : Node3D
         var label = _pool.Count > 0 ? _pool.Dequeue() : NewLabel();
         label.Visible = true;
         label.Text = e.Amount.ToString();
-        label.FontSize = e.Crit ? 72 : 56;
+        label.FontSize = e.Crit ? 72 : e.Kind == DamageKind.Periodic ? 40 : 56;
         label.Modulate = e.ToPlayer ? new Color(1f, 0.3f, 0.3f) : e.Crit ? new Color(1f, 0.6f, 0.15f) : new Color(1f, 0.9f, 0.45f);
         var start = new Vector3(e.Position.X, e.Position.Y, e.Position.Z) + new Vector3((float)GD.RandRange(-0.3, 0.3), 0, (float)GD.RandRange(-0.3, 0.3));
         label.Position = start;

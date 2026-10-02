@@ -12,7 +12,17 @@ using Strata.Core.Voxels;
 namespace Strata.Core.Gameplay.Entities;
 
 /// <summary>A damage event for presentation (damage numbers, sounds, flashes).</summary>
-public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer);
+public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer, long NpcId = 0, DamageKind Kind = DamageKind.Hit);
+
+/// <summary>What a damage number reports: a hit, damage over time, harm to a player, or healing.</summary>
+public enum DamageKind
+{
+    Hit,
+    Periodic,
+    Player,
+    Heal,
+    Mana,
+}
 
 /// <summary>
 /// Owns every live creature: brains, movement against voxels, contact damage to players, taking hits
@@ -153,7 +163,7 @@ public sealed partial class NpcSystem
             if (npc.Effects.DamagePerSecond > 0 && npc.Age % Units.TicksPerSecond == 0)
             {
                 npc.Life -= npc.Effects.DamagePerSecond;
-                Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false));
+                Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false, npc.Id, DamageKind.Periodic));
                 if (npc.Life <= 0)
                 {
                     Kill(npc);
@@ -267,7 +277,7 @@ public sealed partial class NpcSystem
     /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
     public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock)
     {
-        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true));
+        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, DamageKind.Player));
         PlayerHurt?.Invoke(player, damage, knock);
     }
 
@@ -281,7 +291,7 @@ public sealed partial class NpcSystem
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
         Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback);
-        Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
+        Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false, npc.Id));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
         if (npc.Life <= 0) Kill(npc);

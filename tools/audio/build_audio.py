@@ -33,6 +33,11 @@ def check():
     missing = sorted(n for n in names if n not in sfx_recipes.RECIPES)
     for n in missing:
         print(f"ERROR: game plays sound '{n}' but tools/audio/sfx_recipes*.py has no recipe for it")
+    import json
+    cfg = re.sub(r"^\s*//.*$", "", (REPO / "data" / "config" / "creature_materials.json").read_text(encoding="utf-8"), flags=re.M)
+    for m in json.loads(cfg)["materials"].values():
+        names.update((m["hitSound"], m["deathSound"]))
+    missing = sorted(n for n in names if n not in sfx_recipes.RECIPES)
     loops = set()
     for path in (REPO / "game").rglob("*.cs"):
         loops.update(re.findall(r'AmbienceLoops\.(?:Player|Load)\([^"]*"([a-z0-9_]+)"', path.read_text(encoding="utf-8")))

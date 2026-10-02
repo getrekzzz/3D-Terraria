@@ -1,32 +1,47 @@
-using System.Linq;
+using System.Collections.Generic;
 using Godot;
-using Strata.Core.Content.Defs;
-using Strata.Core.Gameplay.Interaction;
+using Strata.Core.Gameplay.Entities;
+using Strata.Core.Presentation;
 using Strata.Core.Session;
 
 namespace Strata.Game.Audio;
 
-/// <summary>Creature sounds: hits and deaths, bosses rising and falling, and the player being hurt.</summary>
+/// <summary>
+/// Creature sounds by what they are made of (data/config/creature_materials.json): a squelch for gel, a clack for
+/// bone, a clang for metal, a crunch for chitin…, each material throttled on its own so a flurry of hits reads as one;
+/// the creature's own hit/death sound wins. Damage over time is silent. Bosses rise and fall loudly; the player is hurt.
+/// </summary>
 public sealed partial class SoundEvents
 {
+    private CreatureMaterialsConfig _materials = null!;
+    private readonly Dictionary<string, ulong> _lastMaterialHit = new();
+
+    /// <summary>The creature materials (shared with the hit dust and gore).</summary>
+    public CreatureMaterialsConfig Materials => _materials;
+
     private void WireCreatures(GameWorld game)
     {
+        _materials = CreatureMaterialsConfig.Load(new Bootstrap.GodotDataSource());
         game.Npcs.Damaged += e =>
         {
-            ulong now = Time.GetTicksMsec();
             if (e.ToPlayer)
             {
-                if (System.Numerics.Vector3.Distance(e.Position, _local.Center) < 3f) Sfx.Play("player_hurt");
+                if (e.Kind != DamageKind.Periodic && System.Numerics.Vector3.Distance(e.Position, _local.Center) < 3f) Sfx.Play("player_hurt");
                 return;
             }
-            if (now - _lastHitMs < 45) return; // a flurry of hits reads as one
-            _lastHitMs = now;
-            Sfx.PlayAt("hit", ToGodot(e.Position), e.Crit ? 2f : 0f);
+            if (e.Kind == DamageKind.Periodic) return;
+            var npc = game.Npcs.Find(e.NpcId);
+            string material = npc != null ? _materials.ResolveId(npc.Def) : CreatureMaterialsConfig.Default;
+            ulong now = Time.GetTicksMsec();
+            if (_lastMaterialHit.TryGetValue(material, out ulong last) && now - last < 45) return;
+            _lastMaterialHit[material] = now;
+            string sound = npc?.Def.HitSound ?? _materials.Materials[material].HitSound;
+            Sfx.PlayAt(Sfx.Has(sound) ? sound : "hit", ToGodot(e.Position), e.Crit ? 2f : 0f);
         };
         game.Npcs.Killed += npc =>
         {
-            string id = npc.Def.HasTag("gel") ? "slime_death" : npc.Def.Model is "skeleton" or "cursed_skull" or "dungeon_guardian" ? "hit_bone" : "npc_death";
-            Sfx.PlayAt(id, ToGodot(npc.Center), npc.IsBoss ? 4f : 0f);
+            string sound = npc.Def.DeathSound ?? _materials.Resolve(npc.Def).DeathSound;
+            Sfx.PlayAt(Sfx.Has(sound) ? sound : "npc_death", ToGodot(npc.Center), npc.IsBoss ? 4f : 0f);
         };
         game.Npcs.BossSpawned += _ => Sfx.Play("boss_roar");
         game.Npcs.BossDefeated += _ => Sfx.Play("boss_defeated");

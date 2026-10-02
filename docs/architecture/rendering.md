@@ -158,7 +158,10 @@ Puff, Splash, Leaves) a pool of one-shot CPU emitters sharing `particle_lit.gdsh
 at its point (instance uniform `voxel_light`, so chips in a dark cave are dark) and varied between a lighter and darker
 shade. Counts × preset `effectsScale`; at most 8 bursts start per frame and about 600 particles live (the oldest emitter
 is reused). `FlashLights` is a pool of `flashLights` short omni lights that fade linearly (explosions); a separate pool
-because DynamicLights re-ranks its providers only a few times a second. SoundEvents is split into World, Weapons,
+because DynamicLights re-ranks its providers only a few times a second. Creature materials
+(data/config/creature_materials.json, Core `CreatureMaterialsConfig`: the enemy's `material`, else its model, else its
+tags, else flesh) pick each creature's hit and death sounds, hit dust (blood, gel, bone chips, sparks, leaves) and death
+gore; `DamageEvent` carries `NpcId` and `Kind` (Hit, Periodic, Player…) so damage over time stays quiet. SoundEvents is split into World, Weapons,
 Creatures and Player partials, each wired once.
 
 ## Weather and ambience

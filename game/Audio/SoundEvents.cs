@@ -19,7 +19,6 @@ public sealed partial class SoundEvents : Node
     private ulong _lastPlaceFrame;
     private ulong _tinkFrame;
     private ulong _blastFrame;
-    private ulong _lastHitMs;
     private bool _wasAlive = true;
     private int _lastSerial;
 
