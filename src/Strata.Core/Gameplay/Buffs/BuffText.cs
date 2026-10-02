@@ -64,6 +64,8 @@ public static class BuffText
         [StatIds.Immunity] = new(Unit.Flat, "invincibility", "Longer invincibility after taking damage", "Shorter invincibility after taking damage"),
         [StatIds.AmmoSave] = new(Unit.Percent, "ammo use", "{0}% chance not to consume ammo", "{0}% more ammo used"),
         [StatIds.Thorns] = new(Unit.Percent, "thorns", "Attackers also take {0}% of the damage they deal", "Reduced thorns"),
+        [StatIds.MeleeKnockback] = Pct("melee knockback"),
+        [StatIds.PotionDelay] = new(Unit.Percent, "potion cooldown", "{0}% longer potion cooldown", "Reduces the cooldown of healing potions by {0}%"),
         [StatIds.LifeSteal] = new(Unit.Percent, "life steal", "{0}% of magic damage dealt heals you", "Reduced life steal"),
     };
 

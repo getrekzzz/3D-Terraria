@@ -1,0 +1,28 @@
+{
+  // X-11 biome Mimics (Terraria 1.4.4): hardmode, rare, sitting disguised as their biome's chest (the Dungeon vault's
+  // chests, data/tileobjects/biome_chests.json) in the underground of their biome. The Ice Mimic takes the plain Mimic's
+  // place under the snow (same strength, same six-way treasure plus the Toy Sled); the Corrupt, Crimson and Hallowed
+  // Mimics are far tougher and drop one of their biome's set plus Greater Healing Potions. The Mimic's own six-way
+  // treasure is mimic_treasure in data/enemies/bestiary.json; the items are data/items/mimic_loot.json.
+  "lootTables": [
+    {"id": "ice_mimic", "coins": [2000, 5000], "entries": [{"table": "mimic_treasure"}, {"item": "toy_sled", "chance": 0.33}]},
+    {"id": "corrupt_mimic", "coins": [20000, 50000], "entries": [{"table": "corrupt_mimic_treasure"}, {"item": "greater_healing_potion", "min": 5, "max": 10}]},
+    {"id": "crimson_mimic", "coins": [20000, 50000], "entries": [{"table": "crimson_mimic_treasure"}, {"item": "greater_healing_potion", "min": 5, "max": 10}]},
+    {"id": "hallowed_mimic", "coins": [20000, 50000], "entries": [{"table": "hallowed_mimic_treasure"}, {"item": "greater_healing_potion", "min": 5, "max": 10}]},
+    {"id": "corrupt_mimic_treasure", "entries": [{"item": "worm_hook", "weight": 1}, {"item": "chain_guillotines", "weight": 1}, {"item": "clinger_staff", "weight": 1}, {"item": "putrid_scent", "weight": 1}], "mode": "weighted"},
+    {"id": "crimson_mimic_treasure", "entries": [{"item": "tendon_hook", "weight": 1}, {"item": "fetid_baghnakhs", "weight": 1}, {"item": "life_drain", "weight": 1}, {"item": "flesh_knuckles", "weight": 1}], "mode": "weighted"},
+    {"id": "hallowed_mimic_treasure", "entries": [{"item": "daedalus_stormbow", "weight": 1}, {"item": "flying_knife", "weight": 1}, {"item": "crystal_vile_shard", "weight": 1}, {"item": "illuminant_hook", "weight": 1}], "mode": "weighted"}
+  ],
+  "enemies": [
+    {"id": "ice_mimic", "model": "ice_mimic", "tags": [], "name": "Ice Mimic", "description": "A Frozen Chest with an appetite.", "brain": {"type": "slimeHop", "jumpHeight": 7, "jumpSpeed": 5, "hopInterval": 70}, "disguise": {"model": "ice_mimic_chest", "name": "Frozen Chest", "wakeRange": 1.4, "wakeSound": "chest_open", "lunge": 7}, "life": 500, "damage": 80, "defense": 30, "knockbackResist": 0.8, "size": [2.0, 2.0], "moveSpeed": 5, "loot": "ice_mimic", "value": 5000, "covers": ["terraria:ice_mimic"]},
+    {"id": "corrupt_mimic", "model": "corrupt_mimic", "tags": [], "name": "Corrupt Mimic", "description": "The Corruption's treasure, and its teeth.", "brain": {"type": "slimeHop", "jumpHeight": 10, "jumpSpeed": 8, "hopInterval": 40}, "disguise": {"model": "corrupt_mimic_chest", "name": "Corruption Chest", "wakeRange": 1.4, "wakeSound": "chest_open", "lunge": 9}, "life": 3500, "damage": 90, "defense": 34, "knockbackResist": 0.9, "size": [2.0, 2.0], "moveSpeed": 7, "loot": "corrupt_mimic", "value": 30000, "covers": ["terraria:corrupt_mimic"]},
+    {"id": "crimson_mimic", "model": "crimson_mimic", "tags": [], "name": "Crimson Mimic", "description": "A chest of flesh that bites back.", "brain": {"type": "slimeHop", "jumpHeight": 10, "jumpSpeed": 8, "hopInterval": 40}, "disguise": {"model": "crimson_mimic_chest", "name": "Crimson Chest", "wakeRange": 1.4, "wakeSound": "chest_open", "lunge": 9}, "life": 3500, "damage": 90, "defense": 34, "knockbackResist": 0.9, "size": [2.0, 2.0], "moveSpeed": 7, "loot": "crimson_mimic", "value": 30000, "covers": ["terraria:crimson_mimic"]},
+    {"id": "hallowed_mimic", "model": "hallowed_mimic", "tags": [], "name": "Hallowed Mimic", "description": "Too radiant to be a real chest.", "brain": {"type": "slimeHop", "jumpHeight": 10, "jumpSpeed": 8, "hopInterval": 40}, "disguise": {"model": "hallowed_mimic_chest", "name": "Hallowed Chest", "wakeRange": 1.4, "wakeSound": "chest_open", "lunge": 9}, "life": 3500, "damage": 90, "defense": 34, "knockbackResist": 0.9, "size": [2.0, 2.0], "moveSpeed": 7, "loot": "hallowed_mimic", "value": 30000, "covers": ["terraria:hallowed_mimic"]}
+  ],
+  "spawnRules": [
+    {"id": "ice_mimic_tundra", "enemy": "ice_mimic", "weight": 0.12, "conditions": [{"type": "biome", "any": ["tundra"]}, {"type": "layer", "any": ["underground", "cavern"]}, {"type": "flag", "id": "hardmode"}], "maxAlive": 1},
+    {"id": "corrupt_mimic_underground", "enemy": "corrupt_mimic", "weight": 0.03, "conditions": [{"type": "biome", "any": ["corruption"]}, {"type": "layer", "any": ["underground", "cavern"]}, {"type": "flag", "id": "hardmode"}], "maxAlive": 1},
+    {"id": "crimson_mimic_underground", "enemy": "crimson_mimic", "weight": 0.03, "conditions": [{"type": "biome", "any": ["crimson"]}, {"type": "layer", "any": ["underground", "cavern"]}, {"type": "flag", "id": "hardmode"}], "maxAlive": 1},
+    {"id": "hallowed_mimic_underground", "enemy": "hallowed_mimic", "weight": 0.03, "conditions": [{"type": "biome", "any": ["hallow"]}, {"type": "layer", "any": ["underground", "cavern"]}, {"type": "flag", "id": "hardmode"}], "maxAlive": 1}
+  ]
+}

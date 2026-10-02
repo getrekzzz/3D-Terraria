@@ -864,6 +864,50 @@
    ]
   },
   {
+   "id": "terraria:ice_mimic",
+   "name": "Ice Mimic",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "underground snow",
+   "mechanics": [
+    "hop",
+    "rare"
+   ]
+  },
+  {
+   "id": "terraria:corrupt_mimic",
+   "name": "Corrupt Mimic",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "underground corruption",
+   "mechanics": [
+    "hop",
+    "rare"
+   ]
+  },
+  {
+   "id": "terraria:crimson_mimic",
+   "name": "Crimson Mimic",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "underground crimson",
+   "mechanics": [
+    "hop",
+    "rare"
+   ]
+  },
+  {
+   "id": "terraria:hallowed_mimic",
+   "name": "Hallowed Mimic",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "underground hallow",
+   "mechanics": [
+    "hop",
+    "rare"
+   ]
+  },
+  {
    "id": "terraria:unicorn",
    "name": "Unicorn",
    "kind": "enemy",

@@ -3645,6 +3645,104 @@
    "source": "mimic"
   },
   {
+   "id": "terraria:titan_glove",
+   "name": "Titan Glove",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:philosophers_stone",
+   "name": "Philosopher's Stone",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:star_cloak",
+   "name": "Star Cloak",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "mimic"
+  },
+  {
+   "id": "terraria:worm_hook",
+   "name": "Worm Hook",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:chain_guillotines",
+   "name": "Chain Guillotines",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:clinger_staff",
+   "name": "Clinger Staff",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:putrid_scent",
+   "name": "Putrid Scent",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corrupt mimic"
+  },
+  {
+   "id": "terraria:tendon_hook",
+   "name": "Tendon Hook",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:fetid_baghnakhs",
+   "name": "Fetid Baghnakhs",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:life_drain",
+   "name": "Life Drain",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:flesh_knuckles",
+   "name": "Flesh Knuckles",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson mimic"
+  },
+  {
+   "id": "terraria:flying_knife",
+   "name": "Flying Knife",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed mimic"
+  },
+  {
+   "id": "terraria:crystal_vile_shard",
+   "name": "Crystal Vile Shard",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed mimic"
+  },
+  {
+   "id": "terraria:illuminant_hook",
+   "name": "Illuminant Hook",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed mimic"
+  },
+  {
    "id": "terraria:wizard_hat",
    "name": "Wizard Hat",
    "kind": "weapon",
@@ -4385,6 +4483,13 @@
    "kind": "paint",
    "stage": "early",
    "source": "painter"
+  },
+  {
+   "id": "terraria:toy_sled",
+   "name": "Toy Sled",
+   "kind": "pet",
+   "stage": "hardmode",
+   "source": "ice mimic"
   },
   {
    "id": "terraria:shadow_orb_light_pet",

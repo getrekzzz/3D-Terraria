@@ -191,6 +191,16 @@
     "hem": "flat"
    }
   },
+  "corrupt_mimic_banner": {
+   "generator": "banner",
+   "params": {
+    "cloth": "#542e61",
+    "trim": "#d8c070",
+    "emblem": "#f0ead8",
+    "shape": "diamond",
+    "hem": "flat"
+   }
+  },
   "corrupt_slime_banner": {
    "generator": "banner",
    "params": {
@@ -249,6 +259,16 @@
     "emblem": "#f0ead8",
     "shape": "diamond",
     "hem": "swallowtail"
+   }
+  },
+  "crimson_mimic_banner": {
+   "generator": "banner",
+   "params": {
+    "cloth": "#25542e",
+    "trim": "#d8c070",
+    "emblem": "#f0ead8",
+    "shape": "diamond",
+    "hem": "flat"
    }
   },
   "crystal_slime_banner": {
@@ -701,6 +721,16 @@
     "hem": "swallowtail"
    }
   },
+  "hallowed_mimic_banner": {
+   "generator": "banner",
+   "params": {
+    "cloth": "#213b6e",
+    "trim": "#d8c070",
+    "emblem": "#f0ead8",
+    "shape": "diamond",
+    "hem": "swallowtail"
+   }
+  },
   "harpy_banner": {
    "generator": "banner",
    "params": {
@@ -789,6 +819,16 @@
     "emblem": "#f0ead8",
     "shape": "diamond",
     "hem": "point"
+   }
+  },
+  "ice_mimic_banner": {
+   "generator": "banner",
+   "params": {
+    "cloth": "#6e5421",
+    "trim": "#d8c070",
+    "emblem": "#f0ead8",
+    "shape": "diamond",
+    "hem": "flat"
    }
   },
   "ice_slime_banner": {

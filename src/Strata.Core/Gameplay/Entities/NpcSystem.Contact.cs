@@ -58,5 +58,6 @@ public sealed partial class NpcSystem
         if (harm is { } h) player.LastHarm = h;
         Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, kind, player));
         PlayerHurt?.Invoke(player, damage, knock);
+        if (kind != DamageKind.Periodic && damage > 0) _world.Projectiles.CallHurtProjectiles(player);
     }
 }
