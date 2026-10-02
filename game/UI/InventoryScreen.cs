@@ -117,9 +117,11 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (open == IsOpen) return;
         _root.Visible = open;
         Audio.Sfx.Play(open ? "ui_open" : "ui_close");
-        InputGate.SetOpen(Gate, open, GateKind.Overlay); // the player keeps walking, jumping and fighting
-        // Auto-pause (single player option): the world waits while the inventory is open.
-        if (Settings.UserSettings.Current.AutoPause || !open) _ui.Player.Runtime.Simulating = !open;
+        // An overlay: the player keeps walking, jumping and fighting. Auto-pause (single player option): the world waits
+        // while the inventory is open, and so does the player, so it is a modal then.
+        bool autoPause = Settings.UserSettings.Current.AutoPause;
+        InputGate.SetOpen(Gate, open, autoPause ? GateKind.Modal : GateKind.Overlay);
+        if (autoPause || !open) _ui.Player.Runtime.Simulating = !open;
         if (open)
         {
             _crafting.Refresh();

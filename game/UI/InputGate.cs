@@ -9,7 +9,7 @@ public enum GateKind
     /// <summary>The inventory, a chest, a shop, an NPC chat: the pointer is free but the player still walks and fights.</summary>
     Overlay,
 
-    /// <summary>The pause menu and settings, the console, the world map: gameplay input stops.</summary>
+    /// <summary>The pause menu and settings, the console, the world map, an auto-pausing inventory: gameplay input stops.</summary>
     Modal,
 }
 
@@ -24,6 +24,7 @@ public static class InputGate
     private static readonly HashSet<string> Modals = new();
     private static readonly HashSet<string> Overlays = new();
     private static bool _worldPointer;
+    private static bool _worldPress;
     private static bool _cameraDrag;
 
     /// <summary>A modal layer is open (menus, the console, the map): gameplay input is ignored.</summary>
@@ -45,7 +46,7 @@ public static class InputGate
     public static bool HotkeysBlocked => GameplayBlocked || TextEntry;
 
     /// <summary>The held item is not used: a modal is open, or an overlay is open and the button is not held on empty screen.</summary>
-    public static bool ItemUseBlocked => GameplayBlocked || TextEntry || (OverlayOpen && !_worldPointer);
+    public static bool ItemUseBlocked => GameplayBlocked || TextEntry || (OverlayOpen && !_worldPointer && !_worldPress);
 
     /// <summary>Mouse motion does not turn the camera: the pointer is free and no right-button drag is turning it.</summary>
     public static bool LookBlocked => GameplayBlocked || (OverlayOpen && !_cameraDrag);
@@ -54,7 +55,23 @@ public static class InputGate
     public static bool WorldPointer
     {
         get => _worldPointer;
-        set => _worldPointer = value && OverlayOpen && !GameplayBlocked;
+        set
+        {
+            bool held = value && OverlayOpen && !GameplayBlocked;
+            if (held && !_worldPointer) _worldPress = true;
+            _worldPointer = held;
+        }
+    }
+
+    /// <summary>
+    /// Whether the use button went down on empty screen since the last call, and clears it: a tap pressed and released
+    /// within one physics tick (a quick click, or any click in a slow frame) still uses the item once.
+    /// </summary>
+    public static bool TakeWorldPress()
+    {
+        bool press = _worldPress;
+        _worldPress = false;
+        return press;
     }
 
     /// <summary>The right button drags on empty screen while an overlay is open: the camera turns.</summary>
@@ -66,11 +83,12 @@ public static class InputGate
 
     public static void SetOpen(string layer, bool open, GateKind kind = GateKind.Modal)
     {
-        var set = kind == GateKind.Overlay ? Overlays : Modals;
-        if (open) set.Add(layer);
-        else set.Remove(layer);
+        // A layer is one kind at a time (the inventory is a modal while it auto-pauses), and closes whatever it opened as.
+        Modals.Remove(layer);
+        Overlays.Remove(layer);
+        if (open) (kind == GateKind.Overlay ? Overlays : Modals).Add(layer);
         // A press or drag on empty screen ends with the last overlay, or when a modal opens over it.
-        if (!OverlayOpen || GameplayBlocked) _worldPointer = _cameraDrag = false;
+        if (!OverlayOpen || GameplayBlocked) _worldPointer = _worldPress = _cameraDrag = false;
         Input.MouseMode = MouseFree ? Input.MouseModeEnum.Visible : Input.MouseModeEnum.Captured;
     }
 
@@ -94,7 +112,7 @@ public static class InputGate
         Modals.Clear();
         Overlays.Clear();
         TextEntry = false;
-        _worldPointer = _cameraDrag = false;
+        _worldPointer = _worldPress = _cameraDrag = false;
         Input.MouseMode = Input.MouseModeEnum.Visible;
     }
 }

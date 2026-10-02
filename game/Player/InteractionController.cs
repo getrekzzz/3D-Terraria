@@ -71,14 +71,17 @@ public sealed partial class InteractionController : Node
         UpdateTarget();
         PollHotbarKeys();
         // With the inventory, a chest or a chat open, Input reports the button down for clicks the panels took too:
-        // only a press on empty screen (the click catcher's WorldPointer) uses the item, toward the crosshair.
+        // only a press on empty screen (the click catcher's WorldPointer) uses the item, toward the crosshair; a tap
+        // already released by this tick still counts once.
         bool overlay = UI.InputGate.OverlayOpen;
+        bool useBlocked = UI.InputGate.ItemUseBlocked;
+        bool tapped = UI.InputGate.TakeWorldPress();
         bool held = overlay ? UI.InputGate.WorldPointer : Input.IsActionPressed(UsePrimary);
-        bool fresh = overlay ? held && !_useHeld : Input.IsActionJustPressed(UsePrimary);
+        bool fresh = overlay ? tapped || (held && !_useHeld) : Input.IsActionJustPressed(UsePrimary);
         _useHeld = held;
         if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.HotkeysBlocked) return;
 
-        if ((fresh || held) && !UI.InputGate.ItemUseBlocked)
+        if ((fresh || held) && !useBlocked)
         {
             var outcome = Game.ItemUse.Use(Entity, Target, fresh);
             if (outcome is not (UseOutcome.None or UseOutcome.Cooldown)) Used?.Invoke(outcome);

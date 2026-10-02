@@ -189,6 +189,12 @@ ui click left down
 wait 0.4
 ui click left up
 assert player.swings >= 1
+# A tap pressed and released within one tick still swings once.
+wait 0.6
+mark
+ui click left
+wait 0.1
+assert player.swings >= 1
 aim 1 0 0
 ui drag 400 0
 assert camera.yaw < -110
