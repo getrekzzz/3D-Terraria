@@ -159,6 +159,7 @@ public partial class GameRoot : Node
         Commands = null;
         CommandContext = null;
         InputGate.Reset();
+        System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.Interactive;
         RemoveChild(host);
         host.QueueFree(); // the world saves as it leaves the tree
         ShowMenu();
@@ -172,6 +173,9 @@ public partial class GameRoot : Node
         AddChild(_worldHost);
         var launched = WorldLauncher.Launch(_worldHost, Services, options);
         World = launched.Runtime;
+        // While a world runs, the GC avoids blocking gen2 collections (background ones instead): fewer freezes for a
+        // little more memory. The menu goes back to the default.
+        System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
         Commands = BuiltinCommands.CreateRegistry();
         EngineCommands.Register(Commands, launched);
         CommandContext = GodotCommandHost.CreateContext(launched, Services.Log, Commands);

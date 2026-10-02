@@ -6,6 +6,9 @@
     <RootNamespace>Strata.Game</RootNamespace>
     <AssemblyName>Strata</AssemblyName>
     <ImplicitUsings>disable</ImplicitUsings>
+    <!-- Background (concurrent) gen2 collections, which SustainedLowLatency relies on (see GameRoot), and dynamic PGO. -->
+    <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+    <TieredPGO>true</TieredPGO>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="src/**;tests/**;tools/**" />

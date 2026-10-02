@@ -103,6 +103,8 @@ probe perf.worst_ms
 probe perf.p99_ms
 probe perf.gc2
 probe perf.gc_pause_ms
+# A running world keeps the GC in SustainedLowLatency (background gen2 collections, GameRoot.StartWorld).
+assert gc.latency_mode == 3
 probe perf.calls.tick.autosave
 assert errors == 0
 

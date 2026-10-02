@@ -157,6 +157,11 @@ the last draw instead, i.e. the main thread's own work, and the summary says "fr
   comes from a rendering run, on a dev GPU (whole frames) or lavapipe (main-thread work, see above):
   `godot --path . --rendering-driver vulkan -- --world=perf --size=small --new --player=perf --fresh-player --view=6
   --graphics=medium --smoke=res://game/Testing/Scripts/perf.cmds`.
+* **GC**: while a world runs `GameRoot` sets `GCSettings.LatencyMode = SustainedLowLatency` (concurrent GC and
+  tiered PGO are on in `Strata.csproj`; probe `gc.latency_mode`, 3 in a world). Large per-job buffers stay off the
+  large-object heap: `MeshVolume.Rent` and the cave pass's dense noise fields are per-thread scratch, and
+  `MeshUpload` passes the Core vertex lists to Godot as spans (`Variant.CreateFrom`) instead of copying them
+  (`AllocationTests` pin both).
 * **Before/after**: run the same rendering command on the parent commit and on the fix, on the same machine, and
   compare the `perf spikes` summary (p99, max, spike counts, GC) and which timers still appear in the spike list.
   Lavapipe timings only compare with other lavapipe runs (they also share the CPU with the software rasteriser, and

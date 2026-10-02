@@ -67,7 +67,7 @@ public static class ChunkMesher
             NeighbourVersions = (int[])nb.Versions.Clone(),
             Light = ExtractCore(light),
         };
-        var vol = new MeshVolume(nb, tables, light);
+        var vol = MeshVolume.Rent(nb, tables, light);
         SurfaceNetsMesher.Build(vol, result.Opaque, result.Collision);
         CellMesher.Build(vol, result.Opaque, result.Transparent, result.Cutout, result.Collision);
         result.Collision.ComputeHashes();

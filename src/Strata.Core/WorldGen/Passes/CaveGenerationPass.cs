@@ -130,11 +130,11 @@ public sealed class CaveGenerationPass : GenPass
         var caves = ctx.Gen.Caves;
         var p = ctx.Palette;
         var size = Int3.One * ChunkGenContext.Size;
-        var spagA = Dense(ctx, new LatticeSampler(ctx.Origin, size, caves.SpaghettiA));
-        var spagB = Dense(ctx, new LatticeSampler(ctx.Origin, size, caves.SpaghettiB));
+        var spagA = Dense(new LatticeSampler(ctx.Origin, size, caves.SpaghettiA), ref _spagA);
+        var spagB = Dense(new LatticeSampler(ctx.Origin, size, caves.SpaghettiB), ref _spagB);
         // Cheese caverns only exist below depth 0.12; the box bottom is its deepest cell.
         bool deep = ctx.Depth(ctx.Origin.Y) > 0.12f;
-        var cheese = deep ? Dense(ctx, new LatticeSampler(ctx.Origin, size, caves.Cheese, 8)) : null;
+        var cheese = deep ? Dense(new LatticeSampler(ctx.Origin, size, caves.Cheese, 8), ref _cheese) : null;
         var spawn = ctx.Plan.Spawn;
         int n = ChunkGenContext.Size;
         for (int lz = 0; lz < n; lz++)
@@ -164,9 +164,12 @@ public sealed class CaveGenerationPass : GenPass
             }
     }
 
-    private static float[] Dense(ChunkGenContext ctx, LatticeSampler sampler)
+    // Per-thread dense field scratch (128 KB each, large-object heap): FillDense overwrites every cell.
+    [ThreadStatic] private static float[]? _spagA, _spagB, _cheese;
+
+    private static float[] Dense(LatticeSampler sampler, ref float[]? scratch)
     {
-        var dest = new float[ChunkGenContext.Volume];
+        var dest = scratch ??= new float[ChunkGenContext.Volume];
         sampler.FillDense(dest, ChunkGenContext.Size);
         return dest;
     }

@@ -60,6 +60,7 @@ public sealed class GodotCommandHost : ICommandHost
         ctx.AddProbe("grass.live", () => runtime.Grass?.LiveChunks ?? 0);
         ctx.AddProbe("grass.builds", () => runtime.Grass?.Builds ?? 0);
         ctx.AddProbe("grass.pending", () => runtime.Grass?.PendingBuilds ?? 0);
+        ctx.AddProbe("gc.latency_mode", () => (int)System.Runtime.GCSettings.LatencyMode);
         ProbeSources.RegisterAll(ctx, typeof(GodotCommandHost).Assembly, world, log);
         return ctx;
     }
