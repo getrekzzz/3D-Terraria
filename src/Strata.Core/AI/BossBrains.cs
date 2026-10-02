@@ -41,9 +41,7 @@ public sealed class GelSovereignBrain : IBrain
             // Reappear beside the target, or right above it when that spot is still behind a wall.
             var dir = BrainFactory.Flat(npc.Position - ctx.Target.Position);
             if (dir == Vector3.Zero) dir = Vector3.UnitX;
-            var beside = ctx.Target.Position + dir * 5f + new Vector3(0, 3f, 0);
-            npc.Position = ctx.InSight?.Invoke(beside + new Vector3(0, npc.HalfExtents.Y, 0), ctx.Target.Eye) ?? true
-                ? beside : ctx.Target.Position + new Vector3(0, 2.5f, 0);
+            if (TeleportSpot(npc, ctx, dir) is { } spot) npc.Position = spot; // nowhere free: it reappears where it was
             npc.Velocity = Vector3.Zero;
             npc.Phase = 2;
             npc.Timer = 0;
@@ -85,6 +83,31 @@ public sealed class GelSovereignBrain : IBrain
         npc.Velocity = toTarget * _p.JumpSpeed * (big ? 1.4f : 1f) + new Vector3(0, BrainFactory.JumpVelocity(_p.JumpHeight * (big ? 1.6f : 1f)), 0);
         npc.Yaw = BrainFactory.YawOf(toTarget);
         npc.Pose = "jump";
+    }
+
+    /// <summary>
+    /// Where the teleport lands (feet): beside the target when that spot sees it, else right above it, else on the ground
+    /// around it; never a spot whose box is in terrain (it would be stuck there). Null when nothing near is free.
+    /// </summary>
+    private static Vector3? TeleportSpot(Npc npc, BrainContext ctx, Vector3 dir)
+    {
+        var target = ctx.Target!;
+        var up = new Vector3(0, npc.HalfExtents.Y, 0);
+        var beside = target.Position + dir * 5f + new Vector3(0, 3f, 0);
+        if (Free(beside) && (ctx.InSight?.Invoke(beside + up, target.Eye) ?? true)) return beside;
+        var above = target.Position + new Vector3(0, 2.5f, 0);
+        if (Free(above)) return above;
+        if (Free(target.Position + new Vector3(0, 0.05f, 0))) return target.Position + new Vector3(0, 0.05f, 0);
+        for (int k = 0; k < 8; k++)
+        {
+            float a = k * MathF.PI / 4f;
+            var around = target.Position + new Vector3(MathF.Sin(a), 0, MathF.Cos(a)) * 4f;
+            if (ctx.Ground?.Invoke(around) is { } feet && Free(feet + new Vector3(0, 0.05f, 0))
+                && (ctx.InSight?.Invoke(feet + up, target.Eye) ?? true)) return feet + new Vector3(0, 0.05f, 0);
+        }
+        return null;
+
+        bool Free(Vector3 feet) => ctx.Fits?.Invoke(feet + up, npc.HalfExtents) ?? true;
     }
 
     /// <summary>Model and box scale with the life left (Terraria's King Slime goes from 1.25 to 0.75).</summary>

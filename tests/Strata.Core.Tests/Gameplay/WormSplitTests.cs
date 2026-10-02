@@ -40,6 +40,20 @@ public class WormSplitTests
     }
 
     [Fact]
+    public void SplittingAtTheCreatureCapKeepsTheBackPiece()
+    {
+        using var g = Arena();
+        var worm = Eater(g);
+        var slime = g.Content.Enemies.Get("green_slime");
+        while (g.World.Npcs.Spawn(slime, g.Player.Position + new Vector3(30f, 1f, 0)) != null) { }
+        Assert.Equal(NpcSystem.MaxNpcs, g.World.Npcs.All.Count);
+        int before = worm.TotalLife;
+        CutSegment(g, worm, 20);
+        Assert.Equal(2, Pieces(g).Count); // the segments were already in the world: the cut does not lose them
+        Assert.Equal(before - 150, Pieces(g).Sum(p => p.TotalLife));
+    }
+
+    [Fact]
     public void KillingAMiddleSegmentSplitsTheWorm()
     {
         using var g = Arena();

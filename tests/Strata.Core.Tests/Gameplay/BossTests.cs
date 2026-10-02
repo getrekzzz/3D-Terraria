@@ -47,7 +47,15 @@ public class BossTests
         g.Ticks(2);
         Assert.True(g.World.Npcs.All.Count >= before + 3, "no minions shed");
 
-        g.Player.Position += new Vector3(0, 0, -40f);
+        // The player runs off to an open pad 27 m away in the loaded chunks (the slime only lands where its box is free).
+        var stone = g.Content.BlockId("stone");
+        var batch = g.World.Session.World.BeginEdit();
+        for (int dx = 44; dx <= 62; dx++)
+            for (int dz = -10; dz <= 10; dz++)
+                for (int dy = 0; dy <= 16; dy++)
+                    batch.SetBlock(g.Floor.X + dx, g.Floor.Y + dy, g.Floor.Z + dz, dy == 0 ? stone : (ushort)0);
+        g.World.Session.Commit(batch);
+        g.Player.Position = TestGame.CellFeet(g.Floor + new Strata.Core.Common.Int3(54, 1, 0));
         g.Ticks(60 * 6);
         Assert.True(Vector3.Distance(boss.Position, g.Player.Position) < 15f, "boss did not follow the player");
     }

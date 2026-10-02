@@ -63,6 +63,7 @@ public sealed partial class NpcSystem
             Announce = text => Announce(text, Messages.MessageKind.Boss),
             Impact = (at, strength) => Impacted?.Invoke(at, strength),
             InSight = InSight,
+            Fits = (center, half) => !VoxelMotion.Overlaps(world.Session.World, center, half),
             Cue = (npc, sfx) => Cued?.Invoke(npc, sfx),
             Pulse = Pulse,
             Bands = world.Session.Generator.Plan.Bands,
