@@ -110,6 +110,7 @@ public sealed partial class WorldSession : IDisposable
         var spawn = session.Generator.Plan.Spawn;
         meta.Spawn = new[] { spawn.X, spawn.Y, spawn.Z };
         meta.PlanHash = session.Generator.Plan.Hash;
+        session.Wires.UnionWith(session.Generator.Plan.PlannedWires); // new worlds only: a loaded world keeps its own
         session.SaveMetaOnly();
         return session;
     }

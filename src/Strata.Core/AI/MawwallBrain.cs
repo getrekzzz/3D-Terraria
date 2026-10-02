@@ -38,7 +38,7 @@ public sealed class MawwallBrain : IBrain
         }
         float d = npc.Direction.X;
         float life = npc.MaxLife > 0 ? npc.Life / (float)npc.MaxLife : 1f;
-        float speed = _p.BaseSpeed + (_p.MaxSpeed - _p.BaseSpeed) * (1f - life);
+        float speed = (_p.BaseSpeed + (_p.MaxSpeed - _p.BaseSpeed) * (1f - life)) * (ctx.Expert ? _p.ExpertSpeed : 1f);
         float zVel = 0f;
         if (target != null)
         {
@@ -59,10 +59,48 @@ public sealed class MawwallBrain : IBrain
         for (int i = 0; i < 2 && i < npc.Segments.Count; i++)
             npc.Segments[i] = new Vector3(c.X + d * half, c.Y + (i == 0 ? 1f : -1f) * _p.EyeSpacing * 0.5f, c.Z);
 
+        if (ctx.TargetPlayer is { Alive: true } player) Tongue(npc, ctx, player, d, half);
+        if (_p.Leech != null && ctx.Spawn != null && ++npc.SummonTimer >= _p.LeechInterval * (0.4f + 0.6f * life))
+        {
+            npc.SummonTimer = 0;
+            if ((ctx.CountAlive?.Invoke(_p.Leech) ?? 0) < _p.MaxLeeches && ctx.Content.Enemies.TryGet(_p.Leech, out var leech))
+                ctx.Spawn(leech, c + new Vector3(d * (half + 1f), 0, 0));
+        }
+
         npc.Timer++;
         if (_p.Minion == null || ctx.Spawn == null || npc.Timer % _p.MinionInterval != 0 || npc.Followers.Count >= _p.MaxMinions) return;
         if (!ctx.Content.Enemies.TryGet(_p.Minion, out var minion)) return;
         var offset = new Vector3(d * (half + 0.5f), ctx.Rng.Range(-_p.EyeSpacing, _p.EyeSpacing), ctx.Rng.Range(-_p.Width * 0.35f, _p.Width * 0.35f));
         if (ctx.Spawn(minion, c + offset) is { } m) NpcSystem.Tether(m, npc, offset);
+    }
+
+    /// <summary>
+    /// The Tongued: a target that runs more than <see cref="MawwallParams.TongueDistance"/> ahead of the face is caught
+    /// and reeled into the mouth, unable to use items, until it reaches it; then the tongue lets go.
+    /// </summary>
+    private void Tongue(Npc npc, BrainContext ctx, Session.PlayerEntity player, float d, float half)
+    {
+        var mouth = npc.Center;
+        var to = mouth - player.Center;
+        float dist = to.Length();
+        bool held = Has(player, _p.TongueBuff);
+        if (held && dist <= npc.HalfExtents.X + 1.5f)
+        {
+            player.State.Buffs.Remove(_p.TongueBuff); // swallowed: the mouth's touch does the rest
+            player.State.Recompute();
+            return;
+        }
+        if (!held && (player.Position.X - (mouth.X + d * half)) * d <= _p.TongueDistance) return;
+        if (!held) ctx.Cue?.Invoke(npc, "boss_roar");
+        ctx.Pulse?.Invoke(player.Center, 0.5f, _p.TongueBuff, 30);
+        if (dist > 1e-3f) ctx.Pull?.Invoke(player, to / dist * _p.TonguePull);
+    }
+
+    private static bool Has(Session.PlayerEntity player, string buff)
+    {
+        var active = player.State.Buffs.Active;
+        for (int i = 0; i < active.Count; i++)
+            if (active[i].Def.Id == buff) return true;
+        return false;
     }
 }

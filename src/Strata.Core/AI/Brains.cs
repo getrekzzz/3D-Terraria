@@ -185,6 +185,7 @@ public sealed class FlyerBrain : IBrain
             return;
         }
         npc.TargetPlayer = 0;
+        bool tethered = npc.Leader is { Alive: true, Removed: false };
         var target = ctx.Target!.Center;
         var toTarget = target - npc.Center;
         if (npc.Phase == 1)
@@ -197,12 +198,24 @@ public sealed class FlyerBrain : IBrain
             }
             npc.Pose = "attack";
         }
-        else if (npc.Timer >= _p.DashCooldown && toTarget.Length() < _p.OrbitRadius * Units.CellSize * 1.6f)
+        else if (npc.Timer >= _p.DashCooldown && (tethered
+                     ? toTarget.Length() < TetherDashRange && ctx.Rng.Chance(TetherDashChance)
+                     : toTarget.Length() < _p.OrbitRadius * Units.CellSize * 1.6f))
         {
             npc.Phase = 1;
             npc.Timer = 0;
             npc.Velocity = Vector3.Normalize(toTarget) * _p.DashSpeed;
             npc.Pose = "attack";
+        }
+        else if (tethered)
+        {
+            // A guard keeps to its slot on the ring around its leader (the Brain's Creepers), bobbing a little.
+            var desired = npc.Anchor + new Vector3(0, MathF.Sin(npc.Age * 0.05f + npc.Id) * 0.4f, 0);
+            var to = desired - npc.Center;
+            float speed = npc.Def.MoveSpeed * 1.5f;
+            var want = to.LengthSquared() > 1e-4f ? Vector3.Normalize(to) * MathF.Min(speed, to.Length() * 3f) : Vector3.Zero;
+            Steer(npc, want, 0.15f);
+            npc.Pose = "move";
         }
         else
         {
@@ -216,6 +229,11 @@ public sealed class FlyerBrain : IBrain
         }
         if (toTarget.LengthSquared() > 1e-4f) npc.Yaw = BrainFactory.YawOf(toTarget);
     }
+
+    /// <summary>A tethered flyer lunges from its leader's ring at a target this close (m), now and then.</summary>
+    private const float TetherDashRange = 14f;
+
+    private const float TetherDashChance = 0.015f;
 
     private static void Steer(Npc npc, Vector3 desired, float rate) => npc.Velocity += (desired - npc.Velocity) * rate;
 

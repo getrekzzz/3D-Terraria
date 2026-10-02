@@ -26,11 +26,17 @@ public sealed class PourLiquidParams : SpecParams, IValidatableSpec
     public string? Validate() => Amount is < 1 or > 31 * 8 ? "amount must be 1–248" : null;
 }
 
-/// <summary>Splits into other creatures (gels shedding smaller gels).</summary>
+/// <summary>Splits into other creatures (gels shedding smaller gels; Golem's head flying free).</summary>
 public sealed class SpawnEnemiesParams : SpecParams, IValidatableSpec
 {
     public string Enemy { get; init; } = "";
     public int Count { get; init; } = 2;
+
+    /// <summary>
+    /// The children are bound to the dying creature's living leader (its body; free when it has none): they rise where
+    /// it fell, move on their own, and die with that body without loot (Golem's head flying free until Golem falls).
+    /// </summary>
+    public bool Tether { get; init; }
 
     public string? Validate() => Count is < 1 or > 12 ? "count must be 1–12" : null;
 }

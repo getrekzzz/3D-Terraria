@@ -5,7 +5,7 @@ using Strata.Core.Gameplay.Player;
 namespace Strata.Core.Session;
 
 /// <summary>A player character inside a world: persistent state plus its live body (synced by the engine layer).</summary>
-public sealed class PlayerEntity
+public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
 {
     public PlayerEntity(PlayerState state) => State = state;
 
@@ -40,6 +40,9 @@ public sealed class PlayerEntity
     /// </summary>
     public int UseCooldown { get; set; }
 
+    /// <summary>Ticks before equipment may throw its next attack projectile (Bone Glove).</summary>
+    public int GloveCooldown { get; set; }
+
     /// <summary>Ticks left in the current use animation (swing/shoot pose); a new animation starts only once it is 0.</summary>
     public int UseAnimation { get; set; }
 
@@ -65,6 +68,13 @@ public sealed class PlayerEntity
 
     /// <summary>The grappling hook: thrown, latched or returning (see <see cref="GrappleHook"/>).</summary>
     public GrappleHook Hook { get; } = new();
+
+    /// <summary>
+    /// A velocity (m/s) a creature forces on the player this tick, replacing their own movement (the Wall of Flesh's
+    /// tongue); zero when nothing drags them. The creature system clears it each tick; the body (or, headless,
+    /// <see cref="GameWorld"/>) applies it.
+    /// </summary>
+    public Vector3 ExternalVelocity { get; set; }
 
     /// <summary>
     /// An engine body owns this player's motion (the running game): it advances <see cref="Hook"/> in its physics step

@@ -47,6 +47,12 @@ public sealed class Projectile
     public Items.MiscSlot? PetSlot { get; init; }
 
     public bool Grounded { get; set; }
+
+    /// <summary>A latching projectile's victim, where on it the projectile bit, and the tick it bit.</summary>
+    public Npc? LatchedTo { get; set; }
+
+    public Vector3 LatchOffset { get; set; }
+    public int LatchedAt { get; set; }
 }
 
 /// <summary>
@@ -103,7 +109,7 @@ public sealed partial class ProjectileSystem
             Id = _nextId++, Def = def, Position = position, Velocity = velocity, Owner = owner, Damage = damage, Knockback = knockback,
             DamageClass = damageClass, Crit = crit, PierceLeft = def.Pierce, BouncesLeft = def.Bounces, Source = source, PetSlot = petSlot,
         };
-        if (def.Minion != null && owner != null) MakeRoomForMinion(owner, def.Minion.Slots);
+        if (def.Minion != null && owner != null) MakeRoomForMinion(owner, def.Minion);
         _items.Add(proj);
         Spawned?.Invoke(proj);
         return proj;
@@ -122,7 +128,7 @@ public sealed partial class ProjectileSystem
                 if (!TickPet(p, dt)) End(i);
                 continue;
             }
-            if (p.Def.Minion != null || p.Def.Bobber || p.Returning)
+            if (p.Def.Minion != null || p.Def.Bobber || p.Returning || p.LatchedTo != null)
             {
                 if (!TickSpecial(p, dt)) End(i);
                 continue;
@@ -141,6 +147,7 @@ public sealed partial class ProjectileSystem
             p.Velocity.Y -= p.Def.Gravity * dt;
             if (p.Def.Drag > 0) p.Velocity *= 1f - p.Def.Drag * dt;
             if (p.Def.Homing > 0) Steer(p, dt);
+            if (p.Def.Guided > 0) Guide(p, dt);
             if (p.Def.CollideTerrain && !MoveThroughTerrain(p, dt))
             {
                 if (p.Def.Returns > 0) p.Returning = true;
@@ -184,10 +191,15 @@ public sealed partial class ProjectileSystem
         foreach (var npc in _npcs.All.ToList())
         {
             if (!npc.Alive || p.HitNpcs.Contains(npc.Id)) continue;
-            if (!npc.Volumes().Any(v => Vector3.DistanceSquared(Vector3.Clamp(p.Position, v.Min, v.Max), p.Position) <= r * r)) continue;
+            int volume = npc.FirstVolume((min, max) => Vector3.DistanceSquared(Vector3.Clamp(p.Position, min, max), p.Position) <= r * r);
+            if (volume < 0) continue;
             p.HitNpcs.Add(npc.Id);
-            _npcs.Hit(npc, p.Owner, p.Damage, p.DamageClass, p.Crit, p.Knockback, p.Position - p.Velocity * 0.05f, melee: false);
-            ApplyOnHit(p, npc);
+            Strike(p, npc, p.Position - p.Velocity * 0.05f, volume - 1);
+            if (p.Def.Latch)
+            {
+                Latch(p, npc);
+                return false;
+            }
             if (p.PierceLeft >= 0 && --p.PierceLeft <= 0) return true;
         }
         return false;
@@ -243,7 +255,15 @@ public sealed partial class ProjectileSystem
         }
     }
 
-    private void ApplyOnHit(Projectile p, Npc? npc)
+    /// <summary>One hit on a creature with its on-hit effects (which see the damage it really dealt).</summary>
+    private void Strike(Projectile p, Npc npc, Vector3 from, int segment = -1)
+    {
+        int before = npc.Life;
+        _npcs.Hit(npc, p.Owner, p.Damage, p.DamageClass, p.Crit, p.Knockback, from, melee: false, segment: segment);
+        ApplyOnHit(p, npc, Math.Max(0, before - Math.Max(0, npc.Life)));
+    }
+
+    private void ApplyOnHit(Projectile p, Npc? npc, int dealt = 0)
     {
         foreach (var spec in p.Def.OnHit)
         {
@@ -255,6 +275,12 @@ public sealed partial class ProjectileSystem
                     break;
                 case ProjectileHitSpecs.Explode:
                     Explode(p, spec.Parse<ExplodeParams>());
+                    break;
+                case ProjectileHitSpecs.LifeSteal when npc != null && dealt > 0:
+                    StealLife(p, dealt, spec.Parse<LifeStealParams>());
+                    break;
+                case ProjectileHitSpecs.SpawnProjectiles when npc != null:
+                    SpawnFrom(p, npc, spec.Parse<SpawnProjectilesParams>());
                     break;
             }
         }

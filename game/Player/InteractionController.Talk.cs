@@ -24,4 +24,13 @@ public sealed partial class InteractionController
         }
         return Targeting.UnderFeet(Game.Session.World, Entity.Position);
     }
+
+    /// <summary>Tries to open (or greet) a disguised creature within reach; it wakes. True when it did.</summary>
+    private bool OpenDisguised(Strata.Core.Gameplay.Entities.Npc npc)
+    {
+        float reach = ItemUseSystem.ReachMeters(Entity, null);
+        if (Game.Interaction.Interact(Entity, npc, reach) != InteractOutcome.Unmasked) return false;
+        Interacted?.Invoke(InteractOutcome.Unmasked);
+        return true;
+    }
 }

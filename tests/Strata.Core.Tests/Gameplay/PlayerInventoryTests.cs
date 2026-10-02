@@ -47,6 +47,26 @@ public class PlayerInventoryTests
     }
 
     [Fact]
+    public void ShownEquipmentPrefersVanityAndSkipsHiddenOrLockedAccessories()
+    {
+        var inv = new PlayerState("tester").Inventory;
+        inv.Armor[0] = S("copper_helmet");
+        inv.Armor[1] = S("copper_chainmail");
+        inv.VanityArmor[1] = new ItemStack(VanityShirt, 1);
+        Assert.Equal("copper_helmet", inv.ShownArmor(0)!.Id);
+        Assert.Equal(VanityShirt, inv.ShownArmor(1));
+        Assert.Null(inv.ShownArmor(2));
+
+        inv.Accessories[0] = S("cobalt_shield");
+        inv.Accessories[1] = S("obsidian_skull");
+        inv.Accessories[5] = S("hermes_boots"); // locked in a Classic world
+        inv.VanityAccessories[0] = new ItemStack(VanityCape, 1);
+        inv.SetAccessoryHidden(1, true);
+        // Functional (not hidden) first, vanity last so it wins where both draw in one place.
+        Assert.Equal(new[] { "cobalt_shield", VanityCape.Id }, inv.ShownAccessories.Select(i => i.Id));
+    }
+
+    [Fact]
     public void ExpertWorldUnlocksSixthAccessory()
     {
         using (var classic = TestGame.Create())

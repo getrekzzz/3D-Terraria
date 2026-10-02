@@ -23,9 +23,11 @@ assert npcs.wall_of_flesh == 1
 assert town.guide.alive == 0
 assert errors == 0
 
-# It fights for a while (the barrier and lasers must not break anything), then falls.
-wait 6
+# It fights for a while (the barrier and lasers must not break anything) and Leeches squirm out of its mouth, then falls.
+wait 8
 assert player.alive == 1
+assert npcs.leech >= 1
+assert errors == 0
 assert npcs.wall_of_flesh == 1
 slay wall_of_flesh
 assert flag.defeated_wall_of_flesh == 1

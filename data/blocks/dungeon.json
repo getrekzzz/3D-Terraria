@@ -1,0 +1,15 @@
+{
+  // Dungeon building blocks: the Bone Block made at a Bone Welder and the dungeon wall panels in blue, green and pink: brick, slab and tiled.
+  "blocks": [
+    { "id": "blue_brick_wall", "name": "Blue Brick Wall", "render": "crisp", "textures": { "all": "azure_brick_wall" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#2a4274", "tags": ["dungeon", "brick"], "covers": ["terraria:blue_brick_wall"] },
+    { "id": "blue_slab_wall", "name": "Blue Slab Wall", "render": "crisp", "textures": { "all": "azure_slab" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#2a4274", "tags": ["dungeon", "brick"], "covers": ["terraria:blue_slab_wall"] },
+    { "id": "blue_tiled_wall", "name": "Blue Tiled Wall", "render": "crisp", "textures": { "all": "azure_tiled" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#2a4274", "tags": ["dungeon", "brick"], "covers": ["terraria:blue_tiled_wall"] },
+    { "id": "green_brick_wall", "name": "Green Brick Wall", "render": "crisp", "textures": { "all": "verdant_brick_wall" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#2e5c42", "tags": ["dungeon", "brick"], "covers": ["terraria:green_brick_wall"] },
+    { "id": "green_slab_wall", "name": "Green Slab Wall", "render": "crisp", "textures": { "all": "verdant_slab" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#2e5c42", "tags": ["dungeon", "brick"], "covers": ["terraria:green_slab_wall"] },
+    { "id": "green_tiled_wall", "name": "Green Tiled Wall", "render": "crisp", "textures": { "all": "verdant_tiled" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#2e5c42", "tags": ["dungeon", "brick"], "covers": ["terraria:green_tiled_wall"] },
+    { "id": "pink_brick_wall", "name": "Pink Brick Wall", "render": "crisp", "textures": { "all": "rose_brick_wall" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#723050", "tags": ["dungeon", "brick"], "covers": ["terraria:pink_brick_wall"] },
+    { "id": "pink_slab_wall", "name": "Pink Slab Wall", "render": "crisp", "textures": { "all": "rose_slab" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#723050", "tags": ["dungeon", "brick"], "covers": ["terraria:pink_slab_wall"] },
+    { "id": "pink_tiled_wall", "name": "Pink Tiled Wall", "render": "crisp", "textures": { "all": "rose_tiled" }, "hardness": 3.0, "pickPower": 65, "sound": "stone", "color": "#723050", "tags": ["dungeon", "brick"], "covers": ["terraria:pink_tiled_wall"] },
+    { "id": "bone_block", "name": "Bone Block", "render": "crisp", "textures": { "all": "bone_block" }, "hardness": 1.5, "sound": "stone", "color": "#d8d0b4", "tags": ["built"], "covers": ["terraria:bone_block"] }
+  ]
+}

@@ -43,6 +43,32 @@ public sealed partial class PropLibrary
         }
     }
 
+    private readonly Queue<string> _preload = new();
+    private readonly HashSet<string> _queued = new();
+
+    /// <summary>
+    /// Queues models (project paths) to load ahead of first use: each starts a threaded load at once and
+    /// <see cref="PumpPreload"/> builds one finished model a frame, so a region full of new props (the Dungeon) neither
+    /// stalls on disk reads nor builds all its meshes in one frame.
+    /// </summary>
+    public void Preload(IEnumerable<string> projectPaths)
+    {
+        foreach (var path in projectPaths)
+            if (_queued.Add(path))
+            {
+                AssetCache.Request("res://" + path);
+                _preload.Enqueue(path);
+            }
+    }
+
+    /// <summary>Builds the next queued model once its load finished (call once a frame); false when nothing is left.</summary>
+    public bool PumpPreload()
+    {
+        if (_preload.Count == 0) return false;
+        if (TryModel(_preload.Peek(), multimesh: true, out _) != AssetState.Pending) _preload.Dequeue();
+        return true;
+    }
+
     /// <summary>Errors found while loading (missing files, unknown layers); surfaced by the smoke test.</summary>
     public List<string> Problems { get; } = new();
 

@@ -2,6 +2,7 @@
   // Hardmode's optional terrors: Queen Slime (a Gelatin Crystal in the Hallow), Duke Fishron (a Truffle Worm used as
   // bait in the ocean) and the Empress of Light (a Prismatic Lacewing set free in the Hallow at night).
   "projectiles": [
+    { "id": "queen_slime_gel", "name": "Regal Gel", "visual": "orb", "color": "#ff8ad8", "gravity": 4, "lifetime": 240, "radius": 0.45, "bounces": 1, "friendly": false, "hostile": true, "light": [9, 3, 8] },
     { "id": "queen_slime_crystal", "name": "Crystal", "visual": "orb", "color": "#f07ad8", "gravity": 10, "lifetime": 200, "radius": 0.4, "friendly": false, "hostile": true, "light": [10, 4, 9] },
     { "id": "fishron_bubble", "name": "Detonating Bubble", "visual": "orb", "color": "#9ae0ff", "lifetime": 240, "radius": 0.6, "homing": 1.5, "friendly": false, "hostile": true },
     { "id": "prismatic_bolt", "name": "Prismatic Bolt", "visual": "bolt", "color": "#ff9aff", "lifetime": 240, "radius": 0.45, "homing": 1.2, "friendly": false, "hostile": true, "light": [12, 8, 14], "trail": "#b0e0ff" },
@@ -50,19 +51,8 @@
       "equipEffects": [{ "type": "flight", "time": 180, "ascent": 50, "maxRise": 9, "glide": 2, "airSpeed": 1.6 }] }
   ],
   "lootTables": [
-    { "id": "queen_slime", "coins": [40000, 60000], "entries": [
-      { "item": "blade_staff", "chance": 0.5 }, { "item": "gel", "min": 50, "max": 100 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
-      { "item": "volatile_gelatin", "conditions": [{ "type": "difficulty", "min": 1 }] }
-    ] },
-    { "id": "duke_fishron", "coins": [80000, 120000], "entries": [
-      { "table": "duke_fishron_weapon" }, { "item": "fishron_wings", "chance": 0.15 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
-      { "item": "shrimpy_truffle", "conditions": [{ "type": "difficulty", "min": 1 }] }
-    ] },
     { "id": "duke_fishron_weapon", "mode": "weighted", "entries": [
       { "item": "flairon" }, { "item": "tsunami" }, { "item": "razorblade_typhoon_book" }, { "item": "bubble_gun" }, { "item": "tempest_staff" }
-    ] },
-    { "id": "empress_of_light", "coins": [100000, 150000], "entries": [
-      { "table": "empress_weapon" }, { "item": "terraprisma", "chance": 0.1 }, { "item": "empress_wings", "chance": 0.1 }, { "item": "greater_healing_potion", "min": 5, "max": 15 }
     ] },
     { "id": "empress_weapon", "mode": "weighted", "entries": [{ "item": "nightglow" }, { "item": "starlight" }] },
     { "id": "lacewing", "entries": [{ "item": "prismatic_lacewing" }] },
@@ -71,15 +61,20 @@
   "enemies": [
     { "id": "crystal_slime", "model": "gel", "tags": ["gel"], "name": "Crystal Slime", "brain": { "type": "slimeHop", "jumpHeight": 7, "jumpSpeed": 5, "hopInterval": 45 },
       "life": 120, "damage": 45, "defense": 20, "knockbackResist": 0.4, "size": [1.8, 1.4], "moveSpeed": 4, "tint": "#f07ad8", "loot": "crystal_slime", "value": 100 },
+    { "id": "bouncy_slime", "model": "gel", "tags": ["gel"], "name": "Bouncy Slime", "description": "One of Queen Slime's court: it bounces very high.", "brain": { "type": "slimeHop", "jumpHeight": 14, "jumpSpeed": 6, "hopInterval": 35 }, "life": 170, "damage": 50, "defense": 18, "knockbackResist": 0.4, "size": [1.8, 1.4], "moveSpeed": 5, "tint": "#7ad8ff", "value": 0, "covers": ["terraria:bouncy_slime"] },
+    { "id": "heavenly_slime", "model": "gel", "tags": ["gel"], "name": "Heavenly Slime", "description": "One of Queen Slime's court, on little wings.", "brain": { "type": "flyer", "aggroRange": 60, "orbitRadius": 4, "dashSpeed": 9, "dashCooldown": 150 }, "life": 120, "damage": 50, "defense": 20, "knockbackResist": 0.5, "size": [1.6, 1.3], "moveSpeed": 6, "gravity": false, "tint": "#e8b8ff", "value": 0, "covers": ["terraria:heavenly_slime"] },
     {
       "id": "queen_slime", "squash": true, "model": "queen_slime", "tags": ["boss", "gel", "lava_immune"], "name": "Queen Slime", "description": "The crystalline sovereign of the Hallow's slimes.",
       "brain": { "type": "pattern", "ground": true, "phases": [
-        { "below": 1.0, "summon": { "enemy": "crystal_slime", "interval": 180, "max": 6, "count": 2 },
+        { "below": 1.0, "summon": { "enemy": "crystal_slime", "pool": ["crystal_slime", "bouncy_slime", "heavenly_slime"], "interval": 180, "max": 6, "count": 2 }, "expert": { "speed": 1.2, "volleyCount": 2 },
           "moves": [{ "type": "hop", "count": 3, "height": 8, "speed": 6, "telegraph": 25 },
             { "type": "wait", "ticks": 50, "pose": "attack", "volley": { "projectile": "queen_slime_crystal", "damage": 40, "speed": 12, "interval": 25, "count": 8, "ring": true } }] },
-        { "below": 0.5, "speed": 1.4, "damage": 1.2, "message": "Queen Slime spreads her wings!", "model": "queen_slime_winged",
-          "volley": { "projectile": "queen_slime_crystal", "damage": 44, "speed": 14, "interval": 60, "count": 3, "spread": 15 },
-          "moves": [{ "type": "hop", "count": 4, "height": 12, "speed": 9, "telegraph": 18 }] }
+        { "below": 0.5, "fly": true, "damage": 1.2, "message": "Queen Slime spreads her wings!", "model": "queen_slime_winged", "expert": { "speed": 1.2, "volleyCount": 2 },
+          "moves": [{ "type": "hover", "ticks": 120, "speed": 9, "height": 8, "distance": 2, "volley": { "projectile": "queen_slime_gel", "damage": 40, "speed": 12, "interval": 90, "count": 5, "spread": 25 } },
+            { "type": "slam", "height": 8, "speed": 26, "telegraph": 30, "ticks": 60, "volley": { "projectile": "queen_slime_crystal", "damage": 44, "speed": 12, "interval": 1, "count": 8, "ring": true } },
+            { "type": "hover", "ticks": 120, "speed": 9, "height": 8, "distance": 2, "volley": { "projectile": "queen_slime_gel", "damage": 40, "speed": 12, "interval": 90, "count": 5, "spread": 25 } },
+            { "type": "slam", "height": 8, "speed": 26, "telegraph": 30, "ticks": 60, "volley": { "projectile": "queen_slime_crystal", "damage": 44, "speed": 12, "interval": 1, "count": 8, "ring": true } },
+            { "type": "dash", "count": 1, "telegraph": 24, "ticks": 40, "speed": 22 }] }
       ] },
       "life": 18000, "damage": 60, "defense": 26, "knockbackResist": 1.0, "size": [7, 6], "moveSpeed": 5, "light": [8, 4, 8],
       "loot": "queen_slime", "value": 40000,
@@ -89,16 +84,22 @@
     {
       "id": "duke_fishron", "facing": "velocity", "model": "duke_fishron", "tags": ["boss", "lava_immune"], "name": "Duke Fishron", "description": "A pig-shark-dragon from the deep, lured by truffle.",
       "brain": { "type": "pattern", "phases": [
-        { "below": 1.0,
+        { "below": 1.0, "expert": { "speed": 1.15 },
           "moves": [{ "type": "dash", "count": 3, "telegraph": 22, "ticks": 40, "speed": 22 },
             { "type": "hover", "ticks": 100, "speed": 10, "height": 4, "distance": 10, "volley": { "projectile": "fishron_bubble", "damage": 50, "speed": 8, "interval": 20, "count": 2, "spread": 30 } }] },
-        { "below": 0.5, "speed": 1.4, "damage": 1.3, "message": "Duke Fishron is enraged!",
+        { "below": 0.5, "speed": 1.4, "damage": 1.3, "message": "Duke Fishron is enraged!", "expert": { "speed": 1.15 },
           "moves": [{ "type": "dash", "count": 4, "telegraph": 16, "ticks": 35, "speed": 26 },
-            { "type": "teleport", "ticks": 20, "telegraph": 20, "distance": 12, "height": 4 }] }
+            { "type": "teleport", "ticks": 20, "telegraph": 20, "distance": 12, "height": 4 }] },
+        { "below": 0.15, "speed": 1.7, "damage": 1.4, "message": "Duke Fishron is in a frenzy!", "expert": { "speed": 1.15 },
+          "moves": [{ "type": "teleport", "ticks": 12, "telegraph": 12, "distance": 10, "height": 3 },
+            { "type": "dash", "count": 3, "telegraph": 10, "ticks": 30, "speed": 30 },
+            { "type": "teleport", "ticks": 12, "telegraph": 12, "distance": 10, "height": 3 },
+            { "type": "dash", "count": 2, "telegraph": 8, "ticks": 30, "speed": 32 }] }
       ] },
       "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [2.4, 1.6], "scale": 4, "moveSpeed": 10, "gravity": false, "collideTerrain": false,
       "loot": "duke_fishron", "value": 80000,
-      "boss": { "title": "Duke Fishron", "flag": "defeated_duke_fishron", "arenaRadius": 180, "music": "boss_fishron" },
+      "boss": { "title": "Duke Fishron", "flag": "defeated_duke_fishron", "arenaRadius": 180, "music": "boss_fishron",
+        "enrage": { "when": [{ "type": "biome", "none": ["ocean"] }], "damage": 2, "speed": 1.5, "setDefense": 100, "message": "Duke Fishron is enraged!" } },
       "covers": ["terraria:duke_fishron"]
     },
     { "id": "lacewing", "model": "lacewing", "name": "Prismatic Lacewing", "description": "A glimmering moth of the Hallow's nights.",
@@ -108,17 +109,19 @@
       "id": "empress_of_light", "model": "empress_of_light", "tags": ["boss", "lava_immune"], "name": "Empress of Light", "description": "The Hallow's radiant ruler.",
       "brain": { "type": "pattern", "phases": [
         { "below": 1.0,
+          "expert": { "volleyCount": 2 },
           "moves": [{ "type": "orbit", "ticks": 180, "speed": 10, "distance": 10, "height": 4, "volley": { "projectile": "prismatic_bolt", "damage": 55, "speed": 10, "interval": 45, "count": 8, "ring": true } },
             { "type": "dash", "count": 2, "telegraph": 30, "ticks": 40, "speed": 24 },
             { "type": "teleport", "ticks": 60, "telegraph": 30, "distance": 9, "height": 5, "volley": { "projectile": "ethereal_lance", "damage": 60, "speed": 30, "interval": 30, "count": 5, "spread": 25 } }] },
-        { "below": 0.5, "speed": 1.35, "damage": 1.3, "message": "The Empress of Light is radiant with fury!",
+        { "below": 0.5, "speed": 1.35, "damage": 1.3, "message": "The Empress of Light is radiant with fury!", "expert": { "volleyCount": 2 },
           "volley": { "projectile": "ethereal_lance", "damage": 65, "speed": 32, "interval": 70, "count": 3, "spread": 12 },
           "moves": [{ "type": "orbit", "ticks": 140, "speed": 14, "distance": 9, "height": 4, "volley": { "projectile": "prismatic_bolt", "damage": 60, "speed": 12, "interval": 30, "count": 10, "ring": true } },
             { "type": "dash", "count": 3, "telegraph": 22, "ticks": 36, "speed": 28 }] }
       ] },
       "life": 70000, "damage": 80, "defense": 50, "knockbackResist": 1.0, "size": [2, 3], "scale": 3, "moveSpeed": 12, "gravity": false, "collideTerrain": false, "light": [14, 10, 14],
       "loot": "empress_of_light", "value": 100000,
-      "boss": { "title": "Empress of Light", "flag": "defeated_empress_of_light", "arenaRadius": 180, "despawnAtDay": true, "music": "boss_empress" },
+      "boss": { "title": "Empress of Light", "flag": "defeated_empress_of_light", "arenaRadius": 180, "music": "boss_empress",
+        "enrage": { "when": [{ "type": "time", "is": "day" }], "setDamage": 9999, "speed": 1.2, "latch": true, "message": "The Empress of Light is furious!" } },
       "covers": ["terraria:empress_of_light"]
     }
   ],

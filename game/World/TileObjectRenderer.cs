@@ -97,6 +97,7 @@ public sealed partial class TileObjectRenderer : Node3D
     public override void _Process(double delta)
     {
         AnimateLids(delta);
+        PreloadNearDungeon();
         if (_dirty.Count == 0) return;
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects");
         long start = System.Diagnostics.Stopwatch.GetTimestamp();

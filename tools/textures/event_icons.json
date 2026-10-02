@@ -16,5 +16,9 @@
   "windy_day":       { "glyph": "swirl",       "fg": "#e8f4ff", "bg": "#3a6aa0" },
   "sandstorm":       { "glyph": "swirl",       "fg": "#f0d8a0", "bg": "#7a5a30" },
   "party":           { "glyph": "present",     "fg": "#ff70c0", "bg": "#2a1e50" },
-  "lantern_night":   { "glyph": "lantern",     "fg": "#ffb050", "bg": "#141838" }
+  "lantern_night":   { "glyph": "lantern",     "fg": "#ffb050", "bg": "#141838" },
+  "evil_presence":   { "glyph": "eye",         "fg": "#ff5a5a", "bg": "#2a0a10" },
+  "mech_twins_night":     { "glyph": "eye",    "fg": "#c8ccd8", "bg": "#2a1020" },
+  "mech_destroyer_night": { "glyph": "chain",  "fg": "#c8ccd8", "bg": "#2a1418" },
+  "mech_prime_night":     { "glyph": "skull",  "fg": "#c8ccd8", "bg": "#1c1424" }
 }

@@ -22,7 +22,7 @@
 ## Assets
 | Asset | Tool | Output |
 |---|---|---|
-| Terrain texture array (71 layers; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
+| Terrain texture array (104 layers, among them the Dungeon wall panels and Bone Block; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
 | Prop texture array (bark, leaf-card sprigs, metals, cloth, leather…) | `--set=props` | `assets/textures/props/` |
 | Block item icons | `tools/textures/build_icons.py` | `assets/icons/items/<block>.png` |
 | UI pixel sprites (hearts, stars, bubbles, slot silhouettes, buttons, pointer, frames) | `tools/textures/build_ui.py` | `assets/ui/<name>.png` |
@@ -53,6 +53,12 @@ sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `
 every tile object, item and enemy has a generator (no Blender needed). The spec is `assets.json` merged with the
 drop-in files `assets.d/*.json` (`asset_spec.load_spec()`; duplicate ids fail), and generator modules can register
 functions with `@generator` (`bgen/__init__.py`), which `build_all.py` finds by importing every `bgen` module.
+
+Bevels: `MeshBuilder.box(..., bevel=r, bevel_segments=n)` / `bevel_box(lo, hi, material, color, radius, segments)` and
+`extrude_polygon(..., bevel=r)` (convex outlines) chamfer (1 segment, 44 tris per box) or round (2, 108 tris) every edge,
+the radius clamped to 45 % of the thinnest extent. `bgen/furniture.py` uses two shared radii, `SOFT` (0.018 m, 2
+segments: tops, seats, chest bodies, frames) and `EDGE` (0.010 m chamfer: legs, slats, bands, planks), scaled per entry
+by `params.bevel` (0 = hard boxes); other furniture modules should import those constants and `bevels(p)`.
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
 weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and
@@ -102,7 +108,9 @@ glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools va
 * **Armour** (`bgen/armor_fit.py`, `armor.py`, `armor_build.py`): pieces are shells fitted to the shipped player
   model per bone and built in the bone's local space; `assets/models/armor/<set>_<piece>.glb`, manifest `armor`
   (model, bone, slot, refLength, hidesHair) and `armorRig`. `PlayerAvatar.Armor` attaches them (scaled by bone length),
-  hides the hair under helmets and draws shields and balloons (`"worn"` items).
+  hides the hair under helmets and draws shields and balloons (`"worn"` items). What is drawn follows the slot model
+  (`PlayerInventory.ShownArmor`/`ShownAccessories`): a vanity piece replaces the armour in its slot, hidden or locked
+  accessory slots are not drawn, and a vanity shield or balloon replaces a functional one.
 * **Portraits**: `build_all.py --boss-icons` (boss bar heads, `assets/icons/bosses`) and `--portraits` (town NPC head
   shots and bestiary thumbnails, `assets/icons/{npcs,creatures}`) import the shipped creature GLBs, pose them on their
   idle action and outline them (`bgen/portraits.py`); `game/Items/PortraitIcons` loads them. Re-render after
@@ -114,6 +122,25 @@ glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools va
 * **Character creator models (X-09)**: player bodies `player_<m|f>_<shirt|vest|coat>` are bald with marker colours
   (red shirt/vest/coat, blue undershirt and irises, green trousers, grey hair, belt and boots); hair is a separate model
   per body and style (`build_all.py --hair`, `bgen/human/hair_styles*.py`) worn on the head bone.
+
+### Palette furniture (dungeon sets)
+`bgen/dungeon_furniture.py` holds a palette-driven furniture family (door, chair, table, bookcase, candelabra,
+chandelier, floor lamp, vase) registered with `@generator`. Every generator reads `palette` (a name from `PALETTES`
+or an inline dict) with per-key overrides (`body`/`bodyTint`, `trim`/`trimTint`, `metal`/`metalTint`, `wax`,
+`books`), so other furniture families reuse it with other layers and tints; `resolve_palette`, `plinth` and
+`candle_cup` are shared helpers. The blue, green and pink Dungeon sets live in `data/tileobjects/dungeon.json`
+(specs in `tools/blender/assets.d/p4-17-dungeon-furniture.json`). A tile object's `flame.also` lists more flame bases
+(same size and colour) for multi-candle lights; keep them in sync with the candle tops the generator places.
+
+### Dungeon and boss generators
+Besides the palette furniture above, the Dungeon draws on `banner` (the six hall banners: Marching Bones, Necromantic
+Sign, Rusted Company Standard, Ragged Brotherhood Sigil, Molten Legion Flag, Diabolic Sigil, 2 x 4 wall hangings
+drawn flush, back to the wall), `statue` (angel, armor and skeleton statues), `book` (shelf books), `spike_strip`
+(`spike`, one MultiMesh per chunk), `chest` (the six vault biome chests and the locked Gold and Shadow chests),
+`bone_welder`, and the bosses' `trophy` generator (3 x 3 wall hangings, front turned away from the wall). Each boss's
+treasure bag, masks and Expert items are items in the boss's data file with models from the boss generator modules.
+Rebuild only what you add: `python3.13 tools/blender/build_all.py --only=<ids>`, which keeps the rest of
+`assets/manifest.json` (when two branches both add assets, take one side's manifest and rebuild the other side's ids).
 
 ## UI look (fonts and theme)
 The interface follows Terraria's look: see-through royal-blue panels (`#3F5297` at ~70%), white text with a black

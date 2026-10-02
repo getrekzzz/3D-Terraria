@@ -2,6 +2,16 @@
 
 NOTABLE = {
     "weapon": """
+piranha_gun|Piranha Gun|hardmode|jungle chest
+scourge_of_the_corruptor|Scourge of the Corruptor|hardmode|corruption chest
+vampire_knives|Vampire Knives|hardmode|crimson chest
+rainbow_gun|Rainbow Gun|hardmode|hallowed chest
+staff_of_the_frost_hydra|Staff of the Frost Hydra|hardmode|frozen chest
+desert_tiger_staff|Desert Tiger Staff|hardmode|desert chest
+aqua_scepter|Aqua Scepter|prehardmode|dungeon
+handgun|Handgun|prehardmode|dungeon
+magic_missile|Magic Missile|prehardmode|dungeon
+valor|Valor|prehardmode|dungeon
 silver_bullet|Silver Bullet|early|arms dealer
 shotgun|Shotgun|hardmode|arms dealer
 rocket_i|Rocket I|hardmode|cyborg
@@ -85,6 +95,62 @@ dart_trap|Dart Trap|early|world
 """,
     "furniture": """
 firefly_in_a_bottle|Firefly in a Bottle|early|craft
+blue_dungeon_door|Blue Dungeon Door|prehardmode|dungeon
+blue_dungeon_chair|Blue Dungeon Chair|prehardmode|dungeon
+blue_dungeon_table|Blue Dungeon Table|prehardmode|dungeon
+blue_dungeon_bookcase|Blue Dungeon Bookcase|prehardmode|dungeon
+blue_dungeon_candelabra|Blue Dungeon Candelabra|prehardmode|dungeon
+blue_dungeon_chandelier|Blue Dungeon Chandelier|prehardmode|dungeon
+blue_dungeon_lamp|Blue Dungeon Lamp|prehardmode|dungeon
+blue_dungeon_vase|Blue Dungeon Vase|prehardmode|dungeon
+green_dungeon_door|Green Dungeon Door|prehardmode|dungeon
+green_dungeon_chair|Green Dungeon Chair|prehardmode|dungeon
+green_dungeon_table|Green Dungeon Table|prehardmode|dungeon
+green_dungeon_bookcase|Green Dungeon Bookcase|prehardmode|dungeon
+green_dungeon_candelabra|Green Dungeon Candelabra|prehardmode|dungeon
+green_dungeon_chandelier|Green Dungeon Chandelier|prehardmode|dungeon
+green_dungeon_lamp|Green Dungeon Lamp|prehardmode|dungeon
+green_dungeon_vase|Green Dungeon Vase|prehardmode|dungeon
+pink_dungeon_door|Pink Dungeon Door|prehardmode|dungeon
+pink_dungeon_chair|Pink Dungeon Chair|prehardmode|dungeon
+pink_dungeon_table|Pink Dungeon Table|prehardmode|dungeon
+pink_dungeon_bookcase|Pink Dungeon Bookcase|prehardmode|dungeon
+pink_dungeon_candelabra|Pink Dungeon Candelabra|prehardmode|dungeon
+pink_dungeon_chandelier|Pink Dungeon Chandelier|prehardmode|dungeon
+pink_dungeon_lamp|Pink Dungeon Lamp|prehardmode|dungeon
+pink_dungeon_vase|Pink Dungeon Vase|prehardmode|dungeon
+marching_bones_banner|Marching Bones Banner|prehardmode|dungeon
+necromantic_sign|Necromantic Sign|prehardmode|dungeon
+rusted_company_standard|Rusted Company Standard|prehardmode|dungeon
+ragged_brotherhood_sigil|Ragged Brotherhood Sigil|prehardmode|dungeon
+molten_legion_flag|Molten Legion Flag|prehardmode|dungeon
+diabolic_sigil|Diabolic Sigil|prehardmode|dungeon
+skeleton_statue|Skeleton Statue|early|world
+armor_statue|Armor Statue|early|world
+angel_statue|Angel Statue|early|world
+spike|Spike|prehardmode|dungeon
+bone_welder|Bone Welder|prehardmode|dungeon
+shadow_chest|Shadow Chest|prehardmode|underworld
+jungle_chest|Jungle Chest|hardmode|dungeon
+corruption_chest|Corruption Chest|hardmode|dungeon
+crimson_chest|Crimson Chest|hardmode|dungeon
+hallowed_chest|Hallowed Chest|hardmode|dungeon
+frozen_chest|Frozen Chest|hardmode|dungeon
+desert_chest|Desert Chest|hardmode|dungeon
+""",
+    "material": """
+book|Book|prehardmode|dungeon
+golden_key|Golden Key|prehardmode|dungeon
+shadow_key|Shadow Key|prehardmode|dungeon
+jungle_key|Jungle Key|hardmode|biome
+corruption_key|Corruption Key|hardmode|biome
+crimson_key|Crimson Key|hardmode|biome
+hallowed_key|Hallowed Key|hardmode|biome
+frozen_key|Frozen Key|hardmode|biome
+desert_key|Desert Key|hardmode|biome
+""",
+    "armor": """
+red_hat|Red Hat|prehardmode|craft
 """,
     "paint": """
 paintbrush|Paintbrush|early|painter

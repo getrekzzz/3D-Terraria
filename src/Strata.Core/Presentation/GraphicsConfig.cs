@@ -133,10 +133,11 @@ public sealed class GraphicsPreset
 
     public float GrassDistance { get; set; } = 30f;
 
-    /// <summary>Chunk grass buffers built or rebuilt per frame at most (nearest first; spreads walking-in pops).</summary>
-    public int GrassBuildsPerFrame { get; set; } = 2;
     /// <summary>Floating combat numbers on screen at once (8–256); past it the oldest number is reused.</summary>
     public int CombatNumbers { get; set; } = 48;
+
+    /// <summary>Chunk grass buffers built or rebuilt per frame at most (nearest first; spreads walking-in pops).</summary>
+    public int GrassBuildsPerFrame { get; set; } = 2;
 
     /// <summary>Mesh LOD switch threshold in pixels (lower keeps detail further away).</summary>
     public float LodThreshold { get; set; } = 1f;

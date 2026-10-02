@@ -54,9 +54,17 @@ public static partial class ContentValidator
             if (t.Flame is { } flame)
             {
                 if (flame.At.Length != 3 || flame.At.Any(v => MathF.Abs(v) > 16f)) ctx.Error(t, "flame.at must be [x, y, z] within ±16 m.");
+                if (flame.Also.Any(a => a.Length != 3 || a.Any(v => MathF.Abs(v) > 16f))) ctx.Error(t, "flame.also points must be [x, y, z] within ±16 m.");
                 if (flame.Size is <= 0f or > 4f) ctx.Error(t, "flame.size must be within (0, 4] m.");
                 ctx.Color(t, flame.Color, "flame.color");
             }
+            if (t.Lock is { } lk)
+            {
+                if (t.Interaction != TileInteraction.Chest) ctx.Error(t, "only chests can have a lock.");
+                ctx.Ref(t, ctx.Db.Items, lk.Key, "lock.key");
+                ctx.Ref(t, ctx.Db.Flags, lk.RequiresFlag, "lock.requiresFlag");
+            }
+            if (t.Hazard is { } hazard && (hazard.Damage < 0 || hazard.Knockback < 0)) ctx.Error(t, "hazard damage and knockback must be >= 0.");
             if (t.Variants < 1) ctx.Error(t, "variants must be >= 1.");
             for (int v = 0; v < t.Variants; v++) ctx.Asset(t, AssetPaths.ObjectModel(t, v), $"model (variant {v})");
             if (t.HitPoints < 1) ctx.Error(t, "hitPoints must be >= 1.");

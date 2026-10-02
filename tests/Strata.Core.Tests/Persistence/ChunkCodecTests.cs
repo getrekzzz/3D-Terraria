@@ -103,6 +103,7 @@ public class ChunkCodecTests
         var db = TestPaths.Content;
         var ids = new WorldIdTables();
         var raw = Inflate(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, Array.Empty<TileObjectInstance>(), db, ids));
+        raw[4] = 1; // a v1 header (after the 4-byte magic)
         using var ms = new MemoryStream();
         ms.Write(raw, 0, raw.Length - 1); // drop the end tag, append an old-style object section
         using (var w = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true))
@@ -136,6 +137,20 @@ public class ChunkCodecTests
         Assert.Equal(17, obj.Container![0].Count);
     }
 
+    [Fact]
+    public void ChestNameSurvivesTheBackgroundSaveCapture()
+    {
+        // The saver captures the object section on the main thread and encodes the voxels later (EncodeObjects + Encode).
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        var chest = new TileObjectInstance(db.TileObjects.Get("wooden_chest"), new Int3(1, 2, 3), 0, 0) { CustomName = "Bars" };
+        var section = ChunkCodec.EncodeObjects(new[] { chest }, ids);
+        Assert.Equal("Bars", Assert.Single(ChunkCodec.DecodeObjects(section, db, ids)).CustomName);
+        var decoded = ChunkCodec.Decode(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, section, db, ids), db, ids);
+        Assert.Equal("Bars", Assert.Single(decoded.TileObjects).CustomName);
+        Assert.Equal(ChunkCodec.FormatVersion, Inflate(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, section, db, ids))[4]);
+    }
+
     private static byte[] Inflate(byte[] blob)
     {
         using var z = new System.IO.Compression.ZLibStream(new MemoryStream(blob), System.IO.Compression.CompressionMode.Decompress);
@@ -149,6 +164,39 @@ public class ChunkCodecTests
         using var o = new MemoryStream();
         using (var z = new System.IO.Compression.ZLibStream(o, System.IO.Compression.CompressionLevel.Fastest, leaveOpen: true)) z.Write(raw);
         return o.ToArray();
+    }
+
+    [Fact]
+    public void LockedStateRoundTrips()
+    {
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        var data = RandomChunk(db, 2);
+        var locked = new TileObjectInstance(db.TileObjects.Get("gold_chest"), new Int3(1, 2, 3), 0, 0) { Locked = true, PendingLoot = "dungeon_chest" };
+        var open = new TileObjectInstance(db.TileObjects.Get("shadow_chest"), new Int3(8, 2, 3), 2, 0) { LootRolled = true, Active = true };
+        var decoded = ChunkCodec.Decode(ChunkCodec.Encode(data, 0, new[] { locked, open }, db, ids), db, ids).TileObjects;
+        var a = decoded.Single(o => o.Def.Id == "gold_chest");
+        var b = decoded.Single(o => o.Def.Id == "shadow_chest");
+        Assert.True(a.Locked);
+        Assert.False(a.LootRolled);
+        Assert.Equal("dungeon_chest", a.PendingLoot);
+        Assert.False(b.Locked);
+        Assert.True(b.LootRolled && b.Active);
+    }
+
+    [Fact]
+    public void LockAndNameShareTheObjectMeta()
+    {
+        // Saved chest names (W3) and the dungeon lock (P4-21) are both meta entries on one record.
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        var chest = new TileObjectInstance(db.TileObjects.Get("gold_chest"), new Int3(1, 2, 3), 0, 0) { Locked = true, CustomName = "Vault" };
+        var next = new TileObjectInstance(db.TileObjects.Get("wooden_chest"), new Int3(6, 2, 3), 0, 0);
+        var decoded = ChunkCodec.Decode(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, new[] { chest, next }, db, ids), db, ids).TileObjects;
+        Assert.True(decoded[0].Locked);
+        Assert.Equal("Vault", decoded[0].CustomName);
+        Assert.False(decoded[1].Locked);
+        Assert.Equal(new Int3(6, 2, 3), decoded[1].Anchor);
     }
 
     [Fact]

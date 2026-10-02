@@ -60,6 +60,20 @@ public class InventoryCraftingTests
     }
 
     [Fact]
+    public void BoneWelderCraftsBoneBlocks()
+    {
+        var book = new RecipeBook(Db);
+        var inv = new Inventory(4);
+        inv.Add(S("bone", 3));
+        var recipe = book.RecipesFor(Db.Items.Get("bone_block"))[0];
+        Assert.False(book.Craft(recipe, inv, new HashSet<string> { "work_bench" }, new ConditionContext()));
+        Assert.True(book.Craft(recipe, inv, new HashSet<string> { "bone_welder" }, new ConditionContext()));
+        Assert.Equal(1, inv.Count(Db.Items.Get("bone_block")));
+        Assert.Equal(2, inv.Count(Db.Items.Get("bone")));
+        Assert.Contains("bone_welder", Db.TileObjects.Get("bone_welder").Stations);
+    }
+
+    [Fact]
     public void CraftingFailsAtomicallyWhenOutputCannotFit()
     {
         var book = new RecipeBook(Db);

@@ -57,6 +57,12 @@ public sealed class PlayerState
 
     public int Deaths { get; set; }
 
+    /// <summary>Demon Heart used: the sixth accessory slot is open while in an Expert or Master world.</summary>
+    public bool ExtraAccessorySlot { get; set; }
+
+    /// <summary>Minecart Upgrade Kit used: every minecart this player rides is the faster Mechanical Cart.</summary>
+    public bool MinecartUpgrade { get; set; }
+
     public Appearance Look { get; set; } = new();
 
     public CharacterDifficulty Difficulty { get; set; }

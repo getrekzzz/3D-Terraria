@@ -114,6 +114,13 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Fires this projectile when a wire signal reaches it (dart traps).</summary>
     public TrapDef? Trap { get; init; }
 
+    /// <summary>Hurts players who touch it (dungeon spikes).</summary>
+    public HazardSpec? Hazard { get; init; }
+
+    /// <summary>The key a locked instance (<c>TileObjectInstance.Locked</c>) of this chest needs; unlocked ones open
+    /// freely.</summary>
+    public LockSpec? Lock { get; init; }
+
     /// <summary>The item id that places/drops this object.</summary>
     public string? PlacingItemId => Item ?? (Natural ? null : Id);
 
@@ -161,6 +168,25 @@ public sealed class AuraBuff
     public int Ticks { get; init; } = 120;
 }
 
+/// <summary>Contact damage an object deals to a player touching it (defense and immunity frames apply).</summary>
+public sealed class HazardSpec
+{
+    public int Damage { get; init; } = 40;
+
+    /// <summary>Knockback away from the object (Terraria knockback units).</summary>
+    public float Knockback { get; init; } = 6f;
+}
+
+/// <summary>How a locked chest opens: with <see cref="Key"/> in the backpack (used up when <see cref="Consume"/>), and only
+/// once <see cref="RequiresFlag"/> is set (with <see cref="Message"/> as the refusal before that).</summary>
+public sealed class LockSpec
+{
+    public string Key { get; init; } = "";
+    public bool Consume { get; init; } = true;
+    public string? RequiresFlag { get; init; }
+    public string? Message { get; init; }
+}
+
 /// <summary>What a wired trap shoots, along the way it faces.</summary>
 public sealed class TrapDef
 {
@@ -182,4 +208,7 @@ public sealed class FlameSpec
 
     /// <summary>Colour of the flame's body (its core burns near white).</summary>
     public string Color { get; init; } = "#ff8a2a";
+
+    /// <summary>More flame bases of the same size and colour (the other candles of a candelabra or chandelier).</summary>
+    public float[][] Also { get; init; } = Array.Empty<float[]>();
 }
