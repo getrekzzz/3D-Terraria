@@ -14,6 +14,7 @@ public class TownFightBackTests
         var g = TestGame.Create();
         g.World.Spawner.Enabled = false;
         g.World.Town.ArrivalsEnabled = false;
+        g.World.Town.DefenseEnabled = true;
         g.World.Session.Clock.SetHour(22f);
         return g;
     }

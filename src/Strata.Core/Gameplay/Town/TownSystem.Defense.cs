@@ -28,6 +28,9 @@ public sealed partial class TownSystem
     /// <summary>A resident was healed by another (numbers).</summary>
     public event Action<TownNpc, int>? ResidentHealed;
 
+    /// <summary>Residents look for threats (off in unit tests and via <c>town defense off</c> so they keep out of other checks).</summary>
+    public bool DefenseEnabled { get; set; } = true;
+
     private bool Hardmode => _world.Session.Flags.Contains("hardmode");
 
     private void TickDefense(TownNpc r)
@@ -36,6 +39,11 @@ public sealed partial class TownSystem
         if (r.AttackTicks > 0) r.AttackTicks--;
         if (r.FleeTicks > 0) r.FleeTicks--;
         if (r.WardTicks > 0) r.WardTicks--;
+        if (!DefenseEnabled)
+        {
+            r.Threat = null;
+            return;
+        }
         if ((_world.Session.Clock.Tick + r.Id) % DefenseStagger != 0) return;
         var attack = r.Def.Attack;
         r.Threat = NearestThreat(r, attack?.Range ?? FleeRange);
