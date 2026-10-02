@@ -31,8 +31,14 @@ public sealed partial class TownSystem
         }
         TakeContactHits(r);
         if (!r.Alive) return;
-        Decide(r);
+        bool seated = UpdateSeat(r);
+        if (!seated && r.SeatTarget == null) Decide(r);
         TickDefense(r);
+        if (seated)
+        {
+            if (r.Threat == null && r.FleeTicks == 0) return; // resting in a chair or bed (P5-11)
+            StandUp(r); // a threat in sight: up and at it
+        }
         // Attacking residents stand still for the moment of the attack; unarmed ones run from threats (P5-10).
         var wish = r.AttackTicks > 0 ? Vector3.Zero : r.FleeTicks > 0 ? FleeWish(r) : Steer(r);
         if (r.ImmuneTicks < HitImmunity - 12)
@@ -77,12 +83,14 @@ public sealed partial class TownSystem
                 GoTo(r, home); // the way was blocked: try again now and then
                 r.IdleTicks = 240;
             }
+            else if (r.Path == null && --r.IdleTicks <= 0 && !TrySit(r)) r.IdleTicks = 120; // home: take a chair or bed
             return;
         }
         if (r.Path != null) return;
         r.Activity = ResidentActivity.Idle;
         if (--r.IdleTicks > 0) return;
         r.IdleTicks = _rng.Range(Config.IdleTicksMin, Config.IdleTicksMax);
+        if (r.Home != null && TrySit(r)) return; // a rest in a chair at home now and then
         var landmark = r.Home == null ? LandmarkNode(r.Def) : null;
         var anchor = r.Home ?? landmark ?? CurrentNode(r);
         int reach = (int)((landmark != null ? Config.LandmarkRadius : Config.WanderRadius) / Units.CellSize);
@@ -191,6 +199,7 @@ public sealed partial class TownSystem
     {
         if (!r.Alive || Vector3.Distance(p.Center, r.Center) > Config.TalkRange) return false;
         if (r.Bound) Rescue(r, p, out _); // Terraria: talking to a bound NPC frees them
+        StandUp(r); // a seated resident gets up to talk
         r.TalkingTo = p;
         r.TalkTicks = Config.TalkTicks;
         r.Path = null;

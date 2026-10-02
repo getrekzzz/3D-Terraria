@@ -98,6 +98,12 @@ public sealed class TownNpc : Combat.ICombatTarget
     /// <summary>Defense now: the resident's own plus a ward's.</summary>
     public int Defense => Def.Defense + (WardTicks > 0 ? WardDefense : 0);
 
+    /// <summary>The chair or bed (tile object id) the resident sits or sleeps in (null = none), see TownSystem.Seating.</summary>
+    public long? Seat { get; set; }
+    internal long? SeatTarget { get; set; }
+    internal Int3? SeatApproach { get; set; }
+    internal int SeatTimer { get; set; }
+
     internal List<Int3>? Path { get; set; }
     internal int PathIndex { get; set; }
     internal int IdleTicks { get; set; }

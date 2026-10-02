@@ -13,6 +13,7 @@ public sealed partial class TownSystem
         r.Path = null;
         ClearDefense(r); // a fallen resident comes back calm, standing and unwarded
         r.Posture = ResidentPosture.Stand;
+        r.Seat = r.SeatTarget = null;
     }
 
     /// <summary>

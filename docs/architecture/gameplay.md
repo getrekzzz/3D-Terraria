@@ -587,3 +587,11 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   projectiles to be friendly with no player- or terrain-harming blast (`data/town/projectiles.json` holds the npc_*
   shots). Dying clears the fight state. `ResidentAttacked` drives the action clip (throw, bow/gun, tome, hold_up,
   swing) and sound; probe `town.<id>.attacks`.
+* **Seating and night routine** (P5-11, `TownSystem.Seating.cs`): at night a housed resident who reached home takes
+  a free `chair` of the room (from `BedHour` 22:00 a free `bed`, leaving the chair for it) and by day an idle resident
+  at home sits a while with `DaySitChance` 0.3. They walk to the nearest node beside the seat, then are snapped to
+  `SeatPoint` (footprint centre at `TileObjectDef.SeatHeight`, or `BedHeight` for beds, in cells; the rest poses put
+  the model origin on the floor or mattress) facing out of it (`SeatYaw`: objects face their placer). Posture Sit or
+  Sleep; no errands or steering while seated. They get up at dawn plus a personal delay of up to an hour, when talked
+  to, when a threat comes into sight, when the seat disappears, or when they die. Residents never share a seat
+  (`Taken`). Probe `town.<id>.sitting`.

@@ -29,7 +29,10 @@ time 21
 wait_until town.guide.home < 0.8 60
 wait 2
 assert town.guide.home < 0.3
+# P5-11: home for the night, the guide takes the room's chair.
+wait_until town.guide.sitting == 1 30
 time noon
+wait_until town.guide.sitting == 0 10
 
 # --- P5-01 ---
 # A slain resident stays dead through the night and returns at dawn.
