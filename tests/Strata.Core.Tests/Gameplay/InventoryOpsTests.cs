@@ -43,7 +43,7 @@ public class InventoryOpsTests
         Assert.Equal("copper_pickaxe", bp[11].Item!.Id);
         Assert.Equal("lesser_healing_potion", bp[12].Item!.Id);
         Assert.Equal(70, Count(bp, "wood"));
-        Assert.Single(Enumerable.Range(10, 40).Where(i => bp[i].Item?.Id == "wood")); // merged into one stack
+        Assert.Single(Enumerable.Range(10, 40), i => bp[i].Item?.Id == "wood"); // merged into one stack
         Assert.Equal(10, Count(bp, "gel"));
         // Sword, pickaxe, potion, wood and gel fill slots 10–14; everything after is empty but the favourite.
         Assert.Equal(5, Enumerable.Range(10, 5).Count(i => !bp[i].IsEmpty));
