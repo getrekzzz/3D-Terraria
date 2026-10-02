@@ -50,6 +50,18 @@ public sealed class ItemDef : ContentDef
     public int UseTime { get; init; } = 20;
     public int UseAnimation { get; init; } = 20;
     public bool AutoReuse { get; init; }
+
+    /// <summary>
+    /// Ticks after a use animation ends before the next may start (Terraria's reuseDelay): the pause between the
+    /// Clockwork Assault Rifle's bursts. Speed prefixes do not shorten it.
+    /// </summary>
+    public int ReuseDelay { get; init; }
+
+    /// <summary>
+    /// A burst (several shots inside one animation, use time shorter than use animation) uses ammo for its first shot
+    /// only, as the Clockwork Assault Rifle does in Terraria; other bursts use ammo per shot.
+    /// </summary>
+    public bool AmmoPerBurst { get; init; }
     public bool Consumable { get; init; }
 
     /// <summary>

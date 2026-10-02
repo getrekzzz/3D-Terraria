@@ -84,7 +84,7 @@ are in [`AUDIT.md`](AUDIT.md).
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
 | Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink; the body always faces the crosshair, legs strafe and backpedal |
 | Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds; eye-plane crosshair ray with decor and canopy filters, the Reach stat, crosshair names for creatures, bosses, worm segments and residents |
-| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; one use animation per swing (speed scales it), hooks thrown by click or key that hold on natural terrain, shots from the hand to the crosshair, bows drawn with a nocked arrow, swords that shoot also swing, failed uses say why; 18 prefixes (invented names) and Goblin Tinkerer reforging (no reforge slot). Yoyos, flails, whips and per-hook visuals are stand-ins (AUDIT §8) |
+| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; one use animation per swing (speed scales it), hooks thrown by click or key that hold on natural terrain, shots from the hand to the crosshair, bows drawn with a nocked arrow, swords that shoot also swing, failed uses say why; Terraria's 83 prefixes (data/prefixes.json; rolled on crafts, drops, chest loot and shop buys; tooltip modifier lines) and Goblin Tinkerer reforging (no reforge slot). Yoyos, flails, whips and per-hook visuals are stand-ins (AUDIT §8) |
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
 | UI | HUD, inventory, equipment, chests, crafting, console, perf overlay, menus, settings, character/world select, map | ✅ | Terraria blue theme and bold UI font, rarity colours, prefix-aware tooltips, Terraria slot clicks, chest buttons, sorting and favourites, 7 accessory slots, coin and ammo slots (Core), combat text and enemy health bars (W3). The HUD still draws bars and text buffs, and the screens do not use the layout regions yet (W4, AUDIT §9) |
 | Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Summons ✅; whips, yoyos and flails are stand-ins 🟡 (AUDIT §8) |
@@ -107,8 +107,8 @@ are in [`AUDIT.md`](AUDIT.md).
 * Streaming once failed to reach idle in a rendered run (not reproduced since); `ChunkStreamer.DebugState()` is logged by the screenshot tool to catch it.
 * Item held-in-hand orientation is generic (+90° about X) except ranged weapons, which aim at the crosshair (bows
   upright, guns along the view, staffs tipped); per-item grip sockets would improve swords and tools (P3-05, P3-06).
-* Reforging is a Goblin Tinkerer service on the held item: no reforge slot, and the 18 prefixes use invented names
-  (P2-28, P3-31).
+* Reforging is a Goblin Tinkerer service on the held item: no reforge slot yet (P2-28). Prefixes are Terraria's 1.4.4
+  table since P3-31; old invented ids load through data/config/aliases.json.
 * Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
   until disturbed.
 * The Wall of Flesh only sweeps along X and only its mouth and eyes take hits; its flesh tiles are separate pooled visuals

@@ -95,3 +95,15 @@ assert sockets.wooden_bow >= 2
 assert sockets.copper_shortsword >= 2
 wait_until assets.pending == 0 60
 assert props.problems == 0
+
+# --- P3-18 ---
+# Pets and light pets: the misc slots summon one companion each; the light pet takes a light from the dynamic pool.
+equip shadow_orb
+equip fish
+wait 0.5
+assert pets.lights == 1
+assert pets.active == 1
+assert projectiles.count >= 2
+wait 1
+assert lights.pets == 1
+assert errors == 0

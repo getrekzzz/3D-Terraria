@@ -3036,6 +3036,20 @@
    "source": "world"
   },
   {
+   "id": "terraria:piggy_bank",
+   "name": "Piggy Bank",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "shop"
+  },
+  {
+   "id": "terraria:safe",
+   "name": "Safe",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "shop"
+  },
+  {
    "id": "terraria:wooden_door",
    "name": "Wooden Door",
    "kind": "furniture",
@@ -4364,6 +4378,62 @@
    "kind": "paint",
    "stage": "early",
    "source": "painter"
+  },
+  {
+   "id": "terraria:shadow_orb_light_pet",
+   "name": "Shadow Orb (light pet)",
+   "kind": "pet",
+   "stage": "early",
+   "source": "shadow orb"
+  },
+  {
+   "id": "terraria:crimson_heart_light_pet",
+   "name": "Crimson Heart (light pet)",
+   "kind": "pet",
+   "stage": "early",
+   "source": "crimson heart"
+  },
+  {
+   "id": "terraria:fairy_bell",
+   "name": "Fairy Bell",
+   "kind": "pet",
+   "stage": "early",
+   "source": "gold chest"
+  },
+  {
+   "id": "terraria:magic_lantern",
+   "name": "Magic Lantern",
+   "kind": "pet",
+   "stage": "early",
+   "source": "skeleton merchant"
+  },
+  {
+   "id": "terraria:wisp_in_a_bottle",
+   "name": "Wisp in a Bottle",
+   "kind": "pet",
+   "stage": "post-plantera",
+   "source": "dungeon spirit"
+  },
+  {
+   "id": "terraria:fish",
+   "name": "Fish",
+   "kind": "pet",
+   "stage": "early",
+   "source": "fishing"
+  },
+  {
+   "id": "terraria:zephyr_fish",
+   "name": "Zephyr Fish",
+   "kind": "pet",
+   "stage": "early",
+   "source": "fishing"
+  },
+  {
+   "id": "terraria:strange_glowing_mushroom",
+   "name": "Strange Glowing Mushroom",
+   "kind": "pet",
+   "stage": "hardmode",
+   "source": "truffle"
   },
   {
    "id": "terraria:treasure_bag",

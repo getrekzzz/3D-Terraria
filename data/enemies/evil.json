@@ -70,11 +70,13 @@
   ],
   "lootTables": [
     { "id": "shadow_orb", "mode": "weighted", "entries": [
-      { "table": "shadow_orb_musket", "weight": 1 }, { "item": "vilethorn", "weight": 1 }, { "item": "ball_o_hurt", "weight": 1 }, { "item": "band_of_starpower", "weight": 1 }
+      { "table": "shadow_orb_musket", "weight": 1 }, { "item": "vilethorn", "weight": 1 }, { "item": "ball_o_hurt", "weight": 1 }, { "item": "band_of_starpower", "weight": 1 },
+      { "item": "shadow_orb", "weight": 1 }
     ] },
     { "id": "shadow_orb_musket", "entries": [{ "item": "musket" }, { "item": "musket_ball", "min": 100, "max": 100 }] },
     { "id": "crimson_heart", "mode": "weighted", "entries": [
-      { "table": "crimson_heart_undertaker", "weight": 1 }, { "item": "crimson_rod", "weight": 1 }, { "item": "the_rotted_fork", "weight": 1 }, { "item": "panic_necklace", "weight": 1 }
+      { "table": "crimson_heart_undertaker", "weight": 1 }, { "item": "crimson_rod", "weight": 1 }, { "item": "the_rotted_fork", "weight": 1 }, { "item": "panic_necklace", "weight": 1 },
+      { "item": "crimson_heart", "weight": 1 }
     ] },
     { "id": "crimson_heart_undertaker", "entries": [{ "item": "the_undertaker" }, { "item": "musket_ball", "min": 100, "max": 100 }] },
     { "id": "eater_of_souls", "coins": [30, 120], "entries": [{ "item": "rotten_chunk", "chance": 0.33 }] },

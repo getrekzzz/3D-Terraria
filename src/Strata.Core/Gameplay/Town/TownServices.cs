@@ -48,7 +48,7 @@ public sealed class TownServices
         long cost = ReforgeCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
         var inv = player.State.Inventory;
-        if (!Wallet.TrySpend(inv, Content, cost, out var change)) return TradeResult.TooPoor;
+        if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, cost, out var change)) return TradeResult.TooPoor;
         foreach (var s in change) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         var held = inv.Held;
         result = new ItemStack(held.Item!, held.Count, Prefixes.Roll(held.Item!, Content, ref _rng, held.Prefix));

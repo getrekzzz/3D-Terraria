@@ -10,7 +10,14 @@
 | 6 | P1b-10, P1b-11, P1b-12 (tile objects, grass, GC) | full headless CI green (507 Core tests, 14/14 smoke, MENU PASS) |
 | 7 | P1b-13, P1b-14, P1b-16 (threaded asset cache, preloading + warm-up, dynamic resolution; reviewed + fixed) | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
 | 8 | P3-48 chest lids | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
-| 9 | P3-46, P3-31, P3-35, X-09 creator menu rows (after P2-30) | pending |
+| 9 | P3-46 movement feel | full headless CI green (14/14 smoke, MENU PASS) |
+| 10 | P3-31 Terraria prefixes (reviewed + fixed) | full headless CI green (533 Core tests, 14/14 smoke, MENU PASS) |
+| 11 | W3 merge (P2-05..08) | full headless CI green (640 Core tests, 16/16 smoke, MENU PASS) |
+| 12 | P3-35 Piggy Bank and Safe | full headless CI green (642 Core tests, 16/16 smoke, MENU PASS) |
+| 13 | P3-01' bursts and reuseDelay | full headless CI green (654 Core tests, 16/16 smoke, MENU PASS) |
+| 14 | P3-18 pets and light pets, burst test isolation fix | full headless CI green (658 Core tests, 16/16 smoke, MENU PASS) |
+| 15 | X-12 photo mode, Bosses + Dungeon integration merge | full headless CI green (1234 Core tests, 17/17 smoke, MENU PASS) |
+| 16 | X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -90,3 +97,40 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   per group and rewrites only swinging lids (100° over 0.15 s). `InventoryScreen.ContainerShown` drives it; probe
   `objects.open_lids` (builder.cmds). Gaps: no `chest_close` sound exists on this branch (P2-17 not here); only
   `chest`-generator objects have lids.
+
+## Push 9-10 notes
+* **Movement (P3-46)**: full held jump ~5.4 cells (probe `player.jump_apex_cells`, movement.cmds asserts 5-6); boots use
+  a new `runSpeed` stat that builds up over `runUpTime` 1.2 s (holds in the air, resets on stopping); Sprint multiplies
+  only that bonus. Run-up covered by Core tests only (no smoke).
+* **Prefixes (P3-31)**: data/prefixes.json (83 Terraria 1.4.4 prefixes, groups per Terraria), old ids in
+  data/config/aliases.json, validator rule against alias keys that are live ids. Rolled per unit on loot (enemy, boss,
+  crate, chest) and shop buys; prefixes that no longer fit their item are dropped on player and chest load (item kept).
+  Use time = base × (1 − useSpeed). Review fixes: chest-load fit check, Deadly/Celestial stats, use-time math, per-unit
+  rolls. Shop prefix rolls consume the commerce RNG, so shopkeeper dialogue order shifts.
+
+## Push 12 notes
+* **Piggy Bank and Safe (P3-35)**: `TileObjectDef.SharedStorage`, `PlayerState.Banks` (40 slots per kind, saved in
+  `PlayerSave.Banks`), `GameWorld.Storage(obj, owner)` used by the W3 container ops; `Wallet.TrySpend` pays purse →
+  piggy bank → safe (shops, Nurse, reforge). Merchant sells the Piggy Bank, Mechanic the Safe. Gaps: the piggy bank is
+  2×1×1 on the floor anchor (not table-top yet); town NPC arrival checks count purse coins only; no Defender's Forge /
+  Void Vault.
+
+## Push 13-14 notes
+* **Bursts (P3-01')**: `ItemDef.ReuseDelay` (ticks, not prefix-scaled) and `AmmoPerBurst`; `ItemUse.Continue` fires
+  the rest of a burst without input. Clockwork Assault Rifle: 3 shots 4 ticks apart, one bullet per burst, 26-tick
+  period. The only burst item in data; a burst shot without ammo/mana waits out its timing.
+* **Pets (P3-18)**: pets are projectiles bound to the Pet / Light Pet misc slots (`ProjectileSystem.Pets.cs`), fly or
+  walk-hop after the owner, teleport past 30 m. Light pets take lights from the DynamicLights pool, capped by the
+  preset's `petLights` (1/2/3/4). Batch: Shadow Orb, Crimson Heart, Fairy Bell, Magic Lantern, Wisp in a Bottle (light);
+  Baby Penguin (Fish), Zephyr Fish, Baby Truffle. No Pet Bunny (no Goodie Bag) or Eater's Bone yet; Fairy Bell 4% gold
+  chest and Wisp 2% are estimates; no pet buffs or visibility toggle.
+* Fix found by the pets screenshot: projectiles created while their model was loading stayed a glow for life (P1b-13);
+  `ProjectileRenderer` now rebuilds them a few times a second until the model is ready.
+
+## Push 15 notes
+* **Photo mode (X-12, photo part only)**: `game/UI/PhotoMode/` (controller, overlay, filter layer, commands) over
+  `FreeCamera` (now tetherable). P toggles (rebindable `photo_mode`), F12/Enter take a picture (`photo_shot`) to
+  `user://screenshots/<timestamp>.png`; pauses the simulation, hides every CanvasLayer from outside (no Hud files
+  touched), lens maths in `Strata.Core.Presentation.PhotoLens`. Smoke `photo.cmds`. Gaps: Tab still opens the
+  inventory in photo mode; free look ignores sensitivity/invert-Y; no gamepad; warm/cool filters are subtle.
+  Autosave indicator, colour-blind filters and subtitles left to the integration session.

@@ -38,7 +38,7 @@ public static partial class WorldLauncher
     }
 
     /// <summary>Renderers for creatures, town residents and projectiles.</summary>
-    private static Entities.NpcRenderer AddCreatureRenderers(WorldRuntime runtime, GameWorld game, Rendering.PropLibrary props)
+    private static (Entities.NpcRenderer, Entities.ProjectileRenderer) AddCreatureRenderers(WorldRuntime runtime, GameWorld game, Rendering.PropLibrary props)
     {
         var creatures = new Entities.NpcRenderer();
         runtime.AddChild(creatures);
@@ -49,7 +49,7 @@ public static partial class WorldLauncher
         var projectiles = new Entities.ProjectileRenderer();
         runtime.AddChild(projectiles);
         projectiles.Initialize(game, props);
-        return creatures;
+        return (creatures, projectiles);
     }
 
     /// <summary>Relevance-driven preloading with pool pre-warming, and the one-time shader warm-up.</summary>

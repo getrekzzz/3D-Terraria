@@ -52,6 +52,9 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
     /// <summary>Goes up by one whenever a new use animation starts: presentation plays each clip once per change.</summary>
     public int UseSerial { get; set; }
 
+    /// <summary>Ticks before the next use animation may start (the item's reuse delay, counted once its animation ends).</summary>
+    public int ReuseDelay { get; set; }
+
     /// <summary>The item whose animation is (or was last) playing; using another item starts a new animation.</summary>
     public Content.Defs.ItemDef? UseItem { get; set; }
 
@@ -60,6 +63,7 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
     {
         UseCooldown = 0;
         UseAnimation = 0;
+        ReuseDelay = 0;
     }
 
     /// <summary>The grappling hook: thrown, latched or returning (see <see cref="GrappleHook"/>).</summary>

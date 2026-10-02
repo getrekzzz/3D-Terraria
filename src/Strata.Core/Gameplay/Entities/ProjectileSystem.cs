@@ -49,6 +49,11 @@ public sealed class Projectile
     /// <summary>Minions: the tick of their next shot and the order they were summoned.</summary>
     public int NextShot { get; set; }
 
+    /// <summary>Pets: the misc slot whose item summoned it, and whether a walker stands on the ground.</summary>
+    public Items.MiscSlot? PetSlot { get; init; }
+
+    public bool Grounded { get; set; }
+
     /// <summary>A latching projectile's victim, where on it the projectile bit, and the tick it bit.</summary>
     public Npc? LatchedTo { get; set; }
 
@@ -103,12 +108,12 @@ public sealed partial class ProjectileSystem
         Spawn(shot.Projectile, from, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
     }
 
-    public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit, ItemDef? source = null)
+    public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit, ItemDef? source = null, Items.MiscSlot? petSlot = null)
     {
         var proj = new Projectile
         {
             Id = _nextId++, Def = def, Position = position, Velocity = velocity, Owner = owner, Damage = damage, Knockback = knockback,
-            DamageClass = damageClass, Crit = crit, PierceLeft = def.Pierce, BouncesLeft = def.Bounces, Source = source,
+            DamageClass = damageClass, Crit = crit, PierceLeft = def.Pierce, BouncesLeft = def.Bounces, Source = source, PetSlot = petSlot,
         };
         if (def.Minion != null && owner != null) MakeRoomForMinion(owner, def.Minion);
         _items.Add(proj);
@@ -120,9 +125,15 @@ public sealed partial class ProjectileSystem
     {
         const float dt = 1f / Units.TicksPerSecond;
         var world = _world.Session.World;
+        SyncPets();
         for (int i = _items.Count - 1; i >= 0; i--)
         {
             var p = _items[i];
+            if (p.PetSlot != null)
+            {
+                if (!TickPet(p, dt)) End(i);
+                continue;
+            }
             if (p.Def.Minion != null || p.Def.Bobber || p.Returning || p.LatchedTo != null)
             {
                 if (!TickSpecial(p, dt)) End(i);

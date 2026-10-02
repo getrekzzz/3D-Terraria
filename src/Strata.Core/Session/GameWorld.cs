@@ -202,7 +202,9 @@ public sealed partial class GameWorld : IDisposable
         TouchHazards(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.GloveCooldown > 0) p.GloveCooldown--;
-        if (p.UseAnimation > 0) p.UseAnimation--;
+        if (p.ReuseDelay > 0) p.ReuseDelay--;
+        if (p.UseAnimation > 0 && --p.UseAnimation == 0) p.ReuseDelay = p.UseItem?.ReuseDelay ?? 0;
+        ItemUse.Continue(p); // a started burst always completes, button held or not
         // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
         if (!p.HasBody && p.Hook.Active) p.Hook.Tick(Session.World, Units.SecondsPerTick, p.Hand);
         if (!p.HasBody && p.ExternalVelocity != Vector3.Zero) p.Position += p.ExternalVelocity * Units.SecondsPerTick; // a tongue's drag

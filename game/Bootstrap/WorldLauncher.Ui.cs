@@ -6,8 +6,8 @@ namespace Strata.Game.Bootstrap;
 
 public static partial class WorldLauncher
 {
-    /// <summary>HUD, inventory, world map and minimap, town dialog and the performance overlay.</summary>
-    private static (UI.Hud Hud, UI.InventoryScreen Inventory, UI.WorldMapScreen WorldMap, UI.TownDialog TownDialog) AddUi(
+    /// <summary>HUD, inventory, world map and minimap, town dialog, the performance overlay and photo mode.</summary>
+    private static (UI.Hud Hud, UI.InventoryScreen Inventory, UI.WorldMapScreen WorldMap, UI.TownDialog TownDialog, UI.PhotoMode.PhotoModeController Photo) AddUi(
         WorldRuntime runtime, GameWorld game, PlayerController player, InteractionController interaction, TileObjectRenderer objectRenderer)
     {
         var ui = new UI.UiContext(game, player, interaction);
@@ -33,6 +33,9 @@ public static partial class WorldLauncher
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
-        return (hud, inventory, worldMap, townDialog);
+        var photo = new UI.PhotoMode.PhotoModeController();
+        runtime.AddChild(photo);
+        photo.Initialize(runtime, player);
+        return (hud, inventory, worldMap, townDialog, photo);
     }
 }

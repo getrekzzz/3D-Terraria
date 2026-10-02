@@ -24,14 +24,16 @@
     {"id": "fishing_rare", "mode": "weighted", "entries": [
       {"item": "prismite", "weight": 8, "conditions": [{"type": "biome", "any": ["hallow"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
       {"item": "trident", "weight": 2, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
-      {"item": "flipper", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
+      {"item": "flipper", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "fish", "weight": 2, "conditions": [{"type": "biome", "any": ["tundra", "ice_biome"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
     ] },
     {"id": "fishing_very_rare", "mode": "weighted", "entries": [
       {"item": "reaver_shark", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
       {"item": "angler_earring", "weight": 1, "conditions": [{"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
     ] },
     {"id": "fishing_legendary", "mode": "weighted", "entries": [
-      {"item": "golden_fishing_rod", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
+      {"item": "golden_fishing_rod", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "zephyr_fish", "weight": 1, "conditions": [{"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
     ] },
     {"id": "fishing_lava", "mode": "weighted", "entries": [
       {"item": "obsidifish", "weight": 1}

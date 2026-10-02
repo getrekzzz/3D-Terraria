@@ -74,8 +74,9 @@ public static class InventoryCommands
                     _ => throw new CommandException($"unknown chest button '{a[0]}'"),
                 };
                 if (op is { } button) return CommandResult.Success($"{button}: {ctx.World.ChestAction(ctx.Player, chest, button)} items moved.");
-                var stacks = chest.Container!.Where(st => !st.IsEmpty).ToList();
-                return CommandResult.Success($"{chest.DisplayName} at {chest.Anchor}: {stacks.Count}/{chest.Container!.Length} slots used" +
+                var box = GameWorld.Storage(chest, ctx.Player.State)!;
+                var stacks = Enumerable.Range(0, box.Size).Select(i => box[i]).Where(st => !st.IsEmpty).ToList();
+                return CommandResult.Success($"{chest.DisplayName} at {chest.Anchor}: {stacks.Count}/{box.Size} slots used" +
                     (stacks.Count > 0 ? ": " + string.Join(", ", stacks) : ""));
             },
         });
@@ -125,6 +126,6 @@ public static class InventoryCommands
         if (chest != null && ctx.World.Session.World.TileObjects.Get(chest.Id) != chest) chest = ctx.OpenContainer = null;
         if (chest == null && needChest) throw new CommandException("no chest is open (interact with one first)");
         var shop = ctx.World.Town.Residents.FirstOrDefault(t => t.TalkingTo == ctx.Player);
-        return chest != null ? SlotContext.Of(chest) : new SlotContext(Shop: shop);
+        return chest != null ? SlotContext.Of(chest, ctx.Player.State) : new SlotContext(Shop: shop);
     }
 }
