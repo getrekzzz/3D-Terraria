@@ -167,3 +167,18 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   actions and is left to a panel under the pointer (`InputGate.PointerOverPanel`). Smoke: `ui click`/`ui drag`
   press on empty screen through the GUI (`PointerInput`); probes `ui.inventory`, `ui.overlay`, `ui.modal`,
   `ui.world_clicks`, `camera.yaw`, `player.hotbar`.
+* **HUD** (`game/UI/Hud.cs`, widgets in `game/UI/Hud/`): `Hud.ApplyLayout` builds a `UiState` and places every widget
+  on its `UiLayout` region whenever the logical viewport, the UI scale or what is shown changes (inventory, NPC chat,
+  boss, buff count, info rows, minimap setting, F3), never per frame; `Hud.LayoutApplied` moves the `Minimap` and the
+  `PerfOverlay` on their own canvas layers. A headless run lays out for the project window over the UI scale
+  (`LayoutWidgets.LogicalSize`). Widgets: `ItemNameLabel` (held stack's `ItemTooltip.NameLine` in its rarity colour,
+  "Inventory" while open), `HotbarBar` (top-left, unselected slots ease to 0.78 scale, `hotbar_tick` on every
+  switch, hidden while the inventory is open), `Crosshair` (cursor colour; `talk_hint`/`open_hint` with the interact
+  key; holds the `TargetLabel`), `StatusLine` (refusals and notices for 2 s under the crosshair, else the build-shape
+  hint), `InfoPanel` (info-accessory rows with the accessory's icon, FPS last, 4 Hz), `VitalsBars` (life, mana and
+  breath bars until the hearts, stars and bubbles), the buff row (`Hud.Buffs.cs`), the pickup feed in the chat region
+  and the boss bar. Text widgets draw through `OutlinedText` (no minimum size, clipped), so nothing outgrows its
+  region; the minimap has a 9-slice `minimap_frame` and +/− buttons (zoom 0.5–6) on CanvasLayer 10, above the click
+  catcher. Every placed control joins `LayoutWidgets.Group`; probe `ui.overlaps` counts intersecting pairs in the live
+  tree (and logs them). Smoke: `ui f3`, `ui minimap in|out`; probes `hud.item_name`, `hud.status`,
+  `ui.layout_width`, `ui.minimap_zoom`.

@@ -188,6 +188,27 @@ SPRITES = {
         ..uuuuunn.
         ...uuunn..
     """,
+    # --- Minimap zoom buttons (8x8 cells = 18 px with the outline) ---
+    "zoom_in": """
+        .aaaaaa.
+        abbbbbba
+        abbwwbba
+        abwwwwba
+        abwwwwba
+        abbwwbba
+        abbbbbba
+        .aaaaaa.
+    """,
+    "zoom_out": """
+        .aaaaaa.
+        abbbbbba
+        abbbbbba
+        abwwwwba
+        abwwwwba
+        abbbbbba
+        abbbbbba
+        .aaaaaa.
+    """,
     # --- Frames (no outline; 9-slice with 4-cell = 8 px margins) ---
     "minimap_frame": """
         kkkkkkkkkkkk

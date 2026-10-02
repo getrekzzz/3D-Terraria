@@ -35,6 +35,7 @@ public static partial class WorldLauncher
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
+        hud.Connect(inventory, townDialog, minimap, perf); // the minimap and F3 overlay take their regions of the HUD layout
         var cursorItem = new UI.CursorItemLayer();
         cursorItem.Initialize(ui);
         runtime.AddChild(cursorItem);

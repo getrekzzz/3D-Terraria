@@ -212,3 +212,48 @@ assert ui.overlay == 0
 assert ui.modal == 0
 god off
 assert errors == 0
+
+# --- P2-12 ---
+# The HUD on the layout model: no two widgets overlap at UI scale 1 and 1.5, with the inventory open or the F3 overlay
+# up (the layout is computed on the logical viewport); the held item's name stays over the hotbar; the minimap's zoom
+# buttons take clicks beside the open inventory; shooting a bow with no arrows says so under the crosshair; with
+# arrows it shows its name and rounds without errors.
+wait 0.2
+assert ui.overlaps == 0
+assert hud.item_name == 1
+assert ui.layout_width > 1500
+ui f3
+wait 0.3
+assert ui.overlaps == 0
+ui f3
+uiscale 1.5
+wait 0.2
+assert ui.layout_width < 1100
+assert ui.overlaps == 0
+ui inventory
+wait 0.2
+assert ui.overlaps == 0
+ui f3
+wait 0.3
+assert ui.overlaps == 0
+ui f3
+ui close
+wait 0.1
+uiscale 1
+wait 0.2
+ui inventory
+wait 0.2
+ui minimap in
+assert ui.minimap_zoom > 2
+ui close
+wait 0.1
+give wooden_bow 1
+wield wooden_bow
+use
+wait 0.1
+assert hud.status == 1
+give wooden_arrow 20
+wait 0.2
+assert hud.item_name == 1
+assert ui.overlaps == 0
+assert errors == 0

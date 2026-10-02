@@ -10,8 +10,8 @@ namespace Strata.Game.Debug;
 /// Probes on the global UI look (P2-01): the shipped font is ThemeDB's fallback, an unthemed panel resolves to
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
-/// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); and on the
-/// overlay input gate and the empty-screen click catcher (P2-11).
+/// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
+/// overlay input gate and the empty-screen click catcher (P2-11); and on the HUD layout (P2-12).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -59,5 +59,18 @@ public static class UiProbes
         ctx.AddProbe("ui.modal", () => InputGate.GameplayBlocked ? 1 : 0);
         ctx.AddProbe("ui.world_clicks", () => world.Runtime.GetNodeOrNull<WorldClickCatcher>(WorldClickCatcher.NodePath)?.Presses ?? 0);
         ctx.AddProbe("camera.yaw", () => world.Player is { } p ? Mathf.RadToDeg(p.Rig.Yaw) : 0);
+        // P2-12: the HUD on the layout model. Overlapping widgets (each pair is logged), the line above the hotbar, a
+        // message on the status line, the logical viewport the layout was computed for and the minimap's zoom.
+        ctx.AddProbe("ui.overlaps", () =>
+        {
+            var pairs = new System.Collections.Generic.List<string>();
+            int count = LayoutWidgets.CountOverlaps(world.Runtime.GetTree(), pairs);
+            foreach (var pair in pairs) log.Warn("ui", $"overlap: {pair}");
+            return count;
+        });
+        ctx.AddProbe("hud.item_name", () => world.Hud?.ItemName.Length > 0 ? 1 : 0);
+        ctx.AddProbe("hud.status", () => world.Hud?.Status.Length > 0 ? 1 : 0);
+        ctx.AddProbe("ui.layout_width", () => world.Hud?.Layout?.Width ?? 0);
+        ctx.AddProbe("ui.minimap_zoom", () => world.Runtime.GetNodeOrNull<Minimap>("Minimap")?.Zoom ?? 0);
     }
 }

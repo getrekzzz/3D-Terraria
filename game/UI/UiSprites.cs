@@ -21,7 +21,7 @@ public static class UiSprites
         "slot_head", "slot_body", "slot_legs", "slot_accessory", "slot_dye", "slot_pet", "slot_light_pet",
         "slot_minecart", "slot_mount", "slot_hook", "slot_coin", "slot_ammo",
         "eye_open", "eye_closed", "sort", "quick_stack", "deposit", "loot", "reforge_hammer", "toggle_on", "toggle_off",
-        "tab_equipment", "tab_misc", "cursor", "smart_cursor", "talk_hint", "open_hint", "minimap_frame",
+        "tab_equipment", "tab_misc", "cursor", "smart_cursor", "talk_hint", "open_hint", "minimap_frame", "zoom_in", "zoom_out",
     };
 
     private static readonly Dictionary<string, Texture2D> Cache = new();
