@@ -8,7 +8,7 @@ namespace Strata.Game.UI;
 /// The name under the crosshair. A creature, boss or town resident shows at any distance with its life ("Blue Slime
 /// 25/25", "Eater of Worlds 3920/4000", "Andrew the Guide 250/250"), tinted green, then yellow, then red as it is hurt
 /// (bosses in the boss bar's red); otherwise the block or object within reach is named. Hidden when the "Show target
-/// name" setting is off. The text is rebuilt only when what it shows changes.
+/// name" setting is off. The text is rebuilt only when what it shows changes. <see cref="Crosshair"/> holds and places it.
 /// </summary>
 public sealed partial class TargetLabel : Label
 {
@@ -27,9 +27,8 @@ public sealed partial class TargetLabel : Label
         Name = "TargetLabel";
         HorizontalAlignment = HorizontalAlignment.Center;
         MouseFilter = MouseFilterEnum.Ignore;
-        SetAnchorsPreset(LayoutPreset.Center);
-        GrowHorizontal = GrowDirection.Both;
-        OffsetTop = 16;
+        ClipText = true; // the crosshair places it in its region, under the cross
+        TextOverrunBehavior = TextServer.OverrunBehavior.TrimEllipsis;
         AddThemeFontSizeOverride("font_size", 14);
         AddThemeColorOverride("font_outline_color", new Color(0, 0, 0, 0.9f));
         AddThemeConstantOverride("outline_size", 4);

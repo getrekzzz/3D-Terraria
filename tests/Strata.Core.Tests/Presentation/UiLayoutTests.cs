@@ -168,6 +168,23 @@ public class UiLayoutTests
         Assert.Equal(1f, UiLayout.Compute(1024, 600, Hud).SlotScale);
     }
 
+    [Fact]
+    public void SettingsButtonSitsInTheBottomRightCornerOrAboveTheEventBar()
+    {
+        foreach (var (w, h) in new[] { (1280f, 720f), (1920f, 1080f) })
+        {
+            var corner = UiLayout.Compute(w, h, Chest).Get(UiRegion.SettingsButton);
+            Assert.Equal(w - UiLayout.Margin, corner.Right, 3);
+            Assert.Equal(h - UiLayout.Margin, corner.Bottom, 3);
+            var crowded = UiLayout.Compute(w, h, Chest with { EventBar = true });
+            var ev = crowded.Get(UiRegion.EventBar);
+            var settings = crowded.Get(UiRegion.SettingsButton);
+            Assert.Equal(w - UiLayout.Margin, settings.Right, 3);
+            Assert.True(settings.Bottom <= ev.Y, $"{w}x{h}: settings {settings}, event bar {ev}");
+        }
+        Assert.False(UiLayout.Compute(1920, 1080, Hud).Has(UiRegion.SettingsButton));
+    }
+
     [Theory]
     [InlineData(0, 0, 10, 10, 10, 0, 10, 10, false)] // touching edges
     [InlineData(0, 0, 10, 10, 9, 9, 10, 10, true)]
@@ -199,6 +216,7 @@ public class UiLayoutTests
             yield return UiRegion.SortButtons;
             yield return UiRegion.Crafting;
             yield return UiRegion.Equipment;
+            yield return UiRegion.SettingsButton;
             if (s.Panel != UiPanel.None) yield return UiRegion.Panel;
             yield break;
         }

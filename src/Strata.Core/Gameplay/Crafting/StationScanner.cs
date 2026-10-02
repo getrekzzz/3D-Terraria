@@ -10,12 +10,20 @@ public static class StationScanner
     public const int ReachXZ = 6;
     public const int ReachY = 4;
 
-    public static HashSet<string> Stations(VoxelWorld world, Int3 cell)
+    /// <summary>
+    /// The station ids the objects in reach provide; <paramref name="objectNames"/>, when given, also gets each such
+    /// object's display name once (a Hellforge is one object, though it serves as a furnace too).
+    /// </summary>
+    public static HashSet<string> Stations(VoxelWorld world, Int3 cell, List<string>? objectNames = null)
     {
         var box = new Aabb3i(cell - new Int3(ReachXZ, ReachY, ReachXZ), cell + new Int3(ReachXZ + 1, ReachY + 1, ReachXZ + 1));
         var set = new HashSet<string>(StringComparer.Ordinal);
         foreach (var obj in world.TileObjects.InBox(box))
+        {
+            if (obj.Def.Stations.Length == 0) continue;
             foreach (var s in obj.Def.Stations) set.Add(s);
+            if (objectNames != null && !objectNames.Contains(obj.Def.DisplayName)) objectNames.Add(obj.Def.DisplayName);
+        }
         return set;
     }
 

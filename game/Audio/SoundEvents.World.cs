@@ -30,6 +30,10 @@ public sealed partial class SoundEvents
             if (def.KillGoal > 0 || def.SkyTint != null) Sfx.Play("event_start", -2f);
         };
         game.Town.Arrived += _ => Sfx.Play("npc_arrive");
+        game.Services.Reforged += (p, _) =>
+        {
+            if (p == _local) Sfx.Play("reforge"); // the hammer on the anvil
+        };
     }
 
     /// <summary>dig_/break_ sound of an object's material (pots shatter), falling back to wood.</summary>

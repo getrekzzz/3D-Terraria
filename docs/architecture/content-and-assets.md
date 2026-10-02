@@ -159,31 +159,5 @@ treasure bag, masks and Expert items are items in the boss's data file with mode
 Rebuild only what you add: `python3.13 tools/blender/build_all.py --only=<ids>`, which keeps the rest of
 `assets/manifest.json` (when two branches both add assets, take one side's manifest and rebuild the other side's ids).
 
-## UI look (fonts and theme)
-The interface follows Terraria's look: see-through royal-blue panels (`#3F5297` at ~70%), white text with a black
-outline in a bold rounded face, slot tints by kind and Terraria's rarity colours.
-* **Fonts** (`assets/fonts/`, SIL OFL, licences and `CREDITS.txt` beside them): Comic Neue Bold is the UI face,
-  Andika Bold its glyph fallback (set in the `.otf` import settings). `game/UI/UiFonts.cs` holds the size and
-  outline constants and pre-rasterises ASCII at boot (`Warmup`, ~40 ms) so screens never rasterise mid-game.
-* **Theme**: `game/UI/UiTheme*.cs` builds one `Theme` in code (panels, labels, buttons and the `TextButton`
-  variation, toggles, dropdowns, tabs, sliders, scrollbars, progress bars, text fields, tooltips) and is the source of
-  truth. It is exported to `assets/ui/strata_theme.tres`, which `project.godot` `[gui] theme/custom` makes the project
-  theme; `UiTheme.Install()` (first thing in `GameRoot.Boot`) also sets ThemeDB's fallback font and merges the code
-  theme in, so CanvasLayers, Label3D and custom drawing all get it. After changing the builder, re-export with
-  `godot --headless --path . -- --export-theme` (or `ui export-theme` in the console); the `ui.theme_synced` probe in
-  `ui.cmds` fails while the file is stale. Slot styles are cached per `SlotKind` (`UiTheme.SlotStyle`), so drawing a
-  slot allocates nothing.
-* **Rarity colours** live in Core (`Strata.Core.Presentation.RarityColors`): tiers -1 and 0–11 with Terraria's RGB,
-  Quest (-11) amber, Expert (-12) a cycling rainbow and Master (-13) a red-orange pulse; `UiTheme.Rarity` converts.
-* **UI scale**: `Strata.Core.Presentation.UiScale` lowers the UI scale setting so the logical viewport never drops
-  below 1024×600; `DisplaySettings.ApplyUiScale` re-applies it whenever the window is resized.
-* **Layout**: `Strata.Core.Presentation.UiLayout.Compute(width, height, UiState)` places every HUD and inventory
-  region (`UiRegion`: hotbar, buffs, hearts, mana, minimap, info, crosshair, breath, status line, chat, boss and
-  event bars, NPC chat, the F3 `debug` overlay, and the inventory's grid, coin/ammo, trash, sort buttons, panel,
-  crafting and equipment) on the logical viewport, so nothing ever overlaps or leaves the screen from 1024×600 up.
-  Fixed regions keep Terraria's places; chat, info, crafting and the F3 overlay shrink around them; breath, status
-  line and bars move to the nearest free spot; the inventory's slots drop to 0.85 and 0.75 (`SlotScale`) and the
-  minimap hides (`MinimapHidden`) when the equipment column cannot fit under it. The F3 overlay goes below the hotbar
-  and buff rows. A region with no room is left out of `Rects` (the widget hides). Engine code calls it on viewport
-  resize and on state changes only; `UiLayoutTests` checks every window size from 1024×600 to 3840×2160 at every UI
-  scale step.
+## UI look
+The interface (fonts, theme, layout, HUD, inventory screens, menus) is documented in [`ui.md`](ui.md).

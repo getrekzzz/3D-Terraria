@@ -45,8 +45,8 @@ driver, output device and how many sound files loaded (the console `audio`, `aud
 `audio device <name>` do the same). Pick another *Output device* there if the chime is silent. The startup log
 (`%APPDATA%\Godot\app_userdata\Strata\logs\strata.log` on Windows) has an `audio:` line with the same details.
 
-Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medium|large --new --player=NAME
---fresh-player --view=CHUNKS --hour=H --free-camera --exec="cmd;cmd" --screenshot=PATH --shots=DIR --smoke=SCRIPT
+Command-line options (after `--`): `--world=NAME --seed=N --size=tiny|small|medium|large
+--difficulty=classic|expert|master|journey (a new world) --new --player=NAME --fresh-player --view=CHUNKS --hour=H --free-camera --exec="cmd;cmd" --screenshot=PATH --shots=DIR --smoke=SCRIPT
 --graphics=low|medium|high|ultra`. Graphics presets live in `data/config/graphics.json` (`graphics <preset>` in the
 console switches and remembers one); rendering is described in [`docs/architecture/rendering.md`](docs/architecture/rendering.md).
 

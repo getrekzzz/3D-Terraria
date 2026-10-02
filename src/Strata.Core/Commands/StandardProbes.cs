@@ -28,6 +28,7 @@ internal static class StandardProbes
         ctx.AddProbe("player.cell_y", () => ctx.Player.FeetCell.Y);
         ctx.AddProbe("player.from_mark", () => ctx.Mark is { } m ? System.Numerics.Vector3.Distance(m, ctx.Player.Position) : throw new CommandException("no mark set"));
         ctx.AddProbe("player.held_count", () => ctx.Player.State.Inventory.Held.Count);
+        ctx.AddProbe("player.hotbar", () => ctx.Player.State.Inventory.SelectedHotbar); // 0-based
         ctx.AddProbe("time.hour", () => w.Session.Clock.Hour);
         ctx.AddProbe("time.day", () => w.Session.Clock.IsDay ? 1 : 0);
         ctx.AddProbe("drops.count", () => w.Drops.Items.Count);
@@ -63,6 +64,9 @@ internal static class StandardProbes
         ctx.AddPrefixProbe("npcs.", id => w.Session.Content.Enemies.Contains(id) ? w.Npcs.All.Count(n => n.Def.Id == id) : null);
         ctx.AddProbe("inv.trash", () => ctx.Player.State.Inventory.Trash[0].Count);
         ctx.AddProbe("inv.cursor", () => ctx.Player.State.Inventory.Cursor.Count);
+        // The accessory slots the world and a Demon Heart unlock, and those hidden on the character (a bit each).
+        ctx.AddProbe("inv.accessory_slots", () => ctx.Player.State.Inventory.AccessorySlotsUnlocked);
+        ctx.AddProbe("inv.hidden_accessories", () => ctx.Player.State.Inventory.HiddenAccessories);
         // The purse in copper: coins in the coin slots and the backpack.
         ctx.AddProbe("inv.coins", () => Gameplay.Items.Coins.Total(ctx.Player.State.Inventory));
         // inv.<item>: in the backpack, coin, ammo and trash slots (worn items do not count).

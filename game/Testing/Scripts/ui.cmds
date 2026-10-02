@@ -107,3 +107,711 @@ wait 0.3
 assert fx.heal_numbers >= 1
 assert fx.number_labels <= 80
 assert errors == 0
+
+# --- P2-10 ---
+# Hidden slot views do no work: with the inventory closed only the hotbar's 10 process. Taking one torch with a right
+# click holds it at the pointer; hovering a slot shows its tooltip at once, in coloured lines; closing the inventory
+# puts the held torch back and hides both.
+wait 0.2
+assert ui.slot_views == 10
+give torch 5
+ui inventory
+wait 0.2
+assert ui.slot_views >= 60
+invclick backpack 3 right
+wait 0.1
+assert ui.cursor_count == 1
+ui hover backpack 0
+assert ui.tooltip_lines >= 3
+wait 0.3
+assert ui.tooltip_lines >= 3
+ui close
+wait 0.2
+assert inv.cursor == 0
+assert ui.cursor_count == 0
+assert ui.tooltip_lines == 0
+assert ui.slot_views == 10
+assert errors == 0
+
+# --- P2-11 ---
+# The inventory is an overlay, not a freeze: with it open the player walks, the number keys pick the hotbar slot, a
+# click on empty screen (routed through the GUI) throws the held stack (right: one), a held left button there swings
+# the item toward the crosshair, and a right drag turns the camera; a press the panels took swings nothing. The map
+# is modal and still stops everything.
+god on
+spawning off
+killall
+clear
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+wait 1.0
+ui inventory
+wait 0.2
+assert ui.inventory == 1
+assert ui.overlay == 1
+assert ui.modal == 0
+mark
+aim 0 0 1
+press move_forward
+wait 0.5
+assert player.speed > 0
+press move_forward off
+wait 0.3
+assert player.from_mark > 1.5
+press hotbar_3
+press hotbar_3 off
+wait 0.1
+assert player.hotbar == 2
+press hotbar_1
+press hotbar_1 off
+wait 0.1
+assert player.hotbar == 0
+give dirt 10
+invclick backpack 0 left
+assert inv.cursor == 10
+ui click right
+assert inv.cursor == 9
+ui click left
+assert inv.cursor == 0
+assert ui.world_clicks >= 2
+wait 0.2
+assert drops.count >= 1
+assert inv.dirt == 0
+give copper_shortsword 1
+wield copper_shortsword
+aim 0 -0.2 1
+mark
+press use_primary
+wait 0.4
+press use_primary off
+assert player.swings == 0
+ui click left down
+wait 0.4
+ui click left up
+assert player.swings >= 1
+# A tap pressed and released within one tick still swings once.
+wait 0.6
+mark
+ui click left
+wait 0.1
+assert player.swings >= 1
+aim 1 0 0
+ui drag 400 0
+assert camera.yaw < -110
+ui map
+wait 0.1
+assert ui.modal == 1
+mark
+press move_forward
+wait 0.4
+press move_forward off
+assert player.from_mark < 0.3
+ui close
+wait 0.2
+assert ui.overlay == 0
+assert ui.modal == 0
+god off
+assert errors == 0
+
+# --- P2-12 ---
+# The HUD on the layout model: no two widgets overlap at UI scale 1 and 1.5, with the inventory open or the F3 overlay
+# up (the layout is computed on the logical viewport); the held item's name stays over the hotbar; the minimap's zoom
+# buttons take clicks beside the open inventory; shooting a bow with no arrows says so under the crosshair; with
+# arrows it shows its name and rounds without errors.
+wait 0.2
+assert ui.overlaps == 0
+assert hud.item_name == 1
+assert ui.layout_width > 1500
+ui f3
+wait 0.3
+assert ui.overlaps == 0
+ui f3
+uiscale 1.5
+wait 0.2
+assert ui.layout_width < 1100
+assert ui.overlaps == 0
+ui inventory
+wait 0.2
+assert ui.overlaps == 0
+ui f3
+wait 0.3
+assert ui.overlaps == 0
+ui f3
+ui close
+wait 0.1
+uiscale 1
+wait 0.2
+ui inventory
+wait 0.2
+ui minimap in
+assert ui.minimap_zoom > 2
+ui close
+wait 0.1
+give wooden_bow 1
+wield wooden_bow
+use
+wait 0.1
+assert hud.status == 1
+give wooden_arrow 20
+wait 0.2
+assert hud.item_name == 1
+assert ui.overlaps == 0
+assert errors == 0
+
+# --- P2-15 ---
+# The inventory screen on the layout: the grid's first row on the hotbar's spot, the coin and ammo columns right of it
+# with the trash under them and the sort buttons beside, crafting bottom-left and equipment under the minimap, none of
+# them overlapping (each is a layout widget). Coins merge in their slots; Ctrl+click puts a stack in the saved trash;
+# Sort Inventory runs. A chest opens in the panel host under the grid with nothing overlapping, at UI scale 1 and 1.5;
+# walking off closes the chest but not the inventory, and closing the inventory puts the chest away.
+clear
+ui inventory
+wait 0.2
+assert ui.overlaps == 0
+assert ui.grid_on_hotbar == 1
+assert ui.slot_scale == 1
+give copper_coin 250
+assert inv.silver_coin == 2
+assert inv.copper_coin == 50
+give dirt 10
+give torch 5
+give wood 5
+give gel 5
+give copper_shortsword 1
+invclick backpack 4 left ctrl
+assert inv.trash >= 1
+ui sort
+assert errors == 0
+ui close
+wait 0.1
+god on
+spawning off
+killall
+fill -3 0 -6 3 3 3 air
+fill -3 -1 -6 3 -1 3 dirt
+wait 0.5
+place wooden_chest 0 0 -4
+interact 0 0 -4
+wait 0.2
+assert ui.inventory == 1
+assert ui.panel == 1
+assert ui.overlaps == 0
+invclick backpack 1 left
+invclick chest 0 left
+assert inv.torch == 0
+ui quickstack
+uiscale 1.5
+wait 0.2
+assert ui.panel == 1
+assert ui.slot_scale < 1
+assert ui.overlaps == 0
+uiscale 1
+wait 0.2
+assert ui.overlaps == 0
+ui close
+wait 0.2
+assert ui.panel == 0
+assert ui.inventory == 0
+god off
+assert errors == 0
+
+# --- P2-13 ---
+# Life as Terraria's hearts (20 each), mana as a column of stars and breath as bubbles shown only underwater: three
+# Life Crystals add three hearts, and holding your breath in a flooded shaft pops the bubbles one by one; back in the
+# air they refill and hide.
+heal
+wait 0.2
+assert hud.hearts == 5
+assert hud.golden_hearts == 0
+assert hud.stars == 1
+assert hud.bubbles == 0
+give life_crystal 3
+wield life_crystal
+use
+wait 0.5
+use
+wait 0.5
+use
+wait 0.5
+assert hud.hearts == 8
+assert ui.overlaps == 0
+god on
+spawning off
+killall
+fill -6 -3 -6 6 -1 6 stone
+fill -6 0 -6 6 7 6 air
+wait_until player.on_floor == 1 5
+fill -2 0 -2 2 5 -2 stone
+fill -2 0 2 2 5 2 stone
+fill -2 0 -1 -2 5 1 stone
+fill 2 0 -1 2 5 1 stone
+liquids off
+liquid water -1 0 -1 1 4 1
+wait 2.5
+assert player.submerged == 1
+assert hud.bubbles >= 8
+assert hud.bubbles <= 9
+liquid none -1 0 -1 1 5 1
+liquids on
+wait_until hud.bubbles == 0 5
+god off
+assert errors == 0
+
+# --- P2-14 ---
+# The buff bar: a potion's buff shows its icon and timer; with the inventory open hovering names it and its effect,
+# and a right click cancels it, but never a debuff (Potion Sickness stays). A summoned minion shows as one more icon,
+# and cancelling it sends the minion home.
+heal
+ui close
+give swiftness_potion 1
+wield swiftness_potion
+use
+wait 0.3
+assert buff.swiftness == 1
+assert hud.buffs >= 1
+assert hud.buff_icons >= 1
+ui inventory
+wait 0.2
+ui buff hover swiftness
+assert ui.tooltip_lines >= 2
+assert ui.overlaps == 0
+ui buff cancel swiftness
+wait 0.1
+assert buff.swiftness == 0
+assert ui.tooltip_lines == 0
+ui close
+give lesser_healing_potion 1
+wield lesser_healing_potion
+use
+wait 0.3
+assert buff.potion_sickness == 1
+ui buff cancel potion_sickness
+assert buff.potion_sickness == 1
+spawning off
+killall
+give slime_staff 1
+wield slime_staff
+use
+wait 0.5
+assert hud.buffs >= 2
+ui buff cancel slime_minion
+wait 0.2
+assert projectiles.count == 0
+assert errors == 0
+
+# --- P2-21 ---
+# World messages scroll up the chat log at the bottom-left in Terraria's colours instead of a centred banner: summoning
+# a boss posts "has awoken!". The chat key opens the history (an overlay: the player keeps moving) with every kept line,
+# and closes it again; with the inventory open the log sits right of the crafting column, overlapping nothing.
+spawning off
+killall
+boss king_slime 12
+wait 0.5
+assert ui.chat_lines >= 1
+killall
+ui chat Hello from the smoke test
+assert ui.chat_lines >= 2
+assert ui.overlaps == 0
+ui history
+assert ui.chat_open == 1
+assert ui.overlay == 1
+assert ui.modal == 0
+ui history
+assert ui.chat_open == 0
+assert ui.overlay == 0
+ui inventory
+wait 0.2
+assert ui.chat_lines >= 2
+assert ui.overlaps == 0
+ui close
+assert errors == 0
+
+# --- P2-22 ---
+# Picked-up items float up over the player's head as one popup per item: a second pickup of the same item while its
+# popup is kept grows it instead of adding another; coins of every kind share one popup. (The drops below have no
+# pickup delay.)
+god on
+spawning off
+killall
+clear
+fill -6 -3 -6 6 -1 6 stone
+fill -6 0 -6 6 5 6 air
+wait 0.5
+assert ui.popups == 0
+drop dirt 5 0 0 1 0
+wait 1.0
+assert inv.dirt == 5
+assert ui.popups == 1
+drop dirt 5 0 0 1 0
+wait 1.0
+assert inv.dirt == 10
+assert ui.popups == 1
+wait 2.5
+assert ui.popups == 0
+drop copper_coin 50 0 0 1 0
+drop silver_coin 2 0 0 1 0
+wait 1.0
+assert ui.popups == 1
+assert ui.overlaps == 0
+god off
+assert errors == 0
+
+# --- P2-23 ---
+# A boss shows Terraria's boss bar bottom-centre (head icon, name, life numbers) and it goes with the boss; an invasion
+# shows its icon, name and kill progress bottom-right beside it, lingering a few seconds after it ends; nothing overlaps.
+god on
+spawning off
+killall
+boss king_slime 12
+wait 1
+assert ui.bossbar == 1
+assert ui.bossbar_fill == 1
+assert ui.overlaps == 0
+killall
+wait 1
+assert ui.bossbar == 0
+event goblin_army
+wait 1
+assert ui.eventbar == 1
+assert ui.eventbar_percent == 0
+assert ui.overlaps == 0
+boss king_slime 12
+wait 0.5
+assert ui.bossbar == 1
+assert ui.overlaps == 0
+killall
+event stop goblin_army
+wait 0.5
+assert ui.eventbar == 1
+wait 4.5
+assert ui.eventbar == 0
+god off
+assert errors == 0
+
+# --- P2-25 ---
+# Dying darkens the screen under "You were slain..." with the cause of death and the respawn countdown; the same line
+# goes to the chat log; on respawn the screen fades away.
+heal
+kill
+wait 0.5
+assert ui.death_dim == 1
+assert ui.death_cause == 1
+assert ui.chat_lines >= 1
+assert player.alive == 0
+wait 6
+assert player.alive == 1
+assert ui.death_dim == 0
+assert errors == 0
+
+# --- P2-29 ---
+# X toggles Smart Cursor (the status line says so; the crosshair turns orange with the smart cursor icon). With a
+# pickaxe the target snaps to a block it can mine near the aim: aiming just beside a lone copper ore block, which the
+# plain crosshair passes by, mines it. Toggling again turns it off.
+tp spawn
+fill -12 -3 -12 12 -1 12 stone
+fill -12 0 -12 12 24 12 air
+tp ~ ~ ~
+wait 0.5
+camera first
+assert ui.smart_cursor == 0
+press smart_cursor
+wait 0.1
+press smart_cursor off
+assert ui.smart_cursor == 1
+assert hud.status == 1
+give copper_pickaxe
+wield copper_pickaxe
+setblock 0 3 -5 copper_ore
+aim 0.25 0.06 -1
+wait 0.3
+assert ui.smart_target == 1
+hold use_primary 2.5
+wait 1.5
+assert inv.copper_ore >= 1
+press smart_cursor
+wait 0.1
+press smart_cursor off
+assert ui.smart_cursor == 0
+assert ui.smart_target == 0
+camera third
+assert errors == 0
+
+# --- P2-16 ---
+# The equipment column: Dye | Vanity | Equip with 5 accessory rows in a Classic world. A helmet equipped with a right
+# click raises the defence on the shield badge; a right click on it swaps it to the vanity column (no defence). Empty
+# slots name themselves on hover. An accessory's eye hides it on the character and shows it again. A hook goes to the
+# Misc page's hook slot.
+clear
+ui inventory
+ui tab equipment
+wait 0.2
+assert ui.equip_rows == 5
+assert inv.accessory_slots == 5
+assert ui.misc_tab == 0
+give iron_helmet 1
+invclick backpack 0 right
+assert inv.iron_helmet == 0
+assert player.defense > 0
+wait 0.1
+assert ui.defense_badge > 0
+invclick armor 0 right
+assert player.defense == 0
+wait 0.1
+assert ui.defense_badge == 0
+ui hover dyes 0
+assert ui.tooltip_lines == 1
+give band_of_regeneration 1
+invclick backpack 0 right
+assert inv.band_of_regeneration == 0
+ui eye 0
+assert inv.hidden_accessories == 1
+ui eye 0
+assert inv.hidden_accessories == 0
+give grappling_hook 1
+invclick backpack 0 right
+assert inv.grappling_hook == 0
+ui tab misc
+wait 0.1
+assert ui.misc_tab == 1
+ui hover misc 4
+assert ui.tooltip_lines >= 2
+ui hover misc_dyes 0
+assert ui.tooltip_lines == 1
+assert ui.overlaps == 0
+ui tab equipment
+ui close
+wait 0.1
+assert errors == 0
+
+# --- P2-17 ---
+# The chest panel: its links move items through Core (Deposit All leaves the hotbar and favourites; Loot All brings
+# everything back); Rename opens a field that holds the keyboard behind a modal gate, so typing never moves the
+# player; Esc keeps the old name and Enter the new one. Walking out of reach puts the chest away with its creak.
+god on
+spawning off
+killall
+clear
+fill -3 0 -6 3 3 20 air
+fill -3 -1 -6 3 -1 20 dirt
+wait 0.5
+place wooden_chest 0 0 -3
+interact 0 0 -3
+wait 0.2
+assert ui.inventory == 1
+assert ui.panel == 1
+give wood 30
+invclick backpack 0 left
+invclick backpack 20 left
+give torch 5
+invclick backpack 0 left
+invclick backpack 21 left
+invclick backpack 21 left alt
+ui chest deposit
+assert inv.wood == 0
+assert inv.torch == 5
+ui chest loot
+assert inv.wood == 30
+ui chest rename
+assert ui.renaming == 1
+assert ui.modal == 1
+mark
+aim 0 0 1
+press move_forward
+wait 0.3
+press move_forward off
+assert player.from_mark < 0.2
+ui chest cancel
+assert ui.renaming == 0
+assert ui.modal == 0
+assert ui.chest_named == 0
+ui chest rename
+ui chest name Loot
+assert ui.renaming == 0
+assert ui.chest_named == 1
+chest
+aim 0 0 1
+press move_forward
+wait_until ui.panel == 0 6
+press move_forward off
+assert ui.chests_closed >= 1
+assert ui.inventory == 1
+ui close
+wait 0.2
+god off
+assert errors == 0
+
+# --- P2-18 ---
+# The crafting column: with a work bench in reach and wood and gel in the backpack it lists recipes, and an idle screen
+# never rebuilds the list (a hovered recipe's tooltip stays). 'ui craft' clicks a recipe's slot as the player does
+# (selecting it, then crafting onto the cursor): two torch crafts merge on the cursor; a sword goes to the cursor too,
+# and closing the inventory puts what is held in the backpack.
+god on
+spawning off
+killall
+clear
+fill -3 0 -4 6 3 4 air
+fill -3 -1 -4 6 -1 4 dirt
+wait 0.5
+place work_bench 3 0 0
+give wood 20
+give gel 2
+ui inventory
+wait 0.6
+assert ui.recipes > 0
+wait 1.2
+assert ui.recipe_rebuilds <= 1
+ui craft torch 2
+assert inv.cursor == 6
+ui close
+wait 0.2
+assert inv.torch == 6
+ui inventory
+wait 0.3
+ui craft wooden_sword
+assert inv.cursor == 1
+ui close
+wait 0.2
+assert inv.wooden_sword == 1
+assert inv.cursor == 0
+god off
+assert errors == 0
+
+# --- P2-26 ---
+# Talking to a resident opens the chat box at the top centre: in the top third of the screen, over nothing else on the
+# HUD (the hotbar, buffs and hearts), and the player can still walk while it is open.
+god on
+spawning off
+killall
+town summon merchant 0 0 -3
+wait 0.3
+ui talk merchant
+wait 0.3
+assert ui.talk_open == 1
+assert ui.npc_chat_top == 1
+assert ui.overlaps == 0
+assert ui.modal == 0
+ui close
+wait 0.2
+assert ui.talk_open == 0
+god off
+assert errors == 0
+
+# --- P2-27 ---
+# Shop opens the inventory with the merchant's 10×4 grid in the panel host. Shift-clicking a backpack slot sells the
+# stack (wood has no value: it goes for nothing, as on Terraria's shop) into the buyback cells, and 'ui buyback' buys
+# it back into the backpack. Clicking a ware buys one onto the cursor and again stacks it; closing the inventory stows
+# what is held. Walking out of talking range puts the shop away.
+god on
+spawning off
+killall
+clear
+town dismiss merchant
+town summon merchant 0 0 -3
+give silver_coin 50
+give wood 10
+wait 0.3
+ui talk merchant
+ui shop
+wait 0.3
+assert ui.talk_open == 0
+assert ui.inventory == 1
+assert ui.panel == 2
+assert ui.shop_slots > 0
+assert ui.overlaps == 0
+ui hover shop 0
+assert ui.tooltip_lines > 1
+ui sell backpack 0
+assert ui.buyback == 1
+assert inv.wood == 0
+ui buyback 0
+assert ui.buyback == 0
+assert inv.wood == 10
+ui buy torch 2
+assert inv.cursor == 2
+assert inv.coins < 5000
+ui close
+wait 0.2
+assert ui.panel == 0
+assert inv.torch == 2
+ui talk merchant
+ui shop
+wait 0.3
+assert ui.panel == 2
+aim 0 0 1
+press move_forward
+wait_until ui.panel == 0 8
+press move_forward off
+assert ui.inventory == 1
+ui close
+wait 0.2
+god off
+assert errors == 0
+
+# --- P2-28 ---
+# The Goblin Tinkerer's Reforge opens the inventory with the reforge slot under the grid ('Place an item here to
+# reforge'). Wood is refused; the sword goes in and its cost shows in coin colours. Each press of the hammer reforges
+# it, charges the purse and clangs; hovering the slot shows its tooltip. Closing the inventory puts the sword back in
+# the backpack.
+god on
+spawning off
+killall
+clear
+town summon goblin_tinkerer 0 0 -3
+give copper_broadsword 1
+give gold_coin 5
+give wood 5
+wait 0.3
+ui talk goblin_tinkerer
+ui reforge
+wait 0.3
+assert ui.talk_open == 0
+assert ui.inventory == 1
+assert ui.panel == 3
+assert ui.service_cost == 0
+assert ui.overlaps == 0
+invclick backpack 1 left
+invclick service 0 left
+assert ui.service_item == 0
+invclick backpack 1 left
+invclick backpack 0 left
+invclick service 0 left
+assert ui.service_item == 1
+assert inv.copper_broadsword == 0
+wait 0.1
+assert ui.service_cost > 0
+ui hover service 0
+assert ui.tooltip_lines > 1
+ui reforge hit
+ui reforge hit
+assert ui.reforges == 2
+assert inv.coins < 50000
+ui close
+wait 0.2
+assert ui.panel == 0
+assert ui.service_item == 0
+assert inv.copper_broadsword == 1
+god off
+assert errors == 0
+
+# --- P2-30 ---
+# The inventory's 'Settings' text button sits in the bottom-right corner of the layout (no overlaps, also at UI scale
+# 1.5) and opens the pause menu over the open inventory, as Terraria's; closing it leaves the world running.
+ui inventory
+wait 0.2
+assert ui.settings_button == 1
+assert ui.overlaps == 0
+uiscale 1.5
+wait 0.2
+assert ui.settings_button == 1
+assert ui.overlaps == 0
+uiscale 1
+ui settings
+wait 0.1
+assert ui.paused == 1
+assert ui.inventory == 1
+ui close
+wait 0.2
+assert ui.paused == 0
+assert ui.inventory == 0
+assert ui.settings_button == 0
+assert errors == 0

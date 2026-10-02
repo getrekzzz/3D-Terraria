@@ -11,7 +11,7 @@ public sealed partial class PlayerController
     /// </summary>
     private Vector2 MoveInput()
     {
-        if (UI.InputGate.GameplayBlocked) return Vector2.Zero;
+        if (UI.InputGate.MovementBlocked) return Vector2.Zero;
         var input = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
         var fx = Entity.State.Effects;
         if (!fx.InvertControls || !Entity.Alive) return input;

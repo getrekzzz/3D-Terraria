@@ -1,6 +1,10 @@
 [gd_resource type="Theme" format=3]
 
+[ext_resource type="Texture2D" path="res://assets/ui/toggle_on.png" id="1_3df45"]
 [ext_resource type="FontFile" path="res://assets/fonts/ComicNeue-Bold.otf" id="1_lgl48"]
+[ext_resource type="Texture2D" path="res://assets/ui/toggle_off.png" id="2_8jt3y"]
+[ext_resource type="Texture2D" path="res://assets/ui/slider_grabber.png" id="3_lmk2j"]
+[ext_resource type="Texture2D" path="res://assets/ui/slider_grabber_hover.png" id="4_ufi0j"]
 
 [sub_resource type="StyleBoxFlat" id="Button_disabled"]
 content_margin_left = 12.0
@@ -554,6 +558,14 @@ CheckButton/colors/font_hover_pressed_color = Color(1, 1, 1, 1)
 CheckButton/colors/font_outline_color = Color(0, 0, 0, 1)
 CheckButton/colors/font_pressed_color = Color(1, 1, 1, 1)
 CheckButton/constants/outline_size = 4
+CheckButton/icons/checked = ExtResource("1_3df45")
+CheckButton/icons/checked_disabled = ExtResource("1_3df45")
+CheckButton/icons/checked_disabled_mirrored = ExtResource("1_3df45")
+CheckButton/icons/checked_mirrored = ExtResource("1_3df45")
+CheckButton/icons/unchecked = ExtResource("2_8jt3y")
+CheckButton/icons/unchecked_disabled = ExtResource("2_8jt3y")
+CheckButton/icons/unchecked_disabled_mirrored = ExtResource("2_8jt3y")
+CheckButton/icons/unchecked_mirrored = ExtResource("2_8jt3y")
 CheckButton/styles/disabled = SubResource("CheckButton_normal")
 CheckButton/styles/focus = SubResource("CheckButton_focus")
 CheckButton/styles/hover = SubResource("CheckButton_normal")
@@ -565,6 +577,9 @@ HScrollBar/styles/grabber_highlight = SubResource("HScrollBar_grabber_highlight"
 HScrollBar/styles/grabber_pressed = SubResource("HScrollBar_grabber_pressed")
 HScrollBar/styles/scroll = SubResource("HScrollBar_scroll")
 HScrollBar/styles/scroll_focus = SubResource("HScrollBar_scroll_focus")
+HSlider/icons/grabber = ExtResource("3_lmk2j")
+HSlider/icons/grabber_disabled = ExtResource("3_lmk2j")
+HSlider/icons/grabber_highlight = ExtResource("4_ufi0j")
 HSlider/styles/grabber_area = SubResource("HSlider_grabber_area")
 HSlider/styles/grabber_area_highlight = SubResource("HSlider_grabber_area_highlight")
 HSlider/styles/slider = SubResource("HSlider_slider")

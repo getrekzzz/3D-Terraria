@@ -96,8 +96,21 @@
   tinted by life, bosses in the boss bar's red), else the block or object in reach, rebuilding its text only when
   that changes. Probes: `hover.npc`, `hover.resident`, `hover.talk`, `hover.<enemy id>`, `hud.target_name`,
   `hud.target_name.<words>` (the label in snake case contains them), `ui.talk_open`.
-* **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
-  nearby liquids, biome/time conditions).
+* **Smart Cursor** — X (`smart_cursor`, saved as `UserSettings.SmartCursor`, also in Settings → Gameplay) toggles it.
+  `SmartTargeting.Find` (Core) samples a cone round `Aim` from the eye (12° half-angle, at most 0.75 m wide, every
+  0.25 m up to the reach and at most 0.75 m past the first solid cell on the aim line): a pickaxe takes the block it
+  can mine (`MiningRules.CanMine`) with a face open toward the eye that is closest along the aim, `ore`/`gem`-tagged
+  blocks first; an axe the nearest `BreakTool.Axe` object (trees), a hammer a `BreakTool.Hammer` one. It allocates
+  nothing. `InteractionController.ApplySmartCursor` swaps it in as `Target` (always in reach) unless the crosshair
+  already rests on a non-decor object in reach, and reruns it only when the item, eye (5 cm) or aim (0.5°) moved, the
+  world was edited, the pick went stale or 15 ticks passed; smart digging still wins when looking down. The crosshair
+  turns orange with the smart cursor icon, the pointer uses its smart sprite, and the status line says "Smart Cursor
+  On/Off". Scripted runs keep the toggle in memory (`GameRoot.Automated`). Probes: `ui.smart_cursor`,
+  `ui.smart_target`.
+* **Crafting** — `RecipeBook` (indexed, atomic crafts; `CraftInto` crafts onto the cursor, merging into the same
+  stackable item and refusing anything else) + `CraftingEnvironment` (stations within reach and the objects providing
+  them, nearby liquids, biome/time conditions; `Browse` tallies the slots once; `Signature` is a stable FNV hash of a
+  browse so the UI rebuilds only on change) + `RecipeText` (group and condition wording).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
   strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
@@ -311,8 +324,10 @@
   `coins`, `maxLife`, `resident`, `flag`) when a vacant valid home exists (rooms found from chairs), re-validates
   homes, and drives residents: stroll by day, walk home at night along A* paths, opening and closing doors, stop
   and face the player while talking. `TownCommerce` picks dialogue lines by condition (placeholders for names),
-  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys and sells
-  (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
+  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys into the
+  backpack or onto the cursor (`BuyTarget`), sells from a slot or the cursor at `sellRatio` (favourites and coins
+  refuse; an item of no value goes for nothing), keeps each player's last 40 sold stacks for buyback at what they
+  fetched (`TownCommerce.Trade.cs`; not saved), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
   residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.
@@ -419,7 +434,8 @@
   same index, otherwise take ONE onto the cursor (held: `HoldRepeat.IntervalTicks` 30, 22, 17 … 1). Left clicks are
   `SlotActions.LeftClick` with `SlotFilters.For(slot)` (coins only in coin slots, `FitsAmmoSlot` in ammo slots, armor
   kind, accessory without duplicate, dye, misc kind). `ThrowCursor`/`ThrowStack` toss stacks the way the drop key does.
-  Favourited slots draw a gold wash on the inventory screen and the hotbar (`ItemSlotView.Favorite`).
+  Favourited slots draw gold with a gold wash on the inventory screen and the hotbar (`ItemSlotView.Favorite`); the
+  view itself repeats a held right click, and the screen stops the repeat once a click no longer moves items.
 * **Chest and inventory buttons** — `InventoryOps`: `LootAll` (via `Pickup`, coins to the purse), `DepositAll` and
   `QuickStack` (backpack 10–49 only, never favourites or coins; quick stack only items the chest already holds,
   topping up its stacks first), `Restock` (tops up backpack and ammo stacks from the chest), `Sort(inv, from, to)`
@@ -438,6 +454,45 @@
   `TownCommerce.SaleValue`; kind by `Coins.TopTier`, "No value" at 0). `BuffDisplay` (timer text, cancel/timer
   rules incl. `hideTimer`), `VitalsDisplay` (hearts, golden hearts, stars, bubbles) and `Content.Index.StationNames`
   ("Iron Anvil or Lead Anvil", cached per database) are the Core maths the HUD, crafting and the Guide read.
+* **Chat log** — world messages go to `ChatLog` (game/UI/Hud/ChatLog.cs) in the layout's Chat region, never a
+  centred banner: `NpcSystem.Messaged` (coloured by `MessageColors.Hex(MessageKind)`; it carries "has awoken!" and
+  "has been defeated!" too), `BossLeft`, town arrivals/departures (blue) and deaths (red), events (invasions purple,
+  others green), progression and objective lines, and catches in rarity colour — wired in `Hud.Messages.cs`
+  (`Hud.Announce(text, colour)` forwards there). `ChatHistory` (Core) keeps the last 50 lines and the fade maths (10 s
+  hold, 1 s fade, the last 10 shown); the `chat` action (Enter) opens the history as an overlay gate. The optional
+  `BigAnnouncements` setting adds a 24 px banner for "has awoken!" only. Command `ui chat <text>`/`ui history`, probes
+  `ui.chat_lines`/`ui.chat_open`.
+* **Pickup popups** — `GameWorld.ItemPickedUp` feeds `PickupPopups` (game/UI/Hud/PickupPopups.cs), drawn over the
+  player's head (0.9 m above it, projected; a fixed point at W/2, 0.38 H in first person or behind the camera).
+  `PickupFeed` (Core) keeps 8 popups keyed by item and prefix (all coins share one, summing copper for
+  `Coins.Format`): a pickup within 2 s joins its popup, restarts it and pops it (1.25 → 1 over 0.12 s); each shows
+  1.5 s, rising 40 px and fading over the last 0.5 s, the latest at the bottom row (22 px apart). Text in rarity
+  colour (Expert/Master animate each frame) or the largest coin's colour. `drop … <delay ticks>` and probe
+  `ui.popups` test it.
+* **Boss bar and invasion progress** — `BossBarModel.Compute(npcs)` (Core, allocation-free, run each frame) picks
+  the strongest living non-minor boss (a body before its parts, by maximum life, a worm counted whole) and sums
+  everything sharing its defeat flag: a pair (the Twins) adds up, a cut worm counts its arrival life once, and a
+  boss's parts count only when flagged `BossPart.InBossBar` (Golem's head, Moon Lord's head and hands; never
+  Skeletron's hands or Golem's fists, which keep their floating mini bars); a fallen part drops out. `BossBar`
+  (game/UI/Hud/BossBar.cs, the layout's BossBar region) draws the title, the head icon (`PortraitIcons.Boss`,
+  preloaded by the HUD; a disc with the initial if missing), a framed red bar with "life/max" and a pale damage
+  chunk that holds 0.4 s, then slides down; it fades in on arrival. `EventProgressPanel` (EventBar region) follows
+  `EventDirector.LatestInvasion` (latest event with a kill goal) with its `StatusIcons` icon, name and
+  `EventDirector.Progress(a)` (kills over `GoalOf`) as "NN%", and holds its last value 3 s after the event ends, then
+  fades. Their `Active` flags feed `UiState.BossBar/EventBar`. Probes `ui.bossbar`, `ui.bossbar_fill`,
+  `ui.eventbar`, `ui.eventbar_percent`.
+* **Death messages and the death screen** — every hurt records `PlayerEntity.LastHarm` (`Harm(HarmKind, Source,
+  Id)`, Gameplay/Combat/Harm.cs): `NpcSystem.ReportPlayerDamage(player, damage, knock, harm)` takes it from creature
+  contact and walls (`Harm.By(EnemyDef)`: bosses by name, others "a Zombie"), shots (`Projectile.Shooter`, set for
+  creature volleys and brain shots, else the projectile's own name), spikes (`Trap`), lava and drowning
+  (`LiquidEffects`); falls set it in `PlayerController.Fall`, damage over time in `GameWorld.TickPlayer` from
+  `EffectState.DotSource` (the buff dealing the most), and the `kill` command `Other`. On death `GameWorld.PlayerSlain(p,
+  text)` fires next to `PlayerDied` with `DeathMessages.Format(name, harm, deaths − 1)` (Core/Presentation,
+  data/config/deaths.json: lines per kind plus per-source lines such as `on_fire`; picked by death count; `Load`
+  rejects a kind without a line; loaded by the launcher into `GameWorld.Deaths`). `DeathScreen` (game/UI/Hud) dims the
+  view to 55 % over 1 s under "You were slain..." (48 px, `UiTheme.Death`; hardcore: "Name has perished..." and
+  "Hardcore characters do not return."), the cause and "Respawning in N", and fades out on respawn; the cause also goes
+  to the chat log in red. Probes `ui.death_dim`, `ui.death_cause`.
 * **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance

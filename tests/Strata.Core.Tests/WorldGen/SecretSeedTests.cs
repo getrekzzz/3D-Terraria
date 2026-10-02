@@ -120,8 +120,13 @@ public class SecretSeedTests
     [Fact]
     public void ForTheWorthyUnlocksExpertsExtraAccessorySlot()
     {
+        // A Classic For the Worthy world plays as Expert: the Demon Heart can be eaten there and opens its slot.
         using var normal = TestGame.Create();
         using var worthy = TestGame.Create(secret: SecretSeed.ForTheWorthy);
+        normal.Hold("demon_heart", 1, slot: 2);
+        worthy.Hold("demon_heart", 1, slot: 2);
+        Assert.Equal(Strata.Core.Gameplay.Interaction.UseOutcome.Blocked, normal.World.ItemUse.Use(normal.Player, null, true));
+        Assert.Equal(Strata.Core.Gameplay.Interaction.UseOutcome.Consumed, worthy.World.ItemUse.Use(worthy.Player, null, true));
         Assert.Equal(normal.Player.State.Inventory.AccessorySlotsUnlocked + 1, worthy.Player.State.Inventory.AccessorySlotsUnlocked);
     }
 
