@@ -24,6 +24,8 @@ spawn fire_imp 1
 spawn lava_slime 1
 spawn hellbat 1
 assert npcs.count >= 15
+wait_until assets.pending == 0 60
+assert assets.loaded > 10
 heal
 wait 3
 assert npcs.hornet == 1
@@ -58,6 +60,7 @@ spawn wyvern 1
 spawn goblin_warrior 1
 spawn pirate_captain 1
 wait 1
+wait_until assets.pending == 0 60
 assert props.problems == 0
 assert errors == 0
 killall

@@ -8,6 +8,7 @@ public static partial class WorldLauncher
     /// <summary>The shared prop library, placed tile objects and their colliders.</summary>
     private static (Rendering.PropLibrary Props, TileObjectRenderer Objects) AddWorldObjects(WorldRuntime runtime)
     {
+        runtime.AddChild(new Rendering.AssetPump { Name = "AssetPump" }); // threaded model loads (Rendering.AssetCache)
         var objectColliders = new ObjectColliders { Name = "ObjectColliders" };
         runtime.AddChild(objectColliders);
         objectColliders.Initialize(runtime);

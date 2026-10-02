@@ -82,6 +82,14 @@ spawn zombie 5
 spawn demon_eye 3
 wait 2.0
 assert perf.calls.gd.npcs.create > 0
+# Kinds never seen before load on loader threads (P1b-13): they show up once the cache has them, none fails.
+spawn skeleton 1
+spawn hornet 1
+spawn goblin_warrior 1
+wait_until assets.pending == 0 60
+wait 0.5
+assert assets.loaded >= 5
+assert props.problems == 0
 
 perf report 40
 perf spikes 10

@@ -31,7 +31,7 @@ public sealed partial class PlayerAvatar : Node3D
         InitializeArmor();
         var look = controller.Entity.State.Look;
         var model = $"assets/models/creatures/{look.ModelId}.glb";
-        _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props, aim: true);
+        _visual = CreatureVisual.Create(ResourceLoader.Exists("res://" + model) ? model : "assets/models/creatures/player.glb", props, aim: true, now: true);
         if (_visual == null) return;
         AddChild(_visual);
         if (ResourceLoader.Exists("res://" + model)) _visual.SetAppearance(look);

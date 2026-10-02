@@ -147,6 +147,17 @@ the last draw instead, i.e. the main thread's own work, and the summary says "fr
   Lavapipe timings only compare with other lavapipe runs (they also share the CPU with the software rasteriser, and
   physics runs its 8-step catch-up every frame). The W0 baseline, before any lag fix, is `docs/perf/perf-before.txt`.
 
+## Threaded asset loading
+`game/Rendering/AssetCache.cs` loads creature models, animation sets and prop models on Godot's loader threads
+(`ResourceLoader.LoadThreadedRequest`); `AssetPump` (added by the world launcher, process priority -100) moves up to
+four finished loads per frame into a strong-reference cache. Everything else stays on the main thread: the loader only
+parses resources, nodes are instantiated by callers (timer `assets.instantiate`). `CreatureVisual.Create` returns null
+while a model or its animation set is pending (creature and town renderers retry every frame), projectiles show their
+glow fallback until a model is ready, and `PropLibrary.TryModel` reports Pending without caching a null. The player's
+own body, held items, armour, hair and the menu preview load synchronously (`LoadNow`, `PropLibrary.Model`), which
+also finishes a pending request. Missing files are cached and reported once. Probes: `assets.pending`,
+`assets.loaded`; smoke scripts that assert on fresh creature visuals first `wait_until assets.pending == 0 60`.
+
 ## Global shader parameters (`project.godot`)
 `strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,
 `strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`.

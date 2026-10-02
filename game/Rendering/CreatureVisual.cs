@@ -20,21 +20,35 @@ public sealed partial class CreatureVisual : Node3D
     /// <summary>Set for generated humans with an animation set (see <see cref="HumanAnimations"/>).</summary>
     public HumanoidAnimator? Humanoid { get; private set; }
 
-    /// <summary>Loads a creature model; returns null (and records a problem) if the file is missing.</summary>
+    /// <summary>
+    /// Instantiates a creature model; returns null (recording a problem once) if the file is missing, and null while
+    /// the model or its animation set is still loading on a loader thread (callers retry on a later frame).
+    /// </summary>
     /// <param name="aim">Give a human an <see cref="AimModifier"/> (the player's body).</param>
-    public static CreatureVisual? Create(string projectPath, PropLibrary props, bool aim = false)
+    /// <param name="now">Load synchronously instead (the player's body, menus): never returns null while pending.</param>
+    public static CreatureVisual? Create(string projectPath, PropLibrary props, bool aim = false, bool now = false)
     {
         var path = "res://" + projectPath;
-        if (!ResourceLoader.Exists(path))
+        PackedScene? packed;
+        if (now) packed = AssetCache.LoadNow<PackedScene>(path);
+        else
         {
-            props.Problems.Add($"missing creature model {path}");
+            var state = AssetCache.TryGet(path, out packed);
+            // Request the animation set alongside the model so both load in parallel.
+            var anims = HumanAnimations.TryFor(projectPath, now: false, out _);
+            if (state == AssetState.Pending || (state == AssetState.Ready && anims == AssetState.Pending)) return null;
+        }
+        if (packed == null)
+        {
+            props.Report($"missing creature model {path}");
             return null;
         }
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("assets.instantiate");
         var visual = new CreatureVisual { Name = "Visual" };
-        var scene = GD.Load<PackedScene>(path).Instantiate<Node3D>();
+        var scene = packed.Instantiate<Node3D>();
         visual.AddChild(scene);
         visual.Setup(scene, props, scene.Transform);
-        if (visual.Skeleton is { } skeleton && HumanAnimations.For(projectPath) is { } library)
+        if (visual.Skeleton is { } skeleton && HumanAnimations.TryFor(projectPath, now: true, out var set) == AssetState.Ready && set is { } library)
         {
             // The set's tracks address the armature by one shared name.
             if (skeleton.GetParent() is Node3D armature && armature != scene) armature.Name = HumanoidAnimator.Rig;
