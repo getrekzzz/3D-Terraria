@@ -147,6 +147,12 @@ public sealed class AnglerQuestConditionParams : SpecParams
 }
 
 /// <summary>The seasonal event running is <see cref="Is"/> ("halloween", "christmas", or "none").</summary>
+/// <summary>True in worlds created with this secret seed ("for_the_worthy", "drunk_world", "celebration", …).</summary>
+public sealed class SecretSeedConditionParams : SpecParams
+{
+    public string Is { get; init; } = "";
+}
+
 public sealed class SeasonConditionParams : SpecParams
 {
     public string Is { get; init; } = "";

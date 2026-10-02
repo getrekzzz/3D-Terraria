@@ -348,6 +348,16 @@
   at Christmas) with seasonal vanity, candy and decorations inside. Santa Claus moves in at Christmas once the Frost
   Legion is beaten and leaves when it ends; `TownRenderer.Hats` puts witch or Santa hats on the other residents (shared
   procedural meshes on the head bone, toggled on season change).
+* **Secret seeds** (X-07) — `World.SecretSeeds.Parse` recognises Terraria's special seed names (any case, spaces and
+  punctuation ignored; "get fixed boi" sets all) into `WorldSettings.Secret` (`SecretSeed` flags, saved as
+  `WorldMeta.Secrets` ids). Generation reads `Plan.Settings.Has(…)`, so ordinary seeds generate exactly as before:
+  Drunk World alternates Corruption and Crimson regions (at least one of each) and both altars; Not the Bees makes the
+  jungle 1.5× wider with 4× the hives; No Traps multiplies the Dungeon halls' dart-trap chance by 6. Gameplay: For the
+  Worthy plays one difficulty step harder (`WorldSettings.EffectiveDifficulty` drives enemy scaling, defense factors and
+  `ConditionContext.Difficulty`); The Constant dims sky light (`EnvironmentController.Dim`); Celebration lets the Party
+  start without the Party Girl (`secretSeed` condition). Don't Dig Up is recognised and saved only (no upside-down
+  generation yet). The menu picks a random number for a secret name and lists found secret seeds under the seed field
+  (`UserSettings.DiscoveredSeeds`); `--secret=` for dev starts and `worldgen-report`.
 * **Enemy banners** — `Banners.BannerSystem` (`GameWorld.Banners`): kills of a banner's creatures (`TileObjectDef.Banner`)
   are tallied world-wide in `Session.Counters["banner:<id>"]` (statue creatures, parts and bosses never count) and every
   `killsPerBanner` (50) drops the banner. Every `refreshTicks` it rescans each player's surroundings (`radius` cells) for

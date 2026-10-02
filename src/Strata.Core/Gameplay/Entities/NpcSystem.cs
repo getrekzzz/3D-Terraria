@@ -79,7 +79,7 @@ public sealed partial class NpcSystem
             Pull = Pull,
             Bands = world.Session.Generator.Plan.Bands,
         };
-        _ctx.Expert = world.Session.Settings.Difficulty is World.Difficulty.Expert or World.Difficulty.Master;
+        _ctx.Expert = world.Session.Settings.EffectiveDifficulty is World.Difficulty.Expert or World.Difficulty.Master;
     }
 
     public IReadOnlyList<Npc> All => _npcs;
@@ -88,7 +88,7 @@ public sealed partial class NpcSystem
     internal BrainContext Context => _ctx;
 
     /// <summary>Creature life and damage multiplier of the world's difficulty.</summary>
-    public float Scale => DamageModel.EnemyScale(_world.Session.Settings.Difficulty);
+    public float Scale => DamageModel.EnemyScale(_world.Session.Settings.EffectiveDifficulty);
 
     public event Action<Npc>? Spawned;
     public event Action<Npc>? Removed;
@@ -177,7 +177,7 @@ public sealed partial class NpcSystem
         const float dt = 1f / Units.TicksPerSecond;
         var session = _world.Session;
         _ctx.IsDay = session.Clock.IsDay;
-        _ctx.Expert = session.Settings.Difficulty is World.Difficulty.Expert or World.Difficulty.Master;
+        _ctx.Expert = session.Settings.EffectiveDifficulty is World.Difficulty.Expert or World.Difficulty.Master;
         for (int i = _npcs.Count - 1; i >= 0; i--)
         {
             var npc = _npcs[i];

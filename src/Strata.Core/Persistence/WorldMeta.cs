@@ -22,6 +22,9 @@ public sealed class WorldMeta
     public Difficulty Difficulty { get; set; }
     public EvilKind Evil { get; set; }
 
+    /// <summary>Secret seed ids (X-07), absent for ordinary worlds.</summary>
+    public List<string>? Secrets { get; set; }
+
     /// <summary>World generator version that produced unmodified regions.</summary>
     public int GeneratorVersion { get; set; }
 
@@ -99,7 +102,8 @@ public sealed class WorldMeta
         public Dictionary<string, JsonElement>? Extra { get; set; }
     }
 
-    public WorldSettings ToSettings() => new() { Name = Name, Seed = Seed, Size = Size, Difficulty = Difficulty, Evil = Evil };
+    public WorldSettings ToSettings() =>
+        new() { Name = Name, Seed = Seed, Size = Size, Difficulty = Difficulty, Evil = Evil, Secret = SecretSeeds.FromIds(Secrets) };
 
     public WorldIdTables CreateIdTables() => new()
     {

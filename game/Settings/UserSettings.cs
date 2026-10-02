@@ -40,6 +40,9 @@ public sealed class UserSettings
     /// <summary>Red screen edges when hurt (strongest in first person).</summary>
     public bool HurtFlash { get; set; } = true;
 
+    /// <summary>Secret world seeds the player has used (shown as a hint on the world creation screen).</summary>
+    public System.Collections.Generic.List<string> DiscoveredSeeds { get; set; } = new();
+
     // Display
     public string WindowMode { get; set; } = "windowed";
     public bool VSync { get; set; } = true;

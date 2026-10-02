@@ -125,7 +125,13 @@ public static class ConditionCompiler
         ["evil"] = s =>
         {
             var p = s.Parse<EvilConditionParams>();
-            return new DelegateCondition(c => string.Equals(c.Evil, p.Is, StringComparison.OrdinalIgnoreCase));
+            // A Drunk World has both evils ("both").
+            return new DelegateCondition(c => c.Evil == "both" || string.Equals(c.Evil, p.Is, StringComparison.OrdinalIgnoreCase));
+        },
+        ["secretSeed"] = s =>
+        {
+            var flag = World.SecretSeeds.FromId(s.Parse<SecretSeedConditionParams>().Is);
+            return new DelegateCondition(c => flag != World.SecretSeed.None && (c.SecretSeeds & flag) != 0);
         },
         ["weather"] = s =>
         {
@@ -207,6 +213,7 @@ public static class ConditionCompiler
         c.Register<ExpertConditionParams>(SpecKind.Condition, "expert");
         c.Register<RangeConditionParams>(SpecKind.Condition, "defense");
         c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
+        c.Register<SecretSeedConditionParams>(SpecKind.Condition, "secretSeed");
         c.Register<RangeConditionParams>(SpecKind.Condition, "worldRing");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");

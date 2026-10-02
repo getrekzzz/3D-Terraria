@@ -37,14 +37,14 @@ public sealed partial class EnvironmentController
         float sunPeak = Mathf.Max(sunT.X, Mathf.Max(sunT.Y, sunT.Z));
         _sun.Visible = sunDir.Y > -0.02f && sunPeak > 0.002f;
         _sun.LightColor = sunPeak > 0f ? new Color(sunT.X / sunPeak, sunT.Y / sunPeak, sunT.Z / sunPeak) : Colors.Black;
-        _sun.LightEnergy = SunEnergy * sunPeak * Mathf.SmoothStep(-0.02f, 0.04f, sunDir.Y) * SunThroughClouds;
+        _sun.LightEnergy = SunEnergy * sunPeak * Mathf.SmoothStep(-0.02f, 0.04f, sunDir.Y) * SunThroughClouds * Dim;
         float phaseLight = Mathf.Abs(clock.MoonPhase - 4) / 4f; // phase 0 is the full moon (1), phase 4 the new moon (0)
         var moonT = Atmosphere.Transmittance(moonDir);
         float moonPeak = Mathf.Max(moonT.X, Mathf.Max(moonT.Y, moonT.Z));
         _moon.Visible = moonDir.Y > 0f && Daylight < 0.5f;
         if (_moon.ShadowEnabled == _sun.Visible) _moon.ShadowEnabled = !_sun.Visible; // one shadow-casting sky light at a time (dusk and dawn overlap)
         _moon.LightColor = new Color(0.66f, 0.76f, 1f);
-        _moon.LightEnergy = MoonEnergy * Mathf.Lerp(0.2f, 1f, phaseLight) * moonPeak * (1f - Daylight) * SunThroughClouds;
+        _moon.LightEnergy = MoonEnergy * Mathf.Lerp(0.2f, 1f, phaseLight) * moonPeak * (1f - Daylight) * SunThroughClouds * Dim * Dim;
 
         _eventBlend = Mathf.MoveToward(_eventBlend, EventTint.HasValue ? 1f : 0f, dt * 0.3f);
         var eventTint = Colors.White.Lerp(EventTint ?? Colors.White, _eventBlend);
@@ -80,11 +80,11 @@ public sealed partial class EnvironmentController
         _env.AdjustmentSaturation = Mathf.Lerp(0.85f, 1.22f, Daylight);
         _env.AdjustmentBrightness = Mathf.Clamp(Settings.UserSettings.Current.Brightness, 0.5f, 2f) * (1f + Flash * 0.35f);
         // Night keeps a floor under the moonlit sky so shapes and creatures stay readable.
-        _env.AmbientLightColor = new Color(0.08f, 0.1f, 0.17f);
+        _env.AmbientLightColor = new Color(0.08f, 0.1f, 0.17f) * Dim * Dim;
         _env.AmbientLightSkyContribution = Mathf.Lerp(0.6f, 1f, Daylight);
 
         var ambient = new Color(_skyIrradiance.X, _skyIrradiance.Y, _skyIrradiance.Z) + new Color(0.045f, 0.06f, 0.1f);
-        ambient *= Colors.White.Lerp(eventTint, 0.45f) * Colors.White.Lerp(_biomeAmbient, 0.5f) * Mathf.Lerp(1f, 0.72f, Overcast);
+        ambient *= Colors.White.Lerp(eventTint, 0.45f) * Colors.White.Lerp(_biomeAmbient, 0.5f) * Mathf.Lerp(1f, 0.72f, Overcast) * Mathf.Lerp(Dim * Dim, Dim, Daylight);
         RenderingServer.GlobalShaderParameterSet("strata_sky_ambient", ambient);
         RenderingServer.GlobalShaderParameterSet("strata_daylight", Daylight);
         RenderingServer.GlobalShaderParameterSet("strata_time", _time);

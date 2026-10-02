@@ -111,6 +111,7 @@ public partial class GameRoot : Node
             {
                 Name = name, Seed = args.Long("seed", 1234),
                 Size = System.Enum.Parse<WorldSizePreset>(args.Get("size") ?? "small", ignoreCase: true),
+                Secret = SecretSeeds.Parse(args.Get("secret") ?? ""), // --secret="drunk world" (X-07)
             },
             ForceNew = args.Flag("new"),
             PlayerName = args.Get("player") ?? "Wanderer",

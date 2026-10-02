@@ -64,7 +64,7 @@ public static partial class DungeonDecorator
                     d.Cobweb(HallBox(hall, k, side, hall.Height - 2, 2, 2, 2));
 
         if (hall.Length >= 20 && d.Rng.Chance(SpikeStripChance)) SpikeStrip(d, hall);
-        else if (hall.Length >= 16 && d.Rng.Chance(TrapChance)) DartTrap(d, hall);
+        else if (hall.Length >= 16 && d.Rng.Chance(MathF.Min(1f, TrapChance * d.TrapScale))) DartTrap(d, hall);
     }
 
     private static readonly int[] Sides = { -1, 1 };

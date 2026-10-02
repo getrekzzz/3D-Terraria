@@ -38,10 +38,10 @@ public sealed class TestGame : IDisposable
     public Strata.Core.Content.ContentDatabase Content => World.Session.Content;
 
     public static TestGame Create(string? saveDir = null, long seed = 42, Difficulty difficulty = Difficulty.Classic, ContentDatabase? content = null,
-        WorldSizePreset size = WorldSizePreset.Tiny)
+        WorldSizePreset size = WorldSizePreset.Tiny, SecretSeed secret = SecretSeed.None)
     {
         var log = new MemoryLog();
-        var settings = new WorldSettings { Name = "test", Seed = seed, Size = size, Difficulty = difficulty };
+        var settings = new WorldSettings { Name = "test", Seed = seed, Size = size, Difficulty = difficulty, Secret = secret };
         var session = WorldSession.Create(content ?? TestPaths.Content, settings, saveDir, content == null ? Tables : new RenderTables(content, _ => 0), log);
         session.Seasons.Clock = () => new DateTime(2026, 6, 1); // no seasonal event unless a test forces one
         var world = new GameWorld(session, new StreamingSettings { MeshRadius = 1, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1 }, 1, saveDir == null ? null : Path.Combine(saveDir, "players"));

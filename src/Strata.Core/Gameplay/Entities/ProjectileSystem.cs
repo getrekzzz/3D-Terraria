@@ -230,7 +230,7 @@ public sealed partial class ProjectileSystem
     {
         var state = player.State;
         var hit = Combat.DamageModel.Roll(damage, DamageClass.None, 0, knockback, null, state.Defense,
-            Combat.DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
+            Combat.DamageModel.DefenseFactor(_world.Session.Settings.EffectiveDifficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
         if (!state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return false;
         float stand = 1f - Math.Clamp(state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), 0f, 1f);

@@ -38,6 +38,7 @@ public sealed class WorldgenReportCommand : IToolCommand
             Seed = context.Options.Long("seed", 1234),
             Size = Enum.Parse<WorldSizePreset>(context.Options.Get("size") ?? "tiny", ignoreCase: true),
             Evil = context.Options.Get("evil") == "crimson" ? EvilKind.Crimson : EvilKind.Corruption,
+            Secret = SecretSeeds.Parse(context.Options.Get("secret") ?? ""),
         };
         var outDir = Path.GetFullPath(context.Options.Get("out") ?? context.PathOf("build/worldgen"));
         int terrainWindow = context.Options.Int("terrain-window", 512);

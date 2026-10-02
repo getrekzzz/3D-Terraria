@@ -98,6 +98,7 @@ public sealed partial class WorldSession
             Size = settings.Size,
             Difficulty = settings.Difficulty,
             Evil = settings.Evil,
+            Secrets = settings.Secret == SecretSeed.None ? null : SecretSeeds.Ids(settings.Secret),
             GeneratorVersion = GenVersion.Current,
             CreatedUtc = DateTime.UtcNow,
             LastPlayedUtc = DateTime.UtcNow,

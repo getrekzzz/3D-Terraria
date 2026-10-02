@@ -70,6 +70,9 @@ public sealed class ConditionContext
     /// <summary>The seasonal event running ("halloween", "christmas"; "" for none).</summary>
     public string Season { get; set; } = "";
 
+    /// <summary>The world's secret seed twists (X-07).</summary>
+    public World.SecretSeed SecretSeeds { get; set; }
+
     /// <summary>Fishing power of the rod making a catch (fishing loot only).</summary>
     public int FishingPower { get; set; }
 
