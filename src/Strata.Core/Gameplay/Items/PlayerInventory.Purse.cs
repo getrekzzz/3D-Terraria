@@ -15,11 +15,13 @@ public sealed partial class PlayerInventory
 
     /// <summary>
     /// Picks up a stack and returns what did not fit: coins go to the coin slots (and convert), ammunition to the ammo
-    /// slots, everything else (and whatever those slots cannot take) to the backpack, hotbar first.
+    /// slots, everything else (and whatever those slots cannot take) to the backpack, hotbar first. Pickups (Hearts,
+    /// Stars) are never stored: they come back whole for the caller to apply (GameWorld.ApplyPickup).
     /// </summary>
     public ItemStack Pickup(ItemStack stack)
     {
         if (stack.IsEmpty) return ItemStack.Empty;
+        if (stack.Item!.Pickup != null) return stack;
         if (CoinMath.IsCoin(stack)) stack = PickupCoins(stack);
         else if (FitsAmmoSlot(stack.Item!)) stack = Ammo.Add(stack);
         return Backpack.Add(stack);
@@ -31,8 +33,12 @@ public sealed partial class PlayerInventory
     /// </summary>
     public static bool FitsAmmoSlot(ItemDef item) => item.AmmoClass != null && item.Category == ItemCategory.Ammo;
 
-    /// <summary>Would <see cref="Pickup"/> take the whole stack? (Coins turning into fewer coins only make more room.)</summary>
-    public bool CanTake(ItemStack stack) => CanTake(Backpack, Coins, Ammo, stack);
+    /// <summary>
+    /// Would <see cref="Pickup"/> take the whole stack? Coins also fit when the coin slots, laid out again as the fewest
+    /// coins with the new ones added, have room (four slots of 100 copper are one silver).
+    /// </summary>
+    public bool CanTake(ItemStack stack) =>
+        CanTake(Backpack, Coins, Ammo, stack) || (Content != null && CoinMath.IsCoin(stack) && CoinMath.FitsWhenTidy(Coins, stack));
 
     /// <summary><see cref="CanTake(ItemStack)"/> over stand-in storages (a crafting trial's copies).</summary>
     internal static bool CanTake(Inventory backpack, Inventory coins, Inventory ammo, ItemStack stack)

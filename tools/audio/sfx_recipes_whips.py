@@ -1,21 +1,9 @@
-"""Whips (P3-15): the lash swinging up (whip_swing: a rising airy swish) and its tip breaking the sound barrier
-(whip_crack: a sharp, bright snap with a short slap of air behind it). Merged into sfx_recipes.RECIPES."""
+"""Whips (P3-15): the lash's tip breaking the sound barrier (whip_crack: a sharp, bright snap with a short slap of
+air behind it). The swing-up whoosh, whip_swing, is sfx_recipes_items' (P3-27). Merged into sfx_recipes.RECIPES."""
 import numpy as np
 
 from sfx_recipes import S, _noise
-from synth import bandpass, decay, highpass, mix, samples, seconds
-
-
-def whip_swing(rng):
-    """A rising swish: band-passed air whose band climbs as the lash speeds up."""
-    dur = 0.32
-    n = samples(dur, S)
-    t = seconds(n, S)
-    env = np.sin(np.pi * np.clip(t / dur, 0, 1)) ** 1.5
-    lo = bandpass(_noise(dur, rng), 400, 1600, S)
-    hi = bandpass(_noise(dur, rng), 1500, 5000, S)
-    k = t / dur
-    return (lo * (1 - k) + hi * k) * env * 0.9
+from synth import bandpass, decay, highpass, mix, samples
 
 
 def whip_crack(rng):
@@ -28,6 +16,6 @@ def whip_crack(rng):
     return mix(snap, ring, slap)
 
 
-RECIPES = {"whip_swing": (whip_swing, 2), "whip_crack": (whip_crack, 3)}
+RECIPES = {"whip_crack": (whip_crack, 3)}
 
-GAIN = {"whip_swing": 0.45, "whip_crack": 0.7}
+GAIN = {"whip_crack": 0.7}

@@ -18,6 +18,27 @@ public static partial class Coins
         IsTidy(inv.Coins) || Layout(inv, content, Total(inv.Coins), null);
 
     /// <summary>
+    /// Whether the coin slots hold their coins plus <paramref name="stack"/> once laid out as the fewest coins: one slot
+    /// per denomination (platinum by its stack limit) among the empty and coin slots. Allocates nothing.
+    /// </summary>
+    public static bool FitsWhenTidy(Inventory slots, ItemStack stack)
+    {
+        if (!IsCoin(stack)) return false;
+        long copper = Total(slots) + (long)stack.Item!.Value * stack.Count;
+        int usable = 0;
+        for (int i = 0; i < slots.Size; i++)
+            if (slots[i].IsEmpty || IsCoin(slots[i])) usable++;
+        long needed = 0;
+        for (int t = 0; t < Ids.Length; t++)
+        {
+            long n = copper / Values[t];
+            copper -= n * Values[t];
+            if (n > 0) needed += t == 0 ? (n + ItemDef.CommonMaxStack - 1) / ItemDef.CommonMaxStack : 1;
+        }
+        return needed <= usable;
+    }
+
+    /// <summary>
     /// Each denomination in one slot at most, and fewer than 100 of all but platinum: laying out again would change
     /// nothing. Checked without allocating, since a full inventory standing on coins retries the pickup every tick.
     /// </summary>

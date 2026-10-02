@@ -118,6 +118,7 @@ public sealed partial class PlayerAvatar
             aimMod.Pitch = entity.Alive ? Mathf.Atan2(aim.Y, new Vector2(aim.X, aim.Z).Length()) : 0f;
             aimMod.ArmAim = h.Action != null || looped != null ? _actionArmAim : RestArmAim;
         }
+        UpdateSleep(entity, h, dt);
     }
 
     /// <summary>
@@ -146,6 +147,7 @@ public sealed partial class PlayerAvatar
     {
         rate = 1f;
         if (!entity.Alive) return "death";
+        if (entity.Sleeping) return h.Has("sleep") ? "sleep" : "idle"; // in a bed (PlayerAvatar.Sleep.cs)
         if (entity.Mount != null) return h.Has("sit") ? "sit" : "idle"; // in the saddle (PlayerAvatar.Mount.cs)
         if (entity.Minecart != null) return "idle"; // standing in the cart (the body is moved along the track)
         if (_controller.Swimming)

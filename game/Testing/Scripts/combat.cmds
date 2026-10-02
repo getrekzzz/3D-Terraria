@@ -427,17 +427,21 @@ press use_primary on
 wait 0.6
 assert projectiles.count == 1
 assert projectiles.strings == 1
+# The yoyo is on its string, not in the fist too: the held model hides while it is out, and is back once it is home.
+assert avatar.held_hidden == 1
 wait 1.5
 press use_primary off
 wait 2
 assert projectiles.count == 0
 assert npcs.zombie == 0
+assert avatar.held_hidden == 0
 # Whip lashes are drawn and crack (P3-15).
 give leather_whip 1
 wield leather_whip
 use
 wait 0.2
 assert whips.drawn == 1
+assert avatar.held_hidden == 1
 wait 0.6
 assert whips.cracks >= 1
 # Flails (P3-13): whirled on the chain while held, flung when let go, reeled back in.
@@ -447,9 +451,17 @@ press use_primary on
 wait 0.5
 assert projectiles.count == 1
 assert projectiles.strings == 1
+assert avatar.held_hidden == 1
+# ...and in first person too, back in hand once the flail is reeled in.
+camera first
+wait 0.1
+assert view.held_hidden == 1
 press use_primary off
 wait 3
 assert projectiles.count == 0
+assert avatar.held_hidden == 0
+assert view.held_hidden == 0
+camera third
 # Projectile views are pooled (P1b-15): forty sparks in volleys reuse the views of the ones that burned out, and the
 # glowing ones near the camera share the preset's few lights. Shots leave the held wand's tip (P3-10).
 give wand_of_sparking 1
@@ -474,6 +486,24 @@ assert fx.muzzle_flashes >= 1
 assert projectiles.pooled >= 1
 ai on
 killall
+assert errors == 0
+# --- P3-27 ---
+# Sound voices: the Crystal Storm fires every 7 ticks and each shot's zap rings for 0.6 s, so a held burst would play
+# more of one sound than an id may hold (3): the oldest is stolen, and no pool ever sounds more voices than it has.
+clear
+heal
+give crystal_storm 1
+wield crystal_storm
+aim 0 0 1
+wait 1
+audio reset
+assert sfx.stolen == 0
+hold use_primary 0.6
+probe sfx.peak
+probe sfx.stolen
+assert sfx.stolen >= 1
+assert sfx.peak <= sfx.cap
+assert sfx.voices <= 48
 assert errors == 0
 # --- P3-29 ---
 # Hearts: a slime slain while hurt drops a Heart that flies in, heals 20 and takes no slot.

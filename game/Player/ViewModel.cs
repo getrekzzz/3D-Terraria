@@ -59,7 +59,7 @@ public sealed partial class ViewModel : Node3D
         float dt = (float)delta;
         UpdateItem(entity.State.Inventory.Held.Item);
         RefreshAmmo(entity, dt);
-        Visible = _controller.Rig.FirstPerson && entity.Alive;
+        Visible = _controller.Rig.FirstPerson && entity.Alive && !entity.Sleeping; // nothing in hand in bed (P3-34)
         if (!Visible)
         {
             // Out of view: the next time it shows, a use in progress is picked up at its phase and eased into.
@@ -70,6 +70,7 @@ public sealed partial class ViewModel : Node3D
             return;
         }
         if (_model == null) return;
+        _model.Visible = !HeldTether.Out(_game, entity); // the yoyo, flail or whip is out of the hand (HeldTether)
 
         var v = _controller.Velocity;
         float speed = new Vector2(v.X, v.Z).Length();

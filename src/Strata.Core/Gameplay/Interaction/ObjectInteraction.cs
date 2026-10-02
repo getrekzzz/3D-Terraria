@@ -23,6 +23,12 @@ public enum InteractOutcome
     /// <summary>A lever or switch was flipped (its wires carried the signal).</summary>
     Switched,
 
+    /// <summary>A bed set the spawn point and the player lay down in it (P3-34).</summary>
+    Slept,
+
+    /// <summary>The player got up from the bed they were sleeping in.</summary>
+    Woke,
+
     /// <summary>What looked like a chest (or a lost girl) was a disguised creature, and it woke.</summary>
     Unmasked,
 
@@ -88,8 +94,9 @@ public sealed partial class ObjectInteraction
                 ContainerOpened?.Invoke(p, obj, storage);
                 return InteractOutcome.ContainerOpened;
             case TileInteraction.Sleep:
+                if (p.SleepBed == obj) return _world.Wake(p) ? InteractOutcome.Woke : InteractOutcome.None;
                 p.State.SpawnPoints[_world.Session.Settings.Name] = new[] { obj.Anchor.X, obj.Anchor.Y + obj.Footprint.Y, obj.Anchor.Z };
-                return InteractOutcome.SpawnSet;
+                return _world.Sleep(p, obj) ? InteractOutcome.Slept : InteractOutcome.SpawnSet;
             case TileInteraction.Sit:
                 return InteractOutcome.Seated;
             case TileInteraction.Read:

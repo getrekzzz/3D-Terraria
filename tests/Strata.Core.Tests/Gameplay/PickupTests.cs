@@ -116,4 +116,43 @@ public class PickupTests
         g.World.Npcs.Kill(boss);
         Assert.InRange(Count(g, GameWorld.HeartItem), 5, 9);
     }
+
+    [Fact]
+    public void AFullBackpackStillCollectsCoinsThatFitOnceTidied()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        var inv = g.Player.State.Inventory;
+        inv.Content ??= g.Content;
+        var stone = g.Content.Items.Get("stone");
+        for (int i = 0; i < inv.Backpack.Size; i++) inv.Backpack[i] = new ItemStack(stone, stone.MaxStack);
+        var copper = g.Content.Items.Get("copper_coin");
+        for (int i = 0; i < inv.Coins.Size; i++) inv.Coins[i] = new ItemStack(copper, copper.MaxStack); // untidy: 400 copper
+        var coin = new ItemStack(copper, 5);
+        Assert.True(inv.CanTake(coin));
+        Assert.True(GameWorld.CanCollect(g.Player, coin));
+        g.World.Drops.Spawn(coin, g.Player.Center + new Vector3(1.5f, 0, 0), Vector3.Zero, pickupDelay: 0);
+        g.Ticks(120);
+        Assert.Equal(0, Count(g, "copper_coin"));
+        Assert.Equal(405, Strata.Core.Gameplay.Items.Coins.Total(inv.Coins));
+        Assert.False(inv.CanTake(new ItemStack(g.Content.Items.Get("dirt"), 1)));
+    }
+
+    [Fact]
+    public void PickupsAreAppliedNeverStored()
+    {
+        using var g = TestGame.Create();
+        var inv = g.Player.State.Inventory;
+        var heart = g.Content.Items.Get(GameWorld.HeartItem);
+        var stack = new ItemStack(heart, 1);
+        Assert.Equal(stack, inv.Pickup(stack)); // comes back whole
+        Assert.Equal(0, inv.Backpack.Count(heart));
+        var v = g.Player.State.Vitals;
+        v.Life = 30;
+        var r = Strata.Core.Commands.BuiltinCommands.CreateRegistry();
+        var ctx = new Strata.Core.Commands.CommandContext(g.World, new Strata.Core.Commands.HeadlessCommandHost()) { Registry = r };
+        Assert.True(r.Execute(ctx, "give heart 2").Ok);
+        Assert.Equal(0, inv.Backpack.Count(heart));
+        Assert.Equal(70, v.Life);
+    }
 }

@@ -230,4 +230,32 @@ assert ui.housing_room_banners > 0
 ui housing_query 8 1 0
 ui close
 assert ui.housing_open == 0
+
+# --- P3-34 ---
+# A bed sets the spawn and lays the player down; asleep, with nothing near, night passes five times as fast.
+killall
+time 22
+place bed -6 0 -2
+interact -5 0 0
+wait 0.2
+assert player.sleeping == 1
+assert time.scale == 5
+wait 10
+assert time.hour > 22.6
+assert player.sleeping == 1
+# Moving gets the player up, and time runs at its normal rate again.
+hold move_forward 0.2
+wait 0.2
+assert player.sleeping == 0
+assert time.scale == 1
+# Lying down again: a creature nearby keeps time normal, and its hit wakes the sleeper.
+interact nearest bed 8 slept
+wait 0.2
+assert player.sleeping == 1
+spawn zombie 1 2
+wait 0.1
+assert time.scale == 1
+wait_until player.sleeping == 0 10
+killall
+time noon
 assert errors == 0

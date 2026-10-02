@@ -33,6 +33,13 @@ public sealed class UseStyleEntry
     /// <summary>How the style is held and moved in first person (P3-07); null = a plain lift from the default rest.</summary>
     public FpStyle? Fp { get; init; }
 
+    /// <summary>The sound a use of this style makes when the item names no soundSet of its own (P3-27); null = the
+    /// engine's fallback by ammo and damage class.</summary>
+    public string? Sound { get; init; }
+
+    /// <summary>The sound of a heavy item of this style (slow guns and rockets, costly spells); null = <see cref="Sound"/>.</summary>
+    public string? HeavySound { get; init; }
+
     /// <summary>Shots flash at the muzzle with a wisp of smoke and a brief light (guns, P3-10).</summary>
     public bool MuzzleFlash { get; init; }
 
@@ -43,6 +50,8 @@ public sealed class UseStyleEntry
     {
         if (string.IsNullOrWhiteSpace(Clip)) yield return "clip must not be empty";
         if (ToolClip is { } tool && string.IsNullOrWhiteSpace(tool)) yield return "toolClip must not be empty";
+        if (Sound is { } sound && string.IsNullOrWhiteSpace(sound)) yield return "sound must not be empty";
+        if (HeavySound is { } heavy && string.IsNullOrWhiteSpace(heavy)) yield return "heavySound must not be empty";
         if (ArmAim is < 0f or > 1f) yield return "armAim must be within 0–1";
         if (Hand is { } hand)
         {

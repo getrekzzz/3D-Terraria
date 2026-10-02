@@ -155,4 +155,17 @@ release use_primary
 wait 1.5
 assert player.hold_clip == 0
 assert anim.missing_clips == 0
+# --- P3-36 ---
+# 3D drops: a sword and coins spin as their models, dirt as a block cube, a Fallen Star glows with a halo and may
+# claim a light; no model is missing.
+drop copper_broadsword 1 0 0 2
+drop gold_coin 5 1 0 2
+drop dirt 3 -1 0 2
+drop fallen_star 1 2 0 2
+wait_until dropvis.models >= 3 5
+assert dropvis.cubes >= 1
+assert dropvis.halos >= 1
+probe dropvis.billboards
+assert dropvis.lit >= 1
+assert props.problems == 0
 assert errors == 0

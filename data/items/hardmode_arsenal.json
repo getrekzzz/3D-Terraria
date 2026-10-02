@@ -18,7 +18,7 @@
       "useAnimation": 12, "reuseDelay": 14, "autoReuse": true, "ammoPerBurst": true, "damage": 19, "damageType": "ranged", "knockback": 1, "useAmmo": "bullet",
       "shootSpeed": 50, "behaviors": [{ "type": "shootProjectile", "spread": 2 }],
       "covers": ["terraria:clockwork_assault_rifle"] },
-    { "id": "laser_rifle", "name": "Laser Rifle", "category": "weapon", "rarity": 4, "value": 100000, "useStyle": "gun", "useTime": 10, "useAnimation": 10, "autoReuse": true,
+    { "id": "laser_rifle", "soundSet": "laser", "name": "Laser Rifle", "category": "weapon", "rarity": 4, "value": 100000, "useStyle": "gun", "useTime": 10, "useAnimation": 10, "autoReuse": true,
       "damage": 38, "damageType": "magic", "manaCost": 8, "projectile": "laser_rifle_beam", "shootSpeed": 45, "covers": ["terraria:laser_rifle"] },
     { "id": "summoner_emblem", "name": "Summoner Emblem", "description": "15% increased summon damage.", "category": "accessory", "rarity": 4, "value": 20000, "equipSlot": "accessory",
       "equipEffects": [{ "type": "stat", "stat": "summonDamage", "add": 0.15 }], "covers": ["terraria:summoner_emblem"] },

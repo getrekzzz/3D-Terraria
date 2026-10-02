@@ -80,9 +80,10 @@ public sealed partial class WhipRenderer : Node3D
             Drawn++;
             if (!_cracked.ContainsKey(lash))
             {
-                // First seen (at a low frame rate maybe a tick or two in): swish unless the crack is already past.
+                // First seen (at a low frame rate maybe a tick or two in): swish unless the crack is already past. The
+                // local player's swing already sounded through its use style (P3-27 whip_swing).
                 _cracked[lash] = false;
-                if (t < CrackT) Sfx.PlayAt("whip_swing", ToGodot(hand) + shift, -4f);
+                if (t < CrackT && p != _game.LocalPlayer) Sfx.PlayAt("whip_swing", ToGodot(hand) + shift, -4f);
             }
             if (t >= CrackT && _cracked.TryGetValue(lash, out bool done) && !done)
             {
