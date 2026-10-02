@@ -32,6 +32,14 @@ public sealed partial class InventoryScreen
         _chestPanel.AddChild(_chestTitle);
         _renameField = new LineEdit { MaxLength = TileObjectInstance.MaxNameLength, Visible = false };
         _renameField.AddThemeFontSizeOverride("font_size", UiFonts.Small);
+        // Without the theme's 4 px padding above and below the text, so the field (as tall as the font's line) grows
+        // less far past the 18 px caption row over the first row of chest slots while a name is typed.
+        foreach (string box in new[] { "normal", "focus" })
+        {
+            var style = (StyleBox)UiTheme.Theme.GetStylebox(box, "LineEdit").Duplicate();
+            style.ContentMarginTop = style.ContentMarginBottom = 0;
+            _renameField.AddThemeStyleboxOverride(box, style);
+        }
         _renameField.FocusEntered += () => InputGate.TextEntry = true;
         _renameField.FocusExited += () =>
         {
