@@ -9,8 +9,8 @@ namespace Strata.Game.Entities;
 
 /// <summary>
 /// Presents creatures: an animated model per creature (pooled by model), smoothed between simulation ticks,
-/// tinted per definition, flashing when hurt, plus a small health readout. Motion on top of the clips (facing,
-/// banking, squash, attacks, deaths): NpcRenderer.Motion.
+/// tinted per definition, flashing when hurt, plus a mini health bar (NpcRenderer.HealthBar). Motion on top of the
+/// clips (facing, banking, squash, attacks, deaths): NpcRenderer.Motion.
 /// </summary>
 public sealed partial class NpcRenderer : Node3D
 {
@@ -18,7 +18,8 @@ public sealed partial class NpcRenderer : Node3D
     {
         public required CreatureVisual Visual;
         public required string Model;
-        public required Label3D Health;
+        public required MeshInstance3D Health;
+        public float BarFraction = -1f;
         public MeshInstance3D? Stalk;
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public readonly List<CreatureVisual> Barrier = new();
@@ -64,6 +65,7 @@ public sealed partial class NpcRenderer : Node3D
         _game = game;
         _props = props;
         Name = "Creatures";
+        InitializeHealthBars();
         game.Npcs.Removed += npc =>
         {
             if (!_views.Remove(npc.Id, out var view)) return;
@@ -71,7 +73,7 @@ public sealed partial class NpcRenderer : Node3D
             foreach (var (seg, model) in view.Segments) Release(seg, model);
             ReleaseArms(npc, view);
             if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
-            view.Health.QueueFree();
+            ReleaseBar(view);
             view.Stalk?.QueueFree();
         };
     }
@@ -108,6 +110,7 @@ public sealed partial class NpcRenderer : Node3D
         float dt = (float)delta;
         var world = _game.Session.World;
         UpdateCorpses(dt);
+        HealthBarsShown = 0;
         if (_prewarm.Count > 0) PrewarmStep();
         foreach (var npc in _game.Npcs.All)
         {
@@ -149,12 +152,7 @@ public sealed partial class NpcRenderer : Node3D
             if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);
             visual.SetTint(tint);
             visual.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, view.Shown + Vector3.Up * 0.5f)));
-            view.Health.Visible = npc.Life < npc.MaxLife;
-            if (view.Health.Visible)
-            {
-                view.Health.Text = $"{npc.Life}/{npc.MaxLife}";
-                view.Health.Position = view.Shown + new Vector3(0, npc.HalfExtents.Y * 2f + 0.35f, 0);
-            }
+            UpdateHealthBar(npc, view);
         }
     }
 
@@ -229,17 +227,7 @@ public sealed partial class NpcRenderer : Node3D
             stalk = NewStalk(npc.Def.TetherColor);
             AddChild(stalk);
         }
-        var health = new Label3D
-        {
-            Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
-            PixelSize = 0.004f,
-            FontSize = 48,
-            OutlineSize = 12,
-            Modulate = new Color(1f, 0.45f, 0.45f),
-            NoDepthTest = false,
-            Visible = false,
-        };
-        AddChild(health);
+        var health = AcquireBar();
         var pos = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
         float yaw = npc.Yaw + Mathf.Pi;
         return new View { Visual = visual, Model = model, Health = health, Shown = pos, Stalk = stalk, Yaw = yaw, Turn = new Quaternion(Vector3.Up, yaw) };

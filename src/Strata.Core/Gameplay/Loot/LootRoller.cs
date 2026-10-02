@@ -23,7 +23,7 @@ public sealed class LootRoller
 
     private void RollInto(LootTableDef table, ref Pcg32 rng, ConditionContext ctx, List<ItemStack> into, int depth)
     {
-        if (depth > 8) return;
+        if (depth > LootTableDef.MaxNesting) return;
         if (table.Coins is { Length: 2 } c) into.AddRange(Coins.ToStacks(_content, rng.Range(c[0], c[1])));
         var eligible = table.Entries.Where(e => Condition(e).Evaluate(ctx)).ToList();
         if (table.Mode == LootMode.Weighted)

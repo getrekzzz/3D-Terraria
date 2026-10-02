@@ -38,11 +38,16 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>What the crosshair label shows ("Blue Slime 25/25", a block's name, or empty).</summary>
     public string TargetText => _targetName.Text;
 
+    /// <summary>Active buffs shown with their generated icon (not the letter fallback); the hud.buff_icons probe.</summary>
+    public int BuffIconsShown { get; private set; }
+
     public void Initialize(UiContext ui)
     {
         _ui = ui;
         Name = "Hud";
         Layer = 10;
+        UiSprites.Preload();
+        StatusIcons.Preload(ui.Game.Session.Content);
         var root = new Control { MouseFilter = Control.MouseFilterEnum.Ignore, Theme = UiTheme.Theme };
         root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(root);
@@ -56,7 +61,11 @@ public sealed partial class Hud : CanvasLayer
         for (int i = 0; i < PlayerInventory.HotbarSize; i++)
         {
             int slot = i;
-            var view = new ItemSlotView(() => ui.Inventory.Backpack[slot], 58, ui.Tooltip) { Badge = ((i + 1) % 10).ToString() };
+            var view = new ItemSlotView(() => ui.Inventory.Backpack[slot], 58, ui.Tooltip)
+            {
+                Badge = ((i + 1) % 10).ToString(),
+                Favorite = () => ui.Inventory.Backpack.IsFavorite(slot),
+            };
             view.Clicked += (_, _) => ui.Inventory.Select(slot);
             hotbar.AddChild(view);
             _hotbar.Add(view);
@@ -241,13 +250,22 @@ public sealed partial class Hud : CanvasLayer
         while (_buffs.GetChildCount() < active.Count)
         {
             var panel = new PanelContainer();
-            panel.AddChild(new Label());
+            var row = new HBoxContainer();
+            row.AddChild(new TextureRect { CustomMinimumSize = new Vector2(32, 32), StretchMode = TextureRect.StretchModeEnum.KeepCentered, TextureFilter = CanvasItem.TextureFilterEnum.Nearest });
+            row.AddChild(new Label { VerticalAlignment = VerticalAlignment.Center });
+            panel.AddChild(row);
             _buffs.AddChild(panel);
         }
+        BuffIconsShown = 0;
         for (int i = 0; i < active.Count; i++)
         {
             var b = active[i];
-            var label = _buffs.GetChild(i).GetChild<Label>(0);
+            var row = _buffs.GetChild(i).GetChild(0);
+            var icon = row.GetChild<TextureRect>(0);
+            var texture = StatusIcons.Get(b.Def);
+            if (icon.Texture != texture) icon.Texture = texture;
+            if (!StatusIcons.IsFallback(texture)) BuffIconsShown++;
+            var label = row.GetChild<Label>(1);
             label.Text = $"{b.Def.DisplayName} {Mathf.CeilToInt(b.TicksLeft / 60f)}s";
             label.AddThemeColorOverride("font_color", Color.FromHtml(b.Def.Color));
             label.TooltipText = b.Def.Description ?? "";

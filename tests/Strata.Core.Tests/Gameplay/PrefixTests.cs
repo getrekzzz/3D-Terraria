@@ -141,13 +141,13 @@ public class PrefixTests
         var stack = new ItemStack(sword, 1, P("legendary"));
         var lines = ItemTooltip.Lines(stack, new ItemUseTable(Db)[sword], usedInRecipes: false);
         Assert.Equal("Legendary Copper Broadsword", lines[0].Text);
-        Assert.Contains(("+15% damage", TooltipKind.Modifier), lines);
-        Assert.Contains(("+10% speed", TooltipKind.Modifier), lines);
+        Assert.Contains(("+15% damage", TooltipKind.Good), lines);
+        Assert.Contains(("+10% speed", TooltipKind.Good), lines);
         Assert.Contains(lines, l => l.Text == $"{Prefixes.Damage(stack)} melee damage");
         Assert.Contains(lines, l => l.Text == $"Sell price: {Coins.Format(Prefixes.Value(stack) / 5)}");
         var bad = ItemTooltip.Lines(new ItemStack(sword, 1, P("sluggish")), new ItemUseTable(Db)[sword], false);
-        Assert.Contains(("-20% speed", TooltipKind.ModifierBad), bad);
-        Assert.Contains(("-15% mana cost", TooltipKind.Modifier), ItemTooltip.Modifiers(P("adept")));
+        Assert.Contains(("-20% speed", TooltipKind.Bad), bad);
+        Assert.Contains(("-15% mana cost", TooltipKind.Good), ItemTooltip.Modifiers(P("adept")));
     }
 
     [Fact]

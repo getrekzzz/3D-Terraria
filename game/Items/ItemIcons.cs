@@ -27,19 +27,21 @@ public static class ItemIcons
         else
         {
             GD.PushWarning($"Missing icon for item '{item.Id}' ({path}).");
-            tex = Missing();
+            tex = MissingTexture;
         }
         Cache[item.Id] = tex;
         return tex;
     }
 
-    private static Texture2D Missing()
+    /// <summary>A magenta checkerboard drawn in place of any absent generated texture (icons, UI sprites).</summary>
+    public static Texture2D MissingTexture => _missing ??= CreateMissing();
+
+    private static Texture2D CreateMissing()
     {
-        if (_missing != null) return _missing;
         var img = Image.CreateEmpty(16, 16, false, Image.Format.Rgba8);
         for (int y = 0; y < 16; y++)
             for (int x = 0; x < 16; x++)
                 img.SetPixel(x, y, ((x / 4 + y / 4) & 1) == 0 ? new Color(1f, 0f, 1f) : new Color(0.1f, 0.1f, 0.1f));
-        return _missing = ImageTexture.CreateFromImage(img);
+        return ImageTexture.CreateFromImage(img);
     }
 }

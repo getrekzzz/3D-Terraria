@@ -3,12 +3,21 @@ using Strata.Core.Content.Defs;
 namespace Strata.Core.Content;
 
 /// <summary>
-/// Where generated assets live (tools/blender/build_all.py and tools/textures/build_icons.py write them).
+/// Where generated assets live (tools/blender/build_all.py, tools/textures/build_icons.py and build_ui.py write them).
 /// Paths are project-relative; the engine prefixes <c>res://</c>.
 /// </summary>
 public static class AssetPaths
 {
     public static string ItemIcon(ItemDef item) => $"assets/icons/items/{item.Icon ?? item.Id}.png";
+
+    /// <summary>A pixel-art UI sprite (heart, star, slot silhouette, pointer…) from tools/textures/build_ui.py.</summary>
+    public static string UiSprite(string name) => $"assets/ui/{name}.png";
+
+    /// <summary>The 32 px buff or debuff icon (tools/textures/build_ui.py, recipe in buff_icons.json).</summary>
+    public static string BuffIcon(BuffDef buff) => $"assets/icons/buffs/{buff.Icon ?? buff.Id}.png";
+
+    /// <summary>The 32 px world event icon (tools/textures/build_ui.py, recipe in event_icons.json).</summary>
+    public static string EventIcon(EventDef ev) => $"assets/icons/events/{ev.Icon ?? ev.Id}.png";
 
     /// <summary>Model for a tile object variant.</summary>
     public static string ObjectModel(TileObjectDef def, int variant) =>

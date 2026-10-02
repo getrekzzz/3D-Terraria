@@ -157,14 +157,18 @@ public sealed class GrappleHook
     }
 
     /// <summary>
-    /// The hook the grapple key throws: the longest-reaching one among the equipped accessories, then the hotbar and
-    /// backpack (the first found wins a tie), or null when the player carries none.
+    /// The hook the grapple key throws: the one in the hook slot, otherwise the longest-reaching one carried in the
+    /// hotbar and backpack (the first found wins a tie), or null when the player has none.
     /// </summary>
     public static GrappleParams? Best(PlayerState s, ItemUseTable uses, out ItemDef? item)
     {
+        if (s.Inventory.EquippedHook is { } worn && uses[worn].Grapple is { } equipped)
+        {
+            item = worn;
+            return equipped;
+        }
         GrappleParams? best = null;
         item = null;
-        Scan(s.Inventory.Accessories, uses, ref best, ref item);
         Scan(s.Inventory.Backpack, uses, ref best, ref item);
         return best;
     }

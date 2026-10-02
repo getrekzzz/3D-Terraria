@@ -1,75 +1,109 @@
 using Strata.Core.Content.Defs;
+using Strata.Core.Gameplay.Combat;
+using Strata.Core.Gameplay.Stats;
 
 namespace Strata.Core.Gameplay.Items;
 
+/// <summary>How a tooltip line is coloured (the UI maps each kind to its colour).</summary>
 public enum TooltipKind
 {
+    /// <summary>The item's name, in its rarity colour.</summary>
     Name,
     Stat,
     Info,
     Flavor,
-    Price,
 
-    /// <summary>A prefix's stat change that helps ('+15% damage'; green).</summary>
-    Modifier,
+    /// <summary>A prefix modifier that helps (green).</summary>
+    Good,
 
-    /// <summary>A prefix's stat change that hurts ('-10% speed'; red).</summary>
-    ModifierBad,
+    /// <summary>A prefix modifier that hurts (red).</summary>
+    Bad,
+
+    /// <summary>A price whose largest coin is copper, silver, gold or platinum (coloured like that coin).</summary>
+    PriceCopper,
+    PriceSilver,
+    PriceGold,
+    PricePlatinum,
+
+    /// <summary>"No value": the item cannot be sold.</summary>
+    NoValue,
 }
 
-/// <summary>Builds item tooltip lines (engine-independent so every UI and test shows the same text).</summary>
-public static class ItemTooltip
+/// <summary>
+/// Builds item tooltip lines in Terraria's order and wording (engine-independent so every UI and test shows the same
+/// text): name with prefix and count, prefix- and player-adjusted combat stats, info lines, the description or buff
+/// effect, buff duration, green and red prefix modifiers, the worn set bonus and the price.
+/// </summary>
+public static partial class ItemTooltip
 {
-    public static List<(string Text, TooltipKind Kind)> Lines(ItemStack stack, ItemUseInfo info, bool usedInRecipes)
+    /// <summary>Lines without content or player context (unadjusted stats, default sell ratio).</summary>
+    public static List<(string Text, TooltipKind Kind)> Lines(ItemStack stack, ItemUseInfo info, bool usedInRecipes) =>
+        Lines(stack, info, TooltipContext.Plain(usedInRecipes));
+
+    public static List<(string Text, TooltipKind Kind)> Lines(ItemStack stack, ItemUseInfo info, TooltipContext ctx)
     {
         var item = stack.Item!;
-        var lines = new List<(string, TooltipKind)> { (stack.Prefix != null ? $"{stack.Prefix.DisplayName} {item.DisplayName}" : item.DisplayName, TooltipKind.Name) };
-        if (item.IsWeapon)
-        {
-            string kind = item.DamageType == DamageClass.Generic ? "" : item.DamageType.ToString().ToLowerInvariant() + " ";
-            lines.Add(($"{Prefixes.Damage(stack)} {kind}damage", TooltipKind.Stat));
-            lines.Add(($"{4 + Prefixes.Crit(stack)}% critical strike chance", TooltipKind.Stat));
-            lines.Add(($"{Speed(Prefixes.UseTime(stack, item.UseAnimation))} speed", TooltipKind.Stat));
-            lines.Add(($"{Knockback(Prefixes.Knockback(stack))} knockback", TooltipKind.Stat));
-        }
+        var lines = new List<(string, TooltipKind)> { (NameLine(stack), TooltipKind.Name) };
+        if (item.IsWeapon) WeaponLines(stack, info, ctx, lines);
+        if (item.EquipSlot != EquipSlot.None) lines.Add(("Equipable", TooltipKind.Info));
+        if (item.Category == ItemCategory.Vanity) lines.Add(("Vanity item", TooltipKind.Info));
+        if (item.Defense > 0) lines.Add(($"{item.Defense} defense", TooltipKind.Stat));
         if (item.PickPower > 0) lines.Add(($"{item.PickPower}% pickaxe power", TooltipKind.Stat));
         if (item.AxePower > 0) lines.Add(($"{item.AxePower}% axe power", TooltipKind.Stat));
         if (item.HammerPower > 0) lines.Add(($"{item.HammerPower}% hammer power", TooltipKind.Stat));
-        if (item.ManaCost > 0) lines.Add(($"Uses {item.ManaCost} mana", TooltipKind.Stat));
-        if (item.EquipSlot != EquipSlot.None) lines.Add(("Equipable", TooltipKind.Info));
-        if (item.Defense > 0) lines.Add(($"{item.Defense} defense", TooltipKind.Stat));
-        if (item.SetBonus != null) lines.Add(($"Set bonus: {item.SetBonus}", TooltipKind.Info));
         if (item.HealLife > 0) lines.Add(($"Restores {item.HealLife} life", TooltipKind.Stat));
         if (item.HealMana > 0) lines.Add(($"Restores {item.HealMana} mana", TooltipKind.Stat));
-        if (item.AmmoClass != null) lines.Add(("Ammo", TooltipKind.Info));
+        if (item.ManaCost > 0) lines.Add(($"Uses {ManaCost(stack, ctx)} mana", TooltipKind.Stat));
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject)) lines.Add(("Can be placed", TooltipKind.Info));
+        if (item.AmmoClass != null) lines.Add(("Ammo", TooltipKind.Info));
         if (item.Consumable && info.Has(ItemAction.Consume)) lines.Add(("Consumable", TooltipKind.Info));
-        if (usedInRecipes) lines.Add(("Material", TooltipKind.Info));
-        if (!string.IsNullOrEmpty(item.Description)) lines.Add((item.Description!, TooltipKind.Flavor));
-        if (stack.Prefix is { } prefix) lines.AddRange(Modifiers(prefix));
-        if (item.Value > 0) lines.Add(($"Sell price: {Coins.Format(Math.Max(1, Prefixes.Value(stack) / 5) * stack.Count)}", TooltipKind.Price));
+        if (ctx.UsedInRecipes) lines.Add(("Material", TooltipKind.Info));
+        DescriptionLines(item, ctx, lines);
+        ModifierLines(stack.Prefix, lines);
+        SetBonusLine(item, ctx, lines);
+        PriceLine(stack, ctx, lines);
         return lines;
     }
 
-    /// <summary>A prefix's stat changes in the reference game's order ('+15% damage', '-10% speed', '+4 defense').</summary>
-    public static IEnumerable<(string Text, TooltipKind Kind)> Modifiers(PrefixDef p)
+    /// <summary>"Legendary Muramasa", "Torch (25)".</summary>
+    public static string NameLine(ItemStack stack)
     {
-        static (string, TooltipKind) Line(float amount, string what, bool percent = true, bool lowerIsBetter = false)
-        {
-            string n = percent ? $"{MathF.Round(amount * 100f):+0;-0}%" : $"{amount:+0;-0}";
-            return ($"{n} {what}", amount > 0 != lowerIsBetter ? TooltipKind.Modifier : TooltipKind.ModifierBad);
-        }
-        if (p.Defense != 0) yield return Line(p.Defense, "defense", percent: false);
-        if (p.Damage != 0) yield return Line(p.Damage, "damage");
-        if (p.UseSpeed != 0) yield return Line(p.UseSpeed, "speed");
-        if (p.Crit != 0) yield return Line(p.Crit / 100f, "critical strike chance");
-        if (p.ManaCost != 0) yield return Line(p.ManaCost, "mana cost", lowerIsBetter: true);
-        if (p.Size != 0) yield return Line(p.Size, "size");
-        if (p.Velocity != 0) yield return Line(p.Velocity, "velocity");
-        if (p.Knockback != 0) yield return Line(p.Knockback, "knockback");
-        if (p.MoveSpeed != 0) yield return Line(p.MoveSpeed, "movement speed");
-        if (p.MeleeSpeed != 0) yield return Line(p.MeleeSpeed, "melee speed");
-        if (p.MaxMana != 0) yield return Line(p.MaxMana, "mana", percent: false);
+        var name = stack.Prefix != null ? $"{stack.Prefix.DisplayName} {stack.Item!.DisplayName}" : stack.Item!.DisplayName;
+        return stack.Count > 1 ? $"{name} ({stack.Count})" : name;
+    }
+
+    /// <summary>Damage with the prefix and the player's class bonus (as <see cref="DamageModel"/> deals it).</summary>
+    public static int Damage(ItemStack stack, TooltipContext ctx)
+    {
+        float damage = Prefixes.Damage(stack);
+        if (ctx.Player != null) damage *= DamageModel.DamageMultiplier(ctx.Player.Effects.Stats, stack.Item!.DamageType);
+        return (int)MathF.Round(damage);
+    }
+
+    /// <summary>Critical strike chance in percent: the base 4, the item's, the prefix's and the player's bonus.</summary>
+    public static int CritChance(ItemStack stack, TooltipContext ctx) =>
+        DamageModel.BaseCritChance + Prefixes.Crit(stack) + (ctx.Player != null ? DamageModel.CritBonus(ctx.Player.Effects.Stats, stack.Item!.DamageType) : 0);
+
+    /// <summary>Use animation in ticks after the prefix's speed and, for swung and thrust items, the player's melee speed.</summary>
+    public static int UseAnimation(ItemStack stack, ItemUseInfo info, TooltipContext ctx)
+    {
+        int ticks = Prefixes.UseTime(stack, stack.Item!.UseAnimation);
+        if (ctx.Player == null || !info.Has(ItemAction.Melee | ItemAction.Thrust)) return ticks;
+        float melee = 1f + ctx.Player.Effects.Stats.Bonus(StatIds.MeleeSpeed);
+        return melee == 1f ? ticks : Math.Max(1, (int)MathF.Round(stack.Item.UseAnimation / MathF.Max(0.1f, Prefixes.UseSpeed(stack) * melee)));
+    }
+
+    private static int ManaCost(ItemStack stack, TooltipContext ctx) =>
+        (int)MathF.Round(Prefixes.ManaCost(stack) * (ctx.Player?.Effects.Stats.Get(StatIds.ManaCost, 1f) ?? 1f));
+
+    private static void WeaponLines(ItemStack stack, ItemUseInfo info, TooltipContext ctx, List<(string, TooltipKind)> lines)
+    {
+        var item = stack.Item!;
+        var cls = item.DamageType == DamageClass.Generic ? "" : item.DamageType.ToString().ToLowerInvariant() + " ";
+        lines.Add(($"{Damage(stack, ctx)} {cls}damage", TooltipKind.Stat));
+        lines.Add(($"{CritChance(stack, ctx)}% critical strike chance", TooltipKind.Stat));
+        lines.Add(($"{Speed(UseAnimation(stack, info, ctx))} speed", TooltipKind.Stat));
+        lines.Add(($"{Knockback(Prefixes.Knockback(stack))} knockback", TooltipKind.Stat));
     }
 
     /// <summary>Use-speed descriptor from use animation ticks (the reference game's thresholds).</summary>

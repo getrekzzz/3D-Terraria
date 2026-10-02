@@ -22,6 +22,12 @@ public static class ChunkCodec
 
     private const byte TagEnd = 0, TagBlocks = 1, TagShapes = 2, TagLiquids = 3, TagFlags = 4, TagObjects = 5;
 
+    // Object state bits; HasMeta means a tagged meta list follows PendingLoot (older chunks never set it).
+    private const byte StateActive = 1, StateLootRolled = 2, StateHasMeta = 4;
+
+    // Object meta entries: tag, length, payload, ended by MetaEnd; readers skip tags they do not know.
+    private const byte MetaEnd = 0, MetaName = 1;
+
     public static byte[] Encode(ChunkData data, int mutationLevel, IReadOnlyList<TileObjectInstance> objects, ContentDatabase db, WorldIdTables ids) =>
         Encode(data, mutationLevel, EncodeObjects(objects, ids), db, ids);
 
@@ -181,8 +187,10 @@ public static class ChunkCodec
             w.Write((byte)o.Rotation);
             w.Write((byte)o.Variant);
             w.WriteVar(Math.Max(0, o.HitPoints));
-            w.Write((byte)((o.Active ? 1 : 0) | (o.LootRolled ? 2 : 0)));
+            bool meta = o.CustomName != null;
+            w.Write((byte)((o.Active ? StateActive : 0) | (o.LootRolled ? StateLootRolled : 0) | (meta ? StateHasMeta : 0)));
             w.Write(o.PendingLoot ?? "");
+            if (meta) WriteObjectMeta(w, o);
             int slots = o.Container?.Length ?? 0;
             w.WriteVar(slots);
             for (int i = 0; i < slots; i++)
@@ -210,10 +218,11 @@ public static class ChunkCodec
             int rotation = r.ReadByte(), variant = r.ReadByte();
             var obj = new TileObjectInstance(def, anchor, rotation, variant) { HitPoints = r.ReadVar() };
             byte state = r.ReadByte();
-            obj.Active = (state & 1) != 0;
-            obj.LootRolled = (state & 2) != 0;
+            obj.Active = (state & StateActive) != 0;
+            obj.LootRolled = (state & StateLootRolled) != 0;
             var loot = r.ReadString();
             obj.PendingLoot = loot.Length == 0 ? null : loot;
+            if ((state & StateHasMeta) != 0) ReadObjectMeta(r, obj);
             int slots = r.ReadVar();
             for (int i = 0; i < slots; i++)
             {
@@ -227,6 +236,25 @@ public static class ChunkCodec
                 if (obj.Container != null && i < obj.Container.Length) obj.Container[i] = new ItemStack(item, stackCount, prefix);
             }
             into.Add(obj);
+        }
+    }
+
+    private static void WriteObjectMeta(BinaryWriter w, TileObjectInstance o)
+    {
+        if (o.CustomName != null) w.WriteSection(MetaName, s => s.Write(o.CustomName));
+        w.Write(MetaEnd);
+    }
+
+    private static void ReadObjectMeta(BinaryReader r, TileObjectInstance obj)
+    {
+        while (true)
+        {
+            byte tag = r.ReadByte();
+            if (tag == MetaEnd) return;
+            int length = r.ReadVar();
+            long end = r.BaseStream.Position + length;
+            if (tag == MetaName) obj.CustomName = r.ReadString();
+            r.BaseStream.Position = end;
         }
     }
 }

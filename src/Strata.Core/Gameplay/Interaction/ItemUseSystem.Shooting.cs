@@ -14,12 +14,12 @@ public sealed partial class ItemUseSystem
         var projectile = info.Projectile;
         var shot = info.Shoot!;
         ItemDef? ammo = null;
-        int ammoSlot = -1;
+        (Inventory Inv, int Slot)? ammoSlot = null;
         if (item.UseAmmo != null)
         {
-            ammoSlot = FindAmmo(state.Inventory.Backpack, item.UseAmmo);
-            if (ammoSlot < 0) return UseOutcome.NoAmmo;
-            ammo = state.Inventory.Backpack[ammoSlot].Item!;
+            ammoSlot = state.Inventory.FindAmmo(item.UseAmmo);
+            if (ammoSlot is not { } found) return UseOutcome.NoAmmo;
+            ammo = found.Inv[found.Slot].Item!;
             projectile ??= _world.Uses[ammo].Projectile;
             if (projectile == null) return UseOutcome.NoAmmo;
         }
@@ -34,7 +34,7 @@ public sealed partial class ItemUseSystem
             if (!state.Vitals.TrySpendMana(cost)) return UseOutcome.NoMana;
         }
         // Ammo is only used up by a shot that actually fires.
-        if (ammo is { Consumable: true } && !_ammoRng.Chance(state.Effects.Stats.Bonus(StatIds.AmmoSave))) state.Inventory.Backpack.Take(ammoSlot, 1);
+        if (ammo is { Consumable: true } && ammoSlot is { } from && !_ammoRng.Chance(state.Effects.Stats.Bonus(StatIds.AmmoSave))) from.Inv.Take(from.Slot, 1);
         int damage = Prefixes.Damage(held) + (ammo?.Damage ?? 0);
         float knockback = Prefixes.Knockback(held) + (ammo?.Knockback ?? 0f);
         for (int i = 0; i < shot.Count; i++)
@@ -53,7 +53,7 @@ public sealed partial class ItemUseSystem
         return n;
     }
 
-    /// <summary>Backpack slot of the first stack of the given ammo class, or −1.</summary>
+    /// <summary>Slot of the first stack of the given ammo class in one storage, or −1 (a player's shots use <see cref="PlayerInventory.FindAmmo"/>).</summary>
     public static int FindAmmo(Inventory backpack, string ammoClass)
     {
         for (int i = 0; i < backpack.Size; i++)

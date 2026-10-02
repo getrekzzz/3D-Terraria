@@ -136,12 +136,12 @@ public sealed partial class TownSystem
     public ConditionContext TownContext(PlayerEntity player)
     {
         var ctx = _world.Session.ContextAt(player.FeetCell);
-        ctx.PlayerCoins = _world.Players.Max(p => Coins.Total(p.State.Inventory.Backpack));
+        ctx.PlayerCoins = _world.Players.Max(p => Coins.Total(p.State.Inventory));
         ctx.PlayerMaxLife = _world.Players.Max(p => p.State.Vitals.MaxLife);
         ctx.Residents = _residents.Select(r => r.Def.Id).ToHashSet();
         ctx.ItemCount = key => _world.Players.Sum(p => key.StartsWith('#')
-            ? p.State.Inventory.Backpack.Count(d => d.HasTag(key[1..]))
-            : _world.Session.Content.Items.TryGet(key, out var item) ? p.State.Inventory.Backpack.Count(item) : 0);
+            ? p.State.Inventory.CountAll(d => d.HasTag(key[1..]))
+            : _world.Session.Content.Items.TryGet(key, out var item) ? p.State.Inventory.CountAll(item) : 0);
         return ctx;
     }
 

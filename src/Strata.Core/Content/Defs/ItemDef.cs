@@ -17,9 +17,13 @@ public enum UseStyle
     None, Swing, Thrust, Shoot, Hold, Consume, Place,
 }
 
+/// <summary>
+/// Where an item is worn. Pet through Hook are the misc equipment row, in the order of
+/// <see cref="Gameplay.Items.MiscSlot"/> (JSON: "pet", "lightPet", "minecart", "mount", "hook").
+/// </summary>
 public enum EquipSlot
 {
-    None, Head, Body, Legs, Accessory,
+    None, Head, Body, Legs, Accessory, Pet, LightPet, Minecart, Mount, Hook,
 }
 
 public sealed class BuffApplication

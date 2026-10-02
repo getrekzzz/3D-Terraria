@@ -24,9 +24,9 @@ public class TownTests
         g.World.Town.Summon(g.Content.TownNpcs.Get(id), g.World.Navigator.NearestStandable(g.Floor + offset, Strata.Core.Gameplay.Navigation.NavAgent.Humanoid, 3)!.Value);
 
     private static void GiveCoins(TestGame g, long copper) =>
-        Assert.Empty(Wallet.Give(g.Player.State.Inventory.Backpack, g.Content, copper));
+        Assert.Empty(Wallet.Give(g.Player.State.Inventory, g.Content, copper));
 
-    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory.Backpack);
+    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory);
 
     [Fact]
     public void GuideStartsInTownAndResidentsMoveIntoValidHomes()

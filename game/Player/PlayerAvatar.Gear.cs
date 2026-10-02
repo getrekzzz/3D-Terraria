@@ -101,10 +101,10 @@ public sealed partial class PlayerAvatar
 
     private ItemDef? WornWings()
     {
-        var acc = _controller.Entity.State.Inventory.Accessories;
-        for (int i = 0; i < acc.Size; i++)
+        var inv = _controller.Entity.State.Inventory;
+        for (int i = 0; i < inv.AccessorySlotsUnlocked; i++)
         {
-            var item = acc[i].Item;
+            var item = inv.Accessories[i].Item;
             if (item == null) continue;
             foreach (var e in item.EquipEffects)
                 if (e.Type == EffectSpecs.Flight && !(e.Raw.TryGetProperty("boots", out var boots) && boots.ValueKind == System.Text.Json.JsonValueKind.True)) return item;

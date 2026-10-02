@@ -1,0 +1,17 @@
+Fonts shipped with Strata (both under the SIL Open Font License 1.1; the licence texts sit beside them)
+
+ComicNeue-Bold.otf
+  Comic Neue Bold, release 2.51 (Debian package fonts-comic-neue 2.51-4)
+  Craig Rozynski, Hrant Papazian, Brandon Schoech
+  Upstream: https://github.com/crozynski/comicneue
+  Licence: OFL-ComicNeue.txt
+  Use: the UI face (HUD, menus, tooltips, map labels, damage numbers, name tags).
+
+Andika-Bold.ttf
+  Andika Bold, version 6.200 (Debian package fonts-sil-andika 6.200-1)
+  SIL International; Reserved Font Names "Andika" and "SIL"
+  Upstream: https://software.sil.org/andika
+  Licence: OFL-Andika.txt
+  Use: glyph fallback for characters Comic Neue lacks (arrows, symbols, extended Latin).
+
+Both files are unmodified copies of the upstream fonts.

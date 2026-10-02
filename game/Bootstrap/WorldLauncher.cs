@@ -83,12 +83,13 @@ public static partial class WorldLauncher
         LoadConfigs(game, services);
         var creatures = AddCreatureRenderers(runtime, game, props);
         AddPreloading(runtime, services, game, props, creatures);
-        AddWorldEffects(runtime, services, game, objectRenderer, creatures);
+        var combatEffects = AddWorldEffects(runtime, services, game, objectRenderer, creatures);
 
         if (o.FreeCamera) return new LaunchedWorld { Runtime = runtime, Props = props, Objects = objectRenderer, FreeCamera = AddFreeCamera(runtime, session, args) };
 
         var (entity, player) = AddPlayer(runtime, services, game, o, playerDir);
         AddPlayerEffects(runtime, game, entity);
+        combatEffects.Follow(entity, player);
         var avatar = AddPlayerVisuals(runtime, services, game, props, entity, player);
         var interaction = AddInteraction(runtime, game, entity, player);
         var (hud, inventory, worldMap, townDialog) = AddUi(runtime, game, player, interaction, objectRenderer);

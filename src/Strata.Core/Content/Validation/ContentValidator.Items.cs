@@ -16,6 +16,9 @@ public static partial class ContentValidator
             if (i.Damage > 0 && i.DamageType == DamageClass.None) ctx.Error(i, "damage > 0 requires damageType.");
             if (i.Crit is < 0 or > 100) ctx.Error(i, "crit must be 0–100.");
             if (i.MineBrush is < 1 or > 8) ctx.Error(i, "mineBrush must be 1–8.");
+            if (i.Rarity is < -13 or > 13) ctx.Error(i, "rarity must be -13–13 (Terraria's rarity tiers).");
+            if (i.Buff != null && ctx.Db.Buffs.TryGet(i.Buff.Id, out var granted) && !Describable(granted, ctx.Db))
+                ctx.Warn(i, $"buff '{granted.Id}' has no description and no effects a tooltip can describe.");
             ctx.Ref(i, ctx.Db.Blocks, i.PlaceBlock, "placeBlock");
             ctx.Ref(i, ctx.Db.TileObjects, i.PlaceObject, "placeObject");
             ctx.Ref(i, ctx.Db.Projectiles, i.Projectile, "projectile");
@@ -59,6 +62,9 @@ public static partial class ContentValidator
                 ctx.Error(i, "shoot items need a projectile or useAmmo.");
             if (i.EquipSlot == EquipSlot.None && (i.Category is ItemCategory.Armor or ItemCategory.Accessory))
                 ctx.Error(i, "armor/accessory needs equipSlot.");
+            if (MiscEquipSlot(i.Category) is { } misc && i.EquipSlot != misc && !(misc == EquipSlot.Pet && i.EquipSlot == EquipSlot.LightPet))
+                ctx.Error(i, $"{i.Category} items need equipSlot '{System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(misc.ToString())}'"
+                    + (misc == EquipSlot.Pet ? " or 'lightPet'." : "."));
             if (i.Consumable && i.MaxStack == 1 && i.PlaceBlock == null && i.PlaceObject == null)
                 ctx.Warn(i, "consumable item with maxStack 1.");
             if (i.PlaceBlock != null && i.PlaceObject != null) ctx.Error(i, "item cannot place both a block and an object.");
@@ -66,6 +72,29 @@ public static partial class ContentValidator
             ctx.Specs(i, SpecKind.Effect, i.EquipEffects, "equipEffects");
             ctx.Specs(i, SpecKind.Effect, i.SetEffects, "setEffects");
             if ((i.SetEffects.Length > 0 || i.SetBonus != null) && i.ArmorSet == null) ctx.Error(i, "setBonus/setEffects need an armorSet.");
+        }
+    }
+
+    /// <summary>The misc slot items of a category must be worn in (hooks, mounts, minecarts, pets); null for other categories.</summary>
+    private static EquipSlot? MiscEquipSlot(ItemCategory category) => category switch
+    {
+        ItemCategory.Hook => EquipSlot.Hook,
+        ItemCategory.Mount => EquipSlot.Mount,
+        ItemCategory.Minecart => EquipSlot.Minecart,
+        ItemCategory.Pet => EquipSlot.Pet,
+        _ => null,
+    };
+
+    /// <summary>Whether a tooltip can say what the buff does (malformed effects are reported by the buff checks).</summary>
+    private static bool Describable(BuffDef buff, ContentDatabase db)
+    {
+        try
+        {
+            return Gameplay.Buffs.BuffText.Describe(buff, db) != null;
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return true;
         }
     }
 

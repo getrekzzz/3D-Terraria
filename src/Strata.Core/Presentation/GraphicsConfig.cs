@@ -132,6 +132,8 @@ public sealed class GraphicsPreset
 
     /// <summary>Chunk grass buffers built or rebuilt per frame at most (nearest first; spreads walking-in pops).</summary>
     public int GrassBuildsPerFrame { get; set; } = 2;
+    /// <summary>Floating combat numbers on screen at once (8–256); past it the oldest number is reused.</summary>
+    public int CombatNumbers { get; set; } = 48;
 
     /// <summary>Mesh LOD switch threshold in pixels (lower keeps detail further away).</summary>
     public float LodThreshold { get; set; } = 1f;
@@ -170,6 +172,7 @@ public sealed class GraphicsPreset
         if (GrassBuildsPerFrame is < 0 or > 16) yield return "grassBuildsPerFrame must be within 0–16";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
+        if (CombatNumbers is < 8 or > 256) yield return "combatNumbers must be within 8–256";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
         if (OreGlintDistance is < 1f or > 60f) yield return "oreGlintDistance must be within 1–60 m";
         if (SwayDistance is < 0f or > 120f) yield return "swayDistance must be within 0–120 m";

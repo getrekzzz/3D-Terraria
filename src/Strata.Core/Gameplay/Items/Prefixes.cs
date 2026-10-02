@@ -119,6 +119,18 @@ public static class Prefixes
     public static float ValueMultiplier(PrefixDef p) => p.ValueMultiplier > 0 ? p.ValueMultiplier
         : (1f + p.Damage) * (1f + p.UseSpeed) * (1f - p.ManaCost) * (1f + p.Size) * (1f + p.Knockback) * (1f + p.Velocity) * (1f + p.Crit * 0.02f);
 
+    /// <summary>
+    /// What a merchant pays for the whole stack (copper): <paramref name="ratio"/> of the prefixed value per item, at
+    /// least one copper for anything worth something (as in Terraria). The tooltip and the shop both use it.
+    /// </summary>
+    public static long SellValue(ItemStack s, float ratio = 0.2f)
+    {
+        if (s.IsEmpty) return 0;
+        long each = Value(s);
+        if (each <= 0) return 0;
+        return Math.Max(1L, (long)Math.Floor(each * (double)ratio + 1e-6)) * s.Count;
+    }
+
     /// <summary>Accessory prefixes as stat bonuses: (stat id, amount) pairs added to the wearer.</summary>
     public static IEnumerable<(string Stat, float Add)> AccessoryStats(PrefixDef p)
     {

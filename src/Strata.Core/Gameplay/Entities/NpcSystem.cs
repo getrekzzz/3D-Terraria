@@ -11,8 +11,11 @@ using Strata.Core.Voxels;
 
 namespace Strata.Core.Gameplay.Entities;
 
-/// <summary>A damage event for presentation (damage numbers, sounds, flashes).</summary>
-public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer);
+/// <summary>
+/// A damage event for presentation (damage numbers, sounds, flashes). <paramref name="Player"/> is the player who was hurt
+/// (null for creatures and residents), so a first-person view can float the number in front of the eye.
+/// </summary>
+public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer, PlayerEntity? Player = null);
 
 /// <summary>
 /// Owns every live creature: brains, movement against voxels, contact damage to players, taking hits
@@ -267,7 +270,7 @@ public sealed partial class NpcSystem
     /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
     public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock)
     {
-        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true));
+        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, player));
         PlayerHurt?.Invoke(player, damage, knock);
     }
 
@@ -283,7 +286,7 @@ public sealed partial class NpcSystem
         Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback);
         Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
-            attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
+            _world.ReportHeal(attacker, attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal))), mana: false);
         if (npc.Life <= 0) Kill(npc);
         else if (melee && attacker != null)
             foreach (var inflict in attacker.State.Effects.Inflicts)

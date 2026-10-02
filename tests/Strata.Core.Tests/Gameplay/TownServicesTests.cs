@@ -22,7 +22,7 @@ public class TownServicesTests
     private static TownNpc Summon(TestGame g, string id) =>
         g.World.Town.Summon(g.Content.TownNpcs.Get(id), g.World.Navigator.NearestStandable(g.Floor + new Int3(3, 1, 3), Strata.Core.Gameplay.Navigation.NavAgent.Humanoid, 3)!.Value);
 
-    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory.Backpack);
+    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory);
 
     [Fact]
     public void PrefixesChangeAWeaponsStats()
@@ -75,7 +75,7 @@ public class TownServicesTests
         var goblin = Summon(g, "goblin_tinkerer");
         var inv = g.Player.State.Inventory;
         inv.Backpack[inv.SelectedHotbar] = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1);
-        Assert.Empty(Wallet.Give(inv.Backpack, g.Content, 1000000));
+        Assert.Empty(Wallet.Give(inv, g.Content, 1000000));
         long cost = g.World.Services.ReforgeCost(goblin, g.Player);
         Assert.True(cost > 0);
         long before = Purse(g);
