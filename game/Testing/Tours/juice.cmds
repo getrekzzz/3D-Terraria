@@ -23,3 +23,11 @@ hold use_primary 0.6
 wait 0.3
 screenshot b_chips
 wait_until screenshot.pending == 0 900
+camera first
+aim 0.2 -0.7 1
+use
+wait 0.6
+use
+wait 0.6
+screenshot c_cracks
+wait_until screenshot.pending == 0 900

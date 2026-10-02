@@ -27,8 +27,8 @@ public sealed partial class NpcRenderer : Node3D
         public float Squash = 1f;
         public float LastVy;
         public Quaternion Turn = Quaternion.Identity;
-        public float Yaw, Bank, Stretch, Spin, Blink = 1f;
-        public int LastAttackTimer, LastHurtFlash, LastSwing = -1000;
+        public float Yaw, Bank, Stretch, Spin, Blink = 1f, Punch;
+        public int LastAttackTimer, LastHurtFlash, LastSwing = -1000, LastPunchFlash;
     }
 
     private readonly Dictionary<long, View> _views = new();
@@ -141,7 +141,8 @@ public sealed partial class NpcRenderer : Node3D
             Animate(npc, view, dt);
             if (view.Stalk != null) UpdateStalk(npc, view);
             var tint = Color.FromHtml(npc.Def.Tint);
-            if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);
+            // The hurt flash fades with the hit's flash timer instead of blinking off.
+            if (npc.HurtFlash > 0) tint = tint.Lerp(new Color(2.2f, 0.7f, 0.7f), Mathf.Clamp(npc.HurtFlash / 8f, 0f, 1f));
             visual.SetTint(tint);
             visual.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, view.Shown + Vector3.Up * 0.5f)));
             view.Health.Visible = npc.Life < npc.MaxLife;

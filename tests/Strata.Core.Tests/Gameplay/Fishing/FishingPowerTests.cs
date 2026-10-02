@@ -195,7 +195,7 @@ public class FishingPowerTests
     public void QuarterMoonsAreNeutral()
     {
         Assert.Equal(1f, FishingPower.Multiplier(Cfg, Precipitation.None, 12.5f, 2, null) / FishingPower.Multiplier(Cfg, Precipitation.None, 12.5f, 6, null), 3);
-        Assert.Equal(Cfg.MoonMultipliers[2], 1f, 3);
-        Assert.Equal(Cfg.MoonMultipliers[6], 1f, 3);
+        Assert.Equal(1f, Cfg.MoonMultipliers[2], 3);
+        Assert.Equal(1f, Cfg.MoonMultipliers[6], 3);
     }
 }

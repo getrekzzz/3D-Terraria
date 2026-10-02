@@ -132,7 +132,9 @@ public sealed partial class PlayerController : CharacterBody3D
             return;
         }
 
-        _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
+        var liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
+        if (liquid != _liquid) LiquidEdge(_liquid, liquid);
+        _liquid = liquid;
         _swimming = _liquid != null;
         _climbing = !_swimming && OnRope();
         var stats = Entity.State.Effects.Stats;
@@ -213,6 +215,7 @@ public sealed partial class PlayerController : CharacterBody3D
             _jumpHold = _config.JumpHoldTime;
             _jumpBuffer = 0;
             _coyote = 0;
+            Jumped?.Invoke();
         }
         else if (!blocked && Input.IsActionJustPressed("jump") && !onFloor && _coyote <= 0 && TryAirJump(ref v))
         {

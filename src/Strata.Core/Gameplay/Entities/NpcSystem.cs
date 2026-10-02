@@ -267,17 +267,21 @@ public sealed partial class NpcSystem
         if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;
         var away = BrainFactory.Flat(player.Position - npc.Position);
         if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
-        var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);
+        // Terraria-like: a clear shove away from the creature with a hop.
+        var knock = away * (4f + hit.Knockback * 0.6f) + new Vector3(0, 5.5f, 0);
         ReportPlayerDamage(player, hit.Damage, knock);
         ApplyContactEffects(npc, player);
         float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
         if (thorns > 0) Hit(npc, null, (int)(npc.Def.Damage * npc.DamageScale * thorns), DamageClass.None, 0, 0f, player.Center, melee: false);
     }
 
-    /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
-    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock)
+    /// <summary>
+    /// Announces damage a player took from any source (numbers, knockback, hurt effects); <paramref name="kind"/> is
+    /// <see cref="DamageKind.Periodic"/> for debuffs ticking, which show smaller numbers and a quieter hurt sound.
+    /// </summary>
+    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock, DamageKind kind = DamageKind.Player)
     {
-        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, DamageKind.Player));
+        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, kind));
         PlayerHurt?.Invoke(player, damage, knock);
     }
 
@@ -290,7 +294,7 @@ public sealed partial class NpcSystem
         npc.Life -= hit.Damage;
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
-        Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback);
+        Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Crit ? hit.Knockback * CritKnockback : hit.Knockback);
         Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false, npc.Id));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));

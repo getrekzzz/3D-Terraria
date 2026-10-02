@@ -200,10 +200,21 @@ public sealed partial class GameWorld : IDisposable
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
         if (Session.Clock.Tick % Units.TicksPerSecond == 0)
         {
-            if (dps > 0 && p.Alive) state.Vitals.DamageDirect(dps);
+            if (dps > 0 && p.Alive) HurtPlayerDirect(p, dps, DamageKind.Periodic);
             state.Recompute();
             CheckMilestones(p);
         }
+    }
+
+    /// <summary>
+    /// Damage that ignores invulnerability and defense (debuffs ticking, falling), announced like any other hurt so it
+    /// shows a number and plays the hurt sound; no knockback.
+    /// </summary>
+    public void HurtPlayerDirect(PlayerEntity p, int damage, DamageKind kind = DamageKind.Player)
+    {
+        if (!p.Alive || damage <= 0) return;
+        p.State.Vitals.DamageDirect(damage);
+        Npcs.ReportPlayerDamage(p, damage, Vector3.Zero, kind);
     }
 
     public void Respawn(PlayerEntity p)

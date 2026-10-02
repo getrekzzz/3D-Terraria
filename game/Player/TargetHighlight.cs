@@ -103,7 +103,8 @@ public sealed partial class TargetHighlight : Node3D
         if (!any) return;
         progress = Mathf.Clamp(progress, 0, 1);
         var color = tooHard ? Invalid : progress > 0 ? Neutral.Lerp(Working, 0.4f + 0.6f * progress) : Neutral;
-        _mesh.Faces(Min(min), Min(max), new Color(color.R, color.G, color.B, tooHard ? 0.18f : 0.11f), progress);
+        // The cracks themselves are BlockCracks decals on every damaged block; the cursor only warms its colour.
+        _mesh.Faces(Min(min), Min(max), new Color(color.R, color.G, color.B, tooHard ? 0.18f : 0.11f), 0f);
         _mesh.Box(Min(min), Min(max), color);
     }
 

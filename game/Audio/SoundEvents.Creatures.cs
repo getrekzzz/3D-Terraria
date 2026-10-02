@@ -15,6 +15,7 @@ public sealed partial class SoundEvents
 {
     private CreatureMaterialsConfig _materials = null!;
     private readonly Dictionary<string, ulong> _lastMaterialHit = new();
+    private ulong _lastPeriodicHurt;
 
     /// <summary>The creature materials (shared with the hit dust and gore).</summary>
     public CreatureMaterialsConfig Materials => _materials;
@@ -26,7 +27,14 @@ public sealed partial class SoundEvents
         {
             if (e.ToPlayer)
             {
-                if (e.Kind != DamageKind.Periodic && System.Numerics.Vector3.Distance(e.Position, _local.Center) < 3f) Sfx.Play("player_hurt");
+                if (System.Numerics.Vector3.Distance(e.Position, _local.Center) >= 3f) return;
+                if (e.Kind != DamageKind.Periodic) Sfx.Play("player_hurt");
+                else if (Time.GetTicksMsec() - _lastPeriodicHurt >= 800)
+                {
+                    // Burning or poisoned: a quieter hurt, at most every 0.8 s.
+                    _lastPeriodicHurt = Time.GetTicksMsec();
+                    Sfx.Play("player_hurt", -6f);
+                }
                 return;
             }
             if (e.Kind == DamageKind.Periodic) return;
@@ -43,7 +51,15 @@ public sealed partial class SoundEvents
             string sound = npc.Def.DeathSound ?? _materials.Resolve(npc.Def).DeathSound;
             Sfx.PlayAt(Sfx.Has(sound) ? sound : "npc_death", ToGodot(npc.Center), npc.IsBoss ? 4f : 0f);
         };
-        game.Npcs.BossSpawned += _ => Sfx.Play("boss_roar");
-        game.Npcs.BossDefeated += _ => Sfx.Play("boss_defeated");
+        game.Npcs.BossSpawned += _ =>
+        {
+            Sfx.Play("boss_roar");
+            Player.CameraShake.Punch(0.45f, 0.5f, 2f);
+        };
+        game.Npcs.BossDefeated += _ =>
+        {
+            Sfx.Play("boss_defeated");
+            Player.CameraShake.Punch(0.7f, 0.7f, 2.5f);
+        };
     }
 }

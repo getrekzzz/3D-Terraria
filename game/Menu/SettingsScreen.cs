@@ -85,6 +85,10 @@ public sealed partial class SettingsScreen : PanelContainer
         box.AddChild(MenuKit.Row("Camera distance", MenuKit.Slider(1.5, 9, 0.1, S.CameraDistance, v => { S.CameraDistance = (float)v; Changed(); }, v => $"{v:0.0} m")));
         box.AddChild(MenuKit.Row("Mouse sensitivity", MenuKit.Slider(0.1, 3, 0.05, S.MouseSensitivity, v => { S.MouseSensitivity = (float)v; Changed(); }, v => $"{v:0.00}x")));
         box.AddChild(MenuKit.Row("Invert mouse Y", MenuKit.Toggle(S.InvertY, v => { S.InvertY = v; Changed(); })));
+        box.AddChild(MenuKit.Row("Camera shake", MenuKit.Toggle(S.CameraShake, v => { S.CameraShake = v; Changed(); }),
+            "Shakes and jolts from explosions, bosses, heavy hits and hard landings."));
+        box.AddChild(MenuKit.Row("Hurt flash", MenuKit.Toggle(S.HurtFlash, v => { S.HurtFlash = v; Changed(); }),
+            "The screen edges flash red when you are hurt."));
         box.AddChild(Header("World"));
         box.AddChild(MenuKit.Row("Pause when inventory is open", MenuKit.Toggle(S.AutoPause, v => { S.AutoPause = v; Changed(); })));
         box.AddChild(MenuKit.Row("Damage numbers", MenuKit.Toggle(S.DamageNumbers, v => { S.DamageNumbers = v; Changed(); })));

@@ -39,8 +39,14 @@ public sealed class BlockDef : ContentDef
 
     public BlockTextures Textures { get; init; } = new();
 
-    /// <summary>Mining health multiplier (1 = dirt-like). Hits needed scale with this.</summary>
+    /// <summary>How solid the block feels: scales mining sounds and particles (hits needed come from <see cref="PickDamageScale"/>).</summary>
     public float Hardness { get; init; } = 1f;
+
+    /// <summary>
+    /// Multiplier on pickaxe damage, as in Terraria: soft tiles (dirt, sand, snow…) take 2×, evil stone, hellstone and
+    /// dungeon brick ½, hardmode ores down to ⅕ (chlorophyte). Every block has <see cref="Gameplay.Mining.MiningRules.TileHealth"/>.
+    /// </summary>
+    public float PickDamageScale { get; init; } = 1f;
 
     /// <summary>Minimum pickaxe power required to mine.</summary>
     public int PickPower { get; init; }

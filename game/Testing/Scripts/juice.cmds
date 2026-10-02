@@ -22,6 +22,10 @@ aim 0.05 -1 0.05
 hold use_primary 1.5
 wait 0.5
 assert effects.bursts > 0
+# One more swing leaves a damaged block: it shows a crack decal.
+use
+wait 0.4
+assert effects.cracks > 0
 # Creatures of different materials take hits and die: dust, then gore.
 spawn zombie 4 3
 spawn skeleton -4 3

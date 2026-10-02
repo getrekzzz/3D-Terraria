@@ -111,6 +111,7 @@ public sealed partial class CameraRig : Node3D
         var shake = CameraShake.Sample(delta);
         Camera.HOffset = shake.X;
         Camera.VOffset = shake.Y;
+        Camera.Rotation = new Vector3(0, 0, CameraShake.Roll);
         _pivot.Rotation = new Vector3(0, _firstPerson ? 0f : Orbit, 0);
         if (_firstPerson)
         {

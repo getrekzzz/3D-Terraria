@@ -23,7 +23,7 @@ public sealed partial class NpcRenderer
         public bool Human;
     }
 
-    private const float CorpseTime = 1.7f, SinkTime = 0.6f, ShrinkTime = 0.3f;
+    private const float CorpseTime = 1.7f, SinkTime = 0.6f, ShrinkTime = 0.3f, PunchTime = 0.1f;
     private readonly List<Corpse> _corpses = new();
 
     /// <summary>Turns a (non-worm) creature: yaw, a look at its target or along its flight, with banking for fliers.</summary>
@@ -102,6 +102,14 @@ public sealed partial class NpcRenderer
         scale *= new Vector3(1f - view.Stretch * 0.5f, 1f - view.Stretch * 0.5f, 1f + view.Stretch);
         view.Blink = Mathf.MoveToward(view.Blink, npc.Pose == "teleport" ? 0.25f : 1f, dt * 4f);
         scale *= view.Blink;
+        // A hit swells the creature by 12% for a tenth of a second.
+        if (npc.HurtFlash > view.LastPunchFlash) view.Punch = PunchTime;
+        view.LastPunchFlash = npc.HurtFlash;
+        if (view.Punch > 0f)
+        {
+            scale *= 1f + 0.12f * view.Punch / PunchTime;
+            view.Punch = Mathf.Max(0f, view.Punch - dt);
+        }
         if (view.Spin > 0f)
         {
             // Changing form: a fast spin that slows to a stop.

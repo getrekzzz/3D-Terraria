@@ -37,6 +37,9 @@ public sealed class UserSettings
     public bool FirstPerson { get; set; }
     public bool CameraShake { get; set; } = true;
 
+    /// <summary>Red screen edges when hurt (strongest in first person).</summary>
+    public bool HurtFlash { get; set; } = true;
+
     // Display
     public string WindowMode { get; set; } = "windowed";
     public bool VSync { get; set; } = true;

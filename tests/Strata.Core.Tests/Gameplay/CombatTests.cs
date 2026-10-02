@@ -61,11 +61,15 @@ public class CombatTests
 
         gel.Life = 1;
         g.Ticks(30);
+        // The first blow knocked it back out of reach: bring it in front again.
+        gel.Position = g.Player.Position + new Vector3(0, 0.05f, 1.2f);
+        gel.Velocity = Vector3.Zero;
         g.World.ItemUse.Use(g.Player, null, true);
         g.Ticks(30);
         Assert.False(gel.Alive);
         Assert.DoesNotContain(gel, g.World.Npcs.All);
-        Assert.Contains(g.World.Drops.Items, d => d.Stack.Item!.Id == "gel");
+        // Dying this close, its gel may already be in the pack.
+        Assert.True(g.World.Drops.Items.Any(d => d.Stack.Item!.Id == "gel") || g.Player.State.Inventory.Backpack.Count(i => i.Id == "gel") > 0);
     }
 
     [Fact]

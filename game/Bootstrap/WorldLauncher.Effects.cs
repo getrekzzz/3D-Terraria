@@ -24,6 +24,9 @@ public static partial class WorldLauncher
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
         blockEffects.Initialize(game, kit);
+        var cracks = new Rendering.BlockCracks();
+        runtime.AddChild(cracks);
+        cracks.Initialize(game);
         var trees = new TreeEffects();
         runtime.AddChild(trees);
         trees.Initialize(game, objectRenderer);
