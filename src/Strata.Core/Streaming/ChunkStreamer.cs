@@ -103,14 +103,23 @@ public sealed partial class ChunkStreamer
         FlushSaves();
     }
 
-    /// <summary>Requests remeshing of chunks (edits, lighting changes). Urgent chunks jump the queue.</summary>
-    public void MarkDirty(IEnumerable<Int3> chunks, bool urgent = true)
+    /// <summary>Scheduling priority of urgent block edits (lower runs first).</summary>
+    public const int EditPriority = -1000;
+
+    /// <summary>Scheduling priority of urgent light-only remeshes: ahead of distance order, behind block edits.</summary>
+    public const int LightPriority = -500;
+
+    /// <summary>
+    /// Requests remeshing of chunks (edits, lighting changes). Urgent chunks jump the queue at
+    /// <paramref name="urgentPriority"/> (a chunk keeps the more urgent of two requests).
+    /// </summary>
+    public void MarkDirty(IEnumerable<Int3> chunks, bool urgent = true, int urgentPriority = EditPriority)
     {
         foreach (var c in chunks)
         {
             if (!_entries.TryGetValue(c, out var e)) continue;
             e.MeshDirty = true;
-            if (urgent) e.Priority = -1000;
+            if (urgent) e.Priority = Math.Min(e.Priority, urgentPriority);
             TouchMesh(c, e);
         }
         if (urgent) ScheduleMeshes();

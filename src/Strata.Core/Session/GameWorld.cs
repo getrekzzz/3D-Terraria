@@ -57,7 +57,7 @@ public sealed partial class GameWorld : IDisposable
         Wires = new Gameplay.Wiring.WireSystem(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
-        Editor.LightDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
+        Editor.LightDirty += dirty => Streamer.MarkDirty(dirty, urgent: true, ChunkStreamer.LightPriority);
         Liquids.ChunksDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
     }
 

@@ -18,7 +18,7 @@ public sealed partial class ColliderManager
             if (c.Hashes[i] != c.BuiltHashes[i]) mask |= 1 << i;
         bool first = !c.Built;
         c.DirtyMask = 0;
-        c.Prioritized = false;
+        if (c.DataVersion >= c.PriorityVersion) c.Prioritized = false;
         c.Built = true;
         _built.Add(coord);
         if (mask == 0 && !first) return;
@@ -49,7 +49,8 @@ public sealed partial class ColliderManager
         var shape = PhysicsServer3D.ConcavePolygonShapeCreate();
         // Hand the triangles to the server straight from the list (no intermediate Vector3[] copy).
         var faces = MemoryMarshal.Cast<System.Numerics.Vector3, Vector3>(CollectionsMarshal.AsSpan(tris));
-        using var data = new Godot.Collections.Dictionary { ["faces"] = Variant.CreateFrom(faces), ["backface_collision"] = true };
+        using var packed = Variant.CreateFrom(faces);
+        using var data = new Godot.Collections.Dictionary { ["faces"] = packed, ["backface_collision"] = true };
         PhysicsServer3D.ShapeSetData(shape, data);
         var body = PhysicsServer3D.BodyCreate();
         PhysicsServer3D.BodySetMode(body, PhysicsServer3D.BodyMode.Static);
@@ -77,6 +78,7 @@ public sealed partial class ColliderManager
         for (int i = 0; i < CollisionBuilder.HashCount; i++) FreeBucket(c, i);
         c.Built = false;
         c.DirtyMask = 0;
+        c.Prioritized = false;
         _built.Remove(coord);
     }
 }

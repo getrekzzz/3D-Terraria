@@ -12,13 +12,18 @@ public class StreamerSchedulingTests
 {
     private static readonly RenderTables Tables = new(TestPaths.Content, _ => 0);
 
-    private static (WorldSession Session, JobSystem Jobs, ChunkStreamer Streamer) Create(int meshRadius = 1)
+    private static (WorldSession Session, JobSystem Jobs, ChunkStreamer Streamer) Create(int meshRadius = 1, int maxMeshes = 0)
     {
         var log = new MemoryLog();
         var settings = new WorldSettings { Name = "t", Seed = 42, Size = WorldSizePreset.Tiny };
         var session = WorldSession.Create(TestPaths.Content, settings, TestWorlds.TempDir(), Tables, log);
         var jobs = new JobSystem(3, log);
-        var streamer = new ChunkStreamer(session, jobs, new StreamingSettings { MeshRadius = meshRadius, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1 });
+        var s = new StreamingSettings
+        {
+            MeshRadius = meshRadius, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1,
+            MaxMeshesInFlight = maxMeshes > 0 ? maxMeshes : new StreamingSettings().MaxMeshesInFlight,
+        };
+        var streamer = new ChunkStreamer(session, jobs, s);
         return (session, jobs, streamer);
     }
 
@@ -112,6 +117,33 @@ public class StreamerSchedulingTests
         Pump(streamer, jobs, spawn);
         Assert.Equal(all.Count, order.Distinct().Count());
         Assert.Equal(focus, order[1]);
+    }
+
+    [Fact]
+    public void LightRemeshesFollowEditsButPrecedeDistanceOrder()
+    {
+        var (session, jobs, streamer) = Create(meshRadius: 2, maxMeshes: 1);
+        using var _ = jobs;
+        var spawn = session.FindStandableNear(session.SpawnCell);
+        Assert.False(streamer.IsSettledNear(spawn));
+        Pump(streamer, jobs, spawn);
+        Assert.True(streamer.IsSettledNear(spawn));
+        var focus = ChunkMath.CellToChunk(spawn);
+
+        // One mesh job at a time: the first urgent request takes the slot, the rest queue by priority.
+        var blocker = focus + new Int3(0, 0, 2);
+        var near = focus;
+        var light = focus + new Int3(2, 0, 0);
+        var edit = focus + new Int3(-2, 0, 0);
+        Assert.True(streamer.IsMeshed(light) && streamer.IsMeshed(edit) && streamer.IsMeshed(blocker));
+        var order = new List<Int3>();
+        streamer.MeshScheduled = order.Add;
+        streamer.MarkDirty(new[] { blocker }, urgent: true);
+        streamer.MarkDirty(new[] { near }, urgent: false);
+        streamer.MarkDirty(new[] { light }, urgent: true, ChunkStreamer.LightPriority);
+        streamer.MarkDirty(new[] { edit }, urgent: true);
+        Pump(streamer, jobs, spawn);
+        Assert.Equal(new[] { blocker, edit, light, near }, order);
     }
 
     [Fact]
