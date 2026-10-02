@@ -88,4 +88,22 @@ public class TownGoodsTests
         Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, freshPress: true));
         Assert.Contains(g.Player.State.Buffs.Active, b => b.Def.Id == "tipsy");
     }
+
+    [Fact]
+    public void TheCrystalBallGivesClairvoyance()
+    {
+        using var g = Arena();
+        Place(g, "crystal_ball", 2, 2);
+        g.Ticks(61);
+        Assert.Contains(g.Player.State.Buffs.Active, b => b.Def.Id == "clairvoyance");
+    }
+
+    [Fact]
+    public void TheResplendentDessertGivesASugarRush()
+    {
+        using var g = Arena();
+        g.Hold("resplendent_dessert", 1);
+        Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, freshPress: true));
+        Assert.Contains(g.Player.State.Buffs.Active, b => b.Def.Id == "sugar_rush");
+    }
 }

@@ -77,3 +77,29 @@ def cog(mb: MeshBuilder, p, rng):
         c, s = math.cos(a), math.sin(a)
         mb.box((c * 0.09 - 0.015, s * 0.09 - 0.015, 0.0), (c * 0.09 + 0.015, s * 0.09 + 0.015, 0.03), "prop:iron", metal)
     mb.cylinder((0, 0, -0.002), (0, 0, 0.032), 0.025, None, "prop:plain", "#2a2a2a", segments=10)
+
+
+@generator
+def crystal_ball(mb: MeshBuilder, p, rng):
+    """A glowing glass sphere on a carved wooden stand."""
+    w, h, d = p["size"]
+    r = min(w, d) * 0.32
+    mb.lathe([(0.0, 0.0), (r * 0.9, 0.0), (r * 0.7, h * 0.12), (r * 0.35, h * 0.3), (r * 0.6, h * 0.42), (0.0, h * 0.44)],
+             "prop:dark_planks", p.get("stand", "#5a3a20"), segments=14)
+    mb.sphere((0, 0, h * 0.44 + r), r, "prop:crystal:glow", p.get("color", "#b090ff"), subdivisions=2)
+
+
+@generator
+def star_topper(mb: MeshBuilder, p, rng):
+    """A five-pointed golden star standing on a short peg."""
+    w, h, d = p["size"]
+    s = min(w, h) * 0.4
+    pts = []
+    for k in range(10):
+        a = math.pi / 2 + math.pi * k / 5
+        rr = s if k % 2 == 0 else s * 0.45
+        pts.append((rr * math.cos(a), rr * math.sin(a)))
+    from mathutils import Matrix
+    m = Matrix.Translation((0, 0.03, h * 0.5)) @ Matrix.Rotation(math.pi / 2, 4, "X")
+    mb.extrude_polygon(pts, 0.06, "prop:gold", p.get("color", "#ffe060"), matrix=m)
+    mb.cylinder((0, 0, 0), (0, 0, h * 0.5 - s * 0.4), 0.02, None, "prop:gold", "#c8a040", segments=6)

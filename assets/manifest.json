@@ -697,6 +697,12 @@
    ],
    "generator": "evil_orb"
   },
+  "crystal_ball": {
+   "models": [
+    "assets/models/objects/crystal_ball_v0.glb"
+   ],
+   "generator": "crystal_ball"
+  },
   "crystal_slime_banner": {
    "models": [
     "assets/models/objects/crystal_slime_banner_v0.glb"
@@ -3107,6 +3113,12 @@
    ],
    "generator": "spike"
   },
+  "star_topper": {
+   "models": [
+    "assets/models/objects/star_topper_v0.glb"
+   ],
+   "generator": "star_topper"
+  },
   "stargazer_banner": {
    "models": [
     "assets/models/objects/stargazer_banner_v0.glb"
@@ -4600,6 +4612,13 @@
    },
    "icon": "assets/icons/items/code_1.png"
   },
+  "cog": {
+   "model": "assets/models/items/cog.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/cog.png"
+  },
   "compass": {
    "model": "assets/models/items/compass.glb",
    "icon": "assets/icons/items/compass.png"
@@ -4864,6 +4883,10 @@
   "cross_necklace": {
    "model": "assets/models/items/cross_necklace.glb",
    "icon": "assets/icons/items/cross_necklace.png"
+  },
+  "crystal_ball": {
+   "object": "crystal_ball",
+   "icon": "assets/icons/items/crystal_ball.png"
   },
   "crystal_shard": {
    "model": "assets/models/items/crystal_shard.glb",
@@ -6931,6 +6954,11 @@
    },
    "icon": "assets/icons/items/magic_dagger.png"
   },
+  "magic_hat": {
+   "model": "assets/models/items/magic_hat.glb",
+   "armor": "magic_hat",
+   "icon": "assets/icons/items/magic_hat.png"
+  },
   "magic_lantern": {
    "model": "assets/models/items/magic_lantern.glb",
    "sockets": {
@@ -7266,6 +7294,11 @@
    "object": "mushroom_candle",
    "icon": "assets/icons/items/mushroom_candle.png"
   },
+  "mushroom_cap": {
+   "model": "assets/models/items/mushroom_cap.glb",
+   "armor": "mushroom_cap",
+   "icon": "assets/icons/items/mushroom_cap.png"
+  },
   "mushroom_chair": {
    "object": "mushroom_chair",
    "icon": "assets/icons/items/mushroom_chair.png"
@@ -7431,6 +7464,10 @@
     "tip": "0.0485 1.038 0 > 0 1 0"
    },
    "icon": "assets/icons/items/mythril_shortsword.png"
+  },
+  "nanites": {
+   "model": "assets/models/items/nanites.glb",
+   "icon": "assets/icons/items/nanites.png"
   },
   "natures_gift": {
    "model": "assets/models/items/natures_gift.glb",
@@ -8105,6 +8142,21 @@
    "object": "pirate_deckhand_banner",
    "icon": "assets/icons/items/pirate_deckhand_banner.png"
   },
+  "pirate_hat": {
+   "model": "assets/models/items/pirate_hat.glb",
+   "armor": "pirate_outfit",
+   "icon": "assets/icons/items/pirate_hat.png"
+  },
+  "pirate_pants": {
+   "model": "assets/models/items/pirate_pants.glb",
+   "armor": "pirate_outfit",
+   "icon": "assets/icons/items/pirate_pants.png"
+  },
+  "pirate_shirt": {
+   "model": "assets/models/items/pirate_shirt.glb",
+   "armor": "pirate_outfit",
+   "icon": "assets/icons/items/pirate_shirt.png"
+  },
   "pirate_staff": {
    "model": "assets/models/items/pirate_staff.glb",
    "sockets": {
@@ -8234,6 +8286,16 @@
   "pressure_plate": {
    "object": "pressure_plate",
    "icon": "assets/icons/items/pressure_plate.png"
+  },
+  "princess_dress": {
+   "model": "assets/models/items/princess_dress.glb",
+   "armor": "princess_outfit",
+   "icon": "assets/icons/items/princess_dress.png"
+  },
+  "princess_hat": {
+   "model": "assets/models/items/princess_hat.glb",
+   "armor": "princess_outfit",
+   "icon": "assets/icons/items/princess_hat.png"
   },
   "prismatic_lacewing": {
    "model": "assets/models/items/prismatic_lacewing.glb",
@@ -8459,6 +8521,13 @@
    },
    "icon": "assets/icons/items/reinforced_fishing_pole.png"
   },
+  "resplendent_dessert": {
+   "model": "assets/models/items/resplendent_dessert.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/resplendent_dessert.png"
+  },
   "retinazer_trophy": {
    "object": "retinazer_trophy",
    "icon": "assets/icons/items/retinazer_trophy.png"
@@ -8538,6 +8607,14 @@
   "rocket_i": {
    "model": "assets/models/items/rocket_i.glb",
    "icon": "assets/icons/items/rocket_i.png"
+  },
+  "rocket_ii": {
+   "model": "assets/models/items/rocket_ii.glb",
+   "icon": "assets/icons/items/rocket_ii.png"
+  },
+  "rocket_iii": {
+   "model": "assets/models/items/rocket_iii.glb",
+   "icon": "assets/icons/items/rocket_iii.png"
   },
   "rocket_launcher": {
    "model": "assets/models/items/rocket_launcher.glb",
@@ -9283,6 +9360,10 @@
     "muzzle": "0 0.88 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/star_cannon.png"
+  },
+  "star_topper": {
+   "object": "star_topper",
+   "icon": "assets/icons/items/star_topper.png"
   },
   "star_wrath": {
    "model": "assets/models/items/star_wrath.glb",
@@ -14915,6 +14996,16 @@
     "tris": 206
    }
   },
+  "magic_hat": {
+   "head": {
+    "model": "assets/models/armor/magic_hat_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": false,
+    "tris": 318
+   }
+  },
   "meteor_armor": {
    "head": {
     "model": "assets/models/armor/meteor_armor_head.glb",
@@ -15111,6 +15202,16 @@
     "refLength": 0.1513,
     "hidesHair": false,
     "tris": 132
+   }
+  },
+  "mushroom_cap": {
+   "head": {
+    "model": "assets/models/armor/mushroom_cap_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 225
    }
   },
   "mythril_armor": {
@@ -15653,6 +15754,96 @@
     "tris": 258
    }
   },
+  "pirate_outfit": {
+   "head": {
+    "model": "assets/models/armor/pirate_outfit_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": false,
+    "tris": 258
+   },
+   "chest": {
+    "model": "assets/models/armor/pirate_outfit_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/pirate_outfit_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/pirate_outfit_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/pirate_outfit_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/pirate_outfit_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/pirate_outfit_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/pirate_outfit_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/pirate_outfit_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/pirate_outfit_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/pirate_outfit_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   }
+  },
   "platinum_armor": {
    "head": {
     "model": "assets/models/armor/platinum_armor_head.glb",
@@ -15757,6 +15948,48 @@
     "refLength": 0.1513,
     "hidesHair": false,
     "tris": 206
+   }
+  },
+  "princess_outfit": {
+   "head": {
+    "model": "assets/models/armor/princess_outfit_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 338
+   },
+   "chest": {
+    "model": "assets/models/armor/princess_outfit_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/princess_outfit_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/princess_outfit_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/princess_outfit_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
    }
   },
   "pumpkin_mask": {

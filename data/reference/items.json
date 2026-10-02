@@ -4938,6 +4938,104 @@
    "kind": "town_goods",
    "stage": "early",
    "source": "tavernkeep"
+  },
+  {
+   "id": "terraria:crystal_ball",
+   "name": "Crystal Ball",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:magic_hat",
+   "name": "Magic Hat",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "wizard"
+  },
+  {
+   "id": "terraria:cog",
+   "name": "Cog",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "steampunker"
+  },
+  {
+   "id": "terraria:rocket_ii",
+   "name": "Rocket II",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:rocket_iii",
+   "name": "Rocket III",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:nanites",
+   "name": "Nanites",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "cyborg"
+  },
+  {
+   "id": "terraria:mushroom_cap",
+   "name": "Mushroom Cap",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "truffle"
+  },
+  {
+   "id": "terraria:pirate_hat",
+   "name": "Pirate Hat",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "pirate"
+  },
+  {
+   "id": "terraria:pirate_shirt",
+   "name": "Pirate Shirt",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "pirate"
+  },
+  {
+   "id": "terraria:pirate_pants",
+   "name": "Pirate Pants",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "pirate"
+  },
+  {
+   "id": "terraria:star_topper",
+   "name": "Star Topper",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "santa claus"
+  },
+  {
+   "id": "terraria:princess_hat",
+   "name": "Princess Hat",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "princess"
+  },
+  {
+   "id": "terraria:princess_dress",
+   "name": "Princess Dress",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "princess"
+  },
+  {
+   "id": "terraria:resplendent_dessert",
+   "name": "Resplendent Dessert",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "princess"
   }
  ]
 }

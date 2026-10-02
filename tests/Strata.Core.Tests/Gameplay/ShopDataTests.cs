@@ -134,4 +134,41 @@ public class ShopDataTests
         foreach (var table in new[] { "old_ones_army", "dark_mage", "ogre", "betsy" })
             Assert.Contains(db.LootTables.Get(table).Entries, e => e.Item == "defender_medal");
     }
+
+    /// <summary>Residents without goods in Terraria (or whose goods do not exist yet: the Stylist's hair dyes).</summary>
+    private static readonly string[] ServiceOnly = { "guide", "nurse", "old_man", "tax_collector", "stylist", "zoologist", "golfer" };
+
+    [Fact]
+    public void EveryResidentExceptServiceOnlyOnesHasAShop()
+    {
+        foreach (var npc in TestPaths.Content.TownNpcs.All)
+            if (Array.IndexOf(ServiceOnly, npc.Id) < 0) Assert.True(npc.Shop.Length > 0, $"{npc.Id} sells nothing");
+    }
+
+    [Fact]
+    public void SantaSellsOnlyAtChristmas()
+    {
+        using var g = Create();
+        var santa = Summon(g, "santa_claus");
+        g.World.Session.Seasons.Override = "";
+        Assert.Empty(Stock(g, santa));
+        g.World.Session.Seasons.Override = "christmas";
+        var stock = Stock(g, santa);
+        Assert.Contains("christmas_tree", stock);
+        Assert.Contains("star_topper", stock);
+    }
+
+    [Fact]
+    public void TheCyborgsRocketsFollowTheNightAndTheBloodMoon()
+    {
+        using var g = Create();
+        var cyborg = Summon(g, "cyborg");
+        g.World.Session.Clock.SetHour(12);
+        var day = Stock(g, cyborg);
+        Assert.Contains("rocket_i", day);
+        Assert.DoesNotContain("rocket_ii", day);
+        Assert.DoesNotContain("rocket_iii", day);
+        g.World.Session.Clock.SetHour(22);
+        Assert.Contains("rocket_iii", Stock(g, cyborg));
+    }
 }

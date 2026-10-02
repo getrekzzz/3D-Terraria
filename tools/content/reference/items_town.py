@@ -44,5 +44,19 @@ bubble_machine|Bubble Machine|early|party girl
 defender_medal|Defender Medal|early|old one's army
 ale|Ale|early|tavernkeep
 eternia_crystal_stand|Eternia Crystal Stand|early|tavernkeep
+crystal_ball|Crystal Ball|hardmode|wizard
+magic_hat|Magic Hat|hardmode|wizard
+cog|Cog|hardmode|steampunker
+rocket_ii|Rocket II|hardmode|cyborg
+rocket_iii|Rocket III|hardmode|cyborg
+nanites|Nanites|hardmode|cyborg
+mushroom_cap|Mushroom Cap|hardmode|truffle
+pirate_hat|Pirate Hat|hardmode|pirate
+pirate_shirt|Pirate Shirt|hardmode|pirate
+pirate_pants|Pirate Pants|hardmode|pirate
+star_topper|Star Topper|hardmode|santa claus
+princess_hat|Princess Hat|early|princess
+princess_dress|Princess Dress|early|princess
+resplendent_dessert|Resplendent Dessert|early|princess
 """,
 }

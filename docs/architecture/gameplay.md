@@ -710,3 +710,9 @@ item value unless given, scaled by happiness (currency prices are not). New good
   harmless glowing puff), the Party Hat and a decor Bubble Machine (no bubbles yet); the Tavernkeep Ale (Tipsy) for a
   Defender Medal (dropped by the Old One's Army: 50% per soldier, 5/10/20 from Dark Mage/Ogre/Betsy) and a decor
   Eternia Crystal Stand (the crystal item still starts the event). `town buy` finds the tab that lists the item.
+* **Shops IV** (P5-18): Wizard (Crystal Ball, an aura giving Clairvoyance; Magic Hat), Steampunker (Cog; wings after
+  Golem), Cyborg (Rocket II in a Blood Moon, digs; Rocket III at night or in an eclipse, wider blast; Nanites as a
+  material), Truffle (Mushroom Cap; Mushroom Spear and Hammush after a mechanical boss), Pirate outfit, Santa's whole
+  stock only at Christmas (plus a Star Topper), Princess outfit and Resplendent Dessert (Sugar Rush). Deferred: the
+  Pirate's Cannon (needs an activatable launcher tile), Steampunker solutions and Clentaminator (no conversion
+  spray), sentry staves and Defender armour (no sentries yet), the Stylist's hair dyes.
