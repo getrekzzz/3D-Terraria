@@ -42,6 +42,33 @@ public sealed class DungeonPass : GenPass
         }
         else marks[LandmarkIds.DungeonChest] = bottom.CenterFloor;
         marks[LandmarkIds.DungeonGate] = DungeonBuilder.GateCell(layout, site.Surface);
+        TourMarks(marks, layout, bp, ctx.Content);
+    }
+
+    /// <summary>Landmarks for the smoke route and the screenshot tour: the foyer, the shaft's foot, a library, a treasure room,
+    /// a banner in a hall (and the hall's floor) and a spike (each only when the dungeon has one).</summary>
+    private static void TourMarks(Dictionary<string, Int3> marks, DungeonLayout layout, Blueprint bp, Content.ContentDatabase content)
+    {
+        marks[LandmarkIds.DungeonFoyer] = layout.Door - layout.Inward * 2;
+        if (layout.Nodes.Count > 1) marks[LandmarkIds.DungeonShaft] = layout.Nodes[1].Floor;
+        foreach (var r in layout.Rooms)
+        {
+            if (r.Kind == RoomKind.Library && !marks.ContainsKey(LandmarkIds.DungeonLibrary)) marks[LandmarkIds.DungeonLibrary] = r.CenterFloor;
+            if (r.Kind == RoomKind.Treasure && !marks.ContainsKey(LandmarkIds.DungeonTreasure)) marks[LandmarkIds.DungeonTreasure] = r.CenterFloor;
+        }
+        foreach (var op in bp.Ops)
+        {
+            if (op is not ObjectOp o) continue;
+            if (o.ObjectId == "spike" && !marks.ContainsKey(LandmarkIds.DungeonSpikes)) marks[LandmarkIds.DungeonSpikes] = o.Anchor;
+            if (!marks.ContainsKey(LandmarkIds.DungeonBanner) && content.TileObjects.TryGet(o.ObjectId, out var def) && def.HasTag("banner"))
+                foreach (var hall in layout.Halls)
+                    foreach (var box in hall.Interiors())
+                        if (hall.Kind != HallKind.Shaft && box.Contains(o.Anchor))
+                        {
+                            marks[LandmarkIds.DungeonBanner] = o.Anchor;
+                            marks[LandmarkIds.DungeonHall] = new Int3((box.Min.X + box.Max.X) / 2, box.Min.Y, (box.Min.Z + box.Max.Z) / 2);
+                        }
+        }
     }
 
     /// <summary>

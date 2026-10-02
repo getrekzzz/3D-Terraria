@@ -193,10 +193,22 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "aim", Usage = "aim <dx> <dy> <dz>", Help = "Points the player's view along a direction.",
+            Name = "aim", Usage = "aim <dx> <dy> <dz> | aim landmark <id> [dy]",
+            Help = "Points the player's view along a direction, or level toward a planned landmark (tilted by dy).",
             Run = (ctx, a) =>
             {
-                var dir = new Vector3(a.Float(0, "dx"), a.Float(1, "dy"), a.Float(2, "dz"));
+                Vector3 dir;
+                if (a.Str(0, "dx") == "landmark")
+                {
+                    var marks = ctx.World.Session.Generator.Plan.Landmarks;
+                    var id = a.Str(1, "id");
+                    if (!marks.TryGetValue(id, out var mark)) throw new CommandException($"no landmark '{id}'");
+                    var eye = ctx.Player.Eye;
+                    dir = new Vector3((mark.X + 0.5f) * Units.CellSize - eye.X, 0, (mark.Z + 0.5f) * Units.CellSize - eye.Z);
+                    if (dir.LengthSquared() < 1e-6f) throw new CommandException("standing on the landmark");
+                    dir = Vector3.Normalize(dir) + new Vector3(0, a.Count > 2 ? a.Float(2, "dy") : 0f, 0);
+                }
+                else dir = new Vector3(a.Float(0, "dx"), a.Float(1, "dy"), a.Float(2, "dz"));
                 if (dir.LengthSquared() < 1e-6f) throw new CommandException("direction must be non-zero");
                 ctx.Host.Aim(ctx.Player, dir);
                 return CommandResult.Success();

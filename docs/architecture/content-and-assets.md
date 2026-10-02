@@ -71,3 +71,13 @@ or an inline dict) with per-key overrides (`body`/`bodyTint`, `trim`/`trimTint`,
 `candle_cup` are shared helpers. The blue, green and pink Dungeon sets live in `data/tileobjects/dungeon.json`
 (specs in `tools/blender/assets.d/p4-17-dungeon-furniture.json`). A tile object's `flame.also` lists more flame bases
 (same size and colour) for multi-candle lights; keep them in sync with the candle tops the generator places.
+
+### Dungeon and boss generators
+Besides the palette furniture above, the Dungeon draws on `banner` (the six hall banners: Marching Bones, Necromantic
+Sign, Rusted Company Standard, Ragged Brotherhood Sigil, Molten Legion Flag, Diabolic Sigil, 2 x 4 wall hangings
+drawn flush, back to the wall), `statue` (angel, armor and skeleton statues), `book` (shelf books), `spike_strip`
+(`spike`, one MultiMesh per chunk), `chest` (the six vault biome chests and the locked Gold and Shadow chests),
+`bone_welder`, and the bosses' `trophy` generator (3 x 3 wall hangings, front turned away from the wall). Each boss's
+treasure bag, masks and Expert items are items in the boss's data file with models from the boss generator modules.
+Rebuild only what you add: `python3.13 tools/blender/build_all.py --only=<ids>`, which keeps the rest of
+`assets/manifest.json` (when two branches both add assets, take one side's manifest and rebuild the other side's ids).

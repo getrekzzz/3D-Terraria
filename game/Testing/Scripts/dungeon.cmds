@@ -1,5 +1,7 @@
-# Dungeon: the keeper at the crypt gate, the guardian that only haunts the crypt, the curse broken at night and
-# Skeletron's hands falling on their own, and its skull's fall freeing the keeper.
+# Dungeon, the whole arc: the keeper at the crypt gate, the guardian that only haunts the crypt, the curse broken at
+# night with Skeletron's hands falling first and then its skull, the guardian gone once the flag is set, then down the
+# shaft into a library, over a spike strip, to the vault and a locked chest opened with a key. Landmarks (planned by
+# the Dungeon pass) stand in for walking.
 wait_until player.frozen == 0 180
 spawning off
 town arrivals off
@@ -46,6 +48,29 @@ assert projectiles.count >= 1
 time noon
 assert errors == 0
 
+# The curse is broken: the guardian no longer answers trespassers at the foot of the entrance shaft.
+tp landmark dungeon_shaft
+wait_until player.frozen == 0 180
+assert zone.dungeon == 1
+repeat 6 spawning now
+assert npcs.dungeon_guardian == 0
+killall
+
+# A library: shelves of books in the crypt's colour.
+tp landmark dungeon_library
+wait_until player.frozen == 0 180
+assert zone.dungeon == 1
+wait_until stream.idle == 1 600
+assert near_object.book > 0
+
+# A spike strip across a hall bites whoever steps on it.
+tp landmark dungeon_spikes
+wait_until player.frozen == 0 180
+heal
+wait 1
+assert player.life < 100
+heal
+
 # Deep in the Dungeon: the vault floor is inside the zone, and so is the floor in front of a locked chest.
 tp landmark dungeon_bottom
 wait_until player.frozen == 0 180
@@ -66,4 +91,5 @@ interact nearest gold_chest 8 refused
 give golden_key 1
 interact nearest gold_chest 8 containeropened
 assert inv.golden_key == 0
+assert props.problems == 0
 assert errors == 0

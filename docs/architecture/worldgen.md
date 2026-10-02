@@ -97,7 +97,17 @@ blueprint rejects new ops. `CarveOp`/`FillOp` carry `NoZone`: approach cuts and 
 but are not "in the structure" for spawns, music or mining locks. The index changes no output (golden hashes
 unchanged; `BlueprintIndexTests` compares it with brute force).
 
-## Dungeon layout planner
+## The Dungeon
+
+The Terraria 1:1 Dungeon (GenVersion 11, on the Phase 1 relief of version 10) is one `DungeonPass`: `Plan` picks the
+site, plans the layout (pure data), builds the blueprint in phases, decorates it, plans its wires and landmarks, and
+adds a `DungeonFeature`; `Generate` stamps the blueprint chunk by chunk. Each step below is deterministic from the seed
+tree and integer-only. Tests: `DungeonLayoutTests` (synthetic sites), `DungeonGenerationTests` and
+`DungeonDecorTests` (seed 1234 Tiny), `DungeonSiteTests` (seeds 1-12 Tiny on the real relief), `DungeonTests`
+(zone, locks, guardian, keeper), and the dungeon chunks among the golden hashes. The smoke `dungeon.cmds` walks the
+arc by landmarks.
+
+### Layout planner
 
 `WorldGen/Structures/Dungeon/` plans the Terraria-style dungeon as pure data (`DungeonPlanner.Plan(site, budget,
 seeds)` returns a `DungeonLayout`), which `DungeonPass` carves (see Dungeon carving below). `DungeonSite` gives the gate (ground cell at the keep centre), the inward axis, world size, layer
@@ -126,13 +136,19 @@ floor limit (`CavernTop - n`, never below `UnderworldTop + 40`).
   plan takes a few milliseconds. `DungeonLayoutTests` check determinism, reachability, cover, floor, quotas, stairs,
   headroom and that interiors only meet where joined.
 
-## Dungeon carving
+### Site, carving and the keep
 
 `DungeonPass.Plan` picks the site (the snow-side angle ±0.07 at 0.86 of the land radius, stepping inward while landness
-< 0.97; inward = the dominant axis toward the centre; it only samples `SurfaceHeight` and `Landness`), plans the layout,
+< 0.97; inward = the dominant axis toward the centre; it only samples `SurfaceHeight` and `Landness`). The Phase 1
+relief rolls, so `DungeonPass.FlattestSite` then tries the spots 0/12/24/36 cells further inland and 12/24 to either
+side (land only) and keeps the one whose keep, apron and approach (20 back, 34 in front, 20 to each side, sampled every
+3 cells) span the least relief, the planned spot winning ties. It plans the layout,
 picks a `DungeonStyle` (blue, green or pink brick with its brick / slab / tiled wall panels) and adds a `DungeonFeature`
 (a `StructureFeature` carrying `Layout` and `Style`). Landmarks: `dungeon_gate` (ground 3 cells out of the keep door,
-outside the zone), `dungeon_bottom` (the vault floor), `dungeon_chest` (in front of the first locked chest).
+outside the zone), `dungeon_bottom` (the vault floor), `dungeon_chest` (in front of the first locked chest), and for
+the smoke route and the tour `dungeon_foyer` (inside the door), `dungeon_shaft` (the shaft's foot), `dungeon_library`,
+`dungeon_treasure` (room centres), `dungeon_banner` / `dungeon_hall` (the first hall banner and its hall's floor) and
+`dungeon_spikes` (the first spike, when there is one). `aim landmark <id> [dy]` faces one.
 
 `DungeonBuilder.Build(content, layout, style)` emits ops in phases so crossings merge: A shells (`interior.Expand(2)`
 brick for every hall step, shaft, room and the keep), B panels (the side faces of `interior.Expand(1)` over the
@@ -155,17 +171,20 @@ an inner panel), the inland-facing front 2 cells thicker, a 2-cell roof with mer
 r 3, 24 tall, stepped caps), an arched door 6 x 9 (+ 4 and 2 wide at +9 / +10), two slit windows and a foyer of four
 pillars round the entrance shaft's 10 x 10 opening. The foundation fills brick under the walls, turrets and a 3-cell
 apron from 6 under the lowest ground (at most 24 under the floor) and, in 4 x 4 blocks, 2 cells into each block's own
-ground, so the keep never floats. The approach is NoZone: a level landing past the apron, then rows at most one cell
+ground, so the keep never floats. Before the shell, `DungeonBuilder.Clearing` cuts any ground that still rises over the
+floor round the keep (a hillside the flattest site touches): NoZone carves one layer per cell over the floor, each
+reaching 3 + its height beyond the footprint (a 1:1 bank, at most 24 layers, none on level ground), so the walls stand
+free. The approach is NoZone: a level landing past the apron, then rows at most one cell
 lower each until they meet the ground (brick steps where the ground is lower), the first 12 rows cut clear 10 wide
 and 12 tall; `DungeonBuilder.GateCell` (the landing just past the apron) is `dungeon_gate`, outside the zone.
 
 Every cell is flagged `CellFlags.Structure` (locked until Skeletron falls). Later passes leave structure cells alone
 (`ChunkGenContext.IsStructure`): cave/nest/chasm carvers skip them, treasure and decoration do not place on them, and
-the dungeon stamp drops objects earlier passes left inside its zone. A Large dungeon is ~6000 ops, planned and built in
-~15 ms. `DungeonGenerationTests` check shells and flags, platforms, stair shapes and walking, reachability on foot from
+the dungeon stamp drops objects earlier passes left inside its zone. A Large dungeon is 7000-8000 ops: planned in ~3 ms, built in ~3 ms and
+decorated in 25-70 ms. `DungeonGenerationTests` check shells and flags, platforms, stair shapes and walking, reachability on foot from
 the entrance junction and open crossings on the real seed-1234 Tiny world.
 
-## Dungeon decorator
+### Decorator
 
 `DungeonDecorator.Decorate` (run by `DungeonPass.Plan` between `DungeonBuilder.Build` and the feature, rng stream
 `dungeon.decor`) appends object ops and small fills to the open blueprint. `BlueprintProbe` answers what a cell will

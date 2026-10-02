@@ -257,9 +257,22 @@
   the item that fired it. A fallen town resident drops table `<id>_death` when it exists; its conditions may test
   `wearing` (an equipped item, the Clothier's Red Hat).
 
+## Bosses and the Dungeon (summary)
+
+Where to look: boss bodies, parts and brains (fixed `parts` such as Skeletron's two hands on bone arms, which fall on
+their own while the skull fights on; segmented worms), `boss.enrage` and Expert context (`BrainContext.Expert`, the
+`expert` loot condition), treasure bags (`<boss>_bag`, Expert and Master) and natural arrivals are in the creature
+notes above; the Dungeon's zone, crypt-wall locks (picks bounce until `defeated_skeletron`), the invulnerable
+Guardian (spawn rule `dungeon_guardian_trespass`, only while the flag is unset, despawns outside the zone), the Old
+Man at `dungeon_gate` (curses into Skeletron at night, leaves when it falls) and the exclusive roster in
+`data/enemies/dungeon.json`; spikes and dart traps under *Object hazards*; locked chests and keys below. The
+smoke `dungeon.cmds` drives the whole arc through landmarks (`tp landmark dungeon_shaft`, `dungeon_library`,
+`dungeon_spikes`, `dungeon_bottom`, `dungeon_chest`) and checks `near_object.book` (tile objects of an id within 16
+cells, `ObjectProbes`), `props.problems` and `errors`.
+
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
-`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …); debug commands such as
+`npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `near_object.<object>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …); debug commands such as
 `god`, `drop`, `slay` and `tp landmark` make fights and summons scriptable used by `assert` and `wait_until`.
 `game/Testing/Scripts/*.cmds` run headless in CI with `--smoke=` and print `SMOKE PASS`/`SMOKE FAIL`;
 `--exec="cmd;cmd"` runs commands at startup (screenshots, manual testing). Runner directives: `wait`,
