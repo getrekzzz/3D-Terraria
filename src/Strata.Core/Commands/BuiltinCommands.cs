@@ -22,6 +22,9 @@ public static class BuiltinCommands
         TownCommands.Register(r);
         InventoryCommands.Register(r);
         WorldCommands.Register(r);
+        WeatherCommands.Register(r);
+        FishingCommands.Register(r);
+        SeasonCommands.Register(r);
         PerfCommands.Register(r);
         GuideCommands.Register(r);
         HintCommands.Register(r);

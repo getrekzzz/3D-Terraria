@@ -13,6 +13,9 @@ public static partial class ContentValidator
             if (i.MaxStack < 1) ctx.Error(i, "maxStack must be >= 1.");
             if (i.Value < 0) ctx.Error(i, "value must be >= 0.");
             if (i.UseTime < 1 || i.UseAnimation < 1) ctx.Error(i, "useTime/useAnimation must be >= 1 tick.");
+            if (i.ReuseDelay < 0) ctx.Error(i, "reuseDelay must be >= 0 ticks.");
+            if (i.AmmoPerBurst && (i.UseAmmo == null || i.UseTime >= i.UseAnimation))
+                ctx.Error(i, "ammoPerBurst needs useAmmo and a burst (useTime < useAnimation).");
             if (i.Damage > 0 && i.DamageType == DamageClass.None) ctx.Error(i, "damage > 0 requires damageType.");
             if (i.Crit is < 0 or > 100) ctx.Error(i, "crit must be 0–100.");
             if (i.MineBrush is < 1 or > 8) ctx.Error(i, "mineBrush must be 1–8.");

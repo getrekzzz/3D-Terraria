@@ -32,6 +32,8 @@ public sealed class ValidateCommand : IToolCommand
         errors += ConfigErrors(LightingConfig.Path, () => LightingConfig.Load(source).Validate());
         errors += ConfigErrors(UseStyleConfig.Path, () => UseStyleConfig.Load(source).Validate());
         errors += ConfigErrors(Strata.Core.Gameplay.Guide.BestiaryConfig.Path, () => Strata.Core.Gameplay.Guide.BestiaryConfig.Load(source).Validate());
+        errors += ConfigErrors(CreatureMaterialsConfig.Path, () => CreatureMaterialsConfig.Load(source).Validate(db));
+        errors += ConfigErrors(AmbienceConfig.Path, () => AmbienceConfig.Load(source).Validate(db));
         int warnings = db.Report.Warnings.Count();
         Console.WriteLine($"{errors} error(s), {warnings} warning(s)");
         return errors == 0 ? 0 : 1;

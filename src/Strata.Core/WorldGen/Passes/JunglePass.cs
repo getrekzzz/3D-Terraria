@@ -20,7 +20,7 @@ public sealed class JunglePass : GenPass
         var bands = ctx.Plan.Bands;
         foreach (var jungle in ctx.Plan.Regions.Where(r => r.Biome == "jungle").ToList())
         {
-            int hives = Math.Max(1, ctx.Scaled(2));
+            int hives = Math.Max(1, ctx.Scaled(2)) * (ctx.Plan.Settings.Has(World.SecretSeed.NotTheBees) ? 4 : 1);
             for (int i = 0; i < hives; i++)
             {
                 float a = rng.NextFloat(), d = rng.Range(0f, 0.55f) * jungle.RadiusX;

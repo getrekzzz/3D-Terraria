@@ -48,6 +48,7 @@ public sealed partial class PlayerAvatar : Node3D
         Visible = !_controller.Rig.FirstPerson && (immune <= 0 || (immune / 4) % 2 == 0); // blink while invulnerable
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
         UpdateCart(entity.Minecart);
+        UpdateMount(entity.Mount);
         UpdateGear(delta);
         Animate(entity, (float)delta);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));

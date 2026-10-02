@@ -1,0 +1,38 @@
+{
+  // Weather (src/Strata.Core/Gameplay/Weather). One in-game hour is one real minute. Every in-game hour a roll seeded
+  // by the world seed may start a rain spell (some are thunderstorms), turn the day windy (at the roll hour) or blow up
+  // a sandstorm on a windy day; the hour's wind is picked too. Rain falls as snow over the snow biomes (a storm as a
+  // blizzard), sandstorms only blow over the sand biomes, and nothing reaches underground or into space.
+  "rainChancePerHour": 0.035,
+  "rainHours": [2, 9],
+  "stormShare": 0.3,
+  "rainIntensity": [0.35, 0.8],
+  "stormIntensity": [0.8, 1.0],
+  "windyChancePerDay": 0.12,
+  "windyRollHour": 6,
+  "windyHours": [6, 14],
+  "calmWind": [0.05, 0.3],
+  "windyWind": [0.55, 0.95],
+  "stormWindMin": 0.6,
+  "sandstormChancePerHour": 0.12,
+  "sandstormHours": [1, 4],
+  "fadeSeconds": 20,
+  "windEaseSeconds": 30,
+  "snowBiomes": ["tundra", "ice_biome"],
+  "sandBiomes": ["desert"],
+  "rainEvent": "rain",
+  "stormEvent": "thunderstorm",
+  "windyEvent": "windy_day",
+  "sandstormEvent": "sandstorm",
+  "presentation": {
+    // Most particles alive per system at full intensity, by graphics preset (custom presets use medium).
+    "budgets": {
+      "low": { "rain": 1200, "snow": 700, "sand": 700, "splash": 160 },
+      "medium": { "rain": 2600, "snow": 1400, "sand": 1500, "splash": 320 },
+      "high": { "rain": 4500, "snow": 2400, "sand": 2500, "splash": 600 },
+      "ultra": { "rain": 6500, "snow": 3200, "sand": 3500, "splash": 900 }
+    },
+    "lightningSeconds": [5, 16],
+    "thunderDelay": [0.3, 2.6]
+  }
+}

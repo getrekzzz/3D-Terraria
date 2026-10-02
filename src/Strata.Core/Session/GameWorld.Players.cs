@@ -11,7 +11,7 @@ public sealed partial class GameWorld
     /// <summary>Puts a character into this world, with the accessory slots the world's difficulty unlocks (and coins that convert).</summary>
     public PlayerEntity AddPlayer(PlayerState state, Vector3 feet)
     {
-        state.Inventory.AccessorySlotsUnlocked = AccessorySlotsFor(Session.Settings.Difficulty);
+        state.Inventory.AccessorySlotsUnlocked = AccessorySlotsFor(Session.Settings.EffectiveDifficulty);
         state.Inventory.Content ??= Session.Content;
         state.Journal.Bestiary = Journal.Bestiary;
         var p = new PlayerEntity(state) { Position = feet };

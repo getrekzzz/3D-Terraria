@@ -83,6 +83,9 @@ public sealed class GraphicsPreset
     /// </summary>
     public int DynamicLights { get; set; } = 8;
 
+    /// <summary>How many light pets (Shadow Orb, Fairy Bell…) may claim a light from the dynamic pool (0 = baked glow only).</summary>
+    public int PetLights { get; set; } = 2;
+
     public bool Ssao { get; set; } = true;
 
     /// <summary>0 very low … 4 ultra.</summary>
@@ -142,6 +145,12 @@ public sealed class GraphicsPreset
     /// <summary>How far the horizon (the world's surface beyond the streamed chunks) reaches, in metres; 0 = none.</summary>
     public float HorizonDistance { get; set; }
 
+    /// <summary>Multiplies the particle counts of hit, mining and death effects (EffectKit).</summary>
+    public float EffectsScale { get; set; } = 0.7f;
+
+    /// <summary>Short-lived flash lights (explosions, sparks) alive at once; 0 disables them.</summary>
+    public int FlashLights { get; set; } = 2;
+
     /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last 30 %).</summary>
     public float OreGlintDistance { get; set; } = 24f;
 
@@ -173,6 +182,9 @@ public sealed class GraphicsPreset
         if (GrassBuildsPerFrame is < 0 or > 16) yield return "grassBuildsPerFrame must be within 0–16";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
+        if (EffectsScale is < 0f or > 2f) yield return "effectsScale must be within 0–2";
+        if (FlashLights is < 0 or > 16) yield return "flashLights must be within 0–16";
+        if (PetLights is < 0 or > 8) yield return "petLights must be within 0–8";
         if (CombatNumbers is < 8 or > 256) yield return "combatNumbers must be within 8–256";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
         if (OreGlintDistance is < 1f or > 60f) yield return "oreGlintDistance must be within 1–60 m";

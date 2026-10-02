@@ -50,12 +50,24 @@ public static class StatIds
     /// <summary>Share of magic damage dealt that heals the caster.</summary>
     public const string LifeSteal = "lifeSteal";
 
+    /// <summary>Flat fishing power from accessories and buffs (Angler Earring, Fishing Potion).</summary>
+    public const string FishingPower = "fishingPower";
+
+    /// <summary>Extra bait saving: each point adds one to the bait-consumption divisor (Tackle Box).</summary>
+    public const string BaitSaving = "baitSaving";
+
+    /// <summary>Above zero: the bobber survives lava, so lava can be fished (Lavaproof Fishing Hook).</summary>
+    public const string LavaFishing = "lavaFishing";
+
+    /// <summary>Added chance (0–1) that a catch is a crate (Crate Potion).</summary>
+    public const string CrateChance = "crateChance";
+
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
         MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, RunSpeed, Acceleration, JumpHeight, GenericDamage,
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
-        Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal,
+        Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal, FishingPower, BaitSaving, LavaFishing, CrateChance,
     };
 
     public static bool IsKnown(string id) => Known.Contains(id);

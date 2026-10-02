@@ -8,24 +8,34 @@ namespace Strata.Core.Gameplay.Interaction;
 
 public sealed partial class ItemUseSystem
 {
-    /// <summary>Red Wrench lays wire through the aimed cell (using one Wire); the Wire Cutter takes it back out.</summary>
+    /// <summary>
+    /// A wrench lays wire of its colour through the aimed cell (using one Wire); an Actuator goes onto the aimed block
+    /// (using itself); the Wire Cutter takes every wire and the actuator back out of the cell, returning them.
+    /// </summary>
     private UseOutcome UseWiring(PlayerEntity p, WiringParams cfg, Target target)
     {
         var cell = target.Cell;
         var wires = _world.Wires;
+        var items = _world.Session.Content.Items;
         if (cfg.Cut)
         {
-            if (!wires.Cut(cell)) return UseOutcome.Blocked;
-            if (_world.Session.Content.Items.TryGet(cfg.Wire, out var wireItem)) Give(p, new ItemStack(wireItem, 1));
+            int wireCount = 0;
+            foreach (var c in Wiring.WireColors.All)
+                if (wires.Has(cell, c)) wireCount++;
+            bool actuator = wires.Grid.HasActuator(cell);
+            if (wires.Cut(cell) == 0) return UseOutcome.Blocked;
+            if (wireCount > 0 && items.TryGet(cfg.Wire, out var wireItem)) Give(p, new ItemStack(wireItem, wireCount));
+            if (actuator && items.TryGet("actuator", out var act)) Give(p, new ItemStack(act, 1));
             return UseOutcome.Wired;
         }
-        if (wires.Has(cell)) return UseOutcome.Blocked;
+        var color = Wiring.WireColors.Parse(cfg.Color);
+        if (cfg.Actuator ? wires.Grid.HasActuator(cell) : wires.Has(cell, color)) return UseOutcome.Blocked;
         var backpack = p.State.Inventory.Backpack;
         for (int i = 0; i < backpack.Size; i++)
         {
             if (backpack[i].Item?.Id != cfg.Wire) continue;
+            if (cfg.Actuator ? !wires.PlaceActuator(cell) : !wires.Place(cell, color)) return UseOutcome.Blocked;
             backpack.Take(i, 1);
-            wires.Place(cell);
             return UseOutcome.Wired;
         }
         return UseOutcome.NoAmmo;
@@ -39,7 +49,7 @@ public sealed partial class ItemUseSystem
         float bestDistance = float.MaxValue;
         foreach (var npc in _world.Npcs.All)
         {
-            if (!npc.Alive || !npc.Def.HasTag(cfg.Tag) || npc.Def.CatchItem == null) continue;
+            if (!npc.Alive || npc.FromStatue || !npc.Def.HasTag(cfg.Tag) || npc.Def.CatchItem == null) continue; // statue critters are not for keeping
             var to = npc.Center - p.Eye;
             float d = to.Length();
             if (d > reach + npc.HalfExtents.X || d >= bestDistance) continue;

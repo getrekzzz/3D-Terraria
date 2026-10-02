@@ -18,13 +18,15 @@ public sealed partial class NpcSystem
         int volume = Touched(npc, pBox);
         if (volume < 0) return;
         var state = player.State;
-        var hit = DamageModel.Roll(ContactOf(npc, volume), DamageClass.None, 0, 6f, null, state.Defense,
-            DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
+        var hit = DamageModel.Roll(_world.Banners.Taken(player, npc, ContactOf(npc, volume)), DamageClass.None, 0, 6f, null, state.Defense,
+            DamageModel.DefenseFactor(_world.Session.Settings.EffectiveDifficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
         if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;
         var away = BrainFactory.Flat(player.Position - npc.Position);
         if (away == Vector3.Zero) away = new Vector3(MathF.Sin(npc.Yaw), 0, MathF.Cos(npc.Yaw));
-        var knock = away * (2.5f + hit.Knockback * 0.6f) + new Vector3(0, 4.5f, 0);
+        // Terraria-like: a clear shove away from the creature with a hop (none at full knockback resistance).
+        float stand = 1f - Math.Clamp(state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), 0f, 1f);
+        var knock = (away * (4f + hit.Knockback * 0.6f) + new Vector3(0, 5.5f, 0)) * stand;
         ReportPlayerDamage(player, hit.Damage, knock);
         ApplyContactEffects(npc, player);
         float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
@@ -45,10 +47,13 @@ public sealed partial class NpcSystem
         return -1;
     }
 
-    /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>
-    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock)
+    /// <summary>
+    /// Announces damage a player took from any source (numbers, knockback, hurt effects); <paramref name="kind"/> is
+    /// <see cref="DamageKind.Periodic"/> for debuffs ticking, which show smaller numbers and a quieter hurt sound.
+    /// </summary>
+    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock, DamageKind kind = DamageKind.Player)
     {
-        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, player));
+        Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, kind, player));
         PlayerHurt?.Invoke(player, damage, knock);
     }
 }

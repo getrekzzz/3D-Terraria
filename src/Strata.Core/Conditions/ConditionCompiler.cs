@@ -125,12 +125,41 @@ public static class ConditionCompiler
         ["evil"] = s =>
         {
             var p = s.Parse<EvilConditionParams>();
-            return new DelegateCondition(c => string.Equals(c.Evil, p.Is, StringComparison.OrdinalIgnoreCase));
+            // A Drunk World has both evils ("both").
+            return new DelegateCondition(c => c.Evil == "both" || string.Equals(c.Evil, p.Is, StringComparison.OrdinalIgnoreCase));
+        },
+        ["secretSeed"] = s =>
+        {
+            var flag = World.SecretSeeds.FromId(s.Parse<SecretSeedConditionParams>().Is);
+            return new DelegateCondition(c => flag != World.SecretSeed.None && (c.SecretSeeds & flag) != 0);
+        },
+        ["weather"] = s =>
+        {
+            var p = s.Parse<WeatherConditionParams>();
+            var kinds = p.Any.Where(k => k != "windy").Select(k => Enum.Parse<Gameplay.Weather.LocalWeather>(k, ignoreCase: true)).ToArray();
+            bool windy = p.Any.Contains("windy");
+            return new DelegateCondition(c => (windy && c.Windy || Array.IndexOf(kinds, c.Weather) >= 0) == p.Active);
         },
         ["fishingPower"] = s =>
         {
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.FishingPower >= p.Min && c.FishingPower <= p.Max);
+        },
+        ["fishingLiquid"] = s =>
+        {
+            var p = s.Parse<FishingLiquidConditionParams>();
+            return new DelegateCondition(c => Array.IndexOf(p.Any, c.FishingLiquid) >= 0);
+        },
+        ["anglerQuest"] = s =>
+        {
+            var p = s.Parse<AnglerQuestConditionParams>();
+            return new DelegateCondition(c => c.AnglerQuest == p.Fish);
+        },
+        ["season"] = s =>
+        {
+            var p = s.Parse<SeasonConditionParams>();
+            string want = p.Is == "none" ? "" : p.Is;
+            return new DelegateCondition(c => c.Season == want);
         },
         ["worldRing"] = s =>
         {
@@ -177,9 +206,14 @@ public static class ConditionCompiler
         c.Register<WearingConditionParams>(SpecKind.Condition, "wearing");
         c.Register<RangeConditionParams>(SpecKind.Condition, "difficulty");
         c.Register<RangeConditionParams>(SpecKind.Condition, "fishingPower");
+        c.Register<WeatherConditionParams>(SpecKind.Condition, "weather");
+        c.Register<FishingLiquidConditionParams>(SpecKind.Condition, "fishingLiquid");
+        c.Register<AnglerQuestConditionParams>(SpecKind.Condition, "anglerQuest");
+        c.Register<SeasonConditionParams>(SpecKind.Condition, "season");
         c.Register<ExpertConditionParams>(SpecKind.Condition, "expert");
         c.Register<RangeConditionParams>(SpecKind.Condition, "defense");
         c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
+        c.Register<SecretSeedConditionParams>(SpecKind.Condition, "secretSeed");
         c.Register<RangeConditionParams>(SpecKind.Condition, "worldRing");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");

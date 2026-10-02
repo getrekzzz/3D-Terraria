@@ -70,6 +70,12 @@ public sealed class ItemSourceIndex
     /// <summary>Loot table rolled after every kill that counts (worth coins, not a critter or a part).</summary>
     public const string GlobalKillTable = "global_kill";
 
+    /// <summary>Seasonal drops every slain hostile creature rolls (goodie bags, presents).</summary>
+    public const string GlobalDropTable = "enemy_global_drops";
+
+    /// <summary>An enemy also rolls table this prefix + its id, so extra drops need no edit of its own loot.</summary>
+    public const string ExtraTablePrefix = "extra_";
+
     /// <summary>A fallen town resident drops table "&lt;resident id&gt;" + this suffix, when it exists.</summary>
     public const string DeathTableSuffix = "_death";
 
@@ -112,6 +118,11 @@ public sealed class ItemSourceIndex
             // Breaking a world-generated object yields its placing item.
             if (t.PlacingItemId != null && (t.Natural || t.HasTag("world")))
                 index.Add(t.PlacingItemId, new(ItemSourceKind.Object, t, null, 1, 1, Array.Empty<TypedSpec>()));
+            // Enemy banners drop every so many kills of their creatures (BannerSystem).
+            if (t.PlacingItemId != null && t.Banner != null)
+                foreach (var id in t.Banner.Enemies)
+                    if (db.Enemies.TryGet(id, out var enemy))
+                        index.Add(t.PlacingItemId, new(ItemSourceKind.Drop, enemy, null, 1, 1, Array.Empty<TypedSpec>()));
         }
         // A bug net turns critters into their catch items.
         foreach (var e in db.Enemies.All)
@@ -170,8 +181,14 @@ public sealed class ItemSourceIndex
             foreach (var b in i.Behaviors)
                 if (b.Type == ItemBehaviorSpecs.Consume && b.Raw.TryGetProperty("loot", out var loot) && loot.ValueKind == JsonValueKind.String)
                     Root(loot.GetString(), ItemSourceKind.Opened, i, null);
-        Root(FishingTable, ItemSourceKind.Fishing, null, "Fishing");
+        // Fishing rolls "fishing", its lava, crate and quest tables and their "<table>_<tier>" rarities (FishingConfig).
+        foreach (var t in db.LootTables.All)
+            if (t.Id == FishingTable || t.Id.StartsWith(FishingTable + "_", StringComparison.Ordinal)) Root(t.Id, ItemSourceKind.Fishing, null, "Fishing");
         Root(GlobalKillTable, ItemSourceKind.Drop, null, "Any enemy");
+        // Every slain hostile creature also rolls the seasonal table, and an enemy its "extra_<enemy>" table (NpcSystem.GlobalDrops).
+        Root(GlobalDropTable, ItemSourceKind.Drop, null, "Any enemy");
+        foreach (var e in db.Enemies.All)
+            Root(ExtraTablePrefix + e.Id, e.Boss != null ? ItemSourceKind.BossDrop : ItemSourceKind.Drop, e, null);
         foreach (var t in db.LootTables.All)
             if (t.Name != null && !claimed.Contains(t.Id)) Walk(db, t, ItemSourceKind.Container, t, t.Name, Array.Empty<TypedSpec>(), 1f, 0);
     }

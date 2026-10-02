@@ -126,7 +126,8 @@ public static class EditCommands
         });
         r.Register(new CommandDef
         {
-            Name = "wire", Usage = "wire <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> [cut]", Help = "Lays (or cuts) red wire through a box relative to the player's feet.",
+            Name = "wire", Usage = "wire <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> [red|blue|green|yellow|actuator|cut]",
+            Help = "Lays wire of a colour (default red) or actuators through a box relative to the player's feet; 'cut' removes all wiring there.",
             Run = (ctx, a) =>
             {
                 var here = Here(ctx);
@@ -135,13 +136,20 @@ public static class EditCommands
                 var min = Int3.Min(p0, p1);
                 var max = Int3.Max(p0, p1);
                 if ((long)(max.X - min.X + 1) * (max.Y - min.Y + 1) * (max.Z - min.Z + 1) > MaxFillCells) throw new CommandException("box too large");
-                bool cut = a.OptStr(6) == "cut";
+                string mode = a.OptStr(6) ?? "red";
+                var color = mode is "cut" or "actuator" ? Gameplay.Wiring.WireColor.None : ParseColor(mode);
+                var wires = ctx.World.Wires;
                 int n = 0;
                 for (int y = min.Y; y <= max.Y; y++)
                     for (int z = min.Z; z <= max.Z; z++)
                         for (int x = min.X; x <= max.X; x++)
-                            if (cut ? ctx.World.Wires.Cut(new Int3(x, y, z)) : ctx.World.Wires.Place(new Int3(x, y, z))) n++;
-                return CommandResult.Success($"{(cut ? "Cut" : "Laid")} wire in {n} cells.");
+                        {
+                            var c = new Int3(x, y, z);
+                            if (mode == "cut") n += wires.Cut(c) > 0 ? 1 : 0;
+                            else if (mode == "actuator") n += wires.PlaceActuator(c) ? 1 : 0;
+                            else n += wires.Place(c, color) ? 1 : 0;
+                        }
+                return CommandResult.Success(mode switch { "cut" => $"Cut wiring in {n} cells.", "actuator" => $"Placed {n} actuators.", _ => $"Laid {mode} wire in {n} cells." });
             },
         });
         r.Register(new CommandDef
@@ -208,5 +216,11 @@ public static class EditCommands
         var content = ctx.World.Session.Content;
         if (!content.Blocks.TryGet(name, out var def)) throw new CommandException($"unknown block '{name}'");
         return ((ushort)def.RuntimeId, def);
+    }
+
+    private static Gameplay.Wiring.WireColor ParseColor(string name)
+    {
+        try { return Gameplay.Wiring.WireColors.Parse(name); }
+        catch (ArgumentException e) { throw new CommandException(e.Message); }
     }
 }

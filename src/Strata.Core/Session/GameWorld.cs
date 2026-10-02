@@ -45,6 +45,8 @@ public sealed partial class GameWorld : IDisposable
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
+        Weather = new Gameplay.Weather.WeatherSystem(this);
+        Banners = new Gameplay.Banners.BannerSystem(this);
         Liquids = new LiquidSimulator(session);
         Housing = new HousingScanner(session.World);
         Navigator = new VoxelNavigator(session.World);
@@ -82,6 +84,12 @@ public sealed partial class GameWorld : IDisposable
     public ProjectileSystem Projectiles { get; }
     public SpawnDirector Spawner { get; }
     public EventDirector Events { get; }
+
+    /// <summary>Rain, storms, snow, sandstorms and wind (state in <see cref="WorldSession.Weather"/>).</summary>
+    public Gameplay.Weather.WeatherSystem Weather { get; }
+
+    /// <summary>Enemy banners: kill tallies, banner drops and the nearby-banner bonus.</summary>
+    public Gameplay.Banners.BannerSystem Banners { get; }
     public LiquidSimulator Liquids { get; }
     public HousingScanner Housing { get; }
     public VoxelNavigator Navigator { get; }
@@ -144,6 +152,9 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.liquids")) Liquids.Tick(Session.Clock.Tick);
         using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
         using (prof.Time("tick.events")) Events.Tick();
+        using (prof.Time("tick.weather")) Weather.Tick();
+        using (prof.Time("tick.banners")) Banners.Tick();
+        using (prof.Time("tick.wires")) Wires.Tick();
         using (prof.Time("tick.spawner")) Spawner.Tick();
         using (prof.Time("tick.npcs")) Npcs.Tick();
         using (prof.Time("tick.town")) Town.Tick();
@@ -176,6 +187,7 @@ public sealed partial class GameWorld : IDisposable
         if (!p.Alive)
         {
             p.Hook.Reset(); // the chain does not hang from a corpse or follow it to the respawn point
+            if (p.Mount != null) Gameplay.Mounts.MountRules.Dismount(this, p);
             if (p.RespawnTicks == 0)
             {
                 p.RespawnTicks = RespawnDelayTicks;
@@ -197,7 +209,9 @@ public sealed partial class GameWorld : IDisposable
         TouchHazards(p);
         if (p.UseCooldown > 0) p.UseCooldown--;
         if (p.GloveCooldown > 0) p.GloveCooldown--;
-        if (p.UseAnimation > 0) p.UseAnimation--;
+        if (p.ReuseDelay > 0) p.ReuseDelay--;
+        if (p.UseAnimation > 0 && --p.UseAnimation == 0) p.ReuseDelay = p.UseItem?.ReuseDelay ?? 0;
+        ItemUse.Continue(p); // a started burst always completes, button held or not
         // An engine body advances its own hook in its physics step (it applies the pull); headless players tick here.
         if (!p.HasBody && p.Hook.Active) p.Hook.Tick(Session.World, Units.SecondsPerTick, p.Hand);
         if (!p.HasBody && p.ExternalVelocity != Vector3.Zero) p.Position += p.ExternalVelocity * Units.SecondsPerTick; // a tongue's drag
@@ -206,10 +220,21 @@ public sealed partial class GameWorld : IDisposable
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
         if (Session.Clock.Tick % Units.TicksPerSecond == 0)
         {
-            if (dps > 0 && p.Alive) state.Vitals.DamageDirect(dps);
+            if (dps > 0 && p.Alive) HurtPlayerDirect(p, dps, DamageKind.Periodic);
             state.Recompute();
             CheckMilestones(p);
         }
+    }
+
+    /// <summary>
+    /// Damage that ignores invulnerability and defense (debuffs ticking, falling), announced like any other hurt so it
+    /// shows a number and plays the hurt sound; no knockback.
+    /// </summary>
+    public void HurtPlayerDirect(PlayerEntity p, int damage, DamageKind kind = DamageKind.Player)
+    {
+        if (!p.Alive || damage <= 0) return;
+        p.State.Vitals.DamageDirect(damage);
+        Npcs.ReportPlayerDamage(p, damage, Vector3.Zero, kind);
     }
 
     public void Respawn(PlayerEntity p)

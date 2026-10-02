@@ -23,7 +23,11 @@ public sealed class TreasurePass : GenPass
         var chest = tiles.Get("wooden_chest");
         var goldChest = tiles.Get("gold_chest");
         var crystal = tiles.Get("life_crystal_node");
-        var altar = tiles.Get(ctx.Gen.Plan.Settings.Evil == World.EvilKind.Crimson ? "crimson_altar" : "demon_altar");
+        // A Drunk World has both kinds of altar (chunk by chunk).
+        bool crimson = ctx.Gen.Plan.Settings.Has(World.SecretSeed.Drunk)
+            ? ((ctx.ChunkOrigin.X + ctx.ChunkOrigin.Z) / Common.ChunkMath.Size & 1) == 1
+            : ctx.Gen.Plan.Settings.Evil == World.EvilKind.Crimson;
+        var altar = tiles.Get(crimson ? "crimson_altar" : "demon_altar");
         var bulb = tiles.Get("plantera_bulb");
         byte jungle = (byte)ctx.Gen.Content.Biomes.Get("jungle").RuntimeId;
         float depth = ctx.Depth(ctx.ChunkOrigin.Y + 16);

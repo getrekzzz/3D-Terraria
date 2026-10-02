@@ -54,6 +54,7 @@ public sealed partial class GameWorld
     private SaveBatch CaptureSave()
     {
         Events.Persist();
+        Weather.Persist();
         Town.Persist();
         var batch = Session.BeginSave();
         if (PlayerDirectory is { } dir)

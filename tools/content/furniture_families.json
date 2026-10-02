@@ -1,0 +1,38 @@
+{
+  "comment": "Furniture families (X-03): every material gets the full set of pieces. gen_furniture.py writes data/items/generated/furniture_families.json and tools/blender/assets.d/x-03-families.json from this table. 'existing' maps pieces to ids that already exist (the plain wooden set). Counts are of the family's material.",
+  "pieces": {
+    "door": {"name": "Door", "size": [2, 4, 1], "count": 6, "collision": "solid", "interaction": "door", "housing": ["door"], "hitPoints": 3, "value": 200},
+    "chair": {"name": "Chair", "size": [2, 3, 2], "count": 4, "interaction": "sit", "housing": ["chair"], "hitPoints": 2, "value": 30},
+    "table": {"name": "Table", "size": [4, 2, 3], "count": 8, "housing": ["table"], "hitPoints": 2, "value": 60},
+    "bed": {"name": "Bed", "size": [3, 2, 5], "count": 15, "extra": [{"item": "silk", "count": 5}], "interaction": "sleep", "housing": ["bed", "comfort"], "hitPoints": 3, "value": 400},
+    "chest": {"name": "Chest", "size": [2, 2, 2], "count": 8, "extra": [{"group": "any_iron_bar", "count": 2}], "collision": "solid", "interaction": "chest", "containerSlots": 40, "category": "container", "hitPoints": 3, "value": 500},
+    "workbench": {"name": "Work Bench", "size": [4, 2, 2], "count": 10, "stationsUsed": [], "interaction": "station", "providesStations": ["work_bench"], "housing": ["table"], "category": "station", "hitPoints": 3, "value": 150},
+    "bookcase": {"name": "Bookcase", "size": [3, 5, 2], "count": 20, "station": "sawmill", "housing": ["table"], "hitPoints": 3, "value": 300},
+    "piano": {"name": "Piano", "size": [4, 3, 2], "count": 15, "extra": [{"item": "bone", "count": 4}], "station": "sawmill", "housing": ["table"], "hitPoints": 3, "value": 600},
+    "sofa": {"name": "Sofa", "size": [5, 2, 2], "count": 5, "extra": [{"item": "silk", "count": 2}], "station": "sawmill", "interaction": "sit", "housing": ["chair", "comfort"], "hitPoints": 3, "value": 300},
+    "bathtub": {"name": "Bathtub", "size": [5, 2, 3], "count": 14, "station": "sawmill", "hitPoints": 3, "value": 300},
+    "lamp": {"name": "Lamp", "size": [1, 4, 1], "count": 3, "extra": [{"item": "torch", "count": 1}], "anchor": "floor", "light": [15, 12, 8], "flame": {"at": [0, 1.62, 0], "size": 0.1}, "housing": ["light"], "hitPoints": 1, "value": 100},
+    "lantern": {"name": "Lantern", "size": [1, 2, 1], "count": 6, "extra": [{"item": "torch", "count": 1}], "anchor": "ceiling", "light": [14, 11, 7], "flame": {"at": [0, 0.55, 0], "size": 0.1}, "housing": ["light"], "hitPoints": 1, "value": 100},
+    "candle": {"name": "Candle", "size": [1, 1, 1], "count": 4, "extra": [{"item": "torch", "count": 1}], "anchor": "floor", "light": [11, 9, 6], "flame": {"at": [0, 0.17, 0], "size": 0.08}, "housing": ["light"], "hitPoints": 1, "value": 30},
+    "candelabra": {"name": "Candelabra", "size": [2, 2, 1], "count": 5, "extra": [{"item": "torch", "count": 3}], "anchor": "floor", "light": [13, 10, 7], "flame": {"at": [0, 0.6, 0], "size": 0.1}, "housing": ["light"], "hitPoints": 1, "value": 150},
+    "chandelier": {"name": "Chandelier", "size": [3, 3, 3], "count": 4, "extra": [{"item": "torch", "count": 4}, {"group": "any_iron_bar", "count": 1}], "station": "anvil", "anchor": "ceiling", "light": [15, 13, 9], "flame": {"at": [0, 0.67, 0], "size": 0.12}, "housing": ["light"], "hitPoints": 2, "value": 300},
+    "clock": {"name": "Grandfather Clock", "size": [2, 5, 1], "count": 10, "extra": [{"item": "glass", "count": 6}, {"group": "any_iron_bar", "count": 3}], "station": "sawmill", "hitPoints": 3, "value": 600},
+    "platform": {"name": "Platform", "size": [2, 1, 2], "count": 1, "output": 2, "stationsUsed": [], "anchor": "any", "collision": "platform", "hitPoints": 1, "category": "furniture", "maxStack": 9999, "value": 5}
+  },
+  "families": [
+    {"id": "wooden", "name": "Wooden", "material": "wood", "mat": "prop:planks", "tint": "#ffffff", "trim": "prop:gold", "cloth": "#b03a3a", "existing": {"door": "wooden_door", "chair": "wooden_chair", "table": "wooden_table", "chest": "wooden_chest", "bed": "bed", "candle": "candle", "workbench": "work_bench"}},
+    {"id": "boreal", "name": "Boreal Wood", "material": "boreal_wood", "mat": "prop:planks", "tint": "#e0d0b0", "trim": "prop:iron", "cloth": "#3a6a9a"},
+    {"id": "palm", "name": "Palm Wood", "material": "palm_wood", "mat": "prop:planks", "tint": "#f0c088", "trim": "prop:copper", "cloth": "#d0a050"},
+    {"id": "rich_mahogany", "name": "Rich Mahogany", "material": "rich_mahogany", "mat": "prop:planks", "tint": "#c05848", "trim": "prop:gold", "cloth": "#3a7a3a"},
+    {"id": "ebonwood", "name": "Ebonwood", "material": "ebonwood", "mat": "prop:dark_planks", "tint": "#a08ac0", "trim": "prop:dark_iron", "cloth": "#6a3a8a", "flame": "#c070ff"},
+    {"id": "shadewood", "name": "Shadewood", "material": "shadewood", "mat": "prop:dark_planks", "tint": "#c07070", "trim": "prop:dark_iron", "cloth": "#8a2a2a", "flame": "#ff5a4a"},
+    {"id": "cactus", "name": "Cactus", "material": "cactus", "mat": "prop:cactus_skin", "tint": "#9ac070", "trim": "prop:copper", "cloth": "#d0a050"},
+    {"id": "mushroom", "name": "Mushroom", "material": "glowing_mushroom", "mat": "prop:plain:glow", "tint": "#3a6ad0", "trim": "prop:plain:glow", "trimTint": "#8ab0ff", "cloth": "#2a4aa0", "flame": "#5a9aff"},
+    {"id": "granite", "name": "Granite", "material": "granite", "mat": "prop:stone", "tint": "#56607a", "trim": "prop:iron", "cloth": "#2a3a6a"},
+    {"id": "marble", "name": "Marble", "material": "marble", "mat": "prop:plain", "tint": "#ece6dc", "trim": "prop:gold", "cloth": "#c0a050"},
+    {"id": "obsidian", "name": "Obsidian", "material": "obsidian", "mat": "prop:stone", "tint": "#3a2a48", "trim": "prop:dark_iron", "cloth": "#5a1a1a", "station": "hellforge"},
+    {"id": "glass", "name": "Glass", "material": "glass", "mat": "prop:plain:clear", "tint": "#bfe0f4", "trim": "prop:iron", "cloth": "#5a9ad0"},
+    {"id": "bone", "name": "Bone", "material": "bone", "mat": "prop:plain", "tint": "#e8e0c8", "trim": "prop:dark_iron", "cloth": "#5a4a3a", "flame": "#7ad0ff"},
+    {"id": "lihzahrd", "name": "Lihzahrd", "material": "lihzahrd_brick", "mat": "prop:stone_brick", "tint": "#d08840", "trim": "prop:gold", "cloth": "#8a5a1a", "flame": "#ffb040", "ids": {"door": "lihzahrd_house_door"}}
+  ]
+}

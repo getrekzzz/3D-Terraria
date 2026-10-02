@@ -109,8 +109,7 @@ public sealed partial class LiquidEffects
             return;
         }
         if (tick % 30 != 0) return;
-        p.State.Vitals.DamageDirect(DrownDamage);
-        _world.Npcs.ReportPlayerDamage(p, DrownDamage, Vector3.Zero);
+        _world.HurtPlayerDirect(p, DrownDamage);
     }
 
     private void TouchPlayer(PlayerEntity p, LiquidDef liquid, long tick)
@@ -138,7 +137,7 @@ public sealed partial class LiquidEffects
         if (liquid.ContactDamage <= 0 || state.Effects.LiquidImmunities.Contains(liquid.Id) || state.Vitals.ImmunityTicks > 0) return;
         var rng = new Pcg32(Hash.Combine(Hash.String(liquid.Id), tick));
         var hit = DamageModel.Roll(liquid.ContactDamage, DamageClass.None, 0, 0f, null, state.Defense,
-            DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref rng);
+            DamageModel.DefenseFactor(_world.Session.Settings.EffectiveDifficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref rng);
         if (state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity))
             _world.Npcs.ReportPlayerDamage(p, hit.Damage, new Vector3(0, 7f, 0)); // lava throws you upward
     }

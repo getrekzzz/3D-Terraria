@@ -114,11 +114,11 @@ public sealed class TownCommerce
         var offer = Stock(npc, player).FirstOrDefault(o => o.Item == item);
         if (offer == null) return TradeResult.Unavailable;
         var inv = player.State.Inventory;
-        var goods = new ItemStack(item, count);
-        if (!inv.CanTake(goods)) return TradeResult.NoRoom;
-        if (!Wallet.TrySpend(inv, Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
-        var rest = inv.Pickup(goods);
-        foreach (var s in change.Append(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
+        if (!inv.CanTake(new ItemStack(item, count))) return TradeResult.NoRoom;
+        if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
+        // Bought weapons and accessories come with a prefix too, each one rolled separately.
+        var rest = Prefixes.Made(item, count, Content, ref _rng).Select(g => inv.Pickup(g)).ToList();
+        foreach (var s in change.Concat(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         Traded?.Invoke(player, item, count);
         return TradeResult.Ok;
     }
@@ -162,7 +162,7 @@ public sealed class TownCommerce
         if (npc.Def.Service is not { Type: TownServiceSpecs.Heal } spec) return TradeResult.Unavailable;
         long cost = HealCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
-        if (!Wallet.TrySpend(player.State.Inventory, Content, cost, out var change)) return TradeResult.TooPoor;
+        if (!Wallet.TrySpend(player.State.Inventory, player.State.BanksForPaying(), Content, cost, out var change)) return TradeResult.TooPoor;
         foreach (var s in change) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         var state = player.State;
         if (spec.Parse<HealServiceParams>().ClearsDebuffs)

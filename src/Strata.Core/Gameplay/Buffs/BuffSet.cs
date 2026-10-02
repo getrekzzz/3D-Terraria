@@ -12,11 +12,17 @@ public sealed class ActiveBuff
 
     public BuffDef Def { get; }
     public int TicksLeft { get; set; }
+
+    /// <summary>Lasts while its source does (a mount being ridden): the buff bar shows no timer for it.</summary>
+    public bool Unlimited => TicksLeft >= BuffSet.Unlimited;
 }
 
 /// <summary>Timed buffs/debuffs on an entity. Re-applying refreshes the duration to the longer value.</summary>
 public sealed class BuffSet
 {
+    /// <summary>Duration for buffs that last as long as their source (removed explicitly, e.g. on dismounting).</summary>
+    public const int Unlimited = int.MaxValue / 4;
+
     private readonly List<ActiveBuff> _buffs = new();
 
     public IReadOnlyList<ActiveBuff> Active => _buffs;

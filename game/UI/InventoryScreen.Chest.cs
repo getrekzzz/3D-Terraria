@@ -16,6 +16,7 @@ public sealed partial class InventoryScreen
     private GridContainer _chestGrid = null!;
     private Label _chestTitle = null!;
     private LineEdit _renameField = null!;
+    private Button _renameButton = null!;
 
     private void BuildChestPanel(Vector2 position)
     {
@@ -33,7 +34,8 @@ public sealed partial class InventoryScreen
         _renameField.TextSubmitted += _ => _renameField.ReleaseFocus();
         header.AddChild(_chestTitle);
         header.AddChild(_renameField);
-        header.AddChild(Button("Rename", StartRename, "Give this chest a name (up to 20 characters)"));
+        _renameButton = Button("Rename", StartRename, "Give this chest a name (up to 20 characters)");
+        header.AddChild(_renameButton);
         chestBox.AddChild(header);
         var buttons = new HBoxContainer();
         buttons.AddChild(Button("Loot all", () => Chest(ChestOp.LootAll)));
@@ -50,14 +52,16 @@ public sealed partial class InventoryScreen
         _chestPanel.Visible = false;
     }
 
-    private void OpenContainer(TileObjectInstance obj)
+    /// <summary>Shows an opened container with the slots it carries (a Piggy Bank or Safe: the character's own).</summary>
+    private void OpenContainer(TileObjectInstance obj, Inventory storage)
     {
         CloseContainer();
         _container = obj;
         ContainerShown?.Invoke(obj, true);
-        _containerInv = new Inventory(obj.Container!);
+        _containerInv = storage;
         _chestTitle.Text = obj.DisplayName;
-        for (int i = 0; i < obj.Container!.Length; i++) _chestGrid.AddChild(Slot(SlotArea.Container, i));
+        _renameButton.Visible = obj.Def.SharedStorage == null;
+        for (int i = 0; i < storage.Size; i++) _chestGrid.AddChild(Slot(SlotArea.Container, i));
         _chestPanel.Visible = true;
         SetOpen(true);
     }

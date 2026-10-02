@@ -12,10 +12,20 @@ using Strata.Core.Voxels;
 namespace Strata.Core.Gameplay.Entities;
 
 /// <summary>
-/// A damage event for presentation (damage numbers, sounds, flashes). <paramref name="Player"/> is the player who was hurt
-/// (null for creatures and residents), so a first-person view can float the number in front of the eye.
+/// A damage event for presentation (damage numbers, sounds, flashes): <paramref name="NpcId"/> the creature struck (0 for
+/// players and residents), <paramref name="Kind"/> what it reports, and <paramref name="Player"/> the player who was hurt
+/// (null otherwise), so a first-person view can float the number in front of the eye.
 /// </summary>
-public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer, PlayerEntity? Player = null);
+public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer, long NpcId = 0, DamageKind Kind = DamageKind.Hit,
+    PlayerEntity? Player = null);
+
+/// <summary>What a damage event reports: a hit, damage over time, or harm to a player.</summary>
+public enum DamageKind
+{
+    Hit,
+    Periodic,
+    Player,
+}
 
 /// <summary>
 /// Owns every live creature: brains, movement against voxels, contact damage to players, taking hits
@@ -72,7 +82,7 @@ public sealed partial class NpcSystem
             Pull = Pull,
             Bands = world.Session.Generator.Plan.Bands,
         };
-        _ctx.Expert = world.Session.Settings.Difficulty is World.Difficulty.Expert or World.Difficulty.Master;
+        _ctx.Expert = world.Session.Settings.EffectiveDifficulty is World.Difficulty.Expert or World.Difficulty.Master;
     }
 
     public IReadOnlyList<Npc> All => _npcs;
@@ -81,7 +91,7 @@ public sealed partial class NpcSystem
     internal BrainContext Context => _ctx;
 
     /// <summary>Creature life and damage multiplier of the world's difficulty.</summary>
-    public float Scale => DamageModel.EnemyScale(_world.Session.Settings.Difficulty);
+    public float Scale => DamageModel.EnemyScale(_world.Session.Settings.EffectiveDifficulty);
 
     public event Action<Npc>? Spawned;
     public event Action<Npc>? Removed;
@@ -170,7 +180,7 @@ public sealed partial class NpcSystem
         const float dt = 1f / Units.TicksPerSecond;
         var session = _world.Session;
         _ctx.IsDay = session.Clock.IsDay;
-        _ctx.Expert = session.Settings.Difficulty is World.Difficulty.Expert or World.Difficulty.Master;
+        _ctx.Expert = session.Settings.EffectiveDifficulty is World.Difficulty.Expert or World.Difficulty.Master;
         for (int i = _npcs.Count - 1; i >= 0; i--)
         {
             var npc = _npcs[i];
@@ -187,7 +197,7 @@ public sealed partial class NpcSystem
             {
                 if (npc.Disguised) Wake(npc, null); // a burning chest gives itself away
                 npc.Life -= npc.Effects.DamagePerSecond;
-                Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false));
+                Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false, npc.Id, DamageKind.Periodic));
                 if (npc.Life <= 0)
                 {
                     Die(npc);
@@ -305,6 +315,7 @@ public sealed partial class NpcSystem
     {
         if (!npc.Alive || npc.Invulnerable || (melee && npc.ImmuneTicks > 0)) return false;
         if (npc.Disguised) Wake(npc, attacker);
+        baseDamage = _world.Banners.Dealt(attacker, npc, baseDamage); // a banner of this creature nearby (X-03)
         if (segment >= 0 && segment < npc.SegmentLife.Count) return HitSegment(npc, segment, attacker, baseDamage, damageClass, critChance, melee);
         // A shared-life worm (the Destroyer) still armours each segment kind on its own: soft head, plated body and tail.
         bool plated = npc.Def.Boss is { SegmentDefense.Length: >= 3 } && segment < npc.Segments.Count;
@@ -313,10 +324,10 @@ public sealed partial class NpcSystem
         npc.Life -= hit.Damage;
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
-        Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback);
+        Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback); // crits already knock 1.4x (DamageModel)
         var shown = segment >= 0 && segment < npc.Segments.Count ? npc.Segments[segment] + new Vector3(0, 0.9f, 0)
             : npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0);
-        Damaged?.Invoke(new DamageEvent(shown, hit.Damage, hit.Crit, false));
+        Damaged?.Invoke(new DamageEvent(shown, hit.Damage, hit.Crit, false, npc.Id));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             _world.ReportHeal(attacker, attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal))), mana: false);
         if (npc.Life <= 0) Die(npc);

@@ -28,10 +28,18 @@ public static partial class WorldLauncher
         game.Town.Config = Strata.Core.Gameplay.Town.TownConfig.Load(services.Data);
         game.Spread.Config = Strata.Core.Gameplay.Progression.SpreadConfig.Load(services.Data);
         game.Journal.Config = Strata.Core.Gameplay.Guide.BestiaryConfig.Load(services.Data);
+        game.Weather.Config = Strata.Core.Gameplay.Weather.WeatherConfig.Load(services.Data);
+        game.Banners.Config = Strata.Core.Gameplay.Banners.BannerConfig.Load(services.Data);
+        game.Projectiles.Fishing = Strata.Core.Gameplay.Fishing.FishingConfig.Load(services.Data);
+        game.Session.Seasons.Config = Strata.Core.Gameplay.Seasons.SeasonConfig.Load(services.Data);
+        game.Session.Seasons.Enabled = () => Settings.UserSettings.Current.SeasonalEvents;
+        // Scripted runs (smoke tests, screenshots) never follow the calendar: a goodie bag dropping in October would make
+        // them depend on the date. Scripts that need a season set it with `season <id>`.
+        if (services.Args.Get("smoke") != null) game.Session.Seasons.Override = "";
     }
 
     /// <summary>Renderers for creatures, town residents and projectiles.</summary>
-    private static Entities.NpcRenderer AddCreatureRenderers(WorldRuntime runtime, GameWorld game, Rendering.PropLibrary props)
+    private static (Entities.NpcRenderer, Entities.ProjectileRenderer) AddCreatureRenderers(WorldRuntime runtime, GameWorld game, Rendering.PropLibrary props)
     {
         var creatures = new Entities.NpcRenderer();
         runtime.AddChild(creatures);
@@ -42,7 +50,7 @@ public static partial class WorldLauncher
         var projectiles = new Entities.ProjectileRenderer();
         runtime.AddChild(projectiles);
         projectiles.Initialize(game, props);
-        return creatures;
+        return (creatures, projectiles);
     }
 
     /// <summary>Relevance-driven preloading with pool pre-warming, and the one-time shader warm-up.</summary>

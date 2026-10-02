@@ -51,10 +51,12 @@ public class ItemSourcesTests
         var fromIndex = db.Items.All.Where(i => index.For(i.Id).Any(s => s.Kind != ItemSourceKind.Tag)).Select(i => i.Id).ToHashSet();
         var fromOld = db.Items.All.Where(i => old.Contains(i.Id)).Select(i => i.Id).ToHashSet();
         Assert.Empty(fromOld.Except(fromIndex));
-        // Angler rewards are new: the fishing rods they give were only excused by a 'shop' tag before.
+        // Angler rewards are new: the fishing rods they give were only excused by a 'shop' tag before. Enemy banners
+        // (dropped every so many kills) are new too.
         var gained = fromIndex.Except(fromOld).ToList();
         Assert.NotEmpty(gained);
-        Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward));
+        Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward
+            || (s.Kind == ItemSourceKind.Drop && db.TileObjects.TryGet(id, out var t) && t.Banner != null)));
     }
 
     [Fact]
@@ -68,7 +70,7 @@ public class ItemSourcesTests
         Assert.True(Has("bunny", ItemSourceKind.Catch, "bunny"));
         Assert.True(Has("stone", ItemSourceKind.Block, "stone"));
         Assert.True(Has("wooden_crate", ItemSourceKind.Fishing));
-        Assert.True(Has("wooden_crate", ItemSourceKind.AnglerReward, "angler"));
+        Assert.True(Has("tackle_box", ItemSourceKind.AnglerReward, "angler"));
         Assert.True(Has("copper_bar", ItemSourceKind.Opened, "wooden_crate"));
         Assert.True(Has("daybloom_seeds", ItemSourceKind.Object, "daybloom_plant"));
 

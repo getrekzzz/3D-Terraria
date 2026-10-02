@@ -18,11 +18,15 @@ public static partial class WorldLauncher
         var player = new PlayerController();
         player.Initialize(runtime, entity, MovementConfig.Load(services.Data));
         runtime.AddChild(player);
+        var dust = new PlayerDust();
+        player.AddChild(dust);
+        dust.Initialize(player);
         player.Rig.Camera.Current = true;
         runtime.Focus = player;
         game.Npcs.PlayerHurt += (p, _, knock) =>
         {
-            if (p == entity) player.ApplyKnockback(new Vector3(knock.X, knock.Y, knock.Z));
+            // Debuffs, falls and drowning hurt without a push.
+            if (p == entity && knock.LengthSquared() > 1e-4f) player.ApplyKnockback(new Vector3(knock.X, knock.Y, knock.Z));
         };
         game.PlayerRespawned += p =>
         {
@@ -31,6 +35,10 @@ public static partial class WorldLauncher
         game.ItemUse.Recalled += (p, home) =>
         {
             if (p == entity) player.Teleport(home, resolveSpawn: true);
+        };
+        game.Wires.Teleported += (p, feet) =>
+        {
+            if (p == entity) player.Teleport(feet);
         };
         return (entity, player);
     }

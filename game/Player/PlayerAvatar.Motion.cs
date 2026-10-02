@@ -121,6 +121,7 @@ public sealed partial class PlayerAvatar
     {
         rate = 1f;
         if (!entity.Alive) return "death";
+        if (entity.Mount != null) return "idle"; // in the saddle (PlayerAvatar.Mount.cs)
         if (entity.Minecart != null) return "idle"; // standing in the cart (the body is moved along the track)
         if (_controller.Swimming)
         {

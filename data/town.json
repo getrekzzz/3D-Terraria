@@ -37,6 +37,7 @@
         { "item": "rope", "price": 10 },
         { "item": "bug_net", "price": 2500 },
         { "item": "mining_helmet", "price": 40000 },
+        { "item": "piggy_bank" },
         { "item": "acorn", "price": 100, "conditions": [{ "type": "flag", "id": "defeated_king_slime" }] },
         { "item": "glowing_mushroom", "price": 50, "conditions": [{ "type": "time", "is": "night" }] }
       ],

@@ -1,0 +1,34 @@
+{
+  // Ambience (src/Strata.Core/Presentation/AmbienceConfig.cs): sound beds (assets/audio/ambience/<loop>.ogg, built by
+  // tools/audio/ambience.py) and ambient particles near the camera, chosen by biome, layer and time of day. Outdoor
+  // beds play through the Outdoors bus, muffled indoors. An exclusive rule silences the others where it applies.
+  "loops": [
+    { "loop": "forest_day", "biomes": ["forest", "living_tree", "graveyard"], "layers": ["surface"], "time": "day", "volume": 0.55, "outdoors": true },
+    { "loop": "forest_night", "biomes": ["forest", "living_tree", "tundra", "desert", "ocean"], "layers": ["surface"], "time": "night", "volume": 0.5, "outdoors": true },
+    { "loop": "jungle_day", "biomes": ["jungle"], "layers": ["surface"], "time": "day", "volume": 0.6, "outdoors": true },
+    { "loop": "jungle_night", "biomes": ["jungle"], "layers": ["surface"], "time": "night", "volume": 0.6, "outdoors": true },
+    { "loop": "ocean", "biomes": ["ocean"], "layers": ["surface"], "volume": 0.7, "outdoors": true },
+    { "loop": "desert", "biomes": ["desert"], "layers": ["surface"], "time": "day", "volume": 0.45, "outdoors": true },
+    { "loop": "tundra", "biomes": ["tundra"], "layers": ["surface"], "volume": 0.45, "outdoors": true },
+    { "loop": "evil", "biomes": ["corruption", "crimson"], "volume": 0.5 },
+    { "loop": "hallow", "biomes": ["hallow"], "volume": 0.45 },
+    { "loop": "sky", "layers": ["sky", "space"], "volume": 0.4, "outdoors": true },
+    { "loop": "cave", "layers": ["underground"], "volume": 0.55 },
+    { "loop": "cavern", "layers": ["cavern"], "volume": 0.6 },
+    { "loop": "mushroom", "biomes": ["mushroom"], "volume": 0.55 },
+    { "loop": "hive", "biomes": ["hive"], "volume": 0.6 },
+    { "loop": "dungeon", "biomes": ["dungeon"], "volume": 0.55 },
+    { "loop": "underworld", "layers": ["underworld"], "volume": 0.75, "exclusive": true }
+  ],
+  "particles": [
+    { "kind": "dust", "layers": ["underground", "cavern"], "count": 160 },
+    { "kind": "dust", "biomes": ["dungeon", "jungle_temple", "marble_cave", "granite_cave"], "count": 160 },
+    { "kind": "drips", "layers": ["underground", "cavern"], "count": 12 },
+    { "kind": "spores", "biomes": ["mushroom"], "count": 220 },
+    { "kind": "embers", "layers": ["underworld"], "count": 260, "exclusive": true },
+    { "kind": "leaves", "biomes": ["forest", "jungle", "living_tree"], "layers": ["surface"], "count": 70 },
+    { "kind": "fireflies", "biomes": ["forest", "jungle", "living_tree"], "layers": ["surface"], "time": "night", "count": 50 }
+  ],
+  "particleScale": { "low": 0.35, "medium": 0.7, "high": 1.0, "ultra": 1.3 },
+  "reverb": { "enclosedWet": 0.18, "deepWet": 0.32, "deepMeters": 80, "roomSize": 0.55, "deepRoomSize": 0.85 }
+}

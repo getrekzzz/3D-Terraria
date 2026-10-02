@@ -7,8 +7,14 @@ namespace Strata.Core.Gameplay.Mining;
 /// <summary>How tools interact with blocks: health, required power and the 3D mining brush.</summary>
 public static class MiningRules
 {
-    /// <summary>Damage needed to break a block (dirt ≈ 80, stone ≈ 150).</summary>
-    public static float Health(BlockDef block) => 100f * block.Hardness;
+    /// <summary>Damage every block takes to break (Terraria's 100): a copper pickaxe (35) breaks stone in 3 hits.</summary>
+    public const float TileHealth = 100f;
+
+    /// <summary>Damage needed to break a block.</summary>
+    public static float Health(BlockDef block) => TileHealth;
+
+    /// <summary>Damage one swing of <paramref name="pickPower"/> deals to <paramref name="block"/> (dirt twice, hardmode ores less).</summary>
+    public static float HitDamage(BlockDef block, float pickPower) => pickPower * block.PickDamageScale;
 
     public static bool CanMine(BlockDef block, int pickPower) =>
         block.Render != BlockRender.None && pickPower >= Math.Max(1, block.PickPower) && !block.HasTag("unbreakable");
@@ -50,6 +56,12 @@ public sealed class BlockDamageTracker
 {
     private readonly Dictionary<Int3, (float Damage, long Tick)> _damage = new();
 
+    /// <summary>Bumped on every change, so renderers rebuild their crack decals only when needed.</summary>
+    public int Version { get; private set; }
+
+    /// <summary>Cells with damage on record (stale ones included until pruned).</summary>
+    public int Count => _damage.Count;
+
     /// <summary>Ticks after which partial damage resets (≈6 s).</summary>
     public int ForgetAfterTicks { get; init; } = 360;
 
@@ -60,20 +72,30 @@ public sealed class BlockDamageTracker
         if (_damage.TryGetValue(cell, out var d) && tick - d.Tick < ForgetAfterTicks) current = d.Damage;
         current += amount;
         _damage[cell] = (current, tick);
+        Version++;
         return current;
     }
 
     public float DamageAt(Int3 cell, long tick) =>
         _damage.TryGetValue(cell, out var d) && tick - d.Tick < ForgetAfterTicks ? d.Damage : 0f;
 
-    public void Clear(Int3 cell) => _damage.Remove(cell);
+    public void Clear(Int3 cell)
+    {
+        if (_damage.Remove(cell)) Version++;
+    }
 
     /// <summary>Drops stale entries (call occasionally).</summary>
     public void Prune(long tick)
     {
         foreach (var key in _damage.Where(kv => tick - kv.Value.Tick >= ForgetAfterTicks).Select(kv => kv.Key).ToList())
+        {
             _damage.Remove(key);
+            Version++;
+        }
     }
+
+    /// <summary>Every damaged cell with its damage and the tick of its last hit (stale ones included until pruned).</summary>
+    public Dictionary<Int3, (float Damage, long Tick)>.Enumerator GetEnumerator() => _damage.GetEnumerator();
 
     public IEnumerable<(Int3 Cell, float Damage)> Active(long tick) =>
         _damage.Where(kv => tick - kv.Value.Tick < ForgetAfterTicks).Select(kv => (kv.Key, kv.Value.Damage));

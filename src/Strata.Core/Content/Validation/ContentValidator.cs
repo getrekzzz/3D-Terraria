@@ -36,6 +36,7 @@ public static partial class ContentValidator
         ValidateTown(ctx);
         ValidateGuide(ctx);
         ValidateHints(ctx);
+        ValidateAliases(ctx);
         if (options.CheckObtainability) ValidateObtainability(ctx);
     }
 

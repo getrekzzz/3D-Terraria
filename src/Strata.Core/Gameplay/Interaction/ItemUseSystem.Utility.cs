@@ -38,16 +38,27 @@ public sealed partial class ItemUseSystem
             return UseOutcome.Shot;
         }
         if (info.Projectile == null) return UseOutcome.None;
+        if (!HasAnyBait(p)) return Refuse(_world.Projectiles.Fishing.NoBaitMessage);
         Shot?.Invoke(new ShotRequest(p, info, info.Projectile, null, info.Item.ShootSpeed, 0, 0));
         return UseOutcome.Shot;
     }
 
+    /// <summary>Bait of any kind in the backpack (fishing bait, or a boss bait such as the Truffle Worm).</summary>
+    private bool HasAnyBait(PlayerEntity p)
+    {
+        var backpack = p.State.Inventory.Backpack;
+        for (int i = 0; i < backpack.Size; i++)
+            if (backpack[i].Item is { } item && _world.Uses[item] is { } u && (u.Bait != null || u.BaitSummon != null)) return true;
+        return false;
+    }
+
     /// <summary>
-    /// Special bait in the backpack whose biome matches the bobber's water hooks its boss instead of a fish: the bait
-    /// is used up and the boss surfaces at the bobber.
+    /// Special bait in the backpack whose biome matches the bobber's water hooks its boss instead of a fish, when it is the
+    /// first bait in the backpack (as in Terraria): the bait is used up and the boss surfaces at the bobber.
     /// </summary>
     private bool HookBoss(PlayerEntity p, Entities.Projectile bobber)
     {
+        if (!_world.Projectiles.LeadsWithBossBait(p)) return false;
         var backpack = p.State.Inventory.Backpack;
         var cell = Physics.VoxelMotion.CellOf(bobber.Position);
         var ctx = _world.Session.ContextAt(cell);

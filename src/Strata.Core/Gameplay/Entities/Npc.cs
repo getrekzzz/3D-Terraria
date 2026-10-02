@@ -143,6 +143,9 @@ public sealed class Npc
     /// <summary>Temporarily immune to damage (teleporting, burrowing phases).</summary>
     public bool Invulnerable { get; set; }
 
+    /// <summary>Released by a wired statue: drops no loot or coins and counts towards the statue caps.</summary>
+    public bool FromStatue { get; set; }
+
     /// <summary>The creature this one is tethered to (a boss's hungry mouths): its anchor follows the leader and it dies with it.</summary>
     public Npc? Leader { get; set; }
 

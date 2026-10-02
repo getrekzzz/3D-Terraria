@@ -48,7 +48,7 @@ public sealed class TownServices
         long cost = ReforgeCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
         var inv = player.State.Inventory;
-        if (!Wallet.TrySpend(inv, Content, cost, out var change)) return TradeResult.TooPoor;
+        if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, cost, out var change)) return TradeResult.TooPoor;
         foreach (var s in change) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         var held = inv.Held;
         result = new ItemStack(held.Item!, held.Count, Prefixes.Roll(held.Item!, Content, ref _rng, held.Prefix));
@@ -98,6 +98,17 @@ public sealed class TownServices
         if (Counters.TryGetValue(AnglerCounter, out int done) && done == (int)day) return null;
         var fish = spec.Parse<AnglerQuestParams>().Fish;
         return Content.Items.Get(fish[(int)(day % fish.Length)]);
+    }
+
+    /// <summary>
+    /// Id of the quest fish a living Angler wants today (null when no Angler lives here or today's quest is done):
+    /// quest fish can only be caught while they are wanted.
+    /// </summary>
+    public string? QuestFishToday()
+    {
+        foreach (var npc in _world.Town.Residents)
+            if (npc.Def.Service is { Type: TownServiceSpecs.AnglerQuest }) return AnglerWants(npc)?.Id;
+        return null;
     }
 
     /// <summary>Hands in today's fish from the backpack for coins and a reward.</summary>

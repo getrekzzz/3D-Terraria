@@ -27,7 +27,8 @@ public sealed class DungeonPass : GenPass
         var styleRng = seeds.Rng("style");
         var style = DungeonStyle.Pick(ref styleRng);
         var bp = DungeonBuilder.Build(ctx.Content, layout, style, site.Surface);
-        ctx.Plan.PlannedWires.UnionWith(DungeonDecorator.Decorate(ctx.Content, bp, layout, style, seeds));
+        ctx.Plan.PlannedWires.UnionWith(DungeonDecorator.Decorate(ctx.Content, bp, layout, style, seeds,
+            ctx.Plan.Settings.Has(World.SecretSeed.NoTraps) ? 6f : 1f));
         StructurePlacementPass.AddStructure(ctx.Plan, new DungeonFeature(bp, layout, style) { Kind = "dungeon", Zone = "dungeon" });
 
         var marks = ctx.Plan.Landmarks;

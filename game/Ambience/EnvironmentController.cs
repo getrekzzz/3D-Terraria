@@ -37,6 +37,9 @@ public sealed partial class EnvironmentController : Node3D
     /// <summary>Tint of the active world event (Blood Moon…), or null.</summary>
     public Color? EventTint { get; set; }
 
+    /// <summary>Sky light scale: 1, or less in a world made with The Constant secret seed (nights darker still).</summary>
+    public float Dim { get; set; } = 1f;
+
     /// <summary>The look of the biome around the camera (fog colour and density, sky and ambient tint), from data.</summary>
     public Strata.Core.Content.Defs.BiomeDef? Biome { get; set; }
 

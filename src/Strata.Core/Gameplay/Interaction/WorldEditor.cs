@@ -94,7 +94,7 @@ public sealed partial class WorldEditor
                 continue;
             }
             float health = MiningRules.Health(block);
-            float total = Damage.Hit(cell, damage, tick);
+            float total = Damage.Hit(cell, MiningRules.HitDamage(block, damage), tick);
             if (total < health)
             {
                 outcome.Damaged.Add((cell, total / health));

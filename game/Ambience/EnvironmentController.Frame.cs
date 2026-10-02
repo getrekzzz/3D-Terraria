@@ -26,6 +26,7 @@ public sealed partial class EnvironmentController
     {
         float dt = (float)delta;
         _time += dt;
+        Depth = depthBelowSurface;
         var (sunDir, moonDir) = Celestial(clock);
         Orient(_sun, sunDir);
         Orient(_moon, moonDir);
@@ -36,14 +37,14 @@ public sealed partial class EnvironmentController
         float sunPeak = Mathf.Max(sunT.X, Mathf.Max(sunT.Y, sunT.Z));
         _sun.Visible = sunDir.Y > -0.02f && sunPeak > 0.002f;
         _sun.LightColor = sunPeak > 0f ? new Color(sunT.X / sunPeak, sunT.Y / sunPeak, sunT.Z / sunPeak) : Colors.Black;
-        _sun.LightEnergy = SunEnergy * sunPeak * Mathf.SmoothStep(-0.02f, 0.04f, sunDir.Y);
+        _sun.LightEnergy = SunEnergy * sunPeak * Mathf.SmoothStep(-0.02f, 0.04f, sunDir.Y) * SunThroughClouds * Dim;
         float phaseLight = Mathf.Abs(clock.MoonPhase - 4) / 4f; // phase 0 is the full moon (1), phase 4 the new moon (0)
         var moonT = Atmosphere.Transmittance(moonDir);
         float moonPeak = Mathf.Max(moonT.X, Mathf.Max(moonT.Y, moonT.Z));
         _moon.Visible = moonDir.Y > 0f && Daylight < 0.5f;
         if (_moon.ShadowEnabled == _sun.Visible) _moon.ShadowEnabled = !_sun.Visible; // one shadow-casting sky light at a time (dusk and dawn overlap)
         _moon.LightColor = new Color(0.66f, 0.76f, 1f);
-        _moon.LightEnergy = MoonEnergy * Mathf.Lerp(0.2f, 1f, phaseLight) * moonPeak * (1f - Daylight);
+        _moon.LightEnergy = MoonEnergy * Mathf.Lerp(0.2f, 1f, phaseLight) * moonPeak * (1f - Daylight) * SunThroughClouds * Dim * Dim;
 
         _eventBlend = Mathf.MoveToward(_eventBlend, EventTint.HasValue ? 1f : 0f, dt * 0.3f);
         var eventTint = Colors.White.Lerp(EventTint ?? Colors.White, _eventBlend);
@@ -68,6 +69,7 @@ public sealed partial class EnvironmentController
             _sky.SetShaderParameter("moon_light", new Vector3(0.05f, 0.06f, 0.08f) * Mathf.Lerp(0.3f, 1f, phaseLight));
             _sky.SetShaderParameter("sky_ambient", _skyIrradiance * 1.4f + new Vector3(0.004f, 0.006f, 0.012f));
             _sky.SetShaderParameter("night", 1f - Daylight);
+            _sky.SetShaderParameter("overcast", Overcast);
             _sky.SetShaderParameter("star_rotation", clock.Hour / 24f * Mathf.Tau);
             _sky.SetShaderParameter("tint", Colors.White.Lerp(eventTint, 0.7f) * Colors.White.Lerp(_biomeSky, 0.6f));
             _sky.SetShaderParameter("ambient_tint", Colors.White.Lerp(_biomeAmbient, 0.5f) * Colors.White.Lerp(eventTint, 0.45f));
@@ -76,13 +78,13 @@ public sealed partial class EnvironmentController
         // Rich colour by day (the reference game's saturated palette over realistic materials); it fades somewhat at
         // night (rod vision), keeping moonlit scenes blue rather than grey.
         _env.AdjustmentSaturation = Mathf.Lerp(0.85f, 1.22f, Daylight);
-        _env.AdjustmentBrightness = Mathf.Clamp(Settings.UserSettings.Current.Brightness, 0.5f, 2f);
+        _env.AdjustmentBrightness = Mathf.Clamp(Settings.UserSettings.Current.Brightness, 0.5f, 2f) * (1f + Flash * 0.35f);
         // Night keeps a floor under the moonlit sky so shapes and creatures stay readable.
-        _env.AmbientLightColor = new Color(0.08f, 0.1f, 0.17f);
+        _env.AmbientLightColor = new Color(0.08f, 0.1f, 0.17f) * Dim * Dim;
         _env.AmbientLightSkyContribution = Mathf.Lerp(0.6f, 1f, Daylight);
 
         var ambient = new Color(_skyIrradiance.X, _skyIrradiance.Y, _skyIrradiance.Z) + new Color(0.045f, 0.06f, 0.1f);
-        ambient *= Colors.White.Lerp(eventTint, 0.45f) * Colors.White.Lerp(_biomeAmbient, 0.5f);
+        ambient *= Colors.White.Lerp(eventTint, 0.45f) * Colors.White.Lerp(_biomeAmbient, 0.5f) * Mathf.Lerp(1f, 0.72f, Overcast) * Mathf.Lerp(Dim * Dim, Dim, Daylight);
         RenderingServer.GlobalShaderParameterSet("strata_sky_ambient", ambient);
         RenderingServer.GlobalShaderParameterSet("strata_daylight", Daylight);
         RenderingServer.GlobalShaderParameterSet("strata_time", _time);
@@ -114,13 +116,12 @@ public sealed partial class EnvironmentController
     {
         float hours = clock.Tick / (float)GameClock.TicksPerHour;
         float weather = SmoothNoise(hours / 7f + _seed % 97);
-        float cover = CloudCoverOverride ?? Mathf.Lerp(0.18f, 0.78f, weather);
-        _wind += new Vector2(7f, 2.6f) * dt;
+        float cover = CloudCoverOverride ?? WeatherCover(Mathf.Lerp(0.18f, 0.78f, weather));
+        // Ground wind for grass and foliage from the weather (gusts scroll downwind); the clouds sail with it.
+        var (dir, strength, scroll) = GroundWind();
+        _wind += dir * (5f + 22f * WeatherWind.Length()) * dt;
         RenderingServer.GlobalShaderParameterSet("strata_clouds", new Vector4(_wind.X, _wind.Y, cover, CloudAltitude));
-        // Ground wind for grass and foliage: stronger under heavy cover; gusts scroll downwind.
-        var dir = new Vector2(7f, 2.6f).Normalized();
-        float strength = Mathf.Lerp(0.25f, 0.85f, Mathf.SmoothStep(0.2f, 0.8f, cover));
-        _gusts += dt * (3f + 6f * strength);
+        _gusts += dt * scroll;
         RenderingServer.GlobalShaderParameterSet("strata_wind", new Vector4(dir.X, dir.Y, strength, _gusts));
     }
 
@@ -134,6 +135,7 @@ public sealed partial class EnvironmentController
         // Open air: clear near the camera, melting into the sky colour at the edge of the streamed world.
         // Underground: close, dark gloom tinted by the biome (crypt murk, cinder haze).
         var skyFog = _biomeFog.Lerp(new Color(0.03f, 0.04f, 0.07f), 1f - Daylight);
+        ApplyWeatherFogColor(ref skyFog);
         var deepFog = new Color(0.015f, 0.016f, 0.022f).Lerp(_biomeFog * 0.2f, 0.5f);
         _env.FogLightColor = skyFog.Lerp(deepFog, deep) * Colors.White.Lerp(eventTint, 0.5f);
         _env.FogAerialPerspective = Mathf.Lerp(0.8f, 0f, deep);
@@ -142,6 +144,7 @@ public sealed partial class EnvironmentController
         // land (sand, snow) fades into the sky instead of glaring at full brightness.
         _env.FogDepthBegin = Mathf.Lerp(Mathf.Min(reach * 0.3f, _fogSettings.NearCap / Mathf.Max(_biomeDensity, 0.5f)), 2f, deep);
         _env.FogDepthEnd = Mathf.Lerp(ViewDistance * 1.02f, 42f / Mathf.Max(_biomeDensity, 0.5f), deep);
+        ApplyWeatherFogReach(deep);
         _env.FogDensity = Mathf.Lerp(1f, 0.92f, deep);
         _env.FogSunScatter = 0.08f * (1f - deep);
         // Deep in a cave the sky background only shows past the streamed chunks (the far side of the underworld, a
