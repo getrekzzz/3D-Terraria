@@ -1,4 +1,5 @@
 using Godot;
+using Strata.Core.Gameplay.Items;
 using Strata.Core.Presentation;
 
 namespace Strata.Game.UI;
@@ -44,6 +45,9 @@ public static partial class UiTheme
     public static readonly Color Bad = Color.Color8(190, 120, 120);
     public static readonly Color Life = Color.Color8(220, 46, 56);
     public static readonly Color Mana = Color.Color8(56, 115, 242);
+
+    /// <summary>The crosshair while Smart Cursor is on.</summary>
+    public static readonly Color SmartCursor = Color.Color8(255, 150, 30);
 
     // Coins.
     public static readonly Color Platinum = Color.Color8(220, 220, 198);
@@ -114,6 +118,29 @@ public static partial class UiTheme
 
     /// <summary>True when the rarity colour changes over time, so its text must be recoloured every frame.</summary>
     public static bool IsAnimated(int rarity) => RarityColors.IsAnimated(rarity);
+
+    // Tooltip line colours that no other text shares.
+    private static readonly Color Flavor = Color.Color8(190, 200, 255);
+    private static readonly Color NoValue = Color.Color8(120, 120, 120);
+
+    /// <summary>
+    /// The colour of a tooltip line as Terraria draws it: the name in its rarity colour, prefix bonuses green and
+    /// penalties red, a price in the colour of its largest coin, "No value" grey, flavour text lilac, info muted.
+    /// </summary>
+    public static Color TooltipColor(TooltipKind kind, int rarity) => kind switch
+    {
+        TooltipKind.Name => Rarity(rarity),
+        TooltipKind.Good => Good,
+        TooltipKind.Bad => Bad,
+        TooltipKind.PriceCopper => Copper,
+        TooltipKind.PriceSilver => Silver,
+        TooltipKind.PriceGold => GoldCoin,
+        TooltipKind.PricePlatinum => Platinum,
+        TooltipKind.NoValue => NoValue,
+        TooltipKind.Flavor => Flavor,
+        TooltipKind.Info => Muted,
+        _ => Text,
+    };
 
     private static StyleBoxFlat Box(Color fill, Color border, int borderWidth, int radius, int marginX, int marginY)
     {

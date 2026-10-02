@@ -59,9 +59,11 @@ public sealed partial class TownDialog : CanvasLayer
 
     public void Open(TownNpc npc)
     {
+        // The interact key works with the chat open: talking to someone else lets the first resident go.
+        if (_npc != null && _npc != npc) _ui.Game.Town.EndTalk(_npc);
         _npc = npc;
         _root.Visible = true;
-        InputGate.SetOpen(Gate, true);
+        InputGate.SetOpen(Gate, true, GateKind.Overlay); // the player can still walk off and fight
         _title.Text = npc.Title;
         _text.Text = _ui.Game.Commerce.Greet(npc, _ui.Entity);
         ShowShop(false);
@@ -72,7 +74,7 @@ public sealed partial class TownDialog : CanvasLayer
     {
         if (!IsOpen) return;
         _root.Visible = false;
-        InputGate.SetOpen(Gate, false);
+        InputGate.SetOpen(Gate, false, GateKind.Overlay);
         if (_npc != null) _ui.Game.Town.EndTalk(_npc);
         _npc = null;
     }
@@ -146,7 +148,7 @@ public sealed partial class TownDialog : CanvasLayer
         {
             var row = new HBoxContainer();
             row.AddChild(new TextureRect { Texture = ItemIcons.Get(offer.Item), CustomMinimumSize = new Vector2(32, 32), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered });
-            row.AddChild(new Label { Text = offer.Item.DisplayName, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, TooltipText = string.Join("\n", _ui.Tooltip(new ItemStack(offer.Item, 1)).Select(t => t.Text)) });
+            row.AddChild(ShopName(offer.Item, offer.Price));
             row.AddChild(new Label { Text = Coins.Format(offer.Price) });
             var item = offer.Item;
             row.AddChild(Button("Buy", () => Report(commerce.Buy(_npc, _ui.Entity, item), $"Bought {item.DisplayName}.")));
@@ -155,6 +157,17 @@ public sealed partial class TownDialog : CanvasLayer
         var sell = new HBoxContainer();
         sell.AddChild(Button("Sell held stack", SellHeld));
         _shop.AddChild(sell);
+    }
+
+    /// <summary>An offer's name in its rarity colour; hovering it shows the item's tooltip with the buy price.</summary>
+    private Label ShopName(Strata.Core.Content.Defs.ItemDef item, long price)
+    {
+        var name = new Label { Text = item.DisplayName, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, MouseFilter = Control.MouseFilterEnum.Pass };
+        name.AddThemeColorOverride("font_color", UiTheme.Rarity(item.Rarity));
+        var stack = new ItemStack(item, 1);
+        name.MouseEntered += () => TooltipFollower.Current?.Show(name, () => stack, s => _ui.Tooltip(s, price));
+        name.MouseExited += () => TooltipFollower.Current?.Hide(name);
+        return name;
     }
 
     private void SellHeld()
@@ -249,7 +262,8 @@ public sealed partial class TownDialog : CanvasLayer
 
     private static Button Button(string text, Action onPressed)
     {
-        var b = new Button { Text = text };
+        // No keyboard focus: the player can walk and jump while talking, and Space (ui_accept) would press it again.
+        var b = new Button { Text = text, FocusMode = Control.FocusModeEnum.None };
         b.Pressed += onPressed;
         return b;
     }

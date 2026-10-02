@@ -45,6 +45,7 @@ public partial class GameRoot : Node
         var log = new GodotLog();
         var data = new GodotDataSource();
         var args = CommandLine.FromOs();
+        Automated = IsAutomated(args);
         Settings.UserSettings.Load();
         UiTheme.Install(); // before any UI node exists: global font, theme and glyph warm-up
         log.Info("boot", $"UI theme installed (glyph warm-up {UiTheme.WarmupMs:0.0} ms).");
@@ -99,6 +100,8 @@ public partial class GameRoot : Node
         var user = Settings.UserSettings.Current;
         user.Changed += ApplyDisplay;
         if (!IsAutomated(args)) ApplyDisplay(user);
+        UI.UiCursor.Apply(user); // Terraria's pointer on every screen, recoloured with the setting
+        user.Changed += UI.UiCursor.Apply;
         GetTree().Root.SizeChanged += () => Settings.DisplaySettings.ApplyUiScale(GetTree().Root, Settings.UserSettings.Current);
 
         if (args.Flag("no-world")) return;
@@ -132,7 +135,14 @@ public partial class GameRoot : Node
         });
     }
 
-    /// <summary>Scripted runs (smoke tests, screenshots) skip the menu and keep the window as launched.</summary>
+    /// <summary>
+    /// A scripted run (smoke test, screenshots, --exec): it skips the menu, keeps the window as launched and never
+    /// writes the player's settings from gameplay toggles (Smart Cursor), so one script cannot change the next.
+    /// </summary>
+    public static bool Automated { get; private set; }
+
+    public override void _ExitTree() => UI.UiCursor.Reset();
+
     private static bool IsAutomated(CommandLine args) =>
         args.Get("smoke") != null || args.Get("screenshot") != null || args.Get("exec") != null || args.Get("shots") != null;
 
@@ -276,7 +286,7 @@ public partial class GameRoot : Node
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (World != null && @event is InputEventMouseButton { Pressed: true } && !InputGate.GameplayBlocked && Input.MouseMode != Input.MouseModeEnum.Captured)
+        if (World != null && @event is InputEventMouseButton { Pressed: true } && !InputGate.MouseFree && Input.MouseMode != Input.MouseModeEnum.Captured)
             Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 }

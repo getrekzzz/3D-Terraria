@@ -173,6 +173,16 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   `godot --headless --path . -- --export-theme` (or `ui export-theme` in the console); the `ui.theme_synced` probe in
   `ui.cmds` fails while the file is stale. Slot styles are cached per `SlotKind` (`UiTheme.SlotStyle`), so drawing a
   slot allocates nothing.
+* **Slots, tooltips and the pointer**: `ItemSlotView` (drawing in `ItemSlotView.Draw.cs`) tints each slot by
+  `SlotKind` (gold when selected or favourited, dark when locked), centres the icon at 62% of the slot, writes the
+  stack count bottom-left in outlined white (a bow's or gun's rounds from `PlayerInventory.CountAmmo` in the same
+  corner, red at 0) and a faint native-size silhouette in empty slots; a held right button repeats the click at
+  `HoldRepeat` pace; hidden views stop processing (probe `ui.slot_views`). `TooltipFollower` (CanvasLayer 95) is
+  the only item tooltip: shown instantly on hover beside the pointer, lines coloured by `UiTheme.TooltipColor`,
+  rebuilt only when the stack changes or every 0.25 s. `CursorItemLayer` (CanvasLayer 90) draws the held cursor
+  stack at the pointer over every screen. `UiCursor` makes the generated `assets/ui/cursor.png` the system pointer,
+  tinted by the cursor colour setting (Terraria's `#ff325f` by default; settings files without a `version` key move
+  from the old white default) and scaled with the UI. Moving items plays `grab` (`tools/audio/sfx_recipes_ui.py`).
 * **Rarity colours** live in Core (`Strata.Core.Presentation.RarityColors`): tiers -1 and 0–11 with Terraria's RGB,
   Quest (-11) amber, Expert (-12) a cycling rainbow and Master (-13) a red-orange pulse; `UiTheme.Rarity` converts.
 * **UI scale**: `Strata.Core.Presentation.UiScale` lowers the UI scale setting so the logical viewport never drops
@@ -187,3 +197,52 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   and buff rows. A region with no room is left out of `Rects` (the widget hides). Engine code calls it on viewport
   resize and on state changes only; `UiLayoutTests` checks every window size from 1024×600 to 3840×2160 at every UI
   scale step.
+* **Input gate** (`game/UI/InputGate.cs`): screens register as `GateKind.Modal` (pause menu and settings, console,
+  world map: `GameplayBlocked`, everything stops) or `GateKind.Overlay` (inventory with its chest, town dialog with
+  its shop: `OverlayOpen`, the pointer is free but `MovementBlocked`/`HotkeysBlocked` stay false, so the player walks,
+  jumps, grapples, picks hotbar slots and fights). `MouseFree` (either kind) shows the pointer and stops mouse look
+  (`LookBlocked`); `TextEntry` blocks movement and hotkeys too. With an overlay open the item is used only while the
+  button is held on empty screen: `WorldClickCatcher`, a full-screen control on CanvasLayer 9 under the HUD and every
+  overlay, takes exactly the clicks no panel or slot took and sets `WorldPointer` (left: use toward the crosshair, or throw the cursor
+  stack; right: throw one, or drag to turn the camera through `CameraRig.AddLook` with `CameraDrag`). The number keys
+  are polled (`InteractionController.PollHotbarKeys`), the wheel reads the rebindable `hotbar_next`/`hotbar_prev`
+  actions and is left to a panel under the pointer (`InputGate.PointerOverPanel`). Smoke: `ui click`/`ui drag`
+  press on empty screen through the GUI (`PointerInput`); probes `ui.inventory`, `ui.overlay`, `ui.modal`,
+  `ui.world_clicks`, `camera.yaw`, `player.hotbar`.
+* **HUD** (`game/UI/Hud.cs`, widgets in `game/UI/Hud/`): `Hud.ApplyLayout` builds a `UiState` and places every widget
+  on its `UiLayout` region whenever the logical viewport, the UI scale or what is shown changes (inventory, NPC chat,
+  boss, buff count, info rows, minimap setting, F3), never per frame; `Hud.LayoutApplied` moves the `Minimap` and the
+  `PerfOverlay` on their own canvas layers. A headless run lays out for the project window over the UI scale
+  (`LayoutWidgets.LogicalSize`). Widgets: `ItemNameLabel` (held stack's `ItemTooltip.NameLine` in its rarity colour,
+  "Inventory" while open), `HotbarBar` (top-left, unselected slots ease to 0.78 scale, `hotbar_tick` on every
+  switch, hidden while the inventory is open), `Crosshair` (cursor colour; `talk_hint`/`open_hint` with the interact
+  key; holds the `TargetLabel`), `StatusLine` (refusals and notices for 2 s under the crosshair, else the build-shape
+  hint), `InfoPanel` (info-accessory rows with the accessory's icon, FPS last, 4 Hz), the vitals (`Hud.Vitals.cs`:
+  "Life: X/Y" over `LifeHearts`, `ManaStars` and `BreathBubbles`, each drawn in `_Draw` from the `heart`/`heart_gold`/
+  `star`/`bubble` sprites with Core `VitalsDisplay` maths: 20 life per heart, golden per Life Fruit past 400 from the
+  permanent maximum, the partial icon at 0.6 + 0.4·fill scale and 0.4 + 0.6·fill alpha, the last full heart beating
+  at 15 Hz redraws, bubbles only below full breath and flashing red at 0; `UserSettings.LifeDisplay` "bars" swaps the
+  hearts and stars for `VitalsBars`), the `BuffBar` (pooled `BuffIconView`s rebound only on `BuffSet.Changed`, a
+  count change, or a change in the minions (`ProjectileSystem.CountMinions`, one icon per kind with its count, the
+  staff's icon) or the minecart; countdowns from `BuffDisplay.Timer`, hidden where `ShowsTimer` is false, redrawn
+  when the whole second changes, blinking in the last 5 s; while `InputGate.MouseFree` the icons take the mouse:
+  hover shows `TooltipFollower.ShowText` with the name and `BuffText.Describe`, a right click goes through
+  `BuffBar.Cancel` (`BuffSet.TryCancel` + `Recompute`, refused for debuffs and persistent buffs; minions go home via
+  `ProjectileSystem.Unsummon`)), the pickup feed in the chat region and the boss bar. Text widgets draw through `OutlinedText` (no minimum size, clipped), so nothing outgrows its
+  region; the minimap has a 9-slice `minimap_frame` and +/− buttons (zoom 0.5–6) on CanvasLayer 10, above the click
+  catcher. Every placed control joins `LayoutWidgets.Group`; probe `ui.overlaps` counts intersecting pairs in the live
+  tree (and logs them). Smoke: `ui f3`, `ui minimap in|out`; probes `hud.item_name`, `hud.status`,
+  `ui.layout_width`, `ui.minimap_zoom`, `hud.hearts`, `hud.golden_hearts`, `hud.stars`, `hud.bubbles`, `hud.buffs`;
+  `ui buff <cancel|hover> <id>`.
+* **Inventory screen** (`game/UI/InventoryScreen*.cs`, `game/UI/Inventory/`): Terraria's layout on the HUD's
+  `UiLayout` (the HUD feeds it `InventoryScreen.Panel` and `AccessoryRows` and calls `InventoryScreen.Place` from
+  `LayoutApplied`; `LayoutChanged` lays it out at once on open, close or a panel change). The backpack's 10×5 grid
+  sits on the hotbar's origin (first row = hotbar, selected slot gold); `CoinAmmoColumns` holds the coin and ammo
+  columns, the trash slot under them (saved with the player) and the `sort`/`quick_stack` buttons; the panel host
+  under the grid shows one panel at a time through `ShowPanel(Control, UiPanel)`/`ClosePanel()` (the chest today,
+  with 40 pooled slot views rebound on open; the shop and service panels plug in here) and sizes its slots by
+  `SlotScale`; `CraftingPanel` takes the Crafting region (pooled rows, no fixed size); the equipment column takes the
+  Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
+  so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
+  (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack), `.Chest`,
+  `.Equipment`. Smoke: `ui sort`, `ui quickstack`; probes `ui.grid_on_hotbar`, `ui.panel`, `ui.slot_scale`.

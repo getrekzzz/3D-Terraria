@@ -61,7 +61,7 @@ public sealed partial class PlayerController
     /// <summary>Top running speed: speed boots ease in over the run-up, and Sprint only boosts their bonus.</summary>
     private float RunSpeed(StatSheet stats)
     {
-        bool sprint = !UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint");
+        bool sprint = !UI.InputGate.MovementBlocked && Input.IsActionPressed("sprint");
         return _config.TopSpeed(stats.Bonus(StatIds.MoveSpeed), stats.Bonus(StatIds.RunSpeed), _runUp, sprint);
     }
 
@@ -141,7 +141,7 @@ public sealed partial class PlayerController
             return true;
         }
         var dash = Entity.State.Effects.Dash;
-        if (dash == null || UI.InputGate.GameplayBlocked) return false;
+        if (dash == null || UI.InputGate.MovementBlocked) return false;
         var actions = DashActions;
         var local = DashDirections;
         for (int i = 0; i < actions.Length; i++)
