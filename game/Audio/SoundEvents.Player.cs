@@ -15,6 +15,10 @@ public sealed partial class SoundEvents
         {
             if (p == _local) Sfx.Play(stack.Item!.HasTag("coin") ? "coins" : "pickup");
         };
+        game.PickupApplied += (p, stack, _, _) =>
+        {
+            if (p == _local) Sfx.Play(stack.Item!.Pickup!.HealMana > 0 ? "mana" : "heal");
+        };
         game.ItemUse.Caught += (p, _) =>
         {
             if (p == _local) Sfx.Play("splash");

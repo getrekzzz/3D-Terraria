@@ -5975,6 +5975,10 @@
    "model": "assets/models/items/healing_potion.glb",
    "icon": "assets/icons/items/healing_potion.png"
   },
+  "heart": {
+   "model": "assets/models/items/heart.glb",
+   "icon": "assets/icons/items/heart.png"
+  },
   "heart_lantern": {
    "object": "heart_lantern",
    "icon": "assets/icons/items/heart_lantern.png"
@@ -8964,6 +8968,10 @@
     "tip": "0 1.18 0 > 0 1 0"
    },
    "icon": "assets/icons/items/staff_of_the_frost_hydra.png"
+  },
+  "star": {
+   "model": "assets/models/items/star.glb",
+   "icon": "assets/icons/items/star.png"
   },
   "star_cannon": {
    "model": "assets/models/items/star_cannon.glb",

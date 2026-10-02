@@ -146,6 +146,11 @@ public sealed class Npc
     /// <summary>Released by a wired statue: drops no loot or coins and counts towards the statue caps.</summary>
     public bool FromStatue { get; set; }
 
+    /// <summary>The player who last struck it (Hearts and Stars drop for them), and whether that hit was magic.</summary>
+    public Session.PlayerEntity? LastAttacker { get; set; }
+
+    public bool LastHitMagic { get; set; }
+
     /// <summary>The creature this one is tethered to (a boss's hungry mouths): its anchor follows the leader and it dies with it.</summary>
     public Npc? Leader { get; set; }
 

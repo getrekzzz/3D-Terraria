@@ -77,8 +77,9 @@ public sealed class ItemSourceIndex
     /// <summary>A fallen town resident drops table "&lt;resident id&gt;" + this suffix, when it exists.</summary>
     public const string DeathTableSuffix = "_death";
 
-    /// <summary>Item tags that are a source by themselves (handed out at player creation, or placed by world generation).</summary>
-    public static readonly string[] SourceTags = { "starter", "world" };
+    /// <summary>Item tags that are a source by themselves (handed out at player creation, placed by world generation, or a
+    /// Heart or Star that kills drop by code).</summary>
+    public static readonly string[] SourceTags = { "starter", "world", "pickup" };
 
     private static readonly IReadOnlyList<ItemSource> None = Array.Empty<ItemSource>();
 

@@ -315,6 +315,7 @@ public sealed partial class NpcSystem
     {
         if (!npc.Alive || npc.Invulnerable || (melee && npc.ImmuneTicks > 0)) return false;
         if (npc.Disguised) Wake(npc, attacker);
+        if (attacker != null) (npc.LastAttacker, npc.LastHitMagic) = (attacker, damageClass == DamageClass.Magic);
         baseDamage = _world.Banners.Dealt(attacker, npc, baseDamage); // a banner of this creature nearby (X-03)
         if (segment >= 0 && segment < npc.SegmentLife.Count) return HitSegment(npc, segment, attacker, baseDamage, damageClass, critChance, melee);
         // A shared-life worm (the Destroyer) still armours each segment kind on its own: soft head, plated body and tail.

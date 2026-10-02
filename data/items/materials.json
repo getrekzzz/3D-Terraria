@@ -149,6 +149,7 @@
         8,
         4
       ],
+      "glows": true,
       "tags": [
         "world"
       ],
@@ -226,6 +227,34 @@
       "value": 0,
       "covers": [
         "terraria:cactus"
+      ]
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "description": "Restores 20 life when touched. Dropped by enemies when you are hurt.",
+      "category": "misc",
+      "maxStack": 1,
+      "pickup": {
+        "healLife": 20
+      },
+      "glows": true,
+      "tags": [
+        "pickup"
+      ]
+    },
+    {
+      "id": "star",
+      "name": "Star",
+      "description": "Restores 100 mana when touched. Dropped by enemies when you are low on mana. (Not the Fallen Star.)",
+      "category": "misc",
+      "maxStack": 1,
+      "pickup": {
+        "healMana": 100
+      },
+      "glows": true,
+      "tags": [
+        "pickup"
       ]
     }
   ]

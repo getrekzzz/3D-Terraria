@@ -57,6 +57,13 @@ public enum EquipSlot
     None, Head, Body, Legs, Accessory, Pet, LightPet, Minecart, Mount, Hook,
 }
 
+/// <summary>What touching a pickup item restores (Terraria's Heart: 20 life; Star: 100 mana).</summary>
+public sealed class PickupEffect
+{
+    public int HealLife { get; init; }
+    public int HealMana { get; init; }
+}
+
 public sealed class BuffApplication
 {
     public string Id { get; init; } = "";
@@ -162,6 +169,15 @@ public sealed class ItemDef : ContentDef
     // --- Consumption ---
     public int HealLife { get; init; }
     public int HealMana { get; init; }
+
+    /// <summary>A pickup (Heart, Star): applied when touched and never stored, so it needs no free slot.</summary>
+    public PickupEffect? Pickup { get; init; }
+
+    /// <summary>Lies where it is dropped, drifting and bobbing (souls).</summary>
+    public bool NoGravity { get; init; }
+
+    /// <summary>Drawn glowing and pulsing on the ground (Heart, Star, Fallen Star).</summary>
+    public bool Glows { get; init; }
     public BuffApplication? Buff { get; init; }
 
     // --- Placement ---

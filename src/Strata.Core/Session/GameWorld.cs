@@ -141,14 +141,10 @@ public sealed partial class GameWorld : IDisposable
         using (Diagnostics.Metrics.Frame.Time("tick.drops"))
         {
             if (player is { Alive: true })
-                Drops.Tick(Session.World, dt, player.Center, stack =>
-                {
-                    var rest = player.State.Inventory.Pickup(stack);
-                    if (rest.Count < stack.Count) ItemPickedUp?.Invoke(player, stack.WithCount(stack.Count - rest.Count));
-                    return rest;
-                });
+                Drops.Tick(Session.World, dt, player.Center, s => CanCollect(player, s), s => Collect(player, s),
+                    player.State.Effects.Stats.Bonus(Gameplay.Stats.StatIds.GrabRange));
             else
-                Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
+                Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), _ => false, s => s);
         }
         var prof = Diagnostics.Metrics.Frame;
         using (prof.Time("tick.players")) foreach (var p in Players) TickPlayer(p);

@@ -62,12 +62,16 @@ public static class StatIds
     /// <summary>Added chance (0–1) that a catch is a crate (Crate Potion).</summary>
     public const string CrateChance = "crateChance";
 
+    /// <summary>Metres added to the item magnet's reach (Treasure Magnet).</summary>
+    public const string GrabRange = "grabRange";
+
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
         MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, RunSpeed, Acceleration, JumpHeight, GenericDamage,
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
         Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal, FishingPower, BaitSaving, LavaFishing, CrateChance,
+        GrabRange,
     };
 
     public static bool IsKnown(string id) => Known.Contains(id);
