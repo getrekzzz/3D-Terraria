@@ -76,10 +76,12 @@ wait 2.5
 assert player.on_floor == 1
 assert player.hook == 0
 
-# Platforms hold a hook too; jumping lets go and the player drops back to the floor.
+# Platforms hold a hook too; jumping lets go and the player drops back to the floor. "aim 0 1 0" leans 0.12 m per metre
+# towards +z (the view's pitch stops at 1.45 rad), so the patch reaches two cells that way wherever the player stands.
 setblock 0 12 0 wood platform
 setblock 1 12 0 wood platform
 setblock 0 12 1 wood platform
+setblock 0 12 2 wood platform
 wait 0.5
 aim 0 1 0
 hold grapple 0.05
