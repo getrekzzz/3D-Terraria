@@ -1,10 +1,52 @@
 namespace Strata.Core.Content.Defs;
 
-/// <summary>How a town NPC lives in the world: housed resident or keeper of a landmark (later: visitor, pet).</summary>
+/// <summary>How a town NPC lives in the world: housed resident, keeper of a landmark, passing visitor or town pet.</summary>
 public enum TownNpcKind
 {
     Resident,
     Landmark,
+    /// <summary>Comes and goes (the Travelling and Skeleton Merchants): never housed, never counted, no happiness.</summary>
+    Visitor,
+    /// <summary>A licensed town pet: takes a house but never counts as a resident, sells nothing and cannot be hurt.</summary>
+    Pet,
+}
+
+/// <summary>
+/// How a visitor comes and goes (Terraria's Travelling Merchant at dawn, the Skeleton Merchant underground). Town
+/// visitors roll <see cref="DawnChance"/> once a day once <see cref="Requires"/> holds and walk in from outside town;
+/// site visitors roll <see cref="HourlyChance"/> while the player is where <see cref="Where"/> holds.
+/// </summary>
+public sealed class VisitInfo
+{
+    public const string TownMode = "town";
+    public const string SiteMode = "site";
+
+    public TypedSpec[] Requires { get; init; } = Array.Empty<TypedSpec>();
+    public string Mode { get; init; } = TownMode;
+    public float DawnChance { get; init; }
+    public float HourlyChance { get; init; }
+    public TypedSpec[] Where { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>Hour of day the town visitor arrives (rolled at dawn) and leaves.</summary>
+    public float ArriveHour { get; init; } = 4.5f;
+    public float LeaveHour { get; init; } = 19.5f;
+
+    /// <summary>How far a town visitor strolls from the town centre (m).</summary>
+    public float WanderRadius { get; init; } = 10f;
+
+    /// <summary>Rotating stock: each pool adds <see cref="ShopPool.Count"/> of its entries, re-rolled every visit.</summary>
+    public ShopPool[] Pools { get; init; } = Array.Empty<ShopPool>();
+
+    /// <summary>Site search shell around the player (m).</summary>
+    public float MinDistance { get; init; } = 25f;
+    public float MaxDistance { get; init; } = 60f;
+}
+
+/// <summary>A group of possible stock from which a visitor brings <see cref="Count"/> entries each visit.</summary>
+public sealed class ShopPool
+{
+    public int Count { get; init; } = 1;
+    public ShopEntry[] Entries { get; init; } = Array.Empty<ShopEntry>();
 }
 
 /// <summary>Something a resident sells. Price defaults to the item's value.</summary>

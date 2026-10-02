@@ -55,7 +55,7 @@ public static class TownCommands
                         var seller = Resident(ctx, a);
                         var item = ctx.World.Session.Content.Items.TryGet(a.Str(2, "item"), out var it) ? it : throw new CommandException($"unknown item '{a.Str(2, "item")}'");
                         // Whichever tab lists it (the Painter's paintings are under "decor").
-                        var tab = seller.Def.Shop.FirstOrDefault(e => e.Item == item.Id)?.Tab ?? Content.Defs.ShopTabs.Shop;
+                        var tab = seller.Def.AllShopEntries.FirstOrDefault(e => e.Item == item.Id)?.Tab ?? Content.Defs.ShopTabs.Shop;
                         var bought = commerce.Buy(seller, ctx.Player, item, Math.Clamp(a.OptInt(3, 1), 1, 999), tab);
                         return bought == TradeResult.Ok ? CommandResult.Success($"Bought {item.DisplayName}.") : CommandResult.Fail(bought.ToString());
                     case "sell":

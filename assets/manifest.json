@@ -4011,6 +4011,14 @@
    "model": "assets/models/items/bone.glb",
    "icon": "assets/icons/items/bone.png"
   },
+  "bone_arrow": {
+   "model": "assets/models/items/bone_arrow.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.38 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/bone_arrow.png"
+  },
   "bone_bathtub": {
    "object": "bone_bathtub",
    "icon": "assets/icons/items/bone_bathtub.png"
@@ -8386,6 +8394,14 @@
    "model": "assets/models/items/prismite.glb",
    "icon": "assets/icons/items/prismite.png"
   },
+  "pulse_bow": {
+   "model": "assets/models/items/pulse_bow.glb",
+   "sockets": {
+    "grip": "-0.11 0 0 > 0 1 0",
+    "nock": "0 0 0 > -1 0 0"
+   },
+   "icon": "assets/icons/items/pulse_bow.png"
+  },
   "pumpkin": {
    "model": "assets/models/items/pumpkin.glb",
    "icon": "assets/icons/items/pumpkin.png"
@@ -8609,6 +8625,14 @@
   "retinazer_trophy": {
    "object": "retinazer_trophy",
    "icon": "assets/icons/items/retinazer_trophy.png"
+  },
+  "revolver": {
+   "model": "assets/models/items/revolver.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "muzzle": "0 0.42 -0.045 > 0 1 0"
+   },
+   "icon": "assets/icons/items/revolver.png"
   },
   "rich_mahogany_bathtub": {
    "object": "rich_mahogany_bathtub",
@@ -9094,6 +9118,14 @@
     "tip": "0 0.918 0 > 0 1 0"
    },
    "icon": "assets/icons/items/silver_shortsword.png"
+  },
+  "sitting_ducks_fishing_pole": {
+   "model": "assets/models/items/sitting_ducks_fishing_pole.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0",
+    "tip": "0 0.9 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/sitting_ducks_fishing_pole.png"
   },
   "skeleton_banner": {
    "object": "skeleton_banner",

@@ -6,7 +6,7 @@ namespace Strata.Core.Commands;
 /// </summary>
 internal static class TownDebugCommands
 {
-    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id>";
+    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | visit <id> | leave <id>";
 
     public static CommandResult? TryRun(CommandContext ctx, CommandArgs a)
     {
@@ -34,6 +34,13 @@ internal static class TownDebugCommands
             case "rescue":
                 var bound = TownCommands.Resident(ctx, a);
                 return town.Rescue(bound, ctx.Player, out var said) ? CommandResult.Success($"{bound.Title}: {said}") : CommandResult.Fail(said.Length > 0 ? said : $"{bound.Title} is not bound.");
+            case "visit":
+                var vdef = ctx.World.Session.Content.TownNpcs.TryGet(a.Str(1, "id"), out var vd) ? vd : throw new CommandException($"unknown visitor '{a.Str(1, "id")}'");
+                if (vdef.Visit == null) return CommandResult.Fail($"{vdef.DisplayName} is not a visitor.");
+                return town.ArriveVisitor(vdef) is { } visitor ? CommandResult.Success($"{visitor.Title} has arrived.") : CommandResult.Fail("no place to arrive at (needs a housed resident, or a site underground).");
+            case "leave":
+                var leaving = TownCommands.Resident(ctx, a);
+                return town.SendAway(leaving) ? CommandResult.Success($"{leaving.Title} is leaving.") : CommandResult.Fail($"{leaving.Title} is not a visitor.");
             default:
                 return null;
         }

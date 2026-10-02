@@ -735,3 +735,18 @@ item value unless given, scaled by happiness (currency prices are not). New good
   clubs (swung; each knocks a Golf Ball, ammo class `golf_ball`, off along the aim at its own speed: driver fastest,
   putter slowest), the bouncing `golf_ball_shot` (6 bounces, light damage), Golf Cup and Tee decor and the golf
   outfit. Golf scoring is not modelled.
+
+## Visiting merchants (P5-19)
+
+`TownNpcDef.Visit` (`VisitInfo`) makes a town NPC a `TownNpcKind.Visitor`: never counted, never housed, no happiness
+(`TownNpc.NeedsHome` is false). `TownSystem.Visitors.cs` runs every `VisitInterval` ticks. Town visitors (the Travelling
+Merchant, `data/town/visitors.json`) roll `dawnChance` once a day with Pcg32(seed, day, id) once `visit.requires` holds
+(2+ housed residents), appear 20–30 m out from the town centre (the mean of the homes), walk in and stroll there
+(`TownNpc.Anchor`), and at `leaveHour` walk out and are removed beyond 40 m (or after a timeout while unseen).
+Site visitors (the Skeleton Merchant) roll `hourlyChance` per check while the player is where `visit.where` holds, are
+placed out of sight with `SiteFinder`, and vanish after the player has been 100 m away for a minute or at the next dawn.
+Arrival and departure raise `Arrived`/`Departed` (HUD announcements) plus `VisitorArrived`/`VisitorLeft`.
+`TownCommerce.VisitorStock` adds each `visit.pools[]` entry draw (Pcg32(seed, visit day, id)), stable per visit;
+`TownNpcDef.AllShopEntries` feeds item sources and validation. `ResidentModel.VisitDay` persists the visit.
+Commands: `town visit <id>`, `town leave <id>`. Gaps: no charged arrows for the Pulse Bow, no Bone Torch, the stock
+pools are a functional subset of Terraria's list.

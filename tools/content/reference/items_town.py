@@ -1,4 +1,4 @@
-"""Reference items the town residents sell (P5-15..P5-18), Terraria 1.4.4 shop stock. Same row format as items.py."""
+"""Reference items the town residents sell (P5-15..P5-19), Terraria 1.4.4 shop stock. Same row format as items.py."""
 
 NOTABLE = {
     "town_goods": """
@@ -70,5 +70,9 @@ golf_shirt|Golf Shirt|early|golfer
 golf_pants|Golf Pants|early|golfer
 fairy_glowstick|Fairy Glowstick|early|zoologist
 critter_shampoo|Critter Shampoo|early|zoologist
+revolver|Revolver|early|travelling merchant
+pulse_bow|Pulse Bow|hardmode|travelling merchant
+sitting_ducks_fishing_pole|Sitting Duck's Fishing Pole|early|travelling merchant
+bone_arrow|Bone Arrow|early|skeleton merchant
 """,
 }

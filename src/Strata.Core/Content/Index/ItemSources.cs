@@ -129,7 +129,7 @@ public sealed class ItemSourceIndex
             if (e.CatchItem != null) index.Add(e.CatchItem, new(ItemSourceKind.Catch, e, null, 1, 1, Array.Empty<TypedSpec>()));
         foreach (var npc in db.TownNpcs.All)
         {
-            foreach (var s in npc.Shop) index.Add(s.Item, new(ItemSourceKind.Shop, npc, null, 1, 1, s.Conditions));
+            foreach (var s in npc.AllShopEntries) index.Add(s.Item, new(ItemSourceKind.Shop, npc, null, 1, 1, s.Conditions));
             foreach (var (item, count) in AnglerRewards(npc))
                 index.Add(item, new(ItemSourceKind.AnglerReward, npc, null, count, count, Array.Empty<TypedSpec>()));
         }

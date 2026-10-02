@@ -1,6 +1,6 @@
 {
   // Town goods added with the NPC slice. Purification Powder frees the Tortured Soul. One item per line.
   "items": [
-    {"id": "purification_powder", "name": "Purification Powder", "description": "Cleanses the evil", "category": "consumable", "maxStack": 9999, "value": 75, "covers": ["terraria:purification_powder"]}
+    {"id": "purification_powder", "name": "Purification Powder", "description": "Cleanses the evil", "category": "consumable", "useStyle": "swing", "maxStack": 9999, "value": 75, "covers": ["terraria:purification_powder"]}
   ]
 }

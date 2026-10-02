@@ -1,0 +1,14 @@
+{
+  // P5-19: the visiting merchants' wares. The Travelling Merchant rotates the Revolver, Pulse Bow and Sitting Duck's
+  // Fishing Pole among his pools; the Skeleton Merchant sells Bone Arrows. The Pulse Bow shoots plain arrows faster
+  // and harder (no charged-arrow conversion yet).
+  "projectiles": [
+    {"id": "bone_arrow", "name": "Bone Arrow", "visual": "arrow", "color": "#e8e0c8", "gravity": 14, "lifetime": 600, "radius": 0.3, "pierce": 2}
+  ],
+  "items": [
+    {"id": "revolver", "name": "Revolver", "category": "weapon", "rarity": 1, "value": 50000, "useStyle": "gun", "useTime": 8, "useAnimation": 8, "damage": 20, "damageType": "ranged", "knockback": 3, "useAmmo": "bullet", "shootSpeed": 46, "covers": ["terraria:revolver"]},
+    {"id": "pulse_bow", "name": "Pulse Bow", "description": "Shoots a charged arrow.", "category": "weapon", "rarity": 5, "value": 375000, "useStyle": "bow", "useTime": 19, "useAnimation": 19, "damage": 50, "damageType": "ranged", "knockback": 2.5, "useAmmo": "arrow", "shootSpeed": 26, "covers": ["terraria:pulse_bow"]},
+    {"id": "sitting_ducks_fishing_pole", "name": "Sitting Duck's Fishing Pole", "category": "fishing", "rarity": 3, "value": 350000, "useStyle": "swing", "useTime": 8, "useAnimation": 8, "projectile": "bobber", "shootSpeed": 15, "behaviors": [{"type": "fishing", "power": 35}], "covers": ["terraria:sitting_ducks_fishing_pole"]},
+    {"id": "bone_arrow", "name": "Bone Arrow", "category": "ammo", "maxStack": 9999, "value": 15, "damage": 6, "damageType": "ranged", "knockback": 2.5, "ammoClass": "arrow", "projectile": "bone_arrow", "consumable": true, "covers": ["terraria:bone_arrow"]}
+  ]
+}

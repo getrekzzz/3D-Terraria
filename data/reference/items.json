@@ -5120,6 +5120,34 @@
    "kind": "town_goods",
    "stage": "early",
    "source": "zoologist"
+  },
+  {
+   "id": "terraria:revolver",
+   "name": "Revolver",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:pulse_bow",
+   "name": "Pulse Bow",
+   "kind": "town_goods",
+   "stage": "hardmode",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:sitting_ducks_fishing_pole",
+   "name": "Sitting Duck's Fishing Pole",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "travelling merchant"
+  },
+  {
+   "id": "terraria:bone_arrow",
+   "name": "Bone Arrow",
+   "kind": "town_goods",
+   "stage": "early",
+   "source": "skeleton merchant"
   }
  ]
 }

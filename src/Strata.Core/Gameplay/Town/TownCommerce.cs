@@ -97,7 +97,7 @@ public sealed class TownCommerce
         var ctx = ContextFor(npc, player);
         float factor = PriceFactor(npc);
         var offers = new List<ShopOffer>();
-        foreach (var e in npc.Def.Shop)
+        foreach (var e in npc.Def.Visit == null ? npc.Def.Shop : npc.Def.Shop.Concat(VisitorStock(npc)))
         {
             if (e.Tab != tab || !Condition(e.Conditions).Evaluate(ctx)) continue;
             var item = Content.Items.Get(e.Item);
@@ -106,6 +106,34 @@ public sealed class TownCommerce
                 : new ShopOffer(item, Math.Max(1, (long)MathF.Round((e.Price ?? item.Value) * factor))));
         }
         return offers;
+    }
+
+    private (long Npc, long Day, List<ShopEntry> Entries) _visitStock = (-1, -1, new());
+
+    /// <summary>
+    /// A visitor's rotating stock for this visit: each pool's <see cref="ShopPool.Count"/> entries drawn with
+    /// Pcg32(world seed, visit day, id), so it holds for the whole visit and changes the next. Conditions apply as usual.
+    /// </summary>
+    public List<ShopEntry> VisitorStock(TownNpc npc)
+    {
+        if (npc.Def.Visit is not { } visit) return new List<ShopEntry>();
+        if (_visitStock.Npc == npc.Id && _visitStock.Day == npc.VisitDay) return _visitStock.Entries;
+        var rng = new Determinism.Pcg32(Determinism.Hash.Combine(Determinism.Hash.Combine((ulong)_world.Session.Settings.Seed, npc.VisitDay), Determinism.Hash.String(npc.Def.Id)));
+        var entries = new List<ShopEntry>();
+        var bag = new List<ShopEntry>();
+        foreach (var pool in visit.Pools)
+        {
+            bag.Clear();
+            bag.AddRange(pool.Entries);
+            for (int i = 0; i < pool.Count && bag.Count > 0; i++)
+            {
+                int k = rng.NextInt(bag.Count);
+                entries.Add(bag[k]);
+                bag.RemoveAt(k);
+            }
+        }
+        _visitStock = (npc.Id, npc.VisitDay, entries);
+        return entries;
     }
 
     public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count = 1, string tab = ShopTabs.Shop)

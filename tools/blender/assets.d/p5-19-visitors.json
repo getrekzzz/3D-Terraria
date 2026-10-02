@@ -1,0 +1,9 @@
+{
+ "comment": "P5-19: the visiting merchants' new wares (Revolver, Pulse Bow, Sitting Duck's Fishing Pole, Bone Arrow).",
+ "items": {"explicit": {
+  "revolver": {"generator": "gun", "params": {"style": "pistol", "metal": "#5a5a66", "wood": "#5a3a22", "length": 0.42}},
+  "pulse_bow": {"generator": "bow", "params": {"style": "recurve", "limbLayer": "iron", "metal": "#6ad8ff"}},
+  "sitting_ducks_fishing_pole": {"generator": "rod", "params": {"metal": "#e8c040", "bobber": "#ffd040"}},
+  "bone_arrow": {"generator": "arrow", "params": {"tip": "#e8e0c8", "fletching": "#d8d0b8"}}
+ }}
+}

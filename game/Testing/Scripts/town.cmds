@@ -132,3 +132,14 @@ assert inv.coins == 250
 give wooden_arrow 30
 assert inv.wooden_arrow == 30
 assert errors == 0
+
+# --- P5-19 ---
+# The Travelling Merchant walks in (forced), trades from his rotating stock and walks off again.
+town visit travelling_merchant
+wait 0.5
+assert town.travelling_merchant == 1
+ui talk travelling_merchant
+ui shop
+ui close
+town leave travelling_merchant
+assert errors == 0

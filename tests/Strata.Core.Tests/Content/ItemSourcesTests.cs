@@ -12,10 +12,7 @@ public class ItemSourcesTests
     /// Shipped items that no source gives yet, each with the work that makes it obtainable. Remove an id once that lands:
     /// the list must match exactly, so a new unobtainable item fails here instead of hiding behind a validate warning.
     /// </summary>
-    private static readonly string[] Pending =
-    {
-        "rally", // sold by the Skeleton Merchant (P5-19)
-    };
+    private static readonly string[] Pending = Array.Empty<string>();
 
     private static readonly Lazy<ItemSourceIndex> Shipped = new(() => ItemSourceIndex.Build(TestPaths.Content));
 
@@ -54,7 +51,9 @@ public class ItemSourcesTests
         // (dropped every so many kills) are new too.
         var gained = fromIndex.Except(fromOld).ToList();
         Assert.NotEmpty(gained);
+        // Visitors' rotating pools (P5-19) were not read by the old check.
         Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward
+            || (s.Kind == ItemSourceKind.Shop && s.Owner is TownNpcDef { Visit: not null })
             || (s.Kind == ItemSourceKind.Drop && db.TileObjects.TryGet(id, out var t) && t.Banner != null)));
     }
 

@@ -76,6 +76,7 @@ public sealed partial class TownSystem
         if (ArrivalsEnabled && tick % Config.ArrivalInterval == 0) Arrivals(force: false, budgeted: true);
         if (tick % LandmarkInterval == 0) UpdateLandmarks();
         if (tick % RescueInterval == 0) UpdateRescues();
+        if (tick % VisitInterval == 0) UpdateVisitors();
         if (tick % Config.HomeCheckInterval == 0) CheckHomes();
         foreach (var r in _residents) TickResident(r);
         _status?.Tick();
@@ -93,7 +94,7 @@ public sealed partial class TownSystem
         if (player == null) return null;
         var rooms = VacantRooms(budgeted);
         // Homeless residents are housed first.
-        foreach (var r in _residents.Where(r => r.Home == null && r.CountsAsResident))
+        foreach (var r in _residents.Where(r => r.Home == null && r.NeedsHome))
         {
             if (rooms.Count == 0) break;
             SetHome(r, rooms[0]);
@@ -108,7 +109,7 @@ public sealed partial class TownSystem
             ctx.Random = _rng; // chance conditions (the Party Girl) draw from the town's stream
             foreach (var def in _world.Session.Content.TownNpcs.All)
             {
-                if (Find(def.Id) != null || def.Starter || def.Landmark != null) continue;
+                if (Find(def.Id) != null || def.Starter || def.Landmark != null || def.Visit != null) continue;
                 bool ok = _arrival[def.Id].Evaluate(ctx) && !HasLeft(def, ctx);
                 _rng = ctx.Random;
                 if (!ok) continue;
@@ -262,7 +263,7 @@ public sealed partial class TownSystem
             r.Home is { } h ? new[] { h.X, h.Y, h.Z } : null,
             r.HomeRoom is { } k ? new[] { k.X, k.Y, k.Z } : null,
             new[] { r.Position.X, r.Position.Y, r.Position.Z }, r.Life, r.RespawnTicks,
-            r.Bound, r.DiedAtTick)).ToList();
+            r.Bound, r.DiedAtTick, r.VisitDay)).ToList();
     }
 
     private void Load(WorldMeta meta)
@@ -285,9 +286,12 @@ public sealed partial class TownSystem
                 RespawnTicks = Math.Min(m.RespawnTicks, LandmarkInterval), // old saves counted the whole delay here
                 Bound = m.Bound,
                 DiedAtTick = m.DiedAt,
+                VisitDay = m.VisitDay,
                 IdleTicks = Config.IdleTicksMin,
             };
             _residents.Add(npc);
         }
+        foreach (var v in _residents)
+            if (v.Def.Kind == TownNpcKind.Visitor) v.Anchor = TownCentre();
     }
 }
