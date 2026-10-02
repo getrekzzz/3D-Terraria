@@ -24,6 +24,15 @@ public sealed partial class GameWorld
     /// <summary>The clock's current rate: <see cref="SleepTimeScale"/> while sleep speeds it up, else 1.</summary>
     public int TimeScale { get; private set; } = 1;
 
+    private long _sleepSkipped;
+
+    /// <summary>
+    /// The clock's tick less the extra ticks sleep added: it advances exactly once per <see cref="Tick"/>, so cadences
+    /// in real time (creature liquid contact, periodic debuff damage, drowning) keep their pace while time runs fast.
+    /// Equal to the clock's tick until someone sleeps in this session.
+    /// </summary>
+    public long RealTick => Session.Clock.Tick - _sleepSkipped;
+
     /// <summary>Raised when a player lies down (true) or gets up (false).</summary>
     public event Action<PlayerEntity, bool>? SleepChanged;
 
@@ -84,7 +93,10 @@ public sealed partial class GameWorld
     private void AdvanceSleepClock()
     {
         TimeScale = SleepSpeedsTime() ? SleepTimeScale : 1;
-        if (TimeScale > 1 && Session.Clock.Tick % SleepTimeScale == 0) Session.Clock.Advance(SleepTimeScale - 1);
+        if (TimeScale <= 1 || Session.Clock.Tick % SleepTimeScale != 0) return;
+        long before = Session.Clock.Tick;
+        Session.Clock.Advance(SleepTimeScale - 1);
+        _sleepSkipped += Session.Clock.Tick - before;
     }
 
     /// <summary>Every living player sleeps, no boss lives, no kill-goal event runs and no hostile creature is near a sleeper.</summary>

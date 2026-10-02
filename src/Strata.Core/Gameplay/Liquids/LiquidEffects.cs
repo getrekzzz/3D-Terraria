@@ -69,7 +69,7 @@ public sealed partial class LiquidEffects
 
     public void Tick()
     {
-        long tick = _world.Session.Clock.Tick;
+        long tick = _world.RealTick; // real-time cadence, also while sleep runs the clock fast
         foreach (var p in _world.Players)
         {
             if (!p.Alive)

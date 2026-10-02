@@ -215,7 +215,7 @@ public sealed partial class GameWorld : IDisposable
         if (state.Buffs.Tick()) state.Recompute();
         int dps = state.Effects.DamagePerSecond;
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
-        if (Session.Clock.Tick % Units.TicksPerSecond == 0)
+        if (RealTick % Units.TicksPerSecond == 0) // real seconds, also while sleep runs the clock fast
         {
             if (dps > 0 && p.Alive) HurtPlayerDirect(p, dps, DamageKind.Periodic);
             state.Recompute();

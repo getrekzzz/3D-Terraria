@@ -108,4 +108,59 @@ public class SleepTests
             Assert.Equal(GameWorld.SleepTimeScale - 1, g.World.Session.Clock.Tick % GameWorld.SleepTimeScale);
         }
     }
+
+    [Fact]
+    public void AFarCreatureStillTakesLavaContactDamageWhileTimeRunsFast()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        g.World.Liquids.Enabled = false;
+        g.World.Session.Clock.SetHour(22f);
+        var bed = new TileObjectInstance(g.Content.TileObjects.Get("bed"), g.Floor + new Int3(9, 1, -2), 0, 0);
+        Assert.True(g.World.Session.World.TileObjects.TryAdd(bed));
+        // A lava pool well past the threat radius (the arena ends at 12 cells; this is carved beyond it).
+        var batch = g.World.Session.World.BeginEdit();
+        var stone = g.Content.BlockId("stone");
+        for (int z = -3; z <= 3; z++)
+            for (int x = -27; x <= -21; x++)
+            {
+                batch.SetBlock(g.Floor.X + x, g.Floor.Y, g.Floor.Z + z, stone);
+                for (int y = 1; y <= 8; y++) batch.SetBlock(g.Floor.X + x, g.Floor.Y + y, g.Floor.Z + z, 0);
+            }
+        g.World.Session.Commit(batch);
+        g.World.Editor.FillLiquid(g.Floor + new Int3(-26, 1, -2), g.Floor + new Int3(-22, 7, 2), g.Content.Liquids.Get("lava"), Strata.Core.Voxels.LiquidCode.MaxLevel);
+        // A creature whose id is not a multiple of the time scale: every tick the systems see is one while asleep.
+        var at = TestGame.CellFeet(g.Floor + new Int3(-24, 1, 0));
+        Strata.Core.Gameplay.Entities.Npc zombie;
+        while ((zombie = g.World.Npcs.Spawn(g.Content.Enemies.Get("zombie"), at)!).Id % GameWorld.SleepTimeScale != 2)
+            g.World.Npcs.Despawn(zombie);
+        int life = zombie.Life;
+
+        Assert.Equal(InteractOutcome.Slept, g.World.Interaction.Interact(g.Player, bed));
+        g.Ticks(40);
+        Assert.Equal(GameWorld.SleepTimeScale, g.World.TimeScale);
+        Assert.True(!zombie.Alive || zombie.Life < life, "the far zombie took no lava damage");
+    }
+
+    [Fact]
+    public void DamageOverTimeKeepsItsRealSecondWhileTimeRunsFast()
+    {
+        var (g, bed) = Bedroom();
+        using var _ = g;
+        Asleep(g, bed, 20);
+        Assert.Equal(GameWorld.SleepTimeScale, g.World.TimeScale);
+        Assert.True(g.World.Session.Clock.Tick > g.World.RealTick);
+        g.Player.State.Buffs.Add(g.Content.Buffs.Get("poisoned"), 600);
+        g.Player.State.Recompute();
+        long start = g.World.RealTick;
+        int life = g.Player.State.Vitals.Life;
+        // The poison's hit lands on the next whole real second (and wakes the sleeper), not every fifth of one.
+        long due = (start / 60 + 1) * 60;
+        g.Ticks((int)(due - start) - 1);
+        Assert.Equal(life, g.Player.State.Vitals.Life);
+        Assert.True(g.Player.Sleeping);
+        g.Ticks(2);
+        Assert.True(g.Player.State.Vitals.Life < life);
+        Assert.False(g.Player.Sleeping);
+    }
 }
