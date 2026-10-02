@@ -136,6 +136,12 @@ public sealed class GraphicsPreset
     /// <summary>How far the horizon (the world's surface beyond the streamed chunks) reaches, in metres; 0 = none.</summary>
     public float HorizonDistance { get; set; }
 
+    /// <summary>Multiplies the particle counts of hit, mining and death effects (EffectKit).</summary>
+    public float EffectsScale { get; set; } = 0.7f;
+
+    /// <summary>Short-lived flash lights (explosions, sparks) alive at once; 0 disables them.</summary>
+    public int FlashLights { get; set; } = 2;
+
     /// <summary>A copy to edit into a custom preset.</summary>
     public GraphicsPreset Clone() => (GraphicsPreset)MemberwiseClone();
 
@@ -160,6 +166,8 @@ public sealed class GraphicsPreset
         if (GrassDistance is < 0f or > 200f) yield return "grassDistance must be within 0–200 m";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
+        if (EffectsScale is < 0f or > 2f) yield return "effectsScale must be within 0–2";
+        if (FlashLights is < 0 or > 16) yield return "flashLights must be within 0–16";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
     }
 

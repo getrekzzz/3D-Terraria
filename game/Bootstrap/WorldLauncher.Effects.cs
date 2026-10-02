@@ -9,12 +9,18 @@ public static partial class WorldLauncher
     /// <summary>Hit and block effects, dropped items, dynamic lights and lava glow.</summary>
     private static void AddWorldEffects(WorldRuntime runtime, GameServices services, GameWorld game, TileObjectRenderer objectRenderer, Entities.NpcRenderer creatures)
     {
+        var kit = new Rendering.EffectKit();
+        runtime.AddChild(kit);
+        kit.Initialize(game.Session.World, services.Graphics);
+        var flashes = new Rendering.FlashLights();
+        runtime.AddChild(flashes);
+        flashes.Initialize(services.Graphics);
         var effects = new Entities.CombatEffects();
         runtime.AddChild(effects);
-        effects.Initialize(game);
+        effects.Initialize(game, kit, flashes);
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
-        blockEffects.Initialize(game);
+        blockEffects.Initialize(game, kit);
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
         drops.Initialize(game);

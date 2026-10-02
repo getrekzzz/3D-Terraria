@@ -152,6 +152,15 @@ the last draw instead, i.e. the main thread's own work, and the summary says "fr
 `strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`, `strata_weather` (wetness, puddles, lightning
 flash, snow; set by `WeatherRenderer`).
 
+## Effects (EffectKit, FlashLights)
+`EffectKit` (game/Rendering) is the one particle path for hits, mining and deaths: per recipe (Chips, Dust, Sparks,
+Puff, Splash, Leaves) a pool of one-shot CPU emitters sharing `particle_lit.gdshader`, each burst lit by the voxel light
+at its point (instance uniform `voxel_light`, so chips in a dark cave are dark) and varied between a lighter and darker
+shade. Counts × preset `effectsScale`; at most 8 bursts start per frame and about 600 particles live (the oldest emitter
+is reused). `FlashLights` is a pool of `flashLights` short omni lights that fade linearly (explosions); a separate pool
+because DynamicLights re-ranks its providers only a few times a second. SoundEvents is split into World, Weapons,
+Creatures and Player partials, each wired once.
+
 ## Weather and ambience
 `WeatherRenderer` (game/Ambience) draws rain streaks, splashes, snow and blowing sand as GPU particles
 (`weather_particles.gdshader` + `weather_drop.gdshader`) in a box that follows the camera. `SkyHeights` uploads the sky
