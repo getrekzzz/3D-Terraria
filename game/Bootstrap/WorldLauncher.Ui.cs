@@ -52,10 +52,17 @@ public static partial class WorldLauncher
         toast.Initialize(game, player.Entity);
         var book = new UI.GuideBook.GuideBookScreen();
         runtime.AddChild(book);
-        book.Initialize(ui);
+        book.Initialize(ui, objectRenderer.Props);
         var hints = new UI.HintToast();
         runtime.AddChild(hints);
         hints.Initialize(game, player.Entity);
+        // The open book covers the screen: hints wait, and the top-right minimap and info panel step out of the way.
+        book.OpenChanged += open =>
+        {
+            hints.Suppressed = open;
+            minimap.Visible = !open;
+            hud.Info.Modulate = open ? Godot.Colors.Transparent : Godot.Colors.White;
+        };
         var loading = new UI.LoadingTips();
         runtime.AddChild(loading);
         loading.Initialize(game, player);

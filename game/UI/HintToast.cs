@@ -26,6 +26,15 @@ public partial class HintToast : CanvasLayer
     private double _left;
     private Tween? _tween;
 
+    /// <summary>
+    /// Holds hints back (the Guide book is open over the screen): a hint on screen is put away and new ones wait in the
+    /// queue until this clears.
+    /// </summary>
+    public bool Suppressed { get; set; }
+
+    /// <summary>A hint is on screen (probe ui.hint_visible).</summary>
+    public bool Showing => _panel.Visible;
+
     public void Initialize(GameWorld game, PlayerEntity local)
     {
         Name = "HintToast";
@@ -77,6 +86,11 @@ public partial class HintToast : CanvasLayer
 
     public override void _Process(double delta)
     {
+        if (Suppressed)
+        {
+            if (_panel.Visible) { _tween?.Kill(); _panel.Visible = false; _left = 0; }
+            return;
+        }
         if (_left > 0)
         {
             _left -= delta;

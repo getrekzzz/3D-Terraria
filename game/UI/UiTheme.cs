@@ -94,6 +94,12 @@ public static partial class UiTheme
     /// <summary>A fresh panel style (callers may change its margins): blue, 2 px navy rim, 10 px rounded corners.</summary>
     public static StyleBoxFlat Panel(float alpha = 1f) => Box(new Color(PanelBlue, PanelBlue.A * alpha), PanelBorder, 2, 10, 12, 10);
 
+    /// <summary>
+    /// A full-screen page's panel (the Guide book): the panel blue as it looks over Terraria's dark backdrop, fully opaque
+    /// so the world and HUD do not show through the text, with the same navy rim.
+    /// </summary>
+    public static StyleBoxFlat SolidPanel() => Box(PanelBlue.Lerp(PanelBorder, 1f - PanelBlue.A) with { A = 1f }, PanelBorder, 3, 10, 14, 12);
+
     /// <summary>The cached style of a slot of <paramref name="kind"/>; drawing with it allocates nothing.</summary>
     public static StyleBoxFlat SlotStyle(SlotKind kind, bool hovered)
     {

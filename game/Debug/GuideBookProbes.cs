@@ -7,7 +7,9 @@ namespace Strata.Game.Debug;
 /// Guide book probes: <c>ui.book_open</c>, <c>ui.book_ready</c> (the Items index finished building),
 /// <c>ui.book_tab</c> (0 items, 1 bestiary, 2 progress, 3 npcs, 4 tips, 5 achievements, -1 closed), <c>ui.book_sources</c> ("Obtained from" rows of the
 /// shown item), <c>ui.book_items</c> (items listed), <c>ui.bestiary_unlock</c> (0–3 for the shown entry, -1 none) and
-/// <c>ui.book_guide</c> (1 once the Progress or Tips tab shows an entry).
+/// <c>ui.book_guide</c> (1 once the Progress or Tips tab shows an entry), <c>ui.book_preview</c> (the bestiary's 3D model:
+/// 1 up, 0 portrait, -1 none), <c>ui.book_title_width</c> (the Bestiary/NPCs entry title's width in px, -1 none) and
+/// <c>ui.hint_visible</c> (an onboarding hint toast is on screen).
 /// </summary>
 [ProbeSource]
 public static class GuideBookProbes
@@ -20,6 +22,9 @@ public static class GuideBookProbes
         ctx.AddProbe("ui.book_sources", () => GuideBookCommands.Find(world)?.Items is { Selected: not null } i ? i.SourceCount : -1);
         ctx.AddProbe("ui.book_items", () => GuideBookCommands.Find(world)?.Items.ListedCount ?? 0);
         ctx.AddProbe("ui.bestiary_unlock", () => GuideBookCommands.Find(world)?.Bestiary.ShownUnlock ?? -1);
+        ctx.AddProbe("ui.book_preview", () => GuideBookCommands.Find(world)?.PreviewState ?? -1);
+        ctx.AddProbe("ui.book_title_width", () => GuideBookCommands.Find(world)?.TitleWidth ?? -1f);
+        ctx.AddProbe("ui.hint_visible", () => world.Runtime.GetNodeOrNull<UI.HintToast>("HintToast")?.Showing == true ? 1 : 0);
         ctx.AddProbe("ui.book_guide", () => GuideBookCommands.Find(world) is { } b && (b.Progress.Selected != null || b.Tips.Selected != null) ? 1 : 0);
     }
 }

@@ -33,6 +33,15 @@ public sealed class BestiaryTab : IGuideTab
     /// <summary>Unlock tier of the shown entry, 0–3 (probe ui.bestiary_unlock); -1 when none.</summary>
     public int ShownUnlock => _details?.Entry == null ? -1 : (int)_details.Unlock;
 
+    /// <summary>1 while the shown creature's 3D model is up, 0 while it shows the portrait, -1 with no preview (probe ui.book_preview).</summary>
+    public int PreviewState => _details?.Preview is { } p ? (p.Active ? 1 : 0) : -1;
+
+    /// <summary>Width of the shown entry's title in pixels, -1 when none (probe ui.book_title_width).</summary>
+    public float TitleWidth => _details?.Title is { } t && GodotObject.IsInstanceValid(t) ? t.Size.X : -1f;
+
+    /// <summary>Frees the 3D preview (the book closed or switched tabs).</summary>
+    public void Hidden() => _details?.ReleasePreview();
+
     private Bestiary Book => _ctx.Ui.Game.Journal.Bestiary;
     private PlayerJournal Journal => _ctx.Ui.Entity.State.Journal;
 

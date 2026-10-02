@@ -41,11 +41,20 @@ public partial class GuideBookScreen : CanvasLayer
     /// <summary>Index of the shown tab (probe ui.book_tab): items 0, bestiary 1, progress 2, npcs 3, tips 4, achievements 5.</summary>
     public int TabIndex => IsOpen && _current != null ? _tabs.IndexOf(_current) : -1;
 
-    public void Initialize(UiContext ui)
+    /// <summary>The book opened (true) or closed: the launcher hides the HUD's top-right panels and holds hints meanwhile.</summary>
+    public event System.Action<bool>? OpenChanged;
+
+    /// <summary>The bestiary's 3D preview: 1 model up, 0 portrait (loading or no model), -1 none (probe ui.book_preview).</summary>
+    public int PreviewState => IsOpen && _current == Bestiary ? Bestiary.PreviewState : -1;
+
+    /// <summary>The shown Bestiary or NPCs entry's title width in pixels, -1 otherwise (probe ui.book_title_width).</summary>
+    public float TitleWidth => !IsOpen ? -1f : _current == Bestiary ? Bestiary.TitleWidth : _current == Npcs ? Npcs.TitleWidth : -1f;
+
+    public void Initialize(UiContext ui, Rendering.PropLibrary? props = null)
     {
         Name = NodeName;
         Layer = 24;
-        _ctx = new GuideBookContext { Ui = ui, Book = this };
+        _ctx = new GuideBookContext { Ui = ui, Book = this, Props = props };
         _tabs.Add(Items);
         _tabs.Add(Bestiary);
         _tabs.Add(Progress);
@@ -101,6 +110,7 @@ public partial class GuideBookScreen : CanvasLayer
             _root!.Visible = true;
             InputGate.SetOpen(Gate, true);
             Audio.Sfx.Play("ui_open");
+            OpenChanged?.Invoke(true);
         }
         Select(target);
         return true;
@@ -124,9 +134,11 @@ public partial class GuideBookScreen : CanvasLayer
     {
         if (!IsOpen) return;
         _root!.Visible = false;
+        Bestiary.Hidden();
         InputGate.SetOpen(Gate, false);
         InputGate.TextEntry = false;
         Audio.Sfx.Play("ui_close");
+        OpenChanged?.Invoke(false);
     }
 
     private void Select(IGuideTab tab)
@@ -141,6 +153,7 @@ public partial class GuideBookScreen : CanvasLayer
         foreach (var (t, r) in _roots) r.Visible = t == tab;
         for (int i = 0; i < _tabs.Count; i++) _buttons[i].ButtonPressed = _tabs[i] == tab;
         if (_current != tab && _current != null) Audio.Sfx.Play("ui_open", -6f);
+        if (_current == Bestiary && tab != Bestiary) Bestiary.Hidden();
         _current = tab;
         tab.Shown();
     }
@@ -154,7 +167,7 @@ public partial class GuideBookScreen : CanvasLayer
         dim.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _root.AddChild(dim);
         var book = new PanelContainer();
-        book.AddThemeStyleboxOverride("panel", UiTheme.Panel(0.97f));
+        book.AddThemeStyleboxOverride("panel", UiTheme.SolidPanel());
         book.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         book.OffsetLeft = 60; book.OffsetTop = 40; book.OffsetRight = -60; book.OffsetBottom = -40;
         var column = new VBoxContainer();

@@ -59,6 +59,14 @@ assert ui.book_sources >= 2
 book bestiary zombie
 assert ui.book_tab == 1
 assert ui.bestiary_unlock >= 2
+# The entry shows its live 3D model once loaded; the title gets the row's width (not a letter per line).
+wait_until ui.book_preview == 1 10
+wait 0.2
+assert ui.book_title_width > 100
+# Onboarding hints wait while the book is open.
+hint show hardmode
+wait 0.3
+assert ui.hint_visible == 0
 book entry shelter
 assert ui.book_tab == 2
 assert ui.book_guide == 1
@@ -67,6 +75,8 @@ book npcs
 assert ui.book_tab == 3
 book entry merchant
 assert ui.book_tab == 3
+wait 0.2
+assert ui.book_title_width > 100
 book entry controls_move
 assert ui.book_tab == 4
 book entry benched
@@ -76,5 +86,7 @@ assert ui.book_tab == 2
 assert errors == 0
 book close
 assert ui.book_open == 0
+assert ui.book_preview == -1
+wait_until ui.hint_visible == 1 3
 wait 0.5
 assert errors == 0
