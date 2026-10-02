@@ -43,6 +43,9 @@ public sealed class MoodEntry
     public string? Biome { get; init; }
     public string? Neighbor { get; init; }
 
+    /// <summary>A layer instead of a biome: "underground" (Terraria's Underground, any depth below the surface).</summary>
+    public string? Layer { get; init; }
+
     /// <summary>+2 loves, +1 likes, −1 dislikes, −2 hates.</summary>
     public int Score { get; init; }
 }

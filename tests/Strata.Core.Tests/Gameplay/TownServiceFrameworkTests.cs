@@ -78,9 +78,9 @@ public class TownServiceFrameworkTests
         long early = NurseCost(g);
         g.World.Progression.Set("defeated_skeletron");
         long later = g.World.Commerce.HealCost(g.World.Town.Find("nurse")!, g.Player);
-        Assert.Equal(25f, later / (float)early, 1);
+        Assert.InRange(later / (float)early, 24.5f, 25.5f); // rounding of a small bill
         using var expert = Create(Difficulty.Expert);
-        Assert.Equal(2f, NurseCost(expert) / (float)early, 1);
+        Assert.InRange(NurseCost(expert) / (float)early, 1.9f, 2.1f);
     }
 
     [Fact]

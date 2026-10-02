@@ -63,7 +63,9 @@ public static partial class ContentValidator
             }
             foreach (var m in t.Mood)
             {
-                if ((m.Biome == null) == (m.Neighbor == null)) ctx.Error(t, "each mood entry needs exactly one of 'biome' or 'neighbor'.");
+                if ((m.Biome != null ? 1 : 0) + (m.Neighbor != null ? 1 : 0) + (m.Layer != null ? 1 : 0) != 1)
+                    ctx.Error(t, "each mood entry needs exactly one of 'biome', 'neighbor' or 'layer'.");
+                if (m.Layer is { } layer && layer != "underground") ctx.Error(t, $"mood layer '{layer}' must be 'underground'.");
                 if (m.Score is < -2 or > 2 or 0) ctx.Error(t, "mood score must be −2, −1, 1 or 2.");
                 ctx.Ref(t, ctx.Db.Biomes, m.Biome, "mood.biome");
                 ctx.Ref(t, ctx.Db.TownNpcs, m.Neighbor, "mood.neighbor");

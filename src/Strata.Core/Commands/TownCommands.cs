@@ -36,7 +36,7 @@ public static class TownCommands
                     case null:
                         if (town.Residents.Count == 0) return CommandResult.Success("Nobody lives in town yet.");
                         return CommandResult.Success(string.Join("\n", town.Residents.Select(t =>
-                            $"{t.Title}: {(t.Home is { } h ? $"home {h}" : "homeless")}, {t.Activity}, mood {commerce.Mood(t, out _):+0;-0;0}, prices ×{commerce.PriceFactor(t):0.00}")));
+                            $"{t.Title}: {(t.Home is { } h ? $"home {h}" : "homeless")}, {t.Activity}, prices ×{commerce.PriceFactor(t):0.00} ({commerce.DescribeHappiness(t)})")));
                     case "check":
                         var arrived = town.CheckArrivals(force: a.OptStr(1) == "force");
                         return CommandResult.Success(arrived != null ? $"{arrived.Title} has arrived." : "Nobody moved in.");

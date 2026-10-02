@@ -37,12 +37,14 @@ public sealed class TownCommerce
     private readonly GameWorld _world;
     private readonly TownSystem _town;
     private readonly Dictionary<TypedSpec[], ICondition> _compiled = new(ReferenceEqualityComparer.Instance);
+    private readonly TownHappiness _happiness;
     private Pcg32 _rng;
 
     public TownCommerce(GameWorld world, TownSystem town)
     {
         _world = world;
         _town = town;
+        _happiness = new TownHappiness(world, town);
         _rng = new Pcg32(Hash.Combine((ulong)world.Session.Settings.Seed, 0x54524144UL));
     }
 
@@ -74,29 +76,14 @@ public sealed class TownCommerce
         });
     }
 
-    /// <summary>Happiness score: liked/disliked biome at home and neighbours nearby.</summary>
-    public int Mood(TownNpc npc, out int neighbours)
-    {
-        var biomes = _world.Session.ContextAt(npc.Home is { } h ? h + Common.Int3.Up : Physics.VoxelMotion.CellOf(npc.Center)).Biomes;
-        var near = _town.Residents.Where(o => o != npc && o.Alive && System.Numerics.Vector3.Distance(o.Position, npc.Position) <= Config.NeighborRadius).ToList();
-        neighbours = near.Count;
-        int score = 0;
-        foreach (var m in npc.Def.Mood)
-        {
-            if (m.Biome != null && biomes.Contains(m.Biome)) score += m.Score;
-            if (m.Neighbor != null && near.Any(o => o.Def.Id == m.Neighbor)) score += m.Score;
-        }
-        return score;
-    }
+    /// <summary>Terraria happiness (biomes, neighbours, crowding, solitude): a report with the price factor and reasons.</summary>
+    public HappinessReport Happiness(TownNpc npc) => _happiness.Evaluate(npc);
 
-    /// <summary>Price multiplier from mood and crowding, clamped to the configured range.</summary>
-    public float PriceFactor(TownNpc npc)
-    {
-        int mood = Mood(npc, out int neighbours);
-        float factor = 1f - mood * Config.MoodStep + Math.Max(0, neighbours - Config.CrowdLimit) * Config.CrowdStep;
-        if (npc.Home == null) factor += Config.CrowdStep * 2f; // homeless residents charge more
-        return Math.Clamp(factor, Config.MinPriceFactor, Config.MaxPriceFactor);
-    }
+    /// <summary>What the resident says about how they feel.</summary>
+    public string DescribeHappiness(TownNpc npc) => _happiness.Describe(npc, _happiness.Evaluate(npc));
+
+    /// <summary>Price multiplier from happiness, clamped to the configured range.</summary>
+    public float PriceFactor(TownNpc npc) => _happiness.Evaluate(npc).Factor;
 
     /// <summary>The resident's shop tabs ("shop", "decor"…), in data order.</summary>
     public IReadOnlyList<string> Tabs(TownNpc npc) => npc.Def.ShopTabs;

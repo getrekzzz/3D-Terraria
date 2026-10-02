@@ -24,17 +24,8 @@ public sealed class TownConfig
     /// <summary>A resident stays dead at least this long even if dawn comes sooner.</summary>
     public int MinDeadTicks { get; init; } = 1800;
 
-    /// <summary>Residents within this distance of a home are its neighbours (happiness, crowding).</summary>
-    public float NeighborRadius { get; init; } = 25f;
-
-    /// <summary>More neighbours than this makes a resident feel crowded.</summary>
-    public int CrowdLimit { get; init; } = 3;
-
-    /// <summary>Price change per mood point (liked biome or neighbour lowers prices).</summary>
-    public float MoodStep { get; init; } = 0.06f;
-
-    /// <summary>Price increase per neighbour over the crowd limit.</summary>
-    public float CrowdStep { get; init; } = 0.05f;
+    /// <summary>Terraria happiness: biome and neighbour preferences, crowding, solitude (prices).</summary>
+    public HappinessConfig Happiness { get; init; } = new();
 
     public float MinPriceFactor { get; init; } = 0.75f;
     public float MaxPriceFactor { get; init; } = 1.5f;

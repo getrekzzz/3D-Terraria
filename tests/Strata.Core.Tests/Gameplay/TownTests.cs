@@ -132,7 +132,7 @@ public class TownTests
         var commerce = g.World.Commerce;
         var peddler = Summon(g, "merchant", new Int3(2, 1, 2));
         float alone = commerce.PriceFactor(peddler);
-        Summon(g, "nurse", new Int3(-2, 1, 2)); // the peddler dislikes the mender
+        Summon(g, "tax_collector", new Int3(-2, 1, 2)); // the Merchant dislikes the Tax Collector
         Assert.True(commerce.PriceFactor(peddler) > alone);
         Assert.InRange(commerce.PriceFactor(peddler), g.World.Town.Config.MinPriceFactor, g.World.Town.Config.MaxPriceFactor);
 

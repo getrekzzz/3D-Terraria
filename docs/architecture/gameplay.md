@@ -530,3 +530,9 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   Eye 3) × the Expert multiplier × happiness. The Dryad's `worldStatus` reads `WorldStatus`, an incremental biome
   sampler (256 samples per tick, approximate, fresh for an hour); `town status <id>` forces it. The chat buttons for
   `services` arrive with the W4 TownDialog.
+* **Happiness** (P5-12, `TownHappiness`): Terraria 1.4 multipliers (love 0.88, like 0.94, dislike 1.06, hate 1.12)
+  for the home's biome or the underground layer (`mood.layer`) and for neighbours within 25 tiles horizontally
+  (vertical cap); the Princess (`lovedByAll`) counts as loved; more than 3 near neighbours +5% each; solitude (≤2 near,
+  ≤4 within 120 tiles) 0.95; homeless 1.1; clamped to the price range. `TownCommerce.PriceFactor/Happiness/
+  DescribeHappiness`; lines from `town.json` `happiness.lines` or per-NPC `happinessLines`. Mood tables follow
+  Terraria's happiness table. The chat's Happiness button arrives with the W4 TownDialog.

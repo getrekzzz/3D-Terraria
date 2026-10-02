@@ -68,4 +68,10 @@ public sealed class TownNpcDef : ContentDef
 
     public DialogueLine[] Lines { get; init; } = Array.Empty<DialogueLine>();
     public MoodEntry[] Mood { get; init; } = Array.Empty<MoodEntry>();
+
+    /// <summary>Everyone nearby loves this resident (the Princess).</summary>
+    public bool LovedByAll { get; init; }
+
+    /// <summary>Own wording for happiness reasons (keys as in <see cref="Gameplay.Town.HappinessConfig.Lines"/>).</summary>
+    public Dictionary<string, string> HappinessLines { get; init; } = new();
 }
