@@ -79,7 +79,13 @@ assert errors == 0
 
 # X-16: a slain zombie crumples into a ragdoll that tumbles, then sinks away and returns to the pool.
 spawning off
-spawn zombie 1
+# Nothing else may claim the zombie first: the parade above can kill the player, and a respawn clears creatures
+# near the spawn point; residents fight back (P5-10), and daylight sends zombies off.
+wait_until player.life > 0 15
+god on
+town dismiss guide
+time midnight
+spawn zombie 1 3
 wait 1.5
 wait_until assets.pending == 0 60
 slay
@@ -90,4 +96,5 @@ wait 1.5
 assert fx.ragdoll_drop > 0.4
 wait 3
 assert fx.ragdolls == 0
+god off
 assert errors == 0
