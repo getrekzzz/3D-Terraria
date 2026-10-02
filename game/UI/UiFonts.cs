@@ -16,6 +16,9 @@ public static class UiFonts
     public const int Body = 16;
     public const int Stack = 14;
     public const int Header = 20;
+
+    /// <summary>Hover names beside the pointer or crosshair (a creature under the crosshair, a map marker), as Terraria's.</summary>
+    public const int Hover = 18;
     public const int Banner = 26;
     public const int Death = 48;
 
@@ -49,7 +52,7 @@ public static class UiFonts
         // is left out: its glyphs cost more than all the others together, and it only shows once play has stopped.
         var font = Bold;
         int pairs = 0;
-        foreach (var (size, outline) in new[] { (Small, Outline), (Stack, Outline), (Body, Outline), (Header, Outline), (Banner, OutlineLarge) })
+        foreach (var (size, outline) in new[] { (Small, Outline), (Stack, Outline), (Body, Outline), (Hover, Outline), (Header, Outline), (Banner, OutlineLarge) })
         {
             font.RenderRange(0, new Vector2I(size, 0), 32, 126);
             font.RenderRange(0, new Vector2I(size, outline), 32, 126);

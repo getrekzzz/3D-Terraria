@@ -6,14 +6,12 @@ using Strata.Core.Gameplay.Map;
 
 namespace Strata.Game.UI;
 
-/// <summary>A point of interest drawn over the map: a position in metres (= map pixels), a colour and an optional label.</summary>
-public readonly record struct MapMarker(Vector2 At, Color Color, string? Label = null, float? Yaw = null, float Size = 5f);
-
 /// <summary>
 /// Draws an <see cref="ExploredMap"/>: each 64×64 tile becomes a cached texture (rebuilt when the tile changes), shown
 /// crisp at any zoom. The surface view shades land by its height like a relief map; the underground view shows cave
 /// floors bright, the rock between them dark and the surface above faintly. Unexplored ground stays black. Used by
-/// the full-screen map (<see cref="Interactive"/>: drag to pan, wheel to zoom) and the minimap.
+/// the full-screen map (<see cref="Interactive"/>: drag to pan, wheel to zoom, hover a marker for its name) and the
+/// minimap; the <see cref="Markers"/> are drawn over it by a <see cref="MapMarkerLayer"/>.
 /// </summary>
 public sealed partial class MapView : Control
 {
@@ -24,6 +22,7 @@ public sealed partial class MapView : Control
     private Color[] _blockColors = Array.Empty<Color>();
     private Color[] _liquidColors = Array.Empty<Color>();
     private bool _dragging;
+    private MapMarkerLayer _markerLayer = null!;
 
     public ExploredMap? Map { get; set; }
 
@@ -38,12 +37,24 @@ public sealed partial class MapView : Control
 
     public bool Interactive { get; set; }
 
-    public Func<IEnumerable<MapMarker>>? Markers { get; set; }
+    /// <summary>Fills the list it is given with the markers to draw this frame (the list is reused).</summary>
+    public Action<List<MapMarker>>? Markers { get; set; }
+
+    /// <summary>The pointer is over the map (an interactive map only follows it).</summary>
+    public bool HasMouse { get; private set; }
+
+    /// <summary>Where the pointer is over the map, in the view's pixels.</summary>
+    public Vector2 Mouse { get; private set; }
+
+    /// <summary>The name of the marker under the pointer (full map), or null.</summary>
+    public string? HoveredMarker => _markerLayer.Hovered;
 
     public void Initialize(ContentDatabase content)
     {
         TextureFilter = TextureFilterEnum.Nearest;
         ClipContents = true;
+        AddChild(_markerLayer = new MapMarkerLayer(this));
+        if (Interactive) MouseExited += () => HasMouse = false;
         _blockColors = new Color[content.Blocks.Count];
         for (int i = 0; i < _blockColors.Length; i++) _blockColors[i] = Color.FromHtml(content.Blocks[i].Color);
         _liquidColors = new Color[8];
@@ -51,7 +62,32 @@ public sealed partial class MapView : Control
             if (liquid.Code is >= 0 and < 8) _liquidColors[liquid.Code] = Color.FromHtml(liquid.Color);
     }
 
-    public override void _Process(double delta) => QueueRedraw();
+    public override void _Process(double delta)
+    {
+        QueueRedraw();
+        _markerLayer.QueueRedraw();
+    }
+
+    /// <summary>
+    /// The share (0–1) of the view showing discovered ground in its current mode (the <c>map.minimap_coverage</c>
+    /// probe); reads every map pixel in view, so it is for probes, not frames.
+    /// </summary>
+    public float ExploredShare()
+    {
+        if (Map == null || Size.X <= 0 || Size.Y <= 0) return 0f;
+        var min = ToMap(Vector2.Zero);
+        var max = ToMap(Size);
+        int x0 = (int)MathF.Floor(min.X), x1 = (int)MathF.Ceiling(max.X), z0 = (int)MathF.Floor(min.Y), z1 = (int)MathF.Ceiling(max.Y);
+        int seen = 0, total = 0;
+        for (int z = z0; z < z1; z++)
+            for (int x = x0; x < x1; x++)
+            {
+                total++;
+                if (x < 0 || z < 0 || x >= Map.Width || z >= Map.Depth) continue;
+                if ((Underground ? Map.Cave(x, z) : Map.Surface(x, z)) != MapValue.Unexplored) seen++;
+            }
+        return total == 0 ? 0f : (float)seen / total;
+    }
 
     public override void _Draw()
     {
@@ -74,35 +110,6 @@ public sealed partial class MapView : Control
         // The world's edge.
         var edge = new Rect2(ToScreen(Vector2.Zero), new Vector2(Map.Width, Map.Depth) * Zoom);
         DrawRect(edge, new Color(0.5f, 0.55f, 0.65f, 0.5f), false, 1.5f);
-        if (Markers != null)
-            foreach (var m in Markers()) DrawMarker(m);
-    }
-
-    private void DrawMarker(MapMarker m)
-    {
-        var p = ToScreen(m.At);
-        if (m.Yaw is { } yaw)
-        {
-            // An arrow pointing where the player looks (map +Z is down the screen).
-            var dir = new Vector2(Mathf.Sin(yaw), Mathf.Cos(yaw));
-            var side = new Vector2(-dir.Y, dir.X);
-            var tip = p + dir * m.Size * 1.6f;
-            var arrow = new[] { tip, p - dir * m.Size + side * m.Size, p - dir * m.Size * 0.4f, p - dir * m.Size - side * m.Size };
-            DrawColoredPolygon(arrow, m.Color);
-            DrawPolyline(new[] { arrow[0], arrow[1], arrow[2], arrow[3], arrow[0] }, Colors.Black, 1.5f);
-        }
-        else
-        {
-            DrawCircle(p, m.Size + 1.5f, Colors.Black);
-            DrawCircle(p, m.Size, m.Color);
-        }
-        if (m.Label != null && Zoom >= 1.5f)
-        {
-            var font = UiFonts.Bold; // the theme's face, also on the minimap's own layer
-            var at = p + new Vector2(m.Size + 4, 5);
-            DrawStringOutline(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, UiFonts.Outline, UiFonts.OutlineColor);
-            DrawString(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, Colors.White);
-        }
     }
 
     private ImageTexture? Texture(MapTile tile, ref int builds)
@@ -184,7 +191,10 @@ public sealed partial class MapView : Control
                 _dragging = button.Pressed;
                 AcceptEvent();
                 break;
-            case InputEventMouseMotion motion when _dragging:
+            case InputEventMouseMotion motion:
+                HasMouse = true;
+                Mouse = motion.Position;
+                if (!_dragging) break;
                 Center -= motion.Relative / Zoom;
                 AcceptEvent();
                 break;

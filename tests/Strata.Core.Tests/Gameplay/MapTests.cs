@@ -41,6 +41,24 @@ public class MapTests
     }
 
     [Fact]
+    public void ARevealCutShortByGroundNotYetLoadedIsRetriedWithoutMoving()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        var world = g.World.Session.World;
+        // A fresh world's spawn: the ground around the player is not streamed in when the first reveals run.
+        var chunks = world.Chunks.ToList();
+        foreach (var c in chunks) world.RemoveChunk(c.Coord, out _);
+        var map = g.World.Maps.For(g.Player);
+        g.Ticks(MapSystem.RevealInterval * 2);
+        Assert.Equal(0, g.World.Maps.Explored(g.Player));
+        // The chunks arrive; the player has not taken a step, and the map still fills in around them.
+        foreach (var c in chunks) world.AddChunk(c);
+        g.Ticks(MapSystem.RetryInterval + MapSystem.RevealInterval);
+        Assert.True(map.CountExplored() > 500, $"only {map.CountExplored()} pixels revealed after the ground loaded");
+    }
+
+    [Fact]
     public void UndergroundTheCaveFloorAtThePlayersDepthIsRevealed()
     {
         using var g = TestGame.Create();

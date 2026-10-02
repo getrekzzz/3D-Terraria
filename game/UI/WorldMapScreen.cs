@@ -9,11 +9,14 @@ namespace Strata.Game.UI;
 /// <summary>
 /// The full-screen world map (M), like the reference game's: everything this character has discovered in this world,
 /// dragged to pan and scrolled to zoom. U switches between the surface and the caves (it opens on whichever the player
-/// is in), C re-centres on the player. Markers: the player (arrow), the world spawn, their bed and the town's residents.
+/// is in), C re-centres on the player. Markers, as on Terraria's map: the player (arrow), the world spawn's flag, their
+/// bed, the head of each living resident and boss; hovering one shows its name beside the pointer.
 /// </summary>
 public sealed partial class WorldMapScreen : CanvasLayer
 {
     private const string Gate = "map";
+    public const float IconSize = 26, MinimapIconSize = 18;
+    private static readonly Dictionary<Strata.Core.Gameplay.Town.TownNpc, (string Name, string Title)> Titles = new();
     private UiContext _ui = null!;
     private Control _root = null!;
     private MapView _view = null!;
@@ -32,7 +35,7 @@ public sealed partial class WorldMapScreen : CanvasLayer
         _view = new MapView { Interactive = true, Zoom = 3f };
         _view.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _view.Initialize(ui.Game.Session.Content);
-        _view.Markers = () => Markers(ui);
+        _view.Markers = into => Markers(ui, into, IconSize);
         _root.AddChild(_view);
         _title = new Label { Position = new Vector2(24, 18) };
         _title.AddThemeFontSizeOverride("font_size", 22);
@@ -94,21 +97,62 @@ public sealed partial class WorldMapScreen : CanvasLayer
         _title.Text = $"{_ui.Game.Session.Settings.Name} — {(_view.Underground ? "Caves" : "Surface")}   ({share:0.0}% explored)";
     }
 
-    /// <summary>What the map marks: the player, the world spawn, the player's bed here and the living residents.</summary>
-    public static IEnumerable<MapMarker> Markers(UiContext ui)
+    /// <summary>The name of the marker under the pointer while the map is open, or null.</summary>
+    public string? HoveredMarker => IsOpen ? _view.HoveredMarker : null;
+
+    /// <summary>The map's markers drawn as an icon rather than a dot (the <c>map.marker_icons</c> probe; allocates).</summary>
+    public int MarkerIcons()
+    {
+        var markers = new List<MapMarker>();
+        Markers(_ui, markers, IconSize);
+        int icons = 0;
+        foreach (var m in markers)
+            if (m.Icon != null) icons++;
+        return icons;
+    }
+
+    /// <summary>
+    /// What the map marks, into <paramref name="into"/>, drawn in this order: the world spawn's flag, the player's bed
+    /// here, the head of each living resident and boss (<paramref name="icon"/> pixels; a dot when the image is missing)
+    /// and the player's arrow on top. Each carries its name for the full map's hover.
+    /// </summary>
+    public static void Markers(UiContext ui, List<MapMarker> into, float icon)
     {
         const float perPixel = Units.CellSize * ExploredMap.CellsPerPixel;
         var session = ui.Game.Session;
         var spawn = session.SpawnCell;
-        yield return new MapMarker(new Vector2(spawn.X, spawn.Z) / ExploredMap.CellsPerPixel, new Color(0.35f, 0.9f, 0.4f), "Spawn", Size: 4f);
+        into.Add(new MapMarker(new Vector2(spawn.X, spawn.Z) / ExploredMap.CellsPerPixel, Colors.White, UiSprites.Get("map_spawn"), "Spawn", Size: icon));
         if (ui.Entity.State.SpawnPoints.TryGetValue(session.Settings.Name, out var bed) && bed.Length == 3)
-            yield return new MapMarker(new Vector2(bed[0], bed[2]) / ExploredMap.CellsPerPixel, new Color(0.4f, 0.65f, 1f), "Bed", Size: 4f);
-        foreach (var r in ui.Game.Town.Residents)
-            if (r.Alive) yield return new MapMarker(new Vector2(r.Position.X, r.Position.Z) / perPixel, new Color(1f, 0.92f, 0.75f), r.Title, Size: 3.5f);
+            into.Add(new MapMarker(new Vector2(bed[0], bed[2]) / ExploredMap.CellsPerPixel, Colors.White, UiSprites.Get("map_bed"), "Bed", Size: icon));
+        var residents = ui.Game.Town.Residents;
+        for (int i = 0; i < residents.Count; i++)
+        {
+            var r = residents[i];
+            if (r.Alive) into.Add(Head(new Vector2(r.Position.X, r.Position.Z) / perPixel, Items.PortraitIcons.TownNpc(r.Def), Title(r), icon));
+        }
+        var npcs = ui.Game.Npcs.All;
+        for (int i = 0; i < npcs.Count; i++)
+        {
+            var n = npcs[i];
+            // One head per boss body (not its hands or segments), as Terraria marks bosses.
+            if (!n.Alive || !n.IsBoss || n.Part != null) continue;
+            into.Add(Head(new Vector2(n.Position.X, n.Position.Z) / perPixel, Items.PortraitIcons.Boss(n.Def), n.Def.Boss!.Title, icon));
+        }
         var p = ui.Entity.Position;
         var aim = ui.Entity.Aim;
-        yield return new MapMarker(new Vector2(p.X, p.Z) / perPixel, new Color(1f, 0.85f, 0.2f), null, Mathf.Atan2(aim.X, aim.Z), 6f);
+        into.Add(new MapMarker(new Vector2(p.X, p.Z) / perPixel, new Color(1f, 0.85f, 0.2f), null, ui.Entity.State.Name, Mathf.Atan2(aim.X, aim.Z), 6f));
     }
+
+    /// <summary>"Andrew the Guide", built once per name rather than every frame the map draws.</summary>
+    private static string Title(Strata.Core.Gameplay.Town.TownNpc r)
+    {
+        if (!Titles.TryGetValue(r, out var t) || !ReferenceEquals(t.Name, r.Name)) Titles[r] = t = (r.Name, r.Title);
+        return t.Title;
+    }
+
+    /// <summary>A head icon, or a pale dot of the same reach when the image is missing.</summary>
+    private static MapMarker Head(Vector2 at, Texture2D? head, string name, float icon) =>
+        head != null ? new MapMarker(at, Colors.White, head, name, Size: icon) : new MapMarker(at, new Color(1f, 0.92f, 0.75f), null, name, Size: icon * 0.2f);
 }
 
 /// <summary>
@@ -140,7 +184,7 @@ public sealed partial class Minimap : CanvasLayer
         AddChild(_box);
         _view = new MapView { Zoom = 2f, MouseFilter = Control.MouseFilterEnum.Ignore };
         _view.Initialize(ui.Game.Session.Content);
-        _view.Markers = () => WorldMapScreen.Markers(ui);
+        _view.Markers = into => WorldMapScreen.Markers(ui, into, WorldMapScreen.MinimapIconSize);
         _view.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _view.OffsetLeft = _view.OffsetTop = Inset;
         _view.OffsetRight = _view.OffsetBottom = -Inset;
@@ -180,6 +224,9 @@ public sealed partial class Minimap : CanvasLayer
         button.EmitSignal(BaseButton.SignalName.Pressed);
         return true;
     }
+
+    /// <summary>The share (0–1) of the minimap showing discovered ground (the <c>map.minimap_coverage</c> probe).</summary>
+    public float Coverage => _view.ExploredShare();
 
     /// <summary>Multiplies the zoom by <paramref name="factor"/> within its limits.</summary>
     public void ZoomBy(float factor) => _view.Zoom = Mathf.Clamp(_view.Zoom * factor, MinZoom, MaxZoom);

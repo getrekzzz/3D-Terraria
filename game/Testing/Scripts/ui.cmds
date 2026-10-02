@@ -5,6 +5,13 @@ wait_until player.frozen == 0 180
 wait 0.5
 assert errors == 0
 
+# --- W4-POLISH (map) ---
+# A fresh world's map is not black at spawn: the ground around the player is revealed (retried in place until it has
+# streamed in) and the minimap shows it; the spawn flag is drawn as an icon, not a text label.
+wait_until map.revealed_cells > 0 10
+assert map.minimap_coverage > 0
+assert map.marker_icons >= 1
+
 # --- P2-01 ---
 # The shipped bold font is the global fallback, an unthemed panel is Terraria blue, and the exported theme file
 # (project.godot [gui] theme/custom) matches the code-built theme.

@@ -16,11 +16,23 @@ public static class PortraitIcons
     private static readonly Dictionary<string, Texture2D?> Cache = new();
     private static readonly List<string> Pending = new();
 
-    public static Texture2D? TownNpc(TownNpcDef npc) => Get(AssetPaths.TownNpcHead(npc));
+    // By definition, so the map's per-frame head lookups build no path strings.
+    private static readonly Dictionary<TownNpcDef, Texture2D?> Heads = new();
+    private static readonly Dictionary<EnemyDef, Texture2D?> BossHeads = new();
+
+    public static Texture2D? TownNpc(TownNpcDef npc)
+    {
+        if (!Heads.TryGetValue(npc, out var tex)) Heads[npc] = tex = Get(AssetPaths.TownNpcHead(npc));
+        return tex;
+    }
 
     public static Texture2D? Creature(EnemyDef enemy) => Get(AssetPaths.CreatureIcon(enemy));
 
-    public static Texture2D? Boss(EnemyDef boss) => Get(AssetPaths.BossIcon(boss));
+    public static Texture2D? Boss(EnemyDef boss)
+    {
+        if (!BossHeads.TryGetValue(boss, out var tex)) BossHeads[boss] = tex = Get(AssetPaths.BossIcon(boss));
+        return tex;
+    }
 
     /// <summary>A portrait by project path; blocks only when it was neither cached nor preloaded.</summary>
     public static Texture2D? Get(string projectPath)
