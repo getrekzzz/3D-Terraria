@@ -5,7 +5,8 @@
 | 1 | P3-05 | full headless CI green (416 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 2 | P3-37, P3-37b, P2-24, P5-28, P3-38, P3-39, P3-40, P3-41a/b, P3-42, P3-43, P3-44, P3-45, P3-50 | full headless CI green (422 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 3 | P4-35, P4-36, P4-37, X-09 (all but the creator menu rows) | full headless CI green (426 Core tests, all checks, 14/14 smoke, MENU PASS) |
-| 4 | X-09 creator menu rows (after the integration UI push, P2-30), X-17 hair/cloth springs | pending |
+| 4 | X-17 hair/cloth motion | see push 4 notes |
+| 5 | X-09 creator menu rows (after the integration UI push, P2-30) | waiting for P2-30 |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -53,3 +54,11 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   `CreatureVisual.SetAppearance` (so `CharacterPreview` already shows it). The old per-hair bodies are gone;
   `anim/index.json` maps the new bodies to the same sets. Remaining: creator UI rows (clothing style, eye and
   undershirt colour pickers, Randomize) in game/Menu after P2-30.
+
+## Push 4 notes
+* **Hair and cloth motion (X-17)**: one damped spring per person (`Strata.Core.Presentation.SpringSway`, tested)
+  anchored at the head; the character shader bends hair hanging below the head joint and loose cloth (vertex alpha
+  marks robe skirts and coat tails; 34 humanoids rebuilt) by it, with wind flutter from `strata_wind`. Budget: graphics
+  preset `swayDistance` (low 0 = off, medium 20 m, high 35 m, ultra 50 m). Deviation from the spec: no dangle bones or
+  per-strand chains (one spring per character, applied per vertex by weight), so long hair swings as one piece; capes
+  and banners do not exist yet. No rendered verification (a still shot cannot show motion).

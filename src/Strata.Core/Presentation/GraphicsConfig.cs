@@ -139,6 +139,9 @@ public sealed class GraphicsPreset
     /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last 30 %).</summary>
     public float OreGlintDistance { get; set; } = 24f;
 
+    /// <summary>Hair and loose clothing (robes, coat tails) sway on characters within this distance, in metres; 0 = off.</summary>
+    public float SwayDistance { get; set; } = 20f;
+
     /// <summary>A copy to edit into a custom preset.</summary>
     public GraphicsPreset Clone() => (GraphicsPreset)MemberwiseClone();
 
@@ -165,6 +168,7 @@ public sealed class GraphicsPreset
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
         if (OreGlintDistance is < 1f or > 60f) yield return "oreGlintDistance must be within 1–60 m";
+        if (SwayDistance is < 0f or > 120f) yield return "swayDistance must be within 0–120 m";
     }
 
     private static bool PowerOfTwo(int v, int min, int max) => v >= min && v <= max && (v & (v - 1)) == 0;

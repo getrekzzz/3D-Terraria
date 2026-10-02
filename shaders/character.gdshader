@@ -42,6 +42,13 @@ instance uniform vec4 shoe_color = vec4(0.216, 0.216, 0.216, 1.0);
 // The undershirt (vest and coat clothing styles) is generated blue, the iris of the eyes the same blue.
 instance uniform vec4 undershirt_color = vec4(0.080, 0.080, 0.434, 1.0);
 instance uniform vec4 eye_color = vec4(0.080, 0.080, 0.434, 1.0);
+// Secondary motion (X-17, game/Rendering/CreatureVisual.Sway.cs): xyz = how far loose parts are pushed (model space,
+// metres), w = 1 while the character is close enough to animate them. Hair below the head joint (sway_head, rest
+// height) and cloth whose vertex alpha marks it loose (skirts, coat tails: alpha 1 - weight / 2) bend by it, plus wind.
+instance uniform vec4 sway = vec4(0.0);
+instance uniform float sway_head = 1.575;
+global uniform vec4 strata_wind;
+global uniform float strata_time;
 
 varying vec3 v_rest;
 varying vec3 v_rest_normal;
@@ -54,6 +61,16 @@ void vertex() {
 	// glTF flips V; Blender (x, y, z) becomes Godot (x, z, -y).
 	v_rest = vec3(UV.x, 1.0 - UV.y, -UV2.x);
 	v_rest_normal = NORMAL;
+	if (sway.w > 0.0) {
+		float h = 1.0 - UV2.y; // rest height (UVRest = rest y, z)
+		float w = kind == 2 ? clamp((sway_head + 0.05 - h) / 0.35, 0.0, 1.0)
+			: kind == 4 && COLOR.a < 0.999 ? (1.0 - COLOR.a) * 2.0 : 0.0;
+		if (w > 0.0) {
+			vec3 wind = transpose(mat3(MODEL_MATRIX)) * vec3(strata_wind.x, 0.0, strata_wind.y) * strata_wind.z;
+			float flutter = 0.5 + 0.5 * sin(strata_time * 3.1 + h * 9.0 + VERTEX.x * 6.0);
+			VERTEX += (sway.xyz + wind * (0.025 + 0.035 * flutter)) * w;
+		}
+	}
 	v_light = voxel_light;
 	v_world = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 }

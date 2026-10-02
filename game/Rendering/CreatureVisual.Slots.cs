@@ -62,6 +62,7 @@ public sealed partial class CreatureVisual
         _hair = node;
         _geometry.Add(node);
         if (_lit) node.SetInstanceShaderParameter("voxel_light", _light);
+        if (_swayReady) node.SetInstanceShaderParameter(SwayHeadParam, _swayHead);
     }
 
     /// <summary>The name of a bone's parent, or null.</summary>

@@ -86,3 +86,10 @@ glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools va
   shots and bestiary thumbnails, `assets/icons/{npcs,creatures}`) import the shipped creature GLBs, pose them on their
   idle action and outline them (`bgen/portraits.py`); `game/Items/PortraitIcons` loads them. Re-render after
   rebuilding a creature. Fur, chitin and bone prop layers (`tools/textures/gen_creature.py`) serve the creatures.
+* **Hair and cloth motion (X-17)**: people within the preset's `swayDistance` run a `SpringSway` (Core) anchored at the
+  head; `CreatureVisual.Sway` passes its offset to the character shader (`sway`, `sway_head`), which bends hair below
+  the head joint and cloth whose vertex alpha marks it loose (skirts, robes, coat tails: alpha = 1 − weight/2, written by
+  `garments.skirt`) and adds `strata_wind` flutter. No extra bones or skinning; nothing updates beyond the distance.
+* **Character creator models (X-09)**: player bodies `player_<m|f>_<shirt|vest|coat>` are bald with marker colours
+  (red shirt/vest/coat, blue undershirt and irises, green trousers, grey hair, belt and boots); hair is a separate model
+  per body and style (`build_all.py --hair`, `bgen/human/hair_styles*.py`) worn on the head bone.

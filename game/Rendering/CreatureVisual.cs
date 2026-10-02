@@ -113,7 +113,11 @@ public sealed partial class CreatureVisual : Node3D
 
     public bool IsPlaying => Humanoid != null || (_player?.IsPlaying() ?? false);
 
-    public override void _Process(double delta) => Humanoid?.Update((float)delta);
+    public override void _Process(double delta)
+    {
+        Humanoid?.Update((float)delta);
+        UpdateSway((float)delta);
+    }
 
     public void SetTint(Color tint)
     {

@@ -30,9 +30,12 @@ public sealed class TerrainMaterials
 
     public ShaderMaterial Opaque { get; }
 
-    /// <summary>Applies a graphics preset's terrain settings (how far ore glints reach).</summary>
-    public void ApplyGraphics(Strata.Core.Presentation.GraphicsPreset preset) =>
+    /// <summary>Applies a graphics preset's world settings: how far ore glints reach and characters' hair and cloth move.</summary>
+    public void ApplyGraphics(Strata.Core.Presentation.GraphicsPreset preset)
+    {
         Opaque.SetShaderParameter("ore_glint_distance", preset.OreGlintDistance);
+        Rendering.CreatureVisual.SwayDistance = preset.SwayDistance; // hair and cloth motion budget (X-17)
+    }
     public ShaderMaterial Cutout { get; }
     public ShaderMaterial Glass { get; }
     public ShaderMaterial Liquid { get; }
