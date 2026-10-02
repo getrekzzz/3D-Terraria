@@ -72,10 +72,34 @@ wait 2.5
 assert player.on_floor == 1
 assert player.hook == 0
 
-# Platforms hold a hook too; jumping lets go and the player drops back to the floor.
+# Platforms hold a hook too; jumping lets go and the player drops back to the floor. The hook flies where the
+# crosshair points, and the third-person crosshair ray is offset from the eye by the shoulder camera, so the
+# platform patch is wide enough (5x5 cells) to be hit whichever way the camera faces.
+setblock -2 12 -2 wood platform
+setblock -2 12 -1 wood platform
+setblock -2 12 0 wood platform
+setblock -2 12 1 wood platform
+setblock -2 12 2 wood platform
+setblock -1 12 -2 wood platform
+setblock -1 12 -1 wood platform
+setblock -1 12 0 wood platform
+setblock -1 12 1 wood platform
+setblock -1 12 2 wood platform
+setblock 0 12 -2 wood platform
+setblock 0 12 -1 wood platform
 setblock 0 12 0 wood platform
-setblock 1 12 0 wood platform
 setblock 0 12 1 wood platform
+setblock 0 12 2 wood platform
+setblock 1 12 -2 wood platform
+setblock 1 12 -1 wood platform
+setblock 1 12 0 wood platform
+setblock 1 12 1 wood platform
+setblock 1 12 2 wood platform
+setblock 2 12 -2 wood platform
+setblock 2 12 -1 wood platform
+setblock 2 12 0 wood platform
+setblock 2 12 1 wood platform
+setblock 2 12 2 wood platform
 wait 0.5
 aim 0 1 0
 hold grapple 0.05
