@@ -38,4 +38,16 @@ generators dungeon_door, dungeon_chair, dungeon_table, bookcase, candelabra, cha
 trim, emblem colours; shape, hem, rod), `statue` (pose, stone, tint, base), `book`, `spike_strip`; helpers
 `emblem_outline`, `hanging_cloth`.
 
-## W9 — hardmode bosses + X-11 + P4-38: done on a lane branch, merged after the W8 push.
+## W9 — hardmode bosses, X-11, P4-38 (pushed)
+WPs done: P4-24 (Wall of Flesh 8000, The Tongued pull, Hungry, Leeches, faster lasers), P4-25 (hardmode bags/trophies,
+Demon Heart flag, Minecart Upgrade Kit), P4-26 (Queen Slime flight), P4-27 (Destroyer 80000 shared life, probes,
+dark plates; Twins 40% transform), P4-28 (Skeletron Prime: saw/vice/cannon/laser as killable parts), P4-29 (Golem and
+Plantera models), P4-30 (Plantera hooks, tentacles, jungle enrage), P4-31 (Golem sealed body, freeing head, punching
+fists), P4-32 (Duke phase 3 + ocean rage, lethal-daylight Empress), P4-38 (furniture bevels: mesh.py `bevel_box`,
+furniture.py `SOFT`/`EDGE`/`bevels(p)`, dungeon furniture rebuilt), X-11 (disguised Mimic and Lost Girl/Nymph via an
+enemy `disguise` block, flying segmented Wyvern).
+CI: full headless CI PASS on the merged branch (all checks, Core tests, 14 smokes, menu tour).
+Gaps: 6th accessory slot (Demon Heart) needs InventoryScreen UI; upgraded cart has no contact damage; Gravity Globe,
+Suspicious Looking Tentacle, Empress Expert item, Titan Glove/Philosopher's Stone/Star Cloak/Metal Detector items do not
+exist yet; biome Mimic variants skipped; the golem trophy still uses the old golem_idol generator; P4-35/36/37 belong to
+the Art session.
