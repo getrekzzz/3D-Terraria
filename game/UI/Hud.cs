@@ -100,6 +100,7 @@ public sealed partial class Hud : CanvasLayer
         root.AddChild(_chat = LayoutWidgets.Register(new ChatLog()));
         root.AddChild(_popups = new PickupPopups(ui)); // full screen, anchored to the player: not a layout region
         BuildBanner(root);
+        BuildAccessibility(root); // subtitles and the autosave spinner (Hud.Accessibility)
 
         root.AddChild(_bossBar = LayoutWidgets.Register(new BossBar()));
         root.AddChild(_eventBar = LayoutWidgets.Register(new EventProgressPanel(ui.Game.Events)));

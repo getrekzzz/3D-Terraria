@@ -7,8 +7,8 @@ using Strata.Game.Settings;
 namespace Strata.Game.Menu;
 
 /// <summary>
-/// The settings menu (title screen and pause menu): Gameplay, Video, Audio, Controls and Interface tabs. Every change
-/// applies immediately; settings are saved when the screen is closed.
+/// The settings menu (title screen and pause menu): Gameplay, Video, Audio, Controls, Interface and Accessibility
+/// tabs. Every change applies immediately; settings are saved when the screen is closed.
 /// </summary>
 public sealed partial class SettingsScreen : PanelContainer
 {
@@ -38,6 +38,7 @@ public sealed partial class SettingsScreen : PanelContainer
         tabs.AddChild(Tab("Audio", Audio));
         tabs.AddChild(Tab("Controls", Controls));
         tabs.AddChild(Tab("Interface", Interface));
+        tabs.AddChild(Tab("Accessibility", Accessibility));
         var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         buttons.AddThemeConstantOverride("separation", 24);
         buttons.AddChild(MenuKit.Big("Back", () =>

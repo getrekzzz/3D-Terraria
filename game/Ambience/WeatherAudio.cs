@@ -16,6 +16,8 @@ public sealed partial class WeatherAudio : Node
     private AmbienceLoops.Fader _light = null!, _heavy = null!, _wind = null!, _blizzard = null!, _sand = null!;
     private AudioStreamPlayer _thunder = null!;
     private readonly RandomNumberGenerator _rng = new();
+    private const float Audible = 0.12f; // a loop at least this loud is captioned
+    private float _captionIn;
 
     public override void _Ready()
     {
@@ -45,6 +47,18 @@ public sealed partial class WeatherAudio : Node
         _wind.Drive(gust * gust * 0.8f * cover * Mathf.Lerp(0.35f, 1f, outdoor), dt, 0.3f);
         _blizzard.Drive(snow ? strength * (local == LocalWeather.Blizzard ? 1f : 0.35f) * cover : 0f, dt);
         _sand.Drive(local == LocalWeather.Sandstorm ? cover * Mathf.Lerp(0.5f, 1f, gust) : 0f, dt);
+        if ((_captionIn -= dt) <= 0f) CaptionLoops();
+    }
+
+    /// <summary>Once a second, tells the subtitles (X-12) which weather loops can be heard; their lines stay up meanwhile.</summary>
+    private void CaptionLoops()
+    {
+        _captionIn = 1f;
+        if (_light.Level > Audible) Sfx.Report("rain_light");
+        if (_heavy.Level > Audible) Sfx.Report("rain_heavy");
+        if (_wind.Level > Audible) Sfx.Report("wind");
+        if (_blizzard.Level > Audible) Sfx.Report("blizzard");
+        if (_sand.Level > Audible) Sfx.Report("sandstorm");
     }
 
     public void Thunder(bool near, float power)
@@ -56,5 +70,6 @@ public sealed partial class WeatherAudio : Node
         _thunder.VolumeDb = Mathf.LinearToDb(Mathf.Lerp(0.55f, 1f, power)) + (near ? 0f : -4f);
         _thunder.PitchScale = _rng.RandfRange(0.9f, 1.08f);
         _thunder.Play();
+        Sfx.Report(id);
     }
 }

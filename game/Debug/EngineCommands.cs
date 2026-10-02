@@ -11,6 +11,7 @@ public static class EngineCommands
     {
         UiCommands.Register(r, world);
         UI.PhotoMode.PhotoCommands.Register(r, world);
+        AccessibilityCommands.Register(r, world);
         r.Register(new CommandDef
         {
             Name = "cull", Usage = "cull <on|off>", Help = "Turns cave culling (hiding chunks the camera cannot see into) on or off.",

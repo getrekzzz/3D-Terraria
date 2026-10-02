@@ -97,6 +97,8 @@ public partial class GameRoot : Node
         var dynamicResolution = new Rendering.DynamicResolution();
         dynamicResolution.Initialize(graphics);
         AddChild(dynamicResolution);
+        UI.UiTheme.InstallVision(data); // colour-blind modes (X-12): the interface palette and the world filter
+        AddChild(new Rendering.ColorBlindFilter());
         var user = Settings.UserSettings.Current;
         user.Changed += ApplyDisplay;
         if (!IsAutomated(args)) ApplyDisplay(user);
