@@ -223,25 +223,25 @@ public class UseTimingTests
     public void SwingHitsOnlyAfterTheWindUp()
     {
         using var g = Arena();
-        // The 150° arc sweeps from +75° (the start side) to −75° (the end side) around the facing.
-        var first = Dummy(g, 65f, 1.4f);
-        var last = Dummy(g, -65f, 1.4f);
+        // The overhead arc comes down in front: a slime 1.5 m ahead at the feet is struck after the wind-up, within the
+        // first 60 % of the swing (the blade is low in front by the clip's strike end).
+        var gel = Dummy(g, 0f, 1.5f);
         g.Hold("wooden_sword");
         g.Player.Aim = Vector3.UnitZ;
         Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
         int duration = g.Player.UseAnimationMax;
         float windUp = g.World.ItemUse.Timing.StrikeStart(UseTiming.Swing) * duration;
-        int firstHit = -1, lastHit = -1;
-        for (int tick = 1; tick <= duration; tick++)
+        int hit = -1;
+        for (int tick = 1; tick <= duration && hit < 0; tick++)
         {
             g.World.Tick();
-            if (firstHit < 0 && first.Life < 5000) firstHit = tick;
-            if (lastHit < 0 && last.Life < 5000) lastHit = tick;
+            if (gel.Life < 5000) hit = tick;
         }
-        Assert.True(firstHit >= windUp, $"the start side was hit at tick {firstHit}, inside the {windUp:0.0}-tick wind-up");
-        Assert.True(lastHit >= windUp, $"the end side was hit at tick {lastHit}, inside the wind-up");
-        Assert.True(firstHit > 0 && lastHit > 0, "the swing missed a slime inside its arc");
-        Assert.True(lastHit > firstHit, "the blade reached the end side before the start side");
+        Assert.True(hit > 0, "the swing missed a slime in front");
+        Assert.True(hit >= windUp, $"hit at tick {hit}, inside the {windUp:0.0}-tick wind-up");
+        Assert.True(hit <= 0.6f * duration, $"hit at tick {hit} of {duration}, after 60 % of the swing");
+        Assert.NotNull(g.World.Melee.LastHit);
+        Assert.InRange(g.World.Melee.LastHit!.Value.BladeDeg, -60f, 30f);
     }
 
     [Fact]

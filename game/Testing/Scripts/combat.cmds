@@ -290,3 +290,44 @@ aim 0 0.3 1
 use
 assert projectiles.count >= 1
 assert errors == 0
+
+# --- P3-04 ---
+# What is seen is what hits: a sword's overhead arc comes down in front, so a slime 1.5 m ahead at the feet is struck
+# by the blade coming down in front (the swing curve's angle at the hit is near or below the horizon, long past the
+# wind-up's 165 degrees behind the head). A spear's
+# thrust reaches a slime 2.3 m away that a shortsword's falls short of.
+killall
+heal
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+camera first
+give wooden_sword 1
+wield wooden_sword
+aim 0 0 1
+spawn green_slime 1 1.5
+ai off
+wait 0.2
+use
+wait 0.8
+assert npcs.alive_life < 14
+assert melee.hit_deg < 30
+assert melee.hit_deg > -70
+assert melee.hit_dist < 2.2
+killall
+give copper_shortsword 1
+wield copper_shortsword
+spawn green_slime 1 2.3
+wait 0.2
+use
+wait 0.6
+assert npcs.alive_life == 14
+give spear 1
+wield spear
+use
+wait 0.8
+assert npcs.alive_life < 14
+assert melee.hit_deg == -999
+assert melee.hit_dist > 2
+ai on
+killall
+assert errors == 0

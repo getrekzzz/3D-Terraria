@@ -47,6 +47,7 @@ public sealed partial class PlayerAvatar : Node3D
         int immune = entity.State.Vitals.ImmunityTicks;
         Visible = !_controller.Rig.FirstPerson && (immune <= 0 || (immune / 4) % 2 == 0); // blink while invulnerable
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
+        ExtendThrust(entity);
         UpdateCart(entity.Minecart);
         UpdateGear(delta);
         Animate(entity, (float)delta);
@@ -95,13 +96,14 @@ public sealed partial class PlayerAvatar : Node3D
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
         {
             node = new MeshInstance3D { Mesh = mesh };
-            scale = HeldScale(item);
+            scale = HeldScale(item) * MeleeScale(item, _game.Uses[item], _props, path, HeldSize(held));
         }
         else
         {
             node = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.25f / 128f, Shaded = true };
         }
         node.Transform = HeldPose(item, _game.Uses[item], scale);
+        RememberHeld(node, item, path, scale, HeldSize(held));
         _held = node;
         LightAnchor = node;
         if (Flames.Of(item, _game.Session.Content) is { } flame)

@@ -166,7 +166,9 @@ public sealed partial class ViewModel : Node3D
         var timing = _game.ItemUse.Timing;
         switch (action)
         {
-            case UseTiming.Swing or UseTiming.Mine:
+            case UseTiming.Swing:
+                return BladePose(t); // the shared swing curve (ViewModel.Swing)
+            case UseTiming.Mine:
             {
                 var clip = timing.Clip(action);
                 float windup = clip.StrikeStart ?? 0f, end = clip.StrikeEnd ?? 1f, through = Mathf.Min(1f, end + UseTiming.FollowThrough);
@@ -177,15 +179,7 @@ public sealed partial class ViewModel : Node3D
                 return Pose.Lerp(after, Poised, Ease((t - through) / (1f - through)));
             }
             case UseTiming.Thrust:
-            {
-                // Out at full length while the stab is live (its strike window and follow-through), then back to level.
-                var clip = timing.Clip(action);
-                float windup = clip.StrikeStart ?? 0f, end = clip.StrikeEnd ?? 1f, through = Mathf.Min(1f, end + UseTiming.FollowThrough);
-                if (t < windup) return Pose.Lerp(Level, Couched, Ease(t / windup));
-                if (t < end) return Pose.Lerp(Couched, Lunge, timing.Sweep(action, t));
-                if (timing.Striking(action, t) || through >= 1f) return Lunge;
-                return Pose.Lerp(Lunge, Level, Ease((t - through) / (1f - through)));
-            }
+                return ThrustPose(t);
             case UseTiming.Bow or Shoot or Cast:
                 return RangedPose(action, t);
             default:
