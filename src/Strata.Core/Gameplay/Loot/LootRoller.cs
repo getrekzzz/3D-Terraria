@@ -55,9 +55,8 @@ public sealed class LootRoller
         }
         int count = rng.Range(e.Min, e.Max);
         if (count <= 0) return;
-        var stack = new ItemStack(_content.Items.Get(e.Item!), count);
-        Prefixes.Apply(ref stack, _content, ref rng); // a single weapon, tool or accessory usually rolls a prefix
-        into.Add(stack);
+        // Each weapon, tool or accessory dropped rolls its own prefix.
+        into.AddRange(Prefixes.Made(_content.Items.Get(e.Item!), count, _content, ref rng));
     }
 
     private ICondition Condition(LootEntry e)

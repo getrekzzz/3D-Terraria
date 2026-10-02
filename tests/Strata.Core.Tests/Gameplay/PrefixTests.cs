@@ -63,6 +63,31 @@ public class PrefixTests
     }
 
     [Fact]
+    public void UseTimeUsesTerrariasMultiplier()
+    {
+        var sword = Db.Items.Get("copper_broadsword");
+        Assert.Equal(27, Prefixes.UseTime(new ItemStack(sword, 1, P("quick")), 30));
+        Assert.Equal(36, Prefixes.UseTime(new ItemStack(sword, 1, P("sluggish")), 30));
+        Assert.Equal(33, Prefixes.UseTime(new ItemStack(sword, 1, P("celestial")), 30));
+        Assert.Equal((0.1f, 0.1f, 0), (P("deadly").Damage, P("deadly").UseSpeed, P("deadly").Crit));
+        Assert.Equal((0.1f, 0.05f, 2, 0.05f, 0.05f),
+            (P("deadly_ranged").Damage, P("deadly_ranged").UseSpeed, P("deadly_ranged").Crit, P("deadly_ranged").Knockback, P("deadly_ranged").Velocity));
+        Assert.Equal((0.1f, -0.1f, -0.1f, 0.1f), (P("celestial").Damage, P("celestial").UseSpeed, P("celestial").ManaCost, P("celestial").Knockback));
+    }
+
+    [Fact]
+    public void SeveralUnitsEachRollTheirOwnPrefix()
+    {
+        var sword = Db.Items.Get("enchanted_sword");
+        var rng = new Pcg32(3);
+        var units = Prefixes.Made(sword, 20, Db, ref rng);
+        Assert.Equal(20, units.Count);
+        Assert.All(units, u => Assert.Equal(1, u.Count));
+        Assert.True(units.Count(u => u.Prefix != null) >= 10);
+        Assert.Equal(new[] { 50 }, Prefixes.Made(Db.Items.Get("torch"), 50, Db, ref rng).Select(s => s.Count));
+    }
+
+    [Fact]
     public void ValueUsesTerrariasSquaredMultiplier()
     {
         var sword = Db.Items.Get("copper_broadsword");
@@ -102,6 +127,11 @@ public class PrefixTests
         var pick = g.Content.Items.Get("copper_pickaxe");
         for (int i = 0; i < 12; i++) Assert.Equal(TradeResult.Ok, g.World.Commerce.Buy(merchant, g.Player, pick));
         Assert.Contains(inv.Stacks, s => s.Item == pick && s.Prefix != null);
+        // A multi-unit buy of a non-stacking item rolls each unit separately.
+        int had = inv.Count(pick);
+        Assert.Equal(TradeResult.Ok, g.World.Commerce.Buy(merchant, g.Player, pick, 8));
+        Assert.Equal(had + 8, inv.Count(pick));
+        Assert.True(inv.Stacks.Count(s => s.Item == pick && s.Prefix != null) >= 10);
     }
 
     [Fact]

@@ -64,17 +64,37 @@ public static class Prefixes
         stack = Fresh(stack.Item!, 1, content, ref rng);
     }
 
+    /// <summary>
+    /// Units of <paramref name="count"/> <paramref name="item"/>s as they are made: one stack, or for a prefixable
+    /// (non-stacking) item a single per unit, each with its own <see cref="Apply"/> roll.
+    /// </summary>
+    public static List<ItemStack> Made(ItemDef item, int count, ContentDatabase content, ref Pcg32 rng)
+    {
+        if (!CanHave(item)) return new List<ItemStack> { new(item, count) };
+        var units = new List<ItemStack>(count);
+        for (int i = 0; i < count; i++)
+        {
+            var one = new ItemStack(item, 1);
+            Apply(ref one, content, ref rng);
+            units.Add(one);
+        }
+        return units;
+    }
+
     public static int Damage(ItemStack s) => s.Prefix is { Damage: not 0 } p ? (int)MathF.Round(s.Item!.Damage * (1f + p.Damage)) : s.Item!.Damage;
 
     public static int Crit(ItemStack s) => s.Item!.Crit + (s.Prefix?.Crit ?? 0);
 
     public static float Knockback(ItemStack s) => s.Item!.Knockback * (1f + (s.Prefix?.Knockback ?? 0f));
 
-    /// <summary>The prefix's use speed as a factor (Brisk 1.1, Sluggish 0.8): it divides use time and animation alike.</summary>
-    public static float UseSpeed(ItemStack s) => 1f + (s.Prefix?.UseSpeed ?? 0f);
+    /// <summary>
+    /// The prefix's use speed as a divisor of use time and animation: useSpeed is 1 - Terraria's use-time multiplier, so
+    /// dividing by 1 / (1 - useSpeed) multiplies by that multiplier (Quick 0.9, Sluggish 1.2).
+    /// </summary>
+    public static float UseSpeed(ItemStack s) => 1f / (1f - (s.Prefix?.UseSpeed ?? 0f));
 
-    /// <summary>Use time after the prefix's speed (positive = faster).</summary>
-    public static int UseTime(ItemStack s, int useTime) => s.Prefix is { UseSpeed: not 0 } ? Math.Max(1, (int)MathF.Round(useTime / UseSpeed(s))) : useTime;
+    /// <summary>Use time after the prefix's speed: Terraria's use-time multiplier (positive useSpeed = faster).</summary>
+    public static int UseTime(ItemStack s, int useTime) => s.Prefix is { UseSpeed: not 0 } p ? Math.Max(1, (int)MathF.Round(useTime * (1f - p.UseSpeed))) : useTime;
 
     public static float ShootSpeed(ItemStack s) => s.Item!.ShootSpeed * (1f + (s.Prefix?.Velocity ?? 0f));
 
