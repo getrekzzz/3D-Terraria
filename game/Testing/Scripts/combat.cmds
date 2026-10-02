@@ -262,6 +262,9 @@ press use_primary
 wait 0.1
 assert player.held_tilt_deg < 15
 assert player.held_aim_deg < 15
+# P3-06: the bow is gripped by its riser (its grip socket, off the model's origin) on the bow style's hand frame.
+assert avatar.grip_error_cm >= 0
+assert avatar.grip_error_cm < 1
 release use_primary
 camera first
 

@@ -32,6 +32,10 @@ wield copper_pickaxe
 wait 0.2
 assert avatar.held_lit == 1
 assert avatar.held_block_cube == 0
+# P3-06: the pickaxe's grip socket sits in the fist (the swing style's hand frame).
+assert avatar.grip_error_cm >= 0
+assert avatar.grip_error_cm < 1
+assert props.problems == 0
 aim 0.05 -1 0.05
 hold use_primary 2.5
 wait 1.5

@@ -1,6 +1,7 @@
 using Godot;
 using Strata.Core.Content;
 using Strata.Core.Content.Defs;
+using Strata.Core.Gameplay.Items;
 using Strata.Game.Items;
 
 namespace Strata.Game.Player;
@@ -10,7 +11,8 @@ namespace Strata.Game.Player;
 /// attachment of the body (<see cref="Rendering.CreatureVisual.AddLit"/>), so it darkens in caves and warms by torches
 /// with the body; a held block is a small cube textured with the block's own terrain faces
 /// (<see cref="BlockItemMeshes"/>) instead of a flat icon card. Sockets of the held model (muzzle, tip, string) are
-/// exposed in world space for effects. The per-use-style hand frame (P3-02 style ids) is applied in HeldPose.
+/// exposed in world space for effects. Each use style grips the item its own way (<see cref="HeldPose"/>: the style's
+/// hand frame from data/config/use_styles.json times the inverse of the model's grip socket).
 /// </summary>
 public sealed partial class PlayerAvatar
 {
@@ -69,6 +71,61 @@ public sealed partial class PlayerAvatar
         if (_socketPath == null || _props.Socket(_socketPath, name) is not { } local) return false;
         global = _held.GlobalTransform * local;
         return true;
+    }
+
+    /// <summary>The hand bone's fist: where a held item's grip sits by default (m along the bone, past the wrist).</summary>
+    private const float Fist = 0.08f;
+
+    /// <summary>
+    /// How an item sits in the right fist (the hand bone: +Y along the fingers, +Z the thumb side): the style's hand
+    /// frame (data/config/use_styles.json <c>hand</c>; the default carries the business end, the model's +Y, out of
+    /// the thumb side) times the inverse of the model's grip socket, so the socket lands on the frame whatever the
+    /// model's origin (a bow is gripped by its riser, a gun by its handle). Items are modelled business end along +Y,
+    /// so a grip socket at the origin pointing +Y leaves the model as it is.
+    /// </summary>
+    private Transform3D HeldPose(ItemUseInfo info, string? path, float scale)
+    {
+        var hand = _game.Styles.Style(info.Style).Hand;
+        var frame = HandFrame(hand);
+        frame = new Transform3D(frame.Basis.Scaled(Vector3.One * scale), frame.Origin);
+        return frame * GripInverse(path);
+    }
+
+    /// <summary>A style's hand frame: its offset (m) and rotation (degrees, XYZ: R = Rx·Ry·Rz) in the hand bone.</summary>
+    public static Transform3D HandFrame(Strata.Core.Presentation.HandGrip? hand)
+    {
+        if (hand == null || hand.Offset.Length != 3 || hand.Euler.Length != 3)
+            return new Transform3D(Basis.FromEuler(new Vector3(Mathf.Pi / 2f, 0, 0)), new Vector3(0, Fist, 0));
+        var e = new Vector3(Mathf.DegToRad(hand.Euler[0]), Mathf.DegToRad(hand.Euler[1]), Mathf.DegToRad(hand.Euler[2]));
+        return new Transform3D(Basis.FromEuler(e, EulerOrder.Xyz), new Vector3(hand.Offset[0], hand.Offset[1], hand.Offset[2]));
+    }
+
+    /// <summary>
+    /// The model-space transform that puts the model's grip socket on the hand frame: the socket's forward (−Z) turned
+    /// onto the model's +Y and its origin moved to the frame's origin. Identity without a socket or a model.
+    /// </summary>
+    private Transform3D GripInverse(string? path)
+    {
+        if (path == null || _props.Socket(path, "grip") is not { } grip) return Transform3D.Identity;
+        var forward = -grip.Basis.Z.Normalized();
+        var turn = forward.IsFinite() && forward.LengthSquared() > 0.5f && forward.Dot(Vector3.Up) < 0.9999f
+            ? new Basis(new Quaternion(forward, Vector3.Up))
+            : Basis.Identity;
+        return new Transform3D(turn, turn * -grip.Origin);
+    }
+
+    /// <summary>
+    /// How far (cm) the held model's grip socket sits from the style's hand frame origin in the fist (probe
+    /// <c>avatar.grip_error_cm</c>; −1 with nothing in hand or no grip socket). About 0 when the grip lands in the fist.
+    /// </summary>
+    public float GripErrorCm()
+    {
+        if (_held == null || _heldItem == null || !IsInstanceValid(_held) || !_held.IsInsideTree()) return -1f;
+        if (!TrySocket("grip", out _) || _socketPath == null || _props.Socket(_socketPath, "grip") is not { } local
+            || _held.GetParentNode3D() is not { } hand) return -1f;
+        var target = hand.GlobalTransform * HandFrame(_game.Styles.Style(_game.Uses[_heldItem].Style).Hand).Origin;
+        var grip = hand.GlobalTransform * _heldRest * local.Origin; // at rest: a thrust slides the model along its shaft
+        return grip.DistanceTo(target) * 100f;
     }
 
     /// <summary>Wings ride the body as a lit attachment (they take its voxel light).</summary>

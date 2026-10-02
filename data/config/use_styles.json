@@ -23,7 +23,10 @@
   //               the right arm while the use lasts, like a held torch, instead of playing once)
   //   toolClip    the clip tools of the style play instead (pickaxes and axes chop)
   //   armAim      how much of the aim pitch the arms take while the clip plays (0–1)
-  //   hand        optional grip in the hand bone: { "offset": [x, y, z] m, "euler": [x, y, z] degrees }
+  //   hand        optional grip in the hand bone (+Y along the fingers, +Z the thumb side): { "offset": [x, y, z] m,
+  //               "euler": [x, y, z] degrees, R = Rx·Ry·Rz }; the item model's "grip" socket lands on this frame. The
+  //               default, [0, 0.08, 0] / [90, 0, 0], carries an item's business end (+Y) out of the thumb side; a bow
+  //               stands upright with its back on the aim (the bow clip holds the hand 23° above it)
   //   holdout     optional business-end offset from the eye: { "forward", "right", "down" } m
   //   bladeCurve  swing only: the blade's pitch over the swing, [t, degrees, ease into the key] (ease: in, out, io,
   //               lin); 0° hangs down, 90° points ahead, 180° is overhead; the swing clip's arm pitch is keyed to it
@@ -46,8 +49,10 @@
     "spear":  { "clip": "spear", "armAim": 1 },
     "shoot":  { "clip": "gun", "armAim": 1 },
     "gun":    { "clip": "gun", "armAim": 1 },
-    "bow":    { "clip": "bow", "armAim": 1 },
-    "staff":  { "clip": "staff", "armAim": 1 },
+    "bow":    { "clip": "bow", "armAim": 1,
+                "hand": { "offset": [0, 0.08, 0], "euler": [0, -90, -67] } },
+    "staff":  { "clip": "staff", "armAim": 1,
+                "hand": { "offset": [0, 0.08, 0], "euler": [60, 0, 0] } },
     "tome":   { "clip": "tome", "armAim": 1 },
     "throw":  { "clip": "throw", "armAim": 0.5 },
     "yoyo":   { "clip": "yoyo", "armAim": 1 },
