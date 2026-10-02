@@ -21,7 +21,9 @@
 | 17 | World integration merge | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
 | 18 | P3-47 buff and debuff visuals | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
 | 19 | P3-06 part 1 (voxel-lit held items and wings, real block cubes in hand) | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
-| 20 | P3-06 grip per use style, P3-07 (after P3-02/03), X-09 creator menu rows (after P2-30) | pending |
+| 20 | P3-02/P3-03 integration merge | full headless CI green (1388 Core tests, 21/21 smoke, MENU PASS) |
+| 21 | P3-06 grip per use style, P3-07 first-person poses, swing curve from `bladeCurve`, rapier melee prefixes, mounted `sit` | full headless CI green (1390 Core tests, 21/21 smoke, MENU PASS) |
+| 22 | X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -163,3 +165,16 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   `PlayerAvatar.Held.cs`, first person `ViewModel.Block.cs`. Probes `avatar.held_lit`, `avatar.wings_lit`,
   `avatar.held_block_cube`, `view.held_block_cube`. Gaps: glass-like blocks render opaque; model-less non-block items
   still use an unlit sprite card; grip per use style waits for P3-02.
+
+## Push 21 notes
+* **Swing curve**: `SwingCurve.Blade` now reads `use_styles.json` `styles.swing.bladeCurve` (converted −90°), the same
+  curve the P3-03 body clips use; hitbox, trail and first-person arc share it; 80° damaging cap kept.
+* **Grip (P3-06)**: held pose = style `hand` frame × inverse of the model's `grip` socket (`PlayerAvatar.Held.cs`); bow
+  and staff frames tuned in data, probe `avatar.grip_error_cm`. Gap: swing/gun/throw/holdUp/eat/yoyo/flail/whip frames
+  use the default grip and still need a screenshot-tuning pass.
+* **First person (P3-07)**: per-style `fp` blocks in `use_styles.json` (rest, keys, tool keys, curve blade/extend,
+  aimAtCrosshair, raiseToFace, recoil), `Strata.Core.Presentation.UseStyleFp`, `ViewModel.Poses.cs`; recoil per
+  `ItemUse.Shot` (bursts kick per round). Probes `fp.kicks`, `fp.recoil`, `fp.depth`. Gaps: holdUp/eat/yoyo/flail poses
+  are first guesses; yoyo/flail arm extension is not tied to the tether; aim uses the aim-distance approach (≤3°), not
+  the muzzle socket at 20 m.
+* `Prefixes.Groups`: `rapier` (shortswords) take melee prefixes; mounted players play `sit` when the clip exists.
