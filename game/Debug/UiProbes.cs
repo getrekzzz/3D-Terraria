@@ -14,8 +14,9 @@ namespace Strata.Game.Debug;
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); on the inventory
 /// screen's layout (P2-15); on the hearts, mana stars and breath bubbles (P2-13); on the buff bar (P2-14); on the
 /// chat log (P2-21); on the pickup popups (P2-22); on the boss bar and the invasion progress (P2-23); on the death
-/// screen (P2-25); on the Smart Cursor (P2-29); and on the equipment column (P2-16), the chest panel (P2-17), the
-/// crafting column (P2-18), the NPC chat box (P2-26), the grid shop (P2-27) and the reforge slot (P2-28).
+/// screen (P2-25); on the Smart Cursor (P2-29); on the equipment column (P2-16), the chest panel (P2-17), the
+/// crafting column (P2-18), the NPC chat box (P2-26), the grid shop (P2-27) and the reforge slot (P2-28); and on the
+/// pause menu and the inventory's Settings button (P2-30).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -126,6 +127,9 @@ public static class UiProbes
         ctx.AddProbe("ui.death_dim", () => world.Hud?.Death.Shown == true ? 1 : 0);
         // The cause under the title ("smoke was slain.") is also the chat log's newest line.
         ctx.AddProbe("ui.death_cause", () => world.Hud is { } hud && hud.Death.Cause.Length > 0 && hud.Chat.LastLine == hud.Death.Cause ? 1 : 0);
+        // P2-30: the pause menu is open (Esc, or the inventory's Settings button) and that button is on screen.
+        ctx.AddProbe("ui.paused", () => UiCommands.Pause(world)?.IsOpen == true ? 1 : 0);
+        ctx.AddProbe("ui.settings_button", () => world.Inventory?.SettingsButtonShown == true ? 1 : 0);
         // P2-29: Smart Cursor is on (X toggles it), and the target is its pick rather than the cell under the crosshair.
         ctx.AddProbe("ui.smart_cursor", () => Settings.UserSettings.Current.SmartCursor ? 1 : 0);
         ctx.AddProbe("ui.smart_target", () => world.Interaction?.SmartTarget == true ? 1 : 0);

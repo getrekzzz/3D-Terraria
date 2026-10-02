@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Terraria-style pixel sprites for the UI, drawn from the ASCII maps in ui_sprites*.py and ui_glyphs*.py.
 
-Usage: python3 tools/textures/build_ui.py [--check] [--only=GLOB[,GLOB...]]
+Usage: python3 tools/textures/build_ui.py [--check] [--only=GLOB[,GLOB...]] [--logo-text=TEXT]
 Passes:
   sprites  ui_sprites.py + ui_sprites_b.py               -> assets/ui/<name>.png
+  logo     ui_logo.py (the main menu's title, --logo-text) -> assets/ui/logo.png
   buffs    buff_icons.json (glyphs from ui_glyphs*.py)   -> assets/icons/buffs/<icon or id>.png (32x32)
   events   event_icons.json                              -> assets/icons/events/<icon or id>.png (32x32)
 `--only` globs match a name or "<pass>/<name>" (heart*, buffs/*). `--check` needs neither numpy nor Pillow (CI runs
@@ -16,6 +17,7 @@ import sys
 
 import ui_glyphs
 import ui_glyphs_b
+import ui_logo
 import ui_sprites
 import ui_sprites_b
 from content_data import REPO, content, load_json
@@ -47,7 +49,7 @@ def rows(text):
 def sprite_maps():
     """Every UI sprite name -> (rows, letter swap), including colour-swapped variants."""
     maps = {name: (rows(text), {}) for name, text in MAPS.items()}
-    for name, (source, swap) in ui_sprites.SWAPS.items():
+    for name, (source, swap) in {**ui_sprites.SWAPS, **ui_sprites_b.SWAPS}.items():
         maps[name] = (maps[source][0], swap)
     return maps
 
@@ -105,6 +107,7 @@ def check():
     errors = validate()
     maps = sprite_maps()
     errors += [f"missing assets/ui/{name}.png (run build_ui.py)" for name in maps if not (OUT["sprites"] / f"{name}.png").exists()]
+    errors += ui_logo.check()
     counts = {}
     for kind in RECIPES:
         jobs = icon_jobs(kind)
@@ -117,7 +120,7 @@ def check():
     if errors:
         print("\n".join(errors))
         return 1
-    print(f"{len(maps)} UI sprites, {counts['buffs']} buff icons, {counts['events']} event icons, {len(GLYPHS)} glyphs: ok")
+    print(f"{len(maps)} UI sprites, the logo, {counts['buffs']} buff icons, {counts['events']} event icons, {len(GLYPHS)} glyphs: ok")
     return 0
 
 
@@ -215,8 +218,11 @@ def selected(globs, kind, name):
     return not globs or any(fnmatch.fnmatch(name, g) or fnmatch.fnmatch(f"{kind}/{name}", g) for g in globs)
 
 
-def build(globs):
+def build(globs, logo_text):
     written = 0
+    if selected(globs, "logo", "logo"):
+        ui_logo.build(logo_text)
+        written += 1
     for name, (cells, swap) in sprite_maps().items():
         if selected(globs, "sprites", name):
             save(render_sprite(name, cells, swap), OUT["sprites"] / f"{name}.png")
@@ -239,7 +245,8 @@ def main():
     if errors:
         print("\n".join(errors))
         return 1
-    build(globs)
+    logo_text = next((a[len("--logo-text="):] for a in sys.argv[1:] if a.startswith("--logo-text=")), ui_logo.DEFAULT_TEXT)
+    build(globs, logo_text)
     return 0
 
 

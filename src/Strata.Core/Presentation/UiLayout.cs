@@ -63,11 +63,12 @@ public static class UiRegion
     public const string Panel = "panel";
     public const string Crafting = "crafting";
     public const string Equipment = "equipment";
+    public const string SettingsButton = "settings_button";
 
     public static readonly string[] All =
     {
         ItemName, Hotbar, Buffs, LifeText, Hearts, Mana, Minimap, Info, Crosshair, Breath, StatusLine, Chat, BossBar,
-        EventBar, NpcChat, Debug, Inventory, CoinAmmo, Trash, SortButtons, Panel, Crafting, Equipment,
+        EventBar, NpcChat, Debug, Inventory, CoinAmmo, Trash, SortButtons, Panel, Crafting, Equipment, SettingsButton,
     };
 }
 
@@ -176,6 +177,8 @@ public static partial class UiLayout
     public const float CraftSelectedScale = 1.25f;
     public const float DefenseBadge = 36;
     public const float EyeToggle = 18;
+    public const float SettingsButtonWidth = 120; // the inventory's 'Settings' text button, bottom-right
+    public const float SettingsButtonHeight = 36;
 
     /// <summary>The inventory slot scales tried in order until everything fits.</summary>
     public static readonly float[] SlotScales = { 1f, 0.85f, 0.75f };

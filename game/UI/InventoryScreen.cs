@@ -25,6 +25,9 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     public bool IsOpen => _root.Visible;
 
+    /// <summary>The screen is open with auto-pause on, so the world waits until it closes.</summary>
+    public bool PausesWorld { get; private set; }
+
     /// <summary>A container's contents were shown (true) or put away (false); its lid follows.</summary>
     public event Action<TileObjectInstance, bool>? ContainerShown;
 
@@ -51,7 +54,7 @@ public sealed partial class InventoryScreen : CanvasLayer
     public override void _UnhandledInput(InputEvent e)
     {
         // Clicks on empty screen (throwing the held stack, using the item, turning the camera) go to WorldClickCatcher.
-        if (InputGate.TextEntry || (!IsOpen && InputGate.GameplayBlocked)) return;
+        if (InputGate.TextEntry || (!IsOpen && InputGate.GameplayBlocked) || InputGate.IsOpen(PauseMenu.Gate)) return;
         if (e.IsActionPressed("inventory") || (IsOpen && e.IsActionPressed("pause")))
         {
             SetOpen(!IsOpen);
@@ -69,6 +72,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         bool autoPause = Settings.UserSettings.Current.AutoPause;
         InputGate.SetOpen(Gate, open, autoPause ? GateKind.Modal : GateKind.Overlay);
         if (autoPause || !open) _ui.Player.Runtime.Simulating = !open;
+        PausesWorld = open && autoPause;
         if (open)
         {
             _equipment.Refresh(_ui.Entity.State);

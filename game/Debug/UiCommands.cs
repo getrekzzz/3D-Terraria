@@ -17,8 +17,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|buy <item> [n]|sell <area> <slot>|buyback <i>|reforge [hit]|hover <area> <index>|buff <cancel|hover> <id>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|craft <item> [n]|chat <text>|history|close|export-theme>",
-            Help = "Opens or closes gameplay screens; shop opens the shop of the resident being talked to (the chat box's Shop); buy clicks a ware's shop slot n times (onto the cursor); sell Shift-clicks a slot with the shop open; buyback Shift-clicks sold stack i (back into the backpack); reforge opens the reforge slot of the resident being talked to (the chat box's Reforge) and reforge hit presses its hammer; hover shows a slot's tooltip (areas as invclick, plus hotbar and shop); buff cancel right-clicks a buff bar icon (a buff id, a minion's projectile id or minecart): buffs go, debuffs never, minions go home; buff hover shows its name and effect; click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); craft clicks the crafting column's recipe for an item as the player does (selecting it, then crafting onto the cursor n times); chat posts a white line to the chat log and history opens or closes its history (the chat key); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|buy <item> [n]|sell <area> <slot>|buyback <i>|reforge [hit]|hover <area> <index>|buff <cancel|hover> <id>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|craft <item> [n]|chat <text>|history|settings|close|export-theme>",
+            Help = "Opens or closes gameplay screens; shop opens the shop of the resident being talked to (the chat box's Shop); buy clicks a ware's shop slot n times (onto the cursor); sell Shift-clicks a slot with the shop open; buyback Shift-clicks sold stack i (back into the backpack); reforge opens the reforge slot of the resident being talked to (the chat box's Reforge) and reforge hit presses its hammer; hover shows a slot's tooltip (areas as invclick, plus hotbar and shop); buff cancel right-clicks a buff bar icon (a buff id, a minion's projectile id or minecart): buffs go, debuffs never, minions go home; buff hover shows its name and effect; click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); craft clicks the crafting column's recipe for an item as the player does (selecting it, then crafting onto the cursor n times); chat posts a white line to the chat log and history opens or closes its history (the chat key); settings presses the inventory's bottom-right Settings button (the pause menu opens over it); close also closes the pause menu; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -117,13 +117,17 @@ public static class UiCommands
                         var chat = world.Hud?.Chat ?? throw new CommandException("no HUD in this mode");
                         chat.SetOpen(!chat.IsOpen);
                         return CommandResult.Success(chat.IsOpen ? "Chat history open." : "Chat history closed.");
+                    case "settings":
+                        if (!screen.PressSettings()) return CommandResult.Fail("The inventory's Settings button is not on screen (open the inventory first).");
+                        return CommandResult.Success("Pressed Settings.");
                     case "close":
+                        if (Pause(world) is { IsOpen: true } pause) pause.SetOpen(false);
                         world.Hud?.Chat.SetOpen(false);
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, reforge, hover, buff, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, chat, history, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, reforge, hover, buff, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, chat, history, settings, close or export-theme");
                 }
             },
         });
@@ -223,4 +227,7 @@ public static class UiCommands
             default: throw new CommandException("expected loot, deposit, quickstack, restock, sort, rename, name or cancel");
         }
     }
+
+    /// <summary>The world's pause menu (none in a free-camera world).</summary>
+    public static PauseMenu? Pause(LaunchedWorld world) => world.Runtime.GetParent()?.GetNodeOrNull<PauseMenu>("PauseMenu");
 }

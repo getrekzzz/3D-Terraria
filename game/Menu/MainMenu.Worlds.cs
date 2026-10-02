@@ -40,7 +40,7 @@ public sealed partial class MainMenu
         box.AddChild(scroll);
         var worlds = SaveCatalog.Worlds(WorldsDirectory, (dir, ex) => _services.Log.Error("menu", $"Unreadable world {dir}", ex));
         if (worlds.Count == 0) list.AddChild(MenuKit.Text("No worlds yet — create one!", 18, MenuKit.Idle));
-        foreach (var w in worlds) list.AddChild(WorldRow(w));
+        foreach (var w in SaveFavorites.StarredFirst(worlds, w => Favorites.IsWorld(w.Directory))) list.AddChild(WorldRow(w));
         var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         buttons.AddThemeConstantOverride("separation", 24);
         buttons.AddChild(MenuKit.Big("Back", ShowCharacters, 26));
@@ -49,13 +49,11 @@ public sealed partial class MainMenu
         Show(MenuKit.Centered(panel));
     }
 
+    /// <summary>A world's blue row: name, size, difficulty, evil, play time and seed, then favourite, play and delete.</summary>
     private Control WorldRow(WorldEntry w)
     {
-        var (panel, box) = MenuKit.Panel(new Vector2(0, 0), 2);
-        var row = new HBoxContainer();
-        row.AddThemeConstantOverride("separation", 14);
-        box.AddChild(row);
-        var info = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+        var (panel, row) = MenuKit.RowPanel();
+        var info = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, Alignment = BoxContainer.AlignmentMode.Center };
         info.AddChild(MenuKit.Text(w.Name, 24, MenuKit.Idle));
         string evil = w.Evil == EvilKind.Corruption ? "Corruption" : "Crimson";
         string difficulty = w.Difficulty switch { Difficulty.Expert => "Expert", Difficulty.Master => "Master", _ => "Classic" };
@@ -63,16 +61,23 @@ public sealed partial class MainMenu
         info.AddChild(MenuKit.Text(detail, 15, w.Difficulty == Difficulty.Master ? new Color(1f, 0.45f, 0.4f) : w.Difficulty == Difficulty.Expert ? new Color(1f, 0.75f, 0.3f) : new Color(0.8f, 0.85f, 0.9f)));
         row.AddChild(info);
         void Play() => PlayRequested?.Invoke(new LaunchRequest(w.Directory, _character!.Name));
-        row.AddChild(MenuKit.Small("Play", () =>
+        bool starred = Favorites.IsWorld(w.Directory);
+        row.AddChild(MenuKit.Icon(starred ? "menu_favourite" : "menu_favourite_off", starred ? "Unfavorite" : "Favorite", () =>
+        {
+            Favorites.ToggleWorld(w.Directory);
+            ShowWorlds();
+        }));
+        row.AddChild(MenuKit.Icon("menu_play", "Play", () =>
         {
             if (w.OldGenerator) Confirm(OldGeneratorWarning, Play);
             else Play();
-        }, 100));
-        row.AddChild(MenuKit.Small("Delete", () => Confirm($"Delete the world {w.Name}? This cannot be undone.", () =>
+        }));
+        row.AddChild(MenuKit.Icon("menu_delete", "Delete", () => Confirm($"Delete the world {w.Name}? This cannot be undone.", () =>
         {
             SaveCatalog.DeleteWorld(w.Directory);
+            Favorites.ForgetWorld(w.Directory);
             ShowWorlds();
-        }), 100));
+        })));
         return panel;
     }
 

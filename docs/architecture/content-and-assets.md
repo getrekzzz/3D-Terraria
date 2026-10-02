@@ -305,3 +305,18 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   service (the Guide's help slot) adds a `ServiceMode`, its slot filter and its content beside the slot. Smoke:
   `ui reforge`, `ui reforge hit`, `invclick service 0 left`, `ui hover service 0`; probes `ui.service_cost`,
   `ui.reforges`, `ui.service_item`.
+* **Menus** (`game/Menu/`, `game/UI/PauseMenu.cs`): the title screen shows `MenuLogo`, `assets/ui/logo.png` (rendered
+  by `tools/textures/ui_logo.py` from the UI font: grass-to-earth gradient, bevel, 6 px outline, drop shadow; the text
+  is the main menu's title, `build_ui.py --logo-text=...`), swaying (rotation 0.03·sin 0.6t, scale 1 + 0.02·sin t)
+  and dimmed by `MenuBackground.Daylight`. `MenuKit.Big` words turn gold and grow to 1.08× about their centre under the
+  mouse (`MenuKit.HoverGrow`, a 0.08 s tween on `Scale`, so no layout moves). The character and world lists are
+  `MenuKit.RowPanel`s (blue, lighter with a gold rim under the mouse) with 32 px `MenuKit.Icon` sprite buttons
+  (`menu_favourite`/`menu_favourite_off`, `menu_play`, `menu_delete`); starred saves are listed first and kept in
+  `user://favorites.json` (`Strata.Core.Persistence.SaveFavorites`, keyed by file or directory name, as Terraria's
+  favorites.json). The list is `MainMenu.CharacterList.cs`; the creator (`MainMenu.Characters.cs`) is a form of
+  `MenuKit.Row`s, so new options are further rows. Settings take the global theme: tabs, the `toggle_on`/`toggle_off`
+  sprites as `CheckButton` icons and a gold `slider_grabber` knob. The pause menu is a 0.45 dim with a centred blue
+  panel of `MenuKit.Big` words (Resume, Settings, Save & Exit to Title, Save & Quit Game), still at
+  `WorldHost/PauseMenu`; the inventory's bottom-right 'Settings' `TextButton` (layout region `settings_button`) opens
+  it over the screen, and Resume leaves an auto-paused inventory's world paused (`PauseMenu.StayPaused`). Smoke:
+  `ui settings`; probes `ui.paused`, `ui.settings_button`; the menu tour (`--menu-tour`) prints `MENU PASS`.

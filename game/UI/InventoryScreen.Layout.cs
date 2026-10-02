@@ -8,7 +8,8 @@ namespace Strata.Game.UI;
 /// <summary>
 /// Building the screen's parts and placing them on the layout's regions: the backpack grid (<see cref="UiRegion.Inventory"/>,
 /// on the HUD hotbar's origin), the coin and ammo columns, trash and sort buttons (<see cref="CoinAmmoColumns"/>), the
-/// panel host (<see cref="UiRegion.Panel"/>: a chest, a shop or a resident's service), the crafting column and the equipment column. The HUD computes the layout
+/// panel host (<see cref="UiRegion.Panel"/>: a chest, a shop or a resident's service), the crafting column, the equipment
+/// column and the 'Settings' text button bottom-right (it opens the pause menu, as Terraria's). The HUD computes the layout
 /// from <see cref="Panel"/> and <see cref="AccessoryRows"/> and calls <see cref="Place"/> when it changes (the window,
 /// the UI scale, opening, a panel shown or closed, an accessory row appearing), never per frame. Slots are sized by the
 /// layout's slot scale.
@@ -27,6 +28,10 @@ public sealed partial class InventoryScreen
     private UiLayoutResult? _layout;
     private CraftingPanel _crafting = null!;
     private EquipmentPanel _equipment = null!;
+    private Button _settings = null!;
+
+    /// <summary>The 'Settings' text button in the bottom-right corner was pressed: the pause menu opens over the screen.</summary>
+    public event Action? SettingsRequested;
 
     /// <summary>
     /// The layout inputs changed (opened or closed, a panel shown or closed, an accessory row appeared): the HUD lays
@@ -97,6 +102,32 @@ public sealed partial class InventoryScreen
         {
             if (IsOpen) LayoutChanged?.Invoke();
         };
+
+        _settings = LayoutWidgets.Register(new Button
+        {
+            Name = "Settings", Text = "Settings", ThemeTypeVariation = UiTheme.TextButton, Alignment = HorizontalAlignment.Right,
+            FocusMode = Control.FocusModeEnum.None, MouseDefaultCursorShape = Control.CursorShape.PointingHand,
+        });
+        _settings.AddThemeFontSizeOverride("font_size", 24);
+        _settings.MouseEntered += () => Audio.Sfx.Play("ui_hover");
+        _settings.Pressed += () =>
+        {
+            Audio.Sfx.Play("ui_click");
+            SettingsRequested?.Invoke();
+        };
+        Menu.MenuKit.HoverGrow(_settings);
+        _root.AddChild(_settings);
+    }
+
+    /// <summary>The 'Settings' button is on screen (the <c>ui.settings_button</c> probe).</summary>
+    public bool SettingsButtonShown => _settings.IsVisibleInTree();
+
+    /// <summary>Presses the 'Settings' button as a click would; false when it is not on screen.</summary>
+    public bool PressSettings()
+    {
+        if (!_settings.IsVisibleInTree()) return false;
+        _settings.EmitSignal(BaseButton.SignalName.Pressed);
+        return true;
     }
 
     /// <summary>A registered region widget that takes the clicks between its slots (no throw from a gap).</summary>
@@ -126,6 +157,7 @@ public sealed partial class InventoryScreen
         if (_crafting.Visible) _crafting.Arrange(SlotScale);
         _equipment.Visible = LayoutWidgets.Place(_equipment, layout, UiRegion.Equipment);
         if (_equipment.Visible) _equipment.Arrange(SlotScale);
+        _settings.Visible = LayoutWidgets.Place(_settings, layout, UiRegion.SettingsButton);
     }
 
     /// <summary>

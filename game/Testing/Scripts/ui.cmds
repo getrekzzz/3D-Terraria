@@ -792,3 +792,26 @@ assert ui.service_item == 0
 assert inv.copper_broadsword == 1
 god off
 assert errors == 0
+
+# --- P2-30 ---
+# The inventory's 'Settings' text button sits in the bottom-right corner of the layout (no overlaps, also at UI scale
+# 1.5) and opens the pause menu over the open inventory, as Terraria's; closing it leaves the world running.
+ui inventory
+wait 0.2
+assert ui.settings_button == 1
+assert ui.overlaps == 0
+uiscale 1.5
+wait 0.2
+assert ui.settings_button == 1
+assert ui.overlaps == 0
+uiscale 1
+ui settings
+wait 0.1
+assert ui.paused == 1
+assert ui.inventory == 1
+ui close
+wait 0.2
+assert ui.paused == 0
+assert ui.inventory == 0
+assert ui.settings_button == 0
+assert errors == 0
