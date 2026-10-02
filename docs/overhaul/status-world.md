@@ -34,6 +34,16 @@ Pending: the equipment mount slot (P2-05 `EquippedMount`) is not on the integrat
 `MountRules.SlotMount = p => <equipped mount item>` (one line) so the quick-mount key prefers it. The rider stands in the
 saddle (no sit clip: the human animation sets belong to the integration session).
 
+## Push 4 — furniture families (X-03 part 1)
+| WP | State | Notes |
+|---|---|---|
+| X-03 furniture families | part 1 done | 14 materials (wood, boreal, palm, rich mahogany, ebonwood, shadewood, cactus, mushroom, granite, marble, obsidian, glass, bone, lihzahrd) × 17 pieces (door, chair, table, bed, chest, work bench, bookcase, piano, sofa, bathtub, lamp, lantern, candle, candelabra, chandelier, grandfather clock, platform) from `tools/content/furniture_families.json` via `gen_furniture.py` (generated `data/items/generated/furniture_families.json` + `tools/blender/assets.d/x-03-families.json`); parametric softened-edge models (`bgen/furniture_family.py`), recipes (work bench / sawmill / anvil / hellforge), housing roles, lights and flames; `FurnitureFamilyTests`. |
+
+X-03 part 2 (after the bosses session's W8 push and P2-08): enemy banners (kill tally → banner drop, placed-banner
+damage bonus hooked into the reworked combat), editable signs (object meta), and reuse of the dungeon furniture /
+banner / statue helpers (P4-17/18) — the family bookcase and models may switch to those helpers then. Living Wood is
+left out (no Living Wood item yet; it needs the Living Loom).
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and
