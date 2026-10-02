@@ -97,7 +97,12 @@ public sealed partial class MapView : Control
             DrawCircle(p, m.Size, m.Color);
         }
         if (m.Label != null && Zoom >= 1.5f)
-            DrawString(ThemeDB.FallbackFont, p + new Vector2(m.Size + 4, 5), m.Label, HorizontalAlignment.Left, -1, 13, Colors.White);
+        {
+            var font = GetThemeDefaultFont();
+            var at = p + new Vector2(m.Size + 4, 5);
+            DrawStringOutline(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, UiFonts.Outline, UiFonts.OutlineColor);
+            DrawString(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, Colors.White);
+        }
     }
 
     private ImageTexture? Texture(MapTile tile, ref int builds)

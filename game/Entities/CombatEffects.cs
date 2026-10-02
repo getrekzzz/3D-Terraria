@@ -60,6 +60,7 @@ public sealed partial class CombatEffects : Node3D
     {
         var label = new Label3D
         {
+            Font = UI.UiFonts.Bold,
             Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
             PixelSize = 0.005f,
             OutlineSize = 14,

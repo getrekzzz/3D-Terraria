@@ -226,6 +226,7 @@ public sealed partial class NpcRenderer : Node3D
         }
         var health = new Label3D
         {
+            Font = UI.UiFonts.Bold,
             Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
             PixelSize = 0.004f,
             FontSize = 48,

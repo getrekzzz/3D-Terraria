@@ -62,3 +62,22 @@ Rendering-only settings: `data/config/graphics.json` (presets) and `data/config/
 block) are validated by `Strata.Tools validate` and at boot, as is `data/config/use_styles.json` (the human clips'
 strike, release and re-draw windows, shared by gameplay and presentation); `data/config/lighting.json` (exposure,
 glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools validate`.
+
+## UI look (fonts and theme)
+The interface follows Terraria's look: see-through royal-blue panels (`#3F5297` at ~70%), white text with a black
+outline in a bold rounded face, slot tints by kind and Terraria's rarity colours.
+* **Fonts** (`assets/fonts/`, SIL OFL, licences and `CREDITS.txt` beside them): Comic Neue Bold is the UI face,
+  Andika Bold its glyph fallback (set in the `.otf` import settings). `game/UI/UiFonts.cs` holds the size and
+  outline constants and pre-rasterises ASCII at boot (`Warmup`, ~40 ms) so screens never rasterise mid-game.
+* **Theme**: `game/UI/UiTheme*.cs` builds one `Theme` in code (panels, labels, buttons and the `TextButton`
+  variation, toggles, dropdowns, tabs, sliders, scrollbars, progress bars, text fields, tooltips) and is the source of
+  truth. It is exported to `assets/ui/strata_theme.tres`, which `project.godot` `[gui] theme/custom` makes the project
+  theme; `UiTheme.Install()` (first thing in `GameRoot.Boot`) also sets ThemeDB's fallback font and merges the code
+  theme in, so CanvasLayers, Label3D and custom drawing all get it. After changing the builder, re-export with
+  `godot --headless --path . -- --export-theme` (or `ui export-theme` in the console); the `ui.theme_synced` probe in
+  `ui.cmds` fails while the file is stale. Slot styles are cached per `SlotKind` (`UiTheme.SlotStyle`), so drawing a
+  slot allocates nothing.
+* **Rarity colours** live in Core (`Strata.Core.Presentation.RarityColors`): tiers -1 and 0–11 with Terraria's RGB,
+  Quest (-11) amber, Expert (-12) a cycling rainbow and Master (-13) a red-orange pulse; `UiTheme.Rarity` converts.
+* **UI scale**: `Strata.Core.Presentation.UiScale` lowers the UI scale setting so the logical viewport never drops
+  below 1024×600; `DisplaySettings.ApplyUiScale` re-applies it whenever the window is resized.

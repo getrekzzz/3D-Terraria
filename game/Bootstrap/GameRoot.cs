@@ -15,6 +15,7 @@ namespace Strata.Game.Bootstrap;
 /// <summary>
 /// Composition root. Loads content (refusing to start on validation errors), registers input and
 /// launches a world. Command line (after "--"): --world=NAME --seed=N --size=tiny|small|medium --new
+/// (--export-theme writes the code-built UI theme to assets/ui/strata_theme.tres and quits).
 /// </summary>
 public partial class GameRoot : Node
 {
@@ -45,6 +46,15 @@ public partial class GameRoot : Node
         var data = new GodotDataSource();
         var args = CommandLine.FromOs();
         Settings.UserSettings.Load();
+        UiTheme.Install(); // before any UI node exists: global font, theme and glyph warm-up
+        log.Info("boot", $"UI theme installed (glyph warm-up {UiTheme.WarmupMs:0.0} ms).");
+        if (args.Flag("export-theme"))
+        {
+            var exported = UiTheme.Export();
+            log.Info("boot", $"Exported the UI theme to {UiTheme.ThemePath}: {exported}.");
+            GetTree().Quit(exported == Error.Ok ? 0 : 1);
+            return;
+        }
 
         var content = ContentLoader.Load(data);
         foreach (var issue in content.Report.Issues)
@@ -89,6 +99,7 @@ public partial class GameRoot : Node
         var user = Settings.UserSettings.Current;
         user.Changed += ApplyDisplay;
         if (!IsAutomated(args)) ApplyDisplay(user);
+        GetTree().Root.SizeChanged += () => Settings.DisplaySettings.ApplyUiScale(GetTree().Root, Settings.UserSettings.Current);
 
         if (args.Flag("no-world")) return;
         if (!IsAutomated(args) && args.Get("world") == null)
