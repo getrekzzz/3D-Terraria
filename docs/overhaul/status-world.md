@@ -27,6 +27,9 @@ mining a block does not drop its actuator; no season-only enemies; seasonal vani
 |---|---|---|
 | X-14 mounts | done except the P2-05 slot | Slimy Saddle (King Slime 25%, high bouncy jump, stomps), Fuzzy Carrot (Goodie Bags, fast bunny), Honeyed Goggles (Queen Bee 5%, 2.6 s flight), Cosmic Car Key (Martian Saucer 10%, free hovering flight); mount buffs; `quick_mount` key (G — R is rotate shape); Core `MountMotion`/`MountRules` + `MountTests`; `PlayerController.Mounts.cs`, `PlayerAvatar.Mount.cs` (existing creature models scaled up); item models/icons (`bgen/mount_items.py`); new smoke `mounts.cmds`. Boss drops via new `extra_<enemy>` loot tables, so the bosses session's loot files stay untouched. |
 
+Buff bar: mount buffs are `ActiveBuff.Unlimited` (TicksLeft ≥ `BuffSet.Unlimited`); the rebuilt buff bar (P2-14) should
+show no timer for them (the current Hud prints a huge seconds count).
+
 Pending: the equipment mount slot (P2-05 `EquippedMount`) is not on the integration branch yet; when it lands, set
 `MountRules.SlotMount = p => <equipped mount item>` (one line) so the quick-mount key prefers it. The rider stands in the
 saddle (no sit clip: the human animation sets belong to the integration session).

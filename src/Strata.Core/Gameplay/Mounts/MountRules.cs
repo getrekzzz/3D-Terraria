@@ -11,7 +11,7 @@ namespace Strata.Core.Gameplay.Mounts;
 public static class MountRules
 {
     /// <summary>Ticks the mount buff is given for (removed on dismount; it never runs out while riding).</summary>
-    private const int BuffTicks = int.MaxValue / 4;
+    private const int BuffTicks = Buffs.BuffSet.Unlimited;
 
     /// <summary>Summons the mount of <paramref name="item"/>, or dismounts if it is the one being ridden. Returns whether the rider is now mounted.</summary>
     public static bool Toggle(GameWorld world, PlayerEntity rider, ItemDef item, MountParams mount)
