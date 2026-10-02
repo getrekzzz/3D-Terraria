@@ -6,6 +6,9 @@ public static class ItemBehaviorSpecs
     public const string MeleeSwing = "meleeSwing";
     public const string Thrust = "thrust";
     public const string ShootProjectile = "shootProjectile";
+
+    /// <summary>A whip: lashes along a path, hitting every creature on it, and tags them for minions (P3-14).</summary>
+    public const string Whip = "whip";
     public const string MineTool = "mineTool";
     public const string ChopTool = "chopTool";
     public const string HammerTool = "hammerTool";
@@ -52,6 +55,7 @@ public static class ItemBehaviorSpecs
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
         c.Register<ThrustParams>(SpecKind.ItemBehavior, Thrust);
         c.Register<ShootProjectileParams>(SpecKind.ItemBehavior, ShootProjectile);
+        c.Register<WhipParams>(SpecKind.ItemBehavior, Whip);
         c.Register<ToolParams>(SpecKind.ItemBehavior, MineTool);
         c.Register<ToolParams>(SpecKind.ItemBehavior, ChopTool);
         c.Register<ToolParams>(SpecKind.ItemBehavior, HammerTool);
@@ -142,6 +146,34 @@ public sealed class ShootProjectileParams : SpecParams, IValidatableSpec
         : MaxActive > 0 && Count > MaxActive ? "count must not exceed maxActive (the weapon could never fire)"
         : From is not ("muzzle" or "sky" or "cursor" or "eye") ? "from must be muzzle, sky, cursor or eye"
         : SkyHeight is <= 0f or > 64f || SkyScatter is < 0f or > 16f ? "skyHeight must be within (0, 64] and skyScatter within [0, 16]" : null;
+}
+
+public sealed class WhipParams : SpecParams, IValidatableSpec
+{
+    /// <summary>Reach of the lash when fully extended, in cells.</summary>
+    public float Length { get; init; } = 10f;
+
+    /// <summary>Points along the lash tested for hits.</summary>
+    public int Segments { get; init; } = 20;
+
+    /// <summary>Each creature after the first takes this much less (compounding): ×(1 − falloff)^hits so far.</summary>
+    public float Falloff { get; init; } = 0.3f;
+
+    /// <summary>The debuff a lash leaves on what it hits (a <c>minionTag</c> buff), and for how long (ticks).</summary>
+    public string? TagBuff { get; init; }
+
+    public int TagTicks { get; init; } = 240;
+
+    /// <summary>Another debuff the lash inflicts (Snapthorn: poisoned), and for how long (ticks).</summary>
+    public string? Inflict { get; init; }
+
+    public int InflictTicks { get; init; } = 240;
+
+    public string? Validate() =>
+        Length is <= 0f or > 40f ? "length must be within (0, 40] cells"
+        : Segments is < 4 or > 64 ? "segments must be within 4–64"
+        : Falloff is < 0f or >= 1f ? "falloff must be within [0, 1)"
+        : TagTicks < 1 || InflictTicks < 1 ? "tagTicks and inflictTicks must be >= 1" : null;
 }
 
 public sealed class ToolParams : SpecParams

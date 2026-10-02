@@ -104,13 +104,17 @@ public sealed partial class ProjectileSystem
         bool sentry = m.Speed <= 0;
         if (!sentry && Vector3.DistanceSquared(p.Position, owner.Center) > 45f * 45f) p.Position = owner.Center + new Vector3(0, 2, 0);
         var watch = sentry ? p.Position : owner.Center;
+        // A creature the owner's whip tagged comes first (the latest, up to half again the usual range); else the nearest.
         Npc? target = null;
+        long tagged = long.MinValue;
+        float focusRange = m.Range * 1.5f;
         float best = m.Range * m.Range;
         foreach (var npc in _npcs.All)
         {
             if (!npc.Alive || npc.Invulnerable) continue;
             float d = Vector3.DistanceSquared(npc.Center, watch);
-            if (d < best) (target, best) = (npc, d);
+            if (npc.TaggedBy == owner && npc.TagTick > tagged && d < focusRange * focusRange) (target, tagged) = (npc, npc.TagTick);
+            else if (tagged == long.MinValue && d < best) (target, best) = (npc, d);
         }
         Vector3 goal;
         if (target == null)
@@ -130,7 +134,7 @@ public sealed partial class ProjectileSystem
             {
                 p.NextShot = p.Age + m.ShootInterval;
                 var dir = Vector3.Normalize(target.Center - p.Position);
-                Spawn(shot, p.Position + dir * 0.3f, dir * m.ShootSpeed, owner, p.Damage, p.Knockback, p.DamageClass, 0);
+                Spawn(shot, p.Position + dir * 0.3f, dir * m.ShootSpeed, owner, p.Damage, p.Knockback, p.DamageClass, 0).FromMinion = true;
             }
         }
         else goal = target.Center;

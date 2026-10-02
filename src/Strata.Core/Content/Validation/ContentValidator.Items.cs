@@ -52,6 +52,11 @@ public static partial class ContentValidator
             {
                 if (b.Type == Specs.ItemBehaviorSpecs.Wiring && ctx.TryParse<Specs.WiringParams>(SpecKind.ItemBehavior, b) is { } wiring)
                     ctx.Ref(i, ctx.Db.Items, wiring.Wire, "wiring.wire");
+                if (b.Type == Specs.ItemBehaviorSpecs.Whip && ctx.TryParse<Specs.WhipParams>(SpecKind.ItemBehavior, b) is { } whip)
+                {
+                    ctx.Ref(i, ctx.Db.Buffs, whip.TagBuff, "whip.tagBuff");
+                    ctx.Ref(i, ctx.Db.Buffs, whip.Inflict, "whip.inflict");
+                }
                 if (b.Type == Specs.ItemBehaviorSpecs.ReleaseCritter && ctx.TryParse<Specs.ReleaseCritterParams>(SpecKind.ItemBehavior, b) is { } release)
                     ctx.Ref(i, ctx.Db.Enemies, release.Enemy, "releaseCritter.enemy");
                 if (i.NoMelee && b.Type is Specs.ItemBehaviorSpecs.MeleeSwing or Specs.ItemBehaviorSpecs.Thrust)

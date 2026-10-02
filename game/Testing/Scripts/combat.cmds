@@ -71,6 +71,17 @@ wait 1
 killall
 assert errors == 0
 
+# P3-14: a leather whip lashes the zombie ahead (and tags it for minions).
+give leather_whip 1
+wield leather_whip
+spawn zombie 1 3
+aim 0 0 1
+use
+wait 0.8
+assert whips.hits >= 1
+killall
+assert errors == 0
+
 # Death and respawn.
 killall
 kill

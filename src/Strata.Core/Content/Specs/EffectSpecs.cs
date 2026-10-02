@@ -42,6 +42,9 @@ public static class EffectSpecs
     /// <summary>Throws a projectile along the aim with weapon attacks, on its own cooldown (Bone Glove).</summary>
     public const string AttackProjectile = "attackProjectile";
 
+    /// <summary>On a creature (a whip's tag buff): minion hits on it deal this much more damage (P3-14).</summary>
+    public const string MinionTag = "minionTag";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -62,7 +65,15 @@ public static class EffectSpecs
         c.Register<InfoParams>(SpecKind.Effect, Info);
         c.Register<InvertControlsParams>(SpecKind.Effect, InvertControls);
         c.Register<AttackProjectileParams>(SpecKind.Effect, AttackProjectile);
+        c.Register<MinionTagParams>(SpecKind.Effect, MinionTag);
     }
+}
+
+public sealed class MinionTagParams : SpecParams, IValidatableSpec
+{
+    public int Damage { get; init; }
+
+    public string? Validate() => Damage is < 0 or > 1000 ? "damage must be within 0–1000" : null;
 }
 
 public sealed class StatEffectParams : SpecParams, IValidatableSpec

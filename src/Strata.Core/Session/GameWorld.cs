@@ -47,6 +47,7 @@ public sealed partial class GameWorld : IDisposable
         Events = new EventDirector(this, Npcs);
         Weather = new Gameplay.Weather.WeatherSystem(this);
         Banners = new Gameplay.Banners.BannerSystem(this);
+        Whips = new Gameplay.Entities.WhipSystem(this);
         Liquids = new LiquidSimulator(session);
         Housing = new HousingScanner(session.World);
         Navigator = new VoxelNavigator(session.World);
@@ -94,6 +95,9 @@ public sealed partial class GameWorld : IDisposable
 
     /// <summary>Enemy banners: kill tallies, banner drops and the nearby-banner bonus.</summary>
     public Gameplay.Banners.BannerSystem Banners { get; }
+
+    /// <summary>Whip lashes in the air (P3-14).</summary>
+    public Gameplay.Entities.WhipSystem Whips { get; }
     public LiquidSimulator Liquids { get; }
     public HousingScanner Housing { get; }
     public VoxelNavigator Navigator { get; }
@@ -161,6 +165,7 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.wires")) Wires.Tick();
         using (prof.Time("tick.spawner")) Spawner.Tick();
         using (prof.Time("tick.npcs")) Npcs.Tick();
+        using (prof.Time("tick.whips")) Whips.Tick();
         using (prof.Time("tick.town")) Town.Tick();
         using (prof.Time("tick.melee")) Melee.Tick();
         using (prof.Time("tick.projectiles")) Projectiles.Tick();

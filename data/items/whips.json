@@ -1,0 +1,8 @@
+{
+  // Whip tags (P3-14): the debuffs whips leave on what they strike; minion hits on a tagged creature deal the extra
+  // damage. Creature-only, so they never show in the player's buff bar.
+  "buffs": [
+    {"id": "leather_whip_tag", "name": "Leather Whip Tag", "debuff": true, "duration": 240, "color": "#c08a50", "effects": [{"type": "minionTag", "damage": 4}]},
+    {"id": "snapthorn_tag", "name": "Snapthorn Tag", "debuff": true, "duration": 240, "color": "#5aa83a", "effects": [{"type": "minionTag", "damage": 6}]}
+  ]
+}

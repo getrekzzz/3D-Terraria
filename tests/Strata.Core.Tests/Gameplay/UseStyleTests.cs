@@ -24,7 +24,7 @@ public class UseStyleTests
     [InlineData("bomb", UseStyle.Throw, ItemAction.Shoot)]
     [InlineData("wood_yoyo", UseStyle.Yoyo, ItemAction.Shoot)]
     [InlineData("ball_o_hurt", UseStyle.Flail, ItemAction.Shoot)]
-    [InlineData("leather_whip", UseStyle.Whip, ItemAction.Melee)]
+    [InlineData("leather_whip", UseStyle.Whip, ItemAction.Whip)]
     [InlineData("minishark", UseStyle.Gun, ItemAction.Shoot)]
     [InlineData("laser_rifle", UseStyle.Gun, ItemAction.Shoot)]
     [InlineData("wooden_bow", UseStyle.Bow, ItemAction.Shoot)]

@@ -63,9 +63,9 @@
     { "id": "dark_lance", "name": "Dark Lance", "category": "weapon", "rarity": 3, "value": 27000, "useStyle": "spear", "useTime": 23, "useAnimation": 23, "damage": 34, "damageType": "melee", "knockback": 5,
       "behaviors": [{ "type": "thrust", "length": 4.2 }], "covers": ["terraria:dark_lance"] },
     { "id": "leather_whip", "name": "Leather Whip", "description": "Your summons will focus struck enemies.", "category": "weapon", "value": 10000, "tags": ["shop"], "useStyle": "whip", "useTime": 30, "useAnimation": 30,
-      "damage": 14, "damageType": "summon", "knockback": 0.5, "behaviors": [{ "type": "meleeSwing", "arc": 110, "length": 5.5 }], "covers": ["terraria:leather_whip"] },
+      "damage": 14, "damageType": "summon", "knockback": 0.5, "behaviors": [{ "type": "whip", "length": 11, "tagBuff": "leather_whip_tag" }], "covers": ["terraria:leather_whip"] },
     { "id": "snapthorn", "name": "Snapthorn", "description": "Inflicts poison on struck enemies.", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "whip", "useTime": 30, "useAnimation": 30,
-      "damage": 18, "damageType": "summon", "knockback": 0.5, "behaviors": [{ "type": "meleeSwing", "arc": 110, "length": 6.5 }], "covers": ["terraria:snapthorn"] },
+      "damage": 18, "damageType": "summon", "knockback": 0.5, "behaviors": [{ "type": "whip", "length": 13, "tagBuff": "snapthorn_tag", "inflict": "poisoned", "inflictTicks": 240 }], "covers": ["terraria:snapthorn"] },
 
     { "id": "wooden_boomerang", "name": "Wooden Boomerang", "category": "weapon", "value": 5000, "useStyle": "throw", "useTime": 15, "useAnimation": 15, "damage": 8, "damageType": "melee", "knockback": 5,
       "projectile": "wooden_boomerang", "shootSpeed": 15, "covers": ["terraria:wooden_boomerang"] },

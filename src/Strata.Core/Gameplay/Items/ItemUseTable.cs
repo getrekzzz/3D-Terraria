@@ -28,6 +28,9 @@ public enum ItemAction
     Mount = 1 << 16,
     Paint = 1 << 17,
     Ride = 1 << 18,
+
+    /// <summary>A whip's lash (P3-14).</summary>
+    Whip = 1 << 19,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -43,6 +46,7 @@ public sealed class ItemUseInfo
     public MeleeSwingParams? Swing { get; internal set; }
     public ThrustParams? ThrustParams { get; internal set; }
     public ShootProjectileParams? Shoot { get; internal set; }
+    public WhipParams? Whip { get; internal set; }
     public ConsumeParams? Consume { get; internal set; }
     public SummonBossParams? Summon { get; internal set; }
 
@@ -143,6 +147,7 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.MeleeSwing: a |= ItemAction.Melee; info.Swing = spec.Parse<MeleeSwingParams>(); break;
                 case ItemBehaviorSpecs.Thrust: a |= ItemAction.Thrust; info.ThrustParams = spec.Parse<ThrustParams>(); break;
                 case ItemBehaviorSpecs.ShootProjectile: a |= ItemAction.Shoot; info.Shoot = spec.Parse<ShootProjectileParams>(); break;
+                case ItemBehaviorSpecs.Whip: a |= ItemAction.Whip; info.Whip = spec.Parse<WhipParams>(); break;
                 case ItemBehaviorSpecs.MineTool: a |= ItemAction.Mine; break;
                 case ItemBehaviorSpecs.ChopTool: a |= ItemAction.Chop; break;
                 case ItemBehaviorSpecs.HammerTool: a |= ItemAction.Hammer; break;
@@ -181,6 +186,7 @@ public sealed class ItemUseTable
         if ((a & ItemAction.Melee) != 0) info.Swing ??= new MeleeSwingParams { Type = ItemBehaviorSpecs.MeleeSwing };
         if ((a & ItemAction.Thrust) != 0) info.ThrustParams ??= new ThrustParams { Type = ItemBehaviorSpecs.Thrust };
         if ((a & ItemAction.Shoot) != 0) info.Shoot ??= new ShootProjectileParams { Type = ItemBehaviorSpecs.ShootProjectile };
+        if ((a & ItemAction.Whip) != 0) info.Whip ??= new WhipParams { Type = ItemBehaviorSpecs.Whip };
         if ((a & ItemAction.Consume) != 0) info.Consume ??= new ConsumeParams { Type = ItemBehaviorSpecs.Consume };
         info.Actions = a;
         return info;

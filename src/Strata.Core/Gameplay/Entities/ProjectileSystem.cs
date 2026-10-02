@@ -19,6 +19,9 @@ public sealed class Projectile
 
     /// <summary>Where the shot started (the muzzle, the sky…), for muzzle flashes and trails.</summary>
     public Vector3 SpawnOrigin;
+
+    /// <summary>Fired by a minion (counts as a minion hit: whip tags add their damage).</summary>
+    public bool FromMinion;
     public required PlayerEntity? Owner { get; init; }
     public required int Damage { get; init; }
     public required float Knockback { get; init; }
@@ -272,7 +275,9 @@ public sealed partial class ProjectileSystem
     private void Strike(Projectile p, Npc npc, Vector3 from, int segment = -1)
     {
         int before = npc.Life;
-        _npcs.Hit(npc, p.Owner, p.Damage, p.DamageClass, p.Crit, p.Knockback, from, melee: false, segment: segment);
+        // Minion hits on a whip-tagged creature deal the tag's extra damage (P3-14).
+        int damage = p.Damage + (p.Def.Minion != null || p.FromMinion ? npc.Effects.MinionTagDamage : 0);
+        _npcs.Hit(npc, p.Owner, damage, p.DamageClass, p.Crit, p.Knockback, from, melee: false, segment: segment);
         ApplyOnHit(p, npc, Math.Max(0, before - Math.Max(0, npc.Life)));
     }
 

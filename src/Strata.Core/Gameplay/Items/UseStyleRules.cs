@@ -36,7 +36,7 @@ public static class UseStyleRules
     /// The actions <paramref name="style"/> implies for <paramref name="item"/>. A swing hits only with a melee weapon
     /// (summon staves and fishing rods swing harmlessly) and a rapier or spear thrusts only then; noMelee items never
     /// hit. Every style that releases something shoots when the item has a projectile or ammo (a summon staff swings
-    /// out its minion). Whips lash as melee for now. Drinking, eating and holding up use the item when it heals or buffs
+    /// out its minion). Whips lash (WhipSystem). Drinking, eating and holding up use the item when it heals or buffs
     /// (consume and loot behaviours add the action themselves).
     /// </summary>
     public static ItemAction Implied(UseStyle style, ItemDef item)
@@ -49,7 +49,7 @@ public static class UseStyleRules
         {
             UseStyle.Swing => (melee ? ItemAction.Melee : ItemAction.None) | shot,
             UseStyle.Rapier or UseStyle.Spear => (melee ? ItemAction.Thrust : ItemAction.None) | shot,
-            UseStyle.Whip => hits ? ItemAction.Melee : ItemAction.None,
+            UseStyle.Whip => hits ? ItemAction.Whip : ItemAction.None,
             UseStyle.HoldUp or UseStyle.Drink or UseStyle.Eat =>
                 item.HealLife > 0 || item.HealMana > 0 || item.Buff != null ? ItemAction.Consume : ItemAction.None,
             _ when Shoots(style) => shot,

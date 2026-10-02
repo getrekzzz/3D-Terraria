@@ -172,6 +172,12 @@ public sealed partial class ItemUseSystem
         {
             outcome = Grapple(p, info);
         }
+        else if (info.Has(ItemAction.Whip))
+        {
+            // One crack per use animation; holding repeats only with autoReuse (the Autoswing rule of P3-15).
+            if (!newAnimation) return UseOutcome.Cooldown;
+            outcome = UseOutcome.Swung;
+        }
         else if (info.Has(ItemAction.Shoot))
         {
             outcome = Shoot(p, info, followUp: !newAnimation);
@@ -187,6 +193,7 @@ public sealed partial class ItemUseSystem
         if (outcome is UseOutcome.None or UseOutcome.OutOfReach) return outcome;
         p.UseCooldown = UseTicks(useTime);
         if (newAnimation) StartAnimation(p, item, speed); // mid-animation digs and gun bursts leave the swing alone
+        if (info.Has(ItemAction.Whip)) _world.Whips.Crack(p, info, p.UseAnimationMax);
         if (swings) Swung?.Invoke(p, info);
         Used?.Invoke(p, info, outcome);
         if (outcome is UseOutcome.Swung or UseOutcome.Shot) LaunchAttackProjectiles(p, info);
