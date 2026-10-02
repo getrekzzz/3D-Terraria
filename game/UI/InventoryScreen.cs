@@ -9,23 +9,24 @@ namespace Strata.Game.UI;
 /// <summary>
 /// The inventory screen (Tab/I), laid out like Terraria's on the HUD's <see cref="UiLayout"/>: the 10×5 backpack on
 /// the hotbar's spot (its first row is the hotbar), the coin and ammo columns right of it with the trash under them and
-/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest
-/// today; shops and services plug in through <see cref="ShowPanel"/>), the crafting column bottom-left and the
-/// equipment column on the right under the minimap. Each part is a registered layout widget placed by <see cref="Place"/>
-/// (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the pointer by <see cref="CursorItemLayer"/>
-/// and clicks are routed by <c>GameWorld.ClickSlot</c> (InventoryScreen.Clicks.cs). An overlay: the player keeps
-/// moving, and clicks on empty screen go to the <see cref="WorldClickCatcher"/> under every panel.
+/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest, a
+/// resident's shop or their service: the reforge slot), the crafting column bottom-left and the
+/// equipment column (<see cref="EquipmentPanel"/>) on the right under the minimap. Each part is a registered layout
+/// widget placed by <see cref="Place"/> (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the
+/// pointer by <see cref="CursorItemLayer"/> and clicks are routed by <c>GameWorld.ClickSlot</c>
+/// (InventoryScreen.Clicks.cs). An overlay: the player keeps moving, and clicks on empty screen go to the
+/// <see cref="WorldClickCatcher"/> under every panel.
 /// </summary>
 public sealed partial class InventoryScreen : CanvasLayer
 {
     private const string Gate = "inventory";
-    private const float ContainerReach = 6f; // metres from the chest's centre before it closes
     private UiContext _ui = null!;
     private Control _root = null!;
-    private TileObjectInstance? _container;
-    private Inventory? _containerInv;
 
     public bool IsOpen => _root.Visible;
+
+    /// <summary>The screen is open with auto-pause on, so the world waits until it closes.</summary>
+    public bool PausesWorld { get; private set; }
 
     /// <summary>A container's contents were shown (true) or put away (false); its lid follows.</summary>
     public event Action<TileObjectInstance, bool>? ContainerShown;
@@ -35,20 +36,25 @@ public sealed partial class InventoryScreen : CanvasLayer
         _ui = ui;
         Name = "Inventory";
         Layer = 20;
-        _root = new Control { Visible = false, Theme = UiTheme.Theme, MouseFilter = Control.MouseFilterEnum.Ignore };
+        _root = new Control { Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
         BuildLayout();
         ui.Game.Interaction.ContainerOpened += (p, obj, storage) =>
         {
-            if (p == ui.Entity) OpenContainer(obj, storage);
+            if (p == ui.Entity) OpenChest(obj, storage);
+        };
+        // Talking to a resident puts an open shop or service away (the chat box takes over; it runs before the box opens).
+        ui.Interaction.TalkRequested += _ =>
+        {
+            if (_panel == _shop || _panel == _service) ClosePanel();
         };
     }
 
     public override void _UnhandledInput(InputEvent e)
     {
         // Clicks on empty screen (throwing the held stack, using the item, turning the camera) go to WorldClickCatcher.
-        if (InputGate.TextEntry || (!IsOpen && InputGate.GameplayBlocked)) return;
+        if (InputGate.TextEntry || (!IsOpen && InputGate.GameplayBlocked) || InputGate.IsOpen(PauseMenu.Gate)) return;
         if (e.IsActionPressed("inventory") || (IsOpen && e.IsActionPressed("pause")))
         {
             SetOpen(!IsOpen);
@@ -66,24 +72,22 @@ public sealed partial class InventoryScreen : CanvasLayer
         bool autoPause = Settings.UserSettings.Current.AutoPause;
         InputGate.SetOpen(Gate, open, autoPause ? GateKind.Modal : GateKind.Overlay);
         if (autoPause || !open) _ui.Player.Runtime.Simulating = !open;
+        PausesWorld = open && autoPause;
         if (open)
         {
-            UpdateEquipment();
+            _equipment.Refresh(_ui.Entity.State);
             _crafting.Refresh();
             LayoutChanged?.Invoke();
             return;
         }
-        // The held stack and the service slot's item (a reforge) go back into the storage (coins and ammo to their
-        // slots); what does not fit is thrown.
+        // The held stack goes back into the storage (coins and ammo to their slots; what does not fit is thrown), and
+        // the service slot's item too (the reforge panel puts it away as it closes; what does not fit drops at the feet).
         var inv = _ui.Inventory;
         var held = inv.Cursor;
         inv.Cursor = ItemStack.Empty;
         Stow(held);
-        var serviced = inv.Service[0];
-        inv.Service[0] = ItemStack.Empty;
-        Stow(serviced);
-        _craftingStale = false;
         HidePanel();
+        ServicePanel.StowSlot(_ui);
         LayoutChanged?.Invoke();
     }
 
@@ -91,22 +95,54 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.inventory_ui");
         if (!IsOpen) return;
-        // Taking one at a time with a held right click refreshes the crafting list once, when the button comes up.
-        if (_craftingStale && !Input.IsMouseButtonPressed(MouseButton.Right))
-        {
-            _craftingStale = false;
-            _crafting.Refresh();
-        }
-        UpdateEquipment();
+        _equipment.Refresh(_ui.Entity.State);
         int selected = _ui.Inventory.SelectedHotbar;
         for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
-        if (_container != null)
+    }
+
+    /// <summary>
+    /// Shows a chest the player opened under the grid with the slots it carries (a Piggy Bank or Safe: the character's
+    /// own; another chest is put away first, with its creak; the one already shown just stays) and opens the screen.
+    /// </summary>
+    private void OpenChest(TileObjectInstance obj, Inventory storage)
+    {
+        if (_panel != _chest || _chest.Container != obj)
         {
-            var world = _ui.Game.Session.World;
-            var center = new System.Numerics.Vector3(_container.Anchor.X + 1, _container.Anchor.Y + 1, _container.Anchor.Z + 1) * Strata.Core.Common.Units.CellSize;
-            if (world.TileObjects.Get(_container.Id) == null || System.Numerics.Vector3.Distance(center, _ui.Entity.Center) > ContainerReach)
-                ClosePanel();
+            HidePanel();
+            _chest.Open(obj, storage);
+            ShowPanel(_chest, UiPanel.Chest);
         }
+        SetOpen(true);
+    }
+
+    /// <summary>
+    /// Shows <paramref name="npc"/>'s shop under the grid where a chest would be (the chat box's Shop button) and opens
+    /// the screen; the one already shown just stays.
+    /// </summary>
+    public void OpenShop(Strata.Core.Gameplay.Town.TownNpc npc)
+    {
+        if (_panel != _shop || _shop.Npc != npc)
+        {
+            HidePanel();
+            _shop.Open(npc);
+            ShowPanel(_shop, UiPanel.Shop);
+        }
+        SetOpen(true);
+    }
+
+    /// <summary>
+    /// Shows <paramref name="npc"/>'s service under the grid in <paramref name="mode"/> (the chat box's Reforge) and opens
+    /// the screen; the one already shown just stays.
+    /// </summary>
+    public void OpenService(Strata.Core.Gameplay.Town.TownNpc npc, ServiceMode mode)
+    {
+        if (_panel != _service || _service.Npc != npc || _service.Mode != mode)
+        {
+            HidePanel();
+            _service.Open(npc, mode);
+            ShowPanel(_service, UiPanel.Service);
+        }
+        SetOpen(true);
     }
 
     /// <summary>Puts <paramref name="stack"/> back into the player's storage; what does not fit is thrown.</summary>
@@ -114,19 +150,5 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         if (stack.IsEmpty) return;
         _ui.Game.ThrowStack(_ui.Entity, _ui.Inventory.Pickup(stack));
-    }
-
-    /// <summary>A bare text button in the small UI font, white turning gold under the mouse (Terraria's chest links).</summary>
-    private static Button TextButton(string text, Action onPressed, string? tooltip = null)
-    {
-        // No keyboard focus: the player walks and jumps with the inventory open, and Space (ui_accept) would press it again.
-        var b = new Button
-        {
-            Text = text, TooltipText = tooltip ?? "", FocusMode = Control.FocusModeEnum.None, ThemeTypeVariation = UiTheme.TextButton,
-            Alignment = HorizontalAlignment.Left, ClipText = true,
-        };
-        b.AddThemeFontSizeOverride("font_size", UiFonts.Small);
-        b.Pressed += onPressed;
-        return b;
     }
 }

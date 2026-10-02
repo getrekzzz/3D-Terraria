@@ -26,6 +26,8 @@ public sealed partial class ItemSlotView : Control
     private SlotKind _kind;
     private bool _selected;
     private bool _locked;
+    private bool _dimmed;
+    private bool _short;
     private bool _hovered;
     private ItemStack _shown;
     private bool _favoriteShown;
@@ -83,11 +85,28 @@ public sealed partial class ItemSlotView : Control
         set => Redraw(ref _locked, value);
     }
 
+    /// <summary>The icon drawn greyed, the slot as usual (a recipe the player cannot craft yet).</summary>
+    public bool Dimmed
+    {
+        get => _dimmed;
+        set => Redraw(ref _dimmed, value);
+    }
+
+    /// <summary>A recipe material the player has too few of: its count is drawn red, even a count of one.</summary>
+    public bool Short
+    {
+        get => _short;
+        set => Redraw(ref _short, value);
+    }
+
     /// <summary>Short label drawn in the top-left corner (hotbar numbers).</summary>
     public string? Badge { get; set; }
 
     /// <summary>Silhouette shown faintly while the slot is empty (armor, accessory and misc slots, trash).</summary>
     public Texture2D? EmptyHint { get; set; }
+
+    /// <summary>The slot's name, shown as its tooltip while it is empty ('Helmet', 'Social Shirt', 'Dye'); null shows none.</summary>
+    public string? EmptyText { get; set; }
 
     /// <summary>Whether the slot is favourited (Alt+click): drawn gold; null for slots that cannot be.</summary>
     public Func<bool>? Favorite { get; set; }
@@ -110,7 +129,7 @@ public sealed partial class ItemSlotView : Control
     /// <summary>Shows this slot's tooltip beside the pointer (on hover, and from the <c>ui hover</c> command).</summary>
     public void ShowTooltip()
     {
-        if (_tooltip != null) TooltipFollower.Current?.Show(this, _read, _tooltip);
+        if (_tooltip != null) TooltipFollower.Current?.Show(this, _read, _tooltip, EmptyText);
     }
 
     /// <summary>Ends a hold-repeat (the owner calls it when a repeated click stops moving items).</summary>

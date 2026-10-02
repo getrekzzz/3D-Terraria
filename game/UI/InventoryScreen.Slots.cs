@@ -17,21 +17,17 @@ public sealed partial class InventoryScreen
     private static readonly string[] MiscHints = { "slot_pet", "slot_light_pet", "slot_minecart", "slot_mount", "slot_hook" };
 
     private readonly List<(Func<SlotRef> Slot, ItemSlotView View)> _slots = new();
-    private bool _showVanity;
 
     /// <summary>The view showing <paramref name="slot"/> now (the <c>ui hover</c> command), or null.</summary>
     public ItemSlotView? FindSlot(SlotRef slot)
     {
+        if (slot.Area == SlotArea.Shop) return _shop.View(slot.Index);
         foreach (var (at, view) in _slots)
             if (at() == slot) return view;
         return null;
     }
 
     private ItemSlotView Slot(SlotArea area, int index, string? badge = null) => Slot(() => new SlotRef(area, index), badge, Hint(area, index));
-
-    /// <summary>An armor or accessory slot that shows the vanity row instead while the Vanity toggle is on.</summary>
-    private ItemSlotView WornSlot(SlotArea worn, SlotArea vanity, int index) =>
-        Slot(() => new SlotRef(_showVanity ? vanity : worn, index), null, Hint(worn, index));
 
     private ItemSlotView Slot(Func<SlotRef> slot, string? badge, Texture2D? hint)
     {
@@ -79,7 +75,7 @@ public sealed partial class InventoryScreen
 
     private ItemStack Read(SlotRef slot)
     {
-        var inv = slot.Area == SlotArea.Container ? _containerInv : _ui.Inventory.Resolve(slot.Area);
+        var inv = slot.Area == SlotArea.Container ? _chest.ContainerInventory : _ui.Inventory.Resolve(slot.Area);
         return inv != null && slot.Index < inv.Size ? inv[slot.Index] : ItemStack.Empty;
     }
 

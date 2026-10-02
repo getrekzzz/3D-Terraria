@@ -93,6 +93,85 @@ public class TownServicesTests
     }
 
     [Fact]
+    public void ReforgeWorksOnTheServiceSlot()
+    {
+        using var g = Create();
+        var goblin = Summon(g, "goblin_tinkerer");
+        var inv = g.Player.State.Inventory;
+        var held = inv.Held;
+        var sword = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1);
+        inv.Service[0] = sword;
+        Assert.Equal(TradeResult.TooPoor, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out _));
+        Assert.Equal(sword, inv.Service[0]);
+        Assert.Empty(Wallet.Give(inv, g.Content, 1000000));
+        long cost = g.World.Services.ReforgeCost(goblin, g.Player, inv.Service[0]);
+        Assert.True(cost > 0);
+        var reforged = new List<ItemStack>();
+        g.World.Services.Reforged += (p, s) => reforged.Add(s);
+        long before = Purse(g);
+        Assert.Equal(TradeResult.Ok, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out var made));
+        Assert.NotNull(made.Prefix);
+        Assert.Equal(made, inv.Service[0]);
+        Assert.Equal(before - cost, Purse(g));
+        Assert.Equal(new[] { made }, reforged);
+        Assert.Equal(held, inv.Held); // the held item is not touched
+        // The cost follows the new prefix's value; a second roll never lands on the same prefix.
+        Assert.Equal(TradeResult.Ok, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out var again));
+        Assert.NotEqual(made.Prefix, again.Prefix);
+        Assert.Equal(2, reforged.Count);
+    }
+
+    [Fact]
+    public void CostIsZeroForUnprefixableItems()
+    {
+        using var g = Create();
+        var goblin = Summon(g, "goblin_tinkerer");
+        var merchant = Summon(g, "merchant");
+        var inv = g.Player.State.Inventory;
+        Assert.Empty(Wallet.Give(inv, g.Content, 1000000));
+        var wood = new ItemStack(g.Content.Items.Get("wood"), 5);
+        var sword = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1);
+        Assert.Equal(0, g.World.Services.ReforgeCost(goblin, g.Player, wood));
+        Assert.Equal(0, g.World.Services.ReforgeCost(goblin, g.Player, ItemStack.Empty));
+        Assert.Equal(0, g.World.Services.ReforgeCost(merchant, g.Player, sword)); // he does not reforge
+        inv.Service[0] = wood;
+        long before = Purse(g);
+        Assert.Equal(TradeResult.NothingToDo, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out _));
+        Assert.Equal(wood, inv.Service[0]);
+        Assert.Equal(before, Purse(g));
+        // The reforge slot takes only what can carry a prefix: wood stays on the cursor, the sword goes in.
+        inv.Service[0] = ItemStack.Empty;
+        inv.Cursor = wood;
+        var slot = new SlotRef(SlotArea.Service, 0);
+        Assert.Equal(ClickOutcome.None, g.World.ClickSlot(g.Player, slot, false, ClickMods.None, default));
+        Assert.True(inv.Service[0].IsEmpty);
+        inv.Cursor = sword;
+        Assert.Equal(ClickOutcome.Moved, g.World.ClickSlot(g.Player, slot, false, ClickMods.None, default));
+        Assert.Equal(sword, inv.Service[0]);
+        Assert.True(inv.Cursor.IsEmpty);
+    }
+
+    [Fact]
+    public void ServiceSlotStowedOnClose()
+    {
+        using var g = Create();
+        var inv = g.Player.State.Inventory;
+        var sword = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1, g.Content.Prefixes.Get("keen"));
+        int carried = inv.CountAll(sword.Item!);
+        inv.Service[0] = sword;
+        Assert.True(inv.StowService().IsEmpty);
+        Assert.True(inv.Service[0].IsEmpty);
+        Assert.Equal(carried + 1, inv.CountAll(sword.Item!));
+        Assert.True(inv.StowService().IsEmpty); // nothing to stow
+        // A full backpack hands the stack back for dropping at the player's feet.
+        var dirt = g.Content.Items.Get("dirt");
+        for (int i = 0; i < inv.Backpack.Size; i++) inv.Backpack[i] = new ItemStack(dirt, dirt.MaxStack);
+        inv.Service[0] = sword;
+        Assert.Equal(sword, inv.StowService());
+        Assert.True(inv.Service[0].IsEmpty);
+    }
+
+    [Fact]
     public void TheTaxCollectorGathersRentFromHousedResidents()
     {
         using var g = Create();

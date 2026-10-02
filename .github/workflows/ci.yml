@@ -131,6 +131,15 @@ jobs:
             --fresh-player --view=3 --graphics=medium --shots="$PWD/shots" --smoke=res://game/Testing/Tours/tour.cmds 2>&1 | tee tour.log
           grep -q "SMOKE PASS" tour.log
           ls -l shots
+      - name: UI tour
+        run: |
+          set -o pipefail
+          export VK_ICD_FILENAMES=$(ls /usr/share/vulkan/icd.d/lvp_icd*.json | head -1)
+          timeout 3600 xvfb-run -a -s "-screen 0 1280x720x24" "$GODOT" --path . --rendering-driver vulkan \
+            --audio-driver Dummy --resolution 1280x720 -- --world=ui-tour --size=tiny --new --player=tour \
+            --fresh-player --view=2 --graphics=medium --shots="$PWD/ui-shots" --smoke=res://game/Testing/Tours/ui.cmds 2>&1 | tee ui-tour.log
+          grep -q "SMOKE PASS" ui-tour.log
+          ls -l ui-shots
       - name: Upload screenshots
         if: always()
         uses: actions/upload-artifact@v4
@@ -139,3 +148,5 @@ jobs:
           path: |
             shots/*.png
             tour.log
+            ui-shots/*.png
+            ui-tour.log

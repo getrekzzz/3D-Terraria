@@ -24,7 +24,7 @@ public sealed class UiContext
     public PlayerEntity Entity => Player.Entity;
     public PlayerInventory Inventory => Entity.State.Inventory;
 
-    /// <summary>Short on-screen notification (crafting results, warnings); the HUD shows them as toasts.</summary>
+    /// <summary>Short on-screen notification (crafting results, warnings); the HUD shows them on the status line under the crosshair.</summary>
     public event System.Action<string, Godot.Color>? Notified;
 
     public void Notify(string text, Godot.Color color) => Notified?.Invoke(text, color);

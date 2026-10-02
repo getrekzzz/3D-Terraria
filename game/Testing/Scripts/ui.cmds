@@ -535,3 +535,283 @@ assert ui.smart_cursor == 0
 assert ui.smart_target == 0
 camera third
 assert errors == 0
+
+# --- P2-16 ---
+# The equipment column: Dye | Vanity | Equip with 5 accessory rows in a Classic world. A helmet equipped with a right
+# click raises the defence on the shield badge; a right click on it swaps it to the vanity column (no defence). Empty
+# slots name themselves on hover. An accessory's eye hides it on the character and shows it again. A hook goes to the
+# Misc page's hook slot.
+clear
+ui inventory
+ui tab equipment
+wait 0.2
+assert ui.equip_rows == 5
+assert inv.accessory_slots == 5
+assert ui.misc_tab == 0
+give iron_helmet 1
+invclick backpack 0 right
+assert inv.iron_helmet == 0
+assert player.defense > 0
+wait 0.1
+assert ui.defense_badge > 0
+invclick armor 0 right
+assert player.defense == 0
+wait 0.1
+assert ui.defense_badge == 0
+ui hover dyes 0
+assert ui.tooltip_lines == 1
+give band_of_regeneration 1
+invclick backpack 0 right
+assert inv.band_of_regeneration == 0
+ui eye 0
+assert inv.hidden_accessories == 1
+ui eye 0
+assert inv.hidden_accessories == 0
+give grappling_hook 1
+invclick backpack 0 right
+assert inv.grappling_hook == 0
+ui tab misc
+wait 0.1
+assert ui.misc_tab == 1
+ui hover misc 4
+assert ui.tooltip_lines >= 2
+ui hover misc_dyes 0
+assert ui.tooltip_lines == 1
+assert ui.overlaps == 0
+ui tab equipment
+ui close
+wait 0.1
+assert errors == 0
+
+# --- P2-17 ---
+# The chest panel: its links move items through Core (Deposit All leaves the hotbar and favourites; Loot All brings
+# everything back); Rename opens a field that holds the keyboard behind a modal gate, so typing never moves the
+# player; Esc keeps the old name and Enter the new one. Walking out of reach puts the chest away with its creak.
+god on
+spawning off
+killall
+clear
+fill -3 0 -6 3 3 20 air
+fill -3 -1 -6 3 -1 20 dirt
+wait 0.5
+place wooden_chest 0 0 -3
+interact 0 0 -3
+wait 0.2
+assert ui.inventory == 1
+assert ui.panel == 1
+give wood 30
+invclick backpack 0 left
+invclick backpack 20 left
+give torch 5
+invclick backpack 0 left
+invclick backpack 21 left
+invclick backpack 21 left alt
+ui chest deposit
+assert inv.wood == 0
+assert inv.torch == 5
+ui chest loot
+assert inv.wood == 30
+ui chest rename
+assert ui.renaming == 1
+assert ui.modal == 1
+mark
+aim 0 0 1
+press move_forward
+wait 0.3
+press move_forward off
+assert player.from_mark < 0.2
+ui chest cancel
+assert ui.renaming == 0
+assert ui.modal == 0
+assert ui.chest_named == 0
+ui chest rename
+ui chest name Loot
+assert ui.renaming == 0
+assert ui.chest_named == 1
+chest
+aim 0 0 1
+press move_forward
+wait_until ui.panel == 0 6
+press move_forward off
+assert ui.chests_closed >= 1
+assert ui.inventory == 1
+ui close
+wait 0.2
+god off
+assert errors == 0
+
+# --- P2-18 ---
+# The crafting column: with a work bench in reach and wood and gel in the backpack it lists recipes, and an idle screen
+# never rebuilds the list (a hovered recipe's tooltip stays). 'ui craft' clicks a recipe's slot as the player does
+# (selecting it, then crafting onto the cursor): two torch crafts merge on the cursor; a sword goes to the cursor too,
+# and closing the inventory puts what is held in the backpack.
+god on
+spawning off
+killall
+clear
+fill -3 0 -4 6 3 4 air
+fill -3 -1 -4 6 -1 4 dirt
+wait 0.5
+place work_bench 3 0 0
+give wood 20
+give gel 2
+ui inventory
+wait 0.6
+assert ui.recipes > 0
+wait 1.2
+assert ui.recipe_rebuilds <= 1
+ui craft torch 2
+assert inv.cursor == 6
+ui close
+wait 0.2
+assert inv.torch == 6
+ui inventory
+wait 0.3
+ui craft wooden_sword
+assert inv.cursor == 1
+ui close
+wait 0.2
+assert inv.wooden_sword == 1
+assert inv.cursor == 0
+god off
+assert errors == 0
+
+# --- P2-26 ---
+# Talking to a resident opens the chat box at the top centre: in the top third of the screen, over nothing else on the
+# HUD (the hotbar, buffs and hearts), and the player can still walk while it is open.
+god on
+spawning off
+killall
+town summon merchant 0 0 -3
+wait 0.3
+ui talk merchant
+wait 0.3
+assert ui.talk_open == 1
+assert ui.npc_chat_top == 1
+assert ui.overlaps == 0
+assert ui.modal == 0
+ui close
+wait 0.2
+assert ui.talk_open == 0
+god off
+assert errors == 0
+
+# --- P2-27 ---
+# Shop opens the inventory with the merchant's 10×4 grid in the panel host. Shift-clicking a backpack slot sells the
+# stack (wood has no value: it goes for nothing, as on Terraria's shop) into the buyback cells, and 'ui buyback' buys
+# it back into the backpack. Clicking a ware buys one onto the cursor and again stacks it; closing the inventory stows
+# what is held. Walking out of talking range puts the shop away.
+god on
+spawning off
+killall
+clear
+town dismiss merchant
+town summon merchant 0 0 -3
+give silver_coin 50
+give wood 10
+wait 0.3
+ui talk merchant
+ui shop
+wait 0.3
+assert ui.talk_open == 0
+assert ui.inventory == 1
+assert ui.panel == 2
+assert ui.shop_slots > 0
+assert ui.overlaps == 0
+ui hover shop 0
+assert ui.tooltip_lines > 1
+ui sell backpack 0
+assert ui.buyback == 1
+assert inv.wood == 0
+ui buyback 0
+assert ui.buyback == 0
+assert inv.wood == 10
+ui buy torch 2
+assert inv.cursor == 2
+assert inv.coins < 5000
+ui close
+wait 0.2
+assert ui.panel == 0
+assert inv.torch == 2
+ui talk merchant
+ui shop
+wait 0.3
+assert ui.panel == 2
+aim 0 0 1
+press move_forward
+wait_until ui.panel == 0 8
+press move_forward off
+assert ui.inventory == 1
+ui close
+wait 0.2
+god off
+assert errors == 0
+
+# --- P2-28 ---
+# The Goblin Tinkerer's Reforge opens the inventory with the reforge slot under the grid ('Place an item here to
+# reforge'). Wood is refused; the sword goes in and its cost shows in coin colours. Each press of the hammer reforges
+# it, charges the purse and clangs; hovering the slot shows its tooltip. Closing the inventory puts the sword back in
+# the backpack.
+god on
+spawning off
+killall
+clear
+town summon goblin_tinkerer 0 0 -3
+give copper_broadsword 1
+give gold_coin 5
+give wood 5
+wait 0.3
+ui talk goblin_tinkerer
+ui reforge
+wait 0.3
+assert ui.talk_open == 0
+assert ui.inventory == 1
+assert ui.panel == 3
+assert ui.service_cost == 0
+assert ui.overlaps == 0
+invclick backpack 1 left
+invclick service 0 left
+assert ui.service_item == 0
+invclick backpack 1 left
+invclick backpack 0 left
+invclick service 0 left
+assert ui.service_item == 1
+assert inv.copper_broadsword == 0
+wait 0.1
+assert ui.service_cost > 0
+ui hover service 0
+assert ui.tooltip_lines > 1
+ui reforge hit
+ui reforge hit
+assert ui.reforges == 2
+assert inv.coins < 50000
+ui close
+wait 0.2
+assert ui.panel == 0
+assert ui.service_item == 0
+assert inv.copper_broadsword == 1
+god off
+assert errors == 0
+
+# --- P2-30 ---
+# The inventory's 'Settings' text button sits in the bottom-right corner of the layout (no overlaps, also at UI scale
+# 1.5) and opens the pause menu over the open inventory, as Terraria's; closing it leaves the world running.
+ui inventory
+wait 0.2
+assert ui.settings_button == 1
+assert ui.overlaps == 0
+uiscale 1.5
+wait 0.2
+assert ui.settings_button == 1
+assert ui.overlaps == 0
+uiscale 1
+ui settings
+wait 0.1
+assert ui.paused == 1
+assert ui.inventory == 1
+ui close
+wait 0.2
+assert ui.paused == 0
+assert ui.inventory == 0
+assert ui.settings_button == 0
+assert errors == 0

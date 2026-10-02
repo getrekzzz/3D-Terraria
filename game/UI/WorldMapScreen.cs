@@ -34,14 +34,10 @@ public sealed partial class WorldMapScreen : CanvasLayer
         _view.Initialize(ui.Game.Session.Content);
         _view.Markers = () => Markers(ui);
         _root.AddChild(_view);
-        _title = new Label { Position = new Vector2(24, 18), Theme = UiTheme.Theme };
+        _title = new Label { Position = new Vector2(24, 18) };
         _title.AddThemeFontSizeOverride("font_size", 22);
         _root.AddChild(_title);
-        var help = new Label
-        {
-            Text = "Drag to move · wheel to zoom · U surface / caves · C centre on you · M or Esc to close",
-            Theme = UiTheme.Theme,
-        };
+        var help = new Label { Text = "Drag to move · wheel to zoom · U surface / caves · C centre on you · M or Esc to close" };
         help.AddThemeFontSizeOverride("font_size", 15);
         help.SetAnchorsPreset(Control.LayoutPreset.BottomLeft);
         help.Position = new Vector2(24, -40);

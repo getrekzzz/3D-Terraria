@@ -126,6 +126,7 @@ public partial class GameRoot : Node
                 Name = name, Seed = args.Long("seed", 1234),
                 Size = System.Enum.Parse<WorldSizePreset>(args.Get("size") ?? "small", ignoreCase: true),
                 Secret = SecretSeeds.Parse(args.Get("secret") ?? ""), // --secret="drunk world" (X-07)
+                Difficulty = System.Enum.Parse<Difficulty>(args.Get("difficulty") ?? "classic", ignoreCase: true),
             },
             ForceNew = args.Flag("new"),
             PlayerName = args.Get("player") ?? "Wanderer",
@@ -209,6 +210,13 @@ public partial class GameRoot : Node
             var pause = new PauseMenu();
             _worldHost.AddChild(pause);
             pause.Initialize(Services, launched.Runtime, ExitToMenu);
+            if (launched.Inventory is { } inventory)
+            {
+                // The inventory's 'Settings' button opens the same menu over it, as Terraria's; Resume leaves an
+                // auto-paused inventory's world paused.
+                inventory.SettingsRequested += () => pause.SetOpen(true);
+                pause.StayPaused = () => inventory.PausesWorld;
+            }
             // A hardcore character's death ends the session: show the message, then return to the title screen.
             launched.Runtime.Game.PlayerLost += _ => GetTree().CreateTimer(6.0).Timeout += () =>
             {

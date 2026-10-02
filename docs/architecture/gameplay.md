@@ -107,8 +107,10 @@
   turns orange with the smart cursor icon, the pointer uses its smart sprite, and the status line says "Smart Cursor
   On/Off". Scripted runs keep the toggle in memory (`GameRoot.Automated`). Probes: `ui.smart_cursor`,
   `ui.smart_target`.
-* **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
-  nearby liquids, biome/time conditions).
+* **Crafting** — `RecipeBook` (indexed, atomic crafts; `CraftInto` crafts onto the cursor, merging into the same
+  stackable item and refusing anything else) + `CraftingEnvironment` (stations within reach and the objects providing
+  them, nearby liquids, biome/time conditions; `Browse` tallies the slots once; `Signature` is a stable FNV hash of a
+  browse so the UI rebuilds only on change) + `RecipeText` (group and condition wording).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
   strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
@@ -322,8 +324,10 @@
   `coins`, `maxLife`, `resident`, `flag`) when a vacant valid home exists (rooms found from chairs), re-validates
   homes, and drives residents: stroll by day, walk home at night along A* paths, opening and closing doors, stop
   and face the player while talking. `TownCommerce` picks dialogue lines by condition (placeholders for names),
-  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys and sells
-  (at `sellRatio`), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
+  prices shop stock by happiness (liked/disliked biomes and neighbours, crowding, homelessness), buys into the
+  backpack or onto the cursor (`BuyTarget`), sells from a slot or the cursor at `sellRatio` (favourites and coins
+  refuse; an item of no value goes for nothing), keeps each player's last 40 sold stacks for buyback at what they
+  fetched (`TownCommerce.Trade.cs`; not saved), and runs services (`heal` for coins with debuff removal, `craftHelp`, `summonBoss`). Landmark
   residents (the Dungeon keeper) are placed at a planned landmark once it streams in and stay near it; any resident
   whose `leavesWhen` holds leaves for good (`Departed`). Residents persist in the world metadata. Residents live in
   `data/town.json`, tuning in `data/config/town.json`.
