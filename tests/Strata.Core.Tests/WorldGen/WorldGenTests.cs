@@ -48,6 +48,7 @@ public class WorldGenTests
     [InlineData(2, 4, 9, 17334305573271451792UL)]
     [InlineData(12, 1, 5, 12384916426225855034UL)]
     [InlineData(8, 7, 12, 7667736912130785385UL)] // the Dungeon's vault
+    [InlineData(3, 11, 11, 10522532040234478090UL)] // the Dungeon's keep
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
         Assert.Equal(11, GenVersion.Current); // bumping the generator version means re-recording these hashes
@@ -74,6 +75,7 @@ public class WorldGenTests
         yield return new object[] { 1, spawn.Y - 1, 8 };
         yield return new object[] { 8, 7, 12 }; // the Dungeon's vault
         yield return new object[] { 6, 9, 13 }; // Dungeon stairs crossing a chunk face
+        yield return new object[] { 3, 11, 11 }; // the Dungeon's keep
     }
 
     [Theory]

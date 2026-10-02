@@ -19,10 +19,12 @@ public static partial class DungeonBuilder
     /// <summary>Rise between shaft platforms: 4 cells (2 m) is under the player's 2.4 m jump apex.</summary>
     public const int PlatformSpacing = 4;
 
-    public static Blueprint Build(ContentDatabase content, DungeonLayout layout, DungeonStyle style)
+    /// <summary>Builds the blueprint. <paramref name="surface"/> is the ground height (top solid cell) of a column,
+    /// sampled for the keep's foundation and approach.</summary>
+    public static Blueprint Build(ContentDatabase content, DungeonLayout layout, DungeonStyle style, Func<int, int, int> surface)
     {
         var bp = new Blueprint { Flags = CellFlags.Structure };
-        var b = new Ctx(bp, content, layout, style);
+        var b = new Ctx(bp, content, layout, style, surface);
 
         // A: brick shells.
         KeepShell(b);
@@ -59,8 +61,9 @@ public static partial class DungeonBuilder
     /// <summary>Shared build state.</summary>
     private sealed class Ctx
     {
-        public Ctx(Blueprint bp, ContentDatabase content, DungeonLayout layout, DungeonStyle style)
+        public Ctx(Blueprint bp, ContentDatabase content, DungeonLayout layout, DungeonStyle style, Func<int, int, int> surface)
         {
+            Surface = surface;
             Bp = bp;
             Content = content;
             Layout = layout;
@@ -71,6 +74,7 @@ public static partial class DungeonBuilder
         public ContentDatabase Content { get; }
         public DungeonLayout Layout { get; }
         public DungeonStyle Style { get; }
+        public Func<int, int, int> Surface { get; }
         public string Brick => Style.Brick;
         public byte Platform { get; } = ShapeCode.Pack(CellShape.Platform, 0);
     }

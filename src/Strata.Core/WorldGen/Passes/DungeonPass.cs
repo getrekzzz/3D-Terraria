@@ -26,7 +26,7 @@ public sealed class DungeonPass : GenPass
         var layout = DungeonPlanner.Plan(site, DungeonBudget.For(ctx.Plan.Settings.Size), seeds);
         var styleRng = seeds.Rng("style");
         var style = DungeonStyle.Pick(ref styleRng);
-        var bp = DungeonBuilder.Build(ctx.Content, layout, style);
+        var bp = DungeonBuilder.Build(ctx.Content, layout, style, site.Surface);
         StructurePlacementPass.AddStructure(ctx.Plan, new DungeonFeature(bp, layout, style) { Kind = "dungeon", Zone = "dungeon" });
 
         var marks = ctx.Plan.Landmarks;
@@ -40,8 +40,7 @@ public sealed class DungeonPass : GenPass
             marks[LandmarkIds.DungeonChest] = new Int3(Math.Clamp(front.X, room.Min.X, room.Max.X - 1), room.Min.Y, Math.Clamp(front.Z, room.Min.Z, room.Max.Z - 1));
         }
         else marks[LandmarkIds.DungeonChest] = bottom.CenterFloor;
-        var gate = layout.Door + layout.Inward * 3;
-        marks[LandmarkIds.DungeonGate] = new Int3(gate.X, Math.Min(site.Surface(gate.X, gate.Z) + 1, layout.Door.Y), gate.Z);
+        marks[LandmarkIds.DungeonGate] = DungeonBuilder.GateCell(layout, site.Surface);
     }
 
     /// <summary>

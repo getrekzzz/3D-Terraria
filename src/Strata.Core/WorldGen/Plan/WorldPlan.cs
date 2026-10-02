@@ -106,7 +106,13 @@ public sealed class WorldPlan
     public void AddFeature(WorldFeature feature)
     {
         Features.Add(feature);
-        RaiseColumnTop(feature.Bounds);
+        if (feature is Structures.Dungeon.DungeonFeature dungeon)
+        {
+            // Op by op: the dungeon's bounding box spans a wide stretch of open ground beside its tall keep, which
+            // would otherwise all count as content up to the turrets (more chunks streamed, sky columns misjudged).
+            foreach (var op in dungeon.Blueprint.Ops) RaiseColumnTop(op.Bounds);
+        }
+        else RaiseColumnTop(feature.Bounds);
     }
 }
 

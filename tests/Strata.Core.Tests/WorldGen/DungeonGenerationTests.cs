@@ -208,5 +208,53 @@ public class DungeonGenerationTests
             }
     }
 
+    [Fact]
+    public void TheKeepStandsOnTheGround()
+    {
+        var g = Loaded();
+        var l = Feature(g).Layout;
+        var w = World(g);
+        var terrain = g.World.Session.Generator.Terrain;
+        var k = l.KeepInterior;
+        var shaft = l.Halls[0].Interior(0).Expand(2);
+        int floor = k.Min.Y, columns = 0;
+        // Every column under the walls and the foundation's apron is solid from the floor down to the ground.
+        for (int x = k.Min.X - 6; x < k.Max.X + 6; x++)
+            for (int z = k.Min.Z - 6; z < k.Max.Z + 6; z++)
+            {
+                if (shaft.Contains(x, shaft.Min.Y, z)) continue;
+                int ground = (int)MathF.Floor(terrain.SurfaceHeight(x, z));
+                for (int y = floor - 1; y >= Math.Min(ground, floor - 1); y--)
+                    Assert.True(w.IsSolid(x, y, z), $"air under the keep at ({x},{y},{z}), ground {ground}, floor {floor}");
+                columns++;
+            }
+        Assert.True(columns > 500);
+        // The roof and the turrets rise over the walls.
+        var corner = new Int3(k.Min.X - 3, floor + 22, k.Min.Z - 3);
+        Assert.True(w.IsSolid(corner.X, corner.Y, corner.Z), "no turret at the keep's corner");
+    }
+
+    [Fact]
+    public void TheDoorFacesTheWorldCentre()
+    {
+        var g = Loaded();
+        var l = Feature(g).Layout;
+        var size = g.World.Session.Generator.Plan.Size;
+        var k = l.KeepInterior;
+        var centre = new Int3((k.Min.X + k.Max.X) / 2, k.Min.Y, (k.Min.Z + k.Max.Z) / 2);
+        var toWorld = new Int3(size.X / 2 - centre.X, 0, size.Z / 2 - centre.Z);
+        Assert.True(l.Inward.X * toWorld.X + l.Inward.Z * toWorld.Z > 0, "the door faces away from the world centre");
+        Assert.True(l.Door.X * l.Inward.X + l.Door.Z * l.Inward.Z > centre.X * l.Inward.X + centre.Z * l.Inward.Z);
+        // Open through the 5-cell front wall, 9 tall, and out onto the approach.
+        for (int a = 0; a < 9; a++)
+            for (int y = 0; y < 8; y++)
+                Assert.True(Air(g, l.Door + l.Inward * a + Int3.Up * y), $"door blocked at {l.Door + l.Inward * a + Int3.Up * y}");
+        var gate = g.World.Session.Generator.Plan.Landmarks[Strata.Core.WorldGen.Plan.LandmarkIds.DungeonGate];
+        Assert.True(g.World.Navigator.IsStandable(gate, NavAgent.Humanoid), $"the gate {gate} is not standable");
+        Assert.DoesNotContain("dungeon", g.World.Session.ZonesAt(gate));
+        Assert.Contains("dungeon", g.World.Session.ZonesAt(centre + Int3.Up * 2));
+        Assert.NotNull(g.World.Navigator.FindPath(gate, Snap(g, l.Door + Int3.Up * 0 - l.Inward)!.Value, NavAgent.Humanoid, 20000));
+    }
+
     private static Int3? Snap(TestGame g, Int3 cell) => g.World.Navigator.NearestStandable(cell, NavAgent.Humanoid, 3);
 }

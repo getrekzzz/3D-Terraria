@@ -117,6 +117,15 @@ interior's height; floors and ceilings stay brick), C carves (every interior, ev
   broken at doorways, each with a step platform at +2.
 * Gold chests on the planned `ChestSpots` (the Shadow Key spot rolls `dungeon_chest_shadow_key`).
 
+The keep (`DungeonBuilder.Keep`, emitted in the same phases): the 20 x 16 x 20 hall behind walls 3 thick (2 brick +
+an inner panel), the inland-facing front 2 cells thicker, a 2-cell roof with merlons, four corner turrets (cylinders
+r 3, 24 tall, stepped caps), an arched door 6 x 9 (+ 4 and 2 wide at +9 / +10), two slit windows and a foyer of four
+pillars round the entrance shaft's 10 x 10 opening. The foundation fills brick under the walls, turrets and a 3-cell
+apron from 6 under the lowest ground (at most 24 under the floor) and, in 4 x 4 blocks, 2 cells into each block's own
+ground, so the keep never floats. The approach is NoZone: a level landing past the apron, then rows at most one cell
+lower each until they meet the ground (brick steps where the ground is lower), the first 12 rows cut clear 10 wide
+and 12 tall; `DungeonBuilder.GateCell` (the landing just past the apron) is `dungeon_gate`, outside the zone.
+
 Every cell is flagged `CellFlags.Structure` (locked until Skeletron falls). Later passes leave structure cells alone
 (`ChunkGenContext.IsStructure`): cave/nest/chasm carvers skip them, treasure and decoration do not place on them, and
 the dungeon stamp drops objects earlier passes left inside its zone. A Large dungeon is ~6000 ops, planned and built in
