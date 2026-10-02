@@ -36,7 +36,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         _ui = ui;
         Name = "Inventory";
         Layer = 20;
-        _root = new Control { Visible = false, Theme = UiTheme.Theme, MouseFilter = Control.MouseFilterEnum.Ignore };
+        _root = new Control { Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
         BuildLayout();

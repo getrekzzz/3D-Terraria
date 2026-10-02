@@ -32,7 +32,7 @@ public sealed partial class PerfOverlay : CanvasLayer
         _objects = objects;
         Name = "PerfOverlay";
         Layer = 40;
-        _label = LayoutWidgets.Register(new Label { Name = "PerfOverlay", Position = new Vector2(16, 60), Visible = false, Theme = UiTheme.Theme, ClipText = true });
+        _label = LayoutWidgets.Register(new Label { Name = "PerfOverlay", Position = new Vector2(16, 60), Visible = false, ClipText = true });
         _label.AddThemeFontSizeOverride("font_size", FontSize);
         _label.AddThemeColorOverride("font_outline_color", UiFonts.OutlineColor);
         _label.AddThemeConstantOverride("outline_size", UiFonts.Outline);

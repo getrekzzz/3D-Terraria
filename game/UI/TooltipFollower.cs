@@ -48,7 +48,7 @@ public sealed partial class TooltipFollower : CanvasLayer
         _cursor = cursor;
         Name = "Tooltip";
         Layer = 95;
-        _root = new Control { MouseFilter = Control.MouseFilterEnum.Ignore, Theme = UiTheme.Theme };
+        _root = new Control { MouseFilter = Control.MouseFilterEnum.Ignore };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
         _panel = new PanelContainer { Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore, ThemeTypeVariation = "TooltipPanel" };
@@ -125,6 +125,7 @@ public sealed partial class TooltipFollower : CanvasLayer
     public override void _Process(double delta)
     {
         if (_owner == null) return;
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.tooltip");
         if (!IsInstanceValid(_owner) || !_owner.IsVisibleInTree() || Input.MouseMode == Input.MouseModeEnum.Captured)
         {
             Clear();
