@@ -10,6 +10,12 @@
 * `ContentValidator`: references, specs, DAG cycles in progression, obtainability, texture layers and
   conventional asset paths (every tile-object variant, item icon/model, creature and projectile model, buff icon
   and invasion icon).
+* `ItemSourceIndex` (`Content/Index/ItemSources.cs`): reverse lookup from an item to every way it is obtained
+  (recipes, enemy and boss loot, named world-generation chest tables such as "Gold Chests", tile objects, blocks,
+  bug-net catches, shops, fishing, crates and bags, Angler rewards, buckets, and `starter`/`world` tags). Loot tables
+  resolve to their owners, and nested tables pass on their owner and conditions. The obtainability check is a loop
+  over `Unobtainable`. A `shop` tag no longer excuses an item; a resident has to sell it. A loot table that nothing
+  rolls is a warning. `ItemSourcesTests` pins the shipped unobtainable list (only items a pending WP will add).
 * `data/reference/*.json`: Terraria concepts (names only) generated from `tools/content/reference/`.
   Content links to them with `covers`; `Strata.Tools coverage` reports coverage and CI publishes it.
 

@@ -1,4 +1,5 @@
 using Strata.Core.Content.Defs;
+using Strata.Core.Content.Index;
 using Strata.Core.Content.Specs;
 
 namespace Strata.Core.Content.Validation;
@@ -97,35 +98,13 @@ public static partial class ContentValidator
 
     private static void ValidateObtainability(Ctx ctx)
     {
-        var sources = new HashSet<string>(StringComparer.Ordinal);
-        foreach (var r in ctx.Db.Recipes.All) sources.Add(r.Output);
+        var index = ItemSourceIndex.Build(ctx.Db);
+        foreach (var i in index.Unobtainable)
+            ctx.Warn(i, i.HasTag("shop")
+                ? "item is tagged 'shop' but no resident sells it."
+                : "item has no recipe, loot, block, tile-object, catch, shop, fishing or bucket source (tag 'starter'/'world' if intended).");
+        // World generation fills chests by table id; a name marks such a table as a container ("Gold Chests").
         foreach (var t in ctx.Db.LootTables.All)
-            foreach (var e in t.Entries)
-                if (e.Item != null) sources.Add(e.Item);
-        foreach (var d in ctx.Db.BlockDrops)
-            if (d != null) sources.Add(d.Id);
-        foreach (var t in ctx.Db.TileObjects.All)
-        {
-            // Breaking a world-generated object yields its placing item.
-            if (t.PlacingItemId != null && (t.Natural || t.HasTag("world"))) sources.Add(t.PlacingItemId);
-        }
-        // A bug net turns critters into their catch items.
-        foreach (var e in ctx.Db.Enemies.All)
-            if (e.CatchItem != null) sources.Add(e.CatchItem);
-        // Residents sell their stock.
-        foreach (var t in ctx.Db.TownNpcs.All)
-            foreach (var e in t.Shop) sources.Add(e.Item);
-        // Filling an obtainable empty bucket yields the liquid's bucket.
-        if (ctx.Db.Items.All.Any(i => sources.Contains(i.Id) && i.Behaviors.Any(b => b.Type == Specs.ItemBehaviorSpecs.Bucket && !b.Raw.TryGetProperty("liquid", out _))))
-            foreach (var l in ctx.Db.Liquids.All)
-                if (l.Bucket != null) sources.Add(l.Bucket);
-        bool anyCoins = ctx.Db.LootTables.All.Any(t => t.Coins != null);
-
-        foreach (var i in ctx.Db.Items.All)
-        {
-            if (sources.Contains(i.Id) || i.HasTag("starter") || i.HasTag("shop") || i.HasTag("debug") || i.HasTag("world")) continue;
-            if (i.HasTag("coin") && anyCoins) continue;
-            ctx.Warn(i, "item has no recipe, loot, block drop or tile-object source (tag 'shop'/'starter' if intended).");
-        }
+            if (!index.IsOwned(t.Id)) ctx.Warn(t, "loot table is not rolled by any enemy, tile object, item or fishing (name it if world generation fills chests with it).");
     }
 }
