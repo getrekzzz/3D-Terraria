@@ -17,8 +17,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|buy <item> [n]|sell <area> <slot>|buyback <i>|reforge [hit]|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|craft <item> [n]|close|export-theme>",
-            Help = "Opens or closes gameplay screens; shop opens the shop of the resident being talked to (the chat box's Shop); buy clicks a ware's shop slot n times (onto the cursor); sell Shift-clicks a slot with the shop open; buyback Shift-clicks sold stack i (back into the backpack); reforge opens the reforge slot of the resident being talked to (the chat box's Reforge) and reforge hit presses its hammer; hover shows a slot's tooltip (areas as invclick, plus hotbar and shop); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); craft clicks the crafting column's recipe for an item as the player does (selecting it, then crafting onto the cursor n times); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|buy <item> [n]|sell <area> <slot>|buyback <i>|reforge [hit]|hover <area> <index>|buff <cancel|hover> <id>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|craft <item> [n]|chat <text>|history|close|export-theme>",
+            Help = "Opens or closes gameplay screens; shop opens the shop of the resident being talked to (the chat box's Shop); buy clicks a ware's shop slot n times (onto the cursor); sell Shift-clicks a slot with the shop open; buyback Shift-clicks sold stack i (back into the backpack); reforge opens the reforge slot of the resident being talked to (the chat box's Reforge) and reforge hit presses its hammer; hover shows a slot's tooltip (areas as invclick, plus hotbar and shop); buff cancel right-clicks a buff bar icon (a buff id, a minion's projectile id or minecart): buffs go, debuffs never, minions go home; buff hover shows its name and effect; click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); craft clicks the crafting column's recipe for an item as the player does (selecting it, then crafting onto the cursor n times); chat posts a white line to the chat log and history opens or closes its history (the chat key); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -61,6 +61,20 @@ public static class UiCommands
                         if (view == null || !view.IsVisibleInTree()) return CommandResult.Fail($"No {area} slot {index} on screen (open the inventory first).");
                         view.ShowTooltip();
                         return CommandResult.Success($"Tooltip: {world.Tooltip?.LineCount ?? 0} lines.");
+                    case "buff":
+                        string action = a.Str(1, "cancel|hover");
+                        if (action is not ("cancel" or "hover")) throw new CommandException("expected: ui buff <cancel|hover> <id>");
+                        var bar = world.Hud?.Buffs ?? throw new CommandException("no HUD in this mode");
+                        string buffId = a.Str(2, "id");
+                        var icon = bar.Find(buffId);
+                        if (icon == null) return CommandResult.Fail($"No '{buffId}' icon on the buff bar.");
+                        if (action == "hover")
+                        {
+                            icon.ShowTooltip();
+                            return CommandResult.Success($"Tooltip: {world.Tooltip?.LineCount ?? 0} lines.");
+                        }
+                        // A refusal (a debuff) is what the player would get, not a script error: the probes tell.
+                        return CommandResult.Success(bar.Cancel(icon) ? $"Cancelled {buffId}." : $"{buffId} cannot be cancelled.");
                     case "click": return PointerInput.Click(world, a.Str(1, "button"), a.OptStr(2));
                     case "drag": return PointerInput.Drag(world, a.Float(1, "dx"), a.Float(2, "dy"));
                     case "minimap":
@@ -95,12 +109,21 @@ public static class UiCommands
                         if (made < 0) return CommandResult.Fail($"No recipe for '{item}' on the crafting column.");
                         var cursor = ctx.Player.State.Inventory.Cursor;
                         return made > 0 ? CommandResult.Success($"Crafted {made} time(s); holding {cursor}.") : CommandResult.Fail($"Could not craft '{item}'; holding {cursor}.");
+                    case "chat":
+                        var log = world.Hud?.Chat ?? throw new CommandException("no HUD in this mode");
+                        log.Add(a.Count > 1 ? a.Rest(1) : throw new CommandException("missing <text>"), UiTheme.Text);
+                        return CommandResult.Success($"Chat: {log.LinesShown} line(s) shown.");
+                    case "history":
+                        var chat = world.Hud?.Chat ?? throw new CommandException("no HUD in this mode");
+                        chat.SetOpen(!chat.IsOpen);
+                        return CommandResult.Success(chat.IsOpen ? "Chat history open." : "Chat history closed.");
                     case "close":
+                        world.Hud?.Chat.SetOpen(false);
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, reforge, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, buy, sell, buyback, reforge, hover, buff, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, chat, history, close or export-theme");
                 }
             },
         });

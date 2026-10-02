@@ -47,6 +47,9 @@ public static partial class UiTheme
     public static readonly Color Life = Color.Color8(220, 46, 56);
     public static readonly Color Mana = Color.Color8(56, 115, 242);
 
+    /// <summary>The crosshair while Smart Cursor is on.</summary>
+    public static readonly Color SmartCursor = Color.Color8(255, 150, 30);
+
     // Coins.
     public static readonly Color Platinum = Color.Color8(220, 220, 198);
     public static readonly Color GoldCoin = Color.Color8(224, 201, 92);

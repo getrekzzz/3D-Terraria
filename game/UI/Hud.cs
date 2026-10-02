@@ -7,42 +7,38 @@ namespace Strata.Game.UI;
 
 /// <summary>
 /// The in-game overlay on the <see cref="UiLayout"/> model, laid out like Terraria's: the selected item's name and the
-/// hotbar top-left with the buff row under them, life and mana top-right above the minimap and the info panel, the
-/// crosshair with its interaction hint and target name at the centre, the breath bar above it and the status line under
-/// it, the pickup feed bottom-left, the boss bar bottom-centre, event banners and the death screen. <see cref="ApplyLayout"/>
-/// places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3 overlay) when the window, the UI
-/// scale or what is shown changes (the inventory and its panel and accessory rows, an NPC chat, a boss, the buff count,
-/// the info rows, the minimap setting, the F3 overlay), never per frame; the inventory screen's parts take their regions
-/// from it too.
+/// hotbar top-left with the buff row under them, the hearts and mana stars top-right above the minimap and the info
+/// panel, the crosshair with its interaction hint and target name at the centre, the breath bubbles above it and the
+/// status line under it, the chat log bottom-left (Hud.Messages), pickup popups over the player's head, the boss bar
+/// bottom-centre, an invasion's progress bottom-right and the death screen.
+/// <see cref="ApplyLayout"/> places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3
+/// overlay) when the window, the UI scale or what is shown changes (the inventory and its panel and accessory rows, an
+/// NPC chat, a boss, an invasion, the buff count, the info rows, the minimap setting, the F3 overlay), never per frame; the inventory
+/// screen's parts take their regions from it too.
 /// </summary>
 public sealed partial class Hud : CanvasLayer
 {
-    private const int FeedLines = 6;
-
     private UiContext _ui = null!;
     private ItemNameLabel _itemName = null!;
     private HotbarBar _hotbar = null!;
-    private VitalsBars _vitals = null!;
+    private BuffBar _buffBar = null!;
     private Crosshair _crosshair = null!;
     private StatusLine _status = null!;
     private InfoPanel _info = null!;
-    private Control _feed = null!;
-    private VBoxContainer _feedLines = null!;
-    private VBoxContainer _announcements = null!;
-    private Label _death = null!;
-    private PanelContainer _bossPanel = null!;
-    private Label _bossName = null!;
-    private ProgressBar _bossBar = null!;
+    private ChatLog _chat = null!;
+    private PickupPopups _popups = null!;
+    private DeathScreen _death = null!;
+    private BossBar _bossBar = null!;
+    private EventProgressPanel _eventBar = null!;
     private InventoryScreen? _inventory;
     private TownDialog? _dialog;
     private PerfOverlay? _perf;
     private LayoutKey _key;
-    private bool _bossShown, _bossPlaced;
     private (ItemDef? Item, Strata.Core.Voxels.CellShape Shape, int Turn) _hintFor;
 
     /// <summary>What decides the layout; a change re-runs <see cref="ApplyLayout"/>.</summary>
-    private readonly record struct LayoutKey(Vector2 Size, bool Inventory, UiPanel Panel, int AccessoryRows, bool Chat, bool Boss, int Buffs,
-        bool Minimap, int Info, bool Debug);
+    private readonly record struct LayoutKey(Vector2 Size, bool Inventory, UiPanel Panel, int AccessoryRows, bool Chat, bool Boss, bool Event,
+        int Buffs, bool Minimap, int Info, bool Debug);
 
     /// <summary>The layout in effect (null until the first frame).</summary>
     public UiLayoutResult? Layout { get; private set; }
@@ -60,7 +56,25 @@ public sealed partial class Hud : CanvasLayer
     public string Status => _status.Message;
 
     /// <summary>Active buffs shown with their generated icon (not the letter fallback); the hud.buff_icons probe.</summary>
-    public int BuffIconsShown { get; private set; }
+    public int BuffIconsShown => _buffBar.IconsShown;
+
+    /// <summary>The buff bar (the <c>ui buff cancel</c> command and the <c>hud.buffs</c> probe).</summary>
+    public BuffBar Buffs => _buffBar;
+
+    /// <summary>The chat log (the <c>ui chat</c> command and the <c>ui.chat_lines</c> probe).</summary>
+    public ChatLog Chat => _chat;
+
+    /// <summary>Pickup popups on screen over the player's head (the <c>ui.popups</c> probe).</summary>
+    public int PopupsShown => _popups.Shown;
+
+    /// <summary>The death screen (the <c>ui.death_dim</c> probe).</summary>
+    public DeathScreen Death => _death;
+
+    /// <summary>The boss bar (the <c>ui.bossbar</c> probe).</summary>
+    public BossBar BossBar => _bossBar;
+
+    /// <summary>The invasion progress panel (the <c>ui.eventbar</c> probe).</summary>
+    public EventProgressPanel EventBar => _eventBar;
 
     /// <summary>The hotbar slot view at <paramref name="index"/> (the <c>ui hover hotbar</c> command), or null.</summary>
     public ItemSlotView? HotbarSlot(int index) => _hotbar.Slot(index);
@@ -78,40 +92,23 @@ public sealed partial class Hud : CanvasLayer
 
         root.AddChild(_itemName = LayoutWidgets.Register(new ItemNameLabel(ui)));
         root.AddChild(_hotbar = LayoutWidgets.Register(new HotbarBar(ui)));
-        root.AddChild(_buffs = LayoutWidgets.Register(new Control { Name = "Buffs", MouseFilter = Control.MouseFilterEnum.Ignore }));
-        _vitals = new VitalsBars(ui, root);
+        root.AddChild(_buffBar = LayoutWidgets.Register(new BuffBar(ui)));
+        BuildVitals(root);
         root.AddChild(_crosshair = LayoutWidgets.Register(new Crosshair(ui)));
         root.AddChild(_status = LayoutWidgets.Register(new StatusLine()));
         root.AddChild(_info = LayoutWidgets.Register(new InfoPanel(ui)));
-        _feed = LayoutWidgets.Register(new Control { Name = "Feed", MouseFilter = Control.MouseFilterEnum.Ignore, ClipContents = true });
-        _feedLines = new VBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore, GrowVertical = Control.GrowDirection.Begin };
-        _feedLines.SetAnchorsPreset(Control.LayoutPreset.BottomWide);
-        _feed.AddChild(_feedLines);
-        root.AddChild(_feed);
+        root.AddChild(_chat = LayoutWidgets.Register(new ChatLog()));
+        root.AddChild(_popups = new PickupPopups(ui)); // full screen, anchored to the player: not a layout region
+        BuildBanner(root);
 
-        _announcements = new VBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore };
-        _announcements.SetAnchorsPreset(Control.LayoutPreset.CenterTop);
-        _announcements.GrowHorizontal = Control.GrowDirection.Both;
-        _announcements.OffsetTop = 120;
-        root.AddChild(_announcements);
-
-        _death = new Label { Visible = false, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-        _death.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        _death.AddThemeFontSizeOverride("font_size", 44);
-        _death.AddThemeColorOverride("font_color", new Color(0.9f, 0.25f, 0.25f));
-        root.AddChild(_death);
-
-        _bossPanel = LayoutWidgets.Register(new PanelContainer { Name = "BossBar", Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore });
-        var bossBox = new VBoxContainer();
-        _bossName = new Label { HorizontalAlignment = HorizontalAlignment.Center, ClipText = true };
-        _bossName.AddThemeFontSizeOverride("font_size", 18);
-        bossBox.AddChild(_bossName);
-        _bossBar = new ProgressBar { ShowPercentage = false, CustomMinimumSize = new Vector2(0, 18), MouseFilter = Control.MouseFilterEnum.Ignore };
-        _bossBar.AddThemeStyleboxOverride("background", new StyleBoxFlat { BgColor = new Color(0, 0, 0, 0.55f) });
-        _bossBar.AddThemeStyleboxOverride("fill", new StyleBoxFlat { BgColor = new Color(0.75f, 0.12f, 0.2f) });
-        bossBox.AddChild(_bossBar);
-        _bossPanel.AddChild(bossBox);
-        root.AddChild(_bossPanel);
+        root.AddChild(_bossBar = LayoutWidgets.Register(new BossBar()));
+        root.AddChild(_eventBar = LayoutWidgets.Register(new EventProgressPanel(ui.Game.Events)));
+        // Boss head icons load in the background now, so a boss's arrival never waits on the disk.
+        var bossIcons = new System.Collections.Generic.List<string>();
+        foreach (var e in ui.Game.Session.Content.Enemies.All)
+            if (e.Boss is { Minor: false }) bossIcons.Add(Strata.Core.Content.AssetPaths.BossIcon(e));
+        Strata.Game.Items.PortraitIcons.Preload(bossIcons);
+        root.AddChild(_death = new DeathScreen()); // last: over every widget
         WireMessages(ui);
     }
 
@@ -137,16 +134,14 @@ public sealed partial class Hud : CanvasLayer
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.hud");
-        UpdateBossBar();
+        Strata.Game.Items.PortraitIcons.Pump();
+        _bossBar.Refresh(BossBarModel.Compute(_ui.Game.Npcs.All), delta); // before the layout, which reads what is shown
+        _eventBar.Refresh(_ui.Game.Events, delta);
+        _buffBar.Refresh(delta);
         UpdateLayout();
-        _vitals.Update();
-        UpdateBuffs();
+        UpdateVitals(delta);
         UpdateBuildHint();
-        _death.Visible = !_ui.Entity.Alive;
-        if (_death.Visible)
-            _death.Text = _ui.Entity.Lost
-                ? $"{_ui.Entity.State.Name} has perished.\nHardcore characters do not return."
-                : $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
+        _death.Refresh(_ui.Entity, delta);
     }
 
     /// <summary>Lays the screen out again when what decides the layout changed (the window, the UI scale or what is shown).</summary>
@@ -154,8 +149,8 @@ public sealed partial class Hud : CanvasLayer
     {
         bool inventory = _inventory?.IsOpen == true;
         var key = new LayoutKey(LayoutWidgets.LogicalSize(GetViewport()), inventory, inventory ? _inventory!.Panel : UiPanel.None,
-            _inventory?.AccessoryRows ?? Strata.Core.Gameplay.Items.PlayerInventory.BaseAccessorySlots, _dialog?.IsOpen == true, _bossShown,
-            _ui.Entity.State.Buffs.Active.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
+            _inventory?.AccessoryRows ?? Strata.Core.Gameplay.Items.PlayerInventory.BaseAccessorySlots, _dialog?.IsOpen == true, _bossBar.Active,
+            _eventBar.Active, _buffBar.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
         if (!key.Equals(_key)) ApplyLayout(key);
     }
 
@@ -163,63 +158,23 @@ public sealed partial class Hud : CanvasLayer
     private void ApplyLayout(LayoutKey key)
     {
         _key = key;
-        var state = new UiState(InventoryOpen: key.Inventory, Panel: key.Panel, BossBar: key.Boss, NpcChat: key.Chat, BuffCount: key.Buffs,
+        var state = new UiState(InventoryOpen: key.Inventory, Panel: key.Panel, BossBar: key.Boss, EventBar: key.Event, NpcChat: key.Chat, BuffCount: key.Buffs,
             AccessoryRows: key.AccessoryRows, ShowMinimap: key.Minimap, InfoLines: key.Info, DebugOverlay: key.Debug);
         var layout = UiLayout.Compute(key.Size.X, key.Size.Y, state);
         Layout = layout;
         _itemName.InventoryOpen = key.Inventory;
         _itemName.Visible = LayoutWidgets.Place(_itemName, layout, UiRegion.ItemName);
         _hotbar.Visible = LayoutWidgets.Place(_hotbar, layout, UiRegion.Hotbar);
-        _buffs.Visible = LayoutWidgets.Place(_buffs, layout, UiRegion.Buffs);
-        _vitals.Place(layout);
+        _buffBar.Visible = LayoutWidgets.Place(_buffBar, layout, UiRegion.Buffs);
+        PlaceVitals(layout);
         _crosshair.Place(layout, key.Size);
         _status.Visible = LayoutWidgets.Place(_status, layout, UiRegion.StatusLine);
         _info.Visible = LayoutWidgets.Place(_info, layout, UiRegion.Info);
-        _feed.Visible = LayoutWidgets.Place(_feed, layout, UiRegion.Chat);
-        _bossPlaced = LayoutWidgets.Place(_bossPanel, layout, UiRegion.BossBar);
-        _bossPanel.Visible = _bossPlaced && _bossShown;
-        ArrangeBuffs();
+        _chat.Visible = LayoutWidgets.Place(_chat, layout, UiRegion.Chat);
+        _bossBar.Visible = LayoutWidgets.Place(_bossBar, layout, UiRegion.BossBar);
+        _eventBar.Visible = LayoutWidgets.Place(_eventBar, layout, UiRegion.EventBar);
+        _buffBar.Arrange();
         LayoutApplied?.Invoke(layout);
-    }
-
-    private void WireMessages(UiContext ui)
-    {
-        var npcs = ui.Game.Npcs;
-        npcs.BossSpawned += b => Announce($"{b.Def.Boss!.Title} has awoken!", new Color(0.8f, 0.5f, 1f));
-        npcs.BossDefeated += b => Announce($"{b.Def.Boss!.Title} has been defeated!", new Color(1f, 0.85f, 0.4f));
-        npcs.BossLeft += b => Announce($"{b.Def.Boss!.Title} has left.", UiTheme.Muted);
-        ui.Game.Town.Arrived += t => Announce($"{t.Title} has arrived!", new Color(0.55f, 0.9f, 0.6f));
-        ui.Game.Town.Died += t => Announce($"{t.Title} was slain...", new Color(1f, 0.4f, 0.35f));
-        ui.Game.Town.Departed += t => Announce($"{t.Title} has left.", new Color(0.7f, 0.8f, 1f));
-        ui.Game.Progression.Raised += f =>
-        {
-            if (f.Announce != null) Announce(f.Announce, new Color(0.75f, 0.55f, 1f));
-        };
-        ui.Game.Objectives.Announced += (text, color) => Announce(text, Color.FromHtml(color));
-        npcs.Announced += text => Announce(text, new Color(1f, 0.55f, 0.45f));
-        ui.Game.Events.Announced += (text, def) => Announce(text, def.SkyTint != null ? Color.FromHtml(def.SkyTint).Lightened(0.3f) : new Color(0.7f, 0.85f, 1f));
-
-        // Refusals and notices: one line under the crosshair.
-        ui.Game.ItemUse.Refused += (p, message) =>
-        {
-            if (p == ui.Entity) _status.Show(message, UiTheme.Muted);
-        };
-        ui.Game.Interaction.Refused += (p, message) =>
-        {
-            if (p == ui.Entity) _status.Show(message, UiTheme.Muted);
-        };
-        ui.Notified += _status.Show;
-        ui.Game.Town.HomeLost += t => _status.Show($"{t.Title}'s home is no longer suitable.", UiTheme.Muted);
-
-        // Pickups and catches: the feed in the chat corner.
-        ui.Game.ItemUse.Caught += (p, stack) =>
-        {
-            if (p == ui.Entity) Toast($"Caught {stack.Item!.DisplayName}!", UiTheme.Rarity(stack.Item.Rarity));
-        };
-        ui.Game.ItemPickedUp += (p, stack) =>
-        {
-            if (p == ui.Entity) Toast($"+{stack.Count} {stack.Item!.DisplayName}", UiTheme.Rarity(stack.Item.Rarity));
-        };
     }
 
     /// <summary>The build-shape hint for a held shaped block, rebuilt only when the block, shape or rotation changes.</summary>
@@ -232,57 +187,5 @@ public sealed partial class Hud : CanvasLayer
         _hintFor = at;
         var info = held != null ? _ui.Game.Uses[held] : null;
         _status.Hint = info?.Block is { Render: BlockRender.Crisp } ? $"{at.Shape} ({at.Turn}) — T shape, R rotate" : "";
-    }
-
-    private void UpdateBossBar()
-    {
-        Strata.Core.Gameplay.Entities.Npc? boss = null;
-        foreach (var n in _ui.Game.Npcs.All)
-            if (n.IsBoss && n.Alive && (boss == null || n.Life > boss.Life)) boss = n;
-        _bossShown = boss != null;
-        _bossPanel.Visible = _bossPlaced && _bossShown;
-        if (boss == null) return;
-        // A pair of bosses (companions share the defeat flag) shows as one bar with their combined life.
-        var flag = boss.Def.Boss!.Flag;
-        long life = 0, max = 0;
-        foreach (var n in _ui.Game.Npcs.All)
-            if (n.Alive && (n == boss || (flag != null && n.Def.Boss?.Flag == flag)))
-            {
-                life += n.Life;
-                max += n.MaxLife;
-            }
-        _bossName.Text = boss.Def.Boss.Title;
-        _bossBar.MaxValue = max;
-        _bossBar.Value = life;
-    }
-
-    /// <summary>A line in the feed at the bottom-left (pickups, catches) that fades after a couple of seconds.</summary>
-    public void Toast(string text, Color color)
-    {
-        var label = new Label { Text = text, MouseFilter = Control.MouseFilterEnum.Ignore };
-        label.AddThemeColorOverride("font_color", color);
-        label.AddThemeColorOverride("font_outline_color", UiFonts.OutlineColor);
-        label.AddThemeConstantOverride("outline_size", UiFonts.Outline);
-        _feedLines.AddChild(label);
-        var tween = label.CreateTween();
-        tween.TweenInterval(2.2);
-        tween.TweenProperty(label, "modulate:a", 0.0, 0.6);
-        tween.TweenCallback(Callable.From(label.QueueFree));
-        while (_feedLines.GetChildCount() > FeedLines) _feedLines.GetChild(0).Free();
-    }
-
-    /// <summary>Large centred message (events, bosses) that fades after a few seconds.</summary>
-    public void Announce(string text, Color color)
-    {
-        // Messages stack downwards instead of printing over one another.
-        var label = new Label { Text = text, HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = Control.MouseFilterEnum.Ignore };
-        label.AddThemeFontSizeOverride("font_size", 30);
-        label.AddThemeColorOverride("font_color", color);
-        _announcements.AddChild(label);
-        while (_announcements.GetChildCount() > 4) _announcements.GetChild(0).Free();
-        var tween = label.CreateTween();
-        tween.TweenInterval(4.0);
-        tween.TweenProperty(label, "modulate:a", 0.0, 1.5);
-        tween.TweenCallback(Callable.From(label.QueueFree));
     }
 }

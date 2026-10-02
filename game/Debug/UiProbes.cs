@@ -11,9 +11,11 @@ namespace Strata.Game.Debug;
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
-/// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); and on the inventory
-/// screen's layout (P2-15), the equipment column (P2-16), the chest panel (P2-17), the crafting column (P2-18), the
-/// NPC chat box (P2-26), the grid shop (P2-27) and the reforge slot (P2-28).
+/// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); on the inventory
+/// screen's layout (P2-15); on the hearts, mana stars and breath bubbles (P2-13); on the buff bar (P2-14); on the
+/// chat log (P2-21); on the pickup popups (P2-22); on the boss bar and the invasion progress (P2-23); on the death
+/// screen (P2-25); on the Smart Cursor (P2-29); and on the equipment column (P2-16), the chest panel (P2-17), the
+/// crafting column (P2-18), the NPC chat box (P2-26), the grid shop (P2-27) and the reforge slot (P2-28).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -103,5 +105,29 @@ public static class UiProbes
         ctx.AddProbe("ui.service_cost", () => world.Inventory?.Service.CostShown ?? 0);
         ctx.AddProbe("ui.reforges", () => world.Inventory?.Service.Reforges ?? 0);
         ctx.AddProbe("ui.service_item", () => ctx.Player.State.Inventory.Service[0].IsEmpty ? 0 : 1);
+        // P2-13: Terraria's hearts (20 life each, golden past 400), mana stars and breath bubbles (0 at full breath).
+        ctx.AddProbe("hud.hearts", () => world.Hud?.HeartsShown ?? 0);
+        ctx.AddProbe("hud.golden_hearts", () => world.Hud?.GoldenHeartsShown ?? 0);
+        ctx.AddProbe("hud.stars", () => world.Hud?.StarsShown ?? 0);
+        ctx.AddProbe("hud.bubbles", () => world.Hud?.BubblesShown ?? 0);
+        // P2-14: icons on the buff bar (buffs, minion kinds, the minecart).
+        ctx.AddProbe("hud.buffs", () => world.Hud?.Buffs.Count ?? 0);
+        // P2-21: chat log lines on show (not yet faded, or all kept ones in the history view) and the history view.
+        ctx.AddProbe("ui.chat_lines", () => world.Hud?.Chat.LinesShown ?? 0);
+        ctx.AddProbe("ui.chat_open", () => world.Hud?.Chat.IsOpen == true ? 1 : 0);
+        // P2-22: pickup popups on screen (repeat pickups of one item, and all coins, share one).
+        ctx.AddProbe("ui.popups", () => world.Hud?.PopupsShown ?? 0);
+        // P2-23: the boss bar (a boss group is up) and the invasion progress panel (an invasion runs or just ended).
+        ctx.AddProbe("ui.bossbar", () => world.Hud?.BossBar.Active == true ? 1 : 0);
+        ctx.AddProbe("ui.bossbar_fill", () => world.Hud?.BossBar.Fraction ?? 0);
+        ctx.AddProbe("ui.eventbar", () => world.Hud?.EventBar.Active == true ? 1 : 0);
+        ctx.AddProbe("ui.eventbar_percent", () => world.Hud?.EventBar.Percent ?? -1);
+        // P2-25: the death screen is up (the player is dead; 0 again once they respawn).
+        ctx.AddProbe("ui.death_dim", () => world.Hud?.Death.Shown == true ? 1 : 0);
+        // The cause under the title ("smoke was slain.") is also the chat log's newest line.
+        ctx.AddProbe("ui.death_cause", () => world.Hud is { } hud && hud.Death.Cause.Length > 0 && hud.Chat.LastLine == hud.Death.Cause ? 1 : 0);
+        // P2-29: Smart Cursor is on (X toggles it), and the target is its pick rather than the cell under the crosshair.
+        ctx.AddProbe("ui.smart_cursor", () => Settings.UserSettings.Current.SmartCursor ? 1 : 0);
+        ctx.AddProbe("ui.smart_target", () => world.Interaction?.SmartTarget == true ? 1 : 0);
     }
 }

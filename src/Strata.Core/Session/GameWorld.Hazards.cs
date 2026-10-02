@@ -40,7 +40,8 @@ public sealed partial class GameWorld
                     var spike = new Vector3(x + 0.5f, y + 0.5f, z + 0.5f) * Units.CellSize;
                     var away = new Vector3(p.Center.X - spike.X, 0, p.Center.Z - spike.Z);
                     away = away.LengthSquared() > 1e-4f ? Vector3.Normalize(away) : Vector3.Zero;
-                    Npcs.ReportPlayerDamage(p, hit.Damage, away * (2f + hit.Knockback * 0.5f) + new Vector3(0, 4f, 0));
+                    Npcs.ReportPlayerDamage(p, hit.Damage, away * (2f + hit.Knockback * 0.5f) + new Vector3(0, 4f, 0),
+                        new Harm(HarmKind.Trap, Harm.WithArticle(obj.Def.DisplayName), obj.Def.Id));
                     return;
                 }
     }

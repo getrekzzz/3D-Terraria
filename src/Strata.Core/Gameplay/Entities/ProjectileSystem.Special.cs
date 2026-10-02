@@ -96,6 +96,37 @@ public sealed partial class ProjectileSystem
     /// <summary>The owner's minions (summon order).</summary>
     public IEnumerable<Projectile> MinionsOf(PlayerEntity owner) => _items.Where(x => x.Owner == owner && x.Def.Minion != null);
 
+    /// <summary>
+    /// The owner's minions by kind in summon order, as the buff bar shows them (sentries have no buff): fills
+    /// <paramref name="into"/>, cleared first, without allocating once it has grown.
+    /// </summary>
+    public void CountMinions(PlayerEntity owner, List<(ProjectileDef Def, int Count)> into)
+    {
+        into.Clear();
+        for (int i = 0; i < _items.Count; i++)
+        {
+            var p = _items[i];
+            if (p.Owner != owner || p.Def.Minion is not { IsSentry: false }) continue;
+            int k = 0;
+            while (k < into.Count && into[k].Def != p.Def) k++;
+            if (k == into.Count) into.Add((p.Def, 1));
+            else into[k] = (p.Def, into[k].Count + 1);
+        }
+    }
+
+    /// <summary>Sends the owner's minions of one kind home (right-clicking their buff); returns how many went.</summary>
+    public int Unsummon(PlayerEntity owner, ProjectileDef kind)
+    {
+        int count = 0;
+        for (int i = _items.Count - 1; i >= 0; i--)
+        {
+            if (_items[i].Owner != owner || _items[i].Def != kind || _items[i].Def.Minion == null) continue;
+            End(i);
+            count++;
+        }
+        return count;
+    }
+
     private bool TickMinion(Projectile p, PlayerEntity owner, float dt)
     {
         var m = p.Def.Minion!;

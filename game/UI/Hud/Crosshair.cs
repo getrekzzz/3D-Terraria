@@ -8,7 +8,8 @@ namespace Strata.Game.UI;
 /// The crosshair in the Crosshair region: a small cross in the cursor colour (Settings → Interface), brighter when the
 /// target is within reach. Pointing at a town resident within talking range shows the speech-bubble hint and, at a
 /// door, chest, bed, chair, lever or altar within reach, the hand hint, each with the interact key to its right; the
-/// <see cref="TargetLabel"/> names what is under it below. With no region (the inventory's layout) only the cross shows.
+/// <see cref="TargetLabel"/> names what is under it below. With Smart Cursor on the cross turns orange and the smart
+/// cursor icon sits to its left. With no region (the inventory's layout) only the cross shows.
 /// </summary>
 public sealed partial class Crosshair : Control
 {
@@ -18,6 +19,7 @@ public sealed partial class Crosshair : Control
     private readonly TargetLabel _target;
     private bool _placed;
     private bool _inReach;
+    private bool _smart;
     private Texture2D? _hint;
     private string _key = "";
     private string? _cursorSetting;
@@ -65,10 +67,12 @@ public sealed partial class Crosshair : Control
             else if (inReach && interaction.Target?.Object is { } obj && Interactive(obj.Def)) hint = UiSprites.Get("open_hint");
         }
         string setting = Settings.UserSettings.Current.CursorColor;
-        if (inReach == _inReach && hint == _hint && ReferenceEquals(setting, _cursorSetting)) return;
+        bool smart = Settings.UserSettings.Current.SmartCursor;
+        if (inReach == _inReach && hint == _hint && smart == _smart && ReferenceEquals(setting, _cursorSetting)) return;
         if (hint != null && _hint == null) _key = Settings.KeyBindings.Label("interact");
         _inReach = inReach;
         _hint = hint;
+        _smart = smart;
         if (!ReferenceEquals(setting, _cursorSetting))
         {
             _cursorSetting = setting;
@@ -80,7 +84,7 @@ public sealed partial class Crosshair : Control
     public override void _Draw()
     {
         var at = _placed ? new Vector2(Size.X / 2, UiLayout.CrosshairTop) : Vector2.Zero;
-        var c = new Color(_tint, _inReach ? 0.95f : 0.5f);
+        var c = new Color(_smart ? UiTheme.SmartCursor : _tint, _inReach ? 0.95f : 0.5f);
         var shadow = new Color(0, 0, 0, c.A * 0.6f);
         for (int pass = 0; pass < 2; pass++)
         {
@@ -91,6 +95,12 @@ public sealed partial class Crosshair : Control
             DrawLine(o + new Vector2(Gap, 0), o + new Vector2(Arm, 0), col, 2);
             DrawLine(o + new Vector2(0, -Arm), o + new Vector2(0, -Gap), col, 2);
             DrawLine(o + new Vector2(0, Gap), o + new Vector2(0, Arm), col, 2);
+        }
+        if (_smart)
+        {
+            var icon = UiSprites.Get("smart_cursor");
+            var iconSize = icon.GetSize();
+            DrawTextureRect(icon, new Rect2((at + new Vector2(-HintOffset - iconSize.X, -iconSize.Y / 2)).Round(), iconSize), false);
         }
         if (_hint == null) return;
         var size = _hint.GetSize();

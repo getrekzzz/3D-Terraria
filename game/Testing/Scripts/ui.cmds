@@ -315,6 +315,227 @@ assert ui.inventory == 0
 god off
 assert errors == 0
 
+# --- P2-13 ---
+# Life as Terraria's hearts (20 each), mana as a column of stars and breath as bubbles shown only underwater: three
+# Life Crystals add three hearts, and holding your breath in a flooded shaft pops the bubbles one by one; back in the
+# air they refill and hide.
+heal
+wait 0.2
+assert hud.hearts == 5
+assert hud.golden_hearts == 0
+assert hud.stars == 1
+assert hud.bubbles == 0
+give life_crystal 3
+wield life_crystal
+use
+wait 0.5
+use
+wait 0.5
+use
+wait 0.5
+assert hud.hearts == 8
+assert ui.overlaps == 0
+god on
+spawning off
+killall
+fill -6 -3 -6 6 -1 6 stone
+fill -6 0 -6 6 7 6 air
+wait_until player.on_floor == 1 5
+fill -2 0 -2 2 5 -2 stone
+fill -2 0 2 2 5 2 stone
+fill -2 0 -1 -2 5 1 stone
+fill 2 0 -1 2 5 1 stone
+liquids off
+liquid water -1 0 -1 1 4 1
+wait 2.5
+assert player.submerged == 1
+assert hud.bubbles >= 8
+assert hud.bubbles <= 9
+liquid none -1 0 -1 1 5 1
+liquids on
+wait_until hud.bubbles == 0 5
+god off
+assert errors == 0
+
+# --- P2-14 ---
+# The buff bar: a potion's buff shows its icon and timer; with the inventory open hovering names it and its effect,
+# and a right click cancels it, but never a debuff (Potion Sickness stays). A summoned minion shows as one more icon,
+# and cancelling it sends the minion home.
+heal
+ui close
+give swiftness_potion 1
+wield swiftness_potion
+use
+wait 0.3
+assert buff.swiftness == 1
+assert hud.buffs >= 1
+assert hud.buff_icons >= 1
+ui inventory
+wait 0.2
+ui buff hover swiftness
+assert ui.tooltip_lines >= 2
+assert ui.overlaps == 0
+ui buff cancel swiftness
+wait 0.1
+assert buff.swiftness == 0
+assert ui.tooltip_lines == 0
+ui close
+give lesser_healing_potion 1
+wield lesser_healing_potion
+use
+wait 0.3
+assert buff.potion_sickness == 1
+ui buff cancel potion_sickness
+assert buff.potion_sickness == 1
+spawning off
+killall
+give slime_staff 1
+wield slime_staff
+use
+wait 0.5
+assert hud.buffs >= 2
+ui buff cancel slime_minion
+wait 0.2
+assert projectiles.count == 0
+assert errors == 0
+
+# --- P2-21 ---
+# World messages scroll up the chat log at the bottom-left in Terraria's colours instead of a centred banner: summoning
+# a boss posts "has awoken!". The chat key opens the history (an overlay: the player keeps moving) with every kept line,
+# and closes it again; with the inventory open the log sits right of the crafting column, overlapping nothing.
+spawning off
+killall
+boss king_slime 12
+wait 0.5
+assert ui.chat_lines >= 1
+killall
+ui chat Hello from the smoke test
+assert ui.chat_lines >= 2
+assert ui.overlaps == 0
+ui history
+assert ui.chat_open == 1
+assert ui.overlay == 1
+assert ui.modal == 0
+ui history
+assert ui.chat_open == 0
+assert ui.overlay == 0
+ui inventory
+wait 0.2
+assert ui.chat_lines >= 2
+assert ui.overlaps == 0
+ui close
+assert errors == 0
+
+# --- P2-22 ---
+# Picked-up items float up over the player's head as one popup per item: a second pickup of the same item while its
+# popup is kept grows it instead of adding another; coins of every kind share one popup. (The drops below have no
+# pickup delay.)
+god on
+spawning off
+killall
+clear
+fill -6 -3 -6 6 -1 6 stone
+fill -6 0 -6 6 5 6 air
+wait 0.5
+assert ui.popups == 0
+drop dirt 5 0 0 1 0
+wait 1.0
+assert inv.dirt == 5
+assert ui.popups == 1
+drop dirt 5 0 0 1 0
+wait 1.0
+assert inv.dirt == 10
+assert ui.popups == 1
+wait 2.5
+assert ui.popups == 0
+drop copper_coin 50 0 0 1 0
+drop silver_coin 2 0 0 1 0
+wait 1.0
+assert ui.popups == 1
+assert ui.overlaps == 0
+god off
+assert errors == 0
+
+# --- P2-23 ---
+# A boss shows Terraria's boss bar bottom-centre (head icon, name, life numbers) and it goes with the boss; an invasion
+# shows its icon, name and kill progress bottom-right beside it, lingering a few seconds after it ends; nothing overlaps.
+god on
+spawning off
+killall
+boss king_slime 12
+wait 1
+assert ui.bossbar == 1
+assert ui.bossbar_fill == 1
+assert ui.overlaps == 0
+killall
+wait 1
+assert ui.bossbar == 0
+event goblin_army
+wait 1
+assert ui.eventbar == 1
+assert ui.eventbar_percent == 0
+assert ui.overlaps == 0
+boss king_slime 12
+wait 0.5
+assert ui.bossbar == 1
+assert ui.overlaps == 0
+killall
+event stop goblin_army
+wait 0.5
+assert ui.eventbar == 1
+wait 4.5
+assert ui.eventbar == 0
+god off
+assert errors == 0
+
+# --- P2-25 ---
+# Dying darkens the screen under "You were slain..." with the cause of death and the respawn countdown; the same line
+# goes to the chat log; on respawn the screen fades away.
+heal
+kill
+wait 0.5
+assert ui.death_dim == 1
+assert ui.death_cause == 1
+assert ui.chat_lines >= 1
+assert player.alive == 0
+wait 6
+assert player.alive == 1
+assert ui.death_dim == 0
+assert errors == 0
+
+# --- P2-29 ---
+# X toggles Smart Cursor (the status line says so; the crosshair turns orange with the smart cursor icon). With a
+# pickaxe the target snaps to a block it can mine near the aim: aiming just beside a lone copper ore block, which the
+# plain crosshair passes by, mines it. Toggling again turns it off.
+tp spawn
+fill -12 -3 -12 12 -1 12 stone
+fill -12 0 -12 12 24 12 air
+tp ~ ~ ~
+wait 0.5
+camera first
+assert ui.smart_cursor == 0
+press smart_cursor
+wait 0.1
+press smart_cursor off
+assert ui.smart_cursor == 1
+assert hud.status == 1
+give copper_pickaxe
+wield copper_pickaxe
+setblock 0 3 -5 copper_ore
+aim 0.25 0.06 -1
+wait 0.3
+assert ui.smart_target == 1
+hold use_primary 2.5
+wait 1.5
+assert inv.copper_ore >= 1
+press smart_cursor
+wait 0.1
+press smart_cursor off
+assert ui.smart_cursor == 0
+assert ui.smart_target == 0
+camera third
+assert errors == 0
+
 # --- P2-16 ---
 # The equipment column: Dye | Vanity | Equip with 5 accessory rows in a Classic world. A helmet equipped with a right
 # click raises the defence on the shield badge; a right click on it swaps it to the vanity column (no defence). Empty

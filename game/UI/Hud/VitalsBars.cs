@@ -1,95 +1,90 @@
 using Godot;
+using Strata.Core.Gameplay.Combat;
 using Strata.Core.Presentation;
-using Strata.Core.Session;
 
 namespace Strata.Game.UI;
 
 /// <summary>
-/// Life, mana and breath as bars in their layout regions: "Life: 80/100" over the life bar where the hearts go, the
-/// mana column at the top-right corner filling upwards under its caption, and the breath bar above the crosshair while
-/// underwater. The hearts, stars and bubbles of the reference game take these regions over later.
+/// The "bars" life display (Settings, Interface): life as a bar across the Hearts region and mana as a column filling
+/// upwards under its caption in the Mana region, in place of the hearts and stars. Values are pushed only when they
+/// change, and only while the style is shown.
 /// </summary>
 public sealed class VitalsBars
 {
     private const float BarHeight = 22;
     private const float CaptionOverhang = 8; // under the screen margin on the right, the hearts' gap on the left
 
-    private readonly UiContext _ui;
-    private readonly OutlinedText _lifeText;
-    private readonly Control _hearts;
+    private readonly Control _lifeRegion;
     private readonly ProgressBar _life;
-    private readonly Control _manaColumn;
+    private readonly Control _manaRegion;
     private readonly ProgressBar _mana;
-    private readonly ProgressBar _breath;
-    private readonly OutlinedText _breathText;
-    private bool _breathPlaced;
-    private int _shownLife = -1, _shownMax = -1, _shownBreath = -1;
+    private bool _lifePlaced, _manaPlaced, _shown;
+    private int _lifeShown = -1, _lifeMax = -1, _manaShown = -1, _manaMax = -1;
 
-    public VitalsBars(UiContext ui, Control root)
+    public VitalsBars(Control root)
     {
-        _ui = ui;
-        _lifeText = LayoutWidgets.Register(new OutlinedText { Name = "LifeText" });
-        root.AddChild(_lifeText);
-        _hearts = Region(root, "Hearts");
+        _lifeRegion = Region(root, "LifeBar");
         _life = Bar(UiTheme.Life);
-        _hearts.AddChild(_life);
-        _manaColumn = Region(root, "Mana");
-        // "Mana" is a little wider than the column, as in the reference game: centred over it, into the margin.
+        _lifeRegion.AddChild(_life);
+        _manaRegion = Region(root, "ManaBar");
         var caption = new OutlinedText
         {
             Name = "ManaCaption", Text = "Mana", FontSize = UiFonts.Small, ClipContents = false,
             Position = new Vector2(-CaptionOverhang, 0), Size = new Vector2(UiLayout.ManaWidth + 2 * CaptionOverhang, UiLayout.Caption),
         };
-        _manaColumn.AddChild(caption);
+        _manaRegion.AddChild(caption);
         _mana = Bar(UiTheme.Mana);
         _mana.FillMode = (int)ProgressBar.FillModeEnum.BottomToTop;
         _mana.Position = new Vector2(0, UiLayout.Caption + 2);
-        _manaColumn.AddChild(_mana);
-        _breath = LayoutWidgets.Register(Bar(new Color(0.55f, 0.85f, 1f)));
-        _breath.Name = "Breath";
-        _breath.MaxValue = PlayerEntity.MaxBreath;
-        _breath.Visible = false;
-        _breathText = new OutlinedText { Name = "BreathText", FontSize = UiFonts.Small };
-        _breathText.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        _breath.AddChild(_breathText);
-        root.AddChild(_breath);
+        _manaRegion.AddChild(_mana);
+    }
+
+    /// <summary>Whether the bars style is chosen (the hearts and stars hide while it is).</summary>
+    public bool Shown
+    {
+        get => _shown;
+        set
+        {
+            _shown = value;
+            Show();
+        }
     }
 
     public void Place(UiLayoutResult layout)
     {
-        _lifeText.Visible = LayoutWidgets.Place(_lifeText, layout, UiRegion.LifeText);
-        _hearts.Visible = LayoutWidgets.Place(_hearts, layout, UiRegion.Hearts);
-        _life.Size = new Vector2(_hearts.Size.X, BarHeight);
-        _manaColumn.Visible = LayoutWidgets.Place(_manaColumn, layout, UiRegion.Mana);
-        _mana.Size = new Vector2(_manaColumn.Size.X, Mathf.Max(0, _manaColumn.Size.Y - _mana.Position.Y));
-        _breathPlaced = LayoutWidgets.Place(_breath, layout, UiRegion.Breath);
-        _breath.Visible = _breathPlaced && _shownBreath is >= 0 and < PlayerEntity.MaxBreath;
+        _lifePlaced = LayoutWidgets.Place(_lifeRegion, layout, UiRegion.Hearts);
+        _life.Size = new Vector2(_lifeRegion.Size.X, BarHeight);
+        _manaPlaced = LayoutWidgets.Place(_manaRegion, layout, UiRegion.Mana);
+        _mana.Size = new Vector2(_manaRegion.Size.X, Mathf.Max(0, _manaRegion.Size.Y - _mana.Position.Y));
+        Show();
     }
 
-    public void Update()
+    public void Update(Vitals v)
     {
-        var v = _ui.Entity.State.Vitals;
-        if (v.Life != _shownLife || v.MaxLife != _shownMax)
+        if (!_shown) return;
+        if (v.Life != _lifeShown || v.MaxLife != _lifeMax)
         {
-            _shownLife = v.Life;
-            _shownMax = v.MaxLife;
+            _lifeShown = v.Life;
+            _lifeMax = v.MaxLife;
             _life.MaxValue = v.MaxLife;
             _life.Value = v.Life;
-            _lifeText.Text = $"Life: {v.Life}/{v.MaxLife}";
         }
+        if (v.Mana == _manaShown && v.MaxMana == _manaMax) return;
+        _manaShown = v.Mana;
+        _manaMax = v.MaxMana;
         _mana.MaxValue = v.MaxMana;
         _mana.Value = v.Mana;
-        int breath = _ui.Entity.Breath;
-        if (breath == _shownBreath) return;
-        _shownBreath = breath;
-        _breath.Visible = _breathPlaced && breath < PlayerEntity.MaxBreath;
-        _breath.Value = breath;
-        _breathText.Text = breath > 0 ? $"Breath {breath * 100 / PlayerEntity.MaxBreath}%" : "Drowning!";
+    }
+
+    private void Show()
+    {
+        _lifeRegion.Visible = _shown && _lifePlaced;
+        _manaRegion.Visible = _shown && _manaPlaced;
     }
 
     private static Control Region(Control root, string name)
     {
-        var c = LayoutWidgets.Register(new Control { Name = name, MouseFilter = Control.MouseFilterEnum.Ignore });
+        var c = LayoutWidgets.Register(new Control { Name = name, MouseFilter = Control.MouseFilterEnum.Ignore, Visible = false });
         root.AddChild(c);
         return c;
     }

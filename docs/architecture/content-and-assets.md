@@ -205,13 +205,23 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   "Inventory" while open), `HotbarBar` (top-left, unselected slots ease to 0.78 scale, `hotbar_tick` on every
   switch, hidden while the inventory is open), `Crosshair` (cursor colour; `talk_hint`/`open_hint` with the interact
   key; holds the `TargetLabel`), `StatusLine` (refusals and notices for 2 s under the crosshair, else the build-shape
-  hint), `InfoPanel` (info-accessory rows with the accessory's icon, FPS last, 4 Hz), `VitalsBars` (life, mana and
-  breath bars until the hearts, stars and bubbles), the buff row (`Hud.Buffs.cs`), the pickup feed in the chat region
-  and the boss bar. Text widgets draw through `OutlinedText` (no minimum size, clipped), so nothing outgrows its
+  hint), `InfoPanel` (info-accessory rows with the accessory's icon, FPS last, 4 Hz), the vitals (`Hud.Vitals.cs`:
+  "Life: X/Y" over `LifeHearts`, `ManaStars` and `BreathBubbles`, each drawn in `_Draw` from the `heart`/`heart_gold`/
+  `star`/`bubble` sprites with Core `VitalsDisplay` maths: 20 life per heart, golden per Life Fruit past 400 from the
+  permanent maximum, the partial icon at 0.6 + 0.4·fill scale and 0.4 + 0.6·fill alpha, the last full heart beating
+  at 15 Hz redraws, bubbles only below full breath and flashing red at 0; `UserSettings.LifeDisplay` "bars" swaps the
+  hearts and stars for `VitalsBars`), the `BuffBar` (pooled `BuffIconView`s rebound only on `BuffSet.Changed`, a
+  count change, or a change in the minions (`ProjectileSystem.CountMinions`, one icon per kind with its count, the
+  staff's icon) or the minecart; countdowns from `BuffDisplay.Timer`, hidden where `ShowsTimer` is false, redrawn
+  when the whole second changes, blinking in the last 5 s; while `InputGate.MouseFree` the icons take the mouse:
+  hover shows `TooltipFollower.ShowText` with the name and `BuffText.Describe`, a right click goes through
+  `BuffBar.Cancel` (`BuffSet.TryCancel` + `Recompute`, refused for debuffs and persistent buffs; minions go home via
+  `ProjectileSystem.Unsummon`)), the pickup feed in the chat region and the boss bar. Text widgets draw through `OutlinedText` (no minimum size, clipped), so nothing outgrows its
   region; the minimap has a 9-slice `minimap_frame` and +/− buttons (zoom 0.5–6) on CanvasLayer 10, above the click
   catcher. Every placed control joins `LayoutWidgets.Group`; probe `ui.overlaps` counts intersecting pairs in the live
   tree (and logs them). Smoke: `ui f3`, `ui minimap in|out`; probes `hud.item_name`, `hud.status`,
-  `ui.layout_width`, `ui.minimap_zoom`.
+  `ui.layout_width`, `ui.minimap_zoom`, `hud.hearts`, `hud.golden_hearts`, `hud.stars`, `hud.bubbles`, `hud.buffs`;
+  `ui buff <cancel|hover> <id>`.
 * **Inventory screen** (`game/UI/InventoryScreen*.cs`, `game/UI/Inventory/`): Terraria's layout on the HUD's
   `UiLayout` (the HUD feeds it `InventoryScreen.Panel` and `AccessoryRows` and calls `InventoryScreen.Place` from
   `LayoutApplied`; `LayoutChanged` lays it out at once on open, close or a panel change). The backpack's 10×5 grid

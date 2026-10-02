@@ -99,7 +99,7 @@ public sealed partial class NpcSystem
             var hit = DamageModel.Roll(ContactBase(npc), Content.Defs.DamageClass.None, 0, 0f, null, state.Defense,
                 DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction), 1f, ref _rng);
             if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) continue;
-            ReportPlayerDamage(p, hit.Damage, new Vector3(dir * BarrierThrow, 5f, 0));
+            ReportPlayerDamage(p, hit.Damage, new Vector3(dir * BarrierThrow, 5f, 0), Harm.By(npc.Def));
         }
     }
 }
