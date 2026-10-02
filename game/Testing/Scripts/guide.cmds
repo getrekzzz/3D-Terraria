@@ -56,6 +56,9 @@ book item torch
 assert ui.book_sources >= 2
 book item gel
 assert ui.book_sources >= 2
+book bestiary zombie
+assert ui.book_tab == 1
+assert ui.bestiary_unlock >= 2
 book entry shelter
 assert ui.book_tab == 2
 assert ui.book_guide == 1

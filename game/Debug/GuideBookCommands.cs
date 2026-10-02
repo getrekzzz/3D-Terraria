@@ -27,11 +27,12 @@ public static class GuideBookCommands
                     case "close":
                         book.Close();
                         return CommandResult.Success("Closed.");
-                    case "item" or "entry" when id != null:
-                        if (!book.IndexReady ) return CommandResult.Fail("The book is still loading.");
+                    case "item" or "entry" or "bestiary" when id != null:
+                        if (!book.IndexReady && what != "bestiary") return CommandResult.Fail("The book is still loading.");
                         bool ok = what switch
                         {
                             "item" => book.Open("items") && book.Items.Show(id),
+                            "bestiary" => book.Open("bestiary") && book.Bestiary.Show(id),
                             _ => book.OpenEntry(id),
                         };
                         return ok ? CommandResult.Success($"Showing {id}.") : CommandResult.Fail($"No entry '{id}'.");

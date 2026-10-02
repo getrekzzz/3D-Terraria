@@ -43,4 +43,14 @@ public class GuideIndexTests
         Assert.Equal("33.33%", GuideIndex.Percent(1f / 3f));
         Assert.Equal("<0.01%", GuideIndex.Percent(0.00001f));
     }
+
+    [Fact]
+    public void HabitatDescribesSpawnsAndSummons()
+    {
+        using var g = TestGame.Create();
+        var zombie = Habitat.For(g.Content, g.Content.Enemies.Get("zombie"));
+        Assert.Contains(zombie.Places, p => p.Contains("night") && p.Contains("urface"));
+        var eye = Habitat.For(g.Content, g.Content.Enemies.Get("eye_of_cthulhu"));
+        Assert.Contains(eye.SummonedBy, i => i.Id == "suspicious_looking_eye");
+    }
 }

@@ -588,3 +588,11 @@ K while a hint with a `guide` entry is up opens the book there. Command `book <t
 probes `ui.book_open`, `ui.book_ready`, `ui.book_tab`, `ui.book_items`, `ui.book_sources`, `ui.book_guide`.
 Not yet: Bosses/NPCs/Achievements tabs, the inventory's book button (InventoryScreen is W4-owned), a page-turn sound.
 
+## Bestiary tab (P5-31)
+
+`BestiaryTab` lists `Bestiary.Entries` ("???" until seen) with filters All/Unlocked/Bosses/Critters/Town, search over
+known names, completion % and portraits (`PortraitIcons`) loaded a few per frame. `BestiaryDetails` by tier: seen →
+portrait and habitat (Core `Habitat.For`: each spawn rule of the entry through `ConditionDescriber`, events it ends,
+summon items from `summonBoss` behaviours); stats → life, defence, damage (scaled by `NpcSystem.Scale`), knockback
+resist, coins, description; full → every drop with its chance. Residents show the description and when they move
+in. Probe `ui.bestiary_unlock`. Not yet: the rotating 3D preview (thumbnails stand in), biome filter.

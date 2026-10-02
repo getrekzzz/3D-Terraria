@@ -7,7 +7,7 @@ using Strata.Core.Session;
 namespace Strata.Game.UI.GuideBook;
 
 /// <summary>
-/// The Guide book (P5-30): a themed two-page book with bookmark tabs (Items, Guide). Toggled with the
+/// The Guide book (P5-30): a themed two-page book with bookmark tabs (Items, Bestiary, Guide). Toggled with the
 /// guide_book key (Esc closes); nothing is built until it first opens, and each tab builds on its first selection.
 /// The Items index is built on a worker thread at world launch; the Items tab says "Loading…" until it is ready.
 /// A hint's Guide link (X-10) opens the book at that entry when the key is pressed while the hint is up.
@@ -32,6 +32,7 @@ public partial class GuideBookScreen : CanvasLayer
     public bool IndexReady => _ctx.Index != null;
     public IGuideTab? Current => _current;
     public ItemsTab Items { get; } = new();
+    public BestiaryTab Bestiary { get; } = new();
     public GuideTab Guide { get; } = new();
 
     public void Initialize(UiContext ui)
@@ -40,6 +41,7 @@ public partial class GuideBookScreen : CanvasLayer
         Layer = 24;
         _ctx = new GuideBookContext { Ui = ui, Book = this };
         _tabs.Add(Items);
+        _tabs.Add(Bestiary);
         _tabs.Add(Guide);
         _indexTask = GuideIndex.BuildAsync(ui.Game.Session.Content);
         ui.Game.Hints.Shown += OnHint;
@@ -100,6 +102,7 @@ public partial class GuideBookScreen : CanvasLayer
     {
         var content = _ctx.Ui.Game.Session.Content;
         IGuideTab? tab = content.GuideSteps.Contains(id) || content.GuideTips.Contains(id) ? Guide
+            : content.Enemies.Contains(id) || content.TownNpcs.Contains(id) ? Bestiary
             : content.Items.Contains(id) ? Items : null;
         if (tab == null || !Open(tab.Key)) return false;
         return tab.Show(id);
