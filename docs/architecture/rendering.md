@@ -56,6 +56,16 @@ near chunks draw the detailed clump (9 curved blades), far ones a 5-blade clump 
 widens far blades so the cover stays even, sinks them into the ground at the distance limit, bends them with gusts
 travelling downwind and parts them around the player (`strata_trample`). Grass casts no shadows.
 
+## Tile objects
+`TileObjectRenderer` draws one MultiMesh per chunk and model variant and updates it in place: one float buffer per
+group (3×4 transform plus light as custom data) goes up with a single `MultimeshSetBuffer`; capacity grows by 1.5× and
+`VisibleInstanceCount` hides the spare. A chunk is marked by the cheapest update that covers the change: structure
+(objects added or removed, a door or wire toggled) regroups it, placement (its collision changed: wait for
+`ColliderManager.BodyBuilt`, which `WorldRuntime.MeshApplied` reports as `Pending`) re-places it once, light (a remesh
+with unchanged collision) only rewrites the light. Flames are rebuilt only when their bases move. Updates run nearest
+the camera first within `Budgets.ObjectsMs` (at least one chunk a frame); probes `objects.rebuilds`,
+`objects.light_refreshes`, `objects.pending` (`colliders reset` also zeroes the object counters).
+
 ## Horizon
 Beyond the streamed chunks the world continues as a heightfield (`HorizonField`, Core, tested): terrain height from
 the generator's `TerrainField`, the surface biome's map colour, and the sea over low ground and past the world's edge.

@@ -62,6 +62,12 @@ assert objects.count >= 10
 probe colliders.skipped
 assert colliders.rebuilt <= 2
 assert perf.calls.gd.objects.rebuild > 0
+# Tile objects: one regroup per torch chunk and edit, light-only remeshes rewrite light in place.
+probe objects.rebuilds
+probe objects.light_refreshes
+assert objects.rebuilds <= 14
+assert objects.light_refreshes > 0
+probe perf.max.gd.objects
 
 # Water pours onto the floor and spreads.
 liquid water 3 0 3 5 2 5

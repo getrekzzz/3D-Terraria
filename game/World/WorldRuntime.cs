@@ -39,6 +39,12 @@ public sealed partial class WorldRuntime : Node3D
     /// <summary>This frame's main-thread budgets (computed first in <see cref="_Process"/>; presentation nodes read it).</summary>
     public FrameBudgets Budgets { get; private set; } = FrameBudgetPlanner.Loading;
 
+    /// <summary>
+    /// A mesh result was applied to a chunk; says whether its collision changed (<see cref="ColliderChange.Pending"/>:
+    /// new bodies follow with <see cref="ColliderManager.BodyBuilt"/>) or not (a light- or liquid-only remesh).
+    /// </summary>
+    public event System.Action<Int3, ColliderChange>? MeshApplied;
+
     /// <summary>When false the fixed tick is paused (menus, loading).</summary>
     public bool Simulating { get; set; } = true;
 
@@ -76,7 +82,8 @@ public sealed partial class WorldRuntime : Node3D
         {
             _renderer.Enqueue(result);
             _grass?.Set(result.Coord, result.Grass);
-            _colliders.SetData(result.Coord, result.Collision, result.Version);
+            var change = _colliders.SetData(result.Coord, result.Collision, result.Version);
+            MeshApplied?.Invoke(result.Coord, change);
         };
         // Player edits rebuild their colliders before distance-ordered work.
         System.Func<Int3, int> chunkVersion = c => Session.World.GetChunk(c)?.Version ?? 0;

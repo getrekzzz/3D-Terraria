@@ -54,6 +54,9 @@ public sealed class GodotCommandHost : ICommandHost
             return world.Props.Problems.Count;
         });
         ctx.AddProbe("objects.instances", () => world.Objects.InstanceCount);
+        ctx.AddProbe("objects.rebuilds", () => world.Objects.Rebuilds);
+        ctx.AddProbe("objects.light_refreshes", () => world.Objects.LightRefreshes);
+        ctx.AddProbe("objects.pending", () => world.Objects.PendingCount);
         ProbeSources.RegisterAll(ctx, typeof(GodotCommandHost).Assembly, world, log);
         return ctx;
     }
