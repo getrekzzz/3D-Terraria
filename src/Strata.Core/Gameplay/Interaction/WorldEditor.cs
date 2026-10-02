@@ -55,6 +55,12 @@ public sealed partial class WorldEditor
     /// <summary>Raised with every chunk whose mesh or lighting must be rebuilt.</summary>
     public event Action<HashSet<Int3>>? ChunksDirty;
 
+    /// <summary>
+    /// Chunks whose lighting changed but whose blocks did not (the neighbours of a placed, broken or switched light):
+    /// remeshed without jumping the queue.
+    /// </summary>
+    public event Action<HashSet<Int3>>? LightDirty;
+
     /// <summary>Raised after every mining swing that hit something (dust, sounds).</summary>
     public event Action<MineOutcome>? Struck;
 

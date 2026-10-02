@@ -35,6 +35,9 @@ public sealed partial class WorldRuntime : Node3D
     /// <summary>Node whose position drives streaming (player or camera).</summary>
     public Node3D? Focus { get; set; }
 
+    /// <summary>This frame's main-thread budgets (computed first in <see cref="_Process"/>; presentation nodes read it).</summary>
+    public FrameBudgets Budgets { get; private set; } = FrameBudgetPlanner.Loading;
+
     /// <summary>When false the fixed tick is paused (menus, loading).</summary>
     public bool Simulating { get; set; } = true;
 
@@ -74,6 +77,8 @@ public sealed partial class WorldRuntime : Node3D
             _grass?.Set(result.Coord, result.Grass);
             _colliders.SetData(result.Coord, result.Collision);
         };
+        // Player edits rebuild their colliders before distance-ordered work.
+        game.Editor.ChunksDirty += _colliders.Prioritize;
         Streamer.ChunkRemoved += coord =>
         {
             _renderer.Remove(coord);
@@ -111,11 +116,12 @@ public sealed partial class WorldRuntime : Node3D
         using var frame = prof.Time("gd.world_runtime");
         prof.Record("frame.delta", delta * 1000.0);
         var focus = FocusCell;
-        // Finish more background work per frame when it piles up (initial load, fast travel).
-        int backlog = Jobs.Completions.Count;
-        using (prof.Time("gd.stream_and_jobs")) Game.Update(focus, backlog > 64 ? 14.0 : backlog > 16 ? 8.0 : 4.0);
-        using (prof.Time("gd.mesh_uploads")) _renderer.ProcessUploads(3.0);
-        using (prof.Time("gd.colliders")) _colliders.UpdateFocus(ChunkMath.CellToChunk(focus));
+        // Big budgets only behind the loading screen; during play they stay small and shrink after a slow frame.
+        bool loading = Focus is Player.PlayerController { Frozen: true };
+        var budgets = Budgets = FrameBudgetPlanner.Plan(loading, Jobs.Completions.Count, delta * 1000.0);
+        using (prof.Time("gd.stream_and_jobs")) Game.Update(focus, budgets.JobsMs);
+        using (prof.Time("gd.mesh_uploads")) _renderer.ProcessUploads(budgets.UploadsMs);
+        using (prof.Time("gd.colliders")) _colliders.UpdateFocus(ChunkMath.CellToChunk(focus), budgets.CollidersMs);
         _environment.EventTint = Game.Events.SkyTint is { } tint ? Color.FromHtml(tint) : null;
         if (Engine.GetProcessFrames() % 15 == 0) _environment.Biome = BiomeAround(focus);
         var camera = GetViewport().GetCamera3D();

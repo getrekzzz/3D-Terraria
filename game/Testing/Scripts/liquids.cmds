@@ -12,10 +12,13 @@ fill -6 0 -2 -4 0 2 air
 wait 0.5
 assert errors == 0
 
-# Poured water falls into the basin, spreads and settles.
+# Poured water falls into the basin, spreads and settles. Liquid-only remeshes leave the colliders alone.
+colliders reset
 liquid water 5 5 0
 assert liquid.5.5.0 == 31
 wait_until liquid.active == 0 20
+wait 3
+assert colliders.skipped > 0
 assert liquid.5.5.0 == 0
 assert liquid.5.0.0 > 0
 liquids

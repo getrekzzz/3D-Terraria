@@ -65,6 +65,7 @@ public static class ChunkMesher
         var vol = new MeshVolume(nb, tables, light);
         SurfaceNetsMesher.Build(vol, result.Opaque, result.Collision);
         CellMesher.Build(vol, result.Opaque, result.Transparent, result.Cutout, result.Collision);
+        result.Collision.ComputeHashes();
         LiquidMesher.Build(vol, result.Liquid, result.Lava, result.LavaTops);
         GrassScatter.Build(vol, result.Opaque, result.Grass);
         result.Visibility = ChunkVisibility.Compute(nb, tables);

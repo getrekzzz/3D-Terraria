@@ -41,6 +41,9 @@ public sealed class GodotCommandHost : ICommandHost
         ctx.AddProbe("errors", () => log.Errors);
         ctx.AddProbe("warnings", () => log.Warnings);
         ctx.AddProbe("colliders.bodies", () => runtime.Colliders.BodyCount);
+        ctx.AddProbe("colliders.rebuilt", () => runtime.Colliders.Rebuilt);
+        ctx.AddProbe("colliders.skipped", () => runtime.Colliders.Skipped);
+        ctx.AddProbe("colliders.pending", () => runtime.Colliders.PendingCount);
         ctx.AddProbe("uploads.pending", () => runtime.Renderer.PendingUploads);
         ctx.AddProbe("chunks.hidden", () => runtime.Renderer.HiddenCount);
         ctx.AddProbe("chunks.triangles", () => runtime.Renderer.ShownTriangles);

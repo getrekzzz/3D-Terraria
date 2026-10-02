@@ -23,6 +23,10 @@ wait_until player.frozen == 0 300
 wait_until stream.idle == 1 900
 assert perf.frames > 0
 assert perf.calls.gd.colliders.build > 0
+# Streaming and job completions stay inside the frame budgets (12 ms while loading, 3-5 ms in play). Generous
+# headless bound; the rendering run shows the real per-frame average.
+probe perf.avg.gd.stream_and_jobs
+assert perf.avg.gd.stream_and_jobs < 14
 probe perf.gc2
 probe perf.calls.stream.unload_flush
 probe perf.max.stream.unload_flush
@@ -41,6 +45,7 @@ probe perf.max.stream.unload_flush
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 7 10 air
 wait 1.0
+colliders reset
 place torch -8 0 -8
 place torch -4 0 -8
 place torch 0 0 -8
@@ -53,6 +58,9 @@ place torch 8 0 8
 place torch -8 0 0
 wait 1.0
 assert objects.count >= 10
+# Light-only remeshes keep the collision geometry: (almost) no collider rebuilds.
+probe colliders.skipped
+assert colliders.rebuilt <= 2
 assert perf.calls.gd.objects.rebuild > 0
 
 # Water pours onto the floor and spreads.
