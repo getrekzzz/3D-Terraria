@@ -93,7 +93,7 @@ public static class CombatCommands
         });
         r.Register(new CommandDef
         {
-            Name = "damage", Usage = "damage <enemy id> <amount>", Help = "Takes life from every living creature of a kind (never below 1): puts a boss into a later phase.",
+            Name = "wound", Usage = "wound <enemy id> <amount>", Help = "Takes life from every living creature of a kind (never below 1): puts a boss into a later phase.",
             Run = (ctx, a) =>
             {
                 var id = a.Str(0, "enemy");
@@ -107,6 +107,20 @@ public static class CombatCommands
                         n++;
                     }
                 return CommandResult.Success($"Hurt {n} creatures.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "damage", Usage = "damage <enemy> <amount> [segment]", Help = "Hits the first living creature of a kind (a worm's segment, 0 = the first behind the head); defense applies.",
+            Run = (ctx, a) =>
+            {
+                var id = a.Str(0, "enemy");
+                var npc = ctx.World.Npcs.All.FirstOrDefault(n => n.Alive && n.Def.Id == id) ?? throw new CommandException($"no living '{id}'");
+                int amount = a.Int(1, "amount");
+                int segment = a.Count > 2 ? a.Int(2, "segment") : -1;
+                if (segment >= npc.Segments.Count) throw new CommandException($"'{id}' has {npc.Segments.Count} segments");
+                bool hit = ctx.World.Npcs.Hit(npc, null, amount, Content.Defs.DamageClass.None, 0, 0f, npc.Center, melee: false, segment: segment);
+                return hit ? CommandResult.Success($"Hit {npc.Def.DisplayName} for up to {amount}.") : CommandResult.Fail("it is immune");
             },
         });
         r.Register(new CommandDef

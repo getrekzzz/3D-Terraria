@@ -55,6 +55,7 @@
     "loot/bosses.json",
     "loot/containers.json",
     "loot/enemies.json",
+    "loot/segments.json",
     "recipes/basic.json",
     "recipes/materials.json",
     "tileobjects/furniture.json",

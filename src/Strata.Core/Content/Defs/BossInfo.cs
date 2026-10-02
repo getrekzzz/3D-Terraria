@@ -99,6 +99,23 @@ public sealed class BossInfo
     /// <summary>Roll the loot table only when the whole group falls (a pair's last eye), not for every member.</summary>
     public bool LootOnDefeat { get; init; }
 
+    /// <summary>
+    /// Per-segment life [head, body, tail] (the Eater of Worlds): every segment is hit and dies on its own. Empty = the
+    /// head's life is the whole worm's.
+    /// </summary>
+    public int[] SegmentLife { get; init; } = Array.Empty<int>();
+
+    /// <summary>Defense and contact damage per segment kind [head, body, tail]; empty = the creature's own.</summary>
+    public int[] SegmentDefense { get; init; } = Array.Empty<int>();
+
+    public int[] SegmentDamage { get; init; } = Array.Empty<int>();
+
+    /// <summary>A killed body segment cuts the worm in two (each piece its own worm of the same boss group).</summary>
+    public bool Splits { get; init; }
+
+    /// <summary>Loot table rolled where each segment dies (Shadow Scales and Demonite Ore).</summary>
+    public string? SegmentLoot { get; init; }
+
     /// <summary>A gathering at a landmark that calls this boss up when disturbed (the Lunatic Cultist's devotees).</summary>
     public BossRitual? Ritual { get; init; }
 }

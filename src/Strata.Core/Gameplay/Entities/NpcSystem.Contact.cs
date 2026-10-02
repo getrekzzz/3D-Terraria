@@ -15,9 +15,10 @@ public sealed partial class NpcSystem
         foreach (var tag in player.State.Effects.Pacified)
             if (npc.Def.HasTag(tag)) return;
         var pBox = (player.Center - PlayerEntity.HalfExtents, player.Center + PlayerEntity.HalfExtents);
-        if (!Touches(npc, pBox)) return;
+        int volume = Touched(npc, pBox);
+        if (volume < 0) return;
         var state = player.State;
-        var hit = DamageModel.Roll(ContactBase(npc), DamageClass.None, 0, 6f, null, state.Defense,
+        var hit = DamageModel.Roll(ContactOf(npc, volume), DamageClass.None, 0, 6f, null, state.Defense,
             DamageModel.DefenseFactor(_world.Session.Settings.Difficulty), state.Effects.Stats.Bonus(Stats.StatIds.EnduranceReduction),
             state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), ref _rng);
         if (!state.Vitals.Hurt(hit.Damage, PlayerHitImmunity + (int)state.Effects.Stats.Bonus(Stats.StatIds.Immunity))) return;
@@ -30,15 +31,18 @@ public sealed partial class NpcSystem
         if (thorns > 0) Hit(npc, null, (int)(npc.Def.Damage * npc.DamageScale * thorns), DamageClass.None, 0, 0f, player.Center, melee: false);
     }
 
-    /// <summary>Any of the creature's volumes (body, segments) overlaps a box; allocation-free (runs every tick).</summary>
-    private static bool Touches(Npc npc, (Vector3 Min, Vector3 Max) box)
+    /// <summary>
+    /// The first of the creature's volumes overlapping a box: 0 = body (head), i + 1 = segment i, −1 = none;
+    /// allocation-free (runs every tick).
+    /// </summary>
+    private static int Touched(Npc npc, (Vector3 Min, Vector3 Max) box)
     {
-        if (Npc.Overlaps(npc.Box, box)) return true;
-        if (npc.Segments.Count == 0) return false;
+        if (Npc.Overlaps(npc.Box, box)) return 0;
+        if (npc.Segments.Count == 0) return -1;
         var half = new Vector3(npc.Def.Boss?.SegmentRadius ?? 0.5f);
         for (int i = 0; i < npc.Segments.Count; i++)
-            if (Npc.Overlaps((npc.Segments[i] - half, npc.Segments[i] + half), box)) return true;
-        return false;
+            if (Npc.Overlaps((npc.Segments[i] - half, npc.Segments[i] + half), box)) return i + 1;
+        return -1;
     }
 
     /// <summary>Announces damage a player took from any source (numbers, knockback, hurt effects).</summary>

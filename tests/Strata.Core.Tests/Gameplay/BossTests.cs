@@ -47,7 +47,15 @@ public class BossTests
         g.Ticks(2);
         Assert.True(g.World.Npcs.All.Count >= before + 3, "no minions shed");
 
-        g.Player.Position += new Vector3(0, 0, -40f);
+        // The player runs off to an open pad 27 m away in the loaded chunks (the slime only lands where its box is free).
+        var stone = g.Content.BlockId("stone");
+        var batch = g.World.Session.World.BeginEdit();
+        for (int dx = 44; dx <= 62; dx++)
+            for (int dz = -10; dz <= 10; dz++)
+                for (int dy = 0; dy <= 16; dy++)
+                    batch.SetBlock(g.Floor.X + dx, g.Floor.Y + dy, g.Floor.Z + dz, dy == 0 ? stone : (ushort)0);
+        g.World.Session.Commit(batch);
+        g.Player.Position = TestGame.CellFeet(g.Floor + new Strata.Core.Common.Int3(54, 1, 0));
         g.Ticks(60 * 6);
         Assert.True(Vector3.Distance(boss.Position, g.Player.Position) < 15f, "boss did not follow the player");
     }
@@ -91,7 +99,7 @@ public class BossTests
             g.World.Tick();
             if (i % 20 == 0) trace.Append($"[{i}: rel={boss.Center - g.Player.Position} vel={boss.Velocity} target={boss.TargetPlayer} solid={g.World.Session.World.IsSolid(Strata.Core.Physics.VoxelMotion.CellOf(boss.Center).X, Strata.Core.Physics.VoxelMotion.CellOf(boss.Center).Y, Strata.Core.Physics.VoxelMotion.CellOf(boss.Center).Z)}] ");
         }
-        Assert.Equal(18, boss.Segments.Count);
+        Assert.Equal(49, boss.Segments.Count);
         for (int i = 1; i < boss.Segments.Count; i++)
             Assert.InRange(Vector3.Distance(boss.Segments[i], boss.Segments[i - 1]), 0.5f, 1.2f);
 
@@ -103,14 +111,15 @@ public class BossTests
                     if (world.GetBlock(g.Floor + new Strata.Core.Common.Int3(x, y, z)) == 0) open++;
         Assert.True(open > 0, "the worm did not dig " + trace);
 
-        // A projectile at a body segment damages the shared life pool (fresh worm inside the loaded arena).
+        // A projectile at a body segment damages that segment (fresh worm inside the loaded arena).
         g.World.Npcs.Clear();
         boss = Boss(g, "eater_of_worlds", new Vector3(0, 5f, 6f));
-        int life = boss.Life;
+        int life = boss.TotalLife, head = boss.Life;
         var seg = boss.Segments[1];
         g.World.Projectiles.Spawn(g.Content.Projectiles.Get("wooden_arrow"), seg + new Vector3(0, 0, -0.1f), Vector3.Zero, g.Player, 20, 1, Strata.Core.Content.Defs.DamageClass.Ranged, 0);
         g.World.Projectiles.Tick();
-        Assert.True(boss.Life < life);
+        Assert.True(boss.TotalLife < life);
+        Assert.Equal(head, boss.Life);
     }
 
     [Fact]

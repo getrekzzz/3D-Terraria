@@ -63,4 +63,22 @@ public sealed class EventDef : ContentDef
     /// Pillars). One whose boss flag is already set is skipped; missing ones return when a saved event is loaded.
     /// </summary>
     public string[] Places { get; init; } = Array.Empty<string>();
+
+    /// <summary>
+    /// A boss arrival ("You feel an evil presence watching you..."): <see cref="Duration"/> is the countdown after the
+    /// start message, at whose end this boss is called near the player (unless one lives or it is already defeated).
+    /// </summary>
+    public string? SpawnBoss { get; init; }
+
+    /// <summary>Once this flag is set the kill goal is <see cref="KillGoalAfter.Goal"/> instead (slime rain after King Slime).</summary>
+    public KillGoalAfter? KillGoalAfterFlag { get; init; }
+
+    /// <summary>Events sharing a group compete: per roll one eligible member is picked at random and only it rolls its chance.</summary>
+    public string? Group { get; init; }
+}
+
+public sealed class KillGoalAfter
+{
+    public string Flag { get; init; } = "";
+    public int Goal { get; init; }
 }

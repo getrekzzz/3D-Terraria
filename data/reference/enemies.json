@@ -149,6 +149,17 @@
    ]
   },
   {
+   "id": "terraria:spiked_slime",
+   "name": "Spiked Slime",
+   "kind": "enemy",
+   "stage": "early",
+   "source": "king slime (expert)",
+   "mechanics": [
+    "hop",
+    "projectiles"
+   ]
+  },
+  {
    "id": "terraria:zombie",
    "name": "Zombie",
    "kind": "enemy",

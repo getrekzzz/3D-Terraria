@@ -127,6 +127,11 @@ public static class ConditionCompiler
             var p = s.Parse<RangeConditionParams>();
             return new DelegateCondition(c => c.FishingPower >= p.Min && c.FishingPower <= p.Max);
         },
+        ["worldRing"] = s =>
+        {
+            var p = s.Parse<RangeConditionParams>();
+            return new DelegateCondition(c => c.CentreDistance >= p.Min && c.CentreDistance <= p.Max);
+        },
         ["all"] = s => new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["any"] = s => new AnyCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray()),
         ["not"] = s => new NotCondition(new AllCondition(s.Parse<CompositeConditionParams>().Of.Select(Compile).ToArray())),
@@ -169,6 +174,7 @@ public static class ConditionCompiler
         c.Register<ExpertConditionParams>(SpecKind.Condition, "expert");
         c.Register<RangeConditionParams>(SpecKind.Condition, "defense");
         c.Register<EvilConditionParams>(SpecKind.Condition, "evil");
+        c.Register<RangeConditionParams>(SpecKind.Condition, "worldRing");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "all");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "any");
         c.Register<CompositeConditionParams>(SpecKind.Condition, "not");

@@ -48,6 +48,9 @@ public sealed class BrainContext
     /// <summary>No solid cell between two points.</summary>
     public Func<Vector3, Vector3, bool>? InSight { get; set; }
 
+    /// <summary>A box (centre, half-extents) overlaps no solid terrain: somewhere a creature can be placed without sticking.</summary>
+    public Func<Vector3, Vector3, bool>? Fits { get; set; }
+
     /// <summary>Plays a sound cue at a creature (a roar, a telegraph): raises NpcSystem.Cued.</summary>
     public Action<Npc, string>? Cue { get; set; }
 

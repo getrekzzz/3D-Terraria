@@ -128,7 +128,7 @@ public sealed partial class NpcRenderer : Node3D
                 view.Spin = 1f;
             }
             var visual = view.Visual;
-            visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.LiftFor(npc.HalfExtents.Y * 2f, npc.Def.Scale) : view.Shown;
+            visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.LiftFor(npc.HalfExtents.Y * 2f, npc.Def.Scale * npc.VisualScale) : view.Shown;
             if (npc.Segments.Count > 0) UpdateSegments(npc, view, world);
             if (npc.Barrier != null) UpdateBarrier(npc, view, world);
             if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
@@ -166,6 +166,7 @@ public sealed partial class NpcRenderer : Node3D
         var boss = npc.Def.Boss!;
         var segModel = boss.SegmentModel ?? view.Model;
         bool freeParts = boss.SegmentModels.Length > 0;
+        if (!freeParts) SyncSegmentViews(npc, view, segModel);
         while (view.Segments.Count < npc.Segments.Count)
         {
             int index = view.Segments.Count;
@@ -190,6 +191,30 @@ public sealed partial class NpcRenderer : Node3D
             seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
             seg.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, p)));
             ahead = p;
+        }
+    }
+
+    /// <summary>
+    /// A worm that lost segments (split, or its head handed on) drops the extra visuals back into the pool, and its
+    /// last visual wears the tail model while the others wear the body's.
+    /// </summary>
+    private void SyncSegmentViews(Npc npc, View view, string segModel)
+    {
+        while (view.Segments.Count > npc.Segments.Count)
+        {
+            var (visual, model) = view.Segments[^1];
+            Release(visual, model);
+            view.Segments.RemoveAt(view.Segments.Count - 1);
+        }
+        var tailModel = npc.Def.Boss!.TailModel ?? segModel;
+        int last = npc.Segments.Count - 1;
+        for (int i = 0; i < view.Segments.Count; i++)
+        {
+            var want = i == last ? tailModel : segModel;
+            if (view.Segments[i].Model == want) continue;
+            if (Acquire(want) is not { } swapped) continue;
+            Release(view.Segments[i].Visual, view.Segments[i].Model);
+            view.Segments[i] = (swapped, want);
         }
     }
 
