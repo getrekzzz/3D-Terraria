@@ -356,6 +356,14 @@
   `TownCommerce.SaleValue`; kind by `Coins.TopTier`, "No value" at 0). `BuffDisplay` (timer text, cancel/timer
   rules incl. `hideTimer`), `VitalsDisplay` (hearts, golden hearts, stars, bubbles) and `Content.Index.StationNames`
   ("Iron Anvil or Lead Anvil", cached per database) are the Core maths the HUD, crafting and the Guide read.
+* **Chat log** — world messages go to `ChatLog` (game/UI/Hud/ChatLog.cs) in the layout's Chat region, never a
+  centred banner: `NpcSystem.Messaged` (coloured by `MessageColors.Hex(MessageKind)`; it carries "has awoken!" and
+  "has been defeated!" too), `BossLeft`, town arrivals/departures (blue) and deaths (red), events (invasions purple,
+  others green), progression and objective lines, and catches in rarity colour — wired in `Hud.Messages.cs`
+  (`Hud.Announce(text, colour)` forwards there). `ChatHistory` (Core) keeps the last 50 lines and the fade maths (10 s
+  hold, 1 s fade, the last 10 shown); the `chat` action (Enter) opens the history as an overlay gate. The optional
+  `BigAnnouncements` setting adds a 24 px banner for "has awoken!" only. Command `ui chat <text>`/`ui history`, probes
+  `ui.chat_lines`/`ui.chat_open`.
 * **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance

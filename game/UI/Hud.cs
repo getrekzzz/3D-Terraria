@@ -9,7 +9,8 @@ namespace Strata.Game.UI;
 /// The in-game overlay on the <see cref="UiLayout"/> model, laid out like Terraria's: the selected item's name and the
 /// hotbar top-left with the buff row under them, the hearts and mana stars top-right above the minimap and the info
 /// panel, the crosshair with its interaction hint and target name at the centre, the breath bubbles above it and the
-/// status line under it, the pickup feed bottom-left, the boss bar bottom-centre, event banners and the death screen.
+/// status line under it, the chat log bottom-left (Hud.Messages), pickup popups over the player's head, the boss bar
+/// bottom-centre and the death screen.
 /// <see cref="ApplyLayout"/> places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3
 /// overlay) when the window, the UI scale or what is shown changes (the inventory and its panel and accessory rows, an
 /// NPC chat, a boss, the buff count, the info rows, the minimap setting, the F3 overlay), never per frame; the inventory
@@ -17,8 +18,6 @@ namespace Strata.Game.UI;
 /// </summary>
 public sealed partial class Hud : CanvasLayer
 {
-    private const int FeedLines = 6;
-
     private UiContext _ui = null!;
     private ItemNameLabel _itemName = null!;
     private HotbarBar _hotbar = null!;
@@ -26,9 +25,7 @@ public sealed partial class Hud : CanvasLayer
     private Crosshair _crosshair = null!;
     private StatusLine _status = null!;
     private InfoPanel _info = null!;
-    private Control _feed = null!;
-    private VBoxContainer _feedLines = null!;
-    private VBoxContainer _announcements = null!;
+    private ChatLog _chat = null!;
     private Label _death = null!;
     private PanelContainer _bossPanel = null!;
     private Label _bossName = null!;
@@ -65,6 +62,9 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>The buff bar (the <c>ui buff cancel</c> command and the <c>hud.buffs</c> probe).</summary>
     public BuffBar Buffs => _buffBar;
 
+    /// <summary>The chat log (the <c>ui chat</c> command and the <c>ui.chat_lines</c> probe).</summary>
+    public ChatLog Chat => _chat;
+
     /// <summary>The hotbar slot view at <paramref name="index"/> (the <c>ui hover hotbar</c> command), or null.</summary>
     public ItemSlotView? HotbarSlot(int index) => _hotbar.Slot(index);
 
@@ -86,17 +86,8 @@ public sealed partial class Hud : CanvasLayer
         root.AddChild(_crosshair = LayoutWidgets.Register(new Crosshair(ui)));
         root.AddChild(_status = LayoutWidgets.Register(new StatusLine()));
         root.AddChild(_info = LayoutWidgets.Register(new InfoPanel(ui)));
-        _feed = LayoutWidgets.Register(new Control { Name = "Feed", MouseFilter = Control.MouseFilterEnum.Ignore, ClipContents = true });
-        _feedLines = new VBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore, GrowVertical = Control.GrowDirection.Begin };
-        _feedLines.SetAnchorsPreset(Control.LayoutPreset.BottomWide);
-        _feed.AddChild(_feedLines);
-        root.AddChild(_feed);
-
-        _announcements = new VBoxContainer { MouseFilter = Control.MouseFilterEnum.Ignore };
-        _announcements.SetAnchorsPreset(Control.LayoutPreset.CenterTop);
-        _announcements.GrowHorizontal = Control.GrowDirection.Both;
-        _announcements.OffsetTop = 120;
-        root.AddChild(_announcements);
+        root.AddChild(_chat = LayoutWidgets.Register(new ChatLog()));
+        BuildBanner(root);
 
         _death = new Label { Visible = false, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
         _death.SetAnchorsPreset(Control.LayoutPreset.FullRect);
@@ -176,51 +167,11 @@ public sealed partial class Hud : CanvasLayer
         _crosshair.Place(layout, key.Size);
         _status.Visible = LayoutWidgets.Place(_status, layout, UiRegion.StatusLine);
         _info.Visible = LayoutWidgets.Place(_info, layout, UiRegion.Info);
-        _feed.Visible = LayoutWidgets.Place(_feed, layout, UiRegion.Chat);
+        _chat.Visible = LayoutWidgets.Place(_chat, layout, UiRegion.Chat);
         _bossPlaced = LayoutWidgets.Place(_bossPanel, layout, UiRegion.BossBar);
         _bossPanel.Visible = _bossPlaced && _bossShown;
         _buffBar.Arrange();
         LayoutApplied?.Invoke(layout);
-    }
-
-    private void WireMessages(UiContext ui)
-    {
-        var npcs = ui.Game.Npcs;
-        npcs.BossSpawned += b => Announce($"{b.Def.Boss!.Title} has awoken!", new Color(0.8f, 0.5f, 1f));
-        npcs.BossDefeated += b => Announce($"{b.Def.Boss!.Title} has been defeated!", new Color(1f, 0.85f, 0.4f));
-        npcs.BossLeft += b => Announce($"{b.Def.Boss!.Title} has left.", UiTheme.Muted);
-        ui.Game.Town.Arrived += t => Announce($"{t.Title} has arrived!", new Color(0.55f, 0.9f, 0.6f));
-        ui.Game.Town.Died += t => Announce($"{t.Title} was slain...", new Color(1f, 0.4f, 0.35f));
-        ui.Game.Town.Departed += t => Announce($"{t.Title} has left.", new Color(0.7f, 0.8f, 1f));
-        ui.Game.Progression.Raised += f =>
-        {
-            if (f.Announce != null) Announce(f.Announce, new Color(0.75f, 0.55f, 1f));
-        };
-        ui.Game.Objectives.Announced += (text, color) => Announce(text, Color.FromHtml(color));
-        npcs.Announced += text => Announce(text, new Color(1f, 0.55f, 0.45f));
-        ui.Game.Events.Announced += (text, def) => Announce(text, def.SkyTint != null ? Color.FromHtml(def.SkyTint).Lightened(0.3f) : new Color(0.7f, 0.85f, 1f));
-
-        // Refusals and notices: one line under the crosshair.
-        ui.Game.ItemUse.Refused += (p, message) =>
-        {
-            if (p == ui.Entity) _status.Show(message, UiTheme.Muted);
-        };
-        ui.Game.Interaction.Refused += (p, message) =>
-        {
-            if (p == ui.Entity) _status.Show(message, UiTheme.Muted);
-        };
-        ui.Notified += _status.Show;
-        ui.Game.Town.HomeLost += t => _status.Show($"{t.Title}'s home is no longer suitable.", UiTheme.Muted);
-
-        // Pickups and catches: the feed in the chat corner.
-        ui.Game.ItemUse.Caught += (p, stack) =>
-        {
-            if (p == ui.Entity) Toast($"Caught {stack.Item!.DisplayName}!", UiTheme.Rarity(stack.Item.Rarity));
-        };
-        ui.Game.ItemPickedUp += (p, stack) =>
-        {
-            if (p == ui.Entity) Toast($"+{stack.Count} {stack.Item!.DisplayName}", UiTheme.Rarity(stack.Item.Rarity));
-        };
     }
 
     /// <summary>The build-shape hint for a held shaped block, rebuilt only when the block, shape or rotation changes.</summary>
@@ -255,35 +206,5 @@ public sealed partial class Hud : CanvasLayer
         _bossName.Text = boss.Def.Boss.Title;
         _bossBar.MaxValue = max;
         _bossBar.Value = life;
-    }
-
-    /// <summary>A line in the feed at the bottom-left (pickups, catches) that fades after a couple of seconds.</summary>
-    public void Toast(string text, Color color)
-    {
-        var label = new Label { Text = text, MouseFilter = Control.MouseFilterEnum.Ignore };
-        label.AddThemeColorOverride("font_color", color);
-        label.AddThemeColorOverride("font_outline_color", UiFonts.OutlineColor);
-        label.AddThemeConstantOverride("outline_size", UiFonts.Outline);
-        _feedLines.AddChild(label);
-        var tween = label.CreateTween();
-        tween.TweenInterval(2.2);
-        tween.TweenProperty(label, "modulate:a", 0.0, 0.6);
-        tween.TweenCallback(Callable.From(label.QueueFree));
-        while (_feedLines.GetChildCount() > FeedLines) _feedLines.GetChild(0).Free();
-    }
-
-    /// <summary>Large centred message (events, bosses) that fades after a few seconds.</summary>
-    public void Announce(string text, Color color)
-    {
-        // Messages stack downwards instead of printing over one another.
-        var label = new Label { Text = text, HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = Control.MouseFilterEnum.Ignore };
-        label.AddThemeFontSizeOverride("font_size", 30);
-        label.AddThemeColorOverride("font_color", color);
-        _announcements.AddChild(label);
-        while (_announcements.GetChildCount() > 4) _announcements.GetChild(0).Free();
-        var tween = label.CreateTween();
-        tween.TweenInterval(4.0);
-        tween.TweenProperty(label, "modulate:a", 0.0, 1.5);
-        tween.TweenCallback(Callable.From(label.QueueFree));
     }
 }

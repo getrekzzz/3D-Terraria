@@ -398,3 +398,30 @@ ui buff cancel slime_minion
 wait 0.2
 assert projectiles.count == 0
 assert errors == 0
+
+# --- P2-21 ---
+# World messages scroll up the chat log at the bottom-left in Terraria's colours instead of a centred banner: summoning
+# a boss posts "has awoken!". The chat key opens the history (an overlay: the player keeps moving) with every kept line,
+# and closes it again; with the inventory open the log sits right of the crafting column, overlapping nothing.
+spawning off
+killall
+boss king_slime 12
+wait 0.5
+assert ui.chat_lines >= 1
+killall
+ui chat Hello from the smoke test
+assert ui.chat_lines >= 2
+assert ui.overlaps == 0
+ui history
+assert ui.chat_open == 1
+assert ui.overlay == 1
+assert ui.modal == 0
+ui history
+assert ui.chat_open == 0
+assert ui.overlay == 0
+ui inventory
+wait 0.2
+assert ui.chat_lines >= 2
+assert ui.overlaps == 0
+ui close
+assert errors == 0

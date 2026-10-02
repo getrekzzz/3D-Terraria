@@ -142,6 +142,8 @@ public sealed partial class SettingsScreen : PanelContainer
             "The interface never grows past what fits a 1024×600 layout in the window; a smaller effective scale is shown."));
         box.AddChild(MenuKit.Row("Show target name", MenuKit.Toggle(S.ShowTargetName, v => { S.ShowTargetName = v; Changed(); }),
             "Names the block or object under the crosshair."));
+        box.AddChild(MenuKit.Row("Boss banners", MenuKit.Toggle(S.BigAnnouncements, v => { S.BigAnnouncements = v; Changed(); }),
+            "Also shows \"… has awoken!\" as a big banner at the top; every message is in the chat log (Enter for the history)."));
         box.AddChild(MenuKit.Row("Show FPS", MenuKit.Toggle(S.ShowFps, v => { S.ShowFps = v; Changed(); })));
         box.AddChild(MenuKit.Row("Minimap", MenuKit.Toggle(S.ShowMinimap, v => { S.ShowMinimap = v; Changed(); }), "The discovered map around you, top right. M opens the full map."));
         box.AddChild(MenuKit.Row("Life display", MenuKit.Choice(new[] { "Hearts and stars", "Bars" }, S.LifeDisplay == UserSettings.BarsLifeDisplay ? 1 : 0,

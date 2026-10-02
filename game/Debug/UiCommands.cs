@@ -14,8 +14,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|buff <cancel|hover> <id>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|close|export-theme>",
-            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); buff cancel right-clicks a buff bar icon (a buff id, a minion's projectile id or minecart): buffs go, debuffs never, minions go home; buff hover shows its name and effect; click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|buff <cancel|hover> <id>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|chat <text>|history|close|export-theme>",
+            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); buff cancel right-clicks a buff bar icon (a buff id, a minion's projectile id or minecart): buffs go, debuffs never, minions go home; buff hover shows its name and effect; click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; chat posts a white line to the chat log and history opens or closes its history (the chat key); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -81,12 +81,21 @@ public static class UiCommands
                     case "quickstack":
                         int chests = screen.QuickStack();
                         return CommandResult.Success(chests > 0 ? $"Quick stacked into {chests} chest(s)." : "No nearby chest holds any of these items.");
+                    case "chat":
+                        var log = world.Hud?.Chat ?? throw new CommandException("no HUD in this mode");
+                        log.Add(a.Count > 1 ? a.Rest(1) : throw new CommandException("missing <text>"), UiTheme.Text);
+                        return CommandResult.Success($"Chat: {log.LinesShown} line(s) shown.");
+                    case "history":
+                        var chat = world.Hud?.Chat ?? throw new CommandException("no HUD in this mode");
+                        chat.SetOpen(!chat.IsOpen);
+                        return CommandResult.Success(chat.IsOpen ? "Chat history open." : "Chat history closed.");
                     case "close":
+                        world.Hud?.Chat.SetOpen(false);
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, hover, buff, click, drag, minimap, f3, sort, quickstack, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, hover, buff, click, drag, minimap, f3, sort, quickstack, chat, history, close or export-theme");
                 }
             },
         });
