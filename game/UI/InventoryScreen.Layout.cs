@@ -41,6 +41,9 @@ public sealed partial class InventoryScreen
     /// <summary>The chest panel shown under the grid while a chest is open.</summary>
     public ChestPanel Chest => _chest;
 
+    /// <summary>The crafting column bottom-left (recipe slots, the selected recipe's materials and stations).</summary>
+    public CraftingPanel Crafting => _crafting;
+
     /// <summary>The equipment column (tabs, Dye | Vanity | Equip, Misc page, defence shield).</summary>
     public EquipmentPanel Equipment => _equipment;
 
@@ -70,7 +73,6 @@ public sealed partial class InventoryScreen
         _panelHost.Visible = false;
         _chest = new ChestPanel(_ui, (area, index) => Slot(area, index));
         _chest.Shown += (obj, shown) => ContainerShown?.Invoke(obj, shown);
-        _chest.ItemsMoved += () => _crafting.Refresh();
         _chest.CloseRequested += ClosePanel;
 
         _crafting = LayoutWidgets.Register(new CraftingPanel { Name = "Crafting" });
@@ -109,6 +111,7 @@ public sealed partial class InventoryScreen
         _coinAmmo.Place(layout);
         PlacePanel();
         _crafting.Visible = LayoutWidgets.Place(_crafting, layout, UiRegion.Crafting);
+        if (_crafting.Visible) _crafting.Arrange(SlotScale);
         _equipment.Visible = LayoutWidgets.Place(_equipment, layout, UiRegion.Equipment);
         if (_equipment.Visible) _equipment.Arrange(SlotScale);
     }

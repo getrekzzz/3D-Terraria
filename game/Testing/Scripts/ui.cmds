@@ -418,3 +418,39 @@ ui close
 wait 0.2
 god off
 assert errors == 0
+
+# --- P2-18 ---
+# The crafting column: with a work bench in reach and wood and gel in the backpack it lists recipes, and an idle screen
+# never rebuilds the list (a hovered recipe's tooltip stays). 'ui craft' clicks a recipe's slot as the player does
+# (selecting it, then crafting onto the cursor): two torch crafts merge on the cursor; a sword goes to the cursor too,
+# and closing the inventory puts what is held in the backpack.
+god on
+spawning off
+killall
+clear
+fill -3 0 -4 6 3 4 air
+fill -3 -1 -4 6 -1 4 dirt
+wait 0.5
+place work_bench 3 0 0
+give wood 20
+give gel 2
+ui inventory
+wait 0.6
+assert ui.recipes > 0
+wait 1.2
+assert ui.recipe_rebuilds <= 1
+ui craft torch 2
+assert inv.cursor == 6
+ui close
+wait 0.2
+assert inv.torch == 6
+ui inventory
+wait 0.3
+ui craft wooden_sword
+assert inv.cursor == 1
+ui close
+wait 0.2
+assert inv.wooden_sword == 1
+assert inv.cursor == 0
+god off
+assert errors == 0

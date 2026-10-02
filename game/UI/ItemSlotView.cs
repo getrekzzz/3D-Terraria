@@ -26,6 +26,8 @@ public sealed partial class ItemSlotView : Control
     private SlotKind _kind;
     private bool _selected;
     private bool _locked;
+    private bool _dimmed;
+    private bool _short;
     private bool _hovered;
     private ItemStack _shown;
     private bool _favoriteShown;
@@ -81,6 +83,20 @@ public sealed partial class ItemSlotView : Control
     {
         get => _locked;
         set => Redraw(ref _locked, value);
+    }
+
+    /// <summary>The icon drawn greyed, the slot as usual (a recipe the player cannot craft yet).</summary>
+    public bool Dimmed
+    {
+        get => _dimmed;
+        set => Redraw(ref _dimmed, value);
+    }
+
+    /// <summary>A recipe material the player has too few of: its count is drawn red, even a count of one.</summary>
+    public bool Short
+    {
+        get => _short;
+        set => Redraw(ref _short, value);
     }
 
     /// <summary>Short label drawn in the top-left corner (hotbar numbers).</summary>

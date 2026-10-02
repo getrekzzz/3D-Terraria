@@ -219,7 +219,7 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   columns, the trash slot under them (saved with the player) and the `sort`/`quick_stack` buttons; the panel host
   under the grid shows one panel at a time through `ShowPanel(Control, UiPanel)`/`ClosePanel()` (the chest today,
   with 40 pooled slot views rebound on open; the shop and service panels plug in here) and sizes its slots by
-  `SlotScale`; `CraftingPanel` takes the Crafting region (pooled rows, no fixed size); the equipment column takes the
+  `SlotScale`; `CraftingPanel` takes the Crafting region (below); the equipment column takes the
   Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
   so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
   (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack).
@@ -244,3 +244,16 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   the tooltip's empty-slot text, and `DefenseBadge` shows the defence on the shield with '{n} Defense' and the set bonus
   in `TooltipFollower.ShowText`. Smoke: `ui tab <equipment|misc>`, `ui eye <row>`; probes `ui.equip_rows`,
   `ui.defense_badge`, `ui.misc_tab`, `inv.accessory_slots`, `inv.hidden_accessories`.
+* **Crafting column** (`game/UI/CraftingPanel*.cs`, `RecipeDetail.cs`): Terraria's bottom-left column of recipe slots
+  (pooled `ItemSlotView`s, `SlotKind.Crafting`; the selected one `CraftingSelected` at 1.25×) in a wheel-scrolled
+  `ScrollContainer` only as tall as its slots, so the rest of the region leaves clicks to the world. Beside it
+  `RecipeDetail` (public, for the Guide's help slot) shows the name, 'Materials' as 32 px slots (`ItemSlotView.Short`
+  draws the count red; a group reads 'Any Wood' via `RecipeText.Ingredient`), 'Required Objects: …' from `StationNames`
+  and `RecipeText.Conditions` ('Near Water'). The 'Near:' line names the station objects and liquids in reach
+  (`CraftingEnvironment.ObjectNames`). Clicking a recipe selects it; on the selected one left crafts to the cursor
+  (`RecipeBook.CraftInto`), Shift crafts a stack into the backpack, a held right button repeats at `HoldRepeat`'s pace
+  (craft sound at most every 0.1 s, stopping if the selection changes); refusals go to the status line. The hammer
+  toggle lists known but uncraftable recipes greyed (`ItemSlotView.Dimmed`). No timer rebuilds: backpack/coin/ammo
+  `Changed` events dirty the list (once a frame at most), a 0.5 s poll dirties it only when the station or liquid sets
+  differ, and the column is rebuilt only when `CraftingEnvironment.Signature` changes (else the counts update in place).
+  Smoke: `ui craft <item> [n]`; probes `ui.recipes`, `ui.recipe_rebuilds` (since the inventory opened).

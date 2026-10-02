@@ -12,7 +12,7 @@ namespace Strata.Game.Debug;
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); and on the inventory
-/// screen's layout (P2-15).
+/// screen's layout (P2-15), the equipment column (P2-16), the chest panel (P2-17) and the crafting column (P2-18).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -88,5 +88,9 @@ public static class UiProbes
         ctx.AddProbe("ui.renaming", () => world.Inventory?.Chest.Renaming == true ? 1 : 0);
         ctx.AddProbe("ui.chest_named", () => world.Inventory?.Chest.Container?.CustomName != null ? 1 : 0);
         ctx.AddProbe("ui.chests_closed", () => world.Inventory?.Chest.ClosedCount ?? 0);
+        // P2-18: the crafting column. Recipe slots listed, and the times it was rebuilt since the inventory opened (an
+        // idle screen rebuilds nothing, so a hovered recipe's tooltip stays).
+        ctx.AddProbe("ui.recipes", () => world.Inventory?.Crafting.RecipesShown ?? 0);
+        ctx.AddProbe("ui.recipe_rebuilds", () => world.Inventory?.Crafting.Rebuilds ?? 0);
     }
 }

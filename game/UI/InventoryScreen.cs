@@ -80,7 +80,6 @@ public sealed partial class InventoryScreen : CanvasLayer
         var serviced = inv.Service[0];
         inv.Service[0] = ItemStack.Empty;
         Stow(serviced);
-        _craftingStale = false;
         HidePanel();
         LayoutChanged?.Invoke();
     }
@@ -89,12 +88,6 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.inventory_ui");
         if (!IsOpen) return;
-        // Taking one at a time with a held right click refreshes the crafting list once, when the button comes up.
-        if (_craftingStale && !Input.IsMouseButtonPressed(MouseButton.Right))
-        {
-            _craftingStale = false;
-            _crafting.Refresh();
-        }
         _equipment.Refresh(_ui.Entity.State);
         int selected = _ui.Inventory.SelectedHotbar;
         for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;

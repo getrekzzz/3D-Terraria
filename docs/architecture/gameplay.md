@@ -96,8 +96,10 @@
   tinted by life, bosses in the boss bar's red), else the block or object in reach, rebuilding its text only when
   that changes. Probes: `hover.npc`, `hover.resident`, `hover.talk`, `hover.<enemy id>`, `hud.target_name`,
   `hud.target_name.<words>` (the label in snake case contains them), `ui.talk_open`.
-* **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
-  nearby liquids, biome/time conditions).
+* **Crafting** — `RecipeBook` (indexed, atomic crafts; `CraftInto` crafts onto the cursor, merging into the same
+  stackable item and refusing anything else) + `CraftingEnvironment` (stations within reach and the objects providing
+  them, nearby liquids, biome/time conditions; `Browse` tallies the slots once; `Signature` is a stable FNV hash of a
+  browse so the UI rebuilds only on change) + `RecipeText` (group and condition wording).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
   strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.

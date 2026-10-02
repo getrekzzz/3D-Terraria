@@ -15,8 +15,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|close|export-theme>",
-            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|chest <loot|deposit|quickstack|restock|sort|rename|name <text>|cancel>|craft <item> [n]|close|export-theme>",
+            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; chest presses an open chest's link (rename opens the name field, name types a name and presses Enter, cancel presses Esc); craft clicks the crafting column's recipe for an item as the player does (selecting it, then crafting onto the cursor n times); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -78,12 +78,20 @@ public static class UiCommands
                         if (!screen.Equipment.PressEye(row)) return CommandResult.Fail($"Accessory row {row} has no eye on screen (open the inventory on the equipment page).");
                         return CommandResult.Success($"Accessory {row} {(ctx.Player.State.Inventory.IsAccessoryHidden(row) ? "hidden" : "shown")}.");
                     case "chest": return ChestPanelCommand(screen.Chest, a.Str(1, "button"), a.Count > 2 ? a.Rest(2) : "");
+                    case "craft":
+                        string item = a.Str(1, "item");
+                        int times = a.OptInt(2, 1);
+                        if (!screen.Crafting.IsVisibleInTree()) return CommandResult.Fail("The crafting column is not on screen (open the inventory first).");
+                        int made = screen.Crafting.Craft(item, times);
+                        if (made < 0) return CommandResult.Fail($"No recipe for '{item}' on the crafting column.");
+                        var cursor = ctx.Player.State.Inventory.Cursor;
+                        return made > 0 ? CommandResult.Success($"Crafted {made} time(s); holding {cursor}.") : CommandResult.Fail($"Could not craft '{item}'; holding {cursor}.");
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, chest, craft, close or export-theme");
                 }
             },
         });

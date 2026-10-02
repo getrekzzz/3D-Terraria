@@ -5,9 +5,9 @@ namespace Strata.Game.UI;
 
 /// <summary>
 /// Drawing a slot as Terraria does, from cached styles so a redraw allocates nothing: the tinted slot (gold when
-/// selected or favourited, dark when locked), the icon at ~62% of the slot, the stack count bottom-left in white with
-/// a black outline, the ammo count of a bow or gun in the same place (red at 0), the badge top-left and the empty-slot
-/// silhouette.
+/// selected or favourited, dark when locked), the icon at ~62% of the slot (greyed when locked or dimmed), the stack
+/// count bottom-left in white with a black outline (red for a material the player is short of), the ammo count of a bow
+/// or gun in the same place (red at 0), the badge top-left and the empty-slot silhouette.
 /// </summary>
 public sealed partial class ItemSlotView
 {
@@ -30,10 +30,10 @@ public sealed partial class ItemSlotView
         var s = _shown;
         if (!s.IsEmpty)
         {
-            DrawTextureRect(ItemIcons.Get(s.Item!), iconRect, false, _locked ? LockedIcon : Colors.White);
+            DrawTextureRect(ItemIcons.Get(s.Item!), iconRect, false, _locked || _dimmed ? LockedIcon : Colors.White);
             // A weapon never stacks, so the rounds it has left take the stack count's corner.
             if (_ammoShown >= 0) Count(_ammoShown.ToString(), _ammoShown == 0 ? OutOfAmmo : UiTheme.Text);
-            else if (s.Count > 1) Count(s.Count.ToString(), UiTheme.Text);
+            else if (s.Count > 1 || _short) Count(s.Count.ToString(), _short ? OutOfAmmo : UiTheme.Text);
         }
         else if (EmptyHint != null)
         {
