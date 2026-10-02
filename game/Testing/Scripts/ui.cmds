@@ -33,3 +33,14 @@ assert errors == 0
 # The HUD preloaded every generated UI sprite (tools/textures/build_ui.py) and none fell back to "missing".
 assert ui.sprites_missing == 0
 assert ui.sprites >= 35
+
+# --- P2-03 ---
+# Every buff and invasion icon loaded from assets/icons; a potion's buff is listed with its generated icon.
+assert ui.status_icons_missing == 0
+give regeneration_potion 1
+wield regeneration_potion
+use
+wait_until buff.regeneration == 1 5
+wait 0.2
+assert hud.buff_icons >= 1
+assert errors == 0

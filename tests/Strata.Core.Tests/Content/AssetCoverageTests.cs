@@ -42,6 +42,20 @@ public class AssetCoverageTests
     }
 
     [Fact]
+    public void EveryBuffHasAnIcon()
+    {
+        var missing = TestPaths.Content.Buffs.All.Where(b => !Exists(AssetPaths.BuffIcon(b))).Select(b => b.Id).ToList();
+        Assert.True(missing.Count == 0, "buffs without icons (add a recipe to tools/textures/buff_icons.json, run build_ui.py): " + string.Join(", ", missing));
+    }
+
+    [Fact]
+    public void EveryEventWithAKillGoalHasAnIcon()
+    {
+        var missing = TestPaths.Content.Events.All.Where(e => e.KillGoal > 0 && !Exists(AssetPaths.EventIcon(e))).Select(e => e.Id).ToList();
+        Assert.True(missing.Count == 0, "invasions without icons (add a recipe to tools/textures/event_icons.json, run build_ui.py): " + string.Join(", ", missing));
+    }
+
+    [Fact]
     public void UiSpritesUsedByCodeExist()
     {
         // The sprites the HUD and inventory are built on, plus every name game code asks UiSprites for.

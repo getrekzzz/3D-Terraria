@@ -8,7 +8,8 @@
 * Open-ended behaviour uses typed specs: item `behaviors`, enemy `brain`, buff `effects`, projectile `onHit`,
   recipe/spawn `conditions` — validated against `SpecCatalog`.
 * `ContentValidator`: references, specs, DAG cycles in progression, obtainability, texture layers and
-  conventional asset paths (every tile-object variant, item icon/model, creature and projectile model).
+  conventional asset paths (every tile-object variant, item icon/model, creature and projectile model, buff icon
+  and invasion icon).
 * `data/reference/*.json`: Terraria concepts (names only) generated from `tools/content/reference/`.
   Content links to them with `covers`; `Strata.Tools coverage` reports coverage and CI publishes it.
 
@@ -19,6 +20,7 @@
 | Prop texture array (bark, leaf-card sprigs, metals, cloth, leather…) | `--set=props` | `assets/textures/props/` |
 | Block item icons | `tools/textures/build_icons.py` | `assets/icons/items/<block>.png` |
 | UI pixel sprites (hearts, stars, bubbles, slot silhouettes, buttons, pointer, frames) | `tools/textures/build_ui.py` | `assets/ui/<name>.png` |
+| Buff/debuff and world-event icons (32 px glyph tiles) | `tools/textures/build_ui.py` (`buff_icons.json`, `event_icons.json`) | `assets/icons/buffs/<icon>.png`, `assets/icons/events/<icon>.png` |
 | Tile objects, items, creatures + icons | `tools/blender/build_all.py` (+ `assets.json`) | `assets/models/{objects,items,creatures}/*.glb`, icons, `assets/manifest.json` |
 
 Textures are synthesised in numpy (`tools/textures/gen_{natural,rock,built,plants,detail}.py` on `synth.py`):
@@ -30,6 +32,12 @@ becomes 2x2 pixels and gets a 1 px `#1a1020` outline, except silhouettes, the po
 their own edges. The game reads them through `UiSprites.Get(name)` (`AssetPaths.UiSprite`), which the HUD preloads;
 draw them at integral sizes (`TextureFilter = Nearest` when scaled). `build_ui.py --check` runs in CI without Pillow,
 and `AssetCoverageTests.UiSpritesUsedByCodeExist` checks every name the game code asks for.
+
+Buff and event icons are glyphs from a 16x16 library (`ui_glyphs.py`, `ui_glyphs_b.py`; X/H/S tones of the
+recipe's fg) on a bevelled 32 px tile in the recipe's bg; debuffs get a 2 px red frame. A new buff or event needs a
+recipe line, or `build_ui.py --check` fails naming it, and `ContentValidator` reports a missing buff icon (and a
+missing icon for any event with a kill goal) as an asset error. The game reads them through `StatusIcons.Get`
+(`AssetPaths.BuffIcon`/`EventIcon`, `EventDef.Icon`), which falls back to a lettered square.
 
 Blender conventions: 1 unit = 1 m, Z up, front faces +Y (glTF −Z); tile objects have their origin at the
 footprint's bottom centre, items at the grip with the business end along +Z. Material slots are named

@@ -53,6 +53,8 @@ public static partial class ContentValidator
             if (e.StartsWhen != null && e.Phase != EventPhase.Manual) ctx.Error(e, "startsWhen is for manual events.");
             ctx.Color(e, e.SkyTint, "skyTint");
             ctx.Specs(e, SpecKind.Condition, e.Conditions, "conditions");
+            // Invasions show their icon on the progress panel.
+            if (e.KillGoal > 0) ctx.Asset(e, AssetPaths.EventIcon(e), "icon");
         }
         foreach (var s in ctx.Db.SpawnRules.All)
             foreach (var c in s.Conditions.Where(c => c.Type == "event"))

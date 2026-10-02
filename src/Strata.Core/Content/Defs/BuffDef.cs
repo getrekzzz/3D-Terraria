@@ -4,6 +4,8 @@ namespace Strata.Core.Content.Defs;
 public sealed class BuffDef : ContentDef
 {
     public bool Debuff { get; init; }
+
+    /// <summary>Icon image name under assets/icons/buffs (defaults to the id).</summary>
     public string? Icon { get; init; }
     public string Color { get; init; } = "#ffffff";
     public TypedSpec[] Effects { get; init; } = Array.Empty<TypedSpec>();

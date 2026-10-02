@@ -9,7 +9,7 @@ namespace Strata.Game.Debug;
 /// <summary>
 /// Probes on the global UI look (P2-01): the shipped font is ThemeDB's fallback, an unthemed panel resolves to
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
-/// generated pixel sprites the HUD preloads (P2-02).
+/// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -35,5 +35,7 @@ public static class UiProbes
         ctx.AddProbe("ui.warmup_ms", () => UiTheme.WarmupMs);
         ctx.AddProbe("ui.sprites", () => UiSprites.LoadedCount);
         ctx.AddProbe("ui.sprites_missing", () => UiSprites.MissingCount);
+        ctx.AddProbe("ui.status_icons_missing", () => StatusIcons.MissingCount);
+        ctx.AddProbe("hud.buff_icons", () => world.Hud?.BuffIconsShown ?? 0);
     }
 }

@@ -13,6 +13,12 @@ public static class AssetPaths
     /// <summary>A pixel-art UI sprite (heart, star, slot silhouette, pointer…) from tools/textures/build_ui.py.</summary>
     public static string UiSprite(string name) => $"assets/ui/{name}.png";
 
+    /// <summary>The 32 px buff or debuff icon (tools/textures/build_ui.py, recipe in buff_icons.json).</summary>
+    public static string BuffIcon(BuffDef buff) => $"assets/icons/buffs/{buff.Icon ?? buff.Id}.png";
+
+    /// <summary>The 32 px world event icon (tools/textures/build_ui.py, recipe in event_icons.json).</summary>
+    public static string EventIcon(EventDef ev) => $"assets/icons/events/{ev.Icon ?? ev.Id}.png";
+
     /// <summary>Model for a tile object variant.</summary>
     public static string ObjectModel(TileObjectDef def, int variant) =>
         def.Model != null ? $"assets/models/{def.Model}_v{variant}.glb" : $"assets/models/objects/{def.Id}_v{variant}.glb";
