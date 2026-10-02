@@ -54,8 +54,12 @@ public sealed class TownServices
         result = new ItemStack(held.Item!, held.Count, Prefixes.Roll(held.Item!, Content, ref _rng, held.Prefix));
         inv.Backpack[inv.SelectedHotbar] = result;
         player.State.Recompute();
+        Reforged?.Invoke(player, result);
         return TradeResult.Ok;
     }
+
+    /// <summary>A player had an item reforged (the new stack) — for the journal.</summary>
+    public event Action<PlayerEntity, ItemStack>? Reforged;
 
     // ---- Taxes -----------------------------------------------------------------------------------------------
 

@@ -13,6 +13,7 @@ public sealed partial class GameWorld
     {
         state.Inventory.AccessorySlotsUnlocked = AccessorySlotsFor(Session.Settings.Difficulty);
         state.Inventory.Content ??= Session.Content;
+        state.Journal.Bestiary = Journal.Bestiary;
         var p = new PlayerEntity(state) { Position = feet };
         Players.Add(p);
         return p;

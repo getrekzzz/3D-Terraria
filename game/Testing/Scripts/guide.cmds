@@ -1,0 +1,22 @@
+# Guide: the player journal (kills, sightings, crafting) and the bestiary.
+wait_until player.frozen == 0 180
+spawning off
+time noon
+killall
+journal reset
+spawn zombie 1 4
+wait 1
+assert journal.seen.zombie == 1
+assert bestiary.zombie == 0
+slay zombie
+wait 0.2
+assert bestiary.zombie == 1
+assert bestiary.zombie.unlock == 2
+assert bestiary.percent > 0
+give wood 20
+craft work_bench
+assert journal.crafted.work_bench == 1
+assert journal.obtained.work_bench == 1
+wait 1.1
+assert journal.obtained.copper_pickaxe == 1
+assert errors == 0

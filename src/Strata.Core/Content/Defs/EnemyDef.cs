@@ -78,6 +78,9 @@ public sealed class EnemyDef : ContentDef
     /// <summary>Item a bug net turns this creature into (critters).</summary>
     public string? CatchItem { get; init; }
 
+    /// <summary>Bestiary entry that kills and sightings of this creature credit instead (a boss's hands and heads).</summary>
+    public string? BestiaryAs { get; init; }
+
     /// <summary>Set for bosses (boss bar, arena, defeat flag, segments).</summary>
     public BossInfo? Boss { get; init; }
 

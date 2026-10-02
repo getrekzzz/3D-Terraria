@@ -23,6 +23,7 @@ public static class BuiltinCommands
         InventoryCommands.Register(r);
         WorldCommands.Register(r);
         PerfCommands.Register(r);
+        GuideCommands.Register(r);
         return r;
     }
 

@@ -74,8 +74,7 @@ public sealed partial class CraftingPanel : PanelContainer
     {
         var env = CraftingEnvironment.Around(_ui.Game, _ui.Entity);
         int times = many ? System.Math.Max(1, recipe.Output.MaxStack / System.Math.Max(1, recipe.Def.Count)) : 1;
-        int crafted = 0;
-        for (int i = 0; i < times && _ui.Recipes.Craft(recipe, _ui.Inventory, env.Stations, env.Context); i++) crafted++;
+        int crafted = _ui.Game.Craft(_ui.Entity, recipe, env, times);
         if (crafted > 0) Audio.Sfx.Play("craft");
         if (crafted > 0) _ui.Notify($"Crafted {crafted * recipe.Def.Count} {recipe.Output.DisplayName}", UiTheme.Text);
         else _ui.Notify("Not enough room in the backpack", UiTheme.Life);

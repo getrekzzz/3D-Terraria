@@ -53,6 +53,9 @@ public sealed class PlayerSave
     public List<SlotModel> Service { get; set; } = new();
     public int HiddenAccessories { get; set; }
 
+    /// <summary>The character's journal (additive: older saves load with an empty one).</summary>
+    public JournalModel? Journal { get; set; }
+
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
 
@@ -95,6 +98,7 @@ public sealed class PlayerSave
         MaxMana = p.Vitals.MaxMana,
         ExtraAccessorySlot = p.ExtraAccessorySlot,
         MinecartUpgrade = p.MinecartUpgrade,
+        Journal = JournalModel.From(p.Journal),
     };
 
     public PlayerState ToState(ContentDatabase content)
@@ -122,6 +126,7 @@ public sealed class PlayerSave
         foreach (var b in Buffs)
             if (content.Buffs.TryGet(content.Current(b.Id), out var def)) p.Buffs.Add(def, b.Ticks);
         foreach (var kv in SpawnPoints) p.SpawnPoints[kv.Key] = kv.Value;
+        Journal?.Fill(p.Journal);
         p.Inventory.Select(SelectedHotbar);
         p.Recompute();
         p.Vitals.Life = Math.Clamp(Life, 1, p.Vitals.MaxLife);

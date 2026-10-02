@@ -119,8 +119,12 @@ public sealed class TownCommerce
         if (!Wallet.TrySpend(inv, Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
         var rest = inv.Pickup(goods);
         foreach (var s in change.Append(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
+        Traded?.Invoke(player, item, count);
         return TradeResult.Ok;
     }
+
+    /// <summary>A player bought goods from a resident (item, count) — for the journal.</summary>
+    public event Action<PlayerEntity, ItemDef, int>? Traded;
 
     /// <summary>Sale value of a stack (copper).</summary>
     public long SaleValue(ItemStack stack) => Prefixes.SellValue(stack, Config.SellRatio);

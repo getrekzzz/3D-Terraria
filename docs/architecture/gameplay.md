@@ -421,3 +421,21 @@ lock's message while `requiresFlag` is unset, then "It's locked." without the ke
 chest, rolls an unopened chest's loot before the not-empty check, `BreakObject` rolls it before spilling, and locked
 chests are never broken for lost support, so generated loot is never lost. `interact nearest <objectId> [radius]
 [expectedOutcome]` drives it from smoke scripts.
+
+## Player journal and bestiary (P5-25)
+
+`PlayerState.Journal` (`Gameplay/Guide/PlayerJournal.cs`) records per character — not per world, unlike the
+reference game — kills per enemy id, creatures seen and caught, residents met, items obtained and crafted, named
+counters (`mined`, `mined:<block>`, `mined:#<tag>`, `broken:…`, `trees_chopped`, `purchases`, `reforges`,
+`deaths`, `catches`) and unlocked achievements. It implements `IPlayerRecords` for conditions and raises
+`Changed(kind, key)`. `JournalSystem` (on `GameWorld.Journal`) feeds it: `Npcs.Killed` credits players within
+`creditRadius` (bosses and parts credit everyone), `ItemUse.NetCaught`, `GameWorld.Crafted` (raised by
+`GameWorld.Craft`, which the crafting menu and the `craft` command use), `Commerce.Traded`, `Services.Reforged`,
+block/object breaks (nearest player), deaths, plus sweeps: creatures within `seenRadius` every 30 ticks, residents
+talking to the player (met), and every carried item once a second (obtained). Recording an existing key allocates
+nothing; counter keys are cached per def. `Bestiary` lists enemies (minus `bestiaryAs` parts and `no_bestiary`) and
+town residents; `Unlock` gives None/Seen/Stats/Full from `data/config/bestiary.json`; parts' kills count for their
+entry. `BestiaryPercent` is cached until the journal changes; `JournalSystem.BestBestiaryPercent()` is the
+world-wide value for town conditions. Saved as `PlayerSave.Journal` (additive; unknown ids kept). Probes
+`bestiary.percent`, `bestiary.<entry>[.unlock]`, `journal.<obtained|crafted|seen|caught|met|kills|counter>.<id>`;
+commands `journal [reset|unlock <enemy> [n]]`, `craft <item> [times]`.

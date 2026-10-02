@@ -14,7 +14,7 @@ public sealed class UiContext
         Game = game;
         Player = player;
         Interaction = interaction;
-        Recipes = new RecipeBook(game.Session.Content);
+        Recipes = game.Recipes;
     }
 
     public GameWorld Game { get; }
