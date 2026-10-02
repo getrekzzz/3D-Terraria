@@ -68,7 +68,6 @@ public sealed class ItemSourceIndex
     /// <summary>Item tags that are a source by themselves (handed out at player creation, or placed by world generation).</summary>
     public static readonly string[] SourceTags = { "starter", "world" };
 
-    private const int MaxDepth = 16;
     private static readonly IReadOnlyList<ItemSource> None = Array.Empty<ItemSource>();
 
     private readonly Dictionary<string, List<ItemSource>> _byItem = new(StringComparer.Ordinal);
@@ -163,7 +162,7 @@ public sealed class ItemSourceIndex
 
     private void Walk(ContentDatabase db, LootTableDef table, ItemSourceKind kind, ContentDef? owner, string? label, TypedSpec[] outer, int depth)
     {
-        if (depth > MaxDepth) return; // the validator reports loot cycles
+        if (depth > LootTableDef.MaxNesting) return; // as deep as LootRoller rolls; the validator reports loot cycles
         _ownedTables.Add(table.Id);
         foreach (var e in table.Entries)
         {
@@ -173,8 +172,9 @@ public sealed class ItemSourceIndex
         }
     }
 
-    private void Add(string itemId, ItemSource source)
+    private void Add(string? itemId, ItemSource source)
     {
+        if (string.IsNullOrEmpty(itemId)) return; // a missing reference is the validator's to report
         if (!_byItem.TryGetValue(itemId, out var list)) _byItem[itemId] = list = new List<ItemSource>();
         list.Add(source);
     }
