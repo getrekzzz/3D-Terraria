@@ -15,6 +15,7 @@ public sealed class Npc
         Position = feet;
         Anchor = feet;
         Life = MaxLife = def.Life;
+        Disguised = def.Disguise != null;
         BaseHalfExtents = HalfExtents = new Vector3(def.Width * 0.25f * def.Scale, def.Height * 0.25f * def.Scale, def.Width * 0.25f * def.Scale);
     }
 
@@ -132,6 +133,12 @@ public sealed class Npc
 
     /// <summary>Model shown instead of the definition's (boss phase changes).</summary>
     public string? ModelOverride { get; set; }
+
+    /// <summary>Still posing as its <see cref="EnemyDef.Disguise"/> (a chest, a lost girl): harmless and still until woken.</summary>
+    public bool Disguised { get; set; }
+
+    /// <summary>The model to draw: the disguise while disguised, else a phase's override, else the creature's own.</summary>
+    public string ShownModel => Disguised ? Def.Disguise!.Model : ModelOverride ?? Def.Model ?? Def.Id;
 
     /// <summary>Temporarily immune to damage (teleporting, burrowing phases).</summary>
     public bool Invulnerable { get; set; }

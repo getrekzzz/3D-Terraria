@@ -275,6 +275,22 @@
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 
+## Disguised creatures and the Wyvern
+
+* **Disguises** — an enemy with `disguise` (`DisguiseInfo`: `model`, `name`, `wakeRange`, `wakeOnInteract`, `wakeSound`,
+  `lunge`) spawns `Npc.Disguised`: `NpcSystem.SitDisguised` only settles it under gravity (no brain, contact damage or
+  volleys) and `Npc.ShownModel` draws the disguise. It wakes for good (`NpcSystem.Wake`, `Unmasked` event) when hit
+  (`Hit`, damage over time), when a player comes within `wakeRange`, or on interaction:
+  `ObjectInteraction.DisguisedAlong` picks the disguised creature under the crosshair (in front of the terrain hit) and
+  `ObjectInteraction.Interact(player, npc, reach)` → `NpcSystem.Provoke` returns `InteractOutcome.Unmasked`. The Mimic
+  sits as `mimic_chest` (built by the Wooden Chest's own generator, yaw squared to 90°; wakes at 1.4 m, lunges); the
+  Nymph stands as the `lost_girl` (wakes at 4.5 m). Mimics spawn from the hardmode cavern spawn rule (no worldgen
+  placement). Console: `open_disguised`; probe `boss.<id>.disguised`.
+* **Wyvern** — the worm brain with `fly` (`WormBrain.Fly`): constant speed and a limited turn rate so it overshoots and
+  loops, a vertical `weave`, ×`catchUp` beyond `farRange`, circling its spawn point without a target; never leaps or
+  falls and ignores terrain. `boss.segmentPattern` cycles models along the body (legs every eighth piece; tail last) via
+  `BossInfo.ChainModel`. Burrowing worms keep `fly: false`.
+
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
 `npcs.<enemy>`, `block.dx.dy.dz`, `liquid.dx.dy.dz`, `near.<block>`, `liquid.active`, `town.<id>`, `town.<id>.home`, `town.<id>.alive`, `zone.<biome>`, `flag.<id>`, `house.valid`, `stream.idle`, `errors`, …); debug commands such as

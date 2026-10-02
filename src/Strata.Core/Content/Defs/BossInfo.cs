@@ -64,6 +64,17 @@ public sealed class BossInfo
 
     public string? TailModel { get; init; }
 
+    /// <summary>
+    /// Models cycled along a worm's body before the tail (segment i wears <c>SegmentPattern[i % length]</c>), e.g. a
+    /// Wyvern's legs every eighth piece; empty = every segment wears <see cref="SegmentModel"/>.
+    /// </summary>
+    public string[] SegmentPattern { get; init; } = Array.Empty<string>();
+
+    /// <summary>The model a chain segment wears: the tail model on the last, else the pattern's, else the body's.</summary>
+    public string ChainModel(int index, int count, string fallback) =>
+        index == count - 1 ? TailModel ?? SegmentModel ?? fallback
+        : SegmentPattern.Length > 0 ? SegmentPattern[index % SegmentPattern.Length] : SegmentModel ?? fallback;
+
     /// <summary>Model per segment index (free parts such as hands); overrides SegmentModel/TailModel.</summary>
     public string[] SegmentModels { get; init; } = Array.Empty<string>();
 

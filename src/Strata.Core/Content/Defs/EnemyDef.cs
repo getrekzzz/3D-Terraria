@@ -81,6 +81,9 @@ public sealed class EnemyDef : ContentDef
     /// <summary>Set for bosses (boss bar, arena, defeat flag, segments).</summary>
     public BossInfo? Boss { get; init; }
 
+    /// <summary>Spawns posing as something harmless (a chest, a lost girl) until woken.</summary>
+    public DisguiseInfo? Disguise { get; init; }
+
     /// <summary>Coins dropped (copper).</summary>
     public int Value { get; init; }
 
