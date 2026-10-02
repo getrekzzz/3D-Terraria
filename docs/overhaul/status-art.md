@@ -14,7 +14,9 @@
 | 10 | P3-31 Terraria prefixes (reviewed + fixed) | full headless CI green (533 Core tests, 14/14 smoke, MENU PASS) |
 | 11 | W3 merge (P2-05..08) | full headless CI green (640 Core tests, 16/16 smoke, MENU PASS) |
 | 12 | P3-35 Piggy Bank and Safe | full headless CI green (642 Core tests, 16/16 smoke, MENU PASS) |
-| 13 | X-09 creator menu rows (after P2-30) | pending |
+| 13 | P3-01' bursts and reuseDelay | full headless CI green (654 Core tests, 16/16 smoke, MENU PASS) |
+| 14 | P3-18 pets and light pets, burst test isolation fix | full headless CI green (658 Core tests, 16/16 smoke, MENU PASS) |
+| 15 | X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -111,3 +113,15 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   piggy bank → safe (shops, Nurse, reforge). Merchant sells the Piggy Bank, Mechanic the Safe. Gaps: the piggy bank is
   2×1×1 on the floor anchor (not table-top yet); town NPC arrival checks count purse coins only; no Defender's Forge /
   Void Vault.
+
+## Push 13-14 notes
+* **Bursts (P3-01')**: `ItemDef.ReuseDelay` (ticks, not prefix-scaled) and `AmmoPerBurst`; `ItemUse.Continue` fires
+  the rest of a burst without input. Clockwork Assault Rifle: 3 shots 4 ticks apart, one bullet per burst, 26-tick
+  period. The only burst item in data; a burst shot without ammo/mana waits out its timing.
+* **Pets (P3-18)**: pets are projectiles bound to the Pet / Light Pet misc slots (`ProjectileSystem.Pets.cs`), fly or
+  walk-hop after the owner, teleport past 30 m. Light pets take lights from the DynamicLights pool, capped by the
+  preset's `petLights` (1/2/3/4). Batch: Shadow Orb, Crimson Heart, Fairy Bell, Magic Lantern, Wisp in a Bottle (light);
+  Baby Penguin (Fish), Zephyr Fish, Baby Truffle. No Pet Bunny (no Goodie Bag) or Eater's Bone yet; Fairy Bell 4% gold
+  chest and Wisp 2% are estimates; no pet buffs or visibility toggle.
+* Fix found by the pets screenshot: projectiles created while their model was loading stayed a glow for life (P1b-13);
+  `ProjectileRenderer` now rebuilds them a few times a second until the model is ready.
