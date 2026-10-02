@@ -3,9 +3,12 @@ using Strata.Core.World;
 
 namespace Strata.Core.Persistence;
 
-/// <summary>A saved world as the world list shows it.</summary>
+/// <summary>
+/// A saved world as the world list shows it. <paramref name="OldGenerator"/>: made by an older world generator, so
+/// regions explored from now on are generated differently and will not join the saved ones seamlessly.
+/// </summary>
 public sealed record WorldEntry(string Directory, string Name, long Seed, WorldSizePreset Size, Difficulty Difficulty, EvilKind Evil,
-    DateTime LastPlayedUtc, long PlayTicks, bool Hardmode);
+    DateTime LastPlayedUtc, long PlayTicks, bool Hardmode, bool OldGenerator = false);
 
 /// <summary>A saved character as the character list shows it.</summary>
 public sealed record CharacterEntry(string Path, string Name, CharacterDifficulty Difficulty, int MaxLife, int MaxMana,
@@ -28,7 +31,8 @@ public static class SaveCatalog
             try
             {
                 var m = store.LoadMeta();
-                list.Add(new WorldEntry(dir, m.Name, m.Seed, m.Size, m.Difficulty, m.Evil, m.LastPlayedUtc, m.PlayTicks, m.Flags.Contains("hardmode")));
+                list.Add(new WorldEntry(dir, m.Name, m.Seed, m.Size, m.Difficulty, m.Evil, m.LastPlayedUtc, m.PlayTicks, m.Flags.Contains("hardmode"),
+                    IsOldGenerator(m)));
             }
             catch (Exception ex)
             {
@@ -37,6 +41,9 @@ public static class SaveCatalog
         }
         return list.OrderByDescending(w => w.LastPlayedUtc).ToList();
     }
+
+    /// <summary>True when the world was made by an older world generator than this build's (<see cref="WorldGen.GenVersion"/>).</summary>
+    public static bool IsOldGenerator(WorldMeta meta) => meta.GeneratorVersion < WorldGen.GenVersion.Current;
 
     public static List<CharacterEntry> Characters(string playersDirectory, Action<string, Exception>? onError = null)
     {

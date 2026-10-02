@@ -91,17 +91,17 @@ public sealed partial class PlayerAvatar : Node3D
         if (item == null || _visual == null) return;
         var path = AssetPaths.ItemModel(item, _game.Session.Content);
         Node3D node;
+        float scale = 1f;
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
         {
-            node = new MeshInstance3D { Mesh = mesh, Scale = Vector3.One * HeldScale(item) };
+            node = new MeshInstance3D { Mesh = mesh };
+            scale = HeldScale(item);
         }
         else
         {
             node = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.25f / 128f, Shaded = true };
         }
-        // Items are modelled with the grip at the origin and the business end along +Y; point it forward.
-        node.RotationDegrees = new Vector3(90, 0, 0);
-        node.Position = new Vector3(0, 0.08f, 0);
+        node.Transform = HeldPose(item, _game.Uses[item], scale);
         _held = node;
         LightAnchor = node;
         if (Flames.Of(item, _game.Session.Content) is { } flame)
@@ -119,6 +119,19 @@ public sealed partial class PlayerAvatar : Node3D
 
     /// <summary>Where a carried light shines from in third person: the held torch's flame, or the held item.</summary>
     public Node3D? LightAnchor { get; private set; }
+
+    /// <summary>
+    /// The held item in the hand: how far (degrees) its limbs or shaft (+Y) lean from straight up, and how far its
+    /// business end (a bow's back, −X; anything else's +Y) points from the aim. −1 with nothing in hand.
+    /// </summary>
+    public (float Tilt, float Aim) HeldDegrees()
+    {
+        if (_held == null || _heldItem == null || !IsInstanceValid(_held) || !_held.IsInsideTree()) return (-1f, -1f);
+        var b = _held.GlobalBasis.Orthonormalized();
+        var a = _controller.Entity.Aim;
+        var axis = ActionFor(_heldItem, _game.Uses[_heldItem]) == UseTiming.Bow ? -b.X : b.Y;
+        return (Mathf.RadToDeg(b.Y.AngleTo(Vector3.Up)), Mathf.RadToDeg(axis.AngleTo(new Vector3(a.X, a.Y, a.Z))));
+    }
 
     private MeshInstance3D? _cart;
 
@@ -139,6 +152,36 @@ public sealed partial class PlayerAvatar : Node3D
         var h = new Vector3(ride.Heading.X, 0, ride.Heading.Z);
         var basis = h.LengthSquared() > 1e-4f ? Basis.LookingAt(h.Normalized(), Vector3.Up) : Basis.Identity;
         _cart.GlobalTransform = new Transform3D(basis.Scaled(Vector3.One * 1.6f), _controller.GlobalPosition - Vector3.Up * 0.2f);
+    }
+
+    /// <summary>The hand bone's fist: where a held item's grip sits (m along the bone, past the wrist).</summary>
+    private const float Fist = 0.08f;
+
+    /// <summary>How far a bow's riser (its grip) lies from the model's origin on the string, toward −X (bgen items.bow).</summary>
+    private const float BowGrip = 0.17f;
+
+    /// <summary>
+    /// The bow clip holds the bow hand about 23° above the aim (the arm stays on the aim pitch), so the bow is set that
+    /// much forward in the fist to stand upright with its back on the aim.
+    /// </summary>
+    private static readonly float BowSet = Mathf.DegToRad(23f);
+
+    /// <summary>
+    /// How an item sits in the right fist (the hand bone: +Y along the fingers, +Z the thumb side). Items are modelled
+    /// with the grip at the origin and the business end along +Y, which points out of the thumb side: a sword is carried
+    /// point-forward and lines up with the arm when the wrist cocks for a strike, a gun with the arm for a shot. A bow
+    /// (limbs along ±Y, its back toward −X, the string on the origin) is gripped by its riser and stands upright with its
+    /// back toward the target when the bow arm is held out: limbs along the thumb side, back along the fingers.
+    /// </summary>
+    private static Transform3D HeldPose(ItemDef item, ItemUseInfo info, float scale)
+    {
+        if (ActionFor(item, info) == UseTiming.Bow)
+        {
+            var upright = new Basis(Vector3.Right, -BowSet) * new Basis(new Vector3(0, -1, 0), new Vector3(0, 0, 1), new Vector3(-1, 0, 0));
+            var riser = upright * new Vector3(-BowGrip * scale, 0, 0);
+            return new Transform3D(upright.Scaled(Vector3.One * scale), new Vector3(0, Fist, 0) - riser);
+        }
+        return new Transform3D(Basis.FromEuler(new Vector3(Mathf.Pi / 2f, 0, 0)).Scaled(Vector3.One * scale), new Vector3(0, Fist, 0));
     }
 
     /// <summary>

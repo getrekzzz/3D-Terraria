@@ -94,6 +94,17 @@ public class CharacterTests
         Assert.Equal(Difficulty.Expert, w.Difficulty);
         Assert.Equal(EvilKind.Crimson, w.Evil);
         Assert.Equal(99, w.Seed);
+        Assert.False(w.OldGenerator);
+
+        // The same world as if an older generator had made it: listed as old, and loading it warns.
+        var store = new WorldSaveStore(dir);
+        var meta = store.LoadMeta();
+        meta.GeneratorVersion = Strata.Core.WorldGen.GenVersion.Current - 1;
+        store.SaveMeta(meta);
+        Assert.True(Assert.Single(SaveCatalog.Worlds(root)).OldGenerator);
+        var log = new Strata.Core.Diagnostics.MemoryLog();
+        WorldSession.Load(TestPaths.Content, dir, tables, log);
+        Assert.Contains(log.Entries, e => e.Level == Strata.Core.Diagnostics.LogLevel.Warning && e.Message.Contains("generator version", StringComparison.Ordinal));
         SaveCatalog.DeleteWorld(w.Directory);
         Assert.Empty(SaveCatalog.Worlds(root));
     }

@@ -1,6 +1,7 @@
 using Strata.Core.Commands;
 using Strata.Core.Common;
 using Strata.Core.Tests.Support;
+using Strata.Core.Voxels;
 
 namespace Strata.Core.Tests.Gameplay;
 
@@ -58,6 +59,16 @@ public class CommandTests
         Assert.Equal(g.Content.BlockId("gray_brick"), g.World.Session.World.GetBlock(g.Floor + new Int3(2, 1, 0)));
         Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 dirt").Ok);
         Assert.True(r.Execute(ctx, "assert block.1.0.1 > 0").Ok);
+        var world = g.World.Session.World;
+        var placed = g.Floor + new Int3(1, 1, 1);
+        Assert.Equal(CellFlags.PlayerPlaced, world.GetFlags(placed.X, placed.Y, placed.Z)); // crisp, as if built by hand
+        Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 stone").Ok);
+        // 'natural' leaves the cells unflagged like generated terrain, so they mesh smooth, even where the same block
+        // was placed by hand.
+        Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 stone natural").Ok);
+        Assert.Equal(g.Content.BlockId("stone"), world.GetBlock(placed));
+        Assert.Equal(CellFlags.None, world.GetFlags(placed.X, placed.Y, placed.Z));
+        Assert.False(r.Execute(ctx, "fill -1 0 -1 1 0 1 stone smooth").Ok);
         Assert.True(r.Execute(ctx, "time midnight").Ok);
         Assert.True(r.Execute(ctx, "assert time.day == 0").Ok);
         var flag = g.Content.Flags.All.First().Id;

@@ -103,6 +103,22 @@ public sealed class EditBatch
         return true;
     }
 
+    /// <summary>
+    /// Clears every flag of the block in a cell (placed by a player, structure, paint), leaving it as generation does:
+    /// natural blocks mesh smooth again. Returns false for empty or unloaded cells.
+    /// </summary>
+    public bool ClearFlags(int x, int y, int z)
+    {
+        var w = GetWorking(x, y, z, out int index);
+        if (w == null || w.Blocks[index] == 0) return false;
+        if (w.Flags == null || w.Flags[index] == 0) return true;
+        w.Flags[index] = 0;
+        ushort block = w.Blocks[index];
+        byte shape = w.Shapes?[index] ?? 0;
+        _result.Changes.Add(new CellChange(new Int3(x, y, z), block, block, shape, shape));
+        return true;
+    }
+
     /// <summary>Paints (or, with 0, scrapes) the block in a cell. Returns false for empty or unloaded cells.</summary>
     public bool SetPaint(Int3 cell, int paint)
     {

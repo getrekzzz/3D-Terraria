@@ -68,6 +68,28 @@ public class SaveStoreTests
     }
 
     [Fact]
+    public void WorldsFromAnOlderGeneratorAreFlagged()
+    {
+        var root = TestWorlds.TempDir();
+        void Write(string name, string generator)
+        {
+            var dir = Path.Combine(root, name);
+            Directory.CreateDirectory(dir);
+            File.WriteAllText(Path.Combine(dir, WorldSaveStore.MetaFile), $$"""
+                { "format": "strata-world", "version": 1, "name": "{{name}}", "seed": 5, "size": "small"{{generator}} }
+                """);
+        }
+        Write("current", $", \"generatorVersion\": {Strata.Core.WorldGen.GenVersion.Current}");
+        Write("older", $", \"generatorVersion\": {Strata.Core.WorldGen.GenVersion.Current - 1}");
+        Write("unversioned", "");
+
+        var worlds = SaveCatalog.Worlds(root).ToDictionary(w => w.Name);
+        Assert.False(worlds["current"].OldGenerator);
+        Assert.True(worlds["older"].OldGenerator);
+        Assert.True(worlds["unversioned"].OldGenerator);
+    }
+
+    [Fact]
     public void NewerVersionsAreRejected()
     {
         var dir = TestWorlds.TempDir();
