@@ -1,29 +1,37 @@
+using System.Collections.Generic;
 using Godot;
 using Strata.Core.Gameplay.Items;
+using Strata.Core.Presentation;
 using Strata.Core.Session;
 using Strata.Core.Voxels.TileObjects;
 
 namespace Strata.Game.UI;
 
 /// <summary>
-/// The open chest: its slots, the reference game's buttons (Loot all, Deposit all, Quick stack, Restock, Sort) and
-/// renaming (saved with the chunk), all through <see cref="GameWorld.ChestAction"/> and <see cref="GameWorld.RenameContainer"/>;
-/// plus the inventory's own Sort and Quick stack to nearby chests.
+/// The open chest, shown in the panel host under the grid as Terraria shows it: its name over 40 slots, and right of
+/// them the Loot All, Deposit All, Quick Stack, Restock, Sort Items and Rename links, all through
+/// <see cref="GameWorld.ChestAction"/> and <see cref="GameWorld.RenameContainer"/> (the name is saved with the chunk).
+/// The slot views are made once and read whichever chest is open, so opening one builds nothing.
 /// </summary>
 public sealed partial class InventoryScreen
 {
-    private PanelContainer _chestPanel = null!;
-    private GridContainer _chestGrid = null!;
-    private Label _chestTitle = null!;
-    private LineEdit _renameField = null!;
+    private const int ChestColumns = 10;
+    private const int PooledChestSlots = 40;
 
-    private void BuildChestPanel(Vector2 position)
+    private readonly List<ItemSlotView> _chestViews = new(PooledChestSlots);
+    private readonly List<Button> _chestButtons = new();
+    private Control _chestPanel = null!;
+    private OutlinedText _chestTitle = null!;
+    private LineEdit _renameField = null!;
+    private UiLayoutResult? _layout;
+
+    private void BuildChestPanel()
     {
-        _chestPanel = Panel(position);
-        var chestBox = new VBoxContainer();
-        var header = new HBoxContainer();
-        _chestTitle = new Label { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        _renameField = new LineEdit { MaxLength = TileObjectInstance.MaxNameLength, Visible = false, SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
+        _chestPanel = new Control { Name = "ChestPanel", Visible = false, MouseFilter = Control.MouseFilterEnum.Stop };
+        _chestTitle = new OutlinedText { Align = HorizontalAlignment.Left };
+        _chestPanel.AddChild(_chestTitle);
+        _renameField = new LineEdit { MaxLength = TileObjectInstance.MaxNameLength, Visible = false };
+        _renameField.AddThemeFontSizeOverride("font_size", UiFonts.Small);
         _renameField.FocusEntered += () => InputGate.TextEntry = true;
         _renameField.FocusExited += () =>
         {
@@ -31,52 +39,92 @@ public sealed partial class InventoryScreen
             FinishRename();
         };
         _renameField.TextSubmitted += _ => _renameField.ReleaseFocus();
-        header.AddChild(_chestTitle);
-        header.AddChild(_renameField);
-        header.AddChild(Button("Rename", StartRename, "Give this chest a name (up to 20 characters)"));
-        chestBox.AddChild(header);
-        var buttons = new HBoxContainer();
-        buttons.AddChild(Button("Loot all", () => Chest(ChestOp.LootAll)));
-        buttons.AddChild(Button("Deposit all", () => Chest(ChestOp.DepositAll), "Everything below the hotbar except favourites and coins"));
-        buttons.AddChild(Button("Quick stack", () => Chest(ChestOp.QuickStack), "Only items this chest already holds"));
-        buttons.AddChild(Button("Restock", () => Chest(ChestOp.Restock), "Top up your stacks from this chest"));
-        buttons.AddChild(Button("Sort", () => Chest(ChestOp.Sort)));
-        chestBox.AddChild(buttons);
-        _chestGrid = new GridContainer { Columns = 10 };
-        _chestGrid.AddThemeConstantOverride("h_separation", 4);
-        _chestGrid.AddThemeConstantOverride("v_separation", 4);
-        chestBox.AddChild(_chestGrid);
-        _chestPanel.AddChild(chestBox);
-        _chestPanel.Visible = false;
+        _chestPanel.AddChild(_renameField);
+        EnsureChestViews(PooledChestSlots);
+        AddChestButton("Loot All", () => Chest(ChestOp.LootAll), "Take everything into the backpack");
+        AddChestButton("Deposit All", () => Chest(ChestOp.DepositAll), "Everything below the hotbar except favourites and coins");
+        AddChestButton("Quick Stack", () => Chest(ChestOp.QuickStack), "Only items this chest already holds");
+        AddChestButton("Restock", () => Chest(ChestOp.Restock), "Top up your stacks from this chest");
+        AddChestButton("Sort Items", () => Chest(ChestOp.Sort));
+        AddChestButton("Rename", StartRename, $"Give this chest a name (up to {TileObjectInstance.MaxNameLength} characters)");
+    }
+
+    private void AddChestButton(string text, System.Action pressed, string? tooltip = null)
+    {
+        var b = TextButton(text, pressed, tooltip);
+        _chestPanel.AddChild(b);
+        _chestButtons.Add(b);
+    }
+
+    /// <summary>Slot views for a container of <paramref name="count"/> slots (every chest has 40; a bigger one adds views once).</summary>
+    private void EnsureChestViews(int count)
+    {
+        while (_chestViews.Count < count)
+        {
+            var view = Slot(SlotArea.Container, _chestViews.Count);
+            _chestPanel.AddChild(view);
+            _chestViews.Add(view);
+        }
+    }
+
+    /// <summary>Places the host on the last layout's Panel region (hidden without a panel or a region) and the chest in it.</summary>
+    private void PlacePanel()
+    {
+        _panelHost.Visible = _panel != null && _layout != null && LayoutWidgets.Place(_panelHost, _layout, UiRegion.Panel);
+        if (_panelHost.Visible && _panel == _chestPanel) ArrangeChest();
+    }
+
+    /// <summary>The chest's name on the caption row, its slots in rows of ten and the links in a column on the right.</summary>
+    private void ArrangeChest()
+    {
+        var size = _panelHost.Size;
+        float side = UiLayout.PanelSlot * SlotScale, pitch = side + UiLayout.Gap, top = UiLayout.Caption;
+        float gridW = ChestColumns * pitch - UiLayout.Gap;
+        int slots = _containerInv?.Size ?? 0;
+        for (int i = 0; i < _chestViews.Count; i++)
+        {
+            var view = _chestViews[i];
+            view.Visible = i < slots;
+            if (view.Visible) PutSlot(view, i % ChestColumns * pitch, top + i / ChestColumns * pitch, side);
+        }
+        _chestTitle.Position = Vector2.Zero;
+        _chestTitle.Size = new Vector2(gridW, top);
+        _renameField.Position = Vector2.Zero;
+        _renameField.Size = new Vector2(gridW, top);
+        float x = gridW + 2 * UiLayout.Gap, row = (size.Y - top) / _chestButtons.Count;
+        for (int i = 0; i < _chestButtons.Count; i++)
+        {
+            _chestButtons[i].Position = new Vector2(x, top + i * row);
+            _chestButtons[i].Size = new Vector2(size.X - x, row);
+        }
     }
 
     private void OpenContainer(TileObjectInstance obj)
     {
-        CloseContainer();
+        HidePanel(); // another chest (or this one again) is put away first
         _container = obj;
-        ContainerShown?.Invoke(obj, true);
         _containerInv = new Inventory(obj.Container!);
+        ContainerShown?.Invoke(obj, true);
         _chestTitle.Text = obj.DisplayName;
-        for (int i = 0; i < obj.Container!.Length; i++) _chestGrid.AddChild(Slot(SlotArea.Container, i));
-        _chestPanel.Visible = true;
+        EnsureChestViews(obj.Container!.Length);
+        ShowPanel(_chestPanel, UiPanel.Chest);
         SetOpen(true);
     }
 
-    private void CloseContainer()
+    /// <summary>The chest is no longer shown: typing its name ends and its lid closes.</summary>
+    private void ReleaseContainer()
     {
         if (_renameField.Visible) _renameField.ReleaseFocus();
         if (_container != null) ContainerShown?.Invoke(_container, false);
         _container = null;
         _containerInv = null;
-        _chestPanel.Visible = false;
-        foreach (var child in _chestGrid.GetChildren()) child.QueueFree();
-        ForgetFreedSlots();
     }
 
     private void Chest(ChestOp op)
     {
         if (_container == null) return;
         _ui.Game.ChestAction(_ui.Entity, _container, op);
+        Audio.Sfx.Play("grab");
         _crafting.Refresh();
     }
 
@@ -99,16 +147,5 @@ public sealed partial class InventoryScreen
         if (_container == null) return;
         _ui.Game.RenameContainer(_container, _renameField.Text);
         _chestTitle.Text = _container.DisplayName;
-    }
-
-    private void SortBackpack()
-    {
-        InventoryOps.Sort(_ui.Inventory.Backpack, PlayerInventory.HotbarSize, PlayerInventory.BackpackSize);
-        _crafting.Refresh();
-    }
-
-    private void QuickStackNearby()
-    {
-        if (_ui.Game.QuickStackNearby(_ui.Entity).Count > 0) _crafting.Refresh();
     }
 }

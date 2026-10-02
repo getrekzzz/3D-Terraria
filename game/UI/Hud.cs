@@ -11,8 +11,9 @@ namespace Strata.Game.UI;
 /// crosshair with its interaction hint and target name at the centre, the breath bar above it and the status line under
 /// it, the pickup feed bottom-left, the boss bar bottom-centre, event banners and the death screen. <see cref="ApplyLayout"/>
 /// places every widget (and, through <see cref="LayoutApplied"/>, the minimap and the F3 overlay) when the window, the UI
-/// scale or what is shown changes (the inventory, an NPC chat, a boss, the buff count, the info rows, the minimap setting,
-/// the F3 overlay), never per frame.
+/// scale or what is shown changes (the inventory and its panel and accessory rows, an NPC chat, a boss, the buff count,
+/// the info rows, the minimap setting, the F3 overlay), never per frame; the inventory screen's parts take their regions
+/// from it too.
 /// </summary>
 public sealed partial class Hud : CanvasLayer
 {
@@ -40,7 +41,8 @@ public sealed partial class Hud : CanvasLayer
     private (ItemDef? Item, Strata.Core.Voxels.CellShape Shape, int Turn) _hintFor;
 
     /// <summary>What decides the layout; a change re-runs <see cref="ApplyLayout"/>.</summary>
-    private readonly record struct LayoutKey(Vector2 Size, bool Inventory, bool Chat, bool Boss, int Buffs, bool Minimap, int Info, bool Debug);
+    private readonly record struct LayoutKey(Vector2 Size, bool Inventory, UiPanel Panel, int AccessoryRows, bool Chat, bool Boss, int Buffs,
+        bool Minimap, int Info, bool Debug);
 
     /// <summary>The layout in effect (null until the first frame).</summary>
     public UiLayoutResult? Layout { get; private set; }
@@ -122,8 +124,11 @@ public sealed partial class Hud : CanvasLayer
         _inventory = inventory;
         _dialog = dialog;
         _perf = perf;
+        LayoutApplied += inventory.Place;
         LayoutApplied += minimap.Place;
         LayoutApplied += perf.Place;
+        // Opening the inventory or a chest lays the screen out at once, so no frame shows it unplaced.
+        inventory.LayoutChanged += UpdateLayout;
         _key = default; // laid out again on the next frame, with them
     }
 
@@ -131,9 +136,7 @@ public sealed partial class Hud : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.hud");
         UpdateBossBar();
-        var key = new LayoutKey(LayoutWidgets.LogicalSize(GetViewport()), _inventory?.IsOpen == true, _dialog?.IsOpen == true, _bossShown,
-            _ui.Entity.State.Buffs.Active.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
-        if (!key.Equals(_key)) ApplyLayout(key);
+        UpdateLayout();
         _vitals.Update();
         UpdateBuffs();
         UpdateBuildHint();
@@ -144,12 +147,22 @@ public sealed partial class Hud : CanvasLayer
                 : $"You were slain\nRespawning in {Mathf.CeilToInt(_ui.Entity.RespawnTicks / 60f)}";
     }
 
+    /// <summary>Lays the screen out again when what decides the layout changed (the window, the UI scale or what is shown).</summary>
+    private void UpdateLayout()
+    {
+        bool inventory = _inventory?.IsOpen == true;
+        var key = new LayoutKey(LayoutWidgets.LogicalSize(GetViewport()), inventory, inventory ? _inventory!.Panel : UiPanel.None,
+            _inventory?.AccessoryRows ?? Strata.Core.Gameplay.Items.PlayerInventory.BaseAccessorySlots, _dialog?.IsOpen == true, _bossShown,
+            _ui.Entity.State.Buffs.Active.Count, Settings.UserSettings.Current.ShowMinimap, _info.Lines, _perf?.IsOpen == true);
+        if (!key.Equals(_key)) ApplyLayout(key);
+    }
+
     /// <summary>Computes the layout for <paramref name="key"/> and moves every widget onto its region (hidden without one).</summary>
     private void ApplyLayout(LayoutKey key)
     {
         _key = key;
-        var state = new UiState(InventoryOpen: key.Inventory, BossBar: key.Boss, NpcChat: key.Chat, BuffCount: key.Buffs,
-            ShowMinimap: key.Minimap, InfoLines: key.Info, DebugOverlay: key.Debug);
+        var state = new UiState(InventoryOpen: key.Inventory, Panel: key.Panel, BossBar: key.Boss, NpcChat: key.Chat, BuffCount: key.Buffs,
+            AccessoryRows: key.AccessoryRows, ShowMinimap: key.Minimap, InfoLines: key.Info, DebugOverlay: key.Debug);
         var layout = UiLayout.Compute(key.Size.X, key.Size.Y, state);
         Layout = layout;
         _itemName.InventoryOpen = key.Inventory;

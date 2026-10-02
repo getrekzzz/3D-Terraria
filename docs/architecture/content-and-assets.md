@@ -207,3 +207,15 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   catcher. Every placed control joins `LayoutWidgets.Group`; probe `ui.overlaps` counts intersecting pairs in the live
   tree (and logs them). Smoke: `ui f3`, `ui minimap in|out`; probes `hud.item_name`, `hud.status`,
   `ui.layout_width`, `ui.minimap_zoom`.
+* **Inventory screen** (`game/UI/InventoryScreen*.cs`, `game/UI/Inventory/`): Terraria's layout on the HUD's
+  `UiLayout` (the HUD feeds it `InventoryScreen.Panel` and `AccessoryRows` and calls `InventoryScreen.Place` from
+  `LayoutApplied`; `LayoutChanged` lays it out at once on open, close or a panel change). The backpack's 10×5 grid
+  sits on the hotbar's origin (first row = hotbar, selected slot gold); `CoinAmmoColumns` holds the coin and ammo
+  columns, the trash slot under them (saved with the player) and the `sort`/`quick_stack` buttons; the panel host
+  under the grid shows one panel at a time through `ShowPanel(Control, UiPanel)`/`ClosePanel()` (the chest today,
+  with 40 pooled slot views rebound on open; the shop and service panels plug in here) and sizes its slots by
+  `SlotScale`; `CraftingPanel` takes the Crafting region (pooled rows, no fixed size); the equipment column takes the
+  Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
+  so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
+  (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack), `.Chest`,
+  `.Equipment`. Smoke: `ui sort`, `ui quickstack`; probes `ui.grid_on_hotbar`, `ui.panel`, `ui.slot_scale`.

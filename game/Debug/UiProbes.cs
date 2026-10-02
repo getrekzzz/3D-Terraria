@@ -11,7 +11,8 @@ namespace Strata.Game.Debug;
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
-/// overlay input gate and the empty-screen click catcher (P2-11); and on the HUD layout (P2-12).
+/// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); and on the inventory
+/// screen's layout (P2-15).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -72,5 +73,10 @@ public static class UiProbes
         ctx.AddProbe("hud.status", () => world.Hud?.Status.Length > 0 ? 1 : 0);
         ctx.AddProbe("ui.layout_width", () => world.Hud?.Layout?.Width ?? 0);
         ctx.AddProbe("ui.minimap_zoom", () => world.Runtime.GetNodeOrNull<Minimap>("Minimap")?.Zoom ?? 0);
+        // P2-15: the inventory screen on the layout. Its grid sits on the hotbar's origin; the panel under it (0 none,
+        // 1 chest, 2 shop, 3 service); the slot scale the layout chose.
+        ctx.AddProbe("ui.grid_on_hotbar", () => world.Inventory?.GridOnHotbar == true ? 1 : 0);
+        ctx.AddProbe("ui.panel", () => (int)(world.Inventory?.Panel ?? Strata.Core.Presentation.UiPanel.None));
+        ctx.AddProbe("ui.slot_scale", () => world.Inventory?.SlotScale ?? 0);
     }
 }

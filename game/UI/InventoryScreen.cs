@@ -1,29 +1,27 @@
 using System;
 using Godot;
 using Strata.Core.Gameplay.Items;
+using Strata.Core.Presentation;
 using Strata.Core.Voxels.TileObjects;
 
 namespace Strata.Game.UI;
 
 /// <summary>
-/// The inventory screen (Tab/I): backpack, equipment (armor, the accessory slots the world unlocks and the misc row:
-/// pet, light pet, minecart, mount, hook), trash and coins, the crafting list for the current environment and an open
-/// container. Items move with a cursor stack (drawn at the pointer by <see cref="CursorItemLayer"/>); clicks are routed by
-/// <c>GameWorld.ClickSlot</c> (InventoryScreen.Slots.cs).
+/// The inventory screen (Tab/I), laid out like Terraria's on the HUD's <see cref="UiLayout"/>: the 10×5 backpack on
+/// the hotbar's spot (its first row is the hotbar), the coin and ammo columns right of it with the trash under them and
+/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest
+/// today; shops and services plug in through <see cref="ShowPanel"/>), the crafting column bottom-left and the
+/// equipment column on the right under the minimap. Each part is a registered layout widget placed by <see cref="Place"/>
+/// (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the pointer by <see cref="CursorItemLayer"/>
+/// and clicks are routed by <c>GameWorld.ClickSlot</c> (InventoryScreen.Clicks.cs). An overlay: the player keeps
+/// moving, and clicks on empty screen go to the <see cref="WorldClickCatcher"/> under every panel.
 /// </summary>
 public sealed partial class InventoryScreen : CanvasLayer
 {
     private const string Gate = "inventory";
-    private const float SlotSize = 50;
+    private const float ContainerReach = 6f; // metres from the chest's centre before it closes
     private UiContext _ui = null!;
     private Control _root = null!;
-    private CraftingPanel _crafting = null!;
-    private Label _coins = null!;
-    private Label _defense = null!;
-    private Label _setBonus = null!;
-    private Button _vanityToggle = null!;
-    private readonly ItemSlotView[] _accessoryViews = new ItemSlotView[PlayerInventory.MaxAccessorySlots];
-    private readonly ItemSlotView[] _hotbarViews = new ItemSlotView[PlayerInventory.HotbarSize];
     private TileObjectInstance? _container;
     private Inventory? _containerInv;
 
@@ -40,61 +38,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         _root = new Control { Visible = false, Theme = UiTheme.Theme, MouseFilter = Control.MouseFilterEnum.Ignore };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
-
-        var inv = ui.Inventory;
-        var backpack = Panel(new Vector2(24, 24));
-        var grid = new GridContainer { Columns = 10 };
-        grid.AddThemeConstantOverride("h_separation", 4);
-        grid.AddThemeConstantOverride("v_separation", 4);
-        for (int i = 0; i < PlayerInventory.BackpackSize; i++)
-        {
-            var view = Slot(SlotArea.Backpack, i, i < PlayerInventory.HotbarSize ? ((i + 1) % 10).ToString() : null);
-            if (i < PlayerInventory.HotbarSize) _hotbarViews[i] = view;
-            grid.AddChild(view);
-        }
-        backpack.AddChild(grid);
-
-        var equipment = Panel(new Vector2(24 + 10 * 54 + 40, 24));
-        var eq = new VBoxContainer();
-        var title = new HBoxContainer();
-        title.AddChild(new Label { Text = "Equipment", SizeFlagsHorizontal = Control.SizeFlags.ExpandFill });
-        title.AddChild(_vanityToggle = Button("Vanity", ToggleVanity));
-        eq.AddChild(title);
-        var slots = new HBoxContainer();
-        slots.AddThemeConstantOverride("separation", 4); // three columns still fit left of the crafting list
-        var armor = new VBoxContainer { TooltipText = "Armor: head, body, legs" };
-        for (int i = 0; i < PlayerInventory.ArmorSlots; i++) armor.AddChild(WornSlot(SlotArea.Armor, SlotArea.VanityArmor, i));
-        var accessories = new VBoxContainer { TooltipText = "Accessories" };
-        for (int i = 0; i < PlayerInventory.MaxAccessorySlots; i++)
-            accessories.AddChild(_accessoryViews[i] = WornSlot(SlotArea.Accessories, SlotArea.VanityAccessories, i));
-        var misc = new VBoxContainer { TooltipText = "Pet, light pet, minecart, mount, hook" };
-        for (int i = 0; i < MiscSlots.Count; i++) misc.AddChild(Slot(SlotArea.Misc, i));
-        slots.AddChild(armor);
-        slots.AddChild(accessories);
-        slots.AddChild(misc);
-        eq.AddChild(slots);
-        _defense = new Label();
-        eq.AddChild(_defense);
-        _setBonus = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(160, 0) };
-        _setBonus.AddThemeColorOverride("font_color", new Color(0.55f, 0.95f, 0.55f));
-        _setBonus.AddThemeFontSizeOverride("font_size", 12);
-        eq.AddChild(_setBonus);
-        eq.AddChild(new Label { Text = "Trash" });
-        eq.AddChild(Slot(SlotArea.Trash, 0));
-        _coins = new Label();
-        eq.AddChild(_coins);
-        var tidy = new HBoxContainer();
-        tidy.AddChild(Button("Sort", SortBackpack, "Sort the backpack below the hotbar (favourites stay put)"));
-        tidy.AddChild(Button("Quick stack", QuickStackNearby, "Quick stack to nearby chests: items they already hold leave the backpack"));
-        eq.AddChild(tidy);
-        equipment.AddChild(eq);
-
-        BuildChestPanel(new Vector2(24, 24 + 5 * 54 + 40));
-
-        _crafting = new CraftingPanel();
-        _root.AddChild(_crafting);
-        _crafting.Initialize(ui, new Vector2(24 + 10 * 54 + 40 + 180, 96));
-
+        BuildLayout();
         ui.Game.Interaction.ContainerOpened += (p, obj) =>
         {
             if (p == ui.Entity) OpenContainer(obj);
@@ -124,15 +68,23 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (autoPause || !open) _ui.Player.Runtime.Simulating = !open;
         if (open)
         {
+            UpdateEquipment();
             _crafting.Refresh();
+            LayoutChanged?.Invoke();
             return;
         }
-        // The held stack goes back into the storage (coins and ammo to their slots); what does not fit is thrown.
-        var rest = _ui.Inventory.Pickup(_ui.Inventory.Cursor);
-        _ui.Inventory.Cursor = ItemStack.Empty;
-        _ui.Game.ThrowStack(_ui.Entity, rest);
+        // The held stack and the service slot's item (a reforge) go back into the storage (coins and ammo to their
+        // slots); what does not fit is thrown.
+        var inv = _ui.Inventory;
+        var held = inv.Cursor;
+        inv.Cursor = ItemStack.Empty;
+        Stow(held);
+        var serviced = inv.Service[0];
+        inv.Service[0] = ItemStack.Empty;
+        Stow(serviced);
         _craftingStale = false;
-        CloseContainer();
+        HidePanel();
+        LayoutChanged?.Invoke();
     }
 
     public override void _Process(double delta)
@@ -145,38 +97,35 @@ public sealed partial class InventoryScreen : CanvasLayer
             _craftingStale = false;
             _crafting.Refresh();
         }
-        var state = _ui.Entity.State;
-        _defense.Text = $"Defense {state.Defense}";
-        _setBonus.Text = state.SetBonus != null ? $"Set bonus: {state.SetBonus}" : "";
-        _coins.Text = Coins.Format(Coins.Total(state.Inventory));
-        // Expert and Master worlds unlock the 6th and 7th accessory slots; a locked slot still shows an item left in it.
-        var row = _showVanity ? state.Inventory.VanityAccessories : state.Inventory.Accessories;
-        for (int i = 0; i < _accessoryViews.Length; i++)
-        {
-            bool unlocked = i < state.Inventory.AccessorySlotsUnlocked;
-            _accessoryViews[i].Visible = unlocked || !row[i].IsEmpty;
-            _accessoryViews[i].Locked = !unlocked;
-        }
-        for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = state.Inventory.SelectedHotbar == i;
+        UpdateEquipment();
+        int selected = _ui.Inventory.SelectedHotbar;
+        for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
         if (_container != null)
         {
             var world = _ui.Game.Session.World;
             var center = new System.Numerics.Vector3(_container.Anchor.X + 1, _container.Anchor.Y + 1, _container.Anchor.Z + 1) * Strata.Core.Common.Units.CellSize;
-            if (world.TileObjects.Get(_container.Id) == null || System.Numerics.Vector3.Distance(center, _ui.Entity.Center) > 6f) CloseContainer();
+            if (world.TileObjects.Get(_container.Id) == null || System.Numerics.Vector3.Distance(center, _ui.Entity.Center) > ContainerReach)
+                ClosePanel();
         }
     }
 
-    private PanelContainer Panel(Vector2 position)
+    /// <summary>Puts <paramref name="stack"/> back into the player's storage; what does not fit is thrown.</summary>
+    private void Stow(ItemStack stack)
     {
-        var p = new PanelContainer { Position = position };
-        _root.AddChild(p);
-        return p;
+        if (stack.IsEmpty) return;
+        _ui.Game.ThrowStack(_ui.Entity, _ui.Inventory.Pickup(stack));
     }
 
-    private static Button Button(string text, Action onPressed, string? tooltip = null)
+    /// <summary>A bare text button in the small UI font, white turning gold under the mouse (Terraria's chest links).</summary>
+    private static Button TextButton(string text, Action onPressed, string? tooltip = null)
     {
         // No keyboard focus: the player walks and jumps with the inventory open, and Space (ui_accept) would press it again.
-        var b = new Button { Text = text, TooltipText = tooltip ?? "", FocusMode = Control.FocusModeEnum.None };
+        var b = new Button
+        {
+            Text = text, TooltipText = tooltip ?? "", FocusMode = Control.FocusModeEnum.None, ThemeTypeVariation = UiTheme.TextButton,
+            Alignment = HorizontalAlignment.Left, ClipText = true,
+        };
+        b.AddThemeFontSizeOverride("font_size", UiFonts.Small);
         b.Pressed += onPressed;
         return b;
     }
