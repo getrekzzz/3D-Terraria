@@ -161,6 +161,12 @@ public sealed class PlayerEntity : Gameplay.Combat.ICombatTarget
         }
     }
 
+    /// <summary>The bed being slept in (P3-34), or null awake; see <see cref="GameWorld.Sleep"/>.</summary>
+    public Voxels.TileObjects.TileObjectInstance? SleepBed { get; set; }
+
+    /// <summary>Lying in a bed: night passes faster while every player sleeps and nothing threatens them.</summary>
+    public bool Sleeping => SleepBed != null;
+
     public Vector3 Center => Position + new Vector3(0, HalfExtents.Y, 0);
 
     public bool Alive => State.Vitals.Life > 0;

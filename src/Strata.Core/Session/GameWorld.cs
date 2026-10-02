@@ -174,11 +174,13 @@ public sealed partial class GameWorld : IDisposable
             // Captures on this thread, writes in the background; retried next tick while the last one is still landing.
             if (BeginAutosave()) _autosaveCounter = 0;
         }
+        AdvanceSleepClock();
     }
 
     private void TickPlayer(PlayerEntity p)
     {
         var state = p.State;
+        TickSleep(p);
         if (!p.Alive)
         {
             p.Hook.Reset(); // the chain does not hang from a corpse or follow it to the respawn point

@@ -63,6 +63,7 @@ public sealed partial class InteractionController : Node
         Entity.Precision = Settings.UserSettings.Current.SmallBlocks != (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("precision_mode"));
         UpdateTarget();
         if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.GameplayBlocked) return;
+        if (Entity.Sleeping || _player.WokeFrame == Engine.GetPhysicsFrames()) return; // in bed, or the press got them up (P3-34)
 
         bool fresh = Input.IsActionJustPressed("use_primary");
         if (fresh || Input.IsActionPressed("use_primary"))
