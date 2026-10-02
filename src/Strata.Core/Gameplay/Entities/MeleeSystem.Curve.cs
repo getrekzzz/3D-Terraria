@@ -60,7 +60,9 @@ public sealed partial class MeleeSystem
             var dir = new Vector3(MathF.Sin(s.Yaw) * MathF.Cos(s.Pitch), MathF.Sin(s.Pitch), MathF.Cos(s.Yaw) * MathF.Cos(s.Pitch));
             _hitDeg = float.NaN;
             _hitPivot = origin;
-            HitCreatures(s, (min, max) => ThrustConnects(origin, dir, reach, min, max));
+            Func<Vector3, Vector3, bool> stabs = (min, max) => ThrustConnects(origin, dir, reach, min, max);
+            HitCreatures(s, stabs);
+            SmashObjects(s, stabs);
             return;
         }
         var clip = timing.Clip(UseTiming.Swing);
@@ -78,14 +80,16 @@ public sealed partial class MeleeSystem
         var plane = PlaneFor(s.Player.Center, s.Yaw, new MeleeSwingInfo(swing.Arc, swing.Length, Prefixes.Size(s.Stack)));
         var center = s.Player.Center;
         _hitPivot = plane.Pivot;
-        HitCreatures(s, (min, max) =>
+        Func<Vector3, Vector3, bool> connects = (min, max) =>
         {
             if (plane.Sweeps(from, to, min, max, out _hitDeg)) return true;
             // Point blank: a creature in the player's face is struck wherever the blade is.
             var near = Vector3.Clamp(center, min, max) - center;
             _hitDeg = to;
             return new Vector2(near.X, near.Z).Length() < PointBlank && MathF.Abs(near.Y) <= VerticalReach;
-        });
+        };
+        HitCreatures(s, connects);
+        SmashObjects(s, connects);
     }
 
     /// <summary>A thrust connects with a box ahead of <paramref name="origin"/>, no further than the stab has reached, close to the aim line.</summary>

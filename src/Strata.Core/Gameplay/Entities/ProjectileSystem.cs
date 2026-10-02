@@ -163,13 +163,18 @@ public sealed partial class ProjectileSystem
             if (p.Def.Drag > 0) p.Velocity *= 1f - p.Def.Drag * dt;
             if (p.Def.Homing > 0) Steer(p, dt);
             if (p.Def.Guided > 0) Guide(p, dt);
-            if (p.Def.CollideTerrain && !MoveThroughTerrain(p, dt))
+            bool moved = !p.Def.CollideTerrain || MoveThroughTerrain(p, dt);
+            if (!p.Def.CollideTerrain) p.Position += p.Velocity * dt;
+            // Friendly shots smash pots and mow grass they pass through, and fly on (P3-23); a shot stopped by the
+            // ground still cuts the tuft it landed in.
+            if (p.Def.Friendly && p.Owner != null && world.TileObjects.At(VoxelMotion.CellOf(p.Position)) is { Def.BreakByAttack: true } struck)
+                _world.Editor.SmashObject(struck);
+            if (!moved)
             {
                 if (p.Def.Returns > 0) p.Returning = true;
                 else End(i);
                 continue;
             }
-            if (!p.Def.CollideTerrain) p.Position += p.Velocity * dt;
             if (p.Def.Contact && (p.Def.Friendly ? HitCreatures(p) : HitPlayers(p)))
             {
                 if (p.Def.Returns > 0) p.Returning = true;

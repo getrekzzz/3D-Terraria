@@ -41,7 +41,7 @@ public sealed partial class GameWorld : IDisposable
         Spread = new Gameplay.Progression.SpreadSystem(this);
         Maps = new Gameplay.Map.MapSystem(this);
         Npcs = new NpcSystem(this);
-        Melee = new MeleeSystem(Npcs, ItemUse);
+        Melee = new MeleeSystem(Npcs, ItemUse) { World = this };
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
