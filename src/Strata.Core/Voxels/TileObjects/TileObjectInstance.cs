@@ -53,6 +53,10 @@ public sealed class TileObjectInstance
     /// <summary>Loot table to roll into the container the first time it is opened (world-generated chests).</summary>
     public string? PendingLoot { get; set; }
 
+    /// <summary>A world chest that only opens with its definition's <see cref="TileObjectDef.Lock"/> key (and cannot
+    /// be broken until then).</summary>
+    public bool Locked { get; set; }
+
     /// <summary>
     /// The trunk column of a tree-like object (<see cref="TileCollision.Trunk"/>) in cell units: centred on the
     /// footprint, half-width Max(0.5, width / 6), from the base up to 55 % of the height. The body collider and

@@ -130,6 +130,7 @@ armor_statue|Armor Statue|early|world
 angel_statue|Angel Statue|early|world
 spike|Spike|prehardmode|dungeon
 bone_welder|Bone Welder|prehardmode|dungeon
+shadow_chest|Shadow Chest|prehardmode|underworld
 """,
     "material": """
 book|Book|prehardmode|dungeon

@@ -24,7 +24,7 @@ public sealed record EllipsoidOp(Aabb3i Bounds, System.Numerics.Vector3 Center, 
 public sealed record CylinderOp(Aabb3i Bounds, float CenterX, float CenterZ, float Radius, string? Block, bool OnlyAir = false) : BlueprintOp(Bounds);
 
 /// <summary>Places a tile object anchored at <see cref="Anchor"/>.</summary>
-public sealed record ObjectOp(Aabb3i Bounds, string ObjectId, Int3 Anchor, int Rotation, int Variant = 0, string? Loot = null) : BlueprintOp(Bounds);
+public sealed record ObjectOp(Aabb3i Bounds, string ObjectId, Int3 Anchor, int Rotation, int Variant = 0, string? Loot = null, bool Locked = false) : BlueprintOp(Bounds);
 
 /// <summary>A deterministic list of operations describing a structure, produced during planning. Once
 /// <see cref="Freeze"/>d it is immutable and carries a per-chunk op index, so chunk stamping and zone queries only
@@ -74,6 +74,10 @@ public sealed partial class Blueprint
     /// <summary>Places a tile object, computing its rotated footprint from the definition.</summary>
     public void Object(Content.Defs.TileObjectDef def, Int3 anchor, int rotation = 0, int variant = 0, string? loot = null) =>
         Object(def.Id, anchor, Voxels.TileObjects.TileObjectInstance.FootprintOf(def, rotation), rotation, variant, loot);
+
+    /// <summary>Places a tile object that starts <paramref name="locked"/> (a chest needing its key).</summary>
+    public void Object(Content.Defs.TileObjectDef def, Int3 anchor, int rotation, int variant, string? loot, bool locked) =>
+        Add(new ObjectOp(new Aabb3i(anchor, anchor + Voxels.TileObjects.TileObjectInstance.FootprintOf(def, rotation)), def.Id, anchor, rotation, variant, loot, locked));
 
     public void Add(BlueprintOp op)
     {

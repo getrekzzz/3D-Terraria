@@ -42,4 +42,10 @@ assert props.problems == 0
 tp landmark dungeon_chest
 wait_until player.frozen == 0 180
 assert zone.dungeon == 1
+# Its Gold Chest is locked: refused without a key, opened by a Golden Key, which is used up.
+wait_until stream.idle == 1 600
+interact nearest gold_chest 8 refused
+give golden_key 1
+interact nearest gold_chest 8 containeropened
+assert inv.golden_key == 0
 assert errors == 0

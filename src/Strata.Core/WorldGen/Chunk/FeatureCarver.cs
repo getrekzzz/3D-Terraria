@@ -144,7 +144,7 @@ public static class FeatureCarver
                 {
                     if (!ctx.InCore(obj.Anchor.X, obj.Anchor.Y, obj.Anchor.Z)) break;
                     var def = ctx.Gen.Content.TileObjects.Get(obj.ObjectId);
-                    var inst = new Voxels.TileObjects.TileObjectInstance(def, obj.Anchor, obj.Rotation, obj.Variant) { PendingLoot = obj.Loot };
+                    var inst = new Voxels.TileObjects.TileObjectInstance(def, obj.Anchor, obj.Rotation, obj.Variant) { PendingLoot = obj.Loot, Locked = obj.Locked };
                     ctx.AddObject(inst);
                     break;
                 }

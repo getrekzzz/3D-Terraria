@@ -571,6 +571,12 @@
    ],
    "generator": "twisted"
   },
+  "shadow_chest": {
+   "models": [
+    "assets/models/objects/shadow_chest_v0.glb"
+   ],
+   "generator": "chest"
+  },
   "shadow_orb": {
    "models": [
     "assets/models/objects/shadow_orb_v0.glb"
@@ -2798,6 +2804,10 @@
   "seedler": {
    "model": "assets/models/items/seedler.glb",
    "icon": "assets/icons/items/seedler.png"
+  },
+  "shadow_chest": {
+   "object": "shadow_chest",
+   "icon": "assets/icons/items/shadow_chest.png"
   },
   "shadow_key": {
    "model": "assets/models/items/shadow_key.glb",

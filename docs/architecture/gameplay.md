@@ -162,3 +162,17 @@ Probes come from `StandardProbes` and from `[ProbeSource]` classes (static `Regi
 `CommandContext` registers those in Strata.Core (e.g. `TownProbes`), `GodotCommandHost.CreateContext` those in the game
 assembly (e.g. `PlayerProbes`, which also takes the `LaunchedWorld`), in full-type-name order (`ProbeSources`). A
 probe name is registered once; new probes go in a new source file (docs/CONVENTIONS.md, *Extension points*).
+
+## Locked chests and keys
+
+A chest definition may carry `lock` (`key`, `consume` default true, `requiresFlag`, `message`); it only applies to
+instances with `TileObjectInstance.Locked`, persisted as bit 4 of the object state byte in `ChunkCodec` (old chunks
+read unlocked). Generation places them through `ObjectOp.Locked` (`Blueprint.Object(..., locked: true)`, copied by
+`FeatureCarver.Stamp`): every dungeon Gold Chest (Golden Key, used up; one rolls `dungeon_chest_shadow_key`) and the
+underworld towers' Shadow Chests (Shadow Key, kept; table `shadow_chest` with Sunfury, Dark Lance or Flamelash,
+hellstone bars and potions, which left `cabin_chest_primary`). `ObjectInteraction` (Locks partial) refuses with the
+lock's message while `requiresFlag` is unset, then "It's locked." without the key; opening raises `Unlocked`
+(`SoundEvents.Locks`: `unlock`; any refusal plays `locked`). `WorldEditor.HitObject` returns `Locked` for a locked
+chest, rolls an unopened chest's loot before the not-empty check, `BreakObject` rolls it before spilling, and locked
+chests are never broken for lost support, so generated loot is never lost. `interact nearest <objectId> [radius]
+[expectedOutcome]` drives it from smoke scripts.

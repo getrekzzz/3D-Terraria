@@ -256,5 +256,27 @@ public class DungeonGenerationTests
         Assert.NotNull(g.World.Navigator.FindPath(gate, Snap(g, l.Door + Int3.Up * 0 - l.Inward)!.Value, NavAgent.Humanoid, 20000));
     }
 
+    [Fact]
+    public void ExactlyOneShadowKeyChestAndEveryChestLocked()
+    {
+        var g = Game.Value;
+        var chests = Feature(g).Blueprint.Ops.OfType<ObjectOp>().Where(o => o.ObjectId == "gold_chest").ToList();
+        Assert.NotEmpty(chests);
+        Assert.Single(chests, o => o.Loot == "dungeon_chest_shadow_key");
+        Assert.All(chests, o => Assert.True(o.Locked, $"chest at {o.Anchor} is not locked"));
+    }
+
+    [Fact]
+    public void UnderworldChestsAreLockedShadowChests()
+    {
+        var plan = Game.Value.World.Session.Generator.Plan;
+        var ops = plan.Features.All.OfType<StructureFeature>().Where(f => f is not DungeonFeature)
+            .SelectMany(f => f.Blueprint.Ops.OfType<ObjectOp>()).Where(o => o.Anchor.Y < plan.Bands.UnderworldTop).ToList();
+        var shadow = ops.Where(o => o.ObjectId == "shadow_chest").ToList();
+        Assert.NotEmpty(shadow);
+        Assert.All(shadow, o => Assert.True(o.Locked && o.Loot == "shadow_chest"));
+        Assert.DoesNotContain(ops, o => o.ObjectId == "gold_chest" && o.Loot == "cabin_chest");
+    }
+
     private static Int3? Snap(TestGame g, Int3 cell) => g.World.Navigator.NearestStandable(cell, NavAgent.Humanoid, 3);
 }

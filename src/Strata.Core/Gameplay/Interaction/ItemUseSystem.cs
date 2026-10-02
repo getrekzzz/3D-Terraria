@@ -215,7 +215,7 @@ public sealed partial class ItemUseSystem
             {
                 ObjectHitResult.WrongTool => UseOutcome.WrongTool,
                 ObjectHitResult.TooWeak => UseOutcome.TooHard,
-                ObjectHitResult.NotEmpty => UseOutcome.Blocked,
+                ObjectHitResult.NotEmpty or ObjectHitResult.Locked => UseOutcome.Blocked,
                 _ => UseOutcome.HitObject,
             };
         }

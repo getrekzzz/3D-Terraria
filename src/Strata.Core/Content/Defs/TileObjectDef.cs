@@ -111,6 +111,10 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Hurts players who touch it (dungeon spikes).</summary>
     public HazardSpec? Hazard { get; init; }
 
+    /// <summary>The key a locked instance (<c>TileObjectInstance.Locked</c>) of this chest needs; unlocked ones open
+    /// freely.</summary>
+    public LockSpec? Lock { get; init; }
+
     /// <summary>The item id that places/drops this object.</summary>
     public string? PlacingItemId => Item ?? (Natural ? null : Id);
 
@@ -165,6 +169,16 @@ public sealed class HazardSpec
 
     /// <summary>Knockback away from the object (Terraria knockback units).</summary>
     public float Knockback { get; init; } = 6f;
+}
+
+/// <summary>How a locked chest opens: with <see cref="Key"/> in the backpack (used up when <see cref="Consume"/>), and only
+/// once <see cref="RequiresFlag"/> is set (with <see cref="Message"/> as the refusal before that).</summary>
+public sealed class LockSpec
+{
+    public string Key { get; init; } = "";
+    public bool Consume { get; init; } = true;
+    public string? RequiresFlag { get; init; }
+    public string? Message { get; init; }
 }
 
 /// <summary>What a wired trap shoots, along the way it faces.</summary>

@@ -63,7 +63,8 @@ public static partial class DungeonBuilder
                 var dais = new Aabb3i(anchor - new Int3(1, 1, 1), anchor + new Int3(size.X + 1, 0, size.Z + 1));
                 bp.Fill(dais.Intersection(layout.Rooms[spot.Room].Interior), style.Brick);
             }
-            bp.Object(chest, anchor, RotationToward(spot.Facing), 0, spot.ShadowKey ? "dungeon_chest_shadow_key" : "dungeon_chest");
+            // Every planned spot is a locked Gold Chest (a Golden Key opens one), the Shadow Key's included.
+            bp.Object(chest, anchor, RotationToward(spot.Facing), 0, spot.ShadowKey ? "dungeon_chest_shadow_key" : "dungeon_chest", locked: true);
         }
         return bp;
     }

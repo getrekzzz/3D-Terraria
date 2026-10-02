@@ -4093,6 +4093,13 @@
    "source": "dungeon"
   },
   {
+   "id": "terraria:shadow_chest",
+   "name": "Shadow Chest",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "underworld"
+  },
+  {
    "id": "terraria:book",
    "name": "Book",
    "kind": "material",
