@@ -1,8 +1,9 @@
 # 3D Terraria-Style World — Master Plan (persistent project memory)
 
 > Update this file at the end of every development cycle. It is the single source of truth for what
-> exists, what is partial, what is missing, and what comes next. Last update: 2026-09-30 (W0 of the player-feedback
-> overhaul: status rows refreshed from the audit in [`AUDIT.md`](AUDIT.md)).
+> exists, what is partial, what is missing, and what comes next. Last update: 2026-10-02 (Phase 1 of the
+> player-feedback overhaul, W1a and W1b: the reported bugs are fixed; status rows refreshed from the audit in
+> [`AUDIT.md`](AUDIT.md)).
 
 ## 1. Vision
 A native-3D evolution of Terraria's design philosophy — depth, interconnectivity, freedom, discovery,
@@ -55,6 +56,11 @@ world that is played in real 3D (vertical caves, overhangs, tunnelling bosses).
 | 2026-09-30 | Human clips are pose functions sampled every frame; characters with the same skeleton share an animation set (`assets/models/creatures/anim`), played through a code-built `AnimationTree` (locomotion + upper-body actions + held light + flinch) and an aim modifier | Layered, Terraria-like motion (swing while running, legs follow movement, torso to the aim) without re-exporting 98 character meshes; sets rebuild in seconds. |
 | 2026-09-30 | Player-feedback overhaul: fix the reported bugs first (targeting, swings, hooks, bows, exposure, torches, terrain), then lag spikes, a faithful Terraria UI, item and feel polish, bosses and a 1:1 Dungeon, complete town NPCs and a guide book, in waves W0–W11. The per-feature status with evidence and planned fixes is [`docs/AUDIT.md`](AUDIT.md), refreshed at every phase gate | The player reported jagged terrain, fast-forwarded swings, broken hooks, a flashbang desert, tiny torch light, wrong facing and lag spikes, and asked for a full audit. Old worlds are disposable; the body always faces the crosshair; the UI follows the Terraria look while the world stays realistic 3D |
 | 2026-09-30 | Bosses are rebuilt from metaball bodies with sculpted, painted detail and small rigs, translucent `:clear` parts, and renderer-drawn arms (`armModel`); centred models are raised onto their feet by their bounds | The primitive-built bosses did not read as the reference game's; eyes and brains were drawn half a hitbox low. |
+| 2026-10-01 | Exposure is a data-driven, deterministic model (`data/config/lighting.json`, Core `ExposureModel`): a cave and night boost and a per-biome `exposureBias`, eased asymmetrically (fast darken, slow brighten) on every preset; Godot's auto exposure only meters within a narrow window around it. Glow, fog, SSIL, volumetrics, torch lights and the block-light curve are data in the same file | The old auto-exposure window could only brighten (1.65–3.3×), so the desert and snow flashbanged and leaving a cave was a white frame; tuning needed numbers, not code edits |
+| 2026-10-01 | The body always faces the crosshair in third person: chest, arms and head follow the camera's yaw, the legs follow the movement (forward, strafe and backpedal clips, at most 70° of twist); the crosshair ray starts at the eye plane, so nothing behind the player is targeted | Aiming and talking turned the body the wrong way through the shoulder-camera offset; the player asked for the body to face where they look |
+| 2026-10-01 | `GenVersion` 10: smooth terrain. Relief is data (`relief` per biome) sampled with cubic B-splines and soft ridges; the surface is a heightfield with overhangs only in rare cliff zones; caves keep a roof under the true surface; ground vertices take their height from nearby column tops (no stair ripples) | The player found the terrain jagged and unpredictable (fins, floating blobs, pits, 4 m creases); old worlds are disposable and are marked "old terrain" in the world list |
+| 2026-10-01 | Lean mode for the overhaul: no software-rendered (lavapipe) tuning loops, at most one short rendered check per work package, smoke only what a change touches (the wave gate runs everything), no optional extras | The player's call: W1a took about 8.5 hours, 6+ of them rendered lighting tuning |
+| 2026-10-01 | The overhaul runs as parallel cloud sessions, each owning a disjoint slice and branch (integration, Bosses + Dungeon, Art, NPCs + Guide book, World & life), merged into `claude/clever-goodall-kgex45` with full CI; rules in [`docs/overhaul/PARALLEL.md`](overhaul/PARALLEL.md) | Cuts wall-clock time; slices avoid each other's hub files so merges stay mechanical |
 
 ## 3. System status
 Legend: ✅ complete for its milestone · 🟡 partial · ⬜ missing
@@ -70,15 +76,15 @@ are in [`AUDIT.md`](AUDIT.md).
 | Content | Reference DBs + coverage | ✅ | 1,025 concepts / 12 DBs (incl. liquids), `Strata.Tools coverage`; 100 % covered, but the list is hand-picked (no Magic Missile, Golden Key, spikes, pylons…, see AUDIT §3) |
 | Voxels | Chunks, edits, raycast, tile objects | ✅ | COW chunks, EditBatch, multi-cell objects with containers |
 | Persistence | Regions, codec, id tables, migrations, players | ✅ | Atomic writes + .bak, v0→v1 migration, player saves, autosave |
-| WorldGen | 20 passes, plan + chunk tiers | ✅ | Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
+| WorldGen | 20 passes, plan + chunk tiers | ✅ | `GenVersion` 10: smooth relief from data, heightfield surface with rare cliff zones, roofed caves, worm cave mouths. Structures: cabins, mineshafts, living trees, pyramid, crypt (zone + locked walls + gate landmark) |
 | WorldGen | Report tool | ✅ | Maps, sections, ore/depth charts |
-| Lighting | Sky + RGB block light | ✅ | Stateless per chunk; outdoor shade under floating roofs; liquid light (lava) from data; sampled by props/creatures via LightProbe; biome fog/sky/ambient looks from data |
-| Meshing | Surface nets + crisp shapes + liquids + collision + grass scatter | ✅ | Far terrain is the horizon heightfield (no coarse voxel chunks) |
+| Lighting | Sky + RGB block light, exposure | ✅ | Stateless per chunk; outdoor shade under floating roofs; liquid light (lava) from data; sampled by props/creatures via LightProbe; biome fog/sky/ambient looks from data; data-driven exposure model with per-biome bias (no desert flashbang); torches light 8–10 m of cave on every preset (`data/config/lighting.json`) |
+| Meshing | Surface nets + crisp shapes + liquids + collision + grass scatter | ✅ | Ground heights rebuilt from column tops (no stair ripples); far terrain is the horizon heightfield (no coarse voxel chunks) |
 | Rendering | Physical sky + clouds, sky-lit PBR, graphics presets, terrain materials, water/lava, grass, leaf-card trees, character shader, horizon | ✅ | See `docs/architecture/rendering.md`. Cave culling, particles polish ⬜ |
 | Streaming | Jobs, chunk streamer, colliders | ✅ | Adaptive completion budget; diagnostics (`stream`) |
-| Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink |
-| Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds |
-| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; 18 prefixes (invented names) and Goblin Tinkerer reforging (no reforge slot). Hooks don't fire on click, use animations restart mid-swing (AUDIT §8) |
+| Player | Controller, camera, avatar, carried light | ✅ | Step-up, variable jump, per-liquid swimming, breath/drowning, fall damage, knockback, blink; the body always faces the crosshair, legs strafe and backpedal |
+| Interaction | Targeting, mining, placing, objects | ✅ | Brushes, falling blocks, support loss, doors/chests/beds; eye-plane crosshair ray with decor and canopy filters, the Reach stat, crosshair names for creatures, bosses, worm segments and residents |
+| Items | Use table, tooltips, dropped items | ✅ | Inferred actions + explicit behaviours; one use animation per swing (speed scales it), hooks thrown by click or key that hold on natural terrain, shots from the hand to the crosshair, bows drawn with a nocked arrow, swords that shoot also swing, failed uses say why; 18 prefixes (invented names) and Goblin Tinkerer reforging (no reforge slot). Yoyos, flails, whips and per-hook visuals are stand-ins (AUDIT §8) |
 | Crafting | Recipes, stations, environment | ✅ | Liquids/biome/time conditions |
 | UI | HUD, inventory, equipment, chests, crafting, console, perf overlay, menus, settings, character/world select, map | ✅ | Generic dark theme with no UI font; no hearts/stars, buff icons, coin/ammo slots, chat log or housing menu (AUDIT §9) |
 | Combat | Damage model, melee arcs, projectiles (friendly + hostile), buffs, contact/death effects | ✅ | Summons ✅; whips, yoyos and flails are stand-ins 🟡 (AUDIT §8) |
@@ -99,7 +105,8 @@ are in [`AUDIT.md`](AUDIT.md).
 * `TileObjectRenderer` rebuilds a chunk's MultiMeshes when its light changes; fine now, could update custom data in place.
 * Screenshot runs on software Vulkan (llvmpipe) are slow (frame-rate-bound job completion); budget is adaptive now.
 * Streaming once failed to reach idle in a rendered run (not reproduced since); `ChunkStreamer.DebugState()` is logged by the screenshot tool to catch it.
-* Item held-in-hand orientation is generic (+90° about X); per-item grip data would improve swords/bows.
+* Item held-in-hand orientation is generic (+90° about X) except ranged weapons, which aim at the crosshair (bows
+  upright, guns along the view, staffs tipped); per-item grip sockets would improve swords and tools (P3-05, P3-06).
 * Reforging is a Goblin Tinkerer service on the held item: no reforge slot, and the 18 prefixes use invented names
   (P2-28, P3-31).
 * Generated liquid can still hang across a chunk's bottom face (pass 20 only sees inside the chunk); it stays static
@@ -143,7 +150,7 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 ## 6. Validation status
 | Check | Where | Status |
 |---|---|---|
-| Core unit/integration tests (313, incl. graphics presets, grass scatter, horizon, hardmode life, mechanical bosses, nights, cabins, legacy saves) | `tests/Strata.Core.Tests` | ✅ CI |
+| Core unit/integration tests (574 at the W3 gate, incl. graphics presets, grass scatter, horizon, hardmode life, mechanical bosses, nights, cabins, legacy saves, use timing, targeting, hooks, terrain shape, slots and coins) | `tests/Strata.Core.Tests` | ✅ CI |
 | Content validation (refs, specs, assets, graphics presets, grass kinds) | `Strata.Tools validate` | ✅ CI |
 | Reference DB freshness + coverage report | `gen_reference.py --check`, `coverage` | ✅ CI summary |
 | Asset coverage (every object/item/enemy) | `build_all.py --check`, `AssetCoverageTests` | ✅ CI |
@@ -159,6 +166,9 @@ Progression flags ─> Mutations (hardmode) ─> WorldGen passes (lazy)
 | Engine smoke: effigy burned in underworld lava calls the Wall of Flesh (guide sacrificed), the fight runs, defeat raises hardmode | `mawwall.cmds` | ✅ CI |
 | Engine smoke: hardmode appends mutations, loaded chunks catch up, the Hallow wedge streams in converted and is a zone, spread runs; hardmode stations place and every hardmode creature spawns | `hardmode.cmds` | ✅ CI |
 | Engine smoke: clockwork eye brings both Twins (flag on the second death), Destroyer releases probes, Skeletron Prime, all-mechs flag | `mechs.cmds` | ✅ CI |
+| Engine smoke: grappling hooks on crisp, natural and platform anchors, rocket boots, wings, extra jumps, dashing | `movement.cmds` | ✅ CI |
+| Engine smoke: climbing rope, minecart track, wiring (lever, door, pressure plate, dart trap) | `builder.cmds` | ✅ CI |
+| Engine smoke: Terraria slot clicks, throwing, crates, chest operations; theme, font, UI scale, combat text, health bars; spike counters | `inventory.cmds`, `ui.cmds`, `perf.cmds` | ✅ CI |
 | Screenshots | `--screenshot` + `--exec` (single shot); `screenshot <name>` in `game/Testing/Tours/tour.cmds` (biomes, caves, underworld, town, night, crypt gate, Skeletron, Wall of Flesh, Hallow wedge) | ✅ CI tour job on main/dispatch (Xvfb + lavapipe, artifacts) |
 
 ## 7. Performance
