@@ -1,14 +1,17 @@
 {
   // Player movement tuning. One cell is 0.5 m; the player is 1.8 m tall (3.6 cells).
+  // Speed boots (the runSpeed stat) ease in over runUpTime of running; Sprint multiplies only their bonus.
   "walkSpeed": 5.0,
   "sprintMultiplier": 1.35,
+  "runUpTime": 1.2,
   "groundAcceleration": 40,
   "groundFriction": 30,
   "airAcceleration": 22,
   "gravity": 32,
   "jumpHoldGravity": 0.45,
   "jumpHoldTime": 0.28,
-  "jumpSpeed": 9.2,
+  // A full held jump peaks about 5.5 cells up (MovementConfig.JumpApex), as in Terraria relative to the body.
+  "jumpSpeed": 9.9,
   "coyoteTime": 0.12,
   "jumpBuffer": 0.12,
   "maxFallSpeed": 30,

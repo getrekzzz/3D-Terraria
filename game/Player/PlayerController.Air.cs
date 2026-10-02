@@ -1,11 +1,13 @@
 using Godot;
 using Strata.Core.Common;
+using Strata.Core.Gameplay.Stats;
 
 namespace Strata.Game.Player;
 
 /// <summary>
 /// Movement accessories: extra jumps in the air (Cloud in a Bottle and friends, one each per flight), wings and rocket
-/// boots (rise while jump is held; wings then glide), and double-tap dashes. Everything refills on landing.
+/// boots (rise while jump is held; wings then glide), double-tap dashes, the speed-boot run-up and the jump-apex
+/// probe. Everything refills on landing.
 /// </summary>
 public sealed partial class PlayerController
 {
@@ -17,6 +19,12 @@ public sealed partial class PlayerController
     private float _dashTime;
     private readonly float[] _lastTap = { -1f, -1f, -1f, -1f };
     private float _clock;
+    private float _runUp;
+    private float _jumpStartY;
+    private bool _jumpTracking;
+
+    /// <summary>Height (cells) the last ground jump has reached above its takeoff (smoke probe).</summary>
+    public float JumpApexCells { get; private set; }
 
     /// <summary>Seconds of wing and boot flight left (HUD).</summary>
     public float FlightLeft => _wingTime + _bootTime;
@@ -48,6 +56,34 @@ public sealed partial class PlayerController
         _peakY = GlobalPosition.Y;
         AirJumped?.Invoke();
         return true;
+    }
+
+    /// <summary>Top running speed: speed boots ease in over the run-up, and Sprint only boosts their bonus.</summary>
+    private float RunSpeed(StatSheet stats)
+    {
+        bool sprint = !UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint");
+        return _config.TopSpeed(stats.Bonus(StatIds.MoveSpeed), stats.Bonus(StatIds.RunSpeed), _runUp, sprint);
+    }
+
+    private void TrackRunUp(float dt, bool onFloor, Vector3 wish, Vector3 horizontal, StatSheet stats)
+    {
+        float walk = _config.WalkSpeed * (1f + stats.Bonus(StatIds.MoveSpeed)) * stats.Multiplier(StatIds.MoveSpeed);
+        _runUp = _config.AdvanceRunUp(_runUp, dt, onFloor, wish.LengthSquared() > 0.01f, horizontal.Length(), walk);
+    }
+
+    private void StartJumpApex()
+    {
+        _jumpStartY = GlobalPosition.Y;
+        _jumpTracking = true;
+        JumpApexCells = 0;
+    }
+
+    /// <summary>Follows the rising ground jump until it lands (called from the fall tracker).</summary>
+    private void TrackJumpApex(float y, bool airborne)
+    {
+        if (!_jumpTracking) return;
+        JumpApexCells = Mathf.Max(JumpApexCells, (y - _jumpStartY) / Units.CellSize);
+        if (!airborne) _jumpTracking = false;
     }
 
     /// <summary>Raised on an extra jump (puff of cloud).</summary>

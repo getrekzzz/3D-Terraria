@@ -14,6 +14,14 @@ fill -4 16 -4 4 17 4 stone
 wait 1.0
 assert player.on_floor == 1
 
+# --- P3-46 ---
+# A full held jump peaks about 5-6 cells above takeoff (Terraria's height relative to the 3.6-cell body).
+hold jump 0.7
+wait 1.2
+assert player.on_floor == 1
+assert player.jump_apex_cells >= 5
+assert player.jump_apex_cells <= 6
+
 # The hook flies up, latches onto the ceiling (its claw on the slab's face) and reels the player in; jumping lets go.
 give grappling_hook 1
 mark

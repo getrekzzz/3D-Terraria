@@ -41,8 +41,9 @@ public class MovementGearTests
     public void TheBestBootsWin()
     {
         var p = Wearing("rocket_boots", "lightning_boots");
+        Assert.Equal(0.47f, p.Effects.Stats.Bonus(StatIds.RunSpeed), 3);
+        Assert.Equal(0.08f, p.Effects.Stats.Bonus(StatIds.MoveSpeed), 3);
         Assert.Equal(110, p.Effects.RocketBoots!.Time);
-        Assert.Equal(0.55f, p.Effects.Stats.Bonus(StatIds.MoveSpeed), 3);
         p.Inventory.Accessories[0] = ItemStack.Empty;
         p.Inventory.Accessories[1] = ItemStack.Empty;
         p.Recompute();

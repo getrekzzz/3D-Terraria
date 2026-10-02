@@ -21,6 +21,7 @@ public static class PlayerProbes
         ctx.AddProbe("player.on_floor", () => player.IsOnFloor() ? 1 : 0);
         ctx.AddProbe("player.frozen", () => player.Frozen ? 1 : 0);
         ctx.AddProbe("player.flight_left", () => player.FlightLeft);
+        ctx.AddProbe("player.jump_apex_cells", () => player.JumpApexCells); // the last ground jump's height above takeoff
         ctx.AddProbe("player.area_ready", () => runtime.IsAreaReady(PlayerController.CellAt(player.GlobalPosition)) ? 1 : 0);
         // How far (m) the hook's claw was moved from its voxel hit onto the rendered surface; -1 when none was found.
         ctx.AddProbe("player.hook_snap", () => runtime.GetNodeOrNull<GrappleVisual>("GrappleVisual")?.SnapDistance ?? -1);
