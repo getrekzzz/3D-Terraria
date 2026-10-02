@@ -19,6 +19,7 @@ public static partial class DungeonBuilder
         var k = b.Layout.KeepInterior;
         int floor = k.Min.Y;
         var outer = Outer(b);
+        Clearing(b, outer);
         Foundation(b, outer);
         b.Bp.Fill(new Aabb3i(new Int3(outer.Min.X, floor - KeepRoof, outer.Min.Z), new Int3(outer.Max.X, k.Max.Y + KeepRoof, outer.Max.Z)), b.Brick);
         Panels(b, k, b.Style.Panel(b.Layout.Rooms[0].PanelStyle), true, true);

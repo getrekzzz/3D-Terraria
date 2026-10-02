@@ -64,12 +64,46 @@ public sealed class DungeonPass : GenPass
         var inward = MathF.Abs(dx) >= MathF.Abs(dz) ? new Int3(Math.Sign(dx), 0, 0) : new Int3(0, 0, Math.Sign(dz));
         var terrain = ctx.Terrain;
         Func<int, int, int> surface = (sx, sz) => (int)MathF.Floor(terrain.SurfaceHeight(sx, sz));
+        var site = FlattestSite(new Int3((int)x, 0, (int)z), inward, surface, (sx, sz) => plan.Landness.Sample(sx, sz));
         return new DungeonSite
         {
-            Gate = new Int3((int)x, surface((int)x, (int)z), (int)z), Inward = inward, WorldSize = plan.Size, Bands = plan.Bands,
+            Gate = new Int3(site.X, surface(site.X, site.Z), site.Z), Inward = inward, WorldSize = plan.Size, Bands = plan.Bands,
             Surface = surface, Landness = (sx, sz) => plan.Landness.Sample(sx, sz),
         };
     }
+
+    /// <summary>
+    /// The keep needs level ground (Phase 1 relief rolls): among sites stepped inward and to either side of the first
+    /// one, the one whose keep, apron and approach span the least relief, so the keep neither sinks into a hillside
+    /// nor stands on a stilted foundation. Ties keep the earlier candidate (the planned spot first).
+    /// </summary>
+    internal static Int3 FlattestSite(Int3 start, Int3 inward, Func<int, int, int> surface, Func<int, int, float> landness)
+    {
+        var across = new Int3(inward.Z != 0 ? 1 : 0, 0, inward.X != 0 ? 1 : 0);
+        Int3 best = start;
+        int bestRelief = int.MaxValue;
+        foreach (int along in SiteSteps)
+            foreach (int side in SiteSides)
+            {
+                var c = start + inward * along + across * side;
+                if (along + side != 0 && landness(c.X, c.Z) < 0.97f) continue;
+                int lo = int.MaxValue, hi = int.MinValue;
+                for (int a = -SiteBack; a <= SiteFront; a += 3)
+                    for (int b = -SiteHalf; b <= SiteHalf; b += 3)
+                    {
+                        var p = c + inward * a + across * b;
+                        int h = surface(p.X, p.Z);
+                        lo = Math.Min(lo, h);
+                        hi = Math.Max(hi, h);
+                    }
+                if (hi - lo < bestRelief) (best, bestRelief) = (c, hi - lo);
+            }
+        return best;
+    }
+
+    private static readonly int[] SiteSteps = { 0, 12, 24, 36 };
+    private static readonly int[] SiteSides = { 0, -12, 12, -24, 24 };
+    private const int SiteBack = 20, SiteFront = 34, SiteHalf = 20;
 
     private static DungeonRoom Deepest(DungeonLayout layout)
     {
