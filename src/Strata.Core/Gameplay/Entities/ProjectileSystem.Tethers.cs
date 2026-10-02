@@ -28,11 +28,18 @@ public sealed partial class ProjectileSystem
         return null;
     }
 
+    /// <summary>Keeps the owner's use going while the tether is out, so the arm stays raised to it in both views.</summary>
+    private static void HoldUse(PlayerEntity owner, Projectile p)
+    {
+        if (owner.UseItem == p.Source && owner.UseAnimation < 2) owner.UseAnimation = 2;
+    }
+
     private bool TickYoyo(Projectile p, PlayerEntity owner, float dt)
     {
         var tether = p.Def.Tether!;
         bool held = owner.UseHeld && owner.State.Inventory.Held.Item == p.Source;
         if (!held || (tether.Lifetime > 0 && p.Age > tether.Lifetime)) return ReelIn(p); // the trip home has its own clock (TickSpecial)
+        HoldUse(owner, p);
         float range = tether.Range * Units.CellSize;
         var goal = AimPoint(owner, range);
         var to = goal - p.Position;

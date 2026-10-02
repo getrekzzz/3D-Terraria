@@ -125,8 +125,7 @@ public sealed partial class ProjectileSystem
             dir = Vector3.Normalize(dir + side * _rng.NextSigned() * spread + up * _rng.NextSigned() * spread * 0.5f);
         }
         var item = shot.Weapon.Item;
-        var fired = Spawn(shot.Projectile, from, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
-        fired.SpawnOrigin = from;
+        Spawn(shot.Projectile, from, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
     }
 
     public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit, ItemDef? source = null, Items.MiscSlot? petSlot = null)
@@ -135,6 +134,7 @@ public sealed partial class ProjectileSystem
         {
             Id = _nextId++, Def = def, Position = position, Velocity = velocity, Owner = owner, Damage = damage, Knockback = knockback,
             DamageClass = damageClass, Crit = crit, PierceLeft = def.Pierce, BouncesLeft = def.Bounces, Source = source, PetSlot = petSlot,
+            SpawnOrigin = position, // set before Spawned is raised: shot effects read it (P3-10)
         };
         if (def.Minion != null && owner != null) MakeRoomForMinion(owner, def.Minion);
         _items.Add(proj);
@@ -200,6 +200,9 @@ public sealed partial class ProjectileSystem
         }
     }
 
+    /// <summary>Slower than this (m/s) a bouncing projectile touching the terrain is resting, not striking it.</summary>
+    private const float MinImpactSpeed = 2f;
+
     /// <summary>Moves with voxel collision; returns false when the projectile should end.</summary>
     private bool MoveThroughTerrain(Projectile p, float dt)
     {
@@ -209,11 +212,19 @@ public sealed partial class ProjectileSystem
         VoxelMotion.Move(_world.Session.World, ref p.Position, ref p.Velocity, half, dt);
         bool collided = p.Velocity.X != before.X || p.Velocity.Y != before.Y || p.Velocity.Z != before.Z;
         if (!collided) return true;
+        // A bouncing throw at rest on the ground (gravity's pull stopped again each tick) neither strikes nor bounces.
+        bool resting = p.BouncesLeft > 0 && before.LengthSquared() < MinImpactSpeed * MinImpactSpeed;
+        if (resting) return true;
         if (HitTerrain != null)
         {
-            // The block struck: the cell just ahead along the incoming flight.
-            var ahead = before.LengthSquared() > 1e-6f ? Vector3.Normalize(before) * (r + 0.1f) : Vector3.Zero;
-            HitTerrain(p, p.Position + ahead, _world.Session.World.GetBlock(VoxelMotion.CellOf(p.Position + ahead)));
+            // The block struck: one step along each axis whose motion the terrain stopped.
+            var step = new Vector3(
+                p.Velocity.X == 0 && before.X != 0 ? MathF.Sign(before.X) : 0,
+                p.Velocity.Y == 0 && before.Y != 0 ? MathF.Sign(before.Y) : 0,
+                p.Velocity.Z == 0 && before.Z != 0 ? MathF.Sign(before.Z) : 0);
+            if (step == Vector3.Zero && before.LengthSquared() > 1e-6f) step = Vector3.Normalize(before);
+            var at = p.Position + step * (r + 0.1f);
+            HitTerrain(p, at, _world.Session.World.GetBlock(VoxelMotion.CellOf(at)));
         }
         if (p.BouncesLeft-- <= 0)
         {

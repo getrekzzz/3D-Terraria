@@ -78,10 +78,11 @@ public sealed partial class WhipRenderer : Node3D
             }
             Tube(span, shift, Color.FromHtml(w.Color));
             Drawn++;
-            if (lash.Age <= 1 && !_cracked.ContainsKey(lash))
+            if (!_cracked.ContainsKey(lash))
             {
+                // First seen (at a low frame rate maybe a tick or two in): swish unless the crack is already past.
                 _cracked[lash] = false;
-                Sfx.PlayAt("whip_swing", ToGodot(hand) + shift, -4f);
+                if (t < CrackT) Sfx.PlayAt("whip_swing", ToGodot(hand) + shift, -4f);
             }
             if (t >= CrackT && _cracked.TryGetValue(lash, out bool done) && !done)
             {

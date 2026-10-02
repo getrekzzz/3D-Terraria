@@ -467,8 +467,8 @@ repeat 10 use
 wait 0.1
 assert projectiles.nodes_created <= 34
 probe projectiles.lights
-probe projectiles.from_muzzle
-probe fx.muzzle_flashes
+assert projectiles.from_muzzle >= 1
+assert fx.muzzle_flashes >= 1
 assert projectiles.pooled >= 1
 ai on
 killall

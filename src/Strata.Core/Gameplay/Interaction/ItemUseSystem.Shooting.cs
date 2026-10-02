@@ -19,6 +19,7 @@ public sealed partial class ItemUseSystem
         if (held.IsEmpty || held.Item != p.UseItem) return;
         var info = _world.Uses[held.Item!];
         if (!info.Has(ItemAction.Shoot) || info.IsTool || info.Has(ItemAction.Melee | ItemAction.Thrust)) return;
+        if (info.Projectile?.Tether != null) return; // a yoyo or flail holds its use open while out: no bursts
         float speed = UseSpeed(p, held, info);
         p.UseCooldown = UseTicks(info.Item.UseTime / speed); // a shot that cannot fire still waits its turn
         var outcome = Shoot(p, info, followUp: true);

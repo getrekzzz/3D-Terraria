@@ -32,6 +32,7 @@ public sealed partial class ProjectileSystem
                 p.HitNpcs.Clear();
                 return true;
             }
+            HoldUse(owner, p);
             // Whirl in a plane tipped 30° from level toward the aim, so the ball swings past the face and the feet.
             var right = Vector3.Cross(owner.Aim, Vector3.UnitY);
             right = right.LengthSquared() > 1e-4f ? Vector3.Normalize(right) : Vector3.UnitX;

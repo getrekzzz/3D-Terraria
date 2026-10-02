@@ -30,6 +30,35 @@ public class ProjectileImpactTests
     }
 
     [Fact]
+    public void ABombAtRestDoesNotKeepStrikingTheGround()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        int hits = 0;
+        g.World.Projectiles.HitTerrain += (_, _, _) => hits++;
+        var start = new Vector3(g.Floor.X + 0.5f, g.Floor.Y + 3f, g.Floor.Z + 4.5f) * Strata.Core.Common.Units.CellSize;
+        var bomb = g.World.Projectiles.Spawn(g.Content.Projectiles.Get("dynamite"), start, Vector3.Zero, g.Player, 0, 0, Strata.Core.Content.Defs.DamageClass.None, 0);
+        g.Ticks(240);
+        Assert.Contains(bomb, g.World.Projectiles.All); // its fuse, not its bounces, sets it off
+        Assert.True(hits <= 6, $"{hits} impacts from a bomb lying still");
+    }
+
+    [Fact]
+    public void AShotKnowsWhereItStartedWhenItAppears()
+    {
+        using var g = TestGame.Create();
+        g.World.Spawner.Enabled = false;
+        g.Hold("wooden_bow");
+        g.Player.State.Inventory.Backpack[30] = new Strata.Core.Gameplay.Items.ItemStack(g.Content.Items.Get("wooden_arrow"), 5);
+        g.Player.Aim = Vector3.UnitZ;
+        Vector3? seen = null;
+        g.World.Projectiles.Spawned += p => seen = p.SpawnOrigin;
+        g.World.ItemUse.Use(g.Player, null, true);
+        Assert.NotNull(seen);
+        Assert.True(Vector3.Distance(seen!.Value, g.Player.Eye) < 2f, $"origin {seen} is not at the player");
+    }
+
+    [Fact]
     public void ShippedSpinsAndTrailsAreValid()
     {
         Assert.Equal("flat", TestPaths.Content.Projectiles.Get("shuriken").SpinAxis);
