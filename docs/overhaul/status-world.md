@@ -22,7 +22,7 @@ CI (push 2, merge): GREEN — 467 Core tests, all 16 smoke scripts (incl. new fi
 Gaps: no junk catches or hardmode crates; statues are crafted (no worldgen placement); lamp models do not show on/off;
 mining a block does not drop its actuator; no season-only enemies; seasonal vanity not drawn on the avatar yet.
 
-## Push 3 — mounts (X-14, slot hook-up pending)
+## Push 3 — mounts (X-14, slot hook-up pending) — CI GREEN (478 Core tests, 17 smoke scripts incl. mounts.cmds, menu tour)
 | WP | State | Notes |
 |---|---|---|
 | X-14 mounts | done except the P2-05 slot | Slimy Saddle (King Slime 25%, high bouncy jump, stomps), Fuzzy Carrot (Goodie Bags, fast bunny), Honeyed Goggles (Queen Bee 5%, 2.6 s flight), Cosmic Car Key (Martian Saucer 10%, free hovering flight); mount buffs; `quick_mount` key (G — R is rotate shape); Core `MountMotion`/`MountRules` + `MountTests`; `PlayerController.Mounts.cs`, `PlayerAvatar.Mount.cs` (existing creature models scaled up); item models/icons (`bgen/mount_items.py`); new smoke `mounts.cmds`. Boss drops via new `extra_<enemy>` loot tables, so the bosses session's loot files stay untouched. |
