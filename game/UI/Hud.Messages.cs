@@ -64,6 +64,7 @@ public sealed partial class Hud
             if (p == ui.Entity) _status.Show(message, UiTheme.Muted);
         };
         ui.Notified += _status.Show;
+        ui.Interaction.SmartCursorToggled += on => _status.Show(on ? "Smart Cursor On" : "Smart Cursor Off", on ? UiTheme.SmartCursor : UiTheme.Muted);
         ui.Game.Town.HomeLost += t => _status.Show($"{t.Title}'s home is no longer suitable.", UiTheme.Muted);
     }
 

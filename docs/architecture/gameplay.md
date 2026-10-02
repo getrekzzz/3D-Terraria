@@ -82,6 +82,17 @@
   tinted by life, bosses in the boss bar's red), else the block or object in reach, rebuilding its text only when
   that changes. Probes: `hover.npc`, `hover.resident`, `hover.talk`, `hover.<enemy id>`, `hud.target_name`,
   `hud.target_name.<words>` (the label in snake case contains them), `ui.talk_open`.
+* **Smart Cursor** — X (`smart_cursor`, saved as `UserSettings.SmartCursor`, also in Settings → Gameplay) toggles it.
+  `SmartTargeting.Find` (Core) samples a cone round `Aim` from the eye (12° half-angle, at most 0.75 m wide, every
+  0.25 m up to the reach and at most 0.75 m past the first solid cell on the aim line): a pickaxe takes the block it
+  can mine (`MiningRules.CanMine`) with a face open toward the eye that is closest along the aim, `ore`/`gem`-tagged
+  blocks first; an axe the nearest `BreakTool.Axe` object (trees), a hammer a `BreakTool.Hammer` one. It allocates
+  nothing. `InteractionController.ApplySmartCursor` swaps it in as `Target` (always in reach) unless the crosshair
+  already rests on a non-decor object in reach, and reruns it only when the item, eye (5 cm) or aim (0.5°) moved, the
+  world was edited, the pick went stale or 15 ticks passed; smart digging still wins when looking down. The crosshair
+  turns orange with the smart cursor icon, the pointer uses its smart sprite, and the status line says "Smart Cursor
+  On/Off". Scripted runs keep the toggle in memory (`GameRoot.Automated`). Probes: `ui.smart_cursor`,
+  `ui.smart_target`.
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback

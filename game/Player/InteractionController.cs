@@ -8,8 +8,8 @@ using Strata.Game.World;
 namespace Strata.Game.Player;
 
 /// <summary>
-/// Turns input into gameplay: crosshair targeting, item use (mine, chop, place, consume, attack), object
-/// interaction, hotbar selection, build shape and rotation, precision mode and item dropping.
+/// Turns input into gameplay: crosshair targeting (with the Smart Cursor), item use (mine, chop, place, consume,
+/// attack), object interaction, hotbar selection, build shape and rotation, precision mode and item dropping.
 /// </summary>
 public sealed partial class InteractionController : Node
 {
@@ -64,6 +64,7 @@ public sealed partial class InteractionController : Node
         _runtime = runtime;
         _player = player;
         Name = "Interaction";
+        WatchWorldForSmartCursor(true);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -71,6 +72,7 @@ public sealed partial class InteractionController : Node
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.interaction.physics");
         // Grid blocks (1 m) by default, single cells when the setting says so; holding the precision key swaps.
         Entity.Precision = Settings.UserSettings.Current.SmallBlocks != (!UI.InputGate.HotkeysBlocked && Input.IsActionPressed(PrecisionMode));
+        PollSmartCursorKey();
         UpdateTarget();
         PollHotbarKeys();
         // With the inventory, a chest or a chat open, Input reports the button down for clicks the panels took too:
@@ -159,10 +161,12 @@ public sealed partial class InteractionController : Node
         TalkTarget = Hovered?.Resident is { } resident && System.Numerics.Vector3.Distance(resident.Center, Entity.Center) <= Game.Town.Config.TalkRange
             ? resident
             : null;
+        ApplySmartCursor(item, reach);
         if (DigDownTarget(dir) is { } below)
         {
             Target = below;
             InReach = true;
+            SmartTarget = false;
         }
         // Disguised creatures (mimics, Nymph) on the view ray in front of the terrain: right-click opens/greets them.
         DisguiseTarget = ObjectInteraction.DisguisedAlong(Game.Npcs.All, camera, view, terrainT + 0.5f);

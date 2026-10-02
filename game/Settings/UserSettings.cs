@@ -21,6 +21,12 @@ public sealed class UserSettings
     /// <summary>Looking steeply down with a pickaxe digs the ground under your feet (a shaft you drop into).</summary>
     public bool SmartDig { get; set; } = true;
 
+    /// <summary>
+    /// Terraria's Smart Cursor (X toggles it in game): pickaxes snap to the nearest block they can mine near the aim,
+    /// axes to the nearest tree.
+    /// </summary>
+    public bool SmartCursor { get; set; }
+
     public bool DamageNumbers { get; set; } = true;
 
     /// <summary>Pause the world while the inventory or a menu is open.</summary>

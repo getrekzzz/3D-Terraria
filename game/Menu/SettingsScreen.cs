@@ -79,6 +79,8 @@ public sealed partial class SettingsScreen : PanelContainer
             "Blocks are mined and placed as 1 m grid blocks, or as single 0.5 m cells. Holding Alt swaps while held."));
         box.AddChild(MenuKit.Row("Smart dig", MenuKit.Toggle(S.SmartDig, v => { S.SmartDig = v; Changed(); }),
             "Looking steeply down with a pickaxe digs the ground under your feet."));
+        box.AddChild(MenuKit.Row("Smart cursor", MenuKit.Toggle(S.SmartCursor, v => { S.SmartCursor = v; Changed(); }),
+            $"Pickaxes snap to the nearest block they can mine near your aim (ores first), axes to the nearest tree. {KeyBindings.Label("smart_cursor")} toggles it in game."));
         box.AddChild(Header("Camera"));
         box.AddChild(MenuKit.Row("First person by default", MenuKit.Toggle(S.FirstPerson, v => { S.FirstPerson = v; Changed(); })));
         box.AddChild(MenuKit.Row("Field of view", MenuKit.Slider(50, 110, 1, S.FieldOfView, v => { S.FieldOfView = (float)v; Changed(); }, v => $"{v:0}°")));

@@ -45,6 +45,7 @@ public partial class GameRoot : Node
         var log = new GodotLog();
         var data = new GodotDataSource();
         var args = CommandLine.FromOs();
+        Automated = IsAutomated(args);
         Settings.UserSettings.Load();
         UiTheme.Install(); // before any UI node exists: global font, theme and glyph warm-up
         log.Info("boot", $"UI theme installed (glyph warm-up {UiTheme.WarmupMs:0.0} ms).");
@@ -133,7 +134,12 @@ public partial class GameRoot : Node
         });
     }
 
-    /// <summary>Scripted runs (smoke tests, screenshots) skip the menu and keep the window as launched.</summary>
+    /// <summary>
+    /// A scripted run (smoke test, screenshots, --exec): it skips the menu, keeps the window as launched and never
+    /// writes the player's settings from gameplay toggles (Smart Cursor), so one script cannot change the next.
+    /// </summary>
+    public static bool Automated { get; private set; }
+
     public override void _ExitTree() => UI.UiCursor.Reset();
 
     private static bool IsAutomated(CommandLine args) =>

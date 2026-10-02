@@ -6,7 +6,8 @@ namespace Strata.Game.UI;
 /// <summary>
 /// Terraria's pointer as the system mouse cursor on every screen: the generated arrow sprite (assets/ui/cursor.png,
 /// white fill, dark rim) tinted by the cursor colour setting (Terraria's pink-red by default) and scaled with the UI
-/// in whole pixels. Applied at boot and whenever the settings change.
+/// in whole pixels. With Smart Cursor on it is the smart variant (assets/ui/smart_cursor.png), whose gold rim keeps its
+/// colour while the fill takes the tint. Applied at boot, whenever the settings change and when Smart Cursor is toggled.
 /// </summary>
 public static class UiCursor
 {
@@ -21,9 +22,9 @@ public static class UiCursor
     {
         if (DisplayServer.GetName() == "headless") return;
         int scale = Mathf.Clamp(Mathf.RoundToInt(DisplaySettings.EffectiveUiScale), 1, 4);
-        string key = s.CursorColor + "@" + scale;
+        string key = s.CursorColor + "@" + scale + (s.SmartCursor ? " smart" : "");
         if (key == _applied) return;
-        var path = UiSprites.PathFor("cursor");
+        var path = UiSprites.PathFor(s.SmartCursor ? "smart_cursor" : "cursor");
         if (!ResourceLoader.Exists(path)) return; // UiSprites reports missing sprites
         var image = GD.Load<Texture2D>(path).GetImage();
         if (image == null) return;
@@ -32,7 +33,11 @@ public static class UiCursor
         var tint = new Color(Color.HtmlIsValid(s.CursorColor) ? Color.FromHtml(s.CursorColor) : Color.FromHtml(UserSettings.DefaultCursorColor), 1f);
         for (int y = 0; y < image.GetHeight(); y++)
             for (int x = 0; x < image.GetWidth(); x++)
-                image.SetPixel(x, y, image.GetPixel(x, y) * tint);
+            {
+                var px = image.GetPixel(x, y);
+                bool rim = s.SmartCursor && (Mathf.Abs(px.R - px.G) > 0.05f || Mathf.Abs(px.R - px.B) > 0.05f);
+                image.SetPixel(x, y, rim ? px : px * tint);
+            }
         if (scale > 1 && image.GetWidth() * scale <= MaxSize)
             image.Resize(image.GetWidth() * scale, image.GetHeight() * scale, Image.Interpolation.Nearest);
         else scale = 1;

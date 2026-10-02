@@ -13,8 +13,8 @@ namespace Strata.Game.Debug;
 /// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); on the
 /// overlay input gate and the empty-screen click catcher (P2-11); on the HUD layout (P2-12); on the inventory
 /// screen's layout (P2-15); on the hearts, mana stars and breath bubbles (P2-13); on the buff bar (P2-14); on the
-/// chat log (P2-21); on the pickup popups (P2-22); on the boss bar and the invasion progress (P2-23); and on the
-/// death screen (P2-25).
+/// chat log (P2-21); on the pickup popups (P2-22); on the boss bar and the invasion progress (P2-23); on the death
+/// screen (P2-25); and on the Smart Cursor (P2-29).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -101,5 +101,8 @@ public static class UiProbes
         ctx.AddProbe("ui.death_dim", () => world.Hud?.Death.Shown == true ? 1 : 0);
         // The cause under the title ("smoke was slain.") is also the chat log's newest line.
         ctx.AddProbe("ui.death_cause", () => world.Hud is { } hud && hud.Death.Cause.Length > 0 && hud.Chat.LastLine == hud.Death.Cause ? 1 : 0);
+        // P2-29: Smart Cursor is on (X toggles it), and the target is its pick rather than the cell under the crosshair.
+        ctx.AddProbe("ui.smart_cursor", () => Settings.UserSettings.Current.SmartCursor ? 1 : 0);
+        ctx.AddProbe("ui.smart_target", () => world.Interaction?.SmartTarget == true ? 1 : 0);
     }
 }

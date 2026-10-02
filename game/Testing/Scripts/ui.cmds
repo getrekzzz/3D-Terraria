@@ -502,3 +502,36 @@ wait 6
 assert player.alive == 1
 assert ui.death_dim == 0
 assert errors == 0
+
+# --- P2-29 ---
+# X toggles Smart Cursor (the status line says so; the crosshair turns orange with the smart cursor icon). With a
+# pickaxe the target snaps to a block it can mine near the aim: aiming just beside a lone copper ore block, which the
+# plain crosshair passes by, mines it. Toggling again turns it off.
+tp spawn
+fill -12 -3 -12 12 -1 12 stone
+fill -12 0 -12 12 24 12 air
+tp ~ ~ ~
+wait 0.5
+camera first
+assert ui.smart_cursor == 0
+press smart_cursor
+wait 0.1
+press smart_cursor off
+assert ui.smart_cursor == 1
+assert hud.status == 1
+give copper_pickaxe
+wield copper_pickaxe
+setblock 0 3 -5 copper_ore
+aim 0.25 0.06 -1
+wait 0.3
+assert ui.smart_target == 1
+hold use_primary 2.5
+wait 1.5
+assert inv.copper_ore >= 1
+press smart_cursor
+wait 0.1
+press smart_cursor off
+assert ui.smart_cursor == 0
+assert ui.smart_target == 0
+camera third
+assert errors == 0
