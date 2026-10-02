@@ -1225,6 +1225,13 @@
    },
    "icon": "assets/icons/items/copper_shortsword.png"
   },
+  "crimson_heart": {
+   "model": "assets/models/items/crimson_heart.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/crimson_heart.png"
+  },
   "crimson_rod": {
    "model": "assets/models/items/crimson_rod.glb",
    "sockets": {
@@ -1626,6 +1633,13 @@
    "model": "assets/models/items/faeling.glb",
    "icon": "assets/icons/items/faeling.png"
   },
+  "fairy_bell": {
+   "model": "assets/models/items/fairy_bell.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/fairy_bell.png"
+  },
   "fairy_wings": {
    "model": "assets/models/items/fairy_wings.glb",
    "icon": "assets/icons/items/fairy_wings.png"
@@ -1669,6 +1683,10 @@
   "firefly_in_a_bottle": {
    "object": "firefly_in_a_bottle",
    "icon": "assets/icons/items/firefly_in_a_bottle.png"
+  },
+  "fish": {
+   "model": "assets/models/items/fish.glb",
+   "icon": "assets/icons/items/fish.png"
   },
   "fisher_of_souls": {
    "model": "assets/models/items/fisher_of_souls.glb",
@@ -2457,6 +2475,13 @@
     "tip": "0 0.548 0 > 0 1 0"
    },
    "icon": "assets/icons/items/magic_dagger.png"
+  },
+  "magic_lantern": {
+   "model": "assets/models/items/magic_lantern.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/magic_lantern.png"
   },
   "magic_mirror": {
    "model": "assets/models/items/magic_mirror.glb",
@@ -3432,6 +3457,13 @@
    },
    "icon": "assets/icons/items/seedler.png"
   },
+  "shadow_orb": {
+   "model": "assets/models/items/shadow_orb.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/shadow_orb.png"
+  },
   "shadow_scale": {
    "model": "assets/models/items/shadow_scale.glb",
    "icon": "assets/icons/items/shadow_scale.png"
@@ -3914,6 +3946,10 @@
   "stinger": {
    "model": "assets/models/items/stinger.glb",
    "icon": "assets/icons/items/stinger.png"
+  },
+  "strange_glowing_mushroom": {
+   "model": "assets/models/items/strange_glowing_mushroom.glb",
+   "icon": "assets/icons/items/strange_glowing_mushroom.png"
   },
   "stynger": {
    "model": "assets/models/items/stynger.glb",
@@ -4563,6 +4599,13 @@
    },
    "icon": "assets/icons/items/wire_cutter.png"
   },
+  "wisp_in_a_bottle": {
+   "model": "assets/models/items/wisp_in_a_bottle.glb",
+   "sockets": {
+    "grip": "0 0 0 > 0 1 0"
+   },
+   "icon": "assets/icons/items/wisp_in_a_bottle.png"
+  },
   "wizard_hat": {
    "model": "assets/models/items/wizard_hat.glb",
    "armor": "wizard_hat",
@@ -4704,6 +4747,10 @@
     "tip": "0 1.3 0 > 0 1 0"
    },
    "icon": "assets/icons/items/zenith.png"
+  },
+  "zephyr_fish": {
+   "model": "assets/models/items/zephyr_fish.glb",
+   "icon": "assets/icons/items/zephyr_fish.png"
   }
  },
  "creatures": {
@@ -4765,6 +4812,22 @@
     "run",
     "swing",
     "use",
+    "walk"
+   ]
+  },
+  "baby_penguin": {
+   "model": "assets/models/creatures/baby_penguin.glb",
+   "generator": "baby_penguin",
+   "animations": [
+    "idle",
+    "walk"
+   ]
+  },
+  "baby_truffle": {
+   "model": "assets/models/creatures/baby_truffle.glb",
+   "generator": "baby_truffle",
+   "animations": [
+    "idle",
     "walk"
    ]
   },

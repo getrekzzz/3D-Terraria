@@ -46,6 +46,7 @@
     "items/materials.json",
     "items/mobility.json",
     "items/paint.json",
+    "items/pets.json",
     "items/radiant.json",
     "items/town_goods.json",
     "items/utility.json",

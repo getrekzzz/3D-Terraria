@@ -106,4 +106,14 @@ white_paint|White Paint|early|painter
 gray_paint|Gray Paint|early|painter
 brown_paint|Brown Paint|early|painter
 """,
+    "pet": """
+shadow_orb_light_pet|Shadow Orb (light pet)|early|shadow orb
+crimson_heart_light_pet|Crimson Heart (light pet)|early|crimson heart
+fairy_bell|Fairy Bell|early|gold chest
+magic_lantern|Magic Lantern|early|skeleton merchant
+wisp_in_a_bottle|Wisp in a Bottle|post-plantera|dungeon spirit
+fish|Fish|early|fishing
+zephyr_fish|Zephyr Fish|early|fishing
+strange_glowing_mushroom|Strange Glowing Mushroom|hardmode|truffle
+""",
 }
