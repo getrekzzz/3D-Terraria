@@ -78,6 +78,16 @@ Notes: P2-19 (combat text) is not on the integration branch yet, so fall/debuff 
 API for X-02/P4-03 (boss spawn/defeat already punch from `SoundEvents.Creatures`). Crack decals need Forward+ (the
 project renderer on every preset).
 
+## Push 7 — bosses W8/W9 merged; enemy banners (X-03 part 2a)
+| WP | State | Notes |
+|---|---|---|
+| merge `origin/claude/ovh-bosses` | done | Contact damage lives in `NpcSystem.Contact.cs` (P3-25 knockback and damage kinds ported); segment hits report the creature id; planned Dungeon wires go on the red `WireGrid` layer. One `skeleton_statue` (the wireable statue, 2×4×2, also placed by the Dungeon decorator) with the Dungeon's statue model; the wiring statues' Blender generator is renamed `critter_statue` (generator names must be unique). |
+| X-03 enemy banners | done | 162 banners from `tools/content/banners.json` via `gen_banners.py` (one per coin-worthy enemy; slimes, zombies and Angry Bones grouped), models from the Dungeon's `banner` generator; `BannerSystem`: world kill tallies, a banner every 50 kills, ×1.5 damage dealt / ×0.9 contact damage taken near a placed banner, Monster Banner buff; `BannerTests`, `builder.cmds` section, probes `banners.near|dropped`. |
+| X-03 editable signs | waiting | Needs P2-08's object meta in the chunk codec (not on the integration branch yet). |
+
+CI (push 7): GREEN — 1123 Core tests, content checks (incl. furniture/banner generators), Godot import, all 18 smoke
+scripts, menu tour.
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and
