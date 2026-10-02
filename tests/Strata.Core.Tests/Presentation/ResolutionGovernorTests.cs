@@ -89,4 +89,12 @@ public class ResolutionGovernorTests
         Assert.Equal(new[] { 0.7f, 0.6f }, scales);
         Assert.Equal(2, g.Changes);
     }
+
+    [Fact]
+    public void NeverStepsDownWithoutGpuTiming()
+    {
+        var g = new ResolutionGovernor(1f);
+        Assert.Empty(Run(g, 30, _ => (25.0, 0.0)));
+        Assert.Equal(1f, g.Scale);
+    }
 }

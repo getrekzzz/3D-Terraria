@@ -25,6 +25,7 @@ public sealed partial class ShaderWarmup : Node3D
     public void Initialize(PropLibrary props)
     {
         _props = props;
+        Warmed = 0; // per world, so the probe waits for this world's warm-up
         Name = "ShaderWarmup";
     }
 
@@ -43,15 +44,21 @@ public sealed partial class ShaderWarmup : Node3D
             _framesShown = 0;
             return;
         }
+        if (GetViewport().GetCamera3D() is { } eye) Follow(eye); // stay in view (not culled) while shown
         if (++_framesShown >= Frames) QueueFree();
+    }
+
+    private void Follow(Camera3D camera)
+    {
+        var eye = camera.GlobalTransform;
+        GlobalTransform = new Transform3D(eye.Basis.Scaled(Vector3.One * 0.01f), eye.Origin - eye.Basis.Z * 1f);
     }
 
     private void Build(Camera3D camera)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.shader_warmup");
         TopLevel = true;
-        var eye = camera.GlobalTransform;
-        GlobalTransform = new Transform3D(eye.Basis.Scaled(Vector3.One * 0.01f), eye.Origin - eye.Basis.Z * 1f);
+        Follow(camera);
         var materials = new List<Material>();
         foreach (var m in _props.Materials) materials.Add(m);
         materials.Add(Flames.Material("#ffa040"));

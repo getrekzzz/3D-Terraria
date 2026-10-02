@@ -40,7 +40,7 @@ public sealed partial class DynamicResolution : Node
     public override void _Process(double delta)
     {
         if (!_graphics.Preset.DynamicResolution || DisplayServer.GetName() == "headless") return;
-        // Drivers without timestamp queries report 0: the governor then judges by frame times alone.
+        // Drivers without timestamp queries report 0: the governor then never steps down.
         if (!_governor.Feed(delta * 1000.0, FrameTiming.GpuMs(GetViewport()))) return;
         // The 3D buffers are reallocated at the next draw; the call count shows how often the scale changes.
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.dynres.change");

@@ -7,8 +7,9 @@ namespace Strata.Core.Presentation;
 /// level after two consecutive slow, GPU-bound windows, and up only when the GPU time predicted at the next level
 /// (scaling with pixel count, gpu × (next / current)²) stays under 12 ms for four windows and at least 8 s have passed
 /// since the last step down. Levels are 1.0, 0.9, 0.8, 0.7 and 0.6, capped at the preset's render scale (which is
-/// itself the top level), with at least 3 s between any two changes. Drivers without GPU timing (0 ms) are judged by
-/// frame times alone. Deterministic and allocation-free.
+/// itself the top level), with at least 3 s between any two changes. Without GPU timing (0 ms) it never steps down: a
+/// vsync-pinned frame time cannot show room to step back up, so a dip would ratchet the scale down for good.
+/// Deterministic and allocation-free.
 /// </summary>
 public sealed class ResolutionGovernor
 {
@@ -51,7 +52,7 @@ public sealed class ResolutionGovernor
         _frames = 0;
         _frameSum = _gpuSum = 0;
         bool measured = gpu > 0.01;
-        bool slow = frame > SlowMs && (!measured || gpu > GpuBusyMs);
+        bool slow = measured && frame > SlowMs && gpu > GpuBusyMs;
         _slow = slow ? _slow + 1 : 0;
         bool roomUp = false;
         if (_level > 0)
