@@ -151,7 +151,7 @@ public sealed class GraphicsPreset
     /// <summary>Short-lived flash lights (explosions, sparks) alive at once; 0 disables them.</summary>
     public int FlashLights { get; set; } = 2;
 
-    /// <summary>Looping buff and debuff emitters (StatusVisuals) alive at once; the nearest statuses win.</summary>
+    /// <summary>Looping buff and debuff emitters (StatusVisuals) alive at once; handed out first come, first served (past it a status shows only its tint).</summary>
     public int StatusEmitters { get; set; } = 16;
 
     /// <summary>How many glowing statuses (On Fire!, Shadowflame…) may claim a light from the dynamic pool.</summary>
