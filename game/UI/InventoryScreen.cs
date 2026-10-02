@@ -173,7 +173,8 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     private static Button Button(string text, Action onPressed, string? tooltip = null)
     {
-        var b = new Button { Text = text, TooltipText = tooltip ?? "" };
+        // No keyboard focus: the player walks and jumps with the inventory open, and Space (ui_accept) would press it again.
+        var b = new Button { Text = text, TooltipText = tooltip ?? "", FocusMode = Control.FocusModeEnum.None };
         b.Pressed += onPressed;
         return b;
     }

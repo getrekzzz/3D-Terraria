@@ -59,6 +59,8 @@ public sealed partial class TownDialog : CanvasLayer
 
     public void Open(TownNpc npc)
     {
+        // The interact key works with the chat open: talking to someone else lets the first resident go.
+        if (_npc != null && _npc != npc) _ui.Game.Town.EndTalk(_npc);
         _npc = npc;
         _root.Visible = true;
         InputGate.SetOpen(Gate, true, GateKind.Overlay); // the player can still walk off and fight
@@ -260,7 +262,8 @@ public sealed partial class TownDialog : CanvasLayer
 
     private static Button Button(string text, Action onPressed)
     {
-        var b = new Button { Text = text };
+        // No keyboard focus: the player can walk and jump while talking, and Space (ui_accept) would press it again.
+        var b = new Button { Text = text, FocusMode = Control.FocusModeEnum.None };
         b.Pressed += onPressed;
         return b;
     }

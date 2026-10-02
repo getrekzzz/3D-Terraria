@@ -49,6 +49,8 @@ public sealed partial class WorldClickCatcher : Control
         {
             case InputEventMouseButton { ButtonIndex: MouseButton.Left or MouseButton.Right } mb:
                 AcceptEvent();
+                // A click on the world ends typing in a panel (the chest name), which would keep the player still.
+                if (mb.Pressed) GetViewport().GuiReleaseFocus();
                 Press(mb.ButtonIndex == MouseButton.Right, mb.Pressed);
                 break;
             case InputEventMouseMotion motion when InputGate.CameraDrag:

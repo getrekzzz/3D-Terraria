@@ -62,6 +62,7 @@ public sealed partial class CraftingPanel : PanelContainer
                 Disabled = !e.CanCraft,
                 TooltipText = Describe(e.Recipe),
                 CustomMinimumSize = new Vector2(300, 40),
+                FocusMode = FocusModeEnum.None, // Space jumps with the inventory open; a focused row would craft again
             };
             row.AddThemeConstantOverride("icon_max_width", 32);
             row.AddThemeColorOverride("font_color", UiTheme.Rarity(e.Recipe.Output.Rarity));
