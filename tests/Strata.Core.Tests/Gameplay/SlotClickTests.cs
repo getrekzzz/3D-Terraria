@@ -242,4 +242,27 @@ public class SlotClickTests
         }
         Assert.Equal(1, last);
     }
+
+    [Fact]
+    public void ShiftClickPutsAnItemInTheOpenReforgeSlot()
+    {
+        using var g = TestGame.Create();
+        var inv = Fresh(g);
+        var ctx = new SlotContext(Service: true);
+        inv.Backpack[12] = S("wood", 10);
+        Assert.Equal(ClickOutcome.None, Click(g, SlotArea.Backpack, 12, mods: ClickMods.Shift, ctx: ctx)); // no prefix: refused
+        Assert.True(inv.Service[0].IsEmpty);
+        inv.Backpack[13] = S("copper_broadsword");
+        Assert.Equal(ClickOutcome.Moved, Click(g, SlotArea.Backpack, 13, mods: ClickMods.Shift, ctx: ctx));
+        Assert.Equal("copper_broadsword", inv.Service[0].Item!.Id);
+        Assert.True(inv.Backpack[13].IsEmpty);
+        // Another one swaps with what the slot held; Shift on the slot takes it back to the backpack.
+        inv.Backpack[14] = S("wooden_sword");
+        Assert.Equal(ClickOutcome.Moved, Click(g, SlotArea.Backpack, 14, mods: ClickMods.Shift, ctx: ctx));
+        Assert.Equal("wooden_sword", inv.Service[0].Item!.Id);
+        Assert.Equal("copper_broadsword", inv.Backpack[14].Item!.Id);
+        Assert.Equal(ClickOutcome.Moved, Click(g, SlotArea.Service, 0, mods: ClickMods.Shift, ctx: ctx));
+        Assert.True(inv.Service[0].IsEmpty);
+        Assert.Equal(1, inv.Backpack.Count(g.Content.Items.Get("wooden_sword")));
+    }
 }

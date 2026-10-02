@@ -917,3 +917,32 @@ uiwindow off
 town dismiss merchant
 god off
 assert errors == 0
+
+# --- W4-POLISH (reforge Shift-click) ---
+# With the reforge slot open, Shift-click puts a backpack sword into it (wood, which takes no prefix, stays), as in
+# Terraria 1.4; closing the inventory puts it back.
+god on
+spawning off
+killall
+clear
+town summon goblin_tinkerer 0 0 -3
+give copper_broadsword 1
+give wood 5
+wait 0.3
+ui talk goblin_tinkerer
+ui reforge
+wait 0.3
+assert ui.panel == 3
+ui shift backpack 1
+assert ui.service_item == 0
+assert inv.wood == 5
+ui shift backpack 0
+assert ui.service_item == 1
+assert inv.copper_broadsword == 0
+ui close
+wait 0.2
+assert ui.service_item == 0
+assert inv.copper_broadsword == 1
+town dismiss goblin_tinkerer
+god off
+assert errors == 0

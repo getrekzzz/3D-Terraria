@@ -8,9 +8,9 @@ namespace Strata.Core.Session;
 
 /// <summary>
 /// What is open beside the inventory when a slot is clicked: a chest (its storage, and the placed object whose chunk
-/// saves it) or a resident's shop.
+/// saves it), a resident's shop, or a resident's service slot (<see cref="Service"/>: the Goblin Tinkerer's reforge).
 /// </summary>
-public readonly record struct SlotContext(Inventory? Container = null, TownNpc? Shop = null, TileObjectInstance? Chest = null)
+public readonly record struct SlotContext(Inventory? Container = null, TownNpc? Shop = null, TileObjectInstance? Chest = null, bool Service = false)
 {
     public static SlotContext None => default;
 
@@ -37,7 +37,8 @@ public sealed partial class GameWorld
     /// One click on an inventory slot, routed as the reference game does. With an empty cursor a left click with Alt
     /// toggles the favourite mark (backpack, coin and ammo slots), with Ctrl (no shop open) moves the stack to the trash
     /// slot (replacing what was there; favourites refuse) and with Shift quick-moves it: chest and backpack both ways,
-    /// equip from the backpack, unequip to the backpack, or sell while a shop is open. A right click opens a crate,
+    /// equip from the backpack, unequip to the backpack, sell while a shop is open, or into the service slot (reforge)
+    /// while that is open. A right click opens a crate,
     /// bag or present in the backpack; every other click is <see cref="SlotActions"/> with the slot's
     /// <see cref="SlotFilters"/>. A chest that changed is marked for saving.
     /// </summary>
@@ -99,6 +100,19 @@ public sealed partial class GameWorld
         return ClickOutcome.Moved;
     }
 
+    /// <summary>
+    /// Shift on a backpack item while a service slot is open (Terraria 1.4's reforge): the item goes into the slot if the
+    /// service works on it, and whatever was in the slot takes its place in the backpack.
+    /// </summary>
+    private static ClickOutcome ToService(PlayerInventory inv, Inventory backpack, int index)
+    {
+        var s = backpack[index];
+        if (SlotFilters.For(new SlotRef(SlotArea.Service, 0), inv) is { } accepts && !accepts(s.Item!)) return ClickOutcome.None;
+        backpack[index] = inv.Service[0];
+        inv.Service[0] = s;
+        return ClickOutcome.Moved;
+    }
+
     private static ClickOutcome ToggleFavorite(Inventory storage, int index)
     {
         if (!storage.KeepsFavorites) return ClickOutcome.None;
@@ -128,6 +142,8 @@ public sealed partial class GameWorld
             case SlotArea.Backpack or SlotArea.Coins or SlotArea.Ammo when ctx.Container != null:
                 storage[i] = ctx.Container.Add(s);
                 break;
+            case SlotArea.Backpack when ctx.Service:
+                return ToService(inv, storage, i);
             case SlotArea.Backpack:
                 return SlotActions.IsWearable(s.Item!) && inv.EquipFrom(storage, i) ? ClickOutcome.Equipped : ClickOutcome.None;
             case SlotArea.Coins or SlotArea.Ammo or SlotArea.Shop:
