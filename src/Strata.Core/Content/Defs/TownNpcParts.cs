@@ -15,6 +15,15 @@ public sealed class ShopEntry
     /// <summary>Price in copper before happiness scaling (null = item value).</summary>
     public long? Price { get; init; }
 
+    /// <summary>Shop tab the entry is listed under ("shop", or e.g. "decor" for the Painter).</summary>
+    public string Tab { get; init; } = ShopTabs.Shop;
+
+    /// <summary>
+    /// Item paid instead of coins (the Tavernkeep's Defender Medals); the price is then a count of it and is not
+    /// scaled by happiness. Null = coins.
+    /// </summary>
+    public string? Currency { get; init; }
+
     /// <summary>Stock appears only while these hold (time, flags, biome of the home…).</summary>
     public TypedSpec[] Conditions { get; init; } = Array.Empty<TypedSpec>();
 }
@@ -36,4 +45,9 @@ public sealed class MoodEntry
 
     /// <summary>+2 loves, +1 likes, −1 dislikes, −2 hates.</summary>
     public int Score { get; init; }
+}
+
+public static class ShopTabs
+{
+    public const string Shop = "shop";
 }

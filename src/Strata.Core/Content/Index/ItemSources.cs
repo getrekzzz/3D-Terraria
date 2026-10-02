@@ -215,7 +215,7 @@ public sealed class ItemSourceIndex
     /// <summary>Items an Angler-quest service hands out (malformed specs are left to the validator).</summary>
     private static IEnumerable<(string Item, int Count)> AnglerRewards(TownNpcDef npc)
     {
-        if (npc.Service is not { Type: TownServiceSpecs.AnglerQuest } spec
+        if (npc.FindService(TownServiceSpecs.AnglerQuest) is not { } spec
             || !spec.Raw.TryGetProperty("rewards", out var rewards) || rewards.ValueKind != JsonValueKind.Array) yield break;
         foreach (var r in rewards.EnumerateArray())
         {

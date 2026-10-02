@@ -22,8 +22,8 @@ public enum TradeResult
     Refused,
 }
 
-/// <summary>An item on offer with its current price (copper).</summary>
-public sealed record ShopOffer(ItemDef Item, long Price);
+/// <summary>An item on offer with its current price (copper, or a count of <see cref="Currency"/> when set).</summary>
+public sealed record ShopOffer(ItemDef Item, long Price, ItemDef? Currency = null);
 
 /// <summary>
 /// Conversation and trade with residents: dialogue lines chosen by condition, shop stock and prices scaled by
@@ -98,24 +98,41 @@ public sealed class TownCommerce
         return Math.Clamp(factor, Config.MinPriceFactor, Config.MaxPriceFactor);
     }
 
-    /// <summary>What the resident sells right now.</summary>
-    public List<ShopOffer> Stock(TownNpc npc, PlayerEntity player)
+    /// <summary>The resident's shop tabs ("shop", "decor"…), in data order.</summary>
+    public IReadOnlyList<string> Tabs(TownNpc npc) => npc.Def.ShopTabs;
+
+    /// <summary>What the resident sells right now under a tab. Coin prices scale with happiness; currency prices do not.</summary>
+    public List<ShopOffer> Stock(TownNpc npc, PlayerEntity player, string tab = ShopTabs.Shop)
     {
         var ctx = ContextFor(npc, player);
         float factor = PriceFactor(npc);
-        return npc.Def.Shop
-            .Where(e => Condition(e.Conditions).Evaluate(ctx))
-            .Select(e => new ShopOffer(Content.Items.Get(e.Item), Math.Max(1, (long)MathF.Round((e.Price ?? Content.Items.Get(e.Item).Value) * factor))))
-            .ToList();
+        var offers = new List<ShopOffer>();
+        foreach (var e in npc.Def.Shop)
+        {
+            if (e.Tab != tab || !Condition(e.Conditions).Evaluate(ctx)) continue;
+            var item = Content.Items.Get(e.Item);
+            offers.Add(e.Currency is { } cur
+                ? new ShopOffer(item, Math.Max(1, e.Price ?? 1), Content.Items.Get(cur))
+                : new ShopOffer(item, Math.Max(1, (long)MathF.Round((e.Price ?? item.Value) * factor))));
+        }
+        return offers;
     }
 
-    public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count = 1)
+    public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count = 1, string tab = ShopTabs.Shop)
     {
-        var offer = Stock(npc, player).FirstOrDefault(o => o.Item == item);
+        var offer = Stock(npc, player, tab).FirstOrDefault(o => o.Item == item);
         if (offer == null) return TradeResult.Unavailable;
         var inv = player.State.Inventory;
         if (!inv.CanTake(new ItemStack(item, count))) return TradeResult.NoRoom;
-        if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
+        IEnumerable<ItemStack> change = Array.Empty<ItemStack>();
+        if (offer.Currency is { } currency)
+        {
+            long cost = offer.Price * count;
+            if (inv.Backpack.Count(currency) < cost) return TradeResult.TooPoor;
+            inv.Backpack.Remove(d => d == currency, (int)cost);
+        }
+        else if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, offer.Price * count, out var coins)) return TradeResult.TooPoor;
+        else change = coins;
         // Bought weapons and accessories come with a prefix too, each one rolled separately.
         var rest = Prefixes.Made(item, count, Content, ref _rng).Select(g => inv.Pickup(g)).ToList();
         foreach (var s in change.Concat(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
@@ -144,18 +161,27 @@ public sealed class TownCommerce
     /// <summary>Cost of the resident's healing service for this player now (0 = nothing to heal or no such service).</summary>
     public long HealCost(TownNpc npc, PlayerEntity player)
     {
-        if (npc.Def.Service is not { Type: TownServiceSpecs.Heal } spec) return 0;
+        if (npc.Def.FindService(TownServiceSpecs.Heal) is not { } spec) return 0;
         var p = spec.Parse<HealServiceParams>();
         var v = player.State.Vitals;
         int missing = v.MaxLife - v.Life;
         int debuffs = p.ClearsDebuffs ? player.State.Buffs.Active.Count(b => b.Def.Debuff && !b.Def.Persistent) : 0;
         if (missing <= 0 && debuffs == 0) return 0;
-        return Math.Max(1, (long)MathF.Round((missing + debuffs * 10) * p.CostPerLife * PriceFactor(npc)));
+        float tier = 1f;
+        foreach (var t in p.Tiers)
+            if (_world.Session.Flags.Contains(t.Flag))
+            {
+                tier = t.Multiplier;
+                break;
+            }
+        float expert = _world.Session.Settings.EffectiveDifficulty is World.Difficulty.Expert or World.Difficulty.Master ? p.ExpertMultiplier : 1f;
+        long baseCost = missing * (long)p.CostPerLife + debuffs * (long)(p.PerDebuff ?? p.CostPerLife * 10);
+        return Math.Max(1, (long)MathF.Round(baseCost * tier * expert * PriceFactor(npc)));
     }
 
     public TradeResult Heal(TownNpc npc, PlayerEntity player)
     {
-        if (npc.Def.Service is not { Type: TownServiceSpecs.Heal } spec) return TradeResult.Unavailable;
+        if (npc.Def.FindService(TownServiceSpecs.Heal) is not { } spec) return TradeResult.Unavailable;
         long cost = HealCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
         if (!Wallet.TrySpend(player.State.Inventory, player.State.BanksForPaying(), Content, cost, out var change)) return TradeResult.TooPoor;
@@ -175,7 +201,7 @@ public sealed class TownCommerce
     public TradeResult Summon(TownNpc npc, PlayerEntity player, out string? message)
     {
         message = null;
-        if (npc.Def.Service is not { Type: TownServiceSpecs.SummonBoss } spec || !npc.Alive) return TradeResult.Unavailable;
+        if (npc.Def.FindService(TownServiceSpecs.SummonBoss) is not { } spec || !npc.Alive) return TradeResult.Unavailable;
         var p = spec.Parse<SummonServiceParams>();
         var boss = Content.Enemies.Get(p.Enemy);
         if (_world.Npcs.All.Any(n => n.Def == boss && n.Alive)) return TradeResult.NothingToDo;

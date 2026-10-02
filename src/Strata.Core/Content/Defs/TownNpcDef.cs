@@ -40,8 +40,31 @@ public sealed class TownNpcDef : ContentDef
 
     public ShopEntry[] Shop { get; init; } = Array.Empty<ShopEntry>();
 
-    /// <summary>Extra action offered in conversation (see <see cref="Specs.TownServiceSpecs"/>).</summary>
+    /// <summary>Extra action offered in conversation (see <see cref="Specs.TownServiceSpecs"/>); legacy single form.</summary>
     public TypedSpec? Service { get; init; }
+
+    /// <summary>Every action offered in conversation besides the shop (Terraria gives some NPCs several).</summary>
+    public TypedSpec[] Services { get; init; } = Array.Empty<TypedSpec>();
+
+    private TypedSpec[]? _allServices;
+
+    /// <summary><see cref="Service"/> and <see cref="Services"/> together, in order.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public TypedSpec[] AllServices => _allServices ??= Service is { } s ? Services.Prepend(s).ToArray() : Services;
+
+    /// <summary>The first service of a type, or null.</summary>
+    public TypedSpec? FindService(string type)
+    {
+        foreach (var s in AllServices)
+            if (s.Type == type) return s;
+        return null;
+    }
+
+    /// <summary>Shop tabs in order of first appearance ("shop" first when it has entries).</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IReadOnlyList<string> ShopTabs => _tabs ??= Shop.Select(e => e.Tab).Distinct().ToArray();
+
+    private string[]? _tabs;
 
     public DialogueLine[] Lines { get; init; } = Array.Empty<DialogueLine>();
     public MoodEntry[] Mood { get; init; } = Array.Empty<MoodEntry>();

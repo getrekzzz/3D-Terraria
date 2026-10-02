@@ -524,3 +524,9 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   bestiary; the Dye Trader a dye and 4 residents; the Party Girl 14 residents and a 2.5% roll (drawn from the town
   stream); Santa the Frost Legion and Christmas (he leaves after); the Princess 3 residents. Visiting merchants are
   inert (`flag never`) until visits exist.
+* **Services** (P5-13): `TownNpcDef.Services` (plus the legacy `service`, merged in `AllServices`/`FindService`).
+  Shop entries have a `tab` (default "shop"; `TownCommerce.Tabs/Stock/Buy` take it) and an optional `currency`
+  item paid by count, unscaled by happiness. The Nurse's heal is base × the first set progression tier (Golem 200 …
+  Eye 3) × the Expert multiplier × happiness. The Dryad's `worldStatus` reads `WorldStatus`, an incremental biome
+  sampler (256 samples per tick, approximate, fresh for an hour); `town status <id>` forces it. The chat buttons for
+  `services` arrive with the W4 TownDialog.

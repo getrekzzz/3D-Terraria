@@ -26,10 +26,14 @@ public static partial class ContentValidator
                 var e = t.Shop[i];
                 ctx.Ref(t, ctx.Db.Items, e.Item, $"shop[{i}].item");
                 if (e.Price is < 0) ctx.Error(t, $"shop[{i}].price must be >= 0.");
+                if (string.IsNullOrWhiteSpace(e.Tab)) ctx.Error(t, $"shop[{i}].tab must not be empty.");
+                ctx.Ref(t, ctx.Db.Items, e.Currency, $"shop[{i}].currency");
                 ctx.Specs(t, SpecKind.Condition, e.Conditions, $"shop[{i}].conditions");
             }
-            if (t.Service is { } service)
+            if (t.Service != null && t.Services.Length > 0) ctx.Warn(t, "both 'service' and 'services' are set; prefer 'services'.");
+            foreach (var service in t.AllServices)
             {
+                if (t.AllServices.Count(o => o.Type == service.Type) > 1) ctx.Error(t, $"service '{service.Type}' is listed twice.");
                 ctx.Spec(t, SpecKind.TownService, service, "service");
                 if (service.Type == TownServiceSpecs.SummonBoss && ctx.TryParse<SummonServiceParams>(SpecKind.TownService, service) is { } summon)
                 {

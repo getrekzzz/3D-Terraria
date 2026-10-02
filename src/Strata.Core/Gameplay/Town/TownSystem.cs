@@ -25,6 +25,10 @@ public sealed partial class TownSystem
     private readonly Dictionary<string, ICondition> _arrival = new();
     private long _nextId = 1;
     private long _homeAudit;
+    private WorldStatus? _status;
+
+    /// <summary>The Dryad's incremental world purity sampler (created on first use).</summary>
+    public WorldStatus Status => _status ??= new WorldStatus(_world.Session);
     private Pcg32 _rng;
 
     public TownSystem(GameWorld world, TownConfig? config = null)
@@ -72,6 +76,7 @@ public sealed partial class TownSystem
         if (tick % LandmarkInterval == 0) UpdateLandmarks();
         if (tick % Config.HomeCheckInterval == 0) CheckHomes();
         foreach (var r in _residents) TickResident(r);
+        _status?.Tick();
     }
 
     /// <summary>

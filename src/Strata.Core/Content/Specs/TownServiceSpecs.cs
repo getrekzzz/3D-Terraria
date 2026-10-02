@@ -9,6 +9,7 @@ public static class TownServiceSpecs
     public const string Reforge = "reforge";
     public const string Taxes = "taxes";
     public const string AnglerQuest = "anglerQuest";
+    public const string WorldStatus = "worldStatus";
 
     public static void Register(SpecCatalog c)
     {
@@ -18,18 +19,52 @@ public static class TownServiceSpecs
         c.Register<ReforgeServiceParams>(SpecKind.TownService, Reforge);
         c.Register<TaxServiceParams>(SpecKind.TownService, Taxes);
         c.Register<AnglerQuestParams>(SpecKind.TownService, AnglerQuest);
+        c.Register<WorldStatusParams>(SpecKind.TownService, WorldStatus);
     }
 }
 
-/// <summary>Restores life (and removes debuffs) for coins, priced per missing life point.</summary>
+/// <summary>
+/// Restores life (and removes debuffs) for coins (the Nurse): <see cref="CostPerLife"/> per missing life point plus
+/// <see cref="PerDebuff"/> per debuff, times the first progression tier whose flag is set (strongest first), times
+/// <see cref="ExpertMultiplier"/> in Expert and Master worlds, times the happiness price factor.
+/// </summary>
 public sealed class HealServiceParams : SpecParams, IValidatableSpec
 {
-    /// <summary>Copper per missing life point.</summary>
+    /// <summary>Copper per missing life point before the tier multiplier.</summary>
     public int CostPerLife { get; init; } = 15;
+
+    /// <summary>Copper per removed debuff before the tier multiplier (default: ten life points' worth).</summary>
+    public int? PerDebuff { get; init; }
 
     public bool ClearsDebuffs { get; init; } = true;
 
-    public string? Validate() => CostPerLife < 0 ? "costPerLife must be >= 0" : null;
+    /// <summary>Progression multipliers, strongest first; the first whose flag is set applies (none = ×1).</summary>
+    public HealTier[] Tiers { get; init; } = Array.Empty<HealTier>();
+
+    public float ExpertMultiplier { get; init; } = 1f;
+
+    public string? Validate() =>
+        CostPerLife < 0 || PerDebuff is < 0 ? "costPerLife and perDebuff must be >= 0"
+        : ExpertMultiplier <= 0 || Array.Exists(Tiers, t => t.Multiplier <= 0 || string.IsNullOrEmpty(t.Flag)) ? "tiers need a flag and multipliers must be > 0"
+        : null;
+}
+
+public sealed class HealTier
+{
+    public string Flag { get; init; } = "";
+    public float Multiplier { get; init; } = 1f;
+}
+
+/// <summary>Reports how pure, evil and hallowed the world is (the Dryad's Status), sampled from its biomes.</summary>
+public sealed class WorldStatusParams : SpecParams, IValidatableSpec
+{
+    public string[] EvilBiomes { get; init; } = { "corruption", "crimson" };
+    public string[] HallowBiomes { get; init; } = { "hallow" };
+
+    /// <summary>Placeholders: {world}, {pure}, {evil}, {evilName}, {hallow}.</summary>
+    public string Text { get; init; } = "{world} is {pure}% pure, {evil}% {evilName} and {hallow}% hallowed.";
+
+    public string? Validate() => string.IsNullOrWhiteSpace(Text) ? "text is required" : null;
 }
 
 /// <summary>Shows what the held item can be crafted into (the guide's help).</summary>

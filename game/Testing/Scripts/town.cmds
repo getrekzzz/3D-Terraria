@@ -65,6 +65,14 @@ housing query 8 1 0
 housing assign guide 8 1 0
 assert town.guide.homed == 1
 
+# --- P5-13 ---
+# The Dryad's Status service reports the world's purity (the chat button arrives with the W4 dialog).
+town summon dryad 0 0 -3
+town services dryad
+town status dryad
+town dismiss dryad
+assert errors == 0
+
 # Talking and trading with the peddler.
 give silver_coin 60
 town summon merchant 0 0 -3
