@@ -146,6 +146,21 @@ public static class UiCommands
                     : $"UI scale {DisplaySettings.EffectiveUiScale:0.##}.");
             },
         });
+        r.Register(new CommandDef
+        {
+            Name = "uiwindow", Usage = "uiwindow <width> <height>|off",
+            Help = "Headless runs only: lays the interface out as in a window of that many pixels (the UI scale is fitted to it as a real window's would be); off goes back to the project's window size.",
+            Run = (_, a) =>
+            {
+                if (DisplayServer.GetName() != "headless") return CommandResult.Fail("uiwindow only applies to headless runs; resize the real window instead.");
+                var root = world.Runtime.GetTree().Root;
+                if (a.Str(0, "width|off") == "off") LayoutWidgets.SimulatedWindow = null;
+                else LayoutWidgets.SimulatedWindow = new Vector2I(a.Int(0, "width"), a.Int(1, "height"));
+                DisplaySettings.ApplyUiScale(root, UserSettings.Current.UiScale);
+                var size = LayoutWidgets.LogicalSize(root);
+                return CommandResult.Success($"Laid out for {LayoutWidgets.HeadlessWindow.X:0}x{LayoutWidgets.HeadlessWindow.Y:0} at UI scale {DisplaySettings.EffectiveUiScale:0.##} ({size.X:0}x{size.Y:0} logical).");
+            },
+        });
     }
 
     /// <summary>The <c>ui buy</c>, <c>ui sell</c> and <c>ui buyback</c> commands: clicks on the open shop as the player makes them.</summary>

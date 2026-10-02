@@ -73,6 +73,14 @@ public static class UiProbes
             foreach (var pair in pairs) log.Warn("ui", $"overlap: {pair}");
             return count;
         });
+        // W4-POLISH: the same check on what each widget draws (its slots, captions and fields included), not just its region.
+        ctx.AddProbe("layout.overlaps", () =>
+        {
+            var pairs = new System.Collections.Generic.List<string>();
+            int count = LayoutWidgets.CountOverlaps(world.Runtime.GetTree(), pairs, content: true);
+            foreach (var pair in pairs) log.Warn("ui", $"content overlap: {pair}");
+            return count;
+        });
         ctx.AddProbe("hud.item_name", () => world.Hud?.ItemName.Length > 0 ? 1 : 0);
         ctx.AddProbe("hud.status", () => world.Hud?.Status.Length > 0 ? 1 : 0);
         ctx.AddProbe("ui.layout_width", () => world.Hud?.Layout?.Width ?? 0);
@@ -90,6 +98,7 @@ public static class UiProbes
         // P2-17: the chest panel. Its name field is open, the shown chest has a name of its own, and the chests put
         // away (each with the chest_close creak).
         ctx.AddProbe("ui.renaming", () => world.Inventory?.Chest.Renaming == true ? 1 : 0);
+        ctx.AddProbe("ui.rename_fits", () => world.Inventory?.Chest.RenameFits == true ? 1 : 0); // W4-POLISH: on the caption row
         ctx.AddProbe("ui.chest_named", () => world.Inventory?.Chest.Container?.CustomName != null ? 1 : 0);
         ctx.AddProbe("ui.chests_closed", () => world.Inventory?.Chest.ClosedCount ?? 0);
         // P2-18: the crafting column. Recipe slots listed, and the times it was rebuilt since the inventory opened (an

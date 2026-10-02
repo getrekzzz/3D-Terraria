@@ -87,7 +87,7 @@ public sealed class CoinAmmoColumns
     private static void Put(ItemSlotView view, float x, float y, float side)
     {
         view.Position = new Vector2(x, y);
-        view.CustomMinimumSize = view.Size = new Vector2(side, side);
+        view.Resize(side);
     }
 
     /// <summary>A 26 px pixel-art button with Terraria's tooltip text; it never takes keyboard focus (Space jumps).</summary>

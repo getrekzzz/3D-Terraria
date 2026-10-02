@@ -134,7 +134,7 @@ public sealed partial class ShopPanel : Control
         for (int i = 0; i < Cells; i++)
         {
             _views[i].Position = new Vector2(i % Columns * pitch, top + i / Columns * pitch);
-            _views[i].CustomMinimumSize = _views[i].Size = new Vector2(side, side);
+            _views[i].Resize(side);
         }
         _title.Position = Vector2.Zero;
         _title.Size = new Vector2(_gridWidth, top);

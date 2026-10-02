@@ -44,6 +44,7 @@ public static class DisplaySettings
 
     /// <summary>The UI scale a window of <paramref name="window"/> pixels gets for <paramref name="setting"/>.</summary>
     public static float Effective(float setting, Vector2I window) =>
-        DisplayServer.GetName() == "headless" ? UiScale.Effective(setting, 0, 0) // no real window to fit
-            : UiScale.Effective(setting, window.X, window.Y);
+        DisplayServer.GetName() != "headless" ? UiScale.Effective(setting, window.X, window.Y)
+            : UI.LayoutWidgets.SimulatedWindow is { } sim ? UiScale.Effective(setting, sim.X, sim.Y) // the window a test lays out for
+            : UiScale.Effective(setting, 0, 0); // no real window to fit
 }

@@ -126,6 +126,17 @@ public sealed partial class ItemSlotView : Control
     /// <summary>Whether the mouse is over the slot.</summary>
     public bool Hovered => _hovered;
 
+    /// <summary>
+    /// Sizes the slot to <paramref name="side"/> pixels square, smaller than it was made too: the minimum size first, as
+    /// a control never shrinks below its minimum (setting the size first would leave a shrinking slot at its old size).
+    /// </summary>
+    public void Resize(float side)
+    {
+        var size = new Vector2(side, side);
+        CustomMinimumSize = size;
+        Size = size;
+    }
+
     /// <summary>Shows this slot's tooltip beside the pointer (on hover, and from the <c>ui hover</c> command).</summary>
     public void ShowTooltip()
     {
