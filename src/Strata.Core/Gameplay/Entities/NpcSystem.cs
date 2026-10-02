@@ -116,6 +116,7 @@ public sealed partial class NpcSystem
         if (Scale > 1f) npc.Life = npc.MaxLife = (int)(def.Life * Scale);
         if (def.Boss is { Segments: > 0 } boss)
             for (int i = 1; i <= boss.Segments; i++) npc.Segments.Add(npc.Center - new Vector3(0, i * boss.SegmentSpacing, 0));
+        InitSegmentLife(npc);
         bool joinsGroup = def.Boss is { Minor: false } && GroupAlive(def.Boss, npc);
         _npcs.Add(npc);
         if (def.Boss is { Minor: false } && !joinsGroup)
@@ -181,8 +182,8 @@ public sealed partial class NpcSystem
                 Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false));
                 if (npc.Life <= 0)
                 {
-                    Kill(npc);
-                    continue;
+                    Die(npc);
+                    if (npc.Removed) continue;
                 }
             }
             var target = Nearest(npc.Center, out float distance);
@@ -286,9 +287,11 @@ public sealed partial class NpcSystem
     }
 
     /// <summary>Applies a hit from a player. Returns false if the NPC was immune (melee) or already dead.</summary>
-    public bool Hit(Npc npc, PlayerEntity? attacker, int baseDamage, DamageClass damageClass, int critChance, float knockback, Vector3 from, bool melee)
+    /// <summary><paramref name="segment"/>: the body segment struck (−1 = the head), for worms whose segments live on their own.</summary>
+    public bool Hit(Npc npc, PlayerEntity? attacker, int baseDamage, DamageClass damageClass, int critChance, float knockback, Vector3 from, bool melee, int segment = -1)
     {
         if (!npc.Alive || npc.Invulnerable || (melee && npc.ImmuneTicks > 0)) return false;
+        if (segment >= 0 && segment < npc.SegmentLife.Count) return HitSegment(npc, segment, attacker, baseDamage, damageClass, critChance, melee);
         var hit = DamageModel.Roll(baseDamage, damageClass, critChance, knockback, attacker?.State.Effects.Stats, npc.Defense,
             0.5f, 0f, npc.Def.KnockbackResist, ref _rng);
         npc.Life -= hit.Damage;
@@ -298,7 +301,7 @@ public sealed partial class NpcSystem
         Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
-        if (npc.Life <= 0) Kill(npc);
+        if (npc.Life <= 0) Die(npc);
         else if (melee && attacker != null)
             foreach (var inflict in attacker.State.Effects.Inflicts)
                 if (_rng.Chance(inflict.Chance) && _world.Session.Content.Buffs.TryGet(inflict.Buff, out var buff)) AddBuff(npc, buff, inflict.Ticks);

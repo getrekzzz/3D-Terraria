@@ -47,6 +47,25 @@ public sealed class WormBrain : IBrain
         if (_p.DigRadius > 0 && ctx.Carve != null && (npc.Age % _p.DigInterval) == 0 && (buried || NearTerrain(ctx, head)))
             ctx.Carve(head, _p.DigRadius);
         ReleaseMinion(npc, ctx);
+        Spit(npc, ctx);
+    }
+
+    /// <summary>A random body segment spits at the target when it can see it (each piece of a split worm on its own clock).</summary>
+    private void Spit(Npc npc, BrainContext ctx)
+    {
+        if (_p.SpitProjectile == null || ctx.Shoot == null || ctx.Target == null || npc.Segments.Count < 2) return;
+        if (_p.SpitExpertOnly && !ctx.Expert) return;
+        int interval = Math.Max(1, _p.SpitInterval);
+        if (npc.Age == 0 || (npc.Age + (int)(npc.Id % interval)) % interval != 0) return;
+        // A few random body segments (never the tail) are tried; the first that sees the target spits.
+        for (int tries = 0; tries < 6; tries++)
+        {
+            var from = npc.Segments[ctx.Rng.NextInt(npc.Segments.Count - 1)];
+            var aim = ctx.Target.Center - from;
+            if (aim.LengthSquared() < 1e-4f || !(ctx.InSight?.Invoke(from, ctx.Target.Eye) ?? true)) continue;
+            ctx.Shoot(_p.SpitProjectile, from, Vector3.Normalize(aim) * _p.SpitSpeed, _p.SpitDamage);
+            return;
+        }
     }
 
     /// <summary>Drones launched from a random segment while fewer than the cap are alive.</summary>

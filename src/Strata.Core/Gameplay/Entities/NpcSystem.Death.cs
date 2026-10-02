@@ -36,6 +36,7 @@ public sealed partial class NpcSystem
         npc.Life = 0;
         foreach (var f in npc.Followers)
             if (f.IsPart && f.Part is { DiesWithBody: true }) f.Life = 0; // FollowLeader removes them next tick
+        if (npc.Def.Boss is { SegmentLife.Length: > 0, SegmentLoot: not null }) RollSegmentLoot(npc, npc.Center); // the head is a segment too
         var cell = npc.Cell;
         bool defeat = npc.Def.Boss is { Minor: false } group && !GroupAlive(group, npc);
         bool rolls = npc.Def.Boss is not { LootOnDefeat: true } || defeat;

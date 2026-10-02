@@ -316,6 +316,7 @@ on_fire|On Fire!|debuff
 poisoned|Poisoned|debuff
 bleeding|Bleeding|debuff
 chilled|Chilled|debuff
+weak|Weak|debuff
 frozen|Frozen|debuff
 confused|Confused|debuff
 cursed_inferno|Cursed Inferno|debuff

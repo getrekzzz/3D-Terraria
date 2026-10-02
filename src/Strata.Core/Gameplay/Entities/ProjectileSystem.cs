@@ -173,9 +173,10 @@ public sealed partial class ProjectileSystem
         foreach (var npc in _npcs.All.ToList())
         {
             if (!npc.Alive || p.HitNpcs.Contains(npc.Id)) continue;
-            if (!npc.Volumes().Any(v => Vector3.DistanceSquared(Vector3.Clamp(p.Position, v.Min, v.Max), p.Position) <= r * r)) continue;
+            int volume = npc.FirstVolume((min, max) => Vector3.DistanceSquared(Vector3.Clamp(p.Position, min, max), p.Position) <= r * r);
+            if (volume < 0) continue;
             p.HitNpcs.Add(npc.Id);
-            _npcs.Hit(npc, p.Owner, p.Damage, p.DamageClass, p.Crit, p.Knockback, p.Position - p.Velocity * 0.05f, melee: false);
+            _npcs.Hit(npc, p.Owner, p.Damage, p.DamageClass, p.Crit, p.Knockback, p.Position - p.Velocity * 0.05f, melee: false, segment: volume - 1);
             ApplyOnHit(p, npc);
             if (p.PierceLeft >= 0 && --p.PierceLeft <= 0) return true;
         }

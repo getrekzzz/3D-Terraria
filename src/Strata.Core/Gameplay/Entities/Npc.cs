@@ -172,6 +172,26 @@ public sealed class Npc
     /// <summary>Centres of trailing body segments (worms), head first; empty for single-body creatures.</summary>
     public List<Vector3> Segments { get; } = new();
 
+    /// <summary>Life left of each segment, parallel to <see cref="Segments"/> (worms whose segments die on their own); else empty.</summary>
+    public List<int> SegmentLife { get; } = new();
+
+    /// <summary>Per-segment state bits for brains (parallel to <see cref="Segments"/> when used).</summary>
+    public List<byte> SegmentFlags { get; } = new();
+
+    /// <summary>Life of the whole piece: the head plus every segment's.</summary>
+    public int TotalLife
+    {
+        get
+        {
+            int sum = Life;
+            foreach (int l in SegmentLife) sum += l;
+            return sum;
+        }
+    }
+
+    /// <summary>The whole worm's life when it arrived (every piece cut from it keeps it), for a boss bar.</summary>
+    public int WholeMaxLife { get; set; }
+
     public bool IsBoss => Def.Boss is { Minor: false };
 
     /// <summary>Every volume that can hit or be hit: the body plus segments.</summary>
@@ -181,6 +201,18 @@ public sealed class Npc
         if (Segments.Count == 0) yield break;
         var half = new Vector3(Def.Boss?.SegmentRadius ?? 0.5f);
         foreach (var s in Segments) yield return (s - half, s + half);
+    }
+
+    /// <summary>The first volume passing a test: −1 none, 0 the body (head), i + 1 segment i. Allocation-free walk.</summary>
+    public int FirstVolume(Func<Vector3, Vector3, bool> test)
+    {
+        var box = Box;
+        if (test(box.Min, box.Max)) return 0;
+        if (Segments.Count == 0) return -1;
+        var half = new Vector3(Def.Boss?.SegmentRadius ?? 0.5f);
+        for (int i = 0; i < Segments.Count; i++)
+            if (test(Segments[i] - half, Segments[i] + half)) return i + 1;
+        return -1;
     }
 
     public bool Alive => Life > 0;

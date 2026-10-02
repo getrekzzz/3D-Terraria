@@ -25,6 +25,11 @@
    "kind": "debuff"
   },
   {
+   "id": "terraria:weak",
+   "name": "Weak",
+   "kind": "debuff"
+  },
+  {
    "id": "terraria:frozen",
    "name": "Frozen",
    "kind": "debuff"

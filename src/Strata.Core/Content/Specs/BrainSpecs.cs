@@ -176,6 +176,15 @@ public sealed class WormParams : SpecParams
     public string? Minion { get; init; }
     public int MinionInterval { get; init; } = 240;
     public int MaxMinions { get; init; } = 6;
+
+    /// <summary>Spat from a random body segment that sees the target every <see cref="SpitInterval"/> ticks (Vile Spit).</summary>
+    public string? SpitProjectile { get; init; }
+    public int SpitInterval { get; init; } = 180;
+    public int SpitDamage { get; init; } = 18;
+    public float SpitSpeed { get; init; } = 8f;
+
+    /// <summary>Spits only in Expert (the Eater of Worlds).</summary>
+    public bool SpitExpertOnly { get; init; }
 }
 
 /// <summary>Lives in liquid: chases targets through water, flops helplessly on land.</summary>
