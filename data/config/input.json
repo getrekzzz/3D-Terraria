@@ -22,6 +22,8 @@
     "console": ["key:QuoteLeft", "key:F1"],
     "debug_overlay": ["key:F3"],
     "free_camera": ["key:F4"],
+    "photo_mode": ["key:P"],
+    "photo_shot": ["key:F12", "key:Enter"],
     "pause": ["key:Escape"],
     "hotbar_1": ["key:1"], "hotbar_2": ["key:2"], "hotbar_3": ["key:3"], "hotbar_4": ["key:4"], "hotbar_5": ["key:5"],
     "hotbar_6": ["key:6"], "hotbar_7": ["key:7"], "hotbar_8": ["key:8"], "hotbar_9": ["key:9"], "hotbar_10": ["key:0"],
