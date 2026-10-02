@@ -54,7 +54,8 @@ public class UseTimingTests
         Assert.Contains(problems, p => p.Contains("maxClipRate"));
         Assert.Contains(problems, p => p.StartsWith("swing:"));
         Assert.Contains(problems, p => p.StartsWith("mine:"));
-        Assert.Contains(problems, p => p.Contains("'thrust' is missing"));
+        Assert.Contains(problems, p => p.Contains("'rapier' is missing"));
+        Assert.Contains(problems, p => p.Contains("'throw' is missing"));
         Assert.Contains(problems, p => p.StartsWith("bow:"));
     }
 
@@ -76,11 +77,25 @@ public class UseTimingTests
             Assert.True(s >= last, "the sweep never goes back");
             last = s;
         }
-        var thrust = timing.Clip(UseTiming.Thrust);
-        Assert.False(timing.Striking(UseTiming.Thrust, thrust.StrikeStart!.Value - 0.01f));
-        Assert.True(timing.Striking(UseTiming.Thrust, thrust.StrikeStart!.Value));
-        Assert.True(timing.Striking(UseTiming.Thrust, thrust.StrikeEnd!.Value + UseTiming.FollowThrough));
-        Assert.False(timing.Striking(UseTiming.Thrust, thrust.StrikeEnd!.Value + UseTiming.FollowThrough + 0.01f));
+        foreach (var name in new[] { UseTiming.Rapier, UseTiming.Spear })
+        {
+            var thrust = timing.Clip(name);
+            Assert.False(timing.Striking(name, thrust.StrikeStart!.Value - 0.01f));
+            Assert.True(timing.Striking(name, thrust.StrikeStart!.Value));
+            Assert.True(timing.Striking(name, thrust.StrikeEnd!.Value + UseTiming.FollowThrough));
+            Assert.False(timing.Striking(name, thrust.StrikeEnd!.Value + UseTiming.FollowThrough + 0.01f));
+        }
+        // A rapier's jab is out and back well before a spear's lunge lands.
+        Assert.True(timing.Clip(UseTiming.Rapier).StrikeEnd < timing.Clip(UseTiming.Spear).StrikeEnd);
+    }
+
+    [Fact]
+    public void ThrustsAreTimedByTheirStylesClip()
+    {
+        var timing = TestPaths.Timing;
+        var uses = new ItemUseTable(TestPaths.Content);
+        Assert.Equal(UseTiming.Rapier, timing.ThrustClip(uses[TestPaths.Content.Items.Get("copper_shortsword")]));
+        Assert.Equal(UseTiming.Spear, timing.ThrustClip(uses[TestPaths.Content.Items.Get("spear")]));
     }
 
     /// <summary>A stone wall two cells ahead, thick enough that a pickaxe never digs through it in a few seconds.</summary>
@@ -259,6 +274,9 @@ public class UseTimingTests
             if (gel.Life < 5000) hit = tick;
         }
         Assert.True(hit > 0, "the thrust missed");
-        Assert.True(g.World.ItemUse.Timing.Striking(UseTiming.Thrust, hit / (float)duration), $"hit at tick {hit} of {duration}, outside the strike");
+        var timing = g.World.ItemUse.Timing;
+        string clip = timing.ThrustClip(g.World.Uses[g.Content.Items.Get("copper_shortsword")]);
+        Assert.Equal(UseTiming.Rapier, clip);
+        Assert.True(timing.Striking(clip, hit / (float)duration), $"hit at tick {hit} of {duration}, outside the {clip} strike");
     }
 }

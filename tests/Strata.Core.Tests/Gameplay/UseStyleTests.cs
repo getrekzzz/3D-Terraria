@@ -87,11 +87,17 @@ public class UseStyleTests
         var styles = TestPaths.Timing.Config;
         Assert.Equal("mine", styles.ClipFor(Info("copper_pickaxe"))); // tools chop
         Assert.Equal("swing", styles.ClipFor(Info("copper_broadsword")));
-        Assert.Equal("thrust", styles.ClipFor(Info("copper_shortsword")));
+        Assert.Equal("rapier", styles.ClipFor(Info("copper_shortsword")));
+        Assert.Equal("spear", styles.ClipFor(Info("spear")));
         Assert.Equal("bow", styles.ClipFor(Info("wooden_bow")));
-        Assert.Equal("shoot", styles.ClipFor(Info("laser_rifle"))); // a magic gun is held like a gun
+        Assert.Equal("gun", styles.ClipFor(Info("laser_rifle"))); // a magic gun is held like a gun
+        Assert.Equal("staff", styles.ClipFor(Info("amethyst_staff")));
+        Assert.Equal("tome", styles.ClipFor(Info("water_bolt")));
+        Assert.Equal("throw", styles.ClipFor(Info("shuriken")));
+        Assert.Equal("whip", styles.ClipFor(Info("leather_whip")));
         Assert.Equal("drink", styles.ClipFor(Info("lesser_healing_potion")));
-        Assert.NotEqual("drink", styles.ClipFor(Info("slime_crown"))); // held up, not drunk
+        Assert.Equal("eat", styles.ClipFor(Info("cooked_fish")));
+        Assert.Equal("hold_up", styles.ClipFor(Info("slime_crown"))); // held up, not drunk
         Assert.Equal(1f, styles.Style(UseStyle.Gun).ArmAim);
     }
 

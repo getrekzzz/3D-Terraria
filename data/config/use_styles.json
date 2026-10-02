@@ -9,46 +9,53 @@
   //   length       authored length in seconds
   //   strikeStart  end of the wind-up: the blade starts down (a melee swing deals no damage before it)
   //   strikeEnd    the blade has swept its whole arc (a thrust stays dangerous a little past it)
-  //   release      the string snaps or the item leaves the hand
+  //   release      the string snaps or the item leaves the hand (ranged uses fire as they start, so it comes early)
   //   redrawStart, redrawEnd  a bow nocks and draws the next arrow (held drawn afterwards so auto-fire chains)
+  // A rapier's jab and a spear's lunge reach full length at their strike end and stay out a moment (gameplay stabs in
+  // that window); a whip winds back until its strike start and cracks at its strike end.
   //
   // maxClipRate: the fastest a clip may play relative to its authored length (1–5). A quicker use should skip the
   // wind-up (start at strikeStart) rather than play faster, so the strike still lands inside the use.
   //
   // styles: how each Terraria use style looks (an item's "useStyle", or the one inferred from its stats; see
   // src/Strata.Core/Gameplay/Items/UseStyleRules.cs for what each style does in play). Every style needs an entry.
-  //   clip        the upper-body clip a use plays (an action in the human animation set)
+  //   clip        the upper-body clip a use plays (an action in the human animation set; "flail" and "yoyo" loop on
+  //               the right arm while the use lasts, like a held torch, instead of playing once)
   //   toolClip    the clip tools of the style play instead (pickaxes and axes chop)
   //   armAim      how much of the aim pitch the arms take while the clip plays (0–1)
   //   hand        optional grip in the hand bone: { "offset": [x, y, z] m, "euler": [x, y, z] degrees }
   //   holdout     optional business-end offset from the eye: { "forward", "right", "down" } m
   //   bladeCurve  swing only: the blade's pitch over the swing, [t, degrees, ease into the key] (ease: in, out, io,
-  //               lin); 0° hangs down, 90° points ahead, 180° is overhead; seeded from the swing clip's arm
+  //               lin); 0° hangs down, 90° points ahead, 180° is overhead; the swing clip's arm pitch is keyed to it
+  //               (rebuild the sets after changing it)
   "maxClipRate": 2.6,
   "clips": {
     "swing":  { "length": 0.5, "strikeStart": 0.1, "strikeEnd": 0.6 },
     "mine":   { "length": 0.46, "strikeStart": 0.18, "strikeEnd": 0.32 },
-    "thrust": { "length": 0.4, "strikeStart": 0.25, "strikeEnd": 0.5 },
+    "rapier": { "length": 0.25, "strikeStart": 0.05, "strikeEnd": 0.15 },
+    "spear":  { "length": 0.4, "strikeStart": 0.12, "strikeEnd": 0.3 },
+    "whip":   { "length": 0.6, "strikeStart": 0.35, "strikeEnd": 0.55 },
+    "throw":  { "length": 0.45, "release": 0.1 },
     "bow":    { "length": 0.7, "release": 0.06, "redrawStart": 0.3, "redrawEnd": 0.85 }
   },
   "styles": {
     "none":   { "clip": "use", "armAim": 0.5 },
     "swing":  { "clip": "swing", "toolClip": "mine", "armAim": 0.5,
                 "bladeCurve": [[0, 158, "lin"], [0.1, 166, "out"], [0.6, 45, "io"], [0.72, 26, "out"], [1, 158, "io"]] },
-    "rapier": { "clip": "thrust", "armAim": 1 },
-    "spear":  { "clip": "thrust", "armAim": 1 },
-    "shoot":  { "clip": "shoot", "armAim": 1 },
-    "gun":    { "clip": "shoot", "armAim": 1 },
+    "rapier": { "clip": "rapier", "armAim": 1 },
+    "spear":  { "clip": "spear", "armAim": 1 },
+    "shoot":  { "clip": "gun", "armAim": 1 },
+    "gun":    { "clip": "gun", "armAim": 1 },
     "bow":    { "clip": "bow", "armAim": 1 },
-    "staff":  { "clip": "cast", "armAim": 1 },
-    "tome":   { "clip": "cast", "armAim": 1 },
-    "throw":  { "clip": "swing", "armAim": 0.5 },
-    "yoyo":   { "clip": "shoot", "armAim": 1 },
-    "flail":  { "clip": "shoot", "armAim": 1 },
-    "whip":   { "clip": "swing", "armAim": 0.5 },
-    "holdUp": { "clip": "use", "armAim": 0.2 },
+    "staff":  { "clip": "staff", "armAim": 1 },
+    "tome":   { "clip": "tome", "armAim": 1 },
+    "throw":  { "clip": "throw", "armAim": 0.5 },
+    "yoyo":   { "clip": "yoyo", "armAim": 1 },
+    "flail":  { "clip": "flail", "armAim": 0.3 },
+    "whip":   { "clip": "whip", "armAim": 0.5 },
+    "holdUp": { "clip": "hold_up", "armAim": 0.2 },
     "drink":  { "clip": "drink", "armAim": 0.5 },
-    "eat":    { "clip": "drink", "armAim": 0.5 },
-    "place":  { "clip": "use", "armAim": 0.5 }
+    "eat":    { "clip": "eat", "armAim": 0.5 },
+    "place":  { "clip": "place", "armAim": 0.5 }
   }
 }

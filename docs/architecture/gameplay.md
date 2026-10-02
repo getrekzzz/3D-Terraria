@@ -32,7 +32,8 @@
   `use` command and tests). Clip windows live in `data/config/use_styles.json` (`clips`: length, strike start/end,
   release, bow re-draw; loaded by `Presentation.UseStyleConfig`, read through `Items.UseTiming`): a swing deals no
   damage during its wind-up and sweeps its arc over the strike window (`UseTiming.Sweep`), a thrust connects only
-  while `UseTiming.Striking`.
+  while `UseTiming.Striking` in its own clip's window (`UseTiming.ThrustClip`: a rapier's quick jab, a spear's
+  later lunge).
 * **Failed-use feedback** — a fresh press that cannot be used raises `ItemUseSystem.Failed` (counted in `Failures`,
   probe `use.failures`) and a message through `Refused`, which the HUD toasts: no ammo names the cheapest obtainable
   item of the weapon's ammo class ("Needs Wooden Arrow", cached per class), no mana says "Not enough mana", and a
@@ -61,7 +62,7 @@
   from the drawn (interpolated) hand and moves the claw from the voxel hit onto the rendered surface: one physics ray
   across the struck face (terrain, platform and object colliders, ±0.6 m) when a throw starts and when it latches, kept
   only within 0.5 m and eased on over the head's last metre of flight (probe `player.hook_snap`, -1 when nothing was
-  found, e.g. a canopy). The third-person body throws a clicked hook with the `thrust` clip. `movement.cmds` covers the
+  found, e.g. a canopy). The third-person body flings a clicked hook out along the aim with the `gun` clip (the `shoot` style). `movement.cmds` covers the
   key, the click, a crisp slab, a natural (smooth-meshed, `fill … natural`) sloped ceiling that must stay latched while
   reeling in, a broken anchor and platforms.
 * **World editing** — `WorldEditor`: accumulated block damage vs hardness/pick power, drops, loose blocks

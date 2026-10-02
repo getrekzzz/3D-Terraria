@@ -17,8 +17,11 @@ public sealed class UseStyleConfig
 {
     public const string Path = "data/config/use_styles.json";
 
-    /// <summary>Clips that must be present, with the windows gameplay and presentation read from them.</summary>
-    public static readonly string[] StrikeClips = { "swing", "mine", "thrust" };
+    /// <summary>Clips that must be present with a strike window (gameplay strikes in it; the body clips are keyed to it).</summary>
+    public static readonly string[] StrikeClips = { "swing", "mine", "rapier", "spear", "whip" };
+
+    /// <summary>Clips that must be present with a release (the item leaves the hand).</summary>
+    public static readonly string[] ReleaseClips = { "throw", "bow" };
 
     public const string BowClip = "bow";
 
@@ -68,7 +71,10 @@ public sealed class UseStyleConfig
         {
             ["swing"] = new ClipTiming { Length = 0.5f, StrikeStart = 0.1f, StrikeEnd = 0.6f },
             ["mine"] = new ClipTiming { Length = 0.46f, StrikeStart = 0.18f, StrikeEnd = 0.32f },
-            ["thrust"] = new ClipTiming { Length = 0.4f, StrikeStart = 0.25f, StrikeEnd = 0.5f },
+            ["rapier"] = new ClipTiming { Length = 0.25f, StrikeStart = 0.05f, StrikeEnd = 0.15f },
+            ["spear"] = new ClipTiming { Length = 0.4f, StrikeStart = 0.12f, StrikeEnd = 0.3f },
+            ["whip"] = new ClipTiming { Length = 0.6f, StrikeStart = 0.35f, StrikeEnd = 0.55f },
+            ["throw"] = new ClipTiming { Length = 0.45f, Release = 0.1f },
             ["bow"] = new ClipTiming { Length = 0.7f, Release = 0.06f, RedrawStart = 0.3f, RedrawEnd = 0.85f },
         },
         Styles = new()
@@ -79,21 +85,21 @@ public sealed class UseStyleConfig
                 Clip = "swing", ToolClip = "mine", ArmAim = 0.5f,
                 BladeCurve = new CurveKey[] { new(0f, 158f, "lin"), new(0.1f, 166f, "out"), new(0.6f, 45f, "io"), new(0.72f, 26f, "out"), new(1f, 158f, "io") },
             },
-            ["rapier"] = new UseStyleEntry { Clip = "thrust", ArmAim = 1f },
-            ["spear"] = new UseStyleEntry { Clip = "thrust", ArmAim = 1f },
-            ["shoot"] = new UseStyleEntry { Clip = "shoot", ArmAim = 1f },
-            ["gun"] = new UseStyleEntry { Clip = "shoot", ArmAim = 1f },
+            ["rapier"] = new UseStyleEntry { Clip = "rapier", ArmAim = 1f },
+            ["spear"] = new UseStyleEntry { Clip = "spear", ArmAim = 1f },
+            ["shoot"] = new UseStyleEntry { Clip = "gun", ArmAim = 1f },
+            ["gun"] = new UseStyleEntry { Clip = "gun", ArmAim = 1f },
             ["bow"] = new UseStyleEntry { Clip = "bow", ArmAim = 1f },
-            ["staff"] = new UseStyleEntry { Clip = "cast", ArmAim = 1f },
-            ["tome"] = new UseStyleEntry { Clip = "cast", ArmAim = 1f },
-            ["throw"] = new UseStyleEntry { Clip = "swing", ArmAim = 0.5f },
-            ["yoyo"] = new UseStyleEntry { Clip = "shoot", ArmAim = 1f },
-            ["flail"] = new UseStyleEntry { Clip = "shoot", ArmAim = 1f },
-            ["whip"] = new UseStyleEntry { Clip = "swing", ArmAim = 0.5f },
-            ["holdUp"] = new UseStyleEntry { Clip = "use", ArmAim = 0.2f },
+            ["staff"] = new UseStyleEntry { Clip = "staff", ArmAim = 1f },
+            ["tome"] = new UseStyleEntry { Clip = "tome", ArmAim = 1f },
+            ["throw"] = new UseStyleEntry { Clip = "throw", ArmAim = 0.5f },
+            ["yoyo"] = new UseStyleEntry { Clip = "yoyo", ArmAim = 1f },
+            ["flail"] = new UseStyleEntry { Clip = "flail", ArmAim = 0.3f },
+            ["whip"] = new UseStyleEntry { Clip = "whip", ArmAim = 0.5f },
+            ["holdUp"] = new UseStyleEntry { Clip = "hold_up", ArmAim = 0.2f },
             ["drink"] = new UseStyleEntry { Clip = "drink", ArmAim = 0.5f },
-            ["eat"] = new UseStyleEntry { Clip = "drink", ArmAim = 0.5f },
-            ["place"] = new UseStyleEntry { Clip = "use", ArmAim = 0.5f },
+            ["eat"] = new UseStyleEntry { Clip = "eat", ArmAim = 0.5f },
+            ["place"] = new UseStyleEntry { Clip = "place", ArmAim = 0.5f },
         },
     };
 
@@ -105,8 +111,10 @@ public sealed class UseStyleConfig
         foreach (var name in StrikeClips)
             if (!Clips.TryGetValue(name, out var clip)) problems.Add($"clip '{name}' is missing");
             else if (clip.StrikeStart == null) problems.Add($"{name}: needs strikeStart and strikeEnd");
-        if (!Clips.TryGetValue(BowClip, out var bow)) problems.Add($"clip '{BowClip}' is missing");
-        else if (bow.Release == null || bow.RedrawStart == null) problems.Add($"{BowClip}: needs release, redrawStart and redrawEnd");
+        foreach (var name in ReleaseClips)
+            if (!Clips.TryGetValue(name, out var clip)) problems.Add($"clip '{name}' is missing");
+            else if (clip.Release == null) problems.Add($"{name}: needs a release");
+        if (Clips.TryGetValue(BowClip, out var bow) && bow.RedrawStart == null) problems.Add($"{BowClip}: needs redrawStart and redrawEnd");
         foreach (var (name, clip) in Clips)
         {
             if (name.Length == 0) problems.Add("a clip has an empty name");
