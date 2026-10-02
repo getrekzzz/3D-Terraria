@@ -10,7 +10,9 @@
 | 6 | P1b-10, P1b-11, P1b-12 (tile objects, grass, GC) | full headless CI green (507 Core tests, 14/14 smoke, MENU PASS) |
 | 7 | P1b-13, P1b-14, P1b-16 (threaded asset cache, preloading + warm-up, dynamic resolution; reviewed + fixed) | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
 | 8 | P3-48 chest lids | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
-| 9 | P3-46, P3-31, P3-35, X-09 creator menu rows (after P2-30) | pending |
+| 9 | P3-46 movement feel | full headless CI green (14/14 smoke, MENU PASS) |
+| 10 | P3-31 Terraria prefixes (reviewed + fixed) | full headless CI green (533 Core tests, 14/14 smoke, MENU PASS) |
+| 11 | P3-35 (after P2-06/P2-08), X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -90,3 +92,13 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   per group and rewrites only swinging lids (100° over 0.15 s). `InventoryScreen.ContainerShown` drives it; probe
   `objects.open_lids` (builder.cmds). Gaps: no `chest_close` sound exists on this branch (P2-17 not here); only
   `chest`-generator objects have lids.
+
+## Push 9-10 notes
+* **Movement (P3-46)**: full held jump ~5.4 cells (probe `player.jump_apex_cells`, movement.cmds asserts 5-6); boots use
+  a new `runSpeed` stat that builds up over `runUpTime` 1.2 s (holds in the air, resets on stopping); Sprint multiplies
+  only that bonus. Run-up covered by Core tests only (no smoke).
+* **Prefixes (P3-31)**: data/prefixes.json (83 Terraria 1.4.4 prefixes, groups per Terraria), old ids in
+  data/config/aliases.json, validator rule against alias keys that are live ids. Rolled per unit on loot (enemy, boss,
+  crate, chest) and shop buys; prefixes that no longer fit their item are dropped on player and chest load (item kept).
+  Use time = base × (1 − useSpeed). Review fixes: chest-load fit check, Deadly/Celestial stats, use-time math, per-unit
+  rolls. Shop prefix rolls consume the commerce RNG, so shopkeeper dialogue order shifts.
