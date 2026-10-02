@@ -466,3 +466,11 @@ references, trigger shapes and `after` cycles (`ContentValidator.Guide.cs`). `Pr
 line. A town service type `advice` (`AdviceParams`) is registered for it, but the conversation UI
 (`TownDialog.Services`) is not wired yet: the Guide keeps `craftHelp` until the W4 dialog lands. Command `advice
 [steps]`; probes `guide.next.<step>`, `guide.done.<step>`.
+
+## Drop rates (P5-24b)
+
+`Gameplay/Loot/DropRates.cs` mirrors `LootRoller`: an each-mode entry drops with its `chance`, a weighted entry with
+1 − (1 − weight/total)^rolls over all entries (conditional ones listed with their conditions), nested tables multiply.
+`DropRates.For(content, table)` flattens a table into `DropInfo(item, chance, min, max, conditions)`;
+`DropRates.Coins(table|enemy)` gives the copper range (table coins, else the enemy's value ±25%). `ItemSourceIndex`
+now fills `ItemSource.Chance` for every loot-derived source with the same maths (null for recipes, shops, tags, …).

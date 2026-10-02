@@ -49,9 +49,11 @@ public enum ItemSourceKind
 
 /// <summary>
 /// One way to obtain an item. <see cref="Min"/>–<see cref="Max"/> is the stack size; <see cref="Conditions"/> are the
-/// loot entry's (outer tables first), the shop stock's or the recipe's.
+/// loot entry's (outer tables first), the shop stock's or the recipe's. <see cref="Chance"/> is set for loot: the
+/// chance per kill, break, catch or opening (<see cref="Gameplay.Loot.DropRates"/>, multiplied through nested tables).
 /// </summary>
-public sealed record ItemSource(ItemSourceKind Kind, ContentDef? Owner, string? Label, int Min, int Max, TypedSpec[] Conditions);
+public sealed record ItemSource(ItemSourceKind Kind, ContentDef? Owner, string? Label, int Min, int Max, TypedSpec[] Conditions,
+    float? Chance = null);
 
 /// <summary>
 /// Reverse lookup from an item to every way it can be obtained: recipes, enemy and boss loot, world-generated chests,
@@ -153,7 +155,7 @@ public sealed class ItemSourceIndex
         {
             if (table == null || !db.LootTables.TryGet(table, out var def)) return;
             claimed.Add(table);
-            Walk(db, def, kind, owner, label, Array.Empty<TypedSpec>(), 0);
+            Walk(db, def, kind, owner, label, Array.Empty<TypedSpec>(), 1f, 0);
         }
 
         foreach (var e in db.Enemies.All)
@@ -171,18 +173,19 @@ public sealed class ItemSourceIndex
         Root(FishingTable, ItemSourceKind.Fishing, null, "Fishing");
         Root(GlobalKillTable, ItemSourceKind.Drop, null, "Any enemy");
         foreach (var t in db.LootTables.All)
-            if (t.Name != null && !claimed.Contains(t.Id)) Walk(db, t, ItemSourceKind.Container, t, t.Name, Array.Empty<TypedSpec>(), 0);
+            if (t.Name != null && !claimed.Contains(t.Id)) Walk(db, t, ItemSourceKind.Container, t, t.Name, Array.Empty<TypedSpec>(), 1f, 0);
     }
 
-    private void Walk(ContentDatabase db, LootTableDef table, ItemSourceKind kind, ContentDef? owner, string? label, TypedSpec[] outer, int depth)
+    private void Walk(ContentDatabase db, LootTableDef table, ItemSourceKind kind, ContentDef? owner, string? label, TypedSpec[] outer, float scale, int depth)
     {
         if (depth > LootTableDef.MaxNesting) return; // as deep as LootRoller rolls; the validator reports loot cycles
         _ownedTables.Add(table.Id);
         foreach (var e in table.Entries)
         {
             var conditions = outer.Length == 0 ? e.Conditions : e.Conditions.Length == 0 ? outer : outer.Concat(e.Conditions).ToArray();
-            if (e.Item != null) Add(e.Item, new(kind, owner, label, e.Min, e.Max, conditions));
-            else if (e.Table != null && db.LootTables.TryGet(e.Table, out var nested)) Walk(db, nested, kind, owner, label, conditions, depth + 1);
+            float chance = scale * Gameplay.Loot.DropRates.EntryChance(table, e);
+            if (e.Item != null) Add(e.Item, new(kind, owner, label, e.Min, e.Max, conditions, chance));
+            else if (e.Table != null && db.LootTables.TryGet(e.Table, out var nested)) Walk(db, nested, kind, owner, label, conditions, chance, depth + 1);
         }
     }
 
