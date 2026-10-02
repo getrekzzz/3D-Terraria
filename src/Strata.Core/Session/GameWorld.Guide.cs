@@ -14,6 +14,9 @@ public sealed partial class GameWorld
     /// <summary>Records what each player sees, kills, catches, meets, obtains and crafts.</summary>
     public JournalSystem Journal { get; }
 
+    /// <summary>Unlocks each player's achievements as their journal and the world change.</summary>
+    public AchievementTracker Achievements { get; }
+
     /// <summary>A player crafted items (output, total count) — for the journal and achievements.</summary>
     public event Action<PlayerEntity, ItemDef, int>? Crafted;
 

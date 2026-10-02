@@ -20,3 +20,12 @@ assert journal.obtained.work_bench == 1
 wait 1.1
 assert journal.obtained.copper_pickaxe == 1
 assert errors == 0
+
+# Achievements: crafting the bench unlocked Benched (swept within a second); grant shows the popup.
+wait 1.1
+assert achievement.benched == 1
+assert achievement.eye_on_you == 0
+achievement grant eye_on_you
+assert achievement.eye_on_you == 1
+wait 0.5
+assert errors == 0

@@ -38,6 +38,7 @@ public static class ContentLoader
         ["mutations"] = (db, a, f) => ReadInto(db, db.Mutations, a, f),
         ["conversions"] = (db, a, f) => ReadInto(db, db.Conversions, a, f),
         ["spreadRules"] = (db, a, f) => ReadInto(db, db.SpreadRules, a, f),
+        ["achievements"] = (db, a, f) => ReadInto(db, db.Achievements, a, f),
     };
 
     public static IReadOnlyCollection<string> CategoryNames => Categories.Keys;

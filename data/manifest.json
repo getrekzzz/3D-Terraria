@@ -2,6 +2,7 @@
   "format": "strata-content-manifest",
   "version": 1,
   "files": [
+    "achievements.json",
     "biomes.json",
     "combat.json",
     "events.json",

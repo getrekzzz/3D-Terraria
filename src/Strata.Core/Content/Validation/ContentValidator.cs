@@ -34,6 +34,7 @@ public static partial class ContentValidator
         ValidateBiomes(ctx);
         ValidateLiquids(ctx);
         ValidateTown(ctx);
+        ValidateGuide(ctx);
         if (options.CheckObtainability) ValidateObtainability(ctx);
     }
 

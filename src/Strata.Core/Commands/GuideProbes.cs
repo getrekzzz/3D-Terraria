@@ -24,6 +24,10 @@ internal static class GuideProbes
             if (parts is [_, "unlock"]) return (int)b.Unlock(b.Entries.First(e => e.Id == parts[0]), j);
             return null;
         });
+        // achievement.<id>: 1 once the local player has unlocked it.
+        ctx.AddPrefixProbe("achievement.", id =>
+            w.Session.Content.Achievements.Contains(id) ? (w.LocalPlayer?.State.Journal.Achieved(id) == true ? 1 : 0) : null);
+        ctx.AddProbe("achievements", () => w.LocalPlayer?.State.Journal.Achievements.Count ?? 0);
         ctx.AddPrefixProbe("journal.", spec =>
         {
             if (w.LocalPlayer?.State.Journal is not { } j) return null;

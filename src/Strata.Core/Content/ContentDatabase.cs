@@ -27,6 +27,7 @@ public sealed class ContentDatabase
     public Registry<WorldMutationDef> Mutations { get; } = new("mutation");
     public Registry<ConversionDef> Conversions { get; } = new("conversion");
     public Registry<SpreadRuleDef> SpreadRules { get; } = new("spreadRule");
+    public Registry<AchievementDef> Achievements { get; } = new("achievement");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();
@@ -50,6 +51,7 @@ public sealed class ContentDatabase
     {
         Blocks, Items, TileObjects, Recipes, RecipeGroups, Biomes, Enemies, SpawnRules, Projectiles, Buffs,
         Prefixes, LootTables, Flags, OreVeins, Events, Liquids, TownNpcs, Mutations, Conversions, SpreadRules,
+        Achievements,
     };
 
     internal ContentDatabase()

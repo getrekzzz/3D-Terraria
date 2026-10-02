@@ -439,3 +439,19 @@ entry. `BestiaryPercent` is cached until the journal changes; `JournalSystem.Bes
 world-wide value for town conditions. Saved as `PlayerSave.Journal` (additive; unknown ids kept). Probes
 `bestiary.percent`, `bestiary.<entry>[.unlock]`, `journal.<obtained|crafted|seen|caught|met|kills|counter>.<id>`;
 commands `journal [reset|unlock <enemy> [n]]`, `craft <item> [times]`.
+
+## Achievements (P5-26)
+
+`data/achievements.json` (category `achievements`, `AchievementDef`: name, description, icon item, category,
+`trigger`) lists ~45 of the reference game's achievements that map to implemented mechanics. Triggers
+(`SpecKind.AchievementTrigger`, `Content/Specs/AchievementSpecs.cs`): `flag{id|all}`, `obtainItem` / `craftItem`
+`{item|tag|category}`, `killEnemy{enemy|tag,count}`, `mineBlock{block|tag,count}`, `breakObject{object|tag,count}`,
+`housed{min}`, `bestiary{min}`, `talkTo{resident?}`, `buy{min}`, `reforge{min}`, `coins{min}`, `reachLayer{layer}`,
+`counter{key,min}`; `GuideTrigger` parses one and measures progress allocation-free (the guide's steps reuse it).
+`AchievementTracker` (`GameWorld.Achievements`) indexes triggers by the `JournalKind` that can advance them and
+evaluates only those on `Journal.Changed`; world-state triggers are swept at 1 Hz, and a player's first sweep
+evaluates all. Unlocks are stored in `Journal.Achievements` (Unix seconds) and raise `Unlocked(player, def)`:
+`game/UI/AchievementToast.cs` (one pooled panel, queued, 4 s, slide tween) and the `achievement` sound
+(`tools/audio/sfx_recipes_guide.py`). Probes `achievement.<id>`, `achievements`; command
+`achievement [grant|progress <id>]`. Not yet: `rescued` and `anglerQuests` triggers (no per-player record of
+rescues or completed quests on this branch), a chat line (no chat log yet).
