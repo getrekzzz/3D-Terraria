@@ -49,6 +49,9 @@ public sealed class PlayerJournal : IPlayerRecords
     /// <summary>Unlocked achievements and when (Unix seconds).</summary>
     public Dictionary<string, long> Achievements { get; } = new(StringComparer.Ordinal);
 
+    /// <summary>Onboarding hints already shown to this character (<see cref="HintDirector"/>); no change event.</summary>
+    public HashSet<string> HintsShown { get; } = new(StringComparer.Ordinal);
+
     /// <summary>The bestiary that <see cref="BestiaryPercent"/> is measured against (set when the player joins a world).</summary>
     public Bestiary? Bestiary { get; set; }
 
@@ -94,6 +97,7 @@ public sealed class PlayerJournal : IPlayerRecords
         Crafted.Clear();
         Counters.Clear();
         Achievements.Clear();
+        HintsShown.Clear();
         _percent = -1f;
     }
 

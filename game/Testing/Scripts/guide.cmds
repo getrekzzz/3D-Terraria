@@ -35,5 +35,16 @@ advice
 assert guide.done.eye_of_cthulhu == 0
 flag defeated_eye_of_cthulhu
 assert guide.done.eye_of_cthulhu == 1
+# Onboarding hints (X-10): the highest-priority hint shows a few seconds in, once; the toggle round-trips.
+hint reset
+wait_until hints.shown >= 1 10
+assert hint.move == 1
+hint show hardmode
+assert hint.hardmode == 1
+hint off
+assert hints.enabled == 0
+hint on
+assert hints.enabled == 1
+hint
 wait 0.5
 assert errors == 0

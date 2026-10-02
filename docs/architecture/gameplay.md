@@ -474,3 +474,21 @@ line. A town service type `advice` (`AdviceParams`) is registered for it, but th
 `DropRates.For(content, table)` flattens a table into `DropInfo(item, chance, min, max, conditions)`;
 `DropRates.Coins(table|enemy)` gives the copper range (table coins, else the enemy's value ±25%). `ItemSourceIndex`
 now fills `ItemSource.Chance` for every loot-derived source with the same maths (null for recipes, shops, tags, …).
+
+## Onboarding hints and loading tips (X-10)
+
+`data/hints.json` (`hints`, `HintDef`: text with `{key:action}`, `priority`, `delay`, `duration`, `when`/`unless`
+achievement triggers, `time` any/day/night/dusk, `carrying` item, `near` {object|tag|tree|resident, radius m},
+`step` = the Guide's next step, `guide` = the Guide book entry, a guide step or tip id) holds ~17 hints: chop the
+tree, night is coming, place a torch underground, talk to the Guide, first death, boss nudges per advisor step,
+hardmode. `HintDirector` (`GameWorld.Hints`, checked with the milestones once a second per player) shows the
+highest-priority due hint (ties by id) once per character, at most one per `CooldownSeconds` (25) and none in the
+first `StartSeconds`; timing counts checks, not the world clock, so time skips never stall or flood it. Shown ids
+are `PlayerJournal.HintsShown`, saved as `JournalModel.Hints` (additive). `Enabled` off shows and marks nothing.
+`game/UI/HintToast.cs` (pooled themed panel above the hotbar, fade, "Guide book: <entry>" line) and
+`game/UI/LoadingTips.cs` (cover with "Loading world..." and rotating guide tips while the player is frozen waiting
+for the ground; teleports under 0.3 s don't flash it) are added in `WorldLauncher.AddUi`. Settings
+`UserSettings.ShowHints` / `LoadingTips` (settings.cfg `showHints` / `loadingTips`); `hint on|off` sets the
+former and saves it. Command `hint [list|reset|show <id>|due <id>|on|off]`; probes `hints.shown`,
+`hints.enabled`, `hint.<id>[.due]`. Not yet: rows in the settings screen (sequenced with P2-30), the menu's own
+"Generating world..." overlay has no tip (MainMenu is integration-owned), the Guide book pages (P5-30).

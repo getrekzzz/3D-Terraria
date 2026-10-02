@@ -6,7 +6,7 @@ namespace Strata.Game.Bootstrap;
 
 public static partial class WorldLauncher
 {
-    /// <summary>HUD, inventory, world map and minimap, town dialog, the performance overlay and achievement popups.</summary>
+    /// <summary>HUD, inventory, world map and minimap, town dialog, the performance overlay, achievement popups, hints and the loading screen.</summary>
     private static (UI.Hud Hud, UI.InventoryScreen Inventory, UI.WorldMapScreen WorldMap, UI.TownDialog TownDialog) AddUi(
         WorldRuntime runtime, GameWorld game, PlayerController player, InteractionController interaction, TileObjectRenderer objectRenderer)
     {
@@ -33,6 +33,12 @@ public static partial class WorldLauncher
         var toast = new UI.AchievementToast();
         runtime.AddChild(toast);
         toast.Initialize(game, player.Entity);
+        var hints = new UI.HintToast();
+        runtime.AddChild(hints);
+        hints.Initialize(game, player.Entity);
+        var loading = new UI.LoadingTips();
+        runtime.AddChild(loading);
+        loading.Initialize(game, player);
         return (hud, inventory, worldMap, townDialog);
     }
 }

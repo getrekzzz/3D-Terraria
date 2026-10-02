@@ -17,6 +17,9 @@ public sealed class JournalModel
     public Dictionary<string, long> Counters { get; set; } = new();
     public Dictionary<string, long> Achievements { get; set; } = new();
 
+    /// <summary>Onboarding hints already shown (additive; absent in older saves).</summary>
+    public List<string> Hints { get; set; } = new();
+
     public static JournalModel From(PlayerJournal j) => new()
     {
         Kills = new Dictionary<string, int>(j.KillCounts),
@@ -27,6 +30,7 @@ public sealed class JournalModel
         Crafted = Sorted(j.Crafted),
         Counters = new Dictionary<string, long>(j.Counters),
         Achievements = new Dictionary<string, long>(j.Achievements),
+        Hints = Sorted(j.HintsShown),
     };
 
     /// <summary>Loads into an (empty) journal without raising its change events; null collections are skipped.</summary>
@@ -43,6 +47,7 @@ public sealed class JournalModel
             foreach (var kv in Counters) if (kv.Key != null) j.Counters[kv.Key] = kv.Value;
         if (Achievements != null)
             foreach (var kv in Achievements) if (kv.Key != null) j.Achievements[kv.Key] = kv.Value;
+        Add(j.HintsShown, Hints);
     }
 
     private static List<string> Sorted(HashSet<string> set)

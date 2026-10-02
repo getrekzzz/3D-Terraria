@@ -24,6 +24,7 @@ public static class BuiltinCommands
         WorldCommands.Register(r);
         PerfCommands.Register(r);
         GuideCommands.Register(r);
+        HintCommands.Register(r);
         return r;
     }
 

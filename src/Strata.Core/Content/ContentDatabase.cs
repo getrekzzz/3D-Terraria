@@ -30,6 +30,7 @@ public sealed class ContentDatabase
     public Registry<AchievementDef> Achievements { get; } = new("achievement");
     public Registry<GuideStepDef> GuideSteps { get; } = new("guideStep");
     public Registry<GuideTipDef> GuideTips { get; } = new("guideTip");
+    public Registry<HintDef> Hints { get; } = new("hint");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();
@@ -53,7 +54,7 @@ public sealed class ContentDatabase
     {
         Blocks, Items, TileObjects, Recipes, RecipeGroups, Biomes, Enemies, SpawnRules, Projectiles, Buffs,
         Prefixes, LootTables, Flags, OreVeins, Events, Liquids, TownNpcs, Mutations, Conversions, SpreadRules,
-        Achievements, GuideSteps, GuideTips,
+        Achievements, GuideSteps, GuideTips, Hints,
     };
 
     internal ContentDatabase()
