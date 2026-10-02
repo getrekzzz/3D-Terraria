@@ -50,6 +50,12 @@ public sealed partial class ColliderManager : Node3D
 
         /// <summary>A player edit touched the chunk: its next rebuild goes before the distance-ordered ones.</summary>
         public bool Prioritized;
+
+        /// <summary>Chunk version of the prioritizing edit: only data at least this new satisfies it.</summary>
+        public int PriorityVersion;
+
+        /// <summary>Chunk version the stored <see cref="Data"/> was meshed from.</summary>
+        public int DataVersion;
     }
 
     private readonly Dictionary<Int3, ChunkCollision> _chunks = new();
@@ -80,10 +86,12 @@ public sealed partial class ColliderManager : Node3D
 
     public void ResetCounters() => Rebuilt = Skipped = 0;
 
-    public ColliderChange SetData(Int3 coord, CollisionBuilder data)
+    /// <param name="version">Chunk version the data was meshed from (settles a <see cref="Prioritize"/> request).</param>
+    public ColliderChange SetData(Int3 coord, CollisionBuilder data, int version = int.MaxValue)
     {
         var hashes = data.Hashes ?? data.ComputeHashes();
         if (!_chunks.TryGetValue(coord, out var c)) _chunks[coord] = c = new ChunkCollision();
+        c.DataVersion = version;
         if (!c.Built)
         {
             c.Data = data;
@@ -102,6 +110,9 @@ public sealed partial class ColliderManager : Node3D
                 c.Hashes = hashes;
                 c.DirtyMask = 0;
             }
+            // The edit's own remesh came back with the same geometry: nothing left to hurry. (An older remesh still
+            // in flight when the edit happened does not count.)
+            if (version >= c.PriorityVersion) c.Prioritized = false;
             Skipped++;
             return ColliderChange.Unchanged;
         }
@@ -111,11 +122,18 @@ public sealed partial class ColliderManager : Node3D
         return ColliderChange.Pending;
     }
 
-    /// <summary>Player edits: these chunks' next rebuilds go first.</summary>
-    public void Prioritize(IEnumerable<Int3> chunks)
+    /// <summary>
+    /// Player edits: these chunks' rebuilds go first until data meshed from at least the chunk's current version
+    /// (<paramref name="version"/>) is built or comes back unchanged.
+    /// </summary>
+    public void Prioritize(IEnumerable<Int3> chunks, System.Func<Int3, int>? version = null)
     {
         foreach (var coord in chunks)
-            if (_chunks.TryGetValue(coord, out var c)) c.Prioritized = true;
+            if (_chunks.TryGetValue(coord, out var c))
+            {
+                c.Prioritized = true;
+                c.PriorityVersion = version?.Invoke(coord) ?? 0;
+            }
     }
 
     public void Remove(Int3 coord)

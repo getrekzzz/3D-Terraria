@@ -19,6 +19,7 @@ public sealed partial class WorldRuntime : Node3D
     private GrassRenderer? _grass;
     private HorizonRenderer _horizon = null!;
     private float _streamDistance;
+    private double _cpuFrameMs;
     private ColliderManager _colliders = null!;
     private EnvironmentController _environment = null!;
 
@@ -75,10 +76,11 @@ public sealed partial class WorldRuntime : Node3D
         {
             _renderer.Enqueue(result);
             _grass?.Set(result.Coord, result.Grass);
-            _colliders.SetData(result.Coord, result.Collision);
+            _colliders.SetData(result.Coord, result.Collision, result.Version);
         };
         // Player edits rebuild their colliders before distance-ordered work.
-        game.Editor.ChunksDirty += _colliders.Prioritize;
+        System.Func<Int3, int> chunkVersion = c => Session.World.GetChunk(c)?.Version ?? 0;
+        game.Editor.ChunksDirty += dirty => _colliders.Prioritize(dirty, chunkVersion);
         Streamer.ChunkRemoved += coord =>
         {
             _renderer.Remove(coord);
@@ -116,9 +118,12 @@ public sealed partial class WorldRuntime : Node3D
         using var frame = prof.Time("gd.world_runtime");
         prof.Record("frame.delta", delta * 1000.0);
         var focus = FocusCell;
-        // Big budgets only behind the loading screen; during play they stay small and shrink after a slow frame.
-        bool loading = Focus is Player.PlayerController { Frozen: true };
-        var budgets = Budgets = FrameBudgetPlanner.Plan(loading, Jobs.Completions.Count, delta * 1000.0);
+        // Big budgets only while loading (frozen, or the ground around the focus not meshed yet after a spawn or
+        // teleport); during play they stay small and shrink after frames that were slow on the CPU.
+        bool loading = Focus is Player.PlayerController { Frozen: true } || !Streamer.IsSettledNear(focus);
+        double cpuMs = (Performance.GetMonitor(Performance.Monitor.TimeProcess) + Performance.GetMonitor(Performance.Monitor.TimePhysicsProcess)) * 1000.0;
+        _cpuFrameMs = _cpuFrameMs * 0.75 + cpuMs * 0.25;
+        var budgets = Budgets = FrameBudgetPlanner.Plan(loading, Jobs.Completions.Count, _cpuFrameMs);
         using (prof.Time("gd.stream_and_jobs")) Game.Update(focus, budgets.JobsMs);
         using (prof.Time("gd.mesh_uploads")) _renderer.ProcessUploads(budgets.UploadsMs);
         using (prof.Time("gd.colliders")) _colliders.UpdateFocus(ChunkMath.CellToChunk(focus), budgets.CollidersMs);

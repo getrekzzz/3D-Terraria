@@ -55,6 +55,26 @@ public sealed partial class ChunkStreamer
         return true;
     }
 
+    /// <summary>
+    /// Every chunk within <paramref name="radius"/> chunks of the focus (horizontally, one up and down; clamped to the
+    /// mesh range) has a mesh (pending remeshes of meshed chunks, e.g. flowing water, do not count). O(radius²) lookups, cheap enough to call every frame.
+    /// </summary>
+    public bool IsSettledNear(Int3 focusCell, int radius = 2)
+    {
+        var focus = ChunkMath.CellToChunk(focusCell);
+        int r = Math.Min(radius, Settings.MeshRadius);
+        int down = Math.Min(1, Settings.MeshDown), up = Math.Min(1, Settings.MeshUp);
+        for (int dy = -down; dy <= up; dy++)
+            for (int dz = -r; dz <= r; dz++)
+                for (int dx = -r; dx <= r; dx++)
+                {
+                    var c = focus + new Int3(dx, dy, dz);
+                    if (!_session.World.ChunkInBounds(c)) continue;
+                    if (!_entries.TryGetValue(c, out var e) || !e.HasMesh) return false;
+                }
+        return true;
+    }
+
     /// <summary>Recounts loaded and meshed entries the slow way (tests compare it with the O(1) counters).</summary>
     internal (int Loaded, int Meshed) RecountForTests()
     {

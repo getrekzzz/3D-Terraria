@@ -138,8 +138,8 @@ public sealed partial class WorldEditor
         var box = obj.Bounds.Expand(Neighborhood.Margin);
         var min = ChunkMath.CellToChunk(box.Min);
         var max = ChunkMath.CellToChunk(box.Max - Int3.One);
-        // Only the light's own chunk remeshes urgently (the player sees the light appear at once); the up to 7 others
-        // around it follow through the normal queue.
+        // The light's own chunk remeshes as an edit (the player sees the light appear at once); the up to 7 others its
+        // reach crosses follow right behind block edits, so no lighting seam lingers at chunk borders.
         var own = ChunkMath.CellToChunk(obj.Anchor);
         var dirty = new HashSet<Int3>();
         for (int y = min.Y; y <= max.Y; y++)

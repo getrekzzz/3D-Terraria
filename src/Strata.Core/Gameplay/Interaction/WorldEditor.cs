@@ -57,7 +57,7 @@ public sealed partial class WorldEditor
 
     /// <summary>
     /// Chunks whose lighting changed but whose blocks did not (the neighbours of a placed, broken or switched light):
-    /// remeshed without jumping the queue.
+    /// remeshed ahead of distance-ordered work but behind block edits, and without touching colliders.
     /// </summary>
     public event Action<HashSet<Int3>>? LightDirty;
 
