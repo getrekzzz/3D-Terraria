@@ -17,6 +17,31 @@ public sealed partial class ProjectileRenderer
 {
     private readonly Dictionary<long, string> _petAnims = new();
 
+    /// <summary>Projectiles drawn with the glow fallback because their model was still loading.</summary>
+    private readonly HashSet<long> _awaiting = new();
+    private float _retryClock;
+    private bool _retryNow;
+
+    /// <summary>
+    /// A few times a second, rebuilds a projectile drawn with the glow fallback once its model has loaded, so long-lived
+    /// ones (pets, minions) do not stay a glow. Returns true with the new node (not yet added) when it was swapped.
+    /// </summary>
+    private bool RetryModel(Projectile p, ref Node3D? node)
+    {
+        if (!_retryNow) return false;
+        _awaiting.Remove(p.Id);
+        var fresh = Create(p);
+        if (_awaiting.Contains(p.Id))
+        {
+            fresh.Free(); // still loading: keep the current glow
+            return false;
+        }
+        node?.QueueFree();
+        _petAnims.Remove(p.Id);
+        node = fresh;
+        return true;
+    }
+
     /// <summary>Light pets offered to the light pool at its last refresh (probe <c>lights.pets</c>).</summary>
     public int PetLightsOffered { get; private set; }
 

@@ -30,6 +30,7 @@ public sealed partial class ProjectileRenderer : Node3D
         {
             if (_views.Remove(p.Id, out var node)) node.QueueFree();
             _petAnims.Remove(p.Id);
+            _awaiting.Remove(p.Id);
         };
         AddChild(new MeshInstance3D
         {
@@ -44,11 +45,13 @@ public sealed partial class ProjectileRenderer : Node3D
         _clock += (float)delta;
         _lines.ClearSurfaces();
         bool anyLine = false;
+        _retryNow = _awaiting.Count > 0 && _clock - _retryClock >= 0.25f;
+        if (_retryNow) _retryClock = _clock;
         foreach (var p in _game.Projectiles.All)
         {
-            if (!_views.TryGetValue(p.Id, out var node))
+            if (!_views.TryGetValue(p.Id, out var node) || (_awaiting.Contains(p.Id) && RetryModel(p, ref node)))
             {
-                node = Create(p);
+                node ??= Create(p);
                 AddChild(node);
                 _views[p.Id] = node;
             }
@@ -113,14 +116,18 @@ public sealed partial class ProjectileRenderer : Node3D
         Mesh? mesh = null;
         string? modelPath = null;
         bool creatureLoading = p.Def.Visual == "creature"; // its model is pending: glow until it is ready
-        if (creatureLoading) modelPath = null;
+        if (creatureLoading)
+        {
+            modelPath = null;
+            _awaiting.Add(p.Id);
+        }
         else if (p.Def.Visual == "item" && content.Items.TryGet(p.Def.Model ?? p.Def.Id, out var thrown) && AssetPaths.ItemModel(thrown, content) is { } itemPath)
             modelPath = itemPath;
         else if (p.Def.Model != null)
             modelPath = AssetPaths.ProjectileModel(p.Def);
         else if (p.Def.Visual == "arrow" && content.Items.TryGet(p.Def.Id, out var ammo) && AssetPaths.ItemModel(ammo, content) is { } path)
             modelPath = path; // ammo projectiles reuse their ammo item's model
-        if (modelPath != null) _props.TryModel(modelPath, multimesh: false, out mesh);
+        if (modelPath != null && _props.TryModel(modelPath, multimesh: false, out mesh) == AssetState.Pending) _awaiting.Add(p.Id);
         if (mesh != null)
         {
             root.AddChild(new MeshInstance3D { Mesh = mesh, Position = new Vector3(0, -0.1f, 0), Scale = Vector3.One * p.Def.Scale });
