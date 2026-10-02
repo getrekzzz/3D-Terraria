@@ -52,10 +52,10 @@ public class ItemSourcesTests
         var fromOld = db.Items.All.Where(i => old.Contains(i.Id)).Select(i => i.Id).ToHashSet();
         Assert.Empty(fromOld.Except(fromIndex));
         // Angler rewards are new: the fishing rods they give were only excused by a 'shop' tag before. Enemy banners
-        // (dropped every so many kills) are new too.
+        // (dropped every so many kills) are new too, and so is the Dye Trader's Strange Plant trade.
         var gained = fromIndex.Except(fromOld).ToList();
         Assert.NotEmpty(gained);
-        Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward
+        Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward || s.Label == "Trade"
             || (s.Kind == ItemSourceKind.Drop && db.TileObjects.TryGet(id, out var t) && t.Banner != null)));
     }
 
