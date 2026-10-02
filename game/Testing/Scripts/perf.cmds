@@ -38,6 +38,7 @@ save
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 7 10 air
 wait 1.0
+colliders reset
 place torch -8 0 -8
 place torch -4 0 -8
 place torch 0 0 -8
@@ -50,6 +51,9 @@ place torch 8 0 8
 place torch -8 0 0
 wait 1.0
 assert objects.count >= 10
+# Light-only remeshes keep the collision geometry: (almost) no collider rebuilds.
+probe colliders.skipped
+assert colliders.rebuilt <= 2
 assert perf.calls.gd.objects.rebuild > 0
 
 # Water pours onto the floor and spreads.

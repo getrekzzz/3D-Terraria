@@ -77,6 +77,8 @@ public sealed partial class WorldRuntime : Node3D
             _grass?.Set(result.Coord, result.Grass);
             _colliders.SetData(result.Coord, result.Collision);
         };
+        // Player edits rebuild their colliders before distance-ordered work.
+        game.Editor.ChunksDirty += _colliders.Prioritize;
         Streamer.ChunkRemoved += coord =>
         {
             _renderer.Remove(coord);
