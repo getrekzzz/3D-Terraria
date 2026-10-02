@@ -34,7 +34,7 @@ Pending: the equipment mount slot (P2-05 `EquippedMount`) is not on the integrat
 `MountRules.SlotMount = p => <equipped mount item>` (one line) so the quick-mount key prefers it. The rider stands in the
 saddle (no sit clip: the human animation sets belong to the integration session).
 
-## Push 4 — furniture families (X-03 part 1)
+## Push 4 — furniture families (X-03 part 1) — CI GREEN (481 Core tests, 17 smoke scripts, menu tour)
 | WP | State | Notes |
 |---|---|---|
 | X-03 furniture families | part 1 done | 14 materials (wood, boreal, palm, rich mahogany, ebonwood, shadewood, cactus, mushroom, granite, marble, obsidian, glass, bone, lihzahrd) × 17 pieces (door, chair, table, bed, chest, work bench, bookcase, piano, sofa, bathtub, lamp, lantern, candle, candelabra, chandelier, grandfather clock, platform) from `tools/content/furniture_families.json` via `gen_furniture.py` (generated `data/items/generated/furniture_families.json` + `tools/blender/assets.d/x-03-families.json`); parametric softened-edge models (`bgen/furniture_family.py`), recipes (work bench / sawmill / anvil / hellforge), housing roles, lights and flames; `FurnitureFamilyTests`. |
