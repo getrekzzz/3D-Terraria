@@ -33,6 +33,7 @@ public sealed partial class SoundEvents : Node
         game.Editor.ObjectPlaced += obj => Placed(obj.Anchor);
         game.Editor.ObjectBroken += obj => Sfx.PlayAt("break_wood", Cell(obj.Anchor), -3f);
         game.ItemUse.Used += OnUsed;
+        InitializeLocks();
         game.ItemUse.Failed += (p, _, outcome) =>
         {
             if (p != _local) return; // once per press, never while held

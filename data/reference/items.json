@@ -3239,6 +3239,76 @@
    "source": "tree"
   },
   {
+   "id": "terraria:piranha_gun",
+   "name": "Piranha Gun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "jungle chest"
+  },
+  {
+   "id": "terraria:scourge_of_the_corruptor",
+   "name": "Scourge of the Corruptor",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "corruption chest"
+  },
+  {
+   "id": "terraria:vampire_knives",
+   "name": "Vampire Knives",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "crimson chest"
+  },
+  {
+   "id": "terraria:rainbow_gun",
+   "name": "Rainbow Gun",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "hallowed chest"
+  },
+  {
+   "id": "terraria:staff_of_the_frost_hydra",
+   "name": "Staff of the Frost Hydra",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "frozen chest"
+  },
+  {
+   "id": "terraria:desert_tiger_staff",
+   "name": "Desert Tiger Staff",
+   "kind": "weapon",
+   "stage": "hardmode",
+   "source": "desert chest"
+  },
+  {
+   "id": "terraria:aqua_scepter",
+   "name": "Aqua Scepter",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:handgun",
+   "name": "Handgun",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:magic_missile",
+   "name": "Magic Missile",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:valor",
+   "name": "Valor",
+   "kind": "weapon",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
    "id": "terraria:silver_bullet",
    "name": "Silver Bullet",
    "kind": "weapon",
@@ -3775,6 +3845,370 @@
    "name": "Firefly in a Bottle",
    "kind": "furniture",
    "stage": "early",
+   "source": "craft"
+  },
+  {
+   "id": "terraria:blue_dungeon_door",
+   "name": "Blue Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_chair",
+   "name": "Blue Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_table",
+   "name": "Blue Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_bookcase",
+   "name": "Blue Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_candelabra",
+   "name": "Blue Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_chandelier",
+   "name": "Blue Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_lamp",
+   "name": "Blue Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:blue_dungeon_vase",
+   "name": "Blue Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_door",
+   "name": "Green Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_chair",
+   "name": "Green Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_table",
+   "name": "Green Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_bookcase",
+   "name": "Green Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_candelabra",
+   "name": "Green Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_chandelier",
+   "name": "Green Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_lamp",
+   "name": "Green Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:green_dungeon_vase",
+   "name": "Green Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_door",
+   "name": "Pink Dungeon Door",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_chair",
+   "name": "Pink Dungeon Chair",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_table",
+   "name": "Pink Dungeon Table",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_bookcase",
+   "name": "Pink Dungeon Bookcase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_candelabra",
+   "name": "Pink Dungeon Candelabra",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_chandelier",
+   "name": "Pink Dungeon Chandelier",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_lamp",
+   "name": "Pink Dungeon Lamp",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:pink_dungeon_vase",
+   "name": "Pink Dungeon Vase",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:marching_bones_banner",
+   "name": "Marching Bones Banner",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:necromantic_sign",
+   "name": "Necromantic Sign",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:rusted_company_standard",
+   "name": "Rusted Company Standard",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:ragged_brotherhood_sigil",
+   "name": "Ragged Brotherhood Sigil",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:molten_legion_flag",
+   "name": "Molten Legion Flag",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:diabolic_sigil",
+   "name": "Diabolic Sigil",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:skeleton_statue",
+   "name": "Skeleton Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:armor_statue",
+   "name": "Armor Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:angel_statue",
+   "name": "Angel Statue",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "world"
+  },
+  {
+   "id": "terraria:spike",
+   "name": "Spike",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:bone_welder",
+   "name": "Bone Welder",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:shadow_chest",
+   "name": "Shadow Chest",
+   "kind": "furniture",
+   "stage": "prehardmode",
+   "source": "underworld"
+  },
+  {
+   "id": "terraria:jungle_chest",
+   "name": "Jungle Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:corruption_chest",
+   "name": "Corruption Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:crimson_chest",
+   "name": "Crimson Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:hallowed_chest",
+   "name": "Hallowed Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:frozen_chest",
+   "name": "Frozen Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:desert_chest",
+   "name": "Desert Chest",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:book",
+   "name": "Book",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:golden_key",
+   "name": "Golden Key",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:shadow_key",
+   "name": "Shadow Key",
+   "kind": "material",
+   "stage": "prehardmode",
+   "source": "dungeon"
+  },
+  {
+   "id": "terraria:jungle_key",
+   "name": "Jungle Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:corruption_key",
+   "name": "Corruption Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:crimson_key",
+   "name": "Crimson Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:hallowed_key",
+   "name": "Hallowed Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:frozen_key",
+   "name": "Frozen Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:desert_key",
+   "name": "Desert Key",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "biome"
+  },
+  {
+   "id": "terraria:red_hat",
+   "name": "Red Hat",
+   "kind": "armor",
+   "stage": "prehardmode",
    "source": "craft"
   },
   {

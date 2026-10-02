@@ -108,6 +108,12 @@ public sealed class ChunkGenContext
     public byte[] EnsureShapes() => Shapes ??= new byte[Volume];
     public byte[] EnsureFlags() => Flags ??= new byte[Volume];
 
+    /// <summary>Whether a padded cell was written by a protected structure (the Dungeon's walls and halls, a temple):
+    /// later passes leave such cells alone.</summary>
+    public bool IsStructure(int index) => Flags != null && (Flags[index] & (byte)Voxels.CellFlags.Structure) != 0;
+
+    public bool IsStructure(int wx, int wy, int wz) => Contains(wx, wy, wz) && IsStructure(WorldIndex(wx, wy, wz));
+
     public void SetLiquid(int wx, int wy, int wz, byte liquid)
     {
         if (Contains(wx, wy, wz)) EnsureLiquids()[WorldIndex(wx, wy, wz)] = liquid;

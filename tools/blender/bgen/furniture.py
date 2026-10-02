@@ -122,15 +122,17 @@ def door(mb: MeshBuilder, p, rng):
 
 
 def chest(mb: MeshBuilder, p, rng):
+    # Optional tints (woodTint, bandTint, latchTint) colour the shared layers for locked and biome chests.
     w, h, d = p["size"]
     wood, band = f"prop:{p.get('wood', 'planks')}", f"prop:{p.get('band', 'dark_iron')}"
+    wt, bt, lt = p.get("woodTint", "#ffffff"), p.get("bandTint", "#ffffff"), p.get("latchTint", "#ffffff")
     body_h = h * 0.58
-    mb.box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood)
+    mb.box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood, wt)
     lid = [(-d * 0.4, 0), (d * 0.4, 0), (d * 0.38, h * 0.18), (d * 0.25, h * 0.3), (0, h * 0.36), (-d * 0.25, h * 0.3), (-d * 0.38, h * 0.18)]
-    mb.extrude_polygon(lid, w * 0.92, wood, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"))
+    mb.extrude_polygon(lid, w * 0.92, wood, wt, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"))
     for x in (-w * 0.3, w * 0.3):
-        mb.box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band)
-    mb.box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"))
+        mb.box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band, bt)
+    mb.box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"), lt)
 
 
 def torch(mb: MeshBuilder, p, rng):

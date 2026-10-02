@@ -45,8 +45,8 @@ public class WorldGenTests
 
     /// <summary>
     /// Golden chunks (seed 1234, tiny, generator version <see cref="GenVersion.Current"/>): the spawn forest, tundra,
-    /// jungle and desert surfaces, two cavern chunks near spawn, one far out, and one at the underworld's top. Any
-    /// change to world generation output fails here. A deliberate change bumps GenVersion and updates these values in
+    /// jungle and desert surfaces, two cavern chunks near spawn, one far out, one at the underworld's top, and the
+    /// Dungeon's vault and keep. Any change to world generation output fails here. A deliberate change bumps GenVersion and updates these values in
     /// the same commit (keep at least three surface chunks: <see cref="GoldenChunksCoverTheSurface"/>).
     /// </summary>
     public static readonly TheoryData<int, int, int, ulong> Golden = new()
@@ -55,17 +55,19 @@ public class WorldGenTests
         { 4, 11, 8, 14139425615911629870UL },
         { 11, 11, 6, 571984169707453842UL },
         { 9, 11, 11, 5935961065046386009UL },
-        { 8, 7, 8, 10901441164280567097UL },
+        { 8, 7, 8, 6744168697885959026UL },
         { 8, 4, 8, 15051355963523294477UL },
         { 2, 4, 9, 63819815911648630UL },
         { 12, 1, 5, 16627187558847016073UL },
+        { 8, 7, 12, 1453973278954663603UL }, // the Dungeon's vault
+        { 3, 11, 11, 12980723143424910121UL }, // the Dungeon's keep
     };
 
     [Theory]
     [MemberData(nameof(Golden))]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(10, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(11, GenVersion.Current); // bumping the generator version means re-recording these hashes
         Assert.Equal(new Int3(256, 349, 256), Tiny.Value.Plan.Spawn);
         Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
     }
@@ -112,6 +114,9 @@ public class WorldGenTests
         yield return new object[] { spawn.X + 3, spawn.Y - 4, spawn.Z - 2 };
         yield return new object[] { 5, uw, 9 };
         yield return new object[] { 1, spawn.Y - 1, 8 };
+        yield return new object[] { 8, 7, 12 }; // the Dungeon's vault
+        yield return new object[] { 6, 9, 13 }; // Dungeon stairs crossing a chunk face
+        yield return new object[] { 3, 11, 11 }; // the Dungeon's keep
     }
 
     [Theory]

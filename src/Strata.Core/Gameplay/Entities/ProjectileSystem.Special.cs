@@ -26,6 +26,7 @@ public sealed partial class ProjectileSystem
         var owner = p.Owner;
         if (p.Def.Minion != null) return owner is { Alive: true } && TickMinion(p, owner, dt);
         if (p.Def.Bobber) return owner is { Alive: true } && TickBobber(p, owner, dt);
+        if (p.LatchedTo != null) return TickLatched(p);
         // Returning boomerang: fly straight back through anything, still striking what it meets.
         if (owner == null || !owner.Alive) return false;
         var to = owner.Center - p.Position;
@@ -72,16 +73,22 @@ public sealed partial class ProjectileSystem
         p.Velocity = dir * speed;
     }
 
-    /// <summary>Unsummons the owner's oldest minions until one using <paramref name="slots"/> fits.</summary>
-    private void MakeRoomForMinion(PlayerEntity owner, int slots)
+    /// <summary>
+    /// Unsummons the owner's oldest minions until a new one fits; sentries (one at a time) are counted apart, so a
+    /// sentry never sends a minion home and the other way round.
+    /// </summary>
+    private void MakeRoomForMinion(PlayerEntity owner, MinionDef minion)
     {
-        int allowed = 1 + (int)owner.State.Effects.Stats.Bonus(Stats.StatIds.MaxMinions);
-        int used = _items.Where(x => x.Owner == owner && x.Def.Minion != null).Sum(x => x.Def.Minion!.Slots);
+        bool sentry = minion.IsSentry;
+        int slots = sentry ? 1 : minion.Slots;
+        int allowed = sentry ? 1 : 1 + (int)owner.State.Effects.Stats.Bonus(Stats.StatIds.MaxMinions);
+        bool Same(Projectile x) => x.Owner == owner && x.Def.Minion is { } m && m.IsSentry == sentry;
+        int used = _items.Where(Same).Sum(x => sentry ? 1 : x.Def.Minion!.Slots);
         for (int i = 0; i < _items.Count && used + slots > allowed; i++)
         {
             var x = _items[i];
-            if (x.Owner != owner || x.Def.Minion == null) continue;
-            used -= x.Def.Minion.Slots;
+            if (!Same(x)) continue;
+            used -= sentry ? 1 : x.Def.Minion!.Slots;
             End(i--);
         }
     }

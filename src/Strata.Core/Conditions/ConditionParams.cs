@@ -106,6 +106,12 @@ public sealed class HasItemConditionParams : SpecParams, IValidatableSpec
     public string? Validate() => (Item == null) == (Tag == null) ? "hasItem needs exactly one of 'item' or 'tag'" : null;
 }
 
+/// <summary>A player wears an item (armor or accessory slot): the Clothier's Red Hat.</summary>
+public sealed class WearingConditionParams : SpecParams
+{
+    public string Item { get; init; } = "";
+}
+
 /// <summary>The world's evil: "corruption" or "crimson".</summary>
 public sealed class EvilConditionParams : SpecParams
 {

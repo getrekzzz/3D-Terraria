@@ -49,6 +49,7 @@ public sealed partial class NpcSystem
         // Coins come from the loot table when it names them, else from the creature's value (never both).
         bool tableCoins = npc.Def.Loot != null && _world.Session.Content.LootTables.TryGet(npc.Def.Loot, out var table) && table.Coins != null;
         if (npc.Def.Value > 0 && !tableCoins && rolls) drops.AddRange(Coins.ToStacks(_world.Session.Content, (long)(npc.Def.Value * _rng.Range(0.75f, 1.25f))));
+        if (rolls) RollGlobalKill(npc, drops);
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
         DeathEffects(npc);
@@ -86,5 +87,19 @@ public sealed partial class NpcSystem
                     break;
             }
         }
+    }
+
+    /// <summary>Table rolled after a creature's own loot for every kill that counts: the Dungeon's Golden Keys.</summary>
+    public const string GlobalKillTable = "global_kill";
+
+    /// <summary>
+    /// Rolls <see cref="GlobalKillTable"/> (when it exists) for kills worth coins, never critters or parts; its
+    /// conditions see the spot the creature died at (zones such as the dungeon included).
+    /// </summary>
+    private void RollGlobalKill(Npc npc, List<ItemStack> into)
+    {
+        if (npc.Def.Value <= 0 || npc.IsPart || npc.Def.HasTag("critter") || !_world.Session.Content.LootTables.Contains(GlobalKillTable)) return;
+        var rng = new Pcg32(Hash.Combine(Hash.Combine((ulong)npc.Id, _world.Session.Clock.Tick), 0x474B4559UL));
+        into.AddRange(_loot.Roll(GlobalKillTable, ref rng, _world.Session.ContextAt(npc.Cell)));
     }
 }

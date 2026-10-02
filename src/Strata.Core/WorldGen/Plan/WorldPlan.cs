@@ -60,6 +60,10 @@ public sealed class WorldPlan
     /// <summary>Named places found while planning (see <see cref="LandmarkIds"/>), for residents and commands.</summary>
     public Dictionary<string, Int3> Landmarks { get; } = new(StringComparer.Ordinal);
 
+    /// <summary>Wire cells structures lay at generation (dungeon pressure plates to their dart traps); a new world's
+    /// session starts with them wired.</summary>
+    public HashSet<Int3> PlannedWires { get; } = new();
+
     /// <summary>Direction (turns) from the centre towards the tundra; the jungle lies opposite.</summary>
     public float SnowAngle { get; set; }
 
@@ -113,7 +117,13 @@ public sealed class WorldPlan
     public void AddFeature(WorldFeature feature)
     {
         Features.Add(feature);
-        RaiseColumnTop(feature.Bounds);
+        if (feature is Structures.Dungeon.DungeonFeature dungeon)
+        {
+            // Op by op: the dungeon's bounding box spans a wide stretch of open ground beside its tall keep, which
+            // would otherwise all count as content up to the turrets (more chunks streamed, sky columns misjudged).
+            foreach (var op in dungeon.Blueprint.Ops) RaiseColumnTop(op.Bounds);
+        }
+        else RaiseColumnTop(feature.Bounds);
     }
 }
 
@@ -123,5 +133,11 @@ public static class LandmarkIds
     /// <summary>Open ground just outside the crypt's gatehouse door.</summary>
     public const string DungeonGate = "dungeon_gate";
 
-    public static readonly IReadOnlySet<string> All = new HashSet<string> { DungeonGate };
+    /// <summary>The floor of the Dungeon's deepest room (the vault).</summary>
+    public const string DungeonBottom = "dungeon_bottom";
+
+    /// <summary>A floor cell in front of the Dungeon's first locked gold chest.</summary>
+    public const string DungeonChest = "dungeon_chest";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string> { DungeonGate, DungeonBottom, DungeonChest };
 }

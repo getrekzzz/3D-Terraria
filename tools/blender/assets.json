@@ -230,6 +230,17 @@
         "latch": "prop:iron"
       }
     },
+    "shadow_chest": {
+      "generator": "chest",
+      "params": {
+        "wood": "dark_planks",
+        "woodTint": "#b8a0d0",
+        "band": "dark_iron",
+        "bandTint": "#8070a0",
+        "latch": "prop:plain:glow",
+        "latchTint": "#b060ff"
+      }
+    },
     "torch": {
       "generator": "torch",
       "params": {}

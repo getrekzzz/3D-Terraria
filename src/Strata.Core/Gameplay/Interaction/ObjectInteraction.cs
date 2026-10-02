@@ -25,7 +25,7 @@ public enum InteractOutcome
 }
 
 /// <summary>"Interact" on tile objects: doors, containers, beds and seats.</summary>
-public sealed class ObjectInteraction
+public sealed partial class ObjectInteraction
 {
     private readonly GameWorld _world;
 
@@ -67,6 +67,7 @@ public sealed class ObjectInteraction
                 StateChanged?.Invoke(obj);
                 return InteractOutcome.DoorToggled;
             case TileInteraction.Chest:
+                if (obj.Locked && !Unlock(p, obj)) return InteractOutcome.Refused;
                 _world.Editor.EnsureContainerLoot(obj);
                 ContainerOpened?.Invoke(p, obj);
                 return InteractOutcome.ContainerOpened;

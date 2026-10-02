@@ -15,7 +15,7 @@
 ## Assets
 | Asset | Tool | Output |
 |---|---|---|
-| Terrain texture array (71 layers; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
+| Terrain texture array (104 layers, among them the Dungeon wall panels and Bone Block; height in albedo alpha) + detail array | `tools/textures/build_textures.py --set=terrain` | `assets/textures/terrain/`, `assets/textures/detail/` |
 | Prop texture array (bark, leaf-card sprigs, metals, cloth, leather…) | `--set=props` | `assets/textures/props/` |
 | Block item icons | `tools/textures/build_icons.py` | `assets/icons/items/<block>.png` |
 | Tile objects, items, creatures + icons | `tools/blender/build_all.py` (+ `assets.json`) | `assets/models/{objects,items,creatures}/*.glb`, icons, `assets/manifest.json` |
@@ -62,3 +62,12 @@ Rendering-only settings: `data/config/graphics.json` (presets) and `data/config/
 block) are validated by `Strata.Tools validate` and at boot, as is `data/config/use_styles.json` (the human clips'
 strike, release and re-draw windows, shared by gameplay and presentation); `data/config/lighting.json` (exposure,
 glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools validate`.
+
+### Palette furniture (dungeon sets)
+`bgen/dungeon_furniture.py` holds a palette-driven furniture family (door, chair, table, bookcase, candelabra,
+chandelier, floor lamp, vase) registered with `@generator`. Every generator reads `palette` (a name from `PALETTES`
+or an inline dict) with per-key overrides (`body`/`bodyTint`, `trim`/`trimTint`, `metal`/`metalTint`, `wax`,
+`books`), so other furniture families reuse it with other layers and tints; `resolve_palette`, `plinth` and
+`candle_cup` are shared helpers. The blue, green and pink Dungeon sets live in `data/tileobjects/dungeon.json`
+(specs in `tools/blender/assets.d/p4-17-dungeon-furniture.json`). A tile object's `flame.also` lists more flame bases
+(same size and colour) for multi-candle lights; keep them in sync with the candle tops the generator places.

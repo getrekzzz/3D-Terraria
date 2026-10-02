@@ -87,6 +87,10 @@
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
   resistance). `MeleeSystem` sweeps swing arcs/thrusts over the speed-scaled use animation, inside the clip's
   strike window (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
+  On-hit effects include `explode`, `applyBuff`, `lifeSteal {fraction}` (heals the owner by a share of the damage
+  dealt) and `spawnProjectiles {projectile, count, speed, homing, damageScale}`; a `latch` projectile sticks to the
+  creature it bites and strikes again every `latchInterval` ticks until its lifetime ends (the Piranha Gun).
+  Minions with speed 0 are sentries, which have their own single slot apart from the minion slots.
 * **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
   brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
@@ -241,6 +245,17 @@
   `data/town.json`, tuning in `data/config/town.json`.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
+* **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
+  (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
+  and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance
+  `PendingLoot` replaces its kind's `loot` when broken (the one Water Bolt among the Dungeon's shelf books).
+* **Dungeon loot and keys** — dungeon rooms place `dungeon_chest` (one weighted treasure: Muramasa, Cobalt Shield,
+  Aqua Scepter, Handgun, Blue Moon, Magic Missile, Valor; Bone Welder 14 %) and one `dungeon_chest_shadow_key` per world
+  (`data/loot/dungeon.json`). `NpcSystem.Kill` rolls `global_kill` (`data/loot/global.json`: Golden Key 1/65 in the
+  dungeon zone) after a creature's own loot for kills worth coins, never critters or parts. `ProjectileDef.guided`
+  (Magic Missile) steers toward the owner's aim ray at the projectile's own distance from the eye while the owner holds
+  the item that fired it. A fallen town resident drops table `<id>_death` when it exists; its conditions may test
+  `wearing` (an equipped item, the Clothier's Red Hat).
 
 ## Commands, probes and smoke scripts
 `CommandRegistry` (Core) + `EngineCommands` (Godot). Probes are named numbers (`player.life`, `inv.<item>`,
@@ -253,3 +268,17 @@ Probes come from `StandardProbes` and from `[ProbeSource]` classes (static `Regi
 `CommandContext` registers those in Strata.Core (e.g. `TownProbes`), `GodotCommandHost.CreateContext` those in the game
 assembly (e.g. `PlayerProbes`, which also takes the `LaunchedWorld`), in full-type-name order (`ProbeSources`). A
 probe name is registered once; new probes go in a new source file (docs/CONVENTIONS.md, *Extension points*).
+
+## Locked chests and keys
+
+A chest definition may carry `lock` (`key`, `consume` default true, `requiresFlag`, `message`); it only applies to
+instances with `TileObjectInstance.Locked`, persisted as bit 4 of the object state byte in `ChunkCodec` (old chunks
+read unlocked). Generation places them through `ObjectOp.Locked` (`Blueprint.Object(..., locked: true)`, copied by
+`FeatureCarver.Stamp`): every dungeon Gold Chest (Golden Key, used up; one rolls `dungeon_chest_shadow_key`) and the
+underworld towers' Shadow Chests (Shadow Key, kept; table `shadow_chest` with Sunfury, Dark Lance or Flamelash,
+hellstone bars and potions, which left `cabin_chest_primary`). `ObjectInteraction` (Locks partial) refuses with the
+lock's message while `requiresFlag` is unset, then "It's locked." without the key; opening raises `Unlocked`
+(`SoundEvents.Locks`: `unlock`; any refusal plays `locked`). `WorldEditor.HitObject` returns `Locked` for a locked
+chest, rolls an unopened chest's loot before the not-empty check, `BreakObject` rolls it before spilling, and locked
+chests are never broken for lost support, so generated loot is never lost. `interact nearest <objectId> [radius]
+[expectedOutcome]` drives it from smoke scripts.

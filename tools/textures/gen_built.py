@@ -16,14 +16,17 @@ def streaks(seed, sx, sy, size=None):
 
 
 def bricks(r, seed):
-    """Irregular hand-laid bricks: per-brick tone and surface, chipped bevelled edges, recessed sandy mortar, grime."""
+    """Irregular hand-laid bricks: per-brick tone and surface, chipped bevelled edges, recessed sandy mortar, grime.
+
+    Options: rows, cols, mortar_width, stagger (offset every other row; default on), bevel (edge rounding width, 0.07).
+    """
     n = s.SIZE
     rows, cols, mw = r.get("rows", 4), r.get("cols", 2), r.get("mortar_width", 0.06)
     y, x = np.mgrid[0:n, 0:n].astype(np.float32) / n
     x = x + (s.spectral_noise(seed + 1, falloff=2.6) - 0.5) * 0.012
     y = y + (s.spectral_noise(seed + 2, falloff=2.6) - 0.5) * 0.012
     row = np.floor(y * rows)
-    xs = x * cols + 0.5 * (row % 2)
+    xs = x * cols + (0.5 * (row % 2) if r.get("stagger", True) else 0.0)
     col = np.floor(xs) % cols
     u, v = xs - np.floor(xs), y * rows - row
     edge = np.minimum(np.minimum(u, 1 - u) / cols * rows, np.minimum(v, 1 - v))
@@ -32,7 +35,7 @@ def bricks(r, seed):
     chips = s.spectral_noise(seed + 3, falloff=1.5)
     edge_eff = edge - np.clip(chips - 0.55, 0, 1) * 0.12
     mask = (edge_eff > mw).astype(np.float32)
-    bevel = np.clip((edge_eff - mw) / 0.07, 0, 1)
+    bevel = np.clip((edge_eff - mw) / r.get("bevel", 0.07), 0, 1)
     bevel = bevel * bevel * (3 - 2 * bevel)
     surface = s.spectral_noise(seed + 4, falloff=1.6)
     pores = s.rng(seed + 5).random((n, n)) > 0.97

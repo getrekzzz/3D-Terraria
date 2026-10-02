@@ -104,6 +104,6 @@ public class MovementGearTests
         Assert.DoesNotContain("anklet_of_the_wind", Found("forest"));
         Assert.Contains("blizzard_in_a_bottle", Found("tundra"));
         Assert.Contains("sandstorm_in_a_bottle", Found("desert"));
-        Assert.Contains("cobalt_shield", Found("dungeon"));
+        Assert.DoesNotContain("cobalt_shield", Found("dungeon")); // dungeon treasures come only from dungeon_chest
     }
 }

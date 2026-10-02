@@ -19,10 +19,10 @@
       "manaCost": 12, "projectile": "book_skull", "shootSpeed": 13, "covers": ["terraria:book_of_skulls"] }
   ],
   "lootTables": [
-    { "id": "angry_bones", "coins": [80, 220], "entries": [{ "item": "bone", "min": 1, "max": 2, "chance": 0.6 }] },
+    { "id": "angry_bones", "coins": [80, 220], "entries": [{ "item": "bone", "min": 1, "max": 3 }] },
     { "id": "dark_caster", "coins": [90, 240], "entries": [{ "item": "bone", "chance": 0.5 }, { "item": "lesser_mana_potion", "chance": 0.1 }] },
     { "id": "cursed_skull", "coins": [60, 180], "entries": [{ "item": "bone", "chance": 0.4 }] },
-    { "id": "dungeon_slime", "coins": [200, 400], "entries": [{ "item": "gel", "min": 3, "max": 6 }] }
+    { "id": "dungeon_slime", "coins": [200, 400], "entries": [{ "item": "gel", "min": 3, "max": 6 }, { "item": "golden_key" }] }
   ],
   "enemies": [
     {
@@ -57,6 +57,9 @@
       "life": 80, "damage": 26, "defense": 8, "knockbackResist": 0.5, "size": [2.0, 3.6], "moveSpeed": 3.0, "tint": "#c8d4f0", "loot": "angry_bones", "value": 130,
       "covers": ["terraria:angry_bones"]
     },
+    { "id": "angry_bones_big", "model": "skeleton", "tags": ["undead"], "name": "Angry Bones", "brain": { "type": "walker", "aggroRange": 70, "jumpHeight": 4 }, "life": 80, "damage": 26, "defense": 8, "knockbackResist": 0.5, "size": [2.2, 4.0], "scale": 1.12, "moveSpeed": 3.0, "tint": "#e0dcc8", "loot": "angry_bones", "value": 130, "covers": ["terraria:angry_bones_big"] },
+    { "id": "angry_bones_big_muscle", "model": "skeleton", "tags": ["undead"], "name": "Angry Bones", "brain": { "type": "walker", "aggroRange": 70, "jumpHeight": 4 }, "life": 80, "damage": 26, "defense": 8, "knockbackResist": 0.5, "size": [2.3, 4.0], "scale": 1.15, "moveSpeed": 3.0, "tint": "#d8b8a0", "loot": "angry_bones", "value": 130, "covers": ["terraria:angry_bones_big_muscle"] },
+    { "id": "angry_bones_big_helmet", "model": "skeleton", "tags": ["undead"], "name": "Angry Bones", "brain": { "type": "walker", "aggroRange": 70, "jumpHeight": 4 }, "life": 80, "damage": 26, "defense": 8, "knockbackResist": 0.5, "size": [2.2, 4.0], "scale": 1.1, "moveSpeed": 3.0, "tint": "#a8b4c8", "loot": "angry_bones", "value": 130, "covers": ["terraria:angry_bones_big_helmet"] },
     {
       "id": "dark_caster", "model": "dark_caster", "tags": ["undead"], "name": "Dark Caster",
       "description": "Mutters curses, then vanishes and reappears somewhere worse.",
@@ -83,7 +86,10 @@
   "spawnRules": [
     { "id": "dungeon_guardian_trespass", "enemy": "dungeon_guardian", "weight": 1000, "atPlayer": true, "maxAlive": 1,
       "conditions": [{ "type": "biome", "any": ["dungeon"] }, { "type": "flag", "id": "defeated_skeletron", "set": false }] },
-    { "id": "angry_bones_dungeon", "enemy": "angry_bones", "weight": 5, "group": [1, 2], "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+    { "id": "angry_bones_dungeon", "enemy": "angry_bones", "weight": 2, "group": [1, 2], "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+    { "id": "angry_bones_big_dungeon", "enemy": "angry_bones_big", "weight": 1, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+    { "id": "angry_bones_big_muscle_dungeon", "enemy": "angry_bones_big_muscle", "weight": 1, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
+    { "id": "angry_bones_big_helmet_dungeon", "enemy": "angry_bones_big_helmet", "weight": 1, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
     { "id": "dark_caster_dungeon", "enemy": "dark_caster", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
     { "id": "cursed_skull_dungeon", "enemy": "cursed_skull", "weight": 2, "conditions": [{ "type": "biome", "any": ["dungeon"] }] },
     { "id": "dungeon_slime_dungeon", "enemy": "dungeon_slime", "weight": 0.5, "conditions": [{ "type": "biome", "any": ["dungeon"] }] }
