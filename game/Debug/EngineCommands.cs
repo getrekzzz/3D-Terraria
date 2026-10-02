@@ -21,6 +21,19 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
+            Name = "colliders", Usage = "colliders reset",
+            Help = "Zeroes the collider and tile-object counters (probes colliders.rebuilt, colliders.skipped, objects.rebuilds, objects.light_refreshes, grass.builds), e.g. before a measured edit.",
+            Run = (_, a) =>
+            {
+                if (a.Str(0, "reset") != "reset") throw new CommandException("usage: colliders reset");
+                world.Runtime.Colliders.ResetCounters();
+                world.Objects.ResetCounters();
+                world.Runtime.Grass?.ResetCounters();
+                return CommandResult.Success("Collider counters reset.");
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "hud", Usage = "hud <on|off>",
             Help = "Shows or hides every 2D layer (HUD, minimap, screens), e.g. so tour screenshots measure only the 3D scene.",
             Run = (_, a) =>

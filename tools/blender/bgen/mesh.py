@@ -40,6 +40,34 @@ class MeshBuilder:
         self.bones: list[str] = []
         # Created up front: adding a layer later would invalidate BMVert references held by callers.
         self.deform = self.bm.verts.layers.deform.verify()
+        # Named attachment points (held items: grip, muzzle, tip, nock, …), see bgen/sockets.py.
+        self.sockets: dict[str, tuple] = {}
+        # Separately exported moving parts (a chest lid): name -> (builder, pivot), see ``part``.
+        self.parts: dict[str, tuple] = {}
+
+    def socket(self, name: str, pos, forward=(0, 0, 1), up=(0, 1, 0)):
+        """Records a named attachment point (Blender space, metres): where the hand grips the item, where shots leave
+        it, where a string or chain starts. ``forward`` is the direction out of it, ``up`` its roll reference."""
+        self.sockets[name] = (tuple(pos), tuple(forward), tuple(up))
+
+    def part(self, name: str, pivot) -> "MeshBuilder":
+        """A moving part exported as its own child node named ``name`` with its origin at ``pivot`` (the hinge), so the
+        game can rotate it (chest lids, game/World/TileObjectRenderer.Lids.cs). Its primitives are given in this
+        builder's space."""
+        sub = MeshBuilder(name)
+        self.parts[name] = (sub, Vector(pivot))
+        return sub
+
+    def build_parts(self, material_factory, parent) -> list:
+        """Builds the moving parts as children of ``parent`` (call after ``build``)."""
+        result = []
+        for name, (sub, pivot) in self.parts.items():
+            obj = sub.build(material_factory)
+            obj.data.transform(Matrix.Translation(-pivot))
+            obj.parent = parent
+            obj.location = pivot
+            result.append(obj)
+        return result
 
     # ------------------------------------------------------------------ bookkeeping
     def _material_index(self, material: str) -> int:

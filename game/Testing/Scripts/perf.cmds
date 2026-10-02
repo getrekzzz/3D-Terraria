@@ -8,6 +8,12 @@
 wait_until player.frozen == 0 300
 wait_until stream.idle == 1 900
 spawning off
+# Preloading (P1b-14): the starting kit, animation sets and streamed-in objects were requested, then the shader
+# warm-up drew every material once.
+wait_until assets.pending == 0 60
+assert assets.preloaded > 0
+wait_until render.warmed > 0 10
+probe npcs.prewarmed
 town arrivals off
 perf start
 
@@ -23,17 +29,34 @@ wait_until player.frozen == 0 300
 wait_until stream.idle == 1 900
 assert perf.frames > 0
 assert perf.calls.gd.colliders.build > 0
+# Streaming and job completions stay inside the frame budgets (12 ms while loading, 3-5 ms in play). Generous
+# headless bound; the rendering run shows the real per-frame average.
+probe perf.avg.gd.stream_and_jobs
+assert perf.avg.gd.stream_and_jobs < 14
 probe perf.gc2
 probe perf.calls.stream.unload_flush
 probe perf.max.stream.unload_flush
+# Grass is built nearest first, at most grassBuildsPerFrame chunks a frame (4 on ultra), even after a teleport.
+probe grass.live
+probe grass.builds
+probe perf.max.gd.grass
+assert perf.max_calls.gd.grass.create <= 4
 
-# A full save on the main thread (what the autosave does every two minutes).
+# A full synchronous save (Save & Quit), then the autosave path: captured on the main thread, written in the background.
 save
+setblock 3 0 3 stone
+save async
+wait 1
+wait_until save.in_flight == 0 300
+assert perf.calls.tick.autosave > 0
+probe perf.max.tick.autosave
+probe perf.max.stream.unload_flush
 
 # A flat arena, then ten torches, one per frame (remeshes, collider and tile-object rebuilds, light).
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 7 10 air
 wait 1.0
+colliders reset
 place torch -8 0 -8
 place torch -4 0 -8
 place torch 0 0 -8
@@ -46,7 +69,16 @@ place torch 8 0 8
 place torch -8 0 0
 wait 1.0
 assert objects.count >= 10
+# Light-only remeshes keep the collision geometry: (almost) no collider rebuilds.
+probe colliders.skipped
+assert colliders.rebuilt <= 2
 assert perf.calls.gd.objects.rebuild > 0
+# Tile objects: one regroup per torch chunk and edit, light-only remeshes rewrite light in place.
+probe objects.rebuilds
+probe objects.light_refreshes
+assert objects.rebuilds <= 14
+assert objects.light_refreshes > 0
+probe perf.max.gd.objects
 
 # Water pours onto the floor and spreads.
 liquid water 3 0 3 5 2 5
@@ -67,6 +99,14 @@ spawn zombie 5
 spawn demon_eye 3
 wait 2.0
 assert perf.calls.gd.npcs.create > 0
+# Kinds never seen before load on loader threads (P1b-13): they show up once the cache has them, none fails.
+spawn skeleton 1
+spawn hornet 1
+spawn goblin_warrior 1
+wait_until assets.pending == 0 60
+wait 0.5
+assert assets.loaded >= 5
+assert props.problems == 0
 
 perf report 40
 perf spikes 10
@@ -77,6 +117,10 @@ probe perf.worst_ms
 probe perf.p99_ms
 probe perf.gc2
 probe perf.gc_pause_ms
+# A running world keeps the GC in SustainedLowLatency (background gen2 collections, GameRoot.StartWorld).
+assert gc.latency_mode == 3
+# Headless has no GPU timing: the dynamic resolution never changes (P1b-16).
+assert render.scale_changes == 0
 probe perf.calls.tick.autosave
 assert errors == 0
 

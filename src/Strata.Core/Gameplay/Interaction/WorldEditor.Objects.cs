@@ -138,11 +138,18 @@ public sealed partial class WorldEditor
         var box = obj.Bounds.Expand(Neighborhood.Margin);
         var min = ChunkMath.CellToChunk(box.Min);
         var max = ChunkMath.CellToChunk(box.Max - Int3.One);
+        // The light's own chunk remeshes as an edit (the player sees the light appear at once); the up to 7 others its
+        // reach crosses follow right behind block edits, so no lighting seam lingers at chunk borders.
+        var own = ChunkMath.CellToChunk(obj.Anchor);
         var dirty = new HashSet<Int3>();
         for (int y = min.Y; y <= max.Y; y++)
             for (int z = min.Z; z <= max.Z; z++)
                 for (int x = min.X; x <= max.X; x++)
-                    if (World.HasChunk(new Int3(x, y, z))) dirty.Add(new Int3(x, y, z));
-        if (dirty.Count > 0) ChunksDirty?.Invoke(dirty);
+                {
+                    var c = new Int3(x, y, z);
+                    if (c != own && World.HasChunk(c)) dirty.Add(c);
+                }
+        if (World.HasChunk(own)) ChunksDirty?.Invoke(new HashSet<Int3> { own });
+        if (dirty.Count > 0) LightDirty?.Invoke(dirty);
     }
 }

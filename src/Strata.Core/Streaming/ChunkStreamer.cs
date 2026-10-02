@@ -24,15 +24,19 @@ public sealed partial class ChunkStreamer
         public bool MeshDirty = true;
         public bool HasMesh;
         public int Priority;
+
+        /// <summary>The ready epoch at which this chunk last failed <see cref="NeighboursReady"/> (-1: never).</summary>
+        public int BlockedEpoch = -1;
     }
 
     private readonly Dictionary<Int3, Entry> _entries = new();
     private readonly WorldSession _session;
     private readonly JobSystem _jobs;
     private readonly RenderTables _tables;
-    private readonly Dictionary<Int3, byte[]> _pendingSaves = new();
+    private readonly List<Persistence.ChunkSnapshot> _pendingSaves = new();
     private Int3 _focusChunk = new(int.MinValue, 0, 0);
     private int _loadsInFlight, _meshesInFlight;
+    private int _loaded, _meshed;
 
     public ChunkStreamer(WorldSession session, JobSystem jobs, StreamingSettings settings)
     {
@@ -50,8 +54,8 @@ public sealed partial class ChunkStreamer
     /// <summary>A chunk left the loaded set (drop its render/physics objects).</summary>
     public event Action<Int3>? ChunkRemoved;
 
-    public int LoadedCount => _entries.Count(e => e.Value.Data == DataState.Ready);
-    public int MeshedCount => _entries.Count(e => e.Value.HasMesh);
+    public int LoadedCount => _loaded;
+    public int MeshedCount => _meshed;
     public int LoadsInFlight => _loadsInFlight;
     public int MeshesInFlight => _meshesInFlight;
 
@@ -99,14 +103,24 @@ public sealed partial class ChunkStreamer
         FlushSaves();
     }
 
-    /// <summary>Requests remeshing of chunks (edits, lighting changes). Urgent chunks jump the queue.</summary>
-    public void MarkDirty(IEnumerable<Int3> chunks, bool urgent = true)
+    /// <summary>Scheduling priority of urgent block edits (lower runs first).</summary>
+    public const int EditPriority = -1000;
+
+    /// <summary>Scheduling priority of urgent light-only remeshes: ahead of distance order, behind block edits.</summary>
+    public const int LightPriority = -500;
+
+    /// <summary>
+    /// Requests remeshing of chunks (edits, lighting changes). Urgent chunks jump the queue at
+    /// <paramref name="urgentPriority"/> (a chunk keeps the more urgent of two requests).
+    /// </summary>
+    public void MarkDirty(IEnumerable<Int3> chunks, bool urgent = true, int urgentPriority = EditPriority)
     {
         foreach (var c in chunks)
         {
             if (!_entries.TryGetValue(c, out var e)) continue;
             e.MeshDirty = true;
-            if (urgent) e.Priority = -1000;
+            if (urgent) e.Priority = Math.Min(e.Priority, urgentPriority);
+            TouchMesh(c, e);
         }
         if (urgent) ScheduleMeshes();
     }
@@ -114,7 +128,11 @@ public sealed partial class ChunkStreamer
     /// <summary>Saves and unloads everything (world exit).</summary>
     public void UnloadAll()
     {
-        foreach (var coord in _entries.Keys.ToList()) Unload(coord);
+        _unloadScratch.Clear();
+        _unloadScratch.AddRange(_entries.Keys);
+        foreach (var coord in _unloadScratch) Unload(coord);
+        _unloadScratch.Clear();
         FlushSaves();
+        _session.Saver?.Flush();
     }
 }

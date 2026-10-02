@@ -61,6 +61,25 @@ public sealed partial class PlayerInventory
 
     public IEnumerable<ItemDef> EquippedItems => EquippedStacks.Select(s => s.Item!);
 
+    /// <summary>The armor piece drawn for a slot (0 head, 1 body, 2 legs): the vanity piece when one is worn, else the armor.</summary>
+    public ItemDef? ShownArmor(int slot) => VanityArmor[slot].Item ?? Armor[slot].Item;
+
+    /// <summary>
+    /// Accessories drawn on the character, in draw order: the unlocked functional slots that are not hidden, then the
+    /// unlocked vanity slots (always shown). A later accessory drawn in the same place replaces an earlier one, so a
+    /// vanity accessory wins over a functional one, as in the reference game.
+    /// </summary>
+    public IEnumerable<ItemDef> ShownAccessories
+    {
+        get
+        {
+            for (int i = 0; i < _accessorySlotsUnlocked; i++)
+                if (!Accessories[i].IsEmpty && !IsAccessoryHidden(i)) yield return Accessories[i].Item!;
+            for (int i = 0; i < _accessorySlotsUnlocked; i++)
+                if (!VanityAccessories[i].IsEmpty) yield return VanityAccessories[i].Item!;
+        }
+    }
+
     public ItemDef? EquippedPet => Misc[(int)MiscSlot.Pet].Item;
     public ItemDef? EquippedLightPet => Misc[(int)MiscSlot.LightPet].Item;
     public ItemDef? EquippedMinecart => Misc[(int)MiscSlot.Minecart].Item;

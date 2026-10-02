@@ -18,6 +18,8 @@ public static partial class ContentValidator
             if (t.Lines.Length == 0) ctx.Error(t, "lines must contain at least one dialogue line.");
             if (!t.Starter && t.Landmark == null && t.Arrival.Length == 0) ctx.Warn(t, "no arrival conditions: arrives as soon as a home exists.");
             ctx.Asset(t, AssetPaths.TownNpcModel(t), "model");
+            if (ctx.Options.AssetExists is { } exists && !exists(AssetPaths.TownNpcHead(t)))
+                ctx.Warn(t, $"head portrait '{AssetPaths.TownNpcHead(t)}' is missing (build_all.py --portraits).");
             ctx.Specs(t, SpecKind.Condition, t.Arrival, "arrival");
             for (int i = 0; i < t.Shop.Length; i++)
             {

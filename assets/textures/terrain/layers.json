@@ -218,126 +218,144 @@
    "index": 30,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#e8804a"
   },
   {
    "name": "tin_ore",
    "index": 31,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#d8cc98"
   },
   {
    "name": "iron_ore",
    "index": 32,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#c4a488"
   },
   {
    "name": "lead_ore",
    "index": 33,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#6a7c98"
   },
   {
    "name": "silver_ore",
    "index": 34,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#eef0f4"
   },
   {
    "name": "tungsten_ore",
    "index": 35,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#86c87c"
   },
   {
    "name": "gold_ore",
    "index": 36,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#ffd040"
   },
   {
    "name": "platinum_ore",
    "index": 37,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#d8ecf8"
   },
   {
    "name": "umbrite_ore",
    "index": 38,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#8a5ae8"
   },
   {
    "name": "sanguite_ore",
    "index": 39,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#e03848"
   },
   {
    "name": "meteorite",
    "index": 40,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#ff7a30"
   },
   {
    "name": "cinderstone",
    "index": 41,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#ff5a20"
   },
   {
    "name": "amethyst_ore",
    "index": 42,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#b070f0"
   },
   {
    "name": "topaz_ore",
    "index": 43,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#f0c030"
   },
   {
    "name": "sapphire_ore",
    "index": 44,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#3a78f0"
   },
   {
    "name": "emerald_ore",
    "index": 45,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#30d070"
   },
   {
    "name": "ruby_ore",
    "index": 46,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#f02840"
   },
   {
    "name": "diamond_ore",
    "index": 47,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#e8f8ff"
   },
   {
    "name": "crystal",
@@ -575,42 +593,48 @@
    "index": 81,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#2a8cff"
   },
   {
    "name": "rosalite_ore",
    "index": 82,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#ff8a5a"
   },
   {
    "name": "verdite_ore",
    "index": 83,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#3ae0b0"
   },
   {
    "name": "orchidite_ore",
    "index": 84,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#ff60c8"
   },
   {
    "name": "crimsite_ore",
    "index": 85,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#ff2a40"
   },
   {
    "name": "stellite_ore",
    "index": 86,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#c8dcf0"
   },
   {
    "name": "lihzahrd_brick",
@@ -624,14 +648,16 @@
    "index": 88,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#5ae05a"
   },
   {
    "name": "luminite",
    "index": 89,
    "type": "ore",
    "detail": 0,
-   "detailStrength": 0.7
+   "detailStrength": 0.7,
+   "ore": "#6affd0"
   },
   {
    "name": "ebonwood_planks",

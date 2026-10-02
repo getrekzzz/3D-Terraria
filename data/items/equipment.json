@@ -194,7 +194,7 @@
       "equipEffects": [
         {
           "type": "stat",
-          "stat": "moveSpeed",
+          "stat": "runSpeed",
           "add": 0.45
         }
       ],

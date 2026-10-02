@@ -82,6 +82,7 @@ public class ChunkCodecTests
         var db = TestPaths.Content;
         var ids = new WorldIdTables();
         var raw = Inflate(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, Array.Empty<TileObjectInstance>(), db, ids));
+        raw[4] = 1; // a v1 header (after the 4-byte magic)
         using var ms = new MemoryStream();
         ms.Write(raw, 0, raw.Length - 1); // drop the end tag, append an old-style object section
         using (var w = new BinaryWriter(ms, System.Text.Encoding.UTF8, leaveOpen: true))
@@ -113,6 +114,20 @@ public class ChunkCodecTests
         Assert.Equal("cabin_chest", obj.PendingLoot);
         Assert.Equal(new Int3(3, -4, 5), obj.Anchor);
         Assert.Equal(17, obj.Container![0].Count);
+    }
+
+    [Fact]
+    public void ChestNameSurvivesTheBackgroundSaveCapture()
+    {
+        // The saver captures the object section on the main thread and encodes the voxels later (EncodeObjects + Encode).
+        var db = TestPaths.Content;
+        var ids = new WorldIdTables();
+        var chest = new TileObjectInstance(db.TileObjects.Get("wooden_chest"), new Int3(1, 2, 3), 0, 0) { CustomName = "Bars" };
+        var section = ChunkCodec.EncodeObjects(new[] { chest }, ids);
+        Assert.Equal("Bars", Assert.Single(ChunkCodec.DecodeObjects(section, db, ids)).CustomName);
+        var decoded = ChunkCodec.Decode(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, section, db, ids), db, ids);
+        Assert.Equal("Bars", Assert.Single(decoded.TileObjects).CustomName);
+        Assert.Equal(ChunkCodec.FormatVersion, Inflate(ChunkCodec.Encode(new ChunkData(db.BlockId("stone")), 0, section, db, ids))[4]);
     }
 
     private static byte[] Inflate(byte[] blob)

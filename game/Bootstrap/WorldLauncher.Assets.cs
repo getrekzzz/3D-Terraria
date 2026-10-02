@@ -8,6 +8,7 @@ public static partial class WorldLauncher
     /// <summary>The shared prop library, placed tile objects and their colliders.</summary>
     private static (Rendering.PropLibrary Props, TileObjectRenderer Objects) AddWorldObjects(WorldRuntime runtime)
     {
+        runtime.AddChild(new Rendering.AssetPump { Name = "AssetPump" }); // threaded model loads (Rendering.AssetCache)
         var objectColliders = new ObjectColliders { Name = "ObjectColliders" };
         runtime.AddChild(objectColliders);
         objectColliders.Initialize(runtime);
@@ -41,5 +42,16 @@ public static partial class WorldLauncher
         runtime.AddChild(projectiles);
         projectiles.Initialize(game, props);
         return creatures;
+    }
+
+    /// <summary>Relevance-driven preloading with pool pre-warming, and the one-time shader warm-up.</summary>
+    private static void AddPreloading(WorldRuntime runtime, GameServices services, GameWorld game, Rendering.PropLibrary props, Entities.NpcRenderer creatures)
+    {
+        var preloader = new Rendering.AssetPreloader();
+        preloader.Initialize(game, creatures, services.Graphics.Name == "low");
+        runtime.AddChild(preloader);
+        var warmup = new Rendering.ShaderWarmup();
+        warmup.Initialize(props);
+        runtime.AddChild(warmup);
     }
 }

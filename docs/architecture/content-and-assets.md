@@ -84,6 +84,39 @@ block) are validated by `Strata.Tools validate` and at boot, as is `data/config/
 strike, release and re-draw windows, shared by gameplay and presentation); `data/config/lighting.json` (exposure,
 glow, fog cap, torch lights, block-light curve) is validated by `Strata.Tools validate`.
 
+### Art overhaul additions (sockets, metals, ores, icons, armour, portraits)
+* **Held-item sockets** (`bgen/sockets.py`): every held item GLB carries named empties beside its mesh — `grip`,
+  `tip`, `muzzle`, `nock`, `string`, `chain`, `handle_end` — oriented so the node's −Z is the socket's forward and +Y
+  its up; `assets/manifest.json` lists them per item (`"x y z > forward"`, Y-up). `PropLibrary.Sockets/Socket/Bounds`
+  caches them at model load. The spec's `projectiles` section builds projectile models (yoyo heads, flail balls).
+* **Metals**: tinted metal slots `prop:iron:metal` read their layer as neutral grey normalised by the layer's mean
+  (`layers.json` `mean`, prop shader `neutral_gain`), so a metal's `metals` hex is the colour seen. `metals` entries may
+  carry accents; `metalStyles` (`assets.d/p3-39-metal-styles.json`) gives each tier its own sword/pick/axe/hammer/bow
+  silhouette (`bgen/blade_profiles.py`, `bgen/tools_heads.py`); iconic weapons have bespoke generators
+  (`bgen/weapons_unique*.py`); guns are side profiles (`bgen/guns.py`).
+* **Ores**: `BlockDef.glow` (0–1, shader only, never baked light) reaches the terrain shader through the surface
+  table's `.w`; the ore tint (packed `0xRRGGBB`) through the layer table's `.w`. Ore flecks (metallic texels) glow
+  and glint out to the preset's `oreGlintDistance`.
+* **Icons**: item icons render as outlined sprites (`render_icon(sprite=True)`: double size, denoised, rim light,
+  outline in the darkened median colour, downsampled); framing per generator in `bgen/icon_views.py`.
+* **Armour** (`bgen/armor_fit.py`, `armor.py`, `armor_build.py`): pieces are shells fitted to the shipped player
+  model per bone and built in the bone's local space; `assets/models/armor/<set>_<piece>.glb`, manifest `armor`
+  (model, bone, slot, refLength, hidesHair) and `armorRig`. `PlayerAvatar.Armor` attaches them (scaled by bone length),
+  hides the hair under helmets and draws shields and balloons (`"worn"` items). What is drawn follows the slot model
+  (`PlayerInventory.ShownArmor`/`ShownAccessories`): a vanity piece replaces the armour in its slot, hidden or locked
+  accessory slots are not drawn, and a vanity shield or balloon replaces a functional one.
+* **Portraits**: `build_all.py --boss-icons` (boss bar heads, `assets/icons/bosses`) and `--portraits` (town NPC head
+  shots and bestiary thumbnails, `assets/icons/{npcs,creatures}`) import the shipped creature GLBs, pose them on their
+  idle action and outline them (`bgen/portraits.py`); `game/Items/PortraitIcons` loads them. Re-render after
+  rebuilding a creature. Fur, chitin and bone prop layers (`tools/textures/gen_creature.py`) serve the creatures.
+* **Hair and cloth motion (X-17)**: people within the preset's `swayDistance` run a `SpringSway` (Core) anchored at the
+  head; `CreatureVisual.Sway` passes its offset to the character shader (`sway`, `sway_head`), which bends hair below
+  the head joint and cloth whose vertex alpha marks it loose (skirts, robes, coat tails: alpha = 1 − weight/2, written by
+  `garments.skirt`) and adds `strata_wind` flutter. No extra bones or skinning; nothing updates beyond the distance.
+* **Character creator models (X-09)**: player bodies `player_<m|f>_<shirt|vest|coat>` are bald with marker colours
+  (red shirt/vest/coat, blue undershirt and irises, green trousers, grey hair, belt and boots); hair is a separate model
+  per body and style (`build_all.py --hair`, `bgen/human/hair_styles*.py`) worn on the head bone.
+
 ## UI look (fonts and theme)
 The interface follows Terraria's look: see-through royal-blue panels (`#3F5297` at ~70%), white text with a black
 outline in a bold rounded face, slot tints by kind and Terraria's rarity colours.

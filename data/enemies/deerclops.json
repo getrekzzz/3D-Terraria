@@ -32,7 +32,7 @@
     { "id": "deerclops_weapon", "mode": "weighted", "entries": [{ "item": "lucy_the_axe" }, { "item": "weather_pain" }, { "item": "pew_matic_horn" }] }
   ],
   "enemies": [
-    { "id": "snow_flinx", "model": "gel", "name": "Snow Flinx", "description": "A ball of fur that rolls down the snowdrifts.",
+    { "id": "snow_flinx", "model": "snow_flinx", "name": "Snow Flinx", "description": "A ball of fur that rolls down the snowdrifts.",
       "brain": { "type": "walker", "aggroRange": 40, "jumpHeight": 3 },
       "life": 70, "damage": 20, "defense": 6, "knockbackResist": 0.3, "size": [1.4, 1.4], "moveSpeed": 4.5, "tint": "#f4f6ff", "loot": "snow_flinx", "value": 80,
       "covers": ["terraria:snow_flinx"] },

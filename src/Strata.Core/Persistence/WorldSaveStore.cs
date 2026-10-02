@@ -7,7 +7,9 @@ namespace Strata.Core.Persistence;
 
 /// <summary>
 /// On-disk layout of one world: <c>world.json</c> + <c>regions/r.X.Y.Z.srg</c>.
-/// Thread-safe (region IO is serialized); callers may load chunks from worker threads.
+/// Thread-safe; callers may load chunks from worker threads. The in-memory region cache is authoritative for every
+/// region touched this session: <see cref="ApplyChunks"/> publishes new copy-on-write region maps under a short lock,
+/// and <see cref="WriteRegions"/> writes them to disk outside it, so loads never wait on a disk write.
 /// </summary>
 public sealed class WorldSaveStore
 {
@@ -15,6 +17,7 @@ public sealed class WorldSaveStore
     public const string RegionDir = "regions";
 
     private readonly object _gate = new();
+    private readonly object _writeGate = new();
     private readonly Dictionary<Int3, Dictionary<int, byte[]>> _regionCache = new();
 
     public WorldSaveStore(string directory)
@@ -54,18 +57,44 @@ public sealed class WorldSaveStore
     }
 
     /// <summary>Writes chunk blobs (null = delete) grouped per region file.</summary>
-    public void SaveChunks(IEnumerable<KeyValuePair<Int3, byte[]?>> chunks)
+    public void SaveChunks(IEnumerable<KeyValuePair<Int3, byte[]?>> chunks) => WriteRegions(ApplyChunks(chunks));
+
+    /// <summary>
+    /// Publishes chunk blobs (null = delete) to the region cache and returns the region images to write. Each touched
+    /// region gets a fresh map (copy-on-write), so a snapshot handed to <see cref="WriteRegions"/> never changes.
+    /// </summary>
+    public IReadOnlyList<RegionWrite> ApplyChunks(IEnumerable<KeyValuePair<Int3, byte[]?>> chunks)
     {
+        var updates = new Dictionary<Int3, Dictionary<int, byte[]>>();
         lock (_gate)
         {
-            foreach (var group in chunks.GroupBy(kv => RegionFile.RegionOf(kv.Key)))
+            foreach (var (coord, blob) in chunks)
             {
-                var updates = group.ToDictionary(kv => RegionFile.LocalIndex(kv.Key), kv => kv.Value);
-                var dir = Path.Combine(Directory, RegionDir);
-                System.IO.Directory.CreateDirectory(dir);
-                RegionFile.Update(Path.Combine(dir, RegionFile.FileName(group.Key)), updates);
-                _regionCache.Remove(group.Key);
+                var region = RegionFile.RegionOf(coord);
+                if (!updates.TryGetValue(region, out var map))
+                {
+                    map = new Dictionary<int, byte[]>(GetRegion(region));
+                    updates[region] = map;
+                    _regionCache[region] = map;
+                }
+                if (blob == null) map.Remove(RegionFile.LocalIndex(coord));
+                else map[RegionFile.LocalIndex(coord)] = blob;
             }
+        }
+        var dir = Path.Combine(Directory, RegionDir);
+        var writes = new List<RegionWrite>(updates.Count);
+        foreach (var (region, map) in updates) writes.Add(new RegionWrite(Path.Combine(dir, RegionFile.FileName(region)), map));
+        return writes;
+    }
+
+    /// <summary>Writes region images from <see cref="ApplyChunks"/> to disk, one writer at a time.</summary>
+    public void WriteRegions(IReadOnlyList<RegionWrite> writes)
+    {
+        if (writes.Count == 0) return;
+        lock (_writeGate)
+        {
+            System.IO.Directory.CreateDirectory(Path.Combine(Directory, RegionDir));
+            foreach (var w in writes) RegionFile.Write(w.Path, w.Blobs);
         }
     }
 
@@ -79,3 +108,6 @@ public sealed class WorldSaveStore
         return blobs;
     }
 }
+
+/// <summary>A region file image to write: the full blob map at the moment it was published.</summary>
+public sealed record RegionWrite(string Path, IReadOnlyDictionary<int, byte[]> Blobs);

@@ -36,4 +36,9 @@ the voxels; only a fixed local window is read, so chunk seams stay identical. `m
 RMS height deviation of up-facing vertices from a local 3×3 plane fit (seed 1234: 3.2 cm before, 1.7 cm after).
 Also produced: liquid surfaces, cutout (leaves, cobweb) and glass surfaces, grass clumps on grass surfaces
 (`GrassScatter`), and collision triangles in 16³ buckets (solid + one-way platforms). Colliders exist only near the player and rebuild the same frame
-for edits next to it.
+for edits next to it. The mesh job hashes each of the 16 buckets (`CollisionBuilder.ComputeHashes`); `ColliderManager`
+keeps one static body per non-empty bucket and rebuilds only buckets whose hash changed, so liquid- and light-only
+remeshes cost nothing (`colliders.skipped`). Build order per frame: the focus chunk and never-built neighbours at once,
+then player-edited chunks (`Prioritize`), then the rest nearest-first within `FrameBudgets.CollidersMs`; old bucket
+bodies stay until replaced. A light placed, broken or switched remeshes its own chunk urgently and its neighbours through
+the normal queue (`WorldEditor.LightDirty`).

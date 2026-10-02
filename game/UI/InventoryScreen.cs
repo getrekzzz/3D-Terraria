@@ -30,6 +30,9 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     public bool IsOpen => _root.Visible;
 
+    /// <summary>A container's contents were shown (true) or put away (false); its lid follows.</summary>
+    public event Action<TileObjectInstance, bool>? ContainerShown;
+
     public void Initialize(UiContext ui)
     {
         _ui = ui;

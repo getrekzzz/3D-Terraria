@@ -54,6 +54,7 @@ public sealed partial class InventoryScreen
     {
         CloseContainer();
         _container = obj;
+        ContainerShown?.Invoke(obj, true);
         _containerInv = new Inventory(obj.Container!);
         _chestTitle.Text = obj.DisplayName;
         for (int i = 0; i < obj.Container!.Length; i++) _chestGrid.AddChild(Slot(SlotArea.Container, i));
@@ -64,6 +65,7 @@ public sealed partial class InventoryScreen
     private void CloseContainer()
     {
         if (_renameField.Visible) _renameField.ReleaseFocus();
+        if (_container != null) ContainerShown?.Invoke(_container, false);
         _container = null;
         _containerInv = null;
         _chestPanel.Visible = false;

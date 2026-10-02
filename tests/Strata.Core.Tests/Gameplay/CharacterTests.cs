@@ -91,7 +91,8 @@ public class CharacterTests
         var dir = TestWorlds.TempDir();
         GameWorld.WritePlayer(dir, state);
         var loaded = GameWorld.LoadOrCreatePlayer(dir, "Ada", TestPaths.Content);
-        Assert.Equal("player_f_ponytail", loaded.Look.ModelId);
+        Assert.Equal("player_f_shirt", loaded.Look.ModelId);
+        Assert.Equal("f_ponytail", loaded.Look.HairModelId);
         Assert.Equal("#c89050", loaded.Look.HairColor);
         Assert.Equal(CharacterDifficulty.Mediumcore, loaded.Difficulty);
         Assert.Equal(7200, loaded.PlayTicks);

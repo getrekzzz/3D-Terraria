@@ -29,6 +29,7 @@ public sealed partial class GameWorld : IDisposable
     {
         Session = session;
         Jobs = new JobSystem(Math.Max(1, workers), session.Log);
+        if (session.Saver != null) session.Saver.Post = Jobs.Completions.Enqueue;
         Streamer = new ChunkStreamer(session, Jobs, streaming);
         Drops = new DroppedItemSystem();
         Editor = new WorldEditor(session, Drops);
@@ -57,6 +58,7 @@ public sealed partial class GameWorld : IDisposable
         Wires = new Gameplay.Wiring.WireSystem(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
+        Editor.LightDirty += dirty => Streamer.MarkDirty(dirty, urgent: true, ChunkStreamer.LightPriority);
         Liquids.ChunksDirty += dirty => Streamer.MarkDirty(dirty, urgent: false);
     }
 
@@ -96,7 +98,7 @@ public sealed partial class GameWorld : IDisposable
 
     public PlayerEntity? LocalPlayer => Players.Count > 0 ? Players[0] : null;
 
-    /// <summary>Raised after an autosave with the number of chunks written.</summary>
+    /// <summary>Raised on the main thread when an autosave has been written, with the number of chunks saved.</summary>
     public event Action<int>? Autosaved;
 
     public event Action<PlayerEntity>? PlayerDied;
@@ -156,8 +158,8 @@ public sealed partial class GameWorld : IDisposable
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
         if (++_autosaveCounter >= AutosaveTicks)
         {
-            _autosaveCounter = 0;
-            using (prof.Time("tick.autosave")) Autosaved?.Invoke(SaveAll());
+            // Captures on this thread, writes in the background; retried next tick while the last one is still landing.
+            if (BeginAutosave()) _autosaveCounter = 0;
         }
     }
 
@@ -221,11 +223,9 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Ordinary creatures this close to the respawn point leave when a player respawns.</summary>
     public const float RespawnClearRadius = 20f;
 
-    public void Shutdown()
+    public void Dispose()
     {
-        SaveAll();
-        Streamer.UnloadAll();
+        Jobs.Dispose();
+        Session.Dispose();
     }
-
-    public void Dispose() => Jobs.Dispose();
 }

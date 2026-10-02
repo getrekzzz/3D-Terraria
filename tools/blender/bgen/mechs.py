@@ -162,7 +162,7 @@ def prime_arm(mb: MeshBuilder, p, rng):
         mb.cylinder((0, -0.2, 0), (0, 1.0, 0), 0.16, 0.12, "prop:iron", STEEL, segments=12)
         for k in range(5):  # coils
             y = 0.05 + k * 0.17
-            mb.cylinder((0, y, 0), (0, y + 0.07, 0), 0.24, 0.24, "prop:copper", "#e08c5a", segments=14)
+            mb.cylinder((0, y, 0), (0, y + 0.07, 0), 0.24, 0.24, "prop:iron:metal", "#e08c5a", segments=14)
         mb.sphere((0, 1.02, 0), 0.14, "prop:plain:glow", glow, subdivisions=2)
 
 

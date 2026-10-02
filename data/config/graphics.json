@@ -12,7 +12,7 @@
       "dynamicLights": 4,
       "ssao": false, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
       "skyRadiance": 64, "cloudSteps": 0, "autoExposure": false,
-      "grassDensity": 0, "grassDistance": 0, "combatNumbers": 24, "lodThreshold": 4, "horizonDistance": 0
+      "grassDensity": 0, "grassDistance": 0, "combatNumbers": 24, "grassBuildsPerFrame": 0, "lodThreshold": 4, "horizonDistance": 0, "oreGlintDistance": 16, "swayDistance": 0
     },
     "medium": {
       "renderScale": 1.0, "upscaler": "none", "antiAliasing": "fxaa", "msaa": 0, "anisotropy": 8,
@@ -20,7 +20,7 @@
       "dynamicLights": 8,
       "ssao": true, "ssaoQuality": 1, "ssaoHalf": true, "ssil": false, "ssr": false, "volumetricFog": false, "glow": true,
       "skyRadiance": 128, "cloudSteps": 2, "autoExposure": true,
-      "grassDensity": 0.35, "grassDistance": 22, "combatNumbers": 48, "lodThreshold": 2, "horizonDistance": 700
+      "grassDensity": 0.35, "grassDistance": 22, "combatNumbers": 48, "grassBuildsPerFrame": 2, "lodThreshold": 2, "horizonDistance": 700, "oreGlintDistance": 22, "swayDistance": 20
     },
     "high": {
       "renderScale": 1.0, "upscaler": "none", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
@@ -29,7 +29,7 @@
       "ssao": true, "ssaoQuality": 2, "ssaoHalf": true, "ssil": true, "ssilQuality": 1, "ssilHalf": true, "ssr": true, "ssrSteps": 48,
       "volumetricFog": true, "volumetricFogSize": 64, "volumetricFogDepth": 64, "glow": true,
       "skyRadiance": 128, "cloudSteps": 3, "autoExposure": true,
-      "grassDensity": 0.7, "grassDistance": 35, "combatNumbers": 80, "lodThreshold": 1, "horizonDistance": 1200
+      "grassDensity": 0.7, "grassDistance": 35, "combatNumbers": 80, "grassBuildsPerFrame": 3, "lodThreshold": 1, "horizonDistance": 1200, "oreGlintDistance": 26, "swayDistance": 35
     },
     "ultra": {
       "renderScale": 1.0, "upscaler": "fsr2", "antiAliasing": "taa", "msaa": 0, "anisotropy": 16,
@@ -38,7 +38,7 @@
       "ssao": true, "ssaoQuality": 3, "ssaoHalf": true, "ssil": true, "ssilQuality": 2, "ssilHalf": true, "ssr": true, "ssrSteps": 64,
       "volumetricFog": true, "volumetricFogSize": 96, "volumetricFogDepth": 64, "glow": true,
       "skyRadiance": 128, "cloudSteps": 4, "autoExposure": true,
-      "grassDensity": 1.0, "grassDistance": 50, "combatNumbers": 80, "lodThreshold": 0.5, "horizonDistance": 2000
+      "grassDensity": 1.0, "grassDistance": 50, "combatNumbers": 80, "grassBuildsPerFrame": 4, "lodThreshold": 0.5, "horizonDistance": 2000, "oreGlintDistance": 28, "swayDistance": 50
     }
   }
 }

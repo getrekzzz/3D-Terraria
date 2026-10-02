@@ -33,4 +33,38 @@ public sealed class CollisionBuilder
     }
 
     public int TriangleCount => Solid.Sum(l => l.Count) / 3 + Platforms.Sum(l => l.Count) / 3;
+
+    /// <summary>Total hash slots: the solid buckets, then the platform buckets.</summary>
+    public const int HashCount = Buckets * 2;
+
+    /// <summary>
+    /// Per-bucket geometry hashes from <see cref="ComputeHashes"/> (null until computed). 0 marks an empty bucket, so
+    /// colliders rebuild only buckets whose triangles changed and skip liquid- or light-only remeshes entirely.
+    /// </summary>
+    public ulong[]? Hashes { get; private set; }
+
+    /// <summary>Hashes every bucket's triangle count and vertex float bits (call on the worker, after meshing).</summary>
+    public ulong[] ComputeHashes()
+    {
+        var hashes = new ulong[HashCount];
+        for (int i = 0; i < Buckets; i++)
+        {
+            hashes[i] = HashBucket(Solid[i], 1);
+            hashes[Buckets + i] = HashBucket(Platforms[i], 2);
+        }
+        Hashes = hashes;
+        return hashes;
+    }
+
+    private static ulong HashBucket(List<Vector3> tris, ulong salt)
+    {
+        if (tris.Count == 0) return 0;
+        ulong h = Determinism.Hash.Combine(salt, (ulong)tris.Count);
+        foreach (var v in tris)
+        {
+            ulong xy = BitConverter.SingleToUInt32Bits(v.X) | (ulong)BitConverter.SingleToUInt32Bits(v.Y) << 32;
+            h = Determinism.Hash.Combine(Determinism.Hash.Combine(h, xy), (ulong)BitConverter.SingleToUInt32Bits(v.Z));
+        }
+        return h == 0 ? 1 : h;
+    }
 }

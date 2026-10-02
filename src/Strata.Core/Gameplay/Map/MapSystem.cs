@@ -142,6 +142,23 @@ public sealed class MapSystem
         }
     }
 
+    /// <summary>
+    /// Adds every changed map to a save batch (main thread): a deep copy is taken now and compressed on the save thread.
+    /// </summary>
+    public void QueueSave(Persistence.SaveBatch batch)
+    {
+        var blocks = _world.Session.Content.Blocks;
+        foreach (var (player, entry) in _maps)
+        {
+            if (!entry.Map.Dirty || PathFor(player) is not { } path) continue;
+            var map = entry.Map;
+            var snapshot = map.Snapshot();
+            map.Dirty = false;
+            // A failed write marks the map changed again (on the main thread), so the next save retries it.
+            batch.Files.Add(new Persistence.SaveFile(path, () => snapshot.Save(id => blocks[id].Id), () => map.Dirty = true));
+        }
+    }
+
     private ExploredMap LoadOrNew(PlayerEntity player)
     {
         var size = _world.Session.Settings.Dimensions;

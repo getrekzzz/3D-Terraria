@@ -39,13 +39,16 @@ public sealed partial class ChunkStreamer
             }
 
         int keep = s.MeshRadius + 1 + s.Hysteresis;
-        foreach (var (coord, e) in _entries.ToList())
+        _unloadScratch.Clear();
+        foreach (var (coord, e) in _entries)
         {
             if (e.Wanted) continue;
             var d = coord - focus;
             bool inHysteresis = Math.Abs(d.X) <= keep && Math.Abs(d.Z) <= keep && d.Y >= -s.MeshDown - 1 - s.Hysteresis && d.Y <= s.MeshUp + 1 + s.Hysteresis;
-            if (!inHysteresis) Unload(coord);
+            if (!inHysteresis) _unloadScratch.Add(coord);
         }
+        foreach (var coord in _unloadScratch) Unload(coord);
+        _unloadScratch.Clear();
     }
 
     private void Want(Int3 c, bool mesh, int priority)
@@ -58,20 +61,37 @@ public sealed partial class ChunkStreamer
         e.Wanted = true;
         e.MeshWanted |= mesh;
         e.Priority = priority;
+        if (e.Data == DataState.Loading && e.Cancelled) _loadQueue.Add(c);
+        TouchMesh(c, e);
     }
 
     private void ScheduleLoads()
     {
-        if (_loadsInFlight >= Settings.MaxLoadsInFlight) return;
-        foreach (var (coord, e) in _entries.Where(kv => kv.Value.Data == DataState.Loading && kv.Value.Cancelled && kv.Value.Wanted)
-                     .OrderBy(kv => kv.Value.Priority).Take(Settings.MaxLoadsInFlight - _loadsInFlight).ToList())
+        if (_loadsInFlight >= Settings.MaxLoadsInFlight || _loadQueue.Count == 0) return;
+        _order.Clear();
+        _prune.Clear();
+        foreach (var coord in _loadQueue)
         {
+            // Entries leave the queue lazily: unwanted (hysteresis) ones rejoin through Want.
+            if (_entries.TryGetValue(coord, out var q) && q.Data == DataState.Loading && q.Cancelled && q.Wanted) _order.Add((q.Priority, coord));
+            else _prune.Add(coord);
+        }
+        foreach (var coord in _prune) _loadQueue.Remove(coord);
+        _order.Sort(OrderComparer.Instance);
+        int take = Math.Min(_order.Count, Settings.MaxLoadsInFlight - _loadsInFlight);
+        for (int i = 0; i < take; i++)
+        {
+            var coord = _order[i].Coord;
+            var e = _entries[coord];
             e.Cancelled = false; // "Cancelled" doubles as "not yet scheduled" for loading entries
+            _loadQueue.Remove(coord);
             _loadsInFlight++;
-            var c = coord;
-            _jobs.Schedule(e.Priority, () => _session.Produce(c), product => OnLoaded(c, product), $"load {c}");
+            ScheduleLoadJob(coord, e.Priority);
         }
     }
+
+    private void ScheduleLoadJob(Int3 c, int priority) =>
+        _jobs.Schedule(priority, () => _session.Produce(c), product => OnLoaded(c, product), $"load {c}");
 
     private void OnLoaded(Int3 coord, ChunkProduct? product)
     {
@@ -80,11 +100,14 @@ public sealed partial class ChunkStreamer
         if (product == null)
         {
             // Load failed (already logged): drop the entry; it will be retried if still wanted.
-            _entries.Remove(coord);
+            RemoveEntry(coord, out _);
             _focusChunk = new Int3(int.MinValue, 0, 0);
             return;
         }
         e.Data = DataState.Ready;
+        _loaded++;
+        _readyEpoch++;
+        TouchMesh(coord, e);
         var skyChanges = _session.Install(product);
         if (skyChanges.Count > 0)
         {
@@ -97,25 +120,44 @@ public sealed partial class ChunkStreamer
 
     private void ScheduleMeshes()
     {
-        if (_meshesInFlight >= Settings.MaxMeshesInFlight) return;
-        var candidates = _entries.Where(kv => kv.Value.MeshWanted && kv.Value.MeshDirty && !kv.Value.MeshInFlight && kv.Value.Data == DataState.Ready)
-            .OrderBy(kv => kv.Value.Priority).ToList();
-        foreach (var (coord, e) in candidates)
+        if (_meshesInFlight >= Settings.MaxMeshesInFlight || _meshCandidates.Count == 0) return;
+        _order.Clear();
+        _prune.Clear();
+        foreach (var coord in _meshCandidates)
         {
-            if (_meshesInFlight >= Settings.MaxMeshesInFlight) break;
-            if (!NeighboursReady(coord)) continue;
+            if (!_entries.TryGetValue(coord, out var q) || !IsMeshCandidate(q)) _prune.Add(coord);
+            else if (q.BlockedEpoch != _readyEpoch) _order.Add((q.Priority, coord));
+        }
+        foreach (var coord in _prune) _meshCandidates.Remove(coord);
+        _order.Sort(OrderComparer.Instance);
+        for (int i = 0; i < _order.Count && _meshesInFlight < Settings.MaxMeshesInFlight; i++)
+        {
+            var coord = _order[i].Coord;
+            var e = _entries[coord];
+            if (!NeighboursReady(coord))
+            {
+                e.BlockedEpoch = _readyEpoch;
+                continue;
+            }
             e.MeshInFlight = true;
             e.MeshDirty = false;
+            _meshCandidates.Remove(coord);
             _meshesInFlight++;
-            var c = coord;
-            var sources = _session.LightSourcesAround(c);
-            _jobs.Schedule(e.Priority, () =>
-            {
-                var nb = Neighborhood.Capture(_session.World, c);
-                return nb == null ? null : ChunkMesher.Build(nb, _tables, _session.Sky.SkyTop, sources, _session.Sky.ShadeTop);
-            }, result => OnMeshed(c, result), $"mesh {c}");
+            MeshScheduled?.Invoke(coord);
+            ScheduleMeshJob(coord, e.Priority);
             if (e.Priority < 0) e.Priority = 0;
         }
+    }
+
+    // Separate method so the job closure is only allocated for chunks actually scheduled.
+    private void ScheduleMeshJob(Int3 c, int priority)
+    {
+        var sources = _session.LightSourcesAround(c);
+        _jobs.Schedule(priority, () =>
+        {
+            var nb = Neighborhood.Capture(_session.World, c);
+            return nb == null ? null : ChunkMesher.Build(nb, _tables, _session.Sky.SkyTop, sources, _session.Sky.ShadeTop);
+        }, result => OnMeshed(c, result), $"mesh {c}");
     }
 
     private bool NeighboursReady(Int3 c)
@@ -139,21 +181,23 @@ public sealed partial class ChunkStreamer
         if (result == null)
         {
             e.MeshDirty = true;
+            TouchMesh(coord, e);
             return;
         }
+        TouchMesh(coord, e); // dirtied again while the job ran
         var chunk = _session.World.GetChunk(coord);
         chunk?.SetLight(result.Light, result.Version);
         if (!e.MeshWanted) return;
+        if (!e.HasMesh) _meshed++;
         e.HasMesh = true;
         MeshReady?.Invoke(result);
     }
 
     private void Unload(Int3 coord)
     {
-        if (!_entries.Remove(coord, out var e)) return;
+        if (!RemoveEntry(coord, out var e)) return;
         if (e.Data == DataState.Loading) return; // in-flight load result will be discarded
-        var blob = _session.Unload(coord);
-        if (blob != null) _pendingSaves[coord] = blob;
+        if (_session.Unload(coord) is { } snapshot) _pendingSaves.Add(snapshot);
         if (e.HasMesh) ChunkRemoved?.Invoke(coord);
     }
 
@@ -161,7 +205,7 @@ public sealed partial class ChunkStreamer
     {
         if (_pendingSaves.Count == 0) return;
         using var profile = Diagnostics.Metrics.Frame.Time("stream.unload_flush");
-        _session.SaveUnloaded(_pendingSaves);
+        _session.SaveUnloaded(_pendingSaves, wait: false);
         _pendingSaves.Clear();
     }
 }

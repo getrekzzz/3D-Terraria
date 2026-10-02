@@ -39,7 +39,7 @@ public class GraphicsConfigTests
         var config = new GraphicsConfig
         {
             Default = "missing",
-            Presets = new() { ["bad"] = new GraphicsPreset { Msaa = 3, ShadowAtlas = 5000, Upscaler = "dlss", SkyRadiance = 100, GrassDensity = 2f, HorizonDistance = 50f } },
+            Presets = new() { ["bad"] = new GraphicsPreset { Msaa = 3, ShadowAtlas = 5000, Upscaler = "dlss", SkyRadiance = 100, GrassDensity = 2f, GrassBuildsPerFrame = 17, HorizonDistance = 50f } },
         };
         var problems = config.Validate();
         Assert.Contains(problems, p => p.Contains("default preset"));
@@ -48,6 +48,7 @@ public class GraphicsConfigTests
         Assert.Contains(problems, p => p.Contains("upscaler"));
         Assert.Contains(problems, p => p.Contains("skyRadiance"));
         Assert.Contains(problems, p => p.Contains("grassDensity"));
+        Assert.Contains(problems, p => p.Contains("grassBuildsPerFrame"));
         Assert.Contains(problems, p => p.Contains("horizonDistance"));
     }
 }

@@ -13,6 +13,7 @@ public static partial class ContentValidator
             if (b.Hardness <= 0) ctx.Error(b, "hardness must be > 0.");
             if (b.PickPower < 0) ctx.Error(b, "pickPower must be >= 0.");
             ctx.Light(b, b.Light, "light");
+            if (b.Glow is < 0f or > 1f) ctx.Error(b, "glow must be within 0–1.");
             ctx.Color(b, b.Color, "color");
             ctx.Ref(b, ctx.Db.Items, b.Drop, "drop");
             if (b.Render != BlockRender.None)

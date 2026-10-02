@@ -5,6 +5,7 @@ import math
 
 from mathutils import Matrix, Vector
 
+from .guns import gun  # noqa: F401  (registered below)
 from .mesh import MeshBuilder
 
 
@@ -55,7 +56,7 @@ def shield(mb: MeshBuilder, p, rng):
     """A heater shield with a raised boss or an eye emblem."""
     layer, tint = _metal(p, p.get("color", "#8a5a3a"))
     pts = [(-0.14, 0.32), (0.14, 0.32), (0.15, 0.14), (0.0, -0.04), (-0.15, 0.14)]
-    mb.extrude_polygon(pts, 0.03, layer, tint, matrix=Matrix.Translation((0, 0.015, 0)) @ Matrix.Rotation(math.pi / 2, 4, "X"))
+    mb.extrude_polygon(pts, 0.03, layer, tint)  # the plate stands in the XZ plane, its face (and boss) toward +Y
     mb.sphere((0, 0.035, 0.16), 0.05, "prop:plain" + (":glow" if p.get("glow") else ""), p.get("emblem", "#e8e0d0"), subdivisions=2, scale=(1, 0.45, 1))
     if p.get("pupil"):
         mb.sphere((0, 0.055, 0.16), 0.022, "prop:plain", p["pupil"], subdivisions=1, scale=(1, 0.4, 1))
@@ -65,29 +66,6 @@ def balloon(mb: MeshBuilder, p, rng):
     """A balloon on a string."""
     mb.cylinder((0, 0, 0), (0, 0, 0.18), 0.003, None, "prop:plain", "#e8e8e8", segments=3)
     mb.sphere((0, 0, 0.28), 0.1, "prop:gel", p.get("color", "#e83040"), subdivisions=2, scale=(1, 1, 1.15))
-
-
-def gun(mb: MeshBuilder, p, rng):
-    """Firearms: pistol, musket/rifle, shotgun, minigun (rotating barrels) or launcher (a wide tube)."""
-    style = p.get("style", "pistol")
-    layer, tint = _metal(p, "#6a6e78")
-    wood = p.get("wood", "#6a4428")
-    length = {"pistol": 0.3, "musket": 0.9, "rifle": 0.85, "shotgun": 0.7, "minigun": 0.75, "launcher": 0.8}.get(style, 0.5)
-    mb.box((-0.025, -0.06, -0.08), (0.025, 0.02, 0.04), "prop:dark_planks", wood)  # grip
-    if style in ("musket", "rifle", "shotgun"):
-        mb.box((-0.03, -0.05, -0.28), (0.03, 0.04, 0.05), "prop:planks", wood)  # stock
-    if style == "minigun":
-        for k in range(6):
-            a = k * math.pi / 3
-            mb.cylinder((math.cos(a) * 0.025, 0.04 + math.sin(a) * 0.025, 0.0), (math.cos(a) * 0.025, 0.04 + math.sin(a) * 0.025, length), 0.01, None, layer, tint, segments=5)
-        mb.cylinder((0, 0.04, -0.05), (0, 0.04, 0.12), 0.05, None, layer, tint, segments=10)
-    elif style == "launcher":
-        mb.cylinder((0, 0.05, -0.2), (0, 0.05, length), 0.06, 0.065, layer, tint, segments=12)
-    else:
-        mb.box((-0.03, 0.0, 0.0), (0.03, 0.07, 0.12), layer, tint)  # receiver
-        mb.cylinder((0, 0.045, 0.1), (0, 0.045, length), 0.018 if style != "shotgun" else 0.024, None, layer, tint, segments=8)
-    if p.get("accent"):
-        mb.box((-0.035, 0.07, 0.02), (0.035, 0.085, length * 0.6), "prop:plain:glow" if p.get("glow") else "prop:plain", p["accent"])
 
 
 def bullet(mb: MeshBuilder, p, rng):
@@ -126,6 +104,7 @@ def rod(mb: MeshBuilder, p, rng):
     line = [Vector((0, 0, 0.9)), Vector((0.04, 0, 0.7)), Vector((0.06, 0, 0.5))]
     mb.tube(line, [0.0015] * 3, "prop:plain", "#e8e8e8", segments=3)
     mb.sphere((0.06, 0, 0.48), 0.018, "prop:plain", p.get("bobber", "#e83030"), subdivisions=1)
+    mb.socket("tip", (0, 0, 0.9))
 
 
 def mirror(mb: MeshBuilder, p, rng):
@@ -171,10 +150,16 @@ def key(mb: MeshBuilder, p, rng):
 
 
 def whip(mb: MeshBuilder, p, rng):
-    """A coiled whip with a handle."""
+    """A coiled whip with a handle; ``pose: s_curve`` (its icon) lays the lash out as an S-curve instead."""
     mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", p.get("handle", "#5a3a24"), segments=6)
-    coil = [Vector((math.cos(a) * (0.1 - a * 0.004), math.sin(a) * (0.1 - a * 0.004), 0.1 + a * 0.01)) for a in (i * 0.4 for i in range(40))]
-    mb.tube(coil, [0.01 - i * 0.0002 for i in range(40)], "prop:leather", p.get("color", "#6a4a2a"), segments=4)
+    if p.get("pose") == "s_curve":
+        lash = [Vector((math.sin(t * 2 * math.pi) * 0.14 * t, 0, 0.08 + t * 0.9)) for t in (i / 30 for i in range(31))]
+        mb.tube(lash, [0.016 - i * 0.00042 for i in range(31)], "prop:leather", p.get("color", "#6a4a2a"), segments=5)
+        mb.sphere(tuple(lash[-1]), 0.012, "prop:leather", p.get("color", "#6a4a2a"), subdivisions=1)
+    else:
+        coil = [Vector((math.cos(a) * (0.1 - a * 0.004), math.sin(a) * (0.1 - a * 0.004), 0.1 + a * 0.01)) for a in (i * 0.4 for i in range(40))]
+        mb.tube(coil, [0.01 - i * 0.0002 for i in range(40)], "prop:leather", p.get("color", "#6a4a2a"), segments=4)
+    mb.socket("handle_end", (0, 0, 0.08))
 
 
 def boomerang(mb: MeshBuilder, p, rng):
@@ -186,11 +171,17 @@ def boomerang(mb: MeshBuilder, p, rng):
 
 
 def yoyo(mb: MeshBuilder, p, rng):
-    """Two discs on an axle with a coil of string."""
+    """Two discs on an axle with a coil of string; ``head_only`` (the thrown projectile) centres the discs on the
+    origin without the string."""
     color = p.get("color", "#b0703a")
+    z = 0.0 if p.get("head_only") else 0.12
+    layer = "prop:plain:glow" if p.get("glow") else "prop:plain"
     for y in (-0.03, 0.03):
-        mb.cylinder((0, y, 0.12), (0, y + (0.02 if y > 0 else -0.02), 0.12), 0.09, 0.08, "prop:plain", color, segments=14)
-    mb.cylinder((0, -0.03, 0.12), (0, 0.03, 0.12), 0.02, None, "prop:plain", "#e8e8e8", segments=8)
+        mb.cylinder((0, y, z), (0, y + (0.02 if y > 0 else -0.02), z), 0.09, 0.08, layer, color, segments=14)
+    mb.cylinder((0, -0.03, z), (0, 0.03, z), 0.02, None, "prop:plain", p.get("axle", "#e8e8e8"), segments=8)
+    mb.socket("string", (0, 0, z))
+    if p.get("head_only"):
+        return
     string = [Vector((0, 0, 0.12)), Vector((0.02, 0, 0.0)), Vector((0.0, 0, -0.1))]
     mb.tube(string, [0.003] * 3, "prop:plain", "#f0f0f0", segments=3)
 
@@ -198,14 +189,19 @@ def yoyo(mb: MeshBuilder, p, rng):
 def flail(mb: MeshBuilder, p, rng):
     """A handle, a short chain and a spiked (or glowing) ball."""
     layer, tint = _metal(p, "#9098a0")
-    mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", "#5a3a24", segments=6)
-    chain = [Vector((0, 0, 0.08)), Vector((0.03, 0, 0.18)), Vector((0.02, 0, 0.28))]
-    mb.tube(chain, [0.008] * 3, "prop:iron", "#8a8e96", segments=4)
+    centre = Vector((0, 0, 0)) if p.get("head_only") else Vector((0.02, 0, 0.36))
+    if p.get("head_only"):  # the thrown ball: centred on the origin, its chain attaches at the bottom
+        mb.socket("chain", (0, 0, -0.08), (0, 0, -1))
+    else:
+        mb.cylinder((0, 0, -0.1), (0, 0, 0.08), 0.02, None, "prop:dark_planks", "#5a3a24", segments=6)
+        chain = [Vector((0, 0, 0.08)), Vector((0.03, 0, 0.18)), Vector((0.02, 0, 0.28))]
+        mb.tube(chain, [0.008] * 3, "prop:iron", "#8a8e96", segments=4)
+        mb.socket("chain", (0, 0, 0.08))
     ball = "prop:plain:glow" if p.get("glow") else layer
-    mb.sphere((0.02, 0, 0.36), 0.08, ball, p.get("ball", tint), subdivisions=2)
+    mb.sphere(tuple(centre), 0.08, ball, p.get("ball", tint), subdivisions=2)
     for k in range(6):
         d = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)][k]
-        base = Vector((0.02, 0, 0.36)) + Vector(d) * 0.07
+        base = centre + Vector(d) * 0.07
         mb.cylinder(tuple(base), tuple(base + Vector(d) * 0.05), 0.02, 0.002, layer, tint, segments=5)
 
 

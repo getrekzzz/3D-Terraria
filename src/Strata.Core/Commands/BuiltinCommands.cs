@@ -232,8 +232,10 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "save", Usage = "save", Help = "Saves the world and players now.",
-            Run = (ctx, _) => CommandResult.Success($"Saved ({ctx.World.SaveAll()} chunks)."),
+            Name = "save", Usage = "save [async]", Help = "Saves the world and players now (async: in the background, like the autosave).",
+            Run = (ctx, a) => a.OptStr(0) == "async"
+                ? CommandResult.Success(ctx.World.BeginAutosave() ? "Autosave started." : "An autosave is still being written.")
+                : CommandResult.Success($"Saved ({ctx.World.SaveAll()} chunks)."),
         });
         r.Register(new CommandDef
         {

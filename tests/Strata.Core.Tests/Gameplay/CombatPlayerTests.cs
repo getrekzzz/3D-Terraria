@@ -58,7 +58,7 @@ public class CombatPlayerTests
         for (int i = 0; i < p.Inventory.Backpack.Size; i++)
             if (!p.Inventory.Backpack[i].IsEmpty && p.Inventory.Backpack[i].Item!.EquipSlot != EquipSlot.None) p.Inventory.Equip(i);
         p.Recompute();
-        Assert.Equal(0.45f, p.Effects.Stats.Bonus(StatIds.MoveSpeed), 3);
+        Assert.Equal(0.45f, p.Effects.Stats.Bonus(StatIds.RunSpeed), 3);
         Assert.True(p.Effects.NoFallDamage);
         Assert.Equal(1, p.Defense);
     }
