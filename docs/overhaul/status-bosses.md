@@ -69,4 +69,13 @@ Gaps (details in docs/architecture/gameplay.md): no 3D bestiary preview; dyes ar
 sold items do not exist yet (sentries/Defender armour, Clentaminator, Toolbelt, Imbuing Station…); golf has no
 scoring; the pylon one-of-each limit and boss/invasion travel block are not enforced; settings toggles for hints live
 in settings.cfg (no SettingsScreen rows yet).
-In progress: Don't Dig Up secret-seed generation (GenVersion 13 → 14), requested by the integration session.
+## Extras requested by the integration session (pushed)
+* X-07 Don't Dig Up: the secret seed reorders the planner's layer bands (Underworld at the top under a thin crust,
+  caverns between, the surface with open air under a rock roof at the bottom); every pass builds upright with normal
+  gravity; spawn on dry ash in the top Underworld. GenVersion 13 → 14; ordinary seeds byte-identical (goldens
+  unchanged), pre-14 Don't Dig Up saves keep their old layout. dontdigup.cmds smoke (`#!` header args). Gaps: no weather
+  or sky under the roof, invasions/meteors land on the bottom surface, wedges only from the bottom surface.
+* X-11 gaps closed: Corrupt/Crimson/Hallowed/Ice Mimics disguised as their biome chests, the Mimic's 6-way loot with
+  Titan Glove, Philosopher's Stone and Star Cloak, biome Mimic drops (hooks, weapons, accessories, Toy Sled). Gaps: no
+  Dart Rifle/Pistol (no darts), no Key of Night/Light chest summon, aggro accessories don't change targeting.
+CI: full headless CI PASS on the merged tree after each.
