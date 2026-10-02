@@ -107,7 +107,12 @@ Frame-time budget (ultra aims at 60 fps at 1080p on an RX 6600 / RTX 2060-class 
 * Only one sky light casts shadows at a time (the moon waits for sunset).
 * SSAO/SSIL can run at half resolution (`ssaoHalf`/`ssilHalf`); high and ultra do.
 * `DynamicResolution` lowers the 3D resolution (FSR, down to 60%) only when the measured GPU time shows the GPU is the
-  bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync).
+  bottleneck and frames fall under ~57 fps, and raises it again when the GPU has headroom (works with vsync). The
+  decisions are `Strata.Core.Presentation.ResolutionGovernor`'s (tested): 30-frame windows without hitch frames over
+  50 ms, one level down after 2 slow GPU-bound windows, one up only when the GPU time predicted at the next level
+  (gpu × (next/current)²) stays under 12 ms for 4 windows and 8 s after the last step down, levels 1.0/0.9/0.8/0.7/0.6
+  capped at the preset's scale, 3 s between changes; so it no longer flips (each change reallocates buffers). Probe
+  `render.scale_changes`, timer `gd.dynres.change`.
 * F3 shows GPU and render-CPU milliseconds, the current 3D scale and the preset.
 
 ## Measuring hitches
