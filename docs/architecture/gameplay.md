@@ -364,6 +364,13 @@
   hold, 1 s fade, the last 10 shown); the `chat` action (Enter) opens the history as an overlay gate. The optional
   `BigAnnouncements` setting adds a 24 px banner for "has awoken!" only. Command `ui chat <text>`/`ui history`, probes
   `ui.chat_lines`/`ui.chat_open`.
+* **Pickup popups** — `GameWorld.ItemPickedUp` feeds `PickupPopups` (game/UI/Hud/PickupPopups.cs), drawn over the
+  player's head (0.9 m above it, projected; a fixed point at W/2, 0.38 H in first person or behind the camera).
+  `PickupFeed` (Core) keeps 8 popups keyed by item and prefix (all coins share one, summing copper for
+  `Coins.Format`): a pickup within 2 s joins its popup, restarts it and pops it (1.25 → 1 over 0.12 s); each shows
+  1.5 s, rising 40 px and fading over the last 0.5 s, the latest at the bottom row (22 px apart). Text in rarity
+  colour (Expert/Master animate each frame) or the largest coin's colour. `drop … <delay ticks>` and probe
+  `ui.popups` test it.
 * **Object hazards** — a tile object with `hazard {damage, knockback}` (Dungeon spikes) hurts a player whose box
   (grown by 0.05 m) overlaps it: `GameWorld.TouchHazards` rolls the hit against defense, respects immunity frames
   and god mode, and reports it with knockback away from the spike and upward. A non-container object's per-instance

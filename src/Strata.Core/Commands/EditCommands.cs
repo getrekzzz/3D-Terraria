@@ -14,8 +14,8 @@ public static class EditCommands
     {
         r.Register(new CommandDef
         {
-            Name = "drop", Usage = "drop <item> [count] [<dx> <dy> <dz>]",
-            Help = "Drops an item stack into the world at a cell relative to the feet (default: in front), out of pickup reach for a while.",
+            Name = "drop", Usage = "drop <item> [count] [<dx> <dy> <dz> [pickup delay ticks]]",
+            Help = "Drops an item stack into the world at a cell relative to the feet (default: in front), out of pickup reach for a while (600 ticks unless given).",
             Run = (ctx, a) =>
             {
                 var content = ctx.World.Session.Content;
@@ -24,7 +24,8 @@ public static class EditCommands
                 var offset = a.Count >= 5 ? new Int3(a.Int(2, "dx"), a.Int(3, "dy"), a.Int(4, "dz")) : new Int3(0, 1, 3);
                 var cell = Here(ctx) + offset;
                 var at = new System.Numerics.Vector3(cell.X + 0.5f, cell.Y + 0.5f, cell.Z + 0.5f) * Units.CellSize;
-                ctx.World.Drops.Spawn(new Gameplay.Items.ItemStack(item, count), at, System.Numerics.Vector3.Zero, pickupDelay: 600);
+                int delay = Math.Max(0, a.OptInt(5, 600));
+                ctx.World.Drops.Spawn(new Gameplay.Items.ItemStack(item, count), at, System.Numerics.Vector3.Zero, pickupDelay: delay);
                 return CommandResult.Success($"Dropped {count} {item.DisplayName} at {cell}.");
             },
         });

@@ -425,3 +425,33 @@ assert ui.chat_lines >= 2
 assert ui.overlaps == 0
 ui close
 assert errors == 0
+
+# --- P2-22 ---
+# Picked-up items float up over the player's head as one popup per item: a second pickup of the same item while its
+# popup is kept grows it instead of adding another; coins of every kind share one popup. (The drops below have no
+# pickup delay.)
+god on
+spawning off
+killall
+clear
+fill -6 -3 -6 6 -1 6 stone
+fill -6 0 -6 6 5 6 air
+wait 0.5
+assert ui.popups == 0
+drop dirt 5 0 0 1 0
+wait 1.0
+assert inv.dirt == 5
+assert ui.popups == 1
+drop dirt 5 0 0 1 0
+wait 1.0
+assert inv.dirt == 10
+assert ui.popups == 1
+wait 2.5
+assert ui.popups == 0
+drop copper_coin 50 0 0 1 0
+drop silver_coin 2 0 0 1 0
+wait 1.0
+assert ui.popups == 1
+assert ui.overlaps == 0
+god off
+assert errors == 0

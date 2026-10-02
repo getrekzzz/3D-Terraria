@@ -26,6 +26,7 @@ public sealed partial class Hud : CanvasLayer
     private StatusLine _status = null!;
     private InfoPanel _info = null!;
     private ChatLog _chat = null!;
+    private PickupPopups _popups = null!;
     private Label _death = null!;
     private PanelContainer _bossPanel = null!;
     private Label _bossName = null!;
@@ -65,6 +66,9 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>The chat log (the <c>ui chat</c> command and the <c>ui.chat_lines</c> probe).</summary>
     public ChatLog Chat => _chat;
 
+    /// <summary>Pickup popups on screen over the player's head (the <c>ui.popups</c> probe).</summary>
+    public int PopupsShown => _popups.Shown;
+
     /// <summary>The hotbar slot view at <paramref name="index"/> (the <c>ui hover hotbar</c> command), or null.</summary>
     public ItemSlotView? HotbarSlot(int index) => _hotbar.Slot(index);
 
@@ -87,6 +91,7 @@ public sealed partial class Hud : CanvasLayer
         root.AddChild(_status = LayoutWidgets.Register(new StatusLine()));
         root.AddChild(_info = LayoutWidgets.Register(new InfoPanel(ui)));
         root.AddChild(_chat = LayoutWidgets.Register(new ChatLog()));
+        root.AddChild(_popups = new PickupPopups(ui)); // full screen, anchored to the player: not a layout region
         BuildBanner(root);
 
         _death = new Label { Visible = false, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };

@@ -9,8 +9,9 @@ namespace Strata.Game.UI;
 /// - residents arriving or leaving in blue, and their deaths ("was slain...") in red;
 /// - other events (the Blood Moon, an eclipse) and world changes (hardmode, a meteorite) in green;
 /// - a catch ("Caught Bass!") in the item's rarity colour.
-/// Refusals and notices take the status line under the crosshair; pickups float over the player's head. The big
-/// centred banner is optional (the BigAnnouncements setting, off by default), and only for "has awoken!".
+/// Refusals and notices take the status line under the crosshair; pickups float over the player's head
+/// (<see cref="PickupPopups"/>). The big centred banner is optional (the BigAnnouncements setting, off by default),
+/// and only for "has awoken!".
 /// </summary>
 public sealed partial class Hud
 {
