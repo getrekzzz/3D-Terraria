@@ -44,6 +44,16 @@ damage bonus hooked into the reworked combat), editable signs (object meta), and
 banner / statue helpers (P4-17/18) — the family bookcase and models may switch to those helpers then. Living Wood is
 left out (no Living Wood item yet; it needs the Living Loom).
 
+## Push 5 — game-feel chain, part 1 (handed over by the integration session): P3-08, P3-19, P3-20
+| WP | State | Notes |
+|---|---|---|
+| P3-08 EffectKit | done | Pooled voxel-lit bursts (chips, dust, sparks, puff, splash, leaves; `particle_lit.gdshader`), budget (effectsScale × count, 8 bursts/frame, ~600 live), `FlashLights` pool (a separate pool, not a DynamicLights provider: those re-rank at 4 Hz and cannot fade a flash), graphics.json `effectsScale`/`flashLights`; mining, steam, burning items, explosions migrated; SoundEvents split into World/Weapons/Creatures/Player partials. |
+| P3-19 creature materials | done | `creature_materials.json` + `CreatureMaterialsConfig` (material from the enemy, its model or tags — no enemy files edited); `DamageEvent.NpcId/Kind`, `NpcSystem.Find`; material hit/death sounds (11 new) and hit dust; periodic numbers smaller. |
+| P3-20 gore | done | `GoreSystem` (pooled MultiMesh chunks, voxel bounce, lit, fading); death dust burst + gore; `juice.cmds` smoke. |
+
+CI (push 5): GREEN except one mawwall.cmds run (its fills ran while the underworld teleport was still settling: "Filled 0
+cells"); it passed on the re-run — a pre-existing timing weakness in that script (bosses session), not these WPs.
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and
