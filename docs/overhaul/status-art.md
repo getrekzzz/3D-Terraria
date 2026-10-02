@@ -190,5 +190,5 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   heal/mana sounds.
 * **3D drops (P3-36)**: `DroppedItemRenderer(.Visuals)`: real item models (async, one build per frame), block cubes,
   billboard only as a fallback; spin + bob; additive rarity halo (`shaders/drop_halo.gdshader`); lights from the
-  DynamicLights pool capped by preset `dropLights` (0/2/4/6). Probes `dropvis.*`. Gaps: no perf run for 150 drops;
+  DynamicLights pool capped by preset `dropLights` (0/2/4/6). Probes `dropvis.*`. Perf (headless, 150 drops spread 2 cells apart, 108 drawn after stack merging: 92 models + 16 cubes, 23 halos, 2 lights): `gd.drops` 0.172 ms/frame avg, 1.89 ms max (target < 0.5 ms met); `tick.drops` peaks 2.8 ms; two 160-200 ms frames in that run are not attributed to drops (largest listed counter 2.8 ms; not investigated). Gaps:
   drops cast no shadows; thin swords read narrow edge-on.
