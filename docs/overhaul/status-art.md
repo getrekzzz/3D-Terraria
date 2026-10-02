@@ -9,7 +9,8 @@
 | 5 | P1b-06, P1b-07 (async saves, reviewed + fixed), P1b-08, P1b-09 (scheduler, budgets, colliders) | full headless CI green (502 Core tests, 14/14 smoke, MENU PASS), all review findings fixed |
 | 6 | P1b-10, P1b-11, P1b-12 (tile objects, grass, GC) | full headless CI green (507 Core tests, 14/14 smoke, MENU PASS) |
 | 7 | P1b-13, P1b-14, P1b-16 (threaded asset cache, preloading + warm-up, dynamic resolution; reviewed + fixed) | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
-| 8 | X-09 creator menu rows (after P2-30) | pending |
+| 8 | P3-48 chest lids | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
+| 9 | P3-46, P3-31, P3-35, X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -82,3 +83,10 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
 * P1b-08/09 review fixes: budgets use main-thread CPU time (not vsync delta), stay at loading level until chunks
   within 2 of the focus have meshes, and a large backlog overrides the slow-frame shrink; collider priority clears by
   mesh version; light-edit neighbours remesh ahead of distance order.
+
+## Push 8 notes
+* **Chest lids (P3-48)**: `MeshBuilder.part(name, pivot)` exports a hinged child node (`lid`, origin at the back top
+  edge); `PropLibrary.Part` returns its mesh and hinge; `TileObjectRenderer.Lids.cs` draws lids as a second MultiMesh
+  per group and rewrites only swinging lids (100° over 0.15 s). `InventoryScreen.ContainerShown` drives it; probe
+  `objects.open_lids` (builder.cmds). Gaps: no `chest_close` sound exists on this branch (P2-17 not here); only
+  `chest`-generator objects have lids.
