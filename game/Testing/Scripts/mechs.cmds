@@ -1,5 +1,5 @@
 # Mechanical terrors: the clockwork eye calls both Twin Lenses (the pair counts once both fall), the Iron Serpent
-# flies through the ground releasing probes, Warden Prime swings four tools; with all three down the world moves on.
+# flies through the ground releasing probes, Skeletron Prime's saw, vice, cannon and laser fight as separate parts; with all three down the world moves on.
 wait_until player.frozen == 0 180
 spawning off
 town arrivals off
@@ -32,6 +32,16 @@ killall
 boss skeletron_prime 12
 wait 3
 assert npcs.skeletron_prime == 1
+# Its four tools are boss parts, destroyed one by one; the skull fights on.
+assert npcs.prime_saw == 1
+assert npcs.prime_vice == 1
+assert npcs.prime_cannon == 1
+assert npcs.prime_laser == 1
+slay prime_saw
+wait 0.2
+assert boss.skeletron_prime.parts == 3
+assert npcs.skeletron_prime == 1
+assert errors == 0
 slay skeletron_prime
 assert flag.defeated_skeletron_prime == 1
 assert flag.defeated_all_mechs == 1

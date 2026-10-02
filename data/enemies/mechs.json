@@ -73,15 +73,18 @@
     {
       "id": "skeletron_prime", "model": "skeletron_prime_head", "tags": ["boss", "lava_immune", "mechanical"], "name": "Skeletron Prime",
       "description": "The dungeon's curse, rebuilt in steel with a saw, a vice, a cannon and a laser.",
-      "brain": { "type": "skeletron", "hoverHeight": 7, "handSpacing": 3.2, "swipeInterval": 70, "spinInterval": 600, "spinDuration": 300, "spinSpeed": 12, "swipingHands": 2, "phase2Life": 0.5 },
-      "ranged": { "projectile": "prime_bomb", "damage": 40, "speed": 15, "interval": 55, "range": 36, "fromParts": true, "parts": [2, 3],
-        "enraged": { "projectile": "death_laser", "damage": 30, "speed": 30, "interval": 20, "range": 40 } },
-      "life": 14000, "damage": 55, "defense": 26, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
+      "brain": { "type": "skeletron", "hoverHeight": 7, "spinInterval": 600, "spinDuration": 300, "spinSpeed": 12, "spinDefense": 24, "speedPerLostHand": 0, "phase2Life": 0.5 },
+      "life": 28000, "damage": 50, "defense": 24, "knockbackResist": 1.0, "size": [3.6, 3.6], "moveSpeed": 8, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
       "loot": "skeletron_prime", "value": 0,
       "boss": { "title": "Skeletron Prime", "flag": "defeated_skeletron_prime", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "music": "boss_mech",
-        "segments": 4, "segmentSpacing": 2.6, "segmentRadius": 1.0, "segmentModels": ["prime_saw", "prime_vice", "prime_cannon", "prime_laser"], "armModel": "prime_arm_strut",
+        "parts": [{ "enemy": "prime_saw", "offset": [-3.2, -1.2, 0.8] }, { "enemy": "prime_vice", "offset": [3.2, -1.2, 0.8] }, { "enemy": "prime_cannon", "offset": [-3.6, -2.6, -0.4], "mirror": true }, { "enemy": "prime_laser", "offset": [3.6, -2.6, -0.4] }],
+        "armModel": "prime_arm_strut",
         "enrage": { "when": [{ "type": "time", "is": "day" }], "setDamage": 1000, "setDefense": 9999, "speed": 2.5 } },
       "covers": ["terraria:skeletron_prime"]
-    }
+    },
+    { "id": "prime_saw", "model": "prime_saw", "tags": ["lava_immune", "mechanical"], "name": "Prime Saw", "description": "Jabs a whirring saw at whatever is near.", "brain": { "type": "skeletronHand", "style": "saw", "attackInterval": 36, "strikeSpeed": 16, "returnSpeed": 12, "strikeTicks": 40, "reach": 8 }, "life": 9000, "damage": 50, "defense": 38, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_saw"] },
+    { "id": "prime_vice", "model": "prime_vice", "tags": ["lava_immune", "mechanical"], "name": "Prime Vice", "description": "Creeps closer, then snaps shut on you.", "brain": { "type": "skeletronHand", "style": "vice", "attackInterval": 150, "windupTicks": 70, "strikeSpeed": 22, "returnSpeed": 10 }, "life": 9000, "damage": 30, "defense": 34, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_vice"] },
+    { "id": "prime_cannon", "model": "prime_cannon", "tags": ["lava_immune", "mechanical"], "name": "Prime Cannon", "description": "Lobs bombs from below the skull.", "brain": { "type": "skeletronHand", "style": "hold" }, "ranged": { "projectile": "prime_bomb", "damage": 30, "speed": 15, "interval": 90, "range": 40, "enraged": { "projectile": "prime_bomb", "damage": 30, "speed": 17, "interval": 45, "range": 40 } }, "life": 7000, "damage": 30, "defense": 23, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_cannon"] },
+    { "id": "prime_laser", "model": "prime_laser", "tags": ["lava_immune", "mechanical"], "name": "Prime Laser", "description": "Fires death lasers, faster once the skull is hurt.", "brain": { "type": "skeletronHand", "style": "hold" }, "ranged": { "projectile": "death_laser", "damage": 25, "speed": 30, "interval": 60, "range": 45, "enraged": { "projectile": "death_laser", "damage": 25, "speed": 32, "interval": 20, "range": 45 } }, "life": 6000, "damage": 30, "defense": 20, "knockbackResist": 1.0, "size": [2.2, 2.2], "gravity": false, "collideTerrain": false, "value": 0, "covers": ["terraria:prime_laser"] }
   ]
 }

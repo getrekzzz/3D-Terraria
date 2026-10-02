@@ -13,6 +13,10 @@ duck|Duck|early|ocean|critter
 faeling|Faeling|early|aether|critter
 ghost|Ghost|early|graveyard|flyer
 leech|Leech|prehardmode|wall of flesh|segmented
+prime_saw|Prime Saw|hardmode|skeletron prime|boss part
+prime_vice|Prime Vice|hardmode|skeletron prime|boss part
+prime_cannon|Prime Cannon|hardmode|skeletron prime|boss part,projectiles
+prime_laser|Prime Laser|hardmode|skeletron prime|boss part,projectiles
 """
 
 # id|Name|stage|kind

@@ -10,9 +10,11 @@ namespace Strata.Core.AI;
 /// leader's turning offset), and every <see cref="HandParams.AttackInterval"/> ticks winds up beside the target and
 /// strikes through where the target stood — a slap dropping from above, or a sideways swipe — then flies back. It holds
 /// its rest while its leader spins, flies through walls, and takes its leader's rage (damage, defense and speed).
+/// Prime's tools use the same phases in their own styles (<c>HandBrain.Styles</c>): the saw jabs without a wind-up,
+/// the vice creeps up before its lunge, and gun arms hold their place while their ranged attack fires.
 /// Phase: 0 rest, 1 wind-up, 2 strike, 3 recover. Counter = attacks made; Direction = strike velocity.
 /// </summary>
-public sealed class HandBrain : IBrain
+public sealed partial class HandBrain : IBrain
 {
     /// <summary>A strike carries on this far (m) past the point it aimed at.</summary>
     private const float Overshoot = 3f;
@@ -35,6 +37,7 @@ public sealed class HandBrain : IBrain
             npc.DefenseOverride = leader.DefenseOverride;
             npc.SpeedScale = leader.SpeedScale;
             npc.Frenzied = leader.Frenzied;
+            npc.Enraged = leader.Enraged; // a gun arm's enraged volley follows its body's second phase
             npc.Yaw = leader.Yaw;
         }
         float side = npc.LeaderOffset.X < 0 ? -1f : 1f;
@@ -48,10 +51,10 @@ public sealed class HandBrain : IBrain
         {
             case 1:
             {
-                var goal = WindupSpot(npc, target!.Center, side, leader);
+                var goal = _p.Style == HandParams.Vice ? Creep(npc, target!.Center) : WindupSpot(npc, target!.Center, side, leader);
                 var to = goal - npc.Center;
                 float d = to.Length();
-                float cap = _p.StrikeSpeed * 1.5f * speedMul;
+                float cap = (_p.Style == HandParams.Vice ? _p.ReturnSpeed * 0.4f : _p.StrikeSpeed * 1.5f) * speedMul;
                 npc.Velocity = d > 1e-3f ? to / d * MathF.Min(cap, d * 6f) : Vector3.Zero;
                 npc.Pose = "telegraph";
                 if (npc.Timer < _p.WindupTicks) return;
@@ -97,8 +100,15 @@ public sealed class HandBrain : IBrain
             npc.Timer--;
             return;
         }
+        if (_p.Style == HandParams.Hold)
+        {
+            npc.Timer = 0; // a gun arm never strikes: its ranged attack does the work
+            return;
+        }
         int wait = interval + (npc.Counter == 0 && side > 0 ? interval / 2 : 0);
-        if (npc.Timer >= wait) Begin(npc, 1);
+        if (npc.Timer < wait) return;
+        if (_p.Style == HandParams.Saw) Jab(npc, ctx, target.Center, speedMul);
+        else Begin(npc, 1);
     }
 
     private static void Begin(Npc npc, int phase)

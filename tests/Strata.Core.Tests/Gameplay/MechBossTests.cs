@@ -96,34 +96,6 @@ public class MechBossTests
     }
 
     [Fact]
-    public void WardenPrimeHoldsFourToolsAndOnlyItsGunsFire()
-    {
-        using var g = Arena();
-        var prime = Boss(g, "skeletron_prime", new Vector3(0, 7f, 8f));
-        Assert.Equal(4, prime.Segments.Count);
-        var fromParts = new List<int>();
-        var seen = new HashSet<long>();
-        for (int i = 0; i < 600; i++)
-        {
-            g.Ticks(1);
-            foreach (var p in g.World.Projectiles.All)
-                if (p.Owner == null && seen.Add(p.Id))
-                {
-                    // The part each shot left from.
-                    var start = p.Position - p.Velocity / Strata.Core.Common.Units.TicksPerSecond;
-                    int nearest = Enumerable.Range(0, 4).OrderBy(k => Vector3.DistanceSquared(prime.Segments[k], start)).First();
-                    fromParts.Add(nearest);
-                }
-        }
-        Assert.NotEmpty(fromParts);
-        Assert.All(fromParts, k => Assert.Contains(k, new[] { 2, 3 }));
-        // The guns (second pair) hang well below the skull, one either side (the saw and vice swipe, so they move).
-        Assert.True(prime.Segments[2].Y < prime.Center.Y - 1.8f && prime.Segments[3].Y < prime.Center.Y - 1.8f,
-            $"guns at {prime.Segments[2].Y:F1}/{prime.Segments[3].Y:F1}, skull at {prime.Center.Y:F1}");
-        Assert.True(Vector3.Distance(prime.Segments[2], prime.Segments[3]) > 4f);
-    }
-
-    [Fact]
     public void AllThreeMechanicalTerrorsMoveTheWorldOn()
     {
         using var g = Arena();

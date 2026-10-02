@@ -1958,6 +1958,48 @@
    "mechanics": [
     "segmented"
    ]
+  },
+  {
+   "id": "terraria:prime_saw",
+   "name": "Prime Saw",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "skeletron prime",
+   "mechanics": [
+    "boss part"
+   ]
+  },
+  {
+   "id": "terraria:prime_vice",
+   "name": "Prime Vice",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "skeletron prime",
+   "mechanics": [
+    "boss part"
+   ]
+  },
+  {
+   "id": "terraria:prime_cannon",
+   "name": "Prime Cannon",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "skeletron prime",
+   "mechanics": [
+    "boss part",
+    "projectiles"
+   ]
+  },
+  {
+   "id": "terraria:prime_laser",
+   "name": "Prime Laser",
+   "kind": "enemy",
+   "stage": "hardmode",
+   "source": "skeletron prime",
+   "mechanics": [
+    "boss part",
+    "projectiles"
+   ]
   }
  ]
 }
