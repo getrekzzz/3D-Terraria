@@ -1,11 +1,13 @@
 """Actions for generated humans, sampled every frame from pose functions (exact curves, authored easing, seamless
 loops).
 
-Whole-body clips: idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt, death, and strafe_left and
-strafe_right (runs at an angle to the hips, human/strafe.py). Upper-body actions that
-the game layers over them (swing, mine, thrust, shoot, bow, cast, drink, use, hold) live in human/actions.py. Undead
-folk (zombies, mummies) shamble with their arms held out; skeletons keep a hunch but walk normally. Item actions
-start every body from a living person's arms (see Motion.stance).
+Whole-body clips: idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt, death, strafe_left and
+strafe_right (runs at an angle to the hips, human/strafe.py), and the rest poses sit, sleep, bound and lie
+(human/rest_poses.py). Upper-body actions that the game layers over them (one per item use style: swing, mine, rapier,
+spear, whip, place, use, wave, hold, flail in human/actions.py; gun, bow, staff, tome, throw, hold_up, drink, eat,
+yoyo in human/actions_items.py) take their timing from data/config/use_styles.json. Undead folk (zombies, mummies)
+shamble with their arms held out; skeletons keep a hunch but walk normally. Item actions and rest poses start every
+body from a living person's arms (see Motion.stance).
 
 Every pose starts from a relaxed stance (arms lowered from the A-pose rest, elbows soft, fingers curled; the right
 hand in a loose grip for held items) and adds the clip's rotations. Poses are dicts of bone -> rotation ops (see
@@ -153,12 +155,12 @@ class Motion:
             "hurt": (0.4, self.hurt),
             "death": (1.3, self.death),
         }
-        from . import actions, strafe     # (import this module's helpers)
+        from . import actions, rest_poses, strafe     # (import this module's helpers)
         clips.update(strafe.clips(walk, clips["run"][0]))
         for name, (length, fn) in clips.items():
             self.clip(name, length, fn, base)
         acting = self.stance(acting=True)
-        for name, (length, fn) in actions.clips(self).items():
+        for name, (length, fn) in {**rest_poses.clips(self), **actions.clips(self)}.items():
             self.clip(name, length, fn, acting)
 
     def clip(self, name, length, fn, base):

@@ -19,6 +19,7 @@ public sealed partial class SwingTrail : Node3D
     {
         public PlayerEntity Player = null!;
         public bool Thrust;
+        public string Clip = UseTiming.Swing; // the clip whose window times it (a thrust's rapier or spear)
         public float Yaw, Pitch, HalfArc, Reach, Duration, StrikeStart, StrikeEnd;
         public Color Color;
         public float Age;
@@ -68,12 +69,14 @@ public sealed partial class SwingTrail : Node3D
         bool thrust = info.Has(ItemAction.Thrust) && !info.Has(ItemAction.Melee);
         var held = player.State.Inventory.Held;
         float size = held.Item == info.Item ? Prefixes.Size(held) : 1f;
-        var clip = _game.ItemUse.Timing.Clip(thrust ? UseTiming.Thrust : UseTiming.Swing);
+        string clipName = thrust ? _game.ItemUse.Timing.ThrustClip(info) : UseTiming.Swing;
+        var clip = _game.ItemUse.Timing.Clip(clipName);
         for (int i = _trails.Count - 1; i >= 0; i--)
             if (_trails[i].Player == player) Recycle(i);
         var t = _pool.Count > 0 ? _pool.Pop() : new Trail();
         t.Player = player;
         t.Thrust = thrust;
+        t.Clip = clipName;
         t.Yaw = Mathf.Atan2(facing.X, facing.Z);
         t.Pitch = Mathf.Clamp(Mathf.Asin(Mathf.Clamp(aim.Y, -1f, 1f)), -1.1f, 1.1f);
         t.HalfArc = thrust ? 0f : (info.Swing?.Arc ?? 150f) * Mathf.Pi / 360f;
@@ -117,7 +120,7 @@ public sealed partial class SwingTrail : Node3D
         foreach (var t in _trails)
         {
             float phase = t.Age / t.Duration;
-            float sweep = timing.Sweep(t.Thrust ? UseTiming.Thrust : UseTiming.Swing, phase);
+            float sweep = timing.Sweep(t.Clip, phase);
             if (phase < t.StrikeStart || sweep <= 0f) continue; // nothing to show through the wind-up
             if (!begun) _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
             begun = true;

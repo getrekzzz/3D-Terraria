@@ -61,8 +61,9 @@ public static partial class ContentValidator
             }
             ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");
             if (i.UseAmmo != null && !ammoClasses.Contains(i.UseAmmo)) ctx.Error(i, $"useAmmo '{i.UseAmmo}' has no ammo items.");
-            if (i.UseStyle == UseStyle.Shoot && i.Projectile == null && i.UseAmmo == null)
-                ctx.Error(i, "shoot items need a projectile or useAmmo.");
+            UseStyleChecks(ctx, i);
+            if (i.MaxStack > 1 && i.MaxStack != ItemDef.CommonMaxStack && i.Category != ItemCategory.Coin)
+                ctx.Error(i, $"stackable items stack to {ItemDef.CommonMaxStack} (Terraria 1.4.4); only coins stop sooner.");
             if (i.EquipSlot == EquipSlot.None && (i.Category is ItemCategory.Armor or ItemCategory.Accessory))
                 ctx.Error(i, "armor/accessory needs equipSlot.");
             if (MiscEquipSlot(i.Category) is { } misc && i.EquipSlot != misc && !(misc == EquipSlot.Pet && i.EquipSlot == EquipSlot.LightPet))
@@ -76,6 +77,22 @@ public static partial class ContentValidator
             ctx.Specs(i, SpecKind.Effect, i.SetEffects, "setEffects");
             if ((i.SetEffects.Length > 0 || i.SetBonus != null) && i.ArmorSet == null) ctx.Error(i, "setBonus/setEffects need an armorSet.");
         }
+    }
+
+    /// <summary>
+    /// Use styles: a style that releases something (gun, bow, staff, boomerang, yoyo, flail…) needs a projectile or
+    /// ammo; yoyos, flails and whips need damage; a weapon, tool or consumable should not end up without a style.
+    /// </summary>
+    private static void UseStyleChecks(Ctx ctx, ItemDef i)
+    {
+        string style = System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(i.UseStyle.ToString());
+        if (Gameplay.Items.UseStyleRules.Shoots(i.UseStyle) && i.Projectile == null && i.UseAmmo == null)
+            ctx.Error(i, $"{style} items need a projectile or useAmmo.");
+        if (i.UseStyle is (UseStyle.Yoyo or UseStyle.Flail or UseStyle.Whip) && i.Damage <= 0)
+            ctx.Error(i, $"{style} items need damage.");
+        bool usable = (i.IsWeapon && i.AmmoClass == null) || i.IsTool || i.Category is ItemCategory.Consumable or ItemCategory.Potion;
+        if (usable && Gameplay.Items.UseStyleRules.Resolve(i) == UseStyle.None)
+            ctx.Warn(i, "no useStyle, and none can be inferred from its stats (it plays no use action).");
     }
 
     /// <summary>The misc slot items of a category must be worn in (hooks, mounts, minecarts, pets); null for other categories.</summary>

@@ -20,7 +20,7 @@ internal static class DerivedContent
                 Name = block.Name,
                 Description = block.Description,
                 Category = ItemCategory.Block,
-                MaxStack = 9999,
+                MaxStack = ItemDef.CommonMaxStack,
                 Value = block.ItemValue,
                 UseStyle = UseStyle.Place,
                 UseTime = 12,

@@ -15,20 +15,20 @@
     { "id": "cooking_pot", "name": "Cooking Pot", "description": "Used for cooking food.", "size": [3, 2, 3], "interaction": "station", "stations": ["cooking_pot"], "hitPoints": 3, "itemCategory": "station", "itemValue": 2000 }
   ],
   "items": [
-    { "id": "magic_mirror", "name": "Magic Mirror", "description": "Gaze in the mirror to return home.", "category": "tool", "rarity": 1, "value": 50000, "useStyle": "consume", "useTime": 90, "useAnimation": 90,
+    { "id": "magic_mirror", "name": "Magic Mirror", "description": "Gaze in the mirror to return home.", "category": "tool", "rarity": 1, "value": 50000, "useStyle": "holdUp", "useTime": 90, "useAnimation": 90,
       "heldLight": [5, 8, 12], "behaviors": [{ "type": "consume", "recall": true }], "covers": ["terraria:magic_mirror"] },
-    { "id": "recall_potion", "name": "Recall Potion", "description": "Teleports you home.", "category": "potion", "maxStack": 30, "value": 1000, "useStyle": "consume", "useTime": 17, "useAnimation": 17,
+    { "id": "recall_potion", "name": "Recall Potion", "description": "Teleports you home.", "category": "potion", "maxStack": 9999, "value": 1000, "useStyle": "drink", "useTime": 17, "useAnimation": 17,
       "consumable": true, "behaviors": [{ "type": "consume", "recall": true }], "covers": ["terraria:recall_potion"] },
 
-    { "id": "wooden_fishing_pole", "name": "Wooden Fishing Pole", "description": "Cast into water, then use again when the bobber dips.", "category": "fishing", "value": 1000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "wooden_fishing_pole", "name": "Wooden Fishing Pole", "description": "Cast into water, then use again when the bobber dips.", "category": "fishing", "value": 1000, "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 11, "behaviors": [{ "type": "fishing", "power": 5 }], "covers": ["terraria:wooden_fishing_pole"] },
-    { "id": "reinforced_fishing_pole", "name": "Reinforced Fishing Pole", "category": "fishing", "rarity": 1, "value": 10000, "tags": ["shop"], "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "reinforced_fishing_pole", "name": "Reinforced Fishing Pole", "category": "fishing", "rarity": 1, "value": 10000, "tags": ["shop"], "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 12, "behaviors": [{ "type": "fishing", "power": 20 }] },
-    { "id": "fisher_of_souls", "name": "Fisher of Souls", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "fisher_of_souls", "name": "Fisher of Souls", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 13, "behaviors": [{ "type": "fishing", "power": 20 }] },
-    { "id": "fleshcatcher", "name": "Fleshcatcher", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "fleshcatcher", "name": "Fleshcatcher", "category": "fishing", "rarity": 1, "value": 10000, "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 13, "behaviors": [{ "type": "fishing", "power": 22 }], "covers": ["terraria:fleshcatcher"] },
-    { "id": "golden_fishing_rod", "name": "Golden Fishing Rod", "category": "fishing", "rarity": 3, "value": 500000, "tags": ["shop"], "useStyle": "shoot", "useTime": 8, "useAnimation": 8,
+    { "id": "golden_fishing_rod", "name": "Golden Fishing Rod", "category": "fishing", "rarity": 3, "value": 500000, "tags": ["shop"], "useStyle": "swing", "useTime": 8, "useAnimation": 8,
       "projectile": "bobber", "shootSpeed": 17, "behaviors": [{ "type": "fishing", "power": 50 }], "covers": ["terraria:golden_fishing_rod"] },
 
     { "id": "bass", "name": "Bass", "category": "material", "maxStack": 9999, "value": 100, "tags": ["fish"] },
@@ -43,14 +43,14 @@
     { "id": "prismite", "name": "Prismite", "category": "material", "rarity": 2, "maxStack": 9999, "value": 5000, "tags": ["fish"] },
     { "id": "specular_fish", "name": "Specular Fish", "category": "material", "maxStack": 9999, "value": 1500, "tags": ["fish"] },
     { "id": "armored_cavefish", "name": "Armored Cavefish", "category": "material", "maxStack": 9999, "value": 1500, "tags": ["fish"] },
-    { "id": "cooked_fish", "name": "Cooked Fish", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 30, "value": 500, "useStyle": "consume", "useTime": 17, "useAnimation": 17,
+    { "id": "cooked_fish", "name": "Cooked Fish", "description": "Minor improvements to all stats.", "category": "consumable", "maxStack": 9999, "value": 500, "useStyle": "eat", "useTime": 17, "useAnimation": 17,
       "consumable": true, "buff": { "id": "well_fed", "ticks": 72000 } },
 
-    { "id": "wooden_crate", "name": "Wooden Crate", "description": "Right click to open.", "category": "container", "maxStack": 9999, "value": 5000, "useStyle": "consume", "useTime": 20, "useAnimation": 20,
+    { "id": "wooden_crate", "name": "Wooden Crate", "description": "Right click to open.", "category": "container", "maxStack": 9999, "value": 5000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20,
       "consumable": true, "behaviors": [{ "type": "consume", "loot": "wooden_crate" }] },
-    { "id": "iron_crate", "name": "Iron Crate", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 10000, "useStyle": "consume", "useTime": 20, "useAnimation": 20,
+    { "id": "iron_crate", "name": "Iron Crate", "description": "Right click to open.", "category": "container", "rarity": 1, "maxStack": 9999, "value": 10000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20,
       "consumable": true, "behaviors": [{ "type": "consume", "loot": "iron_crate" }] },
-    { "id": "golden_crate", "name": "Golden Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "consume", "useTime": 20, "useAnimation": 20,
+    { "id": "golden_crate", "name": "Golden Crate", "description": "Right click to open.", "category": "container", "rarity": 2, "maxStack": 9999, "value": 50000, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20,
       "consumable": true, "behaviors": [{ "type": "consume", "loot": "golden_crate" }] }
   ],
   "recipes": [

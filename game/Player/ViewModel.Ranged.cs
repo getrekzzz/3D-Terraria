@@ -19,7 +19,9 @@ namespace Strata.Game.Player;
 /// </summary>
 public sealed partial class ViewModel
 {
-    private const string Shoot = "shoot", Cast = "cast";
+    // Body clips (data/config/use_styles.json) the view model poses by: guns and generic shooters, staffs, tomes, and
+    // the throws and whips it raises like a swing.
+    private const string Gun = "gun", Staff = "staff", Tome = "tome", Throw = "throw", Whip = "whip";
 
     // Rest poses in the aim frame (offset from Rest, Euler rotation). The bow is turned so its back (model −X) faces
     // the target and canted a little, top to the right; guns turn their barrel (+Y) along −Z, top (model −Z) up;
@@ -63,7 +65,7 @@ public sealed partial class ViewModel
     {
         get
         {
-            if (_style is not (UseTiming.Bow or Shoot) || _model == null || !IsVisibleInTree()) return -1f;
+            if (_style is not (UseTiming.Bow or Gun) || _model == null || !IsVisibleInTree()) return -1f;
             var eye = _controller.Rig.Camera.GlobalTransform;
             var target = eye.Origin - eye.Basis.Z * Mathf.Clamp(_controller.Entity.AimDistance, MinAimDistance, MaxAimDistance);
             var b = GlobalBasis;
@@ -75,7 +77,7 @@ public sealed partial class ViewModel
     private static Pose RangedRest(string style) => style switch
     {
         UseTiming.Bow => BowRest,
-        Shoot => GunRest,
+        Gun => GunRest,
         _ => StaffRest,
     };
 
@@ -94,7 +96,7 @@ public sealed partial class ViewModel
                     : 1f - Ease((t - snap) / (redraw - snap));
                 return new Pose(BowRest.Offset + new Vector3(0f, 0f, -BowKick * kick), BowRest.Rotation);
             }
-            case Cast:
+            case Staff or Tome:
             {
                 // Pushed toward the target as the bolt leaves (it fires as the use starts), held, then eased back.
                 float push = t < 0.12f ? 1f - Mathf.Pow(1f - t / 0.12f, 2f) : t < 0.3f ? 1f : 1f - Ease((t - 0.3f) / 0.7f);
@@ -123,7 +125,7 @@ public sealed partial class ViewModel
     /// <summary>Every shot of the held gun, a burst's included, kicks it.</summary>
     private void OnUsed(PlayerEntity p, ItemUseInfo info, UseOutcome outcome)
     {
-        if (outcome == UseOutcome.Shot && p == _controller.Entity && info.Item == _item && _style == Shoot) _kick = 1f;
+        if (outcome == UseOutcome.Shot && p == _controller.Entity && info.Item == _item && _style == Gun) _kick = 1f;
     }
 
     private void AddArrow(MeshInstance3D bow)

@@ -56,7 +56,7 @@ public static partial class ItemTooltip
         if (item.ManaCost > 0) lines.Add(($"Uses {ManaCost(stack, ctx)} mana", TooltipKind.Stat));
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject)) lines.Add(("Can be placed", TooltipKind.Info));
         if (item.AmmoClass != null) lines.Add(("Ammo", TooltipKind.Info));
-        if (item.Consumable && info.Has(ItemAction.Consume)) lines.Add(("Consumable", TooltipKind.Info));
+        if (item.Consumable && info.Has(ItemAction.Consume | ItemAction.SummonBoss)) lines.Add(("Consumable", TooltipKind.Info));
         if (ctx.UsedInRecipes) lines.Add(("Material", TooltipKind.Info));
         DescriptionLines(item, ctx, lines);
         ModifierLines(stack.Prefix, lines);
