@@ -3911,6 +3911,20 @@
    "source": "boss (expert)"
   },
   {
+   "id": "terraria:demon_heart",
+   "name": "Demon Heart",
+   "kind": "consumable",
+   "stage": "hardmode",
+   "source": "wall of flesh (expert)"
+  },
+  {
+   "id": "terraria:minecart_upgrade_kit",
+   "name": "Minecart Upgrade Kit",
+   "kind": "consumable",
+   "stage": "hardmode",
+   "source": "mechanical pieces"
+  },
+  {
    "id": "terraria:skeletron_mask",
    "name": "Skeletron Mask",
    "kind": "armor",
@@ -3923,6 +3937,27 @@
    "kind": "accessory",
    "stage": "early",
    "source": "skeletron (expert)"
+  },
+  {
+   "id": "terraria:mechanical_wheel_piece",
+   "name": "Mechanical Wheel Piece",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "the twins (expert)"
+  },
+  {
+   "id": "terraria:mechanical_battery_piece",
+   "name": "Mechanical Battery Piece",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "the destroyer (expert)"
+  },
+  {
+   "id": "terraria:mechanical_wagon_piece",
+   "name": "Mechanical Wagon Piece",
+   "kind": "material",
+   "stage": "hardmode",
+   "source": "skeletron prime (expert)"
   },
   {
    "id": "terraria:skeletron_hand",
@@ -3993,6 +4028,83 @@
    "kind": "furniture",
    "stage": "early",
    "source": "wall of flesh"
+  },
+  {
+   "id": "terraria:queen_slime_trophy",
+   "name": "Queen Slime Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "queen slime"
+  },
+  {
+   "id": "terraria:retinazer_trophy",
+   "name": "Retinazer Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "retinazer"
+  },
+  {
+   "id": "terraria:spazmatism_trophy",
+   "name": "Spazmatism Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "spazmatism"
+  },
+  {
+   "id": "terraria:destroyer_trophy",
+   "name": "Destroyer Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "destroyer"
+  },
+  {
+   "id": "terraria:skeletron_prime_trophy",
+   "name": "Skeletron Prime Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "skeletron prime"
+  },
+  {
+   "id": "terraria:plantera_trophy",
+   "name": "Plantera Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "plantera"
+  },
+  {
+   "id": "terraria:golem_trophy",
+   "name": "Golem Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "golem"
+  },
+  {
+   "id": "terraria:duke_fishron_trophy",
+   "name": "Duke Fishron Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "duke fishron"
+  },
+  {
+   "id": "terraria:empress_of_light_trophy",
+   "name": "Empress of Light Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "empress of light"
+  },
+  {
+   "id": "terraria:ancient_cultist_trophy",
+   "name": "Ancient Cultist Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "ancient cultist"
+  },
+  {
+   "id": "terraria:moon_lord_trophy",
+   "name": "Moon Lord Trophy",
+   "kind": "furniture",
+   "stage": "hardmode",
+   "source": "moon lord"
   }
  ]
 }

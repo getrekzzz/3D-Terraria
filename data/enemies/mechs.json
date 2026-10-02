@@ -30,11 +30,6 @@
     { "id": "mechanical_worm", "output": "mechanical_worm", "inputs": [{ "item": "soul_of_night", "count": 6 }, { "item": "iron_bar", "count": 5 }, { "item": "demonite_ore", "count": 10 }], "stations": ["hardmode_anvil"] },
     { "id": "mechanical_skull", "output": "mechanical_skull", "inputs": [{ "item": "bone", "count": 30 }, { "item": "iron_bar", "count": 5 }, { "item": "soul_of_light", "count": 3 }, { "item": "soul_of_night", "count": 3 }], "stations": ["hardmode_anvil"] }
   ],
-  "lootTables": [
-    { "id": "the_twins", "coins": [15000, 22000], "entries": [{ "item": "hallowed_bar", "min": 8, "max": 15 }, { "item": "soul_of_sight", "min": 12, "max": 20 }, { "item": "greater_healing_potion", "min": 3, "max": 8 }] },
-    { "id": "the_destroyer", "coins": [30000, 45000], "entries": [{ "item": "hallowed_bar", "min": 15, "max": 30 }, { "item": "soul_of_might", "min": 25, "max": 40 }, { "item": "greater_healing_potion", "min": 5, "max": 15 }] },
-    { "id": "skeletron_prime", "coins": [30000, 45000], "entries": [{ "item": "hallowed_bar", "min": 15, "max": 30 }, { "item": "soul_of_fright", "min": 25, "max": 40 }, { "item": "greater_healing_potion", "min": 5, "max": 15 }] }
-  ],
   "enemies": [
     {
       "id": "retinazer", "facing": "look", "model": "retinazer", "tags": ["boss", "lava_immune", "mechanical"], "name": "Retinazer",
@@ -44,7 +39,7 @@
         "enraged": { "projectile": "death_laser", "damage": 26, "speed": 34, "interval": 18, "range": 45 } },
       "life": 8000, "damage": 45, "defense": 12, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 9, "gravity": false, "collideTerrain": false, "light": [10, 2, 2],
       "loot": "the_twins", "value": 0,
-      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["spazmatism"] },
+      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "lootOnDefeat": true, "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech", "companions": ["spazmatism"] },
       "covers": ["terraria:the_twins"]
     },
     {
@@ -55,7 +50,7 @@
         "enraged": { "projectile": "eye_fire", "damage": 22, "speed": 17, "interval": 6, "count": 2, "spread": 8, "range": 12 } },
       "life": 8000, "damage": 50, "defense": 10, "knockbackResist": 1.0, "size": [5.2, 5.2], "moveSpeed": 10, "gravity": false, "collideTerrain": false, "light": [2, 10, 2],
       "loot": "the_twins", "value": 0,
-      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech" }
+      "boss": { "title": "The Twins", "flag": "defeated_the_twins", "lootOnDefeat": true, "alsoFlags": ["defeated_mechanical_boss"], "arenaRadius": 200, "despawnAtDay": true, "music": "boss_mech" }
     },
     {
       "id": "the_destroyer", "model": "the_destroyer_head", "tags": ["boss", "lava_immune", "mechanical"], "name": "The Destroyer",

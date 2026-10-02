@@ -37,6 +37,8 @@ public sealed class PlayerSave
     public DateTime LastPlayedUtc { get; set; }
     public int MaxLife { get; set; }
     public int MaxMana { get; set; }
+    public bool ExtraAccessorySlot { get; set; }
+    public bool MinecartUpgrade { get; set; }
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? Extra { get; set; }
@@ -66,6 +68,8 @@ public sealed class PlayerSave
         LastPlayedUtc = p.LastPlayedUtc,
         MaxLife = p.Vitals.MaxLife,
         MaxMana = p.Vitals.MaxMana,
+        ExtraAccessorySlot = p.ExtraAccessorySlot,
+        MinecartUpgrade = p.MinecartUpgrade,
     };
 
     public PlayerState ToState(ContentDatabase content)
@@ -74,6 +78,7 @@ public sealed class PlayerSave
         {
             BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, Look = Look ?? new Appearance(), Difficulty = Difficulty,
             PlayTicks = PlayTicks, CreatedUtc = CreatedUtc, LastPlayedUtc = LastPlayedUtc,
+            ExtraAccessorySlot = ExtraAccessorySlot, MinecartUpgrade = MinecartUpgrade,
         };
         Fill(p.Inventory.Backpack, Backpack, content);
         Fill(p.Inventory.Armor, Armor, content);

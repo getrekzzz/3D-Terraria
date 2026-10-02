@@ -50,19 +50,8 @@
       "equipEffects": [{ "type": "flight", "time": 180, "ascent": 50, "maxRise": 9, "glide": 2, "airSpeed": 1.6 }] }
   ],
   "lootTables": [
-    { "id": "queen_slime", "coins": [40000, 60000], "entries": [
-      { "item": "blade_staff", "chance": 0.5 }, { "item": "gel", "min": 50, "max": 100 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
-      { "item": "volatile_gelatin", "conditions": [{ "type": "expert" }] }
-    ] },
-    { "id": "duke_fishron", "coins": [80000, 120000], "entries": [
-      { "table": "duke_fishron_weapon" }, { "item": "fishron_wings", "chance": 0.15 }, { "item": "greater_healing_potion", "min": 5, "max": 15 },
-      { "item": "shrimpy_truffle", "conditions": [{ "type": "expert" }] }
-    ] },
     { "id": "duke_fishron_weapon", "mode": "weighted", "entries": [
       { "item": "flairon" }, { "item": "tsunami" }, { "item": "razorblade_typhoon_book" }, { "item": "bubble_gun" }, { "item": "tempest_staff" }
-    ] },
-    { "id": "empress_of_light", "coins": [100000, 150000], "entries": [
-      { "table": "empress_weapon" }, { "item": "terraprisma", "chance": 0.1 }, { "item": "empress_wings", "chance": 0.1 }, { "item": "greater_healing_potion", "min": 5, "max": 15 }
     ] },
     { "id": "empress_weapon", "mode": "weighted", "entries": [{ "item": "nightglow" }, { "item": "starlight" }] },
     { "id": "lacewing", "entries": [{ "item": "prismatic_lacewing" }] },

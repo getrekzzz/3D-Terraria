@@ -112,6 +112,15 @@
   `consume` behaviour rolling `<boss>_bag` = the drops plus the Expert-only item). A new boss's bag is data only (bag
   item, three tables, trophy, `tools/blender/assets.d/p4-04-boss-loot.json` rows: `trophy` builds the boss's own
   creature generator into the plaque as a bust, `treasure_bag` takes colours; `bgen/trophies.py`).
+* **Hardmode boss loot** — every hardmode boss table moved to `data/loot/bosses.json` in the same main/`_drops`/`_bag`
+  layout (Queen Slime, the Twins, the Destroyer, Skeletron Prime, Plantera, Golem, Duke Fishron, Empress of Light, Moon
+  Lord; the Lunatic Cultist has a trophy but no bag, as in Terraria). The Twins share `the_twins` with `lootOnDefeat`, so
+  the last to fall drops one bag (and rolls both twins' trophies). Expert items: Volatile Gelatin, the three mechanical
+  pieces (wheel, battery, wagon; `data/items/expert_items.json`) that make the Minecart Upgrade Kit at a Tinkerer's
+  Workshop, Spore Sac, Shiny Stone, Shrimpy Truffle and the Wall of Flesh's Demon Heart. `consume` behaviours
+  `extraAccessorySlot` (Expert/Master worlds only, once) and `minecartUpgrade` (once) set the saved
+  `PlayerState.ExtraAccessorySlot` / `MinecartUpgrade`; an upgraded player's carts get `MinecartRide.SpeedScale` 1.25.
+  The sixth accessory slot itself is not drawn or equipped yet (inventory UI gap).
 * **Skeletron** — the `skeletron` (CryptWarden) brain hovers over its target and every `spinInterval` ticks spins
   at it through walls for `spinDuration` (`spinDefense` while spinning, `boss_roar` cue; the drawn whirl is the
   `spin` pose, the simulated facing turns slowly so the hands keep their sides); it moves `speedPerLostHand` faster

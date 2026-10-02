@@ -13,6 +13,11 @@ public sealed partial class ItemUseSystem
         if (item.HealLife > 0 && _healingCooldown != null && state.Buffs.Has(_healingCooldown.Id)) return Refuse(_healingCooldown.DisplayName);
         if (cfg.PermanentLife > 0 && Player.PlayerState.BaseLife + state.BonusLife >= cfg.LifeCap) return UseOutcome.Blocked;
         if (cfg.PermanentMana > 0 && Player.PlayerState.BaseMana + state.BonusMana >= cfg.ManaCap) return UseOutcome.Blocked;
+        if (cfg.ExtraAccessorySlot && (state.ExtraAccessorySlot || _world.Session.Settings.Difficulty is not (World.Difficulty.Expert or World.Difficulty.Master)))
+            return UseOutcome.Blocked;
+        if (cfg.MinecartUpgrade && state.MinecartUpgrade) return UseOutcome.Blocked;
+        if (cfg.ExtraAccessorySlot) state.ExtraAccessorySlot = true;
+        if (cfg.MinecartUpgrade) state.MinecartUpgrade = true;
 
         if (cfg.PermanentLife > 0) state.BonusLife += cfg.PermanentLife;
         if (cfg.PermanentMana > 0) state.BonusMana += cfg.PermanentMana;
