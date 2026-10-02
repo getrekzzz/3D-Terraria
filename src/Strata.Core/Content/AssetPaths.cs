@@ -8,6 +8,10 @@ namespace Strata.Core.Content;
 /// </summary>
 public static class AssetPaths
 {
+    /// <summary>A sound effect id exists as assets/audio/sfx/&lt;id&gt;.wav or its first variant &lt;id&gt;_1.wav.</summary>
+    public static bool SoundExists(string id, Func<string, bool> exists) =>
+        exists($"assets/audio/sfx/{id}.wav") || exists($"assets/audio/sfx/{id}_1.wav");
+
     public static string ItemIcon(ItemDef item) => $"assets/icons/items/{item.Icon ?? item.Id}.png";
 
     /// <summary>A pixel-art UI sprite (heart, star, slot silhouette, pointer…) from tools/textures/build_ui.py.</summary>

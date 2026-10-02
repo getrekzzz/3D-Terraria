@@ -28,6 +28,7 @@ public static partial class ContentValidator
             ctx.Ref(i, ctx.Db.Buffs, i.Buff?.Id, "buff");
             ctx.Light(i, i.HeldLight, "heldLight");
             ctx.Asset(i, AssetPaths.ItemModel(i, ctx.Db), "model");
+            ctx.Sound(i, i.SoundSet, "soundSet");
             foreach (var b in i.Behaviors.Where(b => b.Type == Specs.ItemBehaviorSpecs.SummonBoss))
             {
                 if (b.Raw.TryGetProperty("enemy", out var enemy)) ctx.Ref(i, ctx.Db.Enemies, enemy.GetString(), "summonBoss.enemy");

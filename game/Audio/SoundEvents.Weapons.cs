@@ -2,12 +2,14 @@ using System.Linq;
 using Godot;
 using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Interaction;
+using Strata.Core.Presentation;
 using Strata.Core.Session;
 
 namespace Strata.Game.Audio;
 
 /// <summary>
-/// The local player's item use: swings and shots by weapon kind, a dry click or a mana fizzle for a press that could not
+/// The local player's item use: the item's sound set, else its use style's sound (swings, shots, throws, whips, yoyos,
+/// flails, food and drinks), else swings and shots by weapon kind; a dry click or a mana fizzle for a press that could not
 /// be used, drinks, wiring and nets.
 /// </summary>
 public sealed partial class SoundEvents
@@ -33,7 +35,7 @@ public sealed partial class SoundEvents
         switch (outcome)
         {
             case UseOutcome.Swung:
-                Sfx.Play("swing", item.UseTime < 18 ? -3f : 0f);
+                Sfx.Play(UseSound(info) ?? "swing", item.UseTime < 18 ? -3f : 0f);
                 break;
             case UseOutcome.Mined or UseOutcome.Damaged or UseOutcome.HitObject or UseOutcome.TooHard or UseOutcome.WrongTool:
                 if (newSwing && info.IsTool) Sfx.Play("swing", -6f); // the tool's whoosh under the bite of the hit
@@ -41,10 +43,11 @@ public sealed partial class SoundEvents
                 if (outcome == UseOutcome.TooHard && Engine.GetProcessFrames() != _tinkFrame) Sfx.Play("tink", -6f);
                 break;
             case UseOutcome.Shot:
-                Sfx.Play(ShotSound(item), item.UseTime <= 6 ? -5f : 0f);
+                Sfx.Play(UseSound(info) ?? ShotSound(item), item.UseTime <= 6 ? -5f : 0f);
                 break;
             case UseOutcome.Consumed:
-                if (item.HealLife > 0) Sfx.Play("potion");
+                if (UseSound(info) is { } own) Sfx.Play(own);
+                else if (item.HealLife > 0) Sfx.Play("potion");
                 else if (item.HealMana > 0) Sfx.Play("mana");
                 else if (item.Category == ItemCategory.BossSummon) Sfx.Play("summon");
                 else Sfx.Play("heal", -4f);
@@ -66,6 +69,10 @@ public sealed partial class SoundEvents
         }
     }
 
+    /// <summary>The item's soundSet, else its use style's sound (data/config/use_styles.json); null = the fallbacks here.</summary>
+    private string? UseSound(Strata.Core.Gameplay.Items.ItemUseInfo info) => ItemSounds.Resolve(info, _game.Styles, Sfx.Exists);
+
+    /// <summary>Shots of a style without a sound of its own (held out, grappling hooks): by ammo and damage class.</summary>
     private static string ShotSound(ItemDef item)
     {
         if (item.UseAmmo == "arrow") return "bow";
