@@ -71,4 +71,54 @@ public class HardmodeBossPhaseTests
         Assert.Contains(kinds, k => k is "crystal_slime" or "bouncy_slime" or "heavenly_slime");
         Assert.True(kinds.Count(k => k is "crystal_slime" or "bouncy_slime" or "heavenly_slime") >= 2, string.Join(",", kinds));
     }
+
+    [Fact]
+    public void DukeEnragesOutOfTheOcean()
+    {
+        using var g = Arena();
+        var messages = new List<string>();
+        g.World.Npcs.Announced += messages.Add;
+        var duke = Boss(g, "duke_fishron", new Vector3(0, 6f, 12f));
+        Run(g, 35);
+        Assert.True(duke.Frenzied, "the forest is not the ocean");
+        Assert.Equal(100, duke.Defense);
+        Assert.Equal(1.5f, duke.SpeedScale);
+        Assert.Contains("Duke Fishron is enraged!", messages);
+    }
+
+    [Fact]
+    public void DukeEntersPhaseThreeBelowFifteenPercent()
+    {
+        using var g = Arena();
+        var duke = Boss(g, "duke_fishron", new Vector3(0, 6f, 12f));
+        duke.Life = (int)(duke.MaxLife * 0.4f);
+        Run(g, 5);
+        Assert.Equal(1, duke.Stage);
+        duke.Life = (int)(duke.MaxLife * 0.1f);
+        Run(g, 5);
+        Assert.Equal(2, duke.Stage);
+    }
+
+    [Fact]
+    public void EmpressIsLethalByDay()
+    {
+        using var g = Arena();
+        var empress = Boss(g, "empress_of_light", new Vector3(0, 6f, 12f));
+        Run(g, 35);
+        Assert.False(empress.Frenzied);
+        Assert.True(g.World.Npcs.ContactBase(empress) < 1000);
+
+        g.World.Session.Clock.SetHour(12f);
+        Run(g, 35);
+        Assert.Contains(empress, g.World.Npcs.All); // she stays for the day
+        Assert.True(empress.Frenzied);
+        Assert.Equal(9999, g.World.Npcs.ContactBase(empress));
+        var seen = new HashSet<Projectile>();
+        Run(g, 400, () => g.World.Projectiles.All.Any(p => p.Owner == null && seen.Add(p) && p.Damage >= 9999));
+        Assert.Contains(g.World.Projectiles.All, p => p.Owner == null && p.Damage >= 9999);
+
+        g.World.Session.Clock.SetHour(22f); // the rage holds once it starts
+        Run(g, 35);
+        Assert.True(empress.Frenzied);
+    }
 }

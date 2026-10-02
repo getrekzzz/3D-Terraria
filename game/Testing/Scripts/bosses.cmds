@@ -97,6 +97,8 @@ time 22
 boss empress_of_light 14
 wait 2
 assert npcs.empress_of_light == 1
+# By night she is not enraged; by day she would be lethal (P4-32).
+assert boss.empress_of_light.frenzied == 0
 slay empress_of_light
 assert flag.defeated_empress_of_light == 1
 killall
