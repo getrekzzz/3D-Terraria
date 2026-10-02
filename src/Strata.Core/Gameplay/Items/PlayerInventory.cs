@@ -1,21 +1,63 @@
-using Strata.Core.Content.Defs;
-
 namespace Strata.Core.Gameplay.Items;
 
-/// <summary>The player's storage: 50-slot backpack (first 10 are the hotbar), equipment and a cursor stack.</summary>
-public sealed class PlayerInventory
+/// <summary>
+/// The player's storage, laid out like the reference game's: the 50-slot backpack (first 10 are the hotbar), coin and
+/// ammo slots, a trash slot that is saved, the equipment (<see cref="PlayerInventory"/>.Equipment.cs) and a cursor stack.
+/// </summary>
+public sealed partial class PlayerInventory
 {
     public const int HotbarSize = 10;
     public const int BackpackSize = 50;
+    public const int CoinSlots = 4;
+    public const int AmmoSlots = 4;
     public const int ArmorSlots = 3;
-    public const int AccessorySlots = 5;
 
-    public Inventory Backpack { get; } = new(BackpackSize);
+    /// <summary>Accessory slots every world has; Expert worlds unlock a 6th and Master worlds a 7th.</summary>
+    public const int BaseAccessorySlots = 5;
+    public const int MaxAccessorySlots = 7;
+
+    /// <summary>One dye per armor piece (0–2), then one per accessory slot (3–9).</summary>
+    public const int DyeSlots = ArmorSlots + MaxAccessorySlots;
+
+    public PlayerInventory()
+    {
+        EquipmentStorages = new[] { Armor, Accessories, VanityArmor, VanityAccessories, Dyes, Misc, MiscDyes };
+        AllStorages = new[] { Backpack, Coins, Ammo, Armor, Accessories, VanityArmor, VanityAccessories, Dyes, Misc, MiscDyes, Service };
+        foreach (var storage in EquipmentStorages) storage.Changed += _ => EquipmentChanged?.Invoke();
+    }
+
+    public Inventory Backpack { get; } = new(BackpackSize, keepsFavorites: true);
+
+    public Inventory Coins { get; } = new(CoinSlots, keepsFavorites: true);
+
+    public Inventory Ammo { get; } = new(AmmoSlots, keepsFavorites: true);
+
+    /// <summary>The last item thrown away; it stays until something else is trashed (and survives quitting).</summary>
+    public Inventory Trash { get; } = new(1);
 
     /// <summary>Head, body, legs.</summary>
     public Inventory Armor { get; } = new(ArmorSlots);
 
-    public Inventory Accessories { get; } = new(AccessorySlots);
+    /// <summary>Functional accessories; only the first <see cref="AccessorySlotsUnlocked"/> count.</summary>
+    public Inventory Accessories { get; } = new(MaxAccessorySlots);
+
+    /// <summary>Armor shown instead of the worn pieces (head, body, legs); grants nothing.</summary>
+    public Inventory VanityArmor { get; } = new(ArmorSlots);
+
+    /// <summary>Accessories worn for their looks only, one per accessory slot.</summary>
+    public Inventory VanityAccessories { get; } = new(MaxAccessorySlots);
+
+    /// <summary>Dyes for the armor pieces (0–2) and the accessory slots (3–9).</summary>
+    public Inventory Dyes { get; } = new(DyeSlots);
+
+    /// <summary>Pet, light pet, minecart, mount and hook, indexed by <see cref="MiscSlot"/>.</summary>
+    public Inventory Misc { get; } = new(MiscSlots.Count);
+
+    /// <summary>Dyes for the misc row, indexed by <see cref="MiscSlot"/>.</summary>
+    public Inventory MiscDyes { get; } = new(MiscSlots.Count);
+
+    /// <summary>The item handed to a town service (the Goblin Tinkerer's reforge slot); the service UI stows it when it closes.</summary>
+    public Inventory Service { get; } = new(1);
 
     /// <summary>Stack held by the mouse cursor while rearranging.</summary>
     public ItemStack Cursor { get; set; }
@@ -34,45 +76,4 @@ public sealed class PlayerInventory
 
     /// <summary>Picks up an item into the backpack (hotbar first). Returns the remainder.</summary>
     public ItemStack Pickup(ItemStack stack) => Backpack.Add(stack);
-
-    /// <summary>Equips the item in a backpack slot into the matching equipment slot (swapping).</summary>
-    public bool Equip(int backpackSlot)
-    {
-        var s = Backpack[backpackSlot];
-        if (s.IsEmpty) return false;
-        switch (s.Item!.EquipSlot)
-        {
-            case EquipSlot.Head: Inventory.Transfer(Backpack, backpackSlot, Armor, 0); return true;
-            case EquipSlot.Body: Inventory.Transfer(Backpack, backpackSlot, Armor, 1); return true;
-            case EquipSlot.Legs: Inventory.Transfer(Backpack, backpackSlot, Armor, 2); return true;
-            case EquipSlot.Accessory:
-                for (int i = 0; i < AccessorySlots; i++)
-                    if (Accessories[i].IsEmpty || Accessories[i].Item == s.Item)
-                    {
-                        if (Accessories[i].Item == s.Item) return false; // no duplicate accessories
-                        Inventory.Transfer(Backpack, backpackSlot, Accessories, i);
-                        return true;
-                    }
-                Inventory.Transfer(Backpack, backpackSlot, Accessories, 0);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public IEnumerable<ItemDef> EquippedItems =>
-        Armor.Stacks.Concat(Accessories.Stacks).Select(s => s.Item!);
-
-    /// <summary>The worn armor pieces when head, body and legs all share one armor set; otherwise empty.</summary>
-    public IReadOnlyList<ItemDef> CompleteSet()
-    {
-        var set = Armor[0].Item?.ArmorSet;
-        if (set == null) return Array.Empty<ItemDef>();
-        for (int i = 1; i < ArmorSlots; i++)
-            if (Armor[i].Item?.ArmorSet != set) return Array.Empty<ItemDef>();
-        return new[] { Armor[0].Item!, Armor[1].Item!, Armor[2].Item! };
-    }
-
-    /// <summary>Equipped stacks (with their prefixes).</summary>
-    public IEnumerable<ItemStack> EquippedStacks => Armor.Stacks.Concat(Accessories.Stacks);
 }

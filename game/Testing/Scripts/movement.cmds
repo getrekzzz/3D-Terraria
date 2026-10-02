@@ -15,7 +15,9 @@ wait 1.0
 assert player.on_floor == 1
 
 # The hook flies up, latches onto the ceiling (its claw on the slab's face) and reels the player in; jumping lets go.
-give grappling_hook 1
+# It is worn in the hook slot (no longer counted as carried) and the grapple key throws the worn one.
+equip grappling_hook
+assert inv.grappling_hook == 0
 mark
 aim 0 1 0
 hold grapple 0.05
@@ -31,7 +33,8 @@ wait 2.5
 assert player.on_floor == 1
 assert player.hook == 0
 
-# Clicking with the hook held throws it too, and jumping lets go of that one as well.
+# Clicking with a hook held throws it too, and jumping lets go of that one as well.
+give grappling_hook 1
 wield grappling_hook
 mark
 aim 0 1 0

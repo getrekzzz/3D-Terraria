@@ -35,7 +35,7 @@
   spread around that line; other spawns (creature volleys) keep their own origins.
 * **Grappling hooks** — `GrappleHook` (`PlayerEntity.Hook`) is the hook's state machine (`None`, `Flying`, `Attached`,
   `Retracting`; probe `player.hook` 0–3). A click with a hook held (`ItemUseSystem` grapple branch,
-  `UseOutcome.Grappled`) or the grapple key (`GrappleHook.Best`: longest reach, accessories then inventory) throws it
+  `UseOutcome.Grappled`) or the grapple key (`GrappleHook.Best`: the hook slot, else the longest reach carried) throws it
   from `PlayerEntity.Hand`; pressing again lets go. The throw walks the voxel ray from the eye along `Aim`
   (`Targeting.CastWhere`) to the first `Latchable` cell within reach: solid blocks (platforms included), shaped blocks
   with a walkable top and colliding tile objects, a tree's whole box (canopy) too, but never liquids, cobwebs, decor,
@@ -148,6 +148,18 @@
   `data/town.json`, tuning in `data/config/town.json`.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
+* **Slot model** — `PlayerInventory` (partials `.Equipment`, `.Storage`) holds Terraria's storages: backpack 50,
+  coins 4, ammo 4, a saved trash slot, armor 3, accessories 7 (`AccessorySlotsUnlocked` 5–7, set by
+  `GameWorld.AddPlayer` from the world difficulty: Expert 6, Master 7), vanity armor 3 and accessories 7, dyes 10
+  (armor 0–2, accessories 3–9), the misc row (`MiscSlot`: pet, light pet, minecart, mount, hook; `EquippedHook`,
+  `EquippedMount`…) with its dyes, and a service slot. Only armor and unlocked accessories grant stats
+  (`EquippedStacks`); any equipment change raises `EquipmentChanged`, which `PlayerState` answers with `Recompute`.
+  `EquipFrom` routes an item by `EquipSlot`/category (vanity row, rotating accessory swap when full, first free
+  dye, misc slot); `ArmorFilter`/`AccessoryFilter`/`DyeFilter`/`MiscFilter` gate clicks. Favourites are per slot
+  (`Inventory.IsFavorite`, only backpack/coins/ammo keep them; `Transfer` carries them, chests drop them), never on
+  `ItemStack`. `AllStorages` is what a Mediumcore death drops (not the trash); `CountAll` backs the `inv.<item>`
+  probe (`inv.trash`, `inv.cursor` too). Content items of category hook/mount/minecart/pet must name the matching
+  `equipSlot`.
 * **Tooltips and display helpers** — `ItemTooltip.Lines(stack, info, TooltipContext)` builds Terraria-ordered
   lines: name with prefix and count, damage/crit/speed/knockback after the prefix and the viewer's class bonuses
   (`DamageModel.DamageMultiplier`/`CritBonus`, the same maths a hit uses), info lines, the description or the buff's

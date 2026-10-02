@@ -62,6 +62,9 @@ public static partial class ContentValidator
                 ctx.Error(i, "shoot items need a projectile or useAmmo.");
             if (i.EquipSlot == EquipSlot.None && (i.Category is ItemCategory.Armor or ItemCategory.Accessory))
                 ctx.Error(i, "armor/accessory needs equipSlot.");
+            if (MiscEquipSlot(i.Category) is { } misc && i.EquipSlot != misc && !(misc == EquipSlot.Pet && i.EquipSlot == EquipSlot.LightPet))
+                ctx.Error(i, $"{i.Category} items need equipSlot '{System.Text.Json.JsonNamingPolicy.CamelCase.ConvertName(misc.ToString())}'"
+                    + (misc == EquipSlot.Pet ? " or 'lightPet'." : "."));
             if (i.Consumable && i.MaxStack == 1 && i.PlaceBlock == null && i.PlaceObject == null)
                 ctx.Warn(i, "consumable item with maxStack 1.");
             if (i.PlaceBlock != null && i.PlaceObject != null) ctx.Error(i, "item cannot place both a block and an object.");
@@ -71,6 +74,16 @@ public static partial class ContentValidator
             if ((i.SetEffects.Length > 0 || i.SetBonus != null) && i.ArmorSet == null) ctx.Error(i, "setBonus/setEffects need an armorSet.");
         }
     }
+
+    /// <summary>The misc slot items of a category must be worn in (hooks, mounts, minecarts, pets); null for other categories.</summary>
+    private static EquipSlot? MiscEquipSlot(ItemCategory category) => category switch
+    {
+        ItemCategory.Hook => EquipSlot.Hook,
+        ItemCategory.Mount => EquipSlot.Mount,
+        ItemCategory.Minecart => EquipSlot.Minecart,
+        ItemCategory.Pet => EquipSlot.Pet,
+        _ => null,
+    };
 
     /// <summary>Whether a tooltip can say what the buff does (malformed effects are reported by the buff checks).</summary>
     private static bool Describable(BuffDef buff, ContentDatabase db)

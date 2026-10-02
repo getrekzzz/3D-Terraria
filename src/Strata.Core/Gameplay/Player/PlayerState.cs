@@ -19,6 +19,8 @@ public sealed class PlayerState
     {
         Name = name;
         Vitals = new Vitals(BaseLife, BaseMana);
+        // Whatever changes the gear (the inventory screen, commands, a death drop, loading) updates the stats at once.
+        Inventory.EquipmentChanged += Recompute;
     }
 
     public string Name { get; set; }

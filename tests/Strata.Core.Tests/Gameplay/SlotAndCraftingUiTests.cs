@@ -49,16 +49,16 @@ public class SlotAndCraftingUiTests
     {
         var armor = new Inventory(3);
         var cursor = S("wood", 1);
-        SlotActions.LeftClick(ref cursor, armor, 0, SlotActions.ArmorFilter(EquipSlot.Head));
+        SlotActions.LeftClick(ref cursor, armor, 0, PlayerInventory.ArmorFilter(EquipSlot.Head));
         Assert.True(armor[0].IsEmpty);
         cursor = S("copper_helmet", 1);
-        SlotActions.LeftClick(ref cursor, armor, 0, SlotActions.ArmorFilter(EquipSlot.Head));
+        SlotActions.LeftClick(ref cursor, armor, 0, PlayerInventory.ArmorFilter(EquipSlot.Head));
         Assert.Equal("copper_helmet", armor[0].Item!.Id);
 
         var acc = new Inventory(2);
         acc[0] = S("hermes_boots", 1);
         cursor = S("hermes_boots", 1);
-        SlotActions.LeftClick(ref cursor, acc, 1, SlotActions.AccessoryFilter(acc, 1));
+        SlotActions.LeftClick(ref cursor, acc, 1, PlayerInventory.AccessoryFilter(acc, 1));
         Assert.True(acc[1].IsEmpty); // no duplicate accessories
     }
 

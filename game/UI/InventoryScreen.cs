@@ -8,8 +8,9 @@ using Strata.Game.Items;
 namespace Strata.Game.UI;
 
 /// <summary>
-/// The inventory screen (Tab/I): backpack, equipment, trash and coins, the crafting list for the current
-/// environment and an open container. Items move with a cursor stack (left/right/shift click).
+/// The inventory screen (Tab/I): backpack, equipment (armor, the accessory slots the world unlocks and the misc row:
+/// pet, light pet, minecart, mount, hook), trash and coins, the crafting list for the current environment and an open
+/// container. Items move with a cursor stack (left/right/shift click).
 /// </summary>
 public sealed partial class InventoryScreen : CanvasLayer
 {
@@ -26,7 +27,7 @@ public sealed partial class InventoryScreen : CanvasLayer
     private Label _setBonus = null!;
     private TextureRect _cursorIcon = null!;
     private Label _cursorCount = null!;
-    private readonly Inventory _trash = new(1);
+    private readonly ItemSlotView[] _accessoryViews = new ItemSlotView[PlayerInventory.MaxAccessorySlots];
     private TileObjectInstance? _container;
     private Inventory? _containerInv;
 
@@ -53,13 +54,18 @@ public sealed partial class InventoryScreen : CanvasLayer
         var eq = new VBoxContainer();
         eq.AddChild(new Label { Text = "Equipment" });
         var slots = new HBoxContainer();
+        slots.AddThemeConstantOverride("separation", 4); // three columns still fit left of the crafting list
         var armor = new VBoxContainer { TooltipText = "Armor: head, body, legs" };
         var kinds = new[] { EquipSlot.Head, EquipSlot.Body, EquipSlot.Legs };
-        for (int i = 0; i < PlayerInventory.ArmorSlots; i++) armor.AddChild(Slot(inv.Armor, i, SlotActions.ArmorFilter(kinds[i]), null));
+        for (int i = 0; i < PlayerInventory.ArmorSlots; i++) armor.AddChild(Slot(inv.Armor, i, PlayerInventory.ArmorFilter(kinds[i]), null));
         var accessories = new VBoxContainer { TooltipText = "Accessories" };
-        for (int i = 0; i < PlayerInventory.AccessorySlots; i++) accessories.AddChild(Slot(inv.Accessories, i, SlotActions.AccessoryFilter(inv.Accessories, i), null));
+        for (int i = 0; i < PlayerInventory.MaxAccessorySlots; i++)
+            accessories.AddChild(_accessoryViews[i] = Slot(inv.Accessories, i, PlayerInventory.AccessoryFilter(inv.Accessories, i), null));
+        var misc = new VBoxContainer { TooltipText = "Pet, light pet, minecart, mount, hook" };
+        for (int i = 0; i < MiscSlots.Count; i++) misc.AddChild(Slot(inv.Misc, i, PlayerInventory.MiscFilter((MiscSlot)i), null));
         slots.AddChild(armor);
         slots.AddChild(accessories);
+        slots.AddChild(misc);
         eq.AddChild(slots);
         _defense = new Label();
         eq.AddChild(_defense);
@@ -68,7 +74,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         _setBonus.AddThemeFontSizeOverride("font_size", 12);
         eq.AddChild(_setBonus);
         eq.AddChild(new Label { Text = "Trash" });
-        eq.AddChild(Slot(_trash, 0, null, null));
+        eq.AddChild(Slot(inv.Trash, 0, null, null));
         _coins = new Label();
         eq.AddChild(_coins);
         equipment.AddChild(eq);
@@ -97,8 +103,6 @@ public sealed partial class InventoryScreen : CanvasLayer
         _root.AddChild(_cursorIcon);
         _root.AddChild(_cursorCount);
 
-        inv.Armor.Changed += _ => ui.Entity.State.Recompute();
-        inv.Accessories.Changed += _ => ui.Entity.State.Recompute();
         ui.Game.Interaction.ContainerOpened += (p, obj) =>
         {
             if (p == ui.Entity) OpenContainer(obj);
@@ -143,6 +147,9 @@ public sealed partial class InventoryScreen : CanvasLayer
         _defense.Text = $"Defense {state.Defense}";
         _setBonus.Text = state.SetBonus != null ? $"Set bonus: {state.SetBonus}" : "";
         _coins.Text = Coins.Format(Coins.Total(state.Inventory.Backpack));
+        // Expert and Master worlds unlock the 6th and 7th accessory slots; a locked slot still shows an item left in it.
+        for (int i = 0; i < _accessoryViews.Length; i++)
+            _accessoryViews[i].Visible = i < state.Inventory.AccessorySlotsUnlocked || !state.Inventory.Accessories[i].IsEmpty;
         var cursor = _ui.Inventory.Cursor;
         _cursorIcon.Visible = !cursor.IsEmpty;
         _cursorCount.Visible = cursor.Count > 1;
@@ -203,7 +210,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (from == backpack)
         {
             if (_containerInv != null) SlotActions.QuickMove(backpack, index, _containerInv);
-            else if (!_ui.Inventory.Equip(index)) SlotActions.QuickMove(backpack, index, _trash);
+            else if (!_ui.Inventory.Equip(index)) SlotActions.QuickMove(backpack, index, _ui.Inventory.Trash);
             MarkContainerModified();
         }
         else

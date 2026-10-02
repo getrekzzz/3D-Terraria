@@ -221,22 +221,6 @@ public sealed partial class GameWorld : IDisposable
     /// <summary>Ordinary creatures this close to the respawn point leave when a player respawns.</summary>
     public const float RespawnClearRadius = 20f;
 
-    public PlayerEntity AddPlayer(PlayerState state, Vector3 feet)
-    {
-        var p = new PlayerEntity(state) { Position = feet };
-        Players.Add(p);
-        return p;
-    }
-
-    /// <summary>Respawn position in meters (bed spawn if set and valid, else world spawn).</summary>
-    public Vector3 SpawnPositionFor(PlayerState state)
-    {
-        var cell = Session.SpawnCell;
-        if (state.SpawnPoints.TryGetValue(Session.Settings.Name, out var bed) && bed.Length == 3) cell = new Int3(bed[0], bed[1], bed[2]);
-        cell = Session.FindStandableNear(cell);
-        return new Vector3(cell.X + 0.5f, cell.Y, cell.Z + 0.5f) * Units.CellSize;
-    }
-
     public void Shutdown()
     {
         SaveAll();

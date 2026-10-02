@@ -5,7 +5,7 @@ namespace Strata.Core.Gameplay.Items;
 /// <summary>
 /// Mouse interaction rules for inventory slots with a cursor ("held by the mouse") stack, matching the reference
 /// game: left click picks up / places / merges / swaps, right click takes half or drops one, shift-click moves
-/// between inventories. Slot filters restrict equipment slots.
+/// between inventories. Slot filters (<see cref="PlayerInventory.ArmorFilter"/> and the others) restrict equipment slots.
 /// </summary>
 public static class SlotActions
 {
@@ -77,9 +77,4 @@ public static class SlotActions
         return rest;
     }
 
-    public static Func<ItemDef, bool> ArmorFilter(EquipSlot slot) => item => item.EquipSlot == slot;
-
-    /// <summary>Accessories only, and never two of the same accessory.</summary>
-    public static Func<ItemDef, bool> AccessoryFilter(Inventory accessories, int slot) =>
-        item => item.EquipSlot == EquipSlot.Accessory && !Enumerable.Range(0, accessories.Size).Any(i => i != slot && accessories[i].Item == item);
 }

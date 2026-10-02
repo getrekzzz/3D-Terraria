@@ -29,14 +29,14 @@ public sealed partial class GameWorld
                 break;
             case CharacterDifficulty.Mediumcore:
             case CharacterDifficulty.Hardcore:
-                foreach (var container in new[] { inv.Backpack, inv.Armor, inv.Accessories })
+                // Backpack, coins, ammo and everything worn (vanity, dyes, pet, mount, hook…); the stats follow the gear.
+                foreach (var container in inv.AllStorages)
                     for (int i = 0; i < container.Size; i++)
                     {
                         if (container[i].IsEmpty) continue;
                         Drops.Spawn(container[i], at, Scatter(), pickupDelay: 60);
                         container[i] = ItemStack.Empty;
                     }
-                state.Recompute();
                 if (state.Difficulty == CharacterDifficulty.Hardcore)
                 {
                     p.Lost = true;
