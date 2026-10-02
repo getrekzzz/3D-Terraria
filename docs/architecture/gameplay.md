@@ -169,6 +169,13 @@
   Legion is beaten and leaves when it ends; `TownRenderer.Hats` puts witch or Santa hats on the other residents (shared
   procedural meshes on the head bone, toggled on season change).
 >>>>>>> ovh-world/laneB
+* **Mounts** — the `mount` item behaviour (`MountParams`, data/items/mounts.json) summons a ride: `MountRules` toggles,
+  swaps and quick-mounts (the `quick_mount` key; the equipment mount slot plugs in through `MountRules.SlotMount`),
+  shows the mount's buff and dismounts on death; `MountMotion` (engine independent, tested) gives each mount its run
+  speed, jump (with a light-gravity hold), limited flight (refilled on landing) or free hovering flight, and the
+  Slimy Saddle's stomp. `PlayerController.Mounts.cs` drives the body with it (no fall damage while riding);
+  `PlayerAvatar.Mount.cs` draws the creature model scaled to the mount's height with the rider in the saddle. Bosses
+  drop mounts through `extra_<enemy>` loot tables rolled on top of their own.
 * **Players** — `PlayerState` (inventory, equipment effects, buffs, vitals, spawn points) is saved per
   character; `PlayerEntity` is the in-world body the engine syncs; death → 5 s → respawn at bed or spawn.
 

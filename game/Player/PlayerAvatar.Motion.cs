@@ -89,6 +89,7 @@ public sealed partial class PlayerAvatar
     {
         rate = 1f;
         if (!entity.Alive) return "death";
+        if (entity.Mount != null) return "idle"; // in the saddle (PlayerAvatar.Mount.cs)
         if (_controller.Swimming)
         {
             rate = 0.7f + Mathf.Min(v.Length(), 4f) * 0.2f;

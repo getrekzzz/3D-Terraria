@@ -37,7 +37,8 @@
       {"item": "witch_hat", "weight": 1},
       {"item": "witch_dress", "weight": 1},
       {"item": "witch_boots", "weight": 1},
-      {"item": "pumpkin_mask", "weight": 1}
+      {"item": "pumpkin_mask", "weight": 1},
+      {"item": "fuzzy_carrot", "weight": 0.13}
     ] },
     {"id": "present", "mode": "weighted", "rolls": 2, "entries": [
       {"item": "candy_cane", "weight": 4, "min": 2, "max": 6},

@@ -22,6 +22,15 @@ CI (push 2, merge): GREEN — 467 Core tests, all 16 smoke scripts (incl. new fi
 Gaps: no junk catches or hardmode crates; statues are crafted (no worldgen placement); lamp models do not show on/off;
 mining a block does not drop its actuator; no season-only enemies; seasonal vanity not drawn on the avatar yet.
 
+## Push 3 — mounts (X-14, slot hook-up pending)
+| WP | State | Notes |
+|---|---|---|
+| X-14 mounts | done except the P2-05 slot | Slimy Saddle (King Slime 25%, high bouncy jump, stomps), Fuzzy Carrot (Goodie Bags, fast bunny), Honeyed Goggles (Queen Bee 5%, 2.6 s flight), Cosmic Car Key (Martian Saucer 10%, free hovering flight); mount buffs; `quick_mount` key (G — R is rotate shape); Core `MountMotion`/`MountRules` + `MountTests`; `PlayerController.Mounts.cs`, `PlayerAvatar.Mount.cs` (existing creature models scaled up); item models/icons (`bgen/mount_items.py`); new smoke `mounts.cmds`. Boss drops via new `extra_<enemy>` loot tables, so the bosses session's loot files stay untouched. |
+
+Pending: the equipment mount slot (P2-05 `EquippedMount`) is not on the integration branch yet; when it lands, set
+`MountRules.SlotMount = p => <equipped mount item>` (one line) so the quick-mount key prefers it. The rider stands in the
+saddle (no sit clip: the human animation sets belong to the integration session).
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and

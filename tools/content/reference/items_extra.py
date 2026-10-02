@@ -83,6 +83,12 @@ switch|Switch|prehardmode|mechanic
 red_pressure_plate|Red Pressure Plate|prehardmode|mechanic
 dart_trap|Dart Trap|early|world
 """,
+    "mount": """
+slimy_saddle|Slimy Saddle|prehardmode|king slime
+fuzzy_carrot|Fuzzy Carrot|prehardmode|goodie bag
+honeyed_goggles|Honeyed Goggles|prehardmode|queen bee
+cosmic_car_key|Cosmic Car Key|hardmode|martian saucer
+""",
     "furniture": """
 firefly_in_a_bottle|Firefly in a Bottle|early|craft
 """,

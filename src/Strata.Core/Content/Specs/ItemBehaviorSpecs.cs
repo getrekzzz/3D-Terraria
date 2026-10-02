@@ -38,6 +38,9 @@ public static class ItemBehaviorSpecs
     /// <summary>Lets a caught critter go.</summary>
     public const string ReleaseCritter = "releaseCritter";
 
+    /// <summary>Summons a rideable mount, or dismounts (Slimy Saddle, Fuzzy Carrot, Honeyed Goggles, Cosmic Car Key).</summary>
+    public const string Mount = "mount";
+
     /// <summary>Boards a minecart on the track beneath the player.</summary>
     public const string Minecart = "minecart";
 
@@ -67,6 +70,7 @@ public static class ItemBehaviorSpecs
         c.Register<BugNetParams>(SpecKind.ItemBehavior, BugNet);
         c.Register<ReleaseCritterParams>(SpecKind.ItemBehavior, ReleaseCritter);
         c.Register<MinecartParams>(SpecKind.ItemBehavior, Minecart);
+        c.Register<Gameplay.Mounts.MountParams>(SpecKind.ItemBehavior, Mount);
         c.Register<PaintToolParams>(SpecKind.ItemBehavior, PaintTool);
     }
 }

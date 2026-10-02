@@ -126,7 +126,7 @@ public sealed partial class PlayerController : CharacterBody3D
             Entity.Minecart = null;
             return;
         }
-        if (UpdateMinecart(dt) || UpdatePhase())
+        if (UpdateMinecart(dt) || UpdateMount(dt) || UpdatePhase())
         {
             ReelInHook(dt);
             return;

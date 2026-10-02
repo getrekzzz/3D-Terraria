@@ -27,6 +27,7 @@ public enum ItemAction
     Release = 1 << 15,
     Mount = 1 << 16,
     Paint = 1 << 17,
+    Ride = 1 << 18,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -57,6 +58,9 @@ public sealed class ItemUseInfo
     public BugNetParams? BugNet { get; internal set; }
     public ReleaseCritterParams? Release { get; internal set; }
     public MinecartParams? Minecart { get; internal set; }
+
+    /// <summary>A mount summoned by this item (<see cref="ItemAction.Ride"/>).</summary>
+    public Mounts.MountParams? Ride { get; internal set; }
     public PaintToolParams? Painting { get; internal set; }
 
     /// <summary>Fishing bait (worms, fireflies, Master Bait).</summary>
@@ -168,6 +172,7 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.BugNet: a |= ItemAction.Net; info.BugNet = spec.Parse<BugNetParams>(); break;
                 case ItemBehaviorSpecs.ReleaseCritter: a |= ItemAction.Release; info.Release = spec.Parse<ReleaseCritterParams>(); break;
                 case ItemBehaviorSpecs.Minecart: a |= ItemAction.Mount; info.Minecart = spec.Parse<MinecartParams>(); break;
+                case ItemBehaviorSpecs.Mount: a |= ItemAction.Ride; info.Ride = spec.Parse<Mounts.MountParams>(); break;
                 case ItemBehaviorSpecs.PaintTool: a |= ItemAction.Paint; info.Painting = spec.Parse<PaintToolParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }

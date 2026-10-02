@@ -1184,6 +1184,10 @@
    "model": "assets/models/items/corrupt_crate.glb",
    "icon": "assets/icons/items/corrupt_crate.png"
   },
+  "cosmic_car_key": {
+   "model": "assets/models/items/cosmic_car_key.glb",
+   "icon": "assets/icons/items/cosmic_car_key.png"
+  },
   "crab_statue": {
    "object": "crab_statue",
    "icon": "assets/icons/items/crab_statue.png"
@@ -1588,6 +1592,10 @@
    "object": "furnace",
    "icon": "assets/icons/items/furnace.png"
   },
+  "fuzzy_carrot": {
+   "model": "assets/models/items/fuzzy_carrot.glb",
+   "icon": "assets/icons/items/fuzzy_carrot.png"
+  },
   "gel": {
    "model": "assets/models/items/gel.glb",
    "icon": "assets/icons/items/gel.png"
@@ -1819,6 +1827,10 @@
   "honey_comb": {
    "model": "assets/models/items/honey_comb.glb",
    "icon": "assets/icons/items/honey_comb.png"
+  },
+  "honeyed_goggles": {
+   "model": "assets/models/items/honeyed_goggles.glb",
+   "icon": "assets/icons/items/honeyed_goggles.png"
   },
   "honeyfin": {
    "model": "assets/models/items/honeyfin.glb",
@@ -2967,6 +2979,10 @@
   "slimefish": {
    "model": "assets/models/items/slimefish.glb",
    "icon": "assets/icons/items/slimefish.png"
+  },
+  "slimy_saddle": {
+   "model": "assets/models/items/slimy_saddle.glb",
+   "icon": "assets/icons/items/slimy_saddle.png"
   },
   "snapthorn": {
    "model": "assets/models/items/snapthorn.glb",

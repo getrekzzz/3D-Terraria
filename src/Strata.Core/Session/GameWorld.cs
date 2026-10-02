@@ -173,6 +173,7 @@ public sealed partial class GameWorld : IDisposable
         if (!p.Alive)
         {
             p.Hook.Reset(); // the chain does not hang from a corpse or follow it to the respawn point
+            if (p.Mount != null) Gameplay.Mounts.MountRules.Dismount(this, p);
             if (p.RespawnTicks == 0)
             {
                 p.RespawnTicks = RespawnDelayTicks;

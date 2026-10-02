@@ -3771,6 +3771,34 @@
    "source": "world"
   },
   {
+   "id": "terraria:slimy_saddle",
+   "name": "Slimy Saddle",
+   "kind": "mount",
+   "stage": "prehardmode",
+   "source": "king slime"
+  },
+  {
+   "id": "terraria:fuzzy_carrot",
+   "name": "Fuzzy Carrot",
+   "kind": "mount",
+   "stage": "prehardmode",
+   "source": "goodie bag"
+  },
+  {
+   "id": "terraria:honeyed_goggles",
+   "name": "Honeyed Goggles",
+   "kind": "mount",
+   "stage": "prehardmode",
+   "source": "queen bee"
+  },
+  {
+   "id": "terraria:cosmic_car_key",
+   "name": "Cosmic Car Key",
+   "kind": "mount",
+   "stage": "hardmode",
+   "source": "martian saucer"
+  },
+  {
    "id": "terraria:firefly_in_a_bottle",
    "name": "Firefly in a Bottle",
    "kind": "furniture",
