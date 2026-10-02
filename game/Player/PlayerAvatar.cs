@@ -105,7 +105,7 @@ public sealed partial class PlayerAvatar : Node3D
         {
             node = HeldFallback(item); // a block's textured cube (PlayerAvatar.Held), else the icon
         }
-        node.Transform = HeldPose(_game.Uses[item], scale);
+        node.Transform = HeldPose(_game.Uses[item], path, scale); // the style's hand frame (PlayerAvatar.Held)
         RememberHeld(node, item, path, scale, HeldSize(held));
         _held = node;
         LightAnchor = node;
@@ -157,36 +157,6 @@ public sealed partial class PlayerAvatar : Node3D
         var h = new Vector3(ride.Heading.X, 0, ride.Heading.Z);
         var basis = h.LengthSquared() > 1e-4f ? Basis.LookingAt(h.Normalized(), Vector3.Up) : Basis.Identity;
         _cart.GlobalTransform = new Transform3D(basis.Scaled(Vector3.One * 1.6f), _controller.GlobalPosition - Vector3.Up * 0.2f);
-    }
-
-    /// <summary>The hand bone's fist: where a held item's grip sits (m along the bone, past the wrist).</summary>
-    private const float Fist = 0.08f;
-
-    /// <summary>How far a bow's riser (its grip) lies from the model's origin on the string, toward −X (bgen items.bow).</summary>
-    private const float BowGrip = 0.17f;
-
-    /// <summary>
-    /// The bow clip holds the bow hand about 23° above the aim (the arm stays on the aim pitch), so the bow is set that
-    /// much forward in the fist to stand upright with its back on the aim.
-    /// </summary>
-    private static readonly float BowSet = Mathf.DegToRad(23f);
-
-    /// <summary>
-    /// How an item sits in the right fist (the hand bone: +Y along the fingers, +Z the thumb side). Items are modelled
-    /// with the grip at the origin and the business end along +Y, which points out of the thumb side: a sword is carried
-    /// point-forward and lines up with the arm when the wrist cocks for a strike, a gun with the arm for a shot. A bow
-    /// (limbs along ±Y, its back toward −X, the string on the origin) is gripped by its riser and stands upright with its
-    /// back toward the target when the bow arm is held out: limbs along the thumb side, back along the fingers.
-    /// </summary>
-    private static Transform3D HeldPose(ItemUseInfo info, float scale)
-    {
-        if (info.Style == UseStyle.Bow)
-        {
-            var upright = new Basis(Vector3.Right, -BowSet) * new Basis(new Vector3(0, -1, 0), new Vector3(0, 0, 1), new Vector3(-1, 0, 0));
-            var riser = upright * new Vector3(-BowGrip * scale, 0, 0);
-            return new Transform3D(upright.Scaled(Vector3.One * scale), new Vector3(0, Fist, 0) - riser);
-        }
-        return new Transform3D(Basis.FromEuler(new Vector3(Mathf.Pi / 2f, 0, 0)).Scaled(Vector3.One * scale), new Vector3(0, Fist, 0));
     }
 
     /// <summary>

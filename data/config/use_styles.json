@@ -23,11 +23,20 @@
   //               the right arm while the use lasts, like a held torch, instead of playing once)
   //   toolClip    the clip tools of the style play instead (pickaxes and axes chop)
   //   armAim      how much of the aim pitch the arms take while the clip plays (0–1)
-  //   hand        optional grip in the hand bone: { "offset": [x, y, z] m, "euler": [x, y, z] degrees }
+  //   hand        optional grip in the hand bone (+Y along the fingers, +Z the thumb side): { "offset": [x, y, z] m,
+  //               "euler": [x, y, z] degrees, R = Rx·Ry·Rz }; the item model's "grip" socket lands on this frame. The
+  //               default, [0, 0.08, 0] / [90, 0, 0], carries an item's business end (+Y) out of the thumb side; a bow
+  //               stands upright with its back on the aim (the bow clip holds the hand 23° above it)
   //   holdout     optional business-end offset from the eye: { "forward", "right", "down" } m
   //   bladeCurve  swing only: the blade's pitch over the swing, [t, degrees, ease into the key] (ease: in, out, io,
   //               lin); 0° hangs down, 90° points ahead, 180° is overhead; the swing clip's arm pitch is keyed to it
   //               (rebuild the sets after changing it)
+  //   fp          first person (game/Player/ViewModel.Poses.cs): "rest" {pos [x, y, z] m from the view model's anchor
+  //               at the lower right of the view, rot [x, y, z] degrees (Godot's YXZ Euler)}; "keys" [{t, pos, rot,
+  //               ease}] over the use, relative to the rest (missing pos/rot = 0, ease default io); "toolKeys" the
+  //               same for the style's tools; "curve" "blade" (the swing's bladeCurve) or "extend" (a thrust's
+  //               extension) instead of keys; "aimAtCrosshair" turns it onto the crosshair point; "raiseToFace"
+  //               keeps a lift to the mouth clear of the near plane; "recoil" {pos, rot, decay s} kicks per shot
   "maxClipRate": 2.6,
   "clips": {
     "swing":  { "length": 0.5, "strikeStart": 0.1, "strikeEnd": 0.6 },
@@ -39,23 +48,61 @@
     "bow":    { "length": 0.7, "release": 0.06, "redrawStart": 0.3, "redrawEnd": 0.85 }
   },
   "styles": {
-    "none":   { "clip": "use", "armAim": 0.5 },
+    "none":   { "clip": "use", "armAim": 0.5,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.5, "pos": [0, 0.08, -0.08] }, { "t": 1 }] } },
     "swing":  { "clip": "swing", "toolClip": "mine", "armAim": 0.5,
-                "bladeCurve": [[0, 158, "lin"], [0.1, 166, "out"], [0.6, 45, "io"], [0.72, 26, "out"], [1, 158, "io"]] },
-    "rapier": { "clip": "rapier", "armAim": 1 },
-    "spear":  { "clip": "spear", "armAim": 1 },
-    "shoot":  { "clip": "gun", "armAim": 1 },
-    "gun":    { "clip": "gun", "armAim": 1, "holdout": { "forward": 0.55, "right": 0.22, "down": 0.25 } },
-    "bow":    { "clip": "bow", "armAim": 1, "holdout": { "forward": 0.35, "right": 0.18, "down": 0.2 } },
-    "staff":  { "clip": "staff", "armAim": 1, "holdout": { "forward": 0.9, "right": 0.2, "down": 0.1 } },
-    "tome":   { "clip": "tome", "armAim": 1, "holdout": { "forward": 0.4, "right": 0.1, "down": 0.2 } },
-    "throw":  { "clip": "throw", "armAim": 0.5, "holdout": { "forward": 0.3, "right": 0.25, "down": 0.1 } },
-    "yoyo":   { "clip": "yoyo", "armAim": 1 },
-    "flail":  { "clip": "flail", "armAim": 0.3 },
-    "whip":   { "clip": "whip", "armAim": 0.5 },
-    "holdUp": { "clip": "hold_up", "armAim": 0.2 },
-    "drink":  { "clip": "drink", "armAim": 0.5 },
-    "eat":    { "clip": "eat", "armAim": 0.5 },
-    "place":  { "clip": "place", "armAim": 0.5 }
+                "bladeCurve": [[0, 158, "lin"], [0.1, 166, "out"], [0.6, 45, "io"], [0.72, 26, "out"], [1, 158, "io"]],
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "curve": "blade",
+                        "toolKeys": [{ "t": 0, "pos": [0.03, 0.06, -0.03], "rot": [37.2, 8.6, -17.2], "ease": "lin" },
+                                     { "t": 0.18, "pos": [0.05, 0.12, -0.05], "rot": [71.6, 14.3, -31.5] },
+                                     { "t": 0.32, "pos": [-0.2, -0.08, -0.05], "rot": [-71.6, -31.5, 25.8] },
+                                     { "t": 0.42, "pos": [-0.16, -0.05, -0.05], "rot": [-50.1, -24.6, 17.2] },
+                                     { "t": 1, "pos": [0.03, 0.06, -0.03], "rot": [37.2, 8.6, -17.2] }] } },
+    "rapier": { "clip": "rapier", "armAim": 1,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "curve": "extend" } },
+    "spear":  { "clip": "spear", "armAim": 1,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "curve": "extend" } },
+    "shoot":  { "clip": "gun", "armAim": 1,
+                "fp": { "rest": { "pos": [-0.1, 0.1, 0.08], "rot": [90, 180, 0] }, "aimAtCrosshair": true,
+                        "recoil": { "pos": [0, 0, 0.03], "rot": [4, 0, 0], "decay": 0.12 } } },
+    "gun":    { "clip": "gun", "armAim": 1, "holdout": { "forward": 0.55, "right": 0.22, "down": 0.25 },
+                "fp": { "rest": { "pos": [-0.1, 0.1, 0.08], "rot": [90, 180, 0] }, "aimAtCrosshair": true,
+                        "recoil": { "pos": [0, 0, 0.04], "rot": [6, 0, 0], "decay": 0.12 } } },
+    "bow":    { "clip": "bow", "armAim": 1, "holdout": { "forward": 0.35, "right": 0.18, "down": 0.2 },
+                "hand": { "offset": [0, 0.08, 0], "euler": [0, -90, -67] },
+                "fp": { "rest": { "pos": [-0.2, 0.18, -0.07], "rot": [-10.3, -90, 0] }, "aimAtCrosshair": true,
+                        "recoil": { "pos": [0, 0, -0.03], "rot": [0, 0, 0], "decay": 0.2 } } },
+    "staff":  { "clip": "staff", "armAim": 1, "holdout": { "forward": 0.9, "right": 0.2, "down": 0.1 },
+                "hand": { "offset": [0, 0.08, 0], "euler": [60, 0, 0] },
+                "fp": { "rest": { "pos": [-0.04, -0.02, 0], "rot": [-54.4, 14.3, 0] }, "aimAtCrosshair": true,
+                        "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.12, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "out" },
+                                 { "t": 0.3, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "lin" }, { "t": 1 }] } },
+    "tome":   { "clip": "tome", "armAim": 1, "holdout": { "forward": 0.4, "right": 0.1, "down": 0.2 },
+                "fp": { "rest": { "pos": [-0.04, -0.02, 0], "rot": [-54.4, 14.3, 0] }, "aimAtCrosshair": true,
+                        "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.12, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "out" },
+                                 { "t": 0.3, "pos": [-0.01, 0.01, -0.08], "rot": [-8.6, 0, 0], "ease": "lin" }, { "t": 1 }] } },
+    "throw":  { "clip": "throw", "armAim": 0.5, "holdout": { "forward": 0.3, "right": 0.25, "down": 0.1 },
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "curve": "blade" } },
+    "yoyo":   { "clip": "yoyo", "armAim": 1,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.15, "pos": [-0.08, 0.06, -0.12], "rot": [-50, 0, 0], "ease": "out" },
+                                                       { "t": 1, "pos": [-0.08, 0.06, -0.12], "rot": [-50, 0, 0], "ease": "lin" }] } },
+    "flail":  { "clip": "flail", "armAim": 0.3,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.15, "pos": [-0.06, 0.08, -0.08], "rot": [-35, 0, 0], "ease": "out" },
+                                                       { "t": 1, "pos": [-0.06, 0.08, -0.08], "rot": [-35, 0, 0], "ease": "lin" }] } },
+    "whip":   { "clip": "whip", "armAim": 0.5,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "curve": "blade" } },
+    "holdUp": { "clip": "hold_up", "armAim": 0.2,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.3, "pos": [-0.14, 0.2, -0.02], "rot": [25, 0, -8] },
+                                                       { "t": 0.75, "pos": [-0.14, 0.2, -0.02], "rot": [25, 0, -8], "ease": "lin" }, { "t": 1 }] } },
+    "drink":  { "clip": "drink", "armAim": 0.5,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "raiseToFace": true,
+                        "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.3, "pos": [-0.26, 0.14, 0.23], "rot": [55, 0, -10] },
+                                 { "t": 0.75, "pos": [-0.26, 0.14, 0.23], "rot": [65, 0, -10], "ease": "lin" }, { "t": 1 }] } },
+    "eat":    { "clip": "eat", "armAim": 0.5,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "raiseToFace": true,
+                        "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.3, "pos": [-0.24, 0.12, 0.22], "rot": [30, 0, -10] },
+                                 { "t": 0.75, "pos": [-0.24, 0.13, 0.22], "rot": [30, 0, -10], "ease": "lin" }, { "t": 1 }] } },
+    "place":  { "clip": "place", "armAim": 0.5,
+                "fp": { "rest": { "pos": [0, 0, 0], "rot": [-20, 14.3, 8.6] }, "keys": [{ "t": 0, "ease": "lin" }, { "t": 0.5, "pos": [0, 0.08, -0.08] }, { "t": 1 }] } }
   }
 }

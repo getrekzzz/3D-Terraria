@@ -82,7 +82,7 @@ public sealed partial class SwingTrail : Node3D
         t.Pitch = Mathf.Clamp(Mathf.Asin(Mathf.Clamp(aim.Y, -1f, 1f)), -1.1f, 1.1f);
         t.Arc = info.Swing?.Arc ?? 150f;
         t.Reach = thrust ? SwingPlane.ThrustReach(info.ThrustParams!.Length, size) : SwingPlane.SwingReach(info.Swing?.Length ?? 3f, size);
-        t.Curve = thrust ? SwingCurve.Extension(clip) : SwingCurve.Blade(clip);
+        t.Curve = thrust ? SwingCurve.Extension(clip) : _game.ItemUse.Timing.BladeCurve;
         t.Duration = Mathf.Max(2, player.UseAnimationMax) / (float)Units.TicksPerSecond; // the animation after speed bonuses
         t.StrikeStart = clip.StrikeStart ?? 0f;
         t.StrikeEnd = clip.StrikeEnd ?? 1f;

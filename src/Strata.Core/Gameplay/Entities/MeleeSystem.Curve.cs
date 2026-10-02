@@ -36,11 +36,8 @@ public sealed partial class MeleeSystem
     public MeleeHit? LastHit { get; private set; }
 
     private float _hitDeg;
-    private ClipTiming? _bladeClip, _thrustClip;
-    private SwingCurve? _blade, _extension;
-
-    /// <summary>The swing clip's blade curve (rebuilt only when the timing is reloaded).</summary>
-    private SwingCurve BladeCurve(ClipTiming clip) => clip == _bladeClip ? _blade! : _blade = SwingCurve.Blade(_bladeClip = clip);
+    private ClipTiming? _thrustClip;
+    private SwingCurve? _extension;
 
     private SwingCurve ExtensionCurve(ClipTiming clip) => clip == _thrustClip ? _extension! : _extension = SwingCurve.Extension(_thrustClip = clip);
     private Vector3 _hitPivot;
@@ -68,10 +65,10 @@ public sealed partial class MeleeSystem
         var clip = timing.Clip(UseTiming.Swing);
         float start = clip.StrikeStart ?? 0f, end = MathF.Min(1f, (clip.StrikeEnd ?? 1f) + UseTiming.FollowThrough);
         if (t < start || tPrev > end) return;
-        var curve = BladeCurve(clip);
+        var curve = timing.BladeCurve;
         var swing = s.Item.Swing!;
-        // Only the part of the arc in front of the player damages: the curve starts raised behind the head (scaled
-        // further back by wide arcs), so the swept angles are capped short of straight up. The trail still draws the
+        // Only the part of the arc in front of the player damages: wide arcs scale the raised blade back over the
+        // head, so the swept angles are capped short of straight up. The trail still draws the
         // whole curve.
         float cap = HighestDamagingDeg * 150f / swing.Arc;
         float from = MathF.Min(cap, float.IsNaN(s.LastDeg) ? curve.Evaluate(MathF.Max(tPrev, start)) : s.LastDeg);

@@ -55,6 +55,8 @@ public class PrefixTests
         Assert.Equal(new[] { "universal", "common", "ranged" }, Prefixes.Groups(Db.Items.Get("wooden_bow")));
         Assert.Equal(new[] { "universal", "common", "magic" }, Prefixes.Groups(Db.Items.Get("amethyst_staff")));
         Assert.Equal(new[] { "accessory" }, Prefixes.Groups(Db.Items.Get("aglet")));
+        // Shortswords take the melee group as broadswords do (Terraria): they can be Large or Legendary.
+        Assert.Equal(new[] { "universal", "common", "melee" }, Prefixes.Groups(Db.Items.Get("copper_shortsword")));
         // A spear can never roll a size prefix.
         var spear = Db.Items.Get("spear");
         Assert.Equal(new[] { "universal", "common" }, Prefixes.Groups(spear));

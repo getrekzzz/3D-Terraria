@@ -26,6 +26,8 @@ public static class PropProbes
         ctx.AddProbe("avatar.held_lit", () => Avatar(world)?.HeldLit == true ? 1 : 0);
         ctx.AddProbe("avatar.wings_lit", () => Avatar(world)?.WingsLit == true ? 1 : 0);
         ctx.AddProbe("avatar.held_block_cube", () => Avatar(world)?.HeldBlockCube == true ? 1 : 0);
+        // P3-06: the held model's grip socket lands on its use style's hand frame (cm; -1 without a grip socket).
+        ctx.AddProbe("avatar.grip_error_cm", () => Avatar(world)?.GripErrorCm() ?? -1f);
         ctx.AddProbe("view.held_block_cube", () => world.Player?.Rig.Camera.GetNodeOrNull<Strata.Game.Player.ViewModel>("ViewModel")?.HeldBlockCube == true ? 1 : 0);
     }
 

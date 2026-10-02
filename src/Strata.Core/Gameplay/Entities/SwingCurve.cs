@@ -66,27 +66,38 @@ public sealed class SwingCurve
         _ => u * u * (3f - 2f * u),
     };
 
-    // Blade angles at the swing clip's keys: raised behind the head, the wind-up's peak, struck low in front, the
-    // follow-through, raised again (a chained swing carries on from there). The body clip's arm reaches the same
-    // places at the same keys.
-    public const float RaisedDeg = 150f, WindupDeg = 165f, StruckDeg = -45f, FollowDeg = -64f;
+    /// <summary>
+    /// A use_styles.json blade-curve angle (0° hangs down, 90° points ahead, 180° overhead: the arm pitch the swing
+    /// clip is keyed to) as a swing-plane angle (0° ahead, positive up).
+    /// </summary>
+    public static float FromStyleDeg(float deg) => deg - 90f;
 
-    /// <summary>The clip's follow-through end as a fraction of the rest of the use after the strike (actions.py).</summary>
-    public const float FollowFraction = 0.3f;
-
-    /// <summary>The blade-angle curve of a swing, keyed to the swing clip's strike window.</summary>
-    public static SwingCurve Blade(ClipTiming clip)
+    /// <summary>A curve key's ease from its use_styles.json name (in, out, io, lin).</summary>
+    public static CurveEase EaseNamed(string name) => name switch
     {
-        float a = clip.StrikeStart ?? 0.1f, b = clip.StrikeEnd ?? 0.6f, f = b + FollowFraction * (1f - b);
-        return new SwingCurve(new[]
-        {
-            new CurveKey(0f, RaisedDeg, CurveEase.Lin),
-            new CurveKey(a, WindupDeg, CurveEase.Out),
-            new CurveKey(b, StruckDeg, CurveEase.Io),
-            new CurveKey(f, FollowDeg, CurveEase.Out),
-            new CurveKey(1f, RaisedDeg, CurveEase.Io),
-        });
+        "lin" => CurveEase.Lin,
+        "in" => CurveEase.In,
+        "out" => CurveEase.Out,
+        _ => CurveEase.Io,
+    };
+
+    /// <summary>
+    /// The blade-angle curve of a swing: the swing style's <c>bladeCurve</c> (data/config/use_styles.json), the one
+    /// curve the body clip's arm, the hitbox, the trail and the first-person arc all follow (the shipped curve when
+    /// the style has none).
+    /// </summary>
+    public static SwingCurve Blade(UseStyleConfig config)
+    {
+        var keys = (config.Styles.TryGetValue("swing", out var style) ? style.BladeCurve : null)
+            ?? UseStyleConfig.Fallback().Styles["swing"].BladeCurve!;
+        return new SwingCurve(keys.Select(k => new CurveKey(k.T, FromStyleDeg(k.Degrees), EaseNamed(k.Ease))).ToArray());
     }
+
+    /// <summary>The lowest value over the use.</summary>
+    public float Min => _keys.Min(k => k.Value);
+
+    /// <summary>The highest value over the use.</summary>
+    public float Max => _keys.Max(k => k.Value);
 
     /// <summary>
     /// The extension curve of a thrust, keyed to the thrust clip: drawn in through the wind-up, stabbed out to full
