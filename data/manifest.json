@@ -76,6 +76,7 @@
     "tileobjects/furniture.json",
     "tileobjects/nature.json",
     "tileobjects/stations.json",
+    "tileobjects/strange_plants.json",
     "tileobjects/trophies.json",
     "town/hardmode.json",
     "town/pre_hardmode.json",

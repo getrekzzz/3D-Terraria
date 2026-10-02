@@ -661,3 +661,13 @@ sets `Appearance.HairDye` (saved with the look) and `HairDyes.ColorFor` computes
 life, mana, world layer, hour, coins, speed and tick. `PlayerAvatar.Look` re-applies the look on `LookChanged` (the
 hair model swaps in place) and re-tints a dynamic dye twice a second. `HaircutPanel` (preview, styles, swatches,
 price, Buy) is opened through `TownPanels`; console `ui haircut <id>`, `town haircut <id> <style> <#rrggbb>`.
+
+## Strange Plants and the Dye Trader (P5-22)
+
+`DecorationPass` grows four natural Strange Plants (`data/tileobjects/strange_plants.json`) on open grass tops (surface
+turf and jungle turf, also underground) at `DecorPalette.StrangePlantChance` (1/2000) from their own seed
+(`strange_plants`), placed after every other plant so the rest of the decoration is unchanged (GenVersion 13; the
+golden hashes differ only where a plant grew). Each drops its `strange_plant_N` item (tag `strange_plant`). The Dye
+Trader's `dyeTrade` service (`DyeTradeParams`: accepted tag, loot table `dye_trader_trade`) takes one plant from the
+backpack for a weighted roll of nine rare dyes (`TownServices.TradeStrangePlant`); the chat box shows 'Trade' only while
+a plant is carried; console `town trade <id>`.

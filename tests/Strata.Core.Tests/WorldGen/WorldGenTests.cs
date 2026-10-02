@@ -60,14 +60,14 @@ public class WorldGenTests
         { 2, 4, 9, 63819815911648630UL },
         { 12, 1, 5, 16627187558847016073UL },
         { 8, 7, 12, 7931888006566429743UL }, // the Dungeon's vault
-        { 3, 11, 11, 16913084954196634421UL }, // the Dungeon's keep
+        { 3, 11, 11, 54679113004194951UL }, // the Dungeon's keep
     };
 
     [Theory]
     [MemberData(nameof(Golden))]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(12, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(13, GenVersion.Current); // bumping the generator version means re-recording these hashes
         Assert.Equal(new Int3(256, 349, 256), Tiny.Value.Plan.Spawn);
         Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
     }

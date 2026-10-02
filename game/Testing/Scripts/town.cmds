@@ -140,3 +140,12 @@ give life_hair_dye 1
 assert inv.life_hair_dye == 1
 town dismiss stylist
 assert errors == 0
+
+# --- P5-22 ---
+# The Dye Trader swaps a Strange Plant for a rare dye.
+town summon dye_trader 1 0 -3
+give strange_plant_2 1
+town trade dye_trader
+assert inv.strange_plant_2 == 0
+town dismiss dye_trader
+assert errors == 0

@@ -25,6 +25,12 @@ public sealed partial class TownDialog
     /// <summary>The service the chat box's button runs: the legacy single service, else the first of the list.</summary>
     private static Strata.Core.Content.TypedSpec? MainService(TownNpc npc) => npc.Def.AllServices.Length > 0 ? npc.Def.AllServices[0] : null;
 
+    private void TradeStrangePlant()
+    {
+        var result = _ui.Game.Services.TradeStrangePlant(_npc!, _ui.Entity, out var dye);
+        Say(result == TradeResult.Ok ? $"A Strange Plant! For you, a {dye.Item!.DisplayName}." : "Bring me Strange Plants and I will make you wonders.");
+    }
+
     private void OpenPanel()
     {
         var npc = _npc!;
@@ -55,6 +61,8 @@ public sealed partial class TownDialog
                 return "Quest";
             case TownServiceSpecs.Haircut:
                 return "Haircut";
+            case TownServiceSpecs.DyeTrade:
+                return _ui.Game.Services.CanTradeStrangePlant(npc, _ui.Entity) ? service.Parse<DyeTradeParams>().Label : null;
             default:
                 return null;
         }
@@ -73,6 +81,7 @@ public sealed partial class TownDialog
             case TownServiceSpecs.Taxes: CollectTaxes(); break;
             case TownServiceSpecs.AnglerQuest: AnglerQuest(); break;
             case TownServiceSpecs.Haircut: OpenPanel(); break;
+            case TownServiceSpecs.DyeTrade: TradeStrangePlant(); break;
         }
         if (_npc != null && _serviceButton != null && ServiceLabel(_npc) is { } label) SetLabel(_serviceButton, label);
     }

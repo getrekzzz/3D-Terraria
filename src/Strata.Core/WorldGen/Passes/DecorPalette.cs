@@ -21,6 +21,8 @@ internal sealed class DecorPalette
         TileObjectDef? O(string id) => content.TileObjects.TryGet(id, out var def) ? def : null;
         Daybloom = O("daybloom_plant"); Moonglow = O("moonglow_plant"); Blinkroot = O("blinkroot_plant"); Deathweed = O("deathweed_plant");
         Shade = O("shadewood_tree"); LifeCrystal = O("life_crystal_rock");
+        StrangePlants = new[] { O("strange_plant_1_plant"), O("strange_plant_2_plant"), O("strange_plant_3_plant"), O("strange_plant_4_plant") }
+            .Where(o => o != null).Select(o => o!).ToArray();
         Waterleaf = O("waterleaf_plant"); Fireblossom = O("fireblossom_plant"); Shiverthorn = O("shiverthorn_plant"); LifeFruit = O("life_fruit_plant");
     }
 
@@ -35,6 +37,12 @@ internal sealed class DecorPalette
     public TileObjectDef? LifeFruit { get; }
     public TileObjectDef? Shade { get; }
     public TileObjectDef? LifeCrystal { get; }
+
+    /// <summary>The four wild Strange Plants (the Dye Trader's trade; optional content, empty without it).</summary>
+    public TileObjectDef[] StrangePlants { get; }
+
+    /// <summary>Chance per open grass top (surface turf or jungle turf) of a Strange Plant: about one per 2000.</summary>
+    public const float StrangePlantChance = 1f / 2000f;
 
     public byte Forest { get; }
     public byte Tundra { get; }

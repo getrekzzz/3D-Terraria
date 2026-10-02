@@ -3041,6 +3041,30 @@
    ],
    "generator": "banner"
   },
+  "strange_plant_1_plant": {
+   "models": [
+    "assets/models/objects/strange_plant_1_plant_v0.glb"
+   ],
+   "generator": "flower"
+  },
+  "strange_plant_2_plant": {
+   "models": [
+    "assets/models/objects/strange_plant_2_plant_v0.glb"
+   ],
+   "generator": "flower"
+  },
+  "strange_plant_3_plant": {
+   "models": [
+    "assets/models/objects/strange_plant_3_plant_v0.glb"
+   ],
+   "generator": "flower"
+  },
+  "strange_plant_4_plant": {
+   "models": [
+    "assets/models/objects/strange_plant_4_plant_v0.glb"
+   ],
+   "generator": "flower"
+  },
   "swamp_thing_banner": {
    "models": [
     "assets/models/objects/swamp_thing_banner_v0.glb"
@@ -3337,6 +3361,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/abeemination.png"
+  },
+  "acid_dye": {
+   "model": "assets/models/items/acid_dye.glb",
+   "icon": "assets/icons/items/acid_dye.png"
   },
   "acorn": {
    "model": "assets/models/items/acorn.glb",
@@ -3770,6 +3798,10 @@
   "bloody_spine": {
    "model": "assets/models/items/bloody_spine.glb",
    "icon": "assets/icons/items/bloody_spine.png"
+  },
+  "blue_acid_dye": {
+   "model": "assets/models/items/blue_acid_dye.glb",
+   "icon": "assets/icons/items/blue_acid_dye.png"
   },
   "blue_dungeon_bookcase": {
    "object": "blue_dungeon_bookcase",
@@ -5498,6 +5530,10 @@
    "model": "assets/models/items/gel.glb",
    "icon": "assets/icons/items/gel.png"
   },
+  "gel_dye": {
+   "model": "assets/models/items/gel_dye.glb",
+   "icon": "assets/icons/items/gel_dye.png"
+  },
   "gelatin_crystal": {
    "model": "assets/models/items/gelatin_crystal.glb",
    "icon": "assets/icons/items/gelatin_crystal.png"
@@ -7055,6 +7091,10 @@
    "object": "mushroom_door",
    "icon": "assets/icons/items/mushroom_door.png"
   },
+  "mushroom_dye": {
+   "model": "assets/models/items/mushroom_dye.glb",
+   "icon": "assets/icons/items/mushroom_dye.png"
+  },
   "mushroom_lamp": {
    "object": "mushroom_lamp",
    "icon": "assets/icons/items/mushroom_lamp.png"
@@ -7297,6 +7337,10 @@
   "necromantic_sign": {
    "object": "necromantic_sign",
    "icon": "assets/icons/items/necromantic_sign.png"
+  },
+  "negative_dye": {
+   "model": "assets/models/items/negative_dye.glb",
+   "icon": "assets/icons/items/negative_dye.png"
   },
   "neon_tetra": {
    "model": "assets/models/items/neon_tetra.glb",
@@ -8007,6 +8051,10 @@
    "model": "assets/models/items/purification_powder.glb",
    "icon": "assets/icons/items/purification_powder.png"
   },
+  "purple_ooze_dye": {
+   "model": "assets/models/items/purple_ooze_dye.glb",
+   "icon": "assets/icons/items/purple_ooze_dye.png"
+  },
   "purple_paint": {
    "model": "assets/models/items/purple_paint.glb",
    "sockets": {
@@ -8151,6 +8199,10 @@
    "model": "assets/models/items/recall_potion.glb",
    "icon": "assets/icons/items/recall_potion.png"
   },
+  "red_acid_dye": {
+   "model": "assets/models/items/red_acid_dye.glb",
+   "icon": "assets/icons/items/red_acid_dye.png"
+  },
   "red_devil_banner": {
    "object": "red_devil_banner",
    "icon": "assets/icons/items/red_devil_banner.png"
@@ -8178,6 +8230,10 @@
     "tip": "0 0.34 0 > 0 1 0"
    },
    "icon": "assets/icons/items/red_wrench.png"
+  },
+  "reflective_dye": {
+   "model": "assets/models/items/reflective_dye.glb",
+   "icon": "assets/icons/items/reflective_dye.png"
   },
   "regeneration_potion": {
    "model": "assets/models/items/regeneration_potion.glb",
@@ -8484,6 +8540,10 @@
   "shadow_chest": {
    "object": "shadow_chest",
    "icon": "assets/icons/items/shadow_chest.png"
+  },
+  "shadow_dye": {
+   "model": "assets/models/items/shadow_dye.glb",
+   "icon": "assets/icons/items/shadow_dye.png"
   },
   "shadow_key": {
    "model": "assets/models/items/shadow_key.glb",
@@ -9115,6 +9175,22 @@
   "strange_glowing_mushroom": {
    "model": "assets/models/items/strange_glowing_mushroom.glb",
    "icon": "assets/icons/items/strange_glowing_mushroom.png"
+  },
+  "strange_plant_1": {
+   "model": "assets/models/items/strange_plant_1.glb",
+   "icon": "assets/icons/items/strange_plant_1.png"
+  },
+  "strange_plant_2": {
+   "model": "assets/models/items/strange_plant_2.glb",
+   "icon": "assets/icons/items/strange_plant_2.png"
+  },
+  "strange_plant_3": {
+   "model": "assets/models/items/strange_plant_3.glb",
+   "icon": "assets/icons/items/strange_plant_3.png"
+  },
+  "strange_plant_4": {
+   "model": "assets/models/items/strange_plant_4.glb",
+   "icon": "assets/icons/items/strange_plant_4.png"
   },
   "stynger": {
    "model": "assets/models/items/stynger.glb",
