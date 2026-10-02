@@ -7,6 +7,7 @@ namespace Strata.Core.Session;
 public sealed partial class GameWorld
 {
     private RecipeBook? _recipes;
+    private ProgressionAdvisor? _advisor;
 
     /// <summary>Every recipe, compiled once (shared by the crafting menu, commands and the guide).</summary>
     public RecipeBook Recipes => _recipes ??= new RecipeBook(Session.Content);
@@ -16,6 +17,9 @@ public sealed partial class GameWorld
 
     /// <summary>Unlocks each player's achievements as their journal and the world change.</summary>
     public AchievementTracker Achievements { get; }
+
+    /// <summary>The Guide's progression steps and Help advice (built on first use).</summary>
+    public ProgressionAdvisor Advisor => _advisor ??= new ProgressionAdvisor(this);
 
     /// <summary>A player crafted items (output, total count) — for the journal and achievements.</summary>
     public event Action<PlayerEntity, ItemDef, int>? Crafted;

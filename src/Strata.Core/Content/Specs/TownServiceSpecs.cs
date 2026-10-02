@@ -9,6 +9,7 @@ public static class TownServiceSpecs
     public const string Reforge = "reforge";
     public const string Taxes = "taxes";
     public const string AnglerQuest = "anglerQuest";
+    public const string Advice = "advice";
 
     public static void Register(SpecCatalog c)
     {
@@ -18,6 +19,7 @@ public static class TownServiceSpecs
         c.Register<ReforgeServiceParams>(SpecKind.TownService, Reforge);
         c.Register<TaxServiceParams>(SpecKind.TownService, Taxes);
         c.Register<AnglerQuestParams>(SpecKind.TownService, AnglerQuest);
+        c.Register<AdviceParams>(SpecKind.TownService, Advice);
     }
 }
 
@@ -30,6 +32,13 @@ public sealed class HealServiceParams : SpecParams, IValidatableSpec
     public bool ClearsDebuffs { get; init; } = true;
 
     public string? Validate() => CostPerLife < 0 ? "costPerLife must be >= 0" : null;
+}
+
+/// <summary>The Guide's Help: what to do next (<c>GameWorld.Advisor.Advice</c>, from data/guide/steps.json).</summary>
+public sealed class AdviceParams : SpecParams
+{
+    /// <summary>Button text in conversation.</summary>
+    public string Label { get; init; } = "Help";
 }
 
 /// <summary>Shows what the held item can be crafted into (the guide's help).</summary>

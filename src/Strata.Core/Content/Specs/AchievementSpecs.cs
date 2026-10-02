@@ -50,15 +50,16 @@ public sealed class FlagTrigger : SpecParams, IValidatableSpec
     public string? Validate() => Id == null && All.Length == 0 ? "flag needs id or all" : null;
 }
 
-/// <summary>An item obtained or crafted: one id, any item with a tag, or any item of a category.</summary>
+/// <summary>An item obtained or crafted: one id, any of several, any item with a tag, or any item of a category.</summary>
 public sealed class ItemTrigger : SpecParams, IValidatableSpec
 {
     public string? Item { get; init; }
+    public string[]? Items { get; init; }
     public string? Tag { get; init; }
     public Defs.ItemCategory? Category { get; init; }
 
-    public string? Validate() => (Item != null ? 1 : 0) + (Tag != null ? 1 : 0) + (Category != null ? 1 : 0) != 1
-        ? "give exactly one of item, tag or category" : null;
+    public string? Validate() => (Item != null ? 1 : 0) + (Items != null ? 1 : 0) + (Tag != null ? 1 : 0) + (Category != null ? 1 : 0) != 1
+        ? "give exactly one of item, items, tag or category" : null;
 }
 
 /// <summary>Kills of one creature, or of every creature with a tag.</summary>

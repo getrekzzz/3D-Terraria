@@ -28,6 +28,14 @@ internal static class GuideProbes
         ctx.AddPrefixProbe("achievement.", id =>
             w.Session.Content.Achievements.Contains(id) ? (w.LocalPlayer?.State.Journal.Achieved(id) == true ? 1 : 0) : null);
         ctx.AddProbe("achievements", () => w.LocalPlayer?.State.Journal.Achievements.Count ?? 0);
+        // guide.next.<step>: 1 while that step is the Guide's advice; guide.done.<step>: 1 once done.
+        ctx.AddPrefixProbe("guide.", spec =>
+        {
+            if (w.LocalPlayer is not { } p) return null;
+            if (spec.StartsWith("next.", StringComparison.Ordinal)) return w.Advisor.Next(p) is [var s, ..] && s.Id == spec[5..] ? 1 : 0;
+            if (spec.StartsWith("done.", StringComparison.Ordinal)) return w.Advisor.IsDone(spec[5..], p) ? 1 : 0;
+            return null;
+        });
         ctx.AddPrefixProbe("journal.", spec =>
         {
             if (w.LocalPlayer?.State.Journal is not { } j) return null;

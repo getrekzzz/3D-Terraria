@@ -27,5 +27,13 @@ assert achievement.benched == 1
 assert achievement.eye_on_you == 0
 achievement grant eye_on_you
 assert achievement.eye_on_you == 1
+
+# The Guide's Help: the work bench step is done; defeating the Eye completes its step.
+assert guide.done.work_bench == 1
+assert guide.next.work_bench == 0
+advice
+assert guide.done.eye_of_cthulhu == 0
+flag defeated_eye_of_cthulhu
+assert guide.done.eye_of_cthulhu == 1
 wait 0.5
 assert errors == 0

@@ -36,6 +36,8 @@
     "enemies/temple.json",
     "enemies/underworld.json",
     "enemies/wilds.json",
+    "guide/steps.json",
+    "guide/tips.json",
     "items/alchemy.json",
     "items/arsenal.json",
     "items/biome_chest_weapons.json",

@@ -90,6 +90,11 @@ public sealed class GuideTrigger
     private static long Items(ContentDatabase content, HashSet<string> set, ItemTrigger t)
     {
         if (t.Item != null) return set.Contains(t.Item) ? 1 : 0;
+        if (t.Items != null)
+        {
+            foreach (var id in t.Items) if (set.Contains(id)) return 1;
+            return 0;
+        }
         foreach (var id in set)
             if (content.Items.TryGet(id, out var item) && (t.Tag != null ? item.HasTag(t.Tag) : item.Category == t.Category)) return 1;
         return 0;

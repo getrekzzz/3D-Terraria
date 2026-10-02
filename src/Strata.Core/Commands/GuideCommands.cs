@@ -62,6 +62,18 @@ public static class GuideCommands
         });
         r.Register(new CommandDef
         {
+            Name = "advice", Usage = "advice [steps]",
+            Help = "Prints the Guide's Help advice for the player (the next progression step), or every step with its state.",
+            Run = (ctx, a) =>
+            {
+                var advisor = ctx.World.Advisor;
+                if (a.OptStr(0) != "steps") return CommandResult.Success(advisor.Advice(ctx.Player));
+                return CommandResult.Success(string.Join("\n", advisor.Steps(ctx.Player).Select(s =>
+                    $"{(s.Done ? "[x]" : s.Available ? "[ ]" : " - ")} {s.Step.Id}: {s.Step.DisplayName}")));
+            },
+        });
+        r.Register(new CommandDef
+        {
             Name = "craft", Usage = "craft <item> [times]",
             Help = "Crafts an item from the backpack with the stations around the player, as the crafting menu does.",
             Run = (ctx, a) =>

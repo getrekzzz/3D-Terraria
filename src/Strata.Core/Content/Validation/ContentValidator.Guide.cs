@@ -13,6 +13,23 @@ public static partial class ContentValidator
             ctx.Ref(a, ctx.Db.Items, a.Icon, "icon");
             ValidateTrigger(ctx, a, a.Trigger, "trigger");
         }
+        foreach (var s in ctx.Db.GuideSteps.All)
+        {
+            if (string.IsNullOrWhiteSpace(s.Text)) ctx.Error(s, "text is required.");
+            if (s.DoneWhen.Length == 0) ctx.Error(s, "doneWhen must list at least one trigger.");
+            foreach (var after in s.After) ctx.Ref(s, ctx.Db.GuideSteps, after, "after");
+            for (int i = 0; i < s.DoneWhen.Length; i++) ValidateTrigger(ctx, s, s.DoneWhen[i], $"doneWhen[{i}]");
+            for (int i = 0; i < s.ShowWhen.Length; i++) ValidateTrigger(ctx, s, s.ShowWhen[i], $"showWhen[{i}]");
+            foreach (var item in s.RelatedItems) ctx.Ref(s, ctx.Db.Items, item, "relatedItems");
+            foreach (var enemy in s.RelatedEnemies) ctx.Ref(s, ctx.Db.Enemies, enemy, "relatedEnemies");
+        }
+        DetectCycles(ctx, ctx.Db.GuideSteps.All, s => s.After, "guide step");
+        foreach (var t in ctx.Db.GuideTips.All)
+        {
+            if (string.IsNullOrWhiteSpace(t.Text)) ctx.Error(t, "text is required.");
+            if (t.Text.Split('{').Length != t.Text.Split('}').Length) ctx.Error(t, "text has unbalanced { } placeholders.");
+            if (t.Topic == Defs.GuideTipTopic.Controls && t.Action == null) ctx.Error(t, "a controls tip names its input action.");
+        }
     }
 
     /// <summary>An achievement trigger (or guide step condition): its shape and every id it names.</summary>
@@ -30,6 +47,7 @@ public static partial class ContentValidator
             case AchievementSpecs.ObtainItem or AchievementSpecs.CraftItem:
                 var item = spec.Parse<ItemTrigger>();
                 ctx.Ref(owner, ctx.Db.Items, item.Item, $"{field}.item");
+                foreach (var id in item.Items ?? Array.Empty<string>()) ctx.Ref(owner, ctx.Db.Items, id, $"{field}.items");
                 if (item.Tag != null && !ctx.Db.Items.All.Any(i => i.HasTag(item.Tag))) ctx.Error(owner, $"{field}.tag '{item.Tag}' is on no item.");
                 break;
             case AchievementSpecs.KillEnemy:

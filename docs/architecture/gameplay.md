@@ -455,3 +455,14 @@ evaluates all. Unlocks are stored in `Journal.Achievements` (Unix seconds) and r
 (`tools/audio/sfx_recipes_guide.py`). Probes `achievement.<id>`, `achievements`; command
 `achievement [grant|progress <id>]`. Not yet: `rescued` and `anglerQuests` triggers (no per-player record of
 rescues or completed quests on this branch), a chat line (no chat log yet).
+
+## Guide progression and tips (P5-27)
+
+`data/guide/steps.json` (`guideSteps`, `GuideStepDef`: text, order, `after`, `doneWhen`/`showWhen` achievement
+triggers, related items/enemies, stage) holds ~30 steps of the reference game's progression; `data/guide/tips.json`
+(`guideTips`: text with `{key:<input action>}` placeholders, topic, controls action) ~40 tips. The validator checks
+references, trigger shapes and `after` cycles (`ContentValidator.Guide.cs`). `ProgressionAdvisor`
+(`GameWorld.Advisor`): `Steps(player)` (done / available), `Next(player, n)`, `Advice(player)` — the Guide's Help
+line. A town service type `advice` (`AdviceParams`) is registered for it, but the conversation UI
+(`TownDialog.Services`) is not wired yet: the Guide keeps `craftHelp` until the W4 dialog lands. Command `advice
+[steps]`; probes `guide.next.<step>`, `guide.done.<step>`.
