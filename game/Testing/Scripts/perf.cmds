@@ -93,7 +93,6 @@ heal
 repeat 10 use
 wait 1.0
 assert perf.calls.gd.projectiles.create > 0
-assert perf.max.gd.projectiles < 6
 
 # Creatures appear (models instantiated on first sight).
 spawn zombie 5
@@ -133,4 +132,17 @@ wait 1.0
 probe perf.calls.gd.colliders.build
 probe perf.calls.gd.objects.rebuild
 probe perf.max_calls.gd.grass.create
+assert errors == 0
+
+# Projectiles in a steady state (P1b-15): a second volley of sparks reuses pooled views and shared resources, so no
+# frame of it spends long drawing projectiles (the first-ever shot's model load is in the report above).
+perf start
+wield wand_of_sparking
+heal
+repeat 10 use
+heal
+repeat 10 use
+wait 1.0
+probe perf.calls.gd.projectiles.create
+assert perf.max.gd.projectiles < 6
 assert errors == 0
