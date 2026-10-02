@@ -7,7 +7,9 @@
 | 3 | P4-35, P4-36, P4-37, X-09 (all but the creator menu rows) | full headless CI green (426 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 4 | X-17 hair/cloth motion | full headless CI green (430 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 5 | P1b-06, P1b-07 (async saves, reviewed + fixed), P1b-08, P1b-09 (scheduler, budgets, colliders) | full headless CI green (502 Core tests, 14/14 smoke, MENU PASS), all review findings fixed |
-| 6 | P1b-10..14, P1b-16, X-09 creator menu rows (after P2-30) | pending |
+| 6 | P1b-10, P1b-11, P1b-12 (tile objects, grass, GC) | full headless CI green (507 Core tests, 14/14 smoke, MENU PASS) |
+| 7 | P1b-13, P1b-14, P1b-16 (threaded asset cache, preloading + warm-up, dynamic resolution; reviewed + fixed) | full headless CI green (518 Core tests, 14/14 smoke, MENU PASS) |
+| 8 | X-09 creator menu rows (after P2-30) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -67,7 +69,16 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
 ## Lag-spike wave (taken over from the integration session)
 * Baseline before any change (headless perf.cmds, small world, view 6): 95 frames >=33 ms of ~11,600, p99 30.5 ms,
   max 492.6 ms, 30 gen-2 GCs (1,217 ms pauses). Saved in `/root/.claude/plans/overhaul-specs/baselines/perf-before.txt`.
-* Follow-up outside the P1b list: `tick.liquids` peaks at 97.7 ms in that run (liquid steps); not addressed yet.
+* After the wave (same flags, push 7 head; perf.cmds now also waits for `assets.pending == 0` and the warm-up, so the
+  frame count differs): 25 frames >=33 ms of 8,455 (>=50 ms 5, >=100 ms 0), p95 11.0 ms (was 15.5), p99 16.0 ms (was
+  30.5), max 64.2 ms (was 492.6), 7 gen-2 GCs (649.7 ms total pauses, was 1,217). Worst subsystem peaks: world_runtime
+  50.9 ms (was 283), objects 4.7 (was 199), grass 7.5 (was 196), colliders 24.2 (was 93.7), music gone from the list
+  (was 271). Most remaining spikes are ~30–35 ms gen-0/1 GC pauses or a single culling/streaming frame.
+* `tick.liquids` peaked at 97.7 ms in the baseline (follow-up outside the P1b list, not changed directly); after the wave
+  its peak is 13.4 ms in this run, so it is no longer a spike source here, but large liquid events were not stress-tested.
+* P1b-14/16 review fixes: without GPU timing the resolution governor never steps down (a vsync-pinned frame could never
+  step back up); the warm-up probe resets per world and its boxes follow the camera. Open (low): materials of models
+  that are preloaded but not yet instantiated are not in the warm-up set.
 * P1b-08/09 review fixes: budgets use main-thread CPU time (not vsync delta), stay at loading level until chunks
   within 2 of the focus have meshes, and a large backlog overrides the slow-frame shrink; collider priority clears by
   mesh version; light-edit neighbours remesh ahead of distance order.
