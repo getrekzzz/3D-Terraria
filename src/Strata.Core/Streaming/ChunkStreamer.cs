@@ -24,6 +24,9 @@ public sealed partial class ChunkStreamer
         public bool MeshDirty = true;
         public bool HasMesh;
         public int Priority;
+
+        /// <summary>The ready epoch at which this chunk last failed <see cref="NeighboursReady"/> (-1: never).</summary>
+        public int BlockedEpoch = -1;
     }
 
     private readonly Dictionary<Int3, Entry> _entries = new();
@@ -33,6 +36,7 @@ public sealed partial class ChunkStreamer
     private readonly Dictionary<Int3, byte[]> _pendingSaves = new();
     private Int3 _focusChunk = new(int.MinValue, 0, 0);
     private int _loadsInFlight, _meshesInFlight;
+    private int _loaded, _meshed;
 
     public ChunkStreamer(WorldSession session, JobSystem jobs, StreamingSettings settings)
     {
@@ -50,8 +54,8 @@ public sealed partial class ChunkStreamer
     /// <summary>A chunk left the loaded set (drop its render/physics objects).</summary>
     public event Action<Int3>? ChunkRemoved;
 
-    public int LoadedCount => _entries.Count(e => e.Value.Data == DataState.Ready);
-    public int MeshedCount => _entries.Count(e => e.Value.HasMesh);
+    public int LoadedCount => _loaded;
+    public int MeshedCount => _meshed;
     public int LoadsInFlight => _loadsInFlight;
     public int MeshesInFlight => _meshesInFlight;
 
@@ -107,6 +111,7 @@ public sealed partial class ChunkStreamer
             if (!_entries.TryGetValue(c, out var e)) continue;
             e.MeshDirty = true;
             if (urgent) e.Priority = -1000;
+            TouchMesh(c, e);
         }
         if (urgent) ScheduleMeshes();
     }
@@ -114,7 +119,10 @@ public sealed partial class ChunkStreamer
     /// <summary>Saves and unloads everything (world exit).</summary>
     public void UnloadAll()
     {
-        foreach (var coord in _entries.Keys.ToList()) Unload(coord);
+        _unloadScratch.Clear();
+        _unloadScratch.AddRange(_entries.Keys);
+        foreach (var coord in _unloadScratch) Unload(coord);
+        _unloadScratch.Clear();
         FlushSaves();
     }
 }
