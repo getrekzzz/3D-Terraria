@@ -13,7 +13,7 @@ public sealed partial class PlayerInventory
     public const int AmmoSlots = 4;
     public const int ArmorSlots = 3;
 
-    /// <summary>Accessory slots every world has; Expert worlds unlock a 6th and Master worlds a 7th.</summary>
+    /// <summary>Accessory slots every world has; Master worlds unlock a 6th and a Demon Heart one more in Expert and Master.</summary>
     public const int BaseAccessorySlots = 5;
     public const int MaxAccessorySlots = 7;
 

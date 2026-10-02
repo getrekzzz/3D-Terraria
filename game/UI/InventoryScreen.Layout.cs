@@ -10,7 +10,8 @@ namespace Strata.Game.UI;
 /// on the HUD hotbar's origin), the coin and ammo columns, trash and sort buttons (<see cref="CoinAmmoColumns"/>), the
 /// panel host (<see cref="UiRegion.Panel"/>), the crafting column and the equipment column. The HUD computes the layout
 /// from <see cref="Panel"/> and <see cref="AccessoryRows"/> and calls <see cref="Place"/> when it changes (the window,
-/// the UI scale, opening, a panel shown or closed), never per frame. Slots are sized by the layout's slot scale.
+/// the UI scale, opening, a panel shown or closed, an accessory row appearing), never per frame. Slots are sized by the
+/// layout's slot scale.
 /// </summary>
 public sealed partial class InventoryScreen
 {
@@ -21,6 +22,7 @@ public sealed partial class InventoryScreen
     private Control _panelHost = null!;
     private Control? _panel;
     private CraftingPanel _crafting = null!;
+    private EquipmentPanel _equipment = null!;
 
     /// <summary>
     /// The layout inputs changed (opened or closed, a panel shown or closed, an accessory row appeared): the HUD lays
@@ -32,7 +34,10 @@ public sealed partial class InventoryScreen
     public UiPanel Panel { get; private set; }
 
     /// <summary>Accessory rows of the equipment column: the slots the world unlocked, and a locked one still holding an item.</summary>
-    public int AccessoryRows { get; private set; } = PlayerInventory.BaseAccessorySlots;
+    public int AccessoryRows => _equipment.AccessoryRows;
+
+    /// <summary>The equipment column (tabs, Dye | Vanity | Equip, Misc page, defence shield).</summary>
+    public EquipmentPanel Equipment => _equipment;
 
     /// <summary>The layout's slot scale (1, or smaller on a crowded screen); hosted panels size their slots by it.</summary>
     public float SlotScale { get; private set; } = 1f;
@@ -64,7 +69,12 @@ public sealed partial class InventoryScreen
         _root.AddChild(_crafting);
         _crafting.Initialize(_ui);
 
-        BuildEquipment();
+        _equipment = LayoutWidgets.Register(new EquipmentPanel((area, index) => Slot(area, index)));
+        _root.AddChild(_equipment);
+        _equipment.RowsChanged += () =>
+        {
+            if (IsOpen) LayoutChanged?.Invoke();
+        };
     }
 
     /// <summary>A registered region widget that takes the clicks between its slots (no throw from a gap).</summary>
@@ -92,7 +102,7 @@ public sealed partial class InventoryScreen
         PlacePanel();
         _crafting.Visible = LayoutWidgets.Place(_crafting, layout, UiRegion.Crafting);
         _equipment.Visible = LayoutWidgets.Place(_equipment, layout, UiRegion.Equipment);
-        if (_equipment.Visible) ArrangeEquipment();
+        if (_equipment.Visible) _equipment.Arrange(SlotScale);
     }
 
     /// <summary>

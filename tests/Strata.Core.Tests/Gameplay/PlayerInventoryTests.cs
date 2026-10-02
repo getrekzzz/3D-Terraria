@@ -66,28 +66,56 @@ public class PlayerInventoryTests
         Assert.Equal(new[] { "cobalt_shield", VanityCape.Id }, inv.ShownAccessories.Select(i => i.Id));
     }
 
-    [Fact]
-    public void ExpertWorldUnlocksSixthAccessory()
+    [Theory]
+    [InlineData(Difficulty.Classic, false, 5)]
+    [InlineData(Difficulty.Classic, true, 5)] // the heart's slot stays greyed out in a Classic world
+    [InlineData(Difficulty.Journey, true, 5)]
+    [InlineData(Difficulty.Expert, false, 5)]
+    [InlineData(Difficulty.Expert, true, 6)]
+    [InlineData(Difficulty.Master, false, 6)]
+    [InlineData(Difficulty.Master, true, 7)]
+    public void AccessorySlotsFollowDifficultyAndDemonHeart(Difficulty difficulty, bool heart, int slots)
     {
-        using (var classic = TestGame.Create())
-            Assert.Equal(5, classic.Player.State.Inventory.AccessorySlotsUnlocked);
-        using var g = TestGame.Create(difficulty: Difficulty.Expert);
-        var inv = g.Player.State.Inventory;
-        Assert.Equal(6, inv.AccessorySlotsUnlocked);
-        Assert.Equal(7, GameWorld.AccessorySlotsFor(Difficulty.Master));
-        Assert.Equal(5, GameWorld.AccessorySlotsFor(Difficulty.Journey));
+        Assert.Equal(slots, GameWorld.AccessorySlotsFor(difficulty, heart));
+        var state = new PlayerState("tester") { ExtraAccessorySlot = heart };
+        using var g = TestGame.Create(difficulty: difficulty);
+        g.World.AddPlayer(state, g.Player.Position);
+        var inv = state.Inventory;
+        Assert.Equal(slots, inv.AccessorySlotsUnlocked);
 
-        // The sixth accessory goes into the sixth slot and counts.
-        inv.Backpack.Clear();
-        var accessories = Accessories(6);
+        // Every unlocked slot takes an accessory and counts.
+        var accessories = Accessories(slots);
         foreach (var a in accessories)
         {
             inv.Backpack[0] = new ItemStack(a, 1);
             Assert.True(inv.Equip(0));
         }
-        Assert.Equal(accessories[5], inv.Accessories[5].Item);
-        Assert.Equal(6, inv.EquippedStacks.Count());
+        Assert.Equal(accessories[slots - 1], inv.Accessories[slots - 1].Item);
+        Assert.Equal(slots, inv.EquippedStacks.Count());
         Assert.True(inv.Backpack[0].IsEmpty);
+    }
+
+    [Fact]
+    public void LockedAccessorySlotKeepsItsItemAndOnlyGivesItBack()
+    {
+        using var g = TestGame.Create();
+        var inv = g.Player.State.Inventory;
+        var (shield, skull) = (S("cobalt_shield"), S("obsidian_skull"));
+        inv.Accessories[5] = shield; // worn in a harder world, locked here
+        Assert.True(inv.IsAccessorySlotLocked(5));
+        Assert.DoesNotContain(shield, inv.EquippedStacks);
+
+        // Nothing goes in (not even a swap), but the item comes out onto the cursor and is never lost.
+        inv.Cursor = skull;
+        Assert.Equal(ClickOutcome.None, g.World.ClickSlot(g.Player, new SlotRef(SlotArea.Accessories, 5), false, ClickMods.None, SlotContext.None));
+        Assert.Equal(shield, inv.Accessories[5]);
+        Assert.Equal(ClickOutcome.None, g.World.ClickSlot(g.Player, new SlotRef(SlotArea.Dyes, PlayerInventory.ArmorSlots + 5), false, ClickMods.None, SlotContext.None));
+        inv.Backpack.Add(inv.Cursor);
+        inv.Cursor = ItemStack.Empty;
+        Assert.Equal(ClickOutcome.None, g.World.ClickSlot(g.Player, new SlotRef(SlotArea.Accessories, 5), true, ClickMods.None, SlotContext.None));
+        Assert.Equal(ClickOutcome.Moved, g.World.ClickSlot(g.Player, new SlotRef(SlotArea.Accessories, 5), false, ClickMods.None, SlotContext.None));
+        Assert.Equal(shield, inv.Cursor);
+        Assert.True(inv.Accessories[5].IsEmpty);
     }
 
     [Fact]

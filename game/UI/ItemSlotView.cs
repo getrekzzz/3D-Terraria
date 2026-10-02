@@ -89,6 +89,9 @@ public sealed partial class ItemSlotView : Control
     /// <summary>Silhouette shown faintly while the slot is empty (armor, accessory and misc slots, trash).</summary>
     public Texture2D? EmptyHint { get; set; }
 
+    /// <summary>The slot's name, shown as its tooltip while it is empty ('Helmet', 'Social Shirt', 'Dye'); null shows none.</summary>
+    public string? EmptyText { get; set; }
+
     /// <summary>Whether the slot is favourited (Alt+click): drawn gold; null for slots that cannot be.</summary>
     public Func<bool>? Favorite { get; set; }
 
@@ -110,7 +113,7 @@ public sealed partial class ItemSlotView : Control
     /// <summary>Shows this slot's tooltip beside the pointer (on hover, and from the <c>ui hover</c> command).</summary>
     public void ShowTooltip()
     {
-        if (_tooltip != null) TooltipFollower.Current?.Show(this, _read, _tooltip);
+        if (_tooltip != null) TooltipFollower.Current?.Show(this, _read, _tooltip, EmptyText);
     }
 
     /// <summary>Ends a hold-repeat (the owner calls it when a repeated click stops moving items).</summary>

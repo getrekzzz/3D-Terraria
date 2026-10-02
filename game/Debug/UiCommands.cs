@@ -14,8 +14,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|close|export-theme>",
-            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|minimap <in|out>|f3|sort|quickstack|tab <equipment|misc>|eye <accessory>|close|export-theme>",
+            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; minimap presses a zoom button when it would take a click; f3 toggles the performance overlay; sort and quickstack press the inventory's Sort Inventory and Quick Stack to Nearby Chests buttons; tab shows an equipment column page; eye presses an accessory row's visibility toggle; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -67,12 +67,21 @@ public static class UiCommands
                     case "quickstack":
                         int chests = screen.QuickStack();
                         return CommandResult.Success(chests > 0 ? $"Quick stacked into {chests} chest(s)." : "No nearby chest holds any of these items.");
+                    case "tab":
+                        string page = a.Str(1, "equipment|misc");
+                        if (page is not ("equipment" or "misc")) throw new CommandException("the tab is equipment or misc");
+                        screen.Equipment.ShowMisc(page == "misc");
+                        return CommandResult.Success($"Showing the {page} page.");
+                    case "eye":
+                        int row = a.Int(1, "accessory");
+                        if (!screen.Equipment.PressEye(row)) return CommandResult.Fail($"Accessory row {row} has no eye on screen (open the inventory on the equipment page).");
+                        return CommandResult.Success($"Accessory {row} {(ctx.Player.State.Inventory.IsAccessoryHidden(row) ? "hidden" : "shown")}.");
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, minimap, f3, sort, quickstack, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, minimap, f3, sort, quickstack, tab, eye, close or export-theme");
                 }
             },
         });

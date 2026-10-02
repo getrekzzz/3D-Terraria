@@ -78,5 +78,10 @@ public static class UiProbes
         ctx.AddProbe("ui.grid_on_hotbar", () => world.Inventory?.GridOnHotbar == true ? 1 : 0);
         ctx.AddProbe("ui.panel", () => (int)(world.Inventory?.Panel ?? Strata.Core.Presentation.UiPanel.None));
         ctx.AddProbe("ui.slot_scale", () => world.Inventory?.SlotScale ?? 0);
+        // P2-16: the equipment column. Accessory rows shown (unlocked, or locked and still holding an item), the
+        // defence on the shield badge and the Misc page shown.
+        ctx.AddProbe("ui.equip_rows", () => world.Inventory?.AccessoryRows ?? 0);
+        ctx.AddProbe("ui.defense_badge", () => world.Inventory?.Equipment.Defense.Shown ?? -1);
+        ctx.AddProbe("ui.misc_tab", () => world.Inventory?.Equipment.MiscShown == true ? 1 : 0);
     }
 }

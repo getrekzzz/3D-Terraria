@@ -9,7 +9,9 @@ namespace Strata.Game.UI;
 /// The one item tooltip, as Terraria shows it: instantly, beside the pointer and following it, each line in its
 /// colour (<see cref="UiTheme.TooltipColor"/>; Expert and Master names cycle). Slots call <see cref="Show"/> and
 /// <see cref="Hide"/> on hover; the lines are rebuilt only when the hovered stack changes, and every quarter second
-/// for text that changes on its own (prices, set bonuses). It hides when its slot hides or the pointer is captured.
+/// for text that changes on its own (prices, set bonuses). An empty slot can name itself ('Helmet', 'Dye'), and
+/// <see cref="ShowText"/> shows plain lines for other controls (the defence shield). It hides when its owner hides or
+/// the pointer is captured.
 /// </summary>
 public sealed partial class TooltipFollower : CanvasLayer
 {
@@ -27,6 +29,9 @@ public sealed partial class TooltipFollower : CanvasLayer
     private Control? _owner;
     private Func<ItemStack>? _read;
     private TooltipSource? _source;
+    private string? _emptyText;
+    private Func<string>? _text;
+    private string? _textShown;
     private ItemStack _stack;
     private double _refresh;
     private int _lines;
@@ -66,13 +71,33 @@ public sealed partial class TooltipFollower : CanvasLayer
         if (Current == this) Current = null;
     }
 
-    /// <summary>Shows the tooltip of the stack <paramref name="read"/> returns, for as long as <paramref name="owner"/> is hovered.</summary>
-    public void Show(Control owner, Func<ItemStack> read, TooltipSource source)
+    /// <summary>
+    /// Shows the tooltip of the stack <paramref name="read"/> returns, for as long as <paramref name="owner"/> is hovered;
+    /// while the slot is empty, <paramref name="emptyText"/> (the slot's name) if given.
+    /// </summary>
+    public void Show(Control owner, Func<ItemStack> read, TooltipSource source, string? emptyText = null)
     {
         _owner = owner;
         _read = read;
         _source = source;
+        _emptyText = emptyText;
+        _text = null;
         Rebuild(read());
+        Follow();
+    }
+
+    /// <summary>
+    /// Text mode: the white lines of <paramref name="text"/> (split at line breaks) for as long as <paramref name="owner"/>
+    /// is hovered, rebuilt when the returned string changes (return a cached one: it is read every frame).
+    /// </summary>
+    public void ShowText(Control owner, Func<string> text)
+    {
+        _owner = owner;
+        _read = null;
+        _source = null;
+        _emptyText = null;
+        _text = text;
+        RebuildText(text());
         Follow();
     }
 
@@ -90,6 +115,13 @@ public sealed partial class TooltipFollower : CanvasLayer
             Clear();
             return;
         }
+        if (_text != null)
+        {
+            var text = _text();
+            if (!ReferenceEquals(text, _textShown) && text != _textShown) RebuildText(text);
+            Follow();
+            return;
+        }
         var stack = _read!();
         _refresh -= delta;
         if (!stack.Equals(_stack) || _refresh <= 0) Rebuild(stack);
@@ -104,20 +136,40 @@ public sealed partial class TooltipFollower : CanvasLayer
         _refresh = RefreshSeconds;
         _lines = 0;
         _nameLine = -1;
-        if (!stack.IsEmpty)
+        if (stack.IsEmpty && _emptyText != null) SetLine(_emptyText, TooltipKind.Stat, 0);
+        else if (!stack.IsEmpty)
         {
             int rarity = stack.Item!.Rarity;
             foreach (var (text, kind) in _source!(stack))
             {
                 if (_lines == MaxLines) break;
-                var label = _labels[_lines];
-                if (label.Text != text) label.Text = text;
-                label.Modulate = UiTheme.TooltipColor(kind, rarity);
-                label.Visible = true;
                 if (kind == TooltipKind.Name && _nameLine < 0) _nameLine = _lines;
-                _lines++;
+                SetLine(text, kind, rarity);
             }
         }
+        FinishLines();
+    }
+
+    private void RebuildText(string text)
+    {
+        _textShown = text;
+        _lines = 0;
+        _nameLine = -1;
+        foreach (var line in text.Split('\n'))
+            if (_lines < MaxLines) SetLine(line, TooltipKind.Stat, 0);
+        FinishLines();
+    }
+
+    private void SetLine(string text, TooltipKind kind, int rarity)
+    {
+        var label = _labels[_lines++];
+        if (label.Text != text) label.Text = text;
+        label.Modulate = UiTheme.TooltipColor(kind, rarity);
+        label.Visible = true;
+    }
+
+    private void FinishLines()
+    {
         for (int i = _lines; i < MaxLines && _labels[i].Visible; i++) _labels[i].Visible = false;
         _panel.Visible = _lines > 0;
         if (_panel.Visible) _panel.ResetSize(); // shrink to the new lines
@@ -139,6 +191,9 @@ public sealed partial class TooltipFollower : CanvasLayer
         _owner = null;
         _read = null;
         _source = null;
+        _emptyText = null;
+        _text = null;
+        _textShown = null;
         _stack = ItemStack.Empty;
         _panel.Visible = false;
     }

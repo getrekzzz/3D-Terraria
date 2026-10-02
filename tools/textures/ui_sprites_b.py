@@ -138,6 +138,20 @@ SPRITES = {
         ..dd....dd..
         ............
     """,
+    "tab_housing": """
+        ............
+        .....tt.....
+        ....tnnt....
+        ...tnnnnt...
+        ..tnnnnnnt..
+        .tnnnnnnnnt.
+        tttttttttttt
+        .uuuuuuuuuu.
+        .uccuuuttuu.
+        .uccuuuttuu.
+        .uuuuuuttuu.
+        .dddddddddd.
+    """,
     # --- Pointer (no outline: the 'k' cells are its 2 px dark border; white is tinted at runtime) ---
     "cursor": """
         kk.......

@@ -222,5 +222,16 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   `SlotScale`; `CraftingPanel` takes the Crafting region (pooled rows, no fixed size); the equipment column takes the
   Equipment region under the minimap. Every part is a registered layout widget made of plain controls placed by hand,
   so none outgrows its region. Closing stows the cursor and the service slot and closes the panel. Partials: `.Layout`
-  (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack), `.Chest`,
-  `.Equipment`. Smoke: `ui sort`, `ui quickstack`; probes `ui.grid_on_hotbar`, `ui.panel`, `ui.slot_scale`.
+  (build and place), `.Slots` (views), `.Clicks` (`GameWorld.ClickSlot`, sounds, sort and quick stack), `.Chest`.
+  Smoke: `ui sort`, `ui quickstack`; probes `ui.grid_on_hotbar`, `ui.panel`, `ui.slot_scale`.
+* **Equipment column** (`game/UI/Inventory/EquipmentPanel*.cs`, `DefenseBadge.cs`): tabs `tab_equipment`,
+  `tab_misc` and a disabled `tab_housing` for the town phase over two pages. Equipment: Dye | Vanity | Equip for the
+  helmet, shirt and pants and one row per accessory slot (`GameWorld.AccessorySlotsFor(difficulty, demonHeart)`: 5 in
+  Classic/Journey and Expert, 6 in Master, +1 from a consumed Demon Heart in Expert/Master, set again the moment the
+  heart is eaten); a locked row shows only while it still holds something (greyed, `SlotFilters` refuse new items, the
+  old one can be taken out) and the rows pack from the top. Each accessory row has an eye (`eye_open`/`eye_closed`)
+  that flips its `PlayerInventory.HiddenAccessories` bit, which `ShownAccessories` (the avatar) skips. Misc: pet, light
+  pet, minecart, mount and hook with their dyes. Empty slots name themselves ('Helmet', 'Social Shirt', 'Dye') through
+  the tooltip's empty-slot text, and `DefenseBadge` shows the defence on the shield with '{n} Defense' and the set bonus
+  in `TooltipFollower.ShowText`. Smoke: `ui tab <equipment|misc>`, `ui eye <row>`; probes `ui.equip_rows`,
+  `ui.defense_badge`, `ui.misc_tab`, `inv.accessory_slots`, `inv.hidden_accessories`.

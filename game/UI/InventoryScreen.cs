@@ -11,10 +11,11 @@ namespace Strata.Game.UI;
 /// the hotbar's spot (its first row is the hotbar), the coin and ammo columns right of it with the trash under them and
 /// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest
 /// today; shops and services plug in through <see cref="ShowPanel"/>), the crafting column bottom-left and the
-/// equipment column on the right under the minimap. Each part is a registered layout widget placed by <see cref="Place"/>
-/// (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the pointer by <see cref="CursorItemLayer"/>
-/// and clicks are routed by <c>GameWorld.ClickSlot</c> (InventoryScreen.Clicks.cs). An overlay: the player keeps
-/// moving, and clicks on empty screen go to the <see cref="WorldClickCatcher"/> under every panel.
+/// equipment column (<see cref="EquipmentPanel"/>) on the right under the minimap. Each part is a registered layout
+/// widget placed by <see cref="Place"/> (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the
+/// pointer by <see cref="CursorItemLayer"/> and clicks are routed by <c>GameWorld.ClickSlot</c>
+/// (InventoryScreen.Clicks.cs). An overlay: the player keeps moving, and clicks on empty screen go to the
+/// <see cref="WorldClickCatcher"/> under every panel.
 /// </summary>
 public sealed partial class InventoryScreen : CanvasLayer
 {
@@ -68,7 +69,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (autoPause || !open) _ui.Player.Runtime.Simulating = !open;
         if (open)
         {
-            UpdateEquipment();
+            _equipment.Refresh(_ui.Entity.State);
             _crafting.Refresh();
             LayoutChanged?.Invoke();
             return;
@@ -97,7 +98,7 @@ public sealed partial class InventoryScreen : CanvasLayer
             _craftingStale = false;
             _crafting.Refresh();
         }
-        UpdateEquipment();
+        _equipment.Refresh(_ui.Entity.State);
         int selected = _ui.Inventory.SelectedHotbar;
         for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
         if (_container != null)
