@@ -151,9 +151,11 @@ public sealed class MapSystem
         foreach (var (player, entry) in _maps)
         {
             if (!entry.Map.Dirty || PathFor(player) is not { } path) continue;
-            var snapshot = entry.Map.Snapshot();
-            entry.Map.Dirty = false;
-            batch.Files.Add((path, () => snapshot.Save(id => blocks[id].Id)));
+            var map = entry.Map;
+            var snapshot = map.Snapshot();
+            map.Dirty = false;
+            // A failed write marks the map changed again (on the main thread), so the next save retries it.
+            batch.Files.Add(new Persistence.SaveFile(path, () => snapshot.Save(id => blocks[id].Id), () => map.Dirty = true));
         }
     }
 

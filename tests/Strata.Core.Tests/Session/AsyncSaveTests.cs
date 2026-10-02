@@ -90,6 +90,57 @@ public class AsyncSaveTests
     }
 
     [Fact]
+    public void HardcoreDeathDuringAutosaveStaysDeleted()
+    {
+        var dir = TestWorlds.TempDir();
+        using var game = TestGame.Create(dir);
+        var w = game.World;
+        game.Player.State.Difficulty = Strata.Core.Gameplay.Player.CharacterDifficulty.Hardcore;
+        w.SaveAll();
+        var path = GameWorld.PlayerPath(Path.Combine(dir, "players"), game.Player.State.Name);
+        Assert.True(File.Exists(path));
+
+        // The autosave (holding the living character's JSON) is still queued when the character dies for good.
+        using var gate = new ManualResetEventSlim(false);
+        w.Session.Saver!.TestGate = gate;
+        Assert.True(w.BeginAutosave());
+        game.Player.State.Vitals.DamageDirect(10_000);
+        game.Ticks(GameWorld.RespawnDelayTicks + 5);
+        Assert.True(game.Player.Lost);
+        gate.Set();
+        Assert.True(w.Session.Saver.Flush(TimeSpan.FromSeconds(60)));
+        w.Jobs.Drain(1000);
+
+        Assert.False(File.Exists(path));
+        Assert.False(File.Exists(path + ".bak"));
+        Assert.False(File.Exists(path + ".tmp"));
+    }
+
+    [Fact]
+    public void FailedMapWriteIsRetried()
+    {
+        var dir = TestWorlds.TempDir();
+        using var game = TestGame.Create(dir);
+        var w = game.World;
+        var map = w.Maps.For(game.Player);
+        map.SetSurface(1, 1, MapValue.Block(game.Content.BlockId("stone")), 10);
+        var mapPath = Path.Combine(dir, MapSystem.MapDirectory, game.Player.State.Name + ".map");
+        Directory.CreateDirectory(mapPath); // a directory where the file goes: the write fails
+
+        Assert.True(w.BeginAutosave());
+        Assert.False(map.Dirty);
+        Assert.True(w.Session.Saver!.Flush(TimeSpan.FromSeconds(60)));
+        w.Jobs.Drain(1000);
+        Assert.True(map.Dirty);
+        Assert.True(game.Log.Count(LogLevel.Error) > 0);
+
+        Directory.Delete(mapPath);
+        w.SaveAll();
+        Assert.False(map.Dirty);
+        Assert.True(File.Exists(mapPath));
+    }
+
+    [Fact]
     public void RestreamBeforeWriteKeepsEdits()
     {
         var dir = TestWorlds.TempDir();

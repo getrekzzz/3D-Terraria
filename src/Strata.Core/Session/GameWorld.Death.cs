@@ -40,7 +40,7 @@ public sealed partial class GameWorld
                 if (state.Difficulty == CharacterDifficulty.Hardcore)
                 {
                     p.Lost = true;
-                    if (PlayerDirectory != null) DeletePlayer(PlayerDirectory, state.Name);
+                    if (PlayerDirectory != null) DeleteLostPlayer(PlayerDirectory, state.Name);
                     PlayerLost?.Invoke(p);
                 }
                 break;

@@ -14,6 +14,12 @@ namespace Strata.Core.Persistence;
 /// </summary>
 public sealed record ChunkSnapshot(Int3 Coord, ChunkData Data, int MutationLevel, byte[] Objects, long Seq);
 
+/// <summary>
+/// A file written by the saver. <see cref="Bytes"/> runs on the save thread and may return null to skip the write
+/// (the content became obsolete); <see cref="Failed"/> runs on the main thread (through the poster) if the write fails.
+/// </summary>
+public sealed record SaveFile(string Path, Func<byte[]?> Bytes, Action? Failed = null);
+
 /// <summary>One unit of save work: chunk snapshots, an optional world.json node and extra files (player, maps).</summary>
 public sealed class SaveBatch
 {
@@ -23,7 +29,10 @@ public sealed class SaveBatch
     public JsonObject? Meta { get; set; }
 
     /// <summary>Files written after the world (bytes are produced on the save thread).</summary>
-    public List<(string Path, Func<byte[]> Bytes)> Files { get; } = new();
+    public List<SaveFile> Files { get; } = new();
+
+    /// <summary>Files deleted after the writes (ordered after every earlier batch, so a queued write cannot resurrect them).</summary>
+    public List<string> Deletes { get; } = new();
 
     /// <summary>Runs on the main thread (through the poster) with the number of chunks written.</summary>
     public Action<int>? Done { get; set; }
@@ -112,14 +121,20 @@ public sealed class WorldSaver : IDisposable
         }
     }
 
-    /// <summary>Blocks until every queued batch is written. Returns false on timeout.</summary>
+    /// <summary>Blocks until every queued batch is written (<see cref="Timeout.InfiniteTimeSpan"/> waits forever). Returns false on timeout.</summary>
     public bool Flush(TimeSpan timeout)
     {
-        var deadline = DateTime.UtcNow + timeout;
+        bool forever = timeout == Timeout.InfiniteTimeSpan;
+        var deadline = forever ? DateTime.MaxValue : DateTime.UtcNow + timeout;
         lock (_gate)
         {
             while (_busy || _queue.Count > 0)
             {
+                if (forever)
+                {
+                    Monitor.Wait(_gate);
+                    continue;
+                }
                 var left = deadline - DateTime.UtcNow;
                 if (left <= TimeSpan.Zero) return false;
                 Monitor.Wait(_gate, left);
@@ -128,7 +143,13 @@ public sealed class WorldSaver : IDisposable
         return true;
     }
 
-    public void Flush() => Flush(TimeSpan.FromMinutes(5));
+    /// <summary>Flushes with a generous bound, logging a warning if the writes did not finish in time.</summary>
+    public bool Flush()
+    {
+        if (Flush(TimeSpan.FromMinutes(5))) return true;
+        _log.Warn("save", "Saving is taking longer than 5 minutes; continuing while the save thread keeps writing.");
+        return false;
+    }
 
     private void Run()
     {
@@ -158,7 +179,8 @@ public sealed class WorldSaver : IDisposable
             }
             catch (Exception ex)
             {
-                _log.Error("save", $"Save batch failed ({batch.Chunks.Count} chunks, meta={batch.Meta != null}, files={batch.Files.Count})", ex);
+                _log.Error("save", $"Save batch failed ({batch.Chunks.Count} chunks, meta={batch.Meta != null}, files={batch.Files.Count}); its chunks are retried with the next save", ex);
+                _retry.AddRange(batch.Chunks);
             }
             if (batch.Done is { } done)
             {
@@ -199,9 +221,26 @@ public sealed class WorldSaver : IDisposable
             }
         }
 
+        IReadOnlyList<RegionWrite> writes = Array.Empty<RegionWrite>();
         if (blobs.Count > 0)
         {
-            var writes = _store.ApplyChunks(blobs);
+            try
+            {
+                writes = _store.ApplyChunks(blobs);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("save", $"Publishing {blobs.Count} chunks failed; they stay pending and are retried with the next save", ex);
+                _retry.AddRange(blobs.Select(b => chosen[b.Key]));
+                blobs.Clear();
+            }
+        }
+
+        // world.json first: its id tables (which only grow) then cover every id the region blobs use, even after a crash.
+        WriteMeta(batch.Meta);
+
+        if (blobs.Count > 0)
+        {
             foreach (var (coord, _) in blobs)
             {
                 var snap = chosen[coord];
@@ -222,16 +261,31 @@ public sealed class WorldSaver : IDisposable
             }
         }
 
-        WriteMeta(batch.Meta);
-        foreach (var (path, bytes) in batch.Files)
+        foreach (var file in batch.Files)
         {
             try
             {
-                AtomicFile.WriteAllBytes(path, bytes());
+                if (file.Bytes() is { } bytes) AtomicFile.WriteAllBytes(file.Path, bytes);
             }
             catch (Exception ex)
             {
-                _log.Error("save", $"Writing {path} failed", ex);
+                _log.Error("save", $"Writing {file.Path} failed", ex);
+                if (file.Failed is { } failed)
+                {
+                    if (Post is { } post) post(failed);
+                    else failed();
+                }
+            }
+        }
+        foreach (var path in batch.Deletes)
+        {
+            try
+            {
+                if (File.Exists(path)) File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("save", $"Deleting {path} failed", ex);
             }
         }
         return blobs.Count;
@@ -265,13 +319,21 @@ public sealed class WorldSaver : IDisposable
         }
     }
 
+    /// <summary>Waits for every queued write (however long it takes: quitting must not lose data), then stops the thread.</summary>
     public void Dispose()
     {
-        Flush(TimeSpan.FromSeconds(30));
+        if (!Flush(TimeSpan.FromSeconds(30)))
+        {
+            _log.Warn("save", "Still writing the world after 30 s; waiting for the save thread to finish.");
+            Flush(Timeout.InfiniteTimeSpan);
+        }
+        Thread? thread;
         lock (_gate)
         {
             _disposed = true;
+            thread = _thread;
             Monitor.PulseAll(_gate);
         }
+        thread?.Join();
     }
 }

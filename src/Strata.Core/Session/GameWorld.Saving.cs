@@ -62,7 +62,9 @@ public sealed partial class GameWorld
                 if (p.Lost) continue; // a dead hardcore character is gone for good
                 p.State.LastPlayedUtc = DateTime.UtcNow;
                 var json = PlayerSave.From(p.State).Serialize();
-                batch.Files.Add((PlayerPath(dir, p.State.Name), () => System.Text.Encoding.UTF8.GetBytes(json)));
+                var player = p;
+                // Re-checked on the save thread: a character lost after this capture must not be written back.
+                batch.Files.Add(new SaveFile(PlayerPath(dir, p.State.Name), () => player.Lost ? null : System.Text.Encoding.UTF8.GetBytes(json)));
             }
         Maps.QueueSave(batch);
         return batch;
@@ -72,6 +74,25 @@ public sealed partial class GameWorld
     {
         if (PlayerDirectory == null || Players.Any(p => p.State == state && p.Lost)) return;
         WritePlayer(PlayerDirectory, state);
+    }
+
+    /// <summary>
+    /// Deletes a lost character's file. It goes through the saver, after every queued write, so an autosave still in
+    /// flight cannot write the character back (and the saver's own temp file is never pulled from under it).
+    /// </summary>
+    private void DeleteLostPlayer(string directory, string name)
+    {
+        if (Session.Saver is not { } saver)
+        {
+            DeletePlayer(directory, name);
+            return;
+        }
+        var path = PlayerPath(directory, name);
+        var batch = new SaveBatch();
+        batch.Deletes.Add(path);
+        batch.Deletes.Add(path + ".bak");
+        batch.Deletes.Add(path + ".tmp");
+        saver.Enqueue(batch);
     }
 
     /// <summary>World exit: lets a running autosave land, then saves and unloads everything synchronously.</summary>
