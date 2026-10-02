@@ -22,11 +22,13 @@ public static class EngineCommands
         r.Register(new CommandDef
         {
             Name = "colliders", Usage = "colliders reset",
-            Help = "Zeroes the collider counters (probes colliders.rebuilt and colliders.skipped), e.g. before a measured edit.",
+            Help = "Zeroes the collider and tile-object counters (probes colliders.rebuilt, colliders.skipped, objects.rebuilds, objects.light_refreshes, grass.builds), e.g. before a measured edit.",
             Run = (_, a) =>
             {
                 if (a.Str(0, "reset") != "reset") throw new CommandException("usage: colliders reset");
                 world.Runtime.Colliders.ResetCounters();
+                world.Objects.ResetCounters();
+                world.Runtime.Grass?.ResetCounters();
                 return CommandResult.Success("Collider counters reset.");
             },
         });

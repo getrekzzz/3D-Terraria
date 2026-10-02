@@ -55,6 +55,21 @@ light is interpolated from the mesh. The output is shuffled so any prefix is an 
 near chunks draw the detailed clump (9 curved blades), far ones a 5-blade clump and a shrinking prefix; the shader
 widens far blades so the cover stays even, sinks them into the ground at the distance limit, bends them with gusts
 travelling downwind and parts them around the player (`strata_trample`). Grass casts no shadows.
+`GrassScatter.Hashes` gives every mesh result a grass shape hash and light hash: a remesh with both unchanged does
+nothing, otherwise the chunk is marked for a rebuild that reuses its multimesh RIDs (reallocated only when the count
+changes) and one pooled scratch buffer, while the old grass stays visible. Builds run nearest first, at most
+`grassBuildsPerFrame` (preset) a frame within `Budgets.GrassMs`; chunks are created within the grass distance and
+released 8 m beyond it. Probes `grass.live`, `grass.builds`, `grass.pending`.
+
+## Tile objects
+`TileObjectRenderer` draws one MultiMesh per chunk and model variant and updates it in place: one float buffer per
+group (3×4 transform plus light as custom data) goes up with a single `MultimeshSetBuffer`; capacity grows by 1.5× and
+`VisibleInstanceCount` hides the spare. A chunk is marked by the cheapest update that covers the change: structure
+(objects added or removed, a door or wire toggled) regroups it, placement (its collision changed: wait for
+`ColliderManager.BodyBuilt`, which `WorldRuntime.MeshApplied` reports as `Pending`) re-places it once, light (a remesh
+with unchanged collision) only rewrites the light. Flames are rebuilt only when their bases move. Updates run nearest
+the camera first within `Budgets.ObjectsMs` (at least one chunk a frame); probes `objects.rebuilds`,
+`objects.light_refreshes`, `objects.pending` (`colliders reset` also zeroes the object counters).
 
 ## Horizon
 Beyond the streamed chunks the world continues as a heightfield (`HorizonField`, Core, tested): terrain height from
@@ -142,6 +157,11 @@ the last draw instead, i.e. the main thread's own work, and the summary says "fr
   comes from a rendering run, on a dev GPU (whole frames) or lavapipe (main-thread work, see above):
   `godot --path . --rendering-driver vulkan -- --world=perf --size=small --new --player=perf --fresh-player --view=6
   --graphics=medium --smoke=res://game/Testing/Scripts/perf.cmds`.
+* **GC**: while a world runs `GameRoot` sets `GCSettings.LatencyMode = SustainedLowLatency` (concurrent GC and
+  tiered PGO are on in `Strata.csproj`; probe `gc.latency_mode`, 3 in a world). Large per-job buffers stay off the
+  large-object heap: `MeshVolume.Rent` and the cave pass's dense noise fields are per-thread scratch, and
+  `MeshUpload` passes the Core vertex lists to Godot as spans (`Variant.CreateFrom`) instead of copying them
+  (`AllocationTests` pin both).
 * **Before/after**: run the same rendering command on the parent commit and on the fix, on the same machine, and
   compare the `perf spikes` summary (p99, max, spike counts, GC) and which timers still appear in the spike list.
   Lavapipe timings only compare with other lavapipe runs (they also share the CPU with the software rasteriser, and

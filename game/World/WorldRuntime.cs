@@ -39,6 +39,12 @@ public sealed partial class WorldRuntime : Node3D
     /// <summary>This frame's main-thread budgets (computed first in <see cref="_Process"/>; presentation nodes read it).</summary>
     public FrameBudgets Budgets { get; private set; } = FrameBudgetPlanner.Loading;
 
+    /// <summary>
+    /// A mesh result was applied to a chunk; says whether its collision changed (<see cref="ColliderChange.Pending"/>:
+    /// new bodies follow with <see cref="ColliderManager.BodyBuilt"/>) or not (a light- or liquid-only remesh).
+    /// </summary>
+    public event System.Action<Int3, ColliderChange>? MeshApplied;
+
     /// <summary>When false the fixed tick is paused (menus, loading).</summary>
     public bool Simulating { get; set; } = true;
 
@@ -75,8 +81,9 @@ public sealed partial class WorldRuntime : Node3D
         Streamer.MeshReady += result =>
         {
             _renderer.Enqueue(result);
-            _grass?.Set(result.Coord, result.Grass);
-            _colliders.SetData(result.Coord, result.Collision, result.Version);
+            _grass?.Set(result.Coord, result.Grass, result.GrassShapeHash, result.GrassLightHash);
+            var change = _colliders.SetData(result.Coord, result.Collision, result.Version);
+            MeshApplied?.Invoke(result.Coord, change);
         };
         // Player edits rebuild their colliders before distance-ordered work.
         System.Func<Int3, int> chunkVersion = c => Session.World.GetChunk(c)?.Version ?? 0;
@@ -135,7 +142,7 @@ public sealed partial class WorldRuntime : Node3D
         var eyeCell = new Int3(Mathf.FloorToInt(eye.X / Units.CellSize), Mathf.FloorToInt(eye.Y / Units.CellSize), Mathf.FloorToInt(eye.Z / Units.CellSize));
         using (prof.Time("gd.culling"))
             _renderer.UpdateCulling(ChunkMath.CellToChunk(eyeCell), st.MeshRadius + 1, System.Math.Max(st.MeshUp, st.MeshDown) + 1, CaveCulling);
-        using (prof.Time("gd.grass")) _grass?.Update(eye, Focus?.GlobalPosition ?? eye);
+        using (prof.Time("gd.grass")) _grass?.Update(eye, Focus?.GlobalPosition ?? eye, budgets.GrassMs);
         UpdateDistance(camera, eye, focus);
         float surface = Session.Generator.Terrain.SurfaceHeight(eye.X / Units.CellSize, eye.Z / Units.CellSize);
         float skyExposure = Rendering.LightProbe.SampleSmooth(Session.World, eye).A;

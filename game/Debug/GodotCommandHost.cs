@@ -54,6 +54,13 @@ public sealed class GodotCommandHost : ICommandHost
             return world.Props.Problems.Count;
         });
         ctx.AddProbe("objects.instances", () => world.Objects.InstanceCount);
+        ctx.AddProbe("objects.rebuilds", () => world.Objects.Rebuilds);
+        ctx.AddProbe("objects.light_refreshes", () => world.Objects.LightRefreshes);
+        ctx.AddProbe("objects.pending", () => world.Objects.PendingCount);
+        ctx.AddProbe("grass.live", () => runtime.Grass?.LiveChunks ?? 0);
+        ctx.AddProbe("grass.builds", () => runtime.Grass?.Builds ?? 0);
+        ctx.AddProbe("grass.pending", () => runtime.Grass?.PendingBuilds ?? 0);
+        ctx.AddProbe("gc.latency_mode", () => (int)System.Runtime.GCSettings.LatencyMode);
         ProbeSources.RegisterAll(ctx, typeof(GodotCommandHost).Assembly, world, log);
         return ctx;
     }

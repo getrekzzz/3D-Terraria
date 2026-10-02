@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using Godot;
 using Strata.Core.Common;
-using Strata.Core.Content;
-using Strata.Core.Content.Defs;
 using Strata.Core.Session;
 using Strata.Core.Voxels.TileObjects;
 using Strata.Game.Rendering;
@@ -11,45 +9,73 @@ namespace Strata.Game.World;
 
 /// <summary>
 /// Draws tile objects (trees, furniture, stations, flora) with one MultiMesh per chunk and model variant.
-/// Chunks are rebuilt when their objects change, a door toggles or their voxel light is recomputed.
+/// Chunks are updated in place: a structural change (objects added or removed, a door toggled) regroups the chunk,
+/// a terrain change re-places its objects once the colliders they rest on are rebuilt, and a light-only remesh just
+/// rewrites the light of the existing instances. Work is spread over frames within <see cref="WorldRuntime.Budgets"/>,
+/// nearest chunks first.
 /// </summary>
 public sealed partial class TileObjectRenderer : Node3D
 {
-    /// <summary>Objects at most this tall (cells) fade out beyond <see cref="SmallObjectRange"/>.</summary>
-    private const int SmallObjectHeight = 2;
-    private const float SmallObjectRange = 48f;
+    /// <summary>What a chunk needs, from cheapest to most expensive (a larger kind includes the smaller ones).</summary>
+    [System.Flags]
+    private enum DirtyKind : byte
+    {
+        None = 0,
+        Light = 1,
+        Placement = 2,
+        Structure = 4,
+    }
 
-    private readonly Dictionary<Int3, List<MultiMeshInstance3D>> _chunks = new();
-    private readonly HashSet<Int3> _dirty = new();
+    private readonly Dictionary<Int3, DirtyKind> _dirty = new();
+    private readonly List<(long Distance, Int3 Coord)> _order = new();
     private GameWorld _game = null!;
+    private WorldRuntime _runtime = null!;
     private PropLibrary _props = null!;
     private Strata.Core.Streaming.ChunkStreamer _streamer = null!;
 
     /// <summary>Where each object's model goes (grounding, wall mounting, doors).</summary>
     public ObjectPlacement Placement { get; private set; } = null!;
 
+    /// <summary>Drawn object instances plus their flames.</summary>
     public int InstanceCount { get; private set; }
+
+    /// <summary>Chunk regroups and re-placements since the last <see cref="ResetCounters"/>.</summary>
+    public int Rebuilds { get; private set; }
+
+    /// <summary>Light-only refreshes (instance light rewritten in place) since the last <see cref="ResetCounters"/>.</summary>
+    public int LightRefreshes { get; private set; }
+
+    /// <summary>Chunks waiting for an update.</summary>
+    public int PendingCount => _dirty.Count;
+
+    public void ResetCounters() => Rebuilds = LightRefreshes = 0;
 
     private ChunkRenderer? _chunkRenderer;
 
     public void Initialize(WorldRuntime runtime, PropLibrary props)
     {
         _game = runtime.Game;
+        _runtime = runtime;
         _props = props;
         _streamer = runtime.Streamer;
         Placement = new ObjectPlacement(runtime);
         Name = "TileObjects";
         var store = _game.Session.World.TileObjects;
-        store.Added += o => _dirty.Add(ChunkOf(o));
-        store.Removed += o => _dirty.Add(ChunkOf(o));
-        _game.Interaction.StateChanged += o => _dirty.Add(ChunkOf(o));
-        runtime.Streamer.MeshReady += r => _dirty.Add(r.Coord);
-        runtime.Colliders.BodyBuilt += c => _dirty.Add(c);
+        store.Added += o => Mark(ChunkOf(o), DirtyKind.Structure);
+        store.Removed += o => Mark(ChunkOf(o), DirtyKind.Structure);
+        _game.Interaction.StateChanged += o => Mark(ChunkOf(o), DirtyKind.Structure);
+        // A remesh whose collision changed waits for the new bodies (placement rays hit them), so the chunk is
+        // re-placed once; one with the same collision only changed light (or liquids).
+        runtime.MeshApplied += (c, change) =>
+        {
+            if (change == ColliderChange.Unchanged) Mark(c, DirtyKind.Light);
+            else if (change == ColliderChange.Stored) Mark(c, DirtyKind.Placement);
+        };
+        runtime.Colliders.BodyBuilt += c => Mark(c, DirtyKind.Placement);
         _chunkRenderer = runtime.Renderer;
         runtime.Renderer.ChunkShown += (c, show) =>
         {
-            if (_chunks.TryGetValue(c, out var nodes))
-                foreach (var n in nodes) n.Visible = show;
+            if (_chunks.TryGetValue(c, out var chunk)) SetVisible(chunk, show);
         };
         runtime.Streamer.ChunkRemoved += c =>
         {
@@ -58,89 +84,53 @@ public sealed partial class TileObjectRenderer : Node3D
         };
     }
 
+    private void Mark(Int3 chunk, DirtyKind kind)
+    {
+        _dirty.TryGetValue(chunk, out var had);
+        _dirty[chunk] = had | kind;
+    }
+
     public override void _Process(double delta)
     {
+        if (_dirty.Count == 0) return;
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects");
-        int budget = 8;
-        var done = new List<Int3>();
-        foreach (var c in _dirty)
+        long start = System.Diagnostics.Stopwatch.GetTimestamp();
+        double budgetMs = _runtime.Budgets.ObjectsMs;
+        var camera = GetViewport().GetCamera3D();
+        var eye = camera?.GlobalPosition ?? _runtime.Focus?.GlobalPosition ?? Vector3.Zero;
+        var eyeChunk = ChunkMath.CellToChunk(new Int3(Mathf.FloorToInt(eye.X / Units.CellSize), Mathf.FloorToInt(eye.Y / Units.CellSize), Mathf.FloorToInt(eye.Z / Units.CellSize)));
+        _order.Clear();
+        foreach (var c in _dirty.Keys)
         {
-            if (budget-- <= 0) break;
-            Rebuild(c);
-            done.Add(c);
+            var d = c - eyeChunk;
+            _order.Add(((long)d.X * d.X + (long)d.Y * d.Y + (long)d.Z * d.Z, c));
         }
-        foreach (var c in done) _dirty.Remove(c);
+        _order.Sort(OrderComparer.Instance);
+        bool first = true;
+        foreach (var (_, c) in _order)
+        {
+            // At least one chunk per frame, then as many as the budget allows.
+            if (!first && System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds >= budgetMs) break;
+            first = false;
+            var kind = _dirty[c];
+            _dirty.Remove(c);
+            Update(c, kind);
+        }
     }
 
     private static Int3 ChunkOf(TileObjectInstance o) => ChunkMath.CellToChunk(o.Anchor);
 
-    private void Rebuild(Int3 chunk)
+    /// <summary>Nearest first, then X, Y, Z (deterministic order).</summary>
+    private sealed class OrderComparer : IComparer<(long Distance, Int3 Coord)>
     {
-        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.objects.rebuild");
-        Clear(chunk);
-        var objects = _game.Session.World.TileObjects.InChunk(chunk);
-        // Only chunks with terrain on screen: objects of load-only border chunks would float without their ground.
-        if (objects.Count == 0 || !_game.Session.World.HasChunk(chunk) || !_streamer.IsMeshed(chunk)) return;
-        var groups = new Dictionary<(TileObjectDef Def, int Variant), List<TileObjectInstance>>();
-        foreach (var o in objects)
-        {
-            var key = (o.Def, o.Variant);
-            if (!groups.TryGetValue(key, out var list)) groups[key] = list = new List<TileObjectInstance>();
-            list.Add(o);
-        }
-        var nodes = new List<MultiMeshInstance3D>();
-        var world = _game.Session.World;
-        foreach (var ((def, variant), list) in groups)
-        {
-            var mesh = _props.Model(AssetPaths.ObjectModel(def, variant), multimesh: true);
-            if (mesh == null) continue;
-            var mm = new MultiMesh
-            {
-                TransformFormat = MultiMesh.TransformFormatEnum.Transform3D,
-                UseCustomData = true,
-                Mesh = mesh,
-                InstanceCount = list.Count,
-            };
-            for (int i = 0; i < list.Count; i++)
-            {
-                var o = list[i];
-                mm.SetInstanceTransform(i, Placement.TransformOf(o));
-                var fp = o.Footprint;
-                var probe = new Vector3(o.Anchor.X + fp.X * 0.5f, o.Anchor.Y + 0.5f, o.Anchor.Z + fp.Z * 0.5f) * Units.CellSize;
-                mm.SetInstanceCustomData(i, LightProbe.Sample(world, probe));
-            }
-            var node = new MultiMeshInstance3D { Multimesh = mm, CastShadow = def.SizeY <= SmallObjectHeight ? GeometryInstance3D.ShadowCastingSetting.Off : GeometryInstance3D.ShadowCastingSetting.On };
-            if (def.SizeY <= SmallObjectHeight) node.VisibilityRangeEnd = SmallObjectRange;
-            node.Visible = _chunkRenderer?.IsShown(chunk) ?? true;
-            AddChild(node);
-            nodes.Add(node);
-            InstanceCount += list.Count;
-            if (def.Flame is { } flame) AddFlames(chunk, flame, list, nodes);
-        }
-        _chunks[chunk] = nodes;
-    }
+        public static readonly OrderComparer Instance = new();
 
-    /// <summary>Living flames over the lit objects of one kind (wired-off torches stay dark).</summary>
-    private void AddFlames(Int3 chunk, FlameSpec flame, List<TileObjectInstance> objects, List<MultiMeshInstance3D> nodes)
-    {
-        var bases = new List<Vector3>();
-        foreach (var o in objects)
-            if (!o.Active || o.IsDoor) bases.Add(Flames.BaseOf(flame, Placement.TransformOf(o)));
-        if (bases.Count == 0) return;
-        var node = Flames.Batch(flame, bases);
-        node.Visible = _chunkRenderer?.IsShown(chunk) ?? true;
-        AddChild(node);
-        nodes.Add(node);
-        InstanceCount += bases.Count;
-    }
-
-    private void Clear(Int3 chunk)
-    {
-        if (!_chunks.Remove(chunk, out var nodes)) return;
-        foreach (var n in nodes)
+        public int Compare((long Distance, Int3 Coord) a, (long Distance, Int3 Coord) b)
         {
-            InstanceCount -= n.Multimesh.InstanceCount;
-            n.QueueFree();
+            if (a.Distance != b.Distance) return a.Distance.CompareTo(b.Distance);
+            if (a.Coord.X != b.Coord.X) return a.Coord.X.CompareTo(b.Coord.X);
+            if (a.Coord.Y != b.Coord.Y) return a.Coord.Y.CompareTo(b.Coord.Y);
+            return a.Coord.Z.CompareTo(b.Coord.Z);
         }
     }
 }

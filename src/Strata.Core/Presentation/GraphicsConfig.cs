@@ -130,6 +130,9 @@ public sealed class GraphicsPreset
 
     public float GrassDistance { get; set; } = 30f;
 
+    /// <summary>Chunk grass buffers built or rebuilt per frame at most (nearest first; spreads walking-in pops).</summary>
+    public int GrassBuildsPerFrame { get; set; } = 2;
+
     /// <summary>Mesh LOD switch threshold in pixels (lower keeps detail further away).</summary>
     public float LodThreshold { get; set; } = 1f;
 
@@ -164,6 +167,7 @@ public sealed class GraphicsPreset
         if (CloudSteps is < 0 or > 12) yield return "cloudSteps must be within 0–12";
         if (GrassDensity is < 0f or > 1f) yield return "grassDensity must be within 0–1";
         if (GrassDistance is < 0f or > 200f) yield return "grassDistance must be within 0–200 m";
+        if (GrassBuildsPerFrame is < 0 or > 16) yield return "grassBuildsPerFrame must be within 0–16";
         if (LodThreshold is < 0f or > 16f) yield return "lodThreshold must be within 0–16";
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
