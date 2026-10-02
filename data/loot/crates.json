@@ -1,0 +1,235 @@
+{
+  // Fishing crates, opened from the inventory. Basic crates (wooden, iron, golden) roll anywhere; biome crates are
+  // fished up in their biome (loot/fishing.json) and the Obsidian Crate from lava. Shared extras: bars, potions, bait.
+  "lootTables": [
+    {"id": "crate_bait", "mode": "weighted", "entries": [
+      {"item": "apprentice_bait", "weight": 3, "min": 1, "max": 4},
+      {"item": "journeyman_bait", "weight": 2, "min": 1, "max": 3},
+      {"item": "master_bait", "weight": 0.5, "min": 1, "max": 2}
+    ] },
+    {"id": "crate_bars", "mode": "weighted", "entries": [
+      {"item": "copper_bar", "weight": 1, "min": 5, "max": 12},
+      {"item": "tin_bar", "weight": 1, "min": 5, "max": 12},
+      {"item": "iron_bar", "weight": 1, "min": 4, "max": 10},
+      {"item": "lead_bar", "weight": 1, "min": 4, "max": 10},
+      {"item": "silver_bar", "weight": 0.8, "min": 4, "max": 10},
+      {"item": "tungsten_bar", "weight": 0.8, "min": 4, "max": 10},
+      {"item": "gold_bar", "weight": 0.5, "min": 3, "max": 8},
+      {"item": "platinum_bar", "weight": 0.5, "min": 3, "max": 8},
+      {"item": "cobalt_bar", "weight": 0.6, "min": 4, "max": 10, "conditions": [{"type": "flag", "id": "hardmode"}]},
+      {"item": "palladium_bar", "weight": 0.6, "min": 4, "max": 10, "conditions": [{"type": "flag", "id": "hardmode"}]},
+      {"item": "mythril_bar", "weight": 0.4, "min": 3, "max": 8, "conditions": [{"type": "flag", "id": "hardmode"}]},
+      {"item": "orichalcum_bar", "weight": 0.4, "min": 3, "max": 8, "conditions": [{"type": "flag", "id": "hardmode"}]}
+    ] },
+    {"id": "crate_potions", "mode": "weighted", "entries": [
+      {"item": "lesser_healing_potion", "weight": 2, "min": 2, "max": 5},
+      {"item": "healing_potion", "weight": 1, "min": 2, "max": 4},
+      {"item": "lesser_mana_potion", "weight": 1, "min": 2, "max": 5},
+      {"item": "gills_potion", "weight": 1, "min": 1, "max": 3},
+      {"item": "swiftness_potion", "weight": 1, "min": 1, "max": 3},
+      {"item": "ironskin_potion", "weight": 1, "min": 1, "max": 3},
+      {"item": "regeneration_potion", "weight": 1, "min": 1, "max": 3},
+      {"item": "fishing_potion", "weight": 1, "min": 1, "max": 3},
+      {"item": "crate_potion", "weight": 0.6, "min": 1, "max": 2},
+      {"item": "recall_potion", "weight": 1, "min": 1, "max": 3}
+    ] },
+    {"id": "wooden_crate", "coins": [1000, 5000], "entries": [
+      {"table": "wooden_crate_treasure", "chance": 0.25},
+      {"item": "copper_bar", "min": 4, "max": 10, "chance": 0.25},
+      {"item": "iron_bar", "min": 4, "max": 10, "chance": 0.2},
+      {"item": "lesser_healing_potion", "min": 2, "max": 4, "chance": 0.4},
+      {"item": "recall_potion", "min": 1, "max": 2, "chance": 0.2},
+      {"item": "bomb", "min": 2, "max": 5, "chance": 0.2},
+      {"table": "crate_bait", "chance": 0.35}
+    ] },
+    {"id": "wooden_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "aglet", "weight": 1},
+      {"item": "wooden_boomerang", "weight": 1},
+      {"item": "spear", "weight": 1},
+      {"item": "shiny_red_balloon", "weight": 0.5},
+      {"item": "trident", "weight": 0.5},
+      {"item": "wood_yoyo", "weight": 1},
+      {"item": "flipper", "weight": 0.5}
+    ] },
+    {"id": "iron_crate", "coins": [2500, 10000], "entries": [
+      {"table": "iron_crate_treasure", "chance": 0.3},
+      {"item": "silver_bar", "min": 4, "max": 12, "chance": 0.3},
+      {"item": "gold_bar", "min": 4, "max": 10, "chance": 0.2},
+      {"item": "lesser_healing_potion", "min": 3, "max": 5, "chance": 0.5},
+      {"item": "recall_potion", "min": 1, "max": 3, "chance": 0.25},
+      {"table": "crate_bait", "chance": 0.45}
+    ] },
+    {"id": "iron_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "magic_mirror", "weight": 1},
+      {"item": "cloud_in_a_bottle", "weight": 1},
+      {"item": "hermes_boots", "weight": 1},
+      {"item": "trident", "weight": 1},
+      {"item": "fiberglass_fishing_pole", "weight": 0.5}, {"item": "tackle_box", "weight": 0.5},
+      {"item": "boomstick", "weight": 1, "conditions": [{"type": "biome", "any": ["jungle"]}]}
+    ] },
+    {"id": "golden_crate", "coins": [10000, 40000], "entries": [
+      {"table": "golden_crate_treasure", "chance": 0.5},
+      {"item": "gold_bar", "min": 8, "max": 16, "chance": 0.4},
+      {"item": "platinum_bar", "min": 8, "max": 16, "chance": 0.3},
+      {"item": "life_crystal", "chance": 0.2},
+      {"item": "recall_potion", "min": 2, "max": 4, "chance": 0.3},
+      {"table": "crate_bait", "chance": 0.6}
+    ] },
+    {"id": "golden_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "enchanted_sword", "weight": 0.5},
+      {"item": "lucky_horseshoe", "weight": 1},
+      {"item": "starfury", "weight": 1},
+      {"item": "magic_mirror", "weight": 1},
+      {"item": "fledgling_wings", "weight": 0.5},
+      {"item": "hotline_fishing_hook", "weight": 0.25},
+      {"item": "reaver_shark", "weight": 0.3, "conditions": [{"type": "biome", "any": ["ocean"]}]}
+    ] },
+    {"id": "jungle_crate", "coins": [5000, 20000], "entries": [
+      {"table": "jungle_crate_treasure", "chance": 0.6},
+      {"item": "jungle_spores", "min": 3, "max": 8, "chance": 0.35},
+      {"item": "bee_wax", "min": 2, "max": 6, "chance": 0.2},
+      {"item": "honey_block", "min": 5, "max": 15, "chance": 0.25},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "jungle_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "anklet_of_the_wind", "weight": 1},
+      {"item": "feral_claws", "weight": 1},
+      {"item": "boomstick", "weight": 1},
+      {"item": "amazon", "weight": 1},
+      {"item": "fiberglass_fishing_pole", "weight": 1}
+    ] },
+    {"id": "sky_crate", "coins": [5000, 20000], "entries": [
+      {"table": "sky_crate_treasure", "chance": 0.6},
+      {"item": "fallen_star", "min": 3, "max": 8, "chance": 0.5},
+      {"item": "feather", "min": 2, "max": 6, "chance": 0.35},
+      {"item": "cloud", "min": 20, "max": 50, "chance": 0.3},
+      {"item": "sunplate_block", "min": 10, "max": 25, "chance": 0.2},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "sky_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "shiny_red_balloon", "weight": 1},
+      {"item": "starfury", "weight": 1},
+      {"item": "cloud_in_a_bottle", "weight": 1},
+      {"item": "lucky_horseshoe", "weight": 1},
+      {"item": "band_of_regeneration", "weight": 0.5}
+    ] },
+    {"id": "corrupt_crate", "coins": [5000, 20000], "entries": [
+      {"table": "corrupt_crate_treasure", "chance": 0.6},
+      {"item": "rotten_chunk", "min": 2, "max": 6, "chance": 0.5},
+      {"item": "demonite_ore", "min": 10, "max": 25, "chance": 0.4},
+      {"item": "soul_of_night", "min": 2, "max": 5, "chance": 0.3, "conditions": [{"type": "flag", "id": "hardmode"}]},
+      {"item": "cursed_flames", "chance": 0.05, "conditions": [{"type": "flag", "id": "hardmode"}]},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "corrupt_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "ball_o_hurt", "weight": 1},
+      {"item": "vilethorn", "weight": 1},
+      {"item": "band_of_starpower", "weight": 1},
+      {"item": "musket", "weight": 1}
+    ] },
+    {"id": "crimson_crate", "coins": [5000, 20000], "entries": [
+      {"table": "crimson_crate_treasure", "chance": 0.6},
+      {"item": "vertebra", "min": 2, "max": 6, "chance": 0.5},
+      {"item": "crimtane_ore", "min": 10, "max": 25, "chance": 0.4},
+      {"item": "soul_of_night", "min": 2, "max": 5, "chance": 0.3, "conditions": [{"type": "flag", "id": "hardmode"}]},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "crimson_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "the_rotted_fork", "weight": 1},
+      {"item": "crimson_rod", "weight": 1},
+      {"item": "panic_necklace", "weight": 1},
+      {"item": "the_undertaker", "weight": 1}
+    ] },
+    {"id": "hallowed_crate", "coins": [5000, 20000], "entries": [
+      {"table": "hallowed_crate_treasure", "chance": 0.8},
+      {"item": "soul_of_light", "min": 2, "max": 5, "chance": 0.4},
+      {"item": "pearlsand", "min": 10, "max": 25, "chance": 0.3},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "hallowed_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "crystal_shard", "weight": 1, "min": 5, "max": 12},
+      {"item": "unicorn_horn", "weight": 1, "min": 1, "max": 3},
+      {"item": "pixie_dust", "weight": 1, "min": 5, "max": 15}
+    ] },
+    {"id": "dungeon_crate", "coins": [5000, 20000], "entries": [
+      {"table": "dungeon_crate_treasure", "chance": 0.6},
+      {"item": "bone", "min": 10, "max": 30, "chance": 0.5},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "dungeon_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "muramasa", "weight": 1},
+      {"item": "cobalt_shield", "weight": 1},
+      {"item": "blue_moon", "weight": 1},
+      {"item": "handgun", "weight": 1},
+      {"item": "water_bolt", "weight": 1}
+    ] },
+    {"id": "frozen_crate", "coins": [5000, 20000], "entries": [
+      {"table": "frozen_crate_treasure", "chance": 0.6},
+      {"item": "ice", "min": 20, "max": 50, "chance": 0.4},
+      {"item": "snow", "min": 20, "max": 50, "chance": 0.3},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "frozen_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "blizzard_in_a_bottle", "weight": 1},
+      {"item": "snow_globe", "weight": 0.3, "conditions": [{"type": "flag", "id": "hardmode"}]}
+    ] },
+    {"id": "oasis_crate", "coins": [5000, 20000], "entries": [
+      {"table": "oasis_crate_treasure", "chance": 0.6},
+      {"item": "sandstone", "min": 20, "max": 50, "chance": 0.35},
+      {"item": "desert_fossil", "min": 10, "max": 25, "chance": 0.3},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "oasis_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "sandstorm_in_a_bottle", "weight": 1},
+      {"item": "amber", "weight": 1, "min": 2, "max": 6}
+    ] },
+    {"id": "ocean_crate", "coins": [5000, 20000], "entries": [
+      {"table": "ocean_crate_treasure", "chance": 0.6},
+      {"item": "shark_fin", "min": 2, "max": 5, "chance": 0.3},
+      {"item": "bottled_water", "min": 3, "max": 8, "chance": 0.3},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "ocean_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "trident", "weight": 1},
+      {"item": "flipper", "weight": 1},
+      {"item": "reaver_shark", "weight": 0.3},
+      {"item": "gills_potion", "weight": 1, "min": 2, "max": 5}
+    ] },
+    {"id": "obsidian_crate", "coins": [5000, 25000], "entries": [
+      {"table": "obsidian_crate_treasure", "chance": 0.6},
+      {"item": "obsidian", "min": 10, "max": 30, "chance": 0.5},
+      {"item": "hellstone", "min": 10, "max": 25, "chance": 0.4},
+      {"item": "hellstone_bar", "min": 4, "max": 10, "chance": 0.25},
+      {"item": "obsidian_skin_potion", "min": 1, "max": 3, "chance": 0.4},
+      {"table": "crate_bars", "chance": 0.45},
+      {"table": "crate_potions", "chance": 0.5},
+      {"table": "crate_bait", "chance": 0.5}
+    ] },
+    {"id": "obsidian_crate_treasure", "mode": "weighted", "entries": [
+      {"item": "lava_charm", "weight": 1},
+      {"item": "dark_lance", "weight": 1},
+      {"item": "flamelash", "weight": 1},
+      {"item": "sunfury", "weight": 1},
+      {"item": "lavaproof_fishing_hook", "weight": 1.5},
+      {"item": "hotline_fishing_hook", "weight": 0.3}
+    ] }
+  ]
+}

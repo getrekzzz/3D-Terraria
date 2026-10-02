@@ -8,8 +8,9 @@ namespace Strata.Game.Audio;
 
 /// <summary>
 /// Chooses and cross-fades the soundtrack (<c>res://assets/audio/music/&lt;track&gt;.ogg</c>): a boss's theme while one
-/// lives, then an active event's, then the biome around the player (with night variants), then the depth layer. Content
-/// music states that have no track of their own fall back to a family track (every early boss shares "boss_1").
+/// lives, then an active event's, then the biome around the player (with night, rain, town and underground variants,
+/// see MusicDirector.Variants.cs), then the depth layer. Content music states that have no track of their own fall back
+/// to a family track (every early boss shares "boss_1").
 /// </summary>
 public sealed partial class MusicDirector : Node
 {
@@ -109,7 +110,8 @@ public sealed partial class MusicDirector : Node
             .OrderBy(n => System.Numerics.Vector3.DistanceSquared(n.Center, player.Center)).FirstOrDefault();
         if (boss != null && Resolve(boss.Def.Boss!.Music!) is { } bossTrack) return bossTrack;
         foreach (var e in game.Events.Active.Reverse())
-            if (Resolve(e.Def.Id) is { } eventTrack) return eventTrack;
+            if (e.Def.Phase != Strata.Core.Content.Defs.EventPhase.Weather && Resolve(e.Def.Id) is { } eventTrack) return eventTrack; // weather picks variants below
+
         var session = game.Session;
         bool night = !session.Clock.IsDay;
         if (night && session.Events.Contains("blood_moon")) return "blood_moon";
@@ -117,10 +119,12 @@ public sealed partial class MusicDirector : Node
         foreach (var biome in ctx.Biomes.Select(id => session.Content.Biomes.TryGet(id, out var b) ? b : null).Where(b => b?.Music != null).OrderByDescending(b => b!.Priority))
         {
             var music = biome!.Music!;
+            if (Variant(game, player, biome, music, ctx.Layer, ctx.Weather, night) is { } variant) return variant;
             if (ctx.Layer is WorldLayer.Underground or WorldLayer.Cavern && biome.Kind == Strata.Core.Content.Defs.BiomeKind.Surface) continue; // the surface theme stays up top
             if (night && Resolve(music.Replace("_day", "") + "_night") is { } nightTrack) return nightTrack;
             if (Resolve(music) is { } track) return track;
         }
+        if (LayerVariant(ctx.Layer) is { } layerTrack) return layerTrack;
         return ctx.Layer switch
         {
             WorldLayer.Underground => "underground",

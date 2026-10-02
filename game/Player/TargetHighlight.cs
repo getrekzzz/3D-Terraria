@@ -62,7 +62,16 @@ public sealed partial class TargetHighlight : Node3D
         else if (info.Object is { } obj)
             DrawObjectGhost(target, obj);
         else if (target.Object is { } o && info.IsTool)
-            _mesh.Box(Min(o.Bounds.Min), Min(o.Bounds.Max), Neutral);
+        {
+            // Cracks spread over the object as its hit points fall (a tree half chopped shows half cracked).
+            float progress = o.Def.HitPoints > 1 ? Mathf.Clamp(1f - o.HitPoints / (float)o.Def.HitPoints, 0f, 1f) : 0f;
+            if (progress <= 0f) _mesh.Box(Min(o.Bounds.Min), Min(o.Bounds.Max), Neutral);
+            else
+            {
+                var color = Neutral.Lerp(Working, 0.4f + 0.6f * progress);
+                _mesh.Faces(Min(o.Bounds.Min), Min(o.Bounds.Max), new Color(color.R, color.G, color.B, 0.11f), progress);
+            }
+        }
         else if (info.Has(ItemAction.Mine))
             DrawMining(target, held.Item!);
         else if (info.Has(ItemAction.Hammer))
@@ -94,7 +103,8 @@ public sealed partial class TargetHighlight : Node3D
         if (!any) return;
         progress = Mathf.Clamp(progress, 0, 1);
         var color = tooHard ? Invalid : progress > 0 ? Neutral.Lerp(Working, 0.4f + 0.6f * progress) : Neutral;
-        _mesh.Faces(Min(min), Min(max), new Color(color.R, color.G, color.B, tooHard ? 0.18f : 0.11f), progress);
+        // The cracks themselves are BlockCracks decals on every damaged block; the cursor only warms its colour.
+        _mesh.Faces(Min(min), Min(max), new Color(color.R, color.G, color.B, tooHard ? 0.18f : 0.11f), 0f);
         _mesh.Box(Min(min), Min(max), color);
     }
 

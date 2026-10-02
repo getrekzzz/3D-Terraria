@@ -12,6 +12,12 @@
    ],
    "generator": "workbench"
   },
+  "alien_hornet_banner": {
+   "models": [
+    "assets/models/objects/alien_hornet_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "ancient_cultist_trophy": {
    "models": [
     "assets/models/objects/ancient_cultist_trophy_v0.glb"
@@ -30,17 +36,65 @@
    ],
    "generator": "statue"
   },
+  "angler_fish_banner": {
+   "models": [
+    "assets/models/objects/angler_fish_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "angry_bones_banner": {
+   "models": [
+    "assets/models/objects/angry_bones_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "anomura_fungus_banner": {
+   "models": [
+    "assets/models/objects/anomura_fungus_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "antlion_banner": {
+   "models": [
+    "assets/models/objects/antlion_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "antlion_charger_banner": {
+   "models": [
+    "assets/models/objects/antlion_charger_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "arapaima_banner": {
+   "models": [
+    "assets/models/objects/arapaima_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "armor_statue": {
    "models": [
     "assets/models/objects/armor_statue_v0.glb"
    ],
    "generator": "statue"
   },
+  "armored_skeleton_banner": {
+   "models": [
+    "assets/models/objects/armored_skeleton_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "autohammer": {
    "models": [
     "assets/models/objects/autohammer_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "bat_statue": {
+   "models": [
+    "assets/models/objects/bat_statue_v0.glb"
+   ],
+   "generator": "critter_statue"
   },
   "bed": {
    "models": [
@@ -54,11 +108,35 @@
    ],
    "generator": "larva"
   },
+  "bird_statue": {
+   "models": [
+    "assets/models/objects/bird_statue_v0.glb"
+   ],
+   "generator": "critter_statue"
+  },
+  "black_recluse_banner": {
+   "models": [
+    "assets/models/objects/black_recluse_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "blinkroot_plant": {
    "models": [
     "assets/models/objects/blinkroot_plant_v0.glb"
    ],
    "generator": "flower"
+  },
+  "blood_crawler_banner": {
+   "models": [
+    "assets/models/objects/blood_crawler_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "blood_zombie_banner": {
+   "models": [
+    "assets/models/objects/blood_zombie_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "blue_dungeon_bookcase": {
    "models": [
@@ -108,11 +186,125 @@
    ],
    "generator": "vase"
   },
+  "blue_jellyfish_banner": {
+   "models": [
+    "assets/models/objects/blue_jellyfish_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "bomb_statue": {
+   "models": [
+    "assets/models/objects/bomb_statue_v0.glb"
+   ],
+   "generator": "critter_statue"
+  },
+  "bone_bathtub": {
+   "models": [
+    "assets/models/objects/bone_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_bed": {
+   "models": [
+    "assets/models/objects/bone_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_bookcase": {
+   "models": [
+    "assets/models/objects/bone_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_candelabra": {
+   "models": [
+    "assets/models/objects/bone_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_candle": {
+   "models": [
+    "assets/models/objects/bone_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_chair": {
+   "models": [
+    "assets/models/objects/bone_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_chandelier": {
+   "models": [
+    "assets/models/objects/bone_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_chest": {
+   "models": [
+    "assets/models/objects/bone_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_clock": {
+   "models": [
+    "assets/models/objects/bone_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_door": {
+   "models": [
+    "assets/models/objects/bone_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_lamp": {
+   "models": [
+    "assets/models/objects/bone_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_lantern": {
+   "models": [
+    "assets/models/objects/bone_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_piano": {
+   "models": [
+    "assets/models/objects/bone_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_platform": {
+   "models": [
+    "assets/models/objects/bone_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_sofa": {
+   "models": [
+    "assets/models/objects/bone_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "bone_table": {
+   "models": [
+    "assets/models/objects/bone_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "bone_welder": {
    "models": [
     "assets/models/objects/bone_welder_v0.glb"
    ],
    "generator": "bone_welder"
+  },
+  "bone_workbench": {
+   "models": [
+    "assets/models/objects/bone_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "book": {
    "models": [
@@ -123,11 +315,125 @@
    ],
    "generator": "book"
   },
+  "boreal_bathtub": {
+   "models": [
+    "assets/models/objects/boreal_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_bed": {
+   "models": [
+    "assets/models/objects/boreal_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_bookcase": {
+   "models": [
+    "assets/models/objects/boreal_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_candelabra": {
+   "models": [
+    "assets/models/objects/boreal_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_candle": {
+   "models": [
+    "assets/models/objects/boreal_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_chair": {
+   "models": [
+    "assets/models/objects/boreal_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_chandelier": {
+   "models": [
+    "assets/models/objects/boreal_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_chest": {
+   "models": [
+    "assets/models/objects/boreal_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_clock": {
+   "models": [
+    "assets/models/objects/boreal_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_door": {
+   "models": [
+    "assets/models/objects/boreal_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_lamp": {
+   "models": [
+    "assets/models/objects/boreal_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_lantern": {
+   "models": [
+    "assets/models/objects/boreal_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_piano": {
+   "models": [
+    "assets/models/objects/boreal_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_platform": {
+   "models": [
+    "assets/models/objects/boreal_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_sofa": {
+   "models": [
+    "assets/models/objects/boreal_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_table": {
+   "models": [
+    "assets/models/objects/boreal_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "boreal_workbench": {
+   "models": [
+    "assets/models/objects/boreal_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "brain_of_cthulhu_trophy": {
    "models": [
     "assets/models/objects/brain_of_cthulhu_trophy_v0.glb"
    ],
    "generator": "trophy"
+  },
+  "brain_suckler_banner": {
+   "models": [
+    "assets/models/objects/brain_suckler_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "bunny_statue": {
+   "models": [
+    "assets/models/objects/bunny_statue_v0.glb"
+   ],
+   "generator": "critter_statue"
   },
   "bush": {
    "models": [
@@ -137,6 +443,12 @@
    ],
    "generator": "bush"
   },
+  "butcher_banner": {
+   "models": [
+    "assets/models/objects/butcher_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "cactus": {
    "models": [
     "assets/models/objects/cactus_v0.glb",
@@ -144,6 +456,108 @@
     "assets/models/objects/cactus_v2.glb"
    ],
    "generator": "cactus"
+  },
+  "cactus_bathtub": {
+   "models": [
+    "assets/models/objects/cactus_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_bed": {
+   "models": [
+    "assets/models/objects/cactus_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_bookcase": {
+   "models": [
+    "assets/models/objects/cactus_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_candelabra": {
+   "models": [
+    "assets/models/objects/cactus_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_candle": {
+   "models": [
+    "assets/models/objects/cactus_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_chair": {
+   "models": [
+    "assets/models/objects/cactus_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_chandelier": {
+   "models": [
+    "assets/models/objects/cactus_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_chest": {
+   "models": [
+    "assets/models/objects/cactus_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_clock": {
+   "models": [
+    "assets/models/objects/cactus_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_door": {
+   "models": [
+    "assets/models/objects/cactus_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_lamp": {
+   "models": [
+    "assets/models/objects/cactus_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_lantern": {
+   "models": [
+    "assets/models/objects/cactus_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_piano": {
+   "models": [
+    "assets/models/objects/cactus_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_platform": {
+   "models": [
+    "assets/models/objects/cactus_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_sofa": {
+   "models": [
+    "assets/models/objects/cactus_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_table": {
+   "models": [
+    "assets/models/objects/cactus_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "cactus_workbench": {
+   "models": [
+    "assets/models/objects/cactus_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "campfire": {
    "models": [
@@ -157,17 +571,95 @@
    ],
    "generator": "candle"
   },
+  "cave_bat_banner": {
+   "models": [
+    "assets/models/objects/cave_bat_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "chaos_elemental_banner": {
+   "models": [
+    "assets/models/objects/chaos_elemental_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "christmas_tree": {
+   "models": [
+    "assets/models/objects/christmas_tree_v0.glb"
+   ],
+   "generator": "christmas_tree"
+  },
+  "clinger_banner": {
+   "models": [
+    "assets/models/objects/clinger_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "cochineal_beetle_banner": {
+   "models": [
+    "assets/models/objects/cochineal_beetle_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "cooking_pot": {
    "models": [
     "assets/models/objects/cooking_pot_v0.glb"
    ],
    "generator": "pot"
   },
+  "corite_banner": {
+   "models": [
+    "assets/models/objects/corite_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "corrupt_slime_banner": {
+   "models": [
+    "assets/models/objects/corrupt_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "corruption_chest": {
    "models": [
     "assets/models/objects/corruption_chest_v0.glb"
    ],
    "generator": "chest"
+  },
+  "corruptor_banner": {
+   "models": [
+    "assets/models/objects/corruptor_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "crab_banner": {
+   "models": [
+    "assets/models/objects/crab_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "crab_statue": {
+   "models": [
+    "assets/models/objects/crab_statue_v0.glb"
+   ],
+   "generator": "critter_statue"
+  },
+  "crawdad_banner": {
+   "models": [
+    "assets/models/objects/crawdad_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "crimera_banner": {
+   "models": [
+    "assets/models/objects/crimera_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "crimslime_banner": {
+   "models": [
+    "assets/models/objects/crimslime_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "crimson_altar": {
    "models": [
@@ -187,6 +679,36 @@
    ],
    "generator": "evil_orb"
   },
+  "crystal_slime_banner": {
+   "models": [
+    "assets/models/objects/crystal_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "cultist_archer_banner": {
+   "models": [
+    "assets/models/objects/cultist_archer_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "cursed_skull_banner": {
+   "models": [
+    "assets/models/objects/cursed_skull_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "cyan_beetle_banner": {
+   "models": [
+    "assets/models/objects/cyan_beetle_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "dark_caster_banner": {
+   "models": [
+    "assets/models/objects/dark_caster_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "dart_trap": {
    "models": [
     "assets/models/objects/dart_trap_v0.glb"
@@ -198,6 +720,12 @@
     "assets/models/objects/daybloom_plant_v0.glb"
    ],
    "generator": "flower"
+  },
+  "deadly_sphere_banner": {
+   "models": [
+    "assets/models/objects/deadly_sphere_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "deathweed_plant": {
    "models": [
@@ -217,6 +745,24 @@
    ],
    "generator": "altar"
   },
+  "demon_banner": {
+   "models": [
+    "assets/models/objects/demon_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "demon_eye_banner": {
+   "models": [
+    "assets/models/objects/demon_eye_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "derpling_banner": {
+   "models": [
+    "assets/models/objects/derpling_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "desert_chest": {
    "models": [
     "assets/models/objects/desert_chest_v0.glb"
@@ -235,11 +781,47 @@
    ],
    "generator": "banner"
   },
+  "drakin_banner": {
+   "models": [
+    "assets/models/objects/drakin_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "drakomire_banner": {
+   "models": [
+    "assets/models/objects/drakomire_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "drippler_banner": {
+   "models": [
+    "assets/models/objects/drippler_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "duke_fishron_trophy": {
    "models": [
     "assets/models/objects/duke_fishron_trophy_v0.glb"
    ],
    "generator": "trophy"
+  },
+  "dungeon_slime_banner": {
+   "models": [
+    "assets/models/objects/dungeon_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "dungeon_spirit_banner": {
+   "models": [
+    "assets/models/objects/dungeon_spirit_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "eater_of_souls_banner": {
+   "models": [
+    "assets/models/objects/eater_of_souls_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "eater_of_worlds_trophy": {
    "models": [
@@ -247,12 +829,126 @@
    ],
    "generator": "trophy"
   },
+  "ebonwood_bathtub": {
+   "models": [
+    "assets/models/objects/ebonwood_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_bed": {
+   "models": [
+    "assets/models/objects/ebonwood_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_bookcase": {
+   "models": [
+    "assets/models/objects/ebonwood_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_candelabra": {
+   "models": [
+    "assets/models/objects/ebonwood_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_candle": {
+   "models": [
+    "assets/models/objects/ebonwood_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_chair": {
+   "models": [
+    "assets/models/objects/ebonwood_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_chandelier": {
+   "models": [
+    "assets/models/objects/ebonwood_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_chest": {
+   "models": [
+    "assets/models/objects/ebonwood_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_clock": {
+   "models": [
+    "assets/models/objects/ebonwood_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_door": {
+   "models": [
+    "assets/models/objects/ebonwood_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_lamp": {
+   "models": [
+    "assets/models/objects/ebonwood_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_lantern": {
+   "models": [
+    "assets/models/objects/ebonwood_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_piano": {
+   "models": [
+    "assets/models/objects/ebonwood_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_platform": {
+   "models": [
+    "assets/models/objects/ebonwood_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_sofa": {
+   "models": [
+    "assets/models/objects/ebonwood_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "ebonwood_table": {
+   "models": [
+    "assets/models/objects/ebonwood_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "ebonwood_tree": {
    "models": [
     "assets/models/objects/ebonwood_tree_v0.glb",
     "assets/models/objects/ebonwood_tree_v1.glb"
    ],
    "generator": "twisted"
+  },
+  "ebonwood_workbench": {
+   "models": [
+    "assets/models/objects/ebonwood_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "elf_archer_banner": {
+   "models": [
+    "assets/models/objects/elf_archer_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "elf_copter_banner": {
+   "models": [
+    "assets/models/objects/elf_copter_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "empress_of_light_trophy": {
    "models": [
@@ -266,11 +962,47 @@
    ],
    "generator": "shrine"
   },
+  "etherian_goblin_banner": {
+   "models": [
+    "assets/models/objects/etherian_goblin_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "etherian_goblin_bomber_banner": {
+   "models": [
+    "assets/models/objects/etherian_goblin_bomber_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "etherian_javelin_thrower_banner": {
+   "models": [
+    "assets/models/objects/etherian_javelin_thrower_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "etherian_wyvern_banner": {
+   "models": [
+    "assets/models/objects/etherian_wyvern_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "eye_of_cthulhu_trophy": {
    "models": [
     "assets/models/objects/eye_of_cthulhu_trophy_v0.glb"
    ],
    "generator": "trophy"
+  },
+  "eyezor_banner": {
+   "models": [
+    "assets/models/objects/eyezor_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "face_monster_banner": {
+   "models": [
+    "assets/models/objects/face_monster_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "fern": {
    "models": [
@@ -279,6 +1011,18 @@
     "assets/models/objects/fern_v2.glb"
    ],
    "generator": "fern"
+  },
+  "festive_lights": {
+   "models": [
+    "assets/models/objects/festive_lights_v0.glb"
+   ],
+   "generator": "festive_lights"
+  },
+  "fire_imp_banner": {
+   "models": [
+    "assets/models/objects/fire_imp_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "fireblossom_plant": {
    "models": [
@@ -292,6 +1036,24 @@
    ],
    "generator": "bottle_light"
   },
+  "floaty_gross_banner": {
+   "models": [
+    "assets/models/objects/floaty_gross_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "flocko_banner": {
+   "models": [
+    "assets/models/objects/flocko_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "flow_invader_banner": {
+   "models": [
+    "assets/models/objects/flow_invader_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "flower": {
    "models": [
     "assets/models/objects/flower_v0.glb",
@@ -301,17 +1063,59 @@
    ],
    "generator": "flower"
   },
+  "flying_fish_banner": {
+   "models": [
+    "assets/models/objects/flying_fish_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "flying_snake_banner": {
+   "models": [
+    "assets/models/objects/flying_snake_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "frankenstein_banner": {
+   "models": [
+    "assets/models/objects/frankenstein_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "frozen_chest": {
    "models": [
     "assets/models/objects/frozen_chest_v0.glb"
    ],
    "generator": "chest"
   },
+  "frozen_zombie_banner": {
+   "models": [
+    "assets/models/objects/frozen_zombie_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "furnace": {
    "models": [
     "assets/models/objects/furnace_v0.glb"
    ],
    "generator": "furnace"
+  },
+  "gastropod_banner": {
+   "models": [
+    "assets/models/objects/gastropod_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ghost_banner": {
+   "models": [
+    "assets/models/objects/ghost_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "giant_bat_banner": {
+   "models": [
+    "assets/models/objects/giant_bat_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "giant_glowing_mushroom": {
    "models": [
@@ -320,11 +1124,167 @@
    ],
    "generator": "giant_mushroom"
   },
+  "giant_shelly_banner": {
+   "models": [
+    "assets/models/objects/giant_shelly_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "giant_tortoise_banner": {
+   "models": [
+    "assets/models/objects/giant_tortoise_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "gigazapper_banner": {
+   "models": [
+    "assets/models/objects/gigazapper_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "gingerbread_man_banner": {
+   "models": [
+    "assets/models/objects/gingerbread_man_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "glass_bathtub": {
+   "models": [
+    "assets/models/objects/glass_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_bed": {
+   "models": [
+    "assets/models/objects/glass_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_bookcase": {
+   "models": [
+    "assets/models/objects/glass_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_candelabra": {
+   "models": [
+    "assets/models/objects/glass_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_candle": {
+   "models": [
+    "assets/models/objects/glass_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_chair": {
+   "models": [
+    "assets/models/objects/glass_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_chandelier": {
+   "models": [
+    "assets/models/objects/glass_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_chest": {
+   "models": [
+    "assets/models/objects/glass_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_clock": {
+   "models": [
+    "assets/models/objects/glass_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_door": {
+   "models": [
+    "assets/models/objects/glass_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_lamp": {
+   "models": [
+    "assets/models/objects/glass_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_lantern": {
+   "models": [
+    "assets/models/objects/glass_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_piano": {
+   "models": [
+    "assets/models/objects/glass_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_platform": {
+   "models": [
+    "assets/models/objects/glass_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_sofa": {
+   "models": [
+    "assets/models/objects/glass_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_table": {
+   "models": [
+    "assets/models/objects/glass_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "glass_workbench": {
+   "models": [
+    "assets/models/objects/glass_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "glowing_mushroom_plant": {
    "models": [
     "assets/models/objects/glowing_mushroom_plant_v0.glb"
    ],
    "generator": "small_mushroom"
+  },
+  "goblin_archer_banner": {
+   "models": [
+    "assets/models/objects/goblin_archer_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "goblin_peon_banner": {
+   "models": [
+    "assets/models/objects/goblin_peon_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "goblin_sorcerer_banner": {
+   "models": [
+    "assets/models/objects/goblin_sorcerer_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "goblin_thief_banner": {
+   "models": [
+    "assets/models/objects/goblin_thief_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "goblin_warrior_banner": {
+   "models": [
+    "assets/models/objects/goblin_warrior_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "gold_chest": {
    "models": [
@@ -337,6 +1297,120 @@
     "assets/models/objects/golem_trophy_v0.glb"
    ],
    "generator": "trophy"
+  },
+  "granite_bathtub": {
+   "models": [
+    "assets/models/objects/granite_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_bed": {
+   "models": [
+    "assets/models/objects/granite_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_bookcase": {
+   "models": [
+    "assets/models/objects/granite_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_candelabra": {
+   "models": [
+    "assets/models/objects/granite_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_candle": {
+   "models": [
+    "assets/models/objects/granite_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_chair": {
+   "models": [
+    "assets/models/objects/granite_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_chandelier": {
+   "models": [
+    "assets/models/objects/granite_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_chest": {
+   "models": [
+    "assets/models/objects/granite_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_clock": {
+   "models": [
+    "assets/models/objects/granite_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_door": {
+   "models": [
+    "assets/models/objects/granite_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_elemental_banner": {
+   "models": [
+    "assets/models/objects/granite_elemental_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "granite_golem_banner": {
+   "models": [
+    "assets/models/objects/granite_golem_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "granite_lamp": {
+   "models": [
+    "assets/models/objects/granite_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_lantern": {
+   "models": [
+    "assets/models/objects/granite_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_piano": {
+   "models": [
+    "assets/models/objects/granite_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_platform": {
+   "models": [
+    "assets/models/objects/granite_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_sofa": {
+   "models": [
+    "assets/models/objects/granite_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_table": {
+   "models": [
+    "assets/models/objects/granite_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "granite_workbench": {
+   "models": [
+    "assets/models/objects/granite_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "grass_tuft": {
    "models": [
@@ -401,11 +1475,29 @@
    ],
    "generator": "chest"
   },
+  "harpy_banner": {
+   "models": [
+    "assets/models/objects/harpy_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "headless_horseman_banner": {
+   "models": [
+    "assets/models/objects/headless_horseman_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "heart_lantern": {
    "models": [
     "assets/models/objects/heart_lantern_v0.glb"
    ],
    "generator": "heart_lantern"
+  },
+  "hellbat_banner": {
+   "models": [
+    "assets/models/objects/hellbat_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "hellforge": {
    "models": [
@@ -413,11 +1505,83 @@
    ],
    "generator": "furnace"
   },
+  "hellhound_banner": {
+   "models": [
+    "assets/models/objects/hellhound_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "herpling_banner": {
+   "models": [
+    "assets/models/objects/herpling_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "hoplite_banner": {
+   "models": [
+    "assets/models/objects/hoplite_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "hornet_banner": {
+   "models": [
+    "assets/models/objects/hornet_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ice_bat_banner": {
+   "models": [
+    "assets/models/objects/ice_bat_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ice_elemental_banner": {
+   "models": [
+    "assets/models/objects/ice_elemental_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ice_slime_banner": {
+   "models": [
+    "assets/models/objects/ice_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ice_tortoise_banner": {
+   "models": [
+    "assets/models/objects/ice_tortoise_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ichor_sticker_banner": {
+   "models": [
+    "assets/models/objects/ichor_sticker_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "illuminant_slime_banner": {
+   "models": [
+    "assets/models/objects/illuminant_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "iron_anvil": {
    "models": [
     "assets/models/objects/iron_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "jack_o_lantern": {
+   "models": [
+    "assets/models/objects/jack_o_lantern_v0.glb"
+   ],
+   "generator": "pumpkin"
+  },
+  "jungle_bat_banner": {
+   "models": [
+    "assets/models/objects/jungle_bat_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "jungle_chest": {
    "models": [
@@ -425,11 +1589,47 @@
    ],
    "generator": "chest"
   },
+  "jungle_slime_banner": {
+   "models": [
+    "assets/models/objects/jungle_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "king_slime_trophy": {
    "models": [
     "assets/models/objects/king_slime_trophy_v0.glb"
    ],
    "generator": "trophy"
+  },
+  "kobold_banner": {
+   "models": [
+    "assets/models/objects/kobold_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "krampus_banner": {
+   "models": [
+    "assets/models/objects/krampus_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "lac_beetle_banner": {
+   "models": [
+    "assets/models/objects/lac_beetle_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "lava_bat_banner": {
+   "models": [
+    "assets/models/objects/lava_bat_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "lava_slime_banner": {
+   "models": [
+    "assets/models/objects/lava_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "lead_anvil": {
    "models": [
@@ -467,11 +1667,161 @@
    ],
    "generator": "altar"
   },
+  "lihzahrd_banner": {
+   "models": [
+    "assets/models/objects/lihzahrd_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "lihzahrd_bathtub": {
+   "models": [
+    "assets/models/objects/lihzahrd_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_bed": {
+   "models": [
+    "assets/models/objects/lihzahrd_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_bookcase": {
+   "models": [
+    "assets/models/objects/lihzahrd_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_candelabra": {
+   "models": [
+    "assets/models/objects/lihzahrd_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_candle": {
+   "models": [
+    "assets/models/objects/lihzahrd_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_chair": {
+   "models": [
+    "assets/models/objects/lihzahrd_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_chandelier": {
+   "models": [
+    "assets/models/objects/lihzahrd_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_chest": {
+   "models": [
+    "assets/models/objects/lihzahrd_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_clock": {
+   "models": [
+    "assets/models/objects/lihzahrd_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "lihzahrd_door": {
    "models": [
     "assets/models/objects/lihzahrd_door_v0.glb"
    ],
    "generator": "stone_door"
+  },
+  "lihzahrd_house_door": {
+   "models": [
+    "assets/models/objects/lihzahrd_house_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_lamp": {
+   "models": [
+    "assets/models/objects/lihzahrd_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_lantern": {
+   "models": [
+    "assets/models/objects/lihzahrd_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_piano": {
+   "models": [
+    "assets/models/objects/lihzahrd_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_platform": {
+   "models": [
+    "assets/models/objects/lihzahrd_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_sofa": {
+   "models": [
+    "assets/models/objects/lihzahrd_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_table": {
+   "models": [
+    "assets/models/objects/lihzahrd_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "lihzahrd_workbench": {
+   "models": [
+    "assets/models/objects/lihzahrd_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "logic_gate_and": {
+   "models": [
+    "assets/models/objects/logic_gate_and_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_lamp": {
+   "models": [
+    "assets/models/objects/logic_gate_lamp_v0.glb"
+   ],
+   "generator": "logic_lamp"
+  },
+  "logic_gate_nand": {
+   "models": [
+    "assets/models/objects/logic_gate_nand_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_nor": {
+   "models": [
+    "assets/models/objects/logic_gate_nor_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_or": {
+   "models": [
+    "assets/models/objects/logic_gate_or_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_xnor": {
+   "models": [
+    "assets/models/objects/logic_gate_xnor_v0.glb"
+   ],
+   "generator": "logic_gate"
+  },
+  "logic_gate_xor": {
+   "models": [
+    "assets/models/objects/logic_gate_xor_v0.glb"
+   ],
+   "generator": "logic_gate"
   },
   "loom": {
    "models": [
@@ -487,9 +1837,153 @@
    ],
    "generator": "jungle"
   },
+  "man_eater_banner": {
+   "models": [
+    "assets/models/objects/man_eater_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "marble_bathtub": {
+   "models": [
+    "assets/models/objects/marble_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_bed": {
+   "models": [
+    "assets/models/objects/marble_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_bookcase": {
+   "models": [
+    "assets/models/objects/marble_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_candelabra": {
+   "models": [
+    "assets/models/objects/marble_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_candle": {
+   "models": [
+    "assets/models/objects/marble_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_chair": {
+   "models": [
+    "assets/models/objects/marble_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_chandelier": {
+   "models": [
+    "assets/models/objects/marble_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_chest": {
+   "models": [
+    "assets/models/objects/marble_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_clock": {
+   "models": [
+    "assets/models/objects/marble_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_door": {
+   "models": [
+    "assets/models/objects/marble_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_lamp": {
+   "models": [
+    "assets/models/objects/marble_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_lantern": {
+   "models": [
+    "assets/models/objects/marble_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_piano": {
+   "models": [
+    "assets/models/objects/marble_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_platform": {
+   "models": [
+    "assets/models/objects/marble_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_sofa": {
+   "models": [
+    "assets/models/objects/marble_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_table": {
+   "models": [
+    "assets/models/objects/marble_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "marble_workbench": {
+   "models": [
+    "assets/models/objects/marble_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "marching_bones_banner": {
    "models": [
     "assets/models/objects/marching_bones_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "martian_drone_banner": {
+   "models": [
+    "assets/models/objects/martian_drone_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "martian_officer_banner": {
+   "models": [
+    "assets/models/objects/martian_officer_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "martian_walker_banner": {
+   "models": [
+    "assets/models/objects/martian_walker_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "medusa_banner": {
+   "models": [
+    "assets/models/objects/medusa_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "meteor_head_banner": {
+   "models": [
+    "assets/models/objects/meteor_head_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "mimic_banner": {
+   "models": [
+    "assets/models/objects/mimic_banner_v0.glb"
    ],
    "generator": "banner"
   },
@@ -498,6 +1992,12 @@
     "assets/models/objects/minecart_track_v0.glb"
    ],
    "generator": "rail"
+  },
+  "mister_stabby_banner": {
+   "models": [
+    "assets/models/objects/mister_stabby_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "molten_legion_flag": {
    "models": [
@@ -517,11 +2017,137 @@
    ],
    "generator": "flower"
   },
+  "moth_banner": {
+   "models": [
+    "assets/models/objects/moth_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "mother_slime_banner": {
+   "models": [
+    "assets/models/objects/mother_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "mummy_banner": {
+   "models": [
+    "assets/models/objects/mummy_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "mushi_ladybug_banner": {
+   "models": [
+    "assets/models/objects/mushi_ladybug_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "mushroom_bathtub": {
+   "models": [
+    "assets/models/objects/mushroom_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_bed": {
+   "models": [
+    "assets/models/objects/mushroom_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_bookcase": {
+   "models": [
+    "assets/models/objects/mushroom_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_candelabra": {
+   "models": [
+    "assets/models/objects/mushroom_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_candle": {
+   "models": [
+    "assets/models/objects/mushroom_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_chair": {
+   "models": [
+    "assets/models/objects/mushroom_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_chandelier": {
+   "models": [
+    "assets/models/objects/mushroom_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_chest": {
+   "models": [
+    "assets/models/objects/mushroom_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_clock": {
+   "models": [
+    "assets/models/objects/mushroom_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_door": {
+   "models": [
+    "assets/models/objects/mushroom_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_lamp": {
+   "models": [
+    "assets/models/objects/mushroom_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_lantern": {
+   "models": [
+    "assets/models/objects/mushroom_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_piano": {
+   "models": [
+    "assets/models/objects/mushroom_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "mushroom_plant": {
    "models": [
     "assets/models/objects/mushroom_plant_v0.glb"
    ],
    "generator": "small_mushroom"
+  },
+  "mushroom_platform": {
+   "models": [
+    "assets/models/objects/mushroom_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_sofa": {
+   "models": [
+    "assets/models/objects/mushroom_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_table": {
+   "models": [
+    "assets/models/objects/mushroom_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "mushroom_workbench": {
+   "models": [
+    "assets/models/objects/mushroom_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "mythril_anvil": {
    "models": [
@@ -529,9 +2155,33 @@
    ],
    "generator": "anvil"
   },
+  "nebula_floater_banner": {
+   "models": [
+    "assets/models/objects/nebula_floater_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "necromancer_banner": {
+   "models": [
+    "assets/models/objects/necromancer_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "necromantic_sign": {
    "models": [
     "assets/models/objects/necromantic_sign_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "nutcracker_banner": {
+   "models": [
+    "assets/models/objects/nutcracker_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "nymph_banner": {
+   "models": [
+    "assets/models/objects/nymph_banner_v0.glb"
    ],
    "generator": "banner"
   },
@@ -544,11 +2194,215 @@
    ],
    "generator": "broadleaf"
   },
+  "obsidian_bathtub": {
+   "models": [
+    "assets/models/objects/obsidian_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_bed": {
+   "models": [
+    "assets/models/objects/obsidian_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_bookcase": {
+   "models": [
+    "assets/models/objects/obsidian_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_candelabra": {
+   "models": [
+    "assets/models/objects/obsidian_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_candle": {
+   "models": [
+    "assets/models/objects/obsidian_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_chair": {
+   "models": [
+    "assets/models/objects/obsidian_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_chandelier": {
+   "models": [
+    "assets/models/objects/obsidian_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_chest": {
+   "models": [
+    "assets/models/objects/obsidian_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_clock": {
+   "models": [
+    "assets/models/objects/obsidian_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_door": {
+   "models": [
+    "assets/models/objects/obsidian_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_lamp": {
+   "models": [
+    "assets/models/objects/obsidian_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_lantern": {
+   "models": [
+    "assets/models/objects/obsidian_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_piano": {
+   "models": [
+    "assets/models/objects/obsidian_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_platform": {
+   "models": [
+    "assets/models/objects/obsidian_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_sofa": {
+   "models": [
+    "assets/models/objects/obsidian_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_table": {
+   "models": [
+    "assets/models/objects/obsidian_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "obsidian_workbench": {
+   "models": [
+    "assets/models/objects/obsidian_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "orichalcum_anvil": {
    "models": [
     "assets/models/objects/orichalcum_anvil_v0.glb"
    ],
    "generator": "anvil"
+  },
+  "paladin_banner": {
+   "models": [
+    "assets/models/objects/paladin_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "palm_bathtub": {
+   "models": [
+    "assets/models/objects/palm_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_bed": {
+   "models": [
+    "assets/models/objects/palm_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_bookcase": {
+   "models": [
+    "assets/models/objects/palm_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_candelabra": {
+   "models": [
+    "assets/models/objects/palm_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_candle": {
+   "models": [
+    "assets/models/objects/palm_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_chair": {
+   "models": [
+    "assets/models/objects/palm_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_chandelier": {
+   "models": [
+    "assets/models/objects/palm_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_chest": {
+   "models": [
+    "assets/models/objects/palm_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_clock": {
+   "models": [
+    "assets/models/objects/palm_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_door": {
+   "models": [
+    "assets/models/objects/palm_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_lamp": {
+   "models": [
+    "assets/models/objects/palm_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_lantern": {
+   "models": [
+    "assets/models/objects/palm_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_piano": {
+   "models": [
+    "assets/models/objects/palm_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_platform": {
+   "models": [
+    "assets/models/objects/palm_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_sofa": {
+   "models": [
+    "assets/models/objects/palm_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "palm_table": {
+   "models": [
+    "assets/models/objects/palm_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "palm_tree": {
    "models": [
@@ -557,6 +2411,18 @@
     "assets/models/objects/palm_tree_v2.glb"
    ],
    "generator": "palm"
+  },
+  "palm_workbench": {
+   "models": [
+    "assets/models/objects/palm_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "parrot_banner": {
+   "models": [
+    "assets/models/objects/parrot_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "pine_tree": {
    "models": [
@@ -614,6 +2480,48 @@
    ],
    "generator": "vase"
   },
+  "pinky_banner": {
+   "models": [
+    "assets/models/objects/pinky_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "pirate_captain_banner": {
+   "models": [
+    "assets/models/objects/pirate_captain_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "pirate_corsair_banner": {
+   "models": [
+    "assets/models/objects/pirate_corsair_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "pirate_crossbower_banner": {
+   "models": [
+    "assets/models/objects/pirate_crossbower_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "pirate_deadeye_banner": {
+   "models": [
+    "assets/models/objects/pirate_deadeye_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "pirate_deckhand_banner": {
+   "models": [
+    "assets/models/objects/pirate_deckhand_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "pixie_banner": {
+   "models": [
+    "assets/models/objects/pixie_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "placed_bottle": {
    "models": [
     "assets/models/objects/placed_bottle_v0.glb"
@@ -632,6 +2540,18 @@
    ],
    "generator": "trophy"
   },
+  "poltergeist_banner": {
+   "models": [
+    "assets/models/objects/poltergeist_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "possessed_armor_banner": {
+   "models": [
+    "assets/models/objects/possessed_armor_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "pot": {
    "models": [
     "assets/models/objects/pot_v0.glb",
@@ -639,6 +2559,18 @@
     "assets/models/objects/pot_v2.glb"
    ],
    "generator": "pot"
+  },
+  "predictor_banner": {
+   "models": [
+    "assets/models/objects/predictor_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "present_mimic_banner": {
+   "models": [
+    "assets/models/objects/present_mimic_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "pressure_plate": {
    "models": [
@@ -664,11 +2596,137 @@
    ],
    "generator": "banner"
   },
+  "raven_banner": {
+   "models": [
+    "assets/models/objects/raven_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "ray_gunner_banner": {
+   "models": [
+    "assets/models/objects/ray_gunner_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "reaper_banner": {
+   "models": [
+    "assets/models/objects/reaper_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "red_devil_banner": {
+   "models": [
+    "assets/models/objects/red_devil_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "retinazer_trophy": {
    "models": [
     "assets/models/objects/retinazer_trophy_v0.glb"
    ],
    "generator": "trophy"
+  },
+  "rich_mahogany_bathtub": {
+   "models": [
+    "assets/models/objects/rich_mahogany_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_bed": {
+   "models": [
+    "assets/models/objects/rich_mahogany_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_bookcase": {
+   "models": [
+    "assets/models/objects/rich_mahogany_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_candelabra": {
+   "models": [
+    "assets/models/objects/rich_mahogany_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_candle": {
+   "models": [
+    "assets/models/objects/rich_mahogany_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_chair": {
+   "models": [
+    "assets/models/objects/rich_mahogany_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_chandelier": {
+   "models": [
+    "assets/models/objects/rich_mahogany_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_chest": {
+   "models": [
+    "assets/models/objects/rich_mahogany_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_clock": {
+   "models": [
+    "assets/models/objects/rich_mahogany_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_door": {
+   "models": [
+    "assets/models/objects/rich_mahogany_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_lamp": {
+   "models": [
+    "assets/models/objects/rich_mahogany_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_lantern": {
+   "models": [
+    "assets/models/objects/rich_mahogany_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_piano": {
+   "models": [
+    "assets/models/objects/rich_mahogany_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_platform": {
+   "models": [
+    "assets/models/objects/rich_mahogany_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_sofa": {
+   "models": [
+    "assets/models/objects/rich_mahogany_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_table": {
+   "models": [
+    "assets/models/objects/rich_mahogany_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "rich_mahogany_workbench": {
+   "models": [
+    "assets/models/objects/rich_mahogany_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "rubble": {
    "models": [
@@ -684,11 +2742,131 @@
    ],
    "generator": "banner"
   },
+  "salamander_banner": {
+   "models": [
+    "assets/models/objects/salamander_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "sand_slime_banner": {
+   "models": [
+    "assets/models/objects/sand_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "sawmill": {
    "models": [
     "assets/models/objects/sawmill_v0.glb"
    ],
    "generator": "sawmill"
+  },
+  "scarecrow_banner": {
+   "models": [
+    "assets/models/objects/scarecrow_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "selenian_banner": {
+   "models": [
+    "assets/models/objects/selenian_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "shadewood_bathtub": {
+   "models": [
+    "assets/models/objects/shadewood_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_bed": {
+   "models": [
+    "assets/models/objects/shadewood_bed_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_bookcase": {
+   "models": [
+    "assets/models/objects/shadewood_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_candelabra": {
+   "models": [
+    "assets/models/objects/shadewood_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_candle": {
+   "models": [
+    "assets/models/objects/shadewood_candle_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_chair": {
+   "models": [
+    "assets/models/objects/shadewood_chair_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_chandelier": {
+   "models": [
+    "assets/models/objects/shadewood_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_chest": {
+   "models": [
+    "assets/models/objects/shadewood_chest_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_clock": {
+   "models": [
+    "assets/models/objects/shadewood_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_door": {
+   "models": [
+    "assets/models/objects/shadewood_door_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_lamp": {
+   "models": [
+    "assets/models/objects/shadewood_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_lantern": {
+   "models": [
+    "assets/models/objects/shadewood_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_piano": {
+   "models": [
+    "assets/models/objects/shadewood_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_platform": {
+   "models": [
+    "assets/models/objects/shadewood_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_sofa": {
+   "models": [
+    "assets/models/objects/shadewood_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "shadewood_table": {
+   "models": [
+    "assets/models/objects/shadewood_table_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "shadewood_tree": {
    "models": [
@@ -696,6 +2874,12 @@
     "assets/models/objects/shadewood_tree_v1.glb"
    ],
    "generator": "twisted"
+  },
+  "shadewood_workbench": {
+   "models": [
+    "assets/models/objects/shadewood_workbench_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "shadow_chest": {
    "models": [
@@ -709,11 +2893,29 @@
    ],
    "generator": "evil_orb"
   },
+  "shark_banner": {
+   "models": [
+    "assets/models/objects/shark_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "shiverthorn_plant": {
    "models": [
     "assets/models/objects/shiverthorn_plant_v0.glb"
    ],
    "generator": "flower"
+  },
+  "skeleton_banner": {
+   "models": [
+    "assets/models/objects/skeleton_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "skeleton_sniper_banner": {
+   "models": [
+    "assets/models/objects/skeleton_sniper_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "skeleton_statue": {
    "models": [
@@ -733,6 +2935,36 @@
    ],
    "generator": "trophy"
   },
+  "slime_banner": {
+   "models": [
+    "assets/models/objects/slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "slime_statue": {
+   "models": [
+    "assets/models/objects/slime_statue_v0.glb"
+   ],
+   "generator": "critter_statue"
+  },
+  "snow_balla_banner": {
+   "models": [
+    "assets/models/objects/snow_balla_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "snow_flinx_banner": {
+   "models": [
+    "assets/models/objects/snow_flinx_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "snowman_gangsta_banner": {
+   "models": [
+    "assets/models/objects/snowman_gangsta_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "spazmatism_trophy": {
    "models": [
     "assets/models/objects/spazmatism_trophy_v0.glb"
@@ -744,6 +2976,30 @@
     "assets/models/objects/spike_v0.glb"
    ],
    "generator": "spike_strip"
+  },
+  "spiked_ice_slime_banner": {
+   "models": [
+    "assets/models/objects/spiked_ice_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "spiked_slime_banner": {
+   "models": [
+    "assets/models/objects/spiked_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "splinterling_banner": {
+   "models": [
+    "assets/models/objects/splinterling_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "spore_zombie_banner": {
+   "models": [
+    "assets/models/objects/spore_zombie_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "stalactite": {
    "models": [
@@ -761,11 +3017,71 @@
    ],
    "generator": "spike"
   },
+  "stargazer_banner": {
+   "models": [
+    "assets/models/objects/stargazer_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "storm_diver_banner": {
+   "models": [
+    "assets/models/objects/storm_diver_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "swamp_thing_banner": {
+   "models": [
+    "assets/models/objects/swamp_thing_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "switch": {
    "models": [
     "assets/models/objects/switch_v0.glb"
    ],
    "generator": "switch"
+  },
+  "teleporter": {
+   "models": [
+    "assets/models/objects/teleporter_v0.glb"
+   ],
+   "generator": "teleporter"
+  },
+  "tesla_turret_banner": {
+   "models": [
+    "assets/models/objects/tesla_turret_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "the_groom_banner": {
+   "models": [
+    "assets/models/objects/the_groom_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "tim_banner": {
+   "models": [
+    "assets/models/objects/tim_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "timer_1_second": {
+   "models": [
+    "assets/models/objects/timer_1_second_v0.glb"
+   ],
+   "generator": "wiring_timer"
+  },
+  "timer_3_second": {
+   "models": [
+    "assets/models/objects/timer_3_second_v0.glb"
+   ],
+   "generator": "wiring_timer"
+  },
+  "timer_5_second": {
+   "models": [
+    "assets/models/objects/timer_5_second_v0.glb"
+   ],
+   "generator": "wiring_timer"
   },
   "tinkerers_workshop": {
    "models": [
@@ -791,11 +3107,71 @@
    ],
    "generator": "torch"
   },
+  "twinkle_popper_banner": {
+   "models": [
+    "assets/models/objects/twinkle_popper_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "umbrella_slime_banner": {
+   "models": [
+    "assets/models/objects/umbrella_slime_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "undead_miner_banner": {
+   "models": [
+    "assets/models/objects/undead_miner_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "unicorn_banner": {
+   "models": [
+    "assets/models/objects/unicorn_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "vampire_banner": {
+   "models": [
+    "assets/models/objects/vampire_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "voodoo_demon_banner": {
+   "models": [
+    "assets/models/objects/voodoo_demon_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "vortexian_banner": {
+   "models": [
+    "assets/models/objects/vortexian_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "vulture_banner": {
+   "models": [
+    "assets/models/objects/vulture_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "wall_creeper_banner": {
+   "models": [
+    "assets/models/objects/wall_creeper_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
   "wall_of_flesh_trophy": {
    "models": [
     "assets/models/objects/wall_of_flesh_trophy_v0.glb"
    ],
    "generator": "trophy"
+  },
+  "wandering_eye_banner": {
+   "models": [
+    "assets/models/objects/wandering_eye_banner_v0.glb"
+   ],
+   "generator": "banner"
   },
   "waterleaf_plant": {
    "models": [
@@ -803,11 +3179,53 @@
    ],
    "generator": "flower"
   },
+  "werewolf_banner": {
+   "models": [
+    "assets/models/objects/werewolf_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "wither_beast_banner": {
+   "models": [
+    "assets/models/objects/wither_beast_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "wolf_banner": {
+   "models": [
+    "assets/models/objects/wolf_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "wooden_bathtub": {
+   "models": [
+    "assets/models/objects/wooden_bathtub_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_bookcase": {
+   "models": [
+    "assets/models/objects/wooden_bookcase_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_candelabra": {
+   "models": [
+    "assets/models/objects/wooden_candelabra_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "wooden_chair": {
    "models": [
     "assets/models/objects/wooden_chair_v0.glb"
    ],
    "generator": "chair"
+  },
+  "wooden_chandelier": {
+   "models": [
+    "assets/models/objects/wooden_chandelier_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "wooden_chest": {
    "models": [
@@ -815,11 +3233,47 @@
    ],
    "generator": "chest"
   },
+  "wooden_clock": {
+   "models": [
+    "assets/models/objects/wooden_clock_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
   "wooden_door": {
    "models": [
     "assets/models/objects/wooden_door_v0.glb"
    ],
    "generator": "door"
+  },
+  "wooden_lamp": {
+   "models": [
+    "assets/models/objects/wooden_lamp_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_lantern": {
+   "models": [
+    "assets/models/objects/wooden_lantern_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_piano": {
+   "models": [
+    "assets/models/objects/wooden_piano_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_platform": {
+   "models": [
+    "assets/models/objects/wooden_platform_v0.glb"
+   ],
+   "generator": "furniture_piece"
+  },
+  "wooden_sofa": {
+   "models": [
+    "assets/models/objects/wooden_sofa_v0.glb"
+   ],
+   "generator": "furniture_piece"
   },
   "wooden_table": {
    "models": [
@@ -832,6 +3286,36 @@
     "assets/models/objects/work_bench_v0.glb"
    ],
    "generator": "workbench"
+  },
+  "wraith_banner": {
+   "models": [
+    "assets/models/objects/wraith_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "yeti_banner": {
+   "models": [
+    "assets/models/objects/yeti_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "zombie_banner": {
+   "models": [
+    "assets/models/objects/zombie_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "zombie_elf_banner": {
+   "models": [
+    "assets/models/objects/zombie_elf_banner_v0.glb"
+   ],
+   "generator": "banner"
+  },
+  "zombie_statue": {
+   "models": [
+    "assets/models/objects/zombie_statue_v0.glb"
+   ],
+   "generator": "critter_statue"
   }
  },
  "items": {
@@ -845,6 +3329,10 @@
   "acorn": {
    "model": "assets/models/items/acorn.glb",
    "icon": "assets/icons/items/acorn.png"
+  },
+  "actuator": {
+   "model": "assets/models/items/actuator.glb",
+   "icon": "assets/icons/items/actuator.png"
   },
   "adamantite_axe": {
    "model": "assets/models/items/adamantite_axe.glb",
@@ -941,6 +3429,14 @@
    "object": "alchemy_table",
    "icon": "assets/icons/items/alchemy_table.png"
   },
+  "alien_hornet_banner": {
+   "object": "alien_hornet_banner",
+   "icon": "assets/icons/items/alien_hornet_banner.png"
+  },
+  "amanitia_fungifin": {
+   "model": "assets/models/items/amanitia_fungifin.glb",
+   "icon": "assets/icons/items/amanitia_fungifin.png"
+  },
   "amazon": {
    "model": "assets/models/items/amazon.glb",
    "sockets": {
@@ -988,6 +3484,26 @@
    "model": "assets/models/items/angel_wings.glb",
    "icon": "assets/icons/items/angel_wings.png"
   },
+  "angelfish": {
+   "model": "assets/models/items/angelfish.glb",
+   "icon": "assets/icons/items/angelfish.png"
+  },
+  "angler_earring": {
+   "model": "assets/models/items/angler_earring.glb",
+   "icon": "assets/icons/items/angler_earring.png"
+  },
+  "angler_fish_banner": {
+   "object": "angler_fish_banner",
+   "icon": "assets/icons/items/angler_fish_banner.png"
+  },
+  "angler_tackle_bag": {
+   "model": "assets/models/items/angler_tackle_bag.glb",
+   "icon": "assets/icons/items/angler_tackle_bag.png"
+  },
+  "angry_bones_banner": {
+   "object": "angry_bones_banner",
+   "icon": "assets/icons/items/angry_bones_banner.png"
+  },
   "ankh_shield": {
    "model": "assets/models/items/ankh_shield.glb",
    "sockets": {
@@ -1000,9 +3516,25 @@
    "model": "assets/models/items/anklet_of_the_wind.glb",
    "icon": "assets/icons/items/anklet_of_the_wind.png"
   },
+  "anomura_fungus_banner": {
+   "object": "anomura_fungus_banner",
+   "icon": "assets/icons/items/anomura_fungus_banner.png"
+  },
+  "antlion_banner": {
+   "object": "antlion_banner",
+   "icon": "assets/icons/items/antlion_banner.png"
+  },
+  "antlion_charger_banner": {
+   "object": "antlion_charger_banner",
+   "icon": "assets/icons/items/antlion_charger_banner.png"
+  },
   "antlion_mandible": {
    "model": "assets/models/items/antlion_mandible.glb",
    "icon": "assets/icons/items/antlion_mandible.png"
+  },
+  "apprentice_bait": {
+   "model": "assets/models/items/apprentice_bait.glb",
+   "icon": "assets/icons/items/apprentice_bait.png"
   },
   "aqua_scepter": {
    "model": "assets/models/items/aqua_scepter.glb",
@@ -1011,6 +3543,10 @@
     "tip": "0 1.18 0 > 0 1 0"
    },
    "icon": "assets/icons/items/aqua_scepter.png"
+  },
+  "arapaima_banner": {
+   "object": "arapaima_banner",
+   "icon": "assets/icons/items/arapaima_banner.png"
   },
   "archery_potion": {
    "model": "assets/models/items/archery_potion.glb",
@@ -1023,6 +3559,10 @@
   "armored_cavefish": {
    "model": "assets/models/items/armored_cavefish.glb",
    "icon": "assets/icons/items/armored_cavefish.png"
+  },
+  "armored_skeleton_banner": {
+   "object": "armored_skeleton_banner",
+   "icon": "assets/icons/items/armored_skeleton_banner.png"
   },
   "atlantic_cod": {
    "model": "assets/models/items/atlantic_cod.glb",
@@ -1059,6 +3599,14 @@
     "tip": "0 0.46 0 > 0 1 0"
    },
    "icon": "assets/icons/items/bat_scepter.png"
+  },
+  "bat_statue": {
+   "object": "bat_statue",
+   "icon": "assets/icons/items/bat_statue.png"
+  },
+  "batfish": {
+   "model": "assets/models/items/batfish.glb",
+   "icon": "assets/icons/items/batfish.png"
   },
   "bed": {
    "object": "bed",
@@ -1148,12 +3696,20 @@
    "model": "assets/models/items/bird.glb",
    "icon": "assets/icons/items/bird.png"
   },
+  "bird_statue": {
+   "object": "bird_statue",
+   "icon": "assets/icons/items/bird_statue.png"
+  },
   "black_paint": {
    "model": "assets/models/items/black_paint.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/black_paint.png"
+  },
+  "black_recluse_banner": {
+   "object": "black_recluse_banner",
+   "icon": "assets/icons/items/black_recluse_banner.png"
   },
   "blade_of_grass": {
    "model": "assets/models/items/blade_of_grass.glb",
@@ -1191,6 +3747,14 @@
    },
    "icon": "assets/icons/items/blizzard_staff.png"
   },
+  "blood_crawler_banner": {
+   "object": "blood_crawler_banner",
+   "icon": "assets/icons/items/blood_crawler_banner.png"
+  },
+  "blood_zombie_banner": {
+   "object": "blood_zombie_banner",
+   "icon": "assets/icons/items/blood_zombie_banner.png"
+  },
   "bloody_spine": {
    "model": "assets/models/items/bloody_spine.glb",
    "icon": "assets/icons/items/bloody_spine.png"
@@ -1227,6 +3791,10 @@
    "object": "blue_dungeon_vase",
    "icon": "assets/icons/items/blue_dungeon_vase.png"
   },
+  "blue_jellyfish_banner": {
+   "object": "blue_jellyfish_banner",
+   "icon": "assets/icons/items/blue_jellyfish_banner.png"
+  },
   "blue_moon": {
    "model": "assets/models/items/blue_moon.glb",
    "sockets": {
@@ -1242,6 +3810,10 @@
    },
    "icon": "assets/icons/items/blue_paint.png"
   },
+  "blue_wrench": {
+   "model": "assets/models/items/blue_wrench.glb",
+   "icon": "assets/icons/items/blue_wrench.png"
+  },
   "bomb": {
    "model": "assets/models/items/bomb.glb",
    "sockets": {
@@ -1249,9 +3821,53 @@
    },
    "icon": "assets/icons/items/bomb.png"
   },
+  "bomb_statue": {
+   "object": "bomb_statue",
+   "icon": "assets/icons/items/bomb_statue.png"
+  },
   "bone": {
    "model": "assets/models/items/bone.glb",
    "icon": "assets/icons/items/bone.png"
+  },
+  "bone_bathtub": {
+   "object": "bone_bathtub",
+   "icon": "assets/icons/items/bone_bathtub.png"
+  },
+  "bone_bed": {
+   "object": "bone_bed",
+   "icon": "assets/icons/items/bone_bed.png"
+  },
+  "bone_bookcase": {
+   "object": "bone_bookcase",
+   "icon": "assets/icons/items/bone_bookcase.png"
+  },
+  "bone_candelabra": {
+   "object": "bone_candelabra",
+   "icon": "assets/icons/items/bone_candelabra.png"
+  },
+  "bone_candle": {
+   "object": "bone_candle",
+   "icon": "assets/icons/items/bone_candle.png"
+  },
+  "bone_chair": {
+   "object": "bone_chair",
+   "icon": "assets/icons/items/bone_chair.png"
+  },
+  "bone_chandelier": {
+   "object": "bone_chandelier",
+   "icon": "assets/icons/items/bone_chandelier.png"
+  },
+  "bone_chest": {
+   "object": "bone_chest",
+   "icon": "assets/icons/items/bone_chest.png"
+  },
+  "bone_clock": {
+   "object": "bone_clock",
+   "icon": "assets/icons/items/bone_clock.png"
+  },
+  "bone_door": {
+   "object": "bone_door",
+   "icon": "assets/icons/items/bone_door.png"
   },
   "bone_glove": {
    "model": "assets/models/items/bone_glove.glb",
@@ -1260,9 +3876,41 @@
    },
    "icon": "assets/icons/items/bone_glove.png"
   },
+  "bone_lamp": {
+   "object": "bone_lamp",
+   "icon": "assets/icons/items/bone_lamp.png"
+  },
+  "bone_lantern": {
+   "object": "bone_lantern",
+   "icon": "assets/icons/items/bone_lantern.png"
+  },
+  "bone_piano": {
+   "object": "bone_piano",
+   "icon": "assets/icons/items/bone_piano.png"
+  },
+  "bone_platform": {
+   "object": "bone_platform",
+   "icon": "assets/icons/items/bone_platform.png"
+  },
+  "bone_sofa": {
+   "object": "bone_sofa",
+   "icon": "assets/icons/items/bone_sofa.png"
+  },
+  "bone_table": {
+   "object": "bone_table",
+   "icon": "assets/icons/items/bone_table.png"
+  },
   "bone_welder": {
    "object": "bone_welder",
    "icon": "assets/icons/items/bone_welder.png"
+  },
+  "bone_workbench": {
+   "object": "bone_workbench",
+   "icon": "assets/icons/items/bone_workbench.png"
+  },
+  "bonefish": {
+   "model": "assets/models/items/bonefish.glb",
+   "icon": "assets/icons/items/bonefish.png"
   },
   "book": {
    "model": "assets/models/items/book.glb",
@@ -1285,6 +3933,74 @@
     "muzzle": "0 0.75 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/boomstick.png"
+  },
+  "boreal_bathtub": {
+   "object": "boreal_bathtub",
+   "icon": "assets/icons/items/boreal_bathtub.png"
+  },
+  "boreal_bed": {
+   "object": "boreal_bed",
+   "icon": "assets/icons/items/boreal_bed.png"
+  },
+  "boreal_bookcase": {
+   "object": "boreal_bookcase",
+   "icon": "assets/icons/items/boreal_bookcase.png"
+  },
+  "boreal_candelabra": {
+   "object": "boreal_candelabra",
+   "icon": "assets/icons/items/boreal_candelabra.png"
+  },
+  "boreal_candle": {
+   "object": "boreal_candle",
+   "icon": "assets/icons/items/boreal_candle.png"
+  },
+  "boreal_chair": {
+   "object": "boreal_chair",
+   "icon": "assets/icons/items/boreal_chair.png"
+  },
+  "boreal_chandelier": {
+   "object": "boreal_chandelier",
+   "icon": "assets/icons/items/boreal_chandelier.png"
+  },
+  "boreal_chest": {
+   "object": "boreal_chest",
+   "icon": "assets/icons/items/boreal_chest.png"
+  },
+  "boreal_clock": {
+   "object": "boreal_clock",
+   "icon": "assets/icons/items/boreal_clock.png"
+  },
+  "boreal_door": {
+   "object": "boreal_door",
+   "icon": "assets/icons/items/boreal_door.png"
+  },
+  "boreal_lamp": {
+   "object": "boreal_lamp",
+   "icon": "assets/icons/items/boreal_lamp.png"
+  },
+  "boreal_lantern": {
+   "object": "boreal_lantern",
+   "icon": "assets/icons/items/boreal_lantern.png"
+  },
+  "boreal_piano": {
+   "object": "boreal_piano",
+   "icon": "assets/icons/items/boreal_piano.png"
+  },
+  "boreal_platform": {
+   "object": "boreal_platform",
+   "icon": "assets/icons/items/boreal_platform.png"
+  },
+  "boreal_sofa": {
+   "object": "boreal_sofa",
+   "icon": "assets/icons/items/boreal_sofa.png"
+  },
+  "boreal_table": {
+   "object": "boreal_table",
+   "icon": "assets/icons/items/boreal_table.png"
+  },
+  "boreal_workbench": {
+   "object": "boreal_workbench",
+   "icon": "assets/icons/items/boreal_workbench.png"
   },
   "bottle": {
    "object": "placed_bottle",
@@ -1325,6 +4041,10 @@
   "brain_of_cthulhu_trophy": {
    "object": "brain_of_cthulhu_trophy",
    "icon": "assets/icons/items/brain_of_cthulhu_trophy.png"
+  },
+  "brain_suckler_banner": {
+   "object": "brain_suckler_banner",
+   "icon": "assets/icons/items/brain_suckler_banner.png"
   },
   "breaker_blade": {
    "model": "assets/models/items/breaker_blade.glb",
@@ -1369,9 +4089,25 @@
    "model": "assets/models/items/builder_potion.glb",
    "icon": "assets/icons/items/builder_potion.png"
   },
+  "bumblebee_tuna": {
+   "model": "assets/models/items/bumblebee_tuna.glb",
+   "icon": "assets/icons/items/bumblebee_tuna.png"
+  },
   "bunny": {
    "model": "assets/models/items/bunny.glb",
    "icon": "assets/icons/items/bunny.png"
+  },
+  "bunny_statue": {
+   "object": "bunny_statue",
+   "icon": "assets/icons/items/bunny_statue.png"
+  },
+  "bunnyfish": {
+   "model": "assets/models/items/bunnyfish.glb",
+   "icon": "assets/icons/items/bunnyfish.png"
+  },
+  "butcher_banner": {
+   "object": "butcher_banner",
+   "icon": "assets/icons/items/butcher_banner.png"
   },
   "butterfly": {
    "model": "assets/models/items/butterfly.glb",
@@ -1385,6 +4121,58 @@
    "model": "assets/models/items/cactus.glb",
    "icon": "assets/icons/items/cactus.png"
   },
+  "cactus_bathtub": {
+   "object": "cactus_bathtub",
+   "icon": "assets/icons/items/cactus_bathtub.png"
+  },
+  "cactus_bed": {
+   "object": "cactus_bed",
+   "icon": "assets/icons/items/cactus_bed.png"
+  },
+  "cactus_bookcase": {
+   "object": "cactus_bookcase",
+   "icon": "assets/icons/items/cactus_bookcase.png"
+  },
+  "cactus_candelabra": {
+   "object": "cactus_candelabra",
+   "icon": "assets/icons/items/cactus_candelabra.png"
+  },
+  "cactus_candle": {
+   "object": "cactus_candle",
+   "icon": "assets/icons/items/cactus_candle.png"
+  },
+  "cactus_chair": {
+   "object": "cactus_chair",
+   "icon": "assets/icons/items/cactus_chair.png"
+  },
+  "cactus_chandelier": {
+   "object": "cactus_chandelier",
+   "icon": "assets/icons/items/cactus_chandelier.png"
+  },
+  "cactus_chest": {
+   "object": "cactus_chest",
+   "icon": "assets/icons/items/cactus_chest.png"
+  },
+  "cactus_clock": {
+   "object": "cactus_clock",
+   "icon": "assets/icons/items/cactus_clock.png"
+  },
+  "cactus_door": {
+   "object": "cactus_door",
+   "icon": "assets/icons/items/cactus_door.png"
+  },
+  "cactus_lamp": {
+   "object": "cactus_lamp",
+   "icon": "assets/icons/items/cactus_lamp.png"
+  },
+  "cactus_lantern": {
+   "object": "cactus_lantern",
+   "icon": "assets/icons/items/cactus_lantern.png"
+  },
+  "cactus_piano": {
+   "object": "cactus_piano",
+   "icon": "assets/icons/items/cactus_piano.png"
+  },
   "cactus_pickaxe": {
    "model": "assets/models/items/cactus_pickaxe.glb",
    "sockets": {
@@ -1392,6 +4180,14 @@
     "tip": "0 0.7525 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cactus_pickaxe.png"
+  },
+  "cactus_platform": {
+   "object": "cactus_platform",
+   "icon": "assets/icons/items/cactus_platform.png"
+  },
+  "cactus_sofa": {
+   "object": "cactus_sofa",
+   "icon": "assets/icons/items/cactus_sofa.png"
   },
   "cactus_sword": {
    "model": "assets/models/items/cactus_sword.glb",
@@ -1401,6 +4197,14 @@
    },
    "icon": "assets/icons/items/cactus_sword.png"
   },
+  "cactus_table": {
+   "object": "cactus_table",
+   "icon": "assets/icons/items/cactus_table.png"
+  },
+  "cactus_workbench": {
+   "object": "cactus_workbench",
+   "icon": "assets/icons/items/cactus_workbench.png"
+  },
   "campfire": {
    "object": "campfire",
    "icon": "assets/icons/items/campfire.png"
@@ -1408,6 +4212,22 @@
   "candle": {
    "object": "candle",
    "icon": "assets/icons/items/candle.png"
+  },
+  "candy_cane": {
+   "model": "assets/models/items/candy_cane.glb",
+   "icon": "assets/icons/items/candy_cane.png"
+  },
+  "candy_corn": {
+   "model": "assets/models/items/candy_corn.glb",
+   "icon": "assets/icons/items/candy_corn.png"
+  },
+  "catfish": {
+   "model": "assets/models/items/catfish.glb",
+   "icon": "assets/icons/items/catfish.png"
+  },
+  "cave_bat_banner": {
+   "object": "cave_bat_banner",
+   "icon": "assets/icons/items/cave_bat_banner.png"
   },
   "celestial_emblem": {
    "model": "assets/models/items/celestial_emblem.glb",
@@ -1434,6 +4254,10 @@
     "muzzle": "0 0.8 -0.045 > 0 1 0"
    },
    "icon": "assets/icons/items/chain_gun.png"
+  },
+  "chaos_elemental_banner": {
+   "object": "chaos_elemental_banner",
+   "icon": "assets/icons/items/chaos_elemental_banner.png"
   },
   "chlorophyte_bar": {
    "model": "assets/models/items/chlorophyte_bar.glb",
@@ -1462,6 +4286,10 @@
    "armor": "chlorophyte_armor",
    "icon": "assets/icons/items/chlorophyte_plate_mail.png"
   },
+  "christmas_tree": {
+   "object": "christmas_tree",
+   "icon": "assets/icons/items/christmas_tree.png"
+  },
   "christmas_tree_sword": {
    "model": "assets/models/items/christmas_tree_sword.glb",
    "sockets": {
@@ -1469,6 +4297,10 @@
     "tip": "0 1.198 0 > 0 1 0"
    },
    "icon": "assets/icons/items/christmas_tree_sword.png"
+  },
+  "clinger_banner": {
+   "object": "clinger_banner",
+   "icon": "assets/icons/items/clinger_banner.png"
   },
   "clockwork_assault_rifle": {
    "model": "assets/models/items/clockwork_assault_rifle.glb",
@@ -1490,6 +4322,14 @@
   "cloud_in_a_bottle": {
    "model": "assets/models/items/cloud_in_a_bottle.glb",
    "icon": "assets/icons/items/cloud_in_a_bottle.png"
+  },
+  "cloudfish": {
+   "model": "assets/models/items/cloudfish.glb",
+   "icon": "assets/icons/items/cloudfish.png"
+  },
+  "clownfish": {
+   "model": "assets/models/items/clownfish.glb",
+   "icon": "assets/icons/items/clownfish.png"
   },
   "cobalt_axe": {
    "model": "assets/models/items/cobalt_axe.glb",
@@ -1582,6 +4422,10 @@
    },
    "icon": "assets/icons/items/cobalt_shortsword.png"
   },
+  "cochineal_beetle_banner": {
+   "object": "cochineal_beetle_banner",
+   "icon": "assets/icons/items/cochineal_beetle_banner.png"
+  },
   "code_1": {
    "model": "assets/models/items/code_1.glb",
    "sockets": {
@@ -1673,6 +4517,18 @@
    },
    "icon": "assets/icons/items/copper_shortsword.png"
   },
+  "corite_banner": {
+   "object": "corite_banner",
+   "icon": "assets/icons/items/corite_banner.png"
+  },
+  "corrupt_crate": {
+   "model": "assets/models/items/corrupt_crate.glb",
+   "icon": "assets/icons/items/corrupt_crate.png"
+  },
+  "corrupt_slime_banner": {
+   "object": "corrupt_slime_banner",
+   "icon": "assets/icons/items/corrupt_slime_banner.png"
+  },
   "corruption_chest": {
    "object": "corruption_chest",
    "icon": "assets/icons/items/corruption_chest.png"
@@ -1684,9 +4540,45 @@
    },
    "icon": "assets/icons/items/corruption_key.png"
   },
+  "corruptor_banner": {
+   "object": "corruptor_banner",
+   "icon": "assets/icons/items/corruptor_banner.png"
+  },
+  "cosmic_car_key": {
+   "model": "assets/models/items/cosmic_car_key.glb",
+   "icon": "assets/icons/items/cosmic_car_key.png"
+  },
+  "crab_banner": {
+   "object": "crab_banner",
+   "icon": "assets/icons/items/crab_banner.png"
+  },
+  "crab_statue": {
+   "object": "crab_statue",
+   "icon": "assets/icons/items/crab_statue.png"
+  },
+  "crate_potion": {
+   "model": "assets/models/items/crate_potion.glb",
+   "icon": "assets/icons/items/crate_potion.png"
+  },
+  "crawdad_banner": {
+   "object": "crawdad_banner",
+   "icon": "assets/icons/items/crawdad_banner.png"
+  },
+  "crimera_banner": {
+   "object": "crimera_banner",
+   "icon": "assets/icons/items/crimera_banner.png"
+  },
+  "crimslime_banner": {
+   "object": "crimslime_banner",
+   "icon": "assets/icons/items/crimslime_banner.png"
+  },
   "crimson_chest": {
    "object": "crimson_chest",
    "icon": "assets/icons/items/crimson_chest.png"
+  },
+  "crimson_crate": {
+   "model": "assets/models/items/crimson_crate.glb",
+   "icon": "assets/icons/items/crimson_crate.png"
   },
   "crimson_key": {
    "model": "assets/models/items/crimson_key.glb",
@@ -1778,12 +4670,20 @@
    "model": "assets/models/items/crystal_shard.glb",
    "icon": "assets/icons/items/crystal_shard.png"
   },
+  "crystal_slime_banner": {
+   "object": "crystal_slime_banner",
+   "icon": "assets/icons/items/crystal_slime_banner.png"
+  },
   "crystal_storm": {
    "model": "assets/models/items/crystal_storm.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/crystal_storm.png"
+  },
+  "cultist_archer_banner": {
+   "object": "cultist_archer_banner",
+   "icon": "assets/icons/items/cultist_archer_banner.png"
   },
   "cursed_arrow": {
    "model": "assets/models/items/cursed_arrow.glb",
@@ -1804,6 +4704,10 @@
    },
    "icon": "assets/icons/items/cursed_flames.png"
   },
+  "cursed_skull_banner": {
+   "object": "cursed_skull_banner",
+   "icon": "assets/icons/items/cursed_skull_banner.png"
+  },
   "cutlass": {
    "model": "assets/models/items/cutlass.glb",
    "sockets": {
@@ -1811,6 +4715,10 @@
     "tip": "0 0.948 0 > 0 1 0"
    },
    "icon": "assets/icons/items/cutlass.png"
+  },
+  "cyan_beetle_banner": {
+   "object": "cyan_beetle_banner",
+   "icon": "assets/icons/items/cyan_beetle_banner.png"
   },
   "cyan_paint": {
    "model": "assets/models/items/cyan_paint.glb",
@@ -1826,6 +4734,10 @@
     "nock": "0 0 0 > -1 0 0"
    },
    "icon": "assets/icons/items/daedalus_stormbow.png"
+  },
+  "dark_caster_banner": {
+   "object": "dark_caster_banner",
+   "icon": "assets/icons/items/dark_caster_banner.png"
   },
   "dark_lance": {
    "model": "assets/models/items/dark_lance.glb",
@@ -1854,6 +4766,10 @@
     "tip": "0 1.52 0 > 0 1 0"
    },
    "icon": "assets/icons/items/daybreak.png"
+  },
+  "deadly_sphere_banner": {
+   "object": "deadly_sphere_banner",
+   "icon": "assets/icons/items/deadly_sphere_banner.png"
   },
   "deadly_sphere_staff": {
    "model": "assets/models/items/deadly_sphere_staff.glb",
@@ -1897,6 +4813,14 @@
    "object": "deerclops_trophy",
    "icon": "assets/icons/items/deerclops_trophy.png"
   },
+  "demon_banner": {
+   "object": "demon_banner",
+   "icon": "assets/icons/items/demon_banner.png"
+  },
+  "demon_eye_banner": {
+   "object": "demon_eye_banner",
+   "icon": "assets/icons/items/demon_eye_banner.png"
+  },
   "demon_heart": {
    "model": "assets/models/items/demon_heart.glb",
    "icon": "assets/icons/items/demon_heart.png"
@@ -1911,6 +4835,10 @@
   "demon_wings": {
    "model": "assets/models/items/demon_wings.glb",
    "icon": "assets/icons/items/demon_wings.png"
+  },
+  "demonic_hellfish": {
+   "model": "assets/models/items/demonic_hellfish.glb",
+   "icon": "assets/icons/items/demonic_hellfish.png"
   },
   "demonite_axe": {
    "model": "assets/models/items/demonite_axe.glb",
@@ -1983,6 +4911,10 @@
    "model": "assets/models/items/depth_meter.glb",
    "icon": "assets/icons/items/depth_meter.png"
   },
+  "derpling_banner": {
+   "object": "derpling_banner",
+   "icon": "assets/icons/items/derpling_banner.png"
+  },
   "desert_chest": {
    "object": "desert_chest",
    "icon": "assets/icons/items/desert_chest.png"
@@ -2029,6 +4961,18 @@
    },
    "icon": "assets/icons/items/diamond_staff.png"
   },
+  "drakin_banner": {
+   "object": "drakin_banner",
+   "icon": "assets/icons/items/drakin_banner.png"
+  },
+  "drakomire_banner": {
+   "object": "drakomire_banner",
+   "icon": "assets/icons/items/drakomire_banner.png"
+  },
+  "drippler_banner": {
+   "object": "drippler_banner",
+   "icon": "assets/icons/items/drippler_banner.png"
+  },
   "dual_hook": {
    "model": "assets/models/items/dual_hook.glb",
    "sockets": {
@@ -2051,12 +4995,32 @@
    "object": "duke_fishron_trophy",
    "icon": "assets/icons/items/duke_fishron_trophy.png"
   },
+  "dungeon_crate": {
+   "model": "assets/models/items/dungeon_crate.glb",
+   "icon": "assets/icons/items/dungeon_crate.png"
+  },
+  "dungeon_slime_banner": {
+   "object": "dungeon_slime_banner",
+   "icon": "assets/icons/items/dungeon_slime_banner.png"
+  },
+  "dungeon_spirit_banner": {
+   "object": "dungeon_spirit_banner",
+   "icon": "assets/icons/items/dungeon_spirit_banner.png"
+  },
   "dynamite": {
    "model": "assets/models/items/dynamite.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/dynamite.png"
+  },
+  "dynamite_fish": {
+   "model": "assets/models/items/dynamite_fish.glb",
+   "icon": "assets/icons/items/dynamite_fish.png"
+  },
+  "eater_of_souls_banner": {
+   "object": "eater_of_souls_banner",
+   "icon": "assets/icons/items/eater_of_souls_banner.png"
   },
   "eater_of_worlds_treasure_bag": {
    "model": "assets/models/items/eater_of_worlds_treasure_bag.glb",
@@ -2073,9 +5037,85 @@
    "model": "assets/models/items/ebonkoi.glb",
    "icon": "assets/icons/items/ebonkoi.png"
   },
+  "ebonwood_bathtub": {
+   "object": "ebonwood_bathtub",
+   "icon": "assets/icons/items/ebonwood_bathtub.png"
+  },
+  "ebonwood_bed": {
+   "object": "ebonwood_bed",
+   "icon": "assets/icons/items/ebonwood_bed.png"
+  },
+  "ebonwood_bookcase": {
+   "object": "ebonwood_bookcase",
+   "icon": "assets/icons/items/ebonwood_bookcase.png"
+  },
+  "ebonwood_candelabra": {
+   "object": "ebonwood_candelabra",
+   "icon": "assets/icons/items/ebonwood_candelabra.png"
+  },
+  "ebonwood_candle": {
+   "object": "ebonwood_candle",
+   "icon": "assets/icons/items/ebonwood_candle.png"
+  },
+  "ebonwood_chair": {
+   "object": "ebonwood_chair",
+   "icon": "assets/icons/items/ebonwood_chair.png"
+  },
+  "ebonwood_chandelier": {
+   "object": "ebonwood_chandelier",
+   "icon": "assets/icons/items/ebonwood_chandelier.png"
+  },
+  "ebonwood_chest": {
+   "object": "ebonwood_chest",
+   "icon": "assets/icons/items/ebonwood_chest.png"
+  },
+  "ebonwood_clock": {
+   "object": "ebonwood_clock",
+   "icon": "assets/icons/items/ebonwood_clock.png"
+  },
+  "ebonwood_door": {
+   "object": "ebonwood_door",
+   "icon": "assets/icons/items/ebonwood_door.png"
+  },
+  "ebonwood_lamp": {
+   "object": "ebonwood_lamp",
+   "icon": "assets/icons/items/ebonwood_lamp.png"
+  },
+  "ebonwood_lantern": {
+   "object": "ebonwood_lantern",
+   "icon": "assets/icons/items/ebonwood_lantern.png"
+  },
+  "ebonwood_piano": {
+   "object": "ebonwood_piano",
+   "icon": "assets/icons/items/ebonwood_piano.png"
+  },
+  "ebonwood_platform": {
+   "object": "ebonwood_platform",
+   "icon": "assets/icons/items/ebonwood_platform.png"
+  },
+  "ebonwood_sofa": {
+   "object": "ebonwood_sofa",
+   "icon": "assets/icons/items/ebonwood_sofa.png"
+  },
+  "ebonwood_table": {
+   "object": "ebonwood_table",
+   "icon": "assets/icons/items/ebonwood_table.png"
+  },
+  "ebonwood_workbench": {
+   "object": "ebonwood_workbench",
+   "icon": "assets/icons/items/ebonwood_workbench.png"
+  },
   "ectoplasm": {
    "model": "assets/models/items/ectoplasm.glb",
    "icon": "assets/icons/items/ectoplasm.png"
+  },
+  "elf_archer_banner": {
+   "object": "elf_archer_banner",
+   "icon": "assets/icons/items/elf_archer_banner.png"
+  },
+  "elf_copter_banner": {
+   "object": "elf_copter_banner",
+   "icon": "assets/icons/items/elf_copter_banner.png"
   },
   "elf_melter": {
    "model": "assets/models/items/elf_melter.glb",
@@ -2152,6 +5192,22 @@
    },
    "icon": "assets/icons/items/eternia_crystal.png"
   },
+  "etherian_goblin_banner": {
+   "object": "etherian_goblin_banner",
+   "icon": "assets/icons/items/etherian_goblin_banner.png"
+  },
+  "etherian_goblin_bomber_banner": {
+   "object": "etherian_goblin_bomber_banner",
+   "icon": "assets/icons/items/etherian_goblin_bomber_banner.png"
+  },
+  "etherian_javelin_thrower_banner": {
+   "object": "etherian_javelin_thrower_banner",
+   "icon": "assets/icons/items/etherian_javelin_thrower_banner.png"
+  },
+  "etherian_wyvern_banner": {
+   "object": "etherian_wyvern_banner",
+   "icon": "assets/icons/items/etherian_wyvern_banner.png"
+  },
   "excalibur": {
    "model": "assets/models/items/excalibur.glb",
    "sockets": {
@@ -2178,6 +5234,14 @@
    },
    "icon": "assets/icons/items/eye_of_the_golem.png"
   },
+  "eyezor_banner": {
+   "object": "eyezor_banner",
+   "icon": "assets/icons/items/eyezor_banner.png"
+  },
+  "face_monster_banner": {
+   "object": "face_monster_banner",
+   "icon": "assets/icons/items/face_monster_banner.png"
+  },
   "faeling": {
    "model": "assets/models/items/faeling.glb",
    "icon": "assets/icons/items/faeling.png"
@@ -2189,6 +5253,10 @@
   "fallen_star": {
    "model": "assets/models/items/fallen_star.glb",
    "icon": "assets/icons/items/fallen_star.png"
+  },
+  "fallen_starfish": {
+   "model": "assets/models/items/fallen_starfish.glb",
+   "icon": "assets/icons/items/fallen_starfish.png"
   },
   "feather": {
    "model": "assets/models/items/feather.glb",
@@ -2202,6 +5270,14 @@
    "model": "assets/models/items/feral_claws.glb",
    "icon": "assets/icons/items/feral_claws.png"
   },
+  "festive_lights": {
+   "object": "festive_lights",
+   "icon": "assets/icons/items/festive_lights.png"
+  },
+  "fiberglass_fishing_pole": {
+   "model": "assets/models/items/fiberglass_fishing_pole.glb",
+   "icon": "assets/icons/items/fiberglass_fishing_pole.png"
+  },
   "finch_staff": {
    "model": "assets/models/items/finch_staff.glb",
    "sockets": {
@@ -2209,6 +5285,10 @@
     "tip": "0 1.18 0 > 0 1 0"
    },
    "icon": "assets/icons/items/finch_staff.png"
+  },
+  "fire_imp_banner": {
+   "object": "fire_imp_banner",
+   "icon": "assets/icons/items/fire_imp_banner.png"
   },
   "fireblossom": {
    "model": "assets/models/items/fireblossom.glb",
@@ -2233,6 +5313,10 @@
     "tip": "0 0.9 0 > 0 1 0"
    },
    "icon": "assets/icons/items/fisher_of_souls.png"
+  },
+  "fishing_potion": {
+   "model": "assets/models/items/fishing_potion.glb",
+   "icon": "assets/icons/items/fishing_potion.png"
   },
   "fishron_wings": {
    "model": "assets/models/items/fishron_wings.glb",
@@ -2269,6 +5353,10 @@
    },
    "icon": "assets/icons/items/flaming_arrow.png"
   },
+  "flarefin_koi": {
+   "model": "assets/models/items/flarefin_koi.glb",
+   "icon": "assets/icons/items/flarefin_koi.png"
+  },
   "fledgling_wings": {
    "model": "assets/models/items/fledgling_wings.glb",
    "icon": "assets/icons/items/fledgling_wings.png"
@@ -2297,6 +5385,18 @@
    "model": "assets/models/items/flipper.glb",
    "icon": "assets/icons/items/flipper.png"
   },
+  "floaty_gross_banner": {
+   "object": "floaty_gross_banner",
+   "icon": "assets/icons/items/floaty_gross_banner.png"
+  },
+  "flocko_banner": {
+   "object": "flocko_banner",
+   "icon": "assets/icons/items/flocko_banner.png"
+  },
+  "flow_invader_banner": {
+   "object": "flow_invader_banner",
+   "icon": "assets/icons/items/flow_invader_banner.png"
+  },
   "flower_pow": {
    "model": "assets/models/items/flower_pow.glb",
    "sockets": {
@@ -2313,6 +5413,18 @@
    },
    "icon": "assets/icons/items/flying_dragon.png"
   },
+  "flying_fish_banner": {
+   "object": "flying_fish_banner",
+   "icon": "assets/icons/items/flying_fish_banner.png"
+  },
+  "flying_snake_banner": {
+   "object": "flying_snake_banner",
+   "icon": "assets/icons/items/flying_snake_banner.png"
+  },
+  "frankenstein_banner": {
+   "object": "frankenstein_banner",
+   "icon": "assets/icons/items/frankenstein_banner.png"
+  },
   "frog": {
    "model": "assets/models/items/frog.glb",
    "icon": "assets/icons/items/frog.png"
@@ -2321,6 +5433,10 @@
    "object": "frozen_chest",
    "icon": "assets/icons/items/frozen_chest.png"
   },
+  "frozen_crate": {
+   "model": "assets/models/items/frozen_crate.glb",
+   "icon": "assets/icons/items/frozen_crate.png"
+  },
   "frozen_key": {
    "model": "assets/models/items/frozen_key.glb",
    "sockets": {
@@ -2328,9 +5444,21 @@
    },
    "icon": "assets/icons/items/frozen_key.png"
   },
+  "frozen_zombie_banner": {
+   "object": "frozen_zombie_banner",
+   "icon": "assets/icons/items/frozen_zombie_banner.png"
+  },
   "furnace": {
    "object": "furnace",
    "icon": "assets/icons/items/furnace.png"
+  },
+  "fuzzy_carrot": {
+   "model": "assets/models/items/fuzzy_carrot.glb",
+   "icon": "assets/icons/items/fuzzy_carrot.png"
+  },
+  "gastropod_banner": {
+   "object": "gastropod_banner",
+   "icon": "assets/icons/items/gastropod_banner.png"
   },
   "gel": {
    "model": "assets/models/items/gel.glb",
@@ -2340,13 +5468,125 @@
    "model": "assets/models/items/gelatin_crystal.glb",
    "icon": "assets/icons/items/gelatin_crystal.png"
   },
+  "ghost_banner": {
+   "object": "ghost_banner",
+   "icon": "assets/icons/items/ghost_banner.png"
+  },
+  "giant_bat_banner": {
+   "object": "giant_bat_banner",
+   "icon": "assets/icons/items/giant_bat_banner.png"
+  },
+  "giant_shelly_banner": {
+   "object": "giant_shelly_banner",
+   "icon": "assets/icons/items/giant_shelly_banner.png"
+  },
+  "giant_tortoise_banner": {
+   "object": "giant_tortoise_banner",
+   "icon": "assets/icons/items/giant_tortoise_banner.png"
+  },
+  "gigazapper_banner": {
+   "object": "gigazapper_banner",
+   "icon": "assets/icons/items/gigazapper_banner.png"
+  },
   "gills_potion": {
    "model": "assets/models/items/gills_potion.glb",
    "icon": "assets/icons/items/gills_potion.png"
   },
+  "gingerbread_man_banner": {
+   "object": "gingerbread_man_banner",
+   "icon": "assets/icons/items/gingerbread_man_banner.png"
+  },
+  "glass_bathtub": {
+   "object": "glass_bathtub",
+   "icon": "assets/icons/items/glass_bathtub.png"
+  },
+  "glass_bed": {
+   "object": "glass_bed",
+   "icon": "assets/icons/items/glass_bed.png"
+  },
+  "glass_bookcase": {
+   "object": "glass_bookcase",
+   "icon": "assets/icons/items/glass_bookcase.png"
+  },
+  "glass_candelabra": {
+   "object": "glass_candelabra",
+   "icon": "assets/icons/items/glass_candelabra.png"
+  },
+  "glass_candle": {
+   "object": "glass_candle",
+   "icon": "assets/icons/items/glass_candle.png"
+  },
+  "glass_chair": {
+   "object": "glass_chair",
+   "icon": "assets/icons/items/glass_chair.png"
+  },
+  "glass_chandelier": {
+   "object": "glass_chandelier",
+   "icon": "assets/icons/items/glass_chandelier.png"
+  },
+  "glass_chest": {
+   "object": "glass_chest",
+   "icon": "assets/icons/items/glass_chest.png"
+  },
+  "glass_clock": {
+   "object": "glass_clock",
+   "icon": "assets/icons/items/glass_clock.png"
+  },
+  "glass_door": {
+   "object": "glass_door",
+   "icon": "assets/icons/items/glass_door.png"
+  },
+  "glass_lamp": {
+   "object": "glass_lamp",
+   "icon": "assets/icons/items/glass_lamp.png"
+  },
+  "glass_lantern": {
+   "object": "glass_lantern",
+   "icon": "assets/icons/items/glass_lantern.png"
+  },
+  "glass_piano": {
+   "object": "glass_piano",
+   "icon": "assets/icons/items/glass_piano.png"
+  },
+  "glass_platform": {
+   "object": "glass_platform",
+   "icon": "assets/icons/items/glass_platform.png"
+  },
+  "glass_sofa": {
+   "object": "glass_sofa",
+   "icon": "assets/icons/items/glass_sofa.png"
+  },
+  "glass_table": {
+   "object": "glass_table",
+   "icon": "assets/icons/items/glass_table.png"
+  },
+  "glass_workbench": {
+   "object": "glass_workbench",
+   "icon": "assets/icons/items/glass_workbench.png"
+  },
   "glowing_mushroom": {
    "model": "assets/models/items/glowing_mushroom.glb",
    "icon": "assets/icons/items/glowing_mushroom.png"
+  },
+  "goblin_archer_banner": {
+   "object": "goblin_archer_banner",
+   "icon": "assets/icons/items/goblin_archer_banner.png"
+  },
+  "goblin_peon_banner": {
+   "object": "goblin_peon_banner",
+   "icon": "assets/icons/items/goblin_peon_banner.png"
+  },
+  "goblin_sorcerer_banner": {
+   "object": "goblin_sorcerer_banner",
+   "icon": "assets/icons/items/goblin_sorcerer_banner.png"
+  },
+  "goblin_thief_banner": {
+   "object": "goblin_thief_banner",
+   "icon": "assets/icons/items/goblin_thief_banner.png"
+  },
+  "goblin_warrior_banner": {
+   "object": "goblin_warrior_banner",
+   "icon": "assets/icons/items/goblin_warrior_banner.png"
   },
   "gold_axe": {
    "model": "assets/models/items/gold_axe.glb",
@@ -2460,12 +5700,92 @@
    "object": "golem_trophy",
    "icon": "assets/icons/items/golem_trophy.png"
   },
+  "goodie_bag": {
+   "model": "assets/models/items/goodie_bag.glb",
+   "icon": "assets/icons/items/goodie_bag.png"
+  },
   "gps": {
    "model": "assets/models/items/gps.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/gps.png"
+  },
+  "granite_bathtub": {
+   "object": "granite_bathtub",
+   "icon": "assets/icons/items/granite_bathtub.png"
+  },
+  "granite_bed": {
+   "object": "granite_bed",
+   "icon": "assets/icons/items/granite_bed.png"
+  },
+  "granite_bookcase": {
+   "object": "granite_bookcase",
+   "icon": "assets/icons/items/granite_bookcase.png"
+  },
+  "granite_candelabra": {
+   "object": "granite_candelabra",
+   "icon": "assets/icons/items/granite_candelabra.png"
+  },
+  "granite_candle": {
+   "object": "granite_candle",
+   "icon": "assets/icons/items/granite_candle.png"
+  },
+  "granite_chair": {
+   "object": "granite_chair",
+   "icon": "assets/icons/items/granite_chair.png"
+  },
+  "granite_chandelier": {
+   "object": "granite_chandelier",
+   "icon": "assets/icons/items/granite_chandelier.png"
+  },
+  "granite_chest": {
+   "object": "granite_chest",
+   "icon": "assets/icons/items/granite_chest.png"
+  },
+  "granite_clock": {
+   "object": "granite_clock",
+   "icon": "assets/icons/items/granite_clock.png"
+  },
+  "granite_door": {
+   "object": "granite_door",
+   "icon": "assets/icons/items/granite_door.png"
+  },
+  "granite_elemental_banner": {
+   "object": "granite_elemental_banner",
+   "icon": "assets/icons/items/granite_elemental_banner.png"
+  },
+  "granite_golem_banner": {
+   "object": "granite_golem_banner",
+   "icon": "assets/icons/items/granite_golem_banner.png"
+  },
+  "granite_lamp": {
+   "object": "granite_lamp",
+   "icon": "assets/icons/items/granite_lamp.png"
+  },
+  "granite_lantern": {
+   "object": "granite_lantern",
+   "icon": "assets/icons/items/granite_lantern.png"
+  },
+  "granite_piano": {
+   "object": "granite_piano",
+   "icon": "assets/icons/items/granite_piano.png"
+  },
+  "granite_platform": {
+   "object": "granite_platform",
+   "icon": "assets/icons/items/granite_platform.png"
+  },
+  "granite_sofa": {
+   "object": "granite_sofa",
+   "icon": "assets/icons/items/granite_sofa.png"
+  },
+  "granite_table": {
+   "object": "granite_table",
+   "icon": "assets/icons/items/granite_table.png"
+  },
+  "granite_workbench": {
+   "object": "granite_workbench",
+   "icon": "assets/icons/items/granite_workbench.png"
   },
   "grappling_hook": {
    "model": "assets/models/items/grappling_hook.glb",
@@ -2528,6 +5848,10 @@
    },
    "icon": "assets/icons/items/green_paint.png"
   },
+  "green_wrench": {
+   "model": "assets/models/items/green_wrench.glb",
+   "icon": "assets/icons/items/green_wrench.png"
+  },
   "grenade": {
    "model": "assets/models/items/grenade.glb",
    "sockets": {
@@ -2546,6 +5870,10 @@
   "hallowed_chest": {
    "object": "hallowed_chest",
    "icon": "assets/icons/items/hallowed_chest.png"
+  },
+  "hallowed_crate": {
+   "model": "assets/models/items/hallowed_crate.glb",
+   "icon": "assets/icons/items/hallowed_crate.png"
   },
   "hallowed_greaves": {
    "model": "assets/models/items/hallowed_greaves.glb",
@@ -2601,6 +5929,18 @@
    },
    "icon": "assets/icons/items/harpoon.png"
   },
+  "harpy_banner": {
+   "object": "harpy_banner",
+   "icon": "assets/icons/items/harpy_banner.png"
+  },
+  "harpyfish": {
+   "model": "assets/models/items/harpyfish.glb",
+   "icon": "assets/icons/items/harpyfish.png"
+  },
+  "headless_horseman_banner": {
+   "object": "headless_horseman_banner",
+   "icon": "assets/icons/items/headless_horseman_banner.png"
+  },
   "healing_potion": {
    "model": "assets/models/items/healing_potion.glb",
    "icon": "assets/icons/items/healing_potion.png"
@@ -2609,9 +5949,17 @@
    "object": "heart_lantern",
    "icon": "assets/icons/items/heart_lantern.png"
   },
+  "hellbat_banner": {
+   "object": "hellbat_banner",
+   "icon": "assets/icons/items/hellbat_banner.png"
+  },
   "hellforge": {
    "object": "hellforge",
    "icon": "assets/icons/items/hellforge.png"
+  },
+  "hellhound_banner": {
+   "object": "hellhound_banner",
+   "icon": "assets/icons/items/hellhound_banner.png"
   },
   "hellstone_axe": {
    "model": "assets/models/items/hellstone_axe.glb",
@@ -2692,6 +6040,10 @@
    "model": "assets/models/items/hermes_boots.glb",
    "icon": "assets/icons/items/hermes_boots.png"
   },
+  "herpling_banner": {
+   "object": "herpling_banner",
+   "icon": "assets/icons/items/herpling_banner.png"
+  },
   "hive_pack": {
    "model": "assets/models/items/hive_pack.glb",
    "icon": "assets/icons/items/hive_pack.png"
@@ -2707,12 +6059,48 @@
    "model": "assets/models/items/honey_comb.glb",
    "icon": "assets/icons/items/honey_comb.png"
   },
+  "honeyed_goggles": {
+   "model": "assets/models/items/honeyed_goggles.glb",
+   "icon": "assets/icons/items/honeyed_goggles.png"
+  },
+  "honeyfin": {
+   "model": "assets/models/items/honeyfin.glb",
+   "icon": "assets/icons/items/honeyfin.png"
+  },
   "hook": {
    "model": "assets/models/items/hook.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/hook.png"
+  },
+  "hoplite_banner": {
+   "object": "hoplite_banner",
+   "icon": "assets/icons/items/hoplite_banner.png"
+  },
+  "hornet_banner": {
+   "object": "hornet_banner",
+   "icon": "assets/icons/items/hornet_banner.png"
+  },
+  "hotline_fishing_hook": {
+   "model": "assets/models/items/hotline_fishing_hook.glb",
+   "icon": "assets/icons/items/hotline_fishing_hook.png"
+  },
+  "ice_bat_banner": {
+   "object": "ice_bat_banner",
+   "icon": "assets/icons/items/ice_bat_banner.png"
+  },
+  "ice_elemental_banner": {
+   "object": "ice_elemental_banner",
+   "icon": "assets/icons/items/ice_elemental_banner.png"
+  },
+  "ice_slime_banner": {
+   "object": "ice_slime_banner",
+   "icon": "assets/icons/items/ice_slime_banner.png"
+  },
+  "ice_tortoise_banner": {
+   "object": "ice_tortoise_banner",
+   "icon": "assets/icons/items/ice_tortoise_banner.png"
   },
   "ichor": {
    "model": "assets/models/items/ichor.glb",
@@ -2725,6 +6113,14 @@
     "tip": "0 0.38 0 > 0 1 0"
    },
    "icon": "assets/icons/items/ichor_arrow.png"
+  },
+  "ichor_sticker_banner": {
+   "object": "ichor_sticker_banner",
+   "icon": "assets/icons/items/ichor_sticker_banner.png"
+  },
+  "illuminant_slime_banner": {
+   "object": "illuminant_slime_banner",
+   "icon": "assets/icons/items/illuminant_slime_banner.png"
   },
   "imp_staff": {
    "model": "assets/models/items/imp_staff.glb",
@@ -2837,6 +6233,10 @@
    },
    "icon": "assets/icons/items/ivy_whip.png"
   },
+  "jack_o_lantern": {
+   "object": "jack_o_lantern",
+   "icon": "assets/icons/items/jack_o_lantern.png"
+  },
   "jesters_arrow": {
    "model": "assets/models/items/jesters_arrow.glb",
    "sockets": {
@@ -2845,9 +6245,25 @@
    },
    "icon": "assets/icons/items/jesters_arrow.png"
   },
+  "jewelfish": {
+   "model": "assets/models/items/jewelfish.glb",
+   "icon": "assets/icons/items/jewelfish.png"
+  },
+  "journeyman_bait": {
+   "model": "assets/models/items/journeyman_bait.glb",
+   "icon": "assets/icons/items/journeyman_bait.png"
+  },
+  "jungle_bat_banner": {
+   "object": "jungle_bat_banner",
+   "icon": "assets/icons/items/jungle_bat_banner.png"
+  },
   "jungle_chest": {
    "object": "jungle_chest",
    "icon": "assets/icons/items/jungle_chest.png"
+  },
+  "jungle_crate": {
+   "model": "assets/models/items/jungle_crate.glb",
+   "icon": "assets/icons/items/jungle_crate.png"
   },
   "jungle_hat": {
    "model": "assets/models/items/jungle_hat.glb",
@@ -2870,6 +6286,10 @@
    "model": "assets/models/items/jungle_shirt.glb",
    "armor": "jungle_armor",
    "icon": "assets/icons/items/jungle_shirt.png"
+  },
+  "jungle_slime_banner": {
+   "object": "jungle_slime_banner",
+   "icon": "assets/icons/items/jungle_slime_banner.png"
   },
   "jungle_spores": {
    "model": "assets/models/items/jungle_spores.glb",
@@ -2894,6 +6314,18 @@
    "object": "king_slime_trophy",
    "icon": "assets/icons/items/king_slime_trophy.png"
   },
+  "kobold_banner": {
+   "object": "kobold_banner",
+   "icon": "assets/icons/items/kobold_banner.png"
+  },
+  "krampus_banner": {
+   "object": "krampus_banner",
+   "icon": "assets/icons/items/krampus_banner.png"
+  },
+  "lac_beetle_banner": {
+   "object": "lac_beetle_banner",
+   "icon": "assets/icons/items/lac_beetle_banner.png"
+  },
   "laser_machinegun": {
    "model": "assets/models/items/laser_machinegun.glb",
    "sockets": {
@@ -2917,6 +6349,10 @@
    },
    "icon": "assets/icons/items/last_prism.png"
   },
+  "lava_bat_banner": {
+   "object": "lava_bat_banner",
+   "icon": "assets/icons/items/lava_bat_banner.png"
+  },
   "lava_bucket": {
    "model": "assets/models/items/lava_bucket.glb",
    "sockets": {
@@ -2927,6 +6363,18 @@
   "lava_charm": {
    "model": "assets/models/items/lava_charm.glb",
    "icon": "assets/icons/items/lava_charm.png"
+  },
+  "lava_slime_banner": {
+   "object": "lava_slime_banner",
+   "icon": "assets/icons/items/lava_slime_banner.png"
+  },
+  "lavaproof_fishing_hook": {
+   "model": "assets/models/items/lavaproof_fishing_hook.glb",
+   "icon": "assets/icons/items/lavaproof_fishing_hook.png"
+  },
+  "lavaproof_tackle_bag": {
+   "model": "assets/models/items/lavaproof_tackle_bag.glb",
+   "icon": "assets/icons/items/lavaproof_tackle_bag.png"
   },
   "lead_anvil": {
    "object": "lead_anvil",
@@ -3051,6 +6499,66 @@
    "model": "assets/models/items/lightning_boots.glb",
    "icon": "assets/icons/items/lightning_boots.png"
   },
+  "lihzahrd_banner": {
+   "object": "lihzahrd_banner",
+   "icon": "assets/icons/items/lihzahrd_banner.png"
+  },
+  "lihzahrd_bathtub": {
+   "object": "lihzahrd_bathtub",
+   "icon": "assets/icons/items/lihzahrd_bathtub.png"
+  },
+  "lihzahrd_bed": {
+   "object": "lihzahrd_bed",
+   "icon": "assets/icons/items/lihzahrd_bed.png"
+  },
+  "lihzahrd_bookcase": {
+   "object": "lihzahrd_bookcase",
+   "icon": "assets/icons/items/lihzahrd_bookcase.png"
+  },
+  "lihzahrd_candelabra": {
+   "object": "lihzahrd_candelabra",
+   "icon": "assets/icons/items/lihzahrd_candelabra.png"
+  },
+  "lihzahrd_candle": {
+   "object": "lihzahrd_candle",
+   "icon": "assets/icons/items/lihzahrd_candle.png"
+  },
+  "lihzahrd_chair": {
+   "object": "lihzahrd_chair",
+   "icon": "assets/icons/items/lihzahrd_chair.png"
+  },
+  "lihzahrd_chandelier": {
+   "object": "lihzahrd_chandelier",
+   "icon": "assets/icons/items/lihzahrd_chandelier.png"
+  },
+  "lihzahrd_chest": {
+   "object": "lihzahrd_chest",
+   "icon": "assets/icons/items/lihzahrd_chest.png"
+  },
+  "lihzahrd_clock": {
+   "object": "lihzahrd_clock",
+   "icon": "assets/icons/items/lihzahrd_clock.png"
+  },
+  "lihzahrd_house_door": {
+   "object": "lihzahrd_house_door",
+   "icon": "assets/icons/items/lihzahrd_house_door.png"
+  },
+  "lihzahrd_lamp": {
+   "object": "lihzahrd_lamp",
+   "icon": "assets/icons/items/lihzahrd_lamp.png"
+  },
+  "lihzahrd_lantern": {
+   "object": "lihzahrd_lantern",
+   "icon": "assets/icons/items/lihzahrd_lantern.png"
+  },
+  "lihzahrd_piano": {
+   "object": "lihzahrd_piano",
+   "icon": "assets/icons/items/lihzahrd_piano.png"
+  },
+  "lihzahrd_platform": {
+   "object": "lihzahrd_platform",
+   "icon": "assets/icons/items/lihzahrd_platform.png"
+  },
   "lihzahrd_power_cell": {
    "model": "assets/models/items/lihzahrd_power_cell.glb",
    "sockets": {
@@ -3058,12 +6566,52 @@
    },
    "icon": "assets/icons/items/lihzahrd_power_cell.png"
   },
+  "lihzahrd_sofa": {
+   "object": "lihzahrd_sofa",
+   "icon": "assets/icons/items/lihzahrd_sofa.png"
+  },
+  "lihzahrd_table": {
+   "object": "lihzahrd_table",
+   "icon": "assets/icons/items/lihzahrd_table.png"
+  },
+  "lihzahrd_workbench": {
+   "object": "lihzahrd_workbench",
+   "icon": "assets/icons/items/lihzahrd_workbench.png"
+  },
   "lime_paint": {
    "model": "assets/models/items/lime_paint.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/lime_paint.png"
+  },
+  "logic_gate_and": {
+   "object": "logic_gate_and",
+   "icon": "assets/icons/items/logic_gate_and.png"
+  },
+  "logic_gate_lamp": {
+   "object": "logic_gate_lamp",
+   "icon": "assets/icons/items/logic_gate_lamp.png"
+  },
+  "logic_gate_nand": {
+   "object": "logic_gate_nand",
+   "icon": "assets/icons/items/logic_gate_nand.png"
+  },
+  "logic_gate_nor": {
+   "object": "logic_gate_nor",
+   "icon": "assets/icons/items/logic_gate_nor.png"
+  },
+  "logic_gate_or": {
+   "object": "logic_gate_or",
+   "icon": "assets/icons/items/logic_gate_or.png"
+  },
+  "logic_gate_xnor": {
+   "object": "logic_gate_xnor",
+   "icon": "assets/icons/items/logic_gate_xnor.png"
+  },
+  "logic_gate_xor": {
+   "object": "logic_gate_xor",
+   "icon": "assets/icons/items/logic_gate_xor.png"
   },
   "loom": {
    "object": "loom",
@@ -3131,6 +6679,10 @@
    "model": "assets/models/items/magma_stone.glb",
    "icon": "assets/icons/items/magma_stone.png"
   },
+  "man_eater_banner": {
+   "object": "man_eater_banner",
+   "icon": "assets/icons/items/man_eater_banner.png"
+  },
   "mana_crystal": {
    "model": "assets/models/items/mana_crystal.glb",
    "icon": "assets/icons/items/mana_crystal.png"
@@ -3147,9 +6699,93 @@
    "model": "assets/models/items/mana_regeneration_potion.glb",
    "icon": "assets/icons/items/mana_regeneration_potion.png"
   },
+  "marble_bathtub": {
+   "object": "marble_bathtub",
+   "icon": "assets/icons/items/marble_bathtub.png"
+  },
+  "marble_bed": {
+   "object": "marble_bed",
+   "icon": "assets/icons/items/marble_bed.png"
+  },
+  "marble_bookcase": {
+   "object": "marble_bookcase",
+   "icon": "assets/icons/items/marble_bookcase.png"
+  },
+  "marble_candelabra": {
+   "object": "marble_candelabra",
+   "icon": "assets/icons/items/marble_candelabra.png"
+  },
+  "marble_candle": {
+   "object": "marble_candle",
+   "icon": "assets/icons/items/marble_candle.png"
+  },
+  "marble_chair": {
+   "object": "marble_chair",
+   "icon": "assets/icons/items/marble_chair.png"
+  },
+  "marble_chandelier": {
+   "object": "marble_chandelier",
+   "icon": "assets/icons/items/marble_chandelier.png"
+  },
+  "marble_chest": {
+   "object": "marble_chest",
+   "icon": "assets/icons/items/marble_chest.png"
+  },
+  "marble_clock": {
+   "object": "marble_clock",
+   "icon": "assets/icons/items/marble_clock.png"
+  },
+  "marble_door": {
+   "object": "marble_door",
+   "icon": "assets/icons/items/marble_door.png"
+  },
+  "marble_lamp": {
+   "object": "marble_lamp",
+   "icon": "assets/icons/items/marble_lamp.png"
+  },
+  "marble_lantern": {
+   "object": "marble_lantern",
+   "icon": "assets/icons/items/marble_lantern.png"
+  },
+  "marble_piano": {
+   "object": "marble_piano",
+   "icon": "assets/icons/items/marble_piano.png"
+  },
+  "marble_platform": {
+   "object": "marble_platform",
+   "icon": "assets/icons/items/marble_platform.png"
+  },
+  "marble_sofa": {
+   "object": "marble_sofa",
+   "icon": "assets/icons/items/marble_sofa.png"
+  },
+  "marble_table": {
+   "object": "marble_table",
+   "icon": "assets/icons/items/marble_table.png"
+  },
+  "marble_workbench": {
+   "object": "marble_workbench",
+   "icon": "assets/icons/items/marble_workbench.png"
+  },
   "marching_bones_banner": {
    "object": "marching_bones_banner",
    "icon": "assets/icons/items/marching_bones_banner.png"
+  },
+  "martian_drone_banner": {
+   "object": "martian_drone_banner",
+   "icon": "assets/icons/items/martian_drone_banner.png"
+  },
+  "martian_officer_banner": {
+   "object": "martian_officer_banner",
+   "icon": "assets/icons/items/martian_officer_banner.png"
+  },
+  "martian_walker_banner": {
+   "object": "martian_walker_banner",
+   "icon": "assets/icons/items/martian_walker_banner.png"
+  },
+  "master_bait": {
+   "model": "assets/models/items/master_bait.glb",
+   "icon": "assets/icons/items/master_bait.png"
   },
   "mechanical_battery_piece": {
    "model": "assets/models/items/mechanical_battery_piece.glb",
@@ -3175,6 +6811,10 @@
    "model": "assets/models/items/mechanical_worm.glb",
    "icon": "assets/icons/items/mechanical_worm.png"
   },
+  "medusa_banner": {
+   "object": "medusa_banner",
+   "icon": "assets/icons/items/medusa_banner.png"
+  },
   "megashark": {
    "model": "assets/models/items/megashark.glb",
    "sockets": {
@@ -3190,6 +6830,10 @@
     "tip": "0 1.2 0 > 0 1 0"
    },
    "icon": "assets/icons/items/meowmere.png"
+  },
+  "meteor_head_banner": {
+   "object": "meteor_head_banner",
+   "icon": "assets/icons/items/meteor_head_banner.png"
   },
   "meteor_helmet": {
    "model": "assets/models/items/meteor_helmet.glb",
@@ -3213,6 +6857,10 @@
   "meteorite_bar": {
    "model": "assets/models/items/meteorite_bar.glb",
    "icon": "assets/icons/items/meteorite_bar.png"
+  },
+  "mimic_banner": {
+   "object": "mimic_banner",
+   "icon": "assets/icons/items/mimic_banner.png"
   },
   "minecart": {
    "model": "assets/models/items/minecart.glb",
@@ -3243,6 +6891,10 @@
    },
    "icon": "assets/icons/items/minishark.png"
   },
+  "mister_stabby_banner": {
+   "object": "mister_stabby_banner",
+   "icon": "assets/icons/items/mister_stabby_banner.png"
+  },
   "molten_legion_flag": {
    "object": "molten_legion_flag",
    "icon": "assets/icons/items/molten_legion_flag.png"
@@ -3266,9 +6918,25 @@
    "object": "moonglow_plant",
    "icon": "assets/icons/items/moonglow_seeds.png"
   },
+  "moth_banner": {
+   "object": "moth_banner",
+   "icon": "assets/icons/items/moth_banner.png"
+  },
+  "mother_slime_banner": {
+   "object": "mother_slime_banner",
+   "icon": "assets/icons/items/mother_slime_banner.png"
+  },
   "mothron_wings": {
    "model": "assets/models/items/mothron_wings.glb",
    "icon": "assets/icons/items/mothron_wings.png"
+  },
+  "mudfish": {
+   "model": "assets/models/items/mudfish.glb",
+   "icon": "assets/icons/items/mudfish.png"
+  },
+  "mummy_banner": {
+   "object": "mummy_banner",
+   "icon": "assets/icons/items/mummy_banner.png"
   },
   "muramasa": {
    "model": "assets/models/items/muramasa.glb",
@@ -3278,9 +6946,73 @@
    },
    "icon": "assets/icons/items/muramasa.png"
   },
+  "mushi_ladybug_banner": {
+   "object": "mushi_ladybug_banner",
+   "icon": "assets/icons/items/mushi_ladybug_banner.png"
+  },
   "mushroom": {
    "model": "assets/models/items/mushroom.glb",
    "icon": "assets/icons/items/mushroom.png"
+  },
+  "mushroom_bathtub": {
+   "object": "mushroom_bathtub",
+   "icon": "assets/icons/items/mushroom_bathtub.png"
+  },
+  "mushroom_bed": {
+   "object": "mushroom_bed",
+   "icon": "assets/icons/items/mushroom_bed.png"
+  },
+  "mushroom_bookcase": {
+   "object": "mushroom_bookcase",
+   "icon": "assets/icons/items/mushroom_bookcase.png"
+  },
+  "mushroom_candelabra": {
+   "object": "mushroom_candelabra",
+   "icon": "assets/icons/items/mushroom_candelabra.png"
+  },
+  "mushroom_candle": {
+   "object": "mushroom_candle",
+   "icon": "assets/icons/items/mushroom_candle.png"
+  },
+  "mushroom_chair": {
+   "object": "mushroom_chair",
+   "icon": "assets/icons/items/mushroom_chair.png"
+  },
+  "mushroom_chandelier": {
+   "object": "mushroom_chandelier",
+   "icon": "assets/icons/items/mushroom_chandelier.png"
+  },
+  "mushroom_chest": {
+   "object": "mushroom_chest",
+   "icon": "assets/icons/items/mushroom_chest.png"
+  },
+  "mushroom_clock": {
+   "object": "mushroom_clock",
+   "icon": "assets/icons/items/mushroom_clock.png"
+  },
+  "mushroom_door": {
+   "object": "mushroom_door",
+   "icon": "assets/icons/items/mushroom_door.png"
+  },
+  "mushroom_lamp": {
+   "object": "mushroom_lamp",
+   "icon": "assets/icons/items/mushroom_lamp.png"
+  },
+  "mushroom_lantern": {
+   "object": "mushroom_lantern",
+   "icon": "assets/icons/items/mushroom_lantern.png"
+  },
+  "mushroom_piano": {
+   "object": "mushroom_piano",
+   "icon": "assets/icons/items/mushroom_piano.png"
+  },
+  "mushroom_platform": {
+   "object": "mushroom_platform",
+   "icon": "assets/icons/items/mushroom_platform.png"
+  },
+  "mushroom_sofa": {
+   "object": "mushroom_sofa",
+   "icon": "assets/icons/items/mushroom_sofa.png"
   },
   "mushroom_spear": {
    "model": "assets/models/items/mushroom_spear.glb",
@@ -3289,6 +7021,14 @@
     "tip": "0 1.52 0 > 0 1 0"
    },
    "icon": "assets/icons/items/mushroom_spear.png"
+  },
+  "mushroom_table": {
+   "object": "mushroom_table",
+   "icon": "assets/icons/items/mushroom_table.png"
+  },
+  "mushroom_workbench": {
+   "object": "mushroom_workbench",
+   "icon": "assets/icons/items/mushroom_workbench.png"
   },
   "musket": {
    "model": "assets/models/items/musket.glb",
@@ -3301,6 +7041,10 @@
   "musket_ball": {
    "model": "assets/models/items/musket_ball.glb",
    "icon": "assets/icons/items/musket_ball.png"
+  },
+  "mutant_flinxfin": {
+   "model": "assets/models/items/mutant_flinxfin.glb",
+   "icon": "assets/icons/items/mutant_flinxfin.png"
   },
   "mythril_anvil": {
    "object": "mythril_anvil",
@@ -3425,6 +7169,10 @@
    },
    "icon": "assets/icons/items/nebula_drill.png"
   },
+  "nebula_floater_banner": {
+   "object": "nebula_floater_banner",
+   "icon": "assets/icons/items/nebula_floater_banner.png"
+  },
   "nebula_fragment": {
    "model": "assets/models/items/nebula_fragment.glb",
    "icon": "assets/icons/items/nebula_fragment.png"
@@ -3474,6 +7222,10 @@
    "armor": "necro_armor",
    "icon": "assets/icons/items/necro_helmet.png"
   },
+  "necromancer_banner": {
+   "object": "necromancer_banner",
+   "icon": "assets/icons/items/necromancer_banner.png"
+  },
   "necromantic_scroll": {
    "model": "assets/models/items/necromantic_scroll.glb",
    "sockets": {
@@ -3517,6 +7269,78 @@
    },
    "icon": "assets/icons/items/north_pole.png"
   },
+  "nutcracker_banner": {
+   "object": "nutcracker_banner",
+   "icon": "assets/icons/items/nutcracker_banner.png"
+  },
+  "nymph_banner": {
+   "object": "nymph_banner",
+   "icon": "assets/icons/items/nymph_banner.png"
+  },
+  "oasis_crate": {
+   "model": "assets/models/items/oasis_crate.glb",
+   "icon": "assets/icons/items/oasis_crate.png"
+  },
+  "obsidian_bathtub": {
+   "object": "obsidian_bathtub",
+   "icon": "assets/icons/items/obsidian_bathtub.png"
+  },
+  "obsidian_bed": {
+   "object": "obsidian_bed",
+   "icon": "assets/icons/items/obsidian_bed.png"
+  },
+  "obsidian_bookcase": {
+   "object": "obsidian_bookcase",
+   "icon": "assets/icons/items/obsidian_bookcase.png"
+  },
+  "obsidian_candelabra": {
+   "object": "obsidian_candelabra",
+   "icon": "assets/icons/items/obsidian_candelabra.png"
+  },
+  "obsidian_candle": {
+   "object": "obsidian_candle",
+   "icon": "assets/icons/items/obsidian_candle.png"
+  },
+  "obsidian_chair": {
+   "object": "obsidian_chair",
+   "icon": "assets/icons/items/obsidian_chair.png"
+  },
+  "obsidian_chandelier": {
+   "object": "obsidian_chandelier",
+   "icon": "assets/icons/items/obsidian_chandelier.png"
+  },
+  "obsidian_chest": {
+   "object": "obsidian_chest",
+   "icon": "assets/icons/items/obsidian_chest.png"
+  },
+  "obsidian_clock": {
+   "object": "obsidian_clock",
+   "icon": "assets/icons/items/obsidian_clock.png"
+  },
+  "obsidian_crate": {
+   "model": "assets/models/items/obsidian_crate.glb",
+   "icon": "assets/icons/items/obsidian_crate.png"
+  },
+  "obsidian_door": {
+   "object": "obsidian_door",
+   "icon": "assets/icons/items/obsidian_door.png"
+  },
+  "obsidian_lamp": {
+   "object": "obsidian_lamp",
+   "icon": "assets/icons/items/obsidian_lamp.png"
+  },
+  "obsidian_lantern": {
+   "object": "obsidian_lantern",
+   "icon": "assets/icons/items/obsidian_lantern.png"
+  },
+  "obsidian_piano": {
+   "object": "obsidian_piano",
+   "icon": "assets/icons/items/obsidian_piano.png"
+  },
+  "obsidian_platform": {
+   "object": "obsidian_platform",
+   "icon": "assets/icons/items/obsidian_platform.png"
+  },
   "obsidian_shield": {
    "model": "assets/models/items/obsidian_shield.glb",
    "sockets": {
@@ -3532,6 +7356,26 @@
   "obsidian_skull": {
    "model": "assets/models/items/obsidian_skull.glb",
    "icon": "assets/icons/items/obsidian_skull.png"
+  },
+  "obsidian_sofa": {
+   "object": "obsidian_sofa",
+   "icon": "assets/icons/items/obsidian_sofa.png"
+  },
+  "obsidian_table": {
+   "object": "obsidian_table",
+   "icon": "assets/icons/items/obsidian_table.png"
+  },
+  "obsidian_workbench": {
+   "object": "obsidian_workbench",
+   "icon": "assets/icons/items/obsidian_workbench.png"
+  },
+  "obsidifish": {
+   "model": "assets/models/items/obsidifish.glb",
+   "icon": "assets/icons/items/obsidifish.png"
+  },
+  "ocean_crate": {
+   "model": "assets/models/items/ocean_crate.glb",
+   "icon": "assets/icons/items/ocean_crate.png"
   },
   "orange_paint": {
    "model": "assets/models/items/orange_paint.glb",
@@ -3651,6 +7495,10 @@
    },
    "icon": "assets/icons/items/paintbrush.png"
   },
+  "paladin_banner": {
+   "object": "paladin_banner",
+   "icon": "assets/icons/items/paladin_banner.png"
+  },
   "paladins_hammer": {
    "model": "assets/models/items/paladins_hammer.glb",
    "sockets": {
@@ -3742,9 +7590,85 @@
    },
    "icon": "assets/icons/items/palladium_shortsword.png"
   },
+  "palm_bathtub": {
+   "object": "palm_bathtub",
+   "icon": "assets/icons/items/palm_bathtub.png"
+  },
+  "palm_bed": {
+   "object": "palm_bed",
+   "icon": "assets/icons/items/palm_bed.png"
+  },
+  "palm_bookcase": {
+   "object": "palm_bookcase",
+   "icon": "assets/icons/items/palm_bookcase.png"
+  },
+  "palm_candelabra": {
+   "object": "palm_candelabra",
+   "icon": "assets/icons/items/palm_candelabra.png"
+  },
+  "palm_candle": {
+   "object": "palm_candle",
+   "icon": "assets/icons/items/palm_candle.png"
+  },
+  "palm_chair": {
+   "object": "palm_chair",
+   "icon": "assets/icons/items/palm_chair.png"
+  },
+  "palm_chandelier": {
+   "object": "palm_chandelier",
+   "icon": "assets/icons/items/palm_chandelier.png"
+  },
+  "palm_chest": {
+   "object": "palm_chest",
+   "icon": "assets/icons/items/palm_chest.png"
+  },
+  "palm_clock": {
+   "object": "palm_clock",
+   "icon": "assets/icons/items/palm_clock.png"
+  },
+  "palm_door": {
+   "object": "palm_door",
+   "icon": "assets/icons/items/palm_door.png"
+  },
+  "palm_lamp": {
+   "object": "palm_lamp",
+   "icon": "assets/icons/items/palm_lamp.png"
+  },
+  "palm_lantern": {
+   "object": "palm_lantern",
+   "icon": "assets/icons/items/palm_lantern.png"
+  },
+  "palm_piano": {
+   "object": "palm_piano",
+   "icon": "assets/icons/items/palm_piano.png"
+  },
+  "palm_platform": {
+   "object": "palm_platform",
+   "icon": "assets/icons/items/palm_platform.png"
+  },
+  "palm_sofa": {
+   "object": "palm_sofa",
+   "icon": "assets/icons/items/palm_sofa.png"
+  },
+  "palm_table": {
+   "object": "palm_table",
+   "icon": "assets/icons/items/palm_table.png"
+  },
+  "palm_workbench": {
+   "object": "palm_workbench",
+   "icon": "assets/icons/items/palm_workbench.png"
+  },
   "panic_necklace": {
    "model": "assets/models/items/panic_necklace.glb",
    "icon": "assets/icons/items/panic_necklace.png"
+  },
+  "parrot_banner": {
+   "object": "parrot_banner",
+   "icon": "assets/icons/items/parrot_banner.png"
+  },
+  "pengfish": {
+   "model": "assets/models/items/pengfish.glb",
+   "icon": "assets/icons/items/pengfish.png"
   },
   "pew_matic_horn": {
    "model": "assets/models/items/pew_matic_horn.glb",
@@ -3825,6 +7749,10 @@
    },
    "icon": "assets/icons/items/pink_paint.png"
   },
+  "pinky_banner": {
+   "object": "pinky_banner",
+   "icon": "assets/icons/items/pinky_banner.png"
+  },
   "piranha_gun": {
    "model": "assets/models/items/piranha_gun.glb",
    "sockets": {
@@ -3833,6 +7761,26 @@
    },
    "icon": "assets/icons/items/piranha_gun.png"
   },
+  "pirate_captain_banner": {
+   "object": "pirate_captain_banner",
+   "icon": "assets/icons/items/pirate_captain_banner.png"
+  },
+  "pirate_corsair_banner": {
+   "object": "pirate_corsair_banner",
+   "icon": "assets/icons/items/pirate_corsair_banner.png"
+  },
+  "pirate_crossbower_banner": {
+   "object": "pirate_crossbower_banner",
+   "icon": "assets/icons/items/pirate_crossbower_banner.png"
+  },
+  "pirate_deadeye_banner": {
+   "object": "pirate_deadeye_banner",
+   "icon": "assets/icons/items/pirate_deadeye_banner.png"
+  },
+  "pirate_deckhand_banner": {
+   "object": "pirate_deckhand_banner",
+   "icon": "assets/icons/items/pirate_deckhand_banner.png"
+  },
   "pirate_staff": {
    "model": "assets/models/items/pirate_staff.glb",
    "sockets": {
@@ -3840,6 +7788,10 @@
     "tip": "0 1.18 0 > 0 1 0"
    },
    "icon": "assets/icons/items/pirate_staff.png"
+  },
+  "pixie_banner": {
+   "object": "pixie_banner",
+   "icon": "assets/icons/items/pixie_banner.png"
   },
   "pixie_dust": {
    "model": "assets/models/items/pixie_dust.glb",
@@ -3927,6 +7879,14 @@
    },
    "icon": "assets/icons/items/platinum_shortsword.png"
   },
+  "poltergeist_banner": {
+   "object": "poltergeist_banner",
+   "icon": "assets/icons/items/poltergeist_banner.png"
+  },
+  "possessed_armor_banner": {
+   "object": "possessed_armor_banner",
+   "icon": "assets/icons/items/possessed_armor_banner.png"
+  },
   "possessed_hatchet": {
    "model": "assets/models/items/possessed_hatchet.glb",
    "sockets": {
@@ -3934,6 +7894,18 @@
     "tip": "0 0.8 0 > 0 1 0"
    },
    "icon": "assets/icons/items/possessed_hatchet.png"
+  },
+  "predictor_banner": {
+   "object": "predictor_banner",
+   "icon": "assets/icons/items/predictor_banner.png"
+  },
+  "present": {
+   "model": "assets/models/items/present.glb",
+   "icon": "assets/icons/items/present.png"
+  },
+  "present_mimic_banner": {
+   "object": "present_mimic_banner",
+   "icon": "assets/icons/items/present_mimic_banner.png"
   },
   "pressure_plate": {
    "object": "pressure_plate",
@@ -3949,6 +7921,15 @@
   "prismite": {
    "model": "assets/models/items/prismite.glb",
    "icon": "assets/icons/items/prismite.png"
+  },
+  "pumpkin": {
+   "model": "assets/models/items/pumpkin.glb",
+   "icon": "assets/icons/items/pumpkin.png"
+  },
+  "pumpkin_mask": {
+   "model": "assets/models/items/pumpkin_mask.glb",
+   "armor": "pumpkin_mask",
+   "icon": "assets/icons/items/pumpkin_mask.png"
   },
   "pumpkin_moon_medallion": {
    "model": "assets/models/items/pumpkin_moon_medallion.glb",
@@ -4050,6 +8031,10 @@
    "model": "assets/models/items/ranger_emblem.glb",
    "icon": "assets/icons/items/ranger_emblem.png"
   },
+  "raven_banner": {
+   "object": "raven_banner",
+   "icon": "assets/icons/items/raven_banner.png"
+  },
   "raven_staff": {
    "model": "assets/models/items/raven_staff.glb",
    "sockets": {
@@ -4057,6 +8042,10 @@
     "tip": "0 1.18 0 > 0 1 0"
    },
    "icon": "assets/icons/items/raven_staff.png"
+  },
+  "ray_gunner_banner": {
+   "object": "ray_gunner_banner",
+   "icon": "assets/icons/items/ray_gunner_banner.png"
   },
   "razorblade_typhoon_book": {
    "model": "assets/models/items/razorblade_typhoon_book.glb",
@@ -4073,6 +8062,10 @@
    },
    "icon": "assets/icons/items/razorpine.png"
   },
+  "reaper_banner": {
+   "object": "reaper_banner",
+   "icon": "assets/icons/items/reaper_banner.png"
+  },
   "reaver_shark": {
    "model": "assets/models/items/reaver_shark.glb",
    "sockets": {
@@ -4084,6 +8077,10 @@
   "recall_potion": {
    "model": "assets/models/items/recall_potion.glb",
    "icon": "assets/icons/items/recall_potion.png"
+  },
+  "red_devil_banner": {
+   "object": "red_devil_banner",
+   "icon": "assets/icons/items/red_devil_banner.png"
   },
   "red_hat": {
    "model": "assets/models/items/red_hat.glb",
@@ -4113,6 +8110,11 @@
    "model": "assets/models/items/regeneration_potion.glb",
    "icon": "assets/icons/items/regeneration_potion.png"
   },
+  "reindeer_antlers": {
+   "model": "assets/models/items/reindeer_antlers.glb",
+   "armor": "reindeer_antlers",
+   "icon": "assets/icons/items/reindeer_antlers.png"
+  },
   "reinforced_fishing_pole": {
    "model": "assets/models/items/reinforced_fishing_pole.glb",
    "sockets": {
@@ -4124,6 +8126,74 @@
   "retinazer_trophy": {
    "object": "retinazer_trophy",
    "icon": "assets/icons/items/retinazer_trophy.png"
+  },
+  "rich_mahogany_bathtub": {
+   "object": "rich_mahogany_bathtub",
+   "icon": "assets/icons/items/rich_mahogany_bathtub.png"
+  },
+  "rich_mahogany_bed": {
+   "object": "rich_mahogany_bed",
+   "icon": "assets/icons/items/rich_mahogany_bed.png"
+  },
+  "rich_mahogany_bookcase": {
+   "object": "rich_mahogany_bookcase",
+   "icon": "assets/icons/items/rich_mahogany_bookcase.png"
+  },
+  "rich_mahogany_candelabra": {
+   "object": "rich_mahogany_candelabra",
+   "icon": "assets/icons/items/rich_mahogany_candelabra.png"
+  },
+  "rich_mahogany_candle": {
+   "object": "rich_mahogany_candle",
+   "icon": "assets/icons/items/rich_mahogany_candle.png"
+  },
+  "rich_mahogany_chair": {
+   "object": "rich_mahogany_chair",
+   "icon": "assets/icons/items/rich_mahogany_chair.png"
+  },
+  "rich_mahogany_chandelier": {
+   "object": "rich_mahogany_chandelier",
+   "icon": "assets/icons/items/rich_mahogany_chandelier.png"
+  },
+  "rich_mahogany_chest": {
+   "object": "rich_mahogany_chest",
+   "icon": "assets/icons/items/rich_mahogany_chest.png"
+  },
+  "rich_mahogany_clock": {
+   "object": "rich_mahogany_clock",
+   "icon": "assets/icons/items/rich_mahogany_clock.png"
+  },
+  "rich_mahogany_door": {
+   "object": "rich_mahogany_door",
+   "icon": "assets/icons/items/rich_mahogany_door.png"
+  },
+  "rich_mahogany_lamp": {
+   "object": "rich_mahogany_lamp",
+   "icon": "assets/icons/items/rich_mahogany_lamp.png"
+  },
+  "rich_mahogany_lantern": {
+   "object": "rich_mahogany_lantern",
+   "icon": "assets/icons/items/rich_mahogany_lantern.png"
+  },
+  "rich_mahogany_piano": {
+   "object": "rich_mahogany_piano",
+   "icon": "assets/icons/items/rich_mahogany_piano.png"
+  },
+  "rich_mahogany_platform": {
+   "object": "rich_mahogany_platform",
+   "icon": "assets/icons/items/rich_mahogany_platform.png"
+  },
+  "rich_mahogany_sofa": {
+   "object": "rich_mahogany_sofa",
+   "icon": "assets/icons/items/rich_mahogany_sofa.png"
+  },
+  "rich_mahogany_table": {
+   "object": "rich_mahogany_table",
+   "icon": "assets/icons/items/rich_mahogany_table.png"
+  },
+  "rich_mahogany_workbench": {
+   "object": "rich_mahogany_workbench",
+   "icon": "assets/icons/items/rich_mahogany_workbench.png"
   },
   "rocket_boots": {
    "model": "assets/models/items/rocket_boots.glb",
@@ -4180,13 +8250,36 @@
    },
    "icon": "assets/icons/items/s_d_m_g.png"
   },
+  "salamander_banner": {
+   "object": "salamander_banner",
+   "icon": "assets/icons/items/salamander_banner.png"
+  },
   "salmon": {
    "model": "assets/models/items/salmon.glb",
    "icon": "assets/icons/items/salmon.png"
   },
+  "sand_slime_banner": {
+   "object": "sand_slime_banner",
+   "icon": "assets/icons/items/sand_slime_banner.png"
+  },
   "sandstorm_in_a_bottle": {
    "model": "assets/models/items/sandstorm_in_a_bottle.glb",
    "icon": "assets/icons/items/sandstorm_in_a_bottle.png"
+  },
+  "santa_hat": {
+   "model": "assets/models/items/santa_hat.glb",
+   "armor": "santa_costume",
+   "icon": "assets/icons/items/santa_hat.png"
+  },
+  "santa_pants": {
+   "model": "assets/models/items/santa_pants.glb",
+   "armor": "santa_costume",
+   "icon": "assets/icons/items/santa_pants.png"
+  },
+  "santa_shirt": {
+   "model": "assets/models/items/santa_shirt.glb",
+   "armor": "santa_costume",
+   "icon": "assets/icons/items/santa_shirt.png"
   },
   "sapphire": {
    "model": "assets/models/items/sapphire.glb",
@@ -4211,6 +8304,18 @@
    "object": "sawmill",
    "icon": "assets/icons/items/sawmill.png"
   },
+  "scarab_fish": {
+   "model": "assets/models/items/scarab_fish.glb",
+   "icon": "assets/icons/items/scarab_fish.png"
+  },
+  "scarecrow_banner": {
+   "object": "scarecrow_banner",
+   "icon": "assets/icons/items/scarecrow_banner.png"
+  },
+  "scorpio_fish": {
+   "model": "assets/models/items/scorpio_fish.glb",
+   "icon": "assets/icons/items/scorpio_fish.png"
+  },
   "scourge_of_the_corruptor": {
    "model": "assets/models/items/scourge_of_the_corruptor.glb",
    "sockets": {
@@ -4226,6 +8331,78 @@
     "tip": "0 1.048 0 > 0 1 0"
    },
    "icon": "assets/icons/items/seedler.png"
+  },
+  "selenian_banner": {
+   "object": "selenian_banner",
+   "icon": "assets/icons/items/selenian_banner.png"
+  },
+  "shadewood_bathtub": {
+   "object": "shadewood_bathtub",
+   "icon": "assets/icons/items/shadewood_bathtub.png"
+  },
+  "shadewood_bed": {
+   "object": "shadewood_bed",
+   "icon": "assets/icons/items/shadewood_bed.png"
+  },
+  "shadewood_bookcase": {
+   "object": "shadewood_bookcase",
+   "icon": "assets/icons/items/shadewood_bookcase.png"
+  },
+  "shadewood_candelabra": {
+   "object": "shadewood_candelabra",
+   "icon": "assets/icons/items/shadewood_candelabra.png"
+  },
+  "shadewood_candle": {
+   "object": "shadewood_candle",
+   "icon": "assets/icons/items/shadewood_candle.png"
+  },
+  "shadewood_chair": {
+   "object": "shadewood_chair",
+   "icon": "assets/icons/items/shadewood_chair.png"
+  },
+  "shadewood_chandelier": {
+   "object": "shadewood_chandelier",
+   "icon": "assets/icons/items/shadewood_chandelier.png"
+  },
+  "shadewood_chest": {
+   "object": "shadewood_chest",
+   "icon": "assets/icons/items/shadewood_chest.png"
+  },
+  "shadewood_clock": {
+   "object": "shadewood_clock",
+   "icon": "assets/icons/items/shadewood_clock.png"
+  },
+  "shadewood_door": {
+   "object": "shadewood_door",
+   "icon": "assets/icons/items/shadewood_door.png"
+  },
+  "shadewood_lamp": {
+   "object": "shadewood_lamp",
+   "icon": "assets/icons/items/shadewood_lamp.png"
+  },
+  "shadewood_lantern": {
+   "object": "shadewood_lantern",
+   "icon": "assets/icons/items/shadewood_lantern.png"
+  },
+  "shadewood_piano": {
+   "object": "shadewood_piano",
+   "icon": "assets/icons/items/shadewood_piano.png"
+  },
+  "shadewood_platform": {
+   "object": "shadewood_platform",
+   "icon": "assets/icons/items/shadewood_platform.png"
+  },
+  "shadewood_sofa": {
+   "object": "shadewood_sofa",
+   "icon": "assets/icons/items/shadewood_sofa.png"
+  },
+  "shadewood_table": {
+   "object": "shadewood_table",
+   "icon": "assets/icons/items/shadewood_table.png"
+  },
+  "shadewood_workbench": {
+   "object": "shadewood_workbench",
+   "icon": "assets/icons/items/shadewood_workbench.png"
   },
   "shadow_chest": {
    "object": "shadow_chest",
@@ -4249,6 +8426,10 @@
     "tip": "0 1.18 0 > 0 1 0"
    },
    "icon": "assets/icons/items/shadowbeam_staff.png"
+  },
+  "shark_banner": {
+   "object": "shark_banner",
+   "icon": "assets/icons/items/shark_banner.png"
   },
   "shark_fin": {
    "model": "assets/models/items/shark_fin.glb",
@@ -4400,6 +8581,14 @@
    },
    "icon": "assets/icons/items/silver_shortsword.png"
   },
+  "skeleton_banner": {
+   "object": "skeleton_banner",
+   "icon": "assets/icons/items/skeleton_banner.png"
+  },
+  "skeleton_sniper_banner": {
+   "object": "skeleton_sniper_banner",
+   "icon": "assets/icons/items/skeleton_sniper_banner.png"
+  },
   "skeleton_statue": {
    "object": "skeleton_statue",
    "icon": "assets/icons/items/skeleton_statue.png"
@@ -4445,6 +8634,14 @@
    },
    "icon": "assets/icons/items/sky_blue_paint.png"
   },
+  "sky_crate": {
+   "model": "assets/models/items/sky_crate.glb",
+   "icon": "assets/icons/items/sky_crate.png"
+  },
+  "slime_banner": {
+   "object": "slime_banner",
+   "icon": "assets/icons/items/slime_banner.png"
+  },
   "slime_crown": {
    "model": "assets/models/items/slime_crown.glb",
    "icon": "assets/icons/items/slime_crown.png"
@@ -4456,6 +8653,18 @@
     "tip": "0 1.18 0 > 0 1 0"
    },
    "icon": "assets/icons/items/slime_staff.png"
+  },
+  "slime_statue": {
+   "object": "slime_statue",
+   "icon": "assets/icons/items/slime_statue.png"
+  },
+  "slimefish": {
+   "model": "assets/models/items/slimefish.glb",
+   "icon": "assets/icons/items/slimefish.png"
+  },
+  "slimy_saddle": {
+   "model": "assets/models/items/slimy_saddle.glb",
+   "icon": "assets/icons/items/slimy_saddle.png"
   },
   "snapthorn": {
    "model": "assets/models/items/snapthorn.glb",
@@ -4473,6 +8682,14 @@
    },
    "icon": "assets/icons/items/sniper_rifle.png"
   },
+  "snow_balla_banner": {
+   "object": "snow_balla_banner",
+   "icon": "assets/icons/items/snow_balla_banner.png"
+  },
+  "snow_flinx_banner": {
+   "object": "snow_flinx_banner",
+   "icon": "assets/icons/items/snow_flinx_banner.png"
+  },
   "snow_globe": {
    "model": "assets/models/items/snow_globe.glb",
    "sockets": {
@@ -4487,6 +8704,10 @@
     "muzzle": "0 0.8 -0.06 > 0 1 0"
    },
    "icon": "assets/icons/items/snowman_cannon.png"
+  },
+  "snowman_gangsta_banner": {
+   "object": "snowman_gangsta_banner",
+   "icon": "assets/icons/items/snowman_gangsta_banner.png"
   },
   "solar_eruption": {
    "model": "assets/models/items/solar_eruption.glb",
@@ -4645,9 +8866,21 @@
    "model": "assets/models/items/spelunker_potion.glb",
    "icon": "assets/icons/items/spelunker_potion.png"
   },
+  "spiderfish": {
+   "model": "assets/models/items/spiderfish.glb",
+   "icon": "assets/icons/items/spiderfish.png"
+  },
   "spike": {
    "object": "spike",
    "icon": "assets/icons/items/spike.png"
+  },
+  "spiked_ice_slime_banner": {
+   "object": "spiked_ice_slime_banner",
+   "icon": "assets/icons/items/spiked_ice_slime_banner.png"
+  },
+  "spiked_slime_banner": {
+   "object": "spiked_slime_banner",
+   "icon": "assets/icons/items/spiked_slime_banner.png"
   },
   "spiky_ball": {
    "model": "assets/models/items/spiky_ball.glb",
@@ -4656,9 +8889,17 @@
    },
    "icon": "assets/icons/items/spiky_ball.png"
   },
+  "splinterling_banner": {
+   "object": "splinterling_banner",
+   "icon": "assets/icons/items/splinterling_banner.png"
+  },
   "spore_sac": {
    "model": "assets/models/items/spore_sac.glb",
    "icon": "assets/icons/items/spore_sac.png"
+  },
+  "spore_zombie_banner": {
+   "object": "spore_zombie_banner",
+   "icon": "assets/icons/items/spore_zombie_banner.png"
   },
   "squirrel": {
    "model": "assets/models/items/squirrel.glb",
@@ -4759,6 +9000,10 @@
    },
    "icon": "assets/icons/items/starfury.png"
   },
+  "stargazer_banner": {
+   "object": "stargazer_banner",
+   "icon": "assets/icons/items/stargazer_banner.png"
+  },
   "starlight": {
    "model": "assets/models/items/starlight.glb",
    "sockets": {
@@ -4774,6 +9019,10 @@
   "stinger": {
    "model": "assets/models/items/stinger.glb",
    "icon": "assets/icons/items/stinger.png"
+  },
+  "storm_diver_banner": {
+   "object": "storm_diver_banner",
+   "icon": "assets/icons/items/storm_diver_banner.png"
   },
   "stynger": {
    "model": "assets/models/items/stynger.glb",
@@ -4811,6 +9060,10 @@
    "model": "assets/models/items/suspicious_looking_eye.glb",
    "icon": "assets/icons/items/suspicious_looking_eye.png"
   },
+  "swamp_thing_banner": {
+   "object": "swamp_thing_banner",
+   "icon": "assets/icons/items/swamp_thing_banner.png"
+  },
   "swiftness_potion": {
    "model": "assets/models/items/swiftness_potion.glb",
    "icon": "assets/icons/items/swiftness_potion.png"
@@ -4823,12 +9076,20 @@
    "model": "assets/models/items/tabi.glb",
    "icon": "assets/icons/items/tabi.png"
   },
+  "tackle_box": {
+   "model": "assets/models/items/tackle_box.glb",
+   "icon": "assets/icons/items/tackle_box.png"
+  },
   "teal_paint": {
    "model": "assets/models/items/teal_paint.glb",
    "sockets": {
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/teal_paint.png"
+  },
+  "teleporter": {
+   "object": "teleporter",
+   "icon": "assets/icons/items/teleporter.png"
   },
   "tempest_staff": {
    "model": "assets/models/items/tempest_staff.glb",
@@ -4873,6 +9134,10 @@
    "model": "assets/models/items/terraspark_boots.glb",
    "icon": "assets/icons/items/terraspark_boots.png"
   },
+  "tesla_turret_banner": {
+   "object": "tesla_turret_banner",
+   "icon": "assets/icons/items/tesla_turret_banner.png"
+  },
   "the_axe": {
    "model": "assets/models/items/the_axe.glb",
    "sockets": {
@@ -4887,6 +9152,10 @@
     "grip": "0 0 0 > 0 1 0"
    },
    "icon": "assets/icons/items/the_destroyer_treasure_bag.png"
+  },
+  "the_groom_banner": {
+   "object": "the_groom_banner",
+   "icon": "assets/icons/items/the_groom_banner.png"
   },
   "the_horsemans_blade": {
    "model": "assets/models/items/the_horsemans_blade.glb",
@@ -4926,6 +9195,22 @@
     "tip": "0 0.04 0 > 0 1 0"
    },
    "icon": "assets/icons/items/throwing_knife.png"
+  },
+  "tim_banner": {
+   "object": "tim_banner",
+   "icon": "assets/icons/items/tim_banner.png"
+  },
+  "timer_1_second": {
+   "object": "timer_1_second",
+   "icon": "assets/icons/items/timer_1_second.png"
+  },
+  "timer_3_second": {
+   "object": "timer_3_second",
+   "icon": "assets/icons/items/timer_3_second.png"
+  },
+  "timer_5_second": {
+   "object": "timer_5_second",
+   "icon": "assets/icons/items/timer_5_second.png"
   },
   "tin_axe": {
    "model": "assets/models/items/tin_axe.glb",
@@ -5250,6 +9535,18 @@
    "model": "assets/models/items/turtle_shell.glb",
    "icon": "assets/icons/items/turtle_shell.png"
   },
+  "twinkle_popper_banner": {
+   "object": "twinkle_popper_banner",
+   "icon": "assets/icons/items/twinkle_popper_banner.png"
+  },
+  "umbrella_slime_banner": {
+   "object": "umbrella_slime_banner",
+   "icon": "assets/icons/items/umbrella_slime_banner.png"
+  },
+  "undead_miner_banner": {
+   "object": "undead_miner_banner",
+   "icon": "assets/icons/items/undead_miner_banner.png"
+  },
   "unholy_arrow": {
    "model": "assets/models/items/unholy_arrow.glb",
    "sockets": {
@@ -5266,6 +9563,10 @@
    },
    "icon": "assets/icons/items/unholy_trident.png"
   },
+  "unicorn_banner": {
+   "object": "unicorn_banner",
+   "icon": "assets/icons/items/unicorn_banner.png"
+  },
   "unicorn_horn": {
    "model": "assets/models/items/unicorn_horn.glb",
    "icon": "assets/icons/items/unicorn_horn.png"
@@ -5277,6 +9578,10 @@
     "string": "0 0.12 0 > 0 1 0"
    },
    "icon": "assets/icons/items/valor.png"
+  },
+  "vampire_banner": {
+   "object": "vampire_banner",
+   "icon": "assets/icons/items/vampire_banner.png"
   },
   "vampire_knives": {
    "model": "assets/models/items/vampire_knives.glb",
@@ -5333,6 +9638,10 @@
    "model": "assets/models/items/volatile_gelatin.glb",
    "icon": "assets/icons/items/volatile_gelatin.png"
   },
+  "voodoo_demon_banner": {
+   "object": "voodoo_demon_banner",
+   "icon": "assets/icons/items/voodoo_demon_banner.png"
+  },
   "vortex_beater": {
    "model": "assets/models/items/vortex_beater.glb",
    "sockets": {
@@ -5388,6 +9697,18 @@
    },
    "icon": "assets/icons/items/vortex_pickaxe.png"
   },
+  "vortexian_banner": {
+   "object": "vortexian_banner",
+   "icon": "assets/icons/items/vortexian_banner.png"
+  },
+  "vulture_banner": {
+   "object": "vulture_banner",
+   "icon": "assets/icons/items/vulture_banner.png"
+  },
+  "wall_creeper_banner": {
+   "object": "wall_creeper_banner",
+   "icon": "assets/icons/items/wall_creeper_banner.png"
+  },
   "wall_of_flesh_treasure_bag": {
    "model": "assets/models/items/wall_of_flesh_treasure_bag.glb",
    "sockets": {
@@ -5406,6 +9727,10 @@
     "tip": "0 0.46 0 > 0 1 0"
    },
    "icon": "assets/icons/items/wand_of_sparking.png"
+  },
+  "wandering_eye_banner": {
+   "object": "wandering_eye_banner",
+   "icon": "assets/icons/items/wandering_eye_banner.png"
   },
   "warmth_potion": {
    "model": "assets/models/items/warmth_potion.glb",
@@ -5445,6 +9770,10 @@
    },
    "icon": "assets/icons/items/weather_pain.png"
   },
+  "werewolf_banner": {
+   "object": "werewolf_banner",
+   "icon": "assets/icons/items/werewolf_banner.png"
+  },
   "white_paint": {
    "model": "assets/models/items/white_paint.glb",
    "sockets": {
@@ -5464,10 +9793,33 @@
    },
    "icon": "assets/icons/items/wire_cutter.png"
   },
+  "witch_boots": {
+   "model": "assets/models/items/witch_boots.glb",
+   "armor": "witch_costume",
+   "icon": "assets/icons/items/witch_boots.png"
+  },
+  "witch_dress": {
+   "model": "assets/models/items/witch_dress.glb",
+   "armor": "witch_costume",
+   "icon": "assets/icons/items/witch_dress.png"
+  },
+  "witch_hat": {
+   "model": "assets/models/items/witch_hat.glb",
+   "armor": "witch_costume",
+   "icon": "assets/icons/items/witch_hat.png"
+  },
+  "wither_beast_banner": {
+   "object": "wither_beast_banner",
+   "icon": "assets/icons/items/wither_beast_banner.png"
+  },
   "wizard_hat": {
    "model": "assets/models/items/wizard_hat.glb",
    "armor": "wizard_hat",
    "icon": "assets/icons/items/wizard_hat.png"
+  },
+  "wolf_banner": {
+   "object": "wolf_banner",
+   "icon": "assets/icons/items/wolf_banner.png"
   },
   "wood_breastplate": {
    "model": "assets/models/items/wood_breastplate.glb",
@@ -5500,6 +9852,14 @@
    },
    "icon": "assets/icons/items/wooden_arrow.png"
   },
+  "wooden_bathtub": {
+   "object": "wooden_bathtub",
+   "icon": "assets/icons/items/wooden_bathtub.png"
+  },
+  "wooden_bookcase": {
+   "object": "wooden_bookcase",
+   "icon": "assets/icons/items/wooden_bookcase.png"
+  },
   "wooden_boomerang": {
    "model": "assets/models/items/wooden_boomerang.glb",
    "sockets": {
@@ -5515,13 +9875,25 @@
    },
    "icon": "assets/icons/items/wooden_bow.png"
   },
+  "wooden_candelabra": {
+   "object": "wooden_candelabra",
+   "icon": "assets/icons/items/wooden_candelabra.png"
+  },
   "wooden_chair": {
    "object": "wooden_chair",
    "icon": "assets/icons/items/wooden_chair.png"
   },
+  "wooden_chandelier": {
+   "object": "wooden_chandelier",
+   "icon": "assets/icons/items/wooden_chandelier.png"
+  },
   "wooden_chest": {
    "object": "wooden_chest",
    "icon": "assets/icons/items/wooden_chest.png"
+  },
+  "wooden_clock": {
+   "object": "wooden_clock",
+   "icon": "assets/icons/items/wooden_clock.png"
   },
   "wooden_crate": {
    "model": "assets/models/items/wooden_crate.glb",
@@ -5546,6 +9918,26 @@
     "tip": "0 0.7563 0 > 0 1 0"
    },
    "icon": "assets/icons/items/wooden_hammer.png"
+  },
+  "wooden_lamp": {
+   "object": "wooden_lamp",
+   "icon": "assets/icons/items/wooden_lamp.png"
+  },
+  "wooden_lantern": {
+   "object": "wooden_lantern",
+   "icon": "assets/icons/items/wooden_lantern.png"
+  },
+  "wooden_piano": {
+   "object": "wooden_piano",
+   "icon": "assets/icons/items/wooden_piano.png"
+  },
+  "wooden_platform": {
+   "object": "wooden_platform",
+   "icon": "assets/icons/items/wooden_platform.png"
+  },
+  "wooden_sofa": {
+   "object": "wooden_sofa",
+   "icon": "assets/icons/items/wooden_sofa.png"
   },
   "wooden_sword": {
    "model": "assets/models/items/wooden_sword.glb",
@@ -5579,6 +9971,10 @@
    "model": "assets/models/items/worm_tooth.glb",
    "icon": "assets/icons/items/worm_tooth.png"
   },
+  "wraith_banner": {
+   "object": "wraith_banner",
+   "icon": "assets/icons/items/wraith_banner.png"
+  },
   "wrath_potion": {
    "model": "assets/models/items/wrath_potion.glb",
    "icon": "assets/icons/items/wrath_potion.png"
@@ -5598,6 +9994,14 @@
    },
    "icon": "assets/icons/items/yellow_paint.png"
   },
+  "yellow_wrench": {
+   "model": "assets/models/items/yellow_wrench.glb",
+   "icon": "assets/icons/items/yellow_wrench.png"
+  },
+  "yeti_banner": {
+   "object": "yeti_banner",
+   "icon": "assets/icons/items/yeti_banner.png"
+  },
   "zenith": {
    "model": "assets/models/items/zenith.glb",
    "sockets": {
@@ -5605,6 +10009,22 @@
     "tip": "0 1.3 0 > 0 1 0"
    },
    "icon": "assets/icons/items/zenith.png"
+  },
+  "zombie_banner": {
+   "object": "zombie_banner",
+   "icon": "assets/icons/items/zombie_banner.png"
+  },
+  "zombie_elf_banner": {
+   "object": "zombie_elf_banner",
+   "icon": "assets/icons/items/zombie_elf_banner.png"
+  },
+  "zombie_fish": {
+   "model": "assets/models/items/zombie_fish.glb",
+   "icon": "assets/icons/items/zombie_fish.png"
+  },
+  "zombie_statue": {
+   "object": "zombie_statue",
+   "icon": "assets/icons/items/zombie_statue.png"
   }
  },
  "creatures": {
@@ -6541,6 +10961,11 @@
     "use",
     "walk"
    ]
+  },
+  "golem": {
+   "model": "assets/models/creatures/golem.glb",
+   "generator": "golem_idol",
+   "animations": []
   },
   "golem_body": {
    "model": "assets/models/creatures/golem_body.glb",
@@ -10797,6 +15222,16 @@
     "tris": 206
    }
   },
+  "pumpkin_mask": {
+   "head": {
+    "model": "assets/models/armor/pumpkin_mask_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 442
+   }
+  },
   "radiant_armor": {
    "head": {
     "model": "assets/models/armor/radiant_armor_head.glb",
@@ -10911,6 +15346,106 @@
     "refLength": 0.193,
     "hidesHair": false,
     "tris": 258
+   }
+  },
+  "reindeer_antlers": {
+   "head": {
+    "model": "assets/models/armor/reindeer_antlers_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": true,
+    "tris": 454
+   }
+  },
+  "santa_costume": {
+   "head": {
+    "model": "assets/models/armor/santa_costume_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": false,
+    "tris": 258
+   },
+   "chest": {
+    "model": "assets/models/armor/santa_costume_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/santa_costume_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/santa_costume_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/santa_costume_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/santa_costume_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/santa_costume_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/santa_costume_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/santa_costume_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/santa_costume_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/santa_costume_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
    }
   },
   "shroomite_armor": {
@@ -12055,6 +16590,96 @@
     "refLength": 0.1513,
     "hidesHair": false,
     "tris": 206
+   }
+  },
+  "witch_costume": {
+   "head": {
+    "model": "assets/models/armor/witch_costume_head.glb",
+    "bone": "head",
+    "slot": "head",
+    "refLength": 0.193,
+    "hidesHair": false,
+    "tris": 258
+   },
+   "chest": {
+    "model": "assets/models/armor/witch_costume_chest.glb",
+    "bone": "chest",
+    "slot": "body",
+    "refLength": 0.2153,
+    "hidesHair": false,
+    "tris": 472
+   },
+   "belt": {
+    "model": "assets/models/armor/witch_costume_belt.glb",
+    "bone": "hips",
+    "slot": "body",
+    "refLength": 0.0953,
+    "hidesHair": false,
+    "tris": 84
+   },
+   "bracer.L": {
+    "model": "assets/models/armor/witch_costume_bracer.L.glb",
+    "bone": "forearm.L",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "bracer.R": {
+    "model": "assets/models/armor/witch_costume_bracer.R.glb",
+    "bone": "forearm.R",
+    "slot": "body",
+    "refLength": 0.252,
+    "hidesHair": false,
+    "tris": 60
+   },
+   "cuisse.L": {
+    "model": "assets/models/armor/witch_costume_cuisse.L.glb",
+    "bone": "thigh.L",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "cuisse.R": {
+    "model": "assets/models/armor/witch_costume_cuisse.R.glb",
+    "bone": "thigh.R",
+    "slot": "legs",
+    "refLength": 0.4302,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.L": {
+    "model": "assets/models/armor/witch_costume_greave.L.glb",
+    "bone": "shin.L",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "greave.R": {
+    "model": "assets/models/armor/witch_costume_greave.R.glb",
+    "bone": "shin.R",
+    "slot": "legs",
+    "refLength": 0.4281,
+    "hidesHair": false,
+    "tris": 96
+   },
+   "boot.L": {
+    "model": "assets/models/armor/witch_costume_boot.L.glb",
+    "bone": "foot.L",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
+   },
+   "boot.R": {
+    "model": "assets/models/armor/witch_costume_boot.R.glb",
+    "bone": "foot.R",
+    "slot": "legs",
+    "refLength": 0.1513,
+    "hidesHair": false,
+    "tris": 132
    }
   },
   "wizard_hat": {

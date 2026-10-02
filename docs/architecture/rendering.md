@@ -196,7 +196,36 @@ every prop-library material plus the flame, lit-sprite and projectile-glow mater
 
 ## Global shader parameters (`project.godot`)
 `strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,
-`strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`.
+`strata_clouds`, `strata_cloud_noise`, `strata_wind`, `strata_trample`, `strata_weather` (wetness, puddles, lightning
+flash, snow; set by `WeatherRenderer`).
+
+## Effects (EffectKit, FlashLights)
+`EffectKit` (game/Rendering) is the one particle path for hits, mining and deaths: per recipe (Chips, Dust, Sparks,
+Puff, Splash, Leaves) a pool of one-shot CPU emitters sharing `particle_lit.gdshader`, each burst lit by the voxel light
+at its point (instance uniform `voxel_light`, so chips in a dark cave are dark) and varied between a lighter and darker
+shade. Counts × preset `effectsScale`; at most 8 bursts start per frame and about 600 particles live (the oldest emitter
+is reused). `FlashLights` is a pool of `flashLights` short omni lights that fade linearly (explosions); a separate pool
+because DynamicLights re-ranks its providers only a few times a second. Creature materials
+(data/config/creature_materials.json, Core `CreatureMaterialsConfig`: the enemy's `material`, else its model, else its
+tags, else flesh) pick each creature's hit and death sounds, hit dust (blood, gel, bone chips, sparks, leaves) and death
+gore (`GoreSystem`: up to 16–96 pooled chunks by preset, simulated against the voxels, voxel-lit through MultiMesh custom
+data, faded after 2.5 s); `DamageEvent` carries `NpcId` and `Kind` (Hit, Periodic, Player…) so damage over time stays quiet. SoundEvents is split into World, Weapons,
+Creatures and Player partials, each wired once.
+
+## Weather and ambience
+`WeatherRenderer` (game/Ambience) draws rain streaks, splashes, snow and blowing sand as GPU particles
+(`weather_particles.gdshader` + `weather_drop.gdshader`) in a box that follows the camera. `SkyHeights` uploads the sky
+map around the camera as a 96×96 float texture (refreshed on a 4-cell move or twice a second); particles die below it
+and splashes are born on it, so rain stops at roofs and cave ceilings with no raycasts. Counts are the preset budget
+(`weather.json`) × the weather's strength via `amount_ratio` (no restarts); emitters stop when nothing falls. Wetness
+(`weather.gdshaderinc`) darkens and glosses sky-exposed terrain and pools puddles on flat tops. The weather feeds
+`EnvironmentController.Weather.cs`: overcast cover dims the sun, the wind drives clouds/grass/foliage/flames, sandstorms
+and blizzards pull the fog into a tinted haze, and lightning pulses a shadowless light and the exposure.
+`AmbienceDirector` picks sound beds and ambient particles by biome, layer and time from `data/config/ambience.json`
+(`AmbienceConfig.Select` in Core): loops (`tools/audio/ambience*.py`) fade on the Ambient bus or the Outdoors bus,
+which `AudioEnvironment` low-passes as the sky is lost; world sounds on the Sound bus get a reverb by enclosure and
+depth. `AmbientParticles` keeps one pooled GPU emitter per kind (dust, spores, embers, leaves, fireflies; counts ×
+preset scale) and `AmbientDrips` drips water from real ceilings near the camera.
 
 Look: AgX tonemapping with colour adjustment (saturation 1.22 by day, 0.85 at night; contrast 1.06) for the reference
 game's rich palette over realistic materials; glow in Screen blend so HDR emitters (flames, lava, glints, magic) bloom

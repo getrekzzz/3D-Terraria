@@ -1,0 +1,104 @@
+{
+  // What fishing lands (see data/config/fishing.json). "fishing" is the plain catch from water and honey; the
+  // "_uncommon", "_rare", "_very_rare" and "_legendary" tables are tried first when that rarity is rolled, falling back
+  // tier by tier. Lava has its own tables; crates come from the crate tables; quest fish only while the Angler wants them.
+  "lootTables": [
+    {"id": "fishing", "mode": "weighted", "entries": [
+      {"item": "bass", "weight": 50, "conditions": [{"type": "depth", "max": 30}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "trout", "weight": 15, "conditions": [{"type": "depth", "max": 30}, {"type": "biome", "any": ["forest", "hallow", "tundra"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "atlantic_cod", "weight": 25, "conditions": [{"type": "biome", "any": ["tundra"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "tuna", "weight": 25, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "ebonkoi", "weight": 25, "conditions": [{"type": "biome", "any": ["corruption"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "hemopiranha", "weight": 25, "conditions": [{"type": "biome", "any": ["crimson"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "specular_fish", "weight": 25, "conditions": [{"type": "depth", "min": 30}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "armored_cavefish", "weight": 20, "conditions": [{"type": "depth", "min": 30}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "honeyfin", "weight": 40, "conditions": [{"type": "fishingLiquid", "any": ["honey"]}]},
+      {"item": "bass", "weight": 10, "conditions": [{"type": "fishingLiquid", "any": ["honey"]}]}
+    ] },
+    {"id": "fishing_uncommon", "mode": "weighted", "entries": [
+      {"item": "salmon", "weight": 12, "conditions": [{"type": "depth", "max": 30}, {"type": "biome", "any": ["forest"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "neon_tetra", "weight": 25, "conditions": [{"type": "biome", "any": ["jungle", "underground_jungle"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "red_snapper", "weight": 25, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "honeyfin", "weight": 25, "conditions": [{"type": "fishingLiquid", "any": ["honey"]}]}
+    ] },
+    {"id": "fishing_rare", "mode": "weighted", "entries": [
+      {"item": "prismite", "weight": 8, "conditions": [{"type": "biome", "any": ["hallow"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "trident", "weight": 2, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "flipper", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
+    ] },
+    {"id": "fishing_very_rare", "mode": "weighted", "entries": [
+      {"item": "reaver_shark", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]},
+      {"item": "angler_earring", "weight": 1, "conditions": [{"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
+    ] },
+    {"id": "fishing_legendary", "mode": "weighted", "entries": [
+      {"item": "golden_fishing_rod", "weight": 1, "conditions": [{"type": "biome", "any": ["ocean"]}, {"type": "not", "of": [{"type": "fishingLiquid", "any": ["honey"]}]}]}
+    ] },
+    {"id": "fishing_lava", "mode": "weighted", "entries": [
+      {"item": "obsidifish", "weight": 1}
+    ] },
+    {"id": "fishing_lava_uncommon", "mode": "weighted", "entries": [
+      {"item": "flarefin_koi", "weight": 1}
+    ] },
+    {"id": "fishing_lava_rare", "mode": "weighted", "entries": [
+      {"item": "bottomless_lava_bucket", "weight": 1},
+      {"item": "lavaproof_fishing_hook", "weight": 1}
+    ] },
+    {"id": "fishing_lava_crate", "mode": "weighted", "entries": [
+      {"item": "obsidian_crate", "weight": 1}
+    ] },
+    {"id": "fishing_crate", "mode": "weighted", "entries": [
+      {"item": "wooden_crate", "weight": 1}
+    ] },
+    {"id": "fishing_crate_uncommon", "mode": "weighted", "entries": [
+      {"item": "iron_crate", "weight": 1},
+      {"item": "jungle_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["jungle", "underground_jungle"]}]},
+      {"item": "sky_crate", "weight": 2, "conditions": [{"type": "layer", "any": ["sky", "space"]}]},
+      {"item": "corrupt_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["corruption"]}]},
+      {"item": "crimson_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["crimson"]}]},
+      {"item": "hallowed_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["hallow"]}]},
+      {"item": "dungeon_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["dungeon"]}]},
+      {"item": "frozen_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["tundra", "ice_biome"]}]},
+      {"item": "oasis_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["desert", "underground_desert"]}]},
+      {"item": "ocean_crate", "weight": 2, "conditions": [{"type": "biome", "any": ["ocean"]}]}
+    ] },
+    {"id": "fishing_crate_rare", "mode": "weighted", "entries": [
+      {"item": "iron_crate", "weight": 1},
+      {"item": "jungle_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["jungle", "underground_jungle"]}]},
+      {"item": "sky_crate", "weight": 3, "conditions": [{"type": "layer", "any": ["sky", "space"]}]},
+      {"item": "corrupt_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["corruption"]}]},
+      {"item": "crimson_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["crimson"]}]},
+      {"item": "hallowed_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["hallow"]}]},
+      {"item": "dungeon_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["dungeon"]}]},
+      {"item": "frozen_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["tundra", "ice_biome"]}]},
+      {"item": "oasis_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["desert", "underground_desert"]}]},
+      {"item": "ocean_crate", "weight": 3, "conditions": [{"type": "biome", "any": ["ocean"]}]}
+    ] },
+    {"id": "fishing_crate_very_rare", "mode": "weighted", "entries": [
+      {"item": "golden_crate", "weight": 1}
+    ] },
+    {"id": "fishing_quest", "mode": "weighted", "entries": [
+      {"item": "bunnyfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "bunnyfish"}, {"type": "biome", "any": ["forest"]}, {"type": "layer", "any": ["surface"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "slimefish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "slimefish"}, {"type": "biome", "any": ["forest"]}, {"type": "layer", "any": ["surface"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "dynamite_fish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "dynamite_fish"}, {"type": "biome", "any": ["forest"]}, {"type": "layer", "any": ["surface"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "zombie_fish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "zombie_fish"}, {"type": "biome", "any": ["forest"]}, {"type": "layer", "any": ["surface"]}, {"type": "time", "is": "night"}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "fallen_starfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "fallen_starfish"}, {"type": "layer", "any": ["surface", "sky"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "catfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "catfish"}, {"type": "biome", "any": ["jungle"]}, {"type": "layer", "any": ["surface"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "mudfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "mudfish"}, {"type": "biome", "any": ["jungle", "underground_jungle"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "pengfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "pengfish"}, {"type": "biome", "any": ["tundra"]}, {"type": "layer", "any": ["surface"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "mutant_flinxfin", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "mutant_flinxfin"}, {"type": "biome", "any": ["ice_biome"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "scarab_fish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "scarab_fish"}, {"type": "biome", "any": ["desert", "underground_desert"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "scorpio_fish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "scorpio_fish"}, {"type": "biome", "any": ["desert", "underground_desert"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "clownfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "clownfish"}, {"type": "biome", "any": ["ocean"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "angelfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "angelfish"}, {"type": "layer", "any": ["sky", "space"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "cloudfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "cloudfish"}, {"type": "layer", "any": ["sky", "space"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "harpyfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "harpyfish"}, {"type": "layer", "any": ["sky", "space"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "batfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "batfish"}, {"type": "layer", "any": ["underground", "cavern"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "spiderfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "spiderfish"}, {"type": "layer", "any": ["cavern"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "jewelfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "jewelfish"}, {"type": "layer", "any": ["underground", "cavern"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "bonefish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "bonefish"}, {"type": "layer", "any": ["underground", "cavern"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "amanitia_fungifin", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "amanitia_fungifin"}, {"type": "biome", "any": ["mushroom"]}, {"type": "fishingLiquid", "any": ["water"]}]},
+      {"item": "demonic_hellfish", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "demonic_hellfish"}, {"type": "layer", "any": ["underworld"]}, {"type": "fishingLiquid", "any": ["lava"]}]},
+      {"item": "bumblebee_tuna", "weight": 1, "conditions": [{"type": "anglerQuest", "fish": "bumblebee_tuna"}, {"type": "fishingLiquid", "any": ["honey"]}]}
+    ] }
+  ]
+}

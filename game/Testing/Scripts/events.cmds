@@ -22,3 +22,20 @@ wait_until npcs.eye_of_cthulhu == 1 15
 assert event.evil_presence == 0
 killall
 assert errors == 0
+
+# --- X-06 ---
+# Seasons: the console forces Halloween and Christmas (residents put on hats); a goodie bag opens; back to the date.
+season halloween
+assert season.id == 1
+wait 0.2
+give goodie_bag
+wield goodie_bag
+use
+assert inv.goodie_bag == 0
+season christmas
+assert season.id == 2
+wait 0.2
+season off
+assert season.id == 0
+season auto
+assert errors == 0

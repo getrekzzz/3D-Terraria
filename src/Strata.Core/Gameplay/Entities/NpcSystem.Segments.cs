@@ -52,7 +52,7 @@ public sealed partial class NpcSystem
         npc.SegmentLife[segment] -= hit.Damage;
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
-        Damaged?.Invoke(new DamageEvent(npc.Segments[segment] + new Vector3(0, 0.9f, 0), hit.Damage, hit.Crit, false));
+        Damaged?.Invoke(new DamageEvent(npc.Segments[segment] + new Vector3(0, 0.9f, 0), hit.Damage, hit.Crit, false, npc.Id));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             _world.ReportHeal(attacker, attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal))), mana: false);
         if (npc.SegmentLife[segment] <= 0) Split(npc, segment);

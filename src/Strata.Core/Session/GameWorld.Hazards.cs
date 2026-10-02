@@ -34,7 +34,7 @@ public sealed partial class GameWorld
                     if (objects.At(new Int3(x, y, z)) is not { Def.Hazard: { } hazard } obj) continue;
                     var rng = new Pcg32(Hash.Combine((ulong)obj.Id, Session.Clock.Tick));
                     var hit = DamageModel.Roll(hazard.Damage, DamageClass.None, 0, hazard.Knockback, null, state.Defense,
-                        DamageModel.DefenseFactor(Session.Settings.Difficulty), state.Effects.Stats.Bonus(StatIds.EnduranceReduction),
+                        DamageModel.DefenseFactor(Session.Settings.EffectiveDifficulty), state.Effects.Stats.Bonus(StatIds.EnduranceReduction),
                         state.Effects.Stats.Bonus(StatIds.KnockbackResist), ref rng);
                     if (!state.Vitals.Hurt(hit.Damage, NpcSystem.PlayerHitImmunity + (int)state.Effects.Stats.Bonus(StatIds.Immunity))) return;
                     var spike = new Vector3(x + 0.5f, y + 0.5f, z + 0.5f) * Units.CellSize;

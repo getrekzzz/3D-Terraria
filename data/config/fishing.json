@@ -1,0 +1,37 @@
+{
+  // Fishing (src/Strata.Core/Gameplay/Fishing). Fishing power = (rod + bait + accessories and buffs) × the multipliers
+  // below, scaled by pool size; it times bites and rolls the catch rarity. Weather is world-wide, as in Terraria.
+  "rainMultiplier": 1.2,
+  "stormMultiplier": 1.1,
+  // Dawn and dusk bite best, the midday sun worst (hours are the in-game clock, 0–24).
+  "hours": [
+    { "from": 4.5, "to": 6, "multiplier": 1.3 },
+    { "from": 18, "to": 19.5, "multiplier": 1.3 },
+    { "from": 9.5, "to": 15.5, "multiplier": 0.8 }
+  ],
+  // By moon phase: full, waning gibbous, third quarter, waning crescent, new, waxing crescent, first quarter, waxing gibbous.
+  "moonMultipliers": [1.1, 1.05, 1.0, 0.95, 0.9, 0.95, 1.0, 1.05],
+  "eventMultipliers": { "blood_moon": 1.1 },
+  // Connected liquid cells (0.5 m cubes) for full power; fewer scale power down, and below the minimum nothing bites.
+  "fullPoolCells": 300,
+  "minPoolCells": 40,
+  // Bait is used up on a catch with chance 1 / (1 + baitPower / baitDivisor + baitSaving).
+  "baitDivisor": 6,
+  "crateChance": 0.1,
+  // Catch rarities, commonest first: each rolls with chance 1 / max(floor, odds / power); the rarest success wins.
+  // Tier tables are "<table>_<id>"; an empty or missing tier falls back to commoner ones, then the plain table.
+  "rarities": [
+    { "id": "uncommon", "odds": 300, "floor": 3 },
+    { "id": "rare", "odds": 1050, "floor": 4 },
+    { "id": "very_rare", "odds": 2250, "floor": 5 },
+    { "id": "legendary", "odds": 4500, "floor": 6 }
+  ],
+  "waterTable": "fishing",
+  "honeyTable": "fishing",
+  "lavaTable": "fishing_lava",
+  "crateTable": "fishing_crate",
+  "lavaCrateTable": "fishing_lava_crate",
+  "questTable": "fishing_quest",
+  "questTier": 1,
+  "noBaitMessage": "You need bait to fish."
+}

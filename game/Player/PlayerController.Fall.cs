@@ -4,9 +4,6 @@ namespace Strata.Game.Player;
 
 public sealed partial class PlayerController
 {
-    /// <summary>Raised with fall damage taken on landing.</summary>
-    public event System.Action<int>? FallDamaged;
-
     private void TrackFall()
     {
         float y = GlobalPosition.Y;
@@ -25,11 +22,8 @@ public sealed partial class PlayerController
         if (_airborne && !_swimming)
         {
             int damage = _config.FallDamage(_peakY - y, Entity.State.Effects.NoFallDamage);
-            if (damage > 0)
-            {
-                Entity.State.Vitals.DamageDirect(damage);
-                FallDamaged?.Invoke(damage);
-            }
+            // Through Core, so the fall shows a number and sounds like a hurt.
+            if (damage > 0) _runtime.Game.HurtPlayerDirect(Entity, damage);
         }
         _airborne = false;
         _peakY = y;

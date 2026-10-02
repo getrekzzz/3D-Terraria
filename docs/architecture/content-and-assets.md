@@ -18,6 +18,18 @@
   rolls is a warning. `ItemSourcesTests` pins the shipped unobtainable list (only items a pending WP will add).
 * `data/reference/*.json`: Terraria concepts (names only) generated from `tools/content/reference/`.
   Content links to them with `covers`; `Strata.Tools coverage` reports coverage and CI publishes it.
+* Furniture families (X-03): `tools/content/furniture_families.json` lists the pieces (door, chair, table, bed, chest,
+  work bench, bookcase, piano, sofa, bathtub, lamp, lantern, candle, candelabra, chandelier, grandfather clock,
+  platform: size, recipe, housing roles, light) and the materials (wood, boreal, palm, rich mahogany, ebonwood,
+  shadewood, cactus, mushroom, granite, marble, obsidian, glass, bone, lihzahrd: material item, look, flame colour);
+  `tools/content/gen_furniture.py` writes `data/items/generated/furniture_families.json` and the model specs
+  `tools/blender/assets.d/x-03-families.json` (generator `furniture_piece`, `bgen/furniture_family.py`). The plain
+  wooden set keeps its original ids. `FurnitureFamilyTests` checks every family is complete, craftable and up to date.
+* **Enemy banners** (X-03) are generated too: `tools/content/banners.json` (variant groups, emblems, palette) →
+  `tools/content/gen_banners.py` → `data/items/generated/banners.json` (one wall banner per coin-worthy enemy, its
+  `banner.enemies`, and the Monster Banner buff) and `tools/blender/assets.d/x-03-banners.json` (the Dungeon's `banner`
+  generator, cloth in the enemy's tint, emblem by its tags). CI runs `gen_furniture.py --check` and
+  `gen_banners.py --check`.
 
 ## Assets
 | Asset | Tool | Output |

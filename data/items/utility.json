@@ -1,6 +1,7 @@
 {
-  // Getting around and living off the land: the Magic Mirror and Recall Potions, fishing (rods, bobbers, the catch
-  // table, crates), cooking fish into Well Fed, and the Cooking Pot.
+  // Getting around and living off the land: the Magic Mirror and Recall Potions, fishing (rods, bobbers, fish, the
+  // basic crates; catch and crate tables live in loot/fishing.json and loot/crates.json), cooking fish into Well Fed,
+  // and the Cooking Pot.
   "projectiles": [
     { "id": "bobber", "name": "Bobber", "visual": "orb", "color": "#e83a3a", "gravity": 12, "lifetime": 60, "radius": 0.3, "contact": false, "bobber": true }
   ],
@@ -61,54 +62,5 @@
   ],
   "recipeGroups": [
     { "id": "any_edible_fish", "name": "Any Fish", "items": ["bass", "trout", "salmon", "atlantic_cod", "neon_tetra", "tuna", "red_snapper", "specular_fish", "armored_cavefish"] }
-  ],
-  "lootTables": [
-    { "id": "fishing", "mode": "weighted", "entries": [
-      { "item": "wooden_crate", "weight": 6 },
-      { "item": "iron_crate", "weight": 3, "conditions": [{ "type": "fishingPower", "min": 15 }] },
-      { "item": "golden_crate", "weight": 1, "conditions": [{ "type": "fishingPower", "min": 30 }] },
-      { "item": "bass", "weight": 50, "conditions": [{ "type": "depth", "max": 30 }] },
-      { "item": "trout", "weight": 15, "conditions": [{ "type": "depth", "max": 30 }, { "type": "biome", "any": ["forest", "hallow", "tundra"] }] },
-      { "item": "salmon", "weight": 12, "conditions": [{ "type": "depth", "max": 30 }, { "type": "biome", "any": ["forest"] }] },
-      { "item": "atlantic_cod", "weight": 25, "conditions": [{ "type": "biome", "any": ["tundra"] }] },
-      { "item": "neon_tetra", "weight": 25, "conditions": [{ "type": "biome", "any": ["jungle"] }] },
-      { "item": "tuna", "weight": 25, "conditions": [{ "type": "biome", "any": ["ocean"] }] },
-      { "item": "red_snapper", "weight": 25, "conditions": [{ "type": "biome", "any": ["ocean"] }] },
-      { "item": "trident", "weight": 1, "conditions": [{ "type": "biome", "any": ["ocean"] }] },
-      { "item": "reaver_shark", "weight": 1, "conditions": [{ "type": "biome", "any": ["ocean"] }, { "type": "fishingPower", "min": 25 }] },
-      { "item": "ebonkoi", "weight": 25, "conditions": [{ "type": "biome", "any": ["corruption"] }] },
-      { "item": "hemopiranha", "weight": 25, "conditions": [{ "type": "biome", "any": ["crimson"] }] },
-      { "item": "prismite", "weight": 8, "conditions": [{ "type": "biome", "any": ["hallow"] }] },
-      { "item": "specular_fish", "weight": 25, "conditions": [{ "type": "depth", "min": 30 }] },
-      { "item": "armored_cavefish", "weight": 20, "conditions": [{ "type": "depth", "min": 30 }] }
-    ] },
-    { "id": "wooden_crate", "coins": [1000, 5000], "entries": [
-      { "table": "wooden_crate_treasure", "chance": 0.25 },
-      { "item": "copper_bar", "min": 4, "max": 10, "chance": 0.25 }, { "item": "iron_bar", "min": 4, "max": 10, "chance": 0.2 },
-      { "item": "lesser_healing_potion", "min": 2, "max": 4, "chance": 0.4 }, { "item": "recall_potion", "min": 1, "max": 2, "chance": 0.2 },
-      { "item": "bomb", "min": 2, "max": 5, "chance": 0.2 }
-    ] },
-    { "id": "wooden_crate_treasure", "mode": "weighted", "entries": [
-      { "item": "aglet", "weight": 1 }, { "item": "wooden_boomerang", "weight": 1 }, { "item": "spear", "weight": 1 }, { "item": "shiny_red_balloon", "weight": 0.5 },
-      { "item": "trident", "weight": 0.5 }, { "item": "wood_yoyo", "weight": 1 }, { "item": "flipper", "weight": 0.5 }
-    ] },
-    { "id": "iron_crate", "coins": [2500, 10000], "entries": [
-      { "table": "iron_crate_treasure", "chance": 0.3 },
-      { "item": "silver_bar", "min": 4, "max": 12, "chance": 0.3 }, { "item": "gold_bar", "min": 4, "max": 10, "chance": 0.2 },
-      { "item": "lesser_healing_potion", "min": 3, "max": 5, "chance": 0.5 }, { "item": "recall_potion", "min": 1, "max": 3, "chance": 0.25 }
-    ] },
-    { "id": "iron_crate_treasure", "mode": "weighted", "entries": [
-      { "item": "magic_mirror", "weight": 1 }, { "item": "cloud_in_a_bottle", "weight": 1 }, { "item": "hermes_boots", "weight": 1 }, { "item": "trident", "weight": 1 },
-      { "item": "boomstick", "weight": 1, "conditions": [{ "type": "biome", "any": ["jungle"] }] }
-    ] },
-    { "id": "golden_crate", "coins": [10000, 40000], "entries": [
-      { "table": "golden_crate_treasure", "chance": 0.5 },
-      { "item": "gold_bar", "min": 8, "max": 16, "chance": 0.4 }, { "item": "platinum_bar", "min": 8, "max": 16, "chance": 0.3 },
-      { "item": "life_crystal", "chance": 0.2 }, { "item": "recall_potion", "min": 2, "max": 4, "chance": 0.3 }
-    ] },
-    { "id": "golden_crate_treasure", "mode": "weighted", "entries": [
-      { "item": "enchanted_sword", "weight": 0.5 }, { "item": "lucky_horseshoe", "weight": 1 }, { "item": "starfury", "weight": 1 }, { "item": "magic_mirror", "weight": 1 },
-      { "item": "fledgling_wings", "weight": 0.5 }, { "item": "reaver_shark", "weight": 0.3, "conditions": [{ "type": "biome", "any": ["ocean"] }] }
-    ] }
   ]
 }

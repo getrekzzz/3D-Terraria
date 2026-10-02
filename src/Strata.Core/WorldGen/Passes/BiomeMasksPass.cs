@@ -32,7 +32,9 @@ public sealed class BiomeMasksPass : GenPass
         plan.SnowAngle = rng.NextFloat();
 
         Add(ctx, seeds, "tundra", 2, RegionProfile.DeepColumn, plan.SnowAngle + rng.Range(-0.03f, 0.03f), 0.5f * R, 0.2f * R, 0.25f * R);
-        Add(ctx, seeds, "jungle", 3, RegionProfile.DeepColumn, plan.SnowAngle + 0.5f + rng.Range(-0.05f, 0.05f), 0.52f * R, 0.24f * R, 0.27f * R);
+        // Not the Bees: a jungle half again as large (its hives multiply in JunglePass).
+        float jungle = plan.Settings.Has(SecretSeed.NotTheBees) ? 1.5f : 1f;
+        Add(ctx, seeds, "jungle", 3, RegionProfile.DeepColumn, plan.SnowAngle + 0.5f + rng.Range(-0.05f, 0.05f), 0.52f * R, 0.24f * R * jungle, 0.27f * R * jungle);
         float desertAngle = plan.SnowAngle + (rng.Chance(0.5f) ? 0.25f : -0.25f) + rng.Range(-0.04f, 0.04f);
         var desert = Add(ctx, seeds, "desert", 2, RegionProfile.ShallowColumn, desertAngle, 0.5f * R, 0.17f * R, 0.21f * R, depthCenter: 0.12f);
         Add(ctx, seeds, "underground_desert", 4, RegionProfile.Buried, 0, 0, desert.RadiusX * 1.05f, desert.RadiusZ * 1.05f,
@@ -40,13 +42,17 @@ public sealed class BiomeMasksPass : GenPass
 
         string evil = plan.Settings.Evil == EvilKind.Corruption ? "corruption" : "crimson";
         int evilCount = plan.Settings.Size switch { WorldSizePreset.Tiny => 1, WorldSizePreset.Small => 2, WorldSizePreset.Medium => 3, _ => 4 };
+        // A Drunk World has both evils, alternating (at least one of each).
+        bool drunk = plan.Settings.Has(SecretSeed.Drunk);
+        if (drunk) evilCount = Math.Max(2, evilCount);
         var avoid = new List<float> { plan.SnowAngle, plan.SnowAngle + 0.5f, desertAngle };
         for (int i = 0; i < evilCount; i++)
         {
             float angle = PickAngle(ref rng, avoid, 0.09f);
             avoid.Add(angle);
             float size = rng.Range(0.085f, 0.12f) * R;
-            Add(ctx, seeds, evil, 6, RegionProfile.ShallowColumn, angle, rng.Range(0.34f, 0.62f) * R, size, size * rng.Range(0.8f, 1.3f), depthCenter: 0.45f);
+            string kind = drunk && i % 2 == 1 ? (evil == "corruption" ? "crimson" : "corruption") : evil;
+            Add(ctx, seeds, kind, 6, RegionProfile.ShallowColumn, angle, rng.Range(0.34f, 0.62f) * R, size, size * rng.Range(0.8f, 1.3f), depthCenter: 0.45f);
         }
 
         int mushrooms = Math.Max(1, ctx.Scaled(2));
