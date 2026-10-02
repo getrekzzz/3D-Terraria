@@ -59,6 +59,9 @@ public sealed partial class NpcSystem
         return npc.Frenzied && rage?.SetDamage is { } set ? set : (int)(npc.Def.Damage * npc.DamageScale * Scale);
     }
 
+    /// <summary>Posts a world announcement from another system (a town rescue) on the same path as boss messages.</summary>
+    public void Broadcast(string text, MessageKind kind) => Announce(text, kind);
+
     /// <summary>Raises <see cref="Announced"/> and <see cref="Messaged"/> with the message's kind.</summary>
     private void Announce(string text, MessageKind kind)
     {

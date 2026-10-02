@@ -74,6 +74,21 @@ public class RescueTests
     }
 
     [Fact]
+    public void ARescueIsAnnouncedAsTownNews()
+    {
+        using var g = Create();
+        var goblin = Bind(g, "goblin_tinkerer");
+        string? said = null;
+        Strata.Core.Gameplay.Messages.MessageKind kind = default;
+        g.World.Npcs.Messaged += (text, k) => (said, kind) = (text, k);
+        Assert.True(g.World.Town.Rescue(goblin, g.Player, out var thanks));
+        Assert.False(string.IsNullOrEmpty(thanks));
+        Assert.Equal(Strata.Core.Gameplay.Messages.MessageKind.Town, kind);
+        Assert.Equal($"{goblin.Title} has been rescued!", said);
+        Assert.EndsWith("the Goblin Tinkerer has been rescued!", said);
+    }
+
+    [Fact]
     public void TheTorturedSoulNeedsPurificationPowder()
     {
         using var g = Create();

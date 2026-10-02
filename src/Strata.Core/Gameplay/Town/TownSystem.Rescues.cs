@@ -98,6 +98,7 @@ public sealed partial class TownSystem
         npc.IdleTicks = Config.IdleTicksMin;
         message = (info?.Thanks ?? "").Replace("{player}", player.State.Name);
         Rescued?.Invoke(npc, player);
+        _world.Npcs.Broadcast($"{npc.Title} has been rescued!", Messages.MessageKind.Town);
         return true;
     }
 }

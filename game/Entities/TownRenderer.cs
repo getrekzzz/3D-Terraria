@@ -16,6 +16,9 @@ public sealed partial class TownRenderer : Node3D
         public required Label3D Tag;
         public required TownNpc Npc;
         public MeshInstance3D? Hat;
+        public MeshInstance3D? Cocoon;
+        public bool? ShownBound;
+        public bool Ghost;
         public Vector3 Shown;
     }
 
@@ -61,7 +64,8 @@ public sealed partial class TownRenderer : Node3D
             string clip = Clip(npc, visual);
             float speed = clip == "walk" ? Mathf.Max(0.6f, new Vector2(npc.Velocity.X, npc.Velocity.Z).Length() / 1.6f) : 1f;
             visual.Play(clip, speed: speed);
-            visual.SetTint(npc.ImmuneTicks > TownSystem.HitImmunity - 8 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
+            UpdateRescueLook(view, npc);
+            visual.SetTint(TintOf(view, npc));
             visual.SetLight(LightProbe.SampleSmooth(world, view.Shown + Vector3.Up));
             view.Tag.Position = view.Shown + new Vector3(0, 2.15f, 0);
         }

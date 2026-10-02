@@ -6,7 +6,7 @@ namespace Strata.Core.Commands;
 /// </summary>
 internal static class TownDebugCommands
 {
-    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id>";
+    public const string Usage = "slay <id> | services <id> | status <id> | bind <id> [dx dy dz] | rescue <id> | pose <id> <stand|sit|sleep|bound|lie>";
 
     public static CommandResult? TryRun(CommandContext ctx, CommandArgs a)
     {
@@ -34,6 +34,11 @@ internal static class TownDebugCommands
             case "rescue":
                 var bound = TownCommands.Resident(ctx, a);
                 return town.Rescue(bound, ctx.Player, out var said) ? CommandResult.Success($"{bound.Title}: {said}") : CommandResult.Fail(said.Length > 0 ? said : $"{bound.Title} is not bound.");
+            case "pose":
+                var posed = TownCommands.Resident(ctx, a);
+                if (!Enum.TryParse<Gameplay.Town.ResidentPosture>(a.Str(2, "posture"), true, out var posture)) throw new CommandException($"unknown posture '{a.Str(2, "posture")}'");
+                posed.Posture = posture;
+                return CommandResult.Success($"{posed.Title} is now {posture.ToString().ToLowerInvariant()}.");
             default:
                 return null;
         }

@@ -570,3 +570,9 @@ chests are never broken for lost support, so generated loot is never lost. `inte
   (`TownRenderer.Clip`: sit, sleep, bound, lie; Stand falls through to walk/jump/idle). A bound NPC takes it from its
   rescue pose (`TownNpc.BoundPosture`: bound/webbed/tortured kneel tied, sleeping/unconscious lie) on bind and load,
   and stands once freed.
+* **Rescue presentation** (P5-08): the name tag follows `TownNpc.Title` ("Bound Goblin" until freed; refreshed when
+  the bound flag flips, `TownRenderer.Props.cs`), a webbed NPC (the Stylist) hangs in a translucent cocoon and the
+  Tortured Soul is tinted ghost-blue without a shadow. Freeing raises `TownSystem.Rescued` (sound `npc_arrive`) and
+  posts "<Title> has been rescued!" through `NpcSystem.Broadcast` with `MessageKind.Town` (Terraria's arrival blue),
+  the same path boss messages take to the HUD and chat log. `town pose <id> <posture>` and probe
+  `town.<id>.posture` serve tours and smokes. The talk-to-free dialog page (thanks / purify) waits for the W4 chat box.

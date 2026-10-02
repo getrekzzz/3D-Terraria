@@ -9,9 +9,15 @@ wait 0.5
 flag defeated_goblin_army
 town bind goblin_tinkerer 4 0 0
 assert town.goblin_tinkerer.bound == 1
+assert town.goblin_tinkerer.posture == 3
 town rescue goblin_tinkerer
 assert flag.rescued_goblin_tinkerer == 1
 assert town.goblin_tinkerer.bound == 0
+assert town.goblin_tinkerer.posture == 0
+# P5-08: the debug pose command sets a resting posture for tours.
+town pose goblin_tinkerer sit
+assert town.goblin_tinkerer.posture == 1
+town pose goblin_tinkerer stand
 
 # A home east of the player (as in town.cmds); the guide is dismissed so the goblin gets it.
 fill 3 0 -5 13 6 5 gray_brick
