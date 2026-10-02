@@ -26,7 +26,10 @@
 | 22 | P3-29 hearts and mana stars (reviewed) | full headless CI green (1396 Core tests, 21/21 smoke, MENU PASS) |
 | 23 | P3-29 review fixes, P3-36 3D dropped items | full headless CI green (1398 Core tests, 21/21 smoke, MENU PASS) |
 | 24 | P3-27 sound sets and SFX voice pool | full headless CI green (1403 Core tests, 21/21 smoke, MENU PASS) |
-| 25 | W4 merge, P3-34 bed sleep, X-09 creator menu rows; per-style hand frames (needs a tuning pass) | pending |
+| 25 | W4 integration merge | full headless CI green (1458 Core tests, 21/21 smoke, MENU PASS) |
+| 26 | P3-34 bed sleep (reviewed + fixed) | full headless CI green (juice smoke re-run alone after a concurrent-run flake) |
+| 27 | X-09 creator menu rows, World slice merge, held model hidden while a yoyo/flail/whip is out | full headless CI green (1493 Core tests, 21/21 smoke, MENU PASS) |
+| 28 | P5-30 Guide book shell + Items tab, then P5-31, P5-32; per-style hand frames (needs a tuning pass) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -200,3 +203,14 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   validator checks sound ids. 12 new synthesised sounds (`tools/audio/sfx_recipes_items.py`). Probes `sfx.*`. Gaps: no
   listening pass; buff potions now play `potion` (louder than the old `heal`); stars/snore/piggy-bank sounds left to
   their WPs.
+
+## Push 26-27 notes
+* **Bed sleep (P3-34)**: `GameWorld.Sleep.cs`: using a bed sets spawn and lies down; while every living player sleeps
+  safely (no boss, no kill-goal event, no hostile within 15 m) the clock runs 5x (extra ticks in multiples of 5).
+  Wakes on hurt, death, mount, grapple, bed removed or input. `GameWorld.RealTick` (clock minus sleep ticks) drives
+  per-entity staggers (liquid contact) and the once-per-second debuff damage. Held item hidden and camera at the lying
+  head while asleep. Gaps: no snore sound; puff is a plain cloud.
+* **Character creator (X-09)**: rows for all 22 hair styles, clothing (shirt/vest/coat), eye and undershirt colour, and
+  Randomize (`Appearance.Random`); the menu tour randomises and checks the saved clothing. Gap: accessories at creation.
+* **Tethered weapons**: `HeldTether.Out` hides the held model (third and first person) while a yoyo or flail is out or a
+  whip lash is drawn; probes `avatar.held_hidden`, `view.held_hidden`.
