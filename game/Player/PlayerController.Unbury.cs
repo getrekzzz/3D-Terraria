@@ -6,16 +6,17 @@ namespace Strata.Game.Player;
 
 public sealed partial class PlayerController
 {
-    /// <summary>Deepest sink (m) into a freshly placed cube that is undone; anything deeper is left to the game.</summary>
-    private const float MaxUnbury = 0.3f;
+    /// <summary>Deepest burial (cells) that is undone; anything deeper is left to the game.</summary>
+    private const int MaxUnburyCells = 4;
 
     /// <summary>
     /// Voxel edits apply at once but a chunk's collider is only rebuilt a little later (the old body stays until its
-    /// replacement exists). A body standing over a hole that has just been filled can therefore drop into the stale
-    /// hole and end up inside the new block, which also puts its feet cell one too low for anything that works
-    /// relative to it. When the feet are a little way inside a full player-placed cube with room above, the body is
-    /// lifted onto the cube's top. Natural smoothed ground and partial shapes (where bodies rest slightly inside the
-    /// cell on purpose) are left alone.
+    /// replacement exists). A body over ground that has just been filled (a debug or smoke `fill` around a falling
+    /// player) can therefore drop through the stale surface and end up inside the new blocks, where it stays or is
+    /// pushed out slowly, which puts its feet cell, and everything that works relative to it, a cell or more too low.
+    /// When the feet are inside full player-placed cubes with room to stand above them within
+    /// <see cref="MaxUnburyCells"/>, the body is lifted onto the top at once. Natural smoothed ground and partial
+    /// shapes (where bodies rest slightly inside the cell on purpose) are left alone.
     /// </summary>
     private void Unbury()
     {
@@ -23,12 +24,16 @@ public sealed partial class PlayerController
         var p = GlobalPosition;
         float cs = Units.CellSize;
         int x = Mathf.FloorToInt(p.X / cs), y = Mathf.FloorToInt((p.Y + 0.02f) / cs), z = Mathf.FloorToInt(p.Z / cs);
-        if (!world.IsSolid(x, y, z) || world.GetShape(x, y, z) != 0 || (world.GetFlags(x, y, z) & CellFlags.PlayerPlaced) == 0) return;
-        float top = (y + 1) * cs;
-        if (top - p.Y > MaxUnbury) return;
-        for (int dy = 1; dy <= 4; dy++)
-            if (world.IsSolid(x, y + dy, z)) return; // no room to stand on it
-        GlobalPosition = new Vector3(p.X, top + 0.001f, p.Z);
+        int k = 0;
+        while (k < MaxUnburyCells && world.IsSolid(x, y + k, z))
+        {
+            if (world.GetShape(x, y + k, z) != 0 || (world.GetFlags(x, y + k, z) & CellFlags.PlayerPlaced) == 0) return;
+            k++;
+        }
+        if (k == 0 || k == MaxUnburyCells) return;
+        for (int dy = 0; dy < 4; dy++)
+            if (world.IsSolid(x, y + k + dy, z)) return; // no room to stand on top
+        GlobalPosition = new Vector3(p.X, (y + k) * cs + 0.001f, p.Z);
         if (Velocity.Y < 0) Velocity = new Vector3(Velocity.X, 0, Velocity.Z);
     }
 }

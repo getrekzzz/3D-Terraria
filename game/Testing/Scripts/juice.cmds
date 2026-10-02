@@ -2,6 +2,7 @@
 # chunks that bounce and fade, a blast flashes and smokes; nothing errors.
 wait_until player.frozen == 0 180
 spawning off
+town defense off
 killall
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 7 10 air
@@ -23,7 +24,9 @@ aim 0.05 -1 0.05
 hold use_primary 1.5
 wait 0.5
 assert effects.bursts > 0
-# One more swing leaves a damaged block: it shows a crack decal.
+# One more swing leaves a damaged block: it shows a crack decal. The block under the feet is made fresh first (the
+# hold may have worn it down far enough for one swing to finish it).
+fill 0 -1 0 0 -1 0 stone
 use
 wait 0.4
 assert effects.cracks > 0

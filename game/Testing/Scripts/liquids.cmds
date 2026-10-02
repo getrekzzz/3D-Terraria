@@ -18,7 +18,8 @@ assert errors == 0
 # Poured water falls into the basin, spreads and settles. Liquid-only remeshes leave the colliders alone.
 colliders reset
 liquid water 5 5 0
-assert liquid.5.5.0 == 31
+# (not liquid.5.5.0 == 31: a liquid step may already have moved the water on before the next command)
+assert liquid.active > 0
 wait_until liquid.active == 0 20
 wait 3
 assert colliders.skipped > 0
@@ -48,8 +49,9 @@ liquids settle 200
 # Lava burns and sets you on fire; water puts the fire out.
 heal
 liquid lava 0 0 0 0 1 0
-wait 0.1
-assert player.in_liquid == 2
+# The burn knocks the player up out of the pool for a moment (they stand on the floor now, not inside it).
+wait_until player.in_liquid == 2 3
+wait_until player.on_floor == 1 3
 assert buff.on_fire == 1
 assert player.life < player.max_life
 liquid water 0 0 0 0 1 0
