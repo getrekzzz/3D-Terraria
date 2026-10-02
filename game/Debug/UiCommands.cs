@@ -14,8 +14,8 @@ public static class UiCommands
     {
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|close|export-theme>",
-            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
+            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|hover <area> <index>|click <left|right> [down|up]|drag <dx> <dy>|close|export-theme>",
+            Help = "Opens or closes gameplay screens; hover shows a slot's tooltip (areas as invclick, plus hotbar); click and drag press on empty screen beside an open screen, through the GUI; export-theme rewrites assets/ui/strata_theme.tres from the code-built theme.",
             Run = (ctx, a) =>
             {
                 string what = a.Str(0, "screen");
@@ -51,12 +51,14 @@ public static class UiCommands
                         if (view == null || !view.IsVisibleInTree()) return CommandResult.Fail($"No {area} slot {index} on screen (open the inventory first).");
                         view.ShowTooltip();
                         return CommandResult.Success($"Tooltip: {world.Tooltip?.LineCount ?? 0} lines.");
+                    case "click": return PointerInput.Click(world, a.Str(1, "button"), a.OptStr(2));
+                    case "drag": return PointerInput.Drag(world, a.Float(1, "dx"), a.Float(2, "dy"));
                     case "close":
                         screen.SetOpen(false);
                         dialog.Close();
                         world.WorldMap?.SetOpen(false);
                         return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, map, talk, shop, hover, close or export-theme");
+                    default: throw new CommandException("expected inventory, map, talk, shop, hover, click, drag, close or export-theme");
                 }
             },
         });

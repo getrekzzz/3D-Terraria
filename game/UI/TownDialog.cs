@@ -61,7 +61,7 @@ public sealed partial class TownDialog : CanvasLayer
     {
         _npc = npc;
         _root.Visible = true;
-        InputGate.SetOpen(Gate, true);
+        InputGate.SetOpen(Gate, true, GateKind.Overlay); // the player can still walk off and fight
         _title.Text = npc.Title;
         _text.Text = _ui.Game.Commerce.Greet(npc, _ui.Entity);
         ShowShop(false);
@@ -72,7 +72,7 @@ public sealed partial class TownDialog : CanvasLayer
     {
         if (!IsOpen) return;
         _root.Visible = false;
-        InputGate.SetOpen(Gate, false);
+        InputGate.SetOpen(Gate, false, GateKind.Overlay);
         if (_npc != null) _ui.Game.Town.EndTalk(_npc);
         _npc = null;
     }

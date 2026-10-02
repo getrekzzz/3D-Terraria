@@ -155,3 +155,15 @@ outline in a bold rounded face, slot tints by kind and Terraria's rarity colours
   and buff rows. A region with no room is left out of `Rects` (the widget hides). Engine code calls it on viewport
   resize and on state changes only; `UiLayoutTests` checks every window size from 1024×600 to 3840×2160 at every UI
   scale step.
+* **Input gate** (`game/UI/InputGate.cs`): screens register as `GateKind.Modal` (pause menu and settings, console,
+  world map: `GameplayBlocked`, everything stops) or `GateKind.Overlay` (inventory with its chest, town dialog with
+  its shop: `OverlayOpen`, the pointer is free but `MovementBlocked`/`HotkeysBlocked` stay false, so the player walks,
+  jumps, grapples, picks hotbar slots and fights). `MouseFree` (either kind) shows the pointer and stops mouse look
+  (`LookBlocked`); `TextEntry` blocks movement and hotkeys too. With an overlay open the item is used only while the
+  button is held on empty screen: `WorldClickCatcher`, a full-screen control on CanvasLayer 9 under the HUD and every
+  overlay, takes exactly the clicks no panel or slot took and sets `WorldPointer` (left: use toward the crosshair, or throw the cursor
+  stack; right: throw one, or drag to turn the camera through `CameraRig.AddLook` with `CameraDrag`). The number keys
+  are polled (`InteractionController.PollHotbarKeys`), the wheel reads the rebindable `hotbar_next`/`hotbar_prev`
+  actions and is left to a panel under the pointer (`InputGate.PointerOverPanel`). Smoke: `ui click`/`ui drag`
+  press on empty screen through the GUI (`PointerInput`); probes `ui.inventory`, `ui.overlay`, `ui.modal`,
+  `ui.world_clicks`, `camera.yaw`, `player.hotbar`.

@@ -10,7 +10,8 @@ namespace Strata.Game.Debug;
 /// Probes on the global UI look (P2-01): the shipped font is ThemeDB's fallback, an unthemed panel resolves to
 /// Terraria's blue, the exported theme file matches the code-built theme, and the effective UI scale; and on the
 /// generated pixel sprites and buff/event icons the HUD preloads (P2-02, P2-03); on the enemy mini health bars; on
-/// the floating combat numbers (P2-19); and on the slots, the following tooltip and the held stack (P2-10).
+/// the floating combat numbers (P2-19); on the slots, the following tooltip and the held stack (P2-10); and on the
+/// overlay input gate and the empty-screen click catcher (P2-11).
 /// </summary>
 [ProbeSource]
 public static class UiProbes
@@ -52,5 +53,11 @@ public static class UiProbes
         ctx.AddProbe("ui.tooltip_lines", () => world.Tooltip?.LineCount ?? 0);
         ctx.AddProbe("ui.cursor_count", () => world.CursorItem?.ShownCount ?? 0);
         ctx.AddProbe("ui.slot_views", () => ItemSlotView.ActiveViews);
+        // P2-11: the inventory is an overlay (the player keeps moving); presses that landed on empty screen; the view's yaw.
+        ctx.AddProbe("ui.inventory", () => world.Inventory?.IsOpen == true ? 1 : 0);
+        ctx.AddProbe("ui.overlay", () => InputGate.OverlayOpen ? 1 : 0);
+        ctx.AddProbe("ui.modal", () => InputGate.GameplayBlocked ? 1 : 0);
+        ctx.AddProbe("ui.world_clicks", () => world.Runtime.GetNodeOrNull<WorldClickCatcher>(WorldClickCatcher.NodePath)?.Presses ?? 0);
+        ctx.AddProbe("camera.yaw", () => world.Player is { } p ? Mathf.RadToDeg(p.Rig.Yaw) : 0);
     }
 }

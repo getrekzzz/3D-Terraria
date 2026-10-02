@@ -279,7 +279,7 @@ public partial class GameRoot : Node
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (World != null && @event is InputEventMouseButton { Pressed: true } && !InputGate.GameplayBlocked && Input.MouseMode != Input.MouseModeEnum.Captured)
+        if (World != null && @event is InputEventMouseButton { Pressed: true } && !InputGate.MouseFree && Input.MouseMode != Input.MouseModeEnum.Captured)
             Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 }

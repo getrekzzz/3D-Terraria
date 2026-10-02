@@ -80,7 +80,7 @@ public sealed partial class WorldMapScreen : CanvasLayer
         }
         _root.Visible = open;
         Audio.Sfx.Play(open ? "ui_open" : "ui_close");
-        InputGate.SetOpen(Gate, open);
+        InputGate.SetOpen(Gate, open, GateKind.Modal);
     }
 
     private void CenterOnPlayer()

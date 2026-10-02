@@ -132,3 +132,77 @@ assert ui.cursor_count == 0
 assert ui.tooltip_lines == 0
 assert ui.slot_views == 10
 assert errors == 0
+
+# --- P2-11 ---
+# The inventory is an overlay, not a freeze: with it open the player walks, the number keys pick the hotbar slot, a
+# click on empty screen (routed through the GUI) throws the held stack (right: one), a held left button there swings
+# the item toward the crosshair, and a right drag turns the camera; a press the panels took swings nothing. The map
+# is modal and still stops everything.
+god on
+spawning off
+killall
+clear
+fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
+wait 1.0
+ui inventory
+wait 0.2
+assert ui.inventory == 1
+assert ui.overlay == 1
+assert ui.modal == 0
+mark
+aim 0 0 1
+press move_forward
+wait 0.5
+assert player.speed > 0
+press move_forward off
+wait 0.3
+assert player.from_mark > 1.5
+press hotbar_3
+press hotbar_3 off
+wait 0.1
+assert player.hotbar == 2
+press hotbar_1
+press hotbar_1 off
+wait 0.1
+assert player.hotbar == 0
+give dirt 10
+invclick backpack 0 left
+assert inv.cursor == 10
+ui click right
+assert inv.cursor == 9
+ui click left
+assert inv.cursor == 0
+assert ui.world_clicks >= 2
+wait 0.2
+assert drops.count >= 1
+assert inv.dirt == 0
+give copper_shortsword 1
+wield copper_shortsword
+aim 0 -0.2 1
+mark
+press use_primary
+wait 0.4
+press use_primary off
+assert player.swings == 0
+ui click left down
+wait 0.4
+ui click left up
+assert player.swings >= 1
+aim 1 0 0
+ui drag 400 0
+assert camera.yaw < -110
+ui map
+wait 0.1
+assert ui.modal == 1
+mark
+press move_forward
+wait 0.4
+press move_forward off
+assert player.from_mark < 0.3
+ui close
+wait 0.2
+assert ui.overlay == 0
+assert ui.modal == 0
+god off
+assert errors == 0

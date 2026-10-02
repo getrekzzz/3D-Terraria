@@ -103,12 +103,8 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     public override void _UnhandledInput(InputEvent e)
     {
-        if (InputGate.TextEntry) return;
-        if (IsOpen && e is InputEventMouseButton { Pressed: true } mb && ThrowCursor(mb))
-        {
-            GetViewport().SetInputAsHandled();
-            return;
-        }
+        // Clicks on empty screen (throwing the held stack, using the item, turning the camera) go to WorldClickCatcher.
+        if (InputGate.TextEntry || (!IsOpen && InputGate.GameplayBlocked)) return;
         if (e.IsActionPressed("inventory") || (IsOpen && e.IsActionPressed("pause")))
         {
             SetOpen(!IsOpen);
@@ -121,7 +117,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (open == IsOpen) return;
         _root.Visible = open;
         Audio.Sfx.Play(open ? "ui_open" : "ui_close");
-        InputGate.SetOpen(Gate, open);
+        InputGate.SetOpen(Gate, open, GateKind.Overlay); // the player keeps walking, jumping and fighting
         // Auto-pause (single player option): the world waits while the inventory is open.
         if (Settings.UserSettings.Current.AutoPause || !open) _ui.Player.Runtime.Simulating = !open;
         if (open)

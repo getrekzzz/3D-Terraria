@@ -28,6 +28,7 @@ internal static class StandardProbes
         ctx.AddProbe("player.cell_y", () => ctx.Player.FeetCell.Y);
         ctx.AddProbe("player.from_mark", () => ctx.Mark is { } m ? System.Numerics.Vector3.Distance(m, ctx.Player.Position) : throw new CommandException("no mark set"));
         ctx.AddProbe("player.held_count", () => ctx.Player.State.Inventory.Held.Count);
+        ctx.AddProbe("player.hotbar", () => ctx.Player.State.Inventory.SelectedHotbar); // 0-based
         ctx.AddProbe("time.hour", () => w.Session.Clock.Hour);
         ctx.AddProbe("time.day", () => w.Session.Clock.IsDay ? 1 : 0);
         ctx.AddProbe("drops.count", () => w.Drops.Items.Count);

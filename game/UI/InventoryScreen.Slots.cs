@@ -11,7 +11,7 @@ namespace Strata.Game.UI;
 /// and the rounds left on bows and guns. Every click goes to <see cref="GameWorld.ClickSlot"/> (right click equips,
 /// swaps with vanity, opens crates or takes one; Ctrl trashes, Alt favourites, Shift quick-moves); a held right click
 /// keeps taking one at <see cref="HoldRepeat"/>'s quickening pace (the view repeats it while items keep moving); moving
-/// items makes Terraria's grab sound; and a click outside every panel throws the held stack (right: one).
+/// items makes Terraria's grab sound. A click outside every panel throws the held stack (<see cref="WorldClickCatcher"/>).
 /// </summary>
 public sealed partial class InventoryScreen
 {
@@ -127,15 +127,6 @@ public sealed partial class InventoryScreen
                 Audio.Sfx.Play("coins");
                 break;
         }
-    }
-
-    /// <summary>A click that no panel took, with a stack on the cursor, throws it where the player looks (right click: one).</summary>
-    private bool ThrowCursor(InputEventMouseButton mb)
-    {
-        if (mb.ButtonIndex is not (MouseButton.Left or MouseButton.Right) || _ui.Inventory.Cursor.IsEmpty) return false;
-        _ui.Game.ThrowCursor(_ui.Entity, one: mb.ButtonIndex == MouseButton.Right);
-        _crafting.Refresh();
-        return true;
     }
 
     private void ToggleVanity()
