@@ -123,10 +123,25 @@ public sealed class ShootProjectileParams : SpecParams, IValidatableSpec
     /// <summary>The live-projectile limit for a projectile that returns after <paramref name="returns"/> ticks (0 = none).</summary>
     public int Limit(int returns) => MaxActive ?? (returns > 0 ? 1 : 0);
 
+    /// <summary>
+    /// Where the shot starts: "muzzle" (the weapon's business end, the default), "sky" (<see cref="SkyHeight"/> above the
+    /// crosshair point, scattered by <see cref="SkyScatter"/>, falling onto it: Starfury, Daedalus Stormbow, Star Wrath),
+    /// "cursor" (at the crosshair point) or "eye". Minions always appear at the crosshair point.
+    /// </summary>
+    public string From { get; init; } = "muzzle";
+
+    /// <summary>Metres above the crosshair point a sky shot starts.</summary>
+    public float SkyHeight { get; init; } = 16f;
+
+    /// <summary>Metres a sky shot's start may stray sideways (it still falls onto the crosshair point).</summary>
+    public float SkyScatter { get; init; } = 3f;
+
     public string? Validate() =>
         Count < 1 ? "count must be >= 1"
         : MaxActive < 0 ? "maxActive must be >= 0"
-        : MaxActive > 0 && Count > MaxActive ? "count must not exceed maxActive (the weapon could never fire)" : null;
+        : MaxActive > 0 && Count > MaxActive ? "count must not exceed maxActive (the weapon could never fire)"
+        : From is not ("muzzle" or "sky" or "cursor" or "eye") ? "from must be muzzle, sky, cursor or eye"
+        : SkyHeight is <= 0f or > 64f || SkyScatter is < 0f or > 16f ? "skyHeight must be within (0, 64] and skyScatter within [0, 16]" : null;
 }
 
 public sealed class ToolParams : SpecParams

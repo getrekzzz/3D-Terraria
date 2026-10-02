@@ -51,7 +51,7 @@
       "behaviors": [{ "type": "meleeSwing", "arc": 160, "length": 3.0 }], "covers": ["terraria:cactus_sword"] },
     { "id": "starfury", "name": "Starfury", "description": "Causes stars to rain from the sky.", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "swing", "useTime": 20, "useAnimation": 20, "autoReuse": true,
       "damage": 22, "damageType": "melee", "knockback": 5, "projectile": "starfury_star", "shootSpeed": 18, "heldLight": [10, 9, 3],
-      "behaviors": [{ "type": "meleeSwing", "arc": 170, "length": 3.4 }, { "type": "shootProjectile" }], "covers": ["terraria:starfury"] },
+      "behaviors": [{ "type": "meleeSwing", "arc": 170, "length": 3.4 }, { "type": "shootProjectile", "from": "sky" }], "covers": ["terraria:starfury"] },
     { "id": "muramasa", "name": "Muramasa", "category": "weapon", "rarity": 2, "value": 27000, "useStyle": "swing", "useTime": 18, "useAnimation": 18, "autoReuse": true,
       "damage": 19, "damageType": "melee", "knockback": 1, "heldLight": [3, 5, 12], "behaviors": [{ "type": "meleeSwing", "arc": 180, "length": 3.4 }], "covers": ["terraria:muramasa"] },
     { "id": "blade_of_grass", "name": "Blade of Grass", "description": "Has a chance to poison enemies.", "category": "weapon", "rarity": 3, "value": 27000, "useStyle": "swing", "useTime": 30, "useAnimation": 30,
@@ -88,7 +88,7 @@
 
     { "id": "flintlock_pistol", "name": "Flintlock Pistol", "category": "weapon", "value": 50000, "tags": ["shop"], "useStyle": "gun", "useTime": 13, "useAnimation": 13,
       "damage": 10, "damageType": "ranged", "knockback": 1.5, "useAmmo": "bullet", "shootSpeed": 45, "covers": ["terraria:flintlock_pistol"] },
-    { "id": "minishark", "name": "Minishark", "description": "Half shark, half gun, completely awesome.", "category": "weapon", "rarity": 2, "value": 350000, "tags": ["shop"], "useStyle": "gun", "useTime": 8, "useAnimation": 8,
+    { "id": "minishark", "ammoSaveChance": 0.33, "name": "Minishark", "description": "Half shark, half gun, completely awesome.", "category": "weapon", "rarity": 2, "value": 350000, "tags": ["shop"], "useStyle": "gun", "useTime": 8, "useAnimation": 8,
       "autoReuse": true, "damage": 6, "damageType": "ranged", "useAmmo": "bullet", "shootSpeed": 45, "behaviors": [{ "type": "shootProjectile", "spread": 3 }], "covers": ["terraria:minishark"] },
     { "id": "boomstick", "name": "Boomstick", "description": "Fires a spread of bullets.", "category": "weapon", "rarity": 2, "value": 20000, "useStyle": "gun", "useTime": 48, "useAnimation": 48,
       "damage": 14, "damageType": "ranged", "knockback": 5.5, "useAmmo": "bullet", "shootSpeed": 40, "behaviors": [{ "type": "shootProjectile", "count": 4, "spread": 9 }], "covers": ["terraria:boomstick"] },

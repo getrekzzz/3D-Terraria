@@ -16,6 +16,9 @@ public sealed class Projectile
     public required ProjectileDef Def { get; init; }
     public Vector3 Position;
     public Vector3 Velocity;
+
+    /// <summary>Where the shot started (the muzzle, the sky…), for muzzle flashes and trails.</summary>
+    public Vector3 SpawnOrigin;
     public required PlayerEntity? Owner { get; init; }
     public required int Damage { get; init; }
     public required float Knockback { get; init; }
@@ -91,13 +94,15 @@ public sealed partial class ProjectileSystem
     /// <summary>An explosion went off (position, radius in metres) — flash, smoke and sound.</summary>
     public event Action<Vector3, float>? Exploded;
 
-    /// <summary>A shot leaves the weapon hand (<see cref="ShotGeometry"/>) and flies at the crosshair point, spread around that line.</summary>
+    /// <summary>
+    /// A shot leaves the weapon's business end (or falls from the sky, or appears at the crosshair: <see cref="ShotStart"/>)
+    /// and flies at the crosshair point, spread around that line.
+    /// </summary>
     private void Fire(ShotRequest shot)
     {
         var p = shot.Player;
         var spread = shot.Weapon.Shoot!.Spread * MathF.PI / 180f;
-        var from = ShotGeometry.Origin(_world.Session.World, p);
-        var dir = ShotGeometry.Direction(p, from);
+        var (from, dir) = ShotStart(shot);
         if (spread > 0)
         {
             var side = Vector3.Normalize(Vector3.Cross(dir, Vector3.UnitY) + new Vector3(1e-4f, 0, 0));
@@ -105,7 +110,8 @@ public sealed partial class ProjectileSystem
             dir = Vector3.Normalize(dir + side * _rng.NextSigned() * spread + up * _rng.NextSigned() * spread * 0.5f);
         }
         var item = shot.Weapon.Item;
-        Spawn(shot.Projectile, from, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
+        var fired = Spawn(shot.Projectile, from, dir * MathF.Max(shot.Speed, 1f), p, shot.Damage, shot.Knockback, item.DamageType, Math.Max(item.Crit, shot.Crit) + Combat.DamageModel.BaseCritChance, item);
+        fired.SpawnOrigin = from;
     }
 
     public Projectile Spawn(ProjectileDef def, Vector3 position, Vector3 velocity, PlayerEntity? owner, int damage, float knockback, DamageClass damageClass, int crit, ItemDef? source = null, Items.MiscSlot? petSlot = null)

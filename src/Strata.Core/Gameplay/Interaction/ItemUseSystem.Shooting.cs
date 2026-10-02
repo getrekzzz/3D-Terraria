@@ -53,7 +53,7 @@ public sealed partial class ItemUseSystem
             if (!state.Vitals.TrySpendMana(cost)) return UseOutcome.NoMana;
         }
         // Ammo is only used up by a shot that actually fires (and, for a per-burst gun, only by the burst's first).
-        if (ammo is { Consumable: true } && !(followUp && item.AmmoPerBurst) && ammoSlot is { } from && !_ammoRng.Chance(state.Effects.Stats.Bonus(StatIds.AmmoSave))) from.Inv.Take(from.Slot, 1);
+        if (ammo is { Consumable: true } && !(followUp && item.AmmoPerBurst) && ammoSlot is { } from && !_ammoRng.Chance(state.Effects.Stats.Bonus(StatIds.AmmoSave) + item.AmmoSaveChance)) from.Inv.Take(from.Slot, 1);
         int damage = Prefixes.Damage(held) + (ammo?.Damage ?? 0);
         float knockback = Prefixes.Knockback(held) + (ammo?.Knockback ?? 0f);
         for (int i = 0; i < shot.Count; i++)

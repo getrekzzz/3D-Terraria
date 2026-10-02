@@ -116,6 +116,11 @@ Review-fix commit: 1313 Core tests, validate, basic smoke and menu tour pass.
 
 CI (push 9, after merging P3-02): GREEN — 1378 Core tests, content checks, Godot import, all smoke scripts, menu tour.
 
+## Weapon and projectile chain (handed over by integration)
+| WP | State | Notes |
+|---|---|---|
+| P3-09' shots leave the weapon | done | Muzzle at the use style's `holdout` (gun, bow, staff, tome, throw; else ShotGeometry's hand) with ShotGeometry's wall fallback; `shootProjectile.from` (`muzzle`/`sky`/`cursor`/`eye`, `skyHeight` 16 m, `skyScatter` 3 m): Starfury, Daedalus Stormbow and Star Wrath rain from the sky onto the crosshair; minions appear at the crosshair (≤ 12 m, 1 m short of surfaces); `ammoSaveChance` (Minishark 0.33, Megashark 0.5, Vortex Beater / Phantasm / S.D.M.G. 0.66; validated); `Projectile.SpawnOrigin` for visuals. Sword+shot, MaxActive and dry fire stay P1-16/P1-15's. `ShotTests`, combat.cmds Starfury section. |
+
 ### Gaps / notes for integration
 * The boss-defeat music stinger is left to X-02 (integration owns "victory sting"); `boss_defeated` SFX still plays.
 * Props (furniture, trees) do not get wet — only terrain (prop_common is shared with the art session); glass and

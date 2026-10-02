@@ -58,6 +58,19 @@ assert projectiles.count >= 1
 wait 1.0
 assert inv.wooden_arrow == 49
 
+# P3-09': Starfury swings and rains a star from the sky onto the crosshair.
+killall
+give starfury 1
+wield starfury
+spawn zombie 1 3
+aim 0 0 1
+use
+wait 0.05
+assert projectiles.count >= 1
+wait 1
+killall
+assert errors == 0
+
 # Death and respawn.
 killall
 kill

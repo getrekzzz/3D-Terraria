@@ -18,6 +18,7 @@ public static partial class ContentValidator
                 ctx.Error(i, "ammoPerBurst needs useAmmo and a burst (useTime < useAnimation).");
             if (i.Damage > 0 && i.DamageType == DamageClass.None) ctx.Error(i, "damage > 0 requires damageType.");
             if (i.Crit is < 0 or > 100) ctx.Error(i, "crit must be 0–100.");
+            if (i.AmmoSaveChance is < 0f or > 1f || (i.AmmoSaveChance > 0f && i.UseAmmo == null)) ctx.Error(i, "ammoSaveChance must be within 0–1 and needs useAmmo.");
             if (i.MineBrush is < 1 or > 8) ctx.Error(i, "mineBrush must be 1–8.");
             if (i.Rarity is < -13 or > 13) ctx.Error(i, "rarity must be -13–13 (Terraria's rarity tiers).");
             if (i.Buff != null && ctx.Db.Buffs.TryGet(i.Buff.Id, out var granted) && !Describable(granted, ctx.Db))
