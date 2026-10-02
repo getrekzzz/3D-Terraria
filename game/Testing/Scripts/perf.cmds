@@ -27,8 +27,15 @@ probe perf.gc2
 probe perf.calls.stream.unload_flush
 probe perf.max.stream.unload_flush
 
-# A full save on the main thread (what the autosave does every two minutes).
+# A full synchronous save (Save & Quit), then the autosave path: captured on the main thread, written in the background.
 save
+setblock 3 0 3 stone
+save async
+wait 1
+wait_until save.in_flight == 0 300
+assert perf.calls.tick.autosave > 0
+probe perf.max.tick.autosave
+probe perf.max.stream.unload_flush
 
 # A flat arena, then ten torches, one per frame (remeshes, collider and tile-object rebuilds, light).
 fill -10 -3 -10 10 -1 10 stone

@@ -31,6 +31,25 @@ public sealed class ExploredMap
 
     public IReadOnlyDictionary<int, MapTile> Tiles => _tiles;
 
+    /// <summary>Changed since it was loaded or last queued for saving (set by every pixel write).</summary>
+    public bool Dirty { get; set; }
+
+    /// <summary>A deep copy for saving on another thread (the live map keeps changing on the main thread).</summary>
+    public ExploredMap Snapshot()
+    {
+        var copy = new ExploredMap(Width * CellsPerPixel, Depth * CellsPerPixel);
+        foreach (var (key, t) in _tiles)
+        {
+            var c = new MapTile(t.X, t.Z) { Version = t.Version };
+            t.Surface.CopyTo(c.Surface, 0);
+            t.SurfaceY.CopyTo(c.SurfaceY, 0);
+            t.Cave.CopyTo(c.Cave, 0);
+            t.CaveY.CopyTo(c.CaveY, 0);
+            copy._tiles[key] = c;
+        }
+        return copy;
+    }
+
     public static int TileKey(int tx, int tz) => tz << 16 | tx;
 
     public MapTile? TileAt(int tx, int tz) => _tiles.GetValueOrDefault(TileKey(tx, tz));
@@ -46,6 +65,7 @@ public sealed class ExploredMap
         t.Surface[i] = value;
         t.SurfaceY[i] = height;
         t.Version++;
+        Dirty = true;
         return true;
     }
 
@@ -56,6 +76,7 @@ public sealed class ExploredMap
         t.Cave[i] = value;
         t.CaveY[i] = y;
         t.Version++;
+        Dirty = true;
         return true;
     }
 
@@ -82,8 +103,11 @@ public sealed class ExploredMap
     {
         var ids = new SortedSet<int>();
         foreach (var t in _tiles.Values)
-            foreach (var v in t.Surface.Concat(t.Cave))
-                if (MapValue.IsBlockish(v)) ids.Add(MapValue.BlockId(v));
+            for (int i = 0; i < t.Surface.Length; i++)
+            {
+                if (MapValue.IsBlockish(t.Surface[i])) ids.Add(MapValue.BlockId(t.Surface[i]));
+                if (MapValue.IsBlockish(t.Cave[i])) ids.Add(MapValue.BlockId(t.Cave[i]));
+            }
         using var buffer = new MemoryStream();
         using (var z = new DeflateStream(buffer, CompressionLevel.Optimal, leaveOpen: true))
         using (var w = new BinaryWriter(z))

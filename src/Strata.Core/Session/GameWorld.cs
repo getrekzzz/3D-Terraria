@@ -97,7 +97,7 @@ public sealed partial class GameWorld : IDisposable
 
     public PlayerEntity? LocalPlayer => Players.Count > 0 ? Players[0] : null;
 
-    /// <summary>Raised after an autosave with the number of chunks written.</summary>
+    /// <summary>Raised on the main thread when an autosave has been written, with the number of chunks saved.</summary>
     public event Action<int>? Autosaved;
 
     public event Action<PlayerEntity>? PlayerDied;
@@ -157,8 +157,8 @@ public sealed partial class GameWorld : IDisposable
         if (Session.Clock.Tick % 600 == 0) Editor.Damage.Prune(Session.Clock.Tick);
         if (++_autosaveCounter >= AutosaveTicks)
         {
-            _autosaveCounter = 0;
-            using (prof.Time("tick.autosave")) Autosaved?.Invoke(SaveAll());
+            // Captures on this thread, writes in the background; retried next tick while the last one is still landing.
+            if (BeginAutosave()) _autosaveCounter = 0;
         }
     }
 
@@ -236,12 +236,6 @@ public sealed partial class GameWorld : IDisposable
         if (state.SpawnPoints.TryGetValue(Session.Settings.Name, out var bed) && bed.Length == 3) cell = new Int3(bed[0], bed[1], bed[2]);
         cell = Session.FindStandableNear(cell);
         return new Vector3(cell.X + 0.5f, cell.Y, cell.Z + 0.5f) * Units.CellSize;
-    }
-
-    public void Shutdown()
-    {
-        SaveAll();
-        Streamer.UnloadAll();
     }
 
     public void Dispose()

@@ -34,6 +34,7 @@ internal static class StandardProbes
         ctx.AddProbe("chunks.loaded", () => w.Streamer.LoadedCount);
         ctx.AddProbe("chunks.meshed", () => w.Streamer.MeshedCount);
         ctx.AddProbe("stream.idle", () => w.Streamer.IsIdle && w.Jobs.Idle ? 1 : 0);
+        ctx.AddProbe("save.in_flight", () => w.Session.Saver is { InFlight: true } || w.AutosaveInFlight ? 1 : 0);
         ctx.AddProbe("objects.count", () => w.Session.World.TileObjects.Count);
         ctx.AddProbe("npcs.count", () => w.Npcs.All.Count);
         ctx.AddProbe("npcs.alive_life", () => w.Npcs.All.Sum(n => n.Life));

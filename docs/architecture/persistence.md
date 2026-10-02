@@ -11,9 +11,14 @@
   buffs, permanent upgrades, deaths, bed spawn per world. Unknown item ids become placeholders that keep
   their string so re-saving never loses data.
 * All writes are atomic (temp file + rename) with a `.bak` of the previous version read as a fallback.
-* Autosave every 2 minutes and on exit; chunks leaving the streaming range are saved when modified.
-* Single writer: every world file (regions, `world.json`, and from P1b-07 the player and map files written during
-  play) goes through `WorldSaver`, one background thread (`strata-saver`). The main thread only captures
+* Autosave every 2 minutes and on exit; chunks leaving the streaming range are saved when modified. Both are
+  asynchronous: `GameWorld.BeginAutosave` (timed as `tick.autosave`) only captures chunk snapshots, world state, player
+  JSON and deep copies of changed maps (`ExploredMap.Dirty`/`Snapshot`); encoding, map compression and disk writes run
+  on the save thread, and `Autosaved` fires on the main thread when the batch lands (a new autosave waits for the last
+  one). Unloaded chunks are queued without blocking (`stream.unload_flush`). `SaveAll` (the `save` command, Save &
+  Quit) and `Shutdown` (waits for a running autosave, saves, unloads, flushes) stay synchronous; `save async` runs
+  the autosave path.
+* Single writer: every world file (regions, `world.json`, and the player and map files written during play) goes through `WorldSaver`, one background thread (`strata-saver`). The main thread only captures
   `ChunkSnapshot`s (immutable voxel data + the encoded object section, `WorldSession.Capture`); the saver encodes them,
   publishes the blobs to `WorldSaveStore`'s region cache (copy-on-write, authoritative for this session, so loads
   never wait on disk), writes region files, then `world.json` with the current id tables (after the blobs, so every id

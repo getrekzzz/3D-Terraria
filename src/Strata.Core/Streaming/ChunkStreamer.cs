@@ -116,5 +116,6 @@ public sealed partial class ChunkStreamer
     {
         foreach (var coord in _entries.Keys.ToList()) Unload(coord);
         FlushSaves();
+        _session.Saver?.Flush();
     }
 }

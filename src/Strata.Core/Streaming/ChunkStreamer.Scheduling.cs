@@ -160,7 +160,7 @@ public sealed partial class ChunkStreamer
     {
         if (_pendingSaves.Count == 0) return;
         using var profile = Diagnostics.Metrics.Frame.Time("stream.unload_flush");
-        _session.SaveUnloaded(_pendingSaves, wait: true);
+        _session.SaveUnloaded(_pendingSaves, wait: false);
         _pendingSaves.Clear();
     }
 }
