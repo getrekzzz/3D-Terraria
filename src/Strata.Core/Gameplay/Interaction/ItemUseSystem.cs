@@ -158,6 +158,12 @@ public sealed partial class ItemUseSystem
         {
             outcome = inReach == null ? UseOutcome.OutOfReach : UsePaint(p, info.Painting!, inReach);
         }
+        else if (info.Has(ItemAction.PlantGrass)) outcome = inReach == null ? UseOutcome.OutOfReach : PlantGrass(p, info.Garden!, inReach);
+        else if (info.Has(ItemAction.License)) outcome = UseLicense(p, info.License!);
+        else if (info.Has(ItemAction.HairDye))
+        {
+            outcome = DyeHair(p, info.HairDye!);
+        }
         else if (info.Has(ItemAction.Ride))
         {
             outcome = ToggleMount(p, info);

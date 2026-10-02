@@ -160,8 +160,11 @@ public static class LandmarkIds
     /// <summary>The cell of the Dungeon's first spike (planned only when it has any).</summary>
     public const string DungeonSpikes = "dungeon_spikes";
 
+    /// <summary>The Dungeon's <c>bound_npc</c> site: the floor cell where the bound Mechanic waits (RoomKind.Mechanic).</summary>
+    public const string DungeonMechanic = "dungeon_mechanic";
+
     public static readonly IReadOnlySet<string> All = new HashSet<string>
     {
-        DungeonGate, DungeonBottom, DungeonChest, DungeonFoyer, DungeonShaft, DungeonLibrary, DungeonTreasure, DungeonBanner, DungeonHall, DungeonSpikes,
+        DungeonMechanic, DungeonGate, DungeonBottom, DungeonChest, DungeonFoyer, DungeonShaft, DungeonLibrary, DungeonTreasure, DungeonBanner, DungeonHall, DungeonSpikes,
     };
 }

@@ -76,6 +76,7 @@ public sealed class TestGame : IDisposable
 
         var player = PlayerState.CreateNew("tester", session.Content);
         world.AddPlayer(player, CellFeet(floor + Int3.Up));
+        world.Town.DefenseEnabled = false; // the starter guide would shoot every test's creatures; TownFightBackTests turn it on
         return new TestGame(world, floor);
     }
 

@@ -23,6 +23,10 @@ public sealed partial class SoundEvents
         {
             if (p == _local) Sfx.Play("splash");
         };
+        game.Achievements.Unlocked += (p, _) =>
+        {
+            if (p == _local) Sfx.Play("achievement");
+        };
         game.ItemUse.Recalled += (p, _) =>
         {
             if (p == _local) Sfx.Play("teleport");

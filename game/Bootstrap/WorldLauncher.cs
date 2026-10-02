@@ -35,6 +35,9 @@ public sealed class LaunchedWorld
 
     /// <summary>The stack held on the cursor, drawn at the pointer.</summary>
     public UI.CursorItemLayer? CursorItem { get; init; }
+
+    /// <summary>The haircut and housing screens (P5-21, P5-29).</summary>
+    public UI.TownPanels? TownPanels { get; init; }
 }
 
 /// <summary>What to open: a world directory (created from <see cref="NewWorld"/> when missing) and a character.</summary>
@@ -99,12 +102,12 @@ public static partial class WorldLauncher
         combatEffects.Follow(entity, player);
         var avatar = AddPlayerVisuals(runtime, services, game, props, entity, player);
         var interaction = AddInteraction(runtime, game, entity, player);
-        var (hud, inventory, worldMap, townDialog, photo, tooltip, cursorItem) = AddUi(runtime, game, player, interaction, objectRenderer);
+        var (hud, inventory, worldMap, townDialog, photo, tooltip, cursorItem, town) = AddUi(runtime, game, player, interaction, objectRenderer);
         return new LaunchedWorld
         {
             Runtime = runtime, Props = props, Objects = objectRenderer, Player = player, Avatar = avatar, Interaction = interaction,
             Inventory = inventory, Hud = hud, TownDialog = townDialog, WorldMap = worldMap, PhotoMode = photo, Tooltip = tooltip,
-            CursorItem = cursorItem,
+            CursorItem = cursorItem, TownPanels = town,
         };
     }
 

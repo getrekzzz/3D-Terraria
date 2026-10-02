@@ -196,4 +196,17 @@ public class ContentValidatorTests
         Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("rarity") && e.Message.Contains("odd_potion"));
         Assert.Contains(db.Report.Warnings, w => w.Message.Contains("buff 'mystery' has no description"));
     }
+
+    [Fact]
+    public void TownConditionsCheckTheirReferences()
+    {
+        var db = Load("""
+            { "townNpcs": [ { "id": "dyer", "names": ["Ana"], "lines": [ { "text": "Hi." } ],
+                "arrival": [ { "type": "hasItem", "category": "paint" }, { "type": "rescued", "id": "nobody" },
+                             { "type": "season", "is": "easter" } ] } ] }
+            """);
+        AssertError(db, "hasItem category 'paint' is not an item category");
+        AssertError(db, "'nobody'");
+        AssertError(db, "season must be one of");
+    }
 }

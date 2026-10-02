@@ -58,6 +58,8 @@ public static partial class ContentValidator
                     ctx.Ref(i, ctx.Db.Buffs, whip.TagBuff, "whip.tagBuff");
                     ctx.Ref(i, ctx.Db.Buffs, whip.Inflict, "whip.inflict");
                 }
+                if (b.Type == Specs.ItemBehaviorSpecs.PlantGrass && ctx.TryParse<Specs.PlantGrassParams>(SpecKind.ItemBehavior, b) is { } garden)
+                    foreach (var block in garden.On.Append(garden.Grass)) ctx.Ref(i, ctx.Db.Blocks, block, "plantGrass");
                 if (b.Type == Specs.ItemBehaviorSpecs.ReleaseCritter && ctx.TryParse<Specs.ReleaseCritterParams>(SpecKind.ItemBehavior, b) is { } release)
                     ctx.Ref(i, ctx.Db.Enemies, release.Enemy, "releaseCritter.enemy");
                 if (i.NoMelee && b.Type is Specs.ItemBehaviorSpecs.MeleeSwing or Specs.ItemBehaviorSpecs.Thrust)

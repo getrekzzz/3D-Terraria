@@ -8,7 +8,7 @@ namespace Strata.Core.Gameplay.Entities;
 public sealed partial class NpcSystem
 {
     /// <summary>Fires the creature's ranged volley at its target when in range, in sight and off cooldown.</summary>
-    private void RangedAttack(Npc npc, PlayerEntity target, float distance)
+    private void RangedAttack(Npc npc, Combat.ICombatTarget target, float distance)
     {
         var r = npc.Def.Ranged!;
         if (npc.Enraged && r.Enraged != null) r = r.Enraged;
@@ -30,10 +30,7 @@ public sealed partial class NpcSystem
             ? (int)MathF.Round(r.Interval + (fastest - r.Interval) * (1f - npc.Life / (float)npc.MaxLife))
             : r.Interval;
         if (parts) npc.PartCursor++;
-        var to = target.Center + new Vector3(0, 0.3f, 0);
-        float flight = Vector3.Distance(from, to) / r.Speed;
-        to.Y += 0.5f * def.Gravity * flight * flight; // lob gravity-bound projectiles
-        var dir = Vector3.Normalize(to - from);
+        var dir = Combat.Ballistics.Aim(from, target.Center + new Vector3(0, 0.3f, 0), r.Speed, def.Gravity); // lob gravity-bound projectiles
         float spread = r.Spread * MathF.PI / 180f;
         for (int i = 0; i < r.Count; i++)
         {

@@ -33,6 +33,7 @@ public sealed partial class SoundEvents : Node
         WireCreatures(game);
         WirePlayer(game);
         InitializeLocks();
+        WireTown(game);
     }
 
     public override void _Process(double delta)

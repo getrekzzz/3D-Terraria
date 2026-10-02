@@ -23,7 +23,7 @@ public static class Prefixes
             DamageClass.Ranged => new[] { "universal", "common", "ranged" },
             DamageClass.Magic or DamageClass.Summon => new[] { "universal", "common", "magic" },
             // Swords and shortswords (Terraria gives both the melee group: size and speed); spears stay common only.
-            _ when item.IsTool || item.DamageType == DamageClass.Melee && item.UseStyle is UseStyle.Swing or UseStyle.Rapier => new[] { "universal", "common", "melee" },
+            _ when item.IsTool || item.DamageType == DamageClass.Melee && UseStyleRules.Resolve(item) is UseStyle.Swing or UseStyle.Rapier => new[] { "universal", "common", "melee" },
             _ => new[] { "universal", "common" },
         };
     }

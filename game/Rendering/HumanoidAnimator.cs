@@ -101,6 +101,9 @@ public sealed partial class HumanoidAnimator
 
     public string State => _state;
 
+    /// <summary>The locomotion state the tree is actually in (what is playing, as opposed to <see cref="State"/>, the request).</summary>
+    public string PlayingState => _tree.Get("parameters/loco/current_state").AsString();
+
     /// <summary>The action playing over the upper body, or null.</summary>
     public string? Action { get; private set; }
 

@@ -29,7 +29,87 @@ time 21
 wait_until town.guide.home < 0.8 60
 wait 2
 assert town.guide.home < 0.3
+# P5-11: home for the night, the guide takes the room's chair.
+wait_until town.guide.sitting == 1 30
 time noon
+wait_until town.guide.sitting == 0 10
+
+# --- P5-01 ---
+# A slain resident stays dead through the night and returns at dawn.
+town slay guide
+assert town.guide.alive == 0
+time 3
+wait 1
+assert town.guide.alive == 0
+time 5
+wait_until town.guide.alive == 1 10
+time noon
+
+# --- P5-02 ---
+# Corruption under the house makes it invalid ("This housing is corrupted."); cleansed, the guide moves back in.
+fill 3 -3 -5 13 -2 5 ebonstone
+wait_until town.guide.home < 0 20
+fill 3 -3 -5 13 -2 5 stone
+town check force
+assert town.homed == 1
+
+# --- P5-03 ---
+season christmas
+assert season.id == 2
+season off
+assert season.id == 0
+season auto
+
+# --- P5-05 ---
+# The housing API: evict the guide (the room reads suitable again), then assign him back.
+housing evict guide
+assert town.guide.homed == 0
+housing query 8 1 0
+housing assign guide 8 1 0
+assert town.guide.homed == 1
+
+# --- P5-13 ---
+# The Dryad's Status service reports the world's purity (the chat button arrives with the W4 dialog).
+town summon dryad 0 0 -3
+town services dryad
+town status dryad
+# W4 chat box: the Dryad's Status button answers in the box.
+ui talk dryad
+ui service worldStatus
+assert ui.talk_open == 1
+ui close
+# --- P5-15 ---
+# The Dryad sells Terraria's grass seeds.
+give copper_coin 30
+town buy dryad grass_seeds
+assert inv.grass_seeds == 1
+town dismiss dryad
+# --- P5-16 ---
+# The Painter's paintings are under his Decor tab; the Tavernkeep takes Defender Medals for Ale.
+town summon painter 2 0 -3
+give copper_coin 99
+give silver_coin 14
+# W4 grid shop: the Decor button opens the Painter's paintings tab, and a click buys one.
+ui talk painter
+ui shop decor
+assert ui.shop_slots > 0
+ui buy land
+ui close
+assert inv.land == 1
+town dismiss painter
+give defender_medal 3
+town summon tavernkeep 2 0 -3
+ui talk tavernkeep
+ui shop
+ui buy ale
+ui close
+assert inv.ale == 1
+assert inv.defender_medal == 2
+town dismiss tavernkeep
+# Back to the starting kit's 25 torches and an empty purse for the trading checks below.
+clear
+give torch 25
+assert errors == 0
 
 # Talking and trading with the peddler.
 give silver_coin 60
@@ -96,4 +176,86 @@ assert time.scale == 1
 wait_until player.sleeping == 0 10
 killall
 time noon
+
+# --- P5-10 ---
+# Residents fight back: the Arms Dealer shoots a zombie that comes near.
+god on
+time noon
+town summon arms_dealer 0 0 2
+aim 0 0 -1
+spawn zombie 1 9
+wait_until town.arms_dealer.attacks > 0 15
+killall
+god off
+
+# --- P5-19 ---
+# The Travelling Merchant walks in (forced), trades from his rotating stock and walks off again.
+town visit travelling_merchant near
+wait 0.5
+assert town.travelling_merchant == 1
+ui talk travelling_merchant
+ui shop
+ui close
+town leave travelling_merchant
+assert errors == 0
+
+# --- P5-20 ---
+# A Cat License sets its flag once; a summoned cat can be petted and never counts as a resident.
+give license_cat
+wield license_cat
+use
+assert flag.license_cat == 1
+town summon town_cat 2 0 0
+assert town.town_cat == 1
+assert errors == 0
+
+# --- P5-34 ---
+# Pylons are placeable items; the network lists them (none placed in the smoke world).
+give forest_pylon
+assert inv.forest_pylon == 1
+town pylons
+assert town.pylons == 0
+assert errors == 0
+
+# --- X-05 ---
+# Emote bubbles: a resident emotes, the player emotes, and the counter rises.
+town emote love merchant
+town emote happy
+assert town.emotes_shown > 0
+assert errors == 0
+
+# --- P5-21 ---
+# The Stylist's haircut: the panel opens, a paid cut changes the look, and a hair dye is used.
+town summon stylist 1 0 -3
+town services stylist
+ui haircut stylist
+assert ui.haircut_open == 1
+ui close
+assert ui.haircut_open == 0
+give gold_coin 10
+town haircut stylist mohawk #3a6ab0
+give life_hair_dye 1
+assert inv.life_hair_dye == 1
+town dismiss stylist
+assert errors == 0
+
+# --- P5-22 ---
+# The Dye Trader swaps a Strange Plant for a rare dye.
+town summon dye_trader 1 0 -3
+give strange_plant_2 1
+town trade dye_trader
+assert inv.strange_plant_2 == 0
+town dismiss dye_trader
+assert errors == 0
+
+# --- P5-29 ---
+# The housing menu: banners for the residents, a room query, and banners hung in the occupied rooms while it is open.
+ui inventory
+ui housing
+assert ui.housing_open == 1
+assert ui.housing_banners > 0
+assert ui.housing_room_banners > 0
+ui housing_query 8 1 0
+ui close
+assert ui.housing_open == 0
 assert errors == 0

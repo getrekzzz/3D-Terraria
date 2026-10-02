@@ -20,6 +20,7 @@ public static class BuiltinCommands
         CombatCommands.Register(r);
         LiquidCommands.Register(r);
         TownCommands.Register(r);
+        HousingCommands.Register(r);
         InventoryCommands.Register(r);
         WorldCommands.Register(r);
         WeatherCommands.Register(r);
@@ -28,6 +29,8 @@ public static class BuiltinCommands
         FishingCommands.Register(r);
         SeasonCommands.Register(r);
         PerfCommands.Register(r);
+        GuideCommands.Register(r);
+        HintCommands.Register(r);
         return r;
     }
 

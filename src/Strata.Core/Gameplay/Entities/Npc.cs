@@ -109,6 +109,12 @@ public sealed class Npc
     /// <summary>Ticks until the next ranged volley.</summary>
     public int AttackTimer;
 
+    /// <summary>Ticks until the creature reconsiders which town resident to go after (P5-09).</summary>
+    internal int RetargetTicks;
+
+    /// <summary>The town resident it is going after instead of a player, if any.</summary>
+    internal Town.TownNpc? ResidentTarget;
+
     /// <summary>Where the creature spawned (anchored creatures stay near it).</summary>
     public Vector3 Anchor;
 

@@ -2,6 +2,8 @@
 # work; respawn works.
 wait_until player.frozen == 0 180
 spawning off
+# The starter guide would shoot the test creatures (P5-10); town.cmds covers residents fighting back.
+town defense off
 killall
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 7 10 air

@@ -1,0 +1,6 @@
+{
+ "comment": "P5-06 rescues: Purification Powder (frees the Tortured Soul; the Dryad sells it).",
+ "items": {"explicit": {
+  "purification_powder": {"generator": "blob", "params": {"color": "#9be8d8"}}
+ }}
+}

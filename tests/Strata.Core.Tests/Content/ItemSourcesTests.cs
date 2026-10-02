@@ -12,11 +12,7 @@ public class ItemSourcesTests
     /// Shipped items that no source gives yet, each with the work that makes it obtainable. Remove an id once that lands:
     /// the list must match exactly, so a new unobtainable item fails here instead of hiding behind a validate warning.
     /// </summary>
-    private static readonly string[] Pending =
-    {
-        "leather_whip", // sold by the Zoologist (P5-17)
-        "rally", // sold by the Skeleton Merchant (P5-19)
-    };
+    private static readonly string[] Pending = Array.Empty<string>();
 
     private static readonly Lazy<ItemSourceIndex> Shipped = new(() => ItemSourceIndex.Build(TestPaths.Content));
 
@@ -52,10 +48,12 @@ public class ItemSourcesTests
         var fromOld = db.Items.All.Where(i => old.Contains(i.Id)).Select(i => i.Id).ToHashSet();
         Assert.Empty(fromOld.Except(fromIndex));
         // Angler rewards are new: the fishing rods they give were only excused by a 'shop' tag before. Enemy banners
-        // (dropped every so many kills) are new too.
+        // (dropped every so many kills) are new too, and so is the Dye Trader's Strange Plant trade.
         var gained = fromIndex.Except(fromOld).ToList();
         Assert.NotEmpty(gained);
-        Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward
+        // Visitors' rotating pools (P5-19) were not read by the old check.
+        Assert.All(gained, id => Assert.Contains(index.For(id), s => s.Kind == ItemSourceKind.AnglerReward || s.Label == "Trade"
+            || (s.Kind == ItemSourceKind.Shop && (s.Owner is TownNpcDef { Visit: not null } || s.Label == "pylon"))
             || (s.Kind == ItemSourceKind.Drop && db.TileObjects.TryGet(id, out var t) && t.Banner != null)));
     }
 

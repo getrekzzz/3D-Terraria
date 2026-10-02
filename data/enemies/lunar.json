@@ -52,7 +52,7 @@
       "brain": { "type": "walker", "aggroRange": 60, "jumpHeight": 4 },
       "ranged": { "projectile": "goblin_arrow", "damage": 40, "speed": 22, "interval": 70, "range": 32 },
       "life": 1000, "damage": 40, "defense": 20, "knockbackResist": 0.5, "size": [1.4, 3.4], "moveSpeed": 2.6, "loot": "cultist_archer", "value": 1500, "covers": ["terraria:cultist_archer"] },
-    { "id": "lunatic_cultist_clone", "model": "lunatic_cultist", "tint": "#7a7aff", "name": "Ancient Cultist", "description": "An illusion of the Lunatic Cultist.",
+    { "id": "lunatic_cultist_clone", "bestiaryAs": "lunatic_cultist", "model": "lunatic_cultist", "tint": "#7a7aff", "name": "Ancient Cultist", "description": "An illusion of the Lunatic Cultist.",
       "brain": { "type": "caster", "aggroRange": 60, "teleportInterval": 200, "minBlink": 6, "maxBlink": 14 },
       "ranged": { "projectile": "shadow_fireball", "damage": 40, "speed": 12, "interval": 90, "range": 40 },
       "life": 400, "damage": 30, "defense": 20, "knockbackResist": 0.5, "size": [1.4, 3.4], "moveSpeed": 0.5, "gravity": false, "collideTerrain": false },
@@ -180,7 +180,7 @@
       "covers": ["terraria:moon_lord"]
     },
     {
-      "id": "moon_lord_head", "model": "moon_lord_head", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Head", "description": "Its great eye opens to burn.",
+      "id": "moon_lord_head", "bestiaryAs": "moon_lord", "model": "moon_lord_head", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Head", "description": "Its great eye opens to burn.",
       "brain": { "type": "pattern", "phases": [
         { "moves": [
           { "type": "wait", "ticks": 150, "volley": { "projectile": "phantasmal_bolt", "damage": 55, "speed": 22, "interval": 30, "count": 3, "spread": 8 } },
@@ -193,7 +193,7 @@
       "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220 }
     },
     {
-      "id": "moon_lord_hand", "model": "moon_lord_hand", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Hand", "description": "An eye stares from each palm.",
+      "id": "moon_lord_hand", "bestiaryAs": "moon_lord", "model": "moon_lord_hand", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Hand", "description": "An eye stares from each palm.",
       "brain": { "type": "pattern", "phases": [
         { "moves": [
           { "type": "wait", "ticks": 120, "volley": { "projectile": "phantasmal_eye", "damage": 50, "speed": 12, "interval": 40, "count": 3, "spread": 25 } },
@@ -204,7 +204,7 @@
       "onDeath": [{ "type": "spawnEnemies", "enemy": "true_eye_of_cthulhu", "count": 1 }],
       "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220 }
     },
-    { "id": "true_eye_of_cthulhu", "facing": "look", "model": "true_eye_of_cthulhu", "tags": ["lava_immune"], "name": "True Eye of Cthulhu", "description": "Freed from its lord's flesh; it will not be stopped.",
+    { "id": "true_eye_of_cthulhu", "bestiaryAs": "moon_lord", "facing": "look", "model": "true_eye_of_cthulhu", "tags": ["lava_immune"], "name": "True Eye of Cthulhu", "description": "Freed from its lord's flesh; it will not be stopped.",
       "brain": { "type": "flyer", "aggroRange": 200, "orbitRadius": 9, "dashSpeed": 12, "dashCooldown": 200, "bounceOffTerrain": false },
       "ranged": { "projectile": "phantasmal_bolt", "damage": 50, "speed": 20, "interval": 120, "count": 3, "spread": 10, "range": 40 },
       "life": 1, "invulnerable": true, "damage": 50, "knockbackResist": 1.0, "size": [3, 3], "moveSpeed": 7, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],

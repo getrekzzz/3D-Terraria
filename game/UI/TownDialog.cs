@@ -35,7 +35,6 @@ public sealed partial class TownDialog : CanvasLayer
     private Label _title = null!;
     private Label _text = null!;
     private HFlowContainer _buttons = null!;
-    private Button? _serviceButton;
     private TownNpc? _npc;
     private UiRect? _region;
     private double _labelWait;
@@ -106,7 +105,7 @@ public sealed partial class TownDialog : CanvasLayer
     /// <summary>Shop: the box hides and the inventory shows the resident's wares (commands and tests press it too).</summary>
     public void OpenShop()
     {
-        if (_npc is not { } npc || npc.Def.Shop.Length == 0) return;
+        if (_npc is not { } npc || !HasShop(npc)) return;
         HideBox();
         ShopRequested?.Invoke(npc);
     }
@@ -147,9 +146,9 @@ public sealed partial class TownDialog : CanvasLayer
         }
         town.HoldTalk(_npc, _ui.Entity);
         // A price on the service button follows the player (the Nurse's heal shrinks as life regenerates).
-        if ((_labelWait -= delta) > 0 || _serviceButton == null) return;
+        if ((_labelWait -= delta) > 0) return;
         _labelWait = LabelRefreshSeconds;
-        if (ServiceLabel(_npc) is { } label && label != _serviceButton.Text) SetLabel(_serviceButton, label);
+        RefreshServiceLabels();
     }
 
     /// <summary>Hides the box without ending the conversation (the shop carries it on).</summary>
@@ -157,7 +156,7 @@ public sealed partial class TownDialog : CanvasLayer
     {
         _root.Visible = false;
         _npc = null;
-        _serviceButton = null;
+        _serviceButtons.Clear();
         InputGate.SetOpen(Gate, false, GateKind.Overlay);
         LayoutChanged?.Invoke();
     }
@@ -178,10 +177,9 @@ public sealed partial class TownDialog : CanvasLayer
             b.QueueFree();
         }
         _buttonList.Clear();
-        _serviceButton = null;
         var npc = _npc!;
-        if (npc.Def.Shop.Length > 0) AddButton("Shop", OpenShop);
-        if (ServiceLabel(npc) is { } label) _serviceButton = AddButton(label, RunService);
+        if (HasShop(npc)) AddShopButtons(npc);
+        AddServiceButtons(npc);
         AddButton("Close", Close);
         _labelWait = LabelRefreshSeconds;
         Arrange();

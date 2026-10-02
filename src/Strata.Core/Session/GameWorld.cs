@@ -60,6 +60,8 @@ public sealed partial class GameWorld : IDisposable
         Objectives = new Gameplay.Progression.WorldObjectives(this);
         Rituals = new Gameplay.Progression.Rituals(this);
         Wires = new Gameplay.Wiring.WireSystem(this);
+        Journal = new Gameplay.Guide.JournalSystem(this);
+        Achievements = new Gameplay.Guide.AchievementTracker(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
         Editor.LightDirty += dirty => Streamer.MarkDirty(dirty, urgent: true, ChunkStreamer.LightPriority);
@@ -173,6 +175,11 @@ public sealed partial class GameWorld : IDisposable
         using (prof.Time("tick.town")) Town.Tick();
         using (prof.Time("tick.melee")) Melee.Tick();
         using (prof.Time("tick.projectiles")) Projectiles.Tick();
+        using (prof.Time("tick.journal"))
+        {
+            Journal.Tick();
+            Achievements.Tick();
+        }
         using (prof.Time("tick.world"))
         {
             Mutations.Tick();
@@ -276,6 +283,7 @@ public sealed partial class GameWorld : IDisposable
 
     public void Dispose()
     {
+        Achievements.Detach();
         Jobs.Dispose();
         Session.Dispose();
     }

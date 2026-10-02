@@ -57,6 +57,12 @@ public sealed class PlayerState
 
     public int Deaths { get; set; }
 
+    /// <summary>Angler quests completed by this character (P5-23).</summary>
+    public int AnglerQuests { get; set; }
+
+    /// <summary>Creatures seen, killed and caught, townsfolk met, items obtained and crafted, achievements.</summary>
+    public Guide.PlayerJournal Journal { get; } = new();
+
     /// <summary>Demon Heart used: the sixth accessory slot is open while in an Expert or Master world.</summary>
     public bool ExtraAccessorySlot { get; set; }
 
@@ -64,6 +70,11 @@ public sealed class PlayerState
     public bool MinecartUpgrade { get; set; }
 
     public Appearance Look { get; set; } = new();
+
+    /// <summary>The look changed in play (a haircut, a hair dye): the avatar re-applies it.</summary>
+    public event Action? LookChanged;
+
+    public void RaiseLookChanged() => LookChanged?.Invoke();
 
     public CharacterDifficulty Difficulty { get; set; }
 

@@ -176,6 +176,7 @@ public sealed partial class PlayerController : CharacterBody3D
         var before = GlobalPosition;
         MoveAndSlide();
         if (IsOnFloor() && IsOnWall() && wish.LengthSquared() > 0.01f) TryStepUp(before, wish);
+        Unbury();
         TrackFall();
         UpdateSounds(dt);
         Sync();

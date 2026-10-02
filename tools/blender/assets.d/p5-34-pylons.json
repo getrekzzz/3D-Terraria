@@ -1,0 +1,53 @@
+{
+ "comment": "P5-34: biome pylons (bgen/pylons.py): a stone plinth with a floating, glowing crystal in the biome's colour.",
+ "objects": {
+  "forest_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#5ad84a"
+   }
+  },
+  "snow_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#bfe8ff"
+   }
+  },
+  "desert_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#ffd060"
+   }
+  },
+  "jungle_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#9aff3a"
+   }
+  },
+  "ocean_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#3ab0ff"
+   }
+  },
+  "mushroom_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#4a7aff"
+   }
+  },
+  "hallow_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#ff8ae8"
+   }
+  },
+  "cavern_pylon": {
+   "generator": "pylon",
+   "params": {
+    "crystal": "#c08aff"
+   }
+  }
+ }
+}
