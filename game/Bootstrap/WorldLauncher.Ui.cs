@@ -7,11 +7,11 @@ namespace Strata.Game.Bootstrap;
 public static partial class WorldLauncher
 {
     /// <summary>
-    /// HUD, inventory, world map and minimap, town dialog, the performance overlay, the emote wheel and NPC voices, photo mode, and above every screen
+    /// HUD, inventory, world map and minimap, town dialog, the performance overlay, the emote wheel and NPC voices, photo mode, the town panels, and above every screen
     /// the held stack at the pointer and the item tooltip that follows it. Under the inventory and the town dialog, the
     /// empty screen catches the clicks their panels do not take (throw, use, camera drag).
     /// </summary>
-    private static (UI.Hud Hud, UI.InventoryScreen Inventory, UI.WorldMapScreen WorldMap, UI.TownDialog TownDialog, UI.PhotoMode.PhotoModeController Photo, UI.TooltipFollower Tooltip, UI.CursorItemLayer CursorItem) AddUi(
+    private static (UI.Hud Hud, UI.InventoryScreen Inventory, UI.WorldMapScreen WorldMap, UI.TownDialog TownDialog, UI.PhotoMode.PhotoModeController Photo, UI.TooltipFollower Tooltip, UI.CursorItemLayer CursorItem, UI.TownPanels Town) AddUi(
         WorldRuntime runtime, GameWorld game, PlayerController player, InteractionController interaction, TileObjectRenderer objectRenderer)
     {
         var ui = new UI.UiContext(game, player, interaction);
@@ -40,6 +40,10 @@ public static partial class WorldLauncher
         signs.Initialize(ui);
         townDialog.ShopRequested += inventory.OpenShop; // the chat box's Shop opens the inventory with the grid shop
         townDialog.ServiceRequested += inventory.OpenService; // and Reforge with the reforge slot
+        var town = UI.TownPanels.Create(runtime, ui);
+        townDialog.PanelRequested += town.Open; // the Stylist's Haircut
+        inventory.Equipment.HousingPressed += town.Housing.Toggle; // the equipment column's Housing tab
+        town.Housing.SetAnchor(inventory.Equipment);
         var perf = new UI.PerfOverlay();
         runtime.AddChild(perf);
         perf.Initialize(runtime, objectRenderer);
@@ -71,6 +75,6 @@ public static partial class WorldLauncher
         var tooltip = new UI.TooltipFollower();
         tooltip.Initialize(cursorItem);
         runtime.AddChild(tooltip);
-        return (hud, inventory, worldMap, townDialog, photo, tooltip, cursorItem);
+        return (hud, inventory, worldMap, townDialog, photo, tooltip, cursorItem, town);
     }
 }

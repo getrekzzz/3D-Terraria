@@ -47,9 +47,7 @@ public sealed partial class EquipmentPanel : Control
         AddChild(Defense = new DefenseBadge());
         AddChild(_equipTab = Tab("tab_equipment", "Equipment", () => ShowMisc(false)));
         AddChild(_miscTab = Tab("tab_misc", "Misc", () => ShowMisc(true)));
-        AddChild(_housingTab = Tab("tab_housing", "Housing (opens with the town's residents)", () => { }));
-        _housingTab.Disabled = true;
-        _housingTab.SelfModulate = new Color(1, 1, 1, 0.35f);
+        AddChild(_housingTab = Tab("tab_housing", "Housing", () => HousingPressed?.Invoke()));
         AddChild(_equipPage);
         for (int r = 0; r < Rows; r++)
         {
@@ -86,6 +84,9 @@ public sealed partial class EquipmentPanel : Control
 
     /// <summary>Raised when <see cref="AccessoryRows"/> changes: the screen is laid out again for the new height.</summary>
     public event Action? RowsChanged;
+
+    /// <summary>The Housing tab was pressed (the town's housing menu, P5-29, opens beside the column).</summary>
+    public event Action? HousingPressed;
 
     /// <summary>Shows the Misc page (pet, light pet, minecart, mount, hook) or the Equipment page.</summary>
     public void ShowMisc(bool misc)

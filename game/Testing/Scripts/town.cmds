@@ -195,3 +195,39 @@ town emote love merchant
 town emote happy
 assert town.emotes_shown > 0
 assert errors == 0
+
+# --- P5-21 ---
+# The Stylist's haircut: the panel opens, a paid cut changes the look, and a hair dye is used.
+town summon stylist 1 0 -3
+town services stylist
+ui haircut stylist
+assert ui.haircut_open == 1
+ui close
+assert ui.haircut_open == 0
+give gold_coin 10
+town haircut stylist mohawk #3a6ab0
+give life_hair_dye 1
+assert inv.life_hair_dye == 1
+town dismiss stylist
+assert errors == 0
+
+# --- P5-22 ---
+# The Dye Trader swaps a Strange Plant for a rare dye.
+town summon dye_trader 1 0 -3
+give strange_plant_2 1
+town trade dye_trader
+assert inv.strange_plant_2 == 0
+town dismiss dye_trader
+assert errors == 0
+
+# --- P5-29 ---
+# The housing menu: banners for the residents, a room query, and banners hung in the occupied rooms while it is open.
+ui inventory
+ui housing
+assert ui.housing_open == 1
+assert ui.housing_banners > 0
+assert ui.housing_room_banners > 0
+ui housing_query 8 1 0
+ui close
+assert ui.housing_open == 0
+assert errors == 0

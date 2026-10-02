@@ -11,6 +11,8 @@ public static class TownServiceSpecs
     public const string AnglerQuest = "anglerQuest";
     public const string Advice = "advice";
     public const string WorldStatus = "worldStatus";
+    public const string Haircut = "haircut";
+    public const string DyeTrade = "dyeTrade";
 
     public static void Register(SpecCatalog c)
     {
@@ -22,6 +24,8 @@ public static class TownServiceSpecs
         c.Register<AnglerQuestParams>(SpecKind.TownService, AnglerQuest);
         c.Register<AdviceParams>(SpecKind.TownService, Advice);
         c.Register<WorldStatusParams>(SpecKind.TownService, WorldStatus);
+        c.Register<HaircutParams>(SpecKind.TownService, Haircut);
+        c.Register<DyeTradeParams>(SpecKind.TownService, DyeTrade);
     }
 }
 

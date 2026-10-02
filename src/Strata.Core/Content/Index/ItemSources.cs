@@ -180,6 +180,10 @@ public sealed class ItemSourceIndex
             Root(e.Boss?.SegmentLoot, kind, e, null);
         }
         foreach (var npc in db.TownNpcs.All) Root(npc.Id + DeathTableSuffix, ItemSourceKind.Drop, npc, null);
+        // The Dye Trader's trade rolls its table for a Strange Plant (listed with the resident's wares, labelled "Trade").
+        foreach (var npc in db.TownNpcs.All)
+            if (npc.FindService(TownServiceSpecs.DyeTrade) is { } trade)
+                Root(trade.Raw.TryGetProperty("table", out var tt) && tt.ValueKind == JsonValueKind.String ? tt.GetString() : new DyeTradeParams().Table, ItemSourceKind.Shop, npc, "Trade");
         foreach (var t in db.TileObjects.All) Root(t.Loot, ItemSourceKind.Object, t, null);
         foreach (var i in db.Items.All)
             foreach (var b in i.Behaviors)

@@ -6970,6 +6970,10 @@
    "model": "assets/models/items/life_fruit.glb",
    "icon": "assets/icons/items/life_fruit.png"
   },
+  "life_hair_dye": {
+   "model": "assets/models/items/life_hair_dye.glb",
+   "icon": "assets/icons/items/life_hair_dye.png"
+  },
   "lifebuoy": {
    "object": "lifebuoy",
    "icon": "assets/icons/items/lifebuoy.png"

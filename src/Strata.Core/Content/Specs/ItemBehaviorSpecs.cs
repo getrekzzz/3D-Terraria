@@ -56,6 +56,9 @@ public static class ItemBehaviorSpecs
     /// <summary>A town pet license (Cat, Dog, Bunny): sets world flag <c>flag</c> once; a used license is refused.</summary>
     public const string License = "license";
 
+    /// <summary>Dyes the user's hair (Life, Mana, Depth, Money, Time… Hair Dye; the remover clears it).</summary>
+    public const string HairDye = "hairDye";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
@@ -84,6 +87,7 @@ public static class ItemBehaviorSpecs
         c.Register<PaintToolParams>(SpecKind.ItemBehavior, PaintTool);
         c.Register<PlantGrassParams>(SpecKind.ItemBehavior, PlantGrass);
         c.Register<LicenseParams>(SpecKind.ItemBehavior, License);
+        c.Register<HairDyeParams>(SpecKind.ItemBehavior, HairDye);
     }
 }
 

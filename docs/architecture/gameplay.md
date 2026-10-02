@@ -888,3 +888,35 @@ next step, summon, Reforge, Taxes, Quest with the player's count, Status) and a 
 `UiContext.ShopTab`, which `ShopPanel.Open` reads (and resets), so the grid shop lists and buys from that tab;
 currency wares (Defender Medals) show their cost in the tooltip and `TownCommerce.Buy` takes the medals. Commands
 `ui service <type>`, `ui shop [tab]`.
+
+## The Stylist and hair dyes (P5-21)
+
+`TownServices.Haircut(npc, player, style, colorHex)` (the `haircut` service, `HaircutParams` price per new style
+plus a colour price, times the happiness price factor) validates the style against `Appearance.StylesFor` and the
+hex colour, charges like the other services and raises `PlayerState.LookChanged`. Hair dyes are items with the
+`hairDye` behaviour (`HairDyeParams.Mode`: static, life, mana, depth, time, money, speed, rainbow, remove); using one
+sets `Appearance.HairDye` (saved with the look) and `HairDyes.ColorFor` computes the colour as a pure function of
+life, mana, world layer, hour, coins, speed and tick. `PlayerAvatar.Look` re-applies the look on `LookChanged` (the
+hair model swaps in place) and re-tints a dynamic dye twice a second. `HaircutPanel` (preview, styles, swatches,
+price, Buy) is opened through `TownPanels`; console `ui haircut <id>`, `town haircut <id> <style> <#rrggbb>`.
+
+## Strange Plants and the Dye Trader (P5-22)
+
+`DecorationPass` grows four natural Strange Plants (`data/tileobjects/strange_plants.json`) on open grass tops (surface
+turf and jungle turf, also underground) at `DecorPalette.StrangePlantChance` (1/2000) from their own seed
+(`strange_plants`), placed after every other plant so the rest of the decoration is unchanged (GenVersion 13; the
+golden hashes differ only where a plant grew). Each drops its `strange_plant_N` item (tag `strange_plant`). The Dye
+Trader's `dyeTrade` service (`DyeTradeParams`: accepted tag, loot table `dye_trader_trade`) takes one plant from the
+backpack for a weighted roll of nine rare dyes (`TownServices.TradeStrangePlant`); the chat box shows 'Trade' only while
+a plant is carried; console `town trade <id>`.
+
+## Housing menu (P5-29)
+
+`HousingPanel` (game/UI) lists a portrait banner per resident (`PortraitIcons.TownNpc`, preloaded on open and pumped
+per frame; greyed while dead or homeless). '?' then a click on a room runs `TownSystem.QueryHousing` and shows the
+message in Terraria's yellow; a banner then a room runs `AssignHome` (swapping with the occupant); right-clicking a
+banner evicts. World clicks are taken by a full-screen catcher while picking and cast through `WorldPicker` (camera
+ray → `Targeting.Cast` → the open cell in front). `HousingBannerRenderer` hangs pooled head sprites at each housed
+resident's `BannerCell` while the menu is open. Opened by the equipment column's Housing tab (beside it), the Housing
+key (unbound by default: H is Terraria's quick heal) or `ui housing`; `ui housing_query dx dy dz`; probes `ui.housing_open`, `ui.housing_banners`,
+`ui.housing_room_banners`.

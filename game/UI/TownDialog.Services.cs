@@ -91,9 +91,29 @@ public sealed partial class TownDialog
                 return $"Quest ({_ui.Entity.State.AnglerQuests} done)";
             case TownServiceSpecs.WorldStatus:
                 return "Status";
+            case TownServiceSpecs.Haircut:
+                return "Haircut";
+            case TownServiceSpecs.DyeTrade:
+                return _ui.Game.Services.CanTradeStrangePlant(npc, _ui.Entity) ? service.Parse<DyeTradeParams>().Label : null;
             default:
                 return null;
         }
+    }
+
+    /// <summary>A service with a screen of its own outside the inventory was pressed (the Stylist's Haircut): the box hides.</summary>
+    public event Action<TownNpc, string>? PanelRequested;
+
+    private void OpenPanel(string type)
+    {
+        var npc = _npc!;
+        HideBox();
+        PanelRequested?.Invoke(npc, type);
+    }
+
+    private void TradeStrangePlant()
+    {
+        var result = _ui.Game.Services.TradeStrangePlant(_npc!, _ui.Entity, out var dye);
+        Say(result == TradeResult.Ok ? $"A Strange Plant! For you, a {dye.Item!.DisplayName}." : "Bring me Strange Plants and I will make you wonders.");
     }
 
     /// <summary>Presses a service button.</summary>
@@ -110,6 +130,8 @@ public sealed partial class TownDialog
             case TownServiceSpecs.Taxes: CollectTaxes(); break;
             case TownServiceSpecs.AnglerQuest: AnglerQuest(); break;
             case TownServiceSpecs.WorldStatus: WorldStatus(); break;
+            case TownServiceSpecs.Haircut: OpenPanel(service.Type); break;
+            case TownServiceSpecs.DyeTrade: TradeStrangePlant(); break;
         }
         if (_npc != null && ServiceLabel(_npc, service) is { } label) SetLabel(button, label);
     }
