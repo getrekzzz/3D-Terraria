@@ -5,7 +5,7 @@
 | 1 | P3-05 | full headless CI green (416 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 2 | P3-37, P3-37b, P2-24, P5-28, P3-38, P3-39, P3-40, P3-41a/b, P3-42, P3-43, P3-44, P3-45, P3-50 | full headless CI green (422 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 3 | P4-35, P4-36, P4-37, X-09 (all but the creator menu rows) | full headless CI green (426 Core tests, all checks, 14/14 smoke, MENU PASS) |
-| 4 | X-17 hair/cloth motion | see push 4 notes |
+| 4 | X-17 hair/cloth motion | full headless CI green (430 Core tests, all checks, 14/14 smoke, MENU PASS) |
 | 5 | X-09 creator menu rows (after the integration UI push, P2-30) | waiting for P2-30 |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
