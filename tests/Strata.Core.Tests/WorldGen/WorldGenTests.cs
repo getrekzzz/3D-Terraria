@@ -43,13 +43,14 @@ public class WorldGenTests
     [Theory]
     [InlineData(8, 10, 8, 4397078274275958443UL)]
     [InlineData(8, 9, 8, 16207009510407108961UL)]
-    [InlineData(8, 7, 8, 2821258928633193851UL)]
+    [InlineData(8, 7, 8, 3282678591356587638UL)]
     [InlineData(8, 4, 8, 3494435149473940947UL)]
     [InlineData(2, 4, 9, 17334305573271451792UL)]
     [InlineData(12, 1, 5, 12384916426225855034UL)]
+    [InlineData(8, 7, 12, 7667736912130785385UL)] // the Dungeon's vault
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(9, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(11, GenVersion.Current); // bumping the generator version means re-recording these hashes
         Assert.Equal(new Int3(8, 10, 8), ChunkMath.CellToChunk(Tiny.Value.Plan.Spawn));
         Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
     }
@@ -71,6 +72,8 @@ public class WorldGenTests
         yield return new object[] { spawn.X + 3, spawn.Y - 4, spawn.Z - 2 };
         yield return new object[] { 5, uw, 9 };
         yield return new object[] { 1, spawn.Y - 1, 8 };
+        yield return new object[] { 8, 7, 12 }; // the Dungeon's vault
+        yield return new object[] { 6, 9, 13 }; // Dungeon stairs crossing a chunk face
     }
 
     [Theory]

@@ -71,7 +71,7 @@ public sealed class DecorationPass : GenPass
                 ulong h = Hash.Cell(seed, gx, gz);
                 int x = gx * grid + 1 + Hash.ToRange(h, grid - 2), z = gz * grid + 1 + Hash.ToRange(Hash.Mix(h), grid - 2);
                 if (x < ctx.ChunkOrigin.X + 1 || z < ctx.ChunkOrigin.Z + 1 || x >= ctx.ChunkOrigin.X + ChunkMath.Size - 2 || z >= ctx.ChunkOrigin.Z + ChunkMath.Size - 2) continue;
-                if (!TryGround(ctx, x, z, out int y, out ushort ground)) continue;
+                if (!TryGround(ctx, x, z, out int y, out ushort ground) || ctx.IsStructure(x, y, z)) continue;
                 var (tree, chance) = d.TreeFor(ctx, ground, ctx.Biome[ctx.WorldIndex(x, y, z)], x, z);
                 if (tree == null || Hash.ToUnitFloat(Hash.Mix(h + 7)) > chance) continue;
                 int variant = Hash.ToRange(Hash.Mix(h + 11), tree.Variants);
@@ -94,7 +94,7 @@ public sealed class DecorationPass : GenPass
                     int i = ChunkGenContext.Index(lx, ly, lz);
                     if (blocks[i] != p.Air || (liquids != null && liquids[i] != 0)) continue;
                     ushort below = blocks[i - layer], above = blocks[i + layer];
-                    if (below == p.Air && above == p.Air) continue;
+                    if ((below == p.Air && above == p.Air) || ctx.IsStructure(i) || ctx.IsStructure(i - layer) || ctx.IsStructure(i + layer)) continue;
                     int x = ctx.Origin.X + lx, y = ctx.Origin.Y + ly, z = ctx.Origin.Z + lz;
                     float roll = Hash.ToUnitFloat(Hash.Cell(seed, x, y, z));
                     TileObjectDef? pick = null;

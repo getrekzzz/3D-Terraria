@@ -31,3 +31,12 @@ wait 1.5
 assert town.old_man == 0
 time noon
 assert errors == 0
+
+# Deep in the Dungeon: the vault floor is inside the zone, and so is the floor in front of a locked chest.
+tp landmark dungeon_bottom
+wait_until player.frozen == 0 180
+assert zone.dungeon == 1
+tp landmark dungeon_chest
+wait_until player.frozen == 0 180
+assert zone.dungeon == 1
+assert errors == 0

@@ -116,5 +116,11 @@ public static class LandmarkIds
     /// <summary>Open ground just outside the crypt's gatehouse door.</summary>
     public const string DungeonGate = "dungeon_gate";
 
-    public static readonly IReadOnlySet<string> All = new HashSet<string> { DungeonGate };
+    /// <summary>The floor of the Dungeon's deepest room (the vault).</summary>
+    public const string DungeonBottom = "dungeon_bottom";
+
+    /// <summary>A floor cell in front of the Dungeon's first locked gold chest.</summary>
+    public const string DungeonChest = "dungeon_chest";
+
+    public static readonly IReadOnlySet<string> All = new HashSet<string> { DungeonGate, DungeonBottom, DungeonChest };
 }

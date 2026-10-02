@@ -67,8 +67,7 @@ unchanged; `BlueprintIndexTests` compares it with brute force).
 ## Dungeon layout planner
 
 `WorldGen/Structures/Dungeon/` plans the Terraria-style dungeon as pure data (`DungeonPlanner.Plan(site, budget,
-seeds)` returns a `DungeonLayout`); it is not wired into `DungeonPass` yet (the carver, P4-15, does that with a
-GenVersion bump). `DungeonSite` gives the gate (ground cell at the keep centre), the inward axis, world size, layer
+seeds)` returns a `DungeonLayout`), which `DungeonPass` carves (see Dungeon carving below). `DungeonSite` gives the gate (ground cell at the keep centre), the inward axis, world size, layer
 bands and surface/landness samplers; `DungeonBudget.For(size)` sets trunk length, room/chest/branch quotas and the
 floor limit (`CavernTop - n`, never below `UnderworldTop + 40`).
 
@@ -93,3 +92,33 @@ floor limit (`CavernTop - n`, never below `UnderworldTop + 40`).
 * Seed streams `dungeon.trunk`, `dungeon.branches`, `dungeon.side`, `dungeon.roles`; integer geometry only. A Large
   plan takes a few milliseconds. `DungeonLayoutTests` check determinism, reachability, cover, floor, quotas, stairs,
   headroom and that interiors only meet where joined.
+
+## Dungeon carving
+
+`DungeonPass.Plan` picks the site (the snow-side angle ±0.07 at 0.86 of the land radius, stepping inward while landness
+< 0.97; inward = the dominant axis toward the centre; it only samples `SurfaceHeight` and `Landness`), plans the layout,
+picks a `DungeonStyle` (blue, green or pink brick with its brick / slab / tiled wall panels) and adds a `DungeonFeature`
+(a `StructureFeature` carrying `Layout` and `Style`). Landmarks: `dungeon_gate` (ground 3 cells out of the keep door,
+outside the zone), `dungeon_bottom` (the vault floor), `dungeon_chest` (in front of the first locked chest).
+
+`DungeonBuilder.Build(content, layout, style)` emits ops in phases so crossings merge: A shells (`interior.Expand(2)`
+brick for every hall step, shaft, room and the keep), B panels (the side faces of `interior.Expand(1)` over the
+interior's height; floors and ceilings stay brick), C carves (every interior, every doorway), D fixtures:
+
+* Stairs: the ground row under every step but the last is a brick `CellShape.Stair` rotated uphill
+  (`DungeonBuilder.RotationToward`: rotation 0 faces +Z, 1 -X, 2 -Z, 3 +X, as ShapeGeometry), so each one-cell drop is
+  two half steps; brick is built up under a step that passes over a node box's air.
+* Shafts: one-way brick platforms every 4 cells (the first 3 over the bottom floor, the top one at most 4 under the
+  floor the shaft leaves, on that node's side), one quadrant each, winding round the shaft like a spiral stair: the
+  next platform up is beside the one you stand on (a 4-cell jump), never above the next one down, so walkers (and the
+  navigator) step down with full headroom.
+* Rooms wider than 18 get four 2 x 2 pillars at their quarter points (left out where they would touch a hall,
+  doorway, chest or the Mechanic spot); rooms taller than 12 get 2-deep platform galleries at +6 along the long walls,
+  broken at doorways, each with a step platform at +2.
+* Gold chests on the planned `ChestSpots` (the Shadow Key spot rolls `dungeon_chest_shadow_key`).
+
+Every cell is flagged `CellFlags.Structure` (locked until Skeletron falls). Later passes leave structure cells alone
+(`ChunkGenContext.IsStructure`): cave/nest/chasm carvers skip them, treasure and decoration do not place on them, and
+the dungeon stamp drops objects earlier passes left inside its zone. A Large dungeon is ~6000 ops, planned and built in
+~15 ms. `DungeonGenerationTests` check shells and flags, platforms, stair shapes and walking, reachability on foot from
+the entrance junction and open crossings on the real seed-1234 Tiny world.

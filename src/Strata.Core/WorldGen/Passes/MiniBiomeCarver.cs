@@ -20,7 +20,7 @@ internal static class MiniBiomeCarver
         };
         FeatureCarver.ForEachCell(ctx, ch.Bounds, (x, y, z, i) =>
         {
-            if (ctx.Blocks[i] == p.Bedrock) return;
+            if (ctx.Blocks[i] == p.Bedrock || ctx.IsStructure(i)) return;
             float d = ch.Distance(x + 0.5f, y + 0.5f, z + 0.5f);
             float jitter = (Hash.ToUnitFloat(Hash.Cell(ch.Seed, x >> 1, y >> 1, z >> 1)) - 0.5f) * 0.1f;
             d += jitter;
