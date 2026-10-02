@@ -109,9 +109,13 @@ public class WorldSaverTests
         var cell = ChunkMath.ChunkOrigin(coord) + new Int3(3, 3, 3);
         Place(s, cell, "gray_brick");
 
-        // Unload-only batch: no world.json in the batch, but encoding interns gray_brick.
+        // Unload-only batch: no world.json in the batch, but encoding interns gray_brick. world.json is written before
+        // the region file, so a crash in between never leaves a blob with an id the tables lack.
+        bool tablesFirst = false;
+        s.Saver!.BeforeWrite = () => tablesFirst = new WorldSaveStore(dir).LoadMeta().IdTables.Blocks.Contains("gray_brick");
         s.SaveUnloaded(new[] { s.Unload(coord)! }, wait: false);
-        Assert.True(s.Saver!.Flush(TimeSpan.FromSeconds(30)));
+        Assert.True(s.Saver.Flush(TimeSpan.FromSeconds(30)));
+        Assert.True(tablesFirst);
 
         Assert.Contains("gray_brick", new WorldSaveStore(dir).LoadMeta().IdTables.Blocks);
         var block = ReadBack(dir, cell, log);
