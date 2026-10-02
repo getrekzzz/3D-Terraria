@@ -157,6 +157,17 @@ glow fallback until a model is ready, and `PropLibrary.TryModel` reports Pending
 own body, held items, armour, hair and the menu preview load synchronously (`LoadNow`, `PropLibrary.Model`), which
 also finishes a pending request. Missing files are cached and reported once. Probes: `assets.pending`,
 `assets.loaded`; smoke scripts that assert on fresh creature visuals first `wait_until assets.pending == 0 60`.
+The cache is cleared when the world closes.
+
+`AssetPreloader` requests by relevance, never everything: at launch every humans' animation set, town residents and
+the carried items with their projectiles; each streamed-in chunk's tile-object models; every 2 s the residents, the
+carried items, the bosses of carried summoning items, and `SpawnDirector.LikelyEnemies` (rules passing where the
+player stands, light ignored, plus rules naming a biome there) with `EnemyDef.ModelNames()` (head, segments, tail,
+parts, arms, barrier). The first six likely kinds are pre-warmed into `NpcRenderer`'s pool (`Prewarm`, one visual
+per frame; 1 per kind on the low preset, 2 otherwise); pooled visuals have processing disabled. `ShaderWarmup` draws
+every prop-library material plus the flame, lit-sprite and projectile-glow materials, as a mesh and a MultiMesh, at
+0.01 scale 1 m before the camera for two frames once the first batch is in (or after 2 s). Probes
+`assets.preloaded`, `npcs.prewarmed`, `render.warmed`.
 
 ## Global shader parameters (`project.godot`)
 `strata_sky_ambient`, `strata_block_light_color`, `strata_daylight`, `strata_time`, `strata_camera`, `strata_light_dir`,

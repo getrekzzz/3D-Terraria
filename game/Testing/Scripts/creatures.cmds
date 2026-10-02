@@ -1,6 +1,7 @@
 # Biome creatures: every new kind spawns, moves and renders; ranged attackers shoot; swimmers live in water.
 wait_until player.frozen == 0 180
 spawning off
+wait_until assets.pending == 0 60
 town arrivals off
 time noon
 fill -14 -3 -14 14 -1 14 stone

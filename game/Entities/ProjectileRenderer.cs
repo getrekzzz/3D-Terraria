@@ -142,7 +142,7 @@ public sealed partial class ProjectileRenderer : Node3D
         return root;
     }
 
-    private static StandardMaterial3D Glow(Color color, float energy) => new()
+    internal static StandardMaterial3D Glow(Color color, float energy) => new()
     {
         AlbedoColor = color, EmissionEnabled = true, Emission = color, EmissionEnergyMultiplier = energy, ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded,
     };

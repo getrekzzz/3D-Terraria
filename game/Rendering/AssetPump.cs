@@ -12,4 +12,6 @@ public sealed partial class AssetPump : Node
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.assets");
         AssetCache.Pump();
     }
+
+    public override void _ExitTree() => AssetCache.Clear(); // the world closed: let its models go
 }

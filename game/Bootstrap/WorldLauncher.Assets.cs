@@ -43,4 +43,15 @@ public static partial class WorldLauncher
         projectiles.Initialize(game, props);
         return creatures;
     }
+
+    /// <summary>Relevance-driven preloading with pool pre-warming, and the one-time shader warm-up.</summary>
+    private static void AddPreloading(WorldRuntime runtime, GameServices services, GameWorld game, Rendering.PropLibrary props, Entities.NpcRenderer creatures)
+    {
+        var preloader = new Rendering.AssetPreloader();
+        preloader.Initialize(game, creatures, services.Graphics.Name == "low");
+        runtime.AddChild(preloader);
+        var warmup = new Rendering.ShaderWarmup();
+        warmup.Initialize(props);
+        runtime.AddChild(warmup);
+    }
 }

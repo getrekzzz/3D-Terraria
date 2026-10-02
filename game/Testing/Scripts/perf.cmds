@@ -8,6 +8,12 @@
 wait_until player.frozen == 0 300
 wait_until stream.idle == 1 900
 spawning off
+# Preloading (P1b-14): the starting kit, animation sets and streamed-in objects were requested, then the shader
+# warm-up drew every material once.
+wait_until assets.pending == 0 60
+assert assets.preloaded > 0
+wait_until render.warmed > 0 10
+probe npcs.prewarmed
 town arrivals off
 perf start
 

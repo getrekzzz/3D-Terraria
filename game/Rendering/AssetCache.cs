@@ -117,6 +117,18 @@ public static class AssetCache
         }
     }
 
+    /// <summary>
+    /// Drops every held resource (the world closed), first finishing the threaded loads still in flight so none is
+    /// orphaned. Resources still used elsewhere stay alive through their users.
+    /// </summary>
+    public static void Clear()
+    {
+        foreach (var path in Requests) ResourceLoader.LoadThreadedGet(path);
+        Requests.Clear();
+        Requested.Clear();
+        Loaded.Clear();
+    }
+
     private static void Fail(string resPath)
     {
         if (Missing.Add(resPath)) GD.PushWarning($"Asset {resPath} failed to load.");

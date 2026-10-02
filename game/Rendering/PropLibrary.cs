@@ -105,6 +105,9 @@ public sealed partial class PropLibrary
         return result;
     }
 
+    /// <summary>The materials made so far (shader warm-up).</summary>
+    public IEnumerable<ShaderMaterial> Materials => _materials.Values;
+
     public ShaderMaterial Material(string slot, bool multimesh)
     {
         var key = (slot, multimesh);

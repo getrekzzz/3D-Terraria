@@ -79,6 +79,7 @@ public sealed partial class NpcRenderer : Node3D
     private void Release(CreatureVisual visual, string model)
     {
         visual.Visible = false;
+        visual.ProcessMode = ProcessModeEnum.Disabled; // pooled visuals neither animate nor sway
         if (!_pool.TryGetValue(model, out var stack)) _pool[model] = stack = new Stack<CreatureVisual>();
         stack.Push(visual);
     }
@@ -89,12 +90,15 @@ public sealed partial class NpcRenderer : Node3D
         {
             var pooled = stack.Pop();
             pooled.Visible = true;
+            pooled.ProcessMode = ProcessModeEnum.Inherit;
             return pooled;
         }
         // A pool miss instantiates the model (and loads it the first time): the creature-side hitch source.
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.npcs.create");
         var visual = CreatureVisual.Create($"assets/models/creatures/{model}.glb", _props);
-        if (visual != null) AddChild(visual);
+        if (visual == null) return null;
+        AddChild(visual);
+        CountMade(model);
         return visual;
     }
 
@@ -104,6 +108,7 @@ public sealed partial class NpcRenderer : Node3D
         float dt = (float)delta;
         var world = _game.Session.World;
         UpdateCorpses(dt);
+        if (_prewarm.Count > 0) PrewarmStep();
         foreach (var npc in _game.Npcs.All)
         {
             if (!_views.TryGetValue(npc.Id, out var view))
