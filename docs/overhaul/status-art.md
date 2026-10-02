@@ -23,7 +23,9 @@
 | 19 | P3-06 part 1 (voxel-lit held items and wings, real block cubes in hand) | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
 | 20 | P3-02/P3-03 integration merge | full headless CI green (1388 Core tests, 21/21 smoke, MENU PASS) |
 | 21 | P3-06 grip per use style, P3-07 first-person poses, swing curve from `bladeCurve`, rapier melee prefixes, mounted `sit` | full headless CI green (1390 Core tests, 21/21 smoke, MENU PASS) |
-| 22 | X-09 creator menu rows (after P2-30) | pending |
+| 22 | P3-29 hearts and mana stars (reviewed) | full headless CI green (1396 Core tests, 21/21 smoke, MENU PASS) |
+| 23 | P3-29 review fixes, P3-36 3D dropped items | full headless CI green (1398 Core tests, 21/21 smoke, MENU PASS) |
+| 24 | X-09 creator menu rows (after P2-30); per-style hand frames (needs a tuning pass) | pending |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -178,3 +180,15 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   are first guesses; yoyo/flail arm extension is not tied to the tether; aim uses the aim-distance approach (≤3°), not
   the muzzle socket at 20 m.
 * `Prefixes.Groups`: `rapier` (shortswords) take melee prefixes; mounted players play `sit` when the clip exists.
+
+## Push 22-23 notes
+* **Hearts and stars (P3-29)**: Terraria 1.4.4 drop rules (last-hitting player, 1/6 roll, star if mana not full else
+  heart if life not full, magic bonus star, 5-9 hearts on boss defeat; own RNG stream; `data/config/pickups.json`).
+  Magnet pulls only what fits (`GameWorld.CanCollect/Collect`); `pickup` items heal on touch and never take a slot.
+  API for P3-30: `GameWorld.SpawnManaStar/SpawnHeart/SpawnPickup/ApplyPickup`. Review fixes: coins fit when tidied
+  (`Coins.FitsWhenTidy`); `PlayerInventory.Pickup` never stores pickups. Gaps: worm segment kills roll nothing; reuses
+  heal/mana sounds.
+* **3D drops (P3-36)**: `DroppedItemRenderer(.Visuals)`: real item models (async, one build per frame), block cubes,
+  billboard only as a fallback; spin + bob; additive rarity halo (`shaders/drop_halo.gdshader`); lights from the
+  DynamicLights pool capped by preset `dropLights` (0/2/4/6). Probes `dropvis.*`. Gaps: no perf run for 150 drops;
+  drops cast no shadows; thin swords read narrow edge-on.
