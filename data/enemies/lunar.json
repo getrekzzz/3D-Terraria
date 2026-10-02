@@ -4,9 +4,9 @@
   // Pillars stand across the world, each shielded until 100 of its legion fall. When the last pillar breaks, the
   // Moon Lord descends: his core stays sealed while his head and hands live.
   "buffs": [
-    { "id": "frostburn", "name": "Frostburn", "description": "It's either really hot or really cold. Either way it REALLY hurts.", "debuff": true, "color": "#8ae0ff", "tags": ["fire"],
+    { "id": "frostburn", "name": "Frostburn", "description": "It's either really hot or really cold. Either way it REALLY hurts.", "debuff": true, "color": "#8ae0ff", "visual": { "tint": "#a0e8ff", "tintStrength": 0.7, "particle": "sparks", "color": "#8ae0ff", "rate": 18, "rise": 2, "light": [3, 8, 12] }, "tags": ["fire"],
       "effects": [{ "type": "damageOverTime", "perSecond": 8 }, { "type": "emitLight", "color": [4, 8, 12] }] },
-    { "id": "confused", "name": "Confused", "description": "Your movement keys are reversed.", "debuff": true, "color": "#c880ff",
+    { "id": "confused", "name": "Confused", "description": "Your movement keys are reversed.", "debuff": true, "color": "#c880ff", "visual": { "tint": "#d8b0ff", "tintStrength": 0.3, "particle": "puff", "color": "#c880ff", "rate": 4, "rise": 0.6 },
       "effects": [{ "type": "invertControls" }], "covers": ["terraria:confused"] }
   ],
   "projectiles": [

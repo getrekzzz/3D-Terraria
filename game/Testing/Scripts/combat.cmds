@@ -328,6 +328,24 @@ wait 0.8
 assert npcs.alive_life < 14
 assert melee.hit_deg == -999
 assert melee.hit_dist > 2
+# Status visuals (P3-47): a buff's emitter attaches while it lasts and is handed back when it ends or its carrier dies.
+killall
+buff on_fire
+wait 0.2
+assert buff.on_fire == 1
+assert fx.status_emitters >= 1
+buff clear
+wait 0.2
+assert fx.status_emitters == 0
+spawn green_slime 2 4
+wait 0.2
+buff poisoned 10 npcs
+buff frostburn 10 npcs
+wait 0.2
+assert fx.status_emitters >= 4
+killall
+wait 0.3
+assert fx.status_emitters == 0
 ai on
 killall
 assert errors == 0

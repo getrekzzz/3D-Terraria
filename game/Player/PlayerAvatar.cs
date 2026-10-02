@@ -54,6 +54,7 @@ public sealed partial class PlayerAvatar : Node3D
         Animate(entity, (float)delta);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
         UpdateArmor((float)delta);
+        UpdateStatus();
     }
 
     /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>

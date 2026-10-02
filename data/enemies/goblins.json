@@ -3,9 +3,14 @@
   // frees the Goblin Tinkerer. Meteorites: the crater's Meteor Heads, the ore's bars and the gear made from them.
   "projectiles": [
     { "id": "goblin_arrow", "name": "Arrow", "visual": "arrow", "color": "#9a7a4a", "gravity": 12, "lifetime": 300, "radius": 0.3, "friendly": false, "hostile": true },
-    { "id": "shadowflame_bolt", "name": "Shadowflame", "visual": "orb", "color": "#9a3aff", "lifetime": 200, "radius": 0.45, "friendly": false, "hostile": true, "light": [8, 2, 12] },
+    { "id": "shadowflame_bolt", "name": "Shadowflame", "visual": "orb", "color": "#9a3aff", "lifetime": 200, "radius": 0.45, "friendly": false, "hostile": true, "light": [8, 2, 12],
+      "onHit": [{ "type": "applyBuff", "buff": "shadowflame", "ticks": 180, "chance": 1 }] },
     { "id": "space_laser", "name": "Green Laser", "visual": "bolt", "color": "#4aff6a", "lifetime": 90, "radius": 0.3, "pierce": 2, "light": [2, 12, 3], "trail": "#9aff9a" },
     { "id": "meteor_shot", "name": "Meteor Shot", "visual": "bullet", "color": "#ffb04a", "lifetime": 150, "radius": 0.25, "pierce": 2, "bounces": 1, "light": [10, 6, 2] }
+  ],
+  "buffs": [
+    { "id": "shadowflame", "name": "Shadowflame", "description": "Losing life", "debuff": true, "color": "#9a3aff", "tags": ["fire"], "visual": { "tint": "#c890ff", "tintStrength": 0.7, "particle": "sparks", "color": "#9a3aff", "rate": 16, "rise": 1.8, "light": [7, 2, 11] },
+      "effects": [{ "type": "damageOverTime", "perSecond": 6 }] }
   ],
   "items": [
     { "id": "meteorite_bar", "name": "Meteorite Bar", "description": "Warm to the touch.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 700, "covers": ["terraria:meteorite_bar"] },

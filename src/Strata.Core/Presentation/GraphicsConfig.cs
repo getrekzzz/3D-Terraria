@@ -151,6 +151,12 @@ public sealed class GraphicsPreset
     /// <summary>Short-lived flash lights (explosions, sparks) alive at once; 0 disables them.</summary>
     public int FlashLights { get; set; } = 2;
 
+    /// <summary>Looping buff and debuff emitters (StatusVisuals) alive at once; the nearest statuses win.</summary>
+    public int StatusEmitters { get; set; } = 16;
+
+    /// <summary>How many glowing statuses (On Fire!, Shadowflame…) may claim a light from the dynamic pool.</summary>
+    public int StatusLights { get; set; } = 1;
+
     /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last 30 %).</summary>
     public float OreGlintDistance { get; set; } = 24f;
 
@@ -185,6 +191,8 @@ public sealed class GraphicsPreset
         if (EffectsScale is < 0f or > 2f) yield return "effectsScale must be within 0–2";
         if (FlashLights is < 0 or > 16) yield return "flashLights must be within 0–16";
         if (PetLights is < 0 or > 8) yield return "petLights must be within 0–8";
+        if (StatusEmitters is < 0 or > 64) yield return "statusEmitters must be within 0–64";
+        if (StatusLights is < 0 or > 8) yield return "statusLights must be within 0–8";
         if (CombatNumbers is < 8 or > 256) yield return "combatNumbers must be within 8–256";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
         if (OreGlintDistance is < 1f or > 60f) yield return "oreGlintDistance must be within 1–60 m";

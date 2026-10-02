@@ -41,6 +41,7 @@ public sealed partial class EffectKit : Node3D
     private static readonly StringName LightParam = "voxel_light";
 
     private readonly List<Emitter>[] _pools = new List<Emitter>[6];
+    private readonly Mesh[] _meshes = new Mesh[6];
     private Strata.Core.Voxels.VoxelWorld? _world;
     private float _scale = 0.7f;
     private int _startedThisFrame;
@@ -68,8 +69,10 @@ public sealed partial class EffectKit : Node3D
             Mesh mesh = (EffectRecipe)r == EffectRecipe.Chips
                 ? new BoxMesh { Size = Vector3.One * 0.07f, Material = material }
                 : new QuadMesh { Size = new Vector2(0.12f, 0.12f), Material = material };
+            _meshes[r] = mesh;
             for (int i = 0; i < PoolPerRecipe; i++) _pools[r].Add(new Emitter(this, (EffectRecipe)r, mesh));
         }
+        InitializeStatus(graphics);
         // Pre-warm: one hidden burst per recipe so the pipelines compile while the world loads.
         for (int r = 0; r < _pools.Length; r++) _pools[r][0].Start(new Vector3(0, -10000, 0), Colors.White, 1, 1f, null, 0f, Colors.White, this);
     }

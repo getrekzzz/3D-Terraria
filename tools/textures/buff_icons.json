@@ -19,6 +19,7 @@
   "cursed":            { "glyph": "skull",          "fg": "#c0a0f0", "bg": "#2a1a44" },
   "ichor":             { "glyph": "blood_drop",     "fg": "#f0c030", "bg": "#4a3810" },
   "cursed_inferno":    { "glyph": "flame",          "fg": "#90f040", "bg": "#183a0c" },
+  "shadowflame":       { "glyph": "flame",          "fg": "#b070ff", "bg": "#2a1048" },
   "frostburn":         { "glyph": "flame",          "fg": "#8ae0ff", "bg": "#10304c" },
   "confused":          { "glyph": "swirl",          "fg": "#d090ff", "bg": "#2c1a4c" },
   "night_owl":         { "glyph": "eye",            "fg": "#e8c060", "bg": "#1e2034" },
