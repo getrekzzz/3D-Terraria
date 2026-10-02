@@ -3,7 +3,10 @@ using Strata.Core.Session;
 
 namespace Strata.Core.Commands;
 
-/// <summary>Inventory slot clicks and throwing, the same code the inventory screen calls (smoke scripts and tests drive it).</summary>
+/// <summary>
+/// Inventory slot clicks, throwing, chest buttons, sorting and quick stack: the same Core calls the inventory screen
+/// makes, so smoke scripts and tests drive them.
+/// </summary>
 public static class InventoryCommands
 {
     public static void Register(CommandRegistry r)
@@ -46,6 +49,54 @@ public static class InventoryCommands
                     _ => throw new CommandException("the only option is 'one'"),
                 };
                 return CommandResult.Success(ctx.World.ThrowCursor(ctx.Player, one).ToString());
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "chest", Usage = "chest [loot | deposit | quickstack | restock | sort | rename [name]]",
+            Help = "Shows the chest opened last, or presses one of its buttons (rename with no name restores the default).",
+            Run = (ctx, a) =>
+            {
+                var chest = Context(ctx, needChest: true).Chest!;
+                if (a.OptStr(0) == "rename")
+                {
+                    ctx.World.RenameContainer(chest, a.Count > 1 ? a.Rest(1) : null);
+                    return CommandResult.Success($"Named \"{chest.DisplayName}\".");
+                }
+                ChestOp? op = a.OptStr(0) switch
+                {
+                    null => null,
+                    "loot" => ChestOp.LootAll,
+                    "deposit" => ChestOp.DepositAll,
+                    "quickstack" => ChestOp.QuickStack,
+                    "restock" => ChestOp.Restock,
+                    "sort" => ChestOp.Sort,
+                    _ => throw new CommandException($"unknown chest button '{a[0]}'"),
+                };
+                if (op is { } button) return CommandResult.Success($"{button}: {ctx.World.ChestAction(ctx.Player, chest, button)} items moved.");
+                var stacks = chest.Container!.Where(st => !st.IsEmpty).ToList();
+                return CommandResult.Success($"{chest.DisplayName} at {chest.Anchor}: {stacks.Count}/{chest.Container!.Length} slots used" +
+                    (stacks.Count > 0 ? ": " + string.Join(", ", stacks) : ""));
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "invsort", Usage = "invsort", Help = "Sorts the backpack below the hotbar (favourites stay put).",
+            Run = (ctx, _) =>
+            {
+                InventoryOps.Sort(ctx.Player.State.Inventory.Backpack, PlayerInventory.HotbarSize, PlayerInventory.BackpackSize);
+                return CommandResult.Success("Sorted.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "quickstack", Usage = "quickstack [radius m]", Help = "Quick stack to nearby chests: items those chests already hold leave the backpack.",
+            Run = (ctx, a) =>
+            {
+                var reached = ctx.World.QuickStackNearby(ctx.Player, a.Count > 0 ? a.Float(0, "radius") : GameWorld.QuickStackRadius);
+                return CommandResult.Success(reached.Count == 0
+                    ? "Nothing to stack."
+                    : string.Join(", ", reached.Select(x => $"{x.Moved} into {x.Chest.DisplayName} at {x.Chest.Anchor}")));
             },
         });
         r.Register(new CommandDef

@@ -43,3 +43,29 @@ invthrow
 assert inv.cursor == 0
 assert inv.torch == 9
 assert errors == 0
+
+# --- P2-08 ---
+# Chest buttons on the chest opened last: deposit (not the hotbar), loot, quick stack to nearby chests, sort, rename.
+clear
+fill -1 0 -5 2 2 -2 air
+fill -1 -1 -5 2 -1 -2 dirt
+place wooden_chest 0 0 -4
+interact 0 0 -4
+give wood 30
+invclick backpack 0 left
+invclick backpack 20 left
+chest deposit
+assert inv.wood == 0
+chest loot
+assert inv.wood == 30
+invclick backpack 0 right
+invclick chest 0 left
+invclick backpack 0 left
+invclick backpack 20 left
+quickstack
+assert inv.wood == 0
+chest sort
+invsort
+chest rename Loot
+chest
+assert errors == 0

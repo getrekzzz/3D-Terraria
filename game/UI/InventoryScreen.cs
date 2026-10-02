@@ -1,6 +1,5 @@
 using System;
 using Godot;
-using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Voxels.TileObjects;
 using Strata.Game.Items;
@@ -18,9 +17,6 @@ public sealed partial class InventoryScreen : CanvasLayer
     private const float SlotSize = 50;
     private UiContext _ui = null!;
     private Control _root = null!;
-    private PanelContainer _chestPanel = null!;
-    private GridContainer _chestGrid = null!;
-    private Label _chestTitle = null!;
     private CraftingPanel _crafting = null!;
     private Label _coins = null!;
     private Label _defense = null!;
@@ -80,22 +76,13 @@ public sealed partial class InventoryScreen : CanvasLayer
         eq.AddChild(Slot(SlotArea.Trash, 0));
         _coins = new Label();
         eq.AddChild(_coins);
+        var tidy = new HBoxContainer();
+        tidy.AddChild(Button("Sort", SortBackpack, "Sort the backpack below the hotbar (favourites stay put)"));
+        tidy.AddChild(Button("Quick stack", QuickStackNearby, "Quick stack to nearby chests: items they already hold leave the backpack"));
+        eq.AddChild(tidy);
         equipment.AddChild(eq);
 
-        _chestPanel = Panel(new Vector2(24, 24 + 5 * 54 + 40));
-        var chestBox = new VBoxContainer();
-        var header = new HBoxContainer();
-        _chestTitle = new Label { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        header.AddChild(_chestTitle);
-        header.AddChild(Button("Loot all", LootAll));
-        header.AddChild(Button("Deposit all", DepositAll));
-        chestBox.AddChild(header);
-        _chestGrid = new GridContainer { Columns = 10 };
-        _chestGrid.AddThemeConstantOverride("h_separation", 4);
-        _chestGrid.AddThemeConstantOverride("v_separation", 4);
-        chestBox.AddChild(_chestGrid);
-        _chestPanel.AddChild(chestBox);
-        _chestPanel.Visible = false;
+        BuildChestPanel(new Vector2(24, 24 + 5 * 54 + 40));
 
         _crafting = new CraftingPanel();
         _root.AddChild(_crafting);
@@ -180,48 +167,6 @@ public sealed partial class InventoryScreen : CanvasLayer
         }
     }
 
-    private void OpenContainer(TileObjectInstance obj)
-    {
-        CloseContainer();
-        _container = obj;
-        _containerInv = new Inventory(obj.Container!);
-        _chestTitle.Text = obj.Def.DisplayName;
-        for (int i = 0; i < obj.Container!.Length; i++) _chestGrid.AddChild(Slot(SlotArea.Container, i));
-        _chestPanel.Visible = true;
-        SetOpen(true);
-    }
-
-    private void CloseContainer()
-    {
-        _container = null;
-        _containerInv = null;
-        _chestPanel.Visible = false;
-        foreach (var child in _chestGrid.GetChildren()) child.QueueFree();
-    }
-
-    private void LootAll()
-    {
-        if (_containerInv == null) return;
-        for (int i = 0; i < _containerInv.Size; i++) SlotActions.QuickMove(_containerInv, i, _ui.Inventory.Backpack);
-        MarkContainerModified();
-    }
-
-    private void DepositAll()
-    {
-        if (_containerInv == null) return;
-        var backpack = _ui.Inventory.Backpack;
-        for (int i = PlayerInventory.HotbarSize; i < backpack.Size; i++)
-            if (!backpack[i].IsEmpty && backpack[i].Item!.Category != ItemCategory.Coin) SlotActions.QuickMove(backpack, i, _containerInv);
-        MarkContainerModified();
-    }
-
-    private void MarkContainerModified()
-    {
-        if (_container == null) return;
-        var chunk = _ui.Game.Session.World.GetChunk(Strata.Core.Common.ChunkMath.CellToChunk(_container.Anchor));
-        chunk?.MarkModified();
-    }
-
     private PanelContainer Panel(Vector2 position)
     {
         var p = new PanelContainer { Position = position };
@@ -229,9 +174,9 @@ public sealed partial class InventoryScreen : CanvasLayer
         return p;
     }
 
-    private static Button Button(string text, Action onPressed)
+    private static Button Button(string text, Action onPressed, string? tooltip = null)
     {
-        var b = new Button { Text = text };
+        var b = new Button { Text = text, TooltipText = tooltip ?? "" };
         b.Pressed += onPressed;
         return b;
     }

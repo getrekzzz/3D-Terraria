@@ -86,13 +86,4 @@ public static class SlotActions
         if (s.IsEmpty || (accepts != null && !accepts(s.Item!))) return;
         from[slot] = to.Add(s);
     }
-
-    /// <summary>Returns the cursor stack to an inventory (closing the UI); returns what did not fit.</summary>
-    public static ItemStack Stow(ref ItemStack cursor, Inventory inv)
-    {
-        var rest = inv.Add(cursor);
-        cursor = ItemStack.Empty;
-        return rest;
-    }
-
 }

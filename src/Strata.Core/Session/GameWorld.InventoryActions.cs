@@ -19,8 +19,17 @@ public readonly record struct SlotContext(Inventory? Container = null, TownNpc? 
         chest.Container == null ? default : new SlotContext(new Inventory(chest.Container), null, chest);
 }
 
+/// <summary>The buttons of an open chest.</summary>
+public enum ChestOp
+{
+    LootAll, DepositAll, QuickStack, Restock, Sort,
+}
+
 public sealed partial class GameWorld
 {
+    /// <summary>How far "quick stack to nearby chests" reaches (metres from the player's centre to a chest's centre).</summary>
+    public const float QuickStackRadius = 12f;
+
     /// <summary>
     /// One click on an inventory slot, routed as the reference game does. With an empty cursor a left click with Alt
     /// toggles the favourite mark (backpack, coin and ammo slots), with Ctrl (no shop open) moves the stack to the trash
@@ -126,6 +135,71 @@ public sealed partial class GameWorld
                 break;
         }
         return storage[i].Equals(s) ? ClickOutcome.None : ClickOutcome.Moved;
+    }
+
+    /// <summary>
+    /// Runs a chest button (<see cref="InventoryOps"/>) between the player and a placed chest, rolling its world loot
+    /// first, and marks the chunk for saving when anything changed. Returns how many items moved (sorting: 0).
+    /// </summary>
+    public int ChestAction(PlayerEntity p, TileObjectInstance chest, ChestOp op)
+    {
+        if (chest.Container == null) return 0;
+        Editor.EnsureContainerLoot(chest);
+        var inv = p.State.Inventory;
+        var box = new Inventory(chest.Container);
+        int moved = op switch
+        {
+            ChestOp.LootAll => InventoryOps.LootAll(box, inv),
+            ChestOp.DepositAll => InventoryOps.DepositAll(inv, box),
+            ChestOp.QuickStack => InventoryOps.QuickStack(inv, box),
+            ChestOp.Restock => InventoryOps.Restock(box, inv),
+            _ => 0,
+        };
+        if (op == ChestOp.Sort) InventoryOps.SortChest(box);
+        if (moved > 0 || op == ChestOp.Sort) MarkObjectModified(chest);
+        return moved;
+    }
+
+    /// <summary>
+    /// Quick Stack to Nearby Chests: every unlocked chest within <paramref name="radiusM"/> metres, nearest first,
+    /// takes the backpack's non-favourite stacks (below the hotbar) of items it already holds. Returns the chests that
+    /// received something and how many items each got (the screen can show them flying).
+    /// </summary>
+    public List<(TileObjectInstance Chest, int Moved)> QuickStackNearby(PlayerEntity p, float radiusM = QuickStackRadius)
+    {
+        var result = new List<(TileObjectInstance, int)>();
+        var center = p.Center;
+        var c = center * Units.CellsPerMeter;
+        int r = (int)MathF.Ceiling(radiusM * Units.CellsPerMeter);
+        var cell = new Int3((int)MathF.Floor(c.X), (int)MathF.Floor(c.Y), (int)MathF.Floor(c.Z));
+        var near = new List<(TileObjectInstance Obj, float Distance)>();
+        foreach (var obj in Session.World.TileObjects.InBox(Aabb3i.FromCenter(cell, new Int3(r, r, r))))
+        {
+            if (obj.Container == null || obj.Locked) continue;
+            var b = obj.Bounds;
+            var mid = new Vector3(b.Min.X + b.Max.X, b.Min.Y + b.Max.Y, b.Min.Z + b.Max.Z) * (0.5f * Units.CellSize);
+            float d = Vector3.Distance(mid, center);
+            if (d <= radiusM) near.Add((obj, d));
+        }
+        near.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+        foreach (var (obj, _) in near)
+        {
+            int moved = ChestAction(p, obj, ChestOp.QuickStack);
+            if (moved > 0) result.Add((obj, moved));
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// Names a chest (trimmed, control characters dropped, at most <see cref="TileObjectInstance.MaxNameLength"/>
+    /// characters; blank restores the default) and marks its chunk for saving. Returns false for objects without storage.
+    /// </summary>
+    public bool RenameContainer(TileObjectInstance chest, string? name)
+    {
+        if (chest.Container == null) return false;
+        chest.CustomName = name;
+        MarkObjectModified(chest);
+        return true;
     }
 
     private void MarkObjectModified(TileObjectInstance obj) =>
