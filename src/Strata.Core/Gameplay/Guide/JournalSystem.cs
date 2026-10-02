@@ -19,7 +19,7 @@ public sealed class JournalSystem
 {
     /// <summary>Counter names (<see cref="PlayerJournal.Counters"/>).</summary>
     public const string Mined = "mined", Broken = "broken", TreesChopped = "trees_chopped", Purchases = "purchases",
-        Reforges = "reforges", Deaths = "deaths", Catches = "catches", Rescued = "rescued";
+        Reforges = "reforges", Deaths = "deaths", Catches = "catches", Rescued = "rescued", AnglerQuests = "angler_quests";
 
     public const int SeenInterval = 30;
 
@@ -44,6 +44,7 @@ public sealed class JournalSystem
             p.State.Journal.MarkObtained(item.Id);
         };
         world.Services.Reforged += (p, _) => p.State.Journal.Count(Reforges);
+        world.Services.AnglerQuestDone += (p, _) => p.State.Journal.Count(AnglerQuests);
         world.PlayerDied += p => p.State.Journal.Count(Deaths);
         world.Town.Rescued += (npc, p) =>
         {

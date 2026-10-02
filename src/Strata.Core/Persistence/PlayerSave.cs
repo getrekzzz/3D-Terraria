@@ -22,6 +22,9 @@ public sealed class PlayerSave
     public int BonusLife { get; set; }
     public int BonusMana { get; set; }
     public int Deaths { get; set; }
+
+    /// <summary>Angler quests completed (additive; older saves read 0).</summary>
+    public int AnglerQuests { get; set; }
     public int SelectedHotbar { get; set; }
     public List<SlotModel> Backpack { get; set; } = new();
     public List<SlotModel> Armor { get; set; } = new();
@@ -76,6 +79,7 @@ public sealed class PlayerSave
         BonusLife = p.BonusLife,
         BonusMana = p.BonusMana,
         Deaths = p.Deaths,
+        AnglerQuests = p.AnglerQuests,
         SelectedHotbar = p.Inventory.SelectedHotbar,
         Backpack = Slots(p.Inventory.Backpack),
         Armor = Slots(p.Inventory.Armor),
@@ -109,7 +113,7 @@ public sealed class PlayerSave
     {
         var p = new PlayerState(Name)
         {
-            BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, Look = Look ?? new Appearance(), Difficulty = Difficulty,
+            BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, AnglerQuests = Math.Max(0, AnglerQuests), Look = Look ?? new Appearance(), Difficulty = Difficulty,
             PlayTicks = PlayTicks, CreatedUtc = CreatedUtc, LastPlayedUtc = LastPlayedUtc,
             ExtraAccessorySlot = ExtraAccessorySlot, MinecartUpgrade = MinecartUpgrade,
         };

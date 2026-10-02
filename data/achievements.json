@@ -45,6 +45,11 @@
     { "id": "pretty_in_pink", "name": "Pretty in Pink", "description": "Kill Pinky.", "icon": "gel", "category": "slayer", "trigger": { "type": "killEnemy", "enemy": "pinky" } },
     { "id": "there_are_some_who_call_him", "name": "There are Some Who Call Him...", "description": "Kill Tim.", "icon": "wizard_hat", "category": "slayer", "trigger": { "type": "killEnemy", "enemy": "tim" } },
     { "id": "til_death", "name": "Til Death...", "description": "Kill the groom.", "icon": "bone", "category": "slayer", "trigger": { "type": "killEnemy", "enemy": "the_groom" } },
-    { "id": "deceiver_of_fools", "name": "Deceiver of Fools", "description": "Kill a nymph.", "icon": "gel", "category": "slayer", "trigger": { "type": "killEnemy", "enemy": "nymph" } }
+    { "id": "deceiver_of_fools", "name": "Deceiver of Fools", "description": "Kill a nymph.", "icon": "gel", "category": "slayer", "trigger": { "type": "killEnemy", "enemy": "nymph" } },
+    { "id": "servant_in_training", "name": "Servant-in-Training", "description": "Complete your 1st quest for the angler.", "icon": "apprentice_bait", "category": "challenger", "trigger": { "type": "counter", "key": "angler_quests", "min": 1 } },
+    { "id": "good_little_slave", "name": "Good Little Slave", "description": "Complete your 10th quest for the angler.", "icon": "journeyman_bait", "category": "challenger", "trigger": { "type": "counter", "key": "angler_quests", "min": 10 } },
+    { "id": "trout_monkey", "name": "Trout Monkey", "description": "Complete your 25th quest for the angler.", "icon": "master_bait", "category": "challenger", "trigger": { "type": "counter", "key": "angler_quests", "min": 25 } },
+    { "id": "fast_and_fishious", "name": "Fast and Fishious", "description": "Complete your 50th quest for the angler.", "icon": "golden_fishing_rod", "category": "challenger", "trigger": { "type": "counter", "key": "angler_quests", "min": 50 } },
+    { "id": "supreme_helper_minion", "name": "Supreme Helper Minion!", "description": "Complete a grand total of 200 quests for the angler.", "icon": "hotline_fishing_hook", "category": "challenger", "trigger": { "type": "counter", "key": "angler_quests", "min": 200 } }
   ]
 }

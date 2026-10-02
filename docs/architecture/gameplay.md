@@ -677,3 +677,14 @@ happiness via `TownCommerce.DescribeHappiness`, services, the whole shop with pr
 date when unlocked, else a progress bar from `AchievementTracker.Progress`). `OpenEntry` routes guide steps,
 tips, achievements, residents, enemies and items to their tab; `ui.book_tab` is the tab index (0 items … 5
 achievements). Not yet: the screenshot-tour line (main-only lavapipe tour).
+
+## Angler quest log, milestones and shop (P5-23)
+
+`PlayerState.AnglerQuests` (saved as `PlayerSave.AnglerQuests`, additive) counts a character's completed quests;
+`TownServices.TurnInFish` increments it, scales the coins by `coinGrowth` per quest (to `coinQuestCap`), gives every
+`AnglerReward` with `everyQuests` on its multiples (from `minQuests`: Crate Potions every 5th, the Golden Fishing Rod
+every 30th) and then rolls the chance rewards allowed by `minQuests`, and raises `AnglerQuestDone` (journal counter
+`angler_quests`: the reference game's five Angler achievements). `TownContext` fills `AnglerQuests` from the player,
+so the Angler's shop sells the fishing decor of `data/tileobjects/angler_decor.json` (seashells, treasure map,
+seaweed planter, lifebuoy, ship's wheel, wall anchor, bass/trout/tuna plaques; `bgen/angler_decor.py`) by
+`anglerQuests` conditions. Not yet: the quest count in the dialog's quest text and its Shop button (TownDialog, W4).

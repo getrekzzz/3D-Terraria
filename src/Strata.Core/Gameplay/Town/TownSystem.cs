@@ -171,7 +171,7 @@ public sealed partial class TownSystem
             : key.StartsWith('@')
                 ? Enum.TryParse<ItemCategory>(key[1..], ignoreCase: true, out var cat) ? p.State.Inventory.CountAll(d => d.Category == cat) : 0
                 : _world.Session.Content.Items.TryGet(key, out var item) ? p.State.Inventory.CountAll(item) : 0);
-        ctx.AnglerQuests = 0; // per-player quest counts arrive with the Angler's quest log (P5-23)
+        ctx.AnglerQuests = player.State.AnglerQuests;
         ctx.Records = PlayerRecords?.Invoke(player);
         return ctx;
     }

@@ -61,6 +61,9 @@ public sealed partial class TownServices
     /// <summary>A player had an item reforged (the new stack) — for the journal.</summary>
     public event Action<PlayerEntity, ItemStack>? Reforged;
 
+    /// <summary>A player completed an Angler quest (their new total).</summary>
+    public event Action<PlayerEntity, int>? AnglerQuestDone;
+
     // ---- Taxes -----------------------------------------------------------------------------------------------
 
     private long Hour => _world.Session.Clock.Tick / GameClock.TicksPerHour;
@@ -122,16 +125,27 @@ public sealed partial class TownServices
         inv.Backpack.Remove(d => d == wanted, 1);
         Counters[AnglerCounter] = (int)_world.Session.Clock.Day;
         var p = npc.Def.FindService(TownServiceSpecs.AnglerQuest)!.Parse<AnglerQuestParams>();
+        int done = ++player.State.AnglerQuests;
         long coins = p.Coins.Length >= 2 ? _rng.Range((int)p.Coins[0], (int)p.Coins[1]) : p.Coins.FirstOrDefault();
+        coins = (long)(coins * (1f + p.CoinGrowth * Math.Min(done, p.CoinQuestCap)));
         foreach (var s in Wallet.Give(inv, Content, coins)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
+        foreach (var r in p.Rewards) // milestones first: certain, on every multiple of EveryQuests
+            if (r.EveryQuests > 0 && done >= Math.Max(r.MinQuests, r.EveryQuests) && done % r.EveryQuests == 0) Give(r, ref reward);
         foreach (var r in p.Rewards)
         {
-            if (!_rng.Chance(r.Chance) || !Content.Items.TryGet(r.Item, out var item)) continue;
-            reward = Prefixes.Fresh(item, r.Count, Content, ref _rng);
-            var rest = inv.Pickup(reward);
-            if (!rest.IsEmpty) _world.Drops.Spawn(rest, player.Center, System.Numerics.Vector3.Zero);
-            break;
+            if (r.EveryQuests > 0 || done < r.MinQuests || !_rng.Chance(r.Chance)) continue;
+            if (Give(r, ref reward)) break;
         }
+        AnglerQuestDone?.Invoke(player, done);
         return TradeResult.Ok;
+
+        bool Give(AnglerReward r, ref ItemStack last)
+        {
+            if (!Content.Items.TryGet(r.Item, out var item)) return false;
+            last = Prefixes.Fresh(item, r.Count, Content, ref _rng);
+            var rest = inv.Pickup(last);
+            if (!rest.IsEmpty) _world.Drops.Spawn(rest, player.Center, System.Numerics.Vector3.Zero);
+            return true;
+        }
     }
 }

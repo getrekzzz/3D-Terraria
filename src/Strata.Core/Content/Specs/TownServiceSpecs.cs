@@ -135,6 +135,10 @@ public sealed class AnglerQuestParams : SpecParams, IValidatableSpec
 
     /// <summary>Coins paid per quest [min, max] (copper).</summary>
     public long[] Coins { get; init; } = { 2000, 10000 };
+
+    /// <summary>Coins grow by this fraction per completed quest, up to <see cref="CoinQuestCap"/> quests.</summary>
+    public float CoinGrowth { get; init; } = 0.02f;
+    public int CoinQuestCap { get; init; } = 50;
     public string? Validate() => Fish.Length == 0 ? "needs at least one fish" : null;
 }
 
@@ -143,4 +147,11 @@ public sealed class AnglerReward
     public string Item { get; init; } = "";
     public int Count { get; init; } = 1;
     public float Chance { get; init; } = 1f;
+
+    /// <summary>Offered only once the player has completed at least this many quests.</summary>
+    public int MinQuests { get; init; }
+
+    /// <summary>When above 0: given for certain (besides the rolled reward) on every quest count that is a multiple of
+    /// it, from <see cref="MinQuests"/> on (the reference game's milestone rewards).</summary>
+    public int EveryQuests { get; init; }
 }

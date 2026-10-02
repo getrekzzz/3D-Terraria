@@ -90,6 +90,12 @@
    ],
    "generator": "anvil"
   },
+  "bass_plaque": {
+   "models": [
+    "assets/models/objects/bass_plaque_v0.glb"
+   ],
+   "generator": "fish_plaque"
+  },
   "bat_statue": {
    "models": [
     "assets/models/objects/bat_statue_v0.glb"
@@ -1661,6 +1667,12 @@
    ],
    "generator": "flower"
   },
+  "lifebuoy": {
+   "models": [
+    "assets/models/objects/lifebuoy_v0.glb"
+   ],
+   "generator": "lifebuoy"
+  },
   "lihzahrd_altar": {
    "models": [
     "assets/models/objects/lihzahrd_altar_v0.glb"
@@ -2430,6 +2442,12 @@
    ],
    "generator": "piggy_bank"
   },
+  "pile_of_seashells": {
+   "models": [
+    "assets/models/objects/pile_of_seashells_v0.glb"
+   ],
+   "generator": "seashells"
+  },
   "pine_tree": {
    "models": [
     "assets/models/objects/pine_tree_v0.glb",
@@ -2778,6 +2796,12 @@
    ],
    "generator": "banner"
   },
+  "seaweed_planter": {
+   "models": [
+    "assets/models/objects/seaweed_planter_v0.glb"
+   ],
+   "generator": "seaweed_planter"
+  },
   "selenian_banner": {
    "models": [
     "assets/models/objects/selenian_banner_v0.glb"
@@ -2910,6 +2934,12 @@
     "assets/models/objects/shark_banner_v0.glb"
    ],
    "generator": "banner"
+  },
+  "ships_wheel": {
+   "models": [
+    "assets/models/objects/ships_wheel_v0.glb"
+   ],
+   "generator": "ships_wheel"
   },
   "shiverthorn_plant": {
    "models": [
@@ -3119,6 +3149,24 @@
    ],
    "generator": "torch"
   },
+  "treasure_map": {
+   "models": [
+    "assets/models/objects/treasure_map_v0.glb"
+   ],
+   "generator": "treasure_map"
+  },
+  "trout_plaque": {
+   "models": [
+    "assets/models/objects/trout_plaque_v0.glb"
+   ],
+   "generator": "fish_plaque"
+  },
+  "tuna_plaque": {
+   "models": [
+    "assets/models/objects/tuna_plaque_v0.glb"
+   ],
+   "generator": "fish_plaque"
+  },
   "twinkle_popper_banner": {
    "models": [
     "assets/models/objects/twinkle_popper_banner_v0.glb"
@@ -3166,6 +3214,12 @@
     "assets/models/objects/vulture_banner_v0.glb"
    ],
    "generator": "banner"
+  },
+  "wall_anchor": {
+   "models": [
+    "assets/models/objects/wall_anchor_v0.glb"
+   ],
+   "generator": "wall_anchor"
   },
   "wall_creeper_banner": {
    "models": [
@@ -3603,6 +3657,10 @@
   "bass": {
    "model": "assets/models/items/bass.glb",
    "icon": "assets/icons/items/bass.png"
+  },
+  "bass_plaque": {
+   "object": "bass_plaque",
+   "icon": "assets/icons/items/bass_plaque.png"
   },
   "bat_scepter": {
    "model": "assets/models/items/bat_scepter.glb",
@@ -6521,6 +6579,10 @@
    "model": "assets/models/items/life_fruit.glb",
    "icon": "assets/icons/items/life_fruit.png"
   },
+  "lifebuoy": {
+   "object": "lifebuoy",
+   "icon": "assets/icons/items/lifebuoy.png"
+  },
   "lifeforce_potion": {
    "model": "assets/models/items/lifeforce_potion.glb",
    "icon": "assets/icons/items/lifeforce_potion.png"
@@ -7751,6 +7813,10 @@
    "object": "piggy_bank",
    "icon": "assets/icons/items/piggy_bank.png"
   },
+  "pile_of_seashells": {
+   "object": "pile_of_seashells",
+   "icon": "assets/icons/items/pile_of_seashells.png"
+  },
   "pink_dungeon_bookcase": {
    "object": "pink_dungeon_bookcase",
    "icon": "assets/icons/items/pink_dungeon_bookcase.png"
@@ -8373,6 +8439,10 @@
    },
    "icon": "assets/icons/items/scourge_of_the_corruptor.png"
   },
+  "seaweed_planter": {
+   "object": "seaweed_planter",
+   "icon": "assets/icons/items/seaweed_planter.png"
+  },
   "seedler": {
    "model": "assets/models/items/seedler.glb",
    "sockets": {
@@ -8511,6 +8581,10 @@
   "shiny_stone": {
    "model": "assets/models/items/shiny_stone.glb",
    "icon": "assets/icons/items/shiny_stone.png"
+  },
+  "ships_wheel": {
+   "object": "ships_wheel",
+   "icon": "assets/icons/items/ships_wheel.png"
   },
   "shiverthorn": {
    "model": "assets/models/items/shiverthorn.glb",
@@ -9465,6 +9539,10 @@
    "object": "torch",
    "icon": "assets/icons/items/torch.png"
   },
+  "treasure_map": {
+   "object": "treasure_map",
+   "icon": "assets/icons/items/treasure_map.png"
+  },
   "trident": {
    "model": "assets/models/items/trident.glb",
    "sockets": {
@@ -9476,6 +9554,10 @@
   "trout": {
    "model": "assets/models/items/trout.glb",
    "icon": "assets/icons/items/trout.png"
+  },
+  "trout_plaque": {
+   "object": "trout_plaque",
+   "icon": "assets/icons/items/trout_plaque.png"
   },
   "true_excalibur": {
    "model": "assets/models/items/true_excalibur.glb",
@@ -9508,6 +9590,10 @@
   "tuna": {
    "model": "assets/models/items/tuna.glb",
    "icon": "assets/icons/items/tuna.png"
+  },
+  "tuna_plaque": {
+   "object": "tuna_plaque",
+   "icon": "assets/icons/items/tuna_plaque.png"
   },
   "tungsten_axe": {
    "model": "assets/models/items/tungsten_axe.glb",
@@ -9764,6 +9850,10 @@
   "vulture_banner": {
    "object": "vulture_banner",
    "icon": "assets/icons/items/vulture_banner.png"
+  },
+  "wall_anchor": {
+   "object": "wall_anchor",
+   "icon": "assets/icons/items/wall_anchor.png"
   },
   "wall_creeper_banner": {
    "object": "wall_creeper_banner",

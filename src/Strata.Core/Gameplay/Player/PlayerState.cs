@@ -57,6 +57,9 @@ public sealed class PlayerState
 
     public int Deaths { get; set; }
 
+    /// <summary>Angler quests completed by this character (P5-23).</summary>
+    public int AnglerQuests { get; set; }
+
     /// <summary>Creatures seen, killed and caught, townsfolk met, items obtained and crafted, achievements.</summary>
     public Guide.PlayerJournal Journal { get; } = new();
 

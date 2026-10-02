@@ -74,6 +74,7 @@
     "loot/segments.json",
     "recipes/basic.json",
     "recipes/materials.json",
+    "tileobjects/angler_decor.json",
     "tileobjects/biome_chests.json",
     "tileobjects/dungeon.json",
     "tileobjects/furniture.json",
