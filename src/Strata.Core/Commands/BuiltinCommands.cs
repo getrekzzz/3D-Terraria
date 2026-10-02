@@ -131,6 +131,7 @@ public static class BuiltinCommands
             Name = "kill", Usage = "kill", Help = "Kills the player (tests respawn).",
             Run = (ctx, _) =>
             {
+                ctx.Player.LastHarm = Gameplay.Combat.Harm.Other;
                 ctx.Player.State.Vitals.Kill();
                 return CommandResult.Success("Killed.");
             },

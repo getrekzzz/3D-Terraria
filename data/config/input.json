@@ -1,5 +1,5 @@
 {
-  "comment": "Default input bindings (registered at startup; rebinding persists to user settings later).",
+  "comment": "Default input bindings, registered at startup; every action is rebindable in Settings > Controls (saved to user://keybinds.cfg over these). Terraria habits: left click uses, right click interacts, 1-0 and the mouse wheel (down: next slot) pick the hotbar slot, Q throws the held item, M opens the map, Enter shows the chat history, Tab/I the inventory, which you can walk, jump, grapple and fight with open. Kept for a 3D game: E interacts, F grapples (Terraria's E), Ctrl drops through platforms (Terraria's S), Shift sprints. X toggles Smart Cursor. Quick heal/mana/buff come later (P3-33).",
   "actions": {
     "move_forward": ["key:W"],
     "move_back": ["key:S"],
@@ -22,8 +22,10 @@
     "drop_item": ["key:Q"],
     "grapple": ["key:F"],
     "quick_mount": ["key:G"],
+    "smart_cursor": ["key:X"],
     "console": ["key:QuoteLeft", "key:F1"],
     "debug_overlay": ["key:F3"],
+    "chat": ["key:Enter"],
     "free_camera": ["key:F4"],
     "photo_mode": ["key:P"],
     "photo_shot": ["key:F12", "key:Enter"],

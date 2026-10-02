@@ -142,7 +142,7 @@ public class ShopDataTests
     public void EveryResidentExceptServiceOnlyOnesHasAShop()
     {
         foreach (var npc in TestPaths.Content.TownNpcs.All)
-            if (Array.IndexOf(ServiceOnly, npc.Id) < 0) Assert.True(npc.AllShopEntries.Length > 0, $"{npc.Id} sells nothing");
+            if (Array.IndexOf(ServiceOnly, npc.Id) < 0 && !npc.Pet) Assert.True(npc.AllShopEntries.Length > 0, $"{npc.Id} sells nothing");
     }
 
     [Fact]

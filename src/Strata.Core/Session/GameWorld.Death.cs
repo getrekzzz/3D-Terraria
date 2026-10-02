@@ -9,6 +9,15 @@ public sealed partial class GameWorld
     /// <summary>A hardcore character died: its save is gone and the game should leave the world.</summary>
     public event Action<PlayerEntity>? PlayerLost;
 
+    /// <summary>A player died, with the death message naming the cause ("Wanderer was slain by a Zombie.").</summary>
+    public event Action<PlayerEntity, string>? PlayerSlain;
+
+    /// <summary>The death message lines (data/config/deaths.json; loaded by the launcher). Without them every death "was slain".</summary>
+    public Presentation.DeathMessages Deaths { get; set; } = new();
+
+    /// <summary>The message for <paramref name="p"/>'s latest death, from what hurt them last; the line follows the death count.</summary>
+    public string DeathMessage(PlayerEntity p) => Deaths.Format(p.State.Name, p.LastHarm, p.State.Deaths - 1);
+
     /// <summary>
     /// What death costs by character difficulty, as in the reference game: Classic drops half the coins carried (coin
     /// slots and backpack), Mediumcore drops the whole inventory, Hardcore drops everything and deletes the character.

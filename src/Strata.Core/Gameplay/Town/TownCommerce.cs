@@ -27,10 +27,10 @@ public sealed record ShopOffer(ItemDef Item, long Price, ItemDef? Currency = nul
 
 /// <summary>
 /// Conversation and trade with residents: dialogue lines chosen by condition, shop stock and prices scaled by
-/// happiness (liked biomes and neighbours make things cheaper, crowding dearer), selling at a fraction of value,
-/// and services (healing for coins, crafting help).
+/// happiness (liked biomes and neighbours make things cheaper, crowding dearer), and services (healing for coins,
+/// crafting help). Buying, selling and buyback are in TownCommerce.Trade.cs.
 /// </summary>
-public sealed class TownCommerce
+public sealed partial class TownCommerce
 {
     private static readonly Regex Placeholder = new(@"\{(player|name|resident:([a-z0-9_]+))\}", RegexOptions.Compiled);
 
@@ -140,49 +140,16 @@ public sealed class TownCommerce
         return entries;
     }
 
-    public TradeResult Buy(TownNpc npc, PlayerEntity player, ItemDef item, int count = 1, string tab = ShopTabs.Shop)
+    /// <summary>The resident's offer of <paramref name="item"/> right now on any tab, or null when they do not sell it now.</summary>
+    public ShopOffer? Offer(TownNpc npc, PlayerEntity player, ItemDef item)
     {
-        var offer = Stock(npc, player, tab).FirstOrDefault(o => o.Item == item);
-        if (offer == null) return TradeResult.Unavailable;
-        var inv = player.State.Inventory;
-        if (!inv.CanTake(new ItemStack(item, count))) return TradeResult.NoRoom;
-        IEnumerable<ItemStack> change = Array.Empty<ItemStack>();
-        if (offer.Currency is { } currency)
-        {
-            long cost = offer.Price * count;
-            if (inv.Backpack.Count(currency) < cost) return TradeResult.TooPoor;
-            inv.Backpack.Remove(d => d == currency, (int)cost);
-        }
-        else if (!Wallet.TrySpend(inv, player.State.BanksForPaying(), Content, offer.Price * count, out var coins)) return TradeResult.TooPoor;
-        else change = coins;
-        // Bought weapons and accessories come with a prefix too, each one rolled separately.
-        var rest = Prefixes.Made(item, count, Content, ref _rng).Select(g => inv.Pickup(g)).ToList();
-        foreach (var s in change.Concat(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
-        Traded?.Invoke(player, item, count);
-        return TradeResult.Ok;
+        foreach (var tab in Tabs(npc).DefaultIfEmpty(ShopTabs.Shop))
+            if (Stock(npc, player, tab).Find(o => o.Item == item) is { } offer) return offer;
+        return null;
     }
 
     /// <summary>A player bought goods from a resident (item, count) — for the journal.</summary>
     public event Action<PlayerEntity, ItemDef, int>? Traded;
-
-    /// <summary>Sale value of a stack (copper).</summary>
-    public long SaleValue(ItemStack stack) => Prefixes.SellValue(stack, Config.SellRatio);
-
-    /// <summary>Sells the whole stack in a backpack slot.</summary>
-    public TradeResult Sell(PlayerEntity player, int slot) => Sell(player, player.State.Inventory.Backpack, slot);
-
-    /// <summary>Sells the whole stack in a slot of one of the player's storages (backpack or ammo; coins never sell).</summary>
-    public TradeResult Sell(PlayerEntity player, Inventory from, int slot)
-    {
-        var inv = player.State.Inventory;
-        var stack = from[slot];
-        if (stack.IsEmpty || stack.Item!.HasTag("coin")) return TradeResult.NotSold;
-        long value = SaleValue(stack);
-        if (value <= 0) return TradeResult.NotSold;
-        from.Take(slot, stack.Count);
-        foreach (var s in Wallet.Give(inv, Content, value)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
-        return TradeResult.Ok;
-    }
 
     /// <summary>Cost of the resident's healing service for this player now (0 = nothing to heal or no such service).</summary>
     public long HealCost(TownNpc npc, PlayerEntity player)

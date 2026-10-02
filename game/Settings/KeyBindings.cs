@@ -19,12 +19,14 @@ public static class KeyBindings
         ("move_forward", "Move forward"), ("move_back", "Move back"), ("move_left", "Move left"), ("move_right", "Move right"),
         ("jump", "Jump"), ("sprint", "Sprint"), ("crouch", "Drop through platforms"),
         ("use_primary", "Use item / attack"), ("use_secondary", "Interact / place"), ("interact", "Interact"),
-        ("inventory", "Inventory"), ("guide_book", "Guide book"), ("toggle_camera", "Toggle first/third person"), ("precision_mode", "Precision (small blocks)"),
+        ("inventory", "Inventory"), ("map", "World map"), ("guide_book", "Guide book"), ("toggle_camera", "Toggle first/third person"), ("precision_mode", "Precision (small blocks)"),
         ("cycle_shape", "Cycle block shape"), ("rotate_shape", "Rotate block shape"), ("drop_item", "Drop item"), ("grapple", "Grappling hook"),
-        ("quick_mount", "Quick mount"), ("emote_wheel", "Emote wheel"), ("pause", "Menu / pause"), ("console", "Console"), ("debug_overlay", "Performance overlay"),
+        ("quick_mount", "Quick mount"), ("smart_cursor", "Smart cursor"), ("emote_wheel", "Emote wheel"),
+        ("pause", "Menu / pause"), ("chat", "Chat history"), ("console", "Console"), ("debug_overlay", "Performance overlay"),
         ("photo_mode", "Photo mode"), ("photo_shot", "Photo mode: take picture"),
         ("hotbar_1", "Hotbar 1"), ("hotbar_2", "Hotbar 2"), ("hotbar_3", "Hotbar 3"), ("hotbar_4", "Hotbar 4"), ("hotbar_5", "Hotbar 5"),
         ("hotbar_6", "Hotbar 6"), ("hotbar_7", "Hotbar 7"), ("hotbar_8", "Hotbar 8"), ("hotbar_9", "Hotbar 9"), ("hotbar_10", "Hotbar 10"),
+        ("hotbar_next", "Next hotbar slot"), ("hotbar_prev", "Previous hotbar slot"),
     };
 
     /// <summary>Applies the saved bindings over the registered defaults.</summary>

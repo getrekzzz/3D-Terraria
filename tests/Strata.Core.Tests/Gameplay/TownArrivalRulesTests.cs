@@ -105,5 +105,5 @@ public class TownArrivalRulesTests
 
     [Fact]
     public void AllTwentyNineTownNpcsLoadFromTheTownFolder() =>
-        Assert.Equal(29, Support.TestPaths.Content.TownNpcs.Count);
+        Assert.Equal(32, Support.TestPaths.Content.TownNpcs.Count); // 29 plus the three town pets (P5-20)
 }

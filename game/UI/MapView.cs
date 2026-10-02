@@ -102,7 +102,7 @@ public sealed partial class MapView : Control
         }
         if (m.Label != null && Zoom >= 1.5f)
         {
-            var font = GetThemeDefaultFont();
+            var font = UiFonts.Bold; // the theme's face, also on the minimap's own layer
             var at = p + new Vector2(m.Size + 4, 5);
             DrawStringOutline(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, UiFonts.Outline, UiFonts.OutlineColor);
             DrawString(font, at, m.Label, HorizontalAlignment.Left, -1, UiFonts.Small, Colors.White);

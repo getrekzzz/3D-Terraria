@@ -27,7 +27,7 @@ public sealed partial class NpcSystem
         // Terraria-like: a clear shove away from the creature with a hop (none at full knockback resistance).
         float stand = 1f - Math.Clamp(state.Effects.Stats.Bonus(Stats.StatIds.KnockbackResist), 0f, 1f);
         var knock = (away * (4f + hit.Knockback * 0.6f) + new Vector3(0, 5.5f, 0)) * stand;
-        ReportPlayerDamage(player, hit.Damage, knock);
+        ReportPlayerDamage(player, hit.Damage, knock, Harm.By(npc.Def));
         ApplyContactEffects(npc, player);
         float thorns = state.Effects.Stats.Bonus(Stats.StatIds.Thorns);
         if (thorns > 0) Hit(npc, null, (int)(npc.Def.Damage * npc.DamageScale * thorns), DamageClass.None, 0, 0f, player.Center, melee: false);
@@ -48,11 +48,14 @@ public sealed partial class NpcSystem
     }
 
     /// <summary>
-    /// Announces damage a player took from any source (numbers, knockback, hurt effects); <paramref name="kind"/> is
-    /// <see cref="DamageKind.Periodic"/> for debuffs ticking, which show smaller numbers and a quieter hurt sound.
+    /// Announces damage a player took from any source (numbers, knockback, hurt effects) and remembers what dealt it
+    /// (<see cref="PlayerEntity.LastHarm"/>, named by the death message; null keeps the cause already set).
+    /// <paramref name="kind"/> is <see cref="DamageKind.Periodic"/> for debuffs ticking, which show smaller numbers and
+    /// a quieter hurt sound.
     /// </summary>
-    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock, DamageKind kind = DamageKind.Player)
+    public void ReportPlayerDamage(PlayerEntity player, int damage, Vector3 knock, Harm? harm = null, DamageKind kind = DamageKind.Player)
     {
+        if (harm is { } h) player.LastHarm = h;
         Damaged?.Invoke(new DamageEvent(player.Center + new Vector3(0, 1f, 0), damage, false, true, 0, kind, player));
         PlayerHurt?.Invoke(player, damage, knock);
     }

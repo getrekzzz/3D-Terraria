@@ -195,6 +195,15 @@ public sealed partial class TownSystem
         return true;
     }
 
+    /// <summary>
+    /// Keeps a conversation going while its chat box or shop is open: the resident waits, facing the player, until
+    /// the window closes (Terraria's talk target).
+    /// </summary>
+    public void HoldTalk(TownNpc r, Session.PlayerEntity p)
+    {
+        if (r.TalkingTo == p) r.TalkTicks = Config.TalkTicks;
+    }
+
     public void EndTalk(TownNpc r)
     {
         r.TalkingTo = null;
