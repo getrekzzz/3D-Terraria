@@ -6,7 +6,8 @@ namespace Strata.Game.UI;
 
 /// <summary>
 /// Clicks: every slot click goes to <see cref="GameWorld.ClickSlot"/> with the open chest as its context (right click
-/// equips, swaps with vanity, opens crates or takes one; Ctrl trashes, Alt favourites, Shift quick-moves); a held right
+/// equips, swaps with vanity, opens crates or takes one; Ctrl trashes, Alt favourites, Shift quick-moves: to the open
+/// chest, to the shop's buyback (a sale) or into the reforge slot); a held right
 /// click keeps taking one at <see cref="HoldRepeat"/>'s quickening pace (the view repeats it while items keep moving).
 /// Moving, equipping, trashing and opening make Terraria's grab sound, a favourite mark a tick and a sale coins (the
 /// crafting list follows the backpack through its change events). The Sort Inventory and Quick Stack to Nearby Chests
@@ -18,10 +19,14 @@ public sealed partial class InventoryScreen
 
     private ulong _lastGrabMs;
 
-    /// <summary>The chest open under the inventory (Shift moves to it), or the shop (Shift sells), if any.</summary>
+    /// <summary>
+    /// The chest open under the inventory (Shift moves to it), the shop (Shift sells) or the reforge slot (Shift puts the
+    /// item in it), if any.
+    /// </summary>
     private SlotContext Context =>
         _chest.Container is { } chest && _chest.ContainerInventory is { } inv ? new SlotContext(inv, null, chest)
         : _panel == _shop && _shop.Npc is { } npc ? new SlotContext(Shop: npc)
+        : _panel == _service && _service.Npc != null ? new SlotContext(Service: true)
         : SlotContext.None;
 
     private void Click(ItemSlotView view, SlotRef slot, bool right, ClickMods mods)

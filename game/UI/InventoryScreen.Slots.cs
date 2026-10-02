@@ -27,6 +27,16 @@ public sealed partial class InventoryScreen
         return null;
     }
 
+    /// <summary>The slot <paramref name="view"/> shows now (the controller cursor's probes), or null for one that shows no slot (a recipe).</summary>
+    public SlotRef? SlotOf(ItemSlotView view)
+    {
+        foreach (var (at, v) in _slots)
+            if (v == view) return at();
+        for (int i = 0; i < ShopPanel.Cells; i++)
+            if (_shop.View(i) == view) return new SlotRef(SlotArea.Shop, i);
+        return null;
+    }
+
     private ItemSlotView Slot(SlotArea area, int index, string? badge = null) => Slot(() => new SlotRef(area, index), badge, Hint(area, index));
 
     private ItemSlotView Slot(Func<SlotRef> slot, string? badge, Texture2D? hint)

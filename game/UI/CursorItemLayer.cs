@@ -7,7 +7,8 @@ namespace Strata.Game.UI;
 /// <summary>
 /// The stack held on the cursor (<see cref="PlayerInventory.Cursor"/>), drawn at the pointer over every screen as
 /// Terraria does: a 40 px icon just below and right of the tip with its count in bold outlined white. Shown whenever
-/// the pointer is free and the cursor holds something; above every panel, below the tooltip.
+/// the pointer is free and the cursor holds something; above every panel, below the tooltip. While a controller drives
+/// the screen it follows the controller cursor (<see cref="PadCursor.Pointer"/>).
 /// </summary>
 public sealed partial class CursorItemLayer : CanvasLayer
 {
@@ -41,7 +42,7 @@ public sealed partial class CursorItemLayer : CanvasLayer
         if (_held.Visible != show) _held.Visible = show;
         if (!show) return;
         _held.Hold(cursor);
-        _held.Position = _root.GetLocalMousePosition() + PointerOffset;
+        _held.Position = (PadCursor.Pointer ?? _root.GetLocalMousePosition()) + PointerOffset;
     }
 
     /// <summary>The held icon and count; redrawn only when the stack changes (following the pointer just moves it).</summary>

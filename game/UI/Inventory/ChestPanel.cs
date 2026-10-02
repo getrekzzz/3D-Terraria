@@ -134,10 +134,11 @@ public sealed partial class ChestPanel : Control
             view.Visible = i < slots;
             if (!view.Visible) continue;
             view.Position = new Vector2(i % Columns * pitch, top + i / Columns * pitch);
-            view.CustomMinimumSize = view.Size = new Vector2(side, side);
+            view.Resize(side);
         }
-        _title.Position = _renameField.Position = Vector2.Zero;
-        _title.Size = _renameField.Size = new Vector2(gridW, top);
+        _title.Position = Vector2.Zero;
+        _title.Size = new Vector2(gridW, top);
+        FitRenameField(gridW, top);
         int shown = 0;
         foreach (var b in _buttons)
             if (b.Visible) shown++;

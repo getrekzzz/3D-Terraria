@@ -114,7 +114,7 @@
       "life": 1000, "damage": 30, "defense": 14, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
       "onContact": [{ "type": "applyBuff", "buff": "confused", "ticks": 90, "chance": 0.33 }],
       "loot": "brain_of_cthulhu", "value": 10000,
-      "boss": { "title": "Brain of Cthulhu", "flag": "defeated_brain_of_cthulhu", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 150, "music": "boss_brain" },
+      "boss": { "title": "Brain of Cthulhu", "flag": "defeated_brain_of_cthulhu", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 150, "music": "boss_brain", "intro": { "subtitle": "Mind of the Crimson", "color": "#e0506a", "framing": 2.0, "letterbox": 1.8 } },
       "covers": ["terraria:brain_of_cthulhu"]
     }
   ],

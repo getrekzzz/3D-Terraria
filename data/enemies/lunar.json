@@ -79,7 +79,7 @@
       ] },
       "life": 32000, "damage": 50, "defense": 42, "knockbackResist": 1.0, "size": [1.6, 3.6], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [6, 8, 14],
       "loot": "lunatic_cultist", "value": 100000,
-      "boss": { "title": "Lunatic Cultist", "flag": "defeated_lunatic_cultist", "arenaRadius": 140, "music": "boss_cultist",
+      "boss": { "title": "Lunatic Cultist", "flag": "defeated_lunatic_cultist", "arenaRadius": 140, "music": "boss_cultist", "intro": { "subtitle": "Herald of the Lunar Doom", "color": "#64a8ff", "framing": 2.5, "letterbox": 2.0 },
         "ritual": { "landmark": "dungeon_gate", "requires": "defeated_golem", "altar": "mysterious_tablet", "worshipper": "lunatic_devotee", "count": 4,
           "guard": "cultist_archer", "guards": 2, "radius": 3.5, "range": 60 } },
       "covers": ["terraria:lunatic_cultist"]
@@ -175,7 +175,7 @@
       ] },
       "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [8, 10], "moveSpeed": 4, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
       "loot": "moon_lord", "value": 200000,
-      "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220, "music": "boss_moon_lord",
+      "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220, "music": "boss_moon_lord", "intro": { "subtitle": "The Final Calamity", "color": "#48e0c8", "framing": 3.5, "letterbox": 2.5 },
         "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5], "inBossBar": true }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2], "inBossBar": true, "mirror": true }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2], "inBossBar": true }] },
       "covers": ["terraria:moon_lord"]
     },

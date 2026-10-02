@@ -8,7 +8,7 @@ namespace Strata.Game.Settings;
 /// interface and display options. Changes apply live through <see cref="Changed"/> and are saved with
 /// <see cref="Save"/>. Key bindings are stored by <see cref="KeyBindings"/>.
 /// </summary>
-public sealed class UserSettings
+public sealed partial class UserSettings
 {
     private const string FilePath = "user://settings.cfg";
 
@@ -73,6 +73,9 @@ public sealed class UserSettings
 
     /// <summary>Besides its chat line, "X has awoken!" also shows as a big banner at the top centre.</summary>
     public bool BigAnnouncements { get; set; }
+
+    /// <summary>A boss's arrival shows its title card with cinema bars and a camera pull-back; its fall a "Defeated" card and a brief slow-motion.</summary>
+    public bool BossIntros { get; set; } = true;
     public string CursorColor { get; set; } = DefaultCursorColor;
 
     /// <summary>How life and mana show: "classic" (Terraria's hearts and stars) or "bars".</summary>

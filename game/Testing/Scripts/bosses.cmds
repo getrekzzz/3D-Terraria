@@ -10,8 +10,17 @@ boss king_slime 12
 assert camera.trauma > 0
 assert boss.king_slime.life > 0
 assert npcs.king_slime == 1
+# X-02: its title card comes up with it, with cinema bars and the camera pulled back for a moment; its own theme plays.
+assert boss.intro_active == 1
+assert boss.intro_cards == 1
+assert boss.intro_defeated == 0
+wait 0.3
+assert boss.intro_bars > 0
+assert camera.framing > 0
 wait 2
 assert player.alive == 1
+assert music.track.boss_gel == 1
+wait_until camera.framing == 0 3
 killall
 time 22
 give suspicious_looking_eye 1
@@ -43,10 +52,23 @@ assert boss.brain_of_cthulhu.illusions == 3
 slay brain_of_cthulhu
 assert flag.defeated_brain_of_cthulhu == 1
 assert music.silent == 1
+# Its fall: the "Defeated" card, the victory sting over the hush and a brief slow motion that ends by itself.
+assert boss.intro_defeated == 1
+assert music.stings > 0
+assert time.scale < 1
+wait_until time.scale == 1 2
 assert flag.defeated_evil_boss == 1
 killall
 boss queen_bee 10
-wait 3
+# Attacking skips the title card (it never holds the player up).
+assert boss.intro_active == 1
+wait 0.6
+press use_primary
+wait 0.1
+release use_primary
+wait_until boss.intro_skips > 0 2
+wait_until boss.intro_active == 0 2
+wait 2.3
 assert npcs.queen_bee == 1
 # Outside the jungle she is enraged.
 assert boss.queen_bee.frenzied == 1

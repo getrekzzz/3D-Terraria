@@ -7,8 +7,9 @@ namespace Strata.Game.UI;
 /// <summary>
 /// The crosshair in the Crosshair region: a small cross in the cursor colour (Settings → Interface), brighter when the
 /// target is within reach. Pointing at a town resident within talking range shows the speech-bubble hint and, at a
-/// door, chest, bed, chair, lever or altar within reach, the hand hint, each with the interact key to its right; the
-/// <see cref="TargetLabel"/> names what is under it below. With Smart Cursor on the cross turns orange and the smart
+/// door, chest, bed, chair, lever or altar within reach, the hand hint, each with the interact key to its right (the
+/// controller's button, drawn as one, while a controller is in use); the
+/// <see cref="TargetLabel"/> names what is under it beside the cross, below and to the right, as Terraria's hover text. With Smart Cursor on the cross turns orange and the smart
 /// cursor icon sits to its left. With no region (the inventory's layout) only the cross shows.
 /// </summary>
 public sealed partial class Crosshair : Control
@@ -22,6 +23,8 @@ public sealed partial class Crosshair : Control
     private bool _smart;
     private Texture2D? _hint;
     private string _key = "";
+    private bool _padKey;
+    private int _deviceVersion = -1;
     private string? _cursorSetting;
     private Color _tint = Colors.White;
 
@@ -35,8 +38,14 @@ public sealed partial class Crosshair : Control
         AddChild(_target);
     }
 
-    /// <summary>What the label under the crosshair shows (the <c>hud.target_name</c> probes).</summary>
+    /// <summary>What the hover name beside the crosshair shows (the <c>hud.target_name</c> probes).</summary>
     public string TargetText => _target.Text;
+
+    /// <summary>The interact hint shows the controller's button (the <c>hud.prompt_pad</c> probe).</summary>
+    public bool PromptOnPad => _hint != null && _padKey;
+
+    /// <summary>The hover name is a boss's, drawn in boss purple (the <c>hud.target_boss</c> probe).</summary>
+    public bool TargetIsBoss => _target.Text.Length > 0 && _target.TextColor == TargetLabel.BossColor;
 
     /// <summary>
     /// Takes the Crosshair region of <paramref name="layout"/>; without one, the cross alone stays at the centre of
@@ -51,8 +60,8 @@ public sealed partial class Crosshair : Control
             Size = Vector2.Zero;
         }
         _target.Visible = _placed;
-        _target.Position = new Vector2(0, UiLayout.CrosshairTop + Arm + 4);
-        _target.Size = new Vector2(Size.X, Mathf.Max(0, Size.Y - _target.Position.Y));
+        _target.Position = Vector2.Zero; // over the whole region: it draws the name beside the cross
+        _target.Size = Size;
         QueueRedraw();
     }
 
@@ -68,8 +77,15 @@ public sealed partial class Crosshair : Control
         }
         string setting = Settings.UserSettings.Current.CursorColor;
         bool smart = Settings.UserSettings.Current.SmartCursor;
-        if (inReach == _inReach && hint == _hint && smart == _smart && ReferenceEquals(setting, _cursorSetting)) return;
-        if (hint != null && _hint == null) _key = Settings.KeyBindings.Label("interact");
+        bool device = InputDevice.Version != _deviceVersion;
+        if (inReach == _inReach && hint == _hint && smart == _smart && ReferenceEquals(setting, _cursorSetting) && !device) return;
+        if (hint != null && (_hint == null || device))
+        {
+            // The interact binding of the device in use: "E", or the controller's X drawn as its button.
+            _key = Settings.KeyBindings.Prompt("interact");
+            _padKey = InputDevice.UsingPad;
+        }
+        _deviceVersion = InputDevice.Version;
         _inReach = inReach;
         _hint = hint;
         _smart = smart;
@@ -106,6 +122,11 @@ public sealed partial class Crosshair : Control
         var size = _hint.GetSize();
         var hintAt = (at + new Vector2(HintOffset, -size.Y / 2)).Round();
         DrawTextureRect(_hint, new Rect2(hintAt, size), false);
+        if (_padKey)
+        {
+            PadGlyph.Draw(this, new Vector2(hintAt.X + size.X + 4, at.Y), _key, UiFonts.Body);
+            return;
+        }
         var font = UiFonts.Bold;
         var baseline = new Vector2(hintAt.X + size.X + 4, at.Y + UiFonts.Body * 0.35f);
         DrawStringOutline(font, baseline, _key, HorizontalAlignment.Left, -1, UiFonts.Body, UiFonts.Outline, UiFonts.OutlineColor);

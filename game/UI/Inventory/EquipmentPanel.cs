@@ -99,10 +99,10 @@ public sealed partial class EquipmentPanel : Control
     }
 
     /// <summary>
-    /// Follows <paramref name="state"/> while the inventory is open: the defence, which accessory rows show (and lock),
-    /// and the eyes. Cheap enough per frame: it reads 7 rows and lays out only when a row appears or goes.
+    /// Follows <paramref name="state"/> while the inventory is open: the defence, which accessory rows show (and lock, with
+    /// what unlocks them in a <paramref name="difficulty"/> world as the tooltip's last line), and the eyes. Cheap enough per frame: it reads 7 rows and lays out only when a row appears or goes.
     /// </summary>
-    public void Refresh(PlayerState state)
+    public void Refresh(PlayerState state, Strata.Core.World.Difficulty difficulty)
     {
         Defense.Update(state);
         var inv = _inv = state.Inventory;
@@ -115,6 +115,8 @@ public sealed partial class EquipmentPanel : Control
             bool shown = !locked || !inv.Accessories[i].IsEmpty || !inv.VanityAccessories[i].IsEmpty || !inv.Dyes[r].IsEmpty;
             if (shown) rows++;
             _dyes[r].Locked = _vanity[r].Locked = _equip[r].Locked = locked;
+            if (locked) _dyes[r].LockedText = _vanity[r].LockedText = _equip[r].LockedText =
+                Strata.Core.Session.GameWorld.AccessorySlotRequirement(difficulty, state.ExtraAccessorySlot, i);
             _eyes[i].Disabled = locked;
             if (_rowShown[r] == shown) continue;
             _rowShown[r] = shown;
@@ -196,7 +198,7 @@ public sealed partial class EquipmentPanel : Control
     private static void Put(ItemSlotView view, float x, float y, float side)
     {
         view.Position = new Vector2(x, y);
-        view.CustomMinimumSize = view.Size = new Vector2(side, side);
+        view.Resize(side);
     }
 
     /// <summary>A 26 px pixel-art tab; it never takes keyboard focus (Space jumps) and brightens under the mouse.</summary>

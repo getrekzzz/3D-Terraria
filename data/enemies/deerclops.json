@@ -51,7 +51,7 @@
       ] },
       "life": 7000, "damage": 20, "defense": 10, "knockbackResist": 1.0, "size": [4, 9], "moveSpeed": 3.5, "tint": "#ffffff",
       "loot": "deerclops", "value": 12000,
-      "boss": { "title": "Deerclops", "flag": "defeated_deerclops", "arenaRadius": 150, "music": "boss_deer" },
+      "boss": { "title": "Deerclops", "flag": "defeated_deerclops", "arenaRadius": 150, "music": "boss_deer", "intro": { "subtitle": "Horror of the Frozen Wastes", "color": "#9cc4ec", "framing": 2.5, "letterbox": 1.8 } },
       "covers": ["terraria:deerclops"]
     }
   ],

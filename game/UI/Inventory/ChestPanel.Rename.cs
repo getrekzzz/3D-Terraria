@@ -1,4 +1,5 @@
 using Godot;
+using Strata.Core.Presentation;
 using Strata.Core.Voxels.TileObjects;
 
 namespace Strata.Game.UI;
@@ -11,13 +12,18 @@ namespace Strata.Game.UI;
 /// </summary>
 public sealed partial class ChestPanel
 {
+    private const int MinRenameFont = 9;
+
+    /// <summary>How far the name field may rise above the panel: the gap between the backpack grid and the panel.</summary>
+    private const float RenameHeadroom = 2 * UiLayout.Gap - 1;
+
     private LineEdit RenameField()
     {
         var field = new LineEdit { MaxLength = TileObjectInstance.MaxNameLength, Visible = false };
         field.AddThemeFontSizeOverride("font_size", UiFonts.Small);
-        // Without the theme's 4 px padding above and below the text, so the field (as tall as the font's line) grows
-        // less far past the 18 px caption row over the first row of chest slots while a name is typed.
-        foreach (string box in new[] { "normal", "focus" })
+        // Without the theme's 4 px padding above and below the text, so the field is as tall as the font's line and fits
+        // the caption row (FitRenameField) instead of covering the first row of chest slots while a name is typed.
+        foreach (string box in new[] { "normal", "focus", "read_only" })
         {
             var style = (StyleBox)UiTheme.Theme.GetStylebox(box, "LineEdit").Duplicate();
             style.ContentMarginTop = style.ContentMarginBottom = 0;
@@ -92,4 +98,29 @@ public sealed partial class ChestPanel
         _ui.Game.RenameContainer(Container, _renameField.Text);
         _title.Text = Container.DisplayName;
     }
+
+    /// <summary>
+    /// Puts the name field on the caption row, <paramref name="width"/> wide, its bottom on the row's bottom so a field
+    /// taller than the row grows up into the gap above the panel rather than down over the first row of slots; in the
+    /// largest font up to the small UI size whose line fits the row and that gap.
+    /// </summary>
+    private void FitRenameField(float width, float height)
+    {
+        var font = _renameField.GetThemeFont("font");
+        float pad = _renameField.GetThemeStylebox("normal").GetMinimumSize().Y, room = height + RenameHeadroom;
+        int size = UiFonts.Small;
+        while (size > MinRenameFont && font.GetHeight(size) + pad > room) size--;
+        _renameField.AddThemeFontSizeOverride("font_size", size);
+        float h = Mathf.Max(height, font.GetHeight(size) + pad);
+        _renameField.CustomMinimumSize = Vector2.Zero;
+        _renameField.Position = new Vector2(0, height - h);
+        _renameField.Size = new Vector2(width, h);
+    }
+
+    /// <summary>
+    /// The name field stays on the caption row and the gap above the panel, off the first row of slots (the
+    /// <c>ui.rename_fits</c> probe).
+    /// </summary>
+    public bool RenameFits => _renameField.Position.Y + _renameField.Size.Y <= UiLayout.Caption + 0.01f
+        && _renameField.Position.Y >= -RenameHeadroom - 0.01f;
 }

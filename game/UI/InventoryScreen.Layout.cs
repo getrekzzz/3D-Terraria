@@ -215,6 +215,6 @@ public sealed partial class InventoryScreen
     private static void PutSlot(ItemSlotView view, float x, float y, float side)
     {
         view.Position = new Vector2(x, y);
-        view.CustomMinimumSize = view.Size = new Vector2(side, side);
+        view.Resize(side);
     }
 }

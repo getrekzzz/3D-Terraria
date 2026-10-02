@@ -67,6 +67,20 @@ public class PlayerInventoryTests
     }
 
     [Theory]
+    [InlineData(Difficulty.Classic, false, 5, "Requires Expert Mode and a Demon Heart")]
+    [InlineData(Difficulty.Classic, true, 6, "Requires Master Mode")]
+    [InlineData(Difficulty.Expert, false, 5, "Requires a Demon Heart")]
+    [InlineData(Difficulty.Expert, true, 6, "Requires Master Mode")]
+    [InlineData(Difficulty.Master, false, 6, "Requires a Demon Heart")]
+    [InlineData(Difficulty.Master, true, 6, null)]
+    [InlineData(Difficulty.Expert, true, 5, null)]
+    public void ALockedAccessorySlotSaysWhatUnlocksIt(Difficulty difficulty, bool heart, int slot, string? reason)
+    {
+        Assert.Equal(reason, GameWorld.AccessorySlotRequirement(difficulty, heart, slot));
+        Assert.Equal(reason != null, slot >= GameWorld.AccessorySlotsFor(difficulty, heart));
+    }
+
+    [Theory]
     [InlineData(Difficulty.Classic, false, 5)]
     [InlineData(Difficulty.Classic, true, 5)] // the heart's slot stays greyed out in a Classic world
     [InlineData(Difficulty.Journey, true, 5)]

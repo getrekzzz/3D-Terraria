@@ -223,6 +223,29 @@ SPRITES = {
         abbbbbba
         .aaaaaa.
     """,
+    # --- Map markers (9x9 cells = 20 px with the outline): the world spawn's flag and the player's bed ---
+    "map_spawn": """
+        .dyyyyy..
+        .dyyyyyo.
+        .dyyyyyo.
+        .dyyyyo..
+        .dooo....
+        .d.......
+        .d.......
+        .d.......
+        ddd......
+    """,
+    "map_bed": """
+        .........
+        t........
+        tw.......
+        twwrrrrrt
+        tmmmmmmmt
+        tnnnnnnnt
+        tnnnnnnnt
+        t.......t
+        t.......t
+    """,
     # --- Menu row icons (15x15 cells = 32 px with the outline) ---
     "menu_play": """
         ...............

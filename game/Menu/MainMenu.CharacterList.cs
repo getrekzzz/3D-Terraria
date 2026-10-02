@@ -15,7 +15,7 @@ public sealed partial class MainMenu
     {
         var (panel, box) = MenuKit.Panel(new Vector2(760, 520));
         box.AddChild(MenuKit.Title("Select Player", 40));
-        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 360), SizeFlagsVertical = Control.SizeFlags.ExpandFill };
+        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 360), SizeFlagsVertical = Control.SizeFlags.ExpandFill, FollowFocus = true };
         var list = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         list.AddThemeConstantOverride("separation", 8);
         scroll.AddChild(list);

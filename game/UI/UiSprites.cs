@@ -23,6 +23,7 @@ public static class UiSprites
         "slot_minecart", "slot_mount", "slot_hook", "slot_coin", "slot_ammo",
         "eye_open", "eye_closed", "sort", "quick_stack", "deposit", "loot", "reforge_hammer", "toggle_on", "toggle_off",
         "tab_equipment", "tab_misc", "tab_housing", "cursor", "smart_cursor", "talk_hint", "open_hint", "minimap_frame", "zoom_in", "zoom_out",
+        "map_spawn", "map_bed",
         "slider_grabber", "slider_grabber_hover", "menu_play", "menu_delete", "menu_favourite", "menu_favourite_off",
     };
 

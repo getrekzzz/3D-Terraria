@@ -52,6 +52,7 @@ jobs:
           python3 tools/content/gen_reference.py --check
           python3 tools/blender/build_all.py --check
           python3 tools/textures/build_ui.py --check
+          python3 tools/textures/icon_mipmaps.py --check
           dotnet run --project tools/Strata.Tools -c Debug --no-build -- coverage | tee coverage.md >> "$GITHUB_STEP_SUMMARY"
 
   engine-smoke:

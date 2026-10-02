@@ -9,25 +9,35 @@ namespace Strata.Game.Audio;
 /// <summary>
 /// Chooses and cross-fades the soundtrack (<c>res://assets/audio/music/&lt;track&gt;.ogg</c>): a boss's theme while one
 /// lives, then an active event's, then the biome around the player (with night, rain, town and underground variants,
-/// see MusicDirector.Variants.cs), then the depth layer. Content music states that have no track of their own fall back
-/// to a family track (every early boss shares "boss_1").
+/// see MusicDirector.Variants.cs), then the depth layer. Every major boss has its own theme (its music state names the
+/// track); a state without a track falls back along <see cref="Aliases"/> to a family track ("boss_1", "boss_2"...).
+/// <see cref="Sting"/> plays a short non-looping cue over the soundtrack (the victory sting as a boss falls).
 /// </summary>
 public sealed partial class MusicDirector : Node
 {
     public const float FadeSeconds = 2.0f;
 
+    /// <summary>
+    /// Where a music state goes when it has no track of its own, followed until a track exists: the evil bosses share one
+    /// theme, the per-boss themes fall back to their family track, events to the invasion or lunar themes.
+    /// </summary>
     private static readonly Dictionary<string, string> Aliases = new()
     {
-        ["boss_eye"] = "boss_1", ["boss_worm"] = "boss_1", ["boss_brain"] = "boss_1", ["boss_crypt"] = "boss_1", ["boss_gel"] = "boss_1",
-        ["boss_deer"] = "boss_1", ["boss_maw"] = "boss_1", ["boss_bee"] = "boss_queen", ["boss_queen_slime"] = "boss_queen", ["boss_empress"] = "boss_queen",
-        ["boss_mech"] = "boss_2", ["boss_fishron"] = "boss_2", ["boss_golem"] = "boss_2", ["boss_pirates"] = "boss_2", ["boss_martians"] = "boss_2",
-        ["boss_ooa"] = "boss_2", ["boss_pumpkin"] = "boss_3", ["boss_frost"] = "boss_3", ["boss_cultist"] = "boss_lunar",
+        ["boss_worm"] = "boss_evil", ["boss_brain"] = "boss_evil", ["boss_evil"] = "boss_1", ["boss_eye"] = "boss_1", ["boss_crypt"] = "boss_1",
+        ["boss_gel"] = "boss_1", ["boss_deer"] = "boss_1", ["boss_maw"] = "boss_1", ["boss_bee"] = "boss_queen", ["boss_queen_slime"] = "boss_queen",
+        ["boss_empress"] = "boss_queen", ["boss_mech"] = "boss_2", ["boss_fishron"] = "boss_2", ["boss_golem"] = "boss_2", ["boss_pirates"] = "boss_2",
+        ["boss_martians"] = "boss_2", ["boss_ooa"] = "boss_2", ["boss_pumpkin"] = "boss_3", ["boss_frost"] = "boss_3", ["boss_cultist"] = "boss_lunar",
         ["solar_eclipse"] = "eclipse", ["goblin_army"] = "invasion", ["pirate_invasion"] = "invasion", ["martian_madness"] = "invasion",
         ["old_ones_army"] = "invasion", ["frost_legion"] = "invasion", ["lunar_events"] = "boss_lunar",
     };
 
+    /// <summary>Short non-looping cues: <c>res://assets/audio/music/stings/&lt;id&gt;.ogg</c>.</summary>
+    public const string StingDirectory = AudioDiagnostics.MusicDirectory + "/stings";
+
     private readonly AudioStreamPlayer[] _players = new AudioStreamPlayer[2];
+    private AudioStreamPlayer _sting = null!;
     private readonly Dictionary<string, AudioStream?> _streams = new();
+    private readonly Dictionary<string, AudioStream?> _stings = new();
     private int _active;
     private string? _current;
     private double _check;
@@ -38,6 +48,15 @@ public sealed partial class MusicDirector : Node
 
     /// <summary>True while <see cref="Silence"/> holds the soundtrack back.</summary>
     public bool Silent => _silence > 0;
+
+    /// <summary>The track playing (or fading in), or null while silent (the <c>music.track.&lt;id&gt;</c> probe).</summary>
+    public string? Current => _current;
+
+    /// <summary>Stings played so far (the <c>music.stings</c> probe).</summary>
+    public int Stings { get; private set; }
+
+    /// <summary>A sting started (its id): for captions.</summary>
+    public event System.Action<string>? Stung;
 
     /// <summary>The one director (created by the game root at boot).</summary>
     public static MusicDirector? Instance { get; private set; }
@@ -51,6 +70,27 @@ public sealed partial class MusicDirector : Node
             _players[i] = new AudioStreamPlayer { Bus = AudioBuses.Music, VolumeDb = -80f };
             AddChild(_players[i]);
         }
+        _sting = new AudioStreamPlayer { Name = "Sting", Bus = AudioBuses.Music };
+        AddChild(_sting);
+    }
+
+    /// <summary>
+    /// Plays the short cue <paramref name="id"/> once over whatever the soundtrack does (a boss's fall: over the hush of
+    /// <see cref="Silence"/>); a newer sting cuts the last one off.
+    /// </summary>
+    public void Sting(string id)
+    {
+        if (!_stings.TryGetValue(id, out var stream))
+        {
+            stream = AudioDiagnostics.Load($"{StingDirectory}/{id}.ogg");
+            if (stream is AudioStreamOggVorbis ogg) ogg.Loop = false;
+            _stings[id] = stream;
+        }
+        if (stream == null) return;
+        _sting.Stream = stream;
+        _sting.Play();
+        Stings++;
+        Stung?.Invoke(id);
     }
 
     /// <summary>Follows a world from now on (the in-game soundtrack).</summary>
@@ -137,8 +177,13 @@ public sealed partial class MusicDirector : Node
 
     private string? Resolve(string state)
     {
-        if (Stream(state) != null) return state;
-        return Aliases.TryGetValue(state, out var alias) && Stream(alias) != null ? alias : null;
+        for (int hop = 0; hop < 4; hop++) // a short chain: boss_worm → boss_evil → boss_1
+        {
+            if (Stream(state) != null) return state;
+            if (!Aliases.TryGetValue(state, out var alias)) return null;
+            state = alias;
+        }
+        return null;
     }
 
     private AudioStream? Stream(string track)

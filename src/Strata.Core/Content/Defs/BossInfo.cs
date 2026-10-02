@@ -50,6 +50,9 @@ public sealed class BossInfo
     /// <summary>Music state requested while alive.</summary>
     public string? Music { get; init; }
 
+    /// <summary>The title card and arena framing when it awakens, and its "Defeated" card (none when absent).</summary>
+    public BossIntro? Intro { get; init; }
+
     /// <summary>Body segments following the head (worms); 0 = single body.</summary>
     public int Segments { get; init; }
 
@@ -129,6 +132,26 @@ public sealed class BossInfo
 
     /// <summary>A gathering at a landmark that calls this boss up when disturbed (the Lunatic Cultist's devotees).</summary>
     public BossRitual? Ritual { get; init; }
+}
+
+/// <summary>
+/// A boss's arrival as an event (<see cref="Presentation.BossIntroModel"/>): a title card with its name over
+/// <see cref="Subtitle"/> in <see cref="Color"/>, the third-person camera pulled back by <see cref="Framing"/> metres (eased
+/// out again within <see cref="Presentation.BossIntroModel.FramingSeconds"/>) and thin cinema bars for
+/// <see cref="Letterbox"/> seconds. The player keeps control throughout.
+/// </summary>
+public sealed class BossIntro
+{
+    public string Subtitle { get; init; } = "";
+
+    /// <summary>The subtitle and ornament colour (#RRGGBB); defaults to the boss purple of announcements.</summary>
+    public string? Color { get; init; }
+
+    /// <summary>Extra camera distance at the height of the framing (m, 0 – <see cref="Presentation.BossIntroModel.MaxFramingDistance"/>).</summary>
+    public float Framing { get; init; } = 2f;
+
+    /// <summary>How long the cinema bars stay (s, 0 – <see cref="Presentation.BossIntroModel.MaxLetterbox"/>; 0 = none).</summary>
+    public float Letterbox { get; init; } = 1.6f;
 }
 
 public sealed class BossPart

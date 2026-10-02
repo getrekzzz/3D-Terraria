@@ -29,6 +29,7 @@ public sealed partial class ItemSlotView : Control
     private bool _dimmed;
     private bool _short;
     private bool _hovered;
+    private bool _padFocused;
     private ItemStack _shown;
     private bool _favoriteShown;
     private int _ammoShown = -1;
@@ -108,6 +109,9 @@ public sealed partial class ItemSlotView : Control
     /// <summary>The slot's name, shown as its tooltip while it is empty ('Helmet', 'Social Shirt', 'Dye'); null shows none.</summary>
     public string? EmptyText { get; set; }
 
+    /// <summary>Why the slot is <see cref="Locked"/> ('Requires Master Mode'), the last line of its tooltip while it is.</summary>
+    public string? LockedText { get; set; }
+
     /// <summary>Whether the slot is favourited (Alt+click): drawn gold; null for slots that cannot be.</summary>
     public Func<bool>? Favorite { get; set; }
 
@@ -123,13 +127,41 @@ public sealed partial class ItemSlotView : Control
     /// <summary>(button, modifier keys) on click, and again for each hold-repeat of the right button.</summary>
     public event Action<MouseButton, ClickMods>? Clicked;
 
+    /// <summary>Clicks do something here (a recipe's material slots only show): the controller cursor stops on it.</summary>
+    public bool Interactive => Clicked != null;
+
     /// <summary>Whether the mouse is over the slot.</summary>
     public bool Hovered => _hovered;
+
+    /// <summary>
+    /// The controller's screen cursor is on the slot (<see cref="PadCursor"/>): drawn as hovered, and a held take-one
+    /// button repeats as a held right button does.
+    /// </summary>
+    public bool PadFocused
+    {
+        get => _padFocused;
+        set
+        {
+            if (!value) StopRepeat();
+            Redraw(ref _padFocused, value);
+        }
+    }
+
+    /// <summary>
+    /// Sizes the slot to <paramref name="side"/> pixels square, smaller than it was made too: the minimum size first, as
+    /// a control never shrinks below its minimum (setting the size first would leave a shrinking slot at its old size).
+    /// </summary>
+    public void Resize(float side)
+    {
+        var size = new Vector2(side, side);
+        CustomMinimumSize = size;
+        Size = size;
+    }
 
     /// <summary>Shows this slot's tooltip beside the pointer (on hover, and from the <c>ui hover</c> command).</summary>
     public void ShowTooltip()
     {
-        if (_tooltip != null) TooltipFollower.Current?.Show(this, _read, _tooltip, EmptyText);
+        if (_tooltip != null) TooltipFollower.Current?.Show(this, _read, _tooltip, EmptyText, _locked ? LockedText : null);
     }
 
     /// <summary>Ends a hold-repeat (the owner calls it when a repeated click stops moving items).</summary>
@@ -162,10 +194,19 @@ public sealed partial class ItemSlotView : Control
         if (e is not InputEventMouseButton { Pressed: true } mb || (mb.ButtonIndex != MouseButton.Left && mb.ButtonIndex != MouseButton.Right)) return;
         var mods = (mb.ShiftPressed ? ClickMods.Shift : 0) | (mb.CtrlPressed || mb.MetaPressed ? ClickMods.Ctrl : 0) | (mb.AltPressed ? ClickMods.Alt : 0);
         AcceptEvent();
-        _repeating = RepeatRight && mb.ButtonIndex == MouseButton.Right && mods == ClickMods.None;
+        Press(mb.ButtonIndex, mods);
+    }
+
+    /// <summary>
+    /// A click on the slot as a press of <paramref name="button"/> with <paramref name="mods"/> makes it (the mouse, and
+    /// the controller cursor's buttons); a plain right press starts the hold-repeat.
+    /// </summary>
+    public void Press(MouseButton button, ClickMods mods)
+    {
+        _repeating = RepeatRight && button == MouseButton.Right && mods == ClickMods.None;
         _repeats = 0;
         _repeatWait = HoldRepeat.IntervalTicks(0) / (double)Units.TicksPerSecond;
-        Clicked?.Invoke(mb.ButtonIndex, mods);
+        Clicked?.Invoke(button, mods);
     }
 
     /// <summary>
@@ -182,10 +223,14 @@ public sealed partial class ItemSlotView : Control
         TooltipFollower.Current?.Hide(this);
     }
 
-    /// <summary>Holding the right button keeps clicking, faster and faster, until it is released or the pointer leaves.</summary>
+    /// <summary>
+    /// Holding the right button (or the controller's take-one button on the cursor's slot) keeps clicking, faster and
+    /// faster, until it is released or the pointer leaves.
+    /// </summary>
     private void Repeat(double delta)
     {
-        if (!_hovered || !Input.IsMouseButtonPressed(MouseButton.Right))
+        bool held = _padFocused ? PadCursor.SplitHeld : _hovered && Input.IsMouseButtonPressed(MouseButton.Right);
+        if (!held)
         {
             _repeating = false;
             return;

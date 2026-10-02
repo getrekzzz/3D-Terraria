@@ -135,7 +135,7 @@
       ] },
       "life": 30000, "damage": 50, "defense": 14, "knockbackResist": 1.0, "size": [7, 7], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 3, 6],
       "loot": "plantera", "value": 50000,
-      "boss": { "title": "Plantera", "flag": "defeated_plantera", "arenaRadius": 160, "music": "boss_plantera",
+      "boss": { "title": "Plantera", "flag": "defeated_plantera", "arenaRadius": 160, "music": "boss_plantera", "intro": { "subtitle": "Bloom of the Underground Jungle", "color": "#ea78bc", "framing": 2.5, "letterbox": 2.0 },
         "enrage": { "when": [{ "type": "biome", "none": ["underground_jungle"] }], "damage": 2, "speed": 1.6 } },
       "covers": ["terraria:plantera"]
     },
@@ -155,7 +155,7 @@
       ] },
       "life": 39000, "damage": 72, "defense": 26, "knockbackResist": 1.0, "size": [4.4, 4], "scale": 2, "moveSpeed": 3, "light": [8, 6, 2],
       "loot": "golem", "value": 60000,
-      "boss": { "title": "Golem", "flag": "defeated_golem", "arenaRadius": 160, "music": "boss_golem",
+      "boss": { "title": "Golem", "flag": "defeated_golem", "arenaRadius": 160, "music": "boss_golem", "intro": { "subtitle": "Idol of the Lihzahrds", "color": "#e0963e", "framing": 2.5, "letterbox": 2.0 },
         "parts": [{ "enemy": "golem_head", "offset": [0, 3.2, 0.3], "inBossBar": true }, { "enemy": "golem_fist", "offset": [-3.2, 0.8, 0.6], "mirror": true }, { "enemy": "golem_fist", "offset": [3.2, 0.8, 0.6] }],
         "enrage": { "when": [{ "type": "biome", "none": ["jungle_temple"] }], "damage": 1.5, "speed": 1.5, "message": "Golem is enraged outside its temple!" } },
       "covers": ["terraria:golem"]

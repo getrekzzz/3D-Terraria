@@ -64,6 +64,16 @@ required ones are present. The engine applies a layout on resize and on state ch
 placed control joins `LayoutWidgets.Group`, and the `ui.overlaps` probe checks the live tree, where real text and
 sprites could outgrow the model.
 
+W4-POLISH added the content check: `layout.overlaps` compares what each widget draws (its visible descendants, a
+clipping scroll list counted by its own rectangle) rather than its region, so a slot or field that outgrew its region
+is caught. Slots are sized with `ItemSlotView.Resize` (minimum size first; a control never shrinks below its minimum),
+the chest's name field sits bottom-aligned on its caption row, and headless runs can lay out for another window with
+`uiwindow <w> <h>` (ui.cmds checks 1280×720 and 1920×1080 at UI scales 1 and 1.5 with a chest and a shop open). The
+boss bars stack one per boss group (`BossBarModel.Compute(npcs, list)`, at most three, the largest at the bottom):
+`UiState.BossBars` sizes the region (as many as fit), and each bar fades in on arrival and out over 0.5 s. The
+crosshair's hover name is Terraria's mouse text (hover size, below-right of the cross, bosses in purple), and
+`MapSystem` retries a reveal that met ground not streamed in yet, so the minimap is never black at spawn.
+
 ## Input gate: overlays and modals
 `game/UI/InputGate.cs` decides what the game hears while screens are open. A **Modal** (pause menu and settings, the
 console, the world map, a chest's rename field, the inventory with auto-pause) sets `GameplayBlocked`: movement,
@@ -71,6 +81,23 @@ hotkeys and item use stop. An **Overlay** (the inventory, the NPC chat box, the 
 (`MouseFree`, no mouse look) but the player keeps walking, jumping, fighting and picking hotbar slots; the item is used
 only while a button is held on empty screen, which `WorldClickCatcher` (CanvasLayer 9, under every panel) reports as
 `WorldPointer`. `TextEntry` (a focused text field) blocks movement and hotkeys too.
+
+## Controller (X-04)
+Bindings live in `data/config/input.json` (`InputConfig`, checked by `Strata.Tools validate` and Core tests): every
+action has keyboard/mouse bindings (`key:W`, `mouse:1`) and controller ones (`pad:a`, `axis:left_y-`, `axis:rt+`), the
+menu actions `ui_*` included; a controller button may serve one gameplay action and one `ui_*` action, never two of
+either. `KeyBindings` rebinds and saves the two devices separately (Settings → Controls has a column each, plus look
+sensitivity, inverted look, stick dead zone and aim assist). `InputDevice` follows whichever device was used last
+(every event passes `PadInput`, a child of the window); prompts (the crosshair's interact hint, drawn by `PadGlyph`)
+follow it. On menus `PadInput` focuses the topmost menu's first control on the first D-pad/stick/A press, frames the
+focus in gold and turns B into Esc; the engine's focus navigation does the rest. On the gameplay screens `PadCursor`
+drives a cursor over every visible slot and button of the inventory (chest, shop, reforge, crafting, equipment) and the
+chat box, stepping with `FocusNavigation` (Core: nearest in the direction, same row first); A/X/RB/LB click as the mouse
+would (`ItemSlotView.Press` with Shift or Alt), B closes, the held stack and tooltip follow `PadCursor.Pointer`, and
+`InputGate.PadNavigating` keeps the world from reacting (the player stands still, as on Terraria's gamepad inventory).
+`CameraRig.Pad.cs` turns the right stick into look rates (`PadLook`: radial dead zone, curve) and applies `AimAssist`
+(Core: friction near a creature in a small cone, magnetism toward it while steering; never on the mouse). The `pad`
+smoke command sends real controller events (`Input.ParseInputEvent`), and `pad.*` probes report the cursor and assist.
 
 ## Slots and click routing
 A slot is a `SlotRef(SlotArea, index)` over the player's storage (backpack, coins, ammo, trash, armour, accessories,
@@ -94,11 +121,12 @@ lines for other controls (the defence shield, buff icons).
 | Layer | Node | Contents |
 |---|---|---|
 | 9 | `WorldClicks` | `WorldClickCatcher`: clicks that land on empty screen |
-| 10 | `Hud` | item name, hotbar, buff bar, life text, hearts, mana stars, breath bubbles, crosshair with the target label and hints, status line, info panel, chat log, pickup popups (over the player, not a region), boss bar, invasion bar, NPC chat placement, death screen |
+| 9 | `BossIntro` | a boss's title card and thin cinema bars (X-02); takes no clicks, the HUD draws over it |
+| 10 | `Hud` | item name, hotbar, buff bar, life text, hearts, mana stars, breath bubbles, crosshair with the hover name and hints, status line, info panel, chat log, pickup popups (over the player, not a region), boss bar, invasion bar, NPC chat placement, death screen |
 | 10 | `Minimap` | the framed minimap and its zoom buttons (above the click catcher) |
 | 20 | `Inventory` | backpack grid, coin/ammo/trash/sort, panel host (chest, shop, reforge), crafting column, equipment column, Settings button |
 | 22 | `TownDialog` | the NPC chat box |
-| 30 | `WorldMap` | the full map (M) |
+| 30 | `WorldMap` | the full map (M); markers (spawn flag, bed, resident and boss heads, the player's arrow) are icons drawn by a `MapMarkerLayer`, named beside the pointer on hover |
 | 40 | `PerfOverlay` | the F3 overlay |
 | 45 | `PauseMenu` | dim and the pause panel, settings |
 | 50 | `DebugConsole`, `MainMenu` | the console; the title screen and its menus |

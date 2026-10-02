@@ -10,8 +10,9 @@ namespace Strata.Game.Entities;
 
 /// <summary>
 /// Boss presentation in the world: the camera jolts when a boss arrives or dies, the soundtrack falls silent for a few
-/// seconds after a win, a slam shakes the camera by distance and throws a ring of dust in the colour of the ground it
-/// hit (8 pooled emitters), and brain cues (<see cref="NpcSystem.Cued"/>, ids are sound ids) play where the creature is.
+/// seconds after a win while the victory sting plays over the hush (the title cards are UI.BossIntro), a slam shakes
+/// the camera by distance and throws a ring of dust in the colour of the ground it hit (8 pooled emitters), and brain
+/// cues (<see cref="NpcSystem.Cued"/>, ids are sound ids) play where the creature is.
 /// </summary>
 public sealed partial class BossEffects : Node3D
 {
@@ -64,6 +65,7 @@ public sealed partial class BossEffects : Node3D
         {
             CameraShake.Kick(DefeatKick);
             MusicDirector.Instance?.Silence(DefeatSilence);
+            MusicDirector.Instance?.Sting("victory");
         };
         game.Npcs.Impacted += OnImpact;
         game.Npcs.Cued += (npc, id) => Sfx.PlayAt(id, ToGodot(npc.Center), npc.IsBoss || npc.IsPart ? 3f : 0f);

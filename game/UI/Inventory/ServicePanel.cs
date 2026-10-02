@@ -145,7 +145,7 @@ public sealed partial class ServicePanel : Control
         _title.Position = Vector2.Zero;
         _title.Size = new Vector2(Size.X, top);
         _slot.Position = new Vector2(0, top);
-        _slot.CustomMinimumSize = _slot.Size = new Vector2(side, side);
+        _slot.Resize(side);
         _slot.PivotOffset = _slot.Size / 2;
         _hammer.Position = new Vector2(side + 2 * UiLayout.Gap, top);
         _hammer.Size = new Vector2(side, side);

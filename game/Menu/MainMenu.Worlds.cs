@@ -33,7 +33,7 @@ public sealed partial class MainMenu
         var (panel, box) = MenuKit.Panel(new Vector2(760, 520));
         box.AddChild(MenuKit.Title("Select World", 40));
         box.AddChild(MenuKit.Text($"Playing as {_character.Name}", 16, new Color(0.8f, 0.85f, 0.95f)));
-        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 340), SizeFlagsVertical = Control.SizeFlags.ExpandFill };
+        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 340), SizeFlagsVertical = Control.SizeFlags.ExpandFill, FollowFocus = true };
         var list = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
         list.AddThemeConstantOverride("separation", 8);
         scroll.AddChild(list);

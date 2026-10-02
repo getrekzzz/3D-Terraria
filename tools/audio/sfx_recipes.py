@@ -155,15 +155,17 @@ def boss_roar(rng):
     return reverb(growl + lowpass(_noise(dur, rng), 600, S) * adsr(n, 0.2, 0.3, 0.5, 0.6, S) * 0.5, S, 0.8, 0.3, 0.35, 0.8)
 
 
-def fanfare(rng):
-    out = np.zeros(samples(1.6, S))
-    for k, note in enumerate((67, 71, 74, 79)):
-        dur = 0.6 if k == 3 else 0.18
-        n = samples(dur, S)
-        tone = (osc("square", midi_hz(note), dur, S) * 0.25 + osc("triangle", midi_hz(note - 12), dur, S) * 0.3) * adsr(n, 0.01, 0.1, 0.6, 0.2, S)
-        at = int(k * 0.17 * S)
-        out[at:at + n] += tone[:len(out) - at]
-    return reverb(lowpass(out, 5000, S), S, 0.6, 0.3, 0.25, 0.5)
+def boss_fall(rng):
+    """A boss falls: a deep boom sinking away under a bright shimmering wash. The tune is the music bus's victory sting
+    (tools/audio/music_tracks.py STINGS), so this stays a sound, not a melody that would clash with it."""
+    dur = 2.2
+    n = samples(dur, S)
+    t = seconds(n, S)
+    boom = osc("sine", 70 * np.exp(-t / 0.6) + 28, dur, S) * decay(n, 0.5, S, 0.002)
+    crack = lowpass(_noise(dur, rng), 1800, S) * decay(n, 0.08, S, 0.001)
+    shimmer = sum(osc("sine", f * rng.uniform(0.99, 1.01), dur, S) * w for f, w in ((1320, 0.3), (1980, 0.2), (2640, 0.12)))
+    shimmer = shimmer * adsr(n, 0.25, 0.4, 0.5, 0.9, S) * 0.25
+    return reverb(mix(boom * 1.4, crack * 0.5, shimmer), S, 0.8, 0.3, 0.35, 1.0)
 
 
 def gong(rng):
@@ -298,7 +300,7 @@ RECIPES = {
     "swing": (swing, 3), "hit": (hit, 3), "hit_squish": (squish, 3), "hit_bone": (clack, 3),
     "npc_death": (npc_death, 3), "slime_death": (squish, 2), "player_hurt": (player_hurt, 3), "player_death": (player_death, 1),
     "bow": (bow, 2), "gun": (lambda r: gun(r), 3), "gun_heavy": (lambda r: gun(r, True), 2), "magic": (lambda r: magic(r), 3),
-    "magic_heavy": (lambda r: magic(r, True), 2), "explosion": (explosion, 2), "boss_roar": (boss_roar, 1), "boss_defeated": (fanfare, 1),
+    "magic_heavy": (lambda r: magic(r, True), 2), "explosion": (explosion, 2), "boss_roar": (boss_roar, 1), "boss_defeated": (boss_fall, 1),
     "event_start": (gong, 1), "npc_arrive": (jingle, 1), "pickup": (pickup, 2), "coins": (coins, 2), "potion": (gulp, 1),
     "mana": (chime(880), 1), "heal": (chime(660), 1), "teleport": (shimmer, 1), "jump": (whoosh(600, 1800, 0.18, 0.5), 2),
     "land": (land, 1), "double_jump": (whoosh(900, 3000, 0.25, 0.7), 1), "wings": (whoosh(300, 900, 0.3, 0.6), 2),

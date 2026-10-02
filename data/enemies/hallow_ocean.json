@@ -78,7 +78,7 @@
       ] },
       "life": 18000, "damage": 60, "defense": 26, "knockbackResist": 1.0, "size": [7, 6], "moveSpeed": 5, "light": [8, 4, 8],
       "loot": "queen_slime", "value": 40000,
-      "boss": { "title": "Queen Slime", "flag": "defeated_queen_slime", "arenaRadius": 150, "music": "boss_queen_slime" },
+      "boss": { "title": "Queen Slime", "flag": "defeated_queen_slime", "arenaRadius": 150, "music": "boss_queen_slime", "intro": { "subtitle": "Crystal Sovereign of the Hallow", "color": "#f290dc", "framing": 2.0, "letterbox": 1.6 } },
       "covers": ["terraria:queen_slime"]
     },
     {
@@ -98,7 +98,7 @@
       ] },
       "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [2.4, 1.6], "scale": 4, "moveSpeed": 10, "gravity": false, "collideTerrain": false,
       "loot": "duke_fishron", "value": 80000,
-      "boss": { "title": "Duke Fishron", "flag": "defeated_duke_fishron", "arenaRadius": 180, "music": "boss_fishron",
+      "boss": { "title": "Duke Fishron", "flag": "defeated_duke_fishron", "arenaRadius": 180, "music": "boss_fishron", "intro": { "subtitle": "Terror of the Deep", "color": "#52c0ae", "framing": 3.0, "letterbox": 2.0 },
         "enrage": { "when": [{ "type": "biome", "none": ["ocean"] }], "damage": 2, "speed": 1.5, "setDefense": 100, "message": "Duke Fishron is enraged!" } },
       "covers": ["terraria:duke_fishron"]
     },
@@ -120,7 +120,7 @@
       ] },
       "life": 70000, "damage": 80, "defense": 50, "knockbackResist": 1.0, "size": [2, 3], "scale": 3, "moveSpeed": 12, "gravity": false, "collideTerrain": false, "light": [14, 10, 14],
       "loot": "empress_of_light", "value": 100000,
-      "boss": { "title": "Empress of Light", "flag": "defeated_empress_of_light", "arenaRadius": 180, "music": "boss_empress",
+      "boss": { "title": "Empress of Light", "flag": "defeated_empress_of_light", "arenaRadius": 180, "music": "boss_empress", "intro": { "subtitle": "Radiance of the Hallow", "color": "#ffa8f4", "framing": 3.0, "letterbox": 2.2 },
         "enrage": { "when": [{ "type": "time", "is": "day" }], "setDamage": 9999, "speed": 1.2, "latch": true, "message": "The Empress of Light is furious!" } },
       "covers": ["terraria:empress_of_light"]
     }

@@ -64,6 +64,16 @@ public static partial class ContentValidator
                 if (boss.BarrierModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.BarrierModel}.glb", "boss.barrierModel");
                 if (boss.ArmModel != null) ctx.Asset(e, $"assets/models/creatures/{boss.ArmModel}.glb", "boss.armModel");
                 if (boss.BarrierTile <= 0) ctx.Error(e, "boss.barrierTile must be > 0.");
+                if (boss.Intro is { } intro)
+                {
+                    if (boss.Minor) ctx.Error(e, "boss.intro: a minor boss gets no title card.");
+                    if (string.IsNullOrWhiteSpace(intro.Subtitle)) ctx.Error(e, "boss.intro.subtitle is required.");
+                    ctx.Color(e, intro.Color, "boss.intro.color");
+                    if (intro.Framing is < 0f or > Presentation.BossIntroModel.MaxFramingDistance)
+                        ctx.Error(e, $"boss.intro.framing must be 0-{Presentation.BossIntroModel.MaxFramingDistance} m.");
+                    if (intro.Letterbox is < 0f or > Presentation.BossIntroModel.MaxLetterbox)
+                        ctx.Error(e, $"boss.intro.letterbox must be 0-{Presentation.BossIntroModel.MaxLetterbox} s.");
+                }
                 if (boss.Enrage is { } rage)
                 {
                     ctx.Specs(e, SpecKind.Condition, rage.When, "boss.enrage.when");

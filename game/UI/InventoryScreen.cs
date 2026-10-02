@@ -25,6 +25,12 @@ public sealed partial class InventoryScreen : CanvasLayer
 
     public bool IsOpen => _root.Visible;
 
+    /// <summary>The input gate the screen holds while open.</summary>
+    public const string GateName = Gate;
+
+    /// <summary>Everything the screen shows (the controller cursor walks it for slots and buttons).</summary>
+    public Control PadRoot => _root;
+
     /// <summary>The screen is open with auto-pause on, so the world waits until it closes.</summary>
     public bool PausesWorld { get; private set; }
 
@@ -75,7 +81,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         PausesWorld = open && autoPause;
         if (open)
         {
-            _equipment.Refresh(_ui.Entity.State);
+            _equipment.Refresh(_ui.Entity.State, _ui.Game.Session.Settings.EffectiveDifficulty);
             _crafting.Refresh();
             LayoutChanged?.Invoke();
             return;
@@ -95,7 +101,7 @@ public sealed partial class InventoryScreen : CanvasLayer
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.inventory_ui");
         if (!IsOpen) return;
-        _equipment.Refresh(_ui.Entity.State);
+        _equipment.Refresh(_ui.Entity.State, _ui.Game.Session.Settings.EffectiveDifficulty);
         int selected = _ui.Inventory.SelectedHotbar;
         for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
     }

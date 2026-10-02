@@ -50,7 +50,8 @@ public sealed partial class SettingsScreen : PanelContainer
 
     private static ScrollContainer Tab(string name, Action<VBoxContainer> build)
     {
-        var scroll = new ScrollContainer { Name = name, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled };
+        // FollowFocus: a controller stepping the focus down a long tab (Controls) scrolls it into view.
+        var scroll = new ScrollContainer { Name = name, HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled, FollowFocus = true };
         var margin = new MarginContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
         margin.AddThemeConstantOverride("margin_left", 12);
         margin.AddThemeConstantOverride("margin_right", 18);
@@ -152,6 +153,8 @@ public sealed partial class SettingsScreen : PanelContainer
             "Names the block or object under the crosshair."));
         box.AddChild(MenuKit.Row("Boss banners", MenuKit.Toggle(S.BigAnnouncements, v => { S.BigAnnouncements = v; Changed(); }),
             "Also shows \"… has awoken!\" as a big banner at the top; every message is in the chat log (Enter for the history)."));
+        box.AddChild(MenuKit.Row("Boss intros", MenuKit.Toggle(S.BossIntros, v => { S.BossIntros = v; Changed(); }),
+            "A boss's arrival shows its name on a title card, with thin cinema bars and the camera pulled back for a moment; its fall a \"Defeated\" card and a brief slow motion. You keep control throughout."));
         box.AddChild(MenuKit.Row("Show FPS", MenuKit.Toggle(S.ShowFps, v => { S.ShowFps = v; Changed(); })));
         box.AddChild(MenuKit.Row("Minimap", MenuKit.Toggle(S.ShowMinimap, v => { S.ShowMinimap = v; Changed(); }), "The discovered map around you, top right. M opens the full map."));
         box.AddChild(MenuKit.Row("Life display", MenuKit.Choice(new[] { "Hearts and stars", "Bars" }, S.LifeDisplay == UserSettings.BarsLifeDisplay ? 1 : 0,

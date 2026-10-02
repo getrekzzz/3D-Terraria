@@ -11,7 +11,7 @@ namespace Strata.Game.UI;
 /// - a catch ("Caught Bass!") in the item's rarity colour.
 /// Refusals and notices take the status line under the crosshair; pickups float over the player's head
 /// (<see cref="PickupPopups"/>). The big centred banner is optional (the BigAnnouncements setting, off by default),
-/// and only for "has awoken!".
+/// and only for "has awoken!" when no boss title card (<see cref="BossIntro"/>) shows.
 /// </summary>
 public sealed partial class Hud
 {
@@ -28,7 +28,7 @@ public sealed partial class Hud
         {
             var color = Color.FromHtml(MessageColors.Hex(kind));
             Announce(text, color);
-            if (kind == MessageKind.BossAwoken) Banner(text, color);
+            if (kind == MessageKind.BossAwoken && !BossIntro.CardShowing) Banner(text, color); // a title card says it bigger
         };
         npcs.BossLeft += b => Announce($"{b.Def.Boss!.Title} has left!", UiTheme.BossPurple);
         var town = ui.Game.Town;

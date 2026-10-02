@@ -75,7 +75,7 @@ public sealed partial class HotbarBar : Control
         {
             var view = _slots[i];
             view.Position = new Vector2(i * (side + UiLayout.Gap), 0);
-            view.CustomMinimumSize = view.Size = new Vector2(side, side);
+            view.Resize(side);
             view.PivotOffset = view.Size / 2;
         }
     }

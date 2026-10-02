@@ -5,6 +5,13 @@ wait_until player.frozen == 0 180
 wait 0.5
 assert errors == 0
 
+# --- W4-POLISH (map) ---
+# A fresh world's map is not black at spawn: the ground around the player is revealed (retried in place until it has
+# streamed in) and the minimap shows it; the spawn flag is drawn as an icon, not a text label.
+wait_until map.revealed_cells > 0 10
+assert map.minimap_coverage > 0
+assert map.marker_icons >= 1
+
 # --- P2-01 ---
 # The shipped bold font is the global fallback, an unthemed panel is Terraria blue, and the exported theme file
 # (project.godot [gui] theme/custom) matches the code-built theme.
@@ -814,4 +821,348 @@ wait 0.2
 assert ui.paused == 0
 assert ui.inventory == 0
 assert ui.settings_button == 0
+assert errors == 0
+
+# --- W4-POLISH (hover name, boss bars) ---
+# The crosshair names a boss beside the cross, small and in boss purple, with its life. Each boss group alive gets its
+# own bar, stacked bottom-centre (King Slime and the Eye of Cthulhu: two), nothing overlapping; when they are gone the
+# bars fade out and the region is freed.
+god on
+spawning off
+killall
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 8 12 air
+camera first
+aim 0 0 1
+spawn king_slime 1 7
+ai off
+wait 0.3
+assert hover.king_slime == 1
+assert hud.target_name.king_slime == 1
+assert hud.target_boss == 1
+aim 0 0 -1
+spawn eye_of_cthulhu 1 9
+ai off
+wait 0.6
+assert ui.bossbar == 1
+assert ui.bossbars == 2
+assert ui.overlaps == 0
+assert layout.overlaps == 0
+killall
+wait 0.2
+assert ui.bossbars == 2
+wait 0.8
+assert ui.bossbars == 0
+assert ui.bossbar == 0
+ai on
+camera third
+god off
+assert errors == 0
+
+# --- W4-POLISH (layout) ---
+# What each inventory widget draws (its slots, captions and the chest's name field) stays inside its own region and
+# off every other widget, with a chest or a shop open, at 1280x720 and 1920x1080 and UI scales 1 and 1.5
+# (layout.overlaps checks the drawn content, ui.overlaps the regions), with info accessories filling the info rows.
+# The chest's name field stays on its caption row, clear of the first row of slots.
+god on
+spawning off
+killall
+clear
+fill -3 0 -6 3 3 3 air
+fill -3 -1 -6 3 -1 3 dirt
+wait 0.5
+equip gps
+equip depth_meter
+place wooden_chest 0 0 -4
+interact 0 0 -4
+wait 0.3
+assert ui.panel == 1
+assert layout.overlaps == 0
+ui chest rename
+assert ui.rename_fits == 1
+ui chest cancel
+uiwindow 1280 720
+wait 0.2
+assert layout.overlaps == 0
+uiscale 1.5
+wait 0.2
+assert layout.overlaps == 0
+uiwindow 1920 1080
+wait 0.2
+assert layout.overlaps == 0
+uiscale 1
+wait 0.2
+assert layout.overlaps == 0
+ui close
+wait 0.2
+town dismiss merchant
+town summon merchant 0 0 -2
+wait 0.3
+ui talk merchant
+ui shop
+wait 0.3
+assert ui.panel == 2
+assert layout.overlaps == 0
+uiscale 1.5
+wait 0.2
+assert layout.overlaps == 0
+uiwindow 1280 720
+wait 0.2
+assert layout.overlaps == 0
+uiscale 1
+wait 0.2
+assert layout.overlaps == 0
+ui close
+wait 0.2
+uiwindow off
+town dismiss merchant
+god off
+assert errors == 0
+
+# --- W4-POLISH (reforge Shift-click) ---
+# With the reforge slot open, Shift-click puts a backpack sword into it (wood, which takes no prefix, stays), as in
+# Terraria 1.4; closing the inventory puts it back.
+god on
+spawning off
+killall
+clear
+town dismiss goblin_tinkerer
+town summon goblin_tinkerer 0 0 -3
+give copper_broadsword 1
+give wood 5
+wait 0.3
+ui talk goblin_tinkerer
+ui reforge
+wait 0.3
+assert ui.panel == 3
+ui shift backpack 1
+assert ui.service_item == 0
+assert inv.wood == 5
+ui shift backpack 0
+assert ui.service_item == 1
+assert inv.copper_broadsword == 0
+ui close
+wait 0.2
+assert ui.service_item == 0
+assert inv.copper_broadsword == 1
+town dismiss goblin_tinkerer
+god off
+assert errors == 0
+
+# --- X-04 (controller) ---
+# A controller plays the inventory as Terraria's gamepad cursor (the 'pad' command sends real controller events):
+# the shoulder buttons step the hotbar; Y opens the inventory with the cursor on the selected hotbar slot and the player
+# standing still (the left stick moves the cursor, not the player); the D-pad steps slot by slot; A picks a stack up and
+# puts it down elsewhere, X takes one; the cursor carries on down into the crafting column, where A selects a recipe (or
+# crafts the one already selected) and crafts it onto the cursor; B closes and stows what is held. The chat box's buttons and the grid shop work the
+# same way (A on Shop, RB quick-moves a backpack stack into a sale, A on a ware buys one). Menus take the focus on the
+# first D-pad press, the D-pad and stick step it, A presses, B presses Back (settings) or closes the pause menu. Aim assist finds the creature by the crosshair, slows the turn on it and
+# draws the view toward it while walking; never with assist off or on the mouse. The interact prompt shows the button.
+god on
+spawning off
+killall
+clear
+fill -3 0 -6 6 3 4 air
+fill -3 -1 -6 6 -1 4 dirt
+wait 0.5
+place work_bench 3 0 0
+give wood 20
+give gel 2
+select 1
+pad rb
+wait 0.2
+assert pad.active == 1
+assert hotbar.selected == 1
+pad lb
+wait 0.2
+assert hotbar.selected == 0
+pad y
+wait 0.3
+assert ui.inventory == 1
+assert pad.cursor == 1
+assert pad.navigating == 1
+assert pad.pointer == 1
+assert pad.focus.backpack == 0
+pad stick left 1 0
+wait 0.25
+pad stick left 0 0
+wait 0.1
+assert pad.focus.backpack == 1
+assert player.speed < 0.1
+pad dpad_left
+wait 0.2
+pad a
+wait 0.2
+assert inv.cursor == 20
+assert ui.cursor_count == 20
+pad dpad_right
+wait 0.2
+pad dpad_right
+wait 0.2
+assert pad.focus.backpack == 2
+pad a
+wait 0.2
+assert inv.cursor == 0
+pad x
+wait 0.2
+assert inv.cursor == 1
+pad a
+wait 0.2
+assert inv.cursor == 0
+assert inv.wood == 20
+pad dpad_left
+wait 0.2
+pad dpad_left
+wait 0.2
+pad dpad_down
+wait 0.2
+pad dpad_down
+wait 0.2
+pad dpad_down
+wait 0.2
+pad dpad_down
+wait 0.2
+assert pad.focus.backpack == 40
+pad dpad_down
+wait 0.2
+assert pad.focus_recipe == 1
+pad a
+wait 0.2
+pad a
+wait 0.2
+assert inv.cursor >= 1
+pad b
+wait 0.3
+assert ui.inventory == 0
+assert pad.cursor == 0
+assert pad.navigating == 0
+assert pad.pointer == 0
+assert inv.cursor == 0
+clear
+town summon merchant 0 0 -3
+give wood 10
+give gold_coin 50
+wait 0.3
+ui talk merchant
+wait 0.3
+assert ui.talk_open == 1
+assert pad.cursor == 1
+assert pad.focus_button == 1
+pad a
+wait 0.3
+assert ui.talk_open == 0
+assert ui.panel == 2
+assert pad.focus.backpack == 0
+pad rb
+wait 0.2
+assert ui.buyback == 1
+assert inv.wood == 0
+pad dpad_down
+wait 0.2
+pad dpad_down
+wait 0.2
+pad dpad_down
+wait 0.2
+pad dpad_down
+wait 0.2
+pad dpad_down
+wait 0.2
+assert pad.focus.shop == 0
+pad a
+wait 0.2
+assert inv.cursor == 1
+pad b
+wait 0.3
+assert ui.panel == 0
+assert inv.cursor == 0
+town dismiss merchant
+pad start
+wait 0.2
+assert ui.paused == 1
+pad dpad_down
+wait 0.2
+assert pad.menu_focus == 1
+assert pad.menu_focus.resume == 1
+pad stick left 0 1
+wait 0.1
+pad stick left 0 0
+wait 0.1
+assert pad.menu_focus.settings == 1
+pad a
+wait 0.3
+assert ui.paused == 1
+assert pad.menu_focus == 0
+pad b
+wait 0.3
+assert ui.paused == 1
+pad dpad_down
+wait 0.2
+assert pad.menu_focus.resume == 1
+pad dpad_down
+wait 0.2
+pad dpad_up
+wait 0.2
+assert pad.menu_focus.resume == 1
+pad a
+wait 0.3
+assert ui.paused == 0
+pad start
+wait 0.2
+assert ui.paused == 1
+pad b
+wait 0.3
+assert ui.paused == 0
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 8 12 air
+wait 0.5
+aim 0 0 -1
+spawn zombie 1 8
+ai off
+aim 0.1 -0.05 -1
+pad lb
+wait 0.3
+assert pad.assist_target == 1
+assert pad.assist_friction < 1
+pad stick left 0 -1
+wait 0.4
+pad stick left 0 0
+assert pad.assist_pull_deg > 0.5
+pad assist off
+wait 0.2
+assert pad.assist_target == 0
+pad assist on
+pad mouse
+wait 0.2
+assert pad.assist_target == 0
+killall
+ai on
+place wooden_chest 0 0 -2
+aim 0 -1 -1
+wait 0.3
+pad rb
+wait 0.3
+assert hud.prompt_pad == 1
+# X opens the chest with the cursor on the selected hotbar slot: that press does not also take one from the slot, and
+# B closing it is not also a drop through platforms while it stays down.
+clear
+give torch 5
+select 1
+pad x
+wait 0.3
+assert ui.inventory == 1
+assert pad.cursor == 1
+assert inv.cursor == 0
+pad b down
+wait 0.2
+assert ui.inventory == 0
+assert pad.navigating == 1
+pad b up
+wait 0.2
+assert pad.navigating == 0
+assert inv.torch == 5
+pad mouse
+wait 0.2
+assert hud.prompt_pad == 0
+pad release
+god off
 assert errors == 0
