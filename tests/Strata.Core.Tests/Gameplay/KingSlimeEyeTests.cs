@@ -64,6 +64,26 @@ public class KingSlimeEyeTests
     }
 
     [Fact]
+    public void KingSlimeNeverTeleportsIntoTerrain()
+    {
+        using var g = Arena();
+        // The player stands in a low tunnel (ceiling 3.5 m up), and a wall hides it from the slime.
+        var stone = g.Content.BlockId("stone");
+        var batch = g.World.Session.World.BeginEdit();
+        for (int dx = -TestGame.ArenaRadius; dx <= TestGame.ArenaRadius; dx++)
+            for (int dz = -TestGame.ArenaRadius; dz <= 5; dz++)
+                for (int dy = 1; dy <= 30; dy++)
+                    if (dz >= 4 || dy >= 8) batch.SetBlock(g.Floor.X + dx, g.Floor.Y + dy, g.Floor.Z + dz, stone);
+        g.World.Session.Commit(batch);
+        var boss = Boss(g, "king_slime", new Vector3(0, 0.2f, 4.6f));
+        float wall = TestGame.CellFeet(g.Floor + new Int3(0, 0, 4)).Z - 0.25f;
+        for (int t = 0; t < 600 && boss.Position.Z > wall; t++) g.World.Tick();
+        Assert.True(boss.Position.Z < wall, "never teleported");
+        g.Ticks(5);
+        Assert.False(Strata.Core.Physics.VoxelMotion.Overlaps(g.World.Session.World, boss.Center, boss.HalfExtents), $"embedded at {boss.Center}");
+    }
+
+    [Fact]
     public void KingSlimeShedsSpikedSlimesInExpert()
     {
         foreach (var (difficulty, spiked) in new[] { (Difficulty.Classic, false), (Difficulty.Expert, true) })

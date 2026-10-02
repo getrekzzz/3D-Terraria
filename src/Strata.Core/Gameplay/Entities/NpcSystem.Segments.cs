@@ -103,7 +103,8 @@ public sealed partial class NpcSystem
     /// <summary>A new worm from segment <paramref name="from"/> (its head) to the tail; it joins the boss group silently.</summary>
     private void SpawnPiece(Npc src, int from)
     {
-        if (_npcs.Count >= MaxNpcs) return; // the cut-off end is lost rather than overflow the creature cap
+        // No creature cap here: the segments were already in the world (in Terraria each is its own NPC), and a worm
+        // splits into at most half its segments, so the pieces may run a few past MaxNpcs rather than vanish.
         var head = src.Segments[from];
         var along = head - src.Segments[from + 1];
         var piece = new Npc(_nextId++, src.Def, head - new Vector3(0, src.HalfExtents.Y, 0))
