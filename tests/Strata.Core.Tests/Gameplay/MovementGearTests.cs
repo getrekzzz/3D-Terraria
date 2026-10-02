@@ -72,14 +72,18 @@ public class MovementGearTests
     {
         var db = TestPaths.Content;
         var loot = new LootRoller(db);
-        bool Drops(int difficulty)
+        // Expert and Master: it comes in the treasure bag, never loose; Classic and Journey never see it.
+        bool Drops(int difficulty, string item)
         {
             var rng = new Pcg32(7);
-            return loot.Roll("eye_of_cthulhu", ref rng, new ConditionContext { Difficulty = difficulty }).Any(s => s.Item!.Id == "shield_of_cthulhu");
+            return loot.Roll("eye_of_cthulhu", ref rng, new ConditionContext { Difficulty = difficulty }).Any(s => s.Item!.Id == item);
         }
-        Assert.False(Drops(0));
-        Assert.True(Drops(1));
-        Assert.True(Drops(2));
+        Assert.False(Drops(0, "shield_of_cthulhu"));
+        Assert.False(Drops(3, "eye_of_cthulhu_treasure_bag"));
+        Assert.True(Drops(1, "eye_of_cthulhu_treasure_bag"));
+        Assert.True(Drops(2, "eye_of_cthulhu_treasure_bag"));
+        var bag = new Pcg32(7);
+        Assert.Contains(loot.Roll("eye_of_cthulhu_bag", ref bag), s => s.Item!.Id == "shield_of_cthulhu");
     }
 
     [Fact]

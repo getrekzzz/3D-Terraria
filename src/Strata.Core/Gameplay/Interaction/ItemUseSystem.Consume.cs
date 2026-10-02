@@ -46,12 +46,22 @@ public sealed partial class ItemUseSystem
         if (_world.Npcs.All.Any(n => n.Def == boss && n.Alive)) return UseOutcome.Blocked;
         var ctx = _world.Session.ContextAt(p.FeetCell);
         if (!info.SummonCondition!.Evaluate(ctx)) return cfg.FailMessage != null ? Refuse(cfg.FailMessage) : UseOutcome.Blocked;
+        if (cfg.Curse != null) return CurseResident(p, info, cfg, boss);
         var flat = System.Numerics.Vector3.Normalize(new System.Numerics.Vector3(p.Aim.X, 0, p.Aim.Z) + new System.Numerics.Vector3(1e-4f, 0, 0));
         var at = p.Position + flat * cfg.Distance;
         if (!boss.Gravity) at.Y += 8f; // fliers arrive from above
         else if (boss.Boss is { Segments: > 0 }) at.Y -= 10f; // burrowers rise from below
         else at.Y += 6f; // hoppers drop in
         if (_world.Npcs.Spawn(boss, at) == null) return UseOutcome.Blocked;
+        if (info.Item.Consumable) ConsumeHeld(p);
+        return UseOutcome.Consumed;
+    }
+
+    private UseOutcome CurseResident(PlayerEntity p, ItemUseInfo info, Content.Specs.SummonBossParams cfg, Content.Defs.EnemyDef boss)
+    {
+        var victim = _world.Town.Residents.FirstOrDefault(r => r.Alive && r.Def.Id == cfg.Curse);
+        if (victim == null) return cfg.CurseFailMessage != null ? Refuse(cfg.CurseFailMessage) : UseOutcome.Blocked;
+        if (!_world.Commerce.Curse(victim, boss, cfg.Height)) return UseOutcome.Blocked;
         if (info.Item.Consumable) ConsumeHeld(p);
         return UseOutcome.Consumed;
     }

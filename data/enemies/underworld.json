@@ -21,9 +21,6 @@
       "equipSlot": "accessory", "equipEffects": [{ "type": "stat", "stat": "magicDamage", "add": 0.15 }], "covers": ["terraria:sorcerer_emblem"] }
   ],
   "lootTables": [
-    { "id": "wall_of_flesh_emblems", "mode": "weighted", "rolls": 1, "entries": [{ "item": "warrior_emblem" }, { "item": "ranger_emblem" }, { "item": "sorcerer_emblem" }, { "item": "summoner_emblem" }] },
-    { "id": "wall_of_flesh_weapons", "mode": "weighted", "rolls": 1, "entries": [{ "item": "breaker_blade" }, { "item": "clockwork_assault_rifle" }, { "item": "laser_rifle" }] },
-    { "id": "wall_of_flesh", "coins": [60000, 90000], "entries": [{ "item": "pwnhammer" }, { "table": "wall_of_flesh_emblems" }, { "table": "wall_of_flesh_weapons" }, { "item": "lesser_healing_potion", "min": 5, "max": 15 }] },
     { "id": "voodoo_demon", "coins": [300, 800], "entries": [{ "item": "guide_voodoo_doll" }, { "item": "demon_scythe", "chance": 0.03 }] }
   ],
   "enemies": [

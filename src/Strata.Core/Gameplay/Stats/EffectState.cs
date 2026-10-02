@@ -56,6 +56,9 @@ public sealed class EffectState
     /// <summary>HUD readouts the wearer has (depth, position, time).</summary>
     public HashSet<string> Info { get; } = new(StringComparer.Ordinal);
 
+    /// <summary>Projectiles thrown with weapon attacks (Bone Glove).</summary>
+    public List<Content.Specs.AttackProjectileParams> AttackProjectiles { get; } = new();
+
     public void Clear()
     {
         Stats.Clear();
@@ -77,6 +80,7 @@ public sealed class EffectState
         Pacified.Clear();
         Inflicts.Clear();
         Info.Clear();
+        AttackProjectiles.Clear();
     }
 
     /// <summary>Applies one effect spec (validated at content load).</summary>
@@ -137,6 +141,9 @@ public sealed class EffectState
             case EffectSpecs.InvertControls:
                 InvertControls = true;
                 InvertForward |= Parsed<InvertControlsParams>(spec).Forward;
+                break;
+            case EffectSpecs.AttackProjectile:
+                AttackProjectiles.Add(Parsed<AttackProjectileParams>(spec));
                 break;
             case EffectSpecs.Pacify:
                 Pacified.Add(Parsed<PacifyParams>(spec).Tag);

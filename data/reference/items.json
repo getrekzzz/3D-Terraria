@@ -3902,6 +3902,97 @@
    "kind": "paint",
    "stage": "early",
    "source": "painter"
+  },
+  {
+   "id": "terraria:treasure_bag",
+   "name": "Treasure Bag",
+   "kind": "consumable",
+   "stage": "early",
+   "source": "boss (expert)"
+  },
+  {
+   "id": "terraria:skeletron_mask",
+   "name": "Skeletron Mask",
+   "kind": "armor",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:bone_glove",
+   "name": "Bone Glove",
+   "kind": "accessory",
+   "stage": "early",
+   "source": "skeletron (expert)"
+  },
+  {
+   "id": "terraria:skeletron_hand",
+   "name": "Skeletron Hand",
+   "kind": "tool",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:clothier_voodoo_doll",
+   "name": "Clothier Voodoo Doll",
+   "kind": "tool",
+   "stage": "early",
+   "source": "clothier"
+  },
+  {
+   "id": "terraria:king_slime_trophy",
+   "name": "King Slime Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "king slime"
+  },
+  {
+   "id": "terraria:eye_of_cthulhu_trophy",
+   "name": "Eye of Cthulhu Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "eye of cthulhu"
+  },
+  {
+   "id": "terraria:eater_of_worlds_trophy",
+   "name": "Eater of Worlds Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "eater of worlds"
+  },
+  {
+   "id": "terraria:brain_of_cthulhu_trophy",
+   "name": "Brain of Cthulhu Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "brain of cthulhu"
+  },
+  {
+   "id": "terraria:queen_bee_trophy",
+   "name": "Queen Bee Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "queen bee"
+  },
+  {
+   "id": "terraria:skeletron_trophy",
+   "name": "Skeletron Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "skeletron"
+  },
+  {
+   "id": "terraria:deerclops_trophy",
+   "name": "Deerclops Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "deerclops"
+  },
+  {
+   "id": "terraria:wall_of_flesh_trophy",
+   "name": "Wall of Flesh Trophy",
+   "kind": "furniture",
+   "stage": "early",
+   "source": "wall of flesh"
   }
  ]
 }

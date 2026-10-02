@@ -186,6 +186,17 @@ public sealed class SummonBossParams : SpecParams
 
     /// <summary>Message shown when the conditions fail.</summary>
     public string? FailMessage { get; init; }
+
+    /// <summary>
+    /// A town resident cursed into the boss instead (the Clothier Voodoo Doll): it appears <see cref="Height"/> m
+    /// above them while they live, and they vanish into it.
+    /// </summary>
+    public string? Curse { get; init; }
+
+    public float Height { get; init; } = 7f;
+
+    /// <summary>Message shown when the cursed resident is not alive in the world.</summary>
+    public string? CurseFailMessage { get; init; }
 }
 
 /// <summary>

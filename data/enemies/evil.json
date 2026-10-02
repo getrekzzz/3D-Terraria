@@ -80,11 +80,7 @@
     { "id": "eater_of_souls", "coins": [30, 120], "entries": [{ "item": "rotten_chunk", "chance": 0.33 }] },
     { "id": "crimera", "coins": [30, 120], "entries": [{ "item": "vertebra", "chance": 0.33 }] },
     { "id": "face_monster", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] },
-    { "id": "blood_crawler", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] },
-    { "id": "brain_of_cthulhu", "coins": [10000, 15000], "entries": [
-      { "item": "crimtane_ore", "min": 40, "max": 110 }, { "item": "tissue_sample", "min": 10, "max": 20 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 },
-      { "item": "brain_of_confusion", "conditions": [{ "type": "expert" }] }
-    ] }
+    { "id": "blood_crawler", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] }
   ],
   "enemies": [
     { "id": "eater_of_souls", "model": "eater_of_souls", "tags": ["evil"], "name": "Eater of Souls", "description": "It swoops from the chasms with a mouth where a face should be.",

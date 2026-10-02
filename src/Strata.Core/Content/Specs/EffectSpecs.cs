@@ -39,6 +39,9 @@ public static class EffectSpecs
     /// <summary>Movement keys are reversed (Confused): strafe always, forward/back unless <c>forward</c> is false.</summary>
     public const string InvertControls = "invertControls";
 
+    /// <summary>Throws a projectile along the aim with weapon attacks, on its own cooldown (Bone Glove).</summary>
+    public const string AttackProjectile = "attackProjectile";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -58,6 +61,7 @@ public static class EffectSpecs
         c.Register<InflictParams>(SpecKind.Effect, Inflict);
         c.Register<InfoParams>(SpecKind.Effect, Info);
         c.Register<InvertControlsParams>(SpecKind.Effect, InvertControls);
+        c.Register<AttackProjectileParams>(SpecKind.Effect, AttackProjectile);
     }
 }
 
@@ -165,4 +169,19 @@ public sealed class InvertControlsParams : SpecParams
 {
     /// <summary>Also reverse forward and back (Terraria's 2D confusion only swaps left and right).</summary>
     public bool Forward { get; init; } = true;
+}
+
+public sealed class AttackProjectileParams : SpecParams, IValidatableSpec
+{
+    public string Projectile { get; init; } = "";
+    public int Damage { get; init; } = 10;
+    public float Knockback { get; init; } = 3f;
+
+    /// <summary>Ticks before the next throw (shared by every attack projectile the wearer has).</summary>
+    public int Cooldown { get; init; } = 60;
+
+    /// <summary>Launch speed (m/s).</summary>
+    public float Speed { get; init; } = 14f;
+
+    public string? Validate() => Projectile.Length == 0 ? "projectile is required" : Cooldown <= 0 ? "cooldown must be > 0" : null;
 }
