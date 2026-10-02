@@ -11,11 +11,11 @@ namespace Strata.Game.Player;
 /// Ranged weapons in first person, held aimed whether or not they are in use. Their poses are in the aim frame: the
 /// view turned so that −Z runs from the item to the crosshair point, so a barrel or an arrow laid along −Z points at
 /// what the crosshair is on at any distance. A bow stands upright right of centre with its back to the target and an
-/// arrow on the string (the first arrows in the backpack, as the shot will use): the arrow leaves at the clip's release
-/// as the bow jolts forward, and the next one is laid on and slid back onto the string through the re-draw window
-/// (data/config/use_styles.json, the body's bow clip), so auto-fire stays in step with the shots. Guns point along the
-/// view and kick up and back on every shot, a burst's included, settling in about 0.12 s. Staffs, wands and tomes lean
-/// their tip toward the crosshair and push toward it on a cast.
+/// arrow on the string (the first arrows in the ammo slots or backpack, as the shot will use): the arrow leaves at the
+/// clip's release as the bow jolts forward, and the next one is laid on and slid back onto the string through the
+/// re-draw window (data/config/use_styles.json, the body's bow clip), so auto-fire stays in step with the shots. Guns
+/// point along the view and kick up and back on every shot, a burst's included, settling in about 0.12 s. Staffs,
+/// wands and tomes lean their tip toward the crosshair and push toward it on a cast.
 /// </summary>
 public sealed partial class ViewModel
 {
@@ -138,8 +138,8 @@ public sealed partial class ViewModel
     }
 
     /// <summary>
-    /// The arrow a held bow will shoot (the first arrows in the backpack), looked up at most four times a second and at
-    /// once when a bow is taken out, in either view, so its model is loaded before the first shot.
+    /// The arrow a held bow will shoot (the first arrows in the ammo slots, then the backpack), looked up at most four
+    /// times a second and at once when a bow is taken out, in either view, so its model is loaded before the first shot.
     /// </summary>
     private void RefreshAmmo(PlayerEntity entity, float dt)
     {
@@ -151,9 +151,7 @@ public sealed partial class ViewModel
         }
         if ((_ammoClock -= dt) > 0f) return;
         _ammoClock = AmmoRefresh;
-        var backpack = entity.State.Inventory.Backpack;
-        int slot = ItemUseSystem.FindAmmo(backpack, ammoClass);
-        var ammo = slot < 0 ? null : backpack[slot].Item;
+        var ammo = entity.State.Inventory.FindAmmo(ammoClass) is { } found ? found.Inv[found.Slot].Item : null;
         if (ammo == _ammo) return;
         _ammo = ammo;
         var path = ammo == null ? null : AssetPaths.ItemModel(ammo, _game.Session.Content);

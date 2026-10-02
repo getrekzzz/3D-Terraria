@@ -10,7 +10,8 @@ public sealed partial class GameWorld
     public event Action<PlayerEntity>? PlayerLost;
 
     /// <summary>
-    /// What death costs by character difficulty, as in the reference game: Classic drops half the coins carried,
+    /// What death costs by character difficulty, as in the reference game: Classic drops half the coins carried (coin slots and
+    /// backpack),
     /// Mediumcore drops the whole inventory, Hardcore drops everything and deletes the character.
     /// </summary>
     private void ApplyDeathPenalty(PlayerEntity p)
@@ -21,9 +22,9 @@ public sealed partial class GameWorld
         switch (state.Difficulty)
         {
             case CharacterDifficulty.Classic:
-                long coins = Coins.Total(inv.Backpack);
+                long coins = Coins.Total(inv);
                 if (coins < 2) return;
-                if (Wallet.TrySpend(inv.Backpack, Session.Content, coins / 2, out var change))
+                if (Wallet.TrySpend(inv, Session.Content, coins / 2, out var change))
                     foreach (var s in change) Drops.Spawn(s, at, Scatter(), pickupDelay: 60);
                 foreach (var s in Coins.ToStacks(Session.Content, coins / 2)) Drops.Spawn(s, at, Scatter(), pickupDelay: 60);
                 break;

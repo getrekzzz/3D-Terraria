@@ -146,7 +146,7 @@ public sealed partial class InventoryScreen : CanvasLayer
         var state = _ui.Entity.State;
         _defense.Text = $"Defense {state.Defense}";
         _setBonus.Text = state.SetBonus != null ? $"Set bonus: {state.SetBonus}" : "";
-        _coins.Text = Coins.Format(Coins.Total(state.Inventory.Backpack));
+        _coins.Text = Coins.Format(Coins.Total(state.Inventory));
         // Expert and Master worlds unlock the 6th and 7th accessory slots; a locked slot still shows an item left in it.
         for (int i = 0; i < _accessoryViews.Length; i++)
             _accessoryViews[i].Visible = i < state.Inventory.AccessorySlotsUnlocked || !state.Inventory.Accessories[i].IsEmpty;

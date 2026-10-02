@@ -157,9 +157,18 @@
   `EquipFrom` routes an item by `EquipSlot`/category (vanity row, rotating accessory swap when full, first free
   dye, misc slot); `ArmorFilter`/`AccessoryFilter`/`DyeFilter`/`MiscFilter` gate clicks. Favourites are per slot
   (`Inventory.IsFavorite`, only backpack/coins/ammo keep them; `Transfer` carries them, chests drop them), never on
-  `ItemStack`. `AllStorages` is what a Mediumcore death drops (not the trash); `CountAll` backs the `inv.<item>`
-  probe (`inv.trash`, `inv.cursor` too). Content items of category hook/mount/minecart/pet must name the matching
-  `equipSlot`.
+  `ItemStack`. `AllStorages` is what a Mediumcore death drops (not the trash); `CountAll` plus the trash backs the
+  `inv.<item>` probe (`inv.trash`, `inv.cursor`, `inv.coins` too). Content items of category hook/mount/minecart/pet
+  must name the matching `equipSlot`.
+* **Purse and ammo** — `PlayerInventory.Pickup` (partial `.Purse`) routes like Terraria: coins merge into the coin
+  slots and `Coins.Normalize` turns each 100 into 1 of the next (each denomination keeps its slot; overflow to the
+  backpack; it needs `PlayerInventory.Content`, set by `CreateNew`, `PlayerSave.ToState` and `AddPlayer`), ammo
+  (category ammo with an `ammoClass`; Fallen Stars stay in the backpack) fills the ammo slots, the rest the backpack.
+  The purse is `Coins.Total(PlayerInventory)` (coin slots + backpack): `Wallet.TrySpend/Give(PlayerInventory, …)` pay
+  from the coin slots first, break backpack coins only when needed and return change to the coin slots; shops,
+  services, the Nurse, taxes, the Angler, Classic death and town `coins` conditions use it. Shots take
+  `PlayerInventory.FindAmmo` (ammo slots top to bottom, then the backpack); `CountAmmo` is the hotbar count;
+  `CanTake` is the pickup-aware room check.
 * **Tooltips and display helpers** — `ItemTooltip.Lines(stack, info, TooltipContext)` builds Terraria-ordered
   lines: name with prefix and count, damage/crit/speed/knockback after the prefix and the viewer's class bonuses
   (`DamageModel.DamageMultiplier`/`CritBonus`, the same maths a hit uses), info lines, the description or the buff's

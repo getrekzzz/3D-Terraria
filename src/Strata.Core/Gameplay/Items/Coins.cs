@@ -15,7 +15,7 @@ public enum CoinTier
 public readonly record struct CoinParts(long Platinum, int Gold, int Silver, int Copper);
 
 /// <summary>Converts copper values to coin stacks (100 copper = 1 silver, 100 silver = 1 gold, 100 gold = 1 platinum).</summary>
-public static class Coins
+public static partial class Coins
 {
     private static readonly string[] Ids = { "platinum_coin", "gold_coin", "silver_coin", "copper_coin" };
     private static readonly long[] Values = { 1_000_000, 10_000, 100, 1 };
@@ -36,10 +36,18 @@ public static class Coins
     public static long Total(Inventory inv)
     {
         long total = 0;
-        foreach (var s in inv.Stacks)
-            if (s.Item!.HasTag("coin")) total += (long)s.Item.Value * s.Count;
+        for (int i = 0; i < inv.Size; i++)
+        {
+            var s = inv[i];
+            if (IsCoin(s)) total += (long)s.Item!.Value * s.Count;
+        }
         return total;
     }
+
+    /// <summary>The purse: coins in the coin slots and anywhere in the backpack (what shops, services and deaths see).</summary>
+    public static long Total(PlayerInventory inv) => Total(inv.Coins) + Total(inv.Backpack);
+
+    public static bool IsCoin(ItemStack s) => !s.IsEmpty && s.Item!.HasTag("coin");
 
     /// <summary>The largest coin in the amount (prices are coloured by it); copper for zero or less.</summary>
     public static CoinTier TopTier(long copper) => copper switch

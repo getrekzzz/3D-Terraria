@@ -17,7 +17,7 @@ public class CharacterTests
         inv.Backpack[20] = new ItemStack(g.Content.Items.Get("silver_coin"), 10); // 1000 copper
         g.Player.State.Vitals.DamageDirect(10_000);
         g.Ticks(2);
-        Assert.Equal(500, Coins.Total(inv.Backpack));
+        Assert.Equal(500, Coins.Total(inv));
         Assert.Equal(500, g.World.Drops.Items.Where(d => d.Stack.Item!.HasTag("coin")).Sum(d => CopperOf(d.Stack)));
         Assert.Contains(inv.Backpack.Stacks, s => s.Item?.Id == "copper_pickaxe"); // items are kept
     }

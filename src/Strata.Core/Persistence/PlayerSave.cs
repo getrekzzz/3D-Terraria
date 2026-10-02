@@ -100,6 +100,7 @@ public sealed class PlayerSave
             BonusLife = BonusLife, BonusMana = BonusMana, Deaths = Deaths, Look = Look ?? new Appearance(), Difficulty = Difficulty,
             PlayTicks = PlayTicks, CreatedUtc = CreatedUtc, LastPlayedUtc = LastPlayedUtc,
         };
+        p.Inventory.Content = content;
         Fill(p.Inventory.Backpack, Backpack, content);
         Fill(p.Inventory.Armor, Armor, content);
         Fill(p.Inventory.Accessories, Accessories, content);

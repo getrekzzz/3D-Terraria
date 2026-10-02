@@ -22,6 +22,9 @@ public sealed partial class PlayerInventory
     /// <summary>How many of an item the character carries where it can be used: the backpack, coin and ammo slots.</summary>
     public int CountAll(ItemDef item) => Backpack.Count(item) + Coins.Count(item) + Ammo.Count(item);
 
+    /// <summary>How many matching items the character carries in the backpack, coin and ammo slots.</summary>
+    public int CountAll(Func<ItemDef, bool> match) => Backpack.Count(match) + Coins.Count(match) + Ammo.Count(match);
+
     /// <summary>The storage behind a player slot area; null for <see cref="SlotArea.Container"/> and <see cref="SlotArea.Shop"/>.</summary>
     public Inventory? Resolve(SlotArea area) => area switch
     {

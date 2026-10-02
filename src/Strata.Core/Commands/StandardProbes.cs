@@ -55,8 +55,12 @@ internal static class StandardProbes
         ctx.AddPrefixProbe("npcs.", id => w.Session.Content.Enemies.Contains(id) ? w.Npcs.All.Count(n => n.Def.Id == id) : null);
         ctx.AddProbe("inv.trash", () => ctx.Player.State.Inventory.Trash[0].Count);
         ctx.AddProbe("inv.cursor", () => ctx.Player.State.Inventory.Cursor.Count);
-        // inv.<item>: carried in the backpack, coin and ammo slots (worn items do not count).
-        ctx.AddPrefixProbe("inv.", id => w.Session.Content.Items.TryGet(id, out var item) ? ctx.Player.State.Inventory.CountAll(item) : null);
+        // The purse in copper: coins in the coin slots and the backpack.
+        ctx.AddProbe("inv.coins", () => Gameplay.Items.Coins.Total(ctx.Player.State.Inventory));
+        // inv.<item>: in the backpack, coin, ammo and trash slots (worn items do not count).
+        ctx.AddPrefixProbe("inv.", id => w.Session.Content.Items.TryGet(id, out var item)
+            ? ctx.Player.State.Inventory.CountAll(item) + ctx.Player.State.Inventory.Trash.Count(item)
+            : null);
         ctx.AddPrefixProbe("event.", id => w.Session.Content.Events.Contains(id) ? (w.Events.IsActive(id) ? 1 : 0) : null);
         ctx.AddPrefixProbe("flag.", id => w.Session.Flags.Contains(id) ? 1 : 0);
         ctx.AddPrefixProbe("buff.", id => ctx.Player.State.Buffs.Has(id) ? 1 : 0);

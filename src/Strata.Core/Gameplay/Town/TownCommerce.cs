@@ -113,11 +113,11 @@ public sealed class TownCommerce
     {
         var offer = Stock(npc, player).FirstOrDefault(o => o.Item == item);
         if (offer == null) return TradeResult.Unavailable;
-        var inv = player.State.Inventory.Backpack;
+        var inv = player.State.Inventory;
         var goods = new ItemStack(item, count);
-        if (!inv.CanFit(goods)) return TradeResult.NoRoom;
+        if (!inv.CanTake(goods)) return TradeResult.NoRoom;
         if (!Wallet.TrySpend(inv, Content, offer.Price * count, out var change)) return TradeResult.TooPoor;
-        var rest = inv.Add(goods);
+        var rest = inv.Pickup(goods);
         foreach (var s in change.Append(rest).Where(s => !s.IsEmpty)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         return TradeResult.Ok;
     }
@@ -128,12 +128,12 @@ public sealed class TownCommerce
     /// <summary>Sells the whole stack in a backpack slot.</summary>
     public TradeResult Sell(PlayerEntity player, int slot)
     {
-        var inv = player.State.Inventory.Backpack;
-        var stack = inv[slot];
+        var inv = player.State.Inventory;
+        var stack = inv.Backpack[slot];
         if (stack.IsEmpty || stack.Item!.HasTag("coin")) return TradeResult.NotSold;
         long value = SaleValue(stack);
         if (value <= 0) return TradeResult.NotSold;
-        inv.Take(slot, stack.Count);
+        inv.Backpack.Take(slot, stack.Count);
         foreach (var s in Wallet.Give(inv, Content, value)) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         return TradeResult.Ok;
     }
@@ -155,8 +155,7 @@ public sealed class TownCommerce
         if (npc.Def.Service is not { Type: TownServiceSpecs.Heal } spec) return TradeResult.Unavailable;
         long cost = HealCost(npc, player);
         if (cost == 0) return TradeResult.NothingToDo;
-        var inv = player.State.Inventory.Backpack;
-        if (!Wallet.TrySpend(inv, Content, cost, out var change)) return TradeResult.TooPoor;
+        if (!Wallet.TrySpend(player.State.Inventory, Content, cost, out var change)) return TradeResult.TooPoor;
         foreach (var s in change) _world.Drops.Spawn(s, player.Center, System.Numerics.Vector3.Zero);
         var state = player.State;
         if (spec.Parse<HealServiceParams>().ClearsDebuffs)

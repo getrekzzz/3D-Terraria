@@ -89,7 +89,7 @@ public sealed partial class TownDialog : CanvasLayer
     public override void _Process(double delta)
     {
         if (!IsOpen || _npc == null) return;
-        _coins.Text = $"Coins: {Coins.Format(Coins.Total(_ui.Inventory.Backpack))}";
+        _coins.Text = $"Coins: {Coins.Format(Coins.Total(_ui.Inventory))}";
         var far = System.Numerics.Vector3.Distance(_npc.Center, _ui.Entity.Center) > _ui.Game.Town.Config.TalkRange + 1f;
         if (far || !_npc.Alive || !_ui.Entity.Alive || !_ui.Game.Town.Residents.Contains(_npc)) Close();
     }

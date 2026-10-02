@@ -3,6 +3,7 @@ namespace Strata.Core.Gameplay.Items;
 /// <summary>
 /// The player's storage, laid out like the reference game's: the 50-slot backpack (first 10 are the hotbar), coin and
 /// ammo slots, a trash slot that is saved, the equipment (<see cref="PlayerInventory"/>.Equipment.cs) and a cursor stack.
+/// Pickups, coins and ammo are routed in <see cref="PlayerInventory"/>.Purse.cs.
 /// </summary>
 public sealed partial class PlayerInventory
 {
@@ -73,7 +74,4 @@ public sealed partial class PlayerInventory
         SelectedHotbar = ((slot % HotbarSize) + HotbarSize) % HotbarSize;
         SelectionChanged?.Invoke();
     }
-
-    /// <summary>Picks up an item into the backpack (hotbar first). Returns the remainder.</summary>
-    public ItemStack Pickup(ItemStack stack) => Backpack.Add(stack);
 }
