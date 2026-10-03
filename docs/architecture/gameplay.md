@@ -196,7 +196,7 @@
   (`tools/audio/music_tracks.py`; composer variations `octave`, `stabs`, `drums="blast"`) and `MusicDirector.Aliases`
   chains a state without a track to its family track (`boss_worm` → `boss_evil` → `boss_1`). Probes:
   `boss.intro_active`, `boss.intro_defeated`, `boss.intro_cards`, `boss.intro_skips`, `boss.intro_bars`,
-  `camera.framing`, `time.scale`, `music.track.<id>`, `music.stings`. `MusicDirector.Stung` reports stings (captions).
+  `camera.framing`, `engine.time_scale`, `music.track.<id>`, `music.stings`. `MusicDirector.Stung` reports stings (captions).
 * **Boss loot** — boss tables live in `data/loot/bosses.json` under the boss's id (`loot` on the enemy). The main
   table always rolls coins, the potions and the 1/10 `<boss>_trophy` (`data/tileobjects/trophies.json`, wall
   hangings drawn flat on the wall face); Classic and Journey roll `<boss>_drops` loose (`expert` `is: false`), Expert

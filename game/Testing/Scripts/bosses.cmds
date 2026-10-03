@@ -55,8 +55,8 @@ assert music.silent == 1
 # Its fall: the "Defeated" card, the victory sting over the hush and a brief slow motion that ends by itself.
 assert boss.intro_defeated == 1
 assert music.stings > 0
-assert time.scale < 1
-wait_until time.scale == 1 2
+assert engine.time_scale < 1
+wait_until engine.time_scale == 1 2
 assert flag.defeated_evil_boss == 1
 killall
 boss queen_bee 10
