@@ -124,8 +124,18 @@ assert hover.talk == 1
 assert hud.target_name.the_merchant_250/250 == 1
 hold use_secondary 0.1
 assert ui.talk_open == 1
+# A resident's name tag steps aside while a screen is open over the world (it showed through translucent panels).
+assert town.merchant.tag == 0
 ui close
 camera third
+# (the camera eases back out of first person, through the close-up fade)
+wait_until town.merchant.tag > 0.9 3
+ui inventory
+wait 0.1
+assert town.merchant.tag == 0
+ui close
+wait 0.1
+assert town.merchant.tag > 0.9
 town talk merchant
 ui talk merchant
 ui shop
