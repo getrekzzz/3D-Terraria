@@ -16,10 +16,11 @@ public static class MiningRules
     /// <summary>
     /// Cells hit by a brush of edge <paramref name="size"/> aimed at <paramref name="target"/> through the face with
     /// normal <paramref name="normal"/>. A brush of the building grid's size is the aligned grid block containing the
-    /// target (the cube the cursor shows, a 1 m shaft when digging down). Larger brushes extend into the surface and,
-    /// on the other axes, towards the half of the cell that was hit.
+    /// target (the cube the cursor shows, a 1 m shaft when digging down); given the <paramref name="world"/>, it is
+    /// <see cref="Building.BlockGrid.BlockOf"/> so a raised block is mined whole and digging beside one never cuts it.
+    /// Larger brushes extend into the surface and, on the other axes, towards the half of the cell that was hit.
     /// </summary>
-    public static IEnumerable<Int3> Brush(Int3 target, Int3 normal, Vector3 hitFraction, int size)
+    public static IEnumerable<Int3> Brush(Int3 target, Int3 normal, Vector3 hitFraction, int size, Voxels.VoxelWorld? world = null)
     {
         if (size <= 1)
         {
@@ -28,7 +29,7 @@ public static class MiningRules
         }
         if (size == Building.BlockGrid.Size)
         {
-            foreach (var cell in Building.BlockGrid.Cells(target)) yield return cell;
+            foreach (var cell in world == null ? Building.BlockGrid.Cells(target) : Building.BlockGrid.BlockOf(world, target)) yield return cell;
             yield break;
         }
         int lo(int axis, float frac, int n)

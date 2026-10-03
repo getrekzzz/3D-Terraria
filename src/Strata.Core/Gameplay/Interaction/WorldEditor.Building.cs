@@ -13,10 +13,11 @@ public sealed partial class WorldEditor
     /// Places a block into several cells at once (a grid block): every listed cell that is free gets the block, in one
     /// edit. At most <paramref name="limit"/> cells are filled (the items the player holds). The group needs support
     /// from at least one of its cells and none of the filled cells may overlap a <paramref name="blockers"/> box.
-    /// Does not consume items; returns how many cells were filled.
+    /// Does not consume items; returns how many cells were filled. <paramref name="flags"/> are set on the filled cells
+    /// besides <see cref="CellFlags.PlayerPlaced"/> (<see cref="CellFlags.HalfStep"/> for a raised block).
     /// </summary>
     public (PlacementResult Result, int Placed) PlaceBlocks(IReadOnlyList<(Int3 Cell, byte Shape)> cells, BlockDef block, int limit,
-        IEnumerable<(Vector3 Min, Vector3 Max)> blockers)
+        IEnumerable<(Vector3 Min, Vector3 Max)> blockers, CellFlags flags = CellFlags.None)
     {
         var (result, free) = PlacementRules.CanPlaceBlocks(World, cells, block, limit, blockers);
         if (result != PlacementResult.Ok) return (result, 0);
@@ -26,7 +27,7 @@ public sealed partial class WorldEditor
         foreach (var (cell, shape) in free)
         {
             if (World.TileObjects.At(cell) is { } decor) BreakObject(decor, dropItems: true);
-            batch.SetBlock(cell, (ushort)block.RuntimeId, block.Render == BlockRender.Crisp ? shape : (byte)0, CellFlags.PlayerPlaced);
+            batch.SetBlock(cell, (ushort)block.RuntimeId, block.Render == BlockRender.Crisp ? shape : (byte)0, CellFlags.PlayerPlaced | flags);
             if (block.IsSolid) batch.SetLiquid(cell, 0);
         }
         if (block.Falls)
@@ -40,16 +41,17 @@ public sealed partial class WorldEditor
 
     /// <summary>
     /// Hammers a grid block into a block-scale shape: its crisp cells take the pattern's shapes and crisp cells the
-    /// pattern leaves open are knocked out (dropping their item). Returns false when nothing in the block could change.
+    /// pattern leaves open are knocked out (dropping their item). A raised block is shaped as itself. Returns false when
+    /// nothing in the block could change.
     /// </summary>
     public bool ReshapeBlock(Int3 cell, CellShape shape, int rotation)
     {
         var content = _session.Content;
-        var pattern = BlockGrid.Pattern(cell, shape, rotation).ToDictionary(p => p.Cell, p => p.Shape);
+        var pattern = BlockGrid.Pattern(cell, shape, rotation, BlockGrid.IsRaised(World, cell)).ToDictionary(p => p.Cell, p => p.Shape);
         var batch = World.BeginEdit();
         var removed = new List<Int3>();
         bool changed = false;
-        foreach (var c in BlockGrid.Cells(cell))
+        foreach (var c in BlockGrid.BlockOf(World, cell))
         {
             ushort id = World.GetBlock(c);
             if (id == 0 || id == VoxelWorld.Unknown || content.Blocks[id].Render != BlockRender.Crisp || IsLocked(c)) continue;

@@ -90,7 +90,8 @@ public class ItemUseTests
         g.Hold("gray_brick", 20);
         var world = g.World.Session.World;
         var front = g.Floor + new Int3(0, 0, 4);
-        var block = BlockGrid.Cells(front + Int3.Up).Where(c => world.GetBlock(c) == 0).ToList();
+        // A whole 1 m block on the floor (raised half a block when the floor is off the grid, see BuildingGridTests).
+        var block = BlockGrid.Cells(front + Int3.Up, raised: ((front.Y + 1) & 1) != 0).ToList();
         g.AimAt(TestGame.CellCenter(front) + new Vector3(0, 0.24f, 0));
         Assert.Equal(UseOutcome.PlacedBlock, g.World.ItemUse.Use(g.Player, g.Target(), true));
         Assert.All(block, c => Assert.Equal(g.Content.BlockId("gray_brick"), world.GetBlock(c)));
