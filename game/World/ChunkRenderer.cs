@@ -9,8 +9,8 @@ namespace Strata.Game.World;
 
 /// <summary>
 /// Owns the render instances of streamed chunks. Mesh results are queued and uploaded within a per-frame
-/// time budget; each chunk has up to four surfaces (opaque, cutout, glass, liquid) as RenderingServer
-/// instances (no scene nodes per chunk).
+/// time budget (only a chunk's newest mesh; an edit's meshes all at once, first); each chunk has up to four surfaces
+/// (opaque, cutout, glass, liquid) as RenderingServer instances (no scene nodes per chunk).
 /// </summary>
 public sealed partial class ChunkRenderer : Node3D
 {
@@ -26,33 +26,60 @@ public sealed partial class ChunkRenderer : Node3D
 
     private readonly Dictionary<Int3, ChunkVisual> _visuals = new();
     private readonly Queue<ChunkMeshResult> _pending = new();
+    private readonly List<ChunkMeshResult> _edits = new();
+    // The newest mesh queued for each chunk; older ones still in the queues are skipped.
+    private readonly Dictionary<Int3, ChunkMeshResult> _latest = new();
     private TerrainMaterials _materials = null!;
 
     public int ChunkCount => _visuals.Count;
-    public int PendingUploads => _pending.Count;
+    public int PendingUploads => _latest.Count;
     public long TriangleCount { get; private set; }
+
+    /// <summary>A chunk's new mesh has replaced its old one (what grows on the terrain switches with it).</summary>
+    public event System.Action<ChunkMeshResult>? Uploaded;
 
     public void Initialize(TerrainMaterials materials) => _materials = materials;
 
-    public void Enqueue(ChunkMeshResult result) => _pending.Enqueue(result);
+    /// <summary>
+    /// Queues a mesh for upload. An edit's meshes (<see cref="ChunkMeshResult.FromEdit"/>, which the streamer hands
+    /// over together) all go up on the next <see cref="ProcessUploads"/>, ahead of streaming and regardless of the
+    /// budget, so the change appears in one frame.
+    /// </summary>
+    public void Enqueue(ChunkMeshResult result)
+    {
+        _latest[result.Coord] = result;
+        if (result.FromEdit) _edits.Add(result);
+        else _pending.Enqueue(result);
+    }
 
     public void Remove(Int3 coord)
     {
+        _latest.Remove(coord); // a mesh still queued for a chunk that left is never uploaded
         if (!_visuals.Remove(coord, out var visual)) return;
         Free(visual);
     }
 
-    /// <summary>Uploads queued meshes until the time budget is used.</summary>
+    /// <summary>Uploads queued meshes: every edit's, then streamed ones until the time budget is used.</summary>
     public int ProcessUploads(double budgetMs)
     {
         var sw = Stopwatch.StartNew();
         int uploaded = 0;
+        foreach (var r in _edits)
+            if (TryUpload(r)) uploaded++;
+        _edits.Clear();
         while (_pending.Count > 0 && (uploaded == 0 || sw.Elapsed.TotalMilliseconds < budgetMs))
-        {
-            Upload(_pending.Dequeue());
-            uploaded++;
-        }
+            if (TryUpload(_pending.Dequeue())) uploaded++;
         return uploaded;
+    }
+
+    /// <summary>Uploads a queued mesh unless a newer one is queued for its chunk (or the chunk was removed).</summary>
+    private bool TryUpload(ChunkMeshResult r)
+    {
+        if (!_latest.TryGetValue(r.Coord, out var latest) || latest != r) return false;
+        _latest.Remove(r.Coord);
+        Upload(r);
+        Uploaded?.Invoke(r);
+        return true;
     }
 
     private void Upload(ChunkMeshResult r)

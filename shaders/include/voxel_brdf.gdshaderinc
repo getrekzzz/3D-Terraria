@@ -15,8 +15,9 @@ void strata_direct_light(vec3 normal, vec3 light_dir, vec3 view, vec3 light_colo
 	float a = r * r;
 	float a2 = a * a;
 	float fd90 = 0.5 + 2.0 * loh * loh * r;
-	float fl = 1.0 + (fd90 - 1.0) * pow(1.0 - nol, 5.0);
-	float fv = 1.0 + (fd90 - 1.0) * pow(1.0 - nov, 5.0);
+	// Rounding can push a dot product of unit vectors just past 1, and pow() of a negative number is NaN.
+	float fl = 1.0 + (fd90 - 1.0) * pow(max(1.0 - nol, 0.0), 5.0);
+	float fv = 1.0 + (fd90 - 1.0) * pow(max(1.0 - nov, 0.0), 5.0);
 	vec3 radiance = light_color * attenuation * g;
 	diffuse_out += radiance * nol * fl * fv / PI;
 	float dd = noh * noh * (a2 - 1.0) + 1.0;

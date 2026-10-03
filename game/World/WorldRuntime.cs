@@ -68,9 +68,10 @@ public sealed partial class WorldRuntime : Node3D
         Streamer.MeshReady += result =>
         {
             _renderer.Enqueue(result);
-            _grass?.Set(result.Coord, result.Grass);
             _colliders.SetData(result.Coord, result.Collision);
         };
+        // Grass switches with the terrain it grows on (a mesh can wait in the upload queue for a few frames).
+        _renderer.Uploaded += result => _grass?.Set(result.Coord, result.Grass);
         Streamer.ChunkRemoved += coord =>
         {
             _renderer.Remove(coord);

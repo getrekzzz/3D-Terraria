@@ -28,6 +28,19 @@ varying vec3 v_world;
 varying float v_rand;
 varying float f_sun_gate;
 
+// A random number per clump from where it stands. INSTANCE_ID is only the clump's slot in its chunk's buffer, and the
+// slots shift whenever an edit rebuilds the chunk, so looks keyed on it would flicker across the whole chunk.
+float clump_random(vec3 root) {
+	uvec3 q = uvec3(ivec3(floor(root * 64.0)));
+	uint h = (q.x * 73856093u) ^ (q.y * 19349663u) ^ (q.z * 83492791u);
+	h ^= h >> 16u;
+	h *= 2146121005u;
+	h ^= h >> 15u;
+	h *= 2221713035u;
+	h ^= h >> 16u;
+	return float(h >> 8u) / 16777216.0;
+}
+
 void vertex() {
 	float t = UV.y;
 	vec3 root = (MODEL_MATRIX * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
@@ -63,11 +76,13 @@ void vertex() {
 	v_light = INSTANCE_CUSTOM;
 	v_tint = COLOR;
 	v_world = VERTEX;
-	v_rand = fract(sin(float(INSTANCE_ID) * 12.9898) * 43758.5453);
+	v_rand = clump_random(root);
 }
 
 void fragment() {
-	float t = UV.y;
+	// Interpolation can land UV.y a hair below 0 at the root, and pow() of a negative number is NaN: a NaN pixel turns
+	// into a black dot after FXAA and a white blob (and a haze over the whole screen) after glow.
+	float t = clamp(UV.y, 0.0, 1.0);
 	vec3 tint = v_tint.rgb;
 	vec3 base;
 	if (flower) {

@@ -10,8 +10,9 @@ namespace Strata.Game.World;
 /// <summary>
 /// Draws the grass scattered by the mesh jobs (<see cref="ChunkMeshResult.Grass"/>): one MultiMesh of clumps (and
 /// one of flowers) per chunk, created only while the chunk is within the preset's grass distance. Clumps arrive
-/// shuffled, so drawing a prefix thins a chunk evenly: far chunks draw fewer, simpler clumps (the shader widens
-/// them), and the blades shrink into the ground at the distance limit.
+/// sorted by their hashed rank, so drawing a prefix thins a chunk evenly, and a clump's place in or out of the prefix
+/// never depends on the rest of the chunk (an edit only changes the grass it touches): far chunks draw fewer, simpler
+/// clumps (the shader widens them), and the blades shrink into the ground at the distance limit.
 /// </summary>
 public sealed partial class GrassRenderer : Node3D
 {
@@ -111,7 +112,7 @@ public sealed partial class GrassRenderer : Node3D
             }
             if (!chunk.Live) Create(coord, chunk);
             float thin = 1f - 0.65f * Mathf.SmoothStep(distance * 0.3f, distance, d);
-            int count = Mathf.Clamp(Mathf.CeilToInt(chunk.Clumps.Length * density * thin), 0, chunk.Clumps.Length);
+            int count = GrassScatter.VisibleCount(chunk.Clumps, density * thin);
             bool near = d < distance * 0.35f;
             if (count != chunk.Visible)
             {

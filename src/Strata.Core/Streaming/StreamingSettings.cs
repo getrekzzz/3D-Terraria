@@ -18,4 +18,10 @@ public sealed class StreamingSettings
 
     public int MaxLoadsInFlight { get; init; } = 48;
     public int MaxMeshesInFlight { get; init; } = 32;
+
+    /// <summary>
+    /// Longest an edit's finished chunk meshes wait for the rest of its chunks, so they appear together (milliseconds;
+    /// a chunk that cannot mesh yet never holds a dig back for long).
+    /// </summary>
+    public double MaxEditHoldMs { get; init; } = 250;
 }
