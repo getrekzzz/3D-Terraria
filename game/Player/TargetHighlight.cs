@@ -70,7 +70,7 @@ public sealed partial class TargetHighlight : Node3D
         _mesh.Commit();
     }
 
-    private IEnumerable<Int3> CellsAt(Int3 cell) => _entity.Precision ? new[] { cell } : BlockGrid.Cells(cell);
+    private IEnumerable<Int3> CellsAt(Int3 cell) => _entity.Precision ? new[] { cell } : BlockGrid.BlockOf(_game.Session.World, cell);
 
     private void DrawMining(Target target, ItemDef tool)
     {
@@ -107,9 +107,10 @@ public sealed partial class TargetHighlight : Node3D
             _mesh.Box(Min(target.Cell), Min(target.Cell + Int3.One), Neutral);
             return;
         }
-        foreach (var (cell, code) in BlockGrid.Pattern(target.Cell, _entity.BuildShape, _entity.FacingQuarter + _entity.BuildRotation))
+        bool raised = BlockGrid.IsRaised(_game.Session.World, target.Cell);
+        foreach (var (cell, code) in BlockGrid.Pattern(target.Cell, _entity.BuildShape, _entity.FacingQuarter + _entity.BuildRotation, raised))
             _mesh.Ghost(Min(cell), code, Units.CellSize, GhostColor);
-        var origin = BlockGrid.MinOf(target.Cell);
+        var origin = BlockGrid.MinOf(target.Cell, raised);
         _mesh.Box(Min(origin), Min(origin + Int3.One * BlockGrid.Size), Neutral);
     }
 
@@ -118,15 +119,17 @@ public sealed partial class TargetHighlight : Node3D
         var cell = ItemUseSystem.PlacementCell(target);
         int rotation = _entity.FacingQuarter + _entity.BuildRotation;
         var shape = block.Render == BlockRender.Crisp ? _entity.BuildShape : CellShape.Full;
+        // The same block placing will fill: on the grid or raised half a block to fit the ground (see ItemUseSystem).
+        bool raised = !_entity.Precision && BlockGrid.PlaceRaised(_game.Session.World, cell, target.Cell, shape, rotation);
         List<(Int3 Cell, byte Shape)> cells = _entity.Precision
             ? new() { (cell, block.Render == BlockRender.Crisp ? ShapeCode.Pack(shape, rotation) : (byte)0) }
-            : BlockGrid.Pattern(cell, shape, rotation);
+            : BlockGrid.Pattern(cell, shape, rotation, raised);
         var blockers = _game.Players.Where(p => p.Alive).Select(p => p.CellBox);
         var (result, free) = PlacementRules.CanPlaceBlocks(_game.Session.World, cells, block, consumable ? count : int.MaxValue, blockers);
         bool ok = result == PlacementResult.Ok;
         foreach (var (c, code) in ok ? free : cells)
             _mesh.Ghost(Min(c), block.Render == BlockRender.Crisp ? code : (byte)0, Units.CellSize, ok ? GhostColor : new Color(Invalid, 0.22f));
-        var origin = _entity.Precision ? cell : BlockGrid.MinOf(cell);
+        var origin = _entity.Precision ? cell : BlockGrid.MinOf(cell, raised);
         int size = _entity.Precision ? 1 : BlockGrid.Size;
         _mesh.Box(Min(origin), Min(origin + Int3.One * size), ok ? Place : Invalid);
     }

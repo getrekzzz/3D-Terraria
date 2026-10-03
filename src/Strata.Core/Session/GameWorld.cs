@@ -43,6 +43,9 @@ public sealed class PlayerEntity
     /// <summary>Quarter turns about +Y for shapes and objects (added to the facing direction).</summary>
     public int BuildRotation { get; set; }
 
+    /// <summary>Cells filled since the use button last went down (holding it never builds onto these).</summary>
+    public HashSet<Common.Int3> PlacedThisPress { get; } = new();
+
     /// <summary>The minecart being ridden (the engine moves the body along it), or null.</summary>
     public Gameplay.Mounts.MinecartRide? Minecart { get; set; }
 

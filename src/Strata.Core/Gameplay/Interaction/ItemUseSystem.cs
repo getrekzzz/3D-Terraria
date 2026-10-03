@@ -64,7 +64,11 @@ public sealed partial class ItemUseSystem
         var buffs = world.Session.Content.Buffs.All;
         _healingCooldown = buffs.FirstOrDefault(b => b.HasTag("healing_cooldown"));
         _manaCooldown = buffs.FirstOrDefault(b => b.HasTag("mana_cooldown"));
-        world.Editor.BlockPlaced += (cell, _) => SprayPlaced(cell);
+        world.Editor.BlockPlaced += (cell, _) =>
+        {
+            _placer?.PlacedThisPress.Add(cell);
+            SprayPlaced(cell);
+        };
     }
 
     /// <summary>A melee swing started (the combat system sweeps its hitbox over the swing).</summary>
@@ -81,6 +85,7 @@ public sealed partial class ItemUseSystem
     /// </summary>
     public UseOutcome Use(PlayerEntity p, Target? target, bool freshPress)
     {
+        if (freshPress) p.PlacedThisPress.Clear();
         var held = p.State.Inventory.Held;
         if (held.IsEmpty || !p.Alive) return UseOutcome.None;
         var info = _world.Uses[held.Item!];
@@ -98,6 +103,9 @@ public sealed partial class ItemUseSystem
 
         if (info.Has(ItemAction.PlaceBlock) || info.Has(ItemAction.PlaceObject))
         {
+            // Holding the button never builds onto blocks laid during the same press: the cursor lands on each new
+            // block, so the build would otherwise creep towards the player one block per use.
+            if (!freshPress && info.Block != null && inReach != null && p.PlacedThisPress.Contains(inReach.Cell)) return UseOutcome.None;
             int placed = 0;
             _placer = p;
             outcome = inReach == null ? UseOutcome.OutOfReach : Place(p, info, inReach, out placed);
@@ -188,7 +196,7 @@ public sealed partial class ItemUseSystem
         if (!info.Has(ItemAction.Mine)) return UseOutcome.WrongTool;
         var normal = target.Normal == Int3.Zero ? DominantFace(p) : target.Normal;
         int size = p.Precision ? 1 : Math.Max(1, item.MineBrush);
-        var cells = MiningRules.Brush(target.Cell, normal, target.Fraction, size);
+        var cells = MiningRules.Brush(target.Cell, normal, target.Fraction, size, _world.Session.World);
         var result = editor.Mine(cells, item.PickPower, item.PickPower, _world.Session.Clock.Tick);
         if (result.Broken.Count > 0) return UseOutcome.Mined;
         if (result.Damaged.Count > 0) return UseOutcome.Damaged;
@@ -205,10 +213,13 @@ public sealed partial class ItemUseSystem
             var blockers = _world.Players.Where(o => o.Alive).Select(o => o.CellBox);
             if (!p.Precision)
             {
-                // A whole grid block (1 m), one item per filled cell.
-                var cells = BlockGrid.Pattern(cell, block.Render == BlockRender.Crisp ? p.BuildShape : CellShape.Full, p.FacingQuarter + p.BuildRotation);
+                // A whole grid block (1 m), one item per filled cell, raised half a block where that fits the ground.
+                var blockShape = block.Render == BlockRender.Crisp ? p.BuildShape : CellShape.Full;
+                int rotation = p.FacingQuarter + p.BuildRotation;
+                bool raised = BlockGrid.PlaceRaised(_world.Session.World, cell, target.Cell, blockShape, rotation);
+                var cells = BlockGrid.Pattern(cell, blockShape, rotation, raised);
                 int limit = info.Item.Consumable ? p.State.Inventory.Held.Count : int.MaxValue;
-                var (result, count) = editor.PlaceBlocks(cells, block, limit, blockers);
+                var (result, count) = editor.PlaceBlocks(cells, block, limit, blockers, raised ? CellFlags.HalfStep : CellFlags.None);
                 placed = count;
                 return result == PlacementResult.Ok ? UseOutcome.PlacedBlock : UseOutcome.Blocked;
             }

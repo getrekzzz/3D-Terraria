@@ -70,3 +70,30 @@ assert projectiles.count >= 1
 wait 0.5
 assert player.life < 100
 assert errors == 0
+
+# Building with wood: a click stands a whole 1 m block on the ground, both where the ground is on the building grid
+# and where it is half a block off it, and holding the button does not stack blocks onto the ones it just built.
+tp spawn
+wait 1
+fill -14 -3 -14 14 -1 14 stone
+fill -14 0 -14 14 30 14 air
+fill -8 0 2 -1 0 9 stone
+wait 0.5
+clear
+give wood 40
+wield wood
+aim 3 -3.2 4
+hold use_primary 1.5
+wait 0.3
+assert inv.wood == 32
+assert block.3.0.4 > 0
+assert block.3.1.4 > 0
+assert block.3.2.4 == 0
+aim -3 -2.2 4
+hold use_primary 1.5
+wait 0.3
+assert inv.wood == 24
+assert block.-3.1.4 > 0
+assert block.-3.2.4 > 0
+assert block.-3.3.4 == 0
+assert errors == 0
