@@ -9,6 +9,9 @@ public sealed class GuideBookContext
     public required UiContext Ui { get; init; }
     public required GuideBookScreen Book { get; init; }
 
+    /// <summary>The shared model library the bestiary's 3D previews instance creatures from (null: portraits only).</summary>
+    public Strata.Game.Rendering.PropLibrary? Props { get; init; }
+
     /// <summary>The Items index (null until its background build completes).</summary>
     public GuideIndex? Index { get; set; }
 }

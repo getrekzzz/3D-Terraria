@@ -37,6 +37,12 @@ public sealed class NpcsTab : ListTab<TownNpcDef>
         return npc.Home != null ? "Living here" : "Homeless";
     }
 
+    /// <summary>The selected resident's title label (probe ui.book_title_width).</summary>
+    public Label? TitleLabel { get; private set; }
+
+    /// <summary>Width of the selected resident's title in pixels, -1 when none.</summary>
+    public float TitleWidth => TitleLabel is { } t && GodotObject.IsInstanceValid(t) ? t.Size.X : -1f;
+
     protected override void Render(TownNpcDef n, VBoxContainer page)
     {
         var game = Ctx.Ui.Game;
@@ -48,9 +54,14 @@ public sealed class NpcsTab : ListTab<TownNpcDef>
             Texture = PortraitIcons.TownNpc(n), CustomMinimumSize = new Vector2(96, 96),
             ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
         });
-        var titles = new VBoxContainer { SizeFlagsVertical = Control.SizeFlags.ShrinkCenter };
+        // The titles take the rest of the row: a shrink-centred box would get no width and wrap a letter per line.
+        var titles = new VBoxContainer
+        {
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
+            CustomMinimumSize = new Vector2(200, 0),
+        };
         var npc = game.Town.Find(n.Id);
-        titles.AddChild(GuidePage.Text(npc is { Bound: false } ? npc.Title : n.DisplayName, UiTheme.Text, 26));
+        titles.AddChild(TitleLabel = GuidePage.Text(npc is { Bound: false } ? npc.Title : n.DisplayName, UiTheme.Text, 26));
         titles.AddChild(GuidePage.Text(Status(n), UiTheme.Muted));
         head.AddChild(titles);
         page.AddChild(head);

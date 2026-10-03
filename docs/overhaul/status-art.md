@@ -30,6 +30,7 @@
 | 26 | P3-34 bed sleep (reviewed + fixed) | full headless CI green (juice smoke re-run alone after a concurrent-run flake) |
 | 27 | X-09 creator menu rows, World slice merge, held model hidden while a yoyo/flail/whip is out | full headless CI green (1493 Core tests, 21/21 smoke, MENU PASS) |
 | 28 | NPC/Bosses slice merge (Guide book), creatures.cmds keeps the player alive | full headless CI green (1639 Core tests, 23/23 smoke, MENU PASS) |
+| 29 | Guide book fixes (3D bestiary preview, titles, opaque panel, hints, worm segment tint) | full headless CI green (1639 Core tests, 23/23 smoke, MENU PASS) |
 | — | per-style hand frames (needs a tuning pass) | open |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
@@ -224,3 +225,14 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
 * Guide book art check: portrait paths are correct (assets/icons/npcs, creatures, bosses). Tinted creatures that reuse
   a dark model (giant worm/devourer on the Eater, pinky on gel) look only faintly tinted in their portraits: the tint
   multiplies the vertex colours exactly as in game (re-rendered: identical), so this is the look, not a bug.
+
+## Push 29 notes
+* **Guide book fixes** (taken over from the NPC session): `GuideBook/CreaturePreview.cs` (160 px own-world SubViewport,
+  async CreatureVisual from the shared PropLibrary with the entry's tint, idle, auto-rotate and drag; still portrait
+  while loading; freed on entry/tab change and close), title boxes expand (min 200 px), `UiTheme.SolidPanel()` for the
+  book and minimap/info panel hidden while open (`GuideBookScreen.OpenChanged`), `HintToast.Suppressed` holds hints,
+  worm segments multiply the creature tint. Probes `ui.book_preview`, `ui.book_title_width`, `ui.hint_visible`
+  (guide.cmds). Gaps: preview lighting a bit dark and the zombie framed small; hotbar/life bar still visible at the
+  book's top edge; segment tint checked in code only.
+* Final-merge note: `ItemUseTable.Whip` is `1 << 19` here (PlantGrass/License/HairDye 20/21/22); World's rehearsal used
+  `1 << 22` — keep one consistent set (runtime-only flags).

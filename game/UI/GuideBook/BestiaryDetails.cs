@@ -14,7 +14,8 @@ namespace Strata.Game.UI.GuideBook;
 /// A bestiary page by unlock tier: nothing but "???" until seen; then portrait, name and habitat (spawn places,
 /// events, summon items); after a kill life, defence, damage, knockback resistance, coins (scaled by the world's
 /// difficulty) and the description; fully unlocked, every drop with its chance. Residents show met state and when
-/// they move in. The portrait is the generated creature thumbnail (no live 3D model yet).
+/// they move in. A creature's portrait is its live 3D model (<see cref="CreaturePreview"/>), the generated thumbnail
+/// while it loads or when it has none; a resident's is the thumbnail.
 /// </summary>
 public sealed class BestiaryDetails
 {
@@ -35,12 +36,27 @@ public sealed class BestiaryDetails
     public ContentDef? Entry { get; private set; }
     public BestiaryUnlock Unlock { get; private set; }
 
+    /// <summary>The shown creature's 3D preview (null for residents, unknown entries and once released).</summary>
+    public CreaturePreview? Preview { get; private set; }
+
+    /// <summary>The shown entry's title label (probe ui.book_title_width).</summary>
+    public Label? Title { get; private set; }
+
+    /// <summary>Drops the 3D preview (the book closed or left the tab); the next <see cref="Show"/> builds a new one.</summary>
+    public void ReleasePreview()
+    {
+        Preview?.Release();
+        Preview = null;
+    }
+
     public void Show(ContentDef entry)
     {
         Entry = entry;
         var game = _ctx.Ui.Game;
         var journal = _ctx.Ui.Entity.State.Journal;
         Unlock = game.Journal.Bestiary.Unlock(entry, journal);
+        ReleasePreview();
+        Title = null;
         foreach (var c in _page.GetChildren()) c.QueueFree();
         if (Unlock == BestiaryUnlock.None)
         {
@@ -50,14 +66,21 @@ public sealed class BestiaryDetails
         }
         var head = new HBoxContainer();
         head.AddThemeConstantOverride("separation", 12);
-        head.AddChild(new TextureRect
+        if (entry is EnemyDef creature)
+            head.AddChild(Preview = new CreaturePreview(creature, _ctx.Props, PortraitIcons.Creature(creature)));
+        else
+            head.AddChild(new TextureRect
+            {
+                Texture = entry is TownNpcDef t ? PortraitIcons.TownNpc(t) : null, CustomMinimumSize = new Vector2(128, 128),
+                ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+            });
+        // The titles take the rest of the row: a shrink-centred box would get no width and wrap a letter per line.
+        var titles = new VBoxContainer
         {
-            Texture = entry switch { EnemyDef e => PortraitIcons.Creature(e), TownNpcDef t => PortraitIcons.TownNpc(t), _ => null },
-            CustomMinimumSize = new Vector2(128, 128),
-            ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
-        });
-        var titles = new VBoxContainer { SizeFlagsVertical = Control.SizeFlags.ShrinkCenter };
-        titles.AddChild(GuidePage.Text(entry.DisplayName, entry is EnemyDef { Boss: not null } ? UiTheme.BossPurple : UiTheme.Text, 26));
+            SizeFlagsHorizontal = Control.SizeFlags.ExpandFill, SizeFlagsVertical = Control.SizeFlags.ShrinkCenter,
+            CustomMinimumSize = new Vector2(200, 0),
+        };
+        titles.AddChild(Title = GuidePage.Text(entry.DisplayName, entry is EnemyDef { Boss: not null } ? UiTheme.BossPurple : UiTheme.Text, 26));
         if (entry is EnemyDef)
             titles.AddChild(GuidePage.Text($"Defeated: {game.Journal.Bestiary.Kills(entry.Id, journal)}", UiTheme.Muted));
         head.AddChild(titles);

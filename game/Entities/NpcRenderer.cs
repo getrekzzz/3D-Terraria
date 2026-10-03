@@ -183,6 +183,7 @@ public sealed partial class NpcRenderer : Node3D
             view.Segments.Add((seg, model));
         }
         var ahead = view.Shown;
+        var tint = Color.FromHtml(npc.Def.Tint);
         for (int i = 0; i < npc.Segments.Count; i++)
         {
             var p = new Vector3(npc.Segments[i].X, npc.Segments[i].Y, npc.Segments[i].Z);
@@ -196,7 +197,8 @@ public sealed partial class NpcRenderer : Node3D
             var dir = ahead - p;
             if (!freeParts && dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
             // A plate that launched its probe goes dark (and no longer fires).
-            seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Strata.Core.AI.WormBrain.Spent(npc, i) ? SpentTint : Colors.White);
+            // Segments wear the creature's tint (as the head does) under the hurt and spent states.
+            seg.SetTint(tint * (npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Strata.Core.AI.WormBrain.Spent(npc, i) ? SpentTint : Colors.White));
             seg.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, p)));
             ahead = p;
         }
