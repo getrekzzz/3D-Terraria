@@ -1,14 +1,17 @@
 using System.Collections.Generic;
 using Godot;
 using Strata.Core.Common;
+using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Interaction;
 using Strata.Core.Session;
+using Strata.Core.Voxels.TileObjects;
 
 namespace Strata.Game.Entities;
 
 /// <summary>
-/// Mining feedback: a puff of dust in the block's colour on every pickaxe hit and a burst of chips when it breaks.
-/// Emitters are pooled one-shot CPU particles.
+/// Mining feedback: a puff of dust in the block's colour on every pickaxe hit and a burst of chips when it breaks; wood
+/// chips fly from the foot of a tree's trunk on every axe chop and in a shower when it falls. Emitters are pooled one-shot
+/// CPU particles.
 /// </summary>
 public sealed partial class BlockEffects : Node3D
 {
@@ -23,6 +26,14 @@ public sealed partial class BlockEffects : Node3D
         _material = new StandardMaterial3D { VertexColorUseAsAlbedo = true, Roughness = 1f };
         _chip = new BoxMesh { Size = Vector3.One * 0.07f, Material = _material };
         game.Editor.Struck += OnStruck;
+        game.Editor.ObjectDamaged += obj =>
+        {
+            if (obj.Def.Collision == TileCollision.Trunk) Burst(ChopPoint(obj), WoodColor(obj.Def), 9, 2.2f, 0.55);
+        };
+        game.Editor.ObjectBroken += obj =>
+        {
+            if (obj.Def.Collision == TileCollision.Trunk) Burst(ChopPoint(obj), WoodColor(obj.Def), 26, 3.4f, 0.9);
+        };
         game.Editor.BlockPlaced += (cell, def) =>
         {
             // One puff per placement (a grid block reports each of its cells).
@@ -91,6 +102,25 @@ public sealed partial class BlockEffects : Node3D
         p.Finished += () => _pool.Enqueue(p);
         return p;
     }
+
+    /// <summary>The middle of the chopped part of the trunk (about waist height).</summary>
+    private static Vector3 ChopPoint(TileObjectInstance obj)
+    {
+        var (min, max) = World.ObjectColliders.HitBox(obj);
+        return (min + max) * 0.5f * Units.CellSize;
+    }
+
+    /// <summary>Bark and heartwood tints by tree kind (objects carry no colour of their own).</summary>
+    private static Color WoodColor(TileObjectDef def) => def.Id switch
+    {
+        "cactus" => new Color(0.36f, 0.55f, 0.24f),
+        "giant_glowing_mushroom" => new Color(0.5f, 0.62f, 0.8f),
+        "ebonwood_tree" => new Color(0.38f, 0.3f, 0.44f),
+        "mahogany_tree" => new Color(0.5f, 0.24f, 0.18f),
+        "palm_tree" => new Color(0.62f, 0.49f, 0.33f),
+        "pine_tree" => new Color(0.42f, 0.31f, 0.22f),
+        _ => new Color(0.5f, 0.35f, 0.21f),
+    };
 
     private static Vector3 CellCenter(Int3 c) => (new Vector3(c.X, c.Y, c.Z) + Vector3.One * 0.5f) * Units.CellSize;
 }

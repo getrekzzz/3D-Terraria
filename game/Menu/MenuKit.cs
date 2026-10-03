@@ -27,8 +27,8 @@ public static class MenuKit
         b.AddThemeConstantOverride("outline_size", 6);
         var empty = new StyleBoxEmpty();
         foreach (var state in new[] { "normal", "hover", "pressed", "focus", "disabled" }) b.AddThemeStyleboxOverride(state, empty);
-        b.Pressed += () => { Audio.Sfx.Play("ui_click"); pressed(); };
-        b.MouseEntered += () => Audio.Sfx.Play("ui_hover");
+        b.Pressed += () => { Audio.Sfx.PlayUi("ui_click"); pressed(); };
+        b.MouseEntered += () => Audio.Sfx.PlayUi("ui_hover");
         return b;
     }
 
@@ -37,7 +37,7 @@ public static class MenuKit
     {
         var b = new Button { Text = text, CustomMinimumSize = new Vector2(minWidth, 38), Theme = UiTheme.Theme };
         b.AddThemeFontSizeOverride("font_size", 18);
-        b.Pressed += () => { Audio.Sfx.Play("ui_click"); pressed(); };
+        b.Pressed += () => { Audio.Sfx.PlayUi("ui_click"); pressed(); };
         return b;
     }
 

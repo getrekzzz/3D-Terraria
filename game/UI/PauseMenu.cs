@@ -8,7 +8,9 @@ namespace Strata.Game.UI;
 
 /// <summary>
 /// Esc in game: pauses the world and offers Resume, Settings, Save &amp; Exit (to the title screen) and Save &amp; Quit.
-/// Other screens (inventory, dialogs, console) close on Esc first.
+/// Other screens (inventory, dialogs, console) close on Esc first. Pausing stops the whole scene tree, not just the
+/// simulation tick: physics, the player, creatures' animation, particles, the day/night sky, music and every sound in
+/// flight hold where they are and carry on from there on Resume. Only this menu (and its button clicks) keeps running.
 /// </summary>
 public sealed partial class PauseMenu : CanvasLayer
 {
@@ -27,6 +29,7 @@ public sealed partial class PauseMenu : CanvasLayer
         _exitToTitle = exitToTitle;
         Name = "PauseMenu";
         Layer = 45;
+        ProcessMode = ProcessModeEnum.Always;
         _root = new ColorRect { Color = new Color(0.02f, 0.03f, 0.06f, 0.6f), Visible = false };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
@@ -44,8 +47,15 @@ public sealed partial class PauseMenu : CanvasLayer
     {
         _root.Visible = open;
         _runtime.Simulating = !open;
+        GetTree().Paused = open;
         InputGate.SetOpen(Gate, open);
         if (open) ShowMain();
+    }
+
+    /// <summary>Never leave the tree paused behind (exiting the world frees this menu).</summary>
+    public override void _ExitTree()
+    {
+        if (IsOpen) GetTree().Paused = false;
     }
 
     private void ShowMain()

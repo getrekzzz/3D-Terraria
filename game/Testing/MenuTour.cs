@@ -58,8 +58,11 @@ public sealed partial class MenuTour : Node
             await Shot("m08_in_game", 3.0);
             var pause = _root.GetNode<PauseMenu>("WorldHost/PauseMenu");
             pause.SetOpen(true);
+            long pausedAt = _root.World!.Session.Clock.Tick;
             await Shot("m09_paused", 1.0);
+            if (!GetTree().Paused || _root.World.Session.Clock.Tick != pausedAt) throw new Exception("the pause menu did not halt the game");
             pause.SetOpen(false);
+            if (GetTree().Paused) throw new Exception("resuming left the game paused");
             _root.ExitToMenu();
             await WaitFor(() => _root.GetNodeOrNull<MainMenu>("MainMenu"), 10);
             await Shot("m10_back_to_title", 1.0);

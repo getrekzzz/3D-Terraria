@@ -28,6 +28,10 @@ public sealed partial class SoundEvents : Node
         game.Editor.BlockPlaced += (cell, _) => Placed(cell);
         game.Editor.ObjectPlaced += obj => Placed(obj.Anchor);
         game.Editor.ObjectBroken += obj => Sfx.PlayAt("break_wood", Cell(obj.Anchor), -3f);
+        game.Editor.ObjectDamaged += obj =>
+        {
+            if (obj.Def.BreakTool == BreakTool.Axe) Sfx.PlayAt("dig_wood", Cell(obj.Anchor), -2f); // a chop into a tree
+        };
         game.ItemUse.Used += OnUsed;
         game.Npcs.Damaged += e =>
         {

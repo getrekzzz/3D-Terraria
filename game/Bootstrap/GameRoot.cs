@@ -152,6 +152,7 @@ public partial class GameRoot : Node
         Commands = null;
         CommandContext = null;
         InputGate.Reset();
+        GetTree().Paused = false;
         RemoveChild(host);
         host.QueueFree(); // the world saves as it leaves the tree
         ShowMenu();

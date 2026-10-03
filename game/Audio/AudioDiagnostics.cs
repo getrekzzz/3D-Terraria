@@ -88,11 +88,12 @@ public static class AudioDiagnostics
     {
         if (_tester == null || !GodotObject.IsInstanceValid(_tester))
         {
-            _tester = new AudioStreamPlayer { Name = "AudioTest", Bus = "Master", Stream = Chime() };
+            _tester = new AudioStreamPlayer { Name = "AudioTest", Bus = "Master", Stream = Chime(), ProcessMode = Node.ProcessModeEnum.Always };
             host.AddChild(_tester);
         }
         _tester.Play();
-        host.GetTree().CreateTimer(0.9).Timeout += () => Sfx.Play("ui_click");
+        // Menu players: the pause menu's settings test while the game (and its sound pool) is paused.
+        host.GetTree().CreateTimer(0.9).Timeout += () => Sfx.PlayUi("ui_click");
     }
 
     /// <summary>C5 then G5 with a soft attack and decay, 16-bit mono PCM at 44.1 kHz.</summary>
