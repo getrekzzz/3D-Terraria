@@ -84,14 +84,19 @@ wait 1
 wait_until assets.pending == 0 60
 assert props.problems == 0
 assert errors == 0
+# God mode held: no hit, shot, debuff or fall got past its floor of 1 life.
+assert player.deaths == 0
 killall
+# The parade leaves the player at 1 life with debuffs still ticking: heal and clear them before god mode goes off.
+buff clear
+heal
 god off
 assert errors == 0
 
 # X-16: a slain zombie crumples into a ragdoll that tumbles, then sinks away and returns to the pool.
 spawning off
-# Nothing else may claim the zombie first: the parade above can kill the player, and a respawn clears creatures
-# near the spawn point; residents fight back (P5-10), and daylight sends zombies off.
+# Nothing else may claim the zombie first: a respawn would clear creatures near the spawn point; residents fight back
+# (P5-10), and daylight sends zombies off.
 wait_until player.life > 0 15
 god on
 town dismiss guide
@@ -107,5 +112,8 @@ wait 1.5
 assert fx.ragdoll_drop > 0.4
 wait 3
 assert fx.ragdolls == 0
+assert player.deaths == 0
+buff clear
+heal
 god off
 assert errors == 0
