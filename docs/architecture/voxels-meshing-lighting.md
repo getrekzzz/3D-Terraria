@@ -27,6 +27,8 @@ Constrained surface nets: one vertex per dual cell (crossing-edge centroid), Tau
 built geometry stays exact and flush with smooth terrain. Materials: exposure-weighted majority per vertex,
 barycentric three-surface blending in the shader (triplanar sampling of the terrain texture array).
 Normals come from a tent-filtered density gradient including the padding ring, so chunk borders match.
+Quads split along their shorter diagonal, keeping the first one on near ties (flat ground), so the rounding noise of
+an edit metres away never flips the triangles (and the grass seeded from them) around it.
 Also produced: liquid surfaces, cutout (leaves, cobweb) and glass surfaces, grass clumps on grass surfaces
 (`GrassScatter`), and collision triangles in 16³ buckets (solid + one-way platforms). Colliders exist only near the player and rebuild the same frame
 for edits next to it.

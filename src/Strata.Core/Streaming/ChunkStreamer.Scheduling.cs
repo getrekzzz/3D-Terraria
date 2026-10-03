@@ -144,6 +144,11 @@ public sealed partial class ChunkStreamer
         var chunk = _session.World.GetChunk(coord);
         chunk?.SetLight(result.Light, result.Version);
         if (!e.MeshWanted) return;
+        if (e.Edit != null)
+        {
+            Hold(e.Edit, result);
+            return;
+        }
         e.HasMesh = true;
         MeshReady?.Invoke(result);
     }

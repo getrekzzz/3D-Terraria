@@ -45,12 +45,16 @@ twinkle, cloud parallax) read the `strata_time` and `strata_camera` globals inst
 Mesh jobs scatter clumps over the upward faces of grass surfaces (`GrassScatter`, Core, unit-tested): density and
 look per grass block from `grass.json`; placement hashed from world position (rebuilds regrow the same grass);
 clumps thin out across material borders like the texture blend, stay off steep faces and out of blocks above;
-light is interpolated from the mesh. The output is shuffled so any prefix is an even thinning of the chunk.
+light is interpolated from the mesh. The output is sorted by a rank hashed per clump, so any prefix is an even
+thinning of the chunk, and which clumps a density draws never depends on the rest of the chunk: digging a block only
+changes the grass beside it.
 
 `GrassRenderer` keeps one MultiMesh of clumps (and one of flowers) per chunk inside the preset's grass distance:
 near chunks draw the detailed clump (9 curved blades), far ones a 5-blade clump and a shrinking prefix; the shader
 widens far blades so the cover stays even, sinks them into the ground at the distance limit, bends them with gusts
-travelling downwind and parts them around the player (`strata_trample`). Grass casts no shadows.
+travelling downwind and parts them around the player (`strata_trample`). A chunk's grass switches when its terrain
+mesh is uploaded, never before. Per-clump looks in the shader (dry tips) are keyed on the clump's position, not its
+slot in the buffer, which moves whenever an edit rebuilds the chunk. Grass casts no shadows.
 
 ## Horizon
 Beyond the streamed chunks the world continues as a heightfield (`HorizonField`, Core, tested): terrain height from

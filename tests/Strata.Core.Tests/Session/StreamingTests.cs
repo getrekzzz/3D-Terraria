@@ -73,6 +73,50 @@ public class StreamingTests
     }
 
     [Fact]
+    public void AnEditsChunksAreHandedOverTogether()
+    {
+        var log = new MemoryLog();
+        var settings = new WorldSettings { Name = "t", Seed = 7, Size = WorldSizePreset.Tiny };
+        var session = WorldSession.Create(TestPaths.Content, settings, TestWorlds.TempDir(), Tables, log);
+        using var jobs = new JobSystem(3, log);
+        // No time limit on the hold here, so a slow machine cannot split the edit.
+        var streaming = new StreamingSettings { MeshRadius = 1, MeshDown = 1, MeshUp = 1, SkyColumnRadius = 1, MaxEditHoldMs = 60_000 };
+        var streamer = new ChunkStreamer(session, jobs, streaming);
+        int pump = 0;
+        var arrivals = new List<(Int3 Coord, int Pump, bool FromEdit)>();
+        streamer.MeshReady += r => arrivals.Add((r.Coord, pump, r.FromEdit));
+        var spawn = session.FindStandableNear(session.SpawnCell);
+        Pump(streamer, jobs, spawn);
+
+        // Dig a 1 m block out of the ground: its smoothing and light reach into several chunks, each meshed on its own
+        // worker. None may show its new mesh before the rest are ready, or the hole opens a chunk at a time.
+        var batch = session.World.BeginEdit();
+        for (int y = -2; y < 0; y++)
+            for (int z = 0; z < 2; z++)
+                for (int x = 0; x < 2; x++) batch.SetBlock(spawn + new Int3(x, y, z), 0);
+        var dirty = session.Commit(batch);
+        var shown = dirty.Where(streamer.IsMeshed).ToHashSet();
+        Assert.True(shown.Count >= 2, $"the dig dirtied {shown.Count} meshed chunks");
+        arrivals.Clear();
+        streamer.MarkDirty(dirty);
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        do
+        {
+            pump++;
+            streamer.Update(spawn);
+            jobs.Drain(50);
+            Thread.Sleep(2);
+        } while (!(streamer.IsIdle && jobs.Idle) && sw.ElapsedMilliseconds < 60_000);
+        Assert.True(streamer.IsIdle, "streaming did not settle");
+
+        var edit = arrivals.Where(a => shown.Contains(a.Coord)).ToList();
+        Assert.True(shown.SetEquals(edit.Select(a => a.Coord)), "every chunk the dig touched gets its new mesh");
+        Assert.Single(edit.Select(a => a.Pump).Distinct());
+        Assert.All(edit, a => Assert.True(a.FromEdit));
+        Assert.Equal(0, log.Count(LogLevel.Error));
+    }
+
+    [Fact]
     public void ClockCyclesDayAndNight()
     {
         var clock = new Simulation.GameClock();

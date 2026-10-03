@@ -303,12 +303,14 @@ public static class SurfaceNetsMesher
             v[k] = s.OutIndex[di];
         }
 
-        // Split along the shorter diagonal for better shape.
+        // Split along the shorter diagonal for better shape. Near ties (flat ground, where the two are equal) keep the
+        // first one: rounding noise from an edit metres away would otherwise flip quads all around it, and the grass
+        // seeded from their triangles with them.
         var p0 = surface.Positions[v[0]];
         var p1 = surface.Positions[v[1]];
         var p2 = surface.Positions[v[2]];
         var p3 = surface.Positions[v[3]];
-        bool flip = Vector3.DistanceSquared(p1, p3) < Vector3.DistanceSquared(p0, p2);
+        bool flip = Vector3.DistanceSquared(p1, p3) < Vector3.DistanceSquared(p0, p2) * 0.99f;
         Span<int> t1 = stackalloc int[3];
         Span<int> t2 = stackalloc int[3];
         if (flip)
