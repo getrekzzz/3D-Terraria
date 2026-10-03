@@ -35,19 +35,19 @@ public sealed partial class SoundEvents : Node
         game.ItemUse.Used += OnUsed;
         game.Npcs.Damaged += e =>
         {
+            if (e.ToPlayer) return; // the local player's own hurt sound comes from PlayerHurt below
             ulong now = Time.GetTicksMsec();
-            if (e.ToPlayer)
-            {
-                if (System.Numerics.Vector3.Distance(e.Position, _local.Center) < 3f) Sfx.Play("player_hurt");
-                return;
-            }
             if (now - _lastHitMs < 45) return; // a flurry of hits reads as one
             _lastHitMs = now;
-            Sfx.PlayAt("hit", ToGodot(e.Position), e.Crit ? 2f : 0f);
+            Sfx.PlayAt(HitSound(e.Target), ToGodot(e.Position), e.Crit ? 3f : 0f, e.Crit ? 0.03f : 0.08f);
+        };
+        game.Npcs.PlayerHurt += (p, damage, _) =>
+        {
+            if (p == _local) Sfx.Play("player_hurt", HurtVolume(damage));
         };
         game.Npcs.Killed += npc =>
         {
-            string id = npc.Def.HasTag("gel") ? "slime_death" : npc.Def.Model is "skeleton" or "cursed_skull" or "dungeon_guardian" ? "hit_bone" : "npc_death";
+            string id = npc.Def.HasTag("gel") ? "slime_death" : Bony(npc) ? "hit_bone" : "npc_death";
             Sfx.PlayAt(id, ToGodot(npc.Center), npc.IsBoss ? 4f : 0f);
         };
         game.Npcs.BossSpawned += _ => Sfx.Play("boss_roar");
@@ -130,6 +130,16 @@ public sealed partial class SoundEvents : Node
                 break;
         }
     }
+
+    /// <summary>What a blow sounds like on this creature: gel squelches, bone clacks, everything else is flesh.</summary>
+    private static string HitSound(Strata.Core.Gameplay.Entities.Npc? npc) =>
+        npc == null ? "hit" : npc.Def.HasTag("gel") ? "hit_squish" : Bony(npc) ? "hit_bone" : "hit";
+
+    private static bool Bony(Strata.Core.Gameplay.Entities.Npc npc) => npc.Def.Model is "skeleton" or "cursed_skull" or "dungeon_guardian";
+
+    /// <summary>Small knocks are a little quieter than the player's hurt sound at full; big ones a little louder.</summary>
+    private float HurtVolume(int damage) =>
+        Mathf.Clamp(-4f + 10f * damage / Mathf.Max(1f, _local.State.Vitals.MaxLife), -4f, 2f);
 
     private static string ShotSound(ItemDef item)
     {
