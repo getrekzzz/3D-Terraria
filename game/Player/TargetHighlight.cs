@@ -16,7 +16,8 @@ namespace Strata.Game.Player;
 /// <summary>
 /// The block cursor: shows exactly what the held item will affect. Mining tools outline the grid block (or single
 /// cell in precision mode) they will dig, with cracks spreading as it weakens; blocks show a ghost of what will be
-/// placed; objects show their footprint. Outlines stay visible through the terrain so the target always reads.
+/// placed; objects show their footprint (a tree just the foot of its trunk). Outlines stay visible through the terrain
+/// so the target always reads.
 /// </summary>
 public sealed partial class TargetHighlight : Node3D
 {
@@ -62,7 +63,7 @@ public sealed partial class TargetHighlight : Node3D
         else if (info.Object is { } obj)
             DrawObjectGhost(target, obj);
         else if (target.Object is { } o && info.IsTool)
-            _mesh.Box(Min(o.Bounds.Min), Min(o.Bounds.Max), Neutral);
+            DrawObjectHit(o);
         else if (info.Has(ItemAction.Mine))
             DrawMining(target, held.Item!);
         else if (info.Has(ItemAction.Hammer))
@@ -70,7 +71,7 @@ public sealed partial class TargetHighlight : Node3D
         _mesh.Commit();
     }
 
-    private IEnumerable<Int3> CellsAt(Int3 cell) => _entity.Precision ? new[] { cell } : BlockGrid.Cells(cell);
+    private IEnumerable<Int3> CellsAt(Int3 cell) => _entity.Precision ? new[] { cell } : BlockGrid.BlockOf(_game.Session.World, cell);
 
     private void DrawMining(Target target, ItemDef tool)
     {
@@ -98,6 +99,21 @@ public sealed partial class TargetHighlight : Node3D
         _mesh.Box(Min(min), Min(max), color);
     }
 
+    /// <summary>
+    /// A tool on an object: trees outline just the foot of the trunk being chopped (the whole 11 m crown box read as a
+    /// stray cage), with cracks spreading as its hit points fall, like a block being mined.
+    /// </summary>
+    private void DrawObjectHit(TileObjectInstance obj)
+    {
+        var (min, max) = World.ObjectColliders.HitBox(obj);
+        min *= Units.CellSize;
+        max *= Units.CellSize;
+        float progress = obj.Def.HitPoints > 1 ? Mathf.Clamp(1f - (float)obj.HitPoints / obj.Def.HitPoints, 0f, 1f) : 0f;
+        var color = progress > 0 ? Neutral.Lerp(Working, 0.4f + 0.6f * progress) : Neutral;
+        if (progress > 0) _mesh.Faces(min, max, new Color(color.R, color.G, color.B, 0.08f), progress);
+        _mesh.Box(min, max, color);
+    }
+
     private void DrawHammer(Target target)
     {
         byte shape = ShapeCode.Pack(_entity.BuildShape, _entity.FacingQuarter + _entity.BuildRotation);
@@ -107,9 +123,10 @@ public sealed partial class TargetHighlight : Node3D
             _mesh.Box(Min(target.Cell), Min(target.Cell + Int3.One), Neutral);
             return;
         }
-        foreach (var (cell, code) in BlockGrid.Pattern(target.Cell, _entity.BuildShape, _entity.FacingQuarter + _entity.BuildRotation))
+        bool raised = BlockGrid.IsRaised(_game.Session.World, target.Cell);
+        foreach (var (cell, code) in BlockGrid.Pattern(target.Cell, _entity.BuildShape, _entity.FacingQuarter + _entity.BuildRotation, raised))
             _mesh.Ghost(Min(cell), code, Units.CellSize, GhostColor);
-        var origin = BlockGrid.MinOf(target.Cell);
+        var origin = BlockGrid.MinOf(target.Cell, raised);
         _mesh.Box(Min(origin), Min(origin + Int3.One * BlockGrid.Size), Neutral);
     }
 
@@ -118,15 +135,17 @@ public sealed partial class TargetHighlight : Node3D
         var cell = ItemUseSystem.PlacementCell(target);
         int rotation = _entity.FacingQuarter + _entity.BuildRotation;
         var shape = block.Render == BlockRender.Crisp ? _entity.BuildShape : CellShape.Full;
+        // The same block placing will fill: on the grid or raised half a block to fit the ground (see ItemUseSystem).
+        bool raised = !_entity.Precision && BlockGrid.PlaceRaised(_game.Session.World, cell, target.Cell, shape, rotation);
         List<(Int3 Cell, byte Shape)> cells = _entity.Precision
             ? new() { (cell, block.Render == BlockRender.Crisp ? ShapeCode.Pack(shape, rotation) : (byte)0) }
-            : BlockGrid.Pattern(cell, shape, rotation);
+            : BlockGrid.Pattern(cell, shape, rotation, raised);
         var blockers = _game.Players.Where(p => p.Alive).Select(p => p.CellBox);
         var (result, free) = PlacementRules.CanPlaceBlocks(_game.Session.World, cells, block, consumable ? count : int.MaxValue, blockers);
         bool ok = result == PlacementResult.Ok;
         foreach (var (c, code) in ok ? free : cells)
             _mesh.Ghost(Min(c), block.Render == BlockRender.Crisp ? code : (byte)0, Units.CellSize, ok ? GhostColor : new Color(Invalid, 0.22f));
-        var origin = _entity.Precision ? cell : BlockGrid.MinOf(cell);
+        var origin = _entity.Precision ? cell : BlockGrid.MinOf(cell, raised);
         int size = _entity.Precision ? 1 : BlockGrid.Size;
         _mesh.Box(Min(origin), Min(origin + Int3.One * size), ok ? Place : Invalid);
     }

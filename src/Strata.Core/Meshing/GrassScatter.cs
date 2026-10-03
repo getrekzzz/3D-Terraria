@@ -7,16 +7,21 @@ namespace Strata.Core.Meshing;
 /// <summary>
 /// One clump of grass blades: chunk-local position in metres, the surface normal it grows from, its facing and
 /// height, grass kind (index into <see cref="Presentation.GrassConfig.Ordered"/>), flower (0 none, else colour
-/// index + 1), a random shade byte for colour variation, and the voxel light at its root (RGBA8 like the mesh).
+/// index + 1), a random shade byte for colour variation, the voxel light at its root (RGBA8 like the mesh), and its
+/// thinning rank in [0, 1): when grass is drawn at a density below full, a clump shows while its rank is under that
+/// density.
 /// </summary>
-public readonly record struct GrassClump(Vector3 Position, Vector3 Normal, float Yaw, float Height, byte Kind, byte Flower, byte Shade, uint Light);
+public readonly record struct GrassClump(Vector3 Position, Vector3 Normal, float Yaw, float Height, byte Kind, byte Flower, byte Shade, uint Light,
+    float Rank);
 
 /// <summary>
 /// Scatters grass clumps over the upward faces of grass surfaces in a chunk mesh. Placement is a pure function of
 /// world position (each triangle is seeded by its centroid), so a chunk regrows the same grass after every rebuild
 /// and edits only disturb the grass they touch. Clumps thin out across material borders the way the terrain
-/// textures blend, stay off steep faces, and never grow into a block above. The output is shuffled: any prefix is
-/// an even thinning of the whole chunk, which the renderer uses for distance LOD.
+/// textures blend, stay off steep faces, and never grow into a block above. The output is sorted by
+/// <see cref="GrassClump.Rank"/>, which is hashed like everything else: any prefix is an even thinning of the whole
+/// chunk (the renderer's density and distance LOD), and since a clump's rank never depends on the rest of the chunk,
+/// thinned grass away from an edit stays exactly as it was.
 /// </summary>
 public static class GrassScatter
 {
@@ -88,10 +93,27 @@ public static class GrassScatter
                 if (look.Flowers > 0f && Hash.ToUnitFloat(Hash.Mix(r ^ 6)) < look.Flowers)
                     flower = (byte)(1 + Hash.ToRange(Hash.Mix(r ^ 7), look.FlowerColors.Length));
                 var light = LerpLight(surface.Custom1[i0], surface.Custom1[i1], surface.Custom1[i2], u, v, w);
-                output.Add(new GrassClump(p, n, yaw, height, (byte)kindIndex, flower, (byte)(Hash.Mix(r ^ 8) >> 56), light));
+                float rank = Hash.ToUnitFloat(Hash.Mix(r ^ 9));
+                output.Add(new GrassClump(p, n, yaw, height, (byte)kindIndex, flower, (byte)(Hash.Mix(r ^ 8) >> 56), light, rank));
             }
         }
-        Shuffle(output, Hash.Cell(Salt, worldOrigin.X, worldOrigin.Y, worldOrigin.Z));
+        output.Sort(static (x, y) => x.Rank.CompareTo(y.Rank));
+    }
+
+    /// <summary>
+    /// How many clumps of a rank-sorted list (see <see cref="Build"/>) to draw for a <paramref name="density"/> in
+    /// [0, 1]: the prefix whose ranks are below it.
+    /// </summary>
+    public static int VisibleCount(IReadOnlyList<GrassClump> sorted, float density)
+    {
+        int lo = 0, hi = sorted.Count;
+        while (lo < hi)
+        {
+            int mid = lo + (hi - lo) / 2;
+            if (sorted[mid].Rank < density) lo = mid + 1;
+            else hi = mid;
+        }
+        return lo;
     }
 
     /// <summary>Material weights at a point: the vertex colours carry per-corner material barycentrics.</summary>
@@ -130,15 +152,5 @@ public static class GrassScatter
             result |= (uint)Math.Clamp((int)(x + 0.5f), 0, 255) << shift;
         }
         return result;
-    }
-
-    private static void Shuffle(List<GrassClump> list, ulong seed)
-    {
-        for (int i = list.Count - 1; i > 0; i--)
-        {
-            seed = Hash.Mix(seed);
-            int j = Hash.ToRange(seed, i + 1);
-            (list[i], list[j]) = (list[j], list[i]);
-        }
     }
 }

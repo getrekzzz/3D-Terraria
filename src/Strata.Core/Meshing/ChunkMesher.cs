@@ -42,6 +42,12 @@ public sealed class ChunkMeshResult
     /// <summary>Which of the chunk's faces see each other through open cells (for cave culling).</summary>
     public ushort Visibility { get; set; } = ChunkVisibility.AllConnected;
 
+    /// <summary>
+    /// Built for an edit (a dug or placed block, a blast). The streamer hands over all of an edit's chunks together,
+    /// and the renderer shows them in the same frame, ahead of streaming, so the change never appears chunk by chunk.
+    /// </summary>
+    public bool FromEdit { get; set; }
+
     public bool IsEmpty => Opaque.IsEmpty && Transparent.IsEmpty && Cutout.IsEmpty && Liquid.IsEmpty && Lava.IsEmpty;
 }
 

@@ -43,6 +43,9 @@
 * Worker threads (`JobSystem`) generate/load chunks and build meshes + light. Chunk data is copy-on-write,
   so jobs read neighbours lock-free; results carry the chunk version and stale ones are dropped.
 * Completions drain on the main thread within a per-frame budget (adaptive to the backlog).
+* Edits appear whole: the meshes of all chunks an edit dirtied are held until the last is built (at most
+  `StreamingSettings.MaxEditHoldMs`), then uploaded together in one frame ahead of streaming, so a dug block never
+  opens one chunk at a time with cracks at the seams.
 * Everything in `GameWorld.Tick` is main-thread only.
 
 ## Frame flow

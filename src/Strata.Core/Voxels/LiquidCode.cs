@@ -40,6 +40,12 @@ public enum CellFlags : byte
 
     /// <summary>Part of a generated structure (dungeon, temple): protected until progression allows.</summary>
     Structure = 2,
+
+    /// <summary>
+    /// Part of a 1 m block placed half a block (one cell) above the building grid, so it sits whole on ground that is
+    /// off the grid; mining and hammering treat such cells as their own block (see <c>BlockGrid</c>).
+    /// </summary>
+    HalfStep = 4,
 }
 
 /// <summary>Paint on a block, kept in the top five bits of its cell flags (0 = unpainted, 1–31 = a paint).</summary>

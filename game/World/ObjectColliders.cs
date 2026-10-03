@@ -93,17 +93,45 @@ public sealed partial class ObjectColliders : Node3D
             case TileCollision.Solid:
                 return ObjectInteraction.Blocks(obj) ? (min, max) : null;
             case TileCollision.Trunk:
-            {
-                var c = (min + max) * 0.5f;
-                float half = Mathf.Max(0.5f, (max.X - min.X) / 6f);
-                return (new Vector3(c.X - half, min.Y, c.Z - half), new Vector3(c.X + half, min.Y + (max.Y - min.Y) * 0.55f, c.Z + half));
-            }
+                return Trunk(obj);
             case TileCollision.Platform:
                 layer = ColliderManager.PlatformLayer;
                 return (new Vector3(min.X, max.Y - 0.2f, min.Z), max);
             default:
                 return null;
         }
+    }
+
+    /// <summary>A tree's trunk in cell units: a central column a third of the footprint wide, up to just over half its height.</summary>
+    public static (Vector3 Min, Vector3 Max) Trunk(TileObjectInstance obj)
+    {
+        var b = obj.Bounds;
+        var min = new Vector3(b.Min.X, b.Min.Y, b.Min.Z);
+        var max = new Vector3(b.Max.X, b.Max.Y, b.Max.Z);
+        var c = (min + max) * 0.5f;
+        float half = Mathf.Max(0.5f, (max.X - min.X) / 6f);
+        return (new Vector3(c.X - half, min.Y, c.Z - half), new Vector3(c.X + half, min.Y + (max.Y - min.Y) * 0.55f, c.Z + half));
+    }
+
+    /// <summary>Cells of trunk above the ground that an axe bites into (about the player's height).</summary>
+    public const float ChopHeight = 4f;
+
+    /// <summary>
+    /// What the cursor outlines and where chips fly when a tool hits an object, in cell units: the foot of the trunk for
+    /// trees (not the whole crown), the full footprint for everything else.
+    /// </summary>
+    public static (Vector3 Min, Vector3 Max) HitBox(TileObjectInstance obj)
+    {
+        if (obj.Def.Collision != TileCollision.Trunk)
+        {
+            var b = obj.Bounds;
+            return (new Vector3(b.Min.X, b.Min.Y, b.Min.Z), new Vector3(b.Max.X, b.Max.Y, b.Max.Z));
+        }
+        // Wide enough to wrap the modelled bark (the collider column is slimmer so the player can brush past).
+        var (min, max) = Trunk(obj);
+        var c = (min + max) * 0.5f;
+        float half = Mathf.Max(0.5f, obj.Footprint.X * 0.3f);
+        return (new Vector3(c.X - half, min.Y, c.Z - half), new Vector3(c.X + half, Mathf.Min(max.Y, min.Y + ChopHeight), c.Z + half));
     }
 
     private void Free(long id)

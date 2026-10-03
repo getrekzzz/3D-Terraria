@@ -24,6 +24,7 @@ public sealed partial class ChunkStreamer
         public bool MeshDirty = true;
         public bool HasMesh;
         public int Priority;
+        public EditGroup? Edit;
     }
 
     private readonly Dictionary<Int3, Entry> _entries = new();
@@ -56,7 +57,7 @@ public sealed partial class ChunkStreamer
     public int MeshesInFlight => _meshesInFlight;
 
     /// <summary>No outstanding loads or meshes for the wanted set.</summary>
-    public bool IsIdle => _loadsInFlight == 0 && _meshesInFlight == 0 &&
+    public bool IsIdle => _loadsInFlight == 0 && _meshesInFlight == 0 && _edits.Count == 0 &&
                           _entries.Values.All(e => !e.MeshWanted || (e.HasMesh && !e.MeshDirty));
 
     /// <summary>Why streaming is not idle (diagnostics): counts and the first chunk blocked on a missing neighbour.</summary>
@@ -80,7 +81,7 @@ public sealed partial class ChunkStreamer
                 if (first.Length == 0 || first.StartsWith("unmeshed")) first = $"{coord} state={e.Data}";
             }
         }
-        return $"wanted={wanted} dirty={dirty} unmeshed={missing} blocked={blocked} {first}";
+        return $"wanted={wanted} dirty={dirty} unmeshed={missing} blocked={blocked} edits={_edits.Count} {first}";
     }
 
     public bool IsMeshed(Int3 chunk) => _entries.TryGetValue(chunk, out var e) && e.HasMesh;
@@ -96,17 +97,24 @@ public sealed partial class ChunkStreamer
         }
         ScheduleLoads();
         ScheduleMeshes();
+        ReleaseEdits();
         FlushSaves();
     }
 
-    /// <summary>Requests remeshing of chunks (edits, lighting changes). Urgent chunks jump the queue.</summary>
+    /// <summary>
+    /// Requests remeshing of chunks (edits, lighting changes). Urgent chunks (edits) jump the queue, and their new meshes
+    /// are handed over together once all are built (held at most <see cref="StreamingSettings.MaxEditHoldMs"/>).
+    /// </summary>
     public void MarkDirty(IEnumerable<Int3> chunks, bool urgent = true)
     {
+        EditGroup? edit = null;
         foreach (var c in chunks)
         {
             if (!_entries.TryGetValue(c, out var e)) continue;
             e.MeshDirty = true;
-            if (urgent) e.Priority = -1000;
+            if (!urgent) continue;
+            e.Priority = -1000;
+            if (e.HasMesh) edit = Join(edit, e, c);
         }
         if (urgent) ScheduleMeshes();
     }
@@ -115,6 +123,7 @@ public sealed partial class ChunkStreamer
     public void UnloadAll()
     {
         foreach (var coord in _entries.Keys.ToList()) Unload(coord);
+        _edits.Clear();
         FlushSaves();
     }
 }

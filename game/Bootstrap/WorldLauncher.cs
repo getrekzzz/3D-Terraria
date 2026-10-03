@@ -140,6 +140,9 @@ public static class WorldLauncher
         runtime.AddChild(sounds);
         sounds.Initialize(game, entity);
         Audio.MusicDirector.Instance?.Follow(game, entity);
+        var ambience = new Audio.AmbienceDirector();
+        ambience.Initialize(game, entity);
+        runtime.AddChild(ambience);
         var senses = new Rendering.PlayerSenses();
         runtime.AddChild(senses);
         senses.Initialize(game, entity);

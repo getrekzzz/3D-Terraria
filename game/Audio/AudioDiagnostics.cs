@@ -13,6 +13,7 @@ public static class AudioDiagnostics
 {
     public const string SfxDirectory = "res://assets/audio/sfx";
     public const string MusicDirectory = "res://assets/audio/music";
+    public const string AmbientDirectory = "res://assets/audio/ambient";
     private static AudioStreamPlayer? _tester;
 
     /// <summary>One line: driver, device, mix rate and latency.</summary>
@@ -43,12 +44,12 @@ public static class AudioDiagnostics
             if (Load(path) == null) log.Error("audio", $"Could not load {path}. Open the project in the Godot editor once (or run `godot --path . --import`) so the audio files are imported.");
     }
 
-    /// <summary>Tries every sound and music file; returns how many loaded and the names of those that did not.</summary>
+    /// <summary>Tries every sound, music and ambience file; returns how many loaded and the names of those that did not.</summary>
     public static (int Loaded, int Total, List<string> Failed) ProbeFiles()
     {
         var failed = new List<string>();
         int loaded = 0, total = 0;
-        foreach (var (dir, ext) in new[] { (SfxDirectory, ".wav"), (MusicDirectory, ".ogg") })
+        foreach (var (dir, ext) in new[] { (SfxDirectory, ".wav"), (MusicDirectory, ".ogg"), (AmbientDirectory, ".ogg") })
         {
             foreach (var name in Files(dir, ext))
             {
@@ -88,11 +89,12 @@ public static class AudioDiagnostics
     {
         if (_tester == null || !GodotObject.IsInstanceValid(_tester))
         {
-            _tester = new AudioStreamPlayer { Name = "AudioTest", Bus = "Master", Stream = Chime() };
+            _tester = new AudioStreamPlayer { Name = "AudioTest", Bus = "Master", Stream = Chime(), ProcessMode = Node.ProcessModeEnum.Always };
             host.AddChild(_tester);
         }
         _tester.Play();
-        host.GetTree().CreateTimer(0.9).Timeout += () => Sfx.Play("ui_click");
+        // Menu players: the pause menu's settings test while the game (and its sound pool) is paused.
+        host.GetTree().CreateTimer(0.9).Timeout += () => Sfx.PlayUi("ui_click");
     }
 
     /// <summary>C5 then G5 with a soft attack and decay, 16-bit mono PCM at 44.1 kHz.</summary>

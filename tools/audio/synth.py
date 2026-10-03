@@ -175,7 +175,7 @@ def kick(sr=SR, punch=1.0):
 
 def snare(sr=SR, tone=190):
     n = samples(0.25, sr)
-    noise = bandpass(osc("noise", 2, 0.25, sr), 1500, 9000, sr) * decay(n, 0.07, sr)
+    noise = bandpass(osc("noise", 2, 0.25, sr), 1300, 6500, sr) * decay(n, 0.06, sr)
     body = osc("triangle", tone, 0.25, sr) * decay(n, 0.05, sr) * 0.6
     return noise * 0.8 + body
 
@@ -183,10 +183,86 @@ def snare(sr=SR, tone=190):
 def hat(sr=SR, open_=False):
     dur = 0.3 if open_ else 0.06
     n = samples(dur, sr)
-    return highpass(osc("noise", 3, dur, sr), 7000, sr) * decay(n, 0.12 if open_ else 0.018, sr) * 0.5
+    return bandpass(osc("noise", 3, dur, sr), 6000, 11000, sr) * decay(n, 0.12 if open_ else 0.018, sr) * 0.35
 
 
 def tom(pitch=110, sr=SR):
     n = samples(0.3, sr)
     f = pitch * (1 + 0.5 * np.exp(-seconds(n, sr) / 0.03))
     return osc("sine", f, 0.3, sr) * decay(n, 0.12, sr)
+
+
+# ---- space: stereo, convolution reverb, loudness ------------------------------------------------------------------
+
+def pan(x, p=0.0):
+    """Mono to stereo (n, 2) with a constant-power pan (-1 left .. 1 right)."""
+    a = (np.clip(p, -1.0, 1.0) + 1.0) * np.pi / 4
+    return np.stack([x * np.cos(a), x * np.sin(a)], axis=1)
+
+
+def hall(x, sr=SR, rt60=2.2, damp=0.55, wet=0.3, predelay=0.018, seed=7, loop=False):
+    """Convolution reverb through a synthetic room: decorrelated noise per ear that dies away exponentially, the highs
+    sooner than the lows (no metallic comb ringing). Mono or stereo in, stereo (n, 2) out. With loop=True the tail wraps
+    onto the start so a looping piece stays seamless; otherwise the tail is appended."""
+    from scipy.signal import fftconvolve
+    x = pan(x) * np.sqrt(2.0) if x.ndim == 1 else x
+    rng = np.random.default_rng(seed)
+    n_ir = samples(rt60 * 1.1, sr)
+    t = seconds(n_ir, sr)
+    out = []
+    for ch in range(2):
+        noise = rng.standard_normal(n_ir)
+        low = lowpass(noise, 1200, sr)
+        ir = low * np.exp(-6.9 * t / rt60) + (noise - low) * np.exp(-6.9 * t / (rt60 * (1.0 - damp)))
+        ir[:samples(predelay, sr)] = 0.0
+        ir *= np.minimum(1.0, t / 0.03)  # soft onset: no hard first reflection
+        ir /= np.sqrt(np.sum(ir ** 2)) or 1.0
+        out.append(fftconvolve(x[:, ch], ir))
+    w = np.stack(out, axis=1)
+    if loop:
+        n = len(x)
+        tail = w[n:]
+        while len(tail):
+            w[:min(n, len(tail))] += tail[:n]
+            tail = tail[n:]
+        w = w[:n]
+        dry = x
+    else:
+        dry = np.concatenate([x, np.zeros((len(w) - len(x), 2))])
+    return dry * (1.0 - wet) + w * wet
+
+
+def loudness(x, rms_db=-18.0, ceiling=0.92):
+    """Levels a piece to a target RMS (so tracks match each other), then rounds off peaks above the ceiling."""
+    rms = np.sqrt(np.mean(x ** 2)) or 1.0
+    y = x * (10 ** (rms_db / 20) / rms)
+    knee = ceiling * 0.8
+    over = np.abs(y) > knee
+    y[over] = np.sign(y[over]) * (knee + (ceiling - knee) * np.tanh((np.abs(y[over]) - knee) / (ceiling - knee)))
+    return y
+
+
+def peaking(x, freq, q, sr=SR):
+    """A narrow resonance (formants, whistling wind)."""
+    b, a = signal.iirpeak(min(freq, sr * 0.45) / (sr / 2), q)
+    return signal.lfilter(b, a, x)
+
+
+def wander(rng, n, rate, sr=SR):
+    """A smooth random curve in [0, 1] over n samples, changing about `rate` times a second."""
+    points = max(4, int(n / sr * rate) + 3)
+    knots = rng.uniform(0, 1, points)
+    pos = np.linspace(0, points - 3, n)
+    i = pos.astype(int)
+    f = pos - i
+    f = f * f * (3 - 2 * f)  # smoothstep between knots
+    return knots[i] * (1 - f) + knots[i + 1] * f
+
+
+def circular(fn, x, run_in=1.0, sr=SR):
+    """Applies a filter `fn` to each channel of a loop as if it had been playing already (run in over the loop's own end),
+    so filtering never puts a seam at the loop point."""
+    k = min(len(x), samples(run_in, sr))
+    if x.ndim == 1:
+        return fn(np.concatenate([x[-k:], x]))[k:]
+    return np.stack([fn(np.concatenate([x[-k:, c], x[:, c]]))[k:] for c in range(x.shape[1])], axis=1)

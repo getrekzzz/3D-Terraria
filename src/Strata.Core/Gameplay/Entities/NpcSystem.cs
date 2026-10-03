@@ -12,8 +12,8 @@ using Strata.Core.Voxels;
 
 namespace Strata.Core.Gameplay.Entities;
 
-/// <summary>A damage event for presentation (damage numbers, sounds, flashes).</summary>
-public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer);
+/// <summary>A damage event for presentation (damage numbers, sounds, flashes); Target is the creature hit (null for players and residents).</summary>
+public readonly record struct DamageEvent(Vector3 Position, int Amount, bool Crit, bool ToPlayer, Npc? Target = null);
 
 /// <summary>
 /// Owns every live creature: brains, movement against voxels, contact damage to players, taking hits
@@ -158,7 +158,7 @@ public sealed partial class NpcSystem
             if (npc.Effects.DamagePerSecond > 0 && npc.Age % Units.TicksPerSecond == 0)
             {
                 npc.Life -= npc.Effects.DamagePerSecond;
-                Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false));
+                Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), npc.Effects.DamagePerSecond, false, false, npc));
                 if (npc.Life <= 0)
                 {
                     Kill(npc);
@@ -286,7 +286,7 @@ public sealed partial class NpcSystem
         npc.HurtFlash = 8;
         if (melee) npc.ImmuneTicks = 10;
         Knock(npc, BrainFactory.Flat(npc.Position - from), hit.Knockback);
-        Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false));
+        Damaged?.Invoke(new DamageEvent(npc.Center + new Vector3(0, npc.HalfExtents.Y + 0.3f, 0), hit.Damage, hit.Crit, false, npc));
         if (attacker != null && damageClass == DamageClass.Magic && attacker.State.Effects.Stats.Bonus(Stats.StatIds.LifeSteal) is > 0 and var steal)
             attacker.State.Vitals.Heal(Math.Max(1, (int)(hit.Damage * steal)));
         if (npc.Life <= 0) Kill(npc);
