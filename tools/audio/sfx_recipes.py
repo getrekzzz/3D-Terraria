@@ -2,6 +2,7 @@
 numpy Generator (for per-variant variation) and returns a mono float array at SFX_SR."""
 import numpy as np
 
+import sfx_combat as combat
 from synth import (adsr, bandpass, decay, fade, highpass, kick, lowpass, midi_hz, mix, osc, reverb, samples, seconds, snare,
                    sweep_lowpass)
 
@@ -32,7 +33,7 @@ def dig(material):
             sparkle = osc("sine", 3200 * rng.uniform(0.9, 1.1), dur, S) * decay(n, 0.12, S) * (0.2 if material == "ore" else 0.0)
             return mix(tick, ring, body, sparkle)
         if material == "wood":
-            return mix(tick, _thud(260 * rng.uniform(0.9, 1.1), dur, 0.05, rng, 0.5) * 0.9)
+            return combat.chop(rng)
         if material in ("sand", "snow"):
             return mix(tick * 0.4, lowpass(_noise(dur, rng), 1400 if material == "sand" else 2400, S) * decay(n, 0.05, S) * 0.9)
         if material in ("glass", "ice"):
@@ -42,6 +43,14 @@ def dig(material):
         # dirt, grass, cloth
         return mix(tick * 0.5, lowpass(_noise(dur, rng), 900, S) * decay(n, 0.04, S), _thud(120, dur, 0.04, rng, 0.2) * 0.6)
     return make
+
+
+def tap(rng):
+    """Setting a block down: a soft tick and a muted knock."""
+    dur = 0.18
+    n = samples(dur, S)
+    tick = highpass(_noise(dur, rng), 2500, S) * decay(n, 0.006, S) * 0.5
+    return mix(tick, _thud(260 * rng.uniform(0.9, 1.1), dur, 0.05, rng, 0.5) * 0.9) * 0.8
 
 
 def broke(material):
@@ -65,15 +74,6 @@ def swing(rng):
     return sweep_lowpass(whoosh * env, 900 * rng.uniform(0.8, 1.2), 3200, S) * 1.2
 
 
-def hit(rng):
-    return _thud(95 * rng.uniform(0.85, 1.15), 0.2, 0.06, rng, 0.6)
-
-
-def squish(rng):
-    dur = 0.25
-    n = samples(dur, S)
-    f = 300 * rng.uniform(0.8, 1.2) * (1 + 0.8 * np.sin(np.linspace(0, 3.5, n)))
-    return osc("sine", f, dur, S) * decay(n, 0.08, S) * 0.6 + lowpass(_noise(dur, rng), 1200, S) * decay(n, 0.05, S) * 0.5
 
 
 def clack(rng):
@@ -82,20 +82,6 @@ def clack(rng):
     return sum(bandpass(_noise(dur, rng), f, f * 1.4, S) for f in (900, 2100)) * decay(n, 0.02, S) * 1.2
 
 
-def npc_death(rng):
-    dur = 0.45
-    n = samples(dur, S)
-    f = 220 * rng.uniform(0.85, 1.15) * np.exp(-seconds(n, S) / 0.2)
-    voice = lowpass(osc("saw", f, dur, S), 1200, S) * adsr(n, 0.01, 0.1, 0.5, 0.2, S) * 0.5
-    return mix(voice, _thud(80, dur, 0.1, rng) * 0.8)
-
-
-def player_hurt(rng):
-    dur = 0.3
-    n = samples(dur, S)
-    f = 180 * rng.uniform(0.9, 1.1) * (1 - 0.3 * seconds(n, S) / dur)
-    grunt = bandpass(osc("saw", f, dur, S), 200, 1500, S) * adsr(n, 0.01, 0.08, 0.4, 0.15, S)
-    return mix(grunt * 0.9, hit(rng) * 0.6)
 
 
 def player_death(rng):
@@ -281,7 +267,7 @@ def grapple(rng):
 def craft(rng):
     dur = 0.3
     n = samples(dur, S)
-    return mix(sum(osc("sine", f, dur, S) for f in (1200, 1830, 2650)) * decay(n, 0.06, S) * 0.3, hit(rng) * 0.4)
+    return mix(sum(osc("sine", f, dur, S) for f in (1200, 1830, 2650)) * decay(n, 0.06, S) * 0.3, _thud(95 * rng.uniform(0.85, 1.15), 0.2, 0.06, rng, 0.6) * 0.4)
 
 
 def summon(rng):
@@ -295,8 +281,8 @@ def summon(rng):
 RECIPES = {
     "ui_click": (blip(1400, 0.05, "sine", 0.015), 1), "ui_hover": (blip(2000, 0.03, "sine", 0.008), 1),
     "ui_open": (blip(700, 0.12, "triangle", 0.05), 1), "ui_close": (blip(500, 0.12, "triangle", 0.05), 1),
-    "swing": (swing, 3), "hit": (hit, 3), "hit_squish": (squish, 3), "hit_bone": (clack, 3),
-    "npc_death": (npc_death, 3), "slime_death": (squish, 2), "player_hurt": (player_hurt, 3), "player_death": (player_death, 1),
+    "swing": (swing, 3), "hit": (combat.hit, 4), "hit_squish": (combat.hit_squish, 3), "hit_bone": (combat.hit_bone, 3),
+    "npc_death": (combat.npc_death, 3), "slime_death": (combat.slime_death, 2), "player_hurt": (combat.player_hurt, 4), "player_death": (player_death, 1),
     "bow": (bow, 2), "gun": (lambda r: gun(r), 3), "gun_heavy": (lambda r: gun(r, True), 2), "magic": (lambda r: magic(r), 3),
     "magic_heavy": (lambda r: magic(r, True), 2), "explosion": (explosion, 2), "boss_roar": (boss_roar, 1), "boss_defeated": (fanfare, 1),
     "event_start": (gong, 1), "npc_arrive": (jingle, 1), "pickup": (pickup, 2), "coins": (coins, 2), "potion": (gulp, 1),
@@ -304,7 +290,7 @@ RECIPES = {
     "land": (land, 1), "double_jump": (whoosh(900, 3000, 0.25, 0.7), 1), "wings": (whoosh(300, 900, 0.3, 0.6), 2),
     "rocket": (whoosh(1500, 5000, 0.35, 0.6), 1), "dash": (whoosh(700, 4000, 0.3, 0.9), 1), "grapple": (grapple, 1),
     "splash": (splash, 2), "fish_bite": (bloop, 1), "door_open": (creak(140), 1), "door_close": (creak(110), 1),
-    "chest_open": (creak(220), 1), "craft": (craft, 2), "summon": (summon, 1), "place": (lambda r: dig("wood")(r) * 0.8, 2),
+    "chest_open": (creak(220), 1), "craft": (craft, 2), "summon": (summon, 1), "place": (tap, 2),
     "lever": (clack, 1), "wire": (blip(2400, 0.05, "square", 0.012), 1), "net": (whoosh(1200, 2600, 0.2, 0.6), 1),
     "minecart": (creak(300), 1), "dart_trap": (bow, 1),
 }

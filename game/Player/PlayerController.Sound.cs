@@ -21,6 +21,7 @@ public partial class PlayerController
             _soundsHooked = true;
             AirJumped += () => Sfx.Play("double_jump");
             Dashed += () => Sfx.Play("dash");
+            FallDamaged += _ => Sfx.Play("player_hurt", -2f);
         }
         bool onFloor = IsOnFloor();
         var v = Velocity;

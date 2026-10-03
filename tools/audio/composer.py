@@ -1,8 +1,9 @@
 """A small procedural composer: turns a track description (key, mode, tempo, chord progression, instruments, drum
-style) into a seamlessly looping piece with a phrase-structured melody, arpeggio, bass, pad and drums."""
+style) into a seamlessly looping stereo piece with a phrase-structured melody, arpeggio, bass, pad and drums, set in a
+convolution room and levelled to a common loudness so tracks match when they cross-fade."""
 import numpy as np
 
-from synth import (SR, adsr, decay, hat, kick, lowpass, midi_hz, osc, place, reverb, samples, seconds, snare, tom)
+from synth import (SR, adsr, circular, decay, hall, hat, kick, loudness, lowpass, midi_hz, osc, pan, place, samples, seconds, snare, tom)
 
 SCALES = {"major": [0, 2, 4, 5, 7, 9, 11], "minor": [0, 2, 3, 5, 7, 8, 10], "dorian": [0, 2, 3, 5, 7, 9, 10], "phrygian": [0, 1, 3, 5, 7, 8, 10],
           "harmonic": [0, 2, 3, 5, 7, 8, 11], "lydian": [0, 2, 4, 6, 7, 9, 11], "mixolydian": [0, 2, 4, 5, 7, 9, 10]}
@@ -24,9 +25,9 @@ def voice(kind, note, dur, vel=1.0, vibrato=0.0):
         f = f * (1 + vibrato * np.sin(2 * np.pi * 5.5 * t) * np.clip((t - 0.15) / 0.3, 0, 1))
     hold = dur
     if kind == "square":
-        x = lowpass(osc("square", f, dur + 0.25), 3200) * adsr(n, 0.008, 0.12, 0.55, 0.12, hold=hold) * 0.32
+        x = lowpass(osc("square", f, dur + 0.25) * 0.6 + osc("triangle", f, dur + 0.25) * 0.5, 2200) * adsr(n, 0.012, 0.12, 0.55, 0.14, hold=hold) * 0.36
     elif kind == "pulse":
-        x = lowpass(osc("pulse", f, dur + 0.25, duty=0.25), 3600) * adsr(n, 0.005, 0.1, 0.5, 0.1, hold=hold) * 0.3
+        x = lowpass(osc("pulse", f, dur + 0.25, duty=0.3), 2500) * adsr(n, 0.01, 0.1, 0.5, 0.12, hold=hold) * 0.32
     elif kind == "triangle":
         x = osc("triangle", f, dur + 0.25) * adsr(n, 0.01, 0.1, 0.7, 0.15, hold=hold) * 0.5
     elif kind == "flute":
@@ -35,7 +36,7 @@ def voice(kind, note, dur, vel=1.0, vibrato=0.0):
     elif kind == "bell":
         x = sum(osc("sine", f * r, dur + 0.25) * w * decay(n, 0.9 / r ** 0.5) for r, w in ((1, 0.5), (2.0, 0.2), (3.01, 0.12), (4.2, 0.06))) * 0.8
     elif kind == "pluck":
-        x = lowpass(osc("saw", f, dur + 0.25), 2400) * decay(n, 0.22) * 0.45
+        x = lowpass(osc("saw", f, dur + 0.25), 1900) * decay(n, 0.22, attack=0.004) * 0.45
     elif kind == "brass":
         x = lowpass(osc("saw", f, dur + 0.25) + osc("saw", f * 1.003, dur + 0.25), 1800) * adsr(n, 0.05, 0.15, 0.7, 0.15, hold=hold) * 0.22
     elif kind == "organ":
@@ -92,8 +93,8 @@ def make_melody(spec, rng, chords):
                     t += -length
                     continue
                 strong = t % 8 == 0
-                step = rng.choice([-2, -1, -1, 1, 1, 2, 0, 3, -3])
-                target = note + (step * 2 if not strong else rng.integers(-4, 5))
+                step = rng.choice([-2, -1, -1, -1, 1, 1, 1, 2, 0])  # mostly stepwise: a singable line, not a random walk
+                target = note + (step * 2 if not strong else rng.integers(-3, 4)) + round((root + 5 - note) * 0.2)  # drift home
                 note = fit(target, chord, strong)
                 out.append((bar * 16 + t, length, note))
                 t += length
@@ -170,11 +171,19 @@ def build(spec, seed=1):
             place(low, voice(spec.get("bass_voice", "bass"), n, l * six * 0.9), at(b * 16 + s))
         drum_bar(spec.get("drums", "none"), drums, b, at, rng)
 
-    mix = reverb(lead, SR, spec.get("room", 0.6), 0.35, spec.get("wet", 0.25), 0.0) * 0.85 + reverb(back, SR, 0.7, 0.4, 0.35, 0.0) + low + drums * 0.5
-    loop = mix[:total].copy()
-    loop[:tail] += mix[total:total + tail]  # the tail wraps into the start: seamless loop
-    loop = lowpass(loop, spec.get("bright", 7000))
-    return (loop / (np.max(np.abs(loop)) or 1.0) * 0.8).astype(np.float32)
+    def wrap(buf):  # the tail wraps into the start: seamless loop
+        out = buf[:total].copy()
+        out[:tail] += buf[total:total + tail]
+        return out
+
+    room = spec.get("room", 0.6)
+    rt60 = 1.2 + 1.6 * room
+    mix = (hall(pan(wrap(lead), 0.1) * 1.41, SR, rt60, 0.5, spec.get("wet", 0.25) + 0.05, seed=seed % 997, loop=True) * 0.85
+           + hall(wrap(back), SR, rt60 + 0.6, 0.55, 0.4, seed=seed % 991 + 1, loop=True)
+           + np.stack([wrap(low)] * 2, axis=1)
+           + hall(wrap(drums), SR, 0.7, 0.5, 0.12, seed=3, loop=True) * 0.5)
+    mix = circular(lambda x: lowpass(x, spec.get("bright", 7000)), mix)
+    return loudness(mix, -17.0, 0.9).astype(np.float32)
 
 
 def drum_bar(style, buf, b, at, rng):
