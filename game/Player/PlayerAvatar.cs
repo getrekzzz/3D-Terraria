@@ -97,9 +97,10 @@ public sealed partial class PlayerAvatar : Node3D
         {
             node = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.25f / 128f, Shaded = true };
         }
-        // Items are modelled with the grip at the origin and the business end along +Y; point it forward.
-        node.RotationDegrees = new Vector3(90, 0, 0);
-        node.Position = new Vector3(0, 0.08f, 0);
+        // Items are modelled with the grip at the origin and the business end along +Y: the handle sits in the fist
+        // and the item leaves it past the thumb (the hand bone's +Z), tilted toward the fingers for guns.
+        node.RotationDegrees = new Vector3(90f - HeldTilt(item), 0, 0);
+        node.Position = HeldGrip();
         _held = node;
         LightAnchor = node;
         if (Flames.Of(item, _game.Session.Content) is { } flame)
@@ -114,6 +115,29 @@ public sealed partial class PlayerAvatar : Node3D
             LightAnchor = null;
         }
     }
+
+    /// <summary>
+    /// Where a held item's handle runs through the right fist, in the hand bone's space: toward the palm and along the
+    /// hand, as a fraction of the hand's length (tools/blender/bgen/human/motion.py GRIP, where the fingers wrap).
+    /// </summary>
+    private static readonly Vector3 Grip = new(-0.33f, 0.89f, 0f);
+
+    private Vector3 HeldGrip()
+    {
+        var sk = _visual?.Skeleton;
+        int hand = sk?.FindBone("hand.R") ?? -1, finger = sk?.FindBone("middle.01.R") ?? -1;
+        if (sk == null || hand < 0) return new Vector3(0, 0.08f, 0);
+        // The hand bone is about 1.05 x the wrist-to-knuckle distance (the generator's 0.1 m against 0.095 m).
+        float length = finger >= 0 ? sk.GetBoneRest(finger).Origin.Length() * 1.05f : 0.1f;
+        return Grip * length;
+    }
+
+    /// <summary>
+    /// Degrees an item tips from square to the forearm toward the fingers: guns lie along the forearm like a real
+    /// pistol grip, so the barrel follows the arm to the target (the shoot action is authored for it, see
+    /// tools/blender/bgen/human/actions.py TILT).
+    /// </summary>
+    private float HeldTilt(ItemDef item) => ActionFor(item, _game.Uses[item]) == "shoot" ? 70f : 0f;
 
     /// <summary>Where a carried light shines from in third person: the held torch's flame, or the held item.</summary>
     public Node3D? LightAnchor { get; private set; }

@@ -32,9 +32,10 @@ sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `
 every tile object, item and enemy has a generator (no Blender needed).
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
-weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and
-lashes), hands with jointed fingers and nails, painted skin (lips, flush, knuckles, stubble), hair styles and
-beards as strand shells, clothing cut from body shells (shirts, trousers, dresses, coats, robes, aprons, belts,
+weight, age, sex), metaball body with shod feet, sculpted head (eyelids resting on the iris, eyeballs with iris and
+pupil, lips, ears, brows and lashes; a narrower jaw, finer nose and fuller lips for women), hands with jointed fingers
+and nails, painted skin (lips, flush, knuckles, stubble), hair styles (a natural hairline with sideburns, a fringe
+swept from the parting, a thick long-hair curtain, a tied ponytail) and beards as strand shells, clothing cut from body shells (shirts, trousers, dresses, coats, robes, aprons, belts,
 boots, hats, masks), and a 52-bone rig (fingers included) with heat/chain weights. Skeletons are separate bones on
 the same rig. Params per character live in `assets.json`. They export rest-pose UVs and tangents for the character
 shader.
@@ -42,7 +43,7 @@ shader.
 Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
 (exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,
 death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,
-hold. Characters with the same skeleton (body, height, gait) share one animation set,
+hold. The right hand is a closed fist around a handle at `motion.GRIP`, where the game attaches held items. Characters with the same skeleton (body, height, gait) share one animation set,
 `assets/models/creatures/anim/<set>.glb`, with `index.json` naming each character's set; rebuild them with
 `build_all.py --anims [--shard=I/N]` (seconds each, no character meshes touched).
 

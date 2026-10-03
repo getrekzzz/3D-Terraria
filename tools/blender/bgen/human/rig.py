@@ -5,7 +5,7 @@ hands use chain weights (nearest bone segment, blended with its parent/children 
 (eyes, ears, nails, hats) are bound to one bone.
 
 Poses are authored in armature space: ``swing(bone, toward, angle)`` turns a bone's rest direction toward a world
-direction, ``twist`` turns it about itself, ``axis`` about an arbitrary axis, ``local`` about one of the bone's own
+direction, ``twist`` turns it about its rest direction, ``roll`` about the direction it points after the ops before it, ``axis`` about an arbitrary axis, ``local`` about one of the bone's own
 rest axes. Rotations are converted to each bone's
 local rest frame, so they compose naturally down the chain (a bent elbow stays bent when the shoulder moves).
 """
@@ -170,6 +170,8 @@ class Poser:
                 r = Quaternion(axis.normalized(), angle)
             elif kind == "twist":
                 r = Quaternion(self.dir[bone], op[1])
+            elif kind == "roll":                  # about where the bone points now (an upper arm's inward rotation)
+                r = Quaternion((q @ self.dir[bone]).normalized(), op[1])
             elif kind == "axis":
                 r = Quaternion(Vector(op[1]).normalized(), op[2])
             elif kind == "local":                 # about one of the bone's own rest axes (e.g. X flexes a wrist)

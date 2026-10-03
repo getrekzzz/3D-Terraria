@@ -95,6 +95,12 @@ every use (so you can swing while running), a right-arm blend that holds a carri
 the player an `AimModifier` (`SkeletonModifier3D`) then turns the torso and head toward the aim while the legs face
 the way they walk, and brings the arms up to the aim for guns, bows, staffs and spears.
 
+The held item hangs on a `BoneAttachment3D` at `hand.R`, placed where the handle runs through the closed fist
+(`PlayerAvatar.Grip`, matching `GRIP` in `tools/blender/bgen/human/motion.py`) and leaving it past the thumb; guns are
+tipped 70 degrees toward the fingers so the barrel lies along the forearm (`HeldTilt`, `actions.TILT`). The actions
+are authored for that grip, so blades swing through level at the strike and spears and torches stay upright or level
+without folding the wrist. `game/Testing/Tours/wielding.cmds` photographs each action close up (`camera distance`).
+
 `NpcRenderer.Motion` adds presence to everything else: `facing` look (eyes stare at their target) or velocity (fish),
 fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a
 dash, a shrink on teleport, a spin when a boss changes form; humanoid enemies swing or shoot when they attack, flinch

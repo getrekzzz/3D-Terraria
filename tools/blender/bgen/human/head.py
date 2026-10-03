@@ -13,6 +13,9 @@ from .blobs import Blob, apply_modifiers
 from .body import limb_rotation
 
 
+LID_UPPER, LID_LOWER = 0.0046, 0.0039   # eye opening above / below the eye centre (head-local)
+
+
 class Head:
     def __init__(self, frame, p):
         self.frame = frame
@@ -41,25 +44,27 @@ class Head:
 
         e((0, -0.014, 0.024), (0.073, 0.094, 0.083))                       # cranium
         e((0, 0.042, 0.036), (0.058, 0.04, 0.048))                         # forehead
+        jaw_w = 0.051 if fem else 0.058                                    # jaw angle: narrower, softer on women
         for sx in (-1, 1):
-            e((sx * 0.056, 0.018, 0.018), (0.024, 0.045, 0.04))            # temples
-            e((sx * 0.05, 0.054, -0.012), (0.023, 0.02, 0.016))            # cheekbones
-            e((sx * 0.043, 0.052, -0.04), (0.029 * fat, 0.028, 0.032))     # cheeks
-            B.capsule(self.at((sx * 0.058, -0.004, -0.052)), self.at((sx * 0.022, 0.072, -0.095)), (0.018 + 0.003 * male) * h)  # jaw
+            e((sx * 0.055, 0.016, 0.016), (0.023, 0.044, 0.04))            # temples
+            e((sx * 0.049, 0.055, -0.011), (0.022, 0.019, 0.015))          # cheekbones
+            e((sx * 0.038, 0.052, -0.036), (0.022 * fat, 0.025, 0.027))    # cheeks (kept under the cheekbones, not puffed out)
+            B.capsule(self.at((sx * jaw_w, -0.006, -0.05)), self.at((sx * (0.017 + 0.005 * male), 0.074, -0.094)), (0.0145 + 0.005 * male) * h)  # jaw
             e((sx * 0.031, 0.086, -0.001), (0.017, 0.011, 0.012), neg=True)  # eye socket
-        e((0, 0.05, -0.03), (0.05, 0.045, 0.042))                          # maxilla
-        e((0, 0.038, -0.068), (0.053, 0.05, 0.036))                        # lower face
-        B.ball(self.at((0, 0.082, -0.096)), (0.016 + 0.004 * male) * h)     # chin
-        B.capsule(self.at((-0.041, 0.077, 0.015)), self.at((0.041, 0.077, 0.015)), (0.008 + 0.004 * male) * h)  # brow ridge
-        # Nose: bridge, tip, wings, septum.
-        B.capsule(self.at((0, 0.087, 0.008)), self.at((0, 0.109, -0.033)), 0.0058 * h)
-        B.ball(self.at((0, 0.111, -0.039)), 0.0094 * h)
+        e((0, 0.044, -0.03), (0.047, 0.042, 0.041))                        # maxilla
+        e((0, 0.032, -0.066 + 0.003 * (1 - male)), (0.044 + 0.004 * male, 0.046, 0.034))        # lower face
+        B.ball(self.at((0, 0.087, -0.09 - 0.006 * male)), (0.0145 + 0.0055 * male) * h)  # chin
+        B.capsule(self.at((-0.041, 0.077, 0.015)), self.at((0.041, 0.077, 0.015)), (0.0075 + 0.0045 * male) * h)  # brow ridge
+        # Nose: bridge, tip, wings, septum (smaller and finer on women).
+        n = 0.86 if fem else 1.0
+        B.capsule(self.at((0, 0.087, 0.008)), self.at((0, 0.087 + 0.022 * n, -0.033)), 0.0058 * h * n)
+        B.ball(self.at((0, 0.089 + 0.022 * n, -0.039)), 0.0094 * h * n)
         for sx in (-1, 1):
-            B.ball(self.at((sx * 0.0122, 0.095, -0.045)), 0.0071 * h)
+            B.ball(self.at((sx * 0.0122 * n, 0.095, -0.045)), 0.0071 * h * n)
         B.capsule(self.at((0, 0.1, -0.049)), self.at((0, 0.092, -0.055)), 0.004 * h)
-        # Lips.
-        e((0, 0.092, -0.064), (0.025, 0.0105, 0.0068))
-        e((0, 0.09, -0.0752), (0.023, 0.011, 0.0078))
+        # Lips: a wider mouth, fuller on women.
+        e((0, 0.088, -0.064), (0.0265, 0.0105, 0.0068 + 0.0014 * (1 - male)))
+        e((0, 0.085, -0.0755), (0.024, 0.011, 0.0078 + 0.0016 * (1 - male)))
         # Neck continues down into the body (covering the body's neck).
         B.capsule(self.at((0, -0.012, -0.03)), self.at((0, -0.03, -0.2)), (0.054 if fem else 0.062) * h)
         obj = B.to_mesh("head", 9000, smooth_iterations=1)
@@ -111,8 +116,8 @@ class Head:
         z = d.z - 0.06 * x                 # outer corner sits a little higher
         half_w = 0.0148
         u = max(0.0, 1.0 - (x / half_w) ** 2)
-        upper = 0.0058 * u ** 0.5
-        lower = 0.0044 * u ** 0.65
+        upper = LID_UPPER * u ** 0.5       # the upper lid rests on the top of the iris (a relaxed, not staring, look)
+        lower = LID_LOWER * u ** 0.65
         radial = math.hypot(d.x, d.z)
         dirn = d.normalized() if d.length > 1e-6 else Vector((0, 1, 0))
         if -lower < z < upper and u > 0:
@@ -140,10 +145,10 @@ class Head:
             t = max(0.0, min(1.0, (p2 - a).dot(b - a) / (b - a).length_squared))
             dist = (p2 - (a + (b - a) * t)).length
             if dist < 0.004 and q.y > 0.06:
-                q = q - Vector((0, 0.0011 * (1 - dist / 0.004) * math.sin(t * math.pi) ** 0.5, 0))
+                q = q - Vector((0, 0.0006 * (1 - dist / 0.004) * math.sin(t * math.pi) ** 0.5, 0))
             corner = Vector((q.x - sx * 0.026, 0, q.z + 0.0697))
             if corner.length < 0.005 and q.y > 0.07:
-                q = q - Vector((0, 0.0016 * (1 - corner.length / 0.005), 0))
+                q = q - Vector((0, 0.001 * (1 - corner.length / 0.005), 0))
         for sx in (1, -1):
             nd = Vector((q.x - sx * 0.0072, 0, q.z + 0.0508))
             if nd.length < 0.0045 and q.y > 0.085:

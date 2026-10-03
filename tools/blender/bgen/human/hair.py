@@ -10,19 +10,30 @@ import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
-from .head import smooth
+from .head import LID_UPPER, smooth
 from .paint import hex3
 
 
-def hairline(q) -> float:
-    """Height (head-local z) of the hairline at the azimuth of q: forehead, temples, above the ears, nape."""
-    phi = abs(math.atan2(q.x, q.y))       # 0 front, pi back
-    pts = [(0.0, 0.052), (0.55, 0.045), (0.95, 0.03), (1.3, 0.012), (1.55, 0.004), (1.85, 0.0), (2.3, -0.045), (math.pi, -0.07)]
+def hairline(q, part=0.0, sideburns=True) -> float:
+    """Height (head-local z) of the hairline at the azimuth of q: a widow's-peak forehead that recedes a little at the
+    temples, sideburns down in front of the ears, up over the ears and down to the nape. ``part`` (-1..1) lowers the
+    hairline on one side of the forehead for a fringe swept across from the parting."""
+    phi = math.atan2(q.x, q.y)            # 0 front, +/-pi back; + toward the character's right
+    a = abs(phi)
+    burn = -0.032 if sideburns else 0.0
+    pts = [(0.0, 0.05), (0.35, 0.053), (0.62, 0.044), (0.9, 0.03), (1.08, 0.004), (1.22, burn), (1.33, burn),
+           (1.42, 0.006), (1.85, 0.004), (2.3, -0.045), (math.pi, -0.072)]
+    z = pts[-1][1]
     for (a0, z0), (a1, z1) in zip(pts, pts[1:]):
-        if phi <= a1:
-            t = (phi - a0) / (a1 - a0)
-            return z0 + (z1 - z0) * t
-    return pts[-1][1]
+        if a <= a1:
+            t = (a - a0) / (a1 - a0)
+            z = z0 + (z1 - z0) * (t * t * (3 - 2 * t))
+            break
+    if part and a < 1.0:                  # the swept side of the fringe falls lower over the forehead
+        side = 0.5 + 0.5 * math.tanh((-phi * (1 if part > 0 else -1) + 0.15) * 5)
+        z -= abs(part) * 0.022 * side * (1 - a / 1.0) ** 0.7
+    # Clumped, uneven ends instead of a cut line.
+    return z - 0.0035 * (0.5 + 0.5 * math.sin(phi * 31 + 0.7)) * (0.5 + 0.5 * math.sin(phi * 13))
 
 
 def _in_ear(q):
@@ -50,77 +61,127 @@ def _strand_uv(bm, head, uv):
             loop[uv].uv = (d.length * 12.0, math.atan2(q.x, -q.y) * 1.6)
 
 
+STYLES = {   # thickness (head-local), top lift (extra volume at the crown and front), fringe sweep, clumping
+    "short": (0.008, 0.007, 0.8, 1.0), "messy": (0.011, 0.008, 0.5, 1.8), "long": (0.009, 0.004, 0.55, 0.8),
+    "ponytail": (0.006, 0.002, 0.0, 0.6), "bun": (0.006, 0.002, 0.0, 0.6), "buzz": (0.0025, 0.0, 0.0, 0.2),
+}
+
+
 def scalp_shell(head, head_obj, style, color, under_hat=False):
-    """Duplicates the scalp and lifts it into a hair volume with clumps, a parting and a feathered hairline. Under a
-    hat only the hair below the hat band remains."""
-    thickness = {"short": 0.009, "messy": 0.013, "long": 0.012, "ponytail": 0.007, "bun": 0.007, "buzz": 0.0025}[style]
+    """Duplicates the scalp and lifts it into a hair volume: fuller on top, a fringe swept from the parting, clumps
+    and strand grooves flowing from the crown, and a hairline that thins out in uneven tufts. Under a hat only the
+    hair below the hat band remains."""
+    thickness, lift, sweep, clumping = STYLES[style]
+    tied = style in ("ponytail", "bun")
+    part = sweep
+    burns = not (head.frame.female or tied)
     bm = bmesh.new()
     bm.from_mesh(head_obj.data)
     bm.normal_update()
     drop = []
     for f in bm.faces:
         q = head.local(f.calc_center_median())
-        if q.z < hairline(q) - 0.004 or _in_ear(q) or q.z < -0.13 or (under_hat and q.z > 0.04):
+        line = hairline(q, part, burns) + (0.006 if tied else 0.0)
+        if q.z < line - 0.004 or _in_ear(q) or q.z < -0.13 or (under_hat and q.z > 0.045):
             drop.append(f)
     bmesh.ops.delete(bm, geom=drop, context="FACES")
     bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
     bm.normal_update()
     for v in [v for v in bm.verts if v.is_boundary]:
         q = head.local(v.co)
-        if not _in_ear(q) and q.z > -0.12:
-            v.co = head.at((q.x, q.y, hairline(q) - 0.004))
+        if not _in_ear(q) and q.z > -0.12 and not (under_hat and q.z > 0.03):
+            v.co = head.at((q.x, q.y, hairline(q, part, burns) + (0.006 if tied else 0.0) - 0.004))
     bm.normal_update()
     uv = bm.loops.layers.uv.new("UVMap")
     col = bm.loops.layers.color.get("Color") or bm.loops.layers.color.new("Color")
     base = hex3(color)
+    crown = Vector((0.012 * (1 if part >= 0 else -1), -0.03, 0.1))
+    moves = []
     for v in bm.verts:
         q = head.local(v.co)
-        edge = smooth(0.0, 0.012, q.z - hairline(q))
-        phi = math.atan2(q.x, -q.y)
-        clump = 0.55 + 0.45 * math.sin(phi * 9 + q.z * 60) * math.sin(phi * 4 - q.z * 25)
+        line = hairline(q, part, burns)
+        edge = smooth(-0.004, 0.02, q.z - line)            # thins out over the last two centimetres
+        flow = q - crown                                     # strands run out from the crown
+        phi = math.atan2(flow.x, -flow.y)
+        clump = math.sin(phi * 9 + q.z * 60) * math.sin(phi * 4 - q.z * 25)
+        groove = math.sin(phi * 38 + 2.0 * math.sin(flow.length * 40))   # strand bundles
         if style == "messy":
-            clump += 0.5 * math.sin(phi * 13 + q.z * 90)
-        top = 0.6 + 0.4 * smooth(-0.02, 0.09, q.z)
-        v.co += v.normal * thickness * head.h * edge * top * (0.75 + 0.35 * clump)
+            clump += 0.6 * math.sin(phi * 13 + q.z * 90) * math.sin(q.x * 70)
+        top = 0.65 + 0.35 * smooth(-0.02, 0.08, q.z)
+        quiff = lift * smooth(0.02, 0.07, q.z) * smooth(-0.04, 0.05, q.y)     # volume at the top front
+        depth = thickness * top * (1.0 + 0.3 * clumping * clump + 0.12 * groove) + quiff
+        if under_hat:                                        # pressed flat under the band
+            depth *= 0.45
+        # Hair lies forward over the forehead and down at the sides, so lift it along the flow as well as outward.
+        sweep_dir = Vector((flow.x, flow.y, min(flow.z, 0.0))).normalized() if flow.length > 1e-6 else Vector()
+        moves.append((v, (v.normal * depth + sweep_dir * depth * 0.35 * smooth(0.0, 0.05, q.z - line)) * head.h * edge))
+    for v, d in moves:
+        v.co += d
     for f in bm.faces:
         for loop in f.loops:
             q = head.local(loop.vert.co)
-            phi = math.atan2(q.x, -q.y)
-            streak = 0.82 + 0.18 * math.sin(phi * 70 + q.z * 40)
-            root = 0.75 + 0.25 * smooth(-0.02, 0.06, q.z)
+            flow = q - crown
+            phi = math.atan2(flow.x, -flow.y)
+            streak = 0.8 + 0.2 * math.sin(phi * 70 + q.z * 40) * math.sin(phi * 23)
+            root = 0.72 + 0.28 * smooth(-0.02, 0.07, q.z)
             loop[col] = (base[0] * streak * root, base[1] * streak * root, base[2] * streak * root, 1.0)
     _strand_uv(bm, head, uv)
     return _mesh_from(bm, "hair_shell")
 
 
 def mane(head, color, length):
-    """Long hair falling over the back and shoulders: curved sheets of strands from the back of the scalp."""
+    """Long hair falling over the back: a thick, clumped curtain that starts on the scalp shell around the back of the
+    head, wraps behind the ears and falls past the shoulders, thinning toward the sides and ending in uneven tips."""
     bm = bmesh.new()
     uv = bm.loops.layers.uv.new("UVMap")
     col = bm.loops.layers.color.new("Color")
     base = hex3(color)
     h = head.h
-    rows, cols = 10, 26
-    grid = []
-    for i in range(rows + 1):
-        t = i / rows
-        row = []
-        for k in range(cols + 1):
-            a = math.pi * (0.5 + k / cols)                # from beside one ear, around the back, to the other
-            r = (0.086 + 0.022 * t) * h
-            drop = length * t
-            sway = 0.004 * h * math.sin(k * 1.7 + t * 5)
-            p = Vector((head.c.x + r * math.sin(a) + sway, head.c.y + r * math.cos(a) - 0.012 * h - 0.03 * t * t * h,
-                        head.c.z + 0.035 * h - drop))
-            row.append(bm.verts.new(p))
-        grid.append(row)
+    rows, cols = 14, 30
+    a0, a1 = math.pi * 0.64, math.pi * 1.36       # from behind one ear, around the back, to the other
+
+    def point(i, k, inner):
+        t, u = i / rows, k / cols
+        a = a0 + (a1 - a0) * u
+        edge = math.sin(math.pi * u) ** 0.6             # thinner toward the sides
+        tip = 1.0 - 0.1 * (0.5 + 0.5 * math.sin(k * 2.3)) * (0.5 + 0.5 * math.sin(k * 0.9 + 1))   # uneven ends
+        clump = 0.0045 * math.sin(k * 1.9 + t * 3) * edge
+        r = 0.083 + 0.004 + 0.009 * min(1.0, t * 4) + clump + 0.016 * t * t   # the top edge tucks under the shell
+        if inner:
+            r -= (0.004 + 0.009 * (1 - t) ** 0.5) * edge
+        z = 0.03 - (length / h) * t * (tip if i == rows else 1.0)
+        back = -0.012 - 0.022 * t * t                   # the curtain hangs a little behind the neck
+        sway = 0.003 * math.sin(k * 1.7 + t * 5)
+        return head.at((r * math.sin(a) * (1.0 - 0.12 * t) + sway, r * math.cos(a) + back, z))
+
+    outer = [[bm.verts.new(point(i, k, False)) for k in range(cols + 1)] for i in range(rows + 1)]
+    inner = [[bm.verts.new(point(i, k, True)) if 0 < k < cols else outer[i][k] for k in range(cols + 1)] for i in range(rows + 1)]
+
+    def quad(vs, idx):     # a face (quad or triangle) with strand UVs and clumped shading
+        f = bm.faces.new(vs)
+        for loop, (a, b) in zip(f.loops, idx):
+            loop[uv].uv = (a / rows * 3.0, b / cols * 6.0)
+            shade = (0.78 + 0.22 * math.sin(b * 2.3 + a * 0.4)) * (0.8 + 0.2 * a / rows)
+            loop[col] = (base[0] * shade, base[1] * shade, base[2] * shade, 1.0)
+
     for i in range(rows):
         for k in range(cols):
-            f = bm.faces.new((grid[i][k], grid[i][k + 1], grid[i + 1][k + 1], grid[i + 1][k]))
-            for loop, (a, b) in zip(f.loops, ((i, k), (i, k + 1), (i + 1, k + 1), (i + 1, k))):
-                loop[uv].uv = (a / rows * 3.0, b / cols * 6.0)
-                shade = 0.8 + 0.2 * math.sin(b * 2.3 + a * 0.4)
-                loop[col] = (base[0] * shade, base[1] * shade, base[2] * shade, 1.0)
+            idx = ((i, k), (i, k + 1), (i + 1, k + 1), (i + 1, k))
+            quad([outer[a][b] for a, b in idx], idx)
+            # The inner layer, facing in; at the side edges it meets the outer layer, so those faces are triangles.
+            ridx = idx[::-1]
+            seen, vs, vidx = set(), [], []
+            for a, b in ridx:
+                if inner[a][b] not in seen:
+                    seen.add(inner[a][b])
+                    vs.append(inner[a][b])
+                    vidx.append((a, b))
+            if len(vs) >= 3:
+                quad(vs, vidx)
+    for k in range(1, cols - 1):                       # close the bottom edge between the layers
+        idx = ((rows, k + 1), (rows, k))
+        quad([outer[rows][k + 1], outer[rows][k], inner[rows][k], inner[rows][k + 1]], (*idx, *idx[::-1]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
     return _mesh_from(bm, "hair_mane")
 
 
@@ -136,13 +197,16 @@ def tail(head, color, style):
         bmesh.ops.scale(bm, vec=(1.0, 0.8, 0.85), verts=res["verts"])
         bmesh.ops.translate(bm, vec=head.at((0, -0.1, 0.05)), verts=res["verts"])
     else:
-        seg, rings = 10, 9
+        seg, rings = 12, 14
         prev = None
         for i in range(rings):
             t = i / (rings - 1)
-            c = head.at((0, -0.105 - 0.03 * t, 0.03 - 0.16 * t + 0.02 * t * t))
-            r = (0.016 - 0.011 * t) * h
-            ring = [bm.verts.new(c + Vector((math.cos(a) * r, math.sin(a) * r * 0.8, 0))) for a in (2 * math.pi * k / seg for k in range(seg))]
+            # From the tie at the back of the crown, out and down in a gentle curve, full then tapering to a tip.
+            c = head.at((0.004 * math.sin(t * 5), -0.094 - 0.05 * t + 0.02 * t * t, 0.045 - 0.2 * t + 0.03 * t * t))
+            r = (0.012 + 0.012 * math.sin(min(1.0, t * 2.2) * math.pi * 0.5) * (1 - t) ** 0.8 + 0.002 * (1 - t)) * h
+            if i == 1:
+                r *= 0.8                                   # pinched by the hair tie
+            ring = [bm.verts.new(c + Vector((math.cos(a) * r, math.sin(a) * r * 0.85, 0))) for a in (2 * math.pi * k / seg for k in range(seg))]
             if prev:
                 for k in range(seg):
                     bm.faces.new((prev[k], prev[(k + 1) % seg], ring[(k + 1) % seg], ring[k]))
@@ -235,7 +299,7 @@ def brows_and_lashes(head, head_obj, hair_color, lash_color="#1a1412"):
         for k in range(22):
             x = -0.0135 + 0.027 * k / 21
             u = max(0.0, 1.0 - (x / 0.0148) ** 2)
-            z = 0.0058 * u ** 0.5 + 0.06 * x + 0.0006
+            z = LID_UPPER * u ** 0.5 + 0.06 * x + 0.0006
             p = head.at((e.x + sx * x, e.y + 0.0118 * 1.02, e.z + z))
             d = Vector((sx * x * 8, 1.0, 1.3)).normalized()
             strand(p, d, Vector((0, 1, 0.2)).normalized(), 0.0085 * h * (0.7 + 0.3 * u), 0.0012 * h, lash)

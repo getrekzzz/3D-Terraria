@@ -30,10 +30,11 @@ def hat(head, head_obj, kind, color, flower="#f0d040"):
     bm = bmesh.new()
     top = head.at((0, -0.012, 0.0))
     if kind == "cap":
-        prof = [(0.086 * h * math.cos(a), 0.05 * h + 0.062 * h * math.sin(a)) for a in (i * math.pi / 2 / 8 for i in range(9))]
+        # Deep enough that the band covers the top of the hair (the hair under a hat stops just inside it).
+        prof = [(0.104 * h * math.cos(a), 0.03 * h + 0.086 * h * math.sin(a)) for a in (i * math.pi / 2 / 8 for i in range(9))]
         _lathe(bm, top, prof, 32, 1.14)
-        visor = [bm.verts.new(top + Vector((x * h, (0.09 + 0.055 * (1 - (x / 0.07) ** 2)) * h, 0.052 * h))) for x in (-0.07, -0.035, 0.0, 0.035, 0.07)]
-        inner = [bm.verts.new(top + Vector((x * h, 0.088 * h, 0.056 * h))) for x in (-0.07, -0.035, 0.0, 0.035, 0.07)]
+        visor = [bm.verts.new(top + Vector((x * h, (0.116 + 0.055 * (1 - (x / 0.07) ** 2)) * h, 0.03 * h))) for x in (-0.07, -0.035, 0.0, 0.035, 0.07)]
+        inner = [bm.verts.new(top + Vector((x * h, 0.112 * h, 0.034 * h))) for x in (-0.07, -0.035, 0.0, 0.035, 0.07)]
         for i in range(4):
             bm.faces.new((inner[i], inner[i + 1], visor[i + 1], visor[i]))
     elif kind == "wide":

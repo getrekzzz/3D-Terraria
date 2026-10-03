@@ -45,6 +45,13 @@ public sealed partial class CameraRig : Node3D
     /// <summary>Swings the third-person camera round the player (radians) without changing the aim (screenshots).</summary>
     public float Orbit { get; set; }
 
+    /// <summary>Third-person camera distance in metres for this session (the <c>camera distance</c> command; not saved).</summary>
+    public float Distance
+    {
+        get => _distance;
+        set => _distance = Mathf.Clamp(value, 1.5f, 9f);
+    }
+
     public float Pitch => _pitch;
 
     public void Initialize(CharacterBody3D body)

@@ -53,8 +53,8 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "camera", Usage = "camera <first|third|orbit <degrees>>",
-            Help = "Switches the player camera mode, or swings the third-person camera round the player (aim unchanged).",
+            Name = "camera", Usage = "camera <first|third|orbit <degrees>|distance <metres>>",
+            Help = "Switches the player camera mode, swings the third-person camera round the player (aim unchanged) or sets its distance.",
             Run = (ctx, a) =>
             {
                 var player = world.Player ?? throw new CommandException("no player camera in this mode");
@@ -63,7 +63,8 @@ public static class EngineCommands
                     case "first": player.Rig.FirstPerson = true; break;
                     case "third": player.Rig.FirstPerson = false; break;
                     case "orbit": player.Rig.Orbit = Mathf.DegToRad(a.Float(1, "degrees")); break;
-                    default: throw new CommandException("expected first, third or orbit <degrees>");
+                    case "distance": player.Rig.Distance = a.Float(1, "metres"); break;
+                    default: throw new CommandException("expected first, third, orbit <degrees> or distance <metres>");
                 }
                 return CommandResult.Success();
             },

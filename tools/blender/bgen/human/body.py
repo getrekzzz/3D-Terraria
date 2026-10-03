@@ -32,8 +32,8 @@ def build_body(frame, blob: Blob):
     old = 0.93 if frame.old else 1.0
     B = blob
 
-    def e(c, r, rot=None, neg=False):
-        B.ellipsoid(Vector(c), tuple(x * s for x in r), rot, negative=neg)
+    def e(c, r, rot=None, neg=False, stiffness=2.0):
+        B.ellipsoid(Vector(c), tuple(x * s for x in r), rot, negative=neg, stiffness=stiffness)
 
     def at(p):
         return Vector(p) * s
@@ -51,7 +51,8 @@ def build_body(frame, blob: Blob):
         e(at((sx * 0.08, -0.055, 1.28)), (0.11 * m, 0.04, 0.045 * m), limb_rotation(Vector((sx * 0.15, 0, -1))))  # lats
         e(at((sx * 0.066, -0.03, 1.438)), (0.1, 0.05 * m, 0.042 * m), limb_rotation(Vector((sx, 0, -0.45))))  # trapezius
         if fem:
-            e(at((sx * 0.072, 0.068, 1.275)), (0.062 * f ** 0.5, 0.058 * f ** 0.5, 0.06 * f ** 0.4))  # breasts
+            # Breasts: soft, slightly outward-facing masses that settle low and blend into the chest (not two spheres).
+            e(at((sx * 0.07, 0.052, 1.268)), (0.062 * f ** 0.5, 0.05 * f ** 0.5, 0.054 * f ** 0.4), limb_rotation(Vector((sx * 0.35, 1, -0.25))), stiffness=1.4)
         else:
             e(at((sx * 0.066, 0.05, 1.34)), (0.08 * m, 0.027 * m, 0.056 * m), limb_rotation(Vector((sx, 0.12, -0.3))))  # pectorals
         B.capsule(j[f"clavicle.{'R' if sx > 0 else 'L'}"] + at((0, 0.006, 0.01)), j[f"shoulder.{'R' if sx > 0 else 'L'}"] + at((0, 0.012, 0.018)), 0.014 * s)  # collarbone
@@ -94,10 +95,12 @@ def build_body(frame, blob: Blob):
         B.capsule(lmid, an, 0.031 * s)
         e(along(kn, an, 0.3) + Vector((0, -0.028 * s, 0)), (0.12, 0.048 * m * old, 0.05 * m * old), rot_sh)   # calf
         B.ball(an + Vector((0, 0, 0.004 * s)), 0.029 * s)
-        # Foot: heel, arch, ball and a toe box.
+        # Foot: one smooth shoe-like mass (heel, instep and a rounded toe box, no separate toes) with a flat sole;
+        # people are always shod, and boots are shells of this surface.
         heel, ball, toe = j[f"heel.{side}"], j[f"ball.{side}"], j[f"toe.{side}"]
-        B.ball(heel + Vector((0, 0.008 * s, 0.022 * s)), 0.033 * s)
-        fd = (ball - heel)
-        e(along(heel, ball, 0.55) + Vector((0, 0, 0.022 * s)), (fd.length * 0.55 / s, 0.043, 0.026), limb_rotation(fd))
-        B.capsule(ball + Vector((-sx * 0.022 * s, 0.004 * s, 0.018 * s)), ball + Vector((sx * 0.022 * s, -0.004 * s, 0.014 * s)), 0.02 * s)
-        e(along(ball, toe, 0.5) + Vector((0, 0, 0.013 * s)), (0.03, 0.04, 0.012), limb_rotation(toe - ball))
+        B.ball(heel + Vector((0, 0.01 * s, 0.026 * s)), 0.034 * s)
+        fd = (toe - heel)
+        e(along(heel, toe, 0.45) + Vector((0, 0, 0.026 * s)), (fd.length * 0.56 / s, 0.041, 0.03), limb_rotation(fd))   # instep
+        e(along(ball, toe, 0.25) + Vector((0, 0, 0.018 * s)), (0.046, 0.044, 0.02), limb_rotation(toe - ball))             # toe box
+        e(along(heel, an, 0.5) + Vector((0, 0.03 * s, 0.01 * s)), (0.05, 0.034, 0.04), limb_rotation(ball - an))           # top of the foot
+        e(Vector((an.x, (heel.y + toe.y) / 2, -0.03 * s)), (0.07, 0.2, 0.034), neg=True)                                   # sole
