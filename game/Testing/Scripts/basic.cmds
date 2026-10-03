@@ -62,6 +62,17 @@ use
 assert inv.work_bench == 0
 assert objects.count > 0
 
+# Chopping a tree: each axe hit sways it and outlines the foot of the trunk; it falls into wood.
+fill -10 0 -10 10 26 10 air
+place oak_tree -1 0 3
+give copper_axe 1
+wield copper_axe
+aim 0 -0.35 1
+hold use_primary 4.0
+wait 1.0
+assert inv.wood >= 6
+assert errors == 0
+
 # Time of day affects lighting (no errors while switching).
 time midnight
 wait 0.5

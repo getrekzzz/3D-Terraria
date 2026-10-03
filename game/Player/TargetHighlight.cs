@@ -16,7 +16,8 @@ namespace Strata.Game.Player;
 /// <summary>
 /// The block cursor: shows exactly what the held item will affect. Mining tools outline the grid block (or single
 /// cell in precision mode) they will dig, with cracks spreading as it weakens; blocks show a ghost of what will be
-/// placed; objects show their footprint. Outlines stay visible through the terrain so the target always reads.
+/// placed; objects show their footprint (a tree just the foot of its trunk). Outlines stay visible through the terrain
+/// so the target always reads.
 /// </summary>
 public sealed partial class TargetHighlight : Node3D
 {
@@ -62,7 +63,7 @@ public sealed partial class TargetHighlight : Node3D
         else if (info.Object is { } obj)
             DrawObjectGhost(target, obj);
         else if (target.Object is { } o && info.IsTool)
-            _mesh.Box(Min(o.Bounds.Min), Min(o.Bounds.Max), Neutral);
+            DrawObjectHit(o);
         else if (info.Has(ItemAction.Mine))
             DrawMining(target, held.Item!);
         else if (info.Has(ItemAction.Hammer))
@@ -96,6 +97,21 @@ public sealed partial class TargetHighlight : Node3D
         var color = tooHard ? Invalid : progress > 0 ? Neutral.Lerp(Working, 0.4f + 0.6f * progress) : Neutral;
         _mesh.Faces(Min(min), Min(max), new Color(color.R, color.G, color.B, tooHard ? 0.18f : 0.11f), progress);
         _mesh.Box(Min(min), Min(max), color);
+    }
+
+    /// <summary>
+    /// A tool on an object: trees outline just the foot of the trunk being chopped (the whole 11 m crown box read as a
+    /// stray cage), with cracks spreading as its hit points fall, like a block being mined.
+    /// </summary>
+    private void DrawObjectHit(TileObjectInstance obj)
+    {
+        var (min, max) = World.ObjectColliders.HitBox(obj);
+        min *= Units.CellSize;
+        max *= Units.CellSize;
+        float progress = obj.Def.HitPoints > 1 ? Mathf.Clamp(1f - (float)obj.HitPoints / obj.Def.HitPoints, 0f, 1f) : 0f;
+        var color = progress > 0 ? Neutral.Lerp(Working, 0.4f + 0.6f * progress) : Neutral;
+        if (progress > 0) _mesh.Faces(min, max, new Color(color.R, color.G, color.B, 0.08f), progress);
+        _mesh.Box(min, max, color);
     }
 
     private void DrawHammer(Target target)
