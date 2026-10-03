@@ -586,6 +586,22 @@ Probes come from `StandardProbes` and from `[ProbeSource]` classes (static `Regi
 `CommandContext` registers those in Strata.Core (e.g. `TownProbes`), `GodotCommandHost.CreateContext` those in the game
 assembly (e.g. `PlayerProbes`, which also takes the `LaunchedWorld`), in full-type-name order (`ProbeSources`). A
 probe name is registered once; new probes go in a new source file (docs/CONVENTIONS.md, *Extension points*).
+`god on` (`Vitals.Undying`) stops every damage path (contact, shots, explosions, lava, debuff ticks, falls, drowning)
+at 1 life without counting a death (`GodModeTests`); only `kill` gets past it. A script that turns it off clears
+debuffs and heals first (`buff clear`, `heal`), or the next debuff tick kills a player left at 1 life.
+
+**CI coverage (P5-33, consolidated at the final integration).** `.github/workflows/ci.yml` runs, per push: the module
+size guard, the solution build and every Core test; the generated-content checks (`gen_ore_tiers`, `gen_furniture`,
+`gen_banners`, `manifest --check`), `validate`, `gen_reference --check`, `build_all.py --check`, `build_ui.py --check`,
+`icon_mipmaps.py --check` (boss, NPC and creature portraits included) and the coverage report; then the Godot import,
+every `game/Testing/Scripts/*.cmds` headless and `--menu-tour`. The town and guide systems of Phase 5 are covered by
+`town.cmds` (move-in, seating, dawn respawn, corrupted housing, the housing API, services in the chat box, shop tabs
+and currencies, talking and trading, name tags, residents fighting back, the Travelling Merchant, town pets, pylons),
+`rescue.cmds` (a bound resident's clip and posture, freeing, moving in), `dungeon.cmds` (the bound Mechanic),
+`guide.cmds` (journal, bestiary, achievements, the Guide's help, hints and every Guide book tab) and the Core tests in
+`tests/Strata.Core.Tests/Gameplay` (town, housing, journal, bestiary and achievement tests). `gen_color_vision.py --check`, `build_emotes.py --check`
+(X-12, X-05) and `tools/audio/build_audio.py --check` need numpy, Pillow or soundfile, which the CI job does not
+install: run them locally with the rest before a merge (the final integration did).
 
 ## Locked chests and keys
 

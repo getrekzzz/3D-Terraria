@@ -5,6 +5,20 @@ cross-phase amendments: `docs/overhaul/_integration.json`, agent rules: `docs/ov
 cloud sessions to cut wall-clock time. Each session owns a disjoint slice and pushes ONLY its own branch; the
 integration session merges every branch into `claude/clever-goodall-kgex45` with full CI.
 
+## Final state (2026-10-03): every slice done and merged
+
+| Slice | Branch | Final head merged | Status |
+|---|---|---|---|
+| World & life (also the rehearsal merge of all slices) | `claude/ovh-world` | `9274cb48` | Done ([status-world.md](status-world.md)) |
+| Art | `claude/ovh-art` | `c4e18e9c` | Done ([status-art.md](status-art.md)) |
+| Bosses + Dungeon, then NPCs and the Guide book | `claude/ovh-bosses` | `58f0624d` | Done ([status-bosses.md](status-bosses.md)) |
+| Integration (W1b–W4, W5i: UI, quick keys, X-02, X-04, X-12; P5-33) | `claude/clever-goodall-kgex45` | `394f0e82` (the final merge, GenVersion 14) | Done |
+
+After the merge the integration branch fixed a duplicate probe (`fb7ff039`), god mode in `creatures.cmds`, the resident
+name tags, and finished the docs (AUDIT, master plan, this file, [FINAL.md](FINAL.md)). Full headless CI is green on
+the final tree. What shipped, the known gaps and how to play-test the changes: [FINAL.md](FINAL.md). The table below is
+the plan as it ran.
+
 | Session | Branch | Owns (in this order) |
 |---|---|---|
 | Integration (original) | `claude/clever-goodall-kgex45` | W1b Phase 1 → W3/W4 Terraria UI → then P3-33 quick keys, X-02, X-12 (rest), X-04 (P3-27/P3-34 moved to Art; P3-02/P3-03 merged early at 68a371df) → X-02 → (older wording:) W5/W6 items & feel (minus the art items below; P3-49 and the juice chain P3-08/19/20/21/22/24/25/26 moved to World; P3-31/35/46/48 moved to Art) → X-16 → X-12 → X-04 → final integration (W2 lag spikes moved to the Art session, except P1b-15 which rides with P3-10/P3-11 in W5) |
