@@ -81,6 +81,7 @@ public sealed partial class PlayerAvatar
         if (wings != _wingItem)
         {
             _wingItem = wings;
+            LightWings(_wings, null);
             _wings?.QueueFree();
             _wings = null;
             var path = wings == null ? null : AssetPaths.ItemModel(wings, _game.Session.Content);
@@ -89,6 +90,7 @@ public sealed partial class PlayerAvatar
                 // Modelled upright with the wings spread along ±X; worn on the back (+Z faces behind the avatar).
                 _wings = new MeshInstance3D { Mesh = mesh, Position = new Vector3(0, 0.98f, 0.15f), Scale = Vector3.One * 2.2f };
                 AddChild(_wings);
+                LightWings(null, _wings);
             }
         }
         if (_wings == null) return;

@@ -52,7 +52,7 @@ public sealed partial class ItemUseSystem
         if (item.HealLife > 0)
         {
             life += state.Vitals.Heal(item.HealLife);
-            if (_healingCooldown != null) state.Buffs.Add(_healingCooldown, _healingCooldown.Duration);
+            if (_healingCooldown != null) state.Buffs.Add(_healingCooldown, PotionSicknessTicks(state, _healingCooldown.Duration));
         }
         if (item.HealMana > 0)
         {
@@ -83,6 +83,10 @@ public sealed partial class ItemUseSystem
         for (int i = active.Count - 1; i >= 0; i--)
             if (active[i].Def.FoodTier > 0 && active[i].Def != food) buffs.Remove(active[i].Def.Id);
     }
+
+    /// <summary>Potion Sickness after a healing potion: its full length, shortened by the Philosopher's Stone (−25 %).</summary>
+    public static int PotionSicknessTicks(Player.PlayerState state, int duration) =>
+        Math.Max(1, (int)MathF.Round(duration * (1f + state.Effects.Stats.Bonus(Stats.StatIds.PotionDelay))));
 
     private UseOutcome Summon(PlayerEntity p, ItemUseInfo info)
     {

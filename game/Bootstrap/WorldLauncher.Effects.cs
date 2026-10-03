@@ -16,6 +16,9 @@ public static partial class WorldLauncher
         var flashes = new Rendering.FlashLights();
         runtime.AddChild(flashes);
         flashes.Initialize(services.Graphics);
+        var status = new Rendering.StatusVisuals();
+        runtime.AddChild(status);
+        status.Initialize(kit, services.Graphics);
         var gore = new Entities.GoreSystem();
         runtime.AddChild(gore);
         gore.Initialize(game.Session.World, services.Graphics);
@@ -25,6 +28,9 @@ public static partial class WorldLauncher
         var bossEffects = new Entities.BossEffects();
         runtime.AddChild(bossEffects);
         bossEffects.Initialize(game);
+        var whips = new Entities.WhipRenderer();
+        runtime.AddChild(whips);
+        whips.Initialize(game, kit); // lashes in the air (P3-15)
         var blockEffects = new Entities.BlockEffects();
         runtime.AddChild(blockEffects);
         blockEffects.Initialize(game, kit);
@@ -36,17 +42,22 @@ public static partial class WorldLauncher
         trees.Initialize(game, objectRenderer);
         var drops = new DroppedItemRenderer();
         runtime.AddChild(drops);
-        drops.Initialize(game);
+        drops.Initialize(game, objectRenderer.Props, services.Render, services.Graphics);
         var lights = new Rendering.DynamicLights();
         runtime.AddChild(lights);
         lights.Initialize(services.Graphics);
         lights.AddProvider((eye, radius) => lights.PlacedLights(game, objectRenderer.Placement, eye, radius));
         lights.AddProvider(creatures.Glows);
+        creatures.RagdollBudget = services.Graphics.Preset.Ragdolls;
+        services.Graphics.Changed += p => creatures.RagdollBudget = p.Ragdolls;
         lights.AddProvider(projectiles.PetLights(services.Graphics)); // light pets, at most the preset's petLights
+        projectiles.UseLights(services.Graphics); // glowing shots nearest the camera, at most the preset's projectileLights
         var lava = new Rendering.LavaEffects();
         runtime.AddChild(lava);
         lava.Initialize(runtime);
         lights.AddProvider(lava.HeatLights);
+        lights.AddProvider(status.Lights); // burning statuses, at most the preset's statusLights
+        lights.AddProvider(drops.Lights); // glowing and light-giving drops, at most the preset's dropLights
         var weather = new Ambience.WeatherRenderer();
         runtime.AddChild(weather);
         weather.Initialize(runtime, services.Graphics, game.Weather.Config);

@@ -3,8 +3,8 @@
   // and the night grow meaner everywhere. Their drops (essences of light and night, glimmer dust, prism horns, blight
   // embers, sanguine ichor) feed the hardmode stations' recipes and the mechanical summons.
   "buffs": [
-    { "id": "ichor", "name": "Ichor", "description": "Reduced defense", "debuff": true, "color": "#e8b830", "effects": [{ "type": "stat", "stat": "defense", "add": -15 }], "covers": ["terraria:ichor"] },
-    { "id": "cursed_inferno", "name": "Cursed Inferno", "description": "Green flames that water will not put out.", "debuff": true, "color": "#80e040", "tags": ["fire"],
+    { "id": "ichor", "name": "Ichor", "description": "Reduced defense", "debuff": true, "color": "#e8b830", "visual": { "tint": "#ffe070", "tintStrength": 0.65, "particle": "splash", "color": "#e8b830", "rate": 8, "rise": -1.5 }, "effects": [{ "type": "stat", "stat": "defense", "add": -15 }], "covers": ["terraria:ichor"] },
+    { "id": "cursed_inferno", "name": "Cursed Inferno", "description": "Green flames that water will not put out.", "debuff": true, "color": "#80e040", "visual": { "tint": "#b0ff80", "tintStrength": 0.7, "particle": "sparks", "color": "#80e040", "rate": 18, "rise": 2, "light": [4, 11, 2] }, "tags": ["fire"],
       "effects": [{ "type": "damageOverTime", "perSecond": 6 }, { "type": "emitLight", "color": [4, 10, 2] }], "covers": ["terraria:cursed_inferno"] }
   ],
   "projectiles": [
@@ -17,8 +17,8 @@
   "items": [
     { "id": "pixie_dust", "name": "Pixie Dust", "description": "Shed by pixies of the Hallow. Sparkles faintly.", "category": "material", "maxStack": 9999, "value": 250, "rarity": 4, "covers": ["terraria:pixie_dust"] },
     { "id": "unicorn_horn", "name": "Unicorn Horn", "description": "The spiralled horn of a unicorn.", "category": "material", "maxStack": 9999, "value": 1500, "rarity": 4, "covers": ["terraria:unicorn_horn"] },
-    { "id": "soul_of_light", "name": "Soul of Light", "description": "Gathered from the creatures beneath the hallowed land.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "covers": ["terraria:soul_of_light"] },
-    { "id": "soul_of_night", "name": "Soul of Night", "description": "The essence of dark creatures.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "covers": ["terraria:soul_of_night"] },
+    { "id": "soul_of_light", "name": "Soul of Light", "description": "Gathered from the creatures beneath the hallowed land.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "noGravity": true, "covers": ["terraria:soul_of_light"] },
+    { "id": "soul_of_night", "name": "Soul of Night", "description": "The essence of dark creatures.", "category": "material", "maxStack": 9999, "value": 1000, "rarity": 4, "noGravity": true, "covers": ["terraria:soul_of_night"] },
     { "id": "cursed_flame", "name": "Cursed Flame", "description": "It burns green and does not go out.", "category": "material", "maxStack": 9999, "value": 400, "rarity": 4, "covers": ["terraria:cursed_flame"] },
     { "id": "ichor", "name": "Ichor", "description": "Golden, sticky and corrosive to armour.", "category": "material", "maxStack": 9999, "value": 400, "rarity": 4 }
   ],

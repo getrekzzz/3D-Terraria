@@ -18,7 +18,7 @@ public sealed class WorldPlan
         Settings = settings;
         Size = settings.Dimensions;
         Seeds = SeedTree.FromWorldSeed(settings.Seed);
-        Bands = new LayerBands(Size.Y);
+        Bands = new LayerBands(Size.Y, settings.Has(SecretSeed.DontDigUp));
         Landness = new Grid2D(Size.X, Size.Z, HeightStep);
         Height = new Grid2D(Size.X, Size.Z, HeightStep);
         Ruggedness = new Grid2D(Size.X, Size.Z, HeightStep);
@@ -91,6 +91,11 @@ public sealed class WorldPlan
     public void RaiseTerrainColumnTops(Fields.TerrainField terrain)
     {
         int cw = Size.X / ChunkMath.Size, cd = Size.Z / ChunkMath.Size;
+        if (Bands.Inverted)
+        {
+            Array.Fill(ColumnTop, Size.Y); // Don't Dig Up: rock up to the world's top everywhere
+            return;
+        }
         for (int cz = 0; cz < cd; cz++)
             for (int cx = 0; cx < cw; cx++)
             {
@@ -160,8 +165,11 @@ public static class LandmarkIds
     /// <summary>The cell of the Dungeon's first spike (planned only when it has any).</summary>
     public const string DungeonSpikes = "dungeon_spikes";
 
+    /// <summary>The Dungeon's <c>bound_npc</c> site: the floor cell where the bound Mechanic waits (RoomKind.Mechanic).</summary>
+    public const string DungeonMechanic = "dungeon_mechanic";
+
     public static readonly IReadOnlySet<string> All = new HashSet<string>
     {
-        DungeonGate, DungeonBottom, DungeonChest, DungeonFoyer, DungeonShaft, DungeonLibrary, DungeonTreasure, DungeonBanner, DungeonHall, DungeonSpikes,
+        DungeonMechanic, DungeonGate, DungeonBottom, DungeonChest, DungeonFoyer, DungeonShaft, DungeonLibrary, DungeonTreasure, DungeonBanner, DungeonHall, DungeonSpikes,
     };
 }

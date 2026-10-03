@@ -43,8 +43,9 @@ public class ShotGeometryTests
         g.Player.AimDistance = 10f;
         var (at, _) = Shoot(g);
         var eye = g.Player.Eye;
-        // Looking along +Z the player's right is −X.
-        var hand = eye + new Vector3(-ShotGeometry.HandOffset.X, ShotGeometry.HandOffset.Y, ShotGeometry.HandOffset.Z);
+        // Looking along +Z the player's right is −X; a bow fires from its use style's holdout (use_styles.json).
+        var h = g.World.Styles.Styles["bow"].Holdout!;
+        var hand = eye + new Vector3(-h.Right, -h.Down, h.Forward);
         Assert.True(Vector3.Distance(at, eye) > 0.3f, $"spawned {Vector3.Distance(at, eye):0.00} m from the eye");
         Assert.True(Vector3.Distance(at, hand) < 0.1f, $"spawned {Vector3.Distance(at, hand):0.00} m from the hand");
     }
@@ -79,7 +80,7 @@ public class ShotGeometryTests
     /// Puts the player's front against the cell row ahead and looks diagonally right, so the hand reaches past the body
     /// into the cell at the right shoulder (returned) while the eye stays in open air.
     /// </summary>
-    private static Int3 HandPastTheBody(TestGame g)
+    private static Int3 HandPastTheBody(TestGame g, string style = "bow")
     {
         var front = (g.Floor.Z + 1) * Units.CellSize;
         g.Player.Position = new Vector3((g.Floor.X + 0.5f) * Units.CellSize, g.Player.Position.Y, front - 0.46f);
@@ -88,14 +89,17 @@ public class ShotGeometryTests
         g.Player.Aim = look;
         g.Player.AimDistance = 10f;
         var right = Vector3.Normalize(Vector3.Cross(look, Vector3.UnitY));
-        return VoxelMotion.CellOf(g.Player.Eye + right * ShotGeometry.HandOffset.X + Vector3.UnitY * ShotGeometry.HandOffset.Y + look * ShotGeometry.HandOffset.Z);
+        var h = g.World.Styles.Styles[style].Holdout!; // a weapon fires from its use style's holdout
+        return VoxelMotion.CellOf(g.Player.Eye + right * h.Right - Vector3.UnitY * h.Down + look * h.Forward);
     }
 
     [Fact]
     public void NeverSpawnsInsideAWall()
     {
         using var g = Archer();
-        var handCell = HandPastTheBody(g);
+        g.Hold("flintlock_pistol"); // a gun's muzzle reaches well past the body
+        g.Player.State.Inventory.Backpack[31] = new ItemStack(g.Content.Items.Get("musket_ball"), 20);
+        var handCell = HandPastTheBody(g, "gun");
         var world = g.World.Session.World;
         var eye = g.Player.Eye;
         var batch = world.BeginEdit();

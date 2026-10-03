@@ -51,3 +51,31 @@ Gaps: 6th accessory slot (Demon Heart) needs InventoryScreen UI; upgraded cart h
 Suspicious Looking Tentacle, Empress Expert item, Titan Glove/Philosopher's Stone/Star Cloak/Metal Detector items do not
 exist yet; biome Mimic variants skipped; the golem trophy still uses the old golem_idol generator; P4-35/36/37 belong to
 the Art session.
+
+## W10 + W11 — Town NPCs and the Guide book (pushed; reassigned to this session by the integration session)
+WPs done: P5-01..P5-05 (population, day-only move-ins, dawn respawn, housing validity + room cache, conditions,
+housing API, data/town/*.json with Terraria move-in rules), P5-06a/b (bound-NPC rescues, SiteFinder; the Mechanic
+at the Dungeon's `bound_npc` room), P5-07/P5-08 (postures and rescue presentation), P5-09 (enemies target residents),
+P5-10 (residents fight back), P5-11 (sit/sleep), P5-12 (happiness), P5-13 (services framework), P5-14 (RecipeLookup),
+P5-15..P5-18 (Terraria shop inventories, tabs, Defender Medals), P5-19 (Travelling/Skeleton Merchants), P5-20 (town
+pets), P5-21 (Stylist + hair dyes), P5-22 (Strange Plants + Dye Trader, GenVersion 12 → 13), P5-23 (Angler), P5-24b
+(drop rates), P5-25 (player journal + bestiary), P5-26 (achievements + toast), P5-27 (guide steps/tips, advisor),
+P5-29 (housing menu in the W4 Housing tab; no default key — H is quick heal), P5-30..P5-32 (Guide book on K: Items,
+Bestiary, Progress, NPCs, Tips, Achievements), P5-34 (pylons), X-05 (emotes + voices; emote wheel on T, block shape
+moved to Y), X-10 (onboarding hints + loading tips). All wired into W4 (chat box service buttons, ShopPanel tabs).
+P5-28 was the Art session's; P5-33 is the integration session's.
+CI: full headless CI PASS on the merged tree (1577 Core tests, all 23 smokes, menu tour).
+Gaps (details in docs/architecture/gameplay.md): no 3D bestiary preview; dyes are cosmetic only (no dye slots); some
+sold items do not exist yet (sentries/Defender armour, Clentaminator, Toolbelt, Imbuing Station…); golf has no
+scoring; the pylon one-of-each limit and boss/invasion travel block are not enforced; settings toggles for hints live
+in settings.cfg (no SettingsScreen rows yet).
+## Extras requested by the integration session (pushed)
+* X-07 Don't Dig Up: the secret seed reorders the planner's layer bands (Underworld at the top under a thin crust,
+  caverns between, the surface with open air under a rock roof at the bottom); every pass builds upright with normal
+  gravity; spawn on dry ash in the top Underworld. GenVersion 13 → 14; ordinary seeds byte-identical (goldens
+  unchanged), pre-14 Don't Dig Up saves keep their old layout. dontdigup.cmds smoke (`#!` header args). Gaps: no weather
+  or sky under the roof, invasions/meteors land on the bottom surface, wedges only from the bottom surface.
+* X-11 gaps closed: Corrupt/Crimson/Hallowed/Ice Mimics disguised as their biome chests, the Mimic's 6-way loot with
+  Titan Glove, Philosopher's Stone and Star Cloak, biome Mimic drops (hooks, weapons, accessories, Toy Sled). Gaps: no
+  Dart Rifle/Pistol (no darts), no Key of Night/Light chest summon, aggro accessories don't change targeting.
+CI: full headless CI PASS on the merged tree after each.

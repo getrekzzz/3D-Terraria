@@ -1,74 +1,96 @@
 using System.Collections.Generic;
 using Godot;
-using Strata.Core.Content.Defs;
-using Strata.Core.Gameplay.Items;
+using Strata.Core.Meshing;
 using Strata.Core.Session;
 using Strata.Game.Rendering;
 
 namespace Strata.Game.Items;
 
 /// <summary>
-/// Draws dropped items as upright, gently bobbing icon sprites lit by the voxel light at their position.
-/// Visuals are pooled; the simulation lives in the Core <see cref="DroppedItemSystem"/>.
+/// Draws dropped items (P3-36) as the real item, slowly spinning and bobbing: its model (PropLibrary, loaded on a loader
+/// thread, at most one new model built per frame), a textured cube for blocks (BlockItemMeshes), or its icon as a
+/// billboard until the model is ready or when it has none. Rare and glowing items (Hearts, Stars, Fallen Stars) get an
+/// additive halo in their rarity or glow colour, and the nearest light-giving ones claim lights from the dynamic pool
+/// (<see cref="Lights"/>, at most the preset's <c>dropLights</c>). Everything is lit by the voxel light at the item,
+/// refreshed round-robin (a quarter of the drops per frame). Visuals are pooled; the simulation is the Core
+/// <see cref="Strata.Core.Gameplay.Items.DroppedItemSystem"/>.
 /// </summary>
 public sealed partial class DroppedItemRenderer : Node3D
 {
-    private static readonly Shader SpriteShader = GD.Load<Shader>("res://shaders/sprite_lit.gdshader");
-    private readonly Dictionary<long, MeshInstance3D> _visuals = new();
-    private readonly Stack<MeshInstance3D> _pool = new();
-    private readonly Dictionary<string, ShaderMaterial> _materials = new();
-    private readonly QuadMesh _quad = new() { Size = new Vector2(1f, 1f), CenterOffset = new Vector3(0, 0.5f, 0) };
-    private GameWorld _game = null!;
-    private float _time;
+    public static DroppedItemRenderer? Instance { get; private set; }
 
-    public void Initialize(GameWorld game)
+    private readonly Dictionary<long, Visual> _visuals = new();
+    private readonly Stack<Visual> _pool = new();
+    private GameWorld _game = null!;
+    private PropLibrary _props = null!;
+    private RenderTables _tables = null!;
+    private float _time;
+    private int _frame;
+    private int _buildsLeft;
+    private int _lightBudget;
+
+    public void Initialize(GameWorld game, PropLibrary props, RenderTables tables, GraphicsSettings graphics)
     {
         _game = game;
+        _props = props;
+        _tables = tables;
         Name = "DroppedItems";
+        Instance = this;
+        _lightBudget = graphics.Preset.DropLights;
+        graphics.Changed += p => _lightBudget = p.DropLights;
         game.Drops.Removed += item =>
         {
-            if (!_visuals.Remove(item.Id, out var mi)) return;
-            mi.Visible = false;
-            _pool.Push(mi);
+            if (!_visuals.Remove(item.Id, out var v)) return;
+            v.Hide();
+            _pool.Push(v);
         };
+    }
+
+    public override void _ExitTree()
+    {
+        if (Instance == this) Instance = null;
     }
 
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.drops");
         _time += (float)delta;
+        _frame++;
+        _buildsLeft = 1;
         var world = _game.Session.World;
-        foreach (var item in _game.Drops.Items)
+        var items = _game.Drops.Items;
+        for (int i = 0; i < items.Count; i++)
         {
-            if (!_visuals.TryGetValue(item.Id, out var mi))
+            var item = items[i];
+            bool fresh = false;
+            if (!_visuals.TryGetValue(item.Id, out var v))
             {
-                mi = _pool.Count > 0 ? _pool.Pop() : CreateVisual();
-                mi.MaterialOverride = MaterialFor(item.Stack.Item!);
-                mi.Visible = true;
-                _visuals[item.Id] = mi;
+                v = _pool.Count > 0 ? _pool.Pop() : CreateVisual();
+                _visuals[item.Id] = v;
+                Setup(v, item.Stack.Item!);
+                fresh = true;
             }
-            var p = item.Position;
-            float bob = item.Grounded ? 0.05f + 0.04f * Mathf.Sin(_time * 2.5f + item.Id) : 0f;
-            float size = item.Stack.Item!.Category == ItemCategory.Block ? 0.3f : 0.38f;
-            mi.Transform = new Transform3D(Basis.Identity.Scaled(Vector3.One * size), new Vector3(p.X, p.Y - 0.15f + bob, p.Z));
-            mi.SetInstanceShaderParameter("voxel_light", LightProbe.SampleSmooth(world, mi.Position + Vector3.Up * 0.1f));
-            mi.SetInstanceShaderParameter("glow", item.Stack.Item.Rarity > 0 ? 0.08f : 0f);
+            else if (v.Awaiting && TryUpgrade(v)) fresh = true;
+            Place(v, item);
+            if (fresh || (i & 3) == (_frame & 3)) v.SetLight(LightProbe.SampleSmooth(world, v.Center + Vector3.Up * 0.1f));
         }
     }
 
-    private MeshInstance3D CreateVisual()
+    /// <summary>Probe counts: drops drawn as models, block cubes, billboards; halos shown; drops that may claim a light.</summary>
+    public (int Models, int Cubes, int Billboards, int Halos, int Lit) Counts()
     {
-        var mi = new MeshInstance3D { Mesh = _quad, CastShadow = GeometryInstance3D.ShadowCastingSetting.Off };
-        AddChild(mi);
-        return mi;
-    }
-
-    private ShaderMaterial MaterialFor(ItemDef item)
-    {
-        if (_materials.TryGetValue(item.Id, out var m)) return m;
-        m = new ShaderMaterial { Shader = SpriteShader };
-        m.SetShaderParameter("icon", ItemIcons.Get(item));
-        _materials[item.Id] = m;
-        return m;
+        int models = 0, cubes = 0, cards = 0, halos = 0, lit = 0;
+        foreach (var v in _visuals.Values)
+        {
+            switch (v.Kind)
+            {
+                case VisualKind.Model: models++; break;
+                case VisualKind.Cube: cubes++; break;
+                default: cards++; break;
+            }
+            if (v.HasHalo) halos++;
+            if (v.LightPeak > 0f) lit++;
+        }
+        return (models, cubes, cards, halos, System.Math.Min(lit, _lightBudget));
     }
 }

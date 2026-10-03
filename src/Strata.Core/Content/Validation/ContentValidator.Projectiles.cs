@@ -15,6 +15,17 @@ public static partial class ContentValidator
             if (p.Radius <= 0) ctx.Error(p, "radius must be > 0.");
             ctx.Light(p, p.Light, "light");
             ctx.Color(p, p.Color, "color");
+            if (p.Trail != null) ctx.Color(p, p.Trail, "trail");
+            if (p.TrailWidth is <= 0 or > 2) ctx.Error(p, "trailWidth must be within (0, 2] m.");
+            if (p.TrailTime is <= 0 or > 3) ctx.Error(p, "trailTime must be within (0, 3] s.");
+            if (p.Tether is { } tether)
+            {
+                if (Array.IndexOf(TetherDef.Kinds, tether.Kind) < 0) ctx.Error(p, $"tether.kind must be one of {string.Join(", ", TetherDef.Kinds)}.");
+                if (tether.Range <= 0 || tether.Speed <= 0 || tether.Lifetime < 0) ctx.Error(p, "tether range and speed must be > 0, lifetime >= 0.");
+                ctx.Color(p, tether.String, "tether.string");
+                if (p.Returns > 0) ctx.Error(p, "a tethered projectile comes back on its own: drop 'returns'.");
+            }
+            if (Array.IndexOf(ProjectileDef.SpinAxes, p.SpinAxis) < 0) ctx.Error(p, $"spinAxis must be one of {string.Join(", ", ProjectileDef.SpinAxes)}.");
             switch (p.Visual)
             {
                 case "creature": ctx.Asset(p, $"assets/models/creatures/{p.Model ?? p.Id}.glb", "model"); break;
@@ -28,6 +39,9 @@ public static partial class ContentValidator
             foreach (var h in p.OnHit.Where(h => h.Type == ProjectileHitSpecs.SpawnProjectiles))
                 if (h.Parse<SpawnProjectilesParams>().Projectile is { Length: > 0 } child && !ctx.Db.Projectiles.Contains(child))
                     ctx.Error(p, $"spawnProjectiles releases unknown projectile '{child}'.");
+            foreach (var h in p.OnHit.Where(h => h.Type == ProjectileHitSpecs.DropItem))
+                if (h.Parse<DropItemParams>().Item is { Length: > 0 } item && !ctx.Db.Items.Contains(item))
+                    ctx.Error(p, $"dropItem leaves unknown item '{item}'.");
             if (p.Latch && p.LatchInterval < 1) ctx.Error(p, "latchInterval must be >= 1.");
             if (p.Minion is { Shoot: { } shot } && !ctx.Db.Projectiles.Contains(shot)) ctx.Error(p, $"minion shoots unknown projectile '{shot}'.");
             if (p.Minion is { Speed: < 0 } or { Range: <= 0 }) ctx.Error(p, "minion speed must be >= 0 (0 = a sentry) and range > 0.");
@@ -55,6 +69,7 @@ public static partial class ContentValidator
             ctx.Specs(b, SpecKind.Effect, b.Effects, "effects");
             ctx.Asset(b, AssetPaths.BuffIcon(b), "icon");
             if (b.FoodTier is < 0 or > 3) ctx.Error(b, "foodTier must be 0 (not food) to 3 (Exquisitely Stuffed).");
+            if (b.Visual is { } v) ValidateBuffVisual(ctx, b, v);
         }
         foreach (var p in ctx.Db.Prefixes.All)
         {
@@ -62,6 +77,19 @@ public static partial class ContentValidator
             foreach (var a in p.Applies)
                 if (!PrefixGroups.Contains(a)) ctx.Error(p, $"unknown prefix group '{a}'.");
         }
+    }
+
+    private static void ValidateBuffVisual(Ctx ctx, BuffDef b, BuffVisualDef v)
+    {
+        ctx.Color(b, v.Tint, "visual.tint");
+        ctx.Color(b, v.Color, "visual.color");
+        ctx.Light(b, v.Light, "visual.light");
+        if (v.Particle != null && Array.IndexOf(BuffVisualDef.Particles, v.Particle) < 0)
+            ctx.Error(b, $"visual.particle '{v.Particle}' must be one of {string.Join(", ", BuffVisualDef.Particles)}.");
+        if (v.TintStrength is < 0f or > 1f) ctx.Error(b, "visual.tintStrength must be within 0–1.");
+        if (v.Rate is < 0f or > 60f) ctx.Error(b, "visual.rate must be within 0–60 particles per second.");
+        if (v.Rise is < -4f or > 4f) ctx.Error(b, "visual.rise must be within -4–4.");
+        if (v.Tint == null && v.Particle == null && v.Light == null) ctx.Warn(b, "visual block shows nothing (no tint, particle or light).");
     }
 
     private static void ValidateLoot(Ctx ctx)

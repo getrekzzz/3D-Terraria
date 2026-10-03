@@ -73,6 +73,7 @@ public sealed class WorldMeta
 
     /// <summary>Starter residents (the guide) have been placed.</summary>
     public bool TownStarted { get; set; }
+
     public int[] Spawn { get; set; } = { 0, 0, 0 };
 
     public IdTablesModel IdTables { get; set; } = new();
@@ -89,7 +90,8 @@ public sealed class WorldMeta
 
     public sealed record InactiveBlockModel(int X, int Y, int Z, string Block, byte Shape, byte Flags);
 
-    public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks);
+    public sealed record ResidentModel(string Id, string Name, int[]? Home, int[]? HomeRoom, float[] Position, int Life, int RespawnTicks,
+        bool Bound = false, long DiedAt = -1, long VisitDay = -1);
 
     public sealed class IdTablesModel
     {
@@ -103,7 +105,14 @@ public sealed class WorldMeta
     }
 
     public WorldSettings ToSettings() =>
-        new() { Name = Name, Seed = Seed, Size = Size, Difficulty = Difficulty, Evil = Evil, Secret = SecretSeeds.FromIds(Secrets) };
+        new() { Name = Name, Seed = Seed, Size = Size, Difficulty = Difficulty, Evil = Evil, Secret = SettingsSecrets() };
+
+    /// <summary>The saved secret seeds; a Don't Dig Up world made before it generated upside down keeps its ordinary layout.</summary>
+    private SecretSeed SettingsSecrets()
+    {
+        var flags = SecretSeeds.FromIds(Secrets);
+        return GeneratorVersion is > 0 and < WorldGen.GenVersion.UpsideDownSince ? flags & ~SecretSeed.DontDigUp : flags;
+    }
 
     public WorldIdTables CreateIdTables() => new()
     {

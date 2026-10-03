@@ -1,6 +1,9 @@
 # Biome creatures: every new kind spawns, moves and renders; ranged attackers shoot; swimmers live in water.
 wait_until player.frozen == 0 180
 spawning off
+# Hits still land (ranged shots, contact, debuffs) but the player never dies: a dead player has no creature near, so
+# everything walks off at day and later sections (X-16's slain zombie) would find nothing to slay.
+god on
 wait_until assets.pending == 0 60
 town arrivals off
 time noon
@@ -41,6 +44,14 @@ assert boss.mimic.disguised == 0
 wait 1
 assert npcs.mimic == 1
 assert errors == 0
+# The biome Mimics sit as their biome's chest the same way.
+killall
+spawn hallowed_mimic 1 3.5
+spawn ice_mimic 1 6
+wait 1
+assert boss.hallowed_mimic.disguised == 1
+assert boss.ice_mimic.disguised == 1
+assert errors == 0
 # Clearing up.
 killall
 assert npcs.count == 0
@@ -50,7 +61,6 @@ assert errors == 0
 # Creatures with their own bodies now (canines, spiders, mimic, shark, flinx, tortoise, lizard, winged serpent, bone
 # serpent, eater of souls, crimera, elementals, antlion), the reworked common enemies and the themed humanoids load
 # and animate without problems.
-god on
 spawn wolf 1
 spawn black_recluse 1
 spawn mimic 1
@@ -75,4 +85,27 @@ wait_until assets.pending == 0 60
 assert props.problems == 0
 assert errors == 0
 killall
+god off
+assert errors == 0
+
+# X-16: a slain zombie crumples into a ragdoll that tumbles, then sinks away and returns to the pool.
+spawning off
+# Nothing else may claim the zombie first: the parade above can kill the player, and a respawn clears creatures
+# near the spawn point; residents fight back (P5-10), and daylight sends zombies off.
+wait_until player.life > 0 15
+god on
+town dismiss guide
+time midnight
+spawn zombie 1 3
+wait 1.5
+wait_until assets.pending == 0 60
+slay
+wait 0.3
+assert fx.ragdolls_started >= 1
+assert fx.ragdolls >= 1
+wait 1.5
+assert fx.ragdoll_drop > 0.4
+wait 3
+assert fx.ragdolls == 0
+god off
 assert errors == 0

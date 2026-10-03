@@ -99,29 +99,6 @@ public sealed class CompositeConditionParams : SpecParams
     public TypedSpec[] Of { get; init; } = Array.Empty<TypedSpec>();
 }
 
-/// <summary>Players carry at least <see cref="Min"/> copper worth of coins.</summary>
-public sealed class CoinsConditionParams : SpecParams
-{
-    public long Min { get; init; }
-}
-
-/// <summary>A resident town NPC is (or is not) living in the world.</summary>
-public sealed class ResidentConditionParams : SpecParams
-{
-    public string Id { get; init; } = "";
-    public bool Present { get; init; } = true;
-}
-
-/// <summary>Players carry at least <see cref="Count"/> of an item, or of any item with <see cref="Tag"/>.</summary>
-public sealed class HasItemConditionParams : SpecParams, IValidatableSpec
-{
-    public string? Item { get; init; }
-    public string? Tag { get; init; }
-    public int Count { get; init; } = 1;
-
-    public string? Validate() => (Item == null) == (Tag == null) ? "hasItem needs exactly one of 'item' or 'tag'" : null;
-}
-
 /// <summary>A player wears an item (armor or accessory slot): the Clothier's Red Hat.</summary>
 public sealed class WearingConditionParams : SpecParams
 {
@@ -155,7 +132,11 @@ public sealed class SecretSeedConditionParams : SpecParams, Content.Specs.IValid
 }
 
 /// <summary>The seasonal event running is <see cref="Is"/> ("halloween", "christmas", or "none").</summary>
-public sealed class SeasonConditionParams : SpecParams
+public sealed class SeasonConditionParams : SpecParams, Content.Specs.IValidatableSpec
 {
+    public static readonly string[] Values = { "halloween", "christmas", "none" };
+
     public string Is { get; init; } = "";
+
+    public string? Validate() => Array.IndexOf(Values, Is) < 0 ? $"season must be one of {string.Join(", ", Values)}" : null;
 }

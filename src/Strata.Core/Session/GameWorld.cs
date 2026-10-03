@@ -41,12 +41,14 @@ public sealed partial class GameWorld : IDisposable
         Spread = new Gameplay.Progression.SpreadSystem(this);
         Maps = new Gameplay.Map.MapSystem(this);
         Npcs = new NpcSystem(this);
-        Melee = new MeleeSystem(Npcs, ItemUse);
+        Melee = new MeleeSystem(Npcs, ItemUse) { World = this };
         Projectiles = new ProjectileSystem(this, Npcs, ItemUse);
         Spawner = new SpawnDirector(this, Npcs);
         Events = new EventDirector(this, Npcs);
+        Starfall = new StarfallDirector(this);
         Weather = new Gameplay.Weather.WeatherSystem(this);
         Banners = new Gameplay.Banners.BannerSystem(this);
+        Whips = new Gameplay.Entities.WhipSystem(this);
         Liquids = new LiquidSimulator(session);
         Housing = new HousingScanner(session.World);
         Navigator = new VoxelNavigator(session.World);
@@ -58,6 +60,8 @@ public sealed partial class GameWorld : IDisposable
         Objectives = new Gameplay.Progression.WorldObjectives(this);
         Rituals = new Gameplay.Progression.Rituals(this);
         Wires = new Gameplay.Wiring.WireSystem(this);
+        Journal = new Gameplay.Guide.JournalSystem(this);
+        Achievements = new Gameplay.Guide.AchievementTracker(this);
         PlayerDirectory = playerDirectory;
         Editor.ChunksDirty += dirty => Streamer.MarkDirty(dirty);
         Editor.LightDirty += dirty => Streamer.MarkDirty(dirty, urgent: true, ChunkStreamer.LightPriority);
@@ -89,11 +93,17 @@ public sealed partial class GameWorld : IDisposable
     public SpawnDirector Spawner { get; }
     public EventDirector Events { get; }
 
+    /// <summary>Fallen Stars at night (P3-30).</summary>
+    public StarfallDirector Starfall { get; }
+
     /// <summary>Rain, storms, snow, sandstorms and wind (state in <see cref="WorldSession.Weather"/>).</summary>
     public Gameplay.Weather.WeatherSystem Weather { get; }
 
     /// <summary>Enemy banners: kill tallies, banner drops and the nearby-banner bonus.</summary>
     public Gameplay.Banners.BannerSystem Banners { get; }
+
+    /// <summary>Whip lashes in the air (P3-14).</summary>
+    public Gameplay.Entities.WhipSystem Whips { get; }
     public LiquidSimulator Liquids { get; }
     public HousingScanner Housing { get; }
     public VoxelNavigator Navigator { get; }
@@ -141,29 +151,35 @@ public sealed partial class GameWorld : IDisposable
         using (Diagnostics.Metrics.Frame.Time("tick.drops"))
         {
             if (player is { Alive: true })
-                Drops.Tick(Session.World, dt, player.Center, stack =>
-                {
-                    var rest = player.State.Inventory.Pickup(stack);
-                    if (rest.Count < stack.Count) ItemPickedUp?.Invoke(player, stack.WithCount(stack.Count - rest.Count));
-                    return rest;
-                });
+                Drops.Tick(Session.World, dt, player.Center, s => CanCollect(player, s), s => Collect(player, s),
+                    player.State.Effects.Stats.Bonus(Gameplay.Stats.StatIds.GrabRange));
             else
-                Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), s => s);
+                Drops.Tick(Session.World, dt, new Vector3(float.MaxValue), _ => false, s => s);
         }
         var prof = Diagnostics.Metrics.Frame;
         using (prof.Time("tick.players")) foreach (var p in Players) TickPlayer(p);
         using (prof.Time("tick.map")) Maps.Tick();
         using (prof.Time("tick.liquids")) Liquids.Tick(Session.Clock.Tick);
         using (prof.Time("tick.liquid_effects")) LiquidEffects.Tick();
-        using (prof.Time("tick.events")) Events.Tick();
+        using (prof.Time("tick.events"))
+        {
+            Events.Tick();
+            Starfall.Tick();
+        }
         using (prof.Time("tick.weather")) Weather.Tick();
         using (prof.Time("tick.banners")) Banners.Tick();
         using (prof.Time("tick.wires")) Wires.Tick();
         using (prof.Time("tick.spawner")) Spawner.Tick();
         using (prof.Time("tick.npcs")) Npcs.Tick();
+        using (prof.Time("tick.whips")) Whips.Tick();
         using (prof.Time("tick.town")) Town.Tick();
         using (prof.Time("tick.melee")) Melee.Tick();
         using (prof.Time("tick.projectiles")) Projectiles.Tick();
+        using (prof.Time("tick.journal"))
+        {
+            Journal.Tick();
+            Achievements.Tick();
+        }
         using (prof.Time("tick.world"))
         {
             Mutations.Tick();
@@ -178,11 +194,13 @@ public sealed partial class GameWorld : IDisposable
             // Captures on this thread, writes in the background; retried next tick while the last one is still landing.
             if (BeginAutosave()) _autosaveCounter = 0;
         }
+        AdvanceSleepClock();
     }
 
     private void TickPlayer(PlayerEntity p)
     {
         var state = p.State;
+        TickSleep(p);
         if (!p.Alive)
         {
             p.Hook.Reset(); // the chain does not hang from a corpse or follow it to the respawn point
@@ -218,7 +236,7 @@ public sealed partial class GameWorld : IDisposable
         if (state.Buffs.Tick()) state.Recompute();
         int dps = state.Effects.DamagePerSecond;
         state.Vitals.Tick(state.Effects.Stats.Get(StatIds.LifeRegen, 0f), suppressNatural: dps > 0);
-        if (Session.Clock.Tick % Units.TicksPerSecond == 0)
+        if (RealTick % Units.TicksPerSecond == 0) // real seconds, also while sleep runs the clock fast
         {
             if (dps > 0 && p.Alive)
                 HurtPlayerDirect(p, dps, DamageKind.Periodic,
@@ -265,6 +283,7 @@ public sealed partial class GameWorld : IDisposable
 
     public void Dispose()
     {
+        Achievements.Detach();
         Jobs.Dispose();
         Session.Dispose();
     }

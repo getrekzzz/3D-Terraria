@@ -84,6 +84,9 @@ NPCS = [
     ("travelling_merchant", "Travelling Merchant", "early", "visits", ["shop", "random_stock"]),
     ("old_man", "Old Man", "prehardmode", "dungeon entrance", ["boss_summon"]),
     ("skeleton_merchant", "Skeleton Merchant", "prehardmode", "caverns", ["shop"]),
+    ("town_cat", "Town Cat", "early", "cat license", ["pet"]),
+    ("town_dog", "Town Dog", "early", "dog license", ["pet"]),
+    ("town_bunny", "Town Bunny", "early", "bunny license", ["pet"]),
 ]
 
 PROGRESSION = [

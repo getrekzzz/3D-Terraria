@@ -46,6 +46,11 @@ public sealed class Npc
     /// <summary>Ticks left of the hurt flash (visual).</summary>
     public int HurtFlash { get; set; }
 
+    /// <summary>The player whose whip last struck this creature (their minions focus it) and the tick it did (P3-14).</summary>
+    public Session.PlayerEntity? TaggedBy { get; set; }
+
+    public long TagTick { get; set; }
+
     /// <summary>Ticks left reeling from a hit: the brain does not steer, so knockback carries it away.</summary>
     public int StunTicks { get; set; }
 
@@ -104,6 +109,12 @@ public sealed class Npc
     /// <summary>Ticks until the next ranged volley.</summary>
     public int AttackTimer;
 
+    /// <summary>Ticks until the creature reconsiders which town resident to go after (P5-09).</summary>
+    internal int RetargetTicks;
+
+    /// <summary>The town resident it is going after instead of a player, if any.</summary>
+    internal Town.TownNpc? ResidentTarget;
+
     /// <summary>Where the creature spawned (anchored creatures stay near it).</summary>
     public Vector3 Anchor;
 
@@ -145,6 +156,11 @@ public sealed class Npc
 
     /// <summary>Released by a wired statue: drops no loot or coins and counts towards the statue caps.</summary>
     public bool FromStatue { get; set; }
+
+    /// <summary>The player who last struck it (Hearts and Stars drop for them), and whether that hit was magic.</summary>
+    public Session.PlayerEntity? LastAttacker { get; set; }
+
+    public bool LastHitMagic { get; set; }
 
     /// <summary>The creature this one is tethered to (a boss's hungry mouths): its anchor follows the leader and it dies with it.</summary>
     public Npc? Leader { get; set; }

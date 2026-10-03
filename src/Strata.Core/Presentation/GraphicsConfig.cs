@@ -151,6 +151,21 @@ public sealed class GraphicsPreset
     /// <summary>Short-lived flash lights (explosions, sparks) alive at once; 0 disables them.</summary>
     public int FlashLights { get; set; } = 2;
 
+    /// <summary>Human creatures that can lie as physics ragdolls at once (X-16); past it they play their death clip.</summary>
+    public int Ragdolls { get; set; } = 3;
+
+    /// <summary>Pooled lights handed each frame to the glowing projectiles nearest the camera (P1b-15); the rest only glow.</summary>
+    public int ProjectileLights { get; set; } = 4;
+
+    /// <summary>Looping buff and debuff emitters (StatusVisuals) alive at once; handed out first come, first served (past it a status shows only its tint).</summary>
+    public int StatusEmitters { get; set; } = 16;
+
+    /// <summary>How many glowing statuses (On Fire!, Shadowflame…) may claim a light from the dynamic pool.</summary>
+    public int StatusLights { get; set; } = 1;
+
+    /// <summary>How many glowing or light-giving dropped items (Fallen Stars, torches, Hearts) may claim a light from the dynamic pool.</summary>
+    public int DropLights { get; set; } = 2;
+
     /// <summary>How far ore veins twinkle with light-catching glints, in metres (they fade over the last 30 %).</summary>
     public float OreGlintDistance { get; set; } = 24f;
 
@@ -184,7 +199,12 @@ public sealed class GraphicsPreset
         if (DynamicLights is < 0 or > 64) yield return "dynamicLights must be within 0–64";
         if (EffectsScale is < 0f or > 2f) yield return "effectsScale must be within 0–2";
         if (FlashLights is < 0 or > 16) yield return "flashLights must be within 0–16";
+        if (Ragdolls is < 0 or > 32) yield return "ragdolls must be within 0–32";
+        if (ProjectileLights is < 0 or > 32) yield return "projectileLights must be within 0–32";
         if (PetLights is < 0 or > 8) yield return "petLights must be within 0–8";
+        if (StatusEmitters is < 0 or > 64) yield return "statusEmitters must be within 0–64";
+        if (StatusLights is < 0 or > 8) yield return "statusLights must be within 0–8";
+        if (DropLights is < 0 or > 8) yield return "dropLights must be within 0–8";
         if (CombatNumbers is < 8 or > 256) yield return "combatNumbers must be within 8–256";
         if (HorizonDistance != 0f && HorizonDistance is < 200f or > 6000f) yield return "horizonDistance must be 0 or within 200–6000 m";
         if (OreGlintDistance is < 1f or > 60f) yield return "oreGlintDistance must be within 1–60 m";

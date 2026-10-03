@@ -69,6 +69,9 @@ public sealed partial class Hud : CanvasLayer
     /// <summary>The buff bar (the <c>ui buff cancel</c> command and the <c>hud.buffs</c> probe).</summary>
     public BuffBar Buffs => _buffBar;
 
+    /// <summary>The info panel under the minimap (the Guide book hides it while open).</summary>
+    public InfoPanel Info => _info;
+
     /// <summary>The chat log (the <c>ui chat</c> command and the <c>ui.chat_lines</c> probe).</summary>
     public ChatLog Chat => _chat;
 

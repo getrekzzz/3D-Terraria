@@ -37,11 +37,16 @@ public static partial class ContentValidator
             if (e.Brain.Type == Specs.BrainSpecs.Pattern) ValidatePattern(ctx, e);
             ctx.Ref(e, ctx.Db.LootTables, e.Loot, "loot");
             ctx.Ref(e, ctx.Db.Items, e.CatchItem, "catchItem");
+            ctx.Ref(e, ctx.Db.Enemies, e.BestiaryAs, "bestiaryAs");
+            if (e.BestiaryAs != null && ctx.Db.Enemies.TryGet(e.BestiaryAs, out var parent) && parent.BestiaryAs != null)
+                ctx.Error(e, $"bestiaryAs '{e.BestiaryAs}' itself credits another entry (one level only).");
             ctx.Color(e, e.Tint, "tint");
             ctx.Color(e, e.TetherColor, "tetherColor");
             if (e.Facing is not ("yaw" or "look" or "velocity")) ctx.Error(e, $"facing '{e.Facing}' must be yaw, look or velocity.");
             ctx.Light(e, e.Light, "light");
             ctx.Asset(e, AssetPaths.CreatureModel(e), "model");
+            ctx.Sound(e, e.HitSound, "hitSound");
+            ctx.Sound(e, e.DeathSound, "deathSound");
             if (e.Boss is { Minor: false }) ctx.Asset(e, AssetPaths.BossIcon(e), "boss head icon");
             if (e.Disguise is { } disguise)
             {

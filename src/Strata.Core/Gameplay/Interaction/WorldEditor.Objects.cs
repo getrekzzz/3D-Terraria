@@ -61,6 +61,18 @@ public sealed partial class WorldEditor
         return result;
     }
 
+    /// <summary>Objects weapons have smashed (probe <c>objects.smashed</c>; the <c>smashed reset</c> command zeroes it).</summary>
+    public int Smashed { get; set; }
+
+    /// <summary>A weapon smashes an object outright (a pot, a tuft of grass): it breaks with its drops and loot (P3-23).</summary>
+    public void SmashObject(TileObjectInstance obj)
+    {
+        if (World.TileObjects.Get(obj.Id) != obj) return;
+        Smashed++;
+        BreakObject(obj, dropItems: true);
+        ObjectHit?.Invoke(obj, ObjectHitResult.Broken);
+    }
+
     private ObjectHitResult HitObjectQuietly(TileObjectInstance obj, ItemDef? tool)
     {
         int power = obj.Def.Decor ? 100 : obj.Def.BreakTool switch

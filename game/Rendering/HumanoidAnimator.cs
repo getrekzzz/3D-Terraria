@@ -101,6 +101,9 @@ public sealed partial class HumanoidAnimator
 
     public string State => _state;
 
+    /// <summary>The locomotion state the tree is actually in (what is playing, as opposed to <see cref="State"/>, the request).</summary>
+    public string PlayingState => _tree.Get("parameters/loco/current_state").AsString();
+
     /// <summary>The action playing over the upper body, or null.</summary>
     public string? Action { get; private set; }
 
@@ -260,6 +263,13 @@ public sealed partial class HumanoidAnimator
         _actionLeft = -ChainGrace;
         _framesEnded = int.MaxValue;
         Action = null;
+    }
+
+    /// <summary>Runs or halts the animation tree (a ragdoll takes the bones while it is off).</summary>
+    public bool Animating
+    {
+        get => _tree.Active;
+        set => _tree.Active = value;
     }
 
     public void Hurt() => _tree.Set(HurtRequest, (int)AnimationNodeOneShot.OneShotRequest.Fire);

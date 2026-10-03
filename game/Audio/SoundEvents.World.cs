@@ -30,6 +30,16 @@ public sealed partial class SoundEvents
             if (def.KillGoal > 0 || def.SkyTint != null) Sfx.Play("event_start", -2f);
         };
         game.Town.Arrived += _ => Sfx.Play("npc_arrive");
+        // Fallen Stars (P3-30): a whoosh as one starts near enough to see, a chime where it lands.
+        game.Starfall.Started += star =>
+        {
+            if (game.LocalPlayer is { } p && System.Numerics.Vector3.Distance(p.Position, star.Position) < 60f) Sfx.PlayAt("star_fall", ToGodot(star.Position), -2f);
+        };
+        game.Projectiles.Landed += p =>
+        {
+            if (p.Def.Id == game.Starfall.Config.Projectile) Sfx.PlayAt("star_land", ToGodot(p.Position));
+        };
+        game.Town.Rescued += (_, _) => Sfx.Play("npc_arrive");
         game.Services.Reforged += (p, _) =>
         {
             if (p == _local) Sfx.Play("reforge"); // the hammer on the anvil

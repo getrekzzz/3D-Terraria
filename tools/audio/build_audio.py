@@ -26,7 +26,8 @@ AMBIENCE_DIR = REPO / "assets" / "audio" / "ambience"
 
 
 def check():
-    """Every sound the game code names (Sfx.Play / Sfx.PlayAt, and the material families) has a recipe."""
+    """Every sound the game code names (Sfx.Play / Sfx.PlayAt), the material families and the data (sound sets, creature
+    and use style sounds) name has a recipe."""
     import re
     names = set()
     for path in (REPO / "game").rglob("*.cs"):
@@ -38,6 +39,13 @@ def check():
     cfg = re.sub(r"^\s*//.*$", "", (REPO / "data" / "config" / "creature_materials.json").read_text(encoding="utf-8"), flags=re.M)
     for m in json.loads(cfg)["materials"].values():
         names.update((m["hitSound"], m["deathSound"]))
+    # Item sound sets, creature sounds and the use styles' sounds named in data (P3-27).
+    for path in (REPO / "data").rglob("*.json"):
+        if path.parent.name in ("items", "enemies"):
+            names.update(re.findall(r'"(?:soundSet|hitSound|deathSound)":\s*"([a-z0-9_]+)"', path.read_text(encoding="utf-8")))
+    names.update(re.findall(r'"(?:sound|heavySound)":\s*"([a-z0-9_]+)"', (REPO / "data" / "config" / "use_styles.json").read_text(encoding="utf-8")))
+    for n in sorted(n for n in names if n not in sfx_recipes.RECIPES and n not in missing):
+        print(f"ERROR: data names sound '{n}' but tools/audio/sfx_recipes*.py has no recipe for it")
     missing = sorted(n for n in names if n not in sfx_recipes.RECIPES)
     loops = set()
     for path in (REPO / "game").rglob("*.cs"):

@@ -69,6 +69,7 @@ public static class DamageModel
         {
             multiplier = DamageMultiplier(attacker, damageClass);
             crit += CritBonus(attacker, damageClass);
+            if (damageClass == DamageClass.Melee) knockback *= 1f + attacker.Bonus(StatIds.MeleeKnockback); // Titan Glove
         }
         float raw = baseDamage * multiplier * rng.Range(0.85f, 1.15f);
         bool isCrit = damageClass != DamageClass.None && rng.NextInt(100) < crit;

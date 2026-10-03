@@ -151,9 +151,13 @@ public sealed partial class WorldRuntime : Node3D
             _renderer.UpdateCulling(ChunkMath.CellToChunk(eyeCell), st.MeshRadius + 1, System.Math.Max(st.MeshUp, st.MeshDown) + 1, CaveCulling);
         using (prof.Time("gd.grass")) _grass?.Update(eye, Focus?.GlobalPosition ?? eye, budgets.GrassMs);
         UpdateDistance(camera, eye, focus);
-        float surface = Session.Generator.Terrain.SurfaceHeight(eye.X / Units.CellSize, eye.Z / Units.CellSize);
+        var terrain = Session.Generator.Terrain;
+        float surface = terrain.SurfaceHeight(eye.X / Units.CellSize, eye.Z / Units.CellSize);
         float skyExposure = Rendering.LightProbe.SampleSmooth(Session.World, eye).A;
-        _environment.Apply(Session.Clock, surface * Units.CellSize - eye.Y, skyExposure, delta);
+        float depth = Session.Generator.Plan.Bands.Inverted // Don't Dig Up: inside the rock above the surface's open air
+            ? Strata.Core.WorldGen.Fields.TerrainField.SurfaceDepth(eye.Y / Units.CellSize, surface, terrain.CeilingHeight(eye.X / Units.CellSize, eye.Z / Units.CellSize)) * Units.CellSize
+            : surface * Units.CellSize - eye.Y;
+        _environment.Apply(Session.Clock, depth, skyExposure, delta);
     }
 
     /// <summary>

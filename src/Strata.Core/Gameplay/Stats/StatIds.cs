@@ -62,12 +62,27 @@ public static class StatIds
     /// <summary>Added chance (0–1) that a catch is a crate (Crate Potion).</summary>
     public const string CrateChance = "crateChance";
 
+    /// <summary>Holding the button repeats whips too (Feral Claws and its upgrades; melee always auto-swings).</summary>
+    public const string Autoswing = "autoswing";
+
+    /// <summary>Metres added to the item magnet's reach (Treasure Magnet).</summary>
+    public const string GrabRange = "grabRange";
+
+    /// <summary>Melee knockback bonus (fraction; the Titan Glove's +100 %).</summary>
+    public const string MeleeKnockback = "meleeKnockback";
+
+    /// <summary>Change to the length of Potion Sickness (fraction; the Philosopher's Stone's −25 %: 45 s instead of 60 s).</summary>
+    public const string PotionDelay = "potionDelay";
+
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
         MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, RunSpeed, Acceleration, JumpHeight, GenericDamage,
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
         Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal, FishingPower, BaitSaving, LavaFishing, CrateChance,
+        Autoswing,
+        GrabRange,
+        MeleeKnockback, PotionDelay,
     };
 
     public static bool IsKnown(string id) => Known.Contains(id);

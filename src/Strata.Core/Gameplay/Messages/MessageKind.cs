@@ -11,6 +11,9 @@ public enum MessageKind
     Boss,
     Event,
     Objective,
+
+    /// <summary>Townsfolk news: an NPC rescued or moving in.</summary>
+    Town,
 }
 
 /// <summary>Terraria's announcement colours per <see cref="MessageKind"/>, as #rrggbb.</summary>
@@ -24,6 +27,7 @@ public static class MessageColors
         MessageKind.BossAwoken or MessageKind.BossDefeated or MessageKind.Boss => BossPurple,
         MessageKind.Event => BossPurple, // invasions and the Blood Moon use the same purple
         MessageKind.Objective => "#32ff82", // world-change messages (a meteorite, hardmode spirits) in green
+        MessageKind.Town => "#327dff", // Terraria's NPC-arrival blue (50, 125, 255)
         _ => "#ffffff",
     };
 }

@@ -29,7 +29,7 @@
     "crab": "chitin", "giant_tortoise": "chitin", "blood_crawler": "chitin", "storm_diver": "metal", "vortexian": "chitin",
     "selenian": "metal", "predictor": "metal", "solar_pillar": "stone", "vortex_pillar": "stone", "nebula_pillar": "stone",
     "stardust_pillar": "stone", "snowman_gangsta": "gel", "snow_balla": "gel", "nutcracker": "plant", "present_mimic": "plant",
-    "mimic": "plant", "ice_queen": "spirit", "pumpking": "plant", "headless_horseman": "flesh", "gingerbread_man": "plant"
+    "mimic": "plant", "ice_mimic": "plant", "corrupt_mimic": "plant", "crimson_mimic": "flesh", "hallowed_mimic": "plant", "ice_queen": "spirit", "pumpking": "plant", "headless_horseman": "flesh", "gingerbread_man": "plant"
   },
   "byTag": { "gel": "gel", "undead_skeleton": "bone", "construct": "metal" }
 }

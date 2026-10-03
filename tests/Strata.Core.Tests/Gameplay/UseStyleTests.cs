@@ -24,7 +24,7 @@ public class UseStyleTests
     [InlineData("bomb", UseStyle.Throw, ItemAction.Shoot)]
     [InlineData("wood_yoyo", UseStyle.Yoyo, ItemAction.Shoot)]
     [InlineData("ball_o_hurt", UseStyle.Flail, ItemAction.Shoot)]
-    [InlineData("leather_whip", UseStyle.Whip, ItemAction.Melee)]
+    [InlineData("leather_whip", UseStyle.Whip, ItemAction.Whip)]
     [InlineData("minishark", UseStyle.Gun, ItemAction.Shoot)]
     [InlineData("laser_rifle", UseStyle.Gun, ItemAction.Shoot)]
     [InlineData("wooden_bow", UseStyle.Bow, ItemAction.Shoot)]
@@ -111,9 +111,46 @@ public class UseStyleTests
         foreach (var (name, entry) in shipped.Styles)
         {
             var d = fallback.Styles[name];
-            Assert.Equal((d.Clip, d.ToolClip, d.ArmAim), (entry.Clip, entry.ToolClip, entry.ArmAim));
+            Assert.Equal((d.Clip, d.ToolClip, d.ArmAim, d.MuzzleFlash, d.TipSparks), (entry.Clip, entry.ToolClip, entry.ArmAim, entry.MuzzleFlash, entry.TipSparks));
             Assert.Equal(d.BladeCurve ?? Array.Empty<CurveKey>(), entry.BladeCurve ?? Array.Empty<CurveKey>());
         }
+    }
+
+    [Fact]
+    public void EveryShippedStyleHasAFirstPersonPose()
+    {
+        var shipped = UseStyleConfig.Load(new FileSystemDataSource(TestPaths.ProjectRoot));
+        foreach (var (name, entry) in shipped.Styles) Assert.True(entry.Fp != null, $"style {name} has no fp");
+        Assert.Equal("blade", shipped.Styles["swing"].Fp!.Curve);
+        Assert.NotNull(shipped.Styles["swing"].Fp!.ToolKeys);
+        Assert.True(shipped.Styles["gun"].Fp!.AimAtCrosshair);
+        Assert.NotNull(shipped.Styles["gun"].Fp!.Recoil);
+        Assert.True(shipped.Styles["drink"].Fp!.RaiseToFace);
+    }
+
+    [Fact]
+    public void FirstPersonKeysMustIncrease()
+    {
+        var good = UseStyleConfig.Fallback();
+        var styles = new Dictionary<string, UseStyleEntry>(good.Styles)
+        {
+            ["gun"] = new UseStyleEntry
+            {
+                Clip = "gun", ArmAim = 1f,
+                Fp = new FpStyle
+                {
+                    Curve = "wiggle",
+                    Keys = new[] { new FpKey { T = 0.5f }, new FpKey { T = 0.2f, Ease = "bounce" } },
+                    Recoil = new FpRecoil { Decay = 0f, Pos = new[] { 0f, 0f } },
+                },
+            },
+        };
+        var problems = new UseStyleConfig { Clips = good.Clips, Styles = styles }.Validate();
+        Assert.Contains("style gun: fp keys 1: t must increase", problems);
+        Assert.Contains(problems, p => p.StartsWith("style gun: fp keys 1: ease must be one of", StringComparison.Ordinal));
+        Assert.Contains(problems, p => p.StartsWith("style gun: fp curve must be one of", StringComparison.Ordinal));
+        Assert.Contains("style gun: fp recoil: decay must be within (0, 2] s", problems);
+        Assert.Contains("style gun: fp recoil: pos needs [x, y, z]", problems);
     }
 
     [Fact]

@@ -17,7 +17,21 @@
 | 13 | P3-01' bursts and reuseDelay | full headless CI green (654 Core tests, 16/16 smoke, MENU PASS) |
 | 14 | P3-18 pets and light pets, burst test isolation fix | full headless CI green (658 Core tests, 16/16 smoke, MENU PASS) |
 | 15 | X-12 photo mode, Bosses + Dungeon integration merge | full headless CI green (1234 Core tests, 17/17 smoke, MENU PASS) |
-| 16 | X-09 creator menu rows (after P2-30) | pending |
+| 16 | P3-04 swing curve (reviewed + fixed) | full headless CI green (1246 Core tests, 17/17 smoke, MENU PASS) |
+| 17 | World integration merge | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 18 | P3-47 buff and debuff visuals | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 19 | P3-06 part 1 (voxel-lit held items and wings, real block cubes in hand) | full headless CI green (1358 Core tests, 21/21 smoke, MENU PASS) |
+| 20 | P3-02/P3-03 integration merge | full headless CI green (1388 Core tests, 21/21 smoke, MENU PASS) |
+| 21 | P3-06 grip per use style, P3-07 first-person poses, swing curve from `bladeCurve`, rapier melee prefixes, mounted `sit` | full headless CI green (1390 Core tests, 21/21 smoke, MENU PASS) |
+| 22 | P3-29 hearts and mana stars (reviewed) | full headless CI green (1396 Core tests, 21/21 smoke, MENU PASS) |
+| 23 | P3-29 review fixes, P3-36 3D dropped items | full headless CI green (1398 Core tests, 21/21 smoke, MENU PASS) |
+| 24 | P3-27 sound sets and SFX voice pool | full headless CI green (1403 Core tests, 21/21 smoke, MENU PASS) |
+| 25 | W4 integration merge | full headless CI green (1458 Core tests, 21/21 smoke, MENU PASS) |
+| 26 | P3-34 bed sleep (reviewed + fixed) | full headless CI green (juice smoke re-run alone after a concurrent-run flake) |
+| 27 | X-09 creator menu rows, World slice merge, held model hidden while a yoyo/flail/whip is out | full headless CI green (1493 Core tests, 21/21 smoke, MENU PASS) |
+| 28 | NPC/Bosses slice merge (Guide book), creatures.cmds keeps the player alive | full headless CI green (1639 Core tests, 23/23 smoke, MENU PASS) |
+| 29 | Guide book fixes (3D bestiary preview, titles, opaque panel, hints, worm segment tint) | full headless CI green (1639 Core tests, 23/23 smoke, MENU PASS) |
+| — | per-style hand frames (needs a tuning pass) | open |
 
 Push 2 CI: full headless CI on the pushed head (file length, build, all Core tests, manifest/validate/coverage,
 gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke script SMOKE PASS, --menu-tour MENU PASS).
@@ -134,3 +148,91 @@ gen_reference, gen_ore_tiers, build_all --check, Godot import, every smoke scrip
   touched), lens maths in `Strata.Core.Presentation.PhotoLens`. Smoke `photo.cmds`. Gaps: Tab still opens the
   inventory in photo mode; free look ignores sensitivity/invert-Y; no gamepad; warm/cool filters are subtle.
   Autosave indicator, colour-blind filters and subtitles left to the integration session.
+
+## Push 16 notes
+* **Swing curve (P3-04)**: `SwingCurve` / `SwingPlane` in Core drive the melee hitbox (`MeleeSystem.Curve.cs`, tick-to-tick
+  sweep in 15° steps, damaging angles capped at 80° above level so wide arcs never hit behind), the trail
+  (`SwingTrail`) and the first-person arc (`ViewModel.Swing.cs`); thrusts hit only at extension ≥ 0.6. Review fix:
+  behind-the-player hits from the scaled 165° wind-up. Gaps: the third-person body clip still lags the curve (needs
+  P3-03's clips); curve constants are code, not use_styles.json (P3-02 owns that file); reforge while held does not
+  rescale the third-person blade.
+
+## Push 18 notes
+* **Status visuals (P3-47)**: `BuffDef.visual` (tint, tintStrength, particle = EffectKit recipe, color, rate, rise,
+  light). `StatusVisuals` multiplies status tints into the instance `tint` uniform (NPCs, player via
+  `PlayerAvatar.Status.cs`) and runs pooled looping emitters (`EffectKit.Status.cs`), scaled by `effectsScale`, capped by
+  presets `statusEmitters` (8/16/32/48, first come first served) and `statusLights` (0/1/2/3). 13 buffs covered; new
+  Shadowflame debuff (applied by `shadowflame_bolt`). Command `buff <id|clear> [seconds] [player|npcs]`, probe
+  `fx.status_emitters`. Gaps: no venom/electrified buffs exist; only the main body of multi-part creatures is tinted;
+  night visibility of fire sparks untuned.
+
+## Push 19 notes
+* **Held items (P3-06 part 1)**: `CreatureVisual.Lit.cs` lit attachments (held item and wings take the body's eased
+  voxel light and tint); `BlockItemMeshes` builds one cached 0.2 m cube per block id with the terrain layers
+  (`shaders/block_item.gdshader` samples the terrain arrays, no new arrays; in the shader warm-up); third person
+  `PlayerAvatar.Held.cs`, first person `ViewModel.Block.cs`. Probes `avatar.held_lit`, `avatar.wings_lit`,
+  `avatar.held_block_cube`, `view.held_block_cube`. Gaps: glass-like blocks render opaque; model-less non-block items
+  still use an unlit sprite card; grip per use style waits for P3-02.
+
+## Push 21 notes
+* **Swing curve**: `SwingCurve.Blade` now reads `use_styles.json` `styles.swing.bladeCurve` (converted −90°), the same
+  curve the P3-03 body clips use; hitbox, trail and first-person arc share it; 80° damaging cap kept.
+* **Grip (P3-06)**: held pose = style `hand` frame × inverse of the model's `grip` socket (`PlayerAvatar.Held.cs`); bow
+  and staff frames tuned in data, probe `avatar.grip_error_cm`. Gap: swing/gun/throw/holdUp/eat/yoyo/flail/whip frames
+  use the default grip and still need a screenshot-tuning pass.
+* **First person (P3-07)**: per-style `fp` blocks in `use_styles.json` (rest, keys, tool keys, curve blade/extend,
+  aimAtCrosshair, raiseToFace, recoil), `Strata.Core.Presentation.UseStyleFp`, `ViewModel.Poses.cs`; recoil per
+  `ItemUse.Shot` (bursts kick per round). Probes `fp.kicks`, `fp.recoil`, `fp.depth`. Gaps: holdUp/eat/yoyo/flail poses
+  are first guesses; yoyo/flail arm extension is not tied to the tether; aim uses the aim-distance approach (≤3°), not
+  the muzzle socket at 20 m.
+* `Prefixes.Groups`: `rapier` (shortswords) take melee prefixes; mounted players play `sit` when the clip exists.
+
+## Push 22-23 notes
+* **Hearts and stars (P3-29)**: Terraria 1.4.4 drop rules (last-hitting player, 1/6 roll, star if mana not full else
+  heart if life not full, magic bonus star, 5-9 hearts on boss defeat; own RNG stream; `data/config/pickups.json`).
+  Magnet pulls only what fits (`GameWorld.CanCollect/Collect`); `pickup` items heal on touch and never take a slot.
+  API for P3-30: `GameWorld.SpawnManaStar/SpawnHeart/SpawnPickup/ApplyPickup`. Review fixes: coins fit when tidied
+  (`Coins.FitsWhenTidy`); `PlayerInventory.Pickup` never stores pickups. Gaps: worm segment kills roll nothing; reuses
+  heal/mana sounds.
+* **3D drops (P3-36)**: `DroppedItemRenderer(.Visuals)`: real item models (async, one build per frame), block cubes,
+  billboard only as a fallback; spin + bob; additive rarity halo (`shaders/drop_halo.gdshader`); lights from the
+  DynamicLights pool capped by preset `dropLights` (0/2/4/6). Probes `dropvis.*`. Perf (headless, 150 drops spread 2 cells apart, 108 drawn after stack merging: 92 models + 16 cubes, 23 halos, 2 lights): `gd.drops` 0.172 ms/frame avg, 1.89 ms max (target < 0.5 ms met); `tick.drops` peaks 2.8 ms; two 160-200 ms frames in that run are not attributed to drops (largest listed counter 2.8 ms; not investigated). Gaps:
+  drops cast no shadows; thin swords read narrow edge-on.
+
+## Push 24 notes
+* **Sound sets (P3-27)**: `Strata.Core.Presentation.ItemSounds` (item `soundSet` > use-style `sound`/`heavySound` >
+  old fallback), `SfxVoicePool` (3 voices per sound id, steal oldest, 24 voices per 2D/3D bus, far 3D sounds skipped),
+  validator checks sound ids. 12 new synthesised sounds (`tools/audio/sfx_recipes_items.py`). Probes `sfx.*`. Gaps: no
+  listening pass; buff potions now play `potion` (louder than the old `heal`); stars/snore/piggy-bank sounds left to
+  their WPs.
+
+## Push 26-27 notes
+* **Bed sleep (P3-34)**: `GameWorld.Sleep.cs`: using a bed sets spawn and lies down; while every living player sleeps
+  safely (no boss, no kill-goal event, no hostile within 15 m) the clock runs 5x (extra ticks in multiples of 5).
+  Wakes on hurt, death, mount, grapple, bed removed or input. `GameWorld.RealTick` (clock minus sleep ticks) drives
+  per-entity staggers (liquid contact) and the once-per-second debuff damage. Held item hidden and camera at the lying
+  head while asleep. Gaps: no snore sound; puff is a plain cloud.
+* **Character creator (X-09)**: rows for all 22 hair styles, clothing (shirt/vest/coat), eye and undershirt colour, and
+  Randomize (`Appearance.Random`); the menu tour randomises and checks the saved clothing. Gap: accessories at creation.
+* **Tethered weapons**: `HeldTether.Out` hides the held model (third and first person) while a yoyo or flail is out or a
+  whip lash is drawn; probes `avatar.held_hidden`, `view.held_hidden`.
+
+## Push 28 notes
+* P5-30..32 were already built by the NPC session; the art slice's start on them was discarded. Merged
+  origin/claude/ovh-bosses: `ItemUseTable` bit 19 stays `Whip` (PlantGrass/License/HairDye moved up one); prefix melee
+  groups use `UseStyleRules.Resolve` (swing or rapier). creatures.cmds turns god mode on from the start (the player
+  could die in the first section, after which every later spawn walks off; chance, not a regression).
+* Guide book art check: portrait paths are correct (assets/icons/npcs, creatures, bosses). Tinted creatures that reuse
+  a dark model (giant worm/devourer on the Eater, pinky on gel) look only faintly tinted in their portraits: the tint
+  multiplies the vertex colours exactly as in game (re-rendered: identical), so this is the look, not a bug.
+
+## Push 29 notes
+* **Guide book fixes** (taken over from the NPC session): `GuideBook/CreaturePreview.cs` (160 px own-world SubViewport,
+  async CreatureVisual from the shared PropLibrary with the entry's tint, idle, auto-rotate and drag; still portrait
+  while loading; freed on entry/tab change and close), title boxes expand (min 200 px), `UiTheme.SolidPanel()` for the
+  book and minimap/info panel hidden while open (`GuideBookScreen.OpenChanged`), `HintToast.Suppressed` holds hints,
+  worm segments multiply the creature tint. Probes `ui.book_preview`, `ui.book_title_width`, `ui.hint_visible`
+  (guide.cmds). Gaps: preview lighting a bit dark and the zombie framed small; hotbar/life bar still visible at the
+  book's top edge; segment tint checked in code only.
+* Final-merge note: `ItemUseTable.Whip` is `1 << 19` here (PlantGrass/License/HairDye 20/21/22); World's rehearsal used
+  `1 << 22` — keep one consistent set (runtime-only flags).

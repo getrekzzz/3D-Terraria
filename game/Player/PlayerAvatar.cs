@@ -37,6 +37,7 @@ public sealed partial class PlayerAvatar : Node3D
         if (ResourceLoader.Exists("res://" + model)) _visual.SetAppearance(look);
         // Full detail up close: simplified LODs let the hair shell sink into the scalp.
         _visual.SetLodBias(8f);
+        InitializeLook(ResourceLoader.Exists("res://" + model));
     }
 
     public override void _Process(double delta)
@@ -47,12 +48,16 @@ public sealed partial class PlayerAvatar : Node3D
         int immune = entity.State.Vitals.ImmunityTicks;
         Visible = !_controller.Rig.FirstPerson && (immune <= 0 || (immune / 4) % 2 == 0); // blink while invulnerable
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
+        ExtendThrust(entity);
         UpdateCart(entity.Minecart);
         UpdateMount(entity.Mount);
         UpdateGear(delta);
         Animate(entity, (float)delta);
+        UpdateRagdoll(entity);
         _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
         UpdateArmor((float)delta);
+        UpdateStatus();
+        UpdateLook(delta);
     }
 
     /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>
@@ -86,7 +91,7 @@ public sealed partial class PlayerAvatar : Node3D
         var item = held.Item;
         if (item == _heldItem) return;
         _heldItem = item;
-        _held?.QueueFree();
+        ReleaseHeld();
         _held = null;
         LightAnchor = null;
         if (item == null || _visual == null) return;
@@ -96,13 +101,14 @@ public sealed partial class PlayerAvatar : Node3D
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
         {
             node = new MeshInstance3D { Mesh = mesh };
-            scale = HeldScale(item);
+            scale = HeldScale(item) * MeleeScale(_game, _game.Uses[item], _props, path, HeldSize(held));
         }
         else
         {
-            node = new Sprite3D { Texture = ItemIcons.Get(item), PixelSize = 0.25f / 128f, Shaded = true };
+            node = HeldFallback(item); // a block's textured cube (PlayerAvatar.Held), else the icon
         }
-        node.Transform = HeldPose(_game.Uses[item], scale);
+        node.Transform = HeldPose(_game.Uses[item], path, scale); // the style's hand frame (PlayerAvatar.Held)
+        RememberHeld(node, item, path, scale, HeldSize(held));
         _held = node;
         LightAnchor = node;
         if (Flames.Of(item, _game.Session.Content) is { } flame)
@@ -111,7 +117,7 @@ public sealed partial class PlayerAvatar : Node3D
             node.AddChild(fire);
             LightAnchor = fire;
         }
-        if (!_visual.AttachToBone("hand.R", node))
+        if (!AttachHeld(node))
         {
             node.QueueFree();
             LightAnchor = null;
@@ -153,36 +159,6 @@ public sealed partial class PlayerAvatar : Node3D
         var h = new Vector3(ride.Heading.X, 0, ride.Heading.Z);
         var basis = h.LengthSquared() > 1e-4f ? Basis.LookingAt(h.Normalized(), Vector3.Up) : Basis.Identity;
         _cart.GlobalTransform = new Transform3D(basis.Scaled(Vector3.One * 1.6f), _controller.GlobalPosition - Vector3.Up * 0.2f);
-    }
-
-    /// <summary>The hand bone's fist: where a held item's grip sits (m along the bone, past the wrist).</summary>
-    private const float Fist = 0.08f;
-
-    /// <summary>How far a bow's riser (its grip) lies from the model's origin on the string, toward −X (bgen items.bow).</summary>
-    private const float BowGrip = 0.17f;
-
-    /// <summary>
-    /// The bow clip holds the bow hand about 23° above the aim (the arm stays on the aim pitch), so the bow is set that
-    /// much forward in the fist to stand upright with its back on the aim.
-    /// </summary>
-    private static readonly float BowSet = Mathf.DegToRad(23f);
-
-    /// <summary>
-    /// How an item sits in the right fist (the hand bone: +Y along the fingers, +Z the thumb side). Items are modelled
-    /// with the grip at the origin and the business end along +Y, which points out of the thumb side: a sword is carried
-    /// point-forward and lines up with the arm when the wrist cocks for a strike, a gun with the arm for a shot. A bow
-    /// (limbs along ±Y, its back toward −X, the string on the origin) is gripped by its riser and stands upright with its
-    /// back toward the target when the bow arm is held out: limbs along the thumb side, back along the fingers.
-    /// </summary>
-    private static Transform3D HeldPose(ItemUseInfo info, float scale)
-    {
-        if (info.Style == UseStyle.Bow)
-        {
-            var upright = new Basis(Vector3.Right, -BowSet) * new Basis(new Vector3(0, -1, 0), new Vector3(0, 0, 1), new Vector3(-1, 0, 0));
-            var riser = upright * new Vector3(-BowGrip * scale, 0, 0);
-            return new Transform3D(upright.Scaled(Vector3.One * scale), new Vector3(0, Fist, 0) - riser);
-        }
-        return new Transform3D(Basis.FromEuler(new Vector3(Mathf.Pi / 2f, 0, 0)).Scaled(Vector3.One * scale), new Vector3(0, Fist, 0));
     }
 
     /// <summary>

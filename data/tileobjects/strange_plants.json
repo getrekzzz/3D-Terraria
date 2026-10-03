@@ -1,0 +1,33 @@
+{
+  // P5-22 Strange Plants: four rare wild plants (DecorationPass grows about one per 2000 grass tops, on the surface
+  // and in the underground jungle) that drop a Strange Plant, and the rare dyes the Dye Trader's 'Trade' rolls from
+  // the dye_trader_trade table for one. One entry per line.
+  "tileObjects": [
+    {"id": "strange_plant_1_plant", "name": "Strange Plant", "size": [1, 1, 1], "decor": true, "natural": true, "loot": "strange_plant_1_pick", "tags": ["strange_plant"]},
+    {"id": "strange_plant_2_plant", "name": "Strange Plant", "size": [1, 1, 1], "decor": true, "natural": true, "loot": "strange_plant_2_pick", "tags": ["strange_plant"]},
+    {"id": "strange_plant_3_plant", "name": "Strange Plant", "size": [1, 1, 1], "decor": true, "natural": true, "loot": "strange_plant_3_pick", "tags": ["strange_plant"]},
+    {"id": "strange_plant_4_plant", "name": "Strange Plant", "size": [1, 1, 1], "decor": true, "natural": true, "loot": "strange_plant_4_pick", "tags": ["strange_plant"]}
+  ],
+  "items": [
+    {"id": "strange_plant_1", "name": "Strange Plant", "description": "The Dye Trader would trade a rare dye for this.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 2500, "tags": ["strange_plant"]},
+    {"id": "strange_plant_2", "name": "Strange Plant", "description": "The Dye Trader would trade a rare dye for this.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 2500, "tags": ["strange_plant"]},
+    {"id": "strange_plant_3", "name": "Strange Plant", "description": "The Dye Trader would trade a rare dye for this.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 2500, "tags": ["strange_plant"]},
+    {"id": "strange_plant_4", "name": "Strange Plant", "description": "The Dye Trader would trade a rare dye for this.", "category": "material", "rarity": 1, "maxStack": 9999, "value": 2500, "tags": ["strange_plant"]},
+    {"id": "acid_dye", "name": "Acid Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "red_acid_dye", "name": "Red Acid Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "blue_acid_dye", "name": "Blue Acid Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "mushroom_dye", "name": "Mushroom Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "purple_ooze_dye", "name": "Purple Ooze Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "reflective_dye", "name": "Reflective Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "gel_dye", "name": "Gel Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "negative_dye", "name": "Negative Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]},
+    {"id": "shadow_dye", "name": "Shadow Dye", "description": "Dye", "category": "dye", "rarity": 2, "maxStack": 9999, "value": 15000, "tags": ["dye", "rare_dye"]}
+  ],
+  "lootTables": [
+    {"id": "strange_plant_1_pick", "entries": [{"item": "strange_plant_1", "min": 1, "max": 1, "chance": 1}]},
+    {"id": "strange_plant_2_pick", "entries": [{"item": "strange_plant_2", "min": 1, "max": 1, "chance": 1}]},
+    {"id": "strange_plant_3_pick", "entries": [{"item": "strange_plant_3", "min": 1, "max": 1, "chance": 1}]},
+    {"id": "strange_plant_4_pick", "entries": [{"item": "strange_plant_4", "min": 1, "max": 1, "chance": 1}]},
+    {"id": "dye_trader_trade", "mode": "weighted", "rolls": 1, "entries": [{"item": "acid_dye", "min": 1, "max": 1}, {"item": "red_acid_dye", "min": 1, "max": 1}, {"item": "blue_acid_dye", "min": 1, "max": 1}, {"item": "mushroom_dye", "min": 1, "max": 1}, {"item": "purple_ooze_dye", "min": 1, "max": 1}, {"item": "reflective_dye", "min": 1, "max": 1}, {"item": "gel_dye", "min": 1, "max": 1}, {"item": "negative_dye", "min": 1, "max": 1}, {"item": "shadow_dye", "min": 1, "max": 1}]}
+  ]
+}

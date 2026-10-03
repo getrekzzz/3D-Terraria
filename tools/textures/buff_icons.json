@@ -19,6 +19,7 @@
   "cursed":            { "glyph": "skull",          "fg": "#c0a0f0", "bg": "#2a1a44" },
   "ichor":             { "glyph": "blood_drop",     "fg": "#f0c030", "bg": "#4a3810" },
   "cursed_inferno":    { "glyph": "flame",          "fg": "#90f040", "bg": "#183a0c" },
+  "shadowflame":       { "glyph": "flame",          "fg": "#b070ff", "bg": "#2a1048" },
   "frostburn":         { "glyph": "flame",          "fg": "#8ae0ff", "bg": "#10304c" },
   "confused":          { "glyph": "swirl",          "fg": "#d090ff", "bg": "#2c1a4c" },
   "night_owl":         { "glyph": "eye",            "fg": "#e8c060", "bg": "#1e2034" },
@@ -48,5 +49,13 @@
   "bunny_mount":       { "glyph": "boot",           "fg": "#e8dcc8", "bg": "#3a3226" },
   "bee_mount":         { "glyph": "honey",          "fg": "#f0c030", "bg": "#4e3410" },
   "ufo_mount":         { "glyph": "ufo",            "fg": "#80e0a0", "bg": "#123a24" },
-  "monster_banner":    { "glyph": "pirate_flag",    "fg": "#d8c070", "bg": "#3a2a14" }
+  "monster_banner":    { "glyph": "pirate_flag",    "fg": "#d8c070", "bg": "#3a2a14" },
+  "leather_whip_tag":  { "glyph": "chain",          "fg": "#c08a50", "bg": "#3a2614" },
+  "snapthorn_tag":     { "glyph": "chain",          "fg": "#7ad04a", "bg": "#1e3a12" },
+  "dryads_ward":       { "glyph": "shield",         "fg": "#90e070", "bg": "#1e3a16" },
+  "happy":             { "glyph": "sun",            "fg": "#ffe050", "bg": "#4a3a10" },
+  "bewitched":         { "glyph": "minion",         "fg": "#c090ff", "bg": "#2c1a48" },
+  "tipsy":             { "glyph": "food",           "fg": "#e0a040", "bg": "#4a2e10" },
+  "clairvoyance":      { "glyph": "crystal",        "fg": "#c0a0ff", "bg": "#2a1a4a" },
+  "sugar_rush":        { "glyph": "food",           "fg": "#ff90c0", "bg": "#4a1a32" }
 }

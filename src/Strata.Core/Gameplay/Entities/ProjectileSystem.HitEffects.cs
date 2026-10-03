@@ -9,6 +9,25 @@ namespace Strata.Core.Gameplay.Entities;
 /// </summary>
 public sealed partial class ProjectileSystem
 {
+    /// <summary>
+    /// The projectile stopped against the terrain: its <see cref="DropItemParams"/> items are left just short of the
+    /// surface it struck, resting (no pickup delay beyond the usual).
+    /// </summary>
+    private void Land(Projectile p)
+    {
+        bool drops = false;
+        foreach (var spec in p.Def.OnHit)
+        {
+            if (spec.Type != ProjectileHitSpecs.DropItem) continue;
+            var d = spec.Parse<DropItemParams>();
+            if (!_world.Session.Content.Items.TryGet(d.Item, out var item)) continue;
+            var back = p.Velocity.LengthSquared() > 1e-4f ? Vector3.Normalize(p.Velocity) * 0.25f : Vector3.Zero;
+            _world.Drops.Spawn(new Items.ItemStack(item, d.Count), p.Position - back + Vector3.UnitY * 0.1f, Vector3.Zero);
+            drops = true;
+        }
+        if (drops) Landed?.Invoke(p);
+    }
+
     /// <summary>Heals the owner by <see cref="LifeStealParams.Fraction"/> of the damage dealt (at least 1), floating the heal.</summary>
     private void StealLife(Projectile p, int dealt, LifeStealParams s)
     {

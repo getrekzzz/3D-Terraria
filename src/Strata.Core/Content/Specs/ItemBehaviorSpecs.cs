@@ -6,6 +6,9 @@ public static class ItemBehaviorSpecs
     public const string MeleeSwing = "meleeSwing";
     public const string Thrust = "thrust";
     public const string ShootProjectile = "shootProjectile";
+
+    /// <summary>A whip: lashes along a path, hitting every creature on it, and tags them for minions (P3-14).</summary>
+    public const string Whip = "whip";
     public const string MineTool = "mineTool";
     public const string ChopTool = "chopTool";
     public const string HammerTool = "hammerTool";
@@ -47,11 +50,21 @@ public static class ItemBehaviorSpecs
     /// <summary>Paints the aimed block with the first paint in the backpack, or scrapes paint off (Paintbrush, Paint Scraper).</summary>
     public const string PaintTool = "paint";
 
+    /// <summary>Grass seeds: the aimed top block (one of <c>on</c>) turns into <c>grass</c>; one seed is used.</summary>
+    public const string PlantGrass = "plantGrass";
+
+    /// <summary>A town pet license (Cat, Dog, Bunny): sets world flag <c>flag</c> once; a used license is refused.</summary>
+    public const string License = "license";
+
+    /// <summary>Dyes the user's hair (Life, Mana, Depth, Money, Time… Hair Dye; the remover clears it).</summary>
+    public const string HairDye = "hairDye";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<MeleeSwingParams>(SpecKind.ItemBehavior, MeleeSwing);
         c.Register<ThrustParams>(SpecKind.ItemBehavior, Thrust);
         c.Register<ShootProjectileParams>(SpecKind.ItemBehavior, ShootProjectile);
+        c.Register<WhipParams>(SpecKind.ItemBehavior, Whip);
         c.Register<ToolParams>(SpecKind.ItemBehavior, MineTool);
         c.Register<ToolParams>(SpecKind.ItemBehavior, ChopTool);
         c.Register<ToolParams>(SpecKind.ItemBehavior, HammerTool);
@@ -72,6 +85,9 @@ public static class ItemBehaviorSpecs
         c.Register<MinecartParams>(SpecKind.ItemBehavior, Minecart);
         c.Register<Gameplay.Mounts.MountParams>(SpecKind.ItemBehavior, Mount);
         c.Register<PaintToolParams>(SpecKind.ItemBehavior, PaintTool);
+        c.Register<PlantGrassParams>(SpecKind.ItemBehavior, PlantGrass);
+        c.Register<LicenseParams>(SpecKind.ItemBehavior, License);
+        c.Register<HairDyeParams>(SpecKind.ItemBehavior, HairDye);
     }
 }
 
@@ -101,7 +117,17 @@ public sealed class GrappleParams : SpecParams, IValidatableSpec
     /// <summary>Chain colour (hex).</summary>
     public string Color { get; init; } = "#9a9aa4";
 
-    public string? Validate() => Reach <= 0 || Speed <= 0 || Pull <= 0 ? "reach, speed and pull must be > 0" : null;
+    /// <summary>The item whose model is drawn as the hook's head (null = the hook item itself; P3-17').</summary>
+    public string? Head { get; init; }
+
+    /// <summary>How the line is drawn: <c>links</c> (a metal chain), <c>vine</c> (Ivy Whip) or <c>gem</c> (glowing gem links).</summary>
+    public string Chain { get; init; } = "links";
+
+    public static readonly string[] Chains = { "links", "vine", "gem" };
+
+    public string? Validate() =>
+        Reach <= 0 || Speed <= 0 || Pull <= 0 ? "reach, speed and pull must be > 0"
+        : Array.IndexOf(Chains, Chain) < 0 ? $"chain must be one of {string.Join(", ", Chains)}" : null;
 }
 
 public sealed class ThrustParams : SpecParams
@@ -123,10 +149,25 @@ public sealed class ShootProjectileParams : SpecParams, IValidatableSpec
     /// <summary>The live-projectile limit for a projectile that returns after <paramref name="returns"/> ticks (0 = none).</summary>
     public int Limit(int returns) => MaxActive ?? (returns > 0 ? 1 : 0);
 
+    /// <summary>
+    /// Where the shot starts: "muzzle" (the weapon's business end, the default), "sky" (<see cref="SkyHeight"/> above the
+    /// crosshair point, scattered by <see cref="SkyScatter"/>, falling onto it: Starfury, Daedalus Stormbow, Star Wrath),
+    /// "cursor" (at the crosshair point) or "eye". Minions always appear at the crosshair point.
+    /// </summary>
+    public string From { get; init; } = "muzzle";
+
+    /// <summary>Metres above the crosshair point a sky shot starts.</summary>
+    public float SkyHeight { get; init; } = 16f;
+
+    /// <summary>Metres a sky shot's start may stray sideways (it still falls onto the crosshair point).</summary>
+    public float SkyScatter { get; init; } = 3f;
+
     public string? Validate() =>
         Count < 1 ? "count must be >= 1"
         : MaxActive < 0 ? "maxActive must be >= 0"
-        : MaxActive > 0 && Count > MaxActive ? "count must not exceed maxActive (the weapon could never fire)" : null;
+        : MaxActive > 0 && Count > MaxActive ? "count must not exceed maxActive (the weapon could never fire)"
+        : From is not ("muzzle" or "sky" or "cursor" or "eye") ? "from must be muzzle, sky, cursor or eye"
+        : SkyHeight is <= 0f or > 64f || SkyScatter is < 0f or > 16f ? "skyHeight must be within (0, 64] and skyScatter within [0, 16]" : null;
 }
 
 public sealed class ToolParams : SpecParams
@@ -319,4 +360,23 @@ public sealed class MinecartParams : SpecParams
 public sealed class PaintToolParams : SpecParams
 {
     public bool Scrape { get; init; }
+}
+
+public sealed class PlantGrassParams : SpecParams, IValidatableSpec
+{
+    /// <summary>The grass block the seeds grow into.</summary>
+    public string Grass { get; init; } = "";
+
+    /// <summary>Blocks the seeds take on (dirt for Grass Seeds, mud for Jungle and Mushroom Grass Seeds).</summary>
+    public string[] On { get; init; } = Array.Empty<string>();
+
+    public string? Validate() => Grass.Length == 0 || On.Length == 0 ? "plantGrass needs grass and on" : null;
+}
+
+public sealed class LicenseParams : SpecParams, IValidatableSpec
+{
+    /// <summary>The world flag the license sets (a pet's arrival waits for it).</summary>
+    public string Flag { get; init; } = "";
+
+    public string? Validate() => Flag.Length == 0 ? "license needs a flag" : null;
 }

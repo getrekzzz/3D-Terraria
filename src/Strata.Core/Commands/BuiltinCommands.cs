@@ -20,12 +20,17 @@ public static class BuiltinCommands
         CombatCommands.Register(r);
         LiquidCommands.Register(r);
         TownCommands.Register(r);
+        HousingCommands.Register(r);
         InventoryCommands.Register(r);
         WorldCommands.Register(r);
         WeatherCommands.Register(r);
+        SignCommands.Register(r);
+        StarfallCommands.Register(r);
         FishingCommands.Register(r);
         SeasonCommands.Register(r);
         PerfCommands.Register(r);
+        GuideCommands.Register(r);
+        HintCommands.Register(r);
         return r;
     }
 
@@ -60,6 +65,11 @@ public static class BuiltinCommands
                 var id = a.Str(0, "item");
                 if (!content.Items.TryGet(id, out var item)) throw new CommandException($"unknown item '{id}'");
                 int count = Math.Clamp(a.OptInt(1, 1), 1, 99_999);
+                if (item.Pickup != null)
+                {
+                    ctx.World.ApplyPickup(ctx.Player, new ItemStack(item, count)); // Hearts and Stars heal, never stored
+                    return CommandResult.Success($"Applied {count}x {item.DisplayName}.");
+                }
                 var rest = ctx.Player.State.Inventory.Pickup(new ItemStack(item, count));
                 return CommandResult.Success($"Gave {count - rest.Count}x {item.DisplayName}" + (rest.IsEmpty ? "" : $" ({rest.Count} did not fit)"));
             },

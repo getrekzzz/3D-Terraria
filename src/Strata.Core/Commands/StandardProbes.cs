@@ -31,7 +31,10 @@ internal static class StandardProbes
         ctx.AddProbe("player.hotbar", () => ctx.Player.State.Inventory.SelectedHotbar); // 0-based
         ctx.AddProbe("time.hour", () => w.Session.Clock.Hour);
         ctx.AddProbe("time.day", () => w.Session.Clock.IsDay ? 1 : 0);
+        ctx.AddProbe("time.scale", () => w.TimeScale);
+        ctx.AddProbe("player.sleeping", () => ctx.Player.Sleeping ? 1 : 0);
         ctx.AddProbe("drops.count", () => w.Drops.Items.Count);
+        ctx.AddPrefixProbe("drops.", id => w.Session.Content.Items.Contains(id) ? w.Drops.Items.Where(d => d.Stack.Item?.Id == id).Sum(d => d.Stack.Count) : null);
         ctx.AddProbe("chunks.loaded", () => w.Streamer.LoadedCount);
         ctx.AddProbe("chunks.meshed", () => w.Streamer.MeshedCount);
         ctx.AddProbe("stream.idle", () => w.Streamer.IsIdle && w.Jobs.Idle ? 1 : 0);
@@ -43,13 +46,23 @@ internal static class StandardProbes
         ctx.AddProbe("pets.active", () => w.Projectiles.PetCount(lights: false));
         ctx.AddProbe("pets.lights", () => w.Projectiles.PetCount(lights: true));
         ctx.AddProbe("melee.swings", () => w.Melee.ActiveSwings);
+        // The last melee hit only (any player, any creature; a later hit overwrites it): the blade's curve angle (0 ahead, 90 up; -999 for a thrust or before any hit) and the
+        // struck creature's distance from the swing pivot or thrust origin (m; -1 before any hit).
+        ctx.AddProbe("melee.hit_deg", () => w.Melee.LastHit is { BladeDeg: var d } && !float.IsNaN(d) ? d : -999);
+        ctx.AddProbe("melee.hit_dist", () => w.Melee.LastHit?.Distance ?? -1);
         ctx.AddProbe("liquid.active", () => w.Liquids.ActiveCells);
-        ctx.AddProbe("house.valid", () => w.Housing.Scan(ctx.Player.FeetCell + Int3.Up).Valid ? 1 : 0);
+        ctx.AddProbe("house.valid", () => w.Rooms.Get(ctx.Player.FeetCell + Int3.Up)!.Valid ? 1 : 0);
+        ctx.AddProbe("house.scans", () => w.Rooms.Scans);
         ctx.AddProbe("liquid.steps", () => w.Liquids.Steps);
         // Voxel light at the player's head (0–15; -1 before the chunk is lit) and the sky map's column top.
         ctx.AddProbe("light.sky", () => HeadLight(w, ctx, block: false));
         ctx.AddProbe("light.block", () => HeadLight(w, ctx, block: true));
         ctx.AddProbe("sky.top", () => w.Session.Sky.SkyTop(ctx.Player.FeetCell.X, ctx.Player.FeetCell.Z));
+        // Where the player is in the world's layers (0 space, 1 sky, 2 surface, 3 underground, 4 cavern, 5 underworld), cells
+        // into the ground from the nearest exposed surface, and whether the world is a Don't Dig Up one (layers inverted).
+        ctx.AddProbe("player.layer", () => (int)w.Session.ContextAt(ctx.Player.FeetCell).Layer);
+        ctx.AddProbe("player.depth", () => w.Session.ContextAt(ctx.Player.FeetCell).Depth);
+        ctx.AddProbe("world.inverted", () => w.Session.Generator.Plan.Bands.Inverted ? 1 : 0);
         ctx.AddProbe("mutation.level", () => w.Session.Mutations.Level);
         ctx.AddProbe("mutation.behind", () => w.Mutations.Behind);
         ctx.AddProbe("spread.conversions", () => w.Spread.Conversions);

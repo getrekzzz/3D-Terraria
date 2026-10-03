@@ -22,7 +22,7 @@ public static class LightEngine
     public const int ShadeLight = 12;
 
     public static ushort[] Compute(Neighborhood nb, RenderTables tables, Func<int, int, int> skyTop, IReadOnlyList<LightSource> sources,
-        ushort[]? into = null, Func<int, int, int>? shadeTop = null)
+        ushort[]? into = null, Func<int, int, int>? shadeTop = null, Func<int, int, int>? shadeCap = null)
     {
         var light = into ?? new ushort[Neighborhood.Volume];
         Array.Clear(light);
@@ -61,7 +61,9 @@ public static class LightEngine
                 {
                     int top = tops[z * N + x];
                     int shade = Math.Clamp(shadeTop(nb.Origin.X + x, nb.Origin.Z + z) - nb.Origin.Y, 0, N);
-                    for (int y = shade; y < top; y++)
+                    // Under a Don't Dig Up world's rock roof the shade ends at the roof (the caves above stay dark).
+                    int end = shadeCap == null ? top : Math.Min(top, (int)Math.Clamp((long)shadeCap(nb.Origin.X + x, nb.Origin.Z + z) - nb.Origin.Y, 0, N));
+                    for (int y = shade; y < end; y++)
                     {
                         int i = Neighborhood.Index(x, y, z);
                         if (filter[blocks[i]] != 0 || liquids[i] != 0 || LightValue.Sky(light[i]) >= ShadeLight) continue;

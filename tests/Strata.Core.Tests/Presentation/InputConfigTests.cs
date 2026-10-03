@@ -106,6 +106,32 @@ public class InputConfigTests
     }
 
     [Fact]
+    public void OptionalActionsMayShipUnboundButRequiredOnesMayNot()
+    {
+        var actions = Shipped().Actions.ToDictionary(p => p.Key, p => p.Value);
+        Assert.Empty(actions["housing"]); // the inventory's Housing tab opens it; the player may bind a key
+        actions["interact"] = System.Array.Empty<string>();
+        var problems = new InputConfig { Actions = actions }.Validate();
+        Assert.Contains("interact has no bindings", problems);
+        Assert.DoesNotContain(problems, p => p.StartsWith("housing"));
+    }
+
+    [Fact]
+    public void GameplayKeysAreNotSharedExceptChatAndThePhotoShot()
+    {
+        // Every gameplay key does one thing; Enter opens the chat, and takes the picture only inside photo mode.
+        var owners = new Dictionary<string, string>();
+        var clashes = new List<string>();
+        foreach (var (action, list) in Shipped().Actions)
+        {
+            if (InputConfig.IsScreenAction(action)) continue;
+            foreach (var b in list)
+                if (b.StartsWith("key:") && !owners.TryAdd(b, action)) clashes.Add($"{b}: {owners[b]} and {action}");
+        }
+        Assert.Equal(new[] { "key:Enter: chat and photo_shot" }, clashes);
+    }
+
+    [Fact]
     public void PadTuningIsRangeChecked()
     {
         var config = new InputConfig

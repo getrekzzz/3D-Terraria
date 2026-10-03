@@ -127,7 +127,7 @@ public sealed partial class PlayerController : CharacterBody3D
             return;
         }
         if (Entity.ExternalVelocity != System.Numerics.Vector3.Zero) Entity.Minecart = null; // the tongue drags you out of a cart
-        if (UpdateMinecart(dt) || UpdateMount(dt) || UpdatePhase())
+        if (UpdateSleep() || UpdateMinecart(dt) || UpdateMount(dt) || UpdatePhase())
         {
             ReelInHook(dt);
             return;
@@ -176,6 +176,7 @@ public sealed partial class PlayerController : CharacterBody3D
         var before = GlobalPosition;
         MoveAndSlide();
         if (IsOnFloor() && IsOnWall() && wish.LengthSquared() > 0.01f) TryStepUp(before, wish);
+        Unbury();
         TrackFall();
         UpdateSounds(dt);
         Sync();

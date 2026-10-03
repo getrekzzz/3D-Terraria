@@ -57,6 +57,13 @@ public enum EquipSlot
     None, Head, Body, Legs, Accessory, Pet, LightPet, Minecart, Mount, Hook,
 }
 
+/// <summary>What touching a pickup item restores (Terraria's Heart: 20 life; Star: 100 mana).</summary>
+public sealed class PickupEffect
+{
+    public int HealLife { get; init; }
+    public int HealMana { get; init; }
+}
+
 public sealed class BuffApplication
 {
     public string Id { get; init; } = "";
@@ -84,6 +91,9 @@ public sealed class ItemDef : ContentDef
 
     // --- Use ---
     public UseStyle UseStyle { get; init; } = UseStyle.None;
+
+    /// <summary>Chance (0–1) a shot keeps its ammo (Megashark 0.5), on top of ammo-saving gear.</summary>
+    public float AmmoSaveChance { get; init; }
     public int UseTime { get; init; } = 20;
     public int UseAnimation { get; init; } = 20;
     public bool AutoReuse { get; init; }
@@ -162,6 +172,15 @@ public sealed class ItemDef : ContentDef
     // --- Consumption ---
     public int HealLife { get; init; }
     public int HealMana { get; init; }
+
+    /// <summary>A pickup (Heart, Star): applied when touched and never stored, so it needs no free slot.</summary>
+    public PickupEffect? Pickup { get; init; }
+
+    /// <summary>Lies where it is dropped, drifting and bobbing (souls).</summary>
+    public bool NoGravity { get; init; }
+
+    /// <summary>Drawn glowing and pulsing on the ground (Heart, Star, Fallen Star).</summary>
+    public bool Glows { get; init; }
     public BuffApplication? Buff { get; init; }
 
     // --- Placement ---
@@ -170,6 +189,9 @@ public sealed class ItemDef : ContentDef
 
     /// <summary>Light emitted while held, [r, g, b] 0–15.</summary>
     public int[]? HeldLight { get; init; }
+
+    /// <summary>Left on the ground, it vanishes when day breaks (Fallen Stars, P3-30).</summary>
+    public bool FadesAtDawn { get; init; }
 
     // --- Presentation ---
     public string? Model { get; init; }

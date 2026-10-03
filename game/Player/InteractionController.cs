@@ -86,15 +86,23 @@ public sealed partial class InteractionController : Node
         bool held = overlay ? UI.InputGate.WorldPointer : Input.IsActionPressed(UsePrimary);
         bool fresh = overlay ? tapped || (held && !_useHeld) : Input.IsActionJustPressed(UsePrimary);
         _useHeld = held;
+        Entity.UseHeld = false; // yoyos and flails stay out only while the button is held (P3-12)
         if (!Enabled || _player.Frozen || !Entity.Alive || UI.InputGate.HotkeysBlocked) return;
+        if (Entity.Sleeping || _player.WokeFrame == Engine.GetPhysicsFrames()) return; // in bed, or the press got them up (P3-34)
 
-        if ((fresh || held) && !useBlocked)
+        Entity.UseHeld = (fresh || held) && !useBlocked;
+        if (Entity.UseHeld)
         {
             var outcome = Game.ItemUse.Use(Entity, Target, fresh);
             if (outcome is not (UseOutcome.None or UseOutcome.Cooldown)) Used?.Invoke(outcome);
         }
         // A right click on a panel is not one on the world: with a screen open only the interact key reaches objects.
         bool interact = (!overlay && Input.IsActionJustPressed(UseSecondary)) || Input.IsActionJustPressed(InteractAction);
+        if (interact && TalkTarget is { Def.Kind: Strata.Core.Content.Defs.TownNpcKind.Pet } pet)
+        {
+            Game.Town.PetAnimal(pet, Entity); // Terraria: a town pet is petted, not talked to
+            return;
+        }
         if (interact && TalkTarget is { } resident && Game.Town.BeginTalk(resident, Entity))
         {
             TalkRequested?.Invoke(resident);

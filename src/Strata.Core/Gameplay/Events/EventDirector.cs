@@ -178,7 +178,7 @@ public sealed class EventDirector
     {
         var session = _world.Session;
         var ctx = session.ContextAt(session.SpawnCell);
-        ctx.Residents = _world.Town.Residents.Where(r => r.Alive).Select(r => r.Def.Id).ToHashSet(); // a party needs its host
+        _world.Town.FillTownFacts(ctx); // a party needs its host alive and in town
         ctx.PlayerMaxLife = _world.Players.Count == 0 ? 0 : _world.Players.Max(p => p.State.Vitals.MaxLife); // Blood Moon, invasions
         ctx.PlayerDefense = _world.Players.Count == 0 ? 0 : _world.Players.Max(p => p.State.Defense); // the Eye's arrival
         List<(string Group, List<EventDef> Members)>? groups = null;

@@ -102,21 +102,38 @@ public static class CombatCommands
                 var id = a.OptStr(0);
                 if (id != null && !ctx.World.Session.Content.Enemies.Contains(id)) throw new CommandException($"unknown enemy '{id}'");
                 var victims = ctx.World.Npcs.All.Where(n => n.Alive && (id == null || n.Def.Id == id)).ToList();
-                foreach (var n in victims) ctx.World.Npcs.Kill(n);
+                foreach (var n in victims)
+                {
+                    n.LastAttacker ??= ctx.Player; // slain by the player: their Hearts and Stars can drop
+                    ctx.World.Npcs.Kill(n);
+                }
                 return CommandResult.Success($"Slew {victims.Count} creatures.");
             },
         });
         r.Register(new CommandDef
         {
-            Name = "hurt", Usage = "hurt <amount>", Help = "Hurts the player, ignoring defense and invulnerability (a number shows and the hurt sound plays).",
+            Name = "hurt", Usage = "hurt <life> [mana]", Help = "Hurts the player by life (never below 1), ignoring defense and invulnerability (a number shows and the hurt sound plays), and takes mana.",
             Run = (ctx, a) =>
             {
-                int amount = a.Int(0, "amount");
-                if (amount <= 0) throw new CommandException("amount must be positive");
+                int life = a.Int(0, "life");
+                if (life < 0) throw new CommandException("life must not be negative");
                 var p = ctx.Player;
                 if (!p.Alive) throw new CommandException("the player is dead");
-                ctx.World.HurtPlayerDirect(p, amount, harm: Gameplay.Combat.Harm.Other);
-                return CommandResult.Success($"Life {p.State.Vitals.Life}/{p.State.Vitals.MaxLife}.");
+                var v = p.State.Vitals;
+                ctx.World.HurtPlayerDirect(p, Math.Min(life, v.Life - 1), harm: Gameplay.Combat.Harm.Other);
+                v.Mana = Math.Max(0, v.Mana - Math.Max(0, a.OptInt(1, 0)));
+                return CommandResult.Success($"Life {v.Life}/{v.MaxLife}, mana {v.Mana}/{v.MaxMana}.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "pickups", Usage = "pickups always|default", Help = "Debug: every kill rolls its Heart or Star (always), or Terraria's odds again.",
+            Run = (ctx, a) =>
+            {
+                var cfg = ctx.World.Drops.Config;
+                bool always = a.Str(0, "mode") == "always";
+                (cfg.DropOneIn, cfg.StarChance, cfg.HeartChance) = always ? (1, 1f, 1f) : (6, 0.5f, 0.5f);
+                return CommandResult.Success(always ? "Every kill drops a pickup." : "Pickup odds restored.");
             },
         });
         r.Register(new CommandDef
@@ -190,6 +207,37 @@ public static class CombatCommands
                     _ => throw new CommandException("expected on or off"),
                 };
                 return CommandResult.Success(ctx.World.Npcs.Paused ? "Creatures frozen." : "Creatures moving.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "buff", Usage = "buff <id|clear> [seconds] [player|npcs]",
+            Help = "Applies a buff or debuff (default duration) to the player or every living creature; 'clear' removes all non-persistent ones.",
+            Run = (ctx, a) =>
+            {
+                var id = a.Str(0, "id");
+                bool npcs = a.OptStr(2) == "npcs";
+                if (id == "clear")
+                {
+                    if (npcs) foreach (var n in ctx.World.Npcs.All) n.Buffs.ClearNonPersistent();
+                    else ctx.Player.State.Buffs.ClearNonPersistent();
+                    return CommandResult.Success("Buffs cleared.");
+                }
+                var content = ctx.World.Session.Content;
+                if (!content.Buffs.TryGet(id, out var def)) throw new CommandException($"unknown buff '{id}'");
+                int ticks = a.Count > 1 ? (int)(a.Float(1, "seconds") * 60) : def.Duration;
+                if (!npcs)
+                {
+                    ctx.Player.State.Buffs.Add(def, ticks);
+                    return CommandResult.Success($"{def.DisplayName} on the player.");
+                }
+                int count = 0;
+                foreach (var n in ctx.World.Npcs.All.Where(n => n.Alive).ToList())
+                {
+                    ctx.World.Npcs.AddBuff(n, def, ticks);
+                    count++;
+                }
+                return CommandResult.Success($"{def.DisplayName} on {count} creatures.");
             },
         });
         r.Register(new CommandDef

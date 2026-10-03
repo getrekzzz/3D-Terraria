@@ -16,6 +16,18 @@ public sealed class Projectile
     public required ProjectileDef Def { get; init; }
     public Vector3 Position;
     public Vector3 Velocity;
+
+    /// <summary>Where the shot started (the muzzle, the sky…), for muzzle flashes and trails.</summary>
+    public Vector3 SpawnOrigin;
+
+    /// <summary>A flail's phase (P3-13): whirling at the hand while held, then flying out once let go.</summary>
+    public bool Launched;
+
+    /// <summary>Ticks since the flail was let go.</summary>
+    public int LaunchedAge;
+
+    /// <summary>Fired by a minion (counts as a minion hit: whip tags add their damage).</summary>
+    public bool FromMinion;
     public required PlayerEntity? Owner { get; init; }
     public required int Damage { get; init; }
     public required float Knockback { get; init; }
@@ -91,16 +103,24 @@ public sealed partial class ProjectileSystem
     /// <summary>A projectile ended (hit, expired or stopped) at its current position.</summary>
     public event Action<Projectile>? Removed;
 
+    /// <summary>A projectile came to rest on the terrain and left its <c>dropItem</c> there (a Fallen Star landing; before <see cref="Removed"/>).</summary>
+    public event Action<Projectile>? Landed;
+
+    /// <summary>A projectile struck the terrain (once per bounce): the point struck and the block there — impact dust and sound.</summary>
+    public event Action<Projectile, Vector3, ushort>? HitTerrain;
+
     /// <summary>An explosion went off (position, radius in metres) — flash, smoke and sound.</summary>
     public event Action<Vector3, float>? Exploded;
 
-    /// <summary>A shot leaves the weapon hand (<see cref="ShotGeometry"/>) and flies at the crosshair point, spread around that line.</summary>
+    /// <summary>
+    /// A shot leaves the weapon's business end (or falls from the sky, or appears at the crosshair: <see cref="ShotStart"/>)
+    /// and flies at the crosshair point, spread around that line.
+    /// </summary>
     private void Fire(ShotRequest shot)
     {
         var p = shot.Player;
         var spread = shot.Weapon.Shoot!.Spread * MathF.PI / 180f;
-        var from = ShotGeometry.Origin(_world.Session.World, p);
-        var dir = ShotGeometry.Direction(p, from);
+        var (from, dir) = ShotStart(shot);
         if (spread > 0)
         {
             var side = Vector3.Normalize(Vector3.Cross(dir, Vector3.UnitY) + new Vector3(1e-4f, 0, 0));
@@ -117,6 +137,7 @@ public sealed partial class ProjectileSystem
         {
             Id = _nextId++, Def = def, Position = position, Velocity = velocity, Owner = owner, Damage = damage, Knockback = knockback,
             DamageClass = damageClass, Crit = crit, PierceLeft = def.Pierce, BouncesLeft = def.Bounces, Source = source, PetSlot = petSlot,
+            SpawnOrigin = position, // set before Spawned is raised: shot effects read it (P3-10)
         };
         if (def.Minion != null && owner != null) MakeRoomForMinion(owner, def.Minion);
         _items.Add(proj);
@@ -137,7 +158,7 @@ public sealed partial class ProjectileSystem
                 if (!TickPet(p, dt)) End(i);
                 continue;
             }
-            if (p.Def.Minion != null || p.Def.Bobber || p.Returning || p.LatchedTo != null)
+            if (p.Def.Minion != null || p.Def.Bobber || p.Returning || p.LatchedTo != null || p.Def.Tether != null)
             {
                 if (!TickSpecial(p, dt)) End(i);
                 continue;
@@ -157,13 +178,22 @@ public sealed partial class ProjectileSystem
             if (p.Def.Drag > 0) p.Velocity *= 1f - p.Def.Drag * dt;
             if (p.Def.Homing > 0) Steer(p, dt);
             if (p.Def.Guided > 0) Guide(p, dt);
-            if (p.Def.CollideTerrain && !MoveThroughTerrain(p, dt))
+            bool moved = !p.Def.CollideTerrain || MoveThroughTerrain(p, dt);
+            if (!p.Def.CollideTerrain) p.Position += p.Velocity * dt;
+            // Friendly shots smash pots and mow grass they pass through, and fly on (P3-23); a shot stopped by the
+            // ground still cuts the tuft it landed in.
+            if (p.Def.Friendly && p.Owner != null && world.TileObjects.At(VoxelMotion.CellOf(p.Position)) is { Def.BreakByAttack: true } struck)
+                _world.Editor.SmashObject(struck);
+            if (!moved)
             {
                 if (p.Def.Returns > 0) p.Returning = true;
-                else End(i);
+                else
+                {
+                    Land(p);
+                    End(i);
+                }
                 continue;
             }
-            if (!p.Def.CollideTerrain) p.Position += p.Velocity * dt;
             if (p.Def.Contact && (p.Def.Friendly ? HitCreatures(p) : HitPlayers(p)))
             {
                 if (p.Def.Returns > 0) p.Returning = true;
@@ -172,6 +202,9 @@ public sealed partial class ProjectileSystem
             }
         }
     }
+
+    /// <summary>Slower than this (m/s) a bouncing projectile touching the terrain is resting, not striking it.</summary>
+    private const float MinImpactSpeed = 2f;
 
     /// <summary>Moves with voxel collision; returns false when the projectile should end.</summary>
     private bool MoveThroughTerrain(Projectile p, float dt)
@@ -182,6 +215,20 @@ public sealed partial class ProjectileSystem
         VoxelMotion.Move(_world.Session.World, ref p.Position, ref p.Velocity, half, dt);
         bool collided = p.Velocity.X != before.X || p.Velocity.Y != before.Y || p.Velocity.Z != before.Z;
         if (!collided) return true;
+        // A bouncing throw at rest on the ground (gravity's pull stopped again each tick) neither strikes nor bounces.
+        bool resting = p.BouncesLeft > 0 && before.LengthSquared() < MinImpactSpeed * MinImpactSpeed;
+        if (resting) return true;
+        if (HitTerrain != null)
+        {
+            // The block struck: one step along each axis whose motion the terrain stopped.
+            var step = new Vector3(
+                p.Velocity.X == 0 && before.X != 0 ? MathF.Sign(before.X) : 0,
+                p.Velocity.Y == 0 && before.Y != 0 ? MathF.Sign(before.Y) : 0,
+                p.Velocity.Z == 0 && before.Z != 0 ? MathF.Sign(before.Z) : 0);
+            if (step == Vector3.Zero && before.LengthSquared() > 1e-6f) step = Vector3.Normalize(before);
+            var at = p.Position + step * (r + 0.1f);
+            HitTerrain(p, at, _world.Session.World.GetBlock(VoxelMotion.CellOf(at)));
+        }
         if (p.BouncesLeft-- <= 0)
         {
             ApplyOnHit(p, null);
@@ -272,7 +319,9 @@ public sealed partial class ProjectileSystem
     private void Strike(Projectile p, Npc npc, Vector3 from, int segment = -1)
     {
         int before = npc.Life;
-        _npcs.Hit(npc, p.Owner, p.Damage, p.DamageClass, p.Crit, p.Knockback, from, melee: false, segment: segment);
+        // Minion hits on a whip-tagged creature deal the tag's extra damage (P3-14).
+        int damage = p.Damage + (p.Def.Minion != null || p.FromMinion ? npc.Effects.MinionTagDamage : 0);
+        _npcs.Hit(npc, p.Owner, damage, p.DamageClass, p.Crit, p.Knockback, from, melee: false, segment: segment);
         ApplyOnHit(p, npc, Math.Max(0, before - Math.Max(0, npc.Life)));
     }
 

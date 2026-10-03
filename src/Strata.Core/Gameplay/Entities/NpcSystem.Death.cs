@@ -58,6 +58,7 @@ public sealed partial class NpcSystem
         }
         foreach (var stack in drops)
             _world.Drops.Spawn(stack, npc.Center, new Vector3(_rng.NextSigned() * 1.5f, 3f, _rng.NextSigned() * 1.5f));
+        if (rolls) RollHeals(npc, defeat);
         DeathEffects(npc);
         CountShieldKill(npc);
         if (npc.Def.Boss is { Minor: true, Flag: { } minorFlag }) _world.Progression.Set(minorFlag);

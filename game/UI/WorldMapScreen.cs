@@ -36,11 +36,12 @@ public sealed partial class WorldMapScreen : CanvasLayer
         _view.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         _view.Initialize(ui.Game.Session.Content);
         _view.Markers = into => Markers(ui, into, IconSize);
+        _view.Clicked += at => PylonMap.TryTeleport(_ui, _view, at, () => SetOpen(false)); // a click on a pylon travels there
         _root.AddChild(_view);
         _title = new Label { Position = new Vector2(24, 18) };
         _title.AddThemeFontSizeOverride("font_size", 22);
         _root.AddChild(_title);
-        var help = new Label { Text = "Drag to move · wheel to zoom · U surface / caves · C centre on you · M or Esc to close" };
+        var help = new Label { Text = "Drag to move · wheel to zoom · click a pylon to travel · U surface / caves · C centre on you · M or Esc to close" };
         help.AddThemeFontSizeOverride("font_size", 15);
         help.SetAnchorsPreset(Control.LayoutPreset.BottomLeft);
         help.Position = new Vector2(24, -40);
@@ -113,7 +114,7 @@ public sealed partial class WorldMapScreen : CanvasLayer
 
     /// <summary>
     /// What the map marks, into <paramref name="into"/>, drawn in this order: the world spawn's flag, the player's bed
-    /// here, the head of each living resident and boss (<paramref name="icon"/> pixels; a dot when the image is missing)
+    /// here, a dot per pylon, the head of each living resident and boss (<paramref name="icon"/> pixels; a dot when the image is missing)
     /// and the player's arrow on top. Each carries its name for the full map's hover.
     /// </summary>
     public static void Markers(UiContext ui, List<MapMarker> into, float icon)
@@ -124,6 +125,7 @@ public sealed partial class WorldMapScreen : CanvasLayer
         into.Add(new MapMarker(new Vector2(spawn.X, spawn.Z) / ExploredMap.CellsPerPixel, Colors.White, UiSprites.Get("map_spawn"), "Spawn", Size: icon));
         if (ui.Entity.State.SpawnPoints.TryGetValue(session.Settings.Name, out var bed) && bed.Length == 3)
             into.Add(new MapMarker(new Vector2(bed[0], bed[2]) / ExploredMap.CellsPerPixel, Colors.White, UiSprites.Get("map_bed"), "Bed", Size: icon));
+        PylonMap.Markers(ui, into, icon);
         var residents = ui.Game.Town.Residents;
         for (int i = 0; i < residents.Count; i++)
         {

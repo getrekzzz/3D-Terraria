@@ -65,7 +65,9 @@ public sealed class InputConfig
         {
             if (action.Length == 0 || action.Any(ch => !(char.IsAsciiLetterLower(ch) || char.IsAsciiDigit(ch) || ch == '_')))
                 problems.Add($"action '{action}' must be snake_case");
-            if (list.Length == 0) problems.Add($"{action} has no bindings");
+            // An optional action may ship unbound (the housing menu: the inventory's Housing tab opens it), left for the
+            // player to bind in Settings > Controls; one the game needs must have a binding.
+            if (list.Length == 0 && Array.IndexOf(Required, action) >= 0) problems.Add($"{action} has no bindings");
             var seen = new HashSet<string>();
             foreach (var text in list)
             {

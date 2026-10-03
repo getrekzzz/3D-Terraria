@@ -36,7 +36,8 @@ public sealed partial class WorldSession : IDisposable
             (x, z) => (int)MathF.Ceiling(Generator.Terrain.SurfaceHeight(x, z)) + 1,
             (cx, cz) => cx >= 0 && cz >= 0 && cx < World.ChunkCounts.X && cz < World.ChunkCounts.Z
                 ? (plan.ColumnTop[plan.ColumnIndex(cx, cz)] - 1) >> ChunkMath.Shift
-                : plan.Bands.SeaLevel >> ChunkMath.Shift);
+                : plan.Bands.SeaLevel >> ChunkMath.Shift,
+            plan.Bands.Inverted ? (x, z) => (int)MathF.Ceiling(Generator.Terrain.CeilingHeight(x, z)) : null);
         Flags = new HashSet<string>(meta.Flags, StringComparer.Ordinal);
         Wires.Load(meta, content);
         Counters = new Dictionary<string, int>(meta.Counters ?? new(), StringComparer.Ordinal);

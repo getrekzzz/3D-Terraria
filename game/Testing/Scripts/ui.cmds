@@ -56,6 +56,7 @@ assert errors == 0
 # A hurt enemy shows a mini health bar (no 'life/max' text); it goes when the enemy does.
 god on
 spawning off
+town defense off
 killall
 fill -10 -3 -10 10 -1 10 stone
 fill -10 0 -10 10 7 10 air

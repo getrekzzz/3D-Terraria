@@ -23,6 +23,10 @@ public sealed partial class MapView : Control
     private Color[] _liquidColors = Array.Empty<Color>();
     private bool _dragging;
     private MapMarkerLayer _markerLayer = null!;
+    private float _dragged;
+
+    /// <summary>A left click that did not drag the map, at a map position (pixels of <see cref="Map"/>).</summary>
+    public event Action<Vector2>? Clicked;
 
     public ExploredMap? Map { get; set; }
 
@@ -188,6 +192,8 @@ public sealed partial class MapView : Control
                 AcceptEvent();
                 break;
             case InputEventMouseButton { ButtonIndex: MouseButton.Left } button:
+                if (button.Pressed) _dragged = 0f;
+                else if (_dragging && _dragged < 4f) Clicked?.Invoke(ToMap(button.Position));
                 _dragging = button.Pressed;
                 AcceptEvent();
                 break;
@@ -196,6 +202,7 @@ public sealed partial class MapView : Control
                 Mouse = motion.Position;
                 if (!_dragging) break;
                 Center -= motion.Relative / Zoom;
+                _dragged += motion.Relative.Length();
                 AcceptEvent();
                 break;
         }

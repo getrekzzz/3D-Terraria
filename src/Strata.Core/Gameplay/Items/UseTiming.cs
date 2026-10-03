@@ -40,6 +40,11 @@ public sealed class UseTiming
 
     public float MaxClipRate => Config.MaxClipRate;
 
+    private Entities.SwingCurve? _blade;
+
+    /// <summary>The swing's blade curve (the swing style's bladeCurve): what the hitbox, trail, view model and body clip follow.</summary>
+    public Entities.SwingCurve BladeCurve => _blade ??= Entities.SwingCurve.Blade(Config);
+
     /// <summary>A clip's timing; a clip without an entry strikes over its whole length.</summary>
     public ClipTiming Clip(string clip) => Config.Clips.TryGetValue(clip, out var timing) ? timing : Whole;
 

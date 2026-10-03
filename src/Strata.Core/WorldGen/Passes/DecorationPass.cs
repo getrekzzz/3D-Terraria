@@ -8,7 +8,7 @@ namespace Strata.Core.WorldGen.Passes;
 
 /// <summary>
 /// Pass 18 — decoration: grass and biome turf on exposed soil, moss on cave rock, trees and plants per
-/// biome, stalagmites/stalactites and rubble in caves.
+/// biome, stalagmites/stalactites and rubble in caves, and the rare Strange Plants on grass tops.
 /// </summary>
 public sealed class DecorationPass : GenPass
 {
@@ -36,7 +36,8 @@ public sealed class DecorationPass : GenPass
         for (int lz = 0; lz < n; lz++)
             for (int lx = 0; lx < n; lx++)
             {
-                float h = ctx.SurfaceHeight[ChunkGenContext.Column(lx, lz)];
+                int col = ChunkGenContext.Column(lx, lz);
+                float h = ctx.SurfaceHeight[col];
                 for (int ly = 0; ly < n - 1; ly++)
                 {
                     int i = ChunkGenContext.Index(lx, ly, lz);
@@ -44,7 +45,8 @@ public sealed class DecorationPass : GenPass
                     if (b == p.Air || ctx.Blocks[ChunkGenContext.Index(lx, ly + 1, lz)] != p.Air) continue;
                     int wy = ctx.Origin.Y + ly;
                     byte biome = ctx.Biome[i];
-                    bool nearSurface = wy >= h - 8f;
+                    // Don't Dig Up: the rock over the open-air pocket is cave, not surface (no grass, moss as usual).
+                    bool nearSurface = wy >= h - 8f && !ctx.AboveRoofPocket(col, wy);
                     if (b == p.Loam && nearSurface)
                         ctx.Blocks[i] = biome == d.Umbral ? p.UmbralTurf : biome == d.Sanguine ? p.SanguineTurf : p.Turf;
                     else if (b == p.Mud && biome == d.Jungle) ctx.Blocks[i] = p.JungleTurf;
@@ -84,6 +86,8 @@ public sealed class DecorationPass : GenPass
         var p = ctx.Palette;
         var d = _decor!;
         ulong seed = ctx.Plan.Seeds.Child("plants").Value;
+        ulong strangeSeed = ctx.Plan.Seeds.Child("strange_plants").Value;
+        List<Int3>? strange = null;
         const int layer = ChunkGenContext.Size * ChunkGenContext.Size;
         var blocks = ctx.Blocks;
         var liquids = ctx.Liquids;
@@ -100,10 +104,25 @@ public sealed class DecorationPass : GenPass
                     TileObjectDef? pick = null;
                     if (below != p.Air) pick = d.FloorPlant(ctx, below, ctx.Biome[i], roll, ctx.Depth(y));
                     else if ((above == p.Stone || above == p.Deepstone) && roll < 0.008f) pick = d.Stalactite;
-                    if (pick == null) continue;
+                    if (pick == null)
+                    {
+                        // Strange Plants: a separate roll on open grass tops, placed after every other plant so the
+                        // ordinary decoration is exactly what it was without them.
+                        if ((below == p.Turf || below == p.JungleTurf) && d.StrangePlants.Length > 0
+                            && Hash.ToUnitFloat(Hash.Cell(strangeSeed, x, y, z)) < DecorPalette.StrangePlantChance)
+                            (strange ??= new List<Int3>()).Add(new Int3(x, y, z));
+                        continue;
+                    }
                     int yy = pick.Anchor == TileAnchor.Ceiling ? y - pick.SizeY + 1 : y;
                     ctx.AddObject(new TileObjectInstance(pick, new Int3(x, yy, z), Hash.ToRange(Hash.Mix((ulong)x * 31 + (ulong)z), 4), Hash.ToRange(Hash.Mix((ulong)y), pick.Variants)));
                 }
+        if (strange == null) return;
+        foreach (var c in strange)
+        {
+            ulong h = Hash.Mix(Hash.Cell(strangeSeed, c.X, c.Y, c.Z));
+            var plant = d.StrangePlants[Hash.ToRange(h, d.StrangePlants.Length)];
+            ctx.AddObject(new TileObjectInstance(plant, c, Hash.ToRange(Hash.Mix(h), 4), Hash.ToRange(Hash.Mix(h + 3), plant.Variants)));
+        }
     }
 
     /// <summary>Topmost ground cell near the terrain surface in this chunk's column, with headroom above.</summary>

@@ -18,6 +18,7 @@ public static partial class ContentValidator
                 ctx.Error(i, "ammoPerBurst needs useAmmo and a burst (useTime < useAnimation).");
             if (i.Damage > 0 && i.DamageType == DamageClass.None) ctx.Error(i, "damage > 0 requires damageType.");
             if (i.Crit is < 0 or > 100) ctx.Error(i, "crit must be 0–100.");
+            if (i.AmmoSaveChance is < 0f or > 1f || (i.AmmoSaveChance > 0f && i.UseAmmo == null)) ctx.Error(i, "ammoSaveChance must be within 0–1 and needs useAmmo.");
             if (i.MineBrush is < 1 or > 8) ctx.Error(i, "mineBrush must be 1–8.");
             if (i.Rarity is < -13 or > 13) ctx.Error(i, "rarity must be -13–13 (Terraria's rarity tiers).");
             if (i.Buff != null && ctx.Db.Buffs.TryGet(i.Buff.Id, out var granted) && !Describable(granted, ctx.Db))
@@ -28,6 +29,7 @@ public static partial class ContentValidator
             ctx.Ref(i, ctx.Db.Buffs, i.Buff?.Id, "buff");
             ctx.Light(i, i.HeldLight, "heldLight");
             ctx.Asset(i, AssetPaths.ItemModel(i, ctx.Db), "model");
+            ctx.Sound(i, i.SoundSet, "soundSet");
             foreach (var b in i.Behaviors.Where(b => b.Type == Specs.ItemBehaviorSpecs.SummonBoss))
             {
                 if (b.Raw.TryGetProperty("enemy", out var enemy)) ctx.Ref(i, ctx.Db.Enemies, enemy.GetString(), "summonBoss.enemy");
@@ -51,6 +53,13 @@ public static partial class ContentValidator
             {
                 if (b.Type == Specs.ItemBehaviorSpecs.Wiring && ctx.TryParse<Specs.WiringParams>(SpecKind.ItemBehavior, b) is { } wiring)
                     ctx.Ref(i, ctx.Db.Items, wiring.Wire, "wiring.wire");
+                if (b.Type == Specs.ItemBehaviorSpecs.Whip && ctx.TryParse<Specs.WhipParams>(SpecKind.ItemBehavior, b) is { } whip)
+                {
+                    ctx.Ref(i, ctx.Db.Buffs, whip.TagBuff, "whip.tagBuff");
+                    ctx.Ref(i, ctx.Db.Buffs, whip.Inflict, "whip.inflict");
+                }
+                if (b.Type == Specs.ItemBehaviorSpecs.PlantGrass && ctx.TryParse<Specs.PlantGrassParams>(SpecKind.ItemBehavior, b) is { } garden)
+                    foreach (var block in garden.On.Append(garden.Grass)) ctx.Ref(i, ctx.Db.Blocks, block, "plantGrass");
                 if (b.Type == Specs.ItemBehaviorSpecs.ReleaseCritter && ctx.TryParse<Specs.ReleaseCritterParams>(SpecKind.ItemBehavior, b) is { } release)
                     ctx.Ref(i, ctx.Db.Enemies, release.Enemy, "releaseCritter.enemy");
                 if (b.Type == Specs.ItemBehaviorSpecs.Consume && ctx.TryParse<Specs.ConsumeParams>(SpecKind.ItemBehavior, b) is { } consume)
@@ -58,7 +67,7 @@ public static partial class ContentValidator
                 if (i.NoMelee && b.Type is Specs.ItemBehaviorSpecs.MeleeSwing or Specs.ItemBehaviorSpecs.Thrust)
                     ctx.Error(i, $"noMelee items cannot have a {b.Type} behaviour (their swing is animation only).");
                 if (b.Type == Specs.ItemBehaviorSpecs.ShootProjectile && ctx.TryParse<Specs.ShootProjectileParams>(SpecKind.ItemBehavior, b) is { } shoot
-                    && i.Projectile != null && ctx.Db.Projectiles.TryGet(i.Projectile, out var shot) && shoot.Limit(shot.Returns) is > 0 and var limit && shoot.Count > limit)
+                    && i.Projectile != null && ctx.Db.Projectiles.TryGet(i.Projectile, out var shot) && shoot.Limit(shot.OneAtATime ? 1 : 0) is > 0 and var limit && shoot.Count > limit)
                     ctx.Error(i, $"shootProjectile fires {shoot.Count} '{shot.Id}' per use but only {limit} may be out at once (set maxActive).");
             }
             ctx.Asset(i, AssetPaths.ItemIcon(i), "icon");

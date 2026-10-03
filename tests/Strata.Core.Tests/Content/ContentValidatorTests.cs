@@ -168,6 +168,16 @@ public class ContentValidatorTests
     }
 
     [Fact]
+    public void SoundSetsMustNameASoundFile()
+    {
+        var db = ContentLoader.LoadFromTexts(new[] { ("test.json", """
+        { "items": [ { "id": "boomer", "soundSet": "shotgun" }, { "id": "typo", "soundSet": "shotgnu" }, { "id": "single", "soundSet": "crystal" } ] }
+        """) }, new ContentValidationOptions { AssetExists = p => p is "assets/audio/sfx/shotgun_1.wav" or "assets/audio/sfx/crystal.wav" });
+        AssertError(db, "soundSet sound 'shotgnu' has no assets/audio/sfx/shotgnu.wav");
+        Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("sound 'shotgun'") || e.Message.Contains("sound 'crystal'"));
+    }
+
+    [Fact]
     public void RejectsBadIdsAndCovers()
     {
         var db = Load("""{ "items": [ { "id": "BadId", "covers": ["copper"] } ] }""");
@@ -185,5 +195,18 @@ public class ContentValidatorTests
         AssertError(db, "rarity must be -13–13");
         Assert.DoesNotContain(db.Report.Errors, e => e.Message.Contains("rarity") && e.Message.Contains("odd_potion"));
         Assert.Contains(db.Report.Warnings, w => w.Message.Contains("buff 'mystery' has no description"));
+    }
+
+    [Fact]
+    public void TownConditionsCheckTheirReferences()
+    {
+        var db = Load("""
+            { "townNpcs": [ { "id": "dyer", "names": ["Ana"], "lines": [ { "text": "Hi." } ],
+                "arrival": [ { "type": "hasItem", "category": "paint" }, { "type": "rescued", "id": "nobody" },
+                             { "type": "season", "is": "easter" } ] } ] }
+            """);
+        AssertError(db, "hasItem category 'paint' is not an item category");
+        AssertError(db, "'nobody'");
+        AssertError(db, "season must be one of");
     }
 }

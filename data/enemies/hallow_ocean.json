@@ -13,7 +13,7 @@
     { "id": "razorblade_typhoon", "name": "Razorblade Typhoon", "visual": "bolt", "color": "#9ae0ff", "lifetime": 180, "radius": 0.6, "homing": 5, "pierce": 3, "trail": "#e0f8ff" },
     { "id": "nightglow_bolt", "name": "Nightglow", "visual": "bolt", "color": "#ffb0ff", "lifetime": 180, "radius": 0.4, "homing": 6, "light": [10, 6, 12], "trail": "#ffe0ff" },
     { "id": "bubble", "name": "Bubble", "visual": "orb", "color": "#bfe8ff", "lifetime": 90, "radius": 0.4, "drag": 1.5 },
-    { "id": "flairon", "name": "Flairon", "visual": "item", "lifetime": 120, "radius": 0.8, "returns": 26, "pierce": -1 }
+    { "id": "flairon", "name": "Flairon", "visual": "item", "lifetime": 120, "radius": 0.8, "pierce": -1, "spin": 12, "tether": { "kind": "flail", "range": 24, "speed": 16, "string": "#4aa0c0" } }
   ],
   "items": [
     { "id": "gelatin_crystal", "name": "Gelatin Crystal", "description": "Summons Queen Slime. Use in the Hallow.", "category": "bossSummon", "rarity": 5, "maxStack": 9999, "value": 20000,

@@ -14,6 +14,7 @@ public sealed class TerrainField
     private readonly NoiseField _detail;
     private readonly NoiseField _overhang;
     private readonly NoiseField _soil;
+    private readonly NoiseField? _roof;
 
     public TerrainField(WorldPlan plan)
     {
@@ -22,7 +23,33 @@ public sealed class TerrainField
         _detail = NoiseField.Create(seeds, "detail", 40f, NoiseFractal.Fbm, 2);
         _overhang = NoiseField.Create(seeds, "overhang", TerrainTuning.OverhangWavelength, NoiseFractal.Fbm, TerrainTuning.OverhangOctaves);
         _soil = NoiseField.Create(seeds, "soil", 48f, NoiseFractal.Fbm, 2);
+        if (plan.Bands.Inverted) _roof = NoiseField.Create(seeds, "roof", 70f, NoiseFractal.Fbm, 3);
     }
+
+    /// <summary>Minimum open air (cells) between the bottom surface and the rock roof of a Don't Dig Up world.</summary>
+    public const float RoofClearance = 48f;
+
+    /// <summary>
+    /// Don't Dig Up: the underside of the rock roof over the bottom surface (cells; solid at and above it), at least
+    /// <see cref="RoofClearance"/> above the ground and never below the underground layer's base. Ordinary worlds have
+    /// no roof (+infinity).
+    /// </summary>
+    public float CeilingHeight(float x, float z)
+    {
+        if (_roof == null) return float.PositiveInfinity;
+        float roof = _plan.Bands.UndergroundTop + _roof.Sample01(x, z) * 16f;
+        return MathF.Max(roof, SurfaceHeight(x, z) + RoofClearance);
+    }
+
+    /// <summary>
+    /// Cells into the ground from the exposed surface nearest a cell's band (negative in open air): the height below the
+    /// surface; in a Don't Dig Up world's rock above the open-air pocket, the height above the roof's underside.
+    /// </summary>
+    public static float SurfaceDepth(float y, float surfaceHeight, float ceiling) =>
+        y + y > surfaceHeight + ceiling ? y - ceiling : surfaceHeight - y;
+
+    /// <summary><see cref="SurfaceDepth(float, float, float)"/> at a cell.</summary>
+    public float SurfaceDepthAt(float x, float y, float z) => SurfaceDepth(y, SurfaceHeight(x, z), CeilingHeight(x, z));
 
     /// <summary>
     /// Surface height at a column (cells, fractional): the plan height through a B-spline (no grid creases) plus gentle

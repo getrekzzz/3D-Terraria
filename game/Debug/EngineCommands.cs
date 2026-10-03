@@ -11,6 +11,7 @@ public static class EngineCommands
     {
         UiCommands.Register(r, world);
         PadCommands.Register(r, world);
+        GuideBookCommands.Register(r, world);
         UI.PhotoMode.PhotoCommands.Register(r, world);
         AccessibilityCommands.Register(r, world);
         r.Register(new CommandDef
@@ -103,8 +104,8 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "audio", Usage = "audio [test|files|device <name|Default>]",
-            Help = "Shows the audio driver, output device and buses; plays a test chime; checks every sound file; or picks the output device.",
+            Name = "audio", Usage = "audio [test|files|reset|device <name|Default>]",
+            Help = "Shows the audio driver, output device and buses; plays a test chime; checks every sound file; resets the sound voice counters (sfx.*); or picks the output device.",
             Run = (_, a) =>
             {
                 string info = $"{Audio.AudioDiagnostics.Device()}\nBuses: {Audio.AudioDiagnostics.Buses()}";
@@ -115,6 +116,9 @@ public static class EngineCommands
                     case "test":
                         Audio.AudioDiagnostics.PlayTest(world.Runtime);
                         return CommandResult.Success($"Playing a test chime, then a click.\n{info}");
+                    case "reset":
+                        Audio.Sfx.ResetCounters();
+                        return CommandResult.Success("Sound voice counters reset.");
                     case "files":
                         var (loaded, total, failed) = Audio.AudioDiagnostics.ProbeFiles();
                         return failed.Count == 0 ? CommandResult.Success($"All {total} sound files load.")

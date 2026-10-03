@@ -56,11 +56,11 @@ public class HousingNavigationTests
         using var g = TestGame.Create();
         BuildHouse(g, chair: false);
         var scanner = new HousingScanner(g.World.Session.World);
-        Assert.Contains("needs a chair", scanner.Scan(Inside(g)).Problems);
+        Assert.Contains("This housing is missing a chair.", scanner.Scan(Inside(g)).Problems);
 
         // A hole in the wall opens the room to the world.
         g.World.Editor.SetBlock(g.Floor + new Int3(5, 3, 0), 0);
-        Assert.Contains("not enclosed or too large", scanner.Scan(Inside(g)).Problems);
+        Assert.Contains("This is not valid housing.", scanner.Scan(Inside(g)).Problems);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class HousingNavigationTests
         using var g = TestGame.Create();
         BuildHouse(g, built: false);
         var room = new HousingScanner(g.World.Session.World).Scan(Inside(g));
-        Assert.Contains("walls must be built, not natural", room.Problems);
+        Assert.Contains("This is not valid housing.", room.Problems);
     }
 
     [Fact]

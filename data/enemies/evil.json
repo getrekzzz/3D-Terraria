@@ -5,7 +5,7 @@
   "projectiles": [
     { "id": "vilethorn", "name": "Vilethorn", "visual": "bolt", "color": "#8a5ac8", "lifetime": 40, "radius": 0.6, "pierce": -1, "collideTerrain": false, "light": [6, 3, 9] },
     { "id": "crimson_rod_bolt", "name": "Blood Rain", "visual": "bolt", "color": "#e8303a", "lifetime": 120, "radius": 0.4, "homing": 3, "light": [10, 2, 2], "trail": "#ff7070" },
-    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "visual": "item", "lifetime": 120, "radius": 0.7, "returns": 26, "pierce": -1 },
+    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "visual": "item", "lifetime": 120, "radius": 0.7, "pierce": -1, "spin": 12, "tether": { "kind": "flail", "range": 18, "speed": 13, "string": "#5a3a6a" } },
     { "id": "creeper_ichor", "name": "Ichor Spit", "visual": "orb", "color": "#e0c040", "gravity": 6, "lifetime": 180, "radius": 0.4, "friendly": false, "hostile": true }
   ],
   "tileObjects": [

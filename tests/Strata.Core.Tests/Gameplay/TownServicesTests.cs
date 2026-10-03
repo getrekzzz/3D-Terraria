@@ -213,6 +213,8 @@ public class TownServicesTests
         bool Arrives(string id) => Conditions.ConditionCompiler.CompileAll(g.Content.TownNpcs.Get(id).Arrival).Evaluate(g.World.Town.TownContext(g.Player));
         Assert.False(Arrives("goblin_tinkerer"));
         g.World.Progression.Set("defeated_goblin_army");
+        Assert.False(Arrives("goblin_tinkerer")); // he must be found and freed first
+        g.World.Progression.Set(TownRescue.FlagFor("goblin_tinkerer"));
         Assert.True(Arrives("goblin_tinkerer"));
         Assert.False(Arrives("arms_dealer"));
         g.Player.State.Inventory.Backpack.Add(new ItemStack(g.Content.Items.Get("musket_ball"), 10));

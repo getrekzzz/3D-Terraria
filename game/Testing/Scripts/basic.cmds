@@ -29,6 +29,13 @@ assert player.on_floor == 1
 
 # Mining the stone floor drops stone that we collect.
 wield copper_pickaxe
+wait 0.2
+assert avatar.held_lit == 1
+assert avatar.held_block_cube == 0
+# P3-06: the pickaxe's grip socket sits in the fist (the swing style's hand frame).
+assert avatar.grip_error_cm >= 0
+assert avatar.grip_error_cm < 1
+assert props.problems == 0
 aim 0.05 -1 0.05
 hold use_primary 2.5
 wait 1.5
@@ -45,6 +52,11 @@ fill -10 0 -10 10 7 10 air
 wait 0.5
 give gray_brick 20
 wield gray_brick
+# P3-06: a held block is a textured cube in both views, lit with the body like any held model.
+wait 0.2
+assert avatar.held_block_cube == 1
+assert view.held_block_cube == 1
+assert avatar.held_lit == 1
 aim 0 -0.8 1
 use
 assert player.held_count < 20
@@ -143,6 +155,19 @@ release use_primary
 wait 1.5
 assert player.hold_clip == 0
 assert anim.missing_clips == 0
+# --- P3-36 ---
+# 3D drops: a sword and coins spin as their models, dirt as a block cube, a Fallen Star glows with a halo and may
+# claim a light; no model is missing.
+drop copper_broadsword 1 0 0 2
+drop gold_coin 5 1 0 2
+drop dirt 3 -1 0 2
+drop fallen_star 1 2 0 2
+wait_until dropvis.models >= 3 5
+assert dropvis.cubes >= 1
+assert dropvis.halos >= 1
+probe dropvis.billboards
+assert dropvis.lit >= 1
+assert props.problems == 0
 assert errors == 0
 
 # --- P3-33 ---

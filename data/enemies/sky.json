@@ -21,6 +21,7 @@
       "rarity": 5,
       "maxStack": 9999,
       "value": 4000,
+      "noGravity": true,
       "covers": [
         "terraria:soul_of_flight"
       ]

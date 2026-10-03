@@ -1,5 +1,5 @@
 {
-  "comment": "Default input bindings, registered at startup; every action is rebindable in Settings > Controls (saved to user://keybinds.cfg over these). Terraria habits: left click uses, right click interacts, 1-0 and the mouse wheel (down: next slot) pick the hotbar slot, Q throws the held item, M opens the map, Enter shows the chat history, Tab/I the inventory, which you can walk, jump, grapple and fight with open. Kept for a 3D game: E interacts, F grapples (Terraria's E), Ctrl drops through platforms (Terraria's S), Shift sprints. X toggles Smart Cursor. H quick heal, J quick mana and B quick buff drink from the backpack without changing the held item. Bindings are key:<name>, mouse:<1-9>, pad:<a|b|x|y|back|start|ls|rs|lb|rb|dpad_up|dpad_down|dpad_left|dpad_right|…> or axis:<left_x|left_y|right_x|right_y|lt|rt><+|->; keyboard/mouse and controller rebind separately. Controller (Xbox names, X-04): left stick moves, right stick looks (gentle aim assist), A jumps, B drops through platforms, X interacts, Y opens the inventory, RT uses the item, LT grapples, LB/RB step the hotbar, LS sprints, RS toggles Smart Cursor, D-pad up mounts, down throws the item, left cycles the block shape, right swaps first/third person, View opens the map and Menu pauses. On a screen the D-pad or left stick moves the cursor, A clicks, X takes one (right click, hold to repeat), RB quick-moves (Shift-click), LB marks a favourite and B closes; the ui_* actions are only read while a screen has the controller.",
+  "comment": "Default input bindings, registered at startup; every action is rebindable in Settings > Controls (saved to user://keybinds.cfg over these). Terraria habits: left click uses, right click interacts, 1-0 and the mouse wheel (down: next slot) pick the hotbar slot, Q throws the held item, M opens the map, Enter shows the chat history, Tab/I the inventory, which you can walk, jump, grapple and fight with open. Kept for a 3D game: E interacts, F grapples (Terraria's E), Ctrl drops through platforms (Terraria's S), Shift sprints. X toggles Smart Cursor, K opens the Guide book, T the emote wheel and Y cycles the block shape; housing has no default key (the inventory's Housing tab). H quick heal, J quick mana and B quick buff drink from the backpack without changing the held item. Bindings are key:<name>, mouse:<1-9>, pad:<a|b|x|y|back|start|ls|rs|lb|rb|dpad_up|dpad_down|dpad_left|dpad_right|…> or axis:<left_x|left_y|right_x|right_y|lt|rt><+|->; keyboard/mouse and controller rebind separately. Controller (Xbox names, X-04): left stick moves, right stick looks (gentle aim assist), A jumps, B drops through platforms, X interacts, Y opens the inventory, RT uses the item, LT grapples, LB/RB step the hotbar, LS sprints, RS toggles Smart Cursor, D-pad up mounts, down throws the item, left cycles the block shape, right swaps first/third person, View opens the map and Menu pauses. On a screen the D-pad or left stick moves the cursor, A clicks, X takes one (right click, hold to repeat), RB quick-moves (Shift-click), LB marks a favourite and B closes; the ui_* actions are only read while a screen has the controller.",
   "actions": {
     "move_forward": ["key:W", "axis:left_y-"],
     "move_back": ["key:S", "axis:left_y+"],
@@ -13,10 +13,13 @@
     "interact": ["key:E", "pad:x"],
     "inventory": ["key:Tab", "key:I", "pad:y"],
     "map": ["key:M", "pad:back"],
+    "housing": [],
+    "guide_book": ["key:K"],
     "toggle_camera": ["key:V", "pad:dpad_right"],
     "precision_mode": ["key:Alt"],
     "rotate_shape": ["key:R"],
-    "cycle_shape": ["key:T", "pad:dpad_left"],
+    "cycle_shape": ["key:Y", "pad:dpad_left"],
+    "emote_wheel": ["key:T"],
     "drop_item": ["key:Q", "pad:dpad_down"],
     "grapple": ["key:F", "axis:lt+"],
     "quick_mount": ["key:G", "pad:dpad_up"],

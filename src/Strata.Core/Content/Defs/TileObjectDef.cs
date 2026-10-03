@@ -52,8 +52,20 @@ public sealed class TileObjectDef : ContentDef
     /// <summary>Crafting station identities this object provides (e.g. "work_bench", "furnace").</summary>
     public string[] Stations { get; init; } = Array.Empty<string>();
 
+    /// <summary>
+    /// Where a resident's model origin goes on this seat, in cells above the anchor's floor: 0 for chairs (the sit pose
+    /// has its hips at seat height above the feet), the mattress top for beds (<see cref="BedHeight"/>).
+    /// </summary>
+    public float SeatHeight { get; init; }
+
+    /// <summary>The mattress top in cells above the floor (the sleep pose lies on it).</summary>
+    public float BedHeight { get; init; } = 1f;
+
     /// <summary>Housing roles (door, light, table, chair, bed).</summary>
     public string[] Housing { get; init; } = Array.Empty<string>();
+
+    /// <summary>Has a housing role (chair, bed…).</summary>
+    public bool HasHousing(string role) => Array.IndexOf(Housing, role) >= 0;
 
     public int ContainerSlots { get; init; }
 
@@ -88,6 +100,9 @@ public sealed class TileObjectDef : ContentDef
 
     /// <summary>Falls over when felled (trees).</summary>
     public bool Topple { get; init; }
+
+    /// <summary>Weapons break it: sword swings and friendly projectiles smash pots and mow grass and flowers (P3-23).</summary>
+    public bool BreakByAttack { get; init; }
 
     /// <summary>The material sound with its default.</summary>
     public string HitSound => Sound ?? (BreakTool == BreakTool.Pick ? "stone" : "wood");

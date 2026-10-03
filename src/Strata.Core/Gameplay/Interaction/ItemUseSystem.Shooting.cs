@@ -19,6 +19,7 @@ public sealed partial class ItemUseSystem
         if (held.IsEmpty || held.Item != p.UseItem) return;
         var info = _world.Uses[held.Item!];
         if (!info.Has(ItemAction.Shoot) || info.IsTool || info.Has(ItemAction.Melee | ItemAction.Thrust)) return;
+        if (info.Projectile?.Tether != null) return; // a yoyo or flail holds its use open while out: no bursts
         float speed = UseSpeed(p, held, info);
         p.UseCooldown = UseTicks(info.Item.UseTime / speed); // a shot that cannot fire still waits its turn
         var outcome = Shoot(p, info, followUp: true);
@@ -44,7 +45,7 @@ public sealed partial class ItemUseSystem
         }
         if (projectile == null) return UseOutcome.None;
         // Boomerangs and flails: one out at a time unless the weapon says otherwise (Zenith: no limit).
-        int limit = shot.Limit(projectile.Returns);
+        int limit = shot.Limit(projectile.OneAtATime ? 1 : 0);
         if (limit > 0 && LiveShots(p, projectile) + shot.Count > limit) return UseOutcome.Blocked;
         var held = state.Inventory.Held.Item == item ? state.Inventory.Held : new ItemStack(item, 1);
         if (item.ManaCost > 0)
@@ -53,7 +54,7 @@ public sealed partial class ItemUseSystem
             if (!state.Vitals.TrySpendMana(cost)) return UseOutcome.NoMana;
         }
         // Ammo is only used up by a shot that actually fires (and, for a per-burst gun, only by the burst's first).
-        if (ammo is { Consumable: true } && !(followUp && item.AmmoPerBurst) && ammoSlot is { } from && !_ammoRng.Chance(state.Effects.Stats.Bonus(StatIds.AmmoSave))) from.Inv.Take(from.Slot, 1);
+        if (ammo is { Consumable: true } && !(followUp && item.AmmoPerBurst) && ammoSlot is { } from && !_ammoRng.Chance(state.Effects.Stats.Bonus(StatIds.AmmoSave) + item.AmmoSaveChance)) from.Inv.Take(from.Slot, 1);
         int damage = Prefixes.Damage(held) + (ammo?.Damage ?? 0);
         float knockback = Prefixes.Knockback(held) + (ammo?.Knockback ?? 0f);
         for (int i = 0; i < shot.Count; i++)

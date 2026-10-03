@@ -23,6 +23,7 @@ public sealed partial class TargetLabel : Control
 
     private UiContext _ui = null!;
     private object? _shown;
+    private string? _sign;
     private int _life = -1, _max = -1;
     private Color _color = UiTheme.Text;
 
@@ -55,8 +56,12 @@ public sealed partial class TargetLabel : Control
         else if (interaction.InReach && interaction.Target is { } t)
         {
             object? what = t.Object != null ? t.Object.Def : t.Block is 0 or VoxelWorld.Unknown ? null : _ui.Game.Session.Content.Blocks[t.Block];
-            if (!Show(what, 0, 0) || what == null) return;
-            Set(t.Object?.Def.DisplayName ?? _ui.Game.Session.Content.Blocks[t.Block].DisplayName, UiTheme.Text);
+            // A sign shows what it says under its name (the text instance changes when it is edited).
+            string? sign = t.Object?.SignText;
+            if ((!Show(what, 0, 0) && ReferenceEquals(sign, _sign)) || what == null) return;
+            _sign = sign;
+            string name = t.Object?.DisplayName ?? _ui.Game.Session.Content.Blocks[t.Block].DisplayName;
+            Set(sign != null ? name + "\n\"" + sign + "\"" : name, UiTheme.Text);
         }
         else Show(null, 0, 0);
     }
@@ -65,12 +70,13 @@ public sealed partial class TargetLabel : Control
     {
         if (Text.Length == 0) return;
         var font = UiFonts.Bold;
-        float width = font.GetStringSize(Text, HorizontalAlignment.Left, -1, UiFonts.Hover).X;
+        float width = font.GetMultilineStringSize(Text, HorizontalAlignment.Left, -1, UiFonts.Hover).X;
         var cross = new Vector2(Size.X / 2, UiLayout.CrosshairTop);
         float x = Mathf.Max(0, Mathf.Min(cross.X + Offset.X, Size.X - width - UiFonts.Outline / 2f));
         var baseline = new Vector2(x, cross.Y + Offset.Y + font.GetAscent(UiFonts.Hover)).Round();
-        DrawStringOutline(font, baseline, Text, HorizontalAlignment.Left, -1, UiFonts.Hover, UiFonts.Outline, UiFonts.OutlineColor);
-        DrawString(font, baseline, Text, HorizontalAlignment.Left, -1, UiFonts.Hover, _color);
+        // Multiline: a sign's text sits under its name.
+        DrawMultilineStringOutline(font, baseline, Text, HorizontalAlignment.Left, -1, UiFonts.Hover, -1, UiFonts.Outline, UiFonts.OutlineColor);
+        DrawMultilineString(font, baseline, Text, HorizontalAlignment.Left, -1, UiFonts.Hover, -1, _color);
     }
 
     private void Set(string text, Color color)

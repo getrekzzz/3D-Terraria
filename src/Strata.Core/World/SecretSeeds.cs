@@ -15,7 +15,7 @@ public enum SecretSeed
     /// <summary>Not the Bees: a far larger jungle riddled with hives.</summary>
     NotTheBees = 4,
 
-    /// <summary>Don't Dig Up: recognised and saved; the upside-down world is not generated yet.</summary>
+    /// <summary>Don't Dig Up: an upside-down world — the underworld near the top (where the player starts), the surface at the bottom.</summary>
     DontDigUp = 8,
 
     /// <summary>The Constant: a dim world with darker nights.</summary>
