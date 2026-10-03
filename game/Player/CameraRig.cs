@@ -14,7 +14,7 @@ public sealed partial class CameraRig : Node3D
 {
     private const float EyeHeight = 1.6f;
     private const float ProbeRadius = 0.22f;
-    private static readonly Vector3 Shoulder = new(0.55f, 0.1f, 0);
+    private Vector3 _shoulder = new(0.55f, 0.1f, 0);
 
     private CharacterBody3D _body = null!;
     private Node3D _pivot = null!;
@@ -53,6 +53,14 @@ public sealed partial class CameraRig : Node3D
     }
 
     public float Pitch => _pitch;
+
+    /// <summary>How far right of the head the third-person camera sits, in metres (the <c>camera shoulder</c> command;
+    /// 0 centres the player, for portraits).</summary>
+    public float ShoulderOffset
+    {
+        get => _shoulder.X;
+        set => _shoulder.X = Mathf.Clamp(value, -1f, 1f);
+    }
 
     public void Initialize(CharacterBody3D body)
     {
@@ -117,9 +125,9 @@ public sealed partial class CameraRig : Node3D
         }
         // Head → shoulder, then shoulder → camera, each stopped a probe radius short of terrain.
         var head = GlobalPosition;
-        var shoulderWorld = GlobalTransform * Shoulder;
+        var shoulderWorld = GlobalTransform * _shoulder;
         float shoulderT = SafeFraction(head, shoulderWorld);
-        _pivot.Position = Shoulder * shoulderT;
+        _pivot.Position = _shoulder * shoulderT;
         var pivotWorld = head + (shoulderWorld - head) * shoulderT;
         var back = GlobalTransform.Basis.Z.Normalized();
         float free = _distance * SafeFraction(pivotWorld, pivotWorld + back * _distance);

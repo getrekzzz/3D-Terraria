@@ -1,7 +1,7 @@
 """Detailed human characters (player, town folk, humanoid enemies), generated from parameters in assets.json.
 
-Pipeline: proportions and skeleton (frame) -> body blob (body) and head blob with sculpted features, ears and
-eyeballs (head) -> hands with fingers and nails (hands) -> skin painting (paint) -> hair, brows and lashes (hair)
+Pipeline: proportions and skeleton (frame) -> body blob (body) and the head's distance field with sculpted features
+and ears, plus eyeballs (head) -> hands with fingers and nails (hands) -> skin painting (paint) -> hair, brows and lashes (hair)
 -> clothing and accessories (garments) -> skinning and actions (rig, motion). Everything is joined into one mesh
 with ``char:<kind>`` material slots that the game maps to its character shader.
 
@@ -13,7 +13,7 @@ import math
 
 import bpy
 
-from . import accessories, hair, motion, rig
+from . import accessories, hair, locks, motion, occlusion, rig
 from . import frame as frame_mod
 from .garments import Wardrobe, strip_covered
 from .blobs import Blob
@@ -50,7 +50,7 @@ def _parts(p: dict):
     body = blob.to_mesh("body", 16000, smooth_iterations=2)
     head = Head(fr, p)
     head_obj = head.build()
-    ears = head.ears()
+    head.fit_neck(head_obj, body)
     eyes = head.eyeballs(p.get("eyes", "#5a7890"))
     hands, nails = [], []
     for side in ("R", "L"):
@@ -60,16 +60,16 @@ def _parts(p: dict):
     painter = SkinPainter(fr, head, p)
     paint(body, painter.body)
     paint(head_obj, painter.face)
-    for part in (*ears, *hands):
-        paint(part, painter.body if part in hands else painter.face)
-    for o in (body, head_obj, *ears, *hands):
+    for part in hands:
+        paint(part, painter.body)
+    for o in (body, head_obj, *hands):
         set_material(o, "char:skin")
     for o in nails:
         flat(o, p.get("nails", "#e8c4b8"))
         set_material(o, "char:nail")
     for o in eyes:
         set_material(o, "char:eye")
-    parts = {"body": body, "head": head_obj, "ears": ears, "hands": hands, "nails": nails, "eyes": eyes}
+    parts = {"body": body, "head": head_obj, "hands": hands, "nails": nails, "eyes": eyes}
     return fr, head, parts
 
 
@@ -82,7 +82,8 @@ def _all(parts):
 
 def build_preview(name: str, p: dict):
     """Unrigged parts for inspection renders."""
-    _, _, parts = _parts(p)
+    _, head, parts = _parts(p)
+    head.bury_neck(parts["body"])
     return _all(parts)
 
 
@@ -144,18 +145,19 @@ def build(name: str, p: dict):
     rig.clean_limb_weights(body, arm, fr)
     tree, body_w = rig.body_lookup(body)
     rig.head_weights(parts["head"], head, tree, body_w)
-    for o in parts["ears"] + parts["eyes"]:
+    for o in parts["eyes"]:
         rig.rigid(o, "head")
     for side, hand, nail in zip(("R", "L"), parts["hands"], parts["nails"]):
         bones = rig.hand_bones(side)
         rig.chain_weights(hand, arm, bones, 0.006, tree, body_w, blend_bone=f"hand.{side}")
         rig.chain_weights(nail, arm, [b for b in bones if b.split(".")[0] in frame_mod.FINGERS], 0.003)
     extras = dress(fr, head, parts, p)
-    extras += groom(fr, head, parts, p)
+    extras += groom(fr, head, parts, p, (tree, body_w))
     objs = _all(parts) + extras
     for o in objs:
         rest_uvs(o)
     mesh = join(objs, name)
+    occlusion.bake(mesh, 0.1 * fr.s)
     mesh.parent = arm
     mod = mesh.modifiers.new("Armature", "ARMATURE")
     mod.object = arm
@@ -194,6 +196,7 @@ def build_skeleton(name: str, p: dict):
     for o in objs:
         rest_uvs(o)
     mesh = join(objs, name)
+    occlusion.bake(mesh, 0.1 * fr.s)
     mesh.parent = arm
     mod = mesh.modifiers.new("Armature", "ARMATURE")
     mod.object = arm
@@ -204,7 +207,7 @@ def build_skeleton(name: str, p: dict):
 def dress(fr, head, parts, p):
     """Clothing and accessories; removes the skin they cover."""
     body = parts["body"]
-    w = Wardrobe(fr, p)
+    w = Wardrobe(fr, p, head)
     w.tear = 0.35 if p.get("undead") else 0.0
     w.fit_collar(body)
     out, covers = [], []
@@ -216,20 +219,23 @@ def dress(fr, head, parts, p):
                 covers.append(test)
 
     if "shirt" in p or "coat" in p or "robe" in p:
-        add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", p.get("robe", "#8a8070")), "char:cloth", cuts=w.shirt_cuts()), w.in_shirt)
+        add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", p.get("robe", "#8a8070")), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt)
     if not p.get("robe"):
-        add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", cuts=w.pants_cuts()), w.in_pants)
-    add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", folds=0.3, cuts=w.boot_cuts()), w.in_boots)
+        add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants)
+    add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
     if "coat" in p:
-        add(w.shell(body, w.in_shirt, "coat", 0.012, p["coat"], "char:cloth", folds=1.3, cuts=w.shirt_cuts()))
-        add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True))
+        add(w.shell(body, w.in_coat, "coat", 0.012, p["coat"], "char:cloth", "coat", w.shirt_cuts(-0.015)))
+        add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True, under=list(out)))
     if "robe" in p:
-        add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim")))
+        add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim"), under=list(out)))
+        out.extend(w.sash(out[-1], p.get("trim", p["robe"])))
     if not p.get("robe"):
-        out.extend(w.belt(body, p.get("belt", "#3a2618")))
+        out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith("coat")]))
     if "apron" in p:
         add(accessories.apron(fr, body, p["apron"]))
+    out.extend(w.extras)
     strip_covered(body, covers)
+    head.bury_neck(body)
     if p.get("hat"):
         add(accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040")))
     if "mask" in p:
@@ -243,24 +249,27 @@ def dress(fr, head, parts, p):
     return out
 
 
-def groom(fr, head, parts, p):
-    """Hair, beard, brows and lashes (all carried by the head)."""
+def groom(fr, head, parts, p, lookup=None):
+    """Hair, beard, brows and lashes, carried by the head; with the body's weights (``lookup``) hair that hangs
+    below the head follows the neck and shoulders instead."""
     style = p.get("hairStyle", "long" if fr.female else "short")
     color = p.get("hair", "#4a3020")
     out = []
     if style != "bald" and p.get("hat") != "hood":
+        from mathutils.bvhtree import BVHTree
         hatted = p.get("hat") in ("cap", "wide")
-        out.append(hair.scalp_shell(head, parts["head"], "buzz" if style == "buzz" else ("short" if style in ("ponytail", "bun") else style), color, hatted))
-        if style == "long":
-            out.append(hair.mane(head, color, 0.3 * fr.s))
-        if style in ("ponytail", "bun"):
-            out.append(hair.tail(head, color, style))
+        tree = BVHTree.FromObject(parts["body"], bpy.context.evaluated_depsgraph_get()) if style == "long" else None
+        seed = sum(ord(ch) for ch in f"{style}{p.get('skin', '')}")     # not the colour: same shape, shared mesh cache
+        out += locks.Groom(head, style, color, hatted, tree, seed).build(parts["head"])
     if "beard" in p:
         out.append(hair.beard(head, parts["head"], p["beard"]))
     out.append(hair.brows_and_lashes(head, parts["head"], p.get("brows", color)))
     for o in out:
         set_material(o, "char:hair")
-        rig.rigid(o, "head")
+        if lookup is not None:
+            rig.head_weights(o, head, *lookup, torso_only=True)
+        else:
+            rig.rigid(o, "head")
     return out
 
 

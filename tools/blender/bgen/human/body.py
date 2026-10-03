@@ -56,7 +56,8 @@ def build_body(frame, blob: Blob):
         else:
             e(at((sx * 0.066, 0.05, 1.34)), (0.08 * m, 0.027 * m, 0.056 * m), limb_rotation(Vector((sx, 0.12, -0.3))))  # pectorals
         B.capsule(j[f"clavicle.{'R' if sx > 0 else 'L'}"] + at((0, 0.006, 0.01)), j[f"shoulder.{'R' if sx > 0 else 'L'}"] + at((0, 0.012, 0.018)), 0.014 * s)  # collarbone
-    B.capsule(j["neck"] + at((0, 0.004, -0.03)), j["head"] + at((0, 0.004, 0.01)), (0.054 if fem else 0.062) * s * m ** 0.4)
+    # A slim core for the neck: the head's sculpted neck covers it and runs down into the chest.
+    B.capsule(j["neck"] + at((0, 0.004, -0.03)), j["head"] + at((0, 0.004, 0.01)), (0.032 if fem else 0.037) * s * m ** 0.4)
 
     # ---- arms
     for side, sx in (("R", 1), ("L", -1)):

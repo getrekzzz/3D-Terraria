@@ -53,8 +53,8 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "camera", Usage = "camera <first|third|orbit <degrees>|distance <metres>>",
-            Help = "Switches the player camera mode, swings the third-person camera round the player (aim unchanged) or sets its distance.",
+            Name = "camera", Usage = "camera <first|third|orbit <degrees>|distance <metres>|fov <degrees>|shoulder <metres>>",
+            Help = "Switches the player camera mode, swings the third-person camera round the player (aim unchanged), or sets its distance, field of view or shoulder offset for this session (close-up screenshots; shoulder 0 centres the player).",
             Run = (ctx, a) =>
             {
                 var player = world.Player ?? throw new CommandException("no player camera in this mode");
@@ -64,7 +64,9 @@ public static class EngineCommands
                     case "third": player.Rig.FirstPerson = false; break;
                     case "orbit": player.Rig.Orbit = Mathf.DegToRad(a.Float(1, "degrees")); break;
                     case "distance": player.Rig.Distance = a.Float(1, "metres"); break;
-                    default: throw new CommandException("expected first, third, orbit <degrees> or distance <metres>");
+                    case "fov": player.Rig.Camera.Fov = Mathf.Clamp(a.Float(1, "degrees"), 5f, 110f); break;
+                    case "shoulder": player.Rig.ShoulderOffset = a.Float(1, "metres"); break;
+                    default: throw new CommandException("expected first, third, orbit <degrees>, distance <metres>, fov <degrees> or shoulder <metres>");
                 }
                 return CommandResult.Success();
             },

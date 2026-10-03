@@ -8,6 +8,8 @@
 //   8 glow   self-lit (undead eyes)
 // Surface detail is sampled in the character's rest pose, rebuilt from the two UV sets the generator writes
 // (UV = rest x, z; UV2 = rest y, z), so it stays attached to skin and cloth while the rig animates.
+// The vertex colour's alpha is ambient occlusion baked by the generator (1 open, 0 enclosed): it darkens sky and
+// block light fully and direct light partly (eye sockets, under the jaw, between locks of hair, inside folds).
 shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, cull_back;
 
@@ -45,6 +47,8 @@ varying vec3 v_world;
 varying vec4 v_light;
 varying float f_sun_gate;
 varying vec3 f_tangent;
+varying float f_occ;
+varying float f_shift;
 
 void vertex() {
 	// glTF flips V; Blender (x, y, z) becomes Godot (x, z, -y).
@@ -99,13 +103,16 @@ void fragment() {
 		vec4 d = rest_sample(detail_array, detail_layer, v_rest, w, detail_tile);
 		bump = rest_bump(detail_array, detail_layer, v_rest, n, w, detail_tile) * detail_strength
 			+ rest_bump(detail_array, detail_layer, v_rest, n, w, detail_tile * 4.0) * detail_strength * 0.5;
+		// The world's grading lifts saturation by up to a fifth by day: skin starts a little greyer so it reads as
+		// skin rather than orange, and the subsurface wrap below adds the warmth back in the shadows.
+		base = mix(vec3(dot(base, vec3(0.2126, 0.7152, 0.0722))), base, 0.75);
 		base *= 0.93 + 0.14 * d.z;
 		rough = roughness_base + (0.5 - d.z) * 0.15;
-		spec = 0.35;
+		spec = 0.3;
 		SSS_STRENGTH = sss;
 	} else if (kind == 1) {
-		spec = 0.6;
-		emit = base * 0.04;
+		spec = 0.55;
+		emit = base * 0.03;
 	} else if (kind == 2) {
 		// Strands: fine stripes across the hair with clumped variation, darker toward the roots.
 		float across = UV.y * 90.0;
@@ -114,7 +121,8 @@ void fragment() {
 		base *= stripe * (0.85 + 0.3 * fibre);
 		rough = roughness_base + (fibre - 0.5) * 0.1;
 		f_tangent = normalize(TANGENT);
-		spec = 0.45;
+		f_shift = (fibre - 0.5) * 0.2 + (stripe - 0.8) * 0.3;   // per-strand jitter of the highlights
+		spec = 0.2;     // the sky's reflection stays faint and broad: the strand highlights below do the shine
 	} else if (kind == 8) {
 		emit = base * 3.5;
 	} else if (kind >= 4) {
@@ -137,36 +145,51 @@ void fragment() {
 	ROUGHNESS = clamp(rough, 0.02, 1.0);
 	METALLIC = metal;
 	SPECULAR = spec;
-	EMISSION = strata_block_light(base, v_light, 1.0) + emit;
-	AO = strata_sky_visibility(v_light);
+	f_occ = COLOR.a;
+	EMISSION = strata_block_light(base, v_light, f_occ) + emit * (kind == 8 ? 1.0 : f_occ);
+	AO = strata_sky_visibility(v_light) * f_occ;
 	f_sun_gate = strata_sun_gate(v_light) * strata_cloud_shadow(v_world, strata_light_dir);
 }
 
 void light() {
 	float g = LIGHT_IS_DIRECTIONAL ? f_sun_gate : 1.0;
+	// Baked occlusion reaches direct light partly (creases the shadow maps are too coarse to catch) and its
+	// highlights fully.
+	float occ_diffuse = mix(1.0, f_occ, 0.6);
+	float occ_spec = f_occ * f_occ;
+	vec3 radiance = LIGHT_COLOR * ATTENUATION * g;
 	if (kind == 2) {
-		// Kajiya-Kay: two highlights along the strand direction (a white primary, a tinted secondary).
+		// Kajiya-Kay with shifted tangents: a light-coloured primary highlight toward the tips and a broader one in
+		// the hair's own colour toward the roots, both jittered per strand so they break into streaks.
 		vec3 h = normalize(VIEW + LIGHT);
 		vec3 t = normalize(f_tangent - NORMAL * dot(f_tangent, NORMAL));
-		float th = dot(t, h);
-		float s1 = pow(sqrt(max(1.0 - th * th, 0.0)), 80.0);
-		vec3 t2 = normalize(t + NORMAL * 0.12);
+		vec3 t1 = normalize(t + NORMAL * (-0.06 + f_shift));
+		vec3 t2 = normalize(t + NORMAL * (0.14 + f_shift));
+		float th1 = dot(t1, h);
 		float th2 = dot(t2, h);
-		float s2 = pow(sqrt(max(1.0 - th2 * th2, 0.0)), 22.0);
-		float ndl = clamp(dot(NORMAL, LIGHT) * 0.7 + 0.3, 0.0, 1.0);
-		vec3 radiance = LIGHT_COLOR * ATTENUATION * g;
-		DIFFUSE_LIGHT += radiance * ndl / PI;
-		SPECULAR_LIGHT += radiance * ndl * (s1 * 0.12 + s2 * 0.1 * ALBEDO);
+		float s1 = pow(sqrt(max(1.0 - th1 * th1, 0.0)), 70.0);
+		float s2 = pow(sqrt(max(1.0 - th2 * th2, 0.0)), 20.0);
+		float ndl = clamp(dot(NORMAL, LIGHT) * 0.6 + 0.4, 0.0, 1.0);
+		DIFFUSE_LIGHT += radiance * ndl * occ_diffuse / PI;
+		vec3 primary = mix(ALBEDO, vec3(1.0), 0.5) * 0.05;
+		vec3 secondary = ALBEDO * 0.11;
+		SPECULAR_LIGHT += radiance * clamp(dot(NORMAL, LIGHT) * 0.5 + 0.5, 0.0, 1.0) * (s1 * primary + s2 * secondary) * occ_spec;
 	} else if (kind == 0) {
-		// Skin: light wraps past the terminator with a warm tint (scattering under the surface).
+		// Skin: red light scatters furthest under the surface, so it wraps further past the terminator than green
+		// and blue (a soft, warm shadow edge while the lit side stays neutral); GGX gives the oily sheen.
 		float ndl = dot(NORMAL, LIGHT);
-		float wrap = clamp((ndl + 0.3) / 1.3, 0.0, 1.0);
-		vec3 radiance = LIGHT_COLOR * ATTENUATION * g;
-		vec3 scatter = mix(vec3(1.0), vec3(1.0, 0.55, 0.45), clamp(1.0 - ndl * 2.0, 0.0, 1.0));
-		DIFFUSE_LIGHT += radiance * wrap * scatter / PI;
+		vec3 wrap = vec3(0.22, 0.12, 0.09);
+		vec3 diffuse = clamp((vec3(ndl) + wrap) / (1.0 + wrap), 0.0, 1.0);
+		DIFFUSE_LIGHT += radiance * diffuse * occ_diffuse / PI;
 		vec3 unused = vec3(0.0);
-		strata_direct_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, ROUGHNESS, 0.0, ALBEDO, unused, SPECULAR_LIGHT);
+		vec3 spec = vec3(0.0);
+		strata_direct_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, ROUGHNESS, 0.0, ALBEDO, unused, spec);
+		SPECULAR_LIGHT += spec * occ_spec;
 	} else {
-		strata_direct_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, ROUGHNESS, METALLIC, ALBEDO, DIFFUSE_LIGHT, SPECULAR_LIGHT);
+		vec3 diffuse = vec3(0.0);
+		vec3 spec = vec3(0.0);
+		strata_direct_light(NORMAL, LIGHT, VIEW, LIGHT_COLOR, ATTENUATION, LIGHT_IS_DIRECTIONAL, f_sun_gate, ROUGHNESS, METALLIC, ALBEDO, diffuse, spec);
+		DIFFUSE_LIGHT += diffuse * occ_diffuse;
+		SPECULAR_LIGHT += spec * occ_spec;
 	}
 }

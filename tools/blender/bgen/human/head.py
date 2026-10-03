@@ -1,5 +1,5 @@
-"""The head: skull, jaw, cheekbones, brow, nose and lips as a fine blob; then sculpted detail on locally subdivided
-regions (eyelids wrapping the eyeballs, the mouth line, nostrils, philtrum); separate eyeballs and ears.
+"""The head: a sculpted surface (headshape: skull, jaw, cheekbones, brow, eyelids, nose, lips and the neck, as a signed
+distance field) meshed at sub-millimetre detail, with the ears sculpted in, plus separate eyeballs.
 
 Head-local coordinates: origin at the skull's centre, x to the character's right, y forward (face), z up.
 """
@@ -7,13 +7,11 @@ import math
 
 import bmesh
 import bpy
+import numpy as np
 from mathutils import Vector
+from mathutils.bvhtree import BVHTree
 
-from .blobs import Blob, apply_modifiers
-from .body import limb_rotation
-
-
-LID_UPPER, LID_LOWER = 0.0046, 0.0039   # eye opening above / below the eye centre (head-local)
+from . import headshape
 
 
 class Head:
@@ -25,6 +23,7 @@ class Head:
         h = self.h
         self.eye_r = 0.0118 * h
         self.eyes = {sx: self.at((sx * 0.0315, 0.0695, -0.002)) for sx in (1, -1)}
+        self._shape = None
 
     def at(self, local) -> Vector:
         return self.c + Vector(local) * self.h
@@ -32,149 +31,53 @@ class Head:
     def local(self, world: Vector) -> Vector:
         return (world - self.c) / self.h
 
+    @property
+    def shape(self) -> headshape.HeadShape:
+        if self._shape is None:
+            eyes = {sx: np.asarray(self.local(e), dtype=float) for sx, e in self.eyes.items()}
+            self._shape = headshape.HeadShape(self.frame, eyes, self.eye_r / self.h)
+        return self._shape
+
     # ------------------------------------------------------------------ shape
     def build(self) -> bpy.types.Object:
-        fem, h = self.frame.female, self.h
-        male = 0.0 if fem else 1.0
-        fat = 0.85 + 0.35 * self.frame.weight
-        B = Blob("head_blob", 0.0024 * h)
-
-        def e(c, r, rot=None, neg=False):
-            B.ellipsoid(self.at(c), tuple(x * h for x in r), rot, negative=neg)
-
-        e((0, -0.014, 0.024), (0.073, 0.094, 0.083))                       # cranium
-        e((0, 0.042, 0.036), (0.058, 0.04, 0.048))                         # forehead
-        jaw_w = 0.051 if fem else 0.058                                    # jaw angle: narrower, softer on women
-        for sx in (-1, 1):
-            e((sx * 0.055, 0.016, 0.016), (0.023, 0.044, 0.04))            # temples
-            e((sx * 0.049, 0.055, -0.011), (0.022, 0.019, 0.015))          # cheekbones
-            e((sx * 0.038, 0.052, -0.036), (0.022 * fat, 0.025, 0.027))    # cheeks (kept under the cheekbones, not puffed out)
-            B.capsule(self.at((sx * jaw_w, -0.006, -0.05)), self.at((sx * (0.017 + 0.005 * male), 0.074, -0.094)), (0.0145 + 0.005 * male) * h)  # jaw
-            e((sx * 0.031, 0.086, -0.001), (0.017, 0.011, 0.012), neg=True)  # eye socket
-        e((0, 0.044, -0.03), (0.047, 0.042, 0.041))                        # maxilla
-        e((0, 0.032, -0.066 + 0.003 * (1 - male)), (0.044 + 0.004 * male, 0.046, 0.034))        # lower face
-        B.ball(self.at((0, 0.087, -0.09 - 0.006 * male)), (0.0145 + 0.0055 * male) * h)  # chin
-        B.capsule(self.at((-0.041, 0.077, 0.015)), self.at((0.041, 0.077, 0.015)), (0.0075 + 0.0045 * male) * h)  # brow ridge
-        # Nose: bridge, tip, wings, septum (smaller and finer on women).
-        n = 0.86 if fem else 1.0
-        B.capsule(self.at((0, 0.087, 0.008)), self.at((0, 0.087 + 0.022 * n, -0.033)), 0.0058 * h * n)
-        B.ball(self.at((0, 0.089 + 0.022 * n, -0.039)), 0.0094 * h * n)
-        for sx in (-1, 1):
-            B.ball(self.at((sx * 0.0122 * n, 0.095, -0.045)), 0.0071 * h * n)
-        B.capsule(self.at((0, 0.1, -0.049)), self.at((0, 0.092, -0.055)), 0.004 * h)
-        # Lips: a wider mouth, fuller on women.
-        e((0, 0.088, -0.064), (0.0265, 0.0105, 0.0068 + 0.0014 * (1 - male)))
-        e((0, 0.085, -0.0755), (0.024, 0.011, 0.0078 + 0.0016 * (1 - male)))
-        # Neck continues down into the body (covering the body's neck).
-        B.capsule(self.at((0, -0.012, -0.03)), self.at((0, -0.03, -0.2)), (0.054 if fem else 0.062) * h)
-        obj = B.to_mesh("head", 9000, smooth_iterations=1)
-        self._sculpt(obj)
+        obj = headshape.mesh(self.shape, h_local=0.00085, target=24000)
+        me = obj.data
+        co = np.empty(len(me.vertices) * 3, dtype=np.float32)
+        me.vertices.foreach_get("co", co)
+        me.vertices.foreach_set("co", (co.reshape(-1, 3) * self.h + np.asarray(self.c, dtype=np.float32)).ravel())
+        me.update()
         return obj
 
-    def _sculpt(self, obj):
-        """Refines the eye and mouth regions, then sculpts lids, the mouth line and nostrils."""
-        bm = bmesh.new()
-        bm.from_mesh(obj.data)
-        for _ in range(2):
-            region = [f for f in bm.faces if self._detail_region(self.local(f.calc_center_median()))]
-            edges = list({e for f in region for e in f.edges})
-            bmesh.ops.subdivide_edges(bm, edges=edges, cuts=1, use_grid_fill=True, smooth=0.5)
-        bmesh.ops.triangulate(bm, faces=bm.faces[:])
-        bm.normal_update()
-        for v in bm.verts:
-            v.co = self._sculpted(v.co.copy(), v.normal.copy())
-        # Cut away the neck's bottom cap (it tucks into the body).
-        bottom = [f for f in bm.faces if self.local(f.calc_center_median()).z < -0.15]
-        bmesh.ops.delete(bm, geom=bottom, context="FACES")
-        bm.to_mesh(obj.data)
-        bm.free()
-        for poly in obj.data.polygons:
-            poly.use_smooth = True
+    def fit_neck(self, head_obj, body_obj):
+        """The head's neck runs down into the chest and the body's own (thinner) neck stays inside it: drops the head
+        faces the torso covers, so the torso shows over them (bury_neck later drops the body's neck)."""
+        tree = BVHTree.FromObject(body_obj, bpy.context.evaluated_depsgraph_get())
 
-    def _detail_region(self, q: Vector) -> bool:
-        for sx in (1, -1):
-            if abs(q.x - sx * 0.0315) < 0.026 and abs(q.z + 0.002) < 0.02 and q.y > 0.045:
-                return True
-        return abs(q.x) < 0.034 and -0.086 < q.z < -0.036 and q.y > 0.06
+        def inside_body(co):
+            hit, normal, _, dist = tree.find_nearest(co)
+            return hit is not None and (co - hit).dot(normal) < 0 and dist > 0.002 * self.h
 
-    def _sculpted(self, co: Vector, n: Vector) -> Vector:
-        q = self.local(co)
-        for sx in (1, -1):
-            e = self.local(self.eyes[sx])
-            d = q - e
-            if abs(d.x) < 0.026 and abs(d.z) < 0.022 and d.y > -0.004:
-                q = self._eyelid(q, e, sx)
-        q = self._mouth(q)
-        return self.c + q * self.h
+        _delete_faces(head_obj, {i for i, poly in enumerate(head_obj.data.polygons)
+                                 if self.local(poly.center).z < -0.1 and inside_body(poly.center)})
 
-    def _eyelid(self, q, e, sx):
-        """Wraps skin around the eyeball: inside the almond-shaped opening the skin sinks behind the eye; around it,
-        the lids hug the eyeball's curve, thickening away from the margin, and fade back into the socket."""
-        R = self.eye_r / self.h
-        d = q - e
-        x = d.x * sx                       # + toward the outer corner
-        z = d.z - 0.06 * x                 # outer corner sits a little higher
-        half_w = 0.0148
-        u = max(0.0, 1.0 - (x / half_w) ** 2)
-        upper = LID_UPPER * u ** 0.5       # the upper lid rests on the top of the iris (a relaxed, not staring, look)
-        lower = LID_LOWER * u ** 0.65
-        radial = math.hypot(d.x, d.z)
-        dirn = d.normalized() if d.length > 1e-6 else Vector((0, 1, 0))
-        if -lower < z < upper and u > 0:
-            return e + dirn * (R - 0.0022)          # opening: hidden behind the eyeball
-        gap = (z - upper) if z >= upper else (-lower - z)
-        gap = max(gap, 0.0) + max(0.0, abs(x) - half_w)
-        lid = R + 0.0009 + min(gap, 0.012) * 0.3
-        if z >= upper and 0.006 < gap < 0.009:
-            lid -= 0.0006                           # upper lid crease
-        blend = 1.0 - smooth(0.012, 0.021, radial)
-        return q.lerp(e + dirn * lid, blend)
+    def bury_neck(self, body_obj):
+        """Drops the body faces inside the head's neck (after clothing is cut from the whole body, so a shirt has
+        no gap where the neck stood)."""
+        centres = np.array([self.local(poly.center) for poly in body_obj.data.polygons], dtype=np.float32).reshape(-1, 3)
+        near = np.flatnonzero(centres[:, 2] > -0.34)
+        inside = self.shape.field(centres[near]) < -0.002
+        _delete_faces(body_obj, set(near[inside].tolist()))
 
-    def _mouth(self, q):
-        """Mouth line (a crease between the lips, deeper at the corners), philtrum groove and nostrils."""
-        mz = -0.0697
-        if abs(q.x) < 0.026 and abs(q.z - mz) < 0.004 and q.y > 0.07:
-            k = (1.0 - abs(q.z - mz) / 0.004) * (1.0 - smooth(0.018, 0.026, abs(q.x)))
-            q = q - Vector((0, 0.0024 + 0.0018 * smooth(0.012, 0.022, abs(q.x)), 0)) * k
-        if abs(q.x) < 0.006 and -0.06 < q.z < -0.052 and q.y > 0.08:
-            q = q - Vector((0, 0.0009 * (1 - abs(q.x) / 0.006), 0))
-        # Nasolabial folds: shallow grooves from the nose wings to beside the mouth corners.
-        for sx in (1, -1):
-            a, b = Vector((sx * 0.018, 0, -0.047)), Vector((sx * 0.03, 0, -0.078))
-            p2 = Vector((q.x, 0, q.z))
-            t = max(0.0, min(1.0, (p2 - a).dot(b - a) / (b - a).length_squared))
-            dist = (p2 - (a + (b - a) * t)).length
-            if dist < 0.004 and q.y > 0.06:
-                q = q - Vector((0, 0.0006 * (1 - dist / 0.004) * math.sin(t * math.pi) ** 0.5, 0))
-            corner = Vector((q.x - sx * 0.026, 0, q.z + 0.0697))
-            if corner.length < 0.005 and q.y > 0.07:
-                q = q - Vector((0, 0.001 * (1 - corner.length / 0.005), 0))
-        for sx in (1, -1):
-            nd = Vector((q.x - sx * 0.0072, 0, q.z + 0.0508))
-            if nd.length < 0.0045 and q.y > 0.085:
-                q = q + Vector((0, -0.001, 0.0035)) * (1 - nd.length / 0.0045)
-        return q
+    def neck_depth(self, X):
+        """How far (metres) each point lies inside the head's neck (0 outside it)."""
+        q = ((np.asarray(X) - np.asarray(self.c)) / self.h).astype(np.float32)
+        out = np.zeros(len(q))
+        near = np.flatnonzero(q[:, 2] > -0.34)
+        if len(near):
+            out[near] = np.maximum(-self.shape.field(q[near]) * self.h, 0.0)
+        return out
 
     # ------------------------------------------------------------------ parts
-    def ears(self):
-        """Ears: a flattened plate with a rolled helix rim, a hollow concha and a lobe."""
-        parts = []
-        for sx in (1, -1):
-            B = Blob(f"ear_{sx}", 0.0012 * self.h)
-            c = self.at((sx * 0.077, -0.002, -0.012))
-            out = Vector((sx, -0.25, 0)).normalized()
-            rot = limb_rotation(Vector((0, 0.18, 1)))
-            h = self.h
-            B.ellipsoid(c + out * 0.004 * h, (0.029 * h, 0.017 * h, 0.0045 * h), rot)
-            pts = [c + Vector((sx * 0.006, -0.012 * math.cos(a) - 0.004, 0.028 * math.sin(a) + 0.002)) * h for a in
-                   (i * math.pi / 9 - math.pi * 0.35 for i in range(12))]
-            for a, b in zip(pts, pts[1:]):
-                B.capsule(a + out * 0.006 * h, b + out * 0.006 * h, 0.0038 * h)
-            B.ellipsoid(c + out * 0.009 * h + Vector((0, 0.002, -0.004)) * h, (0.011 * h, 0.009 * h, 0.004 * h), rot, negative=True)
-            B.ball(c + Vector((0, 0.004, -0.028)) * h + out * 0.004 * h, 0.0068 * h)
-            parts.append(B.to_mesh(f"ear_{sx}", 1400, smooth_iterations=1))
-        return parts
-
     def eyeballs(self, iris_hex: str):
         """Eyeballs built around the gaze axis: exact rings for the pupil, iris (radial fibres) and dark limbus,
         a bulging cornea and a sclera that reddens toward the sides."""
@@ -182,7 +85,7 @@ class Head:
         iris = hex3(iris_hex)
         R = self.eye_r
         # Angles from the gaze axis where rings are placed (radians); faces take the colour of their band.
-        rings = [0.0, 0.08, 0.15, 0.165, 0.22, 0.29, 0.35, 0.385, 0.405, 0.46, 0.6, 0.85, 1.15, 1.5, 1.9, 2.4, 2.9, math.pi]
+        rings = [0.0, 0.08, 0.15, 0.165, 0.24, 0.32, 0.4, 0.455, 0.485, 0.53, 0.65, 0.85, 1.15, 1.5, 1.9, 2.4, 2.9, math.pi]
         seg = 36
         objs = []
         for sx in (1, -1):
@@ -190,7 +93,7 @@ class Head:
             col = bm.loops.layers.color.new("Color")
             verts = []
             for a in rings:
-                r = R * (1.0 + (0.06 * (1 - a / 0.4) ** 1.5 if a < 0.4 else 0.0))   # cornea bulge
+                r = R * (1.0 + (0.06 * (1 - a / 0.5) ** 1.5 if a < 0.5 else 0.0))   # cornea bulge
                 ring = []
                 for k in range(seg if 0 < a < math.pi else 1):
                     t = 2 * math.pi * k / seg
@@ -201,14 +104,14 @@ class Head:
                 mid = (a0 + a1) / 2
                 if mid < 0.155:
                     return (0.015, 0.015, 0.02)
-                if mid < 0.39:
-                    k = (mid - 0.155) / 0.23
+                if mid < 0.47:
+                    k = (mid - 0.155) / 0.315
                     spoke = 0.8 + 0.4 * (0.5 + 0.5 * math.sin(t * 29.0)) * (0.5 + 0.5 * math.sin(t * 11.0 + 1.3))
                     return tuple(min(1.0, iris[i] * spoke * (1.25 - 0.6 * k)) for i in range(3))
-                if mid < 0.41:
+                if mid < 0.51:
                     return tuple(x * 0.3 for x in iris)
-                red = min(1.0, (mid - 0.41) / 1.4)
-                return (0.93, 0.89 - 0.12 * red, 0.86 - 0.15 * red)
+                red = min(1.0, (mid - 0.51) / 1.4)
+                return (0.86, 0.82 - 0.1 * red, 0.78 - 0.12 * red)
 
             for i in range(len(rings) - 1):
                 a, b = verts[i], verts[i + 1]
@@ -233,6 +136,16 @@ class Head:
             bpy.context.scene.collection.objects.link(obj)
             objs.append(obj)
         return objs
+
+
+def _delete_faces(obj, indices):
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    bm.faces.ensure_lookup_table()
+    bmesh.ops.delete(bm, geom=[bm.faces[i] for i in indices], context="FACES")
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    bm.to_mesh(obj.data)
+    bm.free()
 
 
 def smooth(a, b, x):

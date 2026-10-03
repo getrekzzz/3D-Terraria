@@ -7,6 +7,7 @@ glTF export (linear COLOR_0) and the game shader treat every model the same way.
 import math
 
 import bpy
+import numpy as np
 from mathutils import Vector
 
 
@@ -67,6 +68,9 @@ class SkinPainter:
         # thins (distance LOD simplification, extreme head poses).
         style = p.get("hairStyle", "long" if frame.female else "short")
         self.scalp = style != "bald" and p.get("hat") != "hood"
+        from .locks import STYLES
+        self.part = STYLES[style].sweep if style in STYLES else 0.0
+        self.sideburns = not (frame.female or style in ("ponytail", "bun"))
 
     def body(self, co: Vector):
         j = self.frame.j
@@ -79,15 +83,18 @@ class SkinPainter:
         return c
 
     def face(self, co: Vector):
+        from .head import smooth
         q = self.head.local(co)
         c = self.skin
-        # Lips: redder and a little darker, sharpest at the vermilion border.
-        lip = gauss(q.x / 0.024, 1.0) ** 3 * gauss((q.z + 0.07) / 0.0105, 1.0) ** 2 * (1.0 if q.y > 0.078 else 0.0)
-        c = mix(c, mul(c, (0.93, 0.6, 0.6)), min(lip * 1.3, 0.85))
+        # Lips: the sculpted lips' own surface, redder and a little darker, with a crisp vermilion border.
+        lip_d = float(self.head.shape.lips(np.asarray([q], dtype=np.float32))[0]) if q.y > 0.075 and q.z < -0.05 else 1.0
+        lip = 1.0 - smooth(0.0002, 0.001, lip_d)
+        tone = (0.9, 0.62, 0.64) if self.frame.female else (0.92, 0.72, 0.72)
+        c = mix(c, mul(c, tone), lip * (0.75 if self.frame.female else 0.6))
         blush = sum(gauss((q - Vector((sx * 0.042, 0.07, -0.03))).length, 0.022) for sx in (1, -1))
         blush += 0.7 * gauss((q - Vector((0, 0.11, -0.04))).length, 0.012)
         blush += 0.6 * (gauss(abs(q.x) - 0.075, 0.012) if abs(q.x) > 0.06 else 0.0)
-        c = mix(c, mul(c, (1.0, 0.86, 0.85)), min(blush, 1.0) * 0.55)
+        c = mix(c, mul(c, (1.0, 0.88, 0.87)), min(blush, 1.0) * 0.4)
         for sx in (1, -1):
             e = self.head.local(self.head.eyes[sx])
             d = q - e
@@ -101,15 +108,13 @@ class SkinPainter:
             if -0.018 < x < 0.024 and q.y > 0.06:
                 brow = gauss((d.z - arch) / 0.0042, 1.0) * (1.0 - max(0.0, (x - 0.014) / 0.012))
                 c = mix(c, self.hair, max(0.0, min(brow, 1.0)) * 0.7)
-        if self.stubble and q.y > 0.0:
-            jaw = (1.0 if q.z < -0.052 else gauss((q.z + 0.052) / 0.01, 1.0)) * (1.0 if q.z > -0.13 else 0.0)
-            upper = gauss(q.x / 0.022, 1.0) * gauss((q.z + 0.057) / 0.005, 1.0)
-            amount = max(jaw * (1.0 - lip), upper) * 0.22
-            c = mix(c, (0.25, 0.22, 0.2), amount)
+        if self.stubble:
+            # A shaved beard's shadow: cool, over the beard's area, fading out at its edges.
+            from .hair import beard_region
+            shadow = smooth(-0.004, 0.01, beard_region(q, True)) * (1.0 - lip)
+            c = mix(c, mul(c, (0.74, 0.76, 0.8)), shadow * 0.4)
         if self.scalp:
-            from .hair import _in_ear, hairline
-            if not _in_ear(q):
-                from .head import smooth
-                roots = smooth(-0.006, 0.006, q.z - hairline(q))
-                c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), roots)
+            # Hair roots under the hair, thinning out softly at the hairline (the locks cover the edge).
+            from .hair import coverage
+            c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), coverage(q, self.part, self.sideburns, 0.008) * 0.9)
         return c
