@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 using Godot;
 using Strata.Core.Common;
+using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Session;
 
 namespace Strata.Game.Entities;
 
 /// <summary>
-/// Makes melee attacks readable: a fading blade arc that follows the sweep the melee system tests hits against
-/// (from +arc/2 to −arc/2 around the aim, in the aim's plane) and a quick streak along the aim for thrusts.
+/// Makes melee attacks readable: a fading arc at the weapon's reach that follows the sweep the melee system tests hits
+/// against (from the player's right to their left around the aim, in the aim's plane, as the swing strikes) and a quick
+/// streak along the aim as a thrust drives forward. The held blade leaves its own trail (Player/BladeTrail).
 /// </summary>
 public sealed partial class SwingTrail : Node3D
 {
@@ -23,6 +25,7 @@ public sealed partial class SwingTrail : Node3D
 
     private readonly List<Trail> _trails = new();
     private readonly ImmediateMesh _mesh = new();
+    private readonly List<(Vector3, Color)> _vertices = new();
 
     public void Initialize(GameWorld game)
     {
@@ -75,8 +78,7 @@ public sealed partial class SwingTrail : Node3D
             t.Age += (float)delta;
             if (t.Age > t.Duration * 1.3f || !t.Player.Alive) _trails.RemoveAt(i);
         }
-        if (_trails.Count == 0) return; // (an empty surface is an error)
-        _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+        _vertices.Clear();
         foreach (var t in _trails)
         {
             var c = t.Player.Center;
@@ -84,21 +86,29 @@ public sealed partial class SwingTrail : Node3D
             if (t.Thrust) DrawThrust(t, origin);
             else DrawArc(t, origin);
         }
+        if (_vertices.Count == 0) return; // (an empty surface is an error)
+        _mesh.SurfaceBegin(Mesh.PrimitiveType.Triangles);
+        foreach (var (p, col) in _vertices)
+        {
+            _mesh.SurfaceSetColor(col);
+            _mesh.SurfaceAddVertex(p);
+        }
         _mesh.SurfaceEnd();
     }
 
     private void DrawArc(Trail t, Vector3 origin)
     {
-        float progress = Mathf.Clamp(t.Age / t.Duration, 0f, 1f);
-        float fade = t.Age > t.Duration ? 1f - (t.Age - t.Duration) / (t.Duration * 0.3f) : 1f;
-        float head = t.HalfArc - progress * 2f * t.HalfArc;
-        float tail = Mathf.Min(t.HalfArc, head + 1.4f);
+        float time = t.Age / t.Duration;
+        if (time < MeleeSystem.StrikeStart) return; // still winding up
+        float fade = 1f - Mathf.SmoothStep(MeleeSystem.StrikeEnd, MeleeSystem.StrikeEnd + 0.3f, time);
+        float head = -t.HalfArc + MeleeSystem.SweepProgress(time) * 2f * t.HalfArc;
+        float tail = Mathf.Max(-t.HalfArc, head - 1.4f);
         const int steps = 14;
         float inner = t.Reach * 0.35f;
         for (int k = 0; k < steps; k++)
         {
             float a0 = Mathf.Lerp(head, tail, k / (float)steps), a1 = Mathf.Lerp(head, tail, (k + 1) / (float)steps);
-            float alpha0 = (1f - k / (float)steps) * 0.55f * fade, alpha1 = (1f - (k + 1) / (float)steps) * 0.55f * fade;
+            float alpha0 = (1f - k / (float)steps) * 0.4f * fade, alpha1 = (1f - (k + 1) / (float)steps) * 0.4f * fade;
             Quad(Point(t, origin, a0, inner), Point(t, origin, a0, t.Reach), Point(t, origin, a1, t.Reach), Point(t, origin, a1, inner),
                 new Color(t.Color, alpha0 * 0.2f), new Color(t.Color, alpha0), new Color(t.Color, alpha1), new Color(t.Color, alpha1 * 0.2f));
         }
@@ -106,12 +116,14 @@ public sealed partial class SwingTrail : Node3D
 
     private void DrawThrust(Trail t, Vector3 origin)
     {
-        float progress = Mathf.Clamp(t.Age / t.Duration, 0f, 1f);
-        float alpha = Mathf.Sin(progress * Mathf.Pi) * 0.6f;
+        // In step with the thrust action: drawn back until about a third of the way through, full reach by half.
+        float time = t.Age / t.Duration;
+        float alpha = Mathf.SmoothStep(0.3f, 0.38f, time) * (1f - Mathf.SmoothStep(0.5f, 0.8f, time)) * 0.6f;
+        if (alpha <= 0f) return;
         var dir = Direction(t.Yaw, t.Pitch);
         var side = dir.Cross(Vector3.Up).Normalized() * 0.07f;
         var a = origin + dir * 0.4f;
-        var b = origin + dir * (0.4f + t.Reach * Mathf.Min(1f, progress * 2f));
+        var b = origin + dir * (0.4f + t.Reach * Mathf.SmoothStep(0.3f, 0.5f, time));
         Quad(a - side, a + side, b + side * 0.2f, b - side * 0.2f,
             new Color(t.Color, 0), new Color(t.Color, 0), new Color(t.Color, alpha), new Color(t.Color, alpha));
     }
@@ -128,10 +140,6 @@ public sealed partial class SwingTrail : Node3D
 
     private void Quad(Vector3 a, Vector3 b, Vector3 c, Vector3 d, Color ca, Color cb, Color cc, Color cd)
     {
-        foreach (var (p, col) in new[] { (a, ca), (b, cb), (c, cc), (a, ca), (c, cc), (d, cd) })
-        {
-            _mesh.SurfaceSetColor(col);
-            _mesh.SurfaceAddVertex(p);
-        }
+        _vertices.AddRange(new[] { (a, ca), (b, cb), (c, cc), (a, ca), (c, cc), (d, cd) });
     }
 }

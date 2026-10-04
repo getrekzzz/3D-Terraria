@@ -8,7 +8,8 @@ namespace Strata.Core.Gameplay.Entities;
 
 /// <summary>
 /// Resolves melee swings and thrusts over their use animation: the blade sweeps a horizontal arc in front of the
-/// player (or stabs along the aim) and each creature is hit at most once per swing.
+/// player from right to left as the swing strikes (or stabs along the aim) and each creature is hit at most once per
+/// swing.
 /// </summary>
 public sealed class MeleeSystem
 {
@@ -99,12 +100,26 @@ public sealed class MeleeSystem
         float aimPlaneY = MathF.Tan(s.Pitch) * flat.Length();
         if (MathF.Abs(to.Y - aimPlaneY) > VerticalReach + half.Y) return false;
         if (flat.Length() < 0.6f) return true; // point blank
-        // The blade sweeps from +arc/2 to −arc/2 around the aim yaw over the animation.
+        // The blade sweeps from −arc/2 (the player's right) to +arc/2 (their left) around the aim yaw as it strikes.
         float halfArc = swing.Arc * MathF.PI / 360f;
-        float current = halfArc - t * 2f * halfArc;
+        float current = -halfArc + SweepProgress(t) * 2f * halfArc;
         float angle = WrapAngle(BrainFactory.YawOf(flat) - s.Yaw);
-        return angle <= halfArc && angle >= current - 0.25f;
+        return angle >= -halfArc && angle <= current + 0.25f;
     }
+
+    /// <summary>
+    /// How far through its arc a swing is at <paramref name="t"/> (0..1 of the use animation): none during the wind-up,
+    /// all of it by the follow-through, in step with the human swing and chop actions, which strike from over the right
+    /// shoulder down across to the left in that window (tools/blender/bgen/human/actions.py).
+    /// </summary>
+    public static float SweepProgress(float t)
+    {
+        float u = Math.Clamp((t - StrikeStart) / (StrikeEnd - StrikeStart), 0f, 1f);
+        return u * u * (3f - 2f * u);
+    }
+
+    /// <summary>The part of the use animation (fractions) in which a swing's blade crosses in front of the player.</summary>
+    public const float StrikeStart = 0.36f, StrikeEnd = 0.56f;
 
     private static float WrapAngle(float a)
     {

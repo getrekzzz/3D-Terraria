@@ -10,7 +10,7 @@ namespace Strata.Game.Player;
 
 /// <summary>
 /// The visible player body in third person: the animated human (see PlayerAvatar.Motion), the held item in the right
-/// hand and voxel lighting.
+/// hand (carried and trailed as PlayerAvatar.Blade describes) and voxel lighting.
 /// </summary>
 public sealed partial class PlayerAvatar : Node3D
 {
@@ -20,6 +20,7 @@ public sealed partial class PlayerAvatar : Node3D
     private CreatureVisual? _visual;
     private Node3D? _held;
     private ItemDef? _heldItem;
+    private Color _light;
 
     public void Initialize(PlayerController controller, GameWorld game, PropLibrary props)
     {
@@ -36,6 +37,7 @@ public sealed partial class PlayerAvatar : Node3D
         if (ResourceLoader.Exists("res://" + model)) _visual.SetAppearance(look);
         // Full detail up close: simplified LODs let the hair shell sink into the scalp.
         _visual.SetLodBias(8f);
+        InitializeBlade();
     }
 
     public override void _Process(double delta)
@@ -48,8 +50,9 @@ public sealed partial class PlayerAvatar : Node3D
         UpdateHeld(entity.Minecart != null ? default : entity.State.Inventory.Held);
         UpdateCart(entity.Minecart);
         UpdateGear(delta);
+        _light = PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity);
         Animate(entity, (float)delta);
-        _visual.SetLight(PlayerLight.Brighten(LightProbe.SampleSmooth(_game.Session.World, GlobalPosition + Vector3.Up * 0.9f), _controller.Entity));
+        _visual.SetLight(_light);
     }
 
     /// <summary>Clip choice for bodies without an animation set (their own embedded clips).</summary>
@@ -86,9 +89,13 @@ public sealed partial class PlayerAvatar : Node3D
         _held?.QueueFree();
         _held = null;
         LightAnchor = null;
-        if (item == null || _visual == null) return;
+        if (item == null || _visual == null)
+        {
+            TrackBlade(null, null);
+            return;
+        }
         var path = AssetPaths.ItemModel(item, _game.Session.Content);
-        Node3D node;
+        Node3D? node;
         if (path != null && _props.Model(path, multimesh: false) is { } mesh)
         {
             node = new MeshInstance3D { Mesh = mesh, Scale = Vector3.One * HeldScale(item) };
@@ -113,7 +120,9 @@ public sealed partial class PlayerAvatar : Node3D
         {
             node.QueueFree();
             LightAnchor = null;
+            node = null;
         }
+        TrackBlade(node, item);
     }
 
     /// <summary>

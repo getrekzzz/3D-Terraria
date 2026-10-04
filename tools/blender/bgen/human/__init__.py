@@ -296,4 +296,14 @@ def join(objs, name):
     obj = bpy.context.view_layer.objects.active
     obj.name = name
     obj.data.name = name
+    # Faces of five or more sides (button caps, buckle plates) stop the exporter computing tangents for the whole
+    # mesh, which the hair highlights need.
+    import bmesh
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    ngons = [f for f in bm.faces if len(f.verts) > 4]
+    if ngons:
+        bmesh.ops.triangulate(bm, faces=ngons)
+        bm.to_mesh(obj.data)
+    bm.free()
     return obj

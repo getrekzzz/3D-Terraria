@@ -11,8 +11,8 @@
 * **Crafting** — `RecipeBook` (indexed, atomic crafts) + `CraftingEnvironment` (stations within reach,
   nearby liquids, biome/time conditions).
 * **Combat** — `DamageModel` (class bonuses, ±15 % variance, defence × difficulty factor, crits, knockback
-  resistance). `MeleeSystem` sweeps swing arcs/thrusts over the use animation (one hit per creature per
-  swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
+  resistance). `MeleeSystem` sweeps swing arcs from the player's right to their left while the swing
+  strikes (`SweepProgress`, in step with the animation) and thrusts along the aim (one hit per creature per swing); `ProjectileSystem` handles gravity, drag, terrain bounces, pierce and on-hit effects.
 * **Creatures** — `NpcSystem` runs brains (`SlimeHop`, `Walker`, `Flyer`, `Swimmer`, `Lunger`, `Idle`, boss
   brains, created from the enemy's `brain` spec), data-driven `ranged` volleys of hostile projectiles (line of
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage

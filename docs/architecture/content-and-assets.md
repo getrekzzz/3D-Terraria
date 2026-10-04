@@ -32,18 +32,26 @@ sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `
 every tile object, item and enemy has a generator (no Blender needed).
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
-weight, age, sex), metaball body with shod feet, sculpted head (eyelids resting on the iris, eyeballs with iris and
-pupil, lips, ears, brows and lashes; a narrower jaw, finer nose and fuller lips for women), hands with jointed fingers
-and nails, painted skin (lips, flush, knuckles, stubble), hair styles (a natural hairline with sideburns, a fringe
-swept from the parting, a thick long-hair curtain, a tied ponytail) and beards as strand shells, clothing cut from body shells (shirts, trousers, dresses, coats, robes, aprons, belts,
-boots, hats, masks), and a 52-bone rig (fingers included) with heat/chain weights. Skeletons are separate bones on
-the same rig. Params per character live in `assets.json`. They export rest-pose UVs and tangents for the character
-shader.
+weight, age, sex), metaball body, a head sculpted as a signed distance field (`headshape.py`, `earshape.py`, meshed
+by `sdf.py`/`fieldmesh.py` with the meshes cached in `tools/blender/_cache`, not committed: skull, cheekbones, jaw,
+almond eyelids with creases, a nose with wings and nostrils, lips with a cupid's bow, rolled ears) with separate
+eyeballs, brows and lashes; hands with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble);
+hair sculpted from traced locks into one surface with grooves between the clumps (`locks.py` traces where each lock
+roots and how it flows, `hairsdf.py` blends them into clumps with UVs along the flow) and beards as strand shells;
+clothing cut from body shells and tailored (`tailoring.py`: eased off the skin, spanned across hollows, cinched under
+the belt and boot tops, folded inside the elbows and knees and stacked above the cuffs) then finished
+(`finishing.py`: pressed seams, ribbed collars and cuffs, hems, turned-down boot rims, soles, buttons): shirts,
+trousers, dresses, coats, robes with sashes, aprons, belts with buckles, boots, hats, masks. Ambient occlusion is baked
+into the vertex alpha (`occlusion.py`) for the character shader. A 52-bone rig (fingers included) with heat/chain
+weights; long hair follows the torso, not the arms. Skeletons are separate bones on the same rig. Params per
+character live in `assets.json`. They export rest-pose UVs and tangents for the character shader.
 
 Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
 (exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,
 death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,
-hold. The right hand is a closed fist around a handle at `motion.GRIP`, where the game attaches held items. Characters with the same skeleton (body, height, gait) share one animation set,
+hold. The right hand is a closed fist around a handle at `motion.GRIP`, where the game attaches held items; attacks
+have a wind-up, a coil, a whip through to the wrist and a follow-through, and strike where the melee system sweeps
+its hits (see actions.py). Characters with the same skeleton (body, height, gait) share one animation set,
 `assets/models/creatures/anim/<set>.glb`, with `index.json` naming each character's set; rebuild them with
 `build_all.py --anims [--shard=I/N]` (seconds each, no character meshes touched).
 
