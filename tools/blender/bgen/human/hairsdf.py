@@ -1,10 +1,11 @@
 """Sculpted hair: the groom's locks (locks.py, hairtails.py) become clumps blended into each other and into a thin layer
 over the scalp, meshed from their distance field like the head (fieldmesh). The result is one cohesive surface with soft
 grooves between the clumps, the way game hair is sculpted, instead of separate ribbons with gaps. A clump is lens-shaped
-across, grows out of the layer under it and narrows to a rounded point, its tip turning round in section so it never
-ends as a flat flake; tips blend less, so the ends of long hair stay distinct locks. Every face takes its UVs from the
-clump it belongs to (U runs along it), so the hair shader's strands and highlights follow the flow; the colour darkens
-toward the roots and into the grooves.
+across, grows out of the layer under it and narrows to a rounded point (or a blunt end), its tip turning round in
+section so it never ends as a flat flake; round the outside of a bend the section swings round, so a bent clump stays
+full. Tips blend less, so the ends of long hair stay distinct locks (a part may keep them merging, for an even edge).
+Short and tied hair is cut off in a clean line along the hairline. Under a hat the hair is pressed flat inside its
+crown and cut round it. Every face takes its UVs from the clump it belongs to (hairpaint.py).
 
 Everything is in head-local units (headshape) until the finished mesh is placed on the head.
 """
@@ -14,7 +15,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from . import fieldmesh, sdf
-from .hair import coverages, ear_clears
+from .hair import coverages, ear_clears, hairlines
 
 F = np.float32
 CELL = 0.008          # spatial hash cell (head-local) for finding the clumps near a point
@@ -26,8 +27,10 @@ SOURCES = ("hairsdf.py", "hair.py", "locks.py", "headshape.py", "earshape.py", "
 class Strands:
     """Traced locks: rings x locks x 3 centrelines with each lock's width and thickness (per lock, or per ring and
     lock), where they start narrowing to their tips (fraction of their length), how thin they are at the root, how
-    round they stay at least (thickness over width), and optionally the way each lock's flat side faces (rings x locks
-    x 3; by default away from the head)."""
+    round they stay at least (thickness over width), optionally the way each lock's flat side faces (rings x locks
+    x 3; by default away from the head), how much more softly than the rest its locks merge (``blend``), how blunt
+    their ends are (0 a point .. 1 cut square), how much their tips still merge (``merge``, 1 as much as the rest) and
+    whether they are cut off along the hairline (``cut``: the scalp's locks, not a tail hanging from them)."""
     P: np.ndarray
     width: np.ndarray
     thick: np.ndarray
@@ -35,6 +38,10 @@ class Strands:
     root: float = 0.45
     N: np.ndarray = None
     round: float = 0.0
+    blend: float = 1.0
+    blunt: float = 0.0
+    merge: float = 0.25
+    cut: bool = False
 
 
 def _ss(a, b, x):
@@ -61,9 +68,9 @@ def _solid(X, s):
     return sdf.ellipsoid(X, *s[1:])
 
 
-def _tipped(t):
-    """How much blending a clump keeps along it: tips blend little, so they stay apart."""
-    return (1.0 - 0.75 * _ss(0.55, 0.97, t)).astype(F)
+def _tipped(t, merge):
+    """How much blending a clump keeps along it: tips blend only ``merge`` as much, so (by default) they stay apart."""
+    return (1.0 - (1.0 - merge) * _ss(0.55, 0.97, t)).astype(F)
 
 
 class Sculpt:
@@ -73,10 +80,10 @@ class Sculpt:
         self.k = blend
         self.k_hang = blend * 1.4 if groom.st.fall else blend
         self.seam = seam                # groove depth between clumps over the head, below it, and its reach
-        self.reach = max(self.k_hang * 1.25, seam[2])       # how far off a clump still shapes the hair
+        self.reach = max(self.k_hang * 1.25 * max(p.blend for p in parts), seam[2])  # how far off a clump counts
         self.solids = list(solids)
         seg = {k: [] for k in ("a", "b", "Ba", "Bb", "Na", "Nb", "wa", "wb", "ha", "hb", "arc_a", "arc_b", "lock")}
-        self.length, self.span = [], []
+        self.length, self.span, self.kscale = [], [], []
         lock = nseg = 0
         for part in parts:
             P = np.asarray(part.P, dtype=F)
@@ -87,15 +94,15 @@ class Sculpt:
             N = np.cross(B, T)
             t = (np.arange(K) / (K - 1))[:, None]
             u = np.clip((t - part.taper) / (1 - part.taper), 0.0, 1.0)
-            tip = (1 - u ** 2.2) ** 0.55                                  # an ogive: full, then a rounded point
+            tip = part.blunt + (1 - part.blunt) * (1 - u ** 2.2) ** 0.55     # an ogive: full, then a rounded point
             W = np.broadcast_to(np.asarray(part.width, dtype=F), (K, n)) if np.ndim(part.width) == 2 else \
                 np.broadcast_to(np.asarray(part.width, dtype=F)[None, :], (K, n))
             H = np.broadcast_to(np.asarray(part.thick, dtype=F), (K, n)) if np.ndim(part.thick) == 2 else \
                 np.broadcast_to(np.asarray(part.thick, dtype=F)[None, :], (K, n))
             w = W * 0.5 * (0.78 + 0.22 * _ss(0.0, 0.15, t)) * tip
             hh = H * 0.5 * (part.root + (1 - part.root) * _ss(0.0, 0.2, t)) * (1 - 0.2 * t) * np.sqrt(tip)
-            w = np.maximum(w, 0.0008)
-            hh = np.maximum(np.minimum(np.maximum(hh, w * part.round), w), 0.0006)     # round in section toward the tip
+            w = np.maximum(w, 0.0016)
+            hh = np.maximum(np.minimum(np.maximum(hh, w * part.round), w), 0.0013)     # round in section toward the tip
             for i in range(n):
                 arc = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(P[:, i], axis=0), axis=1))])
                 for key, arr in (("a", P[:-1, i]), ("b", P[1:, i]), ("Ba", B[:-1, i]), ("Bb", B[1:, i]), ("Na", N[:-1, i]),
@@ -104,11 +111,18 @@ class Sculpt:
                     seg[key].append(arr)
                 self.span.append((nseg, nseg + K - 1))
                 self.length.append(arc[-1])
+                self.kscale.append((part.blend, part.merge, float(part.cut)))
                 lock += 1
                 nseg += K - 1
         self.s = {k: np.concatenate(v).astype(np.int64 if k == "lock" else F) for k, v in seg.items()}
         self.n_locks = lock
         self.length = np.asarray(self.length)
+        self.kscale = np.asarray(self.kscale, dtype=F)
+        self.cut = self.kscale[:, 2] > 0.5
+        self.hem = None
+        if groom.name == "bob":         # a bob is cut in one even line, through the ends of its locks
+            tips = np.concatenate([np.asarray(p.P[-1], dtype=float) for p in parts if p.cut])
+            self.hem = (np.arctan2(tips[:, 0], tips[:, 1] + 0.012), tips[:, 2])
         self.shade = groom.rng.uniform(0.92, 1.05, lock)
         self.band = groom.rng.random(lock)
         self._hash()
@@ -164,8 +178,12 @@ class Sculpt:
         rb = np.einsum("ij,ij->i", r, Bv)
         rn = np.einsum("ij,ij->i", r, Nv)
         rt2 = np.maximum(np.einsum("ij,ij->i", r, r) - rb * rb - rn * rn, 0.0)
-        k0 = np.sqrt((rb / w) ** 2 + (rn / hh) ** 2 + rt2 / hh ** 2)
-        k1 = np.sqrt((rb / w ** 2) ** 2 + (rn / hh ** 2) ** 2 + rt2 / hh ** 4)
+        # Past a segment's end (round the outside of a bend, beyond a tip) the section is swung round, so the radius
+        # along the lock is the section's own radius in that direction: bends stay full, with no pinch at the joints.
+        e = (0.2 * hh) ** 2
+        inv = ((rb / w) ** 2 + (rn / hh) ** 2 + e / (w * hh)) / (rb * rb + rn * rn + e)
+        k0 = np.sqrt((rb / w) ** 2 + (rn / hh) ** 2 + rt2 * inv)
+        k1 = np.sqrt((rb / w ** 2) ** 2 + (rn / hh ** 2) ** 2 + rt2 * inv * inv)
         return (k0 * (k0 - 1) / np.maximum(k1, 1e-12)).astype(F), u, rb / w
 
     def _along(self, sg, u):
@@ -196,20 +214,27 @@ class Sculpt:
             key, d, pt, sg, u = key[order], d[order], pt[order], sg[order], u[order]
             first = np.r_[0, np.nonzero(np.diff(key))[0] + 1]          # per (point, clump): its nearest segment
             dl, pl, tl = d[first], pt[first], self._along(sg[first], u[first])
+            kl = self.kscale[self.s["lock"][sg[first]]]          # (blend, merge, cut) of each clump
+            cl = self.cut[self.s["lock"][sg[first]]]
+            if cl.any():                                         # the scalp's locks end along the hairline
+                dl[cl] = sdf.smax(dl[cl], self._edge(x)[pl[cl]], 0.005 if self.g.tie is not None else 0.003)
             order = np.lexsort((dl, pl))
-            dl, pl, tl = dl[order], pl[order], tl[order]
+            dl, pl, tl, kl = dl[order], pl[order], tl[order], kl[order]
             starts = np.r_[0, np.nonzero(np.diff(pl))[0] + 1]
             rank = np.arange(len(pl)) - np.repeat(starts, np.diff(np.r_[starts, len(pl)]))
             D = np.full((len(x), rank.max() + 1), np.inf, dtype=F)
             Tk = np.ones((len(x), rank.max() + 1), dtype=F)
+            Ks = np.ones((len(x), rank.max() + 1), dtype=F)
             D[pl, rank] = dl
-            Tk[pl, rank] = _tipped(tl)
+            Tk[pl, rank] = _tipped(tl, kl[:, 1])
+            Ks[pl, rank] = kl[:, 0]
             # How tipped the clumps here are, weighted by nearness, so the blend changes smoothly across grooves.
             d0 = np.where(np.isfinite(D[:, 0]), D[:, 0], 0.0)
             wt = np.where(np.isfinite(D), np.maximum(1 - (D - d0[:, None]) / reach, 0.0) ** 2, 0.0)
             tk = (wt * Tk).sum(1) / np.maximum(wt.sum(1), 1e-6)
+            ks = (wt * Ks).sum(1) / np.maximum(wt.sum(1), 1e-6)
             acc = D[:, 0].copy()
-            k = self._blend(x) * tk
+            k = self._blend(x) * tk * ks
             for j in range(1, D.shape[1]):
                 col = D[:, j]
                 m = np.isfinite(col)
@@ -233,13 +258,34 @@ class Sculpt:
         """Height above the skin of the layer of hair under the clumps (fuller on top), sinking under the skin at the
         hairline and round the ears, and only below the brim under a hat."""
         g = self.g
-        cov = coverages(X, g.part, g.sideburns, 0.009)
+        cov = coverages(X, g.part, g.sideburns, 0.009, ears=not g.st.fall)
+        if g.tie is not None:        # hair pulled back thins out over a wider band, to no lip at its edge
+            cov = _ss(-0.004, 0.024, X[:, 2] - hairlines(X, g.part, g.sideburns)) * ear_clears(X)
         if g.under_hat:
             top = g.top(X)
             cov = cov * _ss(top + 0.015, top - 0.01, X[:, 2])
         k = _ss(0.05, 0.95, cov)
-        ear = 1.0 - ear_clears(X)               # deep under the skin round the ears, so none shows in the ear canal
+        # Deep under the skin round the ears, so none shows in the ear canal (long hair lies over them instead); not
+        # over the top of the ear, where the hair passing above it would show a trough.
+        ear = 0.0 if g.st.fall else (1.0 - ear_clears(X)) * _ss(0.026, 0.01, X[:, 2])
         return ((g.height(X, 0.0, None) + self.fill) * k - 0.0012 * (1 - k) - 0.012 * ear).astype(F), k
+
+    def _edge(self, x):
+        """Where the scalp's locks are cut off along the hairline (a field, < 0 where they may grow): hair pulled back
+        has its edge round the face made by the even layer under the locks; a cut ends in a clean line a little below
+        the hairline, its fringe free to fall across the forehead (unless a hat sits there), messy tips a little
+        further; a bob's ends are trimmed to one smooth line."""
+        g = self.g
+        if self.hem is not None:
+            a = np.arctan2(x[:, 0], x[:, 1] + 0.012)[:, None] - self.hem[0][None]
+            w = np.exp(-((np.angle(np.exp(1j * a))) / 0.35) ** 2)
+            return ((w * self.hem[1][None]).sum(1) / np.maximum(w.sum(1), 1e-9) + 0.004 - x[:, 2]).astype(F)
+        hl = hairlines(x, g.part, g.sideburns) - x[:, 2]
+        if g.tie is not None:        # (well inside the layer's edge, so the locks melt into it)
+            return (hl + 0.01).astype(F)
+        reach = 0.006 if g.st.mess > 0.2 else 0.002
+        fringe = 0.0 if g.under_hat else 0.008 * _ss(0.02, 0.045, x[:, 1])
+        return (hl - reach - fringe).astype(F)
 
     def field(self, X):
         X = np.ascontiguousarray(X, dtype=F)
@@ -253,6 +299,13 @@ class Sculpt:
             skull = self.g.field(x)
             base, k = self.base(x)
             d[near] = sdf.smin(d[near], skull - base, self.k)
+            if self.g.under_hat:         # pressed flat inside the hat, so none of it comes through its crown,
+                uh = self.g.under_hat     # and coming out from under its edge no thicker than the hat is there
+                edge = uh.edge_at(x)
+                lim = F(0.0085) + F(0.04) * _ss(edge + 0.004, edge - 0.008, x[:, 2])
+                lim = np.minimum(lim, uh.rim_at(x) + 0.9 * np.abs(edge + 0.002 - x[:, 2]))
+                lim = (lim + _ss(edge - 0.015, edge - 0.035, x[:, 2])).astype(F)    # (not the hair hanging below)
+                d[near] = sdf.smax(d[near], skull - lim, 0.002)
             thin = (1 - k) * _ss(0.03, 0.015, skull) * _ss(-0.1, -0.06, x[:, 2])
             cut[near] *= 1 - 0.7 * thin           # shallow where the hair thins out at the hairline
             head[near] = skull if self.g.full is self.g.field else self.g.full(x)
@@ -272,95 +325,10 @@ class Sculpt:
         locks = hashlib.sha1(b"".join(np.ascontiguousarray(v).tobytes() for v in self.s.values())).hexdigest()
         hat = g.under_hat.key if g.under_hat else None
         key = ("hair", g.head.shape.key(), g.part, g.sideburns, hat, g.st, solids, self.k, self.k_hang, self.seam,
-               self.fill, locks)
+               self.fill, locks, tuple(np.round(self.kscale, 4).ravel().tolist()))
         obj = fieldmesh.build(self.field, (tuple(lo), tuple(hi)), h, target, name, key,
                               SOURCES, "hair", min_piece=600,
                               keep=lambda c: g.full(np.ascontiguousarray(c, dtype=F)) > -0.0002, resample=True)
-        self._finish(obj)
+        from .hairpaint import finish
+        finish(self, obj)
         return obj
-
-    def _finish(self, obj):
-        """UVs and colours from each face's clump, then the mesh moved from head-local units onto the head."""
-        import bmesh
-        me = obj.data
-        bm = bmesh.new()
-        bm.from_mesh(me)
-        bm.faces.ensure_lookup_table()
-        corners = np.asarray([[v.co[:] for v in f.verts] for f in bm.faces], dtype=F)       # (faces, 3, 3)
-        lock = self._nearest_lock(corners.mean(1))
-        uvs = self._corner_uvs(corners, lock)
-        bm.verts.ensure_lookup_table()
-        shade = self._shade(np.asarray([v.co[:] for v in bm.verts], dtype=F))
-        uv = bm.loops.layers.uv.new("UVMap")
-        col = bm.loops.layers.color.new("Color")
-        base = self.g.color
-        for fi, f in enumerate(bm.faces):
-            for j, loop in enumerate(f.loops):
-                loop[uv].uv = uvs[fi, j]
-                k = shade[loop.vert.index]
-                loop[col] = (base[0] * k, base[1] * k, base[2] * k, 1.0)
-        head = self.g.head
-        for v in bm.verts:
-            v.co = head.at(v.co)
-        bm.to_mesh(me)
-        bm.free()
-        for poly in me.polygons:
-            poly.use_smooth = True
-
-    def _nearest_lock(self, X):
-        """The clump each point belongs to (the nearest one; by segment midpoints where no clump reaches)."""
-        pt, sg = self._pairs(X)
-        d = self._seg_dist(X[pt], sg)[0]
-        lock = np.full(len(X), -1, dtype=np.int64)
-        order = np.argsort(d)[::-1]                    # nearest last, so it wins the scatter
-        lock[pt[order]] = self.s["lock"][sg[order]]
-        lost = np.nonzero(lock < 0)[0]
-        mid = (self.s["a"] + self.s["b"]) * 0.5
-        for c in range(0, len(lost), 2000):
-            i = lost[c:c + 2000]
-            far = np.einsum("ijk,ijk->ij", X[i, None] - mid[None], X[i, None] - mid[None])
-            lock[i] = self.s["lock"][np.argmin(far, axis=1)]
-        return lock
-
-    def _corner_uvs(self, corners, lock):
-        F3 = len(corners)
-        X = corners.reshape(-1, 3)
-        L = np.repeat(lock, 3)
-        span = np.asarray(self.span)
-        S = int((span[:, 1] - span[:, 0]).max())
-        for j in range(S):                             # each corner against every segment of its clump
-            sg = np.minimum(span[L, 0] + j, span[L, 1] - 1)
-            d, u, across = self._seg_dist(X, sg)
-            if j == 0:
-                best = d.copy()
-                pick_u, pick_a, pick_s = u, across, sg
-            else:
-                m = d < best
-                best[m] = d[m]
-                pick_u, pick_a, pick_s = np.where(m, u, pick_u), np.where(m, across, pick_a), np.where(m, sg, pick_s)
-        s = self.s
-        arc = s["arc_a"][pick_s] + (s["arc_b"][pick_s] - s["arc_a"][pick_s]) * pick_u
-        uvs = np.stack([arc * 10.0, self.band[L] + np.clip(pick_a, -1.5, 1.5) * 0.06], 1).astype(F)
-        return uvs.reshape(F3, 3, 2)
-
-    def _shade(self, X):
-        """A colour factor per point that changes smoothly over the hair: each clump's own tone, darker toward its
-        root, blended by nearness, and a little darker down the grooves where clumps meet."""
-        out = np.ones(len(X), dtype=F)
-        pt, sg = self._pairs(X)
-        if not len(pt):
-            return out
-        d, u, _ = self._seg_dist(X[pt], sg)
-        key = pt * self.n_locks + self.s["lock"][sg]
-        order = np.lexsort((d, key))
-        first = order[np.r_[0, np.nonzero(np.diff(key[order]))[0] + 1]]          # per (point, clump): nearest
-        pl, dl, ll, tl = pt[first], d[first], self.s["lock"][sg[first]], self._along(sg[first], u[first])
-        near = np.full(len(X), np.inf, dtype=F)
-        np.minimum.at(near, pl, dl)
-        w = np.exp(-((dl - near[pl]) / 0.0015) ** 2)
-        tone = self.shade[ll] * (0.8 + 0.2 * np.minimum(1.0, tl / 0.3))
-        den = np.bincount(pl, w, len(X))
-        hit = den > 0
-        out[hit] = (np.bincount(pl, w * tone, len(X))[hit] / den[hit]).astype(F)
-        groove = np.bincount(pl, w, len(X)) - 1.0                                 # how many clumps meet here
-        return (out * (1.0 - 0.14 * np.clip(groove, 0.0, 1.0))).astype(F)

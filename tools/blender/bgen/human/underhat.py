@@ -35,11 +35,12 @@ class UnderHat:
         self.fit = (lambda q: _crown(hat.parts(q))) if hat else self.solid
         self.key = (kind, shape, bool(p.get("visor", True)), bald)
         self.angles = (np.arange(BINS) + 0.5) * (2 * math.pi / BINS) - math.pi
-        self.edge = self._edge(head)
+        self.edge, self.rim = self._edge(head)
         self.low = float(self.edge.min())
 
     def _edge(self, head):
-        """Per azimuth, the lowest point at which the hat lies close round the skull, a little smoothed."""
+        """Per azimuth, the lowest point at which the hat lies close round the skull, and how far out from the skull
+        its surface stands there (its rim's thickness), a little smoothed."""
         z = np.arange(-0.14, 0.16, 0.003)
         r = np.arange(0.04, 0.17, 0.003)
         A, Z, R = np.meshgrid(self.angles, z, r, indexing="ij")
@@ -51,16 +52,26 @@ class UnderHat:
         low = np.where(hat, p[:, 2], np.inf).reshape(BINS, -1).min(1)
         top = low[np.isfinite(low)].max() if np.isfinite(low).any() else 1.0
         low = np.where(np.isfinite(low), low, top)
+        at = hat.reshape(BINS, -1) & (p[:, 2].reshape(BINS, -1) <= low[:, None] + 0.0065)
+        rim = np.where(at.any(1), np.where(at, skull.reshape(BINS, -1), 0.0).max(1), 0.01)
+        ring = np.r_[rim[-2:], rim, rim[:2]]
+        rim = np.mean([ring[k:k + BINS] for k in range(5)], 0)
         ring = np.r_[low[-2:], low, low[:2]]
         low = np.min([ring[k:k + BINS] for k in range(5)], 0)          # the lowest of its neighbours, then their mean
         ring = np.r_[low[-2:], low, low[:2]]
-        return np.mean([ring[k:k + BINS] for k in range(5)], 0)
+        return np.mean([ring[k:k + BINS] for k in range(5)], 0), rim
 
     def edge_at(self, p):
         """The height of the hat's lower edge at the azimuth of each point."""
         p = np.asarray(p, dtype=float).reshape(-1, 3)
         phi = np.arctan2(p[:, 0], p[:, 1] - MIDDLE_Y)
         return np.interp(phi, self.angles, self.edge, period=2 * math.pi)
+
+    def rim_at(self, p):
+        """How far the hat's surface stands out from the skull at its lower edge, at the azimuth of each point."""
+        p = np.asarray(p, dtype=float).reshape(-1, 3)
+        phi = np.arctan2(p[:, 0], p[:, 1] - MIDDLE_Y)
+        return np.interp(phi, self.angles, self.rim, period=2 * math.pi)
 
     def top(self, p):
         """How high hair grows at the azimuth of each point."""

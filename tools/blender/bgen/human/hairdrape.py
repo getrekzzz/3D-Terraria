@@ -49,8 +49,8 @@ class Drape:
 
     # ------------------------------------------------------------------ collisions
     def off_head(self, q, height):
-        """Points kept ``height`` (per point) above the head and neck (ears included)."""
-        full = self.g.full
+        """Points kept ``height`` (per point) above the head and neck (ears included, or covered over for long hair)."""
+        full = self.g.hang
         q = np.array(q, dtype=F)
         for _ in range(3):
             d = full(q) - height
@@ -116,14 +116,15 @@ class Drape:
         return P
 
     def settle(self, P, fixed, radius, bias=None, rounds=30, stiff=None, pull=0.3, lean=(0.0, 0.0, 0.0), fade=False,
-               smooth=0):
+               smooth=0, constrain=None):
         """Relaxes chains P (rings x chains x 3) whose first ``fixed`` rings (per chain) are held: gravity pulls the
         rest down (and ``lean`` sideways, against the head and back; with ``fade`` only round the shoulders, steering
         long hair in front of them or behind), bending stiffness (``stiff`` per ring, 0..1)
         keeps them smooth, segment lengths stay as they are, and collisions keep them off the head, body and clothes
         (``radius``, per chain, or per ring and chain: the lock's half thickness). Chains resting on the body slide
         (``bias``, chains x 3: to the front or behind). Returns the chains and the body's normal under every point
-        resting on it. ``smooth`` rounds of smoothing at the end round off kinks."""
+        resting on it. ``smooth`` rounds of smoothing at the end round off kinks. ``constrain(P) -> P`` is applied every
+        round before the segment lengths are restored (to hold chains together, say)."""
         K, n = P.shape[:2]
         P = np.array(P, dtype=F)
         seg = np.linalg.norm(np.diff(P, axis=0), axis=2)                # (K-1, n)
@@ -145,6 +146,8 @@ class Drape:
             for k in range(2, K):         # bending: toward the straight continuation of the two rings before
                 m = free[k]
                 P[k, m] += (2 * P[k - 1, m] - P[k - 2, m] - P[k, m]) * stiff[k]
+            if constrain is not None:
+                P = np.where(free[..., None], constrain(P.copy()), P)
             for k in range(1, K):         # follow the leader: every segment keeps its length
                 m = free[k]
                 P[k, m] = P[k - 1, m] + _unit(P[k, m] - P[k - 1, m]) * seg[k - 1, m, None]

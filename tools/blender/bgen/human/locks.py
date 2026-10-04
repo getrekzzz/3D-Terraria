@@ -3,9 +3,13 @@ surfaces offset from the bare skull (headshape) so they hug it whatever the face
 
 - Short and messy hair is combed out from the crown, the fringe swept across from a side parting, the sideburns and
   the nape lying down; locks that would run past the hairline or onto the ears stop there and lie close to the skin.
+  A neat cut ends in an even, blunt edge that thins into the skin at the sides and nape; messy hair has tufts that
+  end short and stand up off the rest, with pointed tips.
 - Long hair falls from a parting down the sides and back of the head (swept back from the forehead, never over the
-  face), hangs free below it framing the face, and drapes over the shoulders and down the back (hairdrape.py).
-- Tied hair is pulled back to a tie and ends in a ponytail or a bun (hairtails.py).
+  face), over the ears, hangs free below it framing the face, and drapes over the shoulders and down the back
+  (longhair.py, hairdrape.py). A woman's short hair is a chin-length bob in the same way, its ends cut blunt and
+  turned under, with a fringe swept across the forehead.
+- Tied hair is pulled back flat to a tie and ends in a ponytail or a bun (hairtails.py).
 - A buzz cut is a close crop: a tinted layer on the scalp that thins into the skin at the hairline.
 
 hairsdf sculpts the traced locks into the hair's mesh.
@@ -19,7 +23,7 @@ from mathutils import Vector
 
 from . import sdf
 from .hairdrape import Drape
-from .hair import coverage, coverages, ear_clear, hairline, hairlines, mesh_from
+from .hair import EAR_ZONE, coverage, coverages, ear_clear, ear_cover, hairline, hairlines, mesh_from
 from .hairsdf import Strands
 from .paint import hex3
 
@@ -42,11 +46,12 @@ class Style:
 
 
 STYLES = {
-    "short": Style(0.003, 0.007, 0.075, 0.2, 0.023, 0.009, 100, 0.8, 0.04),
-    "messy": Style(0.003, 0.009, 0.08, 0.3, 0.022, 0.0095, 105, 0.4, 0.45),
-    "long": Style(0.003, 0.004, 0.11, 0.1, 0.048, 0.019, 150, 0.55, 0.05, fall=0.36),
-    "ponytail": Style(0.0025, 0.002, 0.0, 0.0, 0.024, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.1, 0.035)),
-    "bun": Style(0.0025, 0.002, 0.0, 0.0, 0.024, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.1, 0.045)),
+    "short": Style(0.003, 0.006, 0.075, 0.2, 0.023, 0.0085, 100, 0.8, 0.04),
+    "messy": Style(0.003, 0.012, 0.08, 0.3, 0.024, 0.0105, 95, 0.4, 0.45),
+    "long": Style(0.003, 0.004, 0.11, 0.1, 0.036, 0.013, 150, 0.55, 0.05, fall=0.36),
+    "bob": Style(0.003, 0.005, 0.0, 0.0, 0.034, 0.012, 150, 0.8, 0.03, fall=0.13),
+    "ponytail": Style(0.0025, 0.002, 0.0, 0.0, 0.026, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.096, 0.048)),
+    "bun": Style(0.0025, 0.002, 0.0, 0.0, 0.026, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.092, 0.058)),
     "buzz": Style(0.0007, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
 }
 
@@ -67,11 +72,15 @@ class Groom:
 
     def __init__(self, head, style, color, under_hat=None, body_tree=None, seed=1, worn_tree=None, tie_color=None):
         self.head = head
+        if style == "short" and head.frame.female:      # a woman's short hair is a chin-length bob
+            style = "bob"
         self.st = STYLES[style]
         # Hair is laid over the bare skull (short hair grows round the ears, so it ignores them; long hair falls over
-        # them); ``full`` adds the ears, which no hair may cut into.
+        # them, lying on a smooth dome over each); ``full`` adds the ears, which no hair may cut into, and ``hang`` is
+        # what hanging hair is kept off.
         self.full = lambda p: head.shape.field(p, face=False)
-        self.field = self.full if self.st.fall else (lambda p: head.shape.field(p, ears=False, face=False))
+        self.field = ear_cover(head.shape) if self.st.fall else (lambda p: head.shape.field(p, ears=False, face=False))
+        self.hang = self.field if self.st.fall else self.full
         self.name = style
         self.color = hex3(color)
         self.tie_color = hex3(tie_color) if tie_color else tuple(c * 0.45 for c in self.color)
@@ -140,7 +149,8 @@ class Groom:
         dirs = np.stack([np.sqrt(1 - z * z) * np.cos(a), np.sqrt(1 - z * z) * np.sin(a), z], 1)
         dirs = _unit(dirs + self.rng.normal(0, 0.9 / math.sqrt(n), dirs.shape))
         p = self._onto(np.asarray((0, -0.01, 0.0)) + dirs * 0.13, self.st.cap * 0.5, steps=5)
-        keep = np.array([self._grows(q) for q in p]) & (p[:, 2] < self.top(p))
+        # Under a hat from well up inside it, so the locks come out from under its edge combed, not as stubs.
+        keep = np.array([self._grows(q) for q in p]) & (p[:, 2] < self.top(p) + (0.025 if self.under_hat else 0.0))
         return p[keep]
 
     def _rows(self):
@@ -174,15 +184,16 @@ class Groom:
         return f * (1 - low) + (DOWN + np.asarray((0, -0.2, 0), dtype=F)) * low * 1.5 + noise * st.mess * 0.6
 
     # ------------------------------------------------------------------ tracing
-    def trace(self, start, lengths, layers, turn, k_rings=None):
-        """Polylines (rings x locks x 3) from each start point, following the flow over the layer's surface."""
+    def trace(self, start, lengths, layers, turn, k_rings=None, lift=0.0):
+        """Polylines (rings x locks x 3) from each start point, following the flow over the layer's surface, their
+        ends rising ``lift`` (per lock) off it."""
         K = k_rings or self.RINGS
         n = len(start)
         P = np.zeros((K, n, 3), dtype=F)
         P[0] = self._onto(start, self.height(start, layers, 0.0))
         step = (lengths / (K - 1)).astype(F)
         lie = np.maximum(lengths, 0.02)            # the whole lock arches a little off the head
-        lift = np.where(self.rng.random(n) < self.st.mess * 0.5, self.rng.uniform(0.002, 0.008, n), 0.0).astype(F)
+        lift = np.broadcast_to(np.asarray(lift, dtype=F), (n,))
         d = None
         for k in range(1, K):
             prev = P[k - 1]
@@ -216,7 +227,10 @@ class Groom:
             arc = np.concatenate([np.zeros((1, n)), np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=2), axis=0)])
             near = np.argmin(np.linalg.norm(P - np.asarray(self.tie, dtype=F), axis=2), axis=0)
             P = self.trace(roots, np.maximum(arc[near, np.arange(n)], 0.01), layers, turn, rings)
-            return Strands(P, widths, thick, taper=0.6, root=0.35)
+            # Thin along the hairline, so the hair's edge there is the smooth layer under the locks.
+            T = thick[None] * (0.3 + 0.7 * _ss(0.003, 0.025, P[..., 2] - hairlines(P.reshape(-1, 3), self.part,
+                                                                                 self.sideburns).reshape(P.shape[:2])))
+            return Strands(P, widths, T, taper=0.6, root=0.35, merge=0.6, cut=True)
         # Every lock runs on to where the hair ends (a fringe may overhang the hairline), so the ends of the locks
         # make the edge of the hair and the scalp shows long combed locks rather than rows of short ones.
         slack = np.where(roots[:, 1] > 0.03, 0.012, 0.005)
@@ -229,11 +243,26 @@ class Groom:
                 if not self._grows(P[k, i], slack[i]):
                     edge[i] = arc[k - 1, i] + 0.5 * (arc[k, i] - arc[k - 1, i])
                     break
-        lengths = np.minimum(lengths * 2.0, edge * self.rng.uniform(0.88, 1.0, n))
+        mess = st.mess > 0.2
+        # A neat cut ends in an even edge; messy hair has tufts that end short and stand up off the rest.
+        lengths = np.minimum(lengths * 2.0, edge * (self.rng.uniform(0.8, 1.0, n) if mess else
+                                                    np.where(roots[:, 1] > 0.03, self.rng.uniform(0.95, 1.0, n),
+                                                             self.rng.uniform(0.9, 1.0, n))))
+        tuft = self.rng.random(n) < st.mess * 0.6
+        lift = np.where(tuft, self.rng.uniform(0.004, 0.011, n) * st.mess / 0.45, 0.0)
+        lengths = np.where(tuft & mess, lengths * self.rng.uniform(0.55, 0.85, n), lengths)
         keep = lengths > 0.02                       # nubs at the hairline: the locks from above cover it
         rings = 10
-        P = self.trace(roots[keep], lengths[keep], layers[keep], turn[keep], rings)
-        return Strands(P, widths[keep], thick[keep], taper=0.55, root=0.5)
+        P = self.trace(roots[keep], lengths[keep], layers[keep], turn[keep], rings, lift[keep])
+        # Narrower and closer to the skin by the ears, down the sideburns and at the nape.
+        (cy, cz), (ry, rz) = EAR_ZONE
+        r = np.hypot((P[..., 1] - cy) / ry, (P[..., 2] - cz) / rz)
+        W = widths[keep][None] * (0.5 + 0.5 * _ss(1.0, 1.7, r))
+        T = thick[keep][None] * (0.6 + 0.4 * _ss(-0.03, 0.02, P[..., 2]))
+        above = P[..., 2] - hairlines(P.reshape(-1, 3), self.part, self.sideburns).reshape(P.shape[:2])
+        T *= 1.0 - 0.6 * _ss(0.015, -0.004, above) * _ss(0.045, 0.02, P[..., 1])    # (the fringe keeps its body)
+        return Strands(P, W, T, taper=0.5 if mess else 0.65, root=0.5, round=0.5 if mess else 0.4,
+                       blunt=0.1 if mess else 0.5, merge=0.55 if mess else 0.85, cut=True)
 
     def cap(self, head_obj):
         """A close crop: the scalp lifted a fraction of a millimetre, stippled like cropped hair, thinning into the
@@ -287,10 +316,12 @@ class Groom:
             bun, core = hairtails.bun(self)
             parts.append(bun)
             solids += core
-        if self.st.fall:
-            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0012, 0.0042, 0.006), 0.005)
+        if self.name == "bob":         # shallower grooves: a bob is a smooth, glossy mass
+            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0008, 0.0009, 0.006), 0.0062)
+        elif self.st.fall:
+            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0011, 0.0013, 0.006), 0.0062)
         elif self.tie:
-            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0009, 0.002, 0.004))
+            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0009, 0.0016, 0.0045), 0.0034)
         else:
             sculpt = Sculpt(self, parts, solids, 0.0026, (0.0008, 0.0008, 0.0045), 0.0015)
         return [sculpt.build()] + extra

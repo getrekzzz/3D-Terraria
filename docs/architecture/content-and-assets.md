@@ -40,9 +40,13 @@ creases; meshed by `sdf.py`/`fieldmesh.py` with the meshes cached in `tools/blen
 params for goblin and elf ears, long or wide noses, wide mouths, heavy brows and jaws, an underbite with tusks and a
 reptile's snout) with separate eyeballs, brows and lashes; hands
 with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble); hair sculpted from traced locks into
-one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows, `hairsdf.py`
-blends them into clumps with UVs along the flow; long hair and ponytails hang onto the shoulders, back and clothes,
-`longhair.py`, `hairdrape.py`, `hairtails.py`, and hair under a hat is cut along the hat's own edge, `underhat.py`);
+one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows: a neat cut
+with a side-swept fringe and an even edge, messy hair with tufts standing up, a woman's short hair as a chin-length
+bob; `hairsdf.py` blends them into lens-shaped clumps that stay full round bends and end in rounded or blunt tips,
+with UVs along the flow, `hairpaint.py`; long hair falls over a smooth dome over each ear, `hair.py`, and with
+ponytails hangs onto the shoulders, back and clothes, `longhair.py`, `hairdrape.py`, `hairtails.py`; buns are a
+rope coiled round a core; hair under a hat is pressed flat inside it, comes out from under its rim no thicker than
+the hat and is cut along the hat's own edge, `underhat.py`);
 beards the same way in styles (`beard.py`: where the beard grows, a feathered cheek line up to the sideburns, the
 lips left clear; `beardlocks.py` lays a combed mass over the face, a moustache and locks hanging from the jaw onto
 the clothes; `beardsdf.py` blends them into tapered clumps); clothing cut from body shells and tailored

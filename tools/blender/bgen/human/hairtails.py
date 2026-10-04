@@ -1,9 +1,10 @@
 """Tied hair (head-local units): the ponytail, the bun and the band that ties them.
 
-- A ponytail: the hair combed back is gathered into the tie, springs out of it in a full bundle, droops over the back
-  of the head and lies down the nape and the back (drape). The bundle is a handful of locks twisting a little round
-  it, each tapering to its own tip, fanning apart toward the end.
-- A bun: a rope of three twisted locks coiled round itself from the scalp up over a full core.
+- A ponytail: the hair combed back is gathered into the tie, springs back out of it in a full bundle, arcs over and
+  falls down the back of the head and the nape in a gentle S, resting on the back (drape), and tapers. The
+  bundle is nine broad locks round a core, overlapping so it reads as one gathered tail with soft grooves, its end
+  a rounded brush of the locks' own tips rather than one spike.
+- A bun: a broad flat rope wound twice round a full core, from the scalp up over the top, sitting on the crown.
 """
 import math
 
@@ -50,81 +51,96 @@ def _tie(g, lift):
     return p[0], g._normal(p)[0]
 
 
+def _tail_axis(g, start, out, length, K, R):
+    """The tail's centreline: it springs back out of the tie, arcs over into a fall down the back of the head and
+    neck (resting on whatever it meets) and flicks out a little at its end, a gentle S."""
+    back = np.asarray((out[0], out[1], 0.0))
+    back = _unit(back) if np.linalg.norm(back) > 0.2 else np.asarray((0.0, -1.0, 0.0))
+    s = np.linspace(0.0, length, K)
+    x = s / length
+    theta = 0.85 * np.exp(-s / 0.04) - 0.38 * np.sin(np.pi * np.minimum(x * 1.3, 1.0)) + 0.22 * x ** 3
+    d = np.cos(theta)[:, None] * DOWN + np.sin(theta)[:, None] * back
+    P = start + np.concatenate([[np.zeros(3)], np.cumsum((d[:-1] + d[1:]) * 0.5 * (length / (K - 1)), axis=0)])
+    seg = np.linalg.norm(np.diff(P, axis=0), axis=1)
+    for _ in range(12):                 # kept off the head and the back, smooth, every segment its length
+        q = g.drape.collide(P[1:].astype(F), (R[1:] * 0.8).astype(F))[0]
+        P[1:] = q
+        P[1:-1] = P[1:-1] * 0.5 + (P[:-2] + P[2:]) * 0.25
+        for k in range(1, K):
+            P[k] = P[k - 1] + _unit(P[k] - P[k - 1]) * seg[k - 1]
+    return P.astype(F)
+
+
 def ponytail(g):
-    """The tail's locks, the gather of hair into the tie (a solid for the sculpt) and the band round it."""
+    """The tail's locks, the gather of hair into the tie (a solid for the sculpt) and the band round it. The tail is
+    a bundle of broad locks round a core, overlapping so it reads as one gathered mass with soft grooves, full just
+    below the band and tapering to its locks' tips; the band grips it where it leaves the head."""
     tie, out = _tie(g, 0.002)
-    r0 = 0.012                                          # the bundle's radius inside the band
-    length = 0.22 if g.under_hat else 0.34
-    K = 18
+    hat = bool(g.under_hat)
+    r0, top = (0.012, 0.026) if hat else (0.0135, 0.032)     # the bundle inside the band, and at its fullest
+    length = 0.22 if hat else 0.32
+    K = 22
     t = np.linspace(0.0, 1.0, K)
-    R = (r0 + (0.026 - r0) * _ss(0.0, 0.12, t)) * (1 - 0.3 * _ss(0.35, 1.0, t))
-    d0 = _unit(out * 0.55 + DOWN)
-    start = tie + out * 0.004
-    axis = start + d0[None] * (length * t)[:, None]
-    stiff = np.maximum(0.55 - 1.8 * t, 0.03).astype(F)    # it springs out of the band, then hangs
-    axis = g.drape.settle(axis[:, None].astype(F), [2], R[:, None] * 0.9, rounds=60, stiff=stiff,
-                          lean=(0.0, 0.7, 0.0))[0][:, 0]
+    s = t * length
+    R = (r0 + (top - r0) * _ss(0.0, 0.07, s)) * (1 - 0.45 * _ss(0.3, 1.0, t))
+    start = tie + out * 0.003
+    axis = _tail_axis(g, start, out, length, K, R)
     T, N, B = _frames(axis, out)
-    n = 6
-    a0 = 2 * math.pi * np.arange(n) / n + g.rng.uniform(-0.25, 0.25, n)
-    ends = g.rng.uniform(0.8, 1.0, n)
+    n = 9
+    a0 = 2 * math.pi * np.arange(n) / n + g.rng.uniform(-0.12, 0.12, n)
+    ends = 1.0 - 0.14 * g.rng.random(n)
     P = np.zeros((K, n + 1, 3), dtype=F)
     Nl = np.zeros((K, n + 1, 3), dtype=F)
     W = np.zeros((K, n + 1), dtype=F)
     H = np.zeros((K, n + 1), dtype=F)
     for i in range(n):
-        s = t * ends[i]
-        c, Ni, Bi = (_resample(x, s, axis) for x in (axis, N, B))
-        r = np.interp(s, t, R)
-        a = a0[i] + 1.6 * s                              # twisting a little round the bundle
+        u = t * ends[i]
+        c, Ni, Bi = (_resample(x, u, axis) for x in (axis, N, B))
+        r = np.interp(u, t, R)
+        a = a0[i] + 0.9 * u                              # twisting a little round the bundle
         radial = _unit(np.cos(a)[:, None] * Ni + np.sin(a)[:, None] * Bi)
-        spread = r * (0.62 - 0.25 * _ss(0.7, 1.0, s))   # coming together toward the tip
+        spread = r * (0.5 - 0.3 * _ss(0.6, 1.0, u))      # drawing together toward the end
         P[:, i] = c + radial * spread[:, None]
         Nl[:, i] = radial
-        W[:, i] = r * 0.85
-        H[:, i] = r * 0.8
-    s = t * 0.6                                          # a core fills the bundle
-    P[:, n] = _resample(axis, s, axis)
-    Nl[:, n] = _resample(N, s, axis)
-    W[:, n] = np.interp(s, t, R) * 0.9
-    H[:, n] = np.interp(s, t, R) * 0.9
-    locks = Strands(P, W, H, taper=0.7, root=1.0, N=Nl)
-    gather = ("cone", tie - out * 0.014, start, 0.022, r0)
-    band = tie_band(g, start + d0 * 0.0015, d0, r0)
+        W[:, i] = r * 1.0
+        H[:, i] = r * 0.62
+    u = t * 0.75                                         # a core fills the bundle
+    P[:, n] = _resample(axis, u, axis)
+    Nl[:, n] = _resample(N, u, axis)
+    W[:, n] = np.interp(u, t, R) * 1.1
+    H[:, n] = np.interp(u, t, R) * 1.1
+    locks = Strands(P, W, H, taper=0.7, root=1.0, N=Nl, round=0.6, blend=2.2, blunt=0.3)
+    gather = ("cone", tie - out * 0.014, start, 0.022, r0 * 0.8)
+    band = tie_band(g, axis[0] + T[0] * 0.003, T[0], r0 * 0.82 + 0.0005)
     return locks, gather, band
 
 
 def bun(g):
-    """The bun's coiled rope and its core (solids for the sculpt)."""
-    R = 0.027 if g.under_hat else 0.036
+    """The bun's coiled rope (locks for the sculpt), its core and the pad it sits on (solids). A broad, flat rope
+    wound twice round a full core from the scalp up over the top, so the bun reads as one wrapped knot sitting right
+    on the back of the crown."""
+    R = 0.027 if g.under_hat else 0.034
     tie, out = _tie(g, 0.0)
-    centre = tie + out * R * 0.6
+    centre = tie + out * R * 0.32
     u = _unit(np.cross(out, (1.0, 0.0, 0.0)))
     v = np.cross(out, u)
-    rope = R * 0.36
-    K = 40
+    K = 56
     t = np.linspace(0.0, 1.0, K)
-    turns = 1.8
+    turns = 2.1
     az = 2 * math.pi * turns * t + g.rng.uniform(0, 2 * math.pi)
-    polar = math.radians(95) * (1 - t) ** 0.85           # from round the base up over the top to the middle
-    rc = R - rope * 0.75
-    path = centre + rc * (np.sin(polar)[:, None] * (np.cos(az)[:, None] * u + np.sin(az)[:, None] * v) +
-                          np.cos(polar)[:, None] * out)
-    T, N, B = _frames(path, out)
-    n = 3
-    P = np.zeros((K, n, 3), dtype=F)
-    Nl = np.zeros((K, n, 3), dtype=F)
-    for i in range(n):
-        a = 2 * math.pi * i / n + 2 * math.pi * 4.0 * t   # twisted into a rope
-        radial = _unit(np.cos(a)[:, None] * N + np.sin(a)[:, None] * B)
-        P[:, i] = path + radial * rope * 0.5
-        Nl[:, i] = radial
-    taper = 1 - 0.55 * _ss(0.75, 1.0, t)
-    W = np.repeat((rope * 1.25 * taper)[:, None], n, 1)
-    H = np.repeat((rope * 0.95 * taper)[:, None], n, 1)
-    locks = Strands(P, W, H, taper=0.85, root=0.6, N=Nl)
-    core = [("ellipsoid", centre, (R * 0.78, R * 0.78, R * 0.66), np.stack([u, v, out], 1)),
-            ("cone", tie - out * 0.012, centre - out * R * 0.2, R * 0.85, R * 0.7)]
+    polar = math.radians(92) * (1 - t) ** 0.8            # from round the base up over the top to the middle
+    rope = R * 0.36                                      # the rope's half thickness
+    rc = R - rope * 0.6                                  # on the core, a little flatter along ``out``
+    radial = np.sin(polar)[:, None] * (np.cos(az)[:, None] * u + np.sin(az)[:, None] * v)
+    path = centre + rc * radial + rc * 0.82 * np.cos(polar)[:, None] * out
+    Nl = _unit(path - centre)
+    P = path[:, None].astype(F)
+    width = R * (1.0 - 0.35 * _ss(0.6, 1.0, t))          # wide enough that the turns lie against each other
+    locks = Strands(P, width[:, None], np.full((K, 1), rope * 2.0, dtype=F), taper=0.88, root=0.7, N=Nl[:, None],
+                    round=0.4, blend=1.6)
+    rot = np.stack([u, v, out], 1)
+    core = [("ellipsoid", centre, (R * 0.8, R * 0.8, R * 0.66), rot),
+            ("ellipsoid", tie, (R * 0.95, R * 0.95, R * 0.4), rot)]
     return locks, core
 
 
