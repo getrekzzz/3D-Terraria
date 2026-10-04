@@ -70,7 +70,8 @@ def _seam(p):
 class Hood:
     def __init__(self, shape, under, shoulder, style=""):
         self.shape, self.under = shape, under
-        self.sx, self.sz = shoulder                    # the shoulder joint, across and up (head-local)
+        sx, self.sz = shoulder                         # the shoulder joint, across and up (head-local)
+        self.turn_x = max(sx - 0.05, 0.125)            # where the hem turns up (never into the fall past a big head)
         top, bottom, self.half_w = OPENING[style]
         self.deep = style == "deep"
         a, b = np.asarray(top), np.asarray(bottom)
@@ -144,12 +145,12 @@ class Hood:
         from under it."""
         ang = np.arctan2(p[:, 0], -p[:, 1])
         side = np.abs(np.sin(ang))
-        over = np.maximum(np.abs(p[:, 0]) - F(self.sx - 0.05), F(0))
+        over = np.maximum(np.abs(p[:, 0]) - F(self.turn_x), F(0))
         return F(self.sz - 0.075) + F(0.08) * side ** 3 + F(0.006) * np.sin(ang * F(7.0) + F(0.5)) + F(2.0) * over
 
     def below(self, p):
         """How far ``p`` is below the hem, roughly a distance (the hem's slope up past the shoulders divided out)."""
-        over = np.abs(p[:, 0]) - F(self.sx - 0.05)
+        over = np.abs(p[:, 0]) - F(self.turn_x)
         return (self.hem_z(p) - p[:, 2]) / np.sqrt(F(1) + (F(2.0) * _smooth(F(-0.01), F(0.01), over)) ** 2)
 
     def parts(self, p):
