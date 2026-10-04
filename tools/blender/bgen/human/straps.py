@@ -151,12 +151,23 @@ def neck_strap(a, panel):
     a.sweep(pts, ups, strip_profile(W, Ts, s), smooth_w([a.torso_w(p) for p in pts]))
 
 
+def girth(objs, z, half, gap, segs, s):
+    """Radius round the waist at each of ``segs`` angles: ``gap`` beyond the furthest point of ``objs`` (the body,
+    garments) within ``half`` of height ``z``."""
+    co = np.concatenate([np.array([v.co[:] for v in o.data.vertices]).reshape(-1, 3) for o in objs])
+    co = co[(np.abs(co[:, 2] - z) < half) & (np.abs(co[:, 0]) < 0.3 * s)]
+    a = 2 * np.pi * np.arange(segs) / segs
+    if not len(co):
+        return [0.15 * s + gap] * segs
+    return list((co[:, :2] @ np.stack([np.sin(a), np.cos(a)])).max(0) + gap)
+
+
 def waist_ties(a, panel):
     """The waistband of apron ``a`` over its panel and the belt, knotted at the back in a bow with two loops and two
     tails."""
     s, w = a.s, a.w
     Tb, Wb, segs = 0.0035 * s, a.band_w, 64
-    rad = np.array(w._girth(a.clothes + [panel], a.tie_z, Wb / 2 + 0.003 * s, 0.0012 * s + Tb / 2, segs))
+    rad = np.array(girth(a.clothes + [panel], a.tie_z, Wb / 2 + 0.003 * s, 0.0012 * s + Tb / 2, segs, s))
     ang = 2 * np.pi * np.arange(segs) / segs
     radial = np.stack([np.sin(ang), np.cos(ang), np.zeros(segs)], 1)
     hips = {"hips": 1.0}
