@@ -41,7 +41,7 @@ roots and how it flows, `hairsdf.py` blends them into clumps with UVs along the 
 clothing cut from body shells and tailored (`tailoring.py`: eased off the skin, spanned across hollows, cinched under
 the belt and boot tops, folded inside the elbows and knees and stacked above the cuffs) then finished
 (`finishing.py`: pressed seams, ribbed collars and cuffs, hems, turned-down boot rims, soles, buttons): shirts,
-trousers, dresses, coats, robes with sashes, aprons, belts with buckles, boots, hats, masks. Ambient occlusion is baked
+trousers, coats, robes with sashes, aprons, belts with buckles, boots, hats, masks. Ambient occlusion is baked
 into the vertex alpha (`occlusion.py`) for the character shader. A 52-bone rig (fingers included) with heat/chain
 weights; long hair follows the torso, not the arms. Skeletons are separate bones on the same rig. Params per
 character live in `assets.json`. They export rest-pose UVs and tangents for the character shader.
@@ -50,7 +50,7 @@ Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functio
 (exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,
 death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,
 hold. The right hand is a closed fist around a handle at `motion.GRIP`, where the game attaches held items; attacks
-have a wind-up, a coil, a whip through to the wrist and a follow-through, and strike where the melee system sweeps
+have a wind-up, a coil, a whip through to the wrist and a follow-through, and strike where the melee system lands
 its hits (see actions.py). Characters with the same skeleton (body, height, gait) share one animation set,
 `assets/models/creatures/anim/<set>.glb`, with `index.json` naming each character's set; rebuild them with
 `build_all.py --anims [--shard=I/N]` (seconds each, no character meshes touched).

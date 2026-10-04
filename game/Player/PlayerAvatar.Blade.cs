@@ -86,7 +86,7 @@ public sealed partial class PlayerAvatar
     {
         "swing" => Window(phase, MeleeSystem.StrikeStart - 0.01f, MeleeSystem.StrikeEnd + 0.02f),
         "thrust" => 0.8f * Window(phase, MeleeSystem.ThrustStart, MeleeSystem.ThrustEnd),
-        "mine" => 0.3f * Window(phase, 0.34f, 0.48f),
+        "mine" => 0.3f * Window(phase, MeleeSystem.ChopStart + 0.04f, MeleeSystem.ChopEnd),
         _ => 0f,
     };
 

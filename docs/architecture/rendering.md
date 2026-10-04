@@ -109,14 +109,15 @@ blades and tools tip forward and down beside the leg, fanned out from it (long o
 the ground), spears, staffs, bows and rods tip up, guns stay as gripped; the turn drops out as an action fades in and
 returns as it fades out. Attacks are timed like a real blow: a settle and a wind-up, a coil where the torso starts
 back while the blade still drags, a whip that reaches the wrist last, then follow-through, overshoot and settle. A
-swing or chop strikes between 0.36 and 0.56 of its clip and a thrust drives out between 0.33 and 0.52, which is where
-`MeleeSystem` lands its hits (a swing sweeps right to left, `SweepProgress`; nothing connects in the wind-up or the
-follow-through), where `SwingTrail` draws the reach arc and where `BladeTrail` lets the blade leave a ribbon:
+swing strikes between 0.36 and 0.56 of its clip, a thrust drives out between 0.33 and 0.52 and a tool's chop comes
+down between 0.3 and 0.48, which is where `MeleeSystem` lands its hits (sweeping right to left, `SweepProgress`;
+nothing connects in the wind-up or the follow-through), where `SwingTrail` draws a swing's reach arc or a thrust's
+streak (tools show the block cursor instead) and where `BladeTrail` lets the blade leave a ribbon:
 sampled from the hand bone once the skeleton is posed, so it starts at the blade, smoothed with Catmull-Rom between
 frames and fading back along the path (fainter for tool chops, a streak for thrusts). It reads the clip's own
 position (`HumanoidAnimator.ActionPhase`), so a long frame cannot put it out of step with the pose.
-`game/Testing/Tours/wielding.cmds` photographs the carry and each action close up (`camera distance`), the swing also
-from behind mid-strike.
+`game/Testing/Tours/wielding.cmds` photographs the carry and the swing, chop, thrust, shoot, bow, cast and torch hold
+close up (`camera distance`), the swing also from behind mid-strike.
 
 `NpcRenderer.Motion` adds presence to everything else: `facing` look (eyes stare at their target) or velocity (fish),
 fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a

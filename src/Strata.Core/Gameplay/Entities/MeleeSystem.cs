@@ -97,7 +97,8 @@ public sealed class MeleeSystem
             if (along < 0 || along > length + radius) return false;
             return (to - dir * along).Length() <= radius + ThrustTolerance;
         }
-        if (t < StrikeStart || t0 > StrikeEnd) return false;
+        var (start, end) = s.Item.IsTool ? (ChopStart, ChopEnd) : (StrikeStart, StrikeEnd);
+        if (t < start || t0 > end) return false;
         var swing = s.Item.Swing!;
         float reach = swing.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.6f;
         var flat = new Vector3(to.X, 0, to.Z);
@@ -107,7 +108,7 @@ public sealed class MeleeSystem
         if (flat.Length() < 0.6f) return true; // point blank
         // The blade sweeps from −arc/2 (the player's right) to +arc/2 (their left) around the aim yaw as it strikes.
         float halfArc = swing.Arc * MathF.PI / 360f;
-        float current = -halfArc + SweepProgress(t) * 2f * halfArc;
+        float current = -halfArc + SweepProgress(t, start, end) * 2f * halfArc;
         float angle = WrapAngle(BrainFactory.YawOf(flat) - s.Yaw);
         return angle >= -halfArc && angle <= current + 0.25f;
     }
@@ -117,9 +118,11 @@ public sealed class MeleeSystem
     /// all of it by the follow-through, in step with the human swing and chop actions, which strike from over the right
     /// shoulder down across to the left in that window (tools/blender/bgen/human/actions.py).
     /// </summary>
-    public static float SweepProgress(float t)
+    public static float SweepProgress(float t) => SweepProgress(t, StrikeStart, StrikeEnd);
+
+    private static float SweepProgress(float t, float start, float end)
     {
-        float u = Math.Clamp((t - StrikeStart) / (StrikeEnd - StrikeStart), 0f, 1f);
+        float u = Math.Clamp((t - start) / (end - start), 0f, 1f);
         return u * u * (3f - 2f * u);
     }
 
@@ -128,6 +131,10 @@ public sealed class MeleeSystem
 
     /// <summary>The part of the use animation (fractions) in which a thrust drives out from drawn back to full reach.</summary>
     public const float ThrustStart = 0.33f, ThrustEnd = 0.52f;
+
+    /// <summary>The part of the use animation (fractions) in which a tool comes down from over the shoulder to land
+    /// (the human mine action, which chops with every tool).</summary>
+    public const float ChopStart = 0.3f, ChopEnd = 0.48f;
 
     private static float WrapAngle(float a)
     {

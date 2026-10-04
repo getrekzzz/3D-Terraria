@@ -108,6 +108,31 @@ public class CombatTests
         Assert.True(spots.All(p => hitAt[p.Item1.Id] <= duration * MeleeSystem.StrikeEnd + 1), "a gel was hit after the strike");
     }
 
+    [Theory]
+    [InlineData("copper_shortsword", MeleeSystem.ThrustStart, MeleeSystem.ThrustEnd)]
+    [InlineData("copper_pickaxe", MeleeSystem.ChopStart, MeleeSystem.ChopEnd)]
+    public void ThrustsAndChopsLandAsTheyStrike(string item, float start, float end)
+    {
+        using var g = Arena();
+        var gel = SpawnInFront(g, "green_slime", 1.0f);
+        gel.Life = gel.MaxLife = 1000;
+        var at = gel.Position;
+        g.Hold(item);
+        g.Player.Aim = Vector3.UnitZ;
+        int tick = 0, hit = -1;
+        g.World.Npcs.Damaged += e => { if (!e.ToPlayer && e.Target == gel && hit < 0) hit = tick; };
+        Assert.Equal(Strata.Core.Gameplay.Interaction.UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
+        int duration = g.Content.Items.Get(item).UseAnimation;
+        for (; tick < duration; tick++)
+        {
+            gel.Position = at;
+            gel.Velocity = Vector3.Zero;
+            g.Ticks(1);
+        }
+        Assert.True(hit >= 0, "the strike missed");
+        Assert.InRange(hit, duration * start - 1, duration * end + 1);
+    }
+
     [Fact]
     public void ShortswordThrustsHitAndRepeatWhileHeld()
     {
