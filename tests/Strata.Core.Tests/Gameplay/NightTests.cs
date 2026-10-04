@@ -1,5 +1,6 @@
 using System.Numerics;
 using Strata.Core.Common;
+using Strata.Core.Content.Loading;
 using Strata.Core.Gameplay.Entities;
 using Strata.Core.Gameplay.Items;
 using Strata.Core.Simulation;
@@ -58,6 +59,42 @@ public class NightTests
         for (int i = 0; i < 4; i++) g.World.Npcs.Spawn(firefly, g.Player.Position + new Vector3(i, 1f, 3f));
         Assert.Equal(0, g.World.Npcs.CountNear(g.Player.Center, 60f, critters: false));
         Assert.Equal(4, g.World.Npcs.CountNear(g.Player.Center, 60f, critters: true));
+    }
+
+    [Fact]
+    public void GroupsAreCutShortAtTheAllowance()
+    {
+        using var g = Night();
+        g.World.Spawner.Config = new SpawnConfig { SafeRadius = 0, MinDistance = 3, MaxDistance = 5 }; // on the arena floor
+        bool groups = false;
+        for (int i = 0; i < 60; i++)
+        {
+            g.World.Npcs.Clear();
+            groups |= g.World.Spawner.TrySpawnNear(g.Player).Count(Hostile) > 1; // zombies come in pairs
+            g.World.Npcs.Clear();
+            Assert.True(g.World.Spawner.TrySpawnNear(g.Player, hostiles: 1, critters: 0).Count <= 1);
+        }
+        Assert.True(groups, "the night roster should include groups");
+    }
+
+    [Fact]
+    public void CreaturesLeftBehindStillCount()
+    {
+        using var g = Night();
+        var spawner = g.World.Spawner;
+        spawner.Config = new SpawnConfig { SafeRadius = 0, MinDistance = 3, MaxDistance = 5, NightChance = 1f, MaxNearbyNight = 1, MaxCritters = 0 };
+        spawner.Enabled = true;
+        // A zombie the player walked away from: out of reach of the old 60 m count, still short of despawning.
+        var zombie = g.World.Npcs.Spawn(g.Content.Enemies.Get("zombie"), g.Player.Position + new Vector3(0, 0.05f, 75f))!;
+        g.Ticks(spawner.Config.CheckInterval * 20);
+        Assert.Equal(new[] { zombie }, g.World.Npcs.All);
+    }
+
+    [Fact]
+    public void ShippedAllowancesCountEveryCreatureUntilItDespawns()
+    {
+        var config = SpawnConfig.Load(new FileSystemDataSource(TestPaths.ProjectRoot));
+        Assert.True(config.CountRadius >= NpcSystem.DespawnDistance, $"count radius {config.CountRadius} m");
     }
 
     [Fact]
