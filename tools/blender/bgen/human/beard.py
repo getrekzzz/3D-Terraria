@@ -1,5 +1,5 @@
-"""Beards and moustaches: the styles, where facial hair grows and how thick it stands; beardlocks lays out the locks it
-grows in and beardsdf sculpts them into the mesh.
+"""Beards and moustaches: the styles, where facial hair grows and how thick it stands; beardlocks shapes the mass over
+the face and the moustache, beardbib the part that hangs below the jaw, and beardsdf sculpts them into one mesh.
 
 A beard grows below a cheek line that runs from beside the nose wings across the cheeks to the sideburns (where it
 reaches up under the head hair), over the jaw and chin and down the throat to a neckline, and on the upper lip; never on
@@ -27,15 +27,16 @@ class Style:
     mess: float         # random turn of the locks
     lock: float         # lock width over the face
     neck: float = 0.0   # how much lower than usual the neckline runs
+    depth: float = 1.0  # how far back under the chin toward the throat the hanging part fills (1 all the way)
 
 
 STYLES = {
     "short": Style(1.0, 0.0055, 0.0, 1.0, 0.0, 0, 0.75, 0.25, 0.03, 0.016),
-    "full": Style(1.0, 0.011, 0.036, 0.75, 0.95, 0, 1.0, 0.55, 0.05, 0.019),
+    "full": Style(1.0, 0.011, 0.045, 0.75, 0.95, 0, 1.0, 0.55, 0.05, 0.019),
     "bushy": Style(1.0, 0.016, 0.07, 0.9, 1.1, 0, 1.25, 0.7, 0.12, 0.021),
     "long": Style(0.92, 0.012, 0.22, 0.4, 0.95, 2, 1.1, 1.0, 0.04, 0.019, 0.008),
-    "pointed": Style(0.8, 0.01, 0.09, 0.05, 0.6, 1, 0.9, 0.6, 0.03, 0.017),
-    "goatee": Style(0.0, 0.01, 0.035, 0.3, 0.3, 1, 0.9, 0.75, 0.03, 0.014, -0.022),
+    "pointed": Style(0.8, 0.01, 0.08, 0.3, 0.6, 1, 0.9, 0.6, 0.03, 0.017, 0.0, 0.8),
+    "goatee": Style(0.0, 0.01, 0.035, 0.3, 0.4, 1, 0.9, 0.75, 0.03, 0.014, -0.045, 0.55),
 }
 
 # The cheek line's height by azimuth from the front (head-local z): beside the nose wings, dipping round the corners of
@@ -53,24 +54,39 @@ def _ss(a, b, x):
     return t * t * (3 - 2 * t)
 
 
-def coverages(q, st):
+def _below(a, z, line_a, line_z):
+    """How far below a line given as heights by azimuth each point lies, measured across the face (head-local;
+    negative above it): its edge thins out over the same distance however steeply the line runs."""
+    px = a * 0.09
+    d = np.full(len(a), np.inf)
+    for i in range(len(line_a) - 1):
+        ax, az = line_a[i] * 0.09, line_z[i]
+        bx, bz = line_a[i + 1] * 0.09 - ax, line_z[i + 1] - az
+        u = np.clip(((px - ax) * bx + (z - az) * bz) / (bx * bx + bz * bz), 0.0, 1.0)
+        d = np.minimum(d, np.hypot(px - ax - u * bx, z - az - u * bz))
+    return np.where(z < np.interp(a, line_a, line_z), d, -d)
+
+
+def coverages(q, st, mouth=True):
     """How much beard grows at each point (0 bare skin .. 1 full), thinning out at every edge: softly over the cheeks
-    and down the throat, crisply round the lips, and clear of the ears."""
+    and down the throat, crisply round the lips (unless ``mouth`` is False: the sculpted beard reads the lips' own
+    shape instead), and clear of the ears."""
     q = np.atleast_2d(np.asarray(q, dtype=F))
     x, y, z = np.abs(q[:, 0]), q[:, 1], q[:, 2]
     a = np.arctan2(x, y)
     if st.cheek > 0:          # lower on the cheeks for a smaller beard, still up to the sideburns
-        top = np.interp(a, LINE_A, CHEEK_Z) - (1 - st.cheek) * 0.06 * _ss(1.45, 0.6, a)
+        m = _ss(-0.004, 0.008, _below(a, z + (1 - st.cheek) * 0.06 * _ss(1.45, 0.6, a), LINE_A, CHEEK_Z))
     else:
-        top = np.interp(a, CHIN_A, CHIN_Z)
-    m = _ss(-0.004, 0.008, top - z)
+        m = _ss(-0.004, 0.008, _below(a, z, CHIN_A, CHIN_Z))
     m = m * _ss(-0.008, 0.01, y + z + 4.0 * x * x + 0.097 + st.neck)
     m = m * _ss(-0.004, 0.007, y + 0.013)
     (cy, cz), (ry, rz) = EAR
     m = m * np.where(x > 0.04, _ss(1.0, 1.3, np.hypot((y - cy) / ry, (z - cz) / rz)), 1.0)
+    if not mouth:
+        return m
     zc, hw, hh = LIPS
     lips = (np.hypot(q[:, 0] / hw, (z - zc) / hh) - 1.0) * 0.01
-    return m * np.where(y > 0.05, _ss(0.0005, 0.0035, lips), 1.0)
+    return m * (1 - (1 - _ss(0.0005, 0.0035, lips)) * _ss(0.04, 0.06, y))
 
 
 def masses(q, st):
@@ -79,13 +95,13 @@ def masses(q, st):
     q = np.atleast_2d(np.asarray(q, dtype=F))
     x, y, z = np.abs(q[:, 0]), q[:, 1], q[:, 2]
     a = np.arctan2(x, y)
-    low = _ss(-0.045, -0.1, z)
+    low = _ss(-0.04, -0.095, z)
     front = _ss(1.35, 0.3, a)
-    t = 0.0024 + (st.mass * 0.7 - 0.0024) * low * (0.4 + 0.6 * front)
+    t = 0.003 + (st.mass * 0.7 - 0.003) * low * (0.6 + 0.4 * front)
     zc, hw, hh = LIPS
-    mouth = np.where(y > 0.05, _ss(0.0, 0.012, (np.hypot(q[:, 0] / hw, (z - zc) / hh) - 1.0) * 0.01), 1.0)
-    t = t * (0.45 + 0.55 * mouth)              # thinner round the mouth, so the lips sit in it, not in a hole
-    lip = _ss(-0.074, -0.062, z) * (y > 0.06)
+    mouth = _ss(0.0, 0.012, (np.hypot(q[:, 0] / hw, (z - zc) / hh) - 1.0) * 0.01)
+    t = t * (1 - 0.6 * (1 - mouth) * _ss(0.04, 0.06, y))  # thinner round the mouth: the lips sit in it, not in a hole
+    lip = _ss(-0.074, -0.062, z) * _ss(0.036, 0.026, x) * _ss(0.04, 0.06, y)       # (the upper lip)
     return (t * (1 - lip) + 0.0022 * lip).astype(F)
 
 
@@ -109,21 +125,15 @@ def _tree(objs):
 def grow(head, p, under=()):
     """The character's beard: ``p["beard"]`` is its colour, ``p["beardStyle"]`` one of STYLES (full by default);
     ``under`` are the body and the clothes it may hang onto. Whatever hangs over them is kept in front of them."""
+    from .beardbib import Bib
     from .beardlocks import Beard
     from .beardsdf import Sculpt
     from .paint import hex3
     style = p.get("beardStyle", "full")
     beard = Beard(head, style, _tree(under), seed=sum(ord(ch) for ch in style))
-    sculpt = Sculpt(beard, beard.locks())
+    bib = Bib(beard) if beard.st.length > 0 else None
+    sculpt = Sculpt(beard, bib)
     hairy = p.get("hairStyle", "short") != "bald" and p.get("hat") != "hood"
     obj = sculpt.finish(sculpt.build(), hex3(p["beard"]), hex3(p.get("skin", "#e0b090")),
                         hex3(p.get("hair", p["beard"])) if hairy else None)
-    if beard.under is not None:           # in front of whatever it hangs over
-        from mathutils import Vector
-        gap, back, ahead = 0.002 * head.h, Vector((0.0, -1.0, 0.0)), Vector((0.0, 0.5 * head.h, 0.0))
-        for v in obj.data.vertices:
-            if head.local(v.co).z < -0.11:
-                hit = beard.under.ray_cast(v.co + ahead, back, head.h)[0]
-                if hit is not None and v.co.y < hit.y + gap:
-                    v.co.y = hit.y + gap
     return obj
