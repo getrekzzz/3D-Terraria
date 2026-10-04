@@ -37,9 +37,12 @@ by `sdf.py`/`fieldmesh.py` with the meshes cached in `tools/blender/_cache`, not
 almond eyelids with creases, a nose with wings and nostrils, lips with a cupid's bow, rolled ears) with separate
 eyeballs, brows and lashes; hands with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble);
 hair sculpted from traced locks into one surface with grooves between the clumps (`locks.py` traces where each lock
-roots and how it flows, `hairsdf.py` blends them into clumps with UVs along the flow) and beards as strand shells;
-clothing cut from body shells and tailored (`tailoring.py`: eased off the skin, spanned across hollows, cinched
-under the belt and boot tops, folded inside the elbows and knees and stacked above the cuffs) then finished
+roots and how it flows, `hairsdf.py` blends them into clumps with UVs along the flow); beards the same way in
+styles (`beard.py`: where the beard grows, a feathered cheek line up to the sideburns, the lips left clear;
+`beardlocks.py` lays a combed mass over the face, a moustache and locks hanging from the jaw onto the clothes;
+`beardsdf.py` blends them into tapered clumps); clothing cut from body shells and tailored (`tailoring.py`: eased off
+the skin, spanned across hollows, cinched under the belt and boot tops, folded inside the elbows and knees and stacked
+above the cuffs) then finished
 (`finishing.py`: pressed seams, ribbed collars and cuffs, hems, turned-down boot rims, soles, buttons): shirts,
 trousers, coats, robes with sashes, bib aprons tied at the neck and waist (`apron.py`, `straps.py`), belts with
 buckles, boots, masks, and caps and hoods sculpted as cloth fields (`headwear.py`; `hood.py` drapes the cowl over

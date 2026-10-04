@@ -6,13 +6,13 @@ and ears, plus eyeballs (head) -> hands with fingers and nails (hands) -> skin p
 with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
-hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's
-peak, default true), hatShape, flower (a wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape,
-tail, tailShape, brows (a colour, default the hair's, or none), feet (talons: a bird's clawed feet in place of shod
-ones), talons (their colour), anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead,
-suit (true when the shirt, pants and boots stand for the creature's own body, coloured like its skin: they are cut
-skin-tight and melt into the skin at their edges, with no seams, folds, collar, cuffs, buttons, boot rims or soles, and
-no belt unless one is given).
+hair, hairStyle, beard (its colour), beardStyle (short|full|bushy|long|pointed|goatee, default full), shirt, pants, boots,
+coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's peak, default true), hatShape, flower (a
+wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape, tail, tailShape, brows (a colour,
+default the hair's, or none), feet (talons: a bird's clawed feet in place of shod ones), talons (their colour),
+anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead, suit (true when the shirt, pants
+and boots stand for the creature's own body, coloured like its skin: they are cut skin-tight and melt into the skin
+at their edges, with no seams, folds, collar, cuffs, buttons, boot rims or soles, and no belt unless one is given).
 
 Build and weight above average (0.5, 0.45) add mass: muscle broadens the shoulders, back and chest and thickens the
 limbs and neck; fat adds a round belly, love handles, a fuller chest, heavy limbs and a thick neck.
@@ -31,7 +31,7 @@ tailShape: devil (default), lizard, fox, wolf, snake (tails.py).
 """
 import bpy
 
-from . import accessories, apron, hair, locks, motion, occlusion, rig
+from . import accessories, apron, beard, hair, locks, motion, occlusion, rig
 from . import frame as frame_mod
 from .garments import Wardrobe, strip_covered
 from .tatters import Tatters
@@ -183,7 +183,7 @@ def build(name: str, p: dict):
         from .talons import skin
         skin((foot, claw), arm, fr, side, tree, body_w)
     extras = dress(fr, head, parts, p, (tree, body_w))
-    hair = groom(fr, head, parts, p, (tree, body_w))
+    hair = groom(fr, head, parts, p, (tree, body_w), extras)
     extras += hair + accessories.on_hair(head, parts, p, hair)
     objs = _all(parts) + extras
     for o in objs:
@@ -293,9 +293,9 @@ def dress(fr, head, parts, p, lookup=None):
     return out
 
 
-def groom(fr, head, parts, p, lookup=None):
+def groom(fr, head, parts, p, lookup=None, worn=()):
     """Hair, beard, brows and lashes, carried by the head; with the body's weights (``lookup``) hair that hangs
-    below the head follows the neck and shoulders instead."""
+    below the head follows the neck and shoulders instead. A long beard lies on the clothes ``worn``."""
     style = p.get("hairStyle", "long" if fr.female else "short")
     color = p.get("hair", "#4a3020")
     out = []
@@ -306,7 +306,8 @@ def groom(fr, head, parts, p, lookup=None):
         seed = sum(ord(ch) for ch in f"{style}{p.get('skin', '')}")     # not the colour: same shape, shared mesh cache
         out += locks.Groom(head, style, color, hatted, tree, seed).build(parts["head"])
     if "beard" in p:
-        out.append(hair.beard(head, parts["head"], p["beard"]))
+        under = [parts["body"]] + [o for o in worn if not o.name.startswith(("hat_", "mask", "horns", "wings", "tail"))]
+        out.append(beard.grow(head, p, under))
     if p.get("brows") != "none":       # (reptiles have neither brows nor lashes)
         out.append(hair.brows_and_lashes(head, parts["head"], p.get("brows", color)))
     for o in out:

@@ -1,6 +1,6 @@
-"""Hair: where it grows (the hairline round the face, ears and nape), beards, eyebrow strands and eyelashes. The hair
-on the scalp is built from locks (locks.py). Every hair surface has UVs running along the strands (U = along), so the
-exported tangents follow the hair and the game's hair shader can draw anisotropic highlights.
+"""Hair: where it grows (the hairline round the face, ears and nape), eyebrow strands and eyelashes. The hair on the
+scalp is built from locks (locks.py), beards by beard.py. Every hair surface has UVs running along the strands
+(U = along), so the exported tangents follow the hair and the game's hair shader can draw anisotropic highlights.
 """
 import math
 
@@ -10,7 +10,6 @@ import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
-from .head import smooth
 from .paint import hex3
 
 EAR_ZONE = ((-0.0125, -0.019), (0.0245, 0.042))   # (y, z) centre and radii of the hair-free zone round each ear
@@ -82,47 +81,6 @@ def mesh_from(bm, name):
     for poly in obj.data.polygons:
         poly.use_smooth = True
     return obj
-
-
-def beard_region(q, full=True) -> float:
-    """Signed distance-like margin (head-local metres) inside the beard: positive inside, 0 at its edge. The beard
-    covers the jaw and chin below a cheek line, a moustache above the upper lip, and leaves the lips bare."""
-    x = abs(q.x)
-    cheek = (-0.037 - 0.3 * max(0.0, 0.05 - x)) - q.z
-    front = q.y + 0.005
-    neck = q.z + 0.135
-    width = 0.05 - x if not full else 1.0
-    lips = (math.hypot(q.x / 0.027, (q.z + 0.07) / 0.0105) - 1.0) * 0.009
-    beard = min(cheek, front, neck, lips, width)
-    moustache = min(0.03 - x, -0.05 - q.z, q.z + 0.061, q.y - 0.07, lips + 0.002)
-    return max(beard, moustache)
-
-
-def beard(head, head_obj, color, full=True):
-    """A beard over the jaw, chin and upper lip, clumped, fuller at the chin and thinning to nothing at its edge."""
-    bm = bmesh.new()
-    bm.from_mesh(head_obj.data)
-    bm.normal_update()
-    drop = [f for f in bm.faces if beard_region(head.local(f.calc_center_median()), full) <= 0.0]
-    bmesh.ops.delete(bm, geom=drop, context="FACES")
-    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
-    bm.normal_update()
-    uv = bm.loops.layers.uv.new("UVMap")
-    col = bm.loops.layers.color.get("Color") or bm.loops.layers.color.new("Color")
-    base = hex3(color)
-    for v in bm.verts:
-        q = head.local(v.co)
-        edge = smooth(0.0, 0.007, beard_region(q, full))
-        depth = 0.003 + 0.013 * smooth(-0.06, -0.11, q.z) * (1.0 if full else 0.6)
-        clump = 0.75 + 0.25 * math.sin(q.x * 300) * math.sin(q.z * 220)
-        v.co += (v.normal * depth * clump + Vector((0, 0, -0.006 * smooth(-0.07, -0.12, q.z)))) * head.h * edge
-    for f in bm.faces:
-        for loop in f.loops:
-            q = head.local(loop.vert.co)
-            loop[uv].uv = (-q.z * 12, q.x * 8)
-            shade = 0.85 + 0.15 * math.sin(q.x * 400 + q.z * 90)
-            loop[col] = (base[0] * shade, base[1] * shade, base[2] * shade, 1.0)
-    return mesh_from(bm, "beard")
 
 
 def brows_and_lashes(head, head_obj, hair_color, lash_color="#1a1412"):

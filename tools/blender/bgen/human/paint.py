@@ -63,6 +63,8 @@ class SkinPainter:
         self.skin = hex3(p.get("skin", "#e0b090"))
         self.hair = hex3(p.get("hair", "#4a3020"))
         self.stubble = not frame.female and "beard" not in p and p.get("stubble", True) and not p.get("undead")
+        from .beard import STYLES as BEARDS
+        self.beard = (hex3(p["beard"]), BEARDS[p.get("beardStyle", "full")]) if "beard" in p else None
         self.undead = bool(p.get("undead"))
         # Skin under the hair takes the hair colour, so the scalp never reads as a bald patch where the hair shell
         # thins (distance LOD simplification, extreme head poses).
@@ -108,11 +110,18 @@ class SkinPainter:
             if -0.018 < x < 0.024 and q.y > 0.06:
                 brow = gauss((d.z - arch) / 0.0042, 1.0) * (1.0 - max(0.0, (x - 0.014) / 0.012))
                 c = mix(c, self.hair, max(0.0, min(brow, 1.0)) * 0.7)
+        if self.stubble or self.beard:
+            from .beard import STYLES, coverages
+            qa = np.asarray([q], dtype=np.float32)
         if self.stubble:
-            # A shaved beard's shadow: cool, over the beard's area, fading out at its edges.
-            from .hair import beard_region
-            shadow = smooth(-0.004, 0.01, beard_region(q, True)) * (1.0 - lip)
+            # A shaved beard's shadow: cool, over where a beard grows, fading out at its edges.
+            shadow = float(coverages(qa, STYLES["short"])[0]) * (1.0 - lip)
             c = mix(c, mul(c, (0.74, 0.76, 0.8)), shadow * 0.4)
+        if self.beard:
+            # The beard's roots on the skin under it, thinning out with it at its edges.
+            color, style = self.beard
+            roots = min(1.0, float(coverages(qa, style)[0]) * 1.3) * (1.0 - lip)
+            c = mix(c, mul(color, (0.72, 0.72, 0.72)), roots * 0.85)
         if self.scalp:
             # Hair roots under the hair, thinning out softly at the hairline (the locks cover the edge).
             from .hair import coverage
