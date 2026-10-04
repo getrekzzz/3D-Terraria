@@ -105,7 +105,7 @@ def lips(shape, p):
     cupid's bow, the fuller lower lip, both following the dental arch and thinning toward the corners of the mouth.
     Women's are fuller, an old man's thinner."""
     fem = shape.fem
-    if shape.snout > 0:        # a snout has no lips
+    if shape.snout > 0 or shape.alien:        # a snout (or an alien's mouth) has no lips
         return np.ones(len(p), dtype=F)
     full = 1.0 + 0.2 * fem - 0.3 * shape.old
     q = np.asarray(p, dtype=F).copy()

@@ -24,7 +24,8 @@ def vertex_occlusion(obj, reach, rays=48):
     """Per-vertex openness (0..1) of a mesh in its own space."""
     me = obj.data
     verts = [v.co.copy() for v in me.vertices]
-    bvh = BVHTree.FromPolygons(verts, [tuple(p.vertices) for p in me.polygons], epsilon=0.0)
+    clear = {i for i, m in enumerate(me.materials) if m is not None and m.name == "char:glass"}   # (light passes it)
+    bvh = BVHTree.FromPolygons(verts, [tuple(p.vertices) for p in me.polygons if p.material_index not in clear], epsilon=0.0)
     dirs = _hemisphere(rays)
     eps = reach * 0.004
     open_ = []

@@ -34,6 +34,9 @@ def wear(fr, head, parts, p, garments=()):
     if "tail" in p:
         from . import tails
         out.append(tails.tail(fr, parts["body"], p, garments))
+    from . import scifi
+    if any(k in p for k in scifi.KEYS):        # machines and aliens: armour, helmets, alien heads (scifi.py)
+        out.extend(scifi.wear(fr, head, parts, p, list(garments) + out))
     return out
 
 

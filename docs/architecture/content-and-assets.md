@@ -77,6 +77,14 @@ in its cuffs, collar and boots, patched clothes and a rope belt (`scarecrow.py`,
 `rope.py`). Params per character live in `assets.json` (documented at the top of
 `bgen/human/__init__.py`). They export rest-pose UVs and tangents for the character shader.
 
+Machines and aliens (`human/scifi.py`, worn after the clothes) get a grey alien's or an insect's head with big
+glossy eyes and antennae (`alienhead.py`, on the head's distance field), armour plates over a body suit (`plates.py`
+fits each plate's core to the clothes it covers and keeps it off them; `armor.py`, `armorparts.py`, `armorsets.py`
+lay out the styles with panel seams and glowing strips; `solarblades.py` adds a Selenian's flame blades), a glass
+dome or a diver's helmet on a neck ring, a closed helm with lit eye slits, a cyborg's skull implant and a jetpack
+(`helmets.py`, `diverhelm.py`, `solarhelm.py`, `implant.py`). Glass uses the `char:glass` slot, drawn see-through by
+`shaders/character_glass.gdshader` and left out of the baked occlusion.
+
 Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
 (exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,
 death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,

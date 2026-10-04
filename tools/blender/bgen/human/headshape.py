@@ -18,7 +18,7 @@ import math
 
 import numpy as np
 
-from . import creature, faceforms, monsterface, nosemouth, sdf
+from . import alienhead, creature, faceforms, monsterface, nosemouth, sdf
 from .earshape import Ear
 from .sdf import F, capsule, carve, ellipsoid, round_cone, smin, sphere, tube
 
@@ -59,6 +59,7 @@ class HeadShape:
         self.nose_w = float(p.get("noseWidth", 1.0))
         self.underbite = float(p.get("underbite", 0.0))
         self.tusks = bool(p.get("tusks"))
+        self.alien = p.get("alien")              # an alien's head in place of a person's (alienhead.py)
         self.ear_spec = tuple(float(p.get(k, v)) for k, v in (("earSize", 1.0), ("earPoint", 0.0), ("earFlare", 0.0)))
         if self.old:      # age: the nose and ears keep growing and the brow grows heavier
             self.nose_len += 0.1
@@ -74,10 +75,13 @@ class HeadShape:
         key = (self.fem, self.old, round(float(self.fat), 4), round(float(self.neck_r), 5), round(float(self.R), 5),
                tuple(round(float(v), 5) for v in self.eyes[1]), self.brow, self.jaw, self.snout, self.nose_len, self.ear_spec,
                self.mouth_w, self.nose_w, self.underbite, self.tusks)
-        return key + ((self.monster, monsterface.digest()),) if self.monster else key
+        key = key + ((self.monster, monsterface.digest()),) if self.monster else key
+        return key + ((self.alien,) if self.alien else ())
 
     def bounds(self):
         """The box the head is meshed in: a person's, grown round big ears, a long nose or a snout."""
+        if self.alien:
+            return alienhead.bounds(self)
         lo, hi = [-0.1, -0.13, -0.3], [0.1, 0.14, 0.13]
         if self.ear_spec != (1.0, 0.0, 0.0):
             for ear in self.ears.values():
@@ -173,6 +177,8 @@ class HeadShape:
     def field(self, p, ears=True, face=True):
         """The head's distance at each point; without ``face`` (eyes, nose and mouth) and ``ears`` it is the bare
         skull and neck, which hair is laid over."""
+        if self.alien:
+            return alienhead.field(self, p, ears, face)
         sn = self.snout
         d = faceforms.masses(self, p)
         if sn > 0:
@@ -264,4 +270,5 @@ def mesh(shape, h_local=0.001, target=14000, name="head"):
     """The head mesh (head-local coordinates): sampled, meshed, snapped onto the field and reduced to about
     ``target`` triangles, keeping detail where the surface bends."""
     from . import fieldmesh
-    return fieldmesh.build(shape.field, shape.bounds(), h_local, target, name, shape.key(), ("headshape.py", "earshape.py", "creature.py"), "heads")
+    sources = ("headshape.py", "earshape.py", "creature.py") + (("alienhead.py",) if shape.alien else ())
+    return fieldmesh.build(shape.field, shape.bounds(), h_local, target, name, shape.key(), sources, "heads")

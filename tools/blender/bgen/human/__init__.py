@@ -32,7 +32,7 @@ Monsters: face (cyclops | brute | ghoul | void, monsterface.py), sleeves (long, 
 none (bare), snakes (snakehair.py), wisps (spectre.py), tribalMask, headdress, beads, grassSkirt, bodyPaint
 (tribal.py); tailShape snake is a serpent's body under a robe (serpent.py). handSize (1) scales the hands (paws.py).
 Creature coverings in place of clothes (described in coverings.py): fur, furBelly, furLength, wraps, moss, mud, muzzle
-(wolf|ape), faceSkin, hands (claws), feet (paws|ape), nails, torn.
+(wolf|ape), faceSkin, hands (claws), feet (paws|ape), nails, torn. Machines and aliens: alien, armor, helmet... (scifi.py).
 
 hatShape by hat: wide: brim (default), floppy, top, pointed, tricorn, bucket, mushroom (hats.py); cap: santa, elf,
 helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched on the hair,
@@ -54,7 +54,7 @@ from .paint import SkinPainter, brow_color, flat, hex3, paint
 
 
 # Material slots the game's character shader understands (game/Rendering/PropLibrary.cs).
-SLOTS = {"char:skin", "char:eye", "char:hair", "char:nail", "char:cloth", "char:leather", "char:metal", "char:bone", "char:glow"}
+SLOTS = {"char:skin", "char:eye", "char:hair", "char:nail", "char:cloth", "char:leather", "char:metal", "char:bone", "char:glow", "char:glass"}
 LOOSE = ("hat_", "mask", "horns", "wing", "tail")      # worn parts long hair does not rest on
 
 
