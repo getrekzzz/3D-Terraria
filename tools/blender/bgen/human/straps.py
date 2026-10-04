@@ -3,9 +3,10 @@ paths laid onto the clothes.
 
 A path is laid by casting rays from outside onto the outermost surface under it (the shirt and its collar, the belt,
 the trousers, the apron's own panel and waistband) and lifting it off far enough that the whole width of the strip
-clears that surface, then smoothing it; the strip's face turns with the surface under it. The waistband follows the
-girth of the belt and the panel round the waist and is knotted at the back: two loops pinched into the knot and two
-tails, cut on the slant, lying over the belt and the seat.
+clears that surface, then smoothing it; the strip's face turns with the surface under it. The waistband, as wide as
+the belt it covers, follows the convex hull of the girth of the belt and the panel round the waist (snug, spanning
+the small of the back rather than standing off as a hoop) and is knotted at the back: two loops pinched into the knot
+and two tails, cut on the slant, lying over the belt and the seat.
 """
 import math
 
@@ -151,32 +152,23 @@ def neck_strap(a, panel):
     a.sweep(pts, ups, strip_profile(W, Ts, s), smooth_w([a.torso_w(p) for p in pts]))
 
 
-def girth(objs, z, half, gap, segs, s):
-    """Radius round the waist at each of ``segs`` angles: ``gap`` beyond the furthest point of ``objs`` (the body,
-    garments) within ``half`` of height ``z``."""
-    co = np.concatenate([np.array([v.co[:] for v in o.data.vertices]).reshape(-1, 3) for o in objs])
-    co = co[(np.abs(co[:, 2] - z) < half) & (np.abs(co[:, 0]) < 0.3 * s)]
-    a = 2 * np.pi * np.arange(segs) / segs
-    if not len(co):
-        return [0.15 * s + gap] * segs
-    return list((co[:, :2] @ np.stack([np.sin(a), np.cos(a)])).max(0) + gap)
-
-
 def waist_ties(a, panel):
     """The waistband of apron ``a`` over its panel and the belt, knotted at the back in a bow with two loops and two
-    tails."""
-    s, w = a.s, a.w
+    tails. The band hugs what it is tied over: its path is the hull of their girth round the body's axis (spanning
+    the small of the back, never standing off as a hoop), its inner face just clear of them."""
+    from .skirts import hull
+    s, w, cy = a.s, a.w, a.j["spine"].y
     Tb, Wb, segs = 0.0035 * s, a.band_w, 64
-    rad = np.array(girth(a.clothes + [panel], a.tie_z, Wb / 2 + 0.003 * s, 0.0012 * s + Tb / 2, segs, s))
+    rad = hull(w.radial(a.clothes + [panel], a.tie_z, Wb / 2 + 0.002 * s, segs)) + 0.0008 * s + Tb / 2
     ang = 2 * np.pi * np.arange(segs) / segs
     radial = np.stack([np.sin(ang), np.cos(ang), np.zeros(segs)], 1)
     hips = {"hips": 1.0}
-    a.sweep(radial * rad[:, None] + np.array((0, 0, a.tie_z)), radial, strip_profile(Wb, Tb, s), [hips] * segs, closed=True)
+    a.sweep(radial * rad[:, None] + np.array((0, cy, a.tie_z)), radial, strip_profile(Wb, Tb, s), [hips] * segs, closed=True)
     bmesh.ops.recalc_face_normals(a.bm, faces=a.bm.faces[:])
     a.bm.normal_update()
     trees = [bvh(a.clothes + [panel], lambda c: not w._on_arm(c)), BVHTree.FromBMesh(a.bm)]
     outer = rad[segs // 2] + Tb / 2               # the band's outer face at the back
-    knot = np.array((0.0, -outer - 0.0058 * s, a.tie_z - 0.003 * s))
+    knot = np.array((0.0, cy - outer - 0.0058 * s, a.tie_z - 0.003 * s))
     for v in ellipsoid(a.bm, knot, np.array((0.013, 0.0068, 0.0145)) * s):
         a.vk[v], a.wt[v] = 0.93, hips
     prof = strip_profile(0.026 * s, 0.003 * s, s)
@@ -186,12 +178,12 @@ def waist_ties(a, panel):
         X = np.array((sx * math.cos(tilt), 0.0, math.sin(tilt)))
         along = length / 2 * (1 - np.cos(phis))
         out = 0.0098 * s + d * np.sin(phis) - 0.4 * along ** 2 / (2 * outer)
-        pts = np.array((0.0, 0.0, knot[2])) + np.outer(along, X) + np.outer(-(outer + out), (0, 1, 0))
+        pts = np.array((0.0, cy, knot[2])) + np.outer(along, X) + np.outer(-(outer + out), (0, 1, 0))
         tang = np.roll(pts, -1, 0) - np.roll(pts, 1, 0)
         ups = np.cross(tang, np.cross(X, (0.0, -1.0, 0.0)))
         ups *= np.sign(np.einsum("ij,ij->i", ups, pts - pts.mean(0)))[:, None]
         a.sweep(pts, ups, prof, [hips] * len(pts), widths=0.45 + 0.55 * np.sin(phis / 2) ** 2, closed=True)
-    outward = lambda p: np.array((p[0], p[1], 0.0)) / max(math.hypot(p[0], p[1]), 1e-6)
+    outward = lambda p: np.array((p[0], p[1] - cy, 0.0)) / max(math.hypot(p[0], p[1] - cy), 1e-6)
     for sx, deg, tl in ((1, 11, 0.15), (-1, 17, 0.13)):   # the tails, lying over the belt and the seat
         t = math.radians(deg)
         u = np.linspace(0.0, 1.0, 14)

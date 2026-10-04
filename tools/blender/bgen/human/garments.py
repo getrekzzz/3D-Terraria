@@ -25,7 +25,7 @@ class Wardrobe(Skirts):
         self.p = p
         self.head = head
         j, s = frame.j, frame.s
-        self.waist = j["hip.R"].z + 0.1 * s
+        self.waist = j["hip.R"].z + (0.125 if p.get("robe") else 0.1) * s     # (a robe is girt at the natural waist)
         self.boot_top = j["ankle.R"].z + (0.16 if "boots" in p else 0.05) * s
         self.cuff = p.get("sleeves", "long")
         self.tatters = None   # where the clothes are torn (tatters.Tatters, the undead)

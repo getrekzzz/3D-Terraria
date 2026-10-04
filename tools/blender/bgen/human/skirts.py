@@ -1,11 +1,14 @@
 """Skirts and sashes (a mixin of garments.Wardrobe): coat tails and robe skirts lofted from under the belt or sash,
 and the cloth sash knotted round a robe's waist.
 
-A skirt's top rows hug the garments under it (measured as the radius round the body in each direction, so nothing
-stands off as a hoop) and are hidden under the belt or sash; below, it is gathered into small pleats that open into
-folds deepening toward the hem, never closer than a little off the hips and legs. Its bottom is finished with a band
-of trim turned up inside (torn into tongues on the undead). Skirts and the sash's hanging ends are weighted between
-the hips and the thighs.
+A skirt's top rows hug the garments under it (measured as the radius round the body in each direction and spanned
+by its convex hull, ``hull``, so nothing stands off as a hoop and nothing dips into the small of the back) and are
+hidden under the belt or sash; below, it is gathered into small pleats that open into folds deepening toward the hem.
+Each row clears the hull of the body under it and falls from the rows above (a column never steps in, so the skirt
+bridges the buttocks and hangs instead of clinging). Its bottom is finished with a band of trim turned up inside
+(torn into tongues on the undead, which lose the trim). Inside it is lined (the outside's rows offset in, facing in,
+darker), so the open hem never shows the cloth's back. Skirts and the sash's hanging ends are weighted between the
+hips and the thighs by angle and height alone (``skirt_weights``), the lining exactly like the outside over it.
 """
 import math
 
@@ -20,6 +23,16 @@ from .tailoring import ridge
 
 def smax(a, b, k):
     return 0.5 * (a + b + np.sqrt((a - b) ** 2 + k * k))
+
+
+def hull(r):
+    """The convex hull of a closed profile given as a radius at each of ``len(r)`` evenly spaced angles: the girth of
+    cloth stretched round it, spanning its hollows (the cleft between the buttocks, the small of the back)."""
+    a = 2 * np.pi * np.arange(len(r)) / len(r)
+    d = np.stack([np.sin(a), np.cos(a)], 1)
+    support = ((d * r[:, None]) @ d.T).max(0)
+    c = d @ d.T
+    return np.maximum(r, np.where(c > 0.2, support[None, :] / np.maximum(c, 1e-3), np.inf).min(1))
 
 
 class Skirts:
@@ -40,17 +53,24 @@ class Skirts:
         return np.maximum(out, 0.5 * (np.roll(out, 1) + np.roll(out, -1)))
 
     def skirt_weights(self, co, bottom_z):
-        """Hips at the waist, handing over to each thigh by the top of the legs, so the cloth over a leg swings
-        with it; behind the calves the shins share it, so a heel kicked back stays under the hem."""
+        """Hips at the waist, handing over to the thighs by the top of the legs: the cloth over each leg (and in front
+        of and behind it) swings with that leg, so a striding knee carries the skirt forward and a heel kicked back
+        carries it back, while the middle of the front and back stays with the hips, never averaged between two legs
+        swinging opposite ways (which would draw the hem up between them). Behind the calves the shins share it, so a
+        heel kicked back stays under the hem."""
         s, j = self.f.s, self.f.j
         t = 0.9 * smooth(self.waist - 0.03 * s, j["hip.R"].z - 0.12 * s, co.z) if bottom_z < self.waist else 0.0
-        side = smooth(-0.05 * s, 0.05 * s, co.x)
+        # (by angle and height alone, so the lining moves exactly with the outside over it)
+        r = max(math.hypot(co.x, co.y - j["spine"].y), 1e-6)
+        u, back = co.x / r, (j["spine"].y - co.y) / r
         knee = j["knee.R"]
-        calf = 0.85 * smooth(knee.z + 0.04 * s, knee.z - 0.16 * s, co.z) * smooth(knee.y + 0.02 * s, knee.y - 0.08 * s, co.y)
-        w = {"hips": 1 - t}
-        for name, k in (("R", side), ("L", 1 - side)):
+        calf = smooth(knee.z + 0.04 * s, knee.z - 0.16 * s, co.z) * smooth(-0.1, 0.35, back)
+        t *= 1.0 + 0.08 * calf          # (all but wholly: a boot's shaft swung back must not outrun the hem)
+        w = {"hips": 1.0}
+        for name, k in (("R", smooth(0.0, 0.4, u)), ("L", smooth(0.0, 0.4, -u))):
             w[f"thigh.{name}"] = t * k * (1 - calf)
             w[f"shin.{name}"] = t * k * calf
+            w["hips"] -= t * k
         return {b: x for b, x in w.items() if x > 0.01}
 
     def skirt(self, body, bottom_z, flare, color, name, open_front=False, trim=None, under=()):
@@ -62,7 +82,7 @@ class Skirts:
         top = self.waist + 0.008 * s
         segs = 72
         inside = [body, *under]
-        hug = self.radial(inside, top, 0.012 * s, segs) + 0.0025 * s
+        hug = hull(self.radial(inside, top, 0.01 * s, segs)) + 0.0015 * s
         trim_h = 0.045 * s
         torn = self.tatters is not None
         ts = sorted({0.0, 0.015, 0.035, 0.06, 0.09} | {i / 18 for i in range(2, 19)}
@@ -70,15 +90,20 @@ class Skirts:
         folds = 10 if bottom_z < self.f.j["knee.R"].z else 8
         a = 2 * np.pi * np.arange(segs) / segs
         bm = bmesh.new()
-        grid, shade = [], {}
+        held = self.waist - 0.027 * s      # the bottom edge of the sash or belt over the skirt's top
+        grid, shade, hang, z_prev = [], {}, None, top
         for t in ts:
             z = top + (bottom_z - top) * t
-            clear = self.radial(inside, z, 0.025 * s, segs) + 0.006 * s
+            snug = smooth(held, held - 0.07 * s, z)          # tight under the sash, then clear of what it falls over
+            clear = hull(self.radial(inside, z, (0.006 + 0.019 * snug) * s, segs)) + (0.0015 + 0.0045 * snug) * s
+            # hanging from the widest it has passed (the seat, a belly) instead of following the body back in
+            hang = clear if hang is None else np.maximum(clear, hang - 0.15 * (z_prev - z))
+            z_prev = z
             crest = ridge(a * folds / (2 * np.pi) + 0.18 * np.sin(a * 3 + t * 2.5) + 0.3 * t)
             pleat = ridge(a * folds * 3 / (2 * np.pi) + 0.4 * np.sin(a * 5 + 1.0))
             gather = smooth(0.0, 0.05, t) * (1 - smooth(0.12, 0.45, t))      # small pleats just under the waist
             deep = t ** 1.1
-            r = smax(hug * (1 + flare * t ** 1.3), clear, 0.012 * s)
+            r = smax(hug * (1 + flare * t ** 1.3), hang, (0.003 + 0.009 * snug) * s)
             r = r + 0.014 * s * deep * (crest - 0.4) + 0.0035 * s * gather * (pleat - 0.5)
             zz = z - (0.008 * s * (crest - 0.5) if t == 1.0 else 0.0)
             row = [bm.verts.new((math.sin(ak) * rk, cy + math.cos(ak) * rk - 0.004 * s * t, zk))
@@ -86,27 +111,37 @@ class Skirts:
             for v, c, p in zip(row, crest, pleat):
                 shade[v] = (1.0 - 0.28 * deep * (1.0 - c) ** 2) * (1.0 - 0.18 * gather * (1.0 - p) ** 2)
             grid.append(row)
-        if not torn:           # the hem turned up inside: round the bottom edge, then back up as a lining
-            bottom = grid[-1]
-            for d_in, dz in ((0.003, -0.0025), (0.0065, 0.0005), (0.0065, trim_h / s)):
-                row = []
-                for v in bottom:
-                    out = Vector((v.co.x, v.co.y - cy, 0)).normalized()
-                    nv = bm.verts.new(v.co - out * d_in * s + Vector((0, 0, dz * s)))
-                    shade[nv] = shade[v] * (0.85 if dz > 0 else 0.95)
-                    row.append(nv)
-                grid.append(row)
-        gap = 1 if open_front else 0
+        # The hem turned up inside (round the bottom edge), and from it a lining back up to the waist, so the skirt's
+        # inside shows as cloth wherever a stride opens it (the game draws only front faces).
+        outer = list(grid)
+        for i, (d_in, dz) in enumerate([(0.003, -0.0025), (0.0065, 0.0005)] + [(0.0065, None)] * (len(outer) - 1)):
+            src = outer[-1] if dz is not None else outer[len(outer) - i]
+            row = []
+            for v in src:
+                out = Vector((v.co.x, v.co.y - cy, 0)).normalized()
+                nv = bm.verts.new(v.co - out * d_in * s + Vector((0, 0, (dz or 0.0) * s)))
+                shade[nv] = shade[v] * (0.95 if i == 0 else 0.85 if dz is not None else 0.7)
+                row.append(nv)
+            grid.append(row)
+        gap, n = (1 if open_front else 0), len(outer)
         for i in range(len(grid) - 1):
             for k in range(gap, segs - gap):
-                bm.faces.new((grid[i][k], grid[i][(k + 1) % segs], grid[i + 1][(k + 1) % segs], grid[i + 1][k]))
+                a, b, c, d = grid[i][k], grid[i][(k + 1) % segs], grid[i + 1][(k + 1) % segs], grid[i + 1][k]
+                # (split alike on both layers, so the lining stays under the outside however a stride shears them)
+                for tri in ((a, b, c), (a, c, d)) if i < n else ((a, b, d), (b, c, d)):
+                    bm.faces.new(tri)
+        for k in (gap, segs - gap) if open_front else ():         # an open front's edges closed between the layers
+            for j in range(n - 1):
+                bm.faces.new((grid[j][k], grid[j + 1][k], grid[2 * n - j - 1][k], grid[2 * n - j][k]))
+            bm.faces.new((grid[n - 1][k], grid[n][k], grid[n + 1][k]))
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
         bm.normal_update()
         f0 = grid[0][segs // 4].link_faces[0]
         if f0.normal.dot(Vector((1, 0, 0))) < 0:
             for f in bm.faces:
                 f.normal_flip()
         layer = bm.loops.layers.color.new("Color")
-        base, band = hex3(color), hex3(trim) if trim else None
+        base, band = hex3(color), hex3(trim) if trim and not torn else None     # (torn off with a torn hem)
         for f in bm.faces:
             m = f.calc_center_median()          # (an open front's edges are trimmed too, like the coat above them)
             edge = open_front and abs(math.atan2(m.x, m.y - cy)) < 6 * math.pi / segs
@@ -140,9 +175,11 @@ class Skirts:
                 lp[layer] = (c[0] * k[0], c[1] * k[1], c[2] * k[2], 1.0)
         deform = bm.verts.layers.deform.verify()
         bm.normal_update()
-        for loop, closed in finishing.open_loops(bm):
-            if sum(v.co.z for v in loop) / len(loop) < bottom_z + 0.2 * s:
-                tatters.lip(bm, layer, deform, loop, closed, 0.004 * s)
+        for loop, closed in finishing.open_loops(bm):       # the outside's torn edge turned under to the lining
+            c = sum((v.co for v in loop), Vector()) / len(loop)
+            outward = sum(v.normal.dot(Vector((v.co.x, v.co.y - cy, 0)).normalized()) for v in loop)
+            if c.z < bottom_z + 0.2 * s and outward > 0:
+                tatters.lip(bm, layer, deform, loop, closed, 0.0065 * s)
 
     # ------------------------------------------------------------------ the sash
     def sash(self, skirt, bodice, color):
@@ -153,7 +190,7 @@ class Skirts:
         z = self.waist - 0.004 * s
         segs = 72
         under = [o for o in (skirt, bodice) if o is not None]
-        radius = self.radial(under, z, 0.024 * s, segs) + 0.0015 * s
+        radius = hull(self.radial(under, z, 0.014 * s, segs)) + 0.0015 * s
         a = 2 * np.pi * np.arange(segs) / segs
         radius = radius + 0.0007 * s * np.sin(a * 9 + 0.7) * np.sin(a * 4)          # soft crumples round it
         rows = ((-0.021, -0.001, 0.72), (-0.0228, 0.0022, 0.86), (-0.0195, 0.0048, 1.0), (-0.005, 0.0054, 0.84),
@@ -179,10 +216,11 @@ class Skirts:
         """The sash's knot: a squat lump of cloth, fuller at the bottom where the ends come out, the wrap pressed
         across it on a slant."""
         from .garments import mesh_from, set_slot
+        from .monsterparts import uv_sphere           # (built in a fixed order, so the same every run)
         s = self.f.s
         side, up = Vector((d.y, -d.x, 0)), Vector((0, 0, 1))
         bm = bmesh.new()
-        bmesh.ops.create_uvsphere(bm, u_segments=14, v_segments=9, radius=1.0)
+        uv_sphere(bm, 14, 9)
         base = hex3(color)
         shade = {}
         for v in bm.verts:

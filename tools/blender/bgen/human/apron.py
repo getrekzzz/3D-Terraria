@@ -7,7 +7,8 @@ pulled in against the belt by the waistband and hangs from the belly and hips be
 soft folds deepening toward the hem. Its pattern (a bib narrower than the skirt) is laid onto that surface by arc
 length; every edge is a turned hem (a thicker band with a stitch line) rounded over from the front face to the back,
 and a stitched patch pocket sits on the skirt. The bib follows the chest and spine like the shirt under it; the skirt
-follows the hips at the waist and each thigh lower down, so a striding leg carries its side of the apron with it.
+follows the hips at the waist and the thigh behind it lower down, as much as a stride needs to keep the thigh behind
+the cloth given the room between them (STRIDE), while the strip between the legs stays with the hips.
 """
 import math
 
@@ -24,6 +25,7 @@ from .tailoring import ridge, ss
 
 STEP = 0.006            # spacing of the grid the panel's surface is solved on (frame scale)
 STITCH = (0.0085, 0.0101)   # a hem's stitch line, inset from the edge (frame scale)
+STRIDE = 36             # the thigh's swing (degrees) the skirt is weighted to stay in front of (walk 24, run ~38)
 
 
 def _lines(features, step):
@@ -54,7 +56,7 @@ class Apron:
         self.gap = 0.0025 * s                # its clearance over the clothes
         self.hem_w = 0.012 * s               # the turned hems' width (their stitch line just inside it)
         self.tie_z = w.waist - 0.005 * s     # the waistband and ties ride on the belt
-        self.band_w = 0.024 * s
+        self.band_w = 0.036 * s               # (as wide as the belt it covers)
         self.top = f.j["chest"].z + 0.1 * s
         self.hem = f.j["knee.R"].z + 0.07 * s
         self.clothes = [body, *under]
@@ -250,11 +252,19 @@ class Apron:
         return {b: x / total for b, x in w.items()}
 
     def _skirt_w(self, p):
-        """Hips at the waist, each thigh taking its side of the skirt lower down."""
+        """Hips at the waist, each thigh taking the part of the skirt in front of it lower down, as much as a stride
+        (thigh up to STRIDE degrees) needs to carry it forward clear of the thigh, given the room the skirt has in
+        front of it (a skirt falling from a belly hangs freer than one against the legs); the strip between the legs
+        stays with the hips (averaged between two thighs swinging opposite ways it would ride up)."""
         j, s = self.j, self.s
-        t = ss(j["hip.R"].z + 0.04 * s, j["hip.R"].z - 0.12 * s, p[2])
-        side = ss(-0.11 * s, 0.11 * s, p[0])        # spread over the width, so a stride shears it evenly
-        return {"hips": 1.0 - t, "thigh.R": t * side, "thigh.L": t * (1.0 - side)}
+        t = ss(j["hip.R"].z + 0.06 * s, j["hip.R"].z - 0.1 * s, p[2])
+        inner = 0.6 * abs(j["hip.R"].x)              # (the inside of the thigh)
+        loc, _, _, dist = self.tree.ray_cast(Vector(p), Vector((0.0, -1.0, 0.0)), 0.3 * s)
+        room = dist if loc is not None else 0.3 * s
+        swing = max(j["hip.R"].z - p[2], 0.0) * math.sin(math.radians(STRIDE))
+        k = t * min(max(1.15 - room / max(swing, 1e-6), 0.35), 1.0)
+        return {"hips": 1.0 - k * ss(0.15 * inner, inner, abs(p[0])),
+                "thigh.R": k * ss(0.15 * inner, inner, p[0]), "thigh.L": k * ss(0.15 * inner, inner, -p[0])}
 
     def _panel_w(self, P, Z):
         """The bib takes the body's weights under it (smoothed over the panel), the skirt the hips' and thighs'."""

@@ -4,7 +4,9 @@ the boots (and the bottoms of skirts) hang in uneven pointed tongues.
 
 The cloth is cut along the tear's outline rather than along its faces (``cut``), so an edge is jagged only where the
 tear is; the cloth darkens with grime toward a tear and lifts a little at the torn edge, and finishing turns every
-torn edge under (``lip``) so it shows the cloth's thickness. The skin stays under the holes (``mask``).
+torn edge under (``lip``) so it shows the cloth's thickness. The skin stays under the holes (``mask``), darkened in
+their shadow so a hole reads as an opening however close the skin's colour is to the cloth's. A torn skirt hem loses
+its trim (skirts.py).
 """
 import math
 import zlib
@@ -13,9 +15,12 @@ import bmesh
 import numpy as np
 from mathutils import Vector
 
+from .paint import hex3
 from .tailoring import Limb, ss
 
 GRIME = np.array((0.74, 0.68, 0.58))      # the colour a torn edge is darkened toward (as a multiplier)
+HOLLOW = (0.06, 0.2)        # what shows through a hole, darkened (linear): just inside the torn edge .. its middle
+LUM = np.array((0.2126, 0.7152, 0.0722))
 
 
 def tri(x):
@@ -129,9 +134,11 @@ class Tatters:
         self.holes[kind].append((c, n, t1, np.cross(n, t1), r, rng.uniform(1.15, 1.6), rng.uniform(0, 2 * math.pi, 5), teeth))
 
     # ------------------------------------------------------------------ the tear field (> 0 cloth, < 0 torn away)
-    def field(self, X, kind, frayed=True):
+    def field(self, X, kind, frayed=True, hems=True, slab=0.0):
         """The tear field at rest positions ``X``; without ``frayed`` the holes' small teeth are left out (for the
-        grime and lift along the edge, which would otherwise streak out from every tooth)."""
+        grime and lift along the edge, which would otherwise streak out from every tooth); without ``hems`` only the
+        holes count; ``slab`` (m) lets the holes reach that far along their normal undiminished (what shows through
+        them, seen past cloth standing off the body)."""
         X = np.asarray(X, dtype=float).reshape(-1, 3)
         f = np.full(len(X), 1.0)
         if kind not in self.kinds:
@@ -143,8 +150,9 @@ class Tatters:
             R = r * (1 + 0.2 * np.sin(2 * th + ph[0]) + 0.12 * np.sin(3 * th + ph[1]) + 0.07 * np.sin(5 * th + ph[2]))
             if frayed:
                 R = R + r * 0.26 * (tri(th * teeth / (2 * np.pi) + ph[3]) - 0.5) * (0.55 + 0.45 * np.sin(3 * th + ph[4]))
+            h = np.maximum(np.abs(h) - slab, 0.0)
             f = np.minimum(f, np.sqrt(a * a + b * b + 2.0 * h * h) - R)
-        for where, side, end, hem in self.hems[kind]:
+        for where, side, end, hem in self.hems[kind] if hems else ():
             if where == "tail":
                 arms = self._arm(X, "R")[0] | self._arm(X, "L")[0]
                 az = np.arctan2(X[:, 0], X[:, 1] - self.f.j["chest"].y)
@@ -162,7 +170,34 @@ class Tatters:
     def mask(self, body, test, kind):
         """The body vertices garment ``kind`` covers (``test``) where it isn't torn away (for strip_covered)."""
         inside = np.array([bool(test(v.co)) for v in body.data.vertices])
+        self._shade_skin(body, inside, kind)
         return inside & (self.field(self.X, kind) > 0.003 * self.s)
+
+    def _shade_skin(self, body, inside, kind):
+        """Darkens the skin that shows through garment ``kind``'s holes (``inside``: the body vertices it covers): the
+        cloth round a hole shades it, most just inside the torn edge (never lighter there than the cloth's own shadowed
+        inside), so a hole reads as an opening into the clothes and not as a patch of the skin's colour. What lies
+        under the cloth past the edge darkens too (it never shows), so the hole stays dark seen through cloth that
+        stands off the body."""
+        me, s, p = body.data, self.s, self.w.p
+        layer = me.color_attributes.get("Color")
+        if layer is None or not self.holes[kind] or len(me.vertices) != len(self.X):
+            return
+        depth = np.where(inside, -self.field(self.X, kind, hems=False, slab=0.05 * s), -1.0)
+        if depth.max() < -0.03 * s:
+            return
+        cloth = LUM @ np.asarray(hex3(p.get("robe") if kind == "shirt" and p.get("robe") else p.get(kind, "#8a8070"))) ** 2.2
+        rgba = np.empty(len(me.loops) * 4, dtype=np.float32)
+        layer.data.foreach_get("color", rgba)
+        rgba = rgba.reshape(-1, 4)
+        idx = np.empty(len(me.loops), dtype=np.int64)
+        me.loops.foreach_get("vertex_index", idx)
+        skin = np.maximum(rgba[:, :3] @ LUM, 1e-4)
+        edge = np.minimum(HOLLOW[0], 0.6 * cloth / skin)
+        mid = np.maximum(edge, np.minimum(HOLLOW[1], 3.0 * cloth / skin))
+        k = np.where(depth[idx] > -0.03 * s, edge + (mid - edge) * ss(0.0, 0.035 * s, depth[idx]), 1.0)
+        rgba[:, :3] *= k[:, None]
+        layer.data.foreach_set("color", rgba.ravel())
 
     # ------------------------------------------------------------------ cutting the cloth
     def tear(self, bm, kind, X, shade):
@@ -175,8 +210,8 @@ class Tatters:
         s = self.s
         k, f = out["shade"], np.maximum(out["soft"], 0.0)
         self.edge = out["field"]
-        grime = 1.0 - ss(0.0, 0.028 * s, f)
-        rgb = k[:, None] * (1.0 - grime[:, None] ** 1.5 * (1.0 - GRIME * 0.7))
+        grime = 1.0 - ss(0.0, 0.022 * s, f)
+        rgb = k[:, None] * (1.0 - grime[:, None] ** 1.5 * (1.0 - GRIME * 0.82))   # (soiled, not stained)
         bm.normal_update()
         lift = 0.0012 * s * (1.0 - ss(0.0, 0.015 * s, f)) ** 2
         for v, d in zip(bm.verts, lift):
