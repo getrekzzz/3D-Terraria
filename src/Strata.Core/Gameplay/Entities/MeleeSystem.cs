@@ -8,8 +8,8 @@ namespace Strata.Core.Gameplay.Entities;
 
 /// <summary>
 /// Resolves melee swings and thrusts over their use animation: the blade sweeps a horizontal arc in front of the
-/// player from right to left as the swing strikes (or stabs along the aim) and each creature is hit at most once per
-/// swing.
+/// player from right to left as the swing strikes (or stabs along the aim as the thrust drives out), nothing connects
+/// in the wind-up or the follow-through, and each creature is hit at most once per swing.
 /// </summary>
 public sealed class MeleeSystem
 {
@@ -62,11 +62,11 @@ public sealed class MeleeSystem
         {
             var s = _active[i];
             s.Tick++;
-            float t = s.Tick / (float)s.Duration;
+            float t0 = (s.Tick - 1) / (float)s.Duration, t = s.Tick / (float)s.Duration;
             foreach (var npc in _npcs.All.ToList())
             {
                 if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
-                if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, t))) continue;
+                if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, t0, t))) continue;
                 var item = s.Item.Item;
                 if (_npcs.Hit(npc, s.Player, Items.Prefixes.Damage(s.Stack), item.DamageType, Items.Prefixes.Crit(s.Stack) + Combat.DamageModel.BaseCritChance,
                         Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true))
@@ -80,19 +80,24 @@ public sealed class MeleeSystem
     /// flyer in 3D is much harder than in the reference game's side view.</summary>
     public const float ThrustTolerance = 0.7f;
 
-    private static bool Connects(Swing s, Vector3 center, Vector3 half, float t)
+    /// <summary>Whether a creature's box (<paramref name="center"/>, <paramref name="half"/> extents) is struck during the
+    /// tick that took the use animation from <paramref name="t0"/> to <paramref name="t"/>: only while the blade strikes
+    /// (or the thrust drives out), never in the wind-up or the follow-through.</summary>
+    private static bool Connects(Swing s, Vector3 center, Vector3 half, float t0, float t)
     {
         var origin = s.Player.Center + new Vector3(0, 0.3f, 0);
         var to = center - origin;
         float radius = MathF.Max(half.X, half.Y);
         if (s.Item.Has(ItemAction.Thrust))
         {
+            if (t < ThrustStart || t0 > ThrustEnd) return false;
             float length = s.Item.ThrustParams!.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.4f;
             var dir = new Vector3(MathF.Sin(s.Yaw) * MathF.Cos(s.Pitch), MathF.Sin(s.Pitch), MathF.Cos(s.Yaw) * MathF.Cos(s.Pitch));
             float along = Vector3.Dot(to, dir);
             if (along < 0 || along > length + radius) return false;
             return (to - dir * along).Length() <= radius + ThrustTolerance;
         }
+        if (t < StrikeStart || t0 > StrikeEnd) return false;
         var swing = s.Item.Swing!;
         float reach = swing.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.6f;
         var flat = new Vector3(to.X, 0, to.Z);
@@ -120,6 +125,9 @@ public sealed class MeleeSystem
 
     /// <summary>The part of the use animation (fractions) in which a swing's blade crosses in front of the player.</summary>
     public const float StrikeStart = 0.36f, StrikeEnd = 0.56f;
+
+    /// <summary>The part of the use animation (fractions) in which a thrust drives out from drawn back to full reach.</summary>
+    public const float ThrustStart = 0.33f, ThrustEnd = 0.52f;
 
     private static float WrapAngle(float a)
     {

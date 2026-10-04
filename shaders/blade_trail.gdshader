@@ -5,12 +5,14 @@ shader_type spatial;
 render_mode unshaded, blend_add, cull_disabled, depth_draw_never, shadows_disabled;
 
 uniform vec4 tint : source_color = vec4(1.0);
-uniform float brightness = 1.0;
+uniform vec2 light = vec2(1.0); // block light, sky exposure (game/Player/BladeTrail.cs SetLight)
+global uniform float strata_daylight;
 
 void fragment() {
 	float across = UV.y;
 	float profile = smoothstep(0.0, 0.8, across) * (1.0 - 0.55 * smoothstep(0.88, 1.0, across));
 	float core = smoothstep(0.6, 0.95, across);
+	float brightness = 0.35 + 0.65 * max(light.x, light.y * strata_daylight);
 	ALBEDO = mix(tint.rgb, vec3(1.0), core * 0.55) * brightness;
 	ALPHA = clamp(COLOR.a * profile, 0.0, 1.0);
 }

@@ -86,7 +86,8 @@ public sealed partial class PlayerAvatar : Node3D
         var item = held.Item;
         if (item == _heldItem) return;
         _heldItem = item;
-        _held?.QueueFree();
+        // (Free the bone attachment AttachToBone made for it too, or every switch leaves one behind on the skeleton.)
+        (_held?.GetParent() as BoneAttachment3D ?? _held)?.QueueFree();
         _held = null;
         LightAnchor = null;
         if (item == null || _visual == null)

@@ -38,7 +38,7 @@ twinkle, cloud parallax) read the `strata_time` and `strata_camera` globals inst
 | `prop_clear.gdshader` | Translucent parts (`prop:<layer>:clear`): slime gel, corneas, wings | The prop shader with alpha: see-through face on, thicker at the rim, vertex alpha per part; drawn after opaque geometry so what is inside shows |
 | `foliage_card.gdshader` | Tree crowns and bushes (`card:<layer>` slots) | UV-mapped alpha-tested sprig cards, crown-shaped normals on both faces, sway + flutter, translucency, mip-aware alpha |
 | `character.gdshader` | People (`char:<kind>` slots) | Skin (pores from the detail array, subsurface scattering, diffuse that wraps furthest in red so shadow edges go warm), eyes, Kajiya–Kay hair highlights along exported tangents (shifted primary and secondary, jittered per strand), nails, cloth sheen, leather, metal, bone, glow. Vertex alpha is ambient occlusion baked by the generator (eye sockets, between locks, inside folds): it darkens ambient light fully, direct light partly and highlights fully. Detail is sampled in the rest pose rebuilt from the two UV sets, so it sticks to the animated body |
-| `blade_trail.gdshader` | The held blade's trail (`BladeTrail`) | Additive ribbon from part way up the blade to its tip: clear at the inner edge, whitest just inside the tip, faded along its length by vertex alpha, tinted to the item and dimmed in the dark |
+| `blade_trail.gdshader` | The held blade's trail (`BladeTrail`) | Additive ribbon from part way up the blade to its tip: clear at the inner edge, whitest just inside the tip, faded along its length by vertex alpha, tinted to the item and dimmed in the dark (block light, or sky light scaled by the time of day) |
 | `grass.gdshader` | Instanced grass and flowers | See below |
 | `sprite_lit.gdshader` | Billboards and particles | Uses `strata_ambient` because it disables environment light |
 
@@ -109,8 +109,9 @@ blades and tools tip forward and down beside the leg, fanned out from it (long o
 the ground), spears, staffs, bows and rods tip up, guns stay as gripped; the turn drops out as an action fades in and
 returns as it fades out. Attacks are timed like a real blow: a settle and a wind-up, a coil where the torso starts
 back while the blade still drags, a whip that reaches the wrist last, then follow-through, overshoot and settle. A
-swing or chop strikes between 0.36 and 0.56 of its clip, which is where `MeleeSystem` sweeps its hits (right to left,
-`SweepProgress`), where `SwingTrail` draws the reach arc and where `BladeTrail` lets the blade leave a ribbon:
+swing or chop strikes between 0.36 and 0.56 of its clip and a thrust drives out between 0.33 and 0.52, which is where
+`MeleeSystem` lands its hits (a swing sweeps right to left, `SweepProgress`; nothing connects in the wind-up or the
+follow-through), where `SwingTrail` draws the reach arc and where `BladeTrail` lets the blade leave a ribbon:
 sampled from the hand bone once the skeleton is posed, so it starts at the blade, smoothed with Catmull-Rom between
 frames and fading back along the path (fainter for tool chops, a streak for thrusts). It reads the clip's own
 position (`HumanoidAnimator.ActionPhase`), so a long frame cannot put it out of step with the pose.

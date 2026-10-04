@@ -61,11 +61,15 @@ public sealed class HumanoidAnimator
         get
         {
             if (Action == null) return 1f;
-            float length = (float)(double)_tree.Get($"parameters/a_{Action}/current_length");
+            if (!PhasePaths.TryGetValue(Action, out var path))
+                PhasePaths[Action] = path = ($"parameters/a_{Action}/current_position", $"parameters/a_{Action}/current_length");
+            float length = (float)(double)_tree.Get(path.Length);
             if (length <= 0f) return Mathf.Clamp(1f - _actionLeft / _actionLength, 0f, 1f);
-            return Mathf.Clamp((float)(double)_tree.Get($"parameters/a_{Action}/current_position") / length, 0f, 1f);
+            return Mathf.Clamp((float)(double)_tree.Get(path.Position) / length, 0f, 1f);
         }
     }
+
+    private static readonly Dictionary<string, (StringName Position, StringName Length)> PhasePaths = new();
 
     /// <summary>Seconds the current (or last) action was stretched over.</summary>
     public float ActionLength => _actionLength;

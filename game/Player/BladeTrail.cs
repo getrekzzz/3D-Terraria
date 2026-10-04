@@ -34,10 +34,19 @@ public sealed partial class BladeTrail : MeshInstance3D
     /// <summary>Seconds the trail takes to fade behind the blade.</summary>
     public float Life { get; set; } = 0.12f;
 
-    /// <summary>Scales the trail's brightness (dim in the dark, full in daylight).</summary>
-    public float Brightness
+    private static readonly StringName LightParam = "light", TintParam = "tint";
+    private Vector2 _light = new(-1f, -1f);
+
+    /// <summary>
+    /// The light where the blade is (0..1 block light and sky exposure): the trail is dim in the dark and full in light,
+    /// the sky's share scaled by the time of day in the shader.
+    /// </summary>
+    public void SetLight(float block, float sky)
     {
-        set => _material.SetShaderParameter("brightness", value);
+        var light = new Vector2(Mathf.Clamp(block, 0f, 1f), Mathf.Clamp(sky, 0f, 1f));
+        if (light.DistanceSquaredTo(_light) < 1e-4f) return;
+        _light = light;
+        _material.SetShaderParameter(LightParam, light);
     }
 
     public void Initialize(Skeleton3D skeleton)
@@ -63,13 +72,13 @@ public sealed partial class BladeTrail : MeshInstance3D
         _inner = inner;
         _tip = tip;
         _samples.Clear();
-        _material.SetShaderParameter("tint", tint);
+        _material.SetShaderParameter(TintParam, tint);
     }
 
     public override void _Process(double delta)
     {
         _time += (float)delta;
-        Rebuild();
+        if (_samples.Count > 0 || _mesh.GetSurfaceCount() > 0) Rebuild(); // (nothing to do between strikes)
     }
 
     public override void _ExitTree()
@@ -91,7 +100,7 @@ public sealed partial class BladeTrail : MeshInstance3D
     private void Rebuild()
     {
         while (_samples.Count > 0 && _time - _samples[0].Time > Life) _samples.RemoveAt(0);
-        _mesh.ClearSurfaces();
+        if (_mesh.GetSurfaceCount() > 0) _mesh.ClearSurfaces();
         if (_samples.Count < 2) return; // (an empty surface is an error)
         _mesh.SurfaceBegin(Mesh.PrimitiveType.TriangleStrip);
         for (int i = _samples.Count - 1; i > 0; i--)

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Entities;
@@ -39,8 +40,9 @@ public sealed partial class PlayerAvatar
         var box = mesh.GetAabb();
         float top = box.End.Y, bottom = Mathf.Max(0f, box.Position.Y);
         var centre = box.GetCenter();
-        _trail.Track(top - bottom > 0.15f ? node : null, new Vector3(centre.X, Mathf.Lerp(bottom, top, 0.3f), centre.Z),
-            new Vector3(centre.X, top, centre.Z), Tint(item));
+        bool blade = top - bottom > 0.15f; // (short items leave no trail)
+        _trail.Track(blade ? node : null, new Vector3(centre.X, Mathf.Lerp(bottom, top, 0.3f), centre.Z),
+            new Vector3(centre.X, top, centre.Z), blade ? Tint(item) : Colors.White);
     }
 
     /// <summary>Called every frame after the animation is chosen: the carry and the trail.</summary>
@@ -55,9 +57,9 @@ public sealed partial class PlayerAvatar
         _carry = _carry.MoveToward(target, dt * (target == Vector2.Zero ? 700f : 240f));
         aim.Carry = new Vector2(Mathf.DegToRad(_carry.X), Mathf.DegToRad(_carry.Y));
         if (_trail == null) return;
-        _trail.Strength = alive ? TrailStrength(h.Action, h.ActionPhase) : 0f;
+        _trail.Strength = alive && h.Action is "swing" or "thrust" or "mine" ? TrailStrength(h.Action, h.ActionPhase) : 0f;
         _trail.Life = Mathf.Clamp(h.ActionLength * 0.3f, 0.07f, 0.16f);
-        _trail.Brightness = 0.35f + 0.65f * Mathf.Clamp(Mathf.Max(Mathf.Max(light.R, light.G), Mathf.Max(light.B, light.A)), 0f, 1f);
+        _trail.SetLight(Mathf.Max(light.R, Mathf.Max(light.G, light.B)), light.A);
     }
 
     /// <summary>
@@ -83,7 +85,7 @@ public sealed partial class PlayerAvatar
     private static float TrailStrength(string? action, float phase) => action switch
     {
         "swing" => Window(phase, MeleeSystem.StrikeStart - 0.01f, MeleeSystem.StrikeEnd + 0.02f),
-        "thrust" => 0.8f * Window(phase, 0.33f, 0.52f),
+        "thrust" => 0.8f * Window(phase, MeleeSystem.ThrustStart, MeleeSystem.ThrustEnd),
         "mine" => 0.3f * Window(phase, 0.34f, 0.48f),
         _ => 0f,
     };
@@ -91,8 +93,17 @@ public sealed partial class PlayerAvatar
     private static float Window(float t, float start, float end) =>
         Mathf.SmoothStep(start - 0.03f, start + 0.02f, t) * (1f - Mathf.SmoothStep(end - 0.04f, end + 0.02f, t));
 
-    /// <summary>An item's trail colour: its icon's average colour, mostly washed toward white.</summary>
+    private static readonly Dictionary<string, Color> Tints = new();
+
+    /// <summary>An item's trail colour: its icon's average colour, mostly washed toward white (worked out once per item:
+    /// reading the icon back from the GPU stalls).</summary>
     private static Color Tint(ItemDef item)
+    {
+        if (!Tints.TryGetValue(item.Id, out var tint)) Tints[item.Id] = tint = AverageTint(item);
+        return tint;
+    }
+
+    private static Color AverageTint(ItemDef item)
     {
         var image = ItemIcons.Get(item)?.GetImage();
         if (image == null || image.IsEmpty()) return Colors.White;
