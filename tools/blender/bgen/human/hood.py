@@ -27,6 +27,8 @@ def drape(head, under):
         base = len(verts)
         verts += [o.matrix_world @ v.co for v in o.data.vertices]
         polys += [[base + i for i in poly.vertices] for poly in o.data.polygons]
+    if not polys:           # (nothing under it: the cowl hangs on the head's own neck)
+        return (lambda p: np.ones(len(p), dtype=np.float32)), "bare"
     tree = BVHTree.FromPolygons(verts, polys)
     axes = [np.arange(LO[i], HI[i] + STEP * 0.5, STEP, dtype=np.float32) for i in range(3)]
     grid = np.stack(np.meshgrid(*axes, indexing="ij"), -1)

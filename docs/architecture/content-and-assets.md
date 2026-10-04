@@ -38,12 +38,16 @@ almond eyelids with creases, a nose with wings and nostrils, lips with a cupid's
 eyeballs, brows and lashes; hands with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble);
 hair sculpted from traced locks into one surface with grooves between the clumps (`locks.py` traces where each lock
 roots and how it flows, `hairsdf.py` blends them into clumps with UVs along the flow) and beards as strand shells;
-clothing cut from body shells and tailored (`tailoring.py`: eased off the skin, spanned across hollows, cinched under
-the belt and boot tops, folded inside the elbows and knees and stacked above the cuffs) then finished
+clothing cut from body shells and tailored (`tailoring.py`: eased off the skin, spanned across hollows, cinched
+under the belt and boot tops, folded inside the elbows and knees and stacked above the cuffs) then finished
 (`finishing.py`: pressed seams, ribbed collars and cuffs, hems, turned-down boot rims, soles, buttons): shirts,
-trousers, coats, robes with sashes, aprons, belts with buckles, boots, hats, masks. Ambient occlusion is baked
-into the vertex alpha (`occlusion.py`) for the character shader. A 52-bone rig (fingers included) with heat/chain
-weights; long hair follows the torso, not the arms. Skeletons are separate bones on the same rig. Params per
+trousers, coats, robes with sashes, bib aprons tied at the neck and waist (`apron.py`, `straps.py`), belts with
+buckles, boots, masks, and caps and hoods sculpted as cloth fields (`headwear.py`; `hood.py` drapes the cowl over
+whatever is under it). Ambient occlusion is baked into the vertex alpha (`occlusion.py`) for the character shader.
+A 52-bone rig (fingers included) with heat/chain weights; long hair follows the torso, not the arms. Skeletons are
+sculpted bone fields on the same rig (`skulls.py` with orbits, teeth and a hinged jaw; `skeltorso.py`,
+`skelgirdle.py`, `skellimbs.py` one connected column, ribcage, pelvis and limbs) weighted to stay joined in every
+action, and dressed from a slim body when their params give an outfit (`skeldress.py`, `skelfit.py`). Params per
 character live in `assets.json`. They export rest-pose UVs and tangents for the character shader.
 
 Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
