@@ -4121,21 +4121,24 @@
     "wraith": {
       "generator": "humanoid",
       "params": {
-        "skin": "#5a6068",
+        "skin": "#2a2d34",
         "shirt": "#16161c",
         "pants": "#121216",
         "hair": "#101014",
-        "eyes": "#90e0ff",
+        "eyes": "#a0f0ff",
         "hat": "hood",
-        "hatColor": "#1a1a22",
-        "robe": "#1c1c24",
-        "trim": "#3a3a48",
+        "hatColor": "#363842",
+        "robe": "#3a3c46",
+        "trim": "#4c4e5c",
         "boots": "#101014",
         "hairStyle": "bald",
         "undead": true,
         "build": 0.3,
         "weight": 0.1,
-        "height": 2.0
+        "height": 2.0,
+        "face": "void",
+        "wisps": "#a8afba",
+        "brows": "none"
       }
     },
     "retinazer": {
@@ -4262,15 +4265,18 @@
       "generator": "humanoid",
       "params": {
         "skin": "#b8484a",
-        "shirt": "#8a2a2a",
-        "pants": "#5a1a1a",
+        "shirt": "#5a5a48",
+        "pants": "#2e3034",
         "hair": "#3a0a0a",
         "eyes": "#ffe040",
-        "boots": "#4a1010",
+        "boots": "#1e1a16",
         "undead": true,
-        "hairStyle": "messy",
+        "hairStyle": "bald",
         "build": 1.1,
-        "weight": 0.6
+        "weight": 0.6,
+        "face": "ghoul",
+        "brow": 0.6,
+        "brows": "none"
       }
     },
     "blood_crawler": {
@@ -4810,18 +4816,20 @@
       "params": {
         "body": "male",
         "age": "adult",
-        "skin": "#6a8a3a",
+        "skin": "#6a7a3a",
         "eyes": "#ff6a2a",
         "hairStyle": "bald",
-        "shirt": "#3a5a2a",
-        "pants": "#2a3a1a",
-        "boots": "#2a1a10",
-        "coat": "#4a6a2a",
-        "hat": "wreath",
-        "hatColor": "#6ab83a",
+        "shirt": "none",
+        "pants": "none",
+        "boots": "#3a2614",
         "height": 1.7,
         "build": 0.7,
-        "hatShape": "fronds"
+        "belt": "#4a2e16",
+        "tribalMask": "#7a4a22",
+        "headdress": "#6a3a1a",
+        "beads": "#e8dcc0",
+        "grassSkirt": "#6a8a2a",
+        "bodyPaint": "#e8e0c8"
       }
     },
     "wizard": {
@@ -5167,15 +5175,22 @@
       "params": {
         "skin": "#8ab87a",
         "hair": "#1a1a1a",
-        "hairStyle": "short",
+        "hairStyle": "buzz",
         "shirt": "#3a3a3a",
         "pants": "#2a2a3a",
         "boots": "#1a1a1a",
         "coat": "#2a2a2a",
         "height": 2.0,
-        "build": 1.0,
-        "weight": 0.8,
-        "undead": true
+        "build": 1.4,
+        "weight": 0.5,
+        "undead": true,
+        "face": "brute",
+        "brow": 1.0,
+        "jaw": 1.0,
+        "eyes": "#4a4030",
+        "handSize": 1.3,
+        "sleeves": 0.8,
+        "nails": "#55644a"
       }
     },
     "swamp_thing": {
@@ -5217,14 +5232,16 @@
         "shirt": "#5a4a3a",
         "pants": "#3a3a2a",
         "boots": "#2a2018",
-        "undead": true
+        "undead": true,
+        "face": "cyclops",
+        "brows": "none"
       }
     },
     "reaper": {
       "generator": "humanoid",
       "params": {
-        "skin": "#d8d8d0",
-        "eyes": "#e84a4a",
+        "skin": "#d8d0b8",
+        "eyes": "#ff2a1a",
         "hairStyle": "bald",
         "robe": "#1a1a1a",
         "trim": "#3a3a3a",
@@ -5233,7 +5250,8 @@
         "shirt": "#1a1a1a",
         "pants": "#1a1a1a",
         "boots": "#1a1a1a",
-        "undead": true
+        "undead": true,
+        "anatomy": "skeleton"
       }
     },
     "butcher": {
@@ -5822,16 +5840,17 @@
       "params": {
         "body": "female",
         "skin": "#8ab88a",
-        "hair": "#3a8a3a",
-        "hairStyle": "long",
+        "hair": "#2e5a2a",
+        "hairStyle": "buzz",
         "eyes": "#ffd040",
         "robe": "#e8e0d0",
         "trim": "#c8a040",
         "shirt": "#e8e0d0",
         "pants": "#e8e0d0",
         "boots": "#8a6a3a",
-        "tail": "#6a9a5a",
-        "tailShape": "snake"
+        "tail": "#5a9048",
+        "tailShape": "snake",
+        "snakes": "#5a9a48"
       }
     },
     "wall_creeper": {

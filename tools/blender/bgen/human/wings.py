@@ -5,34 +5,19 @@
   edge scalloped between the finger tips;
 - feather: a bird's wing, the arm shingled with small coverts and carrying overlapping rows of flight feathers
   (primaries from the hand, secondaries along the forearm) under rows of coverts;
-- ice: the bird's layout in crystal blades, pale and glassy.
+- ice: faceted crystal shards fanning from a crystal spar like flight feathers, pale cyan with white ridges
+  (icewings.py).
 """
 import math
 
 import bmesh
 from mathutils import Vector
-from mathutils.bvhtree import BVHTree
 
+from . import icewings, wingroot
 from .features import blade, paint, round_section, spline, sweep
 from .garments import mesh_from, set_slot
 from .paint import hex3
 from .rig import rigid
-
-
-def _root(fr, body, garments, sx):
-    """The point on the back over the shoulder blade (on the body or the clothes over it)."""
-    import bpy
-    s = fr.s
-    origin = Vector((sx * 0.075 * s, -0.6 * s, 1.33 * s))
-    best = None
-    for o in [body] + list(garments):
-        if o.type != "MESH" or not len(o.data.polygons):
-            continue
-        tree = BVHTree.FromObject(o, bpy.context.evaluated_depsgraph_get())
-        loc, _, _, _ = tree.ray_cast(origin, Vector((0, 1, 0)), 0.6 * s)
-        if loc is not None and (best is None or loc.y < best.y):
-            best = loc
-    return best if best is not None else Vector((sx * 0.075 * s, -0.12 * s, 1.33 * s))
 
 
 class Plane:
@@ -139,15 +124,14 @@ def _claw(bm, plane, base, d, s):
     return sweep(bm, path, round_section(lambda u: s * 0.0075 * (1 - u) ** 0.9 + 0.0004 * s), 8)
 
 
-def _arm_coverts(bm, path, radius, plane, color, ice):
+def _arm_coverts(bm, path, radius, plane, color, first):
     """Small coverts shingled over the back and top of a bird wing's arm from its root out, pointing along it and
-    down a little, in three staggered rows."""
+    down a little, in three staggered rows (from path index ``first``, where the root leaves the back)."""
     from .features import frames
     layer = bm.loops.layers.color.get("Color")
     s, n = plane.s, len(path)
-    first = min(range(n), key=lambda i: (path[i] - plane.o).length)
     for row, theta in enumerate((1.2, 0.45, -0.3)):
-        for i in range(max(first - 4, 1), n - 3, 2):
+        for i in range(max(first, 1), n - 3, 2):
             j = i + row % 2          # the middle row staggered half a step
             t = j / (n - 1)
             p, (tg, _, _) = path[j], frames(path[j - 1:j + 2])[1]
@@ -161,14 +145,12 @@ def _arm_coverts(bm, path, radius, plane, color, ice):
             d = tg * math.cos(0.6) + down * math.sin(0.6)
 
             def tone(u, v, under, k=0.92 + 0.1 * row):
-                if ice:
-                    return tuple(w + (c - w) * (0.2 + 0.5 * u) for w, c in zip((0.93, 0.97, 1.0), (0.55, 0.8, 1.0)))
                 return tuple(min(1.0, c * k * (1.08 if abs(v) < 0.1 else 1.0) * (0.92 + 0.12 * u)) for c in color)
-            blade(bm, layer, p + out * (r * 0.8), d, out, length, length * 0.34, tone, fold=0.3 if ice else 0.06,
-                  curl=-0.14, thick=0.003 * s, rows=4, round_tip=not ice)
+            blade(bm, layer, p + out * (r * 0.8), d, out, length, length * 0.34, tone, fold=0.06,
+                  curl=-0.14, thick=0.003 * s, rows=4, round_tip=True)
 
 
-def _feathers(bm, plane, s, color, ice):
+def _feathers(bm, plane, s, color):
     """Rows of flight feathers and coverts along the arm, each layer a little further out of the plane."""
     V = lambda u, v: Vector((u, v))
     S, E, W, T = V(0, 0), V(0.14, 0.11), V(0.3, 0.18), V(0.47, 0.2)
@@ -178,7 +160,6 @@ def _feathers(bm, plane, s, color, ice):
         (12, S + (E - S) * 0.4, T, -100, -40, 0.12, 0.15, 1),     # greater coverts
         (14, S + (E - S) * 0.5, T, -100, -60, 0.065, 0.08, 2),
     ]
-    white, cyan = (0.93, 0.97, 1.0), (0.55, 0.8, 1.0)
     layer = bm.loops.layers.color.get("Color") or bm.loops.layers.color.new("Color")
     for count, a, b, ang0, ang1, l0, l1, depth in rows:
         for k in range(count):
@@ -193,55 +174,83 @@ def _feathers(bm, plane, s, color, ice):
             shade = 0.82 + 0.18 * depth / 2
 
             def tone(u, v, under, shade=shade, depth=depth):
-                if ice:
-                    m = 0.25 + 0.6 * u
-                    return tuple(w + (c - w) * m for w, c in zip(white, cyan))
                 k_ = shade * (1.0 - 0.28 * u ** 2 * (depth == 0)) * (1.12 if abs(v) < 0.1 else 1.0) * (1.06 if under else 1.0)
                 return tuple(min(1.0, c * k_) for c in color)
             blade(bm, layer, root, tip - root, n, (tip - root).length, length * s * (0.11 if depth == 0 else 0.2), tone,
-                  fold=0.42 if ice else 0.08, curl=0.05, thick=0.0035 * s, rows=4 if ice else 6, round_tip=not ice,
-                  skew=0.0 if ice else 0.35)
+                  fold=0.08, curl=0.05, thick=0.0035 * s, rows=6, round_tip=True, skew=0.35)
     return S, E, W, T
 
 
 def wings(fr, body, color, shape="bat", garments=()):
-    """A pair of wings: membrane (or feathers) and bones as one part, claws as another."""
+    """A pair of wings: membrane (or feathers, or crystal) and bones as one part, claws as another. Each grows out of
+    a slit in the garment over the shoulder blade (wingroot.py), its root broad and flattened where it leaves the
+    back and tapering into the arm."""
     s = fr.s
     base = hex3(color)
+    skin = wingroot.skin_tone(body)
     bm, claws = bmesh.new(), bmesh.new()
     bm.loops.layers.color.new("Color")
+    hems = []
     for sx in (1, -1):
-        root = _root(fr, body, garments, sx)
-        start = root + Vector((0, 0.03 * s, 0))
-        shoulder = root + Vector((sx * 0.035 * s, -0.05 * s, 0.035 * s))
+        root, normal, hit = wingroot.find(fr, body, garments, sx)
+        start = root - normal * 0.035 * s
+        shoulder = root + normal * 0.045 * s + Vector((sx * 0.03 * s, 0, 0.03 * s))
         plane = Plane(shoulder, sx, s, bend=0.07 if shape == "bat" else 0.05)
         if shape == "bat":
             S, E, W, tone = _bat(bm, claws, plane, s, base)
-            radii = (0.034, 0.02, 0.016, 0.0115, 0.009)
+            radii = (0.026, 0.019, 0.016, 0.0115, 0.009)
             vs = _claw(claws, plane, W, Vector((0.03, 0.065)), s)
             paint(claws, vs, lambda u, a: (0.12, 0.1, 0.09))
+        elif shape == "ice":
+            S, E, W, T = icewings.wing(bm, plane, s)
+            tone = (0.85, 0.95, 1.0)
+            radii = (0.022, 0.018, 0.015, 0.011, 0.006)
         else:
-            S, E, W, T = _feathers(bm, plane, s, base, shape == "ice")
-            tone = base if shape != "ice" else (0.85, 0.95, 1.0)
-            radii = (0.034, 0.024, 0.02, 0.014, 0.008)
+            S, E, W, T = _feathers(bm, plane, s, base)
+            tone = base
+            radii = (0.026, 0.022, 0.019, 0.014, 0.008)
         arm = [start, plane.at(S.x, S.y), plane.at(E.x, E.y), plane.at(W.x, W.y)]
         if shape != "bat":
             arm.append(plane.at(T.x, T.y))
-        path = spline(arm, 40)
+        path = spline(arm, 44)
         rs = list(radii[:len(arm)])
+        u_skin = min(range(len(path)), key=lambda i: (path[i] - root).length) / (len(path) - 1)
+        u_joint = min(range(len(path)), key=lambda i: (path[i] - arm[1]).length) / (len(path) - 1)
 
         def radius(u, rs=rs):
             x = u * (len(rs) - 1)
             i = min(int(x), len(rs) - 2)
             return s * (rs[i] + (rs[i + 1] - rs[i]) * (x - i))
-        vs = sweep(bm, path, round_section(radius), 12)
-        paint(bm, vs, lambda u, a, tone=tone: tone)
-        if shape != "bat":
-            _arm_coverts(bm, path, radius, plane, base, shape == "ice")
+        if shape == "ice":
+            icewings.arm(bm, arm, plane.N, s)
+        else:
+            vs = sweep(bm, path, wingroot.section(s, radius, u_skin, u_joint), 14, up=Vector((0, 0, 1)))
+
+            def shade(u, a, tone=tone, a0=u_skin, a1=u_joint):
+                if shape != "bat":
+                    return tone
+                k = min(1.0, max(0.0, (u - a0) / (a1 - a0)))      # the skin of the back runs out along a bat wing's root
+                return tuple(c + (t - c) * k for c, t in zip(skin, tone))
+            paint(bm, vs, shade)
+            if shape != "bat":
+                _arm_coverts(bm, path, radius, plane, base, round(u_skin * (len(path) - 1)) + 1)
+        r = radius(u_skin)               # the slit fits round the root where it leaves the back
+        half_w, half_h = (0.022 * s, 0.032 * s) if shape == "ice" else (max(1.5 * r, 0.02 * s), 2.6 * r)
+        hem = wingroot.slit(hit, root, normal, s, half_w, half_h)
+        if hem is not None:
+            hems.append(hem)
     obj = mesh_from(bm, "wings")
+    if shape == "ice":
+        for poly in obj.data.polygons:
+            poly.use_smooth = False
     set_slot(obj, {"bat": "char:leather", "ice": "char:eye"}.get(shape, "char:cloth"))
     rigid(obj, "chest")
     out = [obj]
+    for i, hem in enumerate(hems):
+        h = mesh_from(hem, f"wing_slit{i}")
+        set_slot(h, "char:cloth")
+        rigid(h, "chest")
+        out.append(h)
     if claws.verts:
         cl = mesh_from(claws, "wing_claws")
         set_slot(cl, "char:nail")

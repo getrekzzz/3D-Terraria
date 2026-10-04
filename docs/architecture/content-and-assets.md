@@ -52,7 +52,11 @@ few large rips and ragged hems with turned edges over skin), body suits for crea
 and waist (`apron.py`, `straps.py`), belts with buckles, boots, masks (`facemask.py`), caps and hoods sculpted as
 cloth fields (`headwear.py`, `capshapes.py`; `hood.py` drapes the cowl over whatever is under it), wide hats
 (`hats.py`), wreaths and circlets resting on the hair (`crowns.py`), horns, wings and tails (`features.py`,
-`wings.py`, `tails.py`) and bird talons (`talons.py`). Ambient occlusion is baked into the vertex alpha
+`wings.py`, `icewings.py`, `tails.py`, `serpent.py`; roots out through hemmed slits in the clothes, `wingroot.py`)
+and bird talons (`talons.py`). Monster faces are sculpted into the head's field (`monsterface.py`: a cyclops eye, a
+stitched brute, a grimacing ghoul, a faceless void) with their own parts (`monsterparts.py`); Medusa wears snakes for
+hair (`snakehair.py`), and a shaman's mask, headdress, beads, leaf skirt and paint (`tribal.py`, `tribalmask.py`)
+and a ghost's wisping hem (`spectre.py`) are put on through `creaturewear.py`. Ambient occlusion is baked into the vertex alpha
 (`occlusion.py`) for the character shader. A 52-bone rig (fingers included) with heat/chain weights; long hair
 follows the torso, not the arms. Skeletons are sculpted bone fields on the same rig (`skulls.py` with orbits, teeth
 and a hinged jaw; `skeltorso.py`, `skelgirdle.py`, `skellimbs.py` one connected column, ribcage, pelvis and limbs)

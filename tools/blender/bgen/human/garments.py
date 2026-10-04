@@ -62,6 +62,8 @@ class Wardrobe(Skirts):
         self.collar_z = max(ring, default=self.f.j["neck"].z) + 0.004 * s
 
     def sleeve_limit(self):
+        if isinstance(self.cuff, (int, float)):     # a sleeve ending that far down the arm (0..1)
+            return float(self.cuff)
         return 0.97 if self.cuff == "long" else 0.38
 
     def in_shirt(self, co):

@@ -10,6 +10,9 @@ import bpy
 import numpy as np
 from mathutils import Vector
 
+from . import monsterface
+from .monsterface import EYELESS
+
 
 def hex3(value: str):
     h = value.lstrip("#")
@@ -97,7 +100,7 @@ class SkinPainter:
         blush += 0.7 * gauss((q - Vector((0, 0.11, -0.04))).length, 0.012)
         blush += 0.6 * (gauss(abs(q.x) - 0.075, 0.012) if abs(q.x) > 0.06 else 0.0)
         c = mix(c, mul(c, (1.0, 0.88, 0.87)), min(blush, 1.0) * 0.4)
-        for sx in (1, -1):
+        for sx in (1, -1) if self.p.get("face") not in EYELESS else ():
             e = self.head.local(self.head.eyes[sx])
             d = q - e
             lid = gauss(math.hypot(d.x, d.z), 0.016) * (1.0 if d.y > -0.004 else 0.0)
@@ -126,4 +129,6 @@ class SkinPainter:
             # Hair roots under the hair, thinning out softly at the hairline (the locks cover the edge).
             from .hair import coverage
             c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), coverage(q, self.part, self.sideburns, 0.008) * 0.9)
+        if self.p.get("face"):          # a monster's sockets, scars, veins and gums
+            c = monsterface.tint(self.head, self.p["face"], q, c)
         return c

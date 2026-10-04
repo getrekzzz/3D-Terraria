@@ -27,6 +27,10 @@ earFlare (0 flat to the head .. 1 standing out sideways), noseLength (1; longer 
 point), brow (0 .. 1 a heavy jutting brow ridge), jaw (0 .. 1 a wide heavy jaw and chin), snout (0 .. 1 a reptile's
 snout in place of nose and mouth).
 
+Monsters: face (cyclops | brute | ghoul | void, monsterface.py), handSize (1), sleeves (long, short or 0..1 down the
+arm), shirt/pants none (bare), snakes (snakehair.py), wisps (spectre.py), tribalMask, headdress, beads, grassSkirt,
+bodyPaint (tribal.py); tailShape snake is a serpent's body under a robe (serpent.py).
+
 hatShape by hat: wide: brim (default), floppy, top, pointed, tricorn, bucket, mushroom (hats.py); cap: santa, elf,
 helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched on the hair,
 crowns.py), anything else the plain cap; wreath: leaves (default), fronds, gold, frost (crowns.py).
@@ -35,7 +39,7 @@ tailShape: devil (default), lizard, fox, wolf, snake (tails.py).
 """
 import bpy
 
-from . import accessories, apron, beard, hair, locks, motion, occlusion, rig, underhat
+from . import accessories, apron, beard, creaturewear, hair, locks, monsterparts, motion, occlusion, rig, underhat
 from . import frame as frame_mod
 from .garments import Wardrobe, strip_covered
 from .tatters import Tatters
@@ -75,12 +79,14 @@ def _parts(p: dict):
     head = Head(fr, p)
     head_obj = head.build()
     head.fit_neck(head_obj, body)
-    eyes = head.eyeballs(p.get("eyes", "#5a7890"))
+    eyes = [] if monsterparts.own_eyes(p) else head.eyeballs(p.get("eyes", "#5a7890"))
     hands, nails = [], []
     for side in ("R", "L"):
         hand, nail = build_hand(fr, side)
         hands.append(hand)
         nails.append(nail)
+    if "handSize" in p:     # a brute's big hands (monsterparts.py)
+        monsterparts.scale_hands(fr, hands, nails, p["handSize"])
     feet, claws = [], []
     if p.get("feet") == "talons":
         from .talons import build_talons
@@ -172,6 +178,7 @@ def build(name: str, p: dict):
         from . import matter
         return matter.build(name, p)
     p = {**DEFAULTS, **p}
+    p = {k: v for k, v in p.items() if not (k in ("shirt", "pants") and v == "none")}     # bare chest, bare legs
     if p.get("undead"):
         p = {"build": 0.25, "weight": 0.15, **p}
     fr, head, parts = _parts(p)
@@ -196,6 +203,7 @@ def build(name: str, p: dict):
     extras = dress(fr, head, parts, p, (tree, body_w))
     hair = groom(fr, head, parts, p, (tree, body_w), extras, bare)
     extras += hair + accessories.on_hair(head, parts, p, hair)
+    extras += monsterparts.build(head, p, (tree, body_w))      # a monster face's own eyes, teeth, stitches, bolts
     objs = _all(parts) + extras
     for o in objs:
         rest_uvs(o)
@@ -274,9 +282,9 @@ def dress(fr, head, parts, p, lookup=None):
         add(shirt, w.in_shirt, "shirt")
     elif "shirt" in p:
         add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", "#8a8070"), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt, "shirt")
-    if not robe:
+    if not robe and "pants" in p:
         add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants, "pants")
-    if not talons:
+    if not talons and "wisps" not in p:      # a ghost drifts on no feet (spectre.py)
         add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
     else:
         covers.append(w.in_boots)          # the talons take the leg's end over
@@ -301,6 +309,7 @@ def dress(fr, head, parts, p, lookup=None):
             rig.head_weights(hat, head, *lookup, torso_only=True)
         add(hat)
     out.extend(accessories.wear(fr, head, parts, p, list(out)))
+    out.extend(creaturewear.wear(fr, head, parts, p, w, list(out), lookup))     # a shaman's outfit, a ghost's hem
     if "sack" in p and lookup is not None:      # a scarecrow: sack head, straw, patches, rope belt (scarecrow.py)
         from . import scarecrow
         out = scarecrow.dress(fr, head, parts, p, out, lookup)
@@ -336,6 +345,9 @@ def groom(fr, head, parts, p, lookup=None, worn=(), bare=None):
             rig.head_weights(o, head, *lookup, torso_only=True)
         else:
             rig.rigid(o, "head")
+    if "snakes" in p:          # Medusa's hair of snakes over her crop (snakehair.py)
+        from . import snakehair
+        out.append(snakehair.build(head, p["snakes"]))
     return out
 
 

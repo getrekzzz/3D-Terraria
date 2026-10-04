@@ -1,12 +1,13 @@
-"""Tails growing from the tailbone (their roots sunk into the body under the clothes), swept along smooth curves and
-carried by the hips. ``tailShape``:
+"""Tails growing from the tailbone (their roots sunk into the body, out through a hemmed slit in the clothes over it,
+wingroot.py), swept along smooth curves and carried by the hips. ``tailShape``:
 
 - lizard: thick at the root and tapering to a fine tip as it sweeps down, back and round, a row of scutes along
   the top, banded scales and a paler belly;
 - fox: slim at the root, swelling into a bushy brush of fur clumps that curls up to a pale tufted tip;
 - wolf: a shaggy brush hanging down behind the legs, darker toward the tip;
 - devil: a long thin whip curling up behind and ending in a flat spade;
-- snake: a serpent's body sliding out from under a robe at the back and trailing along the ground behind.
+- snake: a serpent's body as thick as a thigh coming out from under the back of a robe and lying on the ground in a
+  long S (serpent.py).
 """
 import math
 
@@ -14,6 +15,7 @@ import bmesh
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
+from . import wingroot
 from .features import paint, spline, sweep
 from .garments import mesh_from, set_slot
 from .paint import hex3
@@ -29,24 +31,28 @@ PATHS = {
              (0.03, -0.18, -0.45)],
     "devil": [(0, 0.04, 0.02), (0, -0.03, -0.02), (0.02, -0.15, -0.13), (0.06, -0.29, -0.2), (0.11, -0.41, -0.17),
               (0.14, -0.49, -0.08), (0.145, -0.52, 0.03), (0.13, -0.5, 0.12)],
-    "snake": [(0, 0.08, 0.3), (0, -0.04, 0.12), (0.06, -0.2, 0.0), (0.14, -0.38, -0.03), (0.08, -0.57, -0.035),
-              (-0.08, -0.69, -0.04), (-0.18, -0.83, -0.045), (-0.2, -0.96, -0.05)],
 }
 
 
-def _exit(fr, body, garments):
-    """Where the tailbone's line meets the back of the body or the clothes over it."""
+# the root's radius where it leaves the body (frame units): it comes out low enough to clear the belt
+ROOT = {"lizard": 0.062, "fox": 0.036, "devil": 0.021}
+
+
+def _exit(fr, body, garments, shape):
+    """Where the tailbone's line meets the back of the body or the clothes over it, and what it meets there."""
     s = fr.s
     z = fr.j["pelvis"].z + 0.02 * s
+    if shape in ROOT:            # under the belt (round the waist, hip height + 0.1)
+        z = min(z, fr.j["hip.R"].z + (0.07 - ROOT[shape]) * s)
     best = None
     for o in [body] + list(garments):
         if o.type != "MESH" or not len(o.data.polygons):
             continue
         tree = BVHTree.FromObject(o, __import__("bpy").context.evaluated_depsgraph_get())
         loc, _, _, _ = tree.ray_cast(Vector((0, -0.6 * s, z)), Vector((0, 1, 0)), 0.6 * s)
-        if loc is not None and (best is None or loc.y < best.y):
-            best = loc
-    return best if best is not None else Vector((0, -0.11 * s, z))
+        if loc is not None and (best is None or loc.y < best[0].y):
+            best = (loc, o)
+    return best if best is not None else (Vector((0, -0.11 * s, z)), None)
 
 
 def _fur(t, a, amp, clumps=7, rows=5):
@@ -61,16 +67,17 @@ def _fur(t, a, amp, clumps=7, rows=5):
 
 def tail(fr, body, p, garments=()):
     shape = p.get("tailShape", "devil")
+    if shape == "snake":
+        from . import serpent
+        return serpent.tail(fr, p, garments)
     s = fr.s
     base = hex3(p["tail"])
-    exit_pt = _exit(fr, body, garments) if shape != "snake" else Vector((0, 0, 0.05 * s))
+    exit_pt, cloth = _exit(fr, body, garments, shape)
     ctrl = [exit_pt + Vector(c) * s for c in PATHS.get(shape, PATHS["devil"])]
     if shape == "devil":         # the spade continues straight on from the whip's end
         d = (ctrl[-1] - ctrl[-2]).normalized()
         ctrl += [ctrl[-1] + d * 0.035 * s, ctrl[-1] + d * 0.075 * s]
     path = spline(ctrl, 110 if shape in ("fox", "wolf") else 72)
-    if shape == "snake":         # lying on the ground, not sunk into it
-        path = [Vector((q.x, q.y, max(q.z, s * (0.006 + 0.062 * (1 - i / 71) ** 0.9) * 0.95))) for i, q in enumerate(path)]
     seam = 1 - (0.11 * s) / sum((b - a).length for a, b in zip(path, path[1:])) if shape == "devil" else 1.0
     pale = tuple(c + (1 - c) * 0.55 for c in base)
     if shape == "lizard":
@@ -98,15 +105,6 @@ def tail(fr, body, p, garments=()):
             k = max(0.0, min(1.0, (t - (0.74 if fox else 0.6)) / 0.14))
             streak = 0.9 + 0.1 * math.sin(a * 9 + t * 30)
             return tuple((c + (q - c) * k) * streak for c, q in zip(base, tip))
-    elif shape == "snake":
-        def section(t, a):
-            r = s * (0.006 + 0.062 * (1 - t) ** 0.9)
-            return math.cos(a) * r, math.sin(a) * r * (1.15 if math.cos(a) < 0 else 1.0)
-
-        def tone(t, a):
-            belly = max(0.0, -math.cos(a)) ** 1.2
-            diamond = 0.78 if abs(math.sin(t * 60 + abs(math.sin(a)) * 4)) > 0.75 and math.cos(a) > 0.2 else 1.0
-            return tuple((c + (q - c) * belly * 0.8) * diamond * (0.92 + 0.08 * math.sin(t * 300)) for c, q in zip(base, pale))
     else:                         # devil: a whip and a flat spade, its broad side facing out
         def section(t, a):
             if t <= seam:
@@ -127,6 +125,11 @@ def tail(fr, body, p, garments=()):
     obj = mesh_from(bm, "tail")
     set_slot(obj, "char:hair" if shape in ("fox", "wolf") else "char:skin")
     rigid(obj, "hips")
+    if shape in ROOT:            # out through a hemmed slit in the seat of whatever covers the tailbone
+        r = ROOT[shape] * s
+        hem = wingroot.slit(cloth, exit_pt, Vector((0, -1, 0)), s, 1.12 * r + 0.004 * s, 1.2 * r + 0.005 * s)
+        if hem is not None:
+            wingroot.sew(cloth, hem)
     return obj
 
 

@@ -14,7 +14,7 @@ import math
 
 import numpy as np
 
-from . import creature, sdf
+from . import creature, monsterface, sdf
 from .earshape import Ear
 from .sdf import F, capsule, carve, ellipsoid, round_cone, smin, sphere, tube
 
@@ -61,13 +61,15 @@ class HeadShape:
         self.nose_len = float(p.get("noseLength", 1.0))
         self.ear_spec = tuple(float(p.get(k, v)) for k, v in (("earSize", 1.0), ("earPoint", 0.0), ("earFlare", 0.0)))
         self.ears = {sx: Ear(sx, self.fem, *self.ear_spec) for sx in (1, -1)} if self.ear_spec[0] > 0 else {}
+        self.monster = p.get("face")             # a monster's face (monsterface.py), or None for a person's
         self.anchors = None
         self.anchors = self._find_anchors()
 
     def key(self):
         """Everything the shape depends on (heads with equal keys are identical)."""
-        return (self.fem, self.old, round(float(self.fat), 4), round(float(self.neck_r), 5), round(float(self.R), 5),
-                tuple(round(float(v), 5) for v in self.eyes[1]), self.brow, self.jaw, self.snout, self.nose_len, self.ear_spec)
+        key = (self.fem, self.old, round(float(self.fat), 4), round(float(self.neck_r), 5), round(float(self.R), 5),
+               tuple(round(float(v), 5) for v in self.eyes[1]), self.brow, self.jaw, self.snout, self.nose_len, self.ear_spec)
+        return key + ((self.monster, monsterface.digest()),) if self.monster else key
 
     def bounds(self):
         """The box the head is meshed in: a person's, grown round big ears, a long nose or a snout."""
@@ -221,11 +223,13 @@ class HeadShape:
         d = smin(d, E(p, (0, 0.0825 + 0.005 * br, 0.0125 - 0.001 * br), (0.012 + 0.006 * br, 0.0075 + 0.001 * male + 0.004 * br, 0.0095 + 0.002 * br)), 0.01)
         if sn > 0:
             d = creature.jaws(self, p, d)
+        if self.monster:
+            d = monsterface.skull(self, p, d)
         if old:
             d = self._age(p, d)
         d = self._neck(p, d)
         for sx in (1, -1):
-            if face:
+            if face and not self.monster:
                 d = sdf.region(p, d, self.eyes[sx], 0.047, lambda q, dd, sx=sx: self._eye(q, dd, sx))
             if ears and sx in self.ears:
                 d = sdf.region(p, d, self.ears[sx].centre, self.ears[sx].radius, self.ears[sx].field)
@@ -233,6 +237,8 @@ class HeadShape:
             d = creature.earless(p, d)
         if face and sn > 0:
             d = sdf.region(p, d, (0, 0.11, -0.05), 0.07, lambda q, dd: creature.field(self, q, dd))
+        elif face and self.monster:
+            d = monsterface.face(self, p, d)
         elif face:
             d = sdf.region(p, d, (0, 0.09, -0.03), 0.058, self._nose)
             d = sdf.region(p, d, (0, 0.082, -0.071), 0.046, self._mouth)
