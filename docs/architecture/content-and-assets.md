@@ -32,26 +32,33 @@ sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `
 every tile object, item and enemy has a generator (no Blender needed).
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
-weight, age, sex), metaball body, a head sculpted as a signed distance field (`headshape.py`, `earshape.py`, meshed
-by `sdf.py`/`fieldmesh.py` with the meshes cached in `tools/blender/_cache`, not committed: skull, cheekbones, jaw,
-almond eyelids with creases, a nose with wings and nostrils, lips with a cupid's bow, rolled ears) with separate
-eyeballs, brows and lashes; hands with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble);
-hair sculpted from traced locks into one surface with grooves between the clumps (`locks.py` traces where each lock
-roots and how it flows, `hairsdf.py` blends them into clumps with UVs along the flow); beards the same way in
-styles (`beard.py`: where the beard grows, a feathered cheek line up to the sideburns, the lips left clear;
-`beardlocks.py` lays a combed mass over the face, a moustache and locks hanging from the jaw onto the clothes;
-`beardsdf.py` blends them into tapered clumps); clothing cut from body shells and tailored (`tailoring.py`: eased off
-the skin, spanned across hollows, cinched under the belt and boot tops, folded inside the elbows and knees and stacked
-above the cuffs) then finished
-(`finishing.py`: pressed seams, ribbed collars and cuffs, hems, turned-down boot rims, soles, buttons): shirts,
-trousers, coats, robes with sashes, bib aprons tied at the neck and waist (`apron.py`, `straps.py`), belts with
-buckles, boots, masks, and caps and hoods sculpted as cloth fields (`headwear.py`; `hood.py` drapes the cowl over
-whatever is under it). Ambient occlusion is baked into the vertex alpha (`occlusion.py`) for the character shader.
-A 52-bone rig (fingers included) with heat/chain weights; long hair follows the torso, not the arms. Skeletons are
-sculpted bone fields on the same rig (`skulls.py` with orbits, teeth and a hinged jaw; `skeltorso.py`,
-`skelgirdle.py`, `skellimbs.py` one connected column, ribcage, pelvis and limbs) weighted to stay joined in every
-action, and dressed from a slim body when their params give an outfit (`skeldress.py`, `skelfit.py`). Params per
-character live in `assets.json`. They export rest-pose UVs and tangents for the character shader.
+weight, age, sex; muscle and fat above average add visible mass), metaball body, a head sculpted as a signed
+distance field (`headshape.py`, `earshape.py`, `creature.py`, meshed by `sdf.py`/`fieldmesh.py` with the meshes
+cached in `tools/blender/_cache`, not committed: skull, cheekbones, jaw, almond eyelids with creases, a nose with
+wings and nostrils, lips with a cupid's bow, rolled ears; aging for old characters; creature params for goblin and
+elf ears, long noses, heavy brows and jaws and a reptile's snout) with separate eyeballs, brows and lashes; hands
+with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble); hair sculpted from traced locks into
+one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows, `hairsdf.py`
+blends them into clumps with UVs along the flow; long hair and ponytails hang onto the shoulders, back and clothes,
+`longhair.py`, `hairdrape.py`, `hairtails.py`, and hair under a hat is cut along the hat's own edge, `underhat.py`);
+beards the same way in styles (`beard.py`: where the beard grows, a feathered cheek line up to the sideburns, the
+lips left clear; `beardlocks.py` lays a combed mass over the face, a moustache and locks hanging from the jaw onto
+the clothes; `beardsdf.py` blends them into tapered clumps); clothing cut from body shells and tailored
+(`tailoring.py`, `drape.py`: eased off the skin, bridged across clefts and settled over hollows, hanging from the
+chest, cinched under the belt and boot tops, folded inside the elbows and knees) then finished (`finishing.py`:
+pressed seams, slim collars and cuffs, hems, turned-down boot rims, soles, buttons): shirts, trousers, coats, robes
+as one loose garment with a skirt and a tied sash (`robes.py`, `skirts.py`), torn undead clothing (`tatters.py`: a
+few large rips and ragged hems with turned edges over skin), body suits for creatures, bib aprons tied at the neck
+and waist (`apron.py`, `straps.py`), belts with buckles, boots, masks (`facemask.py`), caps and hoods sculpted as
+cloth fields (`headwear.py`, `capshapes.py`; `hood.py` drapes the cowl over whatever is under it), wide hats
+(`hats.py`), wreaths and circlets resting on the hair (`crowns.py`), horns, wings and tails (`features.py`,
+`wings.py`, `tails.py`) and bird talons (`talons.py`). Ambient occlusion is baked into the vertex alpha
+(`occlusion.py`) for the character shader. A 52-bone rig (fingers included) with heat/chain weights; long hair
+follows the torso, not the arms. Skeletons are sculpted bone fields on the same rig (`skulls.py` with orbits, teeth
+and a hinged jaw; `skeltorso.py`, `skelgirdle.py`, `skellimbs.py` one connected column, ribcage, pelvis and limbs)
+weighted to stay joined in every action, and dressed from a slim body when their params give an outfit
+(`skeldress.py`, `skelfit.py`). Params per character live in `assets.json` (documented at the top of
+`bgen/human/__init__.py`). They export rest-pose UVs and tangents for the character shader.
 
 Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
 (exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,

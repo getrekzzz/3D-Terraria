@@ -141,6 +141,8 @@ def band(bm, layer, deform, loop, closed, profile, s, prefer, axis, color, step,
     """Sweeps ``profile`` along the loop of edge vertices, resampled every ``step``; u runs along ``prefer`` laid
     onto the cloth, w along the cloth's normal (straight out from the line ``axis`` (point, direction) the garment
     wraps round when ``radial``: the neck, a limb), turned out from that line. Ribbed bands alternate their shade."""
+    if len(loop) < 3:          # (a stray edge or two the decimation left open: nothing to finish)
+        return
     pts = [v.co.copy() for v in loop]
     n = len(pts)
     # Normals averaged along the edge and turned outward, so a crumpled corner of the decimated cloth can't twist
