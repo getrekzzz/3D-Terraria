@@ -7,7 +7,8 @@ and add with tight blends so their edges stay crisp: eyelids are a shell round e
 lobules, wings set off by an alar groove, nostrils and a columella; the lips have a cupid's bow, a tubercle, a mouth
 line turning down slightly at the corners, the philtrum above and the hollow below. The neck meets the jaw with a
 clean angle. Women get a smaller brow ridge, a narrower jaw and smaller chin, fuller lips, a finer nose and a slimmer
-neck; age deepens folds and thins lips; weight fills cheeks and the throat.
+neck; age adds jowls, bags under the eyes and forehead lines, deepens folds and thins lips; weight fills cheeks and the
+throat.
 """
 import math
 
@@ -50,7 +51,7 @@ class HeadShape:
         self.u_in, self.u_out = -0.0128, 0.0116
         self.v_in, self.v_out = -0.0006, 0.0011
         self.lid_up, self.lid_down = 0.0037, 0.0046
-        self.neck_r = (0.053 - 0.008 * self.fem) * (0.82 + 0.36 * frame.build) ** 0.4
+        self.neck_r = (0.056 - 0.005 * self.fem) * (0.82 + 0.36 * frame.build) ** 0.4
         self.n = 0.9 if self.fem else 1.0            # nose scale: finer and shorter on women
         self.ears = {sx: Ear(sx, self.fem) for sx in (1, -1)}
         self.anchors = None
@@ -85,8 +86,8 @@ class HeadShape:
             keys.append(key)
             segs.append((a, b))
 
-        for x in np.linspace(-0.0205, 0.0205, 11):              # the junction of the lips, down a little at the corners
-            z = -0.0699 - 0.0018 * (x / 0.024) ** 2
+        for x in np.linspace(-0.0218, 0.0218, 11):              # the junction of the lips, down a little at the corners
+            z = -0.0699 - 0.0018 * (x / 0.0255) ** 2
             seg("mouth", (x, 0.07, z), (x, 0.11, z))
         for z in np.linspace(-0.0603, -0.0562, 4):
             seg("philtrum", (0, 0.08, z), (0, 0.11, z))
@@ -97,6 +98,11 @@ class HeadShape:
             for q in ((0.0156, 0.0928, -0.0378), (0.018, 0.0888, -0.0428), (0.0168, 0.0876, -0.0474)):
                 c = np.asarray(self.nose_at(sx * q[0], q[1], q[2]))
                 seg("alar", c - out * 0.005, c + out * 0.007)
+        if self.old:              # two shallow lines across the forehead
+            for k, z in enumerate((0.047, 0.059)):
+                for x in np.linspace(-0.026 + 0.004 * k, 0.026 - 0.004 * k, 9):
+                    zz = z + 0.004 * (x / 0.026) ** 2
+                    seg(f"forehead{k}", (x, 0.03, zz), (x, 0.13, zz))
         hits = self._surface([a for a, _ in segs], [b for _, b in segs])
         out = {}
         for k, h in zip(keys, hits):
@@ -158,25 +164,28 @@ class HeadShape:
             d = smin(d, E(p, (sx * 0.029, 0.0775 + 0.0015 * male, 0.0165), (0.021, 0.0095 + 0.0025 * male, 0.0085 - 0.001 * fem),
                           _basis((sx, -0.28, -0.12))), 0.012)
             # Cheekbone body and arch.
-            d = smin(d, E(p, (sx * 0.049, 0.056, -0.012 + 0.002 * fem), (0.0175, 0.016, 0.012), _basis((sx, 0.5, 0.1))), 0.02)
-            d = smin(d, capsule(p, (sx * 0.054, 0.048, -0.009), (sx * 0.064, 0.004, -0.012), 0.006), 0.02)
+            d = smin(d, E(p, (sx * 0.048, 0.055, -0.013 + 0.002 * fem), (0.0165, 0.0155, 0.0115), _basis((sx, 0.5, 0.1))), 0.022)
+            d = smin(d, capsule(p, (sx * 0.053, 0.046, -0.01), (sx * 0.059, 0.006, -0.013), 0.0038), 0.024)
             # Soft cheeks under the cheekbones (fuller with weight and on women).
-            d = smin(d, E(p, (sx * 0.039, 0.052, -0.043), ((0.023 + 0.002 * fem) * (0.9 + 0.35 * fat), 0.021, 0.026)), 0.026)
+            d = smin(d, E(p, (sx * 0.04, 0.05, -0.044), ((0.025 + 0.002 * fem) * (0.9 + 0.35 * fat), 0.023, 0.028)), 0.028)
+            d = smin(d, E(p, (sx * 0.044, 0.036, -0.05), ((0.02 + 0.002 * fem) * (0.92 + 0.3 * fat), 0.022, 0.026)), 0.03)
             # Masseter: from the cheekbone's arch down to the jaw angle (fills the side of the face), and the buccal
             # pad in front of it, so no hollow is left between the cheek, the masseter and the jaw.
-            d = smin(d, round_cone(p, (sx * 0.053, 0.03, -0.02), (sx * (jaw_x - 0.003), 0.006, -0.062 + 0.004 * fem), 0.0125, 0.011), 0.02)
+            d = smin(d, round_cone(p, (sx * 0.052, 0.03, -0.02), (sx * (jaw_x - 0.004), 0.006, -0.062 + 0.004 * fem), 0.0115, 0.0098), 0.028)
             d = smin(d, E(p, (sx * 0.0425, 0.018, -0.066), (0.011, 0.012, 0.014)), 0.015)
             # Jaw: ramus up to the ear, the body to the chin.
             ang = (sx * jaw_x, -0.004, -0.071 + 0.006 * fem)
-            d = smin(d, round_cone(p, (sx * (jaw_x + 0.002), -0.01, -0.03), ang, 0.009, 0.0105 + 0.001 * male), 0.014 + 0.006 * fem)
-            d = smin(d, tube(p, [ang, (sx * 0.03, 0.05, -0.096 + 0.002 * fem), (sx * 0.012, 0.079, -0.104 + 0.003 * fem)],
-                             [0.0105 + 0.001 * male, 0.0098, 0.0115 - 0.002 * fem]), 0.016 + 0.006 * fem)
+            d = smin(d, round_cone(p, (sx * (jaw_x + 0.002), -0.01, -0.03), ang, 0.009, 0.0096 + 0.001 * male), 0.017 + 0.006 * fem)
+            d = smin(d, tube(p, [ang, (sx * 0.03, 0.05, -0.094 + 0.002 * fem), (sx * 0.012, 0.079, -0.1015 + 0.003 * fem)],
+                             [0.0098 + 0.001 * male, 0.0098, 0.0115 - 0.002 * fem]), 0.018 + 0.006 * fem)
             # Side of the head round the ear (temporal bone, mastoid), then the temple hollow behind the brow.
             d = smin(d, E(p, (sx * 0.05, -0.012, -0.012), (0.025, 0.038, 0.034)), 0.03)
-            d = carve(d, E(p, (sx * 0.076, 0.043, 0.012), (0.011, 0.026, 0.022)), 0.02)
+            d = carve(d, E(p, (sx * 0.077, 0.043, 0.012), (0.0085, 0.024, 0.02)), 0.022)
         # Chin and glabella.
-        d = smin(d, E(p, (0, 0.081 - 0.002 * fem, -0.1 + 0.004 * fem), (0.017 - 0.004 * fem, 0.0125 - 0.001 * fem, 0.016 - 0.002 * fem)), 0.012 + 0.004 * fem)
+        d = smin(d, E(p, (0, 0.0815 - 0.002 * fem, -0.0975 + 0.004 * fem), (0.017 - 0.004 * fem, 0.0125 - 0.001 * fem, 0.0155 - 0.002 * fem)), 0.013 + 0.004 * fem)
         d = smin(d, E(p, (0, 0.0825, 0.0125), (0.012, 0.0075 + 0.001 * male, 0.0095)), 0.01)
+        if old:
+            d = self._age(p, d)
         d = self._neck(p, d)
         for sx in (1, -1):
             if face:
@@ -186,6 +195,19 @@ class HeadShape:
         if face:
             d = sdf.region(p, d, (0, 0.09, -0.03), 0.058, self._nose)
             d = sdf.region(p, d, (0, 0.082, -0.071), 0.046, self._mouth)
+        return d
+
+    def _age(self, p, d):
+        """Age: jowls along the jaw beside the chin, the cheeks' fat lower, and lines across the forehead."""
+        for sx in (1, -1):
+            d = smin(d, ellipsoid(p, (sx * 0.035, 0.053, -0.089), (0.012, 0.012, 0.0105)), 0.012)
+            d = carve(d, ellipsoid(p, (sx * 0.046, 0.05, -0.022), (0.012, 0.012, 0.01)), 0.016)
+        a = self.anchors
+        if a is not None:
+            for k in (0, 1):
+                line = a[f"forehead{k}"]
+                r = 0.00045 * (0.4 + 0.6 * np.cos(np.linspace(-1, 1, len(line)) * np.pi / 2))
+                d = carve(d, tube(p, list(line - np.stack([0 * r, r * 0.3, 0 * r], 1)), list(r)), 0.0036)
         return d
 
     def _neck(self, p, d):
@@ -215,6 +237,9 @@ class HeadShape:
         # Lids: a shell over the eyeball blending into brow and cheek, opened in an almond.
         d = smin(d, sphere(p, e, Rs), 0.0065)
         d = smin(d, self._lid_tube(p, -0.002, Rs - 0.0003, 0.0009, sx, upper=False, span=(0.12, 0.95)), 0.0025)  # lower roll
+        if self.old:   # bags under the eyes: a second, softer roll below the lid and the crease under it
+            d = smin(d, self._lid_tube(p, -0.0052, Rs + 0.0004, 0.0013, sx, upper=False, span=(0.15, 0.95)), 0.0035)
+            d = carve(d, self._lid_tube(p, -0.0078, Rs + 0.0012, 0.0005, sx, upper=False, span=(0.2, 0.92)), 0.002)
         d = carve(d, self.opening(p, sx), 0.0006)
         d = carve(d, self._lid_tube(p, 0.0048 + 0.0008 * self.fem, Rs + 0.0006, 0.00085, sx, span=(0.12, 0.9)), 0.0014)  # crease
         return smin(d, self.caruncle(p, sx), 0.0008)
@@ -230,9 +255,9 @@ class HeadShape:
         nose = smin(nose, round_cone(p, at(0, 0.077, 0.0), at(0, 0.0875, -0.037), 0.0075 * n, 0.0102 * n), 0.006)  # sidewalls
         nose = smin(nose, ellipsoid(p, at(0, 0.1007, -0.0352), (0.0069 * n, 0.0078 * n, 0.0074 * n)), 0.008)  # tip
         for sx in (1, -1):
-            nose = smin(nose, sphere(p, at(sx * 0.0036, 0.1028, -0.0366), 0.0052 * n), 0.004)            # lobules
-            nose = smin(nose, ellipsoid(p, at(sx * 0.0122, 0.0928, -0.0442), (0.0095 * n, 0.0041 * n, 0.0048 * n),
-                                        _basis((0.42 * sx, 1.0, -0.12), (0, 0, 1))), 0.01)               # wings
+            nose = smin(nose, sphere(p, at(sx * 0.0028, 0.1018, -0.0368), 0.0044 * n), 0.007)            # lobules
+            nose = smin(nose, ellipsoid(p, at(sx * 0.0106, 0.0915, -0.0438), (0.0078 * n, 0.0034 * n, 0.0042 * n),
+                                        _basis((0.42 * sx, 1.0, -0.12), (0, 0, 1))), 0.013)              # wings
         nose = smin(nose, capsule(p, at(0, 0.0985, -0.0432), at(0, 0.0928, -0.0495), 0.0027 * n), 0.003)    # columella
         d = smin(d, nose, 0.009)
         a = self.anchors
@@ -240,13 +265,13 @@ class HeadShape:
             if a is not None:
                 # Alar crease round the back of each wing (sunk into the surface), then the nostril, opening below.
                 out = np.asarray((sx, 0.25, 0.0)) / math.hypot(1, 0.25)
-                radii = [0.0003, 0.0006, 0.0004]
+                radii = [0.00015, 0.00035, 0.00022]
                 d = carve(d, tube(p, [c - out * r * 0.3 for c, r in zip(a["alar"][3 * i:3 * i + 3], radii)], radii), 0.0018)
                 d = carve(d, ellipsoid(p, a["nostril"][i] - NOSTRIL_NORMAL * 0.0007, (0.0037 * n, 0.0018 * n, 0.0019 * n),
                                        _basis((-0.3 * sx, 0.92, 0.4), NOSTRIL_NORMAL)), 0.0012)
             if self.old:           # nasolabial folds deepen with age
-                d = carve(d, tube(p, [at(sx * 0.019, 0.088, -0.04), (sx * 0.026, 0.083, -0.056), (sx * 0.0305, 0.0765, -0.072)],
-                                  [0.0008, 0.0016, 0.0008]), 0.005)
+                d = carve(d, tube(p, [at(sx * 0.0175, 0.0885, -0.0405), (sx * 0.0255, 0.0835, -0.056), (sx * 0.0305, 0.0765, -0.072)],
+                                  [0.0005, 0.0011, 0.0005]), 0.0075)
         return d
 
     def lips(self, p):
@@ -257,15 +282,14 @@ class HeadShape:
         full = 1.0 + 0.18 * fem - 0.22 * self.old
         q = np.asarray(p, dtype=F).copy()
         q[:, 1] += F(14.0) * q[:, 0] * q[:, 0]
-        thin = F(1) + F(0.45) * (q[:, 0] / F(0.026)) ** 2
+        thin = F(1) + F(0.45) * (q[:, 0] / F(0.0275)) ** 2
         q[:, 1] = F(0.09) + (q[:, 1] - F(0.09)) * thin
         q[:, 2] = F(-0.07) + (q[:, 2] + F(0.07)) * thin
-        upper = ellipsoid(q, (0, 0.0912, -0.0652), (0.0275 - 0.0015 * fem, 0.0068, 0.005 * full))
+        upper = ellipsoid(q, (0, 0.0912, -0.0652), (0.029 - 0.0015 * fem, 0.0068, 0.005 * full))
         upper = smin(upper, ellipsoid(q, (0, 0.0952, -0.0665), (0.0062, 0.004, 0.0038 * full)), 0.003)
         for sx in (1, -1):
             upper = smin(upper, ellipsoid(q, (sx * 0.0055, 0.0932, -0.0624), (0.0048, 0.004, 0.0026 * full)), 0.0025)
-        upper = carve(upper, ellipsoid(q, (0, 0.094, -0.0578), (0.0024, 0.007, 0.0018)), 0.0012)
-        lower = ellipsoid(q, (0, 0.089, -0.0745), (0.024 - 0.0015 * fem, 0.0078, 0.006 * full))
+        lower = ellipsoid(q, (0, 0.089, -0.0745), (0.0255 - 0.0015 * fem, 0.0078, 0.006 * full))
         return smin(upper, lower, 0.002)
 
     def _mouth(self, p, d):
@@ -277,9 +301,9 @@ class HeadShape:
             # A rounded groove between the lips, the dimples at the corners and the philtrum's groove, each sunk just
             # into the surface found for it.
             xs = a["mouth"][:, 0]
-            radii = 0.00075 * (0.45 + 0.55 * np.cos(xs / 0.0205 * np.pi / 2))
+            radii = 0.00075 * (0.45 + 0.55 * np.cos(xs / 0.0218 * np.pi / 2))
             d = carve(d, tube(p, list(a["mouth"] - np.stack([0 * radii, radii * 0.35, 0 * radii], 1)), list(radii)), 0.0014)
-            pr = np.linspace(0.001, 0.0005, len(a["philtrum"]))
+            pr = np.linspace(0.0005, 0.0003, len(a["philtrum"]))
             d = carve(d, tube(p, list(a["philtrum"] - np.stack([0 * pr, pr * 0.5, 0 * pr], 1)), list(pr)), 0.0018)
         d = carve(d, ellipsoid(p, (0, 0.0965, -0.0852), (0.015, 0.0055, 0.0038)), 0.006)                     # under the lower lip
         return d

@@ -71,6 +71,8 @@ class Groom:
         self.rng = np.random.default_rng(seed)
         self.part = self.st.sweep
         self.sideburns = not (head.frame.female or self.st.tie)
+        # Under a hat a bun is worn low at the nape, below the band.
+        self.tie = (0.0, -0.09, -0.016) if under_hat and style == "bun" else self.st.tie
         side = 1.0 if self.part >= 0 else -1.0
         self.crown = np.asarray((0.012 * side, -0.045, 0.088), dtype=F)
         self.phase = self.rng.uniform(0, 6.3, 3)
@@ -121,7 +123,7 @@ class Groom:
         """The direction hair lies at p (not yet in the surface's plane)."""
         st = self.st
         if st.tie is not None:                     # gathered back to the tie
-            return _unit(np.asarray(st.tie, dtype=F) - p)
+            return _unit(np.asarray(self.tie, dtype=F) - p)
         if st.fall:
             # Parted: away from the parting and down the sides, the front swept back past the temples (never over the
             # face), the back straight down.
@@ -210,7 +212,7 @@ class Groom:
         roots = self.roots()
         n = len(roots)
         if st.tie is not None:
-            lengths = np.linalg.norm(np.asarray(st.tie) - roots, axis=1) * 1.05
+            lengths = np.linalg.norm(np.asarray(self.tie) - roots, axis=1) * 1.05
         else:
             top = _ss(0.0, 0.08, roots[:, 2]) * _ss(-0.06, 0.03, roots[:, 1])
             lengths = st.length * (0.7 + 0.5 * top) * (1 + self.rng.uniform(-st.spread, st.spread, n))
@@ -238,7 +240,7 @@ class Groom:
 
     def tail_locks(self):
         """A ponytail: thick locks from the tie, out from the head and down the back."""
-        tie = self._onto(np.asarray([self.st.tie]), np.asarray([self.st.cap + 0.006]))
+        tie = self._onto(np.asarray([self.tie]), np.asarray([self.st.cap + 0.006]))
         out = self._normal(tie)[0]
         n = 15
         a = self.rng.uniform(0, 2 * math.pi, n)
@@ -253,7 +255,7 @@ class Groom:
 
     def bun_locks(self):
         """A bun: a ball of hair at the back of the crown, its locks coiled round it in one direction."""
-        tie = self._onto(np.asarray([self.st.tie]), np.asarray([self.st.cap]))
+        tie = self._onto(np.asarray([self.tie]), np.asarray([self.st.cap]))
         out = self._normal(tie)[0]
         centre = tie[0] + out * 0.024
         u = _unit(np.cross(out, (1.0, 0.0, 0.0)))

@@ -3873,6 +3873,7 @@
         "pants": "#e8e8e8",
         "hair": "#c84a2a",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#ffffff",
         "apron": "#f0a0b0",
         "boots": "#f0f0f0",
@@ -4948,6 +4949,7 @@
         "pants": "#6ab0ff",
         "boots": "#ff6ae0",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#ff6ae0"
       }
     },
@@ -5003,6 +5005,7 @@
         "coat": "#c81a1a",
         "belt": "#1a1a1a",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#c81a1a",
         "weight": 0.9
       }
@@ -5244,6 +5247,7 @@
         "pants": "#c82a2a",
         "boots": "#3a2a1a",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#3a8a3a",
         "height": 1.25,
         "undead": true
@@ -5272,6 +5276,7 @@
         "pants": "#c82a2a",
         "boots": "#3a2a1a",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#c82a2a",
         "height": 1.25
       }
@@ -5388,6 +5393,7 @@
         "pants": "#3a3a5a",
         "boots": "#1a1a1a",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#c82a2a"
       }
     },
@@ -5403,6 +5409,7 @@
         "boots": "#1a1a1a",
         "belt": "#c8a040",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#1a1a1a"
       }
     },
@@ -5674,6 +5681,7 @@
         "pants": "#8a2a2a",
         "boots": "#6a4a2a",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#c8a040"
       }
     },
@@ -5781,6 +5789,7 @@
         "pants": "#6a6e76",
         "boots": "#4a4e56",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#8a8e96",
         "height": 1.9
       }
@@ -5813,6 +5822,7 @@
         "coat": "#d8c8a0",
         "trim": "#c8a040",
         "hat": "cap",
+        "visor": false,
         "hatColor": "#d8c8a0",
         "height": 2.1,
         "build": 1.0,

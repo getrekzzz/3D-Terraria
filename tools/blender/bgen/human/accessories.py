@@ -25,32 +25,21 @@ def _lathe(bm, centre, profile, segs, scale_y=1.0):
                 bm.faces.new((a[k], a[(k + 1) % segs], b[(k + 1) % segs], b[k]))
 
 
-def hat(head, head_obj, kind, color, flower="#f0d040"):
+def hat(head, head_obj, kind, color, flower="#f0d040", visor=True):
     h = head.h
-    bm = bmesh.new()
+    if kind in ("cap", "hood"):            # sculpted cloth (headwear): a cap on the skull, a hood standing off it
+        from . import headwear
+        obj = headwear.mesh(head, kind, visor)
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+        bpy_data_remove(obj)
+    else:
+        bm = bmesh.new()
     top = head.at((0, -0.012, 0.0))
-    if kind == "cap":
-        # Deep enough that the band covers the top of the hair (the hair under a hat stops just inside it).
-        prof = [(0.104 * h * math.cos(a), 0.03 * h + 0.086 * h * math.sin(a)) for a in (i * math.pi / 2 / 8 for i in range(9))]
-        _lathe(bm, top, prof, 32, 1.14)
-        visor = [bm.verts.new(top + Vector((x * h, (0.116 + 0.055 * (1 - (x / 0.07) ** 2)) * h, 0.03 * h))) for x in (-0.07, -0.035, 0.0, 0.035, 0.07)]
-        inner = [bm.verts.new(top + Vector((x * h, 0.112 * h, 0.034 * h))) for x in (-0.07, -0.035, 0.0, 0.035, 0.07)]
-        for i in range(4):
-            bm.faces.new((inner[i], inner[i + 1], visor[i + 1], visor[i]))
-    elif kind == "wide":
+    if kind == "wide":
         brim = [(0.19 * h, 0.05 * h), (0.16 * h, 0.056 * h), (0.098 * h, 0.06 * h)]
         crown = [(0.098 * h, 0.06 * h), (0.092 * h, 0.14 * h), (0.07 * h, 0.155 * h), (0.0, 0.158 * h)]
         _lathe(bm, top, [(0.19 * h, 0.046 * h)] + brim + crown, 40, 1.08)
-    elif kind == "hood":
-        bm.from_mesh(head_obj.data)
-        bm.normal_update()
-        drop = [f for f in bm.faces if _face_open(head.local(f.calc_center_median()))]
-        bmesh.ops.delete(bm, geom=drop, context="FACES")
-        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
-        bm.normal_update()
-        for v in bm.verts:
-            q = head.local(v.co)
-            v.co += v.normal * (0.016 + 0.01 * smooth(0.0, -0.15, q.z)) * h + Vector((0, 0, 0.004 * h))
     elif kind == "wreath":
         for k in range(22):
             a = 2 * math.pi * k / 22
@@ -75,6 +64,13 @@ def hat(head, head_obj, kind, color, flower="#f0d040"):
     return obj
 
 
+def bpy_data_remove(obj):
+    import bpy
+    me = obj.data
+    bpy.data.objects.remove(obj)
+    bpy.data.meshes.remove(me)
+
+
 def mask(head, head_obj, color):
     """A smooth face mask (the Lunatic Cultist's): the face lifted into a thin shell over the skin, with eye holes."""
     h = head.h
@@ -97,11 +93,6 @@ def mask(head, head_obj, color):
     set_slot(obj, "char:bone")
     rigid(obj, "head")
     return obj
-
-
-def _face_open(q):
-    """The hood leaves the face uncovered."""
-    return (q.y > 0.03 and abs(q.x) < 0.06 and -0.12 < q.z < 0.055) or q.z < -0.19
 
 
 def apron(frame, body, color):
