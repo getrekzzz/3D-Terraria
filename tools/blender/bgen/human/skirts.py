@@ -108,7 +108,9 @@ class Skirts:
         layer = bm.loops.layers.color.new("Color")
         base, band = hex3(color), hex3(trim) if trim else None
         for f in bm.faces:
-            c = band if band and f.calc_center_median().z < bottom_z + trim_h - 1e-4 else base
+            m = f.calc_center_median()          # (an open front's edges are trimmed too, like the coat above them)
+            edge = open_front and abs(math.atan2(m.x, m.y - cy)) < 6 * math.pi / segs
+            c = band if band and (m.z < bottom_z + trim_h - 1e-4 or edge) else base
             for loop in f.loops:
                 k = shade[loop.vert]
                 loop[layer] = (c[0] * k, c[1] * k, c[2] * k, 1.0)

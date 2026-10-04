@@ -55,19 +55,21 @@ def _pairs(P, Q, cell):
         yield np.repeat(np.arange(len(P)), n), order[np.arange(n.sum()) - np.repeat(first - start, n)], first, n
 
 
-def roll(X, N, lo, R, m):
+def roll(X, N, lo, R, src):
     """The height along each point's normal at which a ball of radius R rolled over the surface X + N*lo (sampled
-    at its first ``m`` points) touches that normal line: cloth too stiff to follow the body into clefts narrower than
-    the ball (between the pecs, down the spine, under the seat) spans them, however the surface curves along them."""
+    at the points ``src``, indices) touches that normal line: cloth too stiff to follow the body into clefts and
+    hollows narrower than the ball (between the pecs, down the spine, under the seat, between the collarbone and the
+    shoulder) spans them, however the surface curves along them."""
     O = X + N * lo[:, None]
     A = X + N * R
     t = lo.copy()
-    for i, j, first, n in _pairs(O, O[:m], 1.25 * R):
-        d = A[i] - O[j]
+    S, NS = O[src], N[src]
+    for i, j, first, n in _pairs(O, S, 1.25 * R):
+        d = A[i] - S[j]
         b = np.einsum("ij,ij->i", N[i], d)
         disc = b * b - np.einsum("ij,ij->i", d, d) + R * R
         # (not a surface facing back at this one across a gap: an arm's inside and the flank beside it)
-        reach = np.where((disc > 0) & (np.einsum("ij,ij->i", N[i], N[j]) > -0.2), np.sqrt(np.maximum(disc, 0)) - b, -1.0)
+        reach = np.where((disc > 0) & (np.einsum("ij,ij->i", N[i], NS[j]) > -0.2), np.sqrt(np.maximum(disc, 0)) - b, -1.0)
         if len(reach):
             has = n > 0
             t[has] = np.maximum(t[has], np.maximum.reduceat(reach, first[has]))
@@ -91,6 +93,17 @@ def settle(X, N, g, h, floor, pinned, rate, iters=40, reach=4):
     for _ in range(3 * reach):
         lift = g.mean(lift)
     return np.maximum(f + lift, floor)
+
+
+def relax(X, N, g, h, floor, pinned, iters=20):
+    """Smooths the cloth surface X + N*h along N (a dent or a bump of the body a few vertices across shouldn't print
+    through cloth standing off it), never below ``floor``; ``pinned`` points stay."""
+    f = h.copy()
+    for _ in range(iters):
+        P = X + N * f[:, None]
+        f = np.maximum(f + 0.5 * np.einsum("ij,ij->i", g.mean(P) - P, N), floor)
+        f[pinned] = h[pinned]
+    return f
 
 
 def untangle(X, N, h, F, NF, g, pinned, rounds=10):

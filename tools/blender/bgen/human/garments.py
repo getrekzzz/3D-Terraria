@@ -33,6 +33,9 @@ class Wardrobe(Skirts):
         self.belted = not p.get("robe")                    # a belt at the waist (over the coat if there is one)
         self.suit = bool(p.get("suit"))                    # shirt and trousers are the creature's own body
         self.tucked = self.belted and "coat" not in p and not self.suit   # the shirt bloused over the belt
+        # A coat worn open (the default, ``lapels``): a V down to the chest with lapels, showing the shirt under it.
+        self.lapels = "coat" in p and p.get("lapels", True) and not self.suit
+        self.front = None               # the open front's V (lapels.Front), once the collar is fitted
         self.sole = 0.022 * s           # top of the boot soles
         self.standoff = {}              # each garment's height off the skin per vertex (a coat sits on the shirt)
         self.extras = []                # parts the garments brought along (buttons)
@@ -60,6 +63,9 @@ class Wardrobe(Skirts):
         ring = [v.co.z for v in body.data.vertices
                 if 0.088 * s < self.neck_radial(v.co) < 0.14 * s and v.co.z < top and not self._on_arm(v.co)]
         self.collar_z = max(ring, default=self.f.j["neck"].z) + 0.004 * s
+        if self.lapels:
+            from .lapels import Front
+            self.front = Front(self)
 
     def sleeve_limit(self):
         if isinstance(self.cuff, (int, float)):     # a sleeve ending that far down the arm (0..1)
@@ -85,7 +91,7 @@ class Wardrobe(Skirts):
         return self.in_shirt(co) and (self._on_arm(co) or co.z > self.waist - 0.015 * self.f.s)
 
     def in_pants(self, co):
-        return self.boot_top - 0.01 * self.f.s < co.z < self.waist + 0.012 * self.f.s and not self._on_arm(co)
+        return self.boot_top - 0.01 * self.f.s < co.z < self.waist + 0.004 * self.f.s and not self._on_arm(co)
 
     def in_boots(self, co):
         return co.z < self.boot_top + 0.01 * self.f.s
@@ -107,7 +113,7 @@ class Wardrobe(Skirts):
     def pants_cuts(self):
         s, up = self.f.s, Vector((0, 0, 1))
         knee = self.f.j["knee.R"].z
-        return [(Vector((0, 0, self.waist + 0.012 * s)), up, lambda c: not self._on_arm(c)),
+        return [(Vector((0, 0, self.waist + 0.004 * s)), up, lambda c: not self._on_arm(c)),   # (well under the belt)
                 (Vector((0, 0, self.boot_top - 0.01 * s)), up, lambda c: c.z < knee)]
 
     def boot_cuts(self):
@@ -117,6 +123,9 @@ class Wardrobe(Skirts):
         """A garment (``kind``: shirt, coat, pants, boots or robe, a robe's bodice) over the body faces whose centres
         pass ``test``, after the body copy is cut cleanly along ``cuts`` (plane point, plane normal, face filter);
         returns the object (or None)."""
+        if kind == "coat" and self.front is not None:       # open down to the chest
+            test = (lambda base: lambda co: base(co) and not self.front.inside(co))(test)
+            cuts = list(cuts) + self.front.cuts()
         bm = bmesh.new()
         bm.from_mesh(body.data)
         bm.verts.layers.deform.verify()
@@ -134,6 +143,8 @@ class Wardrobe(Skirts):
         cloth = RobeCloth(self, thickness) if kind == "robe" else Cloth(self, kind, thickness)
         kind = cloth.kind
         shade = cloth.apply(bm)
+        if kind == "shirt" and self.tucked:
+            self._loosen(bm, body)
         if self.tatters is not None:
             shade = self.tatters.tear(bm, kind, self.standoff[kind][0], shade)
         keep = [cloth.keep(bm)] if isinstance(cloth, RobeCloth) else []
@@ -153,15 +164,31 @@ class Wardrobe(Skirts):
         self.extras += finishing.finish(self, obj, kind, color)
         return obj
 
+    def _loosen(self, bm, body):
+        """A shirt's tail hangs from the hips: most of the thigh's pull the skin under it has goes to the hips, so
+        it doesn't swing with each stride and kink at the hem (just enough left to clear the trousers under it)."""
+        names = [g.name for g in body.vertex_groups]
+        hips = names.index("hips") if "hips" in names else None
+        legs = {i for i, n in enumerate(names) if n.startswith("thigh.")}
+        if hips is None:
+            return
+        s, dl = self.f.s, bm.verts.layers.deform.verify()
+        for v in bm.verts:
+            k = 0.6 * min(max((self.waist - 0.02 * s - v.co.z) / (0.05 * s), 0.0), 1.0)
+            for i in [i for i in v[dl].keys() if i in legs] if k > 0 else ():
+                v[dl][hips] = v[dl].get(hips, 0.0) + v[dl][i] * k
+                v[dl][i] *= 1 - k
+
     def belt(self, body, color, buckle="#c0a060", over=()):
         """A leather band round the waist (following the body's girth and lying over the garments ``over``) with
         rounded, stitched edges, a buckle frame and prong in front, and the strap's tongue running on past it."""
         s = self.f.s
         z = self.waist - 0.005 * s
         segs = 64
-        radius = self.radial([body], z, 0.02 * s, segs) + 0.011 * s
+        radius = self.radial([body], z, 0.017 * s, segs) + 0.011 * s
         if over:
-            radius = np.maximum(radius, self.radial(over, z, 0.022 * s, segs) + 0.004 * s)
+            radius = np.maximum(radius, self.radial(over, z, 0.017 * s, segs) + 0.004 * s)
+        radius = taut(radius)           # (pulled tight it spans the hollow of the spine instead of dipping into it)
         # Rows across the band: (height, out, shade); the dark rows are the stitching along each edge.
         rows = ((-0.017, -0.0015, 0.8), (-0.0155, 0.0, 1.0), (-0.0125, 0.0003, 0.62), (-0.011, 0.0003, 1.0), (0.011, 0.0003, 0.62),
                 (0.0125, 0.0003, 1.0), (0.0155, 0.0, 0.8), (0.017, -0.0015, 0.8))
@@ -187,9 +214,7 @@ class Wardrobe(Skirts):
         colorize(bm, buckle)
         clasp = mesh_from(bm, "buckle")
         set_slot(clasp, "char:metal")
-        from .rig import rigid
-        for o in (band, tongue, clasp):
-            rigid(o, "hips")
+        _cinch(body, (band, tongue), clasp)
         return [band, tongue, clasp]
 
     def _strap(self, rows, path, z, color, name, closed, point=False, slot="char:leather"):
@@ -216,6 +241,42 @@ class Wardrobe(Skirts):
         obj = mesh_from(bm, name)
         set_slot(obj, slot)
         return obj
+
+
+def taut(radius):
+    """A closed band's radii round the waist (``radius[k]`` at angle 2*pi*k/n, 0 in front) pulled taut: the convex
+    hull of the outline they make."""
+    from .envelope import exit_distance, hull
+    a = 2 * np.pi * np.arange(len(radius)) / len(radius)
+    d = np.stack([np.sin(a), np.cos(a)], 1)
+    ring = d * radius[:, None]
+    return exit_distance(np.zeros_like(ring), d, ring[hull(ring)])
+
+
+def _cinch(body, straps, clasp):
+    """The belt skinned like the waist under it (only the trunk's bones), so it turns with the shirt as the hips
+    swing instead of standing off it; the buckle rigid, weighted as the waist is in front."""
+    from mathutils.kdtree import KDTree
+    from .rig import read_weights, write_weights
+    bw = read_weights(body)
+    trunk = [i for i, w in enumerate(bw) if sum(x for k, x in w.items() if k in ("hips", "spine", "chest")) > 0.6]
+    tree = KDTree(len(trunk))
+    for i in trunk:
+        tree.insert(body.data.vertices[i].co, i)
+    tree.balance()
+
+    def near(co):
+        out = {}
+        for _, i, _ in tree.find_n(co, 12):
+            for k, x in bw[i].items():
+                if k in ("hips", "spine", "chest"):
+                    out[k] = out.get(k, 0.0) + x
+        return out or {"hips": 1.0}
+    for o in straps:
+        write_weights(o, [near(v.co) for v in o.data.vertices])
+    centre = sum((v.co for v in clasp.data.vertices), Vector()) / len(clasp.data.vertices)
+    w = near(centre)
+    write_weights(clasp, [w for _ in clasp.data.vertices])
 
 
 def strip_covered(body, tests):

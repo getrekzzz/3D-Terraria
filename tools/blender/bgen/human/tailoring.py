@@ -20,7 +20,8 @@ import math
 
 import numpy as np
 
-from .drape import Graph, blur, membrane, nearest, refine, rings, roll, settle, soften, untangle
+from .drape import Graph, membrane, nearest, refine, relax, rings, roll, settle, soften, untangle
+from .envelope import fall, hoop
 
 
 def ss(a, b, x):
@@ -88,14 +89,17 @@ class Cloth:
         self.shell = X, N, g, pinned    # (for a further pass over the result: robes.RobeCloth)
         self._regions(X)
         edge = rings(g, pinned, 8)
-        if self.kind != "boots":        # (the skin left two rings in from the edges keeps the cloth's weights there)
-            soften(bm, g, ss(2.0, 8.0, edge), 60 if self.kind == "pants" else 100)
+        skin = pinned & ~(self.torso & (self.z < self.w.waist - 0.03 * self.s)) if self.belted else pinned
+        if self.kind != "boots":        # (the skin left two rings in from the edges keeps the cloth's weights there;
+            soften(bm, g, ss(2.0, 8.0, rings(g, skin, 8)), 60 if self.kind == "pants" else 100)   # a tail's hem
+            # lying on the trousers bends with them in broad curves too, not in steps)
         lo, cap, hi = getattr(self, "_" + ("shirt" if self.kind == "coat" else self.kind))(X)
         # The skin under a garment is removed, so inside its edges the cloth may give a little where it rounds over
         # the body's sharper forms; a coat never closer to the shirt than a few millimetres.
         floor = lo * (1.0 - 0.45 * ss(4.0, 8.0, edge))
         if self.kind == "shirt":        # never down onto the trousers' waistband under its tail
-            floor = np.where(self.torso & (self.z < self.w.waist + 0.02 * self.s), np.maximum(floor, 0.0085 * self.s), floor)
+            band = 0.0085 * self.s * ss(self.w.waist + 0.06 * self.s, self.w.waist + 0.015 * self.s, self.z)   # (eased in:
+            floor = np.where(self.torso, np.maximum(floor, band), floor)                                   # no ledge)
             lo = np.maximum(lo, floor)
         if self.kind == "coat":         # over the shirt and close to it: a coat rests on what it covers
             lo = floor = lo * 0.75
@@ -105,7 +109,7 @@ class Cloth:
                 lo, floor = np.maximum(lo, under + 0.4 * self.t), np.maximum(lo * 0.8, under + 0.15 * self.t)
             cap, hi = cap * 1.4, np.full(len(X), 1.0)
         R = (0.045 if self.kind == "coat" else 0.032) * self.s
-        span = roll(X, N, lo, R, coarse) - lo
+        span = roll(X, N, lo, R, np.arange(coarse)) - lo
         span = cap * np.tanh(span / np.maximum(cap, 1e-6))        # (eased into the limit, and blurred: no ledges)
         sh = np.minimum(*[np.linalg.norm(X - np.array(self.f.j[f"shoulder.{k}"]), axis=1) for k in "RL"])
         span *= ss(0.07 * self.s, 0.07 * self.s + 2 * R, sh)     # not where the arm folds in against the chest
@@ -113,10 +117,11 @@ class Cloth:
             span = np.where(pinned, 0.0, g.mean(span))
         h = membrane(X, N, g, lo + span, np.minimum(lo + cap, hi), pinned)
         if self.kind in ("shirt", "coat") and not self.suit:
-            h = self._hang(X, N, h, lo + 2.0 * cap)
+            h = self._hang(X, N, h, lo + cap)
         elif self.kind == "pants" and not self.suit:
-            h = self._fall(X, N, h, lo + 0.03 * self.s)
+            h = self._fall(X, N, h, lo + 0.012 * self.s)
         h = settle(X, N, g, h, floor, pinned, self._stiffness(), int(150 * self.heavy), int(4 * self.heavy + 0.5))
+        h = relax(X, N, g, h, floor, pinned)
         h = np.minimum(h, np.maximum(hi, floor))
         fold, crease = self._folds(X)
         fade = ss(0.0, 4.0, edge)                           # no folds right at a hem: the bands finish the edge there
@@ -128,8 +133,10 @@ class Cloth:
         NF = np.array([f.normal[:] for f in bm.faces])
         P = untangle(X, N, h, F, NF, g, pinned) if self.kind in ("shirt", "coat") else X + N * h[:, None]
         self.w.standoff[self.kind] = (X, np.einsum("ij,ij->i", P - X, N))
-        if self.kind == "shirt" and "coat" in self.w.p:    # under a coat: held in close, clear of it however it bends
-            P = untangle(X, N, floor, F, NF, g, pinned)
+        if self.kind == "shirt" and "coat" in self.w.p:    # under a coat: held in close, clear of it however it bends,
+            held = untangle(X, N, floor, F, NF, g, pinned)   # but draped where it shows in an open coat's V
+            show = ss(-0.03 * self.s, 0.0, self.w.front.depth(X)) if self.w.front is not None else np.zeros(len(X))
+            P = held + (P - held) * show[:, None]
         if self.kind == "boots":                             # a flat tread under the foot
             P[:, 2] = np.maximum(P[:, 2], -0.001 * self.s)
         for v, p in zip(bm.verts, P):
@@ -138,74 +145,67 @@ class Cloth:
         return np.clip(1.0 - crease, 0.75, 1.0)
 
     def _hang(self, X, N, h, most):
-        """Cloth spans the chest and falls from it instead of following the body in under it, and is gathered back
-        in toward the belt (the waist on a robe). On a depth map of the torso's front each row is filled level between
-        its crests and each column carried down from its highest point less a slight slope; the lift that takes
-        (blurred, so neighbouring columns agree) raises the cloth."""
-        s, z = self.s, self.z
-        cell = 0.008 * s
-        top = self.f.j['chest'].z + 0.13 * s
+        """The cloth round the torso in hoop tension and hanging from the chest and the shoulder blades (envelope.py):
+        each level pulled taut across the body's hollows, each column carried down from its widest less a slope
+        (least on a coat and in front, more at the sides and on a woman's darted front), then gathered back in toward
+        the belt (the waist on a robe); down each sleeve the same from the shoulder, so the muscles under it don't
+        show. The lift is smoothed so neighbouring points agree."""
+        j, s, z = self.f.j, self.s, self.z
         floor = self.w.waist + 0.016 * s if self.belted else self.w.waist - 0.04 * s
         P = X + N * h[:, None]
-        ny = N[:, 1]
-        sel = np.flatnonzero(self.torso & (ny > 0.05) & (z > floor))
-        if not len(sel):
-            return h
-        u = (P[sel, 0] - P[sel, 0].min()) / cell + 2       # (a margin so the blur doesn't wrap)
-        v = (P[sel, 2] - floor) / cell + 2
-        iu, iv = np.round(u).astype(int), np.round(v).astype(int)
-        D = np.full((iu.max() + 4, iv.max() + 4), -np.inf)
-        np.maximum.at(D, (iu, iv), P[sel, 1])
-        # Each row spans level from crest to crest (across the bust, the pecs), then each column falls from its top.
-        E = np.maximum(D, np.minimum(np.maximum.accumulate(D, 0), np.maximum.accumulate(D[::-1], 0)[::-1]))
-        for k in range(min(int((top - floor) / cell) + 2, E.shape[1] - 1) - 1, -1, -1):
-            E[:, k] = np.maximum(E[:, k], E[:, k + 1] - 0.08 * cell)
-        fin = np.isfinite(D)
-        lift = np.where(fin, E - np.where(fin, D, 0.0), 0.0)
-        lift = blur(lift * lift / (lift + 0.006 * s), fin.astype(float), 5)       # (eased in where it starts)
-        u0, v0 = np.clip(np.floor(u).astype(int), 0, D.shape[0] - 2), np.clip(np.floor(v).astype(int), 0, D.shape[1] - 2)
-        fu, fv = np.clip(u - u0, 0, 1), np.clip(v - v0, 0, 1)
-        up = (lift[u0, v0] * (1 - fu) * (1 - fv) + lift[u0 + 1, v0] * fu * (1 - fv)
-              + lift[u0, v0 + 1] * (1 - fu) * fv + lift[u0 + 1, v0 + 1] * fu * fv)
-        # Along the normal, so only where that points forward (the front panel, not the flanks it would push out).
-        up = up / np.maximum(ny[sel], 0.3) * ss(0.55, 0.85, ny[sel]) * ss(floor, floor + 0.1 * s, z[sel])
-        out = h.copy()
-        out[sel] = np.minimum(h[sel] + up, np.maximum(most[sel], h[sel]))
-        return out
+        top = j["shoulder.R"].z - 0.08 * s          # (just under the armpits: the sides don't fall from the arms)
+        body = self.torso & (z > floor - 0.03 * s)
+        centre = np.array((0.0, j["chest"].y, 0.0))
+        lift = hoop(P, N, body, centre, (0, 0, 1), (1, 0, 0), 0.008 * s)
+        # Above the armpits the caps of the shoulders hold the cloth out too: it spans the hollows in front of and
+        # behind the armpits (handed over gradually, so no level marks where they start).
+        caps = (self.sleeve < 0.65) & (z > top)
+        lift += (hoop(P, N, body | caps, centre, (0, 0, 1), (1, 0, 0), 0.008 * s) - lift) * ss(top, top + 0.06 * s, z)
+        coat, fem = self.kind == "coat", self.f.female
+        front, sides, back = (0.07, 0.25, 0.1) if coat else (0.32, 0.6, 0.3) if fem else (0.15, 0.45, 0.2)
+        fb = lambda a: np.where(np.cos(a) > 0, front, back)
+        lift += fall(P + N * lift[:, None], N, body, (0.0, centre[1], top), (0, 0, -1), (0, 1, 0), 0.0, 0.01 * s,
+                     lambda a: fb(a) + (sides - fb(a)) * np.sin(a) ** 2) * ss(floor, floor + 0.16 * s, z)
+        # Over the shoulders, taut from the collar to the shoulder points (no dip in front of the shoulder's cap).
+        yoke = hoop(P, N, (N[:, 2] > 0.2) & (z > top - 0.02 * s) & (self.sleeve < 0.6), centre, (0, 1, 0), (1, 0, 0),
+                    0.01 * s)
+        lift = np.maximum(lift, yoke)
+        for side, arm in self.arms.items():
+            sh, wr = np.array(j[f"shoulder.{side}"]), np.array(j[f"wrist.{side}"])
+            on = arm.on & (self.sleeve > 0.35) & (arm.t < 0.93)
+            up = hoop(P, N, on, sh, wr - sh, (0, 1, 0), 0.01 * s)
+            up += fall(P + N * up[:, None], N, on, sh, wr - sh, (0, 1, 0), 0.0, 0.012 * s, lambda a: 0.1 if coat else 0.16)
+            up = np.maximum(up, yoke)
+            k = ss(0.35, 0.65, self.sleeve) * on        # (handing over from the torso's lift across the sleeve head)
+            lift = lift * (1 - k) + up * (1 - ss(0.8, 0.92, arm.t)) * k
+        return self._lifted(h, lift, most)
 
     def _fall(self, X, N, h, most):
-        """Trouser legs fall from the seat and the thigh instead of following the leg in behind the knee and over the
-        shin: on a map of each leg (along it, round it) each column of the cloth's distance from the leg's axis is
-        carried down from its widest, tapering a little; the lift that takes (blurred) raises the cloth."""
-        s, out = self.s, h.copy()
+        """Trouser legs round each leg in hoop tension below the seat and falling from the seat and the thigh (less
+        a slope, steepest on the inside, so the legs keep the gap between them) instead of following the leg in
+        behind the knee and over the shin."""
+        j, s, z = self.f.j, self.s, self.z
         P = X + N * h[:, None]
+        crotch = j["hip.R"].z - 0.09 * s
+        lift = np.zeros(len(X))
         for side, leg in self.legs.items():
-            j = self.f.j
-            a, b = np.array(j[f"hip.{side}"]), np.array(j[f"ankle.{side}"])
-            rv = P - a - np.clip(leg.t, 0, 1)[:, None] * (b - a)
-            r = np.linalg.norm(rv, axis=1)
-            sel = np.flatnonzero(leg.on & (leg.t > 0.05) & (self.z > self.w.boot_top))
-            if not len(sel):
-                continue
-            du, nv = 0.012 * s / leg.length, 40
-            u, v = (leg.t[sel] - 0.05) / du + 1, (leg.phi[sel] + np.pi) / (2 * np.pi) * nv
-            iu, iv = np.round(u).astype(int), np.round(v).astype(int) % nv
-            D = np.full((iu.max() + 3, nv), -np.inf)
-            np.maximum.at(D, (iu, iv), r[sel])
-            E = D.copy()
-            for k in range(1, len(E)):
-                E[k] = np.maximum(E[k], E[k - 1] - 0.1 * 0.012 * s)
-            fin = np.isfinite(D)
-            lift = np.where(fin, E - np.where(fin, D, 0.0), 0.0)
-            lift = blur(lift * lift / (lift + 0.004 * s), fin.astype(float), 3)
-            u0, v0 = np.clip(np.floor(u).astype(int), 0, len(D) - 2), np.floor(v).astype(int) % nv
-            fu, fv = np.clip(u - np.floor(u), 0, 1), v - np.floor(v)
-            up = (lift[u0, v0] * (1 - fu) * (1 - fv) + lift[u0 + 1, v0] * fu * (1 - fv)
-                  + lift[u0, (v0 + 1) % nv] * (1 - fu) * fv + lift[u0 + 1, (v0 + 1) % nv] * fu * fv)
-            facing = np.einsum("ij,ij->i", N[sel], rv[sel]) / np.maximum(r[sel], 1e-9)
-            up *= ss(self.w.boot_top + 0.02 * s, self.w.boot_top + 0.12 * s, self.z[sel]) / np.maximum(facing, 0.4)
-            out[sel] = np.minimum(h[sel] + up, np.maximum(most[sel], h[sel]))
-        return out
+            sx = 1.0 if side == "R" else -1.0
+            hip, ankle = np.array(j[f"hip.{side}"]), np.array(j[f"ankle.{side}"])
+            on = leg.on & (z > self.w.boot_top) & (z < crotch - 0.01 * s)
+            up = hoop(P, N, on, hip, ankle - hip, (sx, 0, 0), 0.01 * s)
+            up += fall(P + N * up[:, None], N, on, hip, ankle - hip, (sx, 0, 0), 0.12 * leg.length, 0.012 * s,
+                       lambda a: 0.12 + 0.5 * ((1 - np.cos(a)) / 2) ** 2)
+            lift = np.where(on, up, lift)
+        lift *= ss(self.w.boot_top + 0.02 * s, self.w.boot_top + 0.12 * s, z)
+        return self._lifted(h, lift, most)
+
+    def _lifted(self, h, lift, most):
+        """The cloth raised by ``lift`` (smoothed so neighbouring points agree), easing into the limit ``most``."""
+        g, pinned = self.shell[2], self.shell[3]
+        for _ in range(4):
+            lift = np.where(pinned, 0.0, g.mean(lift))
+        room = np.maximum(most - h, 1e-6)
+        return h + room * np.tanh(lift / room)
 
     def _stiffness(self):
         """How much the cloth rounds over the body's smaller forms, per point: most on the torso, less down the
@@ -263,7 +263,7 @@ class Cloth:
                 zz = (z - (waist + 0.016 * s)) / (0.1 * s)
                 ease += 0.0075 * s * ss(0.0, 0.22, zz) * (1.0 - ss(0.22, 1.0, zz)) * (0.75 + 0.25 * np.cos(self.az))
                 ease += np.where(z < waist - 0.026 * s, 0.002 * s + 0.0025 * s * ss(waist - 0.026 * s, hem, z), 0.0)
-                hi = np.where((z > waist - 0.026 * s) & (z < waist + 0.016 * s), 0.0085 * s, hi)
+                hi = np.where((z > waist - 0.026 * s) & (z < waist + 0.016 * s), 0.013 * s, hi)   # (room to round over the body)
             for arm in self.arms.values():
                 t = arm.t
                 sleeve = 0.0012 * s + 0.0022 * s * ss(0.25, 0.65, t) + 0.0018 * s * ss(0.66, 0.8, t) * (1 - ss(0.88, 0.95, t))
@@ -335,7 +335,8 @@ class Cloth:
             if self.belted and self.kind == "shirt":
                 waist = self.w.waist        # soft folds standing up out of the belt, gone well below the chest
                 m = torso * ss(waist + 0.012 * s, waist + 0.03 * s, z) * (1 - ss(waist + 0.04 * s, waist + 0.13 * s, z))
-                m = m * (0.675 + 0.325 * np.cos(self.az))                # (most in front, where the tail blouses)
+                m = m * ss(-0.3, 0.5, np.cos(self.az))      # (in front, where the tail blouses; none in the small of
+                # the back, where they would only read as blotches)
                 add(m, self.az * 16 / (2 * math.pi) + 0.25 * np.sin(3 * self.az + 1.0) + 0.15 * np.sin(5 * self.az), 0.0022 * s)
             elif self.kind == "coat":       # a little drape down the back from the shoulder blades
                 m = torso * ss(self.f.j["chest"].z + 0.05 * s, self.w.waist + 0.05 * s, z) * ss(-0.3, -0.7, np.cos(self.az))

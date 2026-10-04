@@ -7,8 +7,9 @@ with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
 hair, hairStyle, beard (its colour), beardStyle (short|full|bushy|long|pointed|goatee, default full), shirt, pants, boots,
-coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's peak, default true), hatShape, flower (a
-wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape, tail, tailShape, brows (a colour,
+coat, lapels (default true: a coat worn open, with lapels and a turned-down collar over the shirt; false: closed to the
+throat), robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's peak, default true), hatShape, flower
+(a wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape, tail, tailShape, brows (a colour,
 default the hair's, or none), feet (talons: a bird's clawed feet in place of shod ones), talons (their colour),
 anatomy (human|skeleton: bones only, dressed when it has outfit parameters|stone|wood|cookie|armor: a granite golem, a
 gnarled wooden creature, a gingerbread man, an empty suit of plate coloured by armor, rivets and glow; matter.py),
@@ -49,7 +50,7 @@ from .blobs import Blob
 from .body import build_body
 from .hands import build_hand
 from .head import Head
-from .paint import SkinPainter, brow_color, flat, paint
+from .paint import SkinPainter, brow_color, flat, hex3, paint
 
 
 # Material slots the game's character shader understands (game/Rendering/PropLibrary.cs).
@@ -277,9 +278,8 @@ def dress(fr, head, parts, p, lookup=None):
                 covers.append(w.tatters.mask(body, test, kind) if torn else test)
     if robe:
         add(w.shell(body, w.in_robe, "robe", 0.0055, p["robe"], "char:cloth", "robe", w.shirt_cuts(-0.035)), w.in_robe, "shirt")
-    elif "coat" in p:       # under a coat the shirt ends with it, and anything glimpsed of it reads as the lining
-        from .paint import hex3     # (unless the coat is torn: then the shirt shows in its holes)
-        lining = tuple(c * 0.55 for c in hex3(p["coat"])) if w.tatters is None else p.get("shirt", "#8a8070")
+    elif "coat" in p:       # under a coat the shirt ends with it, reading as the lining (unless the coat is open or torn)
+        lining = tuple(c * 0.55 for c in hex3(p["coat"])) if w.tatters is None and w.front is None else p.get("shirt", "#8a8070")
         shirt = w.shell(body, w.in_coat, "shirt", 0.0055, lining, "char:cloth", "shirt", w.shirt_cuts(-0.015))
         add(shirt, w.in_shirt, "shirt")
     elif "shirt" in p:
@@ -292,7 +292,7 @@ def dress(fr, head, parts, p, lookup=None):
         covers.append(w.in_boots)          # the talons take the leg's end over
     if "coat" in p:
         add(w.shell(body, w.in_coat, "coat", 0.012, p["coat"], "char:cloth", "coat", w.shirt_cuts(-0.015)))
-        add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True, under=list(out)))
+        add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True, trim=p.get("trim"), under=list(out)))
     if robe:
         bodice = out[0] if out and out[0].name.startswith("robe") else None
         add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim"), under=list(out)))
