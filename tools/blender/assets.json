@@ -3946,11 +3946,7 @@
       "generator": "humanoid",
       "params": {
         "skin": "#e0d8c0",
-        "shirt": "#d8d0b8",
-        "pants": "#c8c0a8",
-        "hair": "#e8e0c8",
         "eyes": "#ff3020",
-        "boots": "#a09880",
         "anatomy": "skeleton"
       }
     },

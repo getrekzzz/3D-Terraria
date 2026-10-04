@@ -7,10 +7,9 @@ with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
 hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's
-peak, default true), mask, horns, wings, tail, anatomy (human|skeleton), undead.
+peak, default true), mask, horns, wings, tail, anatomy (human|skeleton: bones only, dressed when it has outfit
+parameters), undead.
 """
-import math
-
 import bpy
 
 from . import accessories, apron, hair, locks, motion, occlusion, rig
@@ -166,33 +165,28 @@ def build(name: str, p: dict):
 
 
 def build_skeleton(name: str, p: dict):
-    """A walking skeleton on the human rig: bone pieces, glowing eye points, the undead stance."""
+    """A walking skeleton on the human rig (skeletal.py): sculpted bones, eye lights deep in the orbits, the undead
+    stance, and the clothes, hat and accessories its parameters ask for (skeldress.py)."""
     import bmesh
-    from . import skeletal
+    from . import skeldress, skeletal, skulls
     from .garments import mesh_from
-    from .paint import hex3
     fr = frame_mod.Frame(p)
     head = Head(fr, p)
     arm = frame_mod.build_armature(fr, name)
-    bones = skeletal.build_skeleton(fr, head, arm)
-    base = hex3(p.get("skin", "#e0d8c0"))
-
-    def bone_color(co):
-        grime = 0.82 + 0.18 * (0.5 + 0.5 * math.sin(co.x * 90 + co.z * 55) * math.sin(co.y * 70 - co.z * 30))
-        return tuple(c * grime for c in base)
-
+    bones, skull = skeletal.build_skeleton(fr, head, arm, hide=("foot",) if skeldress.dressed(p) else ())
+    extras, bones = skeldress.clothe(fr, head, arm, p, bones)
+    skeletal.paint(bones, skull, head, p.get("skin", "#e0d8c0"))
     for o in bones:
-        paint(o, bone_color)
         set_material(o, "char:bone")
     bm = bmesh.new()
-    for sx in (1, -1):
-        res = bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.0065 * head.h)
-        bmesh.ops.translate(bm, vec=head.at((sx * 0.031, 0.066, -0.002)), verts=res["verts"])
+    for g in skulls.glow_points().values():
+        res = bmesh.ops.create_icosphere(bm, subdivisions=2, radius=0.0062 * head.h)
+        bmesh.ops.translate(bm, vec=head.at(g), verts=res["verts"])
     glow = mesh_from(bm, "eye_glow")
     flat(glow, p.get("eyes", "#ff3020"))
     set_material(glow, "char:glow")
     rig.rigid(glow, "head")
-    objs = bones + [glow]
+    objs = bones + [glow] + extras
     for o in objs:
         rest_uvs(o)
     mesh = join(objs, name)
