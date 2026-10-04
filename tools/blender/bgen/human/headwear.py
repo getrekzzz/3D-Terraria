@@ -64,7 +64,7 @@ def mesh(head, kind, visor=True, under=()):
     shape = head.shape
     if kind == "cap":
         obj = fieldmesh.build(cap_field(shape, visor), BOUNDS, 0.0011, 9000, "hat_cap", ("cap", shape.key(), visor),
-                              ("headshape.py", "earshape.py", "headwear.py"), "headwear")
+                              ("headshape.py", "earshape.py", "creature.py", "headwear.py"), "headwear")
     else:
         from . import hood
         obj = hood.mesh(head, under)

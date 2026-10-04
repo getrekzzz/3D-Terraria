@@ -39,6 +39,9 @@ def clean_limb_weights(obj, arm, frame):
     """Heat weights leak between close surfaces in the rest pose: keep arm bones off the torso's flanks (a web forms
     when the arms come down) and each leg's bones off the other leg."""
     s = frame.s
+    # Muscular or heavy arms reach further from their bones (body.py): their own surface must keep its weights.
+    bulk, fat = max(0.0, frame.build - 0.5) * 2.0, max(0.0, frame.weight - 0.45) / 0.55
+    reach = 0.068 * s * max(1.0, (0.82 + 0.36 * frame.build) * (1.0 + 0.3 * bulk + 0.15 * fat))
 
     def seg_dist(p, bone):
         b = arm.data.bones[bone]
@@ -52,7 +55,7 @@ def clean_limb_weights(obj, arm, frame):
         for side, sx in (("R", 1), ("L", -1)):
             limb = [f"upper_arm.{side}", f"forearm.{side}", f"hand.{side}"]
             if any(b in w for b in limb):
-                if min(seg_dist(v.co, b) for b in limb) > 0.068 * s:
+                if min(seg_dist(v.co, b) for b in limb) > reach:
                     for b in limb:
                         w.pop(b, None)
             if v.co.x * sx < -0.012 * s:          # the other side of the body

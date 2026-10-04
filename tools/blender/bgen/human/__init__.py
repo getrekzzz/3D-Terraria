@@ -8,7 +8,17 @@ with ``char:<kind>`` material slots that the game maps to its character shader.
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
 hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's
 peak, default true), hatShape, flower (a wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape,
-tail, tailShape, anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead.
+tail, tailShape, brows (a colour, default the hair's, or none), feet (talons: a bird's clawed feet in place of shod
+ones), talons (their colour), anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead.
+
+Build and weight above average (0.5, 0.45) add mass: muscle broadens the shoulders, back and chest and thickens the
+limbs and neck; fat adds a round belly, love handles, a fuller chest, heavy limbs and a thick neck.
+
+Creature heads (defaults give a person's head): headSize (head scale against the body, 1), earSize (1; 0 leaves only
+a recessed ear opening, as on reptiles), earPoint (0 round .. 1 an elf's pointed tip .. 2 a goblin's long blade),
+earFlare (0 flat to the head .. 1 standing out sideways), noseLength (1; longer projects further to a drooping
+point), brow (0 .. 1 a heavy jutting brow ridge), jaw (0 .. 1 a wide heavy jaw and chin), snout (0 .. 1 a reptile's
+snout in place of nose and mouth).
 
 hatShape by hat: wide: brim (default), floppy, top, pointed, tricorn, bucket, mushroom (hats.py); cap: santa, elf,
 helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched on the hair,
@@ -52,7 +62,7 @@ def set_material(obj: bpy.types.Object, slot: str):
 def _parts(p: dict):
     fr = frame_mod.Frame(p)
     blob = Blob("body_blob", 0.0085 * fr.s)
-    build_body(fr, blob)
+    build_body(fr, blob, feet=p.get("feet") != "talons")
     body = blob.to_mesh("body", 16000, smooth_iterations=2)
     head = Head(fr, p)
     head_obj = head.build()
@@ -63,19 +73,28 @@ def _parts(p: dict):
         hand, nail = build_hand(fr, side)
         hands.append(hand)
         nails.append(nail)
+    feet, claws = [], []
+    if p.get("feet") == "talons":
+        from .talons import build_talons
+        for side in ("R", "L"):
+            foot, claw = build_talons(fr, side, p.get("talons", "#d8a446"), p.get("claws", "#3a3028"))
+            feet.append(foot)
+            claws.append(claw)
     painter = SkinPainter(fr, head, p)
     paint(body, painter.body)
     paint(head_obj, painter.face)
     for part in hands:
         paint(part, painter.body)
-    for o in (body, head_obj, *hands):
+    for o in (body, head_obj, *hands, *feet):
         set_material(o, "char:skin")
+    for o in claws:
+        set_material(o, "char:nail")
     for o in nails:
         flat(o, p.get("nails", "#e8c4b8"))
         set_material(o, "char:nail")
     for o in eyes:
         set_material(o, "char:eye")
-    parts = {"body": body, "head": head_obj, "hands": hands, "nails": nails, "eyes": eyes}
+    parts = {"body": body, "head": head_obj, "hands": hands, "nails": nails, "eyes": eyes, "feet": feet, "claws": claws}
     return fr, head, parts
 
 
@@ -157,6 +176,9 @@ def build(name: str, p: dict):
         bones = rig.hand_bones(side)
         rig.chain_weights(hand, arm, bones, 0.006, tree, body_w, blend_bone=f"hand.{side}")
         rig.chain_weights(nail, arm, [b for b in bones if b.split(".")[0] in frame_mod.FINGERS], 0.003)
+    for side, foot, claw in zip(("R", "L"), parts["feet"], parts["claws"]):
+        from .talons import skin
+        skin((foot, claw), arm, fr, side, tree, body_w)
     extras = dress(fr, head, parts, p, (tree, body_w))
     hair = groom(fr, head, parts, p, (tree, body_w))
     extras += hair + accessories.on_hair(head, parts, p, hair)
@@ -210,6 +232,9 @@ def dress(fr, head, parts, p, lookup=None):
     """Clothing and accessories; removes the skin they cover (not under tears). With the body's weights (``lookup``)
     a hood's cowl follows the neck and shoulders it hangs on."""
     body = parts["body"]
+    talons = p.get("feet") == "talons"
+    if talons:
+        p = {k: v for k, v in p.items() if k != "boots"}
     w = Wardrobe(fr, p, head)
     robe = bool(p.get("robe"))
     w.fit_collar(body)
@@ -232,7 +257,10 @@ def dress(fr, head, parts, p, lookup=None):
         add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", "#8a8070"), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt, "shirt")
     if not robe:
         add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants, "pants")
-    add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
+    if not talons:
+        add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
+    else:
+        covers.append(w.in_boots)          # the talons take the leg's end over
     if "coat" in p:
         add(w.shell(body, w.in_coat, "coat", 0.012, p["coat"], "char:cloth", "coat", w.shirt_cuts(-0.015)))
         add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True, under=list(out)))
@@ -271,7 +299,8 @@ def groom(fr, head, parts, p, lookup=None):
         out += locks.Groom(head, style, color, hatted, tree, seed).build(parts["head"])
     if "beard" in p:
         out.append(hair.beard(head, parts["head"], p["beard"]))
-    out.append(hair.brows_and_lashes(head, parts["head"], p.get("brows", color)))
+    if p.get("brows") != "none":       # (reptiles have neither brows nor lashes)
+        out.append(hair.brows_and_lashes(head, parts["head"], p.get("brows", color)))
     for o in out:
         set_material(o, "char:hair")
         if lookup is not None:

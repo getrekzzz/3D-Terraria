@@ -3971,7 +3971,12 @@
         "height": 1.5,
         "hornShape": "imp",
         "wingShape": "bat",
-        "tailShape": "devil"
+        "tailShape": "devil",
+        "earSize": 1.2,
+        "earPoint": 1.0,
+        "earFlare": 0.45,
+        "brow": 0.4,
+        "noseLength": 1.2
       }
     },
     "skeletron_head": {
@@ -4298,7 +4303,14 @@
         "weight": 0.35,
         "shirt": "#7a5a3a",
         "pants": "#5a4028",
-        "boots": "#3a2a1a"
+        "boots": "#3a2a1a",
+        "headSize": 1.2,
+        "earSize": 1.4,
+        "earPoint": 1.3,
+        "earFlare": 0.7,
+        "noseLength": 1.8,
+        "brow": 0.5,
+        "hair": "#3e5a2c"
       }
     },
     "goblin_thief": {
@@ -4314,7 +4326,14 @@
         "pants": "#2a2a34",
         "boots": "#1a1a20",
         "hat": "hood",
-        "hatColor": "#2a2a3a"
+        "hatColor": "#2a2a3a",
+        "headSize": 1.2,
+        "earSize": 1.4,
+        "earPoint": 1.3,
+        "earFlare": 0.7,
+        "noseLength": 1.8,
+        "brow": 0.5,
+        "hair": "#3e5a2c"
       }
     },
     "goblin_warrior": {
@@ -4328,7 +4347,15 @@
         "weight": 0.6,
         "shirt": "#8a8e96",
         "pants": "#5a5e66",
-        "boots": "#3a3e46"
+        "boots": "#3a3e46",
+        "headSize": 1.12,
+        "earSize": 1.35,
+        "earPoint": 1.2,
+        "earFlare": 0.65,
+        "noseLength": 1.6,
+        "brow": 0.8,
+        "jaw": 0.6,
+        "hair": "#3e5a2c"
       }
     },
     "goblin_sorcerer": {
@@ -4346,7 +4373,14 @@
         "robe": "#6a3a9a",
         "trim": "#c08aff",
         "hat": "hood",
-        "hatColor": "#5a2a8a"
+        "hatColor": "#5a2a8a",
+        "headSize": 1.2,
+        "earSize": 1.4,
+        "earPoint": 1.3,
+        "earFlare": 0.7,
+        "noseLength": 1.8,
+        "brow": 0.5,
+        "hair": "#3e5a2c"
       }
     },
     "goblin_archer": {
@@ -4360,7 +4394,14 @@
         "weight": 0.35,
         "shirt": "#4a6a3a",
         "pants": "#3a4a2a",
-        "boots": "#2a3a1a"
+        "boots": "#2a3a1a",
+        "headSize": 1.2,
+        "earSize": 1.4,
+        "earPoint": 1.3,
+        "earFlare": 0.7,
+        "noseLength": 1.8,
+        "brow": 0.5,
+        "hair": "#3e5a2c"
       }
     },
     "harpy": {
@@ -4377,7 +4418,10 @@
         "build": 0.6,
         "weight": 0.25,
         "height": 1.6,
-        "wingShape": "feather"
+        "wingShape": "feather",
+        "body": "female",
+        "feet": "talons",
+        "talons": "#e0b048"
       }
     },
     "wyvern_head": {
@@ -4412,7 +4456,7 @@
         "skin": "#c87a3a",
         "shirt": "#8a5a2a",
         "pants": "#6a4420",
-        "hair": "#3a2410",
+        "hair": "#9a5a28",
         "eyes": "#ffe040",
         "tail": "#c87a3a",
         "boots": "#6a4420",
@@ -4420,7 +4464,11 @@
         "build": 1.0,
         "weight": 0.5,
         "height": 1.7,
-        "tailShape": "lizard"
+        "tailShape": "lizard",
+        "snout": 1.0,
+        "earSize": 0,
+        "brow": 0.9,
+        "brows": "none"
       }
     },
     "flying_snake": {
@@ -4743,7 +4791,14 @@
         "apron": "#6a4a2a",
         "height": 1.4,
         "build": 0.6,
-        "weight": 0.35
+        "weight": 0.35,
+        "headSize": 1.18,
+        "earSize": 1.35,
+        "earPoint": 1.2,
+        "earFlare": 0.6,
+        "noseLength": 1.7,
+        "brow": 0.35,
+        "hair": "#3e5a50"
       }
     },
     "witch_doctor": {
@@ -5273,7 +5328,10 @@
         "hatColor": "#3a8a3a",
         "height": 1.25,
         "undead": true,
-        "hatShape": "elf"
+        "hatShape": "elf",
+        "earSize": 1.05,
+        "earPoint": 1.1,
+        "earFlare": 0.5
       }
     },
     "gingerbread_man": {
@@ -5302,7 +5360,10 @@
         "visor": false,
         "hatColor": "#c82a2a",
         "height": 1.25,
-        "hatShape": "elf"
+        "hatShape": "elf",
+        "earSize": 1.05,
+        "earPoint": 1.1,
+        "earFlare": 0.5
       }
     },
     "nutcracker": {
@@ -5555,7 +5616,14 @@
         "weight": 0.35,
         "shirt": "#4a3a6a",
         "pants": "#2a1a4a",
-        "boots": "#1a1030"
+        "boots": "#1a1030",
+        "headSize": 1.2,
+        "earSize": 1.4,
+        "earPoint": 1.5,
+        "earFlare": 0.7,
+        "noseLength": 1.8,
+        "brow": 0.5,
+        "hair": "#4a3a78"
       }
     },
     "kobold": {
@@ -5571,7 +5639,13 @@
         "pants": "#3a2a1a",
         "boots": "#2a1a10",
         "tail": "#6a8ab8",
-        "tailShape": "lizard"
+        "tailShape": "lizard",
+        "snout": 0.85,
+        "earSize": 0,
+        "brow": 0.7,
+        "headSize": 1.12,
+        "hair": "#4a6890",
+        "brows": "none"
       }
     },
     "wither_beast": {
@@ -5624,7 +5698,14 @@
         "boots": "#2a2018",
         "height": 3.2,
         "build": 1.0,
-        "weight": 1.0
+        "weight": 1.0,
+        "jaw": 0.9,
+        "brow": 0.8,
+        "noseLength": 1.15,
+        "headSize": 0.92,
+        "earSize": 1.15,
+        "earPoint": 0.3,
+        "earFlare": 0.35
       }
     },
     "betsy": {
@@ -5700,7 +5781,13 @@
         "boots": "#1a2a4a",
         "build": 1.0,
         "weight": 0.8,
-        "height": 1.6
+        "height": 1.6,
+        "brow": 1.0,
+        "jaw": 1.0,
+        "earSize": 0.75,
+        "headSize": 0.86,
+        "noseLength": 0.9,
+        "brows": "none"
       }
     },
     "granite_elemental": {

@@ -195,7 +195,7 @@ class Sculpt:
         key = ("hair", g.head.shape.key(), g.part, g.sideburns, g.under_hat, g.st,
                __import__("hashlib").sha1(b"".join(np.ascontiguousarray(v).tobytes() for v in self.s.values())).hexdigest())
         obj = fieldmesh.build(self.field, (tuple(lo), tuple(hi)), h, target, name, key,
-                              ("hairsdf.py", "hair.py", "headshape.py", "earshape.py"), "hair", min_piece=40,
+                              ("hairsdf.py", "hair.py", "headshape.py", "earshape.py", "creature.py"), "hair", min_piece=40,
                               keep=lambda c: g.full(np.ascontiguousarray(c, dtype=F)) > -0.0002, resample=True)
         self._finish(obj)
         return obj

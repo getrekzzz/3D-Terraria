@@ -8,13 +8,13 @@ lobules, wings set off by an alar groove, nostrils and a columella; the lips hav
 line turning down slightly at the corners, the philtrum above and the hollow below. The neck meets the jaw with a
 clean angle. Women get a smaller brow ridge, a narrower jaw and smaller chin, fuller lips, a finer nose and a slimmer
 neck; age adds jowls, bags under the eyes and forehead lines, deepens folds and thins lips; weight fills cheeks and the
-throat.
+throat. Creatures add a heavier brow, a wider jaw, a longer pointed nose, a reptile's snout (creature.py) and other ears.
 """
 import math
 
 import numpy as np
 
-from . import sdf
+from . import creature, sdf
 from .earshape import Ear
 from .sdf import F, capsule, carve, ellipsoid, round_cone, smin, sphere, tube
 
@@ -39,7 +39,8 @@ def _bump(t, peak):
 
 
 class HeadShape:
-    def __init__(self, frame, eyes, eye_r):
+    def __init__(self, frame, eyes, eye_r, p=None):
+        p = p or {}
         self.fem = 1.0 if frame.female else 0.0
         self.male = 1.0 - self.fem
         self.old = 1.0 if frame.old else 0.0
@@ -51,21 +52,45 @@ class HeadShape:
         self.u_in, self.u_out = -0.0128, 0.0116
         self.v_in, self.v_out = -0.0006, 0.0011
         self.lid_up, self.lid_down = 0.0037, 0.0046
-        self.neck_r = (0.056 - 0.005 * self.fem) * (0.82 + 0.36 * frame.build) ** 0.4
+        bulk, fat = max(0.0, frame.build - 0.5) * 2.0, max(0.0, frame.weight - 0.45) / 0.55
+        self.neck_r = ((0.056 - 0.003 * self.fem) * (0.82 + 0.36 * frame.build) ** 0.4 * (1.0 + 0.16 * fat + 0.08 * bulk)
+                       * (1.0 + 0.12 * float(p.get("snout", 0.0))) / float(p.get("headSize", 1.0)) ** 0.7)
         self.n = 0.9 if self.fem else 1.0            # nose scale: finer and shorter on women
-        self.ears = {sx: Ear(sx, self.fem) for sx in (1, -1)}
+        # Creature features (all 0, or 1 for the scales, on people): see human/__init__.py.
+        self.brow, self.jaw, self.snout = (float(p.get(k, 0.0)) for k in ("brow", "jaw", "snout"))
+        self.nose_len = float(p.get("noseLength", 1.0))
+        self.ear_spec = tuple(float(p.get(k, v)) for k, v in (("earSize", 1.0), ("earPoint", 0.0), ("earFlare", 0.0)))
+        self.ears = {sx: Ear(sx, self.fem, *self.ear_spec) for sx in (1, -1)} if self.ear_spec[0] > 0 else {}
         self.anchors = None
         self.anchors = self._find_anchors()
 
     def key(self):
         """Everything the shape depends on (heads with equal keys are identical)."""
         return (self.fem, self.old, round(float(self.fat), 4), round(float(self.neck_r), 5), round(float(self.R), 5),
-                tuple(round(float(v), 5) for v in self.eyes[1]))
+                tuple(round(float(v), 5) for v in self.eyes[1]), self.brow, self.jaw, self.snout, self.nose_len, self.ear_spec)
+
+    def bounds(self):
+        """The box the head is meshed in: a person's, grown round big ears, a long nose or a snout."""
+        lo, hi = [-0.1, -0.13, -0.3], [0.1, 0.14, 0.13]
+        if self.ear_spec != (1.0, 0.0, 0.0):
+            for ear in self.ears.values():
+                lo = [min(a, float(c) - ear.radius) for a, c in zip(lo, ear.centre)]
+                hi = [max(a, float(c) + ear.radius) for a, c in zip(hi, ear.centre)]
+        hi[1] = max(hi[1], 0.084 + 0.045 * self.nose_len, (creature.tip_y(self) + 0.025) if self.snout > 0 else 0.0)
+        return tuple(round(v, 3) for v in lo), tuple(round(v, 3) for v in hi)
+
+    def ear_room(self, p, gap=0.0045):
+        """The space a creature's ears take, grown by ``gap``: a hood cuts it out so they come through it."""
+        out = np.ones(len(p), dtype=F)
+        for ear in self.ears.values():
+            out = np.minimum(out, sdf.region(p, out, ear.centre, ear.radius, lambda q, dd, ear=ear: ear.field(q, dd)))
+        return out - F(gap)
 
     def nose_at(self, x, y, z):
-        """A nose point (designed for the male nose) scaled for this face; women's tips turn up slightly."""
-        n = self.n
-        return (x * n, 0.084 + (y - 0.084) * n, z * n + 0.0018 * self.fem * (1 if z < -0.03 else 0))
+        """A nose point (designed for the male nose) scaled for this face; women's tips turn up slightly, a long nose
+        (``noseLength``) projects further and its tip droops."""
+        n, tip = self.n, (1 if z < -0.03 else 0)
+        return (x * n, 0.084 + (y - 0.084) * n * self.nose_len, z * n + 0.0018 * self.fem * tip - 0.005 * (self.nose_len - 1.0) * tip)
 
     def _surface(self, a, b, iters=26):
         """Where segments a -> b (a inside, b outside) first cross the surface, for many segments at once."""
@@ -98,6 +123,9 @@ class HeadShape:
             for q in ((0.0156, 0.0928, -0.0378), (0.018, 0.0888, -0.0428), (0.0168, 0.0876, -0.0474)):
                 c = np.asarray(self.nose_at(sx * q[0], q[1], q[2]))
                 seg("alar", c - out * 0.005, c + out * 0.007)
+        if self.snout > 0:
+            for key, a, b in creature.anchor_segments(self):
+                seg(key, a, b)
         if self.old:              # two shallow lines across the forehead
             for k, z in enumerate((0.047, 0.059)):
                 for x in np.linspace(-0.026 + 0.004 * k, 0.026 - 0.004 * k, 9):
@@ -149,6 +177,7 @@ class HeadShape:
         """The head's distance at each point; without ``face`` (eyes, nose and mouth) and ``ears`` it is the bare
         skull and neck, which hair is laid over."""
         fem, male, old, fat = self.fem, self.male, self.old, self.fat
+        br, jw, sn = self.brow, self.jaw, self.snout
         E = ellipsoid
         # Cranium, forehead, occiput.
         d = E(p, (0, -0.012, 0.022), (0.0755, 0.095, 0.086))
@@ -158,41 +187,53 @@ class HeadShape:
         d = smin(d, E(p, (0, 0.056, -0.046), (0.037, 0.036, 0.031)), 0.022)
         d = smin(d, E(p, (0, 0.046, -0.074), (0.04 - 0.004 * fem, 0.04, 0.033)), 0.02)
         d = smin(d, E(p, (0, 0.064, -0.066), (0.03, 0.028, 0.022)), 0.024)          # mouth (orbicularis)
-        jaw_x = 0.054 - 0.007 * fem
+        jaw_x = 0.054 - 0.007 * fem + 0.012 * jw
         for sx in (1, -1):
-            # Brow ridge over each eye, lower and further back toward the temple.
-            d = smin(d, E(p, (sx * 0.029, 0.0775 + 0.0015 * male, 0.0165), (0.021, 0.0095 + 0.0025 * male, 0.0085 - 0.001 * fem),
+            # Brow ridge over each eye, lower and further back toward the temple (a heavy, jutting ledge with ``brow``).
+            d = smin(d, E(p, (sx * (0.029 + 0.002 * br), 0.0775 + 0.0015 * male + 0.006 * br, 0.0165 - 0.0015 * br),
+                          (0.021 + 0.005 * br, 0.0095 + 0.0025 * male + 0.0045 * br, 0.0085 - 0.001 * fem + 0.0035 * br),
                           _basis((sx, -0.28, -0.12))), 0.012)
             # Cheekbone body and arch.
             d = smin(d, E(p, (sx * 0.048, 0.055, -0.013 + 0.002 * fem), (0.0165, 0.0155, 0.0115), _basis((sx, 0.5, 0.1))), 0.022)
             d = smin(d, capsule(p, (sx * 0.053, 0.046, -0.01), (sx * 0.059, 0.006, -0.013), 0.0038), 0.024)
-            # Soft cheeks under the cheekbones (fuller with weight and on women).
-            d = smin(d, E(p, (sx * 0.04, 0.05, -0.044), ((0.025 + 0.002 * fem) * (0.9 + 0.35 * fat), 0.023, 0.028)), 0.028)
-            d = smin(d, E(p, (sx * 0.044, 0.036, -0.05), ((0.02 + 0.002 * fem) * (0.92 + 0.3 * fat), 0.022, 0.026)), 0.03)
+            # Soft cheeks under the cheekbones (fuller with weight and on women; flat beside a snout).
+            ck = 1.0 - 0.5 * sn
+            d = smin(d, E(p, (sx * 0.04, 0.05, -0.044), ((0.025 + 0.002 * fem) * (0.9 + 0.35 * fat) * ck, 0.023, 0.028)), 0.028)
+            d = smin(d, E(p, (sx * 0.044, 0.036, -0.05), ((0.02 + 0.002 * fem) * (0.92 + 0.3 * fat) * ck, 0.022, 0.026)), 0.03)
             # Masseter: from the cheekbone's arch down to the jaw angle (fills the side of the face), and the buccal
             # pad in front of it, so no hollow is left between the cheek, the masseter and the jaw.
-            d = smin(d, round_cone(p, (sx * 0.052, 0.03, -0.02), (sx * (jaw_x - 0.004), 0.006, -0.062 + 0.004 * fem), 0.0115, 0.0098), 0.028)
+            d = smin(d, round_cone(p, (sx * 0.052, 0.03, -0.02), (sx * (jaw_x - 0.004), 0.006, -0.062 + 0.004 * fem),
+                                   0.0115 + 0.004 * jw, 0.0098 + 0.004 * jw), 0.028)
             d = smin(d, E(p, (sx * 0.0425, 0.018, -0.066), (0.011, 0.012, 0.014)), 0.015)
-            # Jaw: ramus up to the ear, the body to the chin.
-            ang = (sx * jaw_x, -0.004, -0.071 + 0.006 * fem)
+            # Jaw: ramus up to the ear, the body to the chin (forward and up under a snout).
+            ang = (sx * jaw_x, -0.004, -0.071 + 0.006 * fem - 0.004 * jw)
             d = smin(d, round_cone(p, (sx * (jaw_x + 0.002), -0.01, -0.03), ang, 0.009, 0.0096 + 0.001 * male), 0.017 + 0.006 * fem)
-            d = smin(d, tube(p, [ang, (sx * 0.03, 0.05, -0.094 + 0.002 * fem), (sx * 0.012, 0.079, -0.1015 + 0.003 * fem)],
-                             [0.0098 + 0.001 * male, 0.0098, 0.0115 - 0.002 * fem]), 0.018 + 0.006 * fem)
+            d = smin(d, tube(p, [ang, (sx * (0.03 + 0.008 * jw), 0.05 + 0.02 * sn, -0.094 + 0.002 * fem - 0.004 * jw + 0.014 * sn),
+                                 (sx * (0.012 + 0.006 * jw), 0.079 + 0.003 * jw + 0.045 * sn, -0.1015 + 0.003 * fem - 0.004 * jw + 0.03 * sn)],
+                             [0.0098 + 0.001 * male + 0.003 * jw, 0.0098 + 0.003 * jw, 0.0115 - 0.002 * fem + 0.003 * jw]), 0.018 + 0.006 * fem)
             # Side of the head round the ear (temporal bone, mastoid), then the temple hollow behind the brow.
             d = smin(d, E(p, (sx * 0.05, -0.012, -0.012), (0.025, 0.038, 0.034)), 0.03)
             d = carve(d, E(p, (sx * 0.077, 0.043, 0.012), (0.0085, 0.024, 0.02)), 0.022)
         # Chin and glabella.
-        d = smin(d, E(p, (0, 0.0815 - 0.002 * fem, -0.0975 + 0.004 * fem), (0.017 - 0.004 * fem, 0.0125 - 0.001 * fem, 0.0155 - 0.002 * fem)), 0.013 + 0.004 * fem)
-        d = smin(d, E(p, (0, 0.0825, 0.0125), (0.012, 0.0075 + 0.001 * male, 0.0095)), 0.01)
+        d = smin(d, E(p, (0, 0.0815 - 0.002 * fem + 0.004 * jw + 0.045 * sn, -0.0975 + 0.004 * fem - 0.005 * jw + 0.03 * sn),
+                      (0.017 - 0.004 * fem + 0.008 * jw, 0.0125 - 0.001 * fem + 0.002 * jw - 0.004 * sn, 0.0155 - 0.002 * fem + 0.003 * jw - 0.005 * sn)),
+                 0.013 + 0.004 * fem)
+        d = smin(d, E(p, (0, 0.0825 + 0.005 * br, 0.0125 - 0.001 * br), (0.012 + 0.006 * br, 0.0075 + 0.001 * male + 0.004 * br, 0.0095 + 0.002 * br)), 0.01)
+        if sn > 0:
+            d = creature.jaws(self, p, d)
         if old:
             d = self._age(p, d)
         d = self._neck(p, d)
         for sx in (1, -1):
             if face:
                 d = sdf.region(p, d, self.eyes[sx], 0.047, lambda q, dd, sx=sx: self._eye(q, dd, sx))
-            if ears:
-                d = sdf.region(p, d, self.ears[sx].centre, 0.046, self.ears[sx].field)
-        if face:
+            if ears and sx in self.ears:
+                d = sdf.region(p, d, self.ears[sx].centre, self.ears[sx].radius, self.ears[sx].field)
+        if ears and not self.ears:
+            d = creature.earless(p, d)
+        if face and sn > 0:
+            d = sdf.region(p, d, (0, 0.11, -0.05), 0.07, lambda q, dd: creature.field(self, q, dd))
+        elif face:
             d = sdf.region(p, d, (0, 0.09, -0.03), 0.058, self._nose)
             d = sdf.region(p, d, (0, 0.082, -0.071), 0.046, self._mouth)
         return d
@@ -251,11 +292,14 @@ class HeadShape:
 
     def _nose(self, p, d):
         n, at = self.n, self.nose_at
-        nose = round_cone(p, at(0, 0.085, 0.003), at(0, 0.0985, -0.0275), 0.0046 * n, 0.0056 * n)         # dorsum
+        t = n / self.nose_len ** 0.35      # a long nose narrows to a point
+        nose = round_cone(p, at(0, 0.085, 0.003), at(0, 0.0985, -0.0275), 0.0046 * n, 0.0056 * t)         # dorsum
         nose = smin(nose, round_cone(p, at(0, 0.077, 0.0), at(0, 0.0875, -0.037), 0.0075 * n, 0.0102 * n), 0.006)  # sidewalls
-        nose = smin(nose, ellipsoid(p, at(0, 0.1007, -0.0352), (0.0069 * n, 0.0078 * n, 0.0074 * n)), 0.008)  # tip
+        nose = smin(nose, ellipsoid(p, at(0, 0.1007, -0.0352), (0.0069 * t, 0.0078 * t, 0.0074 * t)), 0.008)  # tip
+        if self.nose_len > 1:     # a long nose keeps its mass out to the tip
+            nose = smin(nose, round_cone(p, at(0, 0.08, -0.008), at(0, 0.0975, -0.033), 0.0098 * n, 0.0064 * t), 0.008)
         for sx in (1, -1):
-            nose = smin(nose, sphere(p, at(sx * 0.0028, 0.1018, -0.0368), 0.0044 * n), 0.007)            # lobules
+            nose = smin(nose, sphere(p, at(sx * 0.0028, 0.1018, -0.0368), 0.0044 * t), 0.007)            # lobules
             nose = smin(nose, ellipsoid(p, at(sx * 0.0106, 0.0915, -0.0438), (0.0078 * n, 0.0034 * n, 0.0042 * n),
                                         _basis((0.42 * sx, 1.0, -0.12), (0, 0, 1))), 0.013)              # wings
         nose = smin(nose, capsule(p, at(0, 0.0985, -0.0432), at(0, 0.0928, -0.0495), 0.0027 * n), 0.003)    # columella
@@ -279,6 +323,8 @@ class HeadShape:
         cupid's bow (two peaks under the philtrum columns, a notch between them) and the fuller lower lip, both
         following the dental arch and thinning toward the corners of the mouth."""
         fem = self.fem
+        if self.snout > 0:        # a snout has no lips
+            return np.ones(len(p), dtype=F)
         full = 1.0 + 0.18 * fem - 0.22 * self.old
         q = np.asarray(p, dtype=F).copy()
         q[:, 1] += F(14.0) * q[:, 0] * q[:, 0]
@@ -314,8 +360,8 @@ def E_adam(p, neck_r):
     return ellipsoid(p, (0, neck_r * 0.62, -0.135), (0.0065, 0.0062, 0.0105))
 
 
-def mesh(shape, h_local=0.001, target=14000, name="head", bounds=((-0.1, -0.13, -0.3), (0.1, 0.14, 0.13))):
+def mesh(shape, h_local=0.001, target=14000, name="head"):
     """The head mesh (head-local coordinates): sampled, meshed, snapped onto the field and reduced to about
     ``target`` triangles, keeping detail where the surface bends."""
     from . import fieldmesh
-    return fieldmesh.build(shape.field, bounds, h_local, target, name, shape.key(), ("headshape.py", "earshape.py"), "heads")
+    return fieldmesh.build(shape.field, shape.bounds(), h_local, target, name, shape.key(), ("headshape.py", "earshape.py", "creature.py"), "heads")

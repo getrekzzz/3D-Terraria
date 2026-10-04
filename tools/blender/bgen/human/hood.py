@@ -81,13 +81,16 @@ def hood_field(shape, under, shoulder_z):
         u = (z + F(0.028)) / F(0.096)
         oval = (np.sqrt((x / (F(0.059) + F(0.008) * u)) ** 2 + u ** 2) - F(1)) * F(0.06)
         oval = np.maximum(oval, F(0.014) - y)
-        hem_z = F(shoulder_z - 0.04) - F(0.034) * np.clip(F(1) - np.abs(x) / F(0.16), 0, 1) + F(0.005) * np.sin(ang * F(9.0))
+        hem_z = (F(shoulder_z - 0.04) - F(0.034) * np.clip(F(1) - np.abs(x) / F(0.16), 0, 1)
+                 + F(0.005) * np.sin(ang * F(9.0)))
         rim = np.sqrt(x * x + (y + F(0.02)) ** 2 * F(1.6)) - F(0.185)
         cut = smax(hem_z - z, rim, 0.02)
         edge = np.minimum(np.abs(oval), np.abs(cut)) - F(0.005)
         hem = np.maximum(carve(outer + F(0.002), vol - (t - F(0.0085)), 0.0015), edge)
         d = smin(d, hem, 0.0012)
         d = carve(d, oval, 0.0025)
+        if shape.ear_spec != (1.0, 0.0, 0.0):      # a creature's big ears come out through holes
+            d = carve(d, shape.ear_room(p), 0.002)
         return smax(d, cut, 0.003)
     return field
 
@@ -97,6 +100,6 @@ def mesh(head, under):
     shape = head.shape
     shoulder_z = round(float(head.local(head.frame.j["shoulder.R"]).z), 4)
     field, digest = drape(head, under)
+    sources = ("headshape.py", "earshape.py", "creature.py", "headwear.py", "hood.py")
     return fieldmesh.build(hood_field(shape, field, shoulder_z), BOUNDS, 0.0016, 28000, "hat_hood",
-                           ("hood", shape.key(), shoulder_z, digest), ("headshape.py", "earshape.py", "headwear.py", "hood.py"),
-                           "headwear")
+                           ("hood", shape.key(), shoulder_z, digest), sources, "headwear")

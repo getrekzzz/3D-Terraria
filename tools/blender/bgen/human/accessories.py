@@ -103,22 +103,13 @@ def paint_regions(obj, regions, colors):
 
 
 def mask(head, head_obj, color):
-    """A smooth face mask (the Lunatic Cultist's): the face lifted into a thin shell over the skin, with eye holes."""
-    h = head.h
+    """A smooth, stylised face mask (the Lunatic Cultist's): a rigid shell over the face with almond eye holes and a
+    nose ridge, sculpted as a distance field (facemask.py)."""
+    from . import facemask
+    obj = facemask.mesh(head)
     bm = bmesh.new()
-    bm.from_mesh(head_obj.data)
-    bm.normal_update()
-    eyes = [Vector((sx * 0.031, 0.066, -0.002)) for sx in (1, -1)]
-    drop = []
-    for f in bm.faces:
-        q = head.local(f.calc_center_median())
-        if not (q.y > 0.02 and abs(q.x) < 0.065 and -0.11 < q.z < 0.05) or any((q - e).length < 0.016 for e in eyes):
-            drop.append(f)
-    bmesh.ops.delete(bm, geom=drop, context="FACES")
-    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
-    bm.normal_update()
-    for v in bm.verts:
-        v.co += v.normal * 0.007 * h
+    bm.from_mesh(obj.data)
+    bpy_data_remove(obj)
     colorize(bm, color)
     obj = mesh_from(bm, "mask")
     set_slot(obj, "char:bone")
