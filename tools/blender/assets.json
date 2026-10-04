@@ -5806,7 +5806,8 @@
         "boots": "#6a4a2a",
         "hat": "cap",
         "visor": false,
-        "hatColor": "#c8a040"
+        "hatColor": "#c8a040",
+        "hatShape": "helmet"
       }
     },
     "medusa": {

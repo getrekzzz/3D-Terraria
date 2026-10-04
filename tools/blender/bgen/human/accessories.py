@@ -3,7 +3,6 @@ carry them. Hats: sculpted cloth caps and hoods (headwear, capshapes), wide hats
 perched caps that rest on the finished hair (crowns); creature features: horns (features), wings (wings), tails
 (tails)."""
 import bmesh
-from mathutils import Vector
 
 from .garments import colorize, mesh_from, set_slot
 from .rig import rigid
@@ -100,6 +99,13 @@ def paint_regions(obj, regions, colors):
             loop[layer] = (c[0] * k, c[1] * k, c[2] * k, 1.0)
     bm.to_mesh(obj.data)
     bm.free()
+
+
+def bpy_data_remove(obj):
+    import bpy
+    me = obj.data
+    bpy.data.objects.remove(obj)
+    bpy.data.meshes.remove(me)
 
 
 def mask(head, head_obj, color):
