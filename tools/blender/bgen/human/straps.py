@@ -189,5 +189,5 @@ def waist_ties(a, panel):
         wts = []
         for p, k in zip(pts, ss(0.05, 0.5, u)):       # from the hips at the knot to the seat's own weights
             tw = a.torso_w(p)
-            wts.append({b: (1 - k) * (b == "hips") + k * tw.get(b, 0.0) for b in set(tw) | {"hips"}})
+            wts.append({b: (1 - k) * (b == "hips") + k * tw.get(b, 0.0) for b in sorted(set(tw) | {"hips"})})
         a.sweep(pts, ups, prof, smooth_w(wts, fixed=1), cut=0.6 * sx)

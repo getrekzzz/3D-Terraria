@@ -113,13 +113,16 @@ def build(field, bounds, h, target, name, key, sources, kind, min_piece=None, ke
         me.update()
         _beautify(me)
         verts, faces = _arrays(me)
-    if me.validate():          # (decimating can leave duplicate faces; drop them so the cache and this mesh agree)
-        verts, faces = _arrays(me)
+    me.validate()           # (decimating can leave duplicate faces)
+    verts, faces = _arrays(me)
     _MESHES[key] = (verts, faces)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f"{path.stem}.{os.getpid()}.npz")
     np.savez(tmp, verts=verts, faces=faces)
     os.replace(tmp, path)
-    for poly in me.polygons:
-        poly.use_smooth = True
-    return obj
+    # Hand back the mesh exactly as a cached one is rebuilt, so a character comes out the same whether its parts
+    # were meshed afresh or read from the cache.
+    import bpy
+    bpy.data.objects.remove(obj)
+    bpy.data.meshes.remove(me)
+    return sdf.to_mesh(name, verts, faces)

@@ -135,7 +135,7 @@ def chain_weights(obj, arm, bones, sigma, body_tree=None, body_w=None, blend_bon
             u = max(0.0, min(1.0, (v.co - a).dot(ab) / max(ab.length_squared, 1e-12)))
             d[b] = (v.co - (a + ab * u)).length
         b0 = min(d, key=d.get)
-        w = {b: math.exp(-((d[b] - d[b0]) / sigma) ** 2) for b in rel[b0] | {b0}}
+        w = {b: math.exp(-((d[b] - d[b0]) / sigma) ** 2) for b in sorted(rel[b0] | {b0})}
         if blend_bone is not None and body_tree is not None:
             head = arm.data.bones[blend_bone].head_local
             axis = (arm.data.bones[blend_bone].tail_local - head).normalized()
