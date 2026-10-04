@@ -68,8 +68,9 @@ def _seam(p):
 
 
 class Hood:
-    def __init__(self, shape, under, shoulder_z, style=""):
-        self.shape, self.under, self.sz = shape, under, shoulder_z
+    def __init__(self, shape, under, shoulder, style=""):
+        self.shape, self.under = shape, under
+        self.sx, self.sz = shoulder                    # the shoulder joint, across and up (head-local)
         top, bottom, self.half_w = OPENING[style]
         self.deep = style == "deep"
         a, b = np.asarray(top), np.asarray(bottom)
@@ -122,7 +123,7 @@ class Hood:
         ang = np.arctan2(x, -y)
         u = ang * F(9.0 / (2 * math.pi)) + F(0.3) * np.sin(ang * F(2.0) + F(0.7)) + F(0.08) * np.sin(z * F(30.0))
         hang = (F(0.5) - F(0.5) * np.cos(F(2 * math.pi) * u)) ** F(0.8)
-        hang = hang * (F(0.65) + F(0.35) * np.sin(np.floor(u) * F(2.7) + F(1.0)))
+        hang = hang * (F(0.65) + F(0.35) * np.sin(np.mod(np.floor(u), F(9)) * F(2.7) + F(1.0)))   # (counted round: no step in front)
         front = _smooth(F(0.5 * math.pi), F(0.8 * math.pi), np.abs(ang))
         down = _smooth(F(0.09), F(-0.26), z) ** F(1.4)
         swag = F(0)
@@ -138,17 +139,25 @@ class Hood:
         return smax(-ahead, self.rim(px, v, 0.012), 0.004)
 
     def hem_z(self, p):
-        """The cowl's hem: over the shoulder tops at the sides, lower in front and behind, gently waved."""
+        """The cowl's hem: over the shoulder tops at the sides, lower in front and behind, gently waved, and turning
+        up before the shoulder joints, so the cowl ends on the shoulders and never lies on an arm that moves out
+        from under it."""
         ang = np.arctan2(p[:, 0], -p[:, 1])
         side = np.abs(np.sin(ang))
-        return F(self.sz - 0.075) + F(0.08) * side ** 3 + F(0.006) * np.sin(ang * F(7.0) + F(0.5))
+        over = np.maximum(np.abs(p[:, 0]) - F(self.sx - 0.05), F(0))
+        return F(self.sz - 0.075) + F(0.08) * side ** 3 + F(0.006) * np.sin(ang * F(7.0) + F(0.5)) + F(2.0) * over
+
+    def below(self, p):
+        """How far ``p`` is below the hem, roughly a distance (the hem's slope up past the shoulders divided out)."""
+        over = np.abs(p[:, 0]) - F(self.sx - 0.05)
+        return (self.hem_z(p) - p[:, 2]) / np.sqrt(F(1) + (F(2.0) * _smooth(F(-0.01), F(0.01), over)) ** 2)
 
     def parts(self, p):
         vol = self.volume(p)
         mid = vol - F(THICK / 2)
         cloth = carve(vol - F(THICK), vol, 0.0012)
         cut = self.opening(p)
-        below = self.hem_z(p) - p[:, 2]
+        below = self.below(p)
         cloth = carve(carve(cloth, cut, 0.0012), -below, 0.0012)
         lip = np.sqrt((cut - F(ROLL)) ** 2 + mid * mid) - F(ROLL)
         hem = np.sqrt((below + F(ROLL)) ** 2 + mid * mid) - F(ROLL)
@@ -177,11 +186,12 @@ def mesh(head, under, style=None):
     style = style if style in OPENING else ""
     from .shellmesh import centres, place, refine
     shape = head.shape
-    shoulder_z = round(float(head.local(head.frame.j["shoulder.R"]).z), 4)
+    joint = head.local(head.frame.j["shoulder.R"])
+    shoulder = (round(abs(float(joint.x)), 4), round(float(joint.z), 4))
     field, digest = drape(head, under)
-    hood = Hood(shape, field, shoulder_z, style)
+    hood = Hood(shape, field, shoulder, style)
     sources = ("headshape.py", "earshape.py", "creature.py", "headwear.py", "hood.py")
-    obj = fieldmesh.build(hood.field, BOUNDS, 0.0015, 30000, "hat_hood", ("hood", shape.key(), shoulder_z, digest, style),
+    obj = fieldmesh.build(hood.field, BOUNDS, 0.0015, 30000, "hat_hood", ("hood", shape.key(), shoulder, digest, style),
                           sources, "headwear")
     refine(obj, hood.field, budget=1.3, cuts=(hood.turn,))
     co = place(obj, head)

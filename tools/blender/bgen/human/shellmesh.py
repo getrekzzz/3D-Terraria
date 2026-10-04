@@ -58,6 +58,8 @@ def refine(obj, field, longest=0.008, rounds=3, budget=1.6, cuts=(), normals=Tru
     for fn in cuts:
         _densify(obj, field, fn, out)
         cut(obj, fn)
+    if cuts:
+        _drop_copies(obj)
     if normals:
         co = np.empty(len(me.vertices) * 3, dtype=np.float32)
         me.vertices.foreach_get("co", co)
@@ -161,6 +163,18 @@ def _clean(bm):
         bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
         bmesh.ops.holes_fill(bm, edges=bm.edges[:], sides=3)
         bmesh.ops.delete(bm, geom=[f for group in _copies(bm) for f in group[1:]], context="FACES_ONLY")
+
+
+def _drop_copies(obj):
+    """Keeps one face of each set on the same vertices (a split along a thin fold can double one)."""
+    import bmesh
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    extra = [f for group in _copies(bm) for f in group[1:]]
+    if extra:
+        bmesh.ops.delete(bm, geom=extra, context="FACES_ONLY")
+        bm.to_mesh(obj.data)
+    bm.free()
 
 
 def _copies(bm):
