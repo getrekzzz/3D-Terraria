@@ -26,14 +26,10 @@ def clothe(frame, head, arm, p, bones):
     the bone the clothes cover deeply is cut away and the cloth is lifted over what stays (skelfit.py)."""
     from . import dress
     if not dressed(p):
-        out = []
-        if p.get("hat"):
-            out.append(accessories.hat(head, None, p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040"),
-                                       p.get("visor", True)))
-        for kind, make in (("horns", lambda v: accessories.horns(head, v)), ("wings", lambda v: accessories.wings(frame, v)),
-                           ("tail", lambda v: accessories.tail(frame, v))):
-            if kind in p:
-                out.append(make(p[kind]))
+        out = [accessories.hat(head, p)] if p.get("hat") else []
+        if "horns" in p:
+            from . import features
+            out.append(features.horns(head, p["horns"], p.get("hornShape", "imp")))
     else:
         slim = frame_mod.Frame({**p, "build": 0.2, "weight": 0.1})
         blob = Blob("body_blob", 0.0085 * frame.s)

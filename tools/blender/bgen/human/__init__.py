@@ -7,8 +7,14 @@ with ``char:<kind>`` material slots that the game maps to its character shader.
 
 Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..1), weight (0..1), skin, eyes,
 hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's
-peak, default true), mask, horns, wings, tail, anatomy (human|skeleton: bones only, dressed when it has outfit
-parameters), undead.
+peak, default true), hatShape, flower (a wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape,
+tail, tailShape, anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead.
+
+hatShape by hat: wide: brim (default), floppy, top, pointed, tricorn, bucket, mushroom (hats.py); cap: santa, elf,
+helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched on the hair,
+crowns.py), anything else the plain cap; wreath: leaves (default), fronds, gold, frost (crowns.py).
+hornShape: imp (default), demon, goat (features.py). wingShape: bat (default), feather, ice (wings.py).
+tailShape: devil (default), lizard, fox, wolf, snake (tails.py).
 """
 import bpy
 
@@ -152,7 +158,8 @@ def build(name: str, p: dict):
         rig.chain_weights(hand, arm, bones, 0.006, tree, body_w, blend_bone=f"hand.{side}")
         rig.chain_weights(nail, arm, [b for b in bones if b.split(".")[0] in frame_mod.FINGERS], 0.003)
     extras = dress(fr, head, parts, p, (tree, body_w))
-    extras += groom(fr, head, parts, p, (tree, body_w))
+    hair = groom(fr, head, parts, p, (tree, body_w))
+    extras += hair + accessories.on_hair(head, parts, p, hair)
     objs = _all(parts) + extras
     for o in objs:
         rest_uvs(o)
@@ -240,21 +247,13 @@ def dress(fr, head, parts, p, lookup=None):
     out.extend(w.extras)
     strip_covered(body, covers)
     head.bury_neck(body)
-    if p.get("hat"):
+    if p.get("hat") and not accessories.rests_on_hair(p):
         under = [body] + [o for o in out if o.name.split(".")[0] in ("shirt", "coat", "robe")]
-        hat = accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040"),
-                              p.get("visor", True), under)
+        hat = accessories.hat(head, p, under)
         if p["hat"] == "hood" and lookup is not None:
             rig.head_weights(hat, head, *lookup, torso_only=True)
         add(hat)
-    if "mask" in p:
-        add(accessories.mask(head, parts["head"], p["mask"]))
-    if "horns" in p:
-        add(accessories.horns(head, p["horns"]))
-    if "wings" in p:
-        add(accessories.wings(fr, p["wings"]))
-    if "tail" in p:
-        add(accessories.tail(fr, p["tail"]))
+    out.extend(accessories.wear(fr, head, parts, p, list(out)))
     return out
 
 
@@ -266,7 +265,7 @@ def groom(fr, head, parts, p, lookup=None):
     out = []
     if style != "bald" and p.get("hat") != "hood":
         from mathutils.bvhtree import BVHTree
-        hatted = p.get("hat") in ("cap", "wide")
+        hatted = accessories.trims_hair(p)
         tree = BVHTree.FromObject(parts["body"], bpy.context.evaluated_depsgraph_get()) if style == "long" else None
         seed = sum(ord(ch) for ch in f"{style}{p.get('skin', '')}")     # not the colour: same shape, shared mesh cache
         out += locks.Groom(head, style, color, hatted, tree, seed).build(parts["head"])
