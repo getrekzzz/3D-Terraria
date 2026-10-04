@@ -8,6 +8,7 @@ wingroot.py), swept along smooth curves and carried by the hips. ``tailShape``:
 - devil: a long thin whip curling up behind and ending in a flat spade;
 - snake: a serpent's body as thick as a thigh coming out from under the back of a robe and lying on the ground in a
   long S (serpent.py).
+- brush: a full, bushy brush of fur tufts, grown like the fur coat (furtail.py).
 """
 import math
 
@@ -70,6 +71,9 @@ def tail(fr, body, p, garments=()):
     if shape == "snake":
         from . import serpent
         return serpent.tail(fr, p, garments)
+    if shape == "brush":         # a full furry brush, grown like the fur coat (furtail.py)
+        from .furtail import brush
+        return brush(fr, body, p, garments)
     s = fr.s
     base = hex3(p["tail"])
     exit_pt, cloth = _exit(fr, body, garments, shape)

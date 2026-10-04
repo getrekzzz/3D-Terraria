@@ -27,19 +27,21 @@ earFlare (0 flat to the head .. 1 standing out sideways), noseLength (1; longer 
 point), brow (0 .. 1 a heavy jutting brow ridge), jaw (0 .. 1 a wide heavy jaw and chin), snout (0 .. 1 a reptile's
 snout in place of nose and mouth).
 
-Monsters: face (cyclops | brute | ghoul | void, monsterface.py), handSize (1), sleeves (long, short or 0..1 down the
-arm), shirt/pants none (bare), snakes (snakehair.py), wisps (spectre.py), tribalMask, headdress, beads, grassSkirt,
-bodyPaint (tribal.py); tailShape snake is a serpent's body under a robe (serpent.py).
+Monsters: face (cyclops | brute | ghoul | void, monsterface.py), sleeves (long, short or 0..1 down the arm), shirt/pants
+none (bare), snakes (snakehair.py), wisps (spectre.py), tribalMask, headdress, beads, grassSkirt, bodyPaint
+(tribal.py); tailShape snake is a serpent's body under a robe (serpent.py). handSize (1) scales the hands (paws.py).
+Creature coverings in place of clothes (described in coverings.py): fur, furBelly, furLength, wraps, moss, mud, muzzle
+(wolf|ape), faceSkin, hands (claws), feet (paws|ape), nails, torn.
 
 hatShape by hat: wide: brim (default), floppy, top, pointed, tricorn, bucket, mushroom (hats.py); cap: santa, elf,
 helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched on the hair,
 crowns.py), anything else the plain cap; wreath: leaves (default), fronds, gold, frost (crowns.py).
 hornShape: imp (default), demon, goat (features.py). wingShape: bat (default), feather, ice (wings.py).
-tailShape: devil (default), lizard, fox, wolf, snake (tails.py).
+tailShape: devil (default), lizard, fox, wolf, snake (tails.py), brush (a bushy tail of fur tufts, furtail.py).
 """
 import bpy
 
-from . import accessories, apron, beard, creaturewear, hair, locks, monsterparts, motion, occlusion, rig, underhat
+from . import accessories, apron, beard, coverings, creaturewear, hair, locks, monsterparts, motion, occlusion, rig, underhat
 from . import frame as frame_mod
 from .garments import Wardrobe, strip_covered
 from .tatters import Tatters
@@ -73,10 +75,12 @@ def set_material(obj: bpy.types.Object, slot: str):
 
 def _parts(p: dict):
     fr = frame_mod.Frame(p)
+    coverings.reshape(fr, p)          # (creature hands)
     blob = Blob("body_blob", 0.0085 * fr.s)
-    build_body(fr, blob, feet=p.get("feet") != "talons")
+    build_body(fr, blob, feet=coverings.shod(p))
     body = blob.to_mesh("body", 16000, smooth_iterations=2)
     head = Head(fr, p)
+    coverings.head_shape(head, p)
     head_obj = head.build()
     head.fit_neck(head_obj, body)
     eyes = [] if monsterparts.own_eyes(p) else head.eyeballs(p.get("eyes", "#5a7890"))
@@ -84,10 +88,8 @@ def _parts(p: dict):
     for side in ("R", "L"):
         hand, nail = build_hand(fr, side)
         hands.append(hand)
-        nails.append(nail)
-    if "handSize" in p:     # a brute's big hands (monsterparts.py)
-        monsterparts.scale_hands(fr, hands, nails, p["handSize"])
-    feet, claws = [], []
+        nails.append(coverings.nail(fr, p, side, nail))
+    feet, claws = coverings.feet(fr, p)          # paws and ape feet ([] for shod feet and talons)
     if p.get("feet") == "talons":
         from .talons import build_talons
         for side in ("R", "L"):
@@ -177,7 +179,7 @@ def build(name: str, p: dict):
     if p.get("anatomy", "human") != "human":        # stone, wood, cookie, armor (matter.py)
         from . import matter
         return matter.build(name, p)
-    p = {**DEFAULTS, **p}
+    p = coverings.undress(p, {**DEFAULTS, **p})
     p = {k: v for k, v in p.items() if not (k in ("shirt", "pants") and v == "none")}     # bare chest, bare legs
     if p.get("undead"):
         p = {"build": 0.25, "weight": 0.15, **p}
@@ -201,6 +203,7 @@ def build(name: str, p: dict):
     from mathutils.bvhtree import BVHTree
     bare = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())   # before the clothes strip what they cover
     extras = dress(fr, head, parts, p, (tree, body_w))
+    extras += coverings.grow(fr, head, parts, p, extras)      # fur, wraps, moss
     hair = groom(fr, head, parts, p, (tree, body_w), extras, bare)
     extras += hair + accessories.on_hair(head, parts, p, hair)
     extras += monsterparts.build(head, p, (tree, body_w))      # a monster face's own eyes, teeth, stitches, bolts
@@ -260,7 +263,7 @@ def dress(fr, head, parts, p, lookup=None):
     w = Wardrobe(fr, p, head)
     robe = bool(p.get("robe"))
     w.fit_collar(body)
-    if p.get("undead"):
+    if p.get("undead") or p.get("torn"):
         if not robe and "coat" not in p:
             w.tucked = w.belted = False          # the torn shirt hangs loose over the trousers
         w.tatters = Tatters(w, body, 0.35)
@@ -272,7 +275,6 @@ def dress(fr, head, parts, p, lookup=None):
             if test is not None:
                 torn = w.tatters is not None and kind in w.tatters.kinds
                 covers.append(w.tatters.mask(body, test, kind) if torn else test)
-
     if robe:
         add(w.shell(body, w.in_robe, "robe", 0.0055, p["robe"], "char:cloth", "robe", w.shirt_cuts(-0.035)), w.in_robe, "shirt")
     elif "coat" in p:       # under a coat the shirt ends with it, and anything glimpsed of it reads as the lining
@@ -282,11 +284,11 @@ def dress(fr, head, parts, p, lookup=None):
         add(shirt, w.in_shirt, "shirt")
     elif "shirt" in p:
         add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", "#8a8070"), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt, "shirt")
-    if not robe and "pants" in p:
+    if not robe and "pants" in p:        # (none for bare legs; coverings.undress drops unnamed garments)
         add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants, "pants")
-    if not talons and "wisps" not in p:      # a ghost drifts on no feet (spectre.py)
+    if not talons and "wisps" not in p and coverings.wears(p, "boots"):      # a ghost drifts on no feet (spectre.py)
         add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
-    else:
+    elif talons or "wisps" in p:
         covers.append(w.in_boots)          # the talons take the leg's end over
     if "coat" in p:
         add(w.shell(body, w.in_coat, "coat", 0.012, p["coat"], "char:cloth", "coat", w.shirt_cuts(-0.015)))
@@ -295,7 +297,7 @@ def dress(fr, head, parts, p, lookup=None):
         bodice = out[0] if out and out[0].name.startswith("robe") else None
         add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim"), under=list(out)))
         out.extend(w.sash(out[-1], bodice, p.get("trim", p["robe"])))
-    if w.belted and (not w.suit or "belt" in p):      # a body suit wears only a belt it is given
+    if w.belted and coverings.wears(p, "pants") and (not w.suit or "belt" in p):      # a body suit wears only a belt it is given
         out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith(("coat", "shirt", "pants"))]))
     if "apron" in p:
         out.extend(apron.build(w, body, parts["head"], out + w.extras, p["apron"]))

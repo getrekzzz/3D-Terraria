@@ -218,19 +218,3 @@ def neck_bolts(head):
     rigid(obj, "head")
     return obj
 
-
-def scale_hands(fr, hands, nails, k):
-    """A brute's big hands (``handSize``: ``k`` times as broad): each hand and its nails grow about the wrist, fully
-    from just past it, a little less in length than across so they read as heavy rather than long."""
-    from .head import smooth
-    for side, hand, nail in zip(("R", "L"), hands, nails):
-        wrist = fr.j[f"wrist.{side}"]
-        along = (fr.j[f"middle1.{side}"] - wrist).normalized()
-        for obj in (hand, nail):
-            for v in obj.data.vertices:
-                d = v.co - wrist
-                t = d.dot(along)
-                ramp = smooth(-0.01 * fr.s, 0.05 * fr.s, t)
-                grow = 1 + (k - 1) * ramp
-                v.co = wrist + along * t * (1 + (k ** 0.4 - 1) * ramp) + (d - along * t) * grow
-            obj.data.update()

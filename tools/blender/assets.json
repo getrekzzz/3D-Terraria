@@ -5196,12 +5196,14 @@
     "swamp_thing": {
       "generator": "humanoid",
       "params": {
-        "skin": "#5a7a3a",
+        "skin": "#46602c",
+        "moss": "#9ab048",
+        "mud": "#4e3822",
         "eyes": "#e8e040",
         "hairStyle": "bald",
-        "shirt": "#4a5a2a",
-        "pants": "#3a4a1a",
-        "boots": "#2a3a1a",
+        "brows": "none",
+        "brow": 0.8,
+        "jaw": 0.5,
         "height": 1.9,
         "build": 0.9,
         "weight": 0.7,
@@ -5416,17 +5418,24 @@
     "yeti": {
       "generator": "humanoid",
       "params": {
-        "suit": true,
-        "skin": "#e8f0f8",
-        "eyes": "#4a8aff",
-        "hair": "#f0f8ff",
-        "hairStyle": "long",
-        "shirt": "#e8f0f8",
-        "pants": "#e8f0f8",
-        "boots": "#c8d8e8",
+        "skin": "#7f90a8",
+        "faceSkin": "#7f90a8",
+        "eyes": "#2c3c58",
+        "fur": "#eef3f8",
+        "furBelly": "#dde6ef",
+        "hairStyle": "bald",
+        "brows": "none",
+        "muzzle": "ape",
+        "brow": 1.0,
+        "jaw": 0.8,
+        "earSize": 0,
+        "headSize": 1.15,
+        "handSize": 1.45,
+        "feet": "ape",
+        "nails": "#3a4252",
         "height": 2.6,
         "build": 1.0,
-        "weight": 1.0
+        "weight": 0.6
       }
     },
     "krampus": {
@@ -5874,12 +5883,13 @@
     "mummy": {
       "generator": "humanoid",
       "params": {
-        "skin": "#e8dcc0",
+        "skin": "#3a2c20",
         "eyes": "#ff6a2a",
+        "wraps": "#d8cba6",
         "hairStyle": "bald",
-        "shirt": "#e8dcc0",
-        "pants": "#e8dcc0",
-        "boots": "#c8bca0",
+        "brows": "none",
+        "earSize": 0.5,
+        "noseLength": 0.7,
         "undead": true
       }
     },
@@ -5948,19 +5958,25 @@
     "werewolf": {
       "generator": "humanoid",
       "params": {
-        "skin": "#6a5a4a",
+        "skin": "#3a302a",
+        "faceSkin": "#2e2622",
         "eyes": "#ffd040",
-        "hair": "#4a3a2a",
-        "beard": "#4a3a2a",
-        "beardStyle": "bushy",
-        "hairStyle": "long",
-        "shirt": "#5a4a3a",
-        "pants": "#3a2a1a",
-        "boots": "#2a1a10",
-        "tail": "#5a4a3a",
+        "fur": "#5e4c3c",
+        "furBelly": "#a08a70",
+        "hairStyle": "bald",
+        "brows": "none",
+        "muzzle": "wolf",
+        "brow": 1.0,
+        "pants": "#3c4050",
+        "torn": true,
+        "hands": "claws",
+        "handSize": 1.12,
+        "feet": "paws",
+        "nails": "#1e1a18",
+        "tail": "#5e4c3c",
+        "tailShape": "brush",
         "height": 2.1,
-        "build": 1.0,
-        "tailShape": "wolf"
+        "build": 1.0
       }
     },
     "paladin": {
