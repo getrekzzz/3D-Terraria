@@ -15,6 +15,7 @@ import bpy
 from . import accessories, apron, hair, locks, motion, occlusion, rig
 from . import frame as frame_mod
 from .garments import Wardrobe, strip_covered
+from .tatters import Tatters
 from .blobs import Blob
 from .body import build_body
 from .hands import build_hand
@@ -199,40 +200,48 @@ def build_skeleton(name: str, p: dict):
 
 
 def dress(fr, head, parts, p, lookup=None):
-    """Clothing and accessories; removes the skin they cover. With the body's weights (``lookup``) a hood's cowl
-    follows the neck and shoulders it hangs on."""
+    """Clothing and accessories; removes the skin they cover (not under tears). With the body's weights (``lookup``)
+    a hood's cowl follows the neck and shoulders it hangs on."""
     body = parts["body"]
     w = Wardrobe(fr, p, head)
-    w.tear = 0.35 if p.get("undead") else 0.0
+    robe = bool(p.get("robe"))
     w.fit_collar(body)
+    if p.get("undead"):
+        if not robe and "coat" not in p:
+            w.tucked = w.belted = False          # the torn shirt hangs loose over the trousers
+        w.tatters = Tatters(w, body, 0.35)
     out, covers = [], []
 
-    def add(obj, test=None):
+    def add(obj, test=None, kind=None):
         if obj is not None:
             out.append(obj)
             if test is not None:
-                covers.append(test)
+                torn = w.tatters is not None and kind in w.tatters.kinds
+                covers.append(w.tatters.mask(body, test, kind) if torn else test)
 
-    if "shirt" in p or "coat" in p or "robe" in p:
-        add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", p.get("robe", "#8a8070")), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt)
-    if not p.get("robe"):
-        add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants)
+    if robe:
+        add(w.shell(body, w.in_robe, "robe", 0.0055, p["robe"], "char:cloth", "robe", w.shirt_cuts(-0.035)), w.in_robe, "shirt")
+    elif "shirt" in p or "coat" in p:
+        add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", "#8a8070"), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt, "shirt")
+    if not robe:
+        add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants, "pants")
     add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
     if "coat" in p:
         add(w.shell(body, w.in_coat, "coat", 0.012, p["coat"], "char:cloth", "coat", w.shirt_cuts(-0.015)))
         add(w.skirt(body, fr.j["knee.R"].z + 0.03 * fr.s, 0.35, p["coat"], "coat_tails", open_front=True, under=list(out)))
-    if "robe" in p:
+    if robe:
+        bodice = out[0] if out and out[0].name.startswith("robe") else None
         add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim"), under=list(out)))
-        out.extend(w.sash(out[-1], p.get("trim", p["robe"])))
-    if not p.get("robe"):
-        out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith("coat")]))
+        out.extend(w.sash(out[-1], bodice, p.get("trim", p["robe"])))
+    if w.belted:
+        out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith(("coat", "shirt", "pants"))]))
     if "apron" in p:
         out.extend(apron.build(w, body, parts["head"], out + w.extras, p["apron"]))
     out.extend(w.extras)
     strip_covered(body, covers)
     head.bury_neck(body)
     if p.get("hat"):
-        under = [body] + [o for o in out if o.name.split(".")[0] in ("shirt", "coat")]
+        under = [body] + [o for o in out if o.name.split(".")[0] in ("shirt", "coat", "robe")]
         hat = accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040"),
                               p.get("visor", True), under)
         if p["hat"] == "hood" and lookup is not None:

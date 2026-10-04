@@ -1,8 +1,9 @@
 """Clothing shaped from the body itself: a garment is the body's surface over a region (shirt, trousers, boots,
-coat), tailored into cloth (tailoring.py: ease, draping across hollows, folds) and finished (finishing.py: seams,
-collars, cuffs, hems, boot rims and soles, buttons), skinned with the body's own weights. Skin that ends up under
-clothing is removed so nothing pokes through when limbs bend. Skirts (coats, robes) are lofted from the waist and
-weighted between the hips and thighs; a belt ties it together.
+coat, a robe's bodice), tailored into cloth (tailoring.py, robes.py: ease, draping across hollows, folds), torn on the
+undead (tatters.py) and finished (finishing.py: seams, collars, cuffs, hems, boot rims and soles, buttons), skinned
+with the body's own weights. Skin that ends up under clothing is removed so nothing pokes through when limbs bend
+(but kept under tears). Skirts (coats, robes; skirts.py) are lofted from under the belt or sash, which ties it
+together.
 """
 import math
 
@@ -12,12 +13,13 @@ import numpy as np
 from mathutils import Vector
 
 from . import finishing
-from .head import smooth
 from .paint import hex3
-from .tailoring import Cloth, ridge
+from .robes import RobeCloth
+from .skirts import Skirts
+from .tailoring import Cloth
 
 
-class Wardrobe:
+class Wardrobe(Skirts):
     def __init__(self, frame, p, head=None):
         self.f = frame
         self.p = p
@@ -26,7 +28,7 @@ class Wardrobe:
         self.waist = j["hip.R"].z + 0.1 * s
         self.boot_top = j["ankle.R"].z + (0.16 if "boots" in p else 0.05) * s
         self.cuff = p.get("sleeves", "long")
-        self.tear = 0.0       # fraction of cloth torn away in ragged patches (the undead)
+        self.tatters = None   # where the clothes are torn (tatters.Tatters, the undead)
         self.collar_z = frame.j["neck"].z
         self.belted = not p.get("robe")                    # a belt at the waist (over the coat if there is one)
         self.tucked = self.belted and "coat" not in p      # the shirt tucked in under the belt
@@ -44,14 +46,6 @@ class Wardrobe:
         near = (co - (sh + ab * max(0.0, min(1.0, t)))).length
         sx = 1 if side == "R" else -1
         return t if co.x * sx > abs(sh.x) * 0.7 and t > -0.05 and near < 0.085 * s else None
-
-    def _torn(self, c):
-        """Ragged holes: patchy low-frequency noise with frayed edges."""
-        if self.tear <= 0.0:
-            return False
-        s = self.f.s
-        patch = math.sin(c.x / s * 23 + 1.3) * math.sin(c.z / s * 17 + c.y / s * 11) + 0.35 * math.sin(c.x / s * 97 + c.z / s * 83)
-        return patch > 1.0 - self.tear * 1.6
 
     def neck_radial(self, co):
         n = self.f.j["neck"]
@@ -78,6 +72,10 @@ class Wardrobe:
         if co.z < self.waist - 0.07 * s:
             return False
         return co.z < self.collar_z
+
+    def in_robe(self, co):
+        """A robe's bodice: the shirt's region down to under the sash, where the skirt takes over."""
+        return self.in_shirt(co) and (self._on_arm(co) or co.z > self.waist - 0.035 * self.f.s)
 
     def in_coat(self, co):
         """The shirt's region down to just under the belt, where the coat's tails take over."""
@@ -113,9 +111,9 @@ class Wardrobe:
         return [(Vector((0, 0, self.boot_top + 0.01 * self.f.s)), Vector((0, 0, 1)), lambda c: True)]
 
     def shell(self, body, test, name, thickness, color, material, kind, cuts=()):
-        """A garment (``kind``: shirt, coat, pants or boots) over the body faces whose centres pass ``test``, after
-        the body copy is cut cleanly along ``cuts`` (plane point, plane normal, face filter); returns the object (or
-        None)."""
+        """A garment (``kind``: shirt, coat, pants, boots or robe, a robe's bodice) over the body faces whose centres
+        pass ``test``, after the body copy is cut cleanly along ``cuts`` (plane point, plane normal, face filter);
+        returns the object (or None)."""
         bm = bmesh.new()
         bm.from_mesh(body.data)
         bm.verts.layers.deform.verify()
@@ -124,92 +122,43 @@ class Wardrobe:
             geom = list({e for f in faces for e in f.edges}) + list({v for f in faces for v in f.verts}) + faces
             bmesh.ops.bisect_plane(bm, geom=geom, dist=1e-5, plane_co=point, plane_no=normal)
         bm.normal_update()
-        drop = [f for f in bm.faces if not test(f.calc_center_median()) or self._torn(f.calc_center_median())]
+        drop = [f for f in bm.faces if not test(f.calc_center_median())]
         bmesh.ops.delete(bm, geom=drop, context="FACES")
         bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
         if not bm.faces:
             bm.free()
             return None
-        shade = Cloth(self, kind, thickness).apply(bm)
+        cloth = RobeCloth(self, thickness) if kind == "robe" else Cloth(self, kind, thickness)
+        kind = cloth.kind
+        shade = cloth.apply(bm)
+        if self.tatters is not None:
+            shade = self.tatters.tear(bm, kind, self.standoff[kind][0], shade)
+        keep = [cloth.keep(bm)] if isinstance(cloth, RobeCloth) else []
+        if self.tatters is not None:
+            keep.append(self.tatters.keep(len(bm.verts)))
         colorize(bm, color, shade)
         obj = mesh_from(bm, name)
         for g in body.vertex_groups:            # the copied faces keep the body's weights (same group order)
             obj.vertex_groups.new(name=g.name)
+        keep = [k for k in keep if k is not None]
+        if keep:                                # how much each part may be reduced (see finishing.reduce)
+            g = obj.vertex_groups.new(name="_keep")
+            w = np.round(np.minimum.reduce(keep), 2)
+            for level in np.unique(w):
+                g.add(np.flatnonzero(w == level).tolist(), float(level), "REPLACE")
         set_slot(obj, material)
         self.extras += finishing.finish(self, obj, kind, color)
         return obj
 
-    def skirt(self, body, bottom_z, flare, color, name, open_front=False, trim=None, under=()):
-        """A skirt from the waist to ``bottom_z``: rings follow the girth at the top and flare below into folds
-        that deepen toward the hem (their crests hanging a little lower), never closer than a little off the hips and
-        the garments ``under`` it, with a band of ``trim`` at the hem."""
-        s, j = self.f.s, self.f.j
-        top = self.waist - 0.02 * s
-        segs = 72
-        inside = [body, *under]
-        radius = self._girth(inside, top, 0.02 * s, 0.012 * s, segs)
-        trim_h = 0.045 * s
-        ts = sorted({i / 18 for i in range(19)} | ({1 - trim_h / (top - bottom_z)} if trim else set()))
-        folds = 10 if bottom_z < self.f.j["knee.R"].z else 8
-        bm = bmesh.new()
-        grid, shade = [], {}
-        for t in ts:
-            row = []
-            clear = self._girth(inside, top + (bottom_z - top) * t, 0.03 * s, 0.006 * s, segs)
-            for k in range(segs):
-                a = 2 * math.pi * k / segs
-                crest = ridge(a * folds / (2 * math.pi) + 0.18 * math.sin(a * 3 + t * 2.5) + 0.3 * t)
-                deep = t ** 1.2
-                r = max(radius[k] * (1 + flare * t ** 1.3), clear[k]) + 0.014 * s * deep * (crest - 0.4)
-                z = top + (bottom_z - top) * t - (0.008 * s * (crest - 0.5) if t == 1.0 else 0.0)
-                v = bm.verts.new((math.sin(a) * r, math.cos(a) * r - 0.004 * s * t, z))
-                shade[v] = 1.0 - 0.28 * deep * (1.0 - crest) ** 2
-                row.append(v)
-            grid.append(row)
-        gap = 1 if open_front else 0
-        for i in range(len(ts) - 1):
-            for k in range(gap, segs - gap):
-                bm.faces.new((grid[i][k], grid[i][(k + 1) % segs], grid[i + 1][(k + 1) % segs], grid[i + 1][k]))
-        bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
-        layer = bm.loops.layers.color.new("Color")
-        base, band = hex3(color), hex3(trim) if trim else None
-        for f in bm.faces:
-            c = band if band and f.calc_center_median().z < bottom_z + trim_h - 1e-4 else base
-            for loop in f.loops:
-                k = shade[loop.vert]
-                loop[layer] = (c[0] * k, c[1] * k, c[2] * k, 1.0)
-        obj = mesh_from(bm, name)
-        set_slot(obj, "char:cloth")
-        # Weights: hips at the waist, sharing with each thigh lower down.
-        weights = []
-        for v in obj.data.vertices:
-            t = smooth(top, j["knee.R"].z, v.co.z) if bottom_z < top else 0.0
-            side = smooth(-0.06 * s, 0.06 * s, v.co.x)
-            weights.append({"hips": 1 - t * 0.75, "thigh.R": t * 0.75 * side, "thigh.L": t * 0.75 * (1 - side)})
-        from .rig import write_weights
-        write_weights(obj, [{b: w for b, w in d.items() if w > 0.01} for d in weights])
-        return obj
-
-    def _girth(self, objs, z, half, gap, segs=64):
-        """Radius round the waist at each of ``segs`` angles: ``gap`` beyond the furthest point of ``objs`` (the
-        body, garments) within ``half`` of height ``z``."""
-        s = self.f.s
-        co = np.concatenate([np.array([v.co[:] for v in o.data.vertices]).reshape(-1, 3) for o in objs])
-        co = co[(np.abs(co[:, 2] - z) < half) & (np.abs(co[:, 0]) < 0.3 * s)]
-        a = 2 * np.pi * np.arange(segs) / segs
-        if not len(co):
-            return [0.15 * s + gap] * segs
-        return list((co[:, :2] @ np.stack([np.sin(a), np.cos(a)])).max(0) + gap)
-
     def belt(self, body, color, buckle="#c0a060", over=()):
-        """A leather band round the waist (following the body's girth, or over a coat) with rounded, stitched
-        edges, a buckle frame and prong in front, and the strap's tongue running on past it."""
+        """A leather band round the waist (following the body's girth and lying over the garments ``over``) with
+        rounded, stitched edges, a buckle frame and prong in front, and the strap's tongue running on past it."""
         s = self.f.s
         z = self.waist - 0.005 * s
         segs = 64
-        radius = self._girth([body], z, 0.02 * s, 0.011 * s)
+        radius = self.radial([body], z, 0.02 * s, segs) + 0.011 * s
         if over:
-            radius = [max(a, b) for a, b in zip(radius, self._girth(over, z, 0.022 * s, 0.004 * s))]
+            radius = np.maximum(radius, self.radial(over, z, 0.022 * s, segs) + 0.004 * s)
         # Rows across the band: (height, out, shade); the dark rows are the stitching along each edge.
         rows = ((-0.017, -0.0015, 0.8), (-0.0155, 0.0, 1.0), (-0.0125, 0.0003, 0.62), (-0.011, 0.0003, 1.0), (0.011, 0.0003, 0.62),
                 (0.0125, 0.0003, 1.0), (0.0155, 0.0, 0.8), (0.017, -0.0015, 0.8))
@@ -219,7 +168,7 @@ class Wardrobe:
         tip = [(a, r0 + 0.0035 * s) for a in [i * 0.012 * s / r0 for i in range(-1, 7)]]
         tongue = self._strap(((-0.0145, 0.0, 0.85), (-0.012, 0.0005, 1.0), (0.012, 0.0005, 0.85), (0.0145, 0.0, 0.85)), tip, z,
                              tuple(c * 0.95 for c in hex3(color)), "belt_tongue", closed=False, point=True)
-        front = r0
+        front = r0 + self.f.j["spine"].y
         bm = bmesh.new()
         y0, y1 = front + 0.001 * s, front + 0.0055 * s
         ring = lambda w, h, y: [bm.verts.new((x * w * s, y, z + zz * h * s)) for x, zz in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
@@ -240,58 +189,17 @@ class Wardrobe:
             rigid(o, "hips")
         return [band, tongue, clasp]
 
-    def sash(self, skirt, color):
-        """A cloth sash tied round a robe's waist over the top of its skirt, the knot's two ends hanging in front."""
-        s = self.f.s
-        z = self.waist - 0.012 * s
-        segs = 64
-        radius = self._girth([skirt], z, 0.03 * s, 0.004 * s, segs)
-        rows = ((-0.024, -0.002, 0.8), (-0.021, 0.0, 1.0), (-0.008, 0.0012, 0.86), (-0.006, 0.0012, 1.0), (0.019, 0.0, 0.8),
-                (0.022, -0.002, 0.8))
-        band = self._strap(rows, [(2 * math.pi * k / segs, radius[k]) for k in range(segs)], z, color, "sash", True, slot="char:cloth")
-        out = [band]
-        for i, (a, length) in enumerate(((0.32, 0.2), (0.42, 0.15))):
-            r = radius[int(a / (2 * math.pi) * segs)] + 0.005 * s
-            path = []
-            for k in range(7):
-                drop = length * s * k / 6
-                path.append((r + 0.1 * drop, z - drop))
-            out.append(self._hanging(path, a, 0.03 * s, color, f"sash_end{i}"))
-        from .rig import rigid
-        for o in out:
-            rigid(o, "hips")
-        return out
-
-    def _hanging(self, path, a, width, color, name):
-        """A flat strip hanging down at angle ``a`` round the waist along ``path`` [(radius, height)]."""
-        d = Vector((math.sin(a), math.cos(a), 0))
-        side = Vector((d.y, -d.x, 0))
-        bm = bmesh.new()
-        grid = [[bm.verts.new(d * r + side * (x * width * (1.0 - 0.3 * k / (len(path) - 1))) + Vector((0, 0, z)))
-                 for x in (-0.5, 0.0, 0.5)] for k, (r, z) in enumerate(path)]
-        for k in range(len(path) - 1):
-            for m in range(2):
-                bm.faces.new((grid[k][m], grid[k + 1][m], grid[k + 1][m + 1], grid[k][m + 1]))
-        bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
-        for f in bm.faces:
-            if f.normal.dot(d) < 0:
-                f.normal_flip()
-        colorize(bm, color)
-        obj = mesh_from(bm, name)
-        set_slot(obj, "char:cloth")
-        return obj
-
     def _strap(self, rows, path, z, color, name, closed, point=False, slot="char:leather"):
-        """A leather strip following ``path`` [(angle round the waist, radius)], ``rows`` across it: (height, out,
-        shade of the strip from this row to the next)."""
-        s = self.f.s
+        """A leather strip following ``path`` [(angle round the waist, radius from the body's axis)], ``rows`` across
+        it: (height, out, shade of the strip from this row to the next)."""
+        s, cy = self.f.s, self.f.j["spine"].y
         base = hex3(color) if isinstance(color, str) else color
         bm = bmesh.new()
         grid = []
         for i, (a, r) in enumerate(path):
             taper = 0.35 if point and i == len(path) - 1 else 1.0
             d = Vector((math.sin(a), math.cos(a), 0))
-            grid.append([bm.verts.new((d.x * (r + out * s), d.y * (r + out * s), z + h * s * taper)) for h, out, _ in rows])
+            grid.append([bm.verts.new((d.x * (r + out * s), cy + d.y * (r + out * s), z + h * s * taper)) for h, out, _ in rows])
         layer = bm.loops.layers.color.new("Color")
         n = len(path)
         for i in range(n if closed else n - 1):
@@ -308,10 +216,11 @@ class Wardrobe:
 
 
 def strip_covered(body, tests):
-    """Deletes body faces lying well inside clothing (every vertex covered, two rings in from the garment's edge)."""
+    """Deletes body faces lying well inside clothing (every vertex covered, two rings in from the garment's edge).
+    A test is a function of a rest position, or a mask over the body's vertices (a torn garment's, see tatters)."""
     bm = bmesh.new()
     bm.from_mesh(body.data)
-    inner = {v.index for v in bm.verts if any(t(v.co) for t in tests)}
+    inner = {v.index for v in bm.verts if any(t[v.index] if isinstance(t, np.ndarray) else t(v.co) for t in tests)}
     for _ in range(2):
         inner = {v.index for v in bm.verts if v.index in inner and all(n.index in inner for e in v.link_edges for n in e.verts)}
     drop = [f for f in bm.faces if all(v.index in inner for v in f.verts)]
@@ -322,13 +231,18 @@ def strip_covered(body, tests):
 
 
 def colorize(bm, color, shade=None):
-    """Every face corner in ``color``, darkened by ``shade`` (per vertex index) when given."""
+    """Every face corner in ``color``, darkened by ``shade`` (per vertex index: a factor, or one per channel) when
+    given."""
     layer = bm.loops.layers.color.get("Color") or bm.loops.layers.color.new("Color")
-    c = hex3(color) if isinstance(color, str) else color
+    n = len(bm.verts)
+    c = np.asarray(hex3(color) if isinstance(color, str) else color, dtype=float)[:3]
+    k = np.ones((n, 1)) if shade is None else np.asarray(shade, dtype=float).reshape(n, -1)
+    rgb = (k * c).tolist()
+    bm.verts.index_update()
     for f in bm.faces:
         for loop in f.loops:
-            k = 1.0 if shade is None else float(shade[loop.vert.index])
-            loop[layer] = (c[0] * k, c[1] * k, c[2] * k, 1.0)
+            r, g, b = rgb[loop.vert.index]
+            loop[layer] = (r, g, b, 1.0)
 
 
 def mesh_from(bm, name):

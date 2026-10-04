@@ -12,7 +12,9 @@ import bmesh
 from mathutils import Vector
 from mathutils.kdtree import KDTree
 
-BUDGET = {"shirt": 10000, "coat": 10000, "pants": 8000, "boots": 3200}
+from . import tatters
+
+BUDGET = {"shirt": 10000, "coat": 10000, "pants": 8000, "boots": 3200, "robe": 15000}
 
 # Band profiles: (u, w) in units of the frame scale, u along the surface past the garment's edge, w out from it;
 # each runs from on top of the cloth, over the edge, back underneath.
@@ -29,12 +31,17 @@ RIM = ((-0.038, 0.0005), (-0.035, 0.006), (-0.016, 0.0072), (-0.002, 0.008), (0.
 
 def reduce(obj, budget):
     tris = sum(len(p.vertices) - 2 for p in obj.data.polygons)
+    keep = obj.vertex_groups.get("_keep")          # less weight, less reduced (torn edges, see tatters)
     if tris > budget:
         dec = obj.modifiers.new("decimate", "DECIMATE")
         dec.ratio = budget / tris
         dec.use_collapse_triangulate = True
+        if keep is not None:
+            dec.vertex_group, dec.vertex_group_factor = keep.name, 30.0
         from .blobs import apply_modifiers
         apply_modifiers(obj)
+    if obj.vertex_groups.get("_keep") is not None:
+        obj.vertex_groups.remove(obj.vertex_groups["_keep"])
 
 
 def shade_corners(faces, layer, k):
@@ -198,7 +205,8 @@ def finish(w, obj, kind, color):
     from .paint import hex3
     j, s = w.f.j, w.f.s
     hidden = kind == "shirt" and "coat" in w.p          # a shirt under a coat shows only at the collar
-    reduce(obj, BUDGET[kind] // 2 if hidden else BUDGET[kind])
+    robe = bool(w.p.get("robe"))                        # a robe's bodice, long and gathered by the sash
+    reduce(obj, BUDGET[kind] // 2 if hidden else BUDGET["robe" if robe and kind == "shirt" else kind])
     if hidden:
         return []
     bm = bmesh.new()
@@ -207,7 +215,6 @@ def finish(w, obj, kind, color):
     deform = bm.verts.layers.deform.verify()
     base = hex3(color) if isinstance(color, str) else tuple(color)
     tone = lambda k: tuple(c * k for c in base)
-    robe = bool(w.p.get("robe"))
     trim = hex3(w.p["trim"]) if w.p.get("trim") and (robe or kind == "coat") else None
     edge = trim or tone(0.9)             # collars and cuffs: the trim colour on robes and coats that have one
     width, press = 0.0032 * s, 0.0006 * s
@@ -254,12 +261,16 @@ def finish(w, obj, kind, color):
             ankle = j[f"ankle.{side}"]
             stitch(bm, layer, ankle, (1, 0, 0), lambda c, a=ankle, sx=sx: c.y < a.y - 0.02 * s and c.z > a.z and c.x * sx > 0, width)
     bm.normal_update()
+    torn = w.tatters is not None and kind in w.tatters.kinds
     for loop, closed in open_loops(bm):
         c = sum((v.co for v in loop), Vector()) / len(loop)
         if kind in ("shirt", "coat"):
             if w.neck_radial(c) < 0.09 * s and abs(c.z - w.collar_z) < 0.05 * s:
                 band(bm, layer, deform, loop, closed, STAND_COLLAR if kind == "coat" else COLLAR, s, up, (j["neck"], up),
                      edge, 0.0045 * s, ribs=kind == "shirt" and not robe)
+                continue
+            if torn:                              # torn edges and ragged hems are turned under, not banded
+                tatters.lip(bm, layer, deform, loop, closed, 0.004 * s)
                 continue
             for side, axis in arms.items():
                 t = w.arm_t(c, side)
@@ -268,6 +279,8 @@ def finish(w, obj, kind, color):
                          ribs=kind == "shirt" and not robe)
             if kind == "shirt" and w.tucked and abs(c.z - (w.waist - 0.07 * s)) < 0.03 * s and abs(c.x) < 0.06 * s:
                 band(bm, layer, deform, loop, closed, HEM, s, -up, (Vector((0, j["chest"].y, 0)), up), tone(0.94), 0.008 * s)
+        elif kind == "pants" and torn and c.z < w.waist - 0.04 * s:
+            tatters.lip(bm, layer, deform, loop, closed, 0.004 * s)
         elif kind == "boots" and abs(c.z - w.boot_top) < 0.04 * s:
             side = "R" if c.x > 0 else "L"
             leg = (j[f"knee.{side}"], (j[f"knee.{side}"] - j[f"ankle.{side}"]).normalized())
