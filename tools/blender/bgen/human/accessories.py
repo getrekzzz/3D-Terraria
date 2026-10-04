@@ -1,4 +1,4 @@
-"""Hats (cap, wide brim, hood, wreath), a face mask, aprons and creature features (horns, bat wings, a spaded tail), fitted to
+"""Hats (cap, wide brim, hood, wreath), a face mask and creature features (horns, bat wings, a spaded tail), fitted to
 the generated head and body and bound to the bones that carry them."""
 import math
 
@@ -6,8 +6,7 @@ import bmesh
 from mathutils import Matrix, Vector
 
 from .garments import colorize, mesh_from, set_slot
-from .head import smooth
-from .rig import rigid, write_weights
+from .rig import rigid
 
 
 def _lathe(bm, centre, profile, segs, scale_y=1.0):
@@ -93,46 +92,6 @@ def mask(head, head_obj, color):
     obj = mesh_from(bm, "mask")
     set_slot(obj, "char:bone")
     rigid(obj, "head")
-    return obj
-
-
-def apron(frame, body, color):
-    """A cloth panel hanging from the chest to the knees in front of the body."""
-    s = frame.s
-    j = frame.j
-    bm = bmesh.new()
-    cols, rows = 9, 14
-    front = {}
-    for v in body.data.vertices:
-        key = (round(v.co.x / (0.02 * s)), round(v.co.z / (0.03 * s)))
-        front[key] = max(front.get(key, -1.0), v.co.y)
-    grid = []
-    z0, z1 = 1.34 * s, j["knee.R"].z + 0.06 * s
-    for i in range(rows + 1):
-        z = z0 + (z1 - z0) * i / rows
-        width = (0.11 if z > j["hip.R"].z + 0.12 * s else 0.16) * s
-        row = []
-        for k in range(cols + 1):
-            x = -width + 2 * width * k / cols
-            y = max(front.get((round(x / (0.02 * s)), round(z / (0.03 * s))), 0.08 * s), 0.06 * s) + 0.012 * s
-            if z < j["hip.R"].z:
-                y = max(y, 0.1 * s)
-            row.append(bm.verts.new((x, y, z)))
-        grid.append(row)
-    for i in range(rows):
-        for k in range(cols):
-            bm.faces.new((grid[i][k], grid[i][k + 1], grid[i + 1][k + 1], grid[i + 1][k]))
-    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
-    colorize(bm, color)
-    obj = mesh_from(bm, "apron")
-    set_slot(obj, "char:cloth")
-    weights = []
-    for v in obj.data.vertices:
-        t = smooth(j["hip.R"].z + 0.1 * s, j["hip.R"].z - 0.15 * s, v.co.z)
-        up = 1 - t
-        weights.append({"chest": up * smooth(1.1 * s, 1.3 * s, v.co.z), "spine": up * (1 - smooth(1.1 * s, 1.3 * s, v.co.z)),
-                        "hips": t * 0.5, "thigh.R": t * 0.25, "thigh.L": t * 0.25})
-    write_weights(obj, [{b: w for b, w in d.items() if w > 0.01} for d in weights])
     return obj
 
 

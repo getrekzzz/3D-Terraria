@@ -13,7 +13,7 @@ import math
 
 import bpy
 
-from . import accessories, hair, locks, motion, occlusion, rig
+from . import accessories, apron, hair, locks, motion, occlusion, rig
 from . import frame as frame_mod
 from .garments import Wardrobe, strip_covered
 from .blobs import Blob
@@ -233,7 +233,7 @@ def dress(fr, head, parts, p, lookup=None):
     if not p.get("robe"):
         out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith("coat")]))
     if "apron" in p:
-        add(accessories.apron(fr, body, p["apron"]))
+        out.extend(apron.build(w, body, parts["head"], out + w.extras, p["apron"]))
     out.extend(w.extras)
     strip_covered(body, covers)
     head.bury_neck(body)
