@@ -105,6 +105,7 @@ class Motion:
         self.undead = bool(p.get("undead"))
         self.shamble = self.undead and p.get("anatomy") != "skeleton"
         self.hunch = 1.0 if self.undead else 0.0
+        self.spread = float(p.get("armSpread", 0.0))     # degrees the arms hang further out (bulky creatures)
         self.palm = {side: tuple(-hand_axes(frame, side)[2]) for side, _ in SIDES}
         self.across = {side: tuple(-hand_axes(frame, side)[1]) for side, _ in SIDES}   # from the thumb toward the pinky
         self.bones = [b.name for b in arm.data.bones]
@@ -132,7 +133,7 @@ class Motion:
     def stance(self):
         pose = {"spine": [("swing", FWD, deg(4 * self.hunch))], "neck": [("swing", FWD, deg(10 * self.hunch))]}
         for side, sx in SIDES:
-            pose[f"upper_arm.{side}"] = [("swing", DOWN, deg(33)), ("swing", FWD, deg(4 + 25 * self.hunch))]
+            pose[f"upper_arm.{side}"] = [("swing", DOWN, deg(33 - self.spread)), ("swing", FWD, deg(4 + 25 * self.hunch))]
             pose[f"forearm.{side}"] = [("swing", FWD, deg(12 + 30 * self.hunch))]
             if self.shamble:     # arms held out in front, wrists limp
                 pose[f"upper_arm.{side}"] += [("axis", SIDE_AXIS, deg(52)), ("axis", UP, deg(-6 * sx))]

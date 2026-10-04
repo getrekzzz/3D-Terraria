@@ -10,7 +10,10 @@ hair, hairStyle, beard (its colour), beardStyle (short|full|bushy|long|pointed|g
 coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's peak, default true), hatShape, flower (a
 wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape, tail, tailShape, brows (a colour,
 default the hair's, or none), feet (talons: a bird's clawed feet in place of shod ones), talons (their colour),
-anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead, suit (true when the shirt, pants
+anatomy (human|skeleton: bones only, dressed when it has outfit parameters|stone|wood|cookie|armor: a granite golem, a
+gnarled wooden creature, a gingerbread man, an empty suit of plate coloured by armor, rivets and glow; matter.py),
+armSpread (degrees the arms hang further out, for bulky bodies; keys its own animation set), sack (a scarecrow's
+burlap head, with straw, rope and patches, true or a list of colours: scarecrow.py), undead, suit (true when the shirt, pants
 and boots stand for the creature's own body, coloured like its skin: they are cut skin-tight and melt into the skin
 at their edges, with no seams, folds, collar, cuffs, buttons, boot rims or soles, and no belt unless one is given),
 hairTie (a ponytail's or bun's tie, default a darker shirt).
@@ -136,7 +139,8 @@ def motion_key(p: dict) -> str:
     q = motion_params(p)
     fr = frame_mod.Frame(q)
     kind = "skeleton" if q.get("anatomy") == "skeleton" else "undead" if q.get("undead") else "human"
-    return f"{'f' if fr.female else 'm'}{'_old' if fr.old else ''}_{round(fr.height * 100)}_{kind}"
+    spread = f"_a{round(q['armSpread'])}" if q.get("armSpread") else ""
+    return f"{'f' if fr.female else 'm'}{'_old' if fr.old else ''}_{round(fr.height * 100)}_{kind}{spread}"
 
 
 def build_motion(p: dict):
@@ -164,6 +168,9 @@ def build(name: str, p: dict):
     """The rigged, animated character: [armature, mesh]."""
     if p.get("anatomy") == "skeleton":
         return build_skeleton(name, p)
+    if p.get("anatomy", "human") != "human":        # stone, wood, cookie, armor (matter.py)
+        from . import matter
+        return matter.build(name, p)
     p = {**DEFAULTS, **p}
     if p.get("undead"):
         p = {"build": 0.25, "weight": 0.15, **p}
@@ -294,6 +301,9 @@ def dress(fr, head, parts, p, lookup=None):
             rig.head_weights(hat, head, *lookup, torso_only=True)
         add(hat)
     out.extend(accessories.wear(fr, head, parts, p, list(out)))
+    if "sack" in p and lookup is not None:      # a scarecrow: sack head, straw, patches, rope belt (scarecrow.py)
+        from . import scarecrow
+        out = scarecrow.dress(fr, head, parts, p, out, lookup)
     return out
 
 

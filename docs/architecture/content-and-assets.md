@@ -57,7 +57,12 @@ cloth fields (`headwear.py`, `capshapes.py`; `hood.py` drapes the cowl over what
 follows the torso, not the arms. Skeletons are sculpted bone fields on the same rig (`skulls.py` with orbits, teeth
 and a hinged jaw; `skeltorso.py`, `skelgirdle.py`, `skellimbs.py` one connected column, ribcage, pelvis and limbs)
 weighted to stay joined in every action, and dressed from a slim body when their params give an outfit
-(`skeldress.py`, `skelfit.py`). Params per character live in `assets.json` (documented at the top of
+(`skeldress.py`, `skelfit.py`). Bodies of other stuff share the rig and actions too (`matter.py`): a granite golem
+of chipped, cracked blocks (`golem.py`), a gnarled wooden creature with fissured bark, twig fingers, branches and
+leaves (`woodfolk.py`, `twigs.py`), a gingerbread man with icing and gumdrops (`cookie.py`) and an empty suit of
+plate armour glowing inside (`plate.py`, `gauntlet.py`); a scarecrow has a stuffed burlap sack for a head, straw
+in its cuffs, collar and boots, patched clothes and a rope belt (`scarecrow.py`, `straw.py`, `patches.py`,
+`rope.py`). Params per character live in `assets.json` (documented at the top of
 `bgen/human/__init__.py`). They export rest-pose UVs and tangents for the character shader.
 
 Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
@@ -65,7 +70,7 @@ Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functio
 death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,
 hold. The right hand is a closed fist around a handle at `motion.GRIP`, where the game attaches held items; attacks
 have a wind-up, a coil, a whip through to the wrist and a follow-through, and strike where the melee system lands
-its hits (see actions.py). Characters with the same skeleton (body, height, gait) share one animation set,
+its hits (see actions.py). Characters with the same skeleton (body, height, gait, arm spread) share one animation set,
 `assets/models/creatures/anim/<set>.glb`, with `index.json` naming each character's set; rebuild them with
 `build_all.py --anims [--shard=I/N]` (seconds each, no character meshes touched).
 

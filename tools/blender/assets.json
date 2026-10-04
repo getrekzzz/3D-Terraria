@@ -5262,31 +5262,32 @@
     "scarecrow": {
       "generator": "humanoid",
       "params": {
-        "skin": "#e8c878",
+        "skin": "#6e5236",
+        "nails": "#6e5236",
         "eyes": "#ff8a2a",
         "hairStyle": "bald",
-        "shirt": "#8a6a3a",
-        "pants": "#5a4a2a",
+        "brows": "none",
+        "shirt": "#7e4a36",
+        "pants": "#56607a",
         "boots": "#3a2a1a",
         "hat": "wide",
         "hatColor": "#6a5a3a",
         "weight": 0.3,
-        "hatShape": "floppy"
+        "hatShape": "floppy",
+        "sack": "#b89c68",
+        "straw": "#d8b45a",
+        "rope": "#9a8458",
+        "patches": true
       }
     },
     "splinterling": {
       "generator": "humanoid",
       "params": {
-        "suit": true,
-        "skin": "#6a4a2a",
+        "anatomy": "wood",
+        "skin": "#7a5634",
         "eyes": "#ff8a2a",
-        "hairStyle": "bald",
-        "shirt": "#5a3a22",
-        "pants": "#4a3020",
-        "boots": "#3a2418",
         "height": 1.3,
-        "build": 0.5,
-        "weight": 0.2
+        "headSize": 1.1
       }
     },
     "hellhound": {
@@ -5349,15 +5350,12 @@
     "gingerbread_man": {
       "generator": "humanoid",
       "params": {
-        "suit": true,
+        "anatomy": "cookie",
         "skin": "#b87a3a",
-        "eyes": "#1a1a1a",
-        "hairStyle": "bald",
-        "shirt": "#b87a3a",
-        "pants": "#b87a3a",
-        "boots": "#b87a3a",
-        "belt": "#ffffff",
-        "height": 1.3
+        "eyes": "#2a160c",
+        "height": 1.3,
+        "headSize": 1.3,
+        "armSpread": 20
       }
     },
     "elf_archer": {
@@ -5791,21 +5789,12 @@
     "granite_golem": {
       "generator": "humanoid",
       "params": {
-        "skin": "#3a4a8a",
+        "anatomy": "stone",
+        "skin": "#4e5a72",
         "eyes": "#8ae0ff",
-        "hairStyle": "bald",
-        "shirt": "#2a3a6a",
-        "pants": "#2a3a6a",
-        "boots": "#1a2a4a",
-        "build": 1.0,
-        "weight": 0.8,
         "height": 1.6,
-        "brow": 1.0,
-        "jaw": 1.0,
-        "earSize": 0.75,
-        "headSize": 0.86,
-        "noseLength": 0.9,
-        "brows": "none"
+        "headSize": 0.8,
+        "armSpread": 12
       }
     },
     "granite_elemental": {
@@ -5926,16 +5915,14 @@
     "possessed_armor": {
       "generator": "humanoid",
       "params": {
-        "skin": "#1a1a1a",
+        "anatomy": "armor",
+        "armor": "#9aa0aa",
         "eyes": "#ff3a3a",
-        "hairStyle": "bald",
-        "shirt": "#8a8e96",
-        "pants": "#6a6e76",
-        "boots": "#4a4e56",
+        "height": 1.9,
+        "armSpread": 8,
         "hat": "cap",
         "visor": false,
         "hatColor": "#8a8e96",
-        "height": 1.9,
         "hatShape": "greathelm"
       }
     },
