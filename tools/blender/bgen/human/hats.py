@@ -6,9 +6,9 @@ left below its band, a brim with thickness, curl and a bound edge, and a band ro
 - floppy: a battered slouch hat, the crown dented and leaning, the wide brim sagging in waves;
 - top: a top hat, its tall crown waisted and flaring a little, the narrow brim rolled up at the sides;
 - pointed: a wizard's hat, a tall cone that bends back and wrinkles where it bends, over a wide wavy brim;
-- tricorn: the brim cocked up into three walls round a low crown, tallest mid-side and pinched into points at
-  the front and the back corners, their top edges bound with braid (no band);
-- bucket: a fisherman's hat, a rounded crown over a short brim that slopes down, stitched in rings;
+- tricorn: a low crown, its brim cocked up steeply on three sides and pinched into three low points, the front
+  one over the face, its edge bound with braid (no band);
+- bucket: a fisherman's hat, a rounded crown over a short brim that slopes down;
 - mushroom: a mushroom's domed cap, its rim rolled under (the hat of a mushroom person);
 - shako: a soldier's (or nutcracker's) tall flaring cap with a peak, gold bands, a badge and a plume, worn as a cap.
 """
@@ -16,35 +16,16 @@ import math
 
 import numpy as np
 
-from . import fieldmesh
-from .shellmesh import centres, place, refine
-from .headwear import _cranium, _smooth
-from .sdf import F, carve, ellipsoid, smin, tube
+from .headwear import _cranium, _rounded, _smooth
+from .sdf import F, carve, ellipsoid, gradient, smin, tube
 
 SHAPES = ("brim", "floppy", "top", "pointed", "tricorn", "bucket", "mushroom", "shako")
+# the band's height over the brim (shako: its lower band and the rim round its top); hatmesh lays it on the crown
+BAND = {"brim": ((0.0, 0.019),), "floppy": ((0.0, 0.016),), "top": ((0.0, 0.024),), "pointed": ((0.0, 0.02),),
+        "bucket": ((0.0, 0.014),), "shako": ((0.0, 0.014), (0.117, 0.129))}
 # band height at the crown's centre (head-local z) and pitch (front up) per shape
 SEAT = {"brim": (0.044, 7), "floppy": (0.04, 4), "top": (0.046, 5), "pointed": (0.038, 6), "tricorn": (0.032, 8),
-        "bucket": (0.036, 5), "mushroom": (0.056, 5), "shako": (0.04, 3)}
-TRI = {"rb": 0.011, "t": 0.0046, "lean": math.radians(14), "bow": 0.007}     # the tricorn's fold, sheet and walls
-
-
-def _bend():
-    """The tricorn's bend at a fold: its radius and angle, where it ends, and the wall's direction after it."""
-    rb, lean = TRI["rb"], TRI["lean"]
-    end = math.pi / 2 - lean
-    return rb, end, rb * math.sin(end), rb * (1 - math.cos(end)), math.sin(lean), math.cos(lean)
-
-
-def _wall(tg):
-    """The height of a tricorn wall past its bend, tallest mid-side (tg 0) and low at the corners (tg 1)."""
-    return F(0.018) + F(0.066) * np.clip(1 - tg * tg, 0, 1) ** 0.8
-
-
-def _rounded(a, b, k):
-    """The intersection of two solids with the edge where they meet rounded to radius k."""
-    ax, bx = a + F(k), b + F(k)
-    out = np.sqrt(np.maximum(ax, 0) ** 2 + np.maximum(bx, 0) ** 2) + np.minimum(np.maximum(ax, bx), 0)
-    return out - F(k)
+        "bucket": (0.036, 5), "mushroom": (0.074, 9), "shako": (0.04, 3)}
 
 
 class Hat:
@@ -146,9 +127,28 @@ class Hat:
         d = np.where(b < 0, np.abs(a), np.sqrt(a * a + b * b)) - half
         return d, a
 
-    def band(self, q, crown, height, proud=0.0024):
-        z = q[:, 2]
-        return _rounded(crown - F(proud), np.maximum(z - F(height), -z - F(0.0015)), 0.0012)
+    def band_rows(self, heights, n=160):
+        """Points on the crown's surface all round it at each of ``heights`` (hat-local, over the brim) and the
+        surface's normals there, head-local: (len(heights), n, 3) each."""
+        th = np.linspace(0, 2 * np.pi, n, endpoint=False)
+        z = np.repeat(np.asarray(heights, dtype=F), n)
+        d = np.stack([np.tile(np.cos(th), len(heights)), np.tile(np.sin(th), len(heights)), np.zeros(len(z))], 1).astype(F)
+
+        def at(r):
+            q = d * r[:, None] + np.stack([np.zeros_like(z), np.full_like(z, self.yc), z], 1)
+            return (self.origin + q @ self.rot.T).astype(F)
+
+        def crown(pts):
+            return self.parts(pts)["crown"]
+        lo, hi = np.zeros(len(z), F), np.full(len(z), 0.25, F)
+        for _ in range(26):
+            mid = (lo + hi) / 2
+            inside = crown(at(mid)) < 0
+            lo, hi = np.where(inside, mid, lo), np.where(inside, hi, mid)
+        pts = at(lo)
+        g = gradient(crown, pts, 0.0005)
+        g /= np.maximum(np.linalg.norm(g, axis=1), F(1e-9))[:, None]
+        return pts.reshape(len(heights), n, 3), g.reshape(len(heights), n, 3)
 
     # ------------------------------------------------------------------ shapes
     def parts(self, p):
@@ -164,7 +164,6 @@ class Hat:
             c = self.crown(q, self.height(0.1, 0.03), taper=-0.08, rr=0.016, crease=0.013, pinch=0.007)
             out["brim"] = self.brim(q, 0.068, lambda u, th: F(0.034) * u * u * np.cos(th) ** 2
                                     - F(0.012) * u * np.clip(np.sin(th), 0, 1) ** 2)
-            band_h = 0.019
         elif s == "floppy":
             c = self.crown(q, self.height(0.088, 0.028), taper=-0.14, rr=0.03, lean=0.08)
             x, y, z = q[:, 0], q[:, 1] - F(self.yc), q[:, 2]
@@ -173,27 +172,23 @@ class Hat:
             out["brim"] = self.brim(q, lambda th: F(0.094) * (1 + F(0.05) * np.sin(F(9) * th) + F(0.03) * np.sin(F(17) * th + F(2))),
                                     lambda u, th: -F(0.032) * np.clip(u, 0, None) ** 1.6 * (F(0.62) + F(0.38) * np.sin(F(2) * th + F(0.6)))
                                     + F(0.012) * u * u * np.sin(F(5) * th + F(1)))
-            band_h = 0.016
         elif s == "top":
-            c = self.crown(q, 0.15, taper=0.07, rr=0.007, n=2.3, waist=0.05)
+            c = self.crown(q, 0.15, taper=0.07, rr=0.011, n=2.3, waist=0.05)
             out["brim"] = self.brim(q, lambda th: F(0.042) + F(0.008) * np.cos(th) ** 2,
                                     lambda u, th: F(0.03) * u * u * np.cos(th) ** 2 - F(0.006) * u * np.sin(th) ** 2)
-            band_h = 0.024
         elif s == "pointed":
             c = self._cone(q)
             out["brim"] = self.brim(q, 0.1, lambda u, th: -F(0.022) * np.clip(u, 0, None) ** 1.5
                                     + F(0.012) * u * u * np.sin(F(3) * th + F(0.7)), t=0.0042)
-            band_h = 0.02
         elif s == "shako":          # a tall flaring cylinder with a peak, a badge and a plume (no brim)
             H = 0.13
-            c = self.liner(p, q, self.crown(q, H, taper=0.08, rr=0.007, n=2.4))
+            c = self.liner(p, q, self.crown(q, H, taper=0.08, rr=0.009, n=2.4))
             x, y, z = q[:, 0], q[:, 1] - F(self.yc), q[:, 2]
-            pitch = math.radians(-24)
-            rot = np.asarray(((1, 0, 0), (0, math.cos(pitch), math.sin(pitch)), (0, -math.sin(pitch), math.cos(pitch))))
-            peak = ellipsoid(q, (0, self.yc + 0.93 * self.ry, 0.0), (0.07, 0.062, 0.0036), rot)
-            out["peak"] = np.maximum(peak, F(0.82 * self.ry) - y)
-            rim = _rounded(c - F(0.0022), np.maximum(z - F(H - 0.001), F(H - 0.013) - z), 0.0012)
-            out["band"] = np.minimum(self.band(q, c, 0.014), rim)
+            # a stiff peak leaving the crown under the band, dipping a little toward its rounded edge
+            dip = F(math.tan(math.radians(17)))
+            side = (z + F(0.001) + dip * (y - F(self.ry))) / np.sqrt(F(1) + dip * dip)
+            plan = (np.sqrt((x / F(0.074)) ** 2 + ((y - F(self.ry - 0.035)) / F(0.083)) ** 2) - F(1)) * F(0.06)
+            out["peak"] = np.maximum(_rounded(np.abs(side) - F(0.0021), plan, 0.0017), F(self.ry - 0.035) - y)
             out["badge"] = ellipsoid(q, (0, self.yc + 1.035 * self.ry + 0.002, 0.066), (0.022, 0.006, 0.028))
             plume = ellipsoid(q, (0, self.yc + 0.55 * self.ry, H + 0.035), (0.017, 0.017, 0.04))
             out["plume"] = plume + F(0.002) * np.sin(np.arctan2(y - F(0.55 * self.ry), x) * F(9))
@@ -201,14 +196,9 @@ class Hat:
             return out
         else:                       # bucket
             c = self.crown(q, self.height(0.078, 0.022), taper=-0.12, rr=0.03, n=2.1)
-            out["brim"] = self.brim(q, 0.046, lambda u, th: -F(0.42 * 0.046) * u - F(0.004) * u * u, t=0.004, edge=0.0008)
-            _, _, _, r, r0 = self.polar(q)
-            stitch = sum(np.exp(-((r - r0 - F(k)) / F(0.0012)) ** 2) for k in (0.012, 0.024, 0.036))
-            out["brim"] = (out["brim"][0] + F(0.0007) * stitch, out["brim"][1])
-            band_h = 0.014
+            out["brim"] = self.brim(q, 0.046, lambda u, th: -F(0.42 * 0.046) * u - F(0.004) * u * u, t=0.0042, edge=0.001)
         c = self.liner(p, q, c, 0.066 if s == "pointed" else 0.045)
         out["crown"] = c
-        out["band"] = self.band(q, c, band_h)
         return out
 
     def _cone(self, q):
@@ -226,83 +216,47 @@ class Hat:
         wr = F(0.0024) * np.sin(z * F(95) + F(1.7) * np.sin(ang * F(2))) * _smooth(F(0.12), F(0.17), z) * (1 - _smooth(F(0.24), F(0.26), z))
         return np.maximum(d + wr * (F(0.6) + F(0.4) * np.cos(ang)), -(z + F(0.002)))
 
-    def _sides(self):
-        """The tricorn's fold lines: (normal, tangent, distance from the crown's centre, corner positions along it)."""
-        if not hasattr(self, "_folds"):
-            normal = lambda a: np.asarray((math.cos(math.radians(a)), math.sin(math.radians(a))))
-            folds = {a: math.hypot(self.rx * math.cos(math.radians(a)), self.ry * math.sin(math.radians(a))) + 0.004
-                     for a in (30, 150, 270)}
-            corners = [(a0, a1, np.linalg.solve(np.stack([normal(a0), normal(a1)]), np.asarray((folds[a0], folds[a1]))))
-                       for a0, a1 in ((30, 150), (150, 270), (270, 30))]
-            self._folds = []
-            for ang, fold in folds.items():
-                n = normal(ang)
-                tv = np.asarray((-n[1], n[0]))
-                ends = [float(cn @ tv) for a0, a1, cn in corners if ang in (a0, a1)]
-                self._folds.append((n, tv, fold, min(ends), max(ends)))
-        return self._folds
-
-    def _fold_u(self, x, y, side):
-        """How far past a fold line (bowed out mid-side) a point lies, and how far along it toward a corner (0..1)."""
-        n, tv, fold, lo, hi = side
-        tpos = x * F(tv[0]) + y * F(tv[1])
-        tg = np.where(tpos > 0, tpos / F(hi), tpos / F(lo))
-        return x * F(n[0]) + y * F(n[1]) - F(fold) - F(TRI["bow"]) * np.clip(1 - tg * tg, 0, 1), tg
+    def _tricorn_shape(self, th):
+        """The tricorn brim's width and how high its edge is cocked up, round the crown (th, from the hat's x axis):
+        the corners (front, back left, back right) reach furthest and stay low, pinched to points; between them the
+        brim is turned up steeply, highest mid-side."""
+        c = th - F(math.pi / 2)                                    # 0 at the front corner
+        side = np.abs(np.sin(F(1.5) * c))                          # 0 at a corner .. 1 mid-side
+        width = F(0.05) + F(0.042) * np.abs(np.cos(F(1.5) * c)) ** F(2.5)
+        low = F(0.014) - F(0.012) * np.clip(np.cos(c), 0, 1) ** 8   # the front point dips over the face
+        return width, low + (F(0.07) - low) * side ** F(0.7)
 
     def _tricorn(self, p, q):
-        """A low crown and its brim cocked up along three fold lines into walls that lean out a little, tallest
-        mid-side where they are pinned to the crown and falling to pinched points at the front and back corners."""
-        c = self.liner(p, q, self.crown(q, self.height(0.068, 0.02), taper=-0.1, rr=0.028))
-        x, y = q[:, 0], q[:, 1] - F(self.yc)
-        z = q[:, 2]
-        rb, end, ex, ez, dx, dz = _bend()
-        best_u = np.full(len(q), -1e9, F)
-        dist = np.full(len(q), 1e9, F)
-        for side in self._sides():
-            u, tg = self._fold_u(x, y, side)
-            # distance to the profile (flat, a bend of radius rb, then the wall) and the arc length along it
-            d1, s1 = np.hypot(u - np.minimum(u, 0), z), np.minimum(u, 0)
-            phi = np.clip(np.arctan2(u, -(z - F(rb))), 0, F(end))
-            d2 = np.hypot(u - F(rb) * np.sin(phi), z - F(rb) + F(rb) * np.cos(phi))
-            s2 = F(rb) * phi
-            l = np.maximum((u - F(ex)) * F(dx) + (z - F(ez)) * F(dz), 0)
-            d3 = np.hypot(u - F(ex) - F(dx) * l, z - F(ez) - F(dz) * l)
-            s3 = F(rb * end) + l
-            dd = np.minimum(np.minimum(d1, d2), d3)
-            ss = np.where(dd == d1, s1, np.where(dd == d2, s2, s3))
-            over = np.maximum(ss - F(rb * end) - _wall(tg), 0)
-            dk = np.sqrt(dd * dd + over * over) - F(TRI["t"] / 2)
-            mine = u > best_u
-            best_u = np.where(mine, u, best_u)
-            dist = np.where(mine, dk, dist)
-        return {"crown": c, "brim": (dist, np.zeros_like(dist))}
+        """A low crown and its brim cocked up on three sides into three points, the front one over the face."""
+        c = self.liner(p, q, self.crown(q, self.height(0.064, 0.02), taper=-0.12, rr=0.034))
+
+        def width(th):
+            return self._tricorn_shape(th)[0]
+
+        def lift(u, th):
+            return self._tricorn_shape(th)[1] * np.clip(u, 0, 1.2) ** F(2.4)
+        return {"crown": c, "brim": self.brim(q, width, lift, t=0.0046, edge=0.0012)}
 
     def trim_paths(self):
-        """The tricorn walls' top edges, where the binding runs: one head-local polyline per wall."""
-        rb, end, ex, ez, dx, dz = _bend()
-        sides = self._sides()
-        out = []
-        for side in sides:
-            n, tv, fold, lo, hi = side
-            tpos = np.linspace(lo * 1.6, hi * 1.6, 161)
-            tg = np.where(tpos > 0, tpos / hi, tpos / lo)
-            l = _wall(tg) - 0.0012
-            u = fold + TRI["bow"] * np.clip(1 - tg * tg, 0, 1) + ex + dx * l
-            xy = n[None] * u[:, None] + tv[None] * tpos[:, None]
-            mine = np.ones(len(tpos), bool)
-            own = self._fold_u(xy[:, 0], xy[:, 1], side)[0]
-            for other in sides:
-                if other is not side:
-                    mine &= own >= self._fold_u(xy[:, 0], xy[:, 1], other)[0]
-            q = np.stack([xy[:, 0], xy[:, 1] + self.yc, ez + dz * l], 1)[mine]
-            out.append(q @ self.rot.T + self.origin)
-        return out
+        """The tricorn brim's edge, where the binding runs: one closed head-local polyline."""
+        th = np.linspace(0, 2 * np.pi, 241)[:-1].astype(F)
+        w, h = self._tricorn_shape(th)
+        r0 = 1 / np.sqrt((np.cos(th) / self.rx) ** 2 + (np.sin(th) / self.ry) ** 2)
+        r = r0 + w - 0.0012
+        q = np.stack([r * np.cos(th), r * np.sin(th) + self.yc, h * ((r - r0) / w) ** 2.4], 1)
+        return [np.vstack([q, q[:1]]) @ self.rot.T + self.origin]
 
-    def _mushroom(self, q):
+    def gill_side(self, q):
+        """The mushroom's dome and the hollow under it (hat-local); negative where the gills are nearer."""
         yc = self.yc
         cap = ellipsoid(q, (0, yc, 0.0), (0.148, 0.152, 0.1))
         under = ellipsoid(q, (0, yc, -0.036), (0.132, 0.136, 0.07))
-        self._gill = np.abs(under) < np.abs(cap)
+        return cap, under, np.abs(under) - np.abs(cap)
+
+    def _mushroom(self, q):
+        yc = self.yc
+        cap, under, side = self.gill_side(q)
+        self._gill = side < 0
         cap = carve(cap, under, 0.01)
         x, y = q[:, 0], q[:, 1] - F(yc)
         cap = cap + F(0.003) * np.sin(np.arctan2(y, x) * F(5) + F(0.4)) * _smooth(F(0.09), F(0.14), np.hypot(x, y))
@@ -323,65 +277,16 @@ class Hat:
             out = np.maximum(out, _smooth(F(edge - 0.004), F(edge + 0.004), d @ c))
         return out
 
-    def field(self, p):
+    def filled(self, p):
+        """The hat as a solid, its inside filled (what the hair under it is cut back to, so none pokes through)."""
         parts = self.parts(p)
         d = parts["crown"]
         if "brim" in parts:
             d = smin(d, parts["brim"][0], 0.004)
-        for name, k in (("band", 0.0012), ("peak", 0.003), ("plume", 0.004), ("badge", 0.0015)):
+        for name, k in (("peak", 0.003), ("plume", 0.004), ("badge", 0.0028)):
             if name in parts:
                 d = smin(d, parts[name], k)
-        return carve(d, self.inner(p), 0.002)
+        return d
 
-
-BOUNDS = ((-0.24, -0.26, -0.12), (0.24, 0.24, 0.34))
-GRID, TARGET = 0.0012, 11000
-
-
-def mesh(head, shape, clear):
-    """The hat's mesh (world coordinates) and the region each vertex belongs to (crown, brim, under, band, trim)."""
-    hat = Hat(shape, head.shape.fem, clear)
-    key = ("widehat", shape, round(clear, 4), head.shape.fem)
-    obj = fieldmesh.build(hat.field, BOUNDS, GRID, TARGET, f"hat_{shape}", key, ("headwear.py", "hats.py"), "headwear")
-    refine(obj, hat.field)
-    co = place(obj, head)
-    regions = _regions(hat, centres(obj, co))
-    return obj, (_bind(obj, hat, head, regions) if shape == "tricorn" else regions), hat
-
-
-def _bind(obj, hat, head, regions, r=0.0034):
-    """A binding round the tricorn walls' top edges, added to the hat's mesh as its trim."""
-    import bmesh
-    from mathutils import Vector
-    from .features import round_section, spline, sweep
-    bm = bmesh.new()
-    bm.from_mesh(obj.data)
-    n0 = len(bm.faces)
-    for path in hat.trim_paths():
-        if len(path) > 2:
-            sweep(bm, spline([Vector(head.c) + Vector(p) * head.h for p in path], 60), round_section(lambda t: r * head.h), 8)
-    for f in bm.faces[n0:]:
-        f.smooth = True
-    n1 = len(bm.faces)
-    bm.to_mesh(obj.data)
-    bm.free()
-    return np.concatenate([regions, np.full(n1 - n0, "trim", dtype=object)])
-
-
-def _regions(hat, co):
-    parts = hat.parts(co)
-    names = list(parts)
-    dist = np.stack([np.abs(parts[n][0] if isinstance(parts[n], tuple) else parts[n]) for n in names], 1)
-    region = np.asarray(names, dtype=object)[np.argmin(dist, 1)]
-    region = np.where(np.abs(hat.inner(co)) < 0.0016, "under", region)     # the lining
-    if "brim" in parts:
-        under = (parts["brim"][1] < 0) & (region == "brim")
-        region = np.where(under, "under", region)
-    if hat.shape == "mushroom":
-        q = hat.local(co)
-        gill = hat._gill
-        ang = np.arctan2(q[:, 1] - hat.yc, q[:, 0])
-        shade = np.where(gill, 0.88 + 0.12 * np.cos(ang * 90) ** 2, 1.0)
-        region = np.where(gill, "gill", np.where(hat.spots(q) > 0.5, "spot", region))
-        return region, shade
-    return region
+    def field(self, p):
+        return carve(self.filled(p), self.inner(p), 0.002)

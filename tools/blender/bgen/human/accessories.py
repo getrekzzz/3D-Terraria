@@ -56,17 +56,19 @@ def hat(head, p, under=()):
     base = hex3(p.get("hatColor", "#5a3a1a"))
     trim = hex3(p["trim"]) if p.get("trim") else None
     if kind == "wide" or (kind == "cap" and shape == "shako"):
-        from . import hats
+        from . import hatmesh
         bald = p.get("hairStyle") in ("bald", "buzz")
-        obj, regions, _ = hats.mesh(head, shape or "brim", 0.004 if bald else 0.012)
+        obj, regions, _ = hatmesh.mesh(head, shape or "brim", 0.004 if bald else 0.012)
     else:
         from . import capshapes
-        obj, regions = capshapes.mesh(head, kind, shape, p.get("visor", True), under)
+        obj, regions = capshapes.mesh(head, kind, shape, p.get("visor", True), under, p.get("anatomy") == "skeleton")
     colors = region_colors(base, trim, shape)
     if shape in ("shako", "helmet"):           # gold bands on a shako, a brass brow band on a helmet
         colors["band"] = colors["badge"]
     elif shape == "beret":
         colors["band"] = tuple(c * 0.78 for c in base)
+    if kind == "hood":                         # the lining, seen only in the shadow of the opening
+        colors["under"] = tuple(c * 0.5 for c in base)
     paint_regions(obj, regions, colors)
     set_slot(obj, {"mushroom": "char:leather", "hardhat": "char:leather", "helmet": "char:metal",
                    "greathelm": "char:metal"}.get(shape, "char:cloth"))
@@ -85,7 +87,8 @@ def region_colors(base, trim, shape):
             "plume": (0.8, 0.12, 0.1), "badge": gold, "rivet": gold, "peak": tuple(c * 0.75 for c in base),
             "gill": mix(base, (0.9, 0.95, 1.0), 0.55), "spot": mix(base, (0.85, 0.95, 1.0), 0.6),
             "stripe": mix(base, (1.0, 1.0, 1.0), 0.75), "cross": (0.8, 0.12, 0.14), "slit": (0.05, 0.05, 0.06),
-            "knot": tuple(c * 0.88 for c in base)}
+            "knot": tuple(c * 0.88 for c in base), "hem": tuple(c * 0.86 for c in base), "button": base,
+            "bill": tuple(c * 0.94 for c in base)}
 
 
 def paint_regions(obj, regions, colors):
@@ -93,13 +96,15 @@ def paint_regions(obj, regions, colors):
     bm = bmesh.new()
     bm.from_mesh(obj.data)
     layer = bm.loops.layers.color.get("Color") or bm.loops.layers.color.new("Color")
-    shade = regions[1] if isinstance(regions, tuple) else None
+    shade = regions[1] if isinstance(regions, tuple) else None         # per face, or per vertex
     names = regions[0] if isinstance(regions, tuple) else regions
+    per_vert = shade is not None and len(shade) == len(bm.verts) and len(shade) != len(bm.faces)
     for f in bm.faces:
         c = colors.get(names[f.index], colors["crown"])
-        k = 1.0 if shade is None else float(shade[f.index])
+        k = 1.0 if shade is None or per_vert else float(shade[f.index])
         for loop in f.loops:
-            loop[layer] = (c[0] * k, c[1] * k, c[2] * k, 1.0)
+            kk = float(shade[loop.vert.index]) if per_vert else k
+            loop[layer] = (c[0] * kk, c[1] * kk, c[2] * kk, 1.0)
     bm.to_mesh(obj.data)
     bm.free()
 

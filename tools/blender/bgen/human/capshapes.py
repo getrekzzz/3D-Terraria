@@ -22,7 +22,15 @@ from .headwear import _cranium, _shell, _smooth
 from .sdf import F, carve, ellipsoid, round_cone, smax, smin, sphere, tube
 
 SHAPES = ("santa", "elf", "helmet", "greathelm", "bandana", "turban", "hardhat", "beret")
-BOUNDS = ((-0.17, -0.22, -0.16), (0.17, 0.19, 0.3))
+BOUNDS = ((-0.17, -0.22, -0.25), (0.17, 0.2, 0.3))
+MIDDLE = -0.012                                  # the axis the bandana's edge is measured round
+BAND_T, BAND_THICK = 0.0085, 0.0026              # the bandana's outer surface off the skull, and its cloth
+KNOT = (0.004, -0.12, -0.024)
+# the tails: which side, their path from the knot (out, back in units of 0.012, down) and half-widths along it
+TAILS = ((1.0, ((0.004, 0.0, 0.0), (0.014, 0.25, 0.012), (0.021, 0.4, 0.032), (0.025, 0.45, 0.052),
+                (0.027, 0.42, 0.07)), (0.0075, 0.0105, 0.0095, 0.0065, 0.0016)),
+         (-1.0, ((0.004, 0.0, 0.0), (0.013, 0.25, 0.011), (0.018, 0.38, 0.028), (0.021, 0.4, 0.046)),
+          (0.0075, 0.01, 0.0075, 0.0016)))
 
 
 def _fluff(p, amp, freq):
@@ -42,6 +50,28 @@ def _cap(p, fem, band=True):
     return carve(d, z - rim, 0.0012), base, rim, t
 
 
+def _ribbon(p, spine, widths, half, back=(0.0, -1.0, 0.0)):
+    """A thin strip of cloth along a polyline, ``half`` thick each side, its half-width ``widths`` at each point,
+    lying flat toward ``back``: a flattened tube (round-ended in its own plane, so its pieces join without gaps)."""
+    out = None
+    spine = [np.asarray(c, dtype=F) for c in spine]
+    for i in range(len(spine) - 1):
+        a, b = spine[i], spine[i + 1]
+        d = b - a
+        length = float(np.linalg.norm(d))
+        d = d / F(length)
+        w = np.cross(np.asarray(back, dtype=F), d)
+        w = w / np.linalg.norm(w)
+        n = np.cross(d, w)
+        q = p - a
+        t = np.clip(q @ d / F(length), 0, 1)
+        q = q - (t * F(length))[:, None] * d
+        flat = np.hypot(q @ d, q @ w) - (F(widths[i]) + F(widths[i + 1] - widths[i]) * t)
+        dist = headwear._rounded(flat, np.abs(q @ n) - F(half), half * 0.8)
+        out = dist if out is None else np.minimum(out, dist)
+    return out
+
+
 def _cone(p, spine, radii, wrinkle=0.0):
     d = tube(p, spine, radii)
     if wrinkle:
@@ -51,15 +81,20 @@ def _cone(p, spine, radii, wrinkle=0.0):
 
 
 class CapShape:
-    def __init__(self, shape, fem):
-        self.shape, self.fem = shape, fem
+    def __init__(self, shape, fem, under=None, skull=False):
+        self.shape, self.fem, self.under = shape, fem, under      # (what a greathelm's skirt rests on, as hood.drape)
+        self.skull = skull                                        # (a helmet on a bare skull)
+        self._inside, self._paint = None, {}
 
     def parts(self, p):
         s, fem = self.shape, self.fem
-        if s == "greathelm":
-            return self._greathelm(p)
-        if s == "helmet":
-            return self._helmet(p)
+        if s in ("helmet", "greathelm"):
+            from . import helms
+            if s == "helmet":
+                parts, self._inside = helms.helmet(p, fem, self.skull)
+            else:
+                parts, self._inside, self._paint = helms.greathelm(p, fem, self.under)
+            return parts
         if s in ("turban", "hardhat", "beret"):
             return getattr(self, "_" + s)(p, _cranium(p, fem))
         if s == "bandana":
@@ -87,78 +122,33 @@ class CapShape:
         pom = sphere(p, (0.076, -0.121, 0.206), 0.012) - _fluff(p, 0.0012, 360)
         return {"crown": crown, "band": cuff, "pom": pom}
 
-    def _helmet(self, p):
+    def _bandana(self, p):
+        """Cloth tied tight over the skull: low on the brow, over the tops of the ears and down to the nape, its
+        edge turned under; creases run up from the knot at the nape, and its two corners hang from the knot as thin
+        tapering tails lying on the back of the neck."""
         x, y, z = p[:, 0], p[:, 1], p[:, 2]
         base = _cranium(p, self.fem)
-        rim = F(0.03) + F(0.018) * np.clip(y / F(0.09), -1, 1)          # low at the back, over the brow in front
-        dome = carve(_shell(base, 0.0085, 0.0042), z - rim + F(0.004), 0.0015)
-        crest = carve(np.maximum(np.abs(x) - F(0.0035), base - F(0.0135)), z - rim - F(0.012), 0.003)
-        brow = carve(carve(_shell(base, 0.011, 0.005), rim + F(0.012) - z, 0.0012), z - rim + F(0.006), 0.0012)
-        cheeks = _shell(ellipsoid(p, (0, 0.0, -0.03), (0.092, 0.105, 0.09)), 0.0, 0.004)
-        cheeks = carve(carve(cheeks, np.abs(x) - F(0.05), 0.004), rim - z, 0.002)
-        cheeks = carve(carve(carve(cheeks, F(0.052) - y, 0.006), z + F(0.074), 0.006), y + F(0.03), 0.004)
-        neck = _shell(ellipsoid(p, (0, -0.03, -0.03), (0.09, 0.1, 0.085)), 0.0, 0.004)
-        neck = carve(carve(carve(neck, F(-0.02) - y, 0.006), rim - z, 0.002), z + F(0.06), 0.006)
-        nasal = np.maximum(ellipsoid(p, (0, 0.1, 0.016), (0.0065, 0.0085, 0.032)), -(z + F(0.01)))
-        # rivets round the brow band, set on its surface
-        ang = np.linspace(0, 2 * np.pi, 16, endpoint=False) + np.pi / 16
-        heights = 0.03 + 0.018 * np.clip(0.1 * np.cos(ang) / 0.09, -1, 1) + 0.003
-        dirs = np.stack([np.sin(ang), np.cos(ang), np.zeros_like(ang)], 1)
-        lo, hi = np.zeros(16), np.full(16, 0.15)
-        for _ in range(22):
-            mid = (lo + hi) / 2
-            pts = (np.asarray((0, -0.012, 0)) + dirs * mid[:, None]).astype(F)
-            pts[:, 2] = heights
-            inside = _cranium(pts, self.fem) < 0.0128
-            lo, hi = np.where(inside, mid, lo), np.where(inside, hi, mid)
-        rivets = None
-        for k in range(16):
-            c = (dirs[k, 0] * lo[k], -0.012 + dirs[k, 1] * lo[k], heights[k])
-            r = sphere(p, c, 0.0042)
-            rivets = r if rivets is None else np.minimum(rivets, r)
-        crown = smin(smin(dome, crest, 0.004), smin(cheeks, neck, 0.004), 0.006)
-        return {"crown": crown, "band": brow, "peak": nasal, "rivet": rivets}
-
-    def _greathelm(self, p):
-        x, y, z = p[:, 0], p[:, 1], p[:, 2]
-        yc = 0.006
-        m = (np.abs(x / F(0.092)) ** 2.4 + np.abs((y - F(yc)) / F(0.118)) ** 2.4) ** (1 / 2.4)
-        side = (m - F(1)) * F(0.092)
-        dome = ellipsoid(p, (0, yc, 0.02), (0.092, 0.118, 0.115))
-        outer = np.minimum(np.maximum(side, z - F(0.02)), dome)     # straight walls up to the dome's equator
-        shell = smax(carve(outer, outer + F(0.0045), 0.001), -(z + F(0.122)), 0.0012)
-        cut = np.maximum(np.maximum(np.abs(z + F(0.003)) - F(0.0045), np.abs(x) - F(0.066)), F(0.02) - y)
-        cut = np.maximum(cut, F(0.0065) - np.abs(x))          # the bar between the eyes stays
-        holes = None
-        for k in range(10):
-            hx, hz = 0.026 + 0.011 * (k % 5), -0.05 - 0.013 * (k // 5)
-            hole = np.maximum(np.hypot(np.abs(x) - F(hx), z - F(hz)) - F(0.0026), F(0.03) - y)
-            holes = hole if holes is None else np.minimum(holes, hole)
-        shell = carve(carve(shell, cut, 0.0012), holes, 0.0008)
-        bands = smax(outer - F(0.0018), np.minimum(np.abs(x) - F(0.0075), np.abs(z - F(0.017)) - F(0.0065)), 0.0014)
-        bands = carve(smax(bands, -(z + F(0.122)), 0.0012), cut, 0.0012)
-        self._inside = np.abs(outer + F(0.0045))
-        return {"crown": shell, "band": bands}
-
-    def _bandana(self, p):
-        x, y, z = p[:, 0], p[:, 1], p[:, 2]
-        r = np.hypot(x - F(0.008), z - F(0.008))
-        near = _smooth(F(-0.02), F(-0.11), y) * _smooth(F(0.1), F(0.04), r) * _smooth(F(0.014), F(0.03), r)
-        fold = F(0.0014) * np.sin(np.arctan2(z - F(0.008), x - F(0.008)) * F(7)) * near    # creases drawn to the knot
-        out = p - np.asarray((0, -0.012, 0.022), dtype=F)
-        crown = _cap(p + out * (fold / np.maximum(np.linalg.norm(out, axis=1), F(1e-6)))[:, None], self.fem)[0]
-        knot = ellipsoid(p, (0.008, -0.123, 0.008), (0.018, 0.012, 0.014)) - _fluff(p, 0.0008, 300)
-        sq = np.asarray((1.0, 4.0, 1.0), dtype=F)
-        for end, slant in (((0.034, -0.104, -0.084), 0.7), ((-0.018, -0.108, -0.07), -0.6)):
-            spine = [(0.008, -0.127, 0.0), ((0.008 + end[0]) / 2, -0.121, end[2] / 2), end]
-            tail = tube(p * sq, [tuple(np.asarray(c) * sq) for c in spine], [0.01, 0.017, 0.024]) / F(4.0)
-            d = np.asarray(end) - np.asarray(spine[1])
-            d /= np.linalg.norm(d)
-            n = d + np.asarray((slant, 0, 0))     # the cloth's end cut on the slant
-            n /= np.linalg.norm(n)
-            tail = smax(tail, (p - np.asarray(end, dtype=F) + F(0.01) * d.astype(F)) @ n.astype(F), 0.0015)
-            knot = smin(knot, tail, 0.004)
-        return {"crown": crown, "knot": knot}
+        ang = np.arctan2(x, y - F(MIDDLE))
+        edge = F(0.0115) + F(0.031) * np.cos(ang) - F(0.0125) * np.cos(F(2) * ang)
+        knot = np.asarray(KNOT, dtype=F)
+        kq = p - knot
+        kr = np.hypot(kq[:, 0], kq[:, 2])
+        near = _smooth(F(0.13), F(0.03), kr) * _smooth(F(0.008), F(0.024), kr) * _smooth(F(0.06), F(-0.05), y)
+        fan = np.arctan2(kq[:, 2], kq[:, 0]) * F(4.0) + F(0.4) + F(30.0) * kr
+        ridge = (F(0.5) + F(0.5) * np.cos(F(2) * fan)) ** 2                # creases fanning out from the knot
+        soft = np.sin(x * F(60) + F(1.3)) * np.sin(y * F(45) - z * F(30)) * _smooth(F(0.0), F(0.06), z - edge)
+        t = F(BAND_T) + F(0.0024) * ridge * near + F(0.0009) * soft
+        mid = base - t + F(BAND_THICK / 2)
+        below = edge - z
+        cloth = carve(_shell(base, t, BAND_THICK, 0.001), -below, 0.001)
+        hem = np.sqrt((below + F(0.0016)) ** 2 + mid * mid) - F(0.0019)
+        tie = ellipsoid(p, KNOT, (0.0105, 0.0085, 0.0095)) - _fluff(p, 0.0006, 300)
+        for s in (-1.0, 1.0):
+            lobe = ellipsoid(p, (KNOT[0] + 0.011 * s, KNOT[1] + 0.003, KNOT[2] + 0.002), (0.009, 0.006, 0.0075))
+            tie = smin(tie, lobe, 0.003)
+        tails = [_ribbon(p, [(KNOT[0] + s * a, KNOT[1] - 0.002 - 0.012 * b, KNOT[2] - c) for a, b, c in path],
+                         widths, 0.0012) for s, path, widths in TAILS]
+        return {"crown": smin(cloth, hem, 0.0012), "knot": smin(smin(tie, tails[0], 0.003), tails[1], 0.003)}
 
     def _turban(self, p, base):
         x, y, z = p[:, 0], p[:, 1], p[:, 2]
@@ -204,38 +194,36 @@ class CapShape:
         return d
 
 
-def _cap_regions(co, visor):
-    """headwear's plain cap: the turned band and the peak, a shade darker than the crown."""
-    y, z = co[:, 1], co[:, 2]
-    rim = 0.022 + 0.02 * np.clip(y / 0.09, -1, 1)
-    region = np.where(z < rim + 0.0125, "band", "crown").astype(object)
-    if visor:
-        region = np.where((y > 0.07) & (z < 0.06), "peak", region)
-    return region
-
-
-def mesh(head, kind, shape, visor=True, under=()):
+def mesh(head, kind, shape, visor=True, under=(), skull=False):
     """A cap (or hood, its cowl draped over ``under`` where headwear takes it) and the region of each face, in world
     coordinates."""
     from .shellmesh import centres, place, refine
-    if kind == "hood" or shape not in SHAPES:
-        obj = headwear.mesh(head, kind, visor and kind == "cap", *((under,) if under else ()))
-        me = obj.data
-        co = np.empty(len(me.vertices) * 3, dtype=np.float32)
-        me.vertices.foreach_get("co", co)
-        fc = centres(obj, (co.reshape(-1, 3) - np.asarray(head.c, dtype=np.float32)) / head.h)
-        regions = _cap_regions(fc, visor) if kind == "cap" else np.full(len(fc), "crown", dtype=object)
-        return obj, regions
-    cs = CapShape(shape, head.shape.fem)
-    key = ("capshape", shape, head.shape.fem)
-    target = {"santa": 13000, "elf": 11000, "greathelm": 22000}.get(shape, 12000)     # the helm's flats sliver most
-    obj = fieldmesh.build(cs.field, BOUNDS, 0.0011, target, f"hat_{shape}", key, ("headwear.py", "capshapes.py"), "headwear")
-    refine(obj, cs.field, budget=1.25 if shape == "greathelm" else 1.6)
+    if kind == "cap" and shape not in SHAPES:
+        return headwear.cap_mesh(head, visor, 0.0055 if skull else 0.0)
+    if kind == "hood":
+        from . import hood
+        return hood.mesh(head, under, shape)
+    field, digest = None, None
+    if shape == "greathelm" and under:
+        from . import hood
+        field, digest = hood.drape(head, under)
+    cs = CapShape(shape, head.shape.fem, field, skull)
+    key = ("capshape", shape, head.shape.fem, digest, skull)
+    target = {"santa": 13000, "elf": 11000, "helmet": 16000, "greathelm": 30000}.get(shape, 12000)
+    sources = ("headwear.py", "capshapes.py", "helms.py")
+    obj = fieldmesh.build(cs.field, BOUNDS, 0.0011, target, f"hat_{shape}", key, sources, "headwear")
+    other = {"bandana": "knot", "helmet": "band"}.get(shape)
+    cuts = [lambda co: (lambda q: q["crown"] - q[other])(cs.parts(co))] if other else []
+    if shape == "greathelm":
+        cuts = [lambda co, n=n: (cs.parts(co), cs._paint[n])[1] for n in ("band", "slit")]
+    refine(obj, cs.field, budget=1.25 if shape == "greathelm" else 1.6, cuts=cuts)
     fc = centres(obj, place(obj, head))
     parts = cs.parts(fc)
     names = list(parts)
     dist = np.stack([np.abs(parts[n]) for n in names], 1)
     regions = np.asarray(names, dtype=object)[np.argmin(dist, 1)]
-    if shape == "greathelm":
+    for name, inside in cs._paint.items():
+        regions = np.where(inside < 0, name, regions)
+    if shape == "greathelm":                    # the inside, seen through the eye slit
         regions = np.where(cs._inside < 0.0012, "slit", regions)
     return obj, regions

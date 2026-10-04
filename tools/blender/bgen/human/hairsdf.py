@@ -20,7 +20,7 @@ from .hair import coverages, ear_clears, hairlines
 F = np.float32
 CELL = 0.008          # spatial hash cell (head-local) for finding the clumps near a point
 SOURCES = ("hairsdf.py", "hair.py", "locks.py", "headshape.py", "earshape.py", "creature.py", "underhat.py", "hats.py",
-           "capshapes.py", "headwear.py")      # what the field reads (the hat a head wears is carved out of its hair)
+           "capshapes.py", "helms.py", "headwear.py")      # what the field reads (the hat a head wears is carved out of its hair)
 
 
 @dataclass

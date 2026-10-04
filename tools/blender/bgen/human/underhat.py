@@ -31,6 +31,8 @@ class UnderHat:
             from . import capshapes, headwear
             hat = capshapes.CapShape(shape, fem) if shape in capshapes.SHAPES else None
         self.solid = hat.field if hat else headwear.cap_field(head.shape, p.get("visor", True))
+        if kind == "wide" or shape == "shako":       # (a wide hat's crown filled: no lock pokes out through it)
+            self.solid = hat.filled
         # Where it fits round the head: its crown and band, not a brim, peak, knot or pompom standing off it.
         self.fit = (lambda q: _crown(hat.parts(q))) if hat else self.solid
         self.key = (kind, shape, bool(p.get("visor", True)), bald)

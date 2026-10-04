@@ -35,8 +35,8 @@ Creature coverings in place of clothes (described in coverings.py): fur, furBell
 (wolf|ape), faceSkin, hands (claws), feet (paws|ape), nails, torn. Machines and aliens: alien, armor, helmet... (scifi.py).
 
 hatShape by hat: wide: brim (default), floppy, top, pointed, tricorn, bucket, mushroom (hats.py); cap: santa, elf,
-helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched on the hair,
-crowns.py), anything else the plain cap; wreath: leaves (default), fronds, gold, frost (crowns.py).
+helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched.py), else
+the plain cap; hood: deep (overhanging the face, hood.py); wreath: leaves (default), fronds, gold, frost (crowns.py).
 hornShape: imp (default), demon, goat (features.py). wingShape: bat (default), feather, ice (wings.py).
 tailShape: devil (default), lizard, fox, wolf, snake (tails.py), brush (a bushy tail of fur tufts, furtail.py).
 """
