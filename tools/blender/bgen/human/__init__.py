@@ -9,7 +9,10 @@ Parameters: body (male|female), age (young|adult|old), height, build (muscle 0..
 hair, hairStyle, beard, shirt, pants, boots, coat, robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's
 peak, default true), hatShape, flower (a wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape,
 tail, tailShape, brows (a colour, default the hair's, or none), feet (talons: a bird's clawed feet in place of shod
-ones), talons (their colour), anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead.
+ones), talons (their colour), anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead,
+suit (true when the shirt, pants and boots stand for the creature's own body, coloured like its skin: they are cut
+skin-tight and melt into the skin at their edges, with no seams, folds, collar, cuffs, buttons, boot rims or soles, and
+no belt unless one is given).
 
 Build and weight above average (0.5, 0.45) add mass: muscle broadens the shoulders, back and chest and thickens the
 limbs and neck; fat adds a round belly, love handles, a fuller chest, heavy limbs and a thick neck.
@@ -253,7 +256,12 @@ def dress(fr, head, parts, p, lookup=None):
 
     if robe:
         add(w.shell(body, w.in_robe, "robe", 0.0055, p["robe"], "char:cloth", "robe", w.shirt_cuts(-0.035)), w.in_robe, "shirt")
-    elif "shirt" in p or "coat" in p:
+    elif "coat" in p:       # under a coat the shirt ends with it, and anything glimpsed of it reads as the lining
+        from .paint import hex3     # (unless the coat is torn: then the shirt shows in its holes)
+        lining = tuple(c * 0.55 for c in hex3(p["coat"])) if w.tatters is None else p.get("shirt", "#8a8070")
+        shirt = w.shell(body, w.in_coat, "shirt", 0.0055, lining, "char:cloth", "shirt", w.shirt_cuts(-0.015))
+        add(shirt, w.in_shirt, "shirt")
+    elif "shirt" in p:
         add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", "#8a8070"), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt, "shirt")
     if not robe:
         add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants, "pants")
@@ -268,7 +276,7 @@ def dress(fr, head, parts, p, lookup=None):
         bodice = out[0] if out and out[0].name.startswith("robe") else None
         add(w.skirt(body, fr.j["ankle.R"].z + 0.02 * fr.s, 0.55, p["robe"], "robe_skirt", trim=p.get("trim"), under=list(out)))
         out.extend(w.sash(out[-1], bodice, p.get("trim", p["robe"])))
-    if w.belted:
+    if w.belted and (not w.suit or "belt" in p):      # a body suit wears only a belt it is given
         out.extend(w.belt(body, p.get("belt", "#3a2618"), over=[o for o in out if o.name.startswith(("coat", "shirt", "pants"))]))
     if "apron" in p:
         out.extend(apron.build(w, body, parts["head"], out + w.extras, p["apron"]))

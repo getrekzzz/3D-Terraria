@@ -31,7 +31,8 @@ class Wardrobe(Skirts):
         self.tatters = None   # where the clothes are torn (tatters.Tatters, the undead)
         self.collar_z = frame.j["neck"].z
         self.belted = not p.get("robe")                    # a belt at the waist (over the coat if there is one)
-        self.tucked = self.belted and "coat" not in p      # the shirt tucked in under the belt
+        self.suit = bool(p.get("suit"))                    # shirt and trousers are the creature's own body
+        self.tucked = self.belted and "coat" not in p and not self.suit   # the shirt bloused over the belt
         self.sole = 0.022 * s           # top of the boot soles
         self.standoff = {}              # each garment's height off the skin per vertex (a coat sits on the shirt)
         self.extras = []                # parts the garments brought along (buttons)

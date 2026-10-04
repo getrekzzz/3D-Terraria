@@ -1,14 +1,15 @@
 """A robe's bodice: the robe's own cloth over the shoulders, chest and arms (cut from the body like a shirt by
 garments.Wardrobe.shell), continued under the sash by its skirt (skirts.py), so the two read as one garment.
 
-Unlike a shirt it is cut loose: it rests on the shoulders and falls from them, the chest and the shoulder blades
-nearly plumb to the sash, which gathers it into soft folds (it blouses a little over it). The draped cloth is then
-relaxed over the body like heavy fabric, so the chest's and belly's shapes don't show through, and hangs in long folds
-down the sleeves, which widen toward the wrist.
+Unlike a shirt it is cut loose: draped like one (tailoring.Cloth), it rests on the shoulders and falls from them and
+the chest nearly plumb to the sash, which gathers it into soft folds (it blouses a little over it). The draped cloth
+is then relaxed over the body like heavy fabric, so the chest's and belly's shapes don't show through, and hangs in
+long folds down the sleeves, which widen toward the wrist.
 """
 import numpy as np
 
-from .tailoring import Cloth, ridge, rings, ss, wobble
+from .drape import rings
+from .tailoring import Cloth, ridge, ss, wobble
 
 
 class RobeCloth(Cloth):
@@ -20,21 +21,14 @@ class RobeCloth(Cloth):
     def apply(self, bm):
         shade = super().apply(bm)
         s = self.s
-        X, h = self.w.standoff["shirt"]
+        X, N, g, edge = self.shell
         P = np.array([v.co[:] for v in bm.verts])
-        N = (P - X) / np.maximum(h, 1e-6)[:, None]
-        edges = np.array([(e.verts[0].index, e.verts[1].index) for e in bm.edges])
-        edge = np.array([v.is_boundary for v in bm.verts])
-        n, a, b = len(X), edges[:, 0], edges[:, 1]
-        deg = np.maximum(np.bincount(edges.ravel(), minlength=n), 1).astype(float)[:, None]
         # Easing in from the sleeves (which keep their shape) over a few rings, so no crease marks the armhole.
-        move = 0.6 * ((rings(edges, edge, 3) >= 2) * ss(0.0, 6.0, rings(edges, ~self.torso, 7)))[:, None]
+        move = 0.6 * ((rings(g, edge, 3) >= 2) * ss(0.0, 6.0, rings(g, ~self.torso, 7)))[:, None]
         floor = self.t + 0.002 * s
         for _ in range(40):             # heavy cloth: relaxed over the body's smaller shapes, never into it
-            avg = np.stack([np.bincount(a, P[b, k], n) + np.bincount(b, P[a, k], n) for k in range(3)], 1) / deg
-            P = P + move * (avg - P)
-            hh = np.einsum("ij,ij->i", P - X, N)
-            P = P + N * np.maximum(floor - hh, 0.0)[:, None]
+            P = P + move * (g.mean(P) - P)
+            P = P + N * np.maximum(floor - np.einsum("ij,ij->i", P - X, N), 0.0)[:, None]
         self.draped = True
         for v, p in zip(bm.verts, P):
             v.co = p
@@ -43,9 +37,8 @@ class RobeCloth(Cloth):
         # of the back) the body's points crowd together under it and its normals tilt steeply, which would crumple them.
         self._regions(P)
         fold, crease = self._folds(P)
-        fade = ss(0.0, 4.0, rings(edges, edge, 4))
-        Nc = np.array([v.normal[:] for v in bm.verts])
-        P = P + Nc * (fold * fade)[:, None]
+        fade = ss(0.0, 4.0, rings(g, edge, 4))
+        P = P + np.array([v.normal[:] for v in bm.verts]) * (fold * fade)[:, None]
         self.w.standoff["shirt"] = (X, np.einsum("ij,ij->i", P - X, N))
         for v, p in zip(bm.verts, P):
             v.co = p
@@ -62,7 +55,7 @@ class RobeCloth(Cloth):
 
     def _shirt(self, X):
         """The shirt's ease (with the sash's gathering, as under a belt) let out: loose from the chest down, the
-        sleeves widening toward the wrist and sagging below the arm."""
+        sleeves widening toward the wrist and sagging below the arm, free to span far across the torso's hollows."""
         lo, cap, hi = super()._shirt(X)
         j, s, w, z = self.f.j, self.s, self.w, self.z
         extra = 0.0065 * s * ss(w.collar_z - 0.04 * s, j["chest"].z, z) * ss(w.waist - 0.03 * s, w.waist + 0.03 * s, z)
@@ -75,11 +68,11 @@ class RobeCloth(Cloth):
         cap = np.where(self.torso, np.maximum(cap, 0.05 * s * self._armpits(X)), np.maximum(cap, 0.012 * s * self._armpits(X)))
         return lo + extra, cap, hi
 
-    def _hang(self, X, N, lo):
-        """The shirt's fall from the chest and the shoulder blades, drawn in gradually to the sash instead of
-        stepping in just above it (which leaves a shelf of crumpled cloth over the small of the back)."""
+    def _hang(self, X, N, h, most):
+        """The shirt's fall from the chest, drawn in gradually to the sash instead of stepping in just above it
+        (which would leave a shelf of crumpled cloth)."""
         top = self.w.waist + 0.016 * self.s
-        return lo + (super()._hang(X, N, lo) - lo) * ss(top, top + 0.14 * self.s, self.z)
+        return h + (super()._hang(X, N, h, most) - h) * ss(top, top + 0.14 * self.s, self.z)
 
     def _folds(self, X):
         """The shirt's folds on the sleeves, long soft ones down them from the shoulder, and the gathers the sash

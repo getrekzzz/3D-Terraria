@@ -5266,6 +5266,7 @@
     "splinterling": {
       "generator": "humanoid",
       "params": {
+        "suit": true,
         "skin": "#6a4a2a",
         "eyes": "#ff8a2a",
         "hairStyle": "bald",
@@ -5337,6 +5338,7 @@
     "gingerbread_man": {
       "generator": "humanoid",
       "params": {
+        "suit": true,
         "skin": "#b87a3a",
         "eyes": "#1a1a1a",
         "hairStyle": "bald",
@@ -5386,6 +5388,7 @@
     "yeti": {
       "generator": "humanoid",
       "params": {
+        "suit": true,
         "skin": "#e8f0f8",
         "eyes": "#4a8aff",
         "hair": "#f0f8ff",

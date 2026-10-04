@@ -72,7 +72,10 @@ def build_body(frame, blob: Blob, feet=True):
         else:
             e(at((sx * 0.066, 0.05, 1.34)), (0.08 * m * (1 + 0.1 * bulk), 0.027 * m * (1 + 0.3 * bulk) + 0.022 * fat, 0.056 * m * (1 + 0.1 * fat)),
               limb_rotation(Vector((sx, 0.12, -0.3))))                                                          # pectorals
-        B.capsule(j[f"clavicle.{side}"] + at((0, 0.006, 0.01)), j[f"shoulder.{side}"] + at((0, 0.012, 0.018)), 0.014 * s)  # collarbone
+        # Collarbone, from the top of the sternum (which a stoop doesn't carry forward with the shoulders) out to the
+        # shoulder, lying back over the rounded shoulder instead of standing out in front of it.
+        B.capsule(j[f"clavicle.{side}"] + at((0, 0.006, 0.01)) - Vector((0, frame.stoop, 0)),
+                  j[f"shoulder.{side}"] + at((0, 0.012, 0.018)) - Vector((0, 0.5 * frame.stoop, 0)), 0.014 * s)
     if fem:
         # The bust's common mass over the cleavage and under it, so cloth spans the breasts and falls from them.
         e(at((0, 0.054, 1.258)), (0.072 * f ** 0.5, 0.05 * f ** 0.6, 0.05 * f ** 0.4), stiffness=1.6)

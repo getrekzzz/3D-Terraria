@@ -26,7 +26,7 @@ class Frame:
         self.weight = p.get("weight", 0.45)
         shoulder_w = (0.162 if female else 0.182) * s
         hip_w = (0.092 if female else 0.088) * s
-        stoop = 0.035 * s if self.old else 0.0
+        stoop = self.stoop = 0.035 * s if self.old else 0.0     # rounded shoulders and a forward head
         self.j = j = {}
         j["ground"] = Vector((0, 0, 0))
         j["pelvis"] = Vector((0, -0.005 * s, 0.975 * s))
