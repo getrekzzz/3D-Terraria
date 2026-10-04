@@ -21,7 +21,7 @@ def brush(fr, body, p, garments=()):
     from .tails import _exit
     s = fr.s
     base = np.asarray(hex3(p["tail"]))
-    start = _exit(fr, body, garments)
+    start, _ = _exit(fr, body, garments, "brush")       # (where the tailbone line meets the body or the clothes)
     path = spline([start + Vector(c) * s for c in PATH], 44)
     length = sum((b - a).length for a, b in zip(path, path[1:]))
     bm = bmesh.new()
