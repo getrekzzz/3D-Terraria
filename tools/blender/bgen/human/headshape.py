@@ -35,7 +35,7 @@ def _basis(x_dir, up=(0.0, 0.0, 1.0)):
 def _bump(t, peak):
     """0 at t = 0 and 1, 1 at t = peak (a skewed sine arch)."""
     g = math.log(0.5) / math.log(peak)
-    return np.sin(np.pi * np.clip(t, 0, 1) ** g) ** 0.85
+    return np.maximum(np.sin(np.pi * np.clip(t, 0, 1) ** g), 0.0) ** 0.85     # (sin(pi) can come out just below 0)
 
 
 class HeadShape:

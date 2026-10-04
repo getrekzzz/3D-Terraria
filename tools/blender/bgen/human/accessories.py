@@ -25,11 +25,12 @@ def _lathe(bm, centre, profile, segs, scale_y=1.0):
                 bm.faces.new((a[k], a[(k + 1) % segs], b[(k + 1) % segs], b[k]))
 
 
-def hat(head, head_obj, kind, color, flower="#f0d040", visor=True):
+def hat(head, head_obj, kind, color, flower="#f0d040", visor=True, under=()):
+    """A hat on the head; a hood's cowl drapes over ``under`` (the body and the garments on its shoulders)."""
     h = head.h
     if kind in ("cap", "hood"):            # sculpted cloth (headwear): a cap on the skull, a hood standing off it
         from . import headwear
-        obj = headwear.mesh(head, kind, visor)
+        obj = headwear.mesh(head, kind, visor, under)
         bm = bmesh.new()
         bm.from_mesh(obj.data)
         bpy_data_remove(obj)

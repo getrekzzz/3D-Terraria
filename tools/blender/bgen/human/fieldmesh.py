@@ -113,6 +113,8 @@ def build(field, bounds, h, target, name, key, sources, kind, min_piece=None, ke
         me.update()
         _beautify(me)
         verts, faces = _arrays(me)
+    if me.validate():          # (decimating can leave duplicate faces; drop them so the cache and this mesh agree)
+        verts, faces = _arrays(me)
     _MESHES[key] = (verts, faces)
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_name(f"{path.stem}.{os.getpid()}.npz")

@@ -151,7 +151,7 @@ def build(name: str, p: dict):
         bones = rig.hand_bones(side)
         rig.chain_weights(hand, arm, bones, 0.006, tree, body_w, blend_bone=f"hand.{side}")
         rig.chain_weights(nail, arm, [b for b in bones if b.split(".")[0] in frame_mod.FINGERS], 0.003)
-    extras = dress(fr, head, parts, p)
+    extras = dress(fr, head, parts, p, (tree, body_w))
     extras += groom(fr, head, parts, p, (tree, body_w))
     objs = _all(parts) + extras
     for o in objs:
@@ -204,8 +204,9 @@ def build_skeleton(name: str, p: dict):
     return [arm, mesh]
 
 
-def dress(fr, head, parts, p):
-    """Clothing and accessories; removes the skin they cover."""
+def dress(fr, head, parts, p, lookup=None):
+    """Clothing and accessories; removes the skin they cover. With the body's weights (``lookup``) a hood's cowl
+    follows the neck and shoulders it hangs on."""
     body = parts["body"]
     w = Wardrobe(fr, p, head)
     w.tear = 0.35 if p.get("undead") else 0.0
@@ -237,8 +238,12 @@ def dress(fr, head, parts, p):
     strip_covered(body, covers)
     head.bury_neck(body)
     if p.get("hat"):
-        add(accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040"),
-                            p.get("visor", True)))
+        under = [body] + [o for o in out if o.name.split(".")[0] in ("shirt", "coat")]
+        hat = accessories.hat(head, parts["head"], p["hat"], p.get("hatColor", "#5a3a1a"), p.get("flower", "#f0d040"),
+                              p.get("visor", True), under)
+        if p["hat"] == "hood" and lookup is not None:
+            rig.head_weights(hat, head, *lookup, torso_only=True)
+        add(hat)
     if "mask" in p:
         add(accessories.mask(head, parts["head"], p["mask"]))
     if "horns" in p:

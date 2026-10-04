@@ -69,14 +69,14 @@ def read_weights(obj):
 
 
 def write_weights(obj, weights):
-    for w in weights:
-        for name in w:
-            if name not in obj.vertex_groups:
-                obj.vertex_groups.new(name=name)
+    """Gives vertex i exactly the weights ``weights[i]`` (normalised): whatever it carried before goes, including
+    deform data a copy of another mesh brought along (clearing the groups drops it)."""
+    obj.vertex_groups.clear()
+    groups = {name: obj.vertex_groups.new(name=name) for name in dict.fromkeys(n for w in weights for n in w)}
     for i, w in enumerate(weights):
         total = sum(w.values()) or 1.0
         for name, value in w.items():
-            obj.vertex_groups[name].add([i], value / total, "REPLACE")
+            groups[name].add([i], value / total, "REPLACE")
 
 
 def normalize(obj):
