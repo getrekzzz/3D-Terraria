@@ -84,7 +84,7 @@ def gold(head, surf, ring, p, rng):
     bm = bmesh.new()
     layer = bm.loops.layers.color.new("Color")
     thick = 0.0013
-    frames = band(bm, layer, ring, lambda az: 0.0042 + 0.0024 * max(0.0, math.cos(az)) ** 3, thick,
+    frames = band(bm, layer, ring, lambda az: 0.0053 + 0.0022 * max(0.0, math.cos(az)) ** 3, thick,
                   lambda e, az: dark if e > 0.9 else bright)
     for pt, n, tan, az, half in _branches(ring, 0.0125):           # laurel sprigs along the sides
         front = math.cos(az)

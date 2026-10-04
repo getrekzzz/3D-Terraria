@@ -20,6 +20,7 @@ from .headwear import _cranium, _rounded, _smooth
 from .sdf import F, carve, ellipsoid, gradient, smin, tube
 
 SHAPES = ("brim", "floppy", "top", "pointed", "tricorn", "bucket", "mushroom", "shako")
+TRICORN_CURL = 1.5      # how the tricorn brim turns up across it (higher: flatter by the crown, steeper at the edge)
 # the band's height over the brim (shako: its lower band and the rim round its top); hatmesh lays it on the crown
 BAND = {"brim": ((0.0, 0.019),), "floppy": ((0.0, 0.016),), "top": ((0.0, 0.024),), "pointed": ((0.0, 0.02),),
         "bucket": ((0.0, 0.014),), "shako": ((0.0, 0.014), (0.117, 0.129))}
@@ -218,13 +219,14 @@ class Hat:
 
     def _tricorn_shape(self, th):
         """The tricorn brim's width and how high its edge is cocked up, round the crown (th, from the hat's x axis):
-        the corners (front, back left, back right) reach furthest and stay low, pinched to points; between them the
+        the corners (front, back left, back right) reach furthest and stay low, folded to soft points; between them the
         brim is turned up steeply, highest mid-side."""
         c = th - F(math.pi / 2)                                    # 0 at the front corner
-        side = np.abs(np.sin(F(1.5) * c))                          # 0 at a corner .. 1 mid-side
-        width = F(0.05) + F(0.042) * np.abs(np.cos(F(1.5) * c)) ** F(2.5)
+        s = np.sin(F(1.5) * c)                                     # 0 at a corner .. 1 mid-side, the corner folds
+        side = (np.sqrt(s * s + F(0.0144)) - F(0.12)) / F(math.sqrt(1.0144) - 0.12)     # rounded (a crease shades jagged)
+        width = F(0.057) + F(0.035) * np.abs(np.cos(F(1.5) * c)) ** F(2.5)
         low = F(0.014) - F(0.012) * np.clip(np.cos(c), 0, 1) ** 8   # the front point dips over the face
-        return width, low + (F(0.07) - low) * side ** F(0.7)
+        return width, low + (F(0.058) - low) * side ** F(0.7)
 
     def _tricorn(self, p, q):
         """A low crown and its brim cocked up on three sides into three points, the front one over the face."""
@@ -234,7 +236,7 @@ class Hat:
             return self._tricorn_shape(th)[0]
 
         def lift(u, th):
-            return self._tricorn_shape(th)[1] * np.clip(u, 0, 1.2) ** F(2.4)
+            return self._tricorn_shape(th)[1] * np.clip(u, 0, 1.2) ** F(TRICORN_CURL)
         return {"crown": c, "brim": self.brim(q, width, lift, t=0.0046, edge=0.0012)}
 
     def trim_paths(self):
@@ -243,7 +245,7 @@ class Hat:
         w, h = self._tricorn_shape(th)
         r0 = 1 / np.sqrt((np.cos(th) / self.rx) ** 2 + (np.sin(th) / self.ry) ** 2)
         r = r0 + w - 0.0012
-        q = np.stack([r * np.cos(th), r * np.sin(th) + self.yc, h * ((r - r0) / w) ** 2.4], 1)
+        q = np.stack([r * np.cos(th), r * np.sin(th) + self.yc, h * ((r - r0) / w) ** TRICORN_CURL], 1)
         return [np.vstack([q, q[:1]]) @ self.rot.T + self.origin]
 
     def gill_side(self, q):

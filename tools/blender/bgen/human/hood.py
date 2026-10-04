@@ -123,7 +123,7 @@ class Hood:
         ang = np.arctan2(x, -y)
         u = ang * F(9.0 / (2 * math.pi)) + F(0.3) * np.sin(ang * F(2.0) + F(0.7)) + F(0.08) * np.sin(z * F(30.0))
         hang = (F(0.5) - F(0.5) * np.cos(F(2 * math.pi) * u)) ** F(0.8)
-        hang = hang * (F(0.65) + F(0.35) * np.sin(np.mod(np.floor(u), F(9)) * F(2.7) + F(1.0)))   # (counted round: no step in front)
+        hang = hang * (F(0.65) + F(0.35) * np.sin(np.mod(np.floor(u), F(9)) * F(2.7) + F(1.0)))   # (no step in front)
         front = _smooth(F(0.5 * math.pi), F(0.8 * math.pi), np.abs(ang))
         down = _smooth(F(0.09), F(-0.26), z) ** F(1.4)
         swag = F(0)
@@ -155,7 +155,7 @@ class Hood:
     def parts(self, p):
         vol = self.volume(p)
         mid = vol - F(THICK / 2)
-        cloth = carve(vol - F(THICK), vol, 0.0012)
+        cloth = smin(carve(vol - F(THICK), vol, 0.0012), self.throat(p, vol), 0.003)
         cut = self.opening(p)
         below = self.below(p)
         cloth = carve(carve(cloth, cut, 0.0012), -below, 0.0012)
@@ -166,6 +166,14 @@ class Hood:
             ear = self.shape.ear_room(p, 0.0)
             lip = np.minimum(lip, np.sqrt(ear * ear + mid * mid) - F(ROLL * 0.8))
         return {"crown": cloth, "lip": lip, "hem": hem}
+
+    def throat(self, p, vol):
+        """The cloth gathered in front of the throat a little under the chin (a slab filling the hood there, its top
+        rising toward the front), so a look down into the opening past the chin meets the lining's shadow, not the
+        collar below."""
+        y, z = p[:, 1], p[:, 2]
+        top = F(-0.146) + F(0.25) * (y - F(0.03))
+        return np.maximum(np.maximum(vol, z - top), np.maximum(top - F(0.03) - z, F(-0.005) - y))
 
     def field(self, p):
         parts = self.parts(p)
