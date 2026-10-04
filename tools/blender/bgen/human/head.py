@@ -18,14 +18,17 @@ class Head:
     def __init__(self, frame, p):
         self.frame = frame
         self.p = p
-        base = frame.s * (0.95 if frame.female else 1.0)
+        base = frame.s * (0.97 if frame.female else 1.0)
         self.h = base * p.get("headSize", 1.0)
-        # A bigger head (``headSize``) grows up and out from under the chin, so the neck keeps its length.
-        self.c = frame.head_center + Vector((0, 0, 0.11)) * (self.h - base)
+        # A smaller head (``headSize``) shrinks toward the chin, so the neck keeps its length; a bigger one on a person
+        # grows out from a little above the chin, sinking toward the shoulders on a shorter neck (a goblin's). (Other
+        # anatomies, matter.py, keep the chin where it is.)
+        sink = self.h > base and p.get("anatomy", "human") == "human"
+        self.c = frame.head_center + Vector((0, 0, 0.07 if sink else 0.11)) * (self.h - base)
         if frame.female:      # a woman's smaller head sits a little lower, so her neck isn't drawn out
             self.c.z -= 0.008 * frame.s
         h = self.h
-        self.eye_r = 0.0118 * h
+        self.eye_r = (0.0126 if frame.female else 0.0118) * h       # (women's eyes a little larger)
         self.eyes = {sx: self.at((sx * 0.0315, 0.0695, -0.002)) for sx in (1, -1)}
         self._shape = None
 

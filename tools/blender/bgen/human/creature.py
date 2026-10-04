@@ -1,6 +1,7 @@
 """Creature faces in the head's distance field (head-local units, see headshape): a reptile's snout in place of the
 nose and mouth (upper and lower jaws tapering forward, nostrils at the tip, a lipless mouth line running back under
-the cheeks to a slight upturn) and, on heads without outer ears, a recessed ear opening.
+the cheeks to a slight upturn, the throat sloping up under the jaws), on heads without outer ears a shallow ear opening,
+and an ogre's tusks rising from the lower jaw in front of the upper lip.
 """
 import numpy as np
 
@@ -45,6 +46,8 @@ def jaws(shape, p, d):
     upper = _chain(p, _stations(shape, 0.04, ty - 0.017, (0.047, 0.019), (0.03, 0.0135), top=(0.006, -0.034)))
     upper = smin(upper, round_cone(p, (0, 0.079, 0.01), (0, ty - 0.024, -0.028), 0.0115, 0.0085), 0.012)   # the ridge down the top
     lower = _chain(p, _stations(shape, 0.03, ty - 0.021, (0.04, 0.016), (0.022, 0.0105), bottom=(-0.09, -0.0705)))
+    # The throat, sloping from the neck up under the lower jaw (no human chin over a throat).
+    lower = smin(lower, round_cone(p, (0, 0.008, -0.135), (0, 0.075 + 0.02 * shape.snout, -0.083), 0.046, 0.016), 0.02)
     return smin(d, smin(upper, lower, 0.006), 0.022)
 
 
@@ -77,19 +80,42 @@ def field(shape, p, d):
     if a is not None and "snout_mouth" in a:
         line = a["snout_mouth"]
         n = len(line)
-        r = 0.0011 * (0.45 + 0.55 * np.sin(np.pi * (np.arange(n) + 0.5) / n))
+        # (wide enough for the mesh to resolve cleanly: a hairline groove comes out ragged)
+        r = 0.0021 * (0.5 + 0.5 * np.sin(np.pi * (np.arange(n) + 0.5) / n))
         axis = np.stack([0 * line[:, 0], np.minimum(line[:, 1], tip_y(shape) - 0.03), line[:, 2]], 1)
         inward = axis - line
         inward /= np.maximum(np.linalg.norm(inward, axis=1), 1e-9)[:, None]
-        d = carve(d, tube(p, list(line + inward * (r * 0.35)[:, None]), list(r)), 0.0016)
+        d = carve(d, tube(p, list(line + inward * (r * 0.3)[:, None]), list(r)), 0.002)
         for i, sx in enumerate((1, -1)):
             c = a["snout_nostril"][i]
             d = carve(d, ellipsoid(p, c, (0.0018, 0.0034, 0.0016)), 0.0012)
     return d
 
 
-def earless(p, d):
-    """A recessed ear opening (a reptile's tympanum) where the outer ear would be."""
-    for sx in (1, -1):
-        d = carve(d, ellipsoid(p, (sx * 0.0785, -0.012, -0.014), (0.0065, 0.0105, 0.0095)), 0.0035)
+def earless(shape, p, d):
+    """A reptile's ear opening (tympanum) where the outer ear would be: a shallow round dip, flush with the head at its
+    edge, placed on the surface found for it (an anchor)."""
+    a = shape.anchors
+    if a is None or "tympanum" not in a:
+        return d
+    for i, sx in enumerate((1, -1)):
+        c = a["tympanum"][i] + np.asarray((sx * 0.0032, 0.0, 0.0))
+        d = carve(d, ellipsoid(p, c, (0.004, 0.0085, 0.008)), 0.004)
     return d
+
+
+def tusks(shape, p):
+    """Two tusks from the lower jaw at the corners of the mouth, curving up and out in front of the upper lip (the
+    painter colours them with ``tusks``)."""
+    mw, ub = shape.mouth_w, shape.underbite
+    d = None
+    for sx in (1, -1):
+        base, mid, tip = ((sx * 0.0175 * mw, 0.083 + 0.007 * ub, -0.081), (sx * 0.021 * mw, 0.0925 + 0.004 * ub, -0.066),
+                          (sx * 0.0235 * mw, 0.0955 + 0.002 * ub, -0.0525))
+        t = smin(round_cone(p, base, mid, 0.0046, 0.0032), round_cone(p, mid, tip, 0.0032, 0.0011), 0.002)
+        d = t if d is None else np.minimum(d, t)
+    return d
+
+
+def with_tusks(shape, p, d):
+    return smin(d, tusks(shape, p), 0.0015)

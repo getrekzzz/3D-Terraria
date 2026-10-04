@@ -58,6 +58,35 @@ def mul(a, b):
     return tuple(x * y for x, y in zip(a, b))
 
 
+def brow_arch(x, fem):
+    """Height above the eye's centre (head-local) of the brow's middle line, ``x`` along it from the eye's centre
+    toward the temple: a man's lies low and nearly level, a woman's arches higher over the outer third and tapers."""
+    if fem:
+        return 0.0172 + 0.005 * math.sin((x + 0.014) / 0.034 * math.pi)
+    return 0.0165 + 0.0035 * math.sin((x + 0.012) / 0.03 * math.pi)
+
+
+def human_skin(rgb) -> bool:
+    """Whether a skin colour is one a person has (warm, moderately saturated) rather than a creature's green, blue,
+    purple, grey or deep red."""
+    r, g, b = rgb
+    hi, lo = max(rgb), min(rgb)
+    if not (r >= g >= b) or hi <= 0 or hi == lo:
+        return False
+    return 4.0 <= 60.0 * (g - b) / (hi - lo) <= 50.0 and 0.1 <= (hi - lo) / hi <= 0.75
+
+
+def brow_color(p, hair):
+    """The brows' colour (``hair``'s on a person), or None for none. ``brows`` sets it ("none" for none); on a
+    creature's skin with no hair showing they are the skin's own colour, darker, instead of a person's brown."""
+    if "brows" in p:
+        return None if p["brows"] == "none" else p["brows"]
+    skin = hex3(p.get("skin", "#e0b090"))
+    if human_skin(skin) or (p.get("hairStyle") != "bald" and p.get("hat") != "hood"):
+        return hair
+    return "#" + "".join(f"{round(c * 0.48 * 255):02x}" for c in skin)
+
+
 class SkinPainter:
     def __init__(self, frame, head, p):
         self.frame = frame
@@ -65,10 +94,13 @@ class SkinPainter:
         self.p = p
         self.skin = hex3(p.get("skin", "#e0b090"))
         self.hair = hex3(p.get("hair", "#4a3020"))
+        brows = brow_color(p, p.get("hair", "#4a3020"))
+        self.brows = hex3(brows) if brows else None
         self.stubble = not frame.female and "beard" not in p and p.get("stubble", True) and not p.get("undead")
         from .beard import STYLES as BEARDS
         self.beard = (hex3(p["beard"]), BEARDS[p.get("beardStyle", "full")]) if "beard" in p else None
         self.undead = bool(p.get("undead"))
+        self.tusks = hex3(p["tusks"]) if p.get("tusks") else None
         # Skin under the hair takes the hair colour, so the scalp never reads as a bald patch where the hair shell
         # thins (distance LOD simplification, extreme head poses).
         style = p.get("hairStyle", "long" if frame.female else "short")
@@ -92,6 +124,10 @@ class SkinPainter:
         q = self.head.local(co)
         c = self.skin
         # Lips: the sculpted lips' own surface, redder and a little darker, with a crisp vermilion border.
+        if self.tusks and q.y > 0.075 and -0.09 < q.z < -0.045:
+            from .creature import tusks
+            if float(tusks(self.head.shape, np.asarray([q], dtype=np.float32))[0]) < 0.0004:
+                return self.tusks
         lip_d = float(self.head.shape.lips(np.asarray([q], dtype=np.float32))[0]) if q.y > 0.075 and q.z < -0.05 else 1.0
         lip = 1.0 - smooth(0.0002, 0.001, lip_d)
         tone = (0.9, 0.62, 0.64) if self.frame.female else (0.92, 0.72, 0.72)
@@ -107,12 +143,12 @@ class SkinPainter:
             c = mix(c, mul(c, (0.86, 0.8, 0.82)), lid * (0.85 if self.undead else 0.5))
             if self.undead:
                 c = mix(c, mul(c, (0.45, 0.4, 0.42)), gauss(math.hypot(d.x, d.z), 0.02) * 0.7)   # sunken, bruised sockets
-            # Painted brow (strands are added on top).
+            # Painted brow (strands are added on top), finer on a woman; none where the brows are "none".
             x = d.x * sx
-            arch = 0.0165 + 0.0035 * math.sin((x + 0.012) / 0.03 * math.pi)
-            if -0.018 < x < 0.024 and q.y > 0.06:
-                brow = gauss((d.z - arch) / 0.0042, 1.0) * (1.0 - max(0.0, (x - 0.014) / 0.012))
-                c = mix(c, self.hair, max(0.0, min(brow, 1.0)) * 0.7)
+            if self.brows is not None and -0.018 < x < 0.024 and q.y > 0.06:
+                fem = self.frame.female
+                brow = gauss((d.z - brow_arch(x, fem)) / (0.003 if fem else 0.0042), 1.0) * (1.0 - max(0.0, (x - 0.014) / 0.012))
+                c = mix(c, self.brows, max(0.0, min(brow, 1.0)) * 0.7)
         if self.stubble or self.beard:
             from .beard import STYLES, coverages
             qa = np.asarray([q], dtype=np.float32)

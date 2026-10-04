@@ -33,10 +33,12 @@ every tile object, item and enemy has a generator (no Blender needed).
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
 weight, age, sex; muscle and fat above average add visible mass), metaball body, a head sculpted as a signed
-distance field (`headshape.py`, `earshape.py`, `creature.py`, meshed by `sdf.py`/`fieldmesh.py` with the meshes
-cached in `tools/blender/_cache`, not committed: skull, cheekbones, jaw, almond eyelids with creases, a nose with
-wings and nostrils, lips with a cupid's bow, rolled ears; aging for old characters; creature params for goblin and
-elf ears, long noses, heavy brows and jaws and a reptile's snout) with separate eyeballs, brows and lashes; hands
+distance field (`headshape.py` puts together `faceforms.py`: skull, cheekbones, cheeks and a lofted lower face with
+a clean jaw line, softer and narrower on women, fuller with weight, sagging with age; `nosemouth.py`: a nose in one
+piece with wings and nostrils, lips with a cupid's bow; `earshape.py`: rolled ears; `creature.py`; almond eyelids with
+creases; meshed by `sdf.py`/`fieldmesh.py` with the meshes cached in `tools/blender/_cache`, not committed; creature
+params for goblin and elf ears, long or wide noses, wide mouths, heavy brows and jaws, an underbite with tusks and a
+reptile's snout) with separate eyeballs, brows and lashes; hands
 with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble); hair sculpted from traced locks into
 one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows, `hairsdf.py`
 blends them into clumps with UVs along the flow; long hair and ponytails hang onto the shoulders, back and clothes,

@@ -10,7 +10,7 @@ import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
-from .paint import hex3
+from .paint import brow_arch, hex3
 
 EAR_ZONE = ((-0.0125, -0.019), (0.0245, 0.042))   # (y, z) centre and radii of the hair-free zone round each ear
 
@@ -105,19 +105,21 @@ def brows_and_lashes(head, head_obj, hair_color, lash_color="#1a1412"):
             loop[uv].uv = u
             loop[col] = (*color, 1.0)
 
+    fem = head.frame.female        # a woman's brows are finer and more arched, her lashes longer
     for sx in (1, -1):
         e = head.local(head.eyes[sx])
         for _ in range(70):
             x = rng.uniform(-0.016, 0.024)
-            arch = 0.0165 + 0.0035 * math.sin((x + 0.012) / 0.03 * math.pi)
-            z = arch + rng.gauss(0, 0.0017) * (1.0 - 0.4 * max(0.0, x / 0.024))
+            arch = brow_arch(x, fem)
+            z = arch + rng.gauss(0, 0.0017) * (0.55 if fem else 1.0) * (1.0 - 0.4 * max(0.0, x / 0.024))
             origin = head.at((e.x + sx * x, 0.14, e.z + z))
             hit, normal, _, _ = tree.ray_cast(origin, Vector((0, -1, 0)))
             if hit is None:
                 continue
             flow = Vector((sx * (0.9 if x > -0.008 else 0.4), 0, 0.35 if x < 0.01 else -0.15)).normalized()
             flow = (flow - normal * flow.dot(normal)).normalized()
-            strand(hit + normal * 0.0004 * h, flow, normal, rng.uniform(0.006, 0.009) * h, 0.0009 * h, brow)
+            strand(hit + normal * 0.0004 * h, flow, normal, rng.uniform(0.006, 0.009) * h * (0.8 if fem else 1.0),
+                   (0.0007 if fem else 0.0009) * h, brow)
         # Upper lashes along the lid margin, curling up and out, longest toward the outer corner.
         shape = head.shape
         rs = shape.Rs
@@ -128,6 +130,7 @@ def brows_and_lashes(head, head_obj, hair_color, lash_color="#1a1412"):
             w = math.sqrt(max(rs * rs - u * u - v * v, 0.0))
             p = head.at((e.x + sx * u, e.y + w - 0.0004, e.z + v))
             d = Vector((sx * u * 10, 1.0, 1.1)).normalized()
-            strand(p, d, Vector((0, 1, 0.2)).normalized(), 0.0062 * h * (0.55 + 0.45 * math.sin(math.pi * min(1.0, t * 1.15))), 0.0009 * h, lash)
+            strand(p, d, Vector((0, 1, 0.2)).normalized(), (0.0076 if fem else 0.0052) * h * (0.55 + 0.45 * math.sin(math.pi * min(1.0, t * 1.15))),
+                   0.0009 * h, lash)
     obj = mesh_from(bm, "brows")
     return obj

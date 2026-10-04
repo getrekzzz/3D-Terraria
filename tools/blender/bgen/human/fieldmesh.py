@@ -26,8 +26,14 @@ def _beautify(me, flat=0.2):
     bm.free()
 
 
+HEAD_PARTS = ("faceforms.py", "nosemouth.py")      # the modules headshape builds the head's field from
+
+
 def cache_file(kind, key, sources):
-    src = b"".join((HERE / name).read_bytes() for name in sorted(set(sources) | {"sdf.py", "fieldmesh.py"}))
+    names = set(sources) | {"sdf.py", "fieldmesh.py"}
+    if "headshape.py" in names:       # everything meshed over the head changes with the face's forms too
+        names |= set(HEAD_PARTS)
+    src = b"".join((HERE / name).read_bytes() for name in sorted(names))
     digest = hashlib.sha1(repr(key).encode() + src).hexdigest()[:20]
     return HERE.parents[1] / "_cache" / kind / f"{digest}.npz"
 

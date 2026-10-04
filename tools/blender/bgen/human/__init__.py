@@ -21,11 +21,11 @@ hairTie (a ponytail's or bun's tie, default a darker shirt).
 Build and weight above average (0.5, 0.45) add mass: muscle broadens the shoulders, back and chest and thickens the
 limbs and neck; fat adds a round belly, love handles, a fuller chest, heavy limbs and a thick neck.
 
-Creature heads (defaults give a person's head): headSize (head scale against the body, 1), earSize (1; 0 leaves only
-a recessed ear opening, as on reptiles), earPoint (0 round .. 1 an elf's pointed tip .. 2 a goblin's long blade),
-earFlare (0 flat to the head .. 1 standing out sideways), noseLength (1; longer projects further to a drooping
-point), brow (0 .. 1 a heavy jutting brow ridge), jaw (0 .. 1 a wide heavy jaw and chin), snout (0 .. 1 a reptile's
-snout in place of nose and mouth).
+Creature heads (defaults give a person's head, headshape.py): headSize (head scale against the body, 1; above 1 it
+sinks onto a shorter neck), earSize (1; 0 leaves only a recessed ear opening, as on reptiles), earPoint (0 round .. 1
+an elf's pointed tip .. 2 a goblin's long blade), earFlare (0 flat to the head .. 1 standing out sideways), noseLength
+(1; longer projects further to a drooping point), noseWidth (1), mouthWidth (1), brow (0 .. 1 a heavy jutting brow
+ridge), jaw (0 .. 1 a wide heavy jaw and chin), underbite (0 .. 1), tusks (a colour), snout (0 .. 1 a reptile's snout).
 
 Monsters: face (cyclops | brute | ghoul | void, monsterface.py), sleeves (long, short or 0..1 down the arm), shirt/pants
 none (bare), snakes (snakehair.py), wisps (spectre.py), tribalMask, headdress, beads, grassSkirt, bodyPaint
@@ -49,7 +49,7 @@ from .blobs import Blob
 from .body import build_body
 from .hands import build_hand
 from .head import Head
-from .paint import SkinPainter, flat, paint
+from .paint import SkinPainter, brow_color, flat, paint
 
 
 # Material slots the game's character shader understands (game/Rendering/PropLibrary.cs).
@@ -339,8 +339,8 @@ def groom(fr, head, parts, p, lookup=None, worn=(), bare=None):
     if "beard" in p:
         under = [parts["body"]] + [o for o in worn if not o.name.startswith(("hat_", "mask", "horns", "wings", "tail"))]
         out.append(beard.grow(head, p, under))
-    if p.get("brows") != "none":       # (reptiles have neither brows nor lashes)
-        out.append(hair.brows_and_lashes(head, parts["head"], p.get("brows", color)))
+    if (brows := brow_color(p, color)) is not None:     # (reptiles have neither brows nor lashes)
+        out.append(hair.brows_and_lashes(head, parts["head"], brows))
     for o in out:
         set_material(o, "char:cloth" if o.name.startswith("hair_tie") else "char:hair")
         if lookup is not None:

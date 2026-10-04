@@ -1,6 +1,7 @@
 """The ears as part of the head's signed distance field (head-local units): a thin pinna leaning back and flaring
-away from the head toward its rim, with a rolled helix, the Y of the antihelix, the bowl of the concha leading
-into the ear canal, tragus and antitragus, and a soft lobe; the front edge grows out of the side of the head.
+away from the head toward its rim, with a rolled helix, the Y of the antihelix, the bowl of the concha deepening
+toward the tragus (no open canal, which reads as a stud), the antitragus and a soft lobe; the front edge grows out of
+the side of the head.
 
 Creatures reshape them: ``size`` scales the whole ear, ``point`` draws the top of the pinna up and back into a
 tapered blade with the helix rolled along both its edges (elves, imps, goblins), ``flare`` swings the ear out from the
@@ -26,7 +27,7 @@ class Ear:
         k = (0.94 if fem else 1.0) * size        # women's ears are a little smaller
         self.k = k
         self.point = point
-        self.root = np.asarray((sx * 0.071, -0.003, -0.016 + 0.008 * (size - 1.0)))
+        self.root = np.asarray((sx * 0.0675, -0.003, -0.016 + 0.008 * (size - 1.0)))
         n = np.asarray((sx * 0.95, 0.31, 0.0))  # the pinna faces out and a little forward (flares at the back)
         n = n / np.linalg.norm(n)
         self.u = UP / np.linalg.norm(UP)
@@ -94,17 +95,21 @@ class Ear:
         anti = smin(anti, self._tube(p, [(-0.014, 0.014, 0.0095), (-0.004, 0.015, 0.0085), (0.001, 0.013, 0.007)],
                                      [0.0018, 0.0016, 0.0011]), 0.002)
         ear = smin(ear, anti, 0.003)
-        ear = smin(ear, ellipsoid(p, self.at(0.004, -0.007, 0.006), (0.0032 * k, 0.0045 * k, 0.003 * k), self.rot), 0.003)    # tragus
+        # Tragus: a low flap on the front edge, grown from the cheek.
+        ear = smin(ear, ellipsoid(p, self.at(0.0058, -0.0065, 0.0045), (0.0036 * k, 0.0048 * k, 0.0026 * k), self.rot), 0.0035)
         ear = smin(ear, ellipsoid(p, self.at(-0.015, -0.016, 0.0085), (0.003 * k, 0.0026 * k, 0.0024 * k), self.rot), 0.003)  # antitragus
         # The front edge grows out of the head; the back stands off it over a soft fold.
         d = smin(d, ear, 0.005)
-        # Concha: the bowl in front of the antihelix, deepening into the ear canal behind the tragus.
+        # Concha: the bowl in front of the antihelix, deepening softly behind the tragus.
         d = carve(d, ellipsoid(p, self.at(-0.006, -0.004, 0.0105), (0.0078 * k, 0.0092 * k, 0.0062 * k), self.rot), 0.0025)
-        d = carve(d, ellipsoid(p, self.at(-0.0005, -0.006, 0.0035), (0.0028 * k, 0.0034 * k, 0.0055 * k), self.rot), 0.0015)
-        # Scapha and triangular fossa: the shallow channels inside the rim (a pointed ear's blade keeps only the lower).
+        # (no round canal hole: it reads as a stud) the bowl just deepens softly toward the tragus
+        d = carve(d, ellipsoid(p, self.at(-0.002, -0.0055, 0.007), (0.0042 * k, 0.0052 * k, 0.0034 * k), self.rot), 0.003)
+        # Scapha and triangular fossa: the shallow channels inside the rim. A pointed ear keeps only the scapha's lower
+        # part: the blade is too thin for channels, which would leave slots in its faces.
         scapha = [(-0.011, 0.028, 0.0115), (-0.02, 0.026, 0.0135), (-0.025, 0.016, 0.0145), (-0.025, 0.004, 0.0145), (-0.023, -0.006, 0.0135)]
         radii = [0.0015, 0.0019, 0.002, 0.0019, 0.0014]
         n = 2 if self.point > 0 else 0
         d = carve(d, self._tube(p, scapha[n:], radii[n:]), 0.0018)
-        d = carve(d, self._tube(p, [(-0.012, 0.02, 0.0118), (-0.006, 0.019, 0.0112)], [0.0014, 0.0011]), 0.0014)
+        if self.point <= 0:
+            d = carve(d, self._tube(p, [(-0.012, 0.02, 0.0118), (-0.006, 0.019, 0.0112)], [0.0014, 0.0011]), 0.0014)
         return d

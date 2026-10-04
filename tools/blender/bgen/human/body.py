@@ -34,6 +34,9 @@ def build_body(frame, blob: Blob, feet=True):
     bulk = max(0.0, frame.build - 0.5) * 2.0
     fat = max(0.0, frame.weight - 0.45) / 0.55
     old = 0.93 if frame.old else 1.0
+    # A man's waist runs nearly straight from his ribs to his hips; a lean one (weight under average) also has flat
+    # pectorals and buttocks: thinning him must not pinch his waist or leave rounded masses on his chest.
+    lean = 0.0 if fem else max(0.0, 0.45 - frame.weight) / 0.45
     B = blob
 
     def e(c, r, rot=None, neg=False, stiffness=2.0):
@@ -47,18 +50,18 @@ def build_body(frame, blob: Blob, feet=True):
                               0.095 * (1 + 0.14 * bulk + 0.1 * fat), 0.118))                                  # upper thorax
     e(at((0, -0.006, 1.225)), ((0.118 if fem else 0.128) * f ** 0.5 * (1 + 0.06 * bulk + 0.12 * fat),
                                0.096 * f ** 0.6 * (1 + 0.1 * bulk + 0.12 * fat), 0.1))                         # lower ribs
-    e(at((0, 0.012, 1.1)), ((0.106 if fem else 0.112) * f ** 0.9 * (1 + 0.22 * fat), 0.088 * f * (1 + 0.08 * fat), 0.105))  # abdomen
+    e(at((0, 0.012, 1.1)), ((0.106 * f ** 0.9 if fem else 0.12 * f ** 0.6) * (1 + 0.22 * fat), 0.088 * f * (1 + 0.08 * fat), 0.105))  # abdomen
     if fat > 0:
         # Belly: a round mass carried in front, low, sagging a little over the belt.
         g, fw = min(1.0, fat * 3.0), fat ** 0.7
         e(at((0, 0.035 + 0.06 * fw, 1.08 - 0.02 * fat)), ((0.1 + 0.05 * fat) * g, (0.055 + 0.09 * fw) * g, (0.09 + 0.035 * fat) * g))
-    e(at((0, -0.012, 0.978)), ((0.158 if fem else 0.136) * f ** 0.7 * (1 + 0.1 * fat), 0.092 * f ** 0.6 * (1 + 0.1 * fat), 0.09))  # pelvis
+    e(at((0, -0.012, 0.978)), ((0.158 if fem else 0.136) * f ** 0.7 * (1 + 0.1 * fat - 0.08 * lean), 0.092 * f ** 0.6 * (1 + 0.1 * fat), 0.09))  # pelvis
     for sx in (-1, 1):
         side = "R" if sx > 0 else "L"
-        e(at((sx * (0.068 if fem else 0.062), -0.06, 0.925)), ((0.09 if fem else 0.076) * f ** 0.6 * (1 + 0.12 * fat),
-                                                               (0.082 if fem else 0.07) * (1 + 0.15 * fat), 0.088))  # glutes
+        e(at((sx * (0.068 if fem else 0.062 - 0.012 * lean), -0.06, 0.925)), ((0.09 if fem else 0.076) * f ** 0.6 * (1 + 0.12 * fat),
+                                                               (0.082 if fem else 0.07 * (1 - 0.15 * lean)) * (1 + 0.15 * fat), 0.088))  # glutes
         # Flanks, thickening into love handles (on women lower, where the waist turns into the hips).
-        e(at((sx * ((0.1 if fem else 0.096) + 0.012 * fat), 0.0, 1.02 if fem else 1.035)),
+        e(at((sx * ((0.1 if fem else 0.096) + 0.012 * fat), 0.0, 1.02 if fem else 1.05)),
           ((0.04 if fem else 0.038) * f * (1 + 0.5 * fat), 0.068 * f ** 0.8 * (1 + 0.25 * fat), 0.07))
         e(at((sx * (0.08 + 0.012 * bulk), -0.055, 1.28)), (0.11 * m, 0.04 * (1 + 0.3 * bulk), 0.045 * m * (1 + 0.35 * bulk)),
           limb_rotation(Vector((sx * 0.15, 0, -1))))                                                            # lats
@@ -70,7 +73,9 @@ def build_body(frame, blob: Blob, feet=True):
             e(at((sx * 0.07, 0.058, 1.262)), (0.064 * f ** 0.5, 0.058 * f ** 0.6, 0.058 * f ** 0.4),
               limb_rotation(Vector((sx * 0.3, 1, -0.3))), stiffness=1.6)
         else:
-            e(at((sx * 0.066, 0.05, 1.34)), (0.08 * m * (1 + 0.1 * bulk), 0.027 * m * (1 + 0.3 * bulk) + 0.022 * fat, 0.056 * m * (1 + 0.1 * fat)),
+            pk = 1 - 0.15 * lean            # (broad and thin: a small element would leave a mound)
+            e(at((sx * 0.066, 0.05 - 0.02 * lean, 1.34 + 0.01 * lean)),
+              (0.08 * m * pk * (1 + 0.1 * bulk), 0.027 * m * (1 + 0.3 * bulk - 0.5 * lean) + 0.022 * fat, 0.056 * m * pk * (1 + 0.1 * fat)),
               limb_rotation(Vector((sx, 0.12, -0.3))))                                                          # pectorals
         # Collarbone, from the top of the sternum (which a stoop doesn't carry forward with the shoulders) out to the
         # shoulder, lying back over the rounded shoulder instead of standing out in front of it.
