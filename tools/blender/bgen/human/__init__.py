@@ -12,7 +12,8 @@ wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape
 default the hair's, or none), feet (talons: a bird's clawed feet in place of shod ones), talons (their colour),
 anatomy (human|skeleton: bones only, dressed when it has outfit parameters), undead, suit (true when the shirt, pants
 and boots stand for the creature's own body, coloured like its skin: they are cut skin-tight and melt into the skin
-at their edges, with no seams, folds, collar, cuffs, buttons, boot rims or soles, and no belt unless one is given).
+at their edges, with no seams, folds, collar, cuffs, buttons, boot rims or soles, and no belt unless one is given),
+hairTie (a ponytail's or bun's tie, default a darker shirt).
 
 Build and weight above average (0.5, 0.45) add mass: muscle broadens the shoulders, back and chest and thickens the
 limbs and neck; fat adds a round belly, love handles, a fuller chest, heavy limbs and a thick neck.
@@ -31,7 +32,7 @@ tailShape: devil (default), lizard, fox, wolf, snake (tails.py).
 """
 import bpy
 
-from . import accessories, apron, beard, hair, locks, motion, occlusion, rig
+from . import accessories, apron, beard, hair, locks, motion, occlusion, rig, underhat
 from . import frame as frame_mod
 from .garments import Wardrobe, strip_covered
 from .tatters import Tatters
@@ -44,6 +45,7 @@ from .paint import SkinPainter, flat, paint
 
 # Material slots the game's character shader understands (game/Rendering/PropLibrary.cs).
 SLOTS = {"char:skin", "char:eye", "char:hair", "char:nail", "char:cloth", "char:leather", "char:metal", "char:bone", "char:glow"}
+LOOSE = ("hat_", "mask", "horns", "wing", "tail")      # worn parts long hair does not rest on
 
 
 def validate_slots(objs):
@@ -182,8 +184,10 @@ def build(name: str, p: dict):
     for side, foot, claw in zip(("R", "L"), parts["feet"], parts["claws"]):
         from .talons import skin
         skin((foot, claw), arm, fr, side, tree, body_w)
+    from mathutils.bvhtree import BVHTree
+    bare = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())   # before the clothes strip what they cover
     extras = dress(fr, head, parts, p, (tree, body_w))
-    hair = groom(fr, head, parts, p, (tree, body_w), extras)
+    hair = groom(fr, head, parts, p, (tree, body_w), extras, bare)
     extras += hair + accessories.on_hair(head, parts, p, hair)
     objs = _all(parts) + extras
     for o in objs:
@@ -293,30 +297,47 @@ def dress(fr, head, parts, p, lookup=None):
     return out
 
 
-def groom(fr, head, parts, p, lookup=None, worn=()):
+def groom(fr, head, parts, p, lookup=None, worn=(), bare=None):
     """Hair, beard, brows and lashes, carried by the head; with the body's weights (``lookup``) hair that hangs
-    below the head follows the neck and shoulders instead. A long beard lies on the clothes ``worn``."""
+    below the head follows the neck and shoulders instead. Long hair and ponytails rest on the body (``bare``: a BVH
+    of it from before the clothes trimmed it) and on the clothes ``worn``, a long beard on the clothes."""
     style = p.get("hairStyle", "long" if fr.female else "short")
     color = p.get("hair", "#4a3020")
     out = []
     if style != "bald" and p.get("hat") != "hood":
-        from mathutils.bvhtree import BVHTree
-        hatted = accessories.trims_hair(p)
-        tree = BVHTree.FromObject(parts["body"], bpy.context.evaluated_depsgraph_get()) if style == "long" else None
+        hatted = underhat.UnderHat(head, p) if accessories.trims_hair(p) else None
+        body_tree = worn_tree = None
+        if style in ("long", "ponytail"):
+            from mathutils.bvhtree import BVHTree
+            body_tree = bare or BVHTree.FromObject(parts["body"], bpy.context.evaluated_depsgraph_get())
+            worn_tree = _tree([o for o in worn if o.type == "MESH" and not o.name.startswith(LOOSE)])
+        shirt = p.get("shirt", "#6a4a3a").lstrip("#")
+        tie = p.get("hairTie") or "#" + "".join(f"{int(int(shirt[i:i + 2], 16) * 0.55):02x}" for i in (0, 2, 4))
         seed = sum(ord(ch) for ch in f"{style}{p.get('skin', '')}")     # not the colour: same shape, shared mesh cache
-        out += locks.Groom(head, style, color, hatted, tree, seed).build(parts["head"])
+        out += locks.Groom(head, style, color, hatted, body_tree, seed, worn_tree, tie).build(parts["head"])
     if "beard" in p:
         under = [parts["body"]] + [o for o in worn if not o.name.startswith(("hat_", "mask", "horns", "wings", "tail"))]
         out.append(beard.grow(head, p, under))
     if p.get("brows") != "none":       # (reptiles have neither brows nor lashes)
         out.append(hair.brows_and_lashes(head, parts["head"], p.get("brows", color)))
     for o in out:
-        set_material(o, "char:hair")
+        set_material(o, "char:cloth" if o.name.startswith("hair_tie") else "char:hair")
         if lookup is not None:
             rig.head_weights(o, head, *lookup, torso_only=True)
         else:
             rig.rigid(o, "head")
     return out
+
+
+def _tree(objs):
+    """One BVH (world space) over several meshes, or None."""
+    from mathutils.bvhtree import BVHTree
+    verts, polys = [], []
+    for o in objs:
+        base = len(verts)
+        verts += [o.matrix_world @ v.co for v in o.data.vertices]
+        polys += [tuple(base + i for i in poly.vertices) for poly in o.data.polygons]
+    return BVHTree.FromPolygons(verts, polys) if polys else None
 
 
 def rest_uvs(obj):

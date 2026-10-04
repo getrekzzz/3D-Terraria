@@ -1,8 +1,14 @@
-"""Hair locks: where each lock of hair roots in the scalp and the path it takes in the style's flow (combed out from
-the crown, swept over the forehead from a side parting, parted and falling behind the shoulders, gathered back to a
-tie), traced over surfaces offset from the bare skull (headshape) so they hug it whatever the face looks like. Long
-hair falls free below the head, stays off the head and body and slides off the shoulders; tied hair ends in a
-ponytail or a bun. hairsdf sculpts the traced locks into the hair's mesh; a buzz cut is only a tinted cap.
+"""Hair locks: where each lock of hair roots in the scalp and the path it takes in the style's flow, traced over
+surfaces offset from the bare skull (headshape) so they hug it whatever the face looks like.
+
+- Short and messy hair is combed out from the crown, the fringe swept across from a side parting, the sideburns and
+  the nape lying down; locks that would run past the hairline or onto the ears stop there and lie close to the skin.
+- Long hair falls from a parting down the sides and back of the head (swept back from the forehead, never over the
+  face), hangs free below it framing the face, and drapes over the shoulders and down the back (hairdrape.py).
+- Tied hair is pulled back to a tie and ends in a ponytail or a bun (hairtails.py).
+- A buzz cut is a close crop: a tinted layer on the scalp that thins into the skin at the hairline.
+
+hairsdf sculpts the traced locks into the hair's mesh.
 """
 import math
 from dataclasses import dataclass
@@ -12,7 +18,9 @@ import numpy as np
 from mathutils import Vector
 
 from . import sdf
-from .hair import coverage, ear_clear, hairline, mesh_from
+from .hairdrape import Drape
+from .hair import coverage, coverages, ear_clear, hairline, hairlines, mesh_from
+from .hairsdf import Strands
 from .paint import hex3
 
 F = np.float32
@@ -34,12 +42,12 @@ class Style:
 
 
 STYLES = {
-    "short": Style(0.003, 0.008, 0.07, 0.25, 0.02, 0.008, 110, 0.8, 0.05),
-    "messy": Style(0.003, 0.01, 0.075, 0.4, 0.019, 0.0085, 120, 0.4, 0.6),
-    "long": Style(0.003, 0.005, 0.1, 0.15, 0.026, 0.011, 190, 0.55, 0.08, fall=0.3),
-    "ponytail": Style(0.0025, 0.003, 0.0, 0.0, 0.02, 0.006, 110, 0.0, 0.03, tie=(0.0, -0.098, 0.036)),
-    "bun": Style(0.0025, 0.003, 0.0, 0.0, 0.02, 0.006, 110, 0.0, 0.03, tie=(0.0, -0.084, 0.074)),
-    "buzz": Style(0.0012, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
+    "short": Style(0.003, 0.007, 0.075, 0.2, 0.023, 0.009, 100, 0.8, 0.04),
+    "messy": Style(0.003, 0.009, 0.08, 0.3, 0.022, 0.0095, 105, 0.4, 0.45),
+    "long": Style(0.003, 0.004, 0.11, 0.1, 0.048, 0.019, 150, 0.55, 0.05, fall=0.36),
+    "ponytail": Style(0.0025, 0.002, 0.0, 0.0, 0.024, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.1, 0.035)),
+    "bun": Style(0.0025, 0.002, 0.0, 0.0, 0.024, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.1, 0.045)),
+    "buzz": Style(0.0007, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
 }
 
 DOWN = np.asarray((0.0, 0.0, -1.0), dtype=F)
@@ -57,7 +65,7 @@ def _unit(v):
 class Groom:
     RINGS = 8
 
-    def __init__(self, head, style, color, under_hat=False, body_tree=None, seed=1):
+    def __init__(self, head, style, color, under_hat=None, body_tree=None, seed=1, worn_tree=None, tie_color=None):
         self.head = head
         self.st = STYLES[style]
         # Hair is laid over the bare skull (short hair grows round the ears, so it ignores them; long hair falls over
@@ -66,20 +74,30 @@ class Groom:
         self.field = self.full if self.st.fall else (lambda p: head.shape.field(p, ears=False, face=False))
         self.name = style
         self.color = hex3(color)
-        self.under_hat = under_hat
-        self.body = body_tree                      # BVH of the body (world space): long hair rests on the shoulders
+        self.tie_color = hex3(tie_color) if tie_color else tuple(c * 0.45 for c in self.color)
+        self.under_hat = under_hat                          # the hat it is cut back under (underhat), or None
+        self.drape = Drape(self, body_tree, worn_tree)     # long hair and tails rest on the body and its clothes
         self.rng = np.random.default_rng(seed)
         self.part = self.st.sweep
+        self.part_x = 0.018 * self.part                     # where long hair parts (head-local x)
         self.sideburns = not (head.frame.female or self.st.tie)
-        # Under a hat a bun is worn low at the nape, below the band.
-        self.tie = (0.0, -0.09, -0.016) if under_hat and style == "bun" else self.st.tie
+        # Under a hat tied hair is gathered low at the nape, below the band.
+        nape = min(-0.03, float(under_hat.edge_at((0.0, -0.1, 0.0))[0]) - 0.035) if under_hat else 0.0
+        self.tie = (0.0, -0.09, nape) if under_hat and self.st.tie else self.st.tie
         side = 1.0 if self.part >= 0 else -1.0
         self.crown = np.asarray((0.012 * side, -0.045, 0.088), dtype=F)
         self.phase = self.rng.uniform(0, 6.3, 3)
 
     # ------------------------------------------------------------------ surfaces
-    def _normal(self, p):
-        return _unit(sdf.gradient(self.field, np.ascontiguousarray(p, dtype=F), F(0.0006)))
+    def top(self, p):
+        """How high hair grows at each point's azimuth: all over, or only a little way up under a hat."""
+        p = np.asarray(p, dtype=float).reshape(-1, 3)
+        return self.under_hat.top(p) if self.under_hat else np.full(len(p), 1.0)
+
+    def _normal(self, p, skull=False):
+        """Out from the surface hair is laid over at p (``skull``: from the bare skull, ignoring the ears)."""
+        f = (lambda q: self.head.shape.field(q, ears=False, face=False)) if skull else self.field
+        return _unit(sdf.gradient(f, np.ascontiguousarray(p, dtype=F), F(0.0006)))
 
     def _onto(self, p, height, steps=3):
         """Points moved onto the surface ``height`` (per point) above the skin."""
@@ -93,14 +111,17 @@ class Groom:
     def height(self, p, layer=0.0, t=1.0):
         """Where hair lies, above the skin: with ``t`` None the layer under the clumps (fuller over the top and
         front); otherwise a clump's middle (``t`` 0 at its root .. 1 at its tip), which rises out of that layer and
-        settles back toward it, a little higher for the upper layers, so clumps overlap like combed hair."""
+        settles back toward it, a little higher for the upper layers, so clumps overlap like combed hair. Past the
+        hairline hair lies down close to the skin."""
         top = _ss(-0.01, 0.08, p[:, 2]) * _ss(-0.05, 0.04, p[:, 1])
         base = self.st.cap + self.st.volume * top
         if t is None:
             return base.astype(F)
+        lie = 0.3 + 0.7 * coverages(p, self.part, self.sideburns, 0.012)
         t = np.asarray(t, dtype=F)
         arch = np.maximum(np.sin(np.pi * np.clip(t, 0, 1) ** 0.8), 0.0) ** 0.6   # (sin of pi in float32 is just below 0)
-        return (base + self.st.thick * (arch * (0.1 + layer * 0.12) - 0.6 * (1 - t) ** 3)).astype(F)
+        rise = 0.35 if self.tie is not None else 1.0       # hair pulled back lies flat
+        return (base * lie + self.st.thick * lie * (arch * (0.1 + layer * 0.12) * rise - 0.6 * (1 - t) ** 3)).astype(F)
 
     def _grows(self, q, slack=0.0):
         return coverage(Vector(q), self.part, self.sideburns, 0.002) > 0.5 if slack == 0 else (
@@ -108,7 +129,10 @@ class Groom:
 
     # ------------------------------------------------------------------ roots and flow
     def roots(self):
-        """Lock roots spread evenly over the part of the scalp that grows hair (a jittered spiral of directions)."""
+        """Lock roots spread evenly over the part of the scalp that grows hair (a jittered spiral of directions); for
+        hair pulled back to a tie, rows just inside the hairline all round, so the locks sweep back from it unbroken."""
+        if self.tie is not None:
+            return self._rows()
         n = int(self.st.count / 0.4)
         i = np.arange(n) + 0.5
         z = 1 - 2 * i / n
@@ -116,182 +140,123 @@ class Groom:
         dirs = np.stack([np.sqrt(1 - z * z) * np.cos(a), np.sqrt(1 - z * z) * np.sin(a), z], 1)
         dirs = _unit(dirs + self.rng.normal(0, 0.9 / math.sqrt(n), dirs.shape))
         p = self._onto(np.asarray((0, -0.01, 0.0)) + dirs * 0.13, self.st.cap * 0.5, steps=5)
-        keep = np.array([self._grows(q) and not (self.under_hat and q[2] > 0.03) for q in p])
+        keep = np.array([self._grows(q) for q in p]) & (p[:, 2] < self.top(p))
         return p[keep]
+
+    def _rows(self):
+        out = []
+        for dz, n in ((0.005, 40), (0.024, 30), (0.048, 22)):
+            phi = (np.arange(n) + self.rng.uniform(-0.35, 0.35, n)) * (2 * math.pi / n) - math.pi
+            ring = np.stack([np.sin(phi) * 0.13, np.cos(phi) * 0.13, np.zeros(n)], 1)
+            z = hairlines(ring, self.part, self.sideburns) + dz
+            p = self._onto(np.stack([ring[:, 0], ring[:, 1] - 0.012, z], 1).astype(F), np.full(n, self.st.cap * 0.5), 8)
+            out += [q for q, t in zip(p, self.top(p)) if self._grows(q) and q[2] < t]
+        return np.asarray(out, dtype=F)
 
     def flow(self, p):
         """The direction hair lies at p (not yet in the surface's plane)."""
         st = self.st
-        if st.tie is not None:                     # gathered back to the tie
-            return _unit(np.asarray(self.tie, dtype=F) - p)
-        if st.fall:
-            # Parted: away from the parting and down the sides, the front swept back past the temples (never over the
-            # face), the back straight down.
-            s = np.where(p[:, 0] >= 0.016 * self.part, 1.0, -1.0)
-            front = _ss(-0.02, 0.06, p[:, 1])
-            back = _ss(-0.03, -0.08, p[:, 1])[:, None]
-            side = np.stack([s, -0.25 - 0.7 * front, np.full(len(p), -0.6)], 1)
-            down = np.stack([p[:, 0] * 2, np.full(len(p), -0.3), np.full(len(p), -1.0)], 1)
-            return (side * (1 - back) + down * back).astype(F)
-        # Combed out from the crown; over the forehead swept across, away from the parting.
+        if self.tie is not None:                   # gathered back to the tie
+            to = np.asarray(self.tie, dtype=F) - p
+            if self.under_hat:                     # low at the nape: round the sides from the front, not down the face
+                to[:, 0] += np.where(p[:, 0] < 0, F(-0.12), F(0.12)) * _ss(-0.03, 0.05, p[:, 1])
+            return _unit(to)
+        # Combed out from the crown; over the forehead swept across, away from the parting; the sideburns, the hair
+        # round the ears and the nape lie down.
         v = _unit(p - self.crown)
         front = _ss(-0.01, 0.05, p[:, 1]) * _ss(0.0, 0.07, p[:, 2])
         sweep = np.asarray((-math.copysign(1.0, self.part), 0.4, -0.15), dtype=F) * abs(self.part)
-        noise = np.stack([np.sin(p[:, 0] * 61 + p[:, 2] * 37 + self.phase[0]), np.sin(p[:, 1] * 53 + p[:, 0] * 29 + self.phase[1]),
+        low = (_ss(0.025, -0.015, p[:, 2]) * _ss(-0.06, -0.02, p[:, 1]))[:, None]
+        noise = np.stack([np.sin(p[:, 0] * 61 + p[:, 2] * 37 + self.phase[0]),
+                          np.sin(p[:, 1] * 53 + p[:, 0] * 29 + self.phase[1]),
                           np.sin(p[:, 2] * 47 + p[:, 1] * 31 + self.phase[2])], 1)
-        return v + front[:, None] * sweep * 1.3 + noise * st.mess * 0.6
+        f = v + front[:, None] * sweep * 1.3
+        return f * (1 - low) + (DOWN + np.asarray((0, -0.2, 0), dtype=F)) * low * 1.5 + noise * st.mess * 0.6
 
     # ------------------------------------------------------------------ tracing
-    def trace(self, start, lengths, layers, turn, hang=None, k_rings=None, hanging=False):
-        """Polylines (rings x locks x 3) from each start point, following the flow over the layer's surface; locks
-        marked by ``hang`` (a test on points) fall free once they reach it, staying off the head and the body and
-        sliding down over the shoulders, in front of them or behind (``hanging`` locks fall from the start, steered
-        only by ``turn``)."""
+    def trace(self, start, lengths, layers, turn, k_rings=None):
+        """Polylines (rings x locks x 3) from each start point, following the flow over the layer's surface."""
         K = k_rings or self.RINGS
         n = len(start)
         P = np.zeros((K, n, 3), dtype=F)
-        P[0] = start if hanging else self._onto(start, self.height(start, layers, 0.0))
+        P[0] = self._onto(start, self.height(start, layers, 0.0))
         step = (lengths / (K - 1)).astype(F)
-        lie = np.minimum(lengths, max(self.st.length, 0.05))        # how much of each lock lies on the head
-        lift = np.where(self.rng.random(n) < self.st.mess * 0.5, self.rng.uniform(0.002, 0.009, n), 0.0).astype(F)
-        free = np.full(n, hanging)
-        rest = np.zeros((n, 3), dtype=F)           # the body's normal under a lock resting on it
-        ahead = np.zeros(n)                        # +1 falls in front of the shoulder, -1 behind it
+        lie = np.maximum(lengths, 0.02)            # the whole lock arches a little off the head
+        lift = np.where(self.rng.random(n) < self.st.mess * 0.5, self.rng.uniform(0.002, 0.008, n), 0.0).astype(F)
         d = None
         for k in range(1, K):
             prev = P[k - 1]
             nrm = self._normal(prev)
-            f = (turn if hanging else self.flow(prev) + turn).copy()
-            f[free] = f[free] * ((0.6 if k == 1 else 0.15) if hanging else 0.25) + DOWN
-            on = free & (np.abs(rest).sum(1) > 0)
-            if on.any():                           # slide down the body: off the top of the shoulder to the front or
-                up = np.clip(rest[on, 2] * 2.0, 0.0, 1.0)   # back, and never in toward the neck
-                g = DOWN + np.stack([np.zeros(on.sum()), ahead[on] * 0.7 * up, np.zeros(on.sum())], 1)
-                g = g - rest[on] * np.einsum("ij,ij->i", g, rest[on])[:, None]
-                sx = np.sign(prev[on, 0])
-                g[:, 0] = sx * np.maximum(sx * g[:, 0], 0.0)
-                f[on] = g
-            f[~free] -= nrm[~free] * np.einsum("ij,ij->i", f[~free], nrm[~free])[:, None]
-            f = _unit(f)
+            f = self.flow(prev) + turn
+            f = _unit(f - nrm * np.einsum("ij,ij->i", f, nrm)[:, None])
             d = f if d is None else _unit(d * 0.45 + f * 0.55)
             q = prev + d * step[:, None]
-            hgt = self.height(q, layers, np.minimum(k * step / lie, 1.0)) + lift * (k / (K - 1)) ** 2
-            if (~free).any():
-                q[~free] = self._onto(q[~free], hgt[~free])
-            if free.any():
-                q[free], rest[free] = self._clear(q[free], hgt[free] + 0.004)
-            if hang is not None:
-                new = hang(q) & ~free
-                ahead[new] = np.where(q[new, 1] > 0.012, 1.0, -1.0)
-                free |= new
-            P[k] = q
+            P[k] = self._onto(q, self.height(q, layers, np.minimum(k * step / lie, 1.0)) + lift * (k / (K - 1)) ** 2)
         return P
-
-    def _clear(self, q, height):
-        """Hanging hair kept off the head (``height`` above it) and off the body and clothes; returns the points and
-        the body's normal where they rest on it (zero elsewhere)."""
-        inside = self.field(q) < height
-        if inside.any():
-            q[inside] = self._onto(q[inside], height[inside], steps=2)
-        rest = np.zeros_like(q)
-        if self.body is not None:
-            h, c = self.head.h, np.asarray(self.head.c)
-            gap = 0.026
-            for i in range(len(q)):
-                w = Vector(c + q[i] * h)
-                hit, normal, _, _ = self.body.find_nearest(w, 0.2)
-                if hit is not None and (w - hit).dot(normal) < gap:
-                    q[i] = (np.asarray(hit + normal * gap) - c) / h
-                    rest[i] = normal
-        return q, rest
 
     # ------------------------------------------------------------------ the parts
     def scalp_locks(self):
-        """The locks rooted over the scalp, trimmed where short hair would run past the hairline or onto the ears."""
+        """The locks rooted over the scalp: short hair trimmed where it would run past the hairline or onto the ears,
+        tied hair ending at the tie."""
         st = self.st
         roots = self.roots()
         n = len(roots)
-        if st.tie is not None:
-            lengths = np.linalg.norm(np.asarray(self.tie) - roots, axis=1) * 1.05
-        else:
-            top = _ss(0.0, 0.08, roots[:, 2]) * _ss(-0.06, 0.03, roots[:, 1])
-            lengths = st.length * (0.7 + 0.5 * top) * (1 + self.rng.uniform(-st.spread, st.spread, n))
-            if st.fall:
-                lengths = lengths + st.fall * self.head.frame.s / self.head.h * self.rng.uniform(0.75, 1.0, n) * (0.7 + 0.3 * _ss(-0.06, 0.04, -roots[:, 1]))
-        layers = self.rng.integers(0, 3, n).astype(F)
-        turn = self.rng.normal(0, 0.1 + 0.5 * st.mess, (n, 3)).astype(F)
-        hang = (lambda q: (q[:, 2] < -0.01) & ((np.abs(q[:, 0]) > 0.05) | (q[:, 1] < -0.02))) if st.fall else None
-        rings = 12 if st.fall else self.RINGS
-        P = self.trace(roots, lengths, layers, turn, hang, rings)
-        if not st.fall and st.tie is None:          # short hair: stop at the hairline (a fringe may overhang it)
-            slack = np.where(roots[:, 1] > 0.03, 0.012, 0.006)
-            cut = np.full(n, rings - 1)
-            for i in range(n):
-                for k in range(1, rings):
-                    if not self._grows(P[k, i], slack[i]):
-                        cut[i] = k
-                        break
-            short = cut < rings - 1
-            if short.any():
-                lengths[short] *= np.maximum(cut[short] - 0.6, 1.0) / (rings - 1)
-                P[:, short] = self.trace(roots[short], lengths[short], layers[short], turn[short], None, rings)
-        widths = st.width * self.rng.uniform(0.8, 1.15, n)
-        return P, widths, np.full(n, st.thick) * self.rng.uniform(0.85, 1.15, n)
-
-    def tail_locks(self):
-        """A ponytail: thick locks from the tie, out from the head and down the back."""
-        tie = self._onto(np.asarray([self.tie]), np.asarray([self.st.cap + 0.006]))
-        out = self._normal(tie)[0]
-        n = 15
-        a = self.rng.uniform(0, 2 * math.pi, n)
-        r = 0.006 * np.sqrt(self.rng.random(n))
-        u = _unit(np.cross(out, (1.0, 0.0, 0.0)))
-        v = np.cross(out, u)
-        start = tie + (np.cos(a) * r)[:, None] * u + (np.sin(a) * r)[:, None] * v + out * 0.004
-        lengths = self.rng.uniform(0.2, 0.26, n)
-        turn = (out * 1.6 + (np.cos(a)[:, None] * u + np.sin(a)[:, None] * v) * 0.3).astype(F)
-        P = self.trace(start, lengths, np.full(n, 2.0, dtype=F), turn, None, 10, hanging=True)
-        return P, self.rng.uniform(0.022, 0.028, n), self.rng.uniform(0.012, 0.016, n)
-
-    def bun_locks(self):
-        """A bun: a ball of hair at the back of the crown, its locks coiled round it in one direction."""
-        tie = self._onto(np.asarray([self.tie]), np.asarray([self.st.cap]))
-        out = self._normal(tie)[0]
-        centre = tie[0] + out * 0.024
-        u = _unit(np.cross(out, (1.0, 0.0, 0.0)))
-        v = np.cross(out, u)
-        n, K, r = 7, 14, 0.024
-        P = np.zeros((K, n + 1, 3), dtype=F)
+        top = _ss(0.0, 0.08, roots[:, 2]) * _ss(-0.06, 0.03, roots[:, 1])
+        lengths = st.length * (0.7 + 0.5 * top) * (1 + self.rng.uniform(-st.spread, st.spread, n))
+        crown = np.linalg.norm(roots - self.crown, axis=1)
+        layers = (2.0 * (1 - _ss(0.02, 0.12, crown)) + self.rng.uniform(0, 0.6, n)).astype(F)   # upstream locks on top
+        turn = self.rng.normal(0, 0.05 + 0.5 * st.mess, (n, 3)).astype(F)
+        widths = st.width * self.rng.uniform(0.85, 1.15, n)
+        thick = st.thick * self.rng.uniform(0.85, 1.15, n) * (0.7 if self.under_hat else 1.0)
+        rings = self.RINGS
+        if self.tie is not None:                   # over the skull to the tie: as long as the way there
+            rings = 10
+            far = np.linalg.norm(np.asarray(self.tie) - roots, axis=1) * 1.6
+            P = self.trace(roots, far, layers, turn, 16)
+            arc = np.concatenate([np.zeros((1, n)), np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=2), axis=0)])
+            near = np.argmin(np.linalg.norm(P - np.asarray(self.tie, dtype=F), axis=2), axis=0)
+            P = self.trace(roots, np.maximum(arc[near, np.arange(n)], 0.01), layers, turn, rings)
+            return Strands(P, widths, thick, taper=0.6, root=0.35)
+        # Every lock runs on to where the hair ends (a fringe may overhang the hairline), so the ends of the locks
+        # make the edge of the hair and the scalp shows long combed locks rather than rows of short ones.
+        slack = np.where(roots[:, 1] > 0.03, 0.012, 0.005)
+        K = 16
+        P = self.trace(roots, np.full(n, st.length * 2.4), layers, turn, K)
+        arc = np.concatenate([np.zeros((1, n)), np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=2), axis=0)])
+        edge = arc[-1].copy()
         for i in range(n):
-            a0 = 2 * math.pi * i / n + self.rng.uniform(-0.2, 0.2)
-            for k in range(K):
-                t = k / (K - 1)
-                a, lat = a0 + 1.4 * math.pi * t, -0.9 + 1.5 * t       # round the axis, from the base up over the top
-                P[k, i] = centre + (u * math.cos(a) + v * math.sin(a)) * r * math.cos(lat) + out * r * math.sin(lat)
-        P[:, n] = centre + out[None] * np.linspace(-0.01, 0.004, K)[:, None]     # the core the locks wrap
-        widths = np.r_[self.rng.uniform(0.024, 0.028, n), 0.046]
-        thick = np.r_[self.rng.uniform(0.012, 0.014, n), 0.044]
-        return P, widths, thick
+            for k in range(1, K):
+                if not self._grows(P[k, i], slack[i]):
+                    edge[i] = arc[k - 1, i] + 0.5 * (arc[k, i] - arc[k - 1, i])
+                    break
+        lengths = np.minimum(lengths * 2.0, edge * self.rng.uniform(0.88, 1.0, n))
+        keep = lengths > 0.02                       # nubs at the hairline: the locks from above cover it
+        rings = 10
+        P = self.trace(roots[keep], lengths[keep], layers[keep], turn[keep], rings)
+        return Strands(P, widths[keep], thick[keep], taper=0.55, root=0.5)
 
     def cap(self, head_obj):
-        """The hair's base: the scalp lifted a few millimetres, dark (the depth between locks), sinking into the skin
-        at the hairline."""
+        """A close crop: the scalp lifted a fraction of a millimetre, stippled like cropped hair, thinning into the
+        skin's own colour over a soft hairline."""
         bm = bmesh.new()
         bm.from_mesh(head_obj.data)
         drop = []
         for f in bm.faces:
             q = self.head.local(f.calc_center_median())
-            if coverage(q, self.part, self.sideburns, 0.009) < 0.03 or (self.under_hat and q.z > 0.05):
+            if coverage(q, self.part, self.sideburns, 0.012) < 0.02 or q.z > self.top(q)[0] + 0.005:
                 drop.append(f)
         bmesh.ops.delete(bm, geom=drop, context="FACES")
         bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
         bm.verts.ensure_lookup_table()
         q = np.array([self.head.local(v.co) for v in bm.verts], dtype=F)
-        cov = np.array([coverage(Vector(x), self.part, self.sideburns, 0.009) for x in q], dtype=F)
-        k = _ss(0.05, 0.95, cov)          # a gentle ramp, so the edge where it leaves the skin is a smooth line
-        q = self._onto(q, self.height(q, 0.0, None) * k - 0.001 * (1 - k))
+        cov = coverages(q, self.part, self.sideburns, 0.012).astype(F)
+        k = _ss(0.05, 0.95, cov)
+        grain = (np.sin(q @ np.asarray((12.9898, 78.233, 37.719), dtype=F) * 1000.0) * 43758.5453) % 1.0
+        q = self._onto(q, (self.st.cap + 0.00025 * (grain - 0.5)) * k - 0.0008 * (1 - k))
         for v, x in zip(bm.verts, q):
             v.co = self.head.at(x)
+        dens = dict(zip((v.index for v in bm.verts), _ss(0.0, 0.85, cov) * (0.86 + 0.14 * grain)))
+        shade = dict(zip((v.index for v in bm.verts), 0.8 + 0.2 * grain))
         uv = bm.loops.layers.uv.new("UVMap")
         col = bm.loops.layers.color.get("Color") or bm.loops.layers.color.new("Color")
         for f in bm.faces:
@@ -299,17 +264,33 @@ class Groom:
                 x = self.head.local(loop.vert.co)
                 d = np.asarray(x) - self.crown
                 loop[uv].uv = (float(np.linalg.norm(d)) * 10.0, math.atan2(d[0], -d[1]) * 0.3)
-                loop[col] = (*(c * 0.8 for c in self.color), 1.0)
+                skin = loop[col]
+                a, s = float(dens[loop.vert.index]), float(shade[loop.vert.index])
+                loop[col] = (*(c * s * 0.85 * a + sk * (1 - a) for c, sk in zip(self.color, skin[:3])), 1.0)
         return mesh_from(bm, "hair_cap")
 
     def build(self, head_obj):
-        """The style's hair: one sculpted mesh of clumps (hairsdf), or only the cap for a buzz cut."""
+        """The style's hair: one sculpted mesh of clumps (hairsdf) and, for tied hair, the band that ties it; or only
+        the cap for a buzz cut."""
         if self.st.count == 0:
             return [self.cap(head_obj)]
-        parts = [self.scalp_locks()]
-        if self.name == "ponytail":
-            parts.append(self.tail_locks())
-        elif self.name == "bun":
-            parts.append(self.bun_locks())
+        from . import hairtails
         from .hairsdf import Sculpt
-        return [Sculpt(self, parts).build()]
+        from .longhair import long_locks
+        parts, solids, extra = long_locks(self) if self.st.fall else [self.scalp_locks()], [], []
+        if self.name == "ponytail":
+            tail, gather, band = hairtails.ponytail(self)
+            parts.append(tail)
+            solids.append(gather)
+            extra.append(band)
+        elif self.name == "bun":
+            bun, core = hairtails.bun(self)
+            parts.append(bun)
+            solids += core
+        if self.st.fall:
+            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0012, 0.0042, 0.006), 0.005)
+        elif self.tie:
+            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0009, 0.002, 0.004))
+        else:
+            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0008, 0.0008, 0.0045), 0.0015)
+        return [sculpt.build()] + extra
