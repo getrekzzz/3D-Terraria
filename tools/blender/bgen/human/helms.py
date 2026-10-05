@@ -45,7 +45,7 @@ def _wrap(p, skull=False):
     """What the helmet's guard wraps: the cheeks and jaw, the ears and the nape, which it flares out over (a bare
     skull's narrower cheeks, and no ears)."""
     y, z = p[:, 1], p[:, 2]
-    q = (p - np.asarray((0, -0.02, -0.02), dtype=F)) / np.asarray((0.078 if skull else 0.09, 0.118, 0.1), dtype=F)
+    q = (p - np.asarray((0, -0.02, -0.02), dtype=F)) / np.asarray((0.085 if skull else 0.09, 0.118, 0.1), dtype=F)
     q[:, 1] *= np.where(q[:, 1] < 0, F(0.118 / 0.096), F(1))             # an egg in plan: narrower at the face
     wrap = (np.linalg.norm(q, axis=1) - F(1)) * F(0.09)
     (ex, ey, ez), er = EARS

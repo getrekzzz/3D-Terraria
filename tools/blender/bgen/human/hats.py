@@ -6,8 +6,8 @@ left below its band, a brim with thickness, curl and a bound edge, and a band ro
 - floppy: a battered slouch hat, the crown dented and leaning, the wide brim sagging in waves;
 - top: a top hat, its tall crown waisted and flaring a little, the narrow brim rolled up at the sides;
 - pointed: a wizard's hat, a tall cone that bends back and wrinkles where it bends, over a wide wavy brim;
-- tricorn: a low crown, its brim cocked up steeply on three sides and pinched into three low points, the front
-  one over the face, its edge bound with braid (no band);
+- tricorn: a low crown, its brim turned up all round into three walls about as high as the crown that meet in three
+  corners pointing out, the front one dipping over the face, its edge bound with braid (no band);
 - bucket: a fisherman's hat, a rounded crown over a short brim that slopes down;
 - mushroom: a mushroom's domed cap, its rim rolled under (the hat of a mushroom person);
 - shako: a soldier's (or nutcracker's) tall flaring cap with a peak, gold bands, a badge and a plume, worn as a cap.
@@ -20,10 +20,10 @@ from .headwear import _cranium, _rounded, _smooth
 from .sdf import F, carve, ellipsoid, gradient, smin, tube
 
 SHAPES = ("brim", "floppy", "top", "pointed", "tricorn", "bucket", "mushroom", "shako")
-TRICORN_CURL = 1.5      # how the tricorn brim turns up across it (higher: flatter by the crown, steeper at the edge)
+TRICORN_CURL = 1.15     # how the tricorn brim turns up across it (near 1: a straight wall up from the crown)
 # the band's height over the brim (shako: its lower band and the rim round its top); hatmesh lays it on the crown
 BAND = {"brim": ((0.0, 0.019),), "floppy": ((0.0, 0.016),), "top": ((0.0, 0.024),), "pointed": ((0.0, 0.02),),
-        "bucket": ((0.0, 0.014),), "shako": ((0.0, 0.014), (0.117, 0.129))}
+        "bucket": ((0.0, 0.014),), "shako": ((-0.0016, 0.014), (0.117, 0.129))}     # (the shako's down to its foot)
 # band height at the crown's centre (head-local z) and pitch (front up) per shape
 SEAT = {"brim": (0.044, 7), "floppy": (0.04, 4), "top": (0.046, 5), "pointed": (0.038, 6), "tricorn": (0.032, 8),
         "bucket": (0.036, 5), "mushroom": (0.074, 9), "shako": (0.04, 3)}
@@ -218,19 +218,20 @@ class Hat:
         return np.maximum(d + wr * (F(0.6) + F(0.4) * np.cos(ang)), -(z + F(0.002)))
 
     def _tricorn_shape(self, th):
-        """The tricorn brim's width and how high its edge is cocked up, round the crown (th, from the hat's x axis):
-        the corners (front, back left, back right) reach furthest and stay low, folded to soft points; between them the
-        brim is turned up steeply, highest mid-side."""
+        """The tricorn brim's width and how high its edge is turned up, round the crown (th, from the hat's x axis):
+        turned up all round into three walls standing close to the crown, about as high as it, that meet in three
+        corners (front, back left, back right) reaching further out, so the edge runs round a rounded triangle and
+        each corner is a fold pointing out; the front corner dips over the face."""
         c = th - F(math.pi / 2)                                    # 0 at the front corner
-        s = np.sin(F(1.5) * c)                                     # 0 at a corner .. 1 mid-side, the corner folds
+        s = np.sin(F(1.5) * c)                                     # 0 at a corner .. 1 mid-side
         side = (np.sqrt(s * s + F(0.0144)) - F(0.12)) / F(math.sqrt(1.0144) - 0.12)     # rounded (a crease shades jagged)
-        width = F(0.057) + F(0.035) * np.abs(np.cos(F(1.5) * c)) ** F(2.5)
-        low = F(0.014) - F(0.012) * np.clip(np.cos(c), 0, 1) ** 8   # the front point dips over the face
-        return width, low + (F(0.058) - low) * side ** F(0.7)
+        width = F(0.037) + F(0.05) * np.abs(np.cos(F(1.5) * c)) ** F(2.5)
+        corner = F(0.058) - F(0.026) * np.clip(np.cos(c), 0, 1) ** 8    # the corners' height: the front one lower
+        return width, corner + (F(0.074) - corner) * side ** F(0.7)
 
     def _tricorn(self, p, q):
-        """A low crown and its brim cocked up on three sides into three points, the front one over the face."""
-        c = self.liner(p, q, self.crown(q, self.height(0.064, 0.02), taper=-0.12, rr=0.034))
+        """A low crown, its brim turned up into three walls meeting in three corners, the front one over the face."""
+        c = self.liner(p, q, self.crown(q, self.height(0.052, 0.014), taper=0.0, rr=0.018))
 
         def width(th):
             return self._tricorn_shape(th)[0]

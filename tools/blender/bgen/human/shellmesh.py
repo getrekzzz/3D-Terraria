@@ -7,12 +7,13 @@ import numpy as np
 from .sdf import F
 
 
-def refine(obj, field, longest=0.008, rounds=3, budget=1.6, cuts=(), normals=True):
+def refine(obj, field, longest=0.008, rounds=3, budget=1.6, cuts=(), normals=True, fine=0.0016, grow=0.2):
     """Splits the long slivers a reduction leaves across broad smooth areas (which smear the shading of a crease at
     one end along their whole length), the longest first and up to ``budget`` times the faces it starts with, and
     puts the new vertices back on the surface; then cuts the triangles along the zero set of each of ``cuts``
-    (functions of position, see ``cut``; the edges near each are split finer first) and shades the mesh from the
-    field."""
+    (functions of position, see ``cut``, or (function, edge length) pairs: the edges near each are split finer
+    first, by default down to 0.002 in up to 4 rounds, given a length down to it in up to 8) and shades the mesh from the field (bends are split evenly down to edges of
+    ``fine``, adding up to ``grow`` times more faces)."""
     import bmesh
     from . import sdf
     bm = bmesh.new()
@@ -40,6 +41,7 @@ def refine(obj, field, longest=0.008, rounds=3, budget=1.6, cuts=(), normals=Tru
             pts = _onto(field, np.asarray([v.co for v in new], dtype=F), np.asarray([v.normal for v in new], dtype=F) * F(out))
             for v, q in zip(new, pts):
                 v.co = q
+    _bends(bm, field, out, fine=fine, grow=grow)
     bmesh.ops.beautify_fill(bm, faces=bm.faces[:], edges=[e for e in bm.edges if e.is_manifold and e.calc_face_angle(1.0) < 0.12],
                             method="ANGLE")
     _clean(bm)
@@ -56,7 +58,8 @@ def refine(obj, field, longest=0.008, rounds=3, budget=1.6, cuts=(), normals=Tru
     for poly in me.polygons:
         poly.use_smooth = True
     for fn in cuts:
-        _densify(obj, field, fn, out)
+        fn, edge, rounds = (fn[0], fn[1], 8) if isinstance(fn, tuple) else (fn, 0.002, 4)
+        _densify(obj, field, fn, out, fine=edge, rounds=rounds)
         cut(obj, fn)
     if cuts:
         _drop_copies(obj)
@@ -64,6 +67,48 @@ def refine(obj, field, longest=0.008, rounds=3, budget=1.6, cuts=(), normals=Tru
         co = np.empty(len(me.vertices) * 3, dtype=np.float32)
         me.vertices.foreach_get("co", co)
         _field_normals(me, field, co.reshape(-1, 3), out)
+
+
+def _bends(bm, field, out, spread=0.06, fine=0.0016, rounds=3, grow=0.2):
+    """Splits the triangles across a bend (a rim, a rolled edge: their corners' normals spread by more than
+    ``spread`` radians) evenly down to ``fine``, the sharpest bends first and up to ``grow`` times more faces, the new
+    vertices put back on the surface: a highlight running along a bend follows the edges of the long triangles a
+    reduction lays there, in a wobbling streak."""
+    import bmesh
+    from . import sdf
+    lim = float(np.cos(spread))
+    cap = int(len(bm.faces) * (1 + grow))
+    for _ in range(rounds):
+        bm.verts.index_update()
+        bm.edges.index_update()
+        co = np.asarray([v.co for v in bm.verts], dtype=F)
+        g = sdf.gradient(field, co, 0.0006)
+        g /= np.maximum(np.linalg.norm(g, axis=1), F(1e-9))[:, None]
+        faces = list(bm.faces)
+        tri = np.asarray([[v.index for v in f.verts] for f in faces], dtype=np.int64)
+        a, b, c = g[tri[:, 0]], g[tri[:, 1]], g[tri[:, 2]]
+        low = np.minimum(np.minimum(np.einsum("ij,ij->i", a, b), np.einsum("ij,ij->i", b, c)), np.einsum("ij,ij->i", a, c))
+        room = (cap - len(faces)) // 2
+        split, seen = [], set()
+        for k in np.argsort(low, kind="stable"):
+            if low[k] >= lim or len(split) >= room:
+                break
+            if low[k] < -0.3:       # (a fin folded back on itself, not a bend)
+                continue
+            for e in faces[k].edges:
+                if e.index not in seen and e.calc_length() > fine and e.is_manifold:
+                    seen.add(e.index)
+                    split.append(e)
+        if not split:
+            break
+        res = bmesh.ops.subdivide_edges(bm, edges=split[:max(room, 0)], cuts=1, use_grid_fill=False)
+        bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3])
+        new = [v for v in res["geom_inner"] if isinstance(v, bmesh.types.BMVert)]
+        if new:
+            bm.normal_update()
+            pts = _onto(field, np.asarray([v.co for v in new], dtype=F), np.asarray([v.normal for v in new], dtype=F) * F(out))
+            for v, q in zip(new, pts):
+                v.co = q
 
 
 def _field_normals(me, field, co, out, lo=0.75, hi=0.93):

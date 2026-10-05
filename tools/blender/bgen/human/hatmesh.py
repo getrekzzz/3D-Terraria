@@ -9,7 +9,7 @@ from .sdf import F
 from .shellmesh import centres, place, refine
 
 BOUNDS = ((-0.24, -0.26, -0.12), (0.24, 0.24, 0.34))
-GRID, TARGET = 0.0011, 15000
+GRID, TARGET = 0.0011, 14000
 
 
 def mesh(head, shape, clear):
@@ -22,6 +22,9 @@ def mesh(head, shape, clear):
     regions = _regions(hat, centres(obj, co))
     if shape == "tricorn":
         regions = _bind(obj, hat, head, regions)
+    if shape == "shako":            # its foot, the underside and the lining's lowest edge, gilt like the band over it
+        low = hat.local(centres(obj, co))[:, 2] < F(0.0015)
+        regions = np.where(low & np.isin(regions, ("crown", "under")), "band", regions)
     for z0, z1 in BAND.get(shape, ()):
         regions = _band(obj, hat, head, regions, z0, z1)
     return obj, regions, hat

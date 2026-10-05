@@ -157,7 +157,7 @@ def cap_mesh(head, visor=True, extra=0.0):
     off the head (a skeleton's, which is settled onto the smaller skull)."""
     from .shellmesh import centres, place, refine
     cap = Cap(head.shape.fem, visor, extra)
-    obj = fieldmesh.build(cap.field, BOUNDS, 0.001, 13000, "hat_cap", ("cap", head.shape.fem, visor, extra), ("headwear.py",),
+    obj = fieldmesh.build(cap.field, BOUNDS, 0.001, 12000, "hat_cap", ("cap", head.shape.fem, visor, extra), ("headwear.py",),
                           "headwear", keep=cap.hidden)
     refine(obj, cap.field, cuts=cap.cuts())
     co = place(obj, head)
