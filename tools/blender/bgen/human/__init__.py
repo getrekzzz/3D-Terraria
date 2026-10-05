@@ -10,7 +10,7 @@ hair, hairStyle, beard (its colour), beardStyle (short|full|bushy|long|pointed|g
 coat, lapels (default true: a coat worn open, with lapels and a turned-down collar over the shirt; false: closed to the
 throat), robe, trim, apron, hat (cap|wide|hood|wreath), hatColor, visor (a cap's peak, default true), hatShape, flower
 (a wreath's flowers or a circlet's jewel), mask, horns, hornShape, wings, wingShape, tail, tailShape, brows (a colour,
-default the hair's, or none), feet (talons: a bird's clawed feet in place of shod ones), talons (their colour),
+default the hair's, or none), feet (talons: a bird's clawed feet; none: no feet, a ghost or serpent), talons (their colour),
 anatomy (human|skeleton: bones only, dressed when it has outfit parameters|stone|wood|cookie|armor: a granite golem, a
 gnarled wooden creature, a gingerbread man, an empty suit of plate coloured by armor, rivets and glow; matter.py),
 armSpread (degrees the arms hang further out, for bulky bodies; keys its own animation set), sack (a scarecrow's
@@ -286,9 +286,9 @@ def dress(fr, head, parts, p, lookup=None):
         add(w.shell(body, w.in_shirt, "shirt", 0.0055, p.get("shirt", "#8a8070"), "char:cloth", "shirt", w.shirt_cuts()), w.in_shirt, "shirt")
     if not robe and "pants" in p:        # (none for bare legs; coverings.undress drops unnamed garments)
         add(w.shell(body, w.in_pants, "pants", 0.005, p.get("pants", "#3a4a6a"), "char:cloth", "pants", w.pants_cuts()), w.in_pants, "pants")
-    if not talons and "wisps" not in p and coverings.wears(p, "boots"):      # a ghost drifts on no feet (spectre.py)
+    if not talons and p.get("feet") != "none" and coverings.wears(p, "boots"):      # (a ghost, a serpent: no feet)
         add(w.shell(body, w.in_boots, "boots", 0.007, p.get("boots", "#4a3424"), "char:leather", "boots", w.boot_cuts()), w.in_boots)
-    elif talons or "wisps" in p:
+    elif talons or p.get("feet") == "none":
         covers.append(w.in_boots)          # the talons take the leg's end over
     if "coat" in p:
         add(w.shell(body, w.in_coat, "coat", 0.012, p["coat"], "char:cloth", "coat", w.shirt_cuts(-0.015)))

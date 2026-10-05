@@ -43,8 +43,11 @@ def _exit(fr, body, garments, shape):
     """Where the tailbone's line meets the back of the body or the clothes over it, and what it meets there."""
     s = fr.s
     z = fr.j["pelvis"].z + 0.02 * s
-    if shape in ROOT:            # under the belt (round the waist, hip height + 0.1)
+    if shape in ROOT:            # under the belt (round the waist, hip height + 0.1) and a loose shirt's hem
         z = min(z, fr.j["hip.R"].z + (0.07 - ROOT[shape]) * s)
+        hem = _hem(fr, garments)
+        if hem is not None and hem < z + (ROOT[shape] + 0.012) * s:
+            z = max(hem - (ROOT[shape] + 0.012) * s, fr.j["hip.R"].z - 0.08 * s)
     best = None
     for o in [body] + list(garments):
         if o.type != "MESH" or not len(o.data.polygons):
@@ -54,6 +57,26 @@ def _exit(fr, body, garments, shape):
         if loc is not None and (best is None or loc.y < best[0].y):
             best = (loc, o)
     return best if best is not None else (Vector((0, -0.11 * s, z)), None)
+
+
+def _hem(fr, garments):
+    """The height of the hem of a shirt or coat hanging loose over the seat (None if none does)."""
+    s, j = fr.s, fr.j
+    low = [v.co.z for o in garments if o.type == "MESH" and o.name.split(".")[0] in ("shirt", "coat")
+           for v in o.data.vertices if abs(v.co.x) < 0.05 * s and v.co.y < j["spine"].y]
+    low = min(low, default=None)
+    if low is None or low > j["hip.R"].z + 0.09 * s:
+        return None
+    import bpy
+    best = None                  # tucked in when something else (the trousers) lies over it just above its hem
+    for o in garments:
+        if o.type != "MESH" or not len(o.data.polygons):
+            continue
+        tree = BVHTree.FromObject(o, bpy.context.evaluated_depsgraph_get())
+        loc, _, _, _ = tree.ray_cast(Vector((0, -0.6 * s, low + 0.012 * s)), Vector((0, 1, 0)), 0.6 * s)
+        if loc is not None and (best is None or loc.y < best[0]):
+            best = (loc.y, o.name.split(".")[0])
+    return low if best is not None and best[1] in ("shirt", "coat") else None
 
 
 def _fur(t, a, amp, clumps=7, rows=5):
@@ -70,7 +93,7 @@ def tail(fr, body, p, garments=()):
     shape = p.get("tailShape", "devil")
     if shape == "snake":
         from . import serpent
-        return serpent.tail(fr, p, garments)
+        return serpent.tail(fr, body, p, garments)
     if shape == "brush":         # a full furry brush, grown like the fur coat (furtail.py)
         from .furtail import brush
         return brush(fr, body, p, garments)
@@ -126,12 +149,16 @@ def tail(fr, body, p, garments=()):
     paint(bm, verts, tone)
     if shape in ("fox", "wolf"):
         _strand_uvs(bm, verts, sum((b - a).length for a, b in zip(path, path[1:])))
+    ring = None
+    if shape in ROOT and cloth is not None and cloth is not body:
+        ring = wingroot.crossing(cloth, verts, s)            # where it leaves the cloth (before the bmesh goes)
     obj = mesh_from(bm, "tail")
     set_slot(obj, "char:hair" if shape in ("fox", "wolf") else "char:skin")
     rigid(obj, "hips")
     if shape in ROOT:            # out through a hemmed slit in the seat of whatever covers the tailbone
         r = ROOT[shape] * s
-        hem = wingroot.slit(cloth, exit_pt, Vector((0, -1, 0)), s, 1.12 * r + 0.004 * s, 1.2 * r + 0.005 * s)
+        hem = (wingroot.slit_ring(cloth, ring, Vector((0, -1, 0)), s) if ring else
+               wingroot.slit(cloth, exit_pt, Vector((0, -1, 0)), s, 1.12 * r + 0.004 * s, 1.2 * r + 0.005 * s))
         if hem is not None:
             wingroot.sew(cloth, hem)
     return obj

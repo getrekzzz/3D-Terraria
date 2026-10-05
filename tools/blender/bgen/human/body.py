@@ -129,7 +129,8 @@ def build_body(frame, blob: Blob, feet=True):
         lmid = along(kn, an, 0.5)
         B.capsule(kn, lmid, 0.046 * s * (1 + 0.06 * bulk + 0.08 * fat))
         B.capsule(lmid, an, 0.031 * s)
-        c = m * old * (1 + 0.2 * bulk + 0.12 * fat)
+        # (the calf stops growing past build 1, where it would swell wider than the knee)
+        c = (0.82 + 0.36 * min(frame.build, 1.0)) * old * (1 + 0.2 * min(bulk, 1.0) + 0.12 * fat)
         e(along(kn, an, 0.3) + Vector((0, -0.028 * s, 0)), (0.12, 0.048 * c, 0.05 * c), rot_sh)                # calf
         B.ball(an + Vector((0, 0, 0.004 * s)), 0.029 * s)
         if not feet:

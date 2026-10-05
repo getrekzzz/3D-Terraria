@@ -7,7 +7,7 @@ foot (talus, heel, midfoot, metatarsals, toes). Each returns (field, bounds); th
 """
 import numpy as np
 
-from .bonefield import Body, Bone, ball, capsule, cone, ell, rod, tube
+from .bonefield import Body, Bone, ball, basis, capsule, cone, ell, flat_tube, rod, tube
 from .hands import hand_axes
 
 
@@ -98,34 +98,47 @@ def hand_field(frame):
             kn = np.asarray(j[f"{f}1.R"])
             base = H(0.031, (kn - w) @ thumb / k * 0.82, 0.001)
             b.add(ell(base, (0.0062 * g * k, 0.0058 * g * k, 0.005 * g * k), rot), 0.003 * k)
-            b.add(cone(base, kn, 0.0052 * g * k, 0.0043 * g * k), 0.003 * k)                    # metacarpal
-            _finger(b, j, f, g, k)
+            mid = (base + kn) / 2 + dorsal * 0.0012 * k
+            b.add(flat_tube([base, mid, kn], [0.0042 * g * k, 0.003 * g * k, 0.0042 * g * k], thumb, 0.82), 0.0025 * k)
+            _finger(b, j, f, g, k, dorsal)                                                          # (above: metacarpal)
         tb = np.asarray(j["thumb1.R"])
         b.add(ell(tb - along * 0.004 * k, (0.0062 * k, 0.0055 * k, 0.005 * k), rot), 0.002 * k)   # trapezium
-        _finger(b, j, "thumb", FINGER_R["thumb"], k)
+        _finger(b, j, "thumb", FINGER_R["thumb"], k, dorsal)
         return b.d
 
     pts = [w] + [j[f"{f}_tip.R"] for f in FINGER_R] + [j["thumb1.R"]]
     return field, _bounds(pts, 0.02 * k)
 
 
-def _finger(b, j, f, g, k):
-    """A finger's phalanges (the thumb's metacarpal and two phalanges): a flared base just past each joint's head,
-    a waisted shaft and a head centred on the next joint; the last ends in a tuft."""
+def _finger(b, j, f, g, k, dorsal):
+    """A finger's phalanges (the thumb's metacarpal and two phalanges), each slimmer than the one before: a base
+    broad across the finger just past the joint, a slim shaft flattened front to back, waisted and bowed a little
+    toward the back of the hand, and a head of two knuckles side by side centred on the next joint; the last
+    phalanx ends in a flat spade-shaped tuft."""
     pts = [np.asarray(j[f"{f}{n}.R"]) for n in (1, 2, 3)] + [np.asarray(j[f"{f}_tip.R"])]
-    radii = [(0.0058, 0.0045, 0.0053), (0.0051, 0.004, 0.0047), (0.0045, 0.0035, 0.004)]
-    if f == "thumb":
-        radii = [(0.0068, 0.0052, 0.0062)] + radii[:2]
-    b.add(ball(pts[0], radii[0][2] * 1.1 * g * k), 0.002 * k)
+    sizes = (1.2, 0.95, 0.8) if f == "thumb" else (1.0, 0.8, 0.68)
+    knuckle = 0.0058 * g * k
+    b.add(ball(pts[0], knuckle), 0.002 * k)                    # the head of the metacarpal
+    prev = knuckle
     for i in range(3):
         a, c = pts[i], pts[i + 1]
         d = (c - a) / np.linalg.norm(c - a)
-        rb, rs, rh = (r * g * k for r in radii[i])
-        head = c if i < 2 else c - d * rh * 0.9
-        start = a + d * (radii[i - 1][2] * g * k * 0.9 if i else rb)
-        b.add(ball(start + d * rb * 0.3, rb), 0.0015 * k)
-        b.add(cone(start + d * rb * 0.3, head, rs * 1.05, rs), 0.002 * k)
-        b.add(ball(head, rh if i < 2 else rh * 0.95), 0.0018 * k)
+        rot = basis(d, dorsal)
+        back, across = rot[:, 1], rot[:, 2]
+        q = sizes[i] * g * k
+        rb, rs, rh = 0.0056 * q, 0.0028 * q, 0.0043 * q          # base, shaft (front to back), head
+        start = a + d * (prev * 0.8 + rb * 0.45)
+        b.add(ell(start, (rb * 0.6, rb * 0.82, rb * 1.08), rot), 0.0012 * k)
+        if i < 2:
+            for side in (1, -1):                                  # the condyles
+                b.add(ball(c + across * side * rh * 0.4 - d * rh * 0.1, rh * 0.66), 0.001 * k)
+            end, r_end = c - d * rh * 0.55, rh * 0.62
+        else:
+            end, r_end = c - d * 0.0032 * q, rs * 0.85
+            b.add(ell(end, (0.0033 * q, 0.0016 * q, 0.0033 * q), rot), 0.0015 * k)   # the tuft
+        mid = (start + end) / 2 + back * rs * 0.3
+        b.add(flat_tube([start, mid, end], [rb * 0.55, rs, r_end], across, 0.78), 0.0015 * k)
+        prev = rh * 0.75
 
 
 def femur_field(frame):

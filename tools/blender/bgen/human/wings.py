@@ -183,8 +183,8 @@ def _feathers(bm, plane, s, color):
 
 def wings(fr, body, color, shape="bat", garments=()):
     """A pair of wings: membrane (or feathers, or crystal) and bones as one part, claws as another. Each grows out of
-    a slit in the garment over the shoulder blade (wingroot.py), its root broad and flattened where it leaves the
-    back and tapering into the arm."""
+    a slit in the garment over the shoulder blade (wingroot.py), its root broad and flattened where it leaves a bare
+    back (round through cloth) and tapering into the arm."""
     s = fr.s
     base = hex3(color)
     skin = wingroot.skin_tone(body)
@@ -224,7 +224,8 @@ def wings(fr, body, color, shape="bat", garments=()):
         if shape == "ice":
             icewings.arm(bm, arm, plane.N, s)
         else:
-            vs = sweep(bm, path, wingroot.section(s, radius, u_skin, u_joint), 14, up=Vector((0, 0, 1)))
+            bare = hit is None or hit.name.split(".")[0] not in wingroot.GARMENTS
+            vs = sweep(bm, path, wingroot.section(s, radius, u_skin, u_joint, broad=bare), 14, up=Vector((0, 0, 1)))
 
             def shade(u, a, tone=tone, a0=u_skin, a1=u_joint):
                 if shape != "bat":
@@ -234,9 +235,11 @@ def wings(fr, body, color, shape="bat", garments=()):
             paint(bm, vs, shade)
             if shape != "bat":
                 _arm_coverts(bm, path, radius, plane, base, round(u_skin * (len(path) - 1)) + 1)
-        r = radius(u_skin)               # the slit fits round the root where it leaves the back
-        half_w, half_h = (0.022 * s, 0.032 * s) if shape == "ice" else (max(1.5 * r, 0.02 * s), 2.6 * r)
-        hem = wingroot.slit(hit, root, normal, s, half_w, half_h)
+        ring = None if shape == "ice" or hit is None else wingroot.crossing(hit, vs, s)
+        if ring:                         # the opening hugs the root where it actually comes through the cloth
+            hem = wingroot.slit_ring(hit, ring, normal, s)
+        else:
+            hem = wingroot.slit(hit, root, normal, s, 0.022 * s, 0.032 * s)
         if hem is not None:
             hems.append(hem)
     obj = mesh_from(bm, "wings")

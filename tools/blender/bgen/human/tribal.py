@@ -18,8 +18,10 @@ import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
+from .feathers import feather
 from .features import blade, paint, sweep
 from .garments import mesh_from, set_slot
+from .head import smooth
 from .paint import hex3
 from .rig import rigid, write_weights
 
@@ -32,7 +34,7 @@ def wear(fr, head, parts, p, w, lookup=None):
     if "bodyPaint" in p:
         body_paint(fr, parts["body"], hex3(p["bodyPaint"]), w)
     if "grassSkirt" in p:
-        out.append(grass_skirt(fr, parts["body"], hex3(p["grassSkirt"]), w))
+        out.append(grass_skirt(fr, parts["body"], hex3(p["grassSkirt"]), w, lookup))
     if "beads" in p:
         out.append(beads(fr, parts["body"], hex3(p["beads"]), w, lookup))
     if "headdress" in p:
@@ -85,9 +87,10 @@ def body_paint(fr, body, color, w):
                                                  color[2] * 0.9 + c[2] * 0.1, 1.0)
 
 
-def grass_skirt(fr, body, color, w):
+def grass_skirt(fr, body, color, w, lookup=None):
     """Two overlapping layers of long leaves round the hips, hanging from under the belt to above the knee and
-    leaning out just enough to clear the hips and thighs."""
+    leaning out just enough to clear the hips and thighs. Each leaf is carried by the hips at its root and by the
+    thigh behind it lower down, so a striding thigh carries the leaves over it along instead of pushing through."""
     s, j = fr.s, fr.j
     top = w.waist + 0.004 * s
     bottom = j["knee.R"].z + 0.07 * s
@@ -98,7 +101,8 @@ def grass_skirt(fr, body, color, w):
     bm = bmesh.new()
     layer = bm.loops.layers.color.new("Color")
     straw = tuple(c * 0.55 + q * 0.45 for c, q in zip(color, (0.72, 0.62, 0.32)))
-    for layer_i, (count, out0) in enumerate(((30, 0.012), (30, 0.02))):
+    leaves = []                  # (first vertex, last vertex, root, a point on the thigh behind the leaf)
+    for layer_i, (count, out0) in enumerate(((30, 0.014), (30, 0.024))):
         for k in range(count):
             a = 2 * math.pi * (k + 0.5 * layer_i) / count
             ai = int(round(a / (2 * math.pi) * segs)) % segs
@@ -116,16 +120,30 @@ def grass_skirt(fr, body, color, w):
             def shade(u, v, under, tone=tone, dark=dark):
                 k_ = (dark + (1 - dark) * min(1.0, u * 2.5)) * (1.1 if abs(v) < 0.12 else 1.0) * (0.85 if under else 1.0)
                 return tuple(min(1.0, c * k_) for c in tone)
+            first = len(bm.verts)
             blade(bm, layer, root, tip - root, outward, length, 0.055 * s, shade, fold=0.25, curl=0.02,
                   thick=0.002 * s, rows=7, round_tip=False)
+            low = root.lerp(tip, 0.75) - outward * (lean * length * 0.75 + out0 * s + 0.03 * s)
+            leaves.append((first, len(bm.verts), root - outward * (out0 + 0.02) * s, low))
     obj = mesh_from(bm, "skirt_grass")
     set_slot(obj, "char:cloth")
-    write_weights(obj, [w.skirt_weights(v.co, bottom) for v in obj.data.vertices])
+    if lookup is None:
+        write_weights(obj, [w.skirt_weights(v.co, bottom) for v in obj.data.vertices])
+        return obj
+    ktree, body_w = lookup
+    weights = []
+    for first, last, root, low in leaves:
+        hi_w, lo_w = body_w[ktree.find(root)[1]], body_w[ktree.find(low)[1]]
+        for i in range(first, last):
+            u = smooth(top, bottom, obj.data.vertices[i].co.z) ** 0.8
+            weights.append({b: hi_w.get(b, 0.0) * (1 - u) + lo_w.get(b, 0.0) * u for b in {**hi_w, **lo_w}})
+    write_weights(obj, weights)
     return obj
 
 
 def beads(fr, body, bone, w, lookup):
-    """Three strands of beads lying on the chest, longer each, the lowest hung with fangs at the front."""
+    """Three strands of beads hung round the neck: each rests on the base of the neck behind and at the sides and
+    drops onto the chest in front, longer each, the lowest hung with fangs at the front."""
     import bpy
     s, j = fr.s, fr.j
     tree = BVHTree.FromObject(body, bpy.context.evaluated_depsgraph_get())
@@ -137,12 +155,27 @@ def beads(fr, body, bone, w, lookup):
         ring = []
         for k in range(64):
             ph = 2 * math.pi * k / 64                       # 0 at the front
-            front = 0.5 + 0.5 * math.cos(ph)
-            z = w.collar_z - (0.02 + drop * front ** 1.6) * s
-            q = Vector((math.sin(ph) * 0.3 * s, neck.y + math.cos(ph) * 0.3 * s, z))
-            hit, nrm, _, _ = tree.ray_cast(q, (Vector((neck.x, neck.y, z)) - q).normalized(), 0.4 * s)
+            d = Vector((math.sin(ph), math.cos(ph), 0))
+            front = smooth(0.1, 0.85, math.cos(ph))
+            # behind and at the sides it lies on the shoulders just outside the neck, each strand a little further out
+            r = 0.05 * s
+            for dz in (0.015, 0.03, 0.045):              # the neck's girth just above its base
+                rim = tree.ray_cast(Vector((neck.x, neck.y, w.collar_z + dz * s)), d, 0.2 * s)[0]
+                if rim is not None:
+                    r = max(r, (rim - Vector((neck.x, neck.y, rim.z))).length)
+            ideal = Vector((neck.x, neck.y, w.collar_z - (0.004 + 0.014 * n) * s)) + d * (r + (0.008 + 0.012 * n) * s)
+            a = tree.find_nearest(ideal, 0.1 * s)[0]       # in the crease where the neck meets the shoulders
+            # in front it hangs down onto the chest
+            b = None
+            if front > 0:
+                b = tree.ray_cast(Vector((neck.x, neck.y + 0.01 * s, w.collar_z - (0.012 + drop * front ** 1.3) * s)), d,
+                                  0.3 * s)[0]
+            q = b if a is None else a if b is None else a.lerp(b, front)
+            if q is None:
+                continue
+            hit, nrm, _, _ = tree.find_nearest(q)
             if hit is not None:
-                ring.append(hit + nrm * size * s)
+                ring.append(hit + nrm.normalized() * size * s)
         if len(ring) < 8:
             continue
         for c in _even(ring, size * 2.1 * s):
@@ -214,28 +247,19 @@ def headdress(head, band):
     h = head.h
     vs = sweep(bm, path, lambda t, a: (math.cos(a) * 0.014 * h, math.sin(a) * 0.0045 * h), 8, up=Vector((0, 0, 1)), caps=(False, False))
     paint(bm, vs, lambda t, a: tuple(c * (0.85 + 0.15 * (math.sin(t * 2 * math.pi * 24) > 0)) for c in band))
-    colours = [(0.7, 0.13, 0.08), (0.88, 0.68, 0.16), (0.22, 0.48, 0.18), (0.7, 0.13, 0.08), (0.14, 0.3, 0.58), (0.9, 0.86, 0.76)]
-    count = 21
+    white = (0.88, 0.85, 0.76)                                      # white feathers between the dyed ones
+    colours = [white, (0.68, 0.14, 0.09), white, (0.82, 0.62, 0.18), white, (0.24, 0.46, 0.2)]
+    count = 17
     for k in range(count):
-        ph = math.radians(-125 + 250 * k / (count - 1)) + math.pi       # round the back, from ear to ear
+        ph = math.radians(-112 + 224 * k / (count - 1)) + math.pi       # round the back, from ear to ear
         i = int(round((ph % (2 * math.pi)) / (2 * math.pi) * 48)) % 48
         root = ring[i]
         back = abs(math.cos((ph - math.pi) / 2.0))
-        length = (0.14 + 0.12 * back ** 2) * h * (0.86 if k % 2 else 1.0)
+        length = (0.15 + 0.09 * back ** 2) * h * (0.9 if k % 2 else 1.0)
         outward = Vector((math.sin(ph), math.cos(ph), 0))
-        d = (Vector((0, 0, 1)) * (1.0 - 0.25 * (1 - back)) + outward * (0.35 + 0.25 * (1 - back))).normalized()
-        col = colours[k % len(colours)]
-        tip = (0.08, 0.06, 0.05)
-
-        def tone(u, v, under, col=col, tip=tip):
-            if abs(v) < 0.1:
-                return (0.85, 0.8, 0.68)                          # the pale quill down the middle
-            m = max(0.0, (u - 0.8) / 0.2) if u < 0.97 else 0.0    # a dark band near the tip, a pale tip
-            c = tuple(x + (t - x) * m for x, t in zip(col, tip))
-            bar = 0.8 if 0.5 < u < 0.56 else 1.0                  # a barred stripe across
-            return tuple(x * bar * (0.8 if under else 1.0) for x in c)
-        blade(bm, layer, head.at(root[:]) - d * 0.01 * h, d, outward, length, 0.031 * h, tone, fold=0.22, curl=-0.08,
-              thick=0.0018 * h, rows=9, round_tip=True, skew=0.3)
+        d = (Vector((0, 0, 1)) * (0.8 - 0.25 * (1 - back)) + outward * (0.5 + 0.3 * (1 - back))).normalized()
+        feather(bm, layer, head.at(root[:]) - d * 0.012 * h, d, outward, length, 0.023 * h, 0.002 * h,
+                colours[k % len(colours)], k)
     obj = mesh_from(bm, "hat_headdress")
     set_slot(obj, "char:cloth")
     rigid(obj, "head")

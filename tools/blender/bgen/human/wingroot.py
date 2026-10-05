@@ -1,7 +1,8 @@
 """Where a wing leaves the back: the root found on the body or the garment over the shoulder blade, a vertical slit
 let into that garment for it (the cloth darkened into the opening, its edge turned and hemmed), and the root's own
-section, flattened and broad where it grows out of the back and tapering into the wing's arm. Tails (tails.py) use
-the same slit in the seat of the trousers, its hem sewn into the garment itself."""
+section, flattened and broad where it grows out of a bare back and tapering into the wing's arm (round where it
+comes through cloth, the opening fitted round it). Tails (tails.py) use the same slit in the seat of the trousers,
+its hem sewn into the garment itself."""
 import math
 
 import bmesh
@@ -71,7 +72,7 @@ def slit(obj, point, normal, s, half_w, half_h):
         e = math.hypot(d.dot(side) / half_w, d.dot(up) / half_h)
         if e > 1.25:
             continue
-        k = 1.0 - max(0.0, min(1.0, (e - 0.78) / 0.22))       # 1 inside the opening, fading over its edge
+        k = 1.0 - max(0.0, min(1.0, (e - 0.55) / 0.3))        # dark only well inside, where the root hides it
         for loop in v.link_loops:
             c = loop[layer]
             if base is None:
@@ -88,26 +89,105 @@ def slit(obj, point, normal, s, half_w, half_h):
     n = 28
     for k in range(n + 1):
         a = 2 * math.pi * k / n
-        x, z = math.sin(a) * half_w * 0.92, math.cos(a) * half_h * 0.92
+        x, z = math.sin(a) * half_w, math.cos(a) * half_h
         x *= 1 - 0.35 * abs(math.cos(a)) ** 6                         # pinched toward the ends
         q = point + side * x + up * z + normal * 0.02 * s
         hit, nrm, _, _ = tree.ray_cast(q, -normal, 0.06 * s)
         ring.append((hit if hit is not None else q - normal * 0.02 * s) + normal * 0.0016 * s)
     hem = bmesh.new()
     hem.loops.layers.color.new("Color")
-    verts = sweep(hem, ring, lambda t, a: (math.cos(a) * 0.0032 * s, math.sin(a) * 0.0055 * s), 6, up=normal,
+    verts = sweep(hem, ring, lambda t, a: (math.cos(a) * 0.0024 * s, math.sin(a) * 0.0042 * s), 6, up=normal,
                   caps=(False, False))
-    tone = tuple(c * 0.8 for c in base)
+    tone = tuple(c * 0.96 for c in base)                     # the cloth's own colour, turned
     paint(hem, verts, lambda t, a: tone)
     return hem
 
 
-def section(s, r_arm, u_skin, u_joint, flat=0.85):
+def crossing(obj, verts, s, pad=0.003):
+    """Where a swept part (``verts`` as sweep() returns them) passes out through the garment ``obj``: on each line
+    along the part, the point where it leaves the cloth, pushed ``pad`` out from the part. None when it does not
+    cross the garment cleanly."""
+    import bpy
+    tree = BVHTree.FromObject(obj, bpy.context.evaluated_depsgraph_get())
+    lines = {}
+    for v, t, a in verts:
+        lines.setdefault(round(a, 6), []).append((t, v.co.copy()))
+    ring = []
+    for a in sorted(lines):
+        prev = None
+        for t, co in sorted(lines[a], key=lambda x: x[0]):
+            loc, nrm, _, _ = tree.find_nearest(co, 0.08 * s)
+            if loc is None:
+                prev = None
+                continue
+            sd = (co - loc).dot(nrm)
+            if prev is not None and prev[0] < 0 <= sd:
+                ring.append(prev[1].lerp(co, -prev[0] / (sd - prev[0])))
+                break
+            prev = (sd, co)
+    if len(ring) < 6:
+        return None
+    c = sum(ring, Vector()) / len(ring)
+    return [p + (p - c).normalized() * pad * s for p in ring]
+
+
+def slit_ring(obj, ring, normal, s):
+    """Like slit(), for an opening of any outline ``ring`` (crossing()): darkens the garment just inside it, where
+    the part covers it, and returns the hem lying on the cloth along it (or None if ``obj`` is bare skin)."""
+    if obj is None or obj.name.split(".")[0] not in GARMENTS:
+        return None
+    import bpy
+    up, side = _axes(normal)
+    c = sum(ring, Vector()) / len(ring)
+    polar = sorted((math.atan2((p - c).dot(up), (p - c).dot(side)), (p - c).length) for p in ring)
+
+    def edge(ang):
+        best = min(polar, key=lambda q: abs((q[0] - ang + math.pi) % (2 * math.pi) - math.pi))
+        return best[1]
+    reach = max(r for _, r in polar)
+    bm = bmesh.new()
+    bm.from_mesh(obj.data)
+    layer = bm.loops.layers.color.get("Color")
+    if layer is None:
+        bm.free()
+        return None
+    base = None
+    for v in bm.verts:
+        d = v.co - c
+        if abs(d.dot(normal)) > 0.03 * s or d.length > 1.3 * reach:
+            continue
+        e = d.length / max(edge(math.atan2(d.dot(up), d.dot(side))), 1e-6)
+        k = 1.0 - max(0.0, min(1.0, (e - 0.4) / 0.25))
+        for loop in v.link_loops:
+            col = loop[layer]
+            if base is None:
+                base = (col[0], col[1], col[2])
+            loop[layer] = (col[0] * (1 - 0.88 * k), col[1] * (1 - 0.88 * k), col[2] * (1 - 0.85 * k), col[3])
+    bm.to_mesh(obj.data)
+    bm.free()
+    if base is None:
+        return None
+    tree = BVHTree.FromObject(obj, bpy.context.evaluated_depsgraph_get())
+    lying = []
+    for p in ring + ring[:1]:
+        loc, nrm, _, _ = tree.find_nearest(p, 0.05 * s)
+        lying.append(p if loc is None else loc + nrm * 0.0016 * s)
+    hem = bmesh.new()
+    hem.loops.layers.color.new("Color")
+    verts = sweep(hem, lying, lambda t, a: (math.cos(a) * 0.0024 * s, math.sin(a) * 0.0042 * s), 6, up=normal,
+                  caps=(False, False))
+    tone = tuple(x * 0.96 for x in base)
+    paint(hem, verts, lambda t, a: tone)
+    return hem
+
+
+def section(s, r_arm, u_skin, u_joint, flat=0.85, broad=True):
     """The root's ring offsets: up to ``u_skin`` (where it leaves the back) it is broad and flattened vertically, and
-    it narrows to the arm's radius ``r_arm(u)`` by ``u_joint``; ``a`` = 0 points up."""
+    it narrows to the arm's radius ``r_arm(u)`` by ``u_joint``; ``a`` = 0 points up. Not ``broad`` (coming out
+    through cloth), it keeps the arm's round section, so the opening stays small."""
     def fn(u, a):
         r = r_arm(u)
-        if u < u_joint:
+        if broad and u < u_joint:
             k = 1.0 - max(0.0, (u - u_skin) / (u_joint - u_skin)) if u > u_skin else 1.0
             k = k * k * (3 - 2 * k)
             r_up = r * (1 + 1.25 * k)

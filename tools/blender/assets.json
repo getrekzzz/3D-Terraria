@@ -4139,7 +4139,8 @@
         "height": 2.0,
         "face": "void",
         "wisps": "#a8afba",
-        "brows": "none"
+        "brows": "none",
+        "feet": "none"
       }
     },
     "retinazer": {
@@ -5935,10 +5936,10 @@
         "trim": "#c8a040",
         "shirt": "#e8e0d0",
         "pants": "#e8e0d0",
-        "boots": "#8a6a3a",
         "tail": "#5a9048",
         "tailShape": "snake",
-        "snakes": "#5a9a48"
+        "snakes": "#5a9a48",
+        "feet": "none"
       }
     },
     "wall_creeper": {
