@@ -27,7 +27,8 @@ class Style:
     mess: float         # random turn of the locks
     lock: float         # lock width over the face
     neck: float = 0.0   # how much lower than usual the neckline runs
-    depth: float = 1.0  # how far back under the chin toward the throat the hanging part fills (1 all the way)
+    depth: float = 1.0  # how far back under the chin toward the throat the hanging part fills (1 all the way; less
+    #                     also slopes its underside straight down to its point, a wedge in profile)
 
 
 STYLES = {
@@ -36,7 +37,7 @@ STYLES = {
     "bushy": Style(1.0, 0.016, 0.07, 0.9, 1.1, 0, 1.25, 0.7, 0.12, 0.021),
     "long": Style(0.92, 0.012, 0.22, 0.4, 0.95, 2, 1.1, 1.0, 0.04, 0.019, 0.008),
     "pointed": Style(0.8, 0.01, 0.08, 0.3, 0.6, 1, 0.9, 0.6, 0.03, 0.017, 0.0, 0.8),
-    "goatee": Style(0.0, 0.01, 0.035, 0.3, 0.4, 1, 0.9, 0.75, 0.03, 0.014, -0.045, 0.55),
+    "goatee": Style(0.0, 0.01, 0.035, 0.3, 0.3, 1, 0.9, 0.75, 0.03, 0.014, -0.045, 0.55),
 }
 
 # The cheek line's height by azimuth from the front (head-local z): beside the nose wings, dipping round the corners of
@@ -75,9 +76,10 @@ def coverages(q, st, mouth=True):
     x, y, z = np.abs(q[:, 0]), q[:, 1], q[:, 2]
     a = np.arctan2(x, y)
     if st.cheek > 0:          # lower on the cheeks for a smaller beard, still up to the sideburns
-        m = _ss(-0.004, 0.008, _below(a, z + (1 - st.cheek) * 0.06 * _ss(1.45, 0.6, a), LINE_A, CHEEK_Z))
+        m = _ss(-0.004, 0.014, _below(a, z + (1 - st.cheek) * 0.06 * _ss(1.45, 0.6, a), LINE_A, CHEEK_Z))
     else:
-        m = _ss(-0.004, 0.008, _below(a, z, CHIN_A, CHIN_Z))
+        m = _ss(-0.004, 0.014, _below(a, z, CHIN_A, CHIN_Z))      # (narrowing from the mouth to the chin)
+        m = m * _ss(-0.004, 0.01, (np.maximum(0.4 + 2.4 * (z + 0.065), 0.22) - a) * 0.09)
     m = m * _ss(-0.008, 0.01, y + z + 4.0 * x * x + 0.097 + st.neck)
     m = m * _ss(-0.004, 0.007, y + 0.013)
     (cy, cz), (ry, rz) = EAR
@@ -91,13 +93,15 @@ def coverages(q, st, mouth=True):
 
 def masses(q, st):
     """How thick the beard's layer over the skin is: a few millimetres on the cheeks, fuller down the jaw, fullest at
-    the chin; thin on the upper lip, which carries the moustache's own locks."""
+    the chin, thinner toward the ears, up the sideburns and down the throat; thin on the upper lip, which carries the
+    moustache's own locks."""
     q = np.atleast_2d(np.asarray(q, dtype=F))
     x, y, z = np.abs(q[:, 0]), q[:, 1], q[:, 2]
     a = np.arctan2(x, y)
     low = _ss(-0.04, -0.095, z)
     front = _ss(1.35, 0.3, a)
-    t = 0.003 + (st.mass * 0.7 - 0.003) * low * (0.6 + 0.4 * front)
+    t = 0.0022 + (st.mass * 0.7 - 0.0022) * low * (0.45 + 0.55 * front) * (1 - 0.4 * _ss(0.0, 0.025, jaw_edge(a) - z))
+    t = t * (1 - 0.5 * _ss(-0.035, -0.012, z) * _ss(1.05, 1.35, a))     # (the sideburns short, up to the hair)
     zc, hw, hh = LIPS
     mouth = _ss(0.0, 0.012, (np.hypot(q[:, 0] / hw, (z - zc) / hh) - 1.0) * 0.01)
     t = t * (1 - 0.6 * (1 - mouth) * _ss(0.04, 0.06, y))  # thinner round the mouth: the lips sit in it, not in a hole

@@ -1,12 +1,12 @@
 """The shape of a beard over the face (head-local units): the mass over the face, combed in clumps down the cheeks
-and drawing in toward the chin, with fine grooves between its strands, thinning out to a ragged edge where it grows out
-of the skin; and the moustache rising out of it, sweeping from the philtrum over the upper lip and down past the
-corners of the mouth into the beard, parted from the cheeks by a soft groove. The part that hangs below the jaw is
-beardbib's.
+and drawing in toward the chin, with fine grooves between its strands, thinning out over a centimetre to a soft, tufted
+edge where it grows out of the skin; and the moustache rising out of it, sweeping from the philtrum over the upper lip
+and down past the corners of the mouth, where it sinks into the beard, parted from the cheeks by a soft groove. The
+part that hangs below the jaw is beardbib's.
 """
 import numpy as np
 
-from .beard import STYLES, coverages, masses
+from .beard import STYLES, coverages, jaw_edge, masses
 
 F = np.float32
 CLUMP = 0.024         # spacing of the clumps the mass over the face is combed into (head-local)
@@ -73,15 +73,16 @@ class Beard:
         strand = 0.5 - 0.5 * np.cos(2 * np.pi * (s / STRAND + 0.15 * np.sin(2 * np.pi * s / (3.3 * STRAND) + ph[2])))
         strand = strand * _ss(-0.3, 0.8, np.sin(z * 150 + s * 260 + ph[3]))
         cov = self.coverage(X)
-        ragged = 0.15 * (clump - 0.5) + 0.1 * np.sin(z * 230 + s * 400 + ph[2])     # tufts reach further out
-        cov = cov + ragged * 4 * cov * (1 - cov)
+        ragged = 0.08 * (clump - 0.5) + 0.07 * np.sin(z * 230 + s * 400 + ph[2])     # tufts reach further out
+        trim = 1 - 0.6 * _ss(0.0, 0.02, jaw_edge(np.arctan2(X[:, 0], X[:, 1])) - z)    # (less so down the throat)
+        cov = cov + ragged * trim * 4 * cov * (1 - cov)
         if self.bib is not None:      # toward the jaw the clumps gather into the hanging part's locks
             a = np.arctan2(X[:, 0], X[:, 1])
             above = z - np.interp(a, self.bib.A, self.bib.zj)
             near = _ss(0.035, 0.006, above)
             crest = np.clip(self.bib.reach(a / self.bib.W, -above)[2], 0.0, 1.0)
             clump = clump + (crest - clump) * near
-        k = _ss(0.0, 1.0, cov) ** 1.4
+        k = _ss(0.3, 1.0, cov)        # (a long, soft taper to its edges, not a cut sheet)
         return (k, clump, strand, cov) if edge else (k, clump, strand)
 
     def base(self, X, slope=False):
@@ -92,9 +93,9 @@ class Beard:
         k, clump, strand, cov = self.comb(X, edge=True)
         m = masses(X, self.st)
         # It thins out to a fine edge, then dives under the skin (crossing it steeply, so its outline is clean).
-        dive = _ss(0.5, 0.1, cov)
-        t = m * (0.7 + 0.6 * clump) * k + 0.0004 - 0.0048 * dive
-        t -= np.minimum(0.0008, m * (0.1 + 0.15 * (1 - clump))) * strand * k
+        dive = _ss(0.4, 0.05, cov)
+        t = m * (0.8 + 0.4 * clump) * k + 0.0004 - 0.0048 * dive
+        t -= np.minimum(0.0008, m * (0.1 + 0.15 * (1 - clump))) * strand * k * k     # (none at its edges)
         h, _, _, _, rim = self.whiskers(X)
         t = t - np.minimum(rim, np.maximum(t - 0.0008, 0.0))   # (a soft groove round the moustache parts it from
         #                                                         the cheeks and the chin, never through the layer)
@@ -116,7 +117,7 @@ class Beard:
         path = np.asarray(((0.0, -0.0535), (0.012, -0.0566), (0.0215, -0.0614), (0.0282, -0.0684),
                            (0.0302, -0.0684 - 0.022 * st.droop)), dtype=F)
         path[1:, 1] += self.rng.uniform(-0.0006, 0.0006, 4)
-        half = np.asarray((0.0056, 0.006, 0.0056, 0.0046, 0.0018)) * st.moustache ** 0.5
+        half = np.asarray((0.0062, 0.0066, 0.0062, 0.005, 0.0035)) * st.moustache ** 0.8
         arc = np.r_[0.0, np.cumsum(np.linalg.norm(np.diff(path, axis=0), axis=1))]
         return path, half, arc / arc[-1]
 
@@ -146,16 +147,16 @@ class Beard:
         st = self.st
         o0 = -0.3                                           # (its crest, toward the lip)
         ea = np.where(off >= o0, (off - o0) / (1 - o0), (o0 - off) / (1 + o0))
-        bump = (0.5 + 0.5 * np.cos(np.pi * np.minimum(ea, 1.0))) ** 0.7
-        along = (0.8 + 0.2 * _ss(0.0, 0.2, s)) * (1.0 - 0.5 * _ss(0.6, 1.0, s))
-        h = (0.0035 + 0.003 * st.moustache) * bump * along
+        bump = (0.5 + 0.5 * np.cos(np.pi * np.minimum(ea, 1.0))) ** 0.85
+        along = (0.8 + 0.2 * _ss(0.0, 0.2, s)) * (1.0 - 0.85 * _ss(0.5, 1.0, s))     # (its ends sink into the beard)
+        h = (0.003 + 0.0035 * st.moustache) * (0.6 + 40 * st.mass) * bump * along     # (fuller in a fuller beard)
         h = h * (0.92 + 0.08 * np.cos(2 * np.pi * (off * 1.3 + s * 0.8) + self.phase[4]))     # a few clumps
         strands = 0.5 - 0.5 * np.cos(2 * np.pi * (off * self._path[1].max() / 0.0022 + s * 2.0
                                                    + 0.25 * np.sin(s * 9.0 + self.phase[3])))
         strands = strands * _ss(0.1, 0.4, bump)
         h = h - 0.0006 * strands
         h = h - 0.004 * _ss(0.8, 1.25, e)                   # off it, under the skin (the face's layer is there)
-        rim = 0.0016 * np.exp(-((e - 1.1) / 0.22) ** 2) * np.maximum(off > 0, _ss(0.55, 0.75, s))
+        rim = 0.0016 * np.exp(-((e - 1.1) / 0.22) ** 2) * (off > 0) * _ss(0.95, 0.65, s)  # (above it, not its ends)
         mouth = X[:, 1] > 0.05                               # (only over the mouth, not round the back of the head)
         h, rim = np.where(mouth, h, -0.004), np.where(mouth, rim, 0.0)
         return h.astype(F), s.astype(F), np.clip(off, -1, 1).astype(F), strands.astype(F), rim.astype(F)

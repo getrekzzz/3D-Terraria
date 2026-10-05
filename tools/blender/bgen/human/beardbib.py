@@ -14,6 +14,8 @@ from .beard import coverages, jaw_edge, masses
 F = np.float32
 GAP = 0.0025          # how far it stays off the neck, a collar and the chest
 THROAT = 0.016        # how far below the jaw's edge the throat is measured (clear of the chin)
+SINK = 0.008          # how far it sinks into the face's layer toward its sides
+TIP = 0.006           # the least height its locks round off over (toward its sides, where they get short: no steps)
 
 
 def _ss(a, b, x):
@@ -136,7 +138,7 @@ class Bib:
         self.gd = np.r_[rng.uniform(0.8, 1.0, n - 1), rng.uniform(0.35, 0.6, n)]
         self.g0 = np.r_[np.full(n - 1, -0.03), rng.uniform(-0.01, 0.3, n) * L]
         self.g1 = np.r_[np.full(n - 1, 9.0), rng.uniform(0.5, 1.0, n) * L]
-        self.gs = rng.normal(0.0, 0.15 + 2 * st.mess, 2 * n - 1) * spacing
+        self.gs = rng.normal(0.0, 0.12 + 1.2 * st.mess, 2 * n - 1) * spacing
         self.gp = rng.uniform(0, 6.3, 2 * n - 1)
         if st.forks == 2:           # parted down the middle into two forks
             self.gt, self.gw = np.r_[self.gt, 0.0], np.r_[self.gw, 0.5 * spacing]
@@ -177,13 +179,13 @@ class Bib:
         drop = zj - z
         t, narrow = self.lateral(a, np.maximum(drop, 0.0))
         reach, env, crest = self.reach(t, drop)
-        u = np.maximum(drop, 0.0) / np.maximum(reach, 1e-5)                  # down its lock
-        ue = np.minimum(np.maximum(drop, 0.0) / np.maximum(env, 1e-5), 1.0)   # down the mass behind the locks
+        u = np.maximum(drop, 0.0) / np.maximum(reach, TIP)                   # down its lock
+        ue = np.minimum(np.maximum(drop, 0.0) / np.maximum(env, TIP), 1.0)    # down the mass behind the locks
         src = np.clip(a / narrow, self.A[0], self.A[-1])     # where round the jaw the hair here grew: drawing in, the
         Fj = np.interp(src, self.A, self.Fj)                 # mass narrows and rounds off, no flat sides
         Bn = np.interp(src, self.A, self.Bn)
         zn = np.interp(src, self.A, self.zn)        # (and how far down the throat it grew there)
-        jut = 0.004 + 0.4 * st.mass
+        jut = 0.002 + 0.25 * st.mass
         front = Fj + jut * _ss(0.0, 0.03, drop) - (jut + 0.45 * (Fj - Bn) * st.depth) * _ss(0.4, 1.0, ue)
         # The underside: on the throat down to where the beard stops growing there, then rising to the tips.
         # (Where the beard grows on down the throat the underside lies on it whatever the style's depth, so the hanging
@@ -192,8 +194,10 @@ class Bib:
         start = rest + (Fj - rest) * (1 - st.depth) * _ss(0.03, 0.008, zj - zn)
         s = np.clip((zn - z) / np.maximum(zn - (zj - env), 1e-4), 0.0, 1.0)
         full = _ss(0.08, 0.2, self.L)                # (a short beard full and round underneath, a long one tapering)
-        back = front - (front - start) * ((1 - full) * np.sqrt(np.maximum(1 - s * s, 0.0)) + full * (1 - s ** 1.3))
-        back = front - (front - back) * np.sqrt(np.maximum(1 - np.minimum(u, 1.0) ** 3, 0.0))   # each lock rounded off
+        fill = (1 - full) * np.sqrt(np.maximum(1 - s * s, 0.0)) + full * (1 - s ** 1.3)
+        wedge = min(1.0, 1.2 * (1 - st.depth))          # (a beard that leaves the throat bare slopes straight down)
+        under = front - (front - start) * (fill + ((1 - s) ** 1.2 - fill) * wedge)
+        back = front - (front - under) * np.sqrt(np.maximum(1 - np.minimum(u, 1.0) ** 3, 0.0))   # each lock rounded off
         uu = np.minimum(u, 1.0)                      # (and never a thin sheet: round in profile down to its tip)
         back = np.minimum(back, front - (0.004 + 0.02 * self.L) * np.sqrt(np.maximum(1 - uu * uu, 0.0)))
         # Above where it falls from it runs on up under the face's layer, which takes it over, and into the skin.
@@ -202,10 +206,11 @@ class Bib:
         face = self.radius(a, z) + (masses(q, st) * self.b.coverage(q) + 0.003) * _ss(-0.02, 0.0, drop) - 0.003
         front = front + (np.minimum(face, Fj + jut * 0.2) - front) * _ss(0.0, -0.006, drop)
         side = np.maximum(np.abs(t) - 0.45, 0.0) / 0.55     # the whole rounded off toward its sides, where it sinks
-        front = back + (front - back) * np.sqrt(np.maximum(1 - side * side, 0.0)) - 0.006 * side * side   # into the layer
+        keep = np.sqrt(np.maximum(1 - side * side, 0.0))     # into the layer (its locks' tips with it)
+        front, back = under + (front - under) * keep - 0.006 * side * side, under + (back - under) * keep
         shift = _ramp(rest - back, 0.006)
         front, back = front + shift, back + shift
-        groove = np.minimum(0.002 + 0.3 * st.mass, 0.35 * (front - back + 0.004))     # (never through it)
+        groove = np.minimum(0.0015 + 0.2 * st.mass, 0.35 * (front - back + 0.004))     # (never through it)
         front = front + groove * _ss(-0.02, 0.015, drop) * (crest - 1.0)
         return front, back, drop, reach, t, narrow
 
@@ -217,7 +222,7 @@ class Bib:
         d = np.maximum(d, drop - reach)                          # below its tips
         d = np.maximum(d, -drop - 0.02)                          # (up inside the layer)
         d = np.maximum(d, (np.abs(t) - 1.0) * r * self.W * narrow)      # past its sides
-        return d
+        return d + SINK * _ss(0.5, 1.0, np.abs(t))      # (toward its sides it sinks into the layer, locks and all)
 
     def field(self, X):
         """Distance to the hanging part (a first-order estimate: the raw field over its gradient's length)."""

@@ -50,9 +50,10 @@ ponytails hangs onto the shoulders, back and clothes, `longhair.py`, `hairdrape.
 rope coiled round a core; hair under a hat is pressed flat inside it, comes out from under its rim no thicker than
 the hat and is cut along the hat's own edge, `underhat.py`);
 beards in styles (`beard.py`: where the beard grows, a feathered cheek line up to the sideburns, the lips left
-clear; `beardlocks.py` lays a combed mass over the face that grows out of the skin at a ragged edge, with the
-moustache rising out of it over the upper lip; `beardbib.py` hangs one mass below the jaw, from the chin and the
-throat down to a few big tapered locks with soft grooves, resting on the neck and the clothes; `beardsdf.py` melts
+clear; `beardlocks.py` lays a combed mass over the face that thins out to a soft edge where it grows out of the
+skin, with the moustache rising out of it over the upper lip and sinking into it at the corners of the mouth;
+`beardbib.py` hangs one mass below the jaw, from the chin and the throat down to a few big tapered locks with soft
+grooves, resting on the neck and the clothes and sinking into the face's mass toward its sides; `beardsdf.py` melts
 them into one mesh); clothing cut from body shells and tailored
 (`tailoring.py`, `drape.py`: eased off the skin, bridged across clefts and settled over hollows, hanging from the
 chest, cinched under the belt and boot tops, folded inside the elbows and knees) then finished (`finishing.py`:
