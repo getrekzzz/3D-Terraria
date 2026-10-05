@@ -5,10 +5,10 @@ leaves the head (a ring over the temples, above the ears and round the occiput) 
 (hair.ear_cover: one smooth dome over each ear, so the curtain never parts round it), draped over the shoulders and
 down the back (hairdrape.py). The locks nearest the face fall in front of the shoulders, framing it, the rest behind
 them. Neighbouring locks are held together down to the shoulders, so the curtain stays closed over the ears and the
-neck, and gather toward their ends (in pairs behind the shoulders, those in front of each into one lock framing the
-face), which makes a few big tapered locks with soft grooves between them; the ends make a shallow V, longest down
-the middle of the back. Locks lie thin along the hairline and narrow toward the
-parting. Under a hat the locks start just inside its lower edge.
+neck; behind the shoulders they gather in pairs toward their ends, a few broad locks with soft grooves between them,
+while those in front of each shoulder hang side by side, a sheet over the chest; the ends are cut fairly blunt and
+make a shallow V, longest down the middle of the back. Locks lie thin along the hairline and narrow toward the
+parting. Under a hat the locks start just inside its lower edge, behind the temples, and all hang down the back.
 """
 import math
 
@@ -84,7 +84,7 @@ def _normals(g, P, rest, K1, front):
     out = _unit(P * np.asarray((1.0, 1.0, 0.0), dtype=F) + np.asarray((0.0, 0.02, 0.0), dtype=F))
     q = P[:, front]
     fwd = _unit(np.stack([np.sign(q[..., 0]) * 0.3, np.ones(q.shape[:2]), np.zeros(q.shape[:2])], -1))
-    f = _ss(-0.05, -0.15, q[..., 2])[..., None]
+    f = 0.65 * _ss(-0.05, -0.15, q[..., 2])[..., None]
     out[:, front] = _unit(out[:, front] * (1 - f) + fwd * f)
     off = np.clip((0.9 - np.einsum("kni,kni->kn", N, out)) / 0.3, 0.0, 1.0) * (np.arange(len(P)) >= K1)[:, None]
     a = np.maximum(_ss(-0.04, -0.14, P[:, :, 2]), off)[..., None]
@@ -96,12 +96,18 @@ def _normals(g, P, rest, K1, front):
     return _unit(N)
 
 
-def _pairs(phi):
+def _front(g):
+    """The azimuth nearer the face than which locks fall in front of the shoulders: none under a hat, where the hair
+    comes out from under the brim behind the temples and hangs down the back."""
+    return 0.9 if g.under_hat else FRONT
+
+
+def _pairs(phi, fa):
     """Neighbouring locks round the curtain (index pairs, and whether the pair straddles the front of a shoulder:
     one lock falling in front of it, the other behind)."""
     order = np.argsort(np.where(phi < 0, phi + 2 * math.pi, phi))        # right front .. back .. left front
     a, b = order[:-1], order[1:]
-    split = (np.abs(phi[a]) < FRONT) != (np.abs(phi[b]) < FRONT)
+    split = (np.abs(phi[a]) < fa) != (np.abs(phi[b]) < fa)
     return np.stack([a, b], 1), split
 
 
@@ -114,13 +120,13 @@ def _cohesion(K1, pairs, split, gap, front, curl):
 
     def pull(P):
         q = P[K1:, front]
-        q[..., 0] -= np.sign(q[..., 0]) * 0.0015 * _ss(0.02, -0.02, q[..., 2]) * _ss(-0.12, -0.07, q[..., 2])
+        q[..., 0] -= np.sign(q[..., 0]) * 0.0008 * _ss(0.02, -0.02, q[..., 2]) * _ss(-0.12, -0.07, q[..., 2])
         P[K1:, front] = q
         Q = P[K1:]
         if curl:
             h = _ss(0.5, 1.0, np.linspace(0.0, 1.0, len(Q)))[:, None, None]
             axis = Q * np.asarray((1.0, 1.0, 0.0), dtype=F) - np.asarray((0.0, -0.015, 0.0), dtype=F)
-            Q -= _unit(axis) * F(0.003) * h
+            Q -= _unit(axis) * F(0.005) * h
         d = Q[:, b] - Q[:, a]
         L = np.linalg.norm(d, axis=2)
         z = 0.5 * (Q[:, a, 2] + Q[:, b, 2])
@@ -133,11 +139,12 @@ def _cohesion(K1, pairs, split, gap, front, curl):
     return pull
 
 
-def _gather(g, P, K1, groups, radius):
-    """The ends of the locks of each group drawn together into one tapering lock."""
+def _gather(g, P, K1, groups, radius, fa, phi):
+    """The ends of the locks of each group behind the shoulders drawn toward each other, into a broad tapering lock
+    (those in front of them stay side by side, a sheet over the chest)."""
     K = len(P)
     h = np.r_[np.zeros(K1), np.linspace(0.0, 1.0, K - K1)]
-    c = (0.8 * _ss(0.45, 1.0, h)).astype(F)[:, None, None]
+    c = (0.4 * _ss(0.45, 1.0, h)).astype(F)[:, None, None] * (np.abs(phi) >= fa)[None, :, None]
     mean = np.zeros_like(P)
     for grp in groups:
         mean[:, grp] = P[:, grp].mean(1, keepdims=True)
@@ -149,14 +156,14 @@ def _gather(g, P, K1, groups, radius):
     return P, out
 
 
-def _groups(phi):
+def _groups(phi, fa):
     """The locks in front of each shoulder make one group framing the face; behind them they pair off, and the last
     lock of each side pairs with its mirror down the middle of the back."""
     out, mid = [], []
     for s in (1, -1):
         side = np.flatnonzero(np.sign(phi) == s)
         side = side[np.argsort(np.abs(phi[side]))]
-        front = np.abs(phi[side]) < FRONT
+        front = np.abs(phi[side]) < fa
         if front.any():
             out.append(side[front])
         side = side[~front]
@@ -172,6 +179,7 @@ def _layer(g, phi, roots, rings, K1, K2, width, thick, length, taper, root):
     """The curtain: over the scalp from the roots to ``rings`` (K1 rings), then hanging (K2 rings). A bob's ends are
     cut blunt in one line and turn under; long hair's gather into a few tapering locks."""
     bob = g.name == "bob"
+    fa = _front(g)
     n = len(phi)
     t1 = np.linspace(0.0, 1.0, K1)[:, None]
     t = np.r_[np.linspace(0.0, 1.0, K1), np.ones(K2)][:, None]
@@ -179,28 +187,30 @@ def _layer(g, phi, roots, rings, K1, K2, width, thick, length, taper, root):
     lo = 1.0 if g.under_hat else 0.6                    # narrower toward the parting
     W = width[None, :] * (lo + (1 - lo) * t) * (1 + 0.25 * hang)
     T = thick[None, :] * (0.5 + 0.5 * _ss(0.0, 0.25, hang)) * np.ones((K1 + K2, 1))
+    if bob:                             # no fuller below the head, thinning to its hem, which turns in under
+        T = thick[None, :] * (0.5 + 0.15 * _ss(0.0, 0.5, hang)) * (1.0 - 0.4 * _ss(0.55, 1.0, hang))
     P = np.zeros((K1 + K2, n, 3), dtype=F)
     P[:K1] = _arcs(g, roots, rings, K1, thick[None, :] * 0.2 * (0.2 + 0.8 * _ss(0.0, 0.3, t1)), W[:K1] * 0.5)
     radius = (thick * 0.5).astype(F)
-    ahead = np.clip((FRONT - np.abs(phi)) / 0.15, -1.0, 1.0)
+    ahead = np.clip((fa - np.abs(phi)) / 0.15, -1.0, 1.0)
     bias = np.stack([np.zeros(n), ahead * 0.9, np.zeros(n)], 1).astype(F)
     # Steered in front of the shoulders or behind them as they reach them (the locks at the back hang straight).
     lean = bias * np.where(ahead > 0, 0.35, 0.9 * _ss(2.6, 2.0, np.abs(phi)))[:, None]
     P = g.drape.hang(P, np.full(n, K1), length / K2, radius, bias, lean=lean)
-    pairs, split = _pairs(phi)
+    pairs, split = _pairs(phi, fa)
     gap = np.where(split, 0.4, 0.55) * np.minimum(width[pairs[:, 0]], width[pairs[:, 1]])
     stiff = np.r_[np.zeros(K1), np.full(K2, 0.25)].astype(F)
     P, rest = g.drape.settle(P, np.full(n, K1), radius, bias, rounds=16, stiff=stiff, lean=lean, fade=True, smooth=5,
-                             constrain=_cohesion(K1, pairs, split, gap, np.flatnonzero(np.abs(phi) < FRONT), bob))
+                             constrain=_cohesion(K1, pairs, split, gap, np.flatnonzero(np.abs(phi) < fa), bob))
     if not bob:
-        P, gathered = _gather(g, P, K1, _groups(phi), radius)
+        P, gathered = _gather(g, P, K1, _groups(phi, fa), radius, fa, phi)
         rest = np.where(np.abs(gathered).sum(2, keepdims=True) > 0, gathered, rest)
     # Thin along the hairline, so the hair's edge there is soft rather than a ledge.
     edge = P[:K1, :, 2] - hairlines(P[:K1].reshape(-1, 3), g.part, False).reshape(K1, n)
     T[:K1] *= 0.35 + 0.65 * _ss(0.004, 0.03, edge)
-    front = np.flatnonzero((np.abs(phi) < FRONT) & (not bob))
-    return Strands(P, W, T, taper=taper, root=root, N=_normals(g, P, rest, K1, front), round=0.45,
-                   blunt=0.55 if bob else 0.0, merge=0.8 if bob else 0.25, cut=bob)
+    front = np.flatnonzero((np.abs(phi) < fa) & (not bob))
+    return Strands(P, W, T, taper=taper, root=root, N=_normals(g, P, rest, K1, front), round=0.2 if bob else 0.25,
+                   blunt=0.35 if bob else 0.55, merge=0.8 if bob else 0.5, cut=bob)
 
 
 def _fringe(g, n=6):
@@ -235,14 +245,15 @@ def long_locks(g):
     ring_z = np.interp(np.abs(phi), RING_A, RING_Z)
     rings = _at(g, phi, ring_z)
     n = len(phi)
-    face = np.where(np.abs(phi) < FRONT, 1.0, 0.0)          # the locks by the face finer
+    fa = _front(g)
+    face = np.where(np.abs(phi) < fa, 1.0, 0.0)             # the locks by the face a little finer
     if g.name == "bob":                 # down to the chin, a little longer by the face, short at the nape
-        length = fall * (1.0 - 0.22 * _ss(1.2, 2.8, np.abs(phi))) * rng.uniform(0.98, 1.02, n)
+        length = fall * (1.0 - 0.36 * _ss(1.2, 2.8, np.abs(phi))) * rng.uniform(0.98, 1.02, n)
         return [_layer(g, phi, _roots(g, phi, ring_z), rings, 7, 10, wide * rng.uniform(0.95, 1.05, n),
                        st.thick * rng.uniform(0.95, 1.05, n), length, 0.75, 0.35), _fringe(g)]
     # Long enough at the sides to fall past the shoulders (behind them, or in front for the locks by the face).
-    length = fall * np.where(np.abs(phi) < FRONT, 0.76, 0.86 + 0.14 * _ss(1.6, 3.0, np.abs(phi)))
-    for grp in _groups(phi):            # a group's locks end together, every other group a little shorter
+    length = fall * np.where(np.abs(phi) < fa, 0.76, 0.86 + 0.14 * _ss(1.6, 3.0, np.abs(phi)))
+    for grp in _groups(phi, fa):            # a group's locks end together, every other group a little shorter
         length[grp] = length[grp].mean() * rng.uniform(0.95, 1.03)
     return [_layer(g, phi, _roots(g, phi, ring_z), rings, 7, 16, wide * rng.uniform(0.92, 1.08, n) * (1 - 0.1 * face),
-                   st.thick * rng.uniform(0.92, 1.08, n) * (1 - 0.25 * face), length, 0.6, 0.35)]
+                   st.thick * rng.uniform(0.92, 1.08, n) * (1 - 0.1 * face), length, 0.75, 0.35)]

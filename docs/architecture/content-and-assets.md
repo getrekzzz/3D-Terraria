@@ -42,9 +42,10 @@ heavy brows over deep-set eyes, low foreheads, heavy or pointed jaws, an underbi
 short legs under a goblin's big head) with separate eyeballs, brows and lashes; hands
 with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble); hair sculpted from traced locks into
 one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows: a neat cut
-with a side-swept fringe and an even edge, messy hair with tufts standing up, a woman's short hair as a chin-length
-bob; `hairsdf.py` blends them into lens-shaped clumps that stay full round bends and end in rounded or blunt tips,
-with UVs along the flow, `hairpaint.py`; long hair falls over a smooth dome over each ear, `hair.py`, and with
+with a side-swept fringe, fuller on top and close at the sides and back, messy hair in flat, uneven locks, a woman's
+short hair as a chin-length bob; `hairsdf.py` blends them into lens-shaped clumps that stay full round bends and end
+in rounded or blunt tips, a cut tapering into the skin toward its edge at the sides and nape, with UVs along the
+flow, `hairpaint.py`; long hair falls over a smooth dome over each ear, `hair.py`, and with
 ponytails hangs onto the shoulders, back and clothes, `longhair.py`, `hairdrape.py`, `hairtails.py`; buns are a
 rope coiled round a core; hair under a hat is pressed flat inside it, comes out from under its rim no thicker than
 the hat and is cut along the hat's own edge, `underhat.py`);

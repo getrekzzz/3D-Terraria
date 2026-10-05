@@ -3,8 +3,8 @@ surfaces offset from the bare skull (headshape) so they hug it whatever the face
 
 - Short and messy hair is combed out from the crown, the fringe swept across from a side parting, the sideburns and
   the nape lying down; locks that would run past the hairline or onto the ears stop there and lie close to the skin.
-  A neat cut ends in an even, blunt edge that thins into the skin at the sides and nape; messy hair has tufts that
-  end short and stand up off the rest, with pointed tips.
+  A neat cut is fuller on top and close down the sides and back, ending in an even edge that thins into the skin
+  at the sides and nape; messy hair ends unevenly, flat locks lying over each other with some flicking up.
 - Long hair falls from a parting down the sides and back of the head (swept back from the forehead, never over the
   face), over the ears, hangs free below it framing the face, and drapes over the shoulders and down the back
   (longhair.py, hairdrape.py). A woman's short hair is a chin-length bob in the same way, its ends cut blunt and
@@ -47,7 +47,7 @@ class Style:
 
 STYLES = {
     "short": Style(0.003, 0.006, 0.075, 0.2, 0.023, 0.0085, 100, 0.8, 0.04),
-    "messy": Style(0.003, 0.012, 0.08, 0.3, 0.024, 0.0105, 95, 0.4, 0.45),
+    "messy": Style(0.003, 0.009, 0.08, 0.3, 0.022, 0.0095, 105, 0.4, 0.45),
     "long": Style(0.003, 0.004, 0.11, 0.1, 0.036, 0.013, 150, 0.55, 0.05, fall=0.36),
     "bob": Style(0.003, 0.005, 0.0, 0.0, 0.034, 0.012, 150, 0.8, 0.03, fall=0.13),
     "ponytail": Style(0.0025, 0.002, 0.0, 0.0, 0.026, 0.0065, 90, 0.0, 0.02, tie=(0.0, -0.096, 0.048)),
@@ -79,7 +79,8 @@ class Groom:
         # them, lying on a smooth dome over each); ``full`` adds the ears, which no hair may cut into, and ``hang`` is
         # what hanging hair is kept off.
         self.full = lambda p: head.shape.field(p, face=False)
-        self.field = ear_cover(head.shape) if self.st.fall else (lambda p: head.shape.field(p, ears=False, face=False))
+        self.field = (ear_cover(head.shape, 0.4 if style == "bob" else 0.6) if self.st.fall else
+                      (lambda p: head.shape.field(p, ears=False, face=False)))
         self.hang = self.field if self.st.fall else self.full
         self.name = style
         self.color = hex3(color)
@@ -129,7 +130,7 @@ class Groom:
         lie = 0.3 + 0.7 * coverages(p, self.part, self.sideburns, 0.012)
         t = np.asarray(t, dtype=F)
         arch = np.maximum(np.sin(np.pi * np.clip(t, 0, 1) ** 0.8), 0.0) ** 0.6   # (sin of pi in float32 is just below 0)
-        rise = 0.35 if self.tie is not None else 1.0       # hair pulled back lies flat
+        rise = 0.35 if self.tie is not None else 1.0 if self.st.mess > 0.2 else 0.6   # flat pulled back, close cut neat
         return (base * lie + self.st.thick * lie * (arch * (0.1 + layer * 0.12) * rise - 0.6 * (1 - t) ** 3)).astype(F)
 
     def _grows(self, q, slack=0.0):
@@ -244,13 +245,12 @@ class Groom:
                     edge[i] = arc[k - 1, i] + 0.5 * (arc[k, i] - arc[k - 1, i])
                     break
         mess = st.mess > 0.2
-        # A neat cut ends in an even edge; messy hair has tufts that end short and stand up off the rest.
-        lengths = np.minimum(lengths * 2.0, edge * (self.rng.uniform(0.8, 1.0, n) if mess else
+        # A neat cut ends in an even edge; messy hair ends unevenly, some of its locks flicking up off the rest.
+        lengths = np.minimum(lengths * 2.0, edge * (self.rng.uniform(0.82, 1.0, n) if mess else
                                                     np.where(roots[:, 1] > 0.03, self.rng.uniform(0.95, 1.0, n),
                                                              self.rng.uniform(0.9, 1.0, n))))
         tuft = self.rng.random(n) < st.mess * 0.6
-        lift = np.where(tuft, self.rng.uniform(0.004, 0.011, n) * st.mess / 0.45, 0.0)
-        lengths = np.where(tuft & mess, lengths * self.rng.uniform(0.55, 0.85, n), lengths)
+        lift = np.where(tuft, self.rng.uniform(0.002, 0.0055, n) * st.mess / 0.45, 0.0) * _ss(0.0, 0.04, roots[:, 2])
         keep = lengths > 0.02                       # nubs at the hairline: the locks from above cover it
         rings = 10
         P = self.trace(roots[keep], lengths[keep], layers[keep], turn[keep], rings, lift[keep])
@@ -258,11 +258,14 @@ class Groom:
         (cy, cz), (ry, rz) = EAR_ZONE
         r = np.hypot((P[..., 1] - cy) / ry, (P[..., 2] - cz) / rz)
         W = widths[keep][None] * (0.5 + 0.5 * _ss(1.0, 1.7, r))
-        T = thick[keep][None] * (0.6 + 0.4 * _ss(-0.03, 0.02, P[..., 2]))
+        # Fuller over the top, shorter and closer down the sides and back (a neat cut most of all).
+        T = thick[keep][None] * ((0.6 + 0.4 * _ss(-0.03, 0.02, P[..., 2])) if mess else
+                                 (0.45 + 0.55 * _ss(-0.04, 0.06, P[..., 2])))
+        # Tapered to the skin down the sideburns and over the nape (the fringe keeps its body).
         above = P[..., 2] - hairlines(P.reshape(-1, 3), self.part, self.sideburns).reshape(P.shape[:2])
-        T *= 1.0 - 0.6 * _ss(0.015, -0.004, above) * _ss(0.045, 0.02, P[..., 1])    # (the fringe keeps its body)
-        return Strands(P, W, T, taper=0.5 if mess else 0.65, root=0.5, round=0.5 if mess else 0.4,
-                       blunt=0.1 if mess else 0.5, merge=0.55 if mess else 0.85, cut=True)
+        T *= 1.0 - 0.6 * _ss(0.025, 0.0, above) * _ss(0.06, 0.035, P[..., 1])
+        return Strands(P, W, T, taper=0.55 if mess else 0.65, root=0.5, round=0.15 if mess else 0.2,
+                       blunt=0.0 if mess else 0.15, merge=0.3 if mess else 0.85, cut=True)
 
     def cap(self, head_obj):
         """A close crop: the scalp lifted a fraction of a millimetre, stippled like cropped hair, thinning into the
@@ -317,11 +320,11 @@ class Groom:
             parts.append(bun)
             solids += core
         if self.name == "bob":         # shallower grooves: a bob is a smooth, glossy mass
-            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0008, 0.0009, 0.006), 0.0062)
+            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0008, 0.0009, 0.006), 0.0035)
         elif self.st.fall:
-            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0011, 0.0013, 0.006), 0.0062)
+            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0011, 0.0013, 0.006), 0.0035)
         elif self.tie:
-            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0009, 0.0016, 0.0045), 0.0034)
+            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0009, 0.0016, 0.0045), 0.0028)
         else:
-            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0008, 0.0008, 0.0045), 0.0015)
+            sculpt = Sculpt(self, parts, solids, 0.0026, (0.0008, 0.0008, 0.0045), 0.0005)
         return [sculpt.build()] + extra

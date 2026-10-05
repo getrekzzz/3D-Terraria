@@ -164,8 +164,8 @@ class SkinPainter:
             c = mix(c, mul(color, (0.72, 0.72, 0.72)), roots * 0.85)
         if self.scalp:
             # Hair roots under the hair, thinning out softly at the hairline (the locks cover the edge).
-            from .hair import coverage
-            c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), coverage(q, self.part, self.sideburns, 0.008) * 0.9)
+            from .hair import scalp_tint
+            c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), scalp_tint(q, self.part, self.sideburns) * 0.9)
         if self.p.get("face"):          # a monster's sockets, scars, veins and gums
             c = monsterface.tint(self.head, self.p["face"], q, c)
         return c

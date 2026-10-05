@@ -13,6 +13,11 @@ MIDDLE_Y = -0.012          # the axis the azimuths are measured round
 ROOM = 0.012               # how far above the lower edge hair still grows, out of sight
 
 
+def _ss(a, b, x):
+    t = np.clip((x - a) / (b - a), 0.0, 1.0)
+    return (t * t * (3 - 2 * t)).astype(F)
+
+
 def _crown(parts):
     """The union of a hat's parts that fit round the head."""
     fit = [parts[k][0] if isinstance(parts[k], tuple) else parts[k] for k in ("crown", "band", "fur") if k in parts]
@@ -31,8 +36,12 @@ class UnderHat:
             from . import capshapes, headwear
             hat = capshapes.CapShape(shape, fem) if shape in capshapes.SHAPES else None
         self.solid = hat.field if hat else headwear.cap_field(head.shape, p.get("visor", True))
-        if kind == "wide" or shape == "shako":       # (a wide hat's crown filled: no lock pokes out through it)
+        self.bands = ()
+        self.filled = kind == "wide" or shape == "shako"
+        if self.filled:       # (a wide hat's crown filled: no lock pokes out through it)
+            from .hats import BAND
             self.solid = hat.filled
+            self.hat, self.bands = hat, BAND.get(shape or "brim", ())
         # Where it fits round the head: its crown and band, not a brim, peak, knot or pompom standing off it.
         self.fit = (lambda q: _crown(hat.parts(q))) if hat else self.solid
         self.key = (kind, shape, bool(p.get("visor", True)), bald)
@@ -85,5 +94,11 @@ class UnderHat:
         if m.any():
             from .sdf import smax
             d = d.copy()
-            d[m] = smax(d[m], -(self.solid(np.ascontiguousarray(X[m])) - F(0.0012)), 0.0015)
+            x = np.ascontiguousarray(X[m])
+            room = np.full(len(x), 0.0012, dtype=F)
+            if self.bands:          # (and further round the band laid on its crown, standing out from it)
+                z = self.hat.local(x)[:, 2]
+                for z0, z1 in self.bands:
+                    room += F(0.0028) * _ss(z0 - 0.001, z0 + 0.002, z) * _ss(z1 + 0.005, z1 + 0.001, z)
+            d[m] = smax(d[m], -(self.solid(x) - room), 0.0015)
         return d

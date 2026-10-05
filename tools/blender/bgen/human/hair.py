@@ -57,12 +57,13 @@ def hairlines(q, part=0.0, sideburns=True):
     return z
 
 
-def ear_clears(q):
-    """1 away from the ears, 0 on and right round them: hair grows round the ears, not over them."""
+def ear_clears(q, soft=0.0):
+    """1 away from the ears, 0 on and right round them: hair grows round the ears, not over them (``soft``: thinning
+    out over a wider band round them, as hair pulled back does)."""
     q = _points(q)
     (cy, cz), (ry, rz) = EAR_ZONE
     r = np.hypot((q[:, 1] - cy) / ry, (q[:, 2] - cz) / rz)
-    return np.where(np.abs(q[:, 0]) < 0.035, 1.0, _ss(0.92, 1.12, r))
+    return np.where(np.abs(q[:, 0]) < 0.035, 1.0, _ss(0.92, 1.12 + soft, r))
 
 
 def coverages(q, part=0.0, sideburns=True, soft=0.006, ears=True):
@@ -85,16 +86,23 @@ def coverage(q, part=0.0, sideburns=True, soft=0.006) -> float:
     return float(coverages(q, part, sideburns, soft)[0])
 
 
+def scalp_tint(q, part=0.0, sideburns=True) -> float:
+    """How much the skin under the hair takes its colour (paint): only well inside the hair's edge, so none of it
+    shows below the hairline as a stain on the forehead or in front of the ears."""
+    q = _points(q) - np.asarray((0.0, 0.0, 0.011))
+    return float(coverages(q, part, sideburns, 0.005)[0])
+
+
 _COVERS = {}
 
 
-def ear_cover(shape):
+def ear_cover(shape, slope=0.6):
     """The surface long hair lies over: the bare skull with each ear covered over by a smooth dome (the hair falls
-    over the ear from its rim, sloping back to the skull round it), so the hair hangs past the ears in one curtain
-    instead of parting round them. A field like the head's (head-local units)."""
-    key = shape.key()
+    over the ear from its rim, sloping back to the skull round it at ``slope``), so the hair hangs past the ears in
+    one curtain instead of parting round them. A field like the head's (head-local units)."""
+    key = (shape.key(), slope)
     if key not in _COVERS:
-        _COVERS[key] = _ear_bumps(shape)
+        _COVERS[key] = _ear_bumps(shape, slope=slope)
     lo, step, table = _COVERS[key]
     skull = lambda p: shape.field(p, ears=False, face=False)
     if table is None:
@@ -113,7 +121,7 @@ def ear_cover(shape):
     return field
 
 
-def _ear_bumps(shape, step=0.002, slope=0.6, margin=0.003):
+def _ear_bumps(shape, step=0.002, slope=0.6, margin=0.002):
     """How far out (along x) the ear stands from the bare skull over a (y, z) grid round it, widened into a dome:
     every point is at least as high as the ear's rim minus ``slope`` times the distance to it, plus ``margin``."""
     if not shape.ears:
@@ -134,7 +142,7 @@ def _ear_bumps(shape, step=0.002, slope=0.6, margin=0.003):
     skull = outer(shape.field(p, ears=False, face=False))
     b = np.nan_to_num(np.maximum(ear - np.nan_to_num(skull, nan=0.0), 0.0), nan=0.0)
     b = np.where(b > 0.0015, b, 0.0)
-    r = int(0.03 / step)
+    r = int(min(0.055, float(b.max()) / slope + 0.002) / step)       # as far as the dome reaches
     dome = b.copy()
     pad = np.pad(b, r)
     for dy in range(-r, r + 1):
@@ -143,10 +151,13 @@ def _ear_bumps(shape, step=0.002, slope=0.6, margin=0.003):
             if dist <= r * step:
                 dome = np.maximum(dome, pad[r + dy:r + dy + b.shape[0], r + dz:r + dz + b.shape[1]] - slope * dist)
     dome = np.where(dome > 0, dome + margin * _ss(0.0, 0.004, dome), 0.0)
+    pad = np.pad(dome, 3, mode="edge")      # widened first by as much as the smoothing reaches, so it never sinks
+    dome = np.max([pad[3 + a:3 + a + dome.shape[0], 3 + c:3 + c + dome.shape[1]]      # onto the ear's rim and
+                   for a in range(-3, 4) for c in range(-3, 4)], 0)                     # shows its shape
     for _ in range(3):                       # smoothed so the hair over it has no creases
         pad = np.pad(dome, 1, mode="edge")
         dome = sum(pad[1 + a:1 + a + dome.shape[0], 1 + c:1 + c + dome.shape[1]] for a in (-1, 0, 1) for c in (-1, 0, 1)) / 9
-    return lo, step, np.maximum(dome, np.where(b > 0, b + 0.0015, 0.0))    # (never down onto the ear's rim)
+    return lo, step, np.maximum(dome, np.where(b > 0, b + 0.0015, 0.0))
 
 
 def mesh_from(bm, name):

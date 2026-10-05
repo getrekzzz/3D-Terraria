@@ -2,8 +2,9 @@
 
 - A ponytail: the hair combed back is gathered into the tie, springs back out of it in a full bundle, arcs over and
   falls down the back of the head and the nape in a gentle S, resting on the back (drape), and tapers. The
-  bundle is nine broad locks round a core, overlapping so it reads as one gathered tail with soft grooves, its end
-  a rounded brush of the locks' own tips rather than one spike.
+  bundle is eight broad locks twisting round a short core, apart enough that each reads as a clump with a groove
+  beside it, and they part a little toward the end, which breaks into their own tips at different lengths
+  instead of narrowing to one point.
 - A bun: a broad flat rope wound twice round a full core, from the scalp up over the top, sitting on the crown.
 """
 import math
@@ -73,22 +74,22 @@ def _tail_axis(g, start, out, length, K, R):
 
 def ponytail(g):
     """The tail's locks, the gather of hair into the tie (a solid for the sculpt) and the band round it. The tail is
-    a bundle of broad locks round a core, overlapping so it reads as one gathered mass with soft grooves, full just
-    below the band and tapering to its locks' tips; the band grips it where it leaves the head."""
+    a bundle of broad clumps round a core, full just below the band and ending in the clumps' own tips; the band
+    grips it where it leaves the head."""
     tie, out = _tie(g, 0.002)
     hat = bool(g.under_hat)
-    r0, top = (0.012, 0.026) if hat else (0.0135, 0.032)     # the bundle inside the band, and at its fullest
+    r0, top = (0.012, 0.027) if hat else (0.0135, 0.034)     # the bundle inside the band, and at its fullest
     length = 0.22 if hat else 0.32
     K = 22
     t = np.linspace(0.0, 1.0, K)
     s = t * length
-    R = (r0 + (top - r0) * _ss(0.0, 0.07, s)) * (1 - 0.45 * _ss(0.3, 1.0, t))
+    R = (r0 + (top - r0) * _ss(0.0, 0.07, s)) * (1 - 0.42 * _ss(0.35, 1.0, t))
     start = tie + out * 0.003
     axis = _tail_axis(g, start, out, length, K, R)
     T, N, B = _frames(axis, out)
-    n = 9
-    a0 = 2 * math.pi * np.arange(n) / n + g.rng.uniform(-0.12, 0.12, n)
-    ends = 1.0 - 0.14 * g.rng.random(n)
+    n = 8
+    a0 = 2 * math.pi * np.arange(n) / n + g.rng.uniform(-0.15, 0.15, n)
+    ends = 1.0 - 0.24 * g.rng.random(n)
     P = np.zeros((K, n + 1, 3), dtype=F)
     Nl = np.zeros((K, n + 1, 3), dtype=F)
     W = np.zeros((K, n + 1), dtype=F)
@@ -97,19 +98,19 @@ def ponytail(g):
         u = t * ends[i]
         c, Ni, Bi = (_resample(x, u, axis) for x in (axis, N, B))
         r = np.interp(u, t, R)
-        a = a0[i] + 0.9 * u                              # twisting a little round the bundle
+        a = a0[i] + 1.1 * u                              # twisting a little round the bundle
         radial = _unit(np.cos(a)[:, None] * Ni + np.sin(a)[:, None] * Bi)
-        spread = r * (0.5 - 0.3 * _ss(0.6, 1.0, u))      # drawing together toward the end
+        spread = r * (0.56 + 0.12 * _ss(0.7, 1.0, u))     # parting a little toward the end
         P[:, i] = c + radial * spread[:, None]
         Nl[:, i] = radial
-        W[:, i] = r * 1.0
-        H[:, i] = r * 0.62
-    u = t * 0.75                                         # a core fills the bundle
+        W[:, i] = r * 0.95
+        H[:, i] = r * 0.58
+    u = t * 0.62                                         # a core fills the bundle
     P[:, n] = _resample(axis, u, axis)
     Nl[:, n] = _resample(N, u, axis)
-    W[:, n] = np.interp(u, t, R) * 1.1
-    H[:, n] = np.interp(u, t, R) * 1.1
-    locks = Strands(P, W, H, taper=0.7, root=1.0, N=Nl, round=0.6, blend=2.2, blunt=0.3)
+    W[:, n] = np.interp(u, t, R) * 1.0
+    H[:, n] = np.interp(u, t, R) * 1.0
+    locks = Strands(P, W, H, taper=0.55, root=1.0, N=Nl, round=0.5, blend=1.3, blunt=0.25, merge=0.35)
     gather = ("cone", tie - out * 0.014, start, 0.022, r0 * 0.8)
     band = tie_band(g, axis[0] + T[0] * 0.003, T[0], r0 * 0.82 + 0.0005)
     return locks, gather, band
