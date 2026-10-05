@@ -25,16 +25,16 @@ def hand_field(fr, side):
     wr = V(j[f"wrist.{side}"])
 
     def field(p):
-        d = ellipsoid(p, wr + V(along * 0.036 * s), (0.044 * s, 0.03 * s, 0.019 * s), rot)
+        d = ellipsoid(p, wr + V(along * 0.042 * s), (0.05 * s, 0.034 * s, 0.02 * s), rot)
         d = smin(d, round_cone(p, wr - V(along * 0.02 * s), wr + V(along * 0.02 * s), 0.022 * s, 0.024 * s), 0.01 * s)
         for f, r in (("thumb", 0.0095), ("index", 0.0088), ("middle", 0.009), ("ring", 0.0084)):
             pts = [V(j[f"{f}{i}.{side}"]) for i in (1, 2, 3)] + [V(j[f"{f}_tip.{side}"])]
             pts = [pts[0]] + [pts[0] + (x - pts[0]) * F(1.3) for x in pts[1:]]     # long twigs
             tip = pts[2] + (pts[3] - pts[2]) * 2.1          # with long, pointed ends
-            pts = pts[:3] + [tip]
-            radii = (r * 1.25, r * 1.05, r * 0.82, 0.0018)
+            pts = [pts[0] - V(along * 0.02 * s)] + pts[1:3] + [tip]       # rooted well inside the palm
+            radii = (r * 1.3, r * 1.05, r * 0.82, 0.0018)
             for i in range(3):
-                d = smin(d, round_cone(p, pts[i], pts[i + 1], radii[i] * s, radii[i + 1] * s), 0.004 * s)
+                d = smin(d, round_cone(p, pts[i], pts[i + 1], radii[i] * s, radii[i + 1] * s), (0.008 if i == 0 else 0.004) * s)
             for i in (1, 2):
                 d = smin(d, sphere(p, pts[i], radii[i] * 1.18 * s), 0.003 * s)
         return d + F(0.0005) * (matter.noise(p, 300.0, 7 if side == "R" else 8) - F(0.5))

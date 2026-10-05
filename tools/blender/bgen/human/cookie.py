@@ -41,7 +41,9 @@ class Dough:
         torso = smin(torso, ellipsoid(p, V((0, 0.012 * s, 1.19 * s)), (0.17 * s, 0.078 * s, 0.22 * s)), 0.03 * s)   # puffed front
         q = (p - V(head.c)) / F(head.h)
         disc = _disc(q, 0.142, 0.06, 0.04) * F(head.h)
-        neck = round_cone(p, V(j["neck"]) - V((0, 0, 0.05 * s)), V(head.c) - V((0, 0, 0.04 * s)), 0.11 * s, 0.095 * s)
+        flat = np.asarray((1.0, 1.6, 1.0), dtype=F)          # the neck as flat as the slab (no lump out of the back)
+        a, b = V((0, -0.004 * s, j["neck"].z - 0.05 * s)), V((0, head.c.y, head.c.z - 0.04 * s))
+        neck = round_cone(p * flat, a * flat, b * flat, 0.11 * s, 0.095 * s) / F(1.3)
         d = smin(smin(torso, neck, 0.04 * s), disc, 0.045 * s)
         for side in ("R", "L"):
             sh, wr = V(j[f"shoulder.{side}"]), V(j[f"wrist.{side}"])

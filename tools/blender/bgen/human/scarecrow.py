@@ -40,8 +40,9 @@ def _fold(q):
     return F(1) - np.abs(np.sin(th * F(6) + F(2.2) * matter.noise(q, 22.0, 4))), th
 
 
-def sack_field(hat=None):
-    """The stuffed sack in head-local units; with ``hat`` (hats.Hat) kept inside the hat's crown above its band."""
+def sack_field(hat=None, cut=True):
+    """The stuffed sack in head-local units; with ``hat`` (hats.Hat) kept inside the hat's crown above its band;
+    without ``cut`` the eye holes and the mouth's groove are left out."""
     def field(q):
         x, y, z = q[:, 0], q[:, 1], q[:, 2]
         bag = ellipsoid(q, (0, 0.004, -0.014), (0.088, 0.103, 0.116)) + F(0.005) * (matter.fbm(q, 14.0, 2, 3) - F(0.5))
@@ -56,7 +57,7 @@ def sack_field(hat=None):
         ring = np.stack([np.cos(th), np.sin(th), np.zeros_like(th)], 1)
         hem = F(HEM) + F(0.012) * (matter.noise(ring, 2.2, 7) - F(0.5))
         skirt = np.maximum(np.abs(skirt + F(0.0024)) - F(0.0024), np.maximum(hem - z, z - F(TIE_Z + 0.006)))
-        front = F(0.03) - y
+        front = F(0.03) - y if cut else F(1)
         for sx in (1, -1):                           # eye holes: pockets 2.2 cm deep under the surface
             d = np.maximum(d, -np.maximum(np.maximum(_eye(q, sx), -d - F(0.022)), front))
         groove = np.maximum(np.abs(z - _mouth_z(x).astype(F)) - F(0.0024), np.abs(x) - F(0.05))
@@ -91,13 +92,11 @@ def sack(head, p, under):
     stain = 1 - 0.22 * matter.ss(0.55, 0.75, matter.fbm(q, 9.0, 2, 23))
     weave = 0.95 + 0.1 * matter.noise(q * np.asarray((1.0, 1.0, 9.0)), 160.0, 25)       # coarse threads
     crease = 1 - 0.3 * fold * matter.ss(-0.07, TIE_Z, q[:, 2]) - 0.2 * matter.ss(-0.15, -0.19, q[:, 2])
-    d = field(q.astype(F))
-    hole = np.zeros(len(q))
-    for sx in (1, -1):
-        hole = np.maximum(hole, matter.ss(0.002, -0.004, _eye(q.astype(F), sx)) * (q[:, 1] > 0.03))
-    groove = (np.abs(q[:, 2] - _mouth_z(q[:, 0])) < 0.004) & (np.abs(q[:, 0]) < 0.05) & (q[:, 1] > 0.03)
-    shade = (mottle * stain * weave * crease)[:, None] * (1 - 0.9 * hole[:, None]) * np.where(groove, 0.45, 1.0)[:, None]
-    matter.paint(obj, base * shade + 0 * d[:, None])
+    sunk = matter.ss(-0.0006, -0.0026, sack_field(hat, cut=False)(q.astype(F)))      # inside a cut: below the cloth
+    eye = sunk * (q[:, 2] > -0.04)                                                       # the eye holes black inside
+    groove = sunk * (q[:, 2] <= -0.04)
+    shade = (mottle * stain * weave * crease) * (1 - 0.94 * eye) * (1 - 0.55 * groove)
+    matter.paint(obj, base * shade[:, None])
     matter.slot(obj, "char:cloth")
     return obj, field
 

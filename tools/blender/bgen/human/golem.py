@@ -1,7 +1,8 @@
 """A golem of granite blocks (``anatomy: stone``): chipped slabs and boulders, each riding one bone of the human rig
-so the body grinds and shifts block against block as it moves, over a dark core that fills the cracks between
-them. Broad boulder shoulders over a tapering chest of two front slabs and a hump behind the neck, a narrower belly
-block on a wide pelvis, thick arms swelling to heavy forearms and fists of jointed stone fingers, pillar legs on
+so the body grinds and shifts block against block as it moves, over a lumpy core of dark packed gravel that shows
+only in the cracks between them. Broad boulder shoulders with stones between them and the neck, a tapering chest of
+two front slabs, a hump behind the neck and a block under the jaw, a broad belly block on a wide pelvis, thick arms
+swelling to heavy forearms and massive fists of jointed stone fingers, pillar legs with a stone behind each knee on
 flat block feet, and a blocky head sunk low under a heavy brow, its eyes glowing deep in the sockets.
 
 Colours from ``skin`` (the granite: paler speckle, dark flecks and darker cracks, each block a shade apart) and
@@ -14,6 +15,7 @@ from .matter import F, chips, crack, local, round_box
 from .rig import rigid
 
 SOURCES = ("golem.py",)
+FIST = 1.45          # the hands' blocks against the hand's joints
 
 
 class Piece:
@@ -72,13 +74,14 @@ def pieces(fr):
     S = lambda *v: np.asarray(v) * s
     ident = np.eye(3)
     out = [
-        Piece("pelvis", "hips", S(0, -0.01, 0.95), ident, S(0.136, 0.1, 0.08), 0.03 * s, 11,
+        Piece("pelvis", "hips", S(0, -0.01, 0.95), ident, S(0.15, 0.108, 0.086), 0.032 * s, 11,
               cracks=(((0, 1, 0.3), 0.2, (1, 0, 0), 0.6),)),
-        Piece("belly", "spine", S(0, 0.006, 1.085), ident, S(0.114, 0.094, 0.07), 0.026 * s, 12),
+        Piece("belly", "spine", S(0, 0.002, 1.09), ident, S(0.134, 0.1, 0.088), 0.03 * s, 12, nchips=5),
         Piece("chest", "chest", S(0, -0.014, 1.285), ident, S(0.16, 0.122, 0.13), 0.034 * s, 13, taper=0.3,
               cracks=(((1, 0, 0.4), 0.35, (0, 0, -1), 0.4),)),
         Piece("back", "chest", S(0, -0.1, 1.41), matter.basis((1, 0, 0), (0, 1, 0.5)), S(0.15, 0.064, 0.09), 0.028 * s, 14),
         Piece("nape", "neck", S(0, -0.035, 1.47), matter.basis((1, 0, 0), (0, 1, 0.3)), S(0.075, 0.06, 0.055), 0.022 * s, 15, nchips=7),
+        Piece("throat", "neck", S(0, 0.026, 1.452), matter.basis((1, 0, 0), (0, 1, -0.2)), S(0.084, 0.058, 0.056), 0.022 * s, 16, nchips=6),
     ]
     for side, sx in (("R", 1), ("L", -1)):
         sh, el, wr = j[f"shoulder.{side}"], j[f"elbow.{side}"], j[f"wrist.{side}"]
@@ -86,6 +89,8 @@ def pieces(fr):
         k = 0 if side == "R" else 50
         tilt = matter.basis((sx, 0, -0.32 * sx * sx), (0, 1, 0))
         out += [
+            Piece(f"trap_{side}", "chest", S(sx * 0.1, -0.034, 1.425), matter.basis((sx, 0, -0.45 * sx * sx), (0, 1, 0)),
+                  S(0.072, 0.07, 0.048), 0.02 * s, 31 + k, nchips=6),             # between the neck and the shoulder
             Piece(f"pec_{side}", "chest", S(sx * 0.072, 0.088, 1.31), matter.basis((sx, 0.25 * sx * sx, -0.1), (0, 1, 0.15)),
                   S(0.076, 0.04, 0.08), 0.018 * s, 20 + k),
             Piece(f"shoulder_{side}", f"upper_arm.{side}", np.asarray(tuple(sh)) + S(sx * 0.03, -0.006, 0.036), tilt,
@@ -94,13 +99,15 @@ def pieces(fr):
             _limb(f"upperarm_{side}", f"upper_arm.{side}", sh, el, 0.25, 0.92, 0.062 * s, 0.064 * s, 0.022 * s, 22 + k),
             Piece(f"elbow_{side}", f"forearm.{side}", np.asarray(tuple(el)) + S(0, -0.008, 0), matter.basis(wr - el, (0, 1, 0)),
                   S(0.058, 0.058, 0.06), 0.024 * s, 23 + k, nchips=8),
-            _limb(f"forearm_{side}", f"forearm.{side}", el, wr, 0.15, 0.97, 0.07 * s, 0.074 * s, 0.024 * s, 24 + k, flare=0.18,
+            _limb(f"forearm_{side}", f"forearm.{side}", el, wr, 0.15, 0.95, 0.068 * s, 0.072 * s, 0.024 * s, 24 + k, flare=0.12,
                   cracks=(((0, 0.3, 1), 0.1, (1, 0, 0), 0.3),)),
             _limb(f"thigh_{side}", f"thigh.{side}", hip, kn, 0.06, 0.9, 0.09 * s, 0.086 * s, 0.028 * s, 25 + k,
                   cracks=(((0, 1, 0.2), 0.0, (1, 0, 0), 0.2),)),
+            Piece(f"hock_{side}", f"shin.{side}", np.asarray(tuple(kn)) + S(0, -0.042, 0.012), matter.basis(an - kn, (0, 1, 0)),
+                  S(0.06, 0.042, 0.064), 0.02 * s, 30 + k, nchips=6),             # fills the back of the knee
             Piece(f"knee_{side}", f"shin.{side}", np.asarray(tuple(kn)) + S(0, 0.02, 0.0), matter.basis(an - kn, (0, 1, 0)),
                   S(0.064, 0.058, 0.066), 0.024 * s, 26 + k, nchips=8),
-            _limb(f"shin_{side}", f"shin.{side}", kn, an, 0.12, 0.92, 0.076 * s, 0.08 * s, 0.026 * s, 27 + k, flare=0.14),
+            _limb(f"shin_{side}", f"shin.{side}", kn, an, 0.09, 0.92, 0.076 * s, 0.08 * s, 0.026 * s, 27 + k, flare=0.14),
         ]
         heel, ball, toe = j[f"heel.{side}"], j[f"ball.{side}"], j[f"toe.{side}"]
         fwd = np.asarray(tuple(ball - heel))
@@ -122,8 +129,9 @@ def fist(fr, side):
     along, thumb, dorsal = (np.asarray(tuple(v)) for v in hand_axes(fr, side))
     wr = np.asarray(tuple(j[f"wrist.{side}"]))
     k = 0 if side == "R" else 300
-    out = [Piece(f"palm_{side}", f"hand.{side}", wr + along * 0.044 * s - dorsal * 0.003 * s, np.stack([along, thumb, dorsal], 1),
-                 (0.064 * s, 0.064 * s, 0.038 * s), 0.016 * s, 200 + k, nchips=5)]
+    big = lambda c: wr + (c - wr) * FIST          # a massive fist: the hand's blocks scaled up about the wrist
+    out = [Piece(f"palm_{side}", f"hand.{side}", big(wr + along * 0.04 * s - dorsal * 0.003 * s), np.stack([along, thumb, dorsal], 1),
+                 FIST * np.asarray((0.056 * s, 0.062 * s, 0.04 * s)), 0.016 * s * FIST, 200 + k, nchips=5)]
     for n, f in enumerate(("thumb", "index", "middle", "ring", "pinky")):
         w = (0.021 if f == "thumb" else 0.017 if f != "pinky" else 0.015) * s
         pts = [np.asarray(tuple(j[f"{f}{i}.{side}"])) for i in (1, 2, 3)] + [np.asarray(tuple(j[f"{f}_tip.{side}"]))]
@@ -135,8 +143,8 @@ def fist(fr, side):
             ext = 0.004 * s if i < 2 else 0.0
             c = (a + b) / 2 + (b - a) / L * ext / 2
             rot = matter.basis(b - a, dorsal)
-            out.append(Piece(f"{f}{i}_{side}", f"{f}.0{i + 1}.{side}", c, rot, (L / 2 + ext / 2 - 0.0012 * s, w * 0.95, w),
-                             0.0055 * s, 210 + k + 10 * n + i, nchips=3))
+            out.append(Piece(f"{f}{i}_{side}", f"{f}.0{i + 1}.{side}", big(c), rot,
+                             FIST * np.asarray((L / 2 + ext / 2 - 0.0012 * s, w * 0.95, w)), 0.0055 * s * FIST, 210 + k + 10 * n + i, nchips=3))
     return out
 
 
@@ -262,8 +270,10 @@ def _core(fr, arm, base):
     rig.heat_weights(core, arm, drop=fingers + ["root"])
     rig.clean_limb_weights(core, arm, fr)
     co, n = matter.coords(core), matter.normals(core)
-    core.data.vertices.foreach_set("co", (co - n * 0.016 * fr.s).astype(np.float32).ravel())     # well inside the blocks
+    lumps = 0.022 * fr.s * (matter.fbm(co.astype(F), 16.0, 2, 41)[:, None] - 0.5)          # rubble, not a smooth rod
+    core.data.vertices.foreach_set("co", (co - n * 0.018 * fr.s + n * lumps).astype(np.float32).ravel())   # inside the blocks
     core.data.update()
-    matter.paint(core, np.tile(base * 0.22, (len(core.data.vertices), 1)))
+    grit = matter.fbm(co.astype(F), 40.0, 2, 43)[:, None]
+    matter.paint(core, base * (0.36 + 0.26 * grit))                  # dark packed gravel between the blocks
     matter.slot(core, "char:bone")
     return core

@@ -1,4 +1,4 @@
-"""The rest of the possessed armour (plate.py): gauntlets (a flared cuff, a plate over the back of the hand round
+"""The rest of the possessed armour (plate.py): gauntlets (a lathed bell cuff, a plate over the back of the hand round
 a solid palm, and every finger segment its own small plate on its own bone, knuckles ridged), rivets set along the
 plates' edges, the eyes burning in the helm's slit, and the dim red glow that fills the suit where the plates part.
 """
@@ -7,7 +7,6 @@ import numpy as np
 from mathutils import Vector
 
 from . import matter
-from .matter import F
 from .rig import rigid
 from .sdf import ellipsoid, round_cone, smin
 
@@ -24,12 +23,6 @@ def _hand_pieces(fr, side):
     fw = (wr - el) / np.linalg.norm(wr - el)
     rot = np.stack([along, thumb, dorsal], 1)
     out = []
-    a, b = wr - fw * 0.035 * s, wr + fw * 0.03 * s
-
-    def cuff(p, a=a, b=b):
-        o = round_cone(p, a, b, 0.046 * s, 0.056 * s)
-        return np.maximum(np.maximum(o, -(o + F(0.005 * s))), np.maximum((p - a) @ -fw.astype(F), (p - b) @ fw.astype(F)))
-    out.append((f"gauntlet_cuff_{side}", f"hand.{side}", cuff, a - 0.08 * s, b + 0.08 * s, 1200))
     c = wr + along * 0.05 * s
 
     def back(p, c=c):
@@ -55,10 +48,29 @@ def _hand_pieces(fr, side):
     return out
 
 
+def cuff(fr, side):
+    """The gauntlet's cuff: a lathed bell (no thin field shell to crumple) opening over the end of the vambrace,
+    a little wider across the hand than through it."""
+    from .hands import hand_axes
+    from .lathe import Lathe
+    j, s = fr.j, fr.s
+    thumb = np.asarray(tuple(hand_axes(fr, side)[1]))
+    wr, el = np.asarray(tuple(j[f"wrist.{side}"])), np.asarray(tuple(j[f"elbow.{side}"]))
+    fw = (wr - el) / np.linalg.norm(wr - el)
+    radius = lambda u, e: (0.046 + 0.015 * (1 - u) ** 2) * s * (0.94 + 0.08 * np.abs(e @ thumb))
+    return Lathe(f"gauntlet_cuff_{side}", f"hand.{side}", None, wr - fw * 0.042 * s, wr + fw * 0.026 * s, 0.005 * s, s,
+                 thumb, None, 6, 36, radius)
+
+
 def build(fr, steel, key):
     out = []
     s = fr.s
     for side in ("R", "L"):
+        piece = cuff(fr, side)
+        obj = piece.make(key, s, steel)
+        rigid(obj, piece.bone)
+        matter.slot(obj, "char:metal")
+        out.append(obj)
         for name, bone, field, lo, hi, target in _hand_pieces(fr, side):
             small = target < 500
             obj = matter.mesh(field, (lo, hi), (0.0009 if small else 0.0014) * s, target, name, key, SOURCES)
@@ -162,9 +174,10 @@ def core(fr, arm, color):
     fingers = [b.name for b in arm.data.bones if b.name.split(".")[0] in frame_mod.FINGERS]
     rig.heat_weights(body, arm, drop=fingers + ["root"])
     rig.clean_limb_weights(body, arm, fr)
-    bm = bmesh.new()                       # no hands: the gauntlets are solid, and shrunk fingers would turn inside out
-    bm.from_mesh(body.data)
-    hands = [i for i, w in enumerate(rig.read_weights(body)) if w and max(w, key=w.get).startswith("hand.")]
+    bm = bmesh.new()                       # no hands or feet: gauntlets and sabatons are solid (shrunk fingers would
+    bm.from_mesh(body.data)                # turn inside out, a heel would show through the sabaton)
+    ends = ("hand.", "foot.", "toe.")
+    hands = [i for i, w in enumerate(rig.read_weights(body)) if w and max(w, key=w.get).startswith(ends)]
     bm.verts.ensure_lookup_table()
     bmesh.ops.delete(bm, geom=[bm.verts[i] for i in hands], context="VERTS")
     bm.to_mesh(body.data)
