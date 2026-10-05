@@ -18,9 +18,12 @@ LIFT = np.asarray((0.2, 1.0, 1.0, 0.4, 0.0))           # their height (times the
 class Surface:
     """Radii of a surface round an axis polyline (``pts``) or, with ``centre``, round a point (spherical: t is the
     elevation from ``t0`` to ``t1`` radians), sampled on a (t, angle) grid by ray casts into ``tree`` (or the
-    furthest hit among a list of trees: the neck, where the body's collar lies over the head's)."""
+    furthest hit among a list of trees: the neck, where the body's collar lies over the head's). ``bridge`` passes
+    lift the radii over hollows narrower than a few samples (the crease under the lip, beside the nose), as cloth
+    pulled over them spans them."""
 
-    def __init__(self, tree, pts=None, centre=None, t_range=(-0.4, 1.3), samples=72, step=0.008, reach=0.5, up=None):
+    def __init__(self, tree, pts=None, centre=None, t_range=(-0.4, 1.3), samples=72, step=0.008, reach=0.5, up=None,
+                 bridge=0):
         self.sphere = centre is not None
         self.phis = np.linspace(0.0, 2 * math.pi, samples + 1)
         if self.sphere:
@@ -68,7 +71,13 @@ class Surface:
             ok = ~np.isnan(col)
             if ok.any():
                 R[:, k] = np.interp(np.arange(len(col)), np.flatnonzero(ok), col[ok])
-        self.R = np.nan_to_num(R, nan=0.05)
+        R = np.nan_to_num(R, nan=0.05)
+        for _ in range(bridge):
+            Rp = np.concatenate([R[:, -2:-1], R, R[:, 1:2]], 1)     # the seam at 0 / 2 pi wraps round
+            Rp = np.concatenate([Rp[:1], Rp, Rp[-1:]], 0)
+            blur = (Rp[:-2, 1:-1] + Rp[2:, 1:-1] + Rp[1:-1, :-2] + Rp[1:-1, 2:] + 2 * Rp[1:-1, 1:-1]) / 6
+            R = np.maximum(R, blur)
+        self.R = R
 
     def missed(self, t, ph):
         """True where the rays nearest (t, ph) found no surface within reach (a strip should leave it out)."""
@@ -146,9 +155,10 @@ def _grid(pts, surf_pts, keep, along, across):
             surf_pts.reshape(-1, 3))
 
 
-def ribbon(tree, curve, width, offset, thick, n=None):
+def ribbon(tree, curve, width, offset, thick, n=None, tuck=0.0):
     """A flat strip along a curve over the surface (control points near it): projected onto the surface, raised a
-    little in the middle and turned under at both edges. Returns arrays as _grid does."""
+    little in the middle and turned under at both edges; over ``tuck`` metres at each end it sinks to the surface, so
+    its ends pass under the turns it crosses. Returns arrays as _grid does."""
     from .features import spline
     length = sum((Vector(b) - Vector(a)).length for a, b in zip(curve, curve[1:]))
     n = n or max(6, int(length / 0.012))
@@ -172,36 +182,11 @@ def ribbon(tree, curve, width, offset, thick, n=None):
     across = np.asarray((0.0, 0.08, 0.5, 0.92, 1.0))
     lift = np.asarray((0.2, 1.0, 1.15, 1.0, 0.2))
     surf = P[:, None, :] + side[:, None, :] * ((across - 0.5) * width)[None, :, None]
-    pts = surf + N[:, None, :] * (offset + lift * thick)[None, :, None]
     along = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=1))])
+    sink = np.ones(n)
+    if tuck > 0:
+        e = np.minimum(along, along[-1] - along) / tuck
+        sink = np.clip(e, 0.0, 1.0) ** 2 * (3 - 2 * np.clip(e, 0.0, 1.0))
+    pts = surf + N[:, None, :] * (sink[:, None] * (offset + lift * thick)[None, :])[..., None]
     return _grid(pts, surf, np.ones(n, dtype=bool), along, across)
 
-
-def hanging(start, tangent, normal, width, length, thick, seed, n=10):
-    """A loose end hanging from ``start``: leaving the surface along ``tangent``, falling under its weight, twisting a
-    little and torn off in a ragged edge; two sheets back to back. Returns arrays as _grid does (the surface point of
-    every vertex is the root)."""
-    rng = np.random.default_rng(seed)
-    start, tangent, normal = (np.asarray(v, dtype=float) for v in (start, tangent, normal))
-    side = np.cross(normal, tangent)
-    side /= np.linalg.norm(side)
-    down = np.asarray((0.0, 0.0, -1.0))
-    twist = rng.uniform(-0.9, 0.9)
-    cols = np.asarray((-0.5, -0.25, 0.0, 0.25, 0.5))
-    ragged = rng.uniform(0.0, 1.0, len(cols))
-    rows = []
-    for i in range(n):
-        u = i / (n - 1)
-        c = start + tangent * length * 0.22 * math.sin(min(u * 2.0, 1.0) * math.pi / 2) + down * length * u ** 1.15 \
-            + normal * length * 0.08 * math.sin(u * math.pi)
-        a = twist * u
-        sd = side * math.cos(a) + normal * math.sin(a)
-        face = np.cross(sd, down if u > 0.1 else tangent)
-        face /= max(np.linalg.norm(face), 1e-9)
-        front = [c + sd * v * width * (1.0 - 0.12 * u) + down * (length * 0.07 * ragged[k] * (i == n - 1)) for k, v in enumerate(cols)]
-        back = [q - face * thick for q in front]
-        rows.append(front + back[::-1])
-    pts = np.asarray(rows)
-    surf = np.broadcast_to(start, pts.shape).copy()
-    across = np.concatenate([cols + 0.5, (cols + 0.5)[::-1]])
-    return _grid(pts, surf, np.ones(n, dtype=bool), np.linspace(0.0, length, n), across)

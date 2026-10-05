@@ -21,33 +21,24 @@ from .sdf import F, carve, ellipsoid, round_cone, smin, sphere, tube
 SOURCE = hashlib.sha1(pathlib.Path(__file__).read_bytes()).hexdigest()[:12]
 
 # wolf: muzzle stations from the stop back by the eyes to the nose (y, centre z, half-width, half-height)
-UPPER = [(0.07, -0.032, 0.046, 0.04), (0.1, -0.035, 0.037, 0.033), (0.13, -0.037, 0.03, 0.026),
+UPPER = [(0.07, -0.032, 0.041, 0.04), (0.1, -0.035, 0.034, 0.033), (0.13, -0.037, 0.03, 0.026),
          (0.16, -0.038, 0.025, 0.021), (0.185, -0.039, 0.022, 0.018), (0.198, -0.04, 0.021, 0.0165)]
 LOWER = [(0.035, -0.088, 0.04, 0.024), (0.06, -0.084, 0.035, 0.02), (0.09, -0.079, 0.029, 0.016), (0.125, -0.074, 0.022, 0.0125),
          (0.155, -0.07, 0.017, 0.0105), (0.18, -0.067, 0.0135, 0.009)]
-NOSE = ((0.0, 0.201, -0.029), (0.0195, 0.0135, 0.012))
-EAR = dict(root=(0.047, -0.016, 0.076), height=0.12, width=0.044, thick=0.009)
+NOSE = ((0.0, 0.201, -0.029), (0.017, 0.0125, 0.0115))
+EAR = dict(root=(0.047, -0.016, 0.072), height=0.118, width=0.088, thick=0.013)     # thick: half, at the root
 
 
-def _triangle(x, y, half, height):
-    """2D distance to an isosceles triangle with its apex at the origin and its base ``height`` below it (y grows
-    downward from the apex), ``half`` its base half-width (after Inigo Quilez)."""
-    x = np.abs(x)
-    qx, qy = F(half), F(height)
-    t = np.clip((x * qx + y * qy) / (qx * qx + qy * qy), 0, 1)
-    ax, ay = x - qx * t, y - qy * t
-    u = np.clip(x / qx, 0, 1)
-    bx, by = x - qx * u, y - qy
-    s = -1.0
-    d0 = np.minimum(ax * ax + ay * ay, bx * bx + by * by)
-    sg = np.minimum(s * (x * qy - y * qx), s * (y - qy))
-    return (-np.sqrt(d0) * np.sign(sg)).astype(F)
-
-
-def _slab(d2, w, half):
-    """A 2D shape extruded ``half`` to each side."""
-    a, b = d2, np.abs(w) - half
-    return (np.minimum(np.maximum(a, b), 0) + np.sqrt(np.maximum(a, 0) ** 2 + np.maximum(b, 0) ** 2)).astype(F)
+def ear_frame(sx):
+    """(root, up, face, across) of a wolf's ear on side ``sx``: where it stands on the skull, the way it points,
+    the way its hollow faces and across it (head-local)."""
+    r = EAR["root"]
+    up = np.asarray((sx * 0.28, -0.1, 1.0))
+    up /= np.linalg.norm(up)
+    face = np.asarray((sx * 0.3, 1.0, 0.0))
+    face -= up * face.dot(up)
+    face /= np.linalg.norm(face)
+    return np.asarray((sx * r[0], r[1], r[2])), up, face, np.cross(up, face)
 
 
 def _resample(pts, n):
@@ -133,7 +124,7 @@ class Muzzle:
             lower = _chain(p, LOWER, 0.016)
             m = smin(upper, lower, 0.004)
             for sx in (1, -1):        # cheeks puffed out behind the muzzle, and the flews over the lower jaw
-                m = smin(m, ellipsoid(p, (sx * 0.045, 0.045, -0.042), (0.022, 0.026, 0.026)), 0.025)
+                m = smin(m, ellipsoid(p, (sx * 0.04, 0.045, -0.046), (0.017, 0.024, 0.021)), 0.025)
                 m = smin(m, round_cone(p, (sx * 0.03, 0.075, -0.06), (sx * 0.017, 0.17, -0.056), 0.012, 0.007), 0.01)
             return smin(d, m, 0.02)
         m = ellipsoid(p, (0.0, 0.074, -0.068), (0.05, 0.043, 0.04))            # the jutting lower face
@@ -148,21 +139,18 @@ class Muzzle:
         return (sx * (r[0] + 0.01), r[1], r[2] + EAR["height"] * 0.3)
 
     def _ear(self, p, sx):
-        """A tall pointed ear standing up from the skull: a rounded triangle, thinner toward its tip and leaning out
-        a little, its front hollowed into a cup inside a rim."""
-        r, H, W, T = EAR["root"], EAR["height"], EAR["width"], EAR["thick"]
-        up = np.asarray((sx * 0.28, -0.1, 1.0))
-        up /= np.linalg.norm(up)
-        face = np.asarray((sx * 0.3, 1.0, 0.0))
-        face -= up * face.dot(up)
-        face /= np.linalg.norm(face)
-        across = np.cross(up, face)
-        q = p - np.asarray((sx * r[0], r[1], r[2]), dtype=F)
+        """A tall pointed ear standing up from the skull: a cone flattened front to back, its back rounded, as thick
+        as a finger at the root and thinning toward the tip, leaning out a little, its front dished in a shallow
+        hollow."""
+        root, up, face, across = ear_frame(sx)
+        H, W, T = EAR["height"], EAR["width"], EAR["thick"]
+        q = p - root.astype(F)
         u, v, w = q @ up.astype(F), q @ across.astype(F), q @ face.astype(F)
-        outer = _slab(_triangle(v, H - u, W * (H + 0.045) / H, H + 0.045), w, T * (1.0 - 0.55 * np.clip(u / H, 0, 1))) - F(0.002)
-        outer = np.maximum(outer, -(u + F(0.018) - F(0.25) * np.abs(v)))     # its root follows the skull's curve down
-        inner = _slab(_triangle(v, H * 0.86 - u, W * 0.62, H * 0.7), w - F(T * 0.95), F(T * 0.8))
-        return carve(outer, inner, 0.003)
+        k = W / (2 * T)                          # how much flatter than round
+        flat = np.stack([v, u, w * F(k)], 1)
+        d = round_cone(flat, (0.0, -0.012, 0.0), (0.0, H, 0.0), W / 2, 0.005) / F(k ** 0.5)
+        cup = ellipsoid(np.stack([v, u, w], 1), (0.0, H * 0.34, T * 1.2), (W * 0.24, H * 0.3, T * 0.85))
+        return carve(d, cup, 0.005)
 
     def _surface(self, a, b, iters=24):
         """Where segments a -> b (inside to outside) cross the muzzle's uncut surface."""
@@ -222,7 +210,6 @@ class Muzzle:
 def fangs(head):
     """A wolf's upper canines hanging from under its lips past the lower jaw (ivory, carried by the head)."""
     import bmesh
-    from mathutils import Vector
     from .garments import colorize, mesh_from, set_slot
     from .paws import _hook
     from .rig import rigid

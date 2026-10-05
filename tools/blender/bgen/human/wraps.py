@@ -1,12 +1,13 @@
 """Linen wraps (``wraps``: the linen's colour): a mummy bound head to toe in overlapping strips of aged cloth.
 
-Strips are wound from the feet and hands upward (wrapstrip.py): each leg from the ankle to the hip and each arm from
-the wrist to the shoulder in a helix whose turns overlap, so every edge steps down over the turn below; the feet
-heel to toe; the trunk from the hips to the armpits; the neck; the head in bands round the skull from the jaw to the
-crown with a dark slit left open over the eyes (which glow); straps cross over each shoulder, a strip runs between
-the legs and two bands cross over the crown; the hands are bound in a tight layer with the strips' lines. The turns
-waver, so here and there they part and the dark, shrunken body shows between them; a few loose ends hang free. Each
-strip is its own shade of old linen, stained and grimier toward the feet.
+Strips are wound from the hands and feet upward (wrapstrip.py): each leg from the ankle to the hip and each arm from
+the wrist to the shoulder in a helix whose turns overlap, so every edge steps down over the turn below; the trunk
+from the hips to the armpits over long straps laid first over each shoulder (their ends tucked under the trunk's
+turns); the neck; the head in bands round the skull from the jaw up to a swirl on the crown with a dark slit left
+open over the eyes (which glow), two straps crossing over the top; a strip between the legs. The hands and feet are
+bound in a tight layer with the strips' lines. The turns waver, so here and there they part and the darker, older
+layers show between them; a few loose ends lie down the body and hang off it (drapes.py), moving with the limb they
+lie on. Each strip is its own shade of old linen, stained and grimier toward the feet.
 """
 import math
 
@@ -15,12 +16,14 @@ import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
+from . import drapes
 from . import wrapstrip as ws
 from .coverings import Skin, arrays, make_mesh, noise, smooth_normals, ss, submesh
 from .hands import hand_axes
 from .paint import flat, hex3, paint
 
-DARK = np.asarray((0.16, 0.12, 0.09))          # the dried body between the strips
+DARK = np.asarray((0.16, 0.12, 0.09))          # the dried flesh round the eyes
+UNDER = 0.5                                    # the older layers under the strips (times the linen)
 
 
 class Binder:
@@ -31,7 +34,7 @@ class Binder:
         dg = bpy.context.evaluated_depsgraph_get()
         self.body = BVHTree.FromObject(parts["body"], dg)
         self.skull = BVHTree.FromObject(parts["head"], dg)
-        self.strips = []          # (arrays, tone)
+        self.strips = []          # (arrays, tone, clear)
 
     def add(self, arr, tone=None, clear=False):
         if arr is not None:
@@ -51,13 +54,9 @@ class Binder:
             an = j[f"ankle.{side}"]
             leg = ws.Surface(self.body, [hip + (hip - knee).normalized() * 0.04 * s, knee, an], reach=0.13 * s)
             L = leg.length
-            self.add(ws.helix(leg, 0.95, 0.5, 0.06 * s / L, 0.044 * s / L, off, th, phase=1.0 + sx, spin=sx, skip=leg.missed))
+            self.add(ws.helix(leg, 0.97, 0.5, 0.06 * s / L, 0.044 * s / L, off, th, phase=1.0 + sx, spin=sx, skip=leg.missed))
             self.add(ws.helix(leg, 0.56, 0.0, 0.066 * s / L, 0.05 * s / L, off + 0.6 * th, th, phase=2.3 + sx, spin=-sx,
                               skip=leg.missed))
-            ankle = ws.Surface(self.body, [an.lerp(knee, 0.25), an - Vector((0, 0, 0.025 * s))], reach=0.085 * s)
-            L = ankle.length
-            self.add(ws.helix(ankle, 1.0, 0.45, 0.05 * s / L, 0.036 * s / L, off * 0.7, th, phase=0.6 * sx, spin=-sx,
-                              skip=ankle.missed))
             sh, el, wr = j[f"shoulder.{side}"], j[f"elbow.{side}"], j[f"wrist.{side}"]
             arm = ws.Surface(self.body, [sh + (sh - el).normalized() * 0.035 * s, el, wr + (wr - el) * 0.05], reach=0.12 * s)
             L = arm.length
@@ -65,101 +64,82 @@ class Binder:
                               skip=arm.missed))
             self.add(ws.helix(arm, 0.5, 0.0, 0.05 * s / L, 0.037 * s / L, off * 0.8 + 0.6 * th, th * 0.9, phase=1.7 * sx, spin=-sx,
                               skip=arm.missed))
-            heel, ball, toe = j[f"heel.{side}"], j[f"ball.{side}"], j[f"toe.{side}"]
-            foot = ws.Surface(self.body, [heel + Vector((0, 0.035 * s, 0.032 * s)), ball + Vector((0, 0, 0.028 * s)),
-                                          toe + Vector((0, -0.015 * s, 0.022 * s))], up=(0, 0, 1), reach=0.08 * s)
-            L = foot.length
-            self.add(ws.helix(foot, 0.98, 0.0, 0.05 * s / L, 0.036 * s / L, off * 0.8, th, phase=0.0, spin=sx, skip=foot.missed))
-            fwd = Vector((toe.x - heel.x, toe.y - heel.y, 0)).normalized()
-            out = Vector((fwd.y, -fwd.x, 0))
-            for k, x in enumerate((-0.022, 0.022)):       # two strips over the toes, from the instep to under the tip
-                o = out * x * s
-                cap = [ball + o + Vector((0, 0, 0.06 * s)) - fwd * 0.02 * s, toe + o + Vector((0, 0, 0.035 * s)),
-                       toe + o + fwd * 0.03 * s + Vector((0, 0, 0.012 * s)), toe + o + Vector((0, 0, -0.01 * s))]
-                self.add(ws.ribbon(self.body, cap, 0.05 * s, off + (1.6 + 0.4 * k) * th, th))
-                back = [heel + o * 0.8 + Vector((0, 0, 0.09 * s)) + fwd * 0.01 * s, heel + o * 0.8 - fwd * 0.035 * s + Vector((0, 0, 0.035 * s)),
-                        heel + o * 0.8 - fwd * 0.02 * s + Vector((0, 0, -0.008 * s)), heel + o * 0.8 + fwd * 0.03 * s + Vector((0, 0, -0.012 * s))]
-                self.add(ws.ribbon(self.body, back, 0.045 * s, off + (1.6 + 0.4 * k) * th, th))
+
+    def _arc(self, centre, a0, a1, n=15):
+        """Points on the body where rays from ``centre`` in the plane x = const (angles from +y toward +z) leave it."""
+        out = []
+        for a in np.linspace(a0, a1, n):
+            hit = self.body.ray_cast(centre, Vector((0, math.cos(a), math.sin(a))), 0.5 * self.s)
+            if hit[0] is not None:
+                out.append(hit[0] + hit[1] * 0.003 * self.s)
+        return out
 
     def trunk(self):
         j, s = self.fr.j, self.s
-        th, off = 0.0034 * s, 0.0045 * s
+        th = 0.0034 * s
+        # long straps over each shoulder first, from low on the chest to low on the back, overlapping side by side
+        for sx in (1, -1):
+            for k, x in enumerate((0.05, 0.095, 0.14, 0.18)):
+                c = Vector((sx * x * s, j["chest"].y, j["shoulder.R"].z - (0.12 + 0.03 * (k == 3)) * s))
+                pts = self._arc(c, math.radians(-50), math.radians(230))
+                if len(pts) > 5:
+                    self.add(ws.ribbon(self.body, pts, 0.052 * s, 0.0025 * s + 0.15 * k * th, th))
+        # the trunk's turns over the straps' ends, from the hips to the armpits
+        off = 0.0075 * s
         bottom = Vector((0, j["pelvis"].y, j["hip.R"].z - 0.035 * s))
-        top = Vector((0, j["chest"].y - 0.01 * s, j["shoulder.R"].z - 0.085 * s))
+        top = Vector((0, j["chest"].y - 0.01 * s, j["shoulder.R"].z - 0.08 * s))
         trunk = ws.Surface(self.body, [bottom, (bottom + top) / 2 + Vector((0, 0.01 * s, 0)), top], up=(0, 1, 0), reach=0.22 * s)
         L = trunk.length
         self.add(ws.helix(trunk, 0.0, 1.0, 0.07 * s / L, 0.052 * s / L, off, th, phase=0.3, segs=64, skip=trunk.missed))
         self.add(ws.helix(trunk, 0.0, 0.32, 0.09 * s / L, 0.07 * s / L, off + 1.2 * th, th, phase=2.0, segs=64, spin=-1))
-        # each shoulder bound in turns round the collarbone's line, out over the deltoid and under the armpit; straps
-        # crossing over it (front to back), and a strip between the legs
-        for side, sx in (("R", 1), ("L", -1)):
-            sh = j[f"shoulder.{side}"]
-            inner = Vector((sx * 0.06 * s, sh.y, sh.z - 0.01 * s))
-            yoke = ws.Surface(self.body, [inner, sh + (sh - inner).normalized() * 0.03 * s], up=(0, 0, 1), reach=0.13 * s)
-            L = yoke.length
-            self.add(ws.helix(yoke, 0.0, 1.0, 0.05 * s / L, 0.036 * s / L, off + 1.0 * th, th, phase=0.8, segs=48, spin=sx,
-                              skip=yoke.missed))
-        z = j["shoulder.R"].z - 0.045 * s         # a band across the top of the chest and one across the shoulder blades
-        for a0 in (0.0, math.pi):
-            band = []
-            for a in np.linspace(a0 - 1.1, a0 + 1.1, 11):
-                hit = self.body.ray_cast(Vector((0, j["chest"].y, z)), Vector((math.sin(a), math.cos(a), 0)), 0.3 * s)
-                if hit[0] is not None:
-                    band.append(hit[0] + hit[1] * 0.004 * s)
-            if len(band) > 4:
-                self.add(ws.ribbon(self.body, band, 0.055 * s, off + 1.6 * th, th))
-        for sx in (1, -1):
-            for k, x in enumerate((0.055, 0.1, 0.145)):
-                front = Vector((sx * (x - 0.02) * s, 0.25 * s, j["shoulder.R"].z - (0.12 - 0.02 * k) * s))
-                over = Vector((sx * x * s, j["neck"].y, j["shoulder.R"].z + 0.03 * s))
-                back = Vector((sx * (x - 0.01) * s, -0.25 * s, j["shoulder.R"].z - (0.13 - 0.02 * k) * s))
-                self.add(ws.ribbon(self.body, [front, (front + over) / 2 + Vector((0, 0, 0.02 * s)), over,
-                                               (over + back) / 2 + Vector((0, 0, 0.02 * s)), back],
-                                   0.05 * s, off + (2.0 + 0.6 * k) * th, th))
-        c = Vector((0, j["pelvis"].y, j["hip.R"].z - 0.02 * s))
-        crotch = []
-        for a in np.linspace(math.radians(55), math.radians(-235), 13):     # front, under, up the back
-            d = Vector((0, math.cos(a), math.sin(a)))
-            hit = self.body.ray_cast(c, d, 0.5 * s)
-            if hit[0] is not None:
-                crotch.append(hit[0] + hit[1] * 0.004 * s)
-        if len(crotch) > 4:
-            self.add(ws.ribbon(self.body, crotch, 0.065 * s, off + 2.2 * th, th))
+        # turns round the base of the neck over the straps' tops, closing the chest and back between them
+        base = ws.Surface(self.body, [Vector((0, j["chest"].y, j["shoulder.R"].z - 0.09 * s)),
+                                      Vector((0, j["neck"].y, j["shoulder.R"].z + 0.02 * s))], up=(0, 1, 0), reach=0.12 * s)
+        L = base.length
+        self.add(ws.helix(base, 0.0, 1.0, 0.055 * s / L, 0.04 * s / L, off + 0.6 * th, th, phase=1.3, segs=56, skip=base.missed))
+        crotch = self._arc(Vector((0, j["pelvis"].y, j["hip.R"].z - 0.02 * s)), math.radians(55), math.radians(-235), 13)
+        if len(crotch) > 4:                              # a strip between the legs, front to back
+            self.add(ws.ribbon(self.body, crotch, 0.065 * s, off + 2.2 * th, th, tuck=0.04 * s))
 
     def head_wrap(self):
         head, s = self.head, self.s
-        h = head.h
         th, off = 0.0028 * s, 0.003 * s
-        sphere = ws.Surface(self.skull, centre=head.c, t_range=(-1.2, 1.45), reach=0.3 * s)
+        sphere = ws.Surface(self.skull, centre=head.c, t_range=(-1.2, 1.57), reach=0.3 * s, bridge=3)
         eye_el = math.atan2(head.local(head.eyes[1]).z, head.local(head.eyes[1]).y)
 
         def slit(t, ph):
             ph = np.mod(ph + math.pi, 2 * math.pi) - math.pi
-            return (np.abs(t - eye_el - 0.01) < 0.085) & (np.abs(ph) < 0.75) & (np.abs(ph) > 0.2)
+            return (np.abs(t - eye_el - 0.01) < 0.13) & (np.abs(ph) < 0.8) & (np.abs(ph) > 0.17)
 
-        self.add(ws.helix(sphere, -0.95, 1.2, 0.3, 0.215, off, th, phase=0.5, segs=56, skip=slit), clear=True)
+        # bands from the jaw up, closing in a swirl on the crown
+        self.add(ws.helix(sphere, -0.95, 1.42, 0.3, 0.2, off, th, phase=0.5, segs=56, skip=slit), clear=True)
         neck_top = head.at((0, -0.008, -0.075))
         neck = ws.Surface([self.skull, self.body], [head.at((0, -0.03, -0.27)), head.at((0, -0.02, -0.18)), neck_top],
                           up=(0, 1, 0), reach=0.12 * s)
+        neck.R -= (ss(0.7, 0.95, neck.ts) * (off + 1.3 * th))[:, None]     # its top tucked under the head's lowest turns
         self.add(ws.helix(neck, 0.15, 1.0, 0.045 * s / neck.length, 0.034 * s / neck.length, off, th, phase=1.1, segs=48))
         for k, curve in enumerate((((0, 0.075, 0.06), (0, 0.04, 0.105), (0, -0.02, 0.125), (0, -0.08, 0.1), (0, -0.11, 0.04)),
                                    ((0.085, 0.0, 0.03), (0.06, -0.005, 0.1), (0, -0.01, 0.13), (-0.06, -0.005, 0.1), (-0.085, 0.0, 0.03)))):
-            self.add(ws.ribbon(self.skull, [head.at(c) for c in curve], 0.042 * s, off + (1.6 + 0.5 * k) * th, th), clear=True)
+            self.add(ws.ribbon(self.skull, [head.at(c) for c in curve], 0.04 * s, off + (1.05 + 0.35 * k) * th, th * 0.8,
+                               tuck=0.035 * s), clear=True)
 
     def loose_ends(self):
+        """A few ends come loose: they lie down the body over the wraps and hang off where it turns away."""
         j, s = self.fr.j, self.s
-        th = 0.0025 * s
-        ends = [(j["elbow.L"].lerp(j["wrist.L"], 0.55), (0.0, -0.3, -1.0), 0.28 * s, 0.04 * s),
-                (j["hip.R"] + Vector((0.07 * s, 0.02 * s, -0.08 * s)), (0.3, 0.2, -1.0), 0.22 * s, 0.05 * s),
-                (self.head.at((0.03, -0.09, -0.02)), (0.2, -0.6, -1.0), 0.24 * s, 0.035 * s),
-                (Vector((-0.1 * s, -0.08 * s, j["hip.R"].z + 0.08 * s)), (-0.4, -0.3, -1.0), 0.2 * s, 0.05 * s)]
-        for i, (at, d, length, width) in enumerate(ends):
-            tree = self.skull if i == 2 else self.body
+        verts, polys, base = [], [], 0
+        for o in (self.parts["body"], self.parts["head"]):
+            V, T, _ = arrays(o)
+            verts += [Vector(v) for v in V]
+            polys += (T + base).tolist()
+            base += len(V)
+        tree = BVHTree.FromPolygons(verts, polys)
+        ends = [(j["hip.R"] + Vector((0.075 * s, 0.03 * s, -0.06 * s)), 0.22 * s, 0.048 * s, 0.009),     # over a leg's turns
+                (Vector((-0.11 * s, -0.07 * s, j["hip.R"].z + 0.06 * s)), 0.19 * s, 0.048 * s, 0.0125)]    # the trunk's
+        for i, (at, length, width, gap) in enumerate(ends):
             loc, nrm, _, _ = tree.find_nearest(at)
-            d = Vector(d).normalized()
-            tang = (d - nrm * d.dot(nrm)).normalized()
-            start = loc + nrm * 0.008 * s
-            self.add(ws.hanging(start, tang, nrm, width, length, th, seed=31 + i))
+            rng = np.random.default_rng(32 + i)
+            pts, nrms, skin = drapes.trace(tree, np.asarray(loc), np.asarray(nrm), length, 12, gap * s, rng, sway=0.08)
+            self.add(drapes.ribbon(pts, nrms, skin, width, 0.0025 * s, rng, taper=0.15, ragged=0.35))
 
     def _clear(self, V, S, fixed):
         """Lifts any vertex of the head's strips sunk into the face (where a strip spans the nose or the hollow under
@@ -196,23 +176,50 @@ class Binder:
         return make_mesh("wraps", V, T, C, "char:cloth", skin.weights(S))
 
 
-def _bind_hand(obj, fr, side, linen, s):
-    """A tight layer of linen over a hand, ridged and lined like the strips round the fingers and palm."""
-    from .rig import read_weights
-    V, T, N = arrays(obj)
-    W = read_weights(obj)
-    along, thumb, dorsal = hand_axes(fr, side)
-    w = np.asarray(fr.j[f"wrist.{side}"])
-    q = V - w
-    a = q @ np.asarray(along)
-    ph = np.arctan2(q @ np.asarray(dorsal), q @ np.asarray(thumb))
-    u = a / (0.016 * s) + ph / (2 * math.pi) * 0.7
+def _bound(name, V, T, N, W, u, linen, s, lift=0.0018, ridge=0.0012):
+    """A tight layer of linen over a skin part (V, T, N; weights W), ridged and lined like strips wound along ``u``
+    (turns per vertex: each whole number a strip's edge)."""
     f = u - np.floor(u)
     Ns = smooth_normals(V, T, N, 2)
-    h = 0.0018 * s + 0.0012 * s * ss(0.0, 0.08, f) * (1.0 - ss(0.5, 1.0, f))
+    h = lift * s + ridge * s * ss(0.0, 0.08, f) * (1.0 - ss(0.5, 1.0, f))
     col = linen[None, :] * (1.0 - 0.3 * ss(0.12, 0.0, f) - 0.15 * ss(0.8, 1.0, f))[:, None]
     col *= (0.82 + 0.1 * noise(V, 0.03 * s, 5))[:, None]
-    return make_mesh(f"wraps_hand_{side}", V + Ns * h[:, None], T, col, "char:cloth", W)
+    return make_mesh(name, V + Ns * h[:, None], T, col, "char:cloth", W)
+
+
+def _bind_hand(obj, fr, side, linen, s):
+    """The hand bound in strips round the fingers and palm."""
+    from .rig import read_weights
+    V, T, N = arrays(obj)
+    along, thumb, dorsal = hand_axes(fr, side)
+    q = V - np.asarray(fr.j[f"wrist.{side}"])
+    ph = np.arctan2(q @ np.asarray(dorsal), q @ np.asarray(thumb))
+    return _bound(f"wraps_hand_{side}", V, T, N, read_weights(obj), q @ np.asarray(along) / (0.016 * s) + ph / (2 * math.pi) * 0.7,
+                  linen, s)
+
+
+def _bind_feet(body, fr, linen, s):
+    """Both feet bound in turns round the foot from the toes back over the heel and up to the ankle (a tight layer
+    over the body's feet, its top edge under the legs' turns)."""
+    from .rig import read_weights
+    j = fr.j
+    V, T, N = arrays(body)
+    keep = V[:, 2] < j["ankle.R"].z + 0.03 * s
+    Vs, Ts, idx = submesh(V, T, keep)
+    W = read_weights(body)
+    u = np.zeros(len(Vs))
+    for side, sx in (("R", 1), ("L", -1)):
+        heel, toe = np.asarray(j[f"heel.{side}"]), np.asarray(j[f"toe.{side}"])
+        fwd = (toe - heel) * np.asarray((1.0, 1.0, 0.0))
+        fwd /= np.linalg.norm(fwd)
+        mine = np.sign(Vs[:, 0]) == sx
+        q = Vs[mine] - heel
+        a = q @ fwd
+        out = np.asarray((fwd[1], -fwd[0], 0.0)) * sx
+        ph = np.arctan2(q[:, 2] - 0.03 * s, q @ out)
+        u[mine] = (a + 0.6 * np.maximum(q[:, 2] - 0.05 * s, 0.0)) / (0.022 * s) + ph / (2 * math.pi) * 0.8
+    grime = linen * 0.8
+    return _bound("wraps_feet", Vs, Ts, N[idx], [W[i] for i in idx], u, grime, s, lift=0.003, ridge=0.0022)
 
 
 def grow(fr, head, parts, p, worn):
@@ -223,15 +230,15 @@ def grow(fr, head, parts, p, worn):
     b.trunk()
     b.head_wrap()
     b.loose_ends()
-    out = [b.mesh(skin)]
+    out = [b.mesh(skin), _bind_feet(parts["body"], fr, b.linen, s)]
     for side, hand in zip("RL", parts["hands"]):
         out.append(_bind_hand(hand, fr, side, b.linen * 0.92, s))
-    dark = "#%02x%02x%02x" % tuple(int(c * 255) for c in DARK)
+    under = b.linen * UNDER
     for o in [parts["body"], *parts["hands"]]:
-        flat(o, dark)
-    under, eyes = b.linen * 0.45, [np.asarray(e) for e in head.eyes.values()]
+        flat(o, "#%02x%02x%02x" % tuple(int(c * 255) for c in under))
+    eyes = [np.asarray(e) for e in head.eyes.values()]
 
-    def face(co):       # under-layers of linen on the face, dark round the eyes
+    def face(co):       # the older layers on the face, dark round the eyes
         k = ss(0.024 * s, 0.042 * s, min(float(np.linalg.norm(np.asarray(co) - e)) for e in eyes))
         return tuple(DARK * (1 - k) + under * k)
     paint(parts["head"], face)

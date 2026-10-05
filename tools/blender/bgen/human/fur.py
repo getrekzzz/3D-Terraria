@@ -1,12 +1,16 @@
 """A fur coat (``fur``: its colour; ``furBelly``: a paler chest, belly and throat; ``furLength``: tuft length scale):
 a dense undercoat over the skin with big clumped tufts laid on it, each rooted in the undercoat, lying along the
 fur's flow (down the body, out along the limbs toward the hands and feet, back from the face) and splitting into
-strands whose tips lift off, so the outline breaks up shaggily. Tufts are longest where a creature's fur is longest: a
-yeti's (``muzzle: ape``) on the shoulders, forearms and calves, a werewolf's (``muzzle: wolf``) in a mane over the
-neck and shoulders and a ruff round the cheeks. The fur parts round the face, the hands' palms and fingers and
-where trousers cover it (showing through their tears). Tufts come from tufts.py; heads are painted here.
+strands whose tips lift off, so the outline breaks up shaggily; over the shoulders it falls down and over their
+edge, and long tufts stay narrow locks. Tufts are longest where a creature's fur is longest: a yeti's (``muzzle:
+ape``) on the shoulders, forearms and calves, a werewolf's (``muzzle: wolf``) in a mane over the neck and shoulders
+and a ruff round the cheeks, with short fur over the muzzle, a paler mask round the mouth and throat, and a short
+coat on the backs of the ears (bare in their hollows). The fur parts round the face, the hands' palms and fingers
+and where trousers cover it (showing through their tears); the head's coat stops where its neck sinks into the
+body's. Tufts come from tufts.py; heads are painted here.
 """
 import numpy as np
+from mathutils.bvhtree import BVHTree
 
 from . import tufts
 from .coverings import arrays, decimate, make_mesh, noise, smooth_normals, ss, strip, submesh
@@ -15,9 +19,9 @@ from .paint import hex3
 
 # tuft length per bone (times the coat's base length) for each kind of fur; hang draws long tufts down
 LENGTHS = {
-    "ape": {"hips": 0.9, "spine": 0.9, "chest": 0.95, "clavicle": 1.6, "neck": 1.3, "head": 0.9,
+    "ape": {"hips": 0.9, "spine": 0.9, "chest": 0.95, "clavicle": 1.2, "neck": 1.1, "head": 0.9,
             "upper_arm": 1.25, "forearm": 1.75, "hand": 0.35, "thigh": 1.05, "shin": 1.55, "foot": 0.45, "toe": 0.3},
-    "wolf": {"hips": 0.85, "spine": 0.9, "chest": 1.15, "clavicle": 1.5, "neck": 1.7, "head": 0.85,
+    "wolf": {"hips": 0.85, "spine": 0.9, "chest": 0.95, "clavicle": 1.0, "neck": 1.1, "head": 0.85,
              "upper_arm": 0.95, "forearm": 1.1, "hand": 0.35, "thigh": 0.9, "shin": 1.05, "foot": 0.5, "toe": 0.35},
 }
 HANG = {"forearm": 0.9, "upper_arm": 0.5, "shin": 0.25, "chest": 0.0, "clavicle": 0.3}
@@ -35,16 +39,17 @@ class Coat:
         self.color = np.asarray(hex3(p["fur"]))
         self.belly = np.asarray(hex3(p.get("furBelly", p["fur"])))
         self.base = (0.13 if self.kind == "ape" else 0.1) * self.s * p.get("furLength", 1.0)
-        self.under = (0.03 if self.kind == "ape" else 0.016) * self.s
-        self.lift = 0.14 if self.kind == "ape" else 0.06
-        self.spacing = 0.52 if self.kind == "ape" else 0.6
+        self.under = (0.02 if self.kind == "ape" else 0.012) * self.s
+        self.lift = 0.08 if self.kind == "ape" else 0.035
+        self.spacing = 0.48 if self.kind == "ape" else 0.73
+        self.widest = (0.075 if self.kind == "ape" else 0.05) * self.s      # tufts as locks, not cards
         self.dirs = {}
         for name, a, b, *_ in fr.bones():
             g = _group(name)
             if g in ("upper_arm", "forearm", "hand", "thigh", "shin", "foot", "toe"):
                 d = np.asarray(b - a)
-            elif g == "clavicle":
-                d = np.asarray((1.0 if name.endswith("R") else -1.0, 0.0, -0.8))
+            elif g == "clavicle":           # down over the shoulders, a little out and back
+                d = np.asarray((0.45 if name.endswith("R") else -0.45, -0.15, -1.0))
             elif g == "neck":
                 d = np.asarray((0.0, -0.4, -1.0))
             else:
@@ -77,9 +82,9 @@ class Coat:
         L = np.array([sum(table.get(_group(b), 1.0) * x for b, x in w.items()) for w in W])
         j, s = self.fr.j, self.s
         top = ss(j["chest"].z, j["shoulder.R"].z + 0.04 * s, X[:, 2])       # shoulders and the top of the back
-        L *= 1.0 + (0.35 if self.kind == "ape" else 0.45) * top
+        L *= 1.0 + 0.15 * top
         if self.kind == "wolf":     # a ruff on the chest, shorter on the belly and the backs of the thighs
-            L *= 1.0 + 0.25 * ss(j["spine"].z, j["chest"].z + 0.06 * s, X[:, 2]) * (X[:, 1] > j["chest"].y)
+            L *= 1.0 + 0.12 * ss(j["spine"].z, j["chest"].z + 0.06 * s, X[:, 2]) * (X[:, 1] > j["chest"].y)
         return L * self.base
 
     def belly_mix(self, X):
@@ -95,10 +100,11 @@ class Coat:
         q = np.array([self.head.local(_v(x))[:] for x in X])
         x, y, z = q[:, 0], q[:, 1], q[:, 2]
         neck = ss(-0.06, -0.16, z)
+        low = ss(-0.215, -0.165, z)                  # gone where the head's neck sinks into the body's (its coat is there)
         if self.kind == "ape":
             face = ((x / 0.056) ** 2 + ((z + 0.035) / 0.074) ** 2) * (y > 0.0) + (y <= 0.0) * 9.0
             face = np.where(y > 0.03, face, face + (0.03 - y) * 60.0)
-            amount = ss(0.85, 1.25, face)
+            amount = ss(0.85, 1.25, face) * low
             ruff = ss(1.2, 1.7, face) * (1.0 - ss(1.9, 3.2, face))
             length = amount * (0.75 + 0.3 * ruff + 0.5 * neck)
             return amount, length, np.zeros(len(q)), ss(0.9, 1.7, face) * 0.5
@@ -106,10 +112,24 @@ class Coat:
         nose, lip, under = shape.regions(q)
         eye = np.min([np.linalg.norm(q - self.head.local(self.head.eyes[sx])[:], axis=1) for sx in (1, -1)], axis=0)
         ear = self.ear(q)
-        amount = (1.0 - nose) * (1.0 - lip) * ss(0.017, 0.024, eye) * (1.0 - ear)
+        back = self.ear_back(q)                      # the ears' backs take a short coat
+        amount = (1.0 - nose) * (1.0 - lip) * ss(0.017, 0.024, eye) * (1.0 - ear * (1.0 - back)) * low
         cheek = ss(0.02, 0.05, np.abs(x)) * ss(0.11, 0.06, y) * ss(0.02, -0.03, z)
-        length = amount * ss(0.032, 0.055, eye) * (1.0 - ss(0.07, 0.1, y)) * (0.5 + 0.7 * cheek + 0.85 * neck)
-        return amount, length, under, ss(0.02, 0.045, eye) * (1.0 - 0.5 * ss(0.1, 0.16, y))
+        muzzle = (1.0 - 0.65 * ss(0.07, 0.1, y)) * ss(0.19, 0.165, y)    # short over the muzzle, none on the nose
+        length = amount * ss(0.024, 0.042, eye) * (muzzle * (0.5 + 0.7 * cheek + 0.85 * neck) * (1.0 - ear) + 0.35 * ear * back)
+        pale = ss(-0.028, -0.045, z) * ss(0.02, 0.05, y)       # a paler mask round the mouth, cheeks and throat
+        thin = ss(0.02, 0.045, eye) * (1.0 - 0.7 * ss(0.08, 0.14, y)) * (1.0 - 0.8 * ear)
+        return amount, length, np.maximum(under, 0.85 * pale), thin
+
+    def ear_back(self, q):
+        """1 behind the plane of a wolf's ears (their backs), 0 in front (their hollows)."""
+        from .muzzles import ear_frame
+        out = np.zeros(len(q))
+        for sx in (1, -1):
+            root, _, face, _ = ear_frame(sx)
+            mine = np.sign(q[:, 0]) == sx
+            out[mine] = ss(0.0, -0.004, (q[mine] - root) @ face)
+        return out
 
     def ear(self, q):
         """How far head-local points belong to a wolf's ears (which stand bare above the skull): near the ears'
@@ -166,6 +186,8 @@ def grow(fr, head, parts, p, worn):
     coat = Coat(fr, head, p)
     s = fr.s
     pants = [o for o in worn if o.name.startswith("pants")]
+    Vb, Tb, _ = arrays(parts["body"])
+    body_tree = BVHTree.FromPolygons([_v(x) for x in Vb], Tb.tolist())
     out = []
     jobs = [("body", parts["body"])] + [("head", parts["head"])] + [(f"hand{side}", h) for side, h in zip("RL", parts["hands"])]
     jobs += [(f"foot{side}", f) for side, f in zip("RL", parts["feet"])]
@@ -181,7 +203,8 @@ def grow(fr, head, parts, p, worn):
             belly = coat.belly_mix(V)
         elif kind == "head":
             amount, length, belly, thin = coat.head_fields(V)
-            length = length * coat.base * LENGTHS[coat.kind]["head"]
+            amount = amount * _off_body(V, body_tree, s)
+            length = length * amount * coat.base * LENGTHS[coat.kind]["head"]
         elif kind.startswith("foot"):
             amount = _foot_top(fr, kind[-1], V, s, p.get("feet") == "ape")
             length = amount * coat.base * LENGTHS[coat.kind]["foot"]
@@ -200,13 +223,13 @@ def grow(fr, head, parts, p, worn):
         h = coat.under * amount[idx] * (0.6 + 0.8 * noise(Vs, 0.045 * s, 7, 2)) * thin[idx]
         h = np.maximum(h, 0.0015 * s)
         tone = coat.color[None, :] * (1 - belly[idx, None]) + coat.belly[None, :] * belly[idx, None]
-        under = tone * (0.76 + 0.14 * noise(Vs, 0.03 * s, 11)[:, None])
+        under = tone * (0.74 + 0.14 * noise(Vs, 0.03 * s, 11)[:, None])        # darker deep in the coat
         uv = np.stack([Vs[:, 2] * 8.0, np.arctan2(Vs[:, 0], Vs[:, 1] + 0.02) / np.pi], 1)
         out.append(make_mesh(f"fur_coat_{kind}", Vs + Ns * h[:, None], Ts, under, "char:hair", Ws, uv))
-        if kind == "head":
-            decimate(out[-1], 0.4)
+        decimate(out[-1], 0.4 if kind == "head" else 0.6)
         tuft = tufts.build(f"fur_tufts_{kind}", Vs, Ts, Ns, Ws, flow, length[idx], h, tone, coat.lift * (0.35 if kind == "head" else 1.0),
-                           seed=len(out) * 7919 + 13, spacing=coat.spacing, min_len=0.014 * s if kind == "head" else None)
+                           seed=len(out) * 7919 + 13, spacing=coat.spacing * (0.75 if kind == "head" else 1.0),
+                           min_len=0.013 * s if kind == "head" else None, max_width=coat.widest)
         if tuft is not None:
             out.append(tuft)
         if kind != "head":
@@ -218,6 +241,17 @@ def grow(fr, head, parts, p, worn):
         _paint(hand, np.tile(skin * 0.9, (len(X), 1)))
     strip(parts["head"], coat.head_fields(arrays(parts["head"])[0])[0] > 0.6)
 
+    return out
+
+
+def _off_body(X, tree, s):
+    """0 where head points lie inside the body or close over it (the head's neck sunk into the body's, whose coat
+    covers it), 1 clear of it."""
+    out = np.ones(len(X))
+    for i, x in enumerate(X):
+        loc, nrm, _, _ = tree.find_nearest(_v(x), 0.03 * s)
+        if loc is not None:
+            out[i] = ss(0.004 * s, 0.018 * s, (_v(x) - loc).dot(nrm))
     return out
 
 
