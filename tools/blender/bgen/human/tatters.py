@@ -18,8 +18,8 @@ from mathutils import Vector
 from .paint import hex3
 from .tailoring import Limb, ss
 
-GRIME = np.array((0.74, 0.68, 0.58))      # the colour a torn edge is darkened toward (as a multiplier)
-HOLLOW = (0.06, 0.2)        # what shows through a hole, darkened (linear): just inside the torn edge .. its middle
+GRIME = np.array((0.8, 0.75, 0.66))       # the colour cloth is soiled toward round a tear (as a multiplier)
+HOLLOW = (0.16, 0.5)        # what shows through a hole, shaded: just inside the torn edge .. its middle
 LUM = np.array((0.2126, 0.7152, 0.0722))
 
 
@@ -70,12 +70,14 @@ class Tatters:
         top += 0.07 * s
         n = max(1, round(amount * 6))
         for kind in self.kinds & {"shirt", "coat"}:
-            torso = ~on_arm & (z > top) & (z < wardrobe.collar_z - 0.09 * s) & (np.abs(X[:, 0]) < 0.8 * j["shoulder.R"].x)
+            # (on a skeleton, over the ribs, whose bars show through, not the flat shoulder blades, which read as a patch)
+            hi = wardrobe.collar_z - (0.17 if p.get("anatomy") == "skeleton" else 0.09) * s
+            torso = ~on_arm & (z > top) & (z < hi) & (np.abs(X[:, 0]) < 0.8 * j["shoulder.R"].x)
             for facing in (1, -1, 1 if rng.rand() < 0.5 else -1)[:max(2, n // 2 + 1)]:
-                self._place(rng, kind, torso & (N[:, 1] * facing > 0.35), (0.032, 0.05))
+                self._place(rng, kind, torso & (N[:, 1] * facing > 0.35), (0.026, 0.04))
             for side in ("R", "L") if n > 2 else (("R", "L")[rng.randint(2)],):
-                on, t, _ = arms[side]
-                self._place(rng, kind, on & (t > 0.2) & (t < wardrobe.sleeve_limit() - 0.16), (0.022, 0.032))
+                on, t, _ = arms[side]       # (clear of the armpit, where a raised arm would carry the skin out through it)
+                self._place(rng, kind, on & (t > 0.32) & (t < wardrobe.sleeve_limit() - 0.16), (0.022, 0.032))
             sleeve = wardrobe.sleeve_limit()
             short = rng.randint(2) if wardrobe.cuff == "long" and rng.rand() < 0.5 and not coat else -1
             for k, side in enumerate(("R", "L")):
@@ -85,7 +87,7 @@ class Tatters:
                 self.hems[kind].append(("tail", None, wardrobe.waist - 0.07 * s, Hem(rng, rng.randint(12, 15), 0.065 * s)))
         if coat:            # the shirt under a torn coat is torn with it, a little less (its edge shows in the hole)
             self.kinds.add("shirt")
-            self.holes["shirt"] = [(c, nn, t1, t2, r * 0.7, *rest) for c, nn, t1, t2, r, *rest in self.holes["coat"]]
+            self.holes["shirt"] = [(c, nn, t1, t2, r * 0.8, *rest) for c, nn, t1, t2, r, *rest in self.holes["coat"]]
             self.hems["shirt"] = []
         if "pants" in self.kinds:
             for side, sx in (("R", 1), ("L", -1)):
@@ -171,31 +173,66 @@ class Tatters:
         """The body vertices garment ``kind`` covers (``test``) where it isn't torn away (for strip_covered)."""
         inside = np.array([bool(test(v.co)) for v in body.data.vertices])
         self._shade_skin(body, inside, kind)
+        self._soften_skin(body, inside, kind)
         return inside & (self.field(self.X, kind) > 0.003 * self.s)
+
+    def _soften_skin(self, body, inside, kind):
+        """The skin round garment ``kind``'s holes (what shows in them and what is left under the cloth beside them)
+        takes weights spread as the cloth's are (tailoring softens a garment's: drape.soften), so a bend carries it
+        with the cloth round the hole instead of out through it (a raised arm pulling the skin of the upper back)."""
+        from .drape import Graph
+        me, s = body.data, self.s
+        if not self.holes[kind] or len(me.vertices) != len(self.X):
+            return
+        give = ss(-0.12 * s, -0.06 * s, np.where(inside, -self.field(self.X, kind, hems=False), -1.0))
+        if give.max() <= 0.0:
+            return
+        names = [g.name for g in body.vertex_groups]
+        W = np.zeros((len(me.vertices), len(names)))
+        for v in me.vertices:
+            for g in v.groups:
+                W[v.index, g.group] = g.weight
+        g = Graph(len(me.vertices), np.array([e.vertices[:] for e in me.edges]))
+        S = W
+        for _ in range(40):
+            S = 0.5 * S + 0.5 * g.mean(S)
+        W = W + (S - W) * give[:, None]
+        W[W < np.sort(W, 1)[:, -4:-3]] = 0.0            # (at most four bones each, as the exporter keeps)
+        W /= np.maximum(W.sum(1, keepdims=True), 1e-9)
+        for i in np.flatnonzero(give > 0.0):
+            for k, name in enumerate(names):
+                if W[i, k] > 0.005:
+                    body.vertex_groups[k].add([int(i)], float(W[i, k]), "REPLACE")
+                elif any(gr.group == k for gr in me.vertices[i].groups):
+                    body.vertex_groups[k].remove([int(i)])
 
     def _shade_skin(self, body, inside, kind):
         """Darkens the skin that shows through garment ``kind``'s holes (``inside``: the body vertices it covers): the
         cloth round a hole shades it, most just inside the torn edge (never lighter there than the cloth's own shadowed
         inside), so a hole reads as an opening into the clothes and not as a patch of the skin's colour. What lies
-        under the cloth past the edge darkens too (it never shows), so the hole stays dark seen through cloth that
-        stands off the body."""
-        me, s, p = body.data, self.s, self.w.p
+        under the cloth past the edge darkens too, as far as the skin kept round a hole reaches (it should never show),
+        so the hole stays dark seen through cloth that stands off the body, or where a bend lifts the skin into it."""
+        me, s = body.data, self.s
         layer = me.color_attributes.get("Color")
         if layer is None or not self.holes[kind] or len(me.vertices) != len(self.X):
             return
         depth = np.where(inside, -self.field(self.X, kind, hems=False, slab=0.05 * s), -1.0)
         if depth.max() < -0.03 * s:
             return
-        cloth = LUM @ np.asarray(hex3(p.get("robe") if kind == "shirt" and p.get("robe") else p.get(kind, "#8a8070"))) ** 2.2
+        # Where in its hole each point lies, from the bottom (-1) to the top (1): light falls in from above, so the
+        # torn edge over a hole casts a deeper shadow into it than the one under it.
+        holes = self.holes[kind]
+        near = np.argmin([np.linalg.norm(self.X - h[0], axis=1) / h[4] for h in holes], axis=0)
+        up = np.clip((self.X[:, 2] - np.array([h[0][2] for h in holes])[near])
+                     / np.array([h[4] * h[5] for h in holes])[near], -1.0, 1.0)
         rgba = np.empty(len(me.loops) * 4, dtype=np.float32)
         layer.data.foreach_get("color", rgba)
         rgba = rgba.reshape(-1, 4)
         idx = np.empty(len(me.loops), dtype=np.int64)
         me.loops.foreach_get("vertex_index", idx)
-        skin = np.maximum(rgba[:, :3] @ LUM, 1e-4)
-        edge = np.minimum(HOLLOW[0], 0.6 * cloth / skin)
-        mid = np.maximum(edge, np.minimum(HOLLOW[1], 3.0 * cloth / skin))
-        k = np.where(depth[idx] > -0.03 * s, edge + (mid - edge) * ss(0.0, 0.035 * s, depth[idx]), 1.0)
+        d, u = depth[idx], up[idx]
+        mid = HOLLOW[1] - 0.15 * u
+        k = np.where(d > -0.1 * s, HOLLOW[0] + (mid - HOLLOW[0]) * ss(0.0, 0.012 * s * (1 + 0.7 * np.maximum(u, 0)), d), 1.0)
         rgba[:, :3] *= k[:, None]
         layer.data.foreach_set("color", rgba.ravel())
 
@@ -210,8 +247,16 @@ class Tatters:
         s = self.s
         k, f = out["shade"], np.maximum(out["soft"], 0.0)
         self.edge = out["field"]
-        grime = 1.0 - ss(0.0, 0.022 * s, f)
-        rgb = k[:, None] * (1.0 - grime[:, None] ** 1.5 * (1.0 - GRIME * 0.82))   # (soiled, not stained)
+        # Soiled a little toward the tear, and at the very edge (teeth and all) the broken threads, faded paler and
+        # greyer than the cloth, so the edge reads as frayed cloth with a thickness and not as a stain or a burn.
+        soil = (1.0 - ss(0.0, 0.03 * s, f)) ** 2
+        rgb = k[:, None] * (1.0 - soil[:, None] * (1.0 - GRIME))
+        p = self.w.p
+        c = np.asarray(hex3(p.get("robe") if kind == "shirt" and p.get("robe") else p.get(kind, "#8a8070")))
+        worn = c + (0.62 - c) * 0.5
+        worn = worn + (worn @ LUM - worn) * 0.5
+        fray = 0.9 * (1.0 - ss(0.0, 0.006 * s, np.maximum(out["field"], 0.0))) ** 1.5
+        rgb = rgb * (1.0 - fray[:, None]) + (worn / np.maximum(c, 0.03))[None, :] * fray[:, None]
         bm.normal_update()
         lift = 0.0012 * s * (1.0 - ss(0.0, 0.015 * s, f)) ** 2
         for v, d in zip(bm.verts, lift):

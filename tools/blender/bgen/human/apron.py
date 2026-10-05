@@ -8,7 +8,7 @@ soft folds deepening toward the hem. Its pattern (a bib narrower than the skirt)
 length; every edge is a turned hem (a thicker band with a stitch line) rounded over from the front face to the back,
 and a stitched patch pocket sits on the skirt. The bib follows the chest and spine like the shirt under it; the skirt
 follows the hips at the waist and the thigh behind it lower down, as much as a stride needs to keep the thigh behind
-the cloth given the room between them (STRIDE), while the strip between the legs stays with the hips.
+the cloth given the room between them (STRIDE), the strip between the legs shared by both.
 """
 import math
 
@@ -254,17 +254,19 @@ class Apron:
     def _skirt_w(self, p):
         """Hips at the waist, each thigh taking the part of the skirt in front of it lower down, as much as a stride
         (thigh up to STRIDE degrees) needs to carry it forward clear of the thigh, given the room the skirt has in
-        front of it (a skirt falling from a belly hangs freer than one against the legs); the strip between the legs
-        stays with the hips (averaged between two thighs swinging opposite ways it would ride up)."""
+        front of it (a skirt falling from a belly hangs freer than one against the legs). The strip between the legs
+        is shared between them, so the inside of a striding thigh stays behind the cloth too, and the hem stays level
+        (a thigh swung either way lifts what it carries as much as the two together lift what they share)."""
         j, s = self.j, self.s
         t = ss(j["hip.R"].z + 0.06 * s, j["hip.R"].z - 0.1 * s, p[2])
-        inner = 0.6 * abs(j["hip.R"].x)              # (the inside of the thigh)
-        loc, _, _, dist = self.tree.ray_cast(Vector(p), Vector((0.0, -1.0, 0.0)), 0.3 * s)
-        room = dist if loc is not None else 0.3 * s
+        room = 0.3 * s          # (back toward the thigh, or in toward the body where the sides pass beside it)
+        for d in (Vector((0.0, -1.0, 0.0)), Vector((-p[0], j["spine"].y - p[1], 0.0)).normalized()):
+            loc, _, _, dist = self.tree.ray_cast(Vector(p), d, 0.3 * s)
+            room = min(room, dist) if loc is not None else room
         swing = max(j["hip.R"].z - p[2], 0.0) * math.sin(math.radians(STRIDE))
         k = t * min(max(1.15 - room / max(swing, 1e-6), 0.35), 1.0)
-        return {"hips": 1.0 - k * ss(0.15 * inner, inner, abs(p[0])),
-                "thigh.R": k * ss(0.15 * inner, inner, p[0]), "thigh.L": k * ss(0.15 * inner, inner, -p[0])}
+        side = float(ss(-0.06 * s, 0.06 * s, p[0]))
+        return {"hips": 1.0 - k, "thigh.R": k * side, "thigh.L": k * (1.0 - side)}
 
     def _panel_w(self, P, Z):
         """The bib takes the body's weights under it (smoothed over the panel), the skirt the hips' and thighs'."""

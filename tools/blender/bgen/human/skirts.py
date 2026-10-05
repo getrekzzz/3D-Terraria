@@ -7,8 +7,12 @@ hidden under the belt or sash; below, it is gathered into small pleats that open
 Each row clears the hull of the body under it and falls from the rows above (a column never steps in, so the skirt
 bridges the buttocks and hangs instead of clinging). Its bottom is finished with a band of trim turned up inside
 (torn into tongues on the undead, which lose the trim). Inside it is lined (the outside's rows offset in, facing in,
-darker), so the open hem never shows the cloth's back. Skirts and the sash's hanging ends are weighted between the
-hips and the thighs by angle and height alone (``skirt_weights``), the lining exactly like the outside over it.
+darker), so the open hem never shows the cloth's back. A skirt's top is skinned like the waist under it, girded like
+the sash or belt over it (garments ``girth``), handing over by the top of the legs to the legs' own (``skirt_weights``:
+each leg carries the cloth on its side, front and back alike, and the shin the cloth behind the calf; an open
+coat's front panels each wholly with the thigh behind them), the lining
+like the outside over it; the sash and its ends are skinned like the skirt under them. Under a long skirt the skin
+of the hips, thighs and knees goes (``under_skirt``), so no stride can push it through.
 """
 import math
 
@@ -52,26 +56,37 @@ class Skirts:
         out = np.interp(np.arange(segs), np.concatenate([have - segs, have, have + segs]), np.tile(out[have], 3))
         return np.maximum(out, 0.5 * (np.roll(out, 1) + np.roll(out, -1)))
 
-    def skirt_weights(self, co, bottom_z):
-        """Hips at the waist, handing over to the thighs by the top of the legs: the cloth over each leg (and in front
-        of and behind it) swings with that leg, so a striding knee carries the skirt forward and a heel kicked back
-        carries it back, while the middle of the front and back stays with the hips, never averaged between two legs
-        swinging opposite ways (which would draw the hem up between them). Behind the calves the shins share it, so a
-        heel kicked back stays under the hem."""
+    def skirt_weights(self, co, bottom_z, open_front=False):
+        """Hips at the waist, handing over to the thighs by the top of the legs: each leg carries the cloth on its
+        side of the body (front and back alike, so a stride never folds a panel over itself: how much a leg carries
+        changes little from front to back), the middle shared between the legs. Below the knee the cloth behind the
+        leg goes with the shin, so a heel kicked back stays under the hem (the back moves off the front as a bent
+        knee carries it back, never into it). An ``open_front`` (coat tails) has nothing to share at the front: each
+        panel goes wholly with the thigh behind it there, so a striding thigh carries it instead of showing through."""
         s, j = self.f.s, self.f.j
-        t = 0.9 * smooth(self.waist - 0.03 * s, j["hip.R"].z - 0.12 * s, co.z) if bottom_z < self.waist else 0.0
-        # (by angle and height alone, so the lining moves exactly with the outside over it)
+        legs = smooth(self.waist - 0.03 * s, j["hip.R"].z - 0.12 * s, co.z) if bottom_z < self.waist else 0.0
+        t = (1.0 if open_front else 0.9) * legs
+        # (by height, side and angle alone, so the lining moves exactly with the outside over it)
         r = max(math.hypot(co.x, co.y - j["spine"].y), 1e-6)
-        u, back = co.x / r, (j["spine"].y - co.y) / r
-        knee = j["knee.R"]
-        calf = smooth(knee.z + 0.04 * s, knee.z - 0.16 * s, co.z) * smooth(-0.1, 0.35, back)
-        t *= 1.0 + 0.08 * calf          # (all but wholly: a boot's shaft swung back must not outrun the hem)
+        knee, behind = j["knee.R"], smooth(-0.25, 0.45, (j["spine"].y - co.y) / r)
+        calf = smooth(knee.z + 0.14 * s, knee.z - 0.14 * s, co.z) * behind if bottom_z < knee.z - 0.1 * s else 0.0
+        t = min(t * (1.0 + 0.11 * calf), 1.0)         # (wholly: a boot's shaft swung back must not outrun the hem)
+        # Shared across the middle (softly, so the front doesn't split between the legs), but behind the calves,
+        # which come within a few centimetres of it, each leg takes its own half (the change front to back gentle
+        # enough that a stride only stretches or eases the cloth between, never folds it).
+        hw = (0.1 - 0.06 * behind * (1 - smooth(knee.z + 0.05 * s, j["hip.R"].z - 0.1 * s, co.z))) * s
+        hw = max(hw * behind, 0.005 * s) if open_front else hw
         w = {"hips": 1.0}
-        for name, k in (("R", smooth(0.0, 0.4, u)), ("L", smooth(0.0, 0.4, -u))):
+        for name, k in (("R", smooth(-hw, hw, co.x)), ("L", smooth(-hw, hw, -co.x))):
             w[f"thigh.{name}"] = t * k * (1 - calf)
             w[f"shin.{name}"] = t * k * calf
             w["hips"] -= t * k
         return {b: x for b, x in w.items() if x > 0.01}
+
+    def under_skirt(self, co):
+        """Skin a long skirt hides however the legs move (the hips, thighs and knees, down to the calves), removed
+        so it can't push through the cloth."""
+        return self.f.j["knee.R"].z - 0.06 * self.f.s < co.z < self.waist and not self._on_arm(co)
 
     def skirt(self, body, bottom_z, flare, color, name, open_front=False, trim=None, under=()):
         """A skirt from just under the belt or sash to ``bottom_z`` (see the module's notes), with a band of ``trim``
@@ -153,7 +168,17 @@ class Skirts:
             self._tear_skirt(bm, bottom_z, cy)
         obj = mesh_from(bm, name)
         set_slot(obj, "char:cloth")
-        write_weights(obj, [self.skirt_weights(v.co, bottom_z) for v in obj.data.vertices])
+        # Its top takes the weights of the waist under it (girded like the sash or belt over it, then like the hips
+        # and thighs under it), handing over to ``skirt_weights`` by the top of the legs.
+        at, j = self.waist_weights(body), self.f.j
+        ws = []
+        for v in obj.data.vertices:
+            d = 1 - smooth(self.waist - 0.02 * s, j["hip.R"].z - 0.1 * s, v.co.z)
+            a, b = self.skirt_weights(v.co, bottom_z, open_front), at(v.co) if d > 0 else {}
+            ws.append({k: (1 - d) * a.get(k, 0.0) + d * b.get(k, 0.0) for k in {**a, **b}})
+        write_weights(obj, ws)
+        if not open_front and bottom_z < j["knee.R"].z:
+            self.hidden.append(self.under_skirt)
         return obj
 
     def _tear_skirt(self, bm, bottom_z, cy):
@@ -185,7 +210,8 @@ class Skirts:
     def sash(self, skirt, bodice, color):
         """A cloth sash knotted round a robe's waist over the top of its skirt: a soft band with thickness, a knot in
         front a little to one side, and the two ends hanging from it down the skirt."""
-        from .rig import rigid, write_weights
+        from mathutils.kdtree import KDTree
+        from .rig import read_weights, write_weights
         s, cy = self.f.s, self.f.j["spine"].y
         z = self.waist - 0.004 * s
         segs = 72
@@ -206,10 +232,22 @@ class Skirts:
         drop = z - self.f.j["knee.R"].z
         for i, (da, length) in enumerate(((-0.05, 0.62), (0.08, 0.5))):
             out.append(self._tail(skirt, ak + da, z - 0.004 * s, length * drop, i, color, f"sash_end{i}"))
-        for o in out[:2]:
-            rigid(o, "hips")
-        for o in out[2:]:
-            write_weights(o, [self.skirt_weights(v.co, self.f.j["ankle.R"].z) for v in o.data.vertices])
+        # All of it skinned like the skirt under it (its top girded like the waist), the knot rigid as at its middle.
+        sw = read_weights(skirt)
+        tree = KDTree(len(sw))
+        for i, v in enumerate(skirt.data.vertices):
+            tree.insert(v.co, i)
+        tree.balance()
+
+        def like(co):
+            w = {}
+            for _, i, d in tree.find_n(co, 4):
+                for b, x in sw[i].items():
+                    w[b] = w.get(b, 0.0) + x / (d + 0.003 * s)
+            return w
+        for o in out:
+            mid = sum((v.co for v in o.data.vertices), Vector()) / len(o.data.vertices)
+            write_weights(o, [like(mid if o is out[1] else v.co) for v in o.data.vertices])
         return out
 
     def _knot(self, centre, d, color):

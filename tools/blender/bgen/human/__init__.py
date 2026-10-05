@@ -302,7 +302,7 @@ def dress(fr, head, parts, p, lookup=None):
     if "apron" in p:
         out.extend(apron.build(w, body, parts["head"], out + w.extras, p["apron"]))
     out.extend(w.extras)
-    strip_covered(body, covers)
+    strip_covered(body, covers + w.hidden)
     head.bury_neck(body)
     if p.get("hat") and not accessories.rests_on_hair(p):
         under = [body] + [o for o in out if o.name.split(".")[0] in ("shirt", "coat", "robe")]

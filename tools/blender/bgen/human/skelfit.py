@@ -79,10 +79,11 @@ def hide(bones, skin, depth):
     return out
 
 
-def lift(objs, sheets, bones, margin, reach):
+def lift(objs, sheets, bones, margin, reach, spare=None):
     """Hangs the cloth on the bones: wherever a bone comes within ``margin`` of the outside of one of the ``sheets``,
     everything worn there (``objs``) is lifted together over it, so layers keep their order, and the lift eases out
-    across ``reach``: the bone shows as a soft ridge under the cloth instead of poking through it."""
+    across ``reach``: the bone shows as a soft ridge under the cloth instead of poking through it. ``spare`` (of a
+    point on the cloth, 0..1) scales the lift down where the cloth must keep its cut (a collar round the neck)."""
     if not bones:
         return
     tips = np.concatenate([world(b, "co") for b in bones])
@@ -98,8 +99,9 @@ def lift(objs, sheets, bones, margin, reach):
             # under the cloth's face (not past its edge), facing the same way (not inside a collar or a cuff)
             if out > -margin and abs(out) > 0.8 * dist and Vector(w).dot(n) > 0.25:
                 cell = tuple(np.floor(np.asarray(loc) / (0.3 * margin)).astype(int))
-                if out + margin > found.get(cell, (0,))[0]:
-                    found[cell] = (out + margin, loc, n)
+                up = (out + margin) * (1.0 if spare is None else spare(loc))
+                if up > found.get(cell, (0,))[0]:
+                    found[cell] = (up, loc, n)
         if not found:
             return
         push = list(found.values())

@@ -159,11 +159,18 @@ def waist_ties(a, panel):
     from .skirts import hull
     s, w, cy = a.s, a.w, a.j["spine"].y
     Tb, Wb, segs = 0.0035 * s, a.band_w, 64
-    rad = hull(w.radial(a.clothes + [panel], a.tie_z, Wb / 2 + 0.002 * s, segs)) + 0.0008 * s + Tb / 2
+    # (the girth along each of its edges and across its middle: it lies on the slope from the waist out over the
+    # hips like a cone, both edges down on the cloth, instead of a cylinder as wide as its widest edge)
+    girth = [hull(w.radial(a.clothes + [panel], a.tie_z + dz, 0.006 * s, segs)) for dz in (Wb * 0.42, 0.0, -Wb * 0.42)]
+    rad = np.maximum((girth[0] + girth[2]) / 2, girth[1]) + 0.0008 * s + Tb / 2
+    slope = (girth[0] - girth[2]) / (0.84 * Wb)
     ang = 2 * np.pi * np.arange(segs) / segs
     radial = np.stack([np.sin(ang), np.cos(ang), np.zeros(segs)], 1)
-    hips = {"hips": 1.0}
-    a.sweep(radial * rad[:, None] + np.array((0, cy, a.tie_z)), radial, strip_profile(Wb, Tb, s), [hips] * segs, closed=True)
+    ups = radial - np.outer(slope, (0.0, 0.0, 1.0))
+    points = radial * rad[:, None] + np.array((0, cy, a.tie_z))
+    hips = w.waist_weights(a.clothes[0])        # (girded like a belt: see Wardrobe.girth)
+    a.sweep(points, ups, strip_profile(Wb, Tb, s), [hips(Vector(p)) for p in points], closed=True)
+    hips = hips(Vector(points[segs // 2]))      # the knot's, at the back
     bmesh.ops.recalc_face_normals(a.bm, faces=a.bm.faces[:])
     a.bm.normal_update()
     trees = [bvh(a.clothes + [panel], lambda c: not w._on_arm(c)), BVHTree.FromBMesh(a.bm)]
@@ -190,7 +197,7 @@ def waist_ties(a, panel):
         pts = knot + np.array((sx * 0.004 * s, 0, -0.004 * s)) + np.outer(u * tl * s, (sx * math.sin(t), 0, -math.cos(t)))
         pts, ups = lay(trees, pts, outward, 0.0035 * s, fixed=1, iters=4, half=0.013 * s, taut=True)
         wts = []
-        for p, k in zip(pts, ss(0.05, 0.5, u)):       # from the hips at the knot to the seat's own weights
+        for p, k in zip(pts, ss(0.05, 0.5, u)):       # from the knot's weights to the seat's own
             tw = a.torso_w(p)
-            wts.append({b: (1 - k) * (b == "hips") + k * tw.get(b, 0.0) for b in sorted(set(tw) | {"hips"})})
+            wts.append({b: (1 - k) * hips.get(b, 0.0) + k * tw.get(b, 0.0) for b in sorted(set(tw) | set(hips))})
         a.sweep(pts, ups, prof, smooth_w(wts, fixed=1), cut=0.6 * sx)

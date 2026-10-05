@@ -35,7 +35,7 @@ def clothe(frame, head, arm, p, bones):
             from . import features
             out.append(features.horns(head, p["horns"], p.get("hornShape", "imp")))
     else:
-        body = hanger(frame)
+        body = hanger(frame, "robe" in p)
         fingers = [b.name for b in arm.data.bones if b.name.split(".")[0] in frame_mod.FINGERS]
         rig.heat_weights(body, arm, drop=fingers + ["root"])
         rig.clean_limb_weights(body, arm, frame)
@@ -47,9 +47,13 @@ def clothe(frame, head, arm, p, bones):
         _slacken(worn, frame)
         bare = [b for b in bones if b.name.startswith(("skull", "hand"))]
         covered = skelfit.hide([b for b in bones if b not in bare], skin, 0.035 * frame.s)
-        skelfit.lift(worn, sheets, covered, 0.005 * frame.s, 0.035 * frame.s)
+        neck, s = frame.j["neck"], frame.s
+
+        def spare(c):       # (the collar closes round the vertebrae as cut: lifted there, its back corners rose in peaks)
+            return 1.0 - ss(neck.z - 0.02 * s, neck.z, c.z) * ss(0.075 * s, 0.05 * s, np.hypot(c.x, c.y + 0.045 * s))
+        skelfit.lift(worn, sheets, covered, 0.005 * s, 0.035 * s, spare)
         bones = bare + covered
-        out += [_lining(o, 0.0025 * frame.s) for o in out if o.name.split(".")[0] in ("shirt", "coat")]
+        out += [_lining(o, 0.0025 * frame.s) for o in out if o.name.split(".")[0] in ("shirt", "coat", "robe")]
     for o in out:
         if o.name.startswith("hat_") and p.get("hat") in ("cap", "hood", "wide"):
             _settle(o, head, 0.0105 * head.h)
@@ -73,35 +77,40 @@ class _Neckless:
         pass
 
 
-def hanger(frame):
+def hanger(frame, robe=False):
     """The form a skeleton's clothes are cut from: the shape cloth takes hung on the bones, not a person's body (no
     chest, belly, buttocks or muscle). It lies over the ribcage and shoulder blades, the collarbones and the shoulder
     heads, falls plumb from the lower ribs past the spine to the hip bones, wraps the limb bones in loose tubes that
     sag a little below them and the cervical vertebrae in a thin neck; the feet are a person's (boots are their
-    shells)."""
+    shells). A ``robe`` is heavier cloth hung fuller: off shoulders sloping from the neck and rounded over their heads,
+    broad over the ribs, its sleeves wide and sagging, so a robed skeleton reads as a cloaked figure, not a mannequin."""
     j, s, fem = frame.j, frame.s, frame.female
     B = Blob("body_blob", 0.0085 * s)
     at = lambda *c: Vector(c) * s
+    full = 1.0 if robe else 0.0
 
     def e(c, r, rot=None):
         B.ellipsoid(c, tuple(x * s for x in r), rot)
 
-    e(at(0, -0.03, 1.33), (0.122 if fem else 0.132, 0.092, 0.12))         # over the ribcage and shoulder blades
-    e(at(0, -0.027, 1.205), (0.116 if fem else 0.124, 0.088, 0.1))
-    e(at(0, -0.023, 1.09), (0.114 if fem else 0.12, 0.084, 0.1))          # hanging plumb past the spine
-    e(at(0, -0.014, 0.975), (0.158 if fem else 0.148, 0.084, 0.088))      # the hip bones
+    w = (0.122 if fem else 0.132) + 0.018 * full
+    e(at(0, -0.03, 1.33), (w, 0.092 + 0.01 * full, 0.12 + 0.01 * full))    # over the ribcage and shoulder blades
+    e(at(0, -0.027, 1.205), (w - 0.006, 0.088 + 0.008 * full, 0.1))
+    e(at(0, -0.023, 1.09), (w - 0.008, 0.084 + 0.008 * full, 0.1))         # hanging plumb past the spine
+    e(at(0, -0.014, 0.975), (0.158 if fem else 0.148, 0.084 + 0.006 * full, 0.088))      # the hip bones
     B.capsule(at(0, -0.05, 1.42), at(0, -0.048, 1.56), 0.03 * s)          # round the cervical vertebrae
-    sag = at(0, 0, -0.006)
+    sag = at(0, 0, -0.006 - 0.006 * full)
     for side, sx in (("R", 1), ("L", -1)):
         sh, el, wr = j[f"shoulder.{side}"], j[f"elbow.{side}"], j[f"wrist.{side}"]
         up, fw = (el - sh).normalized(), (wr - el).normalized()
         B.capsule(at(sx * 0.03, -0.018, 1.435), sh + at(0, 0, 0.014), 0.026 * s)    # over the collarbone
-        B.ball(sh + at(sx * 0.004, 0, 0.0), 0.038 * s)                             # the shoulder head
+        if robe:                # (and from the neck down over it, the slope of the shoulder)
+            B.capsule(at(sx * 0.045, -0.034, 1.485), sh + at(-sx * 0.01, -0.01, 0.022), 0.032 * s)
+        B.ball(sh + at(sx * 0.004, 0, 0.0), (0.038 + 0.012 * full) * s)            # the shoulder head
         mid = el.lerp(wr, 0.45)
-        B.capsule(sh + up * 0.03 * s + sag, el + sag, 0.03 * s)
-        B.ball(el + sag, 0.029 * s)
-        B.capsule(el + sag, mid + sag, 0.027 * s)
-        B.capsule(mid + sag, wr - fw * 0.012 * s + sag * 0.5, 0.022 * s)
+        B.capsule(sh + up * 0.03 * s + sag, el + sag, (0.03 + 0.016 * full) * s)
+        B.ball(el + sag, (0.029 + 0.015 * full) * s)
+        B.capsule(el + sag, mid + sag, (0.027 + 0.015 * full) * s)
+        B.capsule(mid + sag, wr - fw * 0.012 * s + sag * 0.5, (0.022 + 0.016 * full) * s)
         hip, kn, an = j[f"hip.{side}"], j[f"knee.{side}"], j[f"ankle.{side}"]
         B.capsule(hip + at(sx * 0.012, -0.004, 0), hip.lerp(kn, 0.45), 0.064 * s)
         B.capsule(hip.lerp(kn, 0.45), kn, 0.05 * s)
