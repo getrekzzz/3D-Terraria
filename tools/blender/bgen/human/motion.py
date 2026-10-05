@@ -281,7 +281,7 @@ class Motion:
         dip = tl(t, [(0, 0.35), (0.22, 1, "out"), (1, 0, "io")])
         th, kn = 34 * dip, 64 * dip
         pose = {
-            "hips": {"rot": [], "loc": (0, -0.02 * self.s * dip, -drop(self.s, th, kn))},
+            "hips": {"rot": [], "loc": (0, -0.02 * self.s * dip, -drop(self.s * self.frame.legs, th, kn))},
             "spine": [("swing", FWD, deg(14 * dip))], "head": [("swing", BACK, deg(8 * dip))],
         }
         for side, sx in SIDES:

@@ -101,6 +101,7 @@ class SkinPainter:
         self.beard = (hex3(p["beard"]), BEARDS[p.get("beardStyle", "full")]) if "beard" in p else None
         self.undead = bool(p.get("undead"))
         self.tusks = hex3(p["tusks"]) if p.get("tusks") else None
+        self.human = human_skin(self.skin)      # (a creature's lips and cheeks are its own skin, deeper, not pink)
         # Skin under the hair takes the hair colour, so the scalp never reads as a bald patch where the hair shell
         # thins (distance LOD simplification, extreme head poses).
         style = p.get("hairStyle", "long" if frame.female else "short")
@@ -130,17 +131,17 @@ class SkinPainter:
                 return self.tusks
         lip_d = float(self.head.shape.lips(np.asarray([q], dtype=np.float32))[0]) if q.y > 0.075 and q.z < -0.05 else 1.0
         lip = 1.0 - smooth(0.0002, 0.001, lip_d)
-        tone = (0.9, 0.62, 0.64) if self.frame.female else (0.92, 0.72, 0.72)
+        tone = ((0.9, 0.62, 0.64) if self.frame.female else (0.92, 0.72, 0.72)) if self.human else (0.8, 0.8, 0.86)
         c = mix(c, mul(c, tone), lip * (0.75 if self.frame.female else 0.6))
         blush = sum(gauss((q - Vector((sx * 0.042, 0.07, -0.03))).length, 0.022) for sx in (1, -1))
         blush += 0.7 * gauss((q - Vector((0, 0.11, -0.04))).length, 0.012)
         blush += 0.6 * (gauss(abs(q.x) - 0.075, 0.012) if abs(q.x) > 0.06 else 0.0)
-        c = mix(c, mul(c, (1.0, 0.88, 0.87)), min(blush, 1.0) * 0.4)
+        c = mix(c, mul(c, (1.0, 0.88, 0.87) if self.human else (0.94, 0.94, 0.97)), min(blush, 1.0) * 0.4)
         for sx in (1, -1) if self.p.get("face") not in EYELESS else ():
             e = self.head.local(self.head.eyes[sx])
             d = q - e
             lid = gauss(math.hypot(d.x, d.z), 0.016) * (1.0 if d.y > -0.004 else 0.0)
-            c = mix(c, mul(c, (0.86, 0.8, 0.82)), lid * (0.85 if self.undead else 0.5))
+            c = mix(c, mul(c, (0.86, 0.8, 0.82)), lid * (0.85 if self.undead else 0.7 if self.frame.old else 0.5))
             if self.undead:
                 c = mix(c, mul(c, (0.45, 0.4, 0.42)), gauss(math.hypot(d.x, d.z), 0.02) * 0.7)   # sunken, bruised sockets
             # Painted brow (strands are added on top), finer on a woman; none where the brows are "none".

@@ -1,10 +1,16 @@
-"""Creature faces in the head's distance field (head-local units, see headshape): a reptile's snout in place of the
-nose and mouth (upper and lower jaws tapering forward, nostrils at the tip, a lipless mouth line running back under
-the cheeks to a slight upturn, the throat sloping up under the jaws), on heads without outer ears a shallow ear opening,
-and an ogre's tusks rising from the lower jaw in front of the upper lip.
+"""Creature faces in the head's distance field (head-local units, see headshape): a reptile's head (``snout``) in
+place of a person's, on heads without outer ears a shallow ear opening, and an ogre's tusks rising from the lower jaw
+in front of the upper lip.
+
+The reptile's skull is long and low: a flat braincase narrower than the jaw muscles that bulge behind and below the
+eyes, a ridge over each eye, and the snout tapering forward from between the eyes to a blunt, flattened tip with the
+nostrils on it. The lower jaw is a bar on each side from its angle under the ear to the chin, so its underline shows
+from the side and the front, with the throat set in above it and running back down into a neck narrower than the
+head. A lipless mouth line runs from the tip back under the eyes to a slight upturn.
 """
 import numpy as np
 
+from .faceforms import _basis
 from .sdf import carve, ellipsoid, round_cone, smin, tube
 
 
@@ -39,16 +45,29 @@ def _stations(shape, y0, y1, w, h, top=None, bottom=None, n=5):
     return out
 
 
-def jaws(shape, p, d):
-    """The snout's mass blended into the face: the upper jaw, wide between the cheeks and tapering forward from
-    between the eyes to a blunt, flattened tip, and the lower jaw under it, a little shorter."""
-    ty = tip_y(shape)
-    upper = _chain(p, _stations(shape, 0.04, ty - 0.017, (0.047, 0.019), (0.03, 0.0135), top=(0.006, -0.034)))
-    upper = smin(upper, round_cone(p, (0, 0.079, 0.01), (0, ty - 0.024, -0.028), 0.0115, 0.0085), 0.012)   # the ridge down the top
-    lower = _chain(p, _stations(shape, 0.03, ty - 0.021, (0.04, 0.016), (0.022, 0.0105), bottom=(-0.09, -0.0705)))
-    # The throat, sloping from the neck up under the lower jaw (no human chin over a throat).
-    lower = smin(lower, round_cone(p, (0, 0.008, -0.135), (0, 0.075 + 0.02 * shape.snout, -0.083), 0.046, 0.016), 0.02)
-    return smin(d, smin(upper, lower, 0.006), 0.022)
+def skull(shape, p):
+    """A reptile's head in place of a person's skull and face masses (see the module docstring)."""
+    ty, br = tip_y(shape), shape.brow
+    E = ellipsoid
+    # The braincase, long, low and flat on top, and the brow between the eyes sloping down into the snout.
+    d = E(p, (0, -0.014, 0.008), (0.05, 0.064, 0.036))
+    d = smin(d, E(p, (0, 0.032, 0.002), (0.045, 0.05, 0.032)), 0.024)
+    d = smin(d, E(p, (0, -0.048, -0.032), (0.042, 0.036, 0.042)), 0.03)     # the nape, sloping down into the neck
+    for sx in (1, -1):
+        # The jaw muscles, wider than the braincase, behind and below the eyes.
+        d = smin(d, E(p, (sx * 0.035, -0.004, -0.036), (0.03, 0.044, 0.034)), 0.028)
+        # The ridge over each eye: a low ledge running along the top of the head toward the snout (not a knob).
+        d = smin(d, E(p, (sx * 0.033, 0.062, 0.015), (0.026, 0.0135 + 0.003 * br, 0.006 + 0.0025 * br), _basis((sx * 0.25, 1, -0.12))), 0.012)
+        # The lower jaw's bar, from its angle under the ear to the chin.
+        d = smin(d, round_cone(p, (sx * 0.04, -0.008, -0.07), (sx * 0.013, ty - 0.034, -0.071), 0.0125, 0.008), 0.018)
+    # The upper jaw, wide between the cheeks and tapering forward to a blunt, flattened tip, with a ridge down its top,
+    # and the lower jaw under it, a little shorter.
+    upper = _chain(p, _stations(shape, 0.035, ty - 0.017, (0.047, 0.019), (0.031, 0.0135), top=(0.008, -0.034)))
+    upper = smin(upper, round_cone(p, (0, 0.074, 0.012), (0, ty - 0.024, -0.028), 0.0115, 0.0085), 0.012)
+    lower = _chain(p, _stations(shape, 0.03, ty - 0.021, (0.04, 0.016), (0.02, 0.0105), bottom=(-0.084, -0.0705)))
+    d = smin(d, smin(upper, lower, 0.006), 0.02)
+    # The throat, set in above the jaw's underline and running back down into the neck.
+    return smin(d, round_cone(p, (0, -0.004, -0.14), (0, 0.058, -0.084), 0.038, 0.017), 0.012)
 
 
 def _mouth_z(shape, y):

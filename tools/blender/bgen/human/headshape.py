@@ -5,14 +5,16 @@ The skull and face masses (cranium, brow, cheekbones, cheeks, the lofted lower f
 age does to them are in faceforms.py; the nose and lips in nosemouth.py; creature faces (snout, tusks, ear openings) in
 creature.py; the ears in earshape.py. This module puts them together with the eyes and the neck: eyelids are a shell
 round each eyeball with an almond opening (margins, a crease above, a roll below, the caruncle in the inner corner),
-and the neck meets the jaw with a clean angle in front and blends wide into the skull behind. Fine cuts (mouth line,
-nostrils, grooves) are placed on the surface the masses make, through anchors found by bisection. Women get larger
+and the neck meets the jaw with a clean angle in front and widens behind into the base of the skull. Fine cuts (mouth
+line, nostrils, grooves) are placed on the surface the masses make, through anchors found by bisection. Women get larger
 eyes and a slimmer neck; age adds bags under the eyes, hooded lids, a longer nose and ears and a heavier brow.
 
-Creature parameters: noseWidth (1) spreads the nose wider and flatter, an ogre's; mouthWidth (1) widens the mouth, a
-goblin's; underbite (0..1) carries the lower lip and chin forward; tusks (a colour) rise from the lower jaw; snout
-(0..1) slopes a low skull into a reptile's snout over a thick neck; headSize above 1 sinks the head onto a shorter
-neck (head.py). Monster faces (``face``) replace the features from monsterface.py, borrowing _eye, _nose and _mouth.
+Creature parameters: noseWidth (1) spreads the nose wider and flatter, an ogre's; mouthWidth (1) widens the mouth
+into a grin, a goblin's; forehead (0..1) lowers and slopes the forehead (faceforms); underbite (0..1) carries the lower
+lip and chin forward; tusks (a colour) rise from the lower jaw; snout (0..1) swaps the skull for a reptile's (low and
+long, ridged over the eyes, on a neck narrower than the head: creature.py); headSize above 1 sinks the head onto a
+shorter neck (head.py). Monster faces (``face``) replace the features from monsterface.py, borrowing _eye, _nose and
+_mouth.
 """
 import math
 
@@ -46,14 +48,14 @@ class HeadShape:
         k = eye_r / 0.0118
         self.u_in, self.u_out = -0.0128 * k, 0.0116 * k
         self.v_in, self.v_out = -0.0006 * k, (0.0011 + 0.0004 * self.fem) * k
-        self.lid_up, self.lid_down = 0.0037 * k, 0.0046 * k
+        self.lid_up, self.lid_down = (0.0037 - 0.0005 * self.old) * k, 0.0046 * k      # (heavier upper lids with age)
         bulk, fat = max(0.0, frame.build - 0.5) * 2.0, max(0.0, frame.weight - 0.45) / 0.55
-        self.neck_r = ((0.0545 - 0.008 * self.fem) * (0.82 + 0.36 * frame.build) ** 0.4 * (1.0 + 0.16 * fat + 0.08 * bulk)
-                       * (1.0 + 0.25 * float(p.get("snout", 0.0))) / float(p.get("headSize", 1.0)) ** 0.7)
+        self.neck_r = ((0.0545 - 0.0045 * self.fem) * (0.82 + 0.36 * frame.build) ** 0.4 * (1.0 + 0.16 * fat + 0.08 * bulk)
+                       * (1.0 - 0.2 * float(p.get("snout", 0.0))) / float(p.get("headSize", 1.0)) ** 0.45)
         self.n = 0.9 if self.fem else 1.0            # nose scale: finer and shorter on women
         self.mouth_up = 0.0045 * self.fem            # a woman's mouth sits higher, under her shorter nose
         # Creature features (all 0, or 1 for the scales, on people): see human/__init__.py.
-        self.brow, self.jaw, self.snout = (float(p.get(k, 0.0)) for k in ("brow", "jaw", "snout"))
+        self.brow, self.jaw, self.snout, self.forehead = (float(p.get(k, 0.0)) for k in ("brow", "jaw", "snout", "forehead"))
         self.nose_len = float(p.get("noseLength", 1.0))
         self.mouth_w = float(p.get("mouthWidth", 1.0))
         self.nose_w = float(p.get("noseWidth", 1.0))
@@ -73,7 +75,7 @@ class HeadShape:
     def key(self):
         """Everything the shape depends on (heads with equal keys are identical)."""
         key = (self.fem, self.old, round(float(self.fat), 4), round(float(self.neck_r), 5), round(float(self.R), 5),
-               tuple(round(float(v), 5) for v in self.eyes[1]), self.brow, self.jaw, self.snout, self.nose_len, self.ear_spec,
+               tuple(round(float(v), 5) for v in self.eyes[1]), self.brow, self.jaw, self.snout, self.forehead, self.nose_len, self.ear_spec,
                self.mouth_w, self.nose_w, self.underbite, self.tusks)
         key = key + ((self.monster, monsterface.digest()),) if self.monster else key
         return key + ((self.alien,) if self.alien else ())
@@ -108,8 +110,8 @@ class HeadShape:
         return a + (b - a) * lo[:, None]
 
     def _find_anchors(self):
-        """Fine cuts (mouth line, philtrum groove, nostrils, alar creases) placed on the surface the
-        other forms make, so each one opens through the skin instead of leaving a bubble inside it."""
+        """Fine cuts (mouth line, nostrils, alar creases, age lines) placed on the surface the other forms make, so
+        each one opens through the skin instead of leaving a bubble inside it."""
         segs, keys = [], []
 
         def seg(key, a, b):
@@ -117,7 +119,7 @@ class HeadShape:
             segs.append((a, b))
 
         for x in np.linspace(-0.0218, 0.0218, 11) * self.mouth_w:   # the junction of the lips, down a little at the corners
-            z = -0.0699 - 0.0018 * (x / (0.0255 * self.mouth_w)) ** 2 + self.mouth_up
+            z = -0.0699 + (nosemouth.grin(self) - 0.0018) * (x / (0.0255 * self.mouth_w)) ** 2 + self.mouth_up
             seg("mouth", (x, 0.07, z), (x, 0.11, z))
         for key, a, b in nosemouth.anchor_segments(self):
             seg(key, a, b)
@@ -127,11 +129,9 @@ class HeadShape:
         if not self.ears:         # where an earless head's ear openings go
             for sx in (1, -1):
                 seg("tympanum", (sx * 0.03, -0.012, -0.014), (sx * 0.12, -0.012, -0.014))
-        if self.old:              # two shallow lines across the forehead
-            for k, z in enumerate((0.047, 0.059)):
-                for x in np.linspace(-0.026 + 0.004 * k, 0.026 - 0.004 * k, 9):
-                    zz = z + 0.004 * (x / 0.026) ** 2
-                    seg(f"forehead{k}", (x, 0.03, zz), (x, 0.13, zz))
+        if self.old:              # lines across the forehead and at the corners of the eyes
+            for key, a, b in faceforms.age_segments(self):
+                seg(key, a, b)
         hits = self._surface([a for a, _ in segs], [b for _, b in segs])
         out = {}
         for k, h in zip(keys, hits):
@@ -180,9 +180,7 @@ class HeadShape:
         if self.alien:
             return alienhead.field(self, p, ears, face)
         sn = self.snout
-        d = faceforms.masses(self, p)
-        if sn > 0:
-            d = creature.jaws(self, p, d)
+        d = creature.skull(self, p) if sn > 0 else faceforms.masses(self, p)
         if self.monster:
             d = monsterface.skull(self, p, d)
         if self.old:
@@ -213,16 +211,17 @@ class HeadShape:
         q = p * np.asarray((1.0, 1.08, 1.0), dtype=F)
         # Down into the chest; the generator trims what the torso covers.
         neck = capsule(q, (0, -0.006 * 1.08, -0.05), (0, -0.03 * 1.08, -0.3), r)
-        for sx in (1, -1):    # sternocleidomastoids: from behind the ears down the front of the neck to the collarbones
+        for sx in (1, -1) if not self.snout else ():  # sternocleidomastoids: behind the ears down to the collarbones
             neck = smin(neck, round_cone(p, (sx * 0.046, -0.018, -0.045), (sx * 0.016, r * 0.42, -0.25),
                                          0.0066 - 0.0018 * fem, 0.0055 - 0.0012 * fem), 0.02)
-        if male:
+        if not self.snout:  # the nape's muscles widen the neck up into the base of the skull (no egg on a stalk)
+            neck = smin(neck, ellipsoid(p, (0, -0.04, -0.09), (0.95 * r, 0.026, 0.05)), 0.025)
+        if male and not self.snout:
             neck = smin(neck, E_adam(p, r), 0.012)
         if fat > 0.55:          # a fuller throat under the chin
             neck = smin(neck, ellipsoid(p, (0, 0.036, -0.104), (0.03, 0.034, 0.016 + 0.02 * (fat - 0.55))), 0.014)
-        # The jaw line stays crisp in front (a reptile's throat runs smoothly up under its jaws); the nape blends wider
-        # into the skull.
-        k = (F(0.013 + 0.003 * fem + 0.022 * self.snout) + F(0.01) * np.clip((F(0.015) - p[:, 1]) / F(0.03), 0, 1)).astype(F) * F(1.25)
+        # The jaw line stays crisp in front; the nape blends wider into the skull.
+        k = (F(0.013 + 0.003 * fem + 0.006 * self.snout) + F(0.016) * np.clip((F(0.015) - p[:, 1]) / F(0.03), 0, 1)).astype(F) * F(1.25)
         h = np.maximum(k - np.abs(d - neck), F(0)) / k
         return np.minimum(d, neck) - h * h * h * k / F(6.0)
 

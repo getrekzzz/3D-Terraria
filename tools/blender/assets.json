@@ -4320,10 +4320,12 @@
         "earPoint": 1.3,
         "earFlare": 0.7,
         "noseLength": 1.7,
-        "brow": 0.75,
+        "brow": 1.0,
         "hair": "#3e5a2c",
-        "mouthWidth": 1.3,
-        "jaw": 0.25
+        "mouthWidth": 1.5,
+        "forehead": 1.0,
+        "legs": 0.78,
+        "jaw": -0.35
       }
     },
     "goblin_thief": {
@@ -4345,10 +4347,12 @@
         "earPoint": 1.3,
         "earFlare": 0.7,
         "noseLength": 1.7,
-        "brow": 0.75,
+        "brow": 1.0,
         "hair": "#3e5a2c",
-        "mouthWidth": 1.3,
-        "jaw": 0.25
+        "mouthWidth": 1.5,
+        "forehead": 1.0,
+        "legs": 0.78,
+        "jaw": -0.35
       }
     },
     "goblin_warrior": {
@@ -4368,10 +4372,11 @@
         "earPoint": 1.2,
         "earFlare": 0.65,
         "noseLength": 1.55,
-        "brow": 0.85,
-        "jaw": 0.6,
+        "brow": 1.0,
         "hair": "#3e5a2c",
-        "mouthWidth": 1.3
+        "mouthWidth": 1.5,
+        "forehead": 0.8,
+        "legs": 0.85
       }
     },
     "goblin_sorcerer": {
@@ -4395,10 +4400,12 @@
         "earPoint": 1.3,
         "earFlare": 0.7,
         "noseLength": 1.7,
-        "brow": 0.75,
+        "brow": 1.0,
         "hair": "#3e5a2c",
-        "mouthWidth": 1.3,
-        "jaw": 0.25
+        "mouthWidth": 1.5,
+        "forehead": 1.0,
+        "legs": 0.78,
+        "jaw": -0.35
       }
     },
     "goblin_archer": {
@@ -4418,10 +4425,12 @@
         "earPoint": 1.3,
         "earFlare": 0.7,
         "noseLength": 1.7,
-        "brow": 0.75,
+        "brow": 1.0,
         "hair": "#3e5a2c",
-        "mouthWidth": 1.3,
-        "jaw": 0.25
+        "mouthWidth": 1.5,
+        "forehead": 1.0,
+        "legs": 0.78,
+        "jaw": -0.35
       }
     },
     "harpy": {
@@ -4488,7 +4497,8 @@
         "snout": 1.0,
         "earSize": 0,
         "brow": 0.4,
-        "brows": "none"
+        "brows": "none",
+        "headSize": 1.12
       }
     },
     "flying_snake": {
@@ -4809,8 +4819,8 @@
         "body": "male",
         "age": "old",
         "skin": "#e8b890",
-        "hair": "#b86a2a",
-        "beard": "#c8742a",
+        "hair": "#a0948a",
+        "beard": "#bcae9e",
         "beardStyle": "bushy",
         "hairStyle": "short",
         "shirt": "#8a6a3a",
@@ -4844,10 +4854,12 @@
         "earPoint": 1.2,
         "earFlare": 0.6,
         "noseLength": 1.6,
-        "brow": 0.6,
+        "brow": 0.85,
         "hair": "#3e5a50",
-        "mouthWidth": 1.25,
-        "jaw": 0.2
+        "mouthWidth": 1.45,
+        "forehead": 0.8,
+        "legs": 0.8,
+        "jaw": -0.3
       }
     },
     "witch_doctor": {
@@ -5740,10 +5752,12 @@
         "earPoint": 1.5,
         "earFlare": 0.7,
         "noseLength": 1.7,
-        "brow": 0.75,
+        "brow": 1.0,
         "hair": "#4a3a78",
-        "mouthWidth": 1.3,
-        "jaw": 0.25
+        "mouthWidth": 1.5,
+        "forehead": 1.0,
+        "legs": 0.78,
+        "jaw": -0.35
       }
     },
     "kobold": {
@@ -5763,7 +5777,7 @@
         "snout": 0.85,
         "earSize": 0,
         "brow": 0.35,
-        "headSize": 1.12,
+        "headSize": 1.22,
         "hair": "#4a6890",
         "brows": "none"
       }

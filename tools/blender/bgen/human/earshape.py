@@ -5,7 +5,8 @@ the side of the head.
 
 Creatures reshape them: ``size`` scales the whole ear, ``point`` draws the top of the pinna up and back into a
 tapered blade with the helix rolled along both its edges (elves, imps, goblins), ``flare`` swings the ear out from the
-head round its front edge, facing forward, and tips it outward so it stands out sideways.
+head round its front edge, facing forward, and tips it outward so it stands out sideways. A long blade (``point`` past
+1) or a flared ear keeps only a small lobe and tragus, so it reads as one leaf rather than a blade over a round ear.
 """
 import math
 
@@ -27,6 +28,9 @@ class Ear:
         k = (0.94 if fem else 1.0) * size        # women's ears are a little smaller
         self.k = k
         self.point = point
+        # A goblin's long blade (point beyond an elf's) and a flared ear carry less of a person's ear with them: a
+        # smaller lobe, tragus and antitragus, so the ear reads as one leaf instead of a blade over a round ear.
+        self.small = max(min(max(point - 1.0, 0.0) / 0.5, 1.0), min(flare, 1.0))
         self.root = np.asarray((sx * 0.0675, -0.003, -0.016 + 0.008 * (size - 1.0)))
         n = np.asarray((sx * 0.95, 0.31, 0.0))  # the pinna faces out and a little forward (flares at the back)
         n = n / np.linalg.norm(n)
@@ -86,7 +90,7 @@ class Ear:
         ear = smin(ear, self._tube(p, self.rim, self.rim_r), 0.003)
         # The lobe: soft and flat, hanging from the bottom of the rim and joined to the cheek in front (small under a
         # pointed ear).
-        lobe = k * (1.0 - 0.3 * min(self.point, 1.0))
+        lobe = k * (1.0 - 0.3 * min(self.point, 1.0)) * (1.0 - 0.35 * self.small)
         ear = smin(ear, ellipsoid(p, self.at(-0.0145, -0.0245 + 0.004 * min(self.point, 1.0), 0.0062),
                                   (0.0088 * lobe, 0.0082 * lobe, 0.0031 * lobe), self.rot), 0.0075)
         # Antihelix: a ridge up the middle of the pinna that forks under the top of the rim.
@@ -96,8 +100,9 @@ class Ear:
                                      [0.0018, 0.0016, 0.0011]), 0.002)
         ear = smin(ear, anti, 0.003)
         # Tragus: a low flap on the front edge, grown from the cheek.
-        ear = smin(ear, ellipsoid(p, self.at(0.0058, -0.0065, 0.0045), (0.0036 * k, 0.0048 * k, 0.0026 * k), self.rot), 0.0035)
-        ear = smin(ear, ellipsoid(p, self.at(-0.015, -0.016, 0.0085), (0.003 * k, 0.0026 * k, 0.0024 * k), self.rot), 0.003)  # antitragus
+        t = k * (1.0 - 0.5 * self.small)
+        ear = smin(ear, ellipsoid(p, self.at(0.0058, -0.0065, 0.0045), (0.0036 * t, 0.0048 * t, 0.0026 * t), self.rot), 0.0035)
+        ear = smin(ear, ellipsoid(p, self.at(-0.015, -0.016, 0.0085), (0.003 * t, 0.0026 * t, 0.0024 * t), self.rot), 0.003)  # antitragus
         # The front edge grows out of the head; the back stands off it over a soft fold.
         d = smin(d, ear, 0.005)
         # Concha: the bowl in front of the antihelix, deepening softly behind the tragus.

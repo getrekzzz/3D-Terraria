@@ -24,12 +24,14 @@ class Head:
         # grows out from a little above the chin, sinking toward the shoulders on a shorter neck (a goblin's). (Other
         # anatomies, matter.py, keep the chin where it is.)
         sink = self.h > base and p.get("anatomy", "human") == "human"
-        self.c = frame.head_center + Vector((0, 0, 0.07 if sink else 0.11)) * (self.h - base)
+        self.c = frame.head_center + Vector((0, 0, 0.085 if sink else 0.11)) * (self.h - base)
         if frame.female:      # a woman's smaller head sits a little lower, so her neck isn't drawn out
-            self.c.z -= 0.008 * frame.s
+            self.c.z -= 0.016 * frame.s
+        self.c.z -= 0.016 * frame.s * p.get("snout", 0.0)       # (as does a reptile's, shorter than a person's)
         h = self.h
-        self.eye_r = (0.0126 if frame.female else 0.0118) * h       # (women's eyes a little larger)
-        self.eyes = {sx: self.at((sx * 0.0315, 0.0695, -0.002)) for sx in (1, -1)}
+        self.eye_r = (0.0123 if frame.female else 0.0118) * h       # (women's eyes a little larger)
+        y = 0.0695 - 0.004 * p.get("brow", 0.0)       # (set deeper under a heavy brow)
+        self.eyes = {sx: self.at((sx * 0.0315, y, -0.002)) for sx in (1, -1)}
         self._shape = None
 
     def at(self, local) -> Vector:

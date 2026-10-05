@@ -22,11 +22,11 @@ hairTie (a ponytail's or bun's tie, default a darker shirt).
 Build and weight above average (0.5, 0.45) add mass: muscle broadens the shoulders, back and chest and thickens the
 limbs and neck; fat adds a round belly, love handles, a fuller chest, heavy limbs and a thick neck.
 
-Creature heads (defaults give a person's head, headshape.py): headSize (head scale against the body, 1; above 1 it
-sinks onto a shorter neck), earSize (1; 0 leaves only a recessed ear opening, as on reptiles), earPoint (0 round .. 1
-an elf's pointed tip .. 2 a goblin's long blade), earFlare (0 flat to the head .. 1 standing out sideways), noseLength
-(1; longer projects further to a drooping point), noseWidth (1), mouthWidth (1), brow (0 .. 1 a heavy jutting brow
-ridge), jaw (0 .. 1 a wide heavy jaw and chin), underbite (0 .. 1), tusks (a colour), snout (0 .. 1 a reptile's snout).
+Creature heads (headshape.py): headSize (1; above 1 sinks onto a shorter neck), legs (1; shorter keeps the body
+stocky under a big head: frame.py), earSize (1; 0 a recessed ear opening), earPoint (0 round .. 1 an elf's tip .. 2 a
+goblin's blade), earFlare (0 flat .. 1 standing out), noseLength (1; longer hooks to a drooping point), noseWidth (1),
+mouthWidth (1; wider grins), brow (0 .. 1 a heavy ridge over deep-set eyes), forehead (0 .. 1 low, sloping back), jaw
+(-1 pointed .. 1 wide and heavy), underbite (0 .. 1), tusks (a colour), snout (0 .. 1 a reptile's low, long skull).
 
 Monsters: face (cyclops | brute | ghoul | void, monsterface.py), sleeves (long, short or 0..1 down the arm), shirt/pants
 none (bare), snakes (snakehair.py), wisps (spectre.py), tribalMask, headdress, beads, grassSkirt, bodyPaint
@@ -148,7 +148,7 @@ def motion_key(p: dict) -> str:
     q = motion_params(p)
     fr = frame_mod.Frame(q)
     kind = "skeleton" if q.get("anatomy") == "skeleton" else "undead" if q.get("undead") else "human"
-    spread = f"_a{round(q['armSpread'])}" if q.get("armSpread") else ""
+    spread = (f"_a{round(q['armSpread'])}" if q.get("armSpread") else "") + (f"_l{round(fr.legs * 100)}" if fr.legs != 1.0 else "")
     return f"{'f' if fr.female else 'm'}{'_old' if fr.old else ''}_{round(fr.height * 100)}_{kind}{spread}"
 
 

@@ -42,7 +42,10 @@ def build_body(frame, blob: Blob, feet=True):
     def e(c, r, rot=None, neg=False, stiffness=2.0):
         B.ellipsoid(Vector(c), tuple(x * s for x in r), rot, negative=neg, stiffness=stiffness)
 
-    def at(p):
+    def at(p):          # a torso position (down with shorter legs, see frame)
+        return Vector(p) * s - Vector((0, 0, frame.drop))
+
+    def off(p):
         return Vector(p) * s
 
     # ---- torso
@@ -79,14 +82,14 @@ def build_body(frame, blob: Blob, feet=True):
               limb_rotation(Vector((sx, 0.12, -0.3))))                                                          # pectorals
         # Collarbone, from the top of the sternum (which a stoop doesn't carry forward with the shoulders) out to the
         # shoulder, lying back over the rounded shoulder instead of standing out in front of it.
-        B.capsule(j[f"clavicle.{side}"] + at((0, 0.006, 0.01)) - Vector((0, frame.stoop, 0)),
-                  j[f"shoulder.{side}"] + at((0, 0.012, 0.018)) - Vector((0, 0.5 * frame.stoop, 0)), 0.014 * s)
+        B.capsule(j[f"clavicle.{side}"] + off((0, 0.006, 0.01)) - Vector((0, frame.stoop, 0)),
+                  j[f"shoulder.{side}"] + off((0, 0.012, 0.018)) - Vector((0, 0.5 * frame.stoop, 0)), 0.014 * s)
     if fem:
         # The bust's common mass over the cleavage and under it, so cloth spans the breasts and falls from them.
         e(at((0, 0.054, 1.258)), (0.072 * f ** 0.5, 0.05 * f ** 0.6, 0.05 * f ** 0.4), stiffness=1.6)
         e(at((0, 0.04, 1.205)), (0.09 * f ** 0.5, 0.05 * f ** 0.6, 0.05), stiffness=1.6)
     # A slim core for the neck: the head's sculpted neck covers it and runs down into the chest.
-    B.capsule(j["neck"] + at((0, 0.004, -0.03)), j["head"] + at((0, 0.004, 0.01)),
+    B.capsule(j["neck"] + off((0, 0.004, -0.03)), j["head"] + off((0, 0.004, 0.01)),
               (0.032 if fem else 0.037) * s * m ** 0.4 * (1 + 0.15 * fat + 0.08 * bulk))
 
     # ---- arms

@@ -34,11 +34,12 @@ every tile object, item and enemy has a generator (no Blender needed).
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
 weight, age, sex; muscle and fat above average add visible mass), metaball body, a head sculpted as a signed
 distance field (`headshape.py` puts together `faceforms.py`: skull, cheekbones, cheeks and a lofted lower face with
-a clean jaw line, softer and narrower on women, fuller with weight, sagging with age; `nosemouth.py`: a nose in one
-piece with wings and nostrils, lips with a cupid's bow; `earshape.py`: rolled ears; `creature.py`; almond eyelids with
-creases; meshed by `sdf.py`/`fieldmesh.py` with the meshes cached in `tools/blender/_cache`, not committed; creature
-params for goblin and elf ears, long or wide noses, wide mouths, heavy brows and jaws, an underbite with tusks and a
-reptile's snout) with separate eyeballs, brows and lashes; hands
+a clean jaw line, rounder and fuller-cheeked on women, fuller with weight, lined and sagging with age; `nosemouth.py`:
+a nose in one piece with wings and nostrils, lips with a cupid's bow; `earshape.py`: rolled ears; `creature.py`: a
+reptile's low, long skull; almond eyelids with creases; meshed by `sdf.py`/`fieldmesh.py` with the meshes cached in
+`tools/blender/_cache`, not committed; creature params for goblin and elf ears, long hooked or wide noses, wide grins,
+heavy brows over deep-set eyes, low foreheads, heavy or pointed jaws, an underbite with tusks, a reptile's snout, and
+short legs under a goblin's big head) with separate eyeballs, brows and lashes; hands
 with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble); hair sculpted from traced locks into
 one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows: a neat cut
 with a side-swept fringe and an even edge, messy hair with tufts standing up, a woman's short hair as a chin-length

@@ -4,12 +4,13 @@ does to them.
 
 The lower face is one lofted form: its horizontal sections are superellipses that narrow toward the chin, cut below by
 the plane of the jaw line and behind by the ramus, both edges rounded. The side of the face so runs in one clean plane
-from under the cheekbone down to a crisp jaw line, with no crease between cheek and jaw, and the cheeks' fat sits high,
-under the cheekbones, blending back into the side of the face. Women's faces are softer: a rounder forehead, a lighter
-brow, cheekbones carried higher, a narrower lower face tapering to a small chin with a gentle jaw line. Weight fills
-the lower face and cheeks and rounds the jaw line; ``jaw`` widens and squares it, ``underbite`` carries it forward,
-``brow`` builds a jutting ridge; behind a snout the skull is low and long and slopes down into it. Age thins the cheeks'
-fat and lets it sink into jowls.
+from under the cheekbone down to the jaw line, with no crease between cheek and jaw. Women's faces are softer and
+younger: a rounder forehead, a lighter brow, full apple cheeks set low and forward, a short lower face with rounder
+sections and a soft jaw line over a small chin (no hollow under the cheekbone). Weight fills the lower face and cheeks
+and rounds the jaw line; ``jaw`` widens and squares it (below 0 it narrows to a pointed chin), ``underbite`` carries it
+forward, ``brow`` builds a jutting ridge over deep-set eyes, ``forehead`` (0..1) lowers the vault and slopes the
+forehead back into the brow (a goblin's). Age thins the cheeks' fat and lets it sink into jowls, hollows the temples,
+and draws three soft lines across the forehead and crow's feet fanning from the outer corners of the eyes.
 """
 import numpy as np
 
@@ -18,9 +19,9 @@ from .sdf import F, capsule, carve, ellipsoid, smax, smin, tube
 # The lower face's sections from under the chin up to the cheekbones: half-width and how far forward they reach.
 LOFT_Z = (-0.135, -0.115, -0.1, -0.085, -0.07, -0.055, -0.04, -0.025, -0.01, 0.0)
 WIDTH = {"m": (0.038, 0.045, 0.0505, 0.0555, 0.0585, 0.062, 0.065, 0.066, 0.062, 0.058),
-         "f": (0.034, 0.0395, 0.0435, 0.046, 0.0488, 0.053, 0.0585, 0.0645, 0.062, 0.058)}
+         "f": (0.034, 0.041, 0.0465, 0.051, 0.0545, 0.0585, 0.062, 0.0645, 0.062, 0.058)}
 SQUARE = {"m": (2.6, 2.8, 3.0, 2.9, 2.8, 2.85, 2.9, 2.75, 2.4, 2.0),      # the sections' superellipse exponent
-          "f": (2.1, 2.15, 2.2, 2.25, 2.3, 2.45, 2.7, 2.75, 2.4, 2.0)}
+          "f": (2.1, 2.2, 2.35, 2.5, 2.65, 2.75, 2.8, 2.75, 2.4, 2.0)}
 FRONT = {"m": (0.082, 0.087, 0.089, 0.0885, 0.0875, 0.0865, 0.0835, 0.077, 0.068, 0.062),
          "f": (0.078, 0.084, 0.0875, 0.0875, 0.087, 0.086, 0.083, 0.077, 0.068, 0.062)}
 JAW_WIDE = (0.012, 0.014, 0.014, 0.013, 0.01, 0.006, 0.003, 0.001, 0.0, 0.0)     # added by ``jaw``
@@ -48,20 +49,20 @@ def _plane(p, at, normal):
 
 def jaw_points(shape):
     """The jaw's angle and the bottom of the chin as (y, z) in the mid-plane."""
-    fem, jw, sn = shape.fem, shape.jaw, shape.snout
-    angle = (-0.006 + 0.002 * fem, -0.077 + 0.008 * fem - 0.004 * jw)
-    chin = (0.082 - 0.002 * fem + 0.005 * jw + 0.018 * sn + 0.008 * shape.underbite, -0.1135 + 0.0095 * fem - 0.006 * jw - 0.003 * shape.full + 0.03 * sn)
+    fem, jw = shape.fem, shape.jaw
+    angle = (-0.006 + 0.003 * fem, -0.077 + 0.0105 * fem - 0.004 * jw)
+    chin = (0.082 - 0.002 * fem + 0.005 * jw + 0.008 * shape.underbite, -0.1135 + 0.0135 * fem - 0.006 * jw - 0.003 * shape.full)
     return angle, chin
 
 
 def lower_face(shape, p):
     """The lofted lower face (see the module docstring)."""
-    fem, jw, sn = shape.fem, shape.jaw, shape.snout
+    fem, jw = shape.fem, shape.jaw
     w = np.asarray(WIDTH["m"]) * (1 - fem) + np.asarray(WIDTH["f"]) * fem
     w = w + jw * np.asarray(JAW_WIDE) + shape.full * np.asarray(FAT_WIDE) - shape.lean * np.asarray(LEAN)
     front = np.asarray(FRONT["m"]) * (1 - fem) + np.asarray(FRONT["f"]) * fem
     lz = np.asarray(LOFT_Z)
-    front = front + (0.006 * jw + 0.009 * shape.underbite) * np.clip((-0.055 - lz) / 0.035, 0, 1) + 0.02 * sn * np.clip((-0.02 - lz) / 0.05, 0, 1)
+    front = front + (0.006 * jw + 0.009 * shape.underbite) * np.clip((-0.055 - lz) / 0.035, 0, 1)
     n = np.asarray(SQUARE["m"]) * (1 - fem) + np.asarray(SQUARE["f"]) * fem + 0.25 * jw + 0.2 * shape.full
     z = p[:, 2]
     a = np.interp(z, LOFT_Z, w).astype(F)
@@ -73,23 +74,23 @@ def lower_face(shape, p):
     gx, gy = (qx / k0) ** (n - 1) / a, (qy / k0) ** (n - 1) / b
     d = (k0 - F(1)) / np.maximum(np.sqrt(gx * gx + gy * gy), F(1e-6))
     (ay, az), (cy, cz) = jaw_points(shape)
-    soft = 0.0065 + 0.0075 * fem + 0.008 * shape.full - 0.0015 * jw
+    soft = 0.009 + 0.008 * fem + 0.008 * shape.full - 0.002 * jw
     d = smax(d, _plane(p, (ay, az), (cz - az, ay - cy)), soft)                # the jaw line
-    d = smax(d, _plane(p, (ay, az), (-0.042, -0.012)), 0.012 + 0.008 * fem)    # the ramus, up behind the angle
+    d = smax(d, _plane(p, (ay, az), (-0.042, -0.012)), 0.012 + 0.012 * fem)    # the ramus, up behind the angle
     return smax(d, p[:, 2] - F(0.004), 0.01)
 
 
 def masses(shape, p):
     """Skull, brow, cheekbones, cheeks, muzzle, lower face and chin, blended softly."""
     fem, male = shape.fem, shape.male
-    br, jw, sn = shape.brow, shape.jaw, shape.snout
+    br, jw, fh = shape.brow, shape.jaw, shape.forehead
     E = ellipsoid
-    # Cranium, forehead (rounder and more upright on women; behind a snout low and long, sloping down into it),
+    # Cranium, forehead (rounder and more upright on women; low and sloping back from the brow with ``forehead``),
     # occiput.
-    d = E(p, (0, -0.012 - 0.004 * sn, 0.022 - 0.014 * sn), (0.0755 - 0.002 * sn, 0.095 + 0.003 * sn, 0.086 - 0.02 * sn))
-    d = smin(d, E(p, (0, 0.034 + 0.002 * fem + 0.014 * sn, 0.03 + 0.005 * fem - 0.02 * sn),
-                  (0.061 + 0.001 * fem - 0.004 * sn, 0.05 + 0.002 * fem + 0.012 * sn, 0.058 + 0.004 * fem - 0.02 * sn)), 0.03 + 0.01 * sn)
-    d = smin(d, E(p, (0, -0.056, -0.008), (0.058, 0.054, 0.06)), 0.03)
+    d = E(p, (0, -0.012 + 0.003 * fh, 0.022 - 0.008 * fh), (0.0755 - 0.004 * fh, 0.095 - 0.016 * fh, 0.086 - 0.016 * fh))
+    d = smin(d, E(p, (0, 0.034 + 0.002 * fem - 0.008 * fh, 0.03 + 0.005 * fem - 0.013 * fh),
+                  (0.061 + 0.001 * fem, 0.05 + 0.002 * fem, 0.058 + 0.004 * fem - 0.018 * fh)), 0.03)
+    d = smin(d, E(p, (0, -0.056 + 0.01 * fh, -0.008), (0.058 - 0.005 * fh, 0.054 - 0.01 * fh, 0.06)), 0.03)
     d = smin(d, lower_face(shape, p), 0.02)
     # Muzzle: the maxilla under the nose and the ring of muscle round the mouth, standing a little proud of the loft
     # in the middle only, so the nose's wings stand clear of the face beside them.
@@ -97,31 +98,62 @@ def masses(shape, p):
     d = smin(d, E(p, (0, 0.064, -0.067 + shape.mouth_up), ((0.028 - 0.001 * fem) * shape.mouth_w, 0.027, 0.02)), 0.016)
     for sx in (1, -1):
         # Brow ridge over each eye, lower and further back toward the temple (a heavy, jutting ledge with ``brow``).
-        d = smin(d, E(p, (sx * (0.029 + 0.002 * br), 0.0772 + 0.002 * male + 0.006 * br, 0.0165 + 0.001 * fem - 0.0015 * br),
-                      (0.021 + 0.005 * br, 0.0085 + 0.0035 * male + 0.0045 * br, 0.0078 + 0.0007 * male + 0.0035 * br),
-                      _basis((sx, -0.28, -0.12))), 0.012 + 0.003 * fem)
+        d = smin(d, E(p, (sx * (0.029 + 0.002 * br), 0.0772 + 0.002 * male + 0.006 * br, 0.0165 + 0.001 * fem - 0.0005 * br),
+                      (0.021 + 0.006 * br, 0.0085 + 0.0035 * male + 0.0045 * br, 0.0078 + 0.0007 * male + 0.0045 * br),
+                      _basis((sx, -0.28, -0.12))), 0.012 + 0.003 * fem + 0.008 * br)
         # Cheekbone body and arch (higher and a little rounder on women).
         d = smin(d, E(p, (sx * 0.048, 0.055 + 0.002 * fem, -0.013 + 0.0045 * fem), (0.0165, 0.0155 + 0.001 * fem, 0.0115 + 0.001 * fem),
                       _basis((sx, 0.5, 0.1))), 0.026)
         d = smin(d, capsule(p, (sx * 0.053, 0.046, -0.01 + 0.003 * fem), (sx * 0.059, 0.006, -0.013 + 0.002 * fem), 0.0038), 0.024)
-        # The cheeks' fat, high under the cheekbone (fuller with weight, flat beside a snout).
-        ck = (1.0 + 0.45 * shape.full - 0.25 * shape.lean) * (1.0 - 0.6 * sn) * (1.0 - 0.15 * shape.old)
-        d = smin(d, E(p, (sx * (0.041 - 0.0008 * fem), 0.049 - 0.001 * fem, -0.031 + 0.007 * fem - 0.004 * shape.full - 0.006 * shape.old),
-                      (0.021 * ck, (0.022 - 0.001 * fem) * ck, 0.02 - 0.003 * fem + 0.004 * shape.full)), 0.029)
+        # The cheeks' fat, under the cheekbone (a woman's lower and rounder, fuller with weight, thinner with age).
+        ck = (1.0 + 0.45 * shape.full - 0.25 * shape.lean) * (1.0 - 0.15 * shape.old)
+        d = smin(d, E(p, (sx * (0.041 - 0.0008 * fem), 0.049 + 0.002 * fem, -0.031 - 0.003 * fem - 0.004 * shape.full - 0.006 * shape.old),
+                      (0.021 * ck, 0.022 * ck, 0.02 + 0.002 * fem + 0.004 * shape.full)), 0.029)
         # The mastoid behind the ear, then the temple hollow behind the brow.
         d = smin(d, E(p, (sx * 0.05, -0.032, -0.024), (0.014, 0.016, 0.02)), 0.02)
         d = carve(d, E(p, (sx * 0.077, 0.043, 0.012), (0.0085, 0.024, 0.02)), 0.022)
     # Chin (square and broad on men, small and round on women) and glabella.
     (_, _), (cy, cz) = jaw_points(shape)
     d = smin(d, E(p, (0, cy - 0.0005 - 0.001 * fem, cz + 0.0175 - 0.001 * fem),
-                  (0.018 - 0.0045 * fem + 0.008 * jw, 0.0115 - 0.0015 * fem + 0.002 * jw - 0.004 * sn, 0.0145 - 0.0025 * fem + 0.003 * jw - 0.005 * sn)),
+                  (0.018 - 0.0045 * fem + 0.008 * jw, 0.0115 - 0.0015 * fem + 0.002 * jw, 0.0145 - 0.0025 * fem + 0.003 * jw)),
              0.012 + 0.004 * fem)
-    d = smin(d, E(p, (0, 0.0825 + 0.005 * br, 0.0125 - 0.001 * br), (0.012 + 0.006 * br, 0.0068 + 0.0015 * male + 0.004 * br, 0.0095 + 0.002 * br)), 0.01)
+    d = smin(d, E(p, (0, 0.0825 + 0.006 * br, 0.0125), (0.012 + 0.016 * br, 0.0068 + 0.0015 * male + 0.004 * br, 0.0095 + 0.002 * br)), 0.01 + 0.008 * br)
+    if br > 0:            # a heavy brow's top sloping back into the forehead (no crease above the ridge)
+        d = smin(d, E(p, (0, 0.066 + 0.004 * br, 0.028), (0.03 + 0.016 * br, 0.006 + 0.012 * br, 0.012 + 0.008 * br)), 0.02)
     # The soft floor of the mouth between the jaw's halves: under the chin the profile runs back level to the throat
     # while the jaw line rises to its angle above it; with weight it fills into a soft double chin.
     g = max(0.0, shape.full - 0.2)
     d = smin(d, E(p, (0, 0.046 + 0.004 * g, cz + 0.0145 - 0.009 * g), (0.025 - 0.004 * fem + 0.01 * g, 0.036, 0.0095 + 0.012 * g)), 0.014)
     return d
+
+
+CROW = (-1, 0, 1)                   # the lines fanning out from the outer corner of each eye (crow's feet)
+
+
+def age_segments(shape):
+    """(key, inside, outside) segments whose surface crossings place the lines of age: three across the forehead,
+    three fanning back from the outer corner of each eye."""
+    out = []
+    for k, z in enumerate((0.044, 0.054, 0.064)):
+        for x in np.linspace(-0.026 + 0.003 * k, 0.026 - 0.003 * k, 9):
+            zz = z + 0.004 * (x / 0.026) ** 2
+            out.append((f"forehead{k}", (x, 0.03, zz), (x, 0.13, zz)))
+    for sx in (1, -1):
+        e = np.asarray(shape.eyes[sx])
+        o = np.asarray((sx * 0.75, 0.66, 0.0))
+        for k in CROW:
+            for t in np.linspace(0.0, 1.0, 4):
+                c = e + np.asarray((sx * (0.0165 + 0.0105 * t), -0.004 - 0.011 * t, 0.0008 + k * (0.0022 + 0.0035 * t)))
+                out.append((f"crow{sx}{k}", c - o * 0.012, c + o * 0.02))
+    return out
+
+
+def _line(p, d, line, r, dip):
+    """A soft line of age: a wide tube along ``line`` (surface points) dipping only its bottom under the skin, deepest
+    in the middle."""
+    w = np.sin(np.linspace(0.12, 0.88, len(line)) * np.pi)
+    rr = np.full(len(line), r)
+    return carve(d, tube(p, list(line + np.stack([0 * rr, rr - dip * w, 0 * rr], 1)), list(rr)), 0.002)
 
 
 def age(shape, p, d):
@@ -132,9 +164,13 @@ def age(shape, p, d):
         d = carve(d, ellipsoid(p, (sx * 0.073, 0.03, 0.006), (0.006, 0.02, 0.016)), 0.014)
     a = shape.anchors
     if a is not None:
-        for k in (0, 1):
-            line = a[f"forehead{k}"]
-            w = np.cos(np.linspace(-1, 1, len(line)) * np.pi / 2)
-            r = np.full(len(line), 0.003)       # a wide tube that dips only its bottom under the skin
-            d = carve(d, tube(p, list(line + np.stack([0 * r, r - 0.00045 * w, 0 * r], 1)), list(r)), 0.002)
+        for k in (0, 1, 2):
+            d = _line(p, d, a[f"forehead{k}"], 0.003, 0.0006)
+        for sx in (1, -1):
+            for k in CROW:
+                line = a[f"crow{sx}{k}"]
+                out = np.asarray((sx * 0.75, 0.66, 0.0)) / np.hypot(0.75, 0.66)
+                w = np.sin(np.linspace(0.15, 0.85, len(line)) * np.pi)
+                rr = np.full(len(line), 0.0018)
+                d = carve(d, tube(p, list(line + out * (rr - 0.00045 * w)[:, None]), list(rr)), 0.0015)
     return d

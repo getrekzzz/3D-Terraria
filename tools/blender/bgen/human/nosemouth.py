@@ -2,12 +2,12 @@
 
 The nose is one connected form: a bridge from between the eyes to a single rounded tip, the broad base of the
 sidewalls, and a lower part in which the wings and the columella are one mass, the wings swelling out of it and
-settling into the cheeks over a soft groove; the nostrils open underneath. A long nose (``noseLength``) grows bigger
-overall and reaches further forward to a drooping point while its base stays on the face, the underside running in one
-piece from the tip back to the nostrils; a wide one (``noseWidth``) spreads its tip, wings and nostrils and projects
-less. The lips have a soft cupid's bow and a small tubercle, a mouth line turning down slightly at the corners, the
-philtrum above as a shallow dip and the hollow below; ``mouthWidth`` widens the mouth, ``underbite`` carries the lower
-lip and chin forward. Age lets the cheek sag over a soft nasolabial fold.
+settling into the cheeks over a soft, shallow crease; the nostrils open underneath as soft dips (no rims). A long nose
+(``noseLength``) grows bigger overall and reaches further forward to a drooping, hooked point over a hump on the
+bridge while its base stays on the face; a wide one (``noseWidth``) spreads its tip, wings and nostrils and projects
+less. The lips have a soft cupid's bow and a small tubercle and a mouth line that fades out at the corners (no notch);
+``mouthWidth`` widens the mouth into a thin-lipped grin turning up at the corners, ``underbite`` carries the lower lip
+and chin forward. Age lets the cheek sag over a soft nasolabial fold.
 """
 import math
 
@@ -38,7 +38,7 @@ def tip_at(shape, x, y, z):
     n, g, L, w = shape.n, size(shape), shape.nose_len, shape.nose_w
     low = 1.0 if z < -0.03 else 0.0
     return (x * n * g * w, 0.084 + (y - 0.084) * n * L / w ** 0.5, z * n * (1 + 0.15 * (g - 1)) + 0.001 * shape.fem * low
-            - 0.007 * (L - 1.0) * low)
+            - 0.011 * max(0.0, L - 1.0) * low)
 
 
 def base_at(shape, x, y, z):
@@ -57,8 +57,9 @@ def nose(shape, p, d):
     tip = t(0, 0.0995, -0.035)
     w = shape.nose_w
     form = smin(form, ellipsoid(p, tip, (0.0074 * s * point * w, 0.0078 * s * point, 0.0068 * s * point)), 0.007 * s)
-    if L > 1:      # the long nose's mass carried out to its point, and its underside back to the nostrils
+    if L > 1:      # the long nose's mass carried out to its point (over a hump: a hook), its underside back to the nostrils
         form = smin(form, round_cone(p, t(0, 0.081, -0.008), t(0, 0.0972, -0.033), 0.0098 * s, 0.0064 * s * point), 0.008 * s)
+        form = smin(form, round_cone(p, t(0, 0.0905, -0.011), t(0, 0.0975, -0.022), 0.0052 * s, 0.0058 * s * point), 0.005 * s)
         form = smin(form, round_cone(p, b(0, 0.0945, -0.0418), t(0, 0.0985, -0.0385), 0.0062 * s, 0.0058 * s * point), 0.008 * s)
     # The lower nose: the lobule's flat underside from the tip back to the lip, which the nostrils open in, and the
     # wings swelling out of it on either side.
@@ -70,12 +71,14 @@ def nose(shape, p, d):
     a = shape.anchors
     for i, sx in enumerate((1, -1)):
         if a is not None:
-            # A soft groove round the back of each wing where it meets the cheek, then the nostril, opening below.
+            # A soft crease round the back of each wing where it meets the cheek (a wide tube that dips only its
+            # bottom under the skin, so it shades instead of cutting a line), then the nostril, opening below.
             out = np.asarray((sx, 0.25, 0.0)) / math.hypot(1, 0.25)
-            radii = [0.0003 * s, 0.0006 * s, 0.0004 * s]
-            d = carve(d, tube(p, [c - out * r * 0.3 for c, r in zip(a["alar"][3 * i:3 * i + 3], radii)], radii), 0.0024 * s)
-            d = carve(d, ellipsoid(p, a["nostril"][i] - NOSTRIL_NORMAL * 0.0004 * s, (0.0028 * s * w ** 0.5, 0.00125 * s * w ** 0.5, 0.0014 * s),
-                                   _basis((-0.3 * sx, 0.95, 0.06), NOSTRIL_NORMAL)), 0.0012 * s)
+            radii = [0.0012 * s, 0.0018 * s, 0.0012 * s]
+            dips = [0.00025 * s, 0.00045 * s, 0.0002 * s]
+            d = carve(d, tube(p, [c + out * (r - dp) for c, r, dp in zip(a["alar"][3 * i:3 * i + 3], radii, dips)], radii), 0.003 * s)
+            d = carve(d, ellipsoid(p, a["nostril"][i] - NOSTRIL_NORMAL * 0.0004 * s, (0.0025 * s * w ** 0.5, 0.0011 * s * w ** 0.5, 0.0013 * s),
+                                   _basis((-0.3 * sx, 0.95, 0.06), NOSTRIL_NORMAL)), 0.0018 * s)
     return d
 
 
@@ -89,15 +92,19 @@ def anchor_segments(shape):
         for q in ((0.0162, 0.0928, -0.0362), (0.0186, 0.0885, -0.0418), (0.0172, 0.0868, -0.047)):
             c = np.asarray(base_at(shape, sx * q[0], q[1], q[2]))
             out.append(("alar", c - o * 0.005, c + o * 0.007))
-        if sx > 0:            # the philtrum and the hollow under the lower lip, on the mid-line
+        if sx > 0:            # the hollow under the lower lip, on the mid-line
             up = shape.mouth_up
-            out.append(("philtrum", (0.0, 0.06, -0.0545 + 0.8 * up), (0.0, 0.14, -0.0545 + 0.8 * up)))
             out.append(("underlip", (0.0, 0.06, -0.0852 + up), (0.0, 0.14, -0.0852 + up)))
         if shape.old:         # the nasolabial fold, from beside the wing down to past the corner of the mouth
             for t in np.linspace(0.0, 1.0, FOLD_N):
                 x, z = sx * (0.0205 + 0.0125 * t), -0.044 - 0.031 * t
                 out.append(("fold", (x * 0.6, 0.05, z), (x * 1.3, 0.12, z)))
     return out
+
+
+def grin(shape):
+    """How far a wide mouth's corners turn up (a goblin's grin)."""
+    return 0.009 * max(0.0, shape.mouth_w - 1.0)
 
 
 def lips(shape, p):
@@ -107,10 +114,11 @@ def lips(shape, p):
     fem = shape.fem
     if shape.snout > 0 or shape.alien:        # a snout (or an alien's mouth) has no lips
         return np.ones(len(p), dtype=F)
-    full = 1.0 + 0.2 * fem - 0.3 * shape.old
+    full = (1.0 + 0.2 * fem - 0.3 * shape.old) * (1.0 - 0.6 * min(0.6, max(0.0, shape.mouth_w - 1.0)))   # (a wide mouth's thin)
     q = np.asarray(p, dtype=F).copy()
     q[:, 2] -= F(shape.mouth_up)
-    q[:, 1] += F(0.0014 * fem)          # (set back a little: full, not pouting)
+    q[:, 2] -= F(grin(shape)) * (q[:, 0] / F(0.0255 * shape.mouth_w)) ** 2
+    q[:, 1] += F(0.0008 * fem)          # (set back a little: full, not pouting)
     q[:, 0] /= F(shape.mouth_w)
     q[:, 1] += F(14.0) * q[:, 0] * q[:, 0]
     thin = F(1) + F(0.45) * (q[:, 0] / F(0.0275)) ** 2
@@ -129,11 +137,12 @@ def mouth(shape, p, d):
     d = smin(d, lips(shape, p), 0.0045)
     a = shape.anchors
     if a is not None:
-        # A rounded groove between the lips with soft dimples at the corners, sunk just into the surface found for it.
+        # A rounded groove between the lips, sunk just into the surface found for it; toward the corners it thins and
+        # rises out of the skin, so the line fades out within the lips instead of ending in a pit.
         xs = a["mouth"][:, 0] / (0.0218 * shape.mouth_w)
-        radii = 0.00075 * (0.55 + 0.45 * np.cos(xs * np.pi / 2))
-        sink = radii * 0.35 + 0.0011 * xs ** 4          # the ends sink under the skin, so the line fades out
-        d = carve(d, tube(p, list(a["mouth"] - np.stack([0 * radii, sink, 0 * radii], 1)), list(radii)), 0.0016)
+        radii = 0.00075 * (0.4 + 0.6 * np.clip(np.cos(xs * np.pi / 2), 0.0, 1.0))
+        sink = radii * 0.35 - 0.0026 * xs ** 6
+        d = carve(d, tube(p, list(a["mouth"] - np.stack([0 * radii, sink, 0 * radii], 1)), list(radii)), 0.001)
     if a is not None and "fold" in a:
         # Age: the cheek sags over the nasolabial fold, a wide shallow dip in front of it (no cut, no pit at the end).
         for i, sx in enumerate((1, -1)):
@@ -146,8 +155,7 @@ def mouth(shape, p, d):
             r = r * 1.3
             d = smin(d, tube(p, list(line + side * 0.006 - out * (r + 0.0002)[:, None]), list(r)), 0.006)
     if a is not None:
-        # The philtrum's shallow dip and the hollow under the lower lip, each sunk a set depth into the surface found
-        # for it (so a heavier jaw or an underbite never leaves them as a void inside the flesh).
-        d = carve(d, ellipsoid(p, a["philtrum"][0] + np.asarray((0.0, 0.001 - 0.0004, 0.0)), (0.003, 0.001, 0.0035)), 0.002)
+        # The hollow under the lower lip, sunk a set depth into the surface found for it (so a heavier jaw or an
+        # underbite never leaves it as a void inside the flesh).
         d = carve(d, ellipsoid(p, a["underlip"][0] + np.asarray((0.0, 0.0055 - 0.0013, 0.0)), (0.015, 0.0055, 0.0036)), 0.006)
     return d

@@ -1,6 +1,8 @@
 """Human proportions and skeleton: joint positions from body parameters and the armature built from them.
 
 Frame: Blender Z up, 1 unit = 1 m, the character faces +Y and its right side is +X (see bgen/creatures.py).
+``legs`` (1) scales the legs' length, bringing the rest of the body down with them (a goblin's short legs).
+
 The rest pose is an A-pose (arms 40 degrees from the body) so skinning separates arms from the torso; actions pose
 the arms down. Bone names keep the old humanoid rig's names (hips, chest, head, upper_arm.R, forearm.R, hand.R,
 thigh.R, shin.R, foot.R) so the game's attachment points (hand.R holds items) are unchanged.
@@ -60,6 +62,16 @@ class Frame:
             j[f"toe.{side}"] = ankle + Vector((sx * 0.016 * s, 0.205 * s, -0.062 * s))
             j[f"heel.{side}"] = ankle + Vector((0, -0.055 * s, -0.06 * s))
             self._hand(side, sx)
+        legs = self.legs = p.get("legs", 1.0)       # shorter legs: everything from the hips up comes down with them
+        drop = self.drop = (1.0 - legs) * (0.935 - 0.078) * s
+        if legs != 1.0:
+            ankle_z = 0.078 * s
+            for name, v in j.items():
+                if name.startswith("knee."):
+                    v.z = ankle_z + (v.z - ankle_z) * legs
+                elif not name.startswith(("ankle.", "ball.", "toe.", "heel.", "ground")):
+                    v.z -= drop
+            self.head_center.z -= drop
 
     def _hand(self, side, sx):
         """Finger joints from the wrist: palm plane faces the body (thumb forward), fingers continue the forearm."""
