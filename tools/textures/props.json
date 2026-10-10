@@ -32,6 +32,8 @@
     {"name": "flesh", "type": "soil", "base": "#9aa27a", "dark": "#6e7656", "light": "#b8c098", "grit": 0.1, "roughness": 0.8},
     {"name": "gel", "type": "translucent", "base": "#8ab8a0", "light": "#e0fff0", "alpha": 1.0, "facets": 6},
     {"name": "plain", "type": "soil", "base": "#d8d8d8", "dark": "#c8c8c8", "light": "#e8e8e8", "grit": 0.02, "roughness": 0.6},
+    {"name": "copper", "type": "metal", "base": "#c47a48", "dark": "#8a4a26", "light": "#f2b484", "roughness": 0.3},
+    {"name": "leaves", "type": "foliage", "base": "#d0dcc8", "dark": "#8a9a80", "light": "#f0f6ea", "sway": 0.012},
     {"name": "missing", "type": "missing"}
   ]
 }

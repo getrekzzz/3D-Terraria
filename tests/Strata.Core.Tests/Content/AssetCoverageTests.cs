@@ -92,4 +92,29 @@ public class AssetCoverageTests
         var missing = names.Where(n => !Exists(AssetPaths.UiSprite(n))).ToList();
         Assert.True(missing.Count == 0, "UI sprites without images (run tools/textures/build_ui.py): " + string.Join(", ", missing));
     }
+
+    [Fact]
+    public void EveryModelMaterialNamesAPropLayer()
+    {
+        // 'prop:<layer>' and 'card:<layer>' slots draw from the prop texture array; an unknown layer draws the 'missing'
+        // checker in game (game/Rendering/PropLibrary.cs).
+        using var layersJson = System.Text.Json.JsonDocument.Parse(File.ReadAllText(Path.Combine(TestPaths.ProjectRoot, "assets/textures/props/layers.json")));
+        var layers = layersJson.RootElement.GetProperty("layers").EnumerateArray().Select(l => l.GetProperty("name").GetString()).ToHashSet();
+        var unknown = new SortedSet<string>(StringComparer.Ordinal);
+        foreach (var file in Directory.EnumerateFiles(Path.Combine(TestPaths.ProjectRoot, "assets/models"), "*.glb", SearchOption.AllDirectories))
+        {
+            // A GLB starts with a 12-byte header, then the JSON chunk (length, type, text).
+            var bytes = File.ReadAllBytes(file);
+            int length = BitConverter.ToInt32(bytes, 12);
+            using var gltf = System.Text.Json.JsonDocument.Parse(new ReadOnlyMemory<byte>(bytes, 20, length));
+            if (!gltf.RootElement.TryGetProperty("materials", out var materials)) continue;
+            foreach (var material in materials.EnumerateArray())
+            {
+                string name = material.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
+                if ((name.StartsWith("prop:", StringComparison.Ordinal) || name.StartsWith("card:", StringComparison.Ordinal)) && !layers.Contains(name[5..].Split(':')[0]))
+                    unknown.Add($"{Path.GetFileName(file)} ({name})");
+            }
+        }
+        Assert.True(unknown.Count == 0, "models naming prop layers that tools/textures/props.json lacks: " + string.Join(", ", unknown));
+    }
 }
