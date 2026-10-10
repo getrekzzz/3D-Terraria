@@ -1,0 +1,53 @@
+# Portrait tour: the player's model close up (face from the front, three-quarter and side; the whole body from the
+# front, side and back) in noon light, for reviewing generated characters. Run with any saved player (its look picks
+# the model) or a fresh one:
+#   godot --path . --rendering-driver vulkan -- --world=portrait --size=tiny --new --player=portrait --fresh-player \
+#         --view=2 --shots=/tmp/shots --smoke=res://game/Testing/Tours/portrait.cmds
+wait_until player.frozen == 0 300
+spawning off
+liquids off
+town arrivals off
+town dismiss guide
+god on
+time 12
+camera third
+camera shoulder 0
+fill -40 -1 -30 40 -1 60 stone
+fill -40 0 -30 40 16 60 air
+aim 0 -0.05 1
+wait_until stream.idle == 1 900
+wait 2
+
+camera fov 16
+camera distance 3.2
+camera orbit 180
+wait 1
+screenshot p01_face_front
+wait_until screenshot.pending == 0 900
+camera orbit 145
+wait 1
+screenshot p02_face_three_quarter
+wait_until screenshot.pending == 0 900
+camera orbit 100
+wait 1
+screenshot p03_face_side
+wait_until screenshot.pending == 0 900
+camera orbit 215
+wait 1
+screenshot p04_face_left
+wait_until screenshot.pending == 0 900
+
+camera fov 34
+camera distance 4.5
+camera orbit 165
+wait 1
+screenshot p05_body_front
+wait_until screenshot.pending == 0 900
+camera orbit 100
+wait 1
+screenshot p06_body_side
+wait_until screenshot.pending == 0 900
+camera orbit 20
+wait 1
+screenshot p07_body_back
+wait_until screenshot.pending == 0 900

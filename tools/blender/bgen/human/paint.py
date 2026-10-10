@@ -7,7 +7,11 @@ glTF export (linear COLOR_0) and the game shader treat every model the same way.
 import math
 
 import bpy
+import numpy as np
 from mathutils import Vector
+
+from . import monsterface
+from .monsterface import EYELESS
 
 
 def hex3(value: str):
@@ -54,6 +58,35 @@ def mul(a, b):
     return tuple(x * y for x, y in zip(a, b))
 
 
+def brow_arch(x, fem):
+    """Height above the eye's centre (head-local) of the brow's middle line, ``x`` along it from the eye's centre
+    toward the temple: a man's lies low and nearly level, a woman's arches higher over the outer third and tapers."""
+    if fem:
+        return 0.0172 + 0.005 * math.sin((x + 0.014) / 0.034 * math.pi)
+    return 0.0165 + 0.0035 * math.sin((x + 0.012) / 0.03 * math.pi)
+
+
+def human_skin(rgb) -> bool:
+    """Whether a skin colour is one a person has (warm, moderately saturated) rather than a creature's green, blue,
+    purple, grey or deep red."""
+    r, g, b = rgb
+    hi, lo = max(rgb), min(rgb)
+    if not (r >= g >= b) or hi <= 0 or hi == lo:
+        return False
+    return 4.0 <= 60.0 * (g - b) / (hi - lo) <= 50.0 and 0.1 <= (hi - lo) / hi <= 0.75
+
+
+def brow_color(p, hair):
+    """The brows' colour (``hair``'s on a person), or None for none. ``brows`` sets it ("none" for none); on a
+    creature's skin with no hair showing they are the skin's own colour, darker, instead of a person's brown."""
+    if "brows" in p:
+        return None if p["brows"] == "none" else p["brows"]
+    skin = hex3(p.get("skin", "#e0b090"))
+    if human_skin(skin) or (p.get("hairStyle") != "bald" and p.get("hat") != "hood"):
+        return hair
+    return "#" + "".join(f"{round(c * 0.48 * 255):02x}" for c in skin)
+
+
 class SkinPainter:
     def __init__(self, frame, head, p):
         self.frame = frame
@@ -61,12 +94,21 @@ class SkinPainter:
         self.p = p
         self.skin = hex3(p.get("skin", "#e0b090"))
         self.hair = hex3(p.get("hair", "#4a3020"))
+        brows = brow_color(p, p.get("hair", "#4a3020"))
+        self.brows = hex3(brows) if brows else None
         self.stubble = not frame.female and "beard" not in p and p.get("stubble", True) and not p.get("undead")
+        from .beard import STYLES as BEARDS
+        self.beard = (hex3(p["beard"]), BEARDS[p.get("beardStyle", "full")]) if "beard" in p else None
         self.undead = bool(p.get("undead"))
+        self.tusks = hex3(p["tusks"]) if p.get("tusks") else None
+        self.human = human_skin(self.skin)      # (a creature's lips and cheeks are its own skin, deeper, not pink)
         # Skin under the hair takes the hair colour, so the scalp never reads as a bald patch where the hair shell
         # thins (distance LOD simplification, extreme head poses).
         style = p.get("hairStyle", "long" if frame.female else "short")
         self.scalp = style != "bald" and p.get("hat") != "hood"
+        from .locks import STYLES
+        self.part = STYLES[style].sweep if style in STYLES else 0.0
+        self.sideburns = not (frame.female or style in ("ponytail", "bun"))
 
     def body(self, co: Vector):
         j = self.frame.j
@@ -79,37 +121,51 @@ class SkinPainter:
         return c
 
     def face(self, co: Vector):
+        from .head import smooth
         q = self.head.local(co)
         c = self.skin
-        # Lips: redder and a little darker, sharpest at the vermilion border.
-        lip = gauss(q.x / 0.024, 1.0) ** 3 * gauss((q.z + 0.07) / 0.0105, 1.0) ** 2 * (1.0 if q.y > 0.078 else 0.0)
-        c = mix(c, mul(c, (0.93, 0.6, 0.6)), min(lip * 1.3, 0.85))
+        # Lips: the sculpted lips' own surface, redder and a little darker, with a crisp vermilion border.
+        if self.tusks and q.y > 0.075 and -0.09 < q.z < -0.045:
+            from .creature import tusks
+            if float(tusks(self.head.shape, np.asarray([q], dtype=np.float32))[0]) < 0.0004:
+                return self.tusks
+        lip_d = float(self.head.shape.lips(np.asarray([q], dtype=np.float32))[0]) if q.y > 0.075 and q.z < -0.05 else 1.0
+        lip = 1.0 - smooth(0.0002, 0.001, lip_d)
+        tone = ((0.9, 0.62, 0.64) if self.frame.female else (0.92, 0.72, 0.72)) if self.human else (0.8, 0.8, 0.86)
+        c = mix(c, mul(c, tone), lip * (0.75 if self.frame.female else 0.6))
         blush = sum(gauss((q - Vector((sx * 0.042, 0.07, -0.03))).length, 0.022) for sx in (1, -1))
         blush += 0.7 * gauss((q - Vector((0, 0.11, -0.04))).length, 0.012)
         blush += 0.6 * (gauss(abs(q.x) - 0.075, 0.012) if abs(q.x) > 0.06 else 0.0)
-        c = mix(c, mul(c, (1.0, 0.86, 0.85)), min(blush, 1.0) * 0.55)
-        for sx in (1, -1):
+        c = mix(c, mul(c, (1.0, 0.88, 0.87) if self.human else (0.94, 0.94, 0.97)), min(blush, 1.0) * 0.4)
+        for sx in (1, -1) if self.p.get("face") not in EYELESS else ():
             e = self.head.local(self.head.eyes[sx])
             d = q - e
             lid = gauss(math.hypot(d.x, d.z), 0.016) * (1.0 if d.y > -0.004 else 0.0)
-            c = mix(c, mul(c, (0.86, 0.8, 0.82)), lid * (0.85 if self.undead else 0.5))
+            c = mix(c, mul(c, (0.86, 0.8, 0.82)), lid * (0.85 if self.undead else 0.7 if self.frame.old else 0.5))
             if self.undead:
                 c = mix(c, mul(c, (0.45, 0.4, 0.42)), gauss(math.hypot(d.x, d.z), 0.02) * 0.7)   # sunken, bruised sockets
-            # Painted brow (strands are added on top).
+            # Painted brow (strands are added on top), finer on a woman; none where the brows are "none".
             x = d.x * sx
-            arch = 0.0165 + 0.0035 * math.sin((x + 0.012) / 0.03 * math.pi)
-            if -0.018 < x < 0.024 and q.y > 0.06:
-                brow = gauss((d.z - arch) / 0.0042, 1.0) * (1.0 - max(0.0, (x - 0.014) / 0.012))
-                c = mix(c, self.hair, max(0.0, min(brow, 1.0)) * 0.7)
-        if self.stubble and q.y > 0.0:
-            jaw = (1.0 if q.z < -0.052 else gauss((q.z + 0.052) / 0.01, 1.0)) * (1.0 if q.z > -0.13 else 0.0)
-            upper = gauss(q.x / 0.022, 1.0) * gauss((q.z + 0.057) / 0.005, 1.0)
-            amount = max(jaw * (1.0 - lip), upper) * 0.22
-            c = mix(c, (0.25, 0.22, 0.2), amount)
+            if self.brows is not None and -0.018 < x < 0.024 and q.y > 0.06:
+                fem = self.frame.female
+                brow = gauss((d.z - brow_arch(x, fem)) / (0.003 if fem else 0.0042), 1.0) * (1.0 - max(0.0, (x - 0.014) / 0.012))
+                c = mix(c, self.brows, max(0.0, min(brow, 1.0)) * 0.7)
+        if self.stubble or self.beard:
+            from .beard import STYLES, coverages
+            qa = np.asarray([q], dtype=np.float32)
+        if self.stubble:
+            # A shaved beard's shadow: cool, over where a beard grows, fading out at its edges.
+            shadow = float(coverages(qa, STYLES["short"])[0]) * (1.0 - lip)
+            c = mix(c, mul(c, (0.74, 0.76, 0.8)), shadow * 0.4)
+        if self.beard:
+            # The beard's roots on the skin under it, thinning out with it at its edges.
+            color, style = self.beard
+            roots = min(1.0, float(coverages(qa, style)[0]) * 1.3) * (1.0 - lip)
+            c = mix(c, mul(color, (0.72, 0.72, 0.72)), roots * 0.85)
         if self.scalp:
-            from .hair import _in_ear, hairline
-            if not _in_ear(q):
-                from .head import smooth
-                roots = smooth(-0.006, 0.006, q.z - hairline(q))
-                c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), roots)
+            # Hair roots under the hair, thinning out softly at the hairline (the locks cover the edge).
+            from .hair import scalp_tint
+            c = mix(c, mul(self.hair, (0.82, 0.82, 0.82)), scalp_tint(q, self.part, self.sideburns) * 0.9)
+        if self.p.get("face"):          # a monster's sockets, scars, veins and gums
+            c = monsterface.tint(self.head, self.p["face"], q, c)
         return c

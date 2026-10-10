@@ -35,7 +35,7 @@ public sealed class HumanoidAnimator
     private readonly AnimationTree _tree;
     private readonly AnimationLibrary _library;
     private string _state = ""; // nothing requested yet: the transition node starts with no current state
-    private float _hold, _holdTarget, _actionLeft;
+    private float _hold, _holdTarget, _actionLeft, _actionLength = 1f;
 
     private HumanoidAnimator(AnimationTree tree, AnimationLibrary library)
     {
@@ -51,6 +51,28 @@ public sealed class HumanoidAnimator
     public string? Action { get; private set; }
 
     public bool ActionPlaying => (bool)_tree.Get("parameters/action/active");
+
+    /// <summary>
+    /// How far through the current action the pose is (0..1; 1 when none plays): the clip's position as the tree last
+    /// played it, which can trail the requested start by a frame or a long one.
+    /// </summary>
+    public float ActionPhase
+    {
+        get
+        {
+            if (Action == null) return 1f;
+            if (!PhasePaths.TryGetValue(Action, out var path))
+                PhasePaths[Action] = path = ($"parameters/a_{Action}/current_position", $"parameters/a_{Action}/current_length");
+            float length = (float)(double)_tree.Get(path.Length);
+            if (length <= 0f) return Mathf.Clamp(1f - _actionLeft / _actionLength, 0f, 1f);
+            return Mathf.Clamp((float)(double)_tree.Get(path.Position) / length, 0f, 1f);
+        }
+    }
+
+    private static readonly Dictionary<string, (StringName Position, StringName Length)> PhasePaths = new();
+
+    /// <summary>Seconds the current (or last) action was stretched over.</summary>
+    public float ActionLength => _actionLength;
 
     /// <summary>
     /// Builds the tree under <paramref name="root"/> (the model's scene root, which holds the <see cref="Rig"/> armature)
@@ -197,7 +219,7 @@ public sealed class HumanoidAnimator
         _tree.Set("parameters/pick/transition_request", action);
         _tree.Set("parameters/act_speed/scale", clip.Length / Mathf.Max(0.08f, seconds));
         _tree.Set("parameters/action/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
-        _actionLeft = Mathf.Max(0.08f, seconds);
+        _actionLeft = _actionLength = Mathf.Max(0.08f, seconds);
     }
 
     public void StopAction() => _tree.Set("parameters/action/request", (int)AnimationNodeOneShot.OneShotRequest.FadeOut);

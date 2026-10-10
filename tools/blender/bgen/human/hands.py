@@ -33,7 +33,7 @@ def _rot(x, y, z):
 def build_hand(frame, side):
     """Returns (hand mesh object, nail mesh object) for one side."""
     j = frame.j
-    k = frame.s * (0.9 if frame.female else 1.0)
+    k = frame.s * (0.9 if frame.female else 1.0) * getattr(frame, "hand_scale", 1.0)     # (handSize, paws.py)
     along, thumb, dorsal = hand_axes(frame, side)
     rot = _rot(along, thumb, dorsal)
     wrist = j[f"wrist.{side}"]

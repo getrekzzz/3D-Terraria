@@ -7,8 +7,8 @@
 Builds the creature from tools/blender/assets.json (nothing is written to assets/) and renders it with Blender's
 Workbench engine in vertex colours: for every clip a row of evenly spaced frames seen from the front-right, or for a
 static model a row of views (front, three-quarter, side, back, top). --view=X,Y,Z sets the clip camera direction
-(the creature faces +Y; 1,0,0 is its right side). --hold=1 puts a 0.8 m rod in a human's right hand, attached as the
-game attaches held items (out of the fist along the hand bone's Z axis). Writes DIR/<creature>.png.
+(the creature faces +Y; 1,0,0 is its right side). --hold=1 puts a 0.9 m rod in a human's right fist, attached as the
+game attaches held items (out of the fist along the hand bone's Z axis); --hold=shoot tilts it as the game tilts guns. Writes DIR/<creature>.png.
 """
 import json
 import math
@@ -56,19 +56,19 @@ def _extra_modules():
     return out
 
 
-def hold_rod(arm):
-    """A stand-in held item: a rod from the grip (0.08 m along the hand) along the hand bone's +Z, tipped red."""
+def hold_rod(arm, tilt=0.0):
+    """A stand-in held item: a rod from the grip (human.motion.GRIP, in the fist) along the hand bone's +Z, tipped red."""
     import bmesh
     import bpy
     from mathutils import Matrix
     bm = bmesh.new()
-    bmesh.ops.create_cone(bm, cap_ends=True, segments=6, radius1=0.02, radius2=0.012, depth=0.8,
-                          matrix=Matrix.Translation((0, 0, 0.4)))
+    bmesh.ops.create_cone(bm, cap_ends=True, segments=8, radius1=0.015, radius2=0.012, depth=0.9,
+                          matrix=Matrix.Translation((0, 0, 0.35)))
     me = bpy.data.meshes.new("rod")
     bm.to_mesh(me)
     colors = me.color_attributes.new("Color", "FLOAT_COLOR", "POINT")
     for i, v in enumerate(me.vertices):
-        colors.data[i].color = (0.9, 0.1, 0.1, 1) if v.co.z > 0.6 else (0.85, 0.75, 0.3, 1)
+        colors.data[i].color = (0.9, 0.1, 0.1, 1) if v.co.z > 0.6 else (0.25, 0.25, 0.3, 1) if v.co.z < -0.04 else (0.85, 0.75, 0.3, 1)
     rod = bpy.data.objects.new("rod", me)
     bpy.context.scene.collection.objects.link(rod)
     bone = arm.data.bones["hand.R"]
@@ -76,7 +76,9 @@ def hold_rod(arm):
     rod.parent_type = "BONE"
     rod.parent_bone = "hand.R"
     rod.matrix_parent_inverse = Matrix.Identity(4)
-    rod.location = (0, 0.08 - bone.length, 0)      # bone parenting starts at the tail
+    from bgen.human.motion import GRIP
+    rod.location = (GRIP[0] * bone.length, (GRIP[1] - 1) * bone.length, GRIP[2] * bone.length)   # bone parenting starts at the tail
+    rod.rotation_euler = (-math.radians(tilt), 0, 0)          # tipped toward the fingers (guns, see actions.TILT)
 
 
 def setup_scene(objs):
@@ -161,7 +163,8 @@ def main():
         sheet(tiles, len(views), out / f"{opts['creature'].split(':')[0]}.png")
         return
     if opts["hold"] and "hand.R" in arm.data.bones:
-        hold_rod(arm)
+        from bgen.human.actions import TILT
+        hold_rod(arm, TILT.get(opts["hold"], 0.0))
     arm.animation_data_create()
     for track in arm.animation_data.nla_tracks:
         track.mute = True

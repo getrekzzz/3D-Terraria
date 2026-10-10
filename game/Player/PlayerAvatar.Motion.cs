@@ -56,6 +56,7 @@ public sealed partial class PlayerAvatar
             aimMod.Twist = entity.Alive ? Mathf.AngleDifference(_legYaw, aimYaw) : 0f;
             aimMod.Pitch = entity.Alive ? Mathf.Atan2(aim.Y, new Vector2(aim.X, aim.Z).Length()) : 0f;
             aimMod.ArmAim = h.Action is "shoot" or "bow" or "cast" or "thrust" ? 1f : h.Action != null ? 0.5f : 0.15f;
+            AnimateBlade(h, aimMod, entity.Alive, _light, dt);
         }
     }
 

@@ -69,6 +69,71 @@ public class CombatTests
     }
 
     [Fact]
+    public void SwingsSweepFromTheRightToTheLeftAsTheBladeStrikes()
+    {
+        using var g = Arena();
+        // Aiming along +Z the player's right is −X. Gels 60 degrees either side and one near the arc's starting edge,
+        // out of point-blank range.
+        var def = g.Content.Enemies.Get("green_slime");
+        Npc At(float degrees)
+        {
+            float a = degrees * MathF.PI / 180f;
+            var npc = g.World.Npcs.Spawn(def, g.Player.Position + new Vector3(MathF.Sin(a) * 1.5f, 0.05f, MathF.Cos(a) * 1.5f))!;
+            npc.Life = npc.MaxLife = 1000;
+            return npc;
+        }
+        var right = At(-60f);
+        var left = At(60f);
+        var edge = At(-70f);
+        g.Hold("wooden_sword");
+        g.Player.Aim = Vector3.UnitZ;
+        var hitAt = new Dictionary<long, int>();
+        int tick = 0;
+        g.World.Npcs.Damaged += e => { if (!e.ToPlayer && e.Target != null) hitAt.TryAdd(e.Target.Id, tick); };
+        var spots = new[] { (right, right.Position), (left, left.Position), (edge, edge.Position) };
+        g.World.ItemUse.Use(g.Player, null, true);
+        int duration = g.Content.Items.Get("wooden_sword").UseAnimation;
+        for (; tick < duration; tick++)
+        {
+            foreach (var (npc, at) in spots) // (held in place: hopping closer would bring them into point-blank range)
+            {
+                npc.Position = at;
+                npc.Velocity = Vector3.Zero;
+            }
+            g.Ticks(1);
+        }
+        Assert.True(spots.All(p => hitAt.ContainsKey(p.Item1.Id)), "the swing missed a gel inside its arc");
+        Assert.True(hitAt[right.Id] < hitAt[left.Id], "the blade reached the left before the right");
+        Assert.True(spots.All(p => hitAt[p.Item1.Id] >= duration * MeleeSystem.StrikeStart - 1), "a gel was hit during the wind-up");
+        Assert.True(spots.All(p => hitAt[p.Item1.Id] <= duration * MeleeSystem.StrikeEnd + 1), "a gel was hit after the strike");
+    }
+
+    [Theory]
+    [InlineData("copper_shortsword", MeleeSystem.ThrustStart, MeleeSystem.ThrustEnd)]
+    [InlineData("copper_pickaxe", MeleeSystem.ChopStart, MeleeSystem.ChopEnd)]
+    public void ThrustsAndChopsLandAsTheyStrike(string item, float start, float end)
+    {
+        using var g = Arena();
+        var gel = SpawnInFront(g, "green_slime", 1.0f);
+        gel.Life = gel.MaxLife = 1000;
+        var at = gel.Position;
+        g.Hold(item);
+        g.Player.Aim = Vector3.UnitZ;
+        int tick = 0, hit = -1;
+        g.World.Npcs.Damaged += e => { if (!e.ToPlayer && e.Target == gel && hit < 0) hit = tick; };
+        Assert.Equal(Strata.Core.Gameplay.Interaction.UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true));
+        int duration = g.Content.Items.Get(item).UseAnimation;
+        for (; tick < duration; tick++)
+        {
+            gel.Position = at;
+            gel.Velocity = Vector3.Zero;
+            g.Ticks(1);
+        }
+        Assert.True(hit >= 0, "the strike missed");
+        Assert.InRange(hit, duration * start - 1, duration * end + 1);
+    }
+
+    [Fact]
     public void ShortswordThrustsHitAndRepeatWhileHeld()
     {
         using var g = Arena();

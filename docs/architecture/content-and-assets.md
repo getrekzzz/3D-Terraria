@@ -32,17 +32,74 @@ sRGB). Creatures are rigidly skinned; actions are exported as glTF animations. `
 every tile object, item and enemy has a generator (no Blender needed).
 
 People (`generator: humanoid`) are built by `tools/blender/bgen/human/`: a proportioned frame (height, build,
-weight, age, sex), metaball body, sculpted head (eyelids, eyeballs with iris and pupil, lips, ears, brows and
-lashes), hands with jointed fingers and nails, painted skin (lips, flush, knuckles, stubble), hair styles and
-beards as strand shells, clothing cut from body shells (shirts, trousers, dresses, coats, robes, aprons, belts,
-boots, hats, masks), and a 52-bone rig (fingers included) with heat/chain weights. Skeletons are separate bones on
-the same rig. Params per character live in `assets.json`. They export rest-pose UVs and tangents for the character
-shader.
+weight, age, sex; muscle and fat above average add visible mass), metaball body, a head sculpted as a signed
+distance field (`headshape.py` puts together `faceforms.py`: skull, cheekbones, cheeks and a lofted lower face with
+a clean jaw line, rounder and fuller-cheeked on women, fuller with weight, lined and sagging with age; `nosemouth.py`:
+a nose in one piece with wings and nostrils, lips with a cupid's bow; `earshape.py`: rolled ears; `creature.py`: a
+reptile's low, long skull; almond eyelids with creases; meshed by `sdf.py`/`fieldmesh.py` with the meshes cached in
+`tools/blender/_cache`, not committed; creature params for goblin and elf ears, long hooked or wide noses, wide grins,
+heavy brows over deep-set eyes, low foreheads, heavy or pointed jaws, an underbite with tusks, a reptile's snout, and
+short legs under a goblin's big head) with separate eyeballs, brows and lashes; hands
+with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble); hair sculpted from traced locks into
+one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows: a neat cut
+with a side-swept fringe, fuller on top and close at the sides and back, messy hair in flat, uneven locks, a woman's
+short hair as a chin-length bob, a buzz cut as a close crop, `crop.py`; `hairsdf.py` blends them into lens-shaped
+clumps that stay full round bends and end in rounded or blunt tips, a cut tapering into the skin toward its edge
+at the sides and nape, with UVs along the flow, `hairpaint.py`; long hair falls over a smooth dome over each ear, `hair.py`, and with
+ponytails hangs onto the shoulders, back and clothes, `longhair.py`, `hairdrape.py`, `hairtails.py`; buns are a
+rope coiled round a core; hair under a hat is pressed flat inside it, comes out from under its rim no thicker than
+the hat and is cut along the hat's own edge, `underhat.py`);
+beards in styles (`beard.py`: where the beard grows, a feathered cheek line up to the sideburns, the lips left
+clear; `beardlocks.py` lays a combed mass over the face that thins out to a soft edge where it grows out of the
+skin, with the moustache rising out of it over the upper lip and sinking into it at the corners of the mouth;
+`beardbib.py` hangs one mass below the jaw, from the chin and the throat down to a few big tapered locks with soft
+grooves, resting on the neck and the clothes and sinking into the face's mass toward its sides; `beardsdf.py` melts
+them into one mesh); clothing cut from body shells and tailored
+(`tailoring.py`, `drape.py`: eased off the skin, bridged across clefts and settled over hollows, hanging from the
+chest, cinched under the belt and boot tops, folded inside the elbows and knees) then finished (`finishing.py`:
+pressed seams, slim collars and cuffs, hems, turned-down boot rims, soles, buttons): shirts, trousers, coats, robes
+as one loose garment with a skirt and a tied sash (`robes.py`, `skirts.py`), torn undead clothing (`tatters.py`: a
+few large rips and ragged hems with turned edges over skin), body suits for creatures, bib aprons tied at the neck
+and waist (`apron.py`, `straps.py`), belts with buckles, boots, masks (`facemask.py`), caps and hoods sculpted as
+cloth fields (`headwear.py`, `capshapes.py`; `hood.py` drapes the cowl over whatever is under it), metal helmets
+(`helms.py`), wide hats (`hats.py`, meshed with clean colour edges and strip bands by `hatmesh.py`, `shellmesh.py`),
+wreaths, circlets and perched caps resting on the hair (`crowns.py`, `circlets.py`, `perched.py`), horns, wings and
+tails (`features.py`, `wings.py`, `icewings.py`, `tails.py`, `serpent.py`; roots out through hemmed slits in the
+clothes, `wingroot.py`) and bird talons (`talons.py`). Monster faces are sculpted into the head's field
+(`monsterface.py`: a cyclops eye, a stitched brute, a grimacing ghoul, a faceless void) with their own parts
+(`monsterparts.py`); Medusa wears snakes for hair (`snakehair.py`), and a shaman's mask, headdress, beads, leaf skirt
+and paint (`tribal.py`, `tribalmask.py`) and a ghost's wisping hem (`spectre.py`) are put on through
+`creaturewear.py`. Ambient occlusion is baked into the vertex alpha
+(`occlusion.py`) for the character shader. A 52-bone rig (fingers included) with heat/chain weights; long hair
+follows the torso, not the arms. Skeletons are sculpted bone fields on the same rig (`skulls.py` with orbits, teeth
+and a hinged jaw; `skeltorso.py`, `skelgirdle.py`, `skellimbs.py` one connected column, ribcage, pelvis and limbs)
+weighted to stay joined in every action, and dressed from a slim body when their params give an outfit
+(`skeldress.py`, `skelfit.py`). Bodies of other stuff share the rig and actions too (`matter.py`): a granite golem
+of chipped, cracked blocks (`golem.py`), a gnarled wooden creature with fissured bark, twig fingers, branches and
+leaves (`woodfolk.py`, `twigs.py`), a gingerbread man with icing and gumdrops (`cookie.py`) and an empty suit of
+plate armour glowing inside (`plate.py`, `gauntlet.py`); a scarecrow has a stuffed burlap sack for a head, straw
+in its cuffs, collar and boots, straw hands, clothes pushed out in stuffing lumps, patched clothes and a rope belt
+(`scarecrow.py`, `straw.py`, `stuffing.py`, `patches.py`, `rope.py`). A skeleton hoplite wears Greek bronze: a
+crested Corinthian helm, a muscled cuirass, leather pteruges, greaves and a round shield (`hoplite.py`,
+`corinthian.py`, `kit: hoplite`), and a goat-legged demon stands on cloven hooves (`hooves.py`, `feet: hooves`).
+Params per character live in `assets.json` (documented at the top of `bgen/human/__init__.py`). They export rest-pose UVs and tangents for the character shader.
+
+Machines and aliens (`human/scifi.py`, worn after the clothes) get a grey alien's or an insect's head with big
+glossy eyes and antennae (`alienhead.py`, on the head's distance field), armour plates over a body suit (`plates.py`
+models each plate as an even shell over a smooth core; `platefit.py` fits the core to the clothes it covers as an
+envelope over their folds, presses the clothes in under the plate rather than denting it, and shades the plate from
+its field so a reduced mesh still reads as hard and smooth; `armor.py`, `armorparts.py`, `armorsets.py`
+lay out the styles with panel seams and glowing strips; `solarblades.py` adds a Selenian's flame blades), a glass
+dome or a diver's helmet on a neck ring (its cross-section swept round the neck, so it is true all the way round), a closed helm with lit eye slits, a cyborg's skull implant and a jetpack
+(`helmets.py`, `diverhelm.py`, `solarhelm.py`, `implant.py`). Glass uses the `char:glass` slot, drawn see-through by
+`shaders/character_glass.gdshader` and left out of the baked occlusion.
 
 Human motion (`human/motion.py`, `human/actions.py`) is authored as pose functions sampled every frame at 30 fps
 (exact curves, eased keys, seamless loops): idle, walk, run, sprint, jump, fall, land, swim, climb, glide, hurt,
 death (plus an undead shamble), and upper-body item actions — swing, mine, thrust, shoot, bow, cast, drink, use,
-hold. Characters with the same skeleton (body, height, gait) share one animation set,
+hold. The right hand is a closed fist around a handle at `motion.GRIP`, where the game attaches held items; attacks
+have a wind-up, a coil, a whip through to the wrist and a follow-through, and strike where the melee system lands
+its hits (see actions.py). Characters with the same skeleton (body, height, gait, arm spread) share one animation set,
 `assets/models/creatures/anim/<set>.glb`, with `index.json` naming each character's set; rebuild them with
 `build_all.py --anims [--shard=I/N]` (seconds each, no character meshes touched).
 

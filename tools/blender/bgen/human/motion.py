@@ -6,7 +6,7 @@ the game layers over them (swing, mine, thrust, shoot, bow, cast, drink, use, ho
 folk (zombies, mummies) shamble with their arms held out; skeletons keep a hunch but walk normally.
 
 Every pose starts from a relaxed stance (arms lowered from the A-pose rest, elbows soft, fingers curled; the right
-hand in a loose grip for held items) and adds the clip's rotations. Poses are dicts of bone -> rotation ops (see
+hand closed around a handle at GRIP for held items) and adds the clip's rotations. Poses are dicts of bone -> rotation ops (see
 rig.Poser), or {"rot": ops, "loc": offset} for bones that also move.
 """
 import math
@@ -22,6 +22,10 @@ SIDES = (("R", 1), ("L", -1))
 FPS = 30
 TAU = 2 * math.pi
 THIGH, SHIN = 0.43, 0.427      # leg segment lengths at scale 1 (human/frame.py)
+# Where a held item's handle runs through the right fist, in units of the hand bone's length from its head: toward the
+# palm (-X) and along the hand (+Y); the handle itself runs along the bone's Z (out past the thumb). The game attaches
+# items here (game/Player/PlayerAvatar.cs, HeldGrip) and tools/blender/preview.py --hold=1 does the same.
+GRIP = (-0.33, 0.89, 0.0)
 
 
 def deg(a):
@@ -101,7 +105,9 @@ class Motion:
         self.undead = bool(p.get("undead"))
         self.shamble = self.undead and p.get("anatomy") != "skeleton"
         self.hunch = 1.0 if self.undead else 0.0
+        self.spread = float(p.get("armSpread", 0.0))     # degrees the arms hang further out (bulky creatures)
         self.palm = {side: tuple(-hand_axes(frame, side)[2]) for side, _ in SIDES}
+        self.across = {side: tuple(-hand_axes(frame, side)[1]) for side, _ in SIDES}   # from the thumb toward the pinky
         self.bones = [b.name for b in arm.data.bones]
 
     def fingers(self, side, curl, thumb=0.5):
@@ -114,17 +120,29 @@ class Motion:
             pose[f"thumb.0{k}.{side}"] = [("swing", palm, deg(amount * thumb))]
         return pose
 
-    def stance(self, grip=0.62):
+    def grip(self, side):
+        """A closed fist around a handle (GRIP, in hand-bone units) that runs across the palm: the fingers wrap it and
+        the thumb closes over the index and middle fingers, so held items sit in the hand rather than on it."""
+        pose = self.fingers(side, 1.12, 0.0)
+        palm, across = self.palm[side], self.across[side]
+        pose[f"thumb.01.{side}"] = [("swing", palm, deg(26)), ("swing", across, deg(14))]
+        pose[f"thumb.02.{side}"] = [("swing", palm, deg(30)), ("swing", across, deg(20))]
+        pose[f"thumb.03.{side}"] = [("swing", palm, deg(26))]
+        return pose
+
+    def stance(self):
         pose = {"spine": [("swing", FWD, deg(4 * self.hunch))], "neck": [("swing", FWD, deg(10 * self.hunch))]}
         for side, sx in SIDES:
-            pose[f"upper_arm.{side}"] = [("swing", DOWN, deg(33)), ("swing", FWD, deg(4 + 25 * self.hunch))]
+            pose[f"upper_arm.{side}"] = [("swing", DOWN, deg(33 - self.spread)), ("swing", FWD, deg(4 + 25 * self.hunch))]
             pose[f"forearm.{side}"] = [("swing", FWD, deg(12 + 30 * self.hunch))]
             if self.shamble:     # arms held out in front, wrists limp
                 pose[f"upper_arm.{side}"] += [("axis", SIDE_AXIS, deg(52)), ("axis", UP, deg(-6 * sx))]
                 pose[f"forearm.{side}"] = [("swing", FWD, deg(14))]
                 pose[f"hand.{side}"] = [("axis", SIDE_AXIS, deg(-28))]
-            curl = (0.3, 0.3) if self.shamble else (grip, 0.28)
-            pose = merge(pose, self.fingers(side, curl[0] if side == "R" else curl[1], 0.7 if side == "R" else 0.35))
+            if side == "R" and not self.shamble:
+                pose = merge(pose, self.grip(side))
+            else:
+                pose = merge(pose, self.fingers(side, 0.3 if self.shamble else 0.28, 0.35))
         return pose
 
     # ------------------------------------------------------------------ clips
@@ -263,7 +281,7 @@ class Motion:
         dip = tl(t, [(0, 0.35), (0.22, 1, "out"), (1, 0, "io")])
         th, kn = 34 * dip, 64 * dip
         pose = {
-            "hips": {"rot": [], "loc": (0, -0.02 * self.s * dip, -drop(self.s, th, kn))},
+            "hips": {"rot": [], "loc": (0, -0.02 * self.s * dip, -drop(self.s * self.frame.legs, th, kn))},
             "spine": [("swing", FWD, deg(14 * dip))], "head": [("swing", BACK, deg(8 * dip))],
         }
         for side, sx in SIDES:

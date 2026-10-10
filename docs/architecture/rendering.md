@@ -37,7 +37,9 @@ twinkle, cloud parallax) read the `strata_time` and `strata_camera` globals inst
 | `prop.gdshader` | Generated props, items, creatures | Object-space triplanar of the props array, vertex-colour tint, sway (body in `include/prop_common.gdshaderinc`) |
 | `prop_clear.gdshader` | Translucent parts (`prop:<layer>:clear`): slime gel, corneas, wings | The prop shader with alpha: see-through face on, thicker at the rim, vertex alpha per part; drawn after opaque geometry so what is inside shows |
 | `foliage_card.gdshader` | Tree crowns and bushes (`card:<layer>` slots) | UV-mapped alpha-tested sprig cards, crown-shaped normals on both faces, sway + flutter, translucency, mip-aware alpha |
-| `character.gdshader` | People (`char:<kind>` slots) | Skin (pores from the detail array, subsurface scattering, wrapped diffuse), eyes, Kajiya–Kay hair highlights along exported tangents, nails, cloth sheen, leather, metal, bone, glow. Detail is sampled in the rest pose rebuilt from the two UV sets, so it sticks to the animated body |
+| `character.gdshader` | People (`char:<kind>` slots) | Skin (pores from the detail array, subsurface scattering, diffuse that wraps furthest in red so shadow edges go warm), eyes, Kajiya–Kay hair highlights along exported tangents (shifted primary and secondary, jittered per strand), nails, cloth sheen, leather, metal, bone, glow. Vertex alpha is ambient occlusion baked by the generator (eye sockets, between locks, inside folds): it darkens ambient light fully, direct light partly and highlights fully. Detail is sampled in the rest pose rebuilt from the two UV sets, so it sticks to the animated body |
+| `character_glass.gdshader` | Clear parts of people (`char:glass`): Martian helmet domes, a diver's visor | Thin tinted glass: nearly clear face on, more reflective toward the rim, the sun's sharp highlight; drawn after opaque geometry so the head inside shows. Declares the character shader's instance uniforms in the same order (one mesh carries both) |
+| `blade_trail.gdshader` | The held blade's trail (`BladeTrail`) | Additive ribbon from part way up the blade to its tip: clear at the inner edge, whitest just inside the tip, faded along its length by vertex alpha, tinted to the item and dimmed in the dark (block light, or sky light scaled by the time of day) |
 | `grass.gdshader` | Instanced grass and flowers | See below |
 | `sprite_lit.gdshader` | Billboards and particles | Uses `strata_ambient` because it disables environment light |
 
@@ -98,6 +100,25 @@ when backpedalling), an upper-body `OneShot` for item actions stretched to the i
 every use (so you can swing while running), a right-arm blend that holds a carried torch up, and a hurt flinch. For
 the player an `AimModifier` (`SkeletonModifier3D`) then turns the torso and head toward the aim while the legs face
 the way they walk, and brings the arms up to the aim for guns, bows, staffs and spears.
+
+The held item hangs on a `BoneAttachment3D` at `hand.R`, placed where the handle runs through the closed fist
+(`PlayerAvatar.Grip`, matching `GRIP` in `tools/blender/bgen/human/motion.py`) and leaving it past the thumb; guns are
+tipped 70 degrees toward the fingers so the barrel lies along the forearm (`HeldTilt`, `actions.TILT`). The actions
+are authored for that grip, so blades swing through level at the strike and spears and torches stay upright or level
+without folding the wrist. Between uses the `AimModifier` also turns the hand to carry the item (`PlayerAvatar.Blade`):
+blades and tools tip forward and down beside the leg, fanned out from it (long ones less steeply so the tip stays off
+the ground), spears, staffs, bows and rods tip up, guns stay as gripped; the turn drops out as an action fades in and
+returns as it fades out. Attacks are timed like a real blow: a settle and a wind-up, a coil where the torso starts
+back while the blade still drags, a whip that reaches the wrist last, then follow-through, overshoot and settle. A
+swing strikes between 0.36 and 0.56 of its clip, a thrust drives out between 0.33 and 0.52 and a tool's chop comes
+down between 0.3 and 0.48, which is where `MeleeSystem` lands its hits (sweeping right to left, `SweepProgress`;
+nothing connects in the wind-up or the follow-through), where `SwingTrail` draws a swing's reach arc or a thrust's
+streak (tools show the block cursor instead) and where `BladeTrail` lets the blade leave a ribbon:
+sampled from the hand bone once the skeleton is posed, so it starts at the blade, smoothed with Catmull-Rom between
+frames and fading back along the path (fainter for tool chops, a streak for thrusts). It reads the clip's own
+position (`HumanoidAnimator.ActionPhase`), so a long frame cannot put it out of step with the pose.
+`game/Testing/Tours/wielding.cmds` photographs the carry and the swing, chop, thrust, shoot, bow, cast and torch hold
+close up (`camera distance`), the swing also from behind mid-strike.
 
 `NpcRenderer.Motion` adds presence to everything else: `facing` look (eyes stare at their target) or velocity (fish),
 fliers banking into turns and pitching with their climb, gels squashing, a quiver before a charge, a stretch along a

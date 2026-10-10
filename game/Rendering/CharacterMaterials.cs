@@ -6,25 +6,28 @@ namespace Strata.Game.Rendering;
 
 /// <summary>
 /// Materials for generated people: GLB slots named <c>char:&lt;kind&gt;</c> (skin, eye, hair, nail, cloth, leather,
-/// metal, bone, glow) get the character shader with that kind's texture layer and surface response. The slot list
-/// matches tools/blender/bgen/human (SLOTS).
+/// metal, bone, glow) get the character shader with that kind's texture layer and surface response; <c>char:glass</c>
+/// (helmet domes, visors) gets the see-through character glass shader. The slot list matches tools/blender/bgen/human
+/// (SLOTS).
 /// </summary>
 public sealed class CharacterMaterials
 {
     private static readonly Shader Shader = GD.Load<Shader>("res://shaders/character.gdshader");
+    private static readonly Shader GlassShader = GD.Load<Shader>("res://shaders/character_glass.gdshader");
 
     /// <summary>kind, props layer, tile (m), detail layer, detail strength, detail tile (m), roughness, metallic, sss, sheen.</summary>
     private static readonly Dictionary<string, (int Kind, string Layer, float Tile, string Detail, float DetailStrength, float DetailTile, float Rough, float Metal, float Sss, float Sheen)> Kinds = new()
     {
-        ["skin"] = (0, "plain", 0.1f, "porous", 0.35f, 0.018f, 0.48f, 0f, 0.6f, 0f),
+        ["skin"] = (0, "plain", 0.1f, "porous", 0.35f, 0.018f, 0.52f, 0f, 0.2f, 0f),
         ["eye"] = (1, "plain", 0.1f, "smooth", 0f, 0.02f, 0.03f, 0f, 0f, 0f),
-        ["hair"] = (2, "plain", 0.1f, "grass", 0f, 0.02f, 0.4f, 0f, 0f, 0f),
+        ["hair"] = (2, "plain", 0.1f, "grass", 0f, 0.02f, 0.62f, 0f, 0f, 0f),
         ["nail"] = (3, "plain", 0.1f, "smooth", 0f, 0.02f, 0.22f, 0f, 0f, 0f),
         ["cloth"] = (4, "cloth", 0.06f, "porous", 0f, 0.02f, 0.9f, 0f, 0f, 1f),
         ["leather"] = (5, "leather", 0.12f, "porous", 0f, 0.02f, 0.5f, 0f, 0f, 0f),
         ["metal"] = (6, "iron", 0.2f, "smooth", 0f, 0.02f, 0.3f, 1f, 0f, 0f),
         ["bone"] = (7, "stone", 0.08f, "porous", 0f, 0.02f, 0.65f, 0f, 0f, 0f),
         ["glow"] = (8, "plain", 0.1f, "smooth", 0f, 0.02f, 0.5f, 0f, 0f, 0f),
+        ["glass"] = (9, "plain", 0.1f, "smooth", 0f, 0.02f, 0.04f, 0f, 0f, 0f),
     };
 
     private readonly Dictionary<string, ShaderMaterial> _cache = new();
@@ -51,7 +54,7 @@ public sealed class CharacterMaterials
         }
         if (!layers.TryGetValue(k.Layer, out var layer)) problems.Add($"character material '{slot}' needs prop layer '{k.Layer}'");
         if (!_detail.TryGetValue(k.Detail, out int detail)) problems.Add($"character material '{slot}' needs detail layer '{k.Detail}'");
-        var m = new ShaderMaterial { Shader = Shader };
+        var m = new ShaderMaterial { Shader = kindName == "glass" ? GlassShader : Shader };
         m.SetShaderParameter("kind", k.Kind);
         m.SetShaderParameter("albedo_array", albedo);
         m.SetShaderParameter("material_array", material);

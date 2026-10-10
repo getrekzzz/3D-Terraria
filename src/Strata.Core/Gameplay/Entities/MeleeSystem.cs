@@ -8,7 +8,8 @@ namespace Strata.Core.Gameplay.Entities;
 
 /// <summary>
 /// Resolves melee swings and thrusts over their use animation: the blade sweeps a horizontal arc in front of the
-/// player (or stabs along the aim) and each creature is hit at most once per swing.
+/// player from right to left as the swing strikes (or stabs along the aim as the thrust drives out), nothing connects
+/// in the wind-up or the follow-through, and each creature is hit at most once per swing.
 /// </summary>
 public sealed class MeleeSystem
 {
@@ -61,11 +62,11 @@ public sealed class MeleeSystem
         {
             var s = _active[i];
             s.Tick++;
-            float t = s.Tick / (float)s.Duration;
+            float t0 = (s.Tick - 1) / (float)s.Duration, t = s.Tick / (float)s.Duration;
             foreach (var npc in _npcs.All.ToList())
             {
                 if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
-                if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, t))) continue;
+                if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, t0, t))) continue;
                 var item = s.Item.Item;
                 if (_npcs.Hit(npc, s.Player, Items.Prefixes.Damage(s.Stack), item.DamageType, Items.Prefixes.Crit(s.Stack) + Combat.DamageModel.BaseCritChance,
                         Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true))
@@ -79,19 +80,25 @@ public sealed class MeleeSystem
     /// flyer in 3D is much harder than in the reference game's side view.</summary>
     public const float ThrustTolerance = 0.7f;
 
-    private static bool Connects(Swing s, Vector3 center, Vector3 half, float t)
+    /// <summary>Whether a creature's box (<paramref name="center"/>, <paramref name="half"/> extents) is struck during the
+    /// tick that took the use animation from <paramref name="t0"/> to <paramref name="t"/>: only while the blade strikes
+    /// (or the thrust drives out), never in the wind-up or the follow-through.</summary>
+    private static bool Connects(Swing s, Vector3 center, Vector3 half, float t0, float t)
     {
         var origin = s.Player.Center + new Vector3(0, 0.3f, 0);
         var to = center - origin;
         float radius = MathF.Max(half.X, half.Y);
         if (s.Item.Has(ItemAction.Thrust))
         {
+            if (t < ThrustStart || t0 > ThrustEnd) return false;
             float length = s.Item.ThrustParams!.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.4f;
             var dir = new Vector3(MathF.Sin(s.Yaw) * MathF.Cos(s.Pitch), MathF.Sin(s.Pitch), MathF.Cos(s.Yaw) * MathF.Cos(s.Pitch));
             float along = Vector3.Dot(to, dir);
             if (along < 0 || along > length + radius) return false;
             return (to - dir * along).Length() <= radius + ThrustTolerance;
         }
+        var (start, end) = s.Item.IsTool ? (ChopStart, ChopEnd) : (StrikeStart, StrikeEnd);
+        if (t < start || t0 > end) return false;
         var swing = s.Item.Swing!;
         float reach = swing.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.6f;
         var flat = new Vector3(to.X, 0, to.Z);
@@ -99,12 +106,35 @@ public sealed class MeleeSystem
         float aimPlaneY = MathF.Tan(s.Pitch) * flat.Length();
         if (MathF.Abs(to.Y - aimPlaneY) > VerticalReach + half.Y) return false;
         if (flat.Length() < 0.6f) return true; // point blank
-        // The blade sweeps from +arc/2 to −arc/2 around the aim yaw over the animation.
+        // The blade sweeps from −arc/2 (the player's right) to +arc/2 (their left) around the aim yaw as it strikes.
         float halfArc = swing.Arc * MathF.PI / 360f;
-        float current = halfArc - t * 2f * halfArc;
+        float current = -halfArc + SweepProgress(t, start, end) * 2f * halfArc;
         float angle = WrapAngle(BrainFactory.YawOf(flat) - s.Yaw);
-        return angle <= halfArc && angle >= current - 0.25f;
+        return angle >= -halfArc && angle <= current + 0.25f;
     }
+
+    /// <summary>
+    /// How far through its arc a swing is at <paramref name="t"/> (0..1 of the use animation): none during the wind-up,
+    /// all of it by the follow-through, in step with the human swing and chop actions, which strike from over the right
+    /// shoulder down across to the left in that window (tools/blender/bgen/human/actions.py).
+    /// </summary>
+    public static float SweepProgress(float t) => SweepProgress(t, StrikeStart, StrikeEnd);
+
+    private static float SweepProgress(float t, float start, float end)
+    {
+        float u = Math.Clamp((t - start) / (end - start), 0f, 1f);
+        return u * u * (3f - 2f * u);
+    }
+
+    /// <summary>The part of the use animation (fractions) in which a swing's blade crosses in front of the player.</summary>
+    public const float StrikeStart = 0.36f, StrikeEnd = 0.56f;
+
+    /// <summary>The part of the use animation (fractions) in which a thrust drives out from drawn back to full reach.</summary>
+    public const float ThrustStart = 0.33f, ThrustEnd = 0.52f;
+
+    /// <summary>The part of the use animation (fractions) in which a tool comes down from over the shoulder to land
+    /// (the human mine action, which chops with every tool).</summary>
+    public const float ChopStart = 0.3f, ChopEnd = 0.48f;
 
     private static float WrapAngle(float a)
     {

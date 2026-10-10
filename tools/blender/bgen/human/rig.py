@@ -2,10 +2,10 @@
 
 Skinning: the body gets Blender's bone-heat weights; the head blends from the body's neck weights to the head bone;
 hands use chain weights (nearest bone segment, blended with its parent/children across each knuckle); rigid parts
-(eyes, ears, nails, hats) are bound to one bone.
+(eyes, nails, hats) are bound to one bone; hair takes the head's weights, so what hangs past the neck follows the body.
 
 Poses are authored in armature space: ``swing(bone, toward, angle)`` turns a bone's rest direction toward a world
-direction, ``twist`` turns it about itself, ``axis`` about an arbitrary axis, ``local`` about one of the bone's own
+direction, ``twist`` turns it about its rest direction, ``roll`` about the direction it points after the ops before it, ``axis`` about an arbitrary axis, ``local`` about one of the bone's own
 rest axes. Rotations are converted to each bone's
 local rest frame, so they compose naturally down the chain (a bent elbow stays bent when the shoulder moves).
 """
@@ -39,6 +39,9 @@ def clean_limb_weights(obj, arm, frame):
     """Heat weights leak between close surfaces in the rest pose: keep arm bones off the torso's flanks (a web forms
     when the arms come down) and each leg's bones off the other leg."""
     s = frame.s
+    # Muscular or heavy arms reach further from their bones (body.py): their own surface must keep its weights.
+    bulk, fat = max(0.0, frame.build - 0.5) * 2.0, max(0.0, frame.weight - 0.45) / 0.55
+    reach = 0.068 * s * max(1.0, (0.82 + 0.36 * frame.build) * (1.0 + 0.3 * bulk + 0.15 * fat))
 
     def seg_dist(p, bone):
         b = arm.data.bones[bone]
@@ -52,7 +55,7 @@ def clean_limb_weights(obj, arm, frame):
         for side, sx in (("R", 1), ("L", -1)):
             limb = [f"upper_arm.{side}", f"forearm.{side}", f"hand.{side}"]
             if any(b in w for b in limb):
-                if min(seg_dist(v.co, b) for b in limb) > 0.068 * s:
+                if min(seg_dist(v.co, b) for b in limb) > reach:
                     for b in limb:
                         w.pop(b, None)
             if v.co.x * sx < -0.012 * s:          # the other side of the body
@@ -69,14 +72,14 @@ def read_weights(obj):
 
 
 def write_weights(obj, weights):
-    for w in weights:
-        for name in w:
-            if name not in obj.vertex_groups:
-                obj.vertex_groups.new(name=name)
+    """Gives vertex i exactly the weights ``weights[i]`` (normalised): whatever it carried before goes, including
+    deform data a copy of another mesh brought along (clearing the groups drops it)."""
+    obj.vertex_groups.clear()
+    groups = {name: obj.vertex_groups.new(name=name) for name in dict.fromkeys(n for w in weights for n in w)}
     for i, w in enumerate(weights):
         total = sum(w.values()) or 1.0
         for name, value in w.items():
-            obj.vertex_groups[name].add([i], value / total, "REPLACE")
+            groups[name].add([i], value / total, "REPLACE")
 
 
 def normalize(obj):
@@ -95,14 +98,23 @@ def body_lookup(body):
     return tree, read_weights(body)
 
 
-def head_weights(obj, head, body_tree, body_w):
-    """Skull and face follow the head; the neck blends from the body's neck weights up into the head."""
+ARM_BONES = ("upper_arm", "forearm", "hand", "thumb", "index", "middle", "ring", "pinky")
+
+
+def head_weights(obj, head, body_tree, body_w, torso_only=False):
+    """Skull and face follow the head; the neck blends from the body's neck weights up into the head. With
+    ``torso_only`` (hair lying on the shoulders) the arms' share is left out, so raising an arm doesn't drag it."""
     out = []
     for v in obj.data.vertices:
         q = head.local(v.co)
         t = smooth(-0.15, -0.075, q.z) if q.y < 0.03 else smooth(-0.16, -0.1, q.z)
         _, idx, _ = body_tree.find(v.co)
-        w = {k: x * (1 - t) for k, x in body_w[idx].items()}
+        body = body_w[idx]
+        if torso_only:
+            body = {k: x for k, x in body.items() if k.split(".")[0] not in ARM_BONES} or {"chest": 1.0}
+            total = sum(body.values())
+            body = {k: x / total for k, x in body.items()}
+        w = {k: x * (1 - t) for k, x in body.items()}
         w["head"] = w.get("head", 0.0) + t
         out.append(w)
     write_weights(obj, out)
@@ -126,7 +138,7 @@ def chain_weights(obj, arm, bones, sigma, body_tree=None, body_w=None, blend_bon
             u = max(0.0, min(1.0, (v.co - a).dot(ab) / max(ab.length_squared, 1e-12)))
             d[b] = (v.co - (a + ab * u)).length
         b0 = min(d, key=d.get)
-        w = {b: math.exp(-((d[b] - d[b0]) / sigma) ** 2) for b in rel[b0] | {b0}}
+        w = {b: math.exp(-((d[b] - d[b0]) / sigma) ** 2) for b in sorted(rel[b0] | {b0})}
         if blend_bone is not None and body_tree is not None:
             head = arm.data.bones[blend_bone].head_local
             axis = (arm.data.bones[blend_bone].tail_local - head).normalized()
@@ -170,6 +182,8 @@ class Poser:
                 r = Quaternion(axis.normalized(), angle)
             elif kind == "twist":
                 r = Quaternion(self.dir[bone], op[1])
+            elif kind == "roll":                  # about where the bone points now (an upper arm's inward rotation)
+                r = Quaternion((q @ self.dir[bone]).normalized(), op[1])
             elif kind == "axis":
                 r = Quaternion(Vector(op[1]).normalized(), op[2])
             elif kind == "local":                 # about one of the bone's own rest axes (e.g. X flexes a wrist)

@@ -6,7 +6,8 @@ namespace Strata.Game.Rendering;
 /// Turns a human's upper body toward where it aims, after the animation has posed it: <see cref="Twist"/> turns the
 /// torso and head about the vertical (the legs keep facing where they walk), <see cref="Pitch"/> bends the spine and
 /// head up or down, and <see cref="ArmAim"/> lets the arms follow the pitch fully (guns, bows, staffs held at the
-/// target). Spread down the spine so no single joint kinks.
+/// target). Spread down the spine so no single joint kinks. <see cref="Carry"/> turns the right hand to carry a held item
+/// between uses.
 /// </summary>
 public sealed partial class AimModifier : SkeletonModifier3D
 {
@@ -16,7 +17,7 @@ public sealed partial class AimModifier : SkeletonModifier3D
     };
 
     private int[] _chain = System.Array.Empty<int>();
-    private int _armR = -1, _armL = -1;
+    private int _armR = -1, _armL = -1, _handR = -1;
 
     /// <summary>Torso turn relative to the legs, radians (+ = to the character's left, as Godot yaw).</summary>
     public float Twist { get; set; }
@@ -26,6 +27,12 @@ public sealed partial class AimModifier : SkeletonModifier3D
 
     /// <summary>0..1: how much the arms join the aim pitch beyond what the chest gives them.</summary>
     public float ArmAim { get; set; }
+
+    /// <summary>
+    /// Radians the right hand turns from the animated grip: X about the hand's own X axis (+ cocks the wrist toward the
+    /// thumb, − toward the little finger), Y about its length (+ fans the item out from the body).
+    /// </summary>
+    public Vector2 Carry { get; set; }
 
     public override void _ProcessModificationWithDelta(double delta)
     {
@@ -37,6 +44,12 @@ public sealed partial class AimModifier : SkeletonModifier3D
             for (int i = 0; i < Chain.Length; i++) _chain[i] = sk.FindBone(Chain[i].Bone);
             _armR = sk.FindBone("upper_arm.R");
             _armL = sk.FindBone("upper_arm.L");
+            _handR = sk.FindBone("hand.R");
+        }
+        if (_handR >= 0 && Carry.LengthSquared() > 1e-6f)
+        {
+            var carry = new Quaternion(Vector3.Right, Carry.X) * new Quaternion(Vector3.Up, Carry.Y);
+            sk.SetBonePoseRotation(_handR, (sk.GetBonePoseRotation(_handR) * carry).Normalized());
         }
         float twist = Mathf.Clamp(Twist, -1.35f, 1.35f), pitch = Mathf.Clamp(Pitch, -1.1f, 1.1f);
         if (Mathf.Abs(twist) < 1e-3f && Mathf.Abs(pitch) < 1e-3f) return;
