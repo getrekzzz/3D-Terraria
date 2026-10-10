@@ -18,7 +18,8 @@
   sight required), `onContact` debuffs and `onDeath` effects (pour liquid, split into creatures), AABB voxel movement, contact damage with player i-frames and knockback, buffs with damage
   over time (debuff stats count: ichor lowers a creature's defense), death loot and coins, despawning far from players. `SpawnDirector` evaluates data-driven spawn
   rules at candidate ground cells (or inside water for `placement: liquid`) with layer/biome/time/light context,
-  slowed in towns (tuning: `data/config/spawning.json`). Rules may cap how many are alive (`maxAlive`) or judge
+  slowed in towns, within per-player allowances of hostiles and critters that count every creature until it
+  despawns and that a group never overshoots (tuning: `data/config/spawning.json`). Rules may cap how many are alive (`maxAlive`) or judge
   their conditions where the player stands (`atPlayer`); creatures may leave when `despawnWhen` holds at their target.
 * **Zones** — planned features with a `zone` (the Dungeon, spider nests, marble/granite halls, evil hearts) are
   reported as extra biomes by `WorldSession.ContextAt`/`ZonesAt`; a structure's zone is its blueprint volumes. A

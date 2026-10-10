@@ -25,12 +25,16 @@ public sealed class SpawnConfig
     /// <summary>Hostile creatures allowed near a player by day and at night (critters count separately).</summary>
     public int MaxNearbyDay { get; init; } = 4;
 
-    public int MaxNearbyNight { get; init; } = 5;
+    public int MaxNearbyNight { get; init; } = 3;
 
     /// <summary>Critters (fireflies, bunnies…) allowed near a player.</summary>
     public int MaxCritters { get; init; } = 3;
 
-    public float CountRadius { get; init; } = 60f;
+    /// <summary>
+    /// Creatures this close to a player count against the allowances. It matches <see cref="NpcSystem.DespawnDistance"/>,
+    /// so creatures a player walks away from keep counting while they follow.
+    /// </summary>
+    public float CountRadius { get; init; } = NpcSystem.DespawnDistance;
     public float MinDistance { get; init; } = 22f;
     public float MaxDistance { get; init; } = 46f;
     public int Attempts { get; init; } = 12;
@@ -104,9 +108,9 @@ public sealed class SpawnDirector
         foreach (var p in _world.Players)
         {
             if (!p.Alive) continue;
-            bool hostiles = _npcs.CountNear(p.Center, Config.CountRadius, critters: false) < max;
-            bool critters = _npcs.CountNear(p.Center, Config.CountRadius, critters: true) < Config.MaxCritters;
-            if (!hostiles && !critters) continue;
+            int hostiles = max - _npcs.CountNear(p.Center, Config.CountRadius, critters: false);
+            int critters = Config.MaxCritters - _npcs.CountNear(p.Center, Config.CountRadius, critters: true);
+            if (hostiles <= 0 && critters <= 0) continue;
             float local = _world.Session.Events.Count == 0 ? chance * TownFactor(p) : chance;
             if (!_rng.Chance(local)) continue;
             TrySpawnNear(p, hostiles, critters);
@@ -151,8 +155,12 @@ public sealed class SpawnDirector
     public bool InTown(PlayerEntity p) =>
         _world.Town.Residents.Count(r => r.Alive && r.Home != null && Vector3.Distance(r.Position, p.Position) <= Config.TownRadius) >= Config.TownResidents;
 
-    /// <summary>Attempts one natural spawn near a player; returns the spawned creatures (possibly none).</summary>
-    public List<Npc> TrySpawnNear(PlayerEntity player, bool hostiles = true, bool critters = true)
+    /// <summary>
+    /// Attempts one natural spawn near a player; returns the spawned creatures (possibly none). At most
+    /// <paramref name="hostiles"/> hostile creatures or <paramref name="critters"/> critters appear: a group is cut
+    /// short rather than overshoot the allowance.
+    /// </summary>
+    public List<Npc> TrySpawnNear(PlayerEntity player, int hostiles = int.MaxValue, int critters = int.MaxValue)
     {
         var spawned = new List<Npc>();
         var session = _world.Session;
@@ -176,8 +184,8 @@ public sealed class SpawnDirector
             atPlayer.Light = EffectiveLight(origin);
             atPlayer.PlayerMaxLife = player.State.Vitals.MaxLife;
             var exclusive = ctx.Biomes.Where(_exclusive.Contains).ToList();
-            bool hostileHere = hostiles && !IsSafe(cell.Value, ctx.Layer);
-            var eligible = _rules.Where(r => (r.Enemy.HasTag("critter") ? critters : hostileHere)
+            bool hostileHere = hostiles > 0 && !IsSafe(cell.Value, ctx.Layer);
+            var eligible = _rules.Where(r => (r.Enemy.HasTag("critter") ? critters > 0 : hostileHere)
                 && (r.Rule.Placement == SpawnPlacement.Liquid ? water : ground) != null
                 && (exclusive.Count == 0 || exclusive.Any(_namedBiomes[r.Rule].Contains))
                 && (r.Rule.MaxAlive <= 0 || _npcs.All.Count(n => n.Def == r.Enemy) < r.Rule.MaxAlive)
@@ -186,7 +194,7 @@ public sealed class SpawnDirector
             if (eligible.Count == 0) continue;
             var pick = Weighted(eligible);
             var at = pick.Rule.Placement == SpawnPlacement.Liquid ? water!.Value : ground!.Value;
-            int count = _rng.Range(pick.Rule.GroupMin, pick.Rule.GroupMax);
+            int count = Math.Min(_rng.Range(pick.Rule.GroupMin, pick.Rule.GroupMax), pick.Enemy.HasTag("critter") ? critters : hostiles);
             for (int i = 0; i < count; i++)
             {
                 var feet = new Vector3(at.X + 0.5f + _rng.NextSigned(), at.Y, at.Z + 0.5f + _rng.NextSigned()) * Units.CellSize;
