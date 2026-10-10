@@ -3,7 +3,8 @@ a dense undercoat over the skin with big clumped tufts laid on it, each rooted i
 fur's flow (down the body, out along the limbs toward the hands and feet, back from the face) and splitting into
 strands whose tips lift off, so the outline breaks up shaggily; over the shoulders it falls down and over their
 edge, and long tufts stay narrow locks. Tufts are longest where a creature's fur is longest: a yeti's (``muzzle:
-ape``) on the shoulders, forearms and calves, a werewolf's (``muzzle: wolf``) in a mane over the neck and shoulders
+ape``, long soft locks that hang under their weight; on its head swept up off the brow, back over the crown and
+down elsewhere) on the shoulders, forearms and calves, a werewolf's (``muzzle: wolf``) in a mane over the neck and shoulders
 and a ruff round the cheeks, with short fur over the muzzle, a paler mask round the mouth and throat, and a short
 coat on the backs of the ears (bare in their hollows). The fur parts round the face, the hands' palms and fingers
 and where trousers cover it (showing through their tears); the head's coat stops where its neck sinks into the
@@ -41,8 +42,9 @@ class Coat:
         self.base = (0.13 if self.kind == "ape" else 0.1) * self.s * p.get("furLength", 1.0)
         self.under = (0.02 if self.kind == "ape" else 0.012) * self.s
         self.lift = 0.08 if self.kind == "ape" else 0.035
-        self.spacing = 0.48 if self.kind == "ape" else 0.73
-        self.widest = (0.075 if self.kind == "ape" else 0.05) * self.s      # tufts as locks, not cards
+        self.spacing = 0.54 if self.kind == "ape" else 0.73
+        self.widest = (0.052 if self.kind == "ape" else 0.05) * self.s      # tufts as locks, not cards
+        self.style = "lock" if self.kind == "ape" else "tuft"               # long shaggy locks, or dense fur
         self.dirs = {}
         for name, a, b, *_ in fr.bones():
             g = _group(name)
@@ -59,6 +61,13 @@ class Coat:
             d = d + np.asarray((0.0, 0.0, -h))
             self.dirs[name] = d / np.linalg.norm(d)
 
+    def spaced(self, kind):
+        """Tuft spacing on a part (times the coat's): closer on the head; sparser on a yeti's hands and feet, whose
+        short tufts would otherwise take a great many."""
+        if self.style != "lock":
+            return 0.75 if kind == "head" else 1.0
+        return 0.85 if kind == "head" else 1.0 if kind == "body" else 2.0
+
     # ------------------------------------------------------------------ fields over a part's vertices
     def flow(self, X, W, head=False):
         """The direction fur lies at each point (before it is laid into the surface)."""
@@ -72,6 +81,11 @@ class Coat:
             away = q - np.asarray((0.0, 0.2 if self.kind == "wolf" else 0.15, -0.045))
             away /= np.linalg.norm(away, axis=1, keepdims=True)
             away[:, 2] -= 0.55 * ss(0.02, -0.1, q[:, 2])
+            if self.kind == "ape":          # up off the brow, straight back over the top, hanging down elsewhere
+                rim = (1.0 - ss(1.1, 1.9, self.face(q))) * ss(-0.01, 0.03, q[:, 2])
+                top = (ss(0.03, 0.07, q[:, 2]) * ss(-0.04, 0.02, q[:, 1]) * ss(0.075, 0.03, np.abs(q[:, 0])))[:, None]
+                hang = np.asarray((0.0, -0.35, -1.2)) * (1.0 - top) + np.asarray((0.0, -1.0, 0.35)) * top
+                away = away * rim[:, None] + hang * (1.0 - rim[:, None])
             hw = np.array([w.get("head", 0.0) for w in W])
             out = out * (1 - hw[:, None]) + away * hw[:, None]
         return out
@@ -102,8 +116,7 @@ class Coat:
         neck = ss(-0.06, -0.16, z)
         low = ss(-0.215, -0.165, z)                  # gone where the head's neck sinks into the body's (its coat is there)
         if self.kind == "ape":
-            face = ((x / 0.056) ** 2 + ((z + 0.035) / 0.074) ** 2) * (y > 0.0) + (y <= 0.0) * 9.0
-            face = np.where(y > 0.03, face, face + (0.03 - y) * 60.0)
+            face = self.face(q)
             amount = ss(0.85, 1.25, face) * low
             ruff = ss(1.2, 1.7, face) * (1.0 - ss(1.9, 3.2, face))
             length = amount * (0.75 + 0.3 * ruff + 0.5 * neck)
@@ -120,6 +133,13 @@ class Coat:
         pale = ss(-0.028, -0.045, z) * ss(0.02, 0.05, y)       # a paler mask round the mouth, cheeks and throat
         thin = ss(0.02, 0.045, eye) * (1.0 - 0.7 * ss(0.08, 0.14, y)) * (1.0 - 0.8 * ear)
         return amount, length, np.maximum(under, 0.85 * pale), thin
+
+    @staticmethod
+    def face(q):
+        """A yeti's bare face over head-local points: below 1 inside it, growing away from it (9 and more behind)."""
+        x, y, z = q[:, 0], q[:, 1], q[:, 2]
+        face = ((x / 0.056) ** 2 + ((z + 0.035) / 0.074) ** 2) * (y > 0.0) + (y <= 0.0) * 9.0
+        return np.where(y > 0.03, face, face + (0.03 - y) * 60.0)
 
     def ear_back(self, q):
         """1 behind the plane of a wolf's ears (their backs), 0 in front (their hollows)."""
@@ -228,8 +248,8 @@ def grow(fr, head, parts, p, worn):
         out.append(make_mesh(f"fur_coat_{kind}", Vs + Ns * h[:, None], Ts, under, "char:hair", Ws, uv))
         decimate(out[-1], 0.4 if kind == "head" else 0.6)
         tuft = tufts.build(f"fur_tufts_{kind}", Vs, Ts, Ns, Ws, flow, length[idx], h, tone, coat.lift * (0.35 if kind == "head" else 1.0),
-                           seed=len(out) * 7919 + 13, spacing=coat.spacing * (0.75 if kind == "head" else 1.0),
-                           min_len=0.013 * s if kind == "head" else None, max_width=coat.widest)
+                           seed=len(out) * 7919 + 13, spacing=coat.spacing * coat.spaced(kind),
+                           min_len=0.013 * s if kind == "head" else None, max_width=coat.widest, style=coat.style)
         if tuft is not None:
             out.append(tuft)
         if kind != "head":

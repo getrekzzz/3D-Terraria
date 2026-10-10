@@ -53,7 +53,7 @@ def brush(fr, body, p, garments=()):
     fur = tufts.arrays(V, T, N, W, flow, L, h, tone, 0.14, seed=4242, min_len=0.02 * s)
     verts, tris, rgb, uvs, weights = V + N * h[:, None], T, core_rgb, uv, list(W)
     if fur is not None:
-        fv, ft, fc, fu, fw = fur
+        fv, ft, fc, fu, fw, _ = fur
         tris = np.concatenate([tris, ft + len(verts)])
         verts = np.concatenate([verts, fv])
         rgb = np.concatenate([rgb, fc])

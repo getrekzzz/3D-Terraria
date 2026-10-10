@@ -119,10 +119,13 @@ class Surface:
         return surf, surf + d * np.asarray(h)[..., None]
 
 
-def helix(surf, t0, t1, width, pitch, offset, thick, phase=0.0, segs=40, spin=1, skip=None):
+def helix(surf, t0, t1, width, pitch, offset, thick, phase=0.0, segs=40, spin=1, skip=None, part=None):
     """A strip wound from t0 to t1 round ``surf`` (``width`` and ``pitch``, its advance per turn, in t units; heights
     in metres), turning ``spin`` (+1 or -1) about the axis; its advance wavers a little, so the turns crowd and part.
-    ``skip(t, ph)`` -> True leaves stretches out (an eye slit). Returns arrays as _grid does, or None."""
+    ``skip(t, ph)`` -> True leaves stretches out (where the surface is missed); ``part(ph)`` -> (t, half, amount)
+    opens a gap between the turns there (an eye slit): the turns either side of t are pushed back off it to t +- half,
+    crowding their edges there (by ``amount``, 0..1, so the push fades out round the sides). Returns arrays as _grid
+    does, or None."""
     turns = abs(t1 - t0) / pitch
     n = max(2, int(turns * segs) + 1)
     u = np.linspace(0.0, 1.0, n)
@@ -132,6 +135,13 @@ def helix(surf, t0, t1, width, pitch, offset, thick, phase=0.0, segs=40, spin=1,
     tc = t0 + (t1 - t0) * acc / acc[-1]
     sgn = 1.0 if t1 > t0 else -1.0
     T = tc[:, None] + sgn * (ACROSS[None, :] - 0.5) * width       # across 0: the raised edge, toward t0
+    if part is not None:
+        mid, half, amount = part(ph)
+        front = ph - (np.mod(ph + math.pi, 2 * math.pi) - math.pi)      # each turn takes one side, where it crosses ph 0
+        order = np.argsort(ph)
+        above = (np.interp(front, ph[order], tc[order]) >= part(front)[0])[:, None]
+        opened = np.where(above, np.maximum(T, (mid + half)[:, None]), np.minimum(T, (mid - half)[:, None]))
+        T = T + (opened - T) * amount[:, None]
     PH = np.repeat(ph[:, None], len(ACROSS), 1)
     H = np.broadcast_to(offset + LIFT[None, :] * thick, T.shape)
     surf_pts, pts = surf.point(T, PH, H)

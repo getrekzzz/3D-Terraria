@@ -104,15 +104,18 @@ class Binder:
     def head_wrap(self):
         head, s = self.head, self.s
         th, off = 0.0028 * s, 0.003 * s
-        sphere = ws.Surface(self.skull, centre=head.c, t_range=(-1.2, 1.57), reach=0.3 * s, bridge=3)
+        sphere = ws.Surface(self.skull, centre=head.c, t_range=(-1.2, 1.57), reach=0.3 * s, bridge=6)
         eye_el = math.atan2(head.local(head.eyes[1]).z, head.local(head.eyes[1]).y)
 
-        def slit(t, ph):
+        def slit(ph):       # a narrow, uneven gap between two turns across the eyes, pinched over the nose
             ph = np.mod(ph + math.pi, 2 * math.pi) - math.pi
-            return (np.abs(t - eye_el - 0.01) < 0.13) & (np.abs(ph) < 0.8) & (np.abs(ph) > 0.17)
+            mid = eye_el + 0.004 + 0.012 * np.sin(2.3 * ph + 0.7)
+            front = ss(0.85, 0.5, np.abs(ph))
+            half = 0.058 * front * (1.0 - 0.55 * ss(0.16, 0.02, np.abs(ph)))
+            return mid, half * (0.8 + 0.2 * np.sin(5.1 * ph + 0.4)), front
 
         # bands from the jaw up, closing in a swirl on the crown
-        self.add(ws.helix(sphere, -0.95, 1.42, 0.3, 0.2, off, th, phase=0.5, segs=56, skip=slit), clear=True)
+        self.add(ws.helix(sphere, -0.95, 1.42, 0.3, 0.2, off, th, phase=0.5, segs=56, part=slit), clear=True)
         neck_top = head.at((0, -0.008, -0.075))
         neck = ws.Surface([self.skull, self.body], [head.at((0, -0.03, -0.27)), head.at((0, -0.02, -0.18)), neck_top],
                           up=(0, 1, 0), reach=0.12 * s)
@@ -143,9 +146,12 @@ class Binder:
 
     def _clear(self, V, S, fixed):
         """Lifts any vertex of the head's strips sunk into the face (where a strip spans the nose or the hollow under
-        the brow) back out to its height over its own surface point."""
+        the brow) back out to its height over its own surface point; not the lips of the eye slit, which lie over the
+        lids' edges (lifting them off those would draw spikes)."""
         h0 = np.linalg.norm(V - S, axis=1)
-        for i in np.flatnonzero(fixed):
+        eyes = [np.asarray(e) for e in self.head.eyes.values()]
+        near_eye = np.min([np.linalg.norm(V - e, axis=1) for e in eyes], axis=0) < 0.03 * self.s
+        for i in np.flatnonzero(fixed & ~near_eye):
             v = Vector(V[i])
             loc, nrm, _, _ = self.skull.find_nearest(v)
             if loc is not None and (v - loc).dot(nrm) < 0.6 * h0[i]:

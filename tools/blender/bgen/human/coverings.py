@@ -249,9 +249,9 @@ def smooth_normals(V, T, N, iters=6):
     return M / np.maximum(np.linalg.norm(M, axis=1, keepdims=True), 1e-12)
 
 
-def make_mesh(name, V, T, colors, slot, weights=None, uv=None, alpha=None):
+def make_mesh(name, V, T, colors, slot, weights=None, uv=None, alpha=None, normals=None):
     """A mesh object from vertex positions and triangles, coloured per vertex (sRGB), with strand UVs per vertex
-    (``uv``) and bone weights per vertex when given."""
+    (``uv``), bone weights and (unit) normals per vertex (or per face corner: shape (triangles, 3, 3)) when given."""
     from ..export import simple_material
     me = bpy.data.meshes.new(name)
     me.vertices.add(len(V))
@@ -274,6 +274,12 @@ def make_mesh(name, V, T, colors, slot, weights=None, uv=None, alpha=None):
         uvl = me.uv_layers.new(name="UVMap")
         uvl.data.foreach_set("uv", np.asarray(uv, dtype=np.float32)[corner].ravel())
     me.polygons.foreach_set("use_smooth", np.ones(len(me.polygons), dtype=bool))
+    if normals is not None:                     # per vertex, or per face corner (3 a triangle)
+        n = np.asarray(normals, dtype=np.float32)
+        if n.ndim == 3:
+            me.normals_split_custom_set(n.reshape(-1, 3).tolist())
+        else:
+            me.normals_split_custom_set_from_vertices(n.tolist())
     obj = bpy.data.objects.new(name, me)
     bpy.context.scene.collection.objects.link(obj)
     obj.data.materials.append(simple_material(slot))
