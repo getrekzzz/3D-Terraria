@@ -21,6 +21,54 @@ def _ss(a, b, x):
     return t * t * (3 - 2 * t)
 
 
+def _tidy(bm):
+    """The specks the mesh reduction leaves where the surface nearly touches itself (thin rims, deep grooves): tiny
+    inside-out pockets on edges shared by four faces, and folded-over vertices. Points closer than half the meshing grid
+    are merged, edges still shared by more than two faces collapsed and the pinholes left closed; then the folded
+    vertices are moved back between their neighbours (``_unfold``). Only sub-millimetre changes to the shape."""
+    import bmesh
+    bmesh.ops.remove_doubles(bm, verts=bm.verts[:], dist=0.0004)
+    for _ in range(3):
+        bad = [e for e in bm.edges if len(e.link_faces) > 2]
+        if bad:
+            bmesh.ops.collapse(bm, edges=bad, uvs=False)
+        bmesh.ops.dissolve_degenerate(bm, edges=bm.edges[:], dist=1e-7)
+        if not bad:
+            break
+    bmesh.ops.holes_fill(bm, edges=[e for e in bm.edges if e.is_boundary], sides=4)
+    bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3])
+    bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
+    for _ in range(2):        # on the open edge under the skin, what stays folded is trimmed off
+        edge = [v for v in _unfold(bm) if v.is_valid and v.is_boundary]
+        if not edge:
+            break
+        bmesh.ops.delete(bm, geom=edge, context="VERTS")
+    bm.normal_update()
+
+
+def _unfold(bm, passes=3):
+    """Vertices folded over on the thinnest rims moved back between their neighbours: onto the centre of their ring, or
+    along the open edge under the skin onto the middle of its two neighbours there (only small moves). Returns the
+    vertices still folded."""
+    for k in range(passes + 1):
+        bm.normal_update()
+        folded = []
+        for v in bm.verts:
+            ring = [e.other_vert(v) for e in v.link_edges]
+            nb = sum((w.normal for w in ring), v.normal * 0)
+            if len(ring) < 3 or nb.length < 1e-9 or v.normal.dot(nb) > 0.2 * nb.length:
+                continue
+            folded.append(v)
+            if v.is_boundary:
+                ring = [e.other_vert(v) for e in v.link_edges if e.is_boundary]
+            step = sum((w.co for w in ring), v.co * 0) / len(ring) - v.co
+            if k < passes and abs(step.dot(nb.normalized())) < 0.0005 and step.length < 0.002:
+                v.co = v.co + step
+        if not folded:
+            break
+    return folded
+
+
 class Sculpt:
     def __init__(self, beard, bib=None):
         """``beard`` the layer over the face (beardlocks.Beard), ``bib`` the hanging part's mass (beardbib), if any."""
@@ -88,6 +136,7 @@ class Sculpt:
         me = obj.data
         bm = bmesh.new()
         bm.from_mesh(me)
+        _tidy(bm)
         bm.faces.ensure_lookup_table()
         corners = np.asarray([[v.co[:] for v in f.verts] for f in bm.faces], dtype=F)
         X = np.ascontiguousarray(corners.reshape(-1, 3))
