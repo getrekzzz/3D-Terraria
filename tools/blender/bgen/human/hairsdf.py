@@ -271,7 +271,8 @@ class Sculpt:
         if g.tie is not None:        # hair pulled back thins out over a wider band, to no lip at its edge
             cov = _ss(-0.004, 0.024, X[:, 2] - hairlines(X, g.part, g.sideburns)) * ear_clears(X, 0.5)
         elif g.st.fall:              # and under long hair, so its edge round the face is the locks, not a shell's rim
-            cov = _ss(-0.009, 0.015, X[:, 2] - hairlines(X, g.part, g.sideburns))
+            front = _ss(0.03, 0.07, X[:, 1])        # (but for a crisp line over the forehead)
+            cov = _ss(-0.009, 0.015 - 0.006 * front, X[:, 2] - hairlines(X, g.part, g.sideburns))
         if g.under_hat:
             top = g.top(X)
             cov = cov * _ss(top + 0.015, top - 0.01, X[:, 2])
@@ -282,7 +283,10 @@ class Sculpt:
         # Deep under the skin round the ears, so none shows in the ear canal (long hair lies over them instead); not
         # over the top of the ear, where the hair passing above it would show a trough.
         ear = 0.0 if g.st.fall else (1.0 - ear_clears(X)) * _ss(0.026, 0.01, X[:, 2])
-        return ((g.height(X, 0.0, None) + self.fill) * k - 0.0012 * (1 - k) - 0.012 * ear).astype(F), k
+        # Fuller at the front of the parting under long hair, so its edge there runs on past it in one smooth line.
+        part = np.exp(-((X[:, 0] - g.part_x) / 0.012) ** 2) * _ss(0.03, 0.07, X[:, 1])
+        fill = self.fill + (0.0027 * part if g.st.fall and not g.under_hat else 0.0)
+        return ((g.height(X, 0.0, None) + fill) * k - 0.0012 * (1 - k) - 0.012 * ear).astype(F), k
 
     def _edge(self, x):
         """Where the scalp's locks are cut off along the hairline (a field, < 0 where they may grow), and how far
@@ -333,11 +337,15 @@ class Sculpt:
                 d[near] = dn
             if self.g.under_hat:         # pressed flat inside the hat, so none of it comes through its crown,
                 uh = self.g.under_hat     # and coming out from under its edge no thicker than the hat is there
-                edge = uh.edge_at(x)        # (from the bare skull the hat sits on, not long hair's cover over the ears)
-                bare = skull if not self.g.st.fall else self.g.head.shape.field(x, ears=False, face=False)
+                edge = uh.edge_at(x)        # (inside it from the bare skull the hat sits on; below its edge long hair
+                bare = skull                # from its cover over the ears, so no ear comes through it)
+                if self.g.st.fall:
+                    flat = self.g.head.shape.field(x, ears=False, face=False)
+                    bare = flat + (skull - flat) * _ss(edge + 0.0015, edge - 0.007, x[:, 2])
                 lim = uh.rim_at(x) - 0.0015         # (a cap's shell, unlike a filled hat, may close in above its rim)
                 lim = (lim if uh.filled else np.minimum(lim, 0.0085)) + 0.6 * np.maximum(edge + 0.002 - x[:, 2], 0.0)
-                lim = (lim + _ss(edge - 0.015, edge - 0.035, x[:, 2])).astype(F)    # (not the hair hanging below)
+                lim = lim - 0.004 * _ss(edge - 0.001, edge + 0.003, x[:, 2])    # (and well clear of its wall inside it,
+                lim = (lim + _ss(edge - 0.015, edge - 0.035, x[:, 2])).astype(F)    # no slivers) (not the hair below)
                 dn = sdf.smax(d[near], bare - lim, 0.003)
                 cut[near] *= 1 - 0.85 * _ss(-0.0025, -0.0002, bare - lim - dn)      # (no grooves where pressed flat)
                 d[near] = dn

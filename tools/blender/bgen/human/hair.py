@@ -121,9 +121,11 @@ def ear_cover(shape, slope=0.6):
     return field
 
 
-def _ear_bumps(shape, step=0.002, slope=0.6, margin=0.002):
+def _ear_bumps(shape, step=0.002, slope=0.6, margin=0.002, top=0.015):
     """How far out (along x) the ear stands from the bare skull over a (y, z) grid round it, widened into a dome:
-    every point is at least as high as the ear's rim minus ``slope`` times the distance to it, plus ``margin``."""
+    every point is at least as high as the ear's rim less a fall that curves over gently within ``top`` of it (a
+    rounded crown, so neither the ear's shape nor a plateau over it shows) and slopes off at ``slope`` beyond, plus
+    ``margin``."""
     if not shape.ears:
         return None, step, None
     lo = np.asarray((-0.078, -0.088))
@@ -142,22 +144,20 @@ def _ear_bumps(shape, step=0.002, slope=0.6, margin=0.002):
     skull = outer(shape.field(p, ears=False, face=False))
     b = np.nan_to_num(np.maximum(ear - np.nan_to_num(skull, nan=0.0), 0.0), nan=0.0)
     b = np.where(b > 0.0015, b, 0.0)
-    r = int(min(0.055, float(b.max()) / slope + 0.002) / step)       # as far as the dome reaches
+    r = int(min(0.055, float(b.max()) / slope + top / 2 + 0.002) / step)       # as far as the dome reaches
     dome = b.copy()
     pad = np.pad(b, r)
     for dy in range(-r, r + 1):
         for dz in range(-r, r + 1):
             dist = math.hypot(dy, dz) * step
             if dist <= r * step:
-                dome = np.maximum(dome, pad[r + dy:r + dy + b.shape[0], r + dz:r + dz + b.shape[1]] - slope * dist)
+                fall = slope * (dist * dist / (2 * top) if dist < top else dist - top / 2)
+                dome = np.maximum(dome, pad[r + dy:r + dy + b.shape[0], r + dz:r + dz + b.shape[1]] - fall)
     dome = np.where(dome > 0, dome + margin * _ss(0.0, 0.004, dome), 0.0)
-    pad = np.pad(dome, 3, mode="edge")      # widened first by as much as the smoothing reaches, so it never sinks
-    dome = np.max([pad[3 + a:3 + a + dome.shape[0], 3 + c:3 + c + dome.shape[1]]      # onto the ear's rim and
-                   for a in range(-3, 4) for c in range(-3, 4)], 0)                     # shows its shape
-    for _ in range(3):                       # smoothed so the hair over it has no creases
+    for _ in range(2):                       # smoothed so the hair over it has no creases
         pad = np.pad(dome, 1, mode="edge")
         dome = sum(pad[1 + a:1 + a + dome.shape[0], 1 + c:1 + c + dome.shape[1]] for a in (-1, 0, 1) for c in (-1, 0, 1)) / 9
-    return lo, step, np.maximum(dome, np.where(b > 0, b + 0.0015, 0.0))
+    return lo, step, np.maximum(dome, np.where(b > 0, b + 0.0015, 0.0))    # (never down onto the ear's rim)
 
 
 def mesh_from(bm, name):
