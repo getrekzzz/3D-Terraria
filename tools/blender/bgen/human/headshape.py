@@ -7,7 +7,8 @@ creature.py; the ears in earshape.py. This module puts them together with the ey
 round each eyeball with an almond opening (margins, a crease above, a roll below, the caruncle in the inner corner),
 and the neck meets the jaw with a clean angle in front and widens behind into the base of the skull. Fine cuts (mouth
 line, nostrils, grooves) are placed on the surface the masses make, through anchors found by bisection. Women get larger
-eyes and a slimmer neck; age adds bags under the eyes, hooded lids, a longer nose and ears and a heavier brow.
+eyes and a slimmer neck that slopes out behind into the collar; age adds bags under the eyes, hooded lids, a longer nose
+and ears and a heavier brow.
 
 Creature parameters: noseWidth (1) spreads the nose wider and flatter, an ogre's; mouthWidth (1) widens the mouth
 into a grin, a goblin's; forehead (0..1) lowers and slopes the forehead (faceforms); underbite (0..1) carries the lower
@@ -216,6 +217,8 @@ class HeadShape:
                                          0.0066 - 0.0018 * fem, 0.0055 - 0.0012 * fem), 0.02)
         if not self.snout:  # the nape's muscles widen the neck up into the base of the skull (no egg on a stalk)
             neck = smin(neck, ellipsoid(p, (0, -0.04, -0.09), (0.95 * r, 0.026, 0.05)), 0.025)
+            if fem:     # her slimmer neck's trapezius slopes out into the collar (no sliver of shoulder skin above it)
+                neck = smin(neck, ellipsoid(p, (0, -0.042, -0.165), (1.1 * r, 0.026, 0.04)), 0.02)
         if male and not self.snout:
             neck = smin(neck, E_adam(p, r), 0.012)
         if fat > 0.55:          # a fuller throat under the chin
