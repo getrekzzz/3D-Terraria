@@ -3,13 +3,13 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://toqjl6asat5f"
-path="res://.godot/imported/m_190_undead.glb-617cf8541ece016a767d81155745f0e9.scn"
+uid="uid://cve6dcmogo32g"
+path="res://.godot/imported/m_130_human_l92.glb-e8b2f1f564f1419e6b4ccfe46effe355.scn"
 
 [deps]
 
-source_file="res://assets/models/creatures/anim/m_190_undead.glb"
-dest_files=["res://.godot/imported/m_190_undead.glb-617cf8541ece016a767d81155745f0e9.scn"]
+source_file="res://assets/models/creatures/anim/m_130_human_l92.glb"
+dest_files=["res://.godot/imported/m_130_human_l92.glb-e8b2f1f564f1419e6b4ccfe46effe355.scn"]
 
 [params]
 
