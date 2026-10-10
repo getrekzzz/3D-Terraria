@@ -1,6 +1,6 @@
 {
  "columns": 8,
- "rows": 4,
+ "rows": 5,
  "size": 256,
  "layers": [
   {
@@ -196,8 +196,21 @@
    "mean": 0.8
   },
   {
-   "name": "missing",
+   "name": "copper",
    "index": 31,
+   "type": "metal",
+   "mean": 0.529
+  },
+  {
+   "name": "leaves",
+   "index": 32,
+   "type": "foliage",
+   "sway": 0.012,
+   "mean": 0.533
+  },
+  {
+   "name": "missing",
+   "index": 33,
    "type": "missing",
    "mean": 0.193
   }
