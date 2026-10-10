@@ -132,6 +132,25 @@ class Shop:
         return obj
 
 
+def ball(bm, centre, radius, segs=16, rings=8, axis=(0.0, 0.0, 1.0), flat=1.0):
+    """A UV sphere in ``bm`` (``rings`` bands, ``segs`` round, its poles on ``axis``, squashed to ``flat`` along it),
+    built in a fixed order (bmesh.ops.create_uvsphere's face order changes from run to run). Returns its vertices."""
+    n = Vector(axis).normalized()
+    e1 = n.orthogonal().normalized()
+    e2 = n.cross(e1)
+    c = Vector(centre)
+    rows = [[bm.verts.new(c + n * (radius * flat))] * segs]
+    for i in range(1, rings):
+        th = math.pi * i / rings
+        rows.append([bm.verts.new(c + n * (radius * flat * math.cos(th)) + (e1 * math.cos(2 * math.pi * k / segs) +
+                                  e2 * math.sin(2 * math.pi * k / segs)) * (radius * math.sin(th))) for k in range(segs)])
+    rows.append([bm.verts.new(c - n * (radius * flat))] * segs)
+    for a, b in zip(rows, rows[1:]):                    # (each face wound outward)
+        for k in range(segs):
+            bm.faces.new(tuple(dict.fromkeys((a[k], b[k], b[(k + 1) % segs], a[(k + 1) % segs]))))
+    return list(dict.fromkeys(v for row in rows for v in row))
+
+
 def _cap(bm, centre, radius, c, u, v, inside, rows, segs=64):
     """The part of the sphere (``centre``, ``radius``) where ``inside(direction)`` > 0, round the direction ``c``
     (``u``, ``v`` across it; the part star-shaped round it): rings out to the edge, found along each spoke, so the

@@ -297,6 +297,7 @@ def antennae(head, color):
     import bmesh
     from .features import paint as tint, spline, sweep
     from .garments import mesh_from
+    from .helmets import ball
     from .paint import hex3
     base = hex3(color)
     bm = bmesh.new()
@@ -309,10 +310,9 @@ def antennae(head, color):
             return math.cos(a) * r, math.sin(a) * r
         verts = sweep(bm, path, section, 10, caps=(False, True))
         tint(bm, verts, lambda t, a: tuple(c * (0.55 + 0.5 * t) for c in base))
-        res = bmesh.ops.create_uvsphere(bm, u_segments=12, v_segments=8, radius=0.0062 * h)
-        bmesh.ops.translate(bm, vec=path[-1], verts=res["verts"])
+        tip = ball(bm, path[-1], 0.0062 * h, 12, 8)
         layer = bm.loops.layers.color.get("Color")
-        for f in {f for v in res["verts"] for f in v.link_faces}:
+        for f in dict.fromkeys(f for v in tip for f in v.link_faces):
             for loop in f.loops:
                 loop[layer] = (*(min(1.0, c * 1.25) for c in base), 1.0)
     return mesh_from(bm, "antennae")

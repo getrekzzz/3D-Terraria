@@ -125,13 +125,10 @@ def _hub(shop, c, sx, radius, s):
 
 def _lamp(centre, r, s, color):
     """A small glowing lamp on the brow, above the window."""
+    from .helmets import ball
     d = Vector((0, math.cos(0.72), math.sin(0.72)))
     bm = bmesh.new()
-    res = bmesh.ops.create_uvsphere(bm, u_segments=16, v_segments=8, radius=0.012 * s)
-    bmesh.ops.scale(bm, vec=(1.0, 0.5, 1.0), verts=res["verts"])
-    rot = Vector((0, 1, 0)).rotation_difference(d).to_matrix()
-    bmesh.ops.rotate(bm, verts=res["verts"], cent=(0, 0, 0), matrix=rot)
-    bmesh.ops.translate(bm, vec=centre + d * (r + 0.002 * s), verts=res["verts"])
+    ball(bm, centre + d * (r + 0.002 * s), 0.012 * s, 16, 8, axis=d, flat=0.5)      # (a flat dome facing out)
     layer = bm.loops.layers.color.new("Color")
     for f in bm.faces:
         for loop in f.loops:
