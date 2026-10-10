@@ -1,7 +1,9 @@
 """The Cyborg's head machinery (``implant``: the colour of its light), modelled on the head's own distance field
 (head-local units, see headshape): a metal plate fitted over the right side of the skull from the temple to the back
-of the head, its edge stepped above the ear, split into panels by seams and set with rivets; a bar down the temple
-into a housing that rings the right eye, and a glowing lens domed over the eye. Everything follows the head.
+of the head, its lower edge arching round the ear and running down behind it, bevelled thinner at its rim, split into
+panels by a seam that follows the arch and one up to the crown, set with rivets along the arch and cut with vents
+behind the ear; a bar down the temple into a housing that rings the right eye, and a glowing lens domed over the eye.
+Everything follows the head.
 """
 import math
 
@@ -11,42 +13,71 @@ import numpy as np
 from . import fieldmesh, shellmesh
 from .garments import mesh_from, set_slot
 from .paint import _ensure_layer, hex3
+from .platefit import field_normals
 from .rig import rigid
 from .sdf import F, capsule, carve, smax, smin, sphere
 
-BOUNDS = ((-0.012, -0.135, -0.07), (0.1, 0.105, 0.135))
+BOUNDS = ((-0.012, -0.135, -0.075), (0.105, 0.105, 0.135))
 SOURCES = ("headshape.py", "earshape.py", "creature.py", "implant.py")
-RIVETS = [(0.03, 0.07), (-0.01, 0.075), (-0.05, 0.06), (-0.085, 0.03), (-0.095, -0.01), (0.045, 0.098), (0.0, 0.115)]
+EAR = (-0.0125, -0.016, 0.0295, 0.043)          # the arch round the ear: its centre (y, z) and half-axes, with room
+ARCH = (40, 75, 110, 145, 180, 212)              # rivets along it (degrees from the front, round over the top)
 
 
-def _half(p, n, c):
-    """Signed distance to a plane through ``c`` with outward normal ``n`` (inside where < 0)."""
-    return (p - np.asarray(c, dtype=F)) @ np.asarray(n, dtype=F)
+def _smooth(t):
+    t = np.clip(t, 0, 1)
+    return t * t * (3 - 2 * t)
+
+
+def _arch(p):
+    """Distance outside the arch round the ear (< 0 inside it)."""
+    ye, ze, ay, az = EAR
+    return (np.sqrt(((p[:, 1] - F(ye)) / F(ay)) ** 2 + ((p[:, 2] - F(ze)) / F(az)) ** 2) - F(1)) * F(min(ay, az))
 
 
 def _outline(p):
-    """The plate's outline on the skull: right of a line near the crown, behind the temple, above the ear (and down
-    behind it), with rounded corners."""
+    """The plate's outline on the skull: right of a line near the crown, behind the temple, in front of the nape,
+    above a line low behind the ear and rising in front of it, and clear of the arch round the ear."""
     x, y, z = p[:, 0], p[:, 1], p[:, 2]
     top = F(0.012) - x + F(0.006) * np.clip((y + F(0.02)) / F(0.06), -1, 1)       # the edge over the crown
-    front = y - F(0.062) + F(0.25) * np.maximum(z - F(0.06), F(0))               # behind the temple
-    above_ear = F(0.032) - z
-    behind_ear = F(-0.042) - y
-    lower = np.minimum(above_ear, smax(behind_ear, F(-0.04) - z, 0.004))         # stepped down behind the ear
-    d = smax(smax(top, front, 0.012), lower, 0.008)
-    return d
+    front = y - F(0.056) + F(0.3) * np.maximum(z - F(0.055), F(0))                # behind the temple
+    back = F(-0.094) - y
+    bottom = F(-0.055) + F(0.06) * _smooth((y + F(0.04)) / F(0.05)) - z           # low behind the ear, up in front
+    d = smax(smax(top, front, 0.012), smax(back, bottom, 0.012), 0.012)
+    return smax(d, -_arch(p), 0.006)
+
+
+def _rivets(shape):
+    """Rivet centres on the plate's face: along the arch a little way out from its edge, and down the front edge."""
+    ye, ze, ay, az = EAR
+    yz = [(ye + (ay + 0.0065) * math.cos(math.radians(a)), ze + (az + 0.0065) * math.sin(math.radians(a))) for a in ARCH]
+    yz += [(0.049, 0.018), (0.047, 0.046)]
+    yz = np.asarray(yz, dtype=F)
+    lo, hi = np.zeros(len(yz), dtype=F), np.full(len(yz), 0.12, dtype=F)
+    for _ in range(26):                 # (found along +x from the midline)
+        mid = (lo + hi) * F(0.5)
+        inside = shape.field(np.stack([mid, yz[:, 0], yz[:, 1]], 1), ears=False, face=False) < F(0.0046)
+        lo, hi = np.where(inside, mid, lo), np.where(inside, hi, mid)
+    rivets = np.stack([lo, yz[:, 0], yz[:, 1]], 1)
+    return rivets[(lo > 0.001) & (_outline(rivets) < -0.0035)]          # (only those on the plate)
+
+
+def _seams(p, below):
+    """Grooves (< 0 in them, ``below`` the plate's outer face): one following the arch, one from its top up to the
+    crown, three vents behind the ear."""
+    ye, ze, ay, az = EAR
+    y, z = p[:, 1], p[:, 2]
+    arch = np.abs(_arch(p) - F(0.013)) - F(0.0011)
+    up = smax(np.abs(y - F(ye)) - F(0.0011), F(ze + az + 0.012) - z, 0.0006)
+    d = np.minimum(arch, up)
+    for k in range(3):
+        vent = smax(np.abs(z - F(-0.006 - 0.01 * k)) - F(0.0014), np.abs(y - F(-0.075)) - F(0.011 - 0.002 * k), 0.001)
+        d = np.minimum(d, vent)
+    return smax(d, F(-0.0014) - below, 0.0006)
 
 
 def field(shape):
     eye = np.asarray(shape.eyes[1], dtype=F)
-    lo, hi = np.zeros(len(RIVETS), dtype=F), np.full(len(RIVETS), 0.12, dtype=F)
-    yz = np.asarray(RIVETS, dtype=F)
-    for _ in range(26):                 # the rivets sit on the plate's face (found along +x from the midline)
-        mid = (lo + hi) * F(0.5)
-        inside = shape.field(np.stack([mid, yz[:, 0], yz[:, 1]], 1), ears=False, face=False) < F(0.0042)
-        lo, hi = np.where(inside, mid, lo), np.where(inside, hi, mid)
-    rivets = np.stack([lo, yz[:, 0], yz[:, 1]], 1)
-    rivets = rivets[(lo > 0.001) & (_outline(rivets) < -0.004)]          # (only those on the plate)
+    rivets = _rivets(shape)
     ex, ey, ez = (float(v) for v in eye)                 # the temple bar: from the plate's front edge to the housing
     ends = shape._surface([(0.02, 0.05, 0.034), (ex + 0.0147, ey - 0.03, ez + 0.0103)],
                           [(0.13, 0.05, 0.034), (ex + 0.0147, ey + 0.05, ez + 0.0103)])
@@ -56,10 +87,10 @@ def field(shape):
 
     def f(p):
         skull = shape.field(p, ears=False, face=False)
-        plate = smax(smax(skull - F(0.0042), F(0.0007) - skull, 0.0), _outline(p), 0.0018)
-        for y0, z0 in ((-0.022, None), (None, 0.07)):          # panel seams
-            line = np.abs(p[:, 1] - F(y0)) - F(0.0012) if y0 is not None else np.abs(p[:, 2] - F(z0)) - F(0.0012)
-            plate = smax(plate, -smax(line, F(0.003) - skull, 0.0006), 0.0006)
+        edge = _outline(p)
+        outer = F(0.0034) + F(0.0016) * _smooth(-edge / F(0.009))              # bevelled thinner toward the rim
+        plate = smax(smax(skull - outer, F(0.0007) - skull, 0.0), edge, 0.0016)
+        plate = smax(plate, -_seams(p, skull - outer), 0.0006)
         face = shape.field(p)
         q = p - eye
         rho = np.sqrt(q[:, 0] ** 2 + q[:, 2] ** 2)
@@ -79,15 +110,15 @@ def field(shape):
 def build(head, p):
     """[plate and housing (metal), lens (glow)], placed on the head and bound to it."""
     shape = head.shape
-    obj = fieldmesh.build(field(shape), BOUNDS, 0.00075, 6500, "implant", ("implant", shape.key()), SOURCES, "headwear",
-                          min_piece=60)
+    f = field(shape)
+    obj = fieldmesh.build(f, BOUNDS, 0.00075, 6500, "implant", ("implant", shape.key()), SOURCES, "headwear", min_piece=60)
+    shellmesh.refine(obj, f)                    # (smooth faces shaded from the field)
+    n = field_normals(obj, f)
     shellmesh.place(obj, head)
     me = obj.data
     layer = _ensure_layer(me)
     base = hex3(p.get("armorColor", "#9aa6b2"))
-    n = np.empty(len(me.vertices) * 3, dtype=np.float32)
-    me.vertex_normals.foreach_get("vector", n)
-    k = 0.88 + 0.14 * np.clip(n.reshape(-1, 3)[:, 2], -1, 1)
+    k = 0.88 + 0.14 * np.clip(n[:, 2], -1, 1)
     for loop in me.loops:
         c = tuple(min(1.0, x * k[loop.vertex_index]) for x in base)
         layer.data[loop.index].color_srgb = (*c, 1.0)

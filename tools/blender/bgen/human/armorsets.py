@@ -34,7 +34,7 @@ def martian(sm):
     """Rounded, chunky trooper armour: glossy plates (``armorColor``) with ``trim`` pauldrons and belt."""
     L, trim = sm.limbs["R"], sm.trim
     A.torso(sm, "plate_chest", top=1.44, bottom=1.16, half=0.15, inner=0.006, thick=0.007, notch=(0.07, 0.035),
-            corner=0.06, panel=(0.022, 0.003), slot="char:nail", seams=[("v", 1.235, -0.1, 0.1)],
+            corner=0.06, panel=(0.022, 0.003), slot="char:nail",
             lines=[[(u, 1.212) for u in np.linspace(-0.1, 0.1, 11)]])
     A.torso(sm, "plate_back", top=1.445, bottom=1.17, half=0.15, back=True, inner=0.006, thick=0.007, notch=(0.065, 0.03),
             corner=0.06, panel=(0.022, 0.003), slot="char:nail")
@@ -47,10 +47,10 @@ def martian(sm):
           color=trim, slot="char:metal", lines=[[(0.62, a) for a in np.linspace(-1.6, 1.6, 13)]])
     A.limb(sm, "plate_cuff", L["fore"], 0.5, 0.97, 0.13, L["lateral"], thick=0.007, corner=0.02, slot="char:nail",
            seams=[("v", 0.62, -0.13, 0.13)], lines=[[(u, 0.8) for u in np.linspace(-0.09, 0.09, 9)]])
-    A.limb(sm, "plate_shin", L["shin"], 0.16, 0.82, 0.072, (0.1, 1.0, 0.0), thick=0.007, corner=0.025, slot="char:nail",
-           seams=[("v", 0.5, -0.08, 0.08)], lines=[[(u, 0.32) for u in np.linspace(-0.05, 0.05, 7)]])
+    A.limb(sm, "plate_shin", L["shin"], 0.16, 0.82, 0.16, (0.1, 1.0, 0.0), thick=0.007, corner=0.025, slot="char:nail",
+           seams=[("v", 0.5, -0.16, 0.16)], lines=[[(u, 0.32) for u in np.linspace(-0.05, 0.05, 7)]])   # (all round)
     c, r = L["knee"]
-    A.cap(sm, "plate_knee", c, r, (0.08, 1.0, 0.15), top=1.0, thick=0.007, color=trim, rings=[0.62], stiff=0.4)
+    A.cap(sm, "plate_knee", c, r, (0.08, 1.0, 0.15), top=0.85, thick=0.007, color=trim, rings=[0.55], stiff=0.4)
 
 
 def diver(sm):
@@ -121,8 +121,8 @@ def solar(sm):
                      rings=[1.08], lines=[[(0.75, a) for a in np.linspace(-1.4, 1.4, 11)]], edge=trim)
     bracer = A.limb(sm, "plate_bracer", L["fore"], 0.08, 0.95, 0.13, L["lateral"], thick=0.007, corner=0.02,
                     ridge=(0.006, 0.003), seams=[("v", 0.5, -0.12, 0.12)], edge=trim)
-    greave = A.limb(sm, "plate_greave", L["shin"], 0.08, 0.8, 0.095, (0.1, 1.0, 0.0), thick=0.007, corner=0.025,
-                    ridge=(0.007, 0.003), taper=0.15, lines=[[(-0.028, 0.18), (-0.025, 0.7)], [(0.028, 0.18), (0.025, 0.7)]],
+    greave = A.limb(sm, "plate_greave", L["shin"], 0.08, 0.8, 0.16, (0.1, 1.0, 0.0), thick=0.007, corner=0.025,
+                    ridge=(0.007, 0.003), lines=[[(sx * (0.028 - 0.006 * v), v) for v in np.linspace(0.18, 0.7, 9)] for sx in (-1, 1)],
                     edge=trim)
     kc, kr = L["knee"]
     A.cap(sm, "plate_knee", kc, kr, (0.08, 1.0, 0.15), top=0.7, thick=0.007, seams=[0.4], stiff=0.4)

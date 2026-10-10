@@ -39,7 +39,10 @@ def wear(fr, head, parts, p, garments):
             bpy.data.meshes.remove(old)
             set_slot(o, "char:eye")
             rigid(o, "head")
-        paint(parts["head"], alienhead.paint(head, kind, p.get("skin", "#8ab08a")))
+        skin = alienhead.paint(head, kind, p.get("skin", "#8ab08a"))
+        paint(parts["head"], skin)
+        alienhead.paint_neck(parts["body"], head, skin)
+        alienhead.shade(parts["head"], head)
     if "antennae" in p:
         from . import alienhead
         obj = alienhead.antennae(head, p["antennae"])
@@ -48,9 +51,9 @@ def wear(fr, head, parts, p, garments):
         out.append(obj)
     if not any(k in p for k in ("armor", "helmet", "implant", "jetpack")):
         return out
-    from . import plates
+    from .platefit import Fitter
     worn = [o for o in garments if o.type == "MESH" and o.name.split(".")[0] in WORN]
-    fitter = plates.Fitter(worn + [parts["body"], parts["head"]])
+    fitter = Fitter(worn + [parts["body"], parts["head"]], clothes=worn)
     if "armor" in p:
         from . import armor
         out += armor.build(p["armor"], fr, p, fitter)

@@ -22,6 +22,11 @@ def _seam_lines(u, v, seams, w):
     return out
 
 
+def _ease(t):
+    t = np.clip(t, 0, 1)
+    return t * t * (3 - 2 * t)
+
+
 def _edge_shade(sm, outline, color, edge):
     """Colours shading from ``edge`` at a plate's outline to its own colour a little way in (or None)."""
     if edge is None:
@@ -35,11 +40,13 @@ def _edge_shade(sm, outline, color, edge):
 
 
 def torso(sm, name, top, bottom, half, inner=0.008, thick=0.005, back=False, corner=0.03, notch=None, ridge=None,
-          seams=(), lines=(), color=None, slot="char:metal", mirror=False, centre=0.0, rim=0.0025, panel=None, edge=None):
+          seams=(), lines=(), color=None, slot="char:metal", mirror=False, centre=0.0, rim=0.0025, panel=None, edge=None,
+          armhole=(0.045, 0.11)):
     """A plate on the torso between heights ``bottom`` and ``top`` (frame units), ``half`` its half-width round the
-    body; ``notch`` (half-width, depth) cuts the neckline; ``ridge`` (half-width, height) raises a strip down its
-    middle; ``panel`` (inset, height) raises an inner panel; seams in (u, z) frame units; ``edge``: the colour it
-    shades to at its outline."""
+    body; ``notch`` (half-width, depth) cuts the neckline; ``armhole`` (across, down) scoops its upper corners clear
+    of the arms (on a plate reaching the shoulders); ``ridge`` (half-width, height) raises a strip down its middle;
+    ``panel`` (inset, height) raises an inner panel; seams in (u, z) frame units; ``edge``: the colour it shades to at
+    its outline."""
     s, fr = sm.s, sm.fr
     core = sm.torso
     zc, hz = (top + bottom) / 2 * s, (top - bottom) / 2 * s
@@ -51,18 +58,25 @@ def torso(sm, name, top, bottom, half, inner=0.008, thick=0.005, back=False, cor
             a, b = notch[0] * s, notch[1] * s
             e = (np.sqrt((u / F(a)) ** 2 + ((z - F(top * s)) / F(b)) ** 2) - F(1)) * F(min(a, b))
             d = smax(d, -e, 0.008 * s)
+        if armhole is not None and top > 1.38:
+            a, b = armhole[0] * s, armhole[1] * s
+            for sx in (1, -1):
+                e = (np.sqrt(((u - F(sx * (centre + half) * s)) / F(a)) ** 2 + ((z - F(top * s)) / F(b)) ** 2) - F(1)) * F(a)
+                d = smax(d, -e, 0.01 * s)
         return d
 
     def extra(p, c, d):
         u, z = P.around_torso(fr, p, back=back)
-        if ridge is not None:
-            band = smax(P.shell(c, inner, thick + ridge[1] * s), smax(np.abs(u) - F(ridge[0] * s), outline(p) + F(0.004 * s), 0.002), 0.003)
-            d = smin(d, band, 0.003 * s)
-        if panel is not None:
-            raised = smax(P.shell(c, inner, thick + panel[1] * s), outline(p) + F(panel[0] * s), 0.004 * s)
-            d = smin(d, raised, 0.002 * s)
-        for line in _seam_lines(u, z, [(a, at * s, lo * s, hi * s) for a, at, lo, hi in seams], 0.0014):
-            d = P.groove(d, c, line, inner + thick + (panel[1] * s if panel else 0.0), 0.0015)
+        edge = outline(p)
+        if ridge is not None:              # a keel swelling smoothly down the middle (no edges to catch the light)
+            t = _ease(1 - np.abs(u) / F(2.5 * ridge[0] * s))
+            keel = smax(P.shell(c, inner, thick + F(ridge[1] * s) * t), edge + F(0.004 * s), 0.004 * s)
+            d = smin(d, keel, 0.002 * s)
+        if panel is not None:              # the middle raised over a soft step (a reduced mesh keeps it clean)
+            t = _ease((-edge - F((panel[0] - 0.008) * s)) / F(0.016 * s))
+            d = np.minimum(d, smax(P.shell(c, inner, thick + F(panel[1] * s) * t), edge + F(0.002 * s), 0.002 * s))
+        for line in _seam_lines(u, z, [(a, at * s, lo * s, hi * s) for a, at, lo, hi in seams], 0.002):
+            d = P.groove(d, c, line, inner + thick + (panel[1] * s if panel else 0.0), 0.0012, 0.0012)
         return d
 
     field = P.plate(core, inner * s, thick * s, outline, rim * s, extra=extra)
@@ -75,7 +89,8 @@ def torso(sm, name, top, bottom, half, inner=0.008, thick=0.005, back=False, cor
         ys = 2 * cy - ys[1], 2 * cy - ys[0]
     bounds = ((xs[0], ys[0], bottom * s - 0.03 * s), (xs[1], ys[1], top * s + 0.03 * s))
     objs = sm.make(name, core, field, bounds, color, slot, mirror=mirror, stiff=0.7, key=(sm.torso_key,),
-                   shade=_edge_shade(sm, outline, color, edge))
+                   shade=_edge_shade(sm, outline, color, edge), tuck=(inner * s, outline),
+                   target=3200 if panel or seams else None)          # (more for a panel's step and seams)
     for pts in lines:              # light strips: [(u, z), ...] in frame units
         us, zs = zip(*pts)
         q = P.torso_points(fr, core, np.asarray(us) * s, np.asarray(zs) * s, (inner + thick) * s, back=back)
@@ -119,7 +134,7 @@ def cap(sm, name, centre, radius, axis, top, inner=0.004, thick=0.005, seams=(),
     c = np.asarray(centre)
     bounds = (tuple(c - r), tuple(c + r))
     objs = sm.make(name, core, field, bounds, color, slot, stiff=stiff, key=(radius,),
-                   shade=_edge_shade(sm, outline, color, edge))
+                   shade=_edge_shade(sm, outline, color, edge), tuck=(inner * s, outline))
     for pts in lines:
         dirs = [_dir(axis_n, a, b) for a, b in pts]
         q = P.onto(core, np.asarray([c] * len(dirs)), np.asarray(dirs), (inner + thick) * s)
@@ -151,16 +166,22 @@ def limb(sm, name, seg, v0, v1, half, front, inner=0.004, thick=0.005, corner=0.
          color=None, slot="char:metal", stiff=0.6, rim=0.0025, taper=0.0, keep=None, edge=None):
     """A plate on a limb segment ``seg`` = (a, b, ra, rb) from ``v0`` to ``v1`` along it (fractions), ``half`` its
     half-width round the limb (frame units) centred on the ``front`` direction; ``taper`` narrows it toward v1;
-    seams ("u"/"v", at, lo, hi) with v in fractions; light strips as [(u, v), ...]; mirrored onto the left side."""
+    seams ("u"/"v", at, lo, hi) with v in fractions; light strips as [(u, v), ...]; mirrored onto the left side. A
+    plate wider than the limb's girth wraps all round it, over a core shaped to the clothes (Fitter.fit_wrap)."""
     s = sm.s
     a, b, ra, rb = seg
     a, b = np.asarray(a, dtype=float), np.asarray(b, dtype=float)
     length = float(np.linalg.norm(b - a))
     ref = 0.045 * s
-    fit = sm.fitter.fit_limb(a, b, front, half * s / ref + 0.3, max(0.0, v0 - 0.05), min(1.0, v1 + 0.05), guess=(ra, rb))
-    if fit is not None:                    # just round the clothes under it
-        ra, rb = max(fit[0], 0.02 * s), max(fit[1], 0.015 * s)
-    core = P.limb(a, b, ra, rb)
+    lo_v, hi_v = max(0.0, v0 - 0.05), min(1.0, v1 + 0.05)
+    if half * s / ref > math.pi:           # all round the limb
+        core, fitted, reach = sm.fitter.fit_wrap(a, b, front, lo_v, hi_v, (ra, rb))
+        ra = rb = reach
+    else:
+        fit = sm.fitter.fit_limb(a, b, front, half * s / ref + 0.3, lo_v, hi_v, guess=(ra, rb))
+        if fit is not None:                # just round the clothes under it
+            ra, rb = max(fit[0], 0.02 * s), max(fit[1], 0.015 * s)
+        core, fitted = P.limb(a, b, ra, rb), ""
 
     def outline(p):
         u, v = P.along(p, a, b, front, ref)
@@ -182,8 +203,8 @@ def limb(sm, name, seg, v0, v1, half, front, inner=0.004, thick=0.005, corner=0.
     field = P.plate(core, inner * s, thick * s, outline, rim * s, extra=extra)
     r = max(ra, rb) + (inner + thick + 0.02) * s
     lo, hi = np.minimum(a, b) - r, np.maximum(a, b) + r
-    objs = sm.make(name, core, field, (tuple(lo), tuple(hi)), color, slot, stiff=stiff, keep=keep, key=(ra, rb),
-                   shade=_edge_shade(sm, outline, color, edge))
+    objs = sm.make(name, core, field, (tuple(lo), tuple(hi)), color, slot, stiff=stiff, keep=keep, key=(ra, rb, fitted),
+                   shade=_edge_shade(sm, outline, color, edge), tuck=(inner * s, outline))
     for pts in lines:
         us, vs = zip(*pts)
         q = P.limb_points(core, a, b, np.asarray(us) * s, np.asarray(vs) * length, (inner + thick) * s, front, ref)

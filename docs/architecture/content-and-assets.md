@@ -81,9 +81,11 @@ in its cuffs, collar and boots, patched clothes and a rope belt (`scarecrow.py`,
 
 Machines and aliens (`human/scifi.py`, worn after the clothes) get a grey alien's or an insect's head with big
 glossy eyes and antennae (`alienhead.py`, on the head's distance field), armour plates over a body suit (`plates.py`
-fits each plate's core to the clothes it covers and keeps it off them; `armor.py`, `armorparts.py`, `armorsets.py`
+models each plate as an even shell over a smooth core; `platefit.py` fits the core to the clothes it covers as an
+envelope over their folds, presses the clothes in under the plate rather than denting it, and shades the plate from
+its field so a reduced mesh still reads as hard and smooth; `armor.py`, `armorparts.py`, `armorsets.py`
 lay out the styles with panel seams and glowing strips; `solarblades.py` adds a Selenian's flame blades), a glass
-dome or a diver's helmet on a neck ring, a closed helm with lit eye slits, a cyborg's skull implant and a jetpack
+dome or a diver's helmet on a neck ring (its cross-section swept round the neck, so it is true all the way round), a closed helm with lit eye slits, a cyborg's skull implant and a jetpack
 (`helmets.py`, `diverhelm.py`, `solarhelm.py`, `implant.py`). Glass uses the `char:glass` slot, drawn see-through by
 `shaders/character_glass.gdshader` and left out of the baked occlusion.
 

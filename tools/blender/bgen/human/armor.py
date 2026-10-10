@@ -23,6 +23,7 @@ from mathutils import Vector
 from . import plates as P
 from .garments import mesh_from, set_slot
 from .paint import _ensure_layer, hex3
+from .platefit import field_normals, set_normals
 from .sdf import F
 
 SOURCES = ("armor.py", "armorparts.py", "armorsets.py")
@@ -66,27 +67,35 @@ class Smith:
 
     # ------------------------------------------------------------------ making one plate
     def make(self, name, core, field, bounds, color=None, slot="char:metal", mirror=True, gap=0.0035, stiff=0.6, keep=None,
-             target=None, h=0.001, shade=None, key=()):
+             target=None, h=0.001, shade=None, key=(), tuck=None):
         """Meshes, fits and binds a plate (and its mirror image on the left); returns the objects. ``key``: whatever
-        else its shape depends on (radii fitted to the body). Triangles by the plate's size unless ``target``."""
+        else its shape depends on (radii fitted to the body). Triangles by the plate's size unless ``target``.
+        ``tuck`` = (inner, outline): the clothes are pressed in under it first (Fitter.tuck), so it needs no push."""
         key = tuple(k if isinstance(k, str) else round(float(k), 4) for k in key)
         if target is None:             # (about 900 for a knee cap to 2000 for a breastplate)
             size = sorted(float(b - a) for a, b in zip(*bounds))
             target = int(np.clip(900 + 9000 * size[1] * size[2], 900, 2100))
         obj = P.mesh(field, bounds, name, (self.key, name) + key, SOURCES, h=h, target=target)
-        objs = [(obj, core)]
+        normals = field_normals(obj, field)
+        objs = [(obj, core, normals)]
         if mirror:
-            objs.append((P.mirror(obj, name + "_L"), lambda q, core=core: core(q * np.asarray((-1, 1, 1), dtype=F))))
+            objs.append((P.mirror(obj, name + "_L"), lambda q, core=core: core(q * np.asarray((-1, 1, 1), dtype=F)),
+                         normals * np.asarray((-1, 1, 1))))
         base = color or self.color
-        for o, c in objs:
+        for o, c, n in objs:
+            if tuck is not None:
+                m = np.asarray((1, 1, 1) if o is obj else (-1, 1, 1), dtype=F)
+                side = [b * m for b in (np.asarray(bounds[0]), np.asarray(bounds[1]))]
+                self.fitter.tuck(c, tuck[0] - gap, lambda q, m=m: tuck[1](q * m), (np.minimum(*side), np.maximum(*side)))
             moved = self.fitter.push(o, c, gap)
+            set_normals(o, n)
             print(f"plate {o.name}: {len(o.data.polygons)} tris, pushed out up to {moved * 1000:.1f} mm")
             flip = shade is not None and o is not obj
             self._paint(o, c, base, (lambda q: shade(q * np.asarray((-1, 1, 1), dtype=F))) if flip else shade)
             set_slot(o, slot)
             self.fitter.bind(o, stiff, keep)
             self.out.append(o)
-        return [o for o, _ in objs]
+        return [o for o, _, _ in objs]
 
     def _paint(self, obj, core, base, shade):
         """The plate's colour, a little lighter toward the top and darker on its underside facing the body."""
