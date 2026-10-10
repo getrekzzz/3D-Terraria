@@ -7,20 +7,28 @@ using Strata.Game.World;
 namespace Strata.Game.UI;
 
 /// <summary>
-/// Esc in game: pauses the world and offers Resume, Settings, Save &amp; Exit (to the title screen) and Save &amp; Quit.
-/// Other screens (inventory, dialogs, console) close on Esc first. Pausing stops the whole scene tree, not just the
-/// simulation tick: physics, the player, creatures' animation, particles, the day/night sky, music and every sound in
-/// flight hold where they are and carry on from there on Resume. Only this menu (and its button clicks) keeps running.
+/// Esc in game (or the inventory's 'Settings' button, as in Terraria): pauses the world under a light dim and shows a
+/// centred blue panel of gold-on-hover text buttons: Resume, Settings, Save &amp; Exit to Title and Save &amp; Quit Game.
+/// Other screens (inventory, dialogs, console) close on Esc first; the inventory stays open beneath it. Pausing stops
+/// the whole scene tree, not just the simulation tick: physics, the player, creatures' animation, particles, the
+/// day/night sky, music and every sound in flight hold where they are and carry on from there on Resume. Only this menu
+/// (and its button clicks) keeps running.
 /// </summary>
 public sealed partial class PauseMenu : CanvasLayer
 {
-    private const string Gate = "pause";
+    /// <summary>The input gate it holds while open (a modal).</summary>
+    public const string Gate = "pause";
     private GameServices _services = null!;
     private WorldRuntime _runtime = null!;
     private Control _root = null!;
     private Action _exitToTitle = null!;
 
     public bool IsOpen => _root.Visible;
+
+    /// <summary>
+    /// True while something else keeps the world paused (the inventory with auto-pause), so Resume does not restart it.
+    /// </summary>
+    public Func<bool>? StayPaused { get; set; }
 
     public void Initialize(GameServices services, WorldRuntime runtime, Action exitToTitle)
     {
@@ -30,7 +38,7 @@ public sealed partial class PauseMenu : CanvasLayer
         Name = "PauseMenu";
         Layer = 45;
         ProcessMode = ProcessModeEnum.Always;
-        _root = new ColorRect { Color = new Color(0.02f, 0.03f, 0.06f, 0.6f), Visible = false };
+        _root = new ColorRect { Color = new Color(0f, 0f, 0f, 0.45f), Visible = false };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
     }
@@ -38,7 +46,7 @@ public sealed partial class PauseMenu : CanvasLayer
     public override void _UnhandledInput(InputEvent e)
     {
         if (!e.IsActionPressed("pause") || InputGate.TextEntry) return;
-        if (!IsOpen && InputGate.GameplayBlocked) return; // an inventory or dialog closes itself on Esc
+        if (!IsOpen && InputGate.MouseFree) return; // an inventory, dialog or the map closes itself on Esc
         GetViewport().SetInputAsHandled();
         SetOpen(!IsOpen);
     }
@@ -46,9 +54,9 @@ public sealed partial class PauseMenu : CanvasLayer
     public void SetOpen(bool open)
     {
         _root.Visible = open;
-        _runtime.Simulating = !open;
+        _runtime.Simulating = !open && StayPaused?.Invoke() != true;
         GetTree().Paused = open;
-        InputGate.SetOpen(Gate, open);
+        InputGate.SetOpen(Gate, open, GateKind.Modal);
         if (open) ShowMain();
     }
 
@@ -61,24 +69,24 @@ public sealed partial class PauseMenu : CanvasLayer
     private void ShowMain()
     {
         foreach (var child in _root.GetChildren()) child.QueueFree();
-        var column = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
-        column.AddThemeConstantOverride("separation", 6);
-        column.AddChild(MenuKit.Title("Paused", 54));
-        column.AddChild(MenuKit.Spacer(24));
-        column.AddChild(MenuKit.Big("Resume", () => SetOpen(false), 32));
-        column.AddChild(MenuKit.Big("Settings", ShowSettings, 32));
-        column.AddChild(MenuKit.Big("Save & Exit to Title", () =>
+        var (panel, box) = MenuKit.Panel(new Vector2(440, 0), 4);
+        box.Alignment = BoxContainer.AlignmentMode.Center;
+        box.AddChild(MenuKit.Title("Paused", 44));
+        box.AddChild(MenuKit.Spacer(8));
+        box.AddChild(MenuKit.Big("Resume", () => SetOpen(false), 30));
+        box.AddChild(MenuKit.Big("Settings", ShowSettings, 30));
+        box.AddChild(MenuKit.Big("Save & Exit to Title", () =>
         {
             SetOpen(false);
             _exitToTitle();
-        }, 32));
-        column.AddChild(MenuKit.Big("Save & Quit Game", () =>
+        }, 30));
+        box.AddChild(MenuKit.Big("Save & Quit Game", () =>
         {
             SetOpen(false);
             _runtime.Game.SaveAll();
             GetTree().Quit();
-        }, 32));
-        _root.AddChild(MenuKit.Centered(column));
+        }, 30));
+        _root.AddChild(MenuKit.Centered(panel));
     }
 
     private void ShowSettings()

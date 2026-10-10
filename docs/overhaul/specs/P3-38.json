@@ -1,0 +1,46 @@
+{
+ "id": "P3-38",
+ "title": "Terraria-readable icons: outlines, fuller framing, side-on guns, S-curve whips (sharded full rebuild)",
+ "player_outcome": "Inventory icons read like Terraria sprites: chunky, saturated and outlined, filling the slot on the diagonal. Guns are drawn side-on with the barrel to the right, whips as an S-curve, and spear heads are lit.",
+ "design": [
+  "Verified: render_icon (export.py:65-138) renders 128 px Cycles, 24 samples, no denoise, no outline. Weapons cover 1.7\u20137.7% of the frame. Guns are modelled in the YZ plane with width \u00b10.03 and viewed along +Y (edge-on black sticks).",
+  "'item' view: frame on the rotated diagonal with an icon-only thickness boost (pivot scaled 1.5\u00d7 perpendicular to the blade) so coverage reaches \u2265 20%.",
+  "Render at 256 with denoising and downsample to 128 in Blender (image scale).",
+  "Compositor outline: alpha dilate 3 px (at 256), filled with the item's darkened median (\u00d70.3), alpha-over under the render. Add a top-left rim light and the AgX 'Medium High Contrast' look.",
+  "New bgen/icon_views.py (moved from build_all._view_for): guns, launchers, drills and chainsaws \u2192 'side' view (camera from +X, barrel right-up at 30\u00b0); whips \u2192 'item' with generator param pose 's_curve' (whip lays out an S-curve lash when rendering icons); spears get an extra fill light on the head.",
+  "gear.gun: model the side profile in the XZ plane (grip \u2212X, barrel +Z, depth along Y), or rotate 90\u00b0 about Z at the end. Update sockets. Add style silhouette params: magazine, sights, stock; minishark/megashark shark fin and mouth; star_cannon star muzzle; space_gun ray-gun bulb. Chainsaw and drill get the same axis fix.",
+  "tools/textures/build_icons.py block icons get the same outline (Pillow dilate) for consistency.",
+  "build_all.py --shard=I/N also for item icons, then do the full rebuild of all ~1,554 icons in 4 shards."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/export.py \u2014 framing, 256\u2192128, denoise, outline compositor, rim light, AgX",
+  "tools/blender/build_all.py \u2014 use icon_views; item sharding",
+  "tools/blender/bgen/gear.py \u2014 gun/chainsaw/drill axis and silhouettes; whip s_curve pose",
+  "tools/textures/build_icons.py \u2014 block icon outline",
+  "assets/icons/items/*.png \u2014 full rebuild"
+ ],
+ "files_add": [
+  "tools/blender/bgen/icon_views.py \u2014 view choice per generator"
+ ],
+ "data_changes": [
+  "assets.json gun params: style silhouettes for minishark/megashark/star_cannon/space_gun/flintlock_pistol/boomstick/sniper_rifle"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check",
+  "Throwaway coverage script: mean opaque coverage per generator \u2265 15% (swords/picks/guns)",
+  "Smoke/menu tour PASS (icons load)"
+ ],
+ "verification": [
+  "Contact sheet of 40 representative icons reviewed against Terraria sprites",
+  "Inventory screenshot (lavapipe)"
+ ],
+ "depends_on": [
+  "P3-37",
+  "P3-05"
+ ],
+ "risks": [
+  "Full icon rebuild takes hours on CPU; shard it and use --samples 16 with denoise.",
+  "Gun axis change must keep the socket/grip correct (P3-06 uses sockets, so it stays correct automatically)."
+ ],
+ "effort": "M"
+}

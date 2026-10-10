@@ -1,0 +1,35 @@
+{
+ "id": "P4-26",
+ "title": "Queen Slime takes flight: hops in phase one, flies and slams in phase two",
+ "player_outcome": "Queen Slime hops and bombards you with crystals. At half life she spreads her wings, flies above you raining gel bolts, and crashes down in screen-shaking slams.",
+ "design": [
+  "Data only on top of P4-02.",
+  "queen_slime phase 1: ground; hop \u00d73; wait with a crystal ring volley; summon crystal_slime (plus bouncy_slime and heavenly_slime if they exist, else add them as gel variants).",
+  "Phase 2 (below 0.5): fly true, model queen_slime_winged, moves [hover height 8 with a queen_slime_gel spread volley 90 ticks, slam speed 26 telegraph 30 with a crystal ring volley on impact] \u00d72 then a dash.",
+  "Expert {speed 1.2, volleyCount +2}.",
+  "New hostile projectile queen_slime_gel (pink orb, gravity 4, bounces 1)."
+ ],
+ "files_modify": [
+  "data/enemies/hallow_ocean.json \u2014 queen_slime pattern, projectile, slime variants"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "queen_slime phases as described."
+ ],
+ "tests": [
+  "BossTests.QueenSlimeTakesWingAtHalfLife: UsesGravityFor is false and she holds a height \u2265 5 m above the target.",
+  "BossTests.QueenSlimeSlamsWithAnImpact.",
+  "Smoke bosses.cmds: 'boss queen_slime 12', 'damage queen_slime 9500', 'wait 3', 'assert boss.queen_slime.stage == 1'."
+ ],
+ "verification": [
+  "dotnet test; headless bosses.cmds"
+ ],
+ "depends_on": [
+  "P4-02",
+  "P4-03"
+ ],
+ "risks": [
+  "Flying slams in narrow terrain may bury her. Slam ends on OnGround or Ticks, and teleport stays in the loop."
+ ],
+ "effort": "S"
+}

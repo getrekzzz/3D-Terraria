@@ -1,0 +1,42 @@
+{
+ "id": "P5-05",
+ "title": "Housing assignment API (query, assign, swap, evict) in Core",
+ "player_outcome": "The game can tell you whether a room is suitable and who lives there, move an NPC into a room you choose, swap two NPCs' rooms, or evict an NPC. P5-29 exposes this in the Housing menu; for now it works through the console.",
+ "design": [
+  "New TownSystem.Housing.cs partial. QueryHousing(Int3 cell) returns HousingQuery(Room Room, bool Suitable, string Message, TownNpc? Occupant) through the Rooms cache. The Message is Room.Message, or '<Title> lives here.' when the room is occupied.",
+  "AssignHome(TownNpc npc, Int3 cell) returns AssignResult {Assigned, Swapped, NotSuitable, NotAResident, AlreadyHome} plus a message. It refuses landmark, bound, visitor and pet kinds. If the room is occupied, the occupant takes npc's old home (or becomes homeless) and the result is Swapped. Sets npc.Home, HomeRoom and BannerCell.",
+  "Evict(TownNpc npc) sets Home = null and raises Evicted. The next CheckArrivals may re-house them in any vacant room, as in Terraria.",
+  "TownNpc.BannerCell: the highest interior cell above the home node, used by the P5-29 banners. Recomputed on Load from the cache.",
+  "New Commands/HousingCommands.cs: 'housing query [dx dy dz]', 'housing assign <id> [dx dy dz]', 'housing evict <id>'. New Commands/TownProbes.cs (called from StandardProbes.Register) takes over the town.<id> prefix probe and adds .homed, plus room for .bound/.sitting/.attacks later. This keeps StandardProbes.cs small."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 BannerCell",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 AssignHome(private) renamed SetHome; Load recomputes BannerCell",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 delegate town.* to TownProbes",
+  "src/Strata.Core/Commands/CommandRegistry.cs (or wherever TownCommands.Register is called) \u2014 register HousingCommands"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownSystem.Housing.cs \u2014 Query/Assign/Evict",
+  "src/Strata.Core/Gameplay/Town/HousingQuery.cs \u2014 records and the AssignResult enum",
+  "src/Strata.Core/Commands/HousingCommands.cs \u2014 console and smoke surface",
+  "src/Strata.Core/Commands/TownProbes.cs \u2014 town.<id>.{home,alive,homed}"
+ ],
+ "data_changes": [
+  "data/config/housing.json Messages: add 'occupied' ('This housing is occupied by {name}.') and 'notResident' ('{name} cannot live in a house.')"
+ ],
+ "tests": [
+  "HousingAssignTests: assign the guide to a vacant valid room \u2192 Assigned; assign the merchant to the guide's room \u2192 Swapped, and the guide gets the merchant's old room; assign to an invalid room \u2192 NotSuitable with the problem message; assign old_man \u2192 NotAResident; Evict \u2192 homeless, then CheckArrivals re-houses",
+  "Smoke town.cmds after the guide is housed: 'housing evict guide' / 'assert town.guide.homed == 0' / 'housing assign guide 8 1 0' / 'assert town.guide.homed == 1'"
+ ],
+ "verification": [
+  "dotnet test",
+  "town.cmds SMOKE PASS; the console 'housing query' inside the smoke house prints 'This housing is suitable.'"
+ ],
+ "depends_on": [
+  "P5-02"
+ ],
+ "risks": [
+  "Players may expect an assignment to stay put. Terraria keeps it until the room becomes invalid, and so does this, because CheckHomes keeps valid homes."
+ ],
+ "effort": "S"
+}

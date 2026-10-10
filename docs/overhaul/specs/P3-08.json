@@ -1,0 +1,48 @@
+{
+ "id": "P3-08",
+ "title": "EffectKit: pooled voxel-lit particles, flash-light pool and a preset effects budget",
+ "player_outcome": "Dust, chips, sparks and puffs are lit like the world: dark in caves and warm by torches, never glowing white. Busy fights don't hitch, because effects are pooled, pre-warmed at load and scaled down on lower graphics presets.",
+ "design": [
+  "Verified: CombatEffects.Puff (CombatEffects.cs:74-98) allocates a new CpuParticles3D with an unshaded sphere material per death. BlockEffects pools emitters but uses an unlit StandardMaterial3D with a single colour.",
+  "New game/Rendering/EffectKit.cs (created in WorldLauncher, injected into effect nodes). Recipes: Chips (boxes, gravity, bounce-free), Dust (soft quads), Sparks (stretched additive), Puff (soft, rising), Splash (droplets), Leaves (slow-falling quads).",
+  "EffectKit API: Burst(recipe, position, Color baseColor, int count, float speed, Vector3? dir, float colorVariance). It sets instance voxel_light from LightProbe.Sample at the burst point and uses a ColorRamp between lighter and darker variants.",
+  "Pools per recipe are sized by preset. Count = count \u00d7 EffectsScale; at most 8 bursts started per frame and 600 live particles, with the oldest emitter stolen.",
+  "New shaders/particle_lit.gdshader: vertex colour \u00d7 voxel_light (includes voxel_light.gdshaderinc), optional emission for sparks, particle billboard for quads.",
+  "New game/Rendering/FlashLights.cs: an OmniLight pool (count from preset: low 0, medium 2, high 4, ultra 6). Flash(position, color, energy, range, seconds) with linear decay; the oldest light is stolen.",
+  "Core GraphicsPreset: add EffectsScale (0.4/0.7/1.0/1.2) and FlashLights. Validate EffectsScale 0\u20132 and FlashLights 0\u201316; add the values to data/config/graphics.json.",
+  "Pre-warm: at world start, emit one hidden burst per recipe (so the pipeline compiles during load) and pre-create the pools.",
+  "Migrate BlockEffects bursts and CombatEffects.Puff (liquid mixing steam, items burning) onto EffectKit, with colour variance."
+ ],
+ "files_modify": [
+  "game/Entities/BlockEffects.cs \u2014 use EffectKit chips, lit, colour variance",
+  "game/Entities/CombatEffects.cs \u2014 Puff via EffectKit",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create EffectKit and FlashLights",
+  "src/Strata.Core/Presentation/GraphicsConfig.cs \u2014 EffectsScale, FlashLights and validation",
+  "data/config/graphics.json \u2014 per-preset values",
+  "game/Rendering/GraphicsSettings.cs \u2014 propagate preset changes",
+  "tests/Strata.Core.Tests/Content/GraphicsConfigTests.cs \u2014 range tests",
+  "docs/architecture/rendering.md \u2014 EffectKit and budgets"
+ ],
+ "files_add": [
+  "game/Rendering/EffectKit.cs \u2014 pooled recipe emitters",
+  "game/Rendering/FlashLights.cs \u2014 pooled short-lived lights",
+  "shaders/particle_lit.gdshader \u2014 voxel-lit particle shader"
+ ],
+ "data_changes": [
+  "data/config/graphics.json: effectsScale low 0.4, medium 0.7, high 1.0, ultra 1.2; flashLights 0/2/4/6"
+ ],
+ "tests": [
+  "GraphicsConfigTests: effectsScale out of range \u2192 validation error",
+  "Smoke basic.cmds (mining): errors == 0; liquids.cmds (obsidian steam puff): errors == 0"
+ ],
+ "verification": [
+  "perf start; mine for 5 s; perf report \u2014 gd.effects < 0.3 ms p95 on medium",
+  "Lavapipe screenshot: chips in a dark cave are dark"
+ ],
+ "depends_on": [],
+ "risks": [
+  "CpuParticles3D with instance uniforms: set once per burst (not per frame).",
+  "Overlaps P1's lag work in effects files; coordinate if P1 also pools puffs."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,57 @@
+{
+ "id": "P5-10",
+ "title": "Residents fight back: per-NPC throw/shoot/magic/melee, Nurse heals, Dryad's ward",
+ "player_outcome": "Townsfolk defend themselves as in Terraria. The Guide shoots arrows, the Merchant throws knives, the Demolitionist lobs grenades, the Arms Dealer fires his gun, the Wizard casts, the Nurse heals hurt residents and the Dryad wards nearby allies, each with a matching animation and sound.",
+ "design": [
+  "TownNpcParts.cs: add TownAttack { string Style (throw|shoot|magic|melee|heal|ward), string? Projectile, int Damage, float HardmodeMultiplier = 2, float Knockback, float Speed = 14, float Range = 14 (m), int Interval = 60, int Count = 1, float Spread, string? Buff, int BuffTicks, int Heal }. Add TownNpcDef.Attack.",
+  "Extract lob aiming from NpcSystem.RangedAttack (NpcSystem.Effects.cs:30-33) into a new Gameplay/Combat/Ballistics.Aim(from, to, speed, gravity) and use it from both places.",
+  "New TownSystem.Defense.cs. TickDefense(r) runs for alive, non-bound residents, staggered: (tick + r.Id) % 6 == 0. It keeps a reusable threat buffer and finds the nearest hostile Npc (alive, not a critter) within Range that Npcs.InSight(r.Eye, npc.Center) confirms.",
+  "When a threat is found and r.AttackCooldown == 0, the resident faces it and stops briefly (r.AttackTicks = 20, and Steer returns zero). By style: shoot/throw/magic spawn Projectiles.Spawn(def, eye+dir*0.5, dir*Speed, owner null, dmg, kb, class, 0). The def must be Friendly (validator). Melee calls Npcs.Hit(npc, null, dmg, DamageClass.Melee, 0, kb, r.Center, melee:true) within 1.8 m. Heal targets the most-hurt resident or player within Range: raise its life and fire an event (and Vitals.Heal for the player). Ward applies Buff to players and residents in range while a threat exists. Then set AttackCooldown = Interval and r.Attacks++, and raise ResidentAttacked(r, attack).",
+  "Residents without an attack flee: Steer points away from a threat within 5 m for 60 ticks.",
+  "Presentation: TownRenderer subscribes to ResidentAttacked and plays visual.Humanoid?.Play(clip, 0.4f) with the clip chosen by style (throw\u2192throw, shoot\u2192shoot, magic/heal/ward\u2192cast, melee\u2192swing). SoundEvents: throw\u2192'swing', shoot\u2192'gun'/'bow' by projectile, magic\u2192'magic', heal\u2192'heal'.",
+  "Data (verify on the wiki): guide shoot wooden_arrow 10; merchant throw throwing_knife 12; nurse heal 20 plus throw npc_syringe; demolitionist throw grenade 30; arms_dealer shoot musket_ball 18; dryad ward dryads_ward buff; painter shoot npc_paintball; dye_trader throw npc_dye_splash; angler throw npc_frost_dagger; zoologist melee 16; golfer throw npc_golf_ball; stylist melee 14; goblin throw spiky_ball projectile; witch_doctor shoot npc_dart (poison buff); clothier magic book_skull; mechanic throw npc_wrench; party_girl throw npc_happy_grenade; tavernkeep throw npc_ale; wizard magic spark; truffle shoot npc_mushroom; pirate shoot npc_cannonball; steampunker shoot musket_ball; cyborg shoot rocket_i; santa shoot npc_snowball; princess magic npc_sparkle; tax_collector melee 12; travelling_merchant shoot musket_ball; skeleton_merchant throw npc_bone.",
+  "New friendly projectiles in data/town/projectiles.json use existing 'visual' kinds (bolt/orb/bullet) with colours, so no new GLBs. New buff dryads_ward (defense +, thorns)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 Attack",
+  "src/Strata.Core/Content/Defs/TownNpcParts.cs \u2014 TownAttack",
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 AttackCooldown, AttackTicks, Attacks, FleeTicks",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Movement.cs \u2014 call TickDefense; Steer honours AttackTicks/FleeTicks",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Effects.cs \u2014 use Ballistics",
+  "src/Strata.Core/Content/Validation/ContentValidator.Town.cs \u2014 the attack projectile must exist and be friendly; the buff ref",
+  "src/Strata.Core/Commands/TownProbes.cs \u2014 town.<id>.attacks",
+  "game/Entities/TownRenderer.cs \u2014 action clip on attack",
+  "game/Audio/SoundEvents.cs \u2014 attack sounds",
+  "data/town/*.json \u2014 attack blocks"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownSystem.Defense.cs \u2014 threat scan, attacks, heal/ward",
+  "src/Strata.Core/Gameplay/Combat/Ballistics.cs \u2014 lob aiming shared with creatures",
+  "data/town/projectiles.json \u2014 npc_* friendly projectiles + dryads_ward buff",
+  "tests/Strata.Core.Tests/Gameplay/TownDefenseTests.cs"
+ ],
+ "data_changes": [
+  "attack blocks for all 29 NPCs (above); about 14 new friendly projectiles; buff dryads_ward; manifest regenerated"
+ ],
+ "tests": [
+  "TownDefenseTests.GuideShootsZombie: the guide at the arena centre and a zombie 10 m away (spawner off, player far) \u2192 zombie life decreases and town.guide.attacks > 0",
+  "TownDefenseTests.NoShotsThroughWalls: a stone wall between them \u2192 no attack",
+  "TownDefenseTests.NurseHealsHurtResident: the merchant damaged to 50%, an enemy nearby \u2192 merchant life rises",
+  "TownDefenseTests.DryadWardBuffsPlayer",
+  "Smoke town.cmds: 'town summon guide 3 0 3' / 'summon zombie 12 0 0' / 'wait_until town.guide.attacks > 0 15' / 'killall' (with 'god on' around it)"
+ ],
+ "verification": [
+  "dotnet test; validate",
+  "town.cmds SMOKE PASS",
+  "In game at night: residents fire at approaching zombies, play the throw/shoot/cast clips, and the number and sound feedback shows"
+ ],
+ "depends_on": [
+  "P5-09",
+  "P5-07"
+ ],
+ "risks": [
+  "Friendly projectiles with owner null get no class bonuses, which is intended; check that ProjectileRenderer handles projectiles without an owner.",
+  "Residents may shoot creatures the player wants alive (critters are excluded)."
+ ],
+ "effort": "M"
+}

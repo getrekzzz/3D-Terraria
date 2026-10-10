@@ -7,6 +7,11 @@ using Strata.Core.Session;
 
 namespace Strata.Game.Menu;
 
+/// <summary>
+/// The character creator: a turntable preview beside a form of labelled rows (name, body, hair and clothing styles, colours, difficulty) with a Randomize button.
+/// Each row is one <see cref="MenuKit.Row"/> added to the form, so more options slot in as further rows; every change
+/// calls Refresh to redraw the preview. The character list is MainMenu.CharacterList.cs.
+/// </summary>
 public sealed partial class MainMenu
 {
     private static readonly string[] HairColors = { "#1a1410", "#3b2616", "#5a3a20", "#8a5a30", "#c89050", "#e8d090", "#a0302a", "#d8d8d8", "#6040a0", "#3050c0" };
@@ -19,102 +24,55 @@ public sealed partial class MainMenu
         "Hardcore: death is permanent — the character is lost.",
     };
 
-    private void ShowCharacters()
-    {
-        var (panel, box) = MenuKit.Panel(new Vector2(760, 520));
-        box.AddChild(MenuKit.Title("Select Player", 40));
-        var scroll = new ScrollContainer { CustomMinimumSize = new Vector2(0, 360), SizeFlagsVertical = Control.SizeFlags.ExpandFill };
-        var list = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        list.AddThemeConstantOverride("separation", 8);
-        scroll.AddChild(list);
-        box.AddChild(scroll);
-        var characters = SaveCatalog.Characters(PlayersDirectory, (path, ex) => _services.Log.Error("menu", $"Unreadable character {path}", ex));
-        if (characters.Count == 0) list.AddChild(MenuKit.Text("No characters yet — create one!", 18, MenuKit.Idle));
-        foreach (var c in characters) list.AddChild(CharacterRow(c));
-        var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
-        buttons.AddThemeConstantOverride("separation", 24);
-        buttons.AddChild(MenuKit.Big("Back", ShowTitle, 26));
-        buttons.AddChild(MenuKit.Big("New", ShowCharacterCreate, 26));
-        box.AddChild(buttons);
-        Show(MenuKit.Centered(panel));
-    }
+    private void ShowCharacterCreate() => ShowCharacterCreate(new Appearance(), "", CharacterDifficulty.Classic);
 
-    private Control CharacterRow(CharacterEntry c)
+    /// <summary>Builds the creator around a look; Randomize rebuilds it around a random one so every row shows it.</summary>
+    private void ShowCharacterCreate(Appearance look, string name, CharacterDifficulty difficulty)
     {
-        var (panel, _) = MenuKit.Panel(new Vector2(0, 0), 2);
-        var row = new HBoxContainer();
-        row.AddThemeConstantOverride("separation", 14);
-        panel.GetChild(0).QueueFree();
-        panel.AddChild(row);
-        var preview = new CharacterPreview();
-        preview.Initialize(new Vector2(70, 90));
-        row.AddChild(preview);
-        preview.Show(c.Look);
-        var info = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        info.AddChild(MenuKit.Text(c.Name, 24, MenuKit.Idle));
-        var difficultyColor = c.Difficulty switch
-        {
-            CharacterDifficulty.Mediumcore => new Color(0.7f, 0.6f, 1f),
-            CharacterDifficulty.Hardcore => new Color(1f, 0.4f, 0.35f),
-            _ => new Color(0.8f, 0.85f, 0.9f),
-        };
-        info.AddChild(MenuKit.Text($"{c.Difficulty}   ·   {c.MaxLife} life   ·   {c.MaxMana} mana   ·   {SaveCatalog.PlayTime(c.PlayTicks)} played", 15, difficultyColor));
-        row.AddChild(info);
-        row.AddChild(MenuKit.Small("Play", () =>
-        {
-            _character = c;
-            ShowWorlds();
-        }, 100));
-        row.AddChild(MenuKit.Small("Delete", () => Confirm($"Delete {c.Name}? This cannot be undone.", () =>
-        {
-            SaveCatalog.DeleteCharacter(c.Path);
-            ShowCharacters();
-        }), 100));
-        return panel;
-    }
-
-    private void ShowCharacterCreate()
-    {
-        var look = new Appearance();
-        string name = "";
-        var difficulty = CharacterDifficulty.Classic;
-        var (panel, box) = MenuKit.Panel(new Vector2(980, 0), 8);
-        box.AddChild(MenuKit.Title("Create Player", 40));
+        var (panel, box) = MenuKit.Panel(new Vector2(1000, 0), 6);
+        box.AddChild(MenuKit.Title("Create Player", 38));
         var columns = new HBoxContainer();
         columns.AddThemeConstantOverride("separation", 24);
         box.AddChild(columns);
+        var left = new VBoxContainer();
+        left.AddThemeConstantOverride("separation", 10);
+        columns.AddChild(left);
         var preview = new CharacterPreview();
         preview.Initialize(new Vector2(280, 420));
-        columns.AddChild(preview);
+        left.AddChild(preview);
+        var randomize = MenuKit.Big("Randomize", () => ShowCharacterCreate(Appearance.Random(new Random()), name, difficulty), 24);
+        randomize.Name = "Randomize";
+        left.AddChild(randomize);
         var form = new VBoxContainer { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        form.AddThemeConstantOverride("separation", 8);
+        form.AddThemeConstantOverride("separation", 4);
         columns.AddChild(form);
 
         void Refresh() => preview.Show(look);
-        form.AddChild(MenuKit.Row("Name", MenuKit.Field("", "Enter a name", t => name = t.Trim())));
-        OptionButton? styles = null;
-        form.AddChild(MenuKit.Row("Body", MenuKit.Choice(new[] { "Male", "Female" }, 0, i =>
+        void Colour(string label, string[] presets, string current, Action<string> set) =>
+            form.AddChild(MenuKit.Row(label, MenuKit.Swatches(presets, current, h => { set(h); Refresh(); })));
+        OptionButton Pick(string label, string nodeName, string[] options, string current, Action<string> set)
         {
-            look.Body = Appearance.Bodies[i];
-            look.HairStyle = Appearance.StylesFor(look.Body)[0];
-            styles!.Clear();
-            foreach (var s in Appearance.StylesFor(look.Body)) styles.AddItem(Capital(s));
-            styles.Selected = 0;
-            Refresh();
-        })));
-        styles = MenuKit.Choice(Array.ConvertAll(Appearance.MaleStyles, Capital), 0, i =>
-        {
-            look.HairStyle = Appearance.StylesFor(look.Body)[i];
-            Refresh();
-        });
-        form.AddChild(MenuKit.Row("Hair Style", styles));
-        form.AddChild(MenuKit.Row("Hair Color", MenuKit.Swatches(HairColors, look.HairColor, h => { look.HairColor = h; Refresh(); })));
-        form.AddChild(MenuKit.Row("Skin", MenuKit.Swatches(SkinColors, look.SkinColor, h => { look.SkinColor = h; Refresh(); })));
-        form.AddChild(MenuKit.Row("Shirt", MenuKit.Swatches(ClothColors, look.ShirtColor, h => { look.ShirtColor = h; Refresh(); })));
-        form.AddChild(MenuKit.Row("Pants", MenuKit.Swatches(ClothColors, look.PantsColor, h => { look.PantsColor = h; Refresh(); })));
-        form.AddChild(MenuKit.Row("Shoes", MenuKit.Swatches(ClothColors, look.ShoeColor, h => { look.ShoeColor = h; Refresh(); })));
-        var note = MenuKit.Text(DifficultyNotes[0], 15, new Color(0.8f, 0.85f, 0.95f));
-        form.AddChild(MenuKit.Row("Difficulty", MenuKit.Choice(new[] { "Classic", "Mediumcore", "Hardcore" }, 0, i =>
+            var choice = MenuKit.Choice(Array.ConvertAll(options, Pretty), Math.Max(0, Array.IndexOf(options, current)), i => { set(options[i]); Refresh(); });
+            choice.Name = nodeName;
+            form.AddChild(MenuKit.Row(label, choice));
+            return choice;
+        }
+
+        var nameField = MenuKit.Field(name, "Enter a name", t => name = t.Trim());
+        nameField.Name = "NameField";
+        form.AddChild(MenuKit.Row("Name", nameField));
+        Pick("Body", "Body", Appearance.Bodies, look.Body, v => look.Body = v);
+        Pick("Hair Style", "HairStyle", Appearance.HairStyles, look.HairStyle, v => look.HairStyle = v);
+        Pick("Clothing", "ClothingStyle", Appearance.ClothingStyles, look.ClothingStyle, v => look.ClothingStyle = v);
+        Colour("Hair Color", HairColors, look.HairColor, h => look.HairColor = h);
+        Colour("Eyes", Appearance.EyePalette, look.EyeColor, h => look.EyeColor = h);
+        Colour("Skin", SkinColors, look.SkinColor, h => look.SkinColor = h);
+        Colour("Shirt", ClothColors, look.ShirtColor, h => look.ShirtColor = h);
+        Colour("Undershirt", ClothColors, look.UndershirtColor, h => look.UndershirtColor = h);
+        Colour("Pants", ClothColors, look.PantsColor, h => look.PantsColor = h);
+        Colour("Shoes", ClothColors, look.ShoeColor, h => look.ShoeColor = h);
+        var note = MenuKit.Text(DifficultyNotes[(int)difficulty], 15, new Color(0.8f, 0.85f, 0.95f));
+        form.AddChild(MenuKit.Row("Difficulty", MenuKit.Choice(new[] { "Classic", "Mediumcore", "Hardcore" }, (int)difficulty, i =>
         {
             difficulty = (CharacterDifficulty)i;
             note.Text = DifficultyNotes[i];
@@ -124,7 +82,7 @@ public sealed partial class MainMenu
         var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         buttons.AddThemeConstantOverride("separation", 24);
         buttons.AddChild(MenuKit.Big("Back", ShowCharacters, 26));
-        buttons.AddChild(MenuKit.Big("Create", () =>
+        var create = MenuKit.Big("Create", () =>
         {
             if (name.Length == 0) name = "Player";
             try
@@ -136,7 +94,9 @@ public sealed partial class MainMenu
             {
                 Error("Could not create the character.", ex);
             }
-        }, 26));
+        }, 26);
+        create.Name = "Create";
+        buttons.AddChild(create);
         box.AddChild(buttons);
         Show(MenuKit.Centered(panel));
         Refresh();
@@ -154,4 +114,7 @@ public sealed partial class MainMenu
     }
 
     private static string Capital(string s) => s.Length == 0 ? s : char.ToUpperInvariant(s[0]) + s.Substring(1);
+
+    /// <summary>"side_part" → "Side part".</summary>
+    private static string Pretty(string s) => Capital(s.Replace('_', ' '));
 }

@@ -11,14 +11,30 @@ public sealed class MeshVolume
 {
     public const int N = Neighborhood.Size;
 
-    public MeshVolume(Neighborhood nb, RenderTables tables, ushort[] light)
+    [ThreadStatic] private static MeshVolume? _pooled;
+
+    public MeshVolume(Neighborhood nb, RenderTables tables, ushort[] light) => Reset(nb, tables, light);
+
+    /// <summary>
+    /// This thread's reusable volume, reset for a new neighbourhood (its three 256 KB arrays are allocated once per
+    /// thread instead of once per mesh job). Valid until the next <see cref="Rent"/> on the same thread: meshers only
+    /// read it during the build.
+    /// </summary>
+    public static MeshVolume Rent(Neighborhood nb, RenderTables tables, ushort[] light)
+    {
+        if (_pooled == null) return _pooled = new MeshVolume(nb, tables, light);
+        _pooled.Reset(nb, tables, light);
+        return _pooled;
+    }
+
+    private void Reset(Neighborhood nb, RenderTables tables, ushort[] light)
     {
         Nb = nb;
         Tables = tables;
         Light = light;
-        Opaque = new bool[Neighborhood.Volume];
-        Snap = new bool[Neighborhood.Volume];
-        CrispCell = new bool[Neighborhood.Volume];
+        var opaque = Opaque;
+        var snap = Snap;
+        var crisp = CrispCell;
         var cls = tables.Class;
         for (int i = 0; i < Neighborhood.Volume; i++)
         {
@@ -27,23 +43,23 @@ public sealed class MeshVolume
             bool shaped = nb.HasShapes && nb.Shapes[i] != 0;
             // Natural materials placed by a player render as crisp blocks: what you build stays exact.
             bool placed = nb.HasFlags && (nb.Flags[i] & (byte)CellFlags.PlayerPlaced) != 0 && c == CellClass.Smooth;
-            Opaque[i] = (c == CellClass.Smooth || c == CellClass.Crisp) && !shaped;
-            CrispCell[i] = Opaque[i] && (c == CellClass.Crisp || placed);
-            Snap[i] = CrispCell[i] || c == CellClass.Transparent || shaped;
+            opaque[i] = (c == CellClass.Smooth || c == CellClass.Crisp) && !shaped;
+            crisp[i] = opaque[i] && (c == CellClass.Crisp || placed);
+            snap[i] = crisp[i] || c == CellClass.Transparent || shaped;
         }
     }
 
-    public Neighborhood Nb { get; }
+    public Neighborhood Nb { get; private set; } = null!;
 
     /// <summary>A cell's paint as surface-flag bits (paint index shifted past the crisp bit; 0 when unpainted).</summary>
     public int PaintBits(int index) => Nb.HasFlags ? (Voxels.CellPaint.Of(Nb.Flags[index]) << 1) : 0;
-    public RenderTables Tables { get; }
-    public ushort[] Light { get; }
-    public bool[] Opaque { get; }
-    public bool[] Snap { get; }
+    public RenderTables Tables { get; private set; } = null!;
+    public ushort[] Light { get; private set; } = null!;
+    public bool[] Opaque { get; } = new bool[Neighborhood.Volume];
+    public bool[] Snap { get; } = new bool[Neighborhood.Volume];
 
     /// <summary>Opaque cell rendered with crisp flat faces (built blocks, player-placed natural blocks).</summary>
-    public bool[] CrispCell { get; }
+    public bool[] CrispCell { get; } = new bool[Neighborhood.Volume];
 
     public static int Index(int x, int y, int z) => (y * N + z) * N + x;
 

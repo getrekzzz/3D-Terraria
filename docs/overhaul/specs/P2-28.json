@@ -1,0 +1,39 @@
+{
+ "id": "P2-28",
+ "title": "Reforge slot UI (Goblin Tinkerer)",
+ "player_outcome": "'Reforge' opens your inventory with a 'Place an item here to reforge' slot, the cost in coin colours and a hammer button. Each click clangs, charges you, and the tooltip instantly shows the new prefix.",
+ "design": [
+  "Core TownServices:\n- `ReforgeCost(npc, player, ItemStack stack)` and `Reforge(npc, player, Inventory inv, int slot, out ItemStack result)`.\n- The existing held-item overloads (TownServices.cs:35-58) delegate, so commands and tests are unchanged.\n- Pays from the purse (P2-06). Raises a `Reforged` event.",
+  "New game/UI/Inventory/ServicePanel.cs (reforge mode) in the panel host.\n- A caption, and one ItemSlotView bound to PlayerInventory.Service[0] that accepts Prefixes.CanHave items.\n- A 'Cost: \u2026' line in coin colours, hidden when the slot is empty.\n- A reforge_hammer TextureButton that calls Reforge.\n- Hammer feedback: a new 'reforge' SFX recipe (metallic clang) and a slot Scale 1.1 \u2192 1 tween. The TooltipFollower re-reads the slot.",
+  "`InventoryScreen.OpenService(npc, ServiceMode.Reforge)`, called from the TownDialog Reforge button. Closing the inventory or dialog stows Service[0] to the backpack, dropping it at the feet if full.",
+  "Structure ServicePanel so the NPC phase's Guide 'Help' slot (recipes using an item) can add a mode reusing the P2-18 recipe views."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/TownServices.cs \u2014 slot-based reforge",
+  "game/UI/InventoryScreen.cs \u2014 OpenService, stow the Service slot on close",
+  "game/UI/TownDialog.Services.cs \u2014 Reforge \u2192 OpenService",
+  "tools/audio/sfx_recipes.py \u2014 reforge",
+  "tests/Strata.Core.Tests/Gameplay/TownServicesTests.cs \u2014 slot reforge tests"
+ ],
+ "files_add": [
+  "game/UI/Inventory/ServicePanel.cs",
+  "assets/audio/sfx/reforge.wav (+ .import)"
+ ],
+ "data_changes": [],
+ "tests": [
+  "TownServicesTests: ReforgeWorksOnTheServiceSlot; CostIsZeroForUnprefixableItems; ServiceSlotStowedOnClose (via PlayerInventory helper)",
+  "ui.cmds: `town summon goblin_tinkerer 0 0 -3` / `ui talk goblin_tinkerer` / `give copper_broadsword 1` / `give gold_coin 5` / `ui reforge` (opens the panel) / `invclick backpack <slot> left` / `invclick service 0 left` / `ui reforge hit` / `assert errors == 0` / `ui close`"
+ ],
+ "verification": [
+  "Headless smoke; lavapipe screenshot of the reforge panel"
+ ],
+ "depends_on": [
+  "P2-06",
+  "P2-15",
+  "P2-26"
+ ],
+ "risks": [
+  "P3 replaces the prefix table (Terraria prefixes). The UI reads prefixes generically."
+ ],
+ "effort": "S"
+}

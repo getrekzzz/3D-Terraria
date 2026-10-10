@@ -1,0 +1,51 @@
+{
+ "id": "P3-32",
+ "title": "Treasure bags in Expert/Master (and Expert-only gating fix)",
+ "player_outcome": "In Expert and Master worlds each boss drops its own glowing Treasure Bag. Opening it gives the boss loot plus the Expert-only item. Journey worlds no longer get Expert items.",
+ "design": [
+  "Verified: boss loot drops loose. Expert entries use {type: difficulty, min: 1}, which also passes Journey (Difficulty enum: Classic 0, Expert 1, Master 2, Journey 3); the condition supports max (ConditionCompiler.cs:105-109). No bag items exist.",
+  "BossInfo.Bag (item id) and BossInfo.LooseLoot (optional table id; Terraria keeps potions and hearts outside the bag).",
+  "NpcSystem.Death: if the world difficulty is Expert or Master and Boss.Bag is set (only when the group's last member dies), drop one bag per player (pickup delay 0) plus LooseLoot, instead of rolling Def.Loot. Coins are rolled when the bag opens (the bag uses the boss table).",
+  "Bag items: category container, rarity \u221212, maxStack 999, useStyle holdUp, behaviors consume {loot: <boss table>}. Right-click opening in the inventory is P2's SlotActions rework; until then bags open by using them.",
+  "Loot tables: every expert-only entry becomes {type: difficulty, min: 1, max: 2}.",
+  "Validator: Boss.Bag must be an item with consume.loot; LooseLoot must be a known table.",
+  "Assets: new generator treasure_bag (a tied sack with a boss-coloured band and emblem) in a new tools/blender/bgen/items_misc.py, registered in build_all; assets.json explicit entries per bag; icons rebuilt."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/EnemyDef.cs \u2014 BossInfo.Bag, LooseLoot",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Death.cs \u2014 bag drops",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 bag validation",
+  "data/enemies/bosses.json, mechs.json, deerclops.json, dungeon.json, temple.json, hive.json, hallow_ocean.json, evil.json, underworld.json, lunar.json, invasions.json \u2014 bag and looseLoot on bosses",
+  "data/loot/enemies.json and boss tables inside enemy packs \u2014 expert gating max 2; looseLoot tables (potions)",
+  "tools/blender/build_all.py \u2014 register items_misc generators",
+  "tools/blender/assets.json \u2014 bag items",
+  "data/manifest.json \u2014 add treasure_bags.json"
+ ],
+ "files_add": [
+  "data/items/treasure_bags.json \u2014 ~20 bag items",
+  "tools/blender/bgen/items_misc.py \u2014 treasure_bag generator (+ later misc item generators)",
+  "tests/Strata.Core.Tests/Gameplay/TreasureBagTests.cs \u2014 bag tests"
+ ],
+ "data_changes": [
+  "Bags (Terraria bosses with bags): king_slime, eye_of_cthulhu, eater_of_worlds, brain_of_cthulhu, queen_bee, skeletron, deerclops, wall_of_flesh, queen_slime, the_twins (retinazer/spazmatism share one, dropped once by the group), the_destroyer, skeletron_prime, plantera, golem, duke_fishron, empress_of_light, moon_lord, betsy, dark_mage, ogre",
+  "Ids like king_slime_treasure_bag; names 'Treasure Bag (King Slime)'"
+ ],
+ "tests": [
+  "TreasureBagTests: Expert world \u2014 'slay king_slime' drops one king_slime_treasure_bag and no loose royal_gel; using the bag yields royal_gel and gel",
+  "TreasureBagTests: a Classic world drops loose loot and no bag; a Journey world gets no royal_gel",
+  "TestGame.Create(difficulty: Difficulty.Expert) exists and is used"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate; build_all --check",
+  "Icon review of the bag contact sheet"
+ ],
+ "depends_on": [
+  "P3-19",
+  "P3-31"
+ ],
+ "risks": [
+  "Overlap with P4 (bosses: Skeletron loot, Expert AI, gating) on the same loot tables and boss defs; one of them owns the gating fix \u2014 announce.",
+  "Twins group: drop the bag once, when the group's last member falls."
+ ],
+ "effort": "M"
+}

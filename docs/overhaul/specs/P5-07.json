@@ -1,0 +1,39 @@
+{
+ "id": "P5-07",
+ "title": "Human animation clips: sit, sleep, bound, lie, throw (Blender) and animator states",
+ "player_outcome": "Residents can sit in chairs, sleep in beds, kneel bound, and lie unconscious or asleep, and they throw weapons with a proper overhand motion instead of a gun pose.",
+ "design": [
+  "Verified: HumanoidAnimator.States (HumanoidAnimator.cs:24) is locomotion only, and Clip() falls back to 'idle' for missing clips. motion.py is 339 lines, so the new clips go in a new module.",
+  "New tools/blender/bgen/human/rest_poses.py with pose functions and clips(m) \u2192 {'sit': (4.0, sit), 'sleep': (4.0, sleep), 'bound': (3.0, bound), 'lie': (4.0, lie)}. sit: thighs 90\u00b0 forward, knees 90\u00b0, hips lowered about 0.45 m (a Humanoid.loc offset matching the chair seat), hands on thighs, breathing. sleep: supine (hips rotated 90\u00b0 about the side axis, lowered to the floor), slow breath. bound: kneeling, wrists crossed behind the back, head down, a struggle twitch at t 0.4\u20130.55. lie: on the side, curled (unconscious, sleeping Angler). All loop seamlessly.",
+  "motion.py build(): add clips.update(rest_poses.clips(self)). actions.py: add 'throw' (0.45 s overhand, release at t 0.45) and 'wave' (greeting, 1.0 s) if the item-presentation phase has not already added throw.",
+  "Regenerate every animation set: python3.13 tools/blender/build_all.py --anims --shard=I/4 in 4 parallel runs; commit assets/models/creatures/anim/*.glb and index.json.",
+  "HumanoidAnimator: States += sit, sleep, bound, lie; Looping += the same; Actions += throw, wave. Change the Clip() fallback for actions to 'swing' so a missing throw clip still animates.",
+  "CreatureVisual: no change (Play(state) already routes locomotion states)."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/human/motion.py \u2014 register rest_poses clips",
+  "tools/blender/bgen/human/actions.py \u2014 throw, wave",
+  "game/Rendering/HumanoidAnimator.cs \u2014 new states and actions, action fallback",
+  "assets/models/creatures/anim/*.glb \u2014 regenerated"
+ ],
+ "files_add": [
+  "tools/blender/bgen/human/rest_poses.py \u2014 sit/sleep/bound/lie pose functions"
+ ],
+ "data_changes": [
+  "none"
+ ],
+ "tests": [
+  "tools/blender/build_all.py --check still passes",
+  "Animation tour game/Testing/Tours/animation.cmds: after the existing shots, 'town summon guide 3 0 3' / 'town pose guide sit' (debug command from P5-08) / 'screenshot r_sit' and the same for bound/sleep. Run locally with lavapipe; CI runs it on main only."
+ ],
+ "verification": [
+  "python3.13 tools/blender/preview.py <guide model> with the clip sheet for sit/sleep/bound/throw (Workbench contact sheet) shows correct poses without limb clipping",
+  "Godot import (--headless --import) has no errors; the animation tour screenshots look right"
+ ],
+ "depends_on": [],
+ "risks": [
+  "The item-presentation phase also edits HumanoidAnimator.cs and actions.py (clip timing, the throw clip). Coordinate: whichever lands second rebases, and the anim sets are regenerated once at the end.",
+  "Regenerating all sets takes minutes and produces large binary diffs."
+ ],
+ "effort": "M"
+}

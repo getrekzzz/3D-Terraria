@@ -1,0 +1,31 @@
+{
+ "id": "X-04",
+ "title": "Gamepad/controller support with aim assist and full UI navigation",
+ "owner_session": "main",
+ "player_outcome": "The whole game plays on a controller: twin-stick movement and camera, triggers for use/interact, bumpers for hotbar, aim assist on enemies, a radial or focus-based inventory/crafting/chest/shop/guide navigation, rebinding for pads, and button prompts that switch between keyboard and pad icons.",
+ "design": [
+  "Joypad bindings in data/config/input.json + InputSetup; KeyBindings rebinding UI supports pads; analog look with curves/deadzones in UserSettings; aim assist (slow-down + slight magnetism to EntityPicking targets, off by default for mouse); focus navigation across every game/UI panel (FocusNeighbour/grab_focus), cursor emulation for slot grids; glyph set for prompts (generated sprites).",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "data/config/input.json",
+  "game/Bootstrap/InputSetup.cs",
+  "game/Settings/*",
+  "game/UI/*",
+  "game/Player/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "InputConfig validation tests; aim-assist math tests in Core"
+ ],
+ "verification": [
+  "ui.cmds navigates inventory/crafting/shop via simulated joypad events"
+ ],
+ "depends_on": [
+  "P2-31",
+  "P5-32"
+ ],
+ "risks": [],
+ "effort": "L"
+}

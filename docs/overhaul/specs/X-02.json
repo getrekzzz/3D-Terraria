@@ -1,0 +1,33 @@
+{
+ "id": "X-02",
+ "title": "Boss intro card, arena framing, victory sting, per-boss themes",
+ "owner_session": "main",
+ "player_outcome": "Every boss arrival feels like an event: a brief cinematic camera pull-back/letterbox, a big title card with the boss name and a subtitle (e.g. 'SKELETRON \u2014 Curse of the Old Man'), the boss's own music theme, screen shake; on defeat a victory sting, slow-mo moment and the title card fading 'DEFEATED'.",
+ "design": [
+  "Data: optional `intro` block on boss defs (subtitle, card colour, camera framing distance, letterbox seconds) in data/enemies/*.json.",
+  "Engine: BossIntro overlay (uses the P2 theme/font), CameraRig framing that never takes control away for more than ~1.5 s and can be skipped, CameraShake punch, MusicDirector per-boss theme mapping (compose distinct themes for King Slime, Eye, Eater/Brain, Skeletron, Queen Bee, Wall of Flesh, mechs, Plantera, Golem, Duke, Empress, Moon Lord with tools/audio composer variations), victory sting + 0.4 s time-scale dip.",
+  "Consumes the bosses session's P4-03 announcement events; no duplicate messages in the chat log.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "game/UI/* (new BossIntro.cs)",
+  "game/Player/CameraRig.cs",
+  "game/Audio/MusicDirector.cs",
+  "tools/audio/*",
+  "data/enemies/*.json"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "BossIntroModel tests (timings, skip)"
+ ],
+ "verification": [
+  "bosses.cmds probes boss.intro_active / music.track"
+ ],
+ "depends_on": [
+  "P2-23",
+  "P4-03"
+ ],
+ "risks": [],
+ "effort": "M"
+}

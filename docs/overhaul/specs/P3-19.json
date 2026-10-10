@@ -1,0 +1,56 @@
+{
+ "id": "P3-19",
+ "title": "Creature materials: per-creature hit/death sounds and hit dust (blood, gel, bone, sparks)",
+ "player_outcome": "Every creature sounds and bleeds like what it is: slimes squish and spray gel in their own colour, skeletons clack and shed bone chips, mechs clang and spark, zombies spill blood, plants shed leaves. Damage-over-time ticks no longer spam hit sounds.",
+ "design": [
+  "Verified: SoundEvents.cs:141 plays 'hit' for every creature. Death is a hard-coded switch (:145). EnemyDef.HitSound/DeathSound are unused. The DoT tick (NpcSystem.cs:161) raises a normal DamageEvent. hit_squish is unused.",
+  "Pre-split: move NpcSystem.Kill (with drops/coins) and the DoT block into a new NpcSystem.Death.cs; NpcSystem.cs is at 378 lines.",
+  "Add Dictionary<long, Npc> ById maintained on Spawn/Remove and a Find(id) method.",
+  "DamageEvent gains NpcId (long, default 0) and Kind (DamageKind: Hit | Periodic | Player | Heal | Mana). The DoT tick sends Periodic; ReportPlayerDamage sends Player.",
+  "EnemyDef.Material (string, default 'flesh').",
+  "New data/config/creature_materials.json. Each material (flesh, gel, bone, metal, plant, stone, spirit, chitin) has hitSound, deathSound, dust {recipe: Chips/Dust/Sparks/Leaves, color, useTint}, gore {pieces, color, shape}. A Core Presentation/CreatureMaterialsConfig.cs loads and validates it (every enemy material exists; recipes known) from ValidateCommand and GameRoot.",
+  "New game/Audio/SoundEvents.Creatures.cs: on a Hit event with an NpcId, play Def.HitSound ?? material.hitSound at the position (throttled 45 ms per material); skip Periodic. On Killed, play Def.DeathSound ?? material.deathSound (bosses +4 dB). The hard-coded switch is removed.",
+  "New game/Entities/CombatEffects.Dust.cs: on a Hit, EffectKit.Burst(material recipe, npc centre biased toward the attacker, colour = useTint ? Def.Tint : material colour, count = min(12, 4 + dmg/10) \u00d7 EffectsScale).",
+  "Data pass (scripted in-session): set 'material' on all 225 enemies from their model (gel/king_slime/queen_slime \u2192 gel; skeleton/cursed_skull/skeletron*/bone models \u2192 bone; probe/mech/martian/destroyer/prime \u2192 metal; man_eater/plantera/mourning_wood/everscream \u2192 plant; granite/golem \u2192 stone; wraith/ghost/pixie/dungeon_spirit \u2192 spirit; hornet/beetle/antlion/moth \u2192 chitin; else flesh). Review bosses by hand."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs \u2014 extract death/DoT; ById map; DamageEvent fields",
+  "src/Strata.Core/Content/Defs/EnemyDef.cs \u2014 Material",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Combat.cs \u2014 DamageEvent construction if used",
+  "game/Audio/SoundEvents.cs \u2014 remove hit/death lambdas",
+  "game/Entities/CombatEffects.cs \u2014 construct with kit; Kind-aware numbers (Periodic smaller)",
+  "tools/Strata.Tools/Commands/ValidateCommand.cs \u2014 validate creature_materials.json",
+  "game/Bootstrap/GameRoot.cs \u2014 boot validation",
+  "data/enemies/*.json \u2014 material per enemy"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Death.cs \u2014 Kill, drops, DoT",
+  "src/Strata.Core/Presentation/CreatureMaterialsConfig.cs \u2014 config model and validation",
+  "data/config/creature_materials.json \u2014 per-material sounds/dust/gore",
+  "game/Audio/SoundEvents.Creatures.cs \u2014 creature hit/death sounds",
+  "game/Entities/CombatEffects.Dust.cs \u2014 hit dust bursts",
+  "tests/Strata.Core.Tests/Gameplay/CreatureMaterialTests.cs \u2014 event/config tests"
+ ],
+ "data_changes": [
+  "'material' on every enemy in data/enemies/*.json",
+  "creature_materials.json sounds: flesh hit/npc_death; gel hit_squish/slime_death; bone hit_bone/death_bone; metal hit_metal/death_metal; plant dig_grass/break_grass; stone dig_stone/break_stone; spirit hit_spirit/death_spirit; chitin hit_chitin/death_chitin (new ids synthesised in P3-27; falls back to 'hit' until then via Sfx.Has)"
+ ],
+ "tests": [
+  "CreatureMaterialTests: burning NPC DoT raises DamageEvent Kind Periodic with NpcId; a melee hit raises Kind Hit with NpcId",
+  "CreatureMaterialTests: validator errors on an unknown material; every shipped enemy's material resolves",
+  "Existing CombatTests stay green; smoke combat.cmds PASS"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate",
+  "Lavapipe: hitting green_slime shows green gel chips; skeleton shows ivory chips",
+  "Audio check: 'audio test' engine command plays the material sounds"
+ ],
+ "depends_on": [
+  "P3-08"
+ ],
+ "risks": [
+  "DamageEvent is a positional record struct; add the new fields as optional trailing parameters to keep call sites compiling.",
+  "NpcSystem is also edited by P4 (boss parts, AI); do the extraction first and announce it."
+ ],
+ "effort": "M"
+}

@@ -27,6 +27,13 @@ public enum ItemAction
     Release = 1 << 15,
     Mount = 1 << 16,
     Paint = 1 << 17,
+    Ride = 1 << 18,
+
+    /// <summary>A whip's lash (P3-14).</summary>
+    Whip = 1 << 19,
+    PlantGrass = 1 << 20,
+    License = 1 << 21,
+    HairDye = 1 << 22,
 }
 
 /// <summary>Resolved use information for one item: inferred actions plus parsed behaviour parameters.</summary>
@@ -36,9 +43,13 @@ public sealed class ItemUseInfo
 
     public ItemDef Item { get; }
     public ItemAction Actions { get; internal set; }
+
+    /// <summary>How the item is used on screen: its data style, or one inferred from its stats (<see cref="UseStyleRules"/>).</summary>
+    public UseStyle Style { get; internal set; }
     public MeleeSwingParams? Swing { get; internal set; }
     public ThrustParams? ThrustParams { get; internal set; }
     public ShootProjectileParams? Shoot { get; internal set; }
+    public WhipParams? Whip { get; internal set; }
     public ConsumeParams? Consume { get; internal set; }
     public SummonBossParams? Summon { get; internal set; }
 
@@ -57,7 +68,18 @@ public sealed class ItemUseInfo
     public BugNetParams? BugNet { get; internal set; }
     public ReleaseCritterParams? Release { get; internal set; }
     public MinecartParams? Minecart { get; internal set; }
+
+    /// <summary>A mount summoned by this item (<see cref="ItemAction.Ride"/>).</summary>
+    public Mounts.MountParams? Ride { get; internal set; }
     public PaintToolParams? Painting { get; internal set; }
+    public PlantGrassParams? Garden { get; internal set; }
+    public LicenseParams? License { get; internal set; }
+
+    /// <summary>Hair dye this item applies when used.</summary>
+    public HairDyeParams? HairDye { get; internal set; }
+
+    /// <summary>Fishing bait (worms, fireflies, Master Bait).</summary>
+    public BaitParams? Bait { get; internal set; }
 
     /// <summary>Boss this bait hooks (Truffle Worm).</summary>
     public BaitSummonParams? BaitSummon { get; internal set; }
@@ -79,8 +101,9 @@ public sealed class ItemUseInfo
 }
 
 /// <summary>
-/// Resolves every item's use actions once. Actions are inferred from item stats (pick power, place targets,
-/// projectiles, healing) so data does not repeat itself; explicit <c>behaviors</c> add or tune actions.
+/// Resolves every item's use actions once. Actions are inferred from item stats (pick power, place targets) and the
+/// use style (a swing hits, a bow shoots, a potion is drunk: <see cref="UseStyleRules"/>) so data does not repeat
+/// itself; explicit <c>behaviors</c> add or tune actions.
 /// </summary>
 public sealed class ItemUseTable
 {
@@ -111,9 +134,8 @@ public sealed class ItemUseTable
         if (item.PickPower > 0) a |= ItemAction.Mine;
         if (item.AxePower > 0) a |= ItemAction.Chop;
         if (item.HammerPower > 0) a |= ItemAction.Hammer;
-        if (item.UseStyle == UseStyle.Swing && item.Damage > 0) a |= ItemAction.Melee;
-        if (item.UseStyle == UseStyle.Thrust && item.Damage > 0) a |= ItemAction.Thrust;
-        if (item.UseStyle == UseStyle.Shoot && (item.Projectile != null || item.UseAmmo != null)) a |= ItemAction.Shoot;
+        info.Style = UseStyleRules.Resolve(item);
+        a |= UseStyleRules.Implied(info.Style, item); // a sword's swing hits, a gun shoots, a potion is drunk
         if (item.PlaceBlock != null && content.Blocks.TryGet(item.PlaceBlock, out var block))
         {
             a |= ItemAction.PlaceBlock;
@@ -124,7 +146,6 @@ public sealed class ItemUseTable
             a |= ItemAction.PlaceObject;
             info.Object = obj;
         }
-        if (item.UseStyle == UseStyle.Consume || item.HealLife > 0 || item.HealMana > 0 || item.Buff != null) a |= ItemAction.Consume;
         if (item.Projectile != null && content.Projectiles.TryGet(item.Projectile, out var proj)) info.Projectile = proj;
 
         foreach (var spec in item.Behaviors)
@@ -134,6 +155,7 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.MeleeSwing: a |= ItemAction.Melee; info.Swing = spec.Parse<MeleeSwingParams>(); break;
                 case ItemBehaviorSpecs.Thrust: a |= ItemAction.Thrust; info.ThrustParams = spec.Parse<ThrustParams>(); break;
                 case ItemBehaviorSpecs.ShootProjectile: a |= ItemAction.Shoot; info.Shoot = spec.Parse<ShootProjectileParams>(); break;
+                case ItemBehaviorSpecs.Whip: a |= ItemAction.Whip; info.Whip = spec.Parse<WhipParams>(); break;
                 case ItemBehaviorSpecs.MineTool: a |= ItemAction.Mine; break;
                 case ItemBehaviorSpecs.ChopTool: a |= ItemAction.Chop; break;
                 case ItemBehaviorSpecs.HammerTool: a |= ItemAction.Hammer; break;
@@ -159,17 +181,23 @@ public sealed class ItemUseTable
                 case ItemBehaviorSpecs.Grapple: a |= ItemAction.Grapple; info.Grapple = spec.Parse<GrappleParams>(); break;
                 case ItemBehaviorSpecs.Fishing: a |= ItemAction.Fish; info.Fishing = spec.Parse<FishingParams>(); break;
                 case ItemBehaviorSpecs.BaitSummon: info.BaitSummon = spec.Parse<BaitSummonParams>(); break;
+                case ItemBehaviorSpecs.Bait: info.Bait = spec.Parse<BaitParams>(); break;
                 case ItemBehaviorSpecs.Wiring: a |= ItemAction.Wire; info.Wiring = spec.Parse<WiringParams>(); break;
                 case ItemBehaviorSpecs.BugNet: a |= ItemAction.Net; info.BugNet = spec.Parse<BugNetParams>(); break;
                 case ItemBehaviorSpecs.ReleaseCritter: a |= ItemAction.Release; info.Release = spec.Parse<ReleaseCritterParams>(); break;
                 case ItemBehaviorSpecs.Minecart: a |= ItemAction.Mount; info.Minecart = spec.Parse<MinecartParams>(); break;
+                case ItemBehaviorSpecs.Mount: a |= ItemAction.Ride; info.Ride = spec.Parse<Mounts.MountParams>(); break;
                 case ItemBehaviorSpecs.PaintTool: a |= ItemAction.Paint; info.Painting = spec.Parse<PaintToolParams>(); break;
+                case ItemBehaviorSpecs.PlantGrass: a |= ItemAction.PlantGrass; info.Garden = spec.Parse<PlantGrassParams>(); break;
+                case ItemBehaviorSpecs.License: a |= ItemAction.License; info.License = spec.Parse<LicenseParams>(); break;
+                case ItemBehaviorSpecs.HairDye: a |= ItemAction.HairDye; info.HairDye = spec.Parse<HairDyeParams>(); break;
                 default: throw new InvalidOperationException($"Item '{item.Id}' has unknown behaviour '{spec.Type}' (validator should have rejected it).");
             }
         }
         if ((a & ItemAction.Melee) != 0) info.Swing ??= new MeleeSwingParams { Type = ItemBehaviorSpecs.MeleeSwing };
         if ((a & ItemAction.Thrust) != 0) info.ThrustParams ??= new ThrustParams { Type = ItemBehaviorSpecs.Thrust };
         if ((a & ItemAction.Shoot) != 0) info.Shoot ??= new ShootProjectileParams { Type = ItemBehaviorSpecs.ShootProjectile };
+        if ((a & ItemAction.Whip) != 0) info.Whip ??= new WhipParams { Type = ItemBehaviorSpecs.Whip };
         if ((a & ItemAction.Consume) != 0) info.Consume ??= new ConsumeParams { Type = ItemBehaviorSpecs.Consume };
         info.Actions = a;
         return info;

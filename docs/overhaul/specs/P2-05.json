@@ -1,0 +1,59 @@
+{
+ "id": "P2-05",
+ "title": "Core slot model: coins, ammo, saved trash, vanity, dyes, misc (pet, light pet, minecart, mount, hook), 7 accessory slots, favourites. Shared contract with P3",
+ "player_outcome": "The character gains Terraria's full storage:\n- 4 coin slots and 4 ammo slots.\n- A trash slot that survives quitting.\n- Vanity and dye slots for armor and accessories.\n- Pet, light pet, minecart, mount and hook slots.\n- A 6th accessory slot in Expert worlds and a 7th in Master.\n- Favourited items that stay favourited.",
+ "design": [
+  "EquipSlot enum (ItemDef.cs) gains Pet, LightPet, Minecart, Mount and Hook; JSON is camelCase ('lightPet'). New src/Strata.Core/Gameplay/Items/MiscSlot.cs: `enum MiscSlot { Pet, LightPet, Minecart, Mount, Hook }`, whose values are the Misc indices.",
+  "ItemStack gains `bool Favorite`: an optional ctor parameter, preserved by WithCount, set by WithFavorite(bool), and included in Equals and GetHashCode. CanStackWith ignores it. Inventory.Add builds new stacks without the flag, so items entering chests drop it, as in Terraria.",
+  "Split PlayerInventory into three partial files. PlayerInventory.cs keeps the storages, Select, Held and Cursor:\n- Backpack 50, Coins 4, Ammo 4, Trash 1.\n- Armor 3, Accessories 7 (MaxAccessorySlots), VanityArmor 3, VanityAccessories 7.\n- Dyes 10: 0\u20132 for armor, 3\u20139 for accessories.\n- Misc 5, MiscDyes 5.\n- Service 1: the reforge/guide slot, stowed when a service closes.",
+  "PlayerInventory.Equipment.cs:\n- `AccessorySlotsUnlocked` (5..7) and `HiddenAccessories` (int bitmask).\n- `EquippedStacks` = Armor plus Accessories[0..Unlocked). Vanity, dyes and misc grant no stats.\n- `EquippedHook`, `EquippedMount`, `EquippedPet`, `EquippedLightPet` and `EquippedMinecart` read Misc[...].\n- `CompleteSet` is unchanged.\n- `EquipFrom(Inventory from, int slot)` routes by type: armor goes to Armor, or VanityArmor when Category is Vanity; accessories go to the first empty unlocked slot, otherwise swap with a rotating `_nextAccessorySwap`; Category Dye goes to the first empty Dyes slot; misc items go to Misc[slot].\n- Raises an `EquipmentChanged` event.\n- Static filters: ArmorFilter, AccessoryFilter (no duplicate functional accessories), DyeFilter, MiscFilter(MiscSlot).",
+  "PlayerInventory.Storage.cs:\n- `AllStorages` (used for death drops and clearing).\n- `CountAll(ItemDef)` over Backpack, Coins and Ammo.\n- `Resolve(SlotArea)`: the SlotArea enum is added here and reused by P2-07.",
+  "PlayerState: subscribe to Inventory.EquipmentChanged in the ctor and call Recompute. The UI wiring at InventoryScreen.cs:100-101 then becomes unnecessary, and hidden changes (commands, death) recompute too.",
+  "Accessory slots unlock with world difficulty. New partial src/Strata.Core/Session/GameWorld.Players.cs takes the moved AddPlayer and sets `AccessorySlotsUnlocked = 5 + (Difficulty >= Expert ? 1 : 0) + (Difficulty >= Master ? 1 : 0)`. P3 can add the Demon Heart flag later. Moving AddPlayer and SpawnPositionFor there also frees lines in GameWorld.cs (currently 387).",
+  "GameWorld.Death.cs: Mediumcore and Hardcore drops iterate `inv.AllStorages`.",
+  "Save (PlayerSave.cs):\n- New lists: Coins, Ammo, Trash, VanityArmor, VanityAccessories, Dyes, Misc, MiscDyes, Service. Also `int HiddenAccessories`.\n- SlotModel becomes `(int Slot, string Item, int Count, string? Prefix, bool Favorite = false)`, with Favorite omitted when false (JsonIgnore WhenWritingDefault).\n- Additive with defaults, so no version bump; older player files load unchanged.",
+  "Probes (StandardProbes.cs): `inv.<id>` uses CountAll. New `inv.trash` (count in Trash) and `inv.cursor` (cursor count).",
+  "Hooks become equipment:\n- Add `\"equipSlot\": \"hook\"` to the 9 hooks in data/items/mobility.json.\n- Validator: Category hook, mount, minecart or pet requires the matching equipSlot.\n- P3 switches PlayerController.Grapple from 'best hook carried' to EquippedHook, with the carried hook as fallback."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 EquipSlot values",
+  "src/Strata.Core/Gameplay/Items/ItemStack.cs \u2014 Favorite",
+  "src/Strata.Core/Gameplay/Items/PlayerInventory.cs \u2014 storages (split into partials)",
+  "src/Strata.Core/Gameplay/Player/PlayerState.cs \u2014 recompute on EquipmentChanged",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 AddPlayer and SpawnPositionFor moved to GameWorld.Players.cs",
+  "src/Strata.Core/Session/GameWorld.Death.cs \u2014 AllStorages",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 new slot lists, favourites, hidden mask",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 inv.* counts all storages; inv.trash; inv.cursor",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 misc category \u21d2 equipSlot",
+  "game/UI/InventoryScreen.cs \u2014 use PlayerInventory.Trash; drop the UI-side Recompute hooks; MaxAccessorySlots rename (temporary)",
+  "data/items/mobility.json \u2014 equipSlot hook on 9 hooks",
+  "docs/architecture/persistence.md \u2014 player save fields"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Items/MiscSlot.cs \u2014 MiscSlot enum",
+  "src/Strata.Core/Gameplay/Items/PlayerInventory.Equipment.cs \u2014 equip/vanity/dye/misc logic, filters",
+  "src/Strata.Core/Gameplay/Items/PlayerInventory.Storage.cs \u2014 AllStorages, CountAll, SlotArea resolve",
+  "src/Strata.Core/Session/GameWorld.Players.cs \u2014 AddPlayer (accessory unlock), SpawnPositionFor",
+  "tests/Strata.Core.Tests/Gameplay/PlayerInventoryTests.cs"
+ ],
+ "data_changes": [
+  "data/items/mobility.json: \"equipSlot\": \"hook\" on grappling_hook, amethyst\u2026diamond_hook, ivy_whip, dual_hook"
+ ],
+ "tests": [
+  "PlayerInventoryTests:\n- EquippedStacksIgnoreVanityDyesMiscAndLockedAccessorySlots.\n- ExpertWorldUnlocksSixthAccessory (TestGame with Difficulty.Expert).\n- EquipFromRoutesVanityDyesAndHooks.\n- FavoriteSurvivesTransferButNotChestAdd.\n- AccessoryEquipRotatesWhenFull.",
+  "CharacterTests:\n- NewSlotsTrashAndFavoritesSurviveASave.\n- MediumcoreDeathDropsVanityAndMiscToo.\n- The existing SavesFromBeforeTheRenameStillLoad stays green.",
+  "ui.cmds: `give grappling_hook 1` / `equip grappling_hook` (the command routes through EquipFrom) / `assert inv.grappling_hook == 0`"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate",
+  "Headless smoke: all scripts still pass (combat.cmds, town.cmds, builder.cmds)",
+  "Load an existing user://players/*.player.json saved before this WP: the character loads with an empty trash and no errors"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Shared contract with P3: P3 must consume these storages (EquippedHook/Mount/Pet/LightPet, Dyes, VanityArmor) and not add its own. If P3 schedules hooks, mounts or pets first, P3 lands this WP; either way it is implemented once.",
+  "ItemStack.Equals now includes Favorite. Check UI 'changed' comparisons and tests comparing stacks.",
+  "GameWorld.cs is at 387 lines; this WP must move code out before adding any."
+ ],
+ "effort": "M"
+}

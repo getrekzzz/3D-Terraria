@@ -1,0 +1,32 @@
+{
+ "id": "P2-20",
+ "title": "Enemy mini health bars",
+ "player_outcome": "A hurt enemy shows a small bar that slides from green through yellow to red. The raw 'life/max' text is gone. Bosses use the boss bar instead.",
+ "design": [
+  "New shaders/ui_healthbar.gdshader (spatial):\n- render_mode unshaded, cull_disabled, depth_draw_never.\n- Billboard in vertex(): MODELVIEW = VIEW\u00b7mat4(INV_VIEW columns, MODEL origin).\n- `instance uniform float fraction`.\n- Fragment: 1 px dark border (UV scaled by aspect), dark translucent background. Fill = f > 0.5 ? mix(yellow, green, (f\u22120.5)\u00b72) : mix(red, yellow, f\u00b72).",
+  "NpcRenderer: replace View.Health (a Label3D, NpcRenderer.cs:225-233) with a MeshInstance3D. It shares one QuadMesh (0.8\u00d70.1 m) and one ShaderMaterial created once in Initialize.\n- Placement: Shown + up\u00b7(HalfExtents.Y\u00b72 + 0.25). Width scales with creature size (0.6\u20132 m).\n- Visible while Life < MaxLife, and not for bosses.\n- `SetInstanceShaderParameter(\"fraction\", life/max)` only when life changes.\n- Pooled with the view, like the current label.",
+  "UiProbes gains `fx.health_bars` (visible count)."
+ ],
+ "files_modify": [
+  "game/Entities/NpcRenderer.cs \u2014 health quad instead of Label3D (lines 145-150, 225-233)",
+  "game/Debug/UiProbes.cs \u2014 fx.health_bars"
+ ],
+ "files_add": [
+  "shaders/ui_healthbar.gdshader (+ .uid) \u2014 billboard bar with a colour ramp"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds: `god` / `spawn green_slime 0 0 3` (or the scripts' existing spawn syntax) / `wield copper_shortsword` / `aim 0 -0.2 1` / `use` / `wait 0.3` / `assert fx.health_bars >= 1` / `killall`"
+ ],
+ "verification": [
+  "Headless smoke; lavapipe screenshot of several damaged slimes"
+ ],
+ "depends_on": [
+  "P2-01"
+ ],
+ "risks": [
+  "The bosses phase (Parts) and the art phase (creature swaps) also edit NpcRenderer. The change here is local to View creation and the per-frame health block.",
+  "The crosshair name plus 'Zombie 34/45' is P1's entity-picking WP."
+ ],
+ "effort": "S"
+}

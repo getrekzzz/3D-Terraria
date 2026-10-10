@@ -1,0 +1,52 @@
+{
+ "id": "P3-16",
+ "title": "Misc equipment slots: pet, light pet, minecart, mount, hook (Core model, save, slots)",
+ "player_outcome": "Terraria's five misc equipment slots (Pet, Light Pet, Minecart, Mount, Hook) appear next to the armour. A hook goes in the hook slot. The minecart slot is used by a quick-mount key (G).",
+ "design": [
+  "Verified: EquipSlot is { None, Head, Body, Legs, Accessory }. PlayerInventory has only Backpack, Armor and Accessories. Hooks are found by PlayerController.BestHook (PlayerController.Grapple.cs:39).",
+  "EquipSlot gains Pet, LightPet, Minecart, Mount, Hook. PlayerInventory.Misc = new Inventory(5) in Terraria's order (pet, light pet, minecart, mount, hook), plus MiscIndex(EquipSlot).",
+  "Equip() handles the new slots (swap); EquippedStacks includes Misc, so light-pet emitLight effects apply.",
+  "PlayerSave: Misc slot list (added without a version bump, like Look).",
+  "SlotActions.ArmorFilter(EquipSlot) reused as the slot filter.",
+  "Validator: category hook \u21d2 equipSlot hook; category pet \u21d2 pet or lightPet; the minecart item \u21d2 minecart.",
+  "input.json: quick_mount on key:G. InteractionController on quick_mount: when standing on a track, board it using the minecart slot item (existing Minecart behaviour via ItemUseSystem.Mount); an empty mount slot gives a Refused 'No mount equipped'.",
+  "UI: InventoryScreen adds a 5-slot misc column below the accessories using ItemSlotView, with slot labels. If P2's equipment panel has landed, register the slots through its factory instead.",
+  "CombatCommands 'equip' handles misc items; StandardProbes adds misc.<pet|light_pet|minecart|mount|hook>."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 EquipSlot values",
+  "src/Strata.Core/Gameplay/Items/PlayerInventory.cs \u2014 Misc, Equip, EquippedStacks",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 Misc slots",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 slot/category rules",
+  "src/Strata.Core/Commands/CombatCommands.cs \u2014 equip misc",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 misc.* probes",
+  "data/config/input.json \u2014 quick_mount",
+  "game/Player/InteractionController.cs \u2014 quick_mount",
+  "game/UI/InventoryScreen.cs \u2014 misc slot column",
+  "game/Settings/KeyBindings.cs \u2014 list quick_mount for rebinding (if the list is explicit)"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/MiscEquipTests.cs \u2014 equip and save tests"
+ ],
+ "data_changes": [
+  "data/items/mobility.json: the 9 hooks get equipSlot 'hook'",
+  "data/items/wiring.json minecart: equipSlot 'minecart'"
+ ],
+ "tests": [
+  "MiscEquipTests: Equip(grappling_hook) lands in Misc[4]; swapping hooks returns the old one to the backpack",
+  "MiscEquipTests: PlayerSave round-trip keeps Misc; a light-pet item with emitLight sets Effects.Light",
+  "Smoke movement.cmds: 'equip grappling_hook' / 'assert misc.hook == 1'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate",
+  "Menu tour and smoke PASS; screenshot of the inventory showing misc slots"
+ ],
+ "depends_on": [
+  "P3-01"
+ ],
+ "risks": [
+  "InventoryScreen.cs is P2's main file; coordinate (P2 may own final layout).",
+  "G may collide with a P2 smart-cursor binding; confirm against P2's input plan."
+ ],
+ "effort": "M"
+}

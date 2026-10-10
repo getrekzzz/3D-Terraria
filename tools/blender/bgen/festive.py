@@ -21,7 +21,7 @@ def haunted_tree(mb: MeshBuilder, p, rng):
         green = p.get("leaves", "#2a6a3a")
         for k in range(4):
             z = 3.4 + k * 0.55
-            mb.cylinder((0, 0, z), (0, 0, z + 0.9), 1.6 - k * 0.35, 0.1, "prop:leaves", green, segments=9, smooth=False)
+            mb.cylinder((0, 0, z), (0, 0, z + 0.9), 1.6 - k * 0.35, 0.1, "prop:jungle_leaves", green, segments=9, smooth=False)
         for k in range(10):  # ornaments
             a, z = rng.random() * math.tau, 3.5 + rng.random() * 1.6
             r = 1.45 - (z - 3.4) * 0.55

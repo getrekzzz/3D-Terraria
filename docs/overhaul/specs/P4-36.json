@@ -1,0 +1,34 @@
+{
+ "id": "P4-36",
+ "title": "Realistic rebuild: Betsy, Mothron and the Martian Saucer",
+ "player_outcome": "Betsy is a proper winged dragon that beats its wings, Mothron a furred moth with dusty flapping wings, and the Martian Saucer a gleaming disc with a pilot dome, turrets and a glowing ring.",
+ "design": [
+  "New tools/blender/bgen/bosses_events.py.",
+  "betsy: metaball dragon body, horned head, rigged wings with a flap clip, ember glow in the throat.",
+  "mothron: fuzzy body via detail strands or shells, patterned wings with a flap clip, compound eyes.",
+  "martian_saucer: a lathe-turned disc, glass dome with an alien pilot (reuse a critter/humanoid-lite mesh), 4 turret models for future parts, glow ring.",
+  "Tri targets 6\u201312k; update boss icons."
+ ],
+ "files_modify": [
+  "tools/blender/assets.json \u2014 generator switch",
+  "tools/blender/build_all.py \u2014 lookup"
+ ],
+ "files_add": [
+  "tools/blender/bgen/bosses_events.py \u2014 Betsy, Mothron, Martian Saucer",
+  "assets/models/creatures/{betsy,mothron,martian_saucer}.glb \u2014 generated"
+ ],
+ "data_changes": [],
+ "tests": [
+  "build_all.py --check; invasion/moon smoke scripts error-free"
+ ],
+ "verification": [
+  "Preview sheets and boss gallery screenshots"
+ ],
+ "depends_on": [
+  "P4-03"
+ ],
+ "risks": [
+  "Translucent wing materials must use prop:*:clear slots and stay cheap on the low preset (no shadows from wings)."
+ ],
+ "effort": "M"
+}

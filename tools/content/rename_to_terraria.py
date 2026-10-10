@@ -19,6 +19,8 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(REPO / "tools" / "blender"))
+from asset_spec import spec_files  # noqa: E402
 from terraria_names import BRAINS, IDS, NAMES, TEXT  # noqa: E402
 
 TOKEN = re.compile(r"(?<![A-Za-z0-9_])([a-z][a-z0-9_]*)(?![A-Za-z0-9_])")
@@ -145,7 +147,7 @@ def asset_renames():
 
 def files():
     data = [p for p in (REPO / "data").rglob("*.json") if "reference" not in p.parts]
-    extra = [REPO / "tools/blender/assets.json", REPO / "tools/content/ore_tiers.json", REPO / "assets/manifest.json"]
+    extra = [*spec_files(), REPO / "tools/content/ore_tiers.json", REPO / "assets/manifest.json"]  # assets.json + assets.d/
     cs = [p for d in ("src", "game", "tests", "tools/Strata.Tools") for p in (REPO / d).rglob("*.cs")
           if "ThirdParty" not in p.parts and "obj" not in p.parts and "bin" not in p.parts]
     cmds = list((REPO / "game/Testing").rglob("*.cmds"))

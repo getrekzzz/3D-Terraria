@@ -1,0 +1,41 @@
+{
+ "id": "P5-24",
+ "title": "Core ItemSources reverse index and drop-rate computation (moved from ContentValidator.World.cs)",
+ "player_outcome": "No visible change on its own. It gives the Guide book exact 'Obtained from' data (drops with percentages, shops, chests, crafting, fishing, crates) and makes the content validator use the same index.",
+ "design": [
+  "Verified: the item-source enumeration exists only inside ContentValidator.ValidateObtainability (ContentValidator.World.cs:241-273); it produces a HashSet with no owners or rates.",
+  "New Content/Index/ItemSources.cs: ItemSourceIndex Build(ContentDatabase). A source is ItemSource(Kind, ContentDef? Owner, string? Label, float? Chance, int Min, int Max, TypedSpec[] Conditions). Kinds: Recipe, Drop (enemy loot), BossDrop, Container (chest tables named by the table's Name), Object (tile object Loot or natural placing item), Block (BlockDrops), Catch (critter CatchItem), Shop (town NPC + tab + conditions + currency), VisitorPool, Fishing (the 'fishing' table, ProjectileSystem.FishingTable), Opened (items whose consume behaviour names a loot table, from ItemUseSystem.cs:274), AnglerReward, DyeTrade, Bucket, Tag (starter/world).",
+  "Loot owners: resolve table \u2192 enemies/objects/items/fishing. Nested tables inherit the owner, with the chance multiplied through DropRates.",
+  "New Gameplay/Loot/DropRates.cs: For(ContentDatabase, tableId) \u2192 List<DropInfo(ItemDef Item, float Chance, int Min, int Max, TypedSpec[] Conditions)>. Each-mode entries: chance. Weighted: 1 - (1 - w/total)^rolls, computed over entries treated as eligible. Nested: multiplied. Coins reported separately (table.Coins or enemy Value \u00b125%). Deterministic, pure and thread-safe, so it can be built off the main thread.",
+  "ContentValidator.ValidateObtainability becomes a loop over index.HasSource(item) with the same tag exemptions and warning text.",
+  "Label chest tables: add 'name' to the loot tables used by world generation (cabin_chest 'Cabin Chests', gold_chest 'Gold Chests', surface_chest 'Surface Chests', sky_chest 'Skyware Chests', temple_chest 'Lihzahrd Chests', pot 'Pots')."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 use ItemSources",
+  "data/loot/containers.json \u2014 table names"
+ ],
+ "files_add": [
+  "src/Strata.Core/Content/Index/ItemSources.cs \u2014 index and records",
+  "src/Strata.Core/Gameplay/Loot/DropRates.cs \u2014 chance maths",
+  "tests/Strata.Core.Tests/Content/ItemSourcesTests.cs",
+  "tests/Strata.Core.Tests/Gameplay/DropRatesTests.cs"
+ ],
+ "data_changes": [
+  "names on world-generation chest tables"
+ ],
+ "tests": [
+  "ItemSourcesTests.ParityWithOldValidator: the set of items with \u22651 source equals the old algorithm's set, with the old code copied into the test as the oracle",
+  "ItemSourcesTests: gel has a Drop source from slimes with a chance; torch has Recipe and Shop(merchant); water_bucket has Bucket; leather_whip has Shop(zoologist) after P5-17",
+  "DropRatesTests: an each-mode entry at 0.33 gives 0.33; a weighted table with 2 rolls over 4 equal entries gives 1-(0.75)^2; nested table multiplication; coins range"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate gives the same warnings as before (diff the output)"
+ ],
+ "depends_on": [
+  "P5-14"
+ ],
+ "risks": [
+  "Conditional entries in weighted tables make the exact rate context-dependent; show the conditions next to the rate."
+ ],
+ "effort": "M"
+}

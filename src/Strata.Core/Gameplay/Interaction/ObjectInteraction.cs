@@ -22,17 +22,35 @@ public enum InteractOutcome
 
     /// <summary>A lever or switch was flipped (its wires carried the signal).</summary>
     Switched,
+
+    /// <summary>A bed set the spawn point and the player lay down in it (P3-34).</summary>
+    Slept,
+
+    /// <summary>The player got up from the bed they were sleeping in.</summary>
+    Woke,
+
+    /// <summary>What looked like a chest (or a lost girl) was a disguised creature, and it woke.</summary>
+    Unmasked,
+
+    /// <summary>A sign was read (the UI shows its text for editing).</summary>
+    SignOpened,
 }
 
 /// <summary>"Interact" on tile objects: doors, containers, beds and seats.</summary>
-public sealed class ObjectInteraction
+public sealed partial class ObjectInteraction
 {
     private readonly GameWorld _world;
 
     public ObjectInteraction(GameWorld world) => _world = world;
 
-    /// <summary>A container was opened by a player (the UI shows it).</summary>
-    public event Action<PlayerEntity, TileObjectInstance>? ContainerOpened;
+    /// <summary>
+    /// A container was opened by a player (the UI shows it): the object and the slots it shows that player (a chest's
+    /// own, or the player's personal storage for a Piggy Bank or Safe).
+    /// </summary>
+    public event Action<PlayerEntity, TileObjectInstance, Items.Inventory>? ContainerOpened;
+
+    /// <summary>A player read a sign (the UI shows its text and lets them edit it).</summary>
+    public event Action<PlayerEntity, TileObjectInstance>? SignOpened;
 
     /// <summary>An object's state (door open/closed) changed; colliders and visuals update.</summary>
     public event Action<TileObjectInstance>? StateChanged;
@@ -54,6 +72,9 @@ public sealed class ObjectInteraction
                 return InteractOutcome.DoorToggled;
             case TileInteraction.Activate when obj.Def.Summon != null:
                 return Activate(p, obj);
+            case TileInteraction.Switch when obj.Def.Timer > 0:
+                _world.Wires.SetTimer(obj, !obj.Active); // timers start and stop by hand; they signal when they run out
+                return InteractOutcome.Switched;
             case TileInteraction.Switch:
                 obj.Active = !obj.Active;
                 NotifyChanged(obj);
@@ -67,17 +88,82 @@ public sealed class ObjectInteraction
                 StateChanged?.Invoke(obj);
                 return InteractOutcome.DoorToggled;
             case TileInteraction.Chest:
+                if (obj.Locked && !Unlock(p, obj)) return InteractOutcome.Refused;
+                if (GameWorld.Storage(obj, p.State) is not { } storage) return InteractOutcome.None;
                 _world.Editor.EnsureContainerLoot(obj);
-                ContainerOpened?.Invoke(p, obj);
+                ContainerOpened?.Invoke(p, obj, storage);
                 return InteractOutcome.ContainerOpened;
             case TileInteraction.Sleep:
+                if (p.SleepBed == obj) return _world.Wake(p) ? InteractOutcome.Woke : InteractOutcome.None;
                 p.State.SpawnPoints[_world.Session.Settings.Name] = new[] { obj.Anchor.X, obj.Anchor.Y + obj.Footprint.Y, obj.Anchor.Z };
-                return InteractOutcome.SpawnSet;
+                return _world.Sleep(p, obj) ? InteractOutcome.Slept : InteractOutcome.SpawnSet;
             case TileInteraction.Sit:
                 return InteractOutcome.Seated;
+            case TileInteraction.Read:
+                SignOpened?.Invoke(p, obj);
+                return InteractOutcome.SignOpened;
             default:
                 return InteractOutcome.None;
         }
+    }
+
+    /// <summary>
+    /// "Interact" on a disguised creature (<see cref="Content.Defs.DisguiseInfo"/>): opening a Mimic's chest or speaking
+    /// to the Lost Girl within <paramref name="reach"/> metres of the player's centre wakes it.
+    /// </summary>
+    public InteractOutcome Interact(PlayerEntity p, Entities.Npc npc, float reach)
+    {
+        if (System.Numerics.Vector3.Distance(p.Center, npc.Center) > reach + npc.HalfExtents.X) return InteractOutcome.None;
+        return _world.Npcs.Provoke(npc, p) ? InteractOutcome.Unmasked : InteractOutcome.None;
+    }
+
+    /// <summary>
+    /// The nearest disguised creature whose box (padded by 0.25 m) the ray from <paramref name="origin"/> along the
+    /// unit <paramref name="dir"/> enters within <paramref name="limit"/> metres — what the crosshair "opens" instead of
+    /// the terrain behind it. Allocation-free.
+    /// </summary>
+    public static Entities.Npc? DisguisedAlong(IReadOnlyList<Entities.Npc> npcs, System.Numerics.Vector3 origin, System.Numerics.Vector3 dir, float limit)
+    {
+        Entities.Npc? best = null;
+        float bestT = limit;
+        for (int i = 0; i < npcs.Count; i++)
+        {
+            var npc = npcs[i];
+            if (!npc.Disguised || !npc.Alive) continue;
+            var pad = new System.Numerics.Vector3(0.25f);
+            if (RayBox(origin, dir, npc.Center - npc.HalfExtents - pad, npc.Center + npc.HalfExtents + pad, out float t) && t < bestT)
+            {
+                bestT = t;
+                best = npc;
+            }
+        }
+        return best;
+    }
+
+    /// <summary>Slab test: the entry distance of a ray into an axis-aligned box (0 when it starts inside).</summary>
+    public static bool RayBox(System.Numerics.Vector3 origin, System.Numerics.Vector3 dir, System.Numerics.Vector3 min, System.Numerics.Vector3 max, out float t)
+    {
+        float near = 0f, far = float.MaxValue;
+        t = 0f;
+        for (int axis = 0; axis < 3; axis++)
+        {
+            float o = axis == 0 ? origin.X : axis == 1 ? origin.Y : origin.Z;
+            float d = axis == 0 ? dir.X : axis == 1 ? dir.Y : dir.Z;
+            float lo = axis == 0 ? min.X : axis == 1 ? min.Y : min.Z;
+            float hi = axis == 0 ? max.X : axis == 1 ? max.Y : max.Z;
+            if (MathF.Abs(d) < 1e-6f)
+            {
+                if (o < lo || o > hi) return false;
+                continue;
+            }
+            float t0 = (lo - o) / d, t1 = (hi - o) / d;
+            if (t0 > t1) (t0, t1) = (t1, t0);
+            near = MathF.Max(near, t0);
+            far = MathF.Min(far, t1);
+            if (near > far) return false;
+        }
+        t = near;
+        return true;
     }
 
     /// <summary>A player was refused (locked door, missing key item) with a message.</summary>

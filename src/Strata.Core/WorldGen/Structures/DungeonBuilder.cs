@@ -1,128 +1,132 @@
 using Strata.Core.Common;
 using Strata.Core.Content;
-using Strata.Core.Determinism;
 using Strata.Core.Voxels;
+using Strata.Core.Voxels.TileObjects;
+using Strata.Core.WorldGen.Structures.Dungeon;
 
 namespace Strata.Core.WorldGen.Structures;
 
 /// <summary>
-/// The Old Crypt: a brick gatehouse on the surface, a great descent shaft, then a multi-level
-/// graph of halls joined by corridors and vertical wells. Walls are protected crypt brick.
+/// Carves a planned <see cref="DungeonLayout"/> into a blueprint: Terraria's Dungeon as long brick halls lined with
+/// dungeon-wall panels, 1:1 stairs, platformed shafts and pillared rooms under a keep on the surface. Ops are emitted
+/// in phases so crossings merge into open junctions instead of walling each other off: A shells (every interior grown
+/// by 2, brick), B panels (the side faces of every interior grown by 1), C carves (every interior and doorway), D
+/// fixtures (stair shapes, shaft platforms, pillars, galleries, chests). Every written cell is flagged
+/// <see cref="CellFlags.Structure"/>, which locks it while the dungeon zone is locked. Integer geometry only.
 /// </summary>
-public static class DungeonBuilder
+public static partial class DungeonBuilder
 {
-    private const int SlotX = 24, SlotY = 16, SlotZ = 24;
+    /// <summary>Rise between shaft platforms: 4 cells (2 m) is under the player's 2.4 m jump apex.</summary>
+    public const int PlatformSpacing = 4;
 
-    public static Blueprint Build(ContentDatabase content, Int3 gate, ref Pcg32 rng, int nx, int ny, int nz)
+    /// <summary>Builds the blueprint. <paramref name="surface"/> is the ground height (top solid cell) of a column,
+    /// sampled for the keep's foundation and approach.</summary>
+    public static Blueprint Build(ContentDatabase content, DungeonLayout layout, DungeonStyle style, Func<int, int, int> surface)
     {
         var bp = new Blueprint { Flags = CellFlags.Structure };
-        string brick = rng.Pick(new[] { "blue_brick", "green_brick", "pink_brick" });
-        byte platform = ShapeCode.Pack(CellShape.Platform, 0);
+        var b = new Ctx(bp, content, layout, style, surface);
 
-        // Gatehouse with crenellations and an open doorway.
-        var tower = new Aabb3i(new Int3(gate.X - 9, gate.Y - 3, gate.Z - 9), new Int3(gate.X + 9, gate.Y + 24, gate.Z + 9));
-        bp.Room(tower, brick);
-        for (int i = 0; i < 18; i += 4)
+        // A: brick shells.
+        KeepShell(b);
+        foreach (var hall in layout.Halls) HallShell(b, hall);
+        foreach (var room in layout.Rooms) if (room.Kind != RoomKind.Keep) bp.Fill(room.Interior.Expand(2), style.Brick);
+
+        // B: wall panels on the side faces (floors and ceilings stay brick).
+        foreach (var hall in layout.Halls) HallPanels(b, hall);
+        foreach (var room in layout.Rooms) if (room.Kind != RoomKind.Keep) Panels(b, room.Interior, style.Panel(room.PanelStyle), true, true);
+
+        // C: carve every interior and doorway.
+        KeepCarve(b);
+        foreach (var hall in layout.Halls) foreach (var box in hall.Interiors()) bp.Carve(box);
+        foreach (var room in layout.Rooms)
         {
-            bp.Fill(new Aabb3i(new Int3(tower.Min.X + i, tower.Max.Y, tower.Min.Z), new Int3(tower.Min.X + i + 2, tower.Max.Y + 2, tower.Min.Z + 1)), brick);
-            bp.Fill(new Aabb3i(new Int3(tower.Min.X + i, tower.Max.Y, tower.Max.Z - 1), new Int3(tower.Min.X + i + 2, tower.Max.Y + 2, tower.Max.Z)), brick);
+            if (room.Kind != RoomKind.Keep) bp.Carve(room.Interior);
+            foreach (var door in room.Doorways) bp.Carve(door.Box);
         }
-        bp.Carve(new Aabb3i(new Int3(gate.X - 2, gate.Y - 2, tower.Min.Z), new Int3(gate.X + 2, gate.Y + 5, tower.Min.Z + 1)));
 
-        // Descent shaft.
-        int depth = rng.Range(46, 70);
-        var shaft = new Aabb3i(new Int3(gate.X - 5, gate.Y - depth, gate.Z - 5), new Int3(gate.X + 5, gate.Y - 1, gate.Z + 5));
-        bp.Room(shaft, brick);
-        bp.Carve(new Aabb3i(new Int3(gate.X - 4, gate.Y - 3, gate.Z - 4), new Int3(gate.X + 4, gate.Y, gate.Z + 4)));
-        for (int y = shaft.Min.Y + 8; y < shaft.Max.Y - 4; y += 10)
-            bp.Fill(new Aabb3i(new Int3(gate.X - 4, y, gate.Z - 4), new Int3(gate.X + 4, y + 1, gate.Z + 4)), brick, platform);
-
-        // Room graph below the shaft.
-        var origin = new Int3(gate.X - SlotX / 2, shaft.Min.Y - ny * SlotY + 2, gate.Z - SlotZ / 2);
-        var rooms = new Aabb3i[nx, ny, nz];
-        var visited = new bool[nx, ny, nz];
-        var stack = new Stack<Int3>();
-        var entry = new Int3(0, ny - 1, 0);
-        stack.Push(entry);
-        visited[0, ny - 1, 0] = true;
-        rooms[0, ny - 1, 0] = PlaceRoom(bp, origin, entry, brick, ref rng);
-        bp.Carve(new Aabb3i(new Int3(gate.X - 4, rooms[0, ny - 1, 0].Max.Y - 2, gate.Z - 4), new Int3(gate.X + 4, shaft.Min.Y + 1, gate.Z + 4)));
-
-        Int3[] dirs = { new(1, 0, 0), new(-1, 0, 0), new(0, 0, 1), new(0, 0, -1), new(0, -1, 0), new(0, 1, 0) };
-        while (stack.Count > 0)
+        // D: fixtures.
+        foreach (var hall in layout.Halls)
         {
-            var cur = stack.Peek();
-            var options = dirs.Select(d => cur + d)
-                .Where(n => n.X >= 0 && n.Y >= 0 && n.Z >= 0 && n.X < nx && n.Y < ny && n.Z < nz && !visited[n.X, n.Y, n.Z]).ToList();
-            if (options.Count == 0 || rng.Chance(0.08f))
+            if (hall.Kind == HallKind.Stairs) Stairs(b, hall);
+            else if (hall.Kind == HallKind.Shaft) ShaftPlatforms(b, hall);
+        }
+        foreach (var room in layout.Rooms) if (room.Kind != RoomKind.Keep) RoomFixtures(b, room);
+        KeepFixtures(b);
+        var chest = content.TileObjects.Get("gold_chest");
+        foreach (var spot in layout.ChestSpots)
+        {
+            var anchor = ChestAnchor(content, layout, spot);
+            if (OnDais(layout, spot))
             {
-                stack.Pop();
-                continue;
+                // A treasure room's own chest stands on a one-cell brick dais reaching a cell past it.
+                var size = TileObjectInstance.FootprintOf(chest, RotationToward(spot.Facing));
+                var dais = new Aabb3i(anchor - new Int3(1, 1, 1), anchor + new Int3(size.X + 1, 0, size.Z + 1));
+                bp.Fill(dais.Intersection(layout.Rooms[spot.Room].Interior), style.Brick);
             }
-            var next = options[rng.NextInt(options.Count)];
-            visited[next.X, next.Y, next.Z] = true;
-            rooms[next.X, next.Y, next.Z] = PlaceRoom(bp, origin, next, brick, ref rng);
-            Connect(bp, rooms[cur.X, cur.Y, cur.Z], rooms[next.X, next.Y, next.Z], next - cur, brick, platform);
-            stack.Push(next);
+            // Every planned spot is a locked Gold Chest (a Golden Key opens one), the Shadow Key's included.
+            bp.Object(chest, anchor, RotationToward(spot.Facing), 0, spot.ShadowKey ? "dungeon_chest_shadow_key" : "dungeon_chest", locked: true);
         }
-
-        for (int y = 0; y < ny; y++)
-            for (int z = 0; z < nz; z++)
-                for (int x = 0; x < nx; x++)
-                    if (visited[x, y, z]) Furnish(bp, content, rooms[x, y, z], ref rng);
         return bp;
     }
 
-    private static Aabb3i PlaceRoom(Blueprint bp, Int3 origin, Int3 slot, string brick, ref Pcg32 rng)
+    /// <summary>Shared build state.</summary>
+    private sealed class Ctx
     {
-        int w = rng.Range(12, 19), h = rng.Range(9, 12), d = rng.Range(12, 19);
-        var slotMin = origin + new Int3(slot.X * SlotX, slot.Y * SlotY, slot.Z * SlotZ);
-        var min = slotMin + new Int3((SlotX - w) / 2, 1, (SlotZ - d) / 2);
-        var room = new Aabb3i(min, min + new Int3(w, h, d));
-        bp.Room(room, brick);
-        return room;
-    }
-
-    private static void Connect(Blueprint bp, Aabb3i a, Aabb3i b, Int3 dir, string brick, byte platform)
-    {
-        var ca = Center(a);
-        var cb = Center(b);
-        if (dir.Y != 0)
+        public Ctx(Blueprint bp, ContentDatabase content, DungeonLayout layout, DungeonStyle style, Func<int, int, int> surface)
         {
-            var upper = dir.Y > 0 ? b : a;
-            var lower = dir.Y > 0 ? a : b;
-            var c = Center(lower);
-            var well = new Aabb3i(new Int3(c.X - 3, lower.Max.Y - 2, c.Z - 3), new Int3(c.X + 3, upper.Min.Y + 2, c.Z + 3));
-            bp.Fill(well.Expand(1), brick, onlyAir: false);
-            bp.Carve(well);
-            for (int y = well.Min.Y + 5; y < well.Max.Y - 2; y += 6)
-                bp.Fill(new Aabb3i(new Int3(well.Min.X, y, well.Min.Z), new Int3(well.Max.X, y + 1, well.Max.Z)), brick, platform);
-            return;
+            Surface = surface;
+            Bp = bp;
+            Content = content;
+            Layout = layout;
+            Style = style;
         }
-        int floor = Math.Max(a.Min.Y, b.Min.Y) + 1;
-        var lo = new Int3(Math.Min(ca.X, cb.X) - 2, floor, Math.Min(ca.Z, cb.Z) - 2);
-        var hi = new Int3(Math.Max(ca.X, cb.X) + 3, floor + 6, Math.Max(ca.Z, cb.Z) + 3);
-        var corridor = new Aabb3i(lo, hi);
-        bp.Fill(corridor.Expand(1), brick);
-        bp.Carve(corridor);
-        bp.Carve(a.Expand(-1));
-        bp.Carve(b.Expand(-1));
+
+        public Blueprint Bp { get; }
+        public ContentDatabase Content { get; }
+        public DungeonLayout Layout { get; }
+        public DungeonStyle Style { get; }
+        public Func<int, int, int> Surface { get; }
+        public string Brick => Style.Brick;
+        public byte Platform { get; } = ShapeCode.Pack(CellShape.Platform, 0);
     }
 
-    private static void Furnish(Blueprint bp, ContentDatabase content, Aabb3i room, ref Pcg32 rng)
+    /// <summary>Quarter turns about +Y that point a shape's (or object's) rotation side at a horizontal direction,
+    /// matching ShapeGeometry and BlockGrid: rotation 0 faces +Z, 1 faces -X, 2 faces -Z, 3 faces +X.</summary>
+    public static int RotationToward(Int3 dir) => dir.Z > 0 ? 0 : dir.X < 0 ? 1 : dir.Z < 0 ? 2 : 3;
+
+    /// <summary>Whether a chest spot is a treasure room's centre spot, which stands on a dais.</summary>
+    public static bool OnDais(DungeonLayout layout, DungeonChestSpot spot)
     {
-        var floor = new Int3(room.Min.X + 2, room.Min.Y + 1, room.Min.Z + 2);
-        var tiles = content.TileObjects;
-        if (rng.Chance(0.3f)) bp.Object(tiles.Get("gold_chest"), floor + new Int3(rng.Range(0, 4), 0, rng.Range(0, 4)), 0, 0, "cabin_chest");
-        if (rng.Chance(0.7f)) bp.Object(tiles.Get("candle"), new Int3(room.Max.X - 3, room.Min.Y + 1, room.Max.Z - 3), 0);
-        for (int i = rng.Range(0, 4); i > 0; i--)
-            bp.Object(tiles.Get("pot"), new Int3(room.Min.X + 2 + i * 3, room.Min.Y + 1, room.Max.Z - 4), 0, i % 3);
-        if (rng.Chance(0.5f))
-        {
-            var top = new Int3(room.Min.X + 1, room.Max.Y - 3, room.Min.Z + 1);
-            bp.Fill(new Aabb3i(top, top + new Int3(3, 2, 3)), "cobweb", onlyAir: true);
-        }
+        var room = layout.Rooms[spot.Room];
+        return room.Kind == RoomKind.Treasure && spot.Cell == room.CenterFloor;
     }
 
-    private static Int3 Center(Aabb3i b) => new((b.Min.X + b.Max.X) / 2, b.Min.Y, (b.Min.Z + b.Max.Z) / 2);
+    /// <summary>Where a planned gold chest stands: the spot's cell, its footprint kept inside the room (on top of the
+    /// dais for a treasure room's centre spot).</summary>
+    public static Int3 ChestAnchor(ContentDatabase content, DungeonLayout layout, DungeonChestSpot spot)
+    {
+        var size = TileObjectInstance.FootprintOf(content.TileObjects.Get("gold_chest"), RotationToward(spot.Facing));
+        var room = layout.Rooms[spot.Room].Interior;
+        int y = room.Min.Y + (OnDais(layout, spot) ? 1 : 0);
+        return new Int3(Math.Clamp(spot.Cell.X, room.Min.X, room.Max.X - size.X), y, Math.Clamp(spot.Cell.Z, room.Min.Z, room.Max.Z - size.Z));
+    }
+
+    /// <summary>Fills the vertical side faces of <paramref name="interior"/> grown by one cell with a panel block, over
+    /// the interior's height. <paramref name="xFaces"/> / <paramref name="zFaces"/> pick the -X/+X and -Z/+Z faces.</summary>
+    private static void Panels(Ctx b, Aabb3i interior, string panel, bool xFaces, bool zFaces)
+    {
+        int y0 = interior.Min.Y, y1 = interior.Max.Y;
+        var lo = interior.Min;
+        var hi = interior.Max;
+        if (xFaces)
+        {
+            b.Bp.Fill(new Aabb3i(new Int3(lo.X - 1, y0, lo.Z - 1), new Int3(lo.X, y1, hi.Z + 1)), panel);
+            b.Bp.Fill(new Aabb3i(new Int3(hi.X, y0, lo.Z - 1), new Int3(hi.X + 1, y1, hi.Z + 1)), panel);
+        }
+        if (zFaces)
+        {
+            b.Bp.Fill(new Aabb3i(new Int3(lo.X - 1, y0, lo.Z - 1), new Int3(hi.X + 1, y1, lo.Z)), panel);
+            b.Bp.Fill(new Aabb3i(new Int3(lo.X - 1, y0, hi.Z), new Int3(hi.X + 1, y1, hi.Z + 1)), panel);
+        }
+    }
 }

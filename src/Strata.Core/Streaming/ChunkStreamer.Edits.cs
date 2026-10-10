@@ -81,6 +81,7 @@ public sealed partial class ChunkStreamer
             if (!_entries.TryGetValue(c, out var e) || e.Edit != group) continue;
             e.Edit = null;
             if (!e.MeshWanted || !group.Held.TryGetValue(c, out var result)) continue;
+            if (!e.HasMesh) _meshed++;
             e.HasMesh = true;
             MeshReady?.Invoke(result);
         }

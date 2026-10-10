@@ -1,0 +1,47 @@
+{
+ "id": "P4-28",
+ "title": "Skeletron Prime: saw, vice, cannon and laser as separately killable arms; spin doubles defense",
+ "player_outcome": "Skeletron Prime fights as in Terraria: four independent arms (Saw 9000, Vice 9000, Cannon 7000, Laser 6000) that you can destroy one by one around a 28,000-life skull, which doubles its defense while spinning.",
+ "design": [
+  "HandBrain styles, in a partial HandBrain.Styles.cs to stay under 400 lines:",
+  "  saw: rapid short jabs toward the target within 6 m.",
+  "  vice: slow approach, then a lunge-grab.",
+  "  hold: stay at the anchor facing the target, letting the arm def's own 'ranged' fire.",
+  "prime_cannon has ranged prime_bomb; prime_laser has ranged death_laser.",
+  "Data mechs.json: skeletron_prime life 28000, defense 25, spinDefense +25. Parts: prime_saw [\u22123.2,\u22121.2,0.8], prime_vice [3.2,\u22121.2,0.8], prime_cannon [\u22123.6,\u22122.6,\u22120.4] mirror, prime_laser [3.6,\u22122.6,\u22120.4]. Keep armModel prime_arm_strut.",
+  "Remove segments, segmentModels and the ranged fromParts spec.",
+  "New enemies prime_saw, prime_vice, prime_cannon and prime_laser with Terraria life (9000/9000/7000/6000), damage (50/30/30/30), defense (38/34/23/20), using the existing prime_* models.",
+  "Delete the legacy segment-hand code paths in CryptWardenBrain and NpcRenderer.Arms now that no boss uses them."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/HandBrain.cs \u2014 style dispatch",
+  "src/Strata.Core/AI/CryptWardenBrain.cs \u2014 legacy segment hands removed",
+  "game/Entities/NpcRenderer.Arms.cs \u2014 legacy path removed",
+  "data/enemies/mechs.json \u2014 Prime and its arms",
+  "game/Testing/Scripts/mechs.cmds \u2014 arm assertions"
+ ],
+ "files_add": [
+  "src/Strata.Core/AI/HandBrain.Styles.cs \u2014 saw, vice, hold"
+ ],
+ "data_changes": [
+  "Prime restructured into a head plus four part enemies."
+ ],
+ "tests": [
+  "MechBossTests.PrimeArmsAreSeparatelyKillable.",
+  "MechBossTests.CannonAndLaserArmsFireFromTheirArms.",
+  "MechBossTests.PrimeSpinDoublesDefense.",
+  "MechBossTests.KillingPrimesSkullEndsTheFight.",
+  "Smoke mechs.cmds, after 'boss skeletron_prime 12': 'assert npcs.prime_saw == 1', 'assert npcs.prime_cannon == 1', 'slay prime_saw', 'assert boss.skeletron_prime.parts == 3', then the existing 'slay skeletron_prime' and flag asserts."
+ ],
+ "verification": [
+  "dotnet test; headless mechs.cmds; boss gallery screenshot"
+ ],
+ "depends_on": [
+  "P4-10"
+ ],
+ "risks": [
+  "Four armed parts plus the head is five creatures, well within the NPC cap.",
+  "Arms that pass through walls in tight hardmode arenas: same Terraria trade-off as Skeletron."
+ ],
+ "effort": "M"
+}

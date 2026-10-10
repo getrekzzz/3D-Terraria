@@ -1,0 +1,45 @@
+{
+ "id": "P3-37b",
+ "title": "Vibrant, glowing, shiny world ores (blocks in the ground, not just items)",
+ "player_outcome": "Ore veins pop out of cave walls like Terraria's: saturated tier colours (copper orange, tin khaki, iron grey-brown, silver white, gold yellow, platinum blue-white, demonite purple, crimtane red, hellstone orange-red, hardmode ores in their colours), metallic flecks that catch torch and sun light with visible specular shine, glints that twinkle from further away, and a soft self-glow so a vein is noticeable in a dark cave without lighting the whole cave.",
+ "design": [
+  "Textures: in tools/textures (materials.json + the ore generators) make every *_ore terrain layer saturated in its P3-37 tier colour with distinct metallic fleck clusters on a stone matrix; write fleck masks into the material's metallic/roughness so flecks are metallic (~0.9) and smooth (~0.25) while the stone stays rough; rebuild the terrain texture array with tools/textures/build_textures.py.",
+  "Shader (shaders/terrain.gdshader ore_glints + game/World/TerrainMaterials.cs Sparkle): raise glint reach from 8-14 m to ~20-28 m (scaled by graphics preset), increase density/brightness so veins read at a glance, colour glints by the ore tint; keep the cost bounded (early-out by distance, no extra texture fetches beyond the existing tables).",
+  "Soft self-glow: add an optional `glow` field on BlockDef (emissive strength, shader-only, does NOT propagate baked block light) validated 0-1; give common metal ores a faint glow (~0.08-0.15) and evil/hellstone/hardmode/luminite ores a stronger one; the glow must be visible in a pitch-dark cave at 5-10 m but must not light surrounding stone. Keep the existing `light` values for ores that already emit light (gems, hellstone, hardmode ores) and retune them so they read as glowing, not as lamps.",
+  "Pass the glow through the existing per-layer/surface tables (layer_table .w is unused) rather than new vertex data, so meshing and chunk memory are unchanged.",
+  "Bump nothing in worldgen (no generator output change)."
+ ],
+ "files_modify": [
+  "tools/textures/materials.json and ore texture generators (tools/textures/gen_rock.py or gen_natural.py)",
+  "assets/textures/terrain/* (rebuilt array)",
+  "shaders/terrain.gdshader",
+  "game/World/TerrainMaterials.cs",
+  "src/Strata.Core/Content/Defs/BlockDef.cs (glow)",
+  "src/Strata.Core/Content/Validation (glow range)",
+  "data/blocks/ores.json, data/blocks/hardmode.json"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Content/OreGlowTests.cs (every ore block has a glow, values in range, non-ore blocks have none)"
+ ],
+ "data_changes": [
+  "glow on every ore block; retuned light on gem/hardmode ores"
+ ],
+ "tests": [
+  "OreGlowTests",
+  "existing terrain/lighting tests unchanged",
+  "basic.cmds passes"
+ ],
+ "verification": [
+  "lavapipe shot of an ore vein in a dark cave (only the player's light) and in a torch-lit cave at --graphics=medium: veins clearly visible, cave not lit by ores; tools/ci/shot_stats.py numbers saved to /root/.claude/plans/overhaul-specs/baselines/ores.txt",
+  "F3 GPU/CPU ms unchanged within noise in a cave scene"
+ ],
+ "depends_on": [
+  "P3-37",
+  "P1-04"
+ ],
+ "risks": [
+  "Over-bright glow would look like lamps; keep it subtle and data-tunable.",
+  "Terrain texture array size must not grow."
+ ],
+ "effort": "M"
+}

@@ -1,6 +1,9 @@
 """A small procedural composer: turns a track description (key, mode, tempo, chord progression, instruments, drum
 style) into a seamlessly looping stereo piece with a phrase-structured melody, arpeggio, bass, pad and drums, set in a
-convolution room and levelled to a common loudness so tracks match when they cross-fade."""
+convolution room and levelled to a common loudness so tracks match when they cross-fade. Boss themes vary it with a lead
+register (`octave`), off-beat chord stabs (`stabs`) and a double-time kit (`drums="blast"`); `build_sting` renders a
+short non-looping cadence (the victory sting when a boss falls) in the same kind of room, its fanfare as loud as the
+tracks."""
 import numpy as np
 
 from synth import (SR, adsr, circular, decay, hall, hat, kick, loudness, lowpass, midi_hz, osc, pan, place, samples, seconds, snare, tom)
@@ -120,7 +123,7 @@ def make_melody(spec, rng, chords):
 
 
 def build(spec, seed=1):
-    """Renders a track spec to a looping mono float array at SR."""
+    """Renders a track spec to a looping stereo float array (n, 2) at SR."""
     rng = np.random.default_rng(seed)
     bpm, bars = spec["bpm"], spec["bars"]
     six = 60.0 / bpm / 4  # seconds per sixteenth
@@ -143,8 +146,9 @@ def build(spec, seed=1):
     low = np.zeros(total + tail)
     drums = np.zeros(total + tail)
 
+    octave = spec.get("octave", 0)  # the lead's register in semitones (a menacing low organ, a shrill high pulse)
     for start, length, note in make_melody(spec, rng, chords):
-        place(lead, voice(spec["lead"], note, length * six * 0.95, 0.9, spec.get("vibrato", 0.004)), at(start))
+        place(lead, voice(spec["lead"], note + octave, length * six * 0.95, 0.9, spec.get("vibrato", 0.004)), at(start))
     if spec.get("double"):  # a second voice an octave down on the melody
         for start, length, note in make_melody(spec, np.random.default_rng(seed), chords):
             place(back, voice(spec["double"], note - 12, length * six * 0.95, 0.4), at(start))
@@ -162,6 +166,10 @@ def build(spec, seed=1):
             for k in range(steps):
                 n = order[k % len(order)] if spec.get("arp_dir", "up") == "up" else order[::-1][k % len(order)]
                 place(back, voice(kind, n + 12, rate * six * 0.9, 0.35), at(b * 16 + k * rate))
+        if spec.get("stabs"):  # chord stabs on the off-beats of two and four push a boss theme forward
+            for s16 in (6, 14):
+                for n in chord:
+                    place(back, voice(spec["stabs"], n, 1.5 * six, 0.28), at(b * 16 + s16))
         bass = spec.get("bass", "half")
         r = chord[0] - 12
         pattern = {"half": [(0, 8, r), (8, 8, r)], "pump": [(k * 2, 2, r if k % 4 else r) for k in range(8)],
@@ -223,9 +231,62 @@ def drum_bar(style, buf, b, at, rng):
             place(buf, tom(p) * 0.8, at(base + i))
         for i in range(0, 16, 4):
             place(buf, h * 0.4, at(base + i + 2))
+    elif style == "blast":
+        for i in range(0, 16, 2):
+            place(buf, k * (1.0 if i % 4 == 0 else 0.75), at(base + i))
+        for i in (4, 12):
+            place(buf, s, at(base + i))
+        for i in range(16):
+            place(buf, h * (0.55 if i % 2 else 0.3), at(base + i))
+        if b % 4 == 0:
+            place(buf, ho * 0.7, at(base))
+        if b % 4 == 3:
+            for i in (12, 13, 14, 15):
+                place(buf, tom(150 - i * 5) * 0.7, at(base + i))
     elif style == "halftime":
         place(buf, k, at(base))
         place(buf, k * 0.7, at(base + 10))
         place(buf, s * 0.8, at(base + 8))
         for i in range(0, 16, 2):
             place(buf, (ho if i == 14 else h) * 0.45, at(base + i))
+
+
+def build_sting(spec, seed=1):
+    """A short non-looping cadence: chord stabs on the progression's approach chords, then the tonic held over a timpani
+    swell, a rising fanfare on top and the room's tail. Returns a stereo float array (n, 2) at SR, mixed like the tracks
+    (the brass in the same kind of convolution room, the bass in the middle) and levelled so the fanfare lands as loud as
+    the soundtrack it interrupts."""
+    rng = np.random.default_rng(seed)
+    root, scale = spec["root"], spec["scale"]
+    beat = 60.0 / spec["bpm"]
+    total = samples(spec.get("length", 4.5))
+    upper, low, drums = np.zeros(total), np.zeros(total), np.zeros(total)
+    cadence = spec.get("cadence", [3, 4, 0])
+    hits = [k * beat * 0.75 for k in range(len(cadence))]
+    final = hits[-1]
+    for k, degree in enumerate(cadence):
+        last = k == len(cadence) - 1
+        dur = beat * (3.2 if last else 0.55)
+        chord = chord_tones(root, scale, degree)
+        for n in chord:
+            place(upper, voice(spec["stab"], n, dur, 0.55 if last else 0.45), samples(hits[k]))
+            if last and spec.get("pad"):
+                place(upper, voice(spec["pad"], n + 12, dur, 0.9), samples(hits[k]))
+        place(low, voice(spec.get("bass_voice", "bass_saw"), chord[0] - 12, dur, 0.9), samples(hits[k]))
+    for i, degree in enumerate(spec.get("fanfare", [0, 2, 4, 7])):  # rising to the octave over the final chord
+        held = i == len(spec.get("fanfare", [0, 2, 4, 7])) - 1
+        note = degree_note(root + 12, scale, degree)
+        place(upper, voice(spec["lead"], note, beat * (2.4 if held else 0.2), 0.8, 0.006 if held else 0.0), samples(final + i * beat * 0.25))
+    steps = max(1, int(final / 0.055))
+    for i in range(steps):  # the timpani roll swells into the last chord
+        place(drums, tom(72 + rng.uniform(-2, 2)) * (0.15 + 0.6 * i / steps), samples(i * 0.055))
+    place(drums, tom(62) * 1.3, samples(final))
+    place(drums, kick() * 0.8, samples(final))
+    room = spec.get("room", 0.8)
+    mix = (hall(upper, SR, 1.2 + 1.6 * room, 0.5, spec.get("wet", 0.32) + 0.05, seed=seed % 997)[:total]
+           + np.stack([low * 0.8] * 2, axis=1)
+           + hall(drums, SR, 0.9, 0.5, 0.15, seed=3)[:total] * 0.6)
+    fade_len = samples(0.8)
+    mix[-fade_len:] *= np.linspace(1.0, 0.0, fade_len)[:, None]
+    mix = np.stack([lowpass(mix[:, c], spec.get("bright", 7500)) for c in range(2)], axis=1)
+    return loudness(mix, spec.get("rms", -20.5), 0.9).astype(np.float32)

@@ -12,6 +12,9 @@ public static class StatIds
     public const string LifeRegen = "lifeRegen";
     public const string ManaRegen = "manaRegen";
     public const string MoveSpeed = "moveSpeed";
+
+    /// <summary>Running-speed bonus of speed boots (Hermes Boots and up): reached after a run-up, boosted by Sprint.</summary>
+    public const string RunSpeed = "runSpeed";
     public const string Acceleration = "acceleration";
     public const string JumpHeight = "jumpHeight";
     public const string GenericDamage = "genericDamage";
@@ -47,12 +50,39 @@ public static class StatIds
     /// <summary>Share of magic damage dealt that heals the caster.</summary>
     public const string LifeSteal = "lifeSteal";
 
+    /// <summary>Flat fishing power from accessories and buffs (Angler Earring, Fishing Potion).</summary>
+    public const string FishingPower = "fishingPower";
+
+    /// <summary>Extra bait saving: each point adds one to the bait-consumption divisor (Tackle Box).</summary>
+    public const string BaitSaving = "baitSaving";
+
+    /// <summary>Above zero: the bobber survives lava, so lava can be fished (Lavaproof Fishing Hook).</summary>
+    public const string LavaFishing = "lavaFishing";
+
+    /// <summary>Added chance (0–1) that a catch is a crate (Crate Potion).</summary>
+    public const string CrateChance = "crateChance";
+
+    /// <summary>Holding the button repeats whips too (Feral Claws and its upgrades; melee always auto-swings).</summary>
+    public const string Autoswing = "autoswing";
+
+    /// <summary>Metres added to the item magnet's reach (Treasure Magnet).</summary>
+    public const string GrabRange = "grabRange";
+
+    /// <summary>Melee knockback bonus (fraction; the Titan Glove's +100 %).</summary>
+    public const string MeleeKnockback = "meleeKnockback";
+
+    /// <summary>Change to the length of Potion Sickness (fraction; the Philosopher's Stone's −25 %: 45 s instead of 60 s).</summary>
+    public const string PotionDelay = "potionDelay";
+
     private static readonly HashSet<string> Known = new(StringComparer.Ordinal)
     {
-        MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, Acceleration, JumpHeight, GenericDamage,
+        MaxLife, MaxMana, Defense, LifeRegen, ManaRegen, MoveSpeed, RunSpeed, Acceleration, JumpHeight, GenericDamage,
         MeleeDamage, RangedDamage, MagicDamage, SummonDamage, GenericCrit, MeleeCrit, RangedCrit, MagicCrit,
         MeleeSpeed, MiningSpeed, KnockbackResist, ManaCost, MaxMinions, Reach, EnduranceReduction, FlightTime,
-        Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal,
+        Immunity, SwimSpeed, AmmoSave, Thorns, LifeSteal, FishingPower, BaitSaving, LavaFishing, CrateChance,
+        Autoswing,
+        GrabRange,
+        MeleeKnockback, PotionDelay,
     };
 
     public static bool IsKnown(string id) => Known.Contains(id);

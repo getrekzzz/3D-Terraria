@@ -1,0 +1,47 @@
+{
+ "id": "P5-04",
+ "title": "Town data reorganisation and Terraria move-in rules for all 29 NPCs",
+ "player_outcome": "Every NPC moves in under Terraria's conditions. The Demolitionist waits for the Merchant; the Dryad comes after any boss; the Zoologist needs 10% bestiary; the Dye Trader needs a dye; Santa comes only at Christmas; the Princess needs 3 others; the Party Girl comes at random with 14+ residents. Rescue NPCs no longer just appear, and the Skeleton Merchant is no longer a permanent resident. The Guide stops mentioning a console-only 'housing check'.",
+ "design": [
+  "Verified: data/town_residents.json holds 23 NPCs as one long line each (for example the demolitionist arrival at line 5 has no merchant requirement). data/town.json holds 6. Mismatches match audit H.",
+  "Move both files into pretty-printed data/town/pre_hardmode.json (guide, merchant, nurse, demolitionist, dye_trader, angler, zoologist, dryad, painter, golfer, arms_dealer, stylist, goblin_tinkerer, witch_doctor, clothier, mechanic, party_girl, tavernkeep, old_man), data/town/hardmode.json (wizard, truffle, tax_collector, pirate, steampunker, cyborg, santa_claus, princess) and data/town/visitors.json (travelling_merchant, skeleton_merchant). Delete data/town.json and data/town_residents.json. Run 'dotnet run --project tools/Strata.Tools -- manifest' to regenerate data/manifest.json.",
+  "Arrival rules to encode, following Terraria 1.4.4 (verify each on terraria.wiki.gg): merchant coins\u22655000; nurse maxLife\u2265120 + resident merchant; demolitionist hasItem any explosive (bomb/dynamite/grenade, or tag 'explosive' if added) + resident merchant; dye_trader hasItem category dye + residents\u22654; angler rescued; zoologist bestiary\u226510; dryad any boss flag (king slime, EoC, evil boss, queen bee, skeletron, deerclops, WoF); painter residents\u22658; golfer rescued; arms_dealer hasItem gun or bullet; stylist rescued; goblin_tinkerer rescued; witch_doctor defeated_queen_bee; clothier defeated_skeletron; mechanic rescued; party_girl residents\u226514 + chance 0.025; tavernkeep rescued; wizard rescued; truffle hardmode + mushroom biome at the home; tax_collector rescued; pirate defeated_pirate_invasion; steampunker defeated_mechanical_boss; cyborg defeated_plantera; santa_claus defeated_frost_legion + season christmas, with leavesWhen 'not season christmas'; princess residents\u22653.",
+  "Visitors: travelling_merchant and skeleton_merchant arrival becomes [{type:'flag', id:'never'}] with a comment 'visits (P5-19)'. That makes them inert until P5-19 adds the visit block, and the validator warning is suppressed there.",
+  "Dialogue: fix the Guide's line (town.json:11) to point at the Housing menu in the inventory; add rescue-flavoured lines (goblin: 'Thanks for untying me...') conditioned on resident presence; keep {resident:x} placeholders valid.",
+  "ContentValidator.Town: a 'rescued' condition on an NPC without a rescue block is a warning until P5-06 lands, then an error."
+ ],
+ "files_modify": [
+  "data/manifest.json \u2014 regenerated",
+  "src/Strata.Core/Content/Validation/ContentValidator.Town.cs \u2014 rescued-without-rescue check",
+  "tests/Strata.Core.Tests/Gameplay/TownTests.cs \u2014 adjust to the new rules where needed"
+ ],
+ "files_add": [
+  "data/town/pre_hardmode.json \u2014 19 NPCs, pretty-printed",
+  "data/town/hardmode.json \u2014 8 NPCs",
+  "data/town/visitors.json \u2014 the two merchants (visit blocks added in P5-19)",
+  "tests/Strata.Core.Tests/Gameplay/TownArrivalRulesTests.cs \u2014 per-NPC arrival table test"
+ ],
+ "data_changes": [
+  "Delete data/town.json and data/town_residents.json (content moved)",
+  "Arrival arrays for all 29 NPCs as listed in the design"
+ ],
+ "tests": [
+  "TownArrivalRulesTests (theory over NPC ids): build a scenario (flags, items, fake records, ResidentCount via summoned housed residents), then assert CheckArrivals(force) brings exactly that NPC and not before the last condition holds. Cases: demolitionist without merchant \u2192 none; dryad after only defeated_deerclops; santa blocked in 'none' season; princess at 3 housed residents; skeleton_merchant never arrives as a resident",
+  "ContentDatabaseTests: 29 town NPCs load from data/town/*",
+  "Smoke town.cmds unchanged; it must still pass (merchant summon/buy)"
+ ],
+ "verification": [
+  "dotnet run --project tools/Strata.Tools -- manifest --check && -- validate",
+  "dotnet test",
+  "town.cmds SMOKE PASS"
+ ],
+ "depends_on": [
+  "P5-01",
+  "P5-03"
+ ],
+ "risks": [
+  "Rescue-gated NPCs can arrive only through the 'flag rescued_x' command until P5-06 lands; ship P5-06 in the same phase push.",
+  "Every later data package edits data/town/*.json; sequence them."
+ ],
+ "effort": "M"
+}

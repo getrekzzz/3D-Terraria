@@ -1,0 +1,39 @@
+{
+ "id": "P2-24",
+ "title": "Boss head icons rendered from the boss models (Blender)",
+ "player_outcome": "The boss bar shows each boss's actual head, rendered from the same 3D model you fight: King Slime's crown, the Eye's iris, Skeletron's skull.",
+ "design": [
+  "New tools/blender/bgen/boss_icons.py: `render_boss_icons(bosses, only)`.\n- For each non-minor boss in content, import assets/models/creatures/<model>.glb with bpy.ops.import_scene.gltf (no rebuild of the models).\n- Call export.render_icon(objs, REPO/'assets/icons/bosses/<id>.png', 'boss', size=64, samples=16).",
+  "export.render_icon gains a 'boss' view: front direction (0,1,0.15); the ortho frame fits the top 60 % of the bounds (the head), or the head segment for worms.",
+  "tools/blender/build_all.py: `--boss-icons` (with `--only`) calls the module. `--check` also fails when a non-minor boss lacks its icon.",
+  "Core:\n- AssetPaths.BossIcon(EnemyDef) => assets/icons/bosses/{Boss.Icon ?? Id}.png.\n- The ContentValidator enemies pass calls ctx.Asset for non-minor bosses.\n- AssetCoverageTests.EveryBossHasAHeadIcon.",
+  "Commit the PNGs and their .import files."
+ ],
+ "files_modify": [
+  "tools/blender/build_all.py \u2014 --boss-icons and check",
+  "tools/blender/bgen/export.py \u2014 'boss' view",
+  "src/Strata.Core/Content/AssetPaths.cs \u2014 BossIcon",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs (or the enemies validator file) \u2014 boss icon asset check",
+  "tests/Strata.Core.Tests/Content/AssetCoverageTests.cs \u2014 EveryBossHasAHeadIcon"
+ ],
+ "files_add": [
+  "tools/blender/bgen/boss_icons.py",
+  "assets/icons/bosses/*.png (+ .import)"
+ ],
+ "data_changes": [],
+ "tests": [
+  "AssetCoverageTests.EveryBossHasAHeadIcon",
+  "python3 tools/blender/build_all.py --check"
+ ],
+ "verification": [
+  "python3.13 tools/blender/build_all.py --boss-icons; inspect king_slime, eye_of_cthulhu, skeletron and moon_lord PNGs; boss bar screenshot"
+ ],
+ "depends_on": [
+  "P2-23"
+ ],
+ "risks": [
+  "Rigged models import in rest pose. Pose them on frame 0 of the 'idle' action when one exists.",
+  "Bosses rebuilt by the bosses or art phases need their icons re-rendered. The --check catches missing icons, not stale ones, so note it in that phase's WP."
+ ],
+ "effort": "S"
+}

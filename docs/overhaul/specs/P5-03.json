@@ -1,0 +1,52 @@
+{
+ "id": "P5-03",
+ "title": "New condition types: rescued, has-dye (hasItem category), bestiary %, season, angler quests, killed/obtained",
+ "player_outcome": "No visible change on its own. These conditions let later packages use Terraria's real move-in and shop rules: rescued NPCs, carrying a dye, bestiary completion, the Christmas season and angler quest counts.",
+ "design": [
+  "Split ConditionCompiler.cs (164 lines): Factories = Build(), which calls AddWorld(f), AddTown(f) and AddComposites(f). Move coins/maxLife/resident/residents/hasItem into a new ConditionCompiler.Town.cs, and their params classes into ConditionParams.Town.cs.",
+  "ConditionContext: add Season (string, '' = none), AnglerQuests (int) and Records (IPlayerRecords?). IPlayerRecords is a new interface in Strata.Core.Conditions: int Kills(string enemy), bool Obtained(string item), float BestiaryPercent {get;}, bool Achieved(string id). P5-25 implements it.",
+  "New condition types: rescued {id} \u2192 Flags.Contains(TownRescue.FlagFor(id)) with flag 'rescued_<id>'; hasItem gains 'category' (an ItemCategory name, ItemCount key '@<category>'); bestiary {min,max} (percent); season {is: christmas|halloween|none}; anglerQuests {min,max}; killed {enemy, min=1}; obtained {item}; achieved {id}. Each has an IValidatableSpec where it applies.",
+  "Season: new Simulation/SeasonCalendar.Of(DateOnly) returns 'christmas' for Dec 15\u201331 and 'halloween' for Oct 10\u2013Nov 1. New WorldSession.Season.cs: Season => Meta.ForcedSeason ?? SeasonCalendar.Of(today). WorldSession.ContextAt sets ctx.Season. WorldMeta gets a ForcedSeason string (no version bump). WorldCommands gains 'season <auto|none|christmas|halloween>'. Season never touches world generation, so determinism is unaffected.",
+  "TownSystem.TownContext: the ItemCount lambda handles '@' category keys; AnglerQuests comes from the local PlayerState (0 until P5-23); Records = _world.Journal?.RecordsFor(player) (null until P5-25; conditions treat null as 0/false).",
+  "ContentValidator.Town.CheckTownCondition: check refs for rescued (TownNpcs), killed (Enemies), obtained (Items) and achieved (Achievements once P5-26 exists); ItemCategory names; season values. Probes: season.<name> (1/0)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Conditions/ConditionCompiler.cs \u2014 split into Build() and partial adders",
+  "src/Strata.Core/Conditions/ConditionParams.cs \u2014 move the town params out",
+  "src/Strata.Core/Conditions/ConditionContext.cs \u2014 Season, AnglerQuests, Records",
+  "src/Strata.Core/Session/WorldSession.Context.cs \u2014 ctx.Season",
+  "src/Strata.Core/Persistence/WorldMeta.cs \u2014 ForcedSeason",
+  "src/Strata.Core/Commands/WorldCommands.cs \u2014 season command",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 ItemCount '@category', AnglerQuests, Records",
+  "src/Strata.Core/Content/Validation/ContentValidator.Town.cs \u2014 validate the new condition refs",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 season.<name>"
+ ],
+ "files_add": [
+  "src/Strata.Core/Conditions/ConditionCompiler.Town.cs \u2014 town and player condition factories",
+  "src/Strata.Core/Conditions/ConditionParams.Town.cs \u2014 Rescued/Bestiary/Season/AnglerQuests/Killed/Obtained/Achieved params",
+  "src/Strata.Core/Conditions/IPlayerRecords.cs \u2014 journal facts interface",
+  "src/Strata.Core/Simulation/SeasonCalendar.cs \u2014 date \u2192 season",
+  "src/Strata.Core/Session/WorldSession.Season.cs \u2014 forced or real-date season",
+  "src/Strata.Core/Gameplay/Town/TownRescue.cs \u2014 static FlagFor(id) (grown by P5-06)"
+ ],
+ "data_changes": [
+  "none (conditions only; P5-04 uses them)"
+ ],
+ "tests": [
+  "ConditionTests: rescued true only after flag 'rescued_goblin_tinkerer'; hasItem category 'dye' counts an item with category Dye; bestiary min 10 with a fake IPlayerRecords (9.9 \u2192 false, 10 \u2192 true; null records \u2192 false); season with ctx.Season; anglerQuests; killed/obtained",
+  "SeasonCalendarTests: Dec 14 none, Dec 15 christmas, Dec 31 christmas, Oct 31 halloween, Nov 2 none",
+  "ContentValidatorTests: unknown category \u2192 error; rescued with an unknown resident id \u2192 error",
+  "Smoke town.cmds: 'season christmas' / 'assert season.christmas == 1' / 'season auto'"
+ ],
+ "verification": [
+  "dotnet test (ConditionTests, ContentValidatorTests)",
+  "dotnet run --project tools/Strata.Tools -- validate reports no new errors"
+ ],
+ "depends_on": [
+  "P5-01"
+ ],
+ "risks": [
+  "Records being null before P5-25 means bestiary-gated content stays locked until then. This is intended; say so in the PR."
+ ],
+ "effort": "M"
+}

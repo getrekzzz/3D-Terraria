@@ -29,6 +29,18 @@ barycentric three-surface blending in the shader (triplanar sampling of the terr
 Normals come from a tent-filtered density gradient including the padding ring, so chunk borders match.
 Quads split along their shorter diagonal, keeping the first one on near ties (flat ground), so the rounding noise of
 an edit metres away never flips the triangles (and the grass seeded from them) around it.
+Heightfield reconstruction (`HeightfieldSmoothing`, after the relaxation): Taubin keeps long staircases as ripples, so
+each free vertex on monotone, up-facing ground takes the tent-weighted mean (radius 4 columns) of the column tops
+around it, read in a ±5-cell window that rejects columns with air under the top (ledges, roofs, caves), snapping
+cells, or a step over 3 cells (cliffs); it needs its own four columns and 75% of the 8×8 around it valid. The height is
+clamped to the dual cell and to the 0.45-cell drift, so colliders, `FeetCell` and object placement still agree with
+the voxels; only a fixed local window is read, so chunk seams stay identical. `mesh-bench --roughness` prints the
+RMS height deviation of up-facing vertices from a local 3×3 plane fit (seed 1234: 3.2 cm before, 1.7 cm after).
 Also produced: liquid surfaces, cutout (leaves, cobweb) and glass surfaces, grass clumps on grass surfaces
 (`GrassScatter`), and collision triangles in 16³ buckets (solid + one-way platforms). Colliders exist only near the player and rebuild the same frame
-for edits next to it.
+for edits next to it. The mesh job hashes each of the 16 buckets (`CollisionBuilder.ComputeHashes`); `ColliderManager`
+keeps one static body per non-empty bucket and rebuilds only buckets whose hash changed, so liquid- and light-only
+remeshes cost nothing (`colliders.skipped`). Build order per frame: the focus chunk and never-built neighbours at once,
+then player-edited chunks (`Prioritize`), then the rest nearest-first within `FrameBudgets.CollidersMs`; old bucket
+bodies stay until replaced. A light placed, broken or switched remeshes its own chunk urgently and its neighbours through
+the normal queue (`WorldEditor.LightDirty`).

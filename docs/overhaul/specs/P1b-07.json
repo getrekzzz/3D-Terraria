@@ -1,0 +1,53 @@
+{
+ "id": "P1b-07",
+ "title": "Async autosave, unload flushes, map and player writes (no main-thread save spikes)",
+ "player_outcome": "The game no longer freezes every 2 minutes at autosave or when walking away from built areas. Saving happens in the background.",
+ "design": [
+  "Checked in code: GameWorld.Tick calls SaveAll() synchronously every 7200 ticks (GameWorld.cs:114, :246-249). It encodes every modified chunk, rewrites region files, serializes player JSON, and deflates each explored map (ExploredMap.Save, Deflate Optimal over 64\u00d764\u00d78-byte tiles, iterating with a LINQ Concat) on the main thread. The map deflate is a spike source the audit did not list. ChunkStreamer.Unload encodes on main (WorldSession.Unload \u2192 Encode).",
+  "GameWorld.cs is 387 lines, so move the save code to a new partial src/Strata.Core/Session/GameWorld.Saving.cs: SaveAll (sync), BeginAutosave (async), SavePlayer, WritePlayer, LoadOrCreatePlayer, DeletePlayer, PlayerPath, Shutdown.",
+  "BeginAutosave, timed as tick.autosave: Events.Persist and Town.Persist on main; Session.BeginSave capture; PlayerSave.From(state).Serialize() on main with the file writes queued; Maps.QueueSave(saver). Raise Autosaved(chunks) from the batch's Done callback on main. If the previous autosave is still in flight, retry on a later tick.",
+  "MapSystem: add QueueSave(WorldSaver). Per player map with Dirty set (set in ExploredMap reveal and write paths, cleared on queue): ExploredMap.Snapshot() deep-copies tile arrays (~32 KB memcpy per tile), and the saver job runs snapshot.Save(blockName) on the worker. Keep Save() synchronous for tests.",
+  "ChunkStreamer.Unload: WorldSession.Unload returns ChunkSnapshot? (capture instead of encode). _pendingSaves becomes List<ChunkSnapshot>. FlushSaves enqueues a batch without blocking. UnloadAll enqueues and then calls Saver.Flush().",
+  "Shutdown (from WorldRuntime._ExitTree): wait for the in-flight save, then synchronous SaveAll and UnloadAll (blocking on exit is fine). PauseMenu 'Save & Quit' keeps the synchronous SaveAll.",
+  "BuiltinCommands `save`: add `save async` for perf.cmds; plain `save` stays synchronous for existing smoke scripts.",
+  "perf.cmds: add `save async`, wait 1, `assert perf.max.tick.autosave < 8` and `assert perf.max.stream.unload_flush < 4` (generous headless bounds).",
+  "docs/architecture/persistence.md: async saving, pending snapshots, single writer, meta written after blobs."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/GameWorld.cs \u2014 autosave calls BeginAutosave; save code moved out (stays under 400 lines)",
+  "src/Strata.Core/Session/WorldSession.cs \u2014 Unload returns ChunkSnapshot?",
+  "src/Strata.Core/Streaming/ChunkStreamer.Scheduling.cs \u2014 snapshot-based Unload and non-blocking FlushSaves",
+  "src/Strata.Core/Streaming/ChunkStreamer.cs \u2014 _pendingSaves type; UnloadAll flushes",
+  "src/Strata.Core/Gameplay/Map/MapSystem.cs \u2014 QueueSave",
+  "src/Strata.Core/Gameplay/Map/ExploredMap.cs \u2014 Snapshot() and Dirty flag",
+  "src/Strata.Core/Commands/BuiltinCommands.cs \u2014 `save async`",
+  "game/UI/PauseMenu.cs \u2014 keep sync save on quit (verify)",
+  "game/Testing/Scripts/perf.cmds \u2014 async save asserts",
+  "docs/architecture/persistence.md \u2014 async saving"
+ ],
+ "files_add": [
+  "src/Strata.Core/Session/GameWorld.Saving.cs \u2014 save, autosave and player-file partial",
+  "tests/Strata.Core.Tests/Session/AsyncSaveTests.cs \u2014 autosave and unload round-trip tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "AsyncSaveTests.AutosaveCaptureIsCheap: TestGame with 50 modified chunks; BeginAutosave main-thread time < 15 ms; after Flush a fresh session reloads identical chunks, player file and map file",
+  "AsyncSaveTests.RestreamBeforeWriteKeepsEdits: edit, move focus away (unload with gated worker), move back, and the edit is present",
+  "Existing tests that call SaveAll or UnloadAll pass unchanged"
+ ],
+ "verification": [
+  "dotnet test; all smoke scripts; menu tour",
+  "Rendering run of perf.cmds: `perf spikes` has no tick.autosave or stream.unload_flush entries (baseline from P1b-05 had them)",
+  "Manual: play past an autosave with F3 open (spike line stays clean); quit during an autosave and reload"
+ ],
+ "depends_on": [
+  "P1b-06"
+ ],
+ "risks": [
+  "Autosave overlapping shutdown: Shutdown must wait before its final synchronous save",
+  "Map Dirty flag must be set on every reveal path, or maps go unsaved",
+  "Lost (dead hardcore) players must still be skipped",
+  "Shares ChunkStreamer.Scheduling.cs and ChunkStreamer.cs with P1b-08: sequence"
+ ],
+ "effort": "M"
+}

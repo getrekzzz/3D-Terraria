@@ -1,0 +1,633 @@
+{
+ "uncovered_requests": [
+  "No WP owns buff and debuff visuals on the player or on creatures (critic #7). NpcRenderer.cs:141-143 and PlayerAvatar.Gear.cs:77-80 draw nothing for On Fire!, Poisoned, Frostburn, Ichor, Cursed Inferno, Shadowflame, Confused or Well Fed. P2-14 only adds the icon bar. Absorb this in a new P3-47 [M], scheduled after P3-08 (EffectKit): add a `visual` block to BuffDef (tint, particle id, optional light), validated in ContentValidator.Projectiles.cs once P0-01 has split the validator. NPCs get an instance-shader tint and pooled EffectKit emitters; the player gets the same through PlayerAvatar.Gear. Scale by effectsScale. Smoke test in combat.cmds: `buff on_fire` then `assert fx.status_emitters >= 1`.",
+  "Movement feel has no owner and P3 lists it as out of scope (game-feel #16, critic #15). The jump reaches only about half of Terraria's height relative to the body, Hermes Boots give an instant +45%, and the Sprint key speeds up everyone. Absorb this in a new P3-46 [S], after P3-26. Changes: in data/config/movement.json, a jump apex of about 5-6 cells for the 3.6-cell body; a run-up acceleration curve for boots in MovementConfig; Sprint only with a run-speed bonus; PlayerController.Air.cs. Smoke test in movement.cmds using a new `player.jump_apex_cells` probe.",
+  "Chest lids never open (critic #16). Absorb this in a new P3-48 [S], after P1b-10 (TileObjectRenderer.Groups). In tools/blender/bgen/furniture.py, export the lid as a separate pivoted node. The renderer draws container lids as a second MultiMesh whose rotation follows the open state. P2-17 already plays chest_close.",
+  "Music and ambience gaps (game-feel #8, #17): no rain, town, underground-biome or night variants; no boss-defeat stinger; the Ambient bus is unused; fishing bites, hotbar switches and water entry are silent. Proposed split: (1) a new P3-49 [M] covering music tracks and variants (tools/audio/composer.py + MusicDirector rules), ambient loops on the Ambient bus, and the fishing-bite sound; (2) the hotbar tick in P2-12 (HotbarBar); (3) water entry in P3-26; (4) projectile impacts in P3-11; (5) the boss-defeat stinger in P4-03.",
+  "Euclidean (non-octahedral) light propagation was deferred by P1 and has no owner. Torch light falls off to about 4 m on diagonals against 7 m along the axes (LightEngine.cs:131), which is part of the 'tiny torch radius' complaint. Add an optional P1b-17 [M] at the end of W2 lane A, triggered if the player still finds torches small after P1-04. It uses a face/edge step-cost table (2/3) in the LightEngine BFS in Core, with LightEngine tests and a mesh-bench comparison. No GenVersion bump: light is not part of the golden ChunkHash.",
+  "Two art gaps are not covered (art #4, #10): themed enemies are recoloured humans with only 4 hat types, and fur, feathers and chitin all use the woven cloth texture. (1) Fold fur/scale/chitin/bone texture layers into P3-43 (tools/textures/props.json). (2) Add a new P3-50 [M] themed-humanoid kit in tools/blender/bgen/human/accessories.py: goblin ears and skin, pirate gear, skeleton casters, cultist robes.",
+  "Furniture and crafting stations are unbevelled boxes (art #12). The player wants realistic 3D world visuals, but P3 excludes this. Add a new P4-38 [M] in the W9 art lane: a bevel pass over tools/blender/bgen/furniture.py and mesh.py that reuses P4-17's dungeon_furniture helpers.",
+  "Pylons (section H) are in no WP. Add a new P5-34 [M] after P5-12 (happiness) and P5-29 (housing UI): biome pylon tile objects sold when two or more happy NPCs live nearby, teleport from WorldMapScreen, and Core PylonNetwork tests.",
+  "The Clothier Voodoo Doll (section I) is missing. Add the item and its drop (the Clothier killed while the player wears the Red Hat) to P4-20. Add its use (summons Skeletron at night) to P4-11.",
+  "Mounts other than the minecart (section K) are excluded by every phase. P2-05 already models EquippedMount. Record them as a post-P5 phase in the master plan (Slimy Saddle first) so the gap is explicit; do not block on it.",
+  "No WP title owns the rarity colours for tiers 9-11 or the special tiers -11/-12/-13 (51-52 items wrong; UiTheme.cs:39-52 falls through to yellow at 8+). Make P2-01 move the table to Core as src/Strata.Core/Presentation/RarityColors.cs, holding Terraria's RGB values including -11 amber (quest), -12 animated rainbow (Expert) and -13 fiery red (Master), with a Core test. P4-04 then only uses -12 and does not edit UiTheme.",
+  "Nothing guards against loading old worlds after a GenVersion bump. WorldMeta.GeneratorVersion is written (WorldSession.cs:94) but never compared, so an old world would silently mix saved chunks with newly generated ones and show seams. Add to P1b-02: SaveCatalog flags outdated worlds, and MainMenu.Worlds.cs shows 'Made with an older world generator - new terrain will not match' with a confirm dialog. Add a Core test for SaveCatalog.",
+  "Summon staves have no minion indicator (items #13). Make P2-14 show the minion buff with its active count. Make P3-10 add the summon puff.",
+  "The controls ignore Terraria habits and the wheel actions are dead (critic #20). P2-11 should own a review of the defaults in data/config/input.json, keeping everything rebindable. Quick heal, mana and buff keys stay in P3-33; smart cursor stays in P2-29.",
+  "Stack sizes mix game versions (items #15). Fold a 1.4.4 max-stack migration into P3-02's data migration (potions, ammo and blocks at 9999), checked by a validator rule.",
+  "MeleeSwingParams.TrailColor is never read (section F). P1-11 already rewrites SwingTrail, so it should use the colour there.",
+  "Background walls (section K) are out of scope in 3D: voxel rooms are already enclosed, and P4-13's wall panels give the dungeon look. Record the decision in the master plan at P1-17 so it is not re-raised.",
+  "The master-plan status table is stale (section K). Refresh it at every phase gate: P1-17, P2-31, a new P3 gate at the end of W6, P4-23 and P5-33.",
+  "The Leather Whip and Rally are unobtainable (section H). The Leather Whip is covered by P5-17. Rally needs an explicit shop entry in P5-15 or P5-19. Rely on the obtainability check in ItemSources (P5-24a) to prove both."
+ ],
+ "conflicts": [
+  "The P1-01 prep must grow into a cross-phase P0-01 that performs every duplicated split once, so no later WP re-does it:\n- Move PlayerEntity from GameWorld.cs:20-105 into src/Strata.Core/Session/PlayerEntity.cs. P2-25 and P3-01 also plan to add this file; they should edit it instead.\n- Split ItemUseSystem.Shooting.cs (Shoot, FindAmmo) and ItemUseSystem.Consume.cs (Consume, Summon, StartEvent, Refused, ConsumeHeld) out of ItemUseSystem.cs. Use the name Consume.cs, which P2-19, P3-01 and P3-33 already expect; P1-01's name ItemUseSystem.Consumables.cs should be dropped.\n- Move Kill, DeathEffects and GroupAlive into NpcSystem.Death.cs. P3-19 planned this move and P4-01 planned an equivalent NpcSystem.Loot.cs.\n- Move BossInfo, BossPart, BossRitual, DayEnrage and KillShield (EnemyDef.cs:4-157) into Content/Defs/BossInfo.cs, which P4-01 also plans to add.\n- Split ContentValidator.World.cs into ContentValidator.Enemies.cs (ValidateEnemies, ValidatePattern) and ContentValidator.Projectiles.cs (ValidateProjectilesAndBuffs, ValidateLoot).\n- Split WorldLauncher.cs into partials: Player, Effects, Ui and Assets.\n- Add PlayerController.Fall.cs (TrackFall and fall damage) and InteractionController.Talk.cs (UpdateTalkTarget and DigDownTarget).",
+  "Add a P0-02 that creates extension points so parallel lanes stop colliding on hub files:\n- Probe sources: static classes marked [ProbeSource], discovered by reflection in CommandContext (Core) and in GodotCommandHost (game). Every WP then adds its own probe file instead of editing GodotCommandHost.cs, StandardProbes.cs, UiProbes or UiCommands.\n- Audio recipes: sfx_recipes.py (334 lines) merges RECIPES from every sfx_recipes_*.py module.\n- Blender assets: build_all.py merges tools/blender/assets.json with tools/blender/assets.d/*.json, and bgen generator modules register themselves through a GENERATORS dict.\n- Smoke scripts: new blocks in shared .cmds files go in WP-id order under a `# --- <WP id> ---` marker, so merge conflicts resolve by concatenation.",
+  "ItemUseSystem*.cs (375 lines before P0-01) is touched by many WPs. Land them strictly in this order and rebase each on the previous: P0-01, P1-05, P1-16, P1-10, P1-15, P1-13, P1-08, P2-06 (FindAmmo), P2-07 (new Slots partial), P2-19 (Consume), P3-01' (bursts only), P3-09, P3-14, P3-15, P3-12, P3-17', P3-33 (Consume and Quick), P4-11 (Gloves partial), P4-25 (Utility), P5-15 (Garden partial), P5-21 (Looks partial), P5-20 (Town partial).",
+  "PlayerEntity.cs only receives additive fields. Order: P1-05 (ViewDirection, Facing, AimDistance), P1-10 (UseAnimationMax, UseSerial, UseItem, ResetUse), P1-08 (Hook, Hand), P2-25 (cause of death), P3-09, P3-12 (tether), P3-33, P3-34 (sleep).",
+  "GameWorld*.cs is at 387 lines, so nothing may be added until P0-01 frees about 85 lines. Order after that: P1-08, P1b-07 (moves SaveAll and SavePlayer into GameWorld.Saving.cs, and the static WritePlayer, LoadOrCreatePlayer, DeletePlayer and PlayerPath into GameWorld.PlayerFiles.cs, which P5-25 and P5-26 then edit instead of creating), P1b-09 (LightDirty), P2-05 (Players.cs), P2-07/P2-08 (InventoryActions.cs), P2-19 (Feedback.cs), P2-25, P3-25, P3-29, P3-30, P3-34, P4-11, P4-18 (Hazards.cs), P4-24, P5-02 (Town.cs), P5-09, P5-14 (Crafting.cs), P5-25.",
+  "NpcSystem*.cs (378 lines) order: P0-01 (Death.cs), P2-19 (numbers), P2-25 (harm cause in ReportPlayerDamage, also in NpcSystem.Parts.cs BarrierEffects), P3-19 (materials in Death.cs), P3-25 (Knockback.cs), P3-29 (heart and star drops in Death.cs), P4-01 (Loot.cs and Enrage.cs split from Death.cs, and the ICombatTarget type change), P4-07 (Segments.cs), P4-20 (Loot.cs), P4-24 and P4-27 (Effects.cs), P5-09 (Targeting.cs behaviour only).",
+  "MeleeSystem.cs order: P1-05 (arc yaw from Facing), P1-10 (strike window), P3-04 (SwingCurve plane and extension), P3-23 (hitting pots and grass), P4-07 (segment hits).",
+  "game/UI/Hud.cs (373 lines) order: P1-07 (removes _targetName and adds TargetLabel), P2-10, P2-12 (restructure into game/UI/Hud/*), P2-15, then P2-13, P2-14, P2-21, P2-22, P2-23 and P2-25 back to back in one lane, then P5-08 (announcements go to ChatLog). P4-03 and P4-22 no longer touch Hud.cs, because BossBar belongs to P2-23 and the bound Mechanic moves into P5-06b.",
+  "InventoryScreen*.cs order: P2-10, P2-11, P2-15 (Layout and Clicks partials), P2-16, P2-17, P2-18, P2-27, P2-28, P2-30, P3-35 (the Piggy Bank and Safe reuse P2-17's ChestPanel with a personal container; no new screen code), P4-25 (data plus an extra accessory slot flag only, because P2-05 and P2-16 already model 7 accessory slots), P5-29 (new Tabs.cs partial), P5-30.",
+  "TownDialog*.cs order: P2-11, P2-26 (creates TownDialog.Services.cs), P2-27 (ShopPanel), P2-28 (ServicePanel), P5-13, P5-12, P5-14, P5-08, P5-21, P5-22, P5-23, P5-27. P5-13 must extend P2-26's Services partial and render shop tabs inside P2-27's ShopPanel. It must not add its own TownDialog.Services.cs or a list-style TownDialog.Shop.cs.",
+  "InteractionController*.cs (206 lines) order: P0-01 (Talk partial), P1-06, P1-07 (moves entity picking to Core EntityPicking), P2-07 (right-click and slot actions), P2-11 (InputGate), P2-29 (SmartTargeting in Core), P3-09, P3-12, P3-17' (the F key uses EquippedHook), P3-33, P3-34.",
+  "The player-avatar files (PlayerAvatar*.cs, ViewModel*.cs, SwingTrail.cs, HumanoidAnimator.cs) land in one chain: P1-06, P1-11, P1-14 (ViewModel.Ranged.cs), P1b-13 (PlayerAvatar asset cache), P3-02, P3-03, P3-04, P3-06 (PlayerAvatar.Held.cs), P3-07 (ViewModel.Poses.cs; P1-14's hard-coded ranged poses are converted into data/config/use_styles.json), P3-12, P3-13, P3-15, P3-33, P3-34, P3-42 (Armor partial), P5-07', P5-21 (Look partial).",
+  "Human animation sets: tools/blender/bgen/human/actions.py, motion.py and the 22 MB of assets/models/creatures/anim/*.glb binaries are rebuilt by P1-12, P3-03 and P5-07. Binary GLBs cannot be merged, so these rebuilds must never run in parallel worktrees. Order: P1-12 (swing, mine, bow, plus strafe_left and strafe_right; see wrong_or_risky), then P3-03 (item clips plus P5-07's sit, sleep, bound and lie rest poses, to save a third 22 MB rebuild). After that, P5-07 only adds animator states in HumanoidAnimator.cs.",
+  "Use-timing data: P1-10 creates data/config/use_timing.json and P3-02 creates data/config/use_styles.json. Merge them: P1-10 should create data/config/use_styles.json with a `clips` section (length, strikeStart, strikeEnd, release per clip) plus the Core loader src/Strata.Core/Presentation/UseStyleConfig.cs. P3-02, P3-03, P3-04, P3-06, P3-07 and P3-10 then extend `styles` and `poses` in that same file. P3-01's UseTiming.cs is dropped in favour of P1-10's src/Strata.Core/Gameplay/Items/UseTiming.cs; both WPs planned tests/.../UseTimingTests.cs.",
+  "Shots and grappling are designed twice (P1 against P3). Resolution:\n- Hand origin: P1-13's ShotGeometry.cs owns it. P3-09 extends it with muzzle-socket offsets and does not add ShotOrigin.cs.\n- Sword+projectile melee and MaxActive: P1-16 owns them.\n- Dry fire: P1-15 owns failed-use feedback.\n- Tink sound: P1-15's tink_1.wav is reused by P3-24.\n- Grapple: P1-08/P1-09 own click-to-use, voxel anchors, platforms and canopies. P3-17 shrinks to per-hook heads and chains (ChainStrip from P3-13) and the F key using PlayerInventory.EquippedHook from P2-05.",
+  "Inventory and item models are designed twice (P2 against P3). Resolution:\n- P2-05 is the only misc/vanity/dye/favourites slot model. P3-16 is dissolved: pet and light-pet summoning from the Misc slots goes into P3-18; F-key and mount-key glue goes into P3-17'.\n- P2-06 is the only coin/ammo implementation. P3-28 is dropped, and P3-35 now depends on P2-06.\n- P2-19 owns heal and mana combat numbers; P3-19 and P3-29 emit through it and add no DamageKind of their own.\n- P2-04 owns the station-name helper, placed at src/Strata.Core/Content/Index/StationNames.cs so P5-14 reuses it.",
+  "Boss presentation, bags and bound NPCs are designed twice (P2/P3/P4/P5). Resolution:\n- P2-23 and P2-24 own BossBar (game/UI/Hud/BossBar.cs), BossIcons and tools/blender/bgen/boss_icons.py.\n- P4-03 shrinks to Terraria boss messages through P2-21's ChatLog, music fade, the boss-defeat stinger and BossEffects. It calls P3-25's camera-punch API instead of adding its own.\n- P3-32 merges into P4-04: one data/items/boss_bags.json and one tests/.../TreasureBagTests.cs (both WPs planned that test file). The Expert gating fix (max 2 so Journey is excluded) moves into P4-01.\n- P4-22 (bound Mechanic) merges into P5-06b. P4-19 reserves a `bound_npc` room role in the dungeon plan so P5-06b's SiteFinder can find it.",
+  "Rendering lights, projectile materials and effect pools must have one owner each:\n- Assign in DynamicLights.cs: P1-04 removes the LINQ and makes it allocation-free, so P1b-12 skips that part.\n- Projectile lights: P1b-15's ProjectileRenderer.Lights.cs is a DynamicLights provider. P3-08's FlashLights is another provider, not a second pool. P3-11 adds no pooling of its own.\n- Edit order for graphics.json and GraphicsConfig.cs: P1-03, P1-04, P1b-11, P1b-12, P1b-15, P3-08, P3-18.",
+  "ProjectileRenderer*.cs order: P1b-05 (timers), P1b-13 (AssetCache), P1b-15 (pooling), P3-10, P3-11 (splits into Visuals and Trails partials), P3-12 (Tethers), P3-13, P3-18. ProjectileSystem*.cs order: P1-13, P2-25, P3-09, P3-11, P3-14 (Special.cs), P3-12 (Tethers.cs), P3-13, P3-18 (Pets.cs), P3-23, P3-25, P3-30, P4-07, P4-20, P4-33.",
+  "SoundEvents*.cs and CombatEffects*.cs are touched by about 20 WPs. P3-08 should first split SoundEvents into domain partials (Weapons, Creatures, World, Player) with one Wire call each, so the lanes add to different files. Order: P1-15, P2-01 (font), P2-19, P3-08, P3-19 (Creatures.cs, CombatEffects.Dust.cs), P3-20, P3-09, P3-10 (CombatEffects.Muzzle.cs), P3-11, P3-21 (World.cs), P3-24, P3-25, P3-27, P3-29, P3-30, P5-08.",
+  "Only one agent may edit the Blender pipeline at a time: tools/blender/build_all.py, assets.json (until P0-02's assets.d exists), tools/textures/props.json and export.py. Order: P1-12, P3-37, P2-24, P3-05 (sockets; needed by P3-38 for side-on guns), P3-38, P3-39, P3-40, P3-41a, P3-41b, P3-43, P3-44, P3-45, P3-50, P4-29, then the P4-04, P4-11, P4-17 and P4-18 models, then P4-35, P4-36, P4-37, P4-38, P5-28, and P5-15/16/18/20/23 decor. Regenerate data/manifest.json with `Strata.Tools manifest`; never hand-merge it.",
+  "ContentValidator files after P0-01's split:\n- World.cs (biomes, events, flags, obtainability): P1-02, P1b-02, P2-03, P5-24a (moves obtainability into Core ItemSources), P4-05.\n- Enemies.cs: P2-24, P3-19, P4-02, P4-03, P4-10, P5-25.\n- Projectiles.cs: P3-11, P3-12, P3-18, P3-27, P3-47.\n- Items.cs: P1-16, P2-04, P3-02, P3-15, P3-27, P3-41.\n- Town*.cs: P5 only.",
+  "EnemyDef.cs and BossInfo.cs: P0-01 (move), P1b-14 (preload hints), P2-23 (boss-bar fields such as InBossBar on BossPart), P3-19 (materials), P4-01, P4-04, P4-07, P5-25 (bestiary). ItemDef.cs: P1-16, P2-05, P3-01', P3-02, P3-09, P3-29, P3-30. ItemBehaviorSpecs.cs: P1-16, P3-09, P3-14, P3-17', P3-33, P4-25, P5-15, P5-21, P5-20.",
+  "PlayerSave.cs: P2-05, P2-06, P3-31, P3-35, P5-21, P5-23, P5-25. All are additive properties at version 1, each with a fixture test proving an old v1 JSON still loads. ChunkCodec.cs and TileObjectInstance.cs: P1b-06, then P2-08, then P4-21. P2-08 adds one tagged 'object meta' section (name now, lock later) so P4-21 appends a field instead of changing the object record layout.",
+  "PlayerController*.cs (293 lines) order: P0-01 (Fall partial), P1-09 (Grapple), P2-11, P2-25 (harm cause for fall damage), P3-25 (hurt sounds and vignette), P3-26 (dust), P3-46, P3-34 (sleep), P4-08 (confusion, as a guarded block in a new Status partial), P4-24 (tongue, in the same Status partial).",
+  "Input and settings files (data/config/input.json, KeyBindings.cs, UserSettings.cs, SettingsScreen*.cs) order: P2-10, P2-11, P2-13, P2-21, P2-29, P2-30, P3-17', P3-33, P5-30. P2-30 goes after the whole HUD lane because it reskins SettingsScreen and PauseMenu.",
+  "WorldGen golden hashes: P1b-02 (GenVersion 10, and ChunkHash switched to block string ids), P1b-03 (re-pin under the same version if P1b-02 is still unpushed), P4-12 (must show no change), P4-15 (bump), P4-16, P4-19, P4-21 and P4-34 (re-pin inside the unpushed W8), P5-22 (bump). With string-id hashing, P4-13 and P4-20, which only add blocks, no longer need to re-pin. Only one worktree at a time may touch tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs or GenVersion.cs.",
+  "Biome data: data/biomes.json, BiomeDef.cs and ContentValidator.World.cs are edited by P1-02 (exposureBias) and then by P1b-02 (relief). Keep both in W1 lane B, in that order.",
+  "WorldRuntime.cs, ChunkStreamer*.cs and ChunkMesher.cs stay inside P1b's own chain: P1b-05, P1b-07, P1b-08, P1b-09, P1b-10, P1b-11, P1b-12. P1b-12 must set GCSettings.LatencyMode in game/Bootstrap/GameRoot.cs, not in WorldLauncher, so it does not collide with P1b-13 and P1b-14 in the WorldLauncher Assets partial.",
+  "TownNpcDef.cs, TownNpcParts.cs and TownSystem*.cs follow P5's own order. P5-13 lands before P5-06a because both edit TownNpcDef and TownNpcParts. ItemUseSystem.cs and ItemBehaviorSpecs.cs inside P5 merge in the order P5-15, P5-21, P5-20.",
+  "Documentation (docs/architecture/*.md and docs/3D_TERRARIA_MASTER_PLAN.md) is edited by almost every WP. Only phase gates (P1-17, P2-31, the P3 gate, P4-23, P5-33) should rewrite shared sections; individual WPs append under their own system heading to avoid merge noise.",
+  "Critical files for implementation:\n- src/Strata.Core/Session/GameWorld.cs, plus PlayerEntity.cs after the move\n- src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs and its Shooting and Consume partials\n- src/Strata.Core/Gameplay/Entities/NpcSystem.cs and NpcSystem.Death.cs\n- game/Bootstrap/WorldLauncher.cs\n- game/UI/Hud.cs\n- game/Player/InteractionController.cs\n- tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs\n- tools/blender/build_all.py"
+ ],
+ "wrong_or_risky": [
+  "The PlayerEntity move and the ItemUseSystem split are planned three times: P1-01, P2-25 and P3-01 all 'add' src/Strata.Core/Session/PlayerEntity.cs, and P1-01, P2-19 and P3-01 all add a consumable partial under two different names (Consumables.cs and Consume.cs). Do it once in P0-01 with the name ItemUseSystem.Consume.cs; the other WPs edit the file instead.",
+  "P1-10 and P3-01 are the same work package: both put useAnimation separate from useTime, both create a UseTiming.cs (Gameplay/Items vs Gameplay/Interaction) and both create UseTimingTests.cs. Keep P1-10. Reduce P3-01 to real gun bursts and reuseDelay, sized S.",
+  "P1-10 says 'speed bonuses scale useAnimation'. That is right for melee speed and speed prefixes, but in Terraria pickaxe or mining speed shortens only the tool's useTime; the tool hits several times inside one continuing swing. ItemUseSystem.cs:110 already divides useTime by MiningSpeed. UseTimingTests must assert that mining speed leaves UseAnimation unchanged and never restarts the clip.",
+  "P1-06 locks body yaw to camera yaw so the player strafes with A/D, but no strafe clips exist. HumanoidAnimator.States has only idle, walk, run, sprint and so on, and motion.py has only walk and run. Pure sideways movement would look like sliding. Fix: keep the pelvis and legs twisted up to 70 degrees toward the movement direction (the existing MaxTwist) while chest, head and arms follow the camera yaw exactly, and add strafe_left and strafe_right to P1-12's clip rebuild.",
+  "Npc.Volumes() (Npc.cs:132-142) is a `yield` iterator, so it allocates an enumerator on every call. P1-07's 'allocation-free' EntityPicking must not call it per NPC per frame. Add VolumeCount and VolumeAt(i) accessors to Npc, plus an allocation test using GC.GetAllocatedBytesForCurrentThread.",
+  "Boss parts and defeat flags: the BossPart docs (EnemyDef.cs) tell parts to carry the boss's Flag. NpcSystem.Kill only raises BossDefeated when GroupAlive is false (NpcSystem.cs:119-120,317). When a leader dies, followers are dropped through FollowLeader and Remove, not Kill. So if Skeletron's head dies while its flagged hands are still alive, the flag is never set and BossDefeated never fires. Hud.UpdateBossBar would also add the hands' life to the bar. P4-01 must add BossPart semantics: DiesWithBody (parts are excluded from GroupAlive and killed after the body) and InBossBar, which P2-23's BossBarModel reads. BossFrameworkTests must cover both.",
+  "Brain target type: BrainContext.Target is PlayerEntity? (Brain.cs:14). P5-09 plans to change it to ICombatTarget only after P4 has written HandBrain, CryptWardenBrain, PlantBrains, PatternBrain.Moves and Illusions, and after WormBrain and MawwallBrain edits. Move the type change (PlayerEntity implements ICombatTarget, plus a TargetPlayer helper for player-only effects such as confusion and the tongue) into P4-01. P5-09 then only adds town residents as targets.",
+  "The golden hashes will break for reasons unrelated to generation:\n- ChunkHash hashes runtime numeric block ids (WorldGenTests.cs ChunkHash, c.Data.GetBlock(i)). The manifest is sorted alphabetically, so data/blocks/dungeon.json (P4-13) sorts before hardmode, natural and ores and shifts their ids.\n- The test hard-codes the spawn chunk as (8,10,8) and asserts GenVersion == 9. P1b-02's new relief will move the spawn.\nFix in P1b-02: hash Content.Blocks[id].Id strings, re-pick the golden chunks so at least 3 of them contain surface terrain, and update the spawn assertion.",
+  "P1b-04 edits SurfaceNetsMesher.cs, which is at 371 lines. Keep all new logic in HeightfieldSmoothing.cs so the mesher grows by less than 25 lines. Because collisions are built from the surface-nets mesh (ChunkMesher.cs:66), the smoothing must keep the MaxDrift clamp (0.45 cells) so visuals and colliders still agree, and it must be seam-identical across chunk borders. Add Core tests for the drift bound and for a chunk meshed alone matching the same chunk meshed among its neighbours. Re-run movement.cmds (the P1-09 hook on natural terrain) and builder.cmds after it lands.",
+  "P2-11 lists only 8 files, but InputGate is read in 14: PlayerController.Grapple.cs, PlayerController.Air.cs and PlayerController.Ride.cs, WorldMapScreen.cs, DebugConsole.cs, PerfOverlay.cs and MenuKit.cs as well. Keep GameplayBlocked meaning 'modal open' so those files keep working, and add a separate OverlayOpen or PointerFree flag for the inventory. Smoke test in ui.cmds: `ui inventory`, walk forward, then `assert player.speed > 0`.",
+  "Several listed 'modified' files do not exist at HEAD:\n- game/Debug/UiCommands.cs and UiProbes.cs (P2-10, P2-13 and later) must be created by P2-10, or become [ProbeSource] files after P0-02.\n- src/Strata.Core/Gameplay/Town/TownRescue.cs (P5-06) is a new file.\n- src/Strata.Core/Content/Index/ does not exist yet.\n- game/Testing/Scripts/ui.cmds and perf.cmds are new, and CI runs every Scripts/*.cmds automatically.",
+  "P4-01 lists BossInfo.cs as a new file, but BossInfo, BossPart, BossRitual, DayEnrage and KillShield already exist inside EnemyDef.cs (lines 4-157). It is a move, done in P0-01. P2-23 and P3-19 both edit these types, so the move must land first.",
+  "ContentValidator.World.cs is 274 lines and about 11 WPs across P1-P4 add rules to it. It will pass 400 lines unless it is split up front (P0-01) and P5-24's ItemSources extraction is pulled forward as P5-24a in W3. Otherwise every new item source (starfall, treasure bags opened via ConsumeParams.Loot, rescues, pets) would be registered in the validator and then moved later. Obtainability warnings do not fail validate (ValidateCommand returns errors only), so gaps would stay silent. Add a Core test that asserts zero obtainability warnings.",
+  "WorldLauncher.cs (215 lines) is a wiring hub that about 25 WPs extend, and PlayerController.cs (293) and InteractionController.cs (206) gain 8 to 11 edits each. All three will breach 400 lines unless the P0-01 partial splits land first.",
+  "The alias table is global across content categories: ContentDatabase.Current is used for items, prefixes, blocks and every other type. When P3-31 aliases the invented prefix ids to Terraria prefixes, an alias key must not equal an id in any other category, or it would also remap that item or block. Add a validator rule for this, and a PrefixTests fixture that loads an old player save with invented prefixes.",
+  "ItemStack is a readonly struct whose equality and CanStackWith compare Item, Count and Prefix. If P2-05 stores favourites on ItemStack, stacking, Transfer and every equality check change behaviour. Store favourites per slot instead (a bool array on Inventory), serialised as SlotModel(..., bool Favorite = false). P2-08's favourite-aware ops read the slot flag.",
+  "P2-06 routes coins into coin slots and ammo into ammo slots. The smoke probes `inv.<item>` (for example combat.cmds `assert inv.wooden_arrow == 49`) and the inventory commands must then count the backpack, coin, ammo and trash slots together, or existing smoke scripts fail.",
+  "P3-24 moves stone and ore hit counts to Terraria's, and P1-10 changes cooldown semantics. Both change how many `use` calls basic.cmds and builder.cmds need to break a block. Their WPs must update those scripts in the same commit.",
+  "P1b-05 adds perf.cmds under game/Testing/Scripts, which CI runs headless on shared runners. Its asserts must use deterministic counters only: main-thread save count, collider rebuilds per edit, tile-object rebuilds per remesh, grass creations per frame, gen2 collections during scripted travel. Wall-clock spike thresholds belong only in the rendering run whose output is attached to the commit.",
+  "P1-08 moves the hook state into Core, but the engine's CharacterBody3D owns the player's position during play. The contract must be explicit: Core GrappleHook decides the anchor, state and pull target; PlayerController applies the velocity in _PhysicsProcess; GameWorld.TickPlayer advances the hook only when no engine body is attached (tests and headless runs). Voxel anchors can sit up to about 0.22 m (MaxDrift 0.45 cells) from the smoothed collider, so the release check must test the anchored voxel cell, not a nudged physics point (the current bug at PlayerController.Grapple.cs:106-111).",
+  "P1-04's flatter block-light curve (voxel_light.gdshaderinc strata_block_curve) brightens every emitter: lava, glowing ores, mushrooms, shimmer. The radius is still capped by 4-bit propagation at 7.5 m on axes and about 4 m on diagonals. Verify with lighting.cmds stops in a lava cavern, the glowing mushroom biome and the underground desert, not only a torch room. Tune data values (torch [15,13,10]) before raising the shader gain.",
+  "P1-03 exposure: Godot 4.7's CameraAttributesPractical auto exposure only adapts within the sensitivity window. With the AgX tonemapper, exposure is multiplied before the glow threshold, so glow also has to be retuned (the level weights currently sum to 4.5). Acceptance must be numeric, not visual. tools/ci/shot_stats.py should assert desert and snow noon mean luminance in [0.35, 0.6] with under 2% clipped pixels, and cave-exit frames at +0.5 s and +2 s, on medium, high and ultra.",
+  "P1b-13's threaded asset loading turns first-use creature, prop and animation loads asynchronous. Smoke scripts and tours that check visuals right after `spawn` (creatures.cmds, bosses and animation tours, props.problems) need a `wait_until assets.pending == 0` step or they will race.",
+  "P2-12 moves the hotbar to the top-left, where the FPS label (Hud.cs:105) and P1b-05's F3 PerfOverlay sit. P2-09's UiLayout must define a 'debug' region that pushes the overlay below the hotbar and buff rows. UiLayoutTests must include the F3-open case.",
+  "P3-43 and P3-44 re-point creature models in data/enemies/evil.json, temple.json and underworld.json, which P4-07, P4-08 and P4-24 also edit in the same wave (W7). Keep one JSON entry per line so text merges succeed, and land P3-44 before P4-08.",
+  "Several WPs are sized L and should be split before assignment:\n- P5-06: split into P5-06a (Core rescue framework, SiteFinder and data) and P5-06b (per-NPC sites, including the dungeon Mechanic from P4-22).\n- P5-15: split into P5-15a (Merchant, Dryad, Arms Dealer, Demolitionist) and P5-15b (Clothier, Goblin, Mechanic, Witch Doctor, plus the Garden partial).\n- P5-30: split into P5-30a (book shell, IGuideTab, search) and P5-30b (Items tab and ItemDetails).\n- P3-41: split into P3-41a (pre-hardmode armour sets) and P3-41b (hardmode and lunar sets).\nP4-07 (Eater of Worlds segments becoming NPCs and splitting) is also closer to L than M: split it into Core segment life and splitting, then renderer and drops.",
+  "P5 plans a new GameWorld.PlayerFiles.cs, but P1b-07 already moves 'the save code' out of GameWorld.cs. Decide once: P1b-07 creates both GameWorld.Saving.cs (async SaveAll and SavePlayer) and GameWorld.PlayerFiles.cs (the static file helpers); P5-25 and P5-26 edit PlayerFiles.cs.",
+  "Each of the three animation-set rebuilds (P1-12, P3-03, P5-07) rewrites about 22 MB of binary GLBs, which bloats the pushed branch history. Fold P5-07's rest poses into P3-03 so there are only two rebuilds. Never run two `build_all.py --anims` jobs from different worktrees."
+ ],
+ "execution_waves": [
+  {
+   "wave": "W0 - Cross-phase prep splits, extension points and baselines (no behaviour change)",
+   "wps": [
+    "P0-01",
+    "P0-02",
+    "P1b-01",
+    "P1b-05"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P0-01",
+     "P0-02"
+    ],
+    [
+     "P1b-01",
+     "P1b-05"
+    ]
+   ],
+   "push_checkpoint": "Merge lane A first. P1b-05 starts only after P0-01 merges, because it wires FrameProbe into the new WorldLauncher partial and adds perf probes through P0-02's probe-source files. Push 'W0 prep' only when: the golden hashes are byte-identical, every smoke script still prints SMOKE PASS, and the menu tour prints MENU PASS. Save build/wg-before (worldgen-report on the parent commit) and a rendering-run `perf spikes` baseline on medium in the commit message or under docs/perf/."
+  },
+  {
+   "wave": "W1a - Phase 1 reported bugs, part 1: flashbang, torches, Core targeting and Reach, melee gate and Zenith, use timing, failed-use feedback, shot geometry, Core grapple, re-timed clips",
+   "wps": [
+    "P1-05",
+    "P1-16",
+    "P1-10",
+    "P1-15",
+    "P1-13",
+    "P1-08",
+    "P1-02",
+    "P1-03",
+    "P1-04",
+    "P1-12"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P1-05",
+     "P1-16",
+     "P1-10",
+     "P1-15",
+     "P1-13",
+     "P1-08"
+    ],
+    [
+     "P1-02",
+     "P1-03",
+     "P1-04",
+     "P1-12"
+    ]
+   ],
+   "push_checkpoint": "P1-12 (the animation rebuild) starts only after P1-10 merges, because it reads the clip windows from data/config/use_styles.json. The lanes share only probe files and sound recipes, both separated by P0-02. Push 'Phase 1a' after the lighting tour meets its luminance thresholds and CI is green."
+  },
+  {
+   "wave": "W1b - Phase 1 reported bugs, part 2: body faces the crosshair, crosshair names, swing visuals, hooks in the engine, bows; terrain smoothing; phase gate",
+   "wps": [
+    "P1-06",
+    "P1-07",
+    "P1-11",
+    "P1-09",
+    "P1-14",
+    "P1b-02",
+    "P1b-03",
+    "P1b-04",
+    "P1-17"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P1-06",
+     "P1-07",
+     "P1-11",
+     "P1-09",
+     "P1-14"
+    ],
+    [
+     "P1b-02",
+     "P1b-03",
+     "P1b-04"
+    ]
+   ],
+   "push_checkpoint": "Lane B also carries: the outdated-world guard, ChunkHash by block string id, and GenVersion 10. P1-09 rebases after P1b-03 so its natural-terrain hook test runs on the final terrain. P1-17 runs after both lanes: full CI, lighting and animation tours, worldgen-report --compare against build/wg-before, docs and master-plan status. Then push 'Phase 1: reported bugs fixed'."
+  },
+  {
+   "wave": "W2 - Lag spikes (perf) plus the item-art refresh lane",
+   "wps": [
+    "P1b-06",
+    "P1b-07",
+    "P1b-08",
+    "P1b-09",
+    "P1b-10",
+    "P1b-11",
+    "P1b-12",
+    "P1b-13",
+    "P1b-14",
+    "P1b-15",
+    "P1b-16",
+    "P1b-17",
+    "P3-37",
+    "P2-24",
+    "P3-05",
+    "P3-38",
+    "P3-39",
+    "P3-40"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P1b-06",
+     "P1b-07",
+     "P1b-08",
+     "P1b-09",
+     "P1b-10",
+     "P1b-11",
+     "P1b-12",
+     "P1b-13",
+     "P1b-14",
+     "P1b-15",
+     "P1b-16",
+     "P1b-17"
+    ],
+    [
+     "P3-37",
+     "P2-24",
+     "P3-05",
+     "P3-38",
+     "P3-39",
+     "P3-40"
+    ]
+   ],
+   "push_checkpoint": "Push twice. (1) After P1b-09, with before/after `perf spikes` attached: the save, streaming and collider spikes are gone. (2) At the end of the wave, when the asset cache, pools, GC work and dynamic resolution are in and the icons and models are rebuilt. P1b-17 is optional, depending on the player's feedback on torches. In lane B, P3-05 waits for P1b-13 to merge because both edit PropLibrary.cs."
+  },
+  {
+   "wave": "W3 - Phase 2a UI foundations: Core tooltip, slot, purse and ammo, click and container models; theme, font, sprites, buff icons, layout, combat text, health bars",
+   "wps": [
+    "P2-04",
+    "P2-05",
+    "P2-06",
+    "P2-07",
+    "P2-08",
+    "P2-19",
+    "P2-01",
+    "P2-02",
+    "P2-03",
+    "P2-09",
+    "P5-24a",
+    "P2-20"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P2-04",
+     "P2-05",
+     "P2-06",
+     "P2-07",
+     "P2-08",
+     "P2-19"
+    ],
+    [
+     "P2-01",
+     "P2-02",
+     "P2-03",
+     "P2-09",
+     "P5-24a",
+     "P2-20"
+    ]
+   ],
+   "push_checkpoint": "P2-19 rebases on P2-01 (CombatEffects.cs font). P5-24a moves obtainability out of ContentValidator.World.cs and runs after P2-03 in the same lane. Push 'Phase 2a' after the old-save fixture tests pass, build_ui.py --check has been added to CI, and the new ui.cmds prints SMOKE PASS."
+  },
+  {
+   "wave": "W4 - Phase 2b HUD, inventory, chest, crafting, NPC chat, shop, reforge, smart cursor, menus (plus use-style vocabulary and item clips in the free lane)",
+   "wps": [
+    "P2-10",
+    "P2-11",
+    "P2-12",
+    "P2-15",
+    "P2-13",
+    "P2-14",
+    "P2-21",
+    "P2-22",
+    "P2-23",
+    "P2-25",
+    "P2-29",
+    "P3-02",
+    "P3-03",
+    "P2-16",
+    "P2-17",
+    "P2-18",
+    "P2-26",
+    "P2-27",
+    "P2-28",
+    "P2-30",
+    "P2-31"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P2-10",
+     "P2-11",
+     "P2-12",
+     "P2-15",
+     "P2-13",
+     "P2-14",
+     "P2-21",
+     "P2-22",
+     "P2-23",
+     "P2-25",
+     "P2-29"
+    ],
+    [
+     "P3-02",
+     "P3-03",
+     "P2-16",
+     "P2-17",
+     "P2-18",
+     "P2-26",
+     "P2-27",
+     "P2-28"
+    ]
+   ],
+   "push_checkpoint": "Lane B switches from P3-03 to the inventory panels only after P2-15 merges. P2-30 and P2-31 run after both lanes, because they touch SettingsScreen, PauseMenu and InventoryScreen.Layout. Push 'Phase 2: Terraria UI' after the ui.cmds tour screenshots at two resolutions and two UI scales report no layout overlaps."
+  },
+  {
+   "wave": "W5 - Phase 3a weapons and item presentation plus combat juice",
+   "wps": [
+    "P3-04",
+    "P3-06",
+    "P3-07",
+    "P3-10",
+    "P3-11",
+    "P3-12",
+    "P3-13",
+    "P3-15",
+    "P3-17",
+    "P3-18",
+    "P3-01",
+    "P3-09",
+    "P3-08",
+    "P3-14",
+    "P3-19",
+    "P3-20",
+    "P3-21",
+    "P3-22",
+    "P3-23",
+    "P3-24"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P3-04",
+     "P3-06",
+     "P3-07",
+     "P3-10",
+     "P3-11",
+     "P3-12",
+     "P3-13",
+     "P3-15",
+     "P3-17",
+     "P3-18"
+    ],
+    [
+     "P3-01",
+     "P3-09",
+     "P3-08",
+     "P3-14",
+     "P3-19",
+     "P3-20",
+     "P3-21",
+     "P3-22",
+     "P3-23",
+     "P3-24"
+    ]
+   ],
+   "push_checkpoint": "Scope reductions: P3-01 is bursts only; P3-09 is reduced; P3-17 is heads, chains and the F key; P3-18 absorbs P3-16's pet and light-pet slots. Sync points: P3-10 waits for P3-08 and P3-09; P3-12 waits for P3-14 (ProjectileSystem.Special.cs); P3-23 waits for P3-04 (MeleeSystem). Push 'Phase 3a' after the animation and items tours and the per-preset effects pool budgets are checked."
+  },
+  {
+   "wave": "W6 - Phase 3b feel and loops: hurt and impact, dust, movement, quick keys, bed sleep, status visuals, 3D drops, sound sets, hearts and stars, Fallen Stars, prefixes, Piggy Bank and Safe, chest lids, music",
+   "wps": [
+    "P3-25",
+    "P3-26",
+    "P3-46",
+    "P3-33",
+    "P3-34",
+    "P3-47",
+    "P3-36",
+    "P3-27",
+    "P3-29",
+    "P3-30",
+    "P3-31",
+    "P3-35",
+    "P3-48",
+    "P3-49"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P3-25",
+     "P3-26",
+     "P3-46",
+     "P3-33",
+     "P3-34",
+     "P3-47",
+     "P3-36"
+    ],
+    [
+     "P3-27",
+     "P3-29",
+     "P3-30",
+     "P3-31",
+     "P3-35",
+     "P3-48",
+     "P3-49"
+    ]
+   ],
+   "push_checkpoint": "P3-35 rebases after P3-34 (both edit ObjectInteraction.cs). P3-36 starts after P3-29 (pickup flags). A P3 gate follows: docs, master plan, full CI and a perf run on medium. Then push 'Phase 3: items and feel'."
+  },
+  {
+   "wave": "W7 - Phase 4a boss framework, natural arrivals, early bosses, Skeletron; creature and armour art lane",
+   "wps": [
+    "P4-01",
+    "P4-02",
+    "P4-03",
+    "P4-04",
+    "P4-05",
+    "P4-06",
+    "P4-07",
+    "P4-08",
+    "P4-09",
+    "P4-10",
+    "P4-11",
+    "P3-41",
+    "P3-42",
+    "P3-43",
+    "P3-44",
+    "P3-45",
+    "P3-50",
+    "P4-29"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P4-01",
+     "P4-02",
+     "P4-03",
+     "P4-04",
+     "P4-05",
+     "P4-06",
+     "P4-07",
+     "P4-08",
+     "P4-09",
+     "P4-10",
+     "P4-11"
+    ],
+    [
+     "P3-41",
+     "P3-42",
+     "P3-43",
+     "P3-44",
+     "P3-45",
+     "P3-50",
+     "P4-29"
+    ]
+   ],
+   "push_checkpoint": "Scope changes: P4-01 also carries the ICombatTarget type change, the DiesWithBody and InBossBar part semantics, and the Expert max-2 gating. P4-03 is reduced. P4-04 absorbs P3-32. P3-41 is split into P3-41a and P3-41b. In lane A, the P4-04 and P4-11 model jobs queue behind lane B's Blender work (one Blender agent at a time). P3-44 lands before P4-08 (evil.json). Push 'Phase 4a' after bosses.cmds and mechs.cmds pass and the boss gallery tour is reviewed."
+  },
+  {
+   "wave": "W8 - Phase 4b Skeletron Dungeon rebuilt 1:1",
+   "wps": [
+    "P4-12",
+    "P4-14",
+    "P4-15",
+    "P4-16",
+    "P4-19",
+    "P4-21",
+    "P4-34",
+    "P4-23",
+    "P4-13",
+    "P4-17",
+    "P4-18",
+    "P4-20",
+    "P4-33"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P4-12",
+     "P4-14",
+     "P4-15",
+     "P4-16",
+     "P4-19",
+     "P4-21",
+     "P4-34",
+     "P4-23"
+    ],
+    [
+     "P4-13",
+     "P4-17",
+     "P4-18",
+     "P4-20",
+     "P4-33"
+    ]
+   ],
+   "push_checkpoint": "P4-15 bumps GenVersion once. The later hash re-pins happen inside this unpushed wave. P4-19 waits for P4-17 and P4-18. P4-21 rebases on P4-18 (WorldEditor.Objects) and on P2-08's object-meta section. P4-34 waits for P4-33. Push 'Phase 4b: Dungeon' after the dungeon.cmds route, DungeonGenerationTests and the dungeon tour stops pass."
+  },
+  {
+   "wave": "W9 - Phase 4c Wall of Flesh and hardmode bosses; event-boss and furniture art",
+   "wps": [
+    "P4-24",
+    "P4-25",
+    "P4-26",
+    "P4-27",
+    "P4-28",
+    "P4-30",
+    "P4-31",
+    "P4-32",
+    "P4-35",
+    "P4-36",
+    "P4-37",
+    "P4-38"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P4-24",
+     "P4-25",
+     "P4-26",
+     "P4-27",
+     "P4-28",
+     "P4-30",
+     "P4-31",
+     "P4-32"
+    ],
+    [
+     "P4-35",
+     "P4-36",
+     "P4-37",
+     "P4-38"
+    ]
+   ],
+   "push_checkpoint": "The P4-23 docs addendum and the master plan are updated. Push 'Phase 4: bosses and Dungeon' after mawwall.cmds, mechs.cmds and bosses.cmds pass and the bosses tour is reviewed."
+  },
+  {
+   "wave": "W10 - Phase 5a town NPCs: population, housing, rescues, defence, seating, happiness, services, shops, visitors, pets, Stylist, Angler, Pylons",
+   "wps": [
+    "P5-01",
+    "P5-02",
+    "P5-03",
+    "P5-04",
+    "P5-05",
+    "P5-13",
+    "P5-12",
+    "P5-06a",
+    "P5-06b",
+    "P5-09",
+    "P5-10",
+    "P5-11",
+    "P5-19",
+    "P5-20",
+    "P5-28",
+    "P5-07",
+    "P5-29",
+    "P5-14",
+    "P5-21",
+    "P5-23",
+    "P5-15a",
+    "P5-15b",
+    "P5-08",
+    "P5-16",
+    "P5-22",
+    "P5-18",
+    "P5-34"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P5-01",
+     "P5-02",
+     "P5-03",
+     "P5-04",
+     "P5-05",
+     "P5-13",
+     "P5-12",
+     "P5-06a",
+     "P5-06b",
+     "P5-09",
+     "P5-10",
+     "P5-11",
+     "P5-19",
+     "P5-20"
+    ],
+    [
+     "P5-28",
+     "P5-07",
+     "P5-29",
+     "P5-14",
+     "P5-21",
+     "P5-23",
+     "P5-15a",
+     "P5-15b",
+     "P5-08",
+     "P5-16",
+     "P5-22",
+     "P5-18",
+     "P5-34"
+    ]
+   ],
+   "push_checkpoint": "P5-06b absorbs P4-22. P5-07 only adds animator states. P5-09 only adds residents as targets. Lane B dependencies on lane A:\n- P5-29 waits for P5-05.\n- P5-14 and P5-21 wait for P5-13.\n- P5-15a/b and P5-08 wait for P5-06b.\n- P5-34 waits for P5-12.\nItemUseSystem.cs merges in the order P5-15, P5-21, P5-20. P5-22 bumps GenVersion once. Push 'Phase 5a: Town NPCs'."
+  },
+  {
+   "wave": "W11 - Phase 5b Guide book, bestiary, achievements, Zoologist and Golfer shops; final gate",
+   "wps": [
+    "P5-24b",
+    "P5-25",
+    "P5-26",
+    "P5-27",
+    "P5-17",
+    "P5-30a",
+    "P5-30b",
+    "P5-31",
+    "P5-32",
+    "P5-33"
+   ],
+   "parallel_safe_groups": [
+    [
+     "P5-24b",
+     "P5-25",
+     "P5-26",
+     "P5-27",
+     "P5-17"
+    ],
+    [
+     "P5-30a",
+     "P5-30b",
+     "P5-31",
+     "P5-32"
+    ]
+   ],
+   "push_checkpoint": "P5-31 waits for P5-25. P5-32 waits for P5-26 and P5-27. P5-33 runs last: full CI on Linux (and on Windows through a workflow_dispatch run for determinism), every tour, docs and master plan. Then push 'Phase 5: NPCs and Guide book' and request the screenshot-tour workflow."
+  }
+ ],
+ "verification_strategy": [
+  "Every WP, before merging into the phase branch:\n- python3 tools/ci/check_file_length.py\n- dotnet build Strata.sln -c Debug\n- dotnet test tests/Strata.Core.Tests\n- python3 tools/content/gen_ore_tiers.py --check\n- Strata.Tools manifest --check, validate and coverage\n- python3 tools/content/gen_reference.py --check\n- python3 tools/blender/build_all.py --check\n- dotnet build Strata.csproj, then godot --headless --import\n- every game/Testing/Scripts/*.cmds, run with the CI flags, must print SMOKE PASS\n- --menu-tour must print MENU PASS\nAfter P2-02, also run python3 tools/textures/build_ui.py --check. Each wave's push also runs both worktrees' new Core tests together on the merged tree, then the WP-specific checks below.",
+  "W0: this is a pure refactor.\n- WorldGenTests golden hashes and all smoke logs must be identical to HEAD; check with `git diff --stat`, which should show only moves.\n- Keep the P1b-01 worldgen-report as build/wg-before.\n- Keep the P1b-05 rendering run of perf.cmds (xvfb, lavapipe, --graphics=medium) as the spike baseline. Lavapipe timings are only compared relative to each other.\n- SpikeLogTests pass.",
+  "W1a:\n- Core tests: TargetingTests, UseTimingTests (mining speed leaves UseAnimation unchanged; one clip per swing), ShotGeometryTests (hand inside a solid falls back to the eye; convergence clamped at 2 m or more), GrappleTests (anchors on natural terrain, platforms and canopies; releases only when the anchored cell breaks), ExposureModelTests and LightingConfigTests.\n- Smoke, combat.cmds: starfury and zenith melee; failed uses give feedback with probes msg.last and sfx.last.\n- Smoke, basic.cmds: exposure probe at or below the cap.\n- Smoke, movement.cmds: hook on a natural slope.\n- Lavapipe lighting.cmds on low, medium and high, measured by tools/ci/shot_stats.py:\n  - desert and snow noon mean luminance in [0.35, 0.6] with under 2% clipped pixels;\n  - cave exit at +0.5 s and +2 s;\n  - torch room light still above 0.15 luminance at 5 m;\n  - lava cavern not washed out.\n- Animation: run build_all.py --anims, then the animation.cmds tour frames at the strike window.",
+  "W1b:\n- Smoke, combat.cmds: player.facing_error_deg below 3 after `camera orbit 90`; the target behind the player is never selected.\n- Crosshair name probes: hud.target_name for a slime, for a worm segment in bosses.cmds, and for a resident in town.cmds.\n- Terrain:\n  - Core tests SurfaceProfileTests, ReliefTests, TerrainShapeTests and HeightfieldSmoothingTests. HeightfieldSmoothingTests covers the drift bound of 0.45 cells or less and a chunk meshed alone matching the same chunk meshed among its neighbours.\n  - WorldGen purity tests.\n  - Golden hashes re-pinned at GenVersion 10, including at least 3 surface chunks.\n  - Outdated-world badge checked in the menu tour.\n- worldgen-report --compare against build/wg-before, attached to the commit. Expect lower slope variance and overhang count and no stair-ripple peaks.\n- Lavapipe tour shots of forest, desert, snow and mountains.\n- perf.cmds counters show no regression.",
+  "W2:\n- Core tests: WorldSaverTests, AsyncSaveTests, StreamerSchedulingTests, FrameBudgetPlannerTests, CollisionHashTests, AllocationTests (byte budgets per mesh job and per generated chunk via GC.GetAllocatedBytesForCurrentThread), ResolutionGovernorTests, SpawnPreloadTests.\n- perf.cmds asserts deterministic counters only:\n  - saves.main_thread_ms_max == 0 path taken;\n  - colliders.rebuilt_per_edit <= 2;\n  - objects.rebuilds_per_remesh == 1;\n  - grass.created_per_frame <= budget;\n  - gc.gen2 == 0 over scripted travel;\n  - assets.pending reaches 0.\n- Before/after `perf spikes` p99 and max from a rendering run on medium, attached to the commit.\n- Art lane: build_all.py --check, a montage contact sheet of assets/icons/items for manual review (outline, framing, side-on guns), and prop-texture array regeneration verified by manifest --check.",
+  "W3:\n- Core tests: PlayerInventoryTests, PurseAndAmmoTests, SlotAndCraftingUiTests, InventoryOpsTests, UiLayoutTests (every size from 1280x720 to 3840x2160 at UI scales 0.75-2.0 with no overlap, including the F3 debug region), ItemSourcesTests (asserting zero obtainability warnings), and tooltip tests (prefix modifier lines in green and red, potion effect and duration, rarity 9-11 and -12).\n- A PlayerSave fixture test: a v1 JSON with 50 backpack slots and loose coins loads, converts the coins and keeps the trash slot.\n- The `inv.<item>` probe counts coin and ammo slots, so combat.cmds still passes.\n- New ui.cmds (theme applied, font warmed up) and build_ui.py --check.",
+  "W4:\n- ui.cmds block per widget:\n  - hud.hearts, hud.golden_hearts, hud.stars;\n  - buff icons, including the minion count;\n  - boss bar value and icon;\n  - chat lines;\n  - merged pickup popup;\n  - death screen cause;\n  - smart cursor target.\n- Inventory-open movement test: player.speed > 0.\n- Shop: buyback and sell by click. Reforge: slot and cost.\n- Menu tour after P2-30.\n- Lavapipe ui.cmds tour at 1280x720 and 1920x1080 and at UI scales 1.0 and 1.5; the UiProbes layout.overlaps probe must be 0.\n- F3 shows gd.hud and each gd.<widget> under 0.3 ms on medium.\n- The P3-03 animation rebuild is followed by the animation tour.",
+  "W5:\n- Core tests: ShotTests, WhipTests, YoyoTests, FlailTests, SwingCurveTests, PetTests, AttackBreaksObjectsTests, MiningHitsTests.\n- combat.cmds blocks: yoyo tether length probe; flail spin, launch and retract; whip tag increases minion damage; sword breaks a pot; a burst gun fires 3 shots over 3 cadence ticks.\n- builder.cmds updated for Terraria hit counts.\n- Lavapipe animation and items tours: grip, muzzle flash, trails, thrown spin.\n- EffectKit and FlashLights pool sizes per preset checked through probes fx.pool_size and lights.active <= preset.\n- ProjectileRenderer allocates nothing per projectile (AllocationTests-style probe).",
+  "W6:\n- Core tests: HurtFeelTests, QuickUseTests, SleepTests, PickupTests (the magnet respects a full inventory), StarfallTests, PrefixTests (old invented prefix ids resolve through aliases; the validator forbids alias keys that collide with other categories), PersonalStorageTests.\n- Player-save fixtures for the Banks lists.\n- movement.cmds: jump_apex_cells.\n- tools/audio build --check for the new recipes.\n- Music director probe for rain and town tracks.\n- Perf run on medium: gore and dust caps honoured.",
+  "W7:\n- Core tests:\n  - BossFrameworkTests: DiesWithBody parts are killed with the body; BossDefeated fires exactly once; InBossBar sums only flagged parts; Journey mode excluded from Expert drops.\n  - PatternBrainTests, WormSplitTests, BrainOfCthulhuTests, SkeletronTests, TreasureBagTests.\n- bosses.cmds and mechs.cmds updated. Natural arrivals via `time` and `event` commands, with chat-log probes.\n- The P2-24 boss-icon coverage test passes.\n- Lavapipe boss gallery tour.\n- Art lane: creatures.cmds and the creature gallery shots.",
+  "W8:\n- Core tests: BlueprintIndexTests (golden hashes unchanged at that commit), DungeonLayoutTests, DungeonGenerationTests (every room reachable by walking or climbing; stairs walkable; keep grounded on the snow-side edge), DungeonDecorTests, HazardTests, DungeonLootTests, LockedChestTests (keys, and unopened chests keep their loot through a ChunkCodec round trip).\n- Golden hashes re-pinned once with the GenVersion bump.\n- dungeon.cmds walks the entrance to the vault.\n- Lavapipe dungeon tour stops.\n- Perf: probe objects.instances and a spike run inside the dungeon (tile-object budget, PropLibrary preloaded).",
+  "W9:\n- Core tests: PlanteraTests, GolemTests, plus the WoF (Wall of Flesh) laser-cadence and tongue tests.\n- mawwall.cmds, mechs.cmds and bosses.cmds.\n- Lavapipe bosses tour.\n- Perf run with the Destroyer on screen: segment rendering and projectile pools, no gen2 collections.",
+  "W10:\n- Core tests: TownArrivalRulesTests, Housing cache invalidation, Rescue, TownDefenseTests, TownHappinessTests, VisitorTests, Pylon network.\n- town.cmds additions:\n  - day-only move-in;\n  - rescue of a bound Goblin;\n  - housing query, assign and evict;\n  - residents defend against a zombie;\n  - Nurse heals.\n- ui.cmds: the housing tab.\n- Perf: the housing scan budget probe stays within its per-tick budget, and no room flood fill runs on the main thread above 1 ms.\n- P5-22 golden hash re-pin.\n- Portrait icon coverage.",
+  "W11:\n- Core tests: journal, bestiary unlocks, AchievementTracker, HabitatTests, DropRatesTests, ProgressionAdvisor.\n- ui.cmds: guide book tabs (search results count, obtained-from and crafted-from lines, a bestiary entry unlocked after a kill).\n- Lavapipe guide tour.\n- Perf: the guide index builds on a worker (a probe proves it runs off the main thread); the list is virtualised with per-frame icon loads within budget; the bestiary preview uses a WhenVisible SubViewport.\n- Final: the full CI list, all tours, docs and master plan, and a Windows determinism run via workflow_dispatch before the last push."
+ ]
+}

@@ -1,0 +1,7 @@
+{
+ "comment": "P3-35 personal storage: the Piggy Bank (a pink pig) and the Safe (a steel box with a dial and a handle).",
+ "objects": {
+  "piggy_bank": {"generator": "piggy_bank", "params": {}},
+  "safe": {"generator": "safe", "params": {}}
+ }
+}

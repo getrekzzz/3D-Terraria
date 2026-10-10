@@ -1,0 +1,63 @@
+{
+ "id": "P2-04",
+ "title": "Core tooltip and display helpers: prefix-aware stats, green/red modifier lines, buff effect and duration, coin-tier prices, station names, heart/star maths",
+ "player_outcome": "Tooltips read like Terraria's:\n- 'Legendary Muramasa' shows its real, prefix-adjusted damage and speed, with green '+15% damage' and red '-10% knockback' lines.\n- Ironskin Potion says 'Increase defense by 8 / 5 minute duration'.\n- Prices are coloured by their top coin, and worthless items say 'No value'.\n- Crafting shows 'Iron Anvil or Lead Anvil' instead of raw ids.",
+ "design": [
+  "New src/Strata.Core/Gameplay/Items/TooltipContext.cs: `sealed record TooltipContext(bool UsedInRecipes, ContentDatabase? Content, PlayerState? Player, float SellRatio = 0.2f, long? BuyPrice = null)`. Keep `ItemTooltip.Lines(stack, info, usedInRecipes)` as an overload that builds a default context, so existing callers and tests still compile.",
+  "Extend TooltipKind with Good, Bad, PriceCopper, PriceSilver, PriceGold, PricePlatinum and NoValue. Drop the single Price kind and update the colour switch in ItemSlotView._MakeCustomTooltip so the build stays green.",
+  "Split ItemTooltip.cs into ItemTooltip.cs (name and stat lines) and ItemTooltip.Extras.cs (modifier, buff, set-bonus and price lines).\n- Name line: '{prefix} {name} ({count})', with the count shown when > 1.\n- Damage: `Prefixes.Damage(stack)` plus the player's class damage bonus when ctx.Player is set; Generic items read 'N damage'.\n- Crit: '{4 + Prefixes.Crit + player crit}% critical strike chance'.\n- Speed: `Speed(Prefixes.UseTime(stack, item.UseAnimation))`.\n- Knockback: `Knockback(Prefixes.Knockback(stack))`.\n- Mana: 'Uses {round(Prefixes.ManaCost)} mana'.\n- Defense: item.Defense plus prefix.Defense.\n- Info lines: 'Equipable', 'Vanity item' (Category Vanity), 'Ammo', 'Consumable', 'Material', 'Can be placed'.",
+  "Modifier lines are generated from every non-zero PrefixDef field, in Terraria's wording: '+15% damage', '+10% speed', '+5% critical strike chance', '+10% size', '+15% knockback', '+10% velocity', '-15% mana cost', '+4 defense', '+4% movement speed', '+20 mana'. The kind is Good or Bad by sign, and ManaCost is inverted (negative is good). Reading PrefixDef fields generically means P3's Terraria prefix table works without code changes.",
+  "Buff lines: when item.Buff is set and ctx.Content knows the buff, add item.Description, or `BuffText.Describe(buff)` when that is null. Then add `BuffDisplay.Duration(ticks)` ('5 minute duration', '30 second duration').",
+  "Show the set bonus only when `ctx.Player.Inventory.CompleteSet()` contains the item.",
+  "Price line:\n- value = ctx.BuyPrice ?? `Prefixes.SellValue(stack, ratio)`, where the new `SellValue = floor(Prefixes.Value(stack)*ratio)*count`. TownCommerce.SaleValue now delegates to it, so the tooltip and the shop agree.\n- Text is 'Sell price: \u2026' or 'Buy price: \u2026', with the kind taken from `Coins.TopTier(value)`.\n- 0 gives 'No value' (NoValue kind).",
+  "New helpers.\n- src/Strata.Core/Presentation/BuffDisplay.cs:\n  - `Timer(ticks)` returns '59 s', '5 m' or '2 h'.\n  - `Duration(ticks)`.\n  - `CanCancel(BuffDef)`: false for Debuff or Persistent.\n  - `ShowsTimer(BuffDef)`: false when HideTimer or Persistent.\n- src/Strata.Core/Gameplay/Buffs/BuffText.cs: `Describe(BuffDef)` turns effects into Terraria wording.\n  - stat add/mul on known StatIds become text like '+8 defense' or '25% increased movement speed'.\n  - damageOverTime becomes 'Slowly losing life'; emitLight becomes 'Emitting light'.\n  - immune becomes 'Immune to {buff name}'; noFallDamage, waterBreathing and liquidImmune get fixed phrases.\n- src/Strata.Core/Presentation/VitalsDisplay.cs:\n  - `Hearts(life, maxLife, permanentMax)` returns HeartRow {Count \u2264 20, LifePerHeart = maxLife > 400 ? maxLife/20 : 20, Golden = max(0,(permanentMax-400)/5), Fill(i)}.\n  - `Stars(mana, maxMana)`: 20 per star, or maxMana/10 per star above 200.\n  - `Bubbles(breath, max)`: 10 bubbles.\n- src/Strata.Core/Gameplay/Crafting/StationNames.cs: `Describe(stationId, content)` joins the display names of the TileObjectDefs whose Stations contain the id. Order by item value, then name, and use at most two names joined by ' or '. Results are cached per content database.\n- Coins.cs: `TopTier(long)` and `Parts(long)`.",
+  "BuffDef gains `bool HideTimer` (JSON `hideTimer`) for placed-furniture and liquid buffs, so their timers stop flickering.",
+  "Validation (ContentValidator.Items.cs): rarity outside -13..13 is an error. Warn when an item grants a buff that has neither a Description nor effects BuffText can describe.",
+  "Update UiContext.Tooltip to build a TooltipContext: content, the local PlayerState, and SellRatio from Game.Town.Config."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Items/ItemTooltip.cs \u2014 context-aware, prefix-aware lines (split)",
+  "src/Strata.Core/Gameplay/Items/Prefixes.cs \u2014 SellValue",
+  "src/Strata.Core/Gameplay/Items/Coins.cs \u2014 TopTier, Parts",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 SaleValue delegates to Prefixes.SellValue",
+  "src/Strata.Core/Content/Defs/BuffDef.cs \u2014 HideTimer",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 rarity range, buff description warning",
+  "game/UI/UiContext.cs \u2014 TooltipContext",
+  "game/UI/ItemSlotView.cs \u2014 map new TooltipKinds (temporary until P2-10)",
+  "tests/Strata.Core.Tests/Gameplay/SlotAndCraftingUiTests.cs \u2014 TooltipsDescribeWeaponsAndTools updated",
+  "data/combat.json \u2014 descriptions for on_fire, poisoned, bleeding, chilled, regeneration, swiftness, ironskin, shine, cozy_fire; hideTimer on cozy_fire",
+  "data/enemies/hardmode.json \u2014 ichor description",
+  "data/items/alchemy.json \u2014 hideTimer on heart_lamp",
+  "data/liquids.json \u2014 hideTimer on honey"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Items/TooltipContext.cs \u2014 tooltip inputs",
+  "src/Strata.Core/Gameplay/Items/ItemTooltip.Extras.cs \u2014 modifier, buff and price lines",
+  "src/Strata.Core/Presentation/BuffDisplay.cs \u2014 timer and duration text, cancel rules",
+  "src/Strata.Core/Gameplay/Buffs/BuffText.cs \u2014 effect-derived buff descriptions",
+  "src/Strata.Core/Presentation/VitalsDisplay.cs \u2014 hearts, stars, bubbles maths",
+  "src/Strata.Core/Gameplay/Crafting/StationNames.cs \u2014 station display names",
+  "tests/Strata.Core.Tests/Gameplay/TooltipTests.cs",
+  "tests/Strata.Core.Tests/Presentation/DisplayHelperTests.cs"
+ ],
+ "data_changes": [
+  "Terraria descriptions for the 10 buffs lacking one: on_fire and poisoned 'Slowly losing life'; bleeding 'Cannot regenerate life'; chilled 'Your movement speed has been reduced'; regeneration 'Provides life regeneration'; swiftness '25% increased movement speed'; ironskin 'Increase defense by 8'; shine 'Emitting light'; cozy_fire 'Life regen is slightly increased'; ichor 'Reduced defense'",
+  "`hideTimer: true` on cozy_fire, heart_lamp and honey"
+ ],
+ "tests": [
+  "TooltipTests:\n- PrefixChangesStatsAndAddsGreenRedLines: copper_broadsword with keen and broken gives a changed damage line plus Good and Bad kinds.\n- PotionShowsBuffEffectAndDuration: ironskin_potion gives 'Increase defense by 8' and '5 minute duration'; swiftness_potion gives '4 minute duration'.\n- ZeroValueSaysNoValue.\n- StackCountInName: 'Torch (25)'.\n- SetBonusOnlyWhenWorn.\n- PriceKindFollowsTopCoin.\n- TooltipSellPriceEqualsCommerceSaleValue.",
+  "DisplayHelperTests:\n- Hearts: 100/100 \u2192 5 hearts; 400 \u2192 20; permanent 500 \u2192 20 golden at 25 each; 250/400 \u2192 12 full plus a half.\n- Stars: 200 \u2192 10; 400 \u2192 10 at 40 each.\n- Timer: 59 s \u2192 '59 s'; 61 s \u2192 '1 m'; 3600 s \u2192 '1 h'.\n- CanCancel is false for potion_sickness.\n- StationNames: anvil \u2192 'Iron Anvil or Lead Anvil'; work_bench \u2192 'Work Bench'; hardmode_anvil \u2192 'Mythril Anvil or Orichalcum Anvil'; alchemy \u2192 'Placed Bottle or Alchemy Table'.",
+  "ContentValidatorTests: rarity 20 is an error"
+ ],
+ "verification": [
+  "dotnet test tests/Strata.Core.Tests (all green)",
+  "Strata.Tools validate \u2192 0 errors; review new warnings for buffs without text",
+  "In-engine checks happen after P2-10 (tooltip follower)"
+ ],
+ "depends_on": [],
+ "risks": [
+  "P3 replaces the prefix table in data/combat.json (the `prefixes` array) while this WP edits the `buffs` array of the same file. Merge carefully.",
+  "Player-adjusted damage must use the same stat ids as DamageModel. Check against CombatPlayerTests."
+ ],
+ "effort": "M"
+}

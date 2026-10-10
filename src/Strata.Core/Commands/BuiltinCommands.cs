@@ -20,8 +20,17 @@ public static class BuiltinCommands
         CombatCommands.Register(r);
         LiquidCommands.Register(r);
         TownCommands.Register(r);
+        HousingCommands.Register(r);
+        InventoryCommands.Register(r);
         WorldCommands.Register(r);
+        WeatherCommands.Register(r);
+        SignCommands.Register(r);
+        StarfallCommands.Register(r);
+        FishingCommands.Register(r);
+        SeasonCommands.Register(r);
         PerfCommands.Register(r);
+        GuideCommands.Register(r);
+        HintCommands.Register(r);
         return r;
     }
 
@@ -49,24 +58,33 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "give", Usage = "give <item> [count]", Help = "Adds items to the backpack.",
+            Name = "give", Usage = "give <item> [count]", Help = "Picks up items (coins to the coin slots, ammo to the ammo slots, the rest to the backpack).",
             Run = (ctx, a) =>
             {
                 var content = ctx.World.Session.Content;
                 var id = a.Str(0, "item");
                 if (!content.Items.TryGet(id, out var item)) throw new CommandException($"unknown item '{id}'");
                 int count = Math.Clamp(a.OptInt(1, 1), 1, 99_999);
+                if (item.Pickup != null)
+                {
+                    ctx.World.ApplyPickup(ctx.Player, new ItemStack(item, count)); // Hearts and Stars heal, never stored
+                    return CommandResult.Success($"Applied {count}x {item.DisplayName}.");
+                }
                 var rest = ctx.Player.State.Inventory.Pickup(new ItemStack(item, count));
                 return CommandResult.Success($"Gave {count - rest.Count}x {item.DisplayName}" + (rest.IsEmpty ? "" : $" ({rest.Count} did not fit)"));
             },
         });
         r.Register(new CommandDef
         {
-            Name = "clear", Usage = "clear", Help = "Empties the backpack.",
+            Name = "clear", Usage = "clear", Help = "Empties the backpack, coin, ammo and trash slots.",
             Run = (ctx, _) =>
             {
-                ctx.Player.State.Inventory.Backpack.Clear();
-                return CommandResult.Success("Backpack cleared.");
+                var inv = ctx.Player.State.Inventory;
+                inv.Backpack.Clear();
+                inv.Coins.Clear();
+                inv.Ammo.Clear();
+                inv.Trash.Clear();
+                return CommandResult.Success("Inventory cleared.");
             },
         });
         r.Register(new CommandDef
@@ -96,10 +114,11 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "mark", Usage = "mark", Help = "Remembers the player's position (probe player.from_mark).",
+            Name = "mark", Usage = "mark", Help = "Remembers the player's position and swing count (probes player.from_mark, player.swings).",
             Run = (ctx, _) =>
             {
                 ctx.Mark = ctx.Player.Position;
+                ctx.MarkSwings = ctx.Player.UseSerial;
                 return CommandResult.Success($"Marked {ctx.Mark}.");
             },
         });
@@ -119,6 +138,7 @@ public static class BuiltinCommands
             Name = "kill", Usage = "kill", Help = "Kills the player (tests respawn).",
             Run = (ctx, _) =>
             {
+                ctx.Player.LastHarm = Gameplay.Combat.Harm.Other;
                 ctx.Player.State.Vitals.Kill();
                 return CommandResult.Success("Killed.");
             },
@@ -136,7 +156,7 @@ public static class BuiltinCommands
         r.Register(new CommandDef
         {
             Name = "tp", Aliases = new[] { "teleport" }, Usage = "tp <x> <y> <z> | tp spawn | tp surface | tp cave <underground|cavern|underworld> | tp landmark <id> | tp zone <biome>",
-            Help = "Teleports the player (cell coordinates).",
+            Help = "Teleports the player (cell coordinates; ~ or ~n is relative to the feet cell, so tp ~ ~ ~ centres the player in it).",
             Run = Teleport,
         });
         r.Register(new CommandDef
@@ -192,10 +212,22 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "aim", Usage = "aim <dx> <dy> <dz>", Help = "Points the player's view along a direction.",
+            Name = "aim", Usage = "aim <dx> <dy> <dz> | aim landmark <id> [dy]",
+            Help = "Points the player's view along a direction, or level toward a planned landmark (tilted by dy).",
             Run = (ctx, a) =>
             {
-                var dir = new Vector3(a.Float(0, "dx"), a.Float(1, "dy"), a.Float(2, "dz"));
+                Vector3 dir;
+                if (a.Str(0, "dx") == "landmark")
+                {
+                    var marks = ctx.World.Session.Generator.Plan.Landmarks;
+                    var id = a.Str(1, "id");
+                    if (!marks.TryGetValue(id, out var mark)) throw new CommandException($"no landmark '{id}'");
+                    var eye = ctx.Player.Eye;
+                    dir = new Vector3((mark.X + 0.5f) * Units.CellSize - eye.X, 0, (mark.Z + 0.5f) * Units.CellSize - eye.Z);
+                    if (dir.LengthSquared() < 1e-6f) throw new CommandException("standing on the landmark");
+                    dir = Vector3.Normalize(dir) + new Vector3(0, a.Count > 2 ? a.Float(2, "dy") : 0f, 0);
+                }
+                else dir = new Vector3(a.Float(0, "dx"), a.Float(1, "dy"), a.Float(2, "dz"));
                 if (dir.LengthSquared() < 1e-6f) throw new CommandException("direction must be non-zero");
                 ctx.Host.Aim(ctx.Player, dir);
                 return CommandResult.Success();
@@ -203,11 +235,11 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "use", Usage = "use", Help = "Uses the held item once at the current aim (ignores the cooldown).",
+            Name = "use", Usage = "use", Help = "Uses the held item once at the current aim (ignores the cooldown and starts a fresh swing).",
             Run = (ctx, _) =>
             {
                 var p = ctx.Player;
-                p.UseCooldown = 0;
+                p.ResetUse();
                 var target = Targeting.Cast(ctx.World.Session.World, p.Eye, p.Aim, 30f);
                 var outcome = ctx.World.ItemUse.Use(p, target, freshPress: true);
                 return CommandResult.Success($"{outcome}" + (target != null ? $" at {target.Cell}" : ""));
@@ -226,8 +258,10 @@ public static class BuiltinCommands
         });
         r.Register(new CommandDef
         {
-            Name = "save", Usage = "save", Help = "Saves the world and players now.",
-            Run = (ctx, _) => CommandResult.Success($"Saved ({ctx.World.SaveAll()} chunks)."),
+            Name = "save", Usage = "save [async]", Help = "Saves the world and players now (async: in the background, like the autosave).",
+            Run = (ctx, a) => a.OptStr(0) == "async"
+                ? CommandResult.Success(ctx.World.BeginAutosave() ? "Autosave started." : "An autosave is still being written.")
+                : CommandResult.Success($"Saved ({ctx.World.SaveAll()} chunks)."),
         });
         r.Register(new CommandDef
         {
@@ -310,13 +344,27 @@ public static class BuiltinCommands
                 break;
             }
             default:
-                cell = new Int3(a.Int(0, "x"), a.Int(1, "y"), a.Int(2, "z"));
+            {
+                var feet = ctx.Player.FeetCell;
+                cell = new Int3(Coordinate(a, 0, "x", feet.X), Coordinate(a, 1, "y", feet.Y), Coordinate(a, 2, "z", feet.Z));
                 break;
+            }
         }
         if (!s.World.InBounds(cell.X, cell.Y, cell.Z)) throw new CommandException($"{cell} is outside the world");
         // Named surface targets are estimates; exact coordinates and caves are taken as given.
         ctx.Host.Teleport(ctx.Player, Feet(cell), settle: a.Str(0, "x") is "spawn" or "surface" or "landmark" or "zone");
         return CommandResult.Success($"Teleported to {cell}.");
+    }
+
+    /// <summary>A cell coordinate: a whole number, or ~ / ~n relative to <paramref name="here"/>.</summary>
+    private static int Coordinate(CommandArgs a, int i, string name, int here)
+    {
+        var text = a.Str(i, name);
+        if (!text.StartsWith('~')) return a.Int(i, name);
+        if (text.Length == 1) return here;
+        return int.TryParse(text.AsSpan(1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int offset)
+            ? here + offset
+            : throw new CommandException($"<{name}> must be an integer or ~[offset], got '{text}'");
     }
 
     private static string Inspect(CommandContext ctx)

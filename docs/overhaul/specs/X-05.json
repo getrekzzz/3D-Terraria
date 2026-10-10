@@ -1,0 +1,30 @@
+{
+ "id": "X-05",
+ "title": "Emotes and NPC voices",
+ "owner_session": "npcs",
+ "player_outcome": "The town feels alive: NPCs show emote bubbles (happy, angry, sleepy, love, music notes, questions) based on mood, neighbours and events, talk to each other with bubbles, and make short voice blips when you talk to them; the player has an emote wheel (key T or a bubble button).",
+ "design": [
+  "Data: emote set (icons generated as sprites), per-NPC voice blip parameters; TownSystem emits emote events (mood, pairings, events, time); TownRenderer draws pooled bubble sprites above heads; voice blips synthesised per NPC (tools/audio) and played per dialog character group; player emote wheel UI and a broadcast over the head.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/*",
+  "game/Entities/TownRenderer.cs",
+  "game/UI/*",
+  "tools/audio/*",
+  "data/town/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "EmoteRulesTests"
+ ],
+ "verification": [
+  "town.cmds probe town.emotes_shown > 0"
+ ],
+ "depends_on": [
+  "P5-12"
+ ],
+ "risks": [],
+ "effort": "M"
+}

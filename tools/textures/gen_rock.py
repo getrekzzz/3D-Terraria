@@ -138,5 +138,14 @@ def ore(r, seed):
     rgb = np.where(nug[..., None], ore_rgb, rgb)
     height = np.where(nug, height + 0.2 + core * 0.2 + tilt * 0.08, height)
     metal = np.where(nug, r.get("metallic", 0.8), 0.0)
-    rough = np.where(nug, (0.06 if gem else 0.28) + bright * 0.12, rough)
+    rough = np.where(nug, (0.06 if gem else 0.2) + bright * 0.1, rough)
+    if not gem and r.get("flecks", 0):
+        # Fleck clusters: tiny bright metallic grains scattered around each nugget, smooth so they catch the light.
+        f2, _, _ = s.voronoi(seed + 16, r["flecks"])
+        grain = s.spectral_noise(seed + 17, falloff=0.6)
+        fleck = (f2 < 0.16) & (shape < size + 0.16) & (grain > 0.45) & ~nug
+        rgb = np.where(fleck[..., None], np.minimum(s.shade(col, 1.25) * (0.85 + grain[..., None] * 0.3), 1.0), rgb)
+        height = np.where(fleck, height + 0.12, height)
+        metal = np.where(fleck, 0.92, metal)
+        rough = np.where(fleck, 0.22, rough)
     return rgb, np.clip(height, 0, 1), rough, metal

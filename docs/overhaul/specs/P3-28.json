@@ -1,0 +1,53 @@
+{
+ "id": "P3-28",
+ "title": "Coins auto-convert; coin and ammo slots (Core model + save, with interim slots UI)",
+ "player_outcome": "Picking up coins merges them upward automatically (100 copper \u2192 1 silver \u2026) into four dedicated coin slots. Arrows and bullets go into four ammo slots that are used first, top to bottom. Shops and the death penalty count coins wherever they are.",
+ "design": [
+  "Verified: Inventory.Add merges into stacks and never converts (Inventory.cs:34-58); coins are consolidated only by Wallet.TrySpend. PlayerInventory has only Backpack, Armor and Accessories. FindAmmo scans Backpack 0..49.",
+  "PlayerInventory: Coins = new Inventory(4), Ammo = new Inventory(4).",
+  "Pickup(stack): coins go into Coins and are then normalised by the new Coins.Normalize(Inventory coins, overflow \u2192 Backpack), which re-gives the total in the largest denominations. Ammo items (AmmoClass != null and not a weapon) merge into existing ammo-slot stacks, else an empty ammo slot, else the backpack.",
+  "Coins.Total(PlayerInventory) sums Coins + Backpack (+ banks from P3-35).",
+  "Wallet.TrySpend/Give get PlayerInventory overloads (paying from Coins first, then the backpack; change into Coins). Update the callers: GameWorld.Death.cs, TownCommerce (Buy/Sell/Reforge), TownServices, TownSystem (arrival coin check), InventoryScreen and TownDialog coin labels.",
+  "ItemUseSystem.FindAmmo returns (Inventory, slot): Ammo 0..3 first, then Backpack.",
+  "PlayerSave: Coins and Ammo slot lists (added fields). On load, move any coin stacks from the backpack into coin slots and Normalize.",
+  "StandardProbes: inv.<item> counts Backpack + Coins + Ammo; add coins.total.",
+  "Interim UI: two 4-slot columns (Coins, Ammo) beside the backpack in InventoryScreen using ItemSlotView and slot filters (coin tag / AmmoClass). P2 restyles."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Items/PlayerInventory.cs \u2014 Coins/Ammo inventories; routing Pickup",
+  "src/Strata.Core/Gameplay/Items/Coins.cs \u2014 Normalize; Total(PlayerInventory)",
+  "src/Strata.Core/Gameplay/Items/Wallet.cs \u2014 PlayerInventory overloads",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs \u2014 ammo slot order",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 Coins/Ammo; load migration",
+  "src/Strata.Core/Session/GameWorld.Death.cs \u2014 coin penalty via PlayerInventory",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 wallet calls",
+  "src/Strata.Core/Gameplay/Town/TownServices.cs \u2014 wallet calls",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 PlayerCoins total",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 inv.* and coins.total",
+  "game/UI/InventoryScreen.cs \u2014 coin/ammo columns; purse label",
+  "game/UI/TownDialog.cs \u2014 purse label",
+  "tests/Strata.Core.Tests/Gameplay/TownServicesTests.cs, TownTests.cs, CharacterTests.cs, ArsenalTests.cs \u2014 Coins.Total(PlayerInventory)"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/CoinAmmoSlotTests.cs \u2014 coin/ammo tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "CoinAmmoSlotTests: picking up 250 copper \u2192 coin slots hold 2 silver + 50 copper; 100 silver \u2192 1 gold",
+  "CoinAmmoSlotTests: TrySpend 1 gold from 150 silver pays from coin slots with change; arrows land in ammo slot 0",
+  "CoinAmmoSlotTests: a bow uses ammo slot 0 before a backpack stack; save round-trip keeps coin/ammo slots",
+  "Smoke town.cmds (buy flow) PASS; combat.cmds: 'assert inv.wooden_arrow == 49' still holds"
+ ],
+ "verification": [
+  "dotnet test; smoke PASS",
+  "Menu tour PASS; screenshot of the inventory showing coin/ammo columns"
+ ],
+ "depends_on": [
+  "P3-01"
+ ],
+ "risks": [
+  "InventoryScreen is P2's; the columns are interim. Announce the Core API (PlayerInventory.Coins/Ammo) to P2.",
+  "Hidden coins if the UI lags; the interim columns are mandatory in this WP."
+ ],
+ "effort": "M"
+}

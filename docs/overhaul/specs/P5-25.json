@@ -1,0 +1,59 @@
+{
+ "id": "P5-25",
+ "title": "Player journal: kills, seen, caught, met, obtained, crafted; bestiary unlocks; per-player save",
+ "player_outcome": "The game now remembers, per character, every creature you have seen, killed or caught, every townsperson you have met and every item you have found or crafted. This powers the bestiary, bestiary completion (so the Zoologist can move in) and achievements.",
+ "design": [
+  "New Gameplay/Guide/PlayerJournal.cs on PlayerState.Journal: Kills (Dictionary<string,int>), Seen/Caught/Met/Obtained/Crafted (HashSet<string>), Counters (Dictionary<string,long>: blocks mined, trees chopped, purchases, reforges, deaths by cause), Achievements (Dictionary<string,long> unlock unix time). It raises Changed(kind, key) and implements IPlayerRecords (Kills/Obtained/BestiaryPercent/Achieved).",
+  "New Gameplay/Guide/BestiaryConfig.cs loading data/config/bestiary.json (killsForStats 1, killsForDrops 25, bossKillsForDrops 1, rareKillsForDrops 1, seenRadius 20, creditRadius 60). New Gameplay/Guide/Bestiary.cs: Entries (enemies without BestiaryAs and not tagged 'no_bestiary', plus town NPCs); Unlock(entry, journal) \u2192 None/Seen/Stats/Full; Percent(journal) = \u03a3 progress / entries, with seen 0.5 and stats-or-more 1.",
+  "EnemyDef.BestiaryAs (string?): kills and sightings credit the named entry. Data: moon_lord_hand/moon_lord_head \u2192 moon_lord, plus any boss parts other phases add (e.g. skeletron hands).",
+  "New Gameplay/Guide/JournalSystem.cs (in GameWorld). It subscribes to Npcs.Killed (credit players within creditRadius; bosses credit all), ItemUse.Caught (critter reverse map CatchItem\u2192enemy), Town.Talked (new event raised in BeginTalk), GameWorld.Crafted (P5-14), Editor.BlockBroken/ObjectBroken (counters by tag), Commerce purchases (a new Traded event) and Services.Reforged. Every 30 ticks it marks as Seen the creatures within seenRadius of each player (squared distance, no LOS). At 1 Hz it scans the backpack for Obtained (reusing the CheckMilestones loop).",
+  "GameWorld: GameWorld.cs is 387 lines, so first move WritePlayer/LoadOrCreatePlayer/DeletePlayer/PlayerPath into a new GameWorld.PlayerFiles.cs partial, then construct Journal in the constructor (1 line). Make JournalSystem.RecordsFor(player) available to TownContext (P5-03).",
+  "PlayerSave: a Journal model (JournalModel with lists and dictionaries; unknown ids kept as strings, so content removals never lose data). Added without a version bump.",
+  "Probes (a new GuideProbes.cs): bestiary.percent, bestiary.<enemy> (kills), journal.obtained.<item> (1/0). Command 'journal reset|unlock <enemy>' for tests."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Player/PlayerState.cs \u2014 Journal",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 Journal model",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 construct JournalSystem; move player file helpers out",
+  "src/Strata.Core/Content/Defs/EnemyDef.cs \u2014 BestiaryAs",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Movement.cs \u2014 Talked event in BeginTalk",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 Traded event",
+  "src/Strata.Core/Gameplay/Town/TownServices.cs \u2014 Reforged event",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 Records in TownContext",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 the BestiaryAs ref",
+  "data/enemies/lunar.json (or wherever moon lord parts live) \u2014 bestiaryAs"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Guide/PlayerJournal.cs",
+  "src/Strata.Core/Gameplay/Guide/JournalSystem.cs",
+  "src/Strata.Core/Gameplay/Guide/Bestiary.cs",
+  "src/Strata.Core/Gameplay/Guide/BestiaryConfig.cs",
+  "src/Strata.Core/Session/GameWorld.PlayerFiles.cs",
+  "src/Strata.Core/Commands/GuideProbes.cs",
+  "data/config/bestiary.json",
+  "tests/Strata.Core.Tests/Gameplay/JournalTests.cs"
+ ],
+ "data_changes": [
+  "data/config/bestiary.json (validated at boot and by Strata.Tools validate, like town.json); bestiaryAs on boss parts"
+ ],
+ "tests": [
+  "JournalTests.KillCreditsNearbyPlayer: a slain zombie gives Kills['zombie'] == 1 and Unlock == Stats",
+  "JournalTests.SeenWithinRadius; JournalTests.CaughtCritterUnlocksEntry",
+  "JournalTests.BestiaryPercentAndZoologist: enough unlocks \u2192 Zoologist arrival condition true (with P5-04 data)",
+  "JournalTests.SaveRoundTrip (PlayerSave with journal; unknown ids preserved)",
+  "JournalTests.PartsCreditParent (moon_lord_hand \u2192 moon_lord)",
+  "Smoke: new game/Testing/Scripts/guide.cmds starts with 'spawning off' / 'summon zombie 4 0 0' / 'wait 0.5' / 'assert bestiary.zombie == 0' / 'killall' / 'assert bestiary.zombie == 1'"
+ ],
+ "verification": [
+  "dotnet test; the smoke guide.cmds PASS; save and reload a character and the kills remain"
+ ],
+ "depends_on": [
+  "P5-03",
+  "P5-14"
+ ],
+ "risks": [
+  "Terraria stores the bestiary per world; here it is per character, as the plan requires. The Zoologist and other conditions use the max over present players. Document this.",
+  "The Killed event has no attacker, so crediting by radius can credit kills by residents; that is acceptable."
+ ],
+ "effort": "M"
+}

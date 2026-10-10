@@ -31,17 +31,16 @@ public class SlotAndCraftingUiTests
     }
 
     [Fact]
-    public void RightClickSplitsAndDropsOne()
+    public void RightClickTakesOneInsteadOfSplitting()
     {
-        var inv = new Inventory(2);
-        inv[0] = S("torch", 9);
-        var cursor = ItemStack.Empty;
-        SlotActions.RightClick(ref cursor, inv, 0);
-        Assert.Equal(5, cursor.Count);
-        Assert.Equal(4, inv[0].Count);
-        SlotActions.RightClick(ref cursor, inv, 1);
-        Assert.Equal(1, inv[1].Count);
-        Assert.Equal(4, cursor.Count);
+        var inv = new PlayerInventory();
+        inv.Backpack[12] = S("torch", 9);
+        Assert.Equal(ClickOutcome.Moved, SlotActions.RightClick(inv, new SlotRef(SlotArea.Backpack, 12), inv.Backpack));
+        Assert.Equal(1, inv.Cursor.Count);
+        Assert.Equal(8, inv.Backpack[12].Count);
+        // An empty slot takes nothing from the cursor.
+        Assert.Equal(ClickOutcome.None, SlotActions.RightClick(inv, new SlotRef(SlotArea.Backpack, 13), inv.Backpack));
+        Assert.True(inv.Backpack[13].IsEmpty);
     }
 
     [Fact]
@@ -49,16 +48,16 @@ public class SlotAndCraftingUiTests
     {
         var armor = new Inventory(3);
         var cursor = S("wood", 1);
-        SlotActions.LeftClick(ref cursor, armor, 0, SlotActions.ArmorFilter(EquipSlot.Head));
+        SlotActions.LeftClick(ref cursor, armor, 0, PlayerInventory.ArmorFilter(EquipSlot.Head));
         Assert.True(armor[0].IsEmpty);
         cursor = S("copper_helmet", 1);
-        SlotActions.LeftClick(ref cursor, armor, 0, SlotActions.ArmorFilter(EquipSlot.Head));
+        SlotActions.LeftClick(ref cursor, armor, 0, PlayerInventory.ArmorFilter(EquipSlot.Head));
         Assert.Equal("copper_helmet", armor[0].Item!.Id);
 
         var acc = new Inventory(2);
         acc[0] = S("hermes_boots", 1);
         cursor = S("hermes_boots", 1);
-        SlotActions.LeftClick(ref cursor, acc, 1, SlotActions.AccessoryFilter(acc, 1));
+        SlotActions.LeftClick(ref cursor, acc, 1, PlayerInventory.AccessoryFilter(acc, 1));
         Assert.True(acc[1].IsEmpty); // no duplicate accessories
     }
 
@@ -78,6 +77,7 @@ public class SlotAndCraftingUiTests
             g.World.Editor.PlaceObject(g.Content.TileObjects.Get("work_bench"), g.Floor + new Strata.Core.Common.Int3(2, 1, 0), 0));
         env = CraftingEnvironment.Around(g.World, g.Player);
         Assert.Contains("work_bench", env.Stations);
+        Assert.Equal(new[] { "Work Bench" }, env.ObjectNames);
         entries = env.Browse(book, g.Player.State.Inventory.Backpack);
         var chair = Assert.Single(entries, e => e.Recipe.Output.Id == "wooden_chair");
         Assert.True(chair.CanCraft);

@@ -1,0 +1,43 @@
+{
+ "id": "P1b-11",
+ "title": "Grass: creation budget, distance hysteresis, in-place updates",
+ "player_outcome": "On medium, high and ultra, walking along the edge of the grass distance no longer causes pops or stutter, and mining or water near grass does not rebuild whole patches.",
+ "design": [
+  "Checked in code: GrassRenderer.Set frees and recreates live grass on every remesh (GrassRenderer.cs:75-83), including liquid- and light-only ones. Update() creates every newly in-range chunk in the same frame and releases exactly at the distance limit (no hysteresis). Shader parameters are set every frame.",
+  "Core: GrassScatter also outputs ChunkMeshResult.GrassShapeHash (positions, normals, kinds, flowers) and GrassLightHash.",
+  "GrassRenderer.Set: same shape hash on a live chunk \u2192 if the light hash differs, rebuild the buffer in place (MultimeshSetBuffer on the existing RID), else do nothing. Different shape \u2192 store the clumps and mark NeedsBuild, keeping the old instance visible until rebuilt; count changes reuse the RID via MultimeshAllocateData.",
+  "Update(): at most preset.GrassBuildsPerFrame builds per frame, nearest first and within runtime.Budgets.GrassMs. Release only beyond distance + 8 m. Set fade parameters on Graphics.Changed only. Reuse a pooled float[] scratch sized to the largest chunk.",
+  "Split GrassRenderer.cs (235 lines) into GrassRenderer.cs and GrassRenderer.Buffers.cs. Add probes grass.live and grass.builds; timer gd.grass.create."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Meshing/GrassScatter.cs \u2014 shape and light hashes",
+  "src/Strata.Core/Meshing/ChunkMesher.cs \u2014 GrassShapeHash and GrassLightHash on ChunkMeshResult",
+  "src/Strata.Core/Presentation/GraphicsConfig.cs \u2014 GrassBuildsPerFrame (0-16) with validation",
+  "game/World/GrassRenderer.cs \u2014 Set diffing, budgeted builds, hysteresis, fade params on change",
+  "game/Debug/GodotCommandHost.cs \u2014 grass probes"
+ ],
+ "files_add": [
+  "game/World/GrassRenderer.Buffers.cs \u2014 instance buffer writing and in-place multimesh updates"
+ ],
+ "data_changes": [
+  "data/config/graphics.json: grassBuildsPerFrame low 0, medium 2, high 3, ultra 4"
+ ],
+ "tests": [
+  "GrassScatterTests: hashes are deterministic; changing only light changes only GrassLightHash; removing a grass block changes GrassShapeHash",
+  "GraphicsConfigTests: grassBuildsPerFrame out of range is rejected",
+  "perf.cmds: after walking loops, `assert perf.max.gd.grass < 6`"
+ ],
+ "verification": [
+  "dotnet test; smoke scripts",
+  "Rendering run with --graphics=high: walk in and out along the grass radius with F3; grass.builds grows at most 3 per frame; no gd.grass entries in perf spikes"
+ ],
+ "depends_on": [
+  "P1b-08",
+  "P1b-09"
+ ],
+ "risks": [
+  "graphics.json and GraphicsConfig.cs are also edited by P1a (desert exposure) and P1b-15: merge carefully",
+  "A NeedsBuild chunk keeps showing old grass for a few frames after an edit; acceptable"
+ ],
+ "effort": "M"
+}

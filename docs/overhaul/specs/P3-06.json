@@ -1,0 +1,49 @@
+{
+ "id": "P3-06",
+ "title": "Third-person grip per style, voxel-lit held items and wings, real block cubes in the hand",
+ "player_outcome": "Weapons sit correctly in the hand: guns point along the arm at the target, bows are held upright, staffs are angled with the gem forward, and sword edges follow the swing. A dirt block in the hand is a small lit dirt cube, not a flat card. Held items and wings darken in caves and warm up by torches like the body does.",
+ "design": [
+  "Verified: PlayerAvatar.UpdateHeld (PlayerAvatar.cs:90-102) rotates every item (90,0,0) and offsets it (0,0.08,0). Blocks become an unlit Sprite3D card. CreatureVisual.SetLight (CreatureVisual.cs:127-132) only touches _geometry collected at Setup, so the attached held item and the wings (PlayerAvatar.Gear.cs:90) stay sky-lit.",
+  "Move the held-item code into a new game/Player/PlayerAvatar.Held.cs. node.Transform = HandFrame(style) * GripSocket.AffineInverse(), with HandFrame from use_styles.json hand {offset, euler} per style. The fallback is today's (90,0,0)/(0,0.08,0).",
+  "Melee scale uses PropLibrary.Bounds tip distance vs hit reach (from P3-04). Other items keep HeldScale.",
+  "game/Rendering/CreatureVisual.cs: AttachToBone(bone, node, lit: true) collects GeometryInstance3D descendants into an _attached list included by SetLight/SetTint. Add Detach(node). PlayerAvatar.Gear attaches the wings through it as well (a body-attached node, not a raw child).",
+  "New game/Items/BlockItemMeshes.cs caches per block id a 0.2 m cube ArrayMesh. Each face's texture-array layer (TextureLayerCatalog.IndexOf of BlockDef.Textures Top/Side/Bottom) is stored in CUSTOM0 and uses a shared ShaderMaterial.",
+  "New shaders/block_item.gdshader samples the terrain albedo array by layer and includes voxel_light.gdshaderinc with instance uniform voxel_light. It serves held blocks in 3P and FP, and dropped blocks in P3-36.",
+  "PlayerAvatar exposes bool TrySocket(string name, out Transform3D global) for muzzle, tip and string (used by P3-10/12/13/15).",
+  "ViewModel swaps its unshaded Sprite3D block card for the block cube (the small part of the FP change)."
+ ],
+ "files_modify": [
+  "game/Player/PlayerAvatar.cs \u2014 held code moved out",
+  "game/Player/PlayerAvatar.Gear.cs \u2014 wings attached lit",
+  "game/Rendering/CreatureVisual.cs \u2014 lit attachments; Detach",
+  "game/Player/ViewModel.cs \u2014 block cube instead of Sprite3D",
+  "data/config/use_styles.json \u2014 hand frames per style",
+  "src/Strata.Core/Presentation/UseStyleConfig.cs \u2014 hand frame model"
+ ],
+ "files_add": [
+  "game/Player/PlayerAvatar.Held.cs \u2014 grip-socket mounting, melee scale, TrySocket",
+  "game/Items/BlockItemMeshes.cs \u2014 cached per-block cube meshes",
+  "shaders/block_item.gdshader \u2014 voxel-lit terrain-textured cube"
+ ],
+ "data_changes": [
+  "use_styles.json hand frames tuned per style: swing (edge in swing plane), gun (barrel along forearm), bow (limbs vertical), staff (30\u00b0 tilt), throw, holdUp, drink/eat, yoyo, flail, whip"
+ ],
+ "tests": [
+  "Smoke basic.cmds: 'wield gray_brick' / 'wield copper_pickaxe' / 'assert props.problems == 0' / 'assert errors == 0'",
+  "Animation tour screenshots: sword, gun, bow, staff and dirt block in a dark cave vs torchlight (tp cave underground; place torch)"
+ ],
+ "verification": [
+  "Lavapipe screenshots: held items share the body's lighting; guns/bows oriented correctly in 3P at the swing/shoot keyframes",
+  "perf report: gd.avatar unchanged (\u00b10.05 ms)"
+ ],
+ "depends_on": [
+  "P3-02",
+  "P3-05"
+ ],
+ "risks": [
+  "Each style's hand frame needs visual tuning; budget a screenshot iteration loop.",
+  "The terrain layer lookup needs GameServices.Layers passed into PlayerAvatar/ViewModel.",
+  "Overlaps P1's facing work in PlayerAvatar.Motion.cs (different partial; low conflict)."
+ ],
+ "effort": "M"
+}

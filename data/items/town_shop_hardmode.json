@@ -1,0 +1,26 @@
+{
+  // P5-18: the hardmode residents' goods: Magic Hat, Cog, Rockets II/III, Nanites, Mushroom Cap, pirate and princess
+  // outfits and the Resplendent Dessert (Sugar Rush). The Crystal Ball and Star Topper are in town_decor3.json.
+  "projectiles": [
+    {"id": "rocket_ii", "name": "Rocket II", "visual": "bolt", "color": "#ff8a3a", "lifetime": 200, "radius": 0.4, "light": [12, 6, 2], "trail": "#b0b0b0", "onHit": [{"type": "explode", "radius": 3, "damage": 0, "destroyTerrain": true, "pickPower": 65}]},
+    {"id": "rocket_iii", "name": "Rocket III", "visual": "bolt", "color": "#ff5a2a", "lifetime": 200, "radius": 0.4, "light": [14, 6, 2], "trail": "#b0b0b0", "onHit": [{"type": "explode", "radius": 5, "damage": 0}]}
+  ],
+  "items": [
+    {"id": "magic_hat", "name": "Magic Hat", "description": "7% increased magic damage and critical strike chance.", "category": "armor", "rarity": 4, "value": 20000, "equipSlot": "head", "defense": 4, "equipEffects": [{"type": "stat", "stat": "magicDamage", "add": 0.07}, {"type": "stat", "stat": "magicCrit", "add": 7}], "covers": ["terraria:magic_hat"]},
+    {"id": "cog", "name": "Cog", "description": "Used to craft machines.", "category": "material", "maxStack": 9999, "value": 50, "covers": ["terraria:cog"]},
+    {"id": "rocket_ii", "name": "Rocket II", "description": "Small blast radius. Will destroy tiles.", "category": "ammo", "maxStack": 9999, "value": 50, "damage": 40, "damageType": "ranged", "knockback": 4, "ammoClass": "rocket", "projectile": "rocket_ii", "consumable": true, "covers": ["terraria:rocket_ii"]},
+    {"id": "rocket_iii", "name": "Rocket III", "description": "Large blast radius. Will not destroy tiles.", "category": "ammo", "maxStack": 9999, "value": 50, "damage": 65, "damageType": "ranged", "knockback": 4, "ammoClass": "rocket", "projectile": "rocket_iii", "consumable": true, "covers": ["terraria:rocket_iii"]},
+    {"id": "nanites", "name": "Nanites", "description": "Used to craft nano bullets and flasks.", "category": "material", "rarity": 3, "maxStack": 9999, "value": 500, "covers": ["terraria:nanites"]},
+    {"id": "mushroom_cap", "name": "Mushroom Cap", "description": "Vanity.", "category": "vanity", "rarity": 3, "value": 10000, "equipSlot": "head", "tags": ["vanity"], "covers": ["terraria:mushroom_cap"]},
+    {"id": "pirate_hat", "armorSet": "pirate_outfit", "name": "Pirate Hat", "description": "Vanity.", "category": "vanity", "value": 50000, "equipSlot": "head", "tags": ["vanity"], "covers": ["terraria:pirate_hat"]},
+    {"id": "pirate_shirt", "armorSet": "pirate_outfit", "name": "Pirate Shirt", "description": "Vanity.", "category": "vanity", "value": 50000, "equipSlot": "body", "tags": ["vanity"], "covers": ["terraria:pirate_shirt"]},
+    {"id": "pirate_pants", "armorSet": "pirate_outfit", "name": "Pirate Pants", "description": "Vanity.", "category": "vanity", "value": 50000, "equipSlot": "legs", "tags": ["vanity"], "covers": ["terraria:pirate_pants"]},
+    {"id": "princess_hat", "armorSet": "princess_outfit", "name": "Princess Hat", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "head", "tags": ["vanity"], "covers": ["terraria:princess_hat"]},
+    {"id": "princess_dress", "armorSet": "princess_outfit", "name": "Princess Dress", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "body", "tags": ["vanity"], "covers": ["terraria:princess_dress"]},
+    {"id": "resplendent_dessert", "name": "Resplendent Dessert", "description": "Minor improvements to all stats, and a burst of speed.", "category": "consumable", "maxStack": 9999, "value": 5000, "useStyle": "eat", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": {"id": "sugar_rush", "ticks": 7200}, "covers": ["terraria:resplendent_dessert"]}
+  ],
+  "buffs": [
+    {"id": "clairvoyance", "name": "Clairvoyance", "description": "Magic powers are increased", "hideTimer": true, "color": "#a070ff", "effects": [{"type": "stat", "stat": "maxMana", "add": 20}, {"type": "stat", "stat": "magicDamage", "add": 0.05}, {"type": "stat", "stat": "magicCrit", "add": 2}, {"type": "stat", "stat": "manaCost", "add": -0.02}]},
+    {"id": "sugar_rush", "name": "Sugar Rush", "description": "20% increased movement and mining speed", "color": "#ff90c0", "effects": [{"type": "stat", "stat": "moveSpeed", "add": 0.2}, {"type": "stat", "stat": "miningSpeed", "add": 0.2}]}
+  ]
+}

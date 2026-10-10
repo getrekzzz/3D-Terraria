@@ -14,11 +14,6 @@ namespace Strata.Core.Gameplay.Entities;
 /// </summary>
 public sealed partial class ProjectileSystem
 {
-    /// <summary>Table rolled for a catch (conditions see the bobber's biome, depth and the rod's fishing power).</summary>
-    public const string FishingTable = "fishing";
-
-    private LootRoller? _loot;
-
     /// <summary>Advances a minion, bobber or returning boomerang; false when it should be removed.</summary>
     private bool TickSpecial(Projectile p, float dt)
     {
@@ -26,6 +21,9 @@ public sealed partial class ProjectileSystem
         var owner = p.Owner;
         if (p.Def.Minion != null) return owner is { Alive: true } && TickMinion(p, owner, dt);
         if (p.Def.Bobber) return owner is { Alive: true } && TickBobber(p, owner, dt);
+        if (p.LatchedTo != null) return TickLatched(p);
+        if (p.Def.Tether is { } tether && !p.Returning)
+            return owner is { Alive: true } && (tether.Kind == "flail" ? TickFlail(p, owner, dt) : TickYoyo(p, owner, dt));
         // Returning boomerang: fly straight back through anything, still striking what it meets.
         if (owner == null || !owner.Alive) return false;
         var to = owner.Center - p.Position;
@@ -72,22 +70,59 @@ public sealed partial class ProjectileSystem
         p.Velocity = dir * speed;
     }
 
-    /// <summary>Unsummons the owner's oldest minions until one using <paramref name="slots"/> fits.</summary>
-    private void MakeRoomForMinion(PlayerEntity owner, int slots)
+    /// <summary>
+    /// Unsummons the owner's oldest minions until a new one fits; sentries (one at a time) are counted apart, so a
+    /// sentry never sends a minion home and the other way round.
+    /// </summary>
+    private void MakeRoomForMinion(PlayerEntity owner, MinionDef minion)
     {
-        int allowed = 1 + (int)owner.State.Effects.Stats.Bonus(Stats.StatIds.MaxMinions);
-        int used = _items.Where(x => x.Owner == owner && x.Def.Minion != null).Sum(x => x.Def.Minion!.Slots);
+        bool sentry = minion.IsSentry;
+        int slots = sentry ? 1 : minion.Slots;
+        int allowed = sentry ? 1 : 1 + (int)owner.State.Effects.Stats.Bonus(Stats.StatIds.MaxMinions);
+        bool Same(Projectile x) => x.Owner == owner && x.Def.Minion is { } m && m.IsSentry == sentry;
+        int used = _items.Where(Same).Sum(x => sentry ? 1 : x.Def.Minion!.Slots);
         for (int i = 0; i < _items.Count && used + slots > allowed; i++)
         {
             var x = _items[i];
-            if (x.Owner != owner || x.Def.Minion == null) continue;
-            used -= x.Def.Minion.Slots;
+            if (!Same(x)) continue;
+            used -= sentry ? 1 : x.Def.Minion!.Slots;
             End(i--);
         }
     }
 
     /// <summary>The owner's minions (summon order).</summary>
     public IEnumerable<Projectile> MinionsOf(PlayerEntity owner) => _items.Where(x => x.Owner == owner && x.Def.Minion != null);
+
+    /// <summary>
+    /// The owner's minions by kind in summon order, as the buff bar shows them (sentries have no buff): fills
+    /// <paramref name="into"/>, cleared first, without allocating once it has grown.
+    /// </summary>
+    public void CountMinions(PlayerEntity owner, List<(ProjectileDef Def, int Count)> into)
+    {
+        into.Clear();
+        for (int i = 0; i < _items.Count; i++)
+        {
+            var p = _items[i];
+            if (p.Owner != owner || p.Def.Minion is not { IsSentry: false }) continue;
+            int k = 0;
+            while (k < into.Count && into[k].Def != p.Def) k++;
+            if (k == into.Count) into.Add((p.Def, 1));
+            else into[k] = (p.Def, into[k].Count + 1);
+        }
+    }
+
+    /// <summary>Sends the owner's minions of one kind home (right-clicking their buff); returns how many went.</summary>
+    public int Unsummon(PlayerEntity owner, ProjectileDef kind)
+    {
+        int count = 0;
+        for (int i = _items.Count - 1; i >= 0; i--)
+        {
+            if (_items[i].Owner != owner || _items[i].Def != kind || _items[i].Def.Minion == null) continue;
+            End(i);
+            count++;
+        }
+        return count;
+    }
 
     private bool TickMinion(Projectile p, PlayerEntity owner, float dt)
     {
@@ -102,13 +137,17 @@ public sealed partial class ProjectileSystem
         bool sentry = m.Speed <= 0;
         if (!sentry && Vector3.DistanceSquared(p.Position, owner.Center) > 45f * 45f) p.Position = owner.Center + new Vector3(0, 2, 0);
         var watch = sentry ? p.Position : owner.Center;
+        // A creature the owner's whip tagged comes first (the latest, up to half again the usual range); else the nearest.
         Npc? target = null;
+        long tagged = long.MinValue;
+        float focusRange = m.Range * 1.5f;
         float best = m.Range * m.Range;
         foreach (var npc in _npcs.All)
         {
             if (!npc.Alive || npc.Invulnerable) continue;
             float d = Vector3.DistanceSquared(npc.Center, watch);
-            if (d < best) (target, best) = (npc, d);
+            if (npc.TaggedBy == owner && npc.TagTick > tagged && d < focusRange * focusRange) (target, tagged) = (npc, npc.TagTick);
+            else if (tagged == long.MinValue && d < best) (target, best) = (npc, d);
         }
         Vector3 goal;
         if (target == null)
@@ -128,7 +167,7 @@ public sealed partial class ProjectileSystem
             {
                 p.NextShot = p.Age + m.ShootInterval;
                 var dir = Vector3.Normalize(target.Center - p.Position);
-                Spawn(shot, p.Position + dir * 0.3f, dir * m.ShootSpeed, owner, p.Damage, p.Knockback, p.DamageClass, 0);
+                Spawn(shot, p.Position + dir * 0.3f, dir * m.ShootSpeed, owner, p.Damage, p.Knockback, p.DamageClass, 0).FromMinion = true;
             }
         }
         else goal = target.Center;
@@ -143,86 +182,5 @@ public sealed partial class ProjectileSystem
             HitCreatures(p);
         }
         return true;
-    }
-
-    /// <summary>The player's bobber, if one is out.</summary>
-    public Projectile? BobberOf(PlayerEntity owner) => _items.FirstOrDefault(x => x.Owner == owner && x.Def.Bobber);
-
-    private bool TickBobber(Projectile p, PlayerEntity owner, float dt)
-    {
-        var world = _world.Session.World;
-        if (Vector3.DistanceSquared(owner.Center, p.Position) > 40f * 40f) return false; // the line snaps
-        var cell = VoxelMotion.CellOf(p.Position);
-        var liquid = LiquidCode.Type(world.GetLiquid(cell.X, cell.Y, cell.Z));
-        bool fishable = liquid is LiquidType.Water or LiquidType.Honey;
-        if (!p.Floating)
-        {
-            p.Velocity.Y -= p.Def.Gravity * dt;
-            if (fishable)
-            {
-                p.Floating = true;
-                p.Velocity = Vector3.Zero;
-                ScheduleBite(p);
-                return true;
-            }
-            float r = MathF.Min(p.Def.Radius * Units.CellSize, 0.2f);
-            VoxelMotion.Move(world, ref p.Position, ref p.Velocity, new Vector3(r), dt);
-            p.Velocity.X *= 0.99f;
-            p.Velocity.Z *= 0.99f;
-            return true;
-        }
-        if (!fishable)
-        {
-            // Drifted out of (or drained from under) the water: sink again.
-            p.Floating = false;
-            p.Biting = false;
-            return true;
-        }
-        // Rise to the surface of the liquid column and rest there.
-        var above = cell + new Int3(0, 1, 0);
-        bool submerged = LiquidCode.Type(world.GetLiquid(above.X, above.Y, above.Z)) != LiquidType.None;
-        float level = (world.GetLiquid(cell.X, cell.Y, cell.Z) & 0x1F) / (float)LiquidCode.MaxLevel;
-        float surface = submerged ? p.Position.Y + 0.5f : (cell.Y + level) * Units.CellSize;
-        p.Position.Y += MathF.Min(surface - p.Position.Y - 0.02f, 2f * dt);
-        if (!p.Biting && p.Age >= p.BiteAt)
-        {
-            p.Biting = true;
-            p.BiteAt = p.Age + 50; // the fish holds on for a moment
-        }
-        else if (p.Biting && p.Age >= p.BiteAt)
-        {
-            p.Biting = false;
-            ScheduleBite(p);
-        }
-        return true;
-    }
-
-    private void ScheduleBite(Projectile p)
-    {
-        float power = p.Source is { } rod ? _world.Uses[rod].Fishing?.Power ?? 5 : 5;
-        float wait = _rng.Range(90, 420) * 25f / (power + 20f);
-        p.BiteAt = p.Age + (int)wait;
-    }
-
-    /// <summary>
-    /// Reels the bobber in: a biting fish yields a catch from the <see cref="FishingTable"/> (rolled for the bobber's
-    /// spot and the rod's fishing power); otherwise nothing.
-    /// </summary>
-    public List<ItemStack> Reel(Projectile bobber)
-    {
-        var catches = new List<ItemStack>();
-        int index = _items.IndexOf(bobber);
-        if (index < 0) return catches;
-        if (bobber.Biting && _world.Session.Content.LootTables.Contains(FishingTable))
-        {
-            var cell = VoxelMotion.CellOf(bobber.Position);
-            var ctx = _world.Session.ContextAt(cell);
-            ctx.FishingPower = bobber.Source is { } rod ? _world.Uses[rod].Fishing?.Power ?? 5 : 5;
-            ctx.Random = _rng;
-            _loot ??= new LootRoller(_world.Session.Content);
-            catches.AddRange(_loot.Roll(FishingTable, ref _rng, ctx));
-        }
-        End(index);
-        return catches;
     }
 }

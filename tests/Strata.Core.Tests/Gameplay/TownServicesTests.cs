@@ -22,7 +22,7 @@ public class TownServicesTests
     private static TownNpc Summon(TestGame g, string id) =>
         g.World.Town.Summon(g.Content.TownNpcs.Get(id), g.World.Navigator.NearestStandable(g.Floor + new Int3(3, 1, 3), Strata.Core.Gameplay.Navigation.NavAgent.Humanoid, 3)!.Value);
 
-    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory.Backpack);
+    private static long Purse(TestGame g) => Coins.Total(g.Player.State.Inventory);
 
     [Fact]
     public void PrefixesChangeAWeaponsStats()
@@ -63,7 +63,7 @@ public class TownServicesTests
     {
         using var g = Create();
         var p = g.Player.State;
-        p.Inventory.Accessories[0] = new ItemStack(g.Content.Items.Get("hermes_boots"), 1, g.Content.Prefixes.Get("sturdy"));
+        p.Inventory.Accessories[0] = new ItemStack(g.Content.Items.Get("hermes_boots"), 1, g.Content.Prefixes.Get("guarding"));
         p.Recompute();
         Assert.Equal(g.Content.Items.Get("hermes_boots").Defense + 2, p.Defense);
     }
@@ -75,7 +75,7 @@ public class TownServicesTests
         var goblin = Summon(g, "goblin_tinkerer");
         var inv = g.Player.State.Inventory;
         inv.Backpack[inv.SelectedHotbar] = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1);
-        Assert.Empty(Wallet.Give(inv.Backpack, g.Content, 1000000));
+        Assert.Empty(Wallet.Give(inv, g.Content, 1000000));
         long cost = g.World.Services.ReforgeCost(goblin, g.Player);
         Assert.True(cost > 0);
         long before = Purse(g);
@@ -90,6 +90,85 @@ public class TownServicesTests
         // Blocks cannot be reforged.
         inv.Backpack[inv.SelectedHotbar] = new ItemStack(g.Content.Items.Get("wood"), 5);
         Assert.Equal(0, g.World.Services.ReforgeCost(goblin, g.Player));
+    }
+
+    [Fact]
+    public void ReforgeWorksOnTheServiceSlot()
+    {
+        using var g = Create();
+        var goblin = Summon(g, "goblin_tinkerer");
+        var inv = g.Player.State.Inventory;
+        var held = inv.Held;
+        var sword = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1);
+        inv.Service[0] = sword;
+        Assert.Equal(TradeResult.TooPoor, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out _));
+        Assert.Equal(sword, inv.Service[0]);
+        Assert.Empty(Wallet.Give(inv, g.Content, 1000000));
+        long cost = g.World.Services.ReforgeCost(goblin, g.Player, inv.Service[0]);
+        Assert.True(cost > 0);
+        var reforged = new List<ItemStack>();
+        g.World.Services.Reforged += (p, s) => reforged.Add(s);
+        long before = Purse(g);
+        Assert.Equal(TradeResult.Ok, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out var made));
+        Assert.NotNull(made.Prefix);
+        Assert.Equal(made, inv.Service[0]);
+        Assert.Equal(before - cost, Purse(g));
+        Assert.Equal(new[] { made }, reforged);
+        Assert.Equal(held, inv.Held); // the held item is not touched
+        // The cost follows the new prefix's value; a second roll never lands on the same prefix.
+        Assert.Equal(TradeResult.Ok, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out var again));
+        Assert.NotEqual(made.Prefix, again.Prefix);
+        Assert.Equal(2, reforged.Count);
+    }
+
+    [Fact]
+    public void CostIsZeroForUnprefixableItems()
+    {
+        using var g = Create();
+        var goblin = Summon(g, "goblin_tinkerer");
+        var merchant = Summon(g, "merchant");
+        var inv = g.Player.State.Inventory;
+        Assert.Empty(Wallet.Give(inv, g.Content, 1000000));
+        var wood = new ItemStack(g.Content.Items.Get("wood"), 5);
+        var sword = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1);
+        Assert.Equal(0, g.World.Services.ReforgeCost(goblin, g.Player, wood));
+        Assert.Equal(0, g.World.Services.ReforgeCost(goblin, g.Player, ItemStack.Empty));
+        Assert.Equal(0, g.World.Services.ReforgeCost(merchant, g.Player, sword)); // he does not reforge
+        inv.Service[0] = wood;
+        long before = Purse(g);
+        Assert.Equal(TradeResult.NothingToDo, g.World.Services.Reforge(goblin, g.Player, inv.Service, 0, out _));
+        Assert.Equal(wood, inv.Service[0]);
+        Assert.Equal(before, Purse(g));
+        // The reforge slot takes only what can carry a prefix: wood stays on the cursor, the sword goes in.
+        inv.Service[0] = ItemStack.Empty;
+        inv.Cursor = wood;
+        var slot = new SlotRef(SlotArea.Service, 0);
+        Assert.Equal(ClickOutcome.None, g.World.ClickSlot(g.Player, slot, false, ClickMods.None, default));
+        Assert.True(inv.Service[0].IsEmpty);
+        inv.Cursor = sword;
+        Assert.Equal(ClickOutcome.Moved, g.World.ClickSlot(g.Player, slot, false, ClickMods.None, default));
+        Assert.Equal(sword, inv.Service[0]);
+        Assert.True(inv.Cursor.IsEmpty);
+    }
+
+    [Fact]
+    public void ServiceSlotStowedOnClose()
+    {
+        using var g = Create();
+        var inv = g.Player.State.Inventory;
+        var sword = new ItemStack(g.Content.Items.Get("gold_broadsword"), 1, g.Content.Prefixes.Get("keen"));
+        int carried = inv.CountAll(sword.Item!);
+        inv.Service[0] = sword;
+        Assert.True(inv.StowService().IsEmpty);
+        Assert.True(inv.Service[0].IsEmpty);
+        Assert.Equal(carried + 1, inv.CountAll(sword.Item!));
+        Assert.True(inv.StowService().IsEmpty); // nothing to stow
+        // A full backpack hands the stack back for dropping at the player's feet.
+        var dirt = g.Content.Items.Get("dirt");
+        for (int i = 0; i < inv.Backpack.Size; i++) inv.Backpack[i] = new ItemStack(dirt, dirt.MaxStack);
+        inv.Service[0] = sword;
+        Assert.Equal(sword, inv.StowService());
+        Assert.True(inv.Service[0].IsEmpty);
     }
 
     [Fact]
@@ -134,6 +213,8 @@ public class TownServicesTests
         bool Arrives(string id) => Conditions.ConditionCompiler.CompileAll(g.Content.TownNpcs.Get(id).Arrival).Evaluate(g.World.Town.TownContext(g.Player));
         Assert.False(Arrives("goblin_tinkerer"));
         g.World.Progression.Set("defeated_goblin_army");
+        Assert.False(Arrives("goblin_tinkerer")); // he must be found and freed first
+        g.World.Progression.Set(TownRescue.FlagFor("goblin_tinkerer"));
         Assert.True(Arrives("goblin_tinkerer"));
         Assert.False(Arrives("arms_dealer"));
         g.Player.State.Inventory.Backpack.Add(new ItemStack(g.Content.Items.Get("musket_ball"), 10));

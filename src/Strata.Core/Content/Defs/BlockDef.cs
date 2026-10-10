@@ -39,8 +39,14 @@ public sealed class BlockDef : ContentDef
 
     public BlockTextures Textures { get; init; } = new();
 
-    /// <summary>Mining health multiplier (1 = dirt-like). Hits needed scale with this.</summary>
+    /// <summary>How solid the block is (descriptive; mining speed comes from <see cref="PickDamageScale"/> and <see cref="PickPower"/>).</summary>
     public float Hardness { get; init; } = 1f;
+
+    /// <summary>
+    /// Multiplier on pickaxe damage, as in Terraria: soft tiles (dirt, sand, snow…) take 2×, evil stone, hellstone and
+    /// dungeon brick ½, hardmode ores down to ⅕ (chlorophyte). Every block has <see cref="Gameplay.Mining.MiningRules.TileHealth"/>.
+    /// </summary>
+    public float PickDamageScale { get; init; } = 1f;
 
     /// <summary>Minimum pickaxe power required to mine.</summary>
     public int PickPower { get; init; }
@@ -50,6 +56,12 @@ public sealed class BlockDef : ContentDef
 
     /// <summary>Emitted light as [r, g, b], each 0–15.</summary>
     public int[]? Light { get; init; }
+
+    /// <summary>
+    /// Soft self-glow of the block's surface (0–1, shader only): ore flecks stay visible in a dark cave without lighting
+    /// anything around them (unlike <see cref="Light"/>, it never enters the baked block light).
+    /// </summary>
+    public float? Glow { get; init; }
 
     public string Sound { get; init; } = "stone";
 

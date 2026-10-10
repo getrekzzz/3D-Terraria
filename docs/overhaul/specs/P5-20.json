@@ -1,0 +1,50 @@
+{
+ "id": "P5-20",
+ "title": "Town pets: Cat, Dog and Bunny licenses",
+ "player_outcome": "Buy a Cat, Dog or Bunny License from the Zoologist and use it. A town pet moves into a free house, wanders the town, and can be petted.",
+ "design": [
+  "TownNpcKind.Pet (from TownNpcDef.Pet = true). Pets: no shop or services; never count as residents; invulnerable and never targeted; need a valid house. BeginTalk on a pet opens a tiny dialog with a 'Pet' button, which plays the player's 'use' action and a heart burst particle, as in Terraria's petting.",
+  "New item behavior 'license' {flag} in ItemBehaviorSpecs, with its handler in a new ItemUseSystem.Town.cs. It sets the world flag 'license_<pet>'. If the flag is already set it is refused with 'This license has already been used.' through the Refused event.",
+  "Data data/town/pets.json: town_cat, town_dog, town_bunny with arrival [{flag license_cat}] etc. Items license_cat/dog/bunny (5 gold). The Zoologist shop entries are added in P5-17.",
+  "Models: a new tools/blender/bgen/pets.py quadruped generator (metaball body, head with ears and whiskers, tail, four legs; a small rig with walk/idle/sit/lie clips) for town_cat and town_dog. town_bunny reuses the 'bunny' generator at scale 1.4. If the art phase adds a better quadruped, reuse it.",
+  "TownRenderer: non-humanoid residents use CreatureVisual.Play('walk'/'idle'). Name tag e.g. 'Whiskers the Cat'."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 Pet; Kind",
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 license",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 dispatch (1 line)",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Combat.cs \u2014 pets are invulnerable",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Targeting.cs \u2014 skip pets",
+  "game/UI/TownDialog.Services.cs \u2014 Pet button for pets",
+  "game/Entities/TownRenderer.cs \u2014 heart particle (pooled) on petting",
+  "tools/blender/assets.json \u2014 town_cat, town_dog, town_bunny, licenses"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Town.cs \u2014 license handler",
+  "data/town/pets.json \u2014 three pets",
+  "data/items/town_licenses.json \u2014 three licenses",
+  "tools/blender/bgen/pets.py \u2014 quadruped pet generator",
+  "assets/models/creatures/town_cat.glb, town_dog.glb, town_bunny.glb + license icons (generated)"
+ ],
+ "data_changes": [
+  "3 town NPC defs, 3 items, reference concepts terraria:town_cat/dog/bunny and the licenses"
+ ],
+ "tests": [
+  "PetTests.LicenseSetsFlagOnce: the second use is refused and not consumed",
+  "PetTests.PetMovesIntoHouseAndDoesNotCount: ResidentCount unchanged after the cat arrives",
+  "PetTests.PetsAreNotTargeted",
+  "Smoke town.cmds: 'give license_cat' / 'wield license_cat' / 'use' / 'assert flag.license_cat == 1'"
+ ],
+ "verification": [
+  "build_all --check; validate; dotnet test; smoke PASS",
+  "In game: buy a license, use it, build a house \u2192 the cat moves in and walks around"
+ ],
+ "depends_on": [
+  "P5-04",
+  "P5-09"
+ ],
+ "risks": [
+  "TownNpc.HalfExtents is static for humans; pets use the humanoid nav agent, which is fine for 1-cell-wide doors. A per-def size is a follow-up."
+ ],
+ "effort": "M"
+}

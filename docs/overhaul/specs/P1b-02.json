@@ -1,0 +1,69 @@
+{
+ "id": "P1b-02",
+ "title": "Smooth biome relief: soft ridges, wide ramps, B-spline heights, per-biome relief in data (GenVersion 10)",
+ "player_outcome": "Hills, snow ridges and mountains read as rounded rolling landforms instead of knife-edge ridges. Biome borders ramp gently instead of stepping. Slopes lose the faceted 4 m grid creases.",
+ "design": [
+  "Grid2D: add `float SampleSmooth(float x, float z)`, a uniform cubic B-spline over 4\u00d74 taps with weights (1-t)^3/6, (3t^3-6t^2+4)/6, (-3t^3+3t^2+3t+1)/6, t^3/6, using the existing clamped indexer. Only + - * / (determinism rules). Keep bilinear Sample for Landness and other masks.",
+  "TerrainField: SurfaceHeight uses _plan.Height.SampleSmooth and Ruggedness uses SampleSmooth. Detail noise becomes NoiseField.Create(seeds, \"detail\", 40f, Fbm, 2) with amplitude 0.8 + 1.2*land (at most 2 cells, down from 2.8; removes single-cell pimples). WorldPlan.RaiseTerrainColumnTops also samples ruggedness with SampleSmooth.",
+  "Data-driven relief: add `ReliefSpec` (Base, Rolling, Hills, Ridges, Bumps, Dunes, Ruggedness, Cliffs, Mountains {Height, Peak}) and `ReliefSpec? Relief` to BiomeDef.cs. This replaces the biome-id switch statements BiomeRelief.Relief(string) and Rugged(string).",
+  "Add DetMath.SoftRidge(float n, float k): 1 - sqrt(n*n + k*k), normalised so SoftRidge(0) = 1 and SoftRidge(\u00b11) = 0. Only MathF.Sqrt. It gives rounded crests instead of FastNoiseLite's per-octave ridged creases.",
+  "Rewrite BiomeRelief with noise fields hills (fBm \u03bb190, 3 oct), ridges (fBm \u03bb240, 3 oct \u2192 SoftRidge k 0.25), bumps (fBm \u03bb90, 2 oct), dunes (fBm \u03bb70, 2 oct \u2192 SoftRidge k 0.12), mountain_mask (fBm \u03bb700, 2 oct), mountains (fBm \u03bb260, 3 oct \u2192 SoftRidge k 0.3). Relief(spec) = Base + Rolling*hills01(x,z)*hills01(0.7z,0.7x) + Hills*hills01 + Ridges*SoftRidge(ridges) + Bumps*bumps01 + Dunes*SoftRidge(dunes). Cache a ReliefSpec per region and use forest's spec for the 'no region' weight. A missing spec logs a warning and falls back to forest.",
+  "Wider ramps: weight = DetMath.SmoothStep(0f, 0.55f, r.Membership(x,z,0f)) replaces Clamp01(membership*3).",
+  "Mountains: h += mask*(m.Height + m.Peak*SoftRidge(mountains)) using forest.Relief.Mountains (22, 38) instead of 30 + 55*ridged(5 oct). Mountain ruggedness blends to 0.5 (was 0.8).",
+  "Blur: relief gets Blur(2) applied twice (about a Gaussian over ~40 cells); the rugged grid gets Blur(3) (today it is never blurred, so overhang amplitude jumps at biome borders).",
+  "ContentValidator.World.cs ValidateBiomes: range-check relief fields (base 0-40, term amplitudes 0-60, ruggedness and cliffs 0-1, mountains height 0-60, peak 0-80).",
+  "GenVersion.Current = 10 with a comment. In WorldGenTests: Assert.Equal(10, ...), re-pin the 6 golden hashes and the spawn-chunk assert.",
+  "Old worlds (player decision: disposable): WorldSession ctor logs a Warn when meta.GeneratorVersion < GenVersion.Current. Add SaveCatalog entry flag OldGenerator; MainMenu.Worlds detail line appends ' \u00b7 old terrain'.",
+  "Run worldgen-report --compare against the P1b-01 baseline and attach the hillshades."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Plan/Grid2D.cs \u2014 SampleSmooth (cubic B-spline)",
+  "src/Strata.Core/WorldGen/Fields/TerrainField.cs \u2014 smooth sampling, gentler 2-octave detail",
+  "src/Strata.Core/WorldGen/Passes/BiomeRelief.cs \u2014 data-driven soft relief, SmoothStep ramps, stronger blur, blurred ruggedness",
+  "src/Strata.Core/WorldGen/Plan/WorldPlan.cs \u2014 RaiseTerrainColumnTops uses SampleSmooth",
+  "src/Strata.Core/Determinism/DetMath.cs \u2014 SoftRidge",
+  "src/Strata.Core/Content/Defs/BiomeDef.cs \u2014 ReliefSpec and Relief",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 relief range checks",
+  "src/Strata.Core/WorldGen/GenVersion.cs \u2014 10",
+  "src/Strata.Core/Session/WorldSession.cs \u2014 old-generator warning",
+  "src/Strata.Core/Persistence/SaveCatalog.cs \u2014 OldGenerator flag",
+  "game/Menu/MainMenu.Worlds.cs \u2014 'old terrain' note",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 GenVersion 10, re-pinned hashes, spawn chunk"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/WorldGen/Grid2DTests.cs \u2014 B-spline exactness and continuity",
+  "tests/Strata.Core.Tests/WorldGen/ReliefTests.cs \u2014 plan slope and relief-kept checks"
+ ],
+ "data_changes": [
+  "data/biomes.json: forest relief {base 7, rolling 24, ruggedness 0.1, cliffs 0.15, mountains {height 22, peak 38}}",
+  "tundra {base 8, hills 6, ridges 20, ruggedness 0.3, cliffs 0.35}",
+  "jungle {base 10, hills 18, bumps 6, ruggedness 0.45, cliffs 0.5}",
+  "desert {base 4, dunes 7, ruggedness 0.03, cliffs 0}",
+  "corruption and crimson {base 7, hills 12, bumps 3, ruggedness 0.3, cliffs 0.25}",
+  "hallow and ocean get no relief (not placed as surface regions)"
+ ],
+ "tests": [
+  "Grid2DTests: SampleSmooth reproduces constant and linear grids within 1e-4; value and first difference are continuous across grid lines on random grids; result stays within the 4\u00d74 neighbourhood min/max",
+  "ReliefTests.PlanSlopesAreGentle: Small seed 1234, finite-difference |\u2207SurfaceHeight| at 2-cell spacing over land outside the mountain mask stays below 0.9 (calibrate against the baseline)",
+  "ReliefTests.RollingHillsKept: std-dev of SurfaceHeight in the 150-400 cell ring around spawn is at least 4 cells",
+  "ContentValidatorTests: biome relief ruggedness 2 is an error",
+  "WorldGenTests: GenVersion 10, new golden hashes, PaddingMatchesNeighbourCores and SpawnHasSolidGroundAndHeadroom still pass",
+  "CabinTests, CaveFinderTests, HorizonFieldTests, MutationTests re-run unchanged"
+ ],
+ "verification": [
+  "dotnet test; dotnet run --project tools/Strata.Tools -- validate; manifest --check; coverage",
+  "worldgen-report --seed=1234 --size=small --out=build/wg-p1b02 --compare=build/wg-before/stats.json: roughness and p99 step down, relief at least 75% of before; compare terrain_hillshade.png visually",
+  "All game/Testing/Scripts/*.cmds print SMOKE PASS (headless); menu tour",
+  "Lavapipe tour (game/Testing/Tours/tour.cmds): compare 01_spawn_forest, 02_desert, 03_tundra, 04_jungle with the baseline shots"
+ ],
+ "depends_on": [
+  "P1b-01"
+ ],
+ "risks": [
+  "B-spline smoothing lowers peaks and shifts shorelines slightly; beach and ocean tests may move",
+  "Relief now comes from data: document that editing a relief value changes world output and needs a GenVersion bump (golden hashes catch it)",
+  "If creases remain visible in the hillshade, fall back to WorldPlan.HeightStep 4 (4\u00d7 plan memory and time)",
+  "Structure placement (cabins, dungeon gate, pyramid) follows the new heights: re-run CabinTests and dungeon.cmds"
+ ],
+ "effort": "M"
+}

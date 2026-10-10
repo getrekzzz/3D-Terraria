@@ -1,0 +1,53 @@
+{
+ "id": "P1b-09",
+ "title": "Colliders: per-bucket diff rebuilds, budgeted urgent builds, no rebuild on liquid- or light-only remeshes",
+ "player_outcome": "Mining, placing torches, flowing water and walking into new ground no longer hitch while physics shapes rebuild. The ground under the player is always solid.",
+ "design": [
+  "Checked in code: ColliderManager.SetData marks Dirty on every remesh (ColliderManager.cs:43-48), including liquid steps and light-only remeshes. Chunks at Chebyshev distance \u2264 1 rebuild outside any budget (:75-77): up to 27 chunks \u00d7 8 ConcavePolygonShape3D Jolt BVH builds on main. WorldEditor.Objects.DirtyForLight (Relight and torches) urgently dirties the 8 chunks within 16 cells.",
+  "Core: add CollisionBuilder.ComputeHashes() \u2192 ulong[16] (8 solid and 8 platform buckets; Hash.Combine over triangle float bits and counts). ChunkMesher.Build calls it on the worker and stores the result on ChunkMeshResult.Collision.",
+  "Rewrite ColliderManager with one static body per non-empty bucket (up to 16 per chunk) instead of one body with 8 shapes. SetData(coord, data) returns ColliderChange {Unchanged, Pending, Stored} by diffing hashes into DirtyMask; Unchanged does no work at all.",
+  "UpdateFocus(focus, budgetMs) frees far bodies, then builds in this order: (a) the focus chunk and never-built chunks at Chebyshev \u2264 1, immediately; (b) chunks passed to Prioritize(IEnumerable<Int3>) (player edits); (c) the rest nearest-first while elapsed < budget. Old bucket bodies stay until replaced, so there are never holes.",
+  "ColliderManager API: BodyBuilt fires only when some bucket's geometry changed. Add IsPending(coord); HasBody(coord) uses a chunk-level Built flag; BodyCount counts chunks with bodies (same meaning for the colliders.bodies probe); counters Rebuilt and Skipped. Time it as gd.colliders.build.",
+  "Shapes: create them with PhysicsServer3D.ConcavePolygonShapeCreate() + ShapeSetData(dict {faces = Variant.CreateFrom(span), backface_collision = true}) to skip the Vector3[] copy. Fall back to MeshUpload.Faces if the span API is unavailable.",
+  "WorldRuntime: MeshReady passes the change result; subscribe game.Editor.ChunksDirty to _colliders.Prioritize; pass Budgets.CollidersMs.",
+  "Light-only dirtying: DirtyForLight raises urgent ChunksDirty only for the light's own chunk, and a new non-urgent LightDirty event for the other up to 7 chunks. GameWorld wires Editor.LightDirty to Streamer.MarkDirty(d, urgent: false).",
+  "Probes in GodotCommandHost: colliders.rebuilt, colliders.skipped, colliders.pending."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Meshing/CollisionBuilder.cs \u2014 ComputeHashes and Hashes",
+  "src/Strata.Core/Meshing/ChunkMesher.cs \u2014 compute collision hashes",
+  "game/World/ColliderManager.cs \u2014 per-bucket bodies, diff, budget order, Prioritize, counters",
+  "game/World/WorldRuntime.cs \u2014 change handling, Prioritize wiring, budget",
+  "src/Strata.Core/Gameplay/Interaction/WorldEditor.Objects.cs \u2014 split urgent and light-only dirtying",
+  "src/Strata.Core/Gameplay/Interaction/WorldEditor.cs \u2014 LightDirty event",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 wire LightDirty to non-urgent remesh",
+  "game/Debug/GodotCommandHost.cs \u2014 collider probes",
+  "game/Testing/Scripts/liquids.cmds, game/Testing/Scripts/perf.cmds \u2014 skip asserts"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Meshing/CollisionHashTests.cs \u2014 hash stability and locality"
+ ],
+ "data_changes": [],
+ "tests": [
+  "CollisionHashTests.LiquidOnlyChangeKeepsHashes: remesh after setting a liquid cell gives identical 16 hashes (the liquid surface differs)",
+  "CollisionHashTests.LightSourceKeepsHashes: meshing with an added LightSource gives identical hashes",
+  "CollisionHashTests.MiningChangesOnlyNearbyBuckets: removing one cell changes at most its bucket and face-adjacent buckets",
+  "CollisionHashTests.Deterministic: same input gives the same hashes",
+  "liquids.cmds: after pouring water and `wait 3`, `assert colliders.skipped > 0`",
+  "perf.cmds: `mark` a probe before torch placement, then `assert colliders.rebuilt` increases by \u2264 2 after 10 torches; basic.cmds still has `assert colliders.bodies > 0`"
+ ],
+ "verification": [
+  "dotnet test; smoke movement.cmds, liquids.cmds, basic.cmds, builder.cmds (player.on_floor after mining and building near chunk borders)",
+  "Rendering perf run: perf.max.gd.colliders well below baseline; no gd.colliders entries in `perf spikes` while placing torches or during water flow"
+ ],
+ "depends_on": [
+  "P1b-08"
+ ],
+ "risks": [
+  "Jolt with many small static bodies (\u226416 \u00d7 125 near the player): verify broadphase cost in F3",
+  "A bucket collider outside the focus chunk can be stale for a few frames: edits are prioritized to limit this",
+  "ObjectPlacement.Ground raycasts use TerrainLayer: keep the same layers",
+  "ChunkMesher.cs is also touched by P1b-11 and P1b-12; WorldRuntime.cs by P1b-08, P1b-10 and P1b-11: sequence"
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,41 @@
+{
+ "id": "P1b-15",
+ "title": "Projectile rendering: shared materials and meshes, node pooling, pooled lights",
+ "player_outcome": "Magic weapons, guns and bosses that fire many projectiles no longer hitch or drop frames; glowing shots still light their surroundings near the camera.",
+ "design": [
+  "Checked in code: ProjectileRenderer.Create makes a new StandardMaterial3D, a new Sphere or CapsuleMesh and a new OmniLight3D per projectile, and QueueFrees it on removal (ProjectileRenderer.cs:91-148).",
+  "Cache Dictionary<(Color, float), StandardMaterial3D> glow materials, sphere meshes keyed by radius in mm, and a single bullet capsule mesh.",
+  "Pool nodes per def id: on Removed, hide and push (cap 32 per def, QueueFree beyond that); reset transforms on reuse. Minion and creature projectiles use the AssetCache CreatureVisual path.",
+  "Lights: new partial game/Entities/ProjectileRenderer.Lights.cs owns N OmniLight3D, with N from the new GraphicsPreset.ProjectileLights. Each frame they go to the lit projectiles nearest the camera; no per-projectile lights.",
+  "Timer gd.projectiles.create; probe projectiles.nodes_created."
+ ],
+ "files_modify": [
+  "game/Entities/ProjectileRenderer.cs \u2014 shared resources, node pool",
+  "src/Strata.Core/Presentation/GraphicsConfig.cs \u2014 ProjectileLights (0-32) with validation",
+  "game/Debug/GodotCommandHost.cs \u2014 projectiles.nodes_created",
+  "game/Testing/Scripts/combat.cmds, game/Testing/Scripts/perf.cmds \u2014 pool asserts"
+ ],
+ "files_add": [
+  "game/Entities/ProjectileRenderer.Lights.cs \u2014 pooled projectile lights"
+ ],
+ "data_changes": [
+  "data/config/graphics.json: projectileLights low 0, medium 4, high 8, ultra 12"
+ ],
+ "tests": [
+  "GraphicsConfigTests: projectileLights range is validated",
+  "combat.cmds: wield a magic weapon and fire 40 times, then `assert projectiles.nodes_created <= 34`",
+  "perf.cmds: `assert perf.max.gd.projectiles < 6`"
+ ],
+ "verification": [
+  "Rendering run: rapid-fire weapon plus a boss volley; F3 draw calls stable; `perf spikes` free of gd.projectiles",
+  "Visual: nearby bolts still cast light; distant ones glow only"
+ ],
+ "depends_on": [
+  "P1b-13"
+ ],
+ "risks": [
+  "Pooled creature minions must reset animation and tint state",
+  "graphics.json and GraphicsConfig.cs are shared with P1b-11 and P1a"
+ ],
+ "effort": "S"
+}

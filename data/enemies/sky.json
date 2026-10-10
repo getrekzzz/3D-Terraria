@@ -21,6 +21,7 @@
       "rarity": 5,
       "maxStack": 9999,
       "value": 4000,
+      "noGravity": true,
       "covers": [
         "terraria:soul_of_flight"
       ]
@@ -278,14 +279,16 @@
       "description": "A long cloud serpent that coils through the sky.",
       "brain": {
         "type": "worm",
+        "fly": true,
         "speed": 13,
-        "turnRate": 3,
+        "turnRate": 2.4,
+        "weave": 0.35,
         "digRadius": 0,
         "digInterval": 9999,
         "airGravity": 0
       },
       "life": 4000,
-      "damage": 60,
+      "damage": 80,
       "defense": 10,
       "knockbackResist": 1.0,
       "size": [
@@ -303,6 +306,7 @@
         "segmentSpacing": 1.0,
         "segmentRadius": 0.6,
         "segmentModel": "wyvern_body",
+        "segmentPattern": ["wyvern_legs", "wyvern_body", "wyvern_body", "wyvern_body", "wyvern_body", "wyvern_body", "wyvern_body", "wyvern_body"],
         "tailModel": "wyvern_tail"
       },
       "covers": [

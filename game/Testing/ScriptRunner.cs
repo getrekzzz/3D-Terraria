@@ -28,6 +28,9 @@ public sealed partial class ScriptRunner : Node
 
     public event System.Action<bool>? Finished;
 
+    // A script drives the game as the player at the keyboard does: it goes on while the pause menu halts the scene tree.
+    public override void _EnterTree() => ProcessMode = ProcessModeEnum.Always;
+
     public void Start(string scriptPath, string text, CommandRegistry registry, CommandContext ctx)
     {
         _registry = registry;
@@ -105,9 +108,10 @@ public sealed partial class ScriptRunner : Node
                 _holdLeft = Seconds(tokens, 2, lineNo);
                 return;
             case "press" or "release" when tokens.Count >= 2:
-                // Keeps an action held (or lets go) while the script goes on, e.g. to screenshot mid-flight.
+                // Keeps an action held (or lets go: release, or press … off) while the script goes on, e.g. to
+                // screenshot mid-flight.
                 if (!InputMap.HasAction(tokens[1])) Fail(lineNo, $"unknown input action '{tokens[1]}'");
-                else if (tokens[0] == "press") Input.ActionPress(tokens[1]);
+                else if (tokens[0] == "press" && !(tokens.Count > 2 && tokens[2] == "off")) Input.ActionPress(tokens[1]);
                 else Input.ActionRelease(tokens[1]);
                 return;
             case "repeat" when tokens.Count >= 3 && int.TryParse(tokens[1], out int times):

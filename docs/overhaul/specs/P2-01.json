@@ -1,0 +1,59 @@
+{
+ "id": "P2-01",
+ "title": "Theme foundation: OFL bold font, Terraria palette and slot kinds, one global theme, UI-scale guard",
+ "player_outcome": "Every screen uses a chunky, black-outlined bold font and Terraria's see-through royal-blue panels. This covers the HUD, inventory, console, pause menu, title and settings menus, map labels, damage numbers and name tags. Buttons, scrollbars, sliders, tabs, dropdowns and text fields share one skin. Raising the UI scale can no longer push panels off a small window.",
+ "design": [
+  "Fonts: at implementation time, run `apt-get install fonts-comic-neue fonts-sil-andika`. Copy ComicNeue-Bold.ttf (the main face, closest to Andy Bold) and Andika-Bold.ttf (glyph fallback) into assets/fonts/. Ship their licences as assets/fonts/OFL-ComicNeue.txt and assets/fonts/OFL-Andika.txt, taken from /usr/share/doc/<pkg>/copyright, plus assets/fonts/CREDITS.txt (name, version, upstream URL). Run `godot --headless --import` and commit the .ttf.import files with these settings: antialiasing=grayscale, hinting=light, subpixel_positioning=disabled, generate_mipmaps=false, msdf=false.",
+  "New game/UI/UiFonts.cs.\n- `Bold` is a FontFile loaded once, with `Fallbacks=[Andika-Bold]` so characters like '\u00b7', '\u2026' and '\u2014' render.\n- Size constants: Body 16, Small 13, Stack 14, Header 20, Banner 26, Death 48.\n- Outline constants: 4 for body text, 8 for large text.\n- `Warmup()` pre-rasterises ASCII 32..126 with `FontFile.RenderRange(0, new Vector2I(size, outline), 32, 126)` for every (size, outline) pair used, so opening a screen never rasterises glyphs mid-game.",
+  "Rewrite game/UI/UiTheme.cs to hold only the palette and helpers.\n- Panel colours: PanelBlue = Color8(63,82,151,178), PanelBorder = Color8(10,12,30), PanelHover = Color8(73,94,171,200), ChatPanel = Color8(35,40,85,205).\n- `enum SlotKind { Inventory, HotbarSelected, Chest, Shop, Equip, Vanity, Dye, Misc, Trash, Coin, Ammo, Favorite, Crafting, CraftingSelected, Locked }`.\n- `SlotStyle(SlotKind, bool hovered)` returns a StyleBoxFlat from a dictionary cache, so drawing allocates nothing. Fills: inventory (52,60,150,210) with rim (22,26,70); hotbar-selected gold (230,190,50); chest (40,95,150); equip (85,75,170); vanity (60,50,120); dye (90,45,110); trash (35,40,80); favourite gold rim. Hover lightens the fill by 0.08 and adds a white rim at alpha 120.\n- Text colours: Good (120,190,120), Bad (190,120,120).\n- Coin colours: platinum (220,220,198), gold (224,201,92), silver (181,192,193), copper (246,138,96).\n- Chat colours: BossPurple (175,75,255), NpcArrived (50,125,255), NpcSlain (255,25,25), EventGreen (50,255,130), Death (225,25,25), Housing (255,240,20).\n- `Rarity(int r, double t)`: tiers 1\u20138 as now; -1 (130,130,130); 9 (5,200,255); 10 (255,40,100); 11 (180,40,255); 12 (0,255,200); 13 (0,255,0); -11 (255,175,0); -12 a rainbow cycle `FromHsv((t*0.3)%1, 0.6, 1)`; -13 a pulse (255, 120+80\u00b7sin 4t, 0). Add `IsAnimated(r)`.",
+  "New game/UI/UiTheme.Build.cs (partial) builds the full Theme.\n- Defaults: DefaultFont = UiFonts.Bold, DefaultFontSize = 16.\n- PanelContainer and Panel `panel`: 10 px corner radius, 2 px border, 12/10 margins, anti-aliased.\n- Label: white text with a black outline of 4.\n- Button: normal, hover, pressed and disabled use the panel style (disabled at alpha 0.4); focus uses StyleBoxEmpty; set font_disabled_color.\n- Type variation \"TextButton\" (base Button): StyleBoxEmpty in every state, white text, hover gold Color8(255,215,0), outline 4.\n- V/HScrollBar: scroll Color8(20,26,60,170), grabber (120,140,220), grabber_highlight (160,180,255), grabber_pressed gold, width 12.\n- Also skin: ProgressBar background/fill; TabContainer and TabBar tab_selected/unselected/hovered; HSlider slider and grabber_area; OptionButton and PopupMenu panel/hover; LineEdit normal/focus; RichTextLabel default_color and outline; TooltipPanel and TooltipLabel.",
+  "Call `UiTheme.Install()` from GameRoot.Boot() straight after UserSettings.Load(), before any UI node exists. It does four things:\n- `ThemeDB.FallbackFont = UiFonts.Bold`\n- `ThemeDB.FallbackFontSize = 16`\n- `ThemeDB.GetDefaultTheme().MergeWith(UiTheme.Theme)`\n- `UiFonts.Warmup()`\n\nTheme propagation stops at CanvasLayer, so this global merge is what reaches the console, pause backdrop, minimap and menus. Label3D also falls back to ThemeDB's font. Remove the existing `Theme = UiTheme.Theme` lines only in files this WP touches (they are harmless elsewhere).",
+  "Remaining font call sites:\n- MapView.cs:100: replace ThemeDB.FallbackFont with GetThemeDefaultFont().\n- Set `Font = UiFonts.Bold` explicitly in CombatEffects.NewLabel, NpcRenderer's health Label3D and TownRenderer's name tag, so the result does not depend on the fallback.",
+  "UI-scale guard:\n- DisplaySettings.ApplyUiScale uses effective = clamp(min(setting, window.X/1024, window.Y/600), 0.5, 3). So the logical viewport is never smaller than 1024\u00d7600, the size the layout model (P2-09) is proven against.\n- Re-apply on `GetTree().Root.SizeChanged` (connect in GameRoot).\n- Expose `DisplaySettings.EffectiveUiScale`.\n- The SettingsScreen Interface row shows '(effective 125%)' when the scale is clamped.",
+  "Test plumbing:\n- Move the `ui` command out of game/Debug/EngineCommands.cs into a new game/Debug/UiCommands.cs and add `uiscale <factor>`.\n- New game/Debug/UiProbes.cs, registered from GodotCommandHost.CreateContext, with probes `ui.font` (1 when ThemeDB.FallbackFont.ResourcePath is the shipped font), `ui.theme` (1 when a temporary PanelContainer resolves its panel stylebox BgColor to PanelBlue) and `ui.scale`.\n- Create game/Testing/Scripts/ui.cmds, the phase's UI smoke script, which every later WP extends.",
+  "project.godot: add `[gui] timers/tooltip_delay_sec=0.15` for non-slot tooltips. Slot tooltips move to the custom follower in P2-10."
+ ],
+ "files_modify": [
+  "game/UI/UiTheme.cs \u2014 palette, SlotKind, cached slot styles, full rarity table, chat/coin colours",
+  "game/Bootstrap/GameRoot.cs \u2014 UiTheme.Install() at boot; re-apply UI scale on root SizeChanged",
+  "game/Settings/DisplaySettings.cs \u2014 effective UI scale clamp (min logical 1024\u00d7600)",
+  "game/Menu/SettingsScreen.cs \u2014 show effective UI scale in the Interface row",
+  "game/UI/MapView.cs \u2014 theme font instead of ThemeDB.FallbackFont (line 100)",
+  "game/Entities/CombatEffects.cs \u2014 Label3D font = UiFonts.Bold",
+  "game/Entities/NpcRenderer.cs \u2014 health Label3D font (replaced in P2-20)",
+  "game/Entities/TownRenderer.cs \u2014 name tag font",
+  "game/Debug/EngineCommands.cs \u2014 `ui` command moved out",
+  "game/Debug/GodotCommandHost.cs \u2014 register UiProbes",
+  "project.godot \u2014 [gui] tooltip delay"
+ ],
+ "files_add": [
+  "assets/fonts/ComicNeue-Bold.ttf (+ .import) \u2014 main UI face (OFL)",
+  "assets/fonts/Andika-Bold.ttf (+ .import) \u2014 glyph fallback (OFL)",
+  "assets/fonts/OFL-ComicNeue.txt, assets/fonts/OFL-Andika.txt, assets/fonts/CREDITS.txt \u2014 shipped licences and credits",
+  "game/UI/UiFonts.cs \u2014 font resource, size constants, glyph warm-up",
+  "game/UI/UiTheme.Build.cs \u2014 full Theme for all control types plus TextButton variation",
+  "game/Debug/UiCommands.cs \u2014 `ui` screens command (moved) + `uiscale`",
+  "game/Debug/UiProbes.cs \u2014 ui.* probes",
+  "game/Testing/Scripts/ui.cmds \u2014 the phase's UI smoke script (every later WP appends to it)"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds: `wait_until player.frozen == 0 180` / `assert ui.font == 1` / `assert ui.theme == 1` / `uiscale 1.5` / `assert ui.scale <= 1.5` / `uiscale 1` / `assert errors == 0`",
+  "Menu tour must still print MENU PASS (MainMenu API untouched)"
+ ],
+ "verification": [
+  "dotnet build Strata.sln; python3 tools/ci/check_file_length.py",
+  "Headless: godot --headless --path . --audio-driver Dummy -- --world=smoke-ui --size=tiny --new --player=smoke --fresh-player --view=2 --smoke=res://game/Testing/Scripts/ui.cmds \u2192 SMOKE PASS",
+  "Headless menu tour \u2192 MENU PASS",
+  "Lavapipe: xvfb-run godot \u2026 --resolution 1280x720 -- --menu-tour=$PWD/shots. Check m01/m06/m09 for the bold font, blue panels, and skinned tabs, sliders and toggles",
+  "Check the boot log: Warmup adds under 50 ms; F3 overlay gd.hud time unchanged"
+ ],
+ "depends_on": [],
+ "risks": [
+  "If MergeWith into ThemeDB's default theme does not reach some controls, fall back to a `ui export-theme` command. It would save UiTheme.Theme to assets/ui/strata_theme.tres and set [gui] theme/custom, with the code builder staying the source of truth. The ui.theme probe catches the gap.",
+  "Comic Neue lacks some punctuation; Andika is wired as the fallback.",
+  "Label3D readability changes with the new face; re-tune outline sizes in P2-19/P2-20.",
+  "The licence files must ship with the fonts."
+ ],
+ "effort": "M"
+}

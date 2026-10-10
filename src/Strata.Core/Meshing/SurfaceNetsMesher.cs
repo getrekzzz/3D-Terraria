@@ -7,6 +7,7 @@ namespace Strata.Core.Meshing;
 /// Constrained surface nets over the opaque/non-opaque boundary of the voxel grid:
 /// one vertex per dual cell, relaxed (Laplacian) but clamped inside its dual cell so the surface never
 /// strays more than half a cell from the voxels (visuals and collision agree, single blocks never vanish).
+/// Gentle ground then gets its sub-cell height back from the column heights (<see cref="HeightfieldSmoothing"/>).
 /// Dual cells touching crisp/shaped/transparent cells snap to grid corners, so built blocks get exact
 /// flat faces that meet smooth terrain watertight. Triangles with mixed materials carry all three
 /// surface ids with barycentric weights so the shader blends seamlessly.
@@ -22,9 +23,9 @@ public static class SurfaceNetsMesher
     private const int Lo = Neighborhood.Margin - 1 - RelaxIterations;
     private const int Hi = Neighborhood.Margin + ChunkMath.Size + RelaxIterations;
     private const int D = Hi - Lo;
-    private const byte None = 0, Free = 1, Snapped = 2;
+    internal const byte None = 0, Free = 1, Snapped = 2;
 
-    private sealed class Scratch
+    internal sealed class Scratch
     {
         public readonly Vector3[] Pos = new Vector3[D * D * D];
         public readonly Vector3[] Tmp = new Vector3[D * D * D];
@@ -38,7 +39,10 @@ public static class SurfaceNetsMesher
 
     [ThreadStatic] private static Scratch? _scratch;
 
-    private static int DI(int x, int y, int z) => ((y - Lo) * D + (z - Lo)) * D + (x - Lo);
+    /// <summary>This thread's scratch after its last <see cref="Build"/> (tests inspect vertex drift).</summary>
+    internal static Scratch? ThreadScratch => _scratch;
+
+    internal static int DI(int x, int y, int z) => ((y - Lo) * D + (z - Lo)) * D + (x - Lo);
 
     public static void Build(MeshVolume vol, MeshSurface surface, CollisionBuilder collision)
     {
@@ -47,6 +51,7 @@ public static class SurfaceNetsMesher
         Array.Fill(s.OutIndex, -1);
         PlaceVertices(vol, s);
         Relax(s);
+        HeightfieldSmoothing.Apply(vol, s);
         ComputeDensity(vol, s.Density);
         EmitQuads(vol, s, surface, collision);
     }

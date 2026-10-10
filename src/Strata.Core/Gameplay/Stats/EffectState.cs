@@ -1,4 +1,5 @@
 using Strata.Core.Content;
+using Strata.Core.Content.Defs;
 using Strata.Core.Content.Specs;
 
 namespace Strata.Core.Gameplay.Stats;
@@ -25,11 +26,21 @@ public sealed class EffectState
     /// <summary>Paints blocks as they are placed (Paint Sprayer).</summary>
     public bool AutoPaint { get; set; }
 
+    /// <summary>Movement keys are reversed (Confused); <see cref="InvertForward"/> also swaps forward and back.</summary>
+    public bool InvertControls { get; set; }
+
+    public bool InvertForward { get; set; }
+
     public HashSet<string> Immunities { get; } = new(StringComparer.Ordinal);
 
     /// <summary>Liquids whose contact damage is ignored.</summary>
     public HashSet<string> LiquidImmunities { get; } = new(StringComparer.Ordinal);
     public int DamagePerSecond { get; set; }
+
+    /// <summary>The buff dealing the most of <see cref="DamagePerSecond"/> (named when it kills), or null.</summary>
+    public BuffDef? DotSource { get; private set; }
+
+    private int _dotSourcePerSecond;
 
     /// <summary>Brightest emitted light [r,g,b] (0–15), or null.</summary>
     public int[]? Light { get; set; }
@@ -51,6 +62,15 @@ public sealed class EffectState
     /// <summary>HUD readouts the wearer has (depth, position, time).</summary>
     public HashSet<string> Info { get; } = new(StringComparer.Ordinal);
 
+    /// <summary>Projectiles thrown with weapon attacks (Bone Glove).</summary>
+    public List<Content.Specs.AttackProjectileParams> AttackProjectiles { get; } = new();
+
+    /// <summary>Extra damage minion hits deal to this creature (whip tags; the strongest tag counts).</summary>
+    public int MinionTagDamage { get; set; }
+
+    /// <summary>Projectiles called down when the wearer is hurt (Star Cloak).</summary>
+    public List<Content.Specs.HurtProjectileParams> HurtProjectiles { get; } = new();
+
     public void Clear()
     {
         Stats.Clear();
@@ -60,9 +80,13 @@ public sealed class EffectState
         NoItemUse = false;
         Phasing = false;
         AutoPaint = false;
+        InvertControls = false;
+        InvertForward = false;
         Immunities.Clear();
         LiquidImmunities.Clear();
         DamagePerSecond = 0;
+        DotSource = null;
+        _dotSourcePerSecond = 0;
         Light = null;
         Wings = null;
         RocketBoots = null;
@@ -70,6 +94,20 @@ public sealed class EffectState
         Pacified.Clear();
         Inflicts.Clear();
         Info.Clear();
+        AttackProjectiles.Clear();
+        MinionTagDamage = 0;
+        HurtProjectiles.Clear();
+    }
+
+    /// <summary>Applies one of a buff's effects, remembering the buff when it is the strongest damage over time.</summary>
+    public void Apply(TypedSpec spec, BuffDef buff)
+    {
+        int before = DamagePerSecond;
+        Apply(spec);
+        int dealt = DamagePerSecond - before;
+        if (dealt <= _dotSourcePerSecond) return;
+        _dotSourcePerSecond = dealt;
+        DotSource = buff;
     }
 
     /// <summary>Applies one effect spec (validated at content load).</summary>
@@ -127,6 +165,19 @@ public sealed class EffectState
             case EffectSpecs.Info:
                 foreach (var k in Parsed<InfoParams>(spec).Show) Info.Add(k);
                 break;
+            case EffectSpecs.InvertControls:
+                InvertControls = true;
+                InvertForward |= Parsed<InvertControlsParams>(spec).Forward;
+                break;
+            case EffectSpecs.AttackProjectile:
+                AttackProjectiles.Add(Parsed<AttackProjectileParams>(spec));
+                break;
+            case EffectSpecs.MinionTag:
+                MinionTagDamage = Math.Max(MinionTagDamage, Parsed<MinionTagParams>(spec).Damage);
+                break;
+            case EffectSpecs.HurtProjectile:
+                HurtProjectiles.Add(Parsed<HurtProjectileParams>(spec));
+                break;
             case EffectSpecs.Pacify:
                 Pacified.Add(Parsed<PacifyParams>(spec).Tag);
                 break;
@@ -134,6 +185,12 @@ public sealed class EffectState
                 throw new InvalidOperationException($"Unhandled effect type '{spec.Type}'.");
         }
     }
+
+    /// <summary>
+    /// Movement input (x = strafe right, y = back) as the player means it: reversed while confused. The camera is not
+    /// affected.
+    /// </summary>
+    public (float X, float Y) SteerInput(float x, float y) => !InvertControls ? (x, y) : (-x, InvertForward ? -y : y);
 
     private static readonly Dictionary<TypedSpec, object> Cache = new();
 

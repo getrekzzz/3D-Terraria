@@ -1,0 +1,33 @@
+{
+  // P5-15: goods the early residents sell (Terraria 1.4.4 stock): the Merchant's Glowsticks and mining clothes, the
+  // Dryad's grass seeds (behavior plantGrass, ItemUseSystem.Garden.cs) and Herb Bag, the Arms Dealer's materials, the
+  // Clothier's tuxedo. Shops in data/town/pre_hardmode.json; the Sunflower and Bewitching Table in
+  // data/tileobjects/town_decor.json. One entry per line.
+  "projectiles": [
+    {"id": "glowstick", "name": "Glowstick", "visual": "item", "color": "#7aff6a", "gravity": 14, "drag": 0.4, "lifetime": 3600, "radius": 0.2, "bounces": 6, "friendly": false, "contact": false, "light": [6, 13, 6]}
+  ],
+  "items": [
+    {"id": "glowstick", "name": "Glowstick", "description": "Works when wet.", "category": "light", "maxStack": 9999, "value": 10, "useStyle": "throw", "useTime": 15, "useAnimation": 15, "consumable": true, "projectile": "glowstick", "shootSpeed": 9, "covers": ["terraria:glowstick"]},
+    {"id": "mining_shirt", "armorSet": "mining_outfit", "name": "Mining Shirt", "description": "5% increased mining speed.", "category": "armor", "rarity": 1, "value": 5000, "equipSlot": "body", "defense": 1, "equipEffects": [{"type": "stat", "stat": "miningSpeed", "add": 0.05}], "covers": ["terraria:mining_shirt"]},
+    {"id": "mining_pants", "armorSet": "mining_outfit", "name": "Mining Pants", "description": "5% increased mining speed.", "category": "armor", "rarity": 1, "value": 5000, "equipSlot": "legs", "defense": 1, "equipEffects": [{"type": "stat", "stat": "miningSpeed", "add": 0.05}], "covers": ["terraria:mining_pants"]},
+    {"id": "grass_seeds", "name": "Grass Seeds", "description": "Plants grass on dirt.", "category": "placeable", "maxStack": 9999, "value": 20, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "autoReuse": true, "behaviors": [{"type": "plantGrass", "grass": "grass", "on": ["dirt"]}], "covers": ["terraria:grass_seeds"]},
+    {"id": "jungle_grass_seeds", "name": "Jungle Grass Seeds", "description": "Plants jungle grass on mud.", "category": "placeable", "maxStack": 9999, "value": 150, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "autoReuse": true, "behaviors": [{"type": "plantGrass", "grass": "jungle_grass", "on": ["mud"]}], "covers": ["terraria:jungle_grass_seeds"]},
+    {"id": "mushroom_grass_seeds", "name": "Mushroom Grass Seeds", "description": "Plants mushroom grass on mud.", "category": "placeable", "maxStack": 9999, "value": 150, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "autoReuse": true, "behaviors": [{"type": "plantGrass", "grass": "mushroom_grass", "on": ["mud"]}], "covers": ["terraria:mushroom_grass_seeds"]},
+    {"id": "corrupt_seeds", "name": "Corrupt Seeds", "description": "Plants corrupt grass on dirt.", "category": "placeable", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "autoReuse": true, "behaviors": [{"type": "plantGrass", "grass": "corrupt_grass", "on": ["dirt", "grass"]}], "covers": ["terraria:corrupt_seeds"]},
+    {"id": "crimson_seeds", "name": "Crimson Seeds", "description": "Plants crimson grass on dirt.", "category": "placeable", "maxStack": 9999, "value": 500, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "autoReuse": true, "behaviors": [{"type": "plantGrass", "grass": "crimson_grass", "on": ["dirt", "grass"]}], "covers": ["terraria:crimson_seeds"]},
+    {"id": "hallowed_seeds", "name": "Hallowed Seeds", "description": "Plants hallowed grass on dirt.", "category": "placeable", "maxStack": 9999, "value": 2000, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "autoReuse": true, "behaviors": [{"type": "plantGrass", "grass": "hallowed_grass", "on": ["dirt", "grass"]}], "covers": ["terraria:hallowed_seeds"]},
+    {"id": "herb_bag", "name": "Herb Bag", "description": "Right click to open.", "category": "container", "maxStack": 9999, "value": 2500, "useStyle": "holdUp", "useTime": 20, "useAnimation": 20, "consumable": true, "behaviors": [{"type": "consume", "loot": "herb_bag"}], "covers": ["terraria:herb_bag"]},
+    {"id": "empty_bullet", "name": "Empty Bullet", "description": "Used to craft bullets.", "category": "material", "maxStack": 9999, "value": 3, "covers": ["terraria:empty_bullet"]},
+    {"id": "illegal_gun_parts", "name": "Illegal Gun Parts", "description": "Banned in most places.", "category": "material", "rarity": 2, "maxStack": 9999, "value": 150000, "covers": ["terraria:illegal_gun_parts"]},
+    {"id": "top_hat", "armorSet": "tuxedo", "name": "Top Hat", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "head", "tags": ["vanity"], "covers": ["terraria:top_hat"]},
+    {"id": "tuxedo_shirt", "armorSet": "tuxedo", "name": "Tuxedo Shirt", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "body", "tags": ["vanity"], "covers": ["terraria:tuxedo_shirt"]},
+    {"id": "tuxedo_pants", "armorSet": "tuxedo", "name": "Tuxedo Pants", "description": "Vanity.", "category": "vanity", "value": 20000, "equipSlot": "legs", "tags": ["vanity"], "covers": ["terraria:tuxedo_pants"]}
+  ],
+  "buffs": [
+    {"id": "happy", "name": "Happy!", "description": "Movement speed increased and monster spawns reduced", "hideTimer": true, "color": "#ffe050", "effects": [{"type": "stat", "stat": "moveSpeed", "add": 0.1}]},
+    {"id": "bewitched", "name": "Bewitched", "description": "Increased max number of minions", "hideTimer": true, "color": "#b070ff", "effects": [{"type": "stat", "stat": "maxMinions", "add": 1}]}
+  ],
+  "lootTables": [
+    {"id": "herb_bag", "mode": "weighted", "rolls": 3, "entries": [{"item": "daybloom", "min": 1, "max": 3}, {"item": "moonglow", "min": 1, "max": 3}, {"item": "blinkroot", "min": 1, "max": 3}, {"item": "waterleaf", "min": 1, "max": 3}, {"item": "deathweed", "min": 1, "max": 3}, {"item": "fireblossom", "min": 1, "max": 3}, {"item": "shiverthorn", "min": 1, "max": 3}, {"item": "daybloom_seeds", "min": 1, "max": 3}, {"item": "moonglow_seeds", "min": 1, "max": 3}, {"item": "blinkroot_seeds", "min": 1, "max": 3}, {"item": "waterleaf_seeds", "min": 1, "max": 3}, {"item": "deathweed_seeds", "min": 1, "max": 3}, {"item": "fireblossom_seeds", "min": 1, "max": 3}, {"item": "shiverthorn_seeds", "min": 1, "max": 3}]}
+  ]
+}

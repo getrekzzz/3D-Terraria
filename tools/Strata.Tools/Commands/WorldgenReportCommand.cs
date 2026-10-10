@@ -1,23 +1,26 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Strata.Core.Common;
 using Strata.Core.Content.Loading;
 using Strata.Core.Diagnostics;
 using Strata.Core.World;
 using Strata.Core.WorldGen;
+using Strata.Core.WorldGen.Analysis;
 using Strata.Core.WorldGen.Chunk;
 
 namespace Strata.Tools.Commands;
 
 /// <summary>
 /// Generates a world plan plus sample chunks and renders PNG maps (biomes, relief, vertical sections,
-/// horizontal depth slices) and a stats JSON — the primary visual QA tool for world generation.
+/// horizontal depth slices, terrain hillshade and flags) and a stats JSON — the primary visual QA tool for world
+/// generation. <c>--compare=old/stats.json</c> prints the terrain metrics before/after (evidence for terrain changes).
 /// </summary>
 public sealed class WorldgenReportCommand : IToolCommand
 {
     public string Name => "worldgen-report";
-    public string Description => "Render worldgen maps/sections + stats (--seed N --size tiny|small|medium --out dir)";
+    public string Description => "Render worldgen maps/sections + stats (--seed N --size tiny|small|medium --out dir --terrain-window N --compare old/stats.json)";
 
     private static int Threads = Environment.ProcessorCount;
 
@@ -35,8 +38,19 @@ public sealed class WorldgenReportCommand : IToolCommand
             Seed = context.Options.Long("seed", 1234),
             Size = Enum.Parse<WorldSizePreset>(context.Options.Get("size") ?? "tiny", ignoreCase: true),
             Evil = context.Options.Get("evil") == "crimson" ? EvilKind.Crimson : EvilKind.Corruption,
+            Secret = SecretSeeds.Parse(context.Options.Get("secret") ?? ""),
         };
         var outDir = Path.GetFullPath(context.Options.Get("out") ?? context.PathOf("build/worldgen"));
+        int terrainWindow = context.Options.Int("terrain-window", 512);
+        string? compare = context.Options.Get("compare");
+        if (compare != null && terrainWindow <= 0)
+        {
+            Console.Error.WriteLine("--compare needs the terrain metrics (--terrain-window > 0)");
+            return 1;
+        }
+        // Read before anything is written: --compare may point at the stats.json this run replaces.
+        string? beforeJson = compare != null ? TerrainCompare.Load(Path.GetFullPath(compare)) : null;
+        if (compare != null && beforeJson == null) return 1;
         Directory.CreateDirectory(outDir);
         File.WriteAllText(Path.Combine(Path.GetDirectoryName(outDir)!, ".gdignore"), "");
 
@@ -69,13 +83,54 @@ public sealed class WorldgenReportCommand : IToolCommand
             painter.Slice(Path.Combine(outDir, $"slice_depth_{(int)(depth * 100):00}.png"), slice, y);
         }
 
-        var summary = stats.Summarize(gen, planMs, timings);
-        File.WriteAllText(Path.Combine(outDir, "stats.json"), JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true }));
+        var terrain = terrainWindow > 0 ? MeasureTerrain(gen, terrainWindow, outDir) : null;
+
+        var summary = stats.Summarize(gen, planMs, timings, terrain);
+        var json = JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(Path.Combine(outDir, "stats.json"), json);
         foreach (var (name, (count, total, max)) in gen.ProfilePasses!.SnapshotTimers().OrderByDescending(kv => kv.Value.TotalMs))
             Console.WriteLine($"  {name,-20} avg {total / count:F2} ms  max {max:F1} ms");
         Console.WriteLine($"plan {planMs} ms; {timings.Count} chunks, avg {timings.Average():F2} ms, max {timings.Max():F1} ms");
+        if (beforeJson != null) TerrainCompare.Write(beforeJson, json, Path.Combine(outDir, "terrain_compare.txt"));
         Console.WriteLine($"report written to {outDir}");
         return 0;
+    }
+
+    /// <summary>Profiles the surface in a square window centred on spawn (clamped to the world) and paints its maps.</summary>
+    private static JsonObject MeasureTerrain(WorldGenerator gen, int window, string outDir)
+    {
+        var size = gen.Plan.Size;
+        var spawn = gen.Plan.Spawn;
+        int w = Math.Min(window, size.X), d = Math.Min(window, size.Z);
+        int x0 = Math.Clamp(spawn.X - w / 2, 0, size.X - w), z0 = Math.Clamp(spawn.Z - d / 2, 0, size.Z - d);
+        // Keep the per-pass timings printed at the end about the section/slice sample chunks only.
+        var passTimers = gen.ProfilePasses;
+        gen.ProfilePasses = null;
+        var sw = Stopwatch.StartNew();
+        var profile = SurfaceProfile.Measure(gen, x0, z0, w, d, Threads);
+        gen.ProfilePasses = passTimers;
+        var t = profile.Stats();
+        long ms = sw.ElapsedMilliseconds;
+        var painter = new TerrainPainter(gen, profile);
+        painter.Hillshade(Path.Combine(outDir, "terrain_hillshade.png"));
+        painter.FlagMap(Path.Combine(outDir, "terrain_flags.png"));
+        Console.WriteLine($"terrain {w}x{d} at ({x0},{z0}): {profile.ChunksGenerated} chunks in {ms} ms; lip {t.LipPercent}% breach {t.BreachPercent}% "
+            + $"floating {t.FloatingPer10k}/10k p99 step {t.StepP99} roughness {t.Roughness} relief {t.Relief}");
+
+        var node = new JsonObject
+        {
+            ["window"] = new JsonObject { ["x0"] = x0, ["z0"] = z0, ["width"] = w, ["depth"] = d },
+            ["chunks"] = profile.ChunksGenerated,
+            ["measureMs"] = ms,
+        };
+        var statsNode = JsonSerializer.SerializeToNode(t, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!.AsObject();
+        foreach (var key in statsNode.Select(kv => kv.Key).ToList())
+        {
+            var value = statsNode[key];
+            statsNode.Remove(key);
+            node[key] = value;
+        }
+        return node;
     }
 
     private static Dictionary<Int3, GeneratedChunk> Generate(WorldGenerator gen, IEnumerable<Int3> coords, ConcurrentBag<double> timings, ReportStats stats)

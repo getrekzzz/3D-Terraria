@@ -1,0 +1,36 @@
+{
+ "id": "P4-32",
+ "title": "Duke Fishron and the Empress of Light: phase three, ocean enrage, lethal daylight Empress",
+ "player_outcome": "Duke Fishron gets a third, frantic phase below 15% and turns savage if you leave the ocean. The Empress of Light is lethal if you fight her in daylight, which is what the Terraprisma challenge is built on.",
+ "design": [
+  "duke_fishron: add phase 3 (below 0.15) with faster dashes, teleport-dash chains and speed 1.7.",
+  "Duke enrage {when [{type biome, none [ocean]}], damage 2, speed 1.5, setDefense 100}.",
+  "Duke Expert {speed 1.15}; phase thresholds per Terraria Expert via expertBelow if desired.",
+  "empress_of_light: despawnAtDay false; enrage {when [{type time, is day}], setDamage 9999, speed 1.2, latch true, message 'The Empress of Light is furious!'}.",
+  "Expert {volleyCount +2}."
+ ],
+ "files_modify": [
+  "data/enemies/hallow_ocean.json \u2014 Duke and Empress"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "Duke phase 3 and ocean enrage; Empress daylight enrage."
+ ],
+ "tests": [
+  "BossTests.DukeEnragesOutOfTheOcean.",
+  "BossTests.DukeEntersPhaseThreeBelowFifteenPercent.",
+  "BossTests.EmpressIsLethalByDay.",
+  "Smoke bosses.cmds, after the existing 'time 22' and 'boss empress_of_light 14': 'assert boss.empress_of_light.frenzied == 0'."
+ ],
+ "verification": [
+  "dotnet test; headless bosses.cmds"
+ ],
+ "depends_on": [
+  "P4-01",
+  "P4-02"
+ ],
+ "risks": [
+  "The existing smoke summons Duke in a forest arena, so he will be enraged. Harmless under god mode; note it."
+ ],
+ "effort": "S"
+}

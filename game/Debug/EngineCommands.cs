@@ -1,15 +1,19 @@
 using Godot;
 using Strata.Core.Commands;
 using Strata.Game.Bootstrap;
-using Strata.Game.UI;
 
 namespace Strata.Game.Debug;
 
-/// <summary>Commands that need the engine layer (UI screens, camera modes).</summary>
+/// <summary>Commands that need the engine layer (camera modes, graphics, audio, sky); UI commands live in <see cref="UiCommands"/>.</summary>
 public static class EngineCommands
 {
     public static void Register(CommandRegistry r, LaunchedWorld world)
     {
+        UiCommands.Register(r, world);
+        PadCommands.Register(r, world);
+        GuideBookCommands.Register(r, world);
+        UI.PhotoMode.PhotoCommands.Register(r, world);
+        AccessibilityCommands.Register(r, world);
         r.Register(new CommandDef
         {
             Name = "cull", Usage = "cull <on|off>", Help = "Turns cave culling (hiding chunks the camera cannot see into) on or off.",
@@ -21,34 +25,26 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "ui", Usage = "ui <inventory|map|talk <resident>|shop|close>", Help = "Opens or closes gameplay screens.",
-            Run = (ctx, a) =>
+            Name = "colliders", Usage = "colliders reset",
+            Help = "Zeroes the collider and tile-object counters (probes colliders.rebuilt, colliders.skipped, objects.rebuilds, objects.light_refreshes, grass.builds), e.g. before a measured edit.",
+            Run = (_, a) =>
             {
-                var screen = world.Inventory ?? throw new CommandException("no inventory screen in this mode");
-                var dialog = world.TownDialog ?? throw new CommandException("no town dialog in this mode");
-                switch (a.Str(0, "screen"))
-                {
-                    case "inventory": screen.SetOpen(true); return CommandResult.Success("Inventory open.");
-                    case "map":
-                        (world.WorldMap ?? throw new CommandException("no map in this mode")).SetOpen(true);
-                        return CommandResult.Success("Map open.");
-                    case "talk":
-                        var id = a.Str(1, "resident");
-                        var npc = ctx.World.Town.Find(id) ?? throw new CommandException($"'{id}' does not live in town");
-                        if (!ctx.World.Town.BeginTalk(npc, ctx.Player)) return CommandResult.Fail($"{npc.Title} is too far away.");
-                        dialog.Open(npc);
-                        return CommandResult.Success($"Talking to {npc.Title}.");
-                    case "shop":
-                        if (!dialog.IsOpen) return CommandResult.Fail("Not talking to anyone.");
-                        dialog.OpenShop();
-                        return CommandResult.Success("Shop open.");
-                    case "close":
-                        screen.SetOpen(false);
-                        dialog.Close();
-                        world.WorldMap?.SetOpen(false);
-                        return CommandResult.Success("Closed.");
-                    default: throw new CommandException("expected inventory, talk, shop or close");
-                }
+                if (a.Str(0, "reset") != "reset") throw new CommandException("usage: colliders reset");
+                world.Runtime.Colliders.ResetCounters();
+                world.Objects.ResetCounters();
+                world.Runtime.Grass?.ResetCounters();
+                return CommandResult.Success("Collider counters reset.");
+            },
+        });
+        r.Register(new CommandDef
+        {
+            Name = "hud", Usage = "hud <on|off>",
+            Help = "Shows or hides every 2D layer (HUD, minimap, screens), e.g. so tour screenshots measure only the 3D scene.",
+            Run = (_, a) =>
+            {
+                bool on = a.Str(0, "on|off") != "off";
+                world.Runtime.GetViewport().CanvasCullMask = on ? uint.MaxValue : 0u;
+                return CommandResult.Success($"HUD {(on ? "shown" : "hidden")}.");
             },
         });
         r.Register(new CommandDef
@@ -111,8 +107,8 @@ public static class EngineCommands
         });
         r.Register(new CommandDef
         {
-            Name = "audio", Usage = "audio [test|files|device <name|Default>]",
-            Help = "Shows the audio driver, output device and buses; plays a test chime; checks every sound file; or picks the output device.",
+            Name = "audio", Usage = "audio [test|files|reset|device <name|Default>]",
+            Help = "Shows the audio driver, output device and buses; plays a test chime; checks every sound file; resets the sound voice counters (sfx.*); or picks the output device.",
             Run = (_, a) =>
             {
                 string info = $"{Audio.AudioDiagnostics.Device()}\nBuses: {Audio.AudioDiagnostics.Buses()}";
@@ -123,6 +119,9 @@ public static class EngineCommands
                     case "test":
                         Audio.AudioDiagnostics.PlayTest(world.Runtime);
                         return CommandResult.Success($"Playing a test chime, then a click.\n{info}");
+                    case "reset":
+                        Audio.Sfx.ResetCounters();
+                        return CommandResult.Success("Sound voice counters reset.");
                     case "files":
                         var (loaded, total, failed) = Audio.AudioDiagnostics.ProbeFiles();
                         return failed.Count == 0 ? CommandResult.Success($"All {total} sound files load.")

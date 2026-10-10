@@ -20,7 +20,7 @@ KINDS = {"stone": "golem", "wood": "woodfolk", "cookie": "cookie", "armor": "pla
 
 def build(name, p):
     """The rigged, animated character [armature, mesh] for a body of another material."""
-    from . import frame as frame_mod, join, motion, occlusion, rest_uvs
+    from . import frame as frame_mod, join, motion, occlusion, rest_uvs, sway_uvs
     from .head import Head
     fr = frame_mod.Frame(p)
     head = Head(fr, p)
@@ -30,6 +30,7 @@ def build(name, p):
     for o in objs:
         rest_uvs(o)
     mesh = join(objs, name)
+    sway_uvs(mesh)
     occlusion.bake(mesh, 0.1 * fr.s)
     mesh.parent = arm
     mod = mesh.modifiers.new("Armature", "ARMATURE")

@@ -1,0 +1,51 @@
+{
+  // X-11 Mimic loot (Terraria 1.4.4). The Mimic and Ice Mimic drop one of six: Dual Hook, Magic Dagger, Titan Glove,
+  // Philosopher's Stone, Cross Necklace, Star Cloak (the Ice Mimic adds the Toy Sled). The biome Mimics drop one of their
+  // biome's set: Corrupt (Worm Hook, Chain Guillotines, Clinger Staff, Putrid Scent), Crimson (Tendon Hook, Fetid
+  // Baghnakhs, Life Drain, Flesh Knuckles), Hallowed (Daedalus Stormbow, Flying Knife, Crystal Vile Shard, Illuminant
+  // Hook). Tables live in data/enemies/biome_mimics.json; shot speeds in m/s.
+  "projectiles": [
+    { "id": "star_cloak_star", "name": "Star", "visual": "bolt", "color": "#ffe860", "lifetime": 60, "radius": 0.5, "pierce": -1, "collideTerrain": false, "light": [12, 11, 4], "trail": "#fff0a0" },
+    { "id": "chain_guillotine", "name": "Chain Guillotine", "visual": "item", "model": "chain_guillotines", "lifetime": 40, "radius": 0.6, "returns": 22, "pierce": -1 },
+    { "id": "clinger_flames", "name": "Cursed Flames", "visual": "orb", "color": "#9aff3a", "lifetime": 240, "radius": 1.0, "pierce": -1, "light": [8, 14, 3],
+      "onHit": [{ "type": "applyBuff", "buff": "cursed_inferno", "ticks": 420, "chance": 1 }] },
+    { "id": "life_drain_bolt", "name": "Life Drain", "visual": "orb", "color": "#ff3a4a", "lifetime": 120, "radius": 0.5, "homing": 6, "light": [14, 3, 4],
+      "onHit": [{ "type": "lifeSteal", "fraction": 0.08 }] },
+    { "id": "flying_knife", "name": "Flying Knife", "visual": "item", "lifetime": 180, "radius": 0.5, "homing": 8, "pierce": -1, "collideTerrain": false },
+    { "id": "crystal_vile_shard", "name": "Crystal Vile Shard", "visual": "bolt", "color": "#e8a8ff", "lifetime": 40, "radius": 0.5, "pierce": -1, "collideTerrain": false, "light": [10, 7, 14], "trail": "#f0d0ff" },
+    { "id": "baby_snowman", "name": "Baby Snowman", "visual": "creature", "model": "snow_balla", "color": "#ffffff", "scale": 0.4, "radius": 0.4, "lifetime": 60,
+      "friendly": false, "contact": false, "pet": { "speed": 6, "follow": 1.6 } }
+  ],
+  "items": [
+    { "id": "titan_glove", "name": "Titan Glove", "description": "Increases melee knockback. Enables auto swing for melee weapons.", "category": "accessory", "rarity": 4, "value": 100000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "meleeKnockback", "add": 1.0 }], "covers": ["terraria:titan_glove"] },
+    { "id": "philosophers_stone", "name": "Philosopher's Stone", "description": "Reduces the cooldown of healing potions by 25%.", "category": "accessory", "rarity": 4, "value": 100000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "potionDelay", "add": -0.25 }], "covers": ["terraria:philosophers_stone"] },
+    { "id": "star_cloak", "name": "Star Cloak", "description": "Causes stars to fall after taking damage.", "category": "accessory", "rarity": 4, "value": 100000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "hurtProjectile", "projectile": "star_cloak_star", "count": 3, "damage": 75, "knockback": 5 }], "covers": ["terraria:star_cloak"] },
+    { "id": "worm_hook", "name": "Worm Hook", "category": "hook", "equipSlot": "hook", "rarity": 5, "value": 100000,
+      "behaviors": [{ "type": "grapple", "reach": 36, "speed": 36, "pull": 16, "color": "#8a5aa0" }], "covers": ["terraria:worm_hook"] },
+    { "id": "tendon_hook", "name": "Tendon Hook", "category": "hook", "equipSlot": "hook", "rarity": 5, "value": 100000,
+      "behaviors": [{ "type": "grapple", "reach": 36, "speed": 36, "pull": 16, "color": "#c84040" }], "covers": ["terraria:tendon_hook"] },
+    { "id": "illuminant_hook", "name": "Illuminant Hook", "category": "hook", "equipSlot": "hook", "rarity": 5, "value": 100000,
+      "behaviors": [{ "type": "grapple", "reach": 36, "speed": 36, "pull": 17, "color": "#e080ff" }], "covers": ["terraria:illuminant_hook"] },
+    { "id": "chain_guillotines", "name": "Chain Guillotines", "description": "Flings a chained blade that rips back to you.", "category": "weapon", "rarity": 5, "value": 100000, "useStyle": "flail", "useTime": 15, "useAnimation": 15, "autoReuse": true,
+      "damage": 35, "damageType": "melee", "knockback": 3, "projectile": "chain_guillotine", "shootSpeed": 18, "covers": ["terraria:chain_guillotines"] },
+    { "id": "clinger_staff", "name": "Clinger Staff", "description": "Summons a wall of cursed flames.", "category": "weapon", "rarity": 5, "value": 100000, "useStyle": "staff", "useTime": 30, "useAnimation": 30,
+      "damage": 43, "damageType": "magic", "knockback": 0, "manaCost": 40, "projectile": "clinger_flames", "shootSpeed": 5, "covers": ["terraria:clinger_staff"] },
+    { "id": "putrid_scent", "name": "Putrid Scent", "description": "5% increased damage and critical strike chance.", "category": "accessory", "rarity": 5, "value": 100000, "equipSlot": "accessory",
+      "equipEffects": [{ "type": "stat", "stat": "genericDamage", "add": 0.05 }, { "type": "stat", "stat": "genericCrit", "add": 5 }], "covers": ["terraria:putrid_scent"] },
+    { "id": "fetid_baghnakhs", "name": "Fetid Baghnakhs", "description": "Rakes at lightning speed.", "category": "weapon", "rarity": 5, "value": 100000, "useStyle": "swing", "useTime": 8, "useAnimation": 8, "autoReuse": true,
+      "damage": 70, "damageType": "melee", "knockback": 4.5, "behaviors": [{ "type": "meleeSwing", "arc": 140, "length": 2.2 }], "covers": ["terraria:fetid_baghnakhs"] },
+    { "id": "life_drain", "name": "Life Drain", "description": "Drains the life of your foes to heal you.", "category": "weapon", "rarity": 5, "value": 100000, "useStyle": "staff", "useTime": 20, "useAnimation": 20, "autoReuse": true,
+      "damage": 34, "damageType": "magic", "knockback": 0, "manaCost": 10, "projectile": "life_drain_bolt", "shootSpeed": 14, "covers": ["terraria:life_drain"] },
+    { "id": "flesh_knuckles", "name": "Flesh Knuckles", "description": "Enemies are more likely to target you.", "category": "accessory", "rarity": 5, "value": 100000, "equipSlot": "accessory", "defense": 8,
+      "covers": ["terraria:flesh_knuckles"] },
+    { "id": "flying_knife", "name": "Flying Knife", "description": "Throws a knife that seeks your foes.", "category": "weapon", "rarity": 5, "value": 100000, "useStyle": "throw", "useTime": 30, "useAnimation": 30,
+      "damage": 40, "damageType": "melee", "knockback": 3.75, "projectile": "flying_knife", "shootSpeed": 16, "covers": ["terraria:flying_knife"] },
+    { "id": "crystal_vile_shard", "name": "Crystal Vile Shard", "description": "Summons a line of piercing crystal.", "category": "weapon", "rarity": 5, "value": 100000, "useStyle": "staff", "useTime": 25, "useAnimation": 25, "autoReuse": true,
+      "damage": 43, "damageType": "magic", "knockback": 1, "manaCost": 13, "projectile": "crystal_vile_shard", "shootSpeed": 24, "covers": ["terraria:crystal_vile_shard"] },
+    { "id": "toy_sled", "name": "Toy Sled", "description": "Summons a baby snowman.", "category": "pet", "equipSlot": "pet", "rarity": 3, "value": 20000,
+      "projectile": "baby_snowman", "covers": ["terraria:toy_sled"] }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+ "id": "P1-10",
+ "title": "Core use timing: one visual animation per swing, speed bonuses scale useAnimation, sweep follows the strike window",
+ "player_outcome": "Pickaxes and swords no longer restart their swing mid-arc. Tools hit several times per swing like Terraria, speed bonuses (Feral Claws, Brisk and other prefixes) make the whole swing faster, and a sword only hurts once the blade actually comes down.",
+ "design": [
+  "PlayerEntity: add int UseAnimationMax (effective length of the current animation), int UseSerial (incremented whenever a new animation starts), ItemDef? UseItem, and void ResetUse() that zeroes UseCooldown/UseAnimation.",
+  "New src/Strata.Core/Gameplay/Items/UseTiming.cs, loaded from the new data/config/use_timing.json. Per style swing/mine/thrust it holds windupEnd and strikeEnd; bow holds release, redrawStart and redrawEnd; plus maxClipRate. It provides Default (matching the file), Load and Validate (0 <= windupEnd < strikeEnd <= 1, 0 <= release < redrawStart < redrawEnd <= 1, maxClipRate in 1-5).",
+  "UseTiming.Sweep(style, t): 0 before windupEnd, SmoothStep to 1 at strikeEnd, then 1. UseTiming.Striking(style, t) = windupEnd <= t <= strikeEnd + 0.1.",
+  "Prefixes: add float UseSpeed(ItemStack) = 1 + prefix.UseSpeed; UseTime uses it.",
+  "ItemUseSystem: public UseTiming Timing { get; set; } = UseTiming.Default. WorldLauncher sets it from the data file, next to SpawnConfig.",
+  "ItemUseSystem.Use, speed and gate: speed = UseSpeed(held) * (info.Has(Melee|Thrust) ? 1 + Stats.Bonus(MeleeSpeed) : 1). newAnimation = p.UseAnimation <= 0 || p.UseItem != item. For pure melee/thrust (not a tool), a use in the middle of an animation returns Cooldown, so one strike per swing.",
+  "ItemUseSystem.Use, Swung and cooldown: raise Swung only when newAnimation. UseCooldown = Max(1, Ceil(item.UseTime / speed)); tools that hit a tile additionally divide by 1 + MiningSpeed as today, so mining speed raises the dig cadence inside a swing, not the swing speed.",
+  "ItemUseSystem.Use, new animation: when newAnimation, UseAnimation = UseAnimationMax = Max(1, Round(item.UseAnimation / speed)), UseSerial++ and UseItem = item. Mid-animation tool digs and gun bursts (useTime < useAnimation) act without restarting the animation.",
+  "MeleeSystem: Swing.Duration = player.UseAnimationMax. Swing hit test: only when t >= Timing.swing.windupEnd, with current = halfArc - Sweep(\"swing\", t) * 2 * halfArc. Thrusts connect only while Striking(\"thrust\", t).",
+  "BuiltinCommands use: call p.ResetUse() instead of UseCooldown = 0, so each scripted use still starts a fresh swing (combat.cmds 'repeat 12 use' keeps its meaning).",
+  "Update docs/architecture/gameplay.md on use time vs animation."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 UseAnimationMax, UseSerial, UseItem, ResetUse",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 speed scaling, animation gate, Timing property",
+  "src/Strata.Core/Gameplay/Items/Prefixes.cs \u2014 UseSpeed",
+  "src/Strata.Core/Gameplay/Entities/MeleeSystem.cs \u2014 scaled duration, windup gate, strike-window sweep",
+  "src/Strata.Core/Commands/BuiltinCommands.cs \u2014 use resets the animation",
+  "game/Bootstrap/WorldLauncher.cs \u2014 load UseTiming",
+  "docs/architecture/gameplay.md \u2014 timing model"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Items/UseTiming.cs \u2014 shared clip/hitbox timing (Load/Validate/Sweep/Striking)",
+  "data/config/use_timing.json \u2014 windup/strike/release keyframes shared with Blender",
+  "tests/Strata.Core.Tests/Gameplay/UseTimingTests.cs \u2014 timing behaviour"
+ ],
+ "data_changes": [
+  "data/config/use_timing.json: swing {windupEnd 0.1, strikeEnd 0.6}, mine {windupEnd 0.18, strikeEnd 0.32}, thrust {windupEnd 0.25, strikeEnd 0.5}, bow {release 0.06, redrawStart 0.3, redrawEnd 0.85}, maxClipRate 2.6"
+ ],
+ "tests": [
+  "UseTimingTests.ShippedFileValidatesAndMatchesDefaults",
+  "UseTimingTests.ToolSwingsNeverRestartMidAnimation: copper_pickaxe (15/21) facing a thick stone wall; over 84 ticks call Use(p, target, tick == 0) each tick, then World.Tick(); UseSerial rises exactly 4 times while ItemUse.Used fires >= 5 times",
+  "UseTimingTests.MeleeSpeedScalesTheAnimation: equip feral_claws, then wooden_sword Use gives UseAnimationMax == Round(20/1.12)",
+  "UseTimingTests.PrefixSpeedScalesTheAnimation: a stack with prefix brisk gives UseAnimationMax == Round(UseAnimation/1.1)",
+  "UseTimingTests.SwingHitsOnlyAfterTheWindUp: a slime on the end side of the arc is not hit before tick windupEnd*Duration, and is hit by the end",
+  "UseTimingTests.OneStrikePerSwing: a sword mid-animation with UseCooldown forced to 0 returns Cooldown and ActiveSwings stays 1",
+  "CombatTests.ShortswordThrustsHitAndRepeatWhileHeld and the Arsenal tests stay green (update any that force a mid-swing reuse to call ResetUse())"
+ ],
+ "verification": [
+  "dotnet test",
+  "Smoke basic.cmds mining ('hold use_primary 2.5' still collects >= 8 stone) and combat.cmds PASS",
+  "Strata.Tools validate"
+ ],
+ "depends_on": [
+  "P1-16"
+ ],
+ "risks": [
+  "The semantics change for tests that force UseCooldown = 0 mid-swing; audit ArsenalTests/GearTests uses and switch to ResetUse() where they expect a fresh swing.",
+  "Tools lose nothing: dig cadence stays useTime-based, so mining speed is unchanged."
+ ],
+ "effort": "M"
+}

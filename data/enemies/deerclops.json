@@ -3,19 +3,20 @@
   "projectiles": [
     { "id": "deerclops_ice", "name": "Ice Spike", "visual": "orb", "color": "#bfe8ff", "gravity": 16, "lifetime": 200, "radius": 0.5, "friendly": false, "hostile": true, "light": [6, 9, 12],
       "onHit": [{ "type": "applyBuff", "buff": "chilled", "ticks": 240, "chance": 0.5 }] },
+    { "id": "deerclops_shadow_hand", "name": "Shadow Hand", "visual": "bolt", "color": "#2a1838", "lifetime": 220, "radius": 0.6, "collideTerrain": false, "friendly": false, "hostile": true, "trail": "#5a3a78" },
     { "id": "weather_pain_bolt", "name": "Weather Pain", "visual": "bolt", "color": "#cfe8ff", "lifetime": 180, "radius": 0.9, "pierce": -1, "collideTerrain": false, "light": [8, 10, 12], "trail": "#ffffff" },
     { "id": "pew_matic_horn_shot", "name": "Pew-matic Horn", "visual": "bolt", "color": "#e8e0c8", "gravity": 10, "lifetime": 150, "radius": 0.45, "bounces": 2 }
   ],
   "items": [
     { "id": "flinx_fur", "name": "Flinx Fur", "category": "material", "maxStack": 9999, "value": 500 },
-    { "id": "deer_thing", "name": "Deer Thing", "description": "Summons Deerclops. Use in the snow.", "category": "bossSummon", "rarity": 1, "maxStack": 20, "value": 5000,
-      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+    { "id": "deer_thing", "name": "Deer Thing", "description": "Summons Deerclops. Use in the snow.", "category": "bossSummon", "rarity": 1, "maxStack": 9999, "value": 5000,
+      "useStyle": "holdUp", "useTime": 45, "useAnimation": 45, "consumable": true,
       "behaviors": [{ "type": "summonBoss", "enemy": "deerclops", "conditions": [{ "type": "biome", "any": ["tundra"] }], "failMessage": "It only stirs in the snow." }] },
     { "id": "lucy_the_axe", "name": "Lucy the Axe", "description": "A talkative axe. It chops trees and foes alike.", "category": "tool", "rarity": 3, "value": 20000, "useStyle": "swing", "useTime": 20, "useAnimation": 20,
       "autoReuse": true, "damage": 35, "damageType": "melee", "knockback": 6, "axePower": 150 },
-    { "id": "weather_pain", "name": "Weather Pain", "description": "Summons a slow-moving tempest that tears through enemies.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "shoot", "useTime": 30, "useAnimation": 30,
+    { "id": "weather_pain", "name": "Weather Pain", "description": "Summons a slow-moving tempest that tears through enemies.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "staff", "useTime": 30, "useAnimation": 30,
       "damage": 20, "damageType": "magic", "manaCost": 10, "projectile": "weather_pain_bolt", "shootSpeed": 5 },
-    { "id": "pew_matic_horn", "name": "Pew-matic Horn", "description": "Fires loose junk.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "shoot", "useTime": 20, "useAnimation": 20,
+    { "id": "pew_matic_horn", "name": "Pew-matic Horn", "description": "Fires loose junk.", "category": "weapon", "rarity": 3, "value": 20000, "useStyle": "gun", "useTime": 20, "useAnimation": 20,
       "autoReuse": true, "damage": 24, "damageType": "ranged", "knockback": 4, "projectile": "pew_matic_horn_shot", "shootSpeed": 16 }
   ],
   "recipes": [
@@ -25,14 +26,10 @@
     { "id": "any_evil_ore", "name": "Demonite or Crimtane Ore", "items": ["demonite_ore", "crimtane_ore"] }
   ],
   "lootTables": [
-    { "id": "snow_flinx", "coins": [40, 120], "entries": [{ "item": "flinx_fur", "chance": 0.6 }] },
-    { "id": "deerclops", "coins": [12000, 18000], "entries": [
-      { "table": "deerclops_weapon" }, { "item": "lesser_healing_potion", "min": 5, "max": 10 }
-    ] },
-    { "id": "deerclops_weapon", "mode": "weighted", "entries": [{ "item": "lucy_the_axe" }, { "item": "weather_pain" }, { "item": "pew_matic_horn" }] }
+    { "id": "snow_flinx", "coins": [40, 120], "entries": [{ "item": "flinx_fur", "chance": 0.6 }] }
   ],
   "enemies": [
-    { "id": "snow_flinx", "model": "gel", "name": "Snow Flinx", "description": "A ball of fur that rolls down the snowdrifts.",
+    { "id": "snow_flinx", "model": "snow_flinx", "name": "Snow Flinx", "description": "A ball of fur that rolls down the snowdrifts.",
       "brain": { "type": "walker", "aggroRange": 40, "jumpHeight": 3 },
       "life": 70, "damage": 20, "defense": 6, "knockbackResist": 0.3, "size": [1.4, 1.4], "moveSpeed": 4.5, "tint": "#f4f6ff", "loot": "snow_flinx", "value": 80,
       "covers": ["terraria:snow_flinx"] },
@@ -40,18 +37,21 @@
       "id": "deerclops", "model": "deerclops", "tags": ["boss", "lava_immune"], "name": "Deerclops",
       "description": "A towering one-eyed beast of the tundra that hurls ice and stamps the ground to pieces.",
       "brain": { "type": "pattern", "ground": true, "phases": [
-        { "below": 1.0,
+        { "below": 1.0, "expert": { "speed": 1.15, "volleyCount": 2 },
           "moves": [{ "type": "walk", "ticks": 200, "speed": 3.2 },
             { "type": "wait", "ticks": 70, "pose": "attack", "volley": { "projectile": "deerclops_ice", "damage": 24, "speed": 13, "interval": 60, "count": 6, "spread": 18 } },
-            { "type": "hop", "count": 1, "height": 5, "speed": 7, "telegraph": 35 }] },
-        { "below": 0.5, "speed": 1.3, "damage": 1.2, "message": "Deerclops grows furious!",
+            { "type": "slam", "height": 3, "track": 0, "telegraph": 40, "speed": 14, "ticks": 60, "volley": { "projectile": "deerclops_ice", "damage": 26, "speed": 11, "count": 10, "ring": true } },
+            { "type": "wait", "ticks": 60, "pose": "attack", "expertOnly": true, "volley": { "projectile": "deerclops_shadow_hand", "damage": 30, "speed": 7, "interval": 30, "count": 3, "spread": 35 } }] },
+        { "below": 0.5, "speed": 1.3, "damage": 1.2, "message": "Deerclops grows furious!", "expert": { "speed": 1.15, "volleyCount": 2 },
           "moves": [{ "type": "walk", "ticks": 150, "speed": 3.8 },
             { "type": "wait", "ticks": 60, "pose": "attack", "volley": { "projectile": "deerclops_ice", "damage": 26, "speed": 12, "interval": 40, "count": 10, "ring": true } },
-            { "type": "hop", "count": 2, "height": 6, "speed": 8, "telegraph": 28 }] }
+            { "type": "slam", "height": 4, "track": 0, "telegraph": 30, "speed": 16, "ticks": 60, "volley": { "projectile": "deerclops_ice", "damage": 28, "speed": 12, "count": 14, "ring": true } },
+            { "type": "wait", "ticks": 50, "pose": "attack", "volley": { "projectile": "deerclops_shadow_hand", "damage": 32, "speed": 8, "interval": 25, "count": 2, "spread": 30 } },
+            { "type": "slam", "height": 3, "track": 0, "telegraph": 25, "speed": 16, "ticks": 60, "expertOnly": true, "volley": { "projectile": "deerclops_ice", "damage": 28, "speed": 12, "count": 14, "ring": true } }] }
       ] },
-      "life": 7000, "damage": 28, "defense": 10, "knockbackResist": 1.0, "size": [4, 9], "moveSpeed": 3.5, "tint": "#ffffff",
+      "life": 7000, "damage": 20, "defense": 10, "knockbackResist": 1.0, "size": [4, 9], "moveSpeed": 3.5, "tint": "#ffffff",
       "loot": "deerclops", "value": 12000,
-      "boss": { "title": "Deerclops", "flag": "defeated_deerclops", "arenaRadius": 150, "music": "boss_deer" },
+      "boss": { "title": "Deerclops", "flag": "defeated_deerclops", "arenaRadius": 150, "music": "boss_deer", "intro": { "subtitle": "Horror of the Frozen Wastes", "color": "#9cc4ec", "framing": 2.5, "letterbox": 1.8 } },
       "covers": ["terraria:deerclops"]
     }
   ],

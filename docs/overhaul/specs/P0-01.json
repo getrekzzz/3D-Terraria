@@ -1,0 +1,60 @@
+{
+ "id": "P0-01",
+ "title": "Cross-phase prep: split hub files once (pure moves, no behaviour change)",
+ "player_outcome": "Nothing visible. Every later WP can grow hub files without breaching the 400-line CI limit and without redoing the same split.",
+ "design": [
+  "Move class PlayerEntity (currently inside src/Strata.Core/Session/GameWorld.cs) verbatim into src/Strata.Core/Session/PlayerEntity.cs (same namespace/usings).",
+  "Split src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs: move Shoot() and FindAmmo() (and private helpers only they use) into partial ItemUseSystem.Shooting.cs; move Consume(), the Refused event, Summon(), StartEvent() and ConsumeHeld() into partial ItemUseSystem.Consume.cs (exact name Consume.cs).",
+  "Split src/Strata.Core/Gameplay/Entities/NpcSystem.cs: move Kill, DeathEffects and GroupAlive (and helpers only they use) into partial NpcSystem.Death.cs.",
+  "Move BossInfo, BossPart, BossRitual, DayEnrage and KillShield (and any other boss-only types) out of src/Strata.Core/Content/Defs/EnemyDef.cs into src/Strata.Core/Content/Defs/BossInfo.cs.",
+  "Split src/Strata.Core/Content/Validation/ContentValidator.World.cs: move ValidateEnemies and ValidatePattern into ContentValidator.Enemies.cs; ValidateProjectilesAndBuffs and ValidateLoot into ContentValidator.Projectiles.cs (partials). Keep biomes/events/flags/obtainability in World.cs.",
+  "Split game/Bootstrap/WorldLauncher.cs into partial files WorldLauncher.Player.cs, WorldLauncher.Effects.cs, WorldLauncher.Ui.cs and WorldLauncher.Assets.cs grouping the existing wiring by concern (the class must be partial; keep _Ready order identical by calling private helper methods defined in the partials).",
+  "Add game/Player/PlayerController.Fall.cs (move TrackFall and fall-damage code) and game/Player/InteractionController.Talk.cs (move UpdateTalkTarget and DigDownTarget).",
+  "Split GameWorld save/player-file code: move SaveAll/SavePlayer (instance) into src/Strata.Core/Session/GameWorld.Saving.cs and static WritePlayer/LoadOrCreatePlayer/DeletePlayer/PlayerPath into GameWorld.PlayerFiles.cs (partials). If they do not exist with those names, move the equivalent save/player-file members.",
+  "Code moves only: identical behaviour, identical public API, no renames except making classes partial. Keep usings minimal and compile warnings at 0."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/GameWorld.cs",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs",
+  "src/Strata.Core/Content/Defs/EnemyDef.cs",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs",
+  "game/Bootstrap/WorldLauncher.cs",
+  "game/Player/PlayerController.cs",
+  "game/Player/InteractionController.cs"
+ ],
+ "files_add": [
+  "src/Strata.Core/Session/PlayerEntity.cs",
+  "src/Strata.Core/Session/GameWorld.Saving.cs",
+  "src/Strata.Core/Session/GameWorld.PlayerFiles.cs",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Shooting.cs",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Death.cs",
+  "src/Strata.Core/Content/Defs/BossInfo.cs",
+  "src/Strata.Core/Content/Validation/ContentValidator.Enemies.cs",
+  "src/Strata.Core/Content/Validation/ContentValidator.Projectiles.cs",
+  "game/Bootstrap/WorldLauncher.Player.cs",
+  "game/Bootstrap/WorldLauncher.Effects.cs",
+  "game/Bootstrap/WorldLauncher.Ui.cs",
+  "game/Bootstrap/WorldLauncher.Assets.cs",
+  "game/Player/PlayerController.Fall.cs",
+  "game/Player/InteractionController.Talk.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "No new tests. Entire Core suite must pass unchanged (golden hashes byte-identical)."
+ ],
+ "verification": [
+  "check_file_length: all touched files < 300 lines where possible",
+  "dotnet build Strata.sln + Strata.csproj with 0 warnings added",
+  "dotnet test all green",
+  "validate/manifest --check unchanged",
+  "smoke basic, combat, bosses, town print SMOKE PASS",
+  "git diff --stat shows moves (similar added/removed counts)"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Everything later depends on this; keep it a pure move so review is trivial."
+ ],
+ "effort": "M"
+}

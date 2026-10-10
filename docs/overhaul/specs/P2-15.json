@@ -1,0 +1,44 @@
+{
+ "id": "P2-15",
+ "title": "Inventory screen rebuilt on the layout: hotbar row plus 4 rows, coin and ammo columns, saved trash, sort and quick-stack buttons, panel host",
+ "player_outcome": "Opening the inventory looks like Terraria:\n- The hotbar becomes row 1 of a 10\u00d75 grid in the same spot.\n- Coin and ammo columns sit to its right, with the trash can under them.\n- Sort Inventory and Quick Stack to Nearby Chests buttons sit beside them.\n- Chests, shops and services appear under the grid, crafting bottom-left, and equipment on the right under the minimap.\n- Nothing covers anything else, and opening a chest no longer hitches.",
+ "design": [
+  "Split game/UI/InventoryScreen.cs:\n- InventoryScreen.cs: open/close, gate, _Process distance close.\n- InventoryScreen.Layout.cs: build the containers and apply the UiLayout rects on resize or panel change.\n- InventoryScreen.Clicks.cs: map (view, SlotRef) to GameWorld.ClickSlot with the right SlotContext; play grab, equip or open sounds by outcome; mark the crafting panel dirty.",
+  "Backpack: a 10-column GridContainer in the Inventory rect, whose origin equals the HUD hotbar's. Slots 0\u20139 use SlotKind.HotbarSelected for the selected one. Slot size = 52 \u00b7 SlotScale.",
+  "New game/UI/Inventory/CoinAmmoColumns.cs:\n- Two VBoxes of 4 small slots (SlotKind.Coin and Ammo, empty hints slot_coin and slot_ammo) under the captions 'Coins' and 'Ammo'.\n- A trash slot (SlotKind.Trash, EmptyHint trash) under the ammo column.\n- Two 26 px TextureButtons: sort \u2192 InventoryOps.Sort(backpack, 10, 50); quick_stack \u2192 GameWorld.QuickStackNearby. Both have tooltips.\n- Remove the `_coins` text label and the UI-owned `_trash`.",
+  "Panel host: a Control in the Panel rect with `ShowPanel(Control panel, UiPanel kind)` and `ClosePanel()`. The existing chest grid moves into it, with 40 pooled slot views rebound on open instead of recreated (today InventoryScreen.cs:171,181 QueueFree and re-create them). ChestPanel (P2-17), ShopPanel (P2-27) and ServicePanel (P2-28) plug in here.",
+  "Crafting host: the CraftingPanel is sized by the Crafting rect (remove the hard-coded Initialize position at InventoryScreen.cs:93). Equipment host: the current armor and accessory columns move into the Equipment rect until P2-16 replaces them.",
+  "The WorldClickCatcher from P2-11 is the root's first child; CursorItemLayer (P2-10) draws the cursor.",
+  "On close: stow the cursor (existing), stow the Service slot, close the panel. The HUD hotbar is hidden and the item name reads 'Inventory' while open.",
+  "UiCommands gains `ui sort` and `ui quickstack`."
+ ],
+ "files_modify": [
+  "game/UI/InventoryScreen.cs \u2014 split; layout-driven; pooled chest slots; panel host",
+  "game/UI/Hud.cs \u2014 hide the hotbar while the inventory is open",
+  "game/Debug/UiCommands.cs \u2014 ui sort / ui quickstack"
+ ],
+ "files_add": [
+  "game/UI/InventoryScreen.Layout.cs",
+  "game/UI/InventoryScreen.Clicks.cs",
+  "game/UI/Inventory/CoinAmmoColumns.cs \u2014 coins, ammo, trash, sort and quick-stack buttons"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds:\n- `ui inventory` / `assert ui.overlaps == 0`.\n- `give copper_coin 250` / `assert inv.silver_coin == 2`.\n- `invclick backpack 4 left ctrl` / `assert inv.trash >= 1`.\n- `ui sort` / `assert errors == 0` / `ui close`."
+ ],
+ "verification": [
+  "Headless ui.cmds SMOKE PASS",
+  "Lavapipe at 1024\u00d7600 (UI scale 1) and 1920\u00d71080: the inventory grid exactly covers the hotbar spot; coin and ammo columns, trash, crafting and equipment are all visible and apart"
+ ],
+ "depends_on": [
+  "P2-06",
+  "P2-08",
+  "P2-10",
+  "P2-11",
+  "P2-12"
+ ],
+ "risks": [
+  "Largest UI refactor in the phase. Land it before P2-16, P2-17, P2-18, P2-27 and P2-28, which all plug into it."
+ ],
+ "effort": "M"
+}

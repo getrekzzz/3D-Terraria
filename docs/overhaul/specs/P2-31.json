@@ -1,0 +1,48 @@
+{
+ "id": "P2-31",
+ "title": "UI screenshot tour, architecture docs and final UI sweep",
+ "player_outcome": "The whole Terraria-style UI is captured in a repeatable screenshot tour at two resolutions and two UI scales, and is documented for future work.",
+ "design": [
+  "New game/Testing/Tours/ui.cmds, run on lavapipe:\n- Tiny world, stone arena.\n- ui_01_hud (day, full hearts); drink 3 potions \u2192 ui_02_buffs.\n- Place a work bench and wooden chest, `interact` \u2192 ui_03_chest; ui_04_crafting.\n- `town summon merchant`, `ui talk merchant` \u2192 ui_05_npc_chat; `ui shop` \u2192 ui_06_shop.\n- `boss king_slime 12` \u2192 ui_07_bossbar; `event goblin_army` \u2192 ui_08_invasion.\n- `kill` \u2192 ui_09_death.\n- `uiscale 1.5` \u2192 ui_10_hud_150; `ui inventory` \u2192 ui_11_inventory_150.\n\nAdd a step to the ci.yml screenshot-tour job (main and dispatch only) that runs it at --resolution 1280x720 and uploads the shots.",
+  "New docs/architecture/ui.md. Covers:\n- fonts and licence;\n- palette, SlotKind and rarity table;\n- the global theme install;\n- the Core UiLayout model and its no-overlap test;\n- InputGate Overlay vs Modal;\n- the slot model and ClickSlot routing;\n- the tooltip pipeline (Core lines \u2192 TooltipFollower);\n- a table of HUD widgets and CanvasLayer numbers: minimap 5, HUD 10, pickup 12, inventory 20, town 22, pause 45, console/menu 50, cursor item 90, tooltip 95;\n- performance rules: pooling, redraw on change, font warm-up, no per-frame strings.\n\nUpdate docs/architecture/overview.md (UI box) and persistence.md (player fields, chest names); refresh the stale UI rows in docs/3D_TERRARIA_MASTER_PLAN.md.",
+  "Sweep:\n- Remove dead code: old Toast/Announce banner paths, Hud.Bar, CraftingPanel.Describe, InventoryScreen cursor nodes, and leftover `Theme = UiTheme.Theme` lines.\n- Run tools/ci/check_file_length.py.\n- Confirm F3 metrics gd.hud, gd.inventory_ui, gd.slot_views and gd.tooltip each stay under 0.5 ms at 1080p on the medium preset."
+ ],
+ "files_modify": [
+  ".github/workflows/ci.yml \u2014 UI tour in the screenshot job",
+  "docs/architecture/overview.md, docs/architecture/persistence.md, docs/3D_TERRARIA_MASTER_PLAN.md \u2014 UI status and fields",
+  "game/UI/*.cs \u2014 dead code removal"
+ ],
+ "files_add": [
+  "game/Testing/Tours/ui.cmds \u2014 UI screenshot tour",
+  "docs/architecture/ui.md \u2014 UI architecture"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Full CI locally: dotnet build + dotnet test, Strata.Tools manifest --check / validate / coverage, gen_reference.py --check, build_all.py --check, build_ui.py --check, all Scripts/*.cmds SMOKE PASS, menu tour MENU PASS"
+ ],
+ "verification": [
+  "Run the tour under xvfb + lavapipe at 1280x720 and 1920x1080, then review all 11 shots against the Terraria checklist in the plan (section L)"
+ ],
+ "depends_on": [
+  "P2-13",
+  "P2-14",
+  "P2-16",
+  "P2-17",
+  "P2-18",
+  "P2-19",
+  "P2-20",
+  "P2-21",
+  "P2-22",
+  "P2-23",
+  "P2-24",
+  "P2-25",
+  "P2-27",
+  "P2-28",
+  "P2-29",
+  "P2-30"
+ ],
+ "risks": [
+  "Lavapipe is slow; keep the tour tiny and on main or manual dispatch only."
+ ],
+ "effort": "S"
+}

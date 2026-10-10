@@ -1,0 +1,45 @@
+{
+ "id": "P5-27",
+ "title": "Guide progression steps, tips and controls data; the Guide's 'Help' advice",
+ "player_outcome": "The Guide's 'Help' button now gives context-aware advice about what to do next ('You should build a house...', 'Try crafting a Suspicious Looking Eye...'). The same steps feed the book's progression checklist.",
+ "design": [
+  "New content category 'guideSteps' (GuideStepDef: Id, Name, Text, Order, After (step ids), TypedSpec[] DoneWhen, TypedSpec[] ShowWhen, RelatedItems, RelatedEnemies, Stage (pre_hardmode|hardmode|post_moon_lord)). New category 'guideTips' (GuideTipDef: Id, Name, Text with {key:action} placeholders, Topic (controls|building|combat|town|exploration), Action (input action name for the controls list)).",
+  "New Gameplay/Guide/ProgressionAdvisor.cs: Steps(ctx) \u2192 (step, done, available), and Next(ctx, n) \u2192 the first available undone steps by order. ctx is TownContext plus Records from the journal, so DoneWhen can use flags, killed, obtained, housed and similar.",
+  "A new 'advice' service replaces the Guide's one-line help. TownDialog.Services 'advice' shows Next(1).Text, and the Guide gets services [advice, craftHelp].",
+  "Data: data/guide/steps.json with about 30 steps (Terraria progression: shelter before night, Work Bench, house for the Guide, copper\u2192iron gear, Life Crystals, EoC, evil boss, Goblin Army, Queen Bee, Skeletron and the Dungeon, Hellstone, WoF, altars, mechs, Plantera, Golem, Cultist, Pillars, Moon Lord). data/guide/tips.json with about 40 tips including a controls list (use_primary, jump, interact, inventory, grapple, map, guide_book, toggle_camera...). Validation lives in ContentValidator.Guide.cs."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/ContentDatabase.cs \u2014 GuideSteps, GuideTips registries",
+  "src/Strata.Core/Content/Loading/ContentLoader.cs \u2014 categories",
+  "src/Strata.Core/Content/Validation/ContentValidator.Guide.cs \u2014 refs, After cycles (DetectCycles), specs",
+  "src/Strata.Core/Content/Specs/TownServiceSpecs.cs \u2014 advice",
+  "game/UI/TownDialog.Services.cs \u2014 advice entry",
+  "data/town/pre_hardmode.json \u2014 guide services and lines"
+ ],
+ "files_add": [
+  "src/Strata.Core/Content/Defs/GuideStepDef.cs",
+  "src/Strata.Core/Content/Defs/GuideTipDef.cs",
+  "src/Strata.Core/Gameplay/Guide/ProgressionAdvisor.cs",
+  "data/guide/steps.json",
+  "data/guide/tips.json",
+  "tests/Strata.Core.Tests/Gameplay/ProgressionAdvisorTests.cs"
+ ],
+ "data_changes": [
+  "about 30 steps, about 40 tips; manifest regenerated"
+ ],
+ "tests": [
+  "ProgressionAdvisorTests: a new world's next step is 'build shelter/work bench'; after flag defeated_eye_of_cthulhu the EoC step is done and the next step is evil-boss related; an After cycle is rejected by the validator",
+  "Smoke town.cmds: 'ui talk guide' / 'ui service advice' / 'ui close'"
+ ],
+ "verification": [
+  "dotnet test; validate; in game the Guide's Help text changes as flags are set with the 'flag' command"
+ ],
+ "depends_on": [
+  "P5-25",
+  "P5-13"
+ ],
+ "risks": [
+  "The step text needs careful Terraria-flavoured wording; keep it in data so it is easy to iterate."
+ ],
+ "effort": "M"
+}

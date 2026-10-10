@@ -1,0 +1,19 @@
+{
+ "comment": "P4-18: Dungeon banners, statues, shelf books and spikes (bgen/dungeon_decor.py); the Book item reuses the shelf-book generator.",
+ "objects": {
+  "marching_bones_banner": {"generator": "banner", "params": {"cloth": "#34449a", "trim": "#c8c0a0", "emblem": "#f0ead8", "shape": "skull"}},
+  "necromantic_sign": {"generator": "banner", "params": {"cloth": "#4a2a6a", "trim": "#a080c0", "emblem": "#b8f0a0", "shape": "diamond", "hem": "flat"}},
+  "rusted_company_standard": {"generator": "banner", "params": {"cloth": "#8a4a2a", "trim": "#c09050", "emblem": "#d0c8b0", "shape": "shield", "hem": "flat"}},
+  "ragged_brotherhood_sigil": {"generator": "banner", "params": {"cloth": "#4a5a3a", "trim": "#8a7a5a", "emblem": "#e0d8c0", "shape": "cross", "hem": "swallowtail"}},
+  "molten_legion_flag": {"generator": "banner", "params": {"cloth": "#a02a1a", "trim": "#f0a030", "emblem": "#ffc040", "shape": "flame"}},
+  "diabolic_sigil": {"generator": "banner", "params": {"cloth": "#2a1a2a", "trim": "#a02020", "emblem": "#e03030", "shape": "star", "hem": "swallowtail"}},
+  "skeleton_statue": {"generator": "statue", "params": {"pose": "skeleton"}},
+  "armor_statue": {"generator": "statue", "params": {"pose": "armor"}},
+  "angel_statue": {"generator": "statue", "params": {"pose": "angel"}},
+  "book": {"generator": "book", "params": {}},
+  "spike": {"generator": "spike_strip", "params": {}}
+ },
+ "items": {"explicit": {
+  "book": {"generator": "book", "params": {}}
+ }}
+}

@@ -1,0 +1,41 @@
+{
+ "id": "P2-30",
+ "title": "Themed menus: logo, hover-grow buttons, blue row panels, skinned settings, Terraria-style pause",
+ "player_outcome": "The title screen shows a swaying '3D Terraria' logo. Menu words grow and turn gold under the mouse. The character and world lists are blue panels with small play and delete icons. Settings uses the same blue skin for tabs, toggles and sliders. The pause menu is a centred blue panel of text buttons.",
+ "design": [
+  "MenuKit.Big (MenuKit.cs:18-33): on Resized set PivotOffset = Size/2; MouseEntered tweens Scale to 1.08 over 0.08 s, MouseExited back. Uses UiFonts.Bold.",
+  "Logo: a new tools/textures/ui_logo.py, used by build_ui.py, renders assets/ui/logo.png from assets/fonts/ComicNeue-Bold.ttf with Pillow: 'Strata' / '3D Terraria' with a grass-green to earth-brown gradient fill, 6 px dark outline, drop shadow and a small bevel. MainMenu.ShowTitle (MainMenu.cs:87-97) uses a TextureRect whose _Process sets Rotation = 0.03\u00b7sin(0.6t) and Scale = 1 + 0.02\u00b7sin(t), tinted by MenuBackground's day/night.",
+  "Character and world rows (MainMenu.Characters.cs:42-74, MainMenu.Worlds.cs): PanelContainer rows in PanelBlue with hover PanelHover, and 32 px TextureButtons for play, delete and favourite (new sprites in ui_sprites_b.py) replacing the framed text buttons. Keep the Open, CreateAndSelectCharacter, CreateWorldNow and Play APIs used by MenuTour.",
+  "Settings: widgets are skinned by the P2-01 global theme; CheckButton uses the toggle_on/off sprites via theme icons (set in UiTheme.Build).",
+  "PauseMenu (PauseMenu.cs): dim 0.45 plus a centred PanelBlue panel with TextButtons (Resume, Settings, Save & Exit to Title, Save & Quit). Add a 'Settings' TextButton at the inventory's bottom-right that opens the same menu, as in Terraria. Keep the node path WorldHost/PauseMenu and SetOpen for MenuTour."
+ ],
+ "files_modify": [
+  "game/Menu/MenuKit.cs \u2014 hover scale, TextButton helpers",
+  "game/Menu/MainMenu.cs \u2014 logo",
+  "game/Menu/MainMenu.Characters.cs, game/Menu/MainMenu.Worlds.cs \u2014 blue rows with icon buttons",
+  "game/UI/PauseMenu.cs \u2014 panel with text buttons",
+  "game/UI/InventoryScreen.Layout.cs \u2014 'Settings' text button",
+  "game/UI/UiTheme.Build.cs \u2014 CheckButton icons",
+  "tools/textures/build_ui.py, tools/textures/ui_sprites_b.py \u2014 logo and menu icons"
+ ],
+ "files_add": [
+  "tools/textures/ui_logo.py \u2014 logo renderer",
+  "assets/ui/logo.png, play/delete/favourite sprites (+ .import)"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Headless menu tour \u2192 MENU PASS",
+  "build_ui.py --check includes logo.png"
+ ],
+ "verification": [
+  "Lavapipe menu tour with --menu-tour=$PWD/shots: review m01 (logo), m03 (character rows), m05 (world rows), m06/m07 (settings tabs), m09 (pause)"
+ ],
+ "depends_on": [
+  "P2-01",
+  "P2-02"
+ ],
+ "risks": [
+  "Logo text: the working title is 'Strata' while the in-game label says '3D Terraria'. Render the current MainMenu title text and make it a build_ui parameter."
+ ],
+ "effort": "M"
+}

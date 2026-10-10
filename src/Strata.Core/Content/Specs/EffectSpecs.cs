@@ -36,6 +36,18 @@ public static class EffectSpecs
     /// <summary>An information readout on the HUD (Depth Meter: depth, Compass: position, GPS: both and time).</summary>
     public const string Info = "info";
 
+    /// <summary>Movement keys are reversed (Confused): strafe always, forward/back unless <c>forward</c> is false.</summary>
+    public const string InvertControls = "invertControls";
+
+    /// <summary>Throws a projectile along the aim with weapon attacks, on its own cooldown (Bone Glove).</summary>
+    public const string AttackProjectile = "attackProjectile";
+
+    /// <summary>On a creature (a whip's tag buff): minion hits on it deal this much more damage (P3-14).</summary>
+    public const string MinionTag = "minionTag";
+
+    /// <summary>Projectiles called down on the wearer's surroundings whenever it is hurt (Star Cloak).</summary>
+    public const string HurtProjectile = "hurtProjectile";
+
     public static void Register(SpecCatalog c)
     {
         c.Register<StatEffectParams>(SpecKind.Effect, Stat);
@@ -54,7 +66,18 @@ public static class EffectSpecs
         c.Register<PacifyParams>(SpecKind.Effect, Pacify);
         c.Register<InflictParams>(SpecKind.Effect, Inflict);
         c.Register<InfoParams>(SpecKind.Effect, Info);
+        c.Register<InvertControlsParams>(SpecKind.Effect, InvertControls);
+        c.Register<AttackProjectileParams>(SpecKind.Effect, AttackProjectile);
+        c.Register<MinionTagParams>(SpecKind.Effect, MinionTag);
+        c.Register<HurtProjectileParams>(SpecKind.Effect, HurtProjectile);
     }
+}
+
+public sealed class MinionTagParams : SpecParams, IValidatableSpec
+{
+    public int Damage { get; init; }
+
+    public string? Validate() => Damage is < 0 or > 1000 ? "damage must be within 0–1000" : null;
 }
 
 public sealed class StatEffectParams : SpecParams, IValidatableSpec
@@ -155,4 +178,48 @@ public sealed class InfoParams : SpecParams, IValidatableSpec
     public string[] Show { get; init; } = Array.Empty<string>();
 
     public string? Validate() => Show.All(k => Array.IndexOf(Kinds, k) >= 0) ? null : $"show must be of {string.Join(", ", Kinds)}";
+}
+
+public sealed class InvertControlsParams : SpecParams
+{
+    /// <summary>Also reverse forward and back (Terraria's 2D confusion only swaps left and right).</summary>
+    public bool Forward { get; init; } = true;
+}
+
+public sealed class AttackProjectileParams : SpecParams, IValidatableSpec
+{
+    public string Projectile { get; init; } = "";
+    public int Damage { get; init; } = 10;
+    public float Knockback { get; init; } = 3f;
+
+    /// <summary>Ticks before the next throw (shared by every attack projectile the wearer has).</summary>
+    public int Cooldown { get; init; } = 60;
+
+    /// <summary>Launch speed (m/s).</summary>
+    public float Speed { get; init; } = 14f;
+
+    public string? Validate() => Projectile.Length == 0 ? "projectile is required" : Cooldown <= 0 ? "cooldown must be > 0" : null;
+}
+
+/// <summary>
+/// Projectiles that fall on the wearer's surroundings when it is hurt (Terraria's Star Cloak: three stars from above
+/// strike near the player).
+/// </summary>
+public sealed class HurtProjectileParams : SpecParams, IValidatableSpec
+{
+    public string Projectile { get; init; } = "";
+    public int Count { get; init; } = 3;
+    public int Damage { get; init; } = 75;
+    public float Knockback { get; init; } = 5f;
+
+    /// <summary>Height (m) above the wearer they start from.</summary>
+    public float Height { get; init; } = 16f;
+
+    /// <summary>Horizontal scatter (m) of where they start and land.</summary>
+    public float Spread { get; init; } = 5f;
+
+    /// <summary>Fall speed (m/s).</summary>
+    public float Speed { get; init; } = 26f;
+
+    public string? Validate() => Projectile.Length == 0 ? "projectile is required" : Count <= 0 ? "count must be > 0" : null;
 }

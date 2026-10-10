@@ -1,0 +1,24 @@
+{
+  // Town residents' own shots (P5-10): friendly, ownerless, never hurting players or terrain. One entry per line.
+  "projectiles": [
+    {"id": "npc_grenade", "name": "Grenade", "visual": "item", "model": "grenade", "gravity": 14, "drag": 0.3, "lifetime": 120, "radius": 0.4, "bounces": 99, "fuse": true, "onHit": [{"type": "explode", "radius": 3, "damage": 0}]},
+    {"id": "npc_happy_grenade", "name": "Happy Grenade", "visual": "orb", "color": "#ff7ad0", "gravity": 14, "drag": 0.3, "lifetime": 120, "radius": 0.4, "bounces": 99, "fuse": true, "light": [8, 3, 6], "onHit": [{"type": "explode", "radius": 2.5, "damage": 0}]},
+    {"id": "npc_cannonball", "name": "Cannonball", "visual": "orb", "color": "#2a2a2a", "gravity": 10, "lifetime": 200, "radius": 0.5, "onHit": [{"type": "explode", "radius": 2, "damage": 0}]},
+    {"id": "npc_spiky_ball", "name": "Spiky Ball", "visual": "item", "model": "spiky_ball", "gravity": 14, "lifetime": 150, "radius": 0.35, "bounces": 3},
+    {"id": "npc_syringe", "name": "Syringe", "visual": "bolt", "color": "#d8f0ff", "gravity": 6, "lifetime": 120, "radius": 0.25},
+    {"id": "npc_paintball", "name": "Paintball", "visual": "orb", "color": "#ff4fb0", "lifetime": 120, "radius": 0.3},
+    {"id": "npc_dye_splash", "name": "Dye", "visual": "orb", "color": "#7a4fff", "gravity": 10, "lifetime": 120, "radius": 0.35},
+    {"id": "npc_frost_dagger", "name": "Frost Dagger", "visual": "bolt", "color": "#8fe8ff", "gravity": 8, "lifetime": 150, "radius": 0.3, "light": [3, 7, 9], "onHit": [{"type": "applyBuff", "buff": "frostburn", "ticks": 120, "chance": 0.5}]},
+    {"id": "npc_golf_ball", "name": "Golf Ball", "visual": "orb", "color": "#f4f4f4", "gravity": 12, "lifetime": 150, "radius": 0.25, "bounces": 2},
+    {"id": "npc_dart", "name": "Poison Dart", "visual": "bolt", "color": "#7ac040", "gravity": 4, "lifetime": 120, "radius": 0.25, "onHit": [{"type": "applyBuff", "buff": "poisoned", "ticks": 300}]},
+    {"id": "npc_wrench", "name": "Wrench", "visual": "item", "model": "red_wrench", "gravity": 12, "lifetime": 150, "radius": 0.35},
+    {"id": "npc_ale", "name": "Ale", "visual": "orb", "color": "#e0a030", "gravity": 12, "lifetime": 150, "radius": 0.35},
+    {"id": "npc_mushroom", "name": "Mushroom", "visual": "orb", "color": "#4fa0ff", "lifetime": 120, "radius": 0.3, "light": [2, 5, 9]},
+    {"id": "npc_snowball", "name": "Snowball", "visual": "orb", "color": "#ffffff", "gravity": 10, "lifetime": 150, "radius": 0.3},
+    {"id": "npc_sparkle", "name": "Sparkle", "visual": "orb", "color": "#ffb0f0", "lifetime": 90, "radius": 0.35, "light": [9, 6, 9], "trail": "#ffd0ff"},
+    {"id": "npc_bone", "name": "Bone", "visual": "orb", "color": "#e8e0c8", "gravity": 12, "lifetime": 150, "radius": 0.3}
+  ],
+  "buffs": [
+    {"id": "dryads_ward", "name": "Dryad's Blessing", "description": "Increased defense and thorns", "color": "#80e060", "effects": [{"type": "stat", "stat": "defense", "add": 8}, {"type": "stat", "stat": "thorns", "add": 0.2}]}
+  ]
+}

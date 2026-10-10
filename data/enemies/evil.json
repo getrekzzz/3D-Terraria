@@ -5,7 +5,7 @@
   "projectiles": [
     { "id": "vilethorn", "name": "Vilethorn", "visual": "bolt", "color": "#8a5ac8", "lifetime": 40, "radius": 0.6, "pierce": -1, "collideTerrain": false, "light": [6, 3, 9] },
     { "id": "crimson_rod_bolt", "name": "Blood Rain", "visual": "bolt", "color": "#e8303a", "lifetime": 120, "radius": 0.4, "homing": 3, "light": [10, 2, 2], "trail": "#ff7070" },
-    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "visual": "item", "lifetime": 120, "radius": 0.7, "returns": 26, "pierce": -1 },
+    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "visual": "item", "lifetime": 120, "radius": 0.7, "pierce": -1, "spin": 12, "tether": { "kind": "flail", "range": 18, "speed": 13, "string": "#5a3a6a" } },
     { "id": "creeper_ichor", "name": "Ichor Spit", "visual": "orb", "color": "#e0c040", "gravity": 6, "lifetime": 180, "radius": 0.4, "friendly": false, "hostile": true }
   ],
   "tileObjects": [
@@ -32,22 +32,22 @@
     { "id": "tissue_sample", "name": "Tissue Sample", "category": "material", "rarity": 1, "maxStack": 9999, "value": 100, "covers": ["terraria:tissue_sample"] },
     { "id": "vile_powder", "name": "Vile Powder", "category": "material", "maxStack": 9999, "value": 100, "tags": ["shop"] },
     { "id": "vicious_powder", "name": "Vicious Powder", "category": "material", "maxStack": 9999, "value": 100, "tags": ["shop"] },
-    { "id": "bloody_spine", "name": "Bloody Spine", "description": "Summons the Brain of Cthulhu. Use in the Crimson.", "category": "bossSummon", "rarity": 1, "maxStack": 20, "value": 5000,
-      "useStyle": "consume", "useTime": 45, "useAnimation": 45, "consumable": true,
+    { "id": "bloody_spine", "name": "Bloody Spine", "description": "Summons the Brain of Cthulhu. Use in the Crimson.", "category": "bossSummon", "rarity": 1, "maxStack": 9999, "value": 5000,
+      "useStyle": "holdUp", "useTime": 45, "useAnimation": 45, "consumable": true,
       "behaviors": [{ "type": "summonBoss", "enemy": "brain_of_cthulhu", "conditions": [{ "type": "biome", "any": ["crimson"] }], "failMessage": "The spine only twitches in the Crimson." }],
       "covers": ["terraria:bloody_spine"] },
 
-    { "id": "musket", "name": "Musket", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 43, "useAnimation": 43,
+    { "id": "musket", "name": "Musket", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "gun", "useTime": 43, "useAnimation": 43,
       "damage": 31, "damageType": "ranged", "knockback": 5.25, "useAmmo": "bullet", "shootSpeed": 55, "covers": ["terraria:musket"] },
-    { "id": "the_undertaker", "name": "The Undertaker", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 20, "useAnimation": 20, "autoReuse": true,
+    { "id": "the_undertaker", "name": "The Undertaker", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "gun", "useTime": 20, "useAnimation": 20, "autoReuse": true,
       "damage": 15, "damageType": "ranged", "knockback": 1.5, "useAmmo": "bullet", "shootSpeed": 45, "covers": ["terraria:the_undertaker"] },
-    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 45, "useAnimation": 45,
+    { "id": "ball_o_hurt", "name": "Ball O' Hurt", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "flail", "useTime": 45, "useAnimation": 45,
       "damage": 15, "damageType": "melee", "knockback": 6.5, "projectile": "ball_o_hurt", "shootSpeed": 15, "covers": ["terraria:ball_o_hurt"] },
-    { "id": "vilethorn", "name": "Vilethorn", "description": "Summons a vile thorn.", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 28, "useAnimation": 28,
+    { "id": "vilethorn", "name": "Vilethorn", "description": "Summons a vile thorn.", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "staff", "useTime": 28, "useAnimation": 28,
       "damage": 10, "damageType": "magic", "knockback": 1, "manaCost": 10, "projectile": "vilethorn", "shootSpeed": 16 },
-    { "id": "crimson_rod", "name": "Crimson Rod", "description": "Casts droplets of blood that seek the wicked.", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "shoot", "useTime": 24, "useAnimation": 24,
+    { "id": "crimson_rod", "name": "Crimson Rod", "description": "Casts droplets of blood that seek the wicked.", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "staff", "useTime": 24, "useAnimation": 24,
       "damage": 12, "damageType": "magic", "manaCost": 8, "projectile": "crimson_rod_bolt", "shootSpeed": 13 },
-    { "id": "the_rotted_fork", "name": "The Rotted Fork", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "thrust", "useTime": 31, "useAnimation": 31,
+    { "id": "the_rotted_fork", "name": "The Rotted Fork", "category": "weapon", "rarity": 1, "value": 20000, "useStyle": "spear", "useTime": 31, "useAnimation": 31,
       "damage": 14, "damageType": "melee", "knockback": 5, "behaviors": [{ "type": "thrust", "length": 3.8 }] },
     { "id": "band_of_starpower", "name": "Band of Starpower", "description": "Increases maximum mana by 20.", "category": "accessory", "rarity": 1, "value": 20000, "equipSlot": "accessory",
       "equipEffects": [{ "type": "stat", "stat": "maxMana", "add": 20 }] },
@@ -70,21 +70,19 @@
   ],
   "lootTables": [
     { "id": "shadow_orb", "mode": "weighted", "entries": [
-      { "table": "shadow_orb_musket", "weight": 1 }, { "item": "vilethorn", "weight": 1 }, { "item": "ball_o_hurt", "weight": 1 }, { "item": "band_of_starpower", "weight": 1 }
+      { "table": "shadow_orb_musket", "weight": 1 }, { "item": "vilethorn", "weight": 1 }, { "item": "ball_o_hurt", "weight": 1 }, { "item": "band_of_starpower", "weight": 1 },
+      { "item": "shadow_orb", "weight": 1 }
     ] },
     { "id": "shadow_orb_musket", "entries": [{ "item": "musket" }, { "item": "musket_ball", "min": 100, "max": 100 }] },
     { "id": "crimson_heart", "mode": "weighted", "entries": [
-      { "table": "crimson_heart_undertaker", "weight": 1 }, { "item": "crimson_rod", "weight": 1 }, { "item": "the_rotted_fork", "weight": 1 }, { "item": "panic_necklace", "weight": 1 }
+      { "table": "crimson_heart_undertaker", "weight": 1 }, { "item": "crimson_rod", "weight": 1 }, { "item": "the_rotted_fork", "weight": 1 }, { "item": "panic_necklace", "weight": 1 },
+      { "item": "crimson_heart", "weight": 1 }
     ] },
     { "id": "crimson_heart_undertaker", "entries": [{ "item": "the_undertaker" }, { "item": "musket_ball", "min": 100, "max": 100 }] },
     { "id": "eater_of_souls", "coins": [30, 120], "entries": [{ "item": "rotten_chunk", "chance": 0.33 }] },
     { "id": "crimera", "coins": [30, 120], "entries": [{ "item": "vertebra", "chance": 0.33 }] },
     { "id": "face_monster", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] },
-    { "id": "blood_crawler", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] },
-    { "id": "brain_of_cthulhu", "coins": [10000, 15000], "entries": [
-      { "item": "crimtane_ore", "min": 40, "max": 110 }, { "item": "tissue_sample", "min": 10, "max": 20 }, { "item": "lesser_healing_potion", "min": 5, "max": 10 },
-      { "item": "brain_of_confusion", "conditions": [{ "type": "difficulty", "min": 1 }] }
-    ] }
+    { "id": "blood_crawler", "coins": [50, 150], "entries": [{ "item": "vertebra", "chance": 0.4 }] }
   ],
   "enemies": [
     { "id": "eater_of_souls", "model": "eater_of_souls", "tags": ["evil"], "name": "Eater of Souls", "description": "It swoops from the chasms with a mouth where a face should be.",
@@ -106,15 +104,17 @@
       "id": "brain_of_cthulhu", "model": "brain_of_cthulhu", "tags": ["boss", "lava_immune"], "name": "Brain of Cthulhu",
       "description": "A disembodied brain that commands the Crimson; its Creepers guard it until they fall.",
       "brain": { "type": "pattern", "phases": [
-        { "below": 1.0, "shieldedBy": "creeper", "summon": { "enemy": "creeper", "max": 20, "once": true },
+        { "below": 1.0, "shieldedBy": "creeper", "untilGuardsFall": true, "summon": { "enemy": "creeper", "max": 20, "once": true, "tether": true, "radius": 5 },
           "moves": [{ "type": "hover", "ticks": 150, "speed": 4, "height": 3, "distance": 9 }, { "type": "teleport", "ticks": 60, "telegraph": 45, "distance": 10, "height": 2 }] },
-        { "below": 0.99, "model": "brain_of_cthulhu_exposed", "speed": 1.3, "damage": 1.3, "message": "The Brain of Cthulhu is exposed!",
-          "moves": [{ "type": "chase", "ticks": 150, "speed": 7 }, { "type": "teleport", "ticks": 20, "telegraph": 30, "distance": 8, "height": 1 },
+        { "below": 0.99, "model": "brain_of_cthulhu_exposed", "illusions": 3, "message": "The Brain of Cthulhu is exposed!",
+          "expert": { "speed": 1.25, "telegraphScale": 0.8 }, "aura": { "buff": "confused", "ticks": 120, "interval": 360, "radius": 22, "expertOnly": true },
+          "moves": [{ "type": "chase", "ticks": 120, "speed": 6 }, { "type": "teleport", "ticks": 20, "telegraph": 25, "distance": 9, "height": 1 },
             { "type": "dash", "count": 2, "ticks": 30, "telegraph": 20, "speed": 16 }] }
       ] },
-      "life": 3000, "damage": 30, "defense": 14, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
+      "life": 1000, "damage": 30, "defense": 14, "knockbackResist": 1.0, "size": [5, 5], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [8, 2, 2],
+      "onContact": [{ "type": "applyBuff", "buff": "confused", "ticks": 90, "chance": 0.33 }],
       "loot": "brain_of_cthulhu", "value": 10000,
-      "boss": { "title": "Brain of Cthulhu", "flag": "defeated_brain_of_cthulhu", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 150, "music": "boss_brain" },
+      "boss": { "title": "Brain of Cthulhu", "flag": "defeated_brain_of_cthulhu", "alsoFlags": ["defeated_evil_boss"], "arenaRadius": 150, "music": "boss_brain", "intro": { "subtitle": "Mind of the Crimson", "color": "#e0506a", "framing": 2.0, "letterbox": 1.8 } },
       "covers": ["terraria:brain_of_cthulhu"]
     }
   ],

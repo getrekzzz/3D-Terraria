@@ -1,0 +1,61 @@
+{
+ "id": "P4-07",
+ "title": "Eater of Worlds: per-segment life and splitting, segment drops, Expert Vile Spit",
+ "player_outcome": "Cutting through the Eater's body splits it into separate worms, as in Terraria, and each killed segment may drop Shadow Scales and Demonite Ore. The fight ends when the last piece dies, and the loot or bag drops once. In Expert, body segments spit Vile Spit.",
+ "design": [
+  "BossInfo additions: SegmentLife (int[3]: head, body, tail), SegmentDefense (int[3]), SegmentDamage (int[3]), Splits (bool), SegmentLoot (loot table id). Use LootOnDefeat from P4-01.",
+  "Npc: SegmentLife (List<int>, parallel to Segments, filled at spawn when the def has SegmentLife) and SegmentFlags (List<byte>, used by the Destroyer in P4-27). TotalLife = Life + sum(SegmentLife) for the bar.",
+  "Hit plumbing: Npc.FirstVolume(Func<(Vector3,Vector3),bool>) returns -1 for no hit, 0 for the head and i+1 for segment i.",
+  "MeleeSystem.cs:68 and ProjectileSystem.cs:174 call _npcs.Hit(..., segment: v - 1). NpcSystem.Hit gets an optional int segment = -1, so other callers are unchanged.",
+  "New partial NpcSystem.Segments.cs. When the def has SegmentDefense, a hit uses that segment's defense. With SegmentLife, damage goes to SegmentLife[segment]; at \u2264 0, call Split(npc, segment). Contact damage per volume uses SegmentDamage.",
+  "Split(npc, i): roll SegmentLoot at segment i. Segments after i become a new worm Npc of the same def: head at segments[i+1], the rest as its segments, the same velocity, and their life values. It joins the flag group, so there is no announcement. The original keeps segments [0, i).",
+  "When the head dies with segments left, promote segment 0 to a new head and remove the old head quietly. Only a worm with no segments dies through Kill, which rolls the main loot only when !GroupAliveExcept.",
+  "game/Entities/NpcRenderer.cs, new SyncSegmentViews: release extra segment visuals when a worm shrinks, and swap the last visual to TailModel (previously body) and back. Pooled; no new materials.",
+  "WormParams additions: SpitProjectile, SpitInterval and SpitExpertOnly. WormBrain fires from a random body segment toward the target through ctx.Shoot when ctx.InSight.",
+  "Debug command 'damage <enemy> <amount> [segment]' in src/Strata.Core/Commands/CombatCommands.cs. It calls Npcs.Hit on the first living creature of that id."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/BossInfo.cs \u2014 segment arrays, Splits, SegmentLoot",
+  "src/Strata.Core/Gameplay/Entities/Npc.cs \u2014 SegmentLife, SegmentFlags, FirstVolume, TotalLife",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs \u2014 Hit(segment)",
+  "src/Strata.Core/Gameplay/Entities/MeleeSystem.cs \u2014 pass the hit volume",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 pass the hit volume",
+  "src/Strata.Core/AI/WormBrain.cs \u2014 Vile Spit",
+  "src/Strata.Core/Content/Specs/BrainSpecs.cs \u2014 WormParams spit fields",
+  "src/Strata.Core/Commands/CombatCommands.cs \u2014 damage command",
+  "game/Entities/NpcRenderer.cs \u2014 segment view sync",
+  "game/UI/BossBar.cs \u2014 use TotalLife",
+  "data/enemies/bosses.json \u2014 eater_of_worlds",
+  "data/loot/bosses.json \u2014 eater tables"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Segments.cs \u2014 segment damage, split, promote",
+  "tests/Strata.Core.Tests/Gameplay/WormSplitTests.cs \u2014 split tests"
+ ],
+ "data_changes": [
+  "eater_of_worlds: segments 49 (plus the head is 50), segmentLife [65,150,220], segmentDefense [0,4,8], segmentDamage [22,13,11] (Terraria Classic), splits true, segmentLoot 'eater_segment', lootOnDefeat true; brain spitProjectile 'vile_spit', spitInterval 180, spitExpertOnly true.",
+  "New loot table 'eater_segment': demonite_ore 1\u20132 chance 0.5; shadow_scale 1\u20132 chance 0.5.",
+  "New hostile projectile 'vile_spit': orb #7a6a2a, onHit applyBuff weak 300 ticks. Add a 'weak' buff if missing (stat meleeDamage add -0.2), covers terraria:weak."
+ ],
+ "tests": [
+  "WormSplitTests.KillingAMiddleSegmentSplitsTheWorm: two eater_of_worlds whose segment counts sum to the original minus one.",
+  "WormSplitTests.KillingTheHeadPromotesTheNextSegment.",
+  "WormSplitTests.TheBossFallsWithItsLastPieceAndDropsLootOnce.",
+  "WormSplitTests.KilledSegmentsDropScalesAndOre.",
+  "WormSplitTests.ExpertBodySegmentsSpit.",
+  "Smoke bosses.cmds: 'boss eater_of_worlds 10', 'wait 2', 'damage eater_of_worlds 9999 20', 'assert npcs.eater_of_worlds == 2', 'slay eater_of_worlds', 'assert flag.defeated_eater_of_worlds == 1'."
+ ],
+ "verification": [
+  "dotnet test; validate; smoke bosses.cmds",
+  "Manual: 'boss eater_of_worlds 10' in a corruption area; cut the body with a sword and see two worms with new tails."
+ ],
+ "depends_on": [
+  "P4-01",
+  "P4-04"
+ ],
+ "risks": [
+  "50-segment worms that split into many pieces raise the NPC count; MaxNpcs is 200. Merge tiny fragments: a 1-segment piece dies outright and drops its loot.",
+  "Per-volume hit tests must not double-hit one swing across several segments. MeleeSystem keeps one hit per creature per swing."
+ ],
+ "effort": "M"
+}

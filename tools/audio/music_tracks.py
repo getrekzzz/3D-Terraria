@@ -1,5 +1,7 @@
 """The soundtrack: one looping piece per music state (biomes, layers, events, bosses). Degrees are 0-based scale steps
-(0 = tonic, 3 = fourth, 4 = fifth, 5 = sixth...). The game maps content music states onto these names (MusicDirector)."""
+(0 = tonic, 3 = fourth, 4 = fifth, 5 = sixth...). The game maps content music states onto these names (MusicDirector).
+Every major boss has its own theme; the family tracks (boss_1, boss_2, boss_3, boss_queen) carry the rest and are the
+fallbacks. STINGS are short non-looping cues (assets/audio/music/stings/), played over the hush after a boss falls."""
 
 BASE = {"bars": 16, "density": "medium", "bass": "half", "drums": "none"}
 
@@ -33,6 +35,20 @@ TRACKS = {
     "pumpkin_moon": track(bpm=132, root=50, scale="harmonic", progression=[0, 5, 3, 4], lead="pulse", arp=("pluck", 2), bass="gallop", drums="drive", density="busy"),
     "frost_moon": track(bpm=130, root=55, scale="minor", progression=[0, 5, 2, 6], lead="bell", arp=("bell", 2), bass="pump", drums="drive", density="busy"),
     "invasion": track(bpm=138, root=52, scale="minor", progression=[0, 6, 5, 4], lead="square", arp=("pulse", 2), bass="pump", drums="drive", density="busy"),
+    # Variants (MusicDirector.Variants.cs): rain over the forest, the town, night versions, underground biome themes, space.
+    "rain": track(bpm=78, root=55, scale="dorian", progression=[0, 5, 3, 4], lead="triangle", pad="pad", arp=("bell", 4), bass="whole", density="sparse", bright=4600),
+    "town_day": track(bpm=104, root=57, scale="major", progression=[0, 3, 4, 0], lead="flute", pad="pad", arp=("pluck", 2), bass="walk", drums="light", swing=0.25),
+    "town_night": track(bpm=80, root=53, scale="mixolydian", progression=[0, 3, 6, 4], lead="bell", pad="choir", arp=("pluck", 4), bass="whole", density="sparse"),
+    "jungle_night": track(bpm=92, root=50, scale="dorian", progression=[0, 6, 3, 4], lead="flute", pad="choir", arp=("pluck", 4), bass="whole", drums="tribal", density="sparse"),
+    "desert_night": track(bpm=84, root=49, scale="harmonic", progression=[0, 1, 4, 0], lead="flute", pad="pad", arp=("bell", 4), bass="whole", density="sparse"),
+    "ocean_night": track(bpm=80, root=55, scale="mixolydian", progression=[0, 6, 3, 0], lead="bell", pad="choir", arp=("pluck", 4), bass="whole", density="sparse", swing=0.3),
+    "tundra_night": track(bpm=76, root=57, scale="lydian", progression=[0, 4, 1, 0], lead="bell", pad="choir", arp=("bell", 4), bass="whole", density="sparse", bright=7000),
+    "underground_jungle": track(bpm=100, root=48, scale="phrygian", progression=[0, 6, 1, 0], lead="flute", pad="pad", arp=("pluck", 2), bass="gallop", drums="tribal", bright=4800),
+    "underground_tundra": track(bpm=86, root=55, scale="lydian", progression=[0, 1, 6, 4], lead="bell", pad="choir", arp=("triangle", 4), bass="whole", density="sparse", bright=6500),
+    "underground_blight": track(bpm=92, root=46, scale="phrygian", progression=[0, 1, 6, 5], lead="organ", pad="choir", arp=("pluck", 4), drums="halftime", density="sparse", bright=3800),
+    "underground_rot": track(bpm=96, root=47, scale="harmonic", progression=[0, 5, 1, 4], lead="brass", pad="choir", arp=("pluck", 4), drums="halftime", density="sparse", bright=4000),
+    "underground_radiant": track(bpm=108, root=60, scale="lydian", progression=[0, 4, 1, 5], lead="bell", pad="choir", arp=("triangle", 2), bass="walk", drums="light", bright=8000),
+    "space": track(bpm=70, root=52, scale="lydian", progression=[0, 1, 4, 3], lead="bell", pad="choir", arp=("bell", 4), bass="whole", density="sparse", bright=9500),
     "boss_1": track(bpm=150, root=50, scale="harmonic", progression=[0, 5, 3, 4], lead="square", double="pulse", arp=("pluck", 2), bass="pump",
                     bass_voice="bass_saw", drums="drive", density="busy"),
     "boss_2": track(bpm=156, root=52, scale="phrygian", progression=[0, 1, 6, 4], lead="brass", double="square", arp=("pulse", 2), bass="gallop", drums="drive", density="busy"),
@@ -42,4 +58,31 @@ TRACKS = {
     "boss_lunar": track(bpm=140, root=49, scale="phrygian", progression=[0, 1, 5, 4], lead="bell", pad="choir", arp=("pulse", 2), bass="pump", drums="halftime", density="busy"),
     "boss_moon_lord": track(bpm=160, root=44, scale="harmonic", progression=[0, 1, 5, 4], lead="brass", double="organ", pad="choir", arp=("pulse", 2), bass="pump",
                             bass_voice="bass_saw", drums="drive", density="busy", bars=24),
+    # Per-boss themes (X-02): each boss's music state names its own track; MusicDirector falls back to the family track.
+    "boss_gel": track(bpm=148, root=55, scale="mixolydian", progression=[0, 3, 4, 0], lead="pulse", double="square", arp=("pluck", 2), bass="gallop",
+                      drums="rock", density="busy", swing=0.2),
+    "boss_eye": track(bpm=154, root=50, scale="harmonic", progression=[0, 5, 1, 4], lead="square", double="brass", arp=("pulse", 2), bass="pump",
+                      bass_voice="bass_saw", drums="drive", density="busy", stabs="brass"),
+    "boss_evil": track(bpm=146, root=47, scale="phrygian", progression=[0, 1, 5, 6], lead="organ", double="pulse", pad="choir", arp=("pluck", 2),
+                       bass="gallop", bass_voice="bass_saw", drums="halftime", density="busy", bright=5200),
+    "boss_crypt": track(bpm=138, root=48, scale="harmonic", progression=[0, 3, 5, 4], lead="organ", pad="choir", arp=("bell", 2), bass="pump",
+                        drums="march", density="busy", octave=-12, stabs="brass"),
+    "boss_bee": track(bpm=162, root=57, scale="dorian", progression=[0, 6, 3, 4], lead="pulse", arp=("pulse", 1), bass="gallop", drums="rock",
+                      density="busy", octave=12, bright=6500),
+    "boss_maw": track(bpm=168, root=43, scale="phrygian", progression=[0, 1, 0, 5], lead="brass", double="organ", pad="choir", arp=("pluck", 2),
+                      bass="pump", bass_voice="bass_saw", drums="blast", density="busy", stabs="brass", bright=6000),
+    "boss_mech": track(bpm=170, root=52, scale="minor", progression=[0, 6, 5, 4], lead="square", double="pulse", arp=("pulse", 2), arp_dir="down",
+                       bass="pump", bass_voice="bass_saw", drums="blast", density="busy", stabs="square"),
+    "boss_golem": track(bpm=136, root=50, scale="phrygian", progression=[0, 1, 6, 0], lead="brass", pad="pad", arp=("pluck", 2), bass="gallop",
+                        drums="tribal", density="busy", stabs="organ"),
+    "boss_fishron": track(bpm=158, root=53, scale="dorian", progression=[0, 6, 3, 5], lead="brass", double="square", arp=("triangle", 2), bass="gallop",
+                          drums="drive", density="busy", swing=0.15),
+    "boss_empress": track(bpm=150, root=60, scale="lydian", progression=[0, 1, 5, 4], lead="bell", double="organ", pad="choir", arp=("triangle", 2),
+                          bass="pump", drums="blast", density="busy", bright=9000),
+}
+
+STINGS = {
+    # A boss falls: IV and V stabs resolve onto a held major tonic over a timpani swell, a brass fanfare rising to the octave.
+    "victory": {"bpm": 112, "root": 55, "scale": "major", "cadence": [3, 4, 0], "stab": "brass", "pad": "choir", "lead": "square",
+                "fanfare": [0, 2, 4, 7], "length": 4.6},
 }

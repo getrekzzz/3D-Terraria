@@ -1,0 +1,43 @@
+{
+ "id": "P3-37",
+ "title": "Metal colours fixed: neutral silver base layer, Terraria-tuned tints, real ingots",
+ "player_outcome": "Ore tiers are colour-coded and bright like Terraria: copper orange, tin khaki, iron grey, silver white, gold yellow, demonite purple, crimtane red, hellstone glowing orange-red, cobalt blue, mythril teal, orichalcum pink, adamantite red, titanium silver-blue. Bars look like chunky ingots.",
+ "design": [
+  "Verified: build_all.py:29 METAL_LAYERS = {copper, gold}; every other metal multiplies its tint onto the grey iron layer (#8a8e96), so copper, palladium and hellstone all come out brown. The bar is two 12-tri trapezoids.",
+  "tools/textures/props.json: append a 'silver' metal layer (base #d8dadf, dark #a8acb4, light #f4f6fa, roughness 0.3) and rebuild with tools/textures/build_textures.py --set=props. Appending keeps existing indices in layers.json.",
+  "build_all.plan: the default metalLayer is 'silver' for all metals except copper and gold (keep their layers or also switch; decide by icon medians).",
+  "Retune assets.json 'metals' hexes against Terraria. Add accents: hellstone and meteorite get prop:plain:glow crack veins (detail.veins); demonite and crimtane a darker edge colour; hallowed gold-white.",
+  "items.bar becomes a bevelled ingot (extrude with chamfer, lighter top face, 2 stacked, ~150 tris).",
+  "export.apply_textured_materials: icon materials get metallic from the layer type so icons match in-game.",
+  "Rebuild all {metal}_* patterns, bars and armour icons: build_all.py --only='*_pickaxe,*_axe,*_hammer,*_broadsword,*_shortsword,*_bow,*_helmet,*_chainmail,*_greaves,*_bar,*_drill,*_chainsaw'."
+ ],
+ "files_modify": [
+  "tools/textures/props.json \u2014 silver layer",
+  "tools/textures/gen_built.py \u2014 metal layer params if needed",
+  "tools/blender/build_all.py \u2014 default metal layer",
+  "tools/blender/assets.json \u2014 metals retune; accents",
+  "tools/blender/bgen/items.py \u2014 ingot bar",
+  "tools/blender/bgen/export.py \u2014 metallic icon materials",
+  "assets/textures/props/* \u2014 rebuilt atlas",
+  "assets/models/items/*, assets/icons/items/* \u2014 rebuilt subset"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "assets.json metals: copper #e8804a, tin #d0c8a0, iron #a8acb4, lead #5a6680, silver #eef0f4, tungsten #8ac080, gold #ffd040, platinum #d8ecf8, demonite #7a60d0, crimtane #d03848, hellstone #ff5a20 (glow), cobalt #2a8cff, palladium #ff8a5a, mythril #3ae0b0, orichalcum #ff60c8, adamantite #ff2a40, titanium #c8dcf0 (tune by eye)"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check",
+  "Throwaway Pillow script: median icon colour per metal within \u0394E 15 of the target hex",
+  "Smoke basic.cmds: props.problems == 0"
+ ],
+ "verification": [
+  "Contact sheet of the 17 bar and sword icons",
+  "In-game inventory screenshot"
+ ],
+ "depends_on": [],
+ "risks": [
+  "A new props layer changes the texture array size (memory +1 layer); fine.",
+  "Serialize assets.json/build_all.py edits across the art WPs."
+ ],
+ "effort": "M"
+}

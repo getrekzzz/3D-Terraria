@@ -27,6 +27,10 @@ public sealed class ContentDatabase
     public Registry<WorldMutationDef> Mutations { get; } = new("mutation");
     public Registry<ConversionDef> Conversions { get; } = new("conversion");
     public Registry<SpreadRuleDef> SpreadRules { get; } = new("spreadRule");
+    public Registry<AchievementDef> Achievements { get; } = new("achievement");
+    public Registry<GuideStepDef> GuideSteps { get; } = new("guideStep");
+    public Registry<GuideTipDef> GuideTips { get; } = new("guideTip");
+    public Registry<HintDef> Hints { get; } = new("hint");
 
     /// <summary>Problems found while loading/validating. Check <see cref="ContentReport.HasErrors"/>.</summary>
     public ContentReport Report { get; } = new();
@@ -50,6 +54,7 @@ public sealed class ContentDatabase
     {
         Blocks, Items, TileObjects, Recipes, RecipeGroups, Biomes, Enemies, SpawnRules, Projectiles, Buffs,
         Prefixes, LootTables, Flags, OreVeins, Events, Liquids, TownNpcs, Mutations, Conversions, SpreadRules,
+        Achievements, GuideSteps, GuideTips, Hints,
     };
 
     internal ContentDatabase()
@@ -142,7 +147,7 @@ public sealed class ContentDatabase
     public ItemDef GetOrAddPlaceholderItem(string id) =>
         Items.TryGet(id = Current(id), out var existing)
             ? existing
-            : Items.AddLate(new ItemDef { Id = id, Name = $"Missing item ({id})", MaxStack = 9999, Tags = new[] { "placeholder" } });
+            : Items.AddLate(new ItemDef { Id = id, Name = $"Missing item ({id})", MaxStack = ItemDef.CommonMaxStack, Tags = new[] { "placeholder" } });
 
     public TileObjectDef GetOrAddPlaceholderTileObject(string id) =>
         TileObjects.TryGet(id = Current(id), out var existing)

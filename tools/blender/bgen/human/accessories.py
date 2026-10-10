@@ -1,7 +1,7 @@
-"""Hats, a face mask and creature features, fitted to the generated head and body and bound to the bones that
-carry them. Hats: sculpted cloth caps and hoods (headwear, capshapes), wide hats (hats), and wreaths, circlets and
-perched caps that rest on the finished hair (crowns); creature features: horns (features), wings (wings), tails
-(tails)."""
+"""Hats, a face mask, an eye patch and creature features, fitted to the generated head and body and bound to the
+bones that carry them. Hats: sculpted cloth caps and hoods (headwear, capshapes), wide hats (hats), and wreaths,
+circlets and perched caps that rest on the finished hair (crowns); creature features: horns (features), wings
+(wings), tails (tails)."""
 import bmesh
 
 from .garments import colorize, mesh_from, set_slot
@@ -130,3 +130,87 @@ def mask(head, head_obj, color):
     rigid(obj, "head")
     return obj
 
+
+
+def eyepatch(head, parts, color="#141414"):
+    """A pirate's eye patch over the left eye with its strap round the head. The patch is a padded oval cast onto the
+    face over the eye socket (onto the brow, cheek and nose round it, and the eyeball inside the lids), rounded out
+    over the eye and sunk at its edge; the strap is a flat band lying on the skin (under hair and headwear) from the
+    patch's outer edge back over the left ear, round the back of the head, over the right ear and diagonally down
+    across the forehead to the patch's inner edge. One object, rigid on the head."""
+    import math
+
+    import bpy
+    import numpy as np
+    from mathutils import Vector
+    from mathutils.bvhtree import BVHTree
+    deps = bpy.context.evaluated_depsgraph_get()
+    trees = [BVHTree.FromObject(o, deps) for o in [parts["head"], *parts.get("eyes", [])]]
+    h = head.h
+
+    def cast(origin, direction):
+        """The nearest surface (world point, world normal) along a ray from a head-local point, or (None, None)."""
+        o, d = head.at(origin), Vector(direction).normalized()
+        best = (None, None, math.inf)
+        for tree in trees:
+            hit, n, _, dist = tree.ray_cast(o, d, h)
+            if hit is not None and dist < best[2]:
+                best = (hit, n, dist)
+        return best[0], best[1]
+
+    bm = bmesh.new()
+    e = head.local(head.eyes[-1])
+    cx, cz, ax, az = e.x - 0.002, e.z + 0.002, 0.024, 0.0195
+    rings, segs = 6, 24
+    grid = []                    # the patch: ring 0 is its centre, the last ring its sunk edge
+    for i in range(rings + 2):
+        r = min(i, rings) / rings
+        row = []
+        for k in range(segs if i else 1):
+            a = 2 * math.pi * k / segs
+            x, z = cx + ax * r * math.cos(a), cz + az * r * math.sin(a)
+            hit, _ = cast((x, 0.3, z), (0, -1, 0))
+            y = head.local(hit).y if hit is not None else e.y + 0.012
+            lift = 0.0024 + 0.0042 * (1 - r * r) if i <= rings else -0.0008      # padded over the eye, sunk at the edge
+            row.append(bm.verts.new(head.at((x, y + lift, z))))
+        grid.append(row)
+    for k in range(segs):
+        bm.faces.new((grid[0][0], grid[1][k], grid[1][(k + 1) % segs]))
+    for i in range(1, rings + 1):
+        for k in range(segs):
+            bm.faces.new((grid[i][k], grid[i + 1][k], grid[i + 1][(k + 1) % segs], grid[i][(k + 1) % segs]))
+    # The strap's path: unwrapped azimuth (0 at the face, + to the character's right) and height, head-local.
+    out_a = math.atan2(cx - ax * 0.96, e.y)
+    in_a = math.atan2(cx + ax * 0.7, e.y) - 2 * math.pi
+    keys = [(out_a, cz + 0.004), (-1.25, 0.022), (-1.57, 0.05), (-2.2, 0.056), (-math.pi, 0.052), (-4.1, 0.06),
+            (-4.71, 0.07), (-5.4, 0.074), (-5.9, 0.055), (in_a, cz + az * 0.7)]
+    n = 96
+    psi = np.linspace(keys[0][0], keys[-1][0], n)
+    zs = np.interp(-psi, [-k[0] for k in keys], [k[1] for k in keys])
+    for _ in range(6):                    # rounded where the path turns (the ends stay where the patch takes them)
+        zs[1:-1] = (zs[:-2] + 2 * zs[1:-1] + zs[2:]) / 4
+    pts, nrm = [], []
+    for a, z in zip(psi, zs):
+        d = Vector((math.sin(a), math.cos(a), 0.0))
+        hit, normal = cast(tuple(Vector((0, -0.012, z)) + d * 0.3), -d)
+        if hit is None:
+            continue
+        pts.append(hit + normal * 0.0016 * h)
+        nrm.append(normal)
+    half, thick = 0.0034 * h, 0.0012 * h
+    loops = []
+    for i, (p, normal) in enumerate(zip(pts, nrm)):
+        tan = (pts[min(i + 1, len(pts) - 1)] - pts[max(i - 1, 0)]).normalized()
+        side = tan.cross(normal).normalized()
+        loops.append([bm.verts.new(p + side * sx * half + normal * nz * thick) for sx, nz in ((-1, 0), (1, 0), (1, 1), (-1, 1))])
+    for a_, b_ in zip(loops, loops[1:]):
+        for k in range(4):
+            bm.faces.new((a_[k], a_[(k + 1) % 4], b_[(k + 1) % 4], b_[k]))
+    for cap in (loops[0], loops[-1][::-1]):
+        bm.faces.new(cap)
+    colorize(bm, color)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    obj = mesh_from(bm, "eyepatch")
+    set_slot(obj, "char:leather")
+    rigid(obj, "head")
+    return obj

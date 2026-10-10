@@ -1,0 +1,47 @@
+{
+ "id": "P5-02",
+ "title": "Housing validity: evil houses invalid, Terraria query messages, cached room scans (lag fix)",
+ "player_outcome": "A house surrounded by Corruption or Crimson blocks reports 'This housing is corrupted.' and nobody moves in. Housing problems use Terraria's wording. The town no longer flood-fills every chair's room every 10 s, which removes a periodic main-thread hitch.",
+ "design": [
+  "Verified: HousingScanner.Check (HousingScanner.cs:124-135) has no evil check and hard-codes its problem strings. TownSystem.VacantRooms (TownSystem.cs:120-133) runs up to a 3000-cell flood fill per chair every ArrivalInterval, and CheckHomes rescans each home every 900 ticks.",
+  "HousingConfig: add EvilTag ('evil'), EvilIgnoreTag ('ore'), EvilMargin (6 cells), EvilLimit (40 samples) and a Messages map (suitable, notOpen, notEnclosed, tooLarge, tooSmall, lowCeiling, natural, corrupted, noStand, occupied). Requirement messages stay per requirement, using Terraria wording.",
+  "HousingScanner: build a bool[] isEvil per block runtime id from world.Content (tag evil and not ore) once in the constructor. CheckEvil(room) samples room.Bounds expanded by EvilMargin with a stride of 2, and the room is 'corrupted' at EvilLimit hits. Problems use config Messages. Add Room.Message (the first problem or the suitable message). Reuse the scanner's HashSet/Queue buffers.",
+  "New HousingCache (Gameplay/Housing): cell\u2192room-key map plus room-key\u2192Room. Get(cell) returns the cached room or scans. It subscribes to VoxelWorld.Edited, using EditResult.Changes cells only and ignoring LiquidChanges, and to TileObjectStore.Added/Removed. Each change drops the rooms whose Bounds, expanded by EvilMargin+1, contain it. MaxScansPerTick (config, default 2) limits new scans; callers that hit the limit retry next interval.",
+  "GameWorld.Town.cs partial: add a lazily created public HousingCache Rooms, so GameWorld.cs (387 lines) needs no new lines. TownSystem.VacantRooms and CheckHomes use _world.Rooms.",
+  "The 'house' command prints room.Message. The probe house.valid uses the cache. Add a Metrics counter 'house.scans' and a probe for it."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Housing/HousingScanner.cs \u2014 evil sampling, config messages, buffer reuse",
+  "src/Strata.Core/Gameplay/Housing/HousingConfig.cs \u2014 evil and Messages fields",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 VacantRooms/CheckHomes through Rooms with a scan budget",
+  "src/Strata.Core/Commands/TownCommands.cs \u2014 the house command prints Message",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 house.valid through the cache; house.scans"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Housing/HousingCache.cs \u2014 cached rooms with edit invalidation",
+  "src/Strata.Core/Session/GameWorld.Town.cs \u2014 lazy Rooms property (later town-related lazies go here too)"
+ ],
+ "data_changes": [
+  "data/config/housing.json: Terraria messages ('This housing is suitable.', 'This is not valid housing.', 'This housing is corrupted.', 'This housing is missing a light source.', '... a door.', '... a table.', '... a chair.', 'This room is too small.'), plus evilTag/evilIgnoreTag/evilMargin/evilLimit/maxScansPerTick"
+ ],
+ "tests": [
+  "HousingNavigationTests.EvilBlocksCorruptAHouse: TestHouses.Build, then fill ebonstone under and around it \u2192 Valid false, Message 'This housing is corrupted.'",
+  "HousingNavigationTests.OreDoesNotCorrupt: demonite ore around the house \u2192 still valid",
+  "HousingCacheTests: a scan is cached (house.scans unchanged on the second Get); removing a wall block invalidates it; a liquid-only edit does not",
+  "TownTests: existing arrival tests still pass through the cache",
+  "Smoke town.cmds: after the house is built, 'fill 3 -3 -5 13 -2 5 ebonstone' / 'wait_until town.guide.home < 0 20' / 'fill 3 -3 -5 13 -2 5 stone' / 'town check force' / 'assert town.homed == 1'"
+ ],
+ "verification": [
+  "dotnet test (Housing*, Town*)",
+  "F3 perf overlay: no 'tick.town' spikes every 10 s with 10+ chairs in loaded chunks (compare the Metrics frame times before and after)",
+  "town.cmds SMOKE PASS"
+ ],
+ "depends_on": [
+  "P5-01"
+ ],
+ "risks": [
+  "Invalidation that misses an edit path (for example SetBlock outside an EditBatch) would leave a stale valid room. Mitigation: CheckHomes rescans one cached home per interval regardless.",
+  "Evil sampling cost grows with room size; the stride and margin are in config."
+ ],
+ "effort": "M"
+}

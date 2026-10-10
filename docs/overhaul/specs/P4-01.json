@@ -1,0 +1,63 @@
+{
+ "id": "P4-01",
+ "title": "Boss framework in Core: parts that fall with their body, Expert context, conditional enrage, defense/speed hooks",
+ "player_outcome": "Multi-part bosses behave as one fight: killing the body ends it, and hands or arms never linger, despawn on their own or vanish when you respawn. Journey worlds stop getting Expert-only drops. Bosses can enrage from data, for example lethal by daylight or when you leave their biome.",
+ "design": [
+  "Keep EnemyDef.cs small. Move BossInfo, BossPart, BossRitual, DayEnrage and KillShield from src/Strata.Core/Content/Defs/EnemyDef.cs into a new Defs/BossInfo.cs (a pure move).",
+  "BossInfo additions: Enrage? Enrage, a new class { TypedSpec[] When; float Damage=1; float Speed=1; int? SetDamage; int? SetDefense; bool Latch; string? Message }. Also string? Icon and bool LootOnDefeat (roll the loot table only when the whole group falls). BossPart additions: bool Mirror and bool Bar (the part counts on the boss bar).",
+  "Npc.cs additions: DefenseDelta (int; the brain writes it and NpcSystem zeroes it before each Think), DefenseOverride (int?), SpeedScale (1f), VisualScale (1f, presentation only), Mirrored, Frenzied, Illusions (int), MirrorAround (Vector3), and IsPart => Leader != null && TurnsWithLeader. The Defense getter becomes DefenseOverride ?? max(0, round(Stats.Get(Defense, Def.Defense)) + DefenseDelta).",
+  "IBrain: add a default method bool UsesGravityFor(Npc npc) => UsesGravity. NpcSystem.Tick and Reel call it, so gravity can differ by phase.",
+  "BrainContext additions: bool Expert (true when Difficulty is Expert or Master, never Journey), Action<Vector3,float>? Impact, Func<Vector3,Vector3,bool>? InSight (wired to NpcSystem.InSight), Action<Npc,string>? Cue, and Action<Vector3,float,string,int>? Pulse (buff pulse to players in a radius; honours State.Effects.Immunities). NpcSystem exposes the events Impacted(Vector3 at, float strength) and Cued(Npc, string sfxId).",
+  "New partial src/Strata.Core/Gameplay/Entities/NpcSystem.Loot.cs. Move Kill() out of NpcSystem.cs (378 lines) with its drops, coins and defeat bookkeeping. The defeat check uses a new GroupAliveExcept(boss, npc) that ignores npc's own IsPart followers; FollowLeader removes them on the next tick without loot. Honour LootOnDefeat.",
+  "New partial NpcSystem.Enrage.cs. Compile Enrage.When once per def, cached like _despawn. Every 30 ticks evaluate it at the target's FeetCell with Session.ContextAt and set npc.Frenzied (it stays set when Latch). After Think: DamageScale *= Damage, SpeedScale = Speed, DefenseOverride = SetDefense ?? the phase value. ContactDamage and BarrierEffects use SetDamage while Frenzied. Announce Message once on the rising edge.",
+  "Parts go with their leader. In Tick, skip the DespawnDistance/FarTicks branch for IsPart creatures. In GameWorld.Respawn (src/Strata.Core/Session/GameWorld.cs, the clear-around-spawn query), exclude n.IsPart as well as bosses.",
+  "Conditions: add 'expert' ({is: true}, meaning Difficulty 1 or 2) and 'defense' (a range over the new ConditionContext.PlayerDefense) in ConditionCompiler.Factories and RegisterSpecs. Add ExpertConditionParams to ConditionParams.cs.",
+  "Probes in src/Strata.Core/Commands/StandardProbes.cs: prefix 'boss.<enemyId>.<field>' for the first living creature of that id. Fields: life, max, defense, stage, phase, enraged, frenzied, illusions, parts (living IsPart followers), segments.",
+  "Validator (ContentValidator.World.cs): validate the boss.enrage.when specs and require multipliers > 0."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/EnemyDef.cs \u2014 BossInfo family moved out",
+  "src/Strata.Core/Gameplay/Entities/Npc.cs \u2014 new presentation/defense/speed fields, IsPart",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs \u2014 Kill moved out, UsesGravityFor, parts skip despawn, ctx wiring, new events",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Knockback.cs \u2014 Reel uses UsesGravityFor",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Parts.cs \u2014 SpawnParts sets Mirrored from BossPart.Mirror",
+  "src/Strata.Core/AI/Brain.cs \u2014 BrainContext fields, IBrain.UsesGravityFor",
+  "src/Strata.Core/Conditions/ConditionCompiler.cs \u2014 expert and defense conditions",
+  "src/Strata.Core/Conditions/ConditionContext.cs \u2014 PlayerDefense",
+  "src/Strata.Core/Conditions/ConditionParams.cs \u2014 ExpertConditionParams",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 Respawn ignores boss parts",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 boss.<id>.<field> probe",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 enrage validation"
+ ],
+ "files_add": [
+  "src/Strata.Core/Content/Defs/BossInfo.cs \u2014 BossInfo, BossPart, BossRitual, Enrage, DayEnrage, KillShield",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Loot.cs \u2014 Kill, drops, group defeat excluding own parts",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Enrage.cs \u2014 condition-driven enrage",
+  "tests/Strata.Core.Tests/Gameplay/BossFrameworkTests.cs \u2014 framework tests"
+ ],
+ "data_changes": [
+  "Replace all nine { \"type\": \"difficulty\", \"min\": 1 } loot gates with { \"type\": \"expert\" }. They are in data/loot/enemies.json (king_slime, eye_of_cthulhu, eater_of_worlds), data/enemies/temple.json (spore_sac, shiny_stone), hive.json (hive_pack), hallow_ocean.json (volatile_gelatin, shrimpy_truffle) and evil.json (brain_of_confusion)."
+ ],
+ "tests": [
+  "BossFrameworkTests.KillingTheBodyEndsTheFightWhilePartsLive: NpcSystem.Kill on the moon_lord core raises defeated_moon_lord, the parts are gone after one tick and they drop nothing.",
+  "BossFrameworkTests.PartsStayWithTheirBodyWhenThePlayerIsFar: player 100 m away for 300 ticks with a 220 m arena; Moon Lord hands still present.",
+  "BossFrameworkTests.RespawnDoesNotStripABossOfItsParts.",
+  "BossFrameworkTests.EnrageConditionsApplyLethalStats: an EnemyDef built in code with enrage when [time day], SetDefense 9999, SetDamage 1000. Defense is 9999 at noon and normal at 22:00; Latch keeps it.",
+  "BossFrameworkTests.ExpertContextFollowsDifficulty: TestGame.Create(difficulty: Journey) gives Expert false; Master gives true.",
+  "ConditionTests.ExpertConditionExcludesClassicAndJourney; ConditionTests.DefenseConditionReadsPlayerDefense.",
+  "BossTests.JourneyWorldsDropNoExpertItems: 50 king_slime kills in Journey, no royal_gel.",
+  "Smoke game/Testing/Scripts/bosses.cmds: after 'boss king_slime 12' add 'assert boss.king_slime.life > 0'. Existing bosses/mechs/dungeon/hardmode scripts must still print SMOKE PASS."
+ ],
+ "verification": [
+  "dotnet build Strata.sln && dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj",
+  "dotnet run --project tools/Strata.Tools -- validate; python3 tools/ci/check_file_length.py",
+  "Godot headless: bosses.cmds, mechs.cmds, dungeon.cmds print SMOKE PASS"
+ ],
+ "depends_on": [],
+ "risks": [
+  "Other phases also edit NpcSystem.cs: the feel phase (hit sounds, knockback pop) and the guide phase (kill tracking). Land this split first so their changes go to small partials.",
+  "Zeroing DefenseDelta each tick must happen before brains write it and must not drop buff/debuff defense (ichor still comes from Stats).",
+  "Moon Lord semantics change only when the core is killed while its parts live (slay/Kill). Check LunarTests line ~119 still holds."
+ ],
+ "effort": "M"
+}

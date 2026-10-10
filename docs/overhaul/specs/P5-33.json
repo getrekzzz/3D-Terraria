@@ -1,0 +1,69 @@
+{
+ "id": "P5-33",
+ "title": "Docs, master-plan status and consolidated CI coverage for P5",
+ "player_outcome": "No visible change. The docs and the audit status table describe the new town and guide systems accurately, and CI exercises them.",
+ "design": [
+  "docs/architecture/gameplay.md: rewrite the Housing and Town bullets (kinds, rescues, visitors, pets, happiness, defence, seating, dawn respawn, services registry, shop tabs and currency, housing API) and add a 'Guide' bullet (journal, bestiary, ItemSources/DropRates, achievements, advisor). List the new probes and commands (housing, town bind/rescue/pose/visit/slay, season, craft, journal, achievement, ui book/bestiary/housing/service/shop/guide_craft).",
+  "docs/architecture/persistence.md: player journal, AnglerQuests, HairDye, and the resident Bound/DiedAt/Kind/VisitDay fields.",
+  "docs/architecture/content-and-assets.md: data/town/*, data/guide/*, data/achievements.json, the portraits pipeline, and the rest_poses clips.",
+  "docs/3D_TERRARIA_MASTER_PLAN.md: update the stale status table (audit K) for town NPCs, the guide book and achievements.",
+  "Make sure the new smoke scripts rescue.cmds and guide.cmds are self-contained (fresh world, 'spawning off', 'town arrivals off' where needed) and finish in under 3 minutes each. Re-run the whole suite plus the menu tour."
+ ],
+ "files_modify": [
+  "docs/architecture/gameplay.md",
+  "docs/architecture/persistence.md",
+  "docs/architecture/content-and-assets.md",
+  "docs/3D_TERRARIA_MASTER_PLAN.md",
+  "game/Testing/Scripts/town.cmds \u2014 tidy the lines added across the phase"
+ ],
+ "files_add": [
+  "none"
+ ],
+ "data_changes": [
+  "none"
+ ],
+ "tests": [
+  "The full CI list: check_file_length.py, dotnet build + test, gen_ore_tiers --check, manifest --check, validate, gen_reference --check, build_all.py --check, coverage, every *.cmds SMOKE PASS, menu tour MENU PASS"
+ ],
+ "verification": [
+  "Run the CI commands locally (dotnet-sdk-8.0 via apt; Godot via tools/ci/get-godot.sh), then push the branch"
+ ],
+ "depends_on": [
+  "P5-01",
+  "P5-02",
+  "P5-03",
+  "P5-04",
+  "P5-05",
+  "P5-06",
+  "P5-07",
+  "P5-08",
+  "P5-09",
+  "P5-10",
+  "P5-11",
+  "P5-12",
+  "P5-13",
+  "P5-14",
+  "P5-15",
+  "P5-16",
+  "P5-17",
+  "P5-18",
+  "P5-19",
+  "P5-20",
+  "P5-21",
+  "P5-22",
+  "P5-23",
+  "P5-24",
+  "P5-25",
+  "P5-26",
+  "P5-27",
+  "P5-28",
+  "P5-29",
+  "P5-30",
+  "P5-31",
+  "P5-32"
+ ],
+ "risks": [
+  "CI time grows by about 2 smoke scripts; keep them short."
+ ],
+ "effort": "S"
+}

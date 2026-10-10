@@ -1,113 +1,66 @@
 using System;
 using Godot;
-using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Items;
+using Strata.Core.Presentation;
 using Strata.Core.Voxels.TileObjects;
-using Strata.Game.Items;
 
 namespace Strata.Game.UI;
 
 /// <summary>
-/// The inventory screen (Tab/I): backpack, equipment, trash and coins, the crafting list for the current
-/// environment and an open container. Items move with a cursor stack (left/right/shift click).
+/// The inventory screen (Tab/I), laid out like Terraria's on the HUD's <see cref="UiLayout"/>: the 10×5 backpack on
+/// the hotbar's spot (its first row is the hotbar), the coin and ammo columns right of it with the trash under them and
+/// the Sort Inventory and Quick Stack to Nearby Chests buttons beside them, the panel host under the grid (a chest, a
+/// resident's shop or their service: the reforge slot), the crafting column bottom-left and the
+/// equipment column (<see cref="EquipmentPanel"/>) on the right under the minimap. Each part is a registered layout
+/// widget placed by <see cref="Place"/> (InventoryScreen.Layout.cs); items move with a cursor stack drawn at the
+/// pointer by <see cref="CursorItemLayer"/> and clicks are routed by <c>GameWorld.ClickSlot</c>
+/// (InventoryScreen.Clicks.cs). An overlay: the player keeps moving, and clicks on empty screen go to the
+/// <see cref="WorldClickCatcher"/> under every panel.
 /// </summary>
 public sealed partial class InventoryScreen : CanvasLayer
 {
     private const string Gate = "inventory";
-    private const float SlotSize = 50;
     private UiContext _ui = null!;
     private Control _root = null!;
-    private PanelContainer _chestPanel = null!;
-    private GridContainer _chestGrid = null!;
-    private Label _chestTitle = null!;
-    private CraftingPanel _crafting = null!;
-    private Label _coins = null!;
-    private Label _defense = null!;
-    private Label _setBonus = null!;
-    private TextureRect _cursorIcon = null!;
-    private Label _cursorCount = null!;
-    private readonly Inventory _trash = new(1);
-    private TileObjectInstance? _container;
-    private Inventory? _containerInv;
 
     public bool IsOpen => _root.Visible;
+
+    /// <summary>The input gate the screen holds while open.</summary>
+    public const string GateName = Gate;
+
+    /// <summary>Everything the screen shows (the controller cursor walks it for slots and buttons).</summary>
+    public Control PadRoot => _root;
+
+    /// <summary>The screen is open with auto-pause on, so the world waits until it closes.</summary>
+    public bool PausesWorld { get; private set; }
+
+    /// <summary>A container's contents were shown (true) or put away (false); its lid follows.</summary>
+    public event Action<TileObjectInstance, bool>? ContainerShown;
 
     public void Initialize(UiContext ui)
     {
         _ui = ui;
         Name = "Inventory";
         Layer = 20;
-        _root = new Control { Visible = false, Theme = UiTheme.Theme, MouseFilter = Control.MouseFilterEnum.Ignore };
+        _root = new Control { Visible = false, MouseFilter = Control.MouseFilterEnum.Ignore };
         _root.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_root);
-
-        var inv = ui.Inventory;
-        var backpack = Panel(new Vector2(24, 24));
-        var grid = new GridContainer { Columns = 10 };
-        grid.AddThemeConstantOverride("h_separation", 4);
-        grid.AddThemeConstantOverride("v_separation", 4);
-        for (int i = 0; i < PlayerInventory.BackpackSize; i++) grid.AddChild(Slot(inv.Backpack, i, null, i < PlayerInventory.HotbarSize ? ((i + 1) % 10).ToString() : null));
-        backpack.AddChild(grid);
-
-        var equipment = Panel(new Vector2(24 + 10 * 54 + 40, 24));
-        var eq = new VBoxContainer();
-        eq.AddChild(new Label { Text = "Equipment" });
-        var slots = new HBoxContainer();
-        var armor = new VBoxContainer { TooltipText = "Armor: head, body, legs" };
-        var kinds = new[] { EquipSlot.Head, EquipSlot.Body, EquipSlot.Legs };
-        for (int i = 0; i < PlayerInventory.ArmorSlots; i++) armor.AddChild(Slot(inv.Armor, i, SlotActions.ArmorFilter(kinds[i]), null));
-        var accessories = new VBoxContainer { TooltipText = "Accessories" };
-        for (int i = 0; i < PlayerInventory.AccessorySlots; i++) accessories.AddChild(Slot(inv.Accessories, i, SlotActions.AccessoryFilter(inv.Accessories, i), null));
-        slots.AddChild(armor);
-        slots.AddChild(accessories);
-        eq.AddChild(slots);
-        _defense = new Label();
-        eq.AddChild(_defense);
-        _setBonus = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(160, 0) };
-        _setBonus.AddThemeColorOverride("font_color", new Color(0.55f, 0.95f, 0.55f));
-        _setBonus.AddThemeFontSizeOverride("font_size", 12);
-        eq.AddChild(_setBonus);
-        eq.AddChild(new Label { Text = "Trash" });
-        eq.AddChild(Slot(_trash, 0, null, null));
-        _coins = new Label();
-        eq.AddChild(_coins);
-        equipment.AddChild(eq);
-
-        _chestPanel = Panel(new Vector2(24, 24 + 5 * 54 + 40));
-        var chestBox = new VBoxContainer();
-        var header = new HBoxContainer();
-        _chestTitle = new Label { SizeFlagsHorizontal = Control.SizeFlags.ExpandFill };
-        header.AddChild(_chestTitle);
-        header.AddChild(Button("Loot all", LootAll));
-        header.AddChild(Button("Deposit all", DepositAll));
-        chestBox.AddChild(header);
-        _chestGrid = new GridContainer { Columns = 10 };
-        _chestGrid.AddThemeConstantOverride("h_separation", 4);
-        _chestGrid.AddThemeConstantOverride("v_separation", 4);
-        chestBox.AddChild(_chestGrid);
-        _chestPanel.AddChild(chestBox);
-        _chestPanel.Visible = false;
-
-        _crafting = new CraftingPanel();
-        _root.AddChild(_crafting);
-        _crafting.Initialize(ui, new Vector2(24 + 10 * 54 + 40 + 180, 96));
-
-        _cursorIcon = new TextureRect { MouseFilter = Control.MouseFilterEnum.Ignore, Size = new Vector2(44, 44), ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize, StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered, ZIndex = 10 };
-        _cursorCount = new Label { MouseFilter = Control.MouseFilterEnum.Ignore, ZIndex = 11 };
-        _root.AddChild(_cursorIcon);
-        _root.AddChild(_cursorCount);
-
-        inv.Armor.Changed += _ => ui.Entity.State.Recompute();
-        inv.Accessories.Changed += _ => ui.Entity.State.Recompute();
-        ui.Game.Interaction.ContainerOpened += (p, obj) =>
+        BuildLayout();
+        ui.Game.Interaction.ContainerOpened += (p, obj, storage) =>
         {
-            if (p == ui.Entity) OpenContainer(obj);
+            if (p == ui.Entity) OpenChest(obj, storage);
+        };
+        // Talking to a resident puts an open shop or service away (the chat box takes over; it runs before the box opens).
+        ui.Interaction.TalkRequested += _ =>
+        {
+            if (_panel == _shop || _panel == _service) ClosePanel();
         };
     }
 
     public override void _UnhandledInput(InputEvent e)
     {
-        if (InputGate.TextEntry) return;
+        // Clicks on empty screen (throwing the held stack, using the item, turning the camera) go to WorldClickCatcher.
+        if (InputGate.TextEntry || (!IsOpen && InputGate.GameplayBlocked) || InputGate.IsOpen(PauseMenu.Gate)) return;
         if (e.IsActionPressed("inventory") || (IsOpen && e.IsActionPressed("pause")))
         {
             SetOpen(!IsOpen);
@@ -120,133 +73,88 @@ public sealed partial class InventoryScreen : CanvasLayer
         if (open == IsOpen) return;
         _root.Visible = open;
         Audio.Sfx.Play(open ? "ui_open" : "ui_close");
-        InputGate.SetOpen(Gate, open);
-        // Auto-pause (single player option): the world waits while the inventory is open.
-        if (Settings.UserSettings.Current.AutoPause || !open) _ui.Player.Runtime.Simulating = !open;
+        // An overlay: the player keeps walking, jumping and fighting. Auto-pause (single player option): the world waits
+        // while the inventory is open, and so does the player, so it is a modal then.
+        bool autoPause = Settings.UserSettings.Current.AutoPause;
+        InputGate.SetOpen(Gate, open, autoPause ? GateKind.Modal : GateKind.Overlay);
+        if (autoPause || !open) _ui.Player.Runtime.Simulating = !open;
+        PausesWorld = open && autoPause;
         if (open)
         {
+            _equipment.Refresh(_ui.Entity.State, _ui.Game.Session.Settings.EffectiveDifficulty);
             _crafting.Refresh();
+            LayoutChanged?.Invoke();
             return;
         }
-        var cursor = _ui.Inventory.Cursor;
-        var rest = SlotActions.Stow(ref cursor, _ui.Inventory.Backpack);
-        _ui.Inventory.Cursor = cursor;
-        if (!rest.IsEmpty) _ui.Game.Drops.Spawn(rest, _ui.Entity.Eye, System.Numerics.Vector3.Zero, pickupDelay: 120);
-        CloseContainer();
+        // The held stack goes back into the storage (coins and ammo to their slots; what does not fit is thrown), and
+        // the service slot's item too (the reforge panel puts it away as it closes; what does not fit drops at the feet).
+        var inv = _ui.Inventory;
+        var held = inv.Cursor;
+        inv.Cursor = ItemStack.Empty;
+        Stow(held);
+        HidePanel();
+        ServicePanel.StowSlot(_ui);
+        LayoutChanged?.Invoke();
     }
 
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.inventory_ui");
         if (!IsOpen) return;
-        var state = _ui.Entity.State;
-        _defense.Text = $"Defense {state.Defense}";
-        _setBonus.Text = state.SetBonus != null ? $"Set bonus: {state.SetBonus}" : "";
-        _coins.Text = Coins.Format(Coins.Total(state.Inventory.Backpack));
-        var cursor = _ui.Inventory.Cursor;
-        _cursorIcon.Visible = !cursor.IsEmpty;
-        _cursorCount.Visible = cursor.Count > 1;
-        if (!cursor.IsEmpty)
-        {
-            var mouse = _root.GetLocalMousePosition();
-            _cursorIcon.Texture = ItemIcons.Get(cursor.Item!);
-            _cursorIcon.Position = mouse + new Vector2(6, 6);
-            _cursorCount.Text = cursor.Count.ToString();
-            _cursorCount.Position = mouse + new Vector2(8, 30);
-        }
-        if (_container != null)
-        {
-            var world = _ui.Game.Session.World;
-            var center = new System.Numerics.Vector3(_container.Anchor.X + 1, _container.Anchor.Y + 1, _container.Anchor.Z + 1) * Strata.Core.Common.Units.CellSize;
-            if (world.TileObjects.Get(_container.Id) == null || System.Numerics.Vector3.Distance(center, _ui.Entity.Center) > 6f) CloseContainer();
-        }
+        _equipment.Refresh(_ui.Entity.State, _ui.Game.Session.Settings.EffectiveDifficulty);
+        int selected = _ui.Inventory.SelectedHotbar;
+        for (int i = 0; i < _hotbarViews.Length; i++) _hotbarViews[i].Selected = selected == i;
     }
 
-    private void OpenContainer(TileObjectInstance obj)
+    /// <summary>
+    /// Shows a chest the player opened under the grid with the slots it carries (a Piggy Bank or Safe: the character's
+    /// own; another chest is put away first, with its creak; the one already shown just stays) and opens the screen.
+    /// </summary>
+    private void OpenChest(TileObjectInstance obj, Inventory storage)
     {
-        CloseContainer();
-        _container = obj;
-        _containerInv = new Inventory(obj.Container!);
-        _chestTitle.Text = obj.Def.DisplayName;
-        for (int i = 0; i < obj.Container!.Length; i++) _chestGrid.AddChild(Slot(_containerInv, i, null, null, markChunk: true));
-        _chestPanel.Visible = true;
+        if (_panel != _chest || _chest.Container != obj)
+        {
+            HidePanel();
+            _chest.Open(obj, storage);
+            ShowPanel(_chest, UiPanel.Chest);
+        }
         SetOpen(true);
     }
 
-    private void CloseContainer()
+    /// <summary>
+    /// Shows <paramref name="npc"/>'s shop under the grid where a chest would be (the chat box's Shop button) and opens
+    /// the screen; the one already shown just stays.
+    /// </summary>
+    public void OpenShop(Strata.Core.Gameplay.Town.TownNpc npc)
     {
-        _container = null;
-        _containerInv = null;
-        _chestPanel.Visible = false;
-        foreach (var child in _chestGrid.GetChildren()) child.QueueFree();
-    }
-
-    private ItemSlotView Slot(Inventory inv, int index, Func<ItemDef, bool>? accepts, string? badge, bool markChunk = false)
-    {
-        var view = new ItemSlotView(() => inv[index], SlotSize, _ui.Tooltip) { Badge = badge };
-        view.Clicked += (button, shift) =>
+        if (_panel != _shop || _shop.Npc != npc)
         {
-            var cursor = _ui.Inventory.Cursor;
-            if (shift && cursor.IsEmpty) QuickMove(inv, index);
-            else if (button == MouseButton.Left) SlotActions.LeftClick(ref cursor, inv, index, accepts);
-            else SlotActions.RightClick(ref cursor, inv, index, accepts);
-            _ui.Inventory.Cursor = cursor;
-            if (markChunk) MarkContainerModified();
-            _crafting.Refresh();
-        };
-        return view;
-    }
-
-    private void QuickMove(Inventory from, int index)
-    {
-        var backpack = _ui.Inventory.Backpack;
-        if (from == backpack)
-        {
-            if (_containerInv != null) SlotActions.QuickMove(backpack, index, _containerInv);
-            else if (!_ui.Inventory.Equip(index)) SlotActions.QuickMove(backpack, index, _trash);
-            MarkContainerModified();
+            HidePanel();
+            _shop.Open(npc);
+            ShowPanel(_shop, UiPanel.Shop);
         }
-        else
+        SetOpen(true);
+    }
+
+    /// <summary>
+    /// Shows <paramref name="npc"/>'s service under the grid in <paramref name="mode"/> (the chat box's Reforge) and opens
+    /// the screen; the one already shown just stays.
+    /// </summary>
+    public void OpenService(Strata.Core.Gameplay.Town.TownNpc npc, ServiceMode mode)
+    {
+        if (_panel != _service || _service.Npc != npc || _service.Mode != mode)
         {
-            SlotActions.QuickMove(from, index, backpack);
-            MarkContainerModified();
+            HidePanel();
+            _service.Open(npc, mode);
+            ShowPanel(_service, UiPanel.Service);
         }
+        SetOpen(true);
     }
 
-    private void LootAll()
+    /// <summary>Puts <paramref name="stack"/> back into the player's storage; what does not fit is thrown.</summary>
+    private void Stow(ItemStack stack)
     {
-        if (_containerInv == null) return;
-        for (int i = 0; i < _containerInv.Size; i++) SlotActions.QuickMove(_containerInv, i, _ui.Inventory.Backpack);
-        MarkContainerModified();
-    }
-
-    private void DepositAll()
-    {
-        if (_containerInv == null) return;
-        var backpack = _ui.Inventory.Backpack;
-        for (int i = PlayerInventory.HotbarSize; i < backpack.Size; i++)
-            if (!backpack[i].IsEmpty && backpack[i].Item!.Category != ItemCategory.Coin) SlotActions.QuickMove(backpack, i, _containerInv);
-        MarkContainerModified();
-    }
-
-    private void MarkContainerModified()
-    {
-        if (_container == null) return;
-        var chunk = _ui.Game.Session.World.GetChunk(Strata.Core.Common.ChunkMath.CellToChunk(_container.Anchor));
-        chunk?.MarkModified();
-    }
-
-    private PanelContainer Panel(Vector2 position)
-    {
-        var p = new PanelContainer { Position = position };
-        _root.AddChild(p);
-        return p;
-    }
-
-    private static Button Button(string text, Action onPressed)
-    {
-        var b = new Button { Text = text };
-        b.Pressed += onPressed;
-        return b;
+        if (stack.IsEmpty) return;
+        _ui.Game.ThrowStack(_ui.Entity, _ui.Inventory.Pickup(stack));
     }
 }

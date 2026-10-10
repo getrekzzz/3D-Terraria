@@ -1,0 +1,41 @@
+{
+ "id": "P0-02",
+ "title": "Extension points so parallel lanes stop colliding on hub files",
+ "player_outcome": "Nothing visible. Later WPs add their own probe files, sound recipes, Blender asset entries and smoke blocks without editing shared hubs.",
+ "design": [
+  "Probe sources: add a [ProbeSource] attribute in Core (src/Strata.Core/Commands/ProbeSourceAttribute.cs). Static classes marked with it expose a static Register(...) method matching the existing probe registration pattern (inspect how StandardProbes registers probes into the command/probe registry and mirror it). CommandContext (Core) discovers them via reflection over the Core assembly at startup; the Godot command host (game/Debug, find GodotCommandHost or equivalent where engine probes are registered) discovers [ProbeSource] classes in the game assembly. Migrate nothing yet except proving it works with one tiny example probe source per side that registers an existing probe moved out of the hub (e.g. move one small probe group), keeping names identical.",
+  "Audio recipes: tools/audio/sfx_recipes.py merges RECIPES dicts from every tools/audio/sfx_recipes_*.py module (importlib/glob, sorted by filename, duplicate keys are an error). build_audio.py output must be unchanged.",
+  "Blender assets: tools/blender/build_all.py loads tools/blender/assets.json and merges every tools/blender/assets.d/*.json (sorted; duplicate ids are an error; same schema). Add a GENERATORS registry in tools/blender/bgen/__init__.py (dict name->callable) that bgen modules can register into via a decorator, and make build_all.py consult it before its existing dispatch so new generator modules do not need edits to build_all.py's dispatch. `build_all.py --check` output must be unchanged. Also make tools/content/gen_reference.py / validators that read assets.json (search for 'assets.json') read the merged set via one shared loader.",
+  "Smoke scripts convention: document in docs/CONVENTIONS.md (Testing section) that new blocks appended to shared .cmds files go under a `# --- <WP id> ---` marker in WP-id order.",
+  "Document all four extension points in docs/CONVENTIONS.md."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Commands/CommandContext.cs (or where probes are registered)",
+  "game/Debug/* command host",
+  "tools/audio/sfx_recipes.py",
+  "tools/blender/build_all.py",
+  "tools/blender/bgen/__init__.py",
+  "docs/CONVENTIONS.md"
+ ],
+ "files_add": [
+  "src/Strata.Core/Commands/ProbeSourceAttribute.cs",
+  "tools/blender/assets.d/README.md (explains the drop-in folder; keep a .gitkeep if needed)",
+  "tests/Strata.Core.Tests/Commands/ProbeSourceTests.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ProbeSourceTests: a [ProbeSource] class in the test assembly or Core is discovered and its probe answers.",
+  "python3 tools/blender/build_all.py --check output identical to before; python3 tools/audio/build_audio.py --check (if a check mode exists) unchanged."
+ ],
+ "verification": [
+  "All checks + Core tests",
+  "smoke basic and combat pass (probes still resolve)"
+ ],
+ "depends_on": [
+  "P0-01"
+ ],
+ "risks": [
+  "Reflection discovery must not change probe names or ordering that smoke scripts rely on."
+ ],
+ "effort": "M"
+}

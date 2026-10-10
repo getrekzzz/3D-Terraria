@@ -48,14 +48,4 @@ public sealed partial class TownSystem
             if (LandmarkNode(def) is { } node) Create(def, node);
         }
     }
-
-    /// <summary>The resident turns into what they summoned: gone (without a death) until the respawn delay passes.</summary>
-    public void Vanish(TownNpc r)
-    {
-        if (r.TalkingTo != null) EndTalk(r);
-        r.Life = 0;
-        r.RespawnTicks = Config.RespawnTicks;
-        r.Path = null;
-        r.Velocity = default;
-    }
 }

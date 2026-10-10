@@ -1,0 +1,50 @@
+{
+ "id": "P1b-12",
+ "title": "GC pressure: pooled MeshVolume, cave-generation scratch buffers, span-based uploads, low-latency GC",
+ "player_outcome": "Fewer periodic whole-game freezes from garbage collection, especially while exploring new ground.",
+ "design": [
+  "Checked in code, and found a larger source than the audit listed: every mesh job builds a new MeshVolume that allocates three bool[262144] arrays (Opaque, Snap, CrispCell), about 786 KB of large-object heap per job (MeshVolume.cs:19-21). CaveGenerationPass.Dense allocates up to three float[39304] (157 KB each, also LOH) per chunk (CaveGenerationPass.cs:201-206). MeshUpload.Build copies every vertex stream with ToArray.",
+  "MeshVolume: add a [ThreadStatic] pooled instance with Reset(nb, tables, light); ChunkMesher uses MeshVolume.Rent(...). Its consumers (SurfaceNets, CellMesher, LiquidMesher, GrassScatter) only read it during the build.",
+  "CaveGenerationPass: [ThreadStatic] float[ChunkGenContext.Volume] scratch buffers for spagA, spagB and cheese; keep the null semantics for cheese. Output must be identical: golden hashes unchanged in the same commit.",
+  "MeshUpload.Build: pass streams with Variant.CreateFrom(span) (positions, normals, colors, indices) and MemoryMarshal.AsBytes spans for Custom0 and Custom1, removing the Custom0Bytes/Custom1Bytes copies. Keep the ToArray path as a fallback if an overload is missing in GodotSharp 4.7.",
+  "GC mode: set GCSettings.LatencyMode = SustainedLowLatency while a world runs (WorldLauncher.Launch) and restore Interactive in WorldRuntime._ExitTree. Strata.csproj: <ConcurrentGarbageCollection>true</ConcurrentGarbageCollection> and <TieredPGO>true</TieredPGO>.",
+  "Small per-frame LINQ: ChunkRenderer.ShownTriangles becomes a maintained counter; DynamicLights.Assign uses a reusable candidate list with manual nearest-k selection instead of OrderBy/Take/ToList."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Meshing/MeshVolume.cs \u2014 pooled Rent/Reset",
+  "src/Strata.Core/Meshing/ChunkMesher.cs \u2014 use the pooled MeshVolume",
+  "src/Strata.Core/WorldGen/Passes/CaveGenerationPass.cs \u2014 ThreadStatic scratch in Dense",
+  "src/Strata.Core/Meshing/MeshSurface.cs \u2014 span accessors for custom streams",
+  "game/World/MeshUpload.cs \u2014 Variant.CreateFrom spans",
+  "game/World/ChunkRenderer.cs \u2014 ShownTriangles counter",
+  "game/Rendering/DynamicLights.cs \u2014 allocation-free Assign",
+  "game/Bootstrap/WorldLauncher.cs \u2014 GC latency mode",
+  "game/World/WorldRuntime.cs \u2014 restore GC mode on exit",
+  "Strata.csproj \u2014 GC and PGO properties"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Meshing/AllocationTests.cs \u2014 allocation regression tests for meshing and cave generation"
+ ],
+ "data_changes": [],
+ "tests": [
+  "AllocationTests.MeshingReusesVolumeBuffers: the second ChunkMesher.Build of an air-bordered chunk allocates < 200 KB (today \u2265 786 KB)",
+  "AllocationTests.CaveGenerationReusesScratch: the second Generate of a deep cave chunk allocates < 400 KB",
+  "WorldGenTests golden hashes unchanged; MeshingTests unchanged"
+ ],
+ "verification": [
+  "dotnet test",
+  "Rendering perf.cmds run: perf.gc2 and perf.gc_pause_ms clearly below the P1b-05 baseline over the same script",
+  "F3 GC line: gen2 rarely increments while walking"
+ ],
+ "depends_on": [
+  "P1b-03",
+  "P1b-04",
+  "P1b-11"
+ ],
+ "risks": [
+  "The Variant.CreateFrom(Span<T>) overload set must be checked against GodotSharp 4.7.2 (keep the fallback)",
+  "SustainedLowLatency raises memory use somewhat; watch F3 managed MB",
+  "DynamicLights.cs is also edited by P1a (torch light energy and range): sequence or merge carefully"
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,10 @@
+{
+ "comment": "P3-43/P3-44: models for creatures that used to borrow another archetype's body (re-pointed in data/enemies).",
+ "creatures": {
+  "shark": {"generator": "shark", "params": {"skin": "#6a7a8a", "belly": "#e8ecf0"}},
+  "snow_flinx": {"generator": "flinx", "params": {"fur": "#f0f4ff"}},
+  "bone_serpent_head": {"generator": "bone_serpent_head", "params": {}},
+  "bone_serpent_body": {"generator": "bone_serpent_vertebra", "params": {}},
+  "bone_serpent_tail": {"generator": "bone_serpent_tail", "params": {}}
+ }
+}

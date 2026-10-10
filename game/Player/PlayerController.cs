@@ -42,13 +42,11 @@ public sealed partial class PlayerController : CharacterBody3D
     /// <summary>Re-resolve a standable spawn position once terrain around it is loaded.</summary>
     private bool _resolveSpawn = true;
 
-    /// <summary>Raised with fall damage taken on landing.</summary>
-    public event System.Action<int>? FallDamaged;
-
     public void Initialize(WorldRuntime runtime, PlayerEntity entity, MovementConfig config)
     {
         _runtime = runtime;
         Entity = entity;
+        Entity.HasBody = true; // this body advances the hook and applies its pull (UpdateGrapple)
         _config = config;
         Name = "Player";
         CollisionLayer = 0;
@@ -85,6 +83,7 @@ public sealed partial class PlayerController : CharacterBody3D
         GlobalPosition = ToGodot(feet);
         Velocity = Vector3.Zero;
         Entity.Position = feet;
+        Entity.Hook.Reset(); // a latched hook would yank the body back across the world
         _airborne = false;
         Frozen = true;
         ResetPhysicsInterpolation();
@@ -127,21 +126,26 @@ public sealed partial class PlayerController : CharacterBody3D
             Entity.Minecart = null;
             return;
         }
-        if (UpdateMinecart(dt)) return;
-        if (UpdatePhase()) return;
+        if (Entity.ExternalVelocity != System.Numerics.Vector3.Zero) Entity.Minecart = null; // the tongue drags you out of a cart
+        if (UpdateSleep() || UpdateMinecart(dt) || UpdateMount(dt) || UpdatePhase())
+        {
+            ReelInHook(dt);
+            return;
+        }
 
-        _liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
+        var liquid = LiquidAt(GlobalPosition + Vector3.Up * 0.9f);
+        if (liquid != _liquid) LiquidEdge(_liquid, liquid);
+        _liquid = liquid;
         _swimming = _liquid != null;
         _climbing = !_swimming && OnRope();
         var stats = Entity.State.Effects.Stats;
-        float speed = _config.WalkSpeed * (1f + stats.Bonus(StatIds.MoveSpeed)) * stats.Multiplier(StatIds.MoveSpeed);
-        if (!UI.InputGate.GameplayBlocked && Input.IsActionPressed("sprint")) speed *= _config.SprintMultiplier;
+        float speed = RunSpeed(stats) * stats.Multiplier(StatIds.MoveSpeed);
         if (_liquid != null) speed = Mathf.Min(speed * _liquid.MoveSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)), _config.SwimSpeed * (1f + stats.Bonus(StatIds.SwimSpeed)));
         speed *= AirSpeedFactor();
         if (_climbing) speed *= 0.6f;
 
-        bool blocked = UI.InputGate.GameplayBlocked;
-        var input = blocked ? Vector2.Zero : Input.GetVector("move_left", "move_right", "move_forward", "move_back");
+        bool blocked = UI.InputGate.MovementBlocked;
+        var input = MoveInput(); // reversed while confused (Status)
         var wish = Rig.YawBasis * new Vector3(input.X, 0, input.Y);
         var v = Velocity;
         var horizontal = new Vector3(v.X, 0, v.Z);
@@ -156,11 +160,13 @@ public sealed partial class PlayerController : CharacterBody3D
         }
         if (UpdateDash(dt, ref horizontal)) accel *= 0.08f; // a dash carries its own momentum
         horizontal = horizontal.MoveToward(target, accel * dt);
+        TrackRunUp(dt, onFloor, wish, horizontal, stats);
 
         UpdateJump(dt, onFloor, ref v);
         v.X = horizontal.X;
         v.Z = horizontal.Z;
         if (UpdateGrapple(dt, ref v)) onFloor = false;
+        if (UpdateTongue(ref v)) onFloor = false; // after all input, so it cannot be out-run (Status)
         Velocity = v;
 
         bool dropThrough = !blocked && Input.IsActionPressed("crouch");
@@ -170,6 +176,7 @@ public sealed partial class PlayerController : CharacterBody3D
         var before = GlobalPosition;
         MoveAndSlide();
         if (IsOnFloor() && IsOnWall() && wish.LengthSquared() > 0.01f) TryStepUp(before, wish);
+        Unbury();
         TrackFall();
         UpdateSounds(dt);
         Sync();
@@ -191,7 +198,7 @@ public sealed partial class PlayerController : CharacterBody3D
     private void UpdateJump(float dt, bool onFloor, ref Vector3 v)
     {
         _coyote = onFloor ? _config.CoyoteTime : _coyote - dt;
-        bool blocked = UI.InputGate.GameplayBlocked;
+        bool blocked = UI.InputGate.MovementBlocked;
         _jumpBuffer = !blocked && Input.IsActionJustPressed("jump") ? _config.JumpBuffer : _jumpBuffer - dt;
         bool held = !blocked && Input.IsActionPressed("jump");
         float jumpScale = 1f + Entity.State.Effects.Stats.Bonus(StatIds.JumpHeight);
@@ -208,9 +215,11 @@ public sealed partial class PlayerController : CharacterBody3D
         if (_jumpBuffer > 0 && _coyote > 0)
         {
             v.Y = _config.JumpSpeed * Mathf.Sqrt(jumpScale);
+            StartJumpApex();
             _jumpHold = _config.JumpHoldTime;
             _jumpBuffer = 0;
             _coyote = 0;
+            Jumped?.Invoke();
         }
         else if (!blocked && Input.IsActionJustPressed("jump") && !onFloor && _coyote <= 0 && TryAirJump(ref v))
         {
@@ -245,32 +254,6 @@ public sealed partial class PlayerController : CharacterBody3D
         if (!TestMove(stepped, -up, collision)) return; // nothing to stand on: not a ledge
         GlobalPosition = stepped.Origin + collision.GetTravel();
         ApplyFloorSnap();
-    }
-
-    private void TrackFall()
-    {
-        float y = GlobalPosition.Y;
-        if (!IsOnFloor() && !_swimming && !_climbing)
-        {
-            if (!_airborne)
-            {
-                _airborne = true;
-                _peakY = y;
-            }
-            _peakY = Mathf.Max(_peakY, y);
-            return;
-        }
-        if (_airborne && !_swimming)
-        {
-            int damage = _config.FallDamage(_peakY - y, Entity.State.Effects.NoFallDamage);
-            if (damage > 0)
-            {
-                Entity.State.Vitals.DamageDirect(damage);
-                FallDamaged?.Invoke(damage);
-            }
-        }
-        _airborne = false;
-        _peakY = y;
     }
 
     private void Sync()

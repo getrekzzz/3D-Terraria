@@ -1,35 +1,52 @@
 """Furniture, crafting stations, containers and lights. Footprint sizes come from tile-object data (cells of 0.5 m);
-``p['size']`` is the footprint in metres [x, y(up), z] after conversion by build_all. Front faces Blender +Y."""
+``p['size']`` is the footprint in metres [x, y(up), z] after conversion by build_all. Front faces Blender +Y.
+
+Bevel pass: every wooden or metal box here is built with ``MeshBuilder.bevel_box`` so no edge is a razor-sharp
+unlit line. Two radii keep the look consistent across the family (and with any other furniture module):
+  SOFT  (0.018 m, 2 segments)  large faces a hand rests on: table and bench tops, seats, chest bodies, bed frames
+  EDGE  (0.010 m, 1 segment)   legs, rails, slats, bands, planks — a chamfer that catches the light
+``p['bevel']`` scales both (0 = the old hard boxes) for a variant that wants crisper or softer edges."""
 import math
 
 from mathutils import Matrix, Vector
 
 from .mesh import MeshBuilder
 
+SOFT, SOFT_SEGMENTS = 0.018, 2
+EDGE = 0.010
 
-def _legs(mb, w, d, h, t, material, inset=0.06, color="#ffffff"):
+
+def bevels(p):
+    """(soft, edge) radii for a params dict: SOFT and EDGE scaled by ``p['bevel']`` (default 1)."""
+    k = p.get("bevel", 1.0)
+    return SOFT * k, EDGE * k
+
+
+def _legs(mb, w, d, h, t, material, inset=0.06, color="#ffffff", bevel=EDGE):
     for sx in (-1, 1):
         for sy in (-1, 1):
             x, y = sx * (w / 2 - inset - t / 2), sy * (d / 2 - inset - t / 2)
-            mb.box((x - t / 2, y - t / 2, 0), (x + t / 2, y + t / 2, h), material, color)
+            mb.bevel_box((x - t / 2, y - t / 2, 0), (x + t / 2, y + t / 2, h), material, color, radius=bevel)
 
 
 def table(mb: MeshBuilder, p, rng):
     w, h, d = p["size"]
     wood = f"prop:{p.get('wood', 'planks')}"
+    soft, edge = bevels(p)
     top = h * 0.82
-    mb.box((-w / 2 + 0.02, -d / 2 + 0.02, top), (w / 2 - 0.02, d / 2 - 0.02, top + 0.08), wood)
-    _legs(mb, w, d, top, 0.09, wood)
-    mb.box((-w / 2 + 0.1, -0.03, top * 0.3), (w / 2 - 0.1, 0.03, top * 0.36), wood)
+    mb.bevel_box((-w / 2 + 0.02, -d / 2 + 0.02, top), (w / 2 - 0.02, d / 2 - 0.02, top + 0.08), wood, radius=soft, segments=SOFT_SEGMENTS)
+    _legs(mb, w, d, top, 0.09, wood, bevel=edge)
+    mb.bevel_box((-w / 2 + 0.1, -0.03, top * 0.3), (w / 2 - 0.1, 0.03, top * 0.36), wood, radius=edge)
 
 
 def workbench(mb: MeshBuilder, p, rng):
     w, h, d = p["size"]
-    table(mb, {"size": (w, h * 0.95, d)}, rng)
+    soft, edge = bevels(p)
+    table(mb, {"size": (w, h * 0.95, d), "bevel": p.get("bevel", 1.0)}, rng)
     top = h * 0.95 * 0.82 + 0.08
-    mb.box((w / 2 - 0.35, -d / 2 + 0.05, top), (w / 2 - 0.1, -d / 2 + 0.25, top + 0.18), "prop:iron", "#9aa0a8")
+    mb.bevel_box((w / 2 - 0.35, -d / 2 + 0.05, top), (w / 2 - 0.1, -d / 2 + 0.25, top + 0.18), "prop:iron", "#9aa0a8", radius=edge)
     mb.cylinder((w / 2 - 0.22, -d / 2 + 0.25, top + 0.09), (w / 2 - 0.22, -d / 2 + 0.45, top + 0.09), 0.02, None, "prop:iron", segments=6)
-    mb.box((-w / 2 + 0.15, -0.1, top), (-w / 2 + 0.55, 0.15, top + 0.05), "prop:dark_planks")  # a plank offcut
+    mb.bevel_box((-w / 2 + 0.15, -0.1, top), (-w / 2 + 0.55, 0.15, top + 0.05), "prop:dark_planks", radius=edge)  # a plank offcut
     mb.cylinder((-0.2, 0.15, top + 0.02), (0.15, 0.2, top + 0.02), 0.02, None, "prop:iron", "#707070", segments=6)  # saw back
 
 
@@ -43,7 +60,7 @@ def furnace(mb: MeshBuilder, p, rng):
     mb.lathe(profile, stone, tint, segments=8, smooth=False)
     mb.cylinder((0, 0, h * 0.8), (0, 0, h), w * 0.12, w * 0.1, stone, p.get("chimneyTint", "#b0a8a0"), segments=8, smooth=False)
     mb.box((-w * 0.2, d * 0.28, 0.08), (w * 0.2, d * 0.46, h * 0.32), "prop:plain:glow", p.get("glow", "#ff8a2a"))
-    mb.box((-w * 0.26, d * 0.38, h * 0.32), (w * 0.26, d * 0.48, h * 0.38), trim, trim_tint)
+    mb.bevel_box((-w * 0.26, d * 0.38, h * 0.32), (w * 0.26, d * 0.48, h * 0.38), trim, trim_tint, radius=EDGE)
     for f in p.get("bands", []):
         z = h * f
         (r0, z0), (r1, z1) = next((a, b) for a, b in zip(profile, profile[1:]) if a[1] <= z <= b[1])
@@ -64,10 +81,11 @@ def anvil(mb: MeshBuilder, p, rng):
 
 def sawmill(mb: MeshBuilder, p, rng):
     w, h, d = p["size"]
-    table(mb, {"size": (w, h * 0.55, d), "wood": "planks"}, rng)
+    edge = bevels(p)[1]
+    table(mb, {"size": (w, h * 0.55, d), "wood": "planks", "bevel": p.get("bevel", 1.0)}, rng)
     top = h * 0.55 * 0.82 + 0.08
     mb.cylinder((0.1, -0.04, top + 0.35), (0.1, 0.04, top + 0.35), 0.38, None, "prop:iron", "#c0c4cc", segments=20)
-    mb.box((-0.05, -0.12, top), (0.25, 0.12, top + 0.2), "prop:dark_iron")
+    mb.bevel_box((-0.05, -0.12, top), (0.25, 0.12, top + 0.2), "prop:dark_iron", radius=edge)
     for k in range(3):
         y = -d / 2 + 0.15 + k * 0.12
         mb.cylinder((-w / 2 + 0.1, y, top + 0.08), (-w / 2 + 0.8, y, top + 0.08), 0.06, None, "prop:bark", segments=8)
@@ -76,10 +94,11 @@ def sawmill(mb: MeshBuilder, p, rng):
 def loom(mb: MeshBuilder, p, rng):
     w, h, d = p["size"]
     wood = "prop:planks"
+    edge = bevels(p)[1]
     for sx in (-1, 1):
-        mb.box((sx * w * 0.42 - 0.05, -d * 0.35, 0), (sx * w * 0.42 + 0.05, -d * 0.25, h * 0.9), wood)
-        mb.box((sx * w * 0.42 - 0.05, d * 0.25, 0), (sx * w * 0.42 + 0.05, d * 0.35, h * 0.55), wood)
-        mb.box((sx * w * 0.42 - 0.05, -d * 0.35, 0.1), (sx * w * 0.42 + 0.05, d * 0.35, 0.18), wood)
+        mb.bevel_box((sx * w * 0.42 - 0.05, -d * 0.35, 0), (sx * w * 0.42 + 0.05, -d * 0.25, h * 0.9), wood, radius=edge)
+        mb.bevel_box((sx * w * 0.42 - 0.05, d * 0.25, 0), (sx * w * 0.42 + 0.05, d * 0.35, h * 0.55), wood, radius=edge)
+        mb.bevel_box((sx * w * 0.42 - 0.05, -d * 0.35, 0.1), (sx * w * 0.42 + 0.05, d * 0.35, 0.18), wood, radius=edge)
     mb.cylinder((-w * 0.42, -d * 0.3, h * 0.88), (w * 0.42, -d * 0.3, h * 0.88), 0.05, None, wood, segments=8)
     mb.cylinder((-w * 0.42, d * 0.3, h * 0.5), (w * 0.42, d * 0.3, h * 0.5), 0.07, None, "prop:red_cloth", segments=10)
     mb.box((-w * 0.36, -d * 0.3, h * 0.5), (w * 0.36, d * 0.3, h * 0.52), "prop:red_cloth", matrix=Matrix.Rotation(-0.55, 4, "X") @ Matrix.Translation((0, -0.2, 0.25)))
@@ -95,42 +114,95 @@ def bottle(mb: MeshBuilder, p, rng):
 def chair(mb: MeshBuilder, p, rng):
     w, h, d = p["size"]
     wood = "prop:planks"
+    soft, edge = bevels(p)
     seat = h * 0.36
-    mb.box((-w * 0.32, -d * 0.32, seat), (w * 0.32, d * 0.32, seat + 0.06), wood)
+    mb.bevel_box((-w * 0.32, -d * 0.32, seat), (w * 0.32, d * 0.32, seat + 0.06), wood, radius=soft, segments=SOFT_SEGMENTS)
     for sx in (-1, 1):
         for sy in (-1, 1):
             top = h * 0.95 if sy < 0 else seat
             x, y = sx * w * 0.27, sy * d * 0.27
-            mb.box((x - 0.04, y - 0.04, 0), (x + 0.04, y + 0.04, top), wood)
+            mb.bevel_box((x - 0.04, y - 0.04, 0), (x + 0.04, y + 0.04, top), wood, radius=edge)
     for k in range(3):
         z = seat + 0.15 + k * (h * 0.95 - seat - 0.2) / 2
-        mb.box((-w * 0.27, -d * 0.3, z), (w * 0.27, -d * 0.24, z + 0.07), wood)
+        mb.bevel_box((-w * 0.27, -d * 0.3, z), (w * 0.27, -d * 0.24, z + 0.07), wood, radius=edge)
 
 
 def door(mb: MeshBuilder, p, rng):
     w, h, d = p["size"]
     wood = "prop:planks"
+    edge = bevels(p)[1]
     leaf_w, leaf_h, t = w * 0.9, h * 0.97, 0.08
-    for k in range(4):
+    for k in range(4):  # planks with chamfered edges, so the joints between them read as grooves
         x0 = -leaf_w / 2 + k * leaf_w / 4
-        mb.box((x0 + 0.005, -t / 2, 0.02), (x0 + leaf_w / 4 - 0.005, t / 2, leaf_h), wood)
+        mb.bevel_box((x0 + 0.005, -t / 2, 0.02), (x0 + leaf_w / 4 - 0.005, t / 2, leaf_h), wood, radius=edge)
     for z in (0.3, leaf_h - 0.35):
-        mb.box((-leaf_w / 2, -t / 2 - 0.02, z), (leaf_w / 2, t / 2 + 0.02, z + 0.1), "prop:dark_planks")
-    mb.box((-leaf_w / 2 + 0.05, -t / 2 - 0.03, leaf_h * 0.4), (leaf_w / 2 - 0.05, t / 2 + 0.03, leaf_h * 0.44), "prop:dark_iron")
+        mb.bevel_box((-leaf_w / 2, -t / 2 - 0.02, z), (leaf_w / 2, t / 2 + 0.02, z + 0.1), "prop:dark_planks", radius=edge)
+    mb.bevel_box((-leaf_w / 2 + 0.05, -t / 2 - 0.03, leaf_h * 0.4), (leaf_w / 2 - 0.05, t / 2 + 0.03, leaf_h * 0.44), "prop:dark_iron", radius=edge * 0.6)
     mb.sphere((leaf_w / 2 - 0.12, t / 2 + 0.05, leaf_h * 0.5), 0.04, "prop:iron", subdivisions=1)
     mb.sphere((leaf_w / 2 - 0.12, -t / 2 - 0.05, leaf_h * 0.5), 0.04, "prop:iron", subdivisions=1)
 
 
 def chest(mb: MeshBuilder, p, rng):
+    # Optional tints (woodTint, bandTint, latchTint) colour the shared layers for locked and biome chests.
     w, h, d = p["size"]
     wood, band = f"prop:{p.get('wood', 'planks')}", f"prop:{p.get('band', 'dark_iron')}"
+    wt, bt, lt = p.get("woodTint", "#ffffff"), p.get("bandTint", "#ffffff"), p.get("latchTint", "#ffffff")
+    soft, edge = bevels(p)
     body_h = h * 0.58
-    mb.box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood)
+    mb.bevel_box((-w * 0.46, -d * 0.4, 0), (w * 0.46, d * 0.4, body_h), wood, wt, radius=soft, segments=SOFT_SEGMENTS)
     lid = [(-d * 0.4, 0), (d * 0.4, 0), (d * 0.38, h * 0.18), (d * 0.25, h * 0.3), (0, h * 0.36), (-d * 0.25, h * 0.3), (-d * 0.38, h * 0.18)]
-    mb.extrude_polygon(lid, w * 0.92, wood, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"))
+    # The lid is its own node hinged at the back top edge of the body (the game swings it open).
+    mb.part("lid", (0, -d * 0.4, body_h)).extrude_polygon(lid, w * 0.92, wood, wt, matrix=Matrix.Translation((0, 0, body_h)) @ Matrix.Rotation(math.pi / 2, 4, "Z"), bevel=edge)
     for x in (-w * 0.3, w * 0.3):
-        mb.box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band)
-    mb.box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"))
+        mb.bevel_box((x - 0.04, -d * 0.42, 0), (x + 0.04, d * 0.42, body_h + 0.02), band, bt, radius=edge)
+    mb.bevel_box((-0.07, d * 0.4, body_h - 0.14), (0.07, d * 0.44, body_h + 0.04), p.get("latch", "prop:gold"), lt, radius=edge)
+
+
+def piggy_bank(mb: MeshBuilder, p, rng):
+    """A pink ceramic pig (snout to +X) with a coin slot on its back; low-poly to sit among the furniture."""
+    w, h, d = p["size"]
+    pink, dark = "#f2a0b4", "#3a2028"
+    body_l, body_r = min(w * 0.62, 0.62), min(h * 0.42, d * 0.42, 0.22)
+    cz = body_r + 0.06
+    mb.sphere((0, 0, cz), body_r, "prop:plain", pink, subdivisions=2, scale=(body_l / (2 * body_r), 1, 0.95))
+    nose_x = body_l / 2 - 0.01
+    mb.cylinder((nose_x, 0, cz), (nose_x + 0.07, 0, cz), body_r * 0.38, body_r * 0.36, "prop:plain", "#e88aa0", segments=8)
+    for y in (-0.025, 0.025):
+        mb.sphere((nose_x + 0.072, y, cz), 0.014, "prop:plain", dark, subdivisions=1, scale=(0.4, 1, 1.3))
+    for y in (-body_r * 0.45, body_r * 0.45):
+        mb.sphere((nose_x - 0.06, y, cz + body_r * 0.42), 0.022, "prop:plain", dark, subdivisions=1)  # eyes
+        ear = [(-0.03, 0), (0.03, 0), (0.0, 0.07)]  # upright, facing the snout
+        mb.extrude_polygon(ear, 0.015, "prop:plain", pink,
+                           matrix=Matrix.Translation((nose_x - 0.16, y, cz + body_r * 0.72)) @ Matrix.Rotation(math.pi / 2, 4, "Z"))
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            x, y = sx * body_l * 0.27, sy * body_r * 0.5
+            mb.cylinder((x, y, 0), (x, y, cz - body_r * 0.6), 0.04, 0.045, "prop:plain", pink, segments=6)
+    mb.box((-0.06, -0.008, cz + body_r * 0.9), (0.06, 0.008, cz + body_r * 1.0), "prop:plain", dark)  # coin slot
+    mb.tube([(-body_l / 2, 0, cz + 0.02), (-body_l / 2 - 0.05, 0, cz + 0.05), (-body_l / 2 - 0.04, 0, cz + 0.09)], [0.012, 0.01, 0.008],
+            "prop:plain", pink, segments=4)
+
+
+def safe(mb: MeshBuilder, p, rng):
+    """A squat steel box with a round combination dial and a lever handle on its door (front +Y)."""
+    w, h, d = p["size"]
+    steel, trim = "prop:iron:metal", "prop:dark_iron"
+    bw, bh, bd = w * 0.84, h * 0.82, d * 0.72
+    mb.box((-bw / 2, -bd / 2, 0.06), (bw / 2, bd / 2, 0.06 + bh), steel, "#5c636c")
+    for sx in (-1, 1):  # feet
+        for sy in (-1, 1):
+            mb.box((sx * bw * 0.4 - 0.05, sy * bd * 0.4 - 0.05, 0), (sx * bw * 0.4 + 0.05, sy * bd * 0.4 + 0.05, 0.06), trim)
+    door_y = bd / 2
+    mb.box((-bw * 0.42, door_y, 0.06 + bh * 0.08), (bw * 0.42, door_y + 0.03, 0.06 + bh * 0.92), steel, "#6c747e")
+    for x in (-bw * 0.42, bw * 0.42 - 0.03):  # hinges and jamb
+        mb.box((x, door_y + 0.03, 0.06 + bh * 0.08), (x + 0.03, door_y + 0.05, 0.06 + bh * 0.92), trim)
+    cz = 0.06 + bh * 0.62
+    mb.cylinder((0, door_y + 0.03, cz), (0, door_y + 0.07, cz), 0.13, 0.12, "prop:gold", segments=16)  # dial
+    mb.cylinder((0, door_y + 0.07, cz), (0, door_y + 0.1, cz), 0.05, 0.04, trim, segments=8)
+    mb.box((-0.008, door_y + 0.07, cz + 0.08), (0.008, door_y + 0.075, cz + 0.115), trim)  # dial mark
+    hz = 0.06 + bh * 0.3
+    mb.cylinder((0, door_y + 0.03, hz), (0, door_y + 0.1, hz), 0.035, None, trim, segments=8)  # handle hub
+    mb.box((-0.03, door_y + 0.08, hz - 0.012), (0.2, door_y + 0.11, hz + 0.012), "prop:iron:metal", "#a0a4ac")
 
 
 def torch(mb: MeshBuilder, p, rng):
@@ -144,7 +216,7 @@ def torch(mb: MeshBuilder, p, rng):
 
 def candle(mb: MeshBuilder, p, rng):
     # Holder, wax and a blackened wick; the flame is drawn live by the game.
-    mb.cylinder((0, 0, 0), (0, 0, 0.02), 0.09, 0.1, "prop:copper", segments=10)
+    mb.cylinder((0, 0, 0), (0, 0, 0.02), 0.09, 0.1, "prop:iron:metal", "#e8804a", segments=10)
     mb.cylinder((0, 0, 0.02), (0, 0, 0.2), 0.035, None, "prop:plain", "#f0ead8", segments=8)
     mb.cylinder((0, 0, 0.2), (0, 0, 0.222), 0.004, 0.003, "prop:plain", "#1a1410", segments=4)
 
@@ -152,12 +224,14 @@ def candle(mb: MeshBuilder, p, rng):
 def bed(mb: MeshBuilder, p, rng):
     w, h, d = p["size"]
     wood = "prop:planks"
-    mb.box((-w * 0.46, -d * 0.48, 0.15), (w * 0.46, d * 0.48, 0.32), wood)
-    _legs(mb, w * 0.92, d * 0.96, 0.18, 0.1, wood, inset=0.0)
-    mb.box((-w * 0.46, -d * 0.48, 0.15), (w * 0.46, -d * 0.43, h * 0.9), wood)  # headboard at the back
-    mb.box((-w * 0.46, d * 0.43, 0.15), (w * 0.46, d * 0.48, h * 0.55), wood)
-    mb.box((-w * 0.42, -d * 0.42, 0.32), (w * 0.42, d * 0.42, 0.45), "prop:cloth")
-    mb.box((-w * 0.43, -d * 0.1, 0.33), (w * 0.43, d * 0.43, 0.48), "prop:red_cloth")
+    soft, edge = bevels(p)
+    mb.bevel_box((-w * 0.46, -d * 0.48, 0.15), (w * 0.46, d * 0.48, 0.32), wood, radius=soft, segments=SOFT_SEGMENTS)
+    _legs(mb, w * 0.92, d * 0.96, 0.18, 0.1, wood, inset=0.0, bevel=edge)
+    mb.bevel_box((-w * 0.46, -d * 0.48, 0.15), (w * 0.46, -d * 0.43, h * 0.9), wood, radius=edge)  # headboard at the back
+    mb.bevel_box((-w * 0.46, d * 0.43, 0.15), (w * 0.46, d * 0.48, h * 0.55), wood, radius=edge)
+    # Mattress and blanket: well rounded, as stuffed cloth is.
+    mb.bevel_box((-w * 0.42, -d * 0.42, 0.32), (w * 0.42, d * 0.42, 0.45), "prop:cloth", radius=0.05, segments=2)
+    mb.bevel_box((-w * 0.43, -d * 0.1, 0.33), (w * 0.43, d * 0.43, 0.48), "prop:red_cloth", radius=0.04, segments=2)
     mb.sphere((0, -d * 0.3, 0.5), 0.2, "prop:cloth", subdivisions=1, scale=(1.6, 0.9, 0.45))
 
 
@@ -171,5 +245,5 @@ def rail(mb: MeshBuilder, p, rng):
 GENERATORS = {
     "table": table, "workbench": workbench, "furnace": furnace, "anvil": anvil, "sawmill": sawmill, "loom": loom,
     "bottle": bottle, "chair": chair, "door": door, "chest": chest, "torch": torch, "candle": candle, "bed": bed,
-    "rail": rail,
+    "rail": rail, "piggy_bank": piggy_bank, "safe": safe,
 }

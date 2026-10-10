@@ -1,0 +1,49 @@
+{
+ "id": "P3-27",
+ "title": "Per-item SoundSet, synthesised missing SFX, SFX voice pool with stealing",
+ "player_outcome": "Weapons are recognisable by ear: shotguns boom, snipers crack, staffs zap, crystals chime, food crunches, bombs and knives whoosh when thrown, empty guns click. Sounds are no longer dropped silently when many play at once.",
+ "design": [
+  "Verified: ItemDef.SoundSet (ItemDef.cs:118) is never read. ShotSound falls back to 'swing' for throws. Sfx.Free returns null when 12 players are busy (Sfx.cs:63-68). sfx_recipes.py is 334 lines.",
+  "SoundEvents.OnUsed: play item.SoundSet when Sfx.Has(it); otherwise use family rules by ItemUseInfo.Style: gun \u2192 gun/gun_heavy; bow \u2192 bow; staff/tome \u2192 magic/magic_heavy; throw \u2192 throw; whip \u2192 whip_swing; yoyo \u2192 yoyo_throw; flail \u2192 flail_spin; eat \u2192 eat; drink \u2192 potion/mana; holdUp \u2192 summon/crystal. Dry fire \u2192 dry_fire; NoMana \u2192 fizzle.",
+  "Sfx: pool 24 2D + 24 3D; per-id max voices (3) with oldest-voice stealing; skip 3D sounds beyond MaxDistance.",
+  "tools/audio: split sfx_recipes.py \u2192 sfx_recipes.py (core/material) + new sfx_recipes_items.py merged into RECIPES.",
+  "New recipes: tink, eat, crystal, mana_crystal, shotgun, sniper, laser, staff_bolt, water_bolt, throw, whip_swing, whip_crack, yoyo_throw, flail_spin, chain, hit_metal, hit_spirit, hit_chitin, death_bone, death_metal, death_spirit, death_chitin, pot_shatter, tree_fall, arrow_hit, dry_fire, fizzle, star_fall, star_land, heart_pickup, mana_star_pickup, bag_open, piggy_bank, sleep_snore.",
+  "build_audio.py --check also scans data JSON soundSet/hitSound/deathSound and data/config/creature_materials.json.",
+  "ContentValidator: soundSet/hitSound/deathSound must resolve to assets/audio/sfx/<id>.wav or <id>_1.wav (ctx.Asset-style check), so CI catches typos without numpy.",
+  "Generate the wavs (/root/bpyenv/bin/python tools/audio/build_audio.py --sfx --only=<ids>), run the Godot import, and commit wav + .import."
+ ],
+ "files_modify": [
+  "game/Audio/SoundEvents.cs \u2014 SoundSet first; style families; dry fire",
+  "game/Audio/Sfx.cs \u2014 pool size, voice limits, stealing",
+  "tools/audio/sfx_recipes.py \u2014 core recipes only; import items recipes",
+  "tools/audio/build_audio.py \u2014 --check scans data",
+  "src/Strata.Core/Content/Validation/ContentValidator.Items.cs \u2014 sound asset check",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 enemy hit/death sound check",
+  "data/items/*.json \u2014 soundSet on families"
+ ],
+ "files_add": [
+  "tools/audio/sfx_recipes_items.py \u2014 item/creature/feel recipes",
+  "assets/audio/sfx/<new ids>.wav \u2014 generated sounds"
+ ],
+ "data_changes": [
+  "soundSet: boomstick, shotgun, tactical_shotgun \u2192 'shotgun'; sniper_rifle \u2192 'sniper'; space_gun, laser_rifle, laser_machinegun \u2192 'laser'; water_bolt \u2192 'water_bolt'; gem staffs \u2192 'staff_bolt'",
+  "soundSet: life_crystal, life_fruit \u2192 'crystal'; mana_crystal \u2192 'mana_crystal'; star_cannon \u2192 'star_fall'"
+ ],
+ "tests": [
+  "ContentValidatorTests: an unknown soundSet \u2192 error",
+  "python tools/audio/build_audio.py --check \u2192 0 missing",
+  "Smoke: all .cmds PASS with errors == 0 (no audio load errors)"
+ ],
+ "verification": [
+  "The 'audio test' engine command plays each new id",
+  "Listen pass on a lavapipe or desktop build"
+ ],
+ "depends_on": [
+  "P3-02"
+ ],
+ "risks": [
+  "Later WPs add recipes to sfx_recipes_items.py; serialise edits or append-only sections per WP.",
+  "build_audio needs scipy/soundfile (bpy venv); CI does not run it, so the validator check covers references."
+ ],
+ "effort": "M"
+}

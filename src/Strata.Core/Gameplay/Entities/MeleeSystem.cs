@@ -7,11 +7,12 @@ using Strata.Core.Session;
 namespace Strata.Core.Gameplay.Entities;
 
 /// <summary>
-/// Resolves melee swings and thrusts over their use animation: the blade sweeps a horizontal arc in front of the
-/// player from right to left as the swing strikes (or stabs along the aim as the thrust drives out), nothing connects
-/// in the wind-up or the follow-through, and each creature is hit at most once per swing.
+/// Resolves melee swings and thrusts over their use animation: after the clip's wind-up the blade sweeps the overhead
+/// arc of <see cref="SwingCurve.Blade"/> in its <see cref="SwingPlane"/> through the strike window and follow-through
+/// (or stabs along the aim while a thrust is extended, MeleeSystem.Curve), and each creature is hit at most once per
+/// swing. Windows come from <see cref="Interaction.ItemUseSystem.Timing"/>.
 /// </summary>
-public sealed class MeleeSystem
+public sealed partial class MeleeSystem
 {
     private sealed class Swing
     {
@@ -24,6 +25,9 @@ public sealed class MeleeSystem
         /// <summary>The swung stack (its prefix changes damage, crit, knockback and reach).</summary>
         public required Items.ItemStack Stack { get; init; }
         public int Tick;
+
+        /// <summary>The blade angle (degrees, curve value) the last hit test swept to.</summary>
+        public float LastDeg = float.NaN;
         public readonly HashSet<long> Hit = new();
     }
 
@@ -31,11 +35,13 @@ public sealed class MeleeSystem
     public const float VerticalReach = 1.4f;
 
     private readonly NpcSystem _npcs;
+    private readonly Interaction.ItemUseSystem _uses;
     private readonly List<Swing> _active = new();
 
     public MeleeSystem(NpcSystem npcs, Interaction.ItemUseSystem uses)
     {
         _npcs = npcs;
+        _uses = uses;
         uses.Swung += Start;
     }
 
@@ -43,14 +49,17 @@ public sealed class MeleeSystem
 
     private void Start(PlayerEntity player, ItemUseInfo info)
     {
+        // The arc is centred on where the player looks; the aim (eye to crosshair point) bends sideways towards
+        // close targets off the shoulder camera, so it only sets the pitch.
         var aim = player.Aim;
+        var facing = player.Facing;
         _active.RemoveAll(s => s.Player == player);
         _active.Add(new Swing
         {
             Player = player,
             Item = info,
-            Duration = Math.Max(2, info.Item.UseAnimation),
-            Yaw = MathF.Atan2(aim.X, aim.Z),
+            Duration = Math.Max(2, player.UseAnimationMax), // the animation after speed bonuses
+            Yaw = MathF.Atan2(facing.X, facing.Z),
             Pitch = MathF.Asin(Math.Clamp(aim.Y, -1f, 1f)),
             Stack = player.State.Inventory.Held.Item == info.Item ? player.State.Inventory.Held : new Items.ItemStack(info.Item, 1),
         });
@@ -58,88 +67,31 @@ public sealed class MeleeSystem
 
     public void Tick()
     {
+        var timing = _uses.Timing;
         for (int i = _active.Count - 1; i >= 0; i--)
         {
             var s = _active[i];
             s.Tick++;
-            float t0 = (s.Tick - 1) / (float)s.Duration, t = s.Tick / (float)s.Duration;
-            foreach (var npc in _npcs.All.ToList())
-            {
-                if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
-                if (!npc.Volumes().Any(v => Connects(s, (v.Min + v.Max) * 0.5f, (v.Max - v.Min) * 0.5f, t0, t))) continue;
-                var item = s.Item.Item;
-                if (_npcs.Hit(npc, s.Player, Items.Prefixes.Damage(s.Stack), item.DamageType, Items.Prefixes.Crit(s.Stack) + Combat.DamageModel.BaseCritChance,
-                        Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true))
-                    s.Hit.Add(npc.Id);
-            }
+            float t = s.Tick / (float)s.Duration;
+            Strike(s, timing, (s.Tick - 1) / (float)s.Duration, t);
             if (s.Tick >= s.Duration) _active.RemoveAt(i);
         }
     }
 
-    /// <summary>How far off the aim line a thrust still connects (m): generous, since aiming a short blade at a circling
-    /// flyer in 3D is much harder than in the reference game's side view.</summary>
-    public const float ThrustTolerance = 0.7f;
-
-    /// <summary>Whether a creature's box (<paramref name="center"/>, <paramref name="half"/> extents) is struck during the
-    /// tick that took the use animation from <paramref name="t0"/> to <paramref name="t"/>: only while the blade strikes
-    /// (or the thrust drives out), never in the wind-up or the follow-through.</summary>
-    private static bool Connects(Swing s, Vector3 center, Vector3 half, float t0, float t)
+    private void HitCreatures(Swing s, Func<Vector3, Vector3, bool> connects)
     {
-        var origin = s.Player.Center + new Vector3(0, 0.3f, 0);
-        var to = center - origin;
-        float radius = MathF.Max(half.X, half.Y);
-        if (s.Item.Has(ItemAction.Thrust))
+        foreach (var npc in _npcs.All.ToList())
         {
-            if (t < ThrustStart || t0 > ThrustEnd) return false;
-            float length = s.Item.ThrustParams!.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.4f;
-            var dir = new Vector3(MathF.Sin(s.Yaw) * MathF.Cos(s.Pitch), MathF.Sin(s.Pitch), MathF.Cos(s.Yaw) * MathF.Cos(s.Pitch));
-            float along = Vector3.Dot(to, dir);
-            if (along < 0 || along > length + radius) return false;
-            return (to - dir * along).Length() <= radius + ThrustTolerance;
+            if (!npc.Alive || s.Hit.Contains(npc.Id)) continue;
+            int volume = npc.FirstVolume(connects);
+            if (volume < 0) continue;
+            var item = s.Item.Item;
+            if (_npcs.Hit(npc, s.Player, Items.Prefixes.Damage(s.Stack), item.DamageType, Items.Prefixes.Crit(s.Stack) + Combat.DamageModel.BaseCritChance,
+                    Items.Prefixes.Knockback(s.Stack), s.Player.Center, melee: true, segment: volume - 1))
+            {
+                s.Hit.Add(npc.Id);
+                LastHit = new MeleeHit(npc.Id, _hitDeg, Vector3.Distance(_hitPivot, npc.Center));
+            }
         }
-        var (start, end) = s.Item.IsTool ? (ChopStart, ChopEnd) : (StrikeStart, StrikeEnd);
-        if (t < start || t0 > end) return false;
-        var swing = s.Item.Swing!;
-        float reach = swing.Length * Items.Prefixes.Size(s.Stack) * Units.CellSize + 0.6f;
-        var flat = new Vector3(to.X, 0, to.Z);
-        if (flat.Length() > reach + radius) return false;
-        float aimPlaneY = MathF.Tan(s.Pitch) * flat.Length();
-        if (MathF.Abs(to.Y - aimPlaneY) > VerticalReach + half.Y) return false;
-        if (flat.Length() < 0.6f) return true; // point blank
-        // The blade sweeps from −arc/2 (the player's right) to +arc/2 (their left) around the aim yaw as it strikes.
-        float halfArc = swing.Arc * MathF.PI / 360f;
-        float current = -halfArc + SweepProgress(t, start, end) * 2f * halfArc;
-        float angle = WrapAngle(BrainFactory.YawOf(flat) - s.Yaw);
-        return angle >= -halfArc && angle <= current + 0.25f;
-    }
-
-    /// <summary>
-    /// How far through its arc a swing is at <paramref name="t"/> (0..1 of the use animation): none during the wind-up,
-    /// all of it by the follow-through, in step with the human swing and chop actions, which strike from over the right
-    /// shoulder down across to the left in that window (tools/blender/bgen/human/actions.py).
-    /// </summary>
-    public static float SweepProgress(float t) => SweepProgress(t, StrikeStart, StrikeEnd);
-
-    private static float SweepProgress(float t, float start, float end)
-    {
-        float u = Math.Clamp((t - start) / (end - start), 0f, 1f);
-        return u * u * (3f - 2f * u);
-    }
-
-    /// <summary>The part of the use animation (fractions) in which a swing's blade crosses in front of the player.</summary>
-    public const float StrikeStart = 0.36f, StrikeEnd = 0.56f;
-
-    /// <summary>The part of the use animation (fractions) in which a thrust drives out from drawn back to full reach.</summary>
-    public const float ThrustStart = 0.33f, ThrustEnd = 0.52f;
-
-    /// <summary>The part of the use animation (fractions) in which a tool comes down from over the shoulder to land
-    /// (the human mine action, which chops with every tool).</summary>
-    public const float ChopStart = 0.3f, ChopEnd = 0.48f;
-
-    private static float WrapAngle(float a)
-    {
-        while (a > MathF.PI) a -= MathF.Tau;
-        while (a < -MathF.PI) a += MathF.Tau;
-        return a;
     }
 }

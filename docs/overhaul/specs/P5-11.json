@@ -1,0 +1,47 @@
+{
+ "id": "P5-11",
+ "title": "Seating and night routine: residents sit in chairs and sleep in beds",
+ "player_outcome": "At night, residents walk home, sit in their room's chair and later lie down in a bed if there is one. In the morning they get up and wander.",
+ "design": [
+  "Core: TownNpc.Seat (long? tile object id) and Posture (from P5-08). New TownSystem.Seating.cs: UpdateSeat(r) is called from Decide. At night, when a housed resident reaches home (distance < 0.5 m) and is not talking or under threat, take a free chair, then after 22:00 a bed. The room's Furniture comes from Rooms.Get(home) (housing role 'chair'; 'bed' needs a bed with a 'bed' housing role). By day, idle at home, sit with a 30% chance for IdleTicks.",
+  "Path to the chair: NearestStandable next to the chair's anchor \u2192 GoTo. On arrival snap Position to SeatPoint(chair) = anchor centre + SeatHeight (a new TileObjectDef.SeatHeight in cells, default 1; beds use BedHeight), set Yaw from the chair's rotation quarter, and set Posture Sit or Sleep.",
+  "Stand up (Posture Stand, Seat null, nudge to a standable node): at hour \u2265 5.5 plus a random delay, on BeginTalk (then face the player), when TickDefense finds a threat, or when TileObjects.Removed hits the seat id. Two residents never share a chair (a HashSet of taken seat ids, rebuilt per scan).",
+  "Renderer: Sit and Sleep postures are already mapped (P5-08). The seat height is in Core Position, so the renderer only uses the yaw.",
+  "TownProbes: town.<id>.sitting (1 when Sit or Sleep)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 Seat",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Movement.cs \u2014 Decide calls UpdateSeat; Steer is zero while seated",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Movement.cs BeginTalk \u2014 stand up",
+  "src/Strata.Core/Content/Defs/TileObjectDef.cs \u2014 SeatHeight, BedHeight",
+  "src/Strata.Core/Commands/TownProbes.cs \u2014 .sitting",
+  "data/tileobjects/furniture.json \u2014 seatHeight/bedHeight for chair/bed where the default is wrong"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownSystem.Seating.cs \u2014 chair/bed selection and posture"
+ ],
+ "data_changes": [
+  "furniture.json: wooden_chair seatHeight, bed bedHeight (verify against the models)"
+ ],
+ "tests": [
+  "SeatingTests.SitsInChairAtNight: TestHouses.Build, housed guide, SetHour(21) \u2192 within 1200 ticks Posture == Sit and within 0.3 m of the chair seat",
+  "SeatingTests.StandsUpInTheMorning",
+  "SeatingTests.StandsWhenChairRemoved",
+  "SeatingTests.SleepsInBedAfter22 (house with a bed)",
+  "Smoke town.cmds after the 'walks home at night' block: 'wait_until town.guide.sitting == 1 30'"
+ ],
+ "verification": [
+  "dotnet test",
+  "town.cmds SMOKE PASS",
+  "In game at night: residents are seated in their chairs facing out, with feet on the floor and no hovering (tune SeatHeight)"
+ ],
+ "depends_on": [
+  "P5-02",
+  "P5-07",
+  "P5-08"
+ ],
+ "risks": [
+  "Chair model pivots may not match SeatHeight, leaving residents floating; check with a screenshot tour."
+ ],
+ "effort": "M"
+}

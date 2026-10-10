@@ -1,0 +1,41 @@
+{
+ "id": "P2-14",
+ "title": "Buff bar: icons with timers, hover names, right-click to cancel",
+ "player_outcome": "Active buffs show as rows of 32 px icons under the hotbar, with timers like '4 m' or '30 s'. Placed-furniture buffs show no timer, and icons blink before expiring. With the inventory open, hovering shows the name and effect, and right-clicking removes a buff, but never a debuff.",
+ "design": [
+  "Core: `BuffSet.TryCancel(string id)` returns false when !BuffDisplay.CanCancel(def), otherwise removes the buff and raises Changed. The caller then calls PlayerState.Recompute.",
+  "New game/UI/Hud/BuffBar.cs: an HFlowContainer in the Buffs rect holding pooled BuffIconView nodes (up to 44). It rebinds only when BuffSet.Changed fires or the count changes.",
+  "New game/UI/Hud/BuffIconView.cs (Control, 32\u00d746):\n- Draws StatusIcons.Get(def) at 32 px.\n- The timer below uses Core BuffDisplay.Timer, is hidden when !ShowsTimer, and its text is rebuilt only when the whole number of seconds changes.\n- In the last 5 s the alpha pulses.\n- MouseFilter is Stop only while the mouse is free (InputGate.MouseFree), so it never eats clicks during play.\n- Hover shows TooltipFollower text: name, plus Description or BuffText.Describe.\n- Right-click calls TryCancel, Recompute and the ui_click sound.",
+  "Remove Hud.UpdateBuffs (Hud.cs:249-267), which re-applied a colour override to every label every frame.",
+  "UiCommands gains `ui buff cancel <id>`, which goes through the same view handler. UiProbes gains `hud.buffs`."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Buffs/BuffSet.cs \u2014 TryCancel",
+  "game/UI/Hud.cs \u2014 BuffBar in place of the chip row",
+  "game/Debug/UiCommands.cs \u2014 ui buff cancel",
+  "game/Debug/UiProbes.cs \u2014 hud.buffs"
+ ],
+ "files_add": [
+  "game/UI/Hud/BuffBar.cs",
+  "game/UI/Hud/BuffIconView.cs",
+  "tests/Strata.Core.Tests/Gameplay/BuffCancelTests.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "BuffCancelTests: CancelRemovesBuffAndRecomputes (ironskin: defense returns to base); DebuffsAndPersistentBuffsCannotBeCancelled",
+  "ui.cmds:\n- `give swiftness_potion 1` / `wield swiftness_potion` / `use` / `wait 0.3` / `assert buff.swiftness == 1` / `assert hud.buffs >= 1`.\n- `ui buff cancel swiftness` / `assert buff.swiftness == 0`.\n- `give lesser_healing_potion 1` / `wield lesser_healing_potion` / `use` / `wait 0.3` / `ui buff cancel potion_sickness` / `assert buff.potion_sickness == 1`."
+ ],
+ "verification": [
+  "Headless ui.cmds SMOKE PASS",
+  "Lavapipe screenshot with 3 potions active: icons under the hotbar, timers readable, nothing over the FPS or info text"
+ ],
+ "depends_on": [
+  "P2-03",
+  "P2-04",
+  "P2-12"
+ ],
+ "risks": [
+  "The status-visual buffs from the feel phase (flames on the player) are separate; this WP only touches the HUD."
+ ],
+ "effort": "S"
+}

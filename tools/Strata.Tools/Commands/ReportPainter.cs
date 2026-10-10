@@ -125,7 +125,7 @@ internal sealed class ReportPainter
         return (c.R, c.G, c.B);
     }
 
-    private static (byte R, byte G, byte B) Parse(string hex) =>
+    internal static (byte R, byte G, byte B) Parse(string hex) =>
         (byte.Parse(hex.AsSpan(1, 2), NumberStyles.HexNumber), byte.Parse(hex.AsSpan(3, 2), NumberStyles.HexNumber), byte.Parse(hex.AsSpan(5, 2), NumberStyles.HexNumber));
 
     private sealed class Image

@@ -1,0 +1,38 @@
+{
+ "id": "P2-16",
+ "title": "Equipment column: armor, vanity and dye; 5\u20137 accessories with visibility toggles; Misc tab (pet, light pet, minecart, mount, hook); defense shield",
+ "player_outcome": "The right-hand column matches Terraria:\n- Dye | Vanity | Equip columns for helmet, shirt and pants, then 5 accessory rows (6 in Expert, 7 in Master), each with faint silhouettes and an eye toggle.\n- A shield badge shows your defense, with the set bonus on hover.\n- A Misc tab holds pet, light pet, minecart, mount and hook slots with their dyes.",
+ "design": [
+  "New game/UI/Inventory/EquipmentPanel.cs in the Equipment rect.\n- A tab row of TextureButtons: tab_equipment and tab_misc, plus a disabled Housing tab placeholder for the NPC phase.\n- The page container swaps between the two pages.",
+  "Equipment page: a 3-column grid (Dye | Vanity | Equip), each 44 \u00b7 SlotScale.\n- Rows: 3 armor rows plus AccessorySlotsUnlocked accessory rows. Locked rows 6\u20137 are hidden unless occupied; an occupied locked row shows with SlotKind.Locked.\n- Kinds: SlotKind.Dye, Vanity and Equip. Empty hints: slot_head, slot_body, slot_legs, slot_accessory, slot_dye.\n- Empty-slot hover text (TooltipFollower text mode): 'Helmet', 'Shirt', 'Pants', 'Accessory', 'Social Helmet', 'Dye'.\n- An eye TextureButton per accessory row toggles the PlayerInventory.HiddenAccessories bit. The avatar reading this bit is P3 or art work.",
+  "Misc page: 5 rows (Pet, Light Pet, Minecart, Mount, Hook) \u00d7 (Dye | Item), with silhouettes and filters from SlotFilters.",
+  "New game/UI/Inventory/DefenseBadge.cs: the shield sprite (36 px) with the defense number (16 px, outlined) centred, left of the column. Hover shows '{n} Defense' and the active set bonus. This replaces the _defense and _setBonus labels.",
+  "Clicks route through InventoryScreen.Clicks using the SlotAreas VanityArmor, VanityAccessories, Dyes, Misc and MiscDyes. Core recomputes stats (P2-05)."
+ ],
+ "files_modify": [
+  "game/UI/InventoryScreen.Layout.cs \u2014 host the EquipmentPanel; accessory rows feed UiState.AccessoryRows",
+  "game/UI/InventoryScreen.Clicks.cs \u2014 new areas"
+ ],
+ "files_add": [
+  "game/UI/Inventory/EquipmentPanel.cs \u2014 tabs and pages",
+  "game/UI/Inventory/EquipmentPanel.Misc.cs \u2014 misc page",
+  "game/UI/Inventory/DefenseBadge.cs \u2014 shield with number"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds:\n- `give iron_helmet 1` / `ui inventory` / `invclick backpack <slot> right` / `assert player.defense > 0`.\n- `invclick armor 0 right` (swaps to vanity) / `assert player.defense == 0`.\n- `give grappling_hook 1` / `invclick backpack <slot> right` / `assert inv.grappling_hook == 0` / `ui close`."
+ ],
+ "verification": [
+  "Headless ui.cmds SMOKE PASS",
+  "Lavapipe screenshot of an Expert world inventory: 6 accessory rows, silhouettes, shield badge; Misc tab screenshot"
+ ],
+ "depends_on": [
+  "P2-05",
+  "P2-07",
+  "P2-15"
+ ],
+ "risks": [
+  "Vanity and dye items do not exist yet (0 in data). The slots are ready for P3's items; until then they only accept armor used as vanity."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,54 @@
+{
+ "id": "P4-05",
+ "title": "Natural boss arrivals: 'You feel an evil presence\u2026', slime rain ends in King Slime, rare surface King Slime, mechanical warnings",
+ "player_outcome": "Without any summon, a ready player may hear 'You feel an evil presence watching you...' at nightfall before the Eye arrives. Slime Rain ends with King Slime after 150 kills (75 once he is beaten). King Slime can rarely wander in on the outer surface. In hardmode, nights may open with 'This is going to be a terrible night...' and similar warnings.",
+ "design": [
+  "EventDef additions (src/Strata.Core/Content/Defs/EventDef.cs): SpawnBoss (enemy id), KillGoalAfterFlag {Flag, Goal} and Group (string; at most one event per group starts per roll).",
+  "For SpawnBoss events, Duration is the countdown. When TicksLeft reaches 0, EventDirector spawns the boss near the LocalPlayer instead of ending with an end message.",
+  "EventDirector.Tick: on a SpawnBoss countdown hitting 0, if no creature of that id lives and its boss flag is unset, spawn it. Fliers go 20 m away and 12 m up along the player's facing; ground bosses 12 m up so they fall in. Then end the event silently. The state persists through the existing EventStateModel (TicksLeft).",
+  "EventDirector.Roll: set ctx.PlayerDefense (max over players, as PlayerMaxLife is set) and skip events whose Group already started this roll.",
+  "EventDirector.OnKilled: the effective goal is KillGoalAfterFlag.Goal when that flag is set.",
+  "ConditionContext.CentreDistance: 0 at the world centre and 1 at LandRadius, computed in WorldSession.ContextAt from cell X/Z and plan size. Add a 'worldRing' {min, max} condition.",
+  "Validator: SpawnBoss must be a non-minor boss; SpawnBoss events need Duration > 0 and no KillGoal; Group is a string."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/EventDef.cs \u2014 SpawnBoss, KillGoalAfterFlag, Group",
+  "src/Strata.Core/Gameplay/Events/EventDirector.cs \u2014 countdown spawn, goal override, groups, PlayerDefense",
+  "src/Strata.Core/Conditions/ConditionCompiler.cs \u2014 worldRing",
+  "src/Strata.Core/Conditions/ConditionContext.cs \u2014 CentreDistance",
+  "src/Strata.Core/Session/WorldSession.Context.cs \u2014 fill CentreDistance",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 event checks",
+  "data/events.json \u2014 new events and slime rain",
+  "data/enemies/bosses.json \u2014 natural King Slime spawn rule"
+ ],
+ "files_add": [],
+ "data_changes": [
+  "data/events.json 'evil_presence': phase night, chance 0.33, conditions [flag defeated_eye_of_cthulhu set false, maxLife min 200, defense min 10], startMessage 'You feel an evil presence watching you...', duration 600, spawnBoss eye_of_cthulhu.",
+  "data/events.json, three mechanical warnings with group 'mech_night', chance 0.1 each, conditions [flag hardmode, flag smashed_altar_1, flag defeated_<boss> set false]:",
+  "  'mech_twins_night': 'This is going to be a terrible night...', spawnBoss retinazer.",
+  "  'mech_destroyer_night': 'You feel vibrations from deep below...', spawnBoss the_destroyer.",
+  "  'mech_prime_night': 'The air is getting colder around you...', spawnBoss skeletron_prime.",
+  "slime_rain: killGoal 150, killGoalAfterFlag {flag defeated_king_slime, goal 75}, finaleEnemy king_slime.",
+  "New spawn rule 'king_slime_natural' in data/enemies/bosses.json: enemy king_slime, weight 0.004, maxAlive 1, conditions [layer surface, worldRing min 0.66, flag defeated_king_slime set false]."
+ ],
+ "tests": [
+  "EventTests.EvilPresenceCallsTheEyeAfterItsCountdown: Start(evil_presence); after 600 ticks npcs.eye_of_cthulhu == 1; the message is announced once.",
+  "EventTests.EvilPresenceNeedsLifeDefenseAndAnUndefeatedEye: conditions evaluated with ConditionContext values.",
+  "EventTests.SlimeRainEndsWithKingSlime: kill 150 gel-tagged creatures; king_slime spawns. With defeated_king_slime set, 75 kills suffice.",
+  "EventTests.OnlyOneMechanicalWarningPerNight: forced Roll with chance 1.",
+  "ConditionTests.WorldRingMeasuresDistanceFromTheCentre.",
+  "Smoke events.cmds: 'event evil_presence', 'wait_until npcs.eye_of_cthulhu == 1 15', 'killall', 'event stop slime_rain'."
+ ],
+ "verification": [
+  "dotnet test; validate; smoke events.cmds prints SMOKE PASS",
+  "Manual: new Tiny world, 'give life_crystal 5', equip armour to 10 defense, 'time 19.4', wait for dusk; message and Eye within 10 s when the roll hits. Force it with 'event evil_presence'."
+ ],
+ "depends_on": [
+  "P4-01"
+ ],
+ "risks": [
+  "The Eye arriving at dusk every third night may annoy players. The chance is data (0.33 is Terraria's); the player can tune it.",
+  "The UI phase's invasion bar reads KillGoal and must use the effective goal. Expose EventDirector.GoalOf(ActiveEvent)."
+ ],
+ "effort": "M"
+}

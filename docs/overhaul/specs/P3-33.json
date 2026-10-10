@@ -1,0 +1,52 @@
+{
+ "id": "P3-33",
+ "title": "Quick heal / quick mana / quick buff keys and Life Fruit gating",
+ "player_outcome": "H drinks your best healing potion, J your best mana potion and B every buff potion you're not already under, without changing your held item, just like Terraria. Life Fruit only works once you've reached 400 max life.",
+ "design": [
+  "Verified: input.json has no quick_* actions; Life Fruit only caps at 500 (data/items/alchemy.json:56).",
+  "input.json: quick_heal key:H, quick_mana key:J, quick_buff key:B (listed for rebinding).",
+  "New ItemUseSystem.Quick.cs, QuickHeal(p): among backpack stacks with HealLife, pick the smallest heal \u2265 missing life, else the largest. Respect potion sickness; Consume that slot via a slot-aware ConsumeAt(p, inventory, slot).",
+  "QuickMana(p): same idea over HealMana. QuickBuff(p): every stack with a Buff not already active and not food-conflicting (well_fed family), consumed once each.",
+  "Each quick use sets PlayerEntity.LastUsedItem + UseSerial++ with a short animation, so PlayerAvatar plays the drink action for that item.",
+  "InteractionController handles the three actions, calls the Quick methods and raises Used for sounds.",
+  "ConsumeParams.RequiresLife (int): Consume returns Blocked with Refused('Requires 400 maximum life') when BaseLife + BonusLife < RequiresLife.",
+  "Data: life_fruit gets requiresLife 400. Potions and boss summons get maxStack 9999 (1.4.4).",
+  "CombatCommands 'hurt <amount>' for scripts (DamageDirect + report)."
+ ],
+ "files_modify": [
+  "data/config/input.json \u2014 quick keys",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Consume.cs \u2014 ConsumeAt, RequiresLife",
+  "src/Strata.Core/Content/Specs/ItemBehaviorSpecs.cs \u2014 ConsumeParams.RequiresLife",
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 LastUsedItem",
+  "game/Player/InteractionController.cs \u2014 quick actions",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 action for LastUsedItem",
+  "src/Strata.Core/Commands/CombatCommands.cs \u2014 hurt command",
+  "data/items/alchemy.json, consumables.json \u2014 requiresLife; maxStack 9999"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.Quick.cs \u2014 quick heal/mana/buff",
+  "tests/Strata.Core.Tests/Gameplay/QuickUseTests.cs \u2014 quick-use tests"
+ ],
+ "data_changes": [
+  "life_fruit consume.requiresLife 400",
+  "maxStack 9999 on potions, boss summons, life/mana crystals (verify current values per item)"
+ ],
+ "tests": [
+  "QuickUseTests: with lesser/healing/greater potions and 60 missing life, QuickHeal picks the healing potion; the selected hotbar slot is unchanged; blocked while potion sickness is active",
+  "QuickUseTests: QuickBuff applies two different buff potions once each",
+  "QuickUseTests: life_fruit is Blocked at 100 max life and works at 400",
+  "Smoke basic.cmds: 'give lesser_healing_potion 2' / 'hurt 50' / 'press quick_heal on' / 'wait 0.1' / 'press quick_heal off' / 'wait 0.3' / 'assert player.life > 50'"
+ ],
+ "verification": [
+  "dotnet test; smoke PASS"
+ ],
+ "depends_on": [
+  "P3-01",
+  "P3-02"
+ ],
+ "risks": [
+  "H/J/B may conflict with P2 bindings (housing menu, etc.); confirm the input plan.",
+  "InteractionController overlap with P1/P2."
+ ],
+ "effort": "S"
+}

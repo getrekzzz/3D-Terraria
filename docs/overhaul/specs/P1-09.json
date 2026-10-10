@@ -1,0 +1,48 @@
+{
+ "id": "P1-09",
+ "title": "Engine hooks: controller on the Core hook, claw snapped to the rendered surface, natural-terrain smoke",
+ "player_outcome": "Hooks feel reliable everywhere: the claw sits on the visible rock, not floating or sunk. Reeling in no longer drops you on natural terrain. Clicking or F both throw, and jumping lets go.",
+ "design": [
+  "PlayerController.Grapple.cs: delete the physics-ray FireHook and local hook state (_hook, _hookTarget, _hookHit) and the BestHook helper.",
+  "F key: if Entity.Hook.State is Flying or Attached, Release(); otherwise Entity.Hook.Fire(world, GrappleHook.Best(Entity.State, Uses, out item), Entity.Hand, Entity.Eye, Entity.Aim).",
+  "UpdateGrapple: when Entity.Hook.State == Attached, v = Entity.Hook.PullVelocity(GlobalPosition + Up*0.9); jump releases and gives v.Y = Max(v.Y, JumpSpeed); keep RefillAirMovement and _peakY, and return true.",
+  "Keep Hook/HookHead/HookColor as pass-through properties for GrappleVisual and PlayerController.Sound (grapple sound on Flying).",
+  "PlayerController.Teleport: Entity.Hook.Release().",
+  "GrappleVisual: on the first frame of each attachment, cast one physics ray from Target + normal*0.6 to Target - normal*0.6 on Terrain|Object|Platform layers. Cache the snapped point and draw the claw there, falling back to Target.",
+  "GrappleVisual: draw from _player.HandPosition. Emit the six Diamond vertices directly instead of allocating new[] per quad (up to 400 allocations per frame today).",
+  "EditCommands fill: optional 8th argument 'natural' writes CellFlags.None, so blocks mesh smooth like generated terrain. Today the smoke slab is PlayerPlaced and therefore crisp, which is why it passed while real terrain failed.",
+  "movement.cmds: keep the crisp-slab F test and add the click, natural, platform and break cases listed in tests.",
+  "docs/architecture/gameplay.md: hooks paragraph (click or F, latch rules)."
+ ],
+ "files_modify": [
+  "game/Player/PlayerController.Grapple.cs \u2014 drive the Core hook",
+  "game/Player/PlayerController.cs \u2014 release hook on Teleport",
+  "game/Player/GrappleVisual.cs \u2014 surface snap, no per-quad allocation, entity hook",
+  "game/Player/PlayerController.Sound.cs \u2014 read the pass-through state (unchanged semantics)",
+  "src/Strata.Core/Commands/EditCommands.cs \u2014 fill ... natural",
+  "game/Testing/Scripts/movement.cmds \u2014 click/natural/platform/break cases",
+  "docs/architecture/gameplay.md \u2014 hooks"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "movement.cmds click-to-use: 'wield grappling_hook' / 'aim 0 1 0' / 'hold use_primary 0.05' / 'wait 0.2' / 'assert player.hook >= 1' / 'wait 1.5' / 'assert player.hook == 2' / 'hold jump 0.05' / 'wait 2.5' / 'assert player.on_floor == 1'",
+  "movement.cmds natural ceiling: 'fill -4 16 -4 4 17 4 air' / 'fill -5 14 -5 5 15 5 stone natural' / 'fill -3 13 -3 3 13 3 stone natural' / 'fill -1 12 -1 1 12 1 stone natural' / 'wait 1.0' / 'mark' / 'aim 0.35 1 0.2' / 'hold grapple 0.05' / 'wait 1.8' / 'assert player.hook == 2' / 'wait 1.0' / 'assert player.hook == 2' / 'assert player.from_mark > 3'",
+  "movement.cmds break: 'fill -5 12 -5 5 15 5 air' / 'wait 0.3' / 'assert player.hook != 2' / 'wait 2.5' / 'assert player.on_floor == 1'",
+  "movement.cmds platform: 'setblock 0 12 0 wood platform' / 'setblock 1 12 0 wood platform' / 'setblock 0 12 1 wood platform' / 'wait 0.5' / 'aim 0 1 0' / 'hold grapple 0.05' / 'wait 1.5' / 'assert player.hook == 2' / 'hold jump 0.05' / 'wait 2.5'",
+  "The rocket boots and dash sections stay unchanged"
+ ],
+ "verification": [
+  "Headless smoke movement.cmds prints SMOKE PASS",
+  "Manual in a real generated cave (tp cave underground) and on a hillside: hooks latch to the ceiling, walls and a tree; the claw sits on the visible surface; reeling to a slope does not drop",
+  "dotnet test (EditCommands fill still passes CommandTests)"
+ ],
+ "depends_on": [
+  "P1-08"
+ ],
+ "risks": [
+  "If the snap ray misses (thin geometry), the claw may float by up to 0.25 m; the fallback to the voxel hit point is acceptable.",
+  "Movement collision while reeling into a slope may jitter; keep the 1.1 m hang distance and tune Pull if needed."
+ ],
+ "effort": "M"
+}

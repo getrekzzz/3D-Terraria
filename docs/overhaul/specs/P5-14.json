@@ -1,0 +1,58 @@
+{
+ "id": "P5-14",
+ "title": "Guide crafting help: item slot \u2192 every recipe with ingredients and named stations",
+ "player_outcome": "Talking to the Guide and pressing 'Crafting' opens your inventory and a Guide slot. Put any item in it to see every recipe it is used in, each with ingredient icons and counts and 'Required objects: Iron Anvil or Lead Anvil'. Raw station ids no longer appear.",
+ "design": [
+  "Verified: TownDialog.CraftHelp (TownDialog.cs:174-187) prints one text line with raw station ids, and TownCommerce.RecipesUsing linearly scans every recipe (TownCommerce.cs:191-195) even though RecipeBook has indexes (RecipeBook.cs:38-40).",
+  "Core StationNames (Content/Index/StationNames.cs): For(station) \u2192 the display names of every TileObjectDef whose Stations contains the id, joined with ' or ' (for example 'Mythril Anvil or Orichalcum Anvil'); fall back to title-cased text. Liquids come from recipe conditions.",
+  "Core ConditionDescriber (Conditions/ConditionDescriber.cs): English for every condition type ('near Water', 'at night', 'after the Eye of Cthulhu is defeated' using the flag def name, 'in Expert mode', 'during a Blood Moon', 'in the Jungle', 'carrying 50 silver', 'the Merchant lives in town', 'at least 3 residents', 'bestiary 10% complete', 'during Christmas'...). Reused by the book, the NPC tab and drop rates.",
+  "Move the RecipeBook into Core ownership: a new GameWorld.Crafting.cs partial with a lazy Recipes property, plus Craft(PlayerEntity p, CompiledRecipe r, IReadOnlySet<string> stations, ConditionContext ctx) that raises Crafted(p, ItemStack). UiContext.Recipes becomes Game.Recipes, and the CraftingPanel crafts through Game.Craft (a one-line change). Add a Core command 'craft <item> [count]' that uses CraftingEnvironment at the player's feet (smoke and achievements).",
+  "Core RecipeLookup (Gameplay/Crafting/RecipeLookup.cs): Using(ItemDef) and Making(ItemDef) \u2192 RecipeView(Output, Count, Ingredients [(label, ItemDef icon item, count, groupItems)], Stations (names), Conditions (text), CanCraftNow?). Remove TownCommerce.RecipesUsing.",
+  "Game: RecipeCard (game/UI/RecipeCard.cs) is a reusable control: output icon, name coloured by rarity, and an ingredient row of 32 px icons with counts and item tooltips (the tooltip sits on a mouse-stop Control, not a Label, see the audit), plus 'Required objects: ...'. Cards are pooled.",
+  "GuideCraftPanel (game/UI/GuideCraftPanel.cs): a PanelContainer under the chat box with an ItemSlotView bound to a 1-slot Inventory (SlotActions Left/Right click with Inventory.Cursor) and a ScrollContainer of up to 40 RecipeCards (paged). The 'craftHelp' service entry opens it and asks the inventory to open through a new UiContext.RequestInventory event wired in WorldLauncher. On close the slot item returns via SlotActions.Stow, or drops if the pack is full.",
+  "Engine command 'ui guide_craft <item>' places a stack in the Guide slot. Probe ui.guide_recipes (in GodotCommandHost)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 remove RecipesUsing",
+  "game/UI/UiContext.cs \u2014 Recipes => Game.Recipes; RequestInventory event",
+  "game/UI/CraftingPanel.cs \u2014 craft through Game.Craft (coordinate with the UI phase rewrite)",
+  "game/UI/TownDialog.Services.cs \u2014 craftHelp opens GuideCraftPanel",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create the panel; wire RequestInventory \u2192 InventoryScreen.SetOpen(true)",
+  "game/Debug/GodotCommandHost.cs \u2014 ui.guide_recipes probe",
+  "game/Debug/EngineCommands.Town.cs \u2014 ui guide_craft",
+  "src/Strata.Core/Commands/BuiltinCommands.cs (or a new CraftCommands.cs) \u2014 craft command"
+ ],
+ "files_add": [
+  "src/Strata.Core/Content/Index/StationNames.cs",
+  "src/Strata.Core/Conditions/ConditionDescriber.cs",
+  "src/Strata.Core/Gameplay/Crafting/RecipeLookup.cs",
+  "src/Strata.Core/Session/GameWorld.Crafting.cs \u2014 Recipes, Craft, Crafted event",
+  "src/Strata.Core/Commands/CraftCommands.cs",
+  "game/UI/RecipeCard.cs",
+  "game/UI/GuideCraftPanel.cs",
+  "tests/Strata.Core.Tests/Gameplay/RecipeLookupTests.cs"
+ ],
+ "data_changes": [
+  "none"
+ ],
+ "tests": [
+  "RecipeLookupTests: Using(wood) contains work_bench with no station; Making(iron_pickaxe) lists stations 'Iron Anvil or Lead Anvil'; group ingredients read 'Any Wood'",
+  "StationNamesTests: every station id used by a recipe has a non-empty name",
+  "ConditionDescriberTests: every registered condition type yields non-empty text (iterate ConditionCompiler.Types with sample specs)",
+  "CommandTests: 'craft work_bench' with 10 wood \u2192 inv.work_bench 1",
+  "Smoke town.cmds: 'ui talk guide' / 'ui service craftHelp' / 'ui guide_craft wood' / 'assert ui.guide_recipes > 0' / 'ui close' / 'assert inv.wood >= 20'"
+ ],
+ "verification": [
+  "dotnet test",
+  "town.cmds SMOKE PASS",
+  "In game: put an Iron Bar in the Guide slot \u2192 recipe cards with icons and named anvils; closing returns the bar"
+ ],
+ "depends_on": [
+  "P5-13"
+ ],
+ "risks": [
+  "CraftingPanel is being rewritten by the UI phase (Terraria crafting column). Only the Craft call changes here, and the UI phase should use StationNames too.",
+  "Inventory open freezes the player (audit L, UI phase); acceptable while in dialog."
+ ],
+ "effort": "M"
+}

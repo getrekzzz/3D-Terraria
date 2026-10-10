@@ -1,0 +1,65 @@
+{
+ "id": "P4-15",
+ "title": "Dungeon carving: brick shells, wall panels, walkable stairs, climbable shafts; DungeonPass rewrite (GenVersion bump)",
+ "player_outcome": "The dungeon is carved into the world as long brick corridors with dungeon-wall panels. Stairs are walkable and shafts have platforms every 2 m, so you can always climb back. Rooms have pillars, and crossings merge into open junctions instead of walling each other off.",
+ "design": [
+  "Rewrite src/Strata.Core/WorldGen/Structures/DungeonBuilder.cs as the orchestrator: Build(content, layout, DungeonStyle style) \u2192 Blueprint. Halls go in DungeonBuilder.Halls.cs and rooms in DungeonBuilder.Rooms.cs. Ops are emitted in phases so crossings merge.",
+  "Phase A shells: Fill(interior.Expand(2), brick) for every hall step, room and shaft.",
+  "Phase B panels: fill the four side faces of interior.Expand(1) with the room or hall's panel block (brick_wall, slab_wall or tiled_wall of the style colour). Floors and ceilings stay brick.",
+  "Phase C carves: Carve every interior (per step for stairs), plus doorways and shaft mouths.",
+  "Phase D fixtures:",
+  "  Stair floors: the step cells get ShapeCode Stair rotated uphill; use the same rotation\u2192direction mapping as the builder and CellShape tests.",
+  "  Shafts: 1-cell brick Platform layers every 4 cells (2 m; the player's jump apex is about 2.4 m and stepHeight 0.55 m).",
+  "  Rooms wider than 18: 2\u00d72 brick pillars. Rooms taller than 12: a platform gallery at +6 along the long walls.",
+  "DungeonStyle.Pick(rng): Brick is blue_brick, green_brick or pink_brick, with the matching Panels[3].",
+  "Rewrite src/Strata.Core/WorldGen/Passes/DungeonPass.cs Plan(). Site: the snow-side angle \u00b10.07 (the jungle is opposite); distance 0.86 \u00d7 LandRadius, stepping inward while Landness < 0.97. Inward = the dominant axis toward the centre.",
+  "Plan() continued: layout = DungeonPlanner.Plan(...); bp = DungeonBuilder.Build(...); add a DungeonFeature : StructureFeature carrying Layout and Style (new overload StructurePlacementPass.AddStructure(plan, feature)).",
+  "Plan() landmarks: dungeon_bottom (the vault floor) and dungeon_chest (in front of the first chest spot). dungeon_gate comes in P4-16. Register them in LandmarkIds.",
+  "Check that TreasurePass, EcologyZonesPass and DecorationPass skip CellFlags.Structure cells. Add the guard if one is missing, so no cabin chests or plants land inside dungeon walls.",
+  "Bump GenVersion.Current by one (with a changelog comment) and re-pin all golden hashes. Add a golden hash for one dungeon chunk (seed 1234 Tiny; chosen from the layout) and include that chunk in the purity test set."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Structures/DungeonBuilder.cs \u2014 rewritten orchestrator",
+  "src/Strata.Core/WorldGen/Passes/DungeonPass.cs \u2014 site, planner, feature, landmarks",
+  "src/Strata.Core/WorldGen/Passes/StructurePlacementPass.cs \u2014 AddStructure(feature) overload",
+  "src/Strata.Core/WorldGen/Plan/WorldPlan.cs \u2014 LandmarkIds additions",
+  "src/Strata.Core/WorldGen/GenVersion.cs \u2014 bump",
+  "src/Strata.Core/WorldGen/Passes/TreasurePass.cs, EcologyZonesPass.cs, DecorationPass.cs \u2014 skip structure cells if not already",
+  "tests/Strata.Core.Tests/WorldGen/WorldGenTests.cs \u2014 re-pin, dungeon golden chunk, purity chunk",
+  "tests/Strata.Core.Tests/Gameplay/DungeonTests.cs \u2014 use DungeonFeature.Layout instead of magic offsets"
+ ],
+ "files_add": [
+  "src/Strata.Core/WorldGen/Structures/DungeonBuilder.Halls.cs \u2014 flat/stairs/shaft emission",
+  "src/Strata.Core/WorldGen/Structures/DungeonBuilder.Rooms.cs \u2014 rooms, pillars, galleries, panels",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonStyle.cs \u2014 colour and panel choice",
+  "src/Strata.Core/WorldGen/Structures/Dungeon/DungeonFeature.cs \u2014 StructureFeature with Layout",
+  "tests/Strata.Core.Tests/WorldGen/DungeonGenerationTests.cs \u2014 carved-geometry tests"
+ ],
+ "data_changes": [],
+ "tests": [
+  "DungeonGenerationTests.HallsAreCarvedAndLinedWithProtectedBrick: hall midpoints are air; the neighbouring wall cells carry CellFlags.Structure.",
+  "DungeonGenerationTests.ShaftsHaveAPlatformEveryFourCells.",
+  "DungeonGenerationTests.StairsAreWalkable: VoxelNavigator path from a stair's top to its bottom.",
+  "DungeonGenerationTests.RoomsAreReachableOnFoot: install chunks along the path; A* from the shaft bottom to 3 sampled rooms in Tiny seed 1234.",
+  "DungeonGenerationTests.CrossingsStayOpen: at every node the adjoining hall interiors are air.",
+  "WorldGenTests purity includes a dungeon chunk; golden hashes re-pinned.",
+  "Existing DungeonTests (zones, locks, guardian, keeper) updated and passing.",
+  "Smoke dungeon.cmds: 'tp landmark dungeon_bottom', 'wait_until player.frozen == 0 180', 'assert zone.dungeon == 1'."
+ ],
+ "verification": [
+  "dotnet test; dotnet run --project tools/Strata.Tools -- worldgen-report --seed=1234 --size=tiny (cross-sections show the halls)",
+  "Headless dungeon.cmds",
+  "lavapipe: 'tp landmark dungeon_bottom' and screenshots in halls/shafts at medium graphics"
+ ],
+ "depends_on": [
+  "P4-12",
+  "P4-13",
+  "P4-14"
+ ],
+ "risks": [
+  "Stair shape rotation may be mirrored relative to the mesher. Verify with a screenshot and a navigator test before re-pinning.",
+  "Several thousand ops per dungeon lengthens plan time. Measure WorldGenerator construction for Large (target < 150 ms extra).",
+  "The terrain phase also bumps GenVersion. Bump from whatever value is current when this lands."
+ ],
+ "effort": "M"
+}

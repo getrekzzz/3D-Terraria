@@ -14,4 +14,37 @@ event slime_rain
 assert event.slime_rain == 1
 event stop slime_rain
 assert event.slime_rain == 0
+# A natural arrival: the warning, then the Eye after the countdown.
+time 21
+event evil_presence
+assert event.evil_presence == 1
+wait_until npcs.eye_of_cthulhu == 1 15
+assert event.evil_presence == 0
+killall
+assert errors == 0
+
+# --- X-06 ---
+# Seasons: the console forces Halloween and Christmas (residents put on hats); a goodie bag opens; back to the date.
+season halloween
+assert season.id == 1
+wait 0.2
+give goodie_bag
+wield goodie_bag
+use
+assert inv.goodie_bag == 0
+season christmas
+assert season.id == 2
+wait 0.2
+season off
+assert season.id == 0
+season auto
+# Fallen Stars (P3-30): one streaks down at night and lies on the ground until dawn.
+time midnight
+starfall now
+assert stars.fallen >= 1
+wait_until drops.fallen_star >= 1 10
+time dawn
+wait 1
+assert drops.fallen_star == 0
+assert stars.faded >= 1
 assert errors == 0

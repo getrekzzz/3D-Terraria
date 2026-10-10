@@ -29,6 +29,13 @@ assert player.on_floor == 1
 
 # Mining the stone floor drops stone that we collect.
 wield copper_pickaxe
+wait 0.2
+assert avatar.held_lit == 1
+assert avatar.held_block_cube == 0
+# P3-06: the pickaxe's grip socket sits in the fist (the swing style's hand frame).
+assert avatar.grip_error_cm >= 0
+assert avatar.grip_error_cm < 1
+assert props.problems == 0
 aim 0.05 -1 0.05
 hold use_primary 2.5
 wait 1.5
@@ -38,11 +45,18 @@ probe player.y
 probe block.0.-1.0
 assert player.alive == 1
 
-# Building: place a brick grid block (1 m, one brick per cell) on the floor in front of us.
+# Building: place a brick grid block (1 m, one brick per cell) on the floor in front of us. The arena is rebuilt
+# around our feet first: standing on the rim of the pit we just dug can leave the body a little lower, one cell down.
 fill -10 -3 -10 10 -1 10 stone
+fill -10 0 -10 10 7 10 air
 wait 0.5
 give gray_brick 20
 wield gray_brick
+# P3-06: a held block is a textured cube in both views, lit with the body like any held model.
+wait 0.2
+assert avatar.held_block_cube == 1
+assert view.held_block_cube == 1
+assert avatar.held_lit == 1
 aim 0 -0.8 1
 use
 assert player.held_count < 20
@@ -54,6 +68,7 @@ probe player.y
 probe block.0.0.3
 probe block.0.-1.3
 place torch -2 0 -3
+wait 0.5
 assert objects.count > 0
 give work_bench 1
 wield work_bench
@@ -82,4 +97,101 @@ assert time.day == 1
 
 save
 inspect
+assert errors == 0
+
+# --- P1-03 ---
+# Eye adaptation: a room sealed from the sky opens the eyes up (cave boost); opening its roof closes them fast.
+time noon
+fill -11 -3 -11 11 9 11 stone
+fill -10 0 -10 10 7 10 air
+wait 4
+assert render.exposure > 1.3
+fill -10 8 -10 10 9 10 air
+wait 1.5
+assert render.exposure < 1.15
+assert errors == 0
+
+# --- P3-05 ---
+# Held-item sockets: a gun knows its grip and muzzle, a bow its grip and nock; models load without problems.
+assert sockets.minishark >= 2
+assert sockets.wooden_bow >= 2
+assert sockets.copper_shortsword >= 2
+wait_until assets.pending == 0 60
+assert props.problems == 0
+
+# --- P3-18 ---
+# Pets and light pets: the misc slots summon one companion each; the light pet takes a light from the dynamic pool.
+equip shadow_orb
+equip fish
+wait 0.5
+assert pets.lights == 1
+assert pets.active == 1
+assert projectiles.count >= 2
+wait 1
+assert lights.pets == 1
+
+# --- P3-03 ---
+# Every use style has its own clip in every human animation set (none falls back to idle), and the new clips play:
+# a throw, a bite of food, a yoyo worked and a flail spun on the right arm while they are used (a glowing flail is held
+# up like a torch between uses).
+assert anim.missing_clips == 0
+give shuriken 20
+wield shuriken
+aim 0 0 1
+use
+wait 0.1
+assert player.action_weight > 0.5
+wait 1
+give cooked_fish 2
+wield cooked_fish
+use
+wait 0.15
+assert player.action_weight > 0.5
+wait 1.5
+give wood_yoyo 1
+wield wood_yoyo
+press use_primary
+wait 0.3
+assert player.hold_clip == 2
+assert player.hold_weight > 0.5
+release use_primary
+wait 1.5
+assert player.hold_weight < 0.1
+give sunfury 1
+wield sunfury
+press use_primary
+wait 0.5
+assert player.hold_clip == 1
+release use_primary
+wait 1.5
+assert player.hold_clip == 0
+assert anim.missing_clips == 0
+# --- P3-36 ---
+# 3D drops: a sword and coins spin as their models, dirt as a block cube, a Fallen Star glows with a halo and may
+# claim a light; no model is missing.
+drop copper_broadsword 1 0 0 2
+drop gold_coin 5 1 0 2
+drop dirt 3 -1 0 2
+drop fallen_star 1 2 0 2
+wait_until dropvis.models >= 3 5
+assert dropvis.cubes >= 1
+assert dropvis.halos >= 1
+probe dropvis.billboards
+assert dropvis.lit >= 1
+assert props.problems == 0
+assert errors == 0
+
+# --- P3-33 ---
+# Quick heal (H) drinks the best healing potion from the backpack without changing the held item (the Sunfury stays
+# selected); the drink floats over the head as "Used Lesser Healing Potion".
+give lesser_healing_potion 2
+hurt 50
+assert player.life <= 50
+press quick_heal
+wait 0.1
+press quick_heal off
+wait 0.3
+assert player.life >= 95
+assert inv.lesser_healing_potion == 1
+assert player.held_count == 1
 assert errors == 0

@@ -14,8 +14,8 @@ public static class EditCommands
     {
         r.Register(new CommandDef
         {
-            Name = "drop", Usage = "drop <item> [count] [<dx> <dy> <dz>]",
-            Help = "Drops an item stack into the world at a cell relative to the feet (default: in front), out of pickup reach for a while.",
+            Name = "drop", Usage = "drop <item> [count] [<dx> <dy> <dz> [pickup delay ticks]]",
+            Help = "Drops an item stack into the world at a cell relative to the feet (default: in front), out of pickup reach for a while (600 ticks unless given).",
             Run = (ctx, a) =>
             {
                 var content = ctx.World.Session.Content;
@@ -24,7 +24,8 @@ public static class EditCommands
                 var offset = a.Count >= 5 ? new Int3(a.Int(2, "dx"), a.Int(3, "dy"), a.Int(4, "dz")) : new Int3(0, 1, 3);
                 var cell = Here(ctx) + offset;
                 var at = new System.Numerics.Vector3(cell.X + 0.5f, cell.Y + 0.5f, cell.Z + 0.5f) * Units.CellSize;
-                ctx.World.Drops.Spawn(new Gameplay.Items.ItemStack(item, count), at, System.Numerics.Vector3.Zero, pickupDelay: 600);
+                int delay = Math.Max(0, a.OptInt(5, 600));
+                ctx.World.Drops.Spawn(new Gameplay.Items.ItemStack(item, count), at, System.Numerics.Vector3.Zero, pickupDelay: delay);
                 return CommandResult.Success($"Dropped {count} {item.DisplayName} at {cell}.");
             },
         });
@@ -48,14 +49,22 @@ public static class EditCommands
         });
         r.Register(new CommandDef
         {
-            Name = "fill", Usage = "fill <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> <block|air>",
-            Help = "Fills a box relative to the player's feet.",
+            Name = "fill", Usage = "fill <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> <block|air> [natural]",
+            Help = "Fills a box relative to the player's feet. Blocks are placed by hand (crisp) unless 'natural' is given: "
+                + "then they are unflagged like generated terrain and mesh smooth.",
             Run = (ctx, a) =>
             {
                 var here = Here(ctx);
                 var p0 = here + new Int3(a.Int(0, "dx0"), a.Int(1, "dy0"), a.Int(2, "dz0"));
                 var p1 = here + new Int3(a.Int(3, "dx1"), a.Int(4, "dy1"), a.Int(5, "dz1"));
                 var (id, def) = Block(ctx, a.Str(6, "block"));
+                bool natural = a.OptStr(7) switch
+                {
+                    null => false,
+                    "natural" => true,
+                    var other => throw new CommandException($"unknown fill option '{other}' (expected 'natural')"),
+                };
+                var flags = id == 0 || natural ? CellFlags.None : CellFlags.PlayerPlaced;
                 bool displaces = def is { IsSolid: true };
                 var min = Int3.Min(p0, p1);
                 var max = Int3.Max(p0, p1);
@@ -66,7 +75,8 @@ public static class EditCommands
                     for (int z = min.Z; z <= max.Z; z++)
                         for (int x = min.X; x <= max.X; x++)
                         {
-                            batch.SetBlock(x, y, z, id, 0, id == 0 ? CellFlags.None : CellFlags.PlayerPlaced);
+                            batch.SetBlock(x, y, z, id, 0, flags);
+                            if (natural && id != 0) batch.ClearFlags(x, y, z); // a hand-placed block it replaces was flagged
                             if (displaces) batch.SetLiquid(x, y, z, 0);
                         }
                 int changed = batch.PendingChanges;
@@ -117,7 +127,8 @@ public static class EditCommands
         });
         r.Register(new CommandDef
         {
-            Name = "wire", Usage = "wire <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> [cut]", Help = "Lays (or cuts) red wire through a box relative to the player's feet.",
+            Name = "wire", Usage = "wire <dx0> <dy0> <dz0> <dx1> <dy1> <dz1> [red|blue|green|yellow|actuator|cut]",
+            Help = "Lays wire of a colour (default red) or actuators through a box relative to the player's feet; 'cut' removes all wiring there.",
             Run = (ctx, a) =>
             {
                 var here = Here(ctx);
@@ -126,13 +137,20 @@ public static class EditCommands
                 var min = Int3.Min(p0, p1);
                 var max = Int3.Max(p0, p1);
                 if ((long)(max.X - min.X + 1) * (max.Y - min.Y + 1) * (max.Z - min.Z + 1) > MaxFillCells) throw new CommandException("box too large");
-                bool cut = a.OptStr(6) == "cut";
+                string mode = a.OptStr(6) ?? "red";
+                var color = mode is "cut" or "actuator" ? Gameplay.Wiring.WireColor.None : ParseColor(mode);
+                var wires = ctx.World.Wires;
                 int n = 0;
                 for (int y = min.Y; y <= max.Y; y++)
                     for (int z = min.Z; z <= max.Z; z++)
                         for (int x = min.X; x <= max.X; x++)
-                            if (cut ? ctx.World.Wires.Cut(new Int3(x, y, z)) : ctx.World.Wires.Place(new Int3(x, y, z))) n++;
-                return CommandResult.Success($"{(cut ? "Cut" : "Laid")} wire in {n} cells.");
+                        {
+                            var c = new Int3(x, y, z);
+                            if (mode == "cut") n += wires.Cut(c) > 0 ? 1 : 0;
+                            else if (mode == "actuator") n += wires.PlaceActuator(c) ? 1 : 0;
+                            else n += wires.Place(c, color) ? 1 : 0;
+                        }
+                return CommandResult.Success(mode switch { "cut" => $"Cut wiring in {n} cells.", "actuator" => $"Placed {n} actuators.", _ => $"Laid {mode} wire in {n} cells." });
             },
         });
         r.Register(new CommandDef
@@ -158,9 +176,11 @@ public static class EditCommands
         });
         r.Register(new CommandDef
         {
-            Name = "interact", Usage = "interact <dx> <dy> <dz>", Help = "Interacts with the tile object at a cell relative to the player's feet (doors, levers).",
+            Name = "interact", Usage = "interact <dx> <dy> <dz> | interact nearest <objectId> [radius] [expectedOutcome]",
+            Help = "Interacts with the tile object at a cell relative to the player's feet (doors, levers), or with the nearest object of a kind within a radius (default 8 cells); fails when the outcome is not the expected one (e.g. refused, containeropened).",
             Run = (ctx, a) =>
             {
+                if (a.Str(0, "dx") == "nearest") return InteractNearest(ctx, a.Str(1, "objectId"), a.OptInt(2, 8), a.Count > 3 ? a.Str(3, "expectedOutcome") : null);
                 var cell = Here(ctx) + new Int3(a.Int(0, "dx"), a.Int(1, "dy"), a.Int(2, "dz"));
                 var obj = ctx.World.Session.World.TileObjects.At(cell) ?? throw new CommandException($"no object at {cell}");
                 return CommandResult.Success($"{obj.Def.Id}: {ctx.World.Interaction.Interact(ctx.Player, obj)}");
@@ -170,11 +190,38 @@ public static class EditCommands
 
     private static Int3 Here(CommandContext ctx) => ctx.Player.FeetCell;
 
+    private static CommandResult InteractNearest(CommandContext ctx, string id, int radius, string? expect)
+    {
+        var here = Here(ctx);
+        var box = new Aabb3i(here - Int3.One * radius, here + Int3.One * (radius + 1));
+        Voxels.TileObjects.TileObjectInstance? best = null;
+        long bestDist = long.MaxValue;
+        foreach (var o in ctx.World.Session.World.TileObjects.InBox(box))
+        {
+            if (o.Def.Id != id) continue;
+            var d = o.Anchor - here;
+            long dist = (long)d.X * d.X + (long)d.Y * d.Y + (long)d.Z * d.Z;
+            if (dist < bestDist || (dist == bestDist && o.Id < best!.Id)) (best, bestDist) = (o, dist);
+        }
+        if (best == null) throw new CommandException($"no {id} within {radius} cells of {here}");
+        var outcome = ctx.World.Interaction.Interact(ctx.Player, best);
+        var text = $"{best.Def.Id}@{best.Anchor}: {outcome}";
+        if (expect != null && !string.Equals(expect, outcome.ToString(), StringComparison.OrdinalIgnoreCase))
+            throw new CommandException($"{text}, expected {expect}");
+        return CommandResult.Success(text);
+    }
+
     private static (ushort Id, BlockDef? Def) Block(CommandContext ctx, string name)
     {
         if (name is "air" or "0") return (0, null);
         var content = ctx.World.Session.Content;
         if (!content.Blocks.TryGet(name, out var def)) throw new CommandException($"unknown block '{name}'");
         return ((ushort)def.RuntimeId, def);
+    }
+
+    private static Gameplay.Wiring.WireColor ParseColor(string name)
+    {
+        try { return Gameplay.Wiring.WireColors.Parse(name); }
+        catch (ArgumentException e) { throw new CommandException(e.Message); }
     }
 }

@@ -477,6 +477,66 @@
    "name": "Aetherium Block",
    "kind": "natural",
    "stage": "early"
+  },
+  {
+   "id": "terraria:bone_block",
+   "name": "Bone Block",
+   "kind": "built",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:blue_brick_wall",
+   "name": "Blue Brick Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:blue_slab_wall",
+   "name": "Blue Slab Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:blue_tiled_wall",
+   "name": "Blue Tiled Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:green_brick_wall",
+   "name": "Green Brick Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:green_slab_wall",
+   "name": "Green Slab Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:green_tiled_wall",
+   "name": "Green Tiled Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:pink_brick_wall",
+   "name": "Pink Brick Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:pink_slab_wall",
+   "name": "Pink Slab Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
+  },
+  {
+   "id": "terraria:pink_tiled_wall",
+   "name": "Pink Tiled Wall",
+   "kind": "wall",
+   "stage": "prehardmode"
   }
  ]
 }

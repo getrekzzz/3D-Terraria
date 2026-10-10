@@ -15,6 +15,7 @@ namespace Strata.Game.Bootstrap;
 /// <summary>
 /// Composition root. Loads content (refusing to start on validation errors), registers input and
 /// launches a world. Command line (after "--"): --world=NAME --seed=N --size=tiny|small|medium --new
+/// (--export-theme writes the code-built UI theme to assets/ui/strata_theme.tres and quits).
 /// </summary>
 public partial class GameRoot : Node
 {
@@ -44,7 +45,17 @@ public partial class GameRoot : Node
         var log = new GodotLog();
         var data = new GodotDataSource();
         var args = CommandLine.FromOs();
+        Automated = IsAutomated(args);
         Settings.UserSettings.Load();
+        UiTheme.Install(); // before any UI node exists: global font, theme and glyph warm-up
+        log.Info("boot", $"UI theme installed (glyph warm-up {UiTheme.WarmupMs:0.0} ms).");
+        if (args.Flag("export-theme"))
+        {
+            var exported = UiTheme.Export();
+            log.Info("boot", $"Exported the UI theme to {UiTheme.ThemePath}: {exported}.");
+            GetTree().Quit(exported == Error.Ok ? 0 : 1);
+            return;
+        }
 
         var content = ContentLoader.Load(data);
         foreach (var issue in content.Report.Issues)
@@ -64,9 +75,20 @@ public partial class GameRoot : Node
             ShowFatal("Grass settings failed validation — see the log for details.");
             return;
         }
+        var useStyleProblems = Strata.Core.Presentation.UseStyleConfig.Load(data).Validate();
+        if (useStyleProblems.Count > 0)
+        {
+            foreach (var problem in useStyleProblems) log.Error("content", $"{Strata.Core.Presentation.UseStyleConfig.Path}: {problem}");
+            ShowFatal("Use style settings failed validation — see the log for details.");
+            return;
+        }
         var render = new RenderTables(content, layers.IndexOf, grass);
         InputSetup.Register(data);
         Settings.KeyBindings.Load();
+        // Controller support for every screen; a child of the window after this root, so it sees each event first.
+        var pad = new PadInput();
+        pad.Initialize(() => World != null);
+        GetTree().Root.CallDeferred(Node.MethodName.AddChild, pad);
         var graphics = Rendering.GraphicsSettings.Load(data, args, log);
         graphics.Apply(GetViewport());
         Services = new GameServices(log, data, content, layers, render, args, graphics);
@@ -79,9 +101,14 @@ public partial class GameRoot : Node
         var dynamicResolution = new Rendering.DynamicResolution();
         dynamicResolution.Initialize(graphics);
         AddChild(dynamicResolution);
+        UI.UiTheme.InstallVision(data); // colour-blind modes (X-12): the interface palette and the world filter
+        AddChild(new Rendering.ColorBlindFilter());
         var user = Settings.UserSettings.Current;
         user.Changed += ApplyDisplay;
         if (!IsAutomated(args)) ApplyDisplay(user);
+        UI.UiCursor.Apply(user); // Terraria's pointer on every screen, recoloured with the setting
+        user.Changed += UI.UiCursor.Apply;
+        GetTree().Root.SizeChanged += () => Settings.DisplaySettings.ApplyUiScale(GetTree().Root, Settings.UserSettings.Current);
 
         if (args.Flag("no-world")) return;
         if (!IsAutomated(args) && args.Get("world") == null)
@@ -104,6 +131,8 @@ public partial class GameRoot : Node
             {
                 Name = name, Seed = args.Long("seed", 1234),
                 Size = System.Enum.Parse<WorldSizePreset>(args.Get("size") ?? "small", ignoreCase: true),
+                Secret = SecretSeeds.Parse(args.Get("secret") ?? ""), // --secret="drunk world" (X-07)
+                Difficulty = System.Enum.Parse<Difficulty>(args.Get("difficulty") ?? "classic", ignoreCase: true),
             },
             ForceNew = args.Flag("new"),
             PlayerName = args.Get("player") ?? "Wanderer",
@@ -113,7 +142,14 @@ public partial class GameRoot : Node
         });
     }
 
-    /// <summary>Scripted runs (smoke tests, screenshots) skip the menu and keep the window as launched.</summary>
+    /// <summary>
+    /// A scripted run (smoke test, screenshots, --exec): it skips the menu, keeps the window as launched and never
+    /// writes the player's settings from gameplay toggles (Smart Cursor), so one script cannot change the next.
+    /// </summary>
+    public static bool Automated { get; private set; }
+
+    public override void _ExitTree() => UI.UiCursor.Reset();
+
     private static bool IsAutomated(CommandLine args) =>
         args.Get("smoke") != null || args.Get("screenshot") != null || args.Get("exec") != null || args.Get("shots") != null;
 
@@ -153,6 +189,7 @@ public partial class GameRoot : Node
         CommandContext = null;
         InputGate.Reset();
         GetTree().Paused = false;
+        System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.Interactive;
         RemoveChild(host);
         host.QueueFree(); // the world saves as it leaves the tree
         ShowMenu();
@@ -166,6 +203,9 @@ public partial class GameRoot : Node
         AddChild(_worldHost);
         var launched = WorldLauncher.Launch(_worldHost, Services, options);
         World = launched.Runtime;
+        // While a world runs, the GC avoids blocking gen2 collections (background ones instead): fewer freezes for a
+        // little more memory. The menu goes back to the default.
+        System.Runtime.GCSettings.LatencyMode = System.Runtime.GCLatencyMode.SustainedLowLatency;
         Commands = BuiltinCommands.CreateRegistry();
         EngineCommands.Register(Commands, launched);
         CommandContext = GodotCommandHost.CreateContext(launched, Services.Log, Commands);
@@ -177,6 +217,13 @@ public partial class GameRoot : Node
             var pause = new PauseMenu();
             _worldHost.AddChild(pause);
             pause.Initialize(Services, launched.Runtime, ExitToMenu);
+            if (launched.Inventory is { } inventory)
+            {
+                // The inventory's 'Settings' button opens the same menu over it, as Terraria's; Resume leaves an
+                // auto-paused inventory's world paused.
+                inventory.SettingsRequested += () => pause.SetOpen(true);
+                pause.StayPaused = () => inventory.PausesWorld;
+            }
             // A hardcore character's death ends the session: show the message, then return to the title screen.
             launched.Runtime.Game.PlayerLost += _ => GetTree().CreateTimer(6.0).Timeout += () =>
             {
@@ -254,7 +301,7 @@ public partial class GameRoot : Node
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (World != null && @event is InputEventMouseButton { Pressed: true } && !InputGate.GameplayBlocked && Input.MouseMode != Input.MouseModeEnum.Captured)
+        if (World != null && @event is InputEventMouseButton { Pressed: true } && !InputGate.MouseFree && Input.MouseMode != Input.MouseModeEnum.Captured)
             Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 }

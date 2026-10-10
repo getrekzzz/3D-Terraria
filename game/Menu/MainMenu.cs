@@ -10,20 +10,27 @@ namespace Strata.Game.Menu;
 public sealed record LaunchRequest(string WorldDirectory, string PlayerName);
 
 /// <summary>
-/// The title screen and its flow, as in the reference game: Single Player → pick or create a character → pick or
-/// create a world → play; Settings; Exit. Screens are swapped inside one layer over the animated backdrop.
+/// The title screen and its flow, as in the reference game: the swaying logo over Single Player → pick or create a
+/// character → pick or create a world → play; Settings; Exit. Screens are swapped inside one layer over the animated
+/// backdrop; the select lists are blue rows with play, favourite and delete icons (MainMenu.CharacterList.cs,
+/// MainMenu.Worlds.cs) and the character creator is MainMenu.Characters.cs.
 /// </summary>
 public sealed partial class MainMenu : CanvasLayer
 {
     private GameServices _services = null!;
+    private MenuBackground _background = null!;
     private Control _host = null!;
     private CharacterEntry? _character;
+    private SaveFavorites? _favorites;
 
     /// <summary>Directory holding one folder per world.</summary>
     public static string WorldsDirectory => ProjectSettings.GlobalizePath("user://worlds");
 
     /// <summary>Directory holding the character saves.</summary>
     public static string PlayersDirectory => ProjectSettings.GlobalizePath("user://players");
+
+    /// <summary>The starred characters and worlds (Terraria's favorites.json), listed first on the select screens.</summary>
+    private SaveFavorites Favorites => _favorites ??= SaveFavorites.Load(ProjectSettings.GlobalizePath("user://favorites.json"));
 
     public event Action<LaunchRequest>? PlayRequested;
 
@@ -32,9 +39,9 @@ public sealed partial class MainMenu : CanvasLayer
         _services = services;
         Name = "MainMenu";
         Layer = 50;
-        var background = new MenuBackground();
-        background.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        AddChild(background);
+        _background = new MenuBackground();
+        _background.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        AddChild(_background);
         _host = new Control { MouseFilter = Control.MouseFilterEnum.Ignore };
         _host.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         AddChild(_host);
@@ -67,6 +74,10 @@ public sealed partial class MainMenu : CanvasLayer
         _character = SaveCatalog.Characters(PlayersDirectory).Find(c => c.Name == name);
     }
 
+    /// <summary>Selects a saved character by name and returns it, or null when none has that name (automated tours).</summary>
+    public CharacterEntry? SelectCharacter(string name) =>
+        _character = SaveCatalog.Characters(PlayersDirectory).Find(c => c.Name == name);
+
     /// <summary>Creates a world synchronously and returns its directory (automated tours).</summary>
     public string CreateWorldNow(Strata.Core.World.WorldSettings settings)
     {
@@ -88,8 +99,8 @@ public sealed partial class MainMenu : CanvasLayer
     {
         var column = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
         column.AddThemeConstantOverride("separation", 8);
-        column.AddChild(MenuKit.Title("3D Terraria", 72));
-        column.AddChild(MenuKit.Spacer(40));
+        column.AddChild(new MenuLogo { Background = _background, SizeFlagsHorizontal = Control.SizeFlags.ShrinkCenter });
+        column.AddChild(MenuKit.Spacer(36));
         column.AddChild(MenuKit.Big("Single Player", ShowCharacters, 36));
         column.AddChild(MenuKit.Big("Settings", () => ShowSettings(ShowTitle), 36));
         column.AddChild(MenuKit.Big("Exit", () => GetTree().Quit(), 36));

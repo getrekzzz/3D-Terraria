@@ -1,0 +1,11 @@
+{
+  // Enemy banners (X-03, Core BannerConfig): a banner drops every killsPerBanner kills of its creatures (world-wide);
+  // players within radius cells of a placed banner deal damageDealt x damage to its creatures and take damageTaken x
+  // their contact damage, and show the buff.
+  "killsPerBanner": 50,
+  "radius": 64,
+  "damageDealt": 1.5,
+  "damageTaken": 0.9,
+  "refreshTicks": 30,
+  "buff": "monster_banner"
+}

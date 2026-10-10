@@ -1,0 +1,52 @@
+{
+ "id": "P3-30",
+ "title": "Fallen Stars fall at night",
+ "player_outcome": "At night, stars streak down across the sky with a whoosh and a glowing trail, land with a chime and lie glowing on the ground, and vanish at dawn if you don't collect them. This is Terraria's classic early-night errand for Mana Crystals.",
+ "design": [
+  "Verified: nothing in src spawns fallen_star; its description promises it (data/items/materials.json).",
+  "New Core Gameplay/Events/StarfallDirector.cs with StarfallConfig (data/config/starfall.json: chancePerSecond, radius, height, speed, maxActive). Loaded like SpawnConfig; ticked by GameWorld during 'tick.events'. It uses a Pcg32 seeded from the world seed.",
+  "At night, once per second per player: roll the chance and spawn a 'falling_star' projectile at player \u00b1 radius, +height, aimed down-diagonal. It only spawns if the target column is loaded and fewer than maxActive stars are out.",
+  "ProjectileHitSpecs 'dropItem' { item, count }: ApplyOnHit(p, null) at terrain impact spawns the dropped item.",
+  "ItemDef.FadesAtDawn. GameWorld detects the night \u2192 day transition and removes such drops (DroppedItemSystem.RemoveWhere).",
+  "Projectile falling_star: visual item (fallen_star), trail #fff4b0, light [15, 14, 8], contact true vs NPCs (modest damage), onHit dropItem fallen_star.",
+  "Sounds via SoundEvents: 'star_fall' when one spawns within 60 m; 'star_land' on its HitTerrain.",
+  "Command 'starfall now' (CombatCommands or WorldCommands) for tests."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Specs/ProjectileHitSpecs.cs \u2014 dropItem spec",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 ApplyOnHit dropItem",
+  "src/Strata.Core/Content/Defs/ItemDef.cs \u2014 FadesAtDawn",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 tick starfall; dawn purge",
+  "src/Strata.Core/Gameplay/Items/DroppedItems.cs \u2014 RemoveWhere",
+  "src/Strata.Core/Commands/WorldCommands.cs \u2014 starfall command",
+  "game/Audio/SoundEvents.cs \u2014 star sounds",
+  "game/Bootstrap/WorldLauncher.cs \u2014 load starfall.json",
+  "data/combat.json \u2014 falling_star projectile",
+  "data/items/materials.json \u2014 fallen_star fadesAtDawn true, glows true"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Events/StarfallDirector.cs \u2014 night star spawning",
+  "data/config/starfall.json \u2014 starfall tuning",
+  "tests/Strata.Core.Tests/Gameplay/StarfallTests.cs \u2014 starfall tests"
+ ],
+ "data_changes": [
+  "starfall.json: chancePerSecond 0.022 (~12 per 9-minute night), radius 40, height 45, speed 18, maxActive 4",
+  "falling_star projectile as above; fallen_star fadesAtDawn/glows"
+ ],
+ "tests": [
+  "StarfallTests: at midnight with chance 1, within 600 ticks \u2265 1 fallen_star drop exists; at noon none; setting dawn removes the drops",
+  "Smoke events.cmds: 'time midnight' / 'starfall now' / 'wait 5' / 'assert drops.fallen_star >= 1' / 'time dawn' / 'wait 1' / 'assert drops.fallen_star == 0'"
+ ],
+ "verification": [
+  "dotnet test; smoke events PASS",
+  "Lavapipe night screenshot with a star streak"
+ ],
+ "depends_on": [
+  "P3-11",
+  "P3-29"
+ ],
+ "risks": [
+  "Stars landing in unloaded chunks: spawn only over loaded columns; drops in lava are destroyed by the existing LiquidEffects."
+ ],
+ "effort": "M"
+}

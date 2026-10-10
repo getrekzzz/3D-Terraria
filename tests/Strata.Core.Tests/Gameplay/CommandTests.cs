@@ -1,6 +1,7 @@
 using Strata.Core.Commands;
 using Strata.Core.Common;
 using Strata.Core.Tests.Support;
+using Strata.Core.Voxels;
 
 namespace Strata.Core.Tests.Gameplay;
 
@@ -58,6 +59,16 @@ public class CommandTests
         Assert.Equal(g.Content.BlockId("gray_brick"), g.World.Session.World.GetBlock(g.Floor + new Int3(2, 1, 0)));
         Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 dirt").Ok);
         Assert.True(r.Execute(ctx, "assert block.1.0.1 > 0").Ok);
+        var world = g.World.Session.World;
+        var placed = g.Floor + new Int3(1, 1, 1);
+        Assert.Equal(CellFlags.PlayerPlaced, world.GetFlags(placed.X, placed.Y, placed.Z)); // crisp, as if built by hand
+        Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 stone").Ok);
+        // 'natural' leaves the cells unflagged like generated terrain, so they mesh smooth, even where the same block
+        // was placed by hand.
+        Assert.True(r.Execute(ctx, "fill -1 0 -1 1 0 1 stone natural").Ok);
+        Assert.Equal(g.Content.BlockId("stone"), world.GetBlock(placed));
+        Assert.Equal(CellFlags.None, world.GetFlags(placed.X, placed.Y, placed.Z));
+        Assert.False(r.Execute(ctx, "fill -1 0 -1 1 0 1 stone smooth").Ok);
         Assert.True(r.Execute(ctx, "time midnight").Ok);
         Assert.True(r.Execute(ctx, "assert time.day == 0").Ok);
         var flag = g.Content.Flags.All.First().Id;
@@ -66,6 +77,12 @@ public class CommandTests
         Assert.True(r.Execute(ctx, "tp 100 300 100").Ok);
         Assert.True(r.Execute(ctx, "assert player.cell_y == 300").Ok);
         Assert.False(r.Execute(ctx, "tp 1 2").Ok);
+        // ~ is relative to the feet cell, and the player lands in the middle of the cell.
+        ctx.Player.Position += new System.Numerics.Vector3(0.2f, 0f, 0.24f);
+        Assert.True(r.Execute(ctx, "tp ~ ~ ~2").Ok);
+        Assert.Equal(new Int3(100, 300, 102), ctx.Player.FeetCell);
+        Assert.Equal(BuiltinCommands.Feet(new Int3(100, 300, 102)), ctx.Player.Position);
+        Assert.False(r.Execute(ctx, "tp ~ ~x ~").Ok);
         Assert.True(r.Execute(ctx, "inspect").Ok);
     }
 
@@ -84,5 +101,29 @@ public class CommandTests
             int x = (i * 7) & 31, y = (i * 13) & 31, z = (i * 29) & 31;
             Assert.Equal(expected.GetBlock(ChunkMath.Index(x, y, z)), world.GetBlock(origin.X + x, origin.Y + y, origin.Z + z));
         }
+    }
+
+    [Fact]
+    public void InvclickRightClickRoundTrips()
+    {
+        var (g, r, ctx) = Setup();
+        using var _ = g;
+        Assert.True(r.Execute(ctx, "clear").Ok);
+        Assert.True(r.Execute(ctx, "give torch 5").Ok);
+        var took = r.Execute(ctx, "invclick backpack 0 right");
+        Assert.True(took.Ok, took.Output);
+        Assert.StartsWith("Moved", took.Output);
+        Assert.True(r.Execute(ctx, "assert inv.cursor == 1").Ok);
+        Assert.Contains("Torch", r.Execute(ctx, "cursor").Output);
+        Assert.True(r.Execute(ctx, "invclick backpack 0 left").Ok); // merges back
+        Assert.True(r.Execute(ctx, "assert inv.cursor == 0").Ok);
+        Assert.True(r.Execute(ctx, "assert inv.torch == 5").Ok);
+        Assert.True(r.Execute(ctx, "invclick vanity_armor 0 right").Ok);
+        Assert.False(r.Execute(ctx, "invclick pocket 0 left").Ok);
+        Assert.False(r.Execute(ctx, "invclick container 0 left").Ok); // no chest open
+        Assert.False(r.Execute(ctx, "invclick backpack 0 middle").Ok);
+        Assert.True(r.Execute(ctx, "invclick backpack 0 right").Ok);
+        Assert.Equal("Thrown", r.Execute(ctx, "invthrow one").Output);
+        Assert.True(r.Execute(ctx, "assert inv.torch == 4").Ok);
     }
 }

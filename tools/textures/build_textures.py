@@ -7,7 +7,8 @@ Outputs per set (assets/textures/<set>/):
   layers.json         layer name -> slice index (consumed by the game and the content validator)
   *.png.import        Godot importer settings (2D texture array, VRAM compressed)
 Sets: terrain (materials.json -> assets/textures/terrain), props (props.json -> assets/textures/props),
-detail (gen_detail.py -> assets/textures/detail/detail.png: fine-grain normal + height layers tiled under terrain).
+detail (gen_detail.py -> assets/textures/detail/detail.png: fine-grain normal + height layers tiled under terrain),
+fx (gen_fx.py -> assets/textures/fx/cracks.png: the four crack stages drawn over damaged blocks).
 Usage: python3 tools/textures/build_textures.py [--set=terrain|props] [--check]
 """
 import json
@@ -20,6 +21,7 @@ import numpy as np
 from PIL import Image
 
 import gen_detail
+import gen_fx
 import generators
 import synth
 
@@ -33,6 +35,7 @@ SETS = {
     "terrain": ("materials.json", "terrain", "terrain"),
     "props": ("props.json", "props", "props"),
     "detail": (None, "detail", "detail"),
+    "fx": (None, "fx", "fx"),
 }
 
 
@@ -111,9 +114,23 @@ def build_detail() -> int:
     return 0
 
 
+def build_fx() -> int:
+    out = REPO / "assets" / "textures" / "fx"
+    if "--check" in sys.argv:
+        ok = (out / "cracks.png").exists()
+        print(f"fx: cracks.png {'OK' if ok else 'missing'}")
+        return 0 if ok else 1
+    out.mkdir(parents=True, exist_ok=True)
+    Image.fromarray(gen_fx.build(), "RGBA").save(out / "cracks.png", optimize=True)
+    print(f"fx: wrote {gen_fx.STAGES} crack stages to {out.relative_to(REPO)}")
+    return 0
+
+
 def build_set(set_name: str) -> int:
     if set_name == "detail":
         return build_detail()
+    if set_name == "fx":
+        return build_fx()
     recipe_file, folder, prefix = SETS[set_name]
     out = REPO / "assets" / "textures" / folder
     recipes = json.loads((HERE / recipe_file).read_text(encoding="utf-8"))["materials"]
@@ -147,8 +164,13 @@ def build_set(set_name: str) -> int:
         entry = {"name": name, "index": i, "type": recipe["type"]}
         if "sway" in recipe:
             entry["sway"] = recipe["sway"]  # foliage wind sway used by the prop shader
+        if set_name == "props":
+            # Mean sRGB luminance: tinted metal slots (prop:<layer>:metal) divide it out so the tint shows as given.
+            entry["mean"] = round(float((a[..., :3].astype(np.float64) / 255.0 @ np.array([0.2126, 0.7152, 0.0722])).mean()), 3)
         if set_name == "terrain":
             entry["detail"], entry["detailStrength"] = gen_detail.detail_for(recipe)  # fine grain layer under it
+            if "ore" in recipe:
+                entry["ore"] = recipe["ore"]  # ore tint: the terrain shader colours glints by it
         layers.append(entry)
     # Unused slices repeat the "missing" layer so sampling never returns garbage.
     missing_index = names.index("missing")

@@ -1,0 +1,53 @@
+{
+ "id": "P1-05",
+ "title": "Core: eye-plane view ray, target filters, Reach stat helper, view direction",
+ "player_outcome": "Groundwork for P1-06: in Core, targets behind the player can no longer be selected, bushes and tree canopies stop stealing the crosshair, and the Reach stat (Builder) extends the cursor as well as the use.",
+ "design": [
+  "PlayerEntity: add Vector3? ViewDirection (camera forward, set by the engine each tick), Vector3 Facing => ViewDirection ?? Aim, and float AimDistance = 40f (eye to crosshair point, metres).",
+  "PlayerEntity.FacingQuarter now uses Facing, so tests that only set Aim keep working.",
+  "Targeting: add [Flags] enum TargetFilter { None = 0, Decor = 1, TreeCanopy = 2, All = 3 } and a Cast(world, origin, dir, reachMeters, TargetFilter) overload. The existing bool overload maps to All/TreeCanopy.",
+  "In the hit predicate, objects with Def.Collision == TileCollision.Trunk count only when the cell is inside obj.TrunkBox, unless TreeCanopy is set; otherwise the DDA continues through the canopy.",
+  "Targeting.CastView(VoxelWorld world, Vector3 camera, Vector3 dir, Vector3 eye, float reachMeters, TargetFilter filter, out float startT): startT = Max(0, Dot(eye - camera, dir)); cast from camera + dir*startT over reach + |lateral offset| + 0.5 m. The returned Target.Distance is measured from the eye, so nothing between camera and player can ever be hit.",
+  "Targeting.CastWhere(world, originMeters, dir, reachMeters, Func<Int3,ushort,bool> isHit): exposes the existing private DDA for hooks and shot origins.",
+  "TileObjectInstance.TrunkBox (cell units): the central column of half-width Max(0.5, width/6) and 55% height, moved from ObjectColliders.ShapeFor. ObjectColliders now calls it (same behaviour).",
+  "ItemUseSystem: public static float ReachMeters(PlayerEntity p, ItemDef? item) = ((item?.Reach ?? 10) + p.State.Effects.Stats.Bonus(StatIds.Reach)) * Units.CellSize. Use() calls it instead of the inline formula at line 94.",
+  "ItemUseSystem: public static TargetFilter FilterFor(ItemUseInfo? info). Decor when the item has Mine/Chop/Hammer, TreeCanopy when it has Chop, None otherwise (weapons, placeables, empty hand). PlacementRules already lets decor be replaced.",
+  "MeleeSystem.Start: Yaw from Atan2(Facing.X, Facing.Z) (arc centred on the crosshair, not pulled 30-69\u00b0 by the shoulder offset); Pitch stays from Aim.",
+  "CommandContext.Aim and GodotCommandHost.Aim: also set ViewDirection = dir."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 ViewDirection, Facing, AimDistance, FacingQuarter via Facing",
+  "src/Strata.Core/Gameplay/Interaction/Targeting.cs \u2014 TargetFilter, CastView, CastWhere, trunk-only unless TreeCanopy",
+  "src/Strata.Core/Voxels/TileObjects/TileObjectInstance.cs \u2014 TrunkBox",
+  "game/World/ObjectColliders.cs \u2014 use TrunkBox",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 ReachMeters, FilterFor",
+  "src/Strata.Core/Gameplay/Entities/MeleeSystem.cs \u2014 arc yaw from Facing",
+  "src/Strata.Core/Commands/CommandContext.cs \u2014 set ViewDirection",
+  "game/Debug/GodotCommandHost.cs \u2014 Aim sets ViewDirection"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/TargetingTests.cs \u2014 view ray, filters, reach, facing"
+ ],
+ "data_changes": [],
+ "tests": [
+  "TargetingTests.ViewRayIgnoresBlocksBetweenCameraAndPlayer: stone at eye height 2 m behind the player and a wall 3 m ahead; camera = eye - fwd*4.2 + right*0.55; CastView hits the wall ahead and Distance is about 3 m from the eye",
+  "TargetingTests.DecorIsSkippedUnlessAllowed: grass_tuft in front of a stone block; None hits the stone, Decor hits the tuft",
+  "TargetingTests.TreeCanopyNeedsAnAxeFilter: place oak_tree; a ray through the canopy (above 55% height, off the trunk column) passes with None and hits with TreeCanopy; a ray at the trunk hits with both",
+  "TargetingTests.ReachStatExtendsReach: ReachMeters grows by 1.0 m after adding the builder buff (reach +2 cells)",
+  "TargetingTests.FacingQuarterFollowsViewDirection: ViewDirection +X with Aim +Z gives quarter 3; ViewDirection null follows Aim",
+  "TargetingTests.FilterForItems: copper_axe has TreeCanopy|Decor, copper_pickaxe Decor, wooden_sword and gray_brick None",
+  "All existing BuilderTests/CombatTests/ItemUseTests stay green"
+ ],
+ "verification": [
+  "dotnet test",
+  "Smoke basic.cmds and builder.cmds PASS (the aim command now also sets the view direction)"
+ ],
+ "depends_on": [
+  "P1-01"
+ ],
+ "risks": [
+  "Trees are 3x22x3-cell boxes; the trunk-column rule must match ObjectColliders exactly or axes and colliders disagree. That is why TrunkBox is shared.",
+  "Callers of the bool Cast overload (use command, inspect, TestGame.Target) keep today's behaviour by design."
+ ],
+ "effort": "M"
+}

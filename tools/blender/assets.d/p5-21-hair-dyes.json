@@ -1,0 +1,67 @@
+{
+ "comment": "P5-21 the Stylist's hair dyes (potion bottles in each dye's colour).",
+ "items": {
+  "explicit": {
+   "life_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#e83030"
+    }
+   },
+   "mana_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#3060ff"
+    }
+   },
+   "depth_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#50a050"
+    }
+   },
+   "money_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#e8c040"
+    }
+   },
+   "time_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#3040a0"
+    }
+   },
+   "speed_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#f0f0f0"
+    }
+   },
+   "rainbow_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#e040e0"
+    }
+   },
+   "martian_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#40f0a0"
+    }
+   },
+   "twilight_hair_dye": {
+    "generator": "potion",
+    "params": {
+     "color": "#6040c0"
+    }
+   },
+   "hair_dye_remover": {
+    "generator": "potion",
+    "params": {
+     "color": "#d8e0e8"
+    }
+   }
+  }
+ }
+}

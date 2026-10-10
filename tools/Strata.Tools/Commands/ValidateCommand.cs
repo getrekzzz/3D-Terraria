@@ -1,6 +1,7 @@
 using Strata.Core.Content;
 using Strata.Core.Content.Loading;
 using Strata.Core.Content.Validation;
+using Strata.Core.Presentation;
 
 namespace Strata.Tools.Commands;
 
@@ -26,15 +27,46 @@ public sealed class ValidateCommand : IToolCommand
         foreach (var reg in db.AllRegistries) Console.WriteLine($"  {reg.Category,-12} {reg.Count,5}");
         int errors = db.Report.Errors.Count();
         // Engine-side configuration that is not part of the content database.
-        var graphics = Strata.Core.Presentation.GraphicsConfig.Load(source).Validate();
-        foreach (var problem in graphics) Console.WriteLine($"Error: {Strata.Core.Presentation.GraphicsConfig.Path}: {problem}");
-        errors += graphics.Count;
-        var grass = Strata.Core.Presentation.GrassConfig.Load(source).Validate(db);
-        foreach (var problem in grass) Console.WriteLine($"Error: {Strata.Core.Presentation.GrassConfig.Path}: {problem}");
-        errors += grass.Count;
+        errors += ConfigErrors(GraphicsConfig.Path, () => GraphicsConfig.Load(source).Validate());
+        errors += ConfigErrors(GrassConfig.Path, () => GrassConfig.Load(source).Validate(db));
+        errors += ConfigErrors(LightingConfig.Path, () => LightingConfig.Load(source).Validate());
+        errors += ConfigErrors(UseStyleConfig.Path, () => UseStyleConfig.Load(source).Validate());
+        errors += ConfigErrors(Strata.Core.Gameplay.Guide.BestiaryConfig.Path, () => Strata.Core.Gameplay.Guide.BestiaryConfig.Load(source).Validate());
+        errors += ConfigErrors(CreatureMaterialsConfig.Path, () => CreatureMaterialsConfig.Load(source).Validate(db));
+        errors += ConfigErrors(AmbienceConfig.Path, () => AmbienceConfig.Load(source).Validate(db));
+        errors += ConfigErrors(InputConfig.Path, () => InputConfig.Load(source).Validate());
+        Func<string, bool>? soundExists = context.Options.Flag("no-assets") ? null : id => SoundExists(context, id);
+        errors += ConfigErrors(CaptionsConfig.Path, () => CaptionsConfig.Load(source).Validate(soundExists));
+        errors += ConfigErrors(ColorVisionPalette.Path, () => ColorVisionPalette.Load(source).Validate());
+        if (options.AssetExists is { } exists)
+        {
+            var styles = UseStyleConfig.Load(source).Styles.SelectMany(s => new[] { (s.Key, s.Value.Sound), (s.Key, s.Value.HeavySound) });
+            errors += ConfigErrors(UseStyleConfig.Path, () => MissingSounds(styles, exists));
+            var materials = CreatureMaterialsConfig.Load(source).Materials.SelectMany(m => new[] { (m.Key, (string?)m.Value.HitSound), (m.Key, (string?)m.Value.DeathSound) });
+            errors += ConfigErrors(CreatureMaterialsConfig.Path, () => MissingSounds(materials, exists));
+        }
         int warnings = db.Report.Warnings.Count();
         Console.WriteLine($"{errors} error(s), {warnings} warning(s)");
         return errors == 0 ? 0 : 1;
+    }
+
+    /// <summary>A sound id the game can play: an sfx (or its first variant) or an ambience loop.</summary>
+    private static bool SoundExists(ToolContext context, string id) =>
+        File.Exists(context.PathOf($"assets/audio/sfx/{id}.wav")) || File.Exists(context.PathOf($"assets/audio/sfx/{id}_1.wav")) ||
+        File.Exists(context.PathOf($"assets/audio/ambience/{id}.ogg"));
+
+    private static List<string> MissingSounds(IEnumerable<(string Owner, string? Sound)> sounds, Func<string, bool> exists) =>
+        sounds.Where(s => s.Sound != null && !AssetPaths.SoundExists(s.Sound, exists))
+            .Select(s => $"{s.Owner}: sound '{s.Sound}' has no assets/audio/sfx/{s.Sound}.wav or {s.Sound}_1.wav").ToList();
+
+    /// <summary>Prints a config file's problems (or why it does not parse) as errors and returns how many there were.</summary>
+    private static int ConfigErrors(string path, Func<List<string>> validate)
+    {
+        List<string> problems;
+        try { problems = validate(); }
+        catch (System.Text.Json.JsonException e) { problems = new List<string> { e.Message }; }
+        foreach (var problem in problems) Console.WriteLine($"Error: {path}: {problem}");
+        return problems.Count;
     }
 }
 

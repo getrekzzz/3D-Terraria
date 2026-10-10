@@ -16,12 +16,13 @@ public static class MeshUpload
         if (surface.IsEmpty) return null;
         var arrays = new Godot.Collections.Array();
         arrays.Resize((int)Mesh.ArrayType.Max);
-        arrays[(int)Mesh.ArrayType.Vertex] = MemoryMarshal.Cast<System.Numerics.Vector3, Vector3>(surface.PositionSpan).ToArray();
-        arrays[(int)Mesh.ArrayType.Normal] = MemoryMarshal.Cast<System.Numerics.Vector3, Vector3>(surface.NormalSpan).ToArray();
-        arrays[(int)Mesh.ArrayType.Color] = MemoryMarshal.Cast<System.Numerics.Vector4, Color>(surface.ColorSpan).ToArray();
-        arrays[(int)Mesh.ArrayType.Custom0] = surface.Custom0Bytes();
-        arrays[(int)Mesh.ArrayType.Custom1] = surface.Custom1Bytes();
-        arrays[(int)Mesh.ArrayType.Index] = surface.IndexSpan.ToArray();
+        // Straight from the Core lists into packed arrays: no managed copies (they were large-object garbage).
+        arrays[(int)Mesh.ArrayType.Vertex] = Variant.CreateFrom(MemoryMarshal.Cast<System.Numerics.Vector3, Vector3>(CollectionsMarshal.AsSpan(surface.Positions)));
+        arrays[(int)Mesh.ArrayType.Normal] = Variant.CreateFrom(MemoryMarshal.Cast<System.Numerics.Vector3, Vector3>(CollectionsMarshal.AsSpan(surface.Normals)));
+        arrays[(int)Mesh.ArrayType.Color] = Variant.CreateFrom(MemoryMarshal.Cast<System.Numerics.Vector4, Color>(CollectionsMarshal.AsSpan(surface.Colors)));
+        arrays[(int)Mesh.ArrayType.Custom0] = Variant.CreateFrom(surface.Custom0ByteSpan);
+        arrays[(int)Mesh.ArrayType.Custom1] = Variant.CreateFrom(surface.Custom1ByteSpan);
+        arrays[(int)Mesh.ArrayType.Index] = Variant.CreateFrom(CollectionsMarshal.AsSpan(surface.Indices));
         var mesh = new ArrayMesh { ResourceName = name };
         mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays, null, null, CustomFormats);
         mesh.SurfaceSetMaterial(0, material);

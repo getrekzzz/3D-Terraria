@@ -1,0 +1,34 @@
+{
+ "id": "X-01",
+ "title": "Weather system: rain, thunderstorms, snow/blizzard, sandstorms, windy days",
+ "owner_session": "world",
+ "player_outcome": "The world has real weather: rain streaks and splashes with wet, darker, shinier surfaces and puddle sheen, thunderstorms with lightning flashes and thunder, snow and blizzards in the tundra, sandstorms with blowing sand in the desert, windy days that bend trees and grass harder and push particles; rain and storms change spawns (umbrella slimes, flying fish) and fishing, and have their own audio.",
+ "design": [
+  "Core WeatherSystem (src/Strata.Core/Gameplay/Weather/*): deterministic per-world weather state (none/rain/storm/snow/blizzard/sandstorm, intensity, wind vector) scheduled like Terraria (random rain spells, more in some biomes; windy days), exposed to ConditionContext (rain, thunderstorm, windy, sandstorm) so spawn rules, fishing loot and NPC routines can read it; existing rain/windy_day/sandstorm events in data/events.json become weather states or drive them; save weather in world meta.",
+  "Engine: game/Ambience/Weather*.cs \u2014 GPU particles (rain streaks, snow, sand) in a camera-following volume, occluded by roofs using the sky map (no rain in caves/houses), budgeted per graphics preset; splash particles on hit; lightning flash (directional light + sky pulse) + delayed thunder; wind drives strata_wind (grass/foliage/flame shaders) and particle drift; terrain/prop shader wetness (darker albedo, lower roughness, puddle sheen on flat tops) via a global shader uniform.",
+  "Audio: rain/storm/wind/blizzard loops on the Ambient bus (synthesise with tools/audio via a sfx_recipes_*.py module), muffled when indoors/underground; rain music variant hook in MusicDirector.",
+  "Data: data/config/weather.json (frequencies, durations, intensities per biome, particle budgets per preset).",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "data/events.json",
+  "src/Strata.Core/Gameplay/Events/EventDirector.cs",
+  "src/Strata.Core/Conditions/*",
+  "game/Ambience/EnvironmentController*.cs",
+  "shaders/terrain.gdshader (wetness)",
+  "shaders/include/*",
+  "game/Audio/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "WeatherSystemTests: deterministic schedule per seed, conditions exposed, save round-trip, no rain underground"
+ ],
+ "verification": [
+  "weather smoke block: `weather rain`/`weather storm`/`weather snow`/`weather sandstorm` commands + probes; one short rendered shot of a storm (no tuning loop)",
+  "F3: weather particles within the preset budget"
+ ],
+ "depends_on": [],
+ "risks": [],
+ "effort": "L"
+}

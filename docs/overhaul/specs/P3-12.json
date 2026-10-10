@@ -1,0 +1,57 @@
+{
+ "id": "P3-12",
+ "title": "Real yoyos: tether, cursor control, visible string, head model",
+ "player_outcome": "Holding the button keeps the yoyo out on a visible string, spinning and following the cursor within its range, grinding enemies. Releasing reels it back. Each yoyo has Terraria's range and hang time.",
+ "design": [
+  "Verified: wood_yoyo is a returning projectile (returns 40, lifetime 120). Only bobbers draw lines (ProjectileRenderer.cs:193-205).",
+  "ProjectileDef.Tether = TetherDef { Kind ('yoyo' | 'flail'), Range (cells), Lifetime (ticks, 0 = until release), Speed (m/s), String (hex) }. Validate the kind and positive ranges.",
+  "PlayerEntity.UseHeld, set every physics tick by InteractionController from use_primary.",
+  "New Core ProjectileSystem.Tethers.cs, TickYoyo: while owner.UseHeld and within lifetime, steer toward AimPoint clamped to Range from Eye (acceleration 60 m/s\u00b2, capped at Speed). Move with VoxelMotion.Move so it never ends on terrain. Clear HitNpcs every 10 ticks, then call HitCreatures. Otherwise set Returning (existing return path).",
+  "TickSpecial dispatches on Def.Tether. Add TetherOf(PlayerEntity) for presentation.",
+  "MaxActive 1 (from P3-09): pressing again while the yoyo is out is a silent no-op.",
+  "New game/Entities/ProjectileRenderer.Tethers.cs: a string from the hand 'string' socket (P3-06 3P / P3-07 FP) to the yoyo as a thin camera-facing strip. The yoyo spins about its axle (roll 25 rad/s).",
+  "The held yoyo model is hidden while the yoyo is out.",
+  "Animation: PlayerAvatar calls Hold('yoyo') while TetherOf(entity) is a yoyo; the FP arm stays extended.",
+  "Sounds: 'yoyo_throw' on launch (recipe in P3-27)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/ProjectileDef.cs \u2014 TetherDef",
+  "src/Strata.Core/Session/PlayerEntity.cs \u2014 UseHeld",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.cs \u2014 dispatch Tether",
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.Special.cs \u2014 TickSpecial routing",
+  "src/Strata.Core/Content/Validation/ContentValidator.World.cs \u2014 tether validation",
+  "game/Player/InteractionController.cs \u2014 sets UseHeld",
+  "game/Player/PlayerAvatar.Motion.cs \u2014 Hold('yoyo')",
+  "game/Player/PlayerAvatar.Held.cs \u2014 hide held yoyo while out",
+  "game/Player/ViewModel.Poses.cs \u2014 tether arm pose"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.Tethers.cs \u2014 yoyo (and later flail) simulation",
+  "game/Entities/ProjectileRenderer.Tethers.cs \u2014 strings/chains and spin",
+  "tests/Strata.Core.Tests/Gameplay/YoyoTests.cs \u2014 tether tests"
+ ],
+ "data_changes": [
+  "data/items/arsenal.json and data/items/lunar.json yoyo projectiles (wood_yoyo, rally, amazon, code_1, terrarian_yoyo): drop 'returns'; add tether {kind: yoyo, range, lifetime, speed} with Terraria values (Wooden Yoyo \u2248 3 s, Rally 5 s, Amazon 7 s, Code 1 9 s, Terrarian unlimited \u2014 confirm ranges against the wiki); model '<id>_head'; spin 25 roll; pierce -1"
+ ],
+ "tests": [
+  "YoyoTests: with UseHeld the yoyo stays alive for its lifetime and within Range of the Eye while AimPoint is far away",
+  "YoyoTests: releasing \u2192 removed within 120 ticks; a dummy in range takes \u2265 3 hits in 60 ticks",
+  "Smoke combat.cmds: 'give wood_yoyo 1' / 'wield wood_yoyo' / 'spawn zombie 1 3' / 'aim 0 0 1' / 'press use_primary on' / 'wait 0.6' / 'assert projectiles.count == 1'",
+  "Smoke combat.cmds, continued: 'wait 1.5' / 'press use_primary off' / 'wait 2' / 'assert projectiles.count == 0' / 'assert npcs.zombie == 0'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate (projectile models exist from P3-05)",
+  "Lavapipe screenshot with the string visible in 3P and FP"
+ ],
+ "depends_on": [
+  "P3-05",
+  "P3-06",
+  "P3-09",
+  "P3-11"
+ ],
+ "risks": [
+  "The aim point in 3P depends on P1's aim ray.",
+  "Hit cadence must use the per-projectile HitNpcs clear (local immunity), not NPC melee immunity."
+ ],
+ "effort": "M"
+}

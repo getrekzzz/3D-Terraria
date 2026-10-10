@@ -1,0 +1,41 @@
+{
+ "id": "P2-08",
+ "title": "Core container ops: Sort, Quick Stack, Restock, Deposit All, Loot All (favourite-aware), Quick Stack to Nearby Chests, persistent chest names",
+ "player_outcome": "Chests get Terraria's buttons:\n- Loot All, Deposit All, Quick Stack, Restock and Sort Items.\n- Rename, with the name kept in the save.\n\nThe inventory's 'Quick stack to nearby chests' sends matching items into every chest around you, and favourited items never move.",
+ "design": [
+  "New src/Strata.Core/Gameplay/Items/InventoryOps.cs:\n- `LootAll(Inventory chest, PlayerInventory inv)`: coins go to the purse.\n- `DepositAll(PlayerInventory, Inventory chest)`: skips the hotbar, favourites and coins.\n- `QuickStack(PlayerInventory, Inventory chest)`: moves only non-favourite backpack stacks (slots 10..49) whose item already exists in the chest, merging first.\n- `Restock(Inventory chest, PlayerInventory)`: tops up stackable backpack stacks from the chest.\n- `Sort(Inventory inv, int from, int to)`: merges partial stacks, then orders by category group (weapons, tools, armor/accessories, potions, placeables, materials, misc), rarity descending, then id. Favourited stacks keep their slots.\n- `SortChest(Inventory)`.",
+  "In GameWorld.InventoryActions.cs, add `QuickStackNearby(PlayerEntity p, float radiusM = 12f)`:\n- Scans `Session.World.TileObjects.InBox(box)` for objects with a Container.\n- Calls `Editor.EnsureContainerLoot(obj)` first, then QuickStack.\n- Marks the chunk modified.\n- Returns `List<(TileObjectInstance, int moved)>` so the UI can later show items flying.",
+  "Chest names:\n- `TileObjectInstance.CustomName` (string?, at most 20 printable characters).\n- ChunkCodec.WriteObjects sets state bit 4 and writes the name after PendingLoot; ReadObjects reads it only when bit 4 is set, so older chunks read unchanged and FormatVersion stays 1.\n- `GameWorld.RenameContainer(TileObjectInstance, string)` trims and sanitises, marks the chunk modified, and calls Interaction.NotifyChanged.",
+  "Extend InventoryCommands: `chest <loot|deposit|quickstack|restock|sort|rename <name>>` acting on the container last opened by the player (ObjectInteraction.ContainerOpened), `invsort` and `quickstack`."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Voxels/TileObjects/TileObjectInstance.cs \u2014 CustomName",
+  "src/Strata.Core/Persistence/ChunkCodec.cs \u2014 name bit and string",
+  "src/Strata.Core/Session/GameWorld.InventoryActions.cs \u2014 QuickStackNearby, RenameContainer",
+  "src/Strata.Core/Commands/InventoryCommands.cs \u2014 chest, invsort, quickstack"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Items/InventoryOps.cs \u2014 container operations",
+  "tests/Strata.Core.Tests/Gameplay/InventoryOpsTests.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "InventoryOpsTests:\n- SortMergesStacksAndKeepsFavoritesInPlace.\n- QuickStackOnlyMovesItemsAlreadyInChest.\n- RestockTopsUpBackpackStacks.\n- DepositAllSkipsHotbarCoinsAndFavorites.\n- LootAllRoutesCoinsToCoinSlots.\n- QuickStackNearbyReachesChestsInRangeOnly: TestGame places wooden_chest at 5 m and at 30 m.",
+  "ChunkCodecTests: ChestNameRoundTrips; ChunkWithoutNameStillReads",
+  "ui.cmds: `place wooden_chest 0 0 -3` / `interact 0 0 -3` / `give wood 30` / `chest deposit` / `assert inv.wood == 0` / `chest loot` / `assert inv.wood == 30` / `chest rename Loot` / `assert errors == 0`"
+ ],
+ "verification": [
+  "dotnet test; headless ui.cmds SMOKE PASS",
+  "Save the world, reload it, reopen the chest: the name is kept"
+ ],
+ "depends_on": [
+  "P2-05",
+  "P2-06",
+  "P2-07"
+ ],
+ "risks": [
+  "Locked dungeon chests (a P4 bosses/dungeon item) must be excluded from QuickStackNearby once they exist. Leave a `Locked` check hook on TileObjectInstance for P4 to fill.",
+  "Chunk-dirty marking must not force urgent remeshes (a D lag item). Use MarkModified only."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,50 @@
+{
+ "id": "P3-05",
+ "title": "Held-item sockets in the Blender pipeline (grip/muzzle/tip/string/chain) and projectile models",
+ "player_outcome": "No direct change yet. Every held item now knows where the hand grips it and where its muzzle, tip, string or chain starts, so later work can fire shots from the barrel, draw strings and chains, and hold guns and bows correctly. Yoyo heads and flail balls get their own models.",
+ "design": [
+  "Verified: PropLibrary.Model (PropLibrary.cs:152-172) instantiates the GLB and keeps only the first mesh. There are no empties anywhere in bgen. ProjectileDef.Model resolves to assets/models/projectiles/<id>.glb and is validated (ContentValidator.World.cs:168), but build_all.py never builds projectiles.",
+  "tools/blender/bgen/mesh.py MeshBuilder: add socket(name, pos, forward=(0,0,1), up=(0,1,0)) stored in mb.sockets.",
+  "New bgen/sockets.py: default sockets per generator when not set explicitly. grip at the origin; tip at the business end (+Z extent); gun muzzle at the barrel end; bow grip at the riser and 'nock' at the string centre; staff/wand tip at the gem; yoyo 'string' at the axle; flail 'chain' at the handle top; whip 'handle_end'; torch 'flame'.",
+  "Explicit sockets in gear.py and items.py where defaults are wrong: gun muzzle per style length, bow nock, rod tip. assets.json params.sockets can override per item.",
+  "build_all.make returns (obj, sockets). Create an empty per socket, parented to obj, with the right matrix, and export [obj, *empties] via export.export_glb. Also record sockets in assets/manifest.json items[iid].sockets (Y-up metres) for review.",
+  "assets.json gets a top-level 'projectiles': {id: {generator, params}}. build_all.plan errors when an id is not a content projectile; build writes assets/models/projectiles/<id>.glb plus manifest 'projectiles'. Add a head_only param to gear.yoyo (discs without the string stub) and gear.flail (ball only).",
+  "game/Rendering/PropLibrary.cs: while loading a model, collect Node3D children whose names match socket names into a cached IReadOnlyDictionary<string, Transform3D> (mesh-relative), exposed as Sockets(path) and Bounds(path). No extra loads.",
+  "GodotCommandHost probe sockets.<item> (socket count), for smoke.",
+  "Rebuild all item GLBs without icons (python3.13 tools/blender/build_all.py --no-icons) and commit."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/mesh.py \u2014 socket API",
+  "tools/blender/bgen/export.py \u2014 export empties alongside meshes",
+  "tools/blender/build_all.py \u2014 sockets, projectiles section and manifest",
+  "tools/blender/bgen/gear.py \u2014 explicit sockets; yoyo/flail head_only",
+  "tools/blender/bgen/items.py \u2014 explicit sockets (bow, staff, wand)",
+  "tools/blender/assets.json \u2014 'projectiles' section; per-item socket overrides",
+  "game/Rendering/PropLibrary.cs \u2014 Sockets()/Bounds() cache",
+  "game/Debug/GodotCommandHost.cs \u2014 sockets.<item> probe",
+  "assets/models/items/*.glb, assets/manifest.json \u2014 rebuilt"
+ ],
+ "files_add": [
+  "tools/blender/bgen/sockets.py \u2014 per-generator default sockets"
+ ],
+ "data_changes": [
+  "assets.json projectiles: wood_yoyo_head, rally_head, amazon_head, code_1_head, terrarian_head (generator yoyo, head_only)",
+  "assets.json projectiles: ball_o_hurt_ball, sunfury_ball, blue_moon_ball, flower_pow_ball, flairon_ball (generator flail, head_only)",
+  "The projectile defs start pointing at these models in P3-12/P3-13, so validation stays green meanwhile"
+ ],
+ "tests": [
+  "python3 tools/blender/build_all.py --check (projectile ids validated)",
+  "Smoke basic.cmds: 'assert sockets.minishark >= 2' and 'assert props.problems == 0'"
+ ],
+ "verification": [
+  "Open a rebuilt gun GLB in Godot: 'grip' and 'muzzle' nodes exist at the grip and barrel end",
+  "Strata.Tools validate (projectile model assets)",
+  "All smoke scripts PASS"
+ ],
+ "depends_on": [],
+ "risks": [
+  "glTF axis conversion (Blender Z-up \u2192 Godot Y-up) for socket orientation; verify on one gun and one bow before rebuilding everything.",
+  "The full GLB rebuild touches ~660 files; commit it on its own for reviewability."
+ ],
+ "effort": "M"
+}

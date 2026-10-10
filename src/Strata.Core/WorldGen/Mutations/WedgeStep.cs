@@ -39,7 +39,7 @@ public sealed class WedgeStep : IMutationStep, IZoneStep
         _z0 = size.Z * 0.5f + Trig.Sin(bearing) * land * p.Distance;
         _ux = Trig.Cos(heading);
         _uz = Trig.Sin(heading);
-        _floorY = gen.Plan.Bands.YForNormalizedDepth(p.Depth);
+        _floorY = gen.Plan.Bands.DescentY(p.Depth); // Don't Dig Up: from the bottom surface down
     }
 
     public string Zone { get; }

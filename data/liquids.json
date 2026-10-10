@@ -32,21 +32,21 @@
     { "id": "crispy_honey", "name": "Crispy Honey Block", "render": "crisp", "textures": { "all": "crispy_honey" }, "hardness": 1.5, "sound": "stone", "color": "#8a4a14", "tags": ["built", "liquid_mix"], "covers": ["terraria:crispy_honey_block"] }
   ],
   "buffs": [
-    { "id": "honey", "name": "Honey", "description": "Honey mends wounds.", "color": "#f0b040", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 2 }], "covers": ["terraria:honey"] },
+    { "id": "honey", "name": "Honey", "description": "Honey mends wounds.", "hideTimer": true, "color": "#f0b040", "effects": [{ "type": "stat", "stat": "lifeRegen", "add": 2 }], "covers": ["terraria:honey"] },
     { "id": "gills", "name": "Gills", "description": "Breathe under liquid.", "color": "#60c0d0", "effects": [{ "type": "waterBreathing" }], "covers": ["terraria:gills"] },
     { "id": "obsidian_skin", "name": "Obsidian Skin", "description": "Immune to lava.", "color": "#a04060", "effects": [{ "type": "liquidImmune", "liquid": "lava" }, { "type": "immune", "buff": "on_fire" }], "covers": ["terraria:obsidian_skin"] }
   ],
   "items": [
-    { "id": "empty_bucket", "name": "Empty Bucket", "description": "Scoops up liquid.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
+    { "id": "empty_bucket", "name": "Empty Bucket", "description": "Scoops up liquid.", "category": "tool", "maxStack": 9999, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
       "behaviors": [{ "type": "bucket" }], "covers": ["terraria:empty_bucket"] },
-    { "id": "water_bucket", "name": "Water Bucket", "description": "Pours a full cell of water.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
+    { "id": "water_bucket", "name": "Water Bucket", "description": "Pours a full cell of water.", "category": "tool", "maxStack": 9999, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
       "behaviors": [{ "type": "bucket", "liquid": "water", "empty": "empty_bucket" }], "covers": ["terraria:water_bucket"] },
-    { "id": "lava_bucket", "name": "Lava Bucket", "description": "Pours a full cell of lava.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "tags": ["liquid_proof"],
+    { "id": "lava_bucket", "name": "Lava Bucket", "description": "Pours a full cell of lava.", "category": "tool", "maxStack": 9999, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15, "tags": ["liquid_proof"],
       "behaviors": [{ "type": "bucket", "liquid": "lava", "empty": "empty_bucket" }], "covers": ["terraria:lava_bucket"] },
-    { "id": "honey_bucket", "name": "Honey Bucket", "description": "Pours a full cell of honey.", "category": "tool", "maxStack": 99, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
+    { "id": "honey_bucket", "name": "Honey Bucket", "description": "Pours a full cell of honey.", "category": "tool", "maxStack": 9999, "value": 200, "useStyle": "swing", "useTime": 15, "useAnimation": 15,
       "behaviors": [{ "type": "bucket", "liquid": "honey", "empty": "empty_bucket" }], "covers": ["terraria:honey_bucket"] },
-    { "id": "gills_potion", "name": "Gills Potion", "description": "Breathe underwater for a while.", "category": "potion", "maxStack": 30, "value": 200, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "gills", "ticks": 7200 }, "covers": ["terraria:gills_potion"] },
-    { "id": "obsidian_skin_potion", "name": "Obsidian Skin Potion", "description": "Walk through lava for a while.", "category": "potion", "maxStack": 30, "value": 300, "useStyle": "consume", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "obsidian_skin", "ticks": 14400 }, "covers": ["terraria:obsidian_skin_potion"] }
+    { "id": "gills_potion", "name": "Gills Potion", "description": "Breathe underwater for a while.", "category": "potion", "maxStack": 9999, "value": 200, "useStyle": "drink", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "gills", "ticks": 7200 }, "covers": ["terraria:gills_potion"] },
+    { "id": "obsidian_skin_potion", "name": "Obsidian Skin Potion", "description": "Walk through lava for a while.", "category": "potion", "maxStack": 9999, "value": 300, "useStyle": "drink", "useTime": 17, "useAnimation": 17, "consumable": true, "buff": { "id": "obsidian_skin", "ticks": 14400 }, "covers": ["terraria:obsidian_skin_potion"] }
   ],
   "recipes": [
     { "id": "empty_bucket", "output": "empty_bucket", "inputs": [{ "group": "any_iron_bar", "count": 3 }], "stations": ["anvil"] },

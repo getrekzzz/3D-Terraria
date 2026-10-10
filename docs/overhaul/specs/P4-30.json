@@ -1,0 +1,48 @@
+{
+ "id": "P4-30",
+ "title": "Plantera: hooks that latch onto the jungle, tentacles in phase two, enrage outside the underground jungle",
+ "player_outcome": "Plantera hangs from three vine hooks that latch onto nearby blocks and creep after you, limiting where she can reach. At half life her bulb bursts open and snapping tentacles sprout around her. Lure her out of the underground jungle and she goes berserk.",
+ "design": [
+  "New brain 'planteraHook' in new src/Strata.Core/AI/PlantBrains.cs, with PlanteraHookParams in BossBrainSpecs.cs {Reach 14 m, RelocateInterval 180, Speed 12}.",
+  "Every RelocateInterval \u00b1 rng, the hook picks a solid cell within Reach of the target by casting up to 12 random rays from the target with ctx.World.IsSolid (no trig: pick axis combinations from Pcg32), then flies there and stays latched.",
+  "Hooks are invulnerable, deal no contact damage, and die with Plantera (tethered).",
+  "Plantera phase 1: summon {enemy plantera_hook, once, max 3, tether true}, leash {kind plantera_hook, radius 9}, seed volleys.",
+  "Phase 2: model plantera_open, summon {plantera_tentacle, once, max 8, tether true, radius 2.5}, leash radius 12, expert {speed 1.2, summonMax +4}.",
+  "Enrage {when [{type biome, none [underground_jungle]}], damage 2, speed 1.6}.",
+  "plantera_tentacle: lunger brain {reach 7, aggroRange 20}, life 1000 (tune), damage 60, tetherColor #3a6a2a, model plantera_tentacle.",
+  "Generalise the stalk renderer in game/Entities/NpcRenderer.cs (currently Lunger-only). Draw a pooled tether cylinder from Leader.Center to the npc for any npc with a Leader and a Def.TetherColor (hooks and tentacles), sharing one material per colour."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/Brain.cs \u2014 register planteraHook",
+  "src/Strata.Core/Content/Specs/BossBrainSpecs.cs \u2014 PlanteraHookParams",
+  "src/Strata.Core/Content/Specs/BrainSpecs.cs \u2014 register",
+  "game/Entities/NpcRenderer.cs \u2014 generic tethers",
+  "data/enemies/temple.json \u2014 Plantera, hook, tentacle"
+ ],
+ "files_add": [
+  "src/Strata.Core/AI/PlantBrains.cs \u2014 hook latching brain",
+  "tests/Strata.Core.Tests/Gameplay/PlanteraTests.cs \u2014 Plantera tests"
+ ],
+ "data_changes": [
+  "plantera_hook and plantera_tentacle enemies; Plantera phases, leash, enrage."
+ ],
+ "tests": [
+  "PlanteraTests.HooksLatchOntoSolidBlocksNearTheTarget.",
+  "PlanteraTests.PlanteraStaysWithinHerLeash: 600 ticks.",
+  "PlanteraTests.TentaclesSproutInPhaseTwoAndDieWithHer.",
+  "PlanteraTests.PlanteraEnragesOutsideTheUndergroundJungle.",
+  "Smoke bosses.cmds, after 'boss plantera 12': 'assert npcs.plantera_hook == 3', then the existing 'slay plantera', 'assert npcs.plantera_hook == 0'."
+ ],
+ "verification": [
+  "dotnet test; headless bosses.cmds; boss gallery screenshot showing vines to the hooks"
+ ],
+ "depends_on": [
+  "P4-02",
+  "P4-29"
+ ],
+ "risks": [
+  "In the open smoke arena there may be no solid cells within reach. Fall back to latching on the floor under the target.",
+  "The enrage makes the smoke arena fight (forest) enraged. Harmless under god mode."
+ ],
+ "effort": "M"
+}

@@ -1,0 +1,30 @@
+{
+ "id": "X-13",
+ "title": "Fishing depth: bait, biome crates, lava fishing, weather and time effects",
+ "owner_session": "world",
+ "player_outcome": "Fishing like Terraria: bait items (worms, fireflies, butterflies, master bait\u2026) with bait power that consumes, biome crates (jungle, sky, corruption, crimson, hallowed, dungeon, frozen, oasis, ocean, obsidian/lava), lava fishing with the right gear, and rain/time/moon affecting catches; quest fish per biome for the Angler.",
+ "design": [
+  "Core fishing power formula (rod + bait + accessories + weather/time/moon), bait consumption, biome crate loot tables, lava fishing gate (hotline/lavaproof), quest fish entries; critters caught with bug nets become bait.",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Entities/ProjectileSystem.Special.cs (fishing)",
+  "data/items/*",
+  "data/loot/containers.json",
+  "data/loot/*"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "FishingPowerTests",
+  "CrateLootTests"
+ ],
+ "verification": [
+  "liquids.cmds or a fishing smoke block catches with bait"
+ ],
+ "depends_on": [
+  "X-01"
+ ],
+ "risks": [],
+ "effort": "M"
+}

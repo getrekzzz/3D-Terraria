@@ -6,11 +6,21 @@ namespace Strata.Core.Gameplay.Items;
 /// A fixed-size container of item stacks (player backpack, chests). Slot 0–9 of the player inventory form
 /// the hotbar. All operations are exact: they return what could not be stored instead of dropping it.
 /// </summary>
+/// <remarks>
+/// Favourites belong to the slot, not to <see cref="ItemStack"/> (whose equality and stacking stay untouched): only the
+/// player's own storages keep them. A slot loses its mark when it empties or another item replaces its stack, and
+/// <see cref="Transfer"/> carries the mark along; <see cref="Add"/> never sets one, so items stored in a chest drop it.
+/// </remarks>
 public sealed class Inventory
 {
     private readonly ItemStack[] _slots;
+    private readonly bool[]? _favorite;
 
-    public Inventory(int size) => _slots = new ItemStack[size];
+    public Inventory(int size, bool keepsFavorites = false)
+    {
+        _slots = new ItemStack[size];
+        if (keepsFavorites) _favorite = new bool[size];
+    }
 
     public Inventory(ItemStack[] backing) => _slots = backing;
 
@@ -21,9 +31,21 @@ public sealed class Inventory
         get => _slots[slot];
         set
         {
+            if (_favorite != null && (value.IsEmpty || value.Item != _slots[slot].Item)) _favorite[slot] = false;
             _slots[slot] = value.IsEmpty ? ItemStack.Empty : value;
             Changed?.Invoke(slot);
         }
+    }
+
+    /// <summary>Whether slots here can be favourited (the backpack, coin and ammo slots).</summary>
+    public bool KeepsFavorites => _favorite != null;
+
+    public bool IsFavorite(int slot) => _favorite != null && _favorite[slot];
+
+    /// <summary>Marks or unmarks a slot's stack as a favourite; ignored for empty slots and storages without favourites.</summary>
+    public void SetFavorite(int slot, bool favorite)
+    {
+        if (_favorite != null) _favorite[slot] = favorite && !_slots[slot].IsEmpty;
     }
 
     public event Action<int>? Changed;
@@ -114,20 +136,24 @@ public sealed class Inventory
         return s.WithCount(take);
     }
 
-    /// <summary>Swaps or merges the contents of two slots (possibly in different inventories).</summary>
+    /// <summary>Swaps or merges the contents of two slots (possibly in different inventories); favourite marks move with the stacks.</summary>
     public static void Transfer(Inventory from, int fromSlot, Inventory to, int toSlot)
     {
         var a = from[fromSlot];
         var b = to[toSlot];
         if (a.CanStackWith(b))
         {
+            // Both slots keep their own marks: the stacks only change size.
             int moved = Math.Min(a.Count, b.SpaceLeft);
             to[toSlot] = b.WithCount(b.Count + moved);
             from[fromSlot] = a.WithCount(a.Count - moved);
             return;
         }
+        bool favA = from.IsFavorite(fromSlot), favB = to.IsFavorite(toSlot);
         to[toSlot] = a;
         from[fromSlot] = b;
+        to.SetFavorite(toSlot, favA);
+        from.SetFavorite(fromSlot, favB);
     }
 
     public ItemStack[] ToArray() => (ItemStack[])_slots.Clone();

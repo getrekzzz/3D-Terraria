@@ -8,7 +8,7 @@ namespace Strata.Game.Settings;
 /// interface and display options. Changes apply live through <see cref="Changed"/> and are saved with
 /// <see cref="Save"/>. Key bindings are stored by <see cref="KeyBindings"/>.
 /// </summary>
-public sealed class UserSettings
+public sealed partial class UserSettings
 {
     private const string FilePath = "user://settings.cfg";
 
@@ -21,10 +21,19 @@ public sealed class UserSettings
     /// <summary>Looking steeply down with a pickaxe digs the ground under your feet (a shaft you drop into).</summary>
     public bool SmartDig { get; set; } = true;
 
+    /// <summary>
+    /// Terraria's Smart Cursor (X toggles it in game): pickaxes snap to the nearest block they can mine near the aim,
+    /// axes to the nearest tree.
+    /// </summary>
+    public bool SmartCursor { get; set; }
+
     public bool DamageNumbers { get; set; } = true;
 
     /// <summary>Pause the world while the inventory or a menu is open.</summary>
     public bool AutoPause { get; set; }
+
+    /// <summary>Halloween and Christmas follow the system date (off: no seasonal events).</summary>
+    public bool SeasonalEvents { get; set; } = true;
 
     // Camera and controls
     public float MouseSensitivity { get; set; } = 1f;
@@ -33,6 +42,12 @@ public sealed class UserSettings
     public float CameraDistance { get; set; } = 4.2f;
     public bool FirstPerson { get; set; }
     public bool CameraShake { get; set; } = true;
+
+    /// <summary>Red screen edges when hurt (strongest in first person).</summary>
+    public bool HurtFlash { get; set; } = true;
+
+    /// <summary>Secret world seeds the player has used, "|"-separated (shown as a hint on the world creation screen).</summary>
+    public string DiscoveredSeeds { get; set; } = "";
 
     // Display
     public string WindowMode { get; set; } = "windowed";
@@ -55,7 +70,43 @@ public sealed class UserSettings
     public bool ShowFps { get; set; }
     public bool ShowMinimap { get; set; } = true;
     public bool ShowTargetName { get; set; } = true;
-    public string CursorColor { get; set; } = "#ffffff";
+
+    /// <summary>Besides its chat line, "X has awoken!" also shows as a big banner at the top centre.</summary>
+    public bool BigAnnouncements { get; set; }
+
+    /// <summary>A boss's arrival shows its title card with cinema bars and a camera pull-back; its fall a "Defeated" card and a brief slow-motion.</summary>
+    public bool BossIntros { get; set; } = true;
+    public string CursorColor { get; set; } = DefaultCursorColor;
+
+    /// <summary>How life and mana show: "classic" (Terraria's hearts and stars) or "bars".</summary>
+    public string LifeDisplay { get; set; } = ClassicLifeDisplay;
+
+    public const string ClassicLifeDisplay = "classic";
+    public const string BarsLifeDisplay = "bars";
+
+    // Accessibility (X-12)
+    /// <summary>Colour-blind mode: "off", "protanopia", "deuteranopia" or "tritanopia" (Strata.Core.Presentation.ColorVision).</summary>
+    public string ColorBlindMode { get; set; } = "off";
+
+    /// <summary>How strongly the colour-blind filter recolours the world view (0–1); the interface palette swaps fully.</summary>
+    public float ColorBlindStrength { get; set; } = 1f;
+
+    /// <summary>Captions for important sounds (bosses, arrivals, weather, nearby creatures) above the chat log.</summary>
+    public bool Subtitles { get; set; }
+
+    /// <summary>Terraria's pink-red pointer.</summary>
+    public const string DefaultCursorColor = "#ff325f";
+
+    /// <summary>The settings file's format; files from before version 2 kept the old white pointer as their default.</summary>
+    public int Version { get; set; } = CurrentVersion;
+
+    private const int CurrentVersion = 2;
+
+    /// <summary>Onboarding hints (the hint toast); also <c>hint on|off</c> in the console.</summary>
+    public bool ShowHints { get; set; } = true;
+
+    /// <summary>Tips on the world loading screen.</summary>
+    public bool LoadingTips { get; set; } = true;
 
     public event Action<UserSettings>? Changed;
 
@@ -83,6 +134,9 @@ public sealed class UserSettings
                     GD.PushWarning($"settings: ignoring {prop.Name}: {ex.Message}");
                 }
             }
+            // Older files saved the then-default white pointer: give it Terraria's colour (a chosen colour stays).
+            if (!file.HasSectionKey("settings", ToKey(nameof(Version))) && s.CursorColor == "#ffffff") s.CursorColor = DefaultCursorColor;
+            s.Version = CurrentVersion;
         }
         Current = s;
         return s;

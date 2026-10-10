@@ -1,0 +1,44 @@
+{
+ "id": "P2-27",
+ "title": "Terraria grid shop with buy-to-cursor, sell by click or drop, and buyback",
+ "player_outcome": "'Shop' opens your inventory with a 10\u00d74 grid of the NPC's wares where the chest would be. Clicking puts an item on your cursor, and holding right-click buys one at a time, faster and faster. Shift-click or dropping an item on the grid sells it for coins. Recently sold items appear at the end of the grid so you can buy them back.",
+ "design": [
+  "Core, splitting TownCommerce into TownCommerce.cs and TownCommerce.Trade.cs:\n- `Buy(npc, player, item, int count, BuyTarget target)`: Cursor merges into PlayerInventory.Cursor (same item with space) and otherwise refuses; Backpack is the existing behaviour and stays the default.\n- `Sell(PlayerEntity p, Inventory inv, int slot)` generalised; the existing Sell(player, slot) delegates. Add `SellCursor(p)`. Both refuse favourites and coins.\n- Buyback: per player, up to 40 stacks, newest first, not persisted. `Buyback(PlayerEntity)` and `BuyBack(player, index, BuyTarget)` at the stack's sale value.",
+  "New game/UI/Inventory/ShopPanel.cs in the panel host: a 10\u00d74 grid of pooled read-only ItemSlotViews (SlotKind.Shop).\n- Stock first, paged with arrow TextButtons past 40 items, then buyback slots, tinted, filling the remaining cells.\n- Tooltips use TooltipContext.BuyPrice for the 'Buy price:' line in coin colours.\n- Left-click buys 1 into the cursor (repeat clicks stack). Right-button hold buys 1 at HoldRepeat intervals.\n- Dropping the cursor on the grid calls SellCursor.\n- Coins sound on success; TooManyItems or TooPoor go to the StatusLine.",
+  "GameWorld.ClickSlot with SlotContext.Shop: Shift+click on a backpack slot sells (P2-07 hook).",
+  "`InventoryScreen.OpenShop(TownNpc)` opens the inventory with ShopPanel and closes when the NPC is out of TalkRange. The `ui shop` command routes here.",
+  "UiCommands gains `ui buy <item> [n]`, `ui sell <area> <slot>` and `ui buyback <i>`. UiProbes gains `ui.shop_slots` and `ui.buyback`."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 Buy targets, generalised Sell, buyback (split)",
+  "src/Strata.Core/Session/GameWorld.InventoryActions.cs \u2014 shop sell on Shift-click",
+  "game/UI/InventoryScreen.cs \u2014 OpenShop",
+  "game/UI/TownDialog.cs \u2014 Shop button \u2192 OpenShop",
+  "game/Debug/UiCommands.cs \u2014 ui shop, buy, sell, buyback",
+  "game/Debug/UiProbes.cs \u2014 ui.shop_slots, ui.buyback",
+  "tests/Strata.Core.Tests/Gameplay/TownTests.cs \u2014 trade tests"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownCommerce.Trade.cs",
+  "game/UI/Inventory/ShopPanel.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "TownTests: BuyIntoCursorMergesSameItem; CursorHoldingOtherItemRefuses; SoldStackCanBeBoughtBackAtSalePrice; SellingAFavoriteIsRefused; BuybackCappedAt40",
+  "town.cmds unchanged (`ui talk merchant`, `ui shop`, `town buy merchant torch`) passes",
+  "ui.cmds:\n- `ui talk merchant` / `ui shop` / `assert ui.shop_slots > 0`.\n- `give wood 10` / `ui sell backpack <slot>` / `assert ui.buyback == 1`.\n- `ui buyback 0` / `assert ui.buyback == 0` / `assert inv.wood == 10` / `ui close`."
+ ],
+ "verification": [
+  "Headless town.cmds and ui.cmds pass; lavapipe screenshot of the Merchant shop at 1280\u00d7720 (the grid is fully on-screen)"
+ ],
+ "depends_on": [
+  "P2-06",
+  "P2-07",
+  "P2-15",
+  "P2-26"
+ ],
+ "risks": [
+  "The NPC phase expands shops (Dye Trader, Stylist, travelling stock). Paging handles more than 40 items."
+ ],
+ "effort": "M"
+}

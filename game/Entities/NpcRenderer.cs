@@ -9,8 +9,8 @@ namespace Strata.Game.Entities;
 
 /// <summary>
 /// Presents creatures: an animated model per creature (pooled by model), smoothed between simulation ticks,
-/// tinted per definition, flashing when hurt, plus a small health readout. Motion on top of the clips (facing,
-/// banking, squash, attacks, deaths): NpcRenderer.Motion.
+/// tinted per definition, flashing when hurt, plus a mini health bar (NpcRenderer.HealthBar). Motion on top of the
+/// clips (facing, banking, squash, attacks, deaths): NpcRenderer.Motion.
 /// </summary>
 public sealed partial class NpcRenderer : Node3D
 {
@@ -18,17 +18,20 @@ public sealed partial class NpcRenderer : Node3D
     {
         public required CreatureVisual Visual;
         public required string Model;
-        public required Label3D Health;
+        public required MeshInstance3D Health;
+        public float BarFraction = -1f;
         public MeshInstance3D? Stalk;
         public readonly List<(CreatureVisual Visual, string Model)> Segments = new();
         public readonly List<CreatureVisual> Barrier = new();
         public readonly List<CreatureVisual> Arms = new();
+        public readonly List<CreatureVisual> Illusions = new();
+        public string? IllusionModel;
         public Vector3 Shown;
         public float Squash = 1f;
         public float LastVy;
         public Quaternion Turn = Quaternion.Identity;
-        public float Yaw, Bank, Stretch, Spin, Blink = 1f;
-        public int LastAttackTimer, LastHurtFlash, LastSwing = -1000;
+        public float Yaw, Bank, Stretch, Spin, Whirl, Blink = 1f, Punch;
+        public int LastAttackTimer, LastHurtFlash, LastSwing = -1000, LastPunchFlash;
     }
 
     private readonly Dictionary<long, View> _views = new();
@@ -64,21 +67,24 @@ public sealed partial class NpcRenderer : Node3D
         _game = game;
         _props = props;
         Name = "Creatures";
+        InitializeHealthBars();
         game.Npcs.Removed += npc =>
         {
             if (!_views.Remove(npc.Id, out var view)) return;
             if (!KeepCorpse(npc, view)) Release(view.Visual, view.Model);
             foreach (var (seg, model) in view.Segments) Release(seg, model);
             ReleaseArms(npc, view);
+            ReleaseIllusions(view);
             if (npc.Def.Boss?.BarrierModel is { } wall) foreach (var tile in view.Barrier) Release(tile, wall);
-            view.Health.QueueFree();
-            view.Stalk?.QueueFree();
+            ReleaseBar(view);
+            ReleaseTether(view.Stalk);
         };
     }
 
     private void Release(CreatureVisual visual, string model)
     {
         visual.Visible = false;
+        visual.ProcessMode = ProcessModeEnum.Disabled; // pooled visuals neither animate nor sway
         if (!_pool.TryGetValue(model, out var stack)) _pool[model] = stack = new Stack<CreatureVisual>();
         stack.Push(visual);
     }
@@ -89,10 +95,15 @@ public sealed partial class NpcRenderer : Node3D
         {
             var pooled = stack.Pop();
             pooled.Visible = true;
+            pooled.ProcessMode = ProcessModeEnum.Inherit;
             return pooled;
         }
+        // A pool miss instantiates the model (and loads it the first time): the creature-side hitch source.
+        using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.npcs.create");
         var visual = CreatureVisual.Create($"assets/models/creatures/{model}.glb", _props);
-        if (visual != null) AddChild(visual);
+        if (visual == null) return null;
+        AddChild(visual);
+        CountMade(model);
         return visual;
     }
 
@@ -102,6 +113,8 @@ public sealed partial class NpcRenderer : Node3D
         float dt = (float)delta;
         var world = _game.Session.World;
         UpdateCorpses(dt);
+        HealthBarsShown = 0;
+        if (_prewarm.Count > 0) PrewarmStep();
         foreach (var npc in _game.Npcs.All)
         {
             if (!_views.TryGetValue(npc.Id, out var view))
@@ -114,21 +127,19 @@ public sealed partial class NpcRenderer : Node3D
                 ? new Vector3(npc.Center.X, npc.Center.Y, npc.Center.Z)
                 : new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
             view.Shown = view.Shown.DistanceSquaredTo(target) > 4f ? target : view.Shown.Lerp(target, 1f - Mathf.Exp(-dt * 25f));
-            var wanted = npc.ModelOverride ?? npc.Def.Model ?? npc.Def.Id;
+            var wanted = npc.ShownModel;
             if (wanted != view.Model && Acquire(wanted) is { } swapped)
             {
+                // A phase change spins into the new form; a disguise drops at once (the chest simply bites).
+                bool unmasked = view.Model == npc.Def.Disguise?.Model;
                 Release(view.Visual, view.Model);
                 view.Visual = swapped;
                 view.Model = wanted;
-                view.Spin = 1f;
+                if (!unmasked) view.Spin = 1f;
             }
             var visual = view.Visual;
-            visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.LiftFor(npc.HalfExtents.Y * 2f, npc.Def.Scale) : view.Shown;
-            if (npc.Segments.Count > 0)
-            {
-                UpdateSegments(npc, view, world);
-                UpdateArms(npc, view);
-            }
+            visual.Position = npc.Segments.Count == 0 ? view.Shown + Vector3.Up * visual.LiftFor(npc.HalfExtents.Y * 2f, npc.Def.Scale * npc.VisualScale) : view.Shown;
+            if (npc.Segments.Count > 0) UpdateSegments(npc, view, world);
             if (npc.Barrier != null) UpdateBarrier(npc, view, world);
             if (npc.Segments.Count > 0 && npc.Def.Boss!.SegmentModels.Length == 0)
             {
@@ -137,18 +148,21 @@ public sealed partial class NpcRenderer : Node3D
             }
             else Orient(npc, view, dt);
             Animate(npc, view, dt);
+            if (npc.Illusions > 0 || view.Illusions.Count > 0) UpdateIllusions(npc, view);
             if (view.Stalk != null) UpdateStalk(npc, view);
             var tint = Color.FromHtml(npc.Def.Tint);
-            if (npc.HurtFlash > 0) tint = new Color(2.2f, 0.7f, 0.7f);
+            // The hurt flash fades with the hit's flash timer instead of blinking off.
+            tint = StatusVisuals.Tint(npc.Buffs, tint, (npc.Id * 0.618034f) % 1f);
+            if (npc.HurtFlash > 0) tint = tint.Lerp(new Color(2.2f, 0.7f, 0.7f), Mathf.Clamp(npc.HurtFlash / 8f, 0f, 1f));
             visual.SetTint(tint);
+            if (npc.Alive && npc.Buffs.Active.Count > 0) TrackStatus(npc, view);
             visual.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, view.Shown + Vector3.Up * 0.5f)));
-            view.Health.Visible = npc.Life < npc.MaxLife;
-            if (view.Health.Visible)
-            {
-                view.Health.Text = $"{npc.Life}/{npc.MaxLife}";
-                view.Health.Position = view.Shown + new Vector3(0, npc.HalfExtents.Y * 2f + 0.35f, 0);
-            }
+            UpdateHealthBar(npc, view);
         }
+        // Arms to boss parts once every view has moved this frame (a hand listed after its body would trail a frame).
+        foreach (var npc in _game.Npcs.All)
+            if (npc.Segments.Count == 0 && npc.Def.Boss is { Parts.Length: > 0, ArmModel: not null } && _views.TryGetValue(npc.Id, out var view))
+                UpdatePartArms(npc, view);
     }
 
     /// <summary>
@@ -160,15 +174,16 @@ public sealed partial class NpcRenderer : Node3D
         var boss = npc.Def.Boss!;
         var segModel = boss.SegmentModel ?? view.Model;
         bool freeParts = boss.SegmentModels.Length > 0;
+        if (!freeParts) SyncSegmentViews(npc, view, segModel);
         while (view.Segments.Count < npc.Segments.Count)
         {
             int index = view.Segments.Count;
-            bool tail = index == npc.Segments.Count - 1;
-            var model = index < boss.SegmentModels.Length ? boss.SegmentModels[index] : tail ? boss.TailModel ?? segModel : segModel;
+            var model = index < boss.SegmentModels.Length ? boss.SegmentModels[index] : boss.ChainModel(index, npc.Segments.Count, segModel);
             if (Acquire(model) is not { } seg) return;
             view.Segments.Add((seg, model));
         }
         var ahead = view.Shown;
+        var tint = Color.FromHtml(npc.Def.Tint);
         for (int i = 0; i < npc.Segments.Count; i++)
         {
             var p = new Vector3(npc.Segments[i].X, npc.Segments[i].Y, npc.Segments[i].Z);
@@ -181,58 +196,57 @@ public sealed partial class NpcRenderer : Node3D
             }
             var dir = ahead - p;
             if (!freeParts && dir.LengthSquared() > 1e-4f) seg.Basis = Basis.LookingAt(dir.Normalized(), Mathf.Abs(dir.Normalized().Y) > 0.98f ? Vector3.Forward : Vector3.Up);
-            seg.SetTint(npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Colors.White);
+            // A plate that launched its probe goes dark (and no longer fires).
+            // Segments wear the creature's tint (as the head does) under the hurt and spent states.
+            seg.SetTint(tint * (npc.HurtFlash > 0 ? new Color(2.2f, 0.7f, 0.7f) : Strata.Core.AI.WormBrain.Spent(npc, i) ? SpentTint : Colors.White));
             seg.SetLight(OwnLight(npc, LightProbe.SampleSmooth(world, p)));
             ahead = p;
         }
     }
 
-    /// <summary>Rooted creatures (snatchers): a vine from the anchor to the head.</summary>
-    private static void UpdateStalk(Npc npc, View view)
+    /// <summary>
+    /// A worm that lost segments (split, or its head handed on) drops the extra visuals back into the pool, and its
+    /// last visual wears the tail model while the others wear the body's.
+    /// </summary>
+    private static readonly Color SpentTint = new(0.35f, 0.35f, 0.35f);
+
+    private void SyncSegmentViews(Npc npc, View view, string segModel)
     {
-        var root = new Vector3(npc.Anchor.X, npc.Anchor.Y, npc.Anchor.Z);
-        var head = view.Shown + new Vector3(0, npc.HalfExtents.Y * 0.8f, 0);
-        var span = head - root;
-        float len = span.Length();
-        view.Stalk!.Visible = len > 0.05f;
-        if (len <= 0.05f) return;
-        var up = span / len;
-        var side = Mathf.Abs(up.Y) > 0.95f ? Vector3.Right : up.Cross(Vector3.Up).Normalized();
-        var basis = new Basis(side, up, side.Cross(up)).Scaled(new Vector3(1, len, 1));
-        view.Stalk.GlobalTransform = new Transform3D(basis, root + span * 0.5f);
+        while (view.Segments.Count > npc.Segments.Count)
+        {
+            var (visual, model) = view.Segments[^1];
+            Release(visual, model);
+            view.Segments.RemoveAt(view.Segments.Count - 1);
+        }
+        var boss = npc.Def.Boss!;
+        for (int i = 0; i < view.Segments.Count; i++)
+        {
+            var want = boss.ChainModel(i, npc.Segments.Count, segModel);
+            if (view.Segments[i].Model == want) continue;
+            if (Acquire(want) is not { } swapped) continue;
+            Release(view.Segments[i].Visual, view.Segments[i].Model);
+            view.Segments[i] = (swapped, want);
+        }
     }
 
-    private static MeshInstance3D NewStalk(string? color) => new()
+    /// <summary>Buff and debuff particles follow the creature's body (StatusVisuals hands them back once it is gone).</summary>
+    private static void TrackStatus(Npc npc, View view)
     {
-        Mesh = new CylinderMesh { TopRadius = 0.05f, BottomRadius = 0.09f, Height = 1f, RadialSegments = 6, Rings = 1 },
-        MaterialOverride = new StandardMaterial3D { AlbedoColor = color != null ? Color.FromHtml(color) : new Color(0.25f, 0.45f, 0.15f), Roughness = 0.9f },
-    };
+        var half = new Vector3(npc.HalfExtents.X, npc.HalfExtents.Y, npc.HalfExtents.Z);
+        var center = npc.Segments.Count > 0 ? view.Shown : view.Shown + Vector3.Up * half.Y;
+        StatusVisuals.Instance?.Track(npc.Id, npc.Buffs, center, half, view.Visual.Visible);
+    }
 
     private View? Create(Npc npc)
     {
-        var model = npc.Def.Model ?? npc.Def.Id;
+        var model = npc.ShownModel;
         var visual = Acquire(model);
         if (visual == null) return null;
         // Glowing creatures get their light from the shared pool (Rendering.DynamicLights, see Glows); visuals made
         // before that carried their own light, which a pooled visual may still hold.
         if (visual.GetNodeOrNull<OmniLight3D>("Glow") is { } oldGlow) oldGlow.QueueFree();
-        MeshInstance3D? stalk = null;
-        if (npc.Def.Brain.Type == Strata.Core.Content.Specs.BrainSpecs.Lunger)
-        {
-            stalk = NewStalk(npc.Def.TetherColor);
-            AddChild(stalk);
-        }
-        var health = new Label3D
-        {
-            Billboard = BaseMaterial3D.BillboardModeEnum.Enabled,
-            PixelSize = 0.004f,
-            FontSize = 48,
-            OutlineSize = 12,
-            Modulate = new Color(1f, 0.45f, 0.45f),
-            NoDepthTest = false,
-            Visible = false,
-        };
-        AddChild(health);
+        var stalk = HasTether(npc) ? AcquireTether(npc.Def.TetherColor) : null;
+        var health = AcquireBar();
         var pos = new Vector3(npc.Position.X, npc.Position.Y, npc.Position.Z);
         float yaw = npc.Yaw + Mathf.Pi;
         return new View { Visual = visual, Model = model, Health = health, Shown = pos, Stalk = stalk, Yaw = yaw, Turn = new Quaternion(Vector3.Up, yaw) };

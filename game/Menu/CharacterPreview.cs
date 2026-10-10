@@ -52,7 +52,7 @@ public sealed partial class CharacterPreview : SubViewportContainer
             _visual = null;
             _model = model;
             if (!ResourceLoader.Exists("res://" + model)) return;
-            _visual = CreatureVisual.Create(model, _props);
+            _visual = CreatureVisual.Create(model, _props, now: true);
             if (_visual == null) return;
             _turntable.AddChild(_visual);
             _visual.SetLodBias(8f);

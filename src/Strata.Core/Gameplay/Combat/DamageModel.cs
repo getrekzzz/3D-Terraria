@@ -48,6 +48,17 @@ public static class DamageModel
         _ => StatIds.GenericCrit,
     };
 
+    /// <summary>The attacker's damage multiplier for a class: 1 + generic bonus + the class's own bonus.</summary>
+    public static float DamageMultiplier(StatSheet attacker, DamageClass damageClass) =>
+        1f + attacker.Bonus(StatIds.GenericDamage) + (damageClass != DamageClass.Generic ? attacker.Bonus(DamageStat(damageClass)) : 0f);
+
+    /// <summary>Critical strike chance (percentage points) the attacker adds for a class; generic crit counts once.</summary>
+    public static int CritBonus(StatSheet attacker, DamageClass damageClass)
+    {
+        string stat = CritStat(damageClass);
+        return (int)(attacker.Bonus(StatIds.GenericCrit) + (stat != StatIds.GenericCrit ? attacker.Bonus(stat) : 0f));
+    }
+
     /// <summary>Damage dealt by an attacker with stats <paramref name="attacker"/> (may be null for enemies).</summary>
     public static HitResult Roll(int baseDamage, DamageClass damageClass, int critChance, float knockback, StatSheet? attacker,
         int targetDefense, float defenseFactor, float targetEndurance, float targetKnockbackResist, ref Pcg32 rng)
@@ -56,8 +67,9 @@ public static class DamageModel
         int crit = critChance;
         if (attacker != null)
         {
-            multiplier += attacker.Bonus(StatIds.GenericDamage) + (damageClass != DamageClass.Generic ? attacker.Bonus(DamageStat(damageClass)) : 0f);
-            crit += (int)(attacker.Bonus(StatIds.GenericCrit) + attacker.Bonus(CritStat(damageClass)));
+            multiplier = DamageMultiplier(attacker, damageClass);
+            crit += CritBonus(attacker, damageClass);
+            if (damageClass == DamageClass.Melee) knockback *= 1f + attacker.Bonus(StatIds.MeleeKnockback); // Titan Glove
         }
         float raw = baseDamage * multiplier * rng.Range(0.85f, 1.15f);
         bool isCrit = damageClass != DamageClass.None && rng.NextInt(100) < crit;

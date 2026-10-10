@@ -1,0 +1,59 @@
+{
+ "id": "P3-31",
+ "title": "Terraria's real prefixes: names and stats, rolled on drops, chest loot and shop buys; tooltip modifier lines",
+ "player_outcome": "Items roll Terraria's real modifiers \u2014 Legendary, Godly, Unreal, Mythical, Menacing, Warding, \u2026 \u2014 with the real stats. Checking the prefix on new loot is back: chest, boss and enemy drops and shop purchases all come with prefixes. Tooltips show '+15% damage' style lines in green or red and the right sell price.",
+ "design": [
+  "Verified: data/combat.json:22-41 has 18 partly invented prefixes. Prefixes.Fresh is only called by RecipeBook.Craft and the angler; LootRoller and TownCommerce.Buy create unprefixed stacks. ItemTooltip ignores the prefix.",
+  "New data/prefixes.json (manifest regenerated) with the Terraria 1.4.4 table, transcribed from the wiki Modifiers page and cross-checked. Groups: universal (Keen, Superior, Forceful, Broken, Damaged, Shoddy, Hurtful, Strong, Unpleasant, Weak, Ruthless, Godly, Demonic, Zealous).",
+  "Group common (Quick, Deadly, Agile, Nimble, Murderous, Slow, Sluggish, Lazy, Annoying, Nasty).",
+  "Group melee (Large, Massive, Dangerous, Savage, Sharp, Pointy, Tiny, Terrible, Small, Dull, Unhappy, Bulky, Shameful, Heavy, Light, Legendary).",
+  "Group ranged (Sighted, Rapid, Hasty, Intimidating, Deadly, Staunch, Awful, Lethargic, Awkward, Powerful, Frenzying, Unreal).",
+  "Group magic (Mystic, Adept, Masterful, Inept, Ignorant, Deranged, Intense, Taboo, Celestial, Furious, Manic, Mythical).",
+  "Group accessory (Hard, Guarding, Armored, Warding, Precise, Lucky, Jagged, Spiked, Angry, Menacing, Brisk, Fleeting, Hasty, Quick, Wild, Rash, Intrepid, Violent, Arcane). Duplicate names get suffixed ids (quick_accessory, deadly_ranged, hasty_accessory) with the shared display name.",
+  "PrefixDef gains MeleeSpeed; Prefixes.AccessoryStats adds MeleeSpeed. Remove the prefixes block from data/combat.json. aliases.json maps old ids: stout\u2192unpleasant, brisk\u2192quick, towering\u2192massive, stubby\u2192tiny, mythic\u2192legendary, farsighted\u2192sighted, unerring\u2192unreal, transcendent\u2192mythical, frugal\u2192adept, sturdy\u2192guarding, fleet\u2192fleeting, swift_tool\u2192quick.",
+  "Prefixes.Groups per Terraria: swung melee and tools \u2192 universal+common+melee; non-swung melee (spear, yoyo, flail, boomerang/throw) \u2192 universal+common only; ranged \u2192 universal+common+ranged; magic and summon \u2192 universal+common+magic; accessories \u2192 accessory. Uniform pick among eligible.",
+  "Prefixes.Value: Terraria's multiplier (damage \u00d7 (2 \u2212 useTime) \u00d7 (2 \u2212 mana) \u00d7 size \u00d7 knockback \u00d7 velocity \u00d7 (1 + crit\u00b70.02), accessory steps), squared.",
+  "Add Prefixes.Apply(ref ItemStack, content, ref rng) and call it in LootRoller.Emit for Count == 1 prefixable items (covers enemy, boss, crate and chest loot, including EnsureContainerLoot) and in TownCommerce.Buy. PlayerSave.Fill drops prefixes that don't apply to the item's groups.",
+  "ItemTooltip: stats via Prefixes.Damage/Crit/Knockback/UseTime; new TooltipKind.Modifier lines ('+15% damage', '-10% speed'; positive/negative flag for P2 colouring); sell price = Prefixes.Value(stack)/5 \u00d7 count; Generic damage prints 'N damage'."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/PrefixDef.cs \u2014 MeleeSpeed",
+  "src/Strata.Core/Gameplay/Items/Prefixes.cs \u2014 groups, Value formula, Apply",
+  "src/Strata.Core/Gameplay/Loot/LootRoller.cs \u2014 prefix on emit",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 prefix on buy",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 sanitize prefixes",
+  "src/Strata.Core/Gameplay/Items/ItemTooltip.cs \u2014 modifier lines, prefixed stats, price",
+  "data/combat.json \u2014 remove prefixes",
+  "data/config/aliases.json \u2014 old prefix ids",
+  "data/manifest.json \u2014 add prefixes.json",
+  "docs/3D_TERRARIA_MASTER_PLAN.md \u2014 prefix/reforge status lines"
+ ],
+ "files_add": [
+  "data/prefixes.json \u2014 Terraria prefix table",
+  "tests/Strata.Core.Tests/Gameplay/PrefixTests.cs \u2014 prefix tests"
+ ],
+ "data_changes": [
+  "data/prefixes.json (~83 prefixes, exact Terraria stats; weights 1)",
+  "aliases for the 12 removed ids"
+ ],
+ "tests": [
+  "PrefixTests: 'legendary' has +15% damage, +10% speed, +5 crit, +10% size, +15% knockback; a spear can never roll a size prefix",
+  "PrefixTests: LootRoller with a seeded rng gives an enchanted_sword drop a prefix in \u2265 60% of 100 rolls; TownCommerce.Buy of copper_pickaxe can carry a prefix",
+  "PrefixTests: a saved stack with old 'mythic' loads as Legendary; an accessory prefix on a weapon is dropped on load",
+  "PrefixTests: the tooltip of a Legendary copper broadsword contains '+15% damage'",
+  "Existing TownServicesTests (reforge) stay green"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate + manifest --check",
+  "In-game: reforge at the Goblin Tinkerer shows Terraria names"
+ ],
+ "depends_on": [
+  "P3-02"
+ ],
+ "risks": [
+  "Transcription errors in the prefix table; add a table test for a few known values per group.",
+  "ItemTooltip is also changed by P2 (layout/colours); P3 owns the data lines, P2 the rendering.",
+  "TownCommerce is also touched by P4 (shops); keep this edit small."
+ ],
+ "effort": "M"
+}

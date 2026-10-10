@@ -1,0 +1,49 @@
+{
+ "id": "P2-06",
+ "title": "Core purse and ammo slots: coins auto-convert into coin slots; wallet spans coin slots and backpack; ammo slots used first",
+ "player_outcome": "Picked-up coins fly into the coin slots, and 100 copper becomes 1 silver on its own. Shops, the Nurse, reforging and death penalties see money in any slot. Arrows and bullets go to the ammo slots and are fired from there first. The bow's hotbar slot will show the arrows left (drawn in P2-12).",
+ "design": [
+  "PlayerInventory.Pickup routing:\n- Coin items (tag 'coin'): merge into Coins, then fill empty Coins slots, then call `Coins.Normalize(this, content)`. Any remainder goes to the backpack.\n- Items with AmmoClass: merge into matching Ammo stacks, then empty Ammo slots, then the backpack.\n- Everything else: backpack.\n- Pickup needs content for Normalize, so PlayerInventory gets a `ContentDatabase? Content` set by PlayerState.CreateNew/ToState, or Normalize becomes a method on a helper taking content. Pick the first to keep Pickup's call sites unchanged.",
+  "Coins.Normalize(PlayerInventory, ContentDatabase): sums the Coins inventory, clears it, and re-gives the largest denominations into Coins. Overflow goes to the backpack. Add `Coins.Total(PlayerInventory)` = Coins plus Backpack.",
+  "Wallet overloads `TrySpend(PlayerInventory, content, copper, out overflow)` and `Give(PlayerInventory, content, copper)`: take from Coins and Backpack coins, and return change to Coins first. Then update every caller:\n- TownCommerce.Buy, Sell and Heal (TownCommerce.cs:119,137,159).\n- TownServices reforge, taxes and angler (TownServices.cs:51,82,111).\n- GameWorld.Death.cs Classic half-coin drop.\n- TownSystem.cs:139 PlayerCoins.\n- The InventoryScreen and TownDialog coin labels (temporary until P2-15).",
+  "Ammo lookup: `PlayerInventory.FindAmmo(string ammoClass)` returns `(Inventory Inv, int Slot)?`, searching Ammo 0..3 then the backpack. `CountAmmo(string ammoClass)` feeds the hotbar count. ItemUseSystem.Shoot (ItemUseSystem.cs:326-331) uses it; this is a 3-line change, and the static FindAmmo(Inventory, \u2026) stays for existing tests.",
+  "Probe `inv.coins`: purse value in copper.",
+  "Update test helpers that read Coins.Total(Backpack) to use Coins.Total(PlayerInventory): TownServicesTests.Purse, TownTests.Purse, CharacterTests, ArsenalTests."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Gameplay/Items/PlayerInventory.cs \u2014 Pickup routing, FindAmmo, CountAmmo",
+  "src/Strata.Core/Gameplay/Items/Coins.cs \u2014 Normalize, Total(PlayerInventory)",
+  "src/Strata.Core/Gameplay/Items/Wallet.cs \u2014 PlayerInventory overloads",
+  "src/Strata.Core/Gameplay/Player/PlayerState.cs \u2014 content handle for normalisation",
+  "src/Strata.Core/Persistence/PlayerSave.cs \u2014 pass content on load",
+  "src/Strata.Core/Gameplay/Town/TownCommerce.cs \u2014 purse-wide wallet",
+  "src/Strata.Core/Gameplay/Town/TownServices.cs \u2014 purse-wide wallet",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 PlayerCoins over the purse",
+  "src/Strata.Core/Session/GameWorld.Death.cs \u2014 Classic penalty over the purse",
+  "src/Strata.Core/Gameplay/Interaction/ItemUseSystem.cs \u2014 Shoot uses PlayerInventory.FindAmmo",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 inv.coins",
+  "game/UI/InventoryScreen.cs, game/UI/TownDialog.cs \u2014 coin labels read the purse (temporary)",
+  "tests/Strata.Core.Tests/Gameplay/TownServicesTests.cs, TownTests.cs, CharacterTests.cs, ArsenalTests.cs \u2014 purse helpers"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/Gameplay/PurseAndAmmoTests.cs"
+ ],
+ "data_changes": [],
+ "tests": [
+  "PurseAndAmmoTests:\n- CoinsGoToCoinSlotsAndAutoConvert: 250 copper \u2192 2 silver + 50 copper in Coins.\n- ConversionOverflowsIntoBackpack.\n- WalletSpendsAcrossCoinSlotsAndBackpack.\n- ChangeReturnsToCoinSlots.\n- ArrowsGoToAmmoSlots.\n- FindAmmoPrefersAmmoSlotsTopToBottom.\n- CountAmmoSumsEverySlot.",
+  "Existing: combat.cmds `give wooden_arrow 50` \u2026 `assert inv.wooden_arrow == 49` still passes (the arrows now live in Ammo; the probe counts all storages)",
+  "town.cmds: `give silver_coin 60` then `town buy merchant torch` still passes",
+  "ui.cmds: `give copper_coin 250` / `assert inv.silver_coin == 2` / `assert inv.coins == 250`"
+ ],
+ "verification": [
+  "dotnet test; all smoke scripts SMOKE PASS"
+ ],
+ "depends_on": [
+  "P2-05"
+ ],
+ "risks": [
+  "P3 edits ItemUseSystem.Shoot for per-weapon ammo saving and bow timing. Keep this change to the FindAmmo lines and rebase in whichever order they land.",
+  "The critic's magnet-into-full-inventory fix (feel phase) must use a PlayerInventory-level CanTake that includes the coin and ammo slots."
+ ],
+ "effort": "M"
+}

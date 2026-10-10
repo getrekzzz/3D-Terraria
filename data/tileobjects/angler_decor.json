@@ -1,0 +1,15 @@
+{
+  // P5-23: fishing-themed decor the Angler sells as his quest count grows (data/town/pre_hardmode.json shop;
+  // models from tools/blender/bgen/angler_decor.py, specs in tools/blender/assets.d/p5-23-angler-decor.json).
+  "tileObjects": [
+    { "id": "pile_of_seashells", "name": "Pile of Seashells", "size": [2, 1, 2], "hitPoints": 1, "itemValue": 2500, "itemMaxStack": 9999, "tags": ["decor", "angler"] },
+    { "id": "treasure_map", "name": "Treasure Map", "size": [3, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 5000, "itemMaxStack": 9999, "tags": ["decor", "angler"] },
+    { "id": "seaweed_planter", "name": "Seaweed Planter", "size": [2, 3, 2], "hitPoints": 1, "itemValue": 7500, "itemMaxStack": 9999, "tags": ["decor", "angler"] },
+    { "id": "lifebuoy", "name": "Lifebuoy", "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 10000, "itemMaxStack": 9999, "tags": ["decor", "angler"] },
+    { "id": "ships_wheel", "name": "Ship's Wheel", "size": [3, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 15000, "itemMaxStack": 9999, "tags": ["decor", "angler"] },
+    { "id": "wall_anchor", "name": "Wall Anchor", "size": [2, 3, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 15000, "itemMaxStack": 9999, "tags": ["decor", "angler"] },
+    { "id": "bass_plaque", "name": "Bass Plaque", "size": [3, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 20000, "itemMaxStack": 9999, "tags": ["decor", "angler", "trophy"] },
+    { "id": "trout_plaque", "name": "Trout Plaque", "size": [3, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 20000, "itemMaxStack": 9999, "tags": ["decor", "angler", "trophy"] },
+    { "id": "tuna_plaque", "name": "Tuna Plaque", "size": [3, 2, 1], "anchor": "wall", "hitPoints": 1, "itemValue": 30000, "itemMaxStack": 9999, "tags": ["decor", "angler", "trophy"] }
+  ]
+}

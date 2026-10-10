@@ -2,13 +2,21 @@ using Godot;
 
 namespace Strata.Game.Debug;
 
-/// <summary>Fly camera for inspecting the world (mouse look, WASD, Space/Ctrl up/down, Shift to boost).</summary>
+/// <summary>
+/// Fly camera (mouse look while the cursor is captured, WASD, Space/Ctrl up/down, Shift to boost): the debug
+/// free-camera worlds and the player's photo mode (X-12), which tethers it near the player so it stays in the streamed world.
+/// </summary>
 public sealed partial class FreeCamera : Camera3D
 {
     private float _yaw;
     private float _pitch;
 
     public float Speed { get; set; } = 12f;
+
+    /// <summary>When set, the camera stays within <see cref="TetherRadius"/> of this point.</summary>
+    public Vector3? Tether { get; set; }
+
+    public float TetherRadius { get; set; } = 40f;
 
     public override void _Ready()
     {
@@ -39,6 +47,8 @@ public sealed partial class FreeCamera : Camera3D
         if (Input.IsActionPressed("crouch")) dir += Vector3.Down;
         float speed = Speed * (Input.IsActionPressed("sprint") ? 5f : 1f);
         GlobalPosition += dir * speed * (float)delta;
+        if (Tether is { } t && (GlobalPosition - t).Length() > TetherRadius)
+            GlobalPosition = t + (GlobalPosition - t).Normalized() * TetherRadius;
     }
 
     public void LookFrom(Vector3 position, Vector3 target)

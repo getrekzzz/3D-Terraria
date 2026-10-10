@@ -33,7 +33,7 @@ public class ArsenalTests
         g.Hold("wooden_boomerang");
         g.Player.Aim = Vector3.Normalize(gel.Center - g.Player.Eye);
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
-        g.Player.UseCooldown = 0;
+        g.Player.ResetUse();
         Assert.Equal(UseOutcome.Blocked, g.World.ItemUse.Use(g.Player, null, true)); // still out
         g.Ticks(30);
         Assert.True(gel.Life < 5000, "boomerang missed");
@@ -42,13 +42,72 @@ public class ArsenalTests
         Assert.Equal(1, g.Player.State.Inventory.Held.Count); // not consumed
     }
 
+    [Theory]
+    [InlineData("starfury")]
+    [InlineData("enchanted_sword")]
+    public void SwordsWithProjectilesAlsoSwing(string sword)
+    {
+        using var g = Arena();
+        var gel = Dummy(g, 1.5f);
+        g.Hold(sword);
+        // Pitched 35° up, so the shot sails over the slime and only the blade can reach it.
+        float pitch = 35f * MathF.PI / 180f;
+        g.Player.Aim = new Vector3(0, MathF.Sin(pitch), MathF.Cos(pitch));
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(1, g.World.Melee.ActiveSwings);
+        Assert.NotEmpty(g.World.Projectiles.All);
+        bool bladeHit = false;
+        for (int t = 0; t < 30; t++)
+        {
+            g.World.Tick();
+            bladeHit |= gel.ImmuneTicks > 0; // only melee hits grant immunity frames
+        }
+        Assert.True(gel.Life < 5000, "the slime was never hit");
+        Assert.True(bladeHit, "the blade never connected");
+    }
+
+    [Fact]
+    public void SwordWhoseShotIsRefusedStillSwings()
+    {
+        using var g = Arena();
+        g.Hold("starfury");
+        g.Player.Aim = Vector3.UnitZ;
+        // One star out at a time (no shipped sword is capped, so cap this world's Starfury).
+        g.World.Uses[g.Content.Items.Get("starfury")].Shoot = new Strata.Core.Content.Specs.ShootProjectileParams
+        {
+            Type = Strata.Core.Content.Specs.ItemBehaviorSpecs.ShootProjectile,
+            MaxActive = 1,
+        };
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        g.Player.ResetUse();
+        Assert.Equal(UseOutcome.Swung, g.World.ItemUse.Use(g.Player, null, true)); // the star is still out
+        Assert.Single(g.World.Projectiles.All);
+        Assert.Equal(1, g.World.Melee.ActiveSwings);
+        Assert.True(g.Player.UseCooldown > 0, "a refused shot must still start the swing's cooldown");
+    }
+
+    [Fact]
+    public void ZenithNeverBlocks()
+    {
+        using var g = Arena();
+        g.Hold("zenith");
+        g.Player.Aim = Vector3.UnitZ;
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        g.Player.ResetUse(); // a fresh use while the first blades are still out
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        Assert.Equal(6, g.World.Projectiles.All.Count);
+        Assert.Equal(0, g.World.Melee.ActiveSwings); // the swing is only an animation
+    }
+
     [Fact]
     public void BombsExplodeOnTheirFuseDiggingAndHurting()
     {
         using var g = Arena();
-        var gel = Dummy(g, 2.5f);
+        var gel = Dummy(g, 1.5f);
         g.Hold("bomb", 3);
-        g.Player.Aim = Vector3.Normalize(new Vector3(0, -0.2f, 1));
+        // Dropped almost straight down: it bounces through the slime and settles beside it instead of rolling off the
+        // arena across whatever terrain lies beyond.
+        g.Player.Aim = Vector3.Normalize(new Vector3(0, -1f, 0.1f));
         int life = g.Player.State.Vitals.Life;
         int stone = CountSolid(g, 8);
         Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
@@ -126,6 +185,7 @@ public class ArsenalTests
         g.World.Session.Commit(batch);
         g.World.Liquids.Enabled = false;
         g.Hold("golden_fishing_rod");
+        g.Player.State.Inventory.Backpack.Add(new ItemStack(g.Content.Items.Get("master_bait"), 50));
         g.Player.Aim = Vector3.Normalize(new Vector3(0, -0.35f, 1)); // lob it into the pond 2–5 m ahead
         int caught = 0;
         for (int cast = 0; cast < 6 && caught == 0; cast++)
@@ -160,9 +220,36 @@ public class ArsenalTests
     {
         using var g = Arena();
         g.Hold("golden_crate", 2);
-        long before = Coins.Total(g.Player.State.Inventory.Backpack);
+        long before = Coins.Total(g.Player.State.Inventory);
         Assert.Equal(UseOutcome.Consumed, g.World.ItemUse.Use(g.Player, null, true));
         Assert.Equal(1, g.Player.State.Inventory.Held.Count);
-        Assert.True(Coins.Total(g.Player.State.Inventory.Backpack) > before, "a golden crate always holds coins");
+        Assert.True(Coins.Total(g.Player.State.Inventory) > before, "a golden crate always holds coins");
+    }
+
+    [Fact]
+    public void MagicMissileFollowsTheAim()
+    {
+        using var g = Arena();
+        g.Player.State.Vitals.MaxMana = 200;
+        g.Player.State.Vitals.RestoreMana(200);
+        g.Hold("magic_missile");
+        var start = Vector3.Normalize(new Vector3(0, 0.5f, 1));
+        g.Player.Aim = start;
+        Assert.Equal(UseOutcome.Shot, g.World.ItemUse.Use(g.Player, null, true));
+        var missile = g.World.Projectiles.All.Single();
+        g.Ticks(5);
+        var turned = Vector3.Transform(start, Matrix4x4.CreateRotationY(MathF.PI / 6)); // swing the crosshair 30 degrees
+        g.Player.Aim = turned;
+        float before = Vector3.Dot(Vector3.Normalize(missile.Velocity), turned);
+        g.Ticks(20);
+        float after = Vector3.Dot(Vector3.Normalize(missile.Velocity), turned);
+        Assert.True(after > before + 0.05f, $"the missile did not turn toward the aim ({before:F2} -> {after:F2})");
+        float speed = missile.Velocity.Length();
+        g.Hold("copper_shortsword"); // let go of the wand: it flies on straight
+        var heading = missile.Velocity;
+        g.Player.Aim = start;
+        g.Ticks(5);
+        Assert.True(Vector3.Dot(Vector3.Normalize(missile.Velocity), Vector3.Normalize(heading)) > 0.999f);
+        Assert.Equal(speed, missile.Velocity.Length(), 2);
     }
 }

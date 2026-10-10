@@ -29,6 +29,13 @@ public sealed class TerrainMaterials
     }
 
     public ShaderMaterial Opaque { get; }
+
+    /// <summary>Applies a graphics preset's world settings: how far ore glints reach and characters' hair and cloth move.</summary>
+    public void ApplyGraphics(Strata.Core.Presentation.GraphicsPreset preset)
+    {
+        Opaque.SetShaderParameter("ore_glint_distance", preset.OreGlintDistance);
+        Rendering.CreatureVisual.SwayDistance = preset.SwayDistance; // hair and cloth motion budget (X-17)
+    }
     public ShaderMaterial Cutout { get; }
     public ShaderMaterial Glass { get; }
     public ShaderMaterial Liquid { get; }
@@ -47,7 +54,10 @@ public sealed class TerrainMaterials
         return m;
     }
 
-    /// <summary>One RGBAF texel per texture layer: (detail layer, detail strength, ore sparkle, 0).</summary>
+    /// <summary>
+    /// One RGBAF texel per texture layer: (detail layer, detail strength, ore sparkle, ore tint). The tint is the ore
+    /// recipe's colour packed exactly into one float as 0xRRGGBB (glints take the vein's colour); 0 when not an ore.
+    /// </summary>
     private static Texture2D BuildLayerTable(string path)
     {
         using var doc = JsonDocument.Parse(FileAccess.GetFileAsString(path));
@@ -59,18 +69,22 @@ public sealed class TerrainMaterials
             float index = layer.TryGetProperty("detail", out var d) ? d.GetSingle() : 0f;
             float strength = layer.TryGetProperty("detailStrength", out var st) ? st.GetSingle() : 0f;
             string name = layer.TryGetProperty("name", out var n) ? n.GetString() ?? "" : "";
-            image.SetPixel(layer.GetProperty("index").GetInt32(), 0, new Color(index, strength, Sparkle(name), 0));
+            float tint = layer.TryGetProperty("ore", out var ore) && ore.GetString() is { Length: 7 } hex ? System.Convert.ToInt32(hex.Substring(1), 16) : 0f;
+            image.SetPixel(layer.GetProperty("index").GetInt32(), 0, new Color(index, strength, Sparkle(name), tint));
         }
         return ImageTexture.CreateFromImage(image);
     }
 
     private static readonly string[] Gems = { "amethyst", "topaz", "sapphire", "emerald", "ruby", "diamond" };
 
+    // Ore layers without the _ore suffix (meteorite, hellstone's cinderstone, luminite).
+    private static readonly string[] OreLayers = { "meteorite", "cinderstone", "luminite" };
+
     /// <summary>How strongly an ore layer glints (gems most, metals less, everything else not at all).</summary>
     private static float Sparkle(string layer) =>
-        !layer.EndsWith("_ore") ? 0f : System.Array.Exists(Gems, g => layer.StartsWith(g)) ? 1f : 0.7f;
+        !layer.EndsWith("_ore") && System.Array.IndexOf(OreLayers, layer) < 0 ? 0f : System.Array.Exists(Gems, g => layer.StartsWith(g)) ? 1f : 0.8f;
 
-    /// <summary>One RGBAF texel per render surface: (top layer, side layer, bottom layer, unused).</summary>
+    /// <summary>One RGBAF texel per render surface: (top layer, side layer, bottom layer, self-glow).</summary>
     private static Texture2D BuildSurfaceTable(RenderTables tables)
     {
         int count = System.Math.Max(1, tables.Surfaces.Count);
@@ -78,7 +92,7 @@ public sealed class TerrainMaterials
         for (int i = 0; i < tables.Surfaces.Count; i++)
         {
             var s = tables.Surfaces[i];
-            image.SetPixel(i, 0, new Color(s.Top, s.Side, s.Bottom, 0));
+            image.SetPixel(i, 0, new Color(s.Top, s.Side, s.Bottom, tables.SurfaceGlow[i]));
         }
         return ImageTexture.CreateFromImage(image);
     }

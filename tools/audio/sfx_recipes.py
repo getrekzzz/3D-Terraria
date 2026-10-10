@@ -1,5 +1,12 @@
 """Recipes for every sound effect the game plays (assets/audio/sfx/<id>.wav, variants <id>_<n>.wav). Each recipe takes a
-numpy Generator (for per-variant variation) and returns a mono float array at SFX_SR."""
+numpy Generator (for per-variant variation) and returns a mono float array at SFX_SR.
+
+New sounds go in their own module, tools/audio/sfx_recipes_<topic>.py, which defines RECIPES (and optionally GAIN) in
+the same form as below; this module merges them in file-name order (a sound id defined twice is an error). Extension
+modules may import helpers from here (``from sfx_recipes import whoosh``); always import this module, not an extension."""
+import importlib
+import pathlib
+
 import numpy as np
 
 import sfx_combat as combat
@@ -134,15 +141,17 @@ def boss_roar(rng):
     return reverb(growl + lowpass(_noise(dur, rng), 600, S) * adsr(n, 0.2, 0.3, 0.5, 0.6, S) * 0.5, S, 0.8, 0.3, 0.35, 0.8)
 
 
-def fanfare(rng):
-    out = np.zeros(samples(1.6, S))
-    for k, note in enumerate((67, 71, 74, 79)):
-        dur = 0.6 if k == 3 else 0.18
-        n = samples(dur, S)
-        tone = (osc("square", midi_hz(note), dur, S) * 0.25 + osc("triangle", midi_hz(note - 12), dur, S) * 0.3) * adsr(n, 0.01, 0.1, 0.6, 0.2, S)
-        at = int(k * 0.17 * S)
-        out[at:at + n] += tone[:len(out) - at]
-    return reverb(lowpass(out, 5000, S), S, 0.6, 0.3, 0.25, 0.5)
+def boss_fall(rng):
+    """A boss falls: a deep boom sinking away under a bright shimmering wash. The tune is the music bus's victory sting
+    (tools/audio/music_tracks.py STINGS), so this stays a sound, not a melody that would clash with it."""
+    dur = 2.2
+    n = samples(dur, S)
+    t = seconds(n, S)
+    boom = osc("sine", 70 * np.exp(-t / 0.6) + 28, dur, S) * decay(n, 0.5, S, 0.002)
+    crack = lowpass(_noise(dur, rng), 1800, S) * decay(n, 0.08, S, 0.001)
+    shimmer = sum(osc("sine", f * rng.uniform(0.99, 1.01), dur, S) * w for f, w in ((1320, 0.3), (1980, 0.2), (2640, 0.12)))
+    shimmer = shimmer * adsr(n, 0.25, 0.4, 0.5, 0.9, S) * 0.25
+    return reverb(mix(boom * 1.4, crack * 0.5, shimmer), S, 0.8, 0.3, 0.35, 1.0)
 
 
 def gong(rng):
@@ -224,13 +233,6 @@ def splash(rng):
     return bandpass(_noise(dur, rng), 400, 4000, S) * decay(n, 0.15, S) * 0.9 + osc("sine", 300 * np.exp(-seconds(n, S) / 0.1), dur, S) * decay(n, 0.05, S) * 0.4
 
 
-def bloop(rng):
-    dur = 0.2
-    n = samples(dur, S)
-    f = 400 * (1 + 1.2 * seconds(n, S) / dur)
-    return osc("sine", f, dur, S) * decay(n, 0.06, S) * 0.6
-
-
 def creak(pitch):
     def make(rng):
         dur = 0.35
@@ -284,12 +286,12 @@ RECIPES = {
     "swing": (swing, 3), "hit": (combat.hit, 4), "hit_squish": (combat.hit_squish, 3), "hit_bone": (combat.hit_bone, 3),
     "npc_death": (combat.npc_death, 3), "slime_death": (combat.slime_death, 2), "player_hurt": (combat.player_hurt, 4), "player_death": (player_death, 1),
     "bow": (bow, 2), "gun": (lambda r: gun(r), 3), "gun_heavy": (lambda r: gun(r, True), 2), "magic": (lambda r: magic(r), 3),
-    "magic_heavy": (lambda r: magic(r, True), 2), "explosion": (explosion, 2), "boss_roar": (boss_roar, 1), "boss_defeated": (fanfare, 1),
+    "magic_heavy": (lambda r: magic(r, True), 2), "explosion": (explosion, 2), "boss_roar": (boss_roar, 1), "boss_defeated": (boss_fall, 1),
     "event_start": (gong, 1), "npc_arrive": (jingle, 1), "pickup": (pickup, 2), "coins": (coins, 2), "potion": (gulp, 1),
     "mana": (chime(880), 1), "heal": (chime(660), 1), "teleport": (shimmer, 1), "jump": (whoosh(600, 1800, 0.18, 0.5), 2),
     "land": (land, 1), "double_jump": (whoosh(900, 3000, 0.25, 0.7), 1), "wings": (whoosh(300, 900, 0.3, 0.6), 2),
     "rocket": (whoosh(1500, 5000, 0.35, 0.6), 1), "dash": (whoosh(700, 4000, 0.3, 0.9), 1), "grapple": (grapple, 1),
-    "splash": (splash, 2), "fish_bite": (bloop, 1), "door_open": (creak(140), 1), "door_close": (creak(110), 1),
+    "splash": (splash, 2), "door_open": (creak(140), 1), "door_close": (creak(110), 1),
     "chest_open": (creak(220), 1), "craft": (craft, 2), "summon": (summon, 1), "place": (tap, 2),
     "lever": (clack, 1), "wire": (blip(2400, 0.05, "square", 0.012), 1), "net": (whoosh(1200, 2600, 0.2, 0.6), 1),
     "minecart": (creak(300), 1), "dart_trap": (bow, 1),
@@ -303,12 +305,33 @@ for _m in ("grass", "stone", "sand", "wood", "snow"):
 
 # Peak level per sound (quiet cues stay quiet; the rest land around -2 dBFS).
 GAIN = {"ui_hover": 0.25, "ui_click": 0.4, "ui_open": 0.4, "ui_close": 0.4, "pickup": 0.45, "coins": 0.55, "jump": 0.4, "land": 0.5,
-        "swing": 0.55, "grapple": 0.6, "fish_bite": 0.6, "place": 0.6, "mana": 0.5, "heal": 0.5,
+        "swing": 0.55, "grapple": 0.6, "place": 0.6, "mana": 0.5, "heal": 0.5,
         "wire": 0.3, "net": 0.5, "lever": 0.6}
 for _m in ("grass", "stone", "sand", "wood", "snow"):
     GAIN[f"step_{_m}"] = 0.3
 for _m in ("dirt", "grass", "stone", "ore", "wood", "sand", "snow", "glass", "ice", "metal", "cloth"):
     GAIN[f"dig_{_m}"] = 0.6
+
+
+def _merge_extensions():
+    """Adds RECIPES and GAIN from every sfx_recipes_*.py next to this file, sorted by file name. A module's GAIN may only
+    name its own recipes, so no file changes the level of another file's sound."""
+    owners = {"RECIPES": dict.fromkeys(RECIPES, "sfx_recipes.py"), "GAIN": dict.fromkeys(GAIN, "sfx_recipes.py")}
+    for path in sorted(pathlib.Path(__file__).resolve().parent.glob("sfx_recipes_*.py")):
+        module = importlib.import_module(path.stem)
+        if not isinstance(getattr(module, "RECIPES", None), dict):
+            raise ValueError(f"tools/audio/{path.name} must define a RECIPES dict")
+        for name, table in (("RECIPES", RECIPES), ("GAIN", GAIN)):
+            for sid, value in getattr(module, name, {}).items():
+                if sid in owners[name]:
+                    raise ValueError(f"sound '{sid}' in {name} of tools/audio/{path.name} is already defined in {owners[name][sid]}")
+                if name == "GAIN" and owners["RECIPES"].get(sid) != path.name:
+                    raise ValueError(f"GAIN '{sid}' in tools/audio/{path.name} is not a recipe of that file")
+                owners[name][sid] = path.name
+                table[sid] = value
+
+
+_merge_extensions()
 
 
 def render(sound_id, variant, seed):

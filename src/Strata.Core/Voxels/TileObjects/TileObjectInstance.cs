@@ -1,3 +1,4 @@
+using System.Numerics;
 using Strata.Core.Common;
 using Strata.Core.Content.Defs;
 using Strata.Core.Gameplay.Items;
@@ -51,6 +52,93 @@ public sealed class TileObjectInstance
 
     /// <summary>Loot table to roll into the container the first time it is opened (world-generated chests).</summary>
     public string? PendingLoot { get; set; }
+
+    public const int MaxNameLength = 20;
+
+    private string? _customName;
+
+    /// <summary>
+    /// The player's name for a chest (shown instead of the object's name), saved with the chunk. Assigning trims it,
+    /// drops control characters and keeps at most <see cref="MaxNameLength"/> characters; blank clears it.
+    /// </summary>
+    public string? CustomName
+    {
+        get => _customName;
+        set => _customName = SanitizeName(value);
+    }
+
+    /// <summary>
+    /// A world chest that only opens with its definition's <see cref="TileObjectDef.Lock"/> key (and cannot be broken
+    /// until then); bulk operations such as quick stack to nearby chests skip it. Saved in the chunk's object meta.
+    /// </summary>
+    public bool Locked { get; set; }
+
+    public string DisplayName => _customName ?? Def.DisplayName;
+
+    public const int MaxSignLength = 240, MaxSignLines = 6;
+
+    private string? _signText;
+
+    /// <summary>
+    /// What a sign says (X-03), saved with the chunk. Assigning keeps at most <see cref="MaxSignLines"/> lines and
+    /// <see cref="MaxSignLength"/> characters, drops other control characters; blank clears it.
+    /// </summary>
+    public string? SignText
+    {
+        get => _signText;
+        set => _signText = SanitizeSign(value);
+    }
+
+    public static string? SanitizeSign(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var sb = new System.Text.StringBuilder(Math.Min(raw.Length, MaxSignLength));
+        int lines = 1;
+        foreach (char c in raw.Replace("\r\n", "\n"))
+        {
+            if (c == '\n')
+            {
+                if (lines == MaxSignLines) break;
+                lines++;
+                sb.Append(c);
+            }
+            else if (!char.IsControl(c) && !char.IsSurrogate(c)) sb.Append(c);
+            if (sb.Length == MaxSignLength) break;
+        }
+        var text = sb.ToString().Trim();
+        return text.Length == 0 ? null : text;
+    }
+
+    public static string? SanitizeName(string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw)) return null;
+        var sb = new System.Text.StringBuilder(MaxNameLength);
+        foreach (char c in raw.Trim())
+        {
+            if (char.IsControl(c) || char.IsSurrogate(c)) continue;
+            sb.Append(c);
+            if (sb.Length == MaxNameLength) break;
+        }
+        var name = sb.ToString().Trim();
+        return name.Length == 0 ? null : name;
+    }
+
+    /// <summary>
+    /// The trunk column of a tree-like object (<see cref="TileCollision.Trunk"/>) in cell units: centred on the
+    /// footprint, half-width Max(0.5, width / 6), from the base up to 55 % of the height. The body collider and
+    /// targeting both use it, so what stops the player is exactly what a tool without an axe can hit.
+    /// </summary>
+    public (Vector3 Min, Vector3 Max) TrunkBox
+    {
+        get
+        {
+            var b = Bounds;
+            float cx = (b.Min.X + b.Max.X) * 0.5f, cz = (b.Min.Z + b.Max.Z) * 0.5f;
+            float half = MathF.Max(0.5f, (b.Max.X - b.Min.X) / 6f);
+            float top = b.Min.Y + (b.Max.Y - b.Min.Y) * 0.55f;
+            return (new Vector3(cx - half, b.Min.Y, cz - half), new Vector3(cx + half, top, cz + half));
+        }
+    }
 
     public static Int3 FootprintOf(TileObjectDef def, int rotation) =>
         (rotation & 1) == 0 ? new Int3(def.SizeX, def.SizeY, def.SizeZ) : new Int3(def.SizeZ, def.SizeY, def.SizeX);

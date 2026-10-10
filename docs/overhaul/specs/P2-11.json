@@ -1,0 +1,44 @@
+{
+ "id": "P2-11",
+ "title": "Inventory no longer freezes the player: overlay vs modal input gate, world-click catcher (throw, use, camera drag), wheel fixes",
+ "player_outcome": "With the inventory, a chest, a shop or an NPC chat open, you can still walk, jump, grapple, switch hotbar slots with the number keys, and fight toward the crosshair. Clicking empty screen with an item on the cursor throws it (right-click throws one). Holding the right mouse button on empty space turns the camera. The mouse wheel scrolls lists instead of changing hotbar slots when the pointer is over a panel.",
+ "design": [
+  "Rewrite game/UI/InputGate.cs.\n- `enum GateKind { Overlay, Modal }`; `SetOpen(string layer, bool open, GateKind kind = GateKind.Modal)`.\n- Derived flags:\n  - MouseFree: any layer open.\n  - MovementBlocked: a Modal is open, or TextEntry.\n  - HotkeysBlocked: a Modal is open, or TextEntry.\n  - ItemUseBlocked: a Modal is open, or an Overlay is open while WorldPointer is false.\n  - LookBlocked: MouseFree and not CameraDrag.\n- Settable: `WorldPointer` and `CameraDrag`.\n- GameplayBlocked is removed and every caller is replaced explicitly.",
+  "Callers:\n- PlayerController.cs:138,143,194; PlayerController.Grapple.cs:86,112; PlayerController.Air.cs:108; PlayerController.Ride.cs:23,101 \u2192 MovementBlocked.\n- CameraRig.cs:75 \u2192 LookBlocked. Add `CameraRig.AddLook(Vector2 relative)` for drag look.\n- InteractionController.cs:57 (precision) \u2192 HotkeysBlocked.\n- InteractionController.cs:59 \u2192 ItemUseBlocked. While an overlay is open, `fresh` and held come from WorldPointer transitions, because Input.IsActionPressed stays true even when the GUI consumed the click.\n- InteractionController.cs:170 \u2192 HotkeysBlocked.\n- The mouse wheel reads the `hotbar_next`/`hotbar_prev` actions instead of the hard-coded WheelUp/WheelDown, which also fixes rebinding. The wheel is ignored when `GetViewport().GuiGetHoveredControl()` is a panel descendant.\n- GameRoot._UnhandledInput recaptures the mouse only when !MouseFree.",
+  "Gate kinds:\n- Overlay: InventoryScreen and TownDialog, plus the chest, shop and service panels inside the inventory.\n- Modal: PauseMenu, DebugConsole, WorldMapScreen, SettingsScreen, and the text-entry rename field.\n- AutoPause stays opt-in.",
+  "New game/UI/WorldClickCatcher.cs: a full-rect Control with MouseFilter.Stop, the first child of the InventoryScreen root, under every panel.\n- Left button with a cursor stack: GameWorld.ThrowCursor(p, one:false) and the grab sound.\n- Right button with a cursor stack: throw one.\n- Left button with an empty cursor: WorldPointer = true while held, so the item is used toward the crosshair.\n- Right-button drag with an empty cursor: CameraDrag = true and CameraRig.AddLook(relative).",
+  "New probe `player.hotbar` (SelectedHotbar) in StandardProbes."
+ ],
+ "files_modify": [
+  "game/UI/InputGate.cs \u2014 kinds and derived flags",
+  "game/Player/PlayerController.cs, PlayerController.Grapple.cs, PlayerController.Air.cs, PlayerController.Ride.cs \u2014 MovementBlocked",
+  "game/Player/CameraRig.cs \u2014 LookBlocked, AddLook",
+  "game/Player/InteractionController.cs \u2014 ItemUseBlocked/WorldPointer, hotkeys, wheel via actions, panel-hover check",
+  "game/UI/InventoryScreen.cs \u2014 Overlay gate, WorldClickCatcher",
+  "game/UI/TownDialog.cs \u2014 Overlay gate",
+  "game/UI/PauseMenu.cs, game/UI/DebugConsole.cs, game/UI/WorldMapScreen.cs \u2014 Modal gate",
+  "game/Bootstrap/GameRoot.cs \u2014 recapture only when !MouseFree",
+  "src/Strata.Core/Commands/StandardProbes.cs \u2014 player.hotbar"
+ ],
+ "files_add": [
+  "game/UI/WorldClickCatcher.cs \u2014 throw, use and camera drag on empty screen"
+ ],
+ "data_changes": [],
+ "tests": [
+  "ui.cmds:\n- Arena: `fill -10 -3 -10 10 -1 10 stone` / `fill -10 0 -10 10 7 10 air`.\n- Movement: `ui inventory` / `assert ui.inventory == 1` / `mark` / `aim 0 0 1` / `hold move_forward 1.2` / `wait 0.3` / `assert player.from_mark > 1.5`.\n- Hotbar key: `press hotbar_3` / `press hotbar_3 off` / `assert player.hotbar == 2`.\n- Throw: `give dirt_block 10` / `invclick backpack <slot> left` / `invthrow` / `wait 0.2` / `assert drops.count >= 1` / `ui close`.",
+  "Existing movement.cmds and combat.cmds still pass"
+ ],
+ "verification": [
+  "dotnet build; all smoke scripts SMOKE PASS",
+  "Manual (xvfb + lavapipe or desktop): open the inventory near a zombie and walk away, then swap slots with 1\u20130"
+ ],
+ "depends_on": [
+  "P2-07",
+  "P2-10"
+ ],
+ "risks": [
+  "Conflicts with P1's facing and targeting WP (InteractionController.UpdateTarget, PlayerController facing, CameraRig). Land right after P1's targeting WP; the edits here are mechanical flag swaps plus the WorldPointer branch.",
+  "GuiGetHoveredControl needs Godot \u22654.4, which 4.7.2 satisfies."
+ ],
+ "effort": "M"
+}

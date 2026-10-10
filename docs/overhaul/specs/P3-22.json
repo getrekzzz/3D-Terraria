@@ -1,0 +1,37 @@
+{
+ "id": "P3-22",
+ "title": "Tree hit shake and falling trees",
+ "player_outcome": "Trees shudder on every axe hit, then topple over away from you with a thud and a burst of leaves and wood, instead of vanishing.",
+ "design": [
+  "Verified: tile objects render as one MultiMesh per chunk and model variant (TileObjectRenderer.cs:90-117); trees disappear on removal.",
+  "TileObjectRenderer.Rebuild records Dictionary<long objId, (MultiMesh mm, int index, Transform3D xf)>. HideInstance(obj) sets a zero-scale transform; ShowInstance restores it.",
+  "New game/World/TreeEffects.cs (pooled, max 3 wobbles + 3 falls). On ObjectHit Damaged for objects with SizeY \u2265 4: hide the instance and show a pooled MeshInstance3D copy (PropLibrary.Model(ObjectModel(def, variant), multimesh:false)). It wobbles \u00b13\u00b0 about the base, damped, for 0.18 s, then the instance is restored.",
+  "On ObjectHit Broken with Def.Topple: the chunk rebuild removes the tree. Spawn a falling copy that rotates 90\u00b0 about the base edge away from the player over 0.9 s (ease-in).",
+  "On impact: 'tree_fall' thud, EffectKit Leaves \u00d730 + wood chips \u00d720 along the trunk line, CameraShake.Kick(0.1) if within 12 m, then sink and fade over 0.3 s.",
+  "Copies set voxel_light from LightProbe.",
+  "Pre-load non-multimesh tree meshes for all tree defs at world start (no hitch on the first chop)."
+ ],
+ "files_modify": [
+  "game/World/TileObjectRenderer.cs \u2014 instance index map; Hide/ShowInstance",
+  "game/Bootstrap/WorldLauncher.cs \u2014 create TreeEffects"
+ ],
+ "files_add": [
+  "game/World/TreeEffects.cs \u2014 wobble and topple effects"
+ ],
+ "data_changes": [],
+ "tests": [
+  "Smoke basic.cmds (tree section from P3-21): 'assert errors == 0' after the tree falls (wait 2)"
+ ],
+ "verification": [
+  "Timescale screenshots of wobble and fall (lavapipe)",
+  "perf: gd.objects p95 unchanged; no main-thread load on the first chop (perf report max frame)"
+ ],
+ "depends_on": [
+  "P3-21"
+ ],
+ "risks": [
+  "A chunk rebuild during a wobble re-creates the MultiMesh; re-apply hidden indices after Rebuild.",
+  "P1's lag work may change TileObjectRenderer rebuild budgeting; rebase."
+ ],
+ "effort": "M"
+}

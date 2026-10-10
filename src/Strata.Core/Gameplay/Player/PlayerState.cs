@@ -19,6 +19,8 @@ public sealed class PlayerState
     {
         Name = name;
         Vitals = new Vitals(BaseLife, BaseMana);
+        // Whatever changes the gear (the inventory screen, commands, a death drop, loading) updates the stats at once.
+        Inventory.EquipmentChanged += Recompute;
     }
 
     public string Name { get; set; }
@@ -26,6 +28,26 @@ public sealed class PlayerState
     public Vitals Vitals { get; }
     public BuffSet Buffs { get; } = new();
     public EffectState Effects { get; } = new();
+
+    /// <summary>Slots in each personal storage (Piggy Bank, Safe), as in the reference game.</summary>
+    public const int BankSize = 40;
+
+    /// <summary>
+    /// Personal storages carried with the character, keyed by <see cref="Content.Defs.TileObjectDef.SharedStorage"/>
+    /// ("piggy_bank", "safe"): every placed object of that kind opens the same slots, in any world.
+    /// </summary>
+    public Dictionary<string, Inventory> Banks { get; } = new(StringComparer.Ordinal);
+
+    /// <summary>The personal storage of that kind, created empty on first use.</summary>
+    public Inventory Bank(string kind)
+    {
+        if (!Banks.TryGetValue(kind, out var bank)) Banks[kind] = bank = new Inventory(BankSize);
+        return bank;
+    }
+
+    /// <summary>The storages a shop may take coins from after the purse, in the reference game's order (Piggy Bank, then Safe).</summary>
+    public IEnumerable<Inventory> BanksForPaying() =>
+        Banks.OrderBy(kv => kv.Key == "piggy_bank" ? 0 : kv.Key == "safe" ? 1 : 2).ThenBy(kv => kv.Key, StringComparer.Ordinal).Select(kv => kv.Value);
 
     /// <summary>Permanent max-life bonus from vital crystals.</summary>
     public int BonusLife { get; set; }
@@ -35,7 +57,24 @@ public sealed class PlayerState
 
     public int Deaths { get; set; }
 
+    /// <summary>Angler quests completed by this character (P5-23).</summary>
+    public int AnglerQuests { get; set; }
+
+    /// <summary>Creatures seen, killed and caught, townsfolk met, items obtained and crafted, achievements.</summary>
+    public Guide.PlayerJournal Journal { get; } = new();
+
+    /// <summary>Demon Heart used: the sixth accessory slot is open while in an Expert or Master world.</summary>
+    public bool ExtraAccessorySlot { get; set; }
+
+    /// <summary>Minecart Upgrade Kit used: every minecart this player rides is the faster Mechanical Cart.</summary>
+    public bool MinecartUpgrade { get; set; }
+
     public Appearance Look { get; set; } = new();
+
+    /// <summary>The look changed in play (a haircut, a hair dye): the avatar re-applies it.</summary>
+    public event Action? LookChanged;
+
+    public void RaiseLookChanged() => LookChanged?.Invoke();
 
     public CharacterDifficulty Difficulty { get; set; }
 
@@ -74,7 +113,7 @@ public sealed class PlayerState
             SetBonus ??= piece.SetBonus;
         }
         foreach (var b in Buffs.Active)
-            foreach (var e in b.Def.Effects) Effects.Apply(e);
+            foreach (var e in b.Def.Effects) Effects.Apply(e, b.Def);
         Defense = (int)Effects.Stats.Get(StatIds.Defense, defense);
         Vitals.MaxLife = (int)Effects.Stats.Get(StatIds.MaxLife, BaseLife + BonusLife);
         Vitals.MaxMana = (int)Effects.Stats.Get(StatIds.MaxMana, BaseMana + BonusMana);
@@ -86,6 +125,7 @@ public sealed class PlayerState
     public static PlayerState CreateNew(string name, ContentDatabase content)
     {
         var p = new PlayerState(name);
+        p.Inventory.Content = content;
         foreach (var (id, count) in new[] { ("copper_shortsword", 1), ("copper_pickaxe", 1), ("copper_axe", 1), ("torch", 25), ("wood", 20) })
             if (content.Items.TryGet(id, out var item)) p.Inventory.Backpack.Add(new ItemStack(item, count));
         p.Recompute();

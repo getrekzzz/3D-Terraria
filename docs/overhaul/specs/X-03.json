@@ -1,0 +1,38 @@
+{
+ "id": "X-03",
+ "title": "Furniture families, platforms and decor (paintings, banners, chandeliers, lanterns, bookcases, clocks, statues, editable signs)",
+ "owner_session": "world",
+ "player_outcome": "Building feels like Terraria: every wood/material has a full furniture family (door, chair, table, bed, chest, workbench, bookcase, piano, sofa, bathtub, lamp, lantern, candelabra, chandelier, clock, platform), paintings and banners decorate walls (enemy banners from kills give a damage bonus near them, like Terraria), statues, and editable signs show text.",
+ "design": [
+  "Data: per-material furniture families generated from one table (tools/content generator like gen_ore_tiers) into data/tileobjects + recipes (Wood, Boreal, Palm, Rich Mahogany, Ebonwood, Shadewood, Pearlwood, Granite, Marble, Glass, Bone, Living Wood, Dynasty, Lihzahrd, Obsidian\u2026); platform items per material.",
+  "Reuse the bosses session's dungeon furniture helpers (P4-17/18) \u2014 merge origin/claude/ovh-bosses after its W8 push before starting; do not duplicate banners/statues/bookcases, extend them.",
+  "Blender: parametric furniture generators in tools/blender (bevelled, material-textured; respect P4-38 bevel work), icons.",
+  "Enemy banners: a banner drops every 50 kills (player journal/kill counter), placed banners give +damage/-damage-taken vs that enemy nearby (data-driven buff).",
+  "Signs: tile object with editable text stored in object meta (P2-08 object-meta section), shown on hover and in a small edit dialog (theme from P2-01).",
+  "Quality bar: what a AAA, realistic 3D Terraria made by Re-Logic would ship. Data-driven, performance-budgeted by graphics preset, Core logic tested, follows docs/overhaul/_BRIEF.md (LEAN MODE)."
+ ],
+ "files_modify": [
+  "data/tileobjects/*",
+  "data/recipes/*",
+  "tools/content/*",
+  "tools/blender/bgen/furniture.py",
+  "game/World/TileObjectRenderer.cs",
+  "game/UI/* (sign dialog)"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "FurnitureFamilyTests (every family complete, craftable, validated)",
+  "BannerTests"
+ ],
+ "verification": [
+  "builder.cmds places a full family; validate passes"
+ ],
+ "depends_on": [
+  "P4-17",
+  "P4-18",
+  "P2-08"
+ ],
+ "risks": [],
+ "effort": "L"
+}

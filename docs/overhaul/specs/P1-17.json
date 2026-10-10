@@ -1,0 +1,48 @@
+{
+ "id": "P1-17",
+ "title": "Phase gate: full CI, lighting and animation tours, docs, push",
+ "player_outcome": "All P1 fixes arrive together, verified in the engine on every graphics preset and pushed to the branch.",
+ "design": [
+  "Run the complete CI sequence locally: check_file_length, dotnet build and test, gen_ore_tiers --check, manifest --check, validate, gen_reference --check, build_all.py --check, coverage, every game/Testing/Scripts/*.cmds headless (all print SMOKE PASS), and --menu-tour (MENU PASS).",
+  "Run lavapipe lighting.cmds (all presets) and animation.cmds on medium. Record the shot_stats.py numbers in the commit message or PR body next to the pre-P1 baseline.",
+  "Update docs/3D_TERRARIA_MASTER_PLAN.md status rows touched by P1 (hooks, lighting, animation, crosshair names) and confirm the rendering.md and gameplay.md edits from each package are consistent.",
+  "Commit per package (already done) and push to claude/clever-goodall-kgex45."
+ ],
+ "files_modify": [
+  "docs/3D_TERRARIA_MASTER_PLAN.md \u2014 P1 status rows",
+  "docs/architecture/rendering.md \u2014 final consistency pass",
+  "docs/architecture/gameplay.md \u2014 final consistency pass"
+ ],
+ "files_add": [],
+ "data_changes": [],
+ "tests": [
+  "Every smoke script, including the new lines in basic/combat/movement/town.cmds, and the menu tour"
+ ],
+ "verification": [
+  "All CI steps green locally with dotnet-sdk-8.0 and Godot 4.7.2 mono headless",
+  "lavapipe tour screenshots inspected: desert and tundra not blown out on medium/high/ultra; torch corridor lit to about 10 m; swing, mine and bow poses correct",
+  "PerfOverlay spot-check on low and ultra: no new frame-time spikes (gd.interaction.physics, gd.dynamic_lights, gd.view_model, gd.grapple all < 0.2 ms)"
+ ],
+ "depends_on": [
+  "P1-01",
+  "P1-02",
+  "P1-03",
+  "P1-04",
+  "P1-05",
+  "P1-06",
+  "P1-07",
+  "P1-08",
+  "P1-09",
+  "P1-10",
+  "P1-11",
+  "P1-12",
+  "P1-13",
+  "P1-14",
+  "P1-15",
+  "P1-16"
+ ],
+ "risks": [
+  "lavapipe tours are slow; run the lighting and animation tours only, not the full screenshot tour."
+ ],
+ "effort": "S"
+}

@@ -1,0 +1,25 @@
+{
+ "id": "W0-AUDIT",
+ "title": "docs/AUDIT.md: the full audit of what works, what is broken, what is missing (with status column)",
+ "player_outcome": "A readable audit report in the repo answering 'what works, what doesn't, what's missing', with a status column that later phases update.",
+ "design": [
+  "Write docs/AUDIT.md from: _PLAN.md (audit summary + root causes), _audit_ui_items_feel.json (UI/items/feel/art/critic findings: title, status, files, fix), and the audit sections in _PLAN.md. Also read docs/3D_TERRARIA_MASTER_PLAN.md to note which statements there are stale.",
+  "Structure: 1) How to read (status legend: \u2705 works, \ud83d\udfe1 partial/stand-in, \u274c broken, \u2b1c missing; 'Fix' column names the planned WP id and wave). 2) Reported problems (table: complaint, root cause with file refs, fix WP). 3) Sections: Rendering & lighting; Terrain; Performance; Player movement/camera/targeting; Items & weapons (per category: tools, swords, spears, bows, guns, magic, thrown, boomerangs, yoyos, flails, whips, summons, hooks, potions, accessories, armor, wings, mounts, pets); UI (HUD, inventory, crafting, chests, tooltips, NPC chat/shop, map); Game feel & audio; Art & models; Bosses (per boss row); Dungeon; Town NPCs (per NPC move-in row + services/shops); Progression & loops; Guide/bestiary/achievements. Each row: feature, status, evidence (file:line), planned fix (WP id).",
+  "Verify a sample of claims against the current code before writing them (the code is the source of truth). Keep it factual and concise; tables over prose. Target 300-600 lines of markdown (docs are not subject to the 400-line cap, which applies to .cs/.py).",
+  "Update docs/3D_TERRARIA_MASTER_PLAN.md section 3 status rows that are stale (29 residents not 6; reforging exists; 7 invasions; 13 wings; audio director + 177 sounds; hellforge/hardmode anvils exist; Plantera/temple exist) and add a line in the decision log for 2026-09-30: player-feedback overhaul plan (link docs/AUDIT.md)."
+ ],
+ "files_modify": [
+  "docs/3D_TERRARIA_MASTER_PLAN.md"
+ ],
+ "files_add": [
+  "docs/AUDIT.md"
+ ],
+ "data_changes": [],
+ "tests": [],
+ "verification": [
+  "Links/paths in the doc resolve to existing files"
+ ],
+ "depends_on": [],
+ "risks": [],
+ "effort": "M"
+}

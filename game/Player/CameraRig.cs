@@ -5,16 +5,23 @@ using Strata.Game.World;
 namespace Strata.Game.Player;
 
 /// <summary>
-/// Over-the-shoulder third-person camera and a first-person mode. Mouse look drives yaw/pitch; the player body does not
-/// rotate with the camera (the model faces the aim). The camera is kept out of terrain every rendered frame with a
-/// sphere cast from the head to the shoulder and on to the camera, so turning quickly can never swing it through the
-/// ground (a physics-tick spring arm lags the view by up to a tick). Collisions pull it in at once; it eases back out.
+/// Over-the-shoulder third-person camera and a first-person mode. Mouse look (or the controller's right stick with aim
+/// assist, CameraRig.Pad.cs) drives yaw/pitch; the third-person body
+/// faces the camera's <see cref="Yaw"/> (its chest is always on the crosshair, see PlayerAvatar.Motion), and the
+/// crosshair ray runs from <see cref="ViewOrigin"/> along <see cref="Forward"/>. The camera is kept out of terrain every
+/// rendered frame with a sphere cast from the head to the shoulder and on to the camera, so turning quickly can never
+/// swing it through the ground (a physics-tick spring arm lags the view by up to a tick). Collisions pull it in at
+/// once; it eases back out. <see cref="Framing"/> pulls it back and widens the view a little while a boss arrives
+/// (UI.BossIntro); it never turns the view, so the player keeps control.
 /// </summary>
 public sealed partial class CameraRig : Node3D
 {
-    private const float EyeHeight = 1.6f;
+    public const float EyeHeight = 1.6f;
     private const float ProbeRadius = 0.22f;
     private Vector3 _shoulder = new(0.55f, 0.1f, 0);
+
+    /// <summary>Degrees of extra field of view per metre of <see cref="Framing"/>.</summary>
+    private const float FramingFov = 1.6f;
 
     private CharacterBody3D _body = null!;
     private Node3D _pivot = null!;
@@ -24,6 +31,7 @@ public sealed partial class CameraRig : Node3D
     private float _distance = 4.2f;
     private float _current = 4.2f;
     private bool _firstPerson;
+    private float _fov = 72f;
 
     public Camera3D Camera { get; private set; } = null!;
 
@@ -62,6 +70,18 @@ public sealed partial class CameraRig : Node3D
         set => _shoulder.X = Mathf.Clamp(value, -1f, 1f);
     }
 
+    /// <summary>Extra metres the third-person camera pulls back (and a slightly wider view in either mode): a boss's arena framing.</summary>
+    public float Framing { get; set; }
+
+    /// <summary>The view's yaw (radians, Godot convention: 0 looks along −Z, + turns left): where the body faces.</summary>
+    public float Yaw => Mathf.Wrap(_yaw, -Mathf.Pi, Mathf.Pi);
+
+    /// <summary>
+    /// Where the crosshair ray starts: the camera as placed this frame, but un-swung by <see cref="Orbit"/>, so orbiting
+    /// for a screenshot changes neither the target nor the aim. The eye in first person.
+    /// </summary>
+    public Vector3 ViewOrigin => GlobalTransform * (_pivot.Position + new Vector3(0, 0, _current));
+
     public void Initialize(CharacterBody3D body)
     {
         _body = body;
@@ -81,41 +101,53 @@ public sealed partial class CameraRig : Node3D
 
     private void ApplySettings(UserSettings s)
     {
-        Camera.Fov = Mathf.Clamp(s.FieldOfView, 50f, 110f);
+        _fov = Mathf.Clamp(s.FieldOfView, 50f, 110f);
+        Camera.Fov = _fov;
         _distance = Mathf.Clamp(s.CameraDistance, 1.5f, 9f);
     }
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (UI.InputGate.GameplayBlocked) return;
-        var s = UserSettings.Current;
-        if (@event is InputEventMouseMotion m && Input.MouseMode == Input.MouseModeEnum.Captured)
+        if (UI.InputGate.HotkeysBlocked) return;
+        if (@event is InputEventMouseMotion m)
         {
-            float k = Sensitivity * Mathf.Max(0.05f, s.MouseSensitivity);
-            _yaw -= m.Relative.X * k;
-            _pitch = Mathf.Clamp(_pitch - m.Relative.Y * k * (s.InvertY ? -1f : 1f), -1.45f, 1.45f);
+            // With a screen open the free pointer does not look around (a right drag on empty screen does, AddLook).
+            if (!UI.InputGate.LookBlocked && Input.MouseMode == Input.MouseModeEnum.Captured) AddLook(m.Relative);
         }
         else if (@event.IsActionPressed("toggle_camera"))
         {
             FirstPerson = !FirstPerson;
         }
-        else if (@event is InputEventMouseButton { Pressed: true, CtrlPressed: true } wheel && !_firstPerson)
+        else if (@event is InputEventMouseButton { Pressed: true, CtrlPressed: true } wheel && !_firstPerson && !UI.InputGate.PointerOverPanel(GetViewport()))
         {
             if (wheel.ButtonIndex == MouseButton.WheelUp) _distance = Mathf.Max(1.5f, _distance - 0.4f);
             if (wheel.ButtonIndex == MouseButton.WheelDown) _distance = Mathf.Min(9f, _distance + 0.4f);
-            s.CameraDistance = _distance;
+            UserSettings.Current.CameraDistance = _distance;
             GetViewport().SetInputAsHandled();
         }
+    }
+
+    /// <summary>Turns the view by a mouse movement in pixels: the captured mouse, or a right-button drag on empty screen.</summary>
+    public void AddLook(Vector2 relative)
+    {
+        var s = UserSettings.Current;
+        float k = Sensitivity * Mathf.Max(0.05f, s.MouseSensitivity);
+        _yaw -= relative.X * k;
+        _pitch = Mathf.Clamp(_pitch - relative.Y * k * (s.InvertY ? -1f : 1f), -1.45f, 1.45f);
     }
 
     public override void _Process(double delta)
     {
         using var profile = Strata.Core.Diagnostics.Metrics.Frame.Time("gd.camera");
+        PadLook((float)delta); // the controller's look stick and aim assist (CameraRig.Pad.cs)
         Rotation = new Vector3(_pitch, _yaw, 0);
         var shake = CameraShake.Sample(delta);
         Camera.HOffset = shake.X;
         Camera.VOffset = shake.Y;
+        Camera.Rotation = new Vector3(0, 0, CameraShake.Roll);
         _pivot.Rotation = new Vector3(0, _firstPerson ? 0f : Orbit, 0);
+        float fov = Mathf.Min(_fov + Framing * FramingFov, 120f);
+        if (Camera.Fov != fov) Camera.Fov = fov;
         if (_firstPerson)
         {
             _pivot.Position = Vector3.Zero;
@@ -130,7 +162,8 @@ public sealed partial class CameraRig : Node3D
         _pivot.Position = _shoulder * shoulderT;
         var pivotWorld = head + (shoulderWorld - head) * shoulderT;
         var back = GlobalTransform.Basis.Z.Normalized();
-        float free = _distance * SafeFraction(pivotWorld, pivotWorld + back * _distance);
+        float reach = _distance + Framing;
+        float free = reach * SafeFraction(pivotWorld, pivotWorld + back * reach);
         // Snap in immediately (never inside terrain), ease back out so the view does not pump.
         _current = free < _current ? free : Mathf.MoveToward(_current, free, (float)delta * 6f);
         Camera.Position = new Vector3(0, 0, _current);

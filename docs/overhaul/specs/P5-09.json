@@ -1,0 +1,47 @@
+{
+ "id": "P5-09",
+ "title": "Enemies may target town residents (ICombatTarget)",
+ "player_outcome": "Zombies and other hostile creatures go after townsfolk when no player is closer, so an undefended town gets attacked at night as in Terraria. Bosses and critters still only care about players.",
+ "design": [
+  "Verified: BrainContext.Target is a PlayerEntity (Brain.cs:14); NpcSystem.Nearest considers players only (NpcSystem.cs:353-368); brains use only Target.Position and Target.Center.",
+  "New Gameplay/Entities/ICombatTarget.cs { Vector3 Position {get;} Vector3 Center {get;} Vector3 Eye {get;} bool Alive {get;} }. PlayerEntity (declared in GameWorld.cs) implements it; this only adds ': ICombatTarget'. TownNpc implements it explicitly (Position is a field; Eye = Position + 1.5 m).",
+  "BrainContext.Target becomes ICombatTarget?; brains compile unchanged. CreatureBrains' InLiquid(ctx, target.Center) is fine.",
+  "New NpcSystem.Targeting.cs partial: ChooseTarget(Npc npc, PlayerEntity? player, float playerDist, out float dist). Only players are targeted when the creature is a boss or a critter, is Invulnerable, has Def.Damage <= 0, or has tag 'passive'. Otherwise re-evaluate every 15 ticks (Npc.RetargetTicks, Npc.TargetResidentId): the nearest resident that CountsAsResident or is a visitor (never a pet or bound NPC), within ResidentAggroRange (config, 14 m), wins when it is closer than playerDist - PlayerPreference (4 m).",
+  "NpcSystem.Tick: keep 'var player = Nearest(...)' for despawn/OutOfBounds/ContactDamage, so players next to a creature still get hurt. Pass ChooseTarget's result to _ctx.Target and RangedAttack. RangedAttack(npc, ICombatTarget target, dist) uses target.Eye. Hostile projectiles already hit residents (ProjectileSystem.HitPlayers covers residents).",
+  "Config: data/config/spawning.json gains 'residentAggroRange' and 'playerPreference' (loaded through the existing spawning config class)."
+ ],
+ "files_modify": [
+  "src/Strata.Core/AI/Brain.cs \u2014 Target type",
+  "src/Strata.Core/Session/GameWorld.cs \u2014 PlayerEntity : ICombatTarget (1 line)",
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 ICombatTarget explicit implementation",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.cs \u2014 Tick uses ChooseTarget (about 4 lines; file at 378)",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Effects.cs \u2014 RangedAttack takes ICombatTarget",
+  "src/Strata.Core/Gameplay/Entities/Npc.cs \u2014 RetargetTicks, TargetResidentId",
+  "data/config/spawning.json + its config class \u2014 targeting tunables"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Entities/ICombatTarget.cs \u2014 shared target interface",
+  "src/Strata.Core/Gameplay/Entities/NpcSystem.Targeting.cs \u2014 target choice"
+ ],
+ "data_changes": [
+  "data/config/spawning.json: residentAggroRange 14, playerPreference 4"
+ ],
+ "tests": [
+  "TownDefenseTests.ZombieHuntsResidentWhenPlayerIsFar: player teleported 60 m away; a zombie spawned 6 m from the housed guide moves toward it and the guide's life drops within 600 ticks",
+  "TownDefenseTests.PlayerPreferredWhenClose: player at 3 m, resident at 5 m \u2192 the zombie targets the player",
+  "TownDefenseTests.BossesIgnoreResidents: an eye_of_cthulhu target is always a player",
+  "Existing CreatureTests, BossTests and NightTests still pass"
+ ],
+ "verification": [
+  "dotnet test",
+  "In game: stand far from town at night (or use the free camera). Zombies walk to the town and hit residents; 'was slain' messages appear, and they return at dawn (P5-01)."
+ ],
+ "depends_on": [
+  "P5-01"
+ ],
+ "risks": [
+  "NpcSystem.cs and Brain.cs are hot files for the bosses/feel phases (Parts, DamageEvent). Keep the edits minimal and in the partial.",
+  "Residents dying more often raises complaints; tune residentAggroRange, and P5-10 gives residents defence."
+ ],
+ "effort": "M"
+}

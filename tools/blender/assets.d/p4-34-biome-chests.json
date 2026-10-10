@@ -1,0 +1,123 @@
+{
+ "comment": "P4-34: the vault's biome chests (tinted chest generator) and their keys.",
+ "objects": {
+  "jungle_chest": {
+   "generator": "chest",
+   "params": {
+    "wood": "planks",
+    "woodTint": "#8ab860",
+    "band": "dark_iron",
+    "bandTint": "#4a7038",
+    "latch": "prop:plain:glow",
+    "latchTint": "#a0ff60"
+   }
+  },
+  "corruption_chest": {
+   "generator": "chest",
+   "params": {
+    "wood": "dark_planks",
+    "woodTint": "#a088c8",
+    "band": "dark_iron",
+    "bandTint": "#604880",
+    "latch": "prop:plain:glow",
+    "latchTint": "#c060ff"
+   }
+  },
+  "crimson_chest": {
+   "generator": "chest",
+   "params": {
+    "wood": "flesh",
+    "woodTint": "#e07070",
+    "band": "dark_iron",
+    "bandTint": "#802828",
+    "latch": "prop:plain:glow",
+    "latchTint": "#ff4040"
+   }
+  },
+  "hallowed_chest": {
+   "generator": "chest",
+   "params": {
+    "wood": "planks",
+    "woodTint": "#f4ecff",
+    "band": "gold",
+    "bandTint": "#ffffff",
+    "latch": "prop:plain:glow",
+    "latchTint": "#60e0ff"
+   }
+  },
+  "frozen_chest": {
+   "generator": "chest",
+   "params": {
+    "wood": "plain",
+    "woodTint": "#b0d8f8",
+    "band": "iron",
+    "bandTint": "#d8f0ff",
+    "latch": "prop:plain:glow",
+    "latchTint": "#80d0ff"
+   }
+  },
+  "desert_chest": {
+   "generator": "chest",
+   "params": {
+    "wood": "clay",
+    "woodTint": "#e8c888",
+    "band": "gold",
+    "bandTint": "#d0a050",
+    "latch": "prop:plain:glow",
+    "latchTint": "#ffd060"
+   }
+  }
+ },
+ "items": {
+  "explicit": {
+   "jungle_key": {
+    "generator": "key",
+    "params": {
+     "metalLayer": "plain",
+     "metal": "#5aa040",
+     "gem": "#a0ff60"
+    }
+   },
+   "corruption_key": {
+    "generator": "key",
+    "params": {
+     "metalLayer": "plain",
+     "metal": "#6a4a8a",
+     "gem": "#c060ff"
+    }
+   },
+   "crimson_key": {
+    "generator": "key",
+    "params": {
+     "metalLayer": "plain",
+     "metal": "#a03030",
+     "gem": "#ff4040"
+    }
+   },
+   "hallowed_key": {
+    "generator": "key",
+    "params": {
+     "metalLayer": "plain",
+     "metal": "#e8d8ff",
+     "gem": "#60e0ff"
+    }
+   },
+   "frozen_key": {
+    "generator": "key",
+    "params": {
+     "metalLayer": "plain",
+     "metal": "#a0d0f0",
+     "gem": "#e0f8ff"
+    }
+   },
+   "desert_key": {
+    "generator": "key",
+    "params": {
+     "metalLayer": "plain",
+     "metal": "#d0a860",
+     "gem": "#ffd060"
+    }
+   }
+  }
+ }
+}

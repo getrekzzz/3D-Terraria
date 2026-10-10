@@ -4,10 +4,10 @@
   // Pillars stand across the world, each shielded until 100 of its legion fall. When the last pillar breaks, the
   // Moon Lord descends: his core stays sealed while his head and hands live.
   "buffs": [
-    { "id": "frostburn", "name": "Frostburn", "description": "It's either really hot or really cold. Either way it REALLY hurts.", "debuff": true, "color": "#8ae0ff", "tags": ["fire"],
+    { "id": "frostburn", "name": "Frostburn", "description": "It's either really hot or really cold. Either way it REALLY hurts.", "debuff": true, "color": "#8ae0ff", "visual": { "tint": "#a0e8ff", "tintStrength": 0.7, "particle": "sparks", "color": "#8ae0ff", "rate": 18, "rise": 2, "light": [3, 8, 12] }, "tags": ["fire"],
       "effects": [{ "type": "damageOverTime", "perSecond": 8 }, { "type": "emitLight", "color": [4, 8, 12] }] },
-    { "id": "confused", "name": "Confused", "description": "Movement is disoriented.", "debuff": true, "color": "#c880ff",
-      "effects": [{ "type": "stat", "stat": "moveSpeed", "add": -0.4 }], "covers": ["terraria:confused"] }
+    { "id": "confused", "name": "Confused", "description": "Your movement keys are reversed.", "debuff": true, "color": "#c880ff", "visual": { "tint": "#d8b0ff", "tintStrength": 0.3, "particle": "puff", "color": "#c880ff", "rate": 4, "rise": 0.6 },
+      "effects": [{ "type": "invertControls" }], "covers": ["terraria:confused"] }
   ],
   "projectiles": [
     { "id": "cultist_fireball", "name": "Fireball", "visual": "orb", "color": "#ff8a2a", "lifetime": 200, "radius": 0.5, "friendly": false, "hostile": true, "light": [14, 7, 2], "trail": "#ffb04a" },
@@ -29,7 +29,6 @@
     { "id": "phantasmal_deathray", "name": "Phantasmal Deathray", "visual": "bolt", "color": "#b8fff8", "lifetime": 60, "radius": 0.9, "friendly": false, "hostile": true, "light": [10, 15, 15], "trail": "#4affd8" }
   ],
   "lootTables": [
-    { "id": "lunatic_cultist", "coins": [100000, 100000], "entries": [{ "item": "ancient_manipulator" }, { "item": "greater_healing_potion", "min": 5, "max": 15 }] },
     { "id": "cultist_archer", "coins": [500, 1500], "entries": [{ "item": "greater_healing_potion", "chance": 0.1 }] },
     { "id": "solar_pillar", "entries": [{ "item": "solar_fragment", "min": 25, "max": 40 }] },
     { "id": "vortex_pillar", "entries": [{ "item": "vortex_fragment", "min": 25, "max": 40 }] },
@@ -39,9 +38,6 @@
     { "id": "vortex_legion", "coins": [500, 1200], "entries": [{ "item": "vortex_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
     { "id": "nebula_legion", "coins": [500, 1200], "entries": [{ "item": "nebula_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
     { "id": "stardust_legion", "coins": [500, 1200], "entries": [{ "item": "stardust_fragment", "min": 1, "max": 2, "chance": 0.25 }] },
-    { "id": "moon_lord", "coins": [200000, 200000], "entries": [
-      { "item": "luminite", "min": 70, "max": 90 }, { "table": "moon_lord_weapon" }, { "item": "greater_healing_potion", "min": 5, "max": 15 }
-    ] },
     { "id": "moon_lord_weapon", "mode": "weighted", "entries": [
       { "item": "meowmere" }, { "item": "terrarian" }, { "item": "star_wrath" }, { "item": "s_d_m_g" }, { "item": "last_prism" },
       { "item": "lunar_flare" }, { "item": "rainbow_crystal_staff" }, { "item": "lunar_portal_staff" }
@@ -56,7 +52,7 @@
       "brain": { "type": "walker", "aggroRange": 60, "jumpHeight": 4 },
       "ranged": { "projectile": "goblin_arrow", "damage": 40, "speed": 22, "interval": 70, "range": 32 },
       "life": 1000, "damage": 40, "defense": 20, "knockbackResist": 0.5, "size": [1.4, 3.4], "moveSpeed": 2.6, "loot": "cultist_archer", "value": 1500, "covers": ["terraria:cultist_archer"] },
-    { "id": "lunatic_cultist_clone", "model": "lunatic_cultist", "tint": "#7a7aff", "name": "Ancient Cultist", "description": "An illusion of the Lunatic Cultist.",
+    { "id": "lunatic_cultist_clone", "bestiaryAs": "lunatic_cultist", "model": "lunatic_cultist", "tint": "#7a7aff", "name": "Ancient Cultist", "description": "An illusion of the Lunatic Cultist.",
       "brain": { "type": "caster", "aggroRange": 60, "teleportInterval": 200, "minBlink": 6, "maxBlink": 14 },
       "ranged": { "projectile": "shadow_fireball", "damage": 40, "speed": 12, "interval": 90, "range": 40 },
       "life": 400, "damage": 30, "defense": 20, "knockbackResist": 0.5, "size": [1.4, 3.4], "moveSpeed": 0.5, "gravity": false, "collideTerrain": false },
@@ -83,7 +79,7 @@
       ] },
       "life": 32000, "damage": 50, "defense": 42, "knockbackResist": 1.0, "size": [1.6, 3.6], "moveSpeed": 6, "gravity": false, "collideTerrain": false, "light": [6, 8, 14],
       "loot": "lunatic_cultist", "value": 100000,
-      "boss": { "title": "Lunatic Cultist", "flag": "defeated_lunatic_cultist", "arenaRadius": 140, "music": "boss_cultist",
+      "boss": { "title": "Lunatic Cultist", "flag": "defeated_lunatic_cultist", "arenaRadius": 140, "music": "boss_cultist", "intro": { "subtitle": "Herald of the Lunar Doom", "color": "#64a8ff", "framing": 2.5, "letterbox": 2.0 },
         "ritual": { "landmark": "dungeon_gate", "requires": "defeated_golem", "altar": "mysterious_tablet", "worshipper": "lunatic_devotee", "count": 4,
           "guard": "cultist_archer", "guards": 2, "radius": 3.5, "range": 60 } },
       "covers": ["terraria:lunatic_cultist"]
@@ -179,12 +175,12 @@
       ] },
       "life": 50000, "damage": 70, "defense": 50, "knockbackResist": 1.0, "size": [8, 10], "moveSpeed": 4, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],
       "loot": "moon_lord", "value": 200000,
-      "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220, "music": "boss_moon_lord",
-        "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5] }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2] }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2] }] },
+      "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220, "music": "boss_moon_lord", "intro": { "subtitle": "The Final Calamity", "color": "#48e0c8", "framing": 3.5, "letterbox": 2.5 },
+        "parts": [{ "enemy": "moon_lord_head", "offset": [0, 7, 0.5], "inBossBar": true }, { "enemy": "moon_lord_hand", "offset": [-8, 1, 2], "inBossBar": true, "mirror": true }, { "enemy": "moon_lord_hand", "offset": [8, 1, 2], "inBossBar": true }] },
       "covers": ["terraria:moon_lord"]
     },
     {
-      "id": "moon_lord_head", "model": "moon_lord_head", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Head", "description": "Its great eye opens to burn.",
+      "id": "moon_lord_head", "bestiaryAs": "moon_lord", "model": "moon_lord_head", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Head", "description": "Its great eye opens to burn.",
       "brain": { "type": "pattern", "phases": [
         { "moves": [
           { "type": "wait", "ticks": 150, "volley": { "projectile": "phantasmal_bolt", "damage": 55, "speed": 22, "interval": 30, "count": 3, "spread": 8 } },
@@ -197,7 +193,7 @@
       "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220 }
     },
     {
-      "id": "moon_lord_hand", "model": "moon_lord_hand", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Hand", "description": "An eye stares from each palm.",
+      "id": "moon_lord_hand", "bestiaryAs": "moon_lord", "model": "moon_lord_hand", "tags": ["boss", "lava_immune"], "name": "Moon Lord's Hand", "description": "An eye stares from each palm.",
       "brain": { "type": "pattern", "phases": [
         { "moves": [
           { "type": "wait", "ticks": 120, "volley": { "projectile": "phantasmal_eye", "damage": 50, "speed": 12, "interval": 40, "count": 3, "spread": 25 } },
@@ -208,7 +204,7 @@
       "onDeath": [{ "type": "spawnEnemies", "enemy": "true_eye_of_cthulhu", "count": 1 }],
       "boss": { "title": "Moon Lord", "flag": "defeated_moon_lord", "arenaRadius": 220 }
     },
-    { "id": "true_eye_of_cthulhu", "facing": "look", "model": "true_eye_of_cthulhu", "tags": ["lava_immune"], "name": "True Eye of Cthulhu", "description": "Freed from its lord's flesh; it will not be stopped.",
+    { "id": "true_eye_of_cthulhu", "bestiaryAs": "moon_lord", "facing": "look", "model": "true_eye_of_cthulhu", "tags": ["lava_immune"], "name": "True Eye of Cthulhu", "description": "Freed from its lord's flesh; it will not be stopped.",
       "brain": { "type": "flyer", "aggroRange": 200, "orbitRadius": 9, "dashSpeed": 12, "dashCooldown": 200, "bounceOffTerrain": false },
       "ranged": { "projectile": "phantasmal_bolt", "damage": 50, "speed": 20, "interval": 120, "count": 3, "spread": 10, "range": 40 },
       "life": 1, "invulnerable": true, "damage": 50, "knockbackResist": 1.0, "size": [3, 3], "moveSpeed": 7, "gravity": false, "collideTerrain": false, "light": [4, 14, 12],

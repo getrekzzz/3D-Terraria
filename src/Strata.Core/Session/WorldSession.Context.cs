@@ -16,15 +16,22 @@ public sealed partial class WorldSession
         string baseBiome = Generator.Biomes.IdOf(Generator.Biomes.BiomeAt(cell.X, cell.Y, cell.Z, surface));
         ctx.Layer = Generator.Plan.Bands.LayerAt(cell.Y);
         ctx.Biomes = ZonesAt(cell).Append(baseBiome).Concat(LayeredBiomes(cell, baseBiome, ctx.Layer)).Distinct().ToArray();
-        ctx.Depth = surface - cell.Y;
+        ctx.Depth = WorldGen.Fields.TerrainField.SurfaceDepth(cell.Y, surface, Generator.Terrain.CeilingHeight(cell.X, cell.Z));
+        ctx.Weather = Weather.LocalAt(ctx.Biomes, ctx.Layer);
+        ctx.Windy = Weather.Windy;
+        ctx.Season = Seasons.Current;
         ctx.Hour = Clock.Hour;
         ctx.IsDay = Clock.IsDay;
         ctx.MoonPhase = Clock.MoonPhase;
         ctx.Flags = Flags;
         ctx.Events = Events;
         ctx.EventKills = EventKills;
-        ctx.Difficulty = (int)Settings.Difficulty;
-        ctx.Evil = Settings.Evil.ToString().ToLowerInvariant();
+        ctx.Difficulty = (int)Settings.EffectiveDifficulty;
+        ctx.Evil = Settings.Has(Strata.Core.World.SecretSeed.Drunk) ? "both" : Settings.Evil.ToString().ToLowerInvariant();
+        ctx.SecretSeeds = Settings.Secret;
+        var size = Generator.Plan.Size;
+        float dx = cell.X - size.X * 0.5f, dz = cell.Z - size.Z * 0.5f, land = Generator.Plan.LandRadius;
+        ctx.CentreDistance = land > 0 ? MathF.Sqrt(dx * dx + dz * dz) / land : 0f;
         return ctx;
     }
 

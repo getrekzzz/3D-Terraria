@@ -1,0 +1,11 @@
+// Fallen Stars (P3-30): at night a star may streak down near each player on the surface, once a roll per second.
+// chancePerSecond 0.022 is about a dozen stars over a 9-minute night; radius and heights are metres, speed m/s.
+{
+  "chancePerSecond": 0.022,
+  "radius": 40,
+  "height": 45,
+  "minHeight": 12,
+  "speed": 18,
+  "maxActive": 4,
+  "projectile": "falling_star"
+}

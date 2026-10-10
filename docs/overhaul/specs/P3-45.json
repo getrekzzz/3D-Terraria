@@ -1,0 +1,42 @@
+{
+ "id": "P3-45",
+ "title": "Common-enemy fidelity: slimes, demon eyes, bats, cursed skulls, wyverns at boss quality",
+ "player_outcome": "The first enemies you meet look as good as the bosses: slimes are translucent jelly with something visible inside, demon eyes are veined with coloured irises, bats have membrane wings, cursed skulls are proper skulls and the wyvern is a real dragon.",
+ "design": [
+  "Verified: gel is 420 tris with an opaque prop:gel that hides its inner sphere (creatures.py:60-66); demon_eye 550; cave_bat 192; cursed_skull 768 (old bosses.skull); wyvern uses the old worm_segment. The boss helpers live in bosses_pre*.py.",
+  "Move the reusable helpers (_slime_body, _slime_face, _eyeball, _optic_nerves, skeletron_skull) into bgen/detail.py (or a new detail_parts.py if detail.py nears 400), keeping bosses_pre imports working.",
+  "gel: _slime_body(alpha 0.7, prop:gel:clear) at ~1.5k tris, keeping the inner item sphere visible; the per-enemy tint still colours it.",
+  "demon_eye: _eyeball with 5 vein trees + 3 optic nerves (~1.5k). cave_bat: organic body + ears + membrane wings with finger struts (prop:fur from P3-43) and a flap clip. cursed_skull: small skeletron_skull (~1.2k) with a glow. wyvern: dragon head with a fur mane, segments with small legs, tail fin.",
+  "Retire superseded generators still registered (bosses.py gel_sovereign, watcher, worm_segment, skull) once unused.",
+  "Rebuild the creatures plus previews."
+ ],
+ "files_modify": [
+  "tools/blender/bgen/detail.py \u2014 shared organic helpers",
+  "tools/blender/bgen/bosses_pre.py, bosses_pre2.py \u2014 import helpers from detail",
+  "tools/blender/bgen/creatures.py \u2014 gel, demon_eye, cave_bat",
+  "tools/blender/bgen/bosses.py \u2014 retire unused generators; cursed_skull",
+  "tools/blender/assets.json \u2014 params",
+  "assets/models/creatures/*.glb \u2014 rebuilt subset"
+ ],
+ "files_add": [
+  "tools/blender/bgen/detail_parts.py \u2014 moved boss helpers (only if detail.py would exceed 400 lines)",
+  "tools/blender/bgen/wyvern.py \u2014 wyvern head/body/tail generators"
+ ],
+ "data_changes": [
+  "assets.json creature params for gel/demon_eye/cave_bat/cursed_skull/wyvern_*"
+ ],
+ "tests": [
+  "build_all --check; smoke creatures.cmds PASS (props.problems == 0)"
+ ],
+ "verification": [
+  "preview.py sheets; perf with 20 slimes on screen (render.primitives probe within budget)"
+ ],
+ "depends_on": [
+  "P3-43"
+ ],
+ "risks": [
+  "The translucent gel shader costs more with many slimes; check the low preset.",
+  "Keep boss GLBs byte-identical after the helper move (rebuild King Slime and diff tri counts)."
+ ],
+ "effort": "M"
+}

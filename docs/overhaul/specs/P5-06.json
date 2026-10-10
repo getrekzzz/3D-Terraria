@@ -1,0 +1,65 @@
+{
+ "id": "P5-06",
+ "title": "Bound NPC rescues (Goblin, Mechanic, Wizard, Stylist, Golfer, Angler, Tavernkeep, Tortured Soul) in Core",
+ "player_outcome": "Some NPCs have to be found and freed before they move in, as in Terraria: a bound Goblin Tinkerer in the caverns after the Goblin Army, a bound Mechanic in the Dungeon after Skeletron, a bound Wizard in the hardmode caverns, a webbed Stylist in a spider nest, a Golfer in the underground desert, a sleeping Angler on the beach, an unconscious Tavernkeep after the evil boss, and a Tortured Soul in the underworld that must be purified to become the Tax Collector. Talking to them frees them.",
+ "design": [
+  "TownNpcParts.cs: add RescueInfo { TypedSpec[] Requires (world conditions for appearing), TypedSpec[] Where (conditions judged at a candidate cell), string? Landmark (use a planned landmark if the dungeon phase adds one), string Pose (bound|sleeping|webbed|unconscious|tortured), string Title ('Bound Goblin'), string? RequiresItem (purification_powder), string Thanks, float MinDistance = 30, float MaxDistance = 70 }. Add TownNpcDef.Rescue.",
+  "New Gameplay/Town/SiteFinder.cs (reused by P5-19). TryFind(Where, player, rng, budget) \u2192 Int3? node. If Where names a zone biome that belongs to plan Features (spider_nest, dungeon), sample inside those features' Bounds near the player. Otherwise sample a shell of MinDistance..MaxDistance m around the player. Accept a candidate only if its chunk is loaded (GetBlock != Unknown), the Where conditions hold on ContextAt(cell), a humanoid can stand there (NearestStandable r=6), and the player cannot see it (!Npcs.InSight(player.Eye, center)). At most 8 candidates per call.",
+  "New TownSystem.Rescues.cs. UpdateRescues() runs every 120 ticks: for each def with Rescue, while the 'rescued_<id>' flag is unset, the NPC is absent and Requires holds, try SiteFinder and create the TownNpc with Bound = true. Rescue(TownNpc npc, PlayerEntity p, out string msg): when RequiresItem is set, it needs and consumes one of that item, otherwise it refuses with msg. On success it sets the flag through Progression.Set, clears Bound, sets Activity Idle and raises Rescued. The NPC is now a homeless resident, and CheckArrivals houses them.",
+  "Bound behaviour: TickResident skips Decide/Steer and only applies gravity. TakeContactHits and Damage ignore bound NPCs (invulnerable). BeginTalk is still allowed. TownNpc.DisplayTitle = Bound ? Rescue.Title : Title.",
+  "Persistence: Bound is already in ResidentModel from P5-01. A bound NPC lost to an unloaded save simply re-spawns later.",
+  "Commands in TownDebugCommands: 'town bind <id> [dx dy dz]' places a bound NPC ignoring Requires/Where; 'town rescue <id>'. TownProbes: town.<id>.bound.",
+  "New item purification_powder (material + Dryad shop entry in P5-15; 'bottled' Blender generator; reference entry). Tortured Soul: the tax_collector rescue has pose 'tortured' and requiresItem purification_powder.",
+  "ContentValidator.Town (split out ContentValidator.TownRescue.cs): check rescue specs, the item ref, the landmark id and the Pose enum. A 'rescued' condition on an NPC without a rescue block is now an error."
+ ],
+ "files_modify": [
+  "src/Strata.Core/Content/Defs/TownNpcDef.cs \u2014 Rescue",
+  "src/Strata.Core/Content/Defs/TownNpcParts.cs \u2014 RescueInfo",
+  "src/Strata.Core/Gameplay/Town/TownSystem.cs \u2014 Tick calls UpdateRescues; Create supports bound",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Movement.cs \u2014 skip AI for bound NPCs",
+  "src/Strata.Core/Gameplay/Town/TownSystem.Combat.cs \u2014 bound NPCs are invulnerable",
+  "src/Strata.Core/Gameplay/Town/TownNpc.cs \u2014 DisplayTitle",
+  "src/Strata.Core/Gameplay/Town/TownRescue.cs \u2014 Rescue helpers and event args",
+  "src/Strata.Core/Commands/TownDebugCommands.cs \u2014 bind/rescue",
+  "src/Strata.Core/Commands/TownProbes.cs \u2014 .bound",
+  "data/town/pre_hardmode.json, data/town/hardmode.json \u2014 rescue blocks",
+  "tools/blender/assets.json \u2014 purification_powder",
+  "tools/content/reference/items_extra.py \u2014 terraria:purification_powder"
+ ],
+ "files_add": [
+  "src/Strata.Core/Gameplay/Town/TownSystem.Rescues.cs \u2014 spawning and rescuing bound NPCs",
+  "src/Strata.Core/Gameplay/Town/SiteFinder.cs \u2014 out-of-sight site search",
+  "src/Strata.Core/Content/Validation/ContentValidator.TownRescue.cs \u2014 rescue validation",
+  "data/items/town_goods2.json \u2014 purification_powder (later shop items join this or per-WP files)",
+  "assets/icons/items/purification_powder.png, assets/models/items/purification_powder.glb \u2014 via python3.13 tools/blender/build_all.py --only=purification_powder"
+ ],
+ "data_changes": [
+  "rescue blocks: goblin_tinkerer {requires flag defeated_goblin_army, where layer cavern, pose bound}; mechanic {requires defeated_skeletron, where biome any [dungeon], pose bound}; wizard {requires hardmode, where layer cavern, pose bound}; stylist {where biome any [spider_nest], pose webbed}; golfer {where biome any [underground_desert], pose unconscious}; angler {where biome any [ocean] + layer surface, pose sleeping}; tavernkeep {requires defeated_evil_boss, where layer surface, pose unconscious}; tax_collector {requires hardmode, where layer underworld, pose tortured, requiresItem purification_powder, title 'Tortured Soul'}",
+  "progression.json: optional named flags rescued_* (names only, so announcements and guide text read well)",
+  "data/reference regenerated with python3 tools/content/gen_reference.py"
+ ],
+ "tests": [
+  "RescueTests.BoundNpcSpawnsWhenRequirementsHold: SiteFinder with a stub predicate on the TestGame arena returns a standable, out-of-sight node; UpdateRescues creates the goblin only after defeated_goblin_army",
+  "RescueTests.RescueSetsFlagAndHousesNpc: bind, then Rescue \u2192 flag set, Bound false, CheckArrivals(force) houses them",
+  "RescueTests.TorturedSoulNeedsPowder: refused without the powder; succeeds and consumes 1 with it",
+  "RescueTests.BoundNpcsDoNotCountAndAreInvulnerable",
+  "RescueTests.BoundStateSurvivesSave",
+  "New smoke game/Testing/Scripts/rescue.cmds: 'wait_until player.frozen == 0 180' / 'spawning off' / 'time noon' / 'flag defeated_goblin_army' / 'town bind goblin_tinkerer 4 0 0' / 'assert town.goblin_tinkerer.bound == 1' / 'town rescue goblin_tinkerer' / 'assert flag.rescued_goblin_tinkerer == 1' / 'assert town.goblin_tinkerer.bound == 0' / build the house as in town.cmds / 'town check force' / 'assert town.goblin_tinkerer.homed == 1' / 'assert errors == 0'"
+ ],
+ "verification": [
+  "dotnet test; Strata.Tools validate + manifest --check; build_all.py --check; gen_reference.py --check",
+  "rescue.cmds SMOKE PASS",
+  "In game: 'flag defeated_goblin_army', walk into the caverns \u2192 a bound goblin appears off-screen within about a minute"
+ ],
+ "depends_on": [
+  "P5-02",
+  "P5-03",
+  "P5-04"
+ ],
+ "risks": [
+  "Rare zones (spider nests) may never be near the player; sampling inside plan features fixes this. The finder should also run when the player enters the zone ('zone.*' probe).",
+  "The dungeon/boss phase may also add a bound Mechanic. Agree that P5-06 owns the rescue system and the dungeon phase only adds a landmark.",
+  "tools/blender/assets.json is also edited by the art phase, so merge conflicts are likely."
+ ],
+ "effort": "L"
+}

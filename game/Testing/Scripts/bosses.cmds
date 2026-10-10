@@ -7,20 +7,37 @@ fill -12 -4 -12 12 -1 12 stone
 fill -12 0 -12 12 8 12 air
 wait 0.5
 boss king_slime 12
+assert camera.trauma > 0
+assert boss.king_slime.life > 0
 assert npcs.king_slime == 1
+# X-02: its title card comes up with it, with cinema bars and the camera pulled back for a moment; its own theme plays.
+assert boss.intro_active == 1
+assert boss.intro_cards == 1
+assert boss.intro_defeated == 0
+wait 0.3
+assert boss.intro_bars > 0
+assert camera.framing > 0
 wait 2
 assert player.alive == 1
+assert music.track.boss_gel == 1
+wait_until camera.framing == 0 3
 killall
 time 22
 give suspicious_looking_eye 1
 wield suspicious_looking_eye
 use
 assert npcs.eye_of_cthulhu == 1
+assert boss.eye_of_cthulhu.defense == 12
 wait 3
 killall
 boss eater_of_worlds 10
 wait 3
 assert npcs.eater_of_worlds == 1
+# Cutting a body segment splits the Eater; it falls with its last piece.
+damage eater_of_worlds 9999 20
+assert npcs.eater_of_worlds == 2
+slay eater_of_worlds
+assert flag.defeated_eater_of_worlds == 1
 killall
 # The pattern bosses: the Brain behind its Creepers, the Queen Bee and her bees, Deerclops; slaying raises their flags.
 # (God mode: a boss leaves once every player is dead.)
@@ -28,13 +45,33 @@ god
 boss brain_of_cthulhu 10
 wait 2
 assert npcs.creeper > 5
+assert boss.brain_of_cthulhu.illusions == 0
+slay creeper
+wait 1
+assert boss.brain_of_cthulhu.illusions == 3
 slay brain_of_cthulhu
 assert flag.defeated_brain_of_cthulhu == 1
+assert music.silent == 1
+# Its fall: the "Defeated" card, the victory sting over the hush and a brief slow motion that ends by itself.
+assert boss.intro_defeated == 1
+assert music.stings > 0
+assert engine.time_scale < 1
+wait_until engine.time_scale == 1 2
 assert flag.defeated_evil_boss == 1
 killall
 boss queen_bee 10
-wait 3
+# Attacking skips the title card (it never holds the player up).
+assert boss.intro_active == 1
+wait 0.6
+press use_primary
+wait 0.1
+release use_primary
+wait_until boss.intro_skips > 0 2
+wait_until boss.intro_active == 0 2
+wait 2.3
 assert npcs.queen_bee == 1
+# Outside the jungle she is enraged.
+assert boss.queen_bee.frenzied == 1
 slay queen_bee
 assert flag.defeated_queen_bee == 1
 killall
@@ -44,6 +81,13 @@ assert npcs.deerclops == 1
 slay deerclops
 assert flag.defeated_deerclops == 1
 killall
+# An Expert treasure bag opens by using it.
+give eye_of_cthulhu_treasure_bag 1
+wield eye_of_cthulhu_treasure_bag
+use
+wait 0.5
+assert inv.shield_of_cthulhu == 1
+assert inv.eye_of_cthulhu_treasure_bag == 0
 # A meteorite strike leaves a crater of ore.
 meteor
 assert errors == 0
@@ -51,20 +95,38 @@ assert errors == 0
 boss queen_slime 12
 wait 2
 assert npcs.queen_slime == 1
+# Below half life she takes wing (P4-26).
+wound queen_slime 9500
+wait 3
+assert boss.queen_slime.stage == 1
+assert errors == 0
 slay queen_slime
 assert flag.defeated_queen_slime == 1
 killall
 boss plantera 12
 wait 2
 assert npcs.plantera == 1
+assert npcs.plantera_hook == 3
 slay plantera
 assert flag.defeated_plantera == 1
+wait 1
+assert npcs.plantera_hook == 0
 killall
 boss golem 14
 wait 2
 assert npcs.golem == 1
+# Golem's sealed body carries its head and two punching fists; the broken head flies free until the body falls (P4-31).
+assert npcs.golem_head == 1
+assert npcs.golem_fist == 2
+slay golem_head
+assert npcs.golem_head_free == 1
+assert flag.defeated_golem == 0
+wait 1
 slay golem
 assert flag.defeated_golem == 1
+wait 0.5
+assert npcs.golem_head_free == 0
+assert npcs.golem_fist == 0
 killall
 boss duke_fishron 14
 wait 2
@@ -76,8 +138,24 @@ time 22
 boss empress_of_light 14
 wait 2
 assert npcs.empress_of_light == 1
+# By night she is not enraged; by day she would be lethal (P4-32).
+assert boss.empress_of_light.frenzied == 0
 slay empress_of_light
 assert flag.defeated_empress_of_light == 1
 killall
 time noon
+# A worm's body segment under the crosshair names the whole worm with its life (P1-07): spawned 2 m up and 4 m ahead
+# and frozen at once, its first segment hangs at eye height below the head.
+fill -12 -4 -12 12 -1 12 stone
+fill -12 0 -12 12 8 12 air
+camera first
+aim 0 0 1
+spawn eater_of_worlds 1 4
+ai off
+wait 0.3
+assert hover.eater_of_worlds == 1
+assert hud.target_name.eater_of_worlds == 1
+ai on
+killall
+camera third
 assert errors == 0

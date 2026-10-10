@@ -1,0 +1,36 @@
+{
+ "id": "P4-12",
+ "title": "Blueprint op index and zone fast path (dungeon prerequisite, no output change)",
+ "player_outcome": "No visible change. A far larger dungeon can generate, and it can answer 'am I in the dungeon?' for spawns, music and mining locks without scanning thousands of operations on the main thread.",
+ "design": [
+  "Blueprint.Freeze(): build Dictionary<Int3, int[]> of op indices per chunk. Each op's bounds are expanded by 1 cell to cover the padded 34\u00b3 context. Op order is preserved; the dictionary is immutable afterwards (thread-safe reads).",
+  "Blueprint.OpsFor(Int3 chunk) returns the ops in original order (an empty array when none).",
+  "StructureFeature's constructor calls blueprint.Freeze().",
+  "FeatureCarver.Stamp iterates blueprint.OpsFor(ctx.Coord) instead of every op.",
+  "StructureFeature.InZone(cell) scans only OpsFor(ChunkMath.CellToChunk(cell)).",
+  "Add bool NoZone to CarveOp and FillOp (Blueprint.Carve(box, liquid, noZone)) so approach cuts outside a building do not count as the zone. InZone ignores NoZone ops. The keep in P4-16 needs this."
+ ],
+ "files_modify": [
+  "src/Strata.Core/WorldGen/Structures/Blueprint.cs \u2014 Freeze, OpsFor, NoZone",
+  "src/Strata.Core/WorldGen/Structures/StructureFeature.cs \u2014 freeze, indexed InZone",
+  "src/Strata.Core/WorldGen/Chunk/FeatureCarver.cs \u2014 indexed Stamp"
+ ],
+ "files_add": [
+  "tests/Strata.Core.Tests/WorldGen/BlueprintIndexTests.cs \u2014 index equals brute force"
+ ],
+ "data_changes": [],
+ "tests": [
+  "BlueprintIndexTests.OpsForMatchesBruteForceInOrder: random blueprints (seeded).",
+  "BlueprintIndexTests.InZoneMatchesBruteForce: 5000 random cells.",
+  "BlueprintIndexTests.NoZoneCarvesAreNotInTheZone.",
+  "WorldGenTests golden hashes are unchanged, which proves no output change."
+ ],
+ "verification": [
+  "dotnet test (golden hashes still pass); check_file_length"
+ ],
+ "depends_on": [],
+ "risks": [
+  "An off-by-one in the padding expansion would silently skip ops at chunk borders. The golden hashes and the purity test catch it."
+ ],
+ "effort": "S"
+}
