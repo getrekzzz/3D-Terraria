@@ -50,7 +50,7 @@ public class RecipeLookupTests
         var samples = new Dictionary<string, object>
         {
             ["biome"] = new { Any = new[] { "jungle" } }, ["layer"] = new { Any = new[] { "cavern" } }, ["time"] = new { Is = "night" },
-            ["flag"] = new { Id = "defeated_eye_of_cthulhu" }, ["event"] = new { Id = "blood_moon" }, ["depth"] = new { Min = 10f },
+            ["flag"] = new { Id = "defeated_eye_of_cthulhu" }, ["event"] = new { Id = "blood_moon" }, ["depth"] = new { Min = 10f }, ["worldDepth"] = new { Min = 0.5f },
             ["light"] = new { Max = 3f }, ["moon"] = new { Phases = new[] { 0 } }, ["nearLiquid"] = new { Liquid = "water" },
             ["chance"] = new { P = 0.25f }, ["coins"] = new { Min = 5000L }, ["maxLife"] = new { Min = 200f },
             ["resident"] = new { Id = "merchant" }, ["residents"] = new { Min = 3f }, ["hasItem"] = new { Item = "torch" },

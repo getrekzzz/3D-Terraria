@@ -167,7 +167,7 @@ public class DontDigUpTests
     public static readonly TheoryData<int, int, int, ulong> Golden = new()
     {
         { 8, 14, 8, 1192776085367922944UL }, // the underworld near the top
-        { 5, 14, 7, 10067167907054985553UL }, // the spawn
+        { 5, 14, 7, 13402838086718216735UL }, // the spawn
         { 8, 3, 8, 6602206723201458421UL }, // the bottom surface
         { 9, 4, 9, 9417002913543057050UL }, // the bottom surface's open air under the roof
     };
@@ -176,7 +176,7 @@ public class DontDigUpTests
     [MemberData(nameof(Golden))]
     public void GoldenChunks(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(14, GenVersion.Current);
+        Assert.Equal(15, GenVersion.Current);
         Assert.Equal(new Int3(160, 448, 240), Ddu.Value.Plan.Spawn);
         Assert.Equal(expected, WorldGenTests.ChunkHash(Ddu.Value.Generate(new Int3(x, y, z))));
     }

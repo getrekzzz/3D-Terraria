@@ -17,6 +17,20 @@ public sealed class LootEntry
     public float Chance { get; init; } = 1f;
 
     public TypedSpec[] Conditions { get; init; } = Array.Empty<TypedSpec>();
+
+    /// <summary>Added to <see cref="Chance"/> (or <see cref="Weight"/> in a weighted roll) per unit of world depth
+    /// (<see cref="Conditions.ConditionContext.WorldDepth"/>, 0 at sea level to 1 at the underworld), so rare finds grow
+    /// likelier deeper down.</summary>
+    public float DepthBonus { get; init; }
+}
+
+/// <summary>How a table's coins and stack sizes grow with world depth: each is multiplied by 1 + k × depth (depth clamped to [0, 1]).</summary>
+public sealed class LootDepthScale
+{
+    public float Coins { get; init; }
+
+    /// <summary>For stackable items only (potions, bars, ammunition); single items stay single.</summary>
+    public float Counts { get; init; }
 }
 
 public enum LootMode
@@ -40,4 +54,7 @@ public sealed class LootTableDef : ContentDef
 
     /// <summary>Coin range in copper [min, max].</summary>
     public int[]? Coins { get; init; }
+
+    /// <summary>Richer coins and stacks the deeper the container lies; nested tables rolled from this one share it.</summary>
+    public LootDepthScale? DepthScale { get; init; }
 }

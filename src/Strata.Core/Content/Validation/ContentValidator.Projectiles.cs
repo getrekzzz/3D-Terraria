@@ -99,6 +99,7 @@ public static partial class ContentValidator
             if (t.Entries.Length == 0 && t.Coins == null) ctx.Error(t, "loot table is empty.");
             if (t.Coins is { } coins && (coins.Length != 2 || coins[0] < 0 || coins[1] < coins[0]))
                 ctx.Error(t, "coins must be [min, max].");
+            if (t.DepthScale is { } scale && (scale.Coins < 0 || scale.Counts < 0)) ctx.Error(t, "depthScale coins and counts must be 0 or more.");
             foreach (var e in t.Entries)
             {
                 if ((e.Item == null) == (e.Table == null)) ctx.Error(t, "each entry needs exactly one of item/table.");
@@ -106,6 +107,8 @@ public static partial class ContentValidator
                 ctx.Ref(t, ctx.Db.LootTables, e.Table, "entries.table");
                 if (e.Min < 0 || e.Max < e.Min) ctx.Error(t, "entry min/max invalid.");
                 if (e.Chance is < 0 or > 1) ctx.Error(t, "entry chance must be 0–1.");
+                if (e.DepthBonus < 0) ctx.Error(t, "entry depthBonus must be 0 or more.");
+                else if (t.Mode == LootMode.Each && e.Chance + e.DepthBonus > 1.0001f) ctx.Warn(t, "entry chance + depthBonus passes 1 (certain before the underworld).");
                 ctx.Specs(t, SpecKind.Condition, e.Conditions, "entries.conditions");
             }
         }

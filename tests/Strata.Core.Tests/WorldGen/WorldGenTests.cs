@@ -55,11 +55,11 @@ public class WorldGenTests
         { 4, 11, 8, 14139425615911629870UL },
         { 11, 11, 6, 571984169707453842UL },
         { 9, 11, 11, 5935961065046386009UL },
-        { 8, 7, 8, 1248400004488476377UL },
-        { 8, 4, 8, 15051355963523294477UL },
-        { 2, 4, 9, 63819815911648630UL },
+        { 8, 7, 8, 668304894443535077UL },
+        { 8, 4, 8, 18011947658627859695UL },
+        { 2, 4, 9, 14390725532925795817UL },
         { 12, 1, 5, 16627187558847016073UL },
-        { 8, 7, 12, 7931888006566429743UL }, // the Dungeon's vault
+        { 8, 7, 12, 17537536889763637019UL }, // the Dungeon's vault
         { 3, 11, 11, 54679113004194951UL }, // the Dungeon's keep
     };
 
@@ -67,7 +67,7 @@ public class WorldGenTests
     [MemberData(nameof(Golden))]
     public void GeneratedChunksMatchTheirGoldenHashes(int x, int y, int z, ulong expected)
     {
-        Assert.Equal(14, GenVersion.Current); // bumping the generator version means re-recording these hashes
+        Assert.Equal(15, GenVersion.Current); // bumping the generator version means re-recording these hashes
         Assert.Equal(new Int3(256, 349, 256), Tiny.Value.Plan.Spawn);
         Assert.Equal(expected, ChunkHash(Tiny.Value.Generate(new Int3(x, y, z))));
     }
@@ -117,6 +117,17 @@ public class WorldGenTests
         yield return new object[] { 8, 7, 12 }; // the Dungeon's vault
         yield return new object[] { 6, 9, 13 }; // Dungeon stairs crossing a chunk face
         yield return new object[] { 3, 11, 11 }; // the Dungeon's keep
+        // The cave network: a room's wall with its pool (water or lava) and formations, and a passage crossing a chunk face.
+        var rooms = gen.Plan.Features.All.OfType<Strata.Core.WorldGen.Caves.CaveRoomFeature>().ToList();
+        foreach (var room in new[] { rooms.First(r => r.Pools.Count > 0), rooms.First(r => r.Formations.Count > 2) })
+        {
+            var wall = room.At(0.95f, 0.3f);
+            var c = ChunkMath.CellToChunk(new Int3((int)wall.X, room.FloorY + 2, (int)wall.Z));
+            yield return new object[] { c.X, c.Y, c.Z };
+        }
+        var passage = gen.Plan.Features.All.OfType<Strata.Core.WorldGen.Caves.CavePassageFeature>().First(p => p.Length > 16f);
+        var mid = ChunkMath.CellToChunk(new Int3((int)((passage.A.X + passage.B.X) / 2), (int)((passage.A.Y + passage.B.Y) / 2) + 2, (int)((passage.A.Z + passage.B.Z) / 2)));
+        yield return new object[] { mid.X, mid.Y, mid.Z };
     }
 
     [Theory]

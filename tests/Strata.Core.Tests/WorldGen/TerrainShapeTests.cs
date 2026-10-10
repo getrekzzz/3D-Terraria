@@ -198,8 +198,10 @@ public class TerrainShapeTests
                     for (int lx = 0; lx < ChunkMath.Size; lx++)
                     {
                         int x = origin.X + lx, z = origin.Z + lz;
-                        if (near.Any(f => x >= f.Bounds.Min.X && x < f.Bounds.Max.X && z >= f.Bounds.Min.Z && z < f.Bounds.Max.Z)) continue;
                         float h = gen.Terrain.SurfaceHeight(x, z);
+                        // The cave network runs everywhere under the ground; only its entrances come near the surface.
+                        if (near.Any(f => x >= f.Bounds.Min.X && x < f.Bounds.Max.X && z >= f.Bounds.Min.Z && z < f.Bounds.Max.Z
+                            && (f is not (Strata.Core.WorldGen.Caves.CaveRoomFeature or Strata.Core.WorldGen.Caves.CavePassageFeature) || f.Bounds.Max.Y >= h - 8f))) continue;
                         if (gen.Plan.Landness.Sample(x, z) < 0.9f || h < gen.Plan.Bands.SeaLevel + 2) continue;
                         if (DensityColumn(gen.Terrain, x, z).Runs > 1) continue; // a deliberate cliff-zone undercut
                         int top = (int)MathF.Ceiling(h + TerrainField.OverhangAmplitude(1f, 1f)) + 2;

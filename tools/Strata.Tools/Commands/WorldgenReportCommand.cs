@@ -20,7 +20,7 @@ namespace Strata.Tools.Commands;
 public sealed class WorldgenReportCommand : IToolCommand
 {
     public string Name => "worldgen-report";
-    public string Description => "Render worldgen maps/sections + stats (--seed N --size tiny|small|medium --out dir --terrain-window N --compare old/stats.json)";
+    public string Description => "Render worldgen maps/sections + stats (--seed N --size tiny|small|medium --out dir --terrain-window N --cave-window N --compare old/stats.json)";
 
     private static int Threads = Environment.ProcessorCount;
 
@@ -60,6 +60,8 @@ public sealed class WorldgenReportCommand : IToolCommand
         var painter = new ReportPainter(gen);
         painter.BiomeMap(Path.Combine(outDir, "biome_map.png"));
         painter.ReliefMap(Path.Combine(outDir, "relief_map.png"));
+        var network = CaveNetworkPainter.Paint(gen, Path.Combine(outDir, "cave_network.png"));
+        var rooms = CaveRoomSheet.Paint(gen, painter, Path.Combine(outDir, "rooms"));
 
         var timings = new ConcurrentBag<double>();
         var stats = new ReportStats(gen);
@@ -84,8 +86,10 @@ public sealed class WorldgenReportCommand : IToolCommand
         }
 
         var terrain = terrainWindow > 0 ? MeasureTerrain(gen, terrainWindow, outDir) : null;
+        int caveWindow = context.Options.Int("cave-window", 0);
+        var caves = caveWindow > 0 && !gen.Plan.Bands.Inverted ? MeasureCaves(gen, caveWindow, context.Options.Int("cave-offset", 0)) : null;
 
-        var summary = stats.Summarize(gen, planMs, timings, terrain);
+        var summary = stats.Summarize(gen, planMs, timings, terrain, caves, network, rooms);
         var json = JsonSerializer.Serialize(summary, new JsonSerializerOptions { WriteIndented = true });
         File.WriteAllText(Path.Combine(outDir, "stats.json"), json);
         foreach (var (name, (count, total, max)) in gen.ProfilePasses!.SnapshotTimers().OrderByDescending(kv => kv.Value.TotalMs))
@@ -131,6 +135,24 @@ public sealed class WorldgenReportCommand : IToolCommand
             node[key] = value;
         }
         return node;
+    }
+
+    /// <summary>Cave census of a square window, its centre <paramref name="offset"/> cells east of spawn (clamped to the world).</summary>
+    private static CaveStats MeasureCaves(WorldGenerator gen, int window, int offset)
+    {
+        var size = gen.Plan.Size;
+        var spawn = gen.Plan.Spawn;
+        int w = Math.Min(window, size.X), d = Math.Min(window, size.Z);
+        int x0 = Math.Clamp(spawn.X + offset - w / 2, 0, size.X - w), z0 = Math.Clamp(spawn.Z - d / 2, 0, size.Z - d);
+        var passTimers = gen.ProfilePasses;
+        gen.ProfilePasses = null;
+        var sw = Stopwatch.StartNew();
+        var caves = CaveProfile.Measure(gen, x0, z0, w, d, Threads);
+        gen.ProfilePasses = passTimers;
+        Console.WriteLine($"caves {w}x{d} at ({x0},{z0}): {caves.Chunks} chunks in {sw.ElapsedMilliseconds} ms; open "
+            + string.Join(" ", caves.OpenPercent.Select(kv => $"{kv.Key} {kv.Value}%")) + $"; sky-linked {caves.SkyLinkedPercent}% largest {caves.LargestPiecePercent}% "
+            + $"pockets {caves.PocketsPerMillion}/M ({caves.PocketPercent}%) floor {caves.FloorPercent}% hall floor {caves.HallFloorPercent}% cramped {caves.CrampedPercent}%");
+        return caves;
     }
 
     private static Dictionary<Int3, GeneratedChunk> Generate(WorldGenerator gen, IEnumerable<Int3> coords, ConcurrentBag<double> timings, ReportStats stats)

@@ -111,7 +111,7 @@ internal sealed class ReportPainter
         img.Save(path);
     }
 
-    private (float, float, float) CellColor(ChunkData data, int idx, int y, int wx, int wz)
+    internal (float, float, float) CellColor(ChunkData data, int idx, int y, int wx, int wz)
     {
         byte liquid = data.Liquids?[idx] ?? 0;
         ushort block = data.GetBlock(idx);
@@ -128,7 +128,7 @@ internal sealed class ReportPainter
     internal static (byte R, byte G, byte B) Parse(string hex) =>
         (byte.Parse(hex.AsSpan(1, 2), NumberStyles.HexNumber), byte.Parse(hex.AsSpan(3, 2), NumberStyles.HexNumber), byte.Parse(hex.AsSpan(5, 2), NumberStyles.HexNumber));
 
-    private sealed class Image
+    internal sealed class Image
     {
         private readonly byte[] _rgba;
 
@@ -163,6 +163,16 @@ internal sealed class ReportPainter
         {
             for (int x = x0; x <= x1; x++) { Set(x, y0, r, g, b); Set(x, y1, r, g, b); }
             for (int y = y0; y <= y1; y++) { Set(x0, y, r, g, b); Set(x1, y, r, g, b); }
+        }
+
+        public void Line(float x0, float y0, float x1, float y1, float r, float g, float b)
+        {
+            int steps = (int)MathF.Ceiling(MathF.Max(MathF.Abs(x1 - x0), MathF.Abs(y1 - y0))) + 1;
+            for (int k = 0; k <= steps; k++)
+            {
+                float t = k / (float)steps;
+                Set((int)(x0 + (x1 - x0) * t), (int)(y0 + (y1 - y0) * t), r, g, b);
+            }
         }
 
         public void Save(string path) => PngWriter.Write(path, W, H, _rgba);
