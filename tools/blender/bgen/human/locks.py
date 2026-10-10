@@ -10,20 +10,19 @@ surfaces offset from the bare skull (headshape) so they hug it whatever the face
   (longhair.py, hairdrape.py). A woman's short hair is a chin-length bob in the same way, its ends cut blunt and
   turned under, with a fringe swept across the forehead.
 - Tied hair is pulled back flat to a tie and ends in a ponytail or a bun (hairtails.py).
-- A buzz cut is a close crop: a tinted layer on the scalp that thins into the skin at the hairline.
+- A buzz cut is a close crop: a tinted layer on the scalp that thins into the skin at the hairline (crop.py).
 
 hairsdf sculpts the traced locks into the hair's mesh.
 """
 import math
 from dataclasses import dataclass
 
-import bmesh
 import numpy as np
 from mathutils import Vector
 
 from . import sdf
 from .hairdrape import Drape
-from .hair import EAR_ZONE, coverage, coverages, ear_clear, ear_cover, hairline, hairlines, mesh_from
+from .hair import EAR_ZONE, coverage, coverages, ear_clear, ear_cover, hairline, hairlines
 from .hairsdf import Strands
 from .paint import hex3
 
@@ -56,6 +55,13 @@ STYLES = {
 }
 
 DOWN = np.asarray((0.0, 0.0, -1.0), dtype=F)
+BEARD_BURN = -0.036          # how low (head-local z) a cut's sideburns run with a beard, under its top edge
+
+
+def _bearded(p):
+    from .beard import STYLES as BEARDS
+    st = BEARDS.get(p.get("beardStyle", "full")) if p.get("beard") else None
+    return st is not None and st.cheek > 0
 
 
 def _ss(a, b, x):
@@ -91,6 +97,8 @@ class Groom:
         self.part = self.st.sweep
         self.part_x = 0.018 * self.part                     # where long hair parts (head-local x)
         self.sideburns = not (head.frame.female or self.st.tie)
+        if self.sideburns and not self.st.fall and _bearded(head.p):     # a cut's sideburns run down into the beard
+            self.sideburns = BEARD_BURN
         # Under a hat tied hair is gathered low at the nape, below the band.
         nape = min(-0.03, float(under_hat.edge_at((0.0, -0.1, 0.0))[0]) - 0.035) if under_hat else 0.0
         self.tie = (0.0, -0.09, nape) if under_hat and self.st.tie else self.st.tie
@@ -124,7 +132,10 @@ class Groom:
         settles back toward it, a little higher for the upper layers, so clumps overlap like combed hair. Past the
         hairline hair lies down close to the skin."""
         top = _ss(-0.01, 0.08, p[:, 2]) * _ss(-0.05, 0.04, p[:, 1])
-        base = self.st.cap + self.st.volume * top
+        cap = self.st.cap
+        if not (self.st.fall or self.tie):          # a cut lies closer down the sides and back than over the top
+            cap = cap * (0.55 + 0.45 * _ss(0.015, 0.06, p[:, 2]))
+        base = cap + self.st.volume * top
         if t is None:
             return base.astype(F)
         lie = 0.3 + 0.7 * coverages(p, self.part, self.sideburns, 0.012)
@@ -217,7 +228,7 @@ class Groom:
         lengths = st.length * (0.7 + 0.5 * top) * (1 + self.rng.uniform(-st.spread, st.spread, n))
         crown = np.linalg.norm(roots - self.crown, axis=1)
         layers = (2.0 * (1 - _ss(0.02, 0.12, crown)) + self.rng.uniform(0, 0.6, n)).astype(F)   # upstream locks on top
-        turn = self.rng.normal(0, 0.05 + 0.5 * st.mess, (n, 3)).astype(F)
+        turn = self.rng.normal(0, 0.05 + 0.5 * min(st.mess, 0.28), (n, 3)).astype(F)   # (messy: tousled, not crossed)
         widths = st.width * self.rng.uniform(0.85, 1.15, n)
         thick = st.thick * self.rng.uniform(0.85, 1.15, n) * (0.7 if self.under_hat else 1.0)
         rings = self.RINGS
@@ -238,17 +249,19 @@ class Groom:
         K = 16
         P = self.trace(roots, np.full(n, st.length * 2.4), layers, turn, K)
         arc = np.concatenate([np.zeros((1, n)), np.cumsum(np.linalg.norm(np.diff(P, axis=0), axis=2), axis=0)])
-        edge = arc[-1].copy()
+        edge, end = arc[-1].copy(), P[-1].copy()
         for i in range(n):
             for k in range(1, K):
                 if not self._grows(P[k, i], slack[i]):
                     edge[i] = arc[k - 1, i] + 0.5 * (arc[k, i] - arc[k - 1, i])
+                    end[i] = P[k - 1, i]
                     break
         mess = st.mess > 0.2
-        # A neat cut ends in an even edge; messy hair ends unevenly, some of its locks flicking up off the rest.
-        lengths = np.minimum(lengths * 2.0, edge * (self.rng.uniform(0.82, 1.0, n) if mess else
-                                                    np.where(roots[:, 1] > 0.03, self.rng.uniform(0.95, 1.0, n),
-                                                             self.rng.uniform(0.9, 1.0, n))))
+        # A neat cut ends in an even edge; messy hair ends unevenly over the top and the fringe, some of its locks
+        # flicking up off the rest, but evenly round the ears and over the nape (no ragged edge there).
+        rough = self.rng.uniform(0.82, 1.0, n) if mess else self.rng.uniform(0.95, 1.0, n)
+        even = self.rng.uniform(0.95, 1.0, n) if mess else self.rng.uniform(0.9, 1.0, n)
+        lengths = np.minimum(lengths * 2.0, edge * np.where((end[:, 1] > 0.03) | (mess & (end[:, 2] > 0.0)), rough, even))
         tuft = self.rng.random(n) < st.mess * 0.6
         lift = np.where(tuft, self.rng.uniform(0.002, 0.0055, n) * st.mess / 0.45, 0.0) * _ss(0.0, 0.04, roots[:, 2])
         keep = lengths > 0.02                       # nubs at the hairline: the locks from above cover it
@@ -260,52 +273,43 @@ class Groom:
         W = widths[keep][None] * (0.5 + 0.5 * _ss(1.0, 1.7, r))
         # Fuller over the top, shorter and closer down the sides and back (a neat cut most of all).
         T = thick[keep][None] * ((0.6 + 0.4 * _ss(-0.03, 0.02, P[..., 2])) if mess else
-                                 (0.45 + 0.55 * _ss(-0.04, 0.06, P[..., 2])))
-        # Tapered to the skin down the sideburns and over the nape (the fringe keeps its body).
-        above = P[..., 2] - hairlines(P.reshape(-1, 3), self.part, self.sideburns).reshape(P.shape[:2])
-        T *= 1.0 - 0.6 * _ss(0.025, 0.0, above) * _ss(0.06, 0.035, P[..., 1])
-        return Strands(P, W, T, taper=0.55 if mess else 0.65, root=0.5, round=0.15 if mess else 0.2,
-                       blunt=0.0 if mess else 0.15, merge=0.3 if mess else 0.85, cut=True)
+                                 (0.38 + 0.62 * _ss(-0.04, 0.06, P[..., 2])))
+        # Tapered to the skin over the nape (the sideburns lie flat and even down to their edge).
+        T *= self.taper(P.reshape(-1, 3), 0.6).reshape(P.shape[:2])
+        return Strands(P, W, T, taper=0.55 if mess else 0.65, root=0.5, round=0.0 if mess else 0.2,
+                       blunt=0.0 if mess else 0.15, merge=0.3 if mess else 0.85, cut=True, tip=0.35 if mess else 0.5)
 
-    def cap(self, head_obj):
-        """A close crop: the scalp lifted a fraction of a millimetre, stippled like cropped hair, thinning into the
-        skin's own colour over a soft hairline."""
-        bm = bmesh.new()
-        bm.from_mesh(head_obj.data)
-        drop = []
-        for f in bm.faces:
-            q = self.head.local(f.calc_center_median())
-            if coverage(q, self.part, self.sideburns, 0.012) < 0.02 or q.z > self.top(q)[0] + 0.005:
-                drop.append(f)
-        bmesh.ops.delete(bm, geom=drop, context="FACES")
-        bmesh.ops.delete(bm, geom=[v for v in bm.verts if not v.link_faces], context="VERTS")
-        bm.verts.ensure_lookup_table()
-        q = np.array([self.head.local(v.co) for v in bm.verts], dtype=F)
-        cov = coverages(q, self.part, self.sideburns, 0.012).astype(F)
-        k = _ss(0.05, 0.95, cov)
-        grain = (np.sin(q @ np.asarray((12.9898, 78.233, 37.719), dtype=F) * 1000.0) * 43758.5453) % 1.0
-        q = self._onto(q, (self.st.cap + 0.00025 * (grain - 0.5)) * k - 0.0008 * (1 - k))
-        for v, x in zip(bm.verts, q):
-            v.co = self.head.at(x)
-        dens = dict(zip((v.index for v in bm.verts), _ss(0.0, 0.85, cov) * (0.86 + 0.14 * grain)))
-        shade = dict(zip((v.index for v in bm.verts), 0.8 + 0.2 * grain))
-        uv = bm.loops.layers.uv.new("UVMap")
-        col = bm.loops.layers.color.get("Color") or bm.loops.layers.color.new("Color")
-        for f in bm.faces:
-            for loop in f.loops:
-                x = self.head.local(loop.vert.co)
-                d = np.asarray(x) - self.crown
-                loop[uv].uv = (float(np.linalg.norm(d)) * 10.0, math.atan2(d[0], -d[1]) * 0.3)
-                skin = loop[col]
-                a, s = float(dens[loop.vert.index]), float(shade[loop.vert.index])
-                loop[col] = (*(c * s * 0.85 * a + sk * (1 - a) for c, sk in zip(self.color, skin[:3])), 1.0)
-        return mesh_from(bm, "hair_cap")
+    # ------------------------------------------------------------------ a cut's edge (hairsdf)
+    def nape(self, x):
+        """1 behind the ears and down the nape, 0 at the sideburns and over the front."""
+        return _ss(-0.012, -0.045, x[:, 1])
+
+    def reach(self, x):
+        """How far past the hairline the scalp's locks may reach: a little further for a messy cut's ends, but evenly
+        over the nape; under long hair a little short of the nape, where its hanging locks cover it."""
+        nape = self.nape(x)
+        return (0.004 * (1 - nape) if self.st.mess > 0.2 else 0.0) + 0.002 - (0.007 * nape if self.st.fall else 0.0)
+
+    def taper(self, x, depth):
+        """A cut's thickness factor: thinning by ``depth`` over its last few centimetres above the nape."""
+        above = x[:, 2] - hairlines(x, self.part, self.sideburns) + self.reach(x)
+        return (1.0 - depth * _ss(0.035, 0.0, above) * self.nape(x)).astype(F)
+
+    def envelope(self, x):
+        """How far off the skull a cut may stand: close down the sides, round the ears and down the sideburns,
+        thinning to the skin toward the hairline over the nape (a taper, not a ledge); the fringe free."""
+        above = x[:, 2] - hairlines(x, self.part, self.sideburns) + self.reach(x)
+        env = 0.45 * np.maximum(above, 0.0) - 0.0006
+        side = 0.0032 + 0.35 * np.maximum(x[:, 2] - 0.008, 0.0) + 0.05 * _ss(-0.035, -0.05, x[:, 1])
+        front = 0.0 if self.under_hat else _ss(0.04, 0.065, x[:, 1])
+        return (np.minimum(env, side) + 0.05 * front).astype(F)
 
     def build(self, head_obj):
         """The style's hair: one sculpted mesh of clumps (hairsdf) and, for tied hair, the band that ties it; or only
-        the cap for a buzz cut."""
+        the crop for a buzz cut (crop.py)."""
+        from .crop import crop
         if self.st.count == 0:
-            return [self.cap(head_obj)]
+            return [crop(self, head_obj)]
         from . import hairtails
         from .hairsdf import Sculpt
         from .longhair import long_locks
@@ -322,7 +326,7 @@ class Groom:
         if self.name == "bob":         # shallower grooves: a bob is a smooth, glossy mass
             sculpt = Sculpt(self, parts, solids, 0.0035, (0.0008, 0.0009, 0.006), 0.0035)
         elif self.st.fall:
-            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0011, 0.0013, 0.006), 0.0035)
+            sculpt = Sculpt(self, parts, solids, 0.0035, (0.0024, 0.0022, 0.006), 0.0035)
         elif self.tie:
             sculpt = Sculpt(self, parts, solids, 0.0026, (0.0009, 0.0016, 0.0045), 0.0028)
         else:

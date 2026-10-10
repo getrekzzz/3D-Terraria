@@ -1,15 +1,17 @@
 """Creature coverings grown over the skin in place of clothes: a fur coat (fur.py), linen wraps (wraps.py) and swamp
-growth (moss.py), with the creature heads, hands and feet that go with them (muzzles.py, paws.py).
+growth (moss.py), with the creature heads, hands and feet that go with them (muzzles.py, paws.py,
+hooves.py).
 
 A covering is built from copies of the skinned body, head and hands, so it fits them exactly and follows the
 animation with their weights; the skin it hides is removed. With a covering a character wears only the garments its
 own parameters name (``pants`` alone gives the werewolf his trousers), torn when ``torn`` is set.
 
 Parameters (listed with the others in human/__init__.py): fur (a shaggy coat's colour, fur.py) with furBelly (paler
-chest and belly) and furLength (1); wraps (a mummy's linen, wraps.py); moss (light moss, moss.py) with mud; muzzle
-(wolf|ape: a wolf's head with snout and tall ears, or an ape's face, muzzles.py); faceSkin (bare face, hands and feet
-under fur); hands (claws); handSize (1, paws.py); feet (also paws|ape, paws.py); nails (claws' and nails' colour);
-torn (tears the clothes worn, as undead's are).
+chest and belly), furLength (1) and furKind (wolf|ape|goat: a goat-demon's shaggy hide and legs, fur.py); wraps (a
+mummy's linen, wraps.py); moss (light moss, moss.py) with mud; muzzle (wolf|ape: a wolf's head with snout and tall
+ears, or an ape's face, muzzles.py); faceSkin (bare face, hands and feet under fur); hands (claws); handSize (1,
+paws.py); feet (also paws|ape, paws.py; hooves: cloven hooves, hooves.py); nails (claws', nails' and hooves'
+colour); torn (tears the clothes worn, as undead's are).
 """
 import math
 
@@ -67,7 +69,7 @@ def reshape(fr, p):
 def shod(p):
     """Whether the body grows its own (shoe-like) feet."""
     from .paws import KINDS
-    return p.get("feet") not in ("talons",) + KINDS
+    return p.get("feet") not in ("talons", "hooves") + KINDS
 
 
 def nail(fr, p, side, obj):
@@ -82,14 +84,15 @@ def nail(fr, p, side, obj):
 
 
 def feet(fr, p):
-    """([foot per side], [claws per side]) for paws and ape feet, painted; ([], []) otherwise."""
+    """([foot per side], [claws per side]) for paws, ape feet and hooves, painted; ([], []) otherwise."""
     from .paws import KINDS, build_feet
-    if p.get("feet") not in KINDS:
+    if p.get("feet") not in KINDS + ("hooves",):
         return [], []
+    from .hooves import build_hoof
     from .paint import flat
     out = ([], [])
     for side in ("R", "L"):
-        foot, claw = build_feet(fr, side, p["feet"])
+        foot, claw = build_hoof(fr, side) if p["feet"] == "hooves" else build_feet(fr, side, p["feet"])
         flat(foot, p.get("faceSkin", p.get("skin", "#8a7a6a")))
         flat(claw, p.get("nails", "#2a2420"))
         out[0].append(foot)

@@ -2,10 +2,12 @@
 
 Strips are wound from the hands and feet upward (wrapstrip.py): each leg from the ankle to the hip and each arm from
 the wrist to the shoulder in a helix whose turns overlap, so every edge steps down over the turn below; the trunk
-from the hips to the armpits over long straps laid first over each shoulder (their ends tucked under the trunk's
-turns); the neck; the head in bands round the skull from the jaw up to a swirl on the crown with a dark slit left
-open over the eyes (which glow), two straps crossing over the top; a strip between the legs. The hands and feet are
-bound in a tight layer with the strips' lines. The turns waver, so here and there they part and the darker, older
+from the hips to the armpits over short straps laid first over each shoulder (their ends tucked under the trunk's
+turns), then bound crosswise: strips from low on each side of the ribs up over the opposite shoulder and down the
+back, crossing over the breastbone and the spine, so the chest and back are not one level block; the neck; the head
+in bands round the skull from the jaw up to a swirl on the crown with a dark slit left open over the eyes (which
+glow), two narrow straps crossing over the top beneath the bands. The hands and feet are bound in a tight layer with
+the strips' lines. The turns waver, so here and there they part and the darker, older
 layers show between them; a few loose ends lie down the body and hang off it (drapes.py), moving with the limb they
 lie on. Each strip is its own shade of old linen, stained and grimier toward the feet.
 """
@@ -77,13 +79,13 @@ class Binder:
     def trunk(self):
         j, s = self.fr.j, self.s
         th = 0.0034 * s
-        # long straps over each shoulder first, from low on the chest to low on the back, overlapping side by side
+        # straps over each shoulder first, from the top of the chest to the top of the back, overlapping side by side
         for sx in (1, -1):
-            for k, x in enumerate((0.05, 0.095, 0.14, 0.18)):
-                c = Vector((sx * x * s, j["chest"].y, j["shoulder.R"].z - (0.12 + 0.03 * (k == 3)) * s))
-                pts = self._arc(c, math.radians(-50), math.radians(230))
+            for k, x in enumerate((0.055, 0.1, 0.14)):
+                c = Vector((sx * x * s, j["chest"].y, j["shoulder.R"].z - 0.11 * s))
+                pts = self._arc(c, math.radians(-25), math.radians(205))
                 if len(pts) > 5:
-                    self.add(ws.ribbon(self.body, pts, 0.052 * s, 0.0025 * s + 0.15 * k * th, th))
+                    self.add(ws.ribbon(self.body, pts, 0.052 * s, 0.0025 * s + 0.15 * k * th, th, tuck=0.03 * s))
         # the trunk's turns over the straps' ends, from the hips to the armpits
         off = 0.0075 * s
         bottom = Vector((0, j["pelvis"].y, j["hip.R"].z - 0.035 * s))
@@ -97,9 +99,26 @@ class Binder:
                                       Vector((0, j["neck"].y, j["shoulder.R"].z + 0.02 * s))], up=(0, 1, 0), reach=0.12 * s)
         L = base.length
         self.add(ws.helix(base, 0.0, 1.0, 0.055 * s / L, 0.04 * s / L, off + 0.6 * th, th, phase=1.3, segs=56, skip=base.missed))
-        crotch = self._arc(Vector((0, j["pelvis"].y, j["hip.R"].z - 0.02 * s)), math.radians(55), math.radians(-235), 13)
-        if len(crotch) > 4:                              # a strip between the legs, front to back
-            self.add(ws.ribbon(self.body, crotch, 0.065 * s, off + 2.2 * th, th, tuck=0.04 * s))
+        # bound crosswise over it all: from low on one side of the ribs, across the breastbone, over the other
+        # shoulder and down across the spine to the first side again, its ends tucked under the trunk's turns
+        for sx in (1, -1):
+            for k in range(2):
+                x, lo = (0.075 + 0.04 * k) * s, j["chest"].z - (0.05 + 0.035 * k) * s
+                hi = j["shoulder.R"].z - (0.06 - 0.01 * k) * s
+                pts = [self._hit(Vector((-sx * 0.11 * s, j["chest"].y, lo)), (0, 1, 0)),
+                       self._hit(Vector((sx * x * 0.7, j["chest"].y, hi)), (0, 1, 0)),
+                       self._hit(Vector((sx * x, j["chest"].y - 0.01 * s, hi - 0.06 * s)), (0, 0, 1)),
+                       self._hit(Vector((sx * x * 0.7, j["chest"].y, hi)), (0, -1, 0)),
+                       self._hit(Vector((-sx * 0.11 * s, j["chest"].y, lo)), (0, -1, 0))]
+                pts = [q for q in pts if q is not None]
+                if len(pts) == 5:
+                    self.add(ws.ribbon(self.body, pts, 0.05 * s, off + (2.2 + 0.7 * k + 0.35 * (sx > 0)) * th, th,
+                                       tuck=0.05 * s))
+
+    def _hit(self, centre, d):
+        """Where a ray from ``centre`` (inside the body) along ``d`` leaves it, or None."""
+        hit = self.body.ray_cast(centre, Vector(d), 0.5 * self.s)
+        return None if hit[0] is None else hit[0]
 
     def head_wrap(self):
         head, s = self.head, self.s
@@ -123,8 +142,8 @@ class Binder:
         self.add(ws.helix(neck, 0.15, 1.0, 0.045 * s / neck.length, 0.034 * s / neck.length, off, th, phase=1.1, segs=48))
         for k, curve in enumerate((((0, 0.075, 0.06), (0, 0.04, 0.105), (0, -0.02, 0.125), (0, -0.08, 0.1), (0, -0.11, 0.04)),
                                    ((0.085, 0.0, 0.03), (0.06, -0.005, 0.1), (0, -0.01, 0.13), (-0.06, -0.005, 0.1), (-0.085, 0.0, 0.03)))):
-            self.add(ws.ribbon(self.skull, [head.at(c) for c in curve], 0.04 * s, off + (1.05 + 0.35 * k) * th, th * 0.8,
-                               tuck=0.035 * s), clear=True)
+            self.add(ws.ribbon(self.skull, [head.at(c) for c in curve], 0.03 * s, off * (0.2 + 0.15 * k), th * 0.6,
+                               tuck=0.035 * s), clear=True)        # (beneath the bands, showing only at the crown)
 
     def loose_ends(self):
         """A few ends come loose: they lie down the body over the wraps and hang off where it turns away."""

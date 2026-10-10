@@ -59,7 +59,7 @@ def _tail_axis(g, start, out, length, K, R):
     back = _unit(back) if np.linalg.norm(back) > 0.2 else np.asarray((0.0, -1.0, 0.0))
     s = np.linspace(0.0, length, K)
     x = s / length
-    theta = 0.85 * np.exp(-s / 0.04) - 0.38 * np.sin(np.pi * np.minimum(x * 1.3, 1.0)) + 0.22 * x ** 3
+    theta = 1.1 * np.exp(-s / 0.04) - 0.38 * np.sin(np.pi * np.minimum(x * 1.3, 1.0)) + 0.22 * x ** 3
     d = np.cos(theta)[:, None] * DOWN + np.sin(theta)[:, None] * back
     P = start + np.concatenate([[np.zeros(3)], np.cumsum((d[:-1] + d[1:]) * 0.5 * (length / (K - 1)), axis=0)])
     seg = np.linalg.norm(np.diff(P, axis=0), axis=1)
@@ -78,18 +78,19 @@ def ponytail(g):
     grips it where it leaves the head."""
     tie, out = _tie(g, 0.002)
     hat = bool(g.under_hat)
-    r0, top = (0.012, 0.027) if hat else (0.0135, 0.034)     # the bundle inside the band, and at its fullest
+    r0, top = (0.012, 0.03) if hat else (0.0135, 0.038)     # the bundle inside the band, and at its fullest
     length = 0.22 if hat else 0.32
-    K = 22
+    K = 24
     t = np.linspace(0.0, 1.0, K)
     s = t * length
-    R = (r0 + (top - r0) * _ss(0.0, 0.07, s)) * (1 - 0.42 * _ss(0.35, 1.0, t))
+    grip = 0.01                                          # the band, just clear of the hair on the head
+    R = (r0 + (top - r0) * _ss(grip, 0.07, s)) * (1 - 0.25 * _ss(0.35, 1.0, t))
     start = tie + out * 0.003
     axis = _tail_axis(g, start, out, length, K, R)
     T, N, B = _frames(axis, out)
-    n = 8
-    a0 = 2 * math.pi * np.arange(n) / n + g.rng.uniform(-0.15, 0.15, n)
-    ends = 1.0 - 0.24 * g.rng.random(n)
+    n = 6
+    a0 = 2 * math.pi * np.arange(n) / n + g.rng.uniform(-0.12, 0.12, n)
+    ends = 1.0 - 0.18 * g.rng.random(n)
     P = np.zeros((K, n + 1, 3), dtype=F)
     Nl = np.zeros((K, n + 1, 3), dtype=F)
     W = np.zeros((K, n + 1), dtype=F)
@@ -98,21 +99,23 @@ def ponytail(g):
         u = t * ends[i]
         c, Ni, Bi = (_resample(x, u, axis) for x in (axis, N, B))
         r = np.interp(u, t, R)
-        a = a0[i] + 1.1 * u                              # twisting a little round the bundle
+        a = a0[i] + 1.8 * u                              # twisting round the bundle
         radial = _unit(np.cos(a)[:, None] * Ni + np.sin(a)[:, None] * Bi)
-        spread = r * (0.56 + 0.12 * _ss(0.7, 1.0, u))     # parting a little toward the end
+        spread = r * (0.6 + 0.08 * _ss(0.65, 1.0, u))     # parting a little toward the end
         P[:, i] = c + radial * spread[:, None]
         Nl[:, i] = radial
-        W[:, i] = r * 0.95
-        H[:, i] = r * 0.58
-    u = t * 0.62                                         # a core fills the bundle
+        W[:, i] = r * 0.92
+        H[:, i] = r * 0.72
+    u = t * 0.55                                         # a core fills the bundle
     P[:, n] = _resample(axis, u, axis)
     Nl[:, n] = _resample(N, u, axis)
-    W[:, n] = np.interp(u, t, R) * 1.0
-    H[:, n] = np.interp(u, t, R) * 1.0
-    locks = Strands(P, W, H, taper=0.55, root=1.0, N=Nl, round=0.5, blend=1.3, blunt=0.25, merge=0.35)
+    W[:, n] = np.interp(u, t, R) * 0.75
+    H[:, n] = np.interp(u, t, R) * 0.75
+    # Round locks blended crisply, so each shows in the outline with a crease beside it.
+    locks = Strands(P, W, H, taper=0.7, root=1.0, N=Nl, round=0.75, blend=1.0, blunt=0.35, merge=0.4)
     gather = ("cone", tie - out * 0.014, start, 0.022, r0 * 0.8)
-    band = tie_band(g, axis[0] + T[0] * 0.003, T[0], r0 * 0.82 + 0.0005)
+    at = _resample(axis, [grip / length], axis)[0]          # (tilted a little toward the head, squeezed against it)
+    band = tie_band(g, at, _unit(_resample(T, [grip / length], axis)[0] + 0.6 * out), r0)
     return locks, gather, band
 
 
@@ -146,7 +149,8 @@ def bun(g):
 
 
 def tie_band(g, centre, axis, r):
-    """The band round a ponytail: a short rounded ring of cloth gripping the bundle (world space)."""
+    """The band round a ponytail: a short rounded ring of cloth gripping the bundle (``r`` its inside radius,
+    head-local) where it leaves the head."""
     axis = _unit(np.asarray(axis, dtype=float))
     u = _unit(np.cross(axis, (1.0, 0.0, 0.0)))
     v = np.cross(axis, u)
@@ -160,7 +164,7 @@ def tie_band(g, centre, axis, r):
         row = []
         for i in range(ring):
             b = 2 * math.pi * i / ring
-            p = centre + radial * (r + 0.0014 + 0.0026 * math.cos(b)) + axis * 0.0034 * math.sin(b)
+            p = centre + radial * (r + 0.003 + 0.0032 * math.cos(b)) + axis * 0.0045 * math.sin(b)
             row.append(bm.verts.new(head.at(p)))
         rows.append(row)
     col = bm.loops.layers.color.new("Color")

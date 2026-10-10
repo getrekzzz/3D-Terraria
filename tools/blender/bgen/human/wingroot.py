@@ -1,8 +1,8 @@
 """Where a wing leaves the back: the root found on the body or the garment over the shoulder blade, a vertical slit
-let into that garment for it (the cloth darkened into the opening, its edge turned and hemmed), and the root's own
-section, flattened and broad where it grows out of a bare back and tapering into the wing's arm (round where it
-comes through cloth, the opening fitted round it). Tails (tails.py) use the same slit in the seat of the trousers,
-its hem sewn into the garment itself."""
+let into that garment for it (the cloth darkened into the opening, its edge turned and hemmed, pointed at both ends and
+taller than the root so the cloth is seen parted round it), and the root's own section, flattened and broad where it
+grows out of a bare back and tapering into the wing's arm (a fleshy stem swelling out of the slit through cloth).
+Tails (tails.py) use the same slit in the seat of the trousers, its hem sewn into the garment itself."""
 import math
 
 import bmesh
@@ -52,9 +52,10 @@ def _axes(normal):
     return up, normal.cross(up).normalized()
 
 
-def slit(obj, point, normal, s, half_w, half_h):
+def slit(obj, point, normal, s, half_w, half_h, pointed=False):
     """Darkens the garment ``obj`` into a vertical slit round ``point`` (half-width and half-height ``half_w``,
-    ``half_h``) and returns the hem along its edge as a sweep in a new bmesh (or None if ``obj`` is bare skin)."""
+    ``half_h``; ``pointed``: a lens coming to a point at top and bottom) and returns the hem along its edge as a sweep
+    in a new bmesh (or None if ``obj`` is bare skin)."""
     if obj is None or obj.name.split(".")[0] not in GARMENTS:
         return None
     up, side = _axes(normal)
@@ -69,10 +70,15 @@ def slit(obj, point, normal, s, half_w, half_h):
         d = v.co - point
         if abs(d.dot(normal)) > 0.03 * s:          # (the front of the garment, the far side of the arm)
             continue
-        e = math.hypot(d.dot(side) / half_w, d.dot(up) / half_h)
+        x, z = d.dot(side) / half_w, d.dot(up) / half_h
+        if pointed:              # dark right out to the hem: the opening is seen above and below what comes through
+            e = max(abs(x) / max(1 - z * z, 1e-3), abs(z))
+            k = 1.0 - max(0.0, min(1.0, (e - 0.72) / 0.2))
+        else:
+            e = math.hypot(x, z)
+            k = 1.0 - max(0.0, min(1.0, (e - 0.55) / 0.3))    # dark only well inside, where the root hides it
         if e > 1.25:
             continue
-        k = 1.0 - max(0.0, min(1.0, (e - 0.55) / 0.3))        # dark only well inside, where the root hides it
         for loop in v.link_loops:
             c = loop[layer]
             if base is None:
@@ -90,7 +96,7 @@ def slit(obj, point, normal, s, half_w, half_h):
     for k in range(n + 1):
         a = 2 * math.pi * k / n
         x, z = math.sin(a) * half_w, math.cos(a) * half_h
-        x *= 1 - 0.35 * abs(math.cos(a)) ** 6                         # pinched toward the ends
+        x *= abs(math.sin(a)) if pointed else 1 - 0.35 * abs(math.cos(a)) ** 6        # pinched toward the ends
         q = point + side * x + up * z + normal * 0.02 * s
         hit, nrm, _, _ = tree.ray_cast(q, -normal, 0.06 * s)
         ring.append((hit if hit is not None else q - normal * 0.02 * s) + normal * 0.0016 * s)
@@ -129,6 +135,18 @@ def crossing(obj, verts, s, pad=0.003):
         return None
     c = sum(ring, Vector()) / len(ring)
     return [p + (p - c).normalized() * pad * s for p in ring]
+
+
+def lens(obj, ring, normal, s, stretch=1.45):
+    """A pointed vertical slit() round the opening ``ring`` (crossing()), ``stretch`` times as tall as it, so the cloth
+    is seen parted above and below what comes through it; the hem fits round it at the sides."""
+    if obj is None or obj.name.split(".")[0] not in GARMENTS:
+        return None
+    up, side = _axes(normal)
+    c = sum(ring, Vector()) / len(ring)
+    half_h = stretch * max(abs((p - c).dot(up)) for p in ring)
+    half_w = max(abs((p - c).dot(side)) / (1 - ((p - c).dot(up) / half_h) ** 2) for p in ring) + 0.001 * s
+    return slit(obj, c, normal, s, half_w, half_h, pointed=True)
 
 
 def slit_ring(obj, ring, normal, s):
@@ -184,12 +202,16 @@ def slit_ring(obj, ring, normal, s):
 def section(s, r_arm, u_skin, u_joint, flat=0.85, broad=True):
     """The root's ring offsets: up to ``u_skin`` (where it leaves the back) it is broad and flattened vertically, and
     it narrows to the arm's radius ``r_arm(u)`` by ``u_joint``; ``a`` = 0 points up. Not ``broad`` (coming out
-    through cloth), it keeps the arm's round section, so the opening stays small."""
+    through cloth) it is a fleshy stem, a little taller than wide and swelling just where it leaves the slit (lens()),
+    so the opening stays small."""
     def fn(u, a):
         r = r_arm(u)
-        if broad and u < u_joint:
+        if u < u_joint:
             k = 1.0 - max(0.0, (u - u_skin) / (u_joint - u_skin)) if u > u_skin else 1.0
             k = k * k * (3 - 2 * k)
+            if not broad:
+                swell = 1 + 0.16 * math.exp(-((u - u_skin) / (0.35 * (u_joint - u_skin))) ** 2)
+                return math.cos(a) * r * (1 + 0.38 * k) * swell, math.sin(a) * r * swell
             r_up = r * (1 + 1.25 * k)
             r_side = r * (1 + 0.15 * k) * (1 - flat * 0.25 * k)
             return math.cos(a) * r_up, math.sin(a) * r_side

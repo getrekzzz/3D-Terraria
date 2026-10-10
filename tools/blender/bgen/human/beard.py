@@ -55,6 +55,11 @@ def _ss(a, b, x):
     return t * t * (3 - 2 * t)
 
 
+def _smin(a, b, k):
+    h = np.maximum(k - np.abs(a - b), 0.0) / k
+    return np.minimum(a, b) - h * h * k * 0.25
+
+
 def _below(a, z, line_a, line_z):
     """How far below a line given as heights by azimuth each point lies, measured across the face (head-local;
     negative above it): its edge thins out over the same distance however steeply the line runs."""
@@ -68,22 +73,25 @@ def _below(a, z, line_a, line_z):
     return np.where(z < np.interp(a, line_a, line_z), d, -d)
 
 
-def coverages(q, st, mouth=True):
+def coverages(q, st, mouth=True, hair=True):
     """How much beard grows at each point (0 bare skin .. 1 full), thinning out at every edge: softly over the cheeks
     and down the throat, crisply round the lips (unless ``mouth`` is False: the sculpted beard reads the lips' own
-    shape instead), and clear of the ears."""
+    shape instead), and clear of the ears. Without head ``hair`` to run up into, its sideburns stop lower."""
     q = np.atleast_2d(np.asarray(q, dtype=F))
     x, y, z = np.abs(q[:, 0]), q[:, 1], q[:, 2]
     a = np.arctan2(x, y)
     if st.cheek > 0:          # lower on the cheeks for a smaller beard, still up to the sideburns
-        m = _ss(-0.004, 0.014, _below(a, z + (1 - st.cheek) * 0.06 * _ss(1.45, 0.6, a), LINE_A, CHEEK_Z))
+        lift = (1 - st.cheek) * 0.06 * _ss(1.45, 0.6, a) + (0.0 if hair else 0.016 * _ss(1.0, 1.4, a))
+        m = _ss(-0.004, 0.014, _below(a, z + lift, LINE_A, CHEEK_Z))
     else:
         m = _ss(-0.004, 0.014, _below(a, z, CHIN_A, CHIN_Z))      # (narrowing from the mouth to the chin)
         m = m * _ss(-0.004, 0.01, (np.maximum(0.4 + 2.4 * (z + 0.065), 0.22) - a) * 0.09)
-    m = m * _ss(-0.008, 0.01, y + z + 4.0 * x * x + 0.097 + st.neck)
-    m = m * _ss(-0.004, 0.007, y + 0.013)
+    # Down the throat to the neckline and behind the jaw to a cut below the ears, the two rounded into one curve
+    # round the jaw's angle (no corner there).
+    neck, back = y + z + 4.0 * x * x + 0.097 + st.neck, 1.2 * (y + 0.019) - 0.008
+    m = m * _ss(-0.008, 0.01, _smin(neck, back, 0.03))
     (cy, cz), (ry, rz) = EAR
-    m = m * np.where(x > 0.04, _ss(1.0, 1.3, np.hypot((y - cy) / ry, (z - cz) / rz)), 1.0)
+    m = m * np.where(x > 0.04, _ss(1.0, 1.4, np.hypot((y - cy) / ry, (z - cz) / rz)), 1.0)
     if not mouth:
         return m
     zc, hw, hh = LIPS
@@ -99,9 +107,10 @@ def masses(q, st):
     x, y, z = np.abs(q[:, 0]), q[:, 1], q[:, 2]
     a = np.arctan2(x, y)
     low = _ss(-0.04, -0.095, z)
-    front = _ss(1.35, 0.3, a)
-    t = 0.0022 + (st.mass * 0.7 - 0.0022) * low * (0.45 + 0.55 * front) * (1 - 0.4 * _ss(0.0, 0.025, jaw_edge(a) - z))
-    t = t * (1 - 0.5 * _ss(-0.035, -0.012, z) * _ss(1.05, 1.35, a))     # (the sideburns short, up to the hair)
+    side = 0.15 + 0.85 * _ss(1.45, 0.45, a)           # (thin toward the ears: it lies flat on the jaw's angle)
+    t = 0.0022 * (1 - 0.35 * _ss(1.2, 1.7, a))
+    t = t + (st.mass * 0.7 - 0.0022) * low * side * (1 - 0.4 * _ss(0.0, 0.025, jaw_edge(a) - z))
+    t = t * (1 - 0.6 * _ss(-0.045, -0.02, z) * _ss(1.05, 1.35, a))      # (the sideburns short: under the hair's)
     zc, hw, hh = LIPS
     mouth = _ss(0.0, 0.012, (np.hypot(q[:, 0] / hw, (z - zc) / hh) - 1.0) * 0.01)
     t = t * (1 - 0.6 * (1 - mouth) * _ss(0.04, 0.06, y))  # thinner round the mouth: the lips sit in it, not in a hole
@@ -134,10 +143,10 @@ def grow(head, p, under=()):
     from .beardsdf import Sculpt
     from .paint import hex3
     style = p.get("beardStyle", "full")
-    beard = Beard(head, style, _tree(under), seed=sum(ord(ch) for ch in style))
+    hairy = p.get("hairStyle", "short") != "bald" and p.get("hat") != "hood"
+    beard = Beard(head, style, _tree(under), seed=sum(ord(ch) for ch in style), hair=hairy)
     bib = Bib(beard) if beard.st.length > 0 else None
     sculpt = Sculpt(beard, bib)
-    hairy = p.get("hairStyle", "short") != "bald" and p.get("hat") != "hood"
     obj = sculpt.finish(sculpt.build(), hex3(p["beard"]), hex3(p.get("skin", "#e0b090")),
                         hex3(p.get("hair", p["beard"])) if hairy else None)
     return obj

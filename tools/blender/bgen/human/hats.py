@@ -212,10 +212,13 @@ class Hat:
         z = q[:, 2]
         k = F(self.ry / self.rx) + (F(1) - F(self.ry / self.rx)) * _smooth(F(0.0), F(0.1), z)
         qq = np.stack([q[:, 0], F(yc) + (q[:, 1] - F(yc)) / k, z], 1)
-        d = tube(qq, spine, [r * t for t in radii])
-        ang = np.arctan2(q[:, 0], q[:, 1] - F(yc))
-        wr = F(0.0024) * np.sin(z * F(95) + F(1.7) * np.sin(ang * F(2))) * _smooth(F(0.12), F(0.17), z) * (1 - _smooth(F(0.24), F(0.26), z))
-        return np.maximum(d + wr * (F(0.6) + F(0.4) * np.cos(ang)), -(z + F(0.002)))
+        d = tube(qq, *_spline(spine, [r * t for t in radii], 5))
+        # (the angle round the hat's axis, eased to nothing near the axis: where the bending cone's front crosses
+        # it, a bare angle swings round in a few millimetres and pinched the cloth into a crease)
+        dx, dy = q[:, 0], q[:, 1] - F(yc)
+        rho2 = dx * dx + dy * dy + F(0.025) ** 2
+        wr = F(0.0024) * np.sin(z * F(95) + F(3.4) * dx * dy / rho2) * _smooth(F(0.12), F(0.17), z) * (1 - _smooth(F(0.24), F(0.26), z))
+        return np.maximum(d + wr * (F(0.6) + F(0.4) * dy / np.sqrt(rho2)), -(z + F(0.002)))
 
     def _tricorn_shape(self, th):
         """The tricorn brim's width and how high its edge is turned up, round the crown (th, from the hat's x axis):
@@ -293,3 +296,23 @@ class Hat:
 
     def field(self, p):
         return carve(self.filled(p), self.inner(p), 0.002)
+
+
+def _spline(points, radii, n):
+    """A polyline through ``points`` smoothed into a Catmull-Rom curve of ``n`` pieces a span (radii eased the same
+    way), so a tube along it bends without a crease where its round cones meet."""
+    pts = np.asarray(points, dtype=float)
+    rad = np.asarray(radii, dtype=float)
+    ext = np.concatenate([2 * pts[:1] - pts[1:2], pts, 2 * pts[-1:] - pts[-2:-1]])
+    rext = np.concatenate([[2 * rad[0] - rad[1]], rad, [2 * rad[-1] - rad[-2]]])
+    out_p, out_r = [tuple(pts[0])], [float(rad[0])]
+    for i in range(len(pts) - 1):
+        p0, p1, p2, p3 = ext[i:i + 4]
+        r0, r1, r2, r3 = rext[i:i + 4]
+        for k in range(1, n + 1):
+            t = k / n
+            w = (-0.5 * t ** 3 + t * t - 0.5 * t, 1.5 * t ** 3 - 2.5 * t * t + 1, -1.5 * t ** 3 + 2 * t * t + 0.5 * t,
+                 0.5 * t ** 3 - 0.5 * t * t)
+            out_p.append(tuple(w[0] * p0 + w[1] * p1 + w[2] * p2 + w[3] * p3))
+            out_r.append(max(float(w[0] * r0 + w[1] * r1 + w[2] * r2 + w[3] * r3), 0.2 * float(min(r1, r2))))
+    return out_p, out_r

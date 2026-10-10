@@ -50,14 +50,15 @@ def skull(shape, p):
     ty, br = tip_y(shape), shape.brow
     E = ellipsoid
     # The braincase, long, low and flat on top, and the brow between the eyes sloping down into the snout.
-    d = E(p, (0, -0.014, 0.008), (0.05, 0.064, 0.036))
-    d = smin(d, E(p, (0, 0.032, 0.002), (0.045, 0.05, 0.032)), 0.024)
-    d = smin(d, E(p, (0, -0.048, -0.032), (0.042, 0.036, 0.042)), 0.03)     # the nape, sloping down into the neck
+    d = E(p, (0, -0.012, 0.001), (0.049, 0.074, 0.028))
+    d = smin(d, E(p, (0, 0.032, 0.0), (0.045, 0.05, 0.029)), 0.024)
+    d = smin(d, E(p, (0, -0.046, -0.026), (0.038, 0.032, 0.03)), 0.03)     # the back of the skull over the nape
     for sx in (1, -1):
         # The jaw muscles, wider than the braincase, behind and below the eyes.
         d = smin(d, E(p, (sx * 0.035, -0.004, -0.036), (0.03, 0.044, 0.034)), 0.028)
-        # The ridge over each eye: a low ledge running along the top of the head toward the snout (not a knob).
-        d = smin(d, E(p, (sx * 0.033, 0.062, 0.015), (0.026, 0.0135 + 0.003 * br, 0.006 + 0.0025 * br), _basis((sx * 0.25, 1, -0.12))), 0.012)
+        # The ridge over each eye: a low ledge along the top of the head, converging toward the snout and level (an
+        # outer end turned down reads sad), clear of the upper lid so the eye stays open.
+        d = smin(d, E(p, (sx * 0.031, 0.06, 0.016), (0.026, 0.012 + 0.003 * br, 0.0055 + 0.002 * br), _basis((-sx * 0.15, 1, 0.0))), 0.012)
         # The lower jaw's bar, from its angle under the ear to the chin.
         d = smin(d, round_cone(p, (sx * 0.04, -0.008, -0.07), (sx * 0.013, ty - 0.034, -0.071), 0.0125, 0.008), 0.018)
     # The upper jaw, wide between the cheeks and tapering forward to a blunt, flattened tip, with a ridge down its top,
@@ -112,14 +113,15 @@ def field(shape, p, d):
 
 
 def earless(shape, p, d):
-    """A reptile's ear opening (tympanum) where the outer ear would be: a shallow round dip, flush with the head at its
+    """A reptile's ear opening (tympanum) where the outer ear would be: a round dish sunk under the skin with a crisp
     edge, placed on the surface found for it (an anchor)."""
     a = shape.anchors
     if a is None or "tympanum" not in a:
         return d
     for i, sx in enumerate((1, -1)):
-        c = a["tympanum"][i] + np.asarray((sx * 0.0032, 0.0, 0.0))
-        d = carve(d, ellipsoid(p, c, (0.004, 0.0085, 0.008)), 0.004)
+        # A dish sunk well under the skin with a crisp edge (a shallow soft dip reads as a raised nub).
+        c = a["tympanum"][i] + np.asarray((sx * 0.0008, 0.0, 0.0))
+        d = carve(d, ellipsoid(p, c, (0.003, 0.0072, 0.0066)), 0.0012)
     return d
 
 

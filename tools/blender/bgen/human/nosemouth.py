@@ -118,18 +118,25 @@ def lips(shape, p):
     q = np.asarray(p, dtype=F).copy()
     q[:, 2] -= F(shape.mouth_up)
     q[:, 2] -= F(grin(shape)) * (q[:, 0] / F(0.0255 * shape.mouth_w)) ** 2
-    q[:, 1] += F(0.0008 * fem)          # (set back a little: full, not pouting)
+    q[:, 1] += F(0.0012 + 0.0004 * fem)
     q[:, 0] /= F(shape.mouth_w)
     q[:, 1] += F(14.0) * q[:, 0] * q[:, 0]
     thin = F(1) + F(0.45) * (q[:, 0] / F(0.0275)) ** 2
     q[:, 1] = F(0.09) + (q[:, 1] - F(0.09)) * thin
     q[:, 2] = F(-0.07) + (q[:, 2] + F(0.07)) * thin
-    upper = ellipsoid(q, (0, 0.0907, -0.0652 + 0.0004 * fem), (0.0285 - 0.0015 * fem, 0.0064 + 0.0002 * fem, 0.0049 * full))
-    upper = smin(upper, ellipsoid(q, (0, 0.0942, -0.0666), (0.0068, 0.0034, 0.0034 * full)), 0.004)
+    # The lips stand only a little proud of the line from the nose to the chin: flattened front to back (not pushed
+    # back whole, which leaves only their middle showing, a pursed rosebud). A woman's fullness goes into the lower
+    # lip's height and the lips' width more than the upper lip's height, so the two still meet in a valley that the
+    # mouth line opens in, not one pouting mass.
+    bu, bl = 0.0008 - 0.0002 * fem, 0.0004 * fem
+    tall = full - 0.12 * fem
+    upper = ellipsoid(q, (0, 0.0907, -0.0652 + 0.0004 * fem), (0.0285 - 0.0005 * fem, 0.0064 + 0.0002 * fem - bu, 0.0049 * tall))
+    upper = smin(upper, ellipsoid(q, (0, 0.0942 - bu, -0.0666), (0.0068, 0.0034, 0.0034 * full)), 0.004)
     for sx in (1, -1):
-        upper = smin(upper, ellipsoid(q, (sx * 0.0045, 0.0924, -0.0628 + 0.0004 * fem), (0.0058, 0.0034, 0.0022 * full)), 0.006)
+        upper = smin(upper, ellipsoid(q, (sx * 0.0045, 0.0924 - bu, -0.0628 + 0.0004 * fem), (0.0058, 0.0034, 0.0022 * full)), 0.006)
     ub = shape.underbite             # an underbite carries the lower lip out in front of the upper
-    lower = ellipsoid(q, (0, 0.0886 + 0.008 * ub, -0.0748 + 0.0015 * ub), (0.025 - 0.0015 * fem, 0.0074 + 0.0003 * fem + 0.001 * ub, 0.006 * full))
+    lower = ellipsoid(q, (0, 0.0886 + 0.008 * ub, -0.0748 - 0.0008 * fem + 0.0015 * ub),
+                      (0.025 - 0.0005 * fem, 0.0074 + 0.0003 * fem + 0.001 * ub - bl, 0.006 * (tall + 0.04 * fem)))
     return smin(upper, lower, 0.002)
 
 
@@ -140,9 +147,9 @@ def mouth(shape, p, d):
         # A rounded groove between the lips, sunk just into the surface found for it; toward the corners it thins and
         # rises out of the skin, so the line fades out within the lips instead of ending in a pit.
         xs = a["mouth"][:, 0] / (0.0218 * shape.mouth_w)
-        radii = 0.00075 * (0.4 + 0.6 * np.clip(np.cos(xs * np.pi / 2), 0.0, 1.0))
-        sink = radii * 0.35 - 0.0026 * xs ** 6
-        d = carve(d, tube(p, list(a["mouth"] - np.stack([0 * radii, sink, 0 * radii], 1)), list(radii)), 0.001)
+        radii = 0.00085 * (0.4 + 0.6 * np.clip(np.cos(xs * np.pi / 2), 0.0, 1.0))
+        sink = radii * 0.5 - 0.0026 * xs ** 6
+        d = carve(d, tube(p, list(a["mouth"] - np.stack([0 * radii, sink, 0 * radii], 1)), list(radii)), 0.0008)
     if a is not None and "fold" in a:
         # Age: the cheek sags over the nasolabial fold, a wide shallow dip in front of it (no cut, no pit at the end).
         for i, sx in enumerate((1, -1)):

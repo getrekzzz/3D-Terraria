@@ -7,5 +7,5 @@ def wear(fr, head, parts, p, w, garments, lookup=None):
     """The parts ``p`` asks for, finished and weighted (``garments``: what the character already wears)."""
     out = tribal.wear(fr, head, parts, p, w, lookup)
     if "wisps" in p:
-        out += spectre.wisps(fr, garments, p)
+        out += spectre.wisps(fr, garments, p, parts["body"])
     return out

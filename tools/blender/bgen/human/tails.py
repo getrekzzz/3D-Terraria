@@ -5,7 +5,8 @@ wingroot.py), swept along smooth curves and carried by the hips. ``tailShape``:
   the top, banded scales and a paler belly;
 - fox: slim at the root, swelling into a bushy brush of fur clumps that curls up to a pale tufted tip;
 - wolf: a shaggy brush hanging down behind the legs, darker toward the tip;
-- devil: a long thin whip curling up behind and ending in a flat spade;
+- devil: a long thin whip hanging down behind and curling out to one side, its tip flicking up beside the knee (below
+  the hand) in a flat spade;
 - snake: a serpent's body as thick as a thigh coming out from under the back of a robe and lying on the ground in a
   long S (serpent.py).
 - brush: a full, bushy brush of fur tufts, grown like the fur coat (furtail.py).
@@ -30,8 +31,8 @@ PATHS = {
             (0.11, -0.36, -0.11), (0.125, -0.41, -0.03)],
     "wolf": [(0, 0.04, 0.02), (0, -0.03, -0.02), (0, -0.11, -0.11), (0.015, -0.17, -0.23), (0.025, -0.19, -0.35),
              (0.03, -0.18, -0.45)],
-    "devil": [(0, 0.04, 0.02), (0, -0.03, -0.02), (0.02, -0.15, -0.13), (0.06, -0.29, -0.2), (0.11, -0.41, -0.17),
-              (0.14, -0.49, -0.08), (0.145, -0.52, 0.03), (0.13, -0.5, 0.12)],
+    "devil": [(0, 0.04, 0.02), (0, -0.03, -0.02), (0.015, -0.13, -0.14), (0.04, -0.22, -0.31), (0.08, -0.3, -0.47),
+              (0.14, -0.36, -0.57), (0.21, -0.41, -0.58), (0.27, -0.43, -0.52), (0.29, -0.43, -0.43)],
 }
 
 
@@ -157,8 +158,10 @@ def tail(fr, body, p, garments=()):
     rigid(obj, "hips")
     if shape in ROOT:            # out through a hemmed slit in the seat of whatever covers the tailbone
         r = ROOT[shape] * s
-        hem = (wingroot.slit_ring(cloth, ring, Vector((0, -1, 0)), s) if ring else
-               wingroot.slit(cloth, exit_pt, Vector((0, -1, 0)), s, 1.12 * r + 0.004 * s, 1.2 * r + 0.005 * s))
+        back = Vector((0, -1, 0))
+        hem = (wingroot.lens(cloth, ring, back, s, 1.35) if ring and shape == "devil" else    # (a thin whip's slit)
+               wingroot.slit_ring(cloth, ring, back, s) if ring else
+               wingroot.slit(cloth, exit_pt, back, s, 1.12 * r + 0.004 * s, 1.2 * r + 0.005 * s))
         if hem is not None:
             wingroot.sew(cloth, hem)
     return obj

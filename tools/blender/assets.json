@@ -4498,7 +4498,7 @@
         "earSize": 0,
         "brow": 0.4,
         "brows": "none",
-        "headSize": 1.12
+        "headSize": 1.3
       }
     },
     "flying_snake": {
@@ -4857,7 +4857,7 @@
         "brow": 0.85,
         "hair": "#3e5a50",
         "mouthWidth": 1.45,
-        "forehead": 0.8,
+        "forehead": 1.0,
         "legs": 0.8,
         "jaw": -0.3
       }
@@ -4974,7 +4974,9 @@
         "hat": "wide",
         "hatColor": "#4a8aff",
         "height": 1.3,
-        "weight": 0.4,
+        "weight": 0.5,
+        "headSize": 1.2,
+        "legs": 0.92,
         "hatShape": "mushroom"
       }
     },
@@ -5235,7 +5237,7 @@
       "params": {
         "skin": "#8ab87a",
         "hair": "#1a1a1a",
-        "hairStyle": "short",
+        "hairStyle": "buzz",
         "shirt": "#3a3a3a",
         "pants": "#2a2a3a",
         "boots": "#1a1a1a",
@@ -5265,10 +5267,10 @@
         "brows": "none",
         "brow": 0.8,
         "jaw": 0.5,
-        "height": 1.9,
-        "build": 0.9,
-        "weight": 0.7,
-        "undead": true
+        "undead": true,
+        "build": 1.2,
+        "weight": 0.45,
+        "height": 2.0
       }
     },
     "vampire": {
@@ -5495,29 +5497,33 @@
         "handSize": 1.45,
         "feet": "ape",
         "nails": "#3a4252",
-        "height": 2.6,
-        "build": 1.0,
-        "weight": 0.6
+        "height": 2.7,
+        "legs": 0.92,
+        "build": 1.5,
+        "armSpread": 12,
+        "weight": 0.75
       }
     },
     "krampus": {
       "generator": "humanoid",
       "params": {
-        "skin": "#4a3a3a",
         "eyes": "#ff3a1a",
-        "hair": "#2a1a1a",
-        "beard": "#2a1a1a",
         "beardStyle": "pointed",
-        "hairStyle": "long",
         "horns": "#e8d8b0",
-        "shirt": "#3a2a2a",
-        "pants": "#2a1a1a",
-        "boots": "#1a1010",
         "height": 2.4,
         "build": 1.0,
-        "weight": 0.8,
-        "hornShape": "ram",
-        "hornShape": "goat"
+        "hornShape": "goat",
+        "skin": "#6a3a32",
+        "hair": "#2e2420",
+        "beard": "#2e2420",
+        "furKind": "goat",
+        "feet": "hooves",
+        "hands": "claws",
+        "nails": "#1a1412",
+        "weight": 0.5,
+        "hairStyle": "bald",
+        "earSize": 0,
+        "fur": "#4e3c30"
       }
     },
     "present_mimic": {
@@ -5930,13 +5936,11 @@
       "generator": "humanoid",
       "params": {
         "anatomy": "skeleton",
-        "shirt": "#c8a040",
-        "pants": "#8a2a2a",
-        "boots": "#6a4a2a",
-        "hat": "cap",
-        "visor": false,
-        "hatColor": "#c8a040",
-        "hatShape": "helmet"
+        "kit": "hoplite",
+        "armor": "#c0903a",
+        "crest": "#b02a22",
+        "pteruges": "#7a2a20",
+        "emblem": "#5a1410"
       }
     },
     "medusa": {

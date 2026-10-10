@@ -165,8 +165,8 @@ def decorations(fr, head, dough, eye_color):
     # the smile: an arc piped across the lower face, a dot at each end
     xs = np.linspace(-0.062, 0.062, 26)
     smile = [(head.c.x + x * h, head.c.z + (-0.035 - 0.032 * (1 - (x / 0.062) ** 2)) * h) for x in xs]
-    pts, _ = _on_front(dough, smile, pipe * 0.5)
-    matter.tube(bm, [Vector(tuple(x)) for x in pts], lambda t: pipe * (1.05 + 0.15 * math.sin(math.pi * t)), 8)
+    pts, _ = _on_front(dough, smile, -pipe * 0.36)         # (piped icing sits nearly flush: half of it sunk)
+    matter.tube(bm, [Vector(tuple(x)) for x in pts], lambda t: pipe * (0.85 + 0.12 * math.sin(math.pi * t)), 8)
     _paint_bm(bm, layer, ICING)
     icing = mesh_from(bm, "icing")
     # eyes ringed with icing, and cheeks
@@ -176,12 +176,15 @@ def decorations(fr, head, dough, eye_color):
     ring_layer = ring_bm.loops.layers.color.new("Color")
     eyes, n = _on_front(dough, [(head.c.x + sx * 0.048 * h, head.c.z + 0.026 * h) for sx in (1, -1)], 0.0)
     for c, nn in zip(eyes, n):
-        _dome(bm, layer, c, nn, 0.021 * h, 0.016 * h, matter.hexrgb(eye_color), sink=0.3)
+        _dome(bm, layer, c, nn, 0.021 * h, 0.0075 * h, matter.hexrgb(eye_color), sink=0.3)
         t = Vector(tuple(nn)).orthogonal().normalized()
         b = Vector(tuple(nn)).cross(t)
-        circle = [Vector(tuple(c)) + (t * math.cos(a) + b * math.sin(a)) * 0.029 * h + Vector(tuple(nn)) * pipe * 0.25
-                  for a in np.linspace(0, 2 * math.pi, 40, endpoint=False)]
-        matter.tube(ring_bm, circle, pipe * 0.8, 8, (c, nn))
+        ang = np.linspace(0, 2 * math.pi, 40, endpoint=False)
+        flat = np.asarray([tuple(Vector(tuple(c)) + (t * math.cos(a) + b * math.sin(a)) * 0.029 * h) for a in ang])
+        nv = np.tile(np.asarray(tuple(nn)), (len(ang), 1))
+        laid = matter.onto(dough.shape, flat + nv * 0.03 * s, -nv, 0.06 * s)       # (onto the face as it curves away)
+        circle = [Vector(tuple(x)) for x in laid - nv * pipe * 0.36]
+        matter.tube(ring_bm, circle, pipe * 0.72, 8, (c, nn))
     _paint_bm(ring_bm, ring_layer, ICING)
     cheeks, n = _on_front(dough, [(head.c.x + sx * 0.085 * h, head.c.z - 0.03 * h) for sx in (1, -1)], 0.0)
     for c, nn in zip(cheeks, n):

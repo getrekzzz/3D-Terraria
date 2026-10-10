@@ -31,8 +31,8 @@ mouthWidth (1; wider grins), brow (0 .. 1 a heavy ridge over deep-set eyes), for
 Monsters: face (cyclops | brute | ghoul | void, monsterface.py), sleeves (long, short or 0..1 down the arm), shirt/pants
 none (bare), snakes (snakehair.py), wisps (spectre.py), tribalMask, headdress, beads, grassSkirt, bodyPaint
 (tribal.py); tailShape snake is a serpent's body under a robe (serpent.py). handSize (1) scales the hands (paws.py).
-Creature coverings in place of clothes (described in coverings.py): fur, furBelly, furLength, wraps, moss, mud, muzzle
-(wolf|ape), faceSkin, hands (claws), feet (paws|ape), nails, torn. Machines and aliens: alien, armor, helmet... (scifi.py).
+Creature coverings in place of clothes (described in coverings.py): fur, furBelly, furLength, furKind (wolf|ape|goat),
+wraps, moss, mud, muzzle (wolf|ape), faceSkin, hands (claws), feet (paws|ape|hooves), nails, torn. Machines and aliens: alien, armor, helmet... (scifi.py).
 
 hatShape by hat: wide: brim (default), floppy, top, pointed, tricorn, bucket, mushroom (hats.py); cap: santa, elf,
 helmet, greathelm, bandana, turban, hardhat, beret (capshapes.py), shako (hats.py), party, nurse (perched.py), else
@@ -224,13 +224,13 @@ def build_skeleton(name: str, p: dict):
     """A walking skeleton on the human rig (skeletal.py): sculpted bones, eye lights deep in the orbits, the undead
     stance, and the clothes, hat and accessories its parameters ask for (skeldress.py)."""
     import bmesh
-    from . import skeldress, skeletal, skulls
+    from . import hoplite, skeldress, skeletal, skulls
     from .garments import mesh_from
     fr = frame_mod.Frame(p)
     head = Head(fr, p)
     arm = frame_mod.build_armature(fr, name)
     bones, skull = skeletal.build_skeleton(fr, head, arm, hide=("foot",) if skeldress.dressed(p) else ())
-    extras, bones = skeldress.clothe(fr, head, arm, p, bones)
+    extras, bones = hoplite.equip(fr, head, p, *skeldress.clothe(fr, head, arm, p, bones))    # (a kit: hoplite.py)
     skeletal.paint(bones, skull, head, p.get("skin", "#e0d8c0"))
     for o in bones:
         set_material(o, "char:bone")

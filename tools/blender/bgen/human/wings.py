@@ -184,7 +184,7 @@ def _feathers(bm, plane, s, color):
 def wings(fr, body, color, shape="bat", garments=()):
     """A pair of wings: membrane (or feathers, or crystal) and bones as one part, claws as another. Each grows out of
     a slit in the garment over the shoulder blade (wingroot.py), its root broad and flattened where it leaves a bare
-    back (round through cloth) and tapering into the arm."""
+    back (a fleshy stem through cloth) and tapering into the arm."""
     s = fr.s
     base = hex3(color)
     skin = wingroot.skin_tone(body)
@@ -236,8 +236,8 @@ def wings(fr, body, color, shape="bat", garments=()):
             if shape != "bat":
                 _arm_coverts(bm, path, radius, plane, base, round(u_skin * (len(path) - 1)) + 1)
         ring = None if shape == "ice" or hit is None else wingroot.crossing(hit, vs, s)
-        if ring:                         # the opening hugs the root where it actually comes through the cloth
-            hem = wingroot.slit_ring(hit, ring, normal, s)
+        if ring:                         # the slit parted round the root where it actually comes through the cloth
+            hem = wingroot.lens(hit, ring, normal, s)
         else:
             hem = wingroot.slit(hit, root, normal, s, 0.022 * s, 0.032 * s)
         if hem is not None:

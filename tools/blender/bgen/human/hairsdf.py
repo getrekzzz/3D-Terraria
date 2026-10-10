@@ -28,10 +28,12 @@ SOURCES = ("hairsdf.py", "hair.py", "locks.py", "headshape.py", "earshape.py", "
 class Strands:
     """Traced locks: rings x locks x 3 centrelines with each lock's width and thickness (per lock, or per ring and
     lock), where they start narrowing to their tips (fraction of their length), how thin they are at the root, how
-    round they stay at least (thickness over width), optionally the way each lock's flat side faces (rings x locks
+    round they stay at least (thickness over width: one value, reached a little way out from the root, or per ring
+    and lock as given), optionally the way each lock's flat side faces (rings x locks
     x 3; by default away from the head), how much more softly than the rest its locks merge (``blend``), how blunt
-    their ends are (0 a point .. 1 cut square), how much their tips still merge (``merge``, 1 as much as the rest) and
-    whether they are cut off along the hairline (``cut``: the scalp's locks, not a tail hanging from them)."""
+    their ends are (0 a point .. 1 cut square), how much their tips still merge (``merge``, 1 as much as the rest),
+    whether they are cut off along the hairline (``cut``: the scalp's locks, not a tail hanging from them) and how
+    fine their tips may get (``tip``: 1 no finer than a rounded point a few millimetres across, less to a sharper one)."""
     P: np.ndarray
     width: np.ndarray
     thick: np.ndarray
@@ -43,6 +45,7 @@ class Strands:
     blunt: float = 0.0
     merge: float = 0.25
     cut: bool = False
+    tip: float = 1.0
 
 
 def _ss(a, b, x):
@@ -81,6 +84,7 @@ class Sculpt:
         self.k = blend
         self.k_hang = blend * 1.4 if groom.st.fall else blend
         self.seam = seam                # groove depth between clumps over the head, below it, and its reach
+        self.depth = 0.65 if groom.st.fall else 0.45     # how much of the thinner clump a groove may cut into
         self.reach = max(self.k_hang * 1.25 * max(p.blend for p in parts), seam[2])  # how far off a clump counts
         self.solids = list(solids)
         seg = {k: [] for k in ("a", "b", "Ba", "Bb", "Na", "Nb", "wa", "wb", "ha", "hb", "arc_a", "arc_b", "lock")}
@@ -102,9 +106,11 @@ class Sculpt:
                 np.broadcast_to(np.asarray(part.thick, dtype=F)[None, :], (K, n))
             w = W * 0.5 * (0.78 + 0.22 * _ss(0.0, 0.15, t)) * tip
             hh = H * 0.5 * (part.root + (1 - part.root) * _ss(0.0, 0.2, t)) * (1 - 0.2 * t) * np.sqrt(tip)
-            w = np.maximum(w, 0.0016)
-            rnd = part.round * _ss(0.0, 0.3, t)            # (flat where they root, lying close: no shell at the edge)
-            hh = np.maximum(np.minimum(np.maximum(hh, w * rnd), w), 0.0013)     # round in section toward the tip
+            fine = 1.0 - (1.0 - part.tip) * u              # (a sharper point needs a finer least size at the tip)
+            w = np.maximum(w, 0.0016 * fine)
+            # (flat where they root, lying close: no shell at the edge; or as the part sets it along its locks)
+            rnd = part.round * _ss(0.0, 0.3, t) if np.ndim(part.round) == 0 else np.asarray(part.round, dtype=F)
+            hh = np.maximum(np.minimum(np.maximum(hh, w * rnd), w), 0.0013 * fine)     # round in section toward the tip
             for i in range(n):
                 arc = np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(P[:, i], axis=0), axis=1))])
                 for key, arr in (("a", P[:-1, i]), ("b", P[1:, i]), ("Ba", B[:-1, i]), ("Bb", B[1:, i]), ("Na", N[:-1, i]),
@@ -252,7 +258,7 @@ class Sculpt:
                 # never deeper than the thinner of the two clumps can take, so no groove cuts through a thin sheet
                 # (only where the clumps make the surface: none in the even layer far over or between them)
                 cut[c:c + chunk] = np.minimum(self._groove(x) * np.clip((tk - 0.25) / 0.75, 0.0, 1.0),
-                                              0.45 * np.minimum(Hh[:, 0], Hh[:, 1])) * seam * _ss(0.003, 0.0, d0)
+                                              self.depth * np.minimum(Hh[:, 0], Hh[:, 1])) * seam * _ss(0.003, 0.0, d0)
         return out, cut
 
     def _groove(self, X):
@@ -277,9 +283,8 @@ class Sculpt:
             top = g.top(X)
             cov = cov * _ss(top + 0.015, top - 0.01, X[:, 2])
         k = _ss(0.05, 0.95, cov)
-        if not g.st.fall and g.tie is None:      # a cut tapers to the skin down the sideburns and over the nape
-            above = X[:, 2] - hairlines(X, g.part, g.sideburns)
-            k = k * (1.0 - 0.75 * _ss(0.03, 0.0, above) * _ss(0.06, 0.035, X[:, 1]))
+        if not g.st.fall and g.tie is None:      # a cut tapers to the skin over the nape (locks.Groom.taper)
+            k = k * g.taper(X, 0.8)
         # Deep under the skin round the ears, so none shows in the ear canal (long hair lies over them instead); not
         # over the top of the ear, where the hair passing above it would show a trough.
         ear = 0.0 if g.st.fall else (1.0 - ear_clears(X)) * _ss(0.026, 0.01, X[:, 2])
@@ -303,20 +308,10 @@ class Sculpt:
         hl = hairlines(x, g.part, g.sideburns) - x[:, 2]
         if g.tie is not None:        # (well inside the layer's edge, so the locks melt into it)
             return (hl + 0.01).astype(F), none
-        reach = 0.006 if g.st.mess > 0.2 else 0.002
+        reach = g.reach(x)                  # (locks.Groom.reach)
         front = 0.0 if g.under_hat else _ss(0.04, 0.065, x[:, 1])
         sink = 0.6 * np.maximum(hl + 0.004, 0.0) * (1.0 - front)
         return (hl - reach - 0.008 * front).astype(F), sink.astype(F)
-
-    def _envelope(self, x):
-        """How far off the skull a cut may stand: thinning to the skin toward the hairline at the sides and nape (a
-        taper, not a ledge; messy ends reach a little further) and lying close down the sideburns; the fringe free."""
-        g = self.g
-        above = x[:, 2] - hairlines(x, g.part, g.sideburns) + (0.006 if g.st.mess > 0.2 else 0.002)
-        env = 0.45 * np.maximum(above, 0.0) - 0.0008
-        side = 0.0028 + 0.35 * np.maximum(x[:, 2] - 0.008, 0.0) + 0.05 * _ss(-0.035, -0.05, x[:, 1])
-        front = 0.0 if g.under_hat else _ss(0.04, 0.065, x[:, 1])
-        return (np.minimum(env, side) + 0.05 * front).astype(F)
 
     def field(self, X):
         X = np.ascontiguousarray(X, dtype=F)
@@ -331,7 +326,7 @@ class Sculpt:
             base, k = self.base(x)
             d[near] = sdf.smin(d[near], skull - base, self.k)
             if not self.g.st.fall and self.g.tie is None:     # a cut tapers to the skin at its edge
-                env = self._envelope(x)
+                env = self.g.envelope(x)
                 dn = sdf.smax(d[near], skull - env, 0.003)
                 cut[near] *= 1 - 0.85 * _ss(-0.0025, -0.0002, skull - env - dn)
                 d[near] = dn
@@ -343,7 +338,14 @@ class Sculpt:
                     flat = self.g.head.shape.field(x, ears=False, face=False)
                     bare = flat + (skull - flat) * _ss(edge + 0.0015, edge - 0.007, x[:, 2])
                 lim = uh.rim_at(x) - 0.0015         # (a cap's shell, unlike a filled hat, may close in above its rim)
-                lim = (lim if uh.filled else np.minimum(lim, 0.0085)) + 0.6 * np.maximum(edge + 0.002 - x[:, 2], 0.0)
+                lim = lim if uh.filled else np.minimum(lim, 0.0085)
+                # Going up under the edge the clumps settle into an even layer as thick as there is room for inside
+                # the hat, rather than being pressed into it (which leaves a crumpled band just below the hat); not
+                # where there is room for barely any (a scarf tied close), which would leave a shell of slivers.
+                even = (_ss(edge - 0.011, edge + 0.002, x[:, 2]) * _ss(0.001, 0.003, lim - 0.004)).astype(F)
+                d[near] = d[near] * (1 - even) + (bare - (lim - 0.004)) * even
+                cut[near] *= 1 - even
+                lim = lim + 0.6 * np.maximum(edge + 0.002 - x[:, 2], 0.0)
                 lim = lim - 0.004 * _ss(edge - 0.001, edge + 0.003, x[:, 2])    # (and well clear of its wall inside it,
                 lim = (lim + _ss(edge - 0.015, edge - 0.035, x[:, 2])).astype(F)    # no slivers) (not the hair below)
                 dn = sdf.smax(d[near], bare - lim, 0.003)

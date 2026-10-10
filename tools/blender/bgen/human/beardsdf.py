@@ -9,6 +9,7 @@ import hashlib
 import numpy as np
 
 from . import fieldmesh, sdf
+from .beard import coverages
 
 F = np.float32
 FACE = ((-0.095, -0.035, -0.16), (0.095, 0.118, 0.0))      # where the layer over the skin can be
@@ -122,7 +123,7 @@ class Sculpt:
         long = b.st.length > 0.1
         h, target = (0.0011, 14000) if long else (0.0009, 10000 if self.bib is not None else 8000)
         shape = hashlib.sha1(b"".join(parts)).hexdigest()
-        key = ("beard", b.head.shape.key(), b.st, shape)
+        key = ("beard", b.head.shape.key(), b.st, b.hair, shape)
         sources = ("beardsdf.py", "beardlocks.py", "beardbib.py", "beard.py", "headshape.py", "earshape.py")
         bounds = (tuple(float(v) for v in lo), tuple(float(v) for v in hi))
         return fieldmesh.build(self.field, bounds, h, target, name, key, sources, "beard",
@@ -155,10 +156,13 @@ class Sculpt:
             across, crest = self.bib.across(X[bib])
             uvs[bib] = np.stack([-X[bib, 2] * 10.0, across * 8.0], 1)
             shade[bib] = 0.8 + 0.24 * crest
-        col = np.asarray(color, dtype=F)[None] * shade[:, None]
+        color = np.asarray(color, dtype=F)
+        col = color[None] * shade[:, None]
         cov = np.maximum(b.coverage(X), whisk)
-        near_skin = ~bib * (1.0 - _ss(0.05, 0.6, cov))           # thinning out: the skin shows through
-        col = col + (np.asarray(skin, dtype=F)[None] * 0.92 - col) * (near_skin * 0.75)[:, None]
+        near_skin = ~bib * (1.0 - _ss(0.05, 0.6, cov))           # thinning out: the skin shows through, as it is
+        roots = np.minimum(coverages(X, b.st) * 1.3, 1.0)[:, None] * 0.85      # painted there (paint: the beard's
+        ground = np.asarray(skin, dtype=F)[None] + (color * 0.72 - np.asarray(skin, dtype=F))[None] * roots   # roots)
+        col = col + (ground - col) * (near_skin * 0.75)[:, None]
         if hair is not None:          # up the sideburns into the head hair's colour
             up = _ss(-0.04, -0.016, X[:, 2]) * _ss(0.9, 1.2, np.arctan2(np.abs(X[:, 0]), X[:, 1]))
             col = col + (np.asarray(hair, dtype=F)[None] * shade[:, None] - col) * up[:, None]

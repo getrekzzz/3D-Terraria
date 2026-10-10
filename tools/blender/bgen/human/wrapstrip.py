@@ -72,6 +72,12 @@ class Surface:
             if ok.any():
                 R[:, k] = np.interp(np.arange(len(col)), np.flatnonzero(ok), col[ok])
         R = np.nan_to_num(R, nan=0.05)
+        if bridge:                               # a pit one sample across (a nostril) is spanned outright
+            Rp = np.concatenate([R[:, -2:-1], R, R[:, 1:2]], 1)
+            Rp = np.concatenate([Rp[:1], Rp, Rp[-1:]], 0)
+            ring = np.stack([Rp[1 + a:Rp.shape[0] - 1 + a, 1 + b:Rp.shape[1] - 1 + b]
+                             for a in (-1, 0, 1) for b in (-1, 0, 1) if a or b])
+            R = np.maximum(R, np.median(ring, axis=0))
         for _ in range(bridge):
             Rp = np.concatenate([R[:, -2:-1], R, R[:, 1:2]], 1)     # the seam at 0 / 2 pi wraps round
             Rp = np.concatenate([Rp[:1], Rp, Rp[-1:]], 0)

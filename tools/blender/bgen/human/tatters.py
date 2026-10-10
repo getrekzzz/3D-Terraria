@@ -20,6 +20,8 @@ from .tailoring import Limb, ss
 
 GRIME = np.array((0.8, 0.75, 0.66))       # the colour cloth is soiled toward round a tear (as a multiplier)
 HOLLOW = (0.16, 0.5)        # what shows through a hole, shaded: just inside the torn edge .. its middle
+SHADOW = (0.6, 6.0)         # .. and at most this bright for the cloth's brightness (in its shadow): edge .. middle
+FRAY = 0.14                 # how much lighter than the cloth its frayed threads may be (display values)
 LUM = np.array((0.2126, 0.7152, 0.0722))
 
 
@@ -211,7 +213,10 @@ class Tatters:
         cloth round a hole shades it, most just inside the torn edge (never lighter there than the cloth's own shadowed
         inside), so a hole reads as an opening into the clothes and not as a patch of the skin's colour. What lies
         under the cloth past the edge darkens too, as far as the skin kept round a hole reaches (it should never show),
-        so the hole stays dark seen through cloth that stands off the body, or where a bend lifts the skin into it."""
+        so the hole stays dark seen through cloth that stands off the body, or where a bend lifts the skin into it.
+        Under dark cloth it lies in the cloth's shadow: never more than a few times the cloth's own brightness and
+        darker than the cloth under the torn edge (``SHADOW``), so pale skin in a hole in a black robe reads as an
+        opening and not as a pale smudge."""
         me, s = body.data, self.s
         layer = me.color_attributes.get("Color")
         if layer is None or not self.holes[kind] or len(me.vertices) != len(self.X):
@@ -232,7 +237,11 @@ class Tatters:
         me.loops.foreach_get("vertex_index", idx)
         d, u = depth[idx], up[idx]
         mid = HOLLOW[1] - 0.15 * u
-        k = np.where(d > -0.1 * s, HOLLOW[0] + (mid - HOLLOW[0]) * ss(0.0, 0.012 * s * (1 + 0.7 * np.maximum(u, 0)), d), 1.0)
+        t = ss(0.0, 0.012 * s * (1 + 0.7 * np.maximum(u, 0)), d)      # (0 at the torn edge and under the cloth)
+        cloth = np.asarray(self.cloth(kind))
+        lum = np.where(cloth > 0.04045, ((cloth + 0.055) / 1.055) ** 2.4, cloth / 12.92) @ LUM    # (linear, as rgba)
+        most = lum * (SHADOW[0] + (SHADOW[1] - SHADOW[0]) * t) / np.maximum(rgba[:, :3] @ LUM, 1e-6)
+        k = np.where(d > -0.1 * s, np.minimum(HOLLOW[0] + (mid - HOLLOW[0]) * t, most), 1.0)
         rgba[:, :3] *= k[:, None]
         layer.data.foreach_set("color", rgba.ravel())
 
@@ -248,13 +257,14 @@ class Tatters:
         k, f = out["shade"], np.maximum(out["soft"], 0.0)
         self.edge = out["field"]
         # Soiled a little toward the tear, and at the very edge (teeth and all) the broken threads, faded paler and
-        # greyer than the cloth, so the edge reads as frayed cloth with a thickness and not as a stain or a burn.
+        # greyer than the cloth, so the edge reads as frayed cloth with a thickness and not as a stain or a burn (on
+        # dark cloth only a little paler: pale threads round a dark opening would read as a pale smudge).
         soil = (1.0 - ss(0.0, 0.03 * s, f)) ** 2
         rgb = k[:, None] * (1.0 - soil[:, None] * (1.0 - GRIME))
-        p = self.w.p
-        c = np.asarray(hex3(p.get("robe") if kind == "shirt" and p.get("robe") else p.get(kind, "#8a8070")))
+        c = np.asarray(self.cloth(kind))
         worn = c + (0.62 - c) * 0.5
         worn = worn + (worn @ LUM - worn) * 0.5
+        worn = worn * min(1.0, (c @ LUM + FRAY) / max(worn @ LUM, 1e-6))
         fray = 0.9 * (1.0 - ss(0.0, 0.006 * s, np.maximum(out["field"], 0.0))) ** 1.5
         rgb = rgb * (1.0 - fray[:, None]) + (worn / np.maximum(c, 0.03))[None, :] * fray[:, None]
         bm.normal_update()
@@ -264,6 +274,11 @@ class Tatters:
                 v.co += v.normal * d
         bm.normal_update()
         return rgb
+
+    def cloth(self, kind):
+        """Garment ``kind``'s colour (a robe's bodice is the robe)."""
+        p = self.w.p
+        return hex3(p.get("robe") if kind == "shirt" and p.get("robe") else p.get(kind, "#8a8070"))
 
     def keep(self, n):
         """Weights for the ``n`` vertices of the cloth just torn (low near the tears; see finishing.reduce), so

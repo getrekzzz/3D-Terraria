@@ -2,9 +2,9 @@
 trunk as wide as her hips comes down inside the robe to the floor, turns back and comes out from under the back of
 the hem, lying on the ground in a long S behind her and tapering to a tip that curls up off the floor. Its section is
 flattened with a broad pale belly crossed by scutes (facing forward on the trunk); the back carries a dark diamond
-chain. The robe's skirt hangs from her hips like a bell over the trunk (carried by the hips, as the trunk is, so in
-the walk her upper body strides while she glides and nothing passes through the cloth), and its hem is lifted where
-the body passes under it so the cloth drapes over it.
+chain. The robe's skirt hangs from her hips like a bell over the trunk down to just off the floor (carried by the hips,
+as the trunk is, so in the walk her upper body strides while she glides and nothing passes through the cloth), and its
+hem is lifted where the body passes under it so the cloth drapes over it.
 """
 import math
 
@@ -54,6 +54,7 @@ def tail(fr, body, p, garments=()):
     pale = tuple(c + (1 - c) * 0.6 for c in base)
     dark = tuple(c * 0.4 for c in base)
     skirts = _skirts(garments)
+    _let_down(fr, skirts)
     hem_z, hem_y = _hem(fr, skirts)
     cut = fr.j["hip.R"].z + 0.06 * s
     strip_covered(body, [lambda co: co.z < cut])          # no legs under the robe (nor hips that move with them)
@@ -120,6 +121,23 @@ def _hang_from_hips(o):
             o.vertex_groups.remove(g)
     hips = o.vertex_groups.get("hips") or o.vertex_groups.new(name="hips")
     hips.add(list(range(len(o.data.vertices))), 1.0, "REPLACE")
+
+
+def _let_down(fr, skirts):
+    """Lets the robe down to just off the floor (under a hem at the ankle the trunk's turn on the floor would show as a
+    bare lump between the hem and the ground): below the knee the cloth stretches down, the hem band moving whole."""
+    if not skirts:
+        return
+    s = fr.s
+    low = min(v.co.z for o in skirts for v in o.data.vertices)
+    drop = low - 0.022 * s
+    knee = fr.j["knee.R"].z
+    if drop <= 0 or low >= knee:
+        return
+    for o in skirts:
+        for v in o.data.vertices:
+            v.co.z -= drop * smooth(knee, low + 0.06 * s, v.co.z)
+        o.data.update()
 
 
 def _hips_carry(body, top, blend):

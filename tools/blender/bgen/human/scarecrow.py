@@ -1,8 +1,8 @@
 """A scarecrow (``sack``: the colour of the burlap sack it has for a head). The sack takes the place of the head and
 eyes: stuffed round and lumpy, tucked up under a wide hat, gathered into folds and tied round the neck with a rope,
 its ragged skirt below the tie lying over the collar. Two slanted holes are cut in it, black inside with an ember
-glowing deep in each (``eyes``), and its mouth is a crooked line stitched shut with coarse thread. Gloves are the
-skin (``skin``, ``nails``) and there are no brows (``brows: none``).
+glowing deep in each (``eyes``), and its mouth is a crooked line stitched shut with coarse thread. Its hands are
+straw and its clothes are stuffed lumpy (stuffing.py); there are no brows (``brows: none``).
 
 The rest of it: straw.py (straw sticking out of the cuffs, the trouser hems, the collar and a few holes, ``straw``),
 patches.py (square patches sewn over the clothes, ``patches``) and rope.py (a rope for a belt and for the tie,
@@ -162,10 +162,11 @@ def embers(head, field, color):
 def dress(fr, head, parts, p, worn, lookup):
     """Hook at the end of human.dress: the sack replaces the head and its eyes, straw, patches and a rope belt join
     the clothes (the leather belt goes). Returns the new list of worn objects."""
-    from . import patches, rope, straw
+    from . import patches, rope, straw, stuffing
     from .rig import head_weights
     tree, body_w = lookup
     cloth = {o.name.split(".")[0]: o for o in worn if o.type == "MESH"}
+    stuffing.lumps(fr, [cloth[k] for k in ("shirt", "pants", "coat") if k in cloth])
     under = [parts["body"]] + [o for o in worn if o.type == "MESH" and not o.name.startswith(("hat", "belt", "buckle"))]
     for o in [parts["head"]] + list(parts["eyes"]):
         bpy.data.objects.remove(o, do_unlink=True)
@@ -184,4 +185,7 @@ def dress(fr, head, parts, p, worn, lookup):
         extra += rope.belt(fr, p, [cloth[k] for k in ("shirt", "pants", "coat") if k in cloth], rope_color)
     extra += patches.sew(fr, cloth, p.get("patches"), lookup)
     extra += straw.stuff(fr, head, obj, cloth, p.get("straw", "#d8b45a"), lookup)
+    extra.append(stuffing.straw_hands(fr, parts, p.get("straw", "#d8b45a")))
+    if "shirt" in cloth:
+        extra.append(stuffing.cuff_ties(fr, cloth["shirt"], rope_color))
     return worn + extra

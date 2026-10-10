@@ -1,8 +1,9 @@
 """A ghost's hem (``wisps``: the colour the cloth fades to): the bottom of a robe's skirt fades from the cloth's own
 colour into a pale mist, and below its edge broad tongues of that mist hang on down the skirt's flare, overlapping,
 curved round it like the cloth, drifting back (longest behind) and rounding off into soft tips just off the ground,
-as if the figure drifted rather than walked (with ``feet: none`` it has no feet: no boots,
-and the legs end under the robe). The wisps follow the hem they hang from.
+as if the figure drifted rather than walked (with ``feet: none`` it has no feet: no boots and nothing of the legs
+under the robe, which the hips carry instead, so in the walk it glides while the upper body strides). The wisps follow
+the hem they hang from.
 """
 import math
 
@@ -11,19 +12,24 @@ import numpy as np
 from mathutils import Vector
 
 from .features import paint, spline, sweep
-from .garments import mesh_from, set_slot
+from .garments import mesh_from, set_slot, strip_covered
 from .head import smooth
 from .paint import hex3
 from .rig import read_weights, write_weights
 
 
-def wisps(fr, garments, p):
+def wisps(fr, garments, p, body=None):
     s = fr.s
     mist = hex3(p["wisps"])
     skirts = [o for o in garments if o.type == "MESH" and o.name.startswith("robe_skirt")]
     if not skirts:
         return []
     skirt = skirts[0]
+    if p.get("feet") == "none":    # nothing of the legs left under the robe (their cut ends showed under the hem)
+        if body is not None:
+            strip_covered(body, [lambda co: co.z < fr.j["knee.R"].z + 0.1 * s])      # (up into the gap above)
+        for o in skirts:
+            _glide(o)
     co = np.array([v.co[:] for v in skirt.data.vertices])
     bottom, top = co[:, 2].min(), co[:, 2].max()
     _fade(skirt, bottom, bottom + 0.5 * (top - bottom), mist)
@@ -86,6 +92,23 @@ def wisps(fr, garments, p):
         start = end
     write_weights(obj, out)
     return [obj]
+
+
+def _glide(o):
+    """The robe carried by the hips instead of the legs (their share handed to the hips; the waist's weights at its top
+    kept): there are no legs under it, and a stride would swing the hem and the wisps hanging from it out behind and
+    to the side, and turn them edge-on under it."""
+    legs = [g for g in o.vertex_groups if g.name.split(".")[0] in ("thigh", "shin", "foot", "toe")]
+    if not legs:
+        return
+    hips = o.vertex_groups.get("hips") or o.vertex_groups.new(name="hips")
+    index = {g.index for g in legs}
+    for v in o.data.vertices:
+        w = sum(g.weight for g in v.groups if g.group in index)
+        if w > 0:
+            hips.add([v.index], w, "ADD")
+    for g in legs:
+        o.vertex_groups.remove(g)
 
 
 def _fade(skirt, z0, z1, mist):

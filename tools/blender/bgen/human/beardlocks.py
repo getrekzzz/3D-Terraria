@@ -20,9 +20,10 @@ def _ss(a, b, x):
 
 
 class Beard:
-    def __init__(self, head, style, under=None, seed=1):
+    def __init__(self, head, style, under=None, seed=1, hair=True):
         self.head = head
         self.st = STYLES[style]
+        self.hair = hair                      # head hair for the sideburns to run up under (beard.coverages)
         shape = head.shape
         self.skin = lambda p: shape.field(p, ears=False)      # the face the beard lies on
         self.full = shape.field                               # with the ears, which nothing may cut into
@@ -55,7 +56,7 @@ class Beard:
     def coverage(self, X):
         """How much beard grows at each point (beard.coverages), up to the lips: bare over a lens round them, which
         narrows to a point at each corner of the mouth so the beard and the moustache close in on it."""
-        cov = coverages(X, self.st, mouth=False)
+        cov = coverages(X, self.st, mouth=False, hair=self.hair)
         zc, hw, hh = MOUTH
         lens = (np.abs(X[:, 0]) / hw + ((X[:, 2] - zc) / hh) ** 2 - 1.0) * 0.01
         return cov * (1 - (1 - _ss(0.0004, 0.006, lens)) * _ss(0.04, 0.06, X[:, 1]))

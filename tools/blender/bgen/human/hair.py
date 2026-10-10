@@ -44,11 +44,12 @@ def _pchip(xs, ys, x):
 def hairlines(q, part=0.0, sideburns=True):
     """Height (head-local z) of the hairline at the azimuth of each point: a forehead line that recedes a little at
     the temples, sideburns down in front of the ears, the line behind the ears and the nape. ``part`` (-1..1) lowers
-    the hairline on one side of the forehead for a fringe swept across from the parting."""
+    the hairline on one side of the forehead for a fringe swept across from the parting; ``sideburns`` is True for the
+    usual ones, False for none, or how low (head-local z) they run, as down into a beard."""
     q = _points(q)
     phi = np.arctan2(q[:, 0], q[:, 1])    # 0 front, +/-pi back; + toward the character's right
     a = np.abs(phi)
-    burn = -0.028 if sideburns else -0.006
+    burn = (-0.028 if isinstance(sideburns, bool) else float(sideburns)) if sideburns else -0.006
     zs = np.asarray((0.052, 0.054, 0.045, 0.031, 0.012, burn, burn - 0.004, -0.036, -0.056, -0.076))
     z = _pchip(HAIRLINE_A, zs, a)
     if part:                              # the swept side of the fringe falls lower over the forehead

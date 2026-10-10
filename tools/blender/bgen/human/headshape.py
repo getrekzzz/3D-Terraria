@@ -5,10 +5,11 @@ The skull and face masses (cranium, brow, cheekbones, cheeks, the lofted lower f
 age does to them are in faceforms.py; the nose and lips in nosemouth.py; creature faces (snout, tusks, ear openings) in
 creature.py; the ears in earshape.py. This module puts them together with the eyes and the neck: eyelids are a shell
 round each eyeball with an almond opening (margins, a crease above, a roll below, the caruncle in the inner corner),
-and the neck meets the jaw with a clean angle in front and widens behind into the base of the skull. Fine cuts (mouth
-line, nostrils, grooves) are placed on the surface the masses make, through anchors found by bisection. Women get larger
-eyes and a slimmer neck that slopes out behind into the collar; age adds bags under the eyes, hooded lids, a longer nose
-and ears and a heavier brow.
+and the neck meets the jaw with a clean angle in front and widens behind into the base of the skull (a big head's neck
+grows less than the head, so it stays narrower than the jaw). Fine cuts (mouth line, nostrils, grooves) are placed on
+the surface the masses make, through anchors found by bisection. Women get larger eyes and a slimmer neck that slopes
+out behind into the collar; age adds bags under the eyes, heavy hooded lids that cover the top of the iris, a longer
+nose and ears and a heavier brow.
 
 Creature parameters: noseWidth (1) spreads the nose wider and flatter, an ogre's; mouthWidth (1) widens the mouth
 into a grin, a goblin's; forehead (0..1) lowers and slopes the forehead (faceforms); underbite (0..1) carries the lower
@@ -38,6 +39,7 @@ class HeadShape:
         self.fem = 1.0 if frame.female else 0.0
         self.male = 1.0 - self.fem
         self.old = 1.0 if frame.old else 0.0
+        self.young = 1.0 if p.get("age") == "young" else 0.0      # (a young man's face is softer: faceforms)
         self.fat = frame.weight
         self.full = max(0.0, frame.weight - 0.45) / 0.55       # weight above average (0 .. 1) and below it
         self.lean = max(0.0, 0.45 - frame.weight) / 0.45
@@ -49,10 +51,12 @@ class HeadShape:
         k = eye_r / 0.0118
         self.u_in, self.u_out = -0.0128 * k, 0.0116 * k
         self.v_in, self.v_out = -0.0006 * k, (0.0011 + 0.0004 * self.fem) * k
-        self.lid_up, self.lid_down = (0.0037 - 0.0005 * self.old) * k, 0.0046 * k      # (heavier upper lids with age)
+        # (heavier upper lids with age, down over the top of the iris, and the lower lid a little higher: no stare)
+        self.lid_up, self.lid_down = (0.0037 - 0.001 * self.old) * k, (0.0046 - 0.0004 * self.old) * k
         bulk, fat = max(0.0, frame.build - 0.5) * 2.0, max(0.0, frame.weight - 0.45) / 0.55
+        hs = float(p.get("headSize", 1.0))      # (a big head's neck grows less than the head: narrower than its jaw)
         self.neck_r = ((0.0545 - 0.0045 * self.fem) * (0.82 + 0.36 * frame.build) ** 0.4 * (1.0 + 0.16 * fat + 0.08 * bulk)
-                       * (1.0 - 0.2 * float(p.get("snout", 0.0))) / float(p.get("headSize", 1.0)) ** 0.45)
+                       * (1.0 - 0.3 * float(p.get("snout", 0.0))) / hs ** (0.45 if hs <= 1.0 else 0.7))
         self.n = 0.9 if self.fem else 1.0            # nose scale: finer and shorter on women
         self.mouth_up = 0.0045 * self.fem            # a woman's mouth sits higher, under her shorter nose
         # Creature features (all 0, or 1 for the scales, on people): see human/__init__.py.
@@ -75,7 +79,7 @@ class HeadShape:
 
     def key(self):
         """Everything the shape depends on (heads with equal keys are identical)."""
-        key = (self.fem, self.old, round(float(self.fat), 4), round(float(self.neck_r), 5), round(float(self.R), 5),
+        key = (self.fem, self.old, self.young, round(float(self.fat), 4), round(float(self.neck_r), 5), round(float(self.R), 5),
                tuple(round(float(v), 5) for v in self.eyes[1]), self.brow, self.jaw, self.snout, self.forehead, self.nose_len, self.ear_spec,
                self.mouth_w, self.nose_w, self.underbite, self.tusks)
         key = key + ((self.monster, monsterface.digest()),) if self.monster else key
@@ -223,8 +227,11 @@ class HeadShape:
             neck = smin(neck, E_adam(p, r), 0.012)
         if fat > 0.55:          # a fuller throat under the chin
             neck = smin(neck, ellipsoid(p, (0, 0.036, -0.104), (0.03, 0.034, 0.016 + 0.02 * (fat - 0.55))), 0.014)
-        # The jaw line stays crisp in front; the nape blends wider into the skull.
-        k = (F(0.013 + 0.003 * fem + 0.006 * self.snout) + F(0.016) * np.clip((F(0.015) - p[:, 1]) / F(0.03), 0, 1)).astype(F) * F(1.25)
+        # The jaw line stays crisp in front (the throat under the chin a little softer, no notch); the nape blends wider
+        # into the skull.
+        throat = np.clip(F(1) - np.abs(p[:, 0]) / F(0.035), 0, 1) * np.clip((p[:, 1] - F(0.015)) / F(0.02), 0, 1)
+        k = (F(0.013 + 0.003 * fem + 0.006 * self.snout) + F(0.005 * male * (1 - self.snout)) * throat
+             + F(0.016 * (1 - 0.6 * self.snout)) * np.clip((F(0.015) - p[:, 1]) / F(0.03), 0, 1)).astype(F) * F(1.25)
         h = np.maximum(k - np.abs(d - neck), F(0)) / k
         return np.minimum(d, neck) - h * h * h * k / F(6.0)
 
@@ -242,7 +249,7 @@ class HeadShape:
             d = smin(d, self._lid_tube(p, -0.0052, Rs + 0.0004, 0.0013, sx, upper=False, span=(0.15, 0.95)), 0.0035)
             d = carve(d, self._lid_tube(p, -0.0078, Rs + 0.0012, 0.0005, sx, upper=False, span=(0.2, 0.92)), 0.002)
             # and the skin above the lid hangs over its crease, heaviest toward the outer corner
-            d = smin(d, self._lid_tube(p, 0.0062, Rs + 0.0011, 0.0016, sx, span=(0.3, 1.0)), 0.003)
+            d = smin(d, self._lid_tube(p, 0.006, Rs + 0.0012, 0.0019, sx, span=(0.25, 1.0)), 0.003)
         d = carve(d, self.opening(p, sx), 0.0006)
         d = carve(d, self._lid_tube(p, 0.0048 + 0.0008 * self.fem, Rs + 0.0006, 0.00085, sx, span=(0.12, 0.9)), 0.0014)  # crease
         return smin(d, self.caruncle(p, sx), 0.0008)
@@ -264,8 +271,8 @@ class HeadShape:
 
 
 def E_adam(p, neck_r):
-    """The larynx (Adam's apple) a third of the way down the front of a man's neck."""
-    return ellipsoid(p, (0, neck_r * 0.62, -0.135), (0.0065, 0.0062, 0.0105))
+    """The larynx (Adam's apple) a third of the way down the front of a man's neck, a low swelling (not a lump)."""
+    return ellipsoid(p, (0, neck_r * 0.6, -0.137), (0.0062, 0.0055, 0.0115))
 
 
 def mesh(shape, h_local=0.001, target=14000, name="head"):

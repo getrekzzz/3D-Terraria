@@ -26,7 +26,7 @@ UPPER = [(0.07, -0.032, 0.041, 0.04), (0.1, -0.035, 0.034, 0.033), (0.13, -0.037
 LOWER = [(0.035, -0.088, 0.04, 0.024), (0.06, -0.084, 0.035, 0.02), (0.09, -0.079, 0.029, 0.016), (0.125, -0.074, 0.022, 0.0125),
          (0.155, -0.07, 0.017, 0.0105), (0.18, -0.067, 0.0135, 0.009)]
 NOSE = ((0.0, 0.201, -0.029), (0.017, 0.0125, 0.0115))
-EAR = dict(root=(0.047, -0.016, 0.072), height=0.118, width=0.088, thick=0.013)     # thick: half, at the root
+EAR = dict(root=(0.047, -0.016, 0.072), height=0.118, width=0.088, thick=0.02)      # thick: half, at the root
 
 
 def ear_frame(sx):
@@ -148,7 +148,7 @@ class Muzzle:
         u, v, w = q @ up.astype(F), q @ across.astype(F), q @ face.astype(F)
         k = W / (2 * T)                          # how much flatter than round
         flat = np.stack([v, u, w * F(k)], 1)
-        d = round_cone(flat, (0.0, -0.012, 0.0), (0.0, H, 0.0), W / 2, 0.005) / F(k ** 0.5)
+        d = round_cone(flat, (0.0, -0.012, 0.0), (0.0, H, 0.0), W / 2, 0.01) / F(k ** 0.5)   # (a rounded tip)
         cup = ellipsoid(np.stack([v, u, w], 1), (0.0, H * 0.34, T * 1.2), (W * 0.24, H * 0.3, T * 0.85))
         return carve(d, cup, 0.005)
 

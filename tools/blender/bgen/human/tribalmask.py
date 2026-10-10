@@ -1,9 +1,10 @@
 """A carved wooden tribal mask (``tribalMask``: the wood's colour), sculpted as a distance field in head-local units
 like the head: a thick shell laid over the bare face (brow, cheekbones, jaw and chin without the soft features), so it
-sits on the face and follows it down to the chin, cut to a long shield from over the brow to a point at the chin. The
-carving rises out of the shell: a jutting ridge for a brow, a long straight nose, round eye holes in raised rims,
-cheek bosses and a wide open mouth in a raised ring. Painted in red, white and black over the wood: stripes up the
-forehead, white rings round the eyes, a white zigzag of teeth round the mouth and bars across the cheeks.
+sits on the face and follows it down to the chin, cut to a long shield from over the brow to a point at the chin (and
+not wrapping on under the jaw). The carving rises out of the shell: a jutting ridge for a brow, a long straight nose,
+round eye holes in raised rims, cheek bosses and a wide open mouth in a raised ring. Painted in red, white and black
+over the wood: stripes up the forehead, white rings round the eyes, a white zigzag of teeth round the mouth and bars
+across the cheeks.
 """
 import numpy as np
 
@@ -13,6 +14,7 @@ from .sdf import F, carve, ellipsoid, round_cone, smax, smin, sphere
 EYES = {sx: (sx * 0.031, -0.002) for sx in (1, -1)}             # (x, z) of the eye holes
 MOUTH_Z = -0.077
 CHIN = -0.126                                                   # the shield's point, at the chin
+UNDER = (-0.121, 0.7, 0.095)        # (z, slope, y) of the slanting cut that keeps it off the underside of the jaw
 BOUNDS = ((-0.085, -0.01, -0.15), (0.085, 0.15, 0.11))
 SHELL = (0.0035, 0.0095)                                        # inner and outer offsets from the bare face
 
@@ -51,6 +53,7 @@ def mask_field(shape):
         base = smin(base, round_cone(p, (0, 0.082, 0.03), (0, 0.108, -0.045), 0.006, 0.0105), 0.01)  # a long nose
         base = smin(base, ellipsoid(p, (0, 0.078, -0.072), (0.03, 0.026, 0.024)), 0.016)            # over the mouth
         cut = smax(outline(x, z), F(0.028) - y, 0.004)            # the shield, and only in front of the ears
+        cut = smax(cut, F(UNDER[0]) + F(UNDER[1]) * (F(UNDER[2]) - y) - z, 0.004)    # ending at the chin's point
         rim = np.clip(-cut / F(0.01), 0, 1)
         rim = rim * (F(2) - rim)                                  # 0 at the edge .. 1 inside: a rounded edge
         outer = base - F(SHELL[0]) - (F(SHELL[1] - SHELL[0]) + relief(x, z)) * rim

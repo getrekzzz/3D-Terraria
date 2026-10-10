@@ -20,11 +20,11 @@ from .sdf import F, carve, ellipsoid, round_cone, smax, smin
 STEP = 0.007                                    # the drape grid's spacing (head-local)
 LO, HI = (-0.25, -0.21, -0.37), (0.25, 0.19, -0.05)
 BOUNDS = ((-0.25, -0.21, -0.37), (0.25, 0.2, 0.15))
-THICK, ROLL = 0.0036, 0.0036                    # the cloth, and the radius of its rolled edges
-EAR_ROLL = 0.003                                # the rolled edge of the slit a creature's ear comes through
-SLIT_GAP, SLIT_STEP = 0.0058, 0.001             # how far the slit stands clear of the ear, and its outline's grid
+THICK, ROLL = 0.0036, 0.003                     # the cloth, and the radius of its rolled edges
+EAR_ROLL = 0.0022                               # the edge of the slit a creature's ear comes through (barely rolled)
+SLIT_GAP, SLIT_STEP = 0.0028, 0.001             # how far the slit stands clear of the ear, and its outline's grid
 # the opening's plane through its top and bottom, and its half-width at the cheekbones: a hood, and a deep one
-OPENING = {"": ((0.0, 0.13, 0.066), (0.0, 0.092, -0.112), 0.077), "deep": ((0.0, 0.168, 0.05), (0.0, 0.118, -0.118), 0.069)}
+OPENING = {"": ((0.0, 0.122, 0.066), (0.0, 0.09, -0.112), 0.077), "deep": ((0.0, 0.168, 0.05), (0.0, 0.118, -0.118), 0.069)}
 
 
 def drape(head, under):
@@ -62,15 +62,17 @@ def drape(head, under):
     return field, digest
 
 
-def _peak(p):
+def _peak(p, sz, k):
     """The back of the hood: the cloth leaves the back of the crown in a soft point and runs straight down to the
-    shoulders, bridging the hollow of the nape instead of following it."""
-    return round_cone(p * np.asarray((0.72, 1.0, 1.0), dtype=F), (0, -0.05, 0.074), (0, -0.045, -0.16), 0.046, 0.085)
+    shoulders (at ``sz``, ``k`` their breadth against a person's), bridging the hollow of the nape instead of
+    following it."""
+    return round_cone(p * np.asarray((0.72, 1.0, 1.0), dtype=F), (0, -0.05, 0.074), (0, -0.045, sz + 0.085),
+                      0.046, 0.085 * k)
 
 
 def _slit(hood, ear):
-    """The slit an ear comes out through, as a field (negative inside): where the ear crosses the cloth's mid-surface,
-    grown by SLIT_GAP, its outline found on a grid across the side of the hood, measured again as a distance across
+    """The slit an ear comes out through, as a field (negative inside): where the ear crosses the cloth's outer
+    surface (so the slit hugs the ear where it is seen, however slantwise the ear crosses), grown by SLIT_GAP, its outline found on a grid across the side of the hood, measured again as a distance across
     the cloth and blurred, so the slit's edge is a smooth line and its roll is even all round, however steeply or
     shallowly the ear crosses (the ear's own folds and a blade lying along the cloth would ripple a 3D distance)."""
     sx = 1.0 if ear.centre[0] > 0 else -1.0
@@ -79,9 +81,9 @@ def _slit(hood, ear):
     zs = np.arange(c[2] - 0.07, c[2] + 0.0705, SLIT_STEP, dtype=F)
     yy, zz = (a.ravel() for a in np.meshgrid(ys, zs, indexing="ij"))
     lo, hi = np.full(len(yy), F(0.03)), np.full(len(yy), F(0.22))
-    for _ in range(26):                                 # the mid-surface's |x| over each grid point
+    for _ in range(26):                                 # the outer surface's |x| over each grid point
         m = (lo + hi) * F(0.5)
-        inside = hood.volume(np.stack([m * F(sx), yy, zz], 1)) < F(THICK / 2)
+        inside = hood.volume(np.stack([m * F(sx), yy, zz], 1)) < F(THICK)
         lo, hi = np.where(inside, m, lo), np.where(inside, hi, m)
     depth = lo.reshape(len(ys), len(zs))
     room = hood.shape.ear_room(np.stack([lo * F(sx), yy, zz], 1), SLIT_GAP).reshape(depth.shape)
@@ -132,7 +134,8 @@ class Hood:
         self.shape, self.under = shape, under
         self.slits = None                              # (the ear slits, found on first use)
         sx, self.sz = shoulder                         # the shoulder joint, across and up (head-local)
-        self.turn_x = max(sx - 0.05, 0.125)            # where the hem turns up (never into the fall past a big head)
+        self.k = min(max(sx / 0.182, 0.6), 1.0)        # the shoulders' breadth against a person's (a goblin's: narrow)
+        self.turn_x = max(sx - 0.05, 0.125 * self.k ** 0.5)     # where the hem turns up (never into the fall)
         top, bottom, self.half_w = OPENING[style]
         self.deep = style == "deep"
         a, b = np.asarray(top), np.asarray(bottom)
@@ -167,13 +170,13 @@ class Hood:
         px, v, ahead = self.plane(p)
         tunnel = smax(np.maximum(self.rim(px, v, THICK), ahead - F(0.012)), -ahead - F(0.13), 0.03)
         vol = smin(vol, tunnel, 0.03)
-        vol = smin(vol, _peak(p), 0.03)                  # the point, a soft fullness behind the crown
+        vol = smin(vol, _peak(p, self.sz, self.k), 0.03)        # the point, a soft fullness behind the crown
         if self.shape.ear_spec == (1.0, 0.0, 0.0):              # (a person's ears stay under the cloth)
             for ear in self.shape.ears.values():
                 q = (p - ear.centre.astype(F)) @ ear.rot.astype(F)
                 vol = smin(vol, ellipsoid(q, (0, 0, 0.004), (0.026, 0.036, 0.016)), 0.02)
         wide = p * np.asarray((0.85, 1.0, 1.0), dtype=F)               # an oval fall, wider than deep
-        vol = smin(vol, round_cone(wide, (0, -0.015, -0.03), (0, -0.028, self.sz + 0.02), 0.082, 0.118), 0.035)
+        vol = smin(vol, round_cone(wide, (0, -0.015, -0.03), (0, -0.028, self.sz + 0.02), 0.082, 0.118 * self.k), 0.035)
         vol = smin(vol, self.under(p) - F(0.002), 0.03)
         return vol - self.folds(p)
 
@@ -187,13 +190,29 @@ class Hood:
         hang = (F(0.5) - F(0.5) * np.cos(F(2 * math.pi) * u)) ** F(0.8)
         hang = hang * (F(0.65) + F(0.35) * np.sin(np.mod(np.floor(u), F(7)) * F(2.7) + F(1.0)))   # (no step in front)
         front = _smooth(F(0.5 * math.pi), F(0.8 * math.pi), np.abs(ang))
-        down = _smooth(F(-0.05), F(-0.27), z) ** F(1.2) * (F(1) - F(0.45) * np.clip(np.cos(ang), 0, 1) ** 2)
+        down = _smooth(F(-0.05), F(self.sz - 0.025), z) ** F(1.2) * (F(1) - F(0.3) * np.clip(np.cos(ang), 0, 1) ** 2)
         swag = F(0)
         for zc, lift, w in ((-0.152, 0.04, 0.075), (-0.205, 0.075, 0.115)):      # two U-shaped swags, one under the other
             line = F(zc) + F(lift) * (x / F(w)) ** 2
             swag = swag + np.exp(-((z - line) / F(0.012)) ** 2) * _smooth(F(w + 0.01), F(w - 0.03), np.abs(x))
-        flat = F(1) - F(0.7) * np.sin(ang) ** 4 * _smooth(F(-0.17), F(-0.24), z)     # (cloth lying on the shoulders)
-        return F(0.016) * hang * down * flat * (F(1) - F(0.8) * front) + F(0.008) * swag * front
+        flat = F(1) - F(0.7) * np.sin(ang) ** 4 * _smooth(F(self.sz + 0.075), F(self.sz + 0.005), z)   # (on the shoulders)
+        return F(0.016) * hang * down * flat * (F(1) - F(0.8) * front) + F(0.008) * swag * front + self.drag(p)
+
+    def drag(self, p):
+        """Two soft folds the hood hangs in behind, running down and out from under its point toward the shoulder
+        blades (one a little longer than the other), fading in from nothing at each end."""
+        x, y, z = p[:, 0], p[:, 1], p[:, 2]
+        out = np.zeros(len(p), dtype=F)
+        for s, z0, x1, z1, amp in ((1.0, 0.004, 0.08, 0.035, 0.0048), (-1.0, -0.012, 0.07, 0.05, 0.0042)):
+            a = np.asarray((s * 0.026, z0), dtype=F)
+            b = np.asarray((s * x1 * self.k, self.sz + z1), dtype=F)
+            q = np.stack([x, z], 1) - a
+            ab = b - a
+            t = np.clip(q @ ab / F(ab @ ab), 0, 1)
+            d = np.linalg.norm(q - t[:, None] * ab, axis=1)
+            width = F(0.007) + F(0.009) * t
+            out = out + F(amp) * np.exp(-(d / width) ** 2) * np.clip(np.sin(F(math.pi) * t), 0, 1) ** F(0.8)
+        return out * _smooth(F(-0.03), F(-0.07), y)
 
     def opening(self, p):
         """The face opening (negative where cloth is cut away): ahead of the plane, within its outline."""
@@ -206,13 +225,15 @@ class Hood:
         from under it."""
         ang = np.arctan2(p[:, 0], -p[:, 1])
         side = np.abs(np.sin(ang))
-        over = np.maximum(np.abs(p[:, 0]) - F(self.turn_x), F(0))
-        return F(self.sz - 0.075) + F(0.08) * side ** 3 + F(0.006) * np.sin(ang * F(7.0) + F(0.5)) + F(2.0) * over
+        o = np.abs(p[:, 0]) - F(self.turn_x)
+        over = F(0.5) * (o + np.sqrt(o * o + F(0.018) ** 2))           # (a rounded turn, no corner at the shoulder)
+        return F(self.sz - 0.075) + F(0.08) * side ** 3 + F(0.006) * np.sin(ang * F(7.0) + F(0.5)) + F(1.6) * over
 
     def below(self, p):
         """How far ``p`` is below the hem, roughly a distance (the hem's slope up past the shoulders divided out)."""
-        over = np.abs(p[:, 0]) - F(self.turn_x)
-        return (self.hem_z(p) - p[:, 2]) / np.sqrt(F(1) + (F(2.0) * _smooth(F(-0.01), F(0.01), over)) ** 2)
+        o = np.abs(p[:, 0]) - F(self.turn_x)
+        slope = F(0.8) * (F(1) + o / np.sqrt(o * o + F(0.018) ** 2))
+        return (self.hem_z(p) - p[:, 2]) / np.sqrt(F(1) + slope * slope)
 
     def parts(self, p):
         vol = self.volume(p)

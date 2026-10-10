@@ -43,9 +43,9 @@ short legs under a goblin's big head) with separate eyeballs, brows and lashes; 
 with jointed fingers and nails; painted skin (lips, flush, knuckles, stubble); hair sculpted from traced locks into
 one surface with grooves between the clumps (`locks.py` traces where each lock roots and how it flows: a neat cut
 with a side-swept fringe, fuller on top and close at the sides and back, messy hair in flat, uneven locks, a woman's
-short hair as a chin-length bob; `hairsdf.py` blends them into lens-shaped clumps that stay full round bends and end
-in rounded or blunt tips, a cut tapering into the skin toward its edge at the sides and nape, with UVs along the
-flow, `hairpaint.py`; long hair falls over a smooth dome over each ear, `hair.py`, and with
+short hair as a chin-length bob, a buzz cut as a close crop, `crop.py`; `hairsdf.py` blends them into lens-shaped
+clumps that stay full round bends and end in rounded or blunt tips, a cut tapering into the skin toward its edge
+at the sides and nape, with UVs along the flow, `hairpaint.py`; long hair falls over a smooth dome over each ear, `hair.py`, and with
 ponytails hangs onto the shoulders, back and clothes, `longhair.py`, `hairdrape.py`, `hairtails.py`; buns are a
 rope coiled round a core; hair under a hat is pressed flat inside it, comes out from under its rim no thicker than
 the hat and is cut along the hat's own edge, `underhat.py`);
@@ -78,9 +78,11 @@ weighted to stay joined in every action, and dressed from a slim body when their
 of chipped, cracked blocks (`golem.py`), a gnarled wooden creature with fissured bark, twig fingers, branches and
 leaves (`woodfolk.py`, `twigs.py`), a gingerbread man with icing and gumdrops (`cookie.py`) and an empty suit of
 plate armour glowing inside (`plate.py`, `gauntlet.py`); a scarecrow has a stuffed burlap sack for a head, straw
-in its cuffs, collar and boots, patched clothes and a rope belt (`scarecrow.py`, `straw.py`, `patches.py`,
-`rope.py`). Params per character live in `assets.json` (documented at the top of
-`bgen/human/__init__.py`). They export rest-pose UVs and tangents for the character shader.
+in its cuffs, collar and boots, straw hands, clothes pushed out in stuffing lumps, patched clothes and a rope belt
+(`scarecrow.py`, `straw.py`, `stuffing.py`, `patches.py`, `rope.py`). A skeleton hoplite wears Greek bronze: a
+crested Corinthian helm, a muscled cuirass, leather pteruges, greaves and a round shield (`hoplite.py`,
+`corinthian.py`, `kit: hoplite`), and a goat-legged demon stands on cloven hooves (`hooves.py`, `feet: hooves`).
+Params per character live in `assets.json` (documented at the top of `bgen/human/__init__.py`). They export rest-pose UVs and tangents for the character shader.
 
 Machines and aliens (`human/scifi.py`, worn after the clothes) get a grey alien's or an insect's head with big
 glossy eyes and antennae (`alienhead.py`, on the head's distance field), armour plates over a body suit (`plates.py`

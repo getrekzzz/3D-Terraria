@@ -27,12 +27,12 @@ SHAPES = ("santa", "elf", "helmet", "greathelm", "bandana", "turban", "hardhat",
 BOUNDS = ((-0.17, -0.22, -0.25), (0.17, 0.2, 0.3))
 MIDDLE = -0.012                                  # the axis the bandana's edge is measured round
 BAND_T, BAND_THICK = 0.0085, 0.0026              # the bandana's outer surface off the skull, and its cloth
-KNOT = (0.004, -0.12, -0.024)
+KNOT = (0.004, -0.122, -0.026)
 # the tails: which side, their path from the knot (out, back in units of 0.012, down) and half-widths along it
-TAILS = ((1.0, ((0.004, 0.0, 0.0), (0.014, 0.25, 0.012), (0.021, 0.4, 0.032), (0.025, 0.45, 0.054),
-                (0.027, 0.42, 0.074)), (0.009, 0.0135, 0.013, 0.0095, 0.003)),
-         (-1.0, ((0.004, 0.0, 0.0), (0.013, 0.25, 0.011), (0.018, 0.38, 0.03), (0.021, 0.4, 0.05)),
-          (0.009, 0.013, 0.0105, 0.003)))
+TAILS = ((1.0, ((0.006, 0.0, 0.0), (0.017, 0.35, 0.014), (0.025, 0.55, 0.036), (0.03, 0.6, 0.062),
+                (0.033, 0.55, 0.088)), (0.012, 0.0185, 0.018, 0.0135, 0.0045)),
+         (-1.0, ((0.006, 0.0, 0.0), (0.016, 0.35, 0.013), (0.022, 0.5, 0.034), (0.026, 0.52, 0.06)),
+          (0.012, 0.018, 0.015, 0.0045)))
 
 
 def _fluff(p, amp, freq):
@@ -52,9 +52,10 @@ def _cap(p, fem, band=True):
     return carve(d, z - rim, 0.0012), base, rim, t
 
 
-def _ribbon(p, spine, widths, half, back=(0.0, -1.0, 0.0)):
+def _ribbon(p, spine, widths, half, back=(0.0, -1.0, 0.0), cup=0.0):
     """A thin strip of cloth along a polyline, ``half`` thick each side, its half-width ``widths`` at each point,
-    lying flat toward ``back``: a flattened tube (round-ended in its own plane, so its pieces join without gaps)."""
+    lying flat toward ``back``: a flattened tube (round-ended in its own plane, so its pieces join without gaps),
+    its edges curling ``cup`` back (cloth, not paper)."""
     out = None
     spine = [np.asarray(c, dtype=F) for c in spine]
     for i in range(len(spine) - 1):
@@ -68,8 +69,10 @@ def _ribbon(p, spine, widths, half, back=(0.0, -1.0, 0.0)):
         q = p - a
         t = np.clip(q @ d / F(length), 0, 1)
         q = q - (t * F(length))[:, None] * d
-        flat = np.hypot(q @ d, q @ w) - (F(widths[i]) + F(widths[i + 1] - widths[i]) * t)
-        dist = headwear._rounded(flat, np.abs(q @ n) - F(half), half * 0.8)
+        width = F(widths[i]) + F(widths[i + 1] - widths[i]) * t
+        flat = np.hypot(q @ d, q @ w) - width
+        bow = F(cup) * np.clip((q @ w) / np.maximum(width, F(1e-4)), -1.2, 1.2) ** 2
+        dist = headwear._rounded(flat, np.abs(q @ n + bow) - F(half), half * 0.8)
         out = dist if out is None else np.minimum(out, dist)
     return out
 
@@ -131,27 +134,29 @@ class CapShape:
         x, y, z = p[:, 0], p[:, 1], p[:, 2]
         base = _cranium(p, self.fem)
         ang = np.arctan2(x, y - F(MIDDLE))
-        edge = F(0.0115) + F(0.031) * np.cos(ang) - F(0.0125) * np.cos(F(2) * ang)
+        edge = F(0.0115) + F(0.031) * np.cos(ang) - F(0.0125) * np.cos(F(2) * ang) - F(0.005) * np.clip(np.cos(ang), 0, 1) ** 2
         edge = edge + F(0.0018) * np.sin(F(5) * ang + F(0.8)) + F(0.001) * np.sin(F(11) * ang + F(2.1))   # (cloth, not a rim)
         knot = np.asarray(KNOT, dtype=F)
         kq = p - knot
         kr = np.hypot(kq[:, 0], kq[:, 2])
-        near = _smooth(F(0.21), F(0.03), kr) * _smooth(F(0.008), F(0.024), kr) * _smooth(F(0.07), F(-0.01), y)
-        fan = np.arctan2(kq[:, 2], kq[:, 0]) * F(5.0) + F(0.4) + F(18.0) * kr
-        ridge = (F(0.5) + F(0.5) * np.cos(F(2) * fan)) ** 3                # folds drawn out from the knot
+        near = _smooth(F(0.2), F(0.02), kr) ** F(1.5) * _smooth(F(0.016), F(0.045), kr) * _smooth(F(0.08), F(-0.01), y)
+        fan = np.arctan2(kq[:, 2], kq[:, 0]) * F(4.0) + F(0.4) + F(14.0) * kr + F(0.5) * np.sin(F(40) * kr)
+        ridge = (F(0.5) + F(0.5) * np.cos(F(2) * fan)) ** 2                # folds drawn out from the knot
         soft = np.sin(x * F(60) + F(1.3)) * np.sin(y * F(45) - z * F(30)) * _smooth(F(0.0), F(0.06), z - edge)
         loose = _smooth(F(0.04), F(0.1), z) * _smooth(F(-0.06), F(0.04), y)    # (a little slack over the crown)
-        t = F(BAND_T) + F(0.004) * ridge * near + F(0.0012) * soft + F(0.0018) * loose
+        far = _smooth(F(0.24), F(0.1), kr) * _smooth(F(0.1), F(0.03), y) * _smooth(F(0.0), F(0.025), z - edge)
+        snug = _smooth(F(0.022), F(0.0), z - edge)                         # (pulled tight along its edge)
+        t = F(BAND_T) + (F(0.006) * near + F(0.003) * far) * ridge + F(0.0014) * soft + F(0.0022) * loose - F(0.0015) * snug
         mid = base - t + F(BAND_THICK / 2)
         below = edge - z
         cloth = carve(_shell(base, t, BAND_THICK, 0.001), -below, 0.001)
-        hem = np.sqrt((below + F(0.0016)) ** 2 + mid * mid) - F(0.0019)
-        tie = ellipsoid(p, KNOT, (0.0105, 0.0085, 0.0095)) - _fluff(p, 0.0006, 300)
-        for s in (-1.0, 1.0):
-            lobe = ellipsoid(p, (KNOT[0] + 0.011 * s, KNOT[1] + 0.003, KNOT[2] + 0.002), (0.009, 0.006, 0.0075))
-            tie = smin(tie, lobe, 0.003)
-        tails = [_ribbon(p, [(KNOT[0] + s * a, KNOT[1] - 0.002 - 0.012 * b, KNOT[2] - c) for a, b, c in path],
-                         widths, 0.0017) for s, path, widths in TAILS]
+        hem = np.sqrt((below + F(0.0012)) ** 2 + mid * mid) - F(0.0015)
+        tie = ellipsoid(p, KNOT, (0.0145, 0.0115, 0.0125)) - _fluff(p, 0.0008, 260)
+        for s, lift in ((-1.0, 0.003), (1.0, -0.001)):         # the two loops of the knot, not quite level
+            lobe = ellipsoid(p, (KNOT[0] + 0.016 * s, KNOT[1] + 0.004, KNOT[2] + lift), (0.0125, 0.0085, 0.0105))
+            tie = smin(tie, lobe, 0.004)
+        tails = [_ribbon(p, [(KNOT[0] + s * a, KNOT[1] - 0.004 - 0.012 * b, KNOT[2] - c) for a, b, c in path],
+                         widths, 0.002, cup=0.0035) for s, path, widths in TAILS]
         # the corner of the folded square hanging from under the knot over the nape
         u, v = x - F(KNOT[0]), F(KNOT[2] - 0.002) - z
         sheet = np.abs(y - F(KNOT[1] - 0.007) - F(0.06) * v * v) - F(0.0013)          # (bowing out a little)
@@ -235,7 +240,7 @@ def mesh(head, kind, shape, visor=True, under=(), skull=False):
         field, digest = hood.drape(head, under)
     cs = CapShape(shape, head.shape.fem, field, skull)
     key = ("capshape", shape, head.shape.fem, digest, skull)
-    target = {"santa": 13000, "elf": 11000, "helmet": 16000, "greathelm": 6500}.get(shape, 11000)
+    target = {"santa": 13000, "elf": 11000, "helmet": 16000, "greathelm": 6500, "bandana": 15000}.get(shape, 11000)
     sources = ("headwear.py", "capshapes.py", "helms.py")
 
     def seen(c):            # a greathelm's inside only round the eye slit and up from its foot: the head hides the rest

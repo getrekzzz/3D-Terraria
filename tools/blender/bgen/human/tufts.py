@@ -3,10 +3,12 @@ the flow), each rooted in the undercoat, laid along the flow following the surfa
 its tips, and split into three thin, rounded strands, so the coat reads as shaggy hair rather than scales or
 feathers. Two styles: ``tuft`` (short dense fur) tapers each strand to a point and fans them apart from the root
 (the middle one the longest, lying on top); ``lock`` (long shaggy hair) keeps the strands together down the clump as
-one lock, each rounding off at its tip, the side ones splaying a little apart there, and shades them soft (their
-normals leant toward the surface's, so their edges do not darken like blades). Built as one mesh with strand UVs
-(U along each tuft); each ring of a strand takes the bone weights of the skin under it, so a tuft bends with the
-skin it lies on (a lock over a shoulder follows the arm down instead of standing off where the arm swung away).
+one lock, full down its length and drawing to a point at its tip, the side ones splaying a little apart there. Both
+are shaded soft (their normals leant toward the surface's, so their edges do not darken like blades or chips) and
+darken toward their roots (deep in the coat), so overlapping tufts read as depth rather than as stacked shingles.
+Built as one mesh with strand UVs (U along each tuft); each ring of a strand takes the bone weights of the skin
+under it, so a tuft bends with the skin it lies on (a lock over a shoulder follows the arm down instead of standing
+off where the arm swung away).
 """
 import math
 
@@ -25,10 +27,10 @@ ARM = ("upper_arm", "forearm", "hand", "thumb", "index", "middle", "ring", "pink
 # surface's (0: its own; their undersides then face down) and how far it bends down under its weight (over a
 # shoulder's top and edge)
 STYLES = {
-    "tuft": dict(aspect=0.55, ts=(0.0, 0.45, 0.8), side=(0.0, 0.55), section=((1.0, 0.0), (0.0, 1.0), (-1.0, 0.0), (0.0, -0.6)),
-                 flat=0.5, widths=(0.66, 0.56), side_len=(0.6, 0.92), turn=0.4, soft=0.0, hang=0.0),
-    "lock": dict(aspect=0.42, ts=(0.0, 0.4, 0.7, 0.88), side=(0.0, 0.5, 0.84), section=((1.0, 0.0), (0.0, 1.0), (-1.0, 0.0)),
-                 flat=0.6, widths=(0.55, 0.45), side_len=(0.75, 0.95), turn=0.2, soft=2.0, hang=0.6),
+    "tuft": dict(aspect=0.55, ts=(0.0, 0.45, 0.8), side=(0.0, 0.55), section=((1.0, 0.0), (0.0, 1.0), (-1.0, 0.0)),
+                 flat=0.5, widths=(0.66, 0.56), side_len=(0.6, 0.92), turn=0.4, soft=1.0, hang=0.0),
+    "lock": dict(aspect=0.42, ts=(0.0, 0.3, 0.55, 0.75, 0.9), side=(0.0, 0.45, 0.8), section=((1.0, 0.0), (0.0, 1.0), (-1.0, 0.0)),
+                 flat=0.6, widths=(0.55, 0.45), side_len=(0.75, 0.95), turn=0.2, soft=1.4, hang=0.6),
 }
 
 
@@ -111,15 +113,17 @@ def _space(P, R, order):
 
 
 def build(name, V, T, N, W, flow, L, shell, tone, lift, seed=1, min_len=None, slot="char:hair", spacing=0.62,
-          max_width=None, style="tuft"):
+          max_width=None, style="tuft", aspect=None):
     """Tufts over the surface (V, T) with normals N, per-vertex weights W, fur direction ``flow``, tuft length L,
     undercoat height ``shell`` and colour ``tone`` (per vertex); ``lift`` raises the tips; long tufts are no wider than
-    ``max_width`` (locks, not cards); ``style`` is a key of STYLES. Returns an object or None."""
-    out = arrays(V, T, N, W, flow, L, shell, tone, lift, seed, min_len, spacing, max_width, style)
+    ``max_width`` (locks, not cards); ``style`` is a key of STYLES (``aspect``: its width / length, if not the style's).
+    Returns an object or None."""
+    out = arrays(V, T, N, W, flow, L, shell, tone, lift, seed, min_len, spacing, max_width, style, aspect)
     return None if out is None else make_mesh(name, *out[:2], out[2], slot, out[4], out[3], normals=out[5])
 
 
-def arrays(V, T, N, W, flow, L, shell, tone, lift, seed=1, min_len=None, spacing=0.62, max_width=None, style="tuft"):
+def arrays(V, T, N, W, flow, L, shell, tone, lift, seed=1, min_len=None, spacing=0.62, max_width=None, style="tuft",
+           aspect=None):
     """The tufts as (verts, triangles, colours, uvs and weights per vertex, normals per face corner or None), or None
     (see build)."""
     st = STYLES[style]
@@ -139,7 +143,7 @@ def arrays(V, T, N, W, flow, L, shell, tone, lift, seed=1, min_len=None, spacing
     length = np.einsum("ij,ij->i", bary, L[corners])
     good = length > min_len * 0.8
     P, n, length, tri, bary, corners = P[good], n[good], length[good], tri[good], bary[good], corners[good]
-    width = st["aspect"] * length
+    width = (st["aspect"] if aspect is None else aspect) * length
     width = width if max_width is None else np.minimum(width, max_width)
     keep = _space(P, spacing * width, rng.permutation(len(P)))
     P, n, length, width, bary, corners = P[keep], n[keep], length[keep], width[keep], bary[keep], corners[keep]
@@ -224,7 +228,7 @@ def arrays(V, T, N, W, flow, L, shell, tone, lift, seed=1, min_len=None, spacing
         return arr[rows, i0] * (1 - a) + arr[rows, i0 + 1] * a
 
     # each clump splits into strands: pointed ones fanning a little apart toward their tips (the middle one longest,
-    # on top; the shorter side strands with a ring fewer), or a lock's lying together and rounding off at their tips
+    # on top; the shorter side strands with a ring fewer), or a lock's lying together and drawing to points at its tip
     lock = style == "lock"
     section, flat = st["section"], st["flat"]
     sides = len(section)
@@ -259,21 +263,21 @@ def arrays(V, T, N, W, flow, L, shell, tone, lift, seed=1, min_len=None, spacing
             ring_w[:, gstart[q] + k] = at(SW, tt)
             grp[o + k * sides:o + (k + 1) * sides] = gstart[q] + k
             if lock:                                           # full down the lock, rounding off toward the tip
-                prof = (0.75 + 0.25 * math.sin(min(t / 0.4, 1.0) * math.pi / 2)) * (1.0 - 0.45 * ss(0.55, 0.95, t))
+                prof = (0.8 + 0.2 * math.sin(min(t / 0.3, 1.0) * math.pi / 2)) * (1.0 - 0.72 * ss(0.3, 1.0, t))
             else:
                 prof = (0.85 + 0.15 * math.sin(min(t / 0.3, 1.0) * math.pi / 2)) * (1 - 0.8 * t ** 1.5)
             half = 0.5 * sw * prof
             for j, (sx, sy) in enumerate(section):
                 idx = o + k * sides + j
                 verts[:, idx] = c + sd * (sx * half)[:, None] + u * (sy * half * flat)[:, None]
-                colors[:, idx] = tone_q * (0.86 + 0.2 * t ** 0.8)
+                colors[:, idx] = tone_q * (0.68 + 0.38 * t ** 0.7)      # dark at the root, deep in the coat
                 uvs[:, idx] = np.stack([length * tt * 6.0, np.full(m, j / sides * 0.6)], 1)
                 norms[:, idx] = sd * sx + u * sy + u * st["soft"]
                 unders[:, idx] = sd * (0.4 * sx) - u
-            if k == len(ts) - 1:                               # the tip: a round cap on the last ring, or a point
+            if k == len(ts) - 1:                               # the tip: a point beyond the last ring
                 if lock:
                     tg = at(tang, tt)
-                    verts[:, tip] = c + tg * (half * 1.1)[:, None]
+                    verts[:, tip] = at(C, lf) + at(side, lf) * (width * lane * 0.26 + width * fan)[:, None] + at(up, lf) * drop[:, None]
                     norms[:, tip] = tg + u * st["soft"]
                     unders[:, tip] = tg - u
                 else:

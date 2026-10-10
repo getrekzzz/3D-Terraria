@@ -39,7 +39,11 @@ def clothe(frame, head, arm, p, bones):
         fingers = [b.name for b in arm.data.bones if b.name.split(".")[0] in frame_mod.FINGERS]
         rig.heat_weights(body, arm, drop=fingers + ["root"])
         rig.clean_limb_weights(body, arm, frame)
+        lookup = rig.body_lookup(body)          # (before dress strips what the clothes cover)
         out = dress(frame, _Neckless(head), {"body": body, "head": None}, {k: v for k, v in p.items() if k != "mask"})
+        for o in out:           # a hood's cowl follows the shoulders it lies on, not the head (as on a person)
+            if o.name.startswith("hat_hood"):
+                rig.head_weights(o, head, *lookup, torso_only=True)
         skin = skelfit.world(body, "co")         # what the clothes leave of the body (dress strips the rest)
         _remove(body)
         worn = [o for o in out if o.name.split(".")[0] not in LOOSE and not o.name.startswith("hat_")]
