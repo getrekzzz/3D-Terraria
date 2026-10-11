@@ -511,7 +511,8 @@ clear
 heal
 pickups always
 hurt 50
-assert player.life <= 50
+# (natural regeneration can add a point in the frame before the check)
+assert player.life <= 51
 spawn green_slime 1 2
 ai off
 slay green_slime
