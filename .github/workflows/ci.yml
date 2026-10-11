@@ -3,17 +3,24 @@ name: CI
 # This repo is private, so every job draws on the account's free Actions minutes (2,000 a month,
 # reset on the 1st; Windows minutes cost double). When they run out, every job fails within seconds
 # without a runner. Where each check runs, with rough billed minutes:
-#   pull request (any base), draft          -> Core tests (ubuntu-latest)                          ~10 per push
-#   pull request (any base), ready          -> + Godot smoke test                                  ~25 per push
-#   push to main                            -> Core tests (ubuntu + windows) + Godot smoke test    ~50 per push
-#   1st of each month                       -> everything, including the Screenshot tour          ~150
-#   Run workflow (Actions tab, any branch)  -> Core tests (ubuntu + windows) + Godot smoke test; tick the box for the tour
-# Keep PRs as drafts while iterating and mark them ready when you want the smoke test. Pushes to
-# branches without a PR, and PRs touching only docs, run nothing. Ready PRs that touch world
-# generation or content also get the Windows determinism check in windows-pr.yml.
+#   pull request (any base), draft          -> Core tests (ubuntu-latest)                               ~10 per push
+#   pull request (any base), ready          -> + Godot smoke test + Windows world generation,
+#                                              determinism, content and save tests                      ~40 per push
+#   push to main                            -> Core tests (ubuntu + full windows) + Godot smoke test    ~50 per push
+#   1st of each month                       -> everything, including the Screenshot tour               ~140-200
+#   Run workflow (Actions tab, any branch)  -> as main (~50); tick the box to add the tour (~170)
+# Keep PRs as drafts while iterating, mark them ready for the full check, and wait for it to pass
+# before merging: nothing is required, and a PR merged as soon as it opens is only checked on main.
+# Nothing runs for pushes to branches without a PR, for docs-only changes, or for a PR with merge
+# conflicts until they are resolved; use Run workflow to check such a branch. The full Windows suite
+# and the Windows build of the game and tools run only on main, monthly and on demand.
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - 'LICENSE'
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths-ignore:
@@ -29,10 +36,11 @@ on:
         type: boolean
         default: false
 
-# A new push to a PR cancels the run it replaces. Every other run has a group of its own.
+# A new push to a PR, or to main, cancels the run it replaces (so a burst of merges tests only the
+# last). Monthly and manual runs each have a group of their own and are never cancelled.
 concurrency:
-  group: ci-${{ github.event.pull_request.number && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ci-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.event_name == 'push' && github.ref || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
 
 permissions:
   contents: read
@@ -74,11 +82,13 @@ jobs:
           python3 tools/textures/icon_mipmaps.py --check
           dotnet run --project tools/Strata.Tools -c Debug --no-build -- coverage | tee coverage.md >> "$GITHUB_STEP_SUMMARY"
 
-  # Cross-OS determinism (golden chunk hashes) and line endings. Its own job, so a Windows-only
-  # failure doesn't skip the smoke test or the tour.
+  # Golden chunk hashes must match on Linux and Windows (docs/CONVENTIONS.md, "Determinism"). Ready
+  # PRs run the tests that guard that, plus content loading and saves; main, monthly and manual runs
+  # build everything and run the full suite. Its own job, so a Windows-only failure doesn't skip the
+  # smoke test or the tour.
   core-windows:
     name: Core tests (windows-latest)
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
@@ -87,9 +97,14 @@ jobs:
         with:
           dotnet-version: 8.0.x
       - name: Build
+        if: github.event_name != 'pull_request'
         run: dotnet build Strata.sln -c Debug
       - name: Test
+        if: github.event_name != 'pull_request'
         run: dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj -c Debug --no-build --logger "console;verbosity=normal"
+      - name: Test world generation, determinism, content and saves
+        if: github.event_name == 'pull_request'
+        run: dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj -c Debug --logger "console;verbosity=normal" --filter "FullyQualifiedName~Strata.Core.Tests.WorldGen|FullyQualifiedName~Strata.Core.Tests.Determinism|FullyQualifiedName~Strata.Core.Tests.Content|FullyQualifiedName~Strata.Core.Tests.Persistence"
 
   engine-smoke:
     name: Godot smoke test
