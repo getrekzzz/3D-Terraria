@@ -1,0 +1,42 @@
+name: Windows (PR)
+
+# Golden chunk hashes must match on Linux and Windows (docs/CONVENTIONS.md, "Determinism"), and
+# content files must load the same with either line ending. CI runs the full suite on Windows only
+# on main, so ready PRs that touch generation or content get this narrower Windows check first.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'src/Strata.Core/WorldGen/**'
+      - 'src/Strata.Core/Determinism/**'
+      - 'src/Strata.Core/ThirdParty/**'
+      - 'src/Strata.Core/Content/**'
+      - 'data/**'
+      - 'tests/Strata.Core.Tests/WorldGen/**'
+      - 'tests/Strata.Core.Tests/Determinism/**'
+      - 'tests/Strata.Core.Tests/Content/**'
+
+concurrency:
+  group: windows-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+
+jobs:
+  determinism:
+    name: Determinism and content (windows-latest)
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Test
+        run: dotnet test tests/Strata.Core.Tests/Strata.Core.Tests.csproj -c Debug --logger "console;verbosity=normal" --filter "FullyQualifiedName~Strata.Core.Tests.WorldGen|FullyQualifiedName~Strata.Core.Tests.Determinism|FullyQualifiedName~Strata.Core.Tests.Content"
