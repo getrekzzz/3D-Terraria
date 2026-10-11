@@ -186,7 +186,8 @@ assert errors == 0
 # selected); the drink floats over the head as "Used Lesser Healing Potion".
 give lesser_healing_potion 2
 hurt 50
-assert player.life <= 50
+# (natural regeneration can add a point in the frame before the check)
+assert player.life <= 51
 press quick_heal
 wait 0.1
 press quick_heal off
