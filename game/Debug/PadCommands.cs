@@ -85,7 +85,7 @@ public static class PadCommands
     {
         if (pressed) Held.Add(index);
         else Held.Remove(index);
-        return new InputEventJoypadButton { Device = 0, ButtonIndex = (JoyButton)index, Pressed = pressed, Pressure = pressed ? 1f : 0f };
+        return new InputEventJoypadButton { Device = 0, ButtonIndex = (JoyButton)index, Pressed = pressed };
     }
 
     private static InputEventJoypadMotion Motion(int axis, float value) => new() { Device = 0, Axis = (JoyAxis)axis, AxisValue = value };

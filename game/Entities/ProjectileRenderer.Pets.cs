@@ -26,7 +26,7 @@ public sealed partial class ProjectileRenderer
     /// A few times a second, rebuilds a projectile drawn with the glow fallback once its model has loaded, so long-lived
     /// ones (pets, minions) do not stay a glow. Returns true with the new node (not yet added) when it was swapped.
     /// </summary>
-    private bool RetryModel(Projectile p, ref Node3D? node)
+    private bool RetryModel(Projectile p, ref Node3D node)
     {
         if (!_retryNow) return false;
         _awaiting.Remove(p.Id);
@@ -37,7 +37,7 @@ public sealed partial class ProjectileRenderer
             return false;
         }
         if (Poolable(p)) _pooledType[fresh] = p.Def.Id; // the finished model may go back to the pool
-        node?.QueueFree();
+        node.QueueFree();
         _petAnims.Remove(p.Id);
         node = fresh;
         return true;

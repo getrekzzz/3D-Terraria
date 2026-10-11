@@ -39,7 +39,7 @@ public sealed partial class MapMarkerLayer : Control
     {
         _markers.Clear();
         _map.Markers?.Invoke(_markers);
-        foreach (var m in _markers) Draw(m);
+        foreach (var m in _markers) DrawMarker(m);
         Hovered = null;
         if (!_map.Interactive || !_map.HasMouse) return;
         var mouse = _map.Mouse;
@@ -63,7 +63,7 @@ public sealed partial class MapMarkerLayer : Control
         return new Rect2(p - new Vector2(half, half), new Vector2(half, half) * 2);
     }
 
-    private void Draw(MapMarker m)
+    private void DrawMarker(MapMarker m)
     {
         var p = _map.ToScreen(m.At);
         if (m.Icon != null)

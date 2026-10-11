@@ -76,7 +76,7 @@ public partial class LoadingTips : CanvasLayer
             if (_cover.Visible && (_tipLeft -= delta) <= 0) NextTip();
             return;
         }
-        if (_cover.Visible && !_hiding) Hide();
+        if (_cover.Visible && !_hiding) HideCover();
         _frozen = 0;
     }
 
@@ -102,7 +102,7 @@ public partial class LoadingTips : CanvasLayer
         _next = (_next + 1) % _tips.Length;
     }
 
-    private void Hide()
+    private void HideCover()
     {
         _hiding = true;
         _tween?.Kill();

@@ -39,6 +39,10 @@ world events and a world that transforms as you progress.
 2. Open `project.godot` in Godot and press Play (F5), or from a terminal: `godot --path .`. Open the project in the editor
    once after every download (or run `godot --headless --path . --import`) so new sounds, models and textures are
    imported; a terminal start does not import anything.
+3. To update, `git pull`. A downloaded ZIP goes into an empty folder, not over the old copy: files the project has
+   since deleted would stay behind and break the C# build (a leftover `game/Audio/AmbienceDirector.cs` stops it with
+   `'AudioDiagnostics' does not contain a definition for 'AmbientDirectory'`). Worlds, characters and settings live
+   in `%APPDATA%\Godot\app_userdata\Strata`, not in the project folder, so nothing is lost.
 
 **No sound?** Settings → Audio → *Test sound* plays a chime made by the game itself, then a game sound, and shows the
 driver, output device and how many sound files loaded (the console `audio`, `audio test`, `audio files` and
